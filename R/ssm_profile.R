@@ -110,6 +110,7 @@ ssm_profile2 <- function(data, groups, scales, angles, bs_number = 2000) {
   ssm_gd$d <- wd(ssm_g1, ssm_g2)
   # Perform bootstrapping on SSM parameters
   bs_function <- function(data, index, angles) {
+    #TODO: Need to change this to filter by group and then computer differences
     resample <- data[index, ]
     scores_rs <- colMeans(resample)
     ssm_rs <- ssm_parameters(scores_rs, angles)
