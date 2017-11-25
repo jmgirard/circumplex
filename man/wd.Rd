@@ -7,9 +7,7 @@
 wd(w1, w2)
 }
 \arguments{
-\item{w1}{Angular displacement one.}
-
-\item{w2}{Angular displacement two.}
+\item{w1, w2}{Angular displacements (numeric).}
 }
 \value{
 Difference between \code{w1} and \code{w2} in circular space.

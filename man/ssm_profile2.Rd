@@ -10,16 +10,19 @@ ssm_profile2(data, groups, scales, angles, bs_number = 2000)
 \item{data}{A matrix or data frame containing circumplex scales and group
 membership.}
 
-\item{scales}{A vector that contains the column numbers or names in
-\code{data} that contain the circumplex scales.}
+\item{scales}{A vector that contains the column names in \code{data} that
+correspond to scores on each circumplex scale. Be sure to enter the names
+as is (i.e., not as strings or a character vector). For convenience,
+consecutive columns can be captured using a colon (e.g., \code{x1:x8}).}
 
 \item{angles}{A vector of angles, in degrees, of the circumplex scales.}
 
 \item{bs_number}{The number of bootstrap resamples (default = 2000).}
 
-\item{group}{The column number or name in \code{data} that contains the
-grouping variable. This variable can be a factor with two levels or a
-numeric or character variable with two unique values.}
+\item{group}{The column name in \code{data} that specifies each observation's
+group. Be sure to enter the name as is (i.e., not as a string or number).
+This variable can be a factor with two levels or a numeric or character
+variable with two unique values.}
 }
 \value{
 A tibble (data frame) containing estimates and bootstrapped 95\%
@@ -31,21 +34,5 @@ Calculate SSM parameters with bootstrapped confidence intervals for the mean
 profile of two groups in a sample and their difference.
 }
 \examples{
-# Enter scales using column numbers in a continuous range
-ssm_profile2(wright2009, 1:8, octants)
-
-# Enter scales using column numbers in a discontinuous set
-ssm_profile2(wright2009, c(1,3,5,7), poles)
-
-# Enter scales using column names in a continuous range
-ssm_profile2(wright2009, PA:NO, octants)
-
-# Enter scales using column names in a discontinuous set
-ssm_profile2(wright2009, c(BC, FG, JK, NO), quadrants)
-
-# Enter angles using a vector of numbers
-ssm_profile2(wright2009, c(BC, FG, JK, NO), c(90, 180, 270, 360))
-
-# Change the number of bootstrap resamples
-ssm_profile2(wright2009, 1:8, octants, 3000)
+ssm_profile2(girard2017, isFemale, ZPA:ZNO, octants, 2000)
 }
