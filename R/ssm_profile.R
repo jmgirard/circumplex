@@ -92,52 +92,60 @@ ssm_profile <- function(data, scales, angles, bs_number = 2000) {
 #' ssm_profile2(girard2017, isFemale, ZPA:ZNO, octants, 2000)
 
 ssm_profile2 <- function(data, groups, scales, angles, bs_number = 2000) {
-  # Split the data by group
+  # Select variables using tidyverse style NSE
   groups <- enquo(groups)
   scales <- enquo(scales)
-  data_use <- data %>% select(!!groups, !!scales) %>% mutate(group = factor(!!groups)) %>% select(-!!groups)
-  if (nlevels(data_use$group) != 2) {
-    return("Error: The number of unique groups must equal 2.")
-  }
-  data_g1 <- data_use %>% filter(group == levels(group)[[1]]) %>% select(-group) 
-  data_g2 <- data_use %>% filter(group == levels(group)[[2]]) %>% select(-group)
-  # Get estimates for SSM parameters
-  scores_g1 <- colMeans(data_g1)
-  scores_g2 <- colMeans(data_g2)
-  ssm_g1 <- ssm_parameters(scores_g1, angles)
-  ssm_g2 <- ssm_parameters(scores_g2, angles)
+  data_use <- data %>% 
+    select(!!groups, !!scales) %>% 
+    mutate(group = factor(!!groups)) %>% 
+    select(-!!groups)
+  # Abort if the number of levels is not 2
+  stopifnot(nlevels(data_use$group) == 2)
+  # Get SSM estimates in each group and their difference
+  scores <- data_use %>% group_by(group) %>% summarize_all(mean)
+  ssm_g1 <- ssm_parameters(as.double(scores[1, 2:ncol(scores)]), angles)
+  ssm_g2 <- ssm_parameters(as.double(scores[2, 2:ncol(scores)]), angles)
   ssm_gd <- ssm_g1 - ssm_g2
-  ssm_gd$d <- wd(ssm_g1, ssm_g2)
+  ssm_gd["d"] <- wd(ssm_g1["d"], ssm_g2["d"])
   # Perform bootstrapping on SSM parameters
   bs_function <- function(data, index, angles) {
-    #TODO: Need to change this to filter by group and then computer differences
     resample <- data[index, ]
-    scores_rs <- colMeans(resample)
-    ssm_rs <- ssm_parameters(scores_rs, angles)
+    scores <- resample %>% group_by(group) %>% summarize_all(mean)
+    ssm_g1 <- ssm_parameters(as.double(scores[1, 2:ncol(scores)]), angles)
+    ssm_g2 <- ssm_parameters(as.double(scores[2, 2:ncol(scores)]), angles)
+    ssm_gd <- ssm_g1 - ssm_g2
+    ssm_gd["d"] <- wd(ssm_g1["d"], ssm_g2["d"])
+    ssm_rs <- c(
+      e1 = ssm_g1["e"], x1 = ssm_g1["x"], y1 = ssm_g1["y"],
+      a1 = ssm_g1["a"], d1 = ssm_g1["d"], fit1 = ssm_g1["fit"],
+      e2 = ssm_g2["e"], x2 = ssm_g2["x"], y2 = ssm_g2["y"],
+      a2 = ssm_g2["a"], d2 = ssm_g2["d"], fit2 = ssm_g2["fit"],
+      ed = ssm_gd["e"], xd = ssm_gd["x"], yd = ssm_gd["y"],
+      ad = ssm_gd["a"], dd = ssm_gd["d"], fitd = ssm_gd["fit"]
+    )
     return(ssm_rs)
   }
   bs_results <- boot(
-    data = select(data, scales),
+    data = data_use,
     statistic = bs_function, 
     R = bs_number,
-    angles = angles
+    angles = angles,
+    strata = data_use$group
   )
   # Prepare bootstrap results to calculate quantiles
   bs_t <- as_tibble(bs_results$t)
-  bs_t <- mutate(bs_t, V5 = circular(V5, units = "degrees", rotation = "counter"))
-  smart_quantile <- function(data, probs){
-    if (is.circular(data)) {
-      q <- circular::quantile.circular(data, probs = probs) %% 360
-    } else {
-      q <- quantile(data, probs = probs)
-    }
-    return(q)
-  }
+  bs_t <- mutate(bs_t,
+    V5 = circular::circular(V5, units = "degrees", rotation = "counter"),
+    V11 = circular::circular(V11, units = "degrees", rotation = "counter"),
+    V17 = circular::circular(V17, units = "degrees", rotation = "counter"))
   # Create output including 95\% confidence intervals
   results <- tibble(
-    parameter = c("Elevation", "X-Value", "Y-Value", 
-      "Amplitude", "Displacement", "Model Fit"),
-    estimate = ssm,
+    group = c(
+      rep(levels(data_use$group)[[1]], 6),
+      rep(levels(data_use$group)[[2]], 6),
+      rep("Difference", 6)),
+    parameter = rep(c("Elevation", "X-Value", "Y-Value", "Amplitude", "Displacement", "Model Fit"), 3),
+    estimate = c(ssm_g1, ssm_g2, ssm_gd),
     lower_ci = map_dbl(bs_t, smart_quantile, probs = .025),
     upper_ci = map_dbl(bs_t, smart_quantile, probs = .975)
   )
