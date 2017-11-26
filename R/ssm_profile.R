@@ -35,15 +35,15 @@ ssm_profile <- function(data, scales, angles, bs_number = 2000) {
   data_use <- data %>% select(!!scales)
   scores <- data_use %>% colMeans()
   #scores <- colMeans(select(data, !!scales))
-  ssm <- ssm_parameters(scores, angles)
+  ssm <- ssm_parameters(scores, angles, FALSE)
   # Perform bootstrapping on SSM parameters
   bs_function <- function(data, index, angles) {
     resample <- data[index, ]
-    scores_rs <- colMeans(resample)
-    ssm_rs <- ssm_parameters(scores_rs, angles)
-    return(ssm_rs)
+    scores_r <- colMeans(resample)
+    ssm_r <- ssm_parameters(scores_r, angles, FALSE)
+    return(ssm_r)
   }
-  bs_results <- boot(
+  bs_results <- boot::boot(
     data = data_use,
     statistic = bs_function, 
     R = bs_number,
@@ -51,8 +51,7 @@ ssm_profile <- function(data, scales, angles, bs_number = 2000) {
   )
   # Prepare bootstrap results to calculate quantiles
   bs_t <- as_tibble(bs_results$t)
-  bs_t <- mutate(bs_t,
-    V5 = circular::circular(V5, units = "degrees", rotation = "counter"))
+  bs_t <- mutate(bs_t, V5 = make_circular(V5))
   # Create output including 95\% confidence intervals
   results <- tibble(
     parameter = c("Elevation", "X-Value", "Y-Value", 
@@ -71,10 +70,10 @@ ssm_profile <- function(data, scales, angles, bs_number = 2000) {
 #'
 #' @param data A matrix or data frame containing circumplex scales and group
 #'   membership.
-#' @param group The column name in \code{data} that specifies each observation's
-#'   group. Be sure to enter the name as is (i.e., not as a string or number).
-#'   This variable can be a factor with two levels or a numeric or character
-#'   variable with two unique values.
+#' @param grouping The column name in \code{data} that specifies each
+#'   observation's group. Be sure to enter the name as is (i.e., not as a string
+#'   or number). This variable can be a factor with two levels or a numeric or
+#'   character variable with two unique values.
 #' @param scales A vector that contains the column names in \code{data} that
 #'   correspond to scores on each circumplex scale. Be sure to enter the names
 #'   as is (i.e., not as strings or a character vector). For convenience,
@@ -87,34 +86,32 @@ ssm_profile <- function(data, scales, angles, bs_number = 2000) {
 #' @examples
 #' ssm_profile2(girard2017, isFemale, ZPA:ZNO, octants, 2000)
 
-ssm_profile2 <- function(data, groups, scales, angles, bs_number = 2000) {
+ssm_profile2 <- function(data, grouping, scales, angles, bs_number = 2000) {
   # Select variables using tidyverse style NSE
-  groups <- enquo(groups)
+  grouping <- enquo(grouping)
   scales <- enquo(scales)
   data_use <- data %>% 
-    select(!!groups, !!scales) %>% 
-    mutate(group = factor(!!groups)) %>% 
-    select(-!!groups)
+    select(!!grouping, !!scales) %>% 
+    mutate(group = factor(!!grouping)) %>% 
+    select(-!!grouping)
   # Abort if the number of levels is not 2
   stopifnot(nlevels(data_use$group) == 2)
   # Get SSM estimates in each group and their difference
   scores <- data_use %>% group_by(group) %>% summarize_all(mean)
-  ssm_g1 <- ssm_parameters(as.double(scores[1, 2:ncol(scores)]), angles)
-  ssm_g2 <- ssm_parameters(as.double(scores[2, 2:ncol(scores)]), angles)
-  ssm_gd <- ssm_g1 - ssm_g2
-  ssm_gd["d"] <- wd(ssm_g1["d"], ssm_g2["d"])
+  ssm_g1 <- ssm_parameters(as.double(scores[1, 2:ncol(scores)]), angles, FALSE)
+  ssm_g2 <- ssm_parameters(as.double(scores[2, 2:ncol(scores)]), angles, FALSE)
+  ssm_gd <- param_diff(ssm_g1, ssm_g2)
   # Perform bootstrapping on SSM parameters
   bs_function <- function(data, index, angles) {
     resample <- data[index, ]
-    scores <- resample %>% group_by(group) %>% summarize_all(mean)
-    ssm_g1 <- ssm_parameters(as.double(scores[1, 2:ncol(scores)]), angles)
-    ssm_g2 <- ssm_parameters(as.double(scores[2, 2:ncol(scores)]), angles)
-    ssm_gd <- ssm_g1 - ssm_g2
-    ssm_gd["d"] <- wd(ssm_g1["d"], ssm_g2["d"])
-    ssm_rs <- c(ssm_g1, ssm_g2, ssm_gd)
+    scores_r <- resample %>% group_by(group) %>% summarize_all(mean)
+    ssm_r1 <- ssm_parameters(as.double(scores_r[1, 2:ncol(scores)]), angles, FALSE)
+    ssm_r2 <- ssm_parameters(as.double(scores_r[2, 2:ncol(scores)]), angles, FALSE)
+    ssm_rd <- param_diff(ssm_r1, ssm_r2)
+    ssm_rs <- c(ssm_r1, ssm_r2, ssm_rd)
     return(ssm_rs)
   }
-  bs_results <- boot(
+  bs_results <- boot::boot(
     data = data_use,
     statistic = bs_function, 
     R = bs_number,
@@ -123,15 +120,13 @@ ssm_profile2 <- function(data, groups, scales, angles, bs_number = 2000) {
   )
   # Prepare bootstrap results to calculate quantiles
   bs_t <- as_tibble(bs_results$t)
-  bs_t <- mutate(bs_t,
-    V5 = circular::circular(V5, units = "degrees", rotation = "counter"),
-    V11 = circular::circular(V11, units = "degrees", rotation = "counter"),
-    V17 = circular::circular(V17, units = "degrees", rotation = "counter"))
+  bs_t <- mutate(bs_t, V5 = make_circular(V5), 
+    V11 = make_circular(V11), V17 = make_circular(V17))
   # Create output including 95\% confidence intervals
   results <- tibble(
     group = c(
-      rep(levels(data_use$group)[[1]], 6),
-      rep(levels(data_use$group)[[2]], 6),
+      rep(paste0("Group=",levels(data_use$group)[[1]]), 6),
+      rep(paste0("Group=",levels(data_use$group)[[2]]), 6),
       rep("Difference", 6)),
     parameter = rep(c("Elevation", "X-Value", "Y-Value",
       "Amplitude", "Displacement", "Model Fit"), 3),

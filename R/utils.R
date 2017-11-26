@@ -24,3 +24,27 @@ smart_quantile <- function(data, probs){
   }
   return(q)
 }
+
+#' Compute difference between two sets of SSM parameters
+#'
+#' @param p1,p2 Outputs from \code{ssm_parameters()}.
+#' @return A numerical vector or tibble (data frame) with \code{p2 - p1} for
+#'   each parameter, while accounting for the fact that differences in
+#'   displacement need to be handled specially.
+
+param_diff <- function(p1, p2) {
+  pd <- p2 - p1
+  pd[5] <- wd(p1[5], p2[5])
+  return(pd)
+}
+
+#' Coerce a variable to the circular data type
+#'
+#' @param x A vector of numbers.
+#' @return The same vector as \code{x} but with the circular data type (in
+#'   degree units and counter-clockwise rotation).
+
+make_circular <- function(x) {
+  y <- circular::circular(x, units = "degrees", rotation = "counter")
+  return(y)
+}
