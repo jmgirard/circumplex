@@ -18,3 +18,6 @@ NULL
 #' @importFrom magrittr %>%
 #' @usage lhs \%>\% rhs
 NULL
+
+#' @importFrom assertthat assert_that not_empty are_equal is.flag is.count
+NULL
