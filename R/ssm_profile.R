@@ -1,42 +1,65 @@
 #' Mean Profile Structural Summary Method
 #'
 #' Calculate SSM parameters with bootstrapped confidence intervals for the mean
-#' profile of a sample.
+#' of any number of groups.
 #'
-#' @param data A matrix or data frame containing circumplex scales.
-#' @param scales A vector of column numbers or names for the circumplex scales.
-#' @param angles A vector of angles, in degrees, of the circumplex scales.
-#' @param bs_number The number of bootstrap resamples (default = 2000).
-#' @return A tibble (data frame) containing estimates and bootstrapped 95\%
-#'   confidence intervals for the mean profile's structural summary parameters:
-#'   elevation, x-value, y-value, amplitude, displacement, and model fit.
+#' @param data A matrix or data frame containing at least circumplex scales.
+#' @param scales A list of the variables in \code{data} that contain circumplex
+#'   scales (in tidyverse-style NSE specification, see examples).
+#' @param angles A numerical vector containing the angular displacement of each
+#'   circumplex scale included in \code{scales} (in degrees).
+#' @param grouping The variable in \code{data} that contains each observation's
+#'   group membership (in tidyverse-style NSE specification, see examples).
+#' @param boots The number of bootstrap resamples to use in calculating the
+#'   confidence intervals (default = 2000).
+#' @param interval The confidence intervals' percentage level (default = 0.95).
+#' @return A tibble containing SSM parameters (point and interval estimates) for
+#'   each group's mean profile.
 #' @examples 
-#' # Enter scales using column numbers in a continuous range
-#' ssm_profile(wright2009, 1:8, octants)
-#' 
-#' # Enter scales using column numbers in a discontinuous set
-#' ssm_profile(wright2009, c(1,3,5,7), poles)
-#' 
-#' # Enter scales using column names in a continuous range
-#' ssm_profile(wright2009, PA:NO, octants)
-#' 
-#' # Enter scales using column names in a discontinuous set
-#' ssm_profile(wright2009, c(BC, FG, JK, NO), quadrants)
-#' 
-#' # Enter angles using a vector of numbers
-#' ssm_profile(wright2009, c(BC, FG, JK, NO), c(90, 180, 270, 360))
-#' 
-#' # Change the number of bootstrap resamples
-#' ssm_profile(wright2009, 1:8, octants, 3000)
+#' ssm_profiles(girard2017, ZPA:ZNO, octants, bordl, 2000, 0.95)
 
-ssm_profile <- function(data, scales, angles, bs_number = 2000) {
-  scales <- rlang::enquo(scales)
-  # Get estimates for SSM parameters
-  data_use <- data %>% dplyr::select(!!scales)
+ssm_profiles <- function(data, scales, angles,
+                         grouping = NULL, boots = 2000, interval = 0.95) {
+  # Enable tidyverse-style NSE column specification -------------------------
+  grouping_en <- rlang::enquo(grouping)
+  scales_en <- rlang::enquo(scales)
+  
+  # Coerce grouping variable to a factor named group ------------------------
+  data_use <- data %>% 
+    dplyr::select(!!grouping_en, !!scales_en) %>% 
+    dplyr::mutate(group = factor(!!grouping_en)) %>% 
+    dplyr::select(-!!grouping_en)
+  
+  # Calculate SSM parameters and confidence intervals for each group --------
+  results <- data_use %>% 
+    group_by(group) %>% 
+    by_slice(ssm_profile_basic, angles, boots, interval, .collate = "rows")
+  
+  return(results)
+}
+
+#' Mean Profile Structural Summary Method
+#'
+#' Worker function for ssm_profiles, calculates point and interval estimates for
+#'   SSM parameters in a single group's mean profile.
+#'
+#' @param data_use A matrix or data frame containing only circumplex scales.
+#' @param angles A numerical vector containing the angular displacement of each
+#'   circumplex scale included in \code{scales} (in degrees).
+#' @param boots The number of bootstrap resamples to use in calculating the
+#'   confidence intervals (default = 2000).
+#' @param interval The confidence intervals' percentage level (default = 0.95).
+#' @return A tibble containing SSM parameters (point and interval estimates) for
+#'   the group's mean profile.
+#' @examples
+#' ssm_profiles_one(wright2009, octants, 2000, 0.95)
+
+ssm_profiles_one <- function(data_use, angles, boots, interval) {
+  # Get SSM parameter estimates for mean profile ----------------------------
   scores <- data_use %>% colMeans()
-  #scores <- colMeans(select(data, !!scales))
   ssm <- ssm_parameters(scores, angles, FALSE)
-  # Perform bootstrapping on SSM parameters
+  
+  # Perform bootstrap on SSM parameters -------------------------------------
   bs_function <- function(data, index, angles) {
     resample <- data[index, ]
     scores_r <- colMeans(resample)
@@ -46,20 +69,25 @@ ssm_profile <- function(data, scales, angles, bs_number = 2000) {
   bs_results <- boot::boot(
     data = data_use,
     statistic = bs_function, 
-    R = bs_number,
+    R = boots,
     angles = angles
   )
-  # Prepare bootstrap results to calculate quantiles
+  
+  # Prepare bootstrap results for quantile calculation ----------------------
   bs_t <- tibble::as_tibble(bs_results$t)
   bs_t <- dplyr::mutate(bs_t, V5 = make_circular(V5))
-  # Create output including 95\% confidence intervals
+  
+  # Create output including confidence intervals ----------------------------
+  low_p <- (1 - interval) / 2
+  upp_p <- 1 - (1 - interval) / 2 
   results <- tibble::tibble(
-    parameter = c("Elevation", "X-Value", "Y-Value", 
+    Parameter = c("Elevation", "X-Value", "Y-Value", 
       "Amplitude", "Displacement", "Model Fit"),
-    estimate = ssm,
-    lower_ci = purrr::map_dbl(bs_t, smart_quantile, probs = .025),
-    upper_ci = purrr::map_dbl(bs_t, smart_quantile, probs = .975)
+    Estimate = ssm,
+    Lower_CI = purrr::map_dbl(bs_t, smart_quantile, probs = low_p),
+    Upper_CI = purrr::map_dbl(bs_t, smart_quantile, probs = upp_p)
   )
+  
   return(results)
 }
 
