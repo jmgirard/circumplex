@@ -30,9 +30,9 @@
 #' ssm_profile(wright2009, 1:8, octants, 3000)
 
 ssm_profile <- function(data, scales, angles, bs_number = 2000) {
-  scales <- enquo(scales)
+  scales <- rlang::enquo(scales)
   # Get estimates for SSM parameters
-  data_use <- data %>% select(!!scales)
+  data_use <- data %>% dplyr::select(!!scales)
   scores <- data_use %>% colMeans()
   #scores <- colMeans(select(data, !!scales))
   ssm <- ssm_parameters(scores, angles, FALSE)
@@ -50,15 +50,15 @@ ssm_profile <- function(data, scales, angles, bs_number = 2000) {
     angles = angles
   )
   # Prepare bootstrap results to calculate quantiles
-  bs_t <- as_tibble(bs_results$t)
-  bs_t <- mutate(bs_t, V5 = make_circular(V5))
+  bs_t <- tibble::as_tibble(bs_results$t)
+  bs_t <- dplyr::mutate(bs_t, V5 = make_circular(V5))
   # Create output including 95\% confidence intervals
-  results <- tibble(
+  results <- tibble::tibble(
     parameter = c("Elevation", "X-Value", "Y-Value", 
       "Amplitude", "Displacement", "Model Fit"),
     estimate = ssm,
-    lower_ci = map_dbl(bs_t, smart_quantile, probs = .025),
-    upper_ci = map_dbl(bs_t, smart_quantile, probs = .975)
+    lower_ci = purrr::map_dbl(bs_t, smart_quantile, probs = .025),
+    upper_ci = purrr::map_dbl(bs_t, smart_quantile, probs = .975)
   )
   return(results)
 }
@@ -88,23 +88,27 @@ ssm_profile <- function(data, scales, angles, bs_number = 2000) {
 
 ssm_profile2 <- function(data, grouping, scales, angles, bs_number = 2000) {
   # Select variables using tidyverse style NSE
-  grouping <- enquo(grouping)
-  scales <- enquo(scales)
+  grouping <- rlang::enquo(grouping)
+  scales <- rlang::enquo(scales)
   data_use <- data %>% 
-    select(!!grouping, !!scales) %>% 
-    mutate(group = factor(!!grouping)) %>% 
-    select(-!!grouping)
+    dplyr::select(!!grouping, !!scales) %>% 
+    dplyr::mutate(group = factor(!!grouping)) %>% 
+    dplyr::select(-!!grouping)
   # Abort if the number of levels is not 2
   stopifnot(nlevels(data_use$group) == 2)
   # Get SSM estimates in each group and their difference
-  scores <- data_use %>% group_by(group) %>% summarize_all(mean)
+  scores <- data_use %>% 
+    dplyr::group_by(group) %>% 
+    dplyr::summarize_all(mean)
   ssm_g1 <- ssm_parameters(as.double(scores[1, 2:ncol(scores)]), angles, FALSE)
   ssm_g2 <- ssm_parameters(as.double(scores[2, 2:ncol(scores)]), angles, FALSE)
   ssm_gd <- param_diff(ssm_g1, ssm_g2)
   # Perform bootstrapping on SSM parameters
   bs_function <- function(data, index, angles) {
     resample <- data[index, ]
-    scores_r <- resample %>% group_by(group) %>% summarize_all(mean)
+    scores_r <- resample %>% 
+      dplyr::group_by(group) %>% 
+      dplyr::summarize_all(mean)
     ssm_r1 <- ssm_parameters(as.double(scores_r[1, 2:ncol(scores)]), angles, FALSE)
     ssm_r2 <- ssm_parameters(as.double(scores_r[2, 2:ncol(scores)]), angles, FALSE)
     ssm_rd <- param_diff(ssm_r1, ssm_r2)
@@ -119,20 +123,22 @@ ssm_profile2 <- function(data, grouping, scales, angles, bs_number = 2000) {
     strata = data_use$group
   )
   # Prepare bootstrap results to calculate quantiles
-  bs_t <- as_tibble(bs_results$t)
-  bs_t <- mutate(bs_t, V5 = make_circular(V5), 
-    V11 = make_circular(V11), V17 = make_circular(V17))
+  bs_t <- tibble::as_tibble(bs_results$t)
+  bs_t <- bs_t %>% dplyr::mutate(
+    bs_t, V5 = make_circular(V5), 
+    V11 = make_circular(V11),
+    V17 = make_circular(V17))
   # Create output including 95\% confidence intervals
-  results <- tibble(
+  results <- tibble::tibble(
     group = c(
-      rep(paste0("Group=",levels(data_use$group)[[1]]), 6),
-      rep(paste0("Group=",levels(data_use$group)[[2]]), 6),
+      rep(paste0("Group=", levels(data_use$group)[[1]]), 6),
+      rep(paste0("Group=", levels(data_use$group)[[2]]), 6),
       rep("Difference", 6)),
     parameter = rep(c("Elevation", "X-Value", "Y-Value",
       "Amplitude", "Displacement", "Model Fit"), 3),
     estimate = c(ssm_g1, ssm_g2, ssm_gd),
-    lower_ci = map_dbl(bs_t, smart_quantile, probs = .025),
-    upper_ci = map_dbl(bs_t, smart_quantile, probs = .975)
+    lower_ci = purrr::map_dbl(bs_t, smart_quantile, probs = .025),
+    upper_ci = purrr::map_dbl(bs_t, smart_quantile, probs = .975)
   )
   return(results)
 }

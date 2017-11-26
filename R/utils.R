@@ -17,7 +17,7 @@ wd <- function(w1, w2) {
 #'   they wiull be normal quantiles otherwise.
 
 smart_quantile <- function(data, probs){
-  if (is.circular(data)) {
+  if (circular::is.circular(data)) {
     q <- circular::quantile.circular(data, probs = probs) %% 360
   } else {
     q <- quantile(data, probs = probs)
