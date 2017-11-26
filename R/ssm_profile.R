@@ -30,8 +30,11 @@
 #' ssm_profile(wright2009, 1:8, octants, 3000)
 
 ssm_profile <- function(data, scales, angles, bs_number = 2000) {
+  scales <- enquo(scales)
   # Get estimates for SSM parameters
-  scores <- colMeans(select(data, scales))
+  data_use <- data %>% select(!!scales)
+  scores <- data_use %>% colMeans()
+  #scores <- colMeans(select(data, !!scales))
   ssm <- ssm_parameters(scores, angles)
   # Perform bootstrapping on SSM parameters
   bs_function <- function(data, index, angles) {
@@ -41,22 +44,15 @@ ssm_profile <- function(data, scales, angles, bs_number = 2000) {
     return(ssm_rs)
   }
   bs_results <- boot(
-    data = select(data, scales),
+    data = data_use,
     statistic = bs_function, 
     R = bs_number,
     angles = angles
   )
   # Prepare bootstrap results to calculate quantiles
   bs_t <- as_tibble(bs_results$t)
-  bs_t <- mutate(bs_t, V5 = circular(V5, units = "degrees", rotation = "counter"))
-  smart_quantile <- function(data, probs){
-    if (is.circular(data)) {
-      q <- circular::quantile.circular(data, probs = probs) %% 360
-    } else {
-      q <- quantile(data, probs = probs)
-    }
-    return(q)
-  }
+  bs_t <- mutate(bs_t,
+    V5 = circular::circular(V5, units = "degrees", rotation = "counter"))
   # Create output including 95\% confidence intervals
   results <- tibble(
     parameter = c("Elevation", "X-Value", "Y-Value", 
@@ -115,14 +111,7 @@ ssm_profile2 <- function(data, groups, scales, angles, bs_number = 2000) {
     ssm_g2 <- ssm_parameters(as.double(scores[2, 2:ncol(scores)]), angles)
     ssm_gd <- ssm_g1 - ssm_g2
     ssm_gd["d"] <- wd(ssm_g1["d"], ssm_g2["d"])
-    ssm_rs <- c(
-      e1 = ssm_g1["e"], x1 = ssm_g1["x"], y1 = ssm_g1["y"],
-      a1 = ssm_g1["a"], d1 = ssm_g1["d"], fit1 = ssm_g1["fit"],
-      e2 = ssm_g2["e"], x2 = ssm_g2["x"], y2 = ssm_g2["y"],
-      a2 = ssm_g2["a"], d2 = ssm_g2["d"], fit2 = ssm_g2["fit"],
-      ed = ssm_gd["e"], xd = ssm_gd["x"], yd = ssm_gd["y"],
-      ad = ssm_gd["a"], dd = ssm_gd["d"], fitd = ssm_gd["fit"]
-    )
+    ssm_rs <- c(ssm_g1, ssm_g2, ssm_gd)
     return(ssm_rs)
   }
   bs_results <- boot(
@@ -144,7 +133,8 @@ ssm_profile2 <- function(data, groups, scales, angles, bs_number = 2000) {
       rep(levels(data_use$group)[[1]], 6),
       rep(levels(data_use$group)[[2]], 6),
       rep("Difference", 6)),
-    parameter = rep(c("Elevation", "X-Value", "Y-Value", "Amplitude", "Displacement", "Model Fit"), 3),
+    parameter = rep(c("Elevation", "X-Value", "Y-Value",
+      "Amplitude", "Displacement", "Model Fit"), 3),
     estimate = c(ssm_g1, ssm_g2, ssm_gd),
     lower_ci = map_dbl(bs_t, smart_quantile, probs = .025),
     upper_ci = map_dbl(bs_t, smart_quantile, probs = .975)
