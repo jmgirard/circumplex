@@ -4,34 +4,43 @@
 \alias{ssm_profiles}
 \title{Mean Profile Structural Summary Method}
 \usage{
-ssm_profiles(data, scales, angles, grouping = NULL, boots = 2000,
-  interval = 0.95)
+ssm_profiles(.data, scales, angles, boots = 2000, interval = 0.95, grouping,
+  plot = TRUE, ...)
 }
 \arguments{
-\item{data}{A matrix or data frame containing at least circumplex scales.}
+\item{.data}{A matrix or data frame containing at least circumplex scales.}
 
-\item{scales}{A list of the variables in \code{data} that contain circumplex
+\item{scales}{A list of the variables in \code{.data} that contain circumplex
 scales (in tidyverse-style NSE specification, see examples).}
 
 \item{angles}{A numerical vector containing the angular displacement of each
 circumplex scale included in \code{scales} (in degrees).}
 
-\item{grouping}{The variable in \code{data} that contains each observation's
-group membership (in tidyverse-style NSE specification, see examples).}
-
 \item{boots}{The number of bootstrap resamples to use in calculating the
 confidence intervals (default = 2000).}
 
 \item{interval}{The confidence intervals' percentage level (default = 0.95).}
+
+\item{grouping}{Optional argument: the variable in \code{.data} that contains
+the group membership of each observation. To assess the mean profile of all
+observations, do not supply this argument (see examples).}
+
+\item{plot}{A logical determining whether a plot should be created (default =
+TRUE).}
+
+\item{...}{Additional parameters for \code{sm_plot()} if \code{plot} is TRUE.}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for
-  each group's mean profile.
+  each group's mean profile (or the entire mean profile without grouping).
 }
 \description{
 Calculate SSM parameters with bootstrapped confidence intervals for the mean
 of any number of groups.
 }
 \examples{
-ssm_profiles(girard2017, ZPA:ZNO, octants, bordl, 2000, 0.95)
+#' # Calculate SSM parameters for all observations in girard2017
+ssm_profiles(girard2017, ZPA:ZNO, octants)
+# Calculate SSM parameters for groups defined by the bordl variable
+ssm_profiles(girard2017, ZPA:ZNO, octants, grouping = bordl)
 }

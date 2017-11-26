@@ -4,11 +4,9 @@
 \alias{ssm_profiles_one}
 \title{Mean Profile Structural Summary Method}
 \usage{
-ssm_profiles_one(data_use, angles, boots, interval)
+ssm_profiles_one(.data, angles, boots, interval)
 }
 \arguments{
-\item{data_use}{A matrix or data frame containing only circumplex scales.}
-
 \item{angles}{A numerical vector containing the angular displacement of each
 circumplex scale included in \code{scales} (in degrees).}
 
@@ -16,6 +14,8 @@ circumplex scale included in \code{scales} (in degrees).}
 confidence intervals (default = 2000).}
 
 \item{interval}{The confidence intervals' percentage level (default = 0.95).}
+
+\item{data_use}{A matrix or data frame containing only circumplex scales.}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for

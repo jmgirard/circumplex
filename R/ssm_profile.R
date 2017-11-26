@@ -3,39 +3,53 @@
 #' Calculate SSM parameters with bootstrapped confidence intervals for the mean
 #' of any number of groups.
 #'
-#' @param data A matrix or data frame containing at least circumplex scales.
-#' @param scales A list of the variables in \code{data} that contain circumplex
+#' @param .data A matrix or data frame containing at least circumplex scales.
+#' @param scales A list of the variables in \code{.data} that contain circumplex
 #'   scales (in tidyverse-style NSE specification, see examples).
 #' @param angles A numerical vector containing the angular displacement of each
 #'   circumplex scale included in \code{scales} (in degrees).
-#' @param grouping The variable in \code{data} that contains each observation's
-#'   group membership (in tidyverse-style NSE specification, see examples).
 #' @param boots The number of bootstrap resamples to use in calculating the
 #'   confidence intervals (default = 2000).
 #' @param interval The confidence intervals' percentage level (default = 0.95).
+#' @param grouping Optional argument: the variable in \code{.data} that contains
+#'   the group membership of each observation. To assess the mean profile of all
+#'   observations, do not supply this argument (see examples).
+#' @param plot A logical determining whether a plot should be created (default =
+#'   TRUE).
+#' @param ... Additional parameters for \code{sm_plot()} if \code{plot} is TRUE.
 #' @return A tibble containing SSM parameters (point and interval estimates) for
-#'   each group's mean profile.
-#' @examples 
-#' ssm_profiles(girard2017, ZPA:ZNO, octants, bordl, 2000, 0.95)
+#'   each group's mean profile (or the entire mean profile without grouping).
+#' @examples
+#' #' # Calculate SSM parameters for all observations in girard2017
+#' ssm_profiles(girard2017, ZPA:ZNO, octants)
+#' # Calculate SSM parameters for groups defined by the bordl variable
+#' ssm_profiles(girard2017, ZPA:ZNO, octants, grouping = bordl)
 
-ssm_profiles <- function(data, scales, angles,
-                         grouping = NULL, boots = 2000, interval = 0.95) {
-  # Enable tidyverse-style NSE column specification -------------------------
-  grouping_en <- rlang::enquo(grouping)
+ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
+                         grouping, plot = TRUE, ...) {
+  # Enable column specification using tidyverse-style NSE -------------------
   scales_en <- rlang::enquo(scales)
   
-  # Coerce grouping variable to a factor named group ------------------------
-  data_use <- data %>% 
-    dplyr::select(!!grouping_en, !!scales_en) %>% 
-    dplyr::mutate(group = factor(!!grouping_en)) %>% 
-    dplyr::select(-!!grouping_en)
+  # Check that inputs are valid ---------------------------------------------
+  assert_that(is.numeric(angles), is.count(boots), is.numeric(interval))
+  assert_that(interval > 0, interval < 1)
   
-  # Calculate SSM parameters and confidence intervals for each group --------
-  results <- data_use %>% 
-    group_by(group) %>% 
-    by_slice(ssm_profiles_one, angles, boots, interval, .collate = "rows")
-  
-  return(results)
+  # Handle the presence or absence of a grouping variable -------------------
+  if (base::missing(grouping)) {
+    results <- .data %>%
+      dplyr::select(!!scales_en) %>%
+      ssm_profiles_one(angles, boots, interval)
+  } else {
+    grouping_en <- rlang::enquo(grouping)
+    results <- .data %>% 
+      dplyr::select(!!grouping_en, !!scales_en) %>% 
+      dplyr::mutate(Group = factor(!!grouping_en)) %>% 
+      dplyr::select(-!!grouping_en) %>%
+      dplyr::group_by(Group) %>%
+      purrrlyr::by_slice(ssm_profiles_one, angles, boots, interval,
+        .collate = "rows")
+  }
+  results
 }
 
 #' Mean Profile Structural Summary Method
@@ -54,20 +68,24 @@ ssm_profiles <- function(data, scales, angles,
 #' @examples
 #' ssm_profiles_one(wright2009, octants, 2000, 0.95)
 
-ssm_profiles_one <- function(data_use, angles, boots, interval) {
+ssm_profiles_one <- function(.data, angles, boots, interval) {
+  
+  # Check that inputs are valid ---------------------------------------------
+  assert_that(are_equal(length(.data), length(angles)))
+    
   # Get SSM parameter estimates for mean profile ----------------------------
-  scores <- data_use %>% colMeans()
-  ssm <- ssm_parameters(scores, angles, FALSE)
+  scores <- .data %>% colMeans()
+  ssm <- ssm_parameters(scores, angles, tibble = FALSE)
   
   # Perform bootstrap on SSM parameters -------------------------------------
-  bs_function <- function(data, index, angles) {
-    resample <- data[index, ]
+  bs_function <- function(.data, index, angles) {
+    resample <- .data[index, ]
     scores_r <- colMeans(resample)
-    ssm_r <- ssm_parameters(scores_r, angles, FALSE)
+    ssm_r <- ssm_parameters(scores_r, angles, tibble = FALSE)
     return(ssm_r)
   }
   bs_results <- boot::boot(
-    data = data_use,
+    data = .data,
     statistic = bs_function, 
     R = boots,
     angles = angles
@@ -87,8 +105,7 @@ ssm_profiles_one <- function(data_use, angles, boots, interval) {
     Lower_CI = purrr::map_dbl(bs_t, smart_quantile, probs = low_p),
     Upper_CI = purrr::map_dbl(bs_t, smart_quantile, probs = upp_p)
   )
-  
-  return(results)
+  results
 }
 
 #' Mean Profile Comparison Structural Summary Method
@@ -168,5 +185,5 @@ ssm_profile2 <- function(data, grouping, scales, angles, bs_number = 2000) {
     lower_ci = purrr::map_dbl(bs_t, smart_quantile, probs = .025),
     upper_ci = purrr::map_dbl(bs_t, smart_quantile, probs = .975)
   )
-  return(results)
+  results
 }
