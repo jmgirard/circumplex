@@ -31,8 +31,8 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   scales_en <- rlang::enquo(scales)
   
   # Check that inputs are valid ---------------------------------------------
-  assert_that(is.numeric(angles), is.count(boots), is.numeric(interval))
-  assert_that(interval > 0, interval < 1)
+  assert_that(is.numeric(angles), is.count(boots))
+  assert_that(is.numeric(interval), interval > 0, interval < 1)
   
   # Handle the presence or absence of a grouping variable -------------------
   if (base::missing(grouping)) {

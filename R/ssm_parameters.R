@@ -22,8 +22,8 @@
 ssm_parameters <- function(scores, angles, tibble = TRUE) {
 
   # Check that inputs are valid ---------------------------------------------
-  assert_that(are_equal(length(scores),length(angles)))
   assert_that(not_empty(scores), not_empty(angles))
+  assert_that(are_equal(length(scores), length(angles)))
   assert_that(is.flag(tibble))
 
   # Calculate SSM parameters ------------------------------------------------
