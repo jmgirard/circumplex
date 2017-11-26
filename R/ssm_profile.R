@@ -33,7 +33,7 @@ ssm_profiles <- function(data, scales, angles,
   # Calculate SSM parameters and confidence intervals for each group --------
   results <- data_use %>% 
     group_by(group) %>% 
-    by_slice(ssm_profile_basic, angles, boots, interval, .collate = "rows")
+    by_slice(ssm_profiles_one, angles, boots, interval, .collate = "rows")
   
   return(results)
 }
