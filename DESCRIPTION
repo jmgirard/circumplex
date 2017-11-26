@@ -1,16 +1,21 @@
 Package: ssm
 Type: Package
-Title: Structural Summary Method with Bootstrap Confidence Intervals
 Version: 0.0.0.9000
+Title: Structural Summary Method with Bootstrap Confidence Intervals
+Description: Calculate structural summary method parameters for circumplex data
 Authors@R: as.person(c(
    "Jeffrey Girard <j.girard@pitt.edu> [aut, cre]",
    "Johannes Zimmermann <j.zimmermann@psychologische-hochschule.de> [aut]",
    "Aidan Wright <aidan@pitt.edu> [aut]"))
-Description: Calculate structural summary method parameters for circumplex data
+URL: http://github.com/jmgirard/ssm
+BugReports: https://github.com/jmgirard/ssm/issues
+Encoding: UTF-8
+Depends: R (>= 3.4.2)
 Imports:
     boot,
     circular,
-    tidyverse
+    tidyverse,
+    purrrlyr
 License: GPL-3
 LazyData: true
 RoxygenNote: 6.0.1
