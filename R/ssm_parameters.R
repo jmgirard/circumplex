@@ -20,6 +20,7 @@
 
 ssm_parameters <- function(scores, angles, tibble = TRUE) {
   stopifnot(length(scores) == length(angles))
+  stopifnot(tibble == TRUE || tibble == FALSE || tibble == 1 || tibble == 0)
   k <- length(scores)
   elev <- mean(scores)
   xval <- as.numeric((2 / k) * (scores %*% cos(angles * (pi / 180))))
