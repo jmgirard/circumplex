@@ -7,9 +7,10 @@
 ssm_parameters(scores, angles, tibble = TRUE)
 }
 \arguments{
-\item{scores}{A vector of scores on circumplex scales.}
+\item{scores}{A numeric vector of scores on multiple circumplex scales.}
 
-\item{angles}{A vector of angles, in degrees, of the circumplex scales.}
+\item{angles}{A numeric vector containing an angular displacement for each
+circumplex scale provided in \code{scores} (in degrees).}
 
 \item{tibble}{A logical determining the type of returned variable. If TRUE,
 the returned variable will be a tibble (data frame). If FALSE, the returned

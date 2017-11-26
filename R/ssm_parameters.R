@@ -1,7 +1,8 @@
 #' Calculate structural summary parameters
 #'
-#' @param scores A vector of scores on circumplex scales.
-#' @param angles A vector of angles, in degrees, of the circumplex scales.
+#' @param scores A numeric vector of scores on multiple circumplex scales.
+#' @param angles A numeric vector containing an angular displacement for each
+#'   circumplex scale provided in \code{scores} (in degrees).
 #' @param tibble A logical determining the type of returned variable. If TRUE,
 #'   the returned variable will be a tibble (data frame). If FALSE, the returned
 #'   variable will be an unnamed vector. Because the latter is much faster than
@@ -19,8 +20,13 @@
 #' ssm_parameters(c(0.37, -0.52, 0.69, 1.58), poles)
 
 ssm_parameters <- function(scores, angles, tibble = TRUE) {
-  stopifnot(length(scores) == length(angles))
-  stopifnot(tibble == TRUE || tibble == FALSE || tibble == 1 || tibble == 0)
+
+  # Check that inputs are valid ---------------------------------------------
+  assert_that(are_equal(length(scores),length(angles)))
+  assert_that(not_empty(scores), not_empty(angles))
+  assert_that(is.flag(tibble))
+
+  # Calculate SSM parameters ------------------------------------------------
   nScales <- length(scores)
   elev <- mean(scores)
   xval <- as.numeric((2 / nScales) * (scores %*% cos(angles * (pi / 180))))
@@ -29,6 +35,8 @@ ssm_parameters <- function(scores, angles, tibble = TRUE) {
   disp <- (atan2(yval, xval) * (180 / pi)) %% 360
   gfit <- 1 - ((sum((elev + ampl * cos((angles - disp) * (pi / 180)) - 
       scores) ^ 2)) / (var(scores) * (nScales - 1)))
+
+  # Format output according to tibble argument ------------------------------
   if (tibble == TRUE) {
     ssm <- tibble::tibble(
       e = elev,
@@ -41,5 +49,7 @@ ssm_parameters <- function(scores, angles, tibble = TRUE) {
   } else if (tibble == FALSE) {
     ssm <- c(elev, xval, yval, ampl, disp, gfit)
   }
-  return(ssm)
+
+  # Return the ssm variable -------------------------------------------------
+  ssm
 }
