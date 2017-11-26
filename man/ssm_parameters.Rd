@@ -4,18 +4,25 @@
 \alias{ssm_parameters}
 \title{Calculate structural summary parameters}
 \usage{
-ssm_parameters(scores, angles)
+ssm_parameters(scores, angles, tibble = TRUE)
 }
 \arguments{
 \item{scores}{A vector of scores on circumplex scales.}
 
 \item{angles}{A vector of angles, in degrees, of the circumplex scales.}
+
+\item{tibble}{A logical determining the type of returned variable. If TRUE,
+the returned variable will be a tibble (data frame). If FALSE, the returned
+variable will be an unnamed vector. Because the latter is much faster than
+the former, use FALSE during bootstrapping and other iterative processes.
+(default = TRUE)}
 }
 \value{
-A named vector of structural summary method parameters describing
+Depending on \code{tibble}, with a tibble (if TRUE) or an unnamed
+  vector (if FALSE) with structural summary method parameters describing
   \code{scores} given \code{angles}. The vector will contain the following
-  values: e (elevation), x (x-axis value), y (y-axis value), 
-  a (amplitude), d (angular displacement, in degrees), and fit (R-squared).
+  values: e (elevation), x (x-axis value), y (y-axis value), a (amplitude), d
+  (angular displacement, in degrees), and fit (R-squared).
 }
 \description{
 Calculate structural summary parameters

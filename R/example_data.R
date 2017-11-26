@@ -3,7 +3,7 @@
 #' A small example dataset containing standardized scores on eight hypothetical
 #' circumplex scales. Taken from Wright, Pincus, Conroy, & Hilsenroth (2009).
 #' 
-#' @format A data frame with 5 rows and 8 variables:
+#' @format A data frame with 5 observations and 8 variables:
 #' \describe{
 #'   \item{PA}{circumplex scale at displacement 90}
 #'   \item{BC}{circumplex scale at displacement 135}
@@ -16,6 +16,28 @@
 #' }
 #' @source \url{http://doi.org/10.1080/00223890902935696}
 "wright2009"
+
+#' Standardized octant scores on IIP-C with covariates
+#'
+#' A large example dataset containing standardized scores on the Inventory of
+#' Interpersonal Problems Circumplex Scales and categorical and continuous
+#' covariates. Taken from Girard et al. (2017).
+#'
+#' @format A data frame with 825 observations and 10 variables:
+#' \describe{
+#'   \item{ZPA}{Domineering (standardized score)}
+#'   \item{ZBC}{Vindictive (standardized score)}
+#'   \item{ZDE}{Cold (standardized score)}
+#'   \item{ZFG}{Socially Avoidant (standardized score)}
+#'   \item{ZHI}{Nonassertive (standardized score)}
+#'   \item{ZJK}{Easily Exploited (standardized score)}
+#'   \item{ZLM}{Overly Nurturant (standardized score)}
+#'   \item{ZNO}{Intrusive (standardized score)}
+#'   \item{bordl}{Borderline Personality Disorder (0 = FALSE, 1 = TRUE)}
+#'   \item{detach}{Detachment Factor Score}
+#' }
+#' @source \url{http://doi.org/10.1016/j.comppsych.2017.06.014}
+"girard2017"
 
 #' Angular displacements for octant circumplex scales
 #'

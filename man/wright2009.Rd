@@ -4,7 +4,7 @@
 \name{wright2009}
 \alias{wright2009}
 \title{Standardized octant scores on hypothetical circumplex scales}
-\format{A data frame with 5 rows and 8 variables:
+\format{A data frame with 5 observations and 8 variables:
 \describe{
   \item{PA}{circumplex scale at displacement 90}
   \item{BC}{circumplex scale at displacement 135}

@@ -4,11 +4,16 @@
 \alias{ssm_profile2}
 \title{Mean Profile Comparison Structural Summary Method}
 \usage{
-ssm_profile2(data, groups, scales, angles, bs_number = 2000)
+ssm_profile2(data, grouping, scales, angles, bs_number = 2000)
 }
 \arguments{
 \item{data}{A matrix or data frame containing circumplex scales and group
 membership.}
+
+\item{grouping}{The column name in \code{data} that specifies each
+observation's group. Be sure to enter the name as is (i.e., not as a string
+or number). This variable can be a factor with two levels or a numeric or
+character variable with two unique values.}
 
 \item{scales}{A vector that contains the column names in \code{data} that
 correspond to scores on each circumplex scale. Be sure to enter the names
@@ -18,11 +23,6 @@ consecutive columns can be captured using a colon (e.g., \code{x1:x8}).}
 \item{angles}{A vector of angles, in degrees, of the circumplex scales.}
 
 \item{bs_number}{The number of bootstrap resamples (default = 2000).}
-
-\item{group}{The column name in \code{data} that specifies each observation's
-group. Be sure to enter the name as is (i.e., not as a string or number).
-This variable can be a factor with two levels or a numeric or character
-variable with two unique values.}
 }
 \value{
 A tibble (data frame) containing estimates and bootstrapped 95\%
