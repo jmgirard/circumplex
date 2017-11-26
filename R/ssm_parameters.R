@@ -21,14 +21,14 @@
 ssm_parameters <- function(scores, angles, tibble = TRUE) {
   stopifnot(length(scores) == length(angles))
   stopifnot(tibble == TRUE || tibble == FALSE || tibble == 1 || tibble == 0)
-  k <- length(scores)
+  nScales <- length(scores)
   elev <- mean(scores)
-  xval <- as.numeric((2 / k) * (scores %*% cos(angles * (pi / 180))))
-  yval <- as.numeric((2 / k) * (scores %*% sin(angles * (pi / 180))))
+  xval <- as.numeric((2 / nScales) * (scores %*% cos(angles * (pi / 180))))
+  yval <- as.numeric((2 / nScales) * (scores %*% sin(angles * (pi / 180))))
   ampl <- sqrt(xval ^ 2 + yval ^ 2)
   disp <- (atan2(yval, xval) * (180 / pi)) %% 360
   gfit <- 1 - ((sum((elev + ampl * cos((angles - disp) * (pi / 180)) - 
-      scores) ^ 2)) / (var(scores) * (k - 1)))
+      scores) ^ 2)) / (var(scores) * (nScales - 1)))
   if (tibble == TRUE) {
     ssm <- tibble::tibble(
       e = elev,
