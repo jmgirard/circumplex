@@ -2,7 +2,10 @@ Package: ssm
 Type: Package
 Version: 0.0.0.9000
 Title: Structural Summary Method with Bootstrap Confidence Intervals
-Description: Calculate structural summary method parameters for circumplex data
+Description: Tools for conducting and visualizing circumplex data analyses using
+    the structural summary method (SSM). SSM parameters can be evaluated for
+    groups' mean profiles on circumplex scales as well as for measures'
+    correlations with circumplex scales.
 Authors@R: as.person(c(
     "Jeffrey Girard <j.girard@pitt.edu> [aut, cre]",
     "Johannes Zimmermann <j.zimmermann@psychologische-hochschule.de> [aut]",
@@ -15,13 +18,15 @@ Imports:
     assertthat,
     boot,
     circular,
+    dplyr,
     magrittr,
+    purrr,
     purrrlyr,
     rlang,
-    tidyverse
+    stats,
+    tibble
 Suggests:
     testthat
 License: GPL-3
 LazyData: true
 RoxygenNote: 6.0.1
-
