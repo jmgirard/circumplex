@@ -20,7 +20,7 @@ smart_quantile <- function(data, probs){
   if (circular::is.circular(data)) {
     q <- circular::quantile.circular(data, probs = probs) %% 360
   } else {
-    q <- quantile(data, probs = probs)
+    q <- stats::quantile(data, probs = probs)
   }
   return(q)
 }
