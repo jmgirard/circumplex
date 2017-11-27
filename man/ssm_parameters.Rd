@@ -28,9 +28,3 @@ Depending on \code{tibble}, with a tibble (if TRUE) or an unnamed
 \description{
 Calculate structural summary parameters
 }
-\examples{
-ssm_parameters(c(0.37, -0.57, -0.52, 0.02, 0.69, 1.42, 1.58, 0.68),
-  c(90, 135, 180, 225, 270, 315, 360, 45))
-ssm_parameters(c(0.37, -0.57, -0.52, 0.02, 0.69, 1.42, 1.58, 0.68), octants)
-ssm_parameters(c(0.37, -0.52, 0.69, 1.58), poles)
-}

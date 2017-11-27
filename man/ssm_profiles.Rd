@@ -38,9 +38,3 @@ A tibble containing SSM parameters (point and interval estimates) for
 Calculate SSM parameters with bootstrapped confidence intervals for the mean
 of any number of groups.
 }
-\examples{
-#' # Calculate SSM parameters for all observations in girard2017
-ssm_profiles(girard2017, ZPA:ZNO, octants)
-# Calculate SSM parameters for groups defined by the bordl variable
-ssm_profiles(girard2017, ZPA:ZNO, octants, grouping = bordl)
-}

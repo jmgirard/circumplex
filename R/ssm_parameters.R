@@ -13,11 +13,6 @@
 #'   \code{scores} given \code{angles}. The vector will contain the following
 #'   values: e (elevation), x (x-axis value), y (y-axis value), a (amplitude), d
 #'   (angular displacement, in degrees), and fit (R-squared).
-#' @examples
-#' ssm_parameters(c(0.37, -0.57, -0.52, 0.02, 0.69, 1.42, 1.58, 0.68),
-#'   c(90, 135, 180, 225, 270, 315, 360, 45))
-#' ssm_parameters(c(0.37, -0.57, -0.52, 0.02, 0.69, 1.42, 1.58, 0.68), octants)
-#' ssm_parameters(c(0.37, -0.52, 0.69, 1.58), poles)
 
 ssm_parameters <- function(scores, angles, tibble = TRUE) {
 
@@ -34,7 +29,7 @@ ssm_parameters <- function(scores, angles, tibble = TRUE) {
   ampl <- sqrt(xval ^ 2 + yval ^ 2)
   disp <- (atan2(yval, xval) * (180 / pi)) %% 360
   gfit <- 1 - ((sum((elev + ampl * cos((angles - disp) * (pi / 180)) - 
-      scores) ^ 2)) / (var(scores) * (nScales - 1)))
+      scores) ^ 2)) / (stats::var(scores) * (nScales - 1)))
 
   # Format output according to tibble argument ------------------------------
   if (tibble == TRUE) {
