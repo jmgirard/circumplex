@@ -4,8 +4,7 @@
 #' @return Difference between \code{w1} and \code{w2} in circular space.
 
 wd <- function(w1, w2) {
-  w <- ((w2 - w1 + 180) %% 360) - 180
-  return(w)
+  ((w2 - w1 + 180) %% 360) - 180
 }
 
 #' Calculate correct quantiles for circular and non-circular data
@@ -22,7 +21,7 @@ smart_quantile <- function(.data, probs){
   } else {
     q <- stats::quantile(.data, probs = probs)
   }
-  return(q)
+  q
 }
 
 #' Compute difference between two sets of SSM parameters
@@ -35,7 +34,7 @@ smart_quantile <- function(.data, probs){
 param_diff <- function(p1, p2) {
   pd <- p2 - p1
   pd[5] <- wd(p1[5], p2[5])
-  return(pd)
+  pd
 }
 
 #' Coerce a variable to the circular data type
@@ -45,8 +44,7 @@ param_diff <- function(p1, p2) {
 #'   degree units and counter-clockwise rotation) for the circular package.
 
 make_circular <- function(x) {
-  y <- circular::circular(x, units = "degrees", rotation = "counter")
-  return(y)
+  circular::circular(x, units = "degrees", rotation = "counter")
 }
 
 #' Calculate bootstrap confidence intervals given data and function
@@ -72,19 +70,32 @@ ssm_bootstrap <- function(.data, bs_function, ssm, angles, boots, interval) {
   )
   
   # Prepare bootstrap results for quantile calculation ----------------------
-  bs_t <- tibble::as_tibble(bs_results$t)
-  bs_t <- dplyr::mutate(bs_t, V5 = make_circular(V5))
+  bs_t <- tibble::as_tibble(bs_results$t) %>%
+    dplyr::mutate(V5 = make_circular(V5))
   
   # Create output including confidence intervals ----------------------------
-  low_p <- (1 - interval) / 2
-  upp_p <- 1 - (1 - interval) / 2 
+  lpr <- (1 - interval) / 2
+  upr <- 1 - (1 - interval) / 2
+  lci <- purrr::map_dbl(bs_t, smart_quantile, probs = lpr)
+  uci <- purrr::map_dbl(bs_t, smart_quantile, probs = upr)
   results <- tibble::tibble(
-    Parameter = c("Elevation", "X-Value", "Y-Value", 
-      "Amplitude", "Displacement", "Model Fit"),
-    Estimate = ssm,
-    Lower_CI = purrr::map_dbl(bs_t, smart_quantile, probs = low_p),
-    Upper_CI = purrr::map_dbl(bs_t, smart_quantile, probs = upp_p)
+    e_est = ssm[[1]],
+    x_est = ssm[[2]],
+    y_est = ssm[[3]],
+    a_est = ssm[[4]],
+    d_est = ssm[[5]],
+    fit   = ssm[[6]],
+    e_lci = lci[[1]],
+    e_uci = uci[[1]],
+    x_lci = lci[[2]],
+    x_uci = uci[[2]],
+    y_lci = lci[[3]],
+    y_uci = uci[[3]],
+    a_lci = lci[[4]],
+    a_uci = uci[[4]],
+    d_lci = lci[[5]],
+    d_uci = uci[[5]]
   )
-  
+
   results
 }
