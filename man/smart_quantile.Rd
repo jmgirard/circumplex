@@ -4,10 +4,10 @@
 \alias{smart_quantile}
 \title{Calculate correct quantiles for circular and non-circular data}
 \usage{
-smart_quantile(data, probs)
+smart_quantile(.data, probs)
 }
 \arguments{
-\item{data}{A vector or data frame containing numeric data.}
+\item{.data}{A vector or data frame containing numeric data.}
 
 \item{probs}{A vector of probabilities to get quantiles for.}
 }

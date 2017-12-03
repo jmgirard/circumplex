@@ -28,7 +28,7 @@ observations, do not supply this argument (see examples).}
 \item{plot}{A logical determining whether a plot should be created (default =
 TRUE).}
 
-\item{...}{Additional parameters for \code{sm_plot()} if \code{plot} is TRUE.}
+\item{...}{Additional parameters to be passed to \code{ssm_plot()}.}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for
