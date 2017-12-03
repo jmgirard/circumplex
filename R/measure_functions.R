@@ -7,10 +7,10 @@
 #'   numeric measures to be evaluated.
 #' @param scales A list of variables in \code{.data} that contain circumplex
 #'   circumplex scales (in tidyverse-style NSE specification, see examples).
-#' @param measures A list of variables in \code{.data} that contain numeric
-#'   values (in tidyverse-style NSE specification, see examples).
 #' @param angles A numerical vector containing the angular displacement of each
 #'   circumplex scale included in \code{scales} (in degrees).
+#' @param measures A list of variables in \code{.data} that contain numeric
+#'   values (in tidyverse-style NSE specification, see examples).
 #' @param boots The number of bootstrap resamples to use in calculating the
 #'   confidence intervals (default = 2000).
 #' @param interval The confidence intervals' percentage level (default = 0.95).
@@ -20,7 +20,7 @@
 #' @return A tibble containing SSM parameters (point and interval estimates) for
 #'   each measure (based on their correaltions with the circumplex scales).
 
-ssm_measures <- function(.data, scales, measures, angles,
+ssm_measures <- function(.data, scales, angles, measures, 
   boots = 2000, interval = 0.95, plot = TRUE, ...) {
   
   # Enable column specification using tidyverse-style NSE -------------------
@@ -71,8 +71,8 @@ ssm_measures_one <- function(.data, angles, boots, interval) {
   # Perform bootstrap on SSM parameters -------------------------------------
   bs_function <- function(.data, index, angles) {
     resample <- .data[index, ]
-    rmat_r <- .data %>% cor()
-    scores_r <- rmat["measure", 1:(ncol(rmat_r) - 1)]
+    rmat_r <- resample %>% cor()
+    scores_r <- rmat_r["measure", 1:(ncol(rmat_r) - 1)]
     ssm_r <- ssm_parameters(scores_r, angles, tibble = FALSE)
     return(ssm_r)
   }
