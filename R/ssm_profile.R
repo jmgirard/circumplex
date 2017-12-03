@@ -16,12 +16,13 @@
 #'   observations, do not supply this argument (see examples).
 #' @param plot A logical determining whether a plot should be created (default =
 #'   TRUE).
-#' @param ... Additional parameters for \code{sm_plot()} if \code{plot} is TRUE.
+#' @param ... Additional parameters to be passed to \code{ssm_plot()}.
 #' @return A tibble containing SSM parameters (point and interval estimates) for
 #'   each group's mean profile (or the entire mean profile without grouping).
 
-ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
-                         grouping, plot = TRUE, ...) {
+ssm_profiles <- function(.data, scales, angles,
+  boots = 2000, interval = 0.95, grouping, plot = TRUE, ...) {
+  
   # Enable column specification using tidyverse-style NSE -------------------
   scales_en <- rlang::enquo(scales)
   
@@ -77,27 +78,8 @@ ssm_profiles_one <- function(.data, angles, boots, interval) {
     ssm_r <- ssm_parameters(scores_r, angles, tibble = FALSE)
     return(ssm_r)
   }
-  bs_results <- boot::boot(
-    data = .data,
-    statistic = bs_function, 
-    R = boots,
-    angles = angles
-  )
-  
-  # Prepare bootstrap results for quantile calculation ----------------------
-  bs_t <- tibble::as_tibble(bs_results$t)
-  bs_t <- dplyr::mutate(bs_t, V5 = make_circular(V5))
-  
-  # Create output including confidence intervals ----------------------------
-  low_p <- (1 - interval) / 2
-  upp_p <- 1 - (1 - interval) / 2 
-  results <- tibble::tibble(
-    Parameter = c("Elevation", "X-Value", "Y-Value", 
-      "Amplitude", "Displacement", "Model Fit"),
-    Estimate = ssm,
-    Lower_CI = purrr::map_dbl(bs_t, smart_quantile, probs = low_p),
-    Upper_CI = purrr::map_dbl(bs_t, smart_quantile, probs = upp_p)
-  )
+  results <- ssm_bootstrap(.data, bs_function, ssm, angles, boots, interval)
+
   results
 }
 
