@@ -34,7 +34,9 @@ ssm_profiles <- function(.data, scales, angles,
   if (base::missing(grouping)) {
     results <- .data %>%
       dplyr::select(!!scales_en) %>%
-      ssm_profiles_one(angles, boots, interval)
+      ssm_profiles_one(angles, boots, interval) %>%
+      dplyr::mutate(Group = factor(Inf)) %>%
+      dplyr::select(Group, everything())
   } else {
     grouping_en <- rlang::enquo(grouping)
     results <- .data %>% 
@@ -45,6 +47,12 @@ ssm_profiles <- function(.data, scales, angles,
       purrrlyr::by_slice(ssm_profiles_one, angles, boots, interval,
         .collate = "rows")
   }
+  
+  if (plot == TRUE) {
+    p <- ssm_plot(results, angles, type = "Profile")
+    print(p)
+  }
+  
   results
 }
 

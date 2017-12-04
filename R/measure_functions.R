@@ -28,18 +28,24 @@ ssm_measures <- function(.data, scales, angles, measures,
   measures_en <- rlang::enquo(measures)
   
   # Check that inputs are valid ---------------------------------------------
-  assert_that(is.numeric(angles), is.count(boots))
+  assert_that(is.numeric(angles), is.count(boots), !missing(measures))
   assert_that(is.numeric(interval), interval > 0, interval < 1)
   
   # Iterate over measures to calculate SSM paramters ------------------------
-    data_scales <- .data %>%
-      dplyr::select(!!scales_en)
-    data_measures <- .data %>%
-      dplyr::select(!!measures_en)
-    results <- data_measures %>%
-      purrr::map_dfr(~ssm_measures_one(mutate(data_scales, measure = .),
-        angles, boots, interval), .id = "Measure")
+  data_scales <- .data %>%
+    dplyr::select(!!scales_en)
+  data_measures <- .data %>%
+    dplyr::select(!!measures_en)
+  results <- data_measures %>%
+    purrr::map_dfr(~ssm_measures_one(mutate(data_scales, measure = .),
+      angles, boots, interval), .id = "Measure")
 
+  # Generate plot if requested ----------------------------------------------
+  if (plot == TRUE) {
+    p <- ssm_plot(results, angles, type = "Measure")
+    print(p)
+  }
+  
   results
 }
 
