@@ -4,7 +4,7 @@
 \alias{ssm_bootstrap}
 \title{Calculate bootstrap confidence intervals given data and function}
 \usage{
-ssm_bootstrap(.data, bs_function, ssm, angles, boots, interval)
+ssm_bootstrap(.data, bs_function, ssm, angles, boots, interval, ...)
 }
 \arguments{
 \item{.data}{A matrix or data frame containing circumplex scales and possibly

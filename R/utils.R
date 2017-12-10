@@ -59,15 +59,15 @@ make_circular <- function(x) {
 #' @param interval The confidence intervals' percentage level (e.g., 0.95).
 #' @return A tibble containing SSM parameters (point and interval estimates).
 
-ssm_bootstrap <- function(.data, bs_function, ssm, angles, boots, interval) {
+ssm_bootstrap <- function(.data, bs_function, ssm,
+                          angles, boots, interval, ...) {
 
   # Perform bootstrapping ---------------------------------------------------
   bs_results <- boot::boot(
     data = .data,
     statistic = bs_function, 
     R = boots,
-    angles = angles
-  )
+    angles = angles, ...)
   
   # Prepare bootstrap results for quantile calculation ----------------------
   bs_t <- tibble::as_tibble(bs_results$t) %>%
@@ -98,4 +98,14 @@ ssm_bootstrap <- function(.data, bs_function, ssm, angles, boots, interval) {
   )
 
   results
+}
+
+#' Enumerate all unique pairwise combinations of a factor's levels
+#'
+#' @param f A vector of type factor.
+#' @return An n-by-2 character matrix containing the n unique pairwise
+#'   combinations of the levels in \code{f}.
+
+unique_pairs <- function(f) {
+  gtools::combinations(n = nlevels(f), r = 2, v = levels(f), repeats = FALSE)
 }
