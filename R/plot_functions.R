@@ -27,13 +27,14 @@ ssm_plot <- function(.results, angles, type, labels = FALSE, palette = "Set1") {
     p <- p + geom_rect(aes(xmin = d_lci, xmax = d_uci, ymin = a_lci, ymax = a_uci,
       color = Group, fill = Group), alpha = 1 / 2, size = 1) + 
       geom_point(aes(x = d_est, y = a_est, color = Group), size = 2) 
+    if (nlevels(.results$Group) == 1) {
+      p <- p + theme(legend.position = "none")
+    }
     if (labels == TRUE) {
       p <- p + geom_label_repel(aes(x = d_est, y = a_est,
-        label = Group, color = Measure)) + theme(legend.position = "none")
+        label = Group, color = Group)) + theme(legend.position = "none")
     }
   }
-  
-      
 
   p
 }
