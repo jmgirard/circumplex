@@ -11,7 +11,7 @@ ssm_profiles_two(.data, angles, boots, interval)
 grouping variable with only two levels.}
 
 \item{angles}{A numerical vector containing the angular displacement of each
-circumplex scale included in \code{scales} (in degrees).}
+circumplex scale included in \code{.data} (in degrees).}
 
 \item{boots}{The number of bootstrap resamples to use in calculating the
 confidence intervals.}
