@@ -20,6 +20,8 @@ circumplex scale (in degrees).}
 \item{boots}{A positive integer specifying the number of bootstrap resamples.}
 
 \item{interval}{The confidence intervals' percentage level (e.g., 0.95).}
+
+\item{...}{Additional parameters to be passed to the \code{boot()} function.}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates).

@@ -17,11 +17,10 @@ wd <- function(w1, w2) {
 
 smart_quantile <- function(.data, probs){
   if (circular::is.circular(.data)) {
-    q <- circular::quantile.circular(.data, probs = probs) %% 360
+    circular::quantile.circular(.data, probs = probs) %% 360
   } else {
-    q <- stats::quantile(.data, probs = probs)
+    stats::quantile(.data, probs = probs)
   }
-  q
 }
 
 #' Compute difference between two sets of SSM parameters
@@ -57,6 +56,7 @@ make_circular <- function(x) {
 #'   circumplex scale (in degrees).
 #' @param boots A positive integer specifying the number of bootstrap resamples.
 #' @param interval The confidence intervals' percentage level (e.g., 0.95).
+#' @param ... Additional parameters to be passed to the \code{boot()} function.
 #' @return A tibble containing SSM parameters (point and interval estimates).
 
 ssm_bootstrap <- function(.data, bs_function, ssm,
@@ -107,5 +107,7 @@ ssm_bootstrap <- function(.data, bs_function, ssm,
 #'   combinations of the levels in \code{f}.
 
 unique_pairs <- function(f) {
-  gtools::combinations(n = nlevels(f), r = 2, v = levels(f), repeats = FALSE)
+  tibble::as_tibble(
+    gtools::combinations(n = nlevels(f), r = 2, v = levels(f), repeats = FALSE)
+  )
 }
