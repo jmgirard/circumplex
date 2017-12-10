@@ -61,14 +61,14 @@ ssm_profiles <- function(.data, scales, angles,
       print(p)
     }
     if (pairwise == TRUE) {
-      g_pairs <- as_tibble(unique_pairs(data_groups$Group))
-      cmp_function <- function(pair, .data, ...) {
-        data_compare <- data_groups %>%
+      g_pairs <- unique_pairs(data_groups$Group)
+      cmp_function <- function(pair, .data) {
+        data_compare <- .data %>%
           dplyr::filter(Group %in% as.character(pair))
         ssm_profiles_two(data_compare, angles, boots, interval)
       }
       c_results <- g_pairs %>%
-        purrrlyr::by_row(cmp_function, .collate = "rows") %>%
+        purrrlyr::by_row(cmp_function, data_groups, .collate = "rows") %>%
         dplyr::mutate(Contrast = sprintf("%s-%s", V2, V1)) %>%
         dplyr::select(-c(V1, V2, .row))
       # Consider outputting a forest plot for the contrast effects here
@@ -76,7 +76,6 @@ ssm_profiles <- function(.data, scales, angles,
         dplyr::select(Group, Contrast, everything())
     }
   }
-  
   results
 }
 
@@ -107,12 +106,10 @@ ssm_profiles_one <- function(.data, angles, boots, interval) {
   bs_function <- function(.data, index, angles) {
     resample <- .data[index, ]
     scores_r <- colMeans(resample)
-    ssm_r <- ssm_parameters(scores_r, angles, tibble = FALSE)
-    ssm_r
+    ssm_parameters(scores_r, angles, tibble = FALSE)
   }
-  results <- ssm_bootstrap(.data, bs_function, ssm, angles, boots, interval)
-
-  results
+  ssm_bootstrap(.data, bs_function, ssm, angles, boots, interval)
+  
 }
 
 #' Mean Profile Comparison Structural Summary Method
@@ -123,7 +120,7 @@ ssm_profiles_one <- function(.data, angles, boots, interval) {
 #' @param .data A matrix or data frame containing circumplex scales and a
 #'   grouping variable with only two levels.
 #' @param angles A numerical vector containing the angular displacement of each
-#'   circumplex scale included in \code{scales} (in degrees).
+#'   circumplex scale included in \code{.data} (in degrees).
 #' @param boots The number of bootstrap resamples to use in calculating the
 #'   confidence intervals.
 #' @param interval The confidence intervals' percentage level.
@@ -131,6 +128,11 @@ ssm_profiles_one <- function(.data, angles, boots, interval) {
 #'   the difference between two groups' mean profiles.
 
 ssm_profiles_two <- function(.data, angles, boots, interval) {
+  
+  # TODO: Can increase speed of pairwise comparisons by doing a single
+  # stratified bootstrapping with all pairwise comparisons built in, rather than
+  # separate bootstraps for each pairwise combination.
+  
   scores <- .data %>%
     dplyr::group_by(Group) %>%
     dplyr::summarize_all(mean)
@@ -145,11 +147,8 @@ ssm_profiles_two <- function(.data, angles, boots, interval) {
       dplyr::summarize_all(mean)
     ssm_r1 <- ssm_parameters(as.double(scores_r[1, 2:ncol(scores_r)]), angles, FALSE)
     ssm_r2 <- ssm_parameters(as.double(scores_r[2, 2:ncol(scores_r)]), angles, FALSE)
-    ssm_rd <- param_diff(ssm_r1, ssm_r2)
-    ssm_rd
+    param_diff(ssm_r1, ssm_r2)
   }
-  results <- ssm_bootstrap(.data, bs_function, ssm_gd, angles, boots, interval,
+  ssm_bootstrap(.data, bs_function, ssm_gd, angles, boots, interval,
     strata = .data$Group)
-  
-  results
 }
