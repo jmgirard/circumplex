@@ -11,6 +11,9 @@
 #'   circumplex scale included in \code{scales} (in degrees).
 #' @param measures A list of variables in \code{.data} that contain numeric
 #'   values (in tidyverse-style NSE specification, see examples).
+#' @param pairwise A logical determining whether the measures should be
+#'   compared. If TRUE, the difference between each unique pairwise combination
+#'   of measures will be output (default = FALSE).
 #' @param boots The number of bootstrap resamples to use in calculating the
 #'   confidence intervals (default = 2000).
 #' @param interval The confidence intervals' percentage level (default = 0.95).
@@ -20,7 +23,7 @@
 #' @return A tibble containing SSM parameters (point and interval estimates) for
 #'   each measure (based on their correaltions with the circumplex scales).
 
-ssm_measures <- function(.data, scales, angles, measures, 
+ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE, 
   boots = 2000, interval = 0.95, plot = TRUE, ...) {
   
   # Enable column specification using tidyverse-style NSE -------------------
@@ -39,13 +42,31 @@ ssm_measures <- function(.data, scales, angles, measures,
   results <- data_measures %>%
     purrr::map_dfr(~ssm_measures_one(mutate(data_scales, measure = .),
       angles, boots, interval), .id = "Measure")
-
+  
   # Generate plot if requested ----------------------------------------------
   if (plot == TRUE) {
     p <- ssm_plot(results, angles, type = "Measure")
     print(p)
   }
-  
+
+  # Calculate pairwise contrasts if requested -------------------------------
+  if (pairwise == TRUE) {
+    m_pairs <- unique_pairs(factor(colnames(data_measures)))
+    cmp_function <- function(pair, data_m, data_s) {
+      data_compare <- data_m %>%
+        dplyr::select(as.character(pair)) %>%
+        dplyr::bind_cols(data_s)
+      ssm_measures_two(data_compare, angles, boots, interval)
+    }
+    c_results <- m_pairs %>%
+      purrrlyr::by_row(cmp_function, data_measures, data_scales,
+        .collate = "rows") %>%
+      dplyr::mutate(Contrast = sprintf("%s-%s", V2, V1)) %>%
+      dplyr::select(-c(V1, V2, .row))
+    # Consider outputting forest plot for the contrast effects here
+    results <- dplyr::bind_rows(results, c_results) %>%
+      dplyr::select(Measure, Contrast, everything())
+  }
   results
 }
 
@@ -77,12 +98,52 @@ ssm_measures_one <- function(.data, angles, boots, interval) {
   # Perform bootstrap on SSM parameters -------------------------------------
   bs_function <- function(.data, index, angles) {
     resample <- .data[index, ]
-    rmat_r <- resample %>% cor()
+    rmat_r <- resample %>% stats::cor()
     scores_r <- rmat_r["measure", 1:(ncol(rmat_r) - 1)]
-    ssm_r <- ssm_parameters(scores_r, angles, tibble = FALSE)
-    return(ssm_r)
+    ssm_parameters(scores_r, angles, tibble = FALSE)
   }
-  results <- ssm_bootstrap(.data, bs_function, ssm, angles, boots, interval)
+  ssm_bootstrap(.data, bs_function, ssm, angles, boots, interval)
+
+}
+
+#' Correlational Comparison Structural Summary Method
+#'
+#' Worker function for ssm_measures, calculates point and interval estimates for
+#' the difference between two measures' correlational SSM parameters.
+#'
+#' @param .data A matrix or data frame containing exactly two measure variables
+#'   and any number of circumplex scales.
+#' @param angles A numerical vector containing the angular displacement of each
+#'   circumplex scale included in \code{.data} (in degrees).
+#' @param boots The number of bootstrap resamples to use in calculating the
+#'   confidence intervals.
+#' @param interval The confidence intervals' percentage level.
+#' @return A tibble containing SSM parameters (point and interval estimates) for
+#'   the difference between two measures (based on correlations).
+
+ssm_measures_two <- function(.data, angles, boots, interval) {
   
-  results
+  # Check that inputs are valid ---------------------------------------------
+  assert_that(are_equal(length(.data) - 2, length(angles)))
+  
+  # Get SSM parameter estimates for mean profile ----------------------------
+  rmat <- .data %>% stats::cor()
+  scores_m1 <- rmat[1, 3:ncol(rmat)]
+  scores_m2 <- rmat[2, 3:ncol(rmat)]
+  ssm_m1 <- ssm_parameters(scores_m1, angles, tibble = FALSE)
+  ssm_m2 <- ssm_parameters(scores_m2, angles, tibble = FALSE)
+  ssm_md <- param_diff(ssm_m1, ssm_m2)
+  
+  # Perform bootstrap on SSM parameters -------------------------------------
+  bs_function <- function(.data, index, angles) {
+    resample <- .data[index, ]
+    rmat_r <- resample %>% stats::cor()
+    scores_r1 <- rmat_r[1, 3:ncol(rmat_r)]
+    scores_r2 <- rmat_r[2, 3:ncol(rmat_r)]
+    ssm_r1 <- ssm_parameters(scores_r1, angles, tibble = FALSE)
+    ssm_r2 <- ssm_parameters(scores_r2, angles, tibble = FALSE)
+    param_diff(ssm_r1, ssm_r2)
+  }
+  ssm_bootstrap(.data, bs_function, ssm_md, angles, boots, interval)
+
 }
