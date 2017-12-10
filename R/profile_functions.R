@@ -71,11 +71,12 @@ ssm_profiles <- function(.data, scales, angles,
         purrrlyr::by_row(cmp_function, data_groups, .collate = "rows") %>%
         dplyr::mutate(Contrast = sprintf("%s-%s", V2, V1)) %>%
         dplyr::select(-c(V1, V2, .row))
-      # Consider outputting a forest plot for the contrast effects here
+      # TODO: Create a forest plot for the contrast effects here
       results <- dplyr::bind_rows(results, c_results) %>%
         dplyr::select(Group, Contrast, everything())
     }
   }
+  # TODO: Create htmlTable from results (after tidying it up)
   results
 }
 

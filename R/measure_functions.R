@@ -63,10 +63,11 @@ ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE,
         .collate = "rows") %>%
       dplyr::mutate(Contrast = sprintf("%s-%s", V2, V1)) %>%
       dplyr::select(-c(V1, V2, .row))
-    # Consider outputting forest plot for the contrast effects here
+    # TODO: Create a forest plot for the contrast effects here
     results <- dplyr::bind_rows(results, c_results) %>%
       dplyr::select(Measure, Contrast, everything())
   }
+  # TODO: Create htmlTable from results (after tidying it a bit)
   results
 }
 
@@ -122,6 +123,10 @@ ssm_measures_one <- function(.data, angles, boots, interval) {
 #'   the difference between two measures (based on correlations).
 
 ssm_measures_two <- function(.data, angles, boots, interval) {
+  
+  # TODO: Can increase speed of pairwise comparisons by doing a single
+  # stratified bootstrapping with all pairwise comparisons built in, rather than
+  # separate bootstraps for each pairwise combination.
   
   # Check that inputs are valid ---------------------------------------------
   assert_that(are_equal(length(.data) - 2, length(angles)))
