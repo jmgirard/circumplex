@@ -13,7 +13,7 @@ Authors@R: as.person(c(
 URL: http://github.com/jmgirard/ssm
 BugReports: https://github.com/jmgirard/ssm/issues
 Encoding: UTF-8
-Depends: R (>= 3.4.2)
+Depends: R (>= 3.4.3)
 Imports:
     assertthat,
     boot,
