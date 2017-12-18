@@ -71,7 +71,10 @@ ssm_profiles <- function(.data, scales, angles,
         purrrlyr::by_row(cmp_function, data_groups, .collate = "rows") %>%
         dplyr::mutate(Contrast = sprintf("%s-%s", V2, V1)) %>%
         dplyr::select(-c(V1, V2, .row))
-      # TODO: Create a forest plot for the contrast effects here
+      if (plot == TRUE) {
+        pd <- diff_plot(c_results)
+        print(pd)
+      }
       results <- dplyr::bind_rows(results, c_results) %>%
         dplyr::select(Group, Contrast, dplyr::everything())
     }

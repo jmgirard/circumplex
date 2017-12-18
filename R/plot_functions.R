@@ -40,12 +40,16 @@ ssm_plot <- function(.results, angles, type, labels = FALSE, palette = "Set1") {
 }
 
 diff_plot <- function(.results, interval) {
-  res <- c_results %>%
-    tidyr::gather(key, value, -Contrast, -fit, -d_est, -d_lci, -d_uci) %>%
+  res <- .results %>%
+    dplyr::mutate(d_est = rwd(d_est), d_lci = rwd(d_lci), d_uci = rwd(d_uci)) %>%
+    tidyr::gather(key, value, -Contrast, -fit) %>%
     tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
-    tidyr::spread(Type, value)
+    tidyr::spread(Type, value) %>%
+    dplyr::rename(Estimate = est)
   p <- ggplot2::ggplot(res) +
-    geom_pointrange(aes(x = Parameter, y = est, ymin = lci, ymax = uci, color = Contrast)) +
-    geom_hline(yintercept = 0) + theme(legend.position = "top")
+    geom_pointrange(aes(x = Contrast, y = Estimate, ymin = lci, ymax = uci, color = Contrast)) +
+    geom_hline(yintercept = 0) + 
+    facet_wrap(~Parameter, nrow = 1, scales = "free") +
+    theme_bw() + theme(legend.position = "top")
   p
 }

@@ -7,6 +7,10 @@ wd <- function(w1, w2) {
   ((w2 - w1 + 180) %% 360) - 180
 }
 
+rwd <- function(wd) {
+  ((wd + 180) %% 360) - 180
+}
+
 #' Calculate correct quantiles for circular and non-circular data
 #'
 #' @param .data A vector or data frame containing numeric data.
