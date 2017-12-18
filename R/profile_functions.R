@@ -40,7 +40,7 @@ ssm_profiles <- function(.data, scales, angles,
       dplyr::select(!!scales_en) %>%
       ssm_profiles_one(angles, boots, interval) %>%
       dplyr::mutate(Group = factor(Inf)) %>%
-      dplyr::select(Group, everything())
+      dplyr::select(Group, dplyr::everything())
     if (plot == TRUE) {
       p <- ssm_plot(results, angles, "Profile")
       print(p)
@@ -73,7 +73,7 @@ ssm_profiles <- function(.data, scales, angles,
         dplyr::select(-c(V1, V2, .row))
       # TODO: Create a forest plot for the contrast effects here
       results <- dplyr::bind_rows(results, c_results) %>%
-        dplyr::select(Group, Contrast, everything())
+        dplyr::select(Group, Contrast, dplyr::everything())
     }
   }
   # TODO: Create htmlTable from results (after tidying it up)
