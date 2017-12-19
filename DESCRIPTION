@@ -19,6 +19,7 @@ Imports:
     boot,
     circular,
     dplyr,
+    ggplot2,
     gtools,
     magrittr,
     purrr,

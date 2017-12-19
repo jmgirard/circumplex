@@ -41,7 +41,10 @@ ssm_plot <- function(.results, angles, type, labels = FALSE, palette = "Set1") {
 
 diff_plot <- function(.results, interval) {
   res <- .results %>%
-    dplyr::mutate(d_est = rwd(d_est), d_lci = rwd(d_lci), d_uci = rwd(d_uci)) %>%
+    dplyr::mutate(
+      d_uci = ifelse(d_uci < d_lci && d_uci < 180, rwd(d_uci), d_uci),
+      d_lci = ifelse(d_lci > d_uci && d_lci > 180, rwd(d_lci), d_lci)
+    ) %>%
     tidyr::gather(key, value, -Contrast, -fit) %>%
     tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
     tidyr::spread(Type, value) %>%
