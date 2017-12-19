@@ -115,3 +115,23 @@ unique_pairs <- function(f) {
     gtools::combinations(n = nlevels(f), r = 2, v = levels(f), repeats = FALSE)
   )
 }
+
+
+results_table <- function(results, group = FALSE, measure = FALSE) {
+  df <- results %>%
+    dplyr::transmute(
+      Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
+      `X-Value` = sprintf("%.2f [%.2f, %.2f]", x_est, x_lci, x_uci),
+      `Y-Value` = sprintf("%.2f [%.2f, %.2f]", y_est, y_lci, y_uci),
+      Amplitude = sprintf("%.2f [%.2f, %.2f]", a_est, a_lci, a_uci),
+      Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
+      Fit = sprintf("%.3f", fit)
+    )
+  if (group == TRUE) {
+    df <- dplyr::bind_cols(Group = results$Group, df)
+  }
+  if (measure == TRUE) {
+    df <- dplyr::bind_cols(Measure = results$Measure, df)
+  }
+  df
+}

@@ -80,6 +80,15 @@ ssm_profiles <- function(.data, scales, angles,
     }
   }
   # TODO: Create htmlTable from results (after tidying it up)
+  df <- results_table(results, group = !base::missing(grouping))
+  print(df)
+  ht <- htmlTable::htmlTable(df,
+    caption = "Structural Summary Method Parameters with Bootstrapped Confidence Intervals",
+    align = "llllll",
+    align.header = "llllll",
+    rnames = FALSE,
+    css.cell = "padding-right: 1em; min-width: 3em;")
+  print(ht)
   results
 }
 
