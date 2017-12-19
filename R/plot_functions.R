@@ -1,7 +1,7 @@
 
 base_plot <- function(data = NULL, angles = octants, alim = c(0, 1), 
   abreaks = round(seq(alim[1], alim[2], length.out = 5), 2)) {
-  p <- ggplot2::ggplot(data) + xlab(NULL) + ylab(NULL) + theme_bw() +
+  p <- ggplot(data) + xlab(NULL) + ylab(NULL) + theme_bw() +
     scale_x_continuous(breaks = octants, limits = c(0, 360)) + 
     scale_y_continuous(breaks = abreaks, limits = alim) +
     coord_polar(theta = "x", start = 1.5 * pi, direction = -1) +
@@ -46,7 +46,7 @@ diff_plot <- function(.results, interval) {
     tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
     tidyr::spread(Type, value) %>%
     dplyr::rename(Estimate = est)
-  p <- ggplot2::ggplot(res) +
+  p <- ggplot(res) +
     geom_pointrange(aes(x = Contrast, y = Estimate, ymin = lci, ymax = uci, color = Contrast)) +
     geom_hline(yintercept = 0) + 
     facet_wrap(~Parameter, nrow = 1, scales = "free") +

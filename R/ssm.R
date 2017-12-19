@@ -61,3 +61,6 @@ NULL
 
 #' @importFrom assertthat assert_that not_empty are_equal is.flag is.count
 NULL
+
+#' @importFrom ggplot2 ggplot geom_rect geom_point geom_pointrange geom_hline facet_wrap xlab ylab theme_bw theme scale_x_continuous scale_y_continuous scale_color_brewer
+NULL
