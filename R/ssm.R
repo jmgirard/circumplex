@@ -62,9 +62,5 @@ NULL
 #' @importFrom assertthat assert_that not_empty are_equal is.flag is.count
 NULL
 
-<<<<<<< HEAD
 #' @importFrom ggplot2 ggplot geom_rect geom_point geom_pointrange geom_hline facet_wrap xlab ylab theme_bw theme scale_x_continuous scale_y_continuous scale_color_brewer
-=======
-#' @importFrom ggplot2 ggplot geom_pointrange xlab ylab 
->>>>>>> 8a68ddd7afc586e69928c42ca19ee3421a8cbf8e
 NULL
