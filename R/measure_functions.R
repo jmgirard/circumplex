@@ -63,9 +63,12 @@ ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE,
         .collate = "rows") %>%
       dplyr::mutate(Contrast = sprintf("%s-%s", V2, V1)) %>%
       dplyr::select(-c(V1, V2, .row))
-    # TODO: Create a forest plot for the contrast effects here
+    if (plot == TRUE) {
+      pd <- diff_plot(c_results)
+      print(pd)
+    }
     results <- dplyr::bind_rows(results, c_results) %>%
-      dplyr::select(Measure, Contrast, everything())
+      dplyr::select(Measure, Contrast, dplyr::everything())
   }
   # TODO: Create htmlTable from results (after tidying it a bit)
   results
