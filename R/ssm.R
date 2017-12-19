@@ -61,3 +61,6 @@ NULL
 
 #' @importFrom assertthat assert_that not_empty are_equal is.flag is.count
 NULL
+
+#' @importFrom ggplot2 ggplot geom_pointrange xlab ylab 
+NULL
