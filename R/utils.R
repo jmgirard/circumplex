@@ -135,3 +135,23 @@ results_table <- function(results, group = FALSE, measure = FALSE) {
   }
   df
 }
+
+ggrad <- function(v) {
+  (v - 90) * (-pi / 180)
+}
+
+pretty_max <- function(v) {
+    amax <- max(v, na.rm = TRUE)
+  options <- c(
+    0.05, 0.10, 0.15, 0.20, 0.25,
+    0.50, 0.75, 1.00, 1.25, 1.50, 
+    2.00, 2.50, 3.00, 4.00, 5.00)
+  match <- options > amax
+  if (sum(match) > 1) {
+    options[match][[2]]
+  } else if (sum(match) == 1) {
+    options[match][[1]]
+  } else {
+    ceiling(amax * 1.50)
+  }
+}
