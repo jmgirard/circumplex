@@ -32,7 +32,8 @@ confidence intervals (default = 2000).}
 \item{plot}{A logical determining whether a plot should be created (default =
 TRUE).}
 
-\item{...}{Additional parameters to be passed to \code{ssm_plot()}.}
+\item{...}{Additional parameters to be passed to
+\code{circle_plot()}.Examples include \code{amax} and \code{font.size}.}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for
