@@ -79,7 +79,6 @@ ssm_profiles <- function(.data, scales, angles,
         dplyr::select(Group, Contrast, dplyr::everything())
     }
   }
-  # TODO: Create htmlTable from results (after tidying it up)
   df <- results_table(results, group = !base::missing(grouping))
   print(df)
   ht <- htmlTable::htmlTable(df,

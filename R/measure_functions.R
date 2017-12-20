@@ -70,7 +70,15 @@ ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE,
     results <- dplyr::bind_rows(results, c_results) %>%
       dplyr::select(Measure, Contrast, dplyr::everything())
   }
-  # TODO: Create htmlTable from results (after tidying it a bit)
+  df <- results_table(results, measure = TRUE)
+  print(df)
+  ht <- htmlTable::htmlTable(df,
+    caption = "Structural Summary Method Parameters with Bootstrapped Confidence Intervals",
+    align = "llllll",
+    align.header = "llllll",
+    rnames = FALSE,
+    css.cell = "padding-right: 1em; min-width: 3em;")
+  print(ht)
   results
 }
 
