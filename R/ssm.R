@@ -59,8 +59,14 @@ NULL
 #' @usage mutate(.data, ...)
 NULL
 
-#' @importFrom assertthat assert_that not_empty are_equal is.flag is.count
+#' @importFrom assertthat are_equal assert_that is.count is.flag not_empty
 NULL
 
-#' @importFrom ggplot2 ggplot geom_rect geom_point geom_pointrange geom_hline facet_wrap xlab ylab theme_bw theme scale_x_continuous scale_y_continuous scale_color_brewer
+#' @importFrom ggplot2 aes coord_fixed facet_wrap geom_hline geom_label
+#'   geom_point geom_pointrange geom_rect geom_segment ggplot scale_color_brewer
+#'   scale_fill_brewer scale_x_continuous scale_y_continuous theme theme_bw
+#'   theme_void xlab ylab
+NULL
+
+#' @importFrom ggforce geom_arc_bar geom_circle
 NULL
