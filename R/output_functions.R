@@ -185,3 +185,40 @@ diff_plot <- function(.results) {
     
   p
 }
+
+results_table <- function(results, contrast = FALSE, group = FALSE,
+  measure = FALSE) {
+  
+  df <- results %>%
+    dplyr::transmute(
+      Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
+      `X-Value` = sprintf("%.2f [%.2f, %.2f]", x_est, x_lci, x_uci),
+      `Y-Value` = sprintf("%.2f [%.2f, %.2f]", y_est, y_lci, y_uci),
+      Amplitude = sprintf("%.2f [%.2f, %.2f]", a_est, a_lci, a_uci),
+      Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
+      Fit = sprintf("%.3f", fit)
+    )
+  if (group == TRUE) {
+    df <- dplyr::bind_cols(Group = results$Group, df)
+    if (contrast == TRUE) {
+      df <- dplyr::bind_cols(Contrast = results$Contrast, df) %>%
+        dplyr::mutate(
+          New = ifelse(is.na(Contrast), as.character(Group), Contrast)
+        ) %>%
+        dplyr::select(New, dplyr::everything(), -Group, -Contrast) %>%
+        dplyr::rename(Group = New)
+    }
+  }
+  if (measure == TRUE) {
+    df <- dplyr::bind_cols(Measure = results$Measure, df)
+    if (contrast == TRUE) {
+      df <- dplyr::bind_cols(Contrast = results$Contrast, df) %>%
+        dplyr::mutate(
+          New = ifelse(is.na(Contrast), as.character(Measure), Contrast)
+        ) %>%
+        dplyr::select(New, dplyr::everything(), -Measure, -Contrast) %>%
+        dplyr::rename(Measure = New)
+    }
+  }
+  df
+}
