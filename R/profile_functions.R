@@ -42,7 +42,7 @@ ssm_profiles <- function(.data, scales, angles,
       dplyr::mutate(Group = factor(Inf)) %>%
       dplyr::select(Group, dplyr::everything())
     if (plot == TRUE) {
-      p <- ssm_plot(results, angles, "Profile")
+      p <- circle_plot(results, angles, "Profile", ...)
       print(p)
     }
   } else {

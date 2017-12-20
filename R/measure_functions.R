@@ -45,7 +45,7 @@ ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE,
   
   # Generate plot if requested ----------------------------------------------
   if (plot == TRUE) {
-    p <- ssm_plot(results, angles, type = "Measure")
+    p <- circle_plot(results, angles, "Measure", ...)
     print(p)
   }
 
