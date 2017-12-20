@@ -19,6 +19,7 @@ Imports:
     boot,
     circular,
     dplyr,
+    ggforce,
     ggplot2,
     gtools,
     htmlTable,
