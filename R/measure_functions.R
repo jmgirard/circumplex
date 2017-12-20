@@ -19,7 +19,8 @@
 #' @param interval The confidence intervals' percentage level (default = 0.95).
 #' @param plot A logical determining whether a plot should be created (default =
 #'   TRUE).
-#' @param ... Additional parameters to be passed to \code{ssm_plot()}.
+#' @param ... Additional parameters to be passed to
+#'   \code{circle_plot()}.Examples include \code{amax} and \code{font.size}.
 #' @return A tibble containing SSM parameters (point and interval estimates) for
 #'   each measure (based on their correaltions with the circumplex scales).
 
@@ -61,7 +62,7 @@ ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE,
     c_results <- m_pairs %>%
       purrrlyr::by_row(cmp_function, data_measures, data_scales,
         .collate = "rows") %>%
-      dplyr::mutate(Contrast = sprintf("%s-%s", V2, V1)) %>%
+      dplyr::mutate(Contrast = sprintf("%s - %s", V2, V1)) %>%
       dplyr::select(-c(V1, V2, .row))
     if (plot == TRUE) {
       pd <- diff_plot(c_results)
@@ -70,14 +71,14 @@ ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE,
     results <- dplyr::bind_rows(results, c_results) %>%
       dplyr::select(Measure, Contrast, dplyr::everything())
   }
-  df <- results_table(results, measure = TRUE)
+  df <- results_table(results, contrast = pairwise, measure = TRUE)
   print(df)
   ht <- htmlTable::htmlTable(df,
     caption = "Structural Summary Method Parameters with Bootstrapped Confidence Intervals",
     align = "llllll",
     align.header = "llllll",
     rnames = FALSE,
-    css.cell = "padding-right: 1em; min-width: 3em;")
+    css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;")
   print(ht)
   results
 }

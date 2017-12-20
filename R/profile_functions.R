@@ -20,12 +20,13 @@
 #'   FALSE, the groups' mean profiles will be output (default = FALSE).
 #' @param plot A logical determining whether a plot should be created (default =
 #'   TRUE).
-#' @param ... Additional parameters to be passed to \code{ssm_plot()}.
+#' @param ... Additional parameters to be passed to \code{circle_plot()}.
+#'   Examples include \code{amax} and \code{font.size}.
 #' @return A tibble containing SSM parameters (point and interval estimates) for
 #'   each group's mean profile (or the entire mean profile without grouping).
 
-ssm_profiles <- function(.data, scales, angles,
-  boots = 2000, interval = 0.95, grouping, pairwise = FALSE, plot = TRUE, ...) {
+ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
+  grouping, pairwise = FALSE, plot = TRUE, ...) {
   
   # Enable column specification using tidyverse-style NSE -------------------
   scales_en <- rlang::enquo(scales)
@@ -57,7 +58,7 @@ ssm_profiles <- function(.data, scales, angles,
       purrrlyr::by_slice(ssm_profiles_one, angles, boots, interval,
         .collate = "rows")
     if (plot == TRUE) {
-      p <- ssm_plot(results, angles, "Profile")
+      p <- circle_plot(results, angles, "Profile", ...)
       print(p)
     }
     if (pairwise == TRUE) {
@@ -69,7 +70,7 @@ ssm_profiles <- function(.data, scales, angles,
       }
       c_results <- g_pairs %>%
         purrrlyr::by_row(cmp_function, data_groups, .collate = "rows") %>%
-        dplyr::mutate(Contrast = sprintf("%s-%s", V2, V1)) %>%
+        dplyr::mutate(Contrast = sprintf("%s - %s", V2, V1)) %>%
         dplyr::select(-c(V1, V2, .row))
       if (plot == TRUE) {
         pd <- diff_plot(c_results)
@@ -79,14 +80,15 @@ ssm_profiles <- function(.data, scales, angles,
         dplyr::select(Group, Contrast, dplyr::everything())
     }
   }
-  df <- results_table(results, group = !base::missing(grouping))
+  df <- results_table(results, contrast = pairwise,
+    group = !base::missing(grouping))
   print(df)
   ht <- htmlTable::htmlTable(df,
     caption = "Structural Summary Method Parameters with Bootstrapped Confidence Intervals",
     align = "llllll",
     align.header = "llllll",
     rnames = FALSE,
-    css.cell = "padding-right: 1em; min-width: 3em;")
+    css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;")
   print(ht)
   results
 }

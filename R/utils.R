@@ -117,7 +117,9 @@ unique_pairs <- function(f) {
 }
 
 
-results_table <- function(results, group = FALSE, measure = FALSE) {
+results_table <- function(results, contrast = FALSE, group = FALSE,
+  measure = FALSE) {
+  
   df <- results %>%
     dplyr::transmute(
       Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
@@ -129,9 +131,25 @@ results_table <- function(results, group = FALSE, measure = FALSE) {
     )
   if (group == TRUE) {
     df <- dplyr::bind_cols(Group = results$Group, df)
+    if (contrast == TRUE) {
+      df <- dplyr::bind_cols(Contrast = results$Contrast, df) %>%
+        dplyr::mutate(
+          New = ifelse(is.na(Contrast), as.character(Group), Contrast)
+        ) %>%
+      dplyr::select(New, everything(), -Group, -Contrast) %>%
+      dplyr::rename(Group = New)
+    }
   }
   if (measure == TRUE) {
     df <- dplyr::bind_cols(Measure = results$Measure, df)
+    if (contrast == TRUE) {
+      df <- dplyr::bind_cols(Contrast = results$Contrast, df) %>%
+        dplyr::mutate(
+          New = ifelse(is.na(Contrast), as.character(Measure), Contrast)
+        ) %>%
+        dplyr::select(New, everything(), -Measure, -Contrast) %>%
+        dplyr::rename(Measure = New)
+    }
   }
   df
 }
