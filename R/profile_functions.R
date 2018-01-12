@@ -86,7 +86,8 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   df <- results_table(results, contrast = pairwise,
     group = !base::missing(grouping))
   ht <- htmlTable::htmlTable(df,
-    caption = "Structural Summary Method Parameters with Bootstrapped Confidence Intervals",
+    caption = "Structural Summary Method Parameters with
+      Bootstrapped Confidence Intervals",
     align = "llllll",
     align.header = "llllll",
     rnames = FALSE,
@@ -112,21 +113,21 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
 ssm_profiles_one <- function(.data, angles, boots, interval) {
   
   # Check that inputs are valid ---------------------------------------------
-  assert_that(is.numeric(.data), is.numeric(angles))
+  assert_that(is.numeric(angles))
   assert_that(are_equal(length(.data), length(angles)))
-    
+
   # Get SSM parameter estimates for mean profile ----------------------------
   scores <- .data %>% colMeans()
-  ssm <- ssm_parameters(scores, angles)
-  
+  ssm <- ssm_parameters(as.double(scores), angles)
+
   # Perform bootstrap on SSM parameters -------------------------------------
   bs_function <- function(.data, index, angles) {
     resample <- .data[index, ]
     scores_r <- colMeans(resample)
-    ssm_parameters(scores_r, angles)
+    ssm_parameters(as.double(scores_r), angles)
   }
   ssm_bootstrap(.data, bs_function, ssm, angles, boots, interval)
-  
+
 }
 
 #' Mean Profile Comparison Structural Summary Method
@@ -153,19 +154,17 @@ ssm_profiles_two <- function(.data, angles, boots, interval) {
   scores <- .data %>%
     dplyr::group_by(Group) %>%
     dplyr::summarize_all(mean)
-  ssm_g1 <- ssm_parameters(as.double(scores[1, 2:ncol(scores)]), angles)
-  ssm_g2 <- ssm_parameters(as.double(scores[2, 2:ncol(scores)]), angles)
-  ssm_gd <- param_diff(ssm_g1, ssm_g2)
+  scores_d <- scores[2, 2:ncol(scores)] - scores[1, 2:ncol(scores)]
+  ssm_d <- ssm_parameters(as.double(scores_d), angles)
   
   bs_function <- function(.data, index, angles) {
     resample <- .data[index, ]
     scores_r <- resample %>%
       dplyr::group_by(Group) %>%
       dplyr::summarize_all(mean)
-    ssm_r1 <- ssm_parameters(as.double(scores_r[1, 2:ncol(scores_r)]), angles)
-    ssm_r2 <- ssm_parameters(as.double(scores_r[2, 2:ncol(scores_r)]), angles)
-    param_diff(ssm_r1, ssm_r2)
+    scores_rd <- scores_r[2, 2:ncol(scores_r)] - scores_r[1, 2:ncol(scores_r)]
+    ssm_parameters(as.double(scores_rd), angles)
   }
-  ssm_bootstrap(.data, bs_function, ssm_gd, angles, boots, interval,
+  ssm_bootstrap(.data, bs_function, ssm_d, angles, boots, interval,
     strata = .data$Group)
 }
