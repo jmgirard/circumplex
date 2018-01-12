@@ -22,7 +22,10 @@
 #' @param ... Additional parameters to be passed to
 #'   \code{circle_plot()}.Examples include \code{amax} and \code{font.size}.
 #' @return A tibble containing SSM parameters (point and interval estimates) for
-#'   each measure (based on their correaltions with the circumplex scales).
+#'   each measure (based on their correlations with the circumplex scales).
+#' @seealso \code{\link{ssm_profiles}}, which calculates SSM parameters for
+#'   groups using a mean-based approach.
+#' @export
 
 ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE, 
   boots = 2000, interval = 0.95, plot = TRUE, ...) {
@@ -106,14 +109,14 @@ ssm_measures_one <- function(.data, angles, boots, interval) {
   # Get SSM parameter estimates for mean profile ----------------------------
   rmat <- .data %>% cor()
   scores <- rmat["measure", 1:(ncol(rmat) - 1)]
-  ssm <- ssm_parameters(scores, angles, tibble = FALSE)
+  ssm <- ssm_parameters(scores, angles)
   
   # Perform bootstrap on SSM parameters -------------------------------------
   bs_function <- function(.data, index, angles) {
     resample <- .data[index, ]
     rmat_r <- resample %>% stats::cor()
     scores_r <- rmat_r["measure", 1:(ncol(rmat_r) - 1)]
-    ssm_parameters(scores_r, angles, tibble = FALSE)
+    ssm_parameters(scores_r, angles)
   }
   ssm_bootstrap(.data, bs_function, ssm, angles, boots, interval)
 
@@ -147,8 +150,8 @@ ssm_measures_two <- function(.data, angles, boots, interval) {
   rmat <- .data %>% stats::cor()
   scores_m1 <- rmat[1, 3:ncol(rmat)]
   scores_m2 <- rmat[2, 3:ncol(rmat)]
-  ssm_m1 <- ssm_parameters(scores_m1, angles, tibble = FALSE)
-  ssm_m2 <- ssm_parameters(scores_m2, angles, tibble = FALSE)
+  ssm_m1 <- ssm_parameters(scores_m1, angles)
+  ssm_m2 <- ssm_parameters(scores_m2, angles)
   ssm_md <- param_diff(ssm_m1, ssm_m2)
   
   # Perform bootstrap on SSM parameters -------------------------------------
@@ -157,8 +160,8 @@ ssm_measures_two <- function(.data, angles, boots, interval) {
     rmat_r <- resample %>% stats::cor()
     scores_r1 <- rmat_r[1, 3:ncol(rmat_r)]
     scores_r2 <- rmat_r[2, 3:ncol(rmat_r)]
-    ssm_r1 <- ssm_parameters(scores_r1, angles, tibble = FALSE)
-    ssm_r2 <- ssm_parameters(scores_r2, angles, tibble = FALSE)
+    ssm_r1 <- ssm_parameters(scores_r1, angles)
+    ssm_r2 <- ssm_parameters(scores_r2, angles)
     param_diff(ssm_r1, ssm_r2)
   }
   ssm_bootstrap(.data, bs_function, ssm_md, angles, boots, interval)
