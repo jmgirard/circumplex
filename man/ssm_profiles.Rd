@@ -44,3 +44,7 @@ A tibble containing SSM parameters (point and interval estimates) for
 Calculate SSM parameters with bootstrapped confidence intervals for the mean
 of any number of groups.
 }
+\seealso{
+\code{\link{ssm_measures}}, which calculates SSM parameters for
+  measures using a correlation-based approach.
+}

@@ -9,16 +9,6 @@
 #' @name ssm
 NULL
 
-#' Pipe operator
-#' 
-#' @name %>%
-#' @rdname pipe
-#' @keywords internal
-#' @export
-#' @importFrom magrittr %>%
-#' @usage lhs \%>\% rhs
-NULL
-
 #' Select variables by name
 #' 
 #' @name select
