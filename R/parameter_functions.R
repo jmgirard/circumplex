@@ -1,6 +1,7 @@
 #' Calculate structural summary parameters
 #'
-#' @param scores A numeric vector of scores on multiple circumplex scales.
+#' @param scores A numeric vector of scores on multiple circumplex scales: can
+#'   be either mean scores or correlations.
 #' @param angles A numeric vector containing an angular displacement for each
 #'   circumplex scale provided in \code{scores} (in degrees).
 #' @return A numerical vector containing structural summary method parameters

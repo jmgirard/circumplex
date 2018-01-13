@@ -7,7 +7,8 @@
 ssm_parameters(scores, angles)
 }
 \arguments{
-\item{scores}{A numeric vector of scores on multiple circumplex scales.}
+\item{scores}{A numeric vector of scores on multiple circumplex scales: can
+be either mean scores or correlations.}
 
 \item{angles}{A numeric vector containing an angular displacement for each
 circumplex scale provided in \code{scores} (in degrees).}

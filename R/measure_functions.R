@@ -75,7 +75,6 @@ ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE,
       dplyr::select(Measure, Contrast, dplyr::everything())
   }
   df <- results_table(results, contrast = pairwise, measure = TRUE)
-  print(df)
   ht <- htmlTable::htmlTable(df,
     caption = "Structural Summary Method Parameters with Bootstrapped Confidence Intervals",
     align = "llllll",
@@ -83,7 +82,7 @@ ssm_measures <- function(.data, scales, angles, measures, pairwise = FALSE,
     rnames = FALSE,
     css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;")
   print(ht)
-  results
+  invisible(results)
 }
 
 #' Correlational Structural Summary Method
