@@ -17,27 +17,36 @@
 #' @source \url{http://doi.org/10.1080/00223890902935696}
 "wright2009"
 
-#' Standardized octant scores on IIP-C with covariates
+#' Large example dataset with IIP-SC and covariates
 #'
-#' A large example dataset containing standardized scores on the Inventory of
-#' Interpersonal Problems Circumplex Scales and categorical and continuous
-#' covariates. Taken from Girard et al. (2017).
+#' A large example dataset containing gender, raw scores on the Inventory of
+#' Interpersonal Problems - Short Circumplex (IIP-SC), and raw scores on
+#' the Personality Diagnostic Questionnaire (PDQ-4).
 #'
-#' @format A data frame with 825 observations and 10 variables:
+#' @format A data frame with 1166 observations and 19 variables:
 #' \describe{
-#'   \item{ZPA}{Domineering (standardized score)}
-#'   \item{ZBC}{Vindictive (standardized score)}
-#'   \item{ZDE}{Cold (standardized score)}
-#'   \item{ZFG}{Socially Avoidant (standardized score)}
-#'   \item{ZHI}{Nonassertive (standardized score)}
-#'   \item{ZJK}{Easily Exploited (standardized score)}
-#'   \item{ZLM}{Overly Nurturant (standardized score)}
-#'   \item{ZNO}{Intrusive (standardized score)}
-#'   \item{bordl}{Borderline Personality Disorder (0 = FALSE, 1 = TRUE)}
-#'   \item{detach}{Detachment Factor Score}
-#' }
-#' @source \url{http://doi.org/10.1016/j.comppsych.2017.06.014}
-"girard2017"
+#'   \item{Gender}{Self-reported gender (0 = Female, 1 = Male)}
+#'   \item{IIPSC_PA}{Domineering Problems (IIP-SC)}
+#'   \item{IIPSC_BC}{Vindictive Problems (IIP-SC)}
+#'   \item{IIPSC_DE}{Cold Problems (IIP-SC)}
+#'   \item{IIPSC_FG}{Socially Avoidant Problems (IIP-SC)}
+#'   \item{IIPSC_HI}{Nonassertive Problems(IIP-SC)}
+#'   \item{IIPSC_JK}{Easily Exploited Problems (IIP-SC)}
+#'   \item{IIPSC_LM}{Overly Nurturant Problems (IIP-SC)}
+#'   \item{IIPSC_NO}{Intrusive Problems (IIP-SC)}
+#'   \item{PARPD}{Paranoid PD Symptoms (PDQ-4)}
+#'   \item{SCZPD}{Schizoid PD Symptoms (PDQ-4)}
+#'   \item{SZTPD}{Schizotypal PD Symptoms (PDQ-4)}
+#'   \item{ASPD}{Antisocial PD Symptoms (PDQ-4)}
+#'   \item{BORPD}{Borderline PD Symptoms (PDQ-4)}
+#'   \item{HISPD}{Histrionic PD Symptoms (PDQ-4)}
+#'   \item{NARPD}{Narcissistic PD Symptoms (PDQ-4)}
+#'   \item{AVPD}{Avoidant PD Symptoms (PDQ-4)}
+#'   \item{DPNPD}{Dependent PD Symptoms (PDQ-4)}
+#'   \item{OCPD}{Obsessive-Compulsive PD Symptoms (PDQ-4)}
+#'   }
+#' @source \url{http://doi.org/10.1177/1073191115621795}
+"zimmermann2017"
 
 #' Angular displacements for octant circumplex scales
 #'
