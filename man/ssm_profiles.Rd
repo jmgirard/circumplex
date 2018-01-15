@@ -5,7 +5,7 @@
 \title{Mean Profile Structural Summary Method}
 \usage{
 ssm_profiles(.data, scales, angles, boots = 2000, interval = 0.95, grouping,
-  pairwise = FALSE, plot = TRUE, ...)
+  contrast = "none", plot = TRUE, ...)
 }
 \arguments{
 \item{.data}{A matrix or data frame containing at least circumplex scales.}
@@ -25,10 +25,7 @@ confidence intervals (default = 2000).}
 the group membership of each observation. To assess the mean profile of all
 observations, do not supply this argument (see examples).}
 
-\item{pairwise}{A logical determining whether the groups defined by the
-\code{grouping} variable should be compared. If TRUE, the difference
-between each unique pairwise combination of groups will be output; if
-FALSE, the groups' mean profiles will be output (default = FALSE).}
+\item{contrast}{(default = "none").}
 
 \item{plot}{A logical determining whether a plot should be created (default =
 TRUE).}
