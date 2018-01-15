@@ -10,17 +10,40 @@
 #' @usage lhs \%>\% rhs
 NULL
 
-#' Calculate difference between angular displacements around circle
-#' 
-#' @param w1,w2 Angular displacements (numeric).
-#' @return Difference between \code{w1} and \code{w2} in circular space.
-
-wd <- function(w1, w2) {
-  ((w2 - w1 + 180) %% 360) - 180
+#' Calculate difference between two angular displacements
+#'
+#' @param d1,d2 Angular displacements (in degrees).
+#' @return The difference (in degrees) between \code{d1} and \code{d2}. Positive
+#'   and negative differences indicate that to move from \code{d1} to \code{d2},
+#'   you would need to move clockwise and counter-clockwise around the
+#'   circumference, respectively. Note that currently differences of 180 and
+#'   -180 are both represented as -180, which may cause problems when
+#'   calculating the bootstrap confidence interval.
+#' @examples
+#' disp_diff(270, 225) #>  45
+#' disp_diff( 90, 180) #> -90
+#' disp_diff( 45, 315) #>  90
+disp_diff <- function(d1, d2) {
+  assert_that(is.scalar(d1), is.scalar(d2))
+  ((d1 - d2 + 180) %% 360) - 180
+  #TODO: Figure out what to do when diff == -180 (can't ignore direction)
+  #Look into circular.quantile to see if that may reveal a solution
 }
 
 rwd <- function(wd) {
   ((wd + 180) %% 360) - 180
+}
+
+#' Compute difference between two sets of SSM parameters
+#'
+#' @param p1,p2 Outputs from \code{ssm_parameters()}.
+#' @return A numeric vector of differences between the parameters in \code{p1}
+#'   and \code{p2}, respecting the circular nature of displacement parameters.
+param_diff <- function(p1, p2) {
+  assert_that(is.numeric(p1), is.numeric(p2))
+  pd <- p1 - p2
+  pd[[5]] <- disp_diff(p1[[5]], p2[[5]])
+  pd
 }
 
 #' Calculate correct quantiles for circular and non-circular data
@@ -32,26 +55,13 @@ rwd <- function(wd) {
 #'   they wiull be normal quantiles otherwise.
 
 smart_quantile <- function(.data, probs){
-  #TODO: Replace this function with quantile and S3:circular
+  #TODO: Replace this function with quantile by using S3:circular
   
   if (circular::is.circular(.data)) {
     circular::quantile.circular(.data, probs = probs) %% 360
   } else {
     stats::quantile(.data, probs = probs)
   }
-}
-
-#' Compute difference between two sets of SSM parameters
-#'
-#' @param p1,p2 Outputs from \code{ssm_parameters()}.
-#' @return A numerical vector or tibble (data frame) with \code{p2 - p1} for
-#'   each parameter, while accounting for the fact that differences in
-#'   displacement need to be handled specially.
-
-param_diff <- function(p1, p2) {
-  pd <- p2 - p1
-  pd[5] <- wd(p1[5], p2[5])
-  pd
 }
 
 #' Coerce a variable to the circular data type
@@ -87,37 +97,31 @@ ssm_bootstrap <- function(.data, statistic, angles, boots, interval, ...) {
     angles = angles,
     ...
   )
-  
-  #TODO: UPDATE TO USE BS_RESULTS$T0 AND T
-  
-  # Prepare bootstrap results for quantile calculation ----------------------
-  bs_t <- tibble::as_tibble(bs_results$t) %>%
-    dplyr::mutate(V5 = make_circular(V5))
-  
-  # Create output including confidence intervals ----------------------------
-  lpr <- (1 - interval) / 2
-  upr <- 1 - (1 - interval) / 2
-  lci <- purrr::map_dbl(bs_t, smart_quantile, probs = lpr)
-  uci <- purrr::map_dbl(bs_t, smart_quantile, probs = upr)
-  results <- tibble::tibble(
-    e_est = ssm[[1]],
-    x_est = ssm[[2]],
-    y_est = ssm[[3]],
-    a_est = ssm[[4]],
-    d_est = ssm[[5]],
-    fit   = ssm[[6]],
-    e_lci = lci[[1]],
-    e_uci = uci[[1]],
-    x_lci = lci[[2]],
-    x_uci = uci[[2]],
-    y_lci = lci[[3]],
-    y_uci = uci[[3]],
-    a_lci = lci[[4]],
-    a_uci = uci[[4]],
-    d_lci = lci[[5]],
-    d_uci = uci[[5]]
-  )
 
+  # Calculate point and interval estimates from bootstrap results -----------
+  bs_est <- bs_results$t0 %>%
+    reshape_params() %>% 
+    `colnames<-`(c("e_est", "x_est", "y_est", "a_est", "d_est", "fit"))
+  
+  bs_t <- bs_results$t %>% 
+    tibble::as_tibble() %>% 
+    dplyr::mutate_at(.funs = make_circular, .vars = (1:(ncol(.) / 6) * 6 - 1))
+  
+  bs_lci <- bs_t %>%
+    purrr::map_dbl(smart_quantile, probs = ((1 - interval) / 2)) %>% 
+    reshape_params() %>% 
+    `colnames<-`(c("e_lci", "x_lci", "y_lci", "a_lci", "d_lci", "f_lci")) %>% 
+    dplyr::select(-f_lci)
+  
+  bs_uci <- bs_t %>% 
+    purrr::map_dbl(smart_quantile, probs = (1 - (1 - interval) / 2)) %>% 
+    reshape_params() %>% 
+    `colnames<-`(c("e_uci", "x_uci", "y_uci", "a_uci", "d_uci", "f_uci")) %>% 
+    dplyr::select(-f_uci)
+  
+  results <- dplyr::bind_cols(bs_est, bs_lci, bs_uci)
+  #TODO: Add a column describing each row (e.g., group name)
+  
   results
 }
 
@@ -153,6 +157,13 @@ pretty_max <- function(v) {
   }
 }
 
+reshape_params <- function(df) {
+  df %>%
+    matrix(nrow = 6) %>% 
+    t() %>% 
+    tibble::as_tibble()
+}
+
 ssm_by_group <- function(scores, angles, contrast) {
   
   # Transpose scores so that each group is a column -------------------------
@@ -174,8 +185,7 @@ ssm_by_group <- function(scores, angles, contrast) {
   
   # To test contrast, SSM then subtract parameters --------------------------
   if (contrast == "test") {
-    #TODO: Replace this subtraction with param_diff function
-    results[13:18] <- results[7:12] - results[1:6]
+    results[13:18] <- param_diff(results[7:12], results[1:6])
   }
   
   results

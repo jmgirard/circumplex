@@ -44,7 +44,7 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   } else {
     #TODO: Check that there are only two groups if contrast != none
     grouping_en <- rlang::enquo(grouping)
-    grouping_qn <- rlang::quo_name(grouping_en)
+    #grouping_qn <- rlang::quo_name(grouping_en)
     bs_input <- .data %>%
       dplyr::select(!!grouping_en, !!scales_en) %>% 
       dplyr::mutate(Group = factor(!!grouping_en)) %>% 
@@ -54,8 +54,8 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   bs_function <- function(.data, index, angles, contrast) {
     resample <- .data[index, ]
     scores_r <- resample %>% 
-      group_by(Group) %>% 
-      summarize_all(mean)
+      dplyr::group_by(Group) %>% 
+      dplyr::summarize_all(mean)
     ssm_by_group(scores_r, angles, contrast)
   }
   
@@ -63,6 +63,8 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
     .data = bs_input,
     statistic = bs_function,
     angles = angles,
+    boots = boots,
+    interval = interval,
     contrast = contrast,
     strata = bs_input$Group
   )
