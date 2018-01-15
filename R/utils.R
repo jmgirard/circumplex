@@ -1,3 +1,15 @@
+#' Pipe operator
+#'
+#' See \code{magrittr::\link[magrittr]{\%>\%}} for details.
+#'
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @export
+#' @importFrom magrittr %>%
+#' @usage lhs \%>\% rhs
+NULL
+
 #' Calculate difference between angular displacements around circle
 #' 
 #' @param w1,w2 Angular displacements (numeric).
@@ -20,6 +32,8 @@ rwd <- function(wd) {
 #'   they wiull be normal quantiles otherwise.
 
 smart_quantile <- function(.data, probs){
+  #TODO: Replace this function with quantile and S3:circular
+  
   if (circular::is.circular(.data)) {
     circular::quantile.circular(.data, probs = probs) %% 360
   } else {
@@ -63,15 +77,18 @@ make_circular <- function(x) {
 #' @param ... Additional parameters to be passed to the \code{boot()} function.
 #' @return A tibble containing SSM parameters (point and interval estimates).
 
-ssm_bootstrap <- function(.data, bs_function, ssm,
-                          angles, boots, interval, ...) {
+ssm_bootstrap <- function(.data, statistic, angles, boots, interval, ...) {
 
   # Perform bootstrapping ---------------------------------------------------
   bs_results <- boot::boot(
     data = .data,
-    statistic = bs_function, 
+    statistic = statistic, 
     R = boots,
-    angles = angles, ...)
+    angles = angles,
+    ...
+  )
+  
+  #TODO: UPDATE TO USE BS_RESULTS$T0 AND T
   
   # Prepare bootstrap results for quantile calculation ----------------------
   bs_t <- tibble::as_tibble(bs_results$t) %>%
@@ -134,4 +151,32 @@ pretty_max <- function(v) {
   } else {
     ceiling(amax * 1.50)
   }
+}
+
+ssm_by_group <- function(scores, angles, contrast) {
+  
+  # Transpose scores so that each group is a column -------------------------
+  scores <- scores %>% 
+    gather(key = Scale, value = Score, -Group, factor_key = TRUE) %>% 
+    spread(key = Group, value = Score) %>% 
+    select(-Scale)
+  
+  # To model contrast, subtract scores then SSM -----------------------------
+  if (contrast == "model") {
+    scores <- scores %>%
+      mutate(Contrast = .[[2]] - .[[1]])
+  }
+  
+  # Calculate SSM parameters for each column --------------------------------
+  results <- scores %>%
+    map(ssm_parameters, angles) %>%
+    flatten_dbl()
+  
+  # To test contrast, SSM then subtract parameters --------------------------
+  if (contrast == "test") {
+    #TODO: Replace this subtraction with param_diff function
+    results[13:18] <- results[7:12] - results[1:6]
+  }
+  
+  results
 }
