@@ -22,8 +22,10 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
 
   # Draw circles corresponding to amplitude scale ---------------------------
   b <- b +
-    geom_circle(aes(x0 = 0, y0 = 0, r = 1:4), color = "gray", size = 0.5) + 
-    geom_circle(aes(x0 = 0, y0 = 0, r = 5), color = "darkgray", size = 1)
+    ggforce::geom_circle(aes(x0 = 0, y0 = 0, r = 1:4),
+      color = "gray", size = 0.5) + 
+    ggforce::geom_circle(aes(x0 = 0, y0 = 0, r = 5),
+      color = "darkgray", size = 1)
   
   # Draw segments corresponding to displacement scale -----------------------
   b <- b +
@@ -113,7 +115,7 @@ circle_plot <- function(.results, angles, type, palette = "Set1",
   if (type == "Measure") {
     # Draw point and interval estimates for each measure ----------------------
     p <- p + 
-      geom_arc_bar(
+      ggforce::geom_arc_bar(
         data = df_plot,
         aes(x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
           fill = Measure, color = Measure),
@@ -128,7 +130,7 @@ circle_plot <- function(.results, angles, type, palette = "Set1",
   } else if (type == "Profile") {
     # Draw point and interval estimates for each group ------------------------
     p <- p +
-      geom_arc_bar(
+      ggforce::geom_arc_bar(
         data = df_plot,
         aes(x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
           fill = Group, color = Group),
