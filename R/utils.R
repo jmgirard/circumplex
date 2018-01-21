@@ -31,6 +31,11 @@ disp_diff <- function(d1, d2) {
   #Look into circular.quantile to see if that may reveal a solution
 }
 
+#' rwd
+#' 
+#' @param wd Description
+#' @return Description
+
 rwd <- function(wd) {
   ((wd + 180) %% 360) - 180
 }
@@ -75,9 +80,35 @@ as_circular <- function(x) {
   circular::circular(x, units = "degrees", rotation = "counter")
 }
 
+#' Convert degrees to radians
+#' 
+#' @param x A numeric vector (in degrees).
+#' @return The same vector as \code{x} but converted to radians.
+#' @export
+
+d2r <- function(x) {x * pi / 180}
+
+#' Convert radians to degrees
+#' 
+#' @param x A numeric vector (in radians).
+#' @return The same vector as \code{x} but converted to degrees.
+#' @export
+
+r2d <- function(x) {x * 180 / pi}
+
+#' ggrad
+#' 
+#' @param v Description
+#' @return Description
+
 ggrad <- function(v) {
   (v - 90) * (-pi / 180)
 }
+
+#' pretty_max
+#' 
+#' @param v Description
+#' @return Description
 
 pretty_max <- function(v) {
     amax <- max(v, na.rm = TRUE)
@@ -93,32 +124,4 @@ pretty_max <- function(v) {
   } else {
     ceiling(amax * 1.50)
   }
-}
-
-ssm_by_group <- function(scores, angles, contrast) {
-  #TODO: Replace this with a functional within ssm_bootstrap
-  
-  # Transpose scores so that each group is a column -------------------------
-  scores <- scores %>% 
-    tidyr::gather(key = Scale, value = Score, -Group, factor_key = TRUE) %>% 
-    tidyr::spread(key = Group, value = Score) %>% 
-    dplyr::select(-Scale)
-  
-  # To model contrast, subtract scores then SSM -----------------------------
-  if (contrast == "model") {
-    scores <- scores %>%
-      dplyr::mutate(Contrast = .[[2]] - .[[1]])
-  }
-  
-  # Calculate SSM parameters for each column --------------------------------
-  results <- scores %>%
-    purrr::map(ssm_parameters, angles) %>%
-    purrr::flatten_dbl()
-  
-  # To test contrast, SSM then subtract parameters --------------------------
-  if (contrast == "test") {
-    results[13:18] <- param_diff(results[7:12], results[1:6])
-  }
-  
-  results
 }
