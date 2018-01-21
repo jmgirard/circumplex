@@ -54,3 +54,31 @@ ssm_bootstrap <- function(.data, statistic, angles, boots, interval, ...) {
   dplyr::bind_cols(bs_est, bs_lci, bs_uci)
   
 }
+
+
+ssm_by_group <- function(scores, angles, contrast) {
+  #TODO: Replace this with a functional within ssm_bootstrap
+  
+  # To model contrast, subtract scores then SSM -----------------------------
+  if (contrast == "model") {
+    scores[[3]] <- scores[[2]] - scores[[1]]
+  }
+  
+  # Transpose scores so that each group is a column -------------------------
+  scores_m <- scores %>%
+    unlist(scores) %>%
+    matrix(ncol = length(scores)) %>% 
+    tibble::as_tibble()
+  
+  # Calculate SSM parameters for each column --------------------------------
+  results <- scores_m %>%
+    purrr::map(ssm_parameters, angles) %>%
+    purrr::flatten_dbl()
+  
+  # To test contrast, SSM then subtract parameters --------------------------
+  if (contrast == "test") {
+    results <- c(results, param_diff(results[7:12], results[1:6]))
+  }
+  
+  results
+}
