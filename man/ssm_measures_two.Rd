@@ -20,7 +20,7 @@ confidence intervals.}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for
-  the difference between two measures (based on correlations).
+the difference between two measures (based on correlations).
 }
 \description{
 Worker function for ssm_measures, calculates point and interval estimates for

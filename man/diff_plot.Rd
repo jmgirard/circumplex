@@ -12,7 +12,7 @@ that included contrasts (i.e., \code{pairwise = TRUE}).}
 }
 \value{
 A ggplot variable containing difference point-ranges faceted by SSM
-  parameter. An interval that does not contain the value of zero has p<.05.
+parameter. An interval that does not contain the value of zero has p<.05.
 }
 \description{
 Take in the results of a Structural Summary Method analysis with pairwise

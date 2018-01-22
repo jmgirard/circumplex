@@ -13,8 +13,8 @@ smart_quantile(.data, probs)
 }
 \value{
 A vector of quantiles corresponding to the probabilities in
-  \code{probs}; these quantiles will be circular if the data are circular and
-  they wiull be normal quantiles otherwise.
+\code{probs}; these quantiles will be circular if the data are circular and
+they wiull be normal quantiles otherwise.
 }
 \description{
 Calculate correct quantiles for circular and non-circular data

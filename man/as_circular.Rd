@@ -11,7 +11,7 @@ as_circular(x)
 }
 \value{
 The same vector as \code{x} but with the circular data type (in
-  degree units and counter-clockwise rotation) for the circular package.
+degree units and counter-clockwise rotation) for the circular package.
 }
 \description{
 Coerce a variable to the circular data type

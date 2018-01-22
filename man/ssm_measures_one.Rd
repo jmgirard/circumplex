@@ -20,7 +20,7 @@ confidence intervals (default = 2000).}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for
-  the measure.
+the measure.
 }
 \description{
 Worker function for ssm_measures, calculates point and interval estimates for

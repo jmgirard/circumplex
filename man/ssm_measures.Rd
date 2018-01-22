@@ -37,7 +37,7 @@ TRUE).}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for
-  each measure (based on their correlations with the circumplex scales).
+each measure (based on their correlations with the circumplex scales).
 }
 \description{
 Calculate SSM parameters with bootstrapped confidence intervals for any
@@ -45,5 +45,5 @@ number of measures (based on their correlations with the circumplex scales).
 }
 \seealso{
 \code{\link{ssm_profiles}}, which calculates SSM parameters for
-  groups using a mean-based approach.
+groups using a mean-based approach.
 }

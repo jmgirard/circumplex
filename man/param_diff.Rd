@@ -11,7 +11,7 @@ param_diff(p1, p2)
 }
 \value{
 A numeric vector of differences between the parameters in \code{p1}
-  and \code{p2}, respecting the circular nature of displacement parameters.
+and \code{p2}, respecting the circular nature of displacement parameters.
 }
 \description{
 Compute difference between two sets of SSM parameters

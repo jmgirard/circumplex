@@ -18,3 +18,7 @@ NULL
 #'   geom_rect geom_segment ggplot scale_color_brewer scale_fill_brewer
 #'   scale_x_continuous scale_y_continuous theme theme_bw theme_void xlab ylab
 NULL
+
+#' @useDynLib ssm, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
+NULL

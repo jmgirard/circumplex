@@ -11,11 +11,11 @@ disp_diff(d1, d2)
 }
 \value{
 The difference (in degrees) between \code{d1} and \code{d2}. Positive
-  and negative differences indicate that to move from \code{d1} to \code{d2},
-  you would need to move clockwise and counter-clockwise around the
-  circumference, respectively. Note that currently differences of 180 and
-  -180 are both represented as -180, which may cause problems when
-  calculating the bootstrap confidence interval.
+and negative differences indicate that to move from \code{d1} to \code{d2},
+you would need to move clockwise and counter-clockwise around the
+circumference, respectively. Note that currently differences of 180 and
+-180 are both represented as -180, which may cause problems when
+calculating the bootstrap confidence interval.
 }
 \description{
 Calculate difference between two angular displacements

@@ -35,7 +35,7 @@ Examples include \code{amax} and \code{font.size}.}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for
-  each group's mean profile (or the entire mean profile without grouping).
+each group's mean profile (or the entire mean profile without grouping).
 }
 \description{
 Calculate SSM parameters with bootstrapped confidence intervals for the mean
@@ -43,5 +43,5 @@ of any number of groups.
 }
 \seealso{
 \code{\link{ssm_measures}}, which calculates SSM parameters for
-  measures using a correlation-based approach.
+measures using a correlation-based approach.
 }

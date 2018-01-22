@@ -90,29 +90,3 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   
   invisible(results)
 }
-
-#' Calculate structural summary parameters
-#'
-#' @param scores A numeric vector of scores on multiple circumplex scales: can
-#'   be either mean scores or correlations.
-#' @param angles A numeric vector containing an angular displacement for each
-#'   circumplex scale provided in \code{scores} (in degrees).
-#' @return A numerical vector containing structural summary method parameters
-#'   that describe \code{scores} given \code{angles}. The vector will contain
-#'   the following values: elevation, x-axis value, y-axis value, amplitude,
-#'   angular displacement (in degrees), and model fit (R-squared).
-
-ssm_parameters <- function(scores, angles) {
-  
-  # Calculate SSM parameters ------------------------------------------------
-  nScales <- length(scores) #3e-8
-  elev <- sum(scores) / nScales #4e-7
-  xval <- as.numeric((2 / nScales) * (scores %*% cos(d2r(angles)))) #3e-6
-  yval <- as.numeric((2 / nScales) * (scores %*% sin(d2r(angles)))) #3e-6
-  ampl <- sqrt(xval * xval + yval * yval) #8e-7
-  disp <- r2d(atan2(yval, xval)) %% 360 #1e-6
-  gfit <- 1 - ((sum((elev + ampl * cos(d2r(angles - disp)) - scores) ^ 2)) /
-      (stats::var(scores) * (nScales - 1))) #5e-5
-  c(elev, xval, yval, ampl, disp, gfit) #4e-7
-  
-}
