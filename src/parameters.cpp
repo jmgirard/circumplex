@@ -6,19 +6,17 @@ using namespace Rcpp;
 
 double inner(arma::vec x, arma::vec y) {
   arma::mat ip = x.t() * y;
-  return(ip(0));
+  return ip(0);
+} 
+
+// [[Rcpp::export]]
+NumericVector rads(NumericVector degrees) {
+  return degrees * (PI / 180);
 }
 
-NumericVector d2r(NumericVector degrees) {
-  static const double pi = 3.14159265;
-  NumericVector radians = degrees * (pi / 180);
-  return(radians);
-}
-
-double r2d(double radians) {
-  static const double pi = 3.14159265;
-  double degrees = radians * (180 / pi);
-  return(degrees);
+// [[Rcpp::export]]
+double deg(double radians) {
+  return radians * (180 / PI);
 }
 
 double remainder(double numerator, double denominator) {
@@ -40,11 +38,11 @@ double remainder(double numerator, double denominator) {
 NumericVector ssm_parameters(NumericVector scores, NumericVector angles) {
   double n = scores.size();
   double elev = mean(scores);
-  double xval = (2 / n) * inner(scores, cos(d2r(angles)));
-  double yval = (2 / n) * inner(scores, sin(d2r(angles)));
+  double xval = (2 / n) * inner(scores, cos(rads(angles)));
+  double yval = (2 / n) * inner(scores, sin(rads(angles)));
   double ampl = sqrt(pow(xval, 2) + pow(yval, 2));
-  double disp = remainder(r2d(std::atan2(yval, xval)), 360);
-  double gfit = 1 - ((sum(pow(elev + ampl * cos(d2r(angles - disp))
+  double disp = remainder(deg(std::atan2(yval, xval)), 360);
+  double gfit = 1 - ((sum(pow(elev + ampl * cos(rads(angles - disp))
     - scores, 2))) / (var(scores) * (n - 1)));
   NumericVector param = NumericVector::create(
     _["e"] = elev,
@@ -54,5 +52,18 @@ NumericVector ssm_parameters(NumericVector scores, NumericVector angles) {
     _["d"] = disp,
     _["fit"] = gfit
   );
-  return(param);
+  return param;
+}
+
+// [[Rcpp::export]]
+std::vector<double> group_parameters(NumericMatrix scores, NumericVector angles) {
+  double n = scores.nrow();
+  std::vector<double> out;
+  out.reserve(6 * n);
+  for (int i(0); i < n; i++) {
+    NumericVector iscores = scores(i, _);
+    NumericVector iparams = ssm_parameters(iscores, angles);
+    out.insert(out.end(), iparams.begin(), iparams.end());
+  }
+  return out;
 }

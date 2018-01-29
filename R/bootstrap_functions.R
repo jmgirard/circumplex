@@ -37,16 +37,16 @@ ssm_bootstrap <- function(.data, statistic, angles, boots, interval, ...) {
   
   bs_t <- bs_results$t %>% 
     tibble::as_tibble() %>% 
-    dplyr::mutate_at(.funs = as_circular, .vars = (1:(ncol(.) / 6) * 6 - 1))
+    dplyr::mutate_at(.funs = as_angle, .vars = (1:(ncol(.) / 6) * 6 - 1))
   
   bs_lci <- bs_t %>%
-    purrr::map_dbl(smart_quantile, probs = ((1 - interval) / 2)) %>% 
+    purrr::map_dbl(quantile, probs = ((1 - interval) / 2)) %>% 
     reshape_params() %>% 
     `colnames<-`(c("e_lci", "x_lci", "y_lci", "a_lci", "d_lci", "f_lci")) %>% 
     dplyr::select(-f_lci)
   
   bs_uci <- bs_t %>% 
-    purrr::map_dbl(smart_quantile, probs = (1 - (1 - interval) / 2)) %>% 
+    purrr::map_dbl(quantile, probs = (1 - (1 - interval) / 2)) %>% 
     reshape_params() %>% 
     `colnames<-`(c("e_uci", "x_uci", "y_uci", "a_uci", "d_uci", "f_uci")) %>% 
     dplyr::select(-f_uci)
@@ -55,25 +55,15 @@ ssm_bootstrap <- function(.data, statistic, angles, boots, interval, ...) {
   
 }
 
-
 ssm_by_group <- function(scores, angles, contrast) {
-  #TODO: Replace this with a functional within ssm_bootstrap
-  
+
   # To model contrast, subtract scores then SSM -----------------------------
   if (contrast == "model") {
-    scores[[3]] <- scores[[2]] - scores[[1]]
+    scores <- rbind(scores, scores[2, ] - scores[1, ])
   }
   
-  # Transpose scores so that each group is a column -------------------------
-  scores_m <- scores %>%
-    unlist(scores) %>%
-    matrix(ncol = length(scores)) %>% 
-    tibble::as_tibble()
-  
-  # Calculate SSM parameters for each column --------------------------------
-  results <- scores_m %>%
-    purrr::map(ssm_parameters, angles) %>%
-    purrr::flatten_dbl()
+  # Calculate parameters per group ------------------------------------------
+  results <- group_parameters(scores, angles)
   
   # To test contrast, SSM then subtract parameters --------------------------
   if (contrast == "test") {
@@ -81,4 +71,13 @@ ssm_by_group <- function(scores, angles, contrast) {
   }
   
   results
+}
+
+quantile.angle <- function(x, probs) {
+  mdn <- angle_median(x)
+  if (is.na(mdn)) return(NA)
+  tx <- (x - mdn) %% (2 * pi)
+  tx <- compare_pi(tx)
+  qtl <- stats::quantile(x = tx, probs = probs)
+  (qtl + mdn) %% (2 * pi)
 }

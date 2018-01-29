@@ -40,7 +40,7 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   if (base::missing(grouping)) {
     bs_input <- .data %>% 
       dplyr::select(!!scales_en) %>% 
-      dplyr::mutate(Group = 1)
+      dplyr::mutate(Group = factor(1))
   } else {
     #TODO: Check that there are only two groups if contrast != none
     grouping_en <- rlang::enquo(grouping)
@@ -54,8 +54,8 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   bs_function <- function(.data, index, angles, contrast) {
     resample <- .data[index, ]
     mat <- as.matrix(resample[, 1:(ncol(resample) - 1)])
-    grp <- resample$Group
-    scores_r <- by(mat, grp, colMeans)
+    grp <- as.integer(resample$Group)
+    scores_r <- group_scores(mat, grp)
     ssm_by_group(scores_r, angles, contrast)
   }
   

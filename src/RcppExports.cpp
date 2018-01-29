@@ -6,6 +6,109 @@
 
 using namespace Rcpp;
 
+// submat
+arma::mat submat(NumericMatrix X, NumericVector T, int TestVal);
+RcppExport SEXP _ssm_submat(SEXP XSEXP, SEXP TSEXP, SEXP TestValSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type T(TSEXP);
+    Rcpp::traits::input_parameter< int >::type TestVal(TestValSEXP);
+    rcpp_result_gen = Rcpp::wrap(submat(X, T, TestVal));
+    return rcpp_result_gen;
+END_RCPP
+}
+// col_means
+arma::rowvec col_means(arma::mat x);
+RcppExport SEXP _ssm_col_means(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(col_means(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// group_scores
+arma::mat group_scores(NumericMatrix X, NumericVector T);
+RcppExport SEXP _ssm_group_scores(SEXP XSEXP, SEXP TSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type T(TSEXP);
+    rcpp_result_gen = Rcpp::wrap(group_scores(X, T));
+    return rcpp_result_gen;
+END_RCPP
+}
+// angle_mean
+double angle_mean(NumericVector x);
+RcppExport SEXP _ssm_angle_mean(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(angle_mean(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// angle_median
+double angle_median(NumericVector x);
+RcppExport SEXP _ssm_angle_median(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(angle_median(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// angle_dist
+double angle_dist(double x, double y);
+RcppExport SEXP _ssm_angle_dist(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(angle_dist(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compare_pi
+NumericVector compare_pi(NumericVector x);
+RcppExport SEXP _ssm_compare_pi(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(compare_pi(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rads
+NumericVector rads(NumericVector degrees);
+RcppExport SEXP _ssm_rads(SEXP degreesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type degrees(degreesSEXP);
+    rcpp_result_gen = Rcpp::wrap(rads(degrees));
+    return rcpp_result_gen;
+END_RCPP
+}
+// deg
+double deg(double radians);
+RcppExport SEXP _ssm_deg(SEXP radiansSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type radians(radiansSEXP);
+    rcpp_result_gen = Rcpp::wrap(deg(radians));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ssm_parameters
 NumericVector ssm_parameters(NumericVector scores, NumericVector angles);
 RcppExport SEXP _ssm_ssm_parameters(SEXP scoresSEXP, SEXP anglesSEXP) {
@@ -18,9 +121,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// group_parameters
+std::vector<double> group_parameters(NumericMatrix scores, NumericVector angles);
+RcppExport SEXP _ssm_group_parameters(SEXP scoresSEXP, SEXP anglesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type scores(scoresSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type angles(anglesSEXP);
+    rcpp_result_gen = Rcpp::wrap(group_parameters(scores, angles));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_ssm_submat", (DL_FUNC) &_ssm_submat, 3},
+    {"_ssm_col_means", (DL_FUNC) &_ssm_col_means, 1},
+    {"_ssm_group_scores", (DL_FUNC) &_ssm_group_scores, 2},
+    {"_ssm_angle_mean", (DL_FUNC) &_ssm_angle_mean, 1},
+    {"_ssm_angle_median", (DL_FUNC) &_ssm_angle_median, 1},
+    {"_ssm_angle_dist", (DL_FUNC) &_ssm_angle_dist, 2},
+    {"_ssm_compare_pi", (DL_FUNC) &_ssm_compare_pi, 1},
+    {"_ssm_rads", (DL_FUNC) &_ssm_rads, 1},
+    {"_ssm_deg", (DL_FUNC) &_ssm_deg, 1},
     {"_ssm_ssm_parameters", (DL_FUNC) &_ssm_ssm_parameters, 2},
+    {"_ssm_group_parameters", (DL_FUNC) &_ssm_group_parameters, 2},
     {NULL, NULL, 0}
 };
 

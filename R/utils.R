@@ -10,27 +10,6 @@
 #' @usage lhs \%>\% rhs
 NULL
 
-#' Calculate difference between two angular displacements
-#'
-#' @param d1,d2 Angular displacements (in degrees).
-#' @return The difference (in degrees) between \code{d1} and \code{d2}. Positive
-#'   and negative differences indicate that to move from \code{d1} to \code{d2},
-#'   you would need to move clockwise and counter-clockwise around the
-#'   circumference, respectively. Note that currently differences of 180 and
-#'   -180 are both represented as -180, which may cause problems when
-#'   calculating the bootstrap confidence interval.
-#' @examples
-#' disp_diff(270, 225) #>  45
-#' disp_diff( 90, 180) #> -90
-#' disp_diff( 45, 315) #>  90
-disp_diff <- function(d1, d2) {
-  assert_that(is.scalar(d1), is.scalar(d2))
-  ((d1 - d2 + 180) %% 360) - 180
-  #TODO: If this is only called by param_diff() then build it into that
-  #TODO: Figure out what to do when diff == -180 (can't ignore direction)
-  #Look into circular.quantile to see if that may reveal a solution
-}
-
 #' rwd
 #' 
 #' @param wd Description
@@ -48,26 +27,8 @@ rwd <- function(wd) {
 param_diff <- function(p1, p2) {
   assert_that(is.numeric(p1), is.numeric(p2))
   pd <- p1 - p2
-  pd[[5]] <- disp_diff(p1[[5]], p2[[5]])
+  pd[[5]] <- angle_dist(p1[[5]], p2[[5]])
   pd
-}
-
-#' Calculate correct quantiles for circular and non-circular data
-#'
-#' @param .data A vector or data frame containing numeric data.
-#' @param probs A vector of probabilities to get quantiles for.
-#' @return A vector of quantiles corresponding to the probabilities in
-#'   \code{probs}; these quantiles will be circular if the data are circular and
-#'   they wiull be normal quantiles otherwise.
-
-smart_quantile <- function(.data, probs){
-  #TODO: Replace this function with quantile by using S3:circular
-  
-  if (circular::is.circular(.data)) {
-    circular::quantile.circular(.data, probs = probs) %% 360
-  } else {
-    stats::quantile(.data, probs = probs)
-  }
 }
 
 #' Coerce a variable to the circular data type
@@ -76,25 +37,11 @@ smart_quantile <- function(.data, probs){
 #' @return The same vector as \code{x} but with the circular data type (in
 #'   degree units and counter-clockwise rotation) for the circular package.
 
-as_circular <- function(x) {
-  circular::circular(x, units = "degrees", rotation = "counter")
+as_angle <- function(x) {
+  assert_that(is.numeric(x))
+  class(x) <- "angle"
+  x
 }
-
-#' Convert degrees to radians
-#' 
-#' @param x A numeric vector (in degrees).
-#' @return The same vector as \code{x} but converted to radians.
-#' @export
-
-d2r <- function(x) {x * pi / 180}
-
-#' Convert radians to degrees
-#' 
-#' @param x A numeric vector (in radians).
-#' @return The same vector as \code{x} but converted to degrees.
-#' @export
-
-r2d <- function(x) {x * 180 / pi}
 
 #' ggrad
 #' 
