@@ -4,7 +4,7 @@
 
 using namespace Rcpp;
 
-//[[Rcpp::export]]
+// Extract all rows of matrix X where T equals TestVal
 arma::mat submat(NumericMatrix X, NumericVector T, int TestVal) {
   arma::mat Xmat(X.begin(), X.nrow(), X.ncol(), false);
   arma::colvec tIdx(T.begin(), T.size(), false); 
@@ -12,13 +12,13 @@ arma::mat submat(NumericMatrix X, NumericVector T, int TestVal) {
   return y;
 }
 
-// [[Rcpp::export]]
+// Calculate the mean of each column in a matrix
 arma::rowvec col_means(arma::mat x){
   arma::mat X = arma::mat(x.begin(), x.n_rows, x.n_cols, false); 
   return arma::mean(X, 0); 
 }
 
-//[[Rcpp::export]]
+// [[Rcpp::export]]
 arma::mat group_scores(NumericMatrix X, NumericVector T) {
   NumericVector levels = unique(T);
   int n = levels.size();

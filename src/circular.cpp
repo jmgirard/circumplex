@@ -55,11 +55,6 @@ double angle_median(NumericVector x) {
 }
 
 // [[Rcpp::export]]
-double angle_dist(double x, double y) {
-  return std::min(x - y, 2 * PI - (x - y));
-}
-
-// [[Rcpp::export]]
 NumericVector compare_pi(NumericVector x) {
   int n = x.size();
   NumericVector y = clone(x);

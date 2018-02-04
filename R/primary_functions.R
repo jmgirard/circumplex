@@ -36,6 +36,9 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
   
+  # Convert angles from degrees to radians ----------------------------------
+  angles <- angles %>% convert_to("radian")
+  
   # Select circumplex scales and grouping variable (if applicable) ----------
   if (base::missing(grouping)) {
     bs_input <- .data %>% 
@@ -60,8 +63,8 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   }
   
   bs_output <- ssm_bootstrap(
-    .data = bs_input,
-    statistic = bs_function,
+    bs_input = bs_input,
+    bs_function = bs_function,
     angles = angles,
     boots = boots,
     interval = interval,

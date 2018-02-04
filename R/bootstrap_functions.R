@@ -1,83 +1,96 @@
 #' Calculate bootstrap confidence intervals given data and function
 #'
-#' @param .data A matrix or data frame containing circumplex scales and possibly
-#'   a measure (if called from ssm_measures).
+#' @param bs_input A matrix or data frame containing circumplex scales and
+#'   possibly a measure (if called from ssm_measures).
 #' @param bs_function A function that calculates the variables to be resampled.
-#' @param ssm The best-guess SSM parameter estimates prior to bootstrapping.
-#' @param angles A numerical vector specifying the angular displacement of each
-#'   circumplex scale (in degrees).
-#' @param boots A positive integer specifying the number of bootstrap resamples.
-#' @param interval The confidence intervals' percentage level (e.g., 0.95).
-#' @param ... Additional parameters to be passed to the \code{boot()} function.
+#' @param strata A factor identifying groups for stratified bootstrapping.
+#' @param angles,boots,interval,contrast Parameters passed on from
+#'   \code{ssm_profiles()} or \code{ssm_measures()}.
 #' @return A tibble containing SSM parameters (point and interval estimates).
 
-ssm_bootstrap <- function(.data, statistic, angles, boots, interval, ...) {
+ssm_bootstrap <- function(bs_input, bs_function, strata, angles, boots,
+                          interval, contrast) {
   
-  # Perform bootstrapping ---------------------------------------------------
+  # Perform bootstrapping ------------------------------------------------------
   bs_results <- boot::boot(
-    data = .data,
-    statistic = statistic, 
+    data = bs_input,
+    statistic = bs_function, 
     R = boots,
     angles = angles,
-    ...
+    contrast = contrast,
+    strata = strata
   )
-  
-  # Reshape parameters from wide to long format -----------------------------
+  # Reshape parameters from wide to long format --------------------------------
   reshape_params <- function(df) {
     df %>%
       matrix(nrow = 6) %>% 
       t() %>% 
       tibble::as_tibble()
   }
-  
-  # Calculate point and interval estimates from bootstrap results -----------
+  # Extract point estimates from bootstrap results -----------------------------
   bs_est <- bs_results$t0 %>%
     reshape_params() %>% 
     `colnames<-`(c("e_est", "x_est", "y_est", "a_est", "d_est", "fit"))
-  
+  # Set the units of the displacement results to radians -----------------------
   bs_t <- bs_results$t %>% 
-    tibble::as_tibble() %>% 
-    dplyr::mutate_at(.funs = as_angle, .vars = (1:(ncol(.) / 6) * 6 - 1))
-  
+    tibble::as_tibble()
+  if (contrast == "none" || contrast == "model") {
+    d_vars <- 1:(ncol(bs_t) / 6) * 6 - 1
+  } else if (contrast == "test") {
+    d_vars <- 1:((ncol(bs_t) - 6) / 6) * 6 - 1
+  }
+  bs_t <- bs_t %>% dplyr::mutate_at(.funs = as_radian, .vars = d_vars)
+  # Calculate the lower bounds of the confidence intervals ---------------------
   bs_lci <- bs_t %>%
-    purrr::map_dbl(quantile, probs = ((1 - interval) / 2)) %>% 
+    purrr::map_dbl(smart_quantile, ((1 - interval) / 2)) %>% 
     reshape_params() %>% 
     `colnames<-`(c("e_lci", "x_lci", "y_lci", "a_lci", "d_lci", "f_lci")) %>% 
     dplyr::select(-f_lci)
-  
+  # Calculate the upper bounds of the confidence intervals ---------------------
   bs_uci <- bs_t %>% 
-    purrr::map_dbl(quantile, probs = (1 - (1 - interval) / 2)) %>% 
+    purrr::map_dbl(smart_quantile, (1 - (1 - interval) / 2)) %>% 
     reshape_params() %>% 
     `colnames<-`(c("e_uci", "x_uci", "y_uci", "a_uci", "d_uci", "f_uci")) %>% 
     dplyr::select(-f_uci)
-  
-  dplyr::bind_cols(bs_est, bs_lci, bs_uci)
-  
+  # Combine the results in one tibble and convert radians to degrees -----------
+  dplyr::bind_cols(bs_est, bs_lci, bs_uci) %>% 
+    dplyr::mutate(
+      d_est = convert_to(d_est, "degree"),
+      d_lci = convert_to(d_lci, "degree"),
+      d_uci = convert_to(d_uci, "degree")
+    )
 }
 
+#
 ssm_by_group <- function(scores, angles, contrast) {
 
-  # To model contrast, subtract scores then SSM -----------------------------
+  # To model contrast, subtract scores then SSM --------------------------------
   if (contrast == "model") {
     scores <- rbind(scores, scores[2, ] - scores[1, ])
   }
-  
-  # Calculate parameters per group ------------------------------------------
+  # Calculate parameters per group ---------------------------------------------
   results <- group_parameters(scores, angles)
-  
-  # To test contrast, SSM then subtract parameters --------------------------
+  # To test contrast, SSM then subtract parameters -----------------------------
   if (contrast == "test") {
     results <- c(results, param_diff(results[7:12], results[1:6]))
   }
-  
   results
 }
 
-quantile.angle <- function(x, probs) {
-  mdn <- angle_median(x)
-  if (is.na(mdn)) return(NA)
-  tx <- (x - mdn) %% (2 * pi)
-  tx <- compare_pi(tx)
-  qtl <- stats::quantile(x = tx, probs = probs)
-  (qtl + mdn) %% (2 * pi)
+#
+smart_quantile <- function(x, prob) {
+  if (is_radian(x)) {
+    # For displacement estimates, calculate circular quantiles -----------------
+    mdn <- angle_median(x)
+    if (is.na(mdn)) return(NA)
+    tx <- (x - mdn) %% (2 * pi)
+    tx <- compare_pi(tx)
+    qtl <- stats::quantile(x = tx, probs = prob)
+    out <- (qtl + mdn) %% (2 * pi)
+    out <- as_radian(out)
+  } else {
+    # For all other estimates, calculate normal quantiles ----------------------
+    out <- stats::quantile(x = x, probs = prob)[[1]]
+  }
+  out
 }
