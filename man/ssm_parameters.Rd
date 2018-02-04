@@ -11,13 +11,13 @@ ssm_parameters(scores, angles)
 be either mean scores or correlations.}
 
 \item{angles}{A numeric vector containing an angular displacement for each
-circumplex scale provided in \code{scores} (in degrees).}
+circumplex scale provided in \code{scores} (in radians).}
 }
 \value{
 A numerical vector containing structural summary method parameters
 that describe \code{scores} given \code{angles}. The vector will contain
 the following values: elevation, x-axis value, y-axis value, amplitude,
-angular displacement (in degrees), and model fit (R-squared).
+angular displacement (in radians), and model fit (R-squared).
 }
 \description{
 Calculate structural summary parameters

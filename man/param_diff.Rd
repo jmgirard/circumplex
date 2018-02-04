@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{param_diff}
 \alias{param_diff}
-\title{Compute difference between two sets of SSM parameters}
+\title{Compute differences between two sets of SSM parameters}
 \usage{
 param_diff(p1, p2)
 }
@@ -14,5 +14,5 @@ A numeric vector of differences between the parameters in \code{p1}
 and \code{p2}, respecting the circular nature of displacement parameters.
 }
 \description{
-Compute difference between two sets of SSM parameters
+Compute differences between two sets of SSM parameters
 }
