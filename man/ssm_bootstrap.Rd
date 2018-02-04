@@ -4,25 +4,18 @@
 \alias{ssm_bootstrap}
 \title{Calculate bootstrap confidence intervals given data and function}
 \usage{
-ssm_bootstrap(bs_input, bs_function, angles, boots, interval, contrast, strata,
-  ...)
+ssm_bootstrap(bs_input, bs_function, strata, angles, boots, interval, contrast)
 }
 \arguments{
+\item{bs_input}{A matrix or data frame containing circumplex scales and
+possibly a measure (if called from ssm_measures).}
+
 \item{bs_function}{A function that calculates the variables to be resampled.}
 
-\item{angles}{A numerical vector specifying the angular displacement of each
-circumplex scale (in degrees).}
+\item{strata}{A factor identifying groups for stratified bootstrapping.}
 
-\item{boots}{A positive integer specifying the number of bootstrap resamples.}
-
-\item{interval}{The confidence intervals' percentage level (e.g., 0.95).}
-
-\item{...}{Additional parameters to be passed to the \code{boot()} function.}
-
-\item{.data}{A matrix or data frame containing circumplex scales and possibly
-a measure (if called from ssm_measures).}
-
-\item{ssm}{The best-guess SSM parameter estimates prior to bootstrapping.}
+\item{angles, boots, interval, contrast}{Parameters passed on from
+\code{ssm_profiles()} or \code{ssm_measures()}.}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates).

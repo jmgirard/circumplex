@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{as_degree}
 \alias{as_degree}
-\title{Set class to degree, converting if necessary}
+\title{Set class to degree (no conversion)}
 \usage{
 as_degree(x)
 }
@@ -13,5 +13,5 @@ as_degree(x)
 \code{x} with the \code{degree} class.
 }
 \description{
-Set class to degree, converting if necessary
+Set class to degree (no conversion)
 }

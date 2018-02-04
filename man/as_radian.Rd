@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{as_radian}
 \alias{as_radian}
-\title{Set class to radian, converting if necessary}
+\title{Set class to radian (no conversion)}
 \usage{
 as_radian(x)
 }
@@ -13,5 +13,5 @@ as_radian(x)
 \code{x} with the \code{radian} class.
 }
 \description{
-Set class to radian, converting if necessary
+Set class to radian (no conversion)
 }
