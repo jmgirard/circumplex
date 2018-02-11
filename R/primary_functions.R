@@ -93,6 +93,32 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   invisible(results)
 }
 
+#' Measure (Correlation-based) Structural Summary Method
+#'
+#' Calculate SSM parameters with bootstrapped confidence intervals for any
+#' number of measures, based on their correlations with circumplex scales.
+#'
+#' @param .data A matrix or data frame containing at least circumplex scales.
+#' @param scales A list of the variables in \code{.data} that contain circumplex
+#'   scales (in tidyverse-style NSE specification, see examples).
+#' @param angles A numerical vector containing the angular displacement of each
+#'   circumplex scale included in \code{scales} (in degrees).
+#' @param measures A list of variables in \code{.data} to be analyzed (in
+#'   tidyverse-style NSE specification, see examples).
+#' @param boots The number of bootstrap resamples to use in calculating the
+#'   confidence intervals (default = 2000).
+#' @param interval The confidence intervals' percentage level (default = 0.95).
+#' @param contrast  (default = "none").
+#' @param plot A logical determining whether a plot should be created (default =
+#'   TRUE).
+#' @param ... Additional parameters to be passed to \code{circle_plot()}.
+#'   Examples include \code{amax} and \code{font.size}.
+#' @return A tibble containing SSM parameters (point and interval estimates) for
+#'   each measure.
+#' @seealso \code{\link{ssm_profiles}}, which calculates SSM parameters for
+#'   profiles using a mean-based approach.
+#' @export
+
 ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   interval = 0.95, contrast = "none", plot = TRUE, ...) {
   
