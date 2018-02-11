@@ -6,18 +6,6 @@
 
 using namespace Rcpp;
 
-// group_scores
-arma::mat group_scores(NumericMatrix X, NumericVector T);
-RcppExport SEXP _ssm_group_scores(SEXP XSEXP, SEXP TSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type T(TSEXP);
-    rcpp_result_gen = Rcpp::wrap(group_scores(X, T));
-    return rcpp_result_gen;
-END_RCPP
-}
 // angle_mean
 double angle_mean(NumericVector x);
 RcppExport SEXP _ssm_angle_mean(SEXP xSEXP) {
@@ -75,14 +63,39 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// group_scores
+arma::mat group_scores(NumericMatrix X, NumericVector T);
+RcppExport SEXP _ssm_group_scores(SEXP XSEXP, SEXP TSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type T(TSEXP);
+    rcpp_result_gen = Rcpp::wrap(group_scores(X, T));
+    return rcpp_result_gen;
+END_RCPP
+}
+// measure_scores
+arma::mat measure_scores(NumericMatrix scales, NumericMatrix measures);
+RcppExport SEXP _ssm_measure_scores(SEXP scalesSEXP, SEXP measuresSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type scales(scalesSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type measures(measuresSEXP);
+    rcpp_result_gen = Rcpp::wrap(measure_scores(scales, measures));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ssm_group_scores", (DL_FUNC) &_ssm_group_scores, 2},
     {"_ssm_angle_mean", (DL_FUNC) &_ssm_angle_mean, 1},
     {"_ssm_angle_median", (DL_FUNC) &_ssm_angle_median, 1},
     {"_ssm_compare_pi", (DL_FUNC) &_ssm_compare_pi, 1},
     {"_ssm_ssm_parameters", (DL_FUNC) &_ssm_ssm_parameters, 2},
     {"_ssm_group_parameters", (DL_FUNC) &_ssm_group_parameters, 2},
+    {"_ssm_group_scores", (DL_FUNC) &_ssm_group_scores, 2},
+    {"_ssm_measure_scores", (DL_FUNC) &_ssm_measure_scores, 2},
     {NULL, NULL, 0}
 };
 
