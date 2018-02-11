@@ -1,15 +1,5 @@
-#' Calculate bootstrap confidence intervals given data and function
-#'
-#' @param bs_input A matrix or data frame containing circumplex scales and
-#'   possibly a measure (if called from ssm_measures).
-#' @param bs_function A function that calculates the variables to be resampled.
-#' @param strata A factor identifying groups for stratified bootstrapping.
-#' @param angles,boots,interval,contrast Parameters passed on from
-#'   \code{ssm_profiles()} or \code{ssm_measures()}.
-#' @return A tibble containing SSM parameters (point and interval estimates).
-
-ssm_bootstrap <- function(bs_input, bs_function, strata, angles, boots,
-                          interval, contrast) {
+ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
+                          contrast, ...) {
   
   # Perform bootstrapping ------------------------------------------------------
   bs_results <- boot::boot(
@@ -18,7 +8,7 @@ ssm_bootstrap <- function(bs_input, bs_function, strata, angles, boots,
     R = boots,
     angles = angles,
     contrast = contrast,
-    strata = strata
+    ...
   )
   # Reshape parameters from wide to long format --------------------------------
   reshape_params <- function(df) {

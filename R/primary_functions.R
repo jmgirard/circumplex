@@ -28,18 +28,18 @@
 ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   grouping, contrast = "none", plot = TRUE, ...) {
   
-  # Enable column specification using tidyverse-style NSE -------------------
+  # Enable column specification using tidyverse-style NSE ----------------------
   scales_en <- rlang::enquo(scales)
   
-  # Check that inputs are valid ---------------------------------------------
+  # Check that inputs are valid ------------------------------------------------
   assert_that(is.numeric(angles), is.count(boots), is.flag(plot))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
   
-  # Convert angles from degrees to radians ----------------------------------
+  # Convert angles from degrees to radians -------------------------------------
   angles <- angles %>% convert_to("radian")
   
-  # Select circumplex scales and grouping variable (if applicable) ----------
+  # Select circumplex scales and grouping variable (if applicable) -------------
   if (base::missing(grouping)) {
     bs_input <- .data %>% 
       dplyr::select(!!scales_en) %>% 
@@ -47,7 +47,6 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   } else {
     #TODO: Check that there are only two groups if contrast != none
     grouping_en <- rlang::enquo(grouping)
-    #grouping_qn <- rlang::quo_name(grouping_en)
     bs_input <- .data %>%
       dplyr::select(!!grouping_en, !!scales_en) %>% 
       dplyr::mutate(Group = factor(!!grouping_en)) %>% 
@@ -73,6 +72,64 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   )
 
   row_labels <- levels(bs_input$Group)
+  if (contrast != "none") {
+    row_labels <- c(row_labels, paste0("Diff ", contrast))
+  }
+  results <- bs_output %>% 
+    dplyr::mutate(label = row_labels)
+  
+  # ht <- results_table(bs_output, contrast = pairwise,
+  #   group = !base::missing(grouping)) %>% 
+  #   htmlTable::htmlTable(
+  #     caption = "Structural Summary Method Parameters with
+  #     Bootstrap Confidence Intervals",
+  #     align = "llllll",
+  #     align.header = "llllll",
+  #     rnames = FALSE,
+  #     css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
+  #   )
+  # print(ht)
+  
+  invisible(results)
+}
+
+ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
+  interval = 0.95, contrast = "none", plot = TRUE, ...) {
+  
+  # Enable column specification using tidyverse-style NSE ----------------------
+  scales_en <- rlang::enquo(scales)
+  measures_en <- rlang::enquo(measures)
+  
+  # Check that inputs are valid ------------------------------------------------
+  assert_that(is.numeric(angles), is.count(boots), is.flag(plot))
+  assert_that(contrast %in% c("none", "model", "test"))
+  assert_that(is.scalar(interval), interval > 0, interval < 1)
+  
+  # Convert angles from degrees to radians -------------------------------------
+  angles <- angles %>% convert_to("radian")
+  
+  # Select circumplex scales and measure variables -----------------------------
+  bs_input <- .data %>% 
+    dplyr::select(!!scales_en, !!measures_en)
+  
+  bs_function <- function(.data, index, angles, contrast) {
+    resample <- .data[index, ]
+    cs <- as.matrix(resample[, 1:length(angles)])
+    mv <- as.matrix(resample[, (length(angles) + 1):ncol(resample)])
+    scores_r <- measure_scores(cs, mv)
+    ssm_by_group(scores_r, angles, contrast)
+  }
+  
+  bs_output <- ssm_bootstrap(
+    bs_input = bs_input,
+    bs_function = bs_function,
+    angles = angles,
+    boots = boots,
+    interval = interval,
+    contrast = contrast
+  )
+  
+  row_labels <- names(select(.data, !!measures_en))
   if (contrast != "none") {
     row_labels <- c(row_labels, paste0("Diff ", contrast))
   }

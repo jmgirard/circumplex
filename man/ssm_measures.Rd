@@ -4,8 +4,8 @@
 \alias{ssm_measures}
 \title{Correlational Structural Summary Method}
 \usage{
-ssm_measures(.data, scales, angles, measures, pairwise = FALSE,
-  boots = 2000, interval = 0.95, plot = TRUE, ...)
+ssm_measures(.data, scales, angles, measures, boots = 2000, interval = 0.95,
+  contrast = "none", plot = TRUE, ...)
 }
 \arguments{
 \item{.data}{A matrix or data frame containing at least circumplex scales and
@@ -20,10 +20,6 @@ circumplex scale included in \code{scales} (in degrees).}
 \item{measures}{A list of variables in \code{.data} that contain numeric
 values (in tidyverse-style NSE specification, see examples).}
 
-\item{pairwise}{A logical determining whether the measures should be
-compared. If TRUE, the difference between each unique pairwise combination
-of measures will be output (default = FALSE).}
-
 \item{boots}{The number of bootstrap resamples to use in calculating the
 confidence intervals (default = 2000).}
 
@@ -34,6 +30,10 @@ TRUE).}
 
 \item{...}{Additional parameters to be passed to
 \code{circle_plot()}.Examples include \code{amax} and \code{font.size}.}
+
+\item{pairwise}{A logical determining whether the measures should be
+compared. If TRUE, the difference between each unique pairwise combination
+of measures will be output (default = FALSE).}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for
