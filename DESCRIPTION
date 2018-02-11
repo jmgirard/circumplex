@@ -1,5 +1,5 @@
-Package: ssm
 Type: Package
+Package: ssm
 Title: Structural Summary Method with Bootstrap Confidence Intervals
 Version: 0.0.0.9000
 Authors@R: as.person(c(
@@ -20,9 +20,10 @@ Imports:
     ggplot2 (>= 2.2.1),
     htmlTable (>= 1.11.1),
     magrittr (>= 1.5),
+    Rcpp (>= 0.12.14),
     rlang (>= 0.1.6),
     stats (>= 3.4.3),
-    Rcpp (>= 0.12.14)
+    tibble (>= 1.4.2)
 LinkingTo: 
     Rcpp (>= 0.12.14),
     RcppArmadillo (>= 0.8.300.1.0)
