@@ -76,19 +76,19 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
     row_labels <- c(row_labels, paste0("Diff ", contrast))
   }
   results <- bs_output %>% 
-    dplyr::mutate(label = row_labels)
-  
-  # ht <- results_table(bs_output, contrast = pairwise,
-  #   group = !base::missing(grouping)) %>% 
-  #   htmlTable::htmlTable(
-  #     caption = "Structural Summary Method Parameters with
-  #     Bootstrap Confidence Intervals",
-  #     align = "llllll",
-  #     align.header = "llllll",
-  #     rnames = FALSE,
-  #     css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
-  #   )
-  # print(ht)
+    dplyr::mutate(label = row_labels) %>% 
+    new_ssm()
+
+  ht <- results_table(bs_output, contrast = pairwise,
+    group = !base::missing(grouping)) %>%
+    htmlTable::htmlTable(
+      caption = "Structural Summary Method Parameters with Bootstrap Confidence Intervals",
+      align = "llllll",
+      align.header = "llllll",
+      rnames = FALSE,
+      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
+    )
+  print(ht)
   
   invisible(results)
 }
@@ -162,17 +162,16 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   results <- bs_output %>% 
     dplyr::mutate(label = row_labels)
   
-  # ht <- results_table(bs_output, contrast = pairwise,
-  #   group = !base::missing(grouping)) %>% 
-  #   htmlTable::htmlTable(
-  #     caption = "Structural Summary Method Parameters with
-  #     Bootstrap Confidence Intervals",
-  #     align = "llllll",
-  #     align.header = "llllll",
-  #     rnames = FALSE,
-  #     css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
-  #   )
-  # print(ht)
+  ht <- results_table(bs_output, contrast = pairwise,
+    group = !base::missing(grouping)) %>% 
+    htmlTable::htmlTable(
+      caption = "Structural Summary Method Parameters with Bootstrap Confidence Intervals",
+      align = "llllll",
+      align.header = "llllll",
+      rnames = FALSE,
+      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
+    )
+  print(ht)
   
   invisible(results)
 }

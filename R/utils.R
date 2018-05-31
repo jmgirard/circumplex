@@ -39,7 +39,7 @@ ggrad <- function(v) {
   (v - 90) * (-pi / 180)
 }
 
-#
+#' Determine good max amplitude value for circle plot
 pretty_max <- function(v) {
   amax <- max(v, na.rm = TRUE)
   options <- c(
