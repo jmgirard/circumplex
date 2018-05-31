@@ -22,6 +22,7 @@ Imports:
     magrittr (>= 1.5),
     Rcpp (>= 0.12.14),
     rlang (>= 0.1.6),
+    sloop (>= 0.0.0.9000),
     stats (>= 3.4.3),
     tibble (>= 1.4.2)
 LinkingTo: 

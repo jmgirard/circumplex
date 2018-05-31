@@ -1,6 +1,6 @@
 #' Pipe operator
 #'
-#' See \code{magrittr::\link[magrittr]{\%>\%}} for details.
+#' See \code{magrittr} for details.
 #'
 #' @name %>%
 #' @rdname pipe
@@ -22,80 +22,19 @@ param_diff <- function(p1, p2) {
   pd
 }
 
-#' Set class to degree (no conversion)
-#' 
-#' @param x Numeric data.
-#' @return \code{x} with the \code{degree} class.
-as_degree <- function(x) {
-  class(x) <- "degree"
-  x
-}
-
-#' Set class to radian (no conversion)
-#' 
-#' @param x Numeric data.
-#' @return \code{x} with the \code{radian} class.
-as_radian <- function(x) {
-  class(x) <- "radian"
-  x
-}
-
-#' Check if class is degree
-#' 
-#' @param x Numeric data.
-#' @return A logical indicating if \code{x} has class \code{degree}.
-is_degree <- function(x) {
-  class(x) == "degree"
-}
-
-#' Check if class is radian
-#' 
-#' @param x Numeric data.
-#' @return A logical indicating if \code{x} has class \code{radian}.
-is_radian <- function(x) {
-  class(x) == "radian"
-}
-
-#
-convert_to <- function(x, unit) {
-  if (unit == "degree") {
-    if (is_degree(x)) {
-      return(x)
-    } else {
-      out <- x * (180 / pi)
-    }
-  } else if (unit == "radian") {
-    if (is_radian(x)) {
-      return(x)
-    } else {
-      out <- x * (pi / 180)
-    }
-  } else {
-    out <-  NA
-  }
-  class(out) <- unit
-  out
-}
-
 #' Calculate angular distance
 #'
-#' @param x,y Angles in degree or radian units.
-#' @return The shortest distance between \code{x} and \code{y} in the same
-#'   units, where positive numbers mean \code{x} is more counterclockwise than
-#'   \code{y} and negative numbers mean the opposite. Note that, given how the
-#'   distance is calculated, when \code{x} and \code{y} are exactly 180 degrees
-#'   or pi radians apart, the distance output will be arbitrarily negative.
+#' @param x,y Angles in radian units.
+#' @return The shortest distance between \code{x} and \code{y} in radians, where 
+#'   positive numbers mean \code{x} is more counterclockwise than \code{y} and
+#'   negative numbers mean the opposite. Note that, given how the distance is
+#'   calculated, when \code{x} and \code{y} are exactly pi radians apart, the
+#'   distance output will be arbitrarily negative.
 angle_dist <- function(x, y)  {
-  if (is_radian(x) && is_radian(y)) {
-    ((x - y + pi) %% (2 * pi)) - pi
-  } else if (is_degree(x) && is_degree(y)) {
-    ((x - y + 180) %% 360) - 180
-  } else {
-    NA
-  }
+  ((x - y + pi) %% (2 * pi)) - pi
 }
 
-#
+#' Convert degrees to ggplot's radian format
 ggrad <- function(v) {
   (v - 90) * (-pi / 180)
 }

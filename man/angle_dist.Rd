@@ -7,14 +7,14 @@
 angle_dist(x, y)
 }
 \arguments{
-\item{x, y}{Angles in degree or radian units.}
+\item{x, y}{Angles in radian units.}
 }
 \value{
-The shortest distance between \code{x} and \code{y} in the same
-units, where positive numbers mean \code{x} is more counterclockwise than
-\code{y} and negative numbers mean the opposite. Note that, given how the
-distance is calculated, when \code{x} and \code{y} are exactly 180 degrees
-or pi radians apart, the distance output will be arbitrarily negative.
+The shortest distance between \code{x} and \code{y} in radians, where
+positive numbers mean \code{x} is more counterclockwise than \code{y} and
+negative numbers mean the opposite. Note that, given how the distance is
+calculated, when \code{x} and \code{y} are exactly pi radians apart, the
+distance output will be arbitrarily negative.
 }
 \description{
 Calculate angular distance

@@ -32,22 +32,22 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   bs_t <- bs_t %>% dplyr::mutate_at(.funs = as_radian, .vars = d_vars)
   # Calculate the lower bounds of the confidence intervals ---------------------
   bs_lci <- bs_t %>%
-    purrr::map_dbl(smart_quantile, ((1 - interval) / 2)) %>% 
+    purrr::map_dbl(quantile, ((1 - interval) / 2)) %>% 
     reshape_params() %>% 
     `colnames<-`(c("e_lci", "x_lci", "y_lci", "a_lci", "d_lci", "f_lci")) %>% 
     dplyr::select(-f_lci)
   # Calculate the upper bounds of the confidence intervals ---------------------
   bs_uci <- bs_t %>% 
-    purrr::map_dbl(smart_quantile, (1 - (1 - interval) / 2)) %>% 
+    purrr::map_dbl(quantile, (1 - (1 - interval) / 2)) %>% 
     reshape_params() %>% 
     `colnames<-`(c("e_uci", "x_uci", "y_uci", "a_uci", "d_uci", "f_uci")) %>% 
     dplyr::select(-f_uci)
   # Combine the results in one tibble and convert radians to degrees -----------
   dplyr::bind_cols(bs_est, bs_lci, bs_uci) %>% 
     dplyr::mutate(
-      d_est = convert_to(d_est, "degree"),
-      d_lci = convert_to(d_lci, "degree"),
-      d_uci = convert_to(d_uci, "degree")
+      d_est = as_degree(d_est),
+      d_lci = as_degree(d_lci),
+      d_uci = as_degree(d_uci)
     )
 }
 
@@ -67,20 +67,13 @@ ssm_by_group <- function(scores, angles, contrast) {
   results
 }
 
-#
-smart_quantile <- function(x, prob) {
-  if (is_radian(x)) {
-    # For displacement estimates, calculate circular quantiles -----------------
-    mdn <- angle_median(x)
-    if (is.na(mdn)) return(NA)
-    tx <- (x - mdn) %% (2 * pi)
-    tx <- compare_pi(tx)
-    qtl <- stats::quantile(x = tx, probs = prob)
-    out <- (qtl + mdn) %% (2 * pi)
-    out <- as_radian(out)
-  } else {
-    # For all other estimates, calculate normal quantiles ----------------------
-    out <- stats::quantile(x = x, probs = prob)[[1]]
-  }
-  out
+#' Calculate quantiles for circular data in radians
+quantile.radian <- function(x, ...) {
+  mdn <- angle_median(x)
+  if (is.na(mdn)) return(NA)
+  tx <- (x - mdn) %% (2 * pi)
+  tx <- compare_pi(tx)
+  class(tx) <- "numeric"
+  qtl <- stats::quantile(x = tx, ...)
+  as_radian((qtl + mdn) %% (2 * pi))
 }
