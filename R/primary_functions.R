@@ -37,6 +37,7 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   assert_that(is.numeric(angles), is.count(boots), is.flag(plot))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
+  #TODO: Add a warning if the scales do not appear to be standardized
   
   # Convert angles from degrees to radians -------------------------------------
   angles <- angles %>% as_degree() %>% as_radian()
@@ -83,11 +84,12 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   ht <- results_table(results, contrast = (contrast != "none"),
     group = !base::missing(grouping)) %>%
     htmlTable::htmlTable(
-      caption = "Structural Summary Method Parameters with Bootstrap Confidence Intervals",
+      caption = sprintf("Mean-based Structural Summary Statistics with %.0f%% Confidence Intervals", interval * 100),
       align = "llllll",
       align.header = "llllll",
       rnames = FALSE,
-      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
+      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
+      tfoot = sprintf("<i>Note. N</i> = %.0f", nrow(.data))
     )
   if (table == TRUE) {
     print(ht)
@@ -168,13 +170,15 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   results <- bs_output %>% 
     dplyr::mutate(label = row_labels)
   
-  ht <- results_table(results, contrast = (contrast != "none")) %>% 
+  ht <- results_table(results, measure = TRUE, 
+    contrast = (contrast != "none")) %>% 
     htmlTable::htmlTable(
-      caption = "Structural Summary Method Parameters with Bootstrap Confidence Intervals",
+      caption = sprintf("Correlation-based Structural Summary Statistics with %.0f%% Confidence Intervals", interval * 100),
       align = "llllll",
       align.header = "llllll",
       rnames = FALSE,
-      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
+      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
+      tfoot = sprintf("<i>Note. N</i> = %.0f", nrow(.data))
     )
   if (table == TRUE) {
     print(ht)

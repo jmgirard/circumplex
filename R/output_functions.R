@@ -212,7 +212,7 @@ results_table <- function(results, contrast = FALSE, group = FALSE,
     }
   }
   if (measure == TRUE) {
-    df <- dplyr::bind_cols(Measure = results$Measure, df)
+    df <- dplyr::bind_cols(Measure = results$label, df)
     if (contrast == TRUE) {
       df <- dplyr::bind_cols(Contrast = results$Contrast, df) %>%
         dplyr::mutate(
