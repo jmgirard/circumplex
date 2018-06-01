@@ -7,9 +7,7 @@ Authors@R: as.person(c(
     "Johannes Zimmermann <j.zimmermann@psychologische-hochschule.de> [aut]",
     "Aidan Wright <aidan@pitt.edu> [aut]"))
 Description: Tools for conducting and visualizing circumplex data analyses using
-    the structural summary method (SSM). SSM parameters can be evaluated for
-    groups' mean profiles on circumplex scales as well as for measures'
-    correlations with circumplex scales.
+    the structural summary method (SSM).
 License: GPL-3
 URL: http://github.com/jmgirard/ssm
 BugReports: https://github.com/jmgirard/ssm/issues
@@ -17,21 +15,18 @@ Depends:
     R (>= 3.4.3)
 Imports: 
     assertthat (>= 0.2.0),
-    boot (>= 1.3.20),
-    circular (>= 0.4.93),
     dplyr (>= 0.7.4),
     ggforce (>= 0.1.1),
     ggplot2 (>= 2.2.1),
-    gtools (>= 3.5.0),
     htmlTable (>= 1.11.1),
     magrittr (>= 1.5),
-    purrr (>= 0.2.4),
-    purrrlyr (>= 0.0.2),
+    Rcpp (>= 0.12.14),
     rlang (>= 0.1.6),
+    sloop (>= 0.0.0.9000),
     stats (>= 3.4.3),
-    tibble (>= 1.4.1)
-Suggests: 
-    testthat (>= 2.0.0)
-Encoding: UTF-8
-LazyData: true
+    tibble (>= 1.4.2)
+LinkingTo: 
+    Rcpp (>= 0.12.14),
+    RcppArmadillo (>= 0.8.300.1.0)
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1
