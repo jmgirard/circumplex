@@ -26,7 +26,9 @@
 #' @export
 
 ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
-  grouping, contrast = "none", plot = TRUE, ...) {
+  grouping, contrast = "none", plot = TRUE, table = TRUE, ...) {
+  
+  cl <- match.call()
   
   # Enable column specification using tidyverse-style NSE ----------------------
   scales_en <- rlang::enquo(scales)
@@ -37,7 +39,7 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   assert_that(is.scalar(interval), interval > 0, interval < 1)
   
   # Convert angles from degrees to radians -------------------------------------
-  angles <- angles %>% as_radian()
+  angles <- angles %>% as_degree() %>% as_radian()
   
   # Select circumplex scales and grouping variable (if applicable) -------------
   if (base::missing(grouping)) {
@@ -76,10 +78,9 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
     row_labels <- c(row_labels, paste0("Diff ", contrast))
   }
   results <- bs_output %>% 
-    dplyr::mutate(label = row_labels) %>% 
-    new_ssm()
+    dplyr::mutate(label = row_labels)
 
-  ht <- results_table(bs_output, contrast = pairwise,
+  ht <- results_table(results, contrast = (contrast != "none"),
     group = !base::missing(grouping)) %>%
     htmlTable::htmlTable(
       caption = "Structural Summary Method Parameters with Bootstrap Confidence Intervals",
@@ -88,9 +89,12 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
       rnames = FALSE,
       css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
     )
-  print(ht)
+  if (table == TRUE) {
+    print(ht)
+  }
   
-  invisible(results)
+  new_ssm(results = results, call = cl, type = "Profile")
+  
 }
 
 #' Measure (Correlation-based) Structural Summary Method
@@ -120,7 +124,9 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
 #' @export
 
 ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
-  interval = 0.95, contrast = "none", plot = TRUE, ...) {
+  interval = 0.95, contrast = "none", plot = TRUE, table = TRUE, ...) {
+  
+  cl <- match.call()
   
   # Enable column specification using tidyverse-style NSE ----------------------
   scales_en <- rlang::enquo(scales)
@@ -132,7 +138,7 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   assert_that(is.scalar(interval), interval > 0, interval < 1)
   
   # Convert angles from degrees to radians -------------------------------------
-  angles <- angles %>% as_radian()
+  angles <- angles %>% as_degree() %>% as_radian()
   
   # Select circumplex scales and measure variables -----------------------------
   bs_input <- .data %>% 
@@ -155,15 +161,14 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
     contrast = contrast
   )
   
-  row_labels <- names(select(.data, !!measures_en))
+  row_labels <- names(dplyr::select(.data, !!measures_en))
   if (contrast != "none") {
     row_labels <- c(row_labels, paste0("Diff ", contrast))
   }
   results <- bs_output %>% 
     dplyr::mutate(label = row_labels)
   
-  ht <- results_table(bs_output, contrast = pairwise,
-    group = !base::missing(grouping)) %>% 
+  ht <- results_table(results, contrast = (contrast != "none")) %>% 
     htmlTable::htmlTable(
       caption = "Structural Summary Method Parameters with Bootstrap Confidence Intervals",
       align = "llllll",
@@ -171,7 +176,32 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
       rnames = FALSE,
       css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
     )
-  print(ht)
+  if (table == TRUE) {
+    print(ht)
+  }
   
-  invisible(results)
+  new_ssm(results = results, call = cl, type = "Measure")
+}
+
+
+#' Standardize scales using existing norms
+#' @export
+ssm_standardize <- function(.data, scales, angles, norms) {
+  
+  # Check that inputs are valid ------------------------------------------------
+  assert_that(is.numeric(angles))
+  # Enable column specification using tidyverse-style NSE ----------------------
+  scales_en <- rlang::enquo(scales)
+  # Move scale columns to the front of the tibble ------------------------------
+  sdata <- .data %>% 
+    dplyr::select(!!scales_en, dplyr::everything())
+  # Match scales with norm variables and standardize ---------------------------
+  for (i in 1:length(angles)) {
+    index <- norms$Angle == angles[i]
+    m <- norms$M[index]
+    s <- norms$SD[index]
+    sdata <- sdata %>% 
+      dplyr::mutate_at(dplyr::funs((. - m) / s), .vars = i)
+  }
+  sdata
 }

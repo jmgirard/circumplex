@@ -64,13 +64,23 @@ ssm <- function(x, y, ...) {
 }
 
 print.ssm <- function(x) {
-  message("success")
+  cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
+    "\n", sep = "")
+  for (i in 1:nrow(x$results)) {
+    dat <- x$results[i, ]
+    v <- c(dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
+           dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
+           dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA)
+    m <- round(matrix(v, nrow = 6, ncol = 3), 3)
+    rownames(m) <- c("Elevation", "X-Value", "Y-Value",
+      "Amplitude", "Displacement", "Model Fit")
+    colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
+    cat("\n", x$type, " [", x$results[[i, "label"]], "]:\n", sep = "")
+    print.default(m, print.gap = 3L, na.print = "")
+  }
+  cat("\n")
 }
 
-new_ssm <- function(x, ...) {
-  sloop::new_s3_scalar(x, ..., class = "ssm")
-}
-
-as_ssm.ssm <- function(x, ...) {
-  x
+new_ssm <- function(results, call, ...) {
+  sloop::new_s3_scalar(results = results, call = call, ..., class = "ssm")
 }

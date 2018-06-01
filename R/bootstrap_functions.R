@@ -45,9 +45,9 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   # Combine the results in one tibble and convert radians to degrees -----------
   dplyr::bind_cols(bs_est, bs_lci, bs_uci) %>% 
     dplyr::mutate(
-      d_est = as_degree(d_est),
-      d_lci = as_degree(d_lci),
-      d_uci = as_degree(d_uci)
+      d_est = as_degree(as_radian(d_est)),
+      d_lci = as_degree(as_radian(d_lci)),
+      d_uci = as_degree(as_radian(d_uci))
     )
 }
 

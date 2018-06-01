@@ -201,7 +201,7 @@ results_table <- function(results, contrast = FALSE, group = FALSE,
       Fit = sprintf("%.3f", fit)
     )
   if (group == TRUE) {
-    df <- dplyr::bind_cols(Group = results$Group, df)
+    df <- dplyr::bind_cols(Group = results$label, df)
     if (contrast == TRUE) {
       df <- dplyr::bind_cols(Contrast = results$Contrast, df) %>%
         dplyr::mutate(
