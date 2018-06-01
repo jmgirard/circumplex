@@ -17,7 +17,7 @@ Calculate mean-based SSM parameters for a single group/sample
 ``` r
 data('wright2009')
 data('octants')
-ssm_profiles(wright2009, PA:NO, octants)
+ssm_profiles(.data = wright2009, scales = PA:NO, angles = octants)
 ```
 
 Calculate mean-based SSM parameters for multiple groups/samples
@@ -26,8 +26,8 @@ Calculate mean-based SSM parameters for multiple groups/samples
 data('zimmermann2017')
 data('octants')
 data('Norms_IIPSC_Hopwood2008')
-zimmermann2017s <- ssm_standardize(zimmermann2017, PA:NO, octants, Norms_IIPSC_Hopwood2008)
-ssm_profiles(zimmermann2017s, PA:NO, octants, grouping = Gender)
+zimmermann2017s <- ssm_standardize(.data = zimmermann2017, scales = PA:NO, angles = octants, norms = Norms_IIPSC_Hopwood2008)
+ssm_profiles(.data = zimmermann2017s, scales = PA:NO, angles = octants, grouping = Gender)
 ```
 
 Calculate correlation-based SSM parameters for multiple measures
@@ -35,5 +35,5 @@ Calculate correlation-based SSM parameters for multiple measures
 ``` r
 data('zimmermann2017')
 data('octants')
-ssm_measures(zimmermann2017, PA:NO, octants, PARPD:OCPD)
+ssm_measures(.data = zimmermann2017, scales = PA:NO, angles = octants, measures = PARPD:OCPD)
 ```
