@@ -58,12 +58,16 @@ as_radian.degree <- function(x) {
 
 # Class ssm ---------------------------------------------------------------
 
-
 ssm <- function(x, y, ...) {
   UseMethod("ssm")
 }
 
-print.ssm <- function(x) {
+new_ssm <- function(results, call, ...) {
+  sloop::new_s3_scalar(results = results, call = call, ..., class = "ssm")
+}
+
+#' @export
+print.ssm <- function(x, ...) {
   cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
     "\n", sep = "")
   for (i in 1:nrow(x$results)) {
@@ -79,8 +83,4 @@ print.ssm <- function(x) {
     print.default(m, print.gap = 3L, na.print = "")
   }
   cat("\n")
-}
-
-new_ssm <- function(results, call, ...) {
-  sloop::new_s3_scalar(results = results, call = call, ..., class = "ssm")
 }

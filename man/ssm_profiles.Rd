@@ -5,7 +5,7 @@
 \title{Profile (Mean-based) Structural Summary Method}
 \usage{
 ssm_profiles(.data, scales, angles, boots = 2000, interval = 0.95, grouping,
-  contrast = "none", plot = TRUE, ...)
+  contrast = "none", plot = TRUE, table = TRUE, ...)
 }
 \arguments{
 \item{.data}{A matrix or data frame containing at least circumplex scales.}
