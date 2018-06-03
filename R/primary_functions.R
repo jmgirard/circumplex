@@ -244,6 +244,10 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   
   if (plot == TRUE) {
     #TODO: Add output plot code
+    
+    if (contrast == "test") {
+      p1 <- diff_plot(out)
+    }
   }
   
   out

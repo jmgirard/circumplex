@@ -158,37 +158,48 @@ circle_plot <- function(.results, angles, type, palette = "Set1",
 #' contrasts and plot the point and interval estimates for each parameter's
 #' contrast (e.g., between groups or measures).
 #'
-#' @param .results The output of \code{ssm_profiles()} or \code{ssm_measures()}
-#'   that included contrasts (i.e., \code{pairwise = TRUE}).
+#' @param .ssm_object The output of \code{ssm_profiles()} or
+#'   \code{ssm_measures()} that included \code{contrast = "test"}.
 #' @return A ggplot variable containing difference point-ranges faceted by SSM
 #'   parameter. An interval that does not contain the value of zero has p<.05.
 
-diff_plot <- function(.results) {
+diff_plot <- function(.ssm_object) {
   
-  res <- .results %>%
+  param_names <- c(
+    a = "Amplitude",
+    d = "Displacement",
+    e = "Elevation",
+    x = "X-Value",
+    y = "Y-Value"
+  )
+  
+  res <- .ssm_object$contrasts %>%
     dplyr::mutate(
       d_uci = ifelse(d_uci < d_lci && d_uci < 180, rwd(d_uci), d_uci),
       d_lci = ifelse(d_lci > d_uci && d_lci > 180, rwd(d_lci), d_lci)
     ) %>%
-    tidyr::gather(key, value, -Contrast, -fit) %>%
+    tidyr::gather(key, value, -label, -fit) %>%
     tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
     tidyr::spread(Type, value) %>%
-    dplyr::rename(Estimate = est)
-  p <- ggplot(res) + theme_bw() + theme(legend.position = "top") +
+    dplyr::rename(Estimate = est, Contrast = label)
+  p <- ggplot(res) + theme_bw() +
+    theme(legend.position = "top",
+      axis.text.x = element_blank(),
+      axis.title.x = element_blank()) +
     geom_pointrange(
       aes(
-        x = Contrast, y = Estimate, ymin = lci, ymax = uci,
-        color = Contrast
+        x = Contrast, y = Estimate, ymin = lci, ymax = uci, color = Contrast
       ),
       size = 1
     ) +
     geom_hline(yintercept = 0) + 
-    facet_wrap(~Parameter, nrow = 1, scales = "free")
+    facet_wrap(~Parameter, nrow = 1, scales = "free",
+      labeller = ggplot2::as_labeller(param_names))
     
   p
 }
 
-ssm_table <- function(ssm_object, type = "results", caption) {
+ssm_table <- function(ssm_object, type = "results", caption = "SSM Results") {
   
   if (type == "results") {
     df <- ssm_object$results
