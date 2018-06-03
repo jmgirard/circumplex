@@ -4,11 +4,11 @@
 \alias{diff_plot}
 \title{Create a Difference Plot of SSM Results}
 \usage{
-diff_plot(.results)
+diff_plot(.ssm_object)
 }
 \arguments{
-\item{.results}{The output of \code{ssm_profiles()} or \code{ssm_measures()}
-that included contrasts (i.e., \code{pairwise = TRUE}).}
+\item{.ssm_object}{The output of \code{ssm_profiles()} or
+\code{ssm_measures()} that included \code{contrast = "test"}.}
 }
 \value{
 A ggplot variable containing difference point-ranges faceted by SSM

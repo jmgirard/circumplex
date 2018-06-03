@@ -51,7 +51,7 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   if (base::missing(grouping)) {
     bs_input <- .data %>% 
       dplyr::select(!!scales_en) %>% 
-      dplyr::mutate(Group = factor(1))
+      dplyr::mutate(Group = factor("Whole Sample"))
   } else {
     #TODO: Check that there are only two groups if contrast != none
     grouping_en <- rlang::enquo(grouping)
@@ -124,7 +124,16 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   }
   
   if (plot == TRUE) {
-    #TODO: Add output plot code
+    p1 <- circle_plot(out, type = "results", ...)
+    print(p1)
+    
+    if (contrast == "test") {
+      p2 <- diff_plot(out)
+      print(p2)
+    } else if (contrast == "model") {
+      p2 <- circle_plot(out, type = "contrasts", ...)
+      print(pt)
+    }
   }
   
   out
@@ -243,10 +252,12 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   }
   
   if (plot == TRUE) {
-    #TODO: Add output plot code
+    p1 <- circle_plot(out, type = "results", ...)
+    print(p1)
     
     if (contrast == "test") {
-      p1 <- diff_plot(out)
+      p2 <- diff_plot(out)
+      print(p2)
     }
   }
   

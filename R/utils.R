@@ -36,6 +36,7 @@ angle_dist <- function(x, y)  {
 
 #' Convert degrees to ggplot's radian format
 ggrad <- function(v) {
+  v <- as.numeric(v)
   (v - 90) * (-pi / 180)
 }
 
@@ -52,9 +53,7 @@ pretty_max <- function(v) {
     0.50, 0.75, 1.00, 1.25, 1.50, 
     2.00, 2.50, 3.00, 4.00, 5.00)
   match <- options > amax
-  if (sum(match) > 1) {
-    out <- options[match][[2]]
-  } else if (sum(match) == 1) {
+  if (sum(match) >= 1) {
     out <- options[match][[1]]
   } else {
     out <- ceiling(amax * 1.50)

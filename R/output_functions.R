@@ -57,7 +57,8 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
   b <- b + 
     geom_label(
       aes(
-        x = 5.1 * cos(angles * pi / 180), y = 5.1 * sin(angles * pi / 180),
+        x = 5.1 * cos(angles * pi / 180),
+        y = 5.1 * sin(angles * pi / 180),
         label = sprintf("%d\u00B0", angles)
       ),
       size = font.size,
@@ -90,17 +91,25 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
 #'   the amplitude and displacement labels (default = 3).
 #' @return A ggplot variable containing a completed circular plot.
 
-circle_plot <- function(.results, angles, type, palette = "Set1",
-  amax = pretty_max(.results$a_uci), font.size = 3) {
+circle_plot <- function(.ssm_object, type, palette = "Set1",
+  amax = pretty_max(.ssm_object$results$a_uci), font.size = 3) {
+  
+  if (type == "results") {
+    df <- .ssm_object$results
+  } else if (type == "Contrasts") {
+    df <- .ssm_object$contrasts
+  } else {
+    return(NA)
+  }
+  
+  angles <- as.numeric(.ssm_object$details$angles)
   
   # Convert results to numbers usable by ggplot and ggforce -----------------
-  df_plot <- .results %>%
+  df_plot <- df %>%
     dplyr::rowwise() %>% 
     dplyr::mutate(
-      d_uci = ifelse(d_uci < d_lci && d_uci < 180, rwd(d_uci), d_uci),
-      d_lci = ifelse(d_lci > d_uci && d_lci > 180, rwd(d_lci), d_lci),
-      d_uci = (d_uci - 90) * (-pi / 180),
-      d_lci = (d_lci - 90) * (-pi / 180),
+      d_uci = ifelse(d_uci < d_lci, ggrad(d_uci + 360), ggrad(d_uci)),
+      d_lci = ggrad(d_lci), 
       a_lci = a_lci * 10 / (2 * amax),
       a_uci = a_uci * 10 / (2 * amax),
       x_est = x_est * 10 / (2 * amax),
@@ -112,42 +121,29 @@ circle_plot <- function(.results, angles, type, palette = "Set1",
     scale_color_brewer(palette = palette) +
     scale_fill_brewer(palette = palette)
   
-  if (type == "Measure") {
-    # Draw point and interval estimates for each measure ----------------------
-    p <- p + 
-      ggforce::geom_arc_bar(
-        data = df_plot,
-        aes(x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
-          fill = Measure, color = Measure),
-        alpha = 0.5,
-        size = 1
-      ) +
-      geom_point(
-        data = df_plot,
-        aes(x = x_est, y = y_est, color = Measure),
-        size = 2
-      )
-  } else if (type == "Profile") {
-    # Draw point and interval estimates for each group ------------------------
-    p <- p +
-      ggforce::geom_arc_bar(
-        data = df_plot,
-        aes(x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
-          fill = Group, color = Group),
-        alpha = 0.5,
-        size = 1
-      ) +
-      geom_point(
-        data = df_plot,
-        aes(x = x_est, y = y_est, color = Group),
-        size = 2
-      )
-
-    # Remove the legend if there is only one group ----------------------------
-    if (nlevels(.results$Group) == 1) {
-      p <- p + theme(legend.position = "none")
-    }
-  }
+  p <- p + 
+    ggforce::geom_arc_bar(
+      data = df_plot,
+      aes(x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
+        fill = label, color = label),
+      alpha = 0.5,
+      size = 1
+    ) +
+    geom_point(
+      data = df_plot,
+      aes(x = x_est, y = y_est, color = label),
+      size = 2
+    ) + 
+    ggplot2::guides(
+      color = ggplot2::guide_legend(.ssm_object$type),
+      fill = ggplot2::guide_legend(.ssm_object$type)
+    )
+  #TODO: Remove the legend if there is only one group/measure
+  #TODO: Change legend title to "Profile" or "Measure" or "Contrast"
+  # Remove the legend if there is only one group ----------------------------
+  # if (nlevels(.results$Group) == 1) {
+  #   p <- p + theme(legend.position = "none")
+  # }
   
   p
 }
@@ -175,20 +171,20 @@ diff_plot <- function(.ssm_object) {
   
   res <- .ssm_object$contrasts %>%
     dplyr::mutate(
-      d_uci = ifelse(d_uci < d_lci && d_uci < 180, rwd(d_uci), d_uci),
-      d_lci = ifelse(d_lci > d_uci && d_lci > 180, rwd(d_lci), d_lci)
+      d_uci = ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci),
+      d_lci = ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci)
     ) %>%
     tidyr::gather(key, value, -label, -fit) %>%
     tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
     tidyr::spread(Type, value) %>%
-    dplyr::rename(Estimate = est, Contrast = label)
+    dplyr::rename(Difference = est, Contrast = label)
   p <- ggplot(res) + theme_bw() +
     theme(legend.position = "top",
       axis.text.x = element_blank(),
       axis.title.x = element_blank()) +
     geom_pointrange(
       aes(
-        x = Contrast, y = Estimate, ymin = lci, ymax = uci, color = Contrast
+        x = Contrast, y = Difference, ymin = lci, ymax = uci, color = Contrast
       ),
       size = 1
     ) +
@@ -199,12 +195,14 @@ diff_plot <- function(.ssm_object) {
   p
 }
 
-ssm_table <- function(ssm_object, type = "results", caption = "SSM Results") {
+ssm_table <- function(.ssm_object, type, caption = "SSM Results") {
   
   if (type == "results") {
-    df <- ssm_object$results
+    df <- .ssm_object$results
   } else if (type == "contrasts") {
-    df <- ssm_object$contrasts
+    df <- .ssm_object$contrasts
+  } else {
+    return(NA)
   }
   
   df <- df %>%
@@ -224,7 +222,7 @@ ssm_table <- function(ssm_object, type = "results", caption = "SSM Results") {
     align.header = "llllll",
     rnames = FALSE,
     css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
-    tfoot = sprintf("<i>Note. N</i> = %.0f", ssm_object$details$n)
+    tfoot = sprintf("<i>Note. N</i> = %.0f", .ssm_object$details$n)
   )
 
 }

@@ -88,6 +88,10 @@ print.ssm <- function(x, ...) {
     cat("\n", x$type, " [", dat$label, "]:\n", sep = "")
     print.default(m, print.gap = 3L, na.print = "")
   }
+  if (is.na(x$contrasts)) {
+    cat("\n")
+    return()
+  }
   for (i in 1:nrow(x$contrasts)) {
     dat <- x$contrasts[i, ]
     v <- c(dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
