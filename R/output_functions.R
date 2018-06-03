@@ -138,12 +138,7 @@ circle_plot <- function(.ssm_object, type, palette = "Set1",
       color = ggplot2::guide_legend(.ssm_object$type),
       fill = ggplot2::guide_legend(.ssm_object$type)
     )
-  #TODO: Remove the legend if there is only one group/measure
-  #TODO: Change legend title to "Profile" or "Measure" or "Contrast"
-  # Remove the legend if there is only one group ----------------------------
-  # if (nlevels(.results$Group) == 1) {
-  #   p <- p + theme(legend.position = "none")
-  # }
+  #TODO: Account for the possibility of more than 8 plots
   
   p
 }
