@@ -14,9 +14,14 @@
 #' @param grouping Optional argument: the variable in \code{.data} that contains
 #'   the group membership of each observation. To assess the mean profile of all
 #'   observations, do not supply this argument (see examples).
-#' @param contrast  (default = "none").
-#' @param plot A logical determining whether a plot should be created (default =
-#'   TRUE).
+#' @param contrast The type of contrast to run for the first two \code{measures}
+#'   specified. Options are "none" to run no contrasts, "model" to calculate SSM
+#'   parameters for the difference between each scale score, or "test" to
+#'   calculate the difference between each SSM parameter (default = "none").
+#' @param plot A logical determining whether a plot should be created for the
+#'   results and contrasts, if applicable (default = TRUE).
+#' @param table A logical determining whether an HTML table should be created
+#'   for the results and contrasts, if applicable (default = TRUE).
 #' @param ... Additional parameters to be passed to \code{circle_plot()}.
 #'   Examples include \code{amax} and \code{font.size}.
 #' @return A tibble containing SSM parameters (point and interval estimates) for
@@ -55,7 +60,7 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
       dplyr::mutate(Group = factor(!!grouping_en)) %>% 
       dplyr::select(-!!grouping_en)
   }
-  
+  # Create function that will perform bootstrapping ----------------------------
   bs_function <- function(.data, index, angles, contrast) {
     resample <- .data[index, ]
     mat <- as.matrix(resample[, 1:(ncol(resample) - 1)])
@@ -63,7 +68,7 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
     scores_r <- group_scores(mat, grp)
     ssm_by_group(scores_r, angles, contrast)
   }
-  
+  # Perform bootstrapping ------------------------------------------------------
   bs_output <- ssm_bootstrap(
     bs_input = bs_input,
     bs_function = bs_function,
@@ -73,30 +78,56 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
     contrast = contrast,
     strata = bs_input$Group
   )
-
+  # Separate and label profile results and contrast results --------------------
   row_labels <- levels(bs_input$Group)
   if (contrast != "none") {
-    row_labels <- c(row_labels, paste0("Diff ", contrast))
+    row_labels <- c(row_labels, sprintf("%s: %s - %s",
+      stringr::str_to_title(contrast), row_labels[2], row_labels[1]))
   }
   results <- bs_output %>% 
-    dplyr::mutate(label = row_labels)
-
-  ht <- results_table(results, contrast = (contrast != "none"),
-    group = !base::missing(grouping)) %>%
-    htmlTable::htmlTable(
-      caption = sprintf("Mean-based Structural Summary Statistics with %.0f%% Confidence Intervals", interval * 100),
-      align = "llllll",
-      align.header = "llllll",
-      rnames = FALSE,
-      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
-      tfoot = sprintf("<i>Note. N</i> = %.0f", nrow(.data))
-    )
-  if (table == TRUE) {
-    print(ht)
+    dplyr::mutate(label = row_labels) 
+  
+  if (contrast != "none") {
+    contrasts <- results[nrow(results), ]
+    results <- results[1:(nrow(results) - 1), ]
+  } else {
+    contrasts <- NA
   }
   
-  new_ssm(results = results, call = cl, type = "Profile")
+  #TODO: Change the overall N to N per group
+  details <- list(
+    n = nrow(.data), 
+    boots = boots, 
+    interval = interval, 
+    angles = as_degree(angles)
+  )
   
+  out <- new_ssm(
+    results = results,
+    contrasts = contrasts,
+    call = cl,
+    details = details,
+    type = "Profile"
+  )
+  
+  if (table == TRUE) {
+    t1 <- ssm_table(out, "results",
+      caption = sprintf("Mean-based Structural Summary Statistics with
+        %s Confidence Intervals", str_percent(interval)))
+    print(t1)
+    if (contrast != "none") {
+      t2 <- ssm_table(out, "contrasts", caption = sprintf("Mean-based 
+        Structural Summary Statistics with %s Confidence Intervals for 
+        Profile Contrasts", str_percent(interval)))
+      print(t2)
+    }
+  }
+  
+  if (plot == TRUE) {
+    #TODO: Add output plot code
+  }
+  
+  out
 }
 
 #' Measure (Correlation-based) Structural Summary Method
@@ -114,9 +145,14 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
 #' @param boots The number of bootstrap resamples to use in calculating the
 #'   confidence intervals (default = 2000).
 #' @param interval The confidence intervals' percentage level (default = 0.95).
-#' @param contrast  (default = "none").
-#' @param plot A logical determining whether a plot should be created (default =
-#'   TRUE).
+#' @param contrast The type of contrast to run for the first two \code{measures}
+#'   specified. Options are "none" to run no contrasts, "model" to calculate SSM
+#'   parameters for the difference between each scale score, or "test" to
+#'   calculate the difference between each SSM parameter (default = "none").
+#' @param plot A logical determining whether a plot should be created for the
+#'   results and contrasts, if applicable (default = TRUE).
+#' @param table A logical determining whether an HTML table should be created
+#'   for the results and contrasts, if applicable (default = TRUE).
 #' @param ... Additional parameters to be passed to \code{circle_plot()}.
 #'   Examples include \code{amax} and \code{font.size}.
 #' @return A tibble containing SSM parameters (point and interval estimates) for
@@ -165,26 +201,52 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   
   row_labels <- names(dplyr::select(.data, !!measures_en))
   if (contrast != "none") {
-    row_labels <- c(row_labels, paste0("Diff ", contrast))
+    row_labels <- c(row_labels, sprintf("%s: %s - %s",
+      stringr::str_to_title(contrast), row_labels[2], row_labels[1]))
   }
   results <- bs_output %>% 
     dplyr::mutate(label = row_labels)
   
-  ht <- results_table(results, measure = TRUE, 
-    contrast = (contrast != "none")) %>% 
-    htmlTable::htmlTable(
-      caption = sprintf("Correlation-based Structural Summary Statistics with %.0f%% Confidence Intervals", interval * 100),
-      align = "llllll",
-      align.header = "llllll",
-      rnames = FALSE,
-      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
-      tfoot = sprintf("<i>Note. N</i> = %.0f", nrow(.data))
-    )
-  if (table == TRUE) {
-    print(ht)
+  if (contrast != "none") {
+    contrasts <- results[nrow(results), ]
+    results <- results[1:(nrow(results) - 1), ]
+  } else {
+    contrasts <- NA
   }
   
-  new_ssm(results = results, call = cl, type = "Measure")
+  details <- list(
+    n = nrow(.data), 
+    boots = boots, 
+    interval = interval, 
+    angles = as_degree(angles)
+  )
+  
+  out <- new_ssm(
+    results = results,
+    contrasts = contrasts,
+    call = cl,
+    details = details,
+    type = "Measure"
+  )
+  
+  if (table == TRUE) {
+    t1 <- ssm_table(out, "results",
+      caption = sprintf("Correlation-based Structural Summary Statistics with
+        %s Confidence Intervals", str_percent(interval)))
+    print(t1)
+    if (contrast != "none") {
+      t2 <- ssm_table(out, "contrasts", caption = sprintf("Correlation-based 
+        Structural Summary Statistics with %s Confidence Intervals for 
+        Measure Contrasts", str_percent(interval)))
+      print(t2)
+    }
+  }
+  
+  if (plot == TRUE) {
+    #TODO: Add output plot code
+  }
+  
+  out
 }
 
 

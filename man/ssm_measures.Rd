@@ -24,10 +24,16 @@ confidence intervals (default = 2000).}
 
 \item{interval}{The confidence intervals' percentage level (default = 0.95).}
 
-\item{contrast}{(default = "none").}
+\item{contrast}{The type of contrast to run for the first two \code{measures}
+specified. Options are "none" to run no contrasts, "model" to calculate SSM
+parameters for the difference between each scale score, or "test" to
+calculate the difference between each SSM parameter (default = "none").}
 
-\item{plot}{A logical determining whether a plot should be created (default =
-TRUE).}
+\item{plot}{A logical determining whether a plot should be created for the
+results and contrasts, if applicable (default = TRUE).}
+
+\item{table}{A logical determining whether an HTML table should be created
+for the results and contrasts, if applicable (default = TRUE).}
 
 \item{...}{Additional parameters to be passed to \code{circle_plot()}.
 Examples include \code{amax} and \code{font.size}.}

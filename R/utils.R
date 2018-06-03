@@ -39,6 +39,11 @@ ggrad <- function(v) {
   (v - 90) * (-pi / 180)
 }
 
+#' Convert percent number to a formatted string
+str_percent <- function(x, digits = 2) {
+  paste0(round(x, digits + 2) * 100, "%")
+}
+
 #' Determine good max amplitude value for circle plot
 pretty_max <- function(v) {
   amax <- max(v, na.rm = TRUE)

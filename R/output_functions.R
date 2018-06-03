@@ -188,11 +188,17 @@ diff_plot <- function(.results) {
   p
 }
 
-results_table <- function(results, contrast = FALSE, group = FALSE,
-  measure = FALSE) {
+ssm_table <- function(ssm_object, type = "results", caption) {
   
-  df <- results %>%
+  if (type == "results") {
+    df <- ssm_object$results
+  } else if (type == "contrasts") {
+    df <- ssm_object$contrasts
+  }
+  
+  df <- df %>%
     dplyr::transmute(
+      Label = label,
       Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
       `X-Value` = sprintf("%.2f [%.2f, %.2f]", x_est, x_lci, x_uci),
       `Y-Value` = sprintf("%.2f [%.2f, %.2f]", y_est, y_lci, y_uci),
@@ -200,27 +206,14 @@ results_table <- function(results, contrast = FALSE, group = FALSE,
       Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
       Fit = sprintf("%.3f", fit)
     )
-  if (group == TRUE) {
-    df <- dplyr::bind_cols(Group = results$label, df)
-    if (contrast == TRUE) {
-      df <- dplyr::bind_cols(Contrast = results$Contrast, df) %>%
-        dplyr::mutate(
-          New = ifelse(is.na(Contrast), as.character(Group), Contrast)
-        ) %>%
-        dplyr::select(New, dplyr::everything(), -Group, -Contrast) %>%
-        dplyr::rename(Group = New)
-    }
-  }
-  if (measure == TRUE) {
-    df <- dplyr::bind_cols(Measure = results$label, df)
-    if (contrast == TRUE) {
-      df <- dplyr::bind_cols(Contrast = results$Contrast, df) %>%
-        dplyr::mutate(
-          New = ifelse(is.na(Contrast), as.character(Measure), Contrast)
-        ) %>%
-        dplyr::select(New, dplyr::everything(), -Measure, -Contrast) %>%
-        dplyr::rename(Measure = New)
-    }
-  }
-  df
+
+  htmlTable::htmlTable(df,
+    caption = caption,
+    align = "llllll",
+    align.header = "llllll",
+    rnames = FALSE,
+    css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
+    tfoot = sprintf("<i>Note. N</i> = %.0f", ssm_object$details$n)
+  )
+
 }
