@@ -88,7 +88,7 @@ print.ssm <- function(x, ...) {
     cat("\n", x$type, " [", dat$label, "]:\n", sep = "")
     print.default(m, print.gap = 3L, na.print = "")
   }
-  if (is.na(x$contrasts)) {
+  if (is.null(x$contrasts)) {
     cat("\n")
     return()
   }
