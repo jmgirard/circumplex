@@ -114,7 +114,9 @@ circle_plot <- function(.ssm_object, type, palette = "Set1",
       a_uci = a_uci * 10 / (2 * amax),
       x_est = x_est * 10 / (2 * amax),
       y_est = y_est * 10 / (2 * amax)
-    )
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
 
   # Initialize and configure the circle plot --------------------------------
   p <- circle_base(angles, amax, font.size) +
