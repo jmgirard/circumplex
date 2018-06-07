@@ -60,3 +60,9 @@ pretty_max <- function(v) {
   }
   out
 }
+
+group_counts <- function(df) {
+  df %>% 
+    dplyr::group_by(Group) %>% 
+    dplyr::summarize(n = dplyr::n())
+}
