@@ -189,12 +189,14 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   
   # Select circumplex scales and measure variables -----------------------------
   bs_input <- .data %>% 
-    dplyr::select(!!scales_en, !!measures_en)
+    dplyr::select(!!scales_en, !!measures_en) %>% 
+    tidyr::drop_na()
   
   bs_function <- function(.data, index, angles, contrast) {
     resample <- .data[index, ]
     cs <- as.matrix(resample[, 1:length(angles)])
     mv <- as.matrix(resample[, (length(angles) + 1):ncol(resample)])
+    
     scores_r <- measure_scores(cs, mv)
     ssm_by_group(scores_r, angles, contrast)
   }
@@ -224,7 +226,7 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   }
   
   details <- list(
-    n = nrow(.data), 
+    n = nrow(bs_input), 
     boots = boots, 
     interval = interval, 
     angles = as_degree(angles)
