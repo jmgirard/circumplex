@@ -36,7 +36,6 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
   assert_that(is.numeric(angles), is.count(boots), is.flag(table))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
-  #TODO: Add a warning if the scales do not appear to be standardized
   
   # Convert angles from degrees to radians -------------------------------------
   angles <- angles %>% as_degree() %>% as_radian()
@@ -62,6 +61,14 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
     if (nlevels(bs_input$Group) > 2 && contrast != "none") {
       message("WARNING: Currently, only one contrast is possible at a time. With more than two levels of the grouping variable, only the first two levels will be compared.")
     }
+  }
+  
+  # Check that scales are standardized -----------------------------------------
+  extrema <- bs_input %>% 
+    dplyr::select(!!scales_en) %>% 
+    abs() %>% max()
+  if (extrema >= 5) {
+    message("WARNING: Your circumplex scales do not appear to be standardized.")
   }
   
   # Create function that will perform bootstrapping ----------------------------
