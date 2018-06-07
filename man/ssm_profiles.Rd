@@ -2,10 +2,10 @@
 % Please edit documentation in R/primary_functions.R
 \name{ssm_profiles}
 \alias{ssm_profiles}
-\title{Profile (Mean-based) Structural Summary Method}
+\title{Mean-based Structural Summary Method for Profiles}
 \usage{
-ssm_profiles(.data, scales, angles, boots = 2000, interval = 0.95, grouping,
-  contrast = "none", plot = TRUE, table = TRUE, ...)
+ssm_profiles(.data, scales, angles, grouping, contrast = "none",
+  table = TRUE, boots = 2000, interval = 0.95)
 }
 \arguments{
 \item{.data}{A matrix or data frame containing at least circumplex scales.}
@@ -16,11 +16,6 @@ scales (in tidyverse-style NSE specification, see examples).}
 \item{angles}{A numerical vector containing the angular displacement of each
 circumplex scale included in \code{scales} (in degrees).}
 
-\item{boots}{The number of bootstrap resamples to use in calculating the
-confidence intervals (default = 2000).}
-
-\item{interval}{The confidence intervals' percentage level (default = 0.95).}
-
 \item{grouping}{Optional argument: the variable in \code{.data} that contains
 the group membership of each observation. To assess the mean profile of all
 observations, do not supply this argument (see examples).}
@@ -30,14 +25,13 @@ specified. Options are "none" to run no contrasts, "model" to calculate SSM
 parameters for the difference between each scale score, or "test" to
 calculate the difference between each SSM parameter (default = "none").}
 
-\item{plot}{A logical determining whether a plot should be created for the
-results and contrasts, if applicable (default = TRUE).}
+\item{table}{A logical determining whether an HTML table should be output to
+display the results of the SSM analysis (default = TRUE).}
 
-\item{table}{A logical determining whether an HTML table should be created
-for the results and contrasts, if applicable (default = TRUE).}
+\item{boots}{The number of bootstrap resamples to use in calculating the
+confidence intervals (default = 2000).}
 
-\item{...}{Additional parameters to be passed to \code{circle_plot()}.
-Examples include \code{amax} and \code{font.size}.}
+\item{interval}{The confidence intervals' percentage level (default = 0.95).}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for

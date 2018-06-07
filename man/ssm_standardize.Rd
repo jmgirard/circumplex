@@ -2,10 +2,28 @@
 % Please edit documentation in R/primary_functions.R
 \name{ssm_standardize}
 \alias{ssm_standardize}
-\title{Standardize scales using existing norms}
+\title{Standardize Circumplex Scales using Normative Data}
 \usage{
 ssm_standardize(.data, scales, angles, norms)
 }
+\arguments{
+\item{.data}{A matrix or data frame containing at least circumplex scales.}
+
+\item{scales}{A list of the variables or column numbers in \code{.data} that
+contain circumplex scales (in tidyverse-style NSE specification).}
+
+\item{angles}{A numerical vector containing the angular displacement of each
+circumplex scale included in \code{scales} (in degrees).}
+
+\item{norms}{A data frame containing normative data for the circumplex scales
+you would like to standardize. Normative data is included in the package
+for several popular circumplex measures.}
+}
+\value{
+A data frame containing normalized versions of the variables
+specified in \code{scales}, as well as any additional variables that were
+included in \code{.data}.
+}
 \description{
-Standardize scales using existing norms
+Description
 }

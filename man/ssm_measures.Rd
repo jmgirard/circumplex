@@ -2,41 +2,36 @@
 % Please edit documentation in R/primary_functions.R
 \name{ssm_measures}
 \alias{ssm_measures}
-\title{Measure (Correlation-based) Structural Summary Method}
+\title{Correlation-based Structural Summary Method for Measures}
 \usage{
-ssm_measures(.data, scales, angles, measures, boots = 2000, interval = 0.95,
-  contrast = "none", plot = TRUE, table = TRUE, ...)
+ssm_measures(.data, scales, angles, measures, contrast = "none",
+  table = TRUE, boots = 2000, interval = 0.95)
 }
 \arguments{
-\item{.data}{A matrix or data frame containing at least circumplex scales.}
+\item{.data}{A matrix or data frame containing at least circumplex scales and
+one additional measure to correlate with them.}
 
-\item{scales}{A list of the variables in \code{.data} that contain circumplex
-scales (in tidyverse-style NSE specification, see examples).}
+\item{scales}{A list of the variables or column numbers in \code{.data} that
+contain circumplex scales (in tidyverse-style NSE specification).}
 
 \item{angles}{A numerical vector containing the angular displacement of each
 circumplex scale included in \code{scales} (in degrees).}
 
-\item{measures}{A list of variables in \code{.data} to be analyzed (in
-tidyverse-style NSE specification, see examples).}
-
-\item{boots}{The number of bootstrap resamples to use in calculating the
-confidence intervals (default = 2000).}
-
-\item{interval}{The confidence intervals' percentage level (default = 0.95).}
+\item{measures}{A list of variables or column numbers in \code{.data} to be
+analyzed (in tidyverse-style NSE specification).}
 
 \item{contrast}{The type of contrast to run for the first two \code{measures}
 specified. Options are "none" to run no contrasts, "model" to calculate SSM
 parameters for the difference between each scale score, or "test" to
 calculate the difference between each SSM parameter (default = "none").}
 
-\item{plot}{A logical determining whether a plot should be created for the
-results and contrasts, if applicable (default = TRUE).}
+\item{table}{A logical determining whether an HTML table should be output to
+display the results of the SSM analysis (default = TRUE).}
 
-\item{table}{A logical determining whether an HTML table should be created
-for the results and contrasts, if applicable (default = TRUE).}
+\item{boots}{The number of bootstrap resamples to use in calculating the
+confidence intervals (default = 2000).}
 
-\item{...}{Additional parameters to be passed to \code{circle_plot()}.
-Examples include \code{amax} and \code{font.size}.}
+\item{interval}{The confidence intervals' percentage level (default = 0.95).}
 }
 \value{
 A tibble containing SSM parameters (point and interval estimates) for

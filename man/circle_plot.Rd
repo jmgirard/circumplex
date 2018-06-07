@@ -4,16 +4,10 @@
 \alias{circle_plot}
 \title{Create a Circular Plot of SSM Results}
 \usage{
-circle_plot(.results, angles, type, palette = "Set1",
-  amax = pretty_max(.results$a_uci), font.size = 3)
+circle_plot(.ssm_object, type, palette = "Set1",
+  amax = pretty_max(.ssm_object$results$a_uci), font.size = 3)
 }
 \arguments{
-\item{.results}{The output of \code{ssm_profiles()} or \code{ssm_measures()}.}
-
-\item{angles}{A numerical vector containing the angular displacement of each
-circumplex scale (in degrees). A line segment from the circle's origin to
-perimeter and a label outside the perimeter will be drawn for each angle.}
-
 \item{type}{A string corresponding to \code{"Profile"} or \code{"Measure"}.}
 
 \item{palette}{A string corresponding to the Color Brewer palette (default =
@@ -25,6 +19,12 @@ labels are drawn.}
 
 \item{font.size}{A positive real number corresponding to the size (in mm) of
 the amplitude and displacement labels (default = 3).}
+
+\item{.results}{The output of \code{ssm_profiles()} or \code{ssm_measures()}.}
+
+\item{angles}{A numerical vector containing the angular displacement of each
+circumplex scale (in degrees). A line segment from the circle's origin to
+perimeter and a label outside the perimeter will be drawn for each angle.}
 }
 \value{
 A ggplot variable containing a completed circular plot.
