@@ -226,11 +226,13 @@ ssm_table <- function(.ssm_object, type, caption = "SSM Results") {
 
 table_footer <- function(.ssm_object) {
   n <- .ssm_object$details$n
-  if (.ssm_object$type == "Profile") {
+  if (is.null(nrow(n))) {
+    out <- sprintf("<i>N = </i>%.0f", n)
+  } else if (nrow(n) == 1) {
+    out <- sprintf("<i>N = </i>%.0f", n$n)
+  } else {
     str <- sprintf("<i>N</i> = %.0f (%s)", n$n, n$Group)
     out <- stringr::str_c(str, collapse = ", ")
-  } else if (.ssm_object$type == "Measure") {
-    out <- sprintf("<i>N = </i>%.0f", n)
   }
   
   out
