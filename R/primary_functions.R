@@ -1,4 +1,4 @@
-#' Profile (Mean-based) Structural Summary Method
+#' Mean-based Structural Summary Method for Profiles
 #'
 #' Calculate SSM parameters with bootstrapped confidence intervals for the mean
 #' of any number of groups.
@@ -8,9 +8,6 @@
 #'   scales (in tidyverse-style NSE specification, see examples).
 #' @param angles A numerical vector containing the angular displacement of each
 #'   circumplex scale included in \code{scales} (in degrees).
-#' @param boots The number of bootstrap resamples to use in calculating the
-#'   confidence intervals (default = 2000).
-#' @param interval The confidence intervals' percentage level (default = 0.95).
 #' @param grouping Optional argument: the variable in \code{.data} that contains
 #'   the group membership of each observation. To assess the mean profile of all
 #'   observations, do not supply this argument (see examples).
@@ -18,28 +15,25 @@
 #'   specified. Options are "none" to run no contrasts, "model" to calculate SSM
 #'   parameters for the difference between each scale score, or "test" to
 #'   calculate the difference between each SSM parameter (default = "none").
-#' @param plot A logical determining whether a plot should be created for the
-#'   results and contrasts, if applicable (default = TRUE).
-#' @param table A logical determining whether an HTML table should be created
-#'   for the results and contrasts, if applicable (default = TRUE).
-#' @param ... Additional parameters to be passed to \code{circle_plot()}.
-#'   Examples include \code{amax} and \code{font.size}.
+#' @param table A logical determining whether an HTML table should be output to
+#'   display the results of the SSM analysis (default = TRUE).
+#' @param boots The number of bootstrap resamples to use in calculating the
+#'   confidence intervals (default = 2000).
+#' @param interval The confidence intervals' percentage level (default = 0.95).
 #' @return A tibble containing SSM parameters (point and interval estimates) for
 #'   each group's mean profile (or the entire mean profile without grouping).
 #' @seealso \code{\link{ssm_measures}}, which calculates SSM parameters for
 #'   measures using a correlation-based approach.
 #' @export
 
-ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
-  grouping, contrast = "none", plot = TRUE, table = TRUE, ...) {
-  
-  cl <- match.call()
+ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
+  table = TRUE, boots = 2000, interval = 0.95) {
   
   # Enable column specification using tidyverse-style NSE ----------------------
   scales_en <- rlang::enquo(scales)
   
   # Check that inputs are valid ------------------------------------------------
-  assert_that(is.numeric(angles), is.count(boots), is.flag(plot))
+  assert_that(is.numeric(angles), is.count(boots), is.flag(table))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
   #TODO: Add a warning if the scales do not appear to be standardized
@@ -51,15 +45,25 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   if (base::missing(grouping)) {
     bs_input <- .data %>% 
       dplyr::select(!!scales_en) %>% 
-      dplyr::mutate(Group = factor("Whole Sample"))
+      dplyr::mutate(Group = factor("Whole Sample")) %>% 
+      tidyr::drop_na()
+    # Check if contrasts are requested without groups
+    if (contrast != "none") {
+      stop("Contrasts are only possible if a grouping variable is also provided.\n\n  Hint: Add a grouping variable or set contrast = 'none'.")
+    }
   } else {
-    #TODO: Check that there are only two groups if contrast != none
     grouping_en <- rlang::enquo(grouping)
     bs_input <- .data %>%
       dplyr::select(!!grouping_en, !!scales_en) %>% 
       dplyr::mutate(Group = factor(!!grouping_en)) %>% 
-      dplyr::select(-!!grouping_en)
+      dplyr::select(-!!grouping_en) %>% 
+      tidyr::drop_na()
+    # Check if more than one contrast is possible
+    if (nlevels(bs_input$Group) > 2 && contrast != "none") {
+      message("WARNING: Currently, only one contrast is possible at a time. With more than two levels of the grouping variable, only the first two levels will be compared.")
+    }
   }
+  
   # Create function that will perform bootstrapping ----------------------------
   bs_function <- function(.data, index, angles, contrast) {
     resample <- .data[index, ]
@@ -68,6 +72,7 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
     scores_r <- group_scores(mat, grp)
     ssm_by_group(scores_r, angles, contrast)
   }
+  
   # Perform bootstrapping ------------------------------------------------------
   bs_output <- ssm_bootstrap(
     bs_input = bs_input,
@@ -78,7 +83,8 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
     contrast = contrast,
     strata = bs_input$Group
   )
-  # Separate and label profile results and contrast results --------------------
+  
+  # Label results --------------------------------------------------------------
   row_labels <- levels(bs_input$Group)
   if (contrast != "none") {
     row_labels <- c(row_labels, sprintf("%s: %s - %s",
@@ -87,29 +93,32 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
   results <- bs_output %>% 
     dplyr::mutate(label = row_labels) 
   
+  # Separate results and contrasts ---------------------------------------------
   if (contrast != "none") {
     contrasts <- results[nrow(results), ]
     results <- results[1:(nrow(results) - 1), ]
   } else {
-    contrasts <- NA
+    contrasts <- NULL
   }
   
-  #TODO: Change the overall N to N per group
+  # Collect analysis details ---------------------------------------------------
   details <- list(
-    n = nrow(.data), 
+    n = group_counts(bs_input), 
     boots = boots, 
     interval = interval, 
     angles = as_degree(angles)
   )
   
+  # Create output ssm object ---------------------------------------------------
   out <- new_ssm(
     results = results,
     contrasts = contrasts,
-    call = cl,
+    call = match.call(),
     details = details,
     type = "Profile"
   )
-  
+
+  # Output HTML results table (if requested) -----------------------------------
   if (table == TRUE) {
     t1 <- ssm_table(out, "results",
       caption = sprintf("Mean-based Structural Summary Statistics with
@@ -123,66 +132,51 @@ ssm_profiles <- function(.data, scales, angles, boots = 2000, interval = 0.95,
     }
   }
   
-  if (plot == TRUE) {
-    p1 <- circle_plot(out, type = "results", ...)
-    print(p1)
-    
-    if (contrast == "test") {
-      p2 <- diff_plot(out)
-      print(p2)
-    } else if (contrast == "model") {
-      p2 <- circle_plot(out, type = "contrasts", ...)
-      print(pt)
-    }
-  }
-  
   out
 }
 
-#' Measure (Correlation-based) Structural Summary Method
+#' Correlation-based Structural Summary Method for Measures
 #'
 #' Calculate SSM parameters with bootstrapped confidence intervals for any
 #' number of measures, based on their correlations with circumplex scales.
 #'
-#' @param .data A matrix or data frame containing at least circumplex scales.
-#' @param scales A list of the variables in \code{.data} that contain circumplex
-#'   scales (in tidyverse-style NSE specification, see examples).
+#' @param .data A matrix or data frame containing at least circumplex scales and
+#'   one additional measure to correlate with them.
+#' @param scales A list of the variables or column numbers in \code{.data} that
+#'   contain circumplex scales (in tidyverse-style NSE specification).
 #' @param angles A numerical vector containing the angular displacement of each
 #'   circumplex scale included in \code{scales} (in degrees).
-#' @param measures A list of variables in \code{.data} to be analyzed (in
-#'   tidyverse-style NSE specification, see examples).
-#' @param boots The number of bootstrap resamples to use in calculating the
-#'   confidence intervals (default = 2000).
-#' @param interval The confidence intervals' percentage level (default = 0.95).
+#' @param measures A list of variables or column numbers in \code{.data} to be
+#'   analyzed (in tidyverse-style NSE specification).
 #' @param contrast The type of contrast to run for the first two \code{measures}
 #'   specified. Options are "none" to run no contrasts, "model" to calculate SSM
 #'   parameters for the difference between each scale score, or "test" to
 #'   calculate the difference between each SSM parameter (default = "none").
-#' @param plot A logical determining whether a plot should be created for the
-#'   results and contrasts, if applicable (default = TRUE).
-#' @param table A logical determining whether an HTML table should be created
-#'   for the results and contrasts, if applicable (default = TRUE).
-#' @param ... Additional parameters to be passed to \code{circle_plot()}.
-#'   Examples include \code{amax} and \code{font.size}.
+#' @param table A logical determining whether an HTML table should be output to
+#'   display the results of the SSM analysis (default = TRUE).
+#' @param boots The number of bootstrap resamples to use in calculating the
+#'   confidence intervals (default = 2000).
+#' @param interval The confidence intervals' percentage level (default = 0.95).
 #' @return A tibble containing SSM parameters (point and interval estimates) for
 #'   each measure.
 #' @seealso \code{\link{ssm_profiles}}, which calculates SSM parameters for
 #'   profiles using a mean-based approach.
 #' @export
 
-ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
-  interval = 0.95, contrast = "none", plot = TRUE, table = TRUE, ...) {
-  
-  cl <- match.call()
+ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
+  table = TRUE, boots = 2000, interval = 0.95) {
   
   # Enable column specification using tidyverse-style NSE ----------------------
   scales_en <- rlang::enquo(scales)
   measures_en <- rlang::enquo(measures)
   
   # Check that inputs are valid ------------------------------------------------
-  assert_that(is.numeric(angles), is.count(boots), is.flag(plot))
+  assert_that(is.numeric(angles), is.count(boots), is.flag(table))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
+  if (base::missing(measures)) {
+    stop("At least one measure must be provided to ssm_measures().\n\n  Hint: Add a measure or try the ssm_profiles() function.")
+  }
   
   # Convert angles from degrees to radians -------------------------------------
   angles <- angles %>% as_degree() %>% as_radian()
@@ -192,15 +186,16 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
     dplyr::select(!!scales_en, !!measures_en) %>% 
     tidyr::drop_na()
   
+  # Create function that will perform bootstrapping ----------------------------
   bs_function <- function(.data, index, angles, contrast) {
     resample <- .data[index, ]
     cs <- as.matrix(resample[, 1:length(angles)])
     mv <- as.matrix(resample[, (length(angles) + 1):ncol(resample)])
-    
     scores_r <- measure_scores(cs, mv)
     ssm_by_group(scores_r, angles, contrast)
   }
   
+  # Perform bootstrapping ------------------------------------------------------
   bs_output <- ssm_bootstrap(
     bs_input = bs_input,
     bs_function = bs_function,
@@ -210,6 +205,7 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
     contrast = contrast
   )
   
+  # Label results --------------------------------------------------------------
   row_labels <- names(dplyr::select(.data, !!measures_en))
   if (contrast != "none") {
     row_labels <- c(row_labels, sprintf("%s: %s - %s",
@@ -218,13 +214,15 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
   results <- bs_output %>% 
     dplyr::mutate(label = row_labels)
   
+  # Separate main results and contrast results ---------------------------------
   if (contrast != "none") {
     contrasts <- results[nrow(results), ]
     results <- results[1:(nrow(results) - 1), ]
   } else {
-    contrasts <- NA
+    contrasts <- NULL
   }
   
+  # Collect analysis details ---------------------------------------------------
   details <- list(
     n = nrow(bs_input), 
     boots = boots, 
@@ -232,14 +230,16 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
     angles = as_degree(angles)
   )
   
+  # Create output ssm object ---------------------------------------------------
   out <- new_ssm(
     results = results,
     contrasts = contrasts,
-    call = cl,
+    call = match.call(),
     details = details,
     type = "Measure"
   )
   
+  # Create HTML results table (if requested) -----------------------------------
   if (table == TRUE) {
     t1 <- ssm_table(out, "results",
       caption = sprintf("Correlation-based Structural Summary Statistics with
@@ -253,31 +253,38 @@ ssm_measures <- function(.data, scales, angles, measures, boots = 2000,
     }
   }
   
-  if (plot == TRUE) {
-    p1 <- circle_plot(out, type = "results", ...)
-    print(p1)
-    
-    if (contrast == "test") {
-      p2 <- diff_plot(out)
-      print(p2)
-    }
-  }
-  
   out
 }
 
-
-#' Standardize scales using existing norms
+#' Standardize Circumplex Scales using Normative Data
+#'
+#' Description
+#'
+#' @param .data A matrix or data frame containing at least circumplex scales.
+#' @param scales A list of the variables or column numbers in \code{.data} that
+#'   contain circumplex scales (in tidyverse-style NSE specification).
+#' @param angles A numerical vector containing the angular displacement of each
+#'   circumplex scale included in \code{scales} (in degrees).
+#' @param norms A data frame containing normative data for the circumplex scales
+#'   you would like to standardize. Normative data is included in the package
+#'   for several popular circumplex measures.
+#' @return A data frame containing normalized versions of the variables
+#'   specified in \code{scales}, as well as any additional variables that were
+#'   included in \code{.data}.
 #' @export
 ssm_standardize <- function(.data, scales, angles, norms) {
   
   # Check that inputs are valid ------------------------------------------------
   assert_that(is.numeric(angles))
+  #TODO: Check that the norms variable contains the necessary data
+  
   # Enable column specification using tidyverse-style NSE ----------------------
   scales_en <- rlang::enquo(scales)
+  
   # Move scale columns to the front of the tibble ------------------------------
   sdata <- .data %>% 
     dplyr::select(!!scales_en, dplyr::everything())
+  
   # Match scales with norm variables and standardize ---------------------------
   for (i in 1:length(angles)) {
     index <- norms$Angle == angles[i]
@@ -286,5 +293,6 @@ ssm_standardize <- function(.data, scales, angles, norms) {
     sdata <- sdata %>% 
       dplyr::mutate_at(dplyr::funs((. - m) / s), .vars = i)
   }
+  
   sdata
 }
