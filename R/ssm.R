@@ -13,13 +13,7 @@ NULL
 #'   are_equal assert_that is.count is.flag not_empty is.scalar
 NULL
 
-#' @importFrom ggplot2 aes coord_fixed element_blank facet_wrap geom_hline
-#'   geom_label geom_point geom_pointrange geom_rect geom_segment ggplot ggsave
-#'   scale_color_brewer scale_fill_brewer scale_x_continuous scale_y_continuous
-#'   theme theme_bw theme_void xlab ylab
-NULL
-
-#' @importFrom stats quantile
+#' @importFrom ggplot2 aes element_blank ggplot ggsave xlab ylab
 NULL
 
 #' @useDynLib ssm, .registration = TRUE

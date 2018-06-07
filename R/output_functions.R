@@ -15,10 +15,12 @@
 circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
 
   # Require plot to be square and remove default styling --------------------
-  b <- ggplot() + coord_fixed() + theme_void()
+  b <- ggplot2::ggplot() + 
+    ggplot2::coord_fixed() +
+    ggplot2::theme_void()
   
   # Expand the x-axis to fit long horizontal labels -------------------------
-  b <- b + scale_x_continuous(expand = c(.1, .1))  
+  b <- b + ggplot2::scale_x_continuous(expand = c(.1, .1))  
 
   # Draw circles corresponding to amplitude scale ---------------------------
   b <- b +
@@ -29,7 +31,7 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
   
   # Draw segments corresponding to displacement scale -----------------------
   b <- b +
-    geom_segment(
+    ggplot2::geom_segment(
       aes(
         x = 0,
         y = 0,
@@ -42,7 +44,7 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
   
   # Draw labels for amplitude scale -----------------------------------------
   b <- b + 
-    geom_label(
+    ggplot2::geom_label(
       aes(
         x = 1:4,
         y = 0,
@@ -55,7 +57,7 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
 
   # Draw labels for displacement scale --------------------------------------
   b <- b + 
-    geom_label(
+    ggplot2::geom_label(
       aes(
         x = 5.1 * cos(angles * pi / 180),
         y = 5.1 * sin(angles * pi / 180),
@@ -77,10 +79,8 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
 #' point and interval estimate for each row (e.g., group or measure) in a
 #' circular space quantified by displacement and amplitude.
 #'
-#' @param .results The output of \code{ssm_profiles()} or \code{ssm_measures()}.
-#' @param angles A numerical vector containing the angular displacement of each
-#'   circumplex scale (in degrees). A line segment from the circle's origin to
-#'   perimeter and a label outside the perimeter will be drawn for each angle.
+#' @param .ssm_object The output of \code{ssm_profiles()} or
+#'   \code{ssm_measures()}.
 #' @param type A string corresponding to \code{"Profile"} or \code{"Measure"}.
 #' @param palette A string corresponding to the Color Brewer palette (default =
 #'   "Set1"). See http://www.cookbook-r.com/Graphs/Colors_(ggplot2).
@@ -120,8 +120,9 @@ circle_plot <- function(.ssm_object, type, palette = "Set1",
 
   # Initialize and configure the circle plot --------------------------------
   p <- circle_base(angles, amax, font.size) +
-    scale_color_brewer(palette = palette) +
-    scale_fill_brewer(palette = palette)
+    ggplot2::scale_color_brewer(palette = palette) +
+    ggplot2::scale_fill_brewer(palette = palette)
+  #TODO: Allow scale customization
   
   p <- p + 
     ggforce::geom_arc_bar(
@@ -131,7 +132,7 @@ circle_plot <- function(.ssm_object, type, palette = "Set1",
       alpha = 0.5,
       size = 1
     ) +
-    geom_point(
+    ggplot2::geom_point(
       data = df_plot,
       aes(x = x_est, y = y_est, color = label),
       size = 2
@@ -166,6 +167,7 @@ diff_plot <- function(.ssm_object) {
     y = "Y-Value"
   )
   
+  #TODO: Check that these ifelse() statements are correct
   res <- .ssm_object$contrasts %>%
     dplyr::mutate(
       d_uci = ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci),
@@ -175,18 +177,21 @@ diff_plot <- function(.ssm_object) {
     tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
     tidyr::spread(Type, value) %>%
     dplyr::rename(Difference = est, Contrast = label)
-  p <- ggplot(res) + theme_bw() +
-    theme(legend.position = "top",
+  p <- ggplot2::ggplot(res) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      legend.position = "top",
       axis.text.x = element_blank(),
-      axis.title.x = element_blank()) +
-    geom_pointrange(
+      axis.title.x = element_blank()
+    ) +
+    ggplot2::geom_pointrange(
       aes(
         x = Contrast, y = Difference, ymin = lci, ymax = uci, color = Contrast
       ),
       size = 1
     ) +
-    geom_hline(yintercept = 0) + 
-    facet_wrap(~Parameter, nrow = 1, scales = "free",
+    ggplot2::geom_hline(yintercept = 0) + 
+    ggplot2::facet_wrap(~Parameter, nrow = 1, scales = "free",
       labeller = ggplot2::as_labeller(param_names))
     
   p
