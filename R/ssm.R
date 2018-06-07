@@ -14,11 +14,15 @@ NULL
 NULL
 
 #' @importFrom ggplot2 aes coord_fixed element_blank facet_wrap geom_hline
-#'   geom_label geom_point geom_pointrange geom_rect geom_segment ggplot
+#'   geom_label geom_point geom_pointrange geom_rect geom_segment ggplot ggsave
 #'   scale_color_brewer scale_fill_brewer scale_x_continuous scale_y_continuous
 #'   theme theme_bw theme_void xlab ylab
+NULL
+
+#' @importFrom stats quantile
 NULL
 
 #' @useDynLib ssm, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 NULL
+

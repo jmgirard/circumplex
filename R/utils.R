@@ -34,18 +34,18 @@ angle_dist <- function(x, y)  {
   ((x - y + pi) %% (2 * pi)) - pi
 }
 
-#' Convert degrees to ggplot's radian format
+# Convert degrees to ggplot's radian format
 ggrad <- function(v) {
   v <- as.numeric(v)
   (v - 90) * (-pi / 180)
 }
 
-#' Convert percent number to a formatted string
+# Convert percent number to a formatted string
 str_percent <- function(x, digits = 2) {
   paste0(round(x, digits + 2) * 100, "%")
 }
 
-#' Determine good max amplitude value for circle plot
+# Determine good max amplitude value for circle plot
 pretty_max <- function(v) {
   amax <- max(v, na.rm = TRUE)
   options <- c(
@@ -61,6 +61,7 @@ pretty_max <- function(v) {
   out
 }
 
+#
 group_counts <- function(df) {
   df %>% 
     dplyr::group_by(Group) %>% 

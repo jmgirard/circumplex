@@ -279,6 +279,7 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
 #'   specified in \code{scales}, as well as any additional variables that were
 #'   included in \code{.data}.
 #' @export
+
 ssm_standardize <- function(.data, scales, angles, norms) {
   
   # Check that inputs are valid ------------------------------------------------

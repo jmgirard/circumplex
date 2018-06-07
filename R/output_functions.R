@@ -192,6 +192,7 @@ diff_plot <- function(.ssm_object) {
   p
 }
 
+#
 ssm_table <- function(.ssm_object, type, caption = "SSM Results") {
   
   if (type == "results") {
@@ -224,6 +225,7 @@ ssm_table <- function(.ssm_object, type, caption = "SSM Results") {
 
 }
 
+#
 table_footer <- function(.ssm_object) {
   n <- .ssm_object$details$n
   if (is.null(nrow(n))) {
