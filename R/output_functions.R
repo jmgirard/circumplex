@@ -181,8 +181,8 @@ diff_plot <- function(.ssm_object) {
     ggplot2::theme_bw() +
     ggplot2::theme(
       legend.position = "top",
-      axis.text.x = element_blank(),
-      axis.title.x = element_blank()
+      axis.text.x = ggplot2::element_blank(),
+      axis.title.x = ggplot2::element_blank()
     ) +
     ggplot2::geom_pointrange(
       aes(

@@ -10,6 +10,19 @@
 #' @usage lhs \%>\% rhs
 NULL
 
+#' Save a ggplot with sensible defaults
+#'
+#' See \code{ggplot2} for details.
+#'
+#' @name ggsave
+#' @rdname ggsave
+#' @keywords internal
+#' @export
+#' @importFrom ggplot2 ggsave
+#' @usage ggsave(filename, width = NA, height = NA, units = c("in", "cm", "mm"),
+#'   dpi = 300, ...)
+NULL
+
 #' Compute differences between two sets of SSM parameters
 #'
 #' @param p1,p2 Outputs from \code{ssm_parameters()}.

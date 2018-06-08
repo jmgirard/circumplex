@@ -13,7 +13,7 @@ NULL
 #'   are_equal assert_that is.count is.flag not_empty is.scalar
 NULL
 
-#' @importFrom ggplot2 aes element_blank ggplot ggsave xlab ylab
+#' @importFrom ggplot2 aes
 NULL
 
 #' @useDynLib ssm, .registration = TRUE
