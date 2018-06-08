@@ -1,17 +1,4 @@
-#' Create an Empty Circular Plot
-#'
-#' Initialize an empty circular plot to be filled in by \code{circle_plot()}.
-#'
-#' @param angles A numerical vector containing the angular displacement of each
-#'   circumplex scale (in degrees). A line segment from the circle's origin to
-#'   perimeter and a label outside the perimeter will be drawn for each angle.
-#' @param amax A positive real number corresponding to the radius of the circle.
-#'   It is used to scale the amplitude values and will determine which amplitude
-#'   labels are drawn.
-#' @param font.size A positive real number corresponding to the size (in mm) of
-#'   the amplitude and displacement labels (default = 3).
-#' @return A ggplot variable containing an empty circular plot.
-
+# Create an Empty Circular Plot
 circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
 
   # Require plot to be square and remove default styling --------------------

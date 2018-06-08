@@ -23,11 +23,7 @@ NULL
 #'   dpi = 300, ...)
 NULL
 
-#' Compute differences between two sets of SSM parameters
-#'
-#' @param p1,p2 Outputs from \code{ssm_parameters()}.
-#' @return A numeric vector of differences between the parameters in \code{p1}
-#'   and \code{p2}, respecting the circular nature of displacement parameters.
+# Compute differences between two sets of SSM parameters
 param_diff <- function(p1, p2) {
   assert_that(is.numeric(p1), is.numeric(p2))
   pd <- p1 - p2
@@ -35,14 +31,7 @@ param_diff <- function(p1, p2) {
   pd
 }
 
-#' Calculate angular distance
-#'
-#' @param x,y Angles in radian units.
-#' @return The shortest distance between \code{x} and \code{y} in radians, where 
-#'   positive numbers mean \code{x} is more counterclockwise than \code{y} and
-#'   negative numbers mean the opposite. Note that, given how the distance is
-#'   calculated, when \code{x} and \code{y} are exactly pi radians apart, the
-#'   distance output will be arbitrarily negative.
+# Calculate angular distance
 angle_dist <- function(x, y)  {
   ((x - y + pi) %% (2 * pi)) - pi
 }
