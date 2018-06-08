@@ -87,3 +87,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_ssm_angle_mean", (DL_FUNC) &_ssm_angle_mean, 1},
+    {"_ssm_angle_median", (DL_FUNC) &_ssm_angle_median, 1},
+    {"_ssm_compare_pi", (DL_FUNC) &_ssm_compare_pi, 1},
+    {"_ssm_ssm_parameters", (DL_FUNC) &_ssm_ssm_parameters, 2},
+    {"_ssm_group_parameters", (DL_FUNC) &_ssm_group_parameters, 2},
+    {"_ssm_group_scores", (DL_FUNC) &_ssm_group_scores, 2},
+    {"_ssm_measure_scores", (DL_FUNC) &_ssm_measure_scores, 2},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_ssm(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
