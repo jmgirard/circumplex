@@ -1,9 +1,27 @@
+# S3 vector constructors -------------------------------------------------------
+
+new_s3_dbl <- function(x, ..., class) {
+  stopifnot(is.double(x))
+  stopifnot(is.character(class))
+  structure(x, ..., class = class)
+}
+
+new_s3_lst <- function(x, ..., class) {
+  stopifnot(is.list(x))
+  stopifnot(is.character(class))
+  structure(x, ..., class = class)
+}
+
+new_s3_scalar <- function(..., class) {
+  new_s3_lst(list(...), class = class)
+}
+
 # Class degree -----------------------------------------------------------------
 
 
 # Set numeric object to class 'degree'
 new_degree <- function(x) {
-  sloop::new_s3_dbl(x, class = "degree")
+  new_s3_dbl(x, class = "degree")
 }
 
 # S3 generic for class 'degree'
@@ -32,7 +50,7 @@ as_degree.radian <- function(x) {
 
 # Set numeric object to class 'radian'
 new_radian <- function(x) {
-  sloop::new_s3_dbl(x, class = "radian")
+  new_s3_dbl(x, class = "radian")
 }
 
 # S3 generic for class 'radian'
@@ -65,7 +83,7 @@ ssm <- function(x, ...) {
 
 # Constructor function
 new_ssm <- function(results, contrasts, details, call, ...) {
-  sloop::new_s3_scalar(
+  new_s3_scalar(
     results = results,
     contrasts = contrasts,
     details = details,
