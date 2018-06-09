@@ -1,6 +1,6 @@
-# ssm
+# circumplex
 
-The goal of ssm is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data using the Structural Summary Method with bootstrapped confidence intervals. This package has been authored by [Jeffrey Girard](http://jmgirard.com/) and is based on work by [Johannes Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/) and [Aidan Wright](http://personalityprocesses.com/).
+The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. This package has been authored by [Jeffrey Girard](http://jmgirard.com/), [Johannes Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/), and [Aidan Wright](http://personalityprocesses.com/). It is maintained by [Jeffrey Girard](http://jmgirard.com/).
 
 ## References
 
@@ -16,7 +16,7 @@ You can install the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("jmgirard/ssm")
+devtools::install_github("jmgirard/circumplex")
 ```
 ## Examples
 

@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // angle_mean
 double angle_mean(NumericVector x);
-RcppExport SEXP _ssm_angle_mean(SEXP xSEXP) {
+RcppExport SEXP _circumplex_angle_mean(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // angle_median
 double angle_median(NumericVector x);
-RcppExport SEXP _ssm_angle_median(SEXP xSEXP) {
+RcppExport SEXP _circumplex_angle_median(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -30,7 +30,7 @@ END_RCPP
 }
 // compare_pi
 NumericVector compare_pi(NumericVector x);
-RcppExport SEXP _ssm_compare_pi(SEXP xSEXP) {
+RcppExport SEXP _circumplex_compare_pi(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -41,7 +41,7 @@ END_RCPP
 }
 // ssm_parameters
 NumericVector ssm_parameters(NumericVector scores, NumericVector angles);
-RcppExport SEXP _ssm_ssm_parameters(SEXP scoresSEXP, SEXP anglesSEXP) {
+RcppExport SEXP _circumplex_ssm_parameters(SEXP scoresSEXP, SEXP anglesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -53,7 +53,7 @@ END_RCPP
 }
 // group_parameters
 std::vector<double> group_parameters(NumericMatrix scores, NumericVector angles);
-RcppExport SEXP _ssm_group_parameters(SEXP scoresSEXP, SEXP anglesSEXP) {
+RcppExport SEXP _circumplex_group_parameters(SEXP scoresSEXP, SEXP anglesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -65,7 +65,7 @@ END_RCPP
 }
 // group_scores
 arma::mat group_scores(NumericMatrix X, NumericVector T);
-RcppExport SEXP _ssm_group_scores(SEXP XSEXP, SEXP TSEXP) {
+RcppExport SEXP _circumplex_group_scores(SEXP XSEXP, SEXP TSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -77,7 +77,7 @@ END_RCPP
 }
 // measure_scores
 arma::mat measure_scores(NumericMatrix scales, NumericMatrix measures);
-RcppExport SEXP _ssm_measure_scores(SEXP scalesSEXP, SEXP measuresSEXP) {
+RcppExport SEXP _circumplex_measure_scores(SEXP scalesSEXP, SEXP measuresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -89,17 +89,17 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ssm_angle_mean", (DL_FUNC) &_ssm_angle_mean, 1},
-    {"_ssm_angle_median", (DL_FUNC) &_ssm_angle_median, 1},
-    {"_ssm_compare_pi", (DL_FUNC) &_ssm_compare_pi, 1},
-    {"_ssm_ssm_parameters", (DL_FUNC) &_ssm_ssm_parameters, 2},
-    {"_ssm_group_parameters", (DL_FUNC) &_ssm_group_parameters, 2},
-    {"_ssm_group_scores", (DL_FUNC) &_ssm_group_scores, 2},
-    {"_ssm_measure_scores", (DL_FUNC) &_ssm_measure_scores, 2},
+    {"_circumplex_angle_mean", (DL_FUNC) &_circumplex_angle_mean, 1},
+    {"_circumplex_angle_median", (DL_FUNC) &_circumplex_angle_median, 1},
+    {"_circumplex_compare_pi", (DL_FUNC) &_circumplex_compare_pi, 1},
+    {"_circumplex_ssm_parameters", (DL_FUNC) &_circumplex_ssm_parameters, 2},
+    {"_circumplex_group_parameters", (DL_FUNC) &_circumplex_group_parameters, 2},
+    {"_circumplex_group_scores", (DL_FUNC) &_circumplex_group_scores, 2},
+    {"_circumplex_measure_scores", (DL_FUNC) &_circumplex_measure_scores, 2},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_ssm(DllInfo *dll) {
+RcppExport void R_init_circumplex(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

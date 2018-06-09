@@ -1,16 +1,15 @@
 Type: Package
-Package: ssm
-Title: Structural Summary Method with Bootstrap Confidence Intervals
+Package: circumplex
+Title: Analysis and Visualization of Circumplex Data
 Version: 0.0.0.9000
 Authors@R: as.person(c(
     "Jeffrey Girard <j.girard@pitt.edu> [aut, cre]",
     "Johannes Zimmermann <j.zimmermann@psychologische-hochschule.de> [aut]",
     "Aidan Wright <aidan@pitt.edu> [aut]"))
-Description: Tools for conducting and visualizing circumplex data analyses using
-    the structural summary method (SSM).
+Description: Tools for analyzing and visualizing circumplex data.
 License: GPL-3
-URL: http://github.com/jmgirard/ssm
-BugReports: https://github.com/jmgirard/ssm/issues
+URL: http://github.com/jmgirard/circumplex
+BugReports: https://github.com/jmgirard/circumplex/issues
 Depends: 
     R (>= 3.5.0)
 Imports: 

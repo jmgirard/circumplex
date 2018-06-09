@@ -2,15 +2,15 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 angle_mean <- function(x) {
-    .Call(`_ssm_angle_mean`, x)
+    .Call(`_circumplex_angle_mean`, x)
 }
 
 angle_median <- function(x) {
-    .Call(`_ssm_angle_median`, x)
+    .Call(`_circumplex_angle_median`, x)
 }
 
 compare_pi <- function(x) {
-    .Call(`_ssm_compare_pi`, x)
+    .Call(`_circumplex_compare_pi`, x)
 }
 
 #' Calculate structural summary parameters
@@ -25,18 +25,18 @@ compare_pi <- function(x) {
 #'   angular displacement (in radians), and model fit (R-squared).
 #' @export
 ssm_parameters <- function(scores, angles) {
-    .Call(`_ssm_ssm_parameters`, scores, angles)
+    .Call(`_circumplex_ssm_parameters`, scores, angles)
 }
 
 group_parameters <- function(scores, angles) {
-    .Call(`_ssm_group_parameters`, scores, angles)
+    .Call(`_circumplex_group_parameters`, scores, angles)
 }
 
 group_scores <- function(X, T) {
-    .Call(`_ssm_group_scores`, X, T)
+    .Call(`_circumplex_group_scores`, X, T)
 }
 
 measure_scores <- function(scales, measures) {
-    .Call(`_ssm_measure_scores`, scales, measures)
+    .Call(`_circumplex_measure_scores`, scales, measures)
 }
 
