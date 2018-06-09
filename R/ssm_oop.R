@@ -1,23 +1,25 @@
 # S3 vector constructors -------------------------------------------------------
 
+# Create a new S3 class from a double
 new_s3_dbl <- function(x, ..., class) {
   stopifnot(is.double(x))
   stopifnot(is.character(class))
   structure(x, ..., class = class)
 }
 
+# Create a new S3 class from a list
 new_s3_lst <- function(x, ..., class) {
   stopifnot(is.list(x))
   stopifnot(is.character(class))
   structure(x, ..., class = class)
 }
 
+# Create a new S3 class from a scalar
 new_s3_scalar <- function(..., class) {
   new_s3_lst(list(...), class = class)
 }
 
 # Class degree -----------------------------------------------------------------
-
 
 # Set numeric object to class 'degree'
 new_degree <- function(x) {
@@ -44,9 +46,7 @@ as_degree.radian <- function(x) {
   new_degree(x * (180 / pi))
 }
 
-
 # Class radian -----------------------------------------------------------------
-
 
 # Set numeric object to class 'radian'
 new_radian <- function(x) {
@@ -73,10 +73,9 @@ as_radian.degree <- function(x) {
   new_radian(x * (pi / 180))
 }
 
-
 # Class ssm --------------------------------------------------------------------
 
-#
+# S3 generic for class 'ssm'
 ssm <- function(x, ...) {
   UseMethod("ssm")
 }
@@ -92,10 +91,13 @@ new_ssm <- function(results, contrasts, details, call, ...) {
     class = "ssm")
 }
 
+#  Print method for objects of ssm class
 #' @export
 print.ssm <- function(x, ...) {
+  # Print function call
   cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
     "\n", sep = "")
+  # Print each result as a block
   for (i in 1:nrow(x$results)) {
     dat <- x$results[i, ]
     v <- c(dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
@@ -108,10 +110,12 @@ print.ssm <- function(x, ...) {
     cat("\n", x$type, " [", dat$label, "]:\n", sep = "")
     print.default(m, print.gap = 3L, na.print = "")
   }
+  # Return if there are no contrasts
   if (is.null(x$contrasts)) {
     cat("\n")
     return()
   }
+  # Print each contrast as a block
   for (i in 1:nrow(x$contrasts)) {
     dat <- x$contrasts[i, ]
     v <- c(dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
