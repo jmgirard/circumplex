@@ -2,7 +2,7 @@
 #'
 #' A small example dataset containing standardized scores on eight hypothetical
 #' circumplex scales. Taken from Wright, Pincus, Conroy, & Hilsenroth (2009).
-#' 
+#'
 #' @format A data frame with 5 observations and 8 variables:
 #' \describe{
 #'   \item{PA}{circumplex scale at displacement 90}

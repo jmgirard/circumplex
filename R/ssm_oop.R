@@ -88,7 +88,8 @@ new_ssm <- function(results, contrasts, details, call, ...) {
     details = details,
     call = call,
     ...,
-    class = "ssm")
+    class = "ssm"
+  )
 }
 
 #  Print method for objects of ssm class
@@ -96,16 +97,22 @@ new_ssm <- function(results, contrasts, details, call, ...) {
 print.ssm <- function(x, ...) {
   # Print function call
   cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
-    "\n", sep = "")
+    "\n",
+    sep = ""
+  )
   # Print each result as a block
   for (i in 1:nrow(x$results)) {
     dat <- x$results[i, ]
-    v <- c(dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
-           dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
-           dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA)
+    v <- c(
+      dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
+      dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
+      dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
+    )
     m <- round(matrix(v, nrow = 6, ncol = 3), 3)
-    rownames(m) <- c("Elevation", "X-Value", "Y-Value",
-      "Amplitude", "Displacement", "Model Fit")
+    rownames(m) <- c(
+      "Elevation", "X-Value", "Y-Value",
+      "Amplitude", "Displacement", "Model Fit"
+    )
     colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
     cat("\n", x$type, " [", dat$label, "]:\n", sep = "")
     print.default(m, print.gap = 3L, na.print = "")
@@ -118,12 +125,16 @@ print.ssm <- function(x, ...) {
   # Print each contrast as a block
   for (i in 1:nrow(x$contrasts)) {
     dat <- x$contrasts[i, ]
-    v <- c(dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
+    v <- c(
+      dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
       dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
-      dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA)
+      dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
+    )
     m <- round(matrix(v, nrow = 6, ncol = 3), 3)
-    rownames(m) <- c("Elevation", "X-Value", "Y-Value",
-      "Amplitude", "Displacement", "Model Fit")
+    rownames(m) <- c(
+      "Elevation", "X-Value", "Y-Value",
+      "Amplitude", "Displacement", "Model Fit"
+    )
     colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
     cat("\nContrast [", dat$label, "]:\n", sep = "")
     print.default(m, print.gap = 3L, na.print = "")

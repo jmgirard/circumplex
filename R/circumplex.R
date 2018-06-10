@@ -19,4 +19,3 @@ NULL
 #' @useDynLib circumplex, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 NULL
-

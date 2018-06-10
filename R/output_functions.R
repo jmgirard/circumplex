@@ -2,20 +2,22 @@
 circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
 
   # Require plot to be square and remove default styling --------------------
-  b <- ggplot2::ggplot() + 
+  b <- ggplot2::ggplot() +
     ggplot2::coord_fixed() +
     ggplot2::theme_void()
-  
+
   # Expand the x-axis to fit long horizontal labels -------------------------
-  b <- b + ggplot2::scale_x_continuous(expand = c(.1, .1))  
+  b <- b + ggplot2::scale_x_continuous(expand = c(.1, .1))
 
   # Draw circles corresponding to amplitude scale ---------------------------
   b <- b +
     ggforce::geom_circle(aes(x0 = 0, y0 = 0, r = 1:4),
-      color = "gray", size = 0.5) + 
+      color = "gray", size = 0.5
+    ) +
     ggforce::geom_circle(aes(x0 = 0, y0 = 0, r = 5),
-      color = "darkgray", size = 1)
-  
+      color = "darkgray", size = 1
+    )
+
   # Draw segments corresponding to displacement scale -----------------------
   b <- b +
     ggplot2::geom_segment(
@@ -24,13 +26,13 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
         y = 0,
         xend = 5 * cos(angles * pi / 180),
         yend = 5 * sin(angles * pi / 180)
-      ), 
+      ),
       color = "darkgray",
       size = 0.5
     )
-  
+
   # Draw labels for amplitude scale -----------------------------------------
-  b <- b + 
+  b <- b +
     ggplot2::geom_label(
       aes(
         x = 1:4,
@@ -43,7 +45,7 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
     )
 
   # Draw labels for displacement scale --------------------------------------
-  b <- b + 
+  b <- b +
     ggplot2::geom_label(
       aes(
         x = 5.1 * cos(angles * pi / 180),
@@ -56,7 +58,7 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
       hjust = "outward",
       vjust = "outward"
     )
-  
+
   b
 }
 
@@ -79,8 +81,7 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
 #' @return A ggplot variable containing a completed circular plot.
 
 circle_plot <- function(.ssm_object, type, palette = "Set1",
-  amax = pretty_max(.ssm_object$results$a_uci), font.size = 3) {
-  
+                        amax = pretty_max(.ssm_object$results$a_uci), font.size = 3) {
   if (type == "results") {
     df <- .ssm_object$results
   } else if (type == "Contrasts") {
@@ -88,34 +89,36 @@ circle_plot <- function(.ssm_object, type, palette = "Set1",
   } else {
     return(NA)
   }
-  
+
   angles <- as.numeric(.ssm_object$details$angles)
-  
+
   # Convert results to numbers usable by ggplot and ggforce -----------------
   df_plot <- df %>%
-    dplyr::rowwise() %>% 
+    dplyr::rowwise() %>%
     dplyr::mutate(
       d_uci = ifelse(d_uci < d_lci, ggrad(d_uci + 360), ggrad(d_uci)),
-      d_lci = ggrad(d_lci), 
+      d_lci = ggrad(d_lci),
       a_lci = a_lci * 10 / (2 * amax),
       a_uci = a_uci * 10 / (2 * amax),
       x_est = x_est * 10 / (2 * amax),
       y_est = y_est * 10 / (2 * amax)
-    ) %>% 
-    dplyr::ungroup() %>% 
+    ) %>%
+    dplyr::ungroup() %>%
     dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
 
   # Initialize and configure the circle plot --------------------------------
   p <- circle_base(angles, amax, font.size) +
     ggplot2::scale_color_brewer(palette = palette) +
     ggplot2::scale_fill_brewer(palette = palette)
-  #TODO: Allow scale customization
-  
-  p <- p + 
+  # TODO: Allow scale customization
+
+  p <- p +
     ggforce::geom_arc_bar(
       data = df_plot,
-      aes(x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
-        fill = label, color = label),
+      aes(
+        x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
+        fill = label, color = label
+      ),
       alpha = 0.5,
       size = 1
     ) +
@@ -123,13 +126,13 @@ circle_plot <- function(.ssm_object, type, palette = "Set1",
       data = df_plot,
       aes(x = x_est, y = y_est, color = label),
       size = 2
-    ) + 
+    ) +
     ggplot2::guides(
       color = ggplot2::guide_legend(.ssm_object$type),
       fill = ggplot2::guide_legend(.ssm_object$type)
     )
-  #TODO: Account for the possibility of more than 8 plots
-  
+  # TODO: Account for the possibility of more than 8 plots
+
   p
 }
 
@@ -145,7 +148,6 @@ circle_plot <- function(.ssm_object, type, palette = "Set1",
 #'   parameter. An interval that does not contain the value of zero has p<.05.
 
 diff_plot <- function(.ssm_object) {
-  
   param_names <- c(
     a = "Amplitude",
     d = "Displacement",
@@ -153,8 +155,8 @@ diff_plot <- function(.ssm_object) {
     x = "X-Value",
     y = "Y-Value"
   )
-  
-  #TODO: Check that these ifelse() statements are correct
+
+  # TODO: Check that these ifelse() statements are correct
   res <- .ssm_object$contrasts %>%
     dplyr::mutate(
       d_uci = ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci),
@@ -177,16 +179,17 @@ diff_plot <- function(.ssm_object) {
       ),
       size = 1
     ) +
-    ggplot2::geom_hline(yintercept = 0) + 
-    ggplot2::facet_wrap(~Parameter, nrow = 1, scales = "free",
-      labeller = ggplot2::as_labeller(param_names))
-    
+    ggplot2::geom_hline(yintercept = 0) +
+    ggplot2::facet_wrap(~ Parameter,
+      nrow = 1, scales = "free",
+      labeller = ggplot2::as_labeller(param_names)
+    )
+
   p
 }
 
 #
 ssm_table <- function(.ssm_object, type, caption = "SSM Results") {
-  
   if (type == "results") {
     df <- .ssm_object$results
   } else if (type == "contrasts") {
@@ -194,7 +197,7 @@ ssm_table <- function(.ssm_object, type, caption = "SSM Results") {
   } else {
     return(NA)
   }
-  
+
   df <- df %>%
     dplyr::transmute(
       Label = label,
@@ -214,7 +217,6 @@ ssm_table <- function(.ssm_object, type, caption = "SSM Results") {
     css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
     tfoot = sprintf("<i>Note.</i> %s", table_footer(.ssm_object))
   )
-
 }
 
 #
@@ -228,6 +230,6 @@ table_footer <- function(.ssm_object) {
     str <- sprintf("<i>N</i> = %.0f (%s)", n$n, n$Group)
     out <- stringr::str_c(str, collapse = ", ")
   }
-  
+
   out
 }

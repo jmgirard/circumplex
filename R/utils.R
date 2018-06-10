@@ -32,7 +32,7 @@ param_diff <- function(p1, p2) {
 }
 
 # Calculate angular distance
-angle_dist <- function(x, y)  {
+angle_dist <- function(x, y) {
   ((x - y + pi) %% (2 * pi)) - pi
 }
 
@@ -52,8 +52,9 @@ pretty_max <- function(v) {
   amax <- max(v, na.rm = TRUE)
   options <- c(
     0.05, 0.10, 0.15, 0.20, 0.25,
-    0.50, 0.75, 1.00, 1.25, 1.50, 
-    2.00, 2.50, 3.00, 4.00, 5.00)
+    0.50, 0.75, 1.00, 1.25, 1.50,
+    2.00, 2.50, 3.00, 4.00, 5.00
+  )
   match <- options > amax
   if (sum(match) >= 1) {
     out <- options[match][[1]]
@@ -65,7 +66,7 @@ pretty_max <- function(v) {
 
 #
 group_counts <- function(df) {
-  df %>% 
-    dplyr::group_by(Group) %>% 
+  df %>%
+    dplyr::group_by(Group) %>%
     dplyr::summarize(n = dplyr::n())
 }
