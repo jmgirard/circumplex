@@ -1,5 +1,6 @@
 # Create an Empty Circular Plot
-circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
+circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
+  amax = 0.5, font.size = 3) {
 
   # Require plot to be square and remove default styling --------------------
   b <- ggplot2::ggplot() +
@@ -50,7 +51,7 @@ circle_base <- function(angles = octants, amax = 0.5, font.size = 3) {
       aes(
         x = 5.1 * cos(angles * pi / 180),
         y = 5.1 * sin(angles * pi / 180),
-        label = sprintf("%d\u00B0", angles)
+        label = labels
       ),
       size = font.size,
       color = "darkgray",
