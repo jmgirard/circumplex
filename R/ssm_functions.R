@@ -272,22 +272,31 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
 
 #' Standardize Circumplex Scales using Normative Data
 #'
-#' Description
+#' Takes in a data frame containing circumplex scales (and possibly other
+#' variables) and returns that same data frame with the following changes: the
+#' circumplex scales will be standardized either using external normative data
+#' (if specified) or using the observed data (if not specified) and the
+#' circumplex scales will be moved to be the first variables.
 #'
-#' @param .data A matrix or data frame containing at least circumplex scales.
+#' @param .data A matrix or data frame containing at least circumplex scales
+#'   (note that \code{.data} should contain mean scores and not sum scores if
+#'   the included normative data is to be used).
 #' @param scales A list of the variables or column numbers in \code{.data} that
 #'   contain circumplex scales (in tidyverse-style NSE specification).
 #' @param angles A numerical vector containing the angular displacement of each
 #'   circumplex scale included in \code{scales} (in degrees).
-#' @param norms A data frame containing normative data for the circumplex scales
-#'   you would like to standardize. Normative data is included in the package
-#'   for several popular circumplex measures.
+#' @param norms Optional: A data frame containing normative data for the
+#'   circumplex scales you would like to standardize. Normative data is included
+#'   in the package for several popular circumplex measures. If \code{norms} is
+#'   not specified or if it is set to NULL, the data will be standardized so
+#'   that its observed mean is equal to 0 and its observed standard deviation is
+#'   equal to 1 (default = NULL).
 #' @return A data frame containing normalized versions of the variables
 #'   specified in \code{scales}, as well as any additional variables that were
 #'   included in \code{.data}.
 #' @export
 
-ssm_standardize <- function(.data, scales, angles, norms) {
+ssm_standardize <- function(.data, scales, angles, norms = NULL) {
 
   # Check that inputs are valid ------------------------------------------------
   assert_that(is.numeric(angles))
@@ -299,14 +308,23 @@ ssm_standardize <- function(.data, scales, angles, norms) {
   # Move scale columns to the front of the tibble ------------------------------
   sdata <- .data %>%
     dplyr::select(!!scales_en, dplyr::everything())
+  # TODO: Retain the existing variable ordering
 
   # Match scales with norm variables and standardize ---------------------------
   for (i in 1:length(angles)) {
-    index <- norms$Angle == angles[i]
-    m <- norms$M[index]
-    s <- norms$SD[index]
-    sdata <- sdata %>%
-      dplyr::mutate_at(dplyr::funs((. - m) / s), .vars = i)
+    if (is.null(norms)) {
+      sdata <- sdata %>% 
+        dplyr::mutate_at(
+          dplyr::funs(as.numeric(scale(., center = TRUE, scale = TRUE))),
+          .vars = i
+        )
+    } else {
+      index <- norms$Angle == angles[i]
+      m <- norms$M[index]
+      s <- norms$SD[index]
+      sdata <- sdata %>%
+        dplyr::mutate_at(dplyr::funs((. - m) / s), .vars = i)
+    }
   }
 
   sdata
