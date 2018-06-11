@@ -18,26 +18,26 @@ You can install the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("jmgirard/circumplex")
 ```
-## Examples
+## Examples of the Structural Summary Method (SSM)
 
 Calculate mean-based SSM parameters for a single group/sample
 
 ``` r
-data('aw2009')
-ssm_profiles(.data = wright2009, scales = PA:NO, angles = octants())
+data('aw2009') # Load example dataset
+ssm_profiles(.data = aw2009, scales = PA:NO, angles = octants())
 ```
 
 Calculate mean-based SSM parameters for multiple groups/samples
 
 ``` r
-data('jz2017')
-jz2017s <- ssm_standardize(.data = jz2017, scales = PA:NO)
+data('jz2017') # Load example dataset
+jz2017s <- ssm_standardize(.data = jz2017, scales = PA:NO) # Calculate z-scores
 ssm_profiles(.data = jz2017s, scales = PA:NO, angles = octants(), grouping = Gender)
 ```
 
 Calculate correlation-based SSM parameters for multiple measures
 
 ``` r
-data('jz2017')
+data('jz2017') # Load example dataset
 ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(), measures = PARPD:AVPD)
 ```
