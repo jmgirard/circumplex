@@ -14,8 +14,9 @@ the included normative data is to be used).}
 \item{scales}{A list of the variables or column numbers in \code{.data} that
 contain circumplex scales (in tidyverse-style NSE specification).}
 
-\item{angles}{A numerical vector containing the angular displacement of each
-circumplex scale included in \code{scales} (in degrees).}
+\item{angles}{Optional: A numerical vector containing the angular
+displacement of each circumplex scale included in \code{scales} (in
+degrees). Only necessary when norms are provided.}
 
 \item{norms}{Optional: A data frame containing normative data for the
 circumplex scales you would like to standardize. Normative data is included

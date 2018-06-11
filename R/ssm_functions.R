@@ -283,8 +283,9 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
 #'   the included normative data is to be used).
 #' @param scales A list of the variables or column numbers in \code{.data} that
 #'   contain circumplex scales (in tidyverse-style NSE specification).
-#' @param angles A numerical vector containing the angular displacement of each
-#'   circumplex scale included in \code{scales} (in degrees).
+#' @param angles Optional: A numerical vector containing the angular
+#'   displacement of each circumplex scale included in \code{scales} (in
+#'   degrees). Only necessary when norms are provided.
 #' @param norms Optional: A data frame containing normative data for the
 #'   circumplex scales you would like to standardize. Normative data is included
 #'   in the package for several popular circumplex measures. If \code{norms} is
@@ -297,10 +298,6 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
 #' @export
 
 ssm_standardize <- function(.data, scales, angles, norms = NULL) {
-
-  # Check that inputs are valid ------------------------------------------------
-  assert_that(is.numeric(angles))
-  # TODO: Check that the norms variable contains the necessary data
 
   # Enable column specification using tidyverse-style NSE ----------------------
   scales_en <- rlang::enquo(scales)
@@ -319,6 +316,8 @@ ssm_standardize <- function(.data, scales, angles, norms = NULL) {
           .vars = i
         )
     } else {
+      # TODO: Check that the norms variable contains the necessary data
+      assert_that(is.numeric(angles))
       index <- norms$Angle == angles[i]
       m <- norms$M[index]
       s <- norms$SD[index]
