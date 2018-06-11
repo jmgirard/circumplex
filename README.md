@@ -31,8 +31,7 @@ Calculate mean-based SSM parameters for multiple groups/samples
 
 ``` r
 data('jz2017')
-data('iipsc')
-jz2017s <- ssm_standardize(.data = jz2017, scales = PA:NO, angles = octants(), norms = iipsc)
+jz2017s <- ssm_standardize(.data = jz2017, scales = PA:NO, angles = octants())
 ssm_profiles(.data = jz2017s, scales = PA:NO, angles = octants(), grouping = Gender)
 ```
 
