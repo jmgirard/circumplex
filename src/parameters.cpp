@@ -73,6 +73,7 @@ arma::rowvec col_means(arma::mat x){
 // [[Rcpp::export]]
 arma::mat group_scores(NumericMatrix X, NumericVector T) {
   NumericVector levels = unique(T);
+  std::sort(levels.begin(), levels.end());
   int n = levels.size();
   int m = X.ncol();
   arma::mat out(n, m);
