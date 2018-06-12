@@ -24,14 +24,14 @@ devtools::install_github("jmgirard/circumplex")
 Calculate mean-based SSM parameters for a single group/sample
 
 ``` r
-data('aw2009') # Load example dataset
+data("aw2009")
 ssm_profiles(.data = aw2009, scales = PA:NO, angles = octants())
 ```
 
 Calculate mean-based SSM parameters for multiple groups/samples
 
 ``` r
-data('jz2017') # Load example dataset
+data("jz2017")
 jz2017s <- standardize(.data = jz2017, scales = PA:NO) # Calculate z-scores
 ssm_profiles(.data = jz2017s, scales = PA:NO, angles = octants(), grouping = Gender)
 ```
@@ -39,7 +39,7 @@ ssm_profiles(.data = jz2017s, scales = PA:NO, angles = octants(), grouping = Gen
 Calculate correlation-based SSM parameters for multiple measures
 
 ``` r
-data('jz2017') # Load example dataset
+data("jz2017")
 ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(), measures = PARPD:AVPD)
 ```
 
@@ -48,7 +48,7 @@ ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(), measures = PARP
 Verbose call with variable names
 
 ``` r
-data("jz2017") # Load example dataset
+data("jz2017")
 jz2017s <- standardize(
   .data = jz2017,
   variables = c(PA, BC, DE, FG, HI, JK, LM, NO)
@@ -68,7 +68,7 @@ ssm_profiles(
 Verbose call with column numbers
 
 ``` r
-data("jz2017") # Load example dataset
+data("jz2017")
 jz2017s <- standardize(
   .data = jz2017,
   variables = c(2, 3, 4, 5, 6, 7, 8, 9)
@@ -88,7 +88,7 @@ ssm_profiles(
 Abbreviated call with variable names and defaults
 
 ``` r
-data("jz2017") # Load example dataset
+data("jz2017")
 jz2017s <- standardize(jz2017, PA:NO)
 ssm_profiles(jz2017s, PA:NO, octants(), Gender)
 ```
