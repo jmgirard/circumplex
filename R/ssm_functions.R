@@ -3,7 +3,8 @@
 #' Calculate SSM parameters with bootstrapped confidence intervals for the mean
 #' of any number of groups.
 #'
-#' @param .data A matrix or data frame containing at least circumplex scales.
+#' @param .data A matrix or data frame containing at least circumplex scales,
+#'   which should be standardized.
 #' @param scales A list of the variables in \code{.data} that contain circumplex
 #'   scales (in tidyverse-style NSE specification, see examples).
 #' @param angles A numerical vector containing the angular displacement of each
@@ -33,6 +34,7 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
   scales_en <- rlang::enquo(scales)
 
   # Check that inputs are valid ------------------------------------------------
+  assert_that(is_provided(.data))
   assert_that(is.numeric(angles), is.count(boots), is.flag(table))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
@@ -41,7 +43,7 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
   angles <- angles %>% as_degree() %>% as_radian()
 
   # Select circumplex scales and grouping variable (if applicable) -------------
-  if (base::missing(grouping)) {
+  if (is_provided(grouping) == FALSE) {
     bs_input <- .data %>%
       dplyr::select(!!scales_en) %>%
       dplyr::mutate(Group = factor("Whole Sample")) %>%
@@ -53,9 +55,8 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
   } else {
     grouping_en <- rlang::enquo(grouping)
     bs_input <- .data %>%
-      dplyr::select(!!grouping_en, !!scales_en) %>%
-      dplyr::mutate(Group = factor(!!grouping_en)) %>%
-      dplyr::select(-!!grouping_en) %>%
+      dplyr::select(!!scales_en, Group = !!grouping_en) %>%
+      dplyr::mutate(Group = factor(Group)) %>%
       tidyr::drop_na()
     # Check if more than one contrast is possible
     if (nlevels(bs_input$Group) > 2 && contrast != "none") {
@@ -64,18 +65,18 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
   }
 
   # Check that scales are standardized -----------------------------------------
-  extrema <- bs_input %>%
+  extrema <- .data %>%
     dplyr::select(!!scales_en) %>%
     abs() %>%
     max()
   if (extrema >= 5) {
-    message("WARNING: Your circumplex scales do not appear to be standardized.")
+    message("WARNING: Your circumplex scales do not appear to be standardized.\n\n  Hint: You can standardize these variables with the standardize() function.")
   }
 
   # Create function that will perform bootstrapping ----------------------------
   bs_function <- function(.data, index, angles, contrast) {
     resample <- .data[index, ]
-    mat <- as.matrix(resample[, 1:(ncol(resample) - 1)])
+    mat <- as.matrix(resample[, which(names(resample) != "Group")])
     grp <- as.integer(resample$Group)
     scores_r <- group_scores(mat, grp)
     ssm_by_group(scores_r, angles, contrast)
@@ -185,9 +186,7 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
   assert_that(is.numeric(angles), is.count(boots), is.flag(table))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
-  if (base::missing(measures)) {
-    stop("At least one measure must be provided to ssm_measures().\n\n  Hint: Add a measure or try the ssm_profiles() function.")
-  }
+  assert_that(is_provided(.data), is_provided(measures))
 
   # Convert angles from degrees to radians -------------------------------------
   angles <- angles %>% as_degree() %>% as_radian()
@@ -268,63 +267,4 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
   }
 
   out
-}
-
-#' Standardize Circumplex Scales using Normative Data
-#'
-#' Takes in a data frame containing circumplex scales (and possibly other
-#' variables) and returns that same data frame with the following changes: the
-#' circumplex scales will be standardized either using external normative data
-#' (if specified) or using the observed data (if not specified) and the
-#' circumplex scales will be moved to be the first variables.
-#'
-#' @param .data A matrix or data frame containing at least circumplex scales
-#'   (note that \code{.data} should contain mean scores and not sum scores if
-#'   the included normative data is to be used).
-#' @param scales A list of the variables or column numbers in \code{.data} that
-#'   contain circumplex scales (in tidyverse-style NSE specification).
-#' @param angles Optional: A numerical vector containing the angular
-#'   displacement of each circumplex scale included in \code{scales} (in
-#'   degrees). Only necessary when norms are provided (default = NULL).
-#' @param norms Optional: A data frame containing normative data for the
-#'   circumplex scales you would like to standardize. Normative data is included
-#'   in the package for several popular circumplex measures. If \code{norms} is
-#'   not specified or if it is set to NULL, the data will be standardized so
-#'   that its observed mean is equal to 0 and its observed standard deviation is
-#'   equal to 1 (default = NULL).
-#' @return A data frame containing normalized versions of the variables
-#'   specified in \code{scales}, as well as any additional variables that were
-#'   included in \code{.data}.
-#' @export
-
-standardize <- function(.data, scales, angles = NULL, norms = NULL) {
-
-  # Enable column specification using tidyverse-style NSE ----------------------
-  scales_en <- rlang::enquo(scales)
-
-  # Move scale columns to the front of the tibble ------------------------------
-  sdata <- .data %>%
-    dplyr::select(!!scales_en, dplyr::everything())
-  # TODO: Retain the existing variable ordering
-
-  # Match scales with norm variables and standardize ---------------------------
-  for (i in 1:length(angles)) {
-    if (is.null(norms)) {
-      sdata <- sdata %>% 
-        dplyr::mutate_at(
-          dplyr::funs(as.numeric(scale(., center = TRUE, scale = TRUE))),
-          .vars = i
-        )
-    } else {
-      # TODO: Check that the norms variable contains the necessary data
-      assert_that(is.numeric(angles))
-      index <- norms$Angle == angles[i]
-      m <- norms$M[index]
-      s <- norms$SD[index]
-      sdata <- sdata %>%
-        dplyr::mutate_at(dplyr::funs((. - m) / s), .vars = i)
-    }
-  }
-
-  sdata
 }

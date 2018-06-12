@@ -18,6 +18,7 @@ You can install the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("jmgirard/circumplex")
 ```
+
 ## Examples of the Structural Summary Method (SSM)
 
 Calculate mean-based SSM parameters for a single group/sample
@@ -40,4 +41,62 @@ Calculate correlation-based SSM parameters for multiple measures
 ``` r
 data('jz2017') # Load example dataset
 ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(), measures = PARPD:AVPD)
+```
+
+## Examples of verbose and abbreviated syntax
+
+Verbose call with variable names
+
+``` r
+data("jz2017") # Load example dataset
+jz2017s <- standardize(
+  .data = jz2017,
+  variables = c(PA, BC, DE, FG, HI, JK, LM, NO)
+)
+ssm_profiles(
+  .data = jz2017s,
+  scales = c(PA, BC, DE, FG, HI, JK, LM, NO),
+  angles = c(90, 135, 180, 225, 270, 315, 360, 45),
+  grouping = Gender,
+  contrast = "none",
+  table = TRUE,
+  boots = 2000,
+  interval = 0.95
+)
+```
+
+Verbose call with column numbers
+
+``` r
+data("jz2017") # Load example dataset
+jz2017s <- standardize(
+  .data = jz2017,
+  variables = c(2, 3, 4, 5, 6, 7, 8, 9)
+)
+ssm_profiles(
+  .data = jz2017s,
+  scales = c(2, 3, 4, 5, 6, 7, 8, 9),
+  angles = c(90, 135, 180, 225, 270, 315, 360, 45),
+  grouping = 1,
+  contrast = "none",
+  table = TRUE,
+  boots = 2000,
+  interval = 0.95
+)
+```
+
+Abbreviated call with variable names and defaults
+
+``` r
+data("jz2017") # Load example dataset
+jz2017s <- standardize(jz2017, PA:NO)
+ssm_profiles(jz2017s, PA:NO, octants(), Gender)
+```
+
+Abbreviated call with column numbers and defaults
+
+``` r
+data("jz2017") # Load example dataset
+jz2017s <- standardize(jz2017, 2:9)
+ssm_profiles(jz2017s, 2:9, octants(), 1)
 ```
