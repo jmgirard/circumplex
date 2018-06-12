@@ -8,7 +8,8 @@ ssm_profiles(.data, scales, angles, grouping, contrast = "none",
   table = TRUE, boots = 2000, interval = 0.95)
 }
 \arguments{
-\item{.data}{A matrix or data frame containing at least circumplex scales.}
+\item{.data}{A matrix or data frame containing at least circumplex scales,
+which should be standardized.}
 
 \item{scales}{A list of the variables in \code{.data} that contain circumplex
 scales (in tidyverse-style NSE specification, see examples).}
