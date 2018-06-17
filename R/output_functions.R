@@ -1,22 +1,24 @@
 # Create an Empty Circular Plot
 circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
-  amax = 0.5, font.size = 3) {
+  amax = 0.5, font.size = 12) {
 
   # Require plot to be square and remove default styling --------------------
   b <- ggplot2::ggplot() +
     ggplot2::coord_fixed() +
-    ggplot2::theme_void()
-
+    ggplot2::theme_void(base_size = font.size)
+  
   # Expand the x-axis to fit long horizontal labels -------------------------
-  b <- b + ggplot2::scale_x_continuous(expand = c(.1, .1))
+  b <- b +
+    ggplot2::scale_x_continuous(expand = c(.25, 0)) +
+    ggplot2::scale_y_continuous(expand = c(.1, 0))
 
   # Draw circles corresponding to amplitude scale ---------------------------
   b <- b +
     ggforce::geom_circle(aes(x0 = 0, y0 = 0, r = 1:4),
-      color = "gray", size = 0.5
+      color = "gray60", size = 0.5
     ) +
     ggforce::geom_circle(aes(x0 = 0, y0 = 0, r = 5),
-      color = "darkgray", size = 1
+      color = "gray50", size = 1.5
     )
 
   # Draw segments corresponding to displacement scale -----------------------
@@ -28,7 +30,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
         xend = 5 * cos(angles * pi / 180),
         yend = 5 * sin(angles * pi / 180)
       ),
-      color = "darkgray",
+      color = "gray60",
       size = 0.5
     )
 
@@ -36,13 +38,14 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
   b <- b +
     ggplot2::geom_label(
       aes(
-        x = 1:4,
+        x = c(2, 4),
         y = 0,
-        label = sprintf("%.2f", seq(from = 0, to = amax, length.out = 6)[2:5])
+        label = sprintf("%.2f",
+          seq(from = 0, to = amax, length.out = 6)[c(3, 5)])
       ),
-      color = "gray",
+      color = "gray20",
       label.size = NA,
-      size = font.size
+      size = font.size / 2.8346438836889
     )
 
   # Draw labels for displacement scale --------------------------------------
@@ -53,11 +56,11 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
         y = 5.1 * sin(angles * pi / 180),
         label = labels
       ),
-      size = font.size,
-      color = "darkgray",
+      color = "gray20",
       label.size = NA,
       hjust = "outward",
-      vjust = "outward"
+      vjust = "outward",
+      size = font.size / 2.8346438836889
     )
 
   b
@@ -71,26 +74,21 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #'
 #' @param .ssm_object The output of \code{ssm_profiles()} or
 #'   \code{ssm_measures()}.
-#' @param type A string corresponding to \code{"Profile"} or \code{"Measure"}.
 #' @param palette A string corresponding to the Color Brewer palette (default =
 #'   "Set1"). See http://www.cookbook-r.com/Graphs/Colors_(ggplot2).
 #' @param amax A positive real number corresponding to the radius of the circle.
 #'   It is used to scale the amplitude values and will determine which amplitude
 #'   labels are drawn.
-#' @param font.size A positive real number corresponding to the size (in mm) of
-#'   the amplitude and displacement labels (default = 3).
+#' @param font.size A positive real number corresponding to the size (in pt) of
+#'   the text labels (default = 12).
 #' @return A ggplot variable containing a completed circular plot.
+#' @export
 
-circle_plot <- function(.ssm_object, type, palette = "Set1",
-                        amax = pretty_max(.ssm_object$results$a_uci), font.size = 3) {
-  if (type == "results") {
-    df <- .ssm_object$results
-  } else if (type == "Contrasts") {
-    df <- .ssm_object$contrasts
-  } else {
-    return(NA)
-  }
-
+ssm_plot_circle <- function(.ssm_object, palette = "Set1",
+                        amax = pretty_max(.ssm_object$results$a_uci), 
+                        font.size = 12) {
+  
+  df <- .ssm_object$results
   angles <- as.numeric(.ssm_object$details$angles)
 
   # Convert results to numbers usable by ggplot and ggforce -----------------
@@ -108,7 +106,7 @@ circle_plot <- function(.ssm_object, type, palette = "Set1",
     dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
 
   # Initialize and configure the circle plot --------------------------------
-  p <- circle_base(angles, amax, font.size) +
+  p <- circle_base(angles = angles, amax = amax, font.size = font.size) +
     ggplot2::scale_color_brewer(palette = palette) +
     ggplot2::scale_fill_brewer(palette = palette)
   # TODO: Allow scale customization
@@ -131,6 +129,9 @@ circle_plot <- function(.ssm_object, type, palette = "Set1",
     ggplot2::guides(
       color = ggplot2::guide_legend(.ssm_object$type),
       fill = ggplot2::guide_legend(.ssm_object$type)
+    ) + 
+    ggplot2::theme(
+      legend.text = ggplot2::element_text(size = font.size)
     )
   # TODO: Account for the possibility of more than 8 plots
 
