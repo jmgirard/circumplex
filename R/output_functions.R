@@ -138,7 +138,7 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
   p
 }
 
-#' Create a Difference Plot of SSM Results
+#' Create a Difference Plot of SSM Contrast Results
 #'
 #' Take in the results of a Structural Summary Method analysis with pairwise
 #' contrasts and plot the point and interval estimates for each parameter's
@@ -146,16 +146,26 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
 #'
 #' @param .ssm_object The output of \code{ssm_profiles()} or
 #'   \code{ssm_measures()} that included \code{contrast = "test"}.
+#' @param axislabel Optional. A string to label the y-axis (default =
+#'   "Difference").
+#' @param color Optional. A string corresponding to the color of the point range
+#'   (default = "red").
+#' @param linesize Optional. A positive number corresponding to the size of the
+#'   point range elements in mm (default = 1.5).
+#' @param fontsize Optional. A positive number corresponding to the size of the
+#'   axis labels, numbers, and facet headings in pt (default = 12).
 #' @return A ggplot variable containing difference point-ranges faceted by SSM
 #'   parameter. An interval that does not contain the value of zero has p<.05.
+#' @export
 
-diff_plot <- function(.ssm_object) {
+ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
+                              color = "red", linesize = 1.5, fontsize = 12) {
   param_names <- c(
-    a = "Amplitude",
-    d = "Displacement",
     e = "Elevation",
     x = "X-Value",
-    y = "Y-Value"
+    y = "Y-Value",
+    a = "Amplitude",
+    d = "Displacement"
   )
 
   # TODO: Check that these ifelse() statements are correct
@@ -167,21 +177,25 @@ diff_plot <- function(.ssm_object) {
     tidyr::gather(key, value, -label, -fit) %>%
     tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
     tidyr::spread(Type, value) %>%
-    dplyr::rename(Difference = est, Contrast = label)
+    dplyr::rename(Difference = est, Contrast = label) %>% 
+    dplyr::mutate(
+      Parameter = factor(Parameter, levels = c("e", "x", "y", "a", "d"))
+    )
   p <- ggplot2::ggplot(res) +
-    ggplot2::theme_bw() +
+    ggplot2::theme_bw(base_size = fontsize) +
     ggplot2::theme(
       legend.position = "top",
       axis.text.x = ggplot2::element_blank(),
       axis.title.x = ggplot2::element_blank()
     ) +
+    ggplot2::geom_hline(yintercept = 0) +
     ggplot2::geom_pointrange(
       aes(
-        x = Contrast, y = Difference, ymin = lci, ymax = uci, color = Contrast
+        x = Contrast, y = Difference, ymin = lci, ymax = uci
       ),
-      size = 1
+      size = linesize, color = color
     ) +
-    ggplot2::geom_hline(yintercept = 0) +
+    ggplot2::labs(y = axislabel) +
     ggplot2::facet_wrap(~ Parameter,
       nrow = 1, scales = "free",
       labeller = ggplot2::as_labeller(param_names)
