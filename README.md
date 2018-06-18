@@ -25,22 +25,33 @@ Calculate mean-based SSM parameters for a single group/sample
 
 ``` r
 data("aw2009")
-ssm_profiles(.data = aw2009, scales = PA:NO, angles = octants())
+results <- ssm_profiles(.data = aw2009, scales = PA:NO, angles = octants())
+ssm_plot_circle(results)
 ```
 
 Calculate mean-based SSM parameters for multiple groups/samples
 
 ``` r
 data("jz2017")
-jz2017s <- standardize(.data = jz2017, scales = PA:NO) # Calculate z-scores
-ssm_profiles(.data = jz2017s, scales = PA:NO, angles = octants(), grouping = Gender)
+jz2017s <- standardize(.data = jz2017, scales = PA:NO)
+results <- ssm_profiles(.data = jz2017s, scales = PA:NO, angles = octants(), grouping = Gender)
+ssm_plot_circle(results)
 ```
 
 Calculate correlation-based SSM parameters for multiple measures
 
 ``` r
 data("jz2017")
-ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(), measures = PARPD:AVPD)
+results <- ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(), measures = PARPD:AVPD)
+ssm_plot_circle(results)
+```
+
+Constrast correlation-based SSM parameters for two measures
+
+``` r
+data("jz2017")
+results <- ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(), measures = c(NARPD, ASPD), contrast = "test")
+ssm_plot_contrast(results)
 ```
 
 ## Examples of verbose and abbreviated syntax
