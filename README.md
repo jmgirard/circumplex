@@ -50,7 +50,8 @@ Constrast correlation-based SSM parameters for two measures
 
 ``` r
 data("jz2017")
-results <- ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(), measures = c(NARPD, ASPD), contrast = "test")
+results <- ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(),
+  measures = c(NARPD, ASPD), contrast = "test")
 ssm_plot_contrast(results)
 ```
 
