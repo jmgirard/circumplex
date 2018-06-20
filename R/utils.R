@@ -75,25 +75,25 @@ quadrants <- function() {
 #' been standardized (i.e., turned into z-scores with mean 0 and variance 1).
 #'
 #' @param .data A matrix or data frame containing at least one variable.
-#' @param variables A list of the variables or column numbers in \code{.data}
+#' @param .vars A list of the variables or column numbers in \code{.data}
 #'   that contain circumplex scales (in tidyverse-style NSE specification).
 #' @return A data frame containing standardized versions of the variables
-#'   specified in \code{variables}, as well as any additional variables that
+#'   specified in \code{.vars}, as well as any additional variables that
 #'   were included in \code{.data}. Variable ordering is preserved.
 #' @export
-standardize <- function(.data, variables) {
+standardize <- function(.data, .vars) {
   
   # Check that the variables parameter has been provided -----------------------
-  assert_that(is_provided(variables))
+  assert_that(is_provided(.vars))
   
   # Enable column specification using tidyverse-style NSE ----------------------
-  variables_en <- rlang::enquo(variables)
+  vars_en <- rlang::enquo(.vars)
   
   # Convert the specified variables to z-scores --------------------------------
   .data %>% 
     dplyr::mutate_at(
       .funs = dplyr::funs(as.numeric(scale(., center = TRUE, scale = TRUE))),
-      .vars = dplyr::vars(!!variables_en)
+      .vars = dplyr::vars(!!vars_en)
     )
   
 }
