@@ -10,7 +10,7 @@
 NULL
 
 #' @importFrom assertthat
-#'   are_equal assert_that is.count is.flag not_empty is.scalar
+#'   are_equal assert_that is.count is.flag not_empty is.scalar is.string
 NULL
 
 #' @importFrom ggplot2 aes

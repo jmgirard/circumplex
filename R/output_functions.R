@@ -9,7 +9,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
     # Expand the axes multiplicatively to fit labels ---------------------------
     ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
     ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
-    # Draw segments corresponding to displacement scale -----------------------
+    # Draw segments corresponding to displacement scale ------------------------
     ggplot2::geom_segment(
       aes(
         x = 0,
@@ -243,6 +243,10 @@ ssm_plot_curve <- function(.ssm_object) {
 ssm_table <- function(.ssm_object, filename = NULL, type = "results",
                       caption = dcaption(.ssm_object, type), xy = TRUE) {
   
+  assert_that(is_provided(.ssm_object), is.string(caption), is.flag(xy))
+  assert_that(type %in% c("results", "contrasts"))
+  assert_that(is_html_fn(filename))
+  
   if (type == "results") {
     df <- .ssm_object$results
     N = .ssm_object$details$n
@@ -309,5 +313,7 @@ dcaption <- function(.ssm_object, type) {
       "%s-based Structural Summary Contrasts with %s Confidence Intervals", 
       basetype, str_percent(.ssm_object$details$interval)
     )
+  } else {
+    "error"
   }
 }
