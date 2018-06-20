@@ -4,7 +4,7 @@
 \alias{ssm_plot_contrast}
 \title{Create a Difference Plot of SSM Contrast Results}
 \usage{
-ssm_plot_contrast(.ssm_object, axislabel = "Difference", xyout = TRUE,
+ssm_plot_contrast(.ssm_object, axislabel = "Difference", xy = TRUE,
   color = "red", linesize = 1.5, fontsize = 12)
 }
 \arguments{
@@ -14,7 +14,7 @@ ssm_plot_contrast(.ssm_object, axislabel = "Difference", xyout = TRUE,
 \item{axislabel}{Optional. A string to label the y-axis (default =
 "Difference").}
 
-\item{xyout}{A logical determining whether the X-Value and Y-Value parameters
+\item{xy}{A logical determining whether the X-Value and Y-Value parameters
 should be included in the plot (default = TRUE).}
 
 \item{color}{Optional. A string corresponding to the color of the point range
@@ -34,4 +34,11 @@ parameter. An interval that does not contain the value of zero has p<.05.
 Take in the results of a Structural Summary Method analysis with pairwise
 contrasts and plot the point and interval estimates for each parameter's
 contrast (e.g., between groups or measures).
+}
+\seealso{
+Other ssm functions: \code{\link{ssm_measures}},
+  \code{\link{ssm_plot_circle}},
+  \code{\link{ssm_profiles}}, \code{\link{ssm_table}}
+
+Other visualization functions: \code{\link{ssm_plot_circle}}
 }

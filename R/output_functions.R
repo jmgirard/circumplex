@@ -2,27 +2,14 @@
 circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
   amax = 0.5, font.size = 12) {
 
-  # Require plot to be square and remove default styling --------------------
-  b <- ggplot2::ggplot() +
+  ggplot2::ggplot() +
+    # Require plot to be square and remove default styling ---------------------
     ggplot2::coord_fixed() +
-    ggplot2::theme_void(base_size = font.size)
-  
-  # Expand the x-axis to fit long horizontal labels -------------------------
-  b <- b +
-    ggplot2::scale_x_continuous(expand = c(.25, 0)) +
-    ggplot2::scale_y_continuous(expand = c(.1, 0))
-
-  # Draw circles corresponding to amplitude scale ---------------------------
-  b <- b +
-    ggforce::geom_circle(aes(x0 = 0, y0 = 0, r = 1:4),
-      color = "gray60", size = 0.5
-    ) +
-    ggforce::geom_circle(aes(x0 = 0, y0 = 0, r = 5),
-      color = "gray50", size = 1.5
-    )
-
-  # Draw segments corresponding to displacement scale -----------------------
-  b <- b +
+    ggplot2::theme_void(base_size = font.size) +
+    # Expand the axes multiplicatively to fit labels ---------------------------
+    ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
+    ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
+    # Draw segments corresponding to displacement scale -----------------------
     ggplot2::geom_segment(
       aes(
         x = 0,
@@ -32,10 +19,19 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
       ),
       color = "gray60",
       size = 0.5
-    )
-
-  # Draw labels for amplitude scale -----------------------------------------
-  b <- b +
+    ) +
+    # Draw circles corresponding to amplitude scale ----------------------------
+    ggforce::geom_circle(
+      aes(x0 = 0, y0 = 0, r = 1:4),
+      color = "gray60",
+      size = 0.5
+    ) +
+    ggforce::geom_circle(
+      aes(x0 = 0, y0 = 0, r = 5),
+      color = "gray50",
+      size = 1.5
+    ) +
+    # Draw labels for amplitude scale ------------------------------------------
     ggplot2::geom_label(
       aes(
         x = c(2, 4),
@@ -46,10 +42,8 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
       color = "gray20",
       label.size = NA,
       size = font.size / 2.8346438836889
-    )
-
-  # Draw labels for displacement scale --------------------------------------
-  b <- b +
+    ) +
+    # Draw labels for displacement scale ---------------------------------------
     ggplot2::geom_label(
       aes(
         x = 5.1 * cos(angles * pi / 180),
@@ -63,7 +57,6 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
       size = font.size / 2.8346438836889
     )
 
-  b
 }
 
 #' Create a Circular Plot of SSM Results
@@ -82,6 +75,8 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' @param font.size A positive real number corresponding to the size (in pt) of
 #'   the text labels (default = 12).
 #' @return A ggplot variable containing a completed circular plot.
+#' @family ssm functions
+#' @family visualization functions
 #' @export
 
 ssm_plot_circle <- function(.ssm_object, palette = "Set1",
@@ -148,7 +143,7 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
 #'   \code{ssm_measures()} that included \code{contrast = "test"}.
 #' @param axislabel Optional. A string to label the y-axis (default =
 #'   "Difference").
-#' @param xyout A logical determining whether the X-Value and Y-Value parameters
+#' @param xy A logical determining whether the X-Value and Y-Value parameters
 #'   should be included in the plot (default = TRUE).
 #' @param color Optional. A string corresponding to the color of the point range
 #'   (default = "red").
@@ -158,10 +153,12 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
 #'   axis labels, numbers, and facet headings in pt (default = 12).
 #' @return A ggplot variable containing difference point-ranges faceted by SSM
 #'   parameter. An interval that does not contain the value of zero has p<.05.
+#' @family ssm functions
+#' @family visualization functions
 #' @export
 
 ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference", 
-  xyout = TRUE, color = "red", linesize = 1.5, fontsize = 12) {
+  xy = TRUE, color = "red", linesize = 1.5, fontsize = 12) {
   
   param_names <- c(
     e = "Elevation",
@@ -173,7 +170,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
   
   res <- .ssm_object$contrasts
   
-  if (xyout == FALSE) {
+  if (xy == FALSE) {
     res <- dplyr::select(res,
       -c(tidyselect::starts_with("x"), tidyselect::starts_with("y")))
     param_names <- param_names[-c(2, 3)]
@@ -215,7 +212,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
   p
 }
 
-#
+# TODO: Finish function
 ssm_plot_curve <- function(.ssm_object) {
   scores <- .ssm_object$scores
   results <- .ssm_object$results
@@ -223,15 +220,35 @@ ssm_plot_curve <- function(.ssm_object) {
   ggplot2::ggplot(scores, aes(x = Scale, y = Score, color = ))
 }
 
-# Create HTML table from SSM results or contrasts
-ssm_table <- function(.ssm_object, type, caption = "", xyout = TRUE) {
+#' Create HTML table from SSM results or contrasts
+#'
+#' Take in the results of an SSM analysis and return an HTML table with the
+#' desired formatting.
+#'
+#' @param .ssm_object The output of \code{ssm_profiles()} or
+#'   \code{ssm_measures()}
+#' @param filename A string determining the filename to which the table should
+#'   be saved. If set to NULL, the table will be displayed but not saved
+#'   (default = NULL).
+#' @param type A string determining whether the table should contain the normal
+#'   SSM "results" or SSM "contrast" results (default = "results").
+#' @param caption A string to be displayed above the table (default = "").
+#' @param xy A logical indicating whether the x-value and y-value parameters
+#'   should be included in the table as columns (default = TRUE).
+#' @return An HTML table containing SSM results or contrasts.
+#' @family ssm functions
+#' @family table functions
+#' @export
+
+ssm_table <- function(.ssm_object, filename = NULL, type = "results",
+                      caption = dcaption(.ssm_object, type), xy = TRUE) {
   
   if (type == "results") {
     df <- .ssm_object$results
     N = .ssm_object$details$n
   } else if (type == "contrasts") {
     df <- .ssm_object$contrasts
-    N = .ssm_object$details$n[[1]]
+    N = .ssm_object$details$n[[1]] # TODO: Replace w/pairwise deletion
   } else {
     return(NA)
   }
@@ -249,18 +266,48 @@ ssm_table <- function(.ssm_object, type, caption = "", xyout = TRUE) {
     Fit = sprintf("%.3f", fit)
   )
   
-  if (xyout == TRUE) {
+  if (xy == TRUE) {
     align <- "llllll"
   } else {
     df <- dplyr::select(df, -c(`X-Value`, `Y-Value`))
     align <- "llll"
   }
   
-  htmlTable::htmlTable(df,
+  t <- htmlTable::htmlTable(df,
     caption = caption,
     align = align,
     align.header = align,
     rnames = FALSE,
     css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
   )
+  
+  if (is.null(filename) == TRUE) {
+    print(t, type = "html", useViewer = TRUE)
+  } else {
+    sink(filename)
+    print(t, type = "html", useViewer = FALSE)
+    sink()
+  }
+  
+  t
+}
+
+# Build the default caption for the ssm_table function
+dcaption <- function(.ssm_object, type) {
+  if (.ssm_object$type == "Profile") {
+    basetype = "Mean"
+  } else if (.ssm_object$type == "Measure") {
+    basetype = "Correlation"
+  }
+  if (type == "results") {
+    sprintf(
+      "%s-based Structural Summary Statistics with %s Confidence Intervals",
+      basetype, str_percent(.ssm_object$details$interval)
+    )
+  } else if (type == "contrasts") {
+    sprintf(
+      "%s-based Structural Summary Contrasts with %s Confidence Intervals", 
+      basetype, str_percent(.ssm_object$details$interval)
+    )
+  }
 }

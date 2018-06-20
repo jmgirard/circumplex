@@ -29,3 +29,10 @@ Take in the results of a Structural Summary Method analysis and plot the
 point and interval estimate for each row (e.g., group or measure) in a
 circular space quantified by displacement and amplitude.
 }
+\seealso{
+Other ssm functions: \code{\link{ssm_measures}},
+  \code{\link{ssm_plot_contrast}},
+  \code{\link{ssm_profiles}}, \code{\link{ssm_table}}
+
+Other visualization functions: \code{\link{ssm_plot_contrast}}
+}

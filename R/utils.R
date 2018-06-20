@@ -141,7 +141,10 @@ pretty_max <- function(v) {
 
 #
 group_counts <- function(df) {
-  df %>%
+  tbl <- df %>%
     dplyr::group_by(Group) %>%
     dplyr::summarize(n = dplyr::n())
+  vec <- tbl$n
+  names(vec) <- tbl$Group
+  vec
 }

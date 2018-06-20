@@ -5,7 +5,7 @@
 \title{Mean-based Structural Summary Method for Profiles}
 \usage{
 ssm_profiles(.data, scales, angles, grouping, contrast = "none",
-  table = TRUE, xyout = TRUE, boots = 2000, interval = 0.95)
+  boots = 2000, interval = 0.95)
 }
 \arguments{
 \item{.data}{A matrix or data frame containing at least circumplex scales,
@@ -26,20 +26,21 @@ specified. Options are "none" to run no contrasts, "model" to calculate SSM
 parameters for the difference between each scale score, or "test" to
 calculate the difference between each SSM parameter (default = "none").}
 
-\item{table}{A logical determining whether an HTML table should be output to
-display the results of the SSM analysis (default = TRUE).}
-
-\item{xyout}{A logical determining whether the X-Value and Y-Value parameters
-should be included in table and figure output (default = TRUE).}
-
 \item{boots}{The number of bootstrap resamples to use in calculating the
 confidence intervals (default = 2000).}
 
 \item{interval}{The confidence intervals' percentage level (default = 0.95).}
 }
 \value{
-A tibble containing SSM parameters (point and interval estimates) for
-each group's mean profile (or the entire mean profile without grouping).
+A list containing the results and description of the analysis.
+\item{results}{A tibble with the SSM parameter estimates for each group}
+\item{contrasts}{A tibble with the SSM parameter contrasts}
+\item{details}{A list with sample size (n), number of bootstrap resamples
+(boots), the confidence interval percentage level (interval), and the
+displacement of angle (angles)} \item{call}{A language object containing
+the function call that created this object} \item{scores}{A tibble
+containing the mean scale scores} \item{type}{A string indicating that the
+results are mean-based "Profile" results}
 }
 \description{
 Calculate SSM parameters with bootstrapped confidence intervals for the mean
@@ -48,4 +49,10 @@ of any number of groups.
 \seealso{
 \code{\link{ssm_measures}}, which calculates SSM parameters for
 measures using a correlation-based approach.
+
+Other ssm functions: \code{\link{ssm_measures}},
+  \code{\link{ssm_plot_circle}},
+  \code{\link{ssm_plot_contrast}}, \code{\link{ssm_table}}
+
+Other data analysis functions: \code{\link{ssm_measures}}
 }

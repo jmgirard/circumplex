@@ -16,28 +16,33 @@
 #'   specified. Options are "none" to run no contrasts, "model" to calculate SSM
 #'   parameters for the difference between each scale score, or "test" to
 #'   calculate the difference between each SSM parameter (default = "none").
-#' @param table A logical determining whether an HTML table should be output to
-#'   display the results of the SSM analysis (default = TRUE).
-#' @param xyout A logical determining whether the X-Value and Y-Value parameters
-#'   should be included in table and figure output (default = TRUE).
 #' @param boots The number of bootstrap resamples to use in calculating the
 #'   confidence intervals (default = 2000).
 #' @param interval The confidence intervals' percentage level (default = 0.95).
-#' @return A tibble containing SSM parameters (point and interval estimates) for
-#'   each group's mean profile (or the entire mean profile without grouping).
+#' @return A list containing the results and description of the analysis.
+#'   \item{results}{A tibble with the SSM parameter estimates for each group}
+#'   \item{contrasts}{A tibble with the SSM parameter contrasts}
+#'   \item{details}{A list with sample size (n), number of bootstrap resamples
+#'   (boots), the confidence interval percentage level (interval), and the
+#'   displacement of angle (angles)} \item{call}{A language object containing
+#'   the function call that created this object} \item{scores}{A tibble
+#'   containing the mean scale scores} \item{type}{A string indicating that the
+#'   results are mean-based "Profile" results}
 #' @seealso \code{\link{ssm_measures}}, which calculates SSM parameters for
 #'   measures using a correlation-based approach.
+#' @family ssm functions
+#' @family data analysis functions
 #' @export
 
 ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
-  table = TRUE, xyout = TRUE, boots = 2000, interval = 0.95) {
+                         boots = 2000, interval = 0.95) {
 
   # Enable column specification using tidyverse-style NSE ----------------------
   scales_en <- rlang::enquo(scales)
 
   # Check that inputs are valid ------------------------------------------------
   assert_that(is_provided(.data))
-  assert_that(is.numeric(angles), is.count(boots), is.flag(table))
+  assert_that(is.numeric(angles), is.count(boots))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
 
@@ -145,20 +150,6 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
     type = "Profile"
   )
 
-  # Output HTML results table (if requested) -----------------------------------
-  if (table == TRUE) {
-    t1 <- ssm_table(out, "results",
-      caption = sprintf("Mean-based Structural Summary Statistics with
-        %s Confidence Intervals", str_percent(interval)), xyout)
-    print(t1)
-    if (contrast != "none") {
-      t2 <- ssm_table(out, "contrasts", caption = sprintf("Mean-based 
-        Structural Summary Statistics with %s Confidence Intervals for 
-        Profile Contrasts", str_percent(interval)), xyout)
-      print(t2)
-    }
-  }
-
   print(out)
   out
 }
@@ -180,24 +171,29 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
 #'   specified. Options are "none" to run no contrasts, "model" to calculate SSM
 #'   parameters for the difference between each scale score, or "test" to
 #'   calculate the difference between each SSM parameter (default = "none").
-#' @param table A logical determining whether an HTML table should be output to
-#'   display the results of the SSM analysis (default = TRUE).
-#' @param xyout A logical determining whether the X-Value and Y-Value parameters
-#'   should be included in table and figure output (default = TRUE).
 #' @param boots The number of bootstrap resamples to use in calculating the
 #'   confidence intervals (default = 2000).
 #' @param interval The confidence intervals' percentage level (default = 0.95).
-#' @return A tibble containing SSM parameters (point and interval estimates) for
-#'   each measure.
+#' @return A list containing the results and description of the analysis.
+#'   \item{results}{A tibble with the SSM parameter estimates for each measure}
+#'   \item{contrasts}{A tibble with the SSM parameter contrasts}
+#'   \item{details}{A list with sample size (n), number of bootstrap resamples
+#'   (boots), the confidence interval percentage level (interval), and the
+#'   displacement of angle (angles)} \item{call}{A language object containing
+#'   the function call that created this object} \item{scores}{A tibble
+#'   containing the measure-scale correlation scores} \item{type}{A string
+#'   indicating that the results are correlation-based "Measure" results}
 #' @seealso \code{\link{ssm_profiles}}, which calculates SSM parameters for
 #'   profiles using a mean-based approach.
+#' @family ssm functions
+#' @family data analysis functions
 #' @export
 
 ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
-  table = TRUE, xyout = TRUE, boots = 2000, interval = 0.95) {
+                         boots = 2000, interval = 0.95) {
 
   # Check that inputs are valid ------------------------------------------------
-  assert_that(is.numeric(angles), is.count(boots), is.flag(table))
+  assert_that(is.numeric(angles), is.count(boots))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
   assert_that(is_provided(.data), is_provided(scales), is_provided(measures))
@@ -212,7 +208,7 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
   # Select circumplex scales and measure variables -----------------------------
   bs_input <- .data %>%
     dplyr::select(!!scales_en, !!measures_en) %>%
-    tidyr::drop_na()
+    tidyr::drop_na() # TODO: Replace w/pairwise deletion
 
   # Calculate observed scores --------------------------------------------------
   cs <- as.matrix(bs_input[, 1:length(angles)])
@@ -261,7 +257,7 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
 
   # Collect analysis details ---------------------------------------------------
   details <- list(
-    n = rep(nrow(bs_input), nrow(scores)), # TODO: Add pairwise deletion
+    n = rep(nrow(bs_input), nrow(scores)), # TODO: Replace w/pairwise deletion
     boots = boots,
     interval = interval,
     angles = as_degree(angles)
@@ -276,20 +272,6 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
     details = details,
     type = "Measure"
   )
-
-  # Create HTML results table (if requested) -----------------------------------
-  if (table == TRUE) {
-    t1 <- ssm_table(out, "results",
-      caption = sprintf("Correlation-based Structural Summary Statistics with
-        %s Confidence Intervals", str_percent(interval)), xyout)
-    print(t1)
-    if (contrast != "none") {
-      t2 <- ssm_table(out, "contrasts", caption = sprintf("Correlation-based 
-        Structural Summary Statistics with %s Confidence Intervals for 
-        Measure Contrasts", str_percent(interval)), xyout)
-      print(t2)
-    }
-  }
 
   print(out)
   out
