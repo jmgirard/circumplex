@@ -18,6 +18,8 @@
 #'   calculate the difference between each SSM parameter (default = "none").
 #' @param table A logical determining whether an HTML table should be output to
 #'   display the results of the SSM analysis (default = TRUE).
+#' @param xyout A logical determining whether the X-Value and Y-Value parameters
+#'   should be included in table and figure output (default = TRUE).
 #' @param boots The number of bootstrap resamples to use in calculating the
 #'   confidence intervals (default = 2000).
 #' @param interval The confidence intervals' percentage level (default = 0.95).
@@ -28,7 +30,7 @@
 #' @export
 
 ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
-                         table = TRUE, boots = 2000, interval = 0.95) {
+  table = TRUE, xyout = TRUE, boots = 2000, interval = 0.95) {
 
   # Enable column specification using tidyverse-style NSE ----------------------
   scales_en <- rlang::enquo(scales)
@@ -50,7 +52,9 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
       tidyr::drop_na()
     # Check if contrasts are requested without groups
     if (contrast != "none") {
-      stop("Contrasts are only possible if a grouping variable is also provided.\n\n  Hint: Add a grouping variable or set contrast = 'none'.")
+      stop(c("Contrasts are only possible if a grouping variable is also ",
+        "provided.\n\n  Hint: Add a grouping variable or set ",
+        "contrast = 'none'."))
     }
   } else {
     grouping_en <- rlang::enquo(grouping)
@@ -60,7 +64,9 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
       tidyr::drop_na()
     # Check if more than one contrast is possible
     if (nlevels(bs_input$Group) > 2 && contrast != "none") {
-      message("WARNING: Currently, only one contrast is possible at a time. With more than two levels of the grouping variable, only the first two levels will be compared.")
+      message(c("WARNING: Currently, only one contrast is possible at a time. ",
+        "With more than two levels of the grouping variable, only the first ",
+        "two levels will be compared."))
     }
   }
 
@@ -70,9 +76,19 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
     abs() %>%
     max()
   if (extrema >= 5) {
-    message("WARNING: Your circumplex scales do not appear to be standardized.\n\n  Hint: You can standardize these variables with the standardize() function.")
+    message(c("WARNING: Your circumplex scales do not appear to be ",
+      "standardized.\n\n  Hint: You can standardize these variables with the ",
+      "standardize() function."))
   }
-
+  
+  # Calculate mean observed scores ---------------------------------------------
+  mat <- as.matrix(bs_input[, which(names(bs_input) != "Group")])
+  grp <- as.integer(bs_input$Group)
+  scores <- group_scores(mat, grp)
+  colnames(scores) <- names(dplyr::select(bs_input, !!scales_en))
+  rownames(scores) <- levels(bs_input$Group)
+  scores <- tibble::as_tibble(scores, rownames = "label")
+  
   # Create function that will perform bootstrapping ----------------------------
   bs_function <- function(.data, index, angles, contrast) {
     resample <- .data[index, ]
@@ -97,8 +113,7 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
   row_labels <- levels(bs_input$Group)
   if (contrast != "none") {
     row_labels <- c(row_labels, sprintf(
-      "%s: %s - %s",
-      stringr::str_to_title(contrast), row_labels[2], row_labels[1]
+      "%s - %s", row_labels[2], row_labels[1]
     ))
   }
   results <- bs_output %>%
@@ -124,6 +139,7 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
   out <- new_ssm(
     results = results,
     contrasts = contrasts,
+    scores = scores,
     call = match.call(),
     details = details,
     type = "Profile"
@@ -133,17 +149,17 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
   if (table == TRUE) {
     t1 <- ssm_table(out, "results",
       caption = sprintf("Mean-based Structural Summary Statistics with
-        %s Confidence Intervals", str_percent(interval))
-    )
+        %s Confidence Intervals", str_percent(interval)), xyout)
     print(t1)
     if (contrast != "none") {
       t2 <- ssm_table(out, "contrasts", caption = sprintf("Mean-based 
         Structural Summary Statistics with %s Confidence Intervals for 
-        Profile Contrasts", str_percent(interval)))
+        Profile Contrasts", str_percent(interval)), xyout)
       print(t2)
     }
   }
 
+  print(out)
   out
 }
 
@@ -166,6 +182,8 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
 #'   calculate the difference between each SSM parameter (default = "none").
 #' @param table A logical determining whether an HTML table should be output to
 #'   display the results of the SSM analysis (default = TRUE).
+#' @param xyout A logical determining whether the X-Value and Y-Value parameters
+#'   should be included in table and figure output (default = TRUE).
 #' @param boots The number of bootstrap resamples to use in calculating the
 #'   confidence intervals (default = 2000).
 #' @param interval The confidence intervals' percentage level (default = 0.95).
@@ -176,18 +194,18 @@ ssm_profiles <- function(.data, scales, angles, grouping, contrast = "none",
 #' @export
 
 ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
-                         table = TRUE, boots = 2000, interval = 0.95) {
-
-  # Enable column specification using tidyverse-style NSE ----------------------
-  scales_en <- rlang::enquo(scales)
-  measures_en <- rlang::enquo(measures)
+  table = TRUE, xyout = TRUE, boots = 2000, interval = 0.95) {
 
   # Check that inputs are valid ------------------------------------------------
   assert_that(is.numeric(angles), is.count(boots), is.flag(table))
   assert_that(contrast %in% c("none", "model", "test"))
   assert_that(is.scalar(interval), interval > 0, interval < 1)
-  assert_that(is_provided(.data), is_provided(measures))
+  assert_that(is_provided(.data), is_provided(scales), is_provided(measures))
 
+  # Enable column specification using tidyverse-style NSE ----------------------
+  scales_en <- rlang::enquo(scales)
+  measures_en <- rlang::enquo(measures)
+  
   # Convert angles from degrees to radians -------------------------------------
   angles <- angles %>% as_degree() %>% as_radian()
 
@@ -196,6 +214,14 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
     dplyr::select(!!scales_en, !!measures_en) %>%
     tidyr::drop_na()
 
+  # Calculate observed scores --------------------------------------------------
+  cs <- as.matrix(bs_input[, 1:length(angles)])
+  mv <- as.matrix(bs_input[, (length(angles) + 1):ncol(bs_input)])
+  scores <- measure_scores(cs, mv)
+  colnames(scores) <- names(dplyr::select(bs_input, !!scales_en))
+  rownames(scores) <- names(dplyr::select(bs_input, !!measures_en))
+  scores <- tibble::as_tibble(scores, rownames = "label")
+  
   # Create function that will perform bootstrapping ----------------------------
   bs_function <- function(.data, index, angles, contrast) {
     resample <- .data[index, ]
@@ -219,8 +245,7 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
   row_labels <- names(dplyr::select(.data, !!measures_en))
   if (contrast != "none") {
     row_labels <- c(row_labels, sprintf(
-      "%s: %s - %s",
-      stringr::str_to_title(contrast), row_labels[2], row_labels[1]
+      "%s - %s", row_labels[2], row_labels[1]
     ))
   }
   results <- bs_output %>%
@@ -236,7 +261,7 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
 
   # Collect analysis details ---------------------------------------------------
   details <- list(
-    n = nrow(bs_input),
+    n = rep(nrow(bs_input), nrow(scores)), # TODO: Add pairwise deletion
     boots = boots,
     interval = interval,
     angles = as_degree(angles)
@@ -246,6 +271,7 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
   out <- new_ssm(
     results = results,
     contrasts = contrasts,
+    scores = scores,
     call = match.call(),
     details = details,
     type = "Measure"
@@ -255,16 +281,16 @@ ssm_measures <- function(.data, scales, angles, measures, contrast = "none",
   if (table == TRUE) {
     t1 <- ssm_table(out, "results",
       caption = sprintf("Correlation-based Structural Summary Statistics with
-        %s Confidence Intervals", str_percent(interval))
-    )
+        %s Confidence Intervals", str_percent(interval)), xyout)
     print(t1)
     if (contrast != "none") {
       t2 <- ssm_table(out, "contrasts", caption = sprintf("Correlation-based 
         Structural Summary Statistics with %s Confidence Intervals for 
-        Measure Contrasts", str_percent(interval)))
+        Measure Contrasts", str_percent(interval)), xyout)
       print(t2)
     }
   }
 
+  print(out)
   out
 }

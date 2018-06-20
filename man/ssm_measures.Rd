@@ -5,7 +5,7 @@
 \title{Correlation-based Structural Summary Method for Measures}
 \usage{
 ssm_measures(.data, scales, angles, measures, contrast = "none",
-  table = TRUE, boots = 2000, interval = 0.95)
+  table = TRUE, xyout = TRUE, boots = 2000, interval = 0.95)
 }
 \arguments{
 \item{.data}{A matrix or data frame containing at least circumplex scales and
@@ -27,6 +27,9 @@ calculate the difference between each SSM parameter (default = "none").}
 
 \item{table}{A logical determining whether an HTML table should be output to
 display the results of the SSM analysis (default = TRUE).}
+
+\item{xyout}{A logical determining whether the X-Value and Y-Value parameters
+should be included in table and figure output (default = TRUE).}
 
 \item{boots}{The number of bootstrap resamples to use in calculating the
 confidence intervals (default = 2000).}

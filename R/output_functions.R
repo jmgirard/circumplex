@@ -148,6 +148,8 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
 #'   \code{ssm_measures()} that included \code{contrast = "test"}.
 #' @param axislabel Optional. A string to label the y-axis (default =
 #'   "Difference").
+#' @param xyout A logical determining whether the X-Value and Y-Value parameters
+#'   should be included in the plot (default = TRUE).
 #' @param color Optional. A string corresponding to the color of the point range
 #'   (default = "red").
 #' @param linesize Optional. A positive number corresponding to the size of the
@@ -158,8 +160,9 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
 #'   parameter. An interval that does not contain the value of zero has p<.05.
 #' @export
 
-ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
-                              color = "red", linesize = 1.5, fontsize = 12) {
+ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference", 
+  xyout = TRUE, color = "red", linesize = 1.5, fontsize = 12) {
+  
   param_names <- c(
     e = "Elevation",
     x = "X-Value",
@@ -167,10 +170,18 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     a = "Amplitude",
     d = "Displacement"
   )
+  
+  res <- .ssm_object$contrasts
+  
+  if (xyout == FALSE) {
+    res <- dplyr::select(res,
+      -c(tidyselect::starts_with("x"), tidyselect::starts_with("y")))
+    param_names <- param_names[-c(2, 3)]
+  }
 
   # TODO: Check that these ifelse() statements are correct
-  res <- .ssm_object$contrasts %>%
-    dplyr::mutate(
+  
+  res <- dplyr::mutate(res,
       d_uci = ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci),
       d_lci = ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci)
     ) %>%
@@ -188,7 +199,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
       axis.text.x = ggplot2::element_blank(),
       axis.title.x = ggplot2::element_blank()
     ) +
-    ggplot2::geom_hline(yintercept = 0) +
+    ggplot2::geom_hline(yintercept = 0, size = linesize, color = "darkgray") +
     ggplot2::geom_pointrange(
       aes(
         x = Contrast, y = Difference, ymin = lci, ymax = uci
@@ -205,47 +216,51 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
 }
 
 #
-ssm_table <- function(.ssm_object, type, caption = "SSM Results") {
+ssm_plot_curve <- function(.ssm_object) {
+  scores <- .ssm_object$scores
+  results <- .ssm_object$results
+  df <- 
+  ggplot2::ggplot(scores, aes(x = Scale, y = Score, color = ))
+}
+
+# Create HTML table from SSM results or contrasts
+ssm_table <- function(.ssm_object, type, caption = "", xyout = TRUE) {
+  
   if (type == "results") {
     df <- .ssm_object$results
+    N = .ssm_object$details$n
   } else if (type == "contrasts") {
     df <- .ssm_object$contrasts
+    N = .ssm_object$details$n[[1]]
   } else {
     return(NA)
   }
 
-  df <- df %>%
-    dplyr::transmute(
-      Label = label,
-      Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
-      `X-Value` = sprintf("%.2f [%.2f, %.2f]", x_est, x_lci, x_uci),
-      `Y-Value` = sprintf("%.2f [%.2f, %.2f]", y_est, y_lci, y_uci),
-      Amplitude = sprintf("%.2f [%.2f, %.2f]", a_est, a_lci, a_uci),
-      Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
-      Fit = sprintf("%.3f", fit)
-    )
-
+  type_sym <- rlang::sym(.ssm_object$type)
+  
+  df <- dplyr::transmute(df,
+    (!!type_sym) := label,
+    N = N,
+    Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
+    `X-Value` = sprintf("%.2f [%.2f, %.2f]", x_est, x_lci, x_uci),
+    `Y-Value` = sprintf("%.2f [%.2f, %.2f]", y_est, y_lci, y_uci),
+    Amplitude = sprintf("%.2f [%.2f, %.2f]", a_est, a_lci, a_uci),
+    Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
+    Fit = sprintf("%.3f", fit)
+  )
+  
+  if (xyout == TRUE) {
+    align <- "llllll"
+  } else {
+    df <- dplyr::select(df, -c(`X-Value`, `Y-Value`))
+    align <- "llll"
+  }
+  
   htmlTable::htmlTable(df,
     caption = caption,
-    align = "llllll",
-    align.header = "llllll",
+    align = align,
+    align.header = align,
     rnames = FALSE,
-    css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
-    tfoot = sprintf("<i>Note.</i> %s", table_footer(.ssm_object))
+    css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
   )
-}
-
-#
-table_footer <- function(.ssm_object) {
-  n <- .ssm_object$details$n
-  if (is.null(nrow(n))) {
-    out <- sprintf("<i>N = </i>%.0f", n)
-  } else if (nrow(n) == 1) {
-    out <- sprintf("<i>N = </i>%.0f", n$n)
-  } else {
-    str <- sprintf("<i>N</i> = %.0f (%s)", n$n, n$Group)
-    out <- stringr::str_c(str, collapse = ", ")
-  }
-
-  out
 }

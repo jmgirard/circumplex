@@ -4,8 +4,8 @@
 \alias{ssm_plot_contrast}
 \title{Create a Difference Plot of SSM Contrast Results}
 \usage{
-ssm_plot_contrast(.ssm_object, axislabel = "Difference", color = "red",
-  linesize = 1.5, fontsize = 12)
+ssm_plot_contrast(.ssm_object, axislabel = "Difference", xyout = TRUE,
+  color = "red", linesize = 1.5, fontsize = 12)
 }
 \arguments{
 \item{.ssm_object}{The output of \code{ssm_profiles()} or
@@ -13,6 +13,9 @@ ssm_plot_contrast(.ssm_object, axislabel = "Difference", color = "red",
 
 \item{axislabel}{Optional. A string to label the y-axis (default =
 "Difference").}
+
+\item{xyout}{A logical determining whether the X-Value and Y-Value parameters
+should be included in the plot (default = TRUE).}
 
 \item{color}{Optional. A string corresponding to the color of the point range
 (default = "red").}

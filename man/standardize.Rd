@@ -4,17 +4,17 @@
 \alias{standardize}
 \title{Standardize specified variables in a data frame}
 \usage{
-standardize(.data, variables)
+standardize(.data, .vars)
 }
 \arguments{
 \item{.data}{A matrix or data frame containing at least one variable.}
 
-\item{variables}{A list of the variables or column numbers in \code{.data}
+\item{.vars}{A list of the variables or column numbers in \code{.data}
 that contain circumplex scales (in tidyverse-style NSE specification).}
 }
 \value{
 A data frame containing standardized versions of the variables
-specified in \code{variables}, as well as any additional variables that
+specified in \code{.vars}, as well as any additional variables that
 were included in \code{.data}. Variable ordering is preserved.
 }
 \description{
