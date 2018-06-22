@@ -1,62 +1,35 @@
-# Create an Empty Circular Plot
-circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
-  amax = 0.5, font.size = 12) {
+#' Create a figure from SSM results
+#'
+#' Take in the results of an SSM analysis function and create figure from it.
+#'
+#' @param .ssm_object Required. The results output of \code{\link{ssm_analyze}}.
+#' @param type Optional. A string indicating what type of figure to create.
+#'   Options currently include "circle" for a circular plot of each row's
+#'   estimated position in the circumplex space and "contrast" for a plot of the
+#'   estimated difference between SSM parameters (default = "circle").
+#' @param fontsize Optional. A single positive number indicating the font size
+#'   of text in the figure, in points (default = 12).
+#' @param ... Additional arguments to pass on to the plotting function.
+#' @return A ggplot2 object representing the figure
+#' @seealso ggsave Function for saving plots to image files.
+#' @family ssm functions
+#' @family visualization functions
+#' @export
 
-  ggplot2::ggplot() +
-    # Require plot to be square and remove default styling ---------------------
-    ggplot2::coord_fixed() +
-    ggplot2::theme_void(base_size = font.size) +
-    # Expand the axes multiplicatively to fit labels ---------------------------
-    ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
-    ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
-    # Draw segments corresponding to displacement scale ------------------------
-    ggplot2::geom_segment(
-      aes(
-        x = 0,
-        y = 0,
-        xend = 5 * cos(angles * pi / 180),
-        yend = 5 * sin(angles * pi / 180)
-      ),
-      color = "gray60",
-      size = 0.5
-    ) +
-    # Draw circles corresponding to amplitude scale ----------------------------
-    ggforce::geom_circle(
-      aes(x0 = 0, y0 = 0, r = 1:4),
-      color = "gray60",
-      size = 0.5
-    ) +
-    ggforce::geom_circle(
-      aes(x0 = 0, y0 = 0, r = 5),
-      color = "gray50",
-      size = 1.5
-    ) +
-    # Draw labels for amplitude scale ------------------------------------------
-    ggplot2::geom_label(
-      aes(
-        x = c(2, 4),
-        y = 0,
-        label = sprintf("%.2f",
-          seq(from = 0, to = amax, length.out = 6)[c(3, 5)])
-      ),
-      color = "gray20",
-      label.size = NA,
-      size = font.size / 2.8346438836889
-    ) +
-    # Draw labels for displacement scale ---------------------------------------
-    ggplot2::geom_label(
-      aes(
-        x = 5.1 * cos(angles * pi / 180),
-        y = 5.1 * sin(angles * pi / 180),
-        label = labels
-      ),
-      color = "gray20",
-      label.size = NA,
-      hjust = "outward",
-      vjust = "outward",
-      size = font.size / 2.8346438836889
-    )
-
+ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
+  
+  # Check for valid input arguments
+  assert_that(is_provided(.ssm_object))
+  assert_that(is.number(fontsize), fontsize > 0)
+  
+  # Forward to the appropriate subfunction
+  if (.ssm_object$details$results_type == "Profile") {
+    ssm_plot_circle(.ssm_object, fontsize = fontsize, ...)
+  } else if (.ssm_object$details$results_type == "Contrast") {
+    ssm_plot_contrast(.ssm_object, fontsize = fontsize, ...)
+  }
+  
+  # TODO: Add more explanation of the possible arguments in documentation.
 }
 
 #' Create a Circular Plot of SSM Results
@@ -72,20 +45,22 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' @param amax A positive real number corresponding to the radius of the circle.
 #'   It is used to scale the amplitude values and will determine which amplitude
 #'   labels are drawn.
-#' @param font.size A positive real number corresponding to the size (in pt) of
+#' @param fontsize A positive real number corresponding to the size (in pt) of
 #'   the text labels (default = 12).
 #' @return A ggplot variable containing a completed circular plot.
-#' @family ssm functions
-#' @family visualization functions
-#' @export
 
-ssm_plot_circle <- function(.ssm_object, palette = "Set1",
-                        amax = pretty_max(.ssm_object$results$a_uci), 
-                        font.size = 12) {
+ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
+  fontsize = 12) {
   
   df <- .ssm_object$results
   angles <- as.numeric(.ssm_object$details$angles)
 
+  assert_that(is.null(amax) || is.number(amax))
+  
+  if (is.null(amax)) {
+    amax <- pretty_max(.ssm_object$results$a_uci)
+  }
+  
   # Convert results to numbers usable by ggplot and ggforce -----------------
   df_plot <- df %>%
     dplyr::rowwise() %>%
@@ -101,7 +76,7 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
     dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
 
   # Initialize and configure the circle plot --------------------------------
-  p <- circle_base(angles = angles, amax = amax, font.size = font.size) +
+  p <- circle_base(angles = angles, amax = amax, fontsize = fontsize) +
     ggplot2::scale_color_brewer(palette = palette) +
     ggplot2::scale_fill_brewer(palette = palette)
   # TODO: Allow scale customization
@@ -118,15 +93,17 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
     ) +
     ggplot2::geom_point(
       data = df_plot,
-      aes(x = x_est, y = y_est, color = label),
-      size = 2
+      aes(x = x_est, y = y_est, fill = label),
+      color = "black",
+      shape = 21,
+      size = 3
     ) +
     ggplot2::guides(
-      color = ggplot2::guide_legend(.ssm_object$type),
-      fill = ggplot2::guide_legend(.ssm_object$type)
+      color = ggplot2::guide_legend(.ssm_object$details$results_type),
+      fill = ggplot2::guide_legend(.ssm_object$details$results_type)
     ) + 
     ggplot2::theme(
-      legend.text = ggplot2::element_text(size = font.size)
+      legend.text = ggplot2::element_text(size = fontsize)
     )
   # TODO: Account for the possibility of more than 8 plots
 
@@ -139,8 +116,7 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
 #' contrasts and plot the point and interval estimates for each parameter's
 #' contrast (e.g., between groups or measures).
 #'
-#' @param .ssm_object The output of \code{ssm_profiles()} or
-#'   \code{ssm_measures()} that included \code{contrast = "test"}.
+#' @param .ssm_object Required. The results output of \code{ssm_analyze}.
 #' @param axislabel Optional. A string to label the y-axis (default =
 #'   "Difference").
 #' @param xy A logical determining whether the X-Value and Y-Value parameters
@@ -153,12 +129,9 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
 #'   axis labels, numbers, and facet headings in pt (default = 12).
 #' @return A ggplot variable containing difference point-ranges faceted by SSM
 #'   parameter. An interval that does not contain the value of zero has p<.05.
-#' @family ssm functions
-#' @family visualization functions
-#' @export
 
 ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference", 
-  xy = TRUE, color = "red", linesize = 1.5, fontsize = 12) {
+  xy = TRUE, color = "red", linesize = 1.25, fontsize = 12) {
   
   param_names <- c(
     e = "Elevation",
@@ -168,7 +141,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     d = "Displacement"
   )
   
-  res <- .ssm_object$contrasts
+  res <- .ssm_object$results
   
   if (xy == FALSE) {
     res <- dplyr::select(res,
@@ -212,6 +185,67 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
   p
 }
 
+# Create an Empty Circular Plot
+circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
+  amax = 0.5, fontsize = 12) {
+  
+  ggplot2::ggplot() +
+    # Require plot to be square and remove default styling ---------------------
+  ggplot2::coord_fixed() +
+    ggplot2::theme_void(base_size = fontsize) +
+    # Expand the axes multiplicatively to fit labels ---------------------------
+  ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
+    ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
+    # Draw segments corresponding to displacement scale ------------------------
+  ggplot2::geom_segment(
+    aes(
+      x = 0,
+      y = 0,
+      xend = 5 * cos(angles * pi / 180),
+      yend = 5 * sin(angles * pi / 180)
+    ),
+    color = "gray60",
+    size = 0.5
+  ) +
+    # Draw circles corresponding to amplitude scale ----------------------------
+  ggforce::geom_circle(
+    aes(x0 = 0, y0 = 0, r = 1:4),
+    color = "gray60",
+    size = 0.5
+  ) +
+    ggforce::geom_circle(
+      aes(x0 = 0, y0 = 0, r = 5),
+      color = "gray50",
+      size = 1.5
+    ) +
+    # Draw labels for amplitude scale ------------------------------------------
+  ggplot2::geom_label(
+    aes(
+      x = c(2, 4),
+      y = 0,
+      label = sprintf("%.2f",
+        seq(from = 0, to = amax, length.out = 6)[c(3, 5)])
+    ),
+    color = "gray20",
+    label.size = NA,
+    size = fontsize / 2.8346438836889
+  ) +
+    # Draw labels for displacement scale ---------------------------------------
+  ggplot2::geom_label(
+    aes(
+      x = 5.1 * cos(angles * pi / 180),
+      y = 5.1 * sin(angles * pi / 180),
+      label = labels
+    ),
+    color = "gray20",
+    label.size = NA,
+    hjust = "outward",
+    vjust = "outward",
+    size = fontsize / 2.8346438836889
+  )
+  
+}
+
 # TODO: Finish function
 ssm_plot_curve <- function(.ssm_object) {
   scores <- .ssm_object$scores
@@ -230,9 +264,7 @@ ssm_plot_curve <- function(.ssm_object) {
 #' @param filename A string determining the filename to which the table should
 #'   be saved. If set to NULL, the table will be displayed but not saved
 #'   (default = NULL).
-#' @param type A string determining whether the table should contain the normal
-#'   SSM "results" or SSM "contrast" results (default = "results").
-#' @param caption A string to be displayed above the table (default = "").
+#' @param caption A string to be displayed above the table (default = NULL).
 #' @param xy A logical indicating whether the x-value and y-value parameters
 #'   should be included in the table as columns (default = TRUE).
 #' @return An HTML table containing SSM results or contrasts.
@@ -240,27 +272,22 @@ ssm_plot_curve <- function(.ssm_object) {
 #' @family table functions
 #' @export
 
-ssm_table <- function(.ssm_object, filename = NULL, type = "results",
-                      caption = dcaption(.ssm_object, type), xy = TRUE) {
+ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   
-  assert_that(is_provided(.ssm_object), is.string(caption), is.flag(xy))
-  assert_that(type %in% c("results", "contrasts"))
-  assert_that(is_html_fn(filename))
+  assert_that(is_provided(.ssm_object))
+  assert_that(is.null(filename) || is_html_fn(filename))
+  assert_that(is.null(caption) || is.string(caption))
+  assert_that(is.flag(xy))
   
-  if (type == "results") {
-    df <- .ssm_object$results
-    N = .ssm_object$details$n
-  } else if (type == "contrasts") {
-    df <- .ssm_object$contrasts
-    N = .ssm_object$details$n[[1]] # TODO: Replace w/pairwise deletion
-  } else {
-    return(NA)
+  df <- .ssm_object$results
+  N <- as.vector(.ssm_object$details$n) # TODO: Replace w/pairwise deletion
+
+  if (is.null(caption)) {
+    caption <- dcaption(.ssm_object)
   }
 
-  type_sym <- rlang::sym(.ssm_object$type)
-  
   df <- dplyr::transmute(df,
-    (!!type_sym) := label,
+    Label = label,
     N = N,
     Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
     `X-Value` = sprintf("%.2f [%.2f, %.2f]", x_est, x_lci, x_uci),
@@ -269,10 +296,12 @@ ssm_table <- function(.ssm_object, filename = NULL, type = "results",
     Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
     Fit = sprintf("%.3f", fit)
   )
+
+  colnames(df)[[1]] <- .ssm_object$details$results_type
   
   if (xy == TRUE) {
     align <- "llllll"
-  } else {
+  } else if (xy == FALSE) {
     df <- dplyr::select(df, -c(`X-Value`, `Y-Value`))
     align <- "llll"
   }
@@ -297,23 +326,18 @@ ssm_table <- function(.ssm_object, filename = NULL, type = "results",
 }
 
 # Build the default caption for the ssm_table function
-dcaption <- function(.ssm_object, type) {
-  if (.ssm_object$type == "Profile") {
-    basetype = "Mean"
-  } else if (.ssm_object$type == "Measure") {
-    basetype = "Correlation"
-  }
-  if (type == "results") {
+dcaption <- function(.ssm_object) {
+  if (.ssm_object$details$results_type == "Profile") {
     sprintf(
-      "%s-based Structural Summary Statistics with %s Confidence Intervals",
-      basetype, str_percent(.ssm_object$details$interval)
+      "%s-based Structural Summary Statistics with %s CIs",
+      .ssm_object$details$score_type,
+      str_percent(.ssm_object$details$interval)
     )
-  } else if (type == "contrasts") {
+  } else if (.ssm_object$details$results_type == "Contrast") {
     sprintf(
-      "%s-based Structural Summary Contrasts with %s Confidence Intervals", 
-      basetype, str_percent(.ssm_object$details$interval)
+      "%s-based Structural Summary Statistic Contrasts with %s CIs", 
+      .ssm_object$details$score_type,
+      str_percent(.ssm_object$details$interval)
     )
-  } else {
-    "error"
   }
 }
