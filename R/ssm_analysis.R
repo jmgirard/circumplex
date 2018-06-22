@@ -223,6 +223,13 @@ ssm_analyze_means <- function(.data, scales, angles, grouping,
 ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping, 
   contrast = "none", boots = 2000, interval = 0.95, call) {
 
+  if (is_provided(grouping)) {
+    message("Error: Grouping is not yet implemented for correlation-based", 
+      " analyses. This is a top priority that will be added soon. If these",
+      " analyses are urgently needed, the original ssm package can do this.")
+    return()
+  }
+  
   scales_en <- rlang::enquo(scales)
   measures_en <- rlang::enquo(measures)
   
