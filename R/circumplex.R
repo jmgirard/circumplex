@@ -9,8 +9,8 @@
 #' @name circumplex
 NULL
 
-#' @importFrom assertthat
-#'   are_equal assert_that is.count is.flag not_empty is.scalar is.string
+#' @importFrom assertthat are_equal assert_that is.count is.flag not_empty
+#'   is.scalar is.string is.number
 NULL
 
 #' @importFrom ggplot2 aes
