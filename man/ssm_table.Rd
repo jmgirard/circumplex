@@ -4,8 +4,7 @@
 \alias{ssm_table}
 \title{Create HTML table from SSM results or contrasts}
 \usage{
-ssm_table(.ssm_object, filename = NULL, type = "results",
-  caption = dcaption(.ssm_object, type), xy = TRUE)
+ssm_table(.ssm_object, filename = NULL, caption = NULL, xy = TRUE)
 }
 \arguments{
 \item{.ssm_object}{The output of \code{ssm_profiles()} or
@@ -15,10 +14,7 @@ ssm_table(.ssm_object, filename = NULL, type = "results",
 be saved. If set to NULL, the table will be displayed but not saved
 (default = NULL).}
 
-\item{type}{A string determining whether the table should contain the normal
-SSM "results" or SSM "contrast" results (default = "results").}
-
-\item{caption}{A string to be displayed above the table (default = "").}
+\item{caption}{A string to be displayed above the table (default = NULL).}
 
 \item{xy}{A logical indicating whether the x-value and y-value parameters
 should be included in the table as columns (default = TRUE).}

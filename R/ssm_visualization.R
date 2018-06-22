@@ -16,20 +16,17 @@
 #' @family visualization functions
 #' @export
 
-ssm_plot <- function(.ssm_object, type = "circle", fontsize = 12, ...) {
+ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
   
   # Check for valid input arguments
   assert_that(is_provided(.ssm_object))
-  assert_that(type %in% c("circle", "contrast"))
   assert_that(is.number(fontsize), fontsize > 0)
   
   # Forward to the appropriate subfunction
-  if (type == "circle") {
+  if (.ssm_object$details$results_type == "Profile") {
     ssm_plot_circle(.ssm_object, fontsize = fontsize, ...)
-  } else if (type == "contrast") {
+  } else if (.ssm_object$details$results_type == "Contrast") {
     ssm_plot_contrast(.ssm_object, fontsize = fontsize, ...)
-  } else {
-    return(NA)
   }
   
   # TODO: Add more explanation of the possible arguments in documentation.
@@ -52,13 +49,18 @@ ssm_plot <- function(.ssm_object, type = "circle", fontsize = 12, ...) {
 #'   the text labels (default = 12).
 #' @return A ggplot variable containing a completed circular plot.
 
-ssm_plot_circle <- function(.ssm_object, palette = "Set1",
-                        amax = pretty_max(.ssm_object$results$a_uci), 
-                        fontsize = 12) {
+ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
+  fontsize = 12) {
   
   df <- .ssm_object$results
   angles <- as.numeric(.ssm_object$details$angles)
 
+  assert_that(is.number(amax), amax > 0)
+  
+  if (is.null(amax)) {
+    amax <- pretty_max(.ssm_object$results$a_uci)
+  }
+  
   # Convert results to numbers usable by ggplot and ggforce -----------------
   df_plot <- df %>%
     dplyr::rowwise() %>%
@@ -91,12 +93,14 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1",
     ) +
     ggplot2::geom_point(
       data = df_plot,
-      aes(x = x_est, y = y_est, color = label),
-      size = 2
+      aes(x = x_est, y = y_est, fill = label),
+      color = "black",
+      shape = 21,
+      size = 3
     ) +
     ggplot2::guides(
-      color = ggplot2::guide_legend(.ssm_object$type),
-      fill = ggplot2::guide_legend(.ssm_object$type)
+      color = ggplot2::guide_legend(.ssm_object$details$results_type),
+      fill = ggplot2::guide_legend(.ssm_object$details$results_type)
     ) + 
     ggplot2::theme(
       legend.text = ggplot2::element_text(size = fontsize)
@@ -137,7 +141,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     d = "Displacement"
   )
   
-  res <- .ssm_object$contrasts
+  res <- .ssm_object$results
   
   if (xy == FALSE) {
     res <- dplyr::select(res,
@@ -260,9 +264,7 @@ ssm_plot_curve <- function(.ssm_object) {
 #' @param filename A string determining the filename to which the table should
 #'   be saved. If set to NULL, the table will be displayed but not saved
 #'   (default = NULL).
-#' @param type A string determining whether the table should contain the normal
-#'   SSM "results" or SSM "contrast" results (default = "results").
-#' @param caption A string to be displayed above the table (default = "").
+#' @param caption A string to be displayed above the table (default = NULL).
 #' @param xy A logical indicating whether the x-value and y-value parameters
 #'   should be included in the table as columns (default = TRUE).
 #' @return An HTML table containing SSM results or contrasts.
@@ -270,27 +272,22 @@ ssm_plot_curve <- function(.ssm_object) {
 #' @family table functions
 #' @export
 
-ssm_table <- function(.ssm_object, filename = NULL, type = "results",
-                      caption = dcaption(.ssm_object, type), xy = TRUE) {
+ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   
-  assert_that(is_provided(.ssm_object), is.string(caption), is.flag(xy))
-  assert_that(type %in% c("results", "contrasts"))
-  assert_that(is_html_fn(filename))
+  assert_that(is_provided(.ssm_object))
+  assert_that(is.null(filename) || is_html_fn(filename))
+  assert_that(is.null(caption) || is.string(caption))
+  assert_that(is.flag(xy))
   
-  if (type == "results") {
-    df <- .ssm_object$results
-    N = .ssm_object$details$n
-  } else if (type == "contrasts") {
-    df <- .ssm_object$contrasts
-    N = .ssm_object$details$n[[1]] # TODO: Replace w/pairwise deletion
-  } else {
-    return(NA)
+  df <- .ssm_object$results
+  N <- as.vector(.ssm_object$details$n) # TODO: Replace w/pairwise deletion
+
+  if (is.null(caption)) {
+    caption <- dcaption(.ssm_object)
   }
 
-  type_sym <- rlang::sym(.ssm_object$type)
-  
   df <- dplyr::transmute(df,
-    (!!type_sym) := label,
+    Label = label,
     N = N,
     Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
     `X-Value` = sprintf("%.2f [%.2f, %.2f]", x_est, x_lci, x_uci),
@@ -299,10 +296,12 @@ ssm_table <- function(.ssm_object, filename = NULL, type = "results",
     Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
     Fit = sprintf("%.3f", fit)
   )
+
+  colnames(df)[[1]] <- .ssm_object$details$results_type
   
   if (xy == TRUE) {
     align <- "llllll"
-  } else {
+  } else if (xy == FALSE) {
     df <- dplyr::select(df, -c(`X-Value`, `Y-Value`))
     align <- "llll"
   }
@@ -327,23 +326,18 @@ ssm_table <- function(.ssm_object, filename = NULL, type = "results",
 }
 
 # Build the default caption for the ssm_table function
-dcaption <- function(.ssm_object, type) {
-  if (.ssm_object$type == "Profile") {
-    basetype = "Mean"
-  } else if (.ssm_object$type == "Measure") {
-    basetype = "Correlation"
-  }
-  if (type == "results") {
+dcaption <- function(.ssm_object) {
+  if (.ssm_object$details$results_type == "Profile") {
     sprintf(
-      "%s-based Structural Summary Statistics with %s Confidence Intervals",
-      basetype, str_percent(.ssm_object$details$interval)
+      "%s-based Structural Summary Statistics with %s CIs",
+      .ssm_object$details$score_type,
+      str_percent(.ssm_object$details$interval)
     )
-  } else if (type == "contrasts") {
+  } else if (.ssm_object$details$results_type == "Contrast") {
     sprintf(
-      "%s-based Structural Summary Contrasts with %s Confidence Intervals", 
-      basetype, str_percent(.ssm_object$details$interval)
+      "%s-based Structural Summary Statistic Contrasts with %s CIs", 
+      .ssm_object$details$score_type,
+      str_percent(.ssm_object$details$interval)
     )
-  } else {
-    "error"
   }
 }

@@ -81,10 +81,9 @@ ssm <- function(x, ...) {
 }
 
 # Constructor function
-new_ssm <- function(results, contrasts, details, call, ...) {
+new_ssm <- function(results, details, call, ...) {
   new_s3_scalar(
     results = results,
-    contrasts = contrasts,
     details = details,
     call = call,
     ...,
@@ -94,15 +93,14 @@ new_ssm <- function(results, contrasts, details, call, ...) {
 
 #  Print method for objects of ssm class
 #' @export
-print.ssm <- function(x, ...) {
+print.ssm <- function(.ssm_object, ...) {
   # Print function call
-  cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
-    "\n",
-    sep = ""
-  )
+  cat("\nCall:\n",
+    paste(deparse(.ssm_object$call), sep = "\n", collapse = "\n"),
+    "\n", sep = "")
   # Print each result as a block
-  for (i in 1:nrow(x$results)) {
-    dat <- x$results[i, ]
+  for (i in 1:nrow(.ssm_object$results)) {
+    dat <- .ssm_object$results[i, ]
     v <- c(
       dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
       dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
@@ -114,29 +112,8 @@ print.ssm <- function(x, ...) {
       "Amplitude", "Displacement", "Model Fit"
     )
     colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
-    cat("\n", x$type, " [", dat$label, "]:\n", sep = "")
-    print.default(m, print.gap = 3L, na.print = "")
-  }
-  # Return if there are no contrasts
-  if (is.null(x$contrasts)) {
-    cat("\n")
-    return()
-  }
-  # Print each contrast as a block
-  for (i in 1:nrow(x$contrasts)) {
-    dat <- x$contrasts[i, ]
-    v <- c(
-      dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
-      dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
-      dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
-    )
-    m <- round(matrix(v, nrow = 6, ncol = 3), 3)
-    rownames(m) <- c(
-      "Elevation", "X-Value", "Y-Value",
-      "Amplitude", "Displacement", "Model Fit"
-    )
-    colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
-    cat("\nContrast [", dat$label, "]:\n", sep = "")
+    cat("\n", .ssm_object$details$results_type, " [", dat$label, "]:\n",
+      sep = "")
     print.default(m, print.gap = 3L, na.print = "")
   }
   cat("\n")

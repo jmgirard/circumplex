@@ -55,7 +55,7 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
   if (is_provided(measures)) {
     measures_en <- rlang::enquo(measures)
     if (is_provided(grouping)) {
-      #Type 1: Multiple group correlations
+      # Multiple group correlations
       grouping_en <- rlang::enquo(grouping)
       ssm_analyze_corrs(.data,
         scales = !!scales_en, 
@@ -67,7 +67,7 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
         interval = interval,
         call = call)
     } else {
-      # Type 2: Single group correlations
+      # Single group correlations
       ssm_analyze_corrs(.data,
         scales = !!scales_en,
         angles = angles, 
@@ -79,7 +79,7 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
     }
   } else {
     if (is_provided(grouping)) {
-      # Type 3: Multiple group means
+      # Multiple group means
       grouping_en <- rlang::enquo(grouping)
       ssm_analyze_means(.data,
         scales = !!scales_en,
@@ -90,7 +90,7 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
         interval = interval,
         call = call)
     } else {
-      # Type 4: Single group means
+      # Single group means
       if (contrasts != "none") {
         message(c("Error: Without specifying measures or grouping, no ", 
           "contrasts are possible.\n\n  Hint: Set contrasts = 'none' or add ", 
@@ -113,7 +113,6 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
 ssm_analyze_means <- function(.data, scales, angles, grouping,
   contrasts = "none", boots = 2000, interval = 0.95, call) {
 
-  print(is_provided(grouping))
   scales_en <- rlang::enquo(scales)
 
   # Convert angles from degrees to radians
@@ -178,40 +177,36 @@ ssm_analyze_means <- function(.data, scales, angles, grouping,
     strata = bs_input$Group
   )
 
-  # Label results
-  row_labels <- levels(bs_input$Group)
-  if (contrasts != "none") {
-    row_labels <- c(row_labels, sprintf(
-      "%s - %s", row_labels[2], row_labels[1]
-    ))
-  }
-  results <- bs_output %>%
-    dplyr::mutate(label = row_labels)
-
-  # Separate results and contrasts
-  if (contrasts != "none") {
-    contrasts_out <- results[nrow(results), ]
-    results <- results[1:(nrow(results) - 1), ]
+  # Select and label results
+  group_levels <- levels(bs_input$Group)
+  if (contrasts == "none") {
+    row_data <- bs_output
+    row_labels <- group_levels
+    analysis_n <- group_counts(bs_input)
   } else {
-    contrasts_out <- NULL
+    row_data <- bs_output[nrow(bs_output), ]
+    row_labels <- sprintf("%s - %s", group_levels[[2]], group_levels[[1]])
+    analysis_n <- sum(group_counts(bs_input))
   }
+  results <- row_data %>%
+    dplyr::mutate(label = row_labels)
 
   # Collect analysis details
   details <- list(
-    n = group_counts(bs_input),
+    n = analysis_n,
     boots = boots,
     interval = interval,
-    angles = as_degree(angles)
+    angles = as_degree(angles),
+    score_type = "Mean",
+    results_type = dplyr::if_else(contrasts == "none", "Profile", "Contrast")
   )
 
   # Create output ssm object
   out <- new_ssm(
     results = results,
-    contrasts = contrasts_out,
     scores = scores,
     call = call,
-    details = details,
-    type = "means"
+    details = details
   )
 
   out
@@ -266,41 +261,35 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
     interval = interval,
     contrasts = contrasts
   )
-
-  # Label results
-  row_labels <- names(dplyr::select(.data, !!measures_en))
-  if (contrasts != "none") {
-    row_labels <- c(row_labels, sprintf(
-      "%s - %s", row_labels[2], row_labels[1]
-    ))
-  }
-  results <- bs_output %>%
-    dplyr::mutate(label = row_labels)
-
-  # Separate main results and contrast results
-  if (contrasts != "none") {
-    contrasts_out <- results[nrow(results), ]
-    results <- results[1:(nrow(results) - 1), ]
+  
+  # Select and label results
+  measure_names <- names(dplyr::select(.data, !!measures_en))
+  if (contrasts == "none") {
+    row_data <- bs_output
+    row_labels <- measure_names
   } else {
-    contrasts_out <- NULL
+    row_data <- bs_output[nrow(bs_output), ]
+    row_labels <- sprintf("%s - %s", measure_names[[2]], measure_names[[1]])
   }
+  results <- row_data %>%
+    dplyr::mutate(label = row_labels)
 
   # Collect analysis details
   details <- list(
     n = rep(nrow(bs_input), nrow(scores)), # TODO: Replace w/pairwise deletion
     boots = boots,
     interval = interval,
-    angles = as_degree(angles)
+    angles = as_degree(angles),
+    score_type = "Correlation",
+    results_type = dplyr::if_else(contrasts == "none", "Profile", "Contrast")
   )
 
   # Create output ssm object
   out <- new_ssm(
     results = results,
-    contrasts = contrasts_out,
     scores = scores,
     call = call,
-    details = details,
-    type = "corrs"
+    details = details
   )
 
   out
