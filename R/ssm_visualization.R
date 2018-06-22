@@ -55,7 +55,7 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
   df <- .ssm_object$results
   angles <- as.numeric(.ssm_object$details$angles)
 
-  assert_that(is.number(amax), amax > 0)
+  assert_that(is.null(amax) || is.number(amax))
   
   if (is.null(amax)) {
     amax <- pretty_max(.ssm_object$results$a_uci)
@@ -131,7 +131,7 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
 #'   parameter. An interval that does not contain the value of zero has p<.05.
 
 ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference", 
-  xy = TRUE, color = "red", linesize = 1.5, fontsize = 12) {
+  xy = TRUE, color = "red", linesize = 1.25, fontsize = 12) {
   
   param_names <- c(
     e = "Elevation",
