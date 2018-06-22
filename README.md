@@ -25,34 +25,34 @@ Calculate mean-based SSM parameters for a single group/sample
 
 ``` r
 data("aw2009")
-results <- ssm_profiles(.data = aw2009, scales = PA:NO, angles = octants())
-ssm_plot_circle(results)
+results <- ssm_analzye(aw2009, PA:NO, octants())
+ssm_plot(results, type = "circle")
 ```
 
 Calculate mean-based SSM parameters for multiple groups/samples
 
 ``` r
 data("jz2017")
-jz2017s <- standardize(.data = jz2017, scales = PA:NO)
-results <- ssm_profiles(.data = jz2017s, scales = PA:NO, angles = octants(), grouping = Gender)
-ssm_plot_circle(results)
+jz2017s <- standardize(jz2017, PA:NO)
+results <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
+ssm_plot(results, type = "circle")
 ```
 
 Calculate correlation-based SSM parameters for multiple measures
 
 ``` r
 data("jz2017")
-results <- ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(), measures = PARPD:AVPD)
-ssm_plot_circle(results)
+results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD))
+ssm_plot(results, type = "circle")
 ```
 
 Constrast correlation-based SSM parameters for two measures
 
 ``` r
 data("jz2017")
-results <- ssm_measures(.data = jz2017, scales = PA:NO, angles = octants(),
-  measures = c(NARPD, ASPD), contrast = "test")
-ssm_plot_contrast(results)
+results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD),
+  contrasts = "test")
+ssm_plot(results, "contrast")
 ```
 
 ## Examples of verbose and abbreviated syntax
@@ -63,15 +63,14 @@ Verbose call with variable names
 data("jz2017")
 jz2017s <- standardize(
   .data = jz2017,
-  variables = c(PA, BC, DE, FG, HI, JK, LM, NO)
+  .vars = c(PA, BC, DE, FG, HI, JK, LM, NO)
 )
-ssm_profiles(
+ssm_analyze(
   .data = jz2017s,
   scales = c(PA, BC, DE, FG, HI, JK, LM, NO),
   angles = c(90, 135, 180, 225, 270, 315, 360, 45),
   grouping = Gender,
-  contrast = "none",
-  table = TRUE,
+  contrasts = "none",
   boots = 2000,
   interval = 0.95
 )
@@ -83,15 +82,14 @@ Verbose call with column numbers
 data("jz2017")
 jz2017s <- standardize(
   .data = jz2017,
-  variables = c(2, 3, 4, 5, 6, 7, 8, 9)
+  .vars = c(2, 3, 4, 5, 6, 7, 8, 9)
 )
-ssm_profiles(
+ssm_analyze(
   .data = jz2017s,
   scales = c(2, 3, 4, 5, 6, 7, 8, 9),
   angles = c(90, 135, 180, 225, 270, 315, 360, 45),
   grouping = 1,
-  contrast = "none",
-  table = TRUE,
+  contrasts = "none",
   boots = 2000,
   interval = 0.95
 )
@@ -102,13 +100,13 @@ Abbreviated call with variable names and defaults
 ``` r
 data("jz2017")
 jz2017s <- standardize(jz2017, PA:NO)
-ssm_profiles(jz2017s, PA:NO, octants(), Gender)
+ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
 ```
 
 Abbreviated call with column numbers and defaults
 
 ``` r
-data("jz2017") # Load example dataset
+data("jz2017")
 jz2017s <- standardize(jz2017, 2:9)
-ssm_profiles(jz2017s, 2:9, octants(), 1)
+ssm_analyze(jz2017s, 2:9, octants(), grouping = 1)
 ```
