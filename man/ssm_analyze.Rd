@@ -4,7 +4,7 @@
 \alias{ssm_analyze}
 \title{Perform analyses using the Structural Summary Method}
 \usage{
-ssm_analyze(.data, scales, angles, measures, grouping, contrast = "none",
+ssm_analyze(.data, scales, angles, measures, grouping, contrasts = "none",
   boots = 2000, interval = 0.95)
 }
 \arguments{
@@ -25,7 +25,7 @@ circumplex scales using mean-based analyses, simply omit this argument.}
 in \code{.data} that indicates the group membership of each observation. To
 analyze all observations in a single group, simply omit this argument.}
 
-\item{contrast}{Optional. A string indicating what type of contrast to run.
+\item{contrasts}{Optional. A string indicating what type of contrast to run.
 Current options are "none" for no contrasts, "model" to find SSM parameters
 for the difference scores, or "test" to find the difference between the SSM
 parameters (default = "none").}
@@ -40,14 +40,13 @@ intevals (default = 0.95).}
 }
 \value{
 A list containing the results and description of the analysis.
-\item{results}{A tibble with the SSM parameter estimates for each group}
-\item{contrasts}{A tibble with the SSM parameter contrasts}
-\item{details}{A list with the sample size for each results row (n), the
-number of bootstrap resamples (boots), the confidence interval percentage
-level (interval), and the angular displacement of scales (angles)}
-\item{call}{A language object containing the function call that created
-this object} \item{scores}{A tibble containing the mean scale scores}
-\item{type}{A string indicating what type of SSM analysis was done}
+\item{results}{A tibble with the SSM parameter estimates} \item{details}{A
+list with the sample size for each results row (n), the number of bootstrap
+resamples (boots), the confidence interval percentage level (interval), and
+the angular displacement of scales (angles)} \item{call}{A language object
+containing the function call that created this object} \item{scores}{A
+tibble containing the mean scale scores} \item{type}{A string indicating
+what type of SSM analysis was done}
 }
 \description{
 Calculate SSM parameters with bootstrapped confidence intervals for a variety
