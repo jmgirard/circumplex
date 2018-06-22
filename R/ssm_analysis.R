@@ -49,6 +49,8 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
   assert_that(is.numeric(angles), contrast %in% c("none", "test", "model"))
   assert_that(is.count(boots), is.number(interval), interval > 0, interval < 1)
   
+  call = match.call()
+  
   # Forward to the appropriate subfunction
   scales_en <- rlang::enquo(scales)
   if (is_provided(measures)) {
@@ -63,7 +65,8 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
         grouping = !!grouping_en,
         contrast = contrast, 
         boots = boots,
-        interval = interval)
+        interval = interval,
+        call = call)
     } else {
       # Type 2: Single group correlations
       ssm_analyze_corrs(.data,
@@ -72,7 +75,8 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
         measures = !!measures_en,
         contrast = contrast,
         boots = boots,
-        interval = interval)
+        interval = interval,
+        call = call)
     }
   } else {
     if (is_provided(grouping)) {
@@ -84,14 +88,16 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
         grouping = !!grouping_en,
         contrast = contrast,
         boots = boots,
-        interval = interval)
+        interval = interval,
+        call = call)
     } else {
       # Type 4: Single group means
       ssm_analyze_means(.data,
         scales = !!scales_en,
         angles = angles,
         boots = boots,
-        interval = interval)
+        interval = interval,
+        call = call)
     }
   }
 }
@@ -100,7 +106,7 @@ ssm_analyze <- function(.data, scales, angles, measures, grouping,
 # Perform analyses using the mean-based Structural Summary Method --------------
 
 ssm_analyze_means <- function(.data, scales, angles, grouping,
-  contrast = "none", boots = 2000, interval = 0.95) {
+  contrast = "none", boots = 2000, interval = 0.95, call) {
 
   print(is_provided(grouping))
   scales_en <- rlang::enquo(scales)
@@ -204,19 +210,18 @@ ssm_analyze_means <- function(.data, scales, angles, grouping,
     results = results,
     contrasts = contrasts,
     scores = scores,
-    call = match.call(),
+    call = call,
     details = details,
     type = "means"
   )
 
-  print(out)
   out
 }
 
 # Perform analyses using the correlation-based SSM -----------------------------
 
 ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping, 
-  contrast = "none", boots = 2000, interval = 0.95) {
+  contrast = "none", boots = 2000, interval = 0.95, call) {
 
   scales_en <- rlang::enquo(scales)
   measures_en <- rlang::enquo(measures)
@@ -287,11 +292,10 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
     results = results,
     contrasts = contrasts,
     scores = scores,
-    call = match.call(),
+    call = call,
     details = details,
     type = "corrs"
   )
 
-  print(out)
   out
 }
