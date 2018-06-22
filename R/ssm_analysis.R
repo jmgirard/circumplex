@@ -274,9 +274,15 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
   results <- row_data %>%
     dplyr::mutate(label = row_labels)
 
+  if (contrasts == "none") {
+    analysis_n <- rep(nrow(bs_input), nrow(scores))
+  } else {
+    analysis_n <- nrow(bs_input) # TODO: Replace with pairwise deletion
+  }
+  
   # Collect analysis details
   details <- list(
-    n = rep(nrow(bs_input), nrow(scores)), # TODO: Replace w/pairwise deletion
+    n = analysis_n,
     boots = boots,
     interval = interval,
     angles = as_degree(angles),
