@@ -26,7 +26,8 @@ Calculate mean-based SSM parameters for a single group/sample
 ``` r
 data("aw2009")
 results <- ssm_analzye(aw2009, PA:NO, octants())
-ssm_plot(results, type = "circle")
+ssm_table(results)
+ssm_plot(results)
 ```
 
 Calculate mean-based SSM parameters for multiple groups/samples
@@ -35,7 +36,8 @@ Calculate mean-based SSM parameters for multiple groups/samples
 data("jz2017")
 jz2017s <- standardize(jz2017, PA:NO)
 results <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
-ssm_plot(results, type = "circle")
+ssm_table(results)
+ssm_plot(results)
 ```
 
 Calculate correlation-based SSM parameters for multiple measures
@@ -43,7 +45,8 @@ Calculate correlation-based SSM parameters for multiple measures
 ``` r
 data("jz2017")
 results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD))
-ssm_plot(results, type = "circle")
+ssm_table(results)
+ssm_plot(results)
 ```
 
 Constrast correlation-based SSM parameters for two measures
@@ -52,7 +55,8 @@ Constrast correlation-based SSM parameters for two measures
 data("jz2017")
 results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD),
   contrasts = "test")
-ssm_plot(results, "contrast")
+ssm_table(results)
+ssm_plot(results)
 ```
 
 ## Examples of verbose and abbreviated syntax
