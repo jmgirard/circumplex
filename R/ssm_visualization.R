@@ -296,6 +296,8 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
     Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
     Fit = sprintf("%.3f", fit)
   )
+  
+  # TODO: If contrasts, add Delta to column names
 
   colnames(df)[[1]] <- .ssm_object$details$results_type
   
