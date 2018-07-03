@@ -289,10 +289,12 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   
   df <- .ssm_object$results
 
+  # Create default caption
   if (is.null(caption)) {
     caption <- dcaption(.ssm_object)
   }
 
+  # Format output data
   df <- dplyr::transmute(df,
     Label = label,
     Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
@@ -303,14 +305,24 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
     Fit = sprintf("%.3f", fit)
   )
   
-  # TODO: If contrasts, add Delta to column names
-
+  # Rename first column
   colnames(df)[[1]] <- .ssm_object$details$results_type
   
+  # Add delta symbol to column names if results are contrasts
+  if (.ssm_object$details$results_type == "Contrast") {
+    colnames(df)[[2]] <- "&#8710 Elevation"
+    colnames(df)[[3]] <- "&#8710 X-Value"
+    colnames(df)[[4]] <- "&#8710 Y-Value"
+    colnames(df)[[5]] <- "&#8710 Amplitude"
+    colnames(df)[[6]] <- "&#8710 Displacement"
+    colnames(df)[[7]] <- "&#8710 Fit"
+  }
+
+  # Drop the x and y columns if requested
   if (xy == TRUE) {
     align <- "lllll"
   } else if (xy == FALSE) {
-    df <- dplyr::select(df, -c(`X-Value`, `Y-Value`))
+    df <- dplyr::select(df, -c(3, 4))
     align <- "lll"
   }
   
