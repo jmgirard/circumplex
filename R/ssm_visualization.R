@@ -47,10 +47,12 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'   labels are drawn.
 #' @param fontsize A positive real number corresponding to the size (in pt) of
 #'   the text labels (default = 12).
+#' @param lowfit A logical determining whether profiles with low model fit
+#'   (<.70) should be plotted (default = FALSE).
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
-  fontsize = 12) {
+  fontsize = 12, lowfit = FALSE) {
   
   df <- .ssm_object$results
   angles <- as.numeric(.ssm_object$details$angles)
@@ -75,6 +77,12 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
     dplyr::ungroup() %>%
     dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
 
+  # Remove profiles with low model fit (unless over-rided) ------------------
+  if (lowfit == FALSE) {
+    df_plot <- df_plot %>% 
+      dplyr::filter(fit >= .70)
+  }
+  
   # Initialize and configure the circle plot --------------------------------
   p <- circle_base(angles = angles, amax = amax, fontsize = fontsize) +
     ggplot2::scale_color_brewer(palette = palette) +
@@ -280,7 +288,6 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   assert_that(is.flag(xy))
   
   df <- .ssm_object$results
-  N <- as.vector(.ssm_object$details$n) # TODO: Replace w/pairwise deletion
 
   if (is.null(caption)) {
     caption <- dcaption(.ssm_object)
@@ -288,7 +295,6 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
 
   df <- dplyr::transmute(df,
     Label = label,
-    N = N,
     Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
     `X-Value` = sprintf("%.2f [%.2f, %.2f]", x_est, x_lci, x_uci),
     `Y-Value` = sprintf("%.2f [%.2f, %.2f]", y_est, y_lci, y_uci),
@@ -302,10 +308,10 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   colnames(df)[[1]] <- .ssm_object$details$results_type
   
   if (xy == TRUE) {
-    align <- "llllll"
+    align <- "lllll"
   } else if (xy == FALSE) {
     df <- dplyr::select(df, -c(`X-Value`, `Y-Value`))
-    align <- "llll"
+    align <- "lll"
   }
   
   t <- htmlTable::htmlTable(df,
