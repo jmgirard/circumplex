@@ -83,14 +83,22 @@ arma::mat group_scores(NumericMatrix X, NumericVector T) {
     arma::rowvec colmeans = col_means(sub);
     out.row(i) = colmeans;
   }
-  return out;
+  return(out);
 }
 
-double pearson_r(arma::vec x, arma::vec y) {
-  double n = x.size();
-  double numerator = inner(x, y) - n * mean(x) * mean(y);
-  double denomenator = (n - 1) * stddev(x) * stddev(y);
-  return numerator / denomenator;
+// Calculate the correlation of x and y vectors after pairwise deletion
+double pairwise_r(arma::vec x, arma::vec y) {
+  // Pairwise deletion
+  int n = x.n_rows;
+  arma::vec idx = arma::ones<arma::vec>(n);
+  for (int i = 0; i < n; i++) {
+    if (!arma::is_finite(x[i]) || !arma::is_finite(y[i])) idx[i] = 0;
+  }
+  arma::vec x2 = x.rows(find(idx == 1));
+  arma::vec y2 = y.rows(find(idx == 1));
+  // Calculation
+  arma::mat r = arma::cor(x2, y2);
+  return r(0, 0);
 }
 
 // [[Rcpp::export]]
@@ -100,7 +108,7 @@ arma::mat measure_scores(NumericMatrix scales, NumericMatrix measures) {
   arma::mat out(k, m);
   for (int i(0); i < k; i++) {
     for (int j(0); j < m; j++) {
-      out(i, j) = pearson_r(measures(_, i), scales(_, j));
+      out(i, j) = pairwise_r(measures(_, i), scales(_, j));
     }
   }
   return out;

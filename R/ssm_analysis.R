@@ -139,7 +139,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping,
   }
 
   # Check that scales are standardized
-  extrema <- .data %>%
+  extrema <- bs_input %>%
     dplyr::select(!!scales_en) %>%
     abs() %>%
     max()
@@ -232,8 +232,7 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
 
   # Select circumplex scales and measure variables
   bs_input <- .data %>%
-    dplyr::select(!!scales_en, !!measures_en) %>%
-    tidyr::drop_na() # TODO: Replace w/pairwise deletion
+    dplyr::select(!!scales_en, !!measures_en)
 
   # Calculate observed scores
   cs <- as.matrix(bs_input[, 1:length(angles)])
