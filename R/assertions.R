@@ -1,10 +1,16 @@
 # Check if argument is provided to function
-is_provided <- function(x) {
-  base::missing(x) == FALSE
+is_provided <- function(enq) {
+  if (rlang::quo_is_missing(enq)) {
+    FALSE
+  } else if (rlang::quo_is_null(enq)) {
+    FALSE
+  } else {
+    TRUE
+  }
 }
 
 assertthat::on_failure(is_provided) <- function(call, env) {
-  paste0("The '", deparse(call$x), "' parameter must be provided.")
+  paste0("The '", deparse(call$x), "' parameter must be provided and not NULL.")
 }
 
 # Check if filename is a string with correct extension

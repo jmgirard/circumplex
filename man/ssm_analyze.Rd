@@ -4,8 +4,8 @@
 \alias{ssm_analyze}
 \title{Perform analyses using the Structural Summary Method}
 \usage{
-ssm_analyze(.data, scales, angles, measures, grouping, contrasts = "none",
-  boots = 2000, interval = 0.95)
+ssm_analyze(.data, scales, angles, measures = NULL, grouping = NULL,
+  contrasts = "none", boots = 2000, interval = 0.95)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -19,11 +19,13 @@ of each circumplex scale included in \code{scales} (in degrees).}
 \item{measures}{Optional. The variable names or column numbers for one or
 more variables in \code{.data} to be correlated with the circumplex scales
 and analyzed using correlation-based SSM analyses. To analyze the
-circumplex scales using mean-based analyses, simply omit this argument.}
+circumplex scales using mean-based analyses, simply omit this argument or
+set it to NULL (default = NULL).}
 
 \item{grouping}{Optional. The variable name or column number for the variable
 in \code{.data} that indicates the group membership of each observation. To
-analyze all observations in a single group, simply omit this argument.}
+analyze all observations in a single group, simply omit this argument or
+set it to NULL (default = NULL).}
 
 \item{contrasts}{Optional. A string indicating what type of contrast to run.
 Current options are "none" for no contrasts, "model" to find SSM parameters
