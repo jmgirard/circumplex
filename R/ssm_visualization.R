@@ -283,7 +283,7 @@ ssm_plot_curve <- function(.ssm_object) {
 ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   
   assert_that(is_provided(.ssm_object))
-  assert_that(is.null(filename) || is_html_fn(filename))
+  assert_that(is.null(filename) || is.string(filename))
   assert_that(is.null(caption) || is.string(caption))
   assert_that(is.flag(xy))
   
