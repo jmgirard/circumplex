@@ -1,10 +1,24 @@
-# Check if argument is provided to function
-is_provided <- function(enq) {
-  if (rlang::quo_is_missing(enq)) {
+# Check if a valid argument was provided ---------------------------------------
+is_provided <- function(x) {
+  if (missing(x)) {
+    # If missing, then FALSE
     FALSE
-  } else if (rlang::quo_is_null(enq)) {
+  } else if (rlang::is_null(x)) {
+    # If null, then FALSE
     FALSE
+  } else if (rlang::is_quosure(x)) {
+    if (rlang::quo_is_missing(x)) {
+      # If quosure but missing, then FALSE
+      FALSE
+    } else if (rlang::quo_is_null(x)) {
+      # If quosure but null, then FALSE
+      FALSE
+    } else {
+      # If quosure but not missing or null, then TRUE
+      TRUE
+    }
   } else {
+    # If not missing, null, or quosure, then TRUE
     TRUE
   }
 }

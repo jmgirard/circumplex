@@ -51,14 +51,14 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
   assert_that(is.count(boots), is.number(interval), interval > 0, interval < 1)
   
   call = match.call()
+  scales_en <- rlang::enquo(scales)
+  measures_en <- rlang::enquo(measures)
+  grouping_en <- rlang::enquo(grouping)
   
   # Forward to the appropriate subfunction
-  scales_en <- rlang::enquo(scales)
   if (is_provided(measures)) {
-    measures_en <- rlang::enquo(measures)
     if (is_provided(grouping)) {
       # Multiple group correlations
-      grouping_en <- rlang::enquo(grouping)
       ssm_analyze_corrs(.data,
         scales = !!scales_en, 
         angles = angles, 
