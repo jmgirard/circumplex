@@ -15,8 +15,7 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   # Reshape parameters from wide to long format --------------------------------
   reshape_params <- function(df) {
     df %>%
-      matrix(nrow = 6) %>%
-      t() %>%
+      matrix(ncol = 6, byrow = TRUE) %>%
       tibble::as_tibble()
   }
 
