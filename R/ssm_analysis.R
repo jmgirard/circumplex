@@ -135,7 +135,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
       dplyr::select(!!scales_en, Group = !!grouping_en) %>%
       dplyr::mutate(Group = factor(Group))
     # Check if more than one contrast is possible
-    if (nlevels(bs_input$Group) > 2 && contrasts != "none") {
+    if (contrasts != "none" && nlevels(bs_input$Group) > 2) {
       message(c("WARNING: Currently, only one contrast is possible at a time. ",
         "With more than two levels of the grouping variable, only the first ",
         "two levels will be compared."))
