@@ -19,8 +19,9 @@ NULL
 #' @keywords internal
 #' @export
 #' @importFrom ggplot2 ggsave
-#' @usage ggsave(filename, width = NA, height = NA, units = c("in", "cm", "mm"),
-#'   dpi = 300, ...)
+#' @usage ggsave(filename, plot = last_plot(), device = NULL, path = NULL, scale
+#'   = 1, width = NA, height = NA, units = c("in", "cm", "mm"), dpi = 300,
+#'   limitsize = TRUE, ...)
 NULL
 
 #' Angular displacements for octant circumplex scales

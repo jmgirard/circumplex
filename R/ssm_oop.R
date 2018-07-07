@@ -88,14 +88,14 @@ new_ssm <- function(results, details, call, ...) {
 
 #  Print method for objects of ssm class
 #' @export
-print.ssm <- function(.ssm_object, ...) {
+print.ssm <- function(x, ...) {
   # Print function call
   cat("\nCall:\n",
-    paste(deparse(.ssm_object$call), sep = "\n", collapse = "\n"),
+    paste(deparse(x$call), sep = "\n", collapse = "\n"),
     "\n", sep = "")
   # Print each result as a block
-  for (i in 1:nrow(.ssm_object$results)) {
-    dat <- .ssm_object$results[i, ]
+  for (i in 1:nrow(x$results)) {
+    dat <- x$results[i, ]
     v <- c(
       dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
       dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
@@ -107,7 +107,7 @@ print.ssm <- function(.ssm_object, ...) {
       "Amplitude", "Displacement", "Model Fit"
     )
     colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
-    cat("\n", .ssm_object$details$results_type, " [", dat$label, "]:\n",
+    cat("\n", x$details$results_type, " [", dat$label, "]:\n",
       sep = "")
     print.default(m, print.gap = 3L, na.print = "")
   }

@@ -13,11 +13,6 @@ ssm_plot(.ssm_object, fontsize = 12, ...)
 of text in the figure, in points (default = 12).}
 
 \item{...}{Additional arguments to pass on to the plotting function.}
-
-\item{type}{Optional. A string indicating what type of figure to create.
-Options currently include "circle" for a circular plot of each row's
-estimated position in the circumplex space and "contrast" for a plot of the
-estimated difference between SSM parameters (default = "circle").}
 }
 \value{
 A ggplot2 object representing the figure

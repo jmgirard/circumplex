@@ -3,10 +3,6 @@
 #' Take in the results of an SSM analysis function and create figure from it.
 #'
 #' @param .ssm_object Required. The results output of \code{\link{ssm_analyze}}.
-#' @param type Optional. A string indicating what type of figure to create.
-#'   Options currently include "circle" for a circular plot of each row's
-#'   estimated position in the circumplex space and "contrast" for a plot of the
-#'   estimated difference between SSM parameters (default = "circle").
 #' @param fontsize Optional. A single positive number indicating the font size
 #'   of text in the figure, in points (default = 12).
 #' @param ... Additional arguments to pass on to the plotting function.

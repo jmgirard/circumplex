@@ -4,8 +4,9 @@
 \alias{ggsave}
 \title{Save a ggplot with sensible defaults}
 \usage{
-ggsave(filename, width = NA, height = NA, units = c("in", "cm", "mm"),
-  dpi = 300, ...)
+ggsave(filename, plot = last_plot(), device = NULL, path = NULL, scale
+  = 1, width = NA, height = NA, units = c("in", "cm", "mm"), dpi = 300,
+  limitsize = TRUE, ...)
 }
 \description{
 See \code{ggplot2} for details.
