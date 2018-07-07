@@ -1,26 +1,7 @@
-# Check if a valid argument was provided ---------------------------------------
+# Check if an argument was provided and is not null ----------------------------
 is_provided <- function(x) {
-  if (missing(x)) {
-    # If missing, then FALSE
-    FALSE
-  } else if (rlang::is_null(x)) {
-    # If null, then FALSE
-    FALSE
-  } else if (rlang::is_quosure(x)) {
-    if (rlang::quo_is_missing(x)) {
-      # If quosure but missing, then FALSE
-      FALSE
-    } else if (rlang::quo_is_null(x)) {
-      # If quosure but null, then FALSE
-      FALSE
-    } else {
-      # If quosure but not missing or null, then TRUE
-      TRUE
-    }
-  } else {
-    # If not missing, null, or quosure, then TRUE
-    TRUE
-  }
+  xq <- rlang::enquo(x)
+  !rlang::quo_is_missing(xq) && !rlang::quo_is_null(xq)
 }
 
 assertthat::on_failure(is_provided) <- function(call, env) {

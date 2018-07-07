@@ -30,6 +30,9 @@
 #' @param interval Optional. A single positive number between 0 and 1 that
 #'   indicates what confidence level to use when estimating the confidence
 #'   intevals (default = 0.95).
+#' @param missing Optional. A string indicating the procedure for handling
+#'   missing values. Current options are "listwise" for listwise deletion or
+#'   "pairwise" for pairwise deletion (default = "listwise").
 #' @return A list containing the results and description of the analysis.
 #'   \item{results}{A tibble with the SSM parameter estimates} \item{details}{A
 #'   list with the sample size for each results row (n), the number of bootstrap
@@ -43,21 +46,24 @@
 #' @export
 
 ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
-  contrasts = "none", boots = 2000, interval = 0.95) {
+  contrasts = "none", boots = 2000, interval = 0.95, missing = "listwise") {
 
+  call = match.call()
+  
   # Check for valid input arguments
   assert_that(is_provided(.data), is_provided(scales), is_provided(angles))
   assert_that(is.numeric(angles), contrasts %in% c("none", "test", "model"))
   assert_that(is.count(boots), is.number(interval), interval > 0, interval < 1)
+  assert_that(missing %in% c("listwise", "pairwise"))
   
-  call = match.call()
+  # Enable tidy evaluation
   scales_en <- rlang::enquo(scales)
   measures_en <- rlang::enquo(measures)
   grouping_en <- rlang::enquo(grouping)
   
   # Forward to the appropriate subfunction
-  if (is_provided(measures)) {
-    if (is_provided(grouping)) {
+  if (is_provided(!!measures_en)) {
+    if (is_provided(!!grouping_en)) {
       # Multiple group correlations
       ssm_analyze_corrs(.data,
         scales = !!scales_en, 
@@ -67,6 +73,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         contrasts = contrasts, 
         boots = boots,
         interval = interval,
+        missing = missing,
         call = call)
     } else {
       # Single group correlations
@@ -77,12 +84,12 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         contrasts = contrasts,
         boots = boots,
         interval = interval,
+        missing = missing,
         call = call)
     }
   } else {
-    if (is_provided(grouping)) {
+    if (is_provided(!!grouping_en)) {
       # Multiple group means
-      grouping_en <- rlang::enquo(grouping)
       ssm_analyze_means(.data,
         scales = !!scales_en,
         angles = angles,
@@ -90,20 +97,21 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         contrasts = contrasts,
         boots = boots,
         interval = interval,
+        missing = missing,
         call = call)
     } else {
       # Single group means
       if (contrasts != "none") {
-        message(c("Error: Without specifying measures or grouping, no ", 
+        stop(c("Error: Without specifying measures or grouping, no ", 
           "contrasts are possible.\n\n  Hint: Set contrasts = 'none' or add ", 
           "the measures or grouping arguments."))
-        return()
       }
       ssm_analyze_means(.data,
         scales = !!scales_en,
         angles = angles,
         boots = boots,
         interval = interval,
+        missing = missing,
         call = call)
     }
   }
@@ -112,34 +120,37 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
 
 # Perform analyses using the mean-based Structural Summary Method --------------
 
-ssm_analyze_means <- function(.data, scales, angles, grouping,
-  contrasts = "none", boots = 2000, interval = 0.95, call) {
+ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
+  boots, interval, missing, call) {
 
   scales_en <- rlang::enquo(scales)
+  grouping_en <- rlang::enquo(grouping)
 
   # Convert angles from degrees to radians
   angles <- angles %>% as_degree() %>% as_radian()
 
   # Select circumplex scales and grouping variable (if applicable)
-  if (is_provided(grouping) == FALSE) {
-    bs_input <- .data %>%
-      dplyr::select(!!scales_en) %>%
-      dplyr::mutate(Group = factor("Whole Sample")) %>%
-      tidyr::drop_na()
-  } else {
-    grouping_en <- rlang::enquo(grouping)
+  if (is_provided(!!grouping_en)) {
     bs_input <- .data %>%
       dplyr::select(!!scales_en, Group = !!grouping_en) %>%
-      dplyr::mutate(Group = factor(Group)) %>%
-      tidyr::drop_na()
+      dplyr::mutate(Group = factor(Group))
     # Check if more than one contrast is possible
     if (nlevels(bs_input$Group) > 2 && contrasts != "none") {
       message(c("WARNING: Currently, only one contrast is possible at a time. ",
         "With more than two levels of the grouping variable, only the first ",
         "two levels will be compared."))
     }
+  } else {
+    bs_input <- .data %>%
+      dplyr::select(!!scales_en) %>%
+      dplyr::mutate(Group = factor("Whole Sample"))
   }
 
+  # Perform listwise deletion if requested
+  if (missing == "listwise") {
+    bs_input <- bs_input %>% tidyr::drop_na()
+  }
+  
   # Check that scales are standardized
   extrema <- bs_input %>%
     dplyr::select(!!scales_en) %>%
@@ -217,17 +228,18 @@ ssm_analyze_means <- function(.data, scales, angles, grouping,
 # Perform analyses using the correlation-based SSM -----------------------------
 
 ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping, 
-  contrasts = "none", boots = 2000, interval = 0.95, call) {
+  contrasts, boots, interval, missing, call) {
 
-  if (is_provided(grouping)) {
-    message("Error: Grouping is not yet implemented for correlation-based", 
-      " analyses. This is a top priority that will be added soon. If these",
-      " analyses are urgently needed, the original ssm package can do this.")
-    return()
-  }
-  
+  # Enable tidy evaluation
   scales_en <- rlang::enquo(scales)
   measures_en <- rlang::enquo(measures)
+  grouping_en <- rlang::enquo(grouping)
+  
+  if (is_provided(!!grouping_en)) {
+    stop("Error: Grouping is not yet implemented for correlation-based", 
+      " analyses. This is a top priority that will be added soon. If these",
+      " analyses are urgently needed, the original ssm package can do this.")
+  }
   
   # Convert angles from degrees to radians
   angles <- angles %>% as_degree() %>% as_radian()
@@ -235,6 +247,11 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
   # Select circumplex scales and measure variables
   bs_input <- .data %>%
     dplyr::select(!!scales_en, !!measures_en)
+  
+  # Perform listwise deletion if requested
+  if (missing == "listwise") {
+    bs_input <- bs_input %>% tidyr::drop_na()
+  }
 
   # Calculate observed scores
   cs <- as.matrix(bs_input[, 1:length(angles)])

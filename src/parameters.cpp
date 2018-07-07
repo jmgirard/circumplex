@@ -64,10 +64,23 @@ arma::mat submat(NumericMatrix X, NumericVector T, int TestVal) {
   return y;
 }
 
+// Old version that is faster but does not allow missing data
+// arma::rowvec col_means(arma::mat x){
+//   arma::mat X = arma::mat(x.begin(), x.n_rows, x.n_cols, false); 
+//   return arma::mean(X, 0); 
+// }
+
 // Calculate the mean of each column in a matrix
+// [[Rcpp::export]]
 arma::rowvec col_means(arma::mat x){
-  arma::mat X = arma::mat(x.begin(), x.n_rows, x.n_cols, false); 
-  return arma::mean(X, 0); 
+  int p = x.n_cols;
+  arma::rowvec out(p);
+  for (int i(0); i < p; i++) {
+    arma::colvec y = x.col(i);
+    y = y.elem(arma::find_finite(y));
+    out(i) = arma::mean(y);
+  }
+  return out; 
 }
 
 // [[Rcpp::export]]
@@ -83,7 +96,7 @@ arma::mat group_scores(NumericMatrix X, NumericVector T) {
     arma::rowvec colmeans = col_means(sub);
     out.row(i) = colmeans;
   }
-  return(out);
+  return out;
 }
 
 // Calculate the correlation of x and y vectors after pairwise deletion

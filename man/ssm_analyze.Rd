@@ -5,7 +5,8 @@
 \title{Perform analyses using the Structural Summary Method}
 \usage{
 ssm_analyze(.data, scales, angles, measures = NULL, grouping = NULL,
-  contrasts = "none", boots = 2000, interval = 0.95)
+  contrasts = "none", boots = 2000, interval = 0.95,
+  missing = "listwise")
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -39,6 +40,10 @@ bootstrap resamples to use when estimating the confidence intervals
 \item{interval}{Optional. A single positive number between 0 and 1 that
 indicates what confidence level to use when estimating the confidence
 intevals (default = 0.95).}
+
+\item{missing}{Optional. A string indicating the procedure for handling
+missing values. Current options are "listwise" for listwise deletion or
+"pairwise" for pairwise deletion (default = "listwise").}
 }
 \value{
 A list containing the results and description of the analysis.

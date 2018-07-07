@@ -63,6 +63,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// col_means
+arma::rowvec col_means(arma::mat x);
+RcppExport SEXP _circumplex_col_means(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(col_means(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // group_scores
 arma::mat group_scores(NumericMatrix X, NumericVector T);
 RcppExport SEXP _circumplex_group_scores(SEXP XSEXP, SEXP TSEXP) {
@@ -94,6 +105,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_circumplex_compare_pi", (DL_FUNC) &_circumplex_compare_pi, 1},
     {"_circumplex_ssm_parameters", (DL_FUNC) &_circumplex_ssm_parameters, 2},
     {"_circumplex_group_parameters", (DL_FUNC) &_circumplex_group_parameters, 2},
+    {"_circumplex_col_means", (DL_FUNC) &_circumplex_col_means, 1},
     {"_circumplex_group_scores", (DL_FUNC) &_circumplex_group_scores, 2},
     {"_circumplex_measure_scores", (DL_FUNC) &_circumplex_measure_scores, 2},
     {NULL, NULL, 0}

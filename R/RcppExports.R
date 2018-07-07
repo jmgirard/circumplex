@@ -32,6 +32,10 @@ group_parameters <- function(scores, angles) {
     .Call(`_circumplex_group_parameters`, scores, angles)
 }
 
+col_means <- function(x) {
+    .Call(`_circumplex_col_means`, x)
+}
+
 group_scores <- function(X, T) {
     .Call(`_circumplex_group_scores`, X, T)
 }
