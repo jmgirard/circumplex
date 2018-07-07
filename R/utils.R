@@ -84,13 +84,13 @@ quadrants <- function() {
 #' @export
 standardize <- function(.data, .vars) {
   
-  # Check that the variables parameter has been provided -----------------------
-  assert_that(is_provided(.vars))
-  
-  # Enable column specification using tidyverse-style NSE ----------------------
+  # Enable tidy evaluation
   vars_en <- rlang::enquo(.vars)
   
-  # Convert the specified variables to z-scores --------------------------------
+  # Check for valid arguments
+  assert_that(is_provided(.data), is_enquo(!!vars_en))
+  
+  # Convert the specified variables to z-scores
   .data %>% 
     dplyr::mutate_at(
       .funs = dplyr::funs(as.numeric(scale(., center = TRUE, scale = TRUE))),
@@ -138,14 +138,4 @@ pretty_max <- function(v) {
     out <- ceiling(amax * 1.50)
   }
   out
-}
-
-#
-group_counts <- function(df) {
-  tbl <- df %>%
-    dplyr::group_by(Group) %>%
-    dplyr::summarize(n = dplyr::n())
-  vec <- tbl$n
-  names(vec) <- tbl$Group
-  vec
 }

@@ -35,12 +35,11 @@
 #'   "pairwise" for pairwise deletion (default = "listwise").
 #' @return A list containing the results and description of the analysis.
 #'   \item{results}{A tibble with the SSM parameter estimates} \item{details}{A
-#'   list with the sample size for each results row (n), the number of bootstrap
-#'   resamples (boots), the confidence interval percentage level (interval), and
-#'   the angular displacement of scales (angles)} \item{call}{A language object
-#'   containing the function call that created this object} \item{scores}{A
-#'   tibble containing the mean scale scores} \item{type}{A string indicating
-#'   what type of SSM analysis was done}
+#'   list with the number of bootstrap resamples (boots), the confidence
+#'   interval percentage level (interval), and the angular displacement of
+#'   scales (angles)} \item{call}{A language object containing the function call
+#'   that created this object} \item{scores}{A tibble containing the mean scale
+#'   scores} \item{type}{A string indicating what type of SSM analysis was done}
 #' @family ssm functions
 #' @family analysis functions
 #' @export
@@ -50,20 +49,26 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
 
   call = match.call()
   
-  # Check for valid input arguments
-  assert_that(is_provided(.data), is_provided(scales), is_provided(angles))
-  assert_that(is.numeric(angles), contrasts %in% c("none", "test", "model"))
-  assert_that(is.count(boots), is.number(interval), interval > 0, interval < 1)
-  assert_that(missing %in% c("listwise", "pairwise"))
-  
   # Enable tidy evaluation
   scales_en <- rlang::enquo(scales)
   measures_en <- rlang::enquo(measures)
   grouping_en <- rlang::enquo(grouping)
   
+  # Check for valid input arguments
+  assert_that(is_provided(.data), is_provided(angles))
+  assert_that(is_enquo(!!scales_en))
+  assert_that(is.numeric(angles), contrasts %in% c("none", "test", "model"))
+  assert_that(is.count(boots), is.number(interval), interval > 0, interval < 1)
+  assert_that(missing %in% c("listwise", "pairwise"))
+  # TODO: Check that scales and angles have same length
+  # TODO: Check that grouping is missing, null, or single variable
+  
+  # Convert angles from degrees to radians
+  angles <- angles %>% as_degree() %>% as_radian()
+  
   # Forward to the appropriate subfunction
-  if (is_provided(!!measures_en)) {
-    if (is_provided(!!grouping_en)) {
+  if (is_enquo(!!measures_en)) {
+    if (is_enquo(!!grouping_en)) {
       # Multiple group correlations
       ssm_analyze_corrs(.data,
         scales = !!scales_en, 
@@ -88,7 +93,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         call = call)
     }
   } else {
-    if (is_provided(!!grouping_en)) {
+    if (is_enquo(!!grouping_en)) {
       # Multiple group means
       ssm_analyze_means(.data,
         scales = !!scales_en,
@@ -110,6 +115,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         scales = !!scales_en,
         angles = angles,
         boots = boots,
+        contrasts = contrasts,
         interval = interval,
         missing = missing,
         call = call)
@@ -117,20 +123,17 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
   }
 }
 
-
 # Perform analyses using the mean-based Structural Summary Method --------------
 
 ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
   boots, interval, missing, call) {
 
+  # Enable tidy evaluation
   scales_en <- rlang::enquo(scales)
   grouping_en <- rlang::enquo(grouping)
 
-  # Convert angles from degrees to radians
-  angles <- angles %>% as_degree() %>% as_radian()
-
   # Select circumplex scales and grouping variable (if applicable)
-  if (is_provided(!!grouping_en)) {
+  if (is_enquo(!!grouping_en)) {
     bs_input <- .data %>%
       dplyr::select(!!scales_en, Group = !!grouping_en) %>%
       dplyr::mutate(Group = factor(Group))
@@ -195,18 +198,15 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
   if (contrasts == "none") {
     row_data <- bs_output
     row_labels <- group_levels
-    analysis_n <- group_counts(bs_input)
   } else {
     row_data <- bs_output[nrow(bs_output), ]
     row_labels <- sprintf("%s - %s", group_levels[[2]], group_levels[[1]])
-    analysis_n <- sum(group_counts(bs_input))
   }
   results <- row_data %>%
     dplyr::mutate(label = row_labels)
 
   # Collect analysis details
   details <- list(
-    n = analysis_n,
     boots = boots,
     interval = interval,
     angles = as_degree(angles),
@@ -234,20 +234,18 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
   scales_en <- rlang::enquo(scales)
   measures_en <- rlang::enquo(measures)
   grouping_en <- rlang::enquo(grouping)
-  
-  if (is_provided(!!grouping_en)) {
-    stop("Error: Grouping is not yet implemented for correlation-based", 
-      " analyses. This is a top priority that will be added soon. If these",
-      " analyses are urgently needed, the original ssm package can do this.")
-  }
-  
-  # Convert angles from degrees to radians
-  angles <- angles %>% as_degree() %>% as_radian()
 
-  # Select circumplex scales and measure variables
-  bs_input <- .data %>%
-    dplyr::select(!!scales_en, !!measures_en)
-  
+  # Select circumplex scales, measure variables, and grouping variable
+  if (is_enquo(!!grouping_en)) {
+    bs_input <- .data %>%
+      dplyr::select(!!scales_en, !!measures_en, Group = !!grouping_en) %>% 
+      dplyr::mutate(Group = factor(Group))
+  } else {
+    bs_input <- .data %>% 
+      dplyr::select(!!scales_en, !!measures_en) %>% 
+      dplyr::mutate(Group = factor("Whole Sample"))
+  }
+
   # Perform listwise deletion if requested
   if (missing == "listwise") {
     bs_input <- bs_input %>% tidyr::drop_na()
@@ -292,15 +290,8 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
   results <- row_data %>%
     dplyr::mutate(label = row_labels)
 
-  if (contrasts == "none") {
-    analysis_n <- rep(nrow(bs_input), nrow(scores))
-  } else {
-    analysis_n <- nrow(bs_input) # TODO: Replace with pairwise deletion
-  }
-  
   # Collect analysis details
   details <- list(
-    n = analysis_n,
     boots = boots,
     interval = interval,
     angles = as_degree(angles),
