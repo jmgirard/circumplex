@@ -1,6 +1,6 @@
 # Perform bootstrap to get confidence intervals around SSM parameters
 ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
-                          contrasts, ...) {
+                          contrasts, listwise, ...) {
 
   # Perform bootstrapping ------------------------------------------------------
   bs_results <- boot::boot(
@@ -9,6 +9,7 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
     R = boots,
     angles = angles,
     contrasts = contrasts,
+    listwise = listwise,
     ...
   )
 

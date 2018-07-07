@@ -27,12 +27,13 @@
 #' @param boots Optional. A single positive integer indicating how many
 #'   bootstrap resamples to use when estimating the confidence intervals
 #'   (default = 2000).
-#' @param interval Optional. A single positive number between 0 and 1 that
-#'   indicates what confidence level to use when estimating the confidence
-#'   intevals (default = 0.95).
-#' @param missing Optional. A string indicating the procedure for handling
-#'   missing values. Current options are "listwise" for listwise deletion or
-#'   "pairwise" for pairwise deletion (default = "listwise").
+#' @param interval Optional. A single positive number between 0 and 1
+#'   (exclusive) that indicates what confidence level to use when estimating the
+#'   confidence intevals (default = 0.95).
+#' @param listwise Optional. A logical indicating whether missing values should
+#'   be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
+#'   that pairwise deletion may result in different missing data patterns in
+#'   each bootstrap resample and is slower to compute (default = TRUE).
 #' @return A list containing the results and description of the analysis.
 #'   \item{results}{A tibble with the SSM parameter estimates} \item{details}{A
 #'   list with the number of bootstrap resamples (boots), the confidence
@@ -45,7 +46,7 @@
 #' @export
 
 ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
-  contrasts = "none", boots = 2000, interval = 0.95, missing = "listwise") {
+  contrasts = "none", boots = 2000, interval = 0.95, listwise = TRUE) {
 
   call = match.call()
   
@@ -59,7 +60,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
   assert_that(is_enquo(!!scales_en))
   assert_that(is.numeric(angles), contrasts %in% c("none", "test", "model"))
   assert_that(is.count(boots), is.number(interval), interval > 0, interval < 1)
-  assert_that(missing %in% c("listwise", "pairwise"))
+  assert_that(is.flag(listwise))
   # TODO: Check that scales and angles have same length
   # TODO: Check that grouping is missing, null, or single variable
   
@@ -78,7 +79,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         contrasts = contrasts, 
         boots = boots,
         interval = interval,
-        missing = missing,
+        listwise = listwise,
         call = call)
     } else {
       # Single group correlations
@@ -89,7 +90,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         contrasts = contrasts,
         boots = boots,
         interval = interval,
-        missing = missing,
+        listwise = listwise,
         call = call)
     }
   } else {
@@ -102,7 +103,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         contrasts = contrasts,
         boots = boots,
         interval = interval,
-        missing = missing,
+        listwise = listwise,
         call = call)
     } else {
       # Single group means
@@ -117,7 +118,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         boots = boots,
         contrasts = contrasts,
         interval = interval,
-        missing = missing,
+        listwise = listwise,
         call = call)
     }
   }
@@ -126,7 +127,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
 # Perform analyses using the mean-based Structural Summary Method --------------
 
 ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
-  boots, interval, missing, call) {
+  boots, interval, listwise, call) {
 
   # Enable tidy evaluation
   scales_en <- rlang::enquo(scales)
@@ -146,11 +147,11 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
   } else {
     bs_input <- .data %>%
       dplyr::select(!!scales_en) %>%
-      dplyr::mutate(Group = factor("Whole Sample"))
+      dplyr::mutate(Group = factor("1"))
   }
 
   # Perform listwise deletion if requested
-  if (missing == "listwise") {
+  if (listwise == TRUE) {
     bs_input <- bs_input %>% tidyr::drop_na()
   }
   
@@ -168,17 +169,17 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
   # Calculate mean observed scores
   mat <- as.matrix(bs_input[, which(names(bs_input) != "Group")])
   grp <- as.integer(bs_input$Group)
-  scores <- group_scores(mat, grp)
+  scores <- mean_scores(mat, grp, listwise)
   colnames(scores) <- names(dplyr::select(bs_input, !!scales_en))
   rownames(scores) <- levels(bs_input$Group)
   scores <- tibble::as_tibble(scores, rownames = "label")
   
   # Create function that will perform bootstrapping
-  bs_function <- function(.data, index, angles, contrasts) {
+  bs_function <- function(.data, index, angles, contrasts, listwise) {
     resample <- .data[index, ]
     mat <- as.matrix(resample[, which(names(resample) != "Group")])
     grp <- as.integer(resample$Group)
-    scores_r <- group_scores(mat, grp)
+    scores_r <- mean_scores(mat, grp, listwise)
     ssm_by_group(scores_r, angles, contrasts)
   }
 
@@ -190,6 +191,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
     boots = boots,
     interval = interval,
     contrasts = contrasts,
+    listwise = listwise,
     strata = bs_input$Group
   )
 
@@ -209,6 +211,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
   details <- list(
     boots = boots,
     interval = interval,
+    listwise = listwise,
     angles = as_degree(angles),
     score_type = "Mean",
     results_type = dplyr::if_else(contrasts == "none", "Profile", "Contrast")
@@ -228,7 +231,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
 # Perform analyses using the correlation-based SSM -----------------------------
 
 ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping, 
-  contrasts, boots, interval, missing, call) {
+  contrasts, boots, interval, listwise, call) {
 
   # Enable tidy evaluation
   scales_en <- rlang::enquo(scales)
@@ -243,28 +246,36 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
   } else {
     bs_input <- .data %>% 
       dplyr::select(!!scales_en, !!measures_en) %>% 
-      dplyr::mutate(Group = factor("Whole Sample"))
+      dplyr::mutate(Group = factor("1"))
   }
 
   # Perform listwise deletion if requested
-  if (missing == "listwise") {
+  if (listwise == TRUE) {
     bs_input <- bs_input %>% tidyr::drop_na()
   }
 
-  # Calculate observed scores
+  # Calculate observed scores (i.e., correlations)
   cs <- as.matrix(bs_input[, 1:length(angles)])
-  mv <- as.matrix(bs_input[, (length(angles) + 1):ncol(bs_input)])
-  scores <- measure_scores(cs, mv)
+  mv <- as.matrix(bs_input[, (length(angles) + 1):(ncol(bs_input) - 1)])
+  grp <- as.integer(bs_input$Group)
+  scores <- corr_scores(cs, mv, grp, listwise)
   colnames(scores) <- names(dplyr::select(bs_input, !!scales_en))
-  rownames(scores) <- names(dplyr::select(bs_input, !!measures_en))
-  scores <- tibble::as_tibble(scores, rownames = "label")
+  scores <- tibble::as_tibble(scores) %>%
+    dplyr::mutate(
+      Group = rep(unique(bs_input$Group), each = ncol(mv)),
+      Measure = rep(names(dplyr::select(bs_input, !!measures_en)),
+        times = nlevels(bs_input$Group)),
+      label = paste0(Group, "_", Measure)
+    ) %>% 
+    dplyr::select(Group, Measure, dplyr::everything(), label)
   
   # Create function that will perform bootstrapping
-  bs_function <- function(.data, index, angles, contrasts) {
+  bs_function <- function(.data, index, angles, contrasts, listwise) {
     resample <- .data[index, ]
+    grp <- as.integer(resample$Group)
     cs <- as.matrix(resample[, 1:length(angles)])
-    mv <- as.matrix(resample[, (length(angles) + 1):ncol(resample)])
-    scores_r <- measure_scores(cs, mv)
+    mv <- as.matrix(resample[, (length(angles) + 1):(ncol(resample) - 1)])
+    scores_r <- corr_scores(cs, mv, grp, listwise)
     ssm_by_group(scores_r, angles, contrasts)
   }
 
@@ -275,25 +286,36 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
     angles = angles,
     boots = boots,
     interval = interval,
-    contrasts = contrasts
+    contrasts = contrasts,
+    listwise = listwise,
+    strata = bs_input$Group
   )
   
   # Select and label results
   measure_names <- names(dplyr::select(.data, !!measures_en))
   if (contrasts == "none") {
     row_data <- bs_output
-    row_labels <- measure_names
+    grp_labels <- rep(unique(bs_input$Group), each = ncol(mv))
+    msr_labels <- rep(names(dplyr::select(bs_input, !!measures_en)),
+        times = nlevels(bs_input$Group))
+    lbl_labels <-  paste0(grp_labels, "_", msr_labels)
   } else {
     row_data <- bs_output[nrow(bs_output), ]
     row_labels <- sprintf("%s - %s", measure_names[[2]], measure_names[[1]])
   }
   results <- row_data %>%
-    dplyr::mutate(label = row_labels)
+    dplyr::mutate(
+      label = lbl_labels,
+      Group = grp_labels,
+      Measure = msr_labels
+    ) %>% 
+    select(Group, Measure, dplyr::everything(), label)
 
   # Collect analysis details
   details <- list(
     boots = boots,
     interval = interval,
+    listwise = listwise,
     angles = as_degree(angles),
     score_type = "Correlation",
     results_type = dplyr::if_else(contrasts == "none", "Profile", "Contrast")

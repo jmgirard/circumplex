@@ -13,17 +13,6 @@ compare_pi <- function(x) {
     .Call(`_circumplex_compare_pi`, x)
 }
 
-#' Calculate structural summary parameters
-#'
-#' @param scores A numeric vector of scores on multiple circumplex scales: can
-#'   be either mean scores or correlations.
-#' @param angles A numeric vector containing an angular displacement for each
-#'   circumplex scale provided in \code{scores} (in radians).
-#' @return A numerical vector containing structural summary method parameters
-#'   that describe \code{scores} given \code{angles}. The vector will contain
-#'   the following values: elevation, x-axis value, y-axis value, amplitude,
-#'   angular displacement (in radians), and model fit (R-squared).
-#' @export
 ssm_parameters <- function(scores, angles) {
     .Call(`_circumplex_ssm_parameters`, scores, angles)
 }
@@ -32,15 +21,11 @@ group_parameters <- function(scores, angles) {
     .Call(`_circumplex_group_parameters`, scores, angles)
 }
 
-col_means <- function(x) {
-    .Call(`_circumplex_col_means`, x)
+mean_scores <- function(cs, grp, lwd) {
+    .Call(`_circumplex_mean_scores`, cs, grp, lwd)
 }
 
-group_scores <- function(X, T) {
-    .Call(`_circumplex_group_scores`, X, T)
-}
-
-measure_scores <- function(scales, measures) {
-    .Call(`_circumplex_measure_scores`, scales, measures)
+corr_scores <- function(cs, mv, grp, lwd) {
+    .Call(`_circumplex_corr_scores`, cs, mv, grp, lwd)
 }
 

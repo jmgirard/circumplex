@@ -5,8 +5,7 @@
 \title{Perform analyses using the Structural Summary Method}
 \usage{
 ssm_analyze(.data, scales, angles, measures = NULL, grouping = NULL,
-  contrasts = "none", boots = 2000, interval = 0.95,
-  missing = "listwise")
+  contrasts = "none", boots = 2000, interval = 0.95, listwise = TRUE)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -37,23 +36,23 @@ parameters (default = "none").}
 bootstrap resamples to use when estimating the confidence intervals
 (default = 2000).}
 
-\item{interval}{Optional. A single positive number between 0 and 1 that
-indicates what confidence level to use when estimating the confidence
-intevals (default = 0.95).}
+\item{interval}{Optional. A single positive number between 0 and 1
+(exclusive) that indicates what confidence level to use when estimating the
+confidence intevals (default = 0.95).}
 
-\item{missing}{Optional. A string indicating the procedure for handling
-missing values. Current options are "listwise" for listwise deletion or
-"pairwise" for pairwise deletion (default = "listwise").}
+\item{listwise}{Optional. A logical indicating whether missing values should
+be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
+that pairwise deletion may result in different missing data patterns in
+each bootstrap resample and is slower to compute (default = TRUE).}
 }
 \value{
 A list containing the results and description of the analysis.
 \item{results}{A tibble with the SSM parameter estimates} \item{details}{A
-list with the sample size for each results row (n), the number of bootstrap
-resamples (boots), the confidence interval percentage level (interval), and
-the angular displacement of scales (angles)} \item{call}{A language object
-containing the function call that created this object} \item{scores}{A
-tibble containing the mean scale scores} \item{type}{A string indicating
-what type of SSM analysis was done}
+list with the number of bootstrap resamples (boots), the confidence
+interval percentage level (interval), and the angular displacement of
+scales (angles)} \item{call}{A language object containing the function call
+that created this object} \item{scores}{A tibble containing the mean scale
+scores} \item{type}{A string indicating what type of SSM analysis was done}
 }
 \description{
 Calculate SSM parameters with bootstrapped confidence intervals for a variety
