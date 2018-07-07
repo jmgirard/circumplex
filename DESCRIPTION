@@ -1,6 +1,6 @@
 Type: Package
 Package: circumplex
-Title: Analysis and Visualization of Circumplex Data
+Title: Analysis and visualization of circumplex data
 Version: 0.0.0.9002
 Authors@R: as.person(c(
     "Jeffrey Girard <j.girard@pitt.edu> [aut, cre]",
