@@ -84,6 +84,9 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
         "low prototypicality (fit < 0.70).\n\n  Hint: You can force these ",
         "profiles to plot by setting the 'lowfit' argument to TRUE."))
     }
+    if (n2 < 1) {
+      stop("After removing profiles, there were none left to plot.")
+    }
   }
   
   # Initialize and configure the circle plot --------------------------------
