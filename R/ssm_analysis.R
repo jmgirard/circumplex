@@ -147,7 +147,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrast,
   } else {
     bs_input <- .data %>%
       dplyr::select(!!scales_en) %>%
-      dplyr::mutate(Group = factor("1"))
+      dplyr::mutate(Group = factor("All"))
   }
 
   # Perform listwise deletion if requested
@@ -246,7 +246,7 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
   } else {
     bs_input <- .data %>% 
       dplyr::select(!!scales_en, !!measures_en) %>% 
-      dplyr::mutate(Group = factor("1"))
+      dplyr::mutate(Group = factor("All"))
   }
 
   # Perform listwise deletion if requested
