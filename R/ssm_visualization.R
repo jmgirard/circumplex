@@ -145,11 +145,11 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
   xy = TRUE, color = "red", linesize = 1.25, fontsize = 12) {
   
   param_names <- c(
-    e = "Elevation",
-    x = "X-Value",
-    y = "Y-Value",
-    a = "Amplitude",
-    d = "Displacement"
+    e = "\u0394 Elevation",
+    x = "\u0394 X-Value",
+    y = "\u0394 Y-Value",
+    a = "\u0394 Amplitude",
+    d = "\u0394 Displacement"
   )
   
   res <- .ssm_object$results
