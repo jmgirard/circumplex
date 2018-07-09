@@ -72,11 +72,18 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
     ) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
-
+  
   # Remove profiles with low model fit (unless over-rided) ------------------
   if (lowfit == FALSE) {
+    n <- nrow(df_plot)
     df_plot <- df_plot %>% 
       dplyr::filter(fit >= .70)
+    n2 <- nrow(df_plot)
+    if (n2 < n) {
+      message(c("WARNING: One or more profiles were not plotted due to having ",
+        "low prototypicality (fit < 0.70).\n\n  Hint: You can force these ",
+        "profiles to plot by setting the 'lowfit' argument to TRUE."))
+    }
   }
   
   # Initialize and configure the circle plot --------------------------------
