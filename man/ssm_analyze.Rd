@@ -5,7 +5,7 @@
 \title{Perform analyses using the Structural Summary Method}
 \usage{
 ssm_analyze(.data, scales, angles, measures = NULL, grouping = NULL,
-  contrasts = "none", boots = 2000, interval = 0.95, listwise = TRUE)
+  contrast = "none", boots = 2000, interval = 0.95, listwise = TRUE)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -27,10 +27,11 @@ in \code{.data} that indicates the group membership of each observation. To
 analyze all observations in a single group, simply omit this argument or
 set it to NULL (default = NULL).}
 
-\item{contrasts}{Optional. A string indicating what type of contrast to run.
-Current options are "none" for no contrasts, "model" to find SSM parameters
+\item{contrast}{Optional. A string indicating what type of contrast to run.
+Current options are "none" for no contrast, "model" to find SSM parameters
 for the difference scores, or "test" to find the difference between the SSM
-parameters (default = "none").}
+parameters. Note that only two groups or measures can be contrasted at a
+time (default = "none").}
 
 \item{boots}{Optional. A single positive integer indicating how many
 bootstrap resamples to use when estimating the confidence intervals
