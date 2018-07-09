@@ -184,11 +184,13 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
       axis.title.x = ggplot2::element_blank()
     ) +
     ggplot2::geom_hline(yintercept = 0, size = linesize, color = "darkgray") +
-    ggplot2::geom_pointrange(
-      aes(
-        x = Contrast, y = Difference, ymin = lci, ymax = uci
-      ),
-      size = linesize, color = color
+    ggplot2::geom_point(
+      aes(x = Contrast, y = Difference),
+      size = linesize * 2, color = color
+    ) +
+    ggplot2::geom_errorbar(
+      aes(x = Contrast, ymin = lci, ymax = uci),
+      size = linesize, color = color, width = 0.1
     ) +
     ggplot2::labs(y = axislabel) +
     ggplot2::facet_wrap(~ Parameter,
