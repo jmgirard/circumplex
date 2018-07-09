@@ -1,6 +1,6 @@
 # Perform bootstrap to get confidence intervals around SSM parameters
 ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
-                          contrasts, listwise, ...) {
+                          contrast, listwise, ...) {
 
   # Perform bootstrapping ------------------------------------------------------
   bs_results <- boot::boot(
@@ -8,7 +8,7 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
     statistic = bs_function,
     R = boots,
     angles = angles,
-    contrasts = contrasts,
+    contrast = contrast,
     listwise = listwise,
     ...
   )
@@ -28,9 +28,9 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   # Set the units of the displacement results to radians -----------------------
   bs_t <- bs_results$t %>%
     tibble::as_tibble()
-  if (contrasts == "none" || contrasts == "model") {
+  if (contrast == "none" || contrast == "model") {
     d_vars <- 1:(ncol(bs_t) / 6) * 6 - 1
-  } else if (contrasts == "test") {
+  } else if (contrast == "test") {
     d_vars <- 1:((ncol(bs_t) - 6) / 6) * 6 - 1
   }
   bs_t <- bs_t %>% dplyr::mutate_at(.funs = as_radian, .vars = d_vars)
@@ -59,10 +59,10 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
 }
 
 #
-ssm_by_group <- function(scores, angles, contrasts) {
+ssm_by_group <- function(scores, angles, contrast) {
 
   # To model contrast, subtract scores then SSM --------------------------------
-  if (contrasts == "model") {
+  if (contrast == "model") {
     scores <- rbind(scores, scores[2, ] - scores[1, ])
   }
 
@@ -70,7 +70,7 @@ ssm_by_group <- function(scores, angles, contrasts) {
   results <- group_parameters(scores, angles)
 
   # To test contrast, SSM then subtract parameters -----------------------------
-  if (contrasts == "test") {
+  if (contrast == "test") {
     results <- c(results, param_diff(results[7:12], results[1:6]))
   }
 

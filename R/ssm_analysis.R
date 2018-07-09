@@ -20,10 +20,11 @@
 #'   in \code{.data} that indicates the group membership of each observation. To
 #'   analyze all observations in a single group, simply omit this argument or
 #'   set it to NULL (default = NULL).
-#' @param contrasts Optional. A string indicating what type of contrast to run.
-#'   Current options are "none" for no contrasts, "model" to find SSM parameters
+#' @param contrast Optional. A string indicating what type of contrast to run.
+#'   Current options are "none" for no contrast, "model" to find SSM parameters
 #'   for the difference scores, or "test" to find the difference between the SSM
-#'   parameters (default = "none").
+#'   parameters. Note that only two groups or measures can be contrasted at a
+#'   time (default = "none").
 #' @param boots Optional. A single positive integer indicating how many
 #'   bootstrap resamples to use when estimating the confidence intervals
 #'   (default = 2000).
@@ -46,7 +47,7 @@
 #' @export
 
 ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
-  contrasts = "none", boots = 2000, interval = 0.95, listwise = TRUE) {
+  contrast = "none", boots = 2000, interval = 0.95, listwise = TRUE) {
 
   call = match.call()
   
@@ -58,7 +59,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
   # Check for valid input arguments
   assert_that(is_provided(.data), is_provided(angles))
   assert_that(is_enquo(!!scales_en))
-  assert_that(is.numeric(angles), contrasts %in% c("none", "test", "model"))
+  assert_that(is.numeric(angles), contrast %in% c("none", "test", "model"))
   assert_that(is.count(boots), is.number(interval), interval > 0, interval < 1)
   assert_that(is.flag(listwise))
   # TODO: Check that scales and angles have same length
@@ -76,7 +77,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         angles = angles, 
         measures = !!measures_en, 
         grouping = !!grouping_en,
-        contrasts = contrasts, 
+        contrast = contrast, 
         boots = boots,
         interval = interval,
         listwise = listwise,
@@ -87,7 +88,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         scales = !!scales_en,
         angles = angles, 
         measures = !!measures_en,
-        contrasts = contrasts,
+        contrast = contrast,
         boots = boots,
         interval = interval,
         listwise = listwise,
@@ -100,23 +101,23 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
         scales = !!scales_en,
         angles = angles,
         grouping = !!grouping_en,
-        contrasts = contrasts,
+        contrast = contrast,
         boots = boots,
         interval = interval,
         listwise = listwise,
         call = call)
     } else {
       # Single group means
-      if (contrasts != "none") {
+      if (contrast != "none") {
         stop(c("Error: Without specifying measures or grouping, no ", 
-          "contrasts are possible.\n\n  Hint: Set contrasts = 'none' or add ", 
+          "contrasts are possible.\n\n  Hint: Set contrast = 'none' or add ", 
           "the measures or grouping arguments."))
       }
       ssm_analyze_means(.data,
         scales = !!scales_en,
         angles = angles,
         boots = boots,
-        contrasts = contrasts,
+        contrast = contrast,
         interval = interval,
         listwise = listwise,
         call = call)
@@ -126,7 +127,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
 
 # Perform analyses using the mean-based Structural Summary Method --------------
 
-ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
+ssm_analyze_means <- function(.data, scales, angles, grouping, contrast,
   boots, interval, listwise, call) {
 
   # Enable tidy evaluation
@@ -139,10 +140,9 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
       dplyr::select(!!scales_en, Group = !!grouping_en) %>%
       dplyr::mutate(Group = factor(Group))
     # Check if more than one contrast is possible
-    if (contrasts != "none" && nlevels(bs_input$Group) > 2) {
-      message(c("WARNING: Currently, only one contrast is possible at a time. ",
-        "With more than two levels of the grouping variable, only the first ",
-        "two levels will be compared."))
+    if (contrast != "none" && nlevels(bs_input$Group) != 2) {
+      stop(c("Only two groups can be contrasted at a time.\n\n  Hint: Set ",
+        "contrast = 'none' or use a dichotomous grouping variable."))
     }
   } else {
     bs_input <- .data %>%
@@ -175,12 +175,12 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
   scores <- tibble::as_tibble(scores, rownames = "label")
   
   # Create function that will perform bootstrapping
-  bs_function <- function(.data, index, angles, contrasts, listwise) {
+  bs_function <- function(.data, index, angles, contrast, listwise) {
     resample <- .data[index, ]
     mat <- as.matrix(resample[, which(names(resample) != "Group")])
     grp <- as.integer(resample$Group)
     scores_r <- mean_scores(mat, grp, listwise)
-    ssm_by_group(scores_r, angles, contrasts)
+    ssm_by_group(scores_r, angles, contrast)
   }
 
   # Perform bootstrapping
@@ -190,14 +190,14 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
     angles = angles,
     boots = boots,
     interval = interval,
-    contrasts = contrasts,
+    contrast = contrast,
     listwise = listwise,
     strata = bs_input$Group
   )
 
   # Select and label results
   group_levels <- levels(bs_input$Group)
-  if (contrasts == "none") {
+  if (contrast == "none") {
     row_data <- bs_output
     row_labels <- group_levels
   } else {
@@ -214,7 +214,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
     listwise = listwise,
     angles = as_degree(angles),
     score_type = "Mean",
-    results_type = dplyr::if_else(contrasts == "none", "Profile", "Contrast")
+    results_type = dplyr::if_else(contrast == "none", "Profile", "Contrast")
   )
 
   # Create output ssm object
@@ -231,7 +231,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrasts,
 # Perform analyses using the correlation-based SSM -----------------------------
 
 ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping, 
-  contrasts, boots, interval, listwise, call) {
+  contrast, boots, interval, listwise, call) {
 
   # Enable tidy evaluation
   scales_en <- rlang::enquo(scales)
@@ -264,19 +264,25 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
     dplyr::mutate(
       Group = rep(unique(bs_input$Group), each = ncol(mv)),
       Measure = rep(names(dplyr::select(bs_input, !!measures_en)),
-        times = nlevels(bs_input$Group)),
-      label = paste0(Group, "_", Measure)
-    ) %>% 
-    dplyr::select(Group, Measure, dplyr::everything(), label)
+        times = nlevels(bs_input$Group))
+      ) %>% 
+    dplyr::select(Group, Measure, dplyr::everything())
+  if (is_enquo(!!grouping_en)) {
+    scores <- scores %>% 
+      dplyr::mutate(label = paste0(Group, "_", Measure))
+  } else {
+    scores <- scores %>% 
+      dplyr::mutate(label = Measure)
+  }
   
   # Create function that will perform bootstrapping
-  bs_function <- function(.data, index, angles, contrasts, listwise) {
+  bs_function <- function(.data, index, angles, contrast, listwise) {
     resample <- .data[index, ]
     grp <- as.integer(resample$Group)
     cs <- as.matrix(resample[, 1:length(angles)])
     mv <- as.matrix(resample[, (length(angles) + 1):(ncol(resample) - 1)])
     scores_r <- corr_scores(cs, mv, grp, listwise)
-    ssm_by_group(scores_r, angles, contrasts)
+    ssm_by_group(scores_r, angles, contrast)
   }
 
   # Perform bootstrapping
@@ -286,21 +292,27 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
     angles = angles,
     boots = boots,
     interval = interval,
-    contrasts = contrasts,
+    contrast = contrast,
     listwise = listwise,
     strata = bs_input$Group
   )
   
   # Select and label results
   measure_names <- names(dplyr::select(.data, !!measures_en))
-  if (contrasts == "none") {
+  if (contrast == "none") {
     row_data <- bs_output
     grp_labels <- rep(unique(bs_input$Group), each = ncol(mv))
     msr_labels <- rep(names(dplyr::select(bs_input, !!measures_en)),
         times = nlevels(bs_input$Group))
-    lbl_labels <-  paste0(grp_labels, "_", msr_labels)
+    if (is_enquo(!!grouping_en)) {
+      lbl_labels <-  paste0(grp_labels, "_", msr_labels)
+    } else {
+      lbl_labels <- msr_labels
+    }
   } else {
+    #TODO: Fix this new labeling system for contrast
     row_data <- bs_output[nrow(bs_output), ]
+    
     row_labels <- sprintf("%s - %s", measure_names[[2]], measure_names[[1]])
   }
   results <- row_data %>%
@@ -318,7 +330,7 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
     listwise = listwise,
     angles = as_degree(angles),
     score_type = "Correlation",
-    results_type = dplyr::if_else(contrasts == "none", "Profile", "Contrast")
+    results_type = dplyr::if_else(contrast == "none", "Profile", "Contrast")
   )
 
   # Create output ssm object
