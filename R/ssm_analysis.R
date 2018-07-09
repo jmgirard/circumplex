@@ -249,6 +249,20 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
       dplyr::mutate(Group = factor("All"))
   }
 
+  # Check that this combination of arguments is executable
+  if (contrast != "none") {
+    n_measures <- ncol(dplyr::select(.data, !!measures_en)) 
+    n_groups <- nlevels(bs_input$Group)
+    contrast_measures <- (n_measures == 2 && n_groups == 1)
+    contrast_groups <- (n_measures == 1 && n_groups == 2)
+    valid_contrast <- contrast_measures || contrast_groups
+    if (valid_contrast == FALSE) {
+      stop(c("No valid contrasts were possible. To contrast measures, ensure ",
+        "there are 2 measures and no grouping variable. To contrast groups, ",
+        "ensure there is 1 measure and a dichotomous grouping variable."))
+    }
+  }
+  
   # Perform listwise deletion if requested
   if (listwise == TRUE) {
     bs_input <- bs_input %>% tidyr::drop_na()
