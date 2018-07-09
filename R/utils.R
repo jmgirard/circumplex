@@ -84,13 +84,13 @@ quadrants <- function() {
 #' @export
 standardize <- function(.data, .vars) {
   
-  # Check that the variables parameter has been provided -----------------------
-  assert_that(is_provided(.vars))
-  
-  # Enable column specification using tidyverse-style NSE ----------------------
+  # Enable tidy evaluation
   vars_en <- rlang::enquo(.vars)
   
-  # Convert the specified variables to z-scores --------------------------------
+  # Check for valid arguments
+  assert_that(is_provided(.data), is_enquo(!!vars_en))
+  
+  # Convert the specified variables to z-scores
   .data %>% 
     dplyr::mutate_at(
       .funs = dplyr::funs(as.numeric(scale(., center = TRUE, scale = TRUE))),
@@ -99,7 +99,7 @@ standardize <- function(.data, .vars) {
   
 }
 
-# Compute differences between two sets of SSM parameters
+# Compute differences between two sets of SSM parameters -----------------------
 param_diff <- function(p1, p2) {
   assert_that(is.numeric(p1), is.numeric(p2))
   pd <- p1 - p2
@@ -107,23 +107,23 @@ param_diff <- function(p1, p2) {
   pd
 }
 
-# Calculate angular distance
+# Calculate angular distance ---------------------------------------------------
 angle_dist <- function(x, y) {
   ((x - y + pi) %% (2 * pi)) - pi
 }
 
-# Convert degrees to ggplot's radian format
+# Convert degrees to ggplot's radian format ------------------------------------
 ggrad <- function(v) {
   v <- as.numeric(v)
   (v - 90) * (-pi / 180)
 }
 
-# Convert percent number to a formatted string
+# Convert percent number to a formatted string ---------------------------------
 str_percent <- function(x, digits = 2) {
   paste0(round(x, digits + 2) * 100, "%")
 }
 
-# Determine good max amplitude value for circle plot
+# Determine good max amplitude value for circle plot ---------------------------
 pretty_max <- function(v) {
   amax <- max(v, na.rm = TRUE)
   options <- c(
@@ -138,14 +138,4 @@ pretty_max <- function(v) {
     out <- ceiling(amax * 1.50)
   }
   out
-}
-
-#
-group_counts <- function(df) {
-  tbl <- df %>%
-    dplyr::group_by(Group) %>%
-    dplyr::summarize(n = dplyr::n())
-  vec <- tbl$n
-  names(vec) <- tbl$Group
-  vec
 }

@@ -40,61 +40,53 @@ BEGIN_RCPP
 END_RCPP
 }
 // ssm_parameters
-NumericVector ssm_parameters(NumericVector scores, NumericVector angles);
+arma::vec ssm_parameters(arma::vec scores, arma::vec angles);
 RcppExport SEXP _circumplex_ssm_parameters(SEXP scoresSEXP, SEXP anglesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type scores(scoresSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type angles(anglesSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type scores(scoresSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type angles(anglesSEXP);
     rcpp_result_gen = Rcpp::wrap(ssm_parameters(scores, angles));
     return rcpp_result_gen;
 END_RCPP
 }
 // group_parameters
-std::vector<double> group_parameters(NumericMatrix scores, NumericVector angles);
+arma::vec group_parameters(arma::mat scores, arma::vec angles);
 RcppExport SEXP _circumplex_group_parameters(SEXP scoresSEXP, SEXP anglesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type scores(scoresSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type angles(anglesSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type scores(scoresSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type angles(anglesSEXP);
     rcpp_result_gen = Rcpp::wrap(group_parameters(scores, angles));
     return rcpp_result_gen;
 END_RCPP
 }
-// col_means
-arma::rowvec col_means(arma::mat x);
-RcppExport SEXP _circumplex_col_means(SEXP xSEXP) {
+// mean_scores
+arma::mat mean_scores(arma::mat cs, arma::vec grp, bool lwd);
+RcppExport SEXP _circumplex_mean_scores(SEXP csSEXP, SEXP grpSEXP, SEXP lwdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(col_means(x));
+    Rcpp::traits::input_parameter< arma::mat >::type cs(csSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type grp(grpSEXP);
+    Rcpp::traits::input_parameter< bool >::type lwd(lwdSEXP);
+    rcpp_result_gen = Rcpp::wrap(mean_scores(cs, grp, lwd));
     return rcpp_result_gen;
 END_RCPP
 }
-// group_scores
-arma::mat group_scores(NumericMatrix X, NumericVector T);
-RcppExport SEXP _circumplex_group_scores(SEXP XSEXP, SEXP TSEXP) {
+// corr_scores
+arma::mat corr_scores(arma::mat cs, arma::mat mv, arma::vec grp, bool lwd);
+RcppExport SEXP _circumplex_corr_scores(SEXP csSEXP, SEXP mvSEXP, SEXP grpSEXP, SEXP lwdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type T(TSEXP);
-    rcpp_result_gen = Rcpp::wrap(group_scores(X, T));
-    return rcpp_result_gen;
-END_RCPP
-}
-// measure_scores
-arma::mat measure_scores(NumericMatrix scales, NumericMatrix measures);
-RcppExport SEXP _circumplex_measure_scores(SEXP scalesSEXP, SEXP measuresSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type scales(scalesSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type measures(measuresSEXP);
-    rcpp_result_gen = Rcpp::wrap(measure_scores(scales, measures));
+    Rcpp::traits::input_parameter< arma::mat >::type cs(csSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type mv(mvSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type grp(grpSEXP);
+    Rcpp::traits::input_parameter< bool >::type lwd(lwdSEXP);
+    rcpp_result_gen = Rcpp::wrap(corr_scores(cs, mv, grp, lwd));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -105,9 +97,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_circumplex_compare_pi", (DL_FUNC) &_circumplex_compare_pi, 1},
     {"_circumplex_ssm_parameters", (DL_FUNC) &_circumplex_ssm_parameters, 2},
     {"_circumplex_group_parameters", (DL_FUNC) &_circumplex_group_parameters, 2},
-    {"_circumplex_col_means", (DL_FUNC) &_circumplex_col_means, 1},
-    {"_circumplex_group_scores", (DL_FUNC) &_circumplex_group_scores, 2},
-    {"_circumplex_measure_scores", (DL_FUNC) &_circumplex_measure_scores, 2},
+    {"_circumplex_mean_scores", (DL_FUNC) &_circumplex_mean_scores, 3},
+    {"_circumplex_corr_scores", (DL_FUNC) &_circumplex_corr_scores, 4},
     {NULL, NULL, 0}
 };
 

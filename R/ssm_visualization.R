@@ -72,11 +72,21 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
     ) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
-
+  
   # Remove profiles with low model fit (unless over-rided) ------------------
   if (lowfit == FALSE) {
+    n <- nrow(df_plot)
     df_plot <- df_plot %>% 
       dplyr::filter(fit >= .70)
+    n2 <- nrow(df_plot)
+    if (n2 < n) {
+      message(c("WARNING: One or more profiles were not plotted due to having ",
+        "low prototypicality (fit < 0.70).\n\n  Hint: You can force these ",
+        "profiles to plot by setting the 'lowfit' argument to TRUE."))
+    }
+    if (n2 < 1) {
+      stop("After removing profiles, there were none left to plot.")
+    }
   }
   
   # Initialize and configure the circle plot --------------------------------
@@ -138,11 +148,11 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
   xy = TRUE, color = "red", linesize = 1.25, fontsize = 12) {
   
   param_names <- c(
-    e = "Elevation",
-    x = "X-Value",
-    y = "Y-Value",
-    a = "Amplitude",
-    d = "Displacement"
+    e = "\u0394 Elevation",
+    x = "\u0394 X-Value",
+    y = "\u0394 Y-Value",
+    a = "\u0394 Amplitude",
+    d = "\u0394 Displacement"
   )
   
   res <- .ssm_object$results
@@ -174,11 +184,13 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
       axis.title.x = ggplot2::element_blank()
     ) +
     ggplot2::geom_hline(yintercept = 0, size = linesize, color = "darkgray") +
-    ggplot2::geom_pointrange(
-      aes(
-        x = Contrast, y = Difference, ymin = lci, ymax = uci
-      ),
-      size = linesize, color = color
+    ggplot2::geom_point(
+      aes(x = Contrast, y = Difference),
+      size = linesize * 3, color = color
+    ) +
+    ggplot2::geom_errorbar(
+      aes(x = Contrast, ymin = lci, ymax = uci),
+      size = linesize, color = color, width = 0.1
     ) +
     ggplot2::labs(y = axislabel) +
     ggplot2::facet_wrap(~ Parameter,
@@ -248,14 +260,6 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
     size = fontsize / 2.8346438836889
   )
   
-}
-
-# TODO: Finish function
-ssm_plot_curve <- function(.ssm_object) {
-  scores <- .ssm_object$scores
-  results <- .ssm_object$results
-  df <- 
-  ggplot2::ggplot(scores, aes(x = Scale, y = Score, color = ))
 }
 
 #' Create HTML table from SSM results or contrasts
