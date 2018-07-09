@@ -186,7 +186,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     ggplot2::geom_hline(yintercept = 0, size = linesize, color = "darkgray") +
     ggplot2::geom_point(
       aes(x = Contrast, y = Difference),
-      size = linesize * 2, color = color
+      size = linesize * 3, color = color
     ) +
     ggplot2::geom_errorbar(
       aes(x = Contrast, ymin = lci, ymax = uci),
