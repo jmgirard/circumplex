@@ -313,29 +313,35 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
   
   # Select and label results
   measure_names <- names(dplyr::select(.data, !!measures_en))
+  group_names <- levels(bs_input$Group)
   if (contrast == "none") {
     row_data <- bs_output
-    grp_labels <- rep(unique(bs_input$Group), each = ncol(mv))
-    msr_labels <- rep(names(dplyr::select(bs_input, !!measures_en)),
-        times = nlevels(bs_input$Group))
+    grp_labels <- rep(group_names, each = ncol(mv))
+    msr_labels <- rep(measure_names, times = nlevels(bs_input$Group))
     if (is_enquo(!!grouping_en)) {
       lbl_labels <-  paste0(grp_labels, "_", msr_labels)
     } else {
       lbl_labels <- msr_labels
     }
+    results <- row_data %>%
+      dplyr::mutate(
+        label = lbl_labels,
+        Group = grp_labels,
+        Measure = msr_labels
+      ) %>% 
+      select(Group, Measure, dplyr::everything(), label)
   } else {
-    #TODO: Fix this new labeling system for contrast
     row_data <- bs_output[nrow(bs_output), ]
-    
-    row_labels <- sprintf("%s - %s", measure_names[[2]], measure_names[[1]])
+    if (contrast_measures) {
+      row_labels <- sprintf("%s - %s", measure_names[[2]], measure_names[[1]])
+    } else if (contrast_groups) {
+      row_labels <- sprintf("%s: %s - %s", measure_names[[1]], group_names[[2]],
+         group_names[[1]])
+    }
+    results <- row_data %>%
+      dplyr::mutate(label = row_labels) %>% 
+      select(label, dplyr::everything())
   }
-  results <- row_data %>%
-    dplyr::mutate(
-      label = lbl_labels,
-      Group = grp_labels,
-      Measure = msr_labels
-    ) %>% 
-    select(Group, Measure, dplyr::everything(), label)
 
   # Collect analysis details
   details <- list(
