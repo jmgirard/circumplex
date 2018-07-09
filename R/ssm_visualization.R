@@ -257,14 +257,6 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
   
 }
 
-# TODO: Finish function
-ssm_plot_curve <- function(.ssm_object) {
-  scores <- .ssm_object$scores
-  results <- .ssm_object$results
-  df <- 
-  ggplot2::ggplot(scores, aes(x = Scale, y = Score, color = ))
-}
-
 #' Create HTML table from SSM results or contrasts
 #'
 #' Take in the results of an SSM analysis and return an HTML table with the
