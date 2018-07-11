@@ -26,6 +26,20 @@ An HTML table containing SSM results or contrasts.
 Take in the results of an SSM analysis and return an HTML table with the
 desired formatting.
 }
+\examples{
+# Load example data
+data("jz2017")
+
+# Create table of profile results
+res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
+  measures = c(NARPD, ASPD))
+ssm_table(res)
+
+# Create table of contrast results
+res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
+  measures = c(NARPD, ASPD), contrast = "test")
+ssm_table(res)
+}
 \seealso{
 Other ssm functions: \code{\link{ssm_analyze}},
   \code{\link{ssm_plot}}

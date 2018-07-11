@@ -82,6 +82,12 @@ quadrants <- function() {
 #'   specified in \code{.vars}, as well as any additional variables that
 #'   were included in \code{.data}. Variable ordering is preserved.
 #' @export
+#' @examples
+#' # Load example data
+#' data("jz2017")
+#' 
+#' # Standardize circumplex scales
+#' jz2017s <- standardize(jz2017, PA:NO)
 standardize <- function(.data, .vars) {
   
   # Enable tidy evaluation

@@ -11,6 +11,19 @@
 #' @family ssm functions
 #' @family visualization functions
 #' @export
+#' @examples 
+#' # Load example data
+#' data("jz2017")
+#' 
+#' # Plot profile results
+#' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
+#'   measures = c(NARPD, ASPD))
+#' ssm_plot(res)
+#' 
+#' # Plot contrast results
+#' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
+#'   measures = c(NARPD, ASPD), contrast = "test")
+#' ssm_plot(res)
 
 ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
   
@@ -279,6 +292,19 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' @family ssm functions
 #' @family table functions
 #' @export
+#' @examples 
+#' # Load example data
+#' data("jz2017")
+#' 
+#' # Create table of profile results
+#' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
+#'   measures = c(NARPD, ASPD))
+#' ssm_table(res)
+#' 
+#' # Create table of contrast results
+#' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
+#'   measures = c(NARPD, ASPD), contrast = "test")
+#' ssm_table(res)
 
 ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   

@@ -20,6 +20,20 @@ A ggplot2 object representing the figure
 \description{
 Take in the results of an SSM analysis function and create figure from it.
 }
+\examples{
+# Load example data
+data("jz2017")
+
+# Plot profile results
+res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
+  measures = c(NARPD, ASPD))
+ssm_plot(res)
+
+# Plot contrast results
+res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
+  measures = c(NARPD, ASPD), contrast = "test")
+ssm_plot(res)
+}
 \seealso{
 ggsave Function for saving plots to image files.
 

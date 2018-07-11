@@ -22,3 +22,10 @@ Takes in a data frame and the location of one or more variables to
 standardize. Returns that same data frame where the specified variables have
 been standardized (i.e., turned into z-scores with mean 0 and variance 1).
 }
+\examples{
+# Load example data
+data("jz2017")
+
+# Standardize circumplex scales
+jz2017s <- standardize(jz2017, PA:NO)
+}

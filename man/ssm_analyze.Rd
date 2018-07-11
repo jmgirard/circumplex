@@ -62,6 +62,36 @@ mean-based or correlation-based analyses will be performed, one or more
 groups will be used to stratify the data, and contrasts between groups or
 measures will be calculated.
 }
+\examples{
+# Load example data
+data("jz2017")
+
+# Single-group mean-based SSM
+ssm_analyze(jz2017, scales = PA:NO, angles = octants())
+
+# Multiple-group mean-based SSM
+ssm_analyze(jz2017, scales = PA:NO, angles = octants(), grouping = Gender)
+
+# Multiple-group mean-based SSM with contrast
+ssm_analyze(jz2017, scales = PA:NO, angles = octants(), grouping = Gender,
+  contrast = "model")
+  
+# Single-group correlation-based SSM
+ssm_analyze(jz2017, scales = PA:NO, angles = octants(), 
+  measures = c(NARPD, ASPD))
+  
+# Single-group correlation-based SSM with contrast
+ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
+  measures = c(NARPD, ASPD), contrast = "test")
+  
+# Multiple-group correlation-based SSM
+ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
+  grouping = Gender)
+  
+# Multiple-group correlation-based SSM with contrast
+ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
+  grouping = Gender, contrast = "test")
+}
 \seealso{
 Other ssm functions: \code{\link{ssm_plot}},
   \code{\link{ssm_table}}
