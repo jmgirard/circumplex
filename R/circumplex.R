@@ -1,21 +1,25 @@
-#' circumplex: A package for Analysis and Visualization of Circumplex Data
+#' Analysis and visualization of circumplex data
 #'
-#' The circumplex package provides the following functions...
+#' circumplex provides functions for analyzing and visualizing circumplex data.
 #'
-#' @section circumplex Functions:
-#' The circumplex functions...
+#' Its goal is to unify, modernize, and extend existing methods of working with
+#' circumplex data. Its functions share an underlying design philosophy and
+#' grammar. The three guiding principles it aspires to are:
 #'
-#' @docType package
-#' @name circumplex
-NULL
-
-#' @importFrom assertthat are_equal assert_that is.count is.flag not_empty
-#'   is.scalar is.string is.number
-NULL
-
-#' @importFrom ggplot2 aes
-NULL
-
+#' \itemize{
+#' \item \strong{Accessibility:} zero cost, open source, libre; works on many 
+#'   platforms; easy to use across skill levels
+#' \item \strong{Flexibility:} customizable by the user; extendable for other uses;
+#'   plays nicely with other packages
+#' \item \strong{Consistency:} unit-tested quality control; firm naming conventions;
+#'   data flows between functions
+#' }
+#' 
+#' To learn more about circumplex, start with the vignettes:
+#' `browseVignettes(package = "circumplex")`
+#'
 #' @useDynLib circumplex, .registration = TRUE
+#' @import assertthat
+#' @importFrom ggplot2 aes
 #' @importFrom Rcpp sourceCpp
-NULL
+"_PACKAGE"
