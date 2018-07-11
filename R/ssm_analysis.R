@@ -64,6 +64,7 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
   assert_that(is.flag(listwise))
   # TODO: Check that scales and angles have same length
   # TODO: Check that grouping is missing, null, or single variable
+  # TODO: Add a flag to flip contrast ordering
   
   # Convert angles from degrees to radians
   angles <- angles %>% as_degree() %>% as_radian()
@@ -329,7 +330,7 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
         Group = grp_labels,
         Measure = msr_labels
       ) %>% 
-      select(Group, Measure, dplyr::everything(), label)
+      dplyr::select(Group, Measure, dplyr::everything(), label)
   } else {
     row_data <- bs_output[nrow(bs_output), ]
     if (contrast_measures) {
@@ -340,7 +341,7 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
     }
     results <- row_data %>%
       dplyr::mutate(label = row_labels) %>% 
-      select(label, dplyr::everything())
+      dplyr::select(label, dplyr::everything())
   }
 
   # Collect analysis details
