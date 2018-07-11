@@ -13,3 +13,8 @@ test_that("SSM parameters are correct", {
   expect_equal(round(res[[6]], 3), 0.954)
   
 })
+
+test_that("remainder is functioning properly", {
+  ans <- remainder(-0.2730117, 2 * pi)
+  expect_equal(round(ans, 3), 6.010)
+})

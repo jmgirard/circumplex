@@ -12,6 +12,7 @@ double inner(arma::vec x, arma::vec y) {
 } 
 
 // Calculate the remainder after division
+// [[Rcpp::export]]
 double remainder(double numerator, double denominator) {
   return(numerator - std::floor(numerator / denominator) * denominator);
 }
