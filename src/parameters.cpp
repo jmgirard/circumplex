@@ -13,7 +13,7 @@ double inner(arma::vec x, arma::vec y) {
 
 // Calculate the remainder after division
 double remainder(double numerator, double denominator) {
-  return(numerator - floor(numerator / denominator) * denominator);
+  return(numerator - std::floor(numerator / denominator) * denominator);
 }
 
 // Calculate structural summary parameters (angles and displacement in radians)
