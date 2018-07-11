@@ -11,12 +11,6 @@ double inner(arma::vec x, arma::vec y) {
   return ip(0);
 } 
 
-// Calculate the remainder after division
-// [[Rcpp::export]]
-double remainder(double numerator, double denominator) {
-  return(numerator - std::floor(numerator / denominator) * denominator);
-}
-
 // Calculate structural summary parameters (angles and displacement in radians)
 // [[Rcpp::export]]
 arma::vec ssm_parameters(arma::vec scores, arma::vec angles) {
@@ -25,7 +19,7 @@ arma::vec ssm_parameters(arma::vec scores, arma::vec angles) {
   double xval = (2 / n) * inner(scores, arma::cos(angles));
   double yval = (2 / n) * inner(scores, arma::sin(angles));
   double ampl = std::sqrt(std::pow(xval, 2) + std::pow(yval, 2));
-  double disp = remainder(std::atan2(yval, xval), 2 * PI);
+  double disp = std::fmod(std::atan2(yval, xval), 2 * PI);
   double gfit = 1 - ((arma::sum(arma::pow(elev + ampl *
     arma::cos(angles - disp) - scores, 2))) / (arma::var(scores) * (n - 1)));
   arma::vec out = {elev, xval, yval, ampl, disp, gfit};

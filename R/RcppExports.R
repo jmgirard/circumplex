@@ -13,10 +13,6 @@ compare_pi <- function(x) {
     .Call(`_circumplex_compare_pi`, x)
 }
 
-remainder <- function(numerator, denominator) {
-    .Call(`_circumplex_remainder`, numerator, denominator)
-}
-
 ssm_parameters <- function(scores, angles) {
     .Call(`_circumplex_ssm_parameters`, scores, angles)
 }
