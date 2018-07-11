@@ -13,6 +13,10 @@ compare_pi <- function(x) {
     .Call(`_circumplex_compare_pi`, x)
 }
 
+modu <- function(x, y) {
+    .Call(`_circumplex_modu`, x, y)
+}
+
 ssm_parameters <- function(scores, angles) {
     .Call(`_circumplex_ssm_parameters`, scores, angles)
 }

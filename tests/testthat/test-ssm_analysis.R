@@ -14,7 +14,7 @@ test_that("Single-group mean-based SSM results are correct", {
   expect_equal(round(res$results$x_est, 3), 0.945)
   expect_equal(round(res$results$y_est, 3), -0.264)
   expect_equal(round(res$results$a_est, 3), 0.981)
-  #expect_equal(as.vector(round(res$results$d_est, 1)), 344.4)
+  expect_equal(as.vector(round(res$results$d_est, 1)), 344.4)
   expect_equal(round(res$results$fit, 3), 0.954)
   expect_equal(res$results$label, "All")
   

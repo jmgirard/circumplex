@@ -39,6 +39,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// modu
+double modu(double x, double y);
+RcppExport SEXP _circumplex_modu(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(modu(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ssm_parameters
 arma::vec ssm_parameters(arma::vec scores, arma::vec angles);
 RcppExport SEXP _circumplex_ssm_parameters(SEXP scoresSEXP, SEXP anglesSEXP) {
@@ -95,6 +107,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_circumplex_angle_mean", (DL_FUNC) &_circumplex_angle_mean, 1},
     {"_circumplex_angle_median", (DL_FUNC) &_circumplex_angle_median, 1},
     {"_circumplex_compare_pi", (DL_FUNC) &_circumplex_compare_pi, 1},
+    {"_circumplex_modu", (DL_FUNC) &_circumplex_modu, 2},
     {"_circumplex_ssm_parameters", (DL_FUNC) &_circumplex_ssm_parameters, 2},
     {"_circumplex_group_parameters", (DL_FUNC) &_circumplex_group_parameters, 2},
     {"_circumplex_mean_scores", (DL_FUNC) &_circumplex_mean_scores, 3},
