@@ -18,12 +18,12 @@
 #' # Plot profile results
 #' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD))
-#' ssm_plot(res)
+#' p <- ssm_plot(res)
 #' 
 #' # Plot contrast results
 #' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD), contrast = "test")
-#' ssm_plot(res)
+#' p <- ssm_plot(res)
 
 ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
   

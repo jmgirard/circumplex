@@ -27,12 +27,12 @@ data("jz2017")
 # Plot profile results
 res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
   measures = c(NARPD, ASPD))
-ssm_plot(res)
+p <- ssm_plot(res)
 
 # Plot contrast results
 res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
   measures = c(NARPD, ASPD), contrast = "test")
-ssm_plot(res)
+p <- ssm_plot(res)
 }
 \seealso{
 ggsave Function for saving plots to image files.

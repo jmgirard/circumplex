@@ -66,7 +66,7 @@
 #' # Single-group correlation-based SSM with contrast
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD), contrast = "test")
-#'   
+#' \donttest{
 #' # Multiple-group correlation-based SSM
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
 #'   grouping = Gender)
@@ -74,6 +74,7 @@
 #' # Multiple-group correlation-based SSM with contrast
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
 #'   grouping = Gender, contrast = "test")
+#' }
 
 ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
   contrast = "none", boots = 2000, interval = 0.95, listwise = TRUE) {

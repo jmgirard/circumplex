@@ -23,7 +23,7 @@ Imports:
     purrr (>= 0.2.5),
     Rcpp (>= 0.12.17),
     rlang (>= 0.2.1),
-    stats (>= 3.5.1),
+    stats,
     tibble (>= 1.4.2),
     tidyr (>= 0.8.1),
     tidyselect (>= 0.2.4)

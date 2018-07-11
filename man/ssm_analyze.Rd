@@ -83,7 +83,7 @@ ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 # Single-group correlation-based SSM with contrast
 ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
   measures = c(NARPD, ASPD), contrast = "test")
-  
+\donttest{
 # Multiple-group correlation-based SSM
 ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
   grouping = Gender)
@@ -91,6 +91,7 @@ ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
 # Multiple-group correlation-based SSM with contrast
 ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
   grouping = Gender, contrast = "test")
+}
 }
 \seealso{
 Other ssm functions: \code{\link{ssm_plot}},
