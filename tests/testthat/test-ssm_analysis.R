@@ -3,40 +3,40 @@ context("test-ssm_analysis.R")
 test_that("Single-group mean-based SSM results are correct", {
   
   data("aw2009")
-  res <- ssm_analyze(aw2009, PA:NO, octants())
+  res1 <- ssm_analyze(aw2009, PA:NO, octants())
   
   # Test the output object
-  expect_type(res, "list")
-  expect_s3_class(res, "ssm")
+  expect_type(res1, "list")
+  expect_s3_class(res1, "ssm")
   
   # Test the results subobject
-  expect_equal(round(res$results$e_est, 3), 0.423)
-  expect_equal(round(res$results$x_est, 3), 0.945)
-  expect_equal(round(res$results$y_est, 3), -0.264)
-  expect_equal(round(res$results$a_est, 3), 0.981)
-  expect_equal(round(res$results$d_est, 1), as_degree(344.4))
-  expect_equal(round(res$results$fit, 3), 0.954)
-  expect_equal(res$results$label, "All")
+  expect_equal(round(res1$results$e_est, 3), 0.423)
+  expect_equal(round(res1$results$x_est, 3), 0.945)
+  expect_equal(round(res1$results$y_est, 3), -0.264)
+  expect_equal(round(res1$results$a_est, 3), 0.981)
+  expect_equal(round(res1$results$d_est, 1), as_degree(344.4))
+  expect_equal(round(res1$results$fit, 3), 0.954)
+  expect_equal(res1$results$label, "All")
   # TODO: Figure out a way to test bootstrap interval estimates
   
   # Test the scores subobject
-  expect_equal(round(res$scores$PA, 3), 0.374)
-  expect_equal(round(res$scores$BC, 3), -0.572)
-  expect_equal(round(res$scores$DE, 3), -0.520)
-  expect_equal(round(res$scores$FG, 3), 0.016)
-  expect_equal(round(res$scores$HI, 3), 0.688)
-  expect_equal(round(res$scores$JK, 3), 1.142)
-  expect_equal(round(res$scores$LM, 3), 1.578)
-  expect_equal(round(res$scores$NO, 3), 0.678) 
-  expect_equal(res$scores$label, "All")
+  expect_equal(round(res1$scores$PA, 3), 0.374)
+  expect_equal(round(res1$scores$BC, 3), -0.572)
+  expect_equal(round(res1$scores$DE, 3), -0.520)
+  expect_equal(round(res1$scores$FG, 3), 0.016)
+  expect_equal(round(res1$scores$HI, 3), 0.688)
+  expect_equal(round(res1$scores$JK, 3), 1.142)
+  expect_equal(round(res1$scores$LM, 3), 1.578)
+  expect_equal(round(res1$scores$NO, 3), 0.678) 
+  expect_equal(res1$scores$label, "All")
   
   # Test the details subobject
-  expect_equal(res$details$boots, 2000)
-  expect_equal(res$details$interval, 0.95)
-  expect_true(res$details$listwise)
-  expect_equal(res$details$angles, as_degree(octants()))
-  expect_equal(res$details$score_type, "Mean")
-  expect_equal(res$details$results_type, "Profile")
+  expect_equal(res1$details$boots, 2000)
+  expect_equal(res1$details$interval, 0.95)
+  expect_true(res1$details$listwise)
+  expect_equal(res1$details$angles, as_degree(octants()))
+  expect_equal(res1$details$score_type, "Mean")
+  expect_equal(res1$details$results_type, "Profile")
   
 })
 
