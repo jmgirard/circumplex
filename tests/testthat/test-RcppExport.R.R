@@ -13,8 +13,3 @@ test_that("SSM parameters are correct", {
   expect_equal(round(res[[6]], 3), 0.954)
   
 })
-
-test_that("modu is working", {
-  ans <- modu(-0.273, 2 * pi)
-  expect_equal(round(ans, 2), 6.01)
-})

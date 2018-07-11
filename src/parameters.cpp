@@ -11,7 +11,7 @@ double inner(arma::vec x, arma::vec y) {
   return ip(0);
 } 
 
-// [[Rcpp::export]]
+// Calculate non-integer modulus
 double modu(double x, double y) {
   double out = (x - std::floor(x / y) * y);
   return out;
