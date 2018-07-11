@@ -23,7 +23,7 @@ new_s3_scalar <- function(..., class) {
 
 # Set numeric object to class 'degree'
 new_degree <- function(x) {
-  new_s3_dbl(x, class = "degree")
+  new_s3_dbl(x, class = c("degree", "numeric"))
 }
 
 # S3 generic for class 'degree'
@@ -50,7 +50,7 @@ as_degree.radian <- function(x, ...) {
 
 # Set numeric object to class 'radian'
 new_radian <- function(x) {
-  new_s3_dbl(x, class = "radian")
+  new_s3_dbl(x, class = c("radian", "numeric"))
 }
 
 # S3 generic for class 'radian'

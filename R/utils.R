@@ -36,7 +36,7 @@ NULL
 #' @export
 #' @usage octants()
 octants <- function() {
-  c(90, 135, 180, 225, 270, 315, 360, 45)
+  as_degree(c(90, 135, 180, 225, 270, 315, 360, 45))
 }
 
 #' Angular displacements for pole circumplex scales
@@ -51,7 +51,7 @@ octants <- function() {
 #' @export
 #' @usage poles()
 poles <- function() {
-  c(90, 180, 270, 360)
+  as_degree(c(90, 180, 270, 360))
 }
 
 #' Angular displacements for quadrant circumplex scales
@@ -66,7 +66,7 @@ poles <- function() {
 #' @export
 #' @usage quadrants()
 quadrants <- function() {
-  c(135, 225, 315, 45)
+  as_degree(c(135, 225, 315, 45))
 }
 
 #' Standardize specified variables in a data frame

@@ -14,10 +14,9 @@ test_that("Single-group mean-based SSM results are correct", {
   expect_equal(round(res1$results$x_est, 3), 0.945)
   expect_equal(round(res1$results$y_est, 3), -0.264)
   expect_equal(round(res1$results$a_est, 3), 0.981)
-  expect_equal(round(res1$results$d_est, 1), as_degree(344.4))
+  expect_equal(as.vector(round(res1$results$d_est, 1)), 344.4)
   expect_equal(round(res1$results$fit, 3), 0.954)
   expect_equal(res1$results$label, "All")
-  # TODO: Figure out a way to test bootstrap interval estimates
   
   # Test the scores subobject
   expect_equal(round(res1$scores$PA, 3), 0.374)
@@ -34,7 +33,7 @@ test_that("Single-group mean-based SSM results are correct", {
   expect_equal(res1$details$boots, 2000)
   expect_equal(res1$details$interval, 0.95)
   expect_true(res1$details$listwise)
-  expect_equal(res1$details$angles, as_degree(octants()))
+  expect_equivalent(res1$details$angles, octants())
   expect_equal(res1$details$score_type, "Mean")
   expect_equal(res1$details$results_type, "Profile")
   
@@ -54,12 +53,11 @@ test_that("Single-group correlation-based SSM results are correct", {
   expect_equal(round(res$results$x_est, 3), -0.094)
   expect_equal(round(res$results$y_est, 3), 0.117)
   expect_equal(round(res$results$a_est, 3), 0.150)
-  expect_equal(round(res$results$d_est, 1), as_degree(128.9))
+  expect_equal(as.vector(round(res$results$d_est, 1)), 128.9)
   expect_equal(round(res$results$fit, 3), 0.802)
   expect_equal(res$scores$Group, factor("All"))
   expect_equal(res$scores$Measure, "PARPD")
   expect_equal(res$scores$label, "PARPD")
-  # TODO: Figure out a way to test bootstrap interval estimates
   
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), 0.329)
@@ -78,7 +76,7 @@ test_that("Single-group correlation-based SSM results are correct", {
   expect_equal(res$details$boots, 2000)
   expect_equal(res$details$interval, 0.95)
   expect_true(res$details$listwise)
-  expect_equal(res$details$angles, as_degree(octants()))
+  expect_equal(res$details$angles, octants())
   expect_match(res$details$score_type, "Correlation")
   expect_match(res$details$results_type, "Profile")
 
@@ -99,10 +97,9 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$x_est, 3), 0.037)
   expect_equal(round(res$results$y_est, 3), -0.024)
   expect_equal(round(res$results$a_est, 3), -0.037)
-  expect_equal(round(res$results$d_est, 1), -7.0) # TODO: check sign
+  expect_equal(round(res$results$d_est, 1), -7.0)
   expect_equal(round(res$results$fit, 3), -0.007)
   expect_equal(res$results$label, "NARPD - ASPD")
-  # TODO: Figure out a way to test bootstrap interval estimates
   
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.368, 0.400))
@@ -121,7 +118,7 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   expect_equal(res$details$boots, 2000)
   expect_equal(res$details$interval, 0.95)
   expect_true(res$details$listwise)
-  expect_equal(res$details$angles, as_degree(octants()))
+  expect_equal(res$details$angles, octants())
   expect_equal(res$details$score_type, "Correlation")
   expect_equal(res$details$results_type, "Contrast")
 })
@@ -141,10 +138,9 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$x_est, 3), 0.051)
   expect_equal(round(res$results$y_est, 3), -0.056)
   expect_equal(round(res$results$a_est, 3), -0.068)
-  expect_equal(round(res$results$d_est, 1), -10.4) # TODO: check sign
+  expect_equal(round(res$results$d_est, 1), -10.4)
   expect_equal(round(res$results$fit, 3), -0.071)
   expect_equal(res$results$label, "NARPD: Male - Female")
-  # TODO: Figure out a way to test bootstrap interval estimates
   
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.385, 0.415))
@@ -163,7 +159,7 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   expect_equal(res$details$boots, 2000)
   expect_equal(res$details$interval, 0.95)
   expect_true(res$details$listwise)
-  expect_equal(res$details$angles, as_degree(octants()))
+  expect_equal(res$details$angles, octants())
   expect_equal(res$details$score_type, "Correlation")
   expect_equal(res$details$results_type, "Contrast")
 })
