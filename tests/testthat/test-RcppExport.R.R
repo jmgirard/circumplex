@@ -5,9 +5,11 @@ test_that("SSM parameters are correct", {
   scores <- colMeans(aw2009)
   res <- ssm_parameters(scores, as_radian(octants()))
   
-  d_est_radian <- res[5, 1]
-  expect_equal(round(d_est_radian, 3), 6.010)
+  expect_equal(round(res[[1]], 3), 0.423)
+  expect_equal(round(res[[2]], 3), 0.945)
+  expect_equal(round(res[[3]], 3), -0.264)
+  expect_equal(round(res[[4]], 3), 0.981)
+  expect_equal(round(res[[5]], 3), 6.010)
+  expect_equal(round(res[[6]], 3), 0.954)
   
-  d_est_degree <- as_degree(as_radian(d_est_radian))
-  expect_equal(as.vector(round(d_est_degree, 1)), 344.4)
 })
