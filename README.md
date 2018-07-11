@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex)
 
+## Overview
+
 The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. This package has been authored by [Jeffrey Girard](http://jmgirard.com/), [Johannes Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/), and [Aidan Wright](http://personalityprocesses.com/). It is maintained by [Jeffrey Girard](http://jmgirard.com/).
 
 ## References

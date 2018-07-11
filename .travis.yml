@@ -3,3 +3,18 @@
 language: R
 sudo: false
 cache: packages
+r_binary_packages:
+  - asserthat
+  - boot
+  - dplyr
+  - ggplot2
+  - htmlTable
+  - magrittr
+  - purrr
+  - Rcpp
+  - rlang
+  - tibble
+  - tidyr
+  - tidyselect
+r_github_packages:
+  - ggforce
