@@ -348,7 +348,7 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   if (xy == TRUE) {
     align <- "lllll"
   } else if (xy == FALSE) {
-    df <- dplyr::select(df, -c(3, 4))
+    df <- df[, -c(3, 4)]
     align <- "lll"
   }
   
