@@ -32,10 +32,10 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
   assert_that(is.number(fontsize), fontsize > 0)
   
   # Forward to the appropriate subfunction
-  if (.ssm_object$details$results_type == "Profile") {
-    ssm_plot_circle(.ssm_object, fontsize = fontsize, ...)
-  } else if (.ssm_object$details$results_type == "Contrast") {
+  if (.ssm_object$details$contrast == "test") {
     ssm_plot_contrast(.ssm_object, fontsize = fontsize, ...)
+  } else {
+    ssm_plot_circle(.ssm_object, fontsize = fontsize, ...)
   }
   
   # TODO: Add more explanation of the possible arguments in documentation.
@@ -335,7 +335,7 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   colnames(df)[[1]] <- .ssm_object$details$results_type
   
   # Add delta symbol to column names if results are contrasts
-  if (.ssm_object$details$results_type == "Contrast") {
+  if (.ssm_object$details$contrast == "test") {
     colnames(df)[[2]] <- "&#8710 Elevation"
     colnames(df)[[3]] <- "&#8710 X-Value"
     colnames(df)[[4]] <- "&#8710 Y-Value"

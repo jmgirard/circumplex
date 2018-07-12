@@ -244,6 +244,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrast,
     interval = interval,
     listwise = listwise,
     angles = as_degree(angles),
+    contrast = contrast,
     score_type = "Mean",
     results_type = dplyr::if_else(contrast == "none", "Profile", "Contrast")
   )
@@ -380,6 +381,7 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
     interval = interval,
     listwise = listwise,
     angles = as_degree(angles),
+    contrast = contrast,
     score_type = "Correlation",
     results_type = dplyr::if_else(contrast == "none", "Profile", "Contrast")
   )
