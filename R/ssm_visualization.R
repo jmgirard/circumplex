@@ -172,7 +172,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
   
   if (xy == FALSE) {
     res <- dplyr::select(res,
-      -c(tidyselect::starts_with("x"), tidyselect::starts_with("y")))
+      -c(x_est, x_lci, x_uci, y_est, y_lci, y_uci))
     param_names <- param_names[-c(2, 3)]
   }
 

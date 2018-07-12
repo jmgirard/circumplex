@@ -25,8 +25,7 @@ Imports:
     rlang (>= 0.2.1),
     stats,
     tibble (>= 1.4.2),
-    tidyr (>= 0.8.1),
-    tidyselect (>= 0.2.4)
+    tidyr (>= 0.8.1)
 LinkingTo: 
     Rcpp (>= 0.12.17),
     RcppArmadillo (>= 0.8.600.0.0)
