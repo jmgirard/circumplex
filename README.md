@@ -105,6 +105,7 @@ ASPD
 </tr>
 </tbody>
 </table>
+
 ``` r
 ssm_plot(results)
 ```
@@ -168,6 +169,7 @@ ASPD - NARPD
 </tr>
 </tbody>
 </table>
+
 ``` r
 ssm_plot(results, xy = FALSE)
 ```

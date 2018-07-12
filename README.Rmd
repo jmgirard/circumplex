@@ -91,6 +91,7 @@ results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD),
 ``` r
 ssm_table(results, xy = FALSE)
 ```
+
 <table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
 <thead>
 <tr><td colspan='5' style='text-align: left;'>
