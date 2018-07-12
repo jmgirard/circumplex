@@ -113,3 +113,40 @@ print.ssm <- function(x, ...) {
   }
   cat("\n")
 }
+
+# Summary method for objects of ssm class
+#' @export 
+summary.ssm <- function(x, ...) {
+  # Print function call
+  cat("\nCall:\n",
+    paste(deparse(x$call), sep = "\n", collapse = "\n"),
+    "\n", sep = "")
+  # Print analysis details
+  cat(
+    "\nStatistical Basis:\t", x$details$score_type, "Scores",
+    "\nBootstrap Resamples:\t", x$details$boots,
+    "\nConfidence Level:\t", x$details$interval,
+    "\nListwise Deletion:\t", x$details$listwise,
+    "\nScale Displacements:\t", as.numeric(x$details$angles),
+    "\n"
+  )
+  # Print each result as a block
+  for (i in 1:nrow(x$results)) {
+    dat <- x$results[i, ]
+    v <- c(
+      dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
+      dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
+      dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
+    )
+    m <- round(matrix(v, nrow = 6, ncol = 3), 3)
+    rownames(m) <- c(
+      "Elevation", "X-Value", "Y-Value",
+      "Amplitude", "Displacement", "Model Fit"
+    )
+    colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
+    cat("\n", x$details$results_type, " [", dat$label, "]:\n",
+      sep = "")
+    print.default(m, print.gap = 3L, na.print = "")
+  }
+  cat("\n")
+}
