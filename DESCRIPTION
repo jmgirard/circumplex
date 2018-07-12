@@ -2,19 +2,16 @@ Type: Package
 Package: circumplex
 Title: Analysis and Visualization of Circular Data
 Version: 0.0.0.9004
-Authors@R: c(
-    person(c("Jeffrey", "M."), "Girard", role = c("aut", "cre"), email = 
-      "j.girard@pitt.edu", comment = c(ORCID = "0000-0002-7359-3746")),
-    person("Johannes", "Zimmermann", role = "aut", email = 
-      "j.zimmermann@psychologische-hochschule.de"),
-    person(c("Aidan", "G.", "C."), "Wright", role = "ctb", comment = "",
-      email = "aidan@pitt.edu")
-)
-Description: Tools for analyzing and visualizing circular data, including a
-    generalized implementation of the structural summary method (SSM) with
-    functions for creating publication-ready SSM tables and figures. Future
-    versions will include tools for circular fit and reliability analyses,
-    as well as greatly enhanced visualization methods.
+Authors@R: as.person(c(
+  "Jeffrey Girard <j.girard@pitt.edu> [aut, cre]
+    (<https://orcid.org/0000-0002-7359-3746>)",
+  "Johannes Zimmermann <j.zimmermann@psychologische-hochschule.de> [aut]",
+  "Aidan Wright <aidan@pitt.edu> [ctb]"))
+Description: Tools for analyzing and visualizing circular data, including a 
+  generalized implementation of the structural summary method (SSM) with
+  functions for creating publication-ready SSM tables and figures. Future
+  versions will include tools for circular fit and reliability analyses, as
+  well as greatly enhanced visualization methods.
 License: GPL-3
 URL: http://github.com/jmgirard/circumplex
 BugReports: https://github.com/jmgirard/circumplex/issues
