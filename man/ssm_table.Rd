@@ -4,7 +4,8 @@
 \alias{ssm_table}
 \title{Create HTML table from SSM results or contrasts}
 \usage{
-ssm_table(.ssm_object, filename = NULL, caption = NULL, xy = TRUE)
+ssm_table(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
+  viewer = TRUE)
 }
 \arguments{
 \item{.ssm_object}{The output of \code{ssm_profiles()} or
@@ -18,6 +19,9 @@ be saved. If set to NULL, the table will be displayed but not saved
 
 \item{xy}{A logical indicating whether the x-value and y-value parameters
 should be included in the table as columns (default = TRUE).}
+
+\item{viewer}{A logical indicating whether the table should be displayed
+using the RStudio viewer.}
 }
 \value{
 An HTML table containing SSM results or contrasts.

@@ -282,6 +282,8 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' @param caption A string to be displayed above the table (default = NULL).
 #' @param xy A logical indicating whether the x-value and y-value parameters
 #'   should be included in the table as columns (default = TRUE).
+#' @param viewer A logical indicating whether the table should be displayed
+#'   using the RStudio viewer.
 #' @return An HTML table containing SSM results or contrasts.
 #' @family ssm functions
 #' @family table functions
@@ -300,7 +302,8 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #'   measures = c(NARPD, ASPD), contrast = "test")
 #' ssm_table(res)
 
-ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
+ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
+  viewer = TRUE) {
   
   assert_that(is_provided(.ssm_object))
   assert_that(is.null(filename) || is.string(filename))
@@ -330,12 +333,12 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   
   # Add delta symbol to column names if results are contrasts
   if (.ssm_object$details$contrast == "test") {
-    colnames(df)[[2]] <- "&#8710 Elevation"
-    colnames(df)[[3]] <- "&#8710 X-Value"
-    colnames(df)[[4]] <- "&#8710 Y-Value"
-    colnames(df)[[5]] <- "&#8710 Amplitude"
-    colnames(df)[[6]] <- "&#8710 Displacement"
-    colnames(df)[[7]] <- "&#8710 Fit"
+    colnames(df)[[2]] <- "&Delta; Elevation"
+    colnames(df)[[3]] <- "&Delta; X-Value"
+    colnames(df)[[4]] <- "&Delta; Y-Value"
+    colnames(df)[[5]] <- "&Delta; Amplitude"
+    colnames(df)[[6]] <- "&Delta; Displacement"
+    colnames(df)[[7]] <- "&Delta; Fit"
   }
 
   # Drop the x and y columns if requested
@@ -355,10 +358,10 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE) {
   )
   
   if (is.null(filename) == TRUE) {
-    print(t, type = "html", useViewer = TRUE)
+    print(t, type = "html", useViewer = viewer)
   } else {
     sink(filename)
-    print(t, type = "html", useViewer = FALSE)
+    print(t, type = "html", useViewer = viewer)
     sink()
   }
   
