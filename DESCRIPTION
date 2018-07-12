@@ -8,7 +8,8 @@ Authors@R: as.person(c(
   "Johannes Zimmermann <j.zimmermann@psychologische-hochschule.de> [aut]",
   "Aidan Wright <aidan@pitt.edu> [ctb]"))
 Description: Tools for analyzing and visualizing circular data, including a 
-  generalized implementation of the structural summary method (SSM) with
+  generalization of the bootstrapped structural summary method (SSM) from
+  Zimmermann & Wright (2017) <doi:10.1177/1073191115621795> and
   functions for creating publication-ready SSM tables and figures. Future
   versions will include tools for circular fit and reliability analyses, as
   well as greatly enhanced visualization methods.
