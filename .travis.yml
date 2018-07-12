@@ -10,3 +10,5 @@ before_install:
 r_binary_packages:
   - dplyr
   - rcpp
+after_success:
+  - Rscript -e 'covr::codecov()'
