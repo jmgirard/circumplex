@@ -4,15 +4,11 @@
 \alias{ssm_plot_circle}
 \title{Create a Circular Plot of SSM Results}
 \usage{
-ssm_plot_circle(.ssm_object, palette = "Set1", amax = NULL, fontsize = 12,
-  lowfit = FALSE)
+ssm_plot_circle(.ssm_object, amax = NULL, fontsize = 12, lowfit = FALSE)
 }
 \arguments{
 \item{.ssm_object}{The output of \code{ssm_profiles()} or
 \code{ssm_measures()}.}
-
-\item{palette}{A string corresponding to the Color Brewer palette (default =
-"Set1"). See http://www.cookbook-r.com/Graphs/Colors_(ggplot2).}
 
 \item{amax}{A positive real number corresponding to the radius of the circle.
 It is used to scale the amplitude values and will determine which amplitude

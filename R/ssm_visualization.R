@@ -49,8 +49,6 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'
 #' @param .ssm_object The output of \code{ssm_profiles()} or
 #'   \code{ssm_measures()}.
-#' @param palette A string corresponding to the Color Brewer palette (default =
-#'   "Set1"). See http://www.cookbook-r.com/Graphs/Colors_(ggplot2).
 #' @param amax A positive real number corresponding to the radius of the circle.
 #'   It is used to scale the amplitude values and will determine which amplitude
 #'   labels are drawn.
@@ -60,8 +58,8 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'   (<.70) should be plotted (default = FALSE).
 #' @return A ggplot variable containing a completed circular plot.
 
-ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
-  fontsize = 12, lowfit = FALSE) {
+ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
+  lowfit = FALSE) {
   
   df <- .ssm_object$results
   angles <- as.numeric(.ssm_object$details$angles)
@@ -72,7 +70,7 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
     amax <- pretty_max(.ssm_object$results$a_uci)
   }
   
-  # Convert results to numbers usable by ggplot and ggforce -----------------
+  # Convert results to numbers usable by ggplot and ggforce
   df_plot <- df %>%
     dplyr::rowwise() %>%
     dplyr::mutate(
@@ -86,9 +84,9 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
     dplyr::ungroup() %>%
     dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
   
-  # Remove profiles with low model fit (unless over-rided) ------------------
+  # Remove profiles with low model fit (unless overrided)
+  n <- nrow(df_plot)
   if (lowfit == FALSE) {
-    n <- nrow(df_plot)
     df_plot <- df_plot %>% 
       dplyr::filter(fit >= .70)
     n2 <- nrow(df_plot)
@@ -102,12 +100,10 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
     }
   }
   
-  # Initialize and configure the circle plot --------------------------------
   p <- circle_base(angles = angles, amax = amax, fontsize = fontsize) +
-    ggplot2::scale_color_brewer(palette = palette) +
-    ggplot2::scale_fill_brewer(palette = palette)
-  # TODO: Allow scale customization
-
+    ggplot2::scale_color_hue() +
+    ggplot2::scale_fill_hue()
+  
   p <- p +
     ggforce::geom_arc_bar(
       data = df_plot,
@@ -120,9 +116,8 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
     ) +
     ggplot2::geom_point(
       data = df_plot,
-      aes(x = x_est, y = y_est, fill = label),
-      color = "black",
-      shape = 21,
+      aes(x = x_est, y = y_est, color = label),
+      shape = 16,
       size = 3
     ) +
     ggplot2::guides(
@@ -132,7 +127,6 @@ ssm_plot_circle <- function(.ssm_object, palette = "Set1", amax = NULL,
     ggplot2::theme(
       legend.text = ggplot2::element_text(size = fontsize)
     )
-  # TODO: Account for the possibility of more than 8 plots
 
   p
 }
@@ -219,13 +213,13 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
   amax = 0.5, fontsize = 12) {
   
   ggplot2::ggplot() +
-    # Require plot to be square and remove default styling ---------------------
+    # Require plot to be square and remove default styling
   ggplot2::coord_fixed() +
     ggplot2::theme_void(base_size = fontsize) +
-    # Expand the axes multiplicatively to fit labels ---------------------------
+    # Expand the axes multiplicatively to fit labels
   ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
     ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
-    # Draw segments corresponding to displacement scale ------------------------
+    # Draw segments corresponding to displacement scale
   ggplot2::geom_segment(
     aes(
       x = 0,
@@ -236,7 +230,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
     color = "gray60",
     size = 0.5
   ) +
-    # Draw circles corresponding to amplitude scale ----------------------------
+    # Draw circles corresponding to amplitude scale
   ggforce::geom_circle(
     aes(x0 = 0, y0 = 0, r = 1:4),
     color = "gray60",
@@ -247,7 +241,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
       color = "gray50",
       size = 1.5
     ) +
-    # Draw labels for amplitude scale ------------------------------------------
+    # Draw labels for amplitude scale
   ggplot2::geom_label(
     aes(
       x = c(2, 4),
@@ -259,7 +253,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
     label.size = NA,
     size = fontsize / 2.8346438836889
   ) +
-    # Draw labels for displacement scale ---------------------------------------
+    # Draw labels for displacement scale
   ggplot2::geom_label(
     aes(
       x = 5.1 * cos(angles * pi / 180),
