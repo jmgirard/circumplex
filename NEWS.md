@@ -1,7 +1,6 @@
-# circumplex 0.0.0.9004
+circumplex 0.1.0 (2018-07-13)
+=============================
 
-* Completed basic SSM functions in anticipation of CRAN submission.
+### NEW FEATURES
 
-# circumplex 0.0.0.9000
-
-* Added a `NEWS.md` file to track changes to the package.
+* Submitted to CRAN
