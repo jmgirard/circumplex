@@ -30,7 +30,7 @@
 #'   (default = 2000).
 #' @param interval Optional. A single positive number between 0 and 1
 #'   (exclusive) that indicates what confidence level to use when estimating the
-#'   confidence intevals (default = 0.95).
+#'   confidence intervals (default = 0.95).
 #' @param listwise Optional. A logical indicating whether missing values should
 #'   be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
 #'   that pairwise deletion may result in different missing data patterns in
