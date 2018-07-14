@@ -69,42 +69,6 @@ quadrants <- function() {
   as_degree(c(135, 225, 315, 45))
 }
 
-#' Standardize specified variables in a data frame
-#'
-#' Takes in a data frame and the location of one or more variables to
-#' standardize. Returns that same data frame where the specified variables have
-#' been standardized (i.e., turned into z-scores with mean 0 and variance 1).
-#'
-#' @param .data A matrix or data frame containing at least one variable.
-#' @param .vars A list of the variables or column numbers in \code{.data}
-#'   that contain circumplex scales (in tidyverse-style NSE specification).
-#' @return A data frame containing standardized versions of the variables
-#'   specified in \code{.vars}, as well as any additional variables that
-#'   were included in \code{.data}. Variable ordering is preserved.
-#' @export
-#' @examples
-#' # Load example data
-#' data("jz2017")
-#' 
-#' # Standardize circumplex scales
-#' jz2017s <- standardize(jz2017, PA:NO)
-standardize <- function(.data, .vars) {
-  
-  # Enable tidy evaluation
-  vars_en <- rlang::enquo(.vars)
-  
-  # Check for valid arguments
-  assert_that(is_provided(.data), is_enquo(!!vars_en))
-  
-  # Convert the specified variables to z-scores
-  .data %>% 
-    dplyr::mutate_at(
-      .funs = dplyr::funs(as.numeric(scale(., center = TRUE, scale = TRUE))),
-      .vars = dplyr::vars(!!vars_en)
-    )
-  
-}
-
 # Compute differences between two sets of SSM parameters -----------------------
 param_diff <- function(p1, p2) {
   assert_that(is.numeric(p1), is.numeric(p2))
