@@ -13,7 +13,7 @@
 \item{SD}{Normative standard deviation for the scale}
 }}
 \source{
-\url{http://doi.org/10.1080/00223890802388665}
+\url{https://doi.org/10.1080/00223890802388665}
 }
 \usage{
 iipsc

@@ -90,7 +90,7 @@ new_ssm <- function(results, details, call, ...) {
 #' @export
 print.ssm <- function(x, digits = 3, ...) {
   # Print function call
-  cat("\nCall:\n",
+  cat("Call:\n",
     paste(deparse(x$call), sep = "\n", collapse = "\n"),
     "\n", sep = "")
   # Print each result as a block
@@ -118,7 +118,7 @@ print.ssm <- function(x, digits = 3, ...) {
 #' @export 
 summary.ssm <- function(object, digits = 3, ...) {
   # Print function call
-  cat("\nCall:\n",
+  cat("Call:\n",
     paste(deparse(object$call), sep = "\n", collapse = "\n"),
     "\n", sep = "")
   # Print analysis details

@@ -14,7 +14,7 @@
 #'   \item{LM}{circumplex scale at displacement 360}
 #'   \item{NO}{circumplex scale at displacement 45}
 #' }
-#' @source \url{http://doi.org/10.1080/00223890902935696}
+#' @source \url{https://doi.org/10.1080/00223890902935696}
 "aw2009"
 
 #' Raw octant scores on real circumplex scales with covariates
@@ -46,7 +46,7 @@
 #'   \item{DPNPD}{Dependent PD Symptoms (PDQ-4)}
 #'   \item{OCPD}{Obsessive-Compulsive PD Symptoms (PDQ-4)}
 #' }
-#' @source \url{http://doi.org/10.1177/1073191115621795}
+#' @source \url{https://doi.org/10.1177/1073191115621795}
 "jz2017"
 
 #' Normative data for IIP-SC
@@ -64,5 +64,5 @@
 #'   \item{M}{Normative mean for the scale}
 #'   \item{SD}{Normative standard deviation for the scale}
 #' }
-#' @source \url{http://doi.org/10.1080/00223890802388665}
+#' @source \url{https://doi.org/10.1080/00223890802388665}
 "iipsc"

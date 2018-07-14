@@ -16,7 +16,7 @@
 \item{NO}{circumplex scale at displacement 45}
 }}
 \source{
-\url{http://doi.org/10.1080/00223890902935696}
+\url{https://doi.org/10.1080/00223890902935696}
 }
 \usage{
 aw2009
