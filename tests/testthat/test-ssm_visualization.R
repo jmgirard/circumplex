@@ -29,7 +29,7 @@ test_that("Measure-contrast SSM plot is correct", {
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(ASPD, NARPD),
     contrast = "test")
-  p <- ssm_plot(res)
+  p <- ssm_plot(res, xy = FALSE)
   
   # Test the output object
   expect_type(p, "list")
@@ -47,5 +47,17 @@ test_that("Group-contrast correlation-based SSM plot is correct", {
   # Test the output object
   expect_type(p, "list")
   expect_s3_class(p, "ggplot")
+  
+})
+
+test_that("Removing plots with low fit works as expected", {
+  
+  data("jz2017")
+  
+  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, OCPD))
+  expect_message(ssm_plot(res), "One or more profiles were not plotted*")
+  
+  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = OCPD)
+  expect_error(ssm_plot(res), "After removing profiles, *")
   
 })
