@@ -99,6 +99,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// pairwise_r
+double pairwise_r(arma::colvec x, arma::colvec y);
+RcppExport SEXP _circumplex_pairwise_r(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::colvec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(pairwise_r(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 // corr_scores
 arma::mat corr_scores(arma::mat cs, arma::mat mv, arma::vec grp, bool lwd);
 RcppExport SEXP _circumplex_corr_scores(SEXP csSEXP, SEXP mvSEXP, SEXP grpSEXP, SEXP lwdSEXP) {
@@ -123,6 +135,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_circumplex_group_parameters", (DL_FUNC) &_circumplex_group_parameters, 2},
     {"_circumplex_col_means", (DL_FUNC) &_circumplex_col_means, 1},
     {"_circumplex_mean_scores", (DL_FUNC) &_circumplex_mean_scores, 3},
+    {"_circumplex_pairwise_r", (DL_FUNC) &_circumplex_pairwise_r, 2},
     {"_circumplex_corr_scores", (DL_FUNC) &_circumplex_corr_scores, 4},
     {NULL, NULL, 0}
 };

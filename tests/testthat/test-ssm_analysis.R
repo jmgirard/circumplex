@@ -82,7 +82,26 @@ test_that("Single-group correlation-based SSM results are correct", {
 
 })
 
+test_that("Pairwise and listwise scores are the same with no missingness", {
+  
+  skip_on_cran()
+  
+  data("jz2017")
+  res_lw <- ssm_analyze(jz2017, PA:NO, octants(), listwise = TRUE)
+  res_pw <- ssm_analyze(jz2017, PA:NO, octants(), listwise = FALSE)
+  expect_equal(res_lw$scores, res_pw$scores)
+  
+  res_lw <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
+    listwise = TRUE)
+  res_pw <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
+    listwise = FALSE)
+  expect_equal(res_lw$scores, res_pw$scores)
+  
+})
+
 test_that("Measure-contrast correlation-based SSM results are correct", {
+  
+  skip_on_cran()
   
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(ASPD, NARPD),
@@ -124,6 +143,8 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
 })
 
 test_that("Group-contrast correlation-based SSM results are correct", {
+  
+  skip_on_cran()
   
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = NARPD,

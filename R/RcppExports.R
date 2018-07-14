@@ -33,6 +33,10 @@ mean_scores <- function(cs, grp, lwd) {
     .Call(`_circumplex_mean_scores`, cs, grp, lwd)
 }
 
+pairwise_r <- function(x, y) {
+    .Call(`_circumplex_pairwise_r`, x, y)
+}
+
 corr_scores <- function(cs, mv, grp, lwd) {
     .Call(`_circumplex_corr_scores`, cs, mv, grp, lwd)
 }
