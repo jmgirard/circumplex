@@ -24,6 +24,18 @@ test_that("Column means are correct", {
   expect_equal(rcm[2], ccm[[2]])
 })
 
+test_that("Pairwise r is correct", {
+  x <- runif(100)
+  y <- runif(100)
+  xidx <- sample(1:100, 10, replace = FALSE)
+  x[xidx] <- NA
+  yidx <- sample(1:100, 10, replace = FALSE)
+  y[yidx] <- NA
+  rcor <- cor(x, y, use = "pairwise.complete.obs")
+  ccor <- pairwise_r(x, y)
+  expect_equal(rcor, ccor)
+})
+
 test_that("Angular mean is correct", {
   am <- angle_mean(c(0, 0, pi / 2))
   expect_equal(round(am, 3), 0.464)
