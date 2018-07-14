@@ -92,14 +92,17 @@ arma::mat mean_scores(arma::mat cs, arma::vec grp, bool lwd) {
 }
 
 // Calculate the correlation of x and y vectors after pairwise deletion
-double pairwise_r(arma::vec x, arma::vec y) {
-  int n = x.size();
-  arma::vec idx = arma::zeros<arma::vec>(n);
-  for (int i = 0; i < n; i++) {
-    if (!arma::is_finite(x[i]) || !arma::is_finite(y[i])) idx[i] = 0;
+// [[Rcpp::export]]
+double pairwise_r(arma::colvec x, arma::colvec y) {
+  arma::uword n = x.size();
+  arma::vec keep = arma::zeros<arma::vec>(n);
+  for (arma::uword i = 0; i < n; i++) {
+    if (arma::is_finite(x(i)) && arma::is_finite(y(i))) {
+      keep(i) = 1;
+    }
   }
-  arma::vec x2 = x.rows(arma::find(idx == 1));
-  arma::vec y2 = y.rows(arma::find(idx == 1));
+  arma::vec x2 = x.rows(arma::find(keep == 1));
+  arma::vec y2 = y.rows(arma::find(keep == 1));
   arma::mat r = arma::cor(x2, y2);
   return r(0, 0);
 }
@@ -108,9 +111,9 @@ double pairwise_r(arma::vec x, arma::vec y) {
 // [[Rcpp::export]]
 arma::mat corr_scores(arma::mat cs, arma::mat mv, arma::vec grp, bool lwd) {
   arma::vec levels = arma::sort(arma::unique(grp));
-  int ng = levels.size();
-  int pm = mv.n_cols;
-  int ps = cs.n_cols;
+  arma::uword ng = levels.size();
+  arma::uword pm = mv.n_cols;
+  arma::uword ps = cs.n_cols;
   arma::mat out = arma::zeros<arma::mat>(ng * pm, ps);
   if (ng == 1) {
     if (lwd == true) {
@@ -118,18 +121,19 @@ arma::mat corr_scores(arma::mat cs, arma::mat mv, arma::vec grp, bool lwd) {
       out = arma::cor(mv, cs);
     } else {
       // Single group and PWD
-      for (int m(0); m < pm; m++) {
+      for (arma::uword m = 0; m < pm; m++) {
         arma::colvec x = mv.col(m);
-        for (int s(0); s < ps; s++) {
+        for (arma::uword s = 0; s < ps; s++) {
           arma::colvec y = cs.col(s);
-          out(m, s) = pairwise_r(x, y);
+          double rpw = pairwise_r(x, y);
+          out(m, s) = rpw;
         }
       }
     }
   } else{ 
     if (lwd == true) {
       // Multiple groups and LWD
-      for (int g(0); g < ng; g++) {
+      for (arma::uword g = 0; g < ng; g++) {
         int level = levels(g);
         arma::mat gcs = cs.rows(arma::find(grp == level));
         arma::mat gmv = mv.rows(arma::find(grp == level));
@@ -137,13 +141,13 @@ arma::mat corr_scores(arma::mat cs, arma::mat mv, arma::vec grp, bool lwd) {
       }
     } else {
       // Multiple groups and PWD
-      for (int g(0); g < ng; g++) {
+      for (arma::uword g = 0; g < ng; g++) {
         int level = levels(g);
         arma::mat gcs = cs.rows(arma::find(grp == level));
         arma::mat gmv = mv.rows(arma::find(grp == level));
-        for (int m(0); m < pm; m++) {
+        for (arma::uword m = 0; m < pm; m++) {
           arma::vec x = gmv.col(m);
-          for (int s(0); s < ps; s++) {
+          for (arma::uword s = 0; s < ps; s++) {
             arma::vec y = gcs.col(s);
             out(g * pm + m, s) = pairwise_r(x, y);
           }
