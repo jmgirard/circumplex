@@ -4,7 +4,7 @@ test_that("Single-group mean-based SSM results are correct", {
   
   data("aw2009")
   res <- ssm_analyze(aw2009, PA:NO, octants())
-  
+
   # Test the output object
   expect_type(res, "list")
   expect_s3_class(res, "ssm")
@@ -43,7 +43,7 @@ test_that("Single-group correlation-based SSM results are correct", {
   
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
-  
+
   # Test the output object
   expect_type(res, "list")
   expect_s3_class(res, "ssm")
@@ -87,7 +87,7 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(ASPD, NARPD),
     contrast = "test")
-  
+
   # Test the output object
   expect_type(res, "list")
   expect_s3_class(res, "ssm")
@@ -128,7 +128,7 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = NARPD,
     grouping = Gender, contrast = "test")
-  
+
   # Test the output object
   expect_type(res, "list")
   expect_s3_class(res, "ssm")

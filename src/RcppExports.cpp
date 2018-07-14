@@ -17,6 +17,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// angle_dev
+double angle_dev(NumericVector theta, double xv);
+RcppExport SEXP _circumplex_angle_dev(SEXP thetaSEXP, SEXP xvSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< double >::type xv(xvSEXP);
+    rcpp_result_gen = Rcpp::wrap(angle_dev(theta, xv));
+    return rcpp_result_gen;
+END_RCPP
+}
 // angle_median
 double angle_median(NumericVector x);
 RcppExport SEXP _circumplex_angle_median(SEXP xSEXP) {
@@ -63,6 +75,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// col_means
+arma::rowvec col_means(arma::mat x);
+RcppExport SEXP _circumplex_col_means(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(col_means(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // mean_scores
 arma::mat mean_scores(arma::mat cs, arma::vec grp, bool lwd);
 RcppExport SEXP _circumplex_mean_scores(SEXP csSEXP, SEXP grpSEXP, SEXP lwdSEXP) {
@@ -93,10 +116,12 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_circumplex_angle_mean", (DL_FUNC) &_circumplex_angle_mean, 1},
+    {"_circumplex_angle_dev", (DL_FUNC) &_circumplex_angle_dev, 2},
     {"_circumplex_angle_median", (DL_FUNC) &_circumplex_angle_median, 1},
     {"_circumplex_compare_pi", (DL_FUNC) &_circumplex_compare_pi, 1},
     {"_circumplex_ssm_parameters", (DL_FUNC) &_circumplex_ssm_parameters, 2},
     {"_circumplex_group_parameters", (DL_FUNC) &_circumplex_group_parameters, 2},
+    {"_circumplex_col_means", (DL_FUNC) &_circumplex_col_means, 1},
     {"_circumplex_mean_scores", (DL_FUNC) &_circumplex_mean_scores, 3},
     {"_circumplex_corr_scores", (DL_FUNC) &_circumplex_corr_scores, 4},
     {NULL, NULL, 0}

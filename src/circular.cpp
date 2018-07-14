@@ -23,6 +23,7 @@ double angle_mean(NumericVector x) {
   return out;
 }
 
+// [[Rcpp::export]]
 double angle_dev(NumericVector theta, double xv) {
   double n = theta.size();
   double values = 0;

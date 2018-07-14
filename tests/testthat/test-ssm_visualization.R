@@ -24,7 +24,7 @@ test_that("Single-group correlation-based SSM plot is correct", {
   
 })
 
-test_that("Measure-contrast correlation-based SSM plot is correct", {
+test_that("Measure-contrast SSM plot is correct", {
   
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(ASPD, NARPD),

@@ -5,6 +5,10 @@ angle_mean <- function(x) {
     .Call(`_circumplex_angle_mean`, x)
 }
 
+angle_dev <- function(theta, xv) {
+    .Call(`_circumplex_angle_dev`, theta, xv)
+}
+
 angle_median <- function(x) {
     .Call(`_circumplex_angle_median`, x)
 }
@@ -19,6 +23,10 @@ ssm_parameters <- function(scores, angles) {
 
 group_parameters <- function(scores, angles) {
     .Call(`_circumplex_group_parameters`, scores, angles)
+}
+
+col_means <- function(x) {
+    .Call(`_circumplex_col_means`, x)
 }
 
 mean_scores <- function(cs, grp, lwd) {
