@@ -46,12 +46,12 @@ arma::vec group_parameters(arma::mat scores, arma::vec angles) {
 // Calculate the mean of each column in matrix x (ignoring missing values)
 // [[Rcpp::export]]
 arma::rowvec col_means(arma::mat x) {
-  int p = x.n_cols;
-  arma::rowvec out(p);
-  for (int i(0); i < p; i++) {
+  arma::uword p = x.n_cols;
+  arma::rowvec out = arma::zeros<arma::rowvec>(p);
+  for (arma::uword i = 0; i < p; i++) {
     arma::colvec y = x.col(i);
     y = y.elem(find_finite(y));
-    out(i) = mean(y);
+    out(i) = arma::mean(y);
   }
   return out; 
 }
