@@ -39,6 +39,35 @@ test_that("Single-group mean-based SSM results are correct", {
   
 })
 
+test_that("Multiple-group mean-based SSM results are correct", {
+  
+  data("jz2017")
+  res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
+  
+  # Test the output object
+  expect_type(res, "list")
+  expect_s3_class(res, "ssm")
+  
+  # TODO: Verify and check results
+  
+})
+
+test_that("Single-group mean-based SSM contrast throws error", {
+  
+  data("aw2009")
+  expect_error(ssm_analyze(aw2009, PA:NO, octants(), contrast = "test"),
+    "Without specifying measures or grouping, *")
+  
+})
+
+test_that("Providing more than two groups throws error", {
+  
+  data("jz2017")
+  expect_error(ssm_analyze(jz2017, PA:NO, octants(), grouping = PARPD,
+    contrast = "test"), "Only two groups can be contrasted at a time.*")
+  
+})
+
 test_that("Single-group correlation-based SSM results are correct", {
   
   data("jz2017")
