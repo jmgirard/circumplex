@@ -52,11 +52,15 @@ test_that("Multiple-group mean-based SSM results are correct", {
   
 })
 
-test_that("Single-group mean-based SSM contrast throws error", {
+test_that("Providing one group throws error", {
   
   data("aw2009")
-  expect_error(ssm_analyze(aw2009, PA:NO, octants(), contrast = "test"),
+  expect_error(ssm_analyze(aw2009, PA:NO, octants(), contrast = "model"),
     "Without specifying measures or grouping, *")
+  
+  data("jz2017")
+  expect_error(ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
+    contrast = "test"), "No valid contrasts were possible*")
   
 })
 
@@ -65,6 +69,18 @@ test_that("Providing more than two groups throws error", {
   data("jz2017")
   expect_error(ssm_analyze(jz2017, PA:NO, octants(), grouping = PARPD,
     contrast = "test"), "Only two groups can be contrasted at a time.*")
+  
+})
+
+test_that("Scale magnitudes greater than 5 trigger message", {
+  
+  data("aw2009")
+  aw2009a <- aw2009 * 5
+  aw2009b <- aw2009 * -5
+  expect_message(ssm_analyze(aw2009a, PA:NO, octants()),
+    "Your circumplex scales do not appear to be standardized*")
+  expect_message(ssm_analyze(aw2009b, PA:NO, octants()),
+    "Your circumplex scales do not appear to be standardized*")
   
 })
 
@@ -133,6 +149,7 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   skip_on_cran()
   
   data("jz2017")
+  res1 <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(ASPD, NARPD))
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(ASPD, NARPD),
     contrast = "test")
 
