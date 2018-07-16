@@ -48,6 +48,9 @@ test_that("Multiple-group mean-based SSM results are correct", {
   expect_type(res, "list")
   expect_s3_class(res, "ssm")
   
+  res1 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender,
+    contrast = "model")
+  
   # TODO: Verify and check results
   
 })
