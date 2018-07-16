@@ -140,9 +140,9 @@ ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
     } else {
       # Single group means
       if (contrast != "none") {
-        stop(c("Error: Without specifying measures or grouping, no ", 
-          "contrasts are possible.\n\n  Hint: Set contrast = 'none' or add ", 
-          "the measures or grouping arguments."))
+        stop(c("Without specifying measures or grouping, no contrasts are ", 
+          "possible.\n\n  Hint: Set contrast = 'none' or add the measures or ",
+          "grouping arguments."))
       }
       ssm_analyze_means(.data,
         scales = !!scales_en,
