@@ -37,14 +37,14 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
 
   # Calculate the lower bounds of the confidence intervals ---------------------
   bs_lci <- bs_t %>%
-    purrr::map_dbl(.f = stats::quantile, probs = ((1 - interval) / 2)) %>%
+    purrr::map_dbl(.f = quantile, probs = ((1 - interval) / 2)) %>%
     reshape_params() %>%
     `colnames<-`(c("e_lci", "x_lci", "y_lci", "a_lci", "d_lci", "f_lci")) %>%
     dplyr::select(-f_lci)
 
   # Calculate the upper bounds of the confidence intervals ---------------------
   bs_uci <- bs_t %>%
-    purrr::map_dbl(.f = stats::quantile, probs = (1 - (1 - interval) / 2)) %>%
+    purrr::map_dbl(.f = quantile, probs = (1 - (1 - interval) / 2)) %>%
     reshape_params() %>%
     `colnames<-`(c("e_uci", "x_uci", "y_uci", "a_uci", "d_uci", "f_uci")) %>%
     dplyr::select(-f_uci)
