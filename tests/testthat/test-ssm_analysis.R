@@ -52,17 +52,97 @@ test_that("Single-group mean-based SSM results are correct", {
 
 test_that("Multiple-group mean-based SSM results are correct", {
   
+  skip_on_cran()
+  
   data("jz2017")
+  set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
   
   # Test the output object
   expect_type(res, "list")
   expect_s3_class(res, "ssm")
   
-  res1 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender,
+  # Test the results subobject
+  expect_equal(round(res$results$e_est, 3), c(0.946, 0.884))
+  expect_equal(round(res$results$x_est, 3), c(0.459, 0.227))
+  expect_equal(round(res$results$y_est, 3), c(-0.310, -0.186))
+  expect_equal(round(res$results$a_est, 3), c(0.554, 0.294))
+  expect_equal(as.vector(round(res$results$d_est, 3)), c(325.963, 320.685))
+  expect_equal(round(res$results$fit, 3), c(0.889, 0.824))
+  expect_equal(res$results$label, c("Female", "Male"))
+  expect_equal(round(res$results$e_lci, 3), c(0.907, 0.843))
+  expect_equal(round(res$results$e_uci, 3), c(0.982, 0.925))
+  expect_equal(round(res$results$x_lci, 3), c(0.421, 0.192))
+  expect_equal(round(res$results$x_uci, 3), c(0.498, 0.261))
+  expect_equal(round(res$results$y_lci, 3), c(-0.350, -0.224))
+  expect_equal(round(res$results$y_uci, 3), c(-0.268, -0.149))
+  expect_equal(round(res$results$a_lci, 3), c(0.511, 0.258))
+  expect_equal(round(res$results$a_uci, 3), c(0.596, 0.331))
+  expect_equal(as.vector(round(res$results$d_lci, 3)), c(322.305, 313.424))
+  expect_equal(as.vector(round(res$results$d_uci, 3)), c(330.027, 327.915))
+  
+  # Test the scores subobject
+  expect_equal(round(res$scores$PA, 3), c(0.519, 0.585))
+  expect_equal(round(res$scores$BC, 3), c(0.504, 0.674))
+  expect_equal(round(res$scores$DE, 3), c(0.589, 0.664))
+  expect_equal(round(res$scores$FG, 3), c(0.685, 0.856))
+  expect_equal(round(res$scores$HI, 3), c(1.330, 1.075))
+  expect_equal(round(res$scores$JK, 3), c(1.361, 1.047))
+  expect_equal(round(res$scores$LM, 3), c(1.645, 1.300))
+  expect_equal(round(res$scores$NO, 3), c(0.933, 0.868)) 
+  expect_equal(res$scores$label, c("Female", "Male"))
+  
+  # Test the details subobject
+  expect_equal(res$details$boots, 2000)
+  expect_equal(res$details$interval, 0.95)
+  expect_true(res$details$listwise)
+  expect_equivalent(res$details$angles, octants())
+  expect_equal(res$details$contrast, "none")
+  expect_equal(res$details$score_type, "Mean")
+  expect_equal(res$details$results_type, "Profile")
+  
+})
+
+test_that("Multiple-group mean-based SSM contrast is correct", {
+  
+  skip_on_cran()
+  
+  data("jz2017")
+  set.seed(12345)
+  res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender,
     contrast = "model")
   
-  # TODO: Verify and check results
+  # Test the output object
+  expect_type(res, "list")
+  expect_s3_class(res, "ssm")
+  
+  # Test the results subobject
+  expect_equal(round(res$results$e_est, 3), -0.062)
+  expect_equal(round(res$results$x_est, 3), -0.232)
+  expect_equal(round(res$results$y_est, 3), 0.124)
+  expect_equal(round(res$results$a_est, 3), 0.263)
+  expect_equal(round(res$results$d_est, 3), 151.858)
+  expect_equal(round(res$results$fit, 3), 0.855)
+  expect_equal(res$results$label, "Male - Female")
+  expect_equal(round(res$results$e_lci, 3), -0.116)
+  expect_equal(round(res$results$e_uci, 3), -0.004)
+  expect_equal(round(res$results$x_lci, 3), -0.286)
+  expect_equal(round(res$results$x_uci, 3), -0.183)
+  expect_equal(round(res$results$y_lci, 3), 0.065)
+  expect_equal(round(res$results$y_uci, 3), 0.181)
+  expect_equal(round(res$results$a_lci, 3), 0.211)
+  expect_equal(round(res$results$a_uci, 3), 0.320)
+  expect_equal(round(res$results$d_lci, 3), 141.379)
+  expect_equal(round(res$results$d_uci, 3), 164.198)
+  
+  # Test the details subobject
+  expect_equal(res$details$boots, 2000)
+  expect_equal(res$details$interval, 0.95)
+  expect_true(res$details$listwise)
+  expect_equivalent(res$details$angles, octants())
+  expect_equal(res$details$contrast, "model")
+  expect_equal(res$details$score_type, "Mean")
+  expect_equal(res$details$results_type, "Contrast")
   
 })
 
@@ -101,6 +181,7 @@ test_that("Scale magnitudes greater than 5 trigger message", {
 test_that("Single-group correlation-based SSM results are correct", {
   
   data("jz2017")
+  set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
 
   # Test the output object
@@ -117,6 +198,16 @@ test_that("Single-group correlation-based SSM results are correct", {
   expect_equal(res$scores$Group, factor("All"))
   expect_equal(res$scores$Measure, "PARPD")
   expect_equal(res$scores$label, "PARPD")
+  expect_equal(round(res$results$e_lci, 3), 0.218)
+  expect_equal(round(res$results$e_uci, 3), 0.280)
+  expect_equal(round(res$results$x_lci, 3), -0.129)
+  expect_equal(round(res$results$x_uci, 3), -0.060)
+  expect_equal(round(res$results$y_lci, 3), 0.081)
+  expect_equal(round(res$results$y_uci, 3), 0.153)
+  expect_equal(round(res$results$a_lci, 3), 0.115)
+  expect_equal(round(res$results$a_uci, 3), 0.189)
+  expect_equal(as.vector(round(res$results$d_lci, 3)), 115.894)
+  expect_equal(as.vector(round(res$results$d_uci, 3)), 142.094)
   
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), 0.329)
@@ -163,7 +254,7 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   skip_on_cran()
   
   data("jz2017")
-  res1 <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(ASPD, NARPD))
+  set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(ASPD, NARPD),
     contrast = "test")
 
@@ -179,6 +270,16 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$d_est, 1), -7.0)
   expect_equal(round(res$results$fit, 3), -0.007)
   expect_equal(res$results$label, "NARPD - ASPD")
+  expect_equal(round(res$results$e_lci, 3), 0.039)
+  expect_equal(round(res$results$e_uci, 3), 0.116)
+  expect_equal(round(res$results$x_lci, 3), -0.003)
+  expect_equal(round(res$results$x_uci, 3), 0.075)
+  expect_equal(round(res$results$y_lci, 3), -0.060)
+  expect_equal(round(res$results$y_uci, 3), 0.012)
+  expect_equal(round(res$results$a_lci, 3), -0.075)
+  expect_equal(round(res$results$a_uci, 3), 0.001)
+  expect_equal(round(res$results$d_lci, 3), -17.322)
+  expect_equal(round(res$results$d_uci, 3), 3.662)
   
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.368, 0.400))
@@ -198,8 +299,10 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   expect_equal(res$details$interval, 0.95)
   expect_true(res$details$listwise)
   expect_equal(res$details$angles, octants())
+  expect_equal(res$details$contrast, "test")
   expect_equal(res$details$score_type, "Correlation")
   expect_equal(res$details$results_type, "Contrast")
+  
 })
 
 test_that("Group-contrast correlation-based SSM results are correct", {
@@ -207,6 +310,7 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   skip_on_cran()
   
   data("jz2017")
+  set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = NARPD,
     grouping = Gender, contrast = "test")
 
@@ -222,6 +326,16 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$d_est, 1), -10.4)
   expect_equal(round(res$results$fit, 3), -0.071)
   expect_equal(res$results$label, "NARPD: Male - Female")
+  expect_equal(round(res$results$e_lci, 3), 0.004)
+  expect_equal(round(res$results$e_uci, 3), 0.140)
+  expect_equal(round(res$results$x_lci, 3), -0.009)
+  expect_equal(round(res$results$x_uci, 3), 0.113)
+  expect_equal(round(res$results$y_lci, 3), -0.122)
+  expect_equal(round(res$results$y_uci, 3), 0.011)
+  expect_equal(round(res$results$a_lci, 3), -0.134)
+  expect_equal(round(res$results$a_uci, 3), 0.003)
+  expect_equal(round(res$results$d_lci, 3), -31.700)
+  expect_equal(round(res$results$d_uci, 3), 9.985)
   
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.385, 0.415))
@@ -241,6 +355,8 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   expect_equal(res$details$interval, 0.95)
   expect_true(res$details$listwise)
   expect_equal(res$details$angles, octants())
+  expect_equal(res$details$contrast, "test")
   expect_equal(res$details$score_type, "Correlation")
   expect_equal(res$details$results_type, "Contrast")
+  
 })
