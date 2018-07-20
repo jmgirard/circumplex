@@ -14,7 +14,7 @@ test_that("SSM parameters are correct", {
   
 })
 
-test_that("Column means are correct", {
+test_that("Column means are correct even with missing", {
   mat <- matrix(runif(200), ncol = 2)
   idx <- sample(1:200, 50, replace = FALSE)
   mat[idx] <- NA
@@ -24,7 +24,7 @@ test_that("Column means are correct", {
   expect_equal(rcm[2], ccm[[2]])
 })
 
-test_that("Pairwise r is correct", {
+test_that("Pairwise r is correct even with missing", {
   x <- runif(100)
   y <- runif(100)
   xidx <- sample(1:100, 10, replace = FALSE)
