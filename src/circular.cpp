@@ -35,6 +35,7 @@ double angle_dev(NumericVector theta, double xv) {
   return values;
 }
 
+// TODO: Check for missing values in x
 // [[Rcpp::export]]
 double angle_median(NumericVector x) {
   double n = x.size();
