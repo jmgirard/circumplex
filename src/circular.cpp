@@ -55,13 +55,17 @@ double angle_median(NumericVector x) {
   return angle_mean(candidates);
 }
 
+// Rescale to between -pi and pi radians (or -180 and 180 degrees)
 // [[Rcpp::export]]
 NumericVector compare_pi(NumericVector x) {
   int n = x.size();
   NumericVector y = clone(x);
   for (int i(0); i < n; i++) {
-    y[i] = (y[i] < -PI)?(y[i] + (2 * PI)):(y[i]);
-    y[i] = (y[i] > PI)?(y[i] - (2 * PI)):(y[i]);
+    // If less than -PI, add 2 * PI
+    y[i] = (y[i] < -PI) ? (y[i] + (2 * PI)) : (y[i]);
+    // If greater than PI, subtract 2 * PI
+    y[i] = (y[i] > PI) ? (y[i] - (2 * PI)) : (y[i]);
+    // If between -PI and PI, leave as is
   }
   return y;
 }
