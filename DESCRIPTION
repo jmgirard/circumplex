@@ -39,7 +39,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1
 Suggests: 
     testthat (>= 2.0.0),
-    kableExtra,
+    kableExtra (>= 0.9.0),
     knitr (>= 1.20),
     rmarkdown (>= 1.10),
     covr (>= 3.1.0)
