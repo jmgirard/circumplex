@@ -80,6 +80,7 @@ ssm_by_group <- function(scores, angles, contrast) {
 # Calculate quantiles for circular data in radians
 #' @export
 quantile.radian <- function(x, ...) {
+  if (all(is.na(x))) return(NA)
   mdn <- angle_median(x)
   if (is.na(mdn)) return(NA)
   tx <- (x - mdn) %% (2 * pi)
