@@ -6,6 +6,8 @@ test_that("Single-group mean-based SSM results are correct", {
   set.seed(12345)
   res <- ssm_analyze(aw2009, PA:NO, octants())
 
+  print(res)
+  
   # Test the output object
   expect_type(res, "list")
   expect_s3_class(res, "ssm")
