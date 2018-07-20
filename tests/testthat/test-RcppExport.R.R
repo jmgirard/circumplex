@@ -39,6 +39,9 @@ test_that("Pairwise r is correct", {
 test_that("Angular mean is correct", {
   am <- angle_mean(c(0, 0, pi / 2))
   expect_equal(round(am, 3), 0.464)
+  
+  am <- angle_mean(as_radian(octants()))
+  expect_true(is.na(am))
 })
 
 test_that("Angular median is correct", {
