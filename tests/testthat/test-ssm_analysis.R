@@ -3,6 +3,7 @@ context("test-ssm_analysis.R")
 test_that("Single-group mean-based SSM results are correct", {
   
   data("aw2009")
+  set.seed(12345)
   res <- ssm_analyze(aw2009, PA:NO, octants())
 
   # Test the output object
@@ -17,6 +18,16 @@ test_that("Single-group mean-based SSM results are correct", {
   expect_equal(as.vector(round(res$results$d_est, 1)), 344.4)
   expect_equal(round(res$results$fit, 3), 0.954)
   expect_equal(res$results$label, "All")
+  expect_equal(round(res$results$e_lci, 3), 0.131)
+  expect_equal(round(res$results$e_uci, 3), 0.702)
+  expect_equal(round(res$results$x_lci, 3), 0.654)
+  expect_equal(round(res$results$x_uci, 3), 1.235)
+  expect_equal(round(res$results$y_lci, 3), -0.829)
+  expect_equal(round(res$results$y_uci, 3), 0.300)
+  expect_equal(round(res$results$a_lci, 3), 0.662)
+  expect_equal(round(res$results$a_uci, 3), 1.370)
+  expect_equal(as.vector(round(res$results$d_lci, 3)), 316.480)
+  expect_equal(as.vector(round(res$results$d_uci, 3)), 17.194)
   
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), 0.374)
