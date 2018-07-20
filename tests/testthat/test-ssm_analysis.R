@@ -236,15 +236,31 @@ test_that("Pairwise and listwise scores are the same with no missingness", {
   
   skip_on_cran()
   
+  # Single-group mean
   data("jz2017")
   res_lw <- ssm_analyze(jz2017, PA:NO, octants(), listwise = TRUE)
   res_pw <- ssm_analyze(jz2017, PA:NO, octants(), listwise = FALSE)
   expect_equal(res_lw$scores, res_pw$scores)
   
+  # Single-group correlation
   res_lw <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
     listwise = TRUE)
   res_pw <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
     listwise = FALSE)
+  expect_equal(res_lw$scores, res_pw$scores)
+  
+  # Multiple-group mean
+  res_lw <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender,
+    listwise = TRUE)
+  res_pw <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender,
+    listwise = FALSE)
+  expect_equal(res_lw$scores, res_pw$scores)
+  
+  # Multiple-group correlation
+  res_lw <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
+    grouping = Gender, listwise = TRUE)
+  res_pw <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
+    grouping = Gender, listwise = FALSE)
   expect_equal(res_lw$scores, res_pw$scores)
   
 })
