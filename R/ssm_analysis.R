@@ -202,6 +202,7 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrast,
   colnames(scores) <- names(dplyr::select(bs_input, !!scales_en))
   rownames(scores) <- levels(bs_input$Group)
   scores <- tibble::as_tibble(scores, rownames = "label")
+  # TODO: If contrast == "model" then scores should be diff
   
   # Create function that will perform bootstrapping
   bs_function <- function(.data, index, angles, contrast, listwise) {

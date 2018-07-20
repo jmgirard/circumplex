@@ -10,6 +10,8 @@ test_that("Single-group mean-based SSM plot is correct", {
   expect_type(p, "list")
   expect_s3_class(p, "ggplot")
   
+  # TODO: Add tests of transformed data and legend
+  
 })
 
 test_that("Single-group correlation-based SSM plot is correct", {
