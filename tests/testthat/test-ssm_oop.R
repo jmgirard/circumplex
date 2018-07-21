@@ -29,13 +29,18 @@ test_that("S3 degree functions work as expected", {
   expect_equal(as.numeric(y3), x)
 })
 
-test_that("The print.ssm method is working", {
+test_that("The ssm display methods is working", {
   
   skip_on_cran()
   
   data("aw2009")
   res <- ssm_analyze(aw2009, PA:NO, octants())
   expect_output(print(res), "Profile \\[All\\]:")
+  expect_output(summary(res), "Statistical Basis:\\t Mean Scores")
+  expect_output(summary(res), "Bootstrap Resamples:\\t 2000")
+  expect_output(summary(res), "Confidence Level:\\t 0\\.95")
+  expect_output(summary(res), "Listwise Deletion:\\t TRUE")
+  expect_output(summary(res), "Scale Displacements:\\t 90 135 180 225 270 315 360 45")
 
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
@@ -49,5 +54,6 @@ test_that("The print.ssm method is working", {
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
     grouping = Gender, contrast = "test")
   expect_output(print(res), "Contrast \\[PARPD: Male - Female\\]:")
+  expect_output(summary(res), "Statistical Basis:\\t Correlation Scores")
   
 })
