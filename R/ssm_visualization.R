@@ -283,7 +283,9 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' @param xy A logical indicating whether the x-value and y-value parameters
 #'   should be included in the table as columns (default = TRUE).
 #' @param viewer A logical indicating whether the table should be displayed
-#'   using the RStudio viewer.
+#'   using the RStudio viewer (default = TRUE).
+#' @param tibble A logical indicating whether the output should be the tibble
+#'   underlying the table or the htmlTable output object (default = FALSE).
 #' @return An HTML table containing SSM results or contrasts.
 #' @family ssm functions
 #' @family table functions
@@ -303,12 +305,12 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' ssm_table(res)
 
 ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
-  viewer = TRUE) {
+  viewer = TRUE, tibble = FALSE) {
   
   assert_that(is_provided(.ssm_object))
   assert_that(is.null(filename) || is.string(filename))
   assert_that(is.null(caption) || is.string(caption))
-  assert_that(is.flag(xy))
+  assert_that(is.flag(xy), is.flag(viewer), is.flag(tibble))
   
   df <- .ssm_object$results
 
@@ -349,22 +351,26 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
     align <- "lll"
   }
   
-  t <- htmlTable::htmlTable(df,
-    caption = caption,
-    align = align,
-    align.header = align,
-    rnames = FALSE,
-    css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
-  )
-  
-  if (is.null(filename) == TRUE) {
-    print(t, type = "html", useViewer = viewer)
+  if (tibble == TRUE) {
+    t <- df
   } else {
-    sink(filename)
-    print(t, type = "html", useViewer = viewer)
-    sink()
+    t <- htmlTable::htmlTable(df,
+      caption = caption,
+      align = align,
+      align.header = align,
+      rnames = FALSE,
+      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
+    )
+    
+    if (is.null(filename) == TRUE) {
+      print(t, type = "html", useViewer = viewer)
+    } else {
+      sink(filename)
+      print(t, type = "html", useViewer = viewer)
+      sink()
+    }
   }
-  
+
   t
 }
 
