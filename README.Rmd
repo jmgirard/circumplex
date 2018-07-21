@@ -1,5 +1,6 @@
 ---
 output: github_document
+always_allow_html: yes
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -9,6 +10,8 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 library(circumplex)
+library(knitr)
+library(kableExtra)
 ```
 
 # circumplex
@@ -47,35 +50,11 @@ results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD))
 ``` r
 ssm_table(results, xy = FALSE)
 ```
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
-<thead>
-<tr><td colspan='5' style='text-align: left;'>
-Correlation-based Structural Summary Statistics with 95% CIs</td></tr>
-<tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>Profile</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>Elevation</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>Amplitude</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>Displacement</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>Fit</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>NARPD</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.20 [0.17, 0.24]</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.19 [0.16, 0.22]</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>109.0 [99.5, 118.2]</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.957</td>
-</tr>
-<tr>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>ASPD</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.12 [0.09, 0.16]</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.23 [0.19, 0.26]</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>115.9 [107.1, 124.4]</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.964</td>
-</tr>
-</tbody>
-</table>
+```{r table1, echo=FALSE}
+ssm_table(results, xy = FALSE, tibble = TRUE) %>% 
+  kable() %>% 
+  kable_styling()
+```
 
 ```{r plot1}
 ssm_plot(results)
@@ -91,29 +70,11 @@ results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD),
 ``` r
 ssm_table(results, xy = FALSE)
 ```
-
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
-<thead>
-<tr><td colspan='5' style='text-align: left;'>
-Correlation-based Structural Summary Statistic Contrasts with 95% CIs</td></tr>
-<tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>Contrast</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>&Delta; Elevation</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>&Delta; Amplitude</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>&Delta; Displacement</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'>&Delta; Fit</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>ASPD - NARPD</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>-0.08 [-0.12, -0.04]</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.04 [-0.00, 0.08]</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>7.0 [-3.7, 17.5]</td>
-<td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.007</td>
-</tr>
-</tbody>
-</table>
+```{r table2, echo=FALSE}
+ssm_table(results, xy = FALSE, tibble = TRUE) %>% 
+  kable() %>% 
+  kable_styling()
+```
 
 ```{r plot2}
 ssm_plot(results, xy = FALSE)

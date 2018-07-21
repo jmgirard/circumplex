@@ -43,69 +43,63 @@ results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD))
 ssm_table(results, xy = FALSE)
 ```
 
-<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
-<td colspan="5" style="text-align: left;">
-Correlation-based Structural Summary Statistics with 95% CIs
-</td>
-</tr>
-<tr>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
+<th style="text-align:left;">
 Profile
 </th>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
+<th style="text-align:left;">
 Elevation
 </th>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
+<th style="text-align:left;">
 Amplitude
 </th>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
+<th style="text-align:left;">
 Displacement
 </th>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
+<th style="text-align:left;">
 Fit
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;">
+<td style="text-align:left;">
 NARPD
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;">
+<td style="text-align:left;">
 0.20 [0.17, 0.24]
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;">
+<td style="text-align:left;">
 0.19 [0.16, 0.22]
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;">
-109.0 [99.5, 118.2]
+<td style="text-align:left;">
+109.0 [100.1, 118.4]
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;">
+<td style="text-align:left;">
 0.957
 </td>
 </tr>
 <tr>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
+<td style="text-align:left;">
 ASPD
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
+<td style="text-align:left;">
 0.12 [0.09, 0.16]
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
+<td style="text-align:left;">
 0.23 [0.19, 0.26]
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
-115.9 [107.1, 124.4]
+<td style="text-align:left;">
+115.9 [107.8, 125.0]
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
+<td style="text-align:left;">
 0.964
 </td>
 </tr>
 </tbody>
 </table>
-
 ``` r
 ssm_plot(results)
 ```
@@ -124,52 +118,46 @@ results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD),
 ssm_table(results, xy = FALSE)
 ```
 
-<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
-<td colspan="5" style="text-align: left;">
-Correlation-based Structural Summary Statistic Contrasts with 95% CIs
-</td>
-</tr>
-<tr>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
+<th style="text-align:left;">
 Contrast
 </th>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
-Δ Elevation
+<th style="text-align:left;">
+&Delta; Elevation
 </th>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
-Δ Amplitude
+<th style="text-align:left;">
+&Delta; Amplitude
 </th>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
-Δ Displacement
+<th style="text-align:left;">
+&Delta; Displacement
 </th>
-<th style="border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;">
-Δ Fit
+<th style="text-align:left;">
+&Delta; Fit
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
+<td style="text-align:left;">
 ASPD - NARPD
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
+<td style="text-align:left;">
 -0.08 [-0.12, -0.04]
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
+<td style="text-align:left;">
 0.04 [-0.00, 0.08]
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
-7.0 [-3.7, 17.5]
+<td style="text-align:left;">
+7.0 [-3.3, 17.3]
 </td>
-<td style="padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;">
+<td style="text-align:left;">
 0.007
 </td>
 </tr>
 </tbody>
 </table>
-
 ``` r
 ssm_plot(results, xy = FALSE)
 ```
