@@ -33,11 +33,12 @@ walking users through applying it using the relevant `circumplex` functions.
 
 To illustrate the SSM functions, we will use the example dataset `jz2017`, which
 was provided by Zimmermann & Wright (2017) and reformatted for this package.
-This dataset includes self-report responses from 1166 undergraduate students on 
-a circumplex measure of interpersonal problems (PA, BC, DE, FG, HI, JK, LM, and
-NO) and a measure of personality disorder symptoms (PARPD, SCZPD, SZTPD, ASPD,
-BORPD, HISPD, NARPD, AVPD, DPNPD, and OCPD). More information about these
-variables can be accessed using the `?jz2017` command in R.
+This dataset includes self-report data from 1166 undergraduate students.
+Students completed a circumplex measure of interpersonal problems with eight 
+subscales (PA, BC, DE, FG, HI, JK, LM, and NO) and a measure of personality
+disorder symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD,
+NARPD, AVPD, DPNPD, and OCPD). More information about these variables can be
+accessed using the `?jz2017` command in R.
 
 ```{r}
 data("jz2017")
@@ -186,38 +187,36 @@ knitr::kable(tab, escape = FALSE) %>%
 The three main questions to ask when conducting a new SSM analysis are:
 
 1. **Do we want to project non-circumplex measures into the circumplex space?**
-If so, you must specify one or more `measures` and the scores that get modeled 
+If yes, we must specify one or more `measures`, and the scores that get modeled 
 using SSM will be the correlations between the circumplex scales and these
-measures. If not, then omit the `measures` argument and the scores that get
+measures. If no, we must omit the `measures` argument, and the scores that get
 modeled using SSM will be the mean scores on the circumplex scales.
 
 1. **Do we want to perform analyses separately for groups within the dataset?**
-If so, you must specify a `grouping` variable and the output will contain
-results for each level (i.e., unique value) of this variable. If not, then omit
-the `grouping` argument and a single set of results for all data will be output.
+If yes, we must specify a `grouping` variable, and the output will contain
+results for each group (i.e., unique value of this variable). If no, we must
+omit the `grouping` argument, and a single set of results for all data will be
+output.
 
-1. **Do we want to contrast/compare two sets of results?** If so, you must
-specify a `contrast` type (i.e., "model" or "test") and ensure that you are only
-requesting two sets of results (i.e., two groups or two measures). If not, then
-omit the `contrast` argument and the results themselves will be output, rather
-than their contrast. Note that "model" contrasts occur before the SSM estimation
-and "test" contrasts occur after the SSM estimation. Thus, "model" contrasts 
-can be interpreted as groups/measures themselves, whereas "test" contrasts need
-to be interpreted as the difference in SSM parameters between groups/measures.
+1. **Do we want to contrast/compare two sets of results?** If yes, we must
+specify a `contrast` type (i.e., "model" or "test") and ensure that we are only
+requesting two sets of results (i.e., two groups or two measures). If no, we
+must omit the `contrast` argument, and the results themselves will be output,
+rather than their contrast.
 
 ## Analysis Type #1: Examine overall mean profile
 
 To begin, let's say that we want to use the SSM to describe the interpersonal 
 problems of the average individual in the entire dataset. If we ask the three
-questions above, we get three no answers, which leaves us with analysis type #1.
-Now we can use the `ssm_analyze()` function to perform the desired SSM analysis
-without needing any additional arguments. The first argument is always `.data`,
-a data frame containing all the variables to be analyzed. The second argument is
-always `scales` and specifies where in `.data` the circumplex scales are (either
-in terms of their variable names or their column numbers). The third argument is
-always `angles` and specifies the angular displacements of each of the 
-circumplex scales included in `scales`. The order and length of the `scales` and
-`angles` arguments should be the same.
+questions above, we get three answers of "no," which leaves us with analysis
+type #1. Now we can use the `ssm_analyze()` function to perform the desired SSM
+analysis without needing any additional arguments. The first argument is always
+`.data`, a data frame containing all the variables to be analyzed. The second
+argument is always `scales` and specifies where in `.data` the circumplex scales
+are (either in terms of their variable names or their column numbers). The third
+argument is always `angles` and specifies the angular displacements of each of
+the  circumplex scales included in `scales`. The order and length of the
+`scales` and `angles` arguments should be the same.
 
 ```{r}
 results <- ssm_analyze(.data = jz2017,
@@ -235,32 +234,62 @@ with bootstrapped confidence intervals.
 summary(results)
 ```
 
-That was pretty easy! We can now write up a paper about these parameters.
-However, the `circumplex` package has some features that can make what we just 
-did even easier, and can also make the publication process easier by generating
-tables and figures for us. First, because the first three arguments of the 
-`ssm_analyze()` function are always the same, we can omit their names. Second,
-because we organized the `jz2017` data frame to have the circumplex scale 
-variables adjacent and in order from PA to NO, we can simplify their 
-specification by using the `PA:NO` shortcut. Finally, because the use of octant
-scales is so common, the `circumplex` package comes with a convenience function
-for outputing their angular displacements: `octants()`. Note how, even when 
-using these shortcuts, the results come out identical.
+That was pretty easy! We can now write up these results. However, the
+`circumplex` package has some features that can make what we just did even 
+easier, and can also make the write-up process easier by generating tables and
+figures for us. First, because the first three arguments of the `ssm_analyze()`
+function are always the same, we can omit their names. Second, because we 
+organized the `jz2017` data frame to have the circumplex scale variables
+adjacent and in order from PA to NO, we can simplify their specification by 
+using the `PA:NO` shortcut. Finally, because the use of octant scales is so 
+common, the `circumplex` package comes with a convenience function for outputing
+their angular displacements: `octants()`. Note how, even when using these
+shortcuts, the results are identical.
 
 ```{r}
 results2 <- ssm_analyze(jz2017, PA:NO, octants())
 summary(results2)
 ```
 
-Next, we can produce an APA-formatted table to display our results. With only a
+Next, we can produce a table to display our results. With only a
 single set of parameters, this table is probably overkill, but in future
 analyses we will see how this function saves a lot of time and effort. To create
 the table, simply pass the `results` object to the `ssm_table()` function.
 
-```{r, echo = FALSE}
-knitr::kable(ssm_table(results), escape = FALSE)
+```r
+ssm_table(results)
 ```
 
+```{r, echo = FALSE}
+ssm_table(results, tibble = TRUE) %>%
+  kable() %>% 
+  kable_styling()
+```
+
+On this screen, the numbers don't fit perfectly, so let's free up some
+horizontal space by omitting the X-Value and Y-Value columns.
+
+```r
+ssm_table(results, xy = FALSE)
+```
+
+```{r, echo = FALSE}
+ssm_table(results, xy = FALSE, tibble = TRUE) %>%
+  kable() %>% 
+  kable_styling()
+```
+
+Next, let's leverage the fact that we are working within a circumplex space by
+creating a nice-looking circular plot with the amplitude parameter as the
+points' distance from the center of the circle and the displacement parameter
+as the points' rotation from due-east (as is convention). This, again, is as 
+simple as passing the `results` object to the `ssm_plot()` function.
+
+```{r, fig.width = 7.2, fig.height = 4}
+ssm_plot(results)
+```
+
+Very cool! 
 
 ## References
 * Gurtman, M. B. (1992). Construct validity of interpersonal personality measures: The interpersonal circumplex as a nomological net. _Journal of Personality and Social Psychology, 63_(1), 105–118.
