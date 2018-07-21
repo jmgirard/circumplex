@@ -28,3 +28,26 @@ test_that("S3 degree functions work as expected", {
   expect_s3_class(y3, "degree")
   expect_equal(as.numeric(y3), x)
 })
+
+test_that("The print.ssm method is working", {
+  
+  skip_on_cran()
+  
+  data("aw2009")
+  res <- ssm_analyze(aw2009, PA:NO, octants())
+  expect_output(print(res), "Profile \\[All\\]:")
+
+  data("jz2017")
+  res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
+  expect_output(print(res), "Profile \\[Female\\]:")
+  expect_output(print(res), "Profile \\[Male\\]:")
+  
+  res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender,
+    contrast = "model")
+  expect_output(print(res), "Contrast \\[Male - Female\\]:")
+  
+  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
+    grouping = Gender, contrast = "test")
+  expect_output(print(res), "Contrast \\[PARPD: Male - Female\\]:")
+  
+})
