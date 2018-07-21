@@ -50,11 +50,13 @@ results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD))
 ``` r
 ssm_table(results, xy = FALSE)
 ```
+
 ```{r table1, echo=FALSE}
 ssm_table(results, xy = FALSE, tibble = TRUE) %>% 
   kable() %>% 
   kable_styling()
 ```
+
 
 ```{r plot1}
 ssm_plot(results)
@@ -70,11 +72,13 @@ results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD),
 ``` r
 ssm_table(results, xy = FALSE)
 ```
+
 ```{r table2, echo=FALSE}
 ssm_table(results, xy = FALSE, tibble = TRUE) %>% 
   kable() %>% 
   kable_styling()
 ```
+
 
 ```{r plot2}
 ssm_plot(results, xy = FALSE)
