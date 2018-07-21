@@ -5,7 +5,7 @@
 \title{Create HTML table from SSM results or contrasts}
 \usage{
 ssm_table(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
-  viewer = TRUE)
+  viewer = TRUE, tibble = FALSE)
 }
 \arguments{
 \item{.ssm_object}{The output of \code{ssm_profiles()} or
@@ -21,7 +21,10 @@ be saved. If set to NULL, the table will be displayed but not saved
 should be included in the table as columns (default = TRUE).}
 
 \item{viewer}{A logical indicating whether the table should be displayed
-using the RStudio viewer.}
+using the RStudio viewer (default = TRUE).}
+
+\item{tibble}{A logical indicating whether the output should be the tibble
+underlying the table or the htmlTable output object (default = FALSE).}
 }
 \value{
 An HTML table containing SSM results or contrasts.
