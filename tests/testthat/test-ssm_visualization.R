@@ -63,3 +63,27 @@ test_that("Removing plots with low fit works as expected", {
   expect_error(ssm_plot(res), "After removing profiles, *")
   
 })
+
+test_that("SSM Table captions are correct", {
+  
+  data("jz2017")
+  
+  res <- ssm_analyze(jz2017, PA:NO, octants())
+  expect_equal(dcaption(res),
+    "Mean-based Structural Summary Statistics with 95% CIs")
+  
+  res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender,
+    contrast = "model")
+  expect_equal(dcaption(res),
+    "Mean-based Structural Summary Statistic Contrasts with 95% CIs")
+  
+  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
+  expect_equal(dcaption(res),
+    "Correlation-based Structural Summary Statistics with 95% CIs")
+  
+  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD,
+    grouping = Gender, contrast = "test")
+  expect_equal(dcaption(res),
+    "Correlation-based Structural Summary Statistic Contrasts with 95% CIs")
+  
+})
