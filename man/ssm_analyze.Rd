@@ -94,6 +94,6 @@ ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
 }
 }
 \seealso{
-Other ssm functions: \code{\link{ssm_plot}},
-  \code{\link{ssm_table}}
+Other ssm functions: \code{\link{ssm_append}},
+  \code{\link{ssm_plot}}, \code{\link{ssm_table}}
 }

@@ -38,5 +38,5 @@ p <- ssm_plot(res)
 ggsave Function for saving plots to image files.
 
 Other ssm functions: \code{\link{ssm_analyze}},
-  \code{\link{ssm_table}}
+  \code{\link{ssm_append}}, \code{\link{ssm_table}}
 }

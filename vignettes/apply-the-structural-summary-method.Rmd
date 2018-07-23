@@ -261,7 +261,7 @@ ssm_table(results)
 ```
 
 ```{r, echo = FALSE}
-ssm_table(results, tibble = TRUE) %>%
+ssm_table(results, render = FALSE) %>%
   kable() %>% 
   kable_styling()
 ```
@@ -274,7 +274,7 @@ ssm_table(results, xy = FALSE)
 ```
 
 ```{r, echo = FALSE}
-ssm_table(results, xy = FALSE, tibble = TRUE) %>%
+ssm_table(results, xy = FALSE, render = FALSE) %>%
   kable() %>% 
   kable_styling()
 ```

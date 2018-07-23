@@ -5,7 +5,7 @@
 \title{Create HTML table from SSM results or contrasts}
 \usage{
 ssm_table(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
-  viewer = TRUE, tibble = FALSE)
+  render = TRUE)
 }
 \arguments{
 \item{.ssm_object}{The output of \code{ssm_profiles()} or
@@ -20,14 +20,13 @@ be saved. If set to NULL, the table will be displayed but not saved
 \item{xy}{A logical indicating whether the x-value and y-value parameters
 should be included in the table as columns (default = TRUE).}
 
-\item{viewer}{A logical indicating whether the table should be displayed
-using the RStudio viewer (default = TRUE).}
-
-\item{tibble}{A logical indicating whether the output should be the tibble
-underlying the table or the htmlTable output object (default = FALSE).}
+\item{render}{A logical indicating whether the table should be displayed in
+the RStudio viewer or web browser (default = TRUE). Note that this argument
+needs to be TRUE in order for a file to be saved via \code{filename}.}
 }
 \value{
-An HTML table containing SSM results or contrasts.
+A tibble containing the information for the HTML table. As a
+side-effect, may also output the HTML table to the web viewer.
 }
 \description{
 Take in the results of an SSM analysis and return an HTML table with the
@@ -49,5 +48,8 @@ ssm_table(res)
 }
 \seealso{
 Other ssm functions: \code{\link{ssm_analyze}},
-  \code{\link{ssm_plot}}
+  \code{\link{ssm_append}}, \code{\link{ssm_plot}}
+
+Other table functions: \code{\link{html_render}},
+  \code{\link{ssm_append}}
 }

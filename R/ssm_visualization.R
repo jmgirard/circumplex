@@ -282,11 +282,11 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' @param caption A string to be displayed above the table (default = NULL).
 #' @param xy A logical indicating whether the x-value and y-value parameters
 #'   should be included in the table as columns (default = TRUE).
-#' @param viewer A logical indicating whether the table should be displayed
-#'   using the RStudio viewer (default = TRUE).
-#' @param tibble A logical indicating whether the output should be the tibble
-#'   underlying the table or the htmlTable output object (default = FALSE).
-#' @return An HTML table containing SSM results or contrasts.
+#' @param render A logical indicating whether the table should be displayed in
+#'   the RStudio viewer or web browser (default = TRUE). Note that this argument
+#'   needs to be TRUE in order for a file to be saved via \code{filename}.
+#' @return A tibble containing the information for the HTML table. As a
+#'  side-effect, may also output the HTML table to the web viewer.
 #' @family ssm functions
 #' @family table functions
 #' @export
@@ -305,12 +305,12 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' ssm_table(res)
 
 ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
-  viewer = TRUE, tibble = FALSE) {
+  render = TRUE) {
   
   assert_that(is_provided(.ssm_object))
   assert_that(is.null(filename) || is.string(filename))
   assert_that(is.null(caption) || is.string(caption))
-  assert_that(is.flag(xy), is.flag(viewer), is.flag(tibble))
+  assert_that(is.flag(xy), is.flag(render))
   
   df <- .ssm_object$results
 
@@ -344,34 +344,14 @@ ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
   }
 
   # Drop the x and y columns if requested
-  if (xy == TRUE) {
-    align <- "lllll"
-  } else if (xy == FALSE) {
-    df <- df[, -c(3, 4)]
-    align <- "lll"
-  }
-  
-  if (tibble == TRUE) {
-    t <- df
-  } else {
-    t <- htmlTable::htmlTable(df,
-      caption = caption,
-      align = align,
-      align.header = align,
-      rnames = FALSE,
-      css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;"
-    )
-    
-    if (is.null(filename) == TRUE) {
-      print(t, type = "html", useViewer = viewer)
-    } else {
-      sink(filename)
-      print(t, type = "html", useViewer = viewer)
-      sink()
-    }
+  if (xy == FALSE) df <- df[, -c(3, 4)]
+
+  # Format and render HTML table if requested
+  if (render == TRUE) {
+    html_render(df, caption, filename)
   }
 
-  t
+  df
 }
 
 # Build the default caption for the ssm_table function
@@ -389,4 +369,84 @@ dcaption <- function(.ssm_object) {
       str_percent(.ssm_object$details$interval)
     )
   }
+}
+
+#' Combine SSM tables by appending them as rows
+#' 
+#' Description
+#' 
+#' @param .ssm_table A data frame from the \code{ssm_table()} function to be the
+#'   first row(s) of the combined table.
+#' @param ... One or more additional data frames from the \code{ssm_table()}
+#'   function to be appended to \code{.ssm_table} in the order of input.
+#' @param caption A string to be displayed above the table if rendered.
+#' @param filename A string determining the filename to which the table should
+#'   be saved. If set to NULL, the table will not be saved (default = NULL).
+#' @param render A logical indicating whether the table should be displayed in
+#'   the RStudio viewer or web browser (default = TRUE). Note that this argument
+#'   needs to be TRUE in order for a file to be saved via \code{filename}.
+#' @return A tibble containing the information for the HTML table. As a
+#'  side-effect, may also output the HTML table to the web viewer.
+#' @family ssm functions
+#' @family table functions
+#' @export
+#' @examples 
+#' res1 <- ssm_analyze(jz2017, PA:NO, octants())
+#' res2 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
+#' tab1 <- ssm_table(res1, render = FALSE)
+#' tab2 <- ssm_table(res2, render = FALSE)
+#' ssm_append(tab1, tab2)
+ssm_append <- function(.ssm_table, ..., caption = NULL, filename = NULL,
+  render = TRUE) {
+  
+  # TODO: Add more assertions
+  assert_that(is.flag(render))
+  
+  # Bind the tibbles together by row
+  df <- dplyr::bind_rows(.ssm_table, ...)
+  
+  # Format and render HTML table if requested
+  if (render == TRUE) {
+    html_render(df, caption, filename)
+  }
+  
+  df
+}
+
+#' Format and render data frame as HTML table
+#' 
+#' Format a data frame as an HTML table and render it to the web viewer.
+#' 
+#' @param df A data frame to be rendered as an HTML table.
+#' @param caption A string to be displayed above the table.
+#' @param filename A string determining the filename to which the table should
+#'   be saved. If set to NULL, the table will be displayed but not saved
+#'   (default = NULL).
+#' @param align A string indicating the alignment of the cells (default = "l").
+#' @param ... Other arguments to pass to \code{htmlTable}.
+#' @return HTML syntax for the \code{df} table. The table will also be displayed
+#'   in the web viewer and may be saved to an HTML file.
+#' @family table functions
+#' @export
+html_render <- function(df, caption = NULL, filename = NULL, align = "l", ...) {
+  
+  # TODO: Add assertions
+  
+  t <- htmlTable::htmlTable(df,
+    caption = caption,
+    align = align,
+    align.header = align,
+    rnames = FALSE,
+    css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
+    ...
+  )
+  if (is.null(filename) == TRUE) {
+    print(t, type = "html")
+  } else {
+    sink(filename)
+    print(t, type = "html")
+    sink()
+  }
+  
+  t
 }
