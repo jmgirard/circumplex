@@ -31,6 +31,7 @@ side-effect, may also output the HTML table to the web viewer.
 Description
 }
 \examples{
+data("jz2017")
 res1 <- ssm_analyze(jz2017, PA:NO, octants())
 res2 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
 tab1 <- ssm_table(res1, render = FALSE)

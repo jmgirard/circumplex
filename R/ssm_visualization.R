@@ -391,6 +391,7 @@ dcaption <- function(.ssm_object) {
 #' @family table functions
 #' @export
 #' @examples 
+#' data("jz2017")
 #' res1 <- ssm_analyze(jz2017, PA:NO, octants())
 #' res2 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
 #' tab1 <- ssm_table(res1, render = FALSE)
