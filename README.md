@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-circumplex
-==========
+circumplex <img src="man/figures/logo.png" align="right" />
+===========================================================
 
 [![Build Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex) [![Coverage status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://codecov.io/github/jmgirard/circumplex?branch=master) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
@@ -69,13 +69,13 @@ Fit
 NARPD
 </td>
 <td style="text-align:left;">
-0.20 [0.17, 0.24]
+0.20 [0.17, 0.23]
 </td>
 <td style="text-align:left;">
-0.19 [0.15, 0.22]
+0.19 [0.16, 0.22]
 </td>
 <td style="text-align:left;">
-109.0 [99.3, 118.5]
+109.0 [99.3, 118.4]
 </td>
 <td style="text-align:left;">
 0.957
@@ -89,7 +89,7 @@ ASPD
 0.12 [0.09, 0.16]
 </td>
 <td style="text-align:left;">
-0.23 [0.19, 0.26]
+0.23 [0.19, 0.27]
 </td>
 <td style="text-align:left;">
 115.9 [107.4, 124.3]
@@ -148,10 +148,10 @@ ASPD - NARPD
 -0.08 [-0.12, -0.04]
 </td>
 <td style="text-align:left;">
-0.04 [-0.00, 0.08]
+0.04 [-0.00, 0.07]
 </td>
 <td style="text-align:left;">
-7.0 [-2.6, 17.5]
+7.0 [-3.5, 17.5]
 </td>
 <td style="text-align:left;">
 0.007
