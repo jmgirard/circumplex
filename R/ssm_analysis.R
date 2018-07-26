@@ -52,6 +52,11 @@
 #' # Single-group mean-based SSM
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants())
 #' 
+#' # Single-group correlation-based SSM
+#' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), 
+#'   measures = c(NARPD, ASPD))
+#'   
+#' \dontrun{
 #' # Multiple-group mean-based SSM
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), grouping = Gender)
 #' 
@@ -59,14 +64,10 @@
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), grouping = Gender,
 #'   contrast = "model")
 #'   
-#' # Single-group correlation-based SSM
-#' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), 
-#'   measures = c(NARPD, ASPD))
-#'   
 #' # Single-group correlation-based SSM with contrast
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD), contrast = "test")
-#' \donttest{
+#'   
 #' # Multiple-group correlation-based SSM
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
 #'   grouping = Gender)
