@@ -1,0 +1,102 @@
+---
+title: "Intermediate SSM Analysis"
+author: "Jeffrey M. Girard"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Intermediate SSM Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(circumplex)
+library(ggplot2)
+library(ggforce)
+library(tibble)
+library(kableExtra)
+```
+
+## 1. Taxonomy of analysis types
+Although all SSM analyses are based on the idea of decomposing circumplex scores
+into the parameters of a cosine curve, there are actually many different ways to
+implement it. Each of these implementations allows different questions to be
+explored. In the table below, a list of the SSM analysis types that are 
+currently implemented in the `circumplex` package is provided. This table also
+provides the specific combination of arguments needed to implement each analysis
+using the `ssm_analyze()` function. Specifying which analysis to run is simply 
+a matter of providing the correct arguments to the function; this allows a 
+single function to essentially do the work of seven and makes for a more 
+intuitive user experience.
+
+```{r, echo = FALSE}
+msr <- c("FALSE", "FALSE", "FALSE", "TRUE",  "TRUE",  "TRUE",  "TRUE")
+grp <- c("FALSE", "TRUE",  "TRUE",  "FALSE", "FALSE", "TRUE",  "TRUE")
+ctr <- c("FALSE", "FALSE", "TRUE",  "FALSE", "TRUE",  "FALSE", "TRUE")
+tab <- tibble(
+  `#` = c(1, 2, 3, 4, 5, 6, 7),
+  Usage = c(
+    "Examine overall mean profile",
+    "Examine groups' mean profiles",
+    "Compare groups' mean profiles",
+    "Examine variables' correlation profiles",
+    "Compare variables' correlation profiles",
+    "Examine groups' correlation profiles",
+    "Compare groups' correlation profiles"
+  ),
+  measures = cell_spec(msr, color = ifelse(msr == "TRUE", "blue", "black")),
+  grouping = cell_spec(grp, color = ifelse(grp == "TRUE", "blue", "black")),
+  contrast = cell_spec(ctr, color = ifelse(ctr == "TRUE", "blue", "black"))
+)
+knitr::kable(tab, escape = FALSE) %>% 
+  column_spec(2, width = "3in") %>% 
+  add_header_above(c("", "", "Arguments Needed" = 3))
+```
+
+The three main questions to ask when conducting a new SSM analysis are:
+
+1. **Do we want to project non-circumplex measures into the circumplex space?**
+If yes, we must specify one or more `measures`, and the scores that get modeled 
+using SSM will be the correlations between the circumplex scales and these
+measures. If no, we must omit the `measures` argument, and the scores that get
+modeled using SSM will be the mean scores on the circumplex scales.
+
+1. **Do we want to perform analyses separately for groups within the dataset?**
+If yes, we must specify a `grouping` variable, and the output will contain
+results for each group (i.e., unique value of this variable). If no, we must
+omit the `grouping` argument, and a single set of results for all data will be
+output.
+
+1. **Do we want to contrast/compare two sets of results?** If yes, we must
+specify a `contrast` type (i.e., "model" or "test") and ensure that we are only
+requesting two sets of results (i.e., two groups or two measures). If no, we
+must omit the `contrast` argument, and the results themselves will be output,
+rather than their contrast.
+
+## 2. Generalizing the basic analyses
+
+### Generalizing to multiple means
+
+### Generalizing to multiple measures
+
+## 3. Contrast analyses
+
+### Contrasts between groups' means
+
+### Contrasts between groups' correlations
+
+### Contrasts between measures in a group
+
+## 4. Working with SSM figures
+
+### Basic customizations of figures
+
+### Exporting figures as files
+
+## 5. Working with SSM tables
+
+### Basic customizations of tables
+
+### Combining/appending tables
+
+## References
