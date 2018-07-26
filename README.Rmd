@@ -53,7 +53,7 @@ ssm_table(results, xy = FALSE)
 ```
 
 ```{r table1, echo=FALSE}
-ssm_table(results, xy = FALSE, tibble = TRUE) %>% 
+ssm_table(results, xy = FALSE, render = FALSE) %>% 
   kable() %>% 
   kable_styling()
 ```
@@ -75,7 +75,7 @@ ssm_table(results, xy = FALSE)
 ```
 
 ```{r table2, echo=FALSE}
-ssm_table(results, xy = FALSE, tibble = TRUE) %>% 
+ssm_table(results, xy = FALSE, render = FALSE) %>% 
   kable() %>% 
   kable_styling()
 ```

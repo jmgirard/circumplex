@@ -3,7 +3,7 @@
 circumplex
 ==========
 
-[![Build Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex) [![Coverage status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://codecov.io/github/jmgirard/circumplex?branch=master) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+[![Build Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex) [![Coverage status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://codecov.io/github/jmgirard/circumplex?branch=master) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
 Overview
 --------
@@ -72,10 +72,10 @@ NARPD
 0.20 [0.17, 0.24]
 </td>
 <td style="text-align:left;">
-0.19 [0.16, 0.22]
+0.19 [0.15, 0.22]
 </td>
 <td style="text-align:left;">
-109.0 [100.1, 118.4]
+109.0 [99.3, 118.5]
 </td>
 <td style="text-align:left;">
 0.957
@@ -92,7 +92,7 @@ ASPD
 0.23 [0.19, 0.26]
 </td>
 <td style="text-align:left;">
-115.9 [107.8, 125.0]
+115.9 [107.4, 124.3]
 </td>
 <td style="text-align:left;">
 0.964
@@ -100,7 +100,6 @@ ASPD
 </tr>
 </tbody>
 </table>
-
 ``` r
 ssm_plot(results)
 ```
@@ -151,7 +150,7 @@ ASPD - NARPD
 0.04 [-0.00, 0.08]
 </td>
 <td style="text-align:left;">
-7.0 [-3.3, 17.3]
+7.0 [-2.6, 17.5]
 </td>
 <td style="text-align:left;">
 0.007
@@ -159,7 +158,6 @@ ASPD - NARPD
 </tr>
 </tbody>
 </table>
-
 ``` r
 ssm_plot(results, xy = FALSE)
 ```
