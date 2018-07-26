@@ -206,25 +206,25 @@ Contrast
 
 <th style="text-align:left;">
 
-\&Delta; Elevation
+&Delta; Elevation
 
 </th>
 
 <th style="text-align:left;">
 
-\&Delta; Amplitude
+&Delta; Amplitude
 
 </th>
 
 <th style="text-align:left;">
 
-\&Delta; Displacement
+&Delta; Displacement
 
 </th>
 
 <th style="text-align:left;">
 
-\&Delta; Fit
+&Delta; Fit
 
 </th>
 
