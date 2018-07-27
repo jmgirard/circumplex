@@ -1,7 +1,7 @@
 Type: Package
 Package: circumplex
 Title: Analysis and Visualization of Circular Data
-Version: 0.0.0.9004
+Version: 0.0.0.9005
 Authors@R: as.person(c(
   "Jeffrey Girard <j.girard@pitt.edu> [aut, cre]
     (<https://orcid.org/0000-0002-7359-3746>)",
