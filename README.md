@@ -10,7 +10,6 @@ status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
 ## Overview
 
@@ -22,21 +21,6 @@ and was inspired by work from and was developed in conjunction with
 Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/)
 and [Aidan Wright](https://personalityprocesses.com/).
 
-## References
-
-Girard, J. M., Zimmermann, J., & Wright, A. G. C. (2018). New tools for
-circumplex data analysis and visualization in R. *Meeting of the Society
-for Interpersonal Theory and Research.* Montreal, Canada.
-
-Zimmermann, J., & Wright, A. G. C. (2017). Beyond description in
-interpersonal construct validation: Methodological advances in the
-circumplex Structural Summary Approach. *Assessment, 24*(1), 3–23.
-
-Wright, A. G. C., Pincus, A. L., Conroy, D. E., & Hilsenroth, M. J.
-(2009). Integrating methods to optimize circumplex description and
-comparison of groups. *Journal of Personality Assessment, 91*(4),
-311–322.
-
 ## Installation
 
 You can install the development version from
@@ -47,13 +31,16 @@ You can install the development version from
 devtools::install_github("jmgirard/circumplex")
 ```
 
-## Examples of the Structural Summary Method (SSM)
-
-### Calculate correlation-based SSM parameters for multiple measures
+## Usage
 
 ``` r
 data("jz2017")
-results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD))
+results <- ssm_analyze(
+  .data = jz2017, 
+  scales = c(PA, BC, DE, FG, HI, JK, LM, NO), 
+  angles = c(90, 135, 180, 225, 270, 315, 360, 45), 
+  measures = c(NARPD, ASPD)
+)
 ```
 
 ``` r
@@ -124,7 +111,7 @@ NARPD
 
 <td style="text-align:left;">
 
-109.0 [99.1, 118.4]
+109.0 [99.2, 118.9]
 
 </td>
 
@@ -158,7 +145,8 @@ ASPD
 
 <td style="text-align:left;">
 
-115.9 [107.2, 124.2]
+115.9 [107.4,
+124.4]
 
 </td>
 
@@ -180,100 +168,33 @@ ssm_plot(results)
 
 ![](README-plot1-1.png)<!-- -->
 
-### Calculate correlation-based SSM parameter contrast for two measures
+## Lifecycle
 
-``` r
-data("jz2017")
-results <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD),
-  contrast = "test")
-```
+[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
-``` r
-ssm_table(results, xy = FALSE)
-```
+Although a full suite of functions for conducting and visualizing the
+Structural Summary Method is available, circumplex is a relatively young
+package and new functionality is planned for the future. Some functions
+and arguments may change as the design philosophy is fully fleshed out,
+but this will be done carefully and with backward-compatibility in mind.
 
-<table class="table" style="margin-left: auto; margin-right: auto;">
+## Code of Conduct
 
-<thead>
+Contributions are welcome and encouraged. However, please note that this
+project is released with a [Contributor Code of Conduct](CONDUCT.md). By
+participating in this project, you agree to abide by its terms.
 
-<tr>
+## References
 
-<th style="text-align:left;">
+Girard, J. M., Zimmermann, J., & Wright, A. G. C. (2018). New tools for
+circumplex data analysis and visualization in R. *Meeting of the Society
+for Interpersonal Theory and Research.* Montreal, Canada.
 
-Contrast
+Zimmermann, J., & Wright, A. G. C. (2017). Beyond description in
+interpersonal construct validation: Methodological advances in the
+circumplex Structural Summary Approach. *Assessment, 24*(1), 3–23.
 
-</th>
-
-<th style="text-align:left;">
-
-&Delta; Elevation
-
-</th>
-
-<th style="text-align:left;">
-
-&Delta; Amplitude
-
-</th>
-
-<th style="text-align:left;">
-
-&Delta; Displacement
-
-</th>
-
-<th style="text-align:left;">
-
-&Delta; Fit
-
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-
-<td style="text-align:left;">
-
-ASPD - NARPD
-
-</td>
-
-<td style="text-align:left;">
-
-\-0.08 [-0.12, -0.04]
-
-</td>
-
-<td style="text-align:left;">
-
-0.04 [-0.00, 0.08]
-
-</td>
-
-<td style="text-align:left;">
-
-7.0 [-3.1, 17.5]
-
-</td>
-
-<td style="text-align:left;">
-
-0.007
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
-
-``` r
-ssm_plot(results, xy = FALSE)
-```
-
-![](README-plot2-1.png)<!-- -->
+Wright, A. G. C., Pincus, A. L., Conroy, D. E., & Hilsenroth, M. J.
+(2009). Integrating methods to optimize circumplex description and
+comparison of groups. *Journal of Personality Assessment, 91*(4),
+311–322.
