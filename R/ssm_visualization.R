@@ -371,9 +371,9 @@ dcaption <- function(.ssm_object) {
   }
 }
 
-#' Combine SSM tables by appending them as rows
+#' Combine SSM tables
 #' 
-#' Description
+#' Combine SSM tables by appending them as rows.
 #' 
 #' @param .ssm_table A data frame from the \code{ssm_table()} function to be the
 #'   first row(s) of the combined table.

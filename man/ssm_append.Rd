@@ -2,7 +2,7 @@
 % Please edit documentation in R/ssm_visualization.R
 \name{ssm_append}
 \alias{ssm_append}
-\title{Combine SSM tables by appending them as rows}
+\title{Combine SSM tables}
 \usage{
 ssm_append(.ssm_table, ..., caption = NULL, filename = NULL,
   render = TRUE)
@@ -28,7 +28,7 @@ A tibble containing the information for the HTML table. As a
 side-effect, may also output the HTML table to the web viewer.
 }
 \description{
-Description
+Combine SSM tables by appending them as rows.
 }
 \examples{
 data("jz2017")
