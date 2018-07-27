@@ -44,10 +44,16 @@ results <- ssm_analyze(
 ```
 
 ``` r
-ssm_table(results, xy = FALSE)
+ssm_table(results)
 ```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
+
+<caption>
+
+Correlation-based Structural Summary Statistics with 95% CIs
+
+</caption>
 
 <thead>
 
@@ -62,6 +68,18 @@ Profile
 <th style="text-align:left;">
 
 Elevation
+
+</th>
+
+<th style="text-align:left;">
+
+X-Value
+
+</th>
+
+<th style="text-align:left;">
+
+Y-Value
 
 </th>
 
@@ -105,6 +123,18 @@ NARPD
 
 <td style="text-align:left;">
 
+-0.06 [-0.09, -0.03]
+
+</td>
+
+<td style="text-align:left;">
+
+0.18 [0.15, 0.21]
+
+</td>
+
+<td style="text-align:left;">
+
 0.19 [0.16, 0.22]
 
 </td>
@@ -134,6 +164,18 @@ ASPD
 <td style="text-align:left;">
 
 0.12 [0.09, 0.16]
+
+</td>
+
+<td style="text-align:left;">
+
+-0.10 [-0.13, -0.06]
+
+</td>
+
+<td style="text-align:left;">
+
+0.20 [0.17, 0.24]
 
 </td>
 
