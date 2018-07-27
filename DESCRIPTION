@@ -27,20 +27,21 @@ Imports:
     htmlTable (>= 1.12),
     magrittr (>= 1.5),
     purrr (>= 0.2.5),
-    Rcpp (>= 0.12.17),
+    Rcpp (>= 0.12.18),
     rlang (>= 0.2.1),
     stats,
     tibble (>= 1.4.2),
     tidyr (>= 0.8.1)
 LinkingTo: 
-    Rcpp (>= 0.12.17),
+    Rcpp (>= 0.12.18),
     RcppArmadillo (>= 0.8.600.0.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1
 Suggests: 
-    testthat (>= 2.0.0),
+    covr (>= 3.1.0),
+    forcats (>= 0.3.0),
     kableExtra (>= 0.9.0),
     knitr (>= 1.20),
     rmarkdown (>= 1.10),
-    covr (>= 3.1.0)
+    testthat (>= 2.0.0)
 VignetteBuilder: knitr
