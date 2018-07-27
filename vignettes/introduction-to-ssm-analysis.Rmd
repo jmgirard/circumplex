@@ -11,10 +11,14 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(circumplex)
-library(ggplot2)
 library(ggforce)
-library(tibble)
 library(kableExtra)
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(forcats)
+library(psych)
+library(knitr)
 ```
 
 ## 1. Background and Motivation
@@ -53,13 +57,257 @@ to understand the emotional experiences of a group of participants during an
 experiment, and a personality psychologist might want to understand what kind
 of interpersonal behaviors are associated with a trait (e.g., extraversion).
 
-<!-- ![](image) -->
+```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+angles <- c(90, 135, 180, 225, 270, 315, 360, 45)
+alabel <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+
+# Create plot ------------------------------------------------------------------
+
+ggplot() +
+  # Require plot to be square and remove default styling
+  coord_fixed() +
+  theme_void() +
+  # Expand the axes multiplicatively to fit the labels
+  scale_x_continuous(expand = c(0.10, 0)) +
+  scale_y_continuous(expand = c(0.10, 0)) +
+  # Draw line segments corresponding to the octants
+  geom_segment(
+    aes(
+      x = 0,
+      y = 0,
+      xend = 5 * cos(angles[c(1,3,5,7)] * pi / 180),
+      yend = 5 * sin(angles[c(1,3,5,7)] * pi / 180)
+    ),
+    color = "gray60",
+    size = 0.5
+  ) +
+  # Draw inner labels for the octant angles
+  geom_label(
+    aes(
+      x = 3 * cos(angles * pi / 180),
+      y = 3 * sin(angles * pi / 180),
+      label = sprintf("%d\u00B0", angles)
+    ),
+    size = 5,
+    color = "black",
+    label.size = NA,
+    hjust = "center",
+    vjust = "center"
+  ) +
+  # Draw the circle
+  geom_circle(aes(x0 = 0, y0 = 0, r = 5),
+    color = "gray50", size = 1.5
+  ) +
+  # Draw outer labels for octant abbreviations
+  geom_label(
+    aes(
+      x = 5.1 * cos(angles * pi / 180),
+      y = 5.1 * sin(angles * pi / 180),
+      label = alabel
+    ),
+    size = 5,
+    color = "black",
+    label.size = NA,
+    hjust = "outward",
+    vjust = "outward"
+  )
+```
+
 
 ### The Structural Summary Method
 The Structural Summary Method (SSM) is a technique for analyzing circumplex data
-that offers practical and interpretive benefits over alternative techniques. 
+that offers practical and interpretive benefits over alternative techniques. It 
+consists of fitting a cosine curve to the data, which captures the pattern of
+correlations among scores associated with a circumplex scale (i.e., mean scores
+on circumplex scales or correlations between circumplex scales and an external 
+measure). By plotting a set of example scores below, we can gain a visual 
+intuition that a cosine curve makes sense in this case. First, we can examine
+the scores with a bar chart ignoring the circular relationship among them.
+
+```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+data("jz2017")
+rci <- jz2017 %>%
+  select(NARPD, PA:NO) %>%
+  cor.ci(plot = FALSE)
+
+# Format data for plotting
+dat_r <- tibble(
+  Scale = factor(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")),
+  Group = rep(1, 8),
+  est = rci$rho[2:9],
+  lci = rci$ci$lower[1:8],
+  uci = rci$ci$upper[1:8]
+)
+
+# Create column plot with 95% CI error bars
+ggplot(dat_r, aes(x = fct_reorder(Scale, est, .desc = TRUE), y = est)) +
+  geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
+  geom_col(position = position_dodge(.9), fill = "red") +
+  geom_errorbar(aes(ymin = lci, ymax = uci), width = .20, 
+    position = position_dodge(.9), size = 1) +
+  scale_y_continuous(
+    limits = c(-0.02, 0.475)
+  ) +
+  labs(title = "Scores with 95% Confidence Intervals") +
+  theme(
+    axis.title = element_blank(),
+    panel.grid.major = element_line(size = 1.0),
+    panel.grid.minor.y = element_line(size = 0.5), 
+    panel.grid.minor.x = element_blank()
+  )
+```
+
+Next, we can leverage the fact that these subscales have specific angular
+displacements in the circumplex model (and that 0 and 360 degrees are the same)
+to create a path diagram.
+
+```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+dat_r <- tibble(
+  Scale = factor(c("LM", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+    levels = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")),
+  Group = rep(1, 9),
+  est = c(rci$rho[[8]], rci$rho[2:9]),
+  lci = c(rci$ci$lower[[7]], rci$ci$lower[1:8]),
+  uci = c(rci$ci$upper[[7]], rci$ci$upper[1:8]),
+  Angle = c(0, octants())
+) %>% 
+  arrange(Angle)
+
+# Plot correlations as connected point ranges with 95% CI ranges
+ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
+  geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
+  geom_pointrange(aes(ymin = lci, ymax = uci), size = 1.25, color = "red") +
+  geom_path(size = 1.25, color = "red") +
+  scale_x_continuous(
+    limits = c(0, 360),
+    breaks = c(0, octants()),
+    expand = c(0.01, 0),
+    labels = function(x) sprintf("%.0f\U00B0", x)
+  ) +
+  scale_y_continuous(
+    limits = c(-0.02, 0.475)
+  ) +
+  labs(title = "Scores with 95% CIs by Angle") +
+  theme(
+    axis.title = element_blank(),
+    plot.margin = unit(c(10, 30, 10, 10), "points"),
+    panel.grid.major = element_line(size = 1.0),
+    panel.grid.minor.y = element_line(size = 0.5), 
+    panel.grid.minor.x = element_blank()
+  )
+```
+
+This already looks like a cosine curve, and we can finally use the SSM to 
+estimate the parameters of the curve that best fits the observed data. By
+plotting it alongside the data, we can get a sense of how well the model fits
+our example data.
+
+```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+# Calculate SSM parameters
+sp <- circumplex:::ssm_parameters(rci$means[1:8], octants() * pi / 180)
+
+# Create function for SSM cosine model
+f <- function(x) {
+  sp[[1]] + sp[[4]] * cos((x - sp[[5]] * 180 / pi) * pi / 180)
+}
+
+# Plot correlations along with SSM cosine model
+ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
+  geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
+  geom_pointrange(aes(ymin = lci, ymax = uci), size = 1.25) +
+  geom_path(size = 1.25) +
+  stat_function(fun = f, size = 2, color = "red") +
+  scale_x_continuous(
+    limits = c(0, 360),
+    breaks = c(0, octants()),
+    expand = c(0.01, 0),
+    labels = function(x) sprintf("%.0f\U00B0", x)
+  ) +
+  scale_y_continuous(
+    limits = c(-0.02, 0.475)
+  ) +
+  labs(title = "Cosine Curve Estimated by SSM") +
+  theme(
+    axis.title = element_blank(),
+    plot.margin = unit(c(10, 30, 10, 10), "points"),
+    panel.grid.major = element_line(size = 1.0),
+    panel.grid.minor.y = element_line(size = 0.5), 
+    panel.grid.minor.x = element_blank()
+  )
+```
 
 ### Understanding the SSM parameters
+The SSM estimates a cosine curve to the data using the following equation:
+$$S_i = e + a \times \cos(\theta_i - d)$$
+where $S_i$ and $\theta_i$ are the score and angle on scale $i$, respectively, 
+and $e$, $a$, and $d$ are the elevation, amplitude, and displacement parameters,
+respectively. Before we discuss these parameters, however, we can also estimate
+the fit of the SSM model. This is essentially how close the cosine curve is to 
+the observed data points. Deviations (in red, below) will lower model fit.
+
+```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+# Plot correlations as path, SSM cosine model, and differences
+ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
+  geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
+  stat_function(fun = f, size = 2, color = "gray20") +
+  geom_point(size = 5.5, color = "black") +
+  geom_path(size = 1.25, color = "black") +
+  geom_segment(aes(x = Angle, xend = Angle, y = est, yend = f(Angle)),
+    size = 4, linetype = "solid", color = "red") +
+  scale_x_continuous(
+    limits = c(0, 360),
+    breaks = c(0, octants()),
+    expand = c(0.01, 0),
+    labels = function(x) sprintf("%.0f\U00B0", x)
+  ) +
+  scale_y_continuous(
+    limits = c(-0.02, 0.475)
+  ) +
+  labs(title = sprintf(
+    "Fit = %.2f", sp[[6]])
+  ) +
+  theme(
+    axis.title = element_blank(),
+    plot.margin = unit(c(10, 30, 10, 10), "points"),
+    panel.grid.major = element_line(size = 1.0),
+    panel.grid.minor.y = element_line(size = 0.5), 
+    panel.grid.minor.x = element_blank()
+  )
+```
+
+If fit is less than 0.70, it is considered "unacceptable" and only the elevation
+parameter should be interpreted. If fit is between 0.70 and 0.80, it is 
+considered "adequate," and if it is greater than 0.80, it is considered "good."
+Sometimes SSM model fit is called prototypicality or denoted using $R^2$.
+
+The first SSM parameter is elevation or $e$, which is calculated as the mean of
+all scores. It is the size of the general factor in the circumplex model and its
+interpretation varies from scale to scale. For measures of interpersonal
+problems, it is interpreted as generalized interpersonal distress. When $e>.15$,
+it is considered "marked" and it is considered "modest" otherwise.
+
+```{r, echo = FALSE, out.width = "100%"}
+knitr::include_graphics("VIG1-e.gif")
+```
+
+The second SSM parameter is amplitude or $a$, which is calculated as the
+difference between the heighest point of the curve and the curve's mean. It is
+interpreted as the distinctiveness or differentiation of a profile: how much it 
+is peaked versus flat. Similar to elevation, amplitude is considered "marked" 
+when $a>.15$ and "modest" otherwise.
+
+```{r, echo = FALSE, out.width = "100%"}
+knitr::include_graphics("VIG1-a.gif")
+```
+
+The final SSM parameter is displacement or $d$, which is calculated as the angle
+at which the curve reaches its highest point. It is interpreted as the style of
+the profile. For instance, if $d=90$ and we are using a circumplex scale that
+defines 90 degrees as "domineering," then the profile's style is domineering.
+
+```{r, echo = FALSE, out.width = "100%"}
+knitr::include_graphics("VIG1-d.gif")
+```
 
 ## 2. Example data: jz2017
 To illustrate the SSM functions, we will use the example dataset `jz2017`, which
