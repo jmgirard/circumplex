@@ -102,6 +102,7 @@ print.ssm <- function(x, digits = 3, ...) {
       dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
     )
     m <- round(matrix(v, nrow = 6, ncol = 3), digits)
+    # TODO: Add delta symbols if parameter contrast
     rownames(m) <- c(
       "Elevation", "X-Value", "Y-Value",
       "Amplitude", "Displacement", "Model Fit"
@@ -139,6 +140,7 @@ summary.ssm <- function(object, digits = 3, ...) {
       dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
     )
     m <- round(matrix(v, nrow = 6, ncol = 3), digits)
+    # TODO: Add delta symbols if parameter contrast
     rownames(m) <- c(
       "Elevation", "X-Value", "Y-Value",
       "Amplitude", "Displacement", "Model Fit"
