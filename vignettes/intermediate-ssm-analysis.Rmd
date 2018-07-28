@@ -3,7 +3,7 @@ title: "Intermediate SSM Analysis"
 author: "Jeffrey M. Girard"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Intermediate SSM Analysis}
+  %\VignetteIndexEntry{ssm-intermediate}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -45,8 +45,8 @@ ssm_table(results, xy = FALSE)
 
 ```{r, echo = FALSE}
 ssm_table(results, xy = FALSE, render = FALSE) %>% 
-  kable() %>% 
-  kable_styling()
+  kable(caption = circumplex:::dcaption(results)) %>% 
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r, fig.width = 7.2, fig.height = 4}
@@ -77,8 +77,8 @@ ssm_table(results2, xy = FALSE)
 
 ```{r, echo = FALSE}
 ssm_table(results2, xy = FALSE, render = FALSE) %>% 
-  kable() %>% 
-  kable_styling()
+  kable(caption = circumplex:::dcaption(results2)) %>% 
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r, fig.width = 7.2, fig.height = 4}
@@ -103,8 +103,8 @@ ssm_table(results3, xy = FALSE)
 
 ```{r, echo = FALSE}
 ssm_table(results3, xy = FALSE, render = FALSE) %>% 
-  kable() %>% 
-  kable_styling()
+  kable(caption = circumplex:::dcaption(results3)) %>% 
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r, fig.width = 7.2, fig.height = 4}
@@ -161,8 +161,8 @@ ssm_table(results4, xy = FALSE)
 
 ```{r, echo = FALSE}
 ssm_table(results4, xy = FALSE, render = FALSE) %>% 
-  kable() %>% 
-  kable_styling()
+  kable(caption = circumplex:::dcaption(results4)) %>% 
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r, fig.width = 7.2, fig.height = 4}
@@ -186,8 +186,8 @@ ssm_table(results5, xy = FALSE)
 
 ```{r, echo = FALSE}
 ssm_table(results5, xy = FALSE, render = FALSE) %>% 
-  kable() %>% 
-  kable_styling()
+  kable(caption = circumplex:::dcaption(results5)) %>% 
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r, fig.width = 7.2, fig.height = 4}
@@ -219,8 +219,8 @@ ssm_table(results6, xy = FALSE)
 
 ```{r, echo = FALSE}
 ssm_table(results6, xy = FALSE, render = FALSE) %>% 
-  kable() %>% 
-  kable_styling()
+  kable(caption = circumplex:::dcaption(results6)) %>% 
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r, fig.width = 7.2, fig.height = 4}
@@ -314,7 +314,7 @@ tab1 <- ssm_table(res1, xy = FALSE, render = FALSE)
 tab2 <- ssm_table(res2, xy = FALSE, render = FALSE)
 ssm_append(tab1, tab2, render = FALSE) %>% 
   kable() %>% 
-  kable_styling()
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 We can export a table by either copy/pasting it into a word processor or by 

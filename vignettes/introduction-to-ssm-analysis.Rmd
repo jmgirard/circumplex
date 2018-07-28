@@ -3,7 +3,7 @@ title: "Introduction to SSM Analysis"
 author: "Jeffrey M. Girard"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to SSM Analysis}
+  %\VignetteIndexEntry{ssm-introduction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,19 +24,7 @@ library(knitr)
 ## 1. Background and Motivation
 
 ### Circumplex models, scales, and data
-Circumplex models are popular within many areas of psychology because they offer
-a parsimonious account of complex psychological domains, such as emotion and
-interpersonal functioning. This parsimony is achieved by understanding phenomena 
-in a domain as being a "blend" of two primary dimensions. For instance, 
-circumplex models of emotion typically represent affective phenomena as a blend
-of *valence* (pleasantness versus unpleasantness) and *arousal* (activity versus
-passivity), whereas circumplex models of interpersonal functioning typically 
-represent interpersonal phenomena as a blend of *communion* (affiliation
-versus separation) and *agency* (dominance versus submissiveness). These models
-are often depicted as circles around the intersection of the two dimensions (see
-figure). Any given phenomenon can be located within this circular space through
-reference to the two underlying dimensions (e.g., anger is a blend of
-unpleasantness and activity).
+Circumplex models are popular within many areas of psychology because they offer a parsimonious account of complex psychological domains, such as emotion and interpersonal functioning. This parsimony is achieved by understanding phenomenain a domain as being a "blend" of two primary dimensions. For instance, circumplex models of emotion typically represent affective phenomena as a blend of *valence* (pleasantness versus unpleasantness) and *arousal* (activity versus passivity), whereas circumplex models of interpersonal functioning typically represent interpersonal phenomena as a blend of *communion* (affiliation versus separation) and *agency* (dominance versus submissiveness). These models are often depicted as circles around the intersection of the two dimensions (see figure). Any given phenomenon can be located within this circular space through reference to the two underlying dimensions (e.g., anger is a blend of unpleasantness and activity).
 
 Circumplex scales contain multiple subscales that attempt to measure different
 blends of the two primary dimensions (i.e., different parts of the circle).
@@ -75,8 +63,8 @@ ggplot() +
     aes(
       x = 0,
       y = 0,
-      xend = 5 * cos(angles[c(1,3,5,7)] * pi / 180),
-      yend = 5 * sin(angles[c(1,3,5,7)] * pi / 180)
+      xend = 5 * cos(angles[c(1, 3, 5, 7)] * pi / 180),
+      yend = 5 * sin(angles[c(1, 3, 5, 7)] * pi / 180)
     ),
     color = "gray60",
     size = 1
@@ -144,8 +132,10 @@ dat_r <- tibble(
 ggplot(dat_r, aes(x = forcats::fct_reorder(Scale, est, .desc = TRUE), y = est)) +
   geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
   geom_col(position = position_dodge(.9), fill = "red") +
-  geom_errorbar(aes(ymin = lci, ymax = uci), width = .20, 
-    position = position_dodge(.9), size = 1) +
+  geom_errorbar(aes(ymin = lci, ymax = uci),
+    width = .20,
+    position = position_dodge(.9), size = 1
+  ) +
   scale_y_continuous(
     limits = c(-0.02, 0.475)
   ) +
@@ -153,7 +143,7 @@ ggplot(dat_r, aes(x = forcats::fct_reorder(Scale, est, .desc = TRUE), y = est)) 
   theme(
     axis.title = element_blank(),
     panel.grid.major = element_line(size = 1.0),
-    panel.grid.minor.y = element_line(size = 0.5), 
+    panel.grid.minor.y = element_line(size = 0.5),
     panel.grid.minor.x = element_blank()
   )
 ```
@@ -165,13 +155,14 @@ to create a path diagram.
 ```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
 dat_r <- tibble(
   Scale = factor(c("LM", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
-    levels = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")),
+    levels = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  ),
   Group = rep(1, 9),
   est = c(rci$rho[[8]], rci$rho[2:9]),
   lci = c(rci$ci$lower[[7]], rci$ci$lower[1:8]),
   uci = c(rci$ci$upper[[7]], rci$ci$upper[1:8]),
   Angle = c(0, octants())
-) %>% 
+) %>%
   arrange(Angle)
 
 # Plot correlations as connected point ranges with 95% CI ranges
@@ -193,7 +184,7 @@ ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
     axis.title = element_blank(),
     plot.margin = unit(c(10, 30, 10, 10), "points"),
     panel.grid.major = element_line(size = 1.0),
-    panel.grid.minor.y = element_line(size = 0.5), 
+    panel.grid.minor.y = element_line(size = 0.5),
     panel.grid.minor.x = element_blank()
   )
 ```
@@ -232,7 +223,7 @@ ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
     axis.title = element_blank(),
     plot.margin = unit(c(10, 30, 10, 10), "points"),
     panel.grid.major = element_line(size = 1.0),
-    panel.grid.minor.y = element_line(size = 0.5), 
+    panel.grid.minor.y = element_line(size = 0.5),
     panel.grid.minor.x = element_blank()
   )
 ```
@@ -254,7 +245,8 @@ ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
   geom_point(size = 5.5, color = "black") +
   geom_path(size = 1.25, color = "black") +
   geom_segment(aes(x = Angle, xend = Angle, y = est, yend = f(Angle)),
-    size = 4, linetype = "solid", color = "red") +
+    size = 4, linetype = "solid", color = "red"
+  ) +
   scale_x_continuous(
     limits = c(0, 360),
     breaks = c(0, octants()),
@@ -265,13 +257,13 @@ ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
     limits = c(-0.02, 0.475)
   ) +
   labs(title = sprintf(
-    "Fit = %.2f", sp[[6]])
-  ) +
+    "Fit = %.2f", sp[[6]]
+  )) +
   theme(
     axis.title = element_blank(),
     plot.margin = unit(c(10, 30, 10, 10), "points"),
     panel.grid.major = element_line(size = 1.0),
-    panel.grid.minor.y = element_line(size = 0.5), 
+    panel.grid.minor.y = element_line(size = 0.5),
     panel.grid.minor.x = element_blank()
   )
 ```
@@ -338,14 +330,15 @@ or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency and communion.
 ```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
 angles <- c(90, 135, 180, 225, 270, 315, 360, 45)
 flabel <- c(
-  "Domineering", 
-  "Vindictive", 
-  "Cold", 
-  "Socially\nAvoidant", 
-  "Nonassertive", 
-  "Easily\nExploited", 
-  "Overly\nNurturant", 
-  "Intrusive")
+  "Domineering",
+  "Vindictive",
+  "Cold",
+  "Socially\nAvoidant",
+  "Nonassertive",
+  "Easily\nExploited",
+  "Overly\nNurturant",
+  "Intrusive"
+)
 alabel <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 
 # Create plot ------------------------------------------------------------------
@@ -429,9 +422,11 @@ need to be combined into a vector using the `c()` function. The order and length
 of the `scales` and `angles` vectors also needs to be the same.
 
 ```{r}
-results <- ssm_analyze(.data = jz2017,
+results <- ssm_analyze(
+  .data = jz2017,
   scales = c(PA, BC, DE, FG, HI, JK, LM, NO),
-  angles = c(90, 135, 180, 225, 270, 315, 360, 45))
+  angles = c(90, 135, 180, 225, 270, 315, 360, 45)
+)
 ```
 
 The output of the function has been saved in the `results` variable, which we 
@@ -475,12 +470,11 @@ ssm_table(results)
 
 ```{r, echo = FALSE}
 ssm_table(results2, render = FALSE) %>%
-  kable() %>% 
-  kable_styling()
+  kable(caption = circumplex:::dcaption(results2)) %>%
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
-On this screen, the numbers don't fit perfectly, so let's free up some
-horizontal space by omitting the X-Value and Y-Value columns. (These columns are
+There are a lot of numbers here, so let's free up some horizontal space by omitting the X-Value and Y-Value columns. (These columns are
 useful for testing hypotheses about primary dimensions, but aren't really needed
 here since our main goal is just to understand the SSM procedure.)
 
@@ -490,8 +484,8 @@ ssm_table(results2, xy = FALSE)
 
 ```{r, echo = FALSE}
 ssm_table(results2, xy = FALSE, render = FALSE) %>%
-  kable() %>% 
-  kable_styling()
+  kable(caption = circumplex:::dcaption(results2)) %>%
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 Next, let's leverage the fact that we are working within a circumplex space by
@@ -546,8 +540,8 @@ ssm_table(results3, xy = FALSE)
 
 ```{r, echo = FALSE}
 ssm_table(results3, xy = FALSE, render = FALSE) %>%
-  kable() %>% 
-  kable_styling()
+  kable(caption = circumplex:::dcaption(results3)) %>%
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 From the table, we can see that the model fit is good (>.80) and that all three
@@ -588,3 +582,4 @@ groups or measures, and (3) export and make basic changes to tables and figures.
 * Wright, A. G. C., Pincus, A. L., Conroy, D. E., & Hilsenroth, M. J. (2009). Integrating methods to optimize circumplex description and comparison of groups. _Journal of Personality Assessment, 91_(4), 311–322.
 
 * Zimmermann, J., & Wright, A. G. C. (2017). Beyond description in interpersonal construct validation: Methodological advances in the circumplex Structural Summary Approach. _Assessment, 24_(1), 3–23.
+
