@@ -5,7 +5,8 @@
 \title{Perform analyses using the Structural Summary Method}
 \usage{
 ssm_analyze(.data, scales, angles, measures = NULL, grouping = NULL,
-  contrast = "none", boots = 2000, interval = 0.95, listwise = TRUE)
+  contrast = "none", boots = 2000, interval = 0.95,
+  listwise = TRUE)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -98,3 +99,5 @@ ssm_analyze(jz2017, scales = PA:NO, angles = octants(), measures = NARPD,
 Other ssm functions: \code{\link{ssm_append}},
   \code{\link{ssm_plot}}, \code{\link{ssm_table}}
 }
+\concept{analysis functions}
+\concept{ssm functions}

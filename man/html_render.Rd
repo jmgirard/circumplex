@@ -30,3 +30,4 @@ Format a data frame as an HTML table and render it to the web viewer.
 Other table functions: \code{\link{ssm_append}},
   \code{\link{ssm_table}}
 }
+\concept{table functions}

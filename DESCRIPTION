@@ -36,7 +36,7 @@ LinkingTo:
     Rcpp (>= 0.12.18),
     RcppArmadillo (>= 0.8.600.0.0)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Suggests: 
     covr (>= 3.1.0),
     forcats (>= 0.3.0),

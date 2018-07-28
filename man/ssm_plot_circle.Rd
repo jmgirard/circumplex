@@ -4,7 +4,8 @@
 \alias{ssm_plot_circle}
 \title{Create a Circular Plot of SSM Results}
 \usage{
-ssm_plot_circle(.ssm_object, amax = NULL, fontsize = 12, lowfit = FALSE)
+ssm_plot_circle(.ssm_object, amax = NULL, fontsize = 12,
+  lowfit = FALSE)
 }
 \arguments{
 \item{.ssm_object}{The output of \code{ssm_profiles()} or

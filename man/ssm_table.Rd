@@ -53,3 +53,5 @@ Other ssm functions: \code{\link{ssm_analyze}},
 Other table functions: \code{\link{html_render}},
   \code{\link{ssm_append}}
 }
+\concept{ssm functions}
+\concept{table functions}
