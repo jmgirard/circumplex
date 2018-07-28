@@ -21,6 +21,7 @@ A ggplot2 object representing the figure
 Take in the results of an SSM analysis function and create figure from it.
 }
 \examples{
+\dontrun{
 # Load example data
 data("jz2017")
 
@@ -33,6 +34,7 @@ p <- ssm_plot(res)
 res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
   measures = c(NARPD, ASPD), contrast = "test")
 p <- ssm_plot(res)
+}
 }
 \seealso{
 ggsave Function for saving plots to image files.
