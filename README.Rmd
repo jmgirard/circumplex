@@ -7,7 +7,7 @@ always_allow_html: yes
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
-  fig.path = "README-"
+  fig.path = "man/figures/README-"
 )
 library(circumplex)
 library(knitr)
@@ -16,12 +16,14 @@ library(kableExtra)
 
 # circumplex <img src="man/figures/logo.png" align="right" />
 
-[![Build Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex) [![Coverage status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://codecov.io/github/jmgirard/circumplex?branch=master) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+[![Build Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex)
+[![Coverage status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://codecov.io/github/jmgirard/circumplex?branch=master)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 
 
 ## Overview
 
-The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by [Jeffrey Girard](https://jmgirard.com/), and was inspired by work from and was developed in conjunction with [Johannes Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/) and [Aidan Wright](https://personalityprocesses.com/).
+The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by [Jeffrey Girard](https://jmgirard.com/), and was inspired by work from and was developed in conjunction with [Johannes Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/) and [Aidan Wright](https://personalityprocesses.com/). You can learn more about using this package to perform the Structural Summary Method (SSM) in `vignette("ssm-introduction")` and `vignette("ssm-intermediate")`.
 
 ## Installation
 
