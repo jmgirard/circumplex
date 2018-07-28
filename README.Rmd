@@ -55,10 +55,10 @@ ssm_table(results)
 ```{r table1, echo = FALSE, results = "asis"}
 ssm_table(results, render = FALSE) %>%
   knitr::kable(caption = circumplex:::dcaption(results)) %>% 
-  kableExtra::kable_styling(full_width = TRUE)
+  kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
-```{r plot1}
+```{r plot}
 ssm_plot(results)
 ```
 
@@ -70,7 +70,7 @@ Although a full suite of functions for conducting and visualizing the Structural
 
 ## Code of Conduct
 
-Contributions are welcome and encouraged. However, please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project, you agree to abide by its terms.
+Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project, you agree to abide by its terms.
 
 ## References
 

@@ -47,9 +47,9 @@ results <- ssm_analyze(
 ssm_table(results)
 ```
 
-<table class="table" style="margin-left: auto; margin-right: auto;">
+<table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 
-<caption>
+<caption style="font-size: initial !important;">
 
 Correlation-based Structural Summary Statistics with 95% CIs
 
@@ -208,7 +208,7 @@ ASPD
 ssm_plot(results)
 ```
 
-![](README-plot1-1.png)<!-- -->
+![](README-plot-1.png)<!-- -->
 
 ## Lifecycle
 
