@@ -19,7 +19,10 @@ created and is maintained by [Jeffrey Girard](https://jmgirard.com/),
 and was inspired by work from and was developed in conjunction with
 [Johannes
 Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/)
-and [Aidan Wright](https://personalityprocesses.com/).
+and [Aidan Wright](https://personalityprocesses.com/). You can learn
+more about using this package to perform the Structural Summary Method
+(SSM) in `vignette("ssm-introduction")` and
+`vignette("ssm-intermediate")`.
 
 ## Installation
 
@@ -208,7 +211,7 @@ ASPD
 ssm_plot(results)
 ```
 
-![](README-plot-1.png)<!-- -->
+![](man/figures/README-plot-1.png)<!-- -->
 
 ## Lifecycle
 
@@ -222,9 +225,9 @@ but this will be done carefully and with backward-compatibility in mind.
 
 ## Code of Conduct
 
-Contributions are welcome and encouraged. However, please note that this
-project is released with a [Contributor Code of Conduct](CONDUCT.md). By
-participating in this project, you agree to abide by its terms.
+Please note that this project is released with a [Contributor Code of
+Conduct](CONDUCT.md). By participating in this project, you agree to
+abide by its terms.
 
 ## References
 
