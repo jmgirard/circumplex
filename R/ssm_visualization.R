@@ -11,7 +11,8 @@
 #' @family ssm functions
 #' @family visualization functions
 #' @export
-#' @examples 
+#' @examples
+#' \dontrun{
 #' # Load example data
 #' data("jz2017")
 #' 
@@ -24,6 +25,7 @@
 #' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD), contrast = "test")
 #' p <- ssm_plot(res)
+#' }
 
 ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
   
@@ -291,6 +293,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' @family table functions
 #' @export
 #' @examples 
+#' \dontrun{
 #' # Load example data
 #' data("jz2017")
 #' 
@@ -303,6 +306,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD), contrast = "test")
 #' ssm_table(res)
+#' }
 
 ssm_table <- function(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
   render = TRUE) {
