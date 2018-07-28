@@ -40,11 +40,11 @@ analyses except that there are now two Profile blocks: one for Female and one
 for Male. A similar modification will occur if we generate a table and figure.
 
 ```r
-ssm_table(results, xy = FALSE)
+ssm_table(results)
 ```
 
 ```{r, echo = FALSE}
-ssm_table(results, xy = FALSE, render = FALSE) %>% 
+ssm_table(results, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results)) %>% 
   kable_styling(full_width = TRUE, font_size = 12)
 ```
@@ -72,11 +72,11 @@ summary(results2)
 ```
 
 ```r
-ssm_table(results2, xy = FALSE)
+ssm_table(results2)
 ```
 
 ```{r, echo = FALSE}
-ssm_table(results2, xy = FALSE, render = FALSE) %>% 
+ssm_table(results2, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results2)) %>% 
   kable_styling(full_width = TRUE, font_size = 12)
 ```
@@ -98,11 +98,11 @@ summary(results3)
 ```
 
 ```r
-ssm_table(results3, xy = FALSE)
+ssm_table(results3)
 ```
 
 ```{r, echo = FALSE}
-ssm_table(results3, xy = FALSE, render = FALSE) %>% 
+ssm_table(results3, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results3)) %>% 
   kable_styling(full_width = TRUE, font_size = 12)
 ```
@@ -156,11 +156,11 @@ the figure will be a circular figure and not a contrast figure which we will see
 below. However, we would get a contrast figure if we used a parameter contrast.
 
 ```r
-ssm_table(results4, xy = FALSE)
+ssm_table(results4)
 ```
 
 ```{r, echo = FALSE}
-ssm_table(results4, xy = FALSE, render = FALSE) %>% 
+ssm_table(results4, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results4)) %>% 
   kable_styling(full_width = TRUE, font_size = 12)
 ```
@@ -181,17 +181,17 @@ summary(results5)
 ```
 
 ```r
-ssm_table(results5, xy = FALSE)
+ssm_table(results5)
 ```
 
-```{r, echo = FALSE}
-ssm_table(results5, xy = FALSE, render = FALSE) %>% 
+```{r, echo = FALSE, results = "asis"}
+ssm_table(results5, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results5)) %>% 
   kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r, fig.width = 7.2, fig.height = 4}
-ssm_plot(results5, xy = FALSE)
+ssm_plot(results5)
 ```
 
 Here, instead of a circle plot, we see a contrast plot showing the difference
@@ -214,17 +214,17 @@ summary(results6)
 ```
 
 ```r
-ssm_table(results6, xy = FALSE)
+ssm_table(results6)
 ```
 
-```{r, echo = FALSE}
-ssm_table(results6, xy = FALSE, render = FALSE) %>% 
+```{r, echo = FALSE, results = "asis"}
+ssm_table(results6, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results6)) %>% 
   kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r, fig.width = 7.2, fig.height = 4}
-ssm_plot(results6, xy = FALSE)
+ssm_plot(results6)
 ```
 
 ## 3. Taxonomy of analysis types
@@ -287,12 +287,12 @@ rather than their contrast.
 
 ### Basic customizations of tables
 Additional arguments to the `ssm_table()` function can be explored using the 
-`?ssm_table` command. Two useful options are the `xy` argument, which we have 
-already seen and that shows or hides the x-value and y-value columns, and the
-`caption` argument which allows a custom string to be printed above the table.
-Note as well that the return object of this function is just a tibble or data
-frame, which can be easily edited to add, change, or remove text. To change
-the formatting of the table, see the `htmlTable` or `kableExtra` packages.
+`?ssm_table` command. Two useful options are the `xy` argument, which shows or 
+hides the x-value and y-value columns, and the `caption` argument which allows a
+custom string to be printed above the table. Note as well that the return object
+of this function is just a tibble or data frame, which can be easily edited to 
+add, change, or remove text. To change the formatting of the table, see the 
+`htmlTable` or `kableExtra` packages.
 
 ### Combining and exporting tables
 In some cases, such as multiple contrasts or groupings, we may want to combine
@@ -354,7 +354,7 @@ left of the plots. More complex customizations will be the subject of an
 advanced vignette.
 
 ```{r, fig.width = 7.2, fig.height = 4}
-ssm_plot(results6, xy = TRUE, color = "blue", linesize = 1,
+ssm_plot(results6, xy = FALSE, color = "blue", linesize = 1,
   axislabel = "BORPD: Male - Female")
 ```
 
@@ -371,7 +371,7 @@ the underlying graphics are vectorized in R, they can be easily scaled to any
 size without loss of quality and used in manuscripts, presentations, or posters.
 
 ```r
-p <- ssm_plot(results6, xy = TRUE, color = "blue", linesize = 1,
+p <- ssm_plot(results6, xy = FALSE, color = "blue", linesize = 1,
   axislabel = "BORPD: Male - Female")
 ggsave(filename = "bordpd_gender.png", plot = p, width = 7.5, height = 4,
   units = "in")

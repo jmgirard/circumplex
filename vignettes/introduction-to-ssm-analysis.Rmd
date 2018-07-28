@@ -474,20 +474,6 @@ ssm_table(results2, render = FALSE) %>%
   kable_styling(full_width = TRUE, font_size = 12)
 ```
 
-There are a lot of numbers here, so let's free up some horizontal space by omitting the X-Value and Y-Value columns. (These columns are
-useful for testing hypotheses about primary dimensions, but aren't really needed
-here since our main goal is just to understand the SSM procedure.)
-
-```r
-ssm_table(results2, xy = FALSE)
-```
-
-```{r, echo = FALSE}
-ssm_table(results2, xy = FALSE, render = FALSE) %>%
-  kable(caption = circumplex:::dcaption(results2)) %>%
-  kable_styling(full_width = TRUE, font_size = 12)
-```
-
 Next, let's leverage the fact that we are working within a circumplex space by
 creating a nice-looking circular plot by mapping the amplitude parameter to the
 points' distance from the center of the circle and the displacement parameter
@@ -535,11 +521,11 @@ whether the results are mean-based or correlation-based and will work in both
 cases.
 
 ```r
-ssm_table(results3, xy = FALSE)
+ssm_table(results3)
 ```
 
 ```{r, echo = FALSE}
-ssm_table(results3, xy = FALSE, render = FALSE) %>%
+ssm_table(results3, render = FALSE) %>%
   kable(caption = circumplex:::dcaption(results3)) %>%
   kable_styling(full_width = TRUE, font_size = 12)
 ```
