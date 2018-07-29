@@ -2,11 +2,11 @@ Type: Package
 Package: circumplex
 Title: Analysis and Visualization of Circular Data
 Version: 0.1.0
-Authors@R: as.person(c(
-  "Jeffrey Girard <j.girard@pitt.edu> [aut, cre]
-    (<https://orcid.org/0000-0002-7359-3746>)",
-  "Johannes Zimmermann <j.zimmermann@psychologische-hochschule.de> [aut]",
-  "Aidan Wright <aidan@pitt.edu> [ctb]"))
+Authors@R: c(
+  person("Jeffrey", "Girard", email = "me@jmgirard.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-7359-3746")),
+  person("Johannes", "Zimmermann", role = "aut", comment = c(ORCID = "0000-0001-6975-2356")),
+  person("Aidan", "Wright", role = "aut", comment = c(ORCID = "0000-0002-2369-0601"))
+  )
 Description: Tools for analyzing and visualizing circular data, including a 
   generalization of the bootstrapped structural summary method from
   Zimmermann & Wright (2017) <doi:10.1177/1073191115621795> and functions for 

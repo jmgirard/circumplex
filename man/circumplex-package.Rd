@@ -34,16 +34,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jeffrey Girard \email{j.girard@pitt.edu} (<https://orcid.org/0000-0002-7359-3746>)
+\strong{Maintainer}: Jeffrey Girard \email{me@jmgirard.com} (0000-0002-7359-3746)
 
 Authors:
 \itemize{
-  \item Johannes Zimmermann \email{j.zimmermann@psychologische-hochschule.de}
-}
-
-Other contributors:
-\itemize{
-  \item Aidan Wright \email{aidan@pitt.edu} [contributor]
+  \item Johannes Zimmermann (0000-0001-6975-2356)
+  \item Aidan Wright (0000-0002-2369-0601)
 }
 
 }
