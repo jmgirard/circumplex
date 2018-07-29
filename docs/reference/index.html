@@ -61,20 +61,14 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions and data</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -84,15 +78,15 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a>
+      <a href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
     </li>
     <li>
-      <a href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
+      <a href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">Changelog</a>
+  <a href="../news/index.html">News</a>
 </li>
       </ul>
       
@@ -129,41 +123,69 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-primary-ssm-functions" class="hasAnchor"><a href="#section-primary-ssm-functions" class="anchor"></a>Primary SSM Functions</h2>
+          <p class="section-desc"><p>Functions for implementing the Structural Summary Method</p></p>
         </th>
       </tr>
       <tr>
         
         <td>
-          <p><code><a href="aw2009.html">aw2009</a></code> </p>
+          <p><code><a href="ssm_analyze.html">ssm_analyze()</a></code> </p>
         </td>
-        <td><p>Standardized octant scores on hypothetical circumplex scales</p></td>
+        <td><p>Perform analyses using the Structural Summary Method</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="circumplex-package.html">circumplex-package</a></code> </p>
+          <p><code><a href="ssm_table.html">ssm_table()</a></code> </p>
         </td>
-        <td><p>Analysis and visualization of circumplex data</p></td>
+        <td><p>Create HTML table from SSM results or contrasts</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ssm_plot.html">ssm_plot()</a></code> </p>
+        </td>
+        <td><p>Create a figure from SSM results</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-secondary-ssm-functions" class="hasAnchor"><a href="#section-secondary-ssm-functions" class="anchor"></a>Secondary SSM Functions</h2>
+          <p class="section-desc"><p>Functions for customizing SSM results</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="ssm_append.html">ssm_append()</a></code> </p>
+        </td>
+        <td><p>Combine SSM tables</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ssm_plot_circle.html">ssm_plot_circle()</a></code> </p>
+        </td>
+        <td><p>Create a Circular Plot of SSM Results</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ssm_plot_contrast.html">ssm_plot_contrast()</a></code> </p>
+        </td>
+        <td><p>Create a Difference Plot of SSM Contrast Results</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="html_render.html">html_render()</a></code> </p>
         </td>
         <td><p>Format and render data frame as HTML table</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="iipsc.html">iipsc</a></code> </p>
-        </td>
-        <td><p>Normative data for IIP-SC</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="jz2017.html">jz2017</a></code> </p>
-        </td>
-        <td><p>Raw octant scores on real circumplex scales with covariates</p></td>
-      </tr><tr>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-convenience-functions" class="hasAnchor"><a href="#section-convenience-functions" class="anchor"></a>Convenience Functions</h2>
+          <p class="section-desc"><p>Functions that make your life easier</p></p>
+        </th>
+      </tr>
+      <tr>
         
         <td>
           <p><code><a href="octants.html">octants()</a></code> </p>
@@ -181,42 +203,32 @@
           <p><code><a href="quadrants.html">quadrants()</a></code> </p>
         </td>
         <td><p>Angular displacements for quadrant circumplex scales</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-example-data" class="hasAnchor"><a href="#section-example-data" class="anchor"></a>Example Data</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="aw2009.html">aw2009</a></code> </p>
+        </td>
+        <td><p>Standardized octant scores on hypothetical circumplex scales</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="ssm_analyze.html">ssm_analyze()</a></code> </p>
+          <p><code><a href="jz2017.html">jz2017</a></code> </p>
         </td>
-        <td><p>Perform analyses using the Structural Summary Method</p></td>
+        <td><p>Raw octant scores on real circumplex scales with covariates</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="ssm_append.html">ssm_append()</a></code> </p>
+          <p><code><a href="iipsc.html">iipsc</a></code> </p>
         </td>
-        <td><p>Combine SSM tables</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="ssm_plot.html">ssm_plot()</a></code> </p>
-        </td>
-        <td><p>Create a figure from SSM results</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="ssm_plot_circle.html">ssm_plot_circle()</a></code> </p>
-        </td>
-        <td><p>Create a Circular Plot of SSM Results</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="ssm_plot_contrast.html">ssm_plot_contrast()</a></code> </p>
-        </td>
-        <td><p>Create a Difference Plot of SSM Contrast Results</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="ssm_table.html">ssm_table()</a></code> </p>
-        </td>
-        <td><p>Create HTML table from SSM results or contrasts</p></td>
+        <td><p>Normative data for IIP-SC</p></td>
       </tr>
     </tbody>
     </table>
@@ -225,7 +237,10 @@
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-primary-ssm-functions">Primary SSM Functions</a></li>
+      <li><a href="#section-secondary-ssm-functions">Secondary SSM Functions</a></li>
+      <li><a href="#section-convenience-functions">Convenience Functions</a></li>
+      <li><a href="#section-example-data">Example Data</a></li>
     </ul>
   </div>
 </div>
