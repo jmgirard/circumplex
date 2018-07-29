@@ -10,6 +10,7 @@ status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
 ## Overview
 
@@ -22,7 +23,9 @@ Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/)
 and [Aidan Wright](https://personalityprocesses.com/). You can learn
 more about using this package to perform the Structural Summary Method
 (SSM) in `vignette("ssm-introduction")` and
-`vignette("ssm-intermediate")`.
+`vignette("ssm-intermediate")`. You can purchase stickers with the
+circumplex logo at
+[redbubble.com](https://www.redbubble.com/people/jmgirard/works/32902204).
 
 ## Installation
 
@@ -120,31 +123,31 @@ NARPD
 
 <td style="text-align:left;">
 
-0.20 [0.17, 0.24]
+0.20 \[0.17, 0.24\]
 
 </td>
 
 <td style="text-align:left;">
 
--0.06 [-0.09, -0.03]
+\-0.06 \[-0.09, -0.03\]
 
 </td>
 
 <td style="text-align:left;">
 
-0.18 [0.15, 0.21]
+0.18 \[0.15, 0.21\]
 
 </td>
 
 <td style="text-align:left;">
 
-0.19 [0.16, 0.22]
+0.19 \[0.16, 0.22\]
 
 </td>
 
 <td style="text-align:left;">
 
-109.0 [99.2, 118.9]
+109.0 \[99.2, 118.9\]
 
 </td>
 
@@ -166,32 +169,31 @@ ASPD
 
 <td style="text-align:left;">
 
-0.12 [0.09, 0.16]
+0.12 \[0.09, 0.16\]
 
 </td>
 
 <td style="text-align:left;">
 
--0.10 [-0.13, -0.06]
+\-0.10 \[-0.13, -0.06\]
 
 </td>
 
 <td style="text-align:left;">
 
-0.20 [0.17, 0.24]
+0.20 \[0.17, 0.24\]
 
 </td>
 
 <td style="text-align:left;">
 
-0.23 [0.19, 0.26]
+0.23 \[0.19, 0.26\]
 
 </td>
 
 <td style="text-align:left;">
 
-115.9 [107.4,
-124.4]
+115.9 \[107.4, 124.4\]
 
 </td>
 
@@ -212,16 +214,6 @@ ssm_plot(results)
 ```
 
 ![](man/figures/README-plot-1.png)<!-- -->
-
-## Lifecycle
-
-[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-
-Although a full suite of functions for conducting and visualizing the
-Structural Summary Method is available, circumplex is a relatively young
-package and new functionality is planned for the future. Some functions
-and arguments may change as the design philosophy is fully fleshed out,
-but this will be done carefully and with backward-compatibility in mind.
 
 ## Code of Conduct
 
