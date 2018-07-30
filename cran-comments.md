@@ -1,7 +1,7 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Replaced /dontrun with /donttest for time-consuming examples
+* Fixed a broken link on NEWS.md
 
 ## Test environments
 * ubuntu 14.04 (on travis-ci), R 3.5.0
