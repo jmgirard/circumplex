@@ -35,6 +35,8 @@ NULL
 #'   PA, BC, DE, FG, HI, JK, LM, NO.
 #' @export
 #' @usage octants()
+#' @examples
+#' octants()
 octants <- function() {
   as_degree(c(90, 135, 180, 225, 270, 315, 360, 45))
 }
@@ -50,6 +52,8 @@ octants <- function() {
 #'   PA, DE, HI, LM.
 #' @export
 #' @usage poles()
+#' @examples
+#' poles()
 poles <- function() {
   as_degree(c(90, 180, 270, 360))
 }
@@ -65,6 +69,8 @@ poles <- function() {
 #'   BC, FG, JK, NO.
 #' @export
 #' @usage quadrants()
+#' @examples
+#' quadrants()
 quadrants <- function() {
   as_degree(c(135, 225, 315, 45))
 }

@@ -16,3 +16,6 @@ Return a vector of angular displacements, in degrees, for four equally spaced
 circumplex scales corresponding to the circumplex poles. Can be passed to the
 \code{angles} parameter of other functions in this package.
 }
+\examples{
+poles()
+}
