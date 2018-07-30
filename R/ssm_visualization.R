@@ -12,7 +12,7 @@
 #' @family visualization functions
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load example data
 #' data("jz2017")
 #' 
@@ -293,7 +293,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' @family table functions
 #' @export
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' # Load example data
 #' data("jz2017")
 #' 

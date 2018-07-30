@@ -33,7 +33,7 @@ Take in the results of an SSM analysis and return an HTML table with the
 desired formatting.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load example data
 data("jz2017")
 

@@ -56,7 +56,7 @@
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), 
 #'   measures = c(NARPD, ASPD))
 #'   
-#' \dontrun{
+#' \donttest{
 #' # Multiple-group mean-based SSM
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), grouping = Gender)
 #' 

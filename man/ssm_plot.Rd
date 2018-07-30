@@ -21,7 +21,7 @@ A ggplot2 object representing the figure
 Take in the results of an SSM analysis function and create figure from it.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load example data
 data("jz2017")
 
