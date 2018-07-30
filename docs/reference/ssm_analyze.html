@@ -67,7 +67,7 @@ measures will be calculated." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.1</span>
       </span>
     </div>
 
@@ -253,26 +253,98 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Displacement    115.927    107.038    124.248
 #&gt; Model Fit         0.964                      
 #&gt; </div><div class='input'>  
-</div><span class='co'># NOT RUN {</span>
-<span class='co'># Multiple-group mean-based SSM</span>
-<span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>)
-
+</div><div class='input'><span class='co'># Multiple-group mean-based SSM</span>
+<span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>)</div><div class='output co'>#&gt; Call:
+#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
+#&gt;     grouping = Gender)
+#&gt; 
+#&gt; Profile [Female]:
+#&gt;                Estimate   Lower CI   Upper CI
+#&gt; Elevation         0.946      0.908      0.983
+#&gt; X-Value           0.459      0.421      0.500
+#&gt; Y-Value          -0.310     -0.354     -0.268
+#&gt; Amplitude         0.554      0.510      0.600
+#&gt; Displacement    325.963    322.176    329.821
+#&gt; Model Fit         0.889                      
+#&gt; 
+#&gt; Profile [Male]:
+#&gt;                Estimate   Lower CI   Upper CI
+#&gt; Elevation         0.884      0.840      0.925
+#&gt; X-Value           0.227      0.192      0.262
+#&gt; Y-Value          -0.186     -0.224     -0.150
+#&gt; Amplitude         0.294      0.260      0.331
+#&gt; Displacement    320.685    313.718    327.851
+#&gt; Model Fit         0.824                      
+#&gt; </div><div class='input'>
 <span class='co'># Multiple-group mean-based SSM with contrast</span>
 <span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>,
-  <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"model"</span>)
-
+  <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"model"</span>)</div><div class='output co'>#&gt; Call:
+#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
+#&gt;     grouping = Gender, contrast = "model")
+#&gt; 
+#&gt; Contrast [Male - Female]:
+#&gt;                Estimate   Lower CI   Upper CI
+#&gt; Elevation        -0.062     -0.120     -0.004
+#&gt; X-Value          -0.232     -0.282     -0.178
+#&gt; Y-Value           0.124      0.065      0.184
+#&gt; Amplitude         0.263      0.209      0.322
+#&gt; Displacement    151.858    140.282    164.263
+#&gt; Model Fit         0.855                      
+#&gt; </div><div class='input'>
 <span class='co'># Single-group correlation-based SSM with contrast</span>
 <span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>)
-
+  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>)</div><div class='output co'>#&gt; Call:
+#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
+#&gt;     measures = c(NARPD, ASPD), contrast = "test")
+#&gt; 
+#&gt; Contrast [ASPD - NARPD]:
+#&gt;                Estimate   Lower CI   Upper CI
+#&gt; Elevation        -0.079     -0.118     -0.043
+#&gt; X-Value          -0.037     -0.076     -0.001
+#&gt; Y-Value           0.024     -0.013      0.062
+#&gt; Amplitude         0.037      0.000      0.077
+#&gt; Displacement      6.960     -2.835     16.963
+#&gt; Model Fit         0.007                      
+#&gt; </div><div class='input'>
 <span class='co'># Multiple-group correlation-based SSM</span>
 <span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>measures</span> <span class='kw'>=</span> <span class='no'>NARPD</span>,
-  <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>)
-
+  <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>)</div><div class='output co'>#&gt; Call:
+#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
+#&gt;     measures = NARPD, grouping = Gender)
+#&gt; 
+#&gt; Profile [Female_NARPD]:
+#&gt;                Estimate   Lower CI   Upper CI
+#&gt; Elevation         0.172      0.126      0.219
+#&gt; X-Value          -0.080     -0.129     -0.036
+#&gt; Y-Value           0.202      0.151      0.250
+#&gt; Amplitude         0.217      0.164      0.272
+#&gt; Displacement    111.669    100.392    123.891
+#&gt; Model Fit         0.972                      
+#&gt; 
+#&gt; Profile [Male_NARPD]:
+#&gt;                Estimate   Lower CI   Upper CI
+#&gt; Elevation         0.244      0.191      0.295
+#&gt; X-Value          -0.029     -0.075      0.015
+#&gt; Y-Value           0.146      0.101      0.192
+#&gt; Amplitude         0.149      0.105      0.195
+#&gt; Displacement    101.248     84.307    118.790
+#&gt; Model Fit         0.902                      
+#&gt; </div><div class='input'>
 <span class='co'># Multiple-group correlation-based SSM with contrast</span>
 <span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>measures</span> <span class='kw'>=</span> <span class='no'>NARPD</span>,
-  <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>, <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>)
-<span class='co'># }</span></pre>
+  <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>, <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>)</div><div class='output co'>#&gt; Call:
+#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
+#&gt;     measures = NARPD, grouping = Gender, contrast = "test")
+#&gt; 
+#&gt; Contrast [NARPD: Male - Female]:
+#&gt;                Estimate   Lower CI   Upper CI
+#&gt; Elevation         0.072      0.006      0.142
+#&gt; X-Value           0.051     -0.012      0.113
+#&gt; Y-Value          -0.056     -0.125      0.008
+#&gt; Amplitude        -0.068     -0.139     -0.002
+#&gt; Displacement    -10.421    -30.970     10.708
+#&gt; Model Fit        -0.071                      
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

@@ -64,7 +64,7 @@ desired formatting." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.1</span>
       </span>
     </div>
 
@@ -172,20 +172,84 @@ side-effect, may also output the HTML table to the web viewer.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># Load example data</span>
+    <pre class="examples"><div class='input'><span class='co'># Load example data</span>
 <span class='fu'>data</span>(<span class='st'>"jz2017"</span>)
 
 <span class='co'># Create table of profile results</span>
 <span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
   <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>))
-<span class='fu'>ssm_table</span>(<span class='no'>res</span>)
-
+<span class='fu'>ssm_table</span>(<span class='no'>res</span>)</div><div class='output co'>#&gt; &lt;table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' &gt;
+#&gt; &lt;thead&gt;
+#&gt; &lt;tr&gt;&lt;td colspan='7' style='text-align: left;'&gt;
+#&gt; Correlation-based Structural Summary Statistics with 95% CIs&lt;/td&gt;&lt;/tr&gt;
+#&gt; &lt;tr&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Profile&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Elevation&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;X-Value&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Y-Value&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Amplitude&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Displacement&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Fit&lt;/th&gt;
+#&gt; &lt;/tr&gt;
+#&gt; &lt;/thead&gt;
+#&gt; &lt;tbody&gt;
+#&gt; &lt;tr&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;NARPD&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.20 [0.17, 0.24]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;-0.06 [-0.09, -0.03]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.18 [0.15, 0.21]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.19 [0.15, 0.22]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;109.0 [99.3, 118.3]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.957&lt;/td&gt;
+#&gt; &lt;/tr&gt;
+#&gt; &lt;tr&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;ASPD&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.12 [0.09, 0.16]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;-0.10 [-0.13, -0.06]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.20 [0.17, 0.24]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.23 [0.19, 0.26]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;115.9 [107.5, 124.6]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.964&lt;/td&gt;
+#&gt; &lt;/tr&gt;
+#&gt; &lt;/tbody&gt;
+#&gt; &lt;/table&gt;</div><div class='output co'>#&gt; # A tibble: 2 x 7
+#&gt;   Profile Elevation    `X-Value`   `Y-Value`   Amplitude   Displacement   Fit  
+#&gt;   &lt;chr&gt;   &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;          &lt;chr&gt;
+#&gt; 1 NARPD   0.20 [0.17,~ -0.06 [-0.~ 0.18 [0.15~ 0.19 [0.15~ 109.0 [99.3, ~ 0.957
+#&gt; 2 ASPD    0.12 [0.09,~ -0.10 [-0.~ 0.20 [0.17~ 0.23 [0.19~ 115.9 [107.5,~ 0.964</div><div class='input'>
 <span class='co'># Create table of contrast results</span>
 <span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
   <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>)
-<span class='fu'>ssm_table</span>(<span class='no'>res</span>)
-<span class='co'># }</span></pre>
+<span class='fu'>ssm_table</span>(<span class='no'>res</span>)</div><div class='output co'>#&gt; &lt;table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' &gt;
+#&gt; &lt;thead&gt;
+#&gt; &lt;tr&gt;&lt;td colspan='7' style='text-align: left;'&gt;
+#&gt; Correlation-based Structural Summary Statistic Contrasts with 95% CIs&lt;/td&gt;&lt;/tr&gt;
+#&gt; &lt;tr&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Contrast&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Elevation&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; X-Value&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Y-Value&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Amplitude&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Displacement&lt;/th&gt;
+#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Fit&lt;/th&gt;
+#&gt; &lt;/tr&gt;
+#&gt; &lt;/thead&gt;
+#&gt; &lt;tbody&gt;
+#&gt; &lt;tr&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;ASPD - NARPD&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;-0.08 [-0.12, -0.04]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;-0.04 [-0.08, -0.00]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.02 [-0.01, 0.06]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.04 [-0.00, 0.08]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;7.0 [-2.6, 17.2]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.007&lt;/td&gt;
+#&gt; &lt;/tr&gt;
+#&gt; &lt;/tbody&gt;
+#&gt; &lt;/table&gt;</div><div class='output co'>#&gt; # A tibble: 1 x 7
+#&gt;   Contrast `&amp;Delta; Elevat~ `&amp;Delta; X-Valu~ `&amp;Delta; Y-Valu~ `&amp;Delta; Amplit~
+#&gt;   &lt;chr&gt;    &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;           
+#&gt; 1 ASPD - ~ -0.08 [-0.12, -~ -0.04 [-0.08, -~ 0.02 [-0.01, 0.~ 0.04 [-0.00, 0.~
+#&gt; # ... with 2 more variables: `&amp;Delta; Displacement` &lt;chr&gt;, `&amp;Delta; Fit` &lt;chr&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

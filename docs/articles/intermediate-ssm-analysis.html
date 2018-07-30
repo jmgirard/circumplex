@@ -30,7 +30,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.1</span>
       </span>
     </div>
 
@@ -110,20 +110,20 @@
 <a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt; Profile [Female]:</span></a>
 <a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">#&gt; Elevation         0.946      0.907      0.984</span></a>
-<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="co">#&gt; X-Value           0.459      0.421      0.498</span></a>
-<a class="sourceLine" id="cb1-18" data-line-number="18"><span class="co">#&gt; Y-Value          -0.310     -0.354     -0.267</span></a>
-<a class="sourceLine" id="cb1-19" data-line-number="19"><span class="co">#&gt; Amplitude         0.554      0.509      0.598</span></a>
-<a class="sourceLine" id="cb1-20" data-line-number="20"><span class="co">#&gt; Displacement    325.963    322.043    329.992</span></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">#&gt; Elevation         0.946      0.909      0.985</span></a>
+<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="co">#&gt; X-Value           0.459      0.420      0.498</span></a>
+<a class="sourceLine" id="cb1-18" data-line-number="18"><span class="co">#&gt; Y-Value          -0.310     -0.354     -0.268</span></a>
+<a class="sourceLine" id="cb1-19" data-line-number="19"><span class="co">#&gt; Amplitude         0.554      0.512      0.600</span></a>
+<a class="sourceLine" id="cb1-20" data-line-number="20"><span class="co">#&gt; Displacement    325.963    321.888    329.966</span></a>
 <a class="sourceLine" id="cb1-21" data-line-number="21"><span class="co">#&gt; Model Fit         0.889                      </span></a>
 <a class="sourceLine" id="cb1-22" data-line-number="22"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb1-23" data-line-number="23"><span class="co">#&gt; Profile [Male]:</span></a>
 <a class="sourceLine" id="cb1-24" data-line-number="24"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb1-25" data-line-number="25"><span class="co">#&gt; Elevation         0.884      0.842      0.926</span></a>
-<a class="sourceLine" id="cb1-26" data-line-number="26"><span class="co">#&gt; X-Value           0.227      0.194      0.263</span></a>
-<a class="sourceLine" id="cb1-27" data-line-number="27"><span class="co">#&gt; Y-Value          -0.186     -0.226     -0.147</span></a>
-<a class="sourceLine" id="cb1-28" data-line-number="28"><span class="co">#&gt; Amplitude         0.294      0.257      0.334</span></a>
-<a class="sourceLine" id="cb1-29" data-line-number="29"><span class="co">#&gt; Displacement    320.685    313.572    328.037</span></a>
+<a class="sourceLine" id="cb1-25" data-line-number="25"><span class="co">#&gt; Elevation         0.884      0.840      0.927</span></a>
+<a class="sourceLine" id="cb1-26" data-line-number="26"><span class="co">#&gt; X-Value           0.227      0.193      0.262</span></a>
+<a class="sourceLine" id="cb1-27" data-line-number="27"><span class="co">#&gt; Y-Value          -0.186     -0.225     -0.147</span></a>
+<a class="sourceLine" id="cb1-28" data-line-number="28"><span class="co">#&gt; Amplitude         0.294      0.257      0.332</span></a>
+<a class="sourceLine" id="cb1-29" data-line-number="29"><span class="co">#&gt; Displacement    320.685    313.597    327.841</span></a>
 <a class="sourceLine" id="cb1-30" data-line-number="30"><span class="co">#&gt; Model Fit         0.824</span></a></code></pre></div>
 <p>Note that the output of <code>summary()</code> looks the same as previous mean-based analyses except that there are now two Profile blocks: one for Female and one for Male. A similar modification will occur if we generate a table and figure.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results)</a></code></pre></div>
@@ -160,7 +160,7 @@ Fit
 Female
 </td>
 <td style="text-align:left;">
-0.95 [0.91, 0.98]
+0.95 [0.91, 0.99]
 </td>
 <td style="text-align:left;">
 0.46 [0.42, 0.50]
@@ -172,7 +172,7 @@ Female
 0.55 [0.51, 0.60]
 </td>
 <td style="text-align:left;">
-326.0 [322.0, 330.0]
+326.0 [321.9, 330.0]
 </td>
 <td style="text-align:left;">
 0.889
@@ -189,13 +189,13 @@ Male
 0.23 [0.19, 0.26]
 </td>
 <td style="text-align:left;">
--0.19 [-0.23, -0.15]
+-0.19 [-0.22, -0.15]
 </td>
 <td style="text-align:left;">
 0.29 [0.26, 0.33]
 </td>
 <td style="text-align:left;">
-320.7 [313.6, 328.0]
+320.7 [313.6, 327.8]
 </td>
 <td style="text-align:left;">
 0.824
@@ -225,20 +225,20 @@ Male
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; Profile [NARPD]:</span></a>
 <a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; Elevation         0.202      0.170      0.235</span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; X-Value          -0.062     -0.095     -0.029</span></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Y-Value           0.179      0.146      0.212</span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.189      0.156      0.223</span></a>
-<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; Displacement    108.967     99.076    118.586</span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; Elevation         0.202      0.169      0.238</span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; X-Value          -0.062     -0.092     -0.028</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Y-Value           0.179      0.145      0.212</span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.189      0.155      0.224</span></a>
+<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; Displacement    108.967     98.956    118.399</span></a>
 <a class="sourceLine" id="cb4-20" data-line-number="20"><span class="co">#&gt; Model Fit         0.957                      </span></a>
 <a class="sourceLine" id="cb4-21" data-line-number="21"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb4-22" data-line-number="22"><span class="co">#&gt; Profile [ASPD]:</span></a>
 <a class="sourceLine" id="cb4-23" data-line-number="23"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb4-24" data-line-number="24"><span class="co">#&gt; Elevation         0.124      0.089      0.158</span></a>
-<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co">#&gt; X-Value          -0.099     -0.135     -0.063</span></a>
-<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="co">#&gt; Y-Value           0.203      0.169      0.239</span></a>
-<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt; Amplitude         0.226      0.191      0.263</span></a>
-<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt; Displacement    115.927    107.165    123.956</span></a>
+<a class="sourceLine" id="cb4-24" data-line-number="24"><span class="co">#&gt; Elevation         0.124      0.090      0.160</span></a>
+<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="co">#&gt; X-Value          -0.099     -0.133     -0.064</span></a>
+<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="co">#&gt; Y-Value           0.203      0.168      0.236</span></a>
+<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="co">#&gt; Amplitude         0.226      0.190      0.263</span></a>
+<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="co">#&gt; Displacement    115.927    107.414    124.193</span></a>
 <a class="sourceLine" id="cb4-29" data-line-number="29"><span class="co">#&gt; Model Fit         0.964</span></a></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results2)</a></code></pre></div>
 <table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -280,13 +280,13 @@ NARPD
 -0.06 [-0.09, -0.03]
 </td>
 <td style="text-align:left;">
-0.18 [0.15, 0.21]
+0.18 [0.14, 0.21]
 </td>
 <td style="text-align:left;">
-0.19 [0.16, 0.22]
+0.19 [0.15, 0.22]
 </td>
 <td style="text-align:left;">
-109.0 [99.1, 118.6]
+109.0 [99.0, 118.4]
 </td>
 <td style="text-align:left;">
 0.957
@@ -309,7 +309,7 @@ ASPD
 0.23 [0.19, 0.26]
 </td>
 <td style="text-align:left;">
-115.9 [107.2, 124.0]
+115.9 [107.4, 124.2]
 </td>
 <td style="text-align:left;">
 0.964
@@ -339,56 +339,56 @@ ASPD
 <a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt; Profile [Female_PARPD]:</span></a>
 <a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; Elevation         0.262      0.221      0.303</span></a>
-<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#&gt; X-Value          -0.146     -0.193     -0.101</span></a>
-<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt; Y-Value           0.120      0.069      0.172</span></a>
-<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; Amplitude         0.189      0.138      0.242</span></a>
-<a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#&gt; Displacement    140.524    127.156    155.583</span></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; Elevation         0.262      0.220      0.302</span></a>
+<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#&gt; X-Value          -0.146     -0.195     -0.099</span></a>
+<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt; Y-Value           0.120      0.069      0.171</span></a>
+<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; Amplitude         0.189      0.137      0.244</span></a>
+<a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#&gt; Displacement    140.524    126.772    155.234</span></a>
 <a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co">#&gt; Model Fit         0.870                      </span></a>
 <a class="sourceLine" id="cb7-22" data-line-number="22"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb7-23" data-line-number="23"><span class="co">#&gt; Profile [Female_SCZPD]:</span></a>
 <a class="sourceLine" id="cb7-24" data-line-number="24"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb7-25" data-line-number="25"><span class="co">#&gt; Elevation         0.177      0.132      0.223</span></a>
-<a class="sourceLine" id="cb7-26" data-line-number="26"><span class="co">#&gt; X-Value          -0.230     -0.285     -0.176</span></a>
-<a class="sourceLine" id="cb7-27" data-line-number="27"><span class="co">#&gt; Y-Value          -0.047     -0.104      0.010</span></a>
-<a class="sourceLine" id="cb7-28" data-line-number="28"><span class="co">#&gt; Amplitude         0.235      0.188      0.288</span></a>
-<a class="sourceLine" id="cb7-29" data-line-number="29"><span class="co">#&gt; Displacement    191.613    177.595    206.850</span></a>
+<a class="sourceLine" id="cb7-25" data-line-number="25"><span class="co">#&gt; Elevation         0.177      0.130      0.219</span></a>
+<a class="sourceLine" id="cb7-26" data-line-number="26"><span class="co">#&gt; X-Value          -0.230     -0.289     -0.172</span></a>
+<a class="sourceLine" id="cb7-27" data-line-number="27"><span class="co">#&gt; Y-Value          -0.047     -0.107      0.011</span></a>
+<a class="sourceLine" id="cb7-28" data-line-number="28"><span class="co">#&gt; Amplitude         0.235      0.185      0.291</span></a>
+<a class="sourceLine" id="cb7-29" data-line-number="29"><span class="co">#&gt; Displacement    191.613    177.337    208.412</span></a>
 <a class="sourceLine" id="cb7-30" data-line-number="30"><span class="co">#&gt; Model Fit         0.845                      </span></a>
 <a class="sourceLine" id="cb7-31" data-line-number="31"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb7-32" data-line-number="32"><span class="co">#&gt; Profile [Female_SZTPD]:</span></a>
 <a class="sourceLine" id="cb7-33" data-line-number="33"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb7-34" data-line-number="34"><span class="co">#&gt; Elevation         0.237      0.193      0.278</span></a>
-<a class="sourceLine" id="cb7-35" data-line-number="35"><span class="co">#&gt; X-Value          -0.130     -0.177     -0.084</span></a>
-<a class="sourceLine" id="cb7-36" data-line-number="36"><span class="co">#&gt; Y-Value           0.016     -0.036      0.067</span></a>
-<a class="sourceLine" id="cb7-37" data-line-number="37"><span class="co">#&gt; Amplitude         0.131      0.089      0.181</span></a>
-<a class="sourceLine" id="cb7-38" data-line-number="38"><span class="co">#&gt; Displacement    172.870    151.692    197.031</span></a>
+<a class="sourceLine" id="cb7-34" data-line-number="34"><span class="co">#&gt; Elevation         0.237      0.194      0.276</span></a>
+<a class="sourceLine" id="cb7-35" data-line-number="35"><span class="co">#&gt; X-Value          -0.130     -0.178     -0.085</span></a>
+<a class="sourceLine" id="cb7-36" data-line-number="36"><span class="co">#&gt; Y-Value           0.016     -0.037      0.070</span></a>
+<a class="sourceLine" id="cb7-37" data-line-number="37"><span class="co">#&gt; Amplitude         0.131      0.088      0.182</span></a>
+<a class="sourceLine" id="cb7-38" data-line-number="38"><span class="co">#&gt; Displacement    172.870    150.819    196.585</span></a>
 <a class="sourceLine" id="cb7-39" data-line-number="39"><span class="co">#&gt; Model Fit         0.812                      </span></a>
 <a class="sourceLine" id="cb7-40" data-line-number="40"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb7-41" data-line-number="41"><span class="co">#&gt; Profile [Male_PARPD]:</span></a>
 <a class="sourceLine" id="cb7-42" data-line-number="42"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb7-43" data-line-number="43"><span class="co">#&gt; Elevation         0.243      0.196      0.292</span></a>
-<a class="sourceLine" id="cb7-44" data-line-number="44"><span class="co">#&gt; X-Value          -0.035     -0.080      0.011</span></a>
-<a class="sourceLine" id="cb7-45" data-line-number="45"><span class="co">#&gt; Y-Value           0.114      0.066      0.164</span></a>
-<a class="sourceLine" id="cb7-46" data-line-number="46"><span class="co">#&gt; Amplitude         0.120      0.074      0.170</span></a>
-<a class="sourceLine" id="cb7-47" data-line-number="47"><span class="co">#&gt; Displacement    106.881     84.749    130.592</span></a>
+<a class="sourceLine" id="cb7-43" data-line-number="43"><span class="co">#&gt; Elevation         0.243      0.195      0.288</span></a>
+<a class="sourceLine" id="cb7-44" data-line-number="44"><span class="co">#&gt; X-Value          -0.035     -0.081      0.013</span></a>
+<a class="sourceLine" id="cb7-45" data-line-number="45"><span class="co">#&gt; Y-Value           0.114      0.068      0.160</span></a>
+<a class="sourceLine" id="cb7-46" data-line-number="46"><span class="co">#&gt; Amplitude         0.120      0.074      0.167</span></a>
+<a class="sourceLine" id="cb7-47" data-line-number="47"><span class="co">#&gt; Displacement    106.881     83.482    130.200</span></a>
 <a class="sourceLine" id="cb7-48" data-line-number="48"><span class="co">#&gt; Model Fit         0.648                      </span></a>
 <a class="sourceLine" id="cb7-49" data-line-number="49"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb7-50" data-line-number="50"><span class="co">#&gt; Profile [Male_SCZPD]:</span></a>
 <a class="sourceLine" id="cb7-51" data-line-number="51"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb7-52" data-line-number="52"><span class="co">#&gt; Elevation         0.204      0.150      0.260</span></a>
-<a class="sourceLine" id="cb7-53" data-line-number="53"><span class="co">#&gt; X-Value          -0.178     -0.222     -0.135</span></a>
-<a class="sourceLine" id="cb7-54" data-line-number="54"><span class="co">#&gt; Y-Value          -0.017     -0.071      0.036</span></a>
-<a class="sourceLine" id="cb7-55" data-line-number="55"><span class="co">#&gt; Amplitude         0.179      0.138      0.224</span></a>
-<a class="sourceLine" id="cb7-56" data-line-number="56"><span class="co">#&gt; Displacement    185.351    169.090    203.251</span></a>
+<a class="sourceLine" id="cb7-52" data-line-number="52"><span class="co">#&gt; Elevation         0.204      0.145      0.261</span></a>
+<a class="sourceLine" id="cb7-53" data-line-number="53"><span class="co">#&gt; X-Value          -0.178     -0.221     -0.134</span></a>
+<a class="sourceLine" id="cb7-54" data-line-number="54"><span class="co">#&gt; Y-Value          -0.017     -0.071      0.035</span></a>
+<a class="sourceLine" id="cb7-55" data-line-number="55"><span class="co">#&gt; Amplitude         0.179      0.138      0.223</span></a>
+<a class="sourceLine" id="cb7-56" data-line-number="56"><span class="co">#&gt; Displacement    185.351    168.598    203.321</span></a>
 <a class="sourceLine" id="cb7-57" data-line-number="57"><span class="co">#&gt; Model Fit         0.917                      </span></a>
 <a class="sourceLine" id="cb7-58" data-line-number="58"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb7-59" data-line-number="59"><span class="co">#&gt; Profile [Male_SZTPD]:</span></a>
 <a class="sourceLine" id="cb7-60" data-line-number="60"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb7-61" data-line-number="61"><span class="co">#&gt; Elevation         0.240      0.185      0.297</span></a>
-<a class="sourceLine" id="cb7-62" data-line-number="62"><span class="co">#&gt; X-Value          -0.037     -0.085      0.010</span></a>
+<a class="sourceLine" id="cb7-61" data-line-number="61"><span class="co">#&gt; Elevation         0.240      0.183      0.293</span></a>
+<a class="sourceLine" id="cb7-62" data-line-number="62"><span class="co">#&gt; X-Value          -0.037     -0.084      0.010</span></a>
 <a class="sourceLine" id="cb7-63" data-line-number="63"><span class="co">#&gt; Y-Value           0.029     -0.019      0.077</span></a>
-<a class="sourceLine" id="cb7-64" data-line-number="64"><span class="co">#&gt; Amplitude         0.047      0.012      0.100</span></a>
-<a class="sourceLine" id="cb7-65" data-line-number="65"><span class="co">#&gt; Displacement    142.345     74.181    229.037</span></a>
+<a class="sourceLine" id="cb7-64" data-line-number="64"><span class="co">#&gt; Amplitude         0.047      0.013      0.101</span></a>
+<a class="sourceLine" id="cb7-65" data-line-number="65"><span class="co">#&gt; Displacement    142.345     67.398    219.989</span></a>
 <a class="sourceLine" id="cb7-66" data-line-number="66"><span class="co">#&gt; Model Fit         0.424</span></a></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results3)</a></code></pre></div>
 <table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -436,7 +436,7 @@ Female_PARPD
 0.19 [0.14, 0.24]
 </td>
 <td style="text-align:left;">
-140.5 [127.2, 155.6]
+140.5 [126.8, 155.2]
 </td>
 <td style="text-align:left;">
 0.870
@@ -450,16 +450,16 @@ Female_SCZPD
 0.18 [0.13, 0.22]
 </td>
 <td style="text-align:left;">
--0.23 [-0.28, -0.18]
+-0.23 [-0.29, -0.17]
 </td>
 <td style="text-align:left;">
--0.05 [-0.10, 0.01]
+-0.05 [-0.11, 0.01]
 </td>
 <td style="text-align:left;">
 0.23 [0.19, 0.29]
 </td>
 <td style="text-align:left;">
-191.6 [177.6, 206.9]
+191.6 [177.3, 208.4]
 </td>
 <td style="text-align:left;">
 0.845
@@ -482,7 +482,7 @@ Female_SZTPD
 0.13 [0.09, 0.18]
 </td>
 <td style="text-align:left;">
-172.9 [151.7, 197.0]
+172.9 [150.8, 196.6]
 </td>
 <td style="text-align:left;">
 0.812
@@ -505,7 +505,7 @@ Male_PARPD
 0.12 [0.07, 0.17]
 </td>
 <td style="text-align:left;">
-106.9 [84.7, 130.6]
+106.9 [83.5, 130.2]
 </td>
 <td style="text-align:left;">
 0.648
@@ -519,16 +519,16 @@ Male_SCZPD
 0.20 [0.15, 0.26]
 </td>
 <td style="text-align:left;">
--0.18 [-0.22, -0.14]
+-0.18 [-0.22, -0.13]
 </td>
 <td style="text-align:left;">
--0.02 [-0.07, 0.04]
+-0.02 [-0.07, 0.03]
 </td>
 <td style="text-align:left;">
 0.18 [0.14, 0.22]
 </td>
 <td style="text-align:left;">
-185.4 [169.1, 203.3]
+185.4 [168.6, 203.3]
 </td>
 <td style="text-align:left;">
 0.917
@@ -539,10 +539,10 @@ Male_SCZPD
 Male_SZTPD
 </td>
 <td style="text-align:left;">
-0.24 [0.18, 0.30]
+0.24 [0.18, 0.29]
 </td>
 <td style="text-align:left;">
--0.04 [-0.09, 0.01]
+-0.04 [-0.08, 0.01]
 </td>
 <td style="text-align:left;">
 0.03 [-0.02, 0.08]
@@ -551,7 +551,7 @@ Male_SZTPD
 0.05 [0.01, 0.10]
 </td>
 <td style="text-align:left;">
-142.3 [74.2, 229.0]
+142.3 [67.4, 220.0]
 </td>
 <td style="text-align:left;">
 0.424
@@ -592,11 +592,11 @@ Male_SZTPD
 <a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb11-14" data-line-number="14"><span class="co">#&gt; Contrast [Male - Female]:</span></a>
 <a class="sourceLine" id="cb11-15" data-line-number="15"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb11-16" data-line-number="16"><span class="co">#&gt; Elevation        -0.062     -0.122     -0.006</span></a>
-<a class="sourceLine" id="cb11-17" data-line-number="17"><span class="co">#&gt; X-Value          -0.232     -0.283     -0.182</span></a>
-<a class="sourceLine" id="cb11-18" data-line-number="18"><span class="co">#&gt; Y-Value           0.124      0.066      0.182</span></a>
-<a class="sourceLine" id="cb11-19" data-line-number="19"><span class="co">#&gt; Amplitude         0.263      0.210      0.322</span></a>
-<a class="sourceLine" id="cb11-20" data-line-number="20"><span class="co">#&gt; Displacement    151.858    141.073    164.029</span></a>
+<a class="sourceLine" id="cb11-16" data-line-number="16"><span class="co">#&gt; Elevation        -0.062     -0.119     -0.004</span></a>
+<a class="sourceLine" id="cb11-17" data-line-number="17"><span class="co">#&gt; X-Value          -0.232     -0.282     -0.179</span></a>
+<a class="sourceLine" id="cb11-18" data-line-number="18"><span class="co">#&gt; Y-Value           0.124      0.064      0.182</span></a>
+<a class="sourceLine" id="cb11-19" data-line-number="19"><span class="co">#&gt; Amplitude         0.263      0.208      0.317</span></a>
+<a class="sourceLine" id="cb11-20" data-line-number="20"><span class="co">#&gt; Displacement    151.858    140.509    164.688</span></a>
 <a class="sourceLine" id="cb11-21" data-line-number="21"><span class="co">#&gt; Model Fit         0.855</span></a></code></pre></div>
 <p>Note that the profile blocks we are used to have been replaced by a contrast block. By default, the contrast is made by subtracting the first level of the grouping variable from the second level (e.g., Male - Female). This provides an indication of the direction of the contrast. We can again generate a table and figure to display the results. Note that, because we used a model contrast, the figure will be a circular figure and not a contrast figure which we will see below. However, we would get a contrast figure if we used a parameter contrast.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results4)</a></code></pre></div>
@@ -632,19 +632,19 @@ Fit
 Male - Female
 </td>
 <td style="text-align:left;">
--0.06 [-0.12, -0.01]
+-0.06 [-0.12, -0.00]
 </td>
 <td style="text-align:left;">
 -0.23 [-0.28, -0.18]
 </td>
 <td style="text-align:left;">
-0.12 [0.07, 0.18]
+0.12 [0.06, 0.18]
 </td>
 <td style="text-align:left;">
 0.26 [0.21, 0.32]
 </td>
 <td style="text-align:left;">
-151.9 [141.1, 164.0]
+151.9 [140.5, 164.7]
 </td>
 <td style="text-align:left;">
 0.855
@@ -673,11 +673,11 @@ Male - Female
 <a class="sourceLine" id="cb14-13" data-line-number="13"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb14-14" data-line-number="14"><span class="co">#&gt; Contrast [ASPD - NARPD]:</span></a>
 <a class="sourceLine" id="cb14-15" data-line-number="15"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb14-16" data-line-number="16"><span class="co">#&gt; Elevation        -0.079     -0.117     -0.042</span></a>
-<a class="sourceLine" id="cb14-17" data-line-number="17"><span class="co">#&gt; X-Value          -0.037     -0.076      0.002</span></a>
-<a class="sourceLine" id="cb14-18" data-line-number="18"><span class="co">#&gt; Y-Value           0.024     -0.011      0.061</span></a>
-<a class="sourceLine" id="cb14-19" data-line-number="19"><span class="co">#&gt; Amplitude         0.037     -0.003      0.074</span></a>
-<a class="sourceLine" id="cb14-20" data-line-number="20"><span class="co">#&gt; Displacement      6.960     -3.204     17.091</span></a>
+<a class="sourceLine" id="cb14-16" data-line-number="16"><span class="co">#&gt; Elevation        -0.079     -0.116     -0.042</span></a>
+<a class="sourceLine" id="cb14-17" data-line-number="17"><span class="co">#&gt; X-Value          -0.037     -0.075      0.001</span></a>
+<a class="sourceLine" id="cb14-18" data-line-number="18"><span class="co">#&gt; Y-Value           0.024     -0.010      0.060</span></a>
+<a class="sourceLine" id="cb14-19" data-line-number="19"><span class="co">#&gt; Amplitude         0.037     -0.002      0.074</span></a>
+<a class="sourceLine" id="cb14-20" data-line-number="20"><span class="co">#&gt; Displacement      6.960     -3.165     16.916</span></a>
 <a class="sourceLine" id="cb14-21" data-line-number="21"><span class="co">#&gt; Model Fit         0.007</span></a></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results5)</a></code></pre></div>
 <table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -715,7 +715,7 @@ ASPD - NARPD
 -0.08 [-0.12, -0.04]
 </td>
 <td style="text-align:left;">
--0.04 [-0.08, 0.00]
+-0.04 [-0.07, 0.00]
 </td>
 <td style="text-align:left;">
 0.02 [-0.01, 0.06]
@@ -724,7 +724,7 @@ ASPD - NARPD
 0.04 [-0.00, 0.07]
 </td>
 <td style="text-align:left;">
-7.0 [-3.2, 17.1]
+7.0 [-3.2, 16.9]
 </td>
 <td style="text-align:left;">
 0.007
@@ -754,11 +754,11 @@ ASPD - NARPD
 <a class="sourceLine" id="cb17-13" data-line-number="13"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb17-14" data-line-number="14"><span class="co">#&gt; Contrast [BORPD: Male - Female]:</span></a>
 <a class="sourceLine" id="cb17-15" data-line-number="15"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb17-16" data-line-number="16"><span class="co">#&gt; Elevation         0.069      0.001      0.139</span></a>
-<a class="sourceLine" id="cb17-17" data-line-number="17"><span class="co">#&gt; X-Value           0.080      0.014      0.146</span></a>
-<a class="sourceLine" id="cb17-18" data-line-number="18"><span class="co">#&gt; Y-Value          -0.072     -0.151      0.009</span></a>
-<a class="sourceLine" id="cb17-19" data-line-number="19"><span class="co">#&gt; Amplitude        -0.088     -0.161     -0.005</span></a>
-<a class="sourceLine" id="cb17-20" data-line-number="20"><span class="co">#&gt; Displacement    -40.880   -113.361     17.150</span></a>
+<a class="sourceLine" id="cb17-16" data-line-number="16"><span class="co">#&gt; Elevation         0.069      0.003      0.141</span></a>
+<a class="sourceLine" id="cb17-17" data-line-number="17"><span class="co">#&gt; X-Value           0.080      0.010      0.145</span></a>
+<a class="sourceLine" id="cb17-18" data-line-number="18"><span class="co">#&gt; Y-Value          -0.072     -0.150      0.008</span></a>
+<a class="sourceLine" id="cb17-19" data-line-number="19"><span class="co">#&gt; Amplitude        -0.088     -0.159     -0.008</span></a>
+<a class="sourceLine" id="cb17-20" data-line-number="20"><span class="co">#&gt; Displacement    -40.880   -108.818     19.215</span></a>
 <a class="sourceLine" id="cb17-21" data-line-number="21"><span class="co">#&gt; Model Fit        -0.447</span></a></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results6)</a></code></pre></div>
 <table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -805,7 +805,7 @@ BORPD: Male - Female
 -0.09 [-0.16, -0.01]
 </td>
 <td style="text-align:left;">
--40.9 [-113.4, 17.2]
+-40.9 [-108.8, 19.2]
 </td>
 <td style="text-align:left;">
 -0.447
@@ -1044,7 +1044,7 @@ Female
 0.55 [0.51, 0.60]
 </td>
 <td style="text-align:left;">
-326.0 [322.1, 329.9]
+326.0 [322.2, 330.1]
 </td>
 <td style="text-align:left;">
 0.889
@@ -1055,13 +1055,13 @@ Female
 Male
 </td>
 <td style="text-align:left;">
-0.88 [0.84, 0.93]
+0.88 [0.84, 0.92]
 </td>
 <td style="text-align:left;">
 0.29 [0.26, 0.33]
 </td>
 <td style="text-align:left;">
-320.7 [313.3, 327.9]
+320.7 [313.5, 327.8]
 </td>
 <td style="text-align:left;">
 0.824
