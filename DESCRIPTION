@@ -1,7 +1,7 @@
 Type: Package
 Package: circumplex
 Title: Analysis and Visualization of Circular Data
-Version: 0.1.0.9000
+Version: 0.1.1
 Authors@R: c(
   person("Jeffrey", "Girard", email = "me@jmgirard.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-7359-3746")),
   person("Johannes", "Zimmermann", role = "aut", comment = c(ORCID = "0000-0001-6975-2356")),
