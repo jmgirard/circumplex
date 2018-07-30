@@ -1,3 +1,19 @@
+url: https://circumplex.jmgirard.com
+
+authors:
+  Jeffrey Girard:
+    href: https://www.jmgirard.com
+  Johannes Zimmermann:
+    href: https://www.psychologische-hochschule.de/prof-dr-johannes-zimmermann/
+  Aidan Wright:
+    href: https://www.personalityprocesses.com
+
+template:
+  params:
+    docsearch:
+      api_key: ec4004481ba8d410e8e20c9e90fa5e60
+      index_name: circumplex
+
 reference:
   - title: Primary SSM Functions
     desc: Functions for implementing the Structural Summary Method
