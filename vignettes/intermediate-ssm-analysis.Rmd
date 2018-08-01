@@ -36,7 +36,7 @@ ssm_table(results)
 ```{r group_table, echo = FALSE}
 ssm_table(results, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results)) %>% 
-  kable_styling(full_width = TRUE, font_size = 14)
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r group_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -60,7 +60,7 @@ ssm_table(results2)
 ```{r measures_table, echo = FALSE}
 ssm_table(results2, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results2)) %>% 
-  kable_styling(full_width = TRUE, font_size = 14)
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r measures_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -83,7 +83,7 @@ ssm_table(results3)
 ```{r general_table, echo = FALSE}
 ssm_table(results3, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results3)) %>% 
-  kable_styling(full_width = TRUE, font_size = 14)
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r general_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -117,7 +117,7 @@ ssm_table(results4)
 ```{r model_table, echo = FALSE}
 ssm_table(results4, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results4)) %>% 
-  kable_styling(full_width = TRUE, font_size = 14)
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r model_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -140,7 +140,7 @@ ssm_table(results5)
 ```{r measure_contrast_table, echo = FALSE, results = "asis"}
 ssm_table(results5, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results5)) %>% 
-  kable_styling(full_width = TRUE, font_size = 14)
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r measure_contrast_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -165,7 +165,7 @@ ssm_table(results6)
 ```{r group_contrast_table, echo = FALSE, results = "asis"}
 ssm_table(results6, render = FALSE) %>% 
   kable(caption = circumplex:::dcaption(results6)) %>% 
-  kable_styling(full_width = TRUE, font_size = 14)
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r group_contrast_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -232,7 +232,7 @@ tab1 <- ssm_table(res1, xy = FALSE, render = FALSE)
 tab2 <- ssm_table(res2, xy = FALSE, render = FALSE)
 ssm_append(tab1, tab2, render = FALSE) %>% 
   kable() %>% 
-  kable_styling(full_width = TRUE, font_size = 14)
+  kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 We can export a table by either copy/pasting it into a word processor or by creating an HTML file using the `filename` argument to either the `ssm_table()` or `ssm_append()` functions. The latter will create the specified file in the current R working directory. Note that the filename should end in `.html`.
