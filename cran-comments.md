@@ -1,3 +1,8 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Fixed a bug on solaris systems related to use of the pow() function
+
 ## Test environments
 * ubuntu 14.04 (on travis-ci), R 3.5.0
 * win-builder (devel and release)
