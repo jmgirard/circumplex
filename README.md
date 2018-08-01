@@ -3,6 +3,7 @@
 
 # circumplex <img src="man/figures/logo.png" align="right" />
 
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/circumplex)](https://cran.r-project.org/package=circumplex)
 [![Build
 Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex)
 [![Coverage
@@ -29,8 +30,16 @@ circumplex logo at
 
 ## Installation
 
-You can install the development version from
-[GitHub](https://github.com/) with:
+``` r
+# Install the most recent release from CRAN
+install.packages("circumplex")
+```
+
+### Development version
+
+Releasing updates to CRAN takes time. You can always install the newest
+development version, which may contain bug fixes and new features, from
+GitHub:
 
 ``` r
 # install.packages("devtools")
@@ -123,31 +132,31 @@ NARPD
 
 <td style="text-align:left;">
 
-0.20 \[0.17, 0.24\]
+0.20 [0.17, 0.24]
 
 </td>
 
 <td style="text-align:left;">
 
-\-0.06 \[-0.09, -0.03\]
+-0.06 [-0.09, -0.03]
 
 </td>
 
 <td style="text-align:left;">
 
-0.18 \[0.15, 0.21\]
+0.18 [0.15, 0.21]
 
 </td>
 
 <td style="text-align:left;">
 
-0.19 \[0.16, 0.22\]
+0.19 [0.16, 0.22]
 
 </td>
 
 <td style="text-align:left;">
 
-109.0 \[99.2, 118.9\]
+109.0 [99.2, 118.9]
 
 </td>
 
@@ -169,31 +178,31 @@ ASPD
 
 <td style="text-align:left;">
 
-0.12 \[0.09, 0.16\]
+0.12 [0.09, 0.16]
 
 </td>
 
 <td style="text-align:left;">
 
-\-0.10 \[-0.13, -0.06\]
+-0.10 [-0.13, -0.06]
 
 </td>
 
 <td style="text-align:left;">
 
-0.20 \[0.17, 0.24\]
+0.20 [0.17, 0.24]
 
 </td>
 
 <td style="text-align:left;">
 
-0.23 \[0.19, 0.26\]
+0.23 [0.19, 0.26]
 
 </td>
 
 <td style="text-align:left;">
 
-115.9 \[107.4, 124.4\]
+115.9 [107.4, 124.4]
 
 </td>
 
