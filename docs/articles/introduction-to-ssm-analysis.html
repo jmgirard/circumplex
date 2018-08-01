@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.1.9001</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
       </span>
     </div>
 
@@ -182,11 +182,11 @@
 <a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt; Profile [All]:</span></a>
 <a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; Elevation         0.917      0.888      0.944</span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; X-Value           0.351      0.324      0.376</span></a>
-<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.252     -0.281     -0.225</span></a>
-<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.432      0.404      0.461</span></a>
-<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt; Displacement    324.292    320.638    327.733</span></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; Elevation         0.917      0.888      0.946</span></a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; X-Value           0.351      0.325      0.379</span></a>
+<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.252     -0.282     -0.223</span></a>
+<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.432      0.404      0.463</span></a>
+<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt; Displacement    324.292    320.840    327.879</span></a>
 <a class="sourceLine" id="cb3-19" data-line-number="19"><span class="co">#&gt; Model Fit         0.878</span></a></code></pre></div>
 <p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputing their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code>set.seed()</code> function to control the random number generator in R.)</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">results2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>())</a>
@@ -203,10 +203,10 @@
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; Profile [All]:</span></a>
 <a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
 <a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; Elevation         0.917      0.890      0.945</span></a>
-<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; X-Value           0.351      0.324      0.377</span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.252     -0.282     -0.223</span></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.432      0.402      0.462</span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Displacement    324.292    320.532    327.730</span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; X-Value           0.351      0.325      0.379</span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.252     -0.281     -0.223</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.432      0.404      0.462</span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Displacement    324.292    320.842    327.893</span></a>
 <a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; Model Fit         0.878</span></a></code></pre></div>
 </div>
 <div id="visualizing-the-results-with-a-table-and-figure" class="section level3">
@@ -249,7 +249,7 @@ All
 0.92 [0.89, 0.94]
 </td>
 <td style="text-align:left;">
-0.35 [0.32, 0.38]
+0.35 [0.33, 0.38]
 </td>
 <td style="text-align:left;">
 -0.25 [-0.28, -0.22]
@@ -258,7 +258,7 @@ All
 0.43 [0.40, 0.46]
 </td>
 <td style="text-align:left;">
-324.3 [320.5, 327.7]
+324.3 [320.8, 327.9]
 </td>
 <td style="text-align:left;">
 0.878
@@ -268,7 +268,7 @@ All
 <p>Next, let’s leverage the fact that we are working within a circumplex space by creating a nice-looking circular plot by mapping the amplitude parameter to the points’ distance from the center of the circle and the displacement parameter to the points’ rotation from due-east (as is conventional). This, again, is as simple as passing the <code>results</code> object to the <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> function.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(results2)</a></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot1-1.png" width="100%"></p>
-<p>We now have a table and figure that can be included in a write-up, and the whole process required less than five lines of code (from us).</p>
+<p>We now have a table and figure that can be included in a write-up, and the whole process required less than five lines of code.</p>
 </div>
 </div>
 <div id="correlation-based-ssm-analysis" class="section level2">
@@ -293,11 +293,11 @@ All
 <a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; Profile [NARPD]:</span></a>
 <a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt; Elevation         0.202      0.168      0.236</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; X-Value          -0.062     -0.093     -0.028</span></a>
+<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt; Elevation         0.202      0.172      0.235</span></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; X-Value          -0.062     -0.092     -0.030</span></a>
 <a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#&gt; Y-Value           0.179      0.145      0.212</span></a>
-<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.189      0.154      0.225</span></a>
-<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; Displacement    108.967     99.034    118.002</span></a>
+<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.189      0.154      0.223</span></a>
+<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; Displacement    108.967     99.628    117.977</span></a>
 <a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#&gt; Model Fit         0.957</span></a></code></pre></div>
 <p>Note that this output looks very similar to the mean-based output except that the statistical basis is now correlation scores instead of mean scores and instead of saying “Profile [All]” it now says “Profile [NARPD]”.</p>
 </div>
@@ -350,7 +350,7 @@ NARPD
 0.19 [0.15, 0.22]
 </td>
 <td style="text-align:left;">
-109.0 [99.0, 118.0]
+109.0 [99.6, 118.0]
 </td>
 <td style="text-align:left;">
 0.957
