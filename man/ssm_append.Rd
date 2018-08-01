@@ -4,8 +4,7 @@
 \alias{ssm_append}
 \title{Combine SSM tables}
 \usage{
-ssm_append(.ssm_table, ..., caption = NULL, filename = NULL,
-  render = TRUE)
+ssm_append(.ssm_table, ..., caption = NULL, render = TRUE)
 }
 \arguments{
 \item{.ssm_table}{A data frame from the \code{ssm_table()} function to be the
@@ -16,12 +15,8 @@ function to be appended to \code{.ssm_table} in the order of input.}
 
 \item{caption}{A string to be displayed above the table if rendered.}
 
-\item{filename}{A string determining the filename to which the table should
-be saved. If set to NULL, the table will not be saved (default = NULL).}
-
 \item{render}{A logical indicating whether the table should be displayed in
-the RStudio viewer or web browser (default = TRUE). Note that this argument
-needs to be TRUE in order for a file to be saved via \code{filename}.}
+the RStudio viewer or web browser (default = TRUE).}
 }
 \value{
 A tibble containing the information for the HTML table. As a

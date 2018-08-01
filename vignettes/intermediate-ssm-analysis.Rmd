@@ -235,12 +235,6 @@ ssm_append(tab1, tab2, render = FALSE) %>%
   kable_styling(full_width = TRUE, font_size = 12)
 ```
 
-We can export a table by either copy/pasting it into a word processor or by creating an HTML file using the `filename` argument to either the `ssm_table()` or `ssm_append()` functions. The latter will create the specified file in the current R working directory. Note that the filename should end in `.html`.
-
-```r
-ssm_append(tab1, tab2, filename = "gender_table.html")
-```
-
 ## 5. Working with SSM figures
 
 ### Basic customizations of figures

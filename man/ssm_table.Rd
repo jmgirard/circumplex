@@ -4,16 +4,11 @@
 \alias{ssm_table}
 \title{Create HTML table from SSM results or contrasts}
 \usage{
-ssm_table(.ssm_object, filename = NULL, caption = NULL, xy = TRUE,
-  render = TRUE)
+ssm_table(.ssm_object, caption = NULL, xy = TRUE, render = TRUE)
 }
 \arguments{
 \item{.ssm_object}{The output of \code{ssm_profiles()} or
 \code{ssm_measures()}}
-
-\item{filename}{A string determining the filename to which the table should
-be saved. If set to NULL, the table will be displayed but not saved
-(default = NULL).}
 
 \item{caption}{A string to be displayed above the table (default = NULL).}
 
@@ -21,8 +16,7 @@ be saved. If set to NULL, the table will be displayed but not saved
 should be included in the table as columns (default = TRUE).}
 
 \item{render}{A logical indicating whether the table should be displayed in
-the RStudio viewer or web browser (default = TRUE). Note that this argument
-needs to be TRUE in order for a file to be saved via \code{filename}.}
+the RStudio viewer or web browser (default = TRUE).}
 }
 \value{
 A tibble containing the information for the HTML table. As a

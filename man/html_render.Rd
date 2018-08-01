@@ -4,24 +4,19 @@
 \alias{html_render}
 \title{Format and render data frame as HTML table}
 \usage{
-html_render(df, caption = NULL, filename = NULL, align = "l", ...)
+html_render(df, caption = NULL, align = "l", ...)
 }
 \arguments{
 \item{df}{A data frame to be rendered as an HTML table.}
 
 \item{caption}{A string to be displayed above the table.}
 
-\item{filename}{A string determining the filename to which the table should
-be saved. If set to NULL, the table will be displayed but not saved
-(default = NULL).}
-
 \item{align}{A string indicating the alignment of the cells (default = "l").}
 
 \item{...}{Other arguments to pass to \code{htmlTable}.}
 }
 \value{
-HTML syntax for the \code{df} table. The table will also be displayed
-in the web viewer and may be saved to an HTML file.
+HTML syntax for the \code{df} table.
 }
 \description{
 Format a data frame as an HTML table and render it to the web viewer.
