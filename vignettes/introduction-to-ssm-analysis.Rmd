@@ -1,6 +1,5 @@
 ---
 title: "Introduction to SSM Analysis"
-author: "Jeffrey M. Girard"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{ssm-introduction}
