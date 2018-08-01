@@ -465,7 +465,7 @@ analyses we will see how this function saves a lot of time and effort. To create
 the table, simply pass the `results` object to the `ssm_table()` function.
 
 ```r
-ssm_table(results)
+ssm_table(results2)
 ```
 
 ```{r, echo = FALSE}
