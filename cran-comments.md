@@ -3,7 +3,7 @@ This is a resubmission. In this version I have:
 
 * Fixed a bug on solaris systems related to use of the pow() function
 
-* Changed to depend on R (>= 3.4.4) to enable testing on r-oldrel machines
+* Changed to depend on R (>= 3.4.0) to enable testing on r-oldrel machines
 
 ## Test environments
 * ubuntu 14.04 (on travis-ci), R 3.5.0
