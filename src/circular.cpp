@@ -48,7 +48,7 @@ double angle_median(NumericVector x) {
     if(((dev_val - minimum) / n) < -DBL_EPSILON) {
       minimum = dev_val;
       candidates[0] = x[i];
-    } else if (fabs(dev_val - minimum) <= pow(10, -8)) {
+    } else if (fabs(dev_val - minimum) <= 1e-8) {
       candidates.push_back(x[i]);
     }
   }
