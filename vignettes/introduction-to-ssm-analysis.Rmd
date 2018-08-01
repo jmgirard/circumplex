@@ -24,28 +24,13 @@ library(knitr)
 ## 1. Background and Motivation
 
 ### Circumplex models, scales, and data
-Circumplex models are popular within many areas of psychology because they offer a parsimonious account of complex psychological domains, such as emotion and interpersonal functioning. This parsimony is achieved by understanding phenomenain a domain as being a "blend" of two primary dimensions. For instance, circumplex models of emotion typically represent affective phenomena as a blend of *valence* (pleasantness versus unpleasantness) and *arousal* (activity versus passivity), whereas circumplex models of interpersonal functioning typically represent interpersonal phenomena as a blend of *communion* (affiliation versus separation) and *agency* (dominance versus submissiveness). These models are often depicted as circles around the intersection of the two dimensions (see figure). Any given phenomenon can be located within this circular space through reference to the two underlying dimensions (e.g., anger is a blend of unpleasantness and activity).
+Circumplex models are popular within many areas of psychology because they offer a parsimonious account of complex psychological domains, such as emotion and interpersonal functioning. This parsimony is achieved by understanding phenomena in a domain as being a "blend" of two primary dimensions. For instance, circumplex models of emotion typically represent affective phenomena as a blend of *valence* (pleasantness versus unpleasantness) and *arousal* (activity versus passivity), whereas circumplex models of interpersonal functioning typically represent interpersonal phenomena as a blend of *communion* (affiliation versus separation) and *agency* (dominance versus submissiveness). These models are often depicted as circles around the intersection of the two dimensions (see figure). Any given phenomenon can be located within this circular space through reference to the two underlying dimensions (e.g., anger is a blend of unpleasantness and activity).
 
-Circumplex scales contain multiple subscales that attempt to measure different
-blends of the two primary dimensions (i.e., different parts of the circle).
-Although there have historically been circumplex scales with as many as sixteen
-subscales, it has become most common to use eight subscales: one for each "pole"
-of the two primary dimensions and one for each "quadrant" that combines the two
-dimensions. In order for a set of subscales to be considered circumplex, they
-must exhibit certain properties. Circumplex fit analyses can be used to quantify
-these properties.
+Circumplex scales contain multiple subscales that attempt to measure different blends of the two primary dimensions (i.e., different parts of the circle). Although there have historically been circumplex scales with as many as sixteen subscales, it has become most common to use eight subscales: one for each "pole" of the two primary dimensions and one for each "quadrant" that combines the two dimensions. In order for a set of subscales to be considered circumplex, they must exhibit certain properties. Circumplex fit analyses can be used to quantify these properties.
 
-Circumplex data is composed of scores on a set of circumplex scales for one or
-more participants (e.g., persons or organizations). Such data is usually
-collected via self-report, informant-report, or observational ratings in order
-to locate psychological phenomena within the circular space of the circumplex
-model. For example, a therapist might want to understand the interpersonal
-problems encountered by an individual patient, a social psychologist might want
-to understand the emotional experiences of a group of participants during an
-experiment, and a personality psychologist might want to understand what kind
-of interpersonal behaviors are associated with a trait (e.g., extraversion).
+Circumplex data is composed of scores on a set of circumplex scales for one or more participants (e.g., persons or organizations). Such data is usually collected via self-report, informant-report, or observational ratings in order to locate psychological phenomena within the circular space of the circumplex model. For example, a therapist might want to understand the interpersonal problems encountered by an individual patient, a social psychologist might want to understand the emotional experiences of a group of participants during an experiment, and a personality psychologist might want to understand what kind of interpersonal behaviors are associated with a trait (e.g., extraversion).
 
-```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r model, echo = FALSE, fig.width = 7.2, fig.height = 4}
 angles <- c(90, 135, 180, 225, 270, 315, 360, 45)
 alabel <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 
@@ -103,16 +88,9 @@ ggplot() +
 
 
 ### The Structural Summary Method
-The Structural Summary Method (SSM) is a technique for analyzing circumplex data
-that offers practical and interpretive benefits over alternative techniques. It 
-consists of fitting a cosine curve to the data, which captures the pattern of
-correlations among scores associated with a circumplex scale (i.e., mean scores
-on circumplex scales or correlations between circumplex scales and an external 
-measure). By plotting a set of example scores below, we can gain a visual 
-intuition that a cosine curve makes sense in this case. First, we can examine
-the scores with a bar chart ignoring the circular relationship among them.
+The Structural Summary Method (SSM) is a technique for analyzing circumplex data that offers practical and interpretive benefits over alternative techniques. It  consists of fitting a cosine curve to the data, which captures the pattern of correlations among scores associated with a circumplex scale (i.e., mean scores on circumplex scales or correlations between circumplex scales and an external  measure). By plotting a set of example scores below, we can gain a visual intuition that a cosine curve makes sense in this case. First, we can examine the scores with a bar chart ignoring the circular relationship among them.
 
-```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r column, echo = FALSE, fig.width = 7.2, fig.height = 4}
 requireNamespace("forcats", quietly = TRUE)
 data("jz2017")
 rci <- jz2017 %>%
@@ -148,11 +126,9 @@ ggplot(dat_r, aes(x = forcats::fct_reorder(Scale, est, .desc = TRUE), y = est)) 
   )
 ```
 
-Next, we can leverage the fact that these subscales have specific angular
-displacements in the circumplex model (and that 0 and 360 degrees are the same)
-to create a path diagram.
+Next, we can leverage the fact that these subscales have specific angular displacements in the circumplex model (and that 0 and 360 degrees are the same) to create a path diagram.
 
-```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r path, echo = FALSE, fig.width = 7.2, fig.height = 4}
 dat_r <- tibble(
   Scale = factor(c("LM", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
     levels = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
@@ -189,12 +165,9 @@ ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
   )
 ```
 
-This already looks like a cosine curve, and we can finally use the SSM to 
-estimate the parameters of the curve that best fits the observed data. By
-plotting it alongside the data, we can get a sense of how well the model fits
-our example data.
+This already looks like a cosine curve, and we can finally use the SSM to  estimate the parameters of the curve that best fits the observed data. By plotting it alongside the data, we can get a sense of how well the model fits our example data.
 
-```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r curve, echo = FALSE, fig.width = 7.2, fig.height = 4}
 # Calculate SSM parameters
 sp <- circumplex:::ssm_parameters(rci$means[1:8], octants() * pi / 180)
 
@@ -231,13 +204,9 @@ ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
 ### Understanding the SSM parameters
 The SSM estimates a cosine curve to the data using the following equation:
 $$S_i = e + a \times \cos(\theta_i - d)$$
-where $S_i$ and $\theta_i$ are the score and angle on scale $i$, respectively, 
-and $e$, $a$, and $d$ are the elevation, amplitude, and displacement parameters,
-respectively. Before we discuss these parameters, however, we can also estimate
-the fit of the SSM model. This is essentially how close the cosine curve is to 
-the observed data points. Deviations (in red, below) will lower model fit.
+where $S_i$ and $\theta_i$ are the score and angle on scale $i$, respectively, and $e$, $a$, and $d$ are the elevation, amplitude, and displacement parameters, respectively. Before we discuss these parameters, however, we can also estimate the fit of the SSM model. This is essentially how close the cosine curve is to the observed data points. Deviations (in red, below) will lower model fit.
 
-```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r residuals, echo = FALSE, fig.width = 7.2, fig.height = 4}
 # Plot correlations as path, SSM cosine model, and differences
 ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
   geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
@@ -268,66 +237,39 @@ ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
   )
 ```
 
-If fit is less than 0.70, it is considered "unacceptable" and only the elevation
-parameter should be interpreted. If fit is between 0.70 and 0.80, it is 
-considered "adequate," and if it is greater than 0.80, it is considered "good."
-Sometimes SSM model fit is called prototypicality or denoted using $R^2$.
+If fit is less than 0.70, it is considered "unacceptable" and only the elevation parameter should be interpreted. If fit is between 0.70 and 0.80, it is  considered "adequate," and if it is greater than 0.80, it is considered "good." Sometimes SSM model fit is called prototypicality or denoted using $R^2$.
 
-The first SSM parameter is elevation or $e$, which is calculated as the mean of
-all scores. It is the size of the general factor in the circumplex model and its
-interpretation varies from scale to scale. For measures of interpersonal
-problems, it is interpreted as generalized interpersonal distress. When $e>.15$,
-it is considered "marked" and it is considered "modest" otherwise.
+The first SSM parameter is elevation or $e$, which is calculated as the mean of all scores. It is the size of the general factor in the circumplex model and its interpretation varies from scale to scale. For measures of interpersonal problems, it is interpreted as generalized interpersonal distress. When $e>.15$, it is considered "marked" and it is considered "modest" otherwise.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r elev, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("VIG1-e.gif")
 ```
 
-The second SSM parameter is amplitude or $a$, which is calculated as the
-difference between the heighest point of the curve and the curve's mean. It is
-interpreted as the distinctiveness or differentiation of a profile: how much it 
-is peaked versus flat. Similar to elevation, amplitude is considered "marked" 
-when $a>.15$ and "modest" otherwise.
+The second SSM parameter is amplitude or $a$, which is calculated as the difference between the highest point of the curve and the curve's mean. It is interpreted as the distinctiveness or differentiation of a profile: how much itis peaked versus flat. Similar to elevation, amplitude is considered "marked" when $a>.15$ and "modest" otherwise.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r ampl, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("VIG1-a.gif")
 ```
 
-The final SSM parameter is displacement or $d$, which is calculated as the angle
-at which the curve reaches its highest point. It is interpreted as the style of
-the profile. For instance, if $d=90$ and we are using a circumplex scale that
-defines 90 degrees as "domineering," then the profile's style is domineering.
+The final SSM parameter is displacement or $d$, which is calculated as the angle at which the curve reaches its highest point. It is interpreted as the style of the profile. For instance, if $d=90$ and we are using a circumplex scale that defines 90 degrees as "domineering," then the profile's style is domineering.
 
-```{r, echo = FALSE, out.width = "100%"}
+```{r disp, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("VIG1-d.gif")
 ```
 
+By interpreting these three parameters, we can understand a profile much more parsimoniously than by trying to interpret all eight subscales individually. This approach also leverages the circumplex relationship (i.e., dependency) among subscales. It is also possible to transform the amplitude and displacement parameters into estimates of distance from the x-axis and y-axis, which will be shown in the output discussed below.
+
 ## 2. Example data: jz2017
-To illustrate the SSM functions, we will use the example dataset `jz2017`, which
-was provided by Zimmermann & Wright (2017) and reformatted for this package.
-This dataset includes self-report data from 1166 undergraduate students.
-Students completed a circumplex measure of interpersonal problems with eight 
-subscales (PA, BC, DE, FG, HI, JK, LM, and NO) and a measure of personality
-disorder symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD,
-NARPD, AVPD, DPNPD, and OCPD). More information about these variables can be
-accessed using the `?jz2017` command in R.
+To illustrate the SSM functions, we will use the example dataset `jz2017`, which was provided by Zimmermann & Wright (2017) and reformatted for this package. This dataset includes self-report data from 1166 undergraduate students. Students completed a circumplex measure of interpersonal problems with eight subscales (PA, BC, DE, FG, HI, JK, LM, and NO) and a measure of personality disorder symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD, NARPD, AVPD, DPNPD, and OCPD). More information about these variables can be accessed using the `?jz2017` command in R.
 
 ```{r}
 data("jz2017")
 print(jz2017)
 ```
 
-The circumplex scales in `jz2017` come from the Inventory of Interpersonal
-Problems - Short Circumplex (IIP-SC). These scales can be arranged into the
-following circular model, which is organized around the two primary dimensions
-of agency (y-axis) and communion (x-axis). Note that the two-letter scale 
-abbreviations and angular values are based in convention. A high score on PA
-indicates that one has interpersonal problems related to being "domineering" or
-too high on agency, whereas a high score on DE indicates problems related to 
-being "cold" or too low on communion. Scales that are not directly on the y-axis
-or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency and communion.
+The circumplex scales in `jz2017` come from the Inventory of Interpersonal Problems - Short Circumplex (IIP-SC). These scales can be arranged into the following circular model, which is organized around the two primary dimensions of agency (y-axis) and communion (x-axis). Note that the two-letter scale abbreviations and angular values are based in convention. A high score on PA indicates that one has interpersonal problems related to being "domineering" or too high on agency, whereas a high score on DE indicates problems related to being "cold" or too low on communion. Scales that are not directly on the y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency and communion.
 
-```{r, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r iipsc, echo = FALSE, fig.width = 7.2, fig.height = 4}
 angles <- c(90, 135, 180, 225, 270, 315, 360, 45)
 flabel <- c(
   "Domineering",
@@ -418,8 +360,8 @@ are (either in terms of their variable names or their column numbers). The third
 argument is always `angles` and specifies the angular displacements of each of
 the  circumplex scales included in `scales`. Note that the `scales` and `angles`
 arguments need to be vectors, so if multiple names/angles are provided, they 
-need to be combined into a vector using the `c()` function. The order and length
-of the `scales` and `angles` vectors also needs to be the same.
+need to be combined into a vector using the `c()` function. The order
+of the `scales` and `angles` vectors needs to be the same, and so does the length.
 
 ```{r}
 results <- ssm_analyze(
@@ -462,7 +404,7 @@ summary(results2)
 Next, we can produce a table to display our results. With only a
 single set of parameters, this table is probably overkill, but in future
 analyses we will see how this function saves a lot of time and effort. To create
-the table, simply pass the `results` object to the `ssm_table()` function.
+the table, simply pass the `results` (or `results2`) object to the `ssm_table()` function.
 
 ```r
 ssm_table(results2)
@@ -480,7 +422,7 @@ points' distance from the center of the circle and the displacement parameter
 to the points' rotation from due-east (as is conventional). This, again, is as 
 simple as passing the `results` object to the `ssm_plot()` function.
 
-```{r, fig.width = 7.2, fig.height = 4}
+```{r plot1, fig.width = 7.2, fig.height = 4}
 ssm_plot(results2)
 ```
 
@@ -500,7 +442,7 @@ expect this measure to be associated with some general interpersonal distress
 and a style that is generally high in agency.
 
 To conduct this analysis, we can start with the syntax from the mean-based
-analysis. All SSM analyses use the `ssm_analyze()` and the data, scales, and
+analysis. All SSM analyses use the `ssm_analyze()` function and the data, scales, and
 angles are the same as before. However, we also need to let the function know
 that we want to analyze correlations with NARPD as opposed to scale means. To
 do this, we add an additional argument `measures`.
@@ -540,7 +482,7 @@ markedly distinctive in its profile (amplitude). The displacement parameter was
 somewhere between 100 and 120 degrees; to interpret this we would need to either
 consult the mapping between scales and angles or plot the results.
 
-```{r, fig.width = 7.2, fig.height = 4}
+```{r plot2, fig.width = 7.2, fig.height = 4}
 ssm_plot(results3)
 ```
 
@@ -568,4 +510,3 @@ groups or measures, and (3) export and make basic changes to tables and figures.
 * Wright, A. G. C., Pincus, A. L., Conroy, D. E., & Hilsenroth, M. J. (2009). Integrating methods to optimize circumplex description and comparison of groups. _Journal of Personality Assessment, 91_(4), 311–322.
 
 * Zimmermann, J., & Wright, A. G. C. (2017). Beyond description in interpersonal construct validation: Methodological advances in the circumplex Structural Summary Approach. _Assessment, 24_(1), 3–23.
-
