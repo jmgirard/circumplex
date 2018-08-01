@@ -30,7 +30,7 @@ Circumplex scales contain multiple subscales that attempt to measure different b
 
 Circumplex data is composed of scores on a set of circumplex scales for one or more participants (e.g., persons or organizations). Such data is usually collected via self-report, informant-report, or observational ratings in order to locate psychological phenomena within the circular space of the circumplex model. For example, a therapist might want to understand the interpersonal problems encountered by an individual patient, a social psychologist might want to understand the emotional experiences of a group of participants during an experiment, and a personality psychologist might want to understand what kind of interpersonal behaviors are associated with a trait (e.g., extraversion).
 
-```{r model, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r model, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 angles <- c(90, 135, 180, 225, 270, 315, 360, 45)
 alabel <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 
@@ -90,7 +90,7 @@ ggplot() +
 ### The Structural Summary Method
 The Structural Summary Method (SSM) is a technique for analyzing circumplex data that offers practical and interpretive benefits over alternative techniques. It  consists of fitting a cosine curve to the data, which captures the pattern of correlations among scores associated with a circumplex scale (i.e., mean scores on circumplex scales or correlations between circumplex scales and an external  measure). By plotting a set of example scores below, we can gain a visual intuition that a cosine curve makes sense in this case. First, we can examine the scores with a bar chart ignoring the circular relationship among them.
 
-```{r column, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r column, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 requireNamespace("forcats", quietly = TRUE)
 data("jz2017")
 rci <- jz2017 %>%
@@ -128,7 +128,7 @@ ggplot(dat_r, aes(x = forcats::fct_reorder(Scale, est, .desc = TRUE), y = est)) 
 
 Next, we can leverage the fact that these subscales have specific angular displacements in the circumplex model (and that 0 and 360 degrees are the same) to create a path diagram.
 
-```{r path, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r path, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 dat_r <- tibble(
   Scale = factor(c("LM", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
     levels = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
@@ -167,7 +167,7 @@ ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
 
 This already looks like a cosine curve, and we can finally use the SSM to  estimate the parameters of the curve that best fits the observed data. By plotting it alongside the data, we can get a sense of how well the model fits our example data.
 
-```{r curve, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r curve, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 # Calculate SSM parameters
 sp <- circumplex:::ssm_parameters(rci$means[1:8], octants() * pi / 180)
 
@@ -206,7 +206,7 @@ The SSM estimates a cosine curve to the data using the following equation:
 $$S_i = e + a \times \cos(\theta_i - d)$$
 where $S_i$ and $\theta_i$ are the score and angle on scale $i$, respectively, and $e$, $a$, and $d$ are the elevation, amplitude, and displacement parameters, respectively. Before we discuss these parameters, however, we can also estimate the fit of the SSM model. This is essentially how close the cosine curve is to the observed data points. Deviations (in red, below) will lower model fit.
 
-```{r residuals, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r residuals, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 # Plot correlations as path, SSM cosine model, and differences
 ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
   geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
@@ -262,14 +262,14 @@ By interpreting these three parameters, we can understand a profile much more pa
 ## 2. Example data: jz2017
 To illustrate the SSM functions, we will use the example dataset `jz2017`, which was provided by Zimmermann & Wright (2017) and reformatted for this package. This dataset includes self-report data from 1166 undergraduate students. Students completed a circumplex measure of interpersonal problems with eight subscales (PA, BC, DE, FG, HI, JK, LM, and NO) and a measure of personality disorder symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD, NARPD, AVPD, DPNPD, and OCPD). More information about these variables can be accessed using the `?jz2017` command in R.
 
-```{r}
+```{r jz2017}
 data("jz2017")
 print(jz2017)
 ```
 
 The circumplex scales in `jz2017` come from the Inventory of Interpersonal Problems - Short Circumplex (IIP-SC). These scales can be arranged into the following circular model, which is organized around the two primary dimensions of agency (y-axis) and communion (x-axis). Note that the two-letter scale abbreviations and angular values are based in convention. A high score on PA indicates that one has interpersonal problems related to being "domineering" or too high on agency, whereas a high score on DE indicates problems related to being "cold" or too low on communion. Scales that are not directly on the y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency and communion.
 
-```{r iipsc, echo = FALSE, fig.width = 7.2, fig.height = 4}
+```{r iipsc, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 angles <- c(90, 135, 180, 225, 270, 315, 360, 45)
 flabel <- c(
   "Domineering",
@@ -351,19 +351,9 @@ ggplot() +
 ## 3. Mean-based SSM Analysis
 
 ### Conducting SSM for a group's mean scores
-To begin, let's say that we want to use the SSM to describe the interpersonal 
-problems of the average individual in the entire dataset. We can use the
-`ssm_analyze()` function to perform this analysis. The first argument is always
-`.data`, a data frame containing all the variables to be analyzed. The second
-argument is always `scales` and specifies where in `.data` the circumplex scales
-are (either in terms of their variable names or their column numbers). The third
-argument is always `angles` and specifies the angular displacements of each of
-the  circumplex scales included in `scales`. Note that the `scales` and `angles`
-arguments need to be vectors, so if multiple names/angles are provided, they 
-need to be combined into a vector using the `c()` function. The order
-of the `scales` and `angles` vectors needs to be the same, and so does the length.
+To begin, let's say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. We can use the `ssm_analyze()` function to perform this analysis. The first argument is always `.data`, a data frame containing all the variables to be analyzed. The second argument is always `scales` and specifies where in `.data` the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is always `angles` and specifies the angular displacements of each of the  circumplex scales included in `scales`. Note that the `scales` and `angles` arguments need to be vectors, so if multiple names/angles are provided, they need to be combined into a vector using the `c()` function. The order of the `scales` and `angles` vectors needs to be the same, and so does the length.
 
-```{r}
+```{r analyze}
 results <- ssm_analyze(
   .data = jz2017,
   scales = c(PA, BC, DE, FG, HI, JK, LM, NO),
@@ -371,136 +361,77 @@ results <- ssm_analyze(
 )
 ```
 
-The output of the function has been saved in the `results` variable, which we 
-can examine in detail using the `summary()` function. This will output the call
-we made to create the output, as well as some of the default options that we
-didn't bother changing and, most importantly, the estimated SSM parameter values
-with bootstrapped confidence intervals.
+The output of the function has been saved in the `results` variable, which we can examine in detail using the `summary()` function. This will output the call we made to create the output, as well as some of the default options that we didn't bother changing (see `?ssm_analyze` to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.
 
-```{r}
+```{r summary1a}
 summary(results)
 ```
 
-That was pretty easy! We can now write up these results. However, the
-`circumplex` package has some features that can make what we just did even 
-easier. First, because the first three arguments of the `ssm_analyze()`
-function are always the same, we can omit their names. Second, because we 
-organized the `jz2017` data frame to have the circumplex scale variables
-adjacent and in order from PA to NO, we can simplify their specification by 
-using the `PA:NO` shortcut. Finally, because the use of octant scales is so 
-common, the `circumplex` package comes with a convenience function for outputing
-their angular displacements: `octants()`. Note how, even when using these
-shortcuts, the results are the same except for minor stochastic differences in
-the confidence intervals due to the randomness inherent to bootstrapping. (To
-get the exact same results, we could use the `set.seed()` function to control
-the random number generator in R.)
+That was pretty easy! We can now write up these results. However, the `circumplex` package has some features that can make what we just did even easier. First, because the first three arguments of the `ssm_analyze()` function are always the same, we can omit their names. Second, because we organized the `jz2017` data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the `PA:NO` shortcut. Finally, because the use of octant scales is so common, the `circumplex` package comes with a convenience function for outputing their angular displacements: `octants()`. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the `set.seed()` function to control the random number generator in R.)
 
-```{r}
+```{r summary1b}
 results2 <- ssm_analyze(jz2017, PA:NO, octants())
 summary(results2)
 ```
 
 ### Visualizing the results with a table and figure
-Next, we can produce a table to display our results. With only a
-single set of parameters, this table is probably overkill, but in future
-analyses we will see how this function saves a lot of time and effort. To create
-the table, simply pass the `results` (or `results2`) object to the `ssm_table()` function.
+Next, we can produce a table to display our results. With only a single set of parameters, this table is probably overkill, but in future analyses we will see how this function saves a lot of time and effort. To create the table, simply pass the `results` (or `results2`) object to the `ssm_table()` function.
 
 ```r
 ssm_table(results2)
 ```
 
-```{r, echo = FALSE}
+```{r table1, echo = FALSE}
 ssm_table(results2, render = FALSE) %>%
   kable(caption = circumplex:::dcaption(results2)) %>%
-  kable_styling(full_width = TRUE, font_size = 12)
+  kable_styling(full_width = TRUE, font_size = 14)
 ```
 
-Next, let's leverage the fact that we are working within a circumplex space by
-creating a nice-looking circular plot by mapping the amplitude parameter to the
-points' distance from the center of the circle and the displacement parameter
-to the points' rotation from due-east (as is conventional). This, again, is as 
-simple as passing the `results` object to the `ssm_plot()` function.
+Next, let's leverage the fact that we are working within a circumplex space by creating a nice-looking circular plot by mapping the amplitude parameter to the points' distance from the center of the circle and the displacement parameter to the points' rotation from due-east (as is conventional). This, again, is as simple as passing the `results` object to the `ssm_plot()` function.
 
-```{r plot1, fig.width = 7.2, fig.height = 4}
+```{r plot1, fig.width = 7.2, fig.height = 4, out.width = "100%"}
 ssm_plot(results2)
 ```
 
-Very cool! We now have a table and figure that can be included in a write-up,
-and the whole process required less than five lines of code.
+We now have a table and figure that can be included in a write-up, and the whole process required less than five lines of code.
 
 ## 4. Correlation-based SSM Analysis
 
 ### Conducting SSM for a group's correlations with an external measure
-Next, let's say that we are interested in analyzing not the mean scores on the
-circumplex scales but rather their correlations with an external measure. This
-is sometimes referred to as "projecting" that external measure into the
-circumplex space. As an example, let's project the NARPD variable, which
-captures symptoms of narcissistic personality disorder, into the circumplex
-space defined by the IIP-SC. Based on theory and previous findings, we can
-expect this measure to be associated with some general interpersonal distress
-and a style that is generally high in agency.
+Next, let's say that we are interested in analyzing not the mean scores on the circumplex scales but rather their correlations with an external measure. This is sometimes referred to as "projecting" that external measure into the circumplex space. As an example, let's project the NARPD variable, which captures symptoms of narcissistic personality disorder, into the circumplex space defined by the IIP-SC. Based on theory and previous findings, we can expect this measure to be associated with some general interpersonal distress and a style that is generally high in agency.
 
-To conduct this analysis, we can start with the syntax from the mean-based
-analysis. All SSM analyses use the `ssm_analyze()` function and the data, scales, and
-angles are the same as before. However, we also need to let the function know
-that we want to analyze correlations with NARPD as opposed to scale means. To
-do this, we add an additional argument `measures`.
+To conduct this analysis, we can start with the syntax from the mean-based analysis. All SSM analyses use the `ssm_analyze()` function and the data, scales, and angles are the same as before. However, we also need to let the function know that we want to analyze correlations with NARPD as opposed to scale means. To do this, we add an additional argument `measures`.
 
-```{r}
+```{r summary2}
 results3 <- ssm_analyze(jz2017, PA:NO, octants(), measures = NARPD)
 summary(results3)
 ```
 
-Note that this output looks very similar to the mean-based output except that
-the statistical basis is now correlation scores instead of mean scores and
-instead of saying "Profile [All]" it now says "Profile [NARPD]".
+Note that this output looks very similar to the mean-based output except that the statistical basis is now correlation scores instead of mean scores and instead of saying "Profile [All]" it now says "Profile [NARPD]".
 
 ### Visualizing the results with a table and figure
-We can also create a similar table and figure using the exact same syntax as
-before. The `ssm_table()` and `ssm_plot()` functions are smart enough to know
-whether the results are mean-based or correlation-based and will work in both
-cases.
+We can also create a similar table and figure using the exact same syntax as before. The `ssm_table()` and `ssm_plot()` functions are smart enough to know whether the results are mean-based or correlation-based and will work in both cases.
 
 ```r
 ssm_table(results3)
 ```
 
-```{r, echo = FALSE}
+```{r table2, echo = FALSE}
 ssm_table(results3, render = FALSE) %>%
   kable(caption = circumplex:::dcaption(results3)) %>%
-  kable_styling(full_width = TRUE, font_size = 12)
+  kable_styling(full_width = TRUE, font_size = 14)
 ```
 
-From the table, we can see that the model fit is good (>.80) and that all three
-SSM parameters are significantly different from zero, i.e., their confidence
-intervals do not include zero. Furthermore, the confidence intervals for the 
-elevation and amplitude parameters are greater than or equal to 0.15, which can
-be interpreted as being "marked." So, consistent with our hypotheses, NARPD was
-associated with marked general interpersonal distress (elevation) and was
-markedly distinctive in its profile (amplitude). The displacement parameter was
-somewhere between 100 and 120 degrees; to interpret this we would need to either
-consult the mapping between scales and angles or plot the results.
+From the table, we can see that the model fit is good (>.80) and that all three SSM parameters are significantly different from zero, i.e., their confidence intervals do not include zero. Furthermore, the confidence intervals for the elevation and amplitude parameters are greater than or equal to 0.15, which can be interpreted as being "marked." So, consistent with our hypotheses, NARPD was associated with marked general interpersonal distress (elevation) and was markedly distinctive in its profile (amplitude). The displacement parameter was somewhere between 100 and 120 degrees; to interpret this we would need to either consult the mapping between scales and angles or plot the results.
 
-```{r plot2, fig.width = 7.2, fig.height = 4}
+```{r plot2, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 ssm_plot(results3)
 ```
 
-From this figure, it is very easy to see that, consistent with our hypotheses,
-the displacement for NARPD was associated with high agency and was somewhere
-between the "domineering" and "vindictive" octants.
+From this figure, it is very easy to see that, consistent with our hypotheses, the displacement for NARPD was associated with high agency and was somewhere between the "domineering" and "vindictive" octants.
 
 ## 5. Wrap-up
-In this vignette, we learned about circumplex models, scales, and data as well
-as the Structural Summary Method (SSM) for analyzing such data. We learned about
-the `circumplex` package and how to use the `ssm_analyze()` function to generate
-SSM results for a single group's mean scores and for correlations with a single
-external measure. We learned several shortcuts for making calls to this function
-easier and then explored the basics of SSM visualization by creating simple
-tables and circular plots. In the next vignette, "Intermediate SSM Analysis",
-we will build upon this knowledge to learn how to (1) generalize our analyses to 
-multiple groups and multiple measures, (2) perform contrast analyses to compare
-groups or measures, and (3) export and make basic changes to tables and figures.
+In this vignette, we learned about circumplex models, scales, and data as well as the Structural Summary Method (SSM) for analyzing such data. We learned about the `circumplex` package and how to use the `ssm_analyze()` function to generate SSM results for a single group's mean scores and for correlations with a single external measure. We learned several shortcuts for making calls to this function easier and then explored the basics of SSM visualization by creating simple tables and circular plots. In the next vignette, "Intermediate SSM Analysis", we will build upon this knowledge to learn how to (1) generalize our analyses to multiple groups and multiple measures, (2) perform contrast analyses to compare groups or measures, and (3) export and make basic changes to tables and figures.
 
 ## References
 * Gurtman, M. B. (1992). Construct validity of interpersonal personality measures: The interpersonal circumplex as a nomological net. _Journal of Personality and Social Psychology, 63_(1), 105–118.
