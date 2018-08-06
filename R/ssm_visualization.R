@@ -115,7 +115,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
         x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
         fill = label, color = label, linetype = lnty
       ),
-      alpha = 0.5,
+      alpha = 0.4,
       size = 1
     ) +
     ggplot2::geom_point(
