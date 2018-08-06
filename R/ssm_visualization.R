@@ -101,6 +101,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
       stop("After removing profiles, there were none left to plot.")
     }
   }
+  df_plot <- df_plot %>% 
+    dplyr::mutate(lnty = dplyr::if_else(fit >= .70, "solid", "dashed"))
   
   p <- circle_base(angles = angles, amax = amax, fontsize = fontsize) +
     ggplot2::scale_color_hue() +
@@ -111,7 +113,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
       data = df_plot,
       aes(
         x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
-        fill = label, color = label
+        fill = label, color = label, linetype = lnty
       ),
       alpha = 0.5,
       size = 1
@@ -128,7 +130,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
     ) + 
     ggplot2::theme(
       legend.text = ggplot2::element_text(size = fontsize)
-    )
+    ) +
+    scale_linetype_identity()
 
   p
 }
