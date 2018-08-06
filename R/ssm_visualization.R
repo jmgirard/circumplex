@@ -131,7 +131,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
     ggplot2::theme(
       legend.text = ggplot2::element_text(size = fontsize)
     ) +
-    scale_linetype_identity()
+    ggplot2::scale_linetype_identity()
 
   p
 }
