@@ -238,19 +238,19 @@ ggplot(data = dat_r, mapping = aes(x = Angle, y = est)) +
 
 If fit is less than 0.70, it is considered "unacceptable" and only the elevation parameter should be interpreted. If fit is between 0.70 and 0.80, it is  considered "adequate," and if it is greater than 0.80, it is considered "good." Sometimes SSM model fit is called prototypicality or denoted using $R^2$.
 
-The first SSM parameter is elevation or $e$, which is calculated as the mean of all scores. It is the size of the general factor in the circumplex model and its interpretation varies from scale to scale. For measures of interpersonal problems, it is interpreted as generalized interpersonal distress. When $e>.15$, it is considered "marked" and it is considered "modest" otherwise.
+The first SSM parameter is elevation or $e$, which is calculated as the mean of all scores. It is the size of the general factor in the circumplex model and its interpretation varies from scale to scale. For measures of interpersonal problems, it is interpreted as generalized interpersonal distress. When using correlation-based SSM, $e\ge.15$ is considered "marked" and $e<.15$ is considered "modest."
 
 ```{r elev, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("VIG1-e.gif")
 ```
 
-The second SSM parameter is amplitude or $a$, which is calculated as the difference between the highest point of the curve and the curve's mean. It is interpreted as the distinctiveness or differentiation of a profile: how much itis peaked versus flat. Similar to elevation, amplitude is considered "marked" when $a>.15$ and "modest" otherwise.
+The second SSM parameter is amplitude or $a$, which is calculated as the difference between the highest point of the curve and the curve's mean. It is interpreted as the distinctiveness or differentiation of a profile: how much itis peaked versus flat. Similar to elevation, when using correlation-based SSM, $a\ge.15$ is considered "marked" and $a<.15$ is considered "modest."
 
 ```{r ampl, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("VIG1-a.gif")
 ```
 
-The final SSM parameter is displacement or $d$, which is calculated as the angle at which the curve reaches its highest point. It is interpreted as the style of the profile. For instance, if $d=90$ and we are using a circumplex scale that defines 90 degrees as "domineering," then the profile's style is domineering.
+The final SSM parameter is displacement or $d$, which is calculated as the angle at which the curve reaches its highest point. It is interpreted as the style of the profile. For instance, if $d=90^\circ$ and we are using a circumplex scale that defines 90 degrees as "domineering," then the profile's style is domineering.
 
 ```{r disp, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("VIG1-d.gif")
@@ -350,7 +350,7 @@ ggplot() +
 ## 3. Mean-based SSM Analysis
 
 ### Conducting SSM for a group's mean scores
-To begin, let's say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. We can use the `ssm_analyze()` function to perform this analysis. The first argument is always `.data`, a data frame containing all the variables to be analyzed. The second argument is always `scales` and specifies where in `.data` the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is always `angles` and specifies the angular displacements of each of the  circumplex scales included in `scales`. Note that the `scales` and `angles` arguments need to be vectors, so if multiple names/angles are provided, they need to be combined into a vector using the `c()` function. The order of the `scales` and `angles` vectors needs to be the same, and so does the length.
+To begin, let's say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. We can use the `ssm_analyze()` function to perform this analysis. The first argument is always `.data`, a data frame containing all the variables to be analyzed. The second argument is always `scales` and specifies where in `.data` the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is always `angles` and specifies the angles of each of the  circumplex scales included in `scales`. Note that the `scales` and `angles` arguments need to be vectors, so if multiple names/angles are provided, they need to be combined into a vector using the `c()` function. The order of the `scales` and `angles` vectors needs to be the same, and so does the length.
 
 ```{r analyze}
 results <- ssm_analyze(
@@ -360,7 +360,7 @@ results <- ssm_analyze(
 )
 ```
 
-The output of the function has been saved in the `results` variable, which we can examine in detail using the `summary()` function. This will output the call we made to create the output, as well as some of the default options that we didn't bother changing (see `?ssm_analyze` to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.
+The output of the function has been saved in the `results` object, which we can examine in detail using the `summary()` function. This will output the call we made to create the output, as well as some of the default options that we didn't bother changing (see `?ssm_analyze` to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.
 
 ```{r summary1a}
 summary(results)
