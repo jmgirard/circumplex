@@ -90,7 +90,7 @@ ssm_table(results3, render = FALSE) %>%
 ssm_plot(results3)
 ```
 
-Note that, as indicated by the warning, several profiles were not plotted due to having low prototypicality (fit < 0.70). Because a profile with low fit will not be very trustworthy, it could be misleading to plot its parameter estimates. If you want to override this, you can add `lowfit = TRUE` to the function call (not recommended).
+Note that, as indicated by the warning, several profiles were not plotted due to having low prototypicality (fit < 0.70). Because a profile with low fit will not be very trustworthy, it could be misleading to plot its parameter estimates. If you want to override this, you can add `lowfit = TRUE` to the function call; the poor-fitting profiles will then be plotted with dashed borders.
 
 ```{r lowfit, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 ssm_plot(results3, lowfit = TRUE)
