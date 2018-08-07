@@ -24,8 +24,8 @@ Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/)
 and [Aidan Wright](https://personalityprocesses.com/). You can learn
 more about using this package to perform the Structural Summary Method
 (SSM) in `vignette("ssm-introduction")` and
-`vignette("ssm-intermediate")`. You can purchase stickers with the
-circumplex logo at
+`vignette("ssm-intermediate")`. You can purchase stickers and other
+merchandise with the circumplex logo at
 [redbubble.com](https://www.redbubble.com/people/jmgirard/works/32902204).
 
 ## Installation
