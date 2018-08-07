@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9000</span>
       </span>
     </div>
 
@@ -172,7 +172,8 @@ of text in the figure, in points (default = 12).</p></td>
 <span class='co'># Plot profile results</span>
 <span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
   <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>))
-<span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'>ssm_plot</span>(<span class='no'>res</span>)</div><div class='output co'>#&gt; <span class='error'>Error in scale_linetype_identity(): could not find function "scale_linetype_identity"</span></div><div class='input'>
+<span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'>ssm_plot</span>(<span class='no'>res</span>)
+
 <span class='co'># Plot contrast results</span>
 <span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
   <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>)
