@@ -244,7 +244,7 @@ The first SSM parameter is elevation or $e$, which is calculated as the mean of 
 knitr::include_graphics("VIG1-e.gif")
 ```
 
-The second SSM parameter is amplitude or $a$, which is calculated as the difference between the highest point of the curve and the curve's mean. It is interpreted as the distinctiveness or differentiation of a profile: how much itis peaked versus flat. Similar to elevation, when using correlation-based SSM, $a\ge.15$ is considered "marked" and $a<.15$ is considered "modest."
+The second SSM parameter is amplitude or $a$, which is calculated as the difference between the highest point of the curve and the curve's mean. It is interpreted as the distinctiveness or differentiation of a profile: how much it is peaked versus flat. Similar to elevation, when using correlation-based SSM, $a\ge.15$ is considered "marked" and $a<.15$ is considered "modest."
 
 ```{r ampl, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("VIG1-a.gif")
