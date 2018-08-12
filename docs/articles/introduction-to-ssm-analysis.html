@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9000</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9001</span>
       </span>
     </div>
 
@@ -122,9 +122,9 @@
 <p>The SSM estimates a cosine curve to the data using the following equation: <span class="math display">\[S_i = e + a \times \cos(\theta_i - d)\]</span> where <span class="math inline">\(S_i\)</span> and <span class="math inline">\(\theta_i\)</span> are the score and angle on scale <span class="math inline">\(i\)</span>, respectively, and <span class="math inline">\(e\)</span>, <span class="math inline">\(a\)</span>, and <span class="math inline">\(d\)</span> are the elevation, amplitude, and displacement parameters, respectively. Before we discuss these parameters, however, we can also estimate the fit of the SSM model. This is essentially how close the cosine curve is to the observed data points. Deviations (in red, below) will lower model fit.</p>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/residuals-1.png" width="100%"></p>
 <p>If fit is less than 0.70, it is considered “unacceptable” and only the elevation parameter should be interpreted. If fit is between 0.70 and 0.80, it is considered “adequate,” and if it is greater than 0.80, it is considered “good.” Sometimes SSM model fit is called prototypicality or denoted using <span class="math inline">\(R^2\)</span>.</p>
-<p>The first SSM parameter is elevation or <span class="math inline">\(e\)</span>, which is calculated as the mean of all scores. It is the size of the general factor in the circumplex model and its interpretation varies from scale to scale. For measures of interpersonal problems, it is interpreted as generalized interpersonal distress. When using correlation-based SSM, <span class="math inline">\(e\ge.15\)</span> is considered “marked” and <span class="math inline">\(e&lt;.15\)</span> is considered “modest.”</p>
+<p>The first SSM parameter is elevation or <span class="math inline">\(e\)</span>, which is calculated as the mean of all scores. It is the size of the general factor in the circumplex model and its interpretation varies from scale to scale. For measures of interpersonal problems, it is interpreted as generalized interpersonal distress. When using correlation-based SSM, <span class="math inline">\(|e|\ge.15\)</span> is considered “marked” and <span class="math inline">\(|e|&lt;.15\)</span> is considered “modest.”</p>
 <p><img src="VIG1-e.gif" width="100%"></p>
-<p>The second SSM parameter is amplitude or <span class="math inline">\(a\)</span>, which is calculated as the difference between the highest point of the curve and the curve’s mean. It is interpreted as the distinctiveness or differentiation of a profile: how much itis peaked versus flat. Similar to elevation, when using correlation-based SSM, <span class="math inline">\(a\ge.15\)</span> is considered “marked” and <span class="math inline">\(a&lt;.15\)</span> is considered “modest.”</p>
+<p>The second SSM parameter is amplitude or <span class="math inline">\(a\)</span>, which is calculated as the difference between the highest point of the curve and the curve’s mean. It is interpreted as the distinctiveness or differentiation of a profile: how much it is peaked versus flat. Similar to elevation, when using correlation-based SSM, <span class="math inline">\(a\ge.15\)</span> is considered “marked” and <span class="math inline">\(a&lt;.15\)</span> is considered “modest.”</p>
 <p><img src="VIG1-a.gif" width="100%"></p>
 <p>The final SSM parameter is displacement or <span class="math inline">\(d\)</span>, which is calculated as the angle at which the curve reaches its highest point. It is interpreted as the style of the profile. For instance, if <span class="math inline">\(d=90^\circ\)</span> and we are using a circumplex scale that defines 90 degrees as “domineering,” then the profile’s style is domineering.</p>
 <p><img src="VIG1-d.gif" width="100%"></p>
@@ -161,37 +161,42 @@
 <div id="conducting-ssm-for-a-groups-mean-scores" class="section level3">
 <h3 class="hasAnchor">
 <a href="#conducting-ssm-for-a-groups-mean-scores" class="anchor"></a>Conducting SSM for a group’s mean scores</h3>
-<p>To begin, let’s say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. We can use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function to perform this analysis. The first argument is always <code>.data</code>, a data frame containing all the variables to be analyzed. The second argument is always <code>scales</code> and specifies where in <code>.data</code> the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is always <code>angles</code> and specifies the angles of each of the circumplex scales included in <code>scales</code>. Note that the <code>scales</code> and <code>angles</code> arguments need to be vectors, so if multiple names/angles are provided, they need to be combined into a vector using the <code>c()</code> function. The order of the <code>scales</code> and <code>angles</code> vectors needs to be the same, and so does the length.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">  <span class="dt">.data =</span> jz2017,</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="dt">scales =</span> <span class="kw">c</span>(PA, BC, DE, FG, HI, JK, LM, NO),</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">  <span class="dt">angles =</span> <span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>)</a>
-<a class="sourceLine" id="cb2-5" data-line-number="5">)</a></code></pre></div>
+<p>To begin, let’s say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. Although it is possible to analyze the raw scores contained in <code>jz2017</code>, our results will be more interpretable if we standardize the scores first. We can do this using the <code><a href="../reference/standardize.html">standardize()</a></code> function. The first argument to this function is <code>.data</code>, a data frame frame containing the circumplex scales to be standardized. The second argument is <code>scales</code> and specifies where in <code>.data</code> the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is <code>angles</code> and specifies the angle of each of the circumplex scales included in <code>scales</code>. Note that the <code>scales</code> and <code>angles</code> arguments need to be vectors (hence the <code>c()</code> function) that have the same ordering and length. Finally, the fourth argument is <code>norms</code>, a data frame containing the normative data we will use to standardize the circumplex scales. Here, we will use normative data for the IIP-SC by loading the <code>iipsc</code> data frame.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">data</span>(<span class="st">"iipsc"</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">jz2017s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/standardize.html">standardize</a></span>(</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="dt">.data =</span> jz2017,</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">  <span class="dt">scales =</span> <span class="kw">c</span>(PA, BC, DE, FG, HI, JK, LM, NO),</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">  <span class="dt">angles =</span> <span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>),</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">  <span class="dt">norms =</span> iipsc</a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">)</a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="kw">print</span>(jz2017s)</a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt; # A tibble: 1,166 x 19</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co">#&gt;    Gender      PA     BC     DE      FG      HI     JK     LM      NO PARPD</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="co">#&gt;    &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="co">#&gt;  1 Female  1.12    1.03   0.409 -0.0501  0.634   1.31   0.952  1.84       4</span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="co">#&gt;  2 Female -1.15   -0.786 -1.05  -0.842  -0.186   0.428  0.952  1.53       1</span></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#&gt;  3 Female -1.15   -1.15  -1.05  -1.11   -1.55   -1.62  -1.78  -1.28       0</span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt;  4 Male    1.88    1.39   0.994  1.53    0.634   0.428  0.648  1.84       1</span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt;  5 Female -0.773  -0.424 -0.760 -1.11   -1.55   -1.62  -1.78  -1.28       0</span></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt;  6 Male    1.12    1.39   1.58   0.741   0.634  -0.158  0.952  1.84       5</span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt;  7 Male    1.88    1.39   0.994  1.01    0.0874 -0.158 -0.261  0.906      3</span></a>
+<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co">#&gt;  8 Female -1.15   -0.786 -0.760 -0.842  -0.459  -0.158 -0.261 -0.0312     0</span></a>
+<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co">#&gt;  9 Female -1.15   -1.15  -1.05  -1.11   -1.28   -1.33  -0.564 -1.28       0</span></a>
+<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="co">#&gt; 10 Male   -0.0152  1.75   0.994  1.53    0.634   0.135  0.648  1.53       4</span></a>
+<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="co">#&gt; # ... with 1,156 more rows, and 9 more variables: SCZPD &lt;int&gt;,</span></a>
+<a class="sourceLine" id="cb2-23" data-line-number="23"><span class="co">#&gt; #   SZTPD &lt;int&gt;, ASPD &lt;int&gt;, BORPD &lt;int&gt;, HISPD &lt;int&gt;, NARPD &lt;int&gt;,</span></a>
+<a class="sourceLine" id="cb2-24" data-line-number="24"><span class="co">#&gt; #   AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</span></a></code></pre></div>
+<p>Now we can use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function to perform the SSM analysis. The first three arguments are the same as the first three arguments to <code><a href="../reference/standardize.html">standardize()</a></code>. We can pass the new <code>jz2017s</code> data frame that contains standardized scores as <code>.data</code> and the same vectors to <code>scales</code> and <code>angles</code> since these haven’t changed.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">  <span class="dt">.data =</span> jz2017s,</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">  <span class="dt">scales =</span> <span class="kw">c</span>(PA, BC, DE, FG, HI, JK, LM, NO),</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">angles =</span> <span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>)</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">)</a></code></pre></div>
 <p>The output of the function has been saved in the <code>results</code> object, which we can examine in detail using the <code>summary()</code> function. This will output the call we made to create the output, as well as some of the default options that we didn’t bother changing (see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">summary</span>(results)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; Call:</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = c(PA, BC, DE, FG, HI, JK, </span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt;     LM, NO), angles = c(90, 135, 180, 225, 270, 315, 360, 45))</span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; Statistical Basis:    Mean Scores </span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; Bootstrap Resamples:  2000 </span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; Confidence Level:     0.95 </span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; Listwise Deletion:    TRUE </span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt; Profile [All]:</span></a>
-<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; Elevation         0.917      0.889      0.946</span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; X-Value           0.351      0.324      0.378</span></a>
-<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.252     -0.283     -0.224</span></a>
-<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.432      0.402      0.465</span></a>
-<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt; Displacement    324.292    320.774    327.702</span></a>
-<a class="sourceLine" id="cb3-19" data-line-number="19"><span class="co">#&gt; Model Fit         0.878</span></a></code></pre></div>
-<p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputing their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code>set.seed()</code> function to control the random number generator in R.)</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">results2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>())</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">summary</span>(results2)</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Call:</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants())</span></a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">summary</span>(results)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Call:</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = c(PA, BC, DE, FG, HI, JK, </span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;     LM, NO), angles = c(90, 135, 180, 225, 270, 315, 360, 45))</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; Statistical Basis:    Mean Scores </span></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Bootstrap Resamples:  2000 </span></a>
@@ -201,18 +206,38 @@
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; Profile [All]:</span></a>
 <a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; Elevation         0.917      0.889      0.945</span></a>
-<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; X-Value           0.351      0.324      0.378</span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.252     -0.281     -0.223</span></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.432      0.404      0.464</span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Displacement    324.292    320.868    327.780</span></a>
-<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; Model Fit         0.878</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; Elevation        -0.225     -0.259     -0.191</span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; X-Value           0.131      0.099      0.164</span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.015     -0.051      0.019</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.131      0.100      0.167</span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Displacement    353.525    338.903      9.254</span></a>
+<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; Model Fit         0.710</span></a></code></pre></div>
+<p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017s</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputing their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code>set.seed()</code> function to control the random number generator in R.)</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">results2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017s, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>())</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw">summary</span>(results2)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; Call:</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA:NO, angles = octants())</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; Statistical Basis:    Mean Scores </span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; Bootstrap Resamples:  2000 </span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; Confidence Level:     0.95 </span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; Listwise Deletion:    TRUE </span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; Profile [All]:</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; Elevation        -0.225     -0.257     -0.190</span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; X-Value           0.131      0.099      0.163</span></a>
+<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.015     -0.051      0.022</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.131      0.100      0.167</span></a>
+<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; Displacement    353.525    338.818     10.617</span></a>
+<a class="sourceLine" id="cb5-19" data-line-number="19"><span class="co">#&gt; Model Fit         0.710</span></a></code></pre></div>
 </div>
 <div id="visualizing-the-results-with-a-table-and-figure" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visualizing-the-results-with-a-table-and-figure" class="anchor"></a>Visualizing the results with a table and figure</h3>
 <p>Next, we can produce a table to display our results. With only a single set of parameters, this table is probably overkill, but in future analyses we will see how this function saves a lot of time and effort. To create the table, simply pass the <code>results</code> (or <code>results2</code>) object to the <code><a href="../reference/ssm_table.html">ssm_table()</a></code> function.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results2)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results2)</a></code></pre></div>
 <table class="table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Mean-based Structural Summary Statistics with 95% CIs
@@ -245,29 +270,28 @@ Fit
 All
 </td>
 <td style="text-align:left;">
-0.92 [0.89, 0.94]
+-0.23 [-0.26, -0.19]
 </td>
 <td style="text-align:left;">
-0.35 [0.32, 0.38]
+0.13 [0.10, 0.16]
 </td>
 <td style="text-align:left;">
--0.25 [-0.28, -0.22]
+-0.01 [-0.05, 0.02]
 </td>
 <td style="text-align:left;">
-0.43 [0.40, 0.46]
+0.13 [0.10, 0.17]
 </td>
 <td style="text-align:left;">
-324.3 [320.9, 327.8]
+353.5 [338.8, 10.6]
 </td>
 <td style="text-align:left;">
-0.878
+0.710
 </td>
 </tr></tbody>
 </table>
 <p>Next, let’s leverage the fact that we are working within a circumplex space by creating a nice-looking circular plot by mapping the amplitude parameter to the points’ distance from the center of the circle and the displacement parameter to the points’ rotation from due-east (as is conventional). This, again, is as simple as passing the <code>results</code> object to the <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> function.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(results2)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(results2)</a></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot1-1.png" width="100%"></p>
-<p>We now have a table and figure that can be included in a write-up, and the whole process required less than five lines of code.</p>
 </div>
 </div>
 <div id="correlation-based-ssm-analysis" class="section level2">
@@ -277,34 +301,34 @@ All
 <h3 class="hasAnchor">
 <a href="#conducting-ssm-for-a-groups-correlations-with-an-external-measure" class="anchor"></a>Conducting SSM for a group’s correlations with an external measure</h3>
 <p>Next, let’s say that we are interested in analyzing not the mean scores on the circumplex scales but rather their correlations with an external measure. This is sometimes referred to as “projecting” that external measure into the circumplex space. As an example, let’s project the NARPD variable, which captures symptoms of narcissistic personality disorder, into the circumplex space defined by the IIP-SC. Based on theory and previous findings, we can expect this measure to be associated with some general interpersonal distress and a style that is generally high in agency.</p>
-<p>To conduct this analysis, we can start with the syntax from the mean-based analysis. All SSM analyses use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function and the data, scales, and angles are the same as before. However, we also need to let the function know that we want to analyze correlations with NARPD as opposed to scale means. To do this, we add an additional argument <code>measures</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">results3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> NARPD)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw">summary</span>(results3)</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; Call:</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;     measures = NARPD)</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; Bootstrap Resamples:  2000 </span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; Confidence Level:     0.95 </span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; Listwise Deletion:    TRUE </span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; Profile [NARPD]:</span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt; Elevation         0.202      0.170      0.236</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; X-Value          -0.062     -0.094     -0.029</span></a>
-<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#&gt; Y-Value           0.179      0.142      0.212</span></a>
-<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.189      0.154      0.224</span></a>
-<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; Displacement    108.967     99.193    118.698</span></a>
-<a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#&gt; Model Fit         0.957</span></a></code></pre></div>
+<p>To conduct this analysis, we can start with the syntax from the mean-based analysis. All SSM analyses use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function and the data, scales, and angles are the same as before. However, we also need to let the function know that we want to analyze correlations with NARPD as opposed to scale means. To do this, we add an additional argument <code>measures</code>. Note that since correlations are already standardized, we don’t need to worry about standardizing the circumplex scales when <code>measures</code> is used.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">results3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> NARPD)</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="kw">summary</span>(results3)</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; Call:</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt;     measures = NARPD)</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></a>
+<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="co">#&gt; Bootstrap Resamples:  2000 </span></a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">#&gt; Confidence Level:     0.95 </span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#&gt; Listwise Deletion:    TRUE </span></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11"><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></a>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; Profile [NARPD]:</span></a>
+<a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
+<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="co">#&gt; Elevation         0.202      0.167      0.234</span></a>
+<a class="sourceLine" id="cb8-16" data-line-number="16"><span class="co">#&gt; X-Value          -0.062     -0.093     -0.028</span></a>
+<a class="sourceLine" id="cb8-17" data-line-number="17"><span class="co">#&gt; Y-Value           0.179      0.145      0.212</span></a>
+<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.189      0.155      0.223</span></a>
+<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="co">#&gt; Displacement    108.967     98.928    118.388</span></a>
+<a class="sourceLine" id="cb8-20" data-line-number="20"><span class="co">#&gt; Model Fit         0.957</span></a></code></pre></div>
 <p>Note that this output looks very similar to the mean-based output except that the statistical basis is now correlation scores instead of mean scores and instead of saying “Profile [All]” it now says “Profile [NARPD]”.</p>
 </div>
 <div id="visualizing-the-results-with-a-table-and-figure-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visualizing-the-results-with-a-table-and-figure-1" class="anchor"></a>Visualizing the results with a table and figure</h3>
 <p>We can also create a similar table and figure using the exact same syntax as before. The <code><a href="../reference/ssm_table.html">ssm_table()</a></code> and <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> functions are smart enough to know whether the results are mean-based or correlation-based and will work in both cases.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results3)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results3)</a></code></pre></div>
 <table class="table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
@@ -337,7 +361,7 @@ Fit
 NARPD
 </td>
 <td style="text-align:left;">
-0.20 [0.17, 0.24]
+0.20 [0.17, 0.23]
 </td>
 <td style="text-align:left;">
 -0.06 [-0.09, -0.03]
@@ -346,10 +370,10 @@ NARPD
 0.18 [0.14, 0.21]
 </td>
 <td style="text-align:left;">
-0.19 [0.15, 0.22]
+0.19 [0.16, 0.22]
 </td>
 <td style="text-align:left;">
-109.0 [99.2, 118.7]
+109.0 [98.9, 118.4]
 </td>
 <td style="text-align:left;">
 0.957
@@ -357,7 +381,7 @@ NARPD
 </tr></tbody>
 </table>
 <p>From the table, we can see that the model fit is good (&gt;.80) and that all three SSM parameters are significantly different from zero, i.e., their confidence intervals do not include zero. Furthermore, the confidence intervals for the elevation and amplitude parameters are greater than or equal to 0.15, which can be interpreted as being “marked.” So, consistent with our hypotheses, NARPD was associated with marked general interpersonal distress (elevation) and was markedly distinctive in its profile (amplitude). The displacement parameter was somewhere between 100 and 120 degrees; to interpret this we would need to either consult the mapping between scales and angles or plot the results.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(results3)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(results3)</a></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot2-1.png" width="100%"></p>
 <p>From this figure, it is very easy to see that, consistent with our hypotheses, the displacement for NARPD was associated with high agency and was somewhere between the “domineering” and “vindictive” octants.</p>
 </div>

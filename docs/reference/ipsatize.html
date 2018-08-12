@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Raw octant scores on real circumplex scales with covariates — jz2017 • circumplex</title>
+<title>Ipsatize circumplex scales using deviation scoring across variables — ipsatize • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,11 +36,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Raw octant scores on real circumplex scales with covariates — jz2017" />
+<meta property="og:title" content="Ipsatize circumplex scales using deviation scoring across variables — ipsatize" />
 
-<meta property="og:description" content="A large example dataset containing gender, raw mean scores on the Inventory
-of Interpersonal Problems - Short Circumplex (IIP-SC), and raw sum scores on
-the Personality Diagnostic Questionnaire - 4th Edition Plus (PDQ-4+)." />
+<meta property="og:description" content="Description." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -125,59 +123,66 @@ the Personality Diagnostic Questionnaire - 4th Edition Plus (PDQ-4+)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Raw octant scores on real circumplex scales with covariates</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/example_data.R'><code>R/example_data.R</code></a></small>
-    <div class="hidden name"><code>jz2017.Rd</code></div>
+    <h1>Ipsatize circumplex scales using deviation scoring across variables</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>ipsatize.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>A large example dataset containing gender, raw mean scores on the Inventory
-of Interpersonal Problems - Short Circumplex (IIP-SC), and raw sum scores on
-the Personality Diagnostic Questionnaire - 4th Edition Plus (PDQ-4+).</p>
+    <p>Description.</p>
     
     </div>
 
-    <pre class="usage"><span class='no'>jz2017</span></pre>
-        
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
-
-    <p>A data frame with 1166 observations and 19 variables:</p><dl class='dl-horizontal'>
-<dt>Gender</dt><dd><p>Self-reported Gender</p></dd>
-<dt>PA</dt><dd><p>Domineering Problems (IIP-SC) 90 degrees</p></dd>
-<dt>BC</dt><dd><p>Vindictive Problems (IIP-SC) 135 degrees</p></dd>
-<dt>DE</dt><dd><p>Cold Problems (IIP-SC) 180 degrees</p></dd>
-<dt>FG</dt><dd><p>Socially Avoidant Problems (IIP-SC) 225 degrees</p></dd>
-<dt>HI</dt><dd><p>Nonassertive Problems(IIP-SC) 270 degrees</p></dd>
-<dt>JK</dt><dd><p>Easily Exploited Problems (IIP-SC) 315 degrees</p></dd>
-<dt>LM</dt><dd><p>Overly Nurturant Problems (IIP-SC) 360 degrees</p></dd>
-<dt>NO</dt><dd><p>Intrusive Problems (IIP-SC) 45 degrees</p></dd>
-<dt>PARPD</dt><dd><p>Paranoid PD Symptoms (PDQ-4+)</p></dd>
-<dt>SCZPD</dt><dd><p>Schizoid PD Symptoms (PDQ-4+)</p></dd>
-<dt>SZTPD</dt><dd><p>Schizotypal PD Symptoms (PDQ-4+)</p></dd>
-<dt>ASPD</dt><dd><p>Antisocial PD Symptoms (PDQ-4+)</p></dd>
-<dt>BORPD</dt><dd><p>Borderline PD Symptoms (PDQ-4+)</p></dd>
-<dt>HISPD</dt><dd><p>Histrionic PD Symptoms (PDQ-4+)</p></dd>
-<dt>NARPD</dt><dd><p>Narcissistic PD Symptoms (PDQ-4+)</p></dd>
-<dt>AVPD</dt><dd><p>Avoidant PD Symptoms (PDQ-4+)</p></dd>
-<dt>DPNPD</dt><dd><p>Dependent PD Symptoms (PDQ-4+)</p></dd>
-<dt>OCPD</dt><dd><p>Obsessive-Compulsive PD Symptoms (PDQ-4+)</p></dd>
-</dl>
+    <pre class="usage"><span class='fu'>ipsatize</span>(<span class='no'>.data</span>, <span class='no'>scales</span>)</pre>
     
-    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>.data</th>
+      <td><p>Required. A data frame containing at least circumplex scales.</p></td>
+    </tr>
+    <tr>
+      <th>scales</th>
+      <td><p>Required. The variable names or column numbers for the
+variables in <code>.data</code> that contain circumplex scales to be ipsatized.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><a href='https://doi.org/10.1177/1073191115621795'>https://doi.org/10.1177/1073191115621795</a></p>
+    <p>A data frame that matches <code>.data</code> except that the variables
+included in <code>scales</code> have been transformed into ipsatized scores.</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='st'>"jz2017"</span>)
+<span class='fu'>ipsatize</span>(<span class='no'>jz2017</span>, <span class='no'>PA</span>:<span class='no'>NO</span>)</div><div class='output co'>#&gt; # A tibble: 1,166 x 19
+#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD
+#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#&gt;  1 Female  -0.5 -0.5  -0.75 -1     0     0.5   0.25  0.5      4     3     7
+#&gt;  2 Female  -1   -0.75 -1    -0.75  0.25  0.75  1.25  1.25     1     0     2
+#&gt;  3 Female   0    0     0     0     0     0     0     0        0     1     0
+#&gt;  4 Male     0   -0.25 -0.25  0.5   0    -0.25  0     0.5      1     0     0
+#&gt;  5 Female   0    0.25  0    -0.25 -0.25 -0.25 -0.25 -0.25     0     0     0
+#&gt;  6 Male    -0.5 -0.25  0.25 -0.25  0    -0.75  0.25  0.5      5     5     7
+#&gt;  7 Male     0   -0.25 -0.25  0    -0.5  -0.75 -0.75 -0.25     3     6     7
+#&gt;  8 Female  -0.5 -0.25 -0.25 -0.25  0.5   0.75  0.75  0.5      0     0     1
+#&gt;  9 Female   0    0     0     0     0.25  0.25  1     0        0     1     0
+#&gt; 10 Male    -0.5  0.75  0.5   1.25  0.75  0.25  0.75  1        4     5     5
+#&gt; # ... with 1,156 more rows, and 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,
+#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#format">Format</a></li>
-
-      <li><a href="#source">Source</a></li>
-          </ul>
+      <li><a href="#value">Value</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

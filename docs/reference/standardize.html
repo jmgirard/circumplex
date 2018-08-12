@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Raw octant scores on real circumplex scales with covariates — jz2017 • circumplex</title>
+<title>Standardize circumplex scales using normative data — standardize • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,11 +36,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Raw octant scores on real circumplex scales with covariates — jz2017" />
+<meta property="og:title" content="Standardize circumplex scales using normative data — standardize" />
 
-<meta property="og:description" content="A large example dataset containing gender, raw mean scores on the Inventory
-of Interpersonal Problems - Short Circumplex (IIP-SC), and raw sum scores on
-the Personality Diagnostic Questionnaire - 4th Edition Plus (PDQ-4+)." />
+<meta property="og:description" content="Take in a data frame containing circumplex scales, angle definitions for each
+scale, and normative data (from the package or custom) and return that same
+data frame with each specified circumplex scale transformed into standard
+scores (i.e., z-scores) based on comparison to the normative data." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -125,59 +126,83 @@ the Personality Diagnostic Questionnaire - 4th Edition Plus (PDQ-4+)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Raw octant scores on real circumplex scales with covariates</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/example_data.R'><code>R/example_data.R</code></a></small>
-    <div class="hidden name"><code>jz2017.Rd</code></div>
+    <h1>Standardize circumplex scales using normative data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>standardize.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>A large example dataset containing gender, raw mean scores on the Inventory
-of Interpersonal Problems - Short Circumplex (IIP-SC), and raw sum scores on
-the Personality Diagnostic Questionnaire - 4th Edition Plus (PDQ-4+).</p>
+    <p>Take in a data frame containing circumplex scales, angle definitions for each
+scale, and normative data (from the package or custom) and return that same
+data frame with each specified circumplex scale transformed into standard
+scores (i.e., z-scores) based on comparison to the normative data.</p>
     
     </div>
 
-    <pre class="usage"><span class='no'>jz2017</span></pre>
-        
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
-
-    <p>A data frame with 1166 observations and 19 variables:</p><dl class='dl-horizontal'>
-<dt>Gender</dt><dd><p>Self-reported Gender</p></dd>
-<dt>PA</dt><dd><p>Domineering Problems (IIP-SC) 90 degrees</p></dd>
-<dt>BC</dt><dd><p>Vindictive Problems (IIP-SC) 135 degrees</p></dd>
-<dt>DE</dt><dd><p>Cold Problems (IIP-SC) 180 degrees</p></dd>
-<dt>FG</dt><dd><p>Socially Avoidant Problems (IIP-SC) 225 degrees</p></dd>
-<dt>HI</dt><dd><p>Nonassertive Problems(IIP-SC) 270 degrees</p></dd>
-<dt>JK</dt><dd><p>Easily Exploited Problems (IIP-SC) 315 degrees</p></dd>
-<dt>LM</dt><dd><p>Overly Nurturant Problems (IIP-SC) 360 degrees</p></dd>
-<dt>NO</dt><dd><p>Intrusive Problems (IIP-SC) 45 degrees</p></dd>
-<dt>PARPD</dt><dd><p>Paranoid PD Symptoms (PDQ-4+)</p></dd>
-<dt>SCZPD</dt><dd><p>Schizoid PD Symptoms (PDQ-4+)</p></dd>
-<dt>SZTPD</dt><dd><p>Schizotypal PD Symptoms (PDQ-4+)</p></dd>
-<dt>ASPD</dt><dd><p>Antisocial PD Symptoms (PDQ-4+)</p></dd>
-<dt>BORPD</dt><dd><p>Borderline PD Symptoms (PDQ-4+)</p></dd>
-<dt>HISPD</dt><dd><p>Histrionic PD Symptoms (PDQ-4+)</p></dd>
-<dt>NARPD</dt><dd><p>Narcissistic PD Symptoms (PDQ-4+)</p></dd>
-<dt>AVPD</dt><dd><p>Avoidant PD Symptoms (PDQ-4+)</p></dd>
-<dt>DPNPD</dt><dd><p>Dependent PD Symptoms (PDQ-4+)</p></dd>
-<dt>OCPD</dt><dd><p>Obsessive-Compulsive PD Symptoms (PDQ-4+)</p></dd>
-</dl>
+    <pre class="usage"><span class='fu'>standardize</span>(<span class='no'>.data</span>, <span class='no'>scales</span>, <span class='no'>angles</span>, <span class='no'>norms</span>)</pre>
     
-    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>.data</th>
+      <td><p>Required. A data frame containing at least circumplex scales.</p></td>
+    </tr>
+    <tr>
+      <th>scales</th>
+      <td><p>Required. The variable names or column numbers for the
+variables in <code>.data</code> that contain circumplex scales to be
+standardized.</p></td>
+    </tr>
+    <tr>
+      <th>angles</th>
+      <td><p>Required. A numeric vector containing the angular displacement
+of each circumplex scale included in <code>scales</code> (in degrees).</p></td>
+    </tr>
+    <tr>
+      <th>norms</th>
+      <td><p>Required. A data frame containing normative data for each
+circumplex scale included in <code>scales</code>. The following variables are
+required: <code>Angle</code>, <code>M</code>, and <code>SD</code>. See <code><a href='iipsc.html'>?iipsc</a></code>.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><a href='https://doi.org/10.1177/1073191115621795'>https://doi.org/10.1177/1073191115621795</a></p>
+    <p>A data frame that matches <code>.data</code> except that the variables
+included in <code>scales</code> have been transformed into standard scores.</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='st'>"jz2017"</span>)
+<span class='fu'>data</span>(<span class='st'>"iipsc"</span>)
+<span class='fu'>standardize</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>norms</span> <span class='kw'>=</span> <span class='no'>iipsc</span>)</div><div class='output co'>#&gt; # A tibble: 1,166 x 19
+#&gt;    Gender      PA     BC     DE      FG      HI     JK     LM      NO PARPD
+#&gt;    &lt;fct&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt;
+#&gt;  1 Female  1.12    1.03   0.409 -0.0501  0.634   1.31   0.952  1.84       4
+#&gt;  2 Female -1.15   -0.786 -1.05  -0.842  -0.186   0.428  0.952  1.53       1
+#&gt;  3 Female -1.15   -1.15  -1.05  -1.11   -1.55   -1.62  -1.78  -1.28       0
+#&gt;  4 Male    1.88    1.39   0.994  1.53    0.634   0.428  0.648  1.84       1
+#&gt;  5 Female -0.773  -0.424 -0.760 -1.11   -1.55   -1.62  -1.78  -1.28       0
+#&gt;  6 Male    1.12    1.39   1.58   0.741   0.634  -0.158  0.952  1.84       5
+#&gt;  7 Male    1.88    1.39   0.994  1.01    0.0874 -0.158 -0.261  0.906      3
+#&gt;  8 Female -1.15   -0.786 -0.760 -0.842  -0.459  -0.158 -0.261 -0.0312     0
+#&gt;  9 Female -1.15   -1.15  -1.05  -1.11   -1.28   -1.33  -0.564 -1.28       0
+#&gt; 10 Male   -0.0152  1.75   0.994  1.53    0.634   0.135  0.648  1.53       4
+#&gt; # ... with 1,156 more rows, and 9 more variables: SCZPD &lt;int&gt;, SZTPD &lt;int&gt;,
+#&gt; #   ASPD &lt;int&gt;, BORPD &lt;int&gt;, HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;,
+#&gt; #   OCPD &lt;int&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#format">Format</a></li>
-
-      <li><a href="#source">Source</a></li>
-          </ul>
+      <li><a href="#value">Value</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>
