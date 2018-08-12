@@ -1,3 +1,20 @@
+circumplex 0.1.2.9001
+=============================
+
+### NEW FEATURES
+
+* Add function to standardize() circumplex scales
+* Add function to ipsatize() circumplex scales
+
+### MINOR IMPROVEMENTS
+
+* Change the default to plot profiles with low fit (but with dashed borders).
+
+### DOCUMENTATION FIXES
+
+* Reformat "Functions and Data" on package website
+* Update vignettes to use the standardize() function
+
 circumplex 0.1.2
 =============================
 
