@@ -193,7 +193,8 @@ ssm_analyze_means <- function(.data, scales, angles, grouping, contrast,
     abs() %>%
     max()
   if (extrema >= 5) {
-    message("Your circumplex scales do not appear to be standardized.")
+    message(c("Your circumplex scales do not appear to be standardized.",
+      "\n\tHint: Consider using the standardize() function."))
   }
   
   # Calculate mean observed scores

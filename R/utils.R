@@ -75,6 +75,45 @@ quadrants <- function() {
   as_degree(c(135, 225, 315, 45))
 }
 
+#' Standardize circumplex scales using normative data
+#' 
+#' Take in a data frame containing circumplex scales, angle definitions for each
+#' scale, and normative data (from the package or custom) and return that same 
+#' data frame with each specified circumplex scale transformed into standard
+#' scores (i.e., z-scores) based on comparison to the normative data.
+#' 
+#' @param .data Required. A data frame containing at least circumplex scales.
+#' @param scales Required. The variable names or column numbers for the
+#'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @param angles Required. A numeric vector containing the angular displacement
+#'   of each circumplex scale included in \code{scales} (in degrees).
+#' @param norms Required. A data frame containing normative data for each
+#'   circumplex scale included in \code{scales}. The following variables are
+#'   required: \code{Angle}, \code{M}, and \code{SD}. See \code{?iipsc}.
+#' @return A data frame that matches \code{.data} except that the variables
+#'   included in \code{scales} have been transformed into standard scores.
+#' @export
+#' @examples 
+#' data("jz2017")
+#' data("iipsc")
+#' z <- standardize(jz2017, scales = PA:NO, angles = octants(), norms = iipsc)
+standardize <- function(.data, scales, angles, norms) {
+  scales_en <- rlang::enquo(scales)
+  scale_names <- names(dplyr::select(.data, !!scales_en))
+  assert_that(is.numeric(angles))
+  assert_that(length(scale_names) == length(angles))
+  assert_that(length(scale_names) <= nrow(norms))
+  for (i in 1:length(angles)) {
+    scale_i <- scale_names[[i]]
+    index_i <- norms$Angle == angles[[i]]
+    m_i <- norms$M[index_i]
+    s_i <- norms$SD[index_i]
+    .data <- .data %>% 
+      dplyr::mutate_at(dplyr::funs((. - m_i) / s_i), .vars = scale_i)
+  }
+  .data
+}
+
 # Compute differences between two sets of SSM parameters -----------------------
 param_diff <- function(p1, p2) {
   assert_that(is.numeric(p1), is.numeric(p2))
