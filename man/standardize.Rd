@@ -10,7 +10,8 @@ standardize(.data, scales, angles, norms)
 \item{.data}{Required. A data frame containing at least circumplex scales.}
 
 \item{scales}{Required. The variable names or column numbers for the
-variables in \code{.data} that contain circumplex scales to be analyzed.}
+variables in \code{.data} that contain circumplex scales to be
+standardized.}
 
 \item{angles}{Required. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees).}
@@ -32,5 +33,5 @@ scores (i.e., z-scores) based on comparison to the normative data.
 \examples{
 data("jz2017")
 data("iipsc")
-z <- standardize(jz2017, scales = PA:NO, angles = octants(), norms = iipsc)
+standardize(jz2017, scales = PA:NO, angles = octants(), norms = iipsc)
 }
