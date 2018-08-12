@@ -23,7 +23,9 @@ We've already seen how adding the `measures` argument can change `ssm_analyze()`
 
 ```{r group}
 data("jz2017")
-results <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
+data("iipsc")
+jz2017s <- standardize(jz2017, PA:NO, octants(), norms = iipsc)
+results <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
 summary(results)
 ```
 
@@ -43,7 +45,11 @@ ssm_table(results, render = FALSE) %>%
 ssm_plot(results)
 ```
 
-Any number of groups can be analyzed in this way, and the output will contain additional profile blocks, the table will contain additional rows, and the figure will contain additional points. The grouping variable just needs to contain more than one level (i.e., unique value). 
+Any number of groups can be analyzed in this way, and the output will contain additional profile blocks, the table will contain additional rows, and the figure will contain additional points. The grouping variable just needs to contain more than one level (i.e., unique value). Also notice how, in the plot above, the Male profile has a dashed border instead of the typical solid border. This is because the Male profile has low prototypicality (i.e., $R^2<.70$) and therefore its plot is untrustworthy. It is also possible to prevent profiles from low prototypicality from plotting using the `lowfit` argument.
+
+```{r group_plot_lowfit, fig.width = 7.5, fig.height = 4, out.width = "100%"}
+ssm_plot(results, lowfit = FALSE)
+```
 
 ### Generalizing to multiple measures
 Similarly, we can analyze multiple external measures in a single function call by providing a vector of variables to the `measures` argument instead of a single variable. This can be done by wrapping the variable names or column numbers with the `c()` or, if they are adjacent columns, with the `:` shortcut. The package functions were written to analyze all measures and groups within a single bootstrap, so adding additional measures and groups should still be fast.
@@ -71,8 +77,7 @@ ssm_plot(results2)
 Finally, it is possible to analyze multiple measures within multiple groups. As you might expect, this requires providing both the `measures` and `grouping` arguments to the same function call. Again, any number of measures and groups is possible. The profiles in such an analysis will be named GROUP_MEASURE as below.
 
 ```{r general}
-results3 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender,
-  measures = PARPD:SZTPD)
+results3 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender, measures = PARPD:SZTPD)
 summary(results3)
 ```
 
@@ -90,12 +95,6 @@ ssm_table(results3, render = FALSE) %>%
 ssm_plot(results3)
 ```
 
-Note that, as indicated by the warning, several profiles were not plotted due to having low prototypicality (fit < 0.70). Because a profile with low fit will not be very trustworthy, it could be misleading to plot its parameter estimates. If you want to override this, you can add `lowfit = TRUE` to the function call; the poor-fitting profiles will then be plotted with dashed borders.
-
-```{r lowfit, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results3, lowfit = TRUE)
-```
-
 ## 2. Contrast analyses
 The final argument to master is `contrast`, which allows us to compare two groups or measures. The value of this argument must be one of the following strings: "none" for no contrast (default), "model" for a model contrast, or "test" for a parameter contrast. A model contrast can be useful for mean-based analyses and first generates scores for each group (or measure), then calculates the difference between these scores, and finally estimates SSM parameters for these difference scores. A parameter contrast is typically what is desired for inferential comparison and first generates scores for each group (or measure), then estimates SSM parameters for these scores, and finally calculates the difference between the parameters. To keep the code simpler and to discourage "fishing expeditions," only two groups or measures can be compared at a time.
 
@@ -103,8 +102,7 @@ The final argument to master is `contrast`, which allows us to compare two group
 To compare the mean profiles for females and males, we can start with the same syntax we had before and then add a `contrast` argument. For the sake of illustration, we will use a model contrast here, but for some purposes, a parameter contrast might be more appropriate.
 
 ```{r model_contrast}
-results4 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender,
-  contrast = "model")
+results4 <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender, contrast = "model")
 summary(results4)
 ```
 
@@ -218,16 +216,16 @@ Additional arguments to the `ssm_table()` function can be explored using the `?s
 In some cases, such as multiple contrasts or groupings, we may want to combine several tables into one by joining them together as rows. This can be done using the `ssm_append()` function.
 
 ```r
-res1 <- ssm_analyze(jz2017, PA:NO, octants())
-res2 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
+res1 <- ssm_analyze(jz2017s, PA:NO, octants())
+res2 <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
 tab1 <- ssm_table(res1, xy = FALSE, render = FALSE)
 tab2 <- ssm_table(res2, xy = FALSE, render = FALSE)
 ssm_append(tab1, tab2)
 ```
 
 ```{r append, echo = FALSE}
-res1 <- ssm_analyze(jz2017, PA:NO, octants())
-res2 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
+res1 <- ssm_analyze(jz2017s, PA:NO, octants())
+res2 <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
 tab1 <- ssm_table(res1, xy = FALSE, render = FALSE)
 tab2 <- ssm_table(res2, xy = FALSE, render = FALSE)
 ssm_append(tab1, tab2, render = FALSE) %>% 
@@ -238,10 +236,10 @@ ssm_append(tab1, tab2, render = FALSE) %>%
 ## 5. Working with SSM figures
 
 ### Basic customizations of figures
-Additional arguments to the `ssm_plot()` function can be explored using the `?ssm_plot`, `?ssm_plot_circle`, and `?ssm_plot_contrast` commands. For both types of figures, the `fontsize` argument will control the baseline text size in pts (default = 12). Some text elements will be rescaled from the specified `fontsize` (e.g., multiplying it by 150%). For circle plots, we have already seen the `lowfit` argument for including points with low model fit. Another useful option is the `amax` argument for the maximum value of the amplitude scale. By default, the package picks a number that will fit all the points and generate "round" numbers at each 1/5 tick; however, this default can be overwritten using the `amax` argument. Below we can configure `amax` to be 0.375, as this value will make the second tick equal to 0.15 which is a common threshold for determining "marked" amplitude.
+Additional arguments to the `ssm_plot()` function can be explored using the `?ssm_plot`, `?ssm_plot_circle`, and `?ssm_plot_contrast` commands. For both types of figures, the `fontsize` argument will control the baseline text size in pts (default = 12). Some text elements will be rescaled from the specified `fontsize` (e.g., multiplying it by 150%). For circle plots, we have already seen the `lowfit` argument for including points with low model fit. Another useful option is the `amax` argument for the maximum value of the amplitude scale. By default, the package picks a number that will fit all the points and generate "round" numbers at each 1/5 tick; however, this default can be overwritten using the `amax` argument.
 
 ```{r amax, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results4, amax = 0.375)
+ssm_plot(results4, amax = 0.6)
 ```
 
 For contrast plots, several arguments exist for customizing the output. We have already seen the `xy` argument for including or excluding the x-value and y-value contrasts. We can also change the `color` and `linesize` of the point range (linesize in mm). Finally, we can change the `axislabel` displayed to the left of the plots. More complex customizations will be the subject of an advanced vignette.
