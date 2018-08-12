@@ -15,16 +15,16 @@
 \item{JK}{Easily Exploited Problems (IIP-SC) 315 degrees}
 \item{LM}{Overly Nurturant Problems (IIP-SC) 360 degrees}
 \item{NO}{Intrusive Problems (IIP-SC) 45 degrees}
-\item{PARPD}{Paranoid PD Symptoms (PDQ-4)}
-\item{SCZPD}{Schizoid PD Symptoms (PDQ-4)}
-\item{SZTPD}{Schizotypal PD Symptoms (PDQ-4)}
-\item{ASPD}{Antisocial PD Symptoms (PDQ-4)}
-\item{BORPD}{Borderline PD Symptoms (PDQ-4)}
-\item{HISPD}{Histrionic PD Symptoms (PDQ-4)}
-\item{NARPD}{Narcissistic PD Symptoms (PDQ-4)}
-\item{AVPD}{Avoidant PD Symptoms (PDQ-4)}
-\item{DPNPD}{Dependent PD Symptoms (PDQ-4)}
-\item{OCPD}{Obsessive-Compulsive PD Symptoms (PDQ-4)}
+\item{PARPD}{Paranoid PD Symptoms (PDQ-4+)}
+\item{SCZPD}{Schizoid PD Symptoms (PDQ-4+)}
+\item{SZTPD}{Schizotypal PD Symptoms (PDQ-4+)}
+\item{ASPD}{Antisocial PD Symptoms (PDQ-4+)}
+\item{BORPD}{Borderline PD Symptoms (PDQ-4+)}
+\item{HISPD}{Histrionic PD Symptoms (PDQ-4+)}
+\item{NARPD}{Narcissistic PD Symptoms (PDQ-4+)}
+\item{AVPD}{Avoidant PD Symptoms (PDQ-4+)}
+\item{DPNPD}{Dependent PD Symptoms (PDQ-4+)}
+\item{OCPD}{Obsessive-Compulsive PD Symptoms (PDQ-4+)}
 }}
 \source{
 \url{https://doi.org/10.1177/1073191115621795}
@@ -34,8 +34,7 @@ jz2017
 }
 \description{
 A large example dataset containing gender, raw mean scores on the Inventory
-of Interpersonal Problems - Short Circumplex (IIP-SC), and raw scores on the
-Personality Diagnostic Questionnaire (PDQ-4). Taken from Zimmermann & Wright
-(2017).
+of Interpersonal Problems - Short Circumplex (IIP-SC), and raw sum scores on
+the Personality Diagnostic Questionnaire - 4th Edition Plus (PDQ-4+).
 }
 \keyword{datasets}

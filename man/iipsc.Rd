@@ -21,7 +21,7 @@ iipsc
 \description{
 Means and standard deviations for the octant scales of the Inventory of
 Interpersonal Problems - Short Circumplex (IIP-SC). Norms correspond to data
-from 872 college students. Taken from Hopwood, Pincus, DeMoor, & Koonce
-(2008).
+from 872 American college students. Note that these norms assume that mean
+scale scores are used rather than sum scale scores. Scores range from 0 to 4.
 }
 \keyword{datasets}
