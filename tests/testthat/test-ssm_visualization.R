@@ -56,11 +56,8 @@ test_that("Removing plots with low fit works as expected", {
   
   data("jz2017")
   
-  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, OCPD))
-  expect_message(ssm_plot(res), "One or more profiles were not plotted*")
-  
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = OCPD)
-  expect_error(ssm_plot(res), "After removing profiles, *")
+  expect_error(ssm_plot(res, lowfit = FALSE), "After removing profiles, *")
   
 })
 
