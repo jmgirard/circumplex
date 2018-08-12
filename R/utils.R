@@ -84,7 +84,8 @@ quadrants <- function() {
 #' 
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
-#'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#'   variables in \code{.data} that contain circumplex scales to be
+#'   standardized.
 #' @param angles Required. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in \code{scales} (in degrees).
 #' @param norms Required. A data frame containing normative data for each
@@ -96,7 +97,7 @@ quadrants <- function() {
 #' @examples 
 #' data("jz2017")
 #' data("iipsc")
-#' z <- standardize(jz2017, scales = PA:NO, angles = octants(), norms = iipsc)
+#' standardize(jz2017, scales = PA:NO, angles = octants(), norms = iipsc)
 standardize <- function(.data, scales, angles, norms) {
   scales_en <- rlang::enquo(scales)
   scale_names <- names(dplyr::select(.data, !!scales_en))
