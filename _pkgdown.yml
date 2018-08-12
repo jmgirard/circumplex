@@ -28,6 +28,11 @@ reference:
       - ssm_plot_circle
       - ssm_plot_contrast
       - html_render
+  - title: Tidying Functions
+    desc: Functions for preparing data for analysis
+    contents:
+      - standardize
+      - ipsatize
   - title: Convenience Functions
     desc: Functions that make your life easier
     contents:
@@ -38,6 +43,9 @@ reference:
     contents:
       - aw2009
       - jz2017
+  - title: Normative Data
+    contents:
+      - iipsc
 
 navbar:
   title: ~
