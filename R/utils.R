@@ -114,6 +114,33 @@ standardize <- function(.data, scales, angles, norms) {
   .data
 }
 
+#' Ipsatize circumplex scales using deviation scoring across variables
+#' 
+#' Description.
+#' 
+#' @param .data Required. A data frame containing at least circumplex scales.
+#' @param scales Required. The variable names or column numbers for the
+#'   variables in \code{.data} that contain circumplex scales to be ipsatized.
+#' @return A data frame that matches \code{.data} except that the variables
+#'   included in \code{scales} have been transformed into ipsatized scores.
+#' @export
+#' @examples 
+#' data("jz2017")
+#' ipsatize(jz2017, PA:NO)
+ipsatize <- function(.data, scales) {
+  scales_en <- rlang::enquo(scales)
+  .data <- .data %>% 
+    dplyr::rowwise() %>% 
+    dplyr::mutate(.sm = mean(!!scales_en)) %>% 
+    dplyr::mutate_at(
+      .vars = dplyr::vars(!!scales_en),
+      .funs = dplyr::funs(. - .sm)
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::select(-.sm)
+  .data
+}
+
 # Compute differences between two sets of SSM parameters -----------------------
 param_diff <- function(p1, p2) {
   assert_that(is.numeric(p1), is.numeric(p2))
