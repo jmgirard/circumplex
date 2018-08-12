@@ -5,7 +5,7 @@
 \title{Create a Circular Plot of SSM Results}
 \usage{
 ssm_plot_circle(.ssm_object, amax = NULL, fontsize = 12,
-  lowfit = FALSE)
+  lowfit = TRUE)
 }
 \arguments{
 \item{.ssm_object}{The output of \code{ssm_profiles()} or
@@ -19,7 +19,7 @@ labels are drawn.}
 the text labels (default = 12).}
 
 \item{lowfit}{A logical determining whether profiles with low model fit
-(<.70) should be plotted (default = FALSE).}
+(<.70) should be plotted, with dashed borders (default = TRUE).}
 }
 \value{
 A ggplot variable containing a completed circular plot.

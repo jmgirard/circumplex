@@ -57,11 +57,11 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #' @param fontsize A positive real number corresponding to the size (in pt) of
 #'   the text labels (default = 12).
 #' @param lowfit A logical determining whether profiles with low model fit
-#'   (<.70) should be plotted (default = FALSE).
+#'   (<.70) should be plotted, with dashed borders (default = TRUE).
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
-  lowfit = FALSE) {
+  lowfit = TRUE) {
   
   df <- .ssm_object$results
   angles <- as.numeric(.ssm_object$details$angles)
@@ -92,11 +92,6 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
     df_plot <- df_plot %>% 
       dplyr::filter(fit >= .70)
     n2 <- nrow(df_plot)
-    if (n2 < n) {
-      message(c("WARNING: One or more profiles were not plotted due to having ",
-        "low prototypicality (fit < 0.70).\n\n  Hint: You can force these ",
-        "profiles to plot by setting the 'lowfit' argument to TRUE."))
-    }
     if (n2 < 1) {
       stop("After removing profiles, there were none left to plot.")
     }
