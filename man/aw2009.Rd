@@ -6,14 +6,14 @@
 \title{Standardized octant scores on hypothetical circumplex scales}
 \format{A data frame with 5 observations and 8 variables:
 \describe{
-\item{PA}{circumplex scale at displacement 90}
-\item{BC}{circumplex scale at displacement 135}
-\item{DE}{circumplex scale at displacement 180}
-\item{FG}{circumplex scale at displacement 225}
-\item{HI}{circumplex scale at displacement 270}
-\item{JK}{circumplex scale at displacement 315}
-\item{LM}{circumplex scale at displacement 360}
-\item{NO}{circumplex scale at displacement 45}
+\item{PA}{circumplex scale at 90 degrees}
+\item{BC}{circumplex scale at 135 degrees}
+\item{DE}{circumplex scale at 180 degrees}
+\item{FG}{circumplex scale at 225 degrees}
+\item{HI}{circumplex scale at 270 degrees}
+\item{JK}{circumplex scale at 315 degrees}
+\item{LM}{circumplex scale at 360 degrees}
+\item{NO}{circumplex scale at 45 degrees}
 }}
 \source{
 \url{https://doi.org/10.1080/00223890902935696}

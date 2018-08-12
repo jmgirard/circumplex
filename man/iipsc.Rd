@@ -8,7 +8,7 @@
 \describe{
 \item{Scale}{Text description (name) of the scale}
 \item{Abbrev}{Text abbreviation of the scale name}
-\item{Angle}{Angular displacement of the scale (in degrees)}
+\item{Angle}{Angle of the scale (in degrees)}
 \item{M}{Normative mean for the scale}
 \item{SD}{Normative standard deviation for the scale}
 }}
