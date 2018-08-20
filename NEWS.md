@@ -1,19 +1,23 @@
-circumplex 0.1.2.9001
+circumplex 0.1.2.9002
 =============================
 
 ### NEW FEATURES
 
-* Add function to standardize() circumplex scales
-* Add function to ipsatize() circumplex scales
+* Added function to standardize() circumplex scales
+* Added function to ipsatize() circumplex scales
+
+### BUG FIXES
+
+* Changed OpenMP flags in Makevars to fix a compile problem on Debian machines.
 
 ### MINOR IMPROVEMENTS
 
-* Change the default to plot profiles with low fit (but with dashed borders).
+* Changed the default to plot profiles with low fit (but with dashed borders).
 
 ### DOCUMENTATION FIXES
 
-* Reformat "Functions and Data" on package website
-* Update vignettes to use the standardize() function
+* Reformatted "Functions and Data" on package website
+* Updated vignettes to use the standardize() function
 
 circumplex 0.1.2
 =============================
@@ -24,8 +28,8 @@ circumplex 0.1.2
 
 ### BUG FIXES
 
-* Fix bug that prevented compilation on Solaris systems
-* Fix bug that prevented CRAN checks on old R versions
+* Fixed bug that prevented compilation on Solaris systems
+* Fixed bug that prevented CRAN checks on old R versions
 
 ### DOCUMENTATION FIXES
 
@@ -40,7 +44,7 @@ circumplex 0.1.1
 
 ### DOCUMENTATION FIXES
 
-* Fix documentation to meet CRAN standards
+* Fixed documentation to meet CRAN standards
 
 circumplex 0.1.0
 =============================
