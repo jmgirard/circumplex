@@ -28,13 +28,13 @@ Imports:
     magrittr (>= 1.5),
     purrr (>= 0.2.5),
     Rcpp (>= 0.12.18),
-    rlang (>= 0.2.1),
+    rlang (>= 0.2.2),
     stats,
     tibble (>= 1.4.2),
     tidyr (>= 0.8.1)
 LinkingTo: 
     Rcpp (>= 0.12.18),
-    RcppArmadillo (>= 0.8.600.0.0)
+    RcppArmadillo (>= 0.9.100.5.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0
 Suggests: 
