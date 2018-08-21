@@ -36,17 +36,13 @@ Imports:
     ggplot2 (>= 3.0.0),
     htmlTable (>= 1.12),
     magrittr (>= 1.5),
+    MASS,
     purrr (>= 0.2.5),
     Rcpp (>= 0.12.18),
     rlang (>= 0.2.2),
     stats,
     tibble (>= 1.4.2),
     tidyr (>= 0.8.1)
-LinkingTo: 
-    Rcpp (>= 0.12.18),
-    RcppArmadillo (>= 0.9.100.5.0)
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.0
 Suggests: 
     covr (>= 3.1.0),
     forcats (>= 0.3.0),
@@ -55,4 +51,10 @@ Suggests:
     psych (>= 1.8.4),
     rmarkdown (>= 1.10),
     testthat (>= 2.0.0)
-VignetteBuilder: knitr
+LinkingTo: 
+    Rcpp (>= 0.12.18),
+    RcppArmadillo (>= 0.9.100.5.0)
+VignetteBuilder: 
+    knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.0
