@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Ipsatize circumplex scales using deviation scoring across variables — ipsatize • circumplex</title>
+<title>Ipsatize circumplex items using deviation scoring across variables — ipsatize • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,7 +36,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Ipsatize circumplex scales using deviation scoring across variables — ipsatize" />
+<meta property="og:title" content="Ipsatize circumplex items using deviation scoring across variables — ipsatize" />
 
 <meta property="og:description" content="Description." />
 
@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9001</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9003</span>
       </span>
     </div>
 
@@ -123,7 +123,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Ipsatize circumplex scales using deviation scoring across variables</h1>
+    <h1>Ipsatize circumplex items using deviation scoring across variables</h1>
     <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
     <div class="hidden name"><code>ipsatize.Rd</code></div>
     </div>
@@ -134,7 +134,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>ipsatize</span>(<span class='no'>.data</span>, <span class='no'>scales</span>)</pre>
+    <pre class="usage"><span class='fu'>ipsatize</span>(<span class='no'>.data</span>, <span class='no'>items</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,35 +144,21 @@
       <td><p>Required. A data frame containing at least circumplex scales.</p></td>
     </tr>
     <tr>
-      <th>scales</th>
+      <th>items</th>
       <td><p>Required. The variable names or column numbers for the
-variables in <code>.data</code> that contain circumplex scales to be ipsatized.</p></td>
+variables in <code>.data</code> that contain circumplex items to be ipsatized.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A data frame that matches <code>.data</code> except that the variables
-included in <code>scales</code> have been transformed into ipsatized scores.</p>
+included in <code>items</code> have been transformed into ipsatized scores.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='st'>"jz2017"</span>)
-<span class='fu'>ipsatize</span>(<span class='no'>jz2017</span>, <span class='no'>PA</span>:<span class='no'>NO</span>)</div><div class='output co'>#&gt; # A tibble: 1,166 x 19
-#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD
-#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
-#&gt;  1 Female  -0.5 -0.5  -0.75 -1     0     0.5   0.25  0.5      4     3     7
-#&gt;  2 Female  -1   -0.75 -1    -0.75  0.25  0.75  1.25  1.25     1     0     2
-#&gt;  3 Female   0    0     0     0     0     0     0     0        0     1     0
-#&gt;  4 Male     0   -0.25 -0.25  0.5   0    -0.25  0     0.5      1     0     0
-#&gt;  5 Female   0    0.25  0    -0.25 -0.25 -0.25 -0.25 -0.25     0     0     0
-#&gt;  6 Male    -0.5 -0.25  0.25 -0.25  0    -0.75  0.25  0.5      5     5     7
-#&gt;  7 Male     0   -0.25 -0.25  0    -0.5  -0.75 -0.75 -0.25     3     6     7
-#&gt;  8 Female  -0.5 -0.25 -0.25 -0.25  0.5   0.75  0.75  0.5      0     0     1
-#&gt;  9 Female   0    0     0     0     0.25  0.25  1     0        0     1     0
-#&gt; 10 Male    -0.5  0.75  0.5   1.25  0.75  0.25  0.75  1        4     5     5
-#&gt; # ... with 1,156 more rows, and 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,
-#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</div></pre>
+<span class='fu'>ipsatize</span>(<span class='no'>jz2017</span>, <span class='no'>PA</span>:<span class='no'>NO</span>)</div><div class='output co'>#&gt; <span class='error'>Error in is_character(x): object '.sm' not found</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Angular displacements for quadrant circumplex scales — quadrants • circumplex</title>
+<title>Test circumplex fit using the RANDALL Concordance Index — fit_randall • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,11 +36,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Angular displacements for quadrant circumplex scales — quadrants" />
+<meta property="og:title" content="Test circumplex fit using the RANDALL Concordance Index — fit_randall" />
 
-<meta property="og:description" content="Return a vector of angular displacements, in degrees, for four equally spaced
-circumplex scales corresponding to the circumplex quadrants. Can be passed to
-the angles parameter of other functions in this package." />
+<meta property="og:description" content="Conduct the Randomization Test of Hypothesized Order Relations (RANDALL).
+Estimate the RANDALL Concordance Index using a Monte-Carlo-based bootstrap
+procedure and estimate its percentile confidence interval." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -125,38 +125,82 @@ the angles parameter of other functions in this package." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Angular displacements for quadrant circumplex scales</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>quadrants.Rd</code></div>
+    <h1>Test circumplex fit using the RANDALL Concordance Index</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/fit_analysis.R'><code>R/fit_analysis.R</code></a></small>
+    <div class="hidden name"><code>fit_randall.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Return a vector of angular displacements, in degrees, for four equally spaced
-circumplex scales corresponding to the circumplex quadrants. Can be passed to
-the <code>angles</code> parameter of other functions in this package.</p>
+    <p>Conduct the Randomization Test of Hypothesized Order Relations (RANDALL).
+Estimate the RANDALL Concordance Index using a Monte-Carlo-based bootstrap
+procedure and estimate its percentile confidence interval.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>quadrants</span>()</pre>
-        
+    <pre class="usage"><span class='fu'>fit_randall</span>(<span class='no'>.data</span>, <span class='no'>scales</span>, <span class='kw'>boots</span> <span class='kw'>=</span> <span class='fl'>2000</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
+  <span class='kw'>listwise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>tolerance</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>.data</th>
+      <td><p>Required. A data frame containing at least circumplex scales.</p></td>
+    </tr>
+    <tr>
+      <th>scales</th>
+      <td><p>Required. The variable names or column numbers for the
+variables in <code>.data</code> that contain circumplex scales to be analyzed.</p></td>
+    </tr>
+    <tr>
+      <th>boots</th>
+      <td><p>Optional. A single positive integer indicating how many
+bootstrap resamples to use when estimating the confidence intervals
+(default = 2000).</p></td>
+    </tr>
+    <tr>
+      <th>interval</th>
+      <td><p>Optional. A single positive number between 0 and 1
+(exclusive) that indicates what confidence level to use when estimating the
+confidence intervals (default = 0.95).</p></td>
+    </tr>
+    <tr>
+      <th>tolerance</th>
+      <td><p>Optional. Tolerance (relative to largest variance) for
+numerical lack of positive-definiteness in the correlation matrix computed
+among <code>scales</code> (default = 0.1). See <code><a href='http://www.rdocumentation.org/packages/MASS/topics/mvrnorm'>MASS::mvrnorm</a></code>.</p></td>
+    </tr>
+    </table>
+    
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A numeric vector with eight elements, each corresponding to the
-angular displacement (in degrees) of a subscale, in the following order:
-BC, FG, JK, NO.</p>
+    <p>A three-element vector containing the mean concordance index, the
+lower bound of the confidence interval, and the upper bound of the
+confidence interval. (Will soon be replaced by a list object.)</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other fit functions: <code><a href='fit_fisher.html'>fit_fisher</a></code>,
+  <code><a href='fit_gap.html'>fit_gap</a></code>, <code><a href='fit_rt.html'>fit_rt</a></code>,
+  <code><a href='fit_vt.html'>fit_vt</a></code></p>
+<p>Other analysis functions: <code><a href='fit_fisher.html'>fit_fisher</a></code>,
+  <code><a href='fit_gap.html'>fit_gap</a></code>, <code><a href='fit_rt.html'>fit_rt</a></code>,
+  <code><a href='fit_vt.html'>fit_vt</a></code>, <code><a href='ssm_analyze.html'>ssm_analyze</a></code></p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>quadrants</span>()</div><div class='output co'>#&gt; [1] 135 225 315  45
-#&gt; attr(,"class")
-#&gt; [1] "degree"  "numeric"</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='st'>"jz2017"</span>)
+<span class='fu'>fit_randall</span>(<span class='kw'>.data</span> <span class='kw'>=</span> <span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>)</div><div class='output co'>#&gt; [1] 0.8055556 0.7569444 0.8402778</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>
