@@ -115,27 +115,27 @@ standardize <- function(.data, scales, angles, norms) {
   .data
 }
 
-#' Ipsatize circumplex scales using deviation scoring across variables
+#' Ipsatize circumplex items using deviation scoring across variables
 #' 
 #' Description.
 #' 
 #' @param .data Required. A data frame containing at least circumplex scales.
-#' @param scales Required. The variable names or column numbers for the
-#'   variables in \code{.data} that contain circumplex scales to be ipsatized.
+#' @param items Required. The variable names or column numbers for the
+#'   variables in \code{.data} that contain circumplex items to be ipsatized.
 #' @return A data frame that matches \code{.data} except that the variables
-#'   included in \code{scales} have been transformed into ipsatized scores.
+#'   included in \code{items} have been transformed into ipsatized scores.
 #' @export
 #' @examples 
 #' data("jz2017")
 #' ipsatize(jz2017, PA:NO)
-ipsatize <- function(.data, scales) {
-  scales_en <- rlang::enquo(scales)
+ipsatize <- function(.data, items) {
+  items_en <- rlang::enquo(items)
   .data <- .data %>% 
     dplyr::rowwise() %>% 
-    dplyr::mutate(.sm = mean(!!scales_en)) %>% 
+    dplyr::mutate(.im = mean(!!items_en)) %>% 
     dplyr::mutate_at(
-      .vars = dplyr::vars(!!scales_en),
-      .funs = dplyr::funs(. - .sm)
+      .vars = dplyr::vars(!!items_en),
+      .funs = dplyr::funs(. - .im)
     ) %>% 
     dplyr::ungroup() %>% 
     dplyr::select(-.sm)

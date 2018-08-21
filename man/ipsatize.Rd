@@ -2,19 +2,19 @@
 % Please edit documentation in R/utils.R
 \name{ipsatize}
 \alias{ipsatize}
-\title{Ipsatize circumplex scales using deviation scoring across variables}
+\title{Ipsatize circumplex items using deviation scoring across variables}
 \usage{
-ipsatize(.data, scales)
+ipsatize(.data, items)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
 
-\item{scales}{Required. The variable names or column numbers for the
-variables in \code{.data} that contain circumplex scales to be ipsatized.}
+\item{items}{Required. The variable names or column numbers for the
+variables in \code{.data} that contain circumplex items to be ipsatized.}
 }
 \value{
 A data frame that matches \code{.data} except that the variables
-included in \code{scales} have been transformed into ipsatized scores.
+included in \code{items} have been transformed into ipsatized scores.
 }
 \description{
 Description.
