@@ -1,8 +1,13 @@
-circumplex 0.1.2.9002
+circumplex 0.1.2.9003
 =============================
 
 ### NEW FEATURES
 
+* Added function to conduct the Fisher Test of equal axes
+* Added function to conduct the Gap Test of interstitiality
+* Added function to conduct the Rotation Test of interstitiality
+* Added function to conduct the Variance Test of interstitiality
+* Added function to conduct the RANDALL Test of circumplex fit
 * Added function to standardize() circumplex scales
 * Added function to ipsatize() circumplex scales
 
