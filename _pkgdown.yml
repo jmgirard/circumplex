@@ -28,6 +28,14 @@ reference:
       - ssm_plot_circle
       - ssm_plot_contrast
       - html_render
+  - title: Circumplex Fit Functions
+    desc: Functions for testing for circumplex structure
+    contents:
+      - fit_fisher
+      - fit_gap
+      - fit_rt
+      - fit_vt
+      - fit_randall
   - title: Tidying Functions
     desc: Functions for preparing data for analysis
     contents:

@@ -17,10 +17,21 @@ get_rotation <- function(lambda, angle) {
   lambda %*% rot
 }
 
-# Fisher Test of equal axes
-# Best if the data were ipsatized
-# less than .10 is almost certain equal axes
-# less than .15 is twice as likely
+#' Fisher Test of equal axes
+#' 
+#' Conduct the Fisher Test of equal axes. The test will have the most power if
+#' the items have been ipsatized first. See the \code{ipsatize} function. 
+#' Simulation studies suggest that test values less than 0.10 almost certainly
+#' indicate equal axes, whereas test values less than 0.15 indicate that equal
+#' axes are twice as likely as non-equal axes.
+#' 
+#' @param .data Required. A data frame containing at least circumplex scales.
+#' @param scales Required. The variable names or column numbers for the
+#'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @return A double
+#' @family fit functions
+#' @family analysis functions
+#' @export
 fit_fisher <- function(.data, scales) {
   scales_en <- rlang::enquo(scales)
   lambda <- get_loadings(.data, !!scales_en)
@@ -28,11 +39,21 @@ fit_fisher <- function(.data, scales) {
   sd(radius) / mean(radius)
 }
 
-# Gap Test of interstitiality
-# less than .03 is almost certian interstitiality
-# less than .05 is twice as likely
-# affected by the number of variables
-# from Upton & Fingleton 1989
+#' Gap Test of interstitiality
+#' 
+#' Conduct the Gap Test of interstitiality. The test will have the most power if
+#' the items have been ipsatized first. See the \code{ipsatize} function.
+#' Simulation studies suggest that values less than 0.03 almost certainly
+#' indicate equal axes, whereas test values less than 0.05 indicate that equal
+#' axes are twice as likely as non-equal axes.
+#' 
+#' @param .data Required. A data frame containing at least circumplex scales.
+#' @param scales Required. The variable names or column numbers for the
+#'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @return A double
+#' @family fit functions
+#' @family analysis functions
+#' @export
 fit_gap <- function(.data, scales) {
   scales_en <- rlang::enquo(scales)
   lambda <- get_loadings(.data, !!scales_en)
@@ -42,11 +63,24 @@ fit_gap <- function(.data, scales) {
   var(gaps)
 }
 
-# Variance Test of interstitiality
-# best with no general factor
-# less than .40 is almost certain interstitiality
-# less than .48 is three times as likely
-# less than .65 is twice as likely
+#' Variance Test of interstitiality
+#' 
+#' Conduct the Variance Test of interstitiality (sometimes called VT2). The test
+#' will have the most power if the items have been ipsatized first. See the 
+#' \code{ipsatize} function. It is also best in the absence of a general factor.
+#' Simulation studies suggest that test values less that 0.40 almost certainly
+#' indicate interstitiality, test values less than 0.48 indicate that
+#' interstitiality is three times as likely as non-interstitiality, and test
+#' values less than 0.65 indicate that interstitiality is twice as likely as
+#' non-interstitiality.
+#' 
+#' @param .data Required. A data frame containing at least circumplex scales.
+#' @param scales Required. The variable names or column numbers for the
+#'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @return A double
+#' @family fit functions
+#' @family analysis functions
+#' @export
 fit_vt <- function(.data, scales) {
   scales_en <- rlang::enquo(scales)
   lambda <- get_loadings(.data, !!scales_en)
@@ -61,6 +95,22 @@ fit_vt <- function(.data, scales) {
 # Rotation Test of interstitiality
 # less than .14 is almost certain interstitiality
 # less than .31 is twice as likely
+
+#' Rotation Test of interstitiality
+#' 
+#' Conduct the Rotation Test of interstitiality. The test will have the most
+#' power if the items have been ipsatized first. See the \code{ipsatize}
+#' function. Simulation studies suggest that test values less that 0.14 almost
+#' certainly indicate interstitiality, whereas test values less than 0.31
+#' indicate that interstitiality is twice  as likely as non-interstitiality.
+#' 
+#' @param .data Required. A data frame containing at least circumplex scales.
+#' @param scales Required. The variable names or column numbers for the
+#'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @return A double
+#' @family fit functions
+#' @family analysis functions
+#' @export
 fit_rt <- function(.data, scales) {
   scales_en <- rlang::enquo(scales)
   lambda <- get_loadings(.data, !!scales_en)

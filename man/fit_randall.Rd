@@ -40,7 +40,13 @@ data("jz2017")
 fit_randall(.data = jz2017, scales = PA:NO) 
 }
 \seealso{
-Other analysis functions: \code{\link{ssm_analyze}}
+Other fit functions: \code{\link{fit_fisher}},
+  \code{\link{fit_gap}}, \code{\link{fit_rt}},
+  \code{\link{fit_vt}}
+
+Other analysis functions: \code{\link{fit_fisher}},
+  \code{\link{fit_gap}}, \code{\link{fit_rt}},
+  \code{\link{fit_vt}}, \code{\link{ssm_analyze}}
 }
 \concept{analysis functions}
 \concept{fit functions}
