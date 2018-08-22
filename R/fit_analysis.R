@@ -36,7 +36,7 @@ fit_fisher <- function(.data, scales) {
   scales_en <- rlang::enquo(scales)
   lambda <- get_loadings(.data, !!scales_en)
   radius <- (lambda[, 1] ^ 2) + (lambda[, 2] ^ 2)
-  stats::sd(radius) / mean(radius)
+  sd(radius) / mean(radius)
 }
 
 #' Gap Test of interstitiality
@@ -87,9 +87,9 @@ fit_vt <- function(.data, scales) {
   criterion <- rep(0, 10)
   for (i in 0:9) {
     rlambda <- get_rotation(lambda, i * 5)
-    criterion[i] <- stats::var(rlambda[, 1] / sum(rlambda ^ 2))
+    criterion[i] <- var(rlambda[, 1] / sum(rlambda ^ 2))
   }
-  stats::sd(criterion) / mean(criterion)
+  sd(criterion) / mean(criterion)
 }
 
 # Rotation Test of interstitiality
@@ -119,7 +119,7 @@ fit_rt <- function(.data, scales) {
     rlambda <- get_rotation(lambda, i * 5)
     criterion[i] <- sum(apply(rlambda ^ 2, 1, var))
   }
-  stats::sd(criterion) / mean(criterion)
+  sd(criterion) / mean(criterion)
 }
 
 #' Test circumplex fit using the RANDALL Concordance Index

@@ -22,5 +22,5 @@
 #' @import assertthat
 #' @importFrom ggplot2 aes
 #' @importFrom Rcpp sourceCpp
-#' @importFrom stats quantile
+#' @importFrom stats cor quantile sd var
 "_PACKAGE"
