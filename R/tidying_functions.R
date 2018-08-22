@@ -65,13 +65,13 @@ score <- function(.data, items, key, na.rm = TRUE, prefix = "", suffix = "") {
   assert_that(is_provided(.data), is_enquo(!!items_en), is_provided(key))
   assert_that(is.flag(na.rm), is.string(prefix))
   
-  item_data <- .data %>% select(!!items_en)
+  item_data <- .data %>% dplyr::select(!!items_en)
   n_items <- ncol(item_data)
   for (i in 1:nrow(key)) {
     new_name <- rlang::sym(paste0(prefix, key$Abbrev[[i]], suffix))
     item_nums <- as.numeric(strsplit(key$Items[[i]], ",")[[1]])
     if (max(item_nums) > n_items) {
-      error("Key is asking for more items than were provided to function.")
+      stop("Key is asking for more items than were provided to function.")
     }
     scores <- item_data %>% 
       dplyr::transmute(!!new_name := rowMeans(item_data[, item_nums], na.rm))
