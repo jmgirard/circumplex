@@ -150,9 +150,11 @@ fit_rt <- function(.data, scales) {
 #' @family fit functions
 #' @family analysis functions
 #' @export
-#' @examples 
+#' @examples
+#' \donttest{
 #' data("jz2017")
 #' fit_randall(.data = jz2017, scales = PA:NO) 
+#' }
 fit_randall <- function(.data, scales, boots = 2000, interval = 0.95,
   listwise = TRUE, tolerance = 0.1) {
   
