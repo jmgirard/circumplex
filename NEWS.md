@@ -8,18 +8,19 @@ circumplex 0.1.2.9004
 * Added function to conduct the Rotation Test of interstitiality
 * Added function to conduct the Variance Test of interstitiality
 * Added function to conduct the RANDALL Test of circumplex fit
-* Added function to ipsatize() circumplex item responses
-* Added function to score() circumplex scales from item responses
-* Added function to standardize() circumplex scale scores
+* Added function to ipsatize circumplex item responses
+* Added function to score circumplex scales from item responses
+* Added function to standardize circumplex scale scores
 * Added scoring instructions for the IIP-SC
 
 ### BUG FIXES
 
-* Changed OpenMP flags in Makevars to fix a compile problem on Debian machines.
+* Changed OpenMP flags in Makevars to fix a compile problem on Debian machines
 
 ### MINOR IMPROVEMENTS
 
-* Changed the default to plot profiles with low fit (but with dashed borders).
+* Changed the default to plot profiles with low fit (but with dashed borders)
+* Import and export functions for tidy evaluation
 
 ### DOCUMENTATION FIXES
 
