@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9003</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9004</span>
       </span>
     </div>
 
@@ -206,11 +206,11 @@
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; Profile [All]:</span></a>
 <a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; Elevation        -0.225     -0.260     -0.190</span></a>
-<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; X-Value           0.131      0.097      0.164</span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.015     -0.049      0.020</span></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.131      0.098      0.168</span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Displacement    353.525    339.133      9.627</span></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; Elevation        -0.225     -0.258     -0.190</span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; X-Value           0.131      0.099      0.161</span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.015     -0.050      0.021</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.131      0.101      0.166</span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Displacement    353.525    339.351      9.929</span></a>
 <a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; Model Fit         0.710</span></a></code></pre></div>
 <p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017s</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputing their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code>set.seed()</code> function to control the random number generator in R.)</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">results2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017s, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>())</a>
@@ -226,11 +226,11 @@
 <a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; Profile [All]:</span></a>
 <a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; Elevation        -0.225     -0.259     -0.191</span></a>
-<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; X-Value           0.131      0.098      0.164</span></a>
-<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.015     -0.050      0.021</span></a>
-<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.131      0.099      0.167</span></a>
-<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; Displacement    353.525    339.118      9.434</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; Elevation        -0.225     -0.259     -0.192</span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; X-Value           0.131      0.099      0.163</span></a>
+<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.015     -0.048      0.020</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.131      0.100      0.166</span></a>
+<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; Displacement    353.525    339.270      9.278</span></a>
 <a class="sourceLine" id="cb5-19" data-line-number="19"><span class="co">#&gt; Model Fit         0.710</span></a></code></pre></div>
 </div>
 <div id="visualizing-the-results-with-a-table-and-figure" class="section level3">
@@ -282,7 +282,7 @@ All
 0.13 [0.10, 0.17]
 </td>
 <td style="text-align:left;">
-353.5 [339.1, 9.4]
+353.5 [339.3, 9.3]
 </td>
 <td style="text-align:left;">
 0.710
@@ -316,11 +316,11 @@ All
 <a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; Profile [NARPD]:</span></a>
 <a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
-<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="co">#&gt; Elevation         0.202      0.170      0.237</span></a>
-<a class="sourceLine" id="cb8-16" data-line-number="16"><span class="co">#&gt; X-Value          -0.062     -0.093     -0.030</span></a>
-<a class="sourceLine" id="cb8-17" data-line-number="17"><span class="co">#&gt; Y-Value           0.179      0.146      0.212</span></a>
-<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.189      0.155      0.224</span></a>
-<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="co">#&gt; Displacement    108.967     99.516    118.331</span></a>
+<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="co">#&gt; Elevation         0.202      0.169      0.236</span></a>
+<a class="sourceLine" id="cb8-16" data-line-number="16"><span class="co">#&gt; X-Value          -0.062     -0.092     -0.031</span></a>
+<a class="sourceLine" id="cb8-17" data-line-number="17"><span class="co">#&gt; Y-Value           0.179      0.145      0.212</span></a>
+<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.189      0.155      0.222</span></a>
+<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="co">#&gt; Displacement    108.967     99.637    118.049</span></a>
 <a class="sourceLine" id="cb8-20" data-line-number="20"><span class="co">#&gt; Model Fit         0.957</span></a></code></pre></div>
 <p>Note that this output looks very similar to the mean-based output except that the statistical basis is now correlation scores instead of mean scores and instead of saying “Profile [All]” it now says “Profile [NARPD]”.</p>
 </div>
@@ -370,10 +370,10 @@ NARPD
 0.18 [0.15, 0.21]
 </td>
 <td style="text-align:left;">
-0.19 [0.16, 0.22]
+0.19 [0.15, 0.22]
 </td>
 <td style="text-align:left;">
-109.0 [99.5, 118.3]
+109.0 [99.6, 118.0]
 </td>
 <td style="text-align:left;">
 0.957

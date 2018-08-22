@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Save a ggplot with sensible defaults — ggsave • circumplex</title>
+<title>Score circumplex scales from item responses — score • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,9 +36,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Save a ggplot with sensible defaults — ggsave" />
+<meta property="og:title" content="Score circumplex scales from item responses — score" />
 
-<meta property="og:description" content="See ggplot2 for details." />
+<meta property="og:description" content="Calculate mean scores on circumplex scales from item responses by using a
+set of scoring instructions, which may be loaded from the package or created
+as a custom data frame." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -123,27 +125,87 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Save a ggplot with sensible defaults</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>ggsave.Rd</code></div>
+    <h1>Score circumplex scales from item responses</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/tidying_functions.R'><code>R/tidying_functions.R</code></a></small>
+    <div class="hidden name"><code>score.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>See <code>ggplot2</code> for details.</p>
+    <p>Calculate mean scores on circumplex scales from item responses by using a
+set of scoring instructions, which may be loaded from the package or created
+as a custom data frame.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>ggsave</span>(<span class='no'>filename</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fu'>last_plot</span>(), <span class='kw'>device</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>scale</span>
-  <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>height</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>units</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"in"</span>, <span class='st'>"cm"</span>, <span class='st'>"mm"</span>), <span class='kw'>dpi</span> <span class='kw'>=</span> <span class='fl'>300</span>,
-  <span class='kw'>limitsize</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
-        
+    <pre class="usage"><span class='fu'>score</span>(<span class='no'>.data</span>, <span class='no'>items</span>, <span class='no'>key</span>, <span class='kw'>na.rm</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>prefix</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='st'>""</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>.data</th>
+      <td><p>Required. A data frame containing at least circumplex scales.</p></td>
+    </tr>
+    <tr>
+      <th>items</th>
+      <td><p>Required. The variable names or column numbers for the
+variables in <code>.data</code> that contain all the circumplex items from a
+single circumplex measure, in ascending order from item 1 to item N.</p></td>
+    </tr>
+    <tr>
+      <th>key</th>
+      <td><p>Required. A data frame containing information about each
+circumplex scale to be calculated from <code>items</code>. The following
+variables are required: <code>Abbrev</code> and <code>Items</code>. See <code><a href='iipsc.html'>?iipsc</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>na.rm</th>
+      <td><p>Optional. A logical that determines if missing values should be
+omitted from the calculation of scores (default = TRUE). When set to TRUE,
+scales with missing data are essentially calculated with mean imputation.</p></td>
+    </tr>
+    <tr>
+      <th>prefix</th>
+      <td><p>Optional. A string to include at the beginning of the newly
+calcualted scale variables' names, before <code>Abbrev</code> from <code>key</code>
+and <code>suffix</code> (default = "").</p></td>
+    </tr>
+    <tr>
+      <th>suffix</th>
+      <td><p>Optional. A string to include at the end of the newly
+calculated scale variables' names, after <code>Abbrev</code> from <code>key</code>
+and <code>prefix</code> (default = "").</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
+    <p>A data frame that matches <code>.data</code> except that new variables are
+appended that contain mean scores on each variable included in <code>key</code>.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other tidying functions: <code><a href='ipsatize.html'>ipsatize</a></code>,
+  <code><a href='standardize.html'>standardize</a></code></p></div>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'>#data("aw2012")</span>
+<span class='fu'>data</span>(<span class='st'>"iipsc"</span>)
+<span class='co'>#score(aw2012, IIP01:IIP32, iipsc)</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+
+      <li><a href="#see-also">See also</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

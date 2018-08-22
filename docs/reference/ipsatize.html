@@ -38,7 +38,10 @@
 
 <meta property="og:title" content="Ipsatize circumplex items using deviation scoring across variables — ipsatize" />
 
-<meta property="og:description" content="Description." />
+<meta property="og:description" content="Rescore each circumplex item using deviation scoring across variables. In
+other words, subtract each observation's mean response from each response.
+This effectively removes the presence of a general factor, which can make
+certain circumplex fit analyses more powerful." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9003</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9004</span>
       </span>
     </div>
 
@@ -124,13 +127,16 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Ipsatize circumplex items using deviation scoring across variables</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/tidying_functions.R'><code>R/tidying_functions.R</code></a></small>
     <div class="hidden name"><code>ipsatize.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Description.</p>
+    <p>Rescore each circumplex item using deviation scoring across variables. In
+other words, subtract each observation's mean response from each response.
+This effectively removes the presence of a general factor, which can make
+certain circumplex fit analyses more powerful.</p>
     
     </div>
 
@@ -152,27 +158,35 @@ variables in <code>.data</code> that contain circumplex items to be ipsatized.</
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame that matches <code>.data</code> except that the variables
-included in <code>items</code> have been transformed into ipsatized scores.</p>
+    <p>A data frame that matches <code>.data</code> except that new variables are
+appended that contain ipsatized versions of <code>items</code>. These new
+variables will have the same name as <code>items</code> but with a "_i" suffix.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other tidying functions: <code><a href='score.html'>score</a></code>,
+  <code><a href='standardize.html'>standardize</a></code></p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='st'>"jz2017"</span>)
-<span class='fu'>ipsatize</span>(<span class='no'>jz2017</span>, <span class='no'>PA</span>:<span class='no'>NO</span>)</div><div class='output co'>#&gt; # A tibble: 1,166 x 19
+<span class='fu'>ipsatize</span>(<span class='no'>jz2017</span>, <span class='no'>PA</span>:<span class='no'>NO</span>)</div><div class='output co'>#&gt; # A tibble: 1,166 x 27
 #&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD
 #&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
-#&gt;  1 Female  -0.5 -0.5  -0.75 -1     0     0.5   0.25  0.5      4     3     7
-#&gt;  2 Female  -1   -0.75 -1    -0.75  0.25  0.75  1.25  1.25     1     0     2
-#&gt;  3 Female   0    0     0     0     0     0     0     0        0     1     0
-#&gt;  4 Male     0   -0.25 -0.25  0.5   0    -0.25  0     0.5      1     0     0
-#&gt;  5 Female   0    0.25  0    -0.25 -0.25 -0.25 -0.25 -0.25     0     0     0
-#&gt;  6 Male    -0.5 -0.25  0.25 -0.25  0    -0.75  0.25  0.5      5     5     7
-#&gt;  7 Male     0   -0.25 -0.25  0    -0.5  -0.75 -0.75 -0.25     3     6     7
-#&gt;  8 Female  -0.5 -0.25 -0.25 -0.25  0.5   0.75  0.75  0.5      0     0     1
-#&gt;  9 Female   0    0     0     0     0.25  0.25  1     0        0     1     0
-#&gt; 10 Male    -0.5  0.75  0.5   1.25  0.75  0.25  0.75  1        4     5     5
-#&gt; # ... with 1,156 more rows, and 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,
-#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</div></pre>
+#&gt;  1 Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7
+#&gt;  2 Female  0     0.25  0     0.25  1.25  1.75  2.25  2.25     1     0     2
+#&gt;  3 Female  0     0     0     0     0     0     0     0        0     1     0
+#&gt;  4 Male    2     1.75  1.75  2.5   2     1.75  2     2.5      1     0     0
+#&gt;  5 Female  0.25  0.5   0.25  0     0     0     0     0        0     0     0
+#&gt;  6 Male    1.5   1.75  2.25  1.75  2     1.25  2.25  2.5      5     5     7
+#&gt;  7 Male    2     1.75  1.75  2     1.5   1.25  1.25  1.75     3     6     7
+#&gt;  8 Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1
+#&gt;  9 Female  0     0     0     0     0.25  0.25  1     0        0     1     0
+#&gt; 10 Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5
+#&gt; # ... with 1,156 more rows, and 15 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,
+#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;, PA_i &lt;dbl&gt;,
+#&gt; #   BC_i &lt;dbl&gt;, DE_i &lt;dbl&gt;, FG_i &lt;dbl&gt;, HI_i &lt;dbl&gt;, JK_i &lt;dbl&gt;, LM_i &lt;dbl&gt;,
+#&gt; #   NO_i &lt;dbl&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -180,6 +194,8 @@ included in <code>items</code> have been transformed into ipsatized scores.</p>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>
