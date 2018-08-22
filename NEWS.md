@@ -1,4 +1,4 @@
-circumplex 0.1.2.9003
+circumplex 0.1.2.9004
 =============================
 
 ### NEW FEATURES
@@ -8,8 +8,10 @@ circumplex 0.1.2.9003
 * Added function to conduct the Rotation Test of interstitiality
 * Added function to conduct the Variance Test of interstitiality
 * Added function to conduct the RANDALL Test of circumplex fit
-* Added function to standardize() circumplex scales
-* Added function to ipsatize() circumplex scales
+* Added function to ipsatize() circumplex item responses
+* Added function to score() circumplex scales from item responses
+* Added function to standardize() circumplex scale scores
+* Added scoring instructions for the IIP-SC
 
 ### BUG FIXES
 
