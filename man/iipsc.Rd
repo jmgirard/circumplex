@@ -11,6 +11,7 @@
 \item{Angle}{Angle of the scale (in degrees)}
 \item{M}{Normative mean for the scale}
 \item{SD}{Normative standard deviation for the scale}
+\item{Items}{A comma-separated list of item numbers}
 }}
 \source{
 \url{https://doi.org/10.1080/00223890802388665}
