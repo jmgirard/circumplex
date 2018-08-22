@@ -166,6 +166,13 @@ bootstrap resamples to use when estimating the confidence intervals
 confidence intervals (default = 0.95).</p></td>
     </tr>
     <tr>
+      <th>listwise</th>
+      <td><p>Optional. A logical indicating whether missing values should
+be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
+that pairwise deletion may result in different missing data patterns in
+each bootstrap resample and is slower to compute (default = TRUE).</p></td>
+    </tr>
+    <tr>
       <th>tolerance</th>
       <td><p>Optional. Tolerance (relative to largest variance) for
 numerical lack of positive-definiteness in the correlation matrix computed

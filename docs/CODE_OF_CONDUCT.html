@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Ipsatize circumplex items using deviation scoring across variables — ipsatize • circumplex</title>
+<title>Contributor Code of Conduct • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -25,20 +25,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script>
+<link href="pkgdown.css" rel="stylesheet">
+<script src="pkgdown.js"></script>
 
 
 <!-- docsearch -->
-<script src="../docsearch.js"></script>
+<script src="docsearch.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
-<link href="../docsearch.css" rel="stylesheet">
+<link href="docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Ipsatize circumplex items using deviation scoring across variables — ipsatize" />
-
-<meta property="og:description" content="Description." />
+<meta property="og:title" content="Contributor Code of Conduct" />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -57,7 +55,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-topic">
+    <div class="container template-title-body">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -68,7 +66,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">circumplex</a>
+        <a class="navbar-link" href="index.html">circumplex</a>
         <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9003</span>
       </span>
     </div>
@@ -76,7 +74,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../reference/index.html">Functions and data</a>
+  <a href="reference/index.html">Functions and data</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -86,15 +84,15 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
+      <a href="articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
     </li>
     <li>
-      <a href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a>
+      <a href="articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="news/index.html">News</a>
 </li>
       </ul>
       
@@ -121,71 +119,25 @@
       </header>
 
 <div class="row">
-  <div class="col-md-9 contents">
+  <div class="contents col-md-9">
     <div class="page-header">
-    <h1>Ipsatize circumplex items using deviation scoring across variables</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>ipsatize.Rd</code></div>
+      <h1>Contributor Code of Conduct</h1>
     </div>
 
-    <div class="ref-description">
-    
-    <p>Description.</p>
-    
-    </div>
+<div id="contributor-code-of-conduct" class="section level1">
 
-    <pre class="usage"><span class='fu'>ipsatize</span>(<span class='no'>.data</span>, <span class='no'>items</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>.data</th>
-      <td><p>Required. A data frame containing at least circumplex scales.</p></td>
-    </tr>
-    <tr>
-      <th>items</th>
-      <td><p>Required. The variable names or column numbers for the
-variables in <code>.data</code> that contain circumplex items to be ipsatized.</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A data frame that matches <code>.data</code> except that the variables
-included in <code>items</code> have been transformed into ipsatized scores.</p>
-    
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='st'>"jz2017"</span>)
-<span class='fu'>ipsatize</span>(<span class='no'>jz2017</span>, <span class='no'>PA</span>:<span class='no'>NO</span>)</div><div class='output co'>#&gt; # A tibble: 1,166 x 19
-#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD
-#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
-#&gt;  1 Female  -0.5 -0.5  -0.75 -1     0     0.5   0.25  0.5      4     3     7
-#&gt;  2 Female  -1   -0.75 -1    -0.75  0.25  0.75  1.25  1.25     1     0     2
-#&gt;  3 Female   0    0     0     0     0     0     0     0        0     1     0
-#&gt;  4 Male     0   -0.25 -0.25  0.5   0    -0.25  0     0.5      1     0     0
-#&gt;  5 Female   0    0.25  0    -0.25 -0.25 -0.25 -0.25 -0.25     0     0     0
-#&gt;  6 Male    -0.5 -0.25  0.25 -0.25  0    -0.75  0.25  0.5      5     5     7
-#&gt;  7 Male     0   -0.25 -0.25  0    -0.5  -0.75 -0.75 -0.25     3     6     7
-#&gt;  8 Female  -0.5 -0.25 -0.25 -0.25  0.5   0.75  0.75  0.5      0     0     1
-#&gt;  9 Female   0    0     0     0     0.25  0.25  1     0        0     1     0
-#&gt; 10 Male    -0.5  0.75  0.5   1.25  0.75  0.25  0.75  1        4     5     5
-#&gt; # ... with 1,156 more rows, and 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,
-#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</div></pre>
-  </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-  </div>
+<p>As contributors and maintainers of this project, we pledge to respect all people who contribute through reporting issues, posting feature requests, updating documentation, submitting pull requests or patches, and other activities.</p>
+<p>We are committed to making participation in this project a harassment-free experience for everyone, regardless of level of experience, gender, gender identity and expression, sexual orientation, disability, personal appearance, body size, race, ethnicity, age, or religion.</p>
+<p>Examples of unacceptable behavior by participants include the use of sexual language or imagery, derogatory comments or personal attacks, trolling, public or private harassment, insults, or other unprofessional conduct.</p>
+<p>Project maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct. Project maintainers who do not follow the Code of Conduct may be removed from the project team.</p>
+<p>Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by opening an issue or contacting one or more of the project maintainers.</p>
+<p>This Code of Conduct is adapted from the Contributor Covenant (<a href="http://contributor-covenant.org" class="uri">http://contributor-covenant.org</a>), version 1.0.0, available at <a href="http://contributor-covenant.org/version/1/0/0/" class="uri">http://contributor-covenant.org/version/1/0/0/</a></p>
 </div>
+
+  </div>
+
+</div>
+
 
       <footer>
       <div class="copyright">
