@@ -39,7 +39,7 @@ set of scoring instructions, which may be loaded from the package or created
 as a custom data frame.
 }
 \examples{
-data("aw2012")
+#data("aw2012")
 data("iipsc")
 #score(aw2012, IIP01:IIP32, iipsc)
 }

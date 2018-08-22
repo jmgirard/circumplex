@@ -56,7 +56,7 @@ ipsatize <- function(.data, items) {
 #' @family tidying functions
 #' @export
 #' @examples
-#' data("aw2012")
+#' #data("aw2012")
 #' data("iipsc")
 #' #score(aw2012, IIP01:IIP32, iipsc)
 score <- function(.data, items, key, na.rm = TRUE, prefix = "", suffix = "") {
