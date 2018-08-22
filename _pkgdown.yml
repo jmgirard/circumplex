@@ -39,8 +39,9 @@ reference:
   - title: Tidying Functions
     desc: Functions for preparing data for analysis
     contents:
-      - standardize
       - ipsatize
+      - score
+      - standardize
   - title: Convenience Functions
     desc: Functions that make your life easier
     contents:
