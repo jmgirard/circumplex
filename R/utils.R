@@ -138,7 +138,7 @@ ipsatize <- function(.data, items) {
       .funs = dplyr::funs(. - .im)
     ) %>% 
     dplyr::ungroup() %>% 
-    dplyr::select(-.sm)
+    dplyr::select(-.im)
   .data
 }
 
