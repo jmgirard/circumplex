@@ -21,6 +21,11 @@ bootstrap resamples to use when estimating the confidence intervals
 (exclusive) that indicates what confidence level to use when estimating the
 confidence intervals (default = 0.95).}
 
+\item{listwise}{Optional. A logical indicating whether missing values should
+be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
+that pairwise deletion may result in different missing data patterns in
+each bootstrap resample and is slower to compute (default = TRUE).}
+
 \item{tolerance}{Optional. Tolerance (relative to largest variance) for
 numerical lack of positive-definiteness in the correlation matrix computed
 among \code{scales} (default = 0.1). See \code{MASS::mvrnorm}.}
