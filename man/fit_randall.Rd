@@ -41,8 +41,10 @@ Estimate the RANDALL Concordance Index using a Monte-Carlo-based bootstrap
 procedure and estimate its percentile confidence interval.
 }
 \examples{
+\donttest{
 data("jz2017")
 fit_randall(.data = jz2017, scales = PA:NO) 
+}
 }
 \seealso{
 Other fit functions: \code{\link{fit_fisher}},
