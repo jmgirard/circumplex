@@ -1,10 +1,18 @@
 
-get_loadings <- function(.data, scales) {
+get_loadings <- function(.data, scales, ridge = 0) {
   scales_en <- rlang::enquo(scales)
-  fit <- .data %>% 
+  rmat <- .data %>% 
     dplyr::select(!!scales_en) %>% 
-    as.matrix() %>% 
-    psych::fa(nfactors = 2, rotate = "none", fm = "pa")
+    as.matrix()
+  ridgemat <- matrix(0, ncol = ncol(rmat), nrow = nrow(rmat))
+  diag(ridgemat) <- rep(ridge, ncol(rmat))
+  rmat <- rmat + ridgemat
+  if (ridge == 0) {
+    fm = "pa"
+  } else {
+    fm = "ml"
+  }
+  fit <- psych::fa(rmat, nfactors = 2, rotate = "none", fm = fm)
   fit$loadings
 }
 
@@ -28,20 +36,45 @@ get_rotation <- function(lambda, angle) {
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @param ridge Optional. A double representing the ridge constant to be added
+#'   to the diagonal of the correlation matrix to address non-positive-definite
+#'   correlation matrix (default = 0). Omit or set ridge to zero in order to 
+#'   use principal axis factor analysis with no ridge constant. Set ridge to a
+#'   positive number in order to use maximum likelihood factor analysis with a
+#'   ridge constant.
 #' @return A double
 #' @family fit functions
 #' @family analysis functions
 #' @export
-fit_fisher <- function(.data, scales) {
+fit_fisher <- function(.data, scales, ridge = 0) {
+  
+  call <- match.call()
   scales_en <- rlang::enquo(scales)
-  lambda <- get_loadings(.data, !!scales_en)
+  lambda <- get_loadings(.data, !!scales_en, ridge)
   radius <- (lambda[, 1] ^ 2) + (lambda[, 2] ^ 2)
-  sd(radius) / mean(radius)
+  statistic <- sd(radius) / mean(radius)
+  
+  details <- list(
+    n = nrow(.data),
+    ridge = ridge,
+    fm = dplyr::if_else(ridge == 0, "pa", "ml"),
+    type = "fisher"
+  )
+  
+  out <- new_fit(
+    stat = statistic,
+    loadings = lambda,
+    radius = radius,
+    details = details,
+    call = call
+  )
+  
+  out
 }
 
-#' Gap Test of interstitiality
+#' Gap Test of equal spacing
 #' 
-#' Conduct the Gap Test of interstitiality. The test will have the most power if
+#' Conduct the Gap Test of equal spacing. The test will have the most power if
 #' the items have been ipsatized first. See the \code{ipsatize} function.
 #' Simulation studies suggest that values less than 0.03 almost certainly
 #' indicate equal axes, whereas test values less than 0.05 indicate that equal
@@ -50,17 +83,41 @@ fit_fisher <- function(.data, scales) {
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @param ridge Optional. A double representing the ridge constant to be added
+#'   to the diagonal of the correlation matrix to address non-positive-definite
+#'   correlation matrix (default = 0). If this argument is non-zero, then the
+#'   factor method is also set to maximum likelihood.
 #' @return A double
 #' @family fit functions
 #' @family analysis functions
 #' @export
-fit_gap <- function(.data, scales) {
+fit_gap <- function(.data, scales, ridge = 0) {
+  
+  call <- match.call()
   scales_en <- rlang::enquo(scales)
-  lambda <- get_loadings(.data, !!scales_en)
+  lambda <- get_loadings(.data, !!scales_en, ridge)
   commun <- (lambda[, 1] ^ 2) + (lambda[, 2] ^ 2)
-  theta <- sign(lambda[, 2]) * acos(lambda[, 1] / sqrt(commun))
+  theta <- sort(sign(lambda[, 2]) * acos(lambda[, 1] / sqrt(commun)))
   gaps <- diff(theta)
-  var(gaps)
+  statistic <- var(gaps)
+
+  details <- list(
+    n = nrow(.data),
+    ridge = ridge,
+    fm = dplyr::if_else(ridge == 0, "pa", "ml"),
+    type = "gap"
+  )
+  
+  out <- new_fit(
+    stat = statistic,
+    loadings = lambda,
+    angles = theta,
+    gaps = gaps,
+    details = details,
+    call = call
+  )
+  
+  out
 }
 
 #' Variance Test of interstitiality
@@ -77,13 +134,19 @@ fit_gap <- function(.data, scales) {
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @param ridge Optional. A double representing the ridge constant to be added
+#'   to the diagonal of the correlation matrix to address non-positive-definite
+#'   correlation matrix (default = 0). Omit or set ridge to zero in order to 
+#'   use principal axis factor analysis with no ridge constant. Set ridge to a
+#'   positive number in order to use maximum likelihood factor analysis with a
+#'   ridge constant.
 #' @return A double
 #' @family fit functions
 #' @family analysis functions
 #' @export
-fit_vt <- function(.data, scales) {
+fit_vt <- function(.data, scales, ridge = 0) {
   scales_en <- rlang::enquo(scales)
-  lambda <- get_loadings(.data, !!scales_en)
+  lambda <- get_loadings(.data, !!scales_en, ridge)
   criterion <- rep(0, 10)
   for (i in 0:9) {
     rlambda <- get_rotation(lambda, i * 5)
@@ -91,10 +154,6 @@ fit_vt <- function(.data, scales) {
   }
   sd(criterion) / mean(criterion)
 }
-
-# Rotation Test of interstitiality
-# less than .14 is almost certain interstitiality
-# less than .31 is twice as likely
 
 #' Rotation Test of interstitiality
 #' 
@@ -107,13 +166,19 @@ fit_vt <- function(.data, scales) {
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @param ridge Optional. A double representing the ridge constant to be added
+#'   to the diagonal of the correlation matrix to address non-positive-definite
+#'   correlation matrix (default = 0). Omit or set ridge to zero in order to 
+#'   use principal axis factor analysis with no ridge constant. Set ridge to a
+#'   positive number in order to use maximum likelihood factor analysis with a
+#'   ridge constant.
 #' @return A double
 #' @family fit functions
 #' @family analysis functions
 #' @export
-fit_rt <- function(.data, scales) {
+fit_rt <- function(.data, scales, ridge = 0) {
   scales_en <- rlang::enquo(scales)
-  lambda <- get_loadings(.data, !!scales_en)
+  lambda <- get_loadings(.data, !!scales_en, ridge)
   criterion <- rep(0, 10)
   for (i in 0:9) {
     rlambda <- get_rotation(lambda, i * 5)
