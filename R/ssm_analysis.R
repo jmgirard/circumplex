@@ -80,7 +80,7 @@
 ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
   contrast = "none", boots = 2000, interval = 0.95, listwise = TRUE) {
 
-  call = match.call()
+  call <- match.call()
   
   # Enable tidy evaluation
   scales_en <- rlang::enquo(scales)
