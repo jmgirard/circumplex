@@ -2,21 +2,37 @@
 % Please edit documentation in R/fit_analysis.R
 \name{fit_gap}
 \alias{fit_gap}
-\title{Gap Test of interstitiality}
+\title{Gap Test of equal spacing}
 \usage{
-fit_gap(.data, scales)
+fit_gap(.data, scales, ridge = 0)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
 
 \item{scales}{Required. The variable names or column numbers for the
 variables in \code{.data} that contain circumplex scales to be analyzed.}
+
+\item{ridge}{Optional. A double representing the ridge constant to be added
+to the diagonal of the correlation matrix to address non-positive-definite
+correlation matrix (default = 0). If this argument is non-zero, then the
+factor method is also set to maximum likelihood.}
 }
 \value{
-A double
+A list containing the results and description of the analysis.
+\item{stat}{A double containing the estimated test statistic}
+\item{loadings}{The loading matrix from the factor analysis}
+\item{angles}{The estimated angle of each scale in the unrotated factor
+analysis (in radians), sorted (it is good to check that the theoretical
+ordering of the scales has been preserved)}
+\item{gaps}{The difference between each adjacent scale's angles (used in
+calculated the test statistic)}
+\item{details}{A list containing the sample size (n), the ridge constant
+(ridge), the factor method (fm), and the type of fit analysis (type).}
+\item{call}{A language object containing the function call that created
+this object}
 }
 \description{
-Conduct the Gap Test of interstitiality. The test will have the most power if
+Conduct the Gap Test of equal spacing. The test will have the most power if
 the items have been ipsatized first. See the \code{ipsatize} function.
 Simulation studies suggest that values less than 0.03 almost certainly
 indicate equal axes, whereas test values less than 0.05 indicate that equal

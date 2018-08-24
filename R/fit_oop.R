@@ -25,7 +25,9 @@ summary.fit <- function(object, digits = 3, ...) {
     paste(deparse(object$call), sep = "\n", collapse = "\n"),
     "\n", sep = "")
   cat("\nSample Size:\t", object$details$n)
-  cat("\nRidge Constant:\t", object$details$ridge)
+  if (object$details$ridge != 0) {
+    cat("\nRidge Constant:\t", object$details$ridge)
+  }
   cat("\nFactor Method:\t", object$details$fm)
   if (object$details$type == "gap") {
     cat("\n\nAngles:\n")
@@ -38,6 +40,14 @@ summary.fit <- function(object, digits = 3, ...) {
     cat("\n\nRadii:\n")
     radius <- round(object$radius, digits)
     print.default(radius, print.gap = 3L)
+  } else if (object$details$type == "vt") {
+    cat("\n\nCriteria:\n")
+    criteria <- round(object$criteria, digits)
+    print.default(criteria, print.gap = 3L)
+  } else if (object$details$type == "rt") {
+    cat("\n\nCriteria:\n")
+    criteria <- round(object$criteria, digits)
+    print.default(criteria, print.gap = 3L)
   }
   cat("\nTest Statistic:\n")
   cat(round(object$stat, digits))

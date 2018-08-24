@@ -43,7 +43,7 @@ procedure and estimate its percentile confidence interval.
 \examples{
 \donttest{
 data("jz2017")
-fit_randall(.data = jz2017, scales = PA:NO) 
+fit_randall(.data = jz2017, scales = PA:NO)
 }
 }
 \seealso{

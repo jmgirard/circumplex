@@ -4,16 +4,31 @@
 \alias{fit_rt}
 \title{Rotation Test of interstitiality}
 \usage{
-fit_rt(.data, scales)
+fit_rt(.data, scales, ridge = 0)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
 
 \item{scales}{Required. The variable names or column numbers for the
 variables in \code{.data} that contain circumplex scales to be analyzed.}
+
+\item{ridge}{Optional. A double representing the ridge constant to be added
+to the diagonal of the correlation matrix to address non-positive-definite
+correlation matrix (default = 0). Omit or set ridge to zero in order to
+use principal axis factor analysis with no ridge constant. Set ridge to a
+positive number in order to use maximum likelihood factor analysis with a
+ridge constant.}
 }
 \value{
-A double
+A list containing the results and description of the analysis.
+\item{stat}{A double containing the estimated test statistic}
+\item{loadings}{The loading matrix from the factor analysis}
+\item{criteria}{The estimated "fit" criterion for each arbitrary rotation
+(used in calculating the test statistic)}
+\item{details}{A list containing the sample size (n), the ridge constant
+(ridge), the factor method (fm), and the type of fit analysis (type).}
+\item{call}{A language object containing the function call that created
+this object}
 }
 \description{
 Conduct the Rotation Test of interstitiality. The test will have the most
