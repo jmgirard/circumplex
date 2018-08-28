@@ -4,14 +4,13 @@ test_that("SSM parameters are correct", {
   data("aw2009")
   scores <- colMeans(aw2009)
   res <- ssm_parameters(scores, as_radian(octants()))
-  
+
   expect_equal(round(res[[1]], 3), 0.423)
   expect_equal(round(res[[2]], 3), 0.945)
   expect_equal(round(res[[3]], 3), -0.264)
   expect_equal(round(res[[4]], 3), 0.981)
   expect_equal(round(res[[5]], 3), 6.010)
   expect_equal(round(res[[6]], 3), 0.954)
-  
 })
 
 test_that("Column means are correct even with missing", {
@@ -39,7 +38,7 @@ test_that("Pairwise r is correct even with missing", {
 test_that("Angular mean is correct", {
   am <- angle_mean(c(0, 0, pi / 2))
   expect_equal(round(am, 3), 0.464)
-  
+
   am <- angle_mean(as_radian(octants()))
   expect_true(is.na(am))
 })

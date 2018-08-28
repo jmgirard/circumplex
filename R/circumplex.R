@@ -7,14 +7,14 @@
 #' grammar. The three guiding principles it aspires to are:
 #'
 #' \itemize{
-#' \item \strong{Accessibility:} zero cost, open source, libre; works on many 
+#' \item \strong{Accessibility:} zero cost, open source, libre; works on many
 #'   platforms; easy to use across skill levels
 #' \item \strong{Flexibility:} customizable by the user; extendable for other uses;
 #'   plays nicely with other packages
 #' \item \strong{Consistency:} unit-tested quality control; firm naming conventions;
 #'   data flows between functions
 #' }
-#' 
+#'
 #' To learn more about circumplex, start with the vignettes:
 #' `browseVignettes(package = "circumplex")`
 #'

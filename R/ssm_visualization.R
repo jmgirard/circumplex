@@ -15,12 +15,12 @@
 #' \donttest{
 #' # Load example data
 #' data("jz2017")
-#' 
+#'
 #' # Plot profile results
 #' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD))
 #' p <- ssm_plot(res)
-#' 
+#'
 #' # Plot contrast results
 #' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD), contrast = "test")
@@ -28,18 +28,18 @@
 #' }
 
 ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
-  
+
   # Check for valid input arguments
   assert_that(is_provided(.ssm_object))
   assert_that(is.number(fontsize), fontsize > 0)
-  
+
   # Forward to the appropriate subfunction
   if (.ssm_object$details$contrast == "test") {
     ssm_plot_contrast(.ssm_object, fontsize = fontsize, ...)
   } else {
     ssm_plot_circle(.ssm_object, fontsize = fontsize, ...)
   }
-  
+
   # TODO: Add more explanation of the possible arguments in documentation.
 }
 
@@ -61,17 +61,16 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
-  lowfit = TRUE) {
-  
+                            lowfit = TRUE) {
   df <- .ssm_object$results
   angles <- as.numeric(.ssm_object$details$angles)
 
   assert_that(is.null(amax) || is.number(amax))
-  
+
   if (is.null(amax)) {
     amax <- pretty_max(.ssm_object$results$a_uci)
   }
-  
+
   # Convert results to numbers usable by ggplot and ggforce
   df_plot <- df %>%
     dplyr::rowwise() %>%
@@ -85,24 +84,24 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
     ) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
-  
+
   # Remove profiles with low model fit (unless overrided)
   n <- nrow(df_plot)
   if (lowfit == FALSE) {
-    df_plot <- df_plot %>% 
+    df_plot <- df_plot %>%
       dplyr::filter(fit >= .70)
     n2 <- nrow(df_plot)
     if (n2 < 1) {
       stop("After removing profiles, there were none left to plot.")
     }
   }
-  df_plot <- df_plot %>% 
+  df_plot <- df_plot %>%
     dplyr::mutate(lnty = dplyr::if_else(fit >= .70, "solid", "dashed"))
-  
+
   p <- circle_base(angles = angles, amax = amax, fontsize = fontsize) +
     ggplot2::scale_color_hue() +
     ggplot2::scale_fill_hue()
-  
+
   p <- p +
     ggforce::geom_arc_bar(
       data = df_plot,
@@ -122,7 +121,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
     ggplot2::guides(
       color = ggplot2::guide_legend(.ssm_object$details$results_type),
       fill = ggplot2::guide_legend(.ssm_object$details$results_type)
-    ) + 
+    ) +
     ggplot2::theme(
       legend.text = ggplot2::element_text(size = fontsize)
     ) +
@@ -151,9 +150,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
 #' @return A ggplot variable containing difference point-ranges faceted by SSM
 #'   parameter. An interval that does not contain the value of zero has p<.05.
 
-ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference", 
-  xy = TRUE, color = "red", linesize = 1.25, fontsize = 12) {
-  
+ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
+                              xy = TRUE, color = "red", linesize = 1.25, fontsize = 12) {
   param_names <- c(
     e = "\u0394 Elevation",
     x = "\u0394 X-Value",
@@ -161,25 +159,27 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     a = "\u0394 Amplitude",
     d = "\u0394 Displacement"
   )
-  
+
   res <- .ssm_object$results
-  
+
   if (xy == FALSE) {
-    res <- dplyr::select(res,
-      -c(x_est, x_lci, x_uci, y_est, y_lci, y_uci))
+    res <- dplyr::select(
+      res,
+      -c(x_est, x_lci, x_uci, y_est, y_lci, y_uci)
+    )
     param_names <- param_names[-c(2, 3)]
   }
 
   # TODO: Check that these ifelse() statements are correct
-  
+
   res <- dplyr::mutate(res,
-      d_uci = ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci),
-      d_lci = ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci)
-    ) %>%
+    d_uci = ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci),
+    d_lci = ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci)
+  ) %>%
     tidyr::gather(key, value, -label, -fit) %>%
     tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
     tidyr::spread(Type, value) %>%
-    dplyr::rename(Difference = est, Contrast = label) %>% 
+    dplyr::rename(Difference = est, Contrast = label) %>%
     dplyr::mutate(
       Parameter = factor(Parameter, levels = c("e", "x", "y", "a", "d"))
     )
@@ -200,7 +200,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
       size = linesize, color = color, width = 0.1
     ) +
     ggplot2::labs(y = axislabel) +
-    ggplot2::facet_wrap(~ Parameter,
+    ggplot2::facet_wrap(~Parameter,
       nrow = 1, scales = "free",
       labeller = ggplot2::as_labeller(param_names)
     )
@@ -210,63 +210,63 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
 
 # Create an Empty Circular Plot
 circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
-  amax = 0.5, fontsize = 12) {
-  
+                        amax = 0.5, fontsize = 12) {
   ggplot2::ggplot() +
     # Require plot to be square and remove default styling
-  ggplot2::coord_fixed() +
+    ggplot2::coord_fixed() +
     ggplot2::theme_void(base_size = fontsize) +
     # Expand the axes multiplicatively to fit labels
-  ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
+    ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
     ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
     # Draw segments corresponding to displacement scale
-  ggplot2::geom_segment(
-    aes(
-      x = 0,
-      y = 0,
-      xend = 5 * cos(angles * pi / 180),
-      yend = 5 * sin(angles * pi / 180)
-    ),
-    color = "gray60",
-    size = 0.5
-  ) +
+    ggplot2::geom_segment(
+      aes(
+        x = 0,
+        y = 0,
+        xend = 5 * cos(angles * pi / 180),
+        yend = 5 * sin(angles * pi / 180)
+      ),
+      color = "gray60",
+      size = 0.5
+    ) +
     # Draw circles corresponding to amplitude scale
-  ggforce::geom_circle(
-    aes(x0 = 0, y0 = 0, r = 1:4),
-    color = "gray60",
-    size = 0.5
-  ) +
+    ggforce::geom_circle(
+      aes(x0 = 0, y0 = 0, r = 1:4),
+      color = "gray60",
+      size = 0.5
+    ) +
     ggforce::geom_circle(
       aes(x0 = 0, y0 = 0, r = 5),
       color = "gray50",
       size = 1.5
     ) +
     # Draw labels for amplitude scale
-  ggplot2::geom_label(
-    aes(
-      x = c(2, 4),
-      y = 0,
-      label = sprintf("%.2f",
-        seq(from = 0, to = amax, length.out = 6)[c(3, 5)])
-    ),
-    color = "gray20",
-    label.size = NA,
-    size = fontsize / 2.8346438836889
-  ) +
+    ggplot2::geom_label(
+      aes(
+        x = c(2, 4),
+        y = 0,
+        label = sprintf(
+          "%.2f",
+          seq(from = 0, to = amax, length.out = 6)[c(3, 5)]
+        )
+      ),
+      color = "gray20",
+      label.size = NA,
+      size = fontsize / 2.8346438836889
+    ) +
     # Draw labels for displacement scale
-  ggplot2::geom_label(
-    aes(
-      x = 5.1 * cos(angles * pi / 180),
-      y = 5.1 * sin(angles * pi / 180),
-      label = labels
-    ),
-    color = "gray20",
-    label.size = NA,
-    hjust = "outward",
-    vjust = "outward",
-    size = fontsize / 2.8346438836889
-  )
-  
+    ggplot2::geom_label(
+      aes(
+        x = 5.1 * cos(angles * pi / 180),
+        y = 5.1 * sin(angles * pi / 180),
+        label = labels
+      ),
+      color = "gray20",
+      label.size = NA,
+      hjust = "outward",
+      vjust = "outward",
+      size = fontsize / 2.8346438836889
+    )
 }
 
 #' Create HTML table from SSM results or contrasts
@@ -286,16 +286,16 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' @family ssm functions
 #' @family table functions
 #' @export
-#' @examples 
+#' @examples
 #' \donttest{
 #' # Load example data
 #' data("jz2017")
-#' 
+#'
 #' # Create table of profile results
 #' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD))
 #' ssm_table(res)
-#' 
+#'
 #' # Create table of contrast results
 #' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD), contrast = "test")
@@ -303,11 +303,10 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' }
 
 ssm_table <- function(.ssm_object, caption = NULL, xy = TRUE, render = TRUE) {
-  
   assert_that(is_provided(.ssm_object))
   assert_that(is.null(caption) || is.string(caption))
   assert_that(is.flag(xy), is.flag(render))
-  
+
   df <- .ssm_object$results
 
   # Create default caption
@@ -325,10 +324,10 @@ ssm_table <- function(.ssm_object, caption = NULL, xy = TRUE, render = TRUE) {
     Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
     Fit = sprintf("%.3f", fit)
   )
-  
+
   # Rename first column
   colnames(df)[[1]] <- .ssm_object$details$results_type
-  
+
   # Add delta symbol to column names if results are contrasts
   if (.ssm_object$details$contrast == "test") {
     colnames(df)[[2]] <- "&Delta; Elevation"
@@ -360,7 +359,7 @@ dcaption <- function(.ssm_object) {
     )
   } else if (.ssm_object$details$results_type == "Contrast") {
     sprintf(
-      "%s-based Structural Summary Statistic Contrasts with %s CIs", 
+      "%s-based Structural Summary Statistic Contrasts with %s CIs",
       .ssm_object$details$score_type,
       str_percent(.ssm_object$details$interval)
     )
@@ -368,9 +367,9 @@ dcaption <- function(.ssm_object) {
 }
 
 #' Combine SSM tables
-#' 
+#'
 #' Combine SSM tables by appending them as rows.
-#' 
+#'
 #' @param .ssm_table A data frame from the \code{ssm_table()} function to be the
 #'   first row(s) of the combined table.
 #' @param ... One or more additional data frames from the \code{ssm_table()}
@@ -383,7 +382,7 @@ dcaption <- function(.ssm_object) {
 #' @family ssm functions
 #' @family table functions
 #' @export
-#' @examples 
+#' @examples
 #' data("jz2017")
 #' res1 <- ssm_analyze(jz2017, PA:NO, octants())
 #' res2 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
@@ -391,25 +390,25 @@ dcaption <- function(.ssm_object) {
 #' tab2 <- ssm_table(res2, render = FALSE)
 #' ssm_append(tab1, tab2)
 ssm_append <- function(.ssm_table, ..., caption = NULL, render = TRUE) {
-  
+
   # TODO: Add more assertions
   assert_that(is.flag(render))
-  
+
   # Bind the tibbles together by row
   df <- dplyr::bind_rows(.ssm_table, ...)
-  
+
   # Format and render HTML table if requested
   if (render == TRUE) {
     html_render(df, caption)
   }
-  
+
   df
 }
 
 #' Format and render data frame as HTML table
-#' 
+#'
 #' Format a data frame as an HTML table and render it to the web viewer.
-#' 
+#'
 #' @param df A data frame to be rendered as an HTML table.
 #' @param caption A string to be displayed above the table.
 #' @param align A string indicating the alignment of the cells (default = "l").
@@ -418,9 +417,9 @@ ssm_append <- function(.ssm_table, ..., caption = NULL, render = TRUE) {
 #' @family table functions
 #' @export
 html_render <- function(df, caption = NULL, align = "l", ...) {
-  
+
   # TODO: Add assertions
-  
+
   t <- htmlTable::htmlTable(df,
     caption = caption,
     align = align,

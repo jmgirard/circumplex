@@ -23,7 +23,9 @@ summary.fit <- function(object, digits = 3, ...) {
   # Print function call
   cat("Call:\n",
     paste(deparse(object$call), sep = "\n", collapse = "\n"),
-    "\n", sep = "")
+    "\n",
+    sep = ""
+  )
   cat("\nSample Size:\t", object$details$n)
   if (object$details$ridge != 0) {
     cat("\nRidge Constant:\t", object$details$ridge)
@@ -51,5 +53,4 @@ summary.fit <- function(object, digits = 3, ...) {
   }
   cat("\nTest Statistic:\n")
   cat(round(object$stat, digits))
-  
 }

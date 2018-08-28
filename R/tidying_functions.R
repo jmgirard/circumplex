@@ -1,10 +1,10 @@
 #' Ipsatize circumplex items using deviation scoring across variables
-#' 
+#'
 #' Rescore each circumplex item using deviation scoring across variables. In
 #' other words, subtract each observation's mean response from each response.
 #' This effectively removes the presence of a general factor, which can make
 #' certain circumplex fit analyses more powerful.
-#' 
+#'
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param items Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex items to be ipsatized.
@@ -13,14 +13,14 @@
 #'   variables will have the same name as \code{items} but with a "_i" suffix.
 #' @family tidying functions
 #' @export
-#' @examples 
+#' @examples
 #' data("jz2017")
 #' ipsatize(jz2017, PA:NO)
 ipsatize <- function(.data, items) {
   items_en <- rlang::enquo(items)
-  new <- .data %>% 
-    dplyr::select(!!items_en) %>% 
-    dplyr::mutate(.im = rowMeans(.)) %>% 
+  new <- .data %>%
+    dplyr::select(!!items_en) %>%
+    dplyr::mutate(.im = rowMeans(.)) %>%
     dplyr::transmute_at(
       .vars = dplyr::vars(!!items_en),
       .funs = dplyr::funs(i = . - .im)
@@ -30,11 +30,11 @@ ipsatize <- function(.data, items) {
 }
 
 #' Score circumplex scales from item responses
-#' 
+#'
 #' Calculate mean scores on circumplex scales from item responses by using a
 #' set of scoring instructions, which may be loaded from the package or created
 #' as a custom data frame.
-#' 
+#'
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param items Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain all the circumplex items from a
@@ -60,11 +60,10 @@ ipsatize <- function(.data, items) {
 #' data("iipsc")
 #' #score(aw2012, IIP01:IIP32, iipsc)
 score <- function(.data, items, key, na.rm = TRUE, prefix = "", suffix = "") {
-  
   items_en <- rlang::enquo(items)
   assert_that(is_provided(.data), is_enquo(!!items_en), is_provided(key))
   assert_that(is.flag(na.rm), is.string(prefix))
-  
+
   item_data <- .data %>% dplyr::select(!!items_en)
   n_items <- ncol(item_data)
   for (i in 1:nrow(key)) {
@@ -73,7 +72,7 @@ score <- function(.data, items, key, na.rm = TRUE, prefix = "", suffix = "") {
     if (max(item_nums) > n_items) {
       stop("Key is asking for more items than were provided to function.")
     }
-    scores <- item_data %>% 
+    scores <- item_data %>%
       dplyr::transmute(!!new_name := rowMeans(item_data[, item_nums], na.rm))
     .data <- dplyr::bind_cols(.data, scores)
   }
@@ -81,12 +80,12 @@ score <- function(.data, items, key, na.rm = TRUE, prefix = "", suffix = "") {
 }
 
 #' Standardize circumplex scales using normative data
-#' 
+#'
 #' Take in a data frame containing circumplex scales, angle definitions for each
-#' scale, and normative data (from the package or custom) and return that same 
+#' scale, and normative data (from the package or custom) and return that same
 #' data frame with each specified circumplex scale transformed into standard
 #' scores (i.e., z-scores) based on comparison to the normative data.
-#' 
+#'
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex scales to be
@@ -101,7 +100,7 @@ score <- function(.data, items, key, na.rm = TRUE, prefix = "", suffix = "") {
 #'   variables will have the same name as \code{scales} but with a "_z" suffix.
 #' @export
 #' @family tidying functions
-#' @examples 
+#' @examples
 #' data("jz2017")
 #' data("iipsc")
 #' standardize(jz2017, scales = PA:NO, angles = octants(), norms = iipsc)
@@ -117,7 +116,7 @@ standardize <- function(.data, scales, angles, norms) {
     index_i <- norms$Angle == angles[[i]]
     m_i <- norms$M[index_i]
     s_i <- norms$SD[index_i]
-    .data <- .data %>% 
+    .data <- .data %>%
       dplyr::mutate_at(
         .vars = scale_i,
         .funs = dplyr::funs(!!new_var := (. - m_i) / s_i)
