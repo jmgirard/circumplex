@@ -12,6 +12,8 @@ circumplex 0.1.2.9004
 * Added function to score circumplex scales from item responses
 * Added function to standardize circumplex scale scores
 * Added scoring instructions for the IIP-SC
+* Added norms and scoring instructions for the CSIV
+* Added norms and scoring instructions for the CSIP
 
 ### BUG FIXES
 
