@@ -52,8 +52,10 @@ reference:
     contents:
       - aw2009
       - jz2017
-  - title: Normative Data
+  - title: Normative and Scoring Data
     contents:
+      - csip
+      - csiv
       - iipsc
 
 navbar:
