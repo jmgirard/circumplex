@@ -85,3 +85,22 @@
 #' }
 #' @source \url{https://doi.org/10.1037/pas0000505}
 "csip"
+
+#' Normative data for CSIV
+#' 
+#' Means and standard deviations for the octant scales of the Circumplex Scales
+#' of Interpersonal Values (CSIV). Norms correspond to data from 1200 American
+#' college students. Note that these norms assume that mean scale scores are
+#' used rather than sum scale scores. Scores range from 0 to 4.
+#' 
+#' @format A data frame with 8 observations and 5 variables:
+#' \describe{
+#'   \item{Scale}{Text description (name) of the scale}
+#'   \item{Abbrev}{Text abbreviation of the scale name}
+#'   \item{Angle}{Angle of the scale (in degrees)}
+#'   \item{M}{Normative mean for the scale}
+#'   \item{SD}{Normative standard deviation for the scale}
+#'   \item{Items}{A comma-separated list of item numbers}
+#' }
+#' @source \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
+"csiv"
