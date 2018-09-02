@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Gap Test of equal spacing — fit_gap • circumplex</title>
+<title>Getting help with circumplex • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -25,24 +25,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script>
+<link href="pkgdown.css" rel="stylesheet">
+<script src="pkgdown.js"></script>
 
 
 <!-- docsearch -->
-<script src="../docsearch.js"></script>
+<script src="docsearch.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
-<link href="../docsearch.css" rel="stylesheet">
+<link href="docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Gap Test of equal spacing — fit_gap" />
-
-<meta property="og:description" content="Conduct the Gap Test of equal spacing. The test will have the most power if
-the items have been ipsatized first. See the ipsatize function.
-Simulation studies suggest that values less than 0.03 almost certainly
-indicate equal axes, whereas test values less than 0.05 indicate that equal
-axes are twice as likely as non-equal axes." />
+<meta property="og:title" content="Getting help with circumplex" />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -61,7 +55,7 @@ axes are twice as likely as non-equal axes." />
   </head>
 
   <body>
-    <div class="container template-reference-topic">
+    <div class="container template-title-body">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -72,7 +66,7 @@ axes are twice as likely as non-equal axes." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">circumplex</a>
+        <a class="navbar-link" href="index.html">circumplex</a>
         <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9004</span>
       </span>
     </div>
@@ -80,7 +74,7 @@ axes are twice as likely as non-equal axes." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../reference/index.html">Functions and data</a>
+  <a href="reference/index.html">Functions and data</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -90,15 +84,15 @@ axes are twice as likely as non-equal axes." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
+      <a href="articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
     </li>
     <li>
-      <a href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a>
+      <a href="articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="news/index.html">News</a>
 </li>
       </ul>
       
@@ -125,85 +119,32 @@ axes are twice as likely as non-equal axes." />
       </header>
 
 <div class="row">
-  <div class="col-md-9 contents">
+  <div class="contents col-md-9">
     <div class="page-header">
-    <h1>Gap Test of equal spacing</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/fit_analysis.R'><code>R/fit_analysis.R</code></a></small>
-    <div class="hidden name"><code>fit_gap.Rd</code></div>
+      <h1>Getting help with circumplex</h1>
     </div>
 
-    <div class="ref-description">
-    
-    <p>Conduct the Gap Test of equal spacing. The test will have the most power if
-the items have been ipsatized first. See the <code>ipsatize</code> function.
-Simulation studies suggest that values less than 0.03 almost certainly
-indicate equal axes, whereas test values less than 0.05 indicate that equal
-axes are twice as likely as non-equal axes.</p>
-    
-    </div>
+<div id="getting-help-with-circumplex" class="section level1">
 
-    <pre class="usage"><span class='fu'>fit_gap</span>(<span class='no'>.data</span>, <span class='no'>scales</span>, <span class='kw'>ridge</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>.data</th>
-      <td><p>Required. A data frame containing at least circumplex scales.</p></td>
-    </tr>
-    <tr>
-      <th>scales</th>
-      <td><p>Required. The variable names or column numbers for the
-variables in <code>.data</code> that contain circumplex scales to be analyzed.</p></td>
-    </tr>
-    <tr>
-      <th>ridge</th>
-      <td><p>Optional. A double representing the ridge constant to be added
-to the diagonal of the correlation matrix to address non-positive-definite
-correlation matrix (default = 0). If this argument is non-zero, then the
-factor method is also set to maximum likelihood.</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A list containing the results and description of the analysis.</p>
-<dt>stat</dt><dd><p>A double containing the estimated test statistic</p></dd>
-<dt>loadings</dt><dd><p>The loading matrix from the factor analysis</p></dd>
-<dt>angles</dt><dd><p>The estimated angle of each scale in the unrotated factor
-analysis (in radians), sorted (it is good to check that the theoretical
-ordering of the scales has been preserved)</p></dd>
-<dt>gaps</dt><dd><p>The difference between each adjacent scale's angles (used in
-calculated the test statistic)</p></dd>
-<dt>details</dt><dd><p>A list containing the sample size (n), the ridge constant
-(ridge), the factor method (fm), and the type of fit analysis (type).</p></dd>
-<dt>call</dt><dd><p>A language object containing the function call that created
-this object</p></dd>
-
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>Other fit functions: <code><a href='fit_fisher.html'>fit_fisher</a></code>,
-  <code><a href='fit_randall.html'>fit_randall</a></code>, <code><a href='fit_rt.html'>fit_rt</a></code>,
-  <code><a href='fit_vt.html'>fit_vt</a></code></p>
-<p>Other analysis functions: <code><a href='fit_fisher.html'>fit_fisher</a></code>,
-  <code><a href='fit_randall.html'>fit_randall</a></code>, <code><a href='fit_rt.html'>fit_rt</a></code>,
-  <code><a href='fit_vt.html'>fit_vt</a></code>, <code><a href='ssm_analyze.html'>ssm_analyze</a></code></p></div>
-    
-
-  </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#see-also">See also</a></li>
-          </ul>
-
-  </div>
+<p>Thanks for using circumplex. Before filing an issue, there are a few places to explore and pieces to put together to make the process as smooth as possible.</p>
+<p>Start by making a minimal <strong>repr</strong>oducible <strong>ex</strong>ample using the <a href="http://reprex.tidyverse.org/">reprex</a> package. If you haven’t heard of or used reprex before, you’re in for a treat! Seriously, reprex will make all of your R-question-asking endeavors easier (which is a pretty insane ROI for the five to ten minutes it’ll take you to learn what it’s all about). For additional reprex pointers, check out the <a href="https://www.tidyverse.org/help/">Get help!</a> section of the tidyverse site.</p>
+<p>Armed with your reprex, the next step is to figure out <a href="https://www.tidyverse.org/help/#where-to-ask">where to ask</a>.</p>
+<ul>
+<li>If it’s a question: start with <a href="https://community.rstudio.com/">community.rstudio.com</a>, and/or StackOverflow. There are more people there to answer questions.<br>
+</li>
+<li>If it’s a bug: you’re in the right place, file an issue.<br>
+</li>
+<li>If you’re not sure: let the community help you figure it out! If your problem <em>is</em> a bug or a feature request, you can easily return here and report it.</li>
+</ul>
+<p>Before opening a new issue, be sure to <a href="https://github.com/tidyverse/circumplex/issues">search issues and pull requests</a> to make sure the bug hasn’t been reported and/or already fixed in the development version. By default, the search will be pre-populated with <code>is:issue is:open</code>. You can <a href="https://help.github.com/articles/searching-issues-and-pull-requests/">edit the qualifiers</a> (e.g. <code>is:pr</code>, <code>is:closed</code>) as needed. For example, you’d simply remove <code>is:open</code> to search <em>all</em> issues in the repo, open or closed.</p>
+<p>If you <em>are</em> in the right place, and need to file an issue, please review the <a href="https://www.tidyverse.org/contribute/#issues">“File issues”</a> paragraph from the tidyverse contributing guidelines.</p>
+<p>Thanks for your help!</p>
 </div>
+
+  </div>
+
+</div>
+
 
       <footer>
       <div class="copyright">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Variance Test of interstitiality — fit_vt • circumplex</title>
+<title>Variance Test of indifference to rotation — fit_vt • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,13 +36,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Variance Test of interstitiality — fit_vt" />
+<meta property="og:title" content="Variance Test of indifference to rotation — fit_vt" />
 
-<meta property="og:description" content="Conduct the Variance Test of interstitiality (sometimes called VT2). The test
-will have the most power if the items have been ipsatized first. See the
-ipsatize function. It is also best in the absence of a general factor.
-Simulation studies suggest that test values less that 0.40 almost certainly
-indicate interstitiality, test values less than 0.48 indicate that
+<meta property="og:description" content="Conduct the Variance Test of indifference to rotation (sometimes called VT2).
+The test will have the most power if the items have been ipsatized first.
+See the ipsatize function. It is also best in the absence of a general
+factor. Simulation studies suggest that test values less that 0.40 almost
+certainly indicate interstitiality, test values less than 0.48 indicate that
 interstitiality is three times as likely as non-interstitiality, and test
 values less than 0.65 indicate that interstitiality is twice as likely as
 non-interstitiality." />
@@ -130,25 +130,25 @@ non-interstitiality." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Variance Test of interstitiality</h1>
+    <h1>Variance Test of indifference to rotation</h1>
     <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/fit_analysis.R'><code>R/fit_analysis.R</code></a></small>
     <div class="hidden name"><code>fit_vt.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Conduct the Variance Test of interstitiality (sometimes called VT2). The test
-will have the most power if the items have been ipsatized first. See the
-<code>ipsatize</code> function. It is also best in the absence of a general factor.
-Simulation studies suggest that test values less that 0.40 almost certainly
-indicate interstitiality, test values less than 0.48 indicate that
+    <p>Conduct the Variance Test of indifference to rotation (sometimes called VT2).
+The test will have the most power if the items have been ipsatized first.
+See the <code>ipsatize</code> function. It is also best in the absence of a general
+factor. Simulation studies suggest that test values less that 0.40 almost
+certainly indicate interstitiality, test values less than 0.48 indicate that
 interstitiality is three times as likely as non-interstitiality, and test
 values less than 0.65 indicate that interstitiality is twice as likely as
 non-interstitiality.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>fit_vt</span>(<span class='no'>.data</span>, <span class='no'>scales</span>)</pre>
+    <pre class="usage"><span class='fu'>fit_vt</span>(<span class='no'>.data</span>, <span class='no'>scales</span>, <span class='kw'>ridge</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -162,11 +162,29 @@ non-interstitiality.</p>
       <td><p>Required. The variable names or column numbers for the
 variables in <code>.data</code> that contain circumplex scales to be analyzed.</p></td>
     </tr>
+    <tr>
+      <th>ridge</th>
+      <td><p>Optional. A double representing the ridge constant to be added
+to the diagonal of the correlation matrix to address non-positive-definite
+correlation matrix (default = 0). Omit or set ridge to zero in order to
+use principal axis factor analysis with no ridge constant. Set ridge to a
+positive number in order to use maximum likelihood factor analysis with a
+ridge constant.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A double</p>
+    <p>A list containing the results and description of the analysis.</p>
+<dt>stat</dt><dd><p>A double containing the estimated test statistic</p></dd>
+<dt>loadings</dt><dd><p>The loading matrix from the factor analysis</p></dd>
+<dt>criteria</dt><dd><p>The estimated "fit" criterion for each arbitrary rotation
+(used in calculating the test statistic)</p></dd>
+<dt>details</dt><dd><p>A list containing the sample size (n), the ridge constant
+(ridge), the factor method (fm), and the type of fit analysis (type).</p></dd>
+<dt>call</dt><dd><p>A language object containing the function call that created
+this object</p></dd>
+
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 

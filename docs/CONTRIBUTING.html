@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • circumplex</title>
+<title>Contributing to circumplex • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -25,18 +25,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script>
+<link href="pkgdown.css" rel="stylesheet">
+<script src="pkgdown.js"></script>
 
 
 <!-- docsearch -->
-<script src="../docsearch.js"></script>
+<script src="docsearch.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
-<link href="../docsearch.css" rel="stylesheet">
+<link href="docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Contributing to circumplex" />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -55,7 +55,7 @@
   </head>
 
   <body>
-    <div class="container template-news">
+    <div class="container template-title-body">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -66,7 +66,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">circumplex</a>
+        <a class="navbar-link" href="index.html">circumplex</a>
         <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9004</span>
       </span>
     </div>
@@ -74,7 +74,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../reference/index.html">Functions and data</a>
+  <a href="reference/index.html">Functions and data</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -84,15 +84,15 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
+      <a href="articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
     </li>
     <li>
-      <a href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a>
+      <a href="articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="news/index.html">News</a>
 </li>
       </ul>
       
@@ -119,132 +119,62 @@
       </header>
 
 <div class="row">
-  <div class="col-md-9 contents">
+  <div class="contents col-md-9">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/jmgirard/circumplex/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+      <h1>Contributing to circumplex</h1>
     </div>
 
-    <div id="circumplex-0-1-2-9004" class="section level1">
-<h1 class="page-header">
-<a href="#circumplex-0-1-2-9004" class="anchor"></a>circumplex 0.1.2.9004<small> Unreleased </small>
-</h1>
-<div id="new-features" class="section level3">
+<div id="contributing-to-circumplex" class="section level1">
+
+<p>This outlines how to propose a change to circumplex. For more detailed info about contributing to this, and other tidyverse packages, please see the <a href="https://rstd.io/tidy-contrib"><strong>development contributing guide</strong></a>.</p>
+<div id="fixing-typos" class="section level3">
 <h3 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>NEW FEATURES</h3>
+<a href="#fixing-typos" class="anchor"></a>Fixing typos</h3>
+<p>Small typos or grammatical errors in documentation may be edited directly using the GitHub web interface, so long as the changes are made in the <em>source</em> file.</p>
 <ul>
-<li>Added function to conduct the Fisher Test of equal axes</li>
-<li>Added function to conduct the Gap Test of interstitiality</li>
-<li>Added function to conduct the Rotation Test of interstitiality</li>
-<li>Added function to conduct the Variance Test of interstitiality</li>
-<li>Added function to conduct the RANDALL Test of circumplex fit</li>
-<li>Added function to ipsatize circumplex item responses</li>
-<li>Added function to score circumplex scales from item responses</li>
-<li>Added function to standardize circumplex scale scores</li>
-<li>Added scoring instructions for the IIP-SC</li>
-<li>Added norms and scoring instructions for the CSIV</li>
-<li>Added norms and scoring instructions for the CSIP</li>
+<li>YES: you edit a roxygen comment in a <code>.R</code> file below <code>R/</code>.</li>
+<li>NO: you edit an <code>.Rd</code> file below <code>man/</code>.</li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level3">
+<div id="prerequisites" class="section level3">
 <h3 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>BUG FIXES</h3>
-<ul>
-<li>Changed OpenMP flags in Makevars to fix a compile problem on Debian machines</li>
-</ul>
+<a href="#prerequisites" class="anchor"></a>Prerequisites</h3>
+<p>Before you make a substantial pull request, you should always file an issue and make sure someone from the team agrees that it’s a problem. If you’ve found a bug, create an associated issue and illustrate the bug with a minimal <a href="https://www.tidyverse.org/help/#reprex">reprex</a>.</p>
 </div>
-<div id="minor-improvements" class="section level3">
+<div id="pull-request-process" class="section level3">
 <h3 class="hasAnchor">
-<a href="#minor-improvements" class="anchor"></a>MINOR IMPROVEMENTS</h3>
+<a href="#pull-request-process" class="anchor"></a>Pull request process</h3>
 <ul>
-<li>Changed the default to plot profiles with low fit (but with dashed borders)</li>
-<li>Import and export functions for tidy evaluation</li>
-</ul>
-</div>
-<div id="documentation-fixes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#documentation-fixes" class="anchor"></a>DOCUMENTATION FIXES</h3>
-<ul>
-<li>Reformatted “Functions and Data” on package website</li>
-<li>Updated vignettes to use the standardize() function</li>
-</ul>
-</div>
-</div>
-    <div id="circumplex-0-1-2" class="section level1">
-<h1 class="page-header">
-<a href="#circumplex-0-1-2" class="anchor"></a>circumplex 0.1.2<small> 2018-08-06 </small>
-</h1>
-<div id="new-features-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>NEW FEATURES</h3>
-<ul>
-<li>Profiles with low fit now have dashed borders when plotted</li>
-</ul>
-</div>
-<div id="bug-fixes-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>BUG FIXES</h3>
-<ul>
-<li>Fixed bug that prevented compilation on Solaris systems</li>
-<li>Fixed bug that prevented CRAN checks on old R versions</li>
-</ul>
-</div>
-<div id="documentation-fixes-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#documentation-fixes-1" class="anchor"></a>DOCUMENTATION FIXES</h3>
-<ul>
-<li>Improved the formatting of vignette source code</li>
-</ul>
-</div>
-</div>
-    <div id="circumplex-0-1-1" class="section level1">
-<h1 class="page-header">
-<a href="#circumplex-0-1-1" class="anchor"></a>circumplex 0.1.1<small> 2018-07-31 </small>
-</h1>
-<div id="new-features-2" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>NEW FEATURES</h3>
-<ul>
-<li>
-<a href="https://circumplex.jmgirard.com">Package website</a> added using <a href="https://pkgdown.r-lib.org/">pkgdown</a>
+<li>We recommend that you create a Git branch for each pull request (PR).<br>
 </li>
+<li>Look at the Travis and AppVeyor build status before and after making changes. The <code>README</code> should contain badges for any continuous integration services used by the package.<br>
+</li>
+<li>New code should follow the tidyverse <a href="http://style.tidyverse.org">style guide</a>. You can use the <a href="https://CRAN.R-project.org/package=styler">styler</a> package to apply these styles, but please don’t restyle code that has nothing to do with your PR.<br>
+</li>
+<li>We use <a href="https://cran.r-project.org/package=roxygen2">roxygen2</a>, with <a href="https://cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html">Markdown syntax</a>, for documentation.<br>
+</li>
+<li>We use <a href="https://cran.r-project.org/package=testthat">testthat</a>. Contributions with test cases included are easier to accept.<br>
+</li>
+<li>For user-facing changes, add a bullet to the top of <code>NEWS.md</code> below the current development version header describing the changes made followed by your GitHub username, and links to relevant issue(s)/PR(s).</li>
 </ul>
 </div>
-<div id="documentation-fixes-2" class="section level3">
+<div id="code-of-conduct" class="section level3">
 <h3 class="hasAnchor">
-<a href="#documentation-fixes-2" class="anchor"></a>DOCUMENTATION FIXES</h3>
-<ul>
-<li>Fixed documentation to meet CRAN standards</li>
-</ul>
+<a href="#code-of-conduct" class="anchor"></a>Code of Conduct</h3>
+<p>Please note that the circumplex project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project you agree to abide by its terms.</p>
 </div>
-</div>
-    <div id="circumplex-0-1-0" class="section level1">
-<h1 class="page-header">
-<a href="#circumplex-0-1-0" class="anchor"></a>circumplex 0.1.0<small> Unreleased </small>
-</h1>
-<div id="new-features-3" class="section level3">
+<div id="see-tidyverse-development-contributing-guide" class="section level3">
 <h3 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>NEW FEATURES</h3>
-<ul>
-<li>Submitted to CRAN</li>
-</ul>
+<a href="#see-tidyverse-development-contributing-guide" class="anchor"></a>See tidyverse <a href="https://rstd.io/tidy-contrib">development contributing guide</a>
+</h3>
+<p>for further details.</p>
 </div>
 </div>
-  </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#circumplex-0-1-2-9004">0.1.2.9004</a></li>
-        <li><a href="#circumplex-0-1-2">0.1.2</a></li>
-        <li><a href="#circumplex-0-1-1">0.1.1</a></li>
-        <li><a href="#circumplex-0-1-0">0.1.0</a></li>
-      </ul>
-    </div>
   </div>
 
 </div>
+
 
       <footer>
       <div class="copyright">

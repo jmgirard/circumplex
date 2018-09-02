@@ -142,7 +142,7 @@ indicate that interstitiality is twice  as likely as non-interstitiality.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>fit_rt</span>(<span class='no'>.data</span>, <span class='no'>scales</span>)</pre>
+    <pre class="usage"><span class='fu'>fit_rt</span>(<span class='no'>.data</span>, <span class='no'>scales</span>, <span class='kw'>ridge</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -156,11 +156,29 @@ indicate that interstitiality is twice  as likely as non-interstitiality.</p>
       <td><p>Required. The variable names or column numbers for the
 variables in <code>.data</code> that contain circumplex scales to be analyzed.</p></td>
     </tr>
+    <tr>
+      <th>ridge</th>
+      <td><p>Optional. A double representing the ridge constant to be added
+to the diagonal of the correlation matrix to address non-positive-definite
+correlation matrix (default = 0). Omit or set ridge to zero in order to
+use principal axis factor analysis with no ridge constant. Set ridge to a
+positive number in order to use maximum likelihood factor analysis with a
+ridge constant.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A double</p>
+    <p>A list containing the results and description of the analysis.</p>
+<dt>stat</dt><dd><p>A double containing the estimated test statistic</p></dd>
+<dt>loadings</dt><dd><p>The loading matrix from the factor analysis</p></dd>
+<dt>criteria</dt><dd><p>The estimated "fit" criterion for each arbitrary rotation
+(used in calculating the test statistic)</p></dd>
+<dt>details</dt><dd><p>A list containing the sample size (n), the ridge constant
+(ridge), the factor method (fm), and the type of fit analysis (type).</p></dd>
+<dt>call</dt><dd><p>A language object containing the function call that created
+this object</p></dd>
+
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 

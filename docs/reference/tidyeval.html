@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • circumplex</title>
+<title>Tidy eval helpers — tidyeval • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,7 +36,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Tidy eval helpers — tidyeval" />
+
+<meta property="og:description" content="
+sym() creates a symbol from a string and
+syms() creates a list of symbols from a
+character vector.
+expr() and quo() quote
+one expression. quo() wraps the quoted expression in a quosure.
+The plural variants rlang::exprs() and
+quos() return a list of quoted expressions or
+quosures.
+enexpr() and enquo()
+capture the expression supplied as argument by the user of the
+current function (enquo() wraps this expression in a quosure).
+enexprs() and enquos()
+capture multiple expressions supplied as arguments, including
+....
+" />
+
+<meta property="og:description" content="exprs() is not exported to avoid conflicts with Biobase::exprs(),
+therefore one should always use rlang::exprs().
+To learn more about tidy eval and how to use these tools, visit
+http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -55,7 +77,7 @@
   </head>
 
   <body>
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -121,129 +143,46 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/jmgirard/circumplex/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Tidy eval helpers</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/utils-tidy-eval.R'><code>R/utils-tidy-eval.R</code></a></small>
+    <div class="hidden name"><code>tidyeval.Rd</code></div>
     </div>
 
-    <div id="circumplex-0-1-2-9004" class="section level1">
-<h1 class="page-header">
-<a href="#circumplex-0-1-2-9004" class="anchor"></a>circumplex 0.1.2.9004<small> Unreleased </small>
-</h1>
-<div id="new-features" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>NEW FEATURES</h3>
-<ul>
-<li>Added function to conduct the Fisher Test of equal axes</li>
-<li>Added function to conduct the Gap Test of interstitiality</li>
-<li>Added function to conduct the Rotation Test of interstitiality</li>
-<li>Added function to conduct the Variance Test of interstitiality</li>
-<li>Added function to conduct the RANDALL Test of circumplex fit</li>
-<li>Added function to ipsatize circumplex item responses</li>
-<li>Added function to score circumplex scales from item responses</li>
-<li>Added function to standardize circumplex scale scores</li>
-<li>Added scoring instructions for the IIP-SC</li>
-<li>Added norms and scoring instructions for the CSIV</li>
-<li>Added norms and scoring instructions for the CSIP</li>
+    <div class="ref-description">
+    
+    <ul>
+<li><p><code><a href='http://www.rdocumentation.org/packages/rlang/topics/sym'>sym</a>()</code> creates a symbol from a string and
+<code><a href='http://www.rdocumentation.org/packages/rlang/topics/sym'>syms</a>()</code> creates a list of symbols from a
+character vector.</p></li>
+<li><p><code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>expr</a>()</code> and <code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>quo</a>()</code> quote
+one expression. <code>quo()</code> wraps the quoted expression in a quosure.</p>
+<p>The plural variants <code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>rlang::exprs()</a></code> and
+<code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>quos</a>()</code> return a list of quoted expressions or
+quosures.</p></li>
+<li><p><code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>enexpr</a>()</code> and <code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>enquo</a>()</code>
+capture the expression supplied as argument by the user of the
+current function (<code>enquo()</code> wraps this expression in a quosure).</p>
+<p><code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>enexprs</a>()</code> and <code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>enquos</a>()</code>
+capture multiple expressions supplied as arguments, including
+<code>...</code>.</p></li>
 </ul>
-</div>
-<div id="bug-fixes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>BUG FIXES</h3>
-<ul>
-<li>Changed OpenMP flags in Makevars to fix a compile problem on Debian machines</li>
-</ul>
-</div>
-<div id="minor-improvements" class="section level3">
-<h3 class="hasAnchor">
-<a href="#minor-improvements" class="anchor"></a>MINOR IMPROVEMENTS</h3>
-<ul>
-<li>Changed the default to plot profiles with low fit (but with dashed borders)</li>
-<li>Import and export functions for tidy evaluation</li>
-</ul>
-</div>
-<div id="documentation-fixes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#documentation-fixes" class="anchor"></a>DOCUMENTATION FIXES</h3>
-<ul>
-<li>Reformatted “Functions and Data” on package website</li>
-<li>Updated vignettes to use the standardize() function</li>
-</ul>
-</div>
-</div>
-    <div id="circumplex-0-1-2" class="section level1">
-<h1 class="page-header">
-<a href="#circumplex-0-1-2" class="anchor"></a>circumplex 0.1.2<small> 2018-08-06 </small>
-</h1>
-<div id="new-features-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>NEW FEATURES</h3>
-<ul>
-<li>Profiles with low fit now have dashed borders when plotted</li>
-</ul>
-</div>
-<div id="bug-fixes-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>BUG FIXES</h3>
-<ul>
-<li>Fixed bug that prevented compilation on Solaris systems</li>
-<li>Fixed bug that prevented CRAN checks on old R versions</li>
-</ul>
-</div>
-<div id="documentation-fixes-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#documentation-fixes-1" class="anchor"></a>DOCUMENTATION FIXES</h3>
-<ul>
-<li>Improved the formatting of vignette source code</li>
-</ul>
-</div>
-</div>
-    <div id="circumplex-0-1-1" class="section level1">
-<h1 class="page-header">
-<a href="#circumplex-0-1-1" class="anchor"></a>circumplex 0.1.1<small> 2018-07-31 </small>
-</h1>
-<div id="new-features-2" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>NEW FEATURES</h3>
-<ul>
-<li>
-<a href="https://circumplex.jmgirard.com">Package website</a> added using <a href="https://pkgdown.r-lib.org/">pkgdown</a>
-</li>
-</ul>
-</div>
-<div id="documentation-fixes-2" class="section level3">
-<h3 class="hasAnchor">
-<a href="#documentation-fixes-2" class="anchor"></a>DOCUMENTATION FIXES</h3>
-<ul>
-<li>Fixed documentation to meet CRAN standards</li>
-</ul>
-</div>
-</div>
-    <div id="circumplex-0-1-0" class="section level1">
-<h1 class="page-header">
-<a href="#circumplex-0-1-0" class="anchor"></a>circumplex 0.1.0<small> Unreleased </small>
-</h1>
-<div id="new-features-3" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>NEW FEATURES</h3>
-<ul>
-<li>Submitted to CRAN</li>
-</ul>
-</div>
-</div>
-  </div>
 
+    <p><code>exprs()</code> is not exported to avoid conflicts with <code>Biobase::exprs()</code>,
+therefore one should always use <code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>rlang::exprs()</a></code>.</p>
+<p>To learn more about tidy eval and how to use these tools, visit
+<a href='http://rlang.r-lib.org'>http://rlang.r-lib.org</a> and the <a href='https://adv-r.hadley.nz/meta.html'>Metaprogramming section</a> of <a href='https://adv-r.hadley.nz'>Advanced R</a>.</p>
+    
+    </div>
+
+        
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#circumplex-0-1-2-9004">0.1.2.9004</a></li>
-        <li><a href="#circumplex-0-1-2">0.1.2</a></li>
-        <li><a href="#circumplex-0-1-1">0.1.1</a></li>
-        <li><a href="#circumplex-0-1-0">0.1.0</a></li>
-      </ul>
-    </div>
-  </div>
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+                </ul>
 
+  </div>
 </div>
 
       <footer>
