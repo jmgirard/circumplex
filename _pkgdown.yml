@@ -54,6 +54,7 @@ reference:
       - jz2017
   - title: Normative and Scoring Data
     contents:
+      - csie
       - csip
       - csiv
       - iipsc

@@ -14,6 +14,8 @@ circumplex 0.1.2.9004
 * Added scoring instructions for the IIP-SC
 * Added norms and scoring instructions for the CSIV
 * Added norms and scoring instructions for the CSIP
+* Added norms and scoring instructions for the IPIP-IPC
+* Added norms and scoring instructions for the CSIE
 
 ### BUG FIXES
 

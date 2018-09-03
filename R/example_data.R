@@ -48,14 +48,14 @@
 #' @source \url{https://doi.org/10.1177/1073191115621795}
 "jz2017"
 
-#' Normative data for IIP-SC
-#'
-#' Means and standard deviations for the octant scales of the Inventory of
-#' Interpersonal Problems - Short Circumplex (IIP-SC). Norms correspond to data
-#' from 872 American college students. Note that these norms assume that mean
-#' scale scores are used rather than sum scale scores. Scores range from 0 to 4.
-#'
-#' @format A data frame with 8 observations and 5 variables:
+#' Normative data for CSIE
+#' 
+#' Means and standard deviations for the octant scales of the Circumplex Scales
+#' of Interpersonal Efficacy (CSIE). Norms correspond to data from 367 American
+#' college students. Note that these norms assume that mean scale scores are
+#' used rather than sum scale scores. Scores range from 0 to 10.
+#' 
+#' @format A data frame with 8 observations and 6 variables:
 #' \describe{
 #'   \item{Scale}{Text description (name) of the scale}
 #'   \item{Abbrev}{Text abbreviation of the scale name}
@@ -64,8 +64,8 @@
 #'   \item{SD}{Normative standard deviation for the scale}
 #'   \item{Items}{A comma-separated list of item numbers}
 #' }
-#' @source \url{https://doi.org/10.1080/00223890802388665}
-"iipsc"
+#' @source \url{https://www.webpages.uidaho.edu/klocke/csie.htm}
+"csie"
 
 #' Normative data for CSIP
 #' 
@@ -74,7 +74,7 @@
 #' college students. Note that these norms assume that mean scale scores are
 #' used rather than sum scale scores. Scores range from 0 to 3.
 #' 
-#' @format A data frame with 8 observations and 5 variables:
+#' @format A data frame with 8 observations and 6 variables:
 #' \describe{
 #'   \item{Scale}{Text description (name) of the scale}
 #'   \item{Abbrev}{Text abbreviation of the scale name}
@@ -105,6 +105,25 @@
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
 "csiv"
 
+#' Normative data for IIP-SC
+#'
+#' Means and standard deviations for the octant scales of the Inventory of
+#' Interpersonal Problems - Short Circumplex (IIP-SC). Norms correspond to data
+#' from 872 American college students. Note that these norms assume that mean
+#' scale scores are used rather than sum scale scores. Scores range from 0 to 4.
+#'
+#' @format A data frame with 8 observations and 6 variables:
+#' \describe{
+#'   \item{Scale}{Text description (name) of the scale}
+#'   \item{Abbrev}{Text abbreviation of the scale name}
+#'   \item{Angle}{Angle of the scale (in degrees)}
+#'   \item{M}{Normative mean for the scale}
+#'   \item{SD}{Normative standard deviation for the scale}
+#'   \item{Items}{A comma-separated list of item numbers}
+#' }
+#' @source \url{https://doi.org/10.1080/00223890802388665}
+"iipsc"
+
 #' Normative data for IPIP-IPC
 #' 
 #' Means and standard deviations for the octant scales of the IPIP Interpersonal
@@ -112,7 +131,7 @@
 #' students. Note that these norms assume that mean scale scores are
 #' used rather than sum scale scores. Scores range from 1 to 5.
 #' 
-#' @format A data frame with 8 observations and 5 variables:
+#' @format A data frame with 8 observations and 6 variables:
 #' \describe{
 #'   \item{Scale}{Text description (name) of the scale}
 #'   \item{Abbrev}{Text abbreviation of the scale name}

@@ -4,7 +4,7 @@
 \name{iipsc}
 \alias{iipsc}
 \title{Normative data for IIP-SC}
-\format{A data frame with 8 observations and 5 variables:
+\format{A data frame with 8 observations and 6 variables:
 \describe{
 \item{Scale}{Text description (name) of the scale}
 \item{Abbrev}{Text abbreviation of the scale name}
