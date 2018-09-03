@@ -14,7 +14,7 @@
 \item{Items}{A comma-separated list of item numbers}
 }}
 \source{
-\url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
+\url{https://www.webpages.uidaho.edu/klocke/csie.htm}
 }
 \usage{
 csie
