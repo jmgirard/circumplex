@@ -124,6 +124,26 @@
 #' @source \url{https://doi.org/10.1080/00223890802388665}
 "iipsc"
 
+#' Normative data for IIS-64
+#'
+#' Means and standard deviations for the octant scales of the Inventory of
+#' Interpersonal Strengths, 64-item version (IIS-64). Norms correspond to data
+#' from 684 American college students. Note that these norms assume that mean
+#' scale scores are used rather than sum scale scores. Scores range from 1 to 6.
+#' TODO: Verify that the scores range from 1 to 6 and not 0 to 5.
+#'
+#' @format A data frame with 8 observations and 6 variables:
+#' \describe{
+#'   \item{Scale}{Text description (name) of the scale}
+#'   \item{Abbrev}{Text abbreviation of the scale name}
+#'   \item{Angle}{Angle of the scale (in degrees)}
+#'   \item{M}{Normative mean for the scale}
+#'   \item{SD}{Normative standard deviation for the scale}
+#'   \item{Items}{A comma-separated list of item numbers}
+#' }
+#' @source \url{https://doi.org/10.1037/a0017269}
+"iis64"
+
 #' Normative data for IPIP-IPC
 #' 
 #' Means and standard deviations for the octant scales of the IPIP Interpersonal
@@ -142,3 +162,22 @@
 #' }
 #' @source \url{https://doi.org/10.1177/1073191109340382}
 "ipipipc"
+
+#' Normative data for ISC
+#' 
+#' Means and standard deviations for the octant scales of the Interpersonal
+#' Sensitivities Circumplex (ISC). Norms correspond to data from 649 American
+#' college students. Note that these norms assume that mean scale scores are
+#' used rather than sum scale scores. Scores range from 1 to 8.
+#' 
+#' @format A data frame with 8 observations and 6 variables:
+#' \describe{
+#'   \item{Scale}{Text description (name) of the scale}
+#'   \item{Abbrev}{Text abbreviation of the scale name}
+#'   \item{Angle}{Angle of the scale (in degrees)}
+#'   \item{M}{Normative mean for the scale}
+#'   \item{SD}{Normative standard deviation for the scale}
+#'   \item{Items}{A comma-separated list of item numbers}
+#' }
+#' @source \url{https://doi.org/10.1111/j.1467-6494.2011.00696.x}
+"isc"

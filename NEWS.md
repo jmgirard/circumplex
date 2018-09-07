@@ -16,6 +16,8 @@ circumplex 0.1.2.9004
 * Added norms and scoring instructions for the CSIP
 * Added norms and scoring instructions for the IPIP-IPC
 * Added norms and scoring instructions for the CSIE
+* Added norms for the ISC (scoring coming soon)
+* Added norms for the IIS-64 (scoring coming soon)
 
 ### BUG FIXES
 
