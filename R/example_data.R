@@ -130,7 +130,6 @@
 #' Interpersonal Strengths, 64-item version (IIS-64). Norms correspond to data
 #' from 684 American college students. Note that these norms assume that mean
 #' scale scores are used rather than sum scale scores. Scores range from 1 to 6.
-#' TODO: Verify that the scores range from 1 to 6 and not 0 to 5.
 #'
 #' @format A data frame with 8 observations and 6 variables:
 #' \describe{
