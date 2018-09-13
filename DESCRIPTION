@@ -42,7 +42,8 @@ Imports:
     rlang (>= 0.2.2),
     stats,
     tibble (>= 1.4.2),
-    tidyr (>= 0.8.1)
+    tidyr (>= 0.8.1),
+    glue
 Suggests: 
     covr (>= 3.1.0),
     forcats (>= 0.3.0),
