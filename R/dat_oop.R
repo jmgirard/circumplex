@@ -9,6 +9,10 @@ new_instrument <- function(Scales, Items, Norms, Details, ...) {
   )
 }
 
+is_instrument <- function(x) {
+  typeof(x) == "list" & class(x) == "instrument"
+}
+
 print.instrument <- function(x, ...) {
   cat(
     glue(
@@ -36,7 +40,7 @@ summary.instrument <- function(x, ...) {
 }
 
 scales <- function(x) {
-  # Assert that x has the instrument class
+  assert_that(is_instrument(x))
   
   cat(
     glue(
@@ -54,8 +58,8 @@ scales <- function(x) {
   }
 }
 
-items <- function(x) {
-  # Assert that x has the instrument class
+items <- function(x, print_scale = TRUE) {
+  assert_that(is_instrument(x), is.flag(print_scale))
   
   cat(
     glue(
@@ -65,15 +69,22 @@ items <- function(x) {
   cat("\n")
   for (i in 1:nrow(x$Items)) {
     xi <- x$Items[i, ]
-    cat(
-      glue("{xi$Number}. {xi$Text}"),
-      "\n"
-    )
+    if (print_scale == TRUE) {
+      cat(
+        glue("{xi$Number}. {xi$Text} ({xi$Scale})"),
+        "\n"
+      )
+    } else {
+      cat(
+        glue("{xi$Number}. {xi$Text}"),
+        "\n"
+      )
+    }
   }
 }
 
 anchors <- function(x) {
-  # Assert that x has the instrument class
+  assert_that(is_instrument(x))
   
   cat(
     glue(

@@ -129,7 +129,8 @@ isc_items <- tibble(
     "Is soft",
     "Is clingy",
     "Takes control"
-  )
+  ),
+  Scale = rep(isc_scales$Abbrev, 8)
 )
 
 isc <- new_instrument(
