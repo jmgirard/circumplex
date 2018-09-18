@@ -3,16 +3,8 @@
 \docType{data}
 \name{iipsc}
 \alias{iipsc}
-\title{Normative data for IIP-SC}
-\format{A data frame with 8 observations and 6 variables:
-\describe{
-\item{Scale}{Text description (name) of the scale}
-\item{Abbrev}{Text abbreviation of the scale name}
-\item{Angle}{Angle of the scale (in degrees)}
-\item{M}{Normative mean for the scale}
-\item{SD}{Normative standard deviation for the scale}
-\item{Items}{A comma-separated list of item numbers}
-}}
+\title{Instrument: IIP-SC}
+\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 8 rows and 6 columns.}
 \source{
 \url{https://doi.org/10.1080/00223890802388665}
 }
@@ -20,9 +12,10 @@
 iipsc
 }
 \description{
-Means and standard deviations for the octant scales of the Inventory of
-Interpersonal Problems - Short Circumplex (IIP-SC). Norms correspond to data
-from 872 American college students. Note that these norms assume that mean
-scale scores are used rather than sum scale scores. Scores range from 0 to 4.
+Information about the Inventory of Interpersonal Problems Short Circumplex.
+}
+\examples{
+data(iipsc)
+summary(iipsc)
 }
 \keyword{datasets}

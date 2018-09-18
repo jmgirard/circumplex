@@ -3,16 +3,8 @@
 \docType{data}
 \name{iis64}
 \alias{iis64}
-\title{Normative data for IIS-64}
-\format{A data frame with 8 observations and 6 variables:
-\describe{
-\item{Scale}{Text description (name) of the scale}
-\item{Abbrev}{Text abbreviation of the scale name}
-\item{Angle}{Angle of the scale (in degrees)}
-\item{M}{Normative mean for the scale}
-\item{SD}{Normative standard deviation for the scale}
-\item{Items}{A comma-separated list of item numbers}
-}}
+\title{Instrument: IIS-64}
+\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 8 rows and 6 columns.}
 \source{
 \url{https://doi.org/10.1037/a0017269}
 }
@@ -20,9 +12,10 @@
 iis64
 }
 \description{
-Means and standard deviations for the octant scales of the Inventory of
-Interpersonal Strengths, 64-item version (IIS-64). Norms correspond to data
-from 684 American college students. Note that these norms assume that mean
-scale scores are used rather than sum scale scores. Scores range from 1 to 6.
+Information about the Inventory of Interpersonal Strengths.
+}
+\examples{
+data(iis64)
+summary(iis64)
 }
 \keyword{datasets}

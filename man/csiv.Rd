@@ -3,16 +3,8 @@
 \docType{data}
 \name{csiv}
 \alias{csiv}
-\title{Normative data for CSIV}
-\format{A data frame with 8 observations and 5 variables:
-\describe{
-\item{Scale}{Text description (name) of the scale}
-\item{Abbrev}{Text abbreviation of the scale name}
-\item{Angle}{Angle of the scale (in degrees)}
-\item{M}{Normative mean for the scale}
-\item{SD}{Normative standard deviation for the scale}
-\item{Items}{A comma-separated list of item numbers}
-}}
+\title{Instrument: CSIV}
+\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 8 rows and 6 columns.}
 \source{
 \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
 }
@@ -20,9 +12,10 @@
 csiv
 }
 \description{
-Means and standard deviations for the octant scales of the Circumplex Scales
-of Interpersonal Values (CSIV). Norms correspond to data from 1200 American
-college students. Note that these norms assume that mean scale scores are
-used rather than sum scale scores. Scores range from 0 to 4.
+Information about the Circumplex Scales of Interpersonal Values.
+}
+\examples{
+data(csiv)
+summary(csiv)
 }
 \keyword{datasets}

@@ -3,16 +3,8 @@
 \docType{data}
 \name{isc}
 \alias{isc}
-\title{Normative data for ISC}
-\format{A data frame with 8 observations and 6 variables:
-\describe{
-\item{Scale}{Text description (name) of the scale}
-\item{Abbrev}{Text abbreviation of the scale name}
-\item{Angle}{Angle of the scale (in degrees)}
-\item{M}{Normative mean for the scale}
-\item{SD}{Normative standard deviation for the scale}
-\item{Items}{A comma-separated list of item numbers}
-}}
+\title{Instrument: ISC}
+\format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://doi.org/10.1111/j.1467-6494.2011.00696.x}
 }
@@ -20,9 +12,10 @@
 isc
 }
 \description{
-Means and standard deviations for the octant scales of the Interpersonal
-Sensitivities Circumplex (ISC). Norms correspond to data from 649 American
-college students. Note that these norms assume that mean scale scores are
-used rather than sum scale scores. Scores range from 1 to 8.
+Information about the Interpersonal Sensitivities Circumplex.
+}
+\examples{
+data(isc)
+summary(isc)
 }
 \keyword{datasets}

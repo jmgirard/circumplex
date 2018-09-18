@@ -14,6 +14,7 @@ is_instrument <- function(x) {
   typeof(x) == "list" & class(x) == "instrument"
 }
 
+#' @export
 print.instrument <- function(x, ...) {
   cat(
     glue(
@@ -24,6 +25,7 @@ print.instrument <- function(x, ...) {
   ) 
 }
 
+#' @export
 summary.instrument <- function(x, ...) {
   cat(
     glue(
@@ -42,6 +44,7 @@ summary.instrument <- function(x, ...) {
   norms(x)
 }
 
+#' @export
 scales <- function(x) {
   assert_that(is_instrument(x))
   
@@ -63,6 +66,7 @@ scales <- function(x) {
   invisible(x)
 }
 
+#' @export
 items <- function(x) {
   assert_that(is_instrument(x))
   
@@ -83,6 +87,7 @@ items <- function(x) {
   invisible(x)
 }
 
+#' @export
 anchors <- function(x) {
   assert_that(is_instrument(x))
   
@@ -105,6 +110,7 @@ anchors <- function(x) {
   invisible(x)
 }
 
+#' @export
 norms <- function(x) {
   assert_that(is_instrument(x))
   

@@ -3,16 +3,8 @@
 \docType{data}
 \name{csip}
 \alias{csip}
-\title{Normative data for CSIP}
-\format{A data frame with 8 observations and 6 variables:
-\describe{
-\item{Scale}{Text description (name) of the scale}
-\item{Abbrev}{Text abbreviation of the scale name}
-\item{Angle}{Angle of the scale (in degrees)}
-\item{M}{Normative mean for the scale}
-\item{SD}{Normative standard deviation for the scale}
-\item{Items}{A comma-separated list of item numbers}
-}}
+\title{Instrument: CSIP}
+\format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://doi.org/10.1037/pas0000505}
 }
@@ -20,9 +12,10 @@
 csip
 }
 \description{
-Means and standard deviations for the octant scales of the Circumplex Scales
-of Interpersonal Problems (CSIP). Norms correspond to data from 712 American
-college students. Note that these norms assume that mean scale scores are
-used rather than sum scale scores. Scores range from 0 to 3.
+Information about the Circumplex Scales of Interpersonal Problems.
+}
+\examples{
+data(csip)
+summary(csip)
 }
 \keyword{datasets}

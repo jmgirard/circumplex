@@ -48,135 +48,84 @@
 #' @source \url{https://doi.org/10.1177/1073191115621795}
 "jz2017"
 
-#' Normative data for CSIE
+#' Instrument: CSIE
 #' 
-#' Means and standard deviations for the octant scales of the Circumplex Scales
-#' of Interpersonal Efficacy (CSIE). Norms correspond to data from 367 American
-#' college students. Note that these norms assume that mean scale scores are
-#' used rather than sum scale scores. Scores range from 0 to 10.
+#' Information about the Circumplex Scales of Interpersonal Efficacy.
 #' 
-#' @format A data frame with 8 observations and 6 variables:
-#' \describe{
-#'   \item{Scale}{Text description (name) of the scale}
-#'   \item{Abbrev}{Text abbreviation of the scale name}
-#'   \item{Angle}{Angle of the scale (in degrees)}
-#'   \item{M}{Normative mean for the scale}
-#'   \item{SD}{Normative standard deviation for the scale}
-#'   \item{Items}{A comma-separated list of item numbers}
-#' }
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csie.htm}
+#' @examples 
+#' data(csie)
+#' summary(csie)
 "csie"
 
-#' Normative data for CSIP
+#' Instrument: CSIP
 #' 
-#' Means and standard deviations for the octant scales of the Circumplex Scales
-#' of Interpersonal Problems (CSIP). Norms correspond to data from 712 American
-#' college students. Note that these norms assume that mean scale scores are
-#' used rather than sum scale scores. Scores range from 0 to 3.
+#' Information about the Circumplex Scales of Interpersonal Problems.
 #' 
-#' @format A data frame with 8 observations and 6 variables:
-#' \describe{
-#'   \item{Scale}{Text description (name) of the scale}
-#'   \item{Abbrev}{Text abbreviation of the scale name}
-#'   \item{Angle}{Angle of the scale (in degrees)}
-#'   \item{M}{Normative mean for the scale}
-#'   \item{SD}{Normative standard deviation for the scale}
-#'   \item{Items}{A comma-separated list of item numbers}
-#' }
 #' @source \url{https://doi.org/10.1037/pas0000505}
+#' @examples 
+#' data(csip)
+#' summary(csip)
 "csip"
 
-#' Normative data for CSIV
+#' Instrument: CSIV
 #' 
-#' Means and standard deviations for the octant scales of the Circumplex Scales
-#' of Interpersonal Values (CSIV). Norms correspond to data from 1200 American
-#' college students. Note that these norms assume that mean scale scores are
-#' used rather than sum scale scores. Scores range from 0 to 4.
+#' Information about the Circumplex Scales of Interpersonal Values.
 #' 
-#' @format A data frame with 8 observations and 5 variables:
-#' \describe{
-#'   \item{Scale}{Text description (name) of the scale}
-#'   \item{Abbrev}{Text abbreviation of the scale name}
-#'   \item{Angle}{Angle of the scale (in degrees)}
-#'   \item{M}{Normative mean for the scale}
-#'   \item{SD}{Normative standard deviation for the scale}
-#'   \item{Items}{A comma-separated list of item numbers}
-#' }
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
+#' @examples 
+#' data(csiv)
+#' summary(csiv)
 "csiv"
 
-#' Normative data for IIP-SC
+#' Instrument: IIP-32
 #'
-#' Means and standard deviations for the octant scales of the Inventory of
-#' Interpersonal Problems - Short Circumplex (IIP-SC). Norms correspond to data
-#' from 872 American college students. Note that these norms assume that mean
-#' scale scores are used rather than sum scale scores. Scores range from 0 to 4.
+#' Information about the Inventory of Interpersonal Problems Brief Version.
+#' Note that, although we have permission to provide some information about the
+#' IIP-32, Mind Garden Inc. has exclusive rights to distribute it in full.
+#' 
+#' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
+#' @examples 
+#' data(iip32)
+#' summary(iip32)
+"iip32"
+
+#' Instrument: IIP-SC
 #'
-#' @format A data frame with 8 observations and 6 variables:
-#' \describe{
-#'   \item{Scale}{Text description (name) of the scale}
-#'   \item{Abbrev}{Text abbreviation of the scale name}
-#'   \item{Angle}{Angle of the scale (in degrees)}
-#'   \item{M}{Normative mean for the scale}
-#'   \item{SD}{Normative standard deviation for the scale}
-#'   \item{Items}{A comma-separated list of item numbers}
-#' }
+#' Information about the Inventory of Interpersonal Problems Short Circumplex.
+#' 
 #' @source \url{https://doi.org/10.1080/00223890802388665}
+#' @examples
+#' data(iipsc)
+#' summary(iipsc)
 "iipsc"
 
-#' Normative data for IIS-64
+#' Instrument: IIS-64
 #'
-#' Means and standard deviations for the octant scales of the Inventory of
-#' Interpersonal Strengths, 64-item version (IIS-64). Norms correspond to data
-#' from 684 American college students. Note that these norms assume that mean
-#' scale scores are used rather than sum scale scores. Scores range from 1 to 6.
-#'
-#' @format A data frame with 8 observations and 6 variables:
-#' \describe{
-#'   \item{Scale}{Text description (name) of the scale}
-#'   \item{Abbrev}{Text abbreviation of the scale name}
-#'   \item{Angle}{Angle of the scale (in degrees)}
-#'   \item{M}{Normative mean for the scale}
-#'   \item{SD}{Normative standard deviation for the scale}
-#'   \item{Items}{A comma-separated list of item numbers}
-#' }
+#' Information about the Inventory of Interpersonal Strengths.
+#' 
 #' @source \url{https://doi.org/10.1037/a0017269}
+#' @examples 
+#' data(iis64)
+#' summary(iis64)
 "iis64"
 
-#' Normative data for IPIP-IPC
+#' Instrument: IPIP-IPC
 #' 
-#' Means and standard deviations for the octant scales of the IPIP Interpersonal
-#' Circumplex (IPIP-IPC). Norms correspond to data from 274 American college
-#' students. Note that these norms assume that mean scale scores are
-#' used rather than sum scale scores. Scores range from 1 to 5.
+#' Information about the IPIP Interpersonal Circumplex.
 #' 
-#' @format A data frame with 8 observations and 6 variables:
-#' \describe{
-#'   \item{Scale}{Text description (name) of the scale}
-#'   \item{Abbrev}{Text abbreviation of the scale name}
-#'   \item{Angle}{Angle of the scale (in degrees)}
-#'   \item{M}{Normative mean for the scale}
-#'   \item{SD}{Normative standard deviation for the scale}
-#'   \item{Items}{A comma-separated list of item numbers}
-#' }
 #' @source \url{https://doi.org/10.1177/1073191109340382}
+#' @examples
+#' data(ipipipc)
+#' summary(ipipipc)
 "ipipipc"
 
-#' Normative data for ISC
+#' Instrument: ISC 
 #' 
-#' Means and standard deviations for the octant scales of the Interpersonal
-#' Sensitivities Circumplex (ISC). Norms correspond to data from 649 American
-#' college students. Note that these norms assume that mean scale scores are
-#' used rather than sum scale scores. Scores range from 1 to 8.
+#' Information about the Interpersonal Sensitivities Circumplex.
 #' 
-#' @format A data frame with 8 observations and 6 variables:
-#' \describe{
-#'   \item{Scale}{Text description (name) of the scale}
-#'   \item{Abbrev}{Text abbreviation of the scale name}
-#'   \item{Angle}{Angle of the scale (in degrees)}
-#'   \item{M}{Normative mean for the scale}
-#'   \item{SD}{Normative standard deviation for the scale}
-#'   \item{Items}{A comma-separated list of item numbers}
-#' }
 #' @source \url{https://doi.org/10.1111/j.1467-6494.2011.00696.x}
+#' @examples 
+#' data(isc)
+#' summary(isc)
 "isc"
