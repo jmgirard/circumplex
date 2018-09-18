@@ -26,7 +26,8 @@ print.instrument <- function(x, ...) {
 }
 
 #' @export
-summary.instrument <- function(x, ...) {
+summary.instrument <- function(object, ...) {
+  x <- object
   cat(
     glue(
       "The {x$Details$Name} ({x$Details$Abbrev}) is a {x$Details$Items}-item ",
@@ -44,7 +45,19 @@ summary.instrument <- function(x, ...) {
   norms(x)
 }
 
+#' Display the scales of a circumplex instrument
+#' 
+#' Display the scales of a circumplex instrument including the total number of
+#' scales and each scale's abbreviation, hypothetical angle, and text label.
+#' 
+#' @param x Required. An object of the instrument class.
+#' @return The same input object. Prints text to console.
+#' @family instrument functions
 #' @export
+#' @examples 
+#' data(csip)
+#' scales(csip)
+
 scales <- function(x) {
   assert_that(is_instrument(x))
   
@@ -66,7 +79,20 @@ scales <- function(x) {
   invisible(x)
 }
 
+#' Display the items of a circumplex instrument
+#' 
+#' Display the items of a circumplex instrument including the total number of
+#' items and each item's number and text. The item ordering/numbering displayed
+#' here is the same ordering/numbering assumed by the \code{score()} function.
+#' 
+#' @param x Required. An object of the instrument class.
+#' @return The same input object. Prints text to console.
+#' @family instrument functions
 #' @export
+#' @examples 
+#' data(csip)
+#' items(csip)
+
 items <- function(x) {
   assert_that(is_instrument(x))
   
@@ -87,7 +113,20 @@ items <- function(x) {
   invisible(x)
 }
 
+#' Display the anchors of a circumplex instrument
+#' 
+#' Display the anchors of a circumplex instrument including the total number of
+#' anchors and each anchor's numerical value and text label. Anchors are the
+#' response options that respondants select from (e.g., 0 = No, 1 = Yes).
+#' 
+#' @param x Required. An object of the instrument class.
+#' @return The same input object. Prints text to console.
+#' @family instrument functions
 #' @export
+#' @examples 
+#' data(csip)
+#' anchors(csip)
+
 anchors <- function(x) {
   assert_that(is_instrument(x))
   
@@ -110,7 +149,21 @@ anchors <- function(x) {
   invisible(x)
 }
 
+#' Display the norms for a circumplex instrument
+#' 
+#' Display the norms for a circumplex instrument including the total number of
+#' normative data sets available and each data set's number, sample size, 
+#' population, and source reference and hyperlink. If another normative data set
+#' exists that is not yet included in the package, please let us know.
+#' 
+#' @param x Required. An object of the instrument class.
+#' @return The same input object. Prints text to console.
+#' @family instrument functions
 #' @export
+#' @examples 
+#' data(csip)
+#' norms(csip)
+
 norms <- function(x) {
   assert_that(is_instrument(x))
   
