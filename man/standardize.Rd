@@ -4,7 +4,7 @@
 \alias{standardize}
 \title{Standardize circumplex scales using normative data}
 \usage{
-standardize(.data, scales, angles, norms)
+standardize(.data, scales, angles, instrument, sample = 1)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -16,9 +16,12 @@ standardized.}
 \item{angles}{Required. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees).}
 
-\item{norms}{Required. A data frame containing normative data for each
-circumplex scale included in \code{scales}. The following variables are
-required: \code{Angle}, \code{M}, and \code{SD}. See \code{?iipsc}.}
+\item{instrument}{Required. An instrument object from the package. To see
+the available circumplex instruments, see \code{instruments()}.}
+
+\item{sample}{Required. An integer corresponding to the normative sample
+to use in standardizing the scale scores (default = 1). See \code{?norms}
+to see the normative samples available for an instrument.}
 }
 \value{
 A data frame that matches \code{.data} except that new variables are
@@ -34,7 +37,7 @@ scores (i.e., z-scores) based on comparison to the normative data.
 \examples{
 data("jz2017")
 data("iipsc")
-standardize(jz2017, scales = PA:NO, angles = octants(), norms = iipsc)
+standardize(jz2017, PA:NO, octants(), instrument = iipsc, sample = 1)
 }
 \seealso{
 Other tidying functions: \code{\link{ipsatize}},

@@ -4,7 +4,8 @@
 \alias{score}
 \title{Score circumplex scales from item responses}
 \usage{
-score(.data, items, key, na.rm = TRUE, prefix = "", suffix = "")
+score(.data, items, instrument, na.rm = TRUE, prefix = "",
+  suffix = "")
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -13,9 +14,8 @@ score(.data, items, key, na.rm = TRUE, prefix = "", suffix = "")
 variables in \code{.data} that contain all the circumplex items from a
 single circumplex measure, in ascending order from item 1 to item N.}
 
-\item{key}{Required. A data frame containing information about each
-circumplex scale to be calculated from \code{items}. The following
-variables are required: \code{Abbrev} and \code{Items}. See \code{?iipsc}.}
+\item{instrument}{Required. An instrument object from the package. To see
+the available circumplex instruments, use \code{instruments()}.}
 
 \item{na.rm}{Optional. A logical that determines if missing values should be
 omitted from the calculation of scores (default = TRUE). When set to TRUE,

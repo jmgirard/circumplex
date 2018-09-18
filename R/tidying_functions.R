@@ -39,9 +39,8 @@ ipsatize <- function(.data, items) {
 #' @param items Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain all the circumplex items from a
 #'   single circumplex measure, in ascending order from item 1 to item N.
-#' @param key Required. A data frame containing information about each
-#'   circumplex scale to be calculated from \code{items}. The following
-#'   variables are required: \code{Abbrev} and \code{Items}. See \code{?iipsc}.
+#' @param instrument Required. An instrument object from the package. To see
+#'   the available circumplex instruments, use \code{instruments()}.
 #' @param na.rm Optional. A logical that determines if missing values should be
 #'   omitted from the calculation of scores (default = TRUE). When set to TRUE,
 #'   scales with missing data are essentially calculated with mean imputation.
@@ -59,13 +58,14 @@ ipsatize <- function(.data, items) {
 #' #data("aw2012")
 #' data("iipsc")
 #' #score(aw2012, IIP01:IIP32, iipsc)
-score <- function(.data, items, key, na.rm = TRUE, prefix = "", suffix = "") {
+score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = "") {
   items_en <- rlang::enquo(items)
-  assert_that(is_provided(.data), is_enquo(!!items_en), is_provided(key))
+  assert_that(is_provided(.data), is_enquo(!!items_en), is_provided(instrument))
   assert_that(is.flag(na.rm), is.string(prefix))
 
   item_data <- .data %>% dplyr::select(!!items_en)
   n_items <- ncol(item_data)
+  key <- instrument$Scales
   for (i in 1:nrow(key)) {
     new_name <- rlang::sym(paste0(prefix, key$Abbrev[[i]], suffix))
     item_nums <- as.numeric(strsplit(key$Items[[i]], ",")[[1]])
@@ -92,9 +92,11 @@ score <- function(.data, items, key, na.rm = TRUE, prefix = "", suffix = "") {
 #'   standardized.
 #' @param angles Required. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in \code{scales} (in degrees).
-#' @param norms Required. A data frame containing normative data for each
-#'   circumplex scale included in \code{scales}. The following variables are
-#'   required: \code{Angle}, \code{M}, and \code{SD}. See \code{?iipsc}.
+#' @param instrument Required. An instrument object from the package. To see
+#'   the available circumplex instruments, see \code{instruments()}.
+#' @param sample Required. An integer corresponding to the normative sample
+#'   to use in standardizing the scale scores (default = 1). See \code{?norms}
+#'   to see the normative samples available for an instrument.
 #' @return A data frame that matches \code{.data} except that new variables are
 #'   appended that contain standardized versions of \code{scales}. These new
 #'   variables will have the same name as \code{scales} but with a "_z" suffix.
@@ -103,19 +105,21 @@ score <- function(.data, items, key, na.rm = TRUE, prefix = "", suffix = "") {
 #' @examples
 #' data("jz2017")
 #' data("iipsc")
-#' standardize(jz2017, scales = PA:NO, angles = octants(), norms = iipsc)
-standardize <- function(.data, scales, angles, norms) {
+#' standardize(jz2017, PA:NO, octants(), instrument = iipsc, sample = 1)
+standardize <- function(.data, scales, angles, instrument, sample = 1) {
   scales_en <- rlang::enquo(scales)
   scale_names <- names(dplyr::select(.data, !!scales_en))
   assert_that(is.numeric(angles))
   assert_that(length(scale_names) == length(angles))
-  assert_that(length(scale_names) <= nrow(norms))
+  key <- instrument$Norms[[1]] %>% 
+    dplyr::filter(Sample == sample)
+  assert_that(length(scale_names) <= nrow(key))
   for (i in 1:length(angles)) {
     scale_i <- scale_names[[i]]
     new_var <- rlang::sym(paste0(scale_i, "_z"))
-    index_i <- norms$Angle == angles[[i]]
-    m_i <- norms$M[index_i]
-    s_i <- norms$SD[index_i]
+    index_i <- key$Angle == angles[[i]]
+    m_i <- key$M[index_i]
+    s_i <- key$SD[index_i]
     .data <- .data %>%
       dplyr::mutate_at(
         .vars = scale_i,
