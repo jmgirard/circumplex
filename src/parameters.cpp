@@ -25,7 +25,7 @@ arma::vec ssm_parameters(arma::vec scores, arma::vec angles) {
   double xval = (2 / n) * inner(scores, arma::cos(angles));
   double yval = (2 / n) * inner(scores, arma::sin(angles));
   double ampl = std::sqrt(std::pow(xval, 2) + std::pow(yval, 2));
-  double disp = modu(std::atan2(yval, xval), 2 * PI);
+  double disp = modu(std::atan2(yval, xval), 2 * M_PI);
   double gfit = 1 - ((arma::sum(arma::pow(elev + ampl *
     arma::cos(angles - disp) - scores, 2))) / (arma::var(scores) * (n - 1)));
   arma::vec out = {elev, xval, yval, ampl, disp, gfit};
