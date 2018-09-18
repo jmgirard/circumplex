@@ -1,6 +1,7 @@
-new_instrument <- function(Scales, Items, Norms, Details, ...) {
+new_instrument <- function(Scales, Anchors, Items, Norms, Details, ...) {
   new_s3_scalar(
     Scales = Scales,
+    Anchors = Anchors,
     Items = Items,
     Norms = Norms,
     Details = Details,
@@ -37,6 +38,8 @@ summary.instrument <- function(x, ...) {
   anchors(x)
   cat("\n")
   items(x)
+  cat("\n")
+  norms(x)
 }
 
 scales <- function(x) {
@@ -56,10 +59,12 @@ scales <- function(x) {
       "\n"
     )
   }
+  
+  invisible(x)
 }
 
-items <- function(x, print_scale = TRUE) {
-  assert_that(is_instrument(x), is.flag(print_scale))
+items <- function(x) {
+  assert_that(is_instrument(x))
   
   cat(
     glue(
@@ -69,18 +74,13 @@ items <- function(x, print_scale = TRUE) {
   cat("\n")
   for (i in 1:nrow(x$Items)) {
     xi <- x$Items[i, ]
-    if (print_scale == TRUE) {
-      cat(
-        glue("{xi$Number}. {xi$Text} ({xi$Scale})"),
-        "\n"
-      )
-    } else {
-      cat(
-        glue("{xi$Number}. {xi$Text}"),
-        "\n"
-      )
+    if (!is.na(xi$Number)) {
+      cat(glue("{xi$Number}. "))
     }
+    cat(glue("{xi$Text}"), "\n")
   }
+  
+  invisible(x)
 }
 
 anchors <- function(x) {
@@ -89,17 +89,53 @@ anchors <- function(x) {
   cat(
     glue(
       "The {x$Details$Abbrev} is rated using the following ",
-      "{x$Details$Max-x$Details$Min+1}-point scale."
+      "{nrow(x$Anchors)}-point scale."
     ),
     "\n"
   )
-  
-  for(i in seq_along(x$Details$Anchors)) {
+  for(i in seq_along(x$Anchors$Value)) {
     cat(
       glue(
-        "{i}. {x$Details$Anchors[[i]]}"
+        "{x$Anchors$Value[[i]]}. {x$Anchors$Label[[i]]}"
       ),
       "\n"
     )
   }
+  
+  invisible(x)
+}
+
+norms <- function(x) {
+  assert_that(is_instrument(x))
+  
+  samples <- x$Norms[[2]]
+  n_norms <- nrow(samples)
+  
+  if (n_norms == 0) {
+    cat("The {x$Details$Abbrev} currently has no normative data sets.\n")
+    return()
+  }
+  
+  cat(
+    glue(
+      "The {x$Details$Abbrev} currently has {n_norms} normative data set(s):"
+    ),
+    "\n"
+  )
+  
+  for (i in 1:n_norms) {
+    sample_i <- samples$Sample[[i]]
+    size_i <- samples$Size[[i]]
+    pop_i <- samples$Population[[i]]
+    cat(
+      glue("{sample_i}. {size_i} {pop_i}"),
+      "\n  ",
+      glue("{samples$Reference[[i]]}"),
+      "\n  ",
+      glue("<{samples$URL[[i]]}>"),
+      "\n"
+    )  
+  }
+  
+  invisible(x)
 }

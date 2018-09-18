@@ -35,7 +35,21 @@ isc_norms_src <- tibble(
   Size = 649,
   Population = "American college students",
   Reference = "Hopwood et al. (2011)",
-  DOI = "10.1111/j.1467-6494.2011.00696.x"
+  URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x"
+)
+
+isc_anchors <- tibble(
+  Value = 1:8,
+  Label = c(
+    "Not at all, never bothers me",
+    "Very little, rarely bothers me",
+    "A little, occasionally bothers me",
+    "Slightly, bothers me less than half the time",
+    "Somewhat, bothers me more than half of the time",
+    "Quite, bothers me frequently",
+    "Very much, bothers me most of the time",
+    "Extremely, always bothers me"
+  )
 )
 
 isc_details <- list(
@@ -45,21 +59,9 @@ isc_details <- list(
   Scales = 8,
   Prefix = "It bothers me when a person...",
   Suffix = "",
-  Min = 1,
-  Max = 8,
-  Anchors = c(
-    "Not at all, never bothers me",
-    "Very little, rarely bothers me",
-    "A little, occasionally bothers me",
-    "Slightly, bothers me less than half the time",
-    "Somewhat, bothers me more than half of the time",
-    "Quite, bothers me frequently",
-    "Very much, bothers me most of the time",
-    "Extremely, always bothers me"
-  ),
   Construct = "interpersonal sensitivities",
   Reference = "Hopwood et al. (2011)",
-  DOI = "10.1111/j.1467-6494.2011.00696.x"
+  URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x"
 )
 
 isc_items <- tibble(
@@ -119,7 +121,7 @@ isc_items <- tibble(
     "Is really shy",
     "Is very passive",
     "Believes everything I say",
-    "Believs I can do no wrong",
+    "Believes I can do no wrong",
     "Tries to show me how to do things",
     "Always puts themselves first",
     "Is mean-spirited",
@@ -129,12 +131,12 @@ isc_items <- tibble(
     "Is soft",
     "Is clingy",
     "Takes control"
-  ),
-  Scale = rep(isc_scales$Abbrev, 8)
+  )
 )
 
 isc <- new_instrument(
   Scales = isc_scales,
+  Anchors = isc_anchors,
   Items = isc_items,
   Norms = list(isc_norms, isc_norms_src),
   Details = isc_details
