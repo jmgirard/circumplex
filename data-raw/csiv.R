@@ -1,18 +1,6 @@
-csiv <- tibble(
-  Scale = c(
-    "+A",
-    "+A-C",
-    "-C",
-    "-A-C",
-    "-A",
-    "-A+C",
-    "+C",
-    "+A+C"
-  ),
+csiv_scales <- tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
-  M = c(2.53, 1.38, 1.10, 1.66, 1.77, 2.67, 2.83, 2.93),
-  SD = c(0.63, 0.71, 0.70, 0.78, 0.75, 0.71, 0.69, 0.57),
   Items = c(
     "1,  9, 17, 25, 33, 41, 49, 57",
     "4, 12, 20, 28, 36, 44, 52, 60",
@@ -22,5 +10,69 @@ csiv <- tibble(
     "8, 16, 24, 32, 40, 48, 56, 64",
     "3, 11, 19, 27, 35, 43, 51, 59",
     "6, 14, 22, 30, 38, 46, 54, 62"
+  ),
+  Label = c(
+    "+A",
+    "+A-C",
+    "-C",
+    "-A-C",
+    "-A",
+    "-A+C",
+    "+C",
+    "+A+C"
+  )
+)
+
+csiv_norms <- tibble(
+  Sample = rep(1, 8),
+  Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+  M = c(2.53, 1.38, 1.10, 1.66, 1.77, 2.67, 2.83, 2.93),
+  SD = c(0.63, 0.71, 0.70, 0.78, 0.75, 0.71, 0.69, 0.57)
+)
+
+csiv_norms_src <- tibble(
+  Sample = 1,
+  Size = 1200,
+  Population = "American college students",
+  Reference = "Locke (2000)",
+  URL = "https://www.webpages.uidaho.edu/klocke/csiv.htm"
+)
+
+csiv_anchors <- tibble(
+  Value = 0:4,
+  Label = c(
+    "Not important to me",
+    "Mildly important to me",
+    "Moderately important to me",
+    "Very important to me",
+    "Extremely important to me"
+  )
+)
+
+csiv_details <- list(
+  Name = "Circumplex Scales of Interpersonal Values",
+  Abbrev = "CSIV",
+  Items = 64,
+  Scales = 8,
+  Prefix = "When I am with him/her/them, it is _____ ...",
+  Suffix = "",
+  Constructs = "interpersonal values",
+  Reference = "Locke (2000)",
+  URL = "https://doi.org/10.1207/S15327752JPA7502_6"
+)
+
+csiv_items <- tibble(
+  Number = 1:64,
+  Text = c(
+    "That I appear confident",
+    "That I not reveal my positive feelings for them",
+    "That I feel connected to them",
+    "That I appear forceful",
+    "That I conform to their expectations",
+    "That I am unique",
+    "That I keep my guard up",
+    "That I put their needs before mine",
+    "That they acknowledge when I am right",
+    "That I not make a social blunder"
   )
 )

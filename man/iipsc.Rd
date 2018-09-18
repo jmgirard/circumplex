@@ -4,7 +4,7 @@
 \name{iipsc}
 \alias{iipsc}
 \title{Instrument: IIP-SC}
-\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 8 rows and 6 columns.}
+\format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://doi.org/10.1080/00223890802388665}
 }

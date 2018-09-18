@@ -61,3 +61,48 @@ ipip_details <- list(
   URL = "https://doi.org/10.1177/1073191109340382"
 )
 
+ipip_items <- tibble(
+  Number = 1:32,
+  Text = c(
+    "Am quiet around strangers",
+    "Speak softly",
+    "Tolerate a lot from others",
+    "Am interested in people",
+    "Feel comfortable around people",
+    "Demand to be the center of interest",
+    "Cut others to pieces",
+    "Believe people should fend for themselves",
+    "Am a very private person",
+    "Let others finish what they are saying",
+    "Take things as they come",
+    "Reassure others",
+    "Start conversations",
+    "Do most of the talking",
+    "Contradict others",
+    "Don't fall for sob-stories",
+    "Don't talk a lot",
+    "Seldom toot my own horn",
+    "Think of others first",
+    "Inquire about others' well-being",
+    "Talk to a lot of different people at parties",
+    "Speak loudly",
+    "Snap at people",
+    "Don't put a lot of thought into things",
+    "Have little to say",
+    "Dislike being the center of attention",
+    "Seldom stretch the truth",
+    "Get along well with others",
+    "Love large parties",
+    "Demand attention",
+    "Have a sharp tongue",
+    "Am not interested in other people's problems"
+  )
+)
+
+ipipipc <- new_instrument(
+  Scales = ipip_scales,
+  Anchors = ipip_anchors,
+  Items = ipip_items,
+  Norms = list(ipip_norms, ipip_norms_src),
+  Details = ipip_details
+)
