@@ -16,6 +16,7 @@ iipsc_scales <- tibble(
 iipsc_norms <- tibble(
   Sample = c(rep(1, 8), rep(2, 8)),
   Scale = rep(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 2),
+  Angle = rep(c(90, 135, 180, 225, 270, 315, 360, 45), 2),
   M = c(
     c(3.04, 3.17, 3.60, 4.19, 5.68, 5.54, 5.86, 4.10) / 4,
     c(0.99, 0.97, 1.30, 1.33, 1.81, 1.92, 2.14, 1.43)
