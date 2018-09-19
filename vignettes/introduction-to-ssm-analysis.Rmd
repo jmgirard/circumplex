@@ -358,7 +358,8 @@ jz2017s <- standardize(
   .data = jz2017,
   scales = c(PA, BC, DE, FG, HI, JK, LM, NO),
   angles = c(90, 135, 180, 225, 270, 315, 360, 45),
-  norms = iipsc
+  instrument = iipsc,
+  sample = 1
 )
 print(jz2017s)
 ```
