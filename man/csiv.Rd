@@ -4,7 +4,7 @@
 \name{csiv}
 \alias{csiv}
 \title{Instrument: CSIV}
-\format{An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 8 rows and 6 columns.}
+\format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
 }

@@ -58,6 +58,16 @@
 #' summary(csie)
 "csie"
 
+#' Instrument: CSIG
+#' 
+#' Information about the Circumplex Scales of Intergroup Goals.
+#' 
+#' @source \url{https://www.webpages.uidaho.edu/klocke/csig.htm}
+#' @examples 
+#' data(csig)
+#' summary(csig)
+"csig"
+
 #' Instrument: CSIP
 #' 
 #' Information about the Circumplex Scales of Interpersonal Problems.
@@ -89,6 +99,18 @@
 #' data(iip32)
 #' summary(iip32)
 "iip32"
+
+#' Instrument: IIP-64
+#'
+#' Information about the Inventory of Interpersonal Problems. Note that,
+#' although we have permission to provide some information about the IIP-64,
+#' Mind Garden Inc. has exclusive rights to distribute it in full.
+#' 
+#' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
+#' @examples 
+#' data(iip64)
+#' summary(iip64)
+"iip64"
 
 #' Instrument: IIP-SC
 #'

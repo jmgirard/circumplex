@@ -10,6 +10,16 @@ iipsc_scales <- tibble(
     "6, 14, 22, 30",
     "7, 15, 23, 31",
     "8, 16, 24, 32"
+  ),
+  Label = c(
+    "Domineering",
+    "Vindictive",
+    "Cold",
+    "Socially Avoidant",
+    "Nonassertive",
+    "Exploitable",
+    "Overly Nurturant",
+    "Intrusive"
   )
 )
 
