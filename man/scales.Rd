@@ -22,6 +22,7 @@ scales(csip)
 }
 \seealso{
 Other instrument functions: \code{\link{anchors}},
-  \code{\link{items}}, \code{\link{norms}}
+  \code{\link{instruments}}, \code{\link{items}},
+  \code{\link{norms}}
 }
 \concept{instrument functions}

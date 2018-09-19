@@ -26,6 +26,7 @@ csip_scales <- tibble(
 csip_norms <- tibble(
   Sample = rep(1, 8),
   Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+  Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   M = c(3.0, 3.2, 5.6, 7.2, 7.1, 6.5, 7.4, 4.7) / 8,
   SD = c(3.9, 3.8, 5.1, 5.5, 5.1, 4.6, 4.7, 4.0) / 8
 )
