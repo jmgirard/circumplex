@@ -19,12 +19,12 @@ population, and source reference and hyperlink. If another normative data set
 exists that is not yet included in the package, please let us know.
 }
 \examples{
-data(csip)
+instrument(csip)
 norms(csip)
 }
 \seealso{
 Other instrument functions: \code{\link{anchors}},
-  \code{\link{instruments}}, \code{\link{items}},
-  \code{\link{scales}}
+  \code{\link{instruments}}, \code{\link{instrument}},
+  \code{\link{items}}, \code{\link{scales}}
 }
 \concept{instrument functions}

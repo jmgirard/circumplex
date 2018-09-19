@@ -2,29 +2,21 @@
 % Please edit documentation in R/dat_oop.R
 \name{instruments}
 \alias{instruments}
-\title{Load and list all circumplex instruments}
+\title{List all available instruments}
 \usage{
-instruments(load = TRUE, display = TRUE)
-}
-\arguments{
-\item{load}{Optional. A logical determining whether the instrument objects
-should be loaded into the environment (default = TRUE).}
-
-\item{display}{Optional. A logical determining whether a list of the
-instruments hould be displayed in the console (default = TRUE).}
+instruments()
 }
 \description{
 The circumplex package includes information about numerous circumplex
 instruments including instructions for scoring and standardizing items.
-Individual instruments can be loaded using the \code{data()} function, but
-this function can be used to quickly load (and list) all such instruments.
+Individual instruments can be loaded using the \code{instrument} function.
 }
 \examples{
 instruments()
 }
 \seealso{
 Other instrument functions: \code{\link{anchors}},
-  \code{\link{items}}, \code{\link{norms}},
-  \code{\link{scales}}
+  \code{\link{instrument}}, \code{\link{items}},
+  \code{\link{norms}}, \code{\link{scales}}
 }
 \concept{instrument functions}

@@ -55,7 +55,7 @@ summary.instrument <- function(object, ...) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' data(csip)
+#' instrument(csip)
 #' scales(csip)
 
 scales <- function(x) {
@@ -90,7 +90,7 @@ scales <- function(x) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' data(csip)
+#' instrument(csip)
 #' items(csip)
 
 items <- function(x) {
@@ -124,7 +124,7 @@ items <- function(x) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' data(csip)
+#' instrument(csip)
 #' anchors(csip)
 
 anchors <- function(x) {
@@ -161,7 +161,7 @@ anchors <- function(x) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' data(csip)
+#' instrument(csip)
 #' norms(csip)
 
 norms <- function(x) {
@@ -200,48 +200,62 @@ norms <- function(x) {
 }
 
 
-#' Load and list all circumplex instruments
+#' List all available instruments
 #'
 #' The circumplex package includes information about numerous circumplex
 #' instruments including instructions for scoring and standardizing items.
-#' Individual instruments can be loaded using the \code{data()} function, but
-#' this function can be used to quickly load (and list) all such instruments.
+#' Individual instruments can be loaded using the \code{instrument} function.
 #'
-#' @param load Optional. A logical determining whether the instrument objects
-#'   should be loaded into the environment (default = TRUE).
-#' @param display Optional. A logical determining whether a list of the
-#'   instruments hould be displayed in the console (default = TRUE).
 #' @family instrument functions
 #' @export
 #' @examples
 #' instruments()
 
-instruments <- function(load = TRUE, display = TRUE) {
+instruments <- function() {
 
   # TODO: Find a way to automate this - maybe dir?
 
-  if (load == TRUE) {
-    data("csie")
-    data("csip")
-    data("csiv")
-    data("iip32")
-    data("iipsc")
-    data("iis64")
-    data("ipipipc")
-    data("isc")
-  }
+  cat(
+    "The circumplex package currently includes 10 instruments:\n",
+    "1. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)\n",
+    "2. CSIG: Circumplex Scales of Intergroup Goals (csig)\n",
+    "3. CSIP: Circumplex Scales of Interpersonal Problems (csip)\n",
+    "4. CSIV: Circumplex Scales of Interpersonal Values (csiv)\n",
+    "5. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)\n",
+    "6. IIP-64: Inventory of Interpersonal Problems (iip64)\n",
+    "7. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)\n",
+    "8. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
+    "9. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
+    "10. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
+  )
+}
 
-  if (display == TRUE) {
-    cat(
-      "The circumplex package currently includes 8 instruments:\n",
-      "1. CSIE: Circumplex Scales of Interpersonal Efficacy\n",
-      "2. CSIP: Circumplex Scales of Interpersonal Problems\n",
-      "3. CSIV: Circumplex Scales of Interpersonal Values\n",
-      "4. IIP-32: Inventory of Interpersonal Problems, Brief Version\n",
-      "5. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex\n",
-      "6. IIS-64: Inventory of Interpersonal Strengths\n",
-      "7. IPIP-IPC: IPIP Interpersonal Circumplex\n",
-      "8. ISC: Interpersonal Sensitivities Circumplex\n"
-    )
-  }
+#' Load a specific instrument object
+#'
+#' The circumplex pacakge includes information about numerous circumplex
+#' instruments including instructions for scoring and standardizing items to be
+#' used in conjunction with the \code{score} and \code{standardize} functions.
+#' This function loads the information for a specific instrument into memory.
+#' See the \code{instruments} function to list all available instruments.
+#'
+#' @param name Required. A string (e.g., "iip32") or text in non-standard
+#'   evaluation (e.g., iip32). The name of the instrument assigned by this
+#'   package. It should contain only lowercase alphanumeric characters.
+#' @return The instrument object for the requested circumplex instrument. If
+#'   the function is called without a name assignment (LHS), then the object
+#'   will be created in the global environment with the default name as above.
+#'   Or, if a name is assigned (LHS), the object will have that name instead.
+#' @family instrument functions
+#' @export
+#' @examples
+#' instrument(iip32)
+#' instrument("iip32")
+#' x <- instrument(iip32)
+
+instrument <- function(name) {
+  name_en <- rlang::enquo(name)
+  assert_that(is_enquo(name_en))
+  name_str <- rlang::quo_name(name_en)
+  data(list = name_str)
+  get(name_str)
 }

@@ -17,12 +17,12 @@ Display the scales of a circumplex instrument including the total number of
 scales and each scale's abbreviation, hypothetical angle, and text label.
 }
 \examples{
-data(csip)
+instrument(csip)
 scales(csip)
 }
 \seealso{
 Other instrument functions: \code{\link{anchors}},
-  \code{\link{instruments}}, \code{\link{items}},
-  \code{\link{norms}}
+  \code{\link{instruments}}, \code{\link{instrument}},
+  \code{\link{items}}, \code{\link{norms}}
 }
 \concept{instrument functions}

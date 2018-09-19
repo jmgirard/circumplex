@@ -22,7 +22,7 @@ omitted from the calculation of scores (default = TRUE). When set to TRUE,
 scales with missing data are essentially calculated with mean imputation.}
 
 \item{prefix}{Optional. A string to include at the beginning of the newly
-calcualted scale variables' names, before \code{Abbrev} from \code{key}
+calculated scale variables' names, before \code{Abbrev} from \code{key}
 and \code{suffix} (default = "").}
 
 \item{suffix}{Optional. A string to include at the end of the newly

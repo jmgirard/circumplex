@@ -18,12 +18,12 @@ items and each item's number and text. The item ordering/numbering displayed
 here is the same ordering/numbering assumed by the \code{score()} function.
 }
 \examples{
-data(csip)
+instrument(csip)
 items(csip)
 }
 \seealso{
 Other instrument functions: \code{\link{anchors}},
-  \code{\link{instruments}}, \code{\link{norms}},
-  \code{\link{scales}}
+  \code{\link{instruments}}, \code{\link{instrument}},
+  \code{\link{norms}}, \code{\link{scales}}
 }
 \concept{instrument functions}
