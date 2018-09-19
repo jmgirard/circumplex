@@ -45,7 +45,7 @@ ipsatize <- function(.data, items) {
 #'   omitted from the calculation of scores (default = TRUE). When set to TRUE,
 #'   scales with missing data are essentially calculated with mean imputation.
 #' @param prefix Optional. A string to include at the beginning of the newly
-#'   calcualted scale variables' names, before \code{Abbrev} from \code{key}
+#'   calculated scale variables' names, before \code{Abbrev} from \code{key}
 #'   and \code{suffix} (default = "").
 #' @param suffix Optional. A string to include at the end of the newly
 #'   calculated scale variables' names, after \code{Abbrev} from \code{key}
@@ -60,6 +60,7 @@ ipsatize <- function(.data, items) {
 #' #score(aw2012, IIP01:IIP32, iipsc)
 score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = "") {
   items_en <- rlang::enquo(items)
+  
   assert_that(is_provided(.data), is_enquo(!!items_en), is_provided(instrument))
   assert_that(is.flag(na.rm), is.string(prefix))
 
@@ -97,6 +98,12 @@ score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = 
 #' @param sample Required. An integer corresponding to the normative sample
 #'   to use in standardizing the scale scores (default = 1). See \code{?norms}
 #'   to see the normative samples available for an instrument.
+#' @param prefix Optional. A string to include at the beginning of the newly
+#'   calcualted scale variables' names, before the scale name and \code{suffix}
+#'   (default = "z").
+#' @param suffix Optional. A string to include at the end of the newly
+#'   calculated scale variables' names, after the scale name and \code{prefix}
+#'   (default = "").
 #' @return A data frame that matches \code{.data} except that new variables are
 #'   appended that contain standardized versions of \code{scales}. These new
 #'   variables will have the same name as \code{scales} but with a "_z" suffix.
@@ -106,17 +113,20 @@ score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = 
 #' data("jz2017")
 #' data("iipsc")
 #' standardize(jz2017, PA:NO, octants(), instrument = iipsc, sample = 1)
-standardize <- function(.data, scales, angles, instrument, sample = 1) {
+standardize <- function(.data, scales, angles, instrument, sample = 1, 
+                        prefix = "z", suffix = "") {
+  
   scales_en <- rlang::enquo(scales)
   scale_names <- names(dplyr::select(.data, !!scales_en))
   assert_that(is.numeric(angles))
   assert_that(length(scale_names) == length(angles))
+  assert_that(is.string(prefix), is.string(suffix))
   key <- instrument$Norms[[1]] %>% 
     dplyr::filter(Sample == sample)
   assert_that(length(scale_names) <= nrow(key))
   for (i in 1:length(angles)) {
     scale_i <- scale_names[[i]]
-    new_var <- rlang::sym(paste0(scale_i, "_z"))
+    new_var <- rlang::sym(paste0(prefix, scale_i, suffix))
     index_i <- key$Angle == angles[[i]]
     m_i <- key$M[index_i]
     s_i <- key$SD[index_i]
