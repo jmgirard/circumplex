@@ -24,7 +24,7 @@ We've already seen how adding the `measures` argument can change `ssm_analyze()`
 ```{r group}
 data("jz2017")
 data("iipsc")
-jz2017s <- standardize(jz2017, PA:NO, octants(), norms = iipsc)
+jz2017s <- standardize(jz2017, PA:NO, octants(), instrument = iipsc, sample = 1)
 results <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
 summary(results)
 ```
