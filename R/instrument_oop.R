@@ -26,8 +26,8 @@ print.instrument <- function(x, ...) {
 }
 
 #' @export
-summary.instrument <- function(object, scales = TRUE, anchors = TRUE, 
-  items = TRUE, norms = TRUE, ...) {
+summary.instrument <- function(object, scales = TRUE, anchors = TRUE,
+                               items = TRUE, norms = TRUE, ...) {
   x <- object
   print(x)
   if (scales == TRUE) {

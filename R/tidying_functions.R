@@ -60,7 +60,7 @@ ipsatize <- function(.data, items) {
 #' #score(aw2012, IIP01:IIP32, iipsc)
 score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = "") {
   items_en <- rlang::enquo(items)
-  
+
   assert_that(is_provided(.data), is_enquo(!!items_en), is_provided(instrument))
   assert_that(is.flag(na.rm), is.string(prefix))
 
@@ -113,15 +113,14 @@ score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = 
 #' data("jz2017")
 #' data("iipsc")
 #' standardize(jz2017, PA:NO, octants(), instrument = iipsc, sample = 1)
-standardize <- function(.data, scales, angles, instrument, sample = 1, 
+standardize <- function(.data, scales, angles, instrument, sample = 1,
                         prefix = "z", suffix = "") {
-  
   scales_en <- rlang::enquo(scales)
   scale_names <- names(dplyr::select(.data, !!scales_en))
   assert_that(is.numeric(angles))
   assert_that(length(scale_names) == length(angles))
   assert_that(is.string(prefix), is.string(suffix))
-  key <- instrument$Norms[[1]] %>% 
+  key <- instrument$Norms[[1]] %>%
     dplyr::filter(Sample == sample)
   assert_that(length(scale_names) <= nrow(key))
   for (i in 1:length(angles)) {
