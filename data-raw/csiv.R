@@ -50,7 +50,7 @@ csiv_anchors <- tibble(
   )
 )
 
-csiv_details <- list(
+csiv_details <- tibble(
   Name = "Circumplex Scales of Interpersonal Values",
   Abbrev = "CSIV",
   Items = 64,

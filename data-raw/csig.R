@@ -34,7 +34,7 @@ csig_norms <- tibble(
 csig_norms_src <- tibble(
   Sample = 1,
   Size = 665,
-  Population = "MTurkers from US, Canada, and India",
+  Population = "MTurkers from US, Canada, and India about interactions between nations",
   Reference = "Locke (2014)",
   URL = "https://doi.org/10.1177/0146167213514280"
 )

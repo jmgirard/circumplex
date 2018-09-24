@@ -51,7 +51,7 @@ iis64_anchors <- tibble(
   )
 )
 
-iis64_details <- list(
+iis64_details <- tibble(
   Name = "Inventory of Interpersonal Strengths",
   Abbrev = "IIS-64",
   Items = 64,

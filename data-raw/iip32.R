@@ -62,7 +62,7 @@ iip32_anchors <- tibble(
   )
 )
 
-iip32_details <- list(
+iip32_details <- tibble(
   Name = "Inventory of Interpersonal Problems, Brief Version",
   Abbrev = "IIP-32",
   Items = 32,

@@ -49,7 +49,7 @@ csip_anchors <- tibble(
   )
 )
 
-csip_details <- list(
+csip_details <- tibble(
   Name = "Circumplex Scales of Interpersonal Problems",
   Abbrev = "CSIP",
   Items = 64,

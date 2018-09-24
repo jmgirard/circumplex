@@ -49,7 +49,7 @@ ipip_anchors <- tibble(
   )
 )
 
-ipip_details <- list(
+ipip_details <- tibble(
   Name = "IPIP Interpersonal Circumplex",
   Abbrev = "IPIP-IPC",
   Items = 32,

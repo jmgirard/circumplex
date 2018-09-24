@@ -65,7 +65,7 @@ iipsc_anchors <- tibble(
   )
 )
 
-iipsc_details <- list(
+iipsc_details <- tibble(
   Name = "Inventory of Interpersonal Problems Short Circumplex",
   Abbrev = "IIP-SC",
   Items = 32,
@@ -79,7 +79,7 @@ iipsc_details <- list(
 
 iipsc_items <- tibble(
   Number = NA,
-  Text = "Pending"
+  Text = "Pending permission."
 )
 
 iipsc <- new_instrument(

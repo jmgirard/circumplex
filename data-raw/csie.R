@@ -56,7 +56,7 @@ csie_anchors <- tibble(
   )
 )
 
-csie_details <- list(
+csie_details <- tibble(
   Name = "Circumplex Scales of Interpersonal Efficacy",
   Abbrev = "CSIE",
   Items = 32,

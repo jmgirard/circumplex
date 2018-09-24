@@ -53,7 +53,7 @@ isc_anchors <- tibble(
   )
 )
 
-isc_details <- list(
+isc_details <- tibble(
   Name = "Interpersonal Sensitivities Circumplex",
   Abbrev = "ISC",
   Items = 64,
