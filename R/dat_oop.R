@@ -26,23 +26,26 @@ print.instrument <- function(x, ...) {
 }
 
 #' @export
-summary.instrument <- function(object, ...) {
+summary.instrument <- function(object, scales = TRUE, anchors = TRUE, 
+  items = TRUE, norms = TRUE, ...) {
   x <- object
-  cat(
-    glue(
-      "The {x$Details$Name} ({x$Details$Abbrev}) is a {x$Details$Items}-item ",
-      "circumplex measure of {x$Details$Construct} from {x$Details$Reference}."
-    ),
-    "\n"
-  )
-  cat("\n")
-  scales(x)
-  cat("\n")
-  anchors(x)
-  cat("\n")
-  items(x)
-  cat("\n")
-  norms(x)
+  print(x)
+  if (scales == TRUE) {
+    cat("\n")
+    scales(x)
+  }
+  if (anchors == TRUE) {
+    cat("\n")
+    anchors(x)
+  }
+  if (items == TRUE) {
+    cat("\n")
+    items(x)
+  }
+  if (norms == TRUE) {
+    cat("\n")
+    norms(x)
+  }
 }
 
 #' Display the scales of a circumplex instrument
