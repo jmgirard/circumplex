@@ -1,4 +1,4 @@
-context("test-dat_oop")
+context("test-instrument_oop")
 
 test_that("S3 class constructors for instrument class work as expected", {
   
@@ -25,5 +25,7 @@ test_that("S3 methods for instrument class work as expected", {
   
   expect_output(norms(isc),
     "The ISC currently has 1 normative data set\\(s\\): \\\n1\\. 649 American college students \\\n   Hopwood et al\\. \\(2011\\)*")
+  
+  expect_output(summary(isc), "The Interpersonal Sensitivities Circumplex*")
   
 })
