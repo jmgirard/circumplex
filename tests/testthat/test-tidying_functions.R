@@ -32,3 +32,24 @@ test_that("score works", {
   expect_equal(new$LM, c(3.25, 1.25, 1.75, 1.50, 1.25))
   expect_equal(new$NO, c(2.75, 3.75, 2.75, 2.25, 1.00))
 })
+
+test_that("standardize works", {
+  instrument("iipsc")
+  set.seed(12345)
+  old <- data.frame(
+    matrix(
+      runif(8 * 5, min = 0, max = 4),
+      nrow = 5,
+      ncol = 8
+    )
+  )
+  new <- standardize(old, X1:X8, octants(), iipsc, sample = 1)
+  expect_equal(round(new$zX1, 4), c(3.2176, 4.1562, 3.4605, 4.2189, 1.6150))
+  expect_equal(round(new$zX2, 4), c(-0.1841, 0.7361, 1.8035, 3.0700, 4.5891))
+  expect_equal(round(new$zX3, 4), c(-0.8911, -0.3398, 2.3892, -1.0473, 0.7776))
+  expect_equal(round(new$zX4, 4), c(0.8469, 0.5331, 0.5936, -0.3500, 2.9120))
+  expect_equal(round(new$zX5, 4), c(0.4316, -0.1235, 2.6685, 1.5409, 1.2658))
+  expect_equal(round(new$zX6, 4), c(0.2045, 1.6530, 0.9281, -0.5620, 0.6490))
+  expect_equal(round(new$zX7, 4), c(2.0691, -1.7467, -0.8656, 1.5301, 0.0187))
+  expect_equal(round(new$zX8, 4), c(0.5269, 3.0627, 3.2395, 1.8059, -0.6111))
+})
