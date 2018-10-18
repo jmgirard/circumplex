@@ -8,6 +8,8 @@
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param items Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex items to be ipsatized.
+#' @param na.rm Optional. A logical that determines whether missing values
+#'   should be ignored during the calculation of the mean during ipsatization.
 #' @return A data frame that matches \code{.data} except that new variables are
 #'   appended that contain ipsatized versions of \code{items}. These new
 #'   variables will have the same name as \code{items} but with a "_i" suffix.
@@ -16,11 +18,12 @@
 #' @examples
 #' data("jz2017")
 #' ipsatize(jz2017, PA:NO)
-ipsatize <- function(.data, items) {
+ipsatize <- function(.data, items, na.rm = TRUE) {
+  
   items_en <- rlang::enquo(items)
   new <- .data %>%
     dplyr::select(!!items_en) %>%
-    dplyr::mutate(.im = rowMeans(.)) %>%
+    dplyr::mutate(.im = rowMeans(., na.rm = na.rm)) %>%
     dplyr::transmute_at(
       .vars = dplyr::vars(!!items_en),
       .funs = dplyr::funs(i = . - .im)
@@ -59,6 +62,7 @@ ipsatize <- function(.data, items) {
 #' data("iipsc")
 #' #score(aw2012, IIP01:IIP32, iipsc)
 score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = "") {
+  
   items_en <- rlang::enquo(items)
 
   assert_that(is_provided(.data), is_enquo(!!items_en), is_provided(instrument))

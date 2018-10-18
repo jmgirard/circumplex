@@ -4,13 +4,16 @@
 \alias{ipsatize}
 \title{Ipsatize circumplex items using deviation scoring across variables}
 \usage{
-ipsatize(.data, items)
+ipsatize(.data, items, na.rm = TRUE)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
 
 \item{items}{Required. The variable names or column numbers for the
 variables in \code{.data} that contain circumplex items to be ipsatized.}
+
+\item{na.rm}{Optional. A logical that determines whether missing values
+should be ignored during the calculation of the mean during ipsatization.}
 }
 \value{
 A data frame that matches \code{.data} except that new variables are
