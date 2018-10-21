@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create a Circular Plot of SSM Results — ssm_plot_circle • circumplex</title>
+<title>Display the items of a circumplex instrument — items • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,11 +36,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Create a Circular Plot of SSM Results — ssm_plot_circle" />
+<meta property="og:title" content="Display the items of a circumplex instrument — items" />
 
-<meta property="og:description" content="Take in the results of a Structural Summary Method analysis and plot the
-point and interval estimate for each row (e.g., group or measure) in a
-circular space quantified by displacement and amplitude." />
+<meta property="og:description" content="Display the items of a circumplex instrument including the total number of
+items and each item's number and text. The item ordering/numbering displayed
+here is the same ordering/numbering assumed by the score() function." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -128,53 +128,108 @@ circular space quantified by displacement and amplitude." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create a Circular Plot of SSM Results</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/ssm_visualization.R'><code>R/ssm_visualization.R</code></a></small>
-    <div class="hidden name"><code>ssm_plot_circle.Rd</code></div>
+    <h1>Display the items of a circumplex instrument</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/instrument_oop.R'><code>R/instrument_oop.R</code></a></small>
+    <div class="hidden name"><code>items.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Take in the results of a Structural Summary Method analysis and plot the
-point and interval estimate for each row (e.g., group or measure) in a
-circular space quantified by displacement and amplitude.</p>
+    <p>Display the items of a circumplex instrument including the total number of
+items and each item's number and text. The item ordering/numbering displayed
+here is the same ordering/numbering assumed by the <code><a href='score.html'>score()</a></code> function.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>ssm_plot_circle</span>(<span class='no'>.ssm_object</span>, <span class='kw'>amax</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fontsize</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>lowfit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>items</span>(<span class='no'>x</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>.ssm_object</th>
-      <td><p>The output of <code>ssm_profiles()</code> or
-<code>ssm_measures()</code>.</p></td>
-    </tr>
-    <tr>
-      <th>amax</th>
-      <td><p>A positive real number corresponding to the radius of the circle.
-It is used to scale the amplitude values and will determine which amplitude
-labels are drawn.</p></td>
-    </tr>
-    <tr>
-      <th>fontsize</th>
-      <td><p>A positive real number corresponding to the size (in pt) of
-the text labels (default = 12).</p></td>
-    </tr>
-    <tr>
-      <th>lowfit</th>
-      <td><p>A logical determining whether profiles with low model fit
-(&lt;.70) should be plotted, with dashed borders (default = TRUE).</p></td>
+      <th>x</th>
+      <td><p>Required. An object of the instrument class.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot variable containing a completed circular plot.</p>
+    <p>The same input object. Prints text to console.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other instrument functions: <code><a href='anchors.html'>anchors</a></code>,
+  <code><a href='instruments.html'>instruments</a></code>, <code><a href='instrument.html'>instrument</a></code>,
+  <code><a href='norms.html'>norms</a></code>, <code><a href='scales.html'>scales</a></code></p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='instrument.html'>instrument</a></span>(<span class='no'>csip</span>)
+<span class='fu'>items</span>(<span class='no'>csip</span>)</div><div class='output co'>#&gt; The CSIP contains 64 items.
+#&gt; 1. Bossing around other people too much 
+#&gt; 2. Acting rude and inconsiderate toward others 
+#&gt; 3. Pushing away from other people who get too close 
+#&gt; 4. Difficulty making friends 
+#&gt; 5. Lacking self-confidence 
+#&gt; 6. Letting other people boss me around too much 
+#&gt; 7. Putting other people's needs before my own too much 
+#&gt; 8. Being overly affectionate with others 
+#&gt; 9. Verbally or physically abusing others 
+#&gt; 10. Acting selfishly with others 
+#&gt; 11. Difficulty showing love and affection to others 
+#&gt; 12. Having trouble fitting in with others 
+#&gt; 13. Getting easily embarrassed in front of others 
+#&gt; 14. Acting overly submissive with others 
+#&gt; 15. Giving too much to others 
+#&gt; 16. Difficulty keeping personal matters private from others 
+#&gt; 17. Starting arguments and conflicts with others 
+#&gt; 18. Being unable to feel guilt or remorse 
+#&gt; 19. Being unable to enjoy the company of others 
+#&gt; 20. Avoiding people or social situations 
+#&gt; 21. Difficulty taking the lead 
+#&gt; 22. Being unable to express anger toward others 
+#&gt; 23. Forgiving people too easily 
+#&gt; 24. Talking too much 
+#&gt; 25. Trying to influence or control other people too much 
+#&gt; 26. Lacking respect for other people's beliefs, attitudes, or opinions 
+#&gt; 27. Feeling emotionally disconnected from others 
+#&gt; 28. Being unable to keep conversations going 
+#&gt; 29. Having trouble asserting myself 
+#&gt; 30. Being too concerned about what other people think 
+#&gt; 31. Being overly sentimental or tender-hearted 
+#&gt; 32. Flirting with other people too much 
+#&gt; 33. Dominating or intimidating others 
+#&gt; 34. Having trouble getting along with others 
+#&gt; 35. Difficulty developing close and lasting relationships 
+#&gt; 36. Feeling like an outsider in most social situations 
+#&gt; 37. Feeling weak and insecure around dominant others 
+#&gt; 38. Being easily taken advantage of 
+#&gt; 39. Being easily affected by the pain and suffering of others 
+#&gt; 40. Having trouble respecting other people's privacy 
+#&gt; 41. Acting aggressively toward others 
+#&gt; 42. Being insensitive to the thoughts, feelings, and needs of others 
+#&gt; 43. Being unable to fully connect with others 
+#&gt; 44. Being unable to be myself around others 
+#&gt; 45. Being unable to stand up to others 
+#&gt; 46. Compromising with other people too much 
+#&gt; 47. Trusting people too easily 
+#&gt; 48. Exaggerating so that other people will respect me 
+#&gt; 49. Manipulating other people to get what I want 
+#&gt; 50. Disliking most people 
+#&gt; 51. Difficulty opening up to others 
+#&gt; 52. Feeling fearful or nervous in social situations 
+#&gt; 53. Avoiding confrontation when problems arise 
+#&gt; 54. Being easily influenced by others 
+#&gt; 55. Trying to solve other people's problems too much 
+#&gt; 56. Confronting people too quickly about problems 
+#&gt; 57. Acting superior or condescending toward others 
+#&gt; 58. Having trouble giving emotional or moral support to others 
+#&gt; 59. Feeling uncomfortable with being close or intimate with others 
+#&gt; 60. Acting shy around others 
+#&gt; 61. Letting other people make decisions too often 
+#&gt; 62. Being unable to say 'no' 
+#&gt; 63. Getting too attached to others 
+#&gt; 64. Needing to be the center of attention </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -182,7 +237,11 @@ the text labels (default = 12).</p></td>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-          </ul>
+
+      <li><a href="#see-also">See also</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

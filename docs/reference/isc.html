@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Normative data for ISC — isc • circumplex</title>
+<title>Instrument: ISC — isc • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,12 +36,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Normative data for ISC — isc" />
+<meta property="og:title" content="Instrument: ISC — isc" />
 
-<meta property="og:description" content="Means and standard deviations for the octant scales of the Interpersonal
-Sensitivities Circumplex (ISC). Norms correspond to data from 649 American
-college students. Note that these norms assume that mean scale scores are
-used rather than sum scale scores. Scores range from 1 to 8." />
+<meta property="og:description" content="Information about the Interpersonal Sensitivities Circumplex." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -72,7 +69,7 @@ used rather than sum scale scores. Scores range from 1 to 8." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9004</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9100</span>
       </span>
     </div>
 
@@ -88,6 +85,9 @@ used rather than sum scale scores. Scores range from 1 to 8." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/using-instruments.html">Using Circumplex Instruments</a>
+    </li>
     <li>
       <a href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
     </li>
@@ -126,17 +126,14 @@ used rather than sum scale scores. Scores range from 1 to 8." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Normative data for ISC</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/example_data.R'><code>R/example_data.R</code></a></small>
+    <h1>Instrument: ISC</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/instrument_data.R'><code>R/instrument_data.R</code></a></small>
     <div class="hidden name"><code>isc.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Means and standard deviations for the octant scales of the Interpersonal
-Sensitivities Circumplex (ISC). Norms correspond to data from 649 American
-college students. Note that these norms assume that mean scale scores are
-used rather than sum scale scores. Scores range from 1 to 8.</p>
+    <p>Information about the Interpersonal Sensitivities Circumplex.</p>
     
     </div>
 
@@ -144,20 +141,110 @@ used rather than sum scale scores. Scores range from 1 to 8.</p>
         
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>A data frame with 8 observations and 6 variables:</p><dl class='dl-horizontal'>
-<dt>Scale</dt><dd><p>Text description (name) of the scale</p></dd>
-<dt>Abbrev</dt><dd><p>Text abbreviation of the scale name</p></dd>
-<dt>Angle</dt><dd><p>Angle of the scale (in degrees)</p></dd>
-<dt>M</dt><dd><p>Normative mean for the scale</p></dd>
-<dt>SD</dt><dd><p>Normative standard deviation for the scale</p></dd>
-<dt>Items</dt><dd><p>A comma-separated list of item numbers</p></dd>
-</dl>
+    <p>An object of class <code>instrument</code> of length 5.</p>
     
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
     <p><a href='https://doi.org/10.1111/j.1467-6494.2011.00696.x'>https://doi.org/10.1111/j.1467-6494.2011.00696.x</a></p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='no'>isc</span>)
+<span class='fu'>summary</span>(<span class='no'>isc</span>)</div><div class='output co'>#&gt; ISC: Interpersonal Sensitivities Circumplex
+#&gt; 64 items, 8 scales, 1 normative data sets
+#&gt; Hopwood et al. (2011)
+#&gt; &lt;https://doi.org/10.1111/j.1467-6494.2011.00696.x&gt;
+#&gt; 
+#&gt; The ISC contains 8 circumplex scales.
+#&gt; PA (090 deg): Sensitive to Control 
+#&gt; BC (135 deg): Sensitive to Antagonism 
+#&gt; DE (180 deg): Sensitive to Remoteness 
+#&gt; FG (225 deg): Sensitive to Timidity 
+#&gt; HI (270 deg): Sensitive to Passivity 
+#&gt; JK (315 deg): Sensitive to Dependence 
+#&gt; LM (360 deg): Sensitive to Affection 
+#&gt; NO (045 deg): Sensitive to Attention-Seeking 
+#&gt; 
+#&gt; The ISC is rated using the following 8-point scale. 
+#&gt; 1. Not at all, never bothers me 
+#&gt; 2. Very little, rarely bothers me 
+#&gt; 3. A little, occasionally bothers me 
+#&gt; 4. Slightly, bothers me less than half the time 
+#&gt; 5. Somewhat, bothers me more than half of the time 
+#&gt; 6. Quite, bothers me frequently 
+#&gt; 7. Very much, bothers me most of the time 
+#&gt; 8. Extremely, always bothers me 
+#&gt; 
+#&gt; The ISC contains 64 items.
+#&gt; 1. Thinks they are my boss 
+#&gt; 2. Disregards my feelings 
+#&gt; 3. Doesn't show any feelings 
+#&gt; 4. Won't engage in conversation 
+#&gt; 5. Cannot assert themselves 
+#&gt; 6. Avoids conflict at all costs 
+#&gt; 7. Wants to spend lots of time with me 
+#&gt; 8. Doesn't respect my privacy 
+#&gt; 9. Orders me around 
+#&gt; 10. Doesn't respond to me 
+#&gt; 11. Doesn't want to be friends 
+#&gt; 12. Is aloof 
+#&gt; 13. Doesn't have a backbone 
+#&gt; 14. Always needs support 
+#&gt; 15. Tries to get close to me really fast 
+#&gt; 16. Talks themselves up 
+#&gt; 17. Talks down to me 
+#&gt; 18. Is hostile 
+#&gt; 19. Walls themselves off from me 
+#&gt; 20. Acts like a wallflower 
+#&gt; 21. Is weak 
+#&gt; 22. Always seems to need my help 
+#&gt; 23. Tells me they love me 
+#&gt; 24. Shows off 
+#&gt; 25. Will do anything to get what they want 
+#&gt; 26. Is deceitful 
+#&gt; 27. Won't share their feelings with me 
+#&gt; 28. Won't step up to the plate 
+#&gt; 29. Allows themselves to be dominated by others 
+#&gt; 30. Acts helpless 
+#&gt; 31. Expresses concern about me 
+#&gt; 32. Talks about themselves 
+#&gt; 33. Has to call the shots 
+#&gt; 34. Mistrusts me 
+#&gt; 35. Is unresponsive 
+#&gt; 36. Doesn't share their ideas 
+#&gt; 37. Is always submissive 
+#&gt; 38. Laughs at all my jokes 
+#&gt; 39. Acts like we're friends when we don't even know each other 
+#&gt; 40. Has to be right 
+#&gt; 41. Intimidates me 
+#&gt; 42. Doesn't care about my feelings 
+#&gt; 43. Avoids me 
+#&gt; 44. Won't participate 
+#&gt; 45. Cannot make decisions 
+#&gt; 46. Is dependent on me 
+#&gt; 47. Humors me 
+#&gt; 48. Interrupts 
+#&gt; 49. Is bossy 
+#&gt; 50. Expects the worst out of me 
+#&gt; 51. Never gets in touch with me 
+#&gt; 52. Is really shy 
+#&gt; 53. Is very passive 
+#&gt; 54. Believes everything I say 
+#&gt; 55. Believes I can do no wrong 
+#&gt; 56. Tries to show me how to do things 
+#&gt; 57. Always puts themselves first 
+#&gt; 58. Is mean-spirited 
+#&gt; 59. Pulls away from me 
+#&gt; 60. Refuses to lead 
+#&gt; 61. Is easily controlled 
+#&gt; 62. Is soft 
+#&gt; 63. Is clingy 
+#&gt; 64. Takes control 
+#&gt; 
+#&gt; The ISC currently has 1 normative data set(s): 
+#&gt; 1. 649 American college students 
+#&gt;    Hopwood et al. (2011) 
+#&gt;    &lt;https://doi.org/10.1111/j.1467-6494.2011.00696.x&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -166,7 +253,9 @@ used rather than sum scale scores. Scores range from 1 to 8.</p>
       <li><a href="#format">Format</a></li>
 
       <li><a href="#source">Source</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

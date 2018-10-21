@@ -71,7 +71,7 @@ as a custom data frame." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9004</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9100</span>
       </span>
     </div>
 
@@ -87,6 +87,9 @@ as a custom data frame." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/using-instruments.html">Using Circumplex Instruments</a>
+    </li>
     <li>
       <a href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
     </li>
@@ -138,7 +141,8 @@ as a custom data frame.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>score</span>(<span class='no'>.data</span>, <span class='no'>items</span>, <span class='no'>key</span>, <span class='kw'>na.rm</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>prefix</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='st'>""</span>)</pre>
+    <pre class="usage"><span class='fu'>score</span>(<span class='no'>.data</span>, <span class='no'>items</span>, <span class='no'>instrument</span>, <span class='kw'>na.rm</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>prefix</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='st'>""</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -154,10 +158,9 @@ variables in <code>.data</code> that contain all the circumplex items from a
 single circumplex measure, in ascending order from item 1 to item N.</p></td>
     </tr>
     <tr>
-      <th>key</th>
-      <td><p>Required. A data frame containing information about each
-circumplex scale to be calculated from <code>items</code>. The following
-variables are required: <code>Abbrev</code> and <code>Items</code>. See <code><a href='iipsc.html'>?iipsc</a></code>.</p></td>
+      <th>instrument</th>
+      <td><p>Required. An instrument object from the package. To see
+the available circumplex instruments, use <code><a href='instruments.html'>instruments()</a></code>.</p></td>
     </tr>
     <tr>
       <th>na.rm</th>
@@ -168,7 +171,7 @@ scales with missing data are essentially calculated with mean imputation.</p></t
     <tr>
       <th>prefix</th>
       <td><p>Optional. A string to include at the beginning of the newly
-calcualted scale variables' names, before <code>Abbrev</code> from <code>key</code>
+calculated scale variables' names, before <code>Abbrev</code> from <code>key</code>
 and <code>suffix</code> (default = "").</p></td>
     </tr>
     <tr>
@@ -191,9 +194,27 @@ appended that contain mean scores on each variable included in <code>key</code>.
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>#data("aw2012")</span>
-<span class='fu'>data</span>(<span class='st'>"iipsc"</span>)
-<span class='co'>#score(aw2012, IIP01:IIP32, iipsc)</span></div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='st'>"raw_iipsc"</span>)
+<span class='fu'><a href='instrument.html'>instrument</a></span>(<span class='st'>"iipsc"</span>)
+<span class='fu'>score</span>(<span class='no'>raw_iipsc</span>, <span class='no'>IIP01</span>:<span class='no'>IIP32</span>, <span class='no'>iipsc</span>)</div><div class='output co'>#&gt; # A tibble: 10 x 40
+#&gt;    IIP01 IIP02 IIP03 IIP04 IIP05 IIP06 IIP07 IIP08 IIP09 IIP10 IIP11 IIP12 IIP13
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt;  1     0     0     0     0     1     0     1     0     2     1     0     0     0
+#&gt;  2     1     1     0     0     3     2     2     1     0     1     0     1     4
+#&gt;  3     1     0     1     0     1     1     1     3     0     1     0     0     2
+#&gt;  4     3     2     3    NA     2     3     2     3     2     3     2     4     2
+#&gt;  5     0     0     0     1     0     0     1     1     0     1     0     2     1
+#&gt;  6     0     0     0     0     0     0     1     1     0     0     0     0     0
+#&gt;  7     1     0     0     0     2     1     1     0     1     0     0     0     1
+#&gt;  8     1     0     1     0     1     1     2     1     1     0     0     0     1
+#&gt;  9     0     0     2     2     0     1     3     0     1     0     1     1     0
+#&gt; 10     0     0     0     0     0     0     2     0     0     0     0     0     0
+#&gt; # ... with 27 more variables: IIP14 &lt;dbl&gt;, IIP15 &lt;dbl&gt;, IIP16 &lt;dbl&gt;,
+#&gt; #   IIP17 &lt;dbl&gt;, IIP18 &lt;dbl&gt;, IIP19 &lt;dbl&gt;, IIP20 &lt;dbl&gt;, IIP21 &lt;dbl&gt;,
+#&gt; #   IIP22 &lt;dbl&gt;, IIP23 &lt;dbl&gt;, IIP24 &lt;dbl&gt;, IIP25 &lt;dbl&gt;, IIP26 &lt;dbl&gt;,
+#&gt; #   IIP27 &lt;dbl&gt;, IIP28 &lt;dbl&gt;, IIP29 &lt;dbl&gt;, IIP30 &lt;dbl&gt;, IIP31 &lt;dbl&gt;,
+#&gt; #   IIP32 &lt;dbl&gt;, PA &lt;dbl&gt;, BC &lt;dbl&gt;, DE &lt;dbl&gt;, FG &lt;dbl&gt;, HI &lt;dbl&gt;, JK &lt;dbl&gt;,
+#&gt; #   LM &lt;dbl&gt;, NO &lt;dbl&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

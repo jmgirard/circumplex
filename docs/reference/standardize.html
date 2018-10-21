@@ -72,7 +72,7 @@ scores (i.e., z-scores) based on comparison to the normative data." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9004</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9100</span>
       </span>
     </div>
 
@@ -88,6 +88,9 @@ scores (i.e., z-scores) based on comparison to the normative data." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/using-instruments.html">Using Circumplex Instruments</a>
+    </li>
     <li>
       <a href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
     </li>
@@ -140,7 +143,8 @@ scores (i.e., z-scores) based on comparison to the normative data.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>standardize</span>(<span class='no'>.data</span>, <span class='no'>scales</span>, <span class='no'>angles</span>, <span class='no'>norms</span>)</pre>
+    <pre class="usage"><span class='fu'>standardize</span>(<span class='no'>.data</span>, <span class='no'>scales</span>, <span class='no'>angles</span>, <span class='no'>instrument</span>, <span class='kw'>sample</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>prefix</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='st'>"_z"</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -161,10 +165,27 @@ standardized.</p></td>
 of each circumplex scale included in <code>scales</code> (in degrees).</p></td>
     </tr>
     <tr>
-      <th>norms</th>
-      <td><p>Required. A data frame containing normative data for each
-circumplex scale included in <code>scales</code>. The following variables are
-required: <code>Angle</code>, <code>M</code>, and <code>SD</code>. See <code><a href='iipsc.html'>?iipsc</a></code>.</p></td>
+      <th>instrument</th>
+      <td><p>Required. An instrument object from the package. To see
+the available circumplex instruments, see <code><a href='instruments.html'>instruments()</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>sample</th>
+      <td><p>Required. An integer corresponding to the normative sample
+to use in standardizing the scale scores (default = 1). See <code><a href='norms.html'>?norms</a></code>
+to see the normative samples available for an instrument.</p></td>
+    </tr>
+    <tr>
+      <th>prefix</th>
+      <td><p>Optional. A string to include at the beginning of the newly
+calcualted scale variables' names, before the scale name and <code>suffix</code>
+(default = "").</p></td>
+    </tr>
+    <tr>
+      <th>suffix</th>
+      <td><p>Optional. A string to include at the end of the newly
+calculated scale variables' names, after the scale name and <code>prefix</code>
+(default = "_z").</p></td>
     </tr>
     </table>
     
@@ -182,8 +203,8 @@ variables will have the same name as <code>scales</code> but with a "_z" suffix.
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='st'>"jz2017"</span>)
-<span class='fu'>data</span>(<span class='st'>"iipsc"</span>)
-<span class='fu'>standardize</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>norms</span> <span class='kw'>=</span> <span class='no'>iipsc</span>)</div><div class='output co'>#&gt; # A tibble: 1,166 x 27
+<span class='fu'><a href='instrument.html'>instrument</a></span>(<span class='st'>"iipsc"</span>)
+<span class='fu'>standardize</span>(<span class='no'>jz2017</span>, <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>instrument</span> <span class='kw'>=</span> <span class='no'>iipsc</span>, <span class='kw'>sample</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; # A tibble: 1,166 x 27
 #&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD
 #&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
 #&gt;  1 Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7

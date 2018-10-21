@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9004</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9100</span>
       </span>
     </div>
 
@@ -83,6 +83,9 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/using-instruments.html">Using Circumplex Instruments</a>
+    </li>
     <li>
       <a href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
     </li>
@@ -133,6 +136,50 @@
     </colgroup>
 
     <tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-instrument-functions" class="hasAnchor"><a href="#section-instrument-functions" class="anchor"></a>Instrument Functions</h2>
+          <p class="section-desc"><p>Functions for importing and examining circumplex instruments</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="instruments.html">instruments()</a></code> </p>
+        </td>
+        <td><p>List all available instruments</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="instrument.html">instrument()</a></code> </p>
+        </td>
+        <td><p>Load a specific instrument object</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="scales.html">scales()</a></code> </p>
+        </td>
+        <td><p>Display the scales of a circumplex instrument</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="anchors.html">anchors()</a></code> </p>
+        </td>
+        <td><p>Display the anchors of a circumplex instrument</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="items.html">items()</a></code> </p>
+        </td>
+        <td><p>Display the items of a circumplex instrument</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="norms.html">norms()</a></code> </p>
+        </td>
+        <td><p>Display the norms for a circumplex instrument</p></td>
+      </tr>
+    </tbody><tbody>
       <tr>
         <th colspan="2">
           <h2 id="section-primary-ssm-functions" class="hasAnchor"><a href="#section-primary-ssm-functions" class="anchor"></a>Primary SSM Functions</h2>
@@ -189,44 +236,6 @@
           <p><code><a href="html_render.html">html_render()</a></code> </p>
         </td>
         <td><p>Format and render data frame as HTML table</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-circumplex-fit-functions" class="hasAnchor"><a href="#section-circumplex-fit-functions" class="anchor"></a>Circumplex Fit Functions</h2>
-          <p class="section-desc"><p>Functions for testing for circumplex structure</p></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="fit_fisher.html">fit_fisher()</a></code> </p>
-        </td>
-        <td><p>Fisher Test of equal axes</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="fit_gap.html">fit_gap()</a></code> </p>
-        </td>
-        <td><p>Gap Test of equal spacing</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="fit_rt.html">fit_rt()</a></code> </p>
-        </td>
-        <td><p>Rotation Test of interstitiality</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="fit_vt.html">fit_vt()</a></code> </p>
-        </td>
-        <td><p>Variance Test of indifference to rotation</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="fit_randall.html">fit_randall()</a></code> </p>
-        </td>
-        <td><p>Test circumplex fit using the RANDALL Concordance Index</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -299,11 +308,17 @@
           <p><code><a href="jz2017.html">jz2017</a></code> </p>
         </td>
         <td><p>Raw octant scores on real circumplex scales with covariates</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="raw_iipsc.html">raw_iipsc</a></code> </p>
+        </td>
+        <td><p>Raw item responses on real circumplex scales</p></td>
       </tr>
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-normative-and-scoring-data" class="hasAnchor"><a href="#section-normative-and-scoring-data" class="anchor"></a>Normative and Scoring Data</h2>
+          <h2 id="section-instrument-data" class="hasAnchor"><a href="#section-instrument-data" class="anchor"></a>Instrument Data</h2>
           <p class="section-desc"></p>
         </th>
       </tr>
@@ -312,43 +327,61 @@
         <td>
           <p><code><a href="csie.html">csie</a></code> </p>
         </td>
-        <td><p>Normative data for CSIE</p></td>
+        <td><p>Instrument: CSIE</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="csig.html">csig</a></code> </p>
+        </td>
+        <td><p>Instrument: CSIG</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="csip.html">csip</a></code> </p>
         </td>
-        <td><p>Normative data for CSIP</p></td>
+        <td><p>Instrument: CSIP</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="csiv.html">csiv</a></code> </p>
         </td>
-        <td><p>Normative data for CSIV</p></td>
+        <td><p>Instrument: CSIV</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="iip32.html">iip32</a></code> </p>
+        </td>
+        <td><p>Instrument: IIP-32</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="iip64.html">iip64</a></code> </p>
+        </td>
+        <td><p>Instrument: IIP-64</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="iipsc.html">iipsc</a></code> </p>
         </td>
-        <td><p>Normative data for IIP-SC</p></td>
+        <td><p>Instrument: IIP-SC</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="iis64.html">iis64</a></code> </p>
         </td>
-        <td><p>Normative data for IIS-64</p></td>
+        <td><p>Instrument: IIS-64</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="ipipipc.html">ipipipc</a></code> </p>
         </td>
-        <td><p>Normative data for IPIP-IPC</p></td>
+        <td><p>Instrument: IPIP-IPC</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="isc.html">isc</a></code> </p>
         </td>
-        <td><p>Normative data for ISC</p></td>
+        <td><p>Instrument: ISC</p></td>
       </tr>
     </tbody>
     </table>
@@ -357,13 +390,13 @@
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#section-instrument-functions">Instrument Functions</a></li>
       <li><a href="#section-primary-ssm-functions">Primary SSM Functions</a></li>
       <li><a href="#section-secondary-ssm-functions">Secondary SSM Functions</a></li>
-      <li><a href="#section-circumplex-fit-functions">Circumplex Fit Functions</a></li>
       <li><a href="#section-tidying-functions">Tidying Functions</a></li>
       <li><a href="#section-convenience-functions">Convenience Functions</a></li>
       <li><a href="#section-example-data">Example Data</a></li>
-      <li><a href="#section-normative-and-scoring-data">Normative and Scoring Data</a></li>
+      <li><a href="#section-instrument-data">Instrument Data</a></li>
     </ul>
   </div>
 </div>

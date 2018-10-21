@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tidy eval helpers — tidyeval • circumplex</title>
+<title>Instrument: CSIG — csig • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,29 +36,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Tidy eval helpers — tidyeval" />
+<meta property="og:title" content="Instrument: CSIG — csig" />
 
-<meta property="og:description" content="
-sym() creates a symbol from a string and
-syms() creates a list of symbols from a
-character vector.
-expr() and quo() quote
-one expression. quo() wraps the quoted expression in a quosure.
-The plural variants rlang::exprs() and
-quos() return a list of quoted expressions or
-quosures.
-enexpr() and enquo()
-capture the expression supplied as argument by the user of the
-current function (enquo() wraps this expression in a quosure).
-enexprs() and enquos()
-capture multiple expressions supplied as arguments, including
-....
-" />
-
-<meta property="og:description" content="exprs() is not exported to avoid conflicts with Biobase::exprs(),
-therefore one should always use rlang::exprs().
-To learn more about tidy eval and how to use these tools, visit
-http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
+<meta property="og:description" content="Information about the Circumplex Scales of Intergroup Goals." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -146,44 +126,101 @@ http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tidy eval helpers</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/utils-tidy-eval.R'><code>R/utils-tidy-eval.R</code></a></small>
-    <div class="hidden name"><code>tidyeval.Rd</code></div>
+    <h1>Instrument: CSIG</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/instrument_data.R'><code>R/instrument_data.R</code></a></small>
+    <div class="hidden name"><code>csig.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <ul>
-<li><p><code><a href='https://rlang.r-lib.org/reference/sym.html'>sym</a>()</code> creates a symbol from a string and
-<code><a href='https://rlang.r-lib.org/reference/sym.html'>syms</a>()</code> creates a list of symbols from a
-character vector.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>expr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>quo</a>()</code> quote
-one expression. <code>quo()</code> wraps the quoted expression in a quosure.</p>
-<p>The plural variants <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code> and
-<code><a href='https://rlang.r-lib.org/reference/quotation.html'>quos</a>()</code> return a list of quoted expressions or
-quosures.</p></li>
-<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexpr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquo</a>()</code>
-capture the expression supplied as argument by the user of the
-current function (<code>enquo()</code> wraps this expression in a quosure).</p>
-<p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexprs</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquos</a>()</code>
-capture multiple expressions supplied as arguments, including
-<code>...</code>.</p></li>
-</ul>
-
-    <p><code>exprs()</code> is not exported to avoid conflicts with <code>Biobase::exprs()</code>,
-therefore one should always use <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code>.</p>
-<p>To learn more about tidy eval and how to use these tools, visit
-<a href='http://rlang.r-lib.org'>http://rlang.r-lib.org</a> and the <a href='https://adv-r.hadley.nz/meta.html'>Metaprogramming section</a> of <a href='https://adv-r.hadley.nz'>Advanced R</a>.</p>
+    <p>Information about the Circumplex Scales of Intergroup Goals.</p>
     
     </div>
 
+    <pre class="usage"><span class='no'>csig</span></pre>
         
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
+    <p>An object of class <code>instrument</code> of length 5.</p>
+    
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p><a href='https://www.webpages.uidaho.edu/klocke/csig.htm'>https://www.webpages.uidaho.edu/klocke/csig.htm</a></p>
+    
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>data</span>(<span class='no'>csig</span>)
+<span class='fu'>summary</span>(<span class='no'>csig</span>)</div><div class='output co'>#&gt; CSIG: Circumplex Scales of Intergroup Goals
+#&gt; 32 items, 8 scales, 1 normative data sets
+#&gt; Locke (2014)
+#&gt; &lt;https://doi.org/10.1177/0146167213514280&gt;
+#&gt; 
+#&gt; The CSIG contains 8 circumplex scales.
+#&gt; PA (090 deg): Be authoritative 
+#&gt; BC (135 deg): Be tough 
+#&gt; DE (180 deg): Be self-protective 
+#&gt; FG (225 deg): Be wary 
+#&gt; HI (270 deg): Be conflict-avoidant 
+#&gt; JK (315 deg): Be cooperative 
+#&gt; LM (360 deg): Be understanding 
+#&gt; NO (045 deg): Be respected 
+#&gt; 
+#&gt; The CSIG is rated using the following 5-point scale. 
+#&gt; 0. It is not at all important that... 
+#&gt; 1. It is somewhat important that... 
+#&gt; 2. It is moderately important that... 
+#&gt; 3. It is very important that... 
+#&gt; 4. It is extremely important that... 
+#&gt; 
+#&gt; The CSIG contains 32 items.
+#&gt; 1. We are friendly 
+#&gt; 2. We are the winners in any argument or dispute 
+#&gt; 3. They respect what we have to say 
+#&gt; 4. We avoid conflict 
+#&gt; 5. We show that we can be tough 
+#&gt; 6. We appreciate what they have to offer 
+#&gt; 7. We let them fend for themselves 
+#&gt; 8. We are assertive 
+#&gt; 9. We celebrate their achievements 
+#&gt; 10. We do whatever is in our best interest 
+#&gt; 11. We get the chance to express our views 
+#&gt; 12. They not get angry with us 
+#&gt; 13. We not appear vulnerable 
+#&gt; 14. We understand their point of view 
+#&gt; 15. They stay out of our business 
+#&gt; 16. We appear confident 
+#&gt; 17. They feel we are all on the same team 
+#&gt; 18. We are better than them 
+#&gt; 19. They listen to what we have to say 
+#&gt; 20. We not get into arguments 
+#&gt; 21. We are aggressive if necessary 
+#&gt; 22. We show concern for their welfare 
+#&gt; 23. We not trust them 
+#&gt; 24. We are decisive 
+#&gt; 25. We are cooperative 
+#&gt; 26. We keep our guard up 
+#&gt; 27. They see us as responsible 
+#&gt; 28. We not make them angry 
+#&gt; 29. We not show our weaknesses 
+#&gt; 30. We are able to compromise 
+#&gt; 31. We not get entangled in their affairs 
+#&gt; 32. They see us as capable 
+#&gt; 
+#&gt; The CSIG currently has 1 normative data set(s): 
+#&gt; 1. 665 MTurkers from US, Canada, and India about interactions between nations 
+#&gt;    Locke (2014) 
+#&gt;    &lt;https://doi.org/10.1177/0146167213514280&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      
+      <li><a href="#format">Format</a></li>
+
+      <li><a href="#source">Source</a></li>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

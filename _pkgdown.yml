@@ -15,6 +15,15 @@ template:
       index_name: circumplex
 
 reference:
+  - title: Instrument Functions
+    desc: Functions for importing and examining circumplex instruments
+    contents:
+      - instruments
+      - instrument
+      - scales
+      - anchors
+      - items
+      - norms
   - title: Primary SSM Functions
     desc: Functions for implementing the Structural Summary Method
     contents: 
@@ -28,14 +37,6 @@ reference:
       - ssm_plot_circle
       - ssm_plot_contrast
       - html_render
-  - title: Circumplex Fit Functions
-    desc: Functions for testing for circumplex structure
-    contents:
-      - fit_fisher
-      - fit_gap
-      - fit_rt
-      - fit_vt
-      - fit_randall
   - title: Tidying Functions
     desc: Functions for preparing data for analysis
     contents:
@@ -52,12 +53,15 @@ reference:
     contents:
       - aw2009
       - jz2017
-  - title: Normative and Scoring Data
+      - raw_iipsc
+  - title: Instrument Data
     contents:
       - csie
+      - csig
       - csip
       - csiv
       - iip32
+      - iip64
       - iipsc
       - iis64
       - ipipipc
@@ -71,6 +75,8 @@ navbar:
       href: reference/index.html
     - text: Articles
       menu:
+      - text: Using Circumplex Instruments
+        href: articles/using-instruments.html
       - text: Introduction to SSM Analysis
         href: articles/introduction-to-ssm-analysis.html
       - text: Intermediate SSM Analysis
