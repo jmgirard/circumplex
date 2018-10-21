@@ -58,9 +58,9 @@ ipsatize <- function(.data, items, na.rm = TRUE) {
 #' @family tidying functions
 #' @export
 #' @examples
-#' #data("aw2012")
-#' data("iipsc")
-#' #score(aw2012, IIP01:IIP32, iipsc)
+#' data("raw_iipsc")
+#' instrument("iipsc")
+#' score(raw_iipsc, IIP01:IIP32, iipsc)
 score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = "") {
   
   items_en <- rlang::enquo(items)
