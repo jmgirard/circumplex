@@ -17,11 +17,10 @@ is_instrument <- function(x) {
 #' @export
 print.instrument <- function(x, ...) {
   cat(
-    glue(
-      "The {x$Details$Name} ({x$Details$Abbrev}) is a {x$Details$Items}-item ",
-      "circumplex measure of {x$Details$Construct} from {x$Details$Reference}."
-    ),
-    "\n"
+    glue("{x$Details$Abbrev}: {x$Details$Name}"), "\n",
+    glue("{x$Details$Items} items, {x$Details$Scales} scales, {nrow(x$Norms[[2]])} normative data sets"), "\n",
+    glue("{x$Details$Reference}"), "\n",
+    glue("<{x$Details$URL}>"), "\n", sep = ""
   )
 }
 
