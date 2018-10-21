@@ -1,0 +1,187 @@
+---
+title: "Using Circumplex Instruments"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(circumplex)
+```
+
+## 1. Overview of Instrument-related Functions
+Although the circumplex package is capable of analyzing and visualizing data in a "source-agnostic" manner (i.e., without knowing what the numbers correspond to), it can be helpful to both the user and the package to have more contextual information about which instrument/questionnaire the data come from. For example, knowing the specific instrument used can enable the package to automatically score item-level responses and standardize these scores using normative data. Furthermore, a centralized repository of information about circumplex instruments would provide a convenient and accessible way for users to discover and begin using new instruments. To address these needs, a suite of new instrument-related functions (and underlying data to power them) was added to the circumplex package in version 0.2.0.
+
+The first part of this vignette will discuss how to preview the instruments currently available in the circumplex package, how to load information about a specific instrument for use in analysis, and how to extract general and specific information about that instrument. The following functions will be discussed: `instruments()`, `instrument()`, `print()`, `summary()`, `scales()`, `items()`, `anchors()`, `norms()`, and `View()`.
+
+The second part of this vignette will discuss how to use the information about an instrument to transform and summarize circumplex data. It will demonstrate how to ipsatize item-level responses (i.e., apply within-person deviation scoring), how to calculate scale scores from item-level responses (with or without imputing/prorating missing values), and how to standardize scale scores using normative/comparison data. The following functions will be discussed: `ipsatize()`, `score()`, and `standardize()`.
+
+## 2. Loading and Examining Instrument Objects
+
+### Previewing the available instruments
+Our goal is to eventually include all circumplex instruments in this package. However, due to time-constraints and copyright issues, this goal may be delayed or even impossible to fully realize. However, you can always preview the list of currently available instruments using the `instruments()` function. This function will print the abbreviation, name, and (in parentheses) the "code" for each available instrument.
+
+```{r}
+instruments()
+```
+
+If there are additional circumplex instruments you would like to have added to the package (especially if you are the author/copyright-holder), please [contact me](mailto:me@jmgirard.com). Note that some information (e.g., item text and normative data) may not be available for all instruments due to copyright issues.
+
+### Loading a specific instrument
+To reduce loading time and memory usage, instrument information is not loaded into R's memory when the circumplex package is loaded. Instead, the `instrument()` function can be used to load specific instruments into memory. The only argument passed to this function should be the "code" for a single instrument. You can name the instrument object any valid name; if no name is assigned, the object will be named the same as the instrument code (overwriting any existing object with that name).
+
+```{r}
+# Load data using explicit assignment
+my_instrument <- instrument("csip")
+```
+
+```{r}
+# Load data using implicit assignment
+instrument("csip")
+```
+
+### Examining an instrument in-brief
+To quickly and briefly examine the information available about a loaded instrument, use the `print()` function, which is also implicitly called when the name of an object is entered into the R console (i.e., typing `print(csip)` and `csip` is the same). This will return the instrument's abbreviation; full name; the number of items, scales, and available normative data sets; original reference; and primary website. Below is a fully explicit call to load and print the CSIP, as well as a fully implicit call to do the same for the IIP-32.
+
+```{r}
+my_instrument <- instrument("csip")
+print(my_instrument)
+```
+
+```{r}
+instrument("iip32")
+iip32
+```
+
+Note, however, that an error will result if the `print()` function (or any of the functions to be described below) is called before the `instrument()` function has loaded the data. Order of operations is important!
+
+```{r, error=TRUE}
+print(isc)
+```
+
+```{r}
+instrument("isc")
+print(isc)
+```
+
+### Examining an instrument in-depth
+To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the `summary()` function. This will return the same information returned by `print()`, followed by information about the instrument's scales, rating scale anchors, items, and normative data set(s).
+
+```{r}
+instrument("ipipipc")
+summary(ipipipc)
+```
+
+Specific subsections of this output can be returned individually using the `scales()`, `anchors()`, `items()`, and `norms()` functions. These functions are especially useful when you need to know a specific bit of information about an instrument and don't want the console to be flooded with unneeded information.
+
+```{r}
+norms(ipipipc)
+```
+
+An additional, though advanced, option for examining the available information about an instrument is to explore the instrument object itself. This can be done within R using the `View()` function. Note that the first letter in this function (V) must be capitalized. This will open up a data viewer window like the one shown below; it will give you full access to the information stored by the package, albeit in a "raw" format. Don't worry if the image below is confusing or overwhelming; you never have to see it again unless you want to!
+
+```{r, eval=FALSE}
+View(ipipipc)
+```
+
+```{r, echo=FALSE, out.width='100%'}
+knitr::include_graphics("./view_ipipipc.png")
+```
+
+
+## 3. Instrument-related Tidying Functions
+It is a good idea in practice to digitize and save each participant's response to each item on an instrument, rather than just their scores on each scale. Having access to item-level data will make it easier to spot and correct mistakes, will enable more advanced analysis of missing data, and will enable latent variable models that account for measurement error (e.g., structural equation modeling). Furthermore, the functions described below will make it easy to transform and summarize such item-level data into scale scores.
+
+First, however, we need to make sure the item-level data is in the expected format. Your data should be stored in a data frame where each row corresponds to one observation (e.g., participant, organization, or timepoint) and each column corresponds to one variable describing these observations (e.g., item responses, demographic characteristics, scale scores). The [tidyverse](https://www.tidyverse.org) packages provide excellent tools for getting your data into this format from a variety of different file types and formats.
+
+For the purpose of illustration, we will work with a small-scale data set, which includes item-level responses to the Inventory of Interpersonal Problems, Short Circumplex (IIP-SC) for just 10 participants. As will become important later on, this data set contains a small amount of missing values (represented as `NA`). This data set is included as part of the circumplex package and can be loaded and previewed as follows:
+
+```{r}
+data("raw_iipsc")
+print(raw_iipsc)
+```
+
+### Ipsatizing item-level data
+For some forms of circumplex data analysis (e.g., analysis of circumplex fit) but not others (e.g., structural summary method), it can be helpful to transform item-level responses by subtracting each participant's mean across all items from his or her response on each item. This practice is called "ipsatizing" or, more precisely, deviation scoring across variables. This practice will attenuate the general factor across all items and recasts the item-level responses as deviations from one's own mean rather than absolute responses. To perform ipsatizing and create a new set of ipsatized responses to each item, use the `ipsatize()` function.
+
+```{r}
+ips_iipsc <- ipsatize(.data = raw_iipsc, items = IIP01:IIP32, na.rm = TRUE, overwrite = TRUE)
+print(ips_iipsc)
+```
+
+Above, we told the function to overwrite the original item variables with their ipsatized versions; new ipsatized variables (ending in `_i`) could have been appended to the data frame instead by changing the `overwrite` argument to `FALSE`. We also told it to calculate the mean for each observation after ignoring any missing values. We could have changed this by setting the `na.rm` argument to `FALSE`.
+
+We can check that the ipsatization was successful by calculating the mean of each row (i.e., each participant's mean response) in the original and ipsatized data frames. We do this below using the `rowMeans()` function; we also apply the `round()` function to make the results fit on one row. As expected, we find below that the mean of each participant is zero in the ipsatized data frame but not in the original.
+
+```{r}
+round(rowMeans(raw_iipsc, na.rm = TRUE), 2)
+round(rowMeans(ips_iipsc, na.rm = TRUE), 2)
+```
+
+### Scoring item-level data
+For many forms of circumplex data analysis (e.g., structural summary method), it can be very helpful to summarize item-level responses by calculating scale scores. This is typically done by averaging a set of items that all measure the same underlying construct (e.g., location in the circumplex model). For example, the IIP-SC has 32 items in total that measure 8 scales representing octants of the interpersonal circumplex model. Thus, a participant's score on each scale is calculated as the arithmetic mean of his or her responses to four specific items. Using the aggregate of multiple similar items produces scale scores with higher reliability than would be achieved by using only a single item per scale. 
+
+```{r}
+instrument("iipsc")
+scales(iipsc)
+```
+
+Although calculating the arithmetic mean of a handful of items is not terribly difficult mathematically, doing so manually (e.g., by hand) across multiple scales and multiple participants can be tedious and error-prone. To address these issues, the circumplex package offers the `score()` function, which automatically calculates scale scores from item-level data.
+
+To demonstrate, let's return to the `item_level_csie` data set. We need to give the `score()` function a data frame containing the item-level data (i.e., the data set), a list of variables from that data frame that contain the item-level responses to be scored, and an instrument object containing instructions on how to score the data. In order for scoring to work properly, the list of items must be in ascending order from the first to the last item and the ordering of the items must be the same as that assumed by the package. Be sure to check your item numbers against those displayed by the `items()` function, especially if you shuffle your items.
+
+```{r}
+scale_scores <- score(.data = raw_iipsc, items = IIP01:IIP32, instrument = iipsc)
+print(scale_scores)
+```
+
+The `scale_scores` data frame contains all the item-level data from `item_level_csie`, as well as the newly calculated scale scores. Note that the scale score variables were named using the scale abbreviations shown by the `scales()` function (i.e., two-letter abbreviations from `PA` to `NO`). You can customize the naming of these variables by using the `prefix` and `suffix` arguments from the `score()` function. We can select and view just the scale score variables using the `select()` function.
+
+```{r}
+select(scale_scores, PA:NO)
+```
+
+Note that the `na.rm` argument for the `score()` function defaulted to `TRUE`, which means that missing values were ignored in calculating the scale scores. This practice is common in the literature, but is technically a form of single imputation and thus can produce biased results when data are not missing completely at random (MCAR). Please examine and report the amount and patterns of missingness in your data. 
+
+### Standardizing scale-level data
+Finally, it can often be helpful to transform scale-level data through reference to a normative or comparison sample. This is often called "standardizing" and involves subtracting the normative sample's mean score on a scale from each participant's score on that scale and then dividing this difference by the normative sample's standard deviation. This rescales the scale scores to be in standard deviation units and to describe the magnitude of each participant's difference from the normative average.
+
+For many circumplex instruments, the data needed to perform standardization is included in its instrument object. Some instruments even have multiple (e.g., different or overlapping) normative samples for comparisons that are matched in terms of gender, age, or nationality. In selecting a normative sample to compare to, it is important to consider both the size and the appropriateness of the sample.
+
+To demonstrate, let's examine the normative data sets available for the IIP-SC. Below we see that there are two options: a rather large sample of American college students and a rather small sample of American psychiatric outpatients.
+
+```{r}
+norms(iipsc)
+```
+
+Assuming our example data also come from a non-psychiatric community sample of mostly college students, the first normative sample seems like a better choice, especially since it is so much larger and therefore subject to less sampling error. However, there may be times when the second normative sample would be the more appropriate comparison, even despite its smaller sample.
+
+To transform the scale scores we calculated during the last section, we can call the `standardize()` function and give it the `scale_scores` object we saved the item-level and scale-level data within. We will save the output of this function to a data frame named `z_scales` to reflect the idea that standardize scores are often called "z-scores."
+
+```{r}
+z_scales <- standardize(
+  .data = scale_scores, 
+  scales = PA:NO, 
+  angles = octants(),
+  instrument = iipsc,
+  sample = 1
+)
+print(z_scales)
+```
+
+Again, the output contains all the item-level, scale-level, and now the standardized scale-level variables. The new variables are named the same as the scale score variables except with a configurable prefix and suffix (by default, they are given only a suffix of `_z`). The naming can be configured using We can again use the `select()` function to view just the newly created standardized variables. These variables are the ones we are most likely to use in subsequent analyses (e.g., the structural summary method).
+
+```{r}
+select(z_scales, PA_z:NO_z)
+```
+
+## 4. Wrap-up
+In this vignette, we learned how to preview the instruments available in the circumplex package, load and examine the information contained in one of these instrument objects, ipsatize item-level data, calculate scale scores from item-level data, and standardize those scale scores using normative data included in the package. We are now in an excellent position to discover and implement new circumplex instruments. Later vignettes describe analyses and visualizations that make use of the data collected using these tools.
+
+
