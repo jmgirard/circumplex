@@ -1,23 +1,11 @@
-circumplex 0.1.2.9005
+circumplex 0.1.2.9100
 =============================
 
 ### NEW FEATURES
 
-* Added function to conduct the Fisher Test of equal axes
-* Added function to conduct the Gap Test of interstitiality
-* Added function to conduct the Rotation Test of interstitiality
-* Added function to conduct the Variance Test of interstitiality
-* Added function to conduct the RANDALL Test of circumplex fit
-* Added function to ipsatize circumplex item responses
-* Added function to score circumplex scales from item responses
-* Added function to standardize circumplex scale scores
-* Added norms and scoring instructions for the CSIE
-* Added norms and scoring instructions for the CSIP
-* Added norms and scoring instructions for the CSIV
-* Added norms and scoring instructions for the IIP-SC
-* Added norms and scoring instructions for the IIS-64
-* Added norms and scoring instructions for the IPIP-IPC
-* Added norms and scoring instructions for the ISC
+* Added functions and documentation for numerous circumplex instruments
+* Added functions for ipsatizing and scoring item-level data
+* Added function for standardizing scale-level data using normative data
 
 ### BUG FIXES
 
@@ -31,7 +19,6 @@ circumplex 0.1.2.9005
 ### DOCUMENTATION FIXES
 
 * Reformatted "Functions and Data" on package website
-* Updated vignettes to use the standardize() function
 
 circumplex 0.1.2
 =============================
