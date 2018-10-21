@@ -104,10 +104,10 @@ score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = 
 #'   to see the normative samples available for an instrument.
 #' @param prefix Optional. A string to include at the beginning of the newly
 #'   calcualted scale variables' names, before the scale name and \code{suffix}
-#'   (default = "z").
+#'   (default = "").
 #' @param suffix Optional. A string to include at the end of the newly
 #'   calculated scale variables' names, after the scale name and \code{prefix}
-#'   (default = "").
+#'   (default = "_z").
 #' @return A data frame that matches \code{.data} except that new variables are
 #'   appended that contain standardized versions of \code{scales}. These new
 #'   variables will have the same name as \code{scales} but with a "_z" suffix.
@@ -115,10 +115,10 @@ score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = 
 #' @family tidying functions
 #' @examples
 #' data("jz2017")
-#' data("iipsc")
+#' instrument("iipsc")
 #' standardize(jz2017, PA:NO, octants(), instrument = iipsc, sample = 1)
 standardize <- function(.data, scales, angles, instrument, sample = 1,
-                        prefix = "z", suffix = "") {
+                        prefix = "", suffix = "_z") {
   scales_en <- rlang::enquo(scales)
   scale_names <- names(dplyr::select(.data, !!scales_en))
   assert_that(is.numeric(angles))
