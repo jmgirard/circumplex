@@ -2,14 +2,14 @@ csie_scales <- tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
-    "4, 12, 20, 28, 36, 44, 52, 60",
-    "7, 15, 23, 31, 39, 47, 55, 63",
-    "2, 10, 18, 26, 34, 42, 50, 58",
-    "5, 13, 21, 29, 37, 45, 53, 61",
-    "8, 16, 24, 32, 40, 48, 56, 64",
-    "3, 11, 19, 27, 35, 43, 51, 59",
-    "6, 14, 22, 30, 38, 46, 54, 62",
-    "1,  9, 17, 25, 33, 41, 49, 57"
+    "4, 12, 20, 28",
+    "7, 15, 23, 31",
+    "2, 10, 18, 26",
+    "5, 13, 21, 29",
+    "8, 16, 24, 32",
+    "3, 11, 19, 27",
+    "6, 14, 22, 30",
+    "1,  9, 17, 25"
   ),
   Label = c(
     "+A",
@@ -36,7 +36,7 @@ csie_norms_src <- tibble(
   Size = 367,
   Population = "American college students",
   Reference = "Locke & Sadler (2007)",
-  URL = "http://www.webpages.uidaho.edu/klocke/csie.htm"
+  URL = "https://www.webpages.uidaho.edu/klocke/csie.htm"
 )
 
 csie_anchors <- tibble(
