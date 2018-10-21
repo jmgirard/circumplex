@@ -259,5 +259,5 @@ instrument <- function(name) {
   assert_that(is_enquo(name_en))
   name_str <- rlang::quo_name(name_en)
   utils::data(list = name_str)
-  get(name_str)
+  invisible(get(name_str))
 }
