@@ -9,27 +9,44 @@
 #' @param items Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex items to be ipsatized.
 #' @param na.rm Optional. A logical that determines whether missing values
-#'   should be ignored during the calculation of the mean during ipsatization.
-#' @return A data frame that matches \code{.data} except that new variables are
-#'   appended that contain ipsatized versions of \code{items}. These new
-#'   variables will have the same name as \code{items} but with a "_i" suffix.
+#'   should be ignored during the calculation of the mean during ipsatization
+#'   (default = TRUE).
+#' @param overwrite Optional. A logical that determines whether the variables
+#'   specified in \code{items} should be overwritten with ipsatized versions
+#'   or alternatively preserved and new variables ending with "_i" should be
+#'   added to the data frame (default = FALSE).
+#' @return A data frame that matches \code{.data} except that the variables
+#'   specified in \code{items} have been rescored using ipsatization.
 #' @family tidying functions
 #' @export
 #' @examples
-#' data("jz2017")
-#' ipsatize(jz2017, PA:NO)
-ipsatize <- function(.data, items, na.rm = TRUE) {
+#' data("raw_iipsc")
+#' ipsatize(raw_iipsc, IIP01:IIP32)
+ipsatize <- function(.data, items, na.rm = TRUE, overwrite = FALSE) {
+  
+  assert_that(is_provided(.data), is_enquo(items))
+  assert_that(is.flag(na.rm), is.flag(overwrite))
   
   items_en <- rlang::enquo(items)
-  new <- .data %>%
-    dplyr::select(!!items_en) %>%
-    dplyr::mutate(.im = rowMeans(., na.rm = na.rm)) %>%
-    dplyr::transmute_at(
-      .vars = dplyr::vars(!!items_en),
-      .funs = dplyr::funs(i = . - .im)
-    )
-  .data <- dplyr::bind_cols(.data, new)
-  .data
+  if (overwrite == TRUE) {
+    .data %>%
+      dplyr::select(!!items_en) %>%
+      dplyr::mutate(.im = rowMeans(., na.rm = na.rm)) %>%
+      dplyr::mutate_at(
+        .vars = dplyr::vars(!!items_en),
+        .funs = dplyr::funs(. - .im)
+      ) %>% 
+      dplyr::select(-.im)
+  } else {
+    .data %>% 
+      dplyr::select(!!items_en) %>% 
+      dplyr::mutate(.im = rowMeans(., na.rm = na.rm)) %>% 
+      dplyr::mutate_at(
+        .vars = dplyr::vars(!!items_en),
+        .funs = dplyr::funs(i = . - .im)
+      ) %>% 
+      dplyr::select(-.im)
+  }
 }
 
 #' Score circumplex scales from item responses
