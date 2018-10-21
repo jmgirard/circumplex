@@ -20,19 +20,19 @@
 \description{
 \itemize{
 \item \code{\link[rlang]{sym}()} creates a symbol from a string and
-\code{\link[rlang]{syms}()} creates a list of symbols from a
+\code{\link[rlang:sym]{syms}()} creates a list of symbols from a
 character vector.
-\item \code{\link[rlang]{expr}()} and \code{\link[rlang]{quo}()} quote
+\item \code{\link[rlang:quotation]{expr}()} and \code{\link[rlang:quotation]{quo}()} quote
 one expression. \code{quo()} wraps the quoted expression in a quosure.
 
-The plural variants \code{\link[rlang:exprs]{rlang::exprs()}} and
-\code{\link[rlang]{quos}()} return a list of quoted expressions or
+The plural variants \code{rlang::exprs()} and
+\code{\link[rlang:quotation]{quos}()} return a list of quoted expressions or
 quosures.
-\item \code{\link[rlang]{enexpr}()} and \code{\link[rlang]{enquo}()}
+\item \code{\link[rlang:quotation]{enexpr}()} and \code{\link[rlang:quotation]{enquo}()}
 capture the expression supplied as argument by the user of the
 current function (\code{enquo()} wraps this expression in a quosure).
 
-\code{\link[rlang]{enexprs}()} and \code{\link[rlang]{enquos}()}
+\code{\link[rlang:quotation]{enexprs}()} and \code{\link[rlang:quotation]{enquos}()}
 capture multiple expressions supplied as arguments, including
 \code{...}.
 }
