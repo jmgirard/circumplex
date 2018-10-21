@@ -15,7 +15,7 @@ csig
 Information about the Circumplex Scales of Intergroup Goals.
 }
 \examples{
-data(csig)
+instrument("csig")
 summary(csig)
 }
 \keyword{datasets}

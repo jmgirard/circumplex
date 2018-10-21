@@ -15,7 +15,7 @@ iipsc
 Information about the Inventory of Interpersonal Problems Short Circumplex.
 }
 \examples{
-data(iipsc)
+instrument("iipsc")
 summary(iipsc)
 }
 \keyword{datasets}

@@ -15,7 +15,7 @@ iis64
 Information about the Inventory of Interpersonal Strengths.
 }
 \examples{
-data(iis64)
+instrument("iis64")
 summary(iis64)
 }
 \keyword{datasets}

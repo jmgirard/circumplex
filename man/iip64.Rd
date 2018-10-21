@@ -17,7 +17,7 @@ although we have permission to provide some information about the IIP-64,
 Mind Garden Inc. has exclusive rights to distribute it in full.
 }
 \examples{
-data(iip64)
+instrument("iip64")
 summary(iip64)
 }
 \keyword{datasets}

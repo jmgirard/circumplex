@@ -4,7 +4,7 @@
 #'
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csie.htm}
 #' @examples
-#' data(csie)
+#' instrument("csie")
 #' summary(csie)
 "csie"
 
@@ -14,7 +14,7 @@
 #'
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csig.htm}
 #' @examples
-#' data(csig)
+#' instrument("csig")
 #' summary(csig)
 "csig"
 
@@ -24,7 +24,7 @@
 #'
 #' @source \url{https://doi.org/10.1037/pas0000505}
 #' @examples
-#' data(csip)
+#' instrument("csip")
 #' summary(csip)
 "csip"
 
@@ -34,7 +34,7 @@
 #'
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
 #' @examples
-#' data(csiv)
+#' instrument("csiv")
 #' summary(csiv)
 "csiv"
 
@@ -46,7 +46,7 @@
 #'
 #' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
 #' @examples
-#' data(iip32)
+#' instrument("iip32")
 #' summary(iip32)
 "iip32"
 
@@ -58,7 +58,7 @@
 #'
 #' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
 #' @examples
-#' data(iip64)
+#' instrument("iip64")
 #' summary(iip64)
 "iip64"
 
@@ -68,7 +68,7 @@
 #'
 #' @source \url{https://doi.org/10.1080/00223890802388665}
 #' @examples
-#' data(iipsc)
+#' instrument("iipsc")
 #' summary(iipsc)
 "iipsc"
 
@@ -78,7 +78,7 @@
 #'
 #' @source \url{https://doi.org/10.1037/a0017269}
 #' @examples
-#' data(iis64)
+#' instrument("iis64")
 #' summary(iis64)
 "iis64"
 
@@ -88,7 +88,7 @@
 #'
 #' @source \url{https://doi.org/10.1177/1073191109340382}
 #' @examples
-#' data(ipipipc)
+#' instrument("ipipipc")
 #' summary(ipipipc)
 "ipipipc"
 
@@ -98,6 +98,6 @@
 #'
 #' @source \url{https://doi.org/10.1111/j.1467-6494.2011.00696.x}
 #' @examples
-#' data(isc)
+#' instrument("isc")
 #' summary(isc)
 "isc"

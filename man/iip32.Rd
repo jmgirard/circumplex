@@ -17,7 +17,7 @@ Note that, although we have permission to provide some information about the
 IIP-32, Mind Garden Inc. has exclusive rights to distribute it in full.
 }
 \examples{
-data(iip32)
+instrument("iip32")
 summary(iip32)
 }
 \keyword{datasets}

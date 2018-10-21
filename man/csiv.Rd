@@ -15,7 +15,7 @@ csiv
 Information about the Circumplex Scales of Interpersonal Values.
 }
 \examples{
-data(csiv)
+instrument("csiv")
 summary(csiv)
 }
 \keyword{datasets}

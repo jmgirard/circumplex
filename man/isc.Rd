@@ -15,7 +15,7 @@ isc
 Information about the Interpersonal Sensitivities Circumplex.
 }
 \examples{
-data(isc)
+instrument("isc")
 summary(isc)
 }
 \keyword{datasets}

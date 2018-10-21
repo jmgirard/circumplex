@@ -15,7 +15,7 @@ ipipipc
 Information about the IPIP Interpersonal Circumplex.
 }
 \examples{
-data(ipipipc)
+instrument("ipipipc")
 summary(ipipipc)
 }
 \keyword{datasets}

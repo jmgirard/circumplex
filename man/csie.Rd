@@ -15,7 +15,7 @@ csie
 Information about the Circumplex Scales of Interpersonal Efficacy.
 }
 \examples{
-data(csie)
+instrument("csie")
 summary(csie)
 }
 \keyword{datasets}

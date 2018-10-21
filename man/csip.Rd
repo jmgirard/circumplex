@@ -15,7 +15,7 @@ csip
 Information about the Circumplex Scales of Interpersonal Problems.
 }
 \examples{
-data(csip)
+instrument("csip")
 summary(csip)
 }
 \keyword{datasets}
