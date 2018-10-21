@@ -4,8 +4,8 @@
 \alias{standardize}
 \title{Standardize circumplex scales using normative data}
 \usage{
-standardize(.data, scales, angles, instrument, sample = 1,
-  prefix = "z", suffix = "")
+standardize(.data, scales, angles, instrument, sample = 1, prefix = "",
+  suffix = "_z")
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -26,11 +26,11 @@ to see the normative samples available for an instrument.}
 
 \item{prefix}{Optional. A string to include at the beginning of the newly
 calcualted scale variables' names, before the scale name and \code{suffix}
-(default = "z").}
+(default = "").}
 
 \item{suffix}{Optional. A string to include at the end of the newly
 calculated scale variables' names, after the scale name and \code{prefix}
-(default = "").}
+(default = "_z").}
 }
 \value{
 A data frame that matches \code{.data} except that new variables are
@@ -45,7 +45,7 @@ scores (i.e., z-scores) based on comparison to the normative data.
 }
 \examples{
 data("jz2017")
-data("iipsc")
+instrument("iipsc")
 standardize(jz2017, PA:NO, octants(), instrument = iipsc, sample = 1)
 }
 \seealso{

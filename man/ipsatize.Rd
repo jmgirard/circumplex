@@ -4,7 +4,7 @@
 \alias{ipsatize}
 \title{Ipsatize circumplex items using deviation scoring across variables}
 \usage{
-ipsatize(.data, items, na.rm = TRUE)
+ipsatize(.data, items, na.rm = TRUE, overwrite = FALSE)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -13,12 +13,17 @@ ipsatize(.data, items, na.rm = TRUE)
 variables in \code{.data} that contain circumplex items to be ipsatized.}
 
 \item{na.rm}{Optional. A logical that determines whether missing values
-should be ignored during the calculation of the mean during ipsatization.}
+should be ignored during the calculation of the mean during ipsatization
+(default = TRUE).}
+
+\item{overwrite}{Optional. A logical that determines whether the variables
+specified in \code{items} should be overwritten with ipsatized versions
+or alternatively preserved and new variables ending with "_i" should be
+added to the data frame (default = FALSE).}
 }
 \value{
-A data frame that matches \code{.data} except that new variables are
-appended that contain ipsatized versions of \code{items}. These new
-variables will have the same name as \code{items} but with a "_i" suffix.
+A data frame that matches \code{.data} except that the variables
+specified in \code{items} have been rescored using ipsatization.
 }
 \description{
 Rescore each circumplex item using deviation scoring across variables. In
@@ -27,8 +32,8 @@ This effectively removes the presence of a general factor, which can make
 certain circumplex fit analyses more powerful.
 }
 \examples{
-data("jz2017")
-ipsatize(jz2017, PA:NO)
+data("raw_iipsc")
+ipsatize(raw_iipsc, IIP01:IIP32)
 }
 \seealso{
 Other tidying functions: \code{\link{score}},

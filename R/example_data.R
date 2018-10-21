@@ -48,106 +48,11 @@
 #' @source \url{https://doi.org/10.1177/1073191115621795}
 "jz2017"
 
-#' Instrument: CSIE
-#'
-#' Information about the Circumplex Scales of Interpersonal Efficacy.
-#'
-#' @source \url{https://www.webpages.uidaho.edu/klocke/csie.htm}
-#' @examples
-#' data(csie)
-#' summary(csie)
-"csie"
-
-#' Instrument: CSIG
-#'
-#' Information about the Circumplex Scales of Intergroup Goals.
-#'
-#' @source \url{https://www.webpages.uidaho.edu/klocke/csig.htm}
-#' @examples
-#' data(csig)
-#' summary(csig)
-"csig"
-
-#' Instrument: CSIP
-#'
-#' Information about the Circumplex Scales of Interpersonal Problems.
-#'
-#' @source \url{https://doi.org/10.1037/pas0000505}
-#' @examples
-#' data(csip)
-#' summary(csip)
-"csip"
-
-#' Instrument: CSIV
-#'
-#' Information about the Circumplex Scales of Interpersonal Values.
-#'
-#' @source \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
-#' @examples
-#' data(csiv)
-#' summary(csiv)
-"csiv"
-
-#' Instrument: IIP-32
-#'
-#' Information about the Inventory of Interpersonal Problems Brief Version.
-#' Note that, although we have permission to provide some information about the
-#' IIP-32, Mind Garden Inc. has exclusive rights to distribute it in full.
-#'
-#' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
-#' @examples
-#' data(iip32)
-#' summary(iip32)
-"iip32"
-
-#' Instrument: IIP-64
-#'
-#' Information about the Inventory of Interpersonal Problems. Note that,
-#' although we have permission to provide some information about the IIP-64,
-#' Mind Garden Inc. has exclusive rights to distribute it in full.
-#'
-#' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
-#' @examples
-#' data(iip64)
-#' summary(iip64)
-"iip64"
-
-#' Instrument: IIP-SC
-#'
-#' Information about the Inventory of Interpersonal Problems Short Circumplex.
-#'
-#' @source \url{https://doi.org/10.1080/00223890802388665}
-#' @examples
-#' data(iipsc)
-#' summary(iipsc)
-"iipsc"
-
-#' Instrument: IIS-64
-#'
-#' Information about the Inventory of Interpersonal Strengths.
-#'
-#' @source \url{https://doi.org/10.1037/a0017269}
-#' @examples
-#' data(iis64)
-#' summary(iis64)
-"iis64"
-
-#' Instrument: IPIP-IPC
-#'
-#' Information about the IPIP Interpersonal Circumplex.
-#'
-#' @source \url{https://doi.org/10.1177/1073191109340382}
-#' @examples
-#' data(ipipipc)
-#' summary(ipipipc)
-"ipipipc"
-
-#' Instrument: ISC
-#'
-#' Information about the Interpersonal Sensitivities Circumplex.
-#'
-#' @source \url{https://doi.org/10.1111/j.1467-6494.2011.00696.x}
-#' @examples
-#' data(isc)
-#' summary(isc)
-"isc"
+#' Raw item responses on real circumplex scales
+#' 
+#' A small example dataset containing raw item responses on the Inventory of
+#' Interpersonal Problems, Short Circumplex (IIP-SC). This data set is useful
+#' for testing functions that operate on item-level data.
+#' 
+#' @format A data frame with 10 observations and 32 variables.
+"raw_iipsc"
