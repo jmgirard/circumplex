@@ -52,7 +52,6 @@ get_rotation <- function(lambda, angle) {
 #'   this object}
 #' @family fit functions
 #' @family analysis functions
-#' @export
 fit_fisher <- function(.data, scales, ridge = 0) {
   call <- match.call()
   scales_en <- rlang::enquo(scales)
@@ -107,7 +106,6 @@ fit_fisher <- function(.data, scales, ridge = 0) {
 #'   this object}
 #' @family fit functions
 #' @family analysis functions
-#' @export
 fit_gap <- function(.data, scales, ridge = 0) {
   call <- match.call()
   scales_en <- rlang::enquo(scales)
@@ -167,7 +165,6 @@ fit_gap <- function(.data, scales, ridge = 0) {
 #'   this object}
 #' @family fit functions
 #' @family analysis functions
-#' @export
 fit_vt <- function(.data, scales, ridge = 0) {
   call <- match.call()
   scales_en <- rlang::enquo(scales)
@@ -226,7 +223,6 @@ fit_vt <- function(.data, scales, ridge = 0) {
 #'   this object}
 #' @family fit functions
 #' @family analysis functions
-#' @export
 fit_rt <- function(.data, scales, ridge = 0) {
   call <- match.call()
   scales_en <- rlang::enquo(scales)
@@ -284,7 +280,6 @@ fit_rt <- function(.data, scales, ridge = 0) {
 #'   confidence interval. (Will soon be replaced by a list object.)
 #' @family fit functions
 #' @family analysis functions
-#' @export
 #' @examples
 #' \donttest{
 #' data("jz2017")
