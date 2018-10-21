@@ -20,8 +20,10 @@
 #'
 #' @useDynLib circumplex, .registration = TRUE
 #' @import assertthat
+#' @importFrom dplyr select
 #' @importFrom ggplot2 aes
 #' @importFrom glue glue
 #' @importFrom Rcpp sourceCpp
 #' @importFrom stats cor quantile sd var
+#' @export select
 "_PACKAGE"
