@@ -1,18 +1,25 @@
-#' dplyr helpers
+#' Select variables by name
 #'
-#' @description
+#' select() keeps only the variables you mention.
 #'
-#' * \code{\link[dplyr]{select}()} keeps only the variables you mention.
+#' See \code{\link[dplyr]{select}} for details.
 #'
-#' * \code{\link[dplyr]{mutate}()} adds new variables and preserves existing.
-#'
-#' To learn more about tidy eval and how to use these tools, visit
-#' <https://dplyr.tidyverse.org/>.
-#'
-#' @md
-#' @name     dplyr
+#' @name select
+#' @rdname select
 #' @keywords internal
-#' @importFrom dplyr select mutate
-#' @export   select
-#' @export   mutate
+#' @export
+#' @importFrom dplyr select
+NULL
+
+#' Add new variables
+#'
+#' mutate() adds new variables and preserves existing.
+#'
+#' See \code{\link[dplyr]{mutate}} for details.
+#'
+#' @name mutate
+#' @rdname mutate
+#' @keywords internal
+#' @export
+#' @importFrom dplyr mutate
 NULL
