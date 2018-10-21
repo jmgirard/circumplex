@@ -369,7 +369,7 @@ Now we can use the `ssm_analyze()` function to perform the SSM analysis. The fir
 ```{r analyze}
 results <- ssm_analyze(
   .data = jz2017s,
-  scales = c(PA, BC, DE, FG, HI, JK, LM, NO),
+  scales = c(PA_z, BC_z, DE_z, FG_z, HI_z, JK_z, LM_z, NO_z),
   angles = c(90, 135, 180, 225, 270, 315, 360, 45)
 )
 ```
@@ -383,7 +383,7 @@ summary(results)
 That was pretty easy! We can now write up these results. However, the `circumplex` package has some features that can make what we just did even easier. First, because the first three arguments of the `ssm_analyze()` function are always the same, we can omit their names. Second, because we organized the `jz2017s` data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the `PA:NO` shortcut. Finally, because the use of octant scales is so common, the `circumplex` package comes with a convenience function for outputing their angular displacements: `octants()`. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the `set.seed()` function to control the random number generator in R.)
 
 ```{r summary1b}
-results2 <- ssm_analyze(jz2017s, PA:NO, octants())
+results2 <- ssm_analyze(jz2017s, PA_z:NO_z, octants())
 summary(results2)
 ```
 
