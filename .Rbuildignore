@@ -1,3 +1,4 @@
+^devel$
 ^data-raw$
 ^\.github$
 ^.*\.Rproj$
