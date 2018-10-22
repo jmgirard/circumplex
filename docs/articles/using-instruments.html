@@ -32,18 +32,24 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.2.9100</span>
+        <span class="label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased package">0.1.2.9100</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../reference/index.html">Functions and data</a>
+  <a href="../index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Vignettes
      
     <span class="caret"></span>
   </a>
@@ -66,7 +72,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/jmgirard/circumplex">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fa fa-github"></span>
      
   </a>
 </li>
@@ -164,7 +170,7 @@ iip32
 <div id="examining-an-instrument-in-depth" class="section level3">
 <h3 class="hasAnchor">
 <a href="#examining-an-instrument-in-depth" class="anchor"></a>Examining an instrument in-depth</h3>
-<p>To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the <code>summary()</code> function. This will return the same information returned by <code>print()</code>, followed by information about the instrument’s scales, rating scale anchors, items, and normative data set(s).</p>
+<p>To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the <code>summary()</code> function. This will return the same information returned by <code>print()</code>, followed by information about the instrument’s scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the <a href="https://circumplex.jmgirard.com/reference/index.html#section-instrument-data">functions and data</a> page of the circumplex package website.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(<span class="st">"ipipipc"</span>)
 <span class="kw">summary</span>(ipipipc)
 <span class="co">#&gt; IPIP-IPC: IPIP Interpersonal Circumplex</span>
