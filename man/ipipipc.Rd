@@ -3,7 +3,7 @@
 \docType{data}
 \name{ipipipc}
 \alias{ipipipc}
-\title{Instrument: IPIP-IPC}
+\title{Instrument: IPIP Interpersonal Circumplex}
 \format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://doi.org/10.1177/1073191109340382}

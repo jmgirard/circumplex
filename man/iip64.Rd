@@ -3,7 +3,7 @@
 \docType{data}
 \name{iip64}
 \alias{iip64}
-\title{Instrument: IIP-64}
+\title{Instrument: Inventory of Interpersonal Problems}
 \format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}

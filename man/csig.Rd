@@ -3,7 +3,7 @@
 \docType{data}
 \name{csig}
 \alias{csig}
-\title{Instrument: CSIG}
+\title{Instrument: Circumplex Scales of Intergroup Goals}
 \format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://www.webpages.uidaho.edu/klocke/csig.htm}

@@ -3,7 +3,7 @@
 \docType{data}
 \name{csip}
 \alias{csip}
-\title{Instrument: CSIP}
+\title{Instrument: Circumplex Scales of Interpersonal Problems}
 \format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://doi.org/10.1037/pas0000505}

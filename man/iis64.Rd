@@ -3,7 +3,7 @@
 \docType{data}
 \name{iis64}
 \alias{iis64}
-\title{Instrument: IIS-64}
+\title{Instrument: Inventory of Interpersonal Strengths}
 \format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://doi.org/10.1037/a0017269}

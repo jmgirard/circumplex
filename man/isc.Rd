@@ -3,7 +3,7 @@
 \docType{data}
 \name{isc}
 \alias{isc}
-\title{Instrument: ISC}
+\title{Instrument: Interpersonal Sensitivities Circumplex}
 \format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://doi.org/10.1111/j.1467-6494.2011.00696.x}

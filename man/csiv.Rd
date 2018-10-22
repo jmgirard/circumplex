@@ -3,7 +3,7 @@
 \docType{data}
 \name{csiv}
 \alias{csiv}
-\title{Instrument: CSIV}
+\title{Instrument: Circumplex Scales of Interpersonal Values}
 \format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
