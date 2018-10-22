@@ -1,8 +1,8 @@
 # S3 vector constructors -------------------------------------------------------
 
-# Create a new S3 class from a double
-new_s3_dbl <- function(x, ..., class) {
-  stopifnot(is.double(x))
+# Create a new S3 class from a numeric
+new_s3_num <- function(x, ..., class) {
+  stopifnot(is.numeric(x))
   stopifnot(is.character(class))
   structure(x, ..., class = class)
 }
@@ -23,7 +23,7 @@ new_s3_scalar <- function(..., class) {
 
 # Set numeric object to class 'degree'
 new_degree <- function(x) {
-  new_s3_dbl(x, class = c("degree", "numeric"))
+  new_s3_num(x, class = c("degree", "numeric"))
 }
 
 # S3 generic for class 'degree'
@@ -50,7 +50,7 @@ as_degree.radian <- function(x, ...) {
 
 # Set numeric object to class 'radian'
 new_radian <- function(x) {
-  new_s3_dbl(x, class = c("radian", "numeric"))
+  new_s3_num(x, class = c("radian", "numeric"))
 }
 
 # S3 generic for class 'radian'
