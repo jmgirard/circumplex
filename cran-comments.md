@@ -3,7 +3,7 @@
 * win-builder (devel and release)
 
 ## R CMD check results
-X errors | X warnings | X notes
+0 errors | 0 warnings | 0 notes
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package
