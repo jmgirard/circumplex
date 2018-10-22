@@ -18,6 +18,7 @@ library(dplyr)
 library(forcats)
 library(psych)
 library(knitr)
+set.seed(12345)
 ```
 
 ## 1. Background and Motivation
