@@ -1,4 +1,4 @@
-circumplex 0.1.2.9100
+circumplex 0.2.0
 =============================
 
 #### NEW FEATURES
@@ -18,8 +18,8 @@ circumplex 0.1.2.9100
 
 #### DOCUMENTATION FIXES
 
-
 * Reformatted package website
+* Updated SSM vignette to use standardization function
 
 circumplex 0.1.2
 =============================
