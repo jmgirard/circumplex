@@ -11,8 +11,8 @@
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased package">0.1.2.9100</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
       </span>
     </div>
 
@@ -134,39 +134,40 @@
       <small>Source: <a href='https://github.com/jmgirard/circumplex/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="circumplex-0-1-2-9100" class="section level1">
+    <div id="circumplex-0-2-0" class="section level1">
 <h1 class="page-header">
-<a href="#circumplex-0-1-2-9100" class="anchor"></a>circumplex 0.1.2.9100<small> Unreleased </small>
+<a href="#circumplex-0-2-0" class="anchor"></a>circumplex 0.2.0<small> Unreleased </small>
 </h1>
-<div id="new-features" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>NEW FEATURES</h3>
+<div id="new-features" class="section level4">
+<h4 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>NEW FEATURES</h4>
 <ul>
 <li>Added functions and documentation for numerous circumplex instruments</li>
 <li>Added functions for ipsatizing and scoring item-level data</li>
 <li>Added function for standardizing scale-level data using normative data</li>
 </ul>
 </div>
-<div id="bug-fixes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#bug-fixes" class="anchor"></a>BUG FIXES</h3>
+<div id="bug-fixes" class="section level4">
+<h4 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>BUG FIXES</h4>
 <ul>
 <li>Changed OpenMP flags in Makevars to fix a compile problem on Debian machines</li>
 </ul>
 </div>
-<div id="minor-improvements" class="section level3">
-<h3 class="hasAnchor">
-<a href="#minor-improvements" class="anchor"></a>MINOR IMPROVEMENTS</h3>
+<div id="minor-improvements" class="section level4">
+<h4 class="hasAnchor">
+<a href="#minor-improvements" class="anchor"></a>MINOR IMPROVEMENTS</h4>
 <ul>
 <li>Changed the default to plot profiles with low fit (but with dashed borders)</li>
 <li>Import and export functions for tidy evaluation</li>
 </ul>
 </div>
-<div id="documentation-fixes" class="section level3">
-<h3 class="hasAnchor">
-<a href="#documentation-fixes" class="anchor"></a>DOCUMENTATION FIXES</h3>
+<div id="documentation-fixes" class="section level4">
+<h4 class="hasAnchor">
+<a href="#documentation-fixes" class="anchor"></a>DOCUMENTATION FIXES</h4>
 <ul>
-<li>Reformatted “Functions and Data” on package website</li>
+<li>Reformatted package website</li>
+<li>Updated SSM vignette to use standardization function</li>
 </ul>
 </div>
 </div>
@@ -174,24 +175,24 @@
 <h1 class="page-header">
 <a href="#circumplex-0-1-2" class="anchor"></a>circumplex 0.1.2<small> 2018-08-06 </small>
 </h1>
-<div id="new-features-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>NEW FEATURES</h3>
+<div id="new-features-1" class="section level4">
+<h4 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>NEW FEATURES</h4>
 <ul>
 <li>Profiles with low fit now have dashed borders when plotted</li>
 </ul>
 </div>
-<div id="bug-fixes-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>BUG FIXES</h3>
+<div id="bug-fixes-1" class="section level4">
+<h4 class="hasAnchor">
+<a href="#bug-fixes-1" class="anchor"></a>BUG FIXES</h4>
 <ul>
 <li>Fixed bug that prevented compilation on Solaris systems</li>
 <li>Fixed bug that prevented CRAN checks on old R versions</li>
 </ul>
 </div>
-<div id="documentation-fixes-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#documentation-fixes-1" class="anchor"></a>DOCUMENTATION FIXES</h3>
+<div id="documentation-fixes-1" class="section level4">
+<h4 class="hasAnchor">
+<a href="#documentation-fixes-1" class="anchor"></a>DOCUMENTATION FIXES</h4>
 <ul>
 <li>Improved the formatting of vignette source code</li>
 </ul>
@@ -201,18 +202,18 @@
 <h1 class="page-header">
 <a href="#circumplex-0-1-1" class="anchor"></a>circumplex 0.1.1<small> 2018-07-31 </small>
 </h1>
-<div id="new-features-2" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>NEW FEATURES</h3>
+<div id="new-features-2" class="section level4">
+<h4 class="hasAnchor">
+<a href="#new-features-2" class="anchor"></a>NEW FEATURES</h4>
 <ul>
 <li>
 <a href="https://circumplex.jmgirard.com">Package website</a> added using <a href="https://pkgdown.r-lib.org/">pkgdown</a>
 </li>
 </ul>
 </div>
-<div id="documentation-fixes-2" class="section level3">
-<h3 class="hasAnchor">
-<a href="#documentation-fixes-2" class="anchor"></a>DOCUMENTATION FIXES</h3>
+<div id="documentation-fixes-2" class="section level4">
+<h4 class="hasAnchor">
+<a href="#documentation-fixes-2" class="anchor"></a>DOCUMENTATION FIXES</h4>
 <ul>
 <li>Fixed documentation to meet CRAN standards</li>
 </ul>
@@ -222,9 +223,9 @@
 <h1 class="page-header">
 <a href="#circumplex-0-1-0" class="anchor"></a>circumplex 0.1.0<small> Unreleased </small>
 </h1>
-<div id="new-features-3" class="section level3">
-<h3 class="hasAnchor">
-<a href="#new-features-3" class="anchor"></a>NEW FEATURES</h3>
+<div id="new-features-3" class="section level4">
+<h4 class="hasAnchor">
+<a href="#new-features-3" class="anchor"></a>NEW FEATURES</h4>
 <ul>
 <li>Submitted to CRAN</li>
 </ul>
@@ -236,7 +237,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-        <li><a href="#circumplex-0-1-2-9100">0.1.2.9100</a></li>
+        <li><a href="#circumplex-0-2-0">0.2.0</a></li>
         <li><a href="#circumplex-0-1-2">0.1.2</a></li>
         <li><a href="#circumplex-0-1-1">0.1.1</a></li>
         <li><a href="#circumplex-0-1-0">0.1.0</a></li>
