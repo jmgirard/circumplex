@@ -40,7 +40,7 @@ Imports:
     MASS,
     purrr (>= 0.2.5),
     Rcpp (>= 0.12.19),
-    rlang (>= 0.2.2),
+    rlang (>= 0.3.0),
     stats,
     tibble (>= 1.4.2),
     tidyr (>= 0.8.1)
