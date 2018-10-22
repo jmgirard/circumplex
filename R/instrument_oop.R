@@ -173,7 +173,10 @@ norms <- function(x) {
   n_norms <- nrow(samples)
 
   if (n_norms == 0) {
-    cat("The {x$Details$Abbrev} currently has no normative data sets.\n")
+    cat(
+      glue("The {x$Details$Abbrev} currently has no normative data sets."),
+      "\n", sep = ""
+    )
     return()
   }
 
