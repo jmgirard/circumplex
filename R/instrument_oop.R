@@ -59,7 +59,6 @@ summary.instrument <- function(object, scales = TRUE, anchors = TRUE,
 #' @examples
 #' instrument(csip)
 #' scales(csip)
-
 scales <- function(x) {
   assert_that(is_instrument(x))
 
@@ -74,7 +73,7 @@ scales <- function(x) {
     ang <- sprintf("%03d", xi$Angle)
     cat(
       glue("{xi$Abbrev} ({ang} deg): {xi$Label}"),
-      "\n"
+      "\n", sep = ""
     )
   }
 
@@ -94,7 +93,6 @@ scales <- function(x) {
 #' @examples
 #' instrument(csip)
 #' items(csip)
-
 items <- function(x) {
   assert_that(is_instrument(x))
 
@@ -109,7 +107,7 @@ items <- function(x) {
     if (!is.na(xi$Number)) {
       cat(glue("{xi$Number}. "))
     }
-    cat(glue("{xi$Text}"), "\n")
+    cat(glue("{xi$Text}"), "\n", sep = "")
   }
 
   invisible(x)
@@ -128,7 +126,6 @@ items <- function(x) {
 #' @examples
 #' instrument(csip)
 #' anchors(csip)
-
 anchors <- function(x) {
   assert_that(is_instrument(x))
 
@@ -137,14 +134,14 @@ anchors <- function(x) {
       "The {x$Details$Abbrev} is rated using the following ",
       "{nrow(x$Anchors)}-point scale."
     ),
-    "\n"
+    "\n", sep = ""
   )
   for (i in seq_along(x$Anchors$Value)) {
     cat(
       glue(
         "{x$Anchors$Value[[i]]}. {x$Anchors$Label[[i]]}"
       ),
-      "\n"
+      "\n", sep = ""
     )
   }
 
@@ -165,7 +162,6 @@ anchors <- function(x) {
 #' @examples
 #' instrument(csip)
 #' norms(csip)
-
 norms <- function(x) {
   assert_that(is_instrument(x))
 
@@ -184,7 +180,7 @@ norms <- function(x) {
     glue(
       "The {x$Details$Abbrev} currently has {n_norms} normative data set(s):"
     ),
-    "\n"
+    "\n", sep = ""
   )
 
   for (i in 1:n_norms) {
@@ -197,7 +193,7 @@ norms <- function(x) {
       glue("{samples$Reference[[i]]}"),
       "\n  ",
       glue("<{samples$URL[[i]]}>"),
-      "\n"
+      "\n", sep = ""
     )
   }
 
@@ -215,7 +211,6 @@ norms <- function(x) {
 #' @export
 #' @examples
 #' instruments()
-
 instruments <- function() {
 
   # TODO: Find a way to automate this - maybe dir?
@@ -256,7 +251,6 @@ instruments <- function() {
 #' instrument(iip32)
 #' instrument("iip32")
 #' x <- instrument(iip32)
-
 instrument <- function(name) {
   name_en <- rlang::enquo(name)
   assert_that(is_enquo(name_en))
