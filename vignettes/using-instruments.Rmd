@@ -71,7 +71,7 @@ print(isc)
 ```
 
 ### Examining an instrument in-depth
-To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the `summary()` function. This will return the same information returned by `print()`, followed by information about the instrument's scales, rating scale anchors, items, and normative data set(s).
+To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the `summary()` function. This will return the same information returned by `print()`, followed by information about the instrument's scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the [reference](https://circumplex.jmgirard.com/reference/index.html#section-instrument-data) page of the circumplex package website.
 
 ```{r}
 instrument("ipipipc")

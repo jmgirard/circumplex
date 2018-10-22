@@ -10,9 +10,13 @@ authors:
 
 template:
   params:
+    bootswatch: flatly
     docsearch:
       api_key: ec4004481ba8d410e8e20c9e90fa5e60
       index_name: circumplex
+
+development:
+  mode: auto
 
 reference:
   - title: Instrument Functions
@@ -68,12 +72,14 @@ reference:
       - isc
 
 navbar:
-  title: ~
+  title: "circumplex"
   type: default
   left:
-    - text: Functions and data
+    - icon: fa-home
+      href: index.html
+    - text: Reference
       href: reference/index.html
-    - text: Articles
+    - text: Vignettes
       menu:
       - text: Using Circumplex Instruments
         href: articles/using-instruments.html
@@ -83,3 +89,6 @@ navbar:
         href: articles/intermediate-ssm-analysis.html
     - text: News
       href: news/index.html
+  right:
+    - icon: fa-github
+      href: https://github.com/jmgirard/circumplex

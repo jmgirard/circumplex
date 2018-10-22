@@ -1,55 +1,56 @@
 circumplex 0.1.2.9100
 =============================
 
-### NEW FEATURES
+#### NEW FEATURES
 
 * Added functions and documentation for numerous circumplex instruments
 * Added functions for ipsatizing and scoring item-level data
 * Added function for standardizing scale-level data using normative data
 
-### BUG FIXES
+#### BUG FIXES
 
 * Changed OpenMP flags in Makevars to fix a compile problem on Debian machines
 
-### MINOR IMPROVEMENTS
+#### MINOR IMPROVEMENTS
 
 * Changed the default to plot profiles with low fit (but with dashed borders)
 * Import and export functions for tidy evaluation
 
-### DOCUMENTATION FIXES
+#### DOCUMENTATION FIXES
 
-* Reformatted "Functions and Data" on package website
+
+* Reformatted package website
 
 circumplex 0.1.2
 =============================
 
-### NEW FEATURES
+#### NEW FEATURES
 
 * Profiles with low fit now have dashed borders when plotted
 
-### BUG FIXES
+#### BUG FIXES
 
 * Fixed bug that prevented compilation on Solaris systems
 * Fixed bug that prevented CRAN checks on old R versions
 
-### DOCUMENTATION FIXES
+#### DOCUMENTATION FIXES
 
 * Improved the formatting of vignette source code
 
 circumplex 0.1.1
 =============================
 
-### NEW FEATURES
+#### NEW FEATURES
 
 * [Package website](https://circumplex.jmgirard.com) added using [pkgdown](https://pkgdown.r-lib.org/)
 
-### DOCUMENTATION FIXES
+#### DOCUMENTATION FIXES
 
 * Fixed documentation to meet CRAN standards
 
 circumplex 0.1.0
 =============================
 
-### NEW FEATURES
+#### NEW FEATURES
 
 * Submitted to CRAN
