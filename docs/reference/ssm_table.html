@@ -211,8 +211,8 @@ side-effect, may also output the HTML table to the web viewer.</p>
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.20 [0.17, 0.24]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;-0.06 [-0.09, -0.03]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.18 [0.15, 0.21]&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.19 [0.16, 0.22]&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;109.0 [99.3, 118.1]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.19 [0.15, 0.22]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;109.0 [99.3, 118.3]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.957&lt;/td&gt;
 #&gt; &lt;/tr&gt;
 #&gt; &lt;tr&gt;
@@ -221,15 +221,15 @@ side-effect, may also output the HTML table to the web viewer.</p>
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;-0.10 [-0.13, -0.06]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.20 [0.17, 0.24]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.23 [0.19, 0.26]&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;115.9 [107.1, 124.4]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;115.9 [107.5, 124.6]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.964&lt;/td&gt;
 #&gt; &lt;/tr&gt;
 #&gt; &lt;/tbody&gt;
 #&gt; &lt;/table&gt;</div><div class='output co'>#&gt; # A tibble: 2 x 7
 #&gt;   Profile Elevation    `X-Value`   `Y-Value`   Amplitude   Displacement   Fit  
 #&gt;   &lt;chr&gt;   &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;          &lt;chr&gt;
-#&gt; 1 NARPD   0.20 [0.17,~ -0.06 [-0.~ 0.18 [0.15~ 0.19 [0.16~ 109.0 [99.3, ~ 0.957
-#&gt; 2 ASPD    0.12 [0.09,~ -0.10 [-0.~ 0.20 [0.17~ 0.23 [0.19~ 115.9 [107.1,~ 0.964</div><div class='input'>
+#&gt; 1 NARPD   0.20 [0.17,~ -0.06 [-0.~ 0.18 [0.15~ 0.19 [0.15~ 109.0 [99.3, ~ 0.957
+#&gt; 2 ASPD    0.12 [0.09,~ -0.10 [-0.~ 0.20 [0.17~ 0.23 [0.19~ 115.9 [107.5,~ 0.964</div><div class='input'>
 <span class='co'># Create table of contrast results</span>
 <span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
   <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>)
@@ -251,17 +251,17 @@ side-effect, may also output the HTML table to the web viewer.</p>
 #&gt; &lt;tr&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;ASPD - NARPD&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;-0.08 [-0.12, -0.04]&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;-0.04 [-0.08, 0.00]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;-0.04 [-0.08, -0.00]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.02 [-0.01, 0.06]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.04 [-0.00, 0.08]&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;7.0 [-3.3, 17.6]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;7.0 [-2.6, 17.2]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.007&lt;/td&gt;
 #&gt; &lt;/tr&gt;
 #&gt; &lt;/tbody&gt;
 #&gt; &lt;/table&gt;</div><div class='output co'>#&gt; # A tibble: 1 x 7
 #&gt;   Contrast `&amp;Delta; Elevat~ `&amp;Delta; X-Valu~ `&amp;Delta; Y-Valu~ `&amp;Delta; Amplit~
 #&gt;   &lt;chr&gt;    &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;            &lt;chr&gt;           
-#&gt; 1 ASPD - ~ -0.08 [-0.12, -~ -0.04 [-0.08, 0~ 0.02 [-0.01, 0.~ 0.04 [-0.00, 0.~
+#&gt; 1 ASPD - ~ -0.08 [-0.12, -~ -0.04 [-0.08, -~ 0.02 [-0.01, 0.~ 0.04 [-0.00, 0.~
 #&gt; # ... with 2 more variables: `&amp;Delta; Displacement` &lt;chr&gt;, `&amp;Delta; Fit` &lt;chr&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
