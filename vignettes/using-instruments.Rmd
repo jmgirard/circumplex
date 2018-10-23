@@ -25,53 +25,35 @@ The second part of this vignette will discuss how to use the information about a
 ## 2. Loading and Examining Instrument Objects
 
 ### Previewing the available instruments
-Our goal is to eventually include all circumplex instruments in this package. However, due to time-constraints and copyright issues, this goal may be delayed or even impossible to fully realize. However, you can always preview the list of currently available instruments using the `instruments()` function. This function will print the abbreviation, name, and (in parentheses) the "code" for each available instrument.
+Our goal is to eventually include all circumplex instruments in this package. However, due to time-constraints and copyright issues, this goal may be delayed or even impossible to fully realize. However, you can always preview the list of currently available instruments using the `instruments()` function. This function will print the abbreviation, name, and (in parentheses) the "code" for each available instrument. We will return to the code in the next section.
 
 ```{r}
 instruments()
 ```
 
-If there are additional circumplex instruments you would like to have added to the package (especially if you are the author/copyright-holder), please [contact me](mailto:me@jmgirard.com). Note that some information (e.g., item text and normative data) may not be available for all instruments due to copyright issues.
+If there are additional circumplex instruments you would like to have added to the package (especially if you are the author/copyright-holder), please [contact me](mailto:me@jmgirard.com). Note that some information (e.g., item text and normative data) may not be available for all instruments due to copyright issues. However, many instruments are released as open-access and have full item text and normative data included in the package.
 
 ### Loading a specific instrument
-To reduce loading time and memory usage, instrument information is not loaded into R's memory when the circumplex package is loaded. Instead, the `instrument()` function can be used to load specific instruments into memory. The instrument to be loaded is determined by the code argument (as below), which corresponds to the codes displayed by the `instruments()` function (as above). To save time, the `code =` and `<-` parts can be omitted and the instrument data will be loaded into an object with the same name as the instrument's code.
+To reduce loading time and memory usage, instrument information is not loaded into R's memory when the circumplex package is loaded. Instead, instruments should be loaded into memory on an as-needed basis. As demonstrated below, this can be done by passing an instrument's code (which we saw how to find in the last section) to the `instrument()` function. We can then examine that instrument data using the `print()` function.
 
 ```{r}
-# Load data into object called my_instrument
-my_instrument <- instrument(code = "csip")
+instrument(csip)
+print(csip)
 ```
 
-```{r}
-# Shortcut to load data into object called csip
-instrument("csip")
-```
-
-### Examining an instrument in-brief
-To quickly and briefly examine the information available about a loaded instrument, use the `print()` function, which is also implicitly called when the name of an object is entered into the R console (i.e., typing `print(csip)` and `csip` is the same). This will return the instrument's abbreviation; full name; the number of items, scales, and available normative data sets; original reference; and primary website. Below is a fully explicit call to load and print the CSIP, as well as a fully implicit call to do the same for the IIP-32.
-
-```{r}
-my_instrument <- instrument("csip")
-print(my_instrument)
-```
-
-```{r}
-instrument("iip32")
-iip32
-```
-
-Note, however, that an error will result if the `print()` function (or any of the functions to be described below) is called before the `instrument()` function has loaded the data. Order of operations is important!
+Note, however, that an error will result if the `print()` function (or any of the functions to be described later) is called before the `instrument()` function has loaded the data. Order of operations is important!
 
 ```{r, error=TRUE}
 print(isc)
 ```
 
 ```{r}
-instrument("isc")
+instrument(isc)
 print(isc)
 ```
 
 ### Examining an instrument in-depth
-To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the `summary()` function. This will return the same information returned by `print()`, followed by information about the instrument's scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the [reference](https://circumplex.jmgirard.com/reference/index.html#section-instrument-data) page of the circumplex package website.
+To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the `summary()` function. This will return the same information returned by `print()`, followed by information about the instrument's scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the package  [reference](https://circumplex.jmgirard.com/reference/index.html#section-instrument-data) page.
 
 ```{r}
 instrument("ipipipc")
@@ -79,6 +61,11 @@ summary(ipipipc)
 ```
 
 Specific subsections of this output can be returned individually using the `scales()`, `anchors()`, `items()`, and `norms()` functions. These functions are especially useful when you need to know a specific bit of information about an instrument and don't want the console to be flooded with unneeded information.
+
+```{r}
+anchors(ipipipc)
+```
+
 
 ```{r}
 norms(ipipipc)
@@ -175,7 +162,7 @@ z_scales <- standardize(
 print(z_scales)
 ```
 
-Again, the output contains all the item-level, scale-level, and now the standardized scale-level variables. The new variables are named the same as the scale score variables except with a configurable prefix and suffix (by default, they are given only a suffix of `_z`). The naming can be configured using We can again use the `select()` function to view just the newly created standardized variables. These variables are the ones we are most likely to use in subsequent analyses (e.g., the structural summary method).
+Again, the output contains all the item-level, scale-level, and now the standardized scale-level variables. The new variables are named the same as the scale score variables except with a configurable `prefix` and `suffix` (by default, they are given only a suffix of `_z`). We can again use the `select()` function to view just the newly created standardized variables. These variables are the ones we are most likely to use in subsequent analyses (e.g., the structural summary method).
 
 ```{r}
 select(z_scales, PA_z:NO_z)
