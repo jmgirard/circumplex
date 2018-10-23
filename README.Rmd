@@ -14,6 +14,7 @@ knitr::opts_chunk$set(
 library(circumplex)
 library(knitr)
 library(kableExtra)
+set.seed(12345)
 ```
 
 # circumplex <img src="man/figures/logo.png" align="right" alt="" />
@@ -37,10 +38,6 @@ devtools::install_github("jmgirard/circumplex")
 ```
 
 ## Usage
-
-```{r, echo = FALSE}
-set.seed(12345)
-```
 
 ```{r analysis1}
 data("jz2017")
@@ -68,7 +65,9 @@ ssm_plot(results)
 
 ## Code of Conduct
 
-Please note that the 'circumplex' project is released with a [Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md). By contributing to this project, you agree to abide by its terms.
+Please note that this project is released with a [Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md).
+
+By contributing to this project, you agree to abide by its terms.
 
 
 ## References
