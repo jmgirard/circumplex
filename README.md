@@ -15,8 +15,8 @@ developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repo
 
 The goal of *circumplex* is to provide a powerful, flexible, and
 user-friendly way to analyze and visualize circumplex data. It was
-created and is maintained by [Jeffrey Girard](https://jmgirard.com/),
-and was inspired by work from and was developed in conjunction with
+created and is maintained by [Jeffrey Girard](https://jmgirard.com/); it
+was inspired by work from and was developed under advisement from
 [Johannes
 Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/)
 and [Aidan Wright](https://personalityprocesses.com/). You can learn
