@@ -12,7 +12,7 @@
 iip32
 }
 \description{
-Information about the Inventory of Interpersonal Problems Brief Version.
+Information about the Inventory of Interpersonal Problems, Brief Version.
 Note that, although we have permission to provide some information about the
 IIP-32, Mind Garden Inc. has exclusive rights to distribute it in full.
 }
