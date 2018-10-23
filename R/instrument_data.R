@@ -72,6 +72,16 @@
 #' summary(iipsc)
 "iipsc"
 
+#' Inventory of Interpersonal Strengths, Brief Version
+#'
+#' Information about the Inventory of Interpersonal Strengths, Brief Version.
+#'
+#' @source \url{https://doi.org/10.1080/00223891.2012.681818}
+#' @examples
+#' instrument("iis32")
+#' summary(iis32)
+"iis32"
+
 #' Inventory of Interpersonal Strengths
 #'
 #' Information about the Inventory of Interpersonal Strengths.

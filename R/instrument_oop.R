@@ -53,14 +53,17 @@ summary.instrument <- function(object, scales = TRUE, anchors = TRUE,
 #' scales and each scale's abbreviation, hypothetical angle, and text label.
 #'
 #' @param x Required. An object of the instrument class.
+#' @param items Optional. A logical determining whether the items for each scale
+#'   should be displayed below its other information (default = FALSE).
 #' @return The same input object. Prints text to console.
 #' @family instrument functions
 #' @export
 #' @examples
 #' instrument(csip)
 #' scales(csip)
-scales <- function(x) {
-  assert_that(is_instrument(x))
+#' scales(csip, items = TRUE)
+scales <- function(x, items = FALSE) {
+  assert_that(is_instrument(x), is.flag(items))
 
   cat(
     glue(
@@ -70,11 +73,18 @@ scales <- function(x) {
   cat("\n")
   for (i in 1:nrow(x$Scales)) {
     xi <- x$Scales[i, ]
-    ang <- sprintf("%03d", xi$Angle)
     cat(
-      glue("{xi$Abbrev} ({ang} deg): {xi$Label}"),
+      glue("{xi$Abbrev}: {xi$Label} ({xi$Angle} degrees)"),
       "\n", sep = ""
     )
+    if (items == TRUE) {
+      item_nums <- as.integer(strsplit(xi$Items, ",")[[1]])
+      for (j in 1:length(item_nums)){
+        num_j <- item_nums[[j]]
+        item_j <- x$Items[num_j, "Text"]
+        cat(glue("    {num_j}. {item_j}"), "\n", sep = "")
+      }
+    }
   }
 
   invisible(x)
@@ -216,7 +226,7 @@ instruments <- function() {
   # TODO: Find a way to automate this - maybe data$results minus example data?
 
   cat(
-    "The circumplex package currently includes 10 instruments:\n",
+    "The circumplex package currently includes 11 instruments:\n",
     "1. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)\n",
     "2. CSIG: Circumplex Scales of Intergroup Goals (csig)\n",
     "3. CSIP: Circumplex Scales of Interpersonal Problems (csip)\n",
@@ -224,9 +234,10 @@ instruments <- function() {
     "5. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)\n",
     "6. IIP-64: Inventory of Interpersonal Problems (iip64)\n",
     "7. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)\n",
-    "8. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
-    "9. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
-    "10. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
+    "8. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)\n",
+    "9. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
+    "10. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
+    "11. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
   )
 }
 

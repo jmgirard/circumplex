@@ -71,6 +71,13 @@ anchors(ipipipc)
 norms(ipipipc)
 ```
 
+Some of these functions also have additional arguments to customize their output. For instance, the `scales()` function has the `items` argument, which will display the items for each scale when set to `TRUE`.
+
+```{r}
+scales(ipipipc, items = TRUE)
+```
+
+
 An additional, though advanced, option for examining the available information about an instrument is to explore the instrument object itself. This can be done within R using the `View()` function. Note that the first letter in this function (V) must be capitalized. This will open up a data viewer window like the one shown below; it will give you full access to the information stored by the package, albeit in a "raw" format. Don't worry if the image below is confusing or overwhelming; you never have to see it again unless you want to!
 
 ```{r, eval=FALSE}

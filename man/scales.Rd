@@ -4,10 +4,13 @@
 \alias{scales}
 \title{Display the scales of a circumplex instrument}
 \usage{
-scales(x)
+scales(x, items = FALSE)
 }
 \arguments{
 \item{x}{Required. An object of the instrument class.}
+
+\item{items}{Optional. A logical determining whether the items for each scale
+should be displayed below its other information (default = FALSE).}
 }
 \value{
 The same input object. Prints text to console.
@@ -19,6 +22,7 @@ scales and each scale's abbreviation, hypothetical angle, and text label.
 \examples{
 instrument(csip)
 scales(csip)
+scales(csip, items = TRUE)
 }
 \seealso{
 Other instrument functions: \code{\link{anchors}},
