@@ -19,6 +19,19 @@ development:
   mode: unreleased
 
 reference:
+  - title: Instrument Data
+    desc: Information about circumplex instruments
+    contents:
+      - csie
+      - csig
+      - csip
+      - csiv
+      - iip32
+      - iip64
+      - iipsc
+      - iis64
+      - ipipipc
+      - isc
   - title: Instrument Functions
     desc: Functions for importing and examining circumplex instruments
     contents:
@@ -28,6 +41,12 @@ reference:
       - anchors
       - items
       - norms
+  - title: Tidying Functions
+    desc: Functions for preparing data for analysis
+    contents:
+      - ipsatize
+      - score
+      - standardize
   - title: Primary SSM Functions
     desc: Functions for implementing the Structural Summary Method
     contents: 
@@ -41,12 +60,6 @@ reference:
       - ssm_plot_circle
       - ssm_plot_contrast
       - html_render
-  - title: Tidying Functions
-    desc: Functions for preparing data for analysis
-    contents:
-      - ipsatize
-      - score
-      - standardize
   - title: Convenience Functions
     desc: Functions that make your life easier
     contents:
@@ -58,18 +71,6 @@ reference:
       - aw2009
       - jz2017
       - raw_iipsc
-  - title: Instrument Data
-    contents:
-      - csie
-      - csig
-      - csip
-      - csiv
-      - iip32
-      - iip64
-      - iipsc
-      - iis64
-      - ipipipc
-      - isc
 
 navbar:
   title: "circumplex"
