@@ -73,9 +73,8 @@ reference:
 
 navbar:
   title: "circumplex"
-  type: default
   left:
-    - icon: fa-home
+    - icon: fa-home fa-lg
       href: index.html
     - text: Reference
       href: reference/index.html
@@ -90,5 +89,5 @@ navbar:
     - text: News
       href: news/index.html
   right:
-    - icon: fa-github
+    - icon: fa-github fa-lg
       href: https://github.com/jmgirard/circumplex
