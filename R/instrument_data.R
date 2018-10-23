@@ -38,6 +38,16 @@
 #' summary(csiv)
 "csiv"
 
+#' Interpersonal Goals Inventory for Children, Revised Version
+#'
+#' Information about the Interpersonal Goals Inventory for Children, Revised Version.
+#'
+#' @source \url{https://doi.org/10.1177/1073191111411672}
+#' @examples
+#' instrument("igicr")
+#' summary(igicr)
+"igicr"
+
 #' Inventory of Interpersonal Problems, Brief Version
 #'
 #' Information about the Inventory of Interpersonal Problems, Brief Version.

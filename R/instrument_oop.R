@@ -226,18 +226,19 @@ instruments <- function() {
   # TODO: Find a way to automate this - maybe data$results minus example data?
 
   cat(
-    "The circumplex package currently includes 11 instruments:\n",
+    "The circumplex package currently includes 12 instruments:\n",
     "1. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)\n",
     "2. CSIG: Circumplex Scales of Intergroup Goals (csig)\n",
     "3. CSIP: Circumplex Scales of Interpersonal Problems (csip)\n",
     "4. CSIV: Circumplex Scales of Interpersonal Values (csiv)\n",
-    "5. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)\n",
-    "6. IIP-64: Inventory of Interpersonal Problems (iip64)\n",
-    "7. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)\n",
-    "8. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)\n",
-    "9. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
-    "10. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
-    "11. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
+    "5. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)\n",
+    "6. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)\n",
+    "7. IIP-64: Inventory of Interpersonal Problems (iip64)\n",
+    "8. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)\n",
+    "9. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)\n",
+    "10. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
+    "11. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
+    "12. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
   )
 }
 
