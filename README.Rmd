@@ -24,7 +24,7 @@ library(kableExtra)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
-The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by [Jeffrey Girard](https://jmgirard.com/), and was inspired by work from and was developed in conjunction with [Johannes Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/) and [Aidan Wright](https://personalityprocesses.com/). You can learn more about using this package through the vignette articles available on the [package website](https://circumplex.jmgirard.com/) or through `vignette(package = "circumplex")`.
+The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by [Jeffrey Girard](https://jmgirard.com/), and was inspired by work from and was developed in conjunction with [Johannes Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/) and [Aidan Wright](https://personalityprocesses.com/). You can learn more about using this package through the vignette articles available on the [package website](https://circumplex.jmgirard.com/) or through `?circumplex`.
 
 ## Installation
 

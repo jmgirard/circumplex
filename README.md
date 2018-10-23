@@ -22,7 +22,7 @@ Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/)
 and [Aidan Wright](https://personalityprocesses.com/). You can learn
 more about using this package through the vignette articles available on
 the [package website](https://circumplex.jmgirard.com/) or through
-`vignette(package = "circumplex")`.
+`?circumplex`.
 
 ## Installation
 
