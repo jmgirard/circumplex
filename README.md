@@ -20,27 +20,17 @@ and was inspired by work from and was developed in conjunction with
 [Johannes
 Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/)
 and [Aidan Wright](https://personalityprocesses.com/). You can learn
-more about using this package to perform the Structural Summary Method
-(SSM) in `vignette("ssm-introduction")` and
-`vignette("ssm-intermediate")`. You can purchase stickers and other
-merchandise with the circumplex logo at
-[redbubble.com](https://www.redbubble.com/people/jmgirard/works/32902204).
+more about using this package through the vignette articles available on
+the [package website](https://circumplex.jmgirard.com/) or through
+`vignette(package = "circumplex")`.
 
 ## Installation
 
 ``` r
-# Install the most recent release from CRAN
+# Install release version from CRAN
 install.packages("circumplex")
-```
 
-### Development version
-
-Releasing updates to CRAN takes time. You can always install the newest
-development version, which may contain bug fixes and new features, from
-GitHub:
-
-``` r
-# install.packages("devtools")
+# Install development version from GitHub
 devtools::install_github("jmgirard/circumplex")
 ```
 
