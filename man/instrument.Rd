@@ -9,7 +9,7 @@ instrument(code)
 \arguments{
 \item{code}{Required. A string (e.g., "iip32") or text in non-standard
 evaluation (e.g., iip32). The code of the instrument assigned by this
-package and displayed in parentheses by \code{\link{instruments()}}.}
+package and displayed in parentheses by \code{instruments()}.}
 }
 \value{
 The instrument object for the requested circumplex instrument. If

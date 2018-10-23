@@ -98,10 +98,10 @@ items <- function(x) {
 
   cat(
     glue(
-      "The {x$Details$Abbrev} contains {x$Details$Items} items.\n"
-    )
+      "The {x$Details$Abbrev} contains {x$Details$Items} items ({x$Details$Status}):"
+    ),
+    "\n", sep = ""
   )
-  cat("\n")
   for (i in 1:nrow(x$Items)) {
     xi <- x$Items[i, ]
     if (!is.na(xi$Number)) {
@@ -240,7 +240,7 @@ instruments <- function() {
 #'
 #' @param code Required. A string (e.g., "iip32") or text in non-standard
 #'   evaluation (e.g., iip32). The code of the instrument assigned by this
-#'   package and displayed in parentheses by \code{\link{instruments()}}.
+#'   package and displayed in parentheses by \code{instruments()}.
 #' @return The instrument object for the requested circumplex instrument. If
 #'   the function is called without a name assignment (LHS), then the object
 #'   will be created in the global environment with the default name as above.
