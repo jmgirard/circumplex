@@ -1,4 +1,4 @@
-csie_scales <- tibble(
+csie_scales <- tibble::tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ csie_scales <- tibble(
   )
 )
 
-csie_norms <- tibble(
+csie_norms <- tibble::tibble(
   Sample = rep(1, 8),
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -31,7 +31,7 @@ csie_norms <- tibble(
   SD = c(1.68, 1.66, 1.82, 1.54, 1.53, 1.11, 1.20, 1.37)
 )
 
-csie_norms_src <- tibble(
+csie_norms_src <- tibble::tibble(
   Sample = 1,
   Size = 367,
   Population = "American college students",
@@ -39,7 +39,7 @@ csie_norms_src <- tibble(
   URL = "https://www.webpages.uidaho.edu/klocke/csie.htm"
 )
 
-csie_anchors <- tibble(
+csie_anchors <- tibble::tibble(
   Value = 0:10,
   Label = c(
     "I am not at all confident that",
@@ -56,19 +56,20 @@ csie_anchors <- tibble(
   )
 )
 
-csie_details <- tibble(
+csie_details <- tibble::tibble(
   Name = "Circumplex Scales of Interpersonal Efficacy",
   Abbrev = "CSIE",
   Items = 32,
   Scales = 8,
   Prefix = "When I am with others, ...",
   Suffix = "",
+  Status = "open-access",
   Construct = "interpersonal efficacy",
   Reference = "Locke & Sadler (2007)",
   URL = "https://doi.org/10.1177/0146167206293375"
 )
 
-csie_items <- tibble(
+csie_items <- tibble::tibble(
   Number = 1:32,
   Text = c(
     "I can express myself openly",
@@ -113,3 +114,5 @@ csie <- new_instrument(
   Norms = list(csie_norms, csie_norms_src),
   Details = csie_details
 )
+
+usethis::use_data(csie, overwrite = TRUE)

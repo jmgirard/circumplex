@@ -1,4 +1,4 @@
-iip32_scales <- tibble(
+iip32_scales <- tibble::tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ iip32_scales <- tibble(
   )
 )
 
-iip32_norms <- tibble(
+iip32_norms <- tibble::tibble(
   Sample = c(rep(1, 8), rep(2, 8), rep(3, 8)),
   Scale = rep(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 3),
   Angle = rep(c(90, 135, 180, 225, 270, 315, 360, 45), 3),
@@ -39,7 +39,7 @@ iip32_norms <- tibble(
   ) / 4
 )
 
-iip32_norms_src <- tibble(
+iip32_norms_src <- tibble::tibble(
   Sample = c(1, 2, 3),
   Size = c(800, 400, 400),
   Population = c(
@@ -51,7 +51,7 @@ iip32_norms_src <- tibble(
   URL = "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
 )
 
-iip32_anchors <- tibble(
+iip32_anchors <- tibble::tibble(
   Value = 0:4,
   Label = c(
     "Not at all",
@@ -62,21 +62,22 @@ iip32_anchors <- tibble(
   )
 )
 
-iip32_details <- tibble(
+iip32_details <- tibble::tibble(
   Name = "Inventory of Interpersonal Problems, Brief Version",
   Abbrev = "IIP-32",
   Items = 32,
   Scales = 8,
   Prefix = "",
   Suffix = "",
+  Status = "copyrighted",
   Construct = "interpersonal problems",
   Reference = "Horowitz, Alden, Wiggins, & Pincus (2003)",
   URL = "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
 )
 
-iip32_items <- tibble(
+iip32_items <- tibble::tibble(
   Number = NA,
-  Text = "(Mind Garden Inc. has exclusive rights to distribute the IIP-32.)"
+  Text = "Visit the Mind Garden Inc. website for item text and numbering."
 )
 
 iip32 <- new_instrument(
@@ -86,3 +87,5 @@ iip32 <- new_instrument(
   Norms = list(iip32_norms, iip32_norms_src),
   Details = iip32_details
 )
+
+usethis::use_data(iip32, overwrite = TRUE)

@@ -1,4 +1,4 @@
-csig_scales <- tibble(
+csig_scales <- tibble::tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ csig_scales <- tibble(
   )
 )
 
-csig_norms <- tibble(
+csig_norms <- tibble::tibble(
   Sample = rep(1, 8),
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -31,7 +31,7 @@ csig_norms <- tibble(
   SD = c(0.68, 0.86, 0.88, 0.74, 0.90, 0.76, 0.71, 0.68)
 )
 
-csig_norms_src <- tibble(
+csig_norms_src <- tibble::tibble(
   Sample = 1,
   Size = 665,
   Population = "MTurkers from US, Canada, and India about interactions between nations",
@@ -39,7 +39,7 @@ csig_norms_src <- tibble(
   URL = "https://doi.org/10.1177/0146167213514280"
 )
 
-csig_anchors <- tibble(
+csig_anchors <- tibble::tibble(
   Value = 0:4,
   Label = c(
     "It is not at all important that...",
@@ -50,19 +50,20 @@ csig_anchors <- tibble(
   )
 )
 
-csig_details <- tibble(
+csig_details <- tibble::tibble(
   Name = "Circumplex Scales of Intergroup Goals",
   Abbrev = "CSIG",
   Items = 32,
   Scales = 8,
   Prefix = "In dealing with other groups, how important is it that we act or appear or are treated this way?",
   Suffix = "",
+  Status = "open-access",
   Construct = "interpersonal intergroup goals",
   Reference = "Locke (2014)",
   URL = "https://doi.org/10.1177/0146167213514280"
 )
 
-csig_items <- tibble(
+csig_items <- tibble::tibble(
   Number = 1:32,
   Text = c(
     "We are friendly",
@@ -107,3 +108,5 @@ csig <- new_instrument(
   Norms = list(csig_norms, csig_norms_src),
   Details = csig_details
 )
+
+usethis::use_data(csig, overwrite = TRUE)

@@ -1,4 +1,4 @@
-csip_scales <- tibble(
+csip_scales <- tibble::tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ csip_scales <- tibble(
   )
 )
 
-csip_norms <- tibble(
+csip_norms <- tibble::tibble(
   Sample = rep(1, 8),
   Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -31,7 +31,7 @@ csip_norms <- tibble(
   SD = c(3.9, 3.8, 5.1, 5.5, 5.1, 4.6, 4.7, 4.0) / 8
 )
 
-csip_norms_src <- tibble(
+csip_norms_src <- tibble::tibble(
   Sample = 1,
   Size = 712,
   Population = "American college students",
@@ -39,7 +39,7 @@ csip_norms_src <- tibble(
   URL = "https://doi.org/10.1037/pas0000505"
 )
 
-csip_anchors <- tibble(
+csip_anchors <- tibble::tibble(
   Value = 0:3,
   Label = c(
     "Not a problem",
@@ -49,19 +49,20 @@ csip_anchors <- tibble(
   )
 )
 
-csip_details <- tibble(
+csip_details <- tibble::tibble(
   Name = "Circumplex Scales of Interpersonal Problems",
   Abbrev = "CSIP",
   Items = 64,
   Scales = 8,
   Prefix = "",
   Suffix = "",
+  Status = "open-access",
   Construct = "interpersonal problems",
   Reference = "Boudreaux, Ozer, Oltmanns, & Wright (2018)",
   URL = "https://doi.org/10.1037/pas0000505"
 )
 
-csip_items <- tibble(
+csip_items <- tibble::tibble(
   Number = 1:64,
   Text = c(
     "Bossing around other people too much",
@@ -138,3 +139,5 @@ csip <- new_instrument(
   Norms = list(csip_norms, csip_norms_src),
   Details = csip_details
 )
+
+usethis::use_data(csip, overwrite = TRUE)

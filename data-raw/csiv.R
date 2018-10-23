@@ -1,4 +1,4 @@
-csiv_scales <- tibble(
+csiv_scales <- tibble::tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ csiv_scales <- tibble(
   )
 )
 
-csiv_norms <- tibble(
+csiv_norms <- tibble::tibble(
   Sample = rep(1, 8),
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -31,7 +31,7 @@ csiv_norms <- tibble(
   SD = c(0.63, 0.71, 0.70, 0.78, 0.75, 0.71, 0.69, 0.57)
 )
 
-csiv_norms_src <- tibble(
+csiv_norms_src <- tibble::tibble(
   Sample = 1,
   Size = 1200,
   Population = "American college students",
@@ -39,7 +39,7 @@ csiv_norms_src <- tibble(
   URL = "https://www.webpages.uidaho.edu/klocke/csiv.htm"
 )
 
-csiv_anchors <- tibble(
+csiv_anchors <- tibble::tibble(
   Value = 0:4,
   Label = c(
     "Not important to me",
@@ -50,19 +50,20 @@ csiv_anchors <- tibble(
   )
 )
 
-csiv_details <- tibble(
+csiv_details <- tibble::tibble(
   Name = "Circumplex Scales of Interpersonal Values",
   Abbrev = "CSIV",
   Items = 64,
   Scales = 8,
   Prefix = "When I am with him/her/them, it is...",
   Suffix = "",
+  Status = "open-access",
   Constructs = "interpersonal values",
   Reference = "Locke (2000)",
   URL = "https://doi.org/10.1207/S15327752JPA7502_6"
 )
 
-csiv_items <- tibble(
+csiv_items <- tibble::tibble(
   Number = 1:64,
   Text = c(
     "That I appear confident",
@@ -139,3 +140,5 @@ csiv <- new_instrument(
   Norms = list(csiv_norms, csiv_norms_src),
   Details = csiv_details
 )
+
+usethis::use_data(csiv, overwrite = TRUE)

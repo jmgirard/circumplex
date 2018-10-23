@@ -1,4 +1,4 @@
-iis64_scales <- tibble(
+iis64_scales <- tibble::tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ iis64_scales <- tibble(
   )
 )
 
-iis64_norms <- tibble(
+iis64_norms <- tibble::tibble(
   Sample = rep(1, 8),
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -31,7 +31,7 @@ iis64_norms <- tibble(
   SD = c(1.32, 1.29, 1.34, 1.24, 1.17, 1.14, 1.24, 1.36)
 )
 
-iis64_norms_src <- tibble(
+iis64_norms_src <- tibble::tibble(
   Sample = 1,
   Size = 684,
   Population = "American college students",
@@ -39,7 +39,7 @@ iis64_norms_src <- tibble(
   URL = "https://doi.org/10.1037/a0017269"
 )
 
-iis64_anchors <- tibble(
+iis64_anchors <- tibble::tibble(
   Value = 1:6,
   Label = c(
     "Very little like me",
@@ -51,21 +51,87 @@ iis64_anchors <- tibble(
   )
 )
 
-iis64_details <- tibble(
+iis64_details <- tibble::tibble(
   Name = "Inventory of Interpersonal Strengths",
   Abbrev = "IIS-64",
   Items = 64,
   Scales = 8,
   Prefix = "",
   Suffix = "",
+  Status = "partial text",
   Construct = "interpersonal strengths",
   Reference = "Hatcher & Rogers (2009)",
   URL = "https://doi.org/10.1037/a0017269"
 )
 
-iis64_items <- tibble(
-  Number = NA,
-  Text = "Pending permission."
+iis64_items <- tibble::tibble(
+  Number = 1:64,
+  Text = c(
+    "...can really shine...",
+    "...learning from people...",
+    "...honest even when...",
+    "...hurt my feelings...",
+    "...friends with everyone...",
+    "...enjoy being with...",
+    "...it's not agreeable...",
+    "...a constructive solution...",
+    "...pretty even-tempered...",
+    "...make a decision...",
+    "...don't give up...",
+    "...open about myself...",
+    "...feel good when...",
+    "...able to compromise",
+    "...neglecting my own...",
+    "...in front of...",
+    "...celebrating others' achievements...",
+    "...can say 'no'...",
+    "...warm with other...",
+    "...argue effectively with...",
+    "...listen and think...",
+    "...enjoy lively competition...",
+    "...time with people...",
+    "...connect with others...",
+    "...regain contact with...",
+    "...emotional support is...",
+    "...they're in trouble...",
+    "...my own interests...",
+    "...be very persuasive...",
+    "...be with others...",
+    "...strong but fair...",
+    "...show my gratitude...",
+    "...makes me happy...",
+    "...hesitate to express...",
+    "...feelings of gratitude...",
+    "...agreements with other...",
+    "...ask other people...",
+    "...mingling at parties...",
+    "...needs feel pressing...",
+    "...can take charge...",
+    "...as an assistant...",
+    "...delighted to help...",
+    "...enriched by helping...",
+    "...meeting new people...",
+    "...others need privacy...",
+    "...too much from...",
+    "...a good listener...",
+    "...rely on myself...",
+    "...cooperative...",
+    "...not being included...",
+    "...interested in others...",
+    "...enjoy complimenting others...",
+    "...angry without pushing...",
+    "...resist others' tempting",
+    "...disagreeing with others...",
+    "...time to themselves...",
+    "...approach other people...",
+    "...be assertive with...",
+    "...can bounce back...",
+    "...are comfortable giving...",
+    "...about their lives...",
+    "...to loosen up...",
+    "...make people laugh...",
+    "...people at ease..."
+  )
 )
 
 iis64 <- new_instrument(
@@ -75,3 +141,5 @@ iis64 <- new_instrument(
   Norms = list(iis64_norms, iis64_norms_src),
   Details = iis64_details
 )
+
+usethis::use_data(iis64, overwrite = TRUE)

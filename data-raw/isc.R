@@ -1,4 +1,4 @@
-isc_scales <- tibble(
+isc_scales <- tibble::tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ isc_scales <- tibble(
   )
 )
 
-isc_norms <- tibble(
+isc_norms <- tibble::tibble(
   Sample = rep(1, 8),
   Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -31,7 +31,7 @@ isc_norms <- tibble(
   SD = c(1.06, 1.10, 1.28, 1.16, 1.24, 0.99, 0.91, 1.00)
 )
 
-isc_norms_src <- tibble(
+isc_norms_src <- tibble::tibble(
   Sample = 1,
   Size = 649,
   Population = "American college students",
@@ -39,7 +39,7 @@ isc_norms_src <- tibble(
   URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x"
 )
 
-isc_anchors <- tibble(
+isc_anchors <- tibble::tibble(
   Value = 1:8,
   Label = c(
     "Not at all, never bothers me",
@@ -53,19 +53,20 @@ isc_anchors <- tibble(
   )
 )
 
-isc_details <- tibble(
+isc_details <- tibble::tibble(
   Name = "Interpersonal Sensitivities Circumplex",
   Abbrev = "ISC",
   Items = 64,
   Scales = 8,
   Prefix = "It bothers me when a person...",
   Suffix = "",
+  Status = "open-access",
   Construct = "interpersonal sensitivities",
   Reference = "Hopwood et al. (2011)",
   URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x"
 )
 
-isc_items <- tibble(
+isc_items <- tibble::tibble(
   Number = 1:64,
   Text = c(
     "Thinks they are my boss",
@@ -142,3 +143,5 @@ isc <- new_instrument(
   Norms = list(isc_norms, isc_norms_src),
   Details = isc_details
 )
+
+usethis::use_data(isc, overwrite = TRUE)

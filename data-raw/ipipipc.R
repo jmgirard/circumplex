@@ -1,4 +1,4 @@
-ipip_scales <- tibble(
+ipip_scales <- tibble::tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,14 +23,14 @@ ipip_scales <- tibble(
   )
 )
 
-ipip_norms <- tibble(
+ipip_norms <- tibble::tibble(
   Sample = rep(1, 8),
   Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   M = c(2.66, 2.27, 2.46, 2.68, 3.20, 3.64, 4.37, 3.64),
   SD = c(0.71, 0.69, 0.58, 0.79, 0.63, 0.58, 0.47, 0.78)
 )
 
-ipip_norms_src <- tibble(
+ipip_norms_src <- tibble::tibble(
   Sample = 1,
   Size = 274,
   Population = "American college students",
@@ -38,7 +38,7 @@ ipip_norms_src <- tibble(
   URL = "https://doi.org/10.1177/1073191109340382"
 )
 
-ipip_anchors <- tibble(
+ipip_anchors <- tibble::tibble(
   Value = 1:5,
   Label = c(
     "Very Inaccurate",
@@ -49,19 +49,20 @@ ipip_anchors <- tibble(
   )
 )
 
-ipip_details <- tibble(
+ipip_details <- tibble::tibble(
   Name = "IPIP Interpersonal Circumplex",
   Abbrev = "IPIP-IPC",
   Items = 32,
   Scales = 8,
   Prefix = "",
   Suffix = "",
+  Status = "open-access",
   Construct = "interpersonal traits",
   Reference = "Markey & Markey (2009)",
   URL = "https://doi.org/10.1177/1073191109340382"
 )
 
-ipip_items <- tibble(
+ipip_items <- tibble::tibble(
   Number = 1:32,
   Text = c(
     "Am quiet around strangers",
@@ -106,3 +107,5 @@ ipipipc <- new_instrument(
   Norms = list(ipip_norms, ipip_norms_src),
   Details = ipip_details
 )
+
+usethis::use_data(ipipipc, overwrite = TRUE)

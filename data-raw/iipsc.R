@@ -1,4 +1,4 @@
-iipsc_scales <- tibble(
+iipsc_scales <- tibble::tibble(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ iipsc_scales <- tibble(
   )
 )
 
-iipsc_norms <- tibble(
+iipsc_norms <- tibble::tibble(
   Sample = c(rep(1, 8), rep(2, 8)),
   Scale = rep(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 2),
   Angle = rep(c(90, 135, 180, 225, 270, 315, 360, 45), 2),
@@ -37,7 +37,7 @@ iipsc_norms <- tibble(
   )
 )
 
-iipsc_norms_src <- tibble(
+iipsc_norms_src <- tibble::tibble(
   Sample = c(1, 2),
   Size = c(872, 106),
   Population = c(
@@ -54,7 +54,7 @@ iipsc_norms_src <- tibble(
   )
 )
 
-iipsc_anchors <- tibble(
+iipsc_anchors <- tibble::tibble(
   Value = 0:4,
   Label = c(
     "Not at all",
@@ -65,21 +65,55 @@ iipsc_anchors <- tibble(
   )
 )
 
-iipsc_details <- tibble(
+iipsc_details <- tibble::tibble(
   Name = "Inventory of Interpersonal Problems Short Circumplex",
   Abbrev = "IIP-SC",
   Items = 32,
   Scales = 8,
   Prefix = "",
   Suffix = "",
+  Status = "partial text",
   Construct = "interpersonal problems",
   Reference = "Soldz, Budman, Demby, & Merry (1995)",
   URL = "https://doi.org/10.1177/1073191195002001006"
 )
 
-iipsc_items <- tibble(
-  Number = NA,
-  Text = "Pending permission."
+iipsc_items <- tibble::tibble(
+  Number = 1:32,
+  Text = c(
+    "...point of view...",
+    "...supportive of another...",
+    "...show affection to...",
+    "...join in on...",
+    "...stop bothering me...",
+    "...I am angry...",
+    "...my own welfare...",
+    "...keep things private...",
+    "...too aggressive toward...",
+    "...another person's happiness...",
+    "...feeling of love...",
+    "...introduce myself to...",
+    "...confront people with...",
+    "...assertive without worrying...",
+    "...please other people...",
+    "...open up to...",
+    "...control other people...",
+    "...too suspicious of...",
+    "...feel close to...",
+    "...socialize with other...",
+    "...assertive with another...",
+    "...too easily persuaded...",
+    "...other people's needs...",
+    "...noticed too much...",
+    "...argue with other...",
+    "...revenge against people...",
+    "...at a distance...",
+    "...get together socially...",
+    "...to be firm...",
+    "...people take advantage...",
+    "...another person's misery...",
+    "...tell personal things..."
+  )
 )
 
 iipsc <- new_instrument(
@@ -89,3 +123,5 @@ iipsc <- new_instrument(
   Norms = list(iipsc_norms, iipsc_norms_src),
   Details = iipsc_details
 )
+
+usethis::use_data(iipsc, overwrite = TRUE)
