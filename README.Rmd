@@ -7,6 +7,8 @@ always_allow_html: yes
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
   fig.path = "man/figures/README-"
 )
 library(circumplex)
@@ -14,7 +16,7 @@ library(knitr)
 library(kableExtra)
 ```
 
-# circumplex <img src="man/figures/logo.png" align="right" />
+# circumplex <img src="man/figures/logo.png" align="right" alt="" />
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/circumplex)](https://cran.r-project.org/package=circumplex)
 [![Build Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex)
