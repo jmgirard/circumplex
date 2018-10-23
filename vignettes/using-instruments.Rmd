@@ -20,7 +20,7 @@ Although the circumplex package is capable of analyzing and visualizing data in 
 
 The first part of this vignette will discuss how to preview the instruments currently available in the circumplex package, how to load information about a specific instrument for use in analysis, and how to extract general and specific information about that instrument. The following functions will be discussed: `instruments()`, `instrument()`, `print()`, `summary()`, `scales()`, `items()`, `anchors()`, `norms()`, and `View()`.
 
-The second part of this vignette will discuss how to use the information about an instrument to transform and summarize circumplex data. It will demonstrate how to ipsatize item-level responses (i.e., apply within-person deviation scoring), how to calculate scale scores from item-level responses (with or without imputing/prorating missing values), and how to standardize scale scores using normative/comparison data. The following functions will be discussed: `ipsatize()`, `score()`, and `standardize()`.
+The second part of this vignette will discuss how to use the information about an instrument to transform and summarize circumplex data. It will demonstrate how to ipsatize item-level responses (i.e., apply deviation scoring across variables), how to calculate scale scores from item-level responses (with or without imputing/prorating missing values), and how to standardize scale scores using normative/comparison data. The following functions will be discussed: `ipsatize()`, `score()`, and `standardize()`.
 
 ## 2. Loading and Examining Instrument Objects
 
@@ -34,15 +34,15 @@ instruments()
 If there are additional circumplex instruments you would like to have added to the package (especially if you are the author/copyright-holder), please [contact me](mailto:me@jmgirard.com). Note that some information (e.g., item text and normative data) may not be available for all instruments due to copyright issues.
 
 ### Loading a specific instrument
-To reduce loading time and memory usage, instrument information is not loaded into R's memory when the circumplex package is loaded. Instead, the `instrument()` function can be used to load specific instruments into memory. The only argument passed to this function should be the "code" for a single instrument. You can name the instrument object any valid name; if no name is assigned, the object will be named the same as the instrument code (overwriting any existing object with that name).
+To reduce loading time and memory usage, instrument information is not loaded into R's memory when the circumplex package is loaded. Instead, the `instrument()` function can be used to load specific instruments into memory. The instrument to be loaded is determined by the code argument (as below), which corresponds to the codes displayed by the `instruments()` function (as above). To save time, the `code =` and `<-` parts can be omitted and the instrument data will be loaded into an object with the same name as the instrument's code.
 
 ```{r}
-# Load data using explicit assignment
-my_instrument <- instrument("csip")
+# Load data into object called my_instrument
+my_instrument <- instrument(code = "csip")
 ```
 
 ```{r}
-# Load data using implicit assignment
+# Shortcut to load data into object called csip
 instrument("csip")
 ```
 
@@ -134,7 +134,7 @@ scales(iipsc)
 
 Although calculating the arithmetic mean of a handful of items is not terribly difficult mathematically, doing so manually (e.g., by hand) across multiple scales and multiple participants can be tedious and error-prone. To address these issues, the circumplex package offers the `score()` function, which automatically calculates scale scores from item-level data.
 
-To demonstrate, let's return to the `raw_iipsc` data set. We need to give the `score()` function a data frame containing the item-level data (i.e., the data set), a list of variables from that data frame that contain the item-level responses to be scored, and an instrument object containing instructions on how to score the data. In order for scoring to work properly, the list of items must be in ascending order from the first to the last item and the ordering of the items must be the same as that assumed by the package. Be sure to check your item numbers against those displayed by the `items()` function, especially if you shuffle your items.
+To demonstrate, let's return to the `raw_iipsc` data set. We need to give the `score()` function a data frame containing the item-level data (i.e., the data set), a list of variables from that data frame that contain the item-level responses to be scored, and an instrument object containing instructions on how to score the data. In order for scoring to work properly, **the list of items must be in ascending order from the first to the last item and the ordering of the items must be the same as that assumed by the package**. Be sure to check your item numbers against those displayed by the `items()` function, especially if you shuffle your items.
 
 ```{r}
 scale_scores <- score(.data = raw_iipsc, items = IIP01:IIP32, instrument = iipsc)
@@ -162,7 +162,7 @@ norms(iipsc)
 
 Assuming our example data also come from a non-psychiatric community sample of mostly college students, the first normative sample seems like a better choice, especially since it is so much larger and therefore subject to less sampling error. However, there may be times when the second normative sample would be the more appropriate comparison, even despite its smaller sample.
 
-To transform the scale scores we calculated during the last section, we can call the `standardize()` function and give it the `scale_scores` object we saved the item-level and scale-level data within. We will save the output of this function to a data frame named `z_scales` to reflect the idea that standardize scores are often called "z-scores."
+To transform the scale scores we calculated during the last section, we can call the `standardize()` function and give it the `scale_scores` object we saved the item-level and scale-level data within. We will save the output of this function to a data frame named `z_scales` to reflect the idea that standardized scores are often called "z-scores."
 
 ```{r}
 z_scales <- standardize(
