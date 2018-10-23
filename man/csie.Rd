@@ -3,7 +3,7 @@
 \docType{data}
 \name{csie}
 \alias{csie}
-\title{Instrument: Circumplex Scales of Interpersonal Efficacy}
+\title{Circumplex Scales of Interpersonal Efficacy}
 \format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://www.webpages.uidaho.edu/klocke/csie.htm}

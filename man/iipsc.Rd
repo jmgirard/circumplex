@@ -3,7 +3,7 @@
 \docType{data}
 \name{iipsc}
 \alias{iipsc}
-\title{Instrument: Inventory of Interpersonal Problems, Short Circumplex}
+\title{Inventory of Interpersonal Problems, Short Circumplex}
 \format{An object of class \code{instrument} of length 5.}
 \source{
 \url{https://doi.org/10.1080/00223890802388665}

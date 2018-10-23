@@ -1,4 +1,4 @@
-#' Instrument: Circumplex Scales of Interpersonal Efficacy
+#' Circumplex Scales of Interpersonal Efficacy
 #'
 #' Information about the Circumplex Scales of Interpersonal Efficacy.
 #'
@@ -8,7 +8,7 @@
 #' summary(csie)
 "csie"
 
-#' Instrument: Circumplex Scales of Intergroup Goals
+#' Circumplex Scales of Intergroup Goals
 #'
 #' Information about the Circumplex Scales of Intergroup Goals.
 #'
@@ -18,7 +18,7 @@
 #' summary(csig)
 "csig"
 
-#' Instrument: Circumplex Scales of Interpersonal Problems
+#' Circumplex Scales of Interpersonal Problems
 #'
 #' Information about the Circumplex Scales of Interpersonal Problems.
 #'
@@ -28,7 +28,7 @@
 #' summary(csip)
 "csip"
 
-#' Instrument: Circumplex Scales of Interpersonal Values
+#' Circumplex Scales of Interpersonal Values
 #'
 #' Information about the Circumplex Scales of Interpersonal Values.
 #'
@@ -38,7 +38,7 @@
 #' summary(csiv)
 "csiv"
 
-#' Instrument: Inventory of Interpersonal Problems, Brief Version
+#' Inventory of Interpersonal Problems, Brief Version
 #'
 #' Information about the Inventory of Interpersonal Problems Brief Version.
 #' Note that, although we have permission to provide some information about the
@@ -50,7 +50,7 @@
 #' summary(iip32)
 "iip32"
 
-#' Instrument: Inventory of Interpersonal Problems
+#' Inventory of Interpersonal Problems
 #'
 #' Information about the Inventory of Interpersonal Problems. Note that,
 #' although we have permission to provide some information about the IIP-64,
@@ -62,7 +62,7 @@
 #' summary(iip64)
 "iip64"
 
-#' Instrument: Inventory of Interpersonal Problems, Short Circumplex
+#' Inventory of Interpersonal Problems, Short Circumplex
 #'
 #' Information about the Inventory of Interpersonal Problems Short Circumplex.
 #'
@@ -72,7 +72,7 @@
 #' summary(iipsc)
 "iipsc"
 
-#' Instrument: Inventory of Interpersonal Strengths
+#' Inventory of Interpersonal Strengths
 #'
 #' Information about the Inventory of Interpersonal Strengths.
 #'
@@ -82,7 +82,7 @@
 #' summary(iis64)
 "iis64"
 
-#' Instrument: IPIP Interpersonal Circumplex
+#' IPIP Interpersonal Circumplex
 #'
 #' Information about the IPIP Interpersonal Circumplex.
 #'
@@ -92,7 +92,7 @@
 #' summary(ipipipc)
 "ipipipc"
 
-#' Instrument: Interpersonal Sensitivities Circumplex
+#' Interpersonal Sensitivities Circumplex
 #'
 #' Information about the Interpersonal Sensitivities Circumplex.
 #'
