@@ -213,7 +213,7 @@ norms <- function(x) {
 #' instruments()
 instruments <- function() {
 
-  # TODO: Find a way to automate this - maybe dir?
+  # TODO: Find a way to automate this - maybe data$results minus example data?
 
   cat(
     "The circumplex package currently includes 10 instruments:\n",
