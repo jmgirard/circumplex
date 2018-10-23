@@ -26,9 +26,11 @@ reference:
       - csig
       - csip
       - csiv
+      - igicr
       - iip32
       - iip64
       - iipsc
+      - iis32
       - iis64
       - ipipipc
       - isc
