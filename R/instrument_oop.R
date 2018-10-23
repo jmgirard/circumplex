@@ -238,9 +238,9 @@ instruments <- function() {
 #' This function loads the information for a specific instrument into memory.
 #' See the \code{instruments} function to list all available instruments.
 #'
-#' @param name Required. A string (e.g., "iip32") or text in non-standard
-#'   evaluation (e.g., iip32). The name of the instrument assigned by this
-#'   package. It should contain only lowercase alphanumeric characters.
+#' @param code Required. A string (e.g., "iip32") or text in non-standard
+#'   evaluation (e.g., iip32). The code of the instrument assigned by this
+#'   package and displayed in parentheses by \code{\link{instruments()}}.
 #' @return The instrument object for the requested circumplex instrument. If
 #'   the function is called without a name assignment (LHS), then the object
 #'   will be created in the global environment with the default name as above.
@@ -251,8 +251,8 @@ instruments <- function() {
 #' instrument(iip32)
 #' instrument("iip32")
 #' x <- instrument(iip32)
-instrument <- function(name) {
-  name_en <- rlang::enquo(name)
+instrument <- function(code) {
+  name_en <- rlang::enquo(code)
   assert_that(is_enquo(name_en))
   name_str <- rlang::quo_name(name_en)
   utils::data(list = name_str)

@@ -4,12 +4,12 @@
 \alias{instrument}
 \title{Load a specific instrument object}
 \usage{
-instrument(name)
+instrument(code)
 }
 \arguments{
-\item{name}{Required. A string (e.g., "iip32") or text in non-standard
-evaluation (e.g., iip32). The name of the instrument assigned by this
-package. It should contain only lowercase alphanumeric characters.}
+\item{code}{Required. A string (e.g., "iip32") or text in non-standard
+evaluation (e.g., iip32). The code of the instrument assigned by this
+package and displayed in parentheses by \code{\link{instruments()}}.}
 }
 \value{
 The instrument object for the requested circumplex instrument. If
