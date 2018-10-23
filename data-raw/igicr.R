@@ -55,9 +55,9 @@ igicr_anchors <- tibble::tibble(
   Value = 0:4,
   Label = c(
     "Not at all important to me",
-    "A little bit important to me",
-    "Moderately important to me",
-    "Quite a bit important to me",
+    "Somewhat important to me",
+    "Important to me",
+    "Very important to me",
     "Extremely important to me"
   )
 )
