@@ -144,23 +144,23 @@
 <h2 class="hasAnchor">
 <a href="#example-data-jz2017" class="anchor"></a>2. Example data: jz2017</h2>
 <p>To illustrate the SSM functions, we will use the example dataset <code>jz2017</code>, which was provided by Zimmermann &amp; Wright (2017) and reformatted for this package. This dataset includes self-report data from 1166 undergraduate students. Students completed a circumplex measure of interpersonal problems with eight subscales (PA, BC, DE, FG, HI, JK, LM, and NO) and a measure of personality disorder symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD, NARPD, AVPD, DPNPD, and OCPD). More information about these variables can be accessed using the <code><a href="../reference/jz2017.html">?jz2017</a></code> command in R.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">"jz2017"</span>)
-<span class="kw">print</span>(jz2017)
-<span class="co">#&gt; # A tibble: 1,166 x 19</span>
-<span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span>
-<span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span>
-<span class="co">#&gt;  1 Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7</span>
-<span class="co">#&gt;  2 Female  0     0.25  0     0.25  1.25  1.75  2.25  2.25     1     0     2</span>
-<span class="co">#&gt;  3 Female  0     0     0     0     0     0     0     0        0     1     0</span>
-<span class="co">#&gt;  4 Male    2     1.75  1.75  2.5   2     1.75  2     2.5      1     0     0</span>
-<span class="co">#&gt;  5 Female  0.25  0.5   0.25  0     0     0     0     0        0     0     0</span>
-<span class="co">#&gt;  6 Male    1.5   1.75  2.25  1.75  2     1.25  2.25  2.5      5     5     7</span>
-<span class="co">#&gt;  7 Male    2     1.75  1.75  2     1.5   1.25  1.25  1.75     3     6     7</span>
-<span class="co">#&gt;  8 Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1</span>
-<span class="co">#&gt;  9 Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span>
-<span class="co">#&gt; 10 Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span>
-<span class="co">#&gt; # ... with 1,156 more rows, and 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,</span>
-<span class="co">#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">data</span>(<span class="st">"jz2017"</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">print</span>(jz2017)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; # A tibble: 1,166 x 19</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt;  1 Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt;  2 Female  0     0.25  0     0.25  1.25  1.75  2.25  2.25     1     0     2</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt;  3 Female  0     0     0     0     0     0     0     0        0     1     0</span></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt;  4 Male    2     1.75  1.75  2.5   2     1.75  2     2.5      1     0     0</span></a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt;  5 Female  0.25  0.5   0.25  0     0     0     0     0        0     0     0</span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt;  6 Male    1.5   1.75  2.25  1.75  2     1.25  2.25  2.5      5     5     7</span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt;  7 Male    2     1.75  1.75  2     1.5   1.25  1.25  1.75     3     6     7</span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt;  8 Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1</span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt;  9 Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt; 10 Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">#&gt; # ... with 1,156 more rows, and 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,</span></a>
+<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="co">#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</span></a></code></pre></div>
 <p>The circumplex scales in <code>jz2017</code> come from the Inventory of Interpersonal Problems - Short Circumplex (IIP-SC). These scales can be arranged into the following circular model, which is organized around the two primary dimensions of agency (y-axis) and communion (x-axis). Note that the two-letter scale abbreviations and angular values are based in convention. A high score on PA indicates that one has interpersonal problems related to being “domineering” or too high on agency, whereas a high score on DE indicates problems related to being “cold” or too low on communion. Scales that are not directly on the y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency and communion.</p>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/iipsc-1.png" width="100%"></p>
 </div>
@@ -171,85 +171,85 @@
 <h3 class="hasAnchor">
 <a href="#conducting-ssm-for-a-groups-mean-scores" class="anchor"></a>Conducting SSM for a group’s mean scores</h3>
 <p>To begin, let’s say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. Although it is possible to analyze the raw scores contained in <code>jz2017</code>, our results will be more interpretable if we standardize the scores first. We can do this using the <code><a href="../reference/standardize.html">standardize()</a></code> function. The first argument to this function is <code>.data</code>, a data frame frame containing the circumplex scales to be standardized. The second argument is <code>scales</code> and specifies where in <code>.data</code> the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is <code>angles</code> and specifies the angle of each of the circumplex scales included in <code>scales</code>. Note that the <code>scales</code> and <code>angles</code> arguments need to be vectors (hence the <code>c()</code> function) that have the same ordering and length. Finally, the fourth argument is <code>norms</code>, a data frame containing the normative data we will use to standardize the circumplex scales. Here, we will use normative data for the IIP-SC by loading the <code>iipsc</code> data frame.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">"iipsc"</span>)
-jz2017s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/standardize.html">standardize</a></span>(
-  <span class="dt">.data =</span> jz2017,
-  <span class="dt">scales =</span> <span class="kw">c</span>(PA, BC, DE, FG, HI, JK, LM, NO),
-  <span class="dt">angles =</span> <span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>),
-  <span class="dt">instrument =</span> iipsc,
-  <span class="dt">sample =</span> <span class="dv">1</span>
-)
-<span class="kw">print</span>(jz2017s)
-<span class="co">#&gt; # A tibble: 1,166 x 27</span>
-<span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span>
-<span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span>
-<span class="co">#&gt;  1 Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7</span>
-<span class="co">#&gt;  2 Female  0     0.25  0     0.25  1.25  1.75  2.25  2.25     1     0     2</span>
-<span class="co">#&gt;  3 Female  0     0     0     0     0     0     0     0        0     1     0</span>
-<span class="co">#&gt;  4 Male    2     1.75  1.75  2.5   2     1.75  2     2.5      1     0     0</span>
-<span class="co">#&gt;  5 Female  0.25  0.5   0.25  0     0     0     0     0        0     0     0</span>
-<span class="co">#&gt;  6 Male    1.5   1.75  2.25  1.75  2     1.25  2.25  2.5      5     5     7</span>
-<span class="co">#&gt;  7 Male    2     1.75  1.75  2     1.5   1.25  1.25  1.75     3     6     7</span>
-<span class="co">#&gt;  8 Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1</span>
-<span class="co">#&gt;  9 Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span>
-<span class="co">#&gt; 10 Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span>
-<span class="co">#&gt; # ... with 1,156 more rows, and 15 more variables: ASPD &lt;int&gt;,</span>
-<span class="co">#&gt; #   BORPD &lt;int&gt;, HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;,</span>
-<span class="co">#&gt; #   OCPD &lt;int&gt;, PA_z &lt;dbl&gt;, BC_z &lt;dbl&gt;, DE_z &lt;dbl&gt;, FG_z &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;, NO_z &lt;dbl&gt;</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">data</span>(<span class="st">"iipsc"</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">jz2017s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/standardize.html">standardize</a></span>(</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="dt">.data =</span> jz2017,</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">  <span class="dt">scales =</span> <span class="kw">c</span>(PA, BC, DE, FG, HI, JK, LM, NO),</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">  <span class="dt">angles =</span> <span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>),</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">  <span class="dt">instrument =</span> iipsc,</a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">  <span class="dt">sample =</span> <span class="dv">1</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8">)</a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="kw">print</span>(jz2017s)</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co">#&gt; # A tibble: 1,166 x 27</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="co">#&gt;  1 Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7</span></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#&gt;  2 Female  0     0.25  0     0.25  1.25  1.75  2.25  2.25     1     0     2</span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt;  3 Female  0     0     0     0     0     0     0     0        0     1     0</span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt;  4 Male    2     1.75  1.75  2.5   2     1.75  2     2.5      1     0     0</span></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt;  5 Female  0.25  0.5   0.25  0     0     0     0     0        0     0     0</span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt;  6 Male    1.5   1.75  2.25  1.75  2     1.25  2.25  2.5      5     5     7</span></a>
+<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co">#&gt;  7 Male    2     1.75  1.75  2     1.5   1.25  1.25  1.75     3     6     7</span></a>
+<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co">#&gt;  8 Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1</span></a>
+<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="co">#&gt;  9 Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span></a>
+<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="co">#&gt; 10 Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span></a>
+<a class="sourceLine" id="cb2-23" data-line-number="23"><span class="co">#&gt; # ... with 1,156 more rows, and 15 more variables: ASPD &lt;int&gt;,</span></a>
+<a class="sourceLine" id="cb2-24" data-line-number="24"><span class="co">#&gt; #   BORPD &lt;int&gt;, HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;,</span></a>
+<a class="sourceLine" id="cb2-25" data-line-number="25"><span class="co">#&gt; #   OCPD &lt;int&gt;, PA_z &lt;dbl&gt;, BC_z &lt;dbl&gt;, DE_z &lt;dbl&gt;, FG_z &lt;dbl&gt;,</span></a>
+<a class="sourceLine" id="cb2-26" data-line-number="26"><span class="co">#&gt; #   HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;, NO_z &lt;dbl&gt;</span></a></code></pre></div>
 <p>Now we can use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function to perform the SSM analysis. The first three arguments are the same as the first three arguments to <code><a href="../reference/standardize.html">standardize()</a></code>. We can pass the new <code>jz2017s</code> data frame that contains standardized scores as <code>.data</code> and the same vectors to <code>scales</code> and <code>angles</code> since these haven’t changed.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(
-  <span class="dt">.data =</span> jz2017s,
-  <span class="dt">scales =</span> <span class="kw">c</span>(PA_z, BC_z, DE_z, FG_z, HI_z, JK_z, LM_z, NO_z),
-  <span class="dt">angles =</span> <span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>)
-)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">  <span class="dt">.data =</span> jz2017s,</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">  <span class="dt">scales =</span> <span class="kw">c</span>(PA_z, BC_z, DE_z, FG_z, HI_z, JK_z, LM_z, NO_z),</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">angles =</span> <span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>)</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">)</a></code></pre></div>
 <p>The output of the function has been saved in the <code>results</code> object, which we can examine in detail using the <code>summary()</code> function. This will output the call we made to create the output, as well as some of the default options that we didn’t bother changing (see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(results)
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = c(PA_z, BC_z, DE_z, FG_z, </span>
-<span class="co">#&gt;     HI_z, JK_z, LM_z, NO_z), angles = c(90, 135, 180, 225, 270, </span>
-<span class="co">#&gt;     315, 360, 45))</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Statistical Basis:    Mean Scores </span>
-<span class="co">#&gt; Bootstrap Resamples:  2000 </span>
-<span class="co">#&gt; Confidence Level:     0.95 </span>
-<span class="co">#&gt; Listwise Deletion:    TRUE </span>
-<span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Profile [All]:</span>
-<span class="co">#&gt;                Estimate   Lower CI   Upper CI</span>
-<span class="co">#&gt; Elevation        -0.225     -0.258     -0.191</span>
-<span class="co">#&gt; X-Value           0.131      0.097      0.163</span>
-<span class="co">#&gt; Y-Value          -0.015     -0.051      0.021</span>
-<span class="co">#&gt; Amplitude         0.131      0.099      0.166</span>
-<span class="co">#&gt; Displacement    353.525    338.869      9.610</span>
-<span class="co">#&gt; Model Fit         0.710</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">summary</span>(results)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Call:</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = c(PA_z, BC_z, DE_z, FG_z, </span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;     HI_z, JK_z, LM_z, NO_z), angles = c(90, 135, 180, 225, 270, </span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt;     315, 360, 45))</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; Statistical Basis:    Mean Scores </span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; Bootstrap Resamples:  2000 </span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; Confidence Level:     0.95 </span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; Listwise Deletion:    TRUE </span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; Profile [All]:</span></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; Elevation        -0.225     -0.258     -0.191</span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; X-Value           0.131      0.097      0.163</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; Y-Value          -0.015     -0.051      0.021</span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.131      0.099      0.166</span></a>
+<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; Displacement    353.525    338.869      9.610</span></a>
+<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="co">#&gt; Model Fit         0.710</span></a></code></pre></div>
 <p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017s</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputing their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code>set.seed()</code> function to control the random number generator in R.)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017s, PA_z<span class="op">:</span>NO_z, <span class="kw"><a href="../reference/octants.html">octants</a></span>())
-<span class="kw">summary</span>(results2)
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA_z:NO_z, angles = octants())</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Statistical Basis:    Mean Scores </span>
-<span class="co">#&gt; Bootstrap Resamples:  2000 </span>
-<span class="co">#&gt; Confidence Level:     0.95 </span>
-<span class="co">#&gt; Listwise Deletion:    TRUE </span>
-<span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Profile [All]:</span>
-<span class="co">#&gt;                Estimate   Lower CI   Upper CI</span>
-<span class="co">#&gt; Elevation        -0.225     -0.258     -0.193</span>
-<span class="co">#&gt; X-Value           0.131      0.098      0.163</span>
-<span class="co">#&gt; Y-Value          -0.015     -0.049      0.021</span>
-<span class="co">#&gt; Amplitude         0.131      0.099      0.165</span>
-<span class="co">#&gt; Displacement    353.525    339.734     10.067</span>
-<span class="co">#&gt; Model Fit         0.710</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">results2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017s, PA_z<span class="op">:</span>NO_z, <span class="kw"><a href="../reference/octants.html">octants</a></span>())</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw">summary</span>(results2)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; Call:</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA_z:NO_z, angles = octants())</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; Statistical Basis:    Mean Scores </span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; Bootstrap Resamples:  2000 </span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; Confidence Level:     0.95 </span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; Listwise Deletion:    TRUE </span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; Profile [All]:</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; Elevation        -0.225     -0.258     -0.193</span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; X-Value           0.131      0.098      0.163</span></a>
+<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; Y-Value          -0.015     -0.049      0.021</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; Amplitude         0.131      0.099      0.165</span></a>
+<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; Displacement    353.525    339.734     10.067</span></a>
+<a class="sourceLine" id="cb5-19" data-line-number="19"><span class="co">#&gt; Model Fit         0.710</span></a></code></pre></div>
 </div>
 <div id="visualizing-the-results-with-a-table-and-figure" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visualizing-the-results-with-a-table-and-figure" class="anchor"></a>Visualizing the results with a table and figure</h3>
 <p>Next, we can produce a table to display our results. With only a single set of parameters, this table is probably overkill, but in future analyses we will see how this function saves a lot of time and effort. To create the table, simply pass the <code>results</code> (or <code>results2</code>) object to the <code><a href="../reference/ssm_table.html">ssm_table()</a></code> function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results2)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results2)</a></code></pre></div>
 <table class="table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Mean-based Structural Summary Statistics with 95% CIs
@@ -302,7 +302,7 @@ All
 </tr></tbody>
 </table>
 <p>Next, let’s leverage the fact that we are working within a circumplex space by creating a nice-looking circular plot by mapping the amplitude parameter to the points’ distance from the center of the circle and the displacement parameter to the points’ rotation from due-east (as is conventional). This, again, is as simple as passing the <code>results</code> object to the <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(results2)</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(results2)</a></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot1-1.png" width="100%"></p>
 </div>
 </div>
@@ -314,33 +314,33 @@ All
 <a href="#conducting-ssm-for-a-groups-correlations-with-an-external-measure" class="anchor"></a>Conducting SSM for a group’s correlations with an external measure</h3>
 <p>Next, let’s say that we are interested in analyzing not the mean scores on the circumplex scales but rather their correlations with an external measure. This is sometimes referred to as “projecting” that external measure into the circumplex space. As an example, let’s project the NARPD variable, which captures symptoms of narcissistic personality disorder, into the circumplex space defined by the IIP-SC. Based on theory and previous findings, we can expect this measure to be associated with some general interpersonal distress and a style that is generally high in agency.</p>
 <p>To conduct this analysis, we can start with the syntax from the mean-based analysis. All SSM analyses use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function and the data, scales, and angles are the same as before. However, we also need to let the function know that we want to analyze correlations with NARPD as opposed to scale means. To do this, we add an additional argument <code>measures</code>. Note that since correlations are already standardized, we don’t need to worry about standardizing the circumplex scales when <code>measures</code> is used.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> NARPD)
-<span class="kw">summary</span>(results3)
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
-<span class="co">#&gt;     measures = NARPD)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Statistical Basis:    Correlation Scores </span>
-<span class="co">#&gt; Bootstrap Resamples:  2000 </span>
-<span class="co">#&gt; Confidence Level:     0.95 </span>
-<span class="co">#&gt; Listwise Deletion:    TRUE </span>
-<span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Profile [NARPD]:</span>
-<span class="co">#&gt;                Estimate   Lower CI   Upper CI</span>
-<span class="co">#&gt; Elevation         0.202      0.168      0.236</span>
-<span class="co">#&gt; X-Value          -0.062     -0.096     -0.028</span>
-<span class="co">#&gt; Y-Value           0.179      0.142      0.212</span>
-<span class="co">#&gt; Amplitude         0.189      0.154      0.224</span>
-<span class="co">#&gt; Displacement    108.967     99.065    118.903</span>
-<span class="co">#&gt; Model Fit         0.957</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">results3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> NARPD)</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="kw">summary</span>(results3)</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; Call:</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt;     measures = NARPD)</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></a>
+<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="co">#&gt; Bootstrap Resamples:  2000 </span></a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">#&gt; Confidence Level:     0.95 </span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#&gt; Listwise Deletion:    TRUE </span></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11"><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></a>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb8-13" data-line-number="13"><span class="co">#&gt; Profile [NARPD]:</span></a>
+<a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></a>
+<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="co">#&gt; Elevation         0.202      0.168      0.236</span></a>
+<a class="sourceLine" id="cb8-16" data-line-number="16"><span class="co">#&gt; X-Value          -0.062     -0.096     -0.028</span></a>
+<a class="sourceLine" id="cb8-17" data-line-number="17"><span class="co">#&gt; Y-Value           0.179      0.142      0.212</span></a>
+<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="co">#&gt; Amplitude         0.189      0.154      0.224</span></a>
+<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="co">#&gt; Displacement    108.967     99.065    118.903</span></a>
+<a class="sourceLine" id="cb8-20" data-line-number="20"><span class="co">#&gt; Model Fit         0.957</span></a></code></pre></div>
 <p>Note that this output looks very similar to the mean-based output except that the statistical basis is now correlation scores instead of mean scores and instead of saying “Profile [All]” it now says “Profile [NARPD]”.</p>
 </div>
 <div id="visualizing-the-results-with-a-table-and-figure-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visualizing-the-results-with-a-table-and-figure-1" class="anchor"></a>Visualizing the results with a table and figure</h3>
 <p>We can also create a similar table and figure using the exact same syntax as before. The <code><a href="../reference/ssm_table.html">ssm_table()</a></code> and <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> functions are smart enough to know whether the results are mean-based or correlation-based and will work in both cases.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results3)</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results3)</a></code></pre></div>
 <table class="table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
@@ -393,7 +393,7 @@ NARPD
 </tr></tbody>
 </table>
 <p>From the table, we can see that the model fit is good (&gt;.80) and that all three SSM parameters are significantly different from zero, i.e., their confidence intervals do not include zero. Furthermore, the confidence intervals for the elevation and amplitude parameters are greater than or equal to 0.15, which can be interpreted as being “marked.” So, consistent with our hypotheses, NARPD was associated with marked general interpersonal distress (elevation) and was markedly distinctive in its profile (amplitude). The displacement parameter was somewhere between 100 and 120 degrees; to interpret this we would need to either consult the mapping between scales and angles or plot the results.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(results3)</code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(results3)</a></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot2-1.png" width="100%"></p>
 <p>From this figure, it is very easy to see that, consistent with our hypotheses, the displacement for NARPD was associated with high agency and was somewhere between the “domineering” and “vindictive” octants.</p>
 </div>

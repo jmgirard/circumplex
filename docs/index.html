@@ -106,38 +106,30 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <div id="circumplex" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#circumplex" class="anchor"></a>circumplex <img src="reference/figures/logo.png" align="right">
+<a href="#circumplex" class="anchor"></a>circumplex <img src="reference/figures/logo.png" align="right" alt="">
 </h1></div>
 
-<div id="overview" class="section level2">
-<h2 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h2>
-<p>The goal of <em>circumplex</em> is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by <a href="https://jmgirard.com/">Jeffrey Girard</a>, and was inspired by work from and was developed in conjunction with <a href="https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/">Johannes Zimmermann</a> and <a href="https://personalityprocesses.com/">Aidan Wright</a>. You can learn more about using this package to perform the Structural Summary Method (SSM) in <code>vignette("ssm-introduction")</code> and <code>vignette("ssm-intermediate")</code>. You can purchase stickers and other merchandise with the circumplex logo at <a href="https://www.redbubble.com/people/jmgirard/works/32902204">redbubble.com</a>.</p>
-</div>
+<p>The goal of <em>circumplex</em> is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by <a href="https://jmgirard.com/">Jeffrey Girard</a>, and was inspired by work from and was developed in conjunction with <a href="https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/">Johannes Zimmermann</a> and <a href="https://personalityprocesses.com/">Aidan Wright</a>. You can learn more about using this package through the vignette articles available on the <a href="https://circumplex.jmgirard.com/">package website</a> or through <code><a href="reference/circumplex-package.html">?circumplex</a></code>.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Install the most recent release from CRAN</span>
-<span class="kw">install.packages</span>(<span class="st">"circumplex"</span>)</code></pre></div>
-<div id="development-version" class="section level3">
-<h3 class="hasAnchor">
-<a href="#development-version" class="anchor"></a>Development version</h3>
-<p>Releasing updates to CRAN takes time. You can always install the newest development version, which may contain bug fixes and new features, from GitHub:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages("devtools")</span>
-devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"jmgirard/circumplex"</span>)</code></pre></div>
-</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># Install release version from CRAN</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">"circumplex"</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co"># Install development version from GitHub</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"jmgirard/circumplex"</span>)</a></code></pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">"jz2017"</span>)
-results &lt;-<span class="st"> </span><span class="kw"><a href="reference/ssm_analyze.html">ssm_analyze</a></span>(
-  <span class="dt">.data =</span> jz2017, 
-  <span class="dt">scales =</span> <span class="kw">c</span>(PA, BC, DE, FG, HI, JK, LM, NO), 
-  <span class="dt">angles =</span> <span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>), 
-  <span class="dt">measures =</span> <span class="kw">c</span>(NARPD, ASPD)
-)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/ssm_table.html">ssm_table</a></span>(results)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">data</span>(<span class="st">"jz2017"</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">results &lt;-<span class="st"> </span><span class="kw"><a href="reference/ssm_analyze.html">ssm_analyze</a></span>(</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="dt">.data =</span> jz2017, </a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">  <span class="dt">scales =</span> <span class="kw">c</span>(PA, BC, DE, FG, HI, JK, LM, NO), </a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">  <span class="dt">angles =</span> <span class="kw">c</span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>), </a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">  <span class="dt">measures =</span> <span class="kw">c</span>(NARPD, ASPD)</a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="reference/ssm_table.html">ssm_table</a></span>(results)</a></code></pre></div>
 <table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
@@ -214,7 +206,7 @@ ASPD
 </tr>
 </tbody>
 </table>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/ssm_plot.html">ssm_plot</a></span>(results)</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="reference/ssm_plot.html">ssm_plot</a></span>(results)</a></code></pre></div>
 <p><img src="reference/figures/README-plot-1.png" width="700"></p>
 </div>
 <div id="code-of-conduct" class="section level2">
