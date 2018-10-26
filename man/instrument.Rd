@@ -18,7 +18,7 @@ will be created in the global environment with the default name as above.
 Or, if a name is assigned (LHS), the object will have that name instead.
 }
 \description{
-The circumplex pacakge includes information about numerous circumplex
+The circumplex package includes information about numerous circumplex
 instruments including instructions for scoring and standardizing items to be
 used in conjunction with the \code{score} and \code{standardize} functions.
 This function loads the information for a specific instrument into memory.

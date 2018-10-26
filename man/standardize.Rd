@@ -25,7 +25,7 @@ to use in standardizing the scale scores (default = 1). See \code{?norms}
 to see the normative samples available for an instrument.}
 
 \item{prefix}{Optional. A string to include at the beginning of the newly
-calcualted scale variables' names, before the scale name and \code{suffix}
+calculated scale variables' names, before the scale name and \code{suffix}
 (default = "").}
 
 \item{suffix}{Optional. A string to include at the end of the newly

@@ -120,7 +120,7 @@ score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = 
 #'   to use in standardizing the scale scores (default = 1). See \code{?norms}
 #'   to see the normative samples available for an instrument.
 #' @param prefix Optional. A string to include at the beginning of the newly
-#'   calcualted scale variables' names, before the scale name and \code{suffix}
+#'   calculated scale variables' names, before the scale name and \code{suffix}
 #'   (default = "").
 #' @param suffix Optional. A string to include at the end of the newly
 #'   calculated scale variables' names, after the scale name and \code{prefix}
