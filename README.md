@@ -3,14 +3,14 @@
 
 # circumplex <img src="man/figures/logo.png" align="right" alt="" />
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/circumplex)](https://cran.r-project.org/package=circumplex)
+[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/circumplex)](https://cran.r-project.org/package=circumplex)
 [![Build
 Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex)
 [![Coverage
 status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://codecov.io/github/jmgirard/circumplex?branch=master)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
-developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
 The goal of *circumplex* is to provide a powerful, flexible, and

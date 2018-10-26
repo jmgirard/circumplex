@@ -16,13 +16,12 @@ Authors@R:
              family = "Wright",
              role = "aut",
              comment = c(ORCID = "0000-0002-2369-0601")))
-Description: Tools for analyzing and visualizing circular data,
-    including information about and scoring functions for circumplex
-    instruments and a generalization of the bootstrapped structural summary
-    method from Zimmermann & Wright (2017) <doi:10.1177/1073191115621795>
-    and functions for creating publication-ready tables and figures from
-    the results. Future versions will include tools for circular fit and
-    reliability analyses, as well as enhanced visualization methods.
+Description: Tools for analyzing and visualizing circular data, including
+    scoring functions for relevant instruments and a generalization of the 
+    bootstrapped structural summary method from Zimmermann & Wright (2017) 
+    <doi:10.1177/1073191115621795> and functions for creating publication-ready
+    tables and figures from the results. Future versions will include tools for 
+    circular fit and reliability analyses, as well as visualization enhancements.
 License: GPL-3
 URL: https://github.com/jmgirard/circumplex
 BugReports: https://github.com/jmgirard/circumplex/issues

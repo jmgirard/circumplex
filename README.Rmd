@@ -19,10 +19,10 @@ set.seed(12345)
 
 # circumplex <img src="man/figures/logo.png" align="right" alt="" />
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/circumplex)](https://cran.r-project.org/package=circumplex)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/circumplex)](https://cran.r-project.org/package=circumplex)
 [![Build Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex)
 [![Coverage status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://codecov.io/github/jmgirard/circumplex?branch=master)
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 
 The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by [Jeffrey Girard](https://jmgirard.com/); it was inspired by work from and was developed under advisement from [Johannes Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/) and [Aidan Wright](https://personalityprocesses.com/). You can learn more about using this package through the vignette articles available on the [package website](https://circumplex.jmgirard.com/) or through `?circumplex`.
