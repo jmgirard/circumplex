@@ -40,7 +40,7 @@ iis64_norms_src <- tibble::tibble(
 )
 
 iis64_anchors <- tibble::tibble(
-  Value = 0:5,
+  Value = 1:6,
   Label = c(
     "Very little like me",
     "Somewhat like me",
