@@ -4,6 +4,7 @@ circumplex 0.2.0.9000
 #### NEW FEATURES ####
 
 * Added one normative data set to the IIS-32
+* Added open-access (i.e., full item text) to the IIS-32 and IIS-64
 
 #### BUG FIXES ####
 
