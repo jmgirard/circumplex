@@ -43,7 +43,7 @@ iis64_anchors <- tibble::tibble(
   Value = 1:6,
   Label = c(
     "Very little like me",
-    "Somewhat like me",
+    "Something like me",
     "Moderately like me",
     "Quite a bit like me",
     "Very like me",

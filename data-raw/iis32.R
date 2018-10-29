@@ -35,8 +35,8 @@ iis32_norms_src <- tibble::tibble(
   Sample = 1,
   Size = 1380,
   Population = "American college students",
-  Reference = NA_character_,
-  URL = NA_character_
+  Reference = "Hatcher & Rogers (2012)",
+  URL = "https://doi.org/10.1080/00223891.2012.681818"
 )
 
 iis32_anchors <- tibble::tibble(
