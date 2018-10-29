@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Load a specific instrument object — instrument • circumplex</title>
+<title>Interpersonal Goals Inventory for Children, Revised Version — igicr • circumplex</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -36,13 +36,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Load a specific instrument object — instrument" />
+<meta property="og:title" content="Interpersonal Goals Inventory for Children, Revised Version — igicr" />
 
-<meta property="og:description" content="The circumplex package includes information about numerous circumplex
-instruments including instructions for scoring and standardizing items to be
-used in conjunction with the score and standardize functions.
-This function loads the information for a specific instrument into memory.
-See the instruments function to list all available instruments." />
+<meta property="og:description" content="Information about the Interpersonal Goals Inventory for Children, Revised Version." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -136,61 +132,104 @@ See the instruments function to list all available instruments." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Load a specific instrument object</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/instrument_oop.R'><code>R/instrument_oop.R</code></a></small>
-    <div class="hidden name"><code>instrument.Rd</code></div>
+    <h1>Interpersonal Goals Inventory for Children, Revised Version</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/instrument_data.R'><code>R/instrument_data.R</code></a></small>
+    <div class="hidden name"><code>igicr.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>The circumplex package includes information about numerous circumplex
-instruments including instructions for scoring and standardizing items to be
-used in conjunction with the <code>score</code> and <code>standardize</code> functions.
-This function loads the information for a specific instrument into memory.
-See the <code>instruments</code> function to list all available instruments.</p>
+    <p>Information about the Interpersonal Goals Inventory for Children, Revised Version.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>instrument</span>(<span class='no'>code</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>code</th>
-      <td><p>Required. A string (e.g., "iip32") or text in non-standard
-evaluation (e.g., iip32). The code of the instrument assigned by this
-package and displayed in parentheses by <code><a href='instruments.html'>instruments()</a></code>.</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <pre class="usage"><span class='no'>igicr</span></pre>
+        
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>The instrument object for the requested circumplex instrument. If
-the function is called without a name assignment (LHS), then the object
-will be created in the global environment with the default name as above.
-Or, if a name is assigned (LHS), the object will have that name instead.</p>
+    <p>An object of class <code>instrument</code> of length 5.</p>
     
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
-    <div class='dont-index'><p>Other instrument functions: <code><a href='anchors.html'>anchors</a></code>,
-  <code><a href='instruments.html'>instruments</a></code>, <code><a href='items.html'>items</a></code>,
-  <code><a href='norms.html'>norms</a></code>, <code><a href='scales.html'>scales</a></code></p></div>
+    <p><a href='https://doi.org/10.1177/1073191111411672'>https://doi.org/10.1177/1073191111411672</a></p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>instrument</span>(<span class='no'>iip32</span>)
-<span class='fu'>instrument</span>(<span class='st'>"iip32"</span>)
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>instrument</span>(<span class='no'>iip32</span>)</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='instrument.html'>instrument</a></span>(<span class='st'>"igicr"</span>)
+<span class='fu'>summary</span>(<span class='no'>igicr</span>)</div><div class='output co'>#&gt; IGI-CR: Interpersonal Goals Inventory for Children, Revised Version
+#&gt; 32 items, 8 scales, 3 normative data sets
+#&gt; Trucco, Wright, &amp; Colder (2013)
+#&gt; &lt;https://doi.org/10.1177/1073191111411672&gt;
+#&gt; 
+#&gt; The IGI-CR contains 8 circumplex scales.
+#&gt; PA: +A (90 degrees)
+#&gt; BC: +A-C (135 degrees)
+#&gt; DE: -C (180 degrees)
+#&gt; FG: -A-C (225 degrees)
+#&gt; HI: -A (270 degrees)
+#&gt; JK: -A+C (315 degrees)
+#&gt; LM: +C (360 degrees)
+#&gt; NO: +A+C (45 degrees)
+#&gt; 
+#&gt; The IGI-CR is rated using the following 5-point scale.
+#&gt; 0. Not at all important to me
+#&gt; 1. Somewhat important to me
+#&gt; 2. Important to me
+#&gt; 3. Very important to me
+#&gt; 4. Extremely important to me
+#&gt; 
+#&gt; The IGI-CR contains 32 items (open-access):
+#&gt; 1. Your peers respect and admire you
+#&gt; 2. Your peers agree to do what you suggest
+#&gt; 3. You do not show your feelings in front of your peers
+#&gt; 4. You do not do anything ridiculous
+#&gt; 5. Your peers do not get angry with you
+#&gt; 6. Everyone feels good
+#&gt; 7. You feel close to your peers
+#&gt; 8. You say exactly what you want
+#&gt; 9. You appear self-confident and make an impression on your peers
+#&gt; 10. You get to decide what to play
+#&gt; 11. You do not give away too much about yourself
+#&gt; 12. You do not say stupid things when your peers are listening
+#&gt; 13. You do not make your peers angry
+#&gt; 14. You can put your peers in a good mood
+#&gt; 15. Real friendship develops between you
+#&gt; 16. Your peers listen to your opinion
+#&gt; 17. Your peers think you are smart
+#&gt; 18. The group does what you say
+#&gt; 19. You keep your thoughts to yourself
+#&gt; 20. Your peers do not laugh or make fun of you
+#&gt; 21. You do not annoy your peers
+#&gt; 22. You are able to please your peers
+#&gt; 23. Your peers help you when you have a problem
+#&gt; 24. You can state your opinion
+#&gt; 25. You don't back down when there is a disagreement
+#&gt; 26. You feel you have control over your peers
+#&gt; 27. You do not let your peers get too close to you
+#&gt; 28. You do not make a fool of yourself in front of your peers
+#&gt; 29. You let your peers make decisions
+#&gt; 30. You agree with your peers about things
+#&gt; 31. Your peers come to you when they have a problem
+#&gt; 32. You are able to tell your peers how you feel
+#&gt; 
+#&gt; The IGI-CR currently has 3 normative data set(s):
+#&gt; 1. 387 American community adolescents (age 11-13), overall
+#&gt;   Trucco, Wright, &amp; Colder (2013)
+#&gt;   &lt;https://doi.org/10.1177/1073191111411672&gt;
+#&gt; 2. 174 American community adolescents (age 11-13), males
+#&gt;   Trucco, Wright, &amp; Colder (2013)
+#&gt;   &lt;https://doi.org/10.1177/1073191111411672&gt;
+#&gt; 3. 213 American community adolescents (age 11-13), females
+#&gt;   Trucco, Wright, &amp; Colder (2013)
+#&gt;   &lt;https://doi.org/10.1177/1073191111411672&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
+      <li><a href="#format">Format</a></li>
 
-      <li><a href="#see-also">See also</a></li>
+      <li><a href="#source">Source</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

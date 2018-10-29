@@ -41,7 +41,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -73,7 +73,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/jmgirard/circumplex">
-    <span class="fa fa-github"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -110,7 +110,7 @@
 <a href="#overview-of-instrument-related-functions" class="anchor"></a>1. Overview of Instrument-related Functions</h2>
 <p>Although the circumplex package is capable of analyzing and visualizing data in a “source-agnostic” manner (i.e., without knowing what the numbers correspond to), it can be helpful to both the user and the package to have more contextual information about which instrument/questionnaire the data come from. For example, knowing the specific instrument used can enable the package to automatically score item-level responses and standardize these scores using normative data. Furthermore, a centralized repository of information about circumplex instruments would provide a convenient and accessible way for users to discover and begin using new instruments. To address these needs, a suite of new instrument-related functions (and underlying data to power them) was added to the circumplex package in version 0.2.0.</p>
 <p>The first part of this vignette will discuss how to preview the instruments currently available in the circumplex package, how to load information about a specific instrument for use in analysis, and how to extract general and specific information about that instrument. The following functions will be discussed: <code><a href="../reference/instruments.html">instruments()</a></code>, <code><a href="../reference/instrument.html">instrument()</a></code>, <code>print()</code>, <code>summary()</code>, <code><a href="../reference/scales.html">scales()</a></code>, <code><a href="../reference/items.html">items()</a></code>, <code><a href="../reference/anchors.html">anchors()</a></code>, <code><a href="../reference/norms.html">norms()</a></code>, and <code>View()</code>.</p>
-<p>The second part of this vignette will discuss how to use the information about an instrument to transform and summarize circumplex data. It will demonstrate how to ipsatize item-level responses (i.e., apply within-person deviation scoring), how to calculate scale scores from item-level responses (with or without imputing/prorating missing values), and how to standardize scale scores using normative/comparison data. The following functions will be discussed: <code><a href="../reference/ipsatize.html">ipsatize()</a></code>, <code><a href="../reference/score.html">score()</a></code>, and <code><a href="../reference/standardize.html">standardize()</a></code>.</p>
+<p>The second part of this vignette will discuss how to use the information about an instrument to transform and summarize circumplex data. It will demonstrate how to ipsatize item-level responses (i.e., apply deviation scoring across variables), how to calculate scale scores from item-level responses (with or without imputing/prorating missing values), and how to standardize scale scores using normative/comparison data. The following functions will be discussed: <code><a href="../reference/ipsatize.html">ipsatize()</a></code>, <code><a href="../reference/score.html">score()</a></code>, and <code><a href="../reference/standardize.html">standardize()</a></code>.</p>
 </div>
 <div id="loading-and-examining-instrument-objects" class="section level2">
 <h2 class="hasAnchor">
@@ -118,50 +118,37 @@
 <div id="previewing-the-available-instruments" class="section level3">
 <h3 class="hasAnchor">
 <a href="#previewing-the-available-instruments" class="anchor"></a>Previewing the available instruments</h3>
-<p>Our goal is to eventually include all circumplex instruments in this package. However, due to time-constraints and copyright issues, this goal may be delayed or even impossible to fully realize. However, you can always preview the list of currently available instruments using the <code><a href="../reference/instruments.html">instruments()</a></code> function. This function will print the abbreviation, name, and (in parentheses) the “code” for each available instrument.</p>
+<p>Our goal is to eventually include all circumplex instruments in this package. However, due to time-constraints and copyright issues, this goal may be delayed or even impossible to fully realize. However, you can always preview the list of currently available instruments using the <code><a href="../reference/instruments.html">instruments()</a></code> function. This function will print the abbreviation, name, and (in parentheses) the “code” for each available instrument. We will return to the code in the next section.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/instruments.html">instruments</a></span>()
-<span class="co">#&gt; The circumplex package currently includes 10 instruments:</span>
+<span class="co">#&gt; The circumplex package currently includes 12 instruments:</span>
 <span class="co">#&gt;  1. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)</span>
 <span class="co">#&gt;  2. CSIG: Circumplex Scales of Intergroup Goals (csig)</span>
 <span class="co">#&gt;  3. CSIP: Circumplex Scales of Interpersonal Problems (csip)</span>
 <span class="co">#&gt;  4. CSIV: Circumplex Scales of Interpersonal Values (csiv)</span>
-<span class="co">#&gt;  5. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)</span>
-<span class="co">#&gt;  6. IIP-64: Inventory of Interpersonal Problems (iip64)</span>
-<span class="co">#&gt;  7. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)</span>
-<span class="co">#&gt;  8. IIS-64: Inventory of Interpersonal Strengths (iis64)</span>
-<span class="co">#&gt;  9. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)</span>
-<span class="co">#&gt;  10. ISC: Interpersonal Sensitivities Circumplex (isc)</span></code></pre></div>
-<p>If there are additional circumplex instruments you would like to have added to the package (especially if you are the author/copyright-holder), please <a href="mailto:me@jmgirard.com">contact me</a>. Note that some information (e.g., item text and normative data) may not be available for all instruments due to copyright issues.</p>
+<span class="co">#&gt;  5. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)</span>
+<span class="co">#&gt;  6. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)</span>
+<span class="co">#&gt;  7. IIP-64: Inventory of Interpersonal Problems (iip64)</span>
+<span class="co">#&gt;  8. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)</span>
+<span class="co">#&gt;  9. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)</span>
+<span class="co">#&gt;  10. IIS-64: Inventory of Interpersonal Strengths (iis64)</span>
+<span class="co">#&gt;  11. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)</span>
+<span class="co">#&gt;  12. ISC: Interpersonal Sensitivities Circumplex (isc)</span></code></pre></div>
+<p>If there are additional circumplex instruments you would like to have added to the package (especially if you are the author/copyright-holder), please <a href="mailto:me@jmgirard.com">contact me</a>. Note that some information (e.g., item text and normative data) may not be available for all instruments due to copyright issues. However, many instruments are released as open-access and have full item text and normative data included in the package.</p>
 </div>
 <div id="loading-a-specific-instrument" class="section level3">
 <h3 class="hasAnchor">
 <a href="#loading-a-specific-instrument" class="anchor"></a>Loading a specific instrument</h3>
-<p>To reduce loading time and memory usage, instrument information is not loaded into R’s memory when the circumplex package is loaded. Instead, the <code><a href="../reference/instrument.html">instrument()</a></code> function can be used to load specific instruments into memory. The only argument passed to this function should be the “code” for a single instrument. You can name the instrument object any valid name; if no name is assigned, the object will be named the same as the instrument code (overwriting any existing object with that name).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load data using explicit assignment</span>
-my_instrument &lt;-<span class="st"> </span><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(<span class="st">"csip"</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load data using implicit assignment</span>
-<span class="kw"><a href="../reference/instrument.html">instrument</a></span>(<span class="st">"csip"</span>)</code></pre></div>
-</div>
-<div id="examining-an-instrument-in-brief" class="section level3">
-<h3 class="hasAnchor">
-<a href="#examining-an-instrument-in-brief" class="anchor"></a>Examining an instrument in-brief</h3>
-<p>To quickly and briefly examine the information available about a loaded instrument, use the <code>print()</code> function, which is also implicitly called when the name of an object is entered into the R console (i.e., typing <code>print(csip)</code> and <code>csip</code> is the same). This will return the instrument’s abbreviation; full name; the number of items, scales, and available normative data sets; original reference; and primary website. Below is a fully explicit call to load and print the CSIP, as well as a fully implicit call to do the same for the IIP-32.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_instrument &lt;-<span class="st"> </span><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(<span class="st">"csip"</span>)
-<span class="kw">print</span>(my_instrument)
+<p>To reduce loading time and memory usage, instrument information is not loaded into R’s memory when the circumplex package is loaded. Instead, instruments should be loaded into memory on an as-needed basis. As demonstrated below, this can be done by passing an instrument’s code (which we saw how to find in the last section) to the <code><a href="../reference/instrument.html">instrument()</a></code> function. We can then examine that instrument data using the <code>print()</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(csip)
+<span class="kw">print</span>(csip)
 <span class="co">#&gt; CSIP: Circumplex Scales of Interpersonal Problems</span>
 <span class="co">#&gt; 64 items, 8 scales, 1 normative data sets</span>
 <span class="co">#&gt; Boudreaux, Ozer, Oltmanns, &amp; Wright (2018)</span>
 <span class="co">#&gt; &lt;https://doi.org/10.1037/pas0000505&gt;</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(<span class="st">"iip32"</span>)
-iip32
-<span class="co">#&gt; IIP-32: Inventory of Interpersonal Problems, Brief Version</span>
-<span class="co">#&gt; 32 items, 8 scales, 3 normative data sets</span>
-<span class="co">#&gt; Horowitz, Alden, Wiggins, &amp; Pincus (2003)</span>
-<span class="co">#&gt; &lt;https://www.mindgarden.com/113-inventory-of-interpersonal-problems&gt;</span></code></pre></div>
-<p>Note, however, that an error will result if the <code>print()</code> function (or any of the functions to be described below) is called before the <code><a href="../reference/instrument.html">instrument()</a></code> function has loaded the data. Order of operations is important!</p>
+<p>Note, however, that an error will result if the <code>print()</code> function (or any of the functions to be described later) is called before the <code><a href="../reference/instrument.html">instrument()</a></code> function has loaded the data. Order of operations is important!</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(isc)
 <span class="co">#&gt; Error in print(isc): object 'isc' not found</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(<span class="st">"isc"</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(isc)
 <span class="kw">print</span>(isc)
 <span class="co">#&gt; ISC: Interpersonal Sensitivities Circumplex</span>
 <span class="co">#&gt; 64 items, 8 scales, 1 normative data sets</span>
@@ -171,7 +158,7 @@ iip32
 <div id="examining-an-instrument-in-depth" class="section level3">
 <h3 class="hasAnchor">
 <a href="#examining-an-instrument-in-depth" class="anchor"></a>Examining an instrument in-depth</h3>
-<p>To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the <code>summary()</code> function. This will return the same information returned by <code>print()</code>, followed by information about the instrument’s scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the <a href="https://circumplex.jmgirard.com/reference/index.html#section-instrument-data">reference</a> page of the circumplex package website.</p>
+<p>To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the <code>summary()</code> function. This will return the same information returned by <code>print()</code>, followed by information about the instrument’s scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the package <a href="https://circumplex.jmgirard.com/reference/index.html#section-instrument-data">reference</a> page.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(<span class="st">"ipipipc"</span>)
 <span class="kw">summary</span>(ipipipc)
 <span class="co">#&gt; IPIP-IPC: IPIP Interpersonal Circumplex</span>
@@ -180,14 +167,14 @@ iip32
 <span class="co">#&gt; &lt;https://doi.org/10.1177/1073191109340382&gt;</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; The IPIP-IPC contains 8 circumplex scales.</span>
-<span class="co">#&gt; PA (090 deg): Assured-Dominant</span>
-<span class="co">#&gt; BC (135 deg): Arrogant-Calculating</span>
-<span class="co">#&gt; DE (180 deg): Cold-Hearted</span>
-<span class="co">#&gt; FG (225 deg): Aloof-Introverted</span>
-<span class="co">#&gt; HI (270 deg): Unassured-Submissive</span>
-<span class="co">#&gt; JK (315 deg): Unassuming-Ingenuous</span>
-<span class="co">#&gt; LM (360 deg): Warm-Agreeable</span>
-<span class="co">#&gt; NO (045 deg): Gregarious-Extraverted</span>
+<span class="co">#&gt; PA: Assured-Dominant (90 degrees)</span>
+<span class="co">#&gt; BC: Arrogant-Calculating (135 degrees)</span>
+<span class="co">#&gt; DE: Cold-Hearted (180 degrees)</span>
+<span class="co">#&gt; FG: Aloof-Introverted (225 degrees)</span>
+<span class="co">#&gt; HI: Unassured-Submissive (270 degrees)</span>
+<span class="co">#&gt; JK: Unassuming-Ingenuous (315 degrees)</span>
+<span class="co">#&gt; LM: Warm-Agreeable (360 degrees)</span>
+<span class="co">#&gt; NO: Gregarious-Extraverted (45 degrees)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; The IPIP-IPC is rated using the following 5-point scale.</span>
 <span class="co">#&gt; 1. Very Inaccurate</span>
@@ -196,7 +183,7 @@ iip32
 <span class="co">#&gt; 4. Moderately Accurate</span>
 <span class="co">#&gt; 5. Very Accurate</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; The IPIP-IPC contains 32 items.</span>
+<span class="co">#&gt; The IPIP-IPC contains 32 items (open-access):</span>
 <span class="co">#&gt; 1. Am quiet around strangers</span>
 <span class="co">#&gt; 2. Speak softly</span>
 <span class="co">#&gt; 3. Tolerate a lot from others</span>
@@ -235,11 +222,61 @@ iip32
 <span class="co">#&gt;   Markey &amp; Markey (2009)</span>
 <span class="co">#&gt;   &lt;https://doi.org/10.1177/1073191109340382&gt;</span></code></pre></div>
 <p>Specific subsections of this output can be returned individually using the <code><a href="../reference/scales.html">scales()</a></code>, <code><a href="../reference/anchors.html">anchors()</a></code>, <code><a href="../reference/items.html">items()</a></code>, and <code><a href="../reference/norms.html">norms()</a></code> functions. These functions are especially useful when you need to know a specific bit of information about an instrument and don’t want the console to be flooded with unneeded information.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/anchors.html">anchors</a></span>(ipipipc)
+<span class="co">#&gt; The IPIP-IPC is rated using the following 5-point scale.</span>
+<span class="co">#&gt; 1. Very Inaccurate</span>
+<span class="co">#&gt; 2. Moderately Inaccurate</span>
+<span class="co">#&gt; 3. Neither Inaccurate nor Accurate</span>
+<span class="co">#&gt; 4. Moderately Accurate</span>
+<span class="co">#&gt; 5. Very Accurate</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/norms.html">norms</a></span>(ipipipc)
 <span class="co">#&gt; The IPIP-IPC currently has 1 normative data set(s):</span>
 <span class="co">#&gt; 1. 274 American college students</span>
 <span class="co">#&gt;   Markey &amp; Markey (2009)</span>
 <span class="co">#&gt;   &lt;https://doi.org/10.1177/1073191109340382&gt;</span></code></pre></div>
+<p>Some of these functions also have additional arguments to customize their output. For instance, the <code><a href="../reference/scales.html">scales()</a></code> function has the <code>items</code> argument, which will display the items for each scale when set to <code>TRUE</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/scales.html">scales</a></span>(ipipipc, <span class="dt">items =</span> <span class="ot">TRUE</span>)
+<span class="co">#&gt; The IPIP-IPC contains 8 circumplex scales.</span>
+<span class="co">#&gt; PA: Assured-Dominant (90 degrees)</span>
+<span class="co">#&gt;     6. Demand to be the center of interest</span>
+<span class="co">#&gt;     14. Do most of the talking</span>
+<span class="co">#&gt;     22. Speak loudly</span>
+<span class="co">#&gt;     30. Demand attention</span>
+<span class="co">#&gt; BC: Arrogant-Calculating (135 degrees)</span>
+<span class="co">#&gt;     7. Cut others to pieces</span>
+<span class="co">#&gt;     15. Contradict others</span>
+<span class="co">#&gt;     23. Snap at people</span>
+<span class="co">#&gt;     31. Have a sharp tongue</span>
+<span class="co">#&gt; DE: Cold-Hearted (180 degrees)</span>
+<span class="co">#&gt;     8. Believe people should fend for themselves</span>
+<span class="co">#&gt;     16. Don't fall for sob-stories</span>
+<span class="co">#&gt;     24. Don't put a lot of thought into things</span>
+<span class="co">#&gt;     32. Am not interested in other people's problems</span>
+<span class="co">#&gt; FG: Aloof-Introverted (225 degrees)</span>
+<span class="co">#&gt;     1. Am quiet around strangers</span>
+<span class="co">#&gt;     9. Am a very private person</span>
+<span class="co">#&gt;     17. Don't talk a lot</span>
+<span class="co">#&gt;     25. Have little to say</span>
+<span class="co">#&gt; HI: Unassured-Submissive (270 degrees)</span>
+<span class="co">#&gt;     2. Speak softly</span>
+<span class="co">#&gt;     10. Let others finish what they are saying</span>
+<span class="co">#&gt;     18. Seldom toot my own horn</span>
+<span class="co">#&gt;     26. Dislike being the center of attention</span>
+<span class="co">#&gt; JK: Unassuming-Ingenuous (315 degrees)</span>
+<span class="co">#&gt;     3. Tolerate a lot from others</span>
+<span class="co">#&gt;     11. Take things as they come</span>
+<span class="co">#&gt;     19. Think of others first</span>
+<span class="co">#&gt;     27. Seldom stretch the truth</span>
+<span class="co">#&gt; LM: Warm-Agreeable (360 degrees)</span>
+<span class="co">#&gt;     4. Am interested in people</span>
+<span class="co">#&gt;     12. Reassure others</span>
+<span class="co">#&gt;     20. Inquire about others' well-being</span>
+<span class="co">#&gt;     28. Get along well with others</span>
+<span class="co">#&gt; NO: Gregarious-Extraverted (45 degrees)</span>
+<span class="co">#&gt;     5. Feel comfortable around people</span>
+<span class="co">#&gt;     13. Start conversations</span>
+<span class="co">#&gt;     21. Talk to a lot of different people at parties</span>
+<span class="co">#&gt;     29. Love large parties</span></code></pre></div>
 <p>An additional, though advanced, option for examining the available information about an instrument is to explore the instrument object itself. This can be done within R using the <code>View()</code> function. Note that the first letter in this function (V) must be capitalized. This will open up a data viewer window like the one shown below; it will give you full access to the information stored by the package, albeit in a “raw” format. Don’t worry if the image below is confusing or overwhelming; you never have to see it again unless you want to!</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">View</span>(ipipipc)</code></pre></div>
 <p><img src="view_ipipipc.png" width="100%"></p>
@@ -309,16 +346,16 @@ iip32
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(<span class="st">"iipsc"</span>)
 <span class="kw"><a href="../reference/scales.html">scales</a></span>(iipsc)
 <span class="co">#&gt; The IIP-SC contains 8 circumplex scales.</span>
-<span class="co">#&gt; PA (090 deg): Domineering</span>
-<span class="co">#&gt; BC (135 deg): Vindictive</span>
-<span class="co">#&gt; DE (180 deg): Cold</span>
-<span class="co">#&gt; FG (225 deg): Socially Avoidant</span>
-<span class="co">#&gt; HI (270 deg): Nonassertive</span>
-<span class="co">#&gt; JK (315 deg): Exploitable</span>
-<span class="co">#&gt; LM (360 deg): Overly Nurturant</span>
-<span class="co">#&gt; NO (045 deg): Intrusive</span></code></pre></div>
+<span class="co">#&gt; PA: Domineering (90 degrees)</span>
+<span class="co">#&gt; BC: Vindictive (135 degrees)</span>
+<span class="co">#&gt; DE: Cold (180 degrees)</span>
+<span class="co">#&gt; FG: Socially Avoidant (225 degrees)</span>
+<span class="co">#&gt; HI: Nonassertive (270 degrees)</span>
+<span class="co">#&gt; JK: Exploitable (315 degrees)</span>
+<span class="co">#&gt; LM: Overly Nurturant (360 degrees)</span>
+<span class="co">#&gt; NO: Intrusive (45 degrees)</span></code></pre></div>
 <p>Although calculating the arithmetic mean of a handful of items is not terribly difficult mathematically, doing so manually (e.g., by hand) across multiple scales and multiple participants can be tedious and error-prone. To address these issues, the circumplex package offers the <code><a href="../reference/score.html">score()</a></code> function, which automatically calculates scale scores from item-level data.</p>
-<p>To demonstrate, let’s return to the <code>raw_iipsc</code> data set. We need to give the <code><a href="../reference/score.html">score()</a></code> function a data frame containing the item-level data (i.e., the data set), a list of variables from that data frame that contain the item-level responses to be scored, and an instrument object containing instructions on how to score the data. In order for scoring to work properly, the list of items must be in ascending order from the first to the last item and the ordering of the items must be the same as that assumed by the package. Be sure to check your item numbers against those displayed by the <code><a href="../reference/items.html">items()</a></code> function, especially if you shuffle your items.</p>
+<p>To demonstrate, let’s return to the <code>raw_iipsc</code> data set. We need to give the <code><a href="../reference/score.html">score()</a></code> function a data frame containing the item-level data (i.e., the data set), a list of variables from that data frame that contain the item-level responses to be scored, and an instrument object containing instructions on how to score the data. In order for scoring to work properly, <strong>the list of items must be in ascending order from the first to the last item and the ordering of the items must be the same as that assumed by the package</strong>. Be sure to check your item numbers against those displayed by the <code><a href="../reference/items.html">items()</a></code> function, especially if you shuffle your items.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">scale_scores &lt;-<span class="st"> </span><span class="kw"><a href="../reference/score.html">score</a></span>(<span class="dt">.data =</span> raw_iipsc, <span class="dt">items =</span> IIP01<span class="op">:</span>IIP32, <span class="dt">instrument =</span> iipsc)
 <span class="kw">print</span>(scale_scores)
 <span class="co">#&gt; # A tibble: 10 x 40</span>
@@ -372,7 +409,7 @@ iip32
 <span class="co">#&gt;   Soldz, Budman, Demby, &amp; Merry (1995)</span>
 <span class="co">#&gt;   &lt;https://doi.org/10.1177/1073191195002001006&gt;</span></code></pre></div>
 <p>Assuming our example data also come from a non-psychiatric community sample of mostly college students, the first normative sample seems like a better choice, especially since it is so much larger and therefore subject to less sampling error. However, there may be times when the second normative sample would be the more appropriate comparison, even despite its smaller sample.</p>
-<p>To transform the scale scores we calculated during the last section, we can call the <code><a href="../reference/standardize.html">standardize()</a></code> function and give it the <code>scale_scores</code> object we saved the item-level and scale-level data within. We will save the output of this function to a data frame named <code>z_scales</code> to reflect the idea that standardize scores are often called “z-scores.”</p>
+<p>To transform the scale scores we calculated during the last section, we can call the <code><a href="../reference/standardize.html">standardize()</a></code> function and give it the <code>scale_scores</code> object we saved the item-level and scale-level data within. We will save the output of this function to a data frame named <code>z_scales</code> to reflect the idea that standardized scores are often called “z-scores.”</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">z_scales &lt;-<span class="st"> </span><span class="kw"><a href="../reference/standardize.html">standardize</a></span>(
   <span class="dt">.data =</span> scale_scores, 
   <span class="dt">scales =</span> PA<span class="op">:</span>NO, 
@@ -401,7 +438,7 @@ iip32
 <span class="co">#&gt; #   IIP31 &lt;dbl&gt;, IIP32 &lt;dbl&gt;, PA &lt;dbl&gt;, BC &lt;dbl&gt;, DE &lt;dbl&gt;, FG &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   HI &lt;dbl&gt;, JK &lt;dbl&gt;, LM &lt;dbl&gt;, NO &lt;dbl&gt;, PA_z &lt;dbl&gt;, BC_z &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   DE_z &lt;dbl&gt;, FG_z &lt;dbl&gt;, HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;, NO_z &lt;dbl&gt;</span></code></pre></div>
-<p>Again, the output contains all the item-level, scale-level, and now the standardized scale-level variables. The new variables are named the same as the scale score variables except with a configurable prefix and suffix (by default, they are given only a suffix of <code>_z</code>). The naming can be configured using We can again use the <code><a href="../reference/select.html">select()</a></code> function to view just the newly created standardized variables. These variables are the ones we are most likely to use in subsequent analyses (e.g., the structural summary method).</p>
+<p>Again, the output contains all the item-level, scale-level, and now the standardized scale-level variables. The new variables are named the same as the scale score variables except with a configurable <code>prefix</code> and <code>suffix</code> (by default, they are given only a suffix of <code>_z</code>). We can again use the <code><a href="../reference/select.html">select()</a></code> function to view just the newly created standardized variables. These variables are the ones we are most likely to use in subsequent analyses (e.g., the structural summary method).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/select.html">select</a></span>(z_scales, PA_z<span class="op">:</span>NO_z)
 <span class="co">#&gt; # A tibble: 10 x 8</span>
 <span class="co">#&gt;       PA_z    BC_z   DE_z    FG_z   HI_z   JK_z    LM_z    NO_z</span>
@@ -422,7 +459,7 @@ iip32
 <h2 class="hasAnchor">
 <a href="#wrap-up" class="anchor"></a>4. Wrap-up</h2>
 <p>In this vignette, we learned how to preview the instruments available in the circumplex package, load and examine the information contained in one of these instrument objects, ipsatize item-level data, calculate scale scores from item-level data, and standardize those scale scores using normative data included in the package. We are now in an excellent position to discover and implement new circumplex instruments. Later vignettes describe analyses and visualizations that make use of the data collected using these tools.</p>
-<p>Special thanks to the authors and publishers who granted permission to include information about their instruments in this package: Michael Boudreaux, Christopher Hopwood, Kenneth Locke, Patrick Markey, Aaron Pincus, and MindGarden Inc.</p>
+<p>Special thanks to the authors and publishers who granted permission to include information about their instruments in this package: Michael Boudreaux, Christopher Hopwood, Leonard Horowitz, Kenneth Locke, Patrick Markey, Aaron Pincus, Elisa Trucco, and MindGarden Inc.</p>
 </div>
   </div>
 
