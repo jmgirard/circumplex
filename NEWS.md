@@ -1,3 +1,17 @@
+circumplex 0.2.0.9000
+=============================
+
+#### NEW FEATURES ####
+
+* Added one normative data set to the IIS-32
+
+#### BUG FIXES ####
+
+* Updated the IIS-32 response anchors to range from 1 to 6 to match norms
+
+#### MINOR IMPROVEMENTS ####
+* Updated the IIS-32 item ordering and scoring to match the author's version
+
 circumplex 0.2.0
 =============================
 

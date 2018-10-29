@@ -16,7 +16,7 @@ template:
       index_name: circumplex
 
 development:
-  mode: release
+  mode: devel
 
 reference:
   - title: Instrument Data
