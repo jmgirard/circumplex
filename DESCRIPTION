@@ -56,4 +56,4 @@ LinkingTo:
     RcppArmadillo (>= 0.9.200.5.0)
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
