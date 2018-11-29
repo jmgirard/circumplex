@@ -89,14 +89,14 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
   n <- nrow(df_plot)
   if (lowfit == FALSE) {
     df_plot <- df_plot %>%
-      dplyr::filter(fit >= .70)
+      dplyr::filter(fit_est >= .70)
     n2 <- nrow(df_plot)
     if (n2 < 1) {
       stop("After removing profiles, there were none left to plot.")
     }
   }
   df_plot <- df_plot %>%
-    dplyr::mutate(lnty = dplyr::if_else(fit >= .70, "solid", "dashed"))
+    dplyr::mutate(lnty = dplyr::if_else(fit_est >= .70, "solid", "dashed"))
 
   p <- circle_base(angles = angles, amax = amax, fontsize = fontsize) +
     ggplot2::scale_color_hue() +
@@ -176,7 +176,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     d_uci = ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci),
     d_lci = ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci)
   ) %>%
-    tidyr::gather(key, value, -label, -fit) %>%
+    tidyr::gather(key, value, -label, -fit_est) %>%
     tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
     tidyr::spread(Type, value) %>%
     dplyr::rename(Difference = est, Contrast = label) %>%
@@ -322,7 +322,7 @@ ssm_table <- function(.ssm_object, caption = NULL, xy = TRUE, render = TRUE) {
     `Y-Value` = sprintf("%.2f [%.2f, %.2f]", y_est, y_lci, y_uci),
     Amplitude = sprintf("%.2f [%.2f, %.2f]", a_est, a_lci, a_uci),
     Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
-    Fit = sprintf("%.3f", fit)
+    Fit = sprintf("%.3f", fit_est)
   )
 
   # Rename first column

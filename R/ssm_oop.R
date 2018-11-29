@@ -99,7 +99,7 @@ print.ssm <- function(x, digits = 3, ...) {
   for (i in 1:nrow(x$results)) {
     dat <- x$results[i, ]
     v <- c(
-      dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
+      dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit_est,
       dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
       dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
     )
@@ -140,7 +140,7 @@ summary.ssm <- function(object, digits = 3, ...) {
   for (i in 1:nrow(object$results)) {
     dat <- object$results[i, ]
     v <- c(
-      dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit,
+      dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit_est,
       dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
       dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
     )

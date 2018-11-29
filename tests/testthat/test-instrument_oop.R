@@ -83,7 +83,7 @@ test_that("The sub-summary functions produce the expected output", {
 
 test_that("The norms function detects when no norms are available", {
   isc_drop <- instrument("isc")
-  isc_drop$Norms[[2]] <- tibble::as_tibble(matrix(nrow = 0, ncol = 5))
+  isc_drop$Norms[[2]] <- tibble::new_tibble(list(), nrow = 0)
   expect_output(
     norms(isc_drop),
     "The ISC currently has no normative data sets\\."

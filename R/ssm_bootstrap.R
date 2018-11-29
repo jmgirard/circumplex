@@ -14,20 +14,21 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   )
 
   # Reshape parameters from wide to long format --------------------------------
-  reshape_params <- function(df) {
+  reshape_params <- function(df, suffix) {
     df %>%
       matrix(ncol = 6, byrow = TRUE) %>%
-      tibble::as_tibble()
+      `colnames<-`(paste0(c("e_", "x_", "y_", "a_", "d_", "fit_"), suffix)) %>% 
+      tibble::as_tibble(nrow = nrow(.))
   }
 
   # Extract point estimates from bootstrap results -----------------------------
   bs_est <- bs_results$t0 %>%
-    reshape_params() %>%
-    `colnames<-`(c("e_est", "x_est", "y_est", "a_est", "d_est", "fit"))
+    reshape_params(suffix = "est")
 
   # Set the units of the displacement results to radians -----------------------
   bs_t <- bs_results$t %>%
-    tibble::as_tibble()
+    `colnames<-`(paste0("t", 1:ncol(.))) %>% 
+    tibble::as_tibble(nrow = nrow(.))
   if (contrast == "none" || contrast == "model") {
     d_vars <- 1:(ncol(bs_t) / 6) * 6 - 1
   } else if (contrast == "test") {
@@ -38,16 +39,14 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   # Calculate the lower bounds of the confidence intervals ---------------------
   bs_lci <- bs_t %>%
     purrr::map_dbl(.f = quantile, probs = ((1 - interval) / 2)) %>%
-    reshape_params() %>%
-    `colnames<-`(c("e_lci", "x_lci", "y_lci", "a_lci", "d_lci", "f_lci")) %>%
-    dplyr::select(-f_lci)
+    reshape_params(suffix = "lci") %>%
+    dplyr::select(-fit_lci)
 
   # Calculate the upper bounds of the confidence intervals ---------------------
   bs_uci <- bs_t %>%
     purrr::map_dbl(.f = quantile, probs = (1 - (1 - interval) / 2)) %>%
-    reshape_params() %>%
-    `colnames<-`(c("e_uci", "x_uci", "y_uci", "a_uci", "d_uci", "f_uci")) %>%
-    dplyr::select(-f_uci)
+    reshape_params(suffix = "uci") %>%
+    dplyr::select(-fit_uci)
 
   # Combine the results in one tibble and convert radians to degrees -----------
   dplyr::bind_cols(bs_est, bs_lci, bs_uci) %>%
