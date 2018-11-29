@@ -1,4 +1,4 @@
-circumplex 0.2.0.9000
+circumplex 0.2.1
 =============================
 
 #### NEW FEATURES ####
