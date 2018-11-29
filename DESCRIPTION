@@ -38,7 +38,7 @@ Imports:
     magrittr (>= 1.5),
     purrr (>= 0.2.5),
     Rcpp (>= 1.0.0),
-    rlang (>= 0.3.0.1),
+    rlang (>= 0.3.0),
     stats,
     tibble (>= 1.4.2),
     tidyr (>= 0.8.2)
@@ -53,7 +53,7 @@ Suggests:
     testthat (>= 2.0.1)
 LinkingTo: 
     Rcpp (>= 1.0.0),
-    RcppArmadillo (>= 0.9.200.5.0)
+    RcppArmadillo (>= 0.9.0)
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
