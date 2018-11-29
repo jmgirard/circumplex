@@ -1,7 +1,7 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Added a new features (information about a new instrument)
+* Added new features (information about a new instrument)
 * Removed an upstream package dependency that wasn't being used
 * Updated code to avoid issues with a new upstream dependency version
 
