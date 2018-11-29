@@ -9,8 +9,11 @@ circumplex 0.2.0.9000
 #### BUG FIXES ####
 
 * Updated the IIS-32 response anchors to range from 1 to 6 to match norms
+* Changed use of tibble functions to avoid problems when new version releases
+* Removed dependency on MASS package (until it is used by exported functions)
 
 #### MINOR IMPROVEMENTS ####
+
 * Updated the IIS-32 item ordering and scoring to match the author's version
 
 circumplex 0.2.0
