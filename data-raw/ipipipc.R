@@ -26,6 +26,7 @@ ipip_scales <- tibble::tibble(
 ipip_norms <- tibble::tibble(
   Sample = rep(1, 8),
   Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+  Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   M = c(2.66, 2.27, 2.46, 2.68, 3.20, 3.64, 4.37, 3.64),
   SD = c(0.71, 0.69, 0.58, 0.79, 0.63, 0.58, 0.47, 0.78)
 )
