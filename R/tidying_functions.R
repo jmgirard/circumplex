@@ -34,7 +34,7 @@ ipsatize <- function(.data, items, na.rm = TRUE, overwrite = FALSE) {
       dplyr::mutate(.im = rowMeans(., na.rm = na.rm)) %>%
       dplyr::mutate_at(
         .vars = dplyr::vars(!!items_en),
-        .funs = dplyr::funs(. - .im)
+        .funs = list(~(. - .im))
       ) %>% 
       dplyr::select(-.im)
   } else {
@@ -43,7 +43,7 @@ ipsatize <- function(.data, items, na.rm = TRUE, overwrite = FALSE) {
       dplyr::mutate(.im = rowMeans(., na.rm = na.rm)) %>% 
       dplyr::mutate_at(
         .vars = dplyr::vars(!!items_en),
-        .funs = dplyr::funs(i = . - .im)
+        .funs = list(i = ~(. - .im))
       ) %>% 
       dplyr::select(-.im)
   }
