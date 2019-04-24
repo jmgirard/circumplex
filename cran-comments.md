@@ -5,8 +5,11 @@ This is a resubmission intended to return the package from being archived. In th
 * Modified some code to avoid calling a function that is being deprecated by a dependency
 
 ## Test environments
-* ubuntu 14.04 (on travis-ci), R 3.5.1
-* win-builder (devel, release, and oldrelease)
+
+* local: mingw32-3.5.3
+* travis: 3.1, 3.2, 3.3, oldrel, release, devel
+* r-hub: windows-x86_64-devel, ubuntu-gcc-release, fedora-clang-devel
+* win-builder: windows-x86_64-devel
 
 ## R CMD check results
 0 errors | 0 warnings | 0 notes
