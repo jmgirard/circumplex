@@ -24,6 +24,7 @@ test_that("ipsatize works", {
 })
 
 test_that("score works", {
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   old <- data.frame(
     matrix(
@@ -46,6 +47,7 @@ test_that("score works", {
 
 test_that("standardize works", {
   instrument("iipsc")
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   old <- data.frame(
     matrix(

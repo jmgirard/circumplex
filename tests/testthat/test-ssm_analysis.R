@@ -2,6 +2,7 @@ context("test-ssm_analysis.R")
 
 test_that("Single-group mean-based SSM results are correct", {
   data("aw2009")
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(aw2009, PA:NO, octants())
 
@@ -52,6 +53,7 @@ test_that("Multiple-group mean-based SSM results are correct", {
   skip_on_cran()
 
   data("jz2017")
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
 
@@ -103,6 +105,7 @@ test_that("Multiple-group mean-based SSM contrast is correct", {
   skip_on_cran()
 
   data("jz2017")
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     grouping = Gender,
@@ -180,6 +183,7 @@ test_that("Scale magnitudes greater than 5 trigger message", {
 
 test_that("Single-group correlation-based SSM results are correct", {
   data("jz2017")
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
 
@@ -277,6 +281,7 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   skip_on_cran()
 
   data("jz2017")
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     measures = c(ASPD, NARPD),
@@ -333,6 +338,7 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   skip_on_cran()
 
   data("jz2017")
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     measures = NARPD,
