@@ -1,9 +1,8 @@
 ## Resubmission
-This is a resubmission. In this version I have:
+This is a resubmission intended to return the package from being archived. In this version I have:
 
-* Added new features (information about a new instrument)
-* Removed an upstream package dependency that wasn't being used
-* Updated code to avoid issues with a new upstream dependency version
+* Fixed check errors in development R by explicitly setting the RNG version in seeded tets
+* Modified some code to avoid calling a function that is being deprecated by a dependency
 
 ## Test environments
 * ubuntu 14.04 (on travis-ci), R 3.5.1
