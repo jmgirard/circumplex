@@ -145,16 +145,13 @@ standardize <- function(.data, scales, angles, instrument, sample = 1,
     dplyr::filter(Sample == sample)
   assert_that(length(scale_names) <= nrow(key))
   for (i in 1:length(angles)) {
-    scale_i <- scale_names[[i]]
+    scale_i <- rlang::sym(scale_names[[i]])
     new_var <- rlang::sym(paste0(prefix, scale_i, suffix))
     index_i <- key$Angle == angles[[i]]
     m_i <- key$M[index_i]
     s_i <- key$SD[index_i]
     .data <- .data %>%
-      dplyr::mutate_at(
-        .vars = scale_i,
-        .funs = dplyr::funs(!!new_var := (. - m_i) / s_i)
-      )
+      dplyr::mutate(!!new_var := (!!scale_i - m_i) / s_i)
   }
   .data
 }
