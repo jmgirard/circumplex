@@ -45,10 +45,8 @@ Imports:
     tidyr (>= 0.8.3)
 Suggests: 
     covr (>= 3.2.1),
-    forcats (>= 0.4.0),
     kableExtra (>= 1.1.0),
     knitr (>= 1.22),
-    psych (>= 1.8.12),
     rmarkdown (>= 1.12),
     roxygen2 (>= 6.1.1),
     testthat (>= 2.1.1)
