@@ -7,13 +7,14 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
 library(circumplex)
 ```
+
 
 ## 1. Overview of Instrument-related Functions
 Although the circumplex package is capable of analyzing and visualizing data in a "source-agnostic" manner (i.e., without knowing what the numbers correspond to), it can be helpful to both the user and the package to have more contextual information about which instrument/questionnaire the data come from. For example, knowing the specific instrument used can enable the package to automatically score item-level responses and standardize these scores using normative data. Furthermore, a centralized repository of information about circumplex instruments would provide a convenient and accessible way for users to discover and begin using new instruments. To address these needs, a suite of new instrument-related functions (and underlying data to power them) was added to the circumplex package in version 0.2.0.
@@ -43,7 +44,7 @@ print(csip)
 
 Note, however, that an error will result if the `print()` function (or any of the functions to be described later) is called before the `instrument()` function has loaded the data. Order of operations is important!
 
-```{r, error=TRUE}
+```{r, error = TRUE, purl = FALSE}
 print(isc)
 ```
 
