@@ -1,10 +1,12 @@
 circumplex (development version)
 =============================
 
+* Added support for older versions of R (3.3.x)
 * Fixed a bug in the normative data for IPIP-IPC that prevented standardization
 * Fixed a bug caused by changes in how random numbers are generated in R
 * Fixed several broken links by running package through new version of usethis
 * Replaced use of dplyr::funs() as this function is being deprecated
+* Fixed warnings related to documentation inherited from other packages
 
 circumplex 0.2.1
 =============================
