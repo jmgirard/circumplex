@@ -9,7 +9,7 @@ lhs \%>\% rhs
 lhs \%>\% rhs
 }
 \description{
-See \code{magrittr::\link[magrittr]{\%>\%}} for details.
+See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
 
 See \code{magrittr} for details.
 }
