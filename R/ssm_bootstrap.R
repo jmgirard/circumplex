@@ -17,7 +17,7 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   reshape_params <- function(df, suffix) {
     df %>%
       matrix(ncol = 6, byrow = TRUE) %>%
-      `colnames<-`(paste0(c("e_", "x_", "y_", "a_", "d_", "fit_"), suffix)) %>% 
+      `colnames<-`(paste0(c("e_", "x_", "y_", "a_", "d_", "fit_"), suffix)) %>%
       tibble::as_tibble(nrow = nrow(.))
   }
 
@@ -27,7 +27,7 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
 
   # Set the units of the displacement results to radians -----------------------
   bs_t <- bs_results$t %>%
-    `colnames<-`(paste0("t", 1:ncol(.))) %>% 
+    `colnames<-`(paste0("t", 1:ncol(.))) %>%
     tibble::as_tibble(nrow = nrow(.))
   if (contrast == "none" || contrast == "model") {
     d_vars <- 1:(ncol(bs_t) / 6) * 6 - 1

@@ -23,10 +23,9 @@
 #' data("raw_iipsc")
 #' ipsatize(raw_iipsc, IIP01:IIP32)
 ipsatize <- function(.data, items, na.rm = TRUE, overwrite = FALSE) {
-  
   assert_that(is_provided(.data), is_enquo(items))
   assert_that(is.flag(na.rm), is.flag(overwrite))
-  
+
   items_en <- rlang::enquo(items)
   if (overwrite == TRUE) {
     .data %>%
@@ -34,17 +33,17 @@ ipsatize <- function(.data, items, na.rm = TRUE, overwrite = FALSE) {
       dplyr::mutate(.im = rowMeans(., na.rm = na.rm)) %>%
       dplyr::mutate_at(
         .vars = dplyr::vars(!!items_en),
-        .funs = list(~(. - .im))
-      ) %>% 
+        .funs = list(~ (. - .im))
+      ) %>%
       dplyr::select(-.im)
   } else {
-    .data %>% 
-      dplyr::select(!!items_en) %>% 
-      dplyr::mutate(.im = rowMeans(., na.rm = na.rm)) %>% 
+    .data %>%
+      dplyr::select(!!items_en) %>%
+      dplyr::mutate(.im = rowMeans(., na.rm = na.rm)) %>%
       dplyr::mutate_at(
         .vars = dplyr::vars(!!items_en),
-        .funs = list(i = ~(. - .im))
-      ) %>% 
+        .funs = list(i = ~ (. - .im))
+      ) %>%
       dplyr::select(-.im)
   }
 }
@@ -79,7 +78,6 @@ ipsatize <- function(.data, items, na.rm = TRUE, overwrite = FALSE) {
 #' instrument("iipsc")
 #' score(raw_iipsc, IIP01:IIP32, iipsc)
 score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = "") {
-  
   items_en <- rlang::enquo(items)
 
   assert_that(is_provided(.data), is_enquo(!!items_en), is_provided(instrument))

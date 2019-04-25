@@ -15,18 +15,22 @@
 #' \donttest{
 #' # Load example data
 #' data("jz2017")
-#'
+#' 
 #' # Plot profile results
-#' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
-#'   measures = c(NARPD, ASPD))
+#' res <- ssm_analyze(jz2017,
+#'   scales = PA:NO, angles = octants(),
+#'   measures = c(NARPD, ASPD)
+#' )
 #' p <- ssm_plot(res)
-#'
+#' 
 #' # Plot contrast results
-#' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
-#'   measures = c(NARPD, ASPD), contrast = "test")
+#' res <- ssm_analyze(jz2017,
+#'   scales = PA:NO, angles = octants(),
+#'   measures = c(NARPD, ASPD), contrast = "test"
+#' )
 #' p <- ssm_plot(res)
 #' }
-
+#' 
 ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 
   # Check for valid input arguments
@@ -290,18 +294,22 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
 #' \donttest{
 #' # Load example data
 #' data("jz2017")
-#'
+#' 
 #' # Create table of profile results
-#' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
-#'   measures = c(NARPD, ASPD))
+#' res <- ssm_analyze(jz2017,
+#'   scales = PA:NO, angles = octants(),
+#'   measures = c(NARPD, ASPD)
+#' )
 #' ssm_table(res)
-#'
+#' 
 #' # Create table of contrast results
-#' res <- ssm_analyze(jz2017, scales = PA:NO, angles = octants(),
-#'   measures = c(NARPD, ASPD), contrast = "test")
+#' res <- ssm_analyze(jz2017,
+#'   scales = PA:NO, angles = octants(),
+#'   measures = c(NARPD, ASPD), contrast = "test"
+#' )
 #' ssm_table(res)
 #' }
-
+#' 
 ssm_table <- function(.ssm_object, caption = NULL, xy = TRUE, render = TRUE) {
   assert_that(is_provided(.ssm_object))
   assert_that(is.null(caption) || is.string(caption))

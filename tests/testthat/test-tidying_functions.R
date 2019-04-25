@@ -11,7 +11,7 @@ test_that("ipsatize works", {
   expect_equal(new$JK_i, c(2.0575, 0.5575, -0.2700, 0.7350, 0.5150))
   expect_equal(new$LM_i, c(1.3475, 1.5475, 1.3100, 0.9750, 0.5950))
   expect_equal(new$NO_i, c(-0.1625, 1.2875, 0.3400, -0.1450, -0.0450))
-  
+
   ow <- ipsatize(aw2009, PA:NO, overwrite = TRUE)
   expect_equal(ow$PA, c(-1.5225, 0.8975, 0.9800, -0.1550, -0.4450))
   expect_equal(ow$BC, c(-1.4725, -1.2725, -0.5800, -1.0750, -0.5750))

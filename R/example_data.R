@@ -49,10 +49,10 @@
 "jz2017"
 
 #' Raw item responses on real circumplex scales
-#' 
+#'
 #' A small example dataset containing raw item responses on the Inventory of
 #' Interpersonal Problems, Short Circumplex (IIP-SC). This data set is useful
 #' for testing functions that operate on item-level data.
-#' 
+#'
 #' @format A data frame with 10 observations and 32 variables.
 "raw_iipsc"

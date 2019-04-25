@@ -20,7 +20,8 @@ print.instrument <- function(x, ...) {
     glue("{x$Details$Abbrev}: {x$Details$Name}"), "\n",
     glue("{x$Details$Items} items, {x$Details$Scales} scales, {nrow(x$Norms[[2]])} normative data sets"), "\n",
     glue("{x$Details$Reference}"), "\n",
-    glue("<{x$Details$URL}>"), "\n", sep = ""
+    glue("<{x$Details$URL}>"), "\n",
+    sep = ""
   )
 }
 
@@ -75,11 +76,12 @@ scales <- function(x, items = FALSE) {
     xi <- x$Scales[i, ]
     cat(
       glue("{xi$Abbrev}: {xi$Label} ({xi$Angle} degrees)"),
-      "\n", sep = ""
+      "\n",
+      sep = ""
     )
     if (items == TRUE) {
       item_nums <- as.integer(strsplit(xi$Items, ",")[[1]])
-      for (j in 1:length(item_nums)){
+      for (j in 1:length(item_nums)) {
         num_j <- item_nums[[j]]
         item_j <- x$Items[num_j, "Text"]
         cat(glue("    {num_j}. {item_j}"), "\n", sep = "")
@@ -110,7 +112,8 @@ items <- function(x) {
     glue(
       "The {x$Details$Abbrev} contains {x$Details$Items} items ({x$Details$Status}):"
     ),
-    "\n", sep = ""
+    "\n",
+    sep = ""
   )
   for (i in 1:nrow(x$Items)) {
     xi <- x$Items[i, ]
@@ -144,14 +147,16 @@ anchors <- function(x) {
       "The {x$Details$Abbrev} is rated using the following ",
       "{nrow(x$Anchors)}-point scale."
     ),
-    "\n", sep = ""
+    "\n",
+    sep = ""
   )
   for (i in seq_along(x$Anchors$Value)) {
     cat(
       glue(
         "{x$Anchors$Value[[i]]}. {x$Anchors$Label[[i]]}"
       ),
-      "\n", sep = ""
+      "\n",
+      sep = ""
     )
   }
 
@@ -181,7 +186,8 @@ norms <- function(x) {
   if (n_norms == 0) {
     cat(
       glue("The {x$Details$Abbrev} currently has no normative data sets."),
-      "\n", sep = ""
+      "\n",
+      sep = ""
     )
     return()
   }
@@ -190,7 +196,8 @@ norms <- function(x) {
     glue(
       "The {x$Details$Abbrev} currently has {n_norms} normative data set(s):"
     ),
-    "\n", sep = ""
+    "\n",
+    sep = ""
   )
 
   for (i in 1:n_norms) {
@@ -203,7 +210,8 @@ norms <- function(x) {
       glue("{samples$Reference[[i]]}"),
       "\n  ",
       glue("<{samples$URL[[i]]}>"),
-      "\n", sep = ""
+      "\n",
+      sep = ""
     )
   }
 
