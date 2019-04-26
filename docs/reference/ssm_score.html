@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Angular displacements for octant circumplex scales — octants • circumplex</title>
+<title>Calculate SSM parameters by row and add results as new columns — ssm_score • circumplex</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -36,11 +36,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Angular displacements for octant circumplex scales — octants" />
+<meta property="og:title" content="Calculate SSM parameters by row and add results as new columns — ssm_score" />
 
-<meta property="og:description" content="Return a vector of angular displacements, in degrees, for eight equally
-spaced circumplex scales corresponding to the circumplex octants. Can be
-passed to the angles parameter of other functions in this package." />
+<meta property="og:description" content="Calculate the SSM parameters for each row of a data frame and add the results
+as additional columns. This can be useful when the SSM is being used for the
+description or visualization of individual data points rather than for
+statistical inference on groups of data points." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -136,38 +137,84 @@ passed to the angles parameter of other functions in this package." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Angular displacements for octant circumplex scales</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/convenience_functions.R'><code>R/convenience_functions.R</code></a></small>
-    <div class="hidden name"><code>octants.Rd</code></div>
+    <h1>Calculate SSM parameters by row and add results as new columns</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jmgirard/circumplex/blob/master/R/ssm_analysis.R'><code>R/ssm_analysis.R</code></a></small>
+    <div class="hidden name"><code>ssm_score.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Return a vector of angular displacements, in degrees, for eight equally
-spaced circumplex scales corresponding to the circumplex octants. Can be
-passed to the <code>angles</code> parameter of other functions in this package.</p>
+    <p>Calculate the SSM parameters for each row of a data frame and add the results
+as additional columns. This can be useful when the SSM is being used for the
+description or visualization of individual data points rather than for
+statistical inference on groups of data points.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>octants</span>()</pre>
-        
+    <pre class="usage"><span class='fu'>ssm_score</span>(<span class='no'>.data</span>, <span class='no'>scales</span>, <span class='no'>angles</span>, <span class='no'>...</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>.data</th>
+      <td><p>Required. A data frame containing at least circumplex scales.</p></td>
+    </tr>
+    <tr>
+      <th>scales</th>
+      <td><p>Required. The variable names or column numbers for the
+variables in <code>.data</code> that contain circumplex scales to be analyzed.</p></td>
+    </tr>
+    <tr>
+      <th>angles</th>
+      <td><p>Required. A numeric vector containing the angular displacement
+of each circumplex scale included in <code>scales</code> (in degrees).</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Optional. Additional parameters to pass to
+<code><a href='ssm_parameters.html'>ssm_parameters</a>()</code>, such as <code>prefix</code> and <code>suffix</code>.</p></td>
+    </tr>
+    </table>
+    
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A numeric vector with eight elements, each corresponding to the
-angular displacement (in degrees) of a subscale, in the following order:
-PA, BC, DE, FG, HI, JK, LM, NO.</p>
+    <p>A data frame containing <code>.data</code> plus six additional columns
+containing the SSM parameters (calculated rowwise).</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other ssm functions: <code><a href='ssm_analyze.html'>ssm_analyze</a></code>,
+  <code><a href='ssm_append.html'>ssm_append</a></code>, <code><a href='ssm_parameters.html'>ssm_parameters</a></code>,
+  <code><a href='ssm_plot.html'>ssm_plot</a></code>, <code><a href='ssm_table.html'>ssm_table</a></code></p>
+<p>Other analysis functions: <code><a href='ssm_analyze.html'>ssm_analyze</a></code>,
+  <code><a href='ssm_parameters.html'>ssm_parameters</a></code></p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>octants</span>()</div><div class='output co'>#&gt; [1]  90 135 180 225 270 315 360  45
-#&gt; attr(,"class")
-#&gt; [1] "degree"  "numeric"</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='st'>"aw2009"</span>)
+<span class='fu'>ssm_score</span>(<span class='no'>aw2009</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>())</div><div class='output co'>#&gt;      PA    BC    DE    FG    HI    JK   LM   NO    Elev      Xval       Yval
+#&gt; 1 -1.09 -1.04 -0.97  0.61  1.41  2.49 1.78 0.27  0.4325 1.2514177 -1.3091258
+#&gt; 2  1.13 -1.04 -0.97 -0.79 -0.56  0.79 1.78 1.52  0.2325 1.4193555  0.5073528
+#&gt; 3  0.91 -0.65 -0.80 -0.96 -0.23 -0.34 1.24 0.27 -0.0700 0.7822361  0.4476346
+#&gt; 4  0.47 -0.45 -0.29  0.26  1.57  1.36 1.60 0.48  0.6250 0.8313567 -0.5560749
+#&gt; 5  0.45  0.32  0.43  0.96  1.25  1.41 1.49 0.85  0.8950 0.4382412 -0.4121320
+#&gt;        Ampl      Disp       Fit
+#&gt; 1 1.8110374 313.70892 0.9706769
+#&gt; 2 1.5073079  19.66958 0.9172710
+#&gt; 3 0.9012602  29.78035 0.7137698
+#&gt; 4 1.0001866 326.22237 0.8784837
+#&gt; 5 0.6015880 316.75861 0.9674101</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

@@ -44,7 +44,7 @@ syms() creates a list of symbols from a
 character vector.
 expr() and quo() quote
 one expression. quo() wraps the quoted expression in a quosure.
-The plural variants rlang::exprs() and
+The plural variants exprs() and
 quos() return a list of quoted expressions or
 quosures.
 enexpr() and enquo()
@@ -91,7 +91,7 @@ http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -162,12 +162,12 @@ http://rlang.r-lib.org and the Metaprogramming section of Advanced R." />
     <div class="ref-description">
     
     <ul>
-<li><p><code><a href='https://rlang.r-lib.org/reference/sym.html'>sym</a>()</code> creates a symbol from a string and
-<code><a href='https://rlang.r-lib.org/reference/sym.html'>syms</a>()</code> creates a list of symbols from a
+<li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>sym</a>()</code> creates a symbol from a string and
+<code><a href='https://rlang.r-lib.org/reference/quotation.html'>syms</a>()</code> creates a list of symbols from a
 character vector.</p></li>
 <li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>expr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>quo</a>()</code> quote
 one expression. <code>quo()</code> wraps the quoted expression in a quosure.</p>
-<p>The plural variants <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code> and
+<p>The plural variants <code><a href='https://rlang.r-lib.org/reference/quotation.html'>exprs()</a></code> and
 <code><a href='https://rlang.r-lib.org/reference/quotation.html'>quos</a>()</code> return a list of quoted expressions or
 quosures.</p></li>
 <li><p><code><a href='https://rlang.r-lib.org/reference/quotation.html'>enexpr</a>()</code> and <code><a href='https://rlang.r-lib.org/reference/quotation.html'>enquo</a>()</code>
@@ -181,7 +181,7 @@ capture multiple expressions supplied as arguments, including
     <p><code>exprs()</code> is not exported to avoid conflicts with <code>Biobase::exprs()</code>,
 therefore one should always use <code><a href='https://rlang.r-lib.org/reference/quotation.html'>rlang::exprs()</a></code>.</p>
 <p>To learn more about tidy eval and how to use these tools, visit
-<a href='http://rlang.r-lib.org'>http://rlang.r-lib.org</a> and the <a href='https://adv-r.hadley.nz/introduction-16.html'>Metaprogramming section</a> of <a href='https://adv-r.hadley.nz'>Advanced R</a>.</p>
+<a href='http://rlang.r-lib.org'>http://rlang.r-lib.org</a> and the <a href='https://adv-r.hadley.nz/metaprogramming.html'>Metaprogramming section</a> of <a href='https://adv-r.hadley.nz'>Advanced R</a>.</p>
     
     </div>
 

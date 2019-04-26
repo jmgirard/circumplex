@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -173,7 +173,8 @@ of text in the figure, in points (default = 12).</p></td>
 
     <div class='dont-index'><p>ggsave Function for saving plots to image files.</p>
 <p>Other ssm functions: <code><a href='ssm_analyze.html'>ssm_analyze</a></code>,
-  <code><a href='ssm_append.html'>ssm_append</a></code>, <code><a href='ssm_table.html'>ssm_table</a></code></p></div>
+  <code><a href='ssm_append.html'>ssm_append</a></code>, <code><a href='ssm_parameters.html'>ssm_parameters</a></code>,
+  <code><a href='ssm_score.html'>ssm_score</a></code>, <code><a href='ssm_table.html'>ssm_table</a></code></p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -181,14 +182,19 @@ of text in the figure, in points (default = 12).</p></td>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='st'>"jz2017"</span>)
 
 <span class='co'># Plot profile results</span>
-<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>))
+<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>,
+  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
+  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>)
+)
 <span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'>ssm_plot</span>(<span class='no'>res</span>)
 
 <span class='co'># Plot contrast results</span>
-<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>)
-<span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'>ssm_plot</span>(<span class='no'>res</span>)</div></pre>
+<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>,
+  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
+  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>
+)
+<span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'>ssm_plot</span>(<span class='no'>res</span>)</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

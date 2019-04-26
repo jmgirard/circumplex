@@ -72,7 +72,7 @@ desired formatting." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -181,7 +181,8 @@ side-effect, may also output the HTML table to the web viewer.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other ssm functions: <code><a href='ssm_analyze.html'>ssm_analyze</a></code>,
-  <code><a href='ssm_append.html'>ssm_append</a></code>, <code><a href='ssm_plot.html'>ssm_plot</a></code></p>
+  <code><a href='ssm_append.html'>ssm_append</a></code>, <code><a href='ssm_parameters.html'>ssm_parameters</a></code>,
+  <code><a href='ssm_plot.html'>ssm_plot</a></code>, <code><a href='ssm_score.html'>ssm_score</a></code></p>
 <p>Other table functions: <code><a href='html_render.html'>html_render</a></code>,
   <code><a href='ssm_append.html'>ssm_append</a></code></p></div>
     
@@ -191,8 +192,10 @@ side-effect, may also output the HTML table to the web viewer.</p>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='st'>"jz2017"</span>)
 
 <span class='co'># Create table of profile results</span>
-<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>))
+<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>,
+  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
+  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>)
+)
 <span class='fu'>ssm_table</span>(<span class='no'>res</span>)</div><div class='output co'>#&gt; &lt;table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' &gt;
 #&gt; &lt;thead&gt;
 #&gt; &lt;tr&gt;&lt;td colspan='7' style='text-align: left;'&gt;
@@ -233,8 +236,10 @@ side-effect, may also output the HTML table to the web viewer.</p>
 #&gt; </span><span style='color: #555555;'>1</span><span> NARPD   0.20 [0.17,~ -0.06 [-0.0~ 0.18 [0.15~ 0.19 [0.15~ 109.0 [99.3, ~ 0.957
 #&gt; </span><span style='color: #555555;'>2</span><span> ASPD    0.12 [0.09,~ -0.10 [-0.1~ 0.20 [0.17~ 0.23 [0.19~ 115.9 [107.5,~ 0.964</div><div class='input'>
 <span class='co'># Create table of contrast results</span>
-<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>)
+<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>,
+  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
+  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>
+)
 <span class='fu'>ssm_table</span>(<span class='no'>res</span>)</div><div class='output co'>#&gt; &lt;table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' &gt;
 #&gt; &lt;thead&gt;
 #&gt; &lt;tr&gt;&lt;td colspan='7' style='text-align: left;'&gt;
@@ -264,7 +269,8 @@ side-effect, may also output the HTML table to the web viewer.</p>
 #&gt;   Contrast `&amp;Delta; Elevat~ `&amp;Delta; X-Valu~ `&amp;Delta; Y-Valu~ `&amp;Delta; Amplit~
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>           
 #&gt; </span><span style='color: #555555;'>1</span><span> ASPD - ~ -0.08 [-0.12, -~ -0.04 [-0.08, -~ 0.02 [-0.01, 0.~ 0.04 [-0.00, 0.~
-#&gt; </span><span style='color: #555555;'># ... with 2 more variables: `&amp;Delta; Displacement` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, `&amp;Delta; Fit` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div></span></pre>
+#&gt; </span><span style='color: #555555;'># ... with 2 more variables: `&amp;Delta; Displacement` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, `&amp;Delta; Fit` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div></span><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
