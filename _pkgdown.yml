@@ -55,6 +55,8 @@ reference:
       - ssm_analyze
       - ssm_table
       - ssm_plot
+      - ssm_parameters
+      - ssm_score
   - title: Secondary SSM Functions
     desc: Functions for customizing SSM results
     contents:
