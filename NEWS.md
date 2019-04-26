@@ -1,3 +1,5 @@
+# circumplex 0.3.0
+
 circumplex (development version)
 =============================
 
