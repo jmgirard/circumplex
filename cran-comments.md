@@ -8,7 +8,9 @@
 ## R CMD check results
 0 errors | 0 warnings | 1 note
 
-* New submission, Package was archived on CRAN
+* New submission
+
+Package was archived on CRAN
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package
