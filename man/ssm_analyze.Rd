@@ -107,7 +107,11 @@ ssm_analyze(jz2017,
 }
 \seealso{
 Other ssm functions: \code{\link{ssm_append}},
-  \code{\link{ssm_plot}}, \code{\link{ssm_table}}
+  \code{\link{ssm_parameters}}, \code{\link{ssm_plot}},
+  \code{\link{ssm_score}}, \code{\link{ssm_table}}
+
+Other analysis functions: \code{\link{ssm_parameters}},
+  \code{\link{ssm_score}}
 }
 \concept{analysis functions}
 \concept{ssm functions}

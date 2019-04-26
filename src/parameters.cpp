@@ -19,7 +19,7 @@ double modu(double x, double y) {
 
 // Calculate structural summary parameters (angles and displacement in radians)
 // [[Rcpp::export]]
-arma::vec ssm_parameters(arma::vec scores, arma::vec angles) {
+arma::vec ssm_parameters_cpp(arma::vec scores, arma::vec angles) {
   double n = scores.size();
   double elev = arma::mean(scores);
   double xval = (2 / n) * inner(scores, arma::cos(angles));
@@ -38,7 +38,7 @@ arma::vec group_parameters(arma::mat scores, arma::vec angles) {
   double n = scores.n_rows;
   arma::vec out = arma::zeros<arma::vec>(n * 6);
   for (int i(0); i < n; i++) {
-    out.subvec(i * 6, i * 6 + 5) = ssm_parameters(scores.row(i).t(), angles);
+    out.subvec(i * 6, i * 6 + 5) = ssm_parameters_cpp(scores.row(i).t(), angles);
   }
   return out;
 }

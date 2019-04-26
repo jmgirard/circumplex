@@ -420,3 +420,125 @@ ssm_analyze_corrs <- function(.data, scales, angles, measures, grouping,
 
   out
 }
+
+#' Calculate Structural Summary Method parameters for a set of scores
+#'
+#' Calculate SSM parameters (without confidence intervals) for a set of scores
+#' and generate a tibble with customizable labels for each parameter value. This
+#' function requires the input to be a numeric vector (or coercable to one) and
+#' returns only the parameters. See \code{\link{ssm_score}()} for a similar
+#' function that calculates SSM parameters for each row of a data frame.
+#'
+#' @param scores Required. A numeric vector (or single row data frame)
+#'   containing one score for each of a set of circumplex scales.
+#' @param angles Required. A numeric vector containing the angular displacement
+#'   of each circumplex scale included in \code{scores} (in degrees).
+#' @param prefix Optional. A string to append to the beginning of all of the SSM
+#'   parameters' variable names (default = "").
+#' @param suffix Optional. A string to append to the end of all of the SSM
+#'   parameters' variable names (default = "").
+#' @param e_label Optional. A string representing the variable name of the SSM
+#'   elevation parameter (default = "Elev").
+#' @param x_label Optional. A string representing the variable name of the SSM
+#'   x-value parameter (default = "Xval").
+#' @param y_label Optional. A string representing the variable name of the SSM
+#'   y-value parameter (default = "Yval").
+#' @param a_label Optional. A string representing the variable name of the SSM
+#'   amplitude parameter (default = "Ampl").
+#' @param d_label Optional. A string representing the variable name of the SSM
+#'   displacement parameter (default = "Disp").
+#' @param f_label Optional. A string representing the variable name of the SSM
+#'   fit or R-squared value (default = "Fit").
+#' @return A tibble containing the SSM parameters calculated from \code{scores}.
+#' @family ssm functions
+#' @family analysis functions
+#' @export
+#' @examples
+#' # Manually enter octant scores
+#' scores <- c(0.55, 0.58, 0.62, 0.76, 1.21, 1.21, 1.48, 0.90)
+#' ssm_parameters(scores, angles = octants())
+#'
+#' # Customize several of the labels
+#' ssm_parameters(scores, angles = octants(), x_label = "LOV", y_label = "DOM")
+#'
+#' # Add a prefix to all labels
+#' ssm_parameters(scores, angles = octants(), prefix = "IIP_")
+#' 
+ssm_parameters <- function(scores, angles, prefix = "", suffix = "", 
+                           e_label = "Elev", x_label = "Xval", y_label = "Yval",
+                           a_label = "Ampl", d_label = "Disp", f_label = "Fit") {
+
+  assert_that(is_numvec(scores), is_numvec(angles))
+  scores <- scores %>% as.numeric()
+  assert_that(
+    length(scores) == length(angles), 
+    msg = "The 'scores' and 'angles' arguments must have the same length."
+  )
+  assert_that(
+    rlang::is_character(prefix), rlang::is_character(suffix),
+    msg = "The 'prefix' and 'suffix' arguments must be a string."
+  )
+  assert_that(
+    rlang::is_character(e_label), rlang::is_character(x_label), 
+    rlang::is_character(y_label), rlang::is_character(a_label), 
+    rlang::is_character(d_label), rlang::is_character(f_label),
+    msg = "The 'label' arguments must be strings."
+  )
+  
+  
+  angles <- angles %>% as_degree() %>% as_radian()
+  params <- ssm_parameters_cpp(scores, angles)
+  params[[5]] <- params[[5]] %>% as_radian() %>% as_degree()
+  
+  tibble::tibble(
+    !!rlang::sym(paste0(prefix, e_label, suffix)) := params[[1]],
+    !!rlang::sym(paste0(prefix, x_label, suffix)) := params[[2]],
+    !!rlang::sym(paste0(prefix, y_label, suffix)) := params[[3]],
+    !!rlang::sym(paste0(prefix, a_label, suffix)) := params[[4]],
+    !!rlang::sym(paste0(prefix, d_label, suffix)) := params[[5]],
+    !!rlang::sym(paste0(prefix, f_label, suffix)) := params[[6]]
+  )
+}
+
+#' Calculate SSM parameters by row and add results as new columns
+#'
+#' Calculate the SSM parameters for each row of a data frame and add the results
+#' as additional columns. This can be useful when the SSM is being used for the
+#' description or visualization of individual data points rather than for
+#' statistical inference on groups of data points.
+#' 
+#' @param .data Required. A data frame containing at least circumplex scales.
+#' @param scales Required. The variable names or column numbers for the
+#'   variables in \code{.data} that contain circumplex scales to be analyzed.
+#' @param angles Required. A numeric vector containing the angular displacement
+#'   of each circumplex scale included in \code{scales} (in degrees).
+#' @param ... Optional. Additional parameters to pass to
+#'   \code{\link{ssm_parameters}()}, such as \code{prefix} and \code{suffix}.
+#' @return A data frame containing \code{.data} plus six additional columns
+#'   containing the SSM parameters (calculated rowwise).
+#' @family ssm functions
+#' @family analysis functions
+#' @export
+#' @examples
+#' data("aw2009")
+#' ssm_score(aw2009, scales = PA:NO, angles = octants())
+#' 
+ssm_score <- function(.data, scales, angles, ...) {
+  scales_en <- rlang::enquo(scales)
+  
+  assert_that(is_provided(.data), is_provided(angles))
+  assert_that(is_enquo(!!scales_en))
+  
+  scales_mat <- .data %>%
+    dplyr::select(!!scales_en)
+  scale_names <- names(scales_mat)
+  df_params <- scales_mat %>% 
+    dplyr::mutate(id = 1:nrow(.)) %>% 
+    tidyr::gather(key = "Scale", value = "Score", -id) %>% 
+    dplyr::mutate(Scale = factor(Scale, levels = scale_names)) %>% 
+    tidyr::spread(key = id, value = Score) %>% 
+    dplyr::select(-Scale) %>% 
+    purrr::map_dfr(ssm_parameters, angles = angles, ...)
+  dplyr::bind_cols(.data, df_params)
+}
+

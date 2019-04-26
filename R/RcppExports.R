@@ -17,8 +17,8 @@ compare_pi <- function(x) {
     .Call(`_circumplex_compare_pi`, x)
 }
 
-ssm_parameters <- function(scores, angles) {
-    .Call(`_circumplex_ssm_parameters`, scores, angles)
+ssm_parameters_cpp <- function(scores, angles) {
+    .Call(`_circumplex_ssm_parameters_cpp`, scores, angles)
 }
 
 group_parameters <- function(scores, angles) {

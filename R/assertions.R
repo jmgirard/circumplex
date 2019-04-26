@@ -20,3 +20,19 @@ is_provided <- function(x) {
 assertthat::on_failure(is_provided) <- function(call, env) {
   paste0("The '", deparse(call$x), "' argument must be provided and not NULL.")
 }
+
+
+# Check if a numeric vector or single dimension data frame was provided --------
+is_numvec <- function(x) {
+  if (is.data.frame(x)) {
+    all(sapply(x, is.numeric)) & (nrow(x) == 1 | ncol(x) == 1)
+  } else if (is.matrix(x)) {
+    is.numeric(x) & (nrow(x) == 1 | ncol(x) == 1)
+  } else {
+    is.numeric(x) & is.vector(suppressWarnings(as.numeric(x)))
+  }
+}
+
+assertthat::on_failure(is_numvec) <- function(call, env) {
+  paste0("The '", deparse(call$x), "' argument must be a numeric vector or a single-dimension data frame with only numeric variables.")
+}

@@ -35,7 +35,8 @@ ssm_append(tab1, tab2)
 }
 \seealso{
 Other ssm functions: \code{\link{ssm_analyze}},
-  \code{\link{ssm_plot}}, \code{\link{ssm_table}}
+  \code{\link{ssm_parameters}}, \code{\link{ssm_plot}},
+  \code{\link{ssm_score}}, \code{\link{ssm_table}}
 
 Other table functions: \code{\link{html_render}},
   \code{\link{ssm_table}}

@@ -49,7 +49,8 @@ ssm_table(res)
 }
 \seealso{
 Other ssm functions: \code{\link{ssm_analyze}},
-  \code{\link{ssm_append}}, \code{\link{ssm_plot}}
+  \code{\link{ssm_append}}, \code{\link{ssm_parameters}},
+  \code{\link{ssm_plot}}, \code{\link{ssm_score}}
 
 Other table functions: \code{\link{html_render}},
   \code{\link{ssm_append}}

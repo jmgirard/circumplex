@@ -3,7 +3,7 @@ context("RcppExport.R")
 test_that("SSM parameters are correct", {
   data("aw2009")
   scores <- colMeans(aw2009)
-  res <- ssm_parameters(scores, as_radian(octants()))
+  res <- ssm_parameters_cpp(scores, as_radian(octants()))
 
   expect_equal(round(res[[1]], 3), 0.423)
   expect_equal(round(res[[2]], 3), 0.945)
