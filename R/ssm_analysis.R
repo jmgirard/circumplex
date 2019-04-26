@@ -533,10 +533,10 @@ ssm_score <- function(.data, scales, angles, ...) {
     dplyr::select(!!scales_en)
   scale_names <- names(scales_mat)
   df_params <- scales_mat %>% 
-    dplyr::mutate(id = 1:nrow(.)) %>% 
-    tidyr::gather(key = "Scale", value = "Score", -id) %>% 
+    dplyr::mutate(Group = 1:nrow(.)) %>% 
+    tidyr::gather(key = "Scale", value = "Score", -Group) %>% 
     dplyr::mutate(Scale = factor(Scale, levels = scale_names)) %>% 
-    tidyr::spread(key = id, value = Score) %>% 
+    tidyr::spread(key = Group, value = Score) %>% 
     dplyr::select(-Scale) %>% 
     purrr::map_dfr(ssm_parameters, angles = angles, ...)
   dplyr::bind_cols(.data, df_params)
