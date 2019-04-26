@@ -162,11 +162,11 @@ This already looks like a cosine curve, and we can finally use the SSM to  estim
 
 ```{r curve, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 # Calculate SSM parameters
-sp <- circumplex:::ssm_parameters(r, octants() * pi / 180)
+sp <- ssm_parameters(r, octants())
 
 # Create function for SSM cosine model
 f <- function(x) {
-  sp[[1]] + sp[[4]] * cos((x - sp[[5]] * 180 / pi) * pi / 180)
+  sp$Elev + sp$Ampl * cos((x - sp$Disp) * pi / 180)
 }
 
 # Plot correlations along with SSM cosine model
