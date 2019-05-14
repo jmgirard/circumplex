@@ -34,7 +34,7 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   } else if (contrast == "test") {
     d_vars <- 1:((ncol(bs_t) - 6) / 6) * 6 - 1
   }
-  bs_t <- bs_t %>% dplyr::mutate_at(.funs = as_radian, .vars = d_vars)
+  bs_t <- bs_t %>% dplyr::mutate_at(.vars = d_vars, .funs = new_radian)
 
   # Calculate the lower bounds of the confidence intervals ---------------------
   bs_lci <- bs_t %>%
