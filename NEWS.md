@@ -1,3 +1,5 @@
+# circumplex 0.3.1
+
 # circumplex (development version)
 
 * Avoid a bug with dplyr 0.8.1 and S3 methods on Linux systems
