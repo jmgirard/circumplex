@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -110,27 +110,27 @@
 <a href="#circumplex" class="anchor"></a>circumplex <img src="reference/figures/logo.png" align="right" alt="">
 </h1></div>
 
-<p>The goal of <em>circumplex</em> is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by <a href="https://jmgirard.com/">Jeffrey Girard</a>; it was inspired by work from and was developed under advisement from <a href="https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/">Johannes Zimmermann</a> and <a href="https://personalityprocesses.com/">Aidan Wright</a>. You can learn more about using this package through the vignette articles available on the <a href="https://circumplex.jmgirard.com/">package website</a> or through <code><a href="reference/circumplex-package.html">?circumplex</a></code>.</p>
+<p>The goal of <em>circumplex</em> is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by <a href="https://jmgirard.com/">Jeffrey Girard</a>; it was inspired by work from and was developed under advisement from <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html">Johannes Zimmermann</a> and <a href="https://personalityprocesses.com/">Aidan Wright</a>. You can learn more about using this package through the vignette articles available on the <a href="https://circumplex.jmgirard.com/">package website</a> or through <code><a href="reference/circumplex-package.html">?circumplex</a></code>.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Install release version from CRAN</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"circumplex"</span>)
-
-<span class="co"># Install development version from GitHub</span>
-devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"jmgirard/circumplex"</span>)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># Install release version from CRAN</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"circumplex"</span>)</a>
+<a class="sourceLine" id="cb2-3" title="3"></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="co"># Install development version from GitHub</span></a>
+<a class="sourceLine" id="cb2-5" title="5">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"jmgirard/circumplex"</span>)</a></code></pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(<span class="st">"jz2017"</span>)
-results &lt;-<span class="st"> </span><span class="kw"><a href="reference/ssm_analyze.html">ssm_analyze</a></span>(
-  <span class="dt">.data =</span> jz2017, 
-  <span class="dt">scales =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(PA, BC, DE, FG, HI, JK, LM, NO), 
-  <span class="dt">angles =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>), 
-  <span class="dt">measures =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(NARPD, ASPD)
-)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/ssm_table.html">ssm_table</a></span>(results)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(<span class="st">"jz2017"</span>)</a>
+<a class="sourceLine" id="cb3-2" title="2">results &lt;-<span class="st"> </span><span class="kw"><a href="reference/ssm_analyze.html">ssm_analyze</a></span>(</a>
+<a class="sourceLine" id="cb3-3" title="3">  <span class="dt">.data =</span> jz2017, </a>
+<a class="sourceLine" id="cb3-4" title="4">  <span class="dt">scales =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(PA, BC, DE, FG, HI, JK, LM, NO), </a>
+<a class="sourceLine" id="cb3-5" title="5">  <span class="dt">angles =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>), </a>
+<a class="sourceLine" id="cb3-6" title="6">  <span class="dt">measures =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(NARPD, ASPD)</a>
+<a class="sourceLine" id="cb3-7" title="7">)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw"><a href="reference/ssm_table.html">ssm_table</a></span>(results)</a></code></pre></div>
 <table class="table table table">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
@@ -170,13 +170,13 @@ NARPD
 -0.06 [-0.09, -0.03]
 </td>
 <td style="text-align:left;">
-0.18 [0.15, 0.21]
+0.18 [0.14, 0.21]
 </td>
 <td style="text-align:left;">
-0.19 [0.16, 0.22]
+0.19 [0.15, 0.23]
 </td>
 <td style="text-align:left;">
-109.0 [99.2, 118.9]
+109.0 [98.6, 118.5]
 </td>
 <td style="text-align:left;">
 0.957
@@ -199,7 +199,7 @@ ASPD
 0.23 [0.19, 0.26]
 </td>
 <td style="text-align:left;">
-115.9 [107.4, 124.4]
+115.9 [107.3, 124.2]
 </td>
 <td style="text-align:left;">
 0.964
@@ -207,7 +207,7 @@ ASPD
 </tr>
 </tbody>
 </table>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/ssm_plot.html">ssm_plot</a></span>(results)</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw"><a href="reference/ssm_plot.html">ssm_plot</a></span>(results)</a></code></pre></div>
 <p><img src="reference/figures/README-plot-1.png" width="700"></p>
 </div>
 <div id="code-of-conduct" class="section level2">

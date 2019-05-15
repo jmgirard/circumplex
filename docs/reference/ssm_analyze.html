@@ -75,7 +75,7 @@ measures will be calculated." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -248,11 +248,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; 
 #&gt; Profile [All]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.917      0.889      0.946
-#&gt; X-Value           0.351      0.326      0.379
-#&gt; Y-Value          -0.252     -0.280     -0.222
-#&gt; Amplitude         0.432      0.405      0.462
-#&gt; Displacement    324.292    321.063    327.900
+#&gt; Elevation         0.917      0.888      0.946
+#&gt; X-Value           0.351      0.324      0.378
+#&gt; Y-Value          -0.252     -0.282     -0.222
+#&gt; Amplitude         0.432      0.402      0.462
+#&gt; Displacement    324.292    320.907    327.921
 #&gt; Model Fit         0.878                      
 #&gt; </div><div class='input'>
 <span class='co'># Single-group correlation-based SSM</span>
@@ -265,20 +265,20 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; 
 #&gt; Profile [NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.202      0.171      0.235
-#&gt; X-Value          -0.062     -0.095     -0.028
-#&gt; Y-Value           0.179      0.144      0.213
-#&gt; Amplitude         0.189      0.153      0.225
-#&gt; Displacement    108.967     99.207    118.622
+#&gt; Elevation         0.202      0.169      0.236
+#&gt; X-Value          -0.062     -0.094     -0.030
+#&gt; Y-Value           0.179      0.145      0.214
+#&gt; Amplitude         0.189      0.153      0.226
+#&gt; Displacement    108.967     99.334    118.620
 #&gt; Model Fit         0.957                      
 #&gt; 
 #&gt; Profile [ASPD]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.124      0.089      0.159
-#&gt; X-Value          -0.099     -0.132     -0.063
-#&gt; Y-Value           0.203      0.168      0.240
-#&gt; Amplitude         0.226      0.190      0.264
-#&gt; Displacement    115.927    107.038    124.248
+#&gt; X-Value          -0.099     -0.133     -0.063
+#&gt; Y-Value           0.203      0.167      0.237
+#&gt; Amplitude         0.226      0.190      0.263
+#&gt; Displacement    115.927    107.451    124.435
 #&gt; Model Fit         0.964                      
 #&gt; </div><div class='input'><span class='co'># Multiple-group mean-based SSM</span>
 <span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>)</div><div class='output co'>#&gt; Call:
@@ -287,20 +287,20 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; 
 #&gt; Profile [Female]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.946      0.908      0.983
-#&gt; X-Value           0.459      0.421      0.500
-#&gt; Y-Value          -0.310     -0.354     -0.268
-#&gt; Amplitude         0.554      0.510      0.600
-#&gt; Displacement    325.963    322.176    329.821
+#&gt; Elevation         0.946      0.907      0.983
+#&gt; X-Value           0.459      0.420      0.499
+#&gt; Y-Value          -0.310     -0.355     -0.268
+#&gt; Amplitude         0.554      0.509      0.599
+#&gt; Displacement    325.963    322.240    329.833
 #&gt; Model Fit         0.889                      
 #&gt; 
 #&gt; Profile [Male]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.884      0.840      0.925
+#&gt; Elevation         0.884      0.842      0.925
 #&gt; X-Value           0.227      0.192      0.262
-#&gt; Y-Value          -0.186     -0.224     -0.150
-#&gt; Amplitude         0.294      0.260      0.331
-#&gt; Displacement    320.685    313.718    327.851
+#&gt; Y-Value          -0.186     -0.225     -0.148
+#&gt; Amplitude         0.294      0.258      0.332
+#&gt; Displacement    320.685    313.267    327.988
 #&gt; Model Fit         0.824                      
 #&gt; </div><div class='input'>
 <span class='co'># Multiple-group mean-based SSM with contrast</span>
@@ -313,11 +313,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; 
 #&gt; Contrast [Male - Female]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation        -0.062     -0.120     -0.004
-#&gt; X-Value          -0.232     -0.282     -0.178
-#&gt; Y-Value           0.124      0.065      0.184
-#&gt; Amplitude         0.263      0.209      0.322
-#&gt; Displacement    151.858    140.282    164.263
+#&gt; Elevation        -0.062     -0.118     -0.004
+#&gt; X-Value          -0.232     -0.286     -0.181
+#&gt; Y-Value           0.124      0.069      0.179
+#&gt; Amplitude         0.263      0.208      0.321
+#&gt; Displacement    151.858    140.348    163.727
 #&gt; Model Fit         0.855                      
 #&gt; </div><div class='input'>
 <span class='co'># Single-group correlation-based SSM with contrast</span>
@@ -330,11 +330,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; 
 #&gt; Contrast [ASPD - NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation        -0.079     -0.118     -0.043
-#&gt; X-Value          -0.037     -0.076     -0.001
-#&gt; Y-Value           0.024     -0.013      0.062
-#&gt; Amplitude         0.037      0.000      0.077
-#&gt; Displacement      6.960     -2.835     16.963
+#&gt; Elevation        -0.079     -0.116     -0.041
+#&gt; X-Value          -0.037     -0.077      0.000
+#&gt; Y-Value           0.024     -0.014      0.060
+#&gt; Amplitude         0.037     -0.001      0.075
+#&gt; Displacement      6.960     -3.385     18.057
 #&gt; Model Fit         0.007                      
 #&gt; </div><div class='input'>
 <span class='co'># Multiple-group correlation-based SSM</span>
@@ -347,20 +347,20 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; 
 #&gt; Profile [Female_NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.172      0.126      0.219
-#&gt; X-Value          -0.080     -0.129     -0.036
-#&gt; Y-Value           0.202      0.151      0.250
-#&gt; Amplitude         0.217      0.164      0.272
-#&gt; Displacement    111.669    100.392    123.891
+#&gt; Elevation         0.172      0.128      0.218
+#&gt; X-Value          -0.080     -0.125     -0.033
+#&gt; Y-Value           0.202      0.153      0.250
+#&gt; Amplitude         0.217      0.168      0.268
+#&gt; Displacement    111.669     99.626    122.752
 #&gt; Model Fit         0.972                      
 #&gt; 
 #&gt; Profile [Male_NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.244      0.191      0.295
-#&gt; X-Value          -0.029     -0.075      0.015
-#&gt; Y-Value           0.146      0.101      0.192
-#&gt; Amplitude         0.149      0.105      0.195
-#&gt; Displacement    101.248     84.307    118.790
+#&gt; Elevation         0.244      0.194      0.295
+#&gt; X-Value          -0.029     -0.074      0.017
+#&gt; Y-Value           0.146      0.097      0.192
+#&gt; Amplitude         0.149      0.102      0.195
+#&gt; Displacement    101.248     83.457    119.191
 #&gt; Model Fit         0.902                      
 #&gt; </div><div class='input'>
 <span class='co'># Multiple-group correlation-based SSM with contrast</span>
@@ -373,11 +373,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; 
 #&gt; Contrast [NARPD: Male - Female]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.072      0.006      0.142
+#&gt; Elevation         0.072      0.005      0.139
 #&gt; X-Value           0.051     -0.012      0.113
-#&gt; Y-Value          -0.056     -0.125      0.008
-#&gt; Amplitude        -0.068     -0.139     -0.002
-#&gt; Displacement    -10.421    -30.970     10.708
+#&gt; Y-Value          -0.056     -0.124      0.010
+#&gt; Amplitude        -0.068     -0.138     -0.004
+#&gt; Displacement    -10.421    -30.538     10.798
 #&gt; Model Fit        -0.071                      
 #&gt; </div><div class='input'>
 </div></pre>
