@@ -4,9 +4,9 @@ scaling_factor <- function(R, N, r) {
   pgtol <- 0 # convergence gradient tolerance
   iterlim <- 250 # maximum number of iterations
   
-  p <- dim(R)[1]
-  k <- 3
-  K <- pi / 180
+  p <- dim(R)[1] # number of scales
+  k <- 3 # same as m?
+  K <- pi / 180 # degrees to radians conversion factor
   
   ifa <- function(rr, mm) {
     if (length(which(eigen(rr)$values < 0)) != 0) {
