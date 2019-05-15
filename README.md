@@ -18,7 +18,7 @@ user-friendly way to analyze and visualize circumplex data. It was
 created and is maintained by [Jeffrey Girard](https://jmgirard.com/); it
 was inspired by work from and was developed under advisement from
 [Johannes
-Zimmermann](https://psychologische-hochschule.de/prof-dr-johannes-zimmermann/)
+Zimmermann](https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html)
 and [Aidan Wright](https://personalityprocesses.com/). You can learn
 more about using this package through the vignette articles available on
 the [package website](https://circumplex.jmgirard.com/) or through
@@ -132,19 +132,19 @@ NARPD
 
 <td style="text-align:left;">
 
-0.18 \[0.15, 0.21\]
+0.18 \[0.14, 0.21\]
 
 </td>
 
 <td style="text-align:left;">
 
-0.19 \[0.16, 0.22\]
+0.19 \[0.15, 0.23\]
 
 </td>
 
 <td style="text-align:left;">
 
-109.0 \[99.2, 118.9\]
+109.0 \[98.6, 118.5\]
 
 </td>
 
@@ -190,7 +190,7 @@ ASPD
 
 <td style="text-align:left;">
 
-115.9 \[107.4, 124.4\]
+115.9 \[107.3, 124.2\]
 
 </td>
 
@@ -214,9 +214,9 @@ ssm_plot(results)
 
 ## Code of Conduct
 
-This project is released with a [Contributor Code of
-Conduct](.github/CODE_OF_CONDUCT.md). By contributing to this project,
-you agree to abide by its terms.
+Please note that the ‘circumplex’ project is released with a
+[Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md). By
+contributing to this project, you agree to abide by its terms.
 
 ## References
 
