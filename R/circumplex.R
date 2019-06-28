@@ -19,8 +19,7 @@
 #' `browseVignettes(package = "circumplex")`
 #'
 #' @useDynLib circumplex, .registration = TRUE
-#' @import assertthat
-#' @importFrom ggplot2 aes
+#' @importFrom assertthat assert_that is.flag is.number is.count is.string
 #' @importFrom glue glue
 #' @importFrom Rcpp sourceCpp
 #' @importFrom stats cor quantile sd var
