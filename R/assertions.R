@@ -14,13 +14,16 @@ assertthat::on_failure(is_enquo) <- function(call, env) {
 
 # Check if a normal argument was provided and is not null ----------------------
 is_provided <- function(x) {
-  !(base::missing(x) || is.null(x))
+  if (rlang::is_quosure(x)) {
+    !rlang::quo_is_missing(x) && !rlang::quo_is_null(x)
+  } else {
+    !(base::missing(x) || is.null(x))
+  }
 }
 
 assertthat::on_failure(is_provided) <- function(call, env) {
   paste0("The '", deparse(call$x), "' argument must be provided and not NULL.")
 }
-
 
 # Check if a numeric vector or single dimension data frame was provided --------
 is_numvec <- function(x) {

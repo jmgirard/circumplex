@@ -272,9 +272,9 @@ instruments <- function() {
 #' instrument("iip32")
 #' x <- instrument(iip32)
 instrument <- function(code) {
-  name_en <- rlang::enquo(code)
-  assert_that(is_enquo(name_en))
-  name_str <- rlang::quo_name(name_en)
+  code <- rlang::enquo(code)
+  assert_that(is_provided(code))
+  name_str <- rlang::quo_name(code)
   utils::data(list = name_str)
   invisible(get(name_str))
 }

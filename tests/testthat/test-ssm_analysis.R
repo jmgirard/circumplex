@@ -167,20 +167,6 @@ test_that("Providing more than two groups throws error", {
   ), "Only two groups can be contrasted at a time.*")
 })
 
-test_that("Scale magnitudes greater than 5 trigger message", {
-  data("aw2009")
-  aw2009a <- aw2009 * 5
-  aw2009b <- aw2009 * -5
-  expect_message(
-    ssm_analyze(aw2009a, PA:NO, octants()),
-    "Your circumplex scales do not appear to be standardized*"
-  )
-  expect_message(
-    ssm_analyze(aw2009b, PA:NO, octants()),
-    "Your circumplex scales do not appear to be standardized*"
-  )
-})
-
 test_that("Single-group correlation-based SSM results are correct", {
   data("jz2017")
   suppressWarnings(RNGversion("3.5.0"))

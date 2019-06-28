@@ -27,3 +27,28 @@ test_that("is_numvec works", {
   expect_false(is_numvec(mat_char))
   expect_false(is_numvec(df_mixed))
 })
+
+test_that("is_provided works", {
+  data(jz2017)
+  f <- function(df, n = NULL) {
+    is_provided(n)
+  }
+  expect_true(f(jz2017, n = 1))
+  expect_false(f(jz2017, n = NULL))
+  expect_false(f(jz2017))
+  
+  f2 <- function(df, n = 1) {
+    is_provided(n)
+  }
+  expect_true(f2(jz2017, n = 1))
+  expect_false(f2(jz2017, n = NULL))
+  expect_true(f2(jz2017))
+
+  f3 <- function(df, vars) {
+    is_provided(rlang::enquo(vars))
+  }
+  expect_true(f3(jz2017, vars = PA:NO))
+  expect_false(f3(jz2017, vars = NULL))
+  expect_false(f3(jz2017))
+})
+

@@ -5,8 +5,8 @@
 \title{Perform analyses using the Structural Summary Method}
 \usage{
 ssm_analyze(.data, scales, angles, measures = NULL, grouping = NULL,
-  contrast = "none", boots = 2000, interval = 0.95,
-  listwise = TRUE)
+  contrast = c("none", "test", "model"), boots = 2000,
+  interval = 0.95, listwise = TRUE)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}

@@ -3,15 +3,16 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
                           contrast, listwise, ...) {
 
   # Perform bootstrapping ------------------------------------------------------
-  bs_results <- boot::boot(
-    data = bs_input,
-    statistic = bs_function,
-    R = boots,
-    angles = angles,
-    contrast = contrast,
-    listwise = listwise,
-    ...
-  )
+  bs_results <- 
+    boot::boot(
+      data = bs_input,
+      statistic = bs_function,
+      R = boots,
+      angles = angles,
+      contrast = contrast,
+      listwise = listwise,
+      ...
+    )
 
   # Reshape parameters from wide to long format --------------------------------
   reshape_params <- function(df, suffix) {
@@ -22,11 +23,13 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   }
 
   # Extract point estimates from bootstrap results -----------------------------
-  bs_est <- bs_results$t0 %>%
+  bs_est <- 
+    bs_results$t0 %>%
     reshape_params(suffix = "est")
 
   # Set the units of the displacement results to radians -----------------------
-  bs_t <- bs_results$t %>%
+  bs_t <- 
+    bs_results$t %>%
     `colnames<-`(paste0("t", 1:ncol(.))) %>%
     tibble::as_tibble(nrow = nrow(.))
   if (contrast == "none" || contrast == "model") {
@@ -34,16 +37,20 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   } else if (contrast == "test") {
     d_vars <- 1:((ncol(bs_t) - 6) / 6) * 6 - 1
   }
-  bs_t <- bs_t %>% dplyr::mutate_at(.vars = d_vars, .funs = new_radian)
+  bs_t <- 
+    bs_t %>% 
+    dplyr::mutate_at(.vars = d_vars, .funs = new_radian)
 
   # Calculate the lower bounds of the confidence intervals ---------------------
-  bs_lci <- bs_t %>%
+  bs_lci <- 
+    bs_t %>%
     purrr::map_dbl(.f = quantile, probs = ((1 - interval) / 2)) %>%
     reshape_params(suffix = "lci") %>%
     dplyr::select(-fit_lci)
 
   # Calculate the upper bounds of the confidence intervals ---------------------
-  bs_uci <- bs_t %>%
+  bs_uci <- 
+    bs_t %>%
     purrr::map_dbl(.f = quantile, probs = (1 - (1 - interval) / 2)) %>%
     reshape_params(suffix = "uci") %>%
     dplyr::select(-fit_uci)
@@ -51,9 +58,9 @@ ssm_bootstrap <- function(bs_input, bs_function, angles, boots, interval,
   # Combine the results in one tibble and convert radians to degrees -----------
   dplyr::bind_cols(bs_est, bs_lci, bs_uci) %>%
     dplyr::mutate(
-      d_est = as_degree(as_radian(d_est)),
-      d_lci = as_degree(as_radian(d_lci)),
-      d_uci = as_degree(as_radian(d_uci))
+      d_est = as_degree(as_radian(.$d_est)),
+      d_lci = as_degree(as_radian(.$d_lci)),
+      d_uci = as_degree(as_radian(.$d_uci))
     )
 }
 

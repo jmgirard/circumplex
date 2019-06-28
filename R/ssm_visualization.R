@@ -109,7 +109,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
   p <- p +
     ggforce::geom_arc_bar(
       data = df_plot,
-      aes(
+      ggplot2::aes(
         x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
         fill = label, color = label, linetype = lnty
       ),
@@ -118,7 +118,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
     ) +
     ggplot2::geom_point(
       data = df_plot,
-      aes(x = x_est, y = y_est, color = label),
+      ggplot2::aes(x = x_est, y = y_est, color = label),
       shape = 16,
       size = 3
     ) +
@@ -196,11 +196,11 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     ) +
     ggplot2::geom_hline(yintercept = 0, size = linesize, color = "darkgray") +
     ggplot2::geom_point(
-      aes(x = Contrast, y = Difference),
+      ggplot2::aes(x = Contrast, y = Difference),
       size = linesize * 3, color = color
     ) +
     ggplot2::geom_errorbar(
-      aes(x = Contrast, ymin = lci, ymax = uci),
+      ggplot2::aes(x = Contrast, ymin = lci, ymax = uci),
       size = linesize, color = color, width = 0.1
     ) +
     ggplot2::labs(y = axislabel) +
@@ -224,7 +224,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
     ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
     # Draw segments corresponding to displacement scale
     ggplot2::geom_segment(
-      aes(
+      ggplot2::aes(
         x = 0,
         y = 0,
         xend = 5 * cos(angles * pi / 180),
@@ -235,18 +235,18 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
     ) +
     # Draw circles corresponding to amplitude scale
     ggforce::geom_circle(
-      aes(x0 = 0, y0 = 0, r = 1:4),
+      ggplot2::aes(x0 = 0, y0 = 0, r = 1:4),
       color = "gray60",
       size = 0.5
     ) +
     ggforce::geom_circle(
-      aes(x0 = 0, y0 = 0, r = 5),
+      ggplot2::aes(x0 = 0, y0 = 0, r = 5),
       color = "gray50",
       size = 1.5
     ) +
     # Draw labels for amplitude scale
     ggplot2::geom_label(
-      aes(
+      ggplot2::aes(
         x = c(2, 4),
         y = 0,
         label = sprintf(
@@ -260,7 +260,7 @@ circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
     ) +
     # Draw labels for displacement scale
     ggplot2::geom_label(
-      aes(
+      ggplot2::aes(
         x = 5.1 * cos(angles * pi / 180),
         y = 5.1 * sin(angles * pi / 180),
         label = labels
