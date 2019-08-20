@@ -55,15 +55,13 @@ cais_norms_src <- tibble::tibble(
   )
 )
 
-cais_anchors <- tibble::tibble(
-  Value = 1:5,
-  Label = c(
-    "Never",
-    "A little",
-    "Some",
-    "A lot",
-    "Always"
-  )
+cais_anchors <- tibble::tribble(
+  ~Value, ~Label,
+  1, "Never",
+  2, "A little",
+  3, "Some",
+  4, "A lot",
+  5, "Always"
 )
 
 cais_details <- tibble::tibble(
