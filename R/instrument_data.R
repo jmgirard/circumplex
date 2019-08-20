@@ -121,3 +121,13 @@
 #' instrument("isc")
 #' summary(isc)
 "isc"
+
+#' Inventory of Influence Tactics Circumplex
+#' 
+#' Information about the Inventory of Influence Tactics Circumplex.
+#' 
+#' @source \url{https://doi.org/10.1177/1073191119864661}
+#' @examples
+#' instrument("iitc")
+#' summary(iitc)
+"iitc"
