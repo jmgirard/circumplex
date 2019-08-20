@@ -1,108 +1,121 @@
 # circumplex (development version)
 
-circumplex 0.3.1
-=============================
+* Updated the formatting on this NEWS changelog to match tidyverse style.
 
-#### BUG FIXES ####
+* New `iitc` provides instrument information for the Inventory of Influence 
+  Tactics Circumplex.
 
-* Avoid a bug with dplyr 0.8.1 and S3 methods on Linux systems
-* Update the web address for Johannes in the README document
+* Nonstandard evaluation is now handled using `{{}}` notation.
 
-circumplex 0.3.0
-=============================
+* Fix CRAN warnings by setting `LazyDate: true`.
 
-#### NEW FEATURES ####
+# circumplex 0.3.1
 
-* Added the ssm_parameters() function to calculate SSM parameters (without 
+## Minor improvements and fixes
+
+* Avoid a bug with dplyr 0.8.1 and S3 methods on Linux systems.
+
+* Update the web address for Johannes in the README document.
+
+
+# circumplex 0.3.0
+
+## New features
+
+* New `ssm_parameters()` calculates SSM parameters (without 
   confidence intervals) from a vector of scores.
-* Added the ssm_score() function to calculate SSM parameters by row.
-* Added support for older versions of R (3.3.x)
+  
+* New `ssm_score()` calculates SSM parameters by row.
 
-#### BUG FIXES ####
+* Added support for older versions of R (3.3.x).
 
-* Fixed a bug in the normative data for IPIP-IPC that prevented standardization
-* Fixed a bug caused by changes in how random numbers are generated in R
-* Fixed several broken links by running package through new version of usethis
-* Fixed warnings related to documentation inherited from other packages
+## Minor improvements and fixes
 
-#### MINOR IMPROVEMENTS ####
+* Updated the "Introduction to SSM" vignette's figures.
 
-* Updated the Introduction to SSM vignette's figures
-* Replaced use of dplyr::funs() as this function is being deprecated
+* Replaced use of `dplyr::funs()` as this function is being deprecated.
 
-circumplex 0.2.1
-=============================
+* Fixed a bug in the normative data for `ipipipc` that prevented standardization.
 
-#### NEW FEATURES ####
+* Fixed a bug caused by changes in how random numbers are generated in R 3.6.x.
 
-* Added one normative data set to the IIS-32
-* Added open-access (i.e., full item text) to the IIS-32 and IIS-64
+* Fixed several broken links by running package through new version of `usethis`.
 
-#### BUG FIXES ####
+* Fixed warnings related to documentation inherited from other packages.
 
-* Updated the IIS-32 response anchors to range from 1 to 6 to match norms
-* Changed use of tibble functions to avoid problems when new version releases
-* Removed dependency on MASS package (until it is used by exported functions)
 
-#### MINOR IMPROVEMENTS ####
+# circumplex 0.2.1
 
-* Updated the IIS-32 item ordering and scoring to match the author's version
+## New features
 
-circumplex 0.2.0
-=============================
+* `iis32` now has normative data.
 
-#### NEW FEATURES ####
+* Added open-access (i.e., full item text) to the `iis32` and `iis64`.
 
-* Added functions and documentation for numerous circumplex instruments
-* Added functions for ipsatizing and scoring item-level data
-* Added function for standardizing scale-level data using normative data
+## Minor improvements and fixes
 
-#### BUG FIXES ####
+* `iis32` item ordering and scoring now match the author's version.
 
-* Changed OpenMP flags in Makevars to fix a compile problem on Debian machines
-* Fixed a bug related to calculating angular medians in the presence of NAs
+* `iis32` response anchors now range from 1 to 6 and match norms.
 
-#### MINOR IMPROVEMENTS ####
+* Changed use of `tibble` functions to avoid problems when new version releases.
 
-* Changed the default to plot profiles with low fit (but with dashed borders)
-* Import and export functions from rlang tidy evaluation
-* Added unit testing of various functions to increase code coverage
+* Removed dependency on `MASS` package (until it is used by exported functions).
 
-#### DOCUMENTATION FIXES ####
 
-* Redesigned package website to be more attractive and clear
-* Updated SSM vignette to use standardization function
+# circumplex 0.2.0
 
-circumplex 0.1.2
-=============================
+## New features
 
-#### NEW FEATURES ####
+* Added functions and documentation for numerous circumplex instruments.
 
-* Profiles with low fit now have dashed borders when plotted
+* Added functions for ipsatizing and scoring item-level data.
 
-#### BUG FIXES ####
+* Added function for standardizing scale-level data using normative data.
 
-* Fixed bug that prevented compilation on Solaris systems
-* Fixed bug that prevented CRAN checks on old R versions
+## Minor improvements and fixes
 
-#### DOCUMENTATION FIXES ####
+* Changed OpenMP flags in Makevars to fix a compile problem on Debian machines.
 
-* Improved the formatting of vignette source code
+* Fixed a bug related to calculating angular medians in the presence of NAs.
 
-circumplex 0.1.1
-=============================
+* Changed the default to plot profiles with low fit (but with dashed borders).
 
-#### NEW FEATURES ####
+* Import and export functions from rlang tidy evaluation.
 
-* [Package website](https://circumplex.jmgirard.com) added using [pkgdown](https://pkgdown.r-lib.org/)
+* Added unit testing of various functions to increase code coverage.
 
-#### DOCUMENTATION FIXES ####
+* Redesigned package website to be more attractive and clear.
 
-* Fixed documentation to meet CRAN standards
+* Updated the SSM vignette to use the `standardize()` function.
 
-circumplex 0.1.0
-=============================
 
-#### NEW FEATURES ####
+# circumplex 0.1.2
 
-* Submitted to CRAN
+## New features
+
+* `ssm_plot()` now uses dashed borders to indicate that a profile has low prototypicality/fit.
+
+## Minor improvements and fixes
+
+* Fixed bug that prevented compilation on Solaris systems.
+
+* Fixed bug that prevented CRAN checks on old R versions.
+
+* Improved the formatting of vignette source code.
+
+
+# circumplex 0.1.1
+
+## New features
+
+* [Package website](https://circumplex.jmgirard.com) added using [pkgdown](https://pkgdown.r-lib.org/).
+
+## Minor improvements and fixes
+
+* Fixed documentation to meet CRAN standards.
+
+
+# circumplex 0.1.0
+
+* Package submitted to CRAN.
