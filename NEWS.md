@@ -1,13 +1,20 @@
 # circumplex (development version)
 
-* Updated the formatting on this NEWS changelog to match tidyverse style.
+# circumplex 0.3.2
+
+## New features
 
 * New `iitc` provides instrument information for the Inventory of Influence 
   Tactics Circumplex.
 
-* Nonstandard evaluation is now handled using `{{}}` notation.
+## Minor improvements and fixes
 
 * Fix CRAN warnings by setting `LazyDate: true`.
+
+* Nonstandard evaluation is now handled using `{{}}` notation.
+
+* Updated the formatting on this NEWS changelog to match tidyverse style.
+
 
 # circumplex 0.3.1
 
