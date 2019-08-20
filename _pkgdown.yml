@@ -16,7 +16,7 @@ template:
       index_name: circumplex
 
 development:
-  mode: release
+  mode: devel
 
 reference:
   - title: Instrument Data
@@ -32,6 +32,7 @@ reference:
       - iipsc
       - iis32
       - iis64
+      - iitc
       - ipipipc
       - isc
   - title: Instrument Functions

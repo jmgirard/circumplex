@@ -32,6 +32,7 @@
 <!-- docsearch -->
 <script src="../docsearch.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
@@ -70,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.2.1</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.3.1.9000</span>
       </span>
     </div>
 
@@ -178,7 +179,8 @@ side-effect, may also output the HTML table to the web viewer.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other ssm functions: <code><a href='ssm_analyze.html'>ssm_analyze</a></code>,
-  <code><a href='ssm_plot.html'>ssm_plot</a></code>, <code><a href='ssm_table.html'>ssm_table</a></code></p>
+  <code><a href='ssm_parameters.html'>ssm_parameters</a></code>, <code><a href='ssm_plot.html'>ssm_plot</a></code>,
+  <code><a href='ssm_score.html'>ssm_score</a></code>, <code><a href='ssm_table.html'>ssm_table</a></code></p>
 <p>Other table functions: <code><a href='html_render.html'>html_render</a></code>,
   <code><a href='ssm_table.html'>ssm_table</a></code></p></div>
     
@@ -210,34 +212,34 @@ side-effect, may also output the HTML table to the web viewer.</p>
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.35 [0.32, 0.38]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;-0.25 [-0.28, -0.22]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.43 [0.40, 0.46]&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;324.3 [320.7, 327.9]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;324.3 [320.8, 327.9]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.878&lt;/td&gt;
 #&gt; &lt;/tr&gt;
 #&gt; &lt;tr&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;Female&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.95 [0.91, 0.99]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.95 [0.91, 0.98]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.46 [0.42, 0.50]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;-0.31 [-0.35, -0.27]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.55 [0.51, 0.60]&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;326.0 [322.0, 330.0]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;326.0 [322.1, 329.7]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'&gt;0.889&lt;/td&gt;
 #&gt; &lt;/tr&gt;
 #&gt; &lt;tr&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;Male&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.88 [0.84, 0.93]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.23 [0.19, 0.26]&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;-0.19 [-0.22, -0.15]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;-0.19 [-0.23, -0.15]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.29 [0.26, 0.33]&lt;/td&gt;
-#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;320.7 [313.2, 328.1]&lt;/td&gt;
+#&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;320.7 [313.5, 327.8]&lt;/td&gt;
 #&gt; &lt;td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'&gt;0.824&lt;/td&gt;
 #&gt; &lt;/tr&gt;
 #&gt; &lt;/tbody&gt;
 #&gt; &lt;/table&gt;</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 3 x 7</span><span>
-#&gt;   Profile Elevation    `X-Value`   `Y-Value`   Amplitude   Displacement   Fit  
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> All     0.92 [0.89,~ 0.35 [0.32~ -0.25 [-0.~ 0.43 [0.40~ 324.3 [320.7,~ 0.878
-#&gt; </span><span style='color: #555555;'>2</span><span> Female  0.95 [0.91,~ 0.46 [0.42~ -0.31 [-0.~ 0.55 [0.51~ 326.0 [322.0,~ 0.889
-#&gt; </span><span style='color: #555555;'>3</span><span> Male    0.88 [0.84,~ 0.23 [0.19~ -0.19 [-0.~ 0.29 [0.26~ 320.7 [313.2,~ 0.824</div></span></pre>
+#&gt;   Profile Elevation    `X-Value`   `Y-Value`    Amplitude   Displacement   Fit  
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> All     0.92 [0.89,~ 0.35 [0.32~ -0.25 [-0.2~ 0.43 [0.40~ 324.3 [320.8,~ 0.878
+#&gt; </span><span style='color: #555555;'>2</span><span> Female  0.95 [0.91,~ 0.46 [0.42~ -0.31 [-0.3~ 0.55 [0.51~ 326.0 [322.1,~ 0.889
+#&gt; </span><span style='color: #555555;'>3</span><span> Male    0.88 [0.84,~ 0.23 [0.19~ -0.19 [-0.2~ 0.29 [0.26~ 320.7 [313.5,~ 0.824</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -260,7 +262,7 @@ side-effect, may also output the HTML table to the web viewer.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
 </div>
       </footer>
    </div>

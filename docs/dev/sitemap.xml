@@ -49,6 +49,9 @@
     <loc>https://circumplex.jmgirard.com/reference/iis64.html</loc>
   </url>
   <url>
+    <loc>https://circumplex.jmgirard.com/reference/iitc.html</loc>
+  </url>
+  <url>
     <loc>https://circumplex.jmgirard.com/reference/instrument.html</loc>
   </url>
   <url>
@@ -106,6 +109,9 @@
     <loc>https://circumplex.jmgirard.com/reference/ssm_append.html</loc>
   </url>
   <url>
+    <loc>https://circumplex.jmgirard.com/reference/ssm_parameters.html</loc>
+  </url>
+  <url>
     <loc>https://circumplex.jmgirard.com/reference/ssm_plot.html</loc>
   </url>
   <url>
@@ -113,6 +119,9 @@
   </url>
   <url>
     <loc>https://circumplex.jmgirard.com/reference/ssm_plot_contrast.html</loc>
+  </url>
+  <url>
+    <loc>https://circumplex.jmgirard.com/reference/ssm_score.html</loc>
   </url>
   <url>
     <loc>https://circumplex.jmgirard.com/reference/ssm_table.html</loc>
