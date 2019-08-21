@@ -179,6 +179,6 @@ select(z_scales, PA_z:NO_z)
 ## 4. Wrap-up
 In this vignette, we learned how to preview the instruments available in the circumplex package, load and examine the information contained in one of these instrument objects, ipsatize item-level data, calculate scale scores from item-level data, and standardize those scale scores using normative data included in the package. We are now in an excellent position to discover and implement new circumplex instruments. Later vignettes describe analyses and visualizations that make use of the data collected using these tools.
 
-Special thanks to the authors and publishers who granted permission to include information about their instruments in this package: Michael Boudreaux, Robert Hatcher, Christopher Hopwood, Leonard Horowitz, Kenneth Locke, Patrick Markey, Aaron Pincus, Elisa Trucco, and MindGarden Inc.
+Special thanks to the authors and publishers who granted permission to include information about their instruments in this package: Chloe Bliton, Michael Boudreaux, Robert Hatcher, Christopher Hopwood, Leonard Horowitz, Kenneth Locke, Patrick Markey, Aaron Pincus, Elisa Trucco, and MindGarden Inc.
 
 

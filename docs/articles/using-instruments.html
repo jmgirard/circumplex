@@ -169,7 +169,7 @@
 <a href="#previewing-the-available-instruments" class="anchor"></a>Previewing the available instruments</h3>
 <p>Our goal is to eventually include all circumplex instruments in this package. However, due to time-constraints and copyright issues, this goal may be delayed or even impossible to fully realize. However, you can always preview the list of currently available instruments using the <code><a href="../reference/instruments.html">instruments()</a></code> function. This function will print the abbreviation, name, and (in parentheses) the “code” for each available instrument. We will return to the code in the next section.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw"><a href="../reference/instruments.html">instruments</a></span>()</a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="co">#&gt; The circumplex package currently includes 12 instruments:</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="co">#&gt; The circumplex package currently includes 13 instruments:</span></a>
 <a class="sourceLine" id="cb2-3" title="3"><span class="co">#&gt;  1. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)</span></a>
 <a class="sourceLine" id="cb2-4" title="4"><span class="co">#&gt;  2. CSIG: Circumplex Scales of Intergroup Goals (csig)</span></a>
 <a class="sourceLine" id="cb2-5" title="5"><span class="co">#&gt;  3. CSIP: Circumplex Scales of Interpersonal Problems (csip)</span></a>
@@ -180,8 +180,9 @@
 <a class="sourceLine" id="cb2-10" title="10"><span class="co">#&gt;  8. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)</span></a>
 <a class="sourceLine" id="cb2-11" title="11"><span class="co">#&gt;  9. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)</span></a>
 <a class="sourceLine" id="cb2-12" title="12"><span class="co">#&gt;  10. IIS-64: Inventory of Interpersonal Strengths (iis64)</span></a>
-<a class="sourceLine" id="cb2-13" title="13"><span class="co">#&gt;  11. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)</span></a>
-<a class="sourceLine" id="cb2-14" title="14"><span class="co">#&gt;  12. ISC: Interpersonal Sensitivities Circumplex (isc)</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-13" title="13"><span class="co">#&gt;  11. IIT-C: Inventory of Influence Tactics Circumplex (iitc)</span></a>
+<a class="sourceLine" id="cb2-14" title="14"><span class="co">#&gt;  12. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)</span></a>
+<a class="sourceLine" id="cb2-15" title="15"><span class="co">#&gt;  13. ISC: Interpersonal Sensitivities Circumplex (isc)</span></a></code></pre></div>
 <p>If there are additional circumplex instruments you would like to have added to the package (especially if you are the author/copyright-holder), please <a href="mailto:me@jmgirard.com">contact me</a>. Note that some information (e.g., item text and normative data) may not be available for all instruments due to copyright issues. However, many instruments are released as open-access and have full item text and normative data included in the package.</p>
 </div>
 <div id="loading-a-specific-instrument" class="section level3">
@@ -196,7 +197,10 @@
 <a class="sourceLine" id="cb3-6" title="6"><span class="co">#&gt; &lt;https://doi.org/10.1037/pas0000505&gt;</span></a></code></pre></div>
 <p>Note, however, that an error will result if the <code><a href="https://www.rdocumentation.org/packages/base/topics/print">print()</a></code> function (or any of the functions to be described later) is called before the <code><a href="../reference/instrument.html">instrument()</a></code> function has loaded the data. Order of operations is important!</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(isc)</a>
-<a class="sourceLine" id="cb4-2" title="2"><span class="co">#&gt; Error in print(isc): object 'isc' not found</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-2" title="2"><span class="co">#&gt; ISC: Interpersonal Sensitivities Circumplex</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co">#&gt; 64 items, 8 scales, 1 normative data sets</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="co">#&gt; Hopwood et al. (2011)</span></a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="co">#&gt; &lt;https://doi.org/10.1111/j.1467-6494.2011.00696.x&gt;</span></a></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw"><a href="../reference/instrument.html">instrument</a></span>(isc)</a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(isc)</a>
 <a class="sourceLine" id="cb5-3" title="3"><span class="co">#&gt; ISC: Interpersonal Sensitivities Circumplex</span></a>
@@ -508,7 +512,7 @@
 <h2 class="hasAnchor">
 <a href="#wrap-up" class="anchor"></a>4. Wrap-up</h2>
 <p>In this vignette, we learned how to preview the instruments available in the circumplex package, load and examine the information contained in one of these instrument objects, ipsatize item-level data, calculate scale scores from item-level data, and standardize those scale scores using normative data included in the package. We are now in an excellent position to discover and implement new circumplex instruments. Later vignettes describe analyses and visualizations that make use of the data collected using these tools.</p>
-<p>Special thanks to the authors and publishers who granted permission to include information about their instruments in this package: Michael Boudreaux, Robert Hatcher, Christopher Hopwood, Leonard Horowitz, Kenneth Locke, Patrick Markey, Aaron Pincus, Elisa Trucco, and MindGarden Inc.</p>
+<p>Special thanks to the authors and publishers who granted permission to include information about their instruments in this package: Chloe Bliton, Michael Boudreaux, Robert Hatcher, Christopher Hopwood, Leonard Horowitz, Kenneth Locke, Patrick Markey, Aaron Pincus, Elisa Trucco, and MindGarden Inc.</p>
 </div>
   </div>
 
