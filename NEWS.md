@@ -9,7 +9,7 @@
 
 ## Minor improvements and fixes
 
-* Fix CRAN warnings by setting `LazyDate: true`.
+* Fix CRAN warnings by setting `LazyData: true`.
 
 * Nonstandard evaluation is now handled using `{{}}` notation.
 
