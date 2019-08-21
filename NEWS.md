@@ -11,6 +11,8 @@
 
 * Fix CRAN warnings by setting `LazyData: true`.
 
+* Fix CRAN note by replacing relative URLs with absolute URLs.
+
 * Nonstandard evaluation is now handled using `{{}}` notation.
 
 * Updated the formatting on this NEWS changelog to match tidyverse style.
