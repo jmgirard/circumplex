@@ -1,5 +1,11 @@
 # circumplex (development version)
 
+* Add APA-style citations to instrument documentation in addition to DOI links.
+
+* Add "Instruments" menu to package website for viewing documentation pages.
+
+----
+
 # circumplex 0.3.2
 
 ## New features
@@ -17,6 +23,7 @@
 
 * Updated the formatting on this NEWS changelog to match tidyverse style.
 
+----
 
 # circumplex 0.3.1
 
@@ -26,6 +33,7 @@
 
 * Update the web address for Johannes in the README document.
 
+----
 
 # circumplex 0.3.0
 
@@ -52,6 +60,7 @@
 
 * Fixed warnings related to documentation inherited from other packages.
 
+----
 
 # circumplex 0.2.1
 
@@ -71,6 +80,7 @@
 
 * Removed dependency on `MASS` package (until it is used by exported functions).
 
+----
 
 # circumplex 0.2.0
 
@@ -98,6 +108,7 @@
 
 * Updated the SSM vignette to use the `standardize()` function.
 
+----
 
 # circumplex 0.1.2
 
@@ -113,6 +124,7 @@
 
 * Improved the formatting of vignette source code.
 
+----
 
 # circumplex 0.1.1
 
@@ -124,6 +136,7 @@
 
 * Fixed documentation to meet CRAN standards.
 
+----
 
 # circumplex 0.1.0
 
