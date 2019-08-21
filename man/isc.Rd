@@ -6,16 +6,22 @@
 \title{Interpersonal Sensitivities Circumplex}
 \format{An object of class \code{instrument} of length 5.}
 \source{
+Hopwood, C. J., Ansell, E. B., Pincus, A. L., Wright, A. G. C.,
+Lukowitsky, M. R., & Roche, M. J. (2011). The circumplex structure of
+interpersonal sensitivities. \emph{Journal of Personality, 79}(4), 707–740.
+\url{https://doi.org/10/fsmn7d}
+
 \url{https://doi.org/10.1111/j.1467-6494.2011.00696.x}
 }
 \usage{
 isc
 }
 \description{
-Information about the Interpersonal Sensitivities Circumplex.
+Information about the Interpersonal Sensitivities Circumplex (ISC).
 }
 \examples{
 instrument("isc")
 summary(isc)
+scales(isc, items = TRUE)
 }
 \keyword{datasets}

@@ -6,15 +6,19 @@
 \title{Inventory of Interpersonal Problems}
 \format{An object of class \code{instrument} of length 5.}
 \source{
+Horowitz, L. M., Alden, L. E., Wiggins, J. S., & Pincus, A. L.
+(2000). \emph{IIP-64/IIP-32 professional manual.} San Antonio, TX: The
+Psychological Corporation.
+
 \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
 }
 \usage{
 iip64
 }
 \description{
-Information about the Inventory of Interpersonal Problems. Note that,
-although we have permission to provide some information about the IIP-64,
-Mind Garden Inc. has exclusive rights to distribute it in full.
+Information about the Inventory of Interpersonal Problems (IIP-64). Note
+that, although we have permission to provide some information about the
+IIP-64, Mind Garden Inc. has exclusive rights to distribute it in full.
 }
 \examples{
 instrument("iip64")

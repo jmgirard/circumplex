@@ -6,16 +6,22 @@
 \title{Circumplex Scales of Interpersonal Values}
 \format{An object of class \code{instrument} of length 5.}
 \source{
+Locke, K. D. (2000). Circumplex scales of interpersonal values:
+Reliability, validity, and applicability to interpersonal problems and
+personality disorders. \emph{Journal of Personality Assessment, 75}(2), 249-267.
+\url{https://doi.org/10/frtj3p}
+
 \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
 }
 \usage{
 csiv
 }
 \description{
-Information about the Circumplex Scales of Interpersonal Values.
+Information about the Circumplex Scales of Interpersonal Values (CSIV).
 }
 \examples{
 instrument("csiv")
 summary(csiv)
+scales(csiv, items = TRUE)
 }
 \keyword{datasets}

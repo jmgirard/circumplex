@@ -6,16 +6,21 @@
 \title{IPIP Interpersonal Circumplex}
 \format{An object of class \code{instrument} of length 5.}
 \source{
+Markey, P. M., & Markey, C. N. (2009). A brief assessment of the
+interpersonal circumplex: The IPIP-IPC. \emph{Assessment, 16}(4), 352–361.
+\url{https://doi.org/10/fc6h8s}
+
 \url{https://doi.org/10.1177/1073191109340382}
 }
 \usage{
 ipipipc
 }
 \description{
-Information about the IPIP Interpersonal Circumplex.
+Information about the IPIP Interpersonal Circumplex (IPIP-IPC).
 }
 \examples{
 instrument("ipipipc")
 summary(ipipipc)
+scales(ipipipc, items = TRUE)
 }
 \keyword{datasets}

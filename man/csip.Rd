@@ -6,16 +6,22 @@
 \title{Circumplex Scales of Interpersonal Problems}
 \format{An object of class \code{instrument} of length 5.}
 \source{
+Boudreaux, M. J., Ozer, D. J., Oltmanns, T. F., & Wright, A. G. C.
+(2018). Development and validation of the circumplex scales of
+interpersonal problems. \emph{Psychological Assessment, 30}(5), 594-609.
+\url{https://doi.org/10/gdkhdp}
+
 \url{https://doi.org/10.1037/pas0000505}
 }
 \usage{
 csip
 }
 \description{
-Information about the Circumplex Scales of Interpersonal Problems.
+Information about the Circumplex Scales of Interpersonal Problems (CSIP).
 }
 \examples{
 instrument("csip")
 summary(csip)
+scales(csig, items = TRUE)
 }
 \keyword{datasets}

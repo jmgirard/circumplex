@@ -6,16 +6,22 @@
 \title{Inventory of Interpersonal Strengths}
 \format{An object of class \code{instrument} of length 5.}
 \source{
+Hatcher, R. L., & Rogers, D. T. (2009). Development and validation of
+a measure of interpersonal strengths: The Inventory of Interpersonal
+Strengths. \emph{Psychological Assessment, 21}(4), 554–569.
+\url{https://doi.org/10/fkppmj}
+
 \url{https://doi.org/10.1037/a0017269}
 }
 \usage{
 iis64
 }
 \description{
-Information about the Inventory of Interpersonal Strengths.
+Information about the Inventory of Interpersonal Strengths (IIS-64).
 }
 \examples{
 instrument("iis64")
 summary(iis64)
+scales(iis64, items = TRUE)
 }
 \keyword{datasets}

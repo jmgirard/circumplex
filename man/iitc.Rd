@@ -6,16 +6,21 @@
 \title{Inventory of Influence Tactics Circumplex}
 \format{An object of class \code{instrument} of length 5.}
 \source{
+Bliton, C. F., & Pincus, A. L. (in press). Construction and
+Validation of the Interpersonal Influence Tactics Circumplex (IIT-C)
+Scales. \emph{Assessment}. \url{https://doi.org/10/gf5nf8}
+
 \url{https://doi.org/10.1177/1073191119864661}
 }
 \usage{
 iitc
 }
 \description{
-Information about the Inventory of Influence Tactics Circumplex.
+Information about the Inventory of Influence Tactics Circumplex (IIT-C).
 }
 \examples{
 instrument("iitc")
 summary(iitc)
+scales(iitc, items = TRUE)
 }
 \keyword{datasets}
