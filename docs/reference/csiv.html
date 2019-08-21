@@ -38,7 +38,7 @@
 
 <meta property="og:title" content="Circumplex Scales of Interpersonal Values — csiv" />
 
-<meta property="og:description" content="Information about the Circumplex Scales of Interpersonal Values." />
+<meta property="og:description" content="Information about the Circumplex Scales of Interpersonal Values (CSIV)." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -85,6 +85,54 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Instruments
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../reference/csie.html">Circumplex Scales of Interpersonal Efficacy</a>
+    </li>
+    <li>
+      <a href="../reference/csig.html">Circumplex Scales of Intergroup Goals</a>
+    </li>
+    <li>
+      <a href="../reference/csip.html">Circumplex Scales of Interpersonal Problems</a>
+    </li>
+    <li>
+      <a href="../reference/csiv.html">Circumplex Scales of Interpersonal Values</a>
+    </li>
+    <li>
+      <a href="../reference/igicr.html">Interpersonal Goals Inventory for Children, Revised Version</a>
+    </li>
+    <li>
+      <a href="../reference/iip32.html">Inventory of Interpersonal Problems, Brief Version</a>
+    </li>
+    <li>
+      <a href="../reference/iip64.html">Inventory of Interpersonal Problems</a>
+    </li>
+    <li>
+      <a href="../reference/iipsc.html">Inventory of Interpersonal Problems, Short Circumplex</a>
+    </li>
+    <li>
+      <a href="../reference/iis32.html">Inventory of Interpersonal Strengths, Brief Version</a>
+    </li>
+    <li>
+      <a href="../reference/iis64.html">Inventory of Interpersonal Strengths</a>
+    </li>
+    <li>
+      <a href="../reference/iitc.html">Inventory of Influence Tactics Circumplex</a>
+    </li>
+    <li>
+      <a href="../reference/ipipipc.html">IPIP Interpersonal Circumplex</a>
+    </li>
+    <li>
+      <a href="../reference/isc.html">Interpersonal Sensitivities Circumplex</a>
+    </li>
+  </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -141,7 +189,7 @@
 
     <div class="ref-description">
     
-    <p>Information about the Circumplex Scales of Interpersonal Values.</p>
+    <p>Information about the Circumplex Scales of Interpersonal Values (CSIV).</p>
     
     </div>
 
@@ -153,7 +201,11 @@
     
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
-    <p><a href='https://www.webpages.uidaho.edu/klocke/csiv.htm'>https://www.webpages.uidaho.edu/klocke/csiv.htm</a></p>
+    <p>Locke, K. D. (2000). Circumplex scales of interpersonal values:
+Reliability, validity, and applicability to interpersonal problems and
+personality disorders. <em>Journal of Personality Assessment, 75</em>(2), 249-267.
+<a href='https://doi.org/10/frtj3p'>https://doi.org/10/frtj3p</a></p>
+<p><a href='https://www.webpages.uidaho.edu/klocke/csiv.htm'>https://www.webpages.uidaho.edu/klocke/csiv.htm</a></p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -249,7 +301,79 @@
 #&gt; The CSIV currently has 1 normative data set(s):
 #&gt; 1. 1200 American college students
 #&gt;   Locke (2000)
-#&gt;   &lt;https://www.webpages.uidaho.edu/klocke/csiv.htm&gt;</div></pre>
+#&gt;   &lt;https://www.webpages.uidaho.edu/klocke/csiv.htm&gt;</div><div class='input'><span class='fu'><a href='scales.html'>scales</a></span>(<span class='no'>csiv</span>, <span class='kw'>items</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; The CSIV contains 8 circumplex scales.
+#&gt; PA: +A (90 degrees)
+#&gt;     1. That I appear confident
+#&gt;     9. That they acknowledge when I am right
+#&gt;     17. That I get the chance to voice my views
+#&gt;     25. That they respect my privacy
+#&gt;     33. That I not back down when disagreements arise
+#&gt;     41. That they not tell me what to do
+#&gt;     49. That I am obeyed when I am in authority
+#&gt;     57. That they admit it when they are wrong
+#&gt; BC: +A-C (135 degrees)
+#&gt;     4. That I appear forceful
+#&gt;     12. That I attack back when I am attacked
+#&gt;     20. That I keep the upper hand
+#&gt;     28. That I put my needs first
+#&gt;     36. That I am the one in charge
+#&gt;     44. That I avenge insults and injustices against me
+#&gt;     52. That I win if there is an argument
+#&gt;     60. That they mind their own business
+#&gt; DE: -C (180 degrees)
+#&gt;     7. That I keep my guard up
+#&gt;     15. That they not know what I am thinking or feelings
+#&gt;     23. That I not show I care about them
+#&gt;     31. That they keep their distance from me
+#&gt;     39. That I do better than them
+#&gt;     47. That they see me as cool and unemotional
+#&gt;     55. That I appear detached
+#&gt;     63. That I not reveal what I am really like
+#&gt; FG: -A-C (225 degrees)
+#&gt;     2. That I not reveal my positive feelings for them
+#&gt;     10. That I not make a social blunder
+#&gt;     18. That I appear aloof
+#&gt;     26. That I not make mistakes in front of them
+#&gt;     34. That I not say something stupid
+#&gt;     42. That I not expose myself to the possibility of rejection
+#&gt;     50. That I not expose myself to ridicule
+#&gt;     58. That I keep my thoughts or feelings to myself
+#&gt; HI: -A (270 degrees)
+#&gt;     5. That I conform to their expectations
+#&gt;     13. That I not get into an argument
+#&gt;     21. That I do what they want me to do
+#&gt;     29. That I live up to their expectations
+#&gt;     37. That I not make them angry
+#&gt;     45. That I go along with what they want to do
+#&gt;     53. That I not embarrass myself
+#&gt;     61. That they not get angry with me
+#&gt; JK: -A+C (315 degrees)
+#&gt;     8. That I put their needs before mine
+#&gt;     16. That they not see me as getting in their way
+#&gt;     24. That I get along with them
+#&gt;     32. That they not reject me
+#&gt;     40. That I make them feel happy
+#&gt;     48. That they approve of me
+#&gt;     56. That they think I am a nice person
+#&gt;     64. That they not get their feelings hurt
+#&gt; LM: +C (360 degrees)
+#&gt;     3. That I feel connected to them
+#&gt;     11. That they show interest in what I have to say
+#&gt;     19. That they support me when I am having problems
+#&gt;     27. That they understand me
+#&gt;     35. That they come to me with their problems
+#&gt;     43. That they are considerate
+#&gt;     51. That they stay with me when things aren't going well
+#&gt;     59. That they show concern for how I am feeling
+#&gt; NO: +A+C (45 degrees)
+#&gt;     6. That I am unique
+#&gt;     14. That they not deceive me
+#&gt;     22. That I express myself openly
+#&gt;     30. That they respect what I have to say
+#&gt;     38. That I have an impact on them
+#&gt;     46. That they show me respect
+#&gt;     54. That they see me as responsible
+#&gt;     62. That they listen to what I have to say</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -267,7 +391,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://www.jmgirard.com'>Jeffrey Girard</a>, <a href='https://www.psychologische-hochschule.de/prof-dr-johannes-zimmermann/'>Johannes Zimmermann</a>, <a href='https://www.personalityprocesses.com'>Aidan Wright</a>.</p>
+  <p>Developed by <a href='https://www.jmgirard.com'>Jeffrey Girard</a>, <a href='https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html'>Johannes Zimmermann</a>, <a href='https://www.personalityprocesses.com'>Aidan Wright</a>.</p>
 </div>
 
 <div class="pkgdown">

@@ -38,7 +38,7 @@
 
 <meta property="og:title" content="Interpersonal Sensitivities Circumplex — isc" />
 
-<meta property="og:description" content="Information about the Interpersonal Sensitivities Circumplex." />
+<meta property="og:description" content="Information about the Interpersonal Sensitivities Circumplex (ISC)." />
 
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -85,6 +85,54 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Instruments
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../reference/csie.html">Circumplex Scales of Interpersonal Efficacy</a>
+    </li>
+    <li>
+      <a href="../reference/csig.html">Circumplex Scales of Intergroup Goals</a>
+    </li>
+    <li>
+      <a href="../reference/csip.html">Circumplex Scales of Interpersonal Problems</a>
+    </li>
+    <li>
+      <a href="../reference/csiv.html">Circumplex Scales of Interpersonal Values</a>
+    </li>
+    <li>
+      <a href="../reference/igicr.html">Interpersonal Goals Inventory for Children, Revised Version</a>
+    </li>
+    <li>
+      <a href="../reference/iip32.html">Inventory of Interpersonal Problems, Brief Version</a>
+    </li>
+    <li>
+      <a href="../reference/iip64.html">Inventory of Interpersonal Problems</a>
+    </li>
+    <li>
+      <a href="../reference/iipsc.html">Inventory of Interpersonal Problems, Short Circumplex</a>
+    </li>
+    <li>
+      <a href="../reference/iis32.html">Inventory of Interpersonal Strengths, Brief Version</a>
+    </li>
+    <li>
+      <a href="../reference/iis64.html">Inventory of Interpersonal Strengths</a>
+    </li>
+    <li>
+      <a href="../reference/iitc.html">Inventory of Influence Tactics Circumplex</a>
+    </li>
+    <li>
+      <a href="../reference/ipipipc.html">IPIP Interpersonal Circumplex</a>
+    </li>
+    <li>
+      <a href="../reference/isc.html">Interpersonal Sensitivities Circumplex</a>
+    </li>
+  </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -141,7 +189,7 @@
 
     <div class="ref-description">
     
-    <p>Information about the Interpersonal Sensitivities Circumplex.</p>
+    <p>Information about the Interpersonal Sensitivities Circumplex (ISC).</p>
     
     </div>
 
@@ -153,7 +201,11 @@
     
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
-    <p><a href='https://doi.org/10.1111/j.1467-6494.2011.00696.x'>https://doi.org/10.1111/j.1467-6494.2011.00696.x</a></p>
+    <p>Hopwood, C. J., Ansell, E. B., Pincus, A. L., Wright, A. G. C.,
+Lukowitsky, M. R., &amp; Roche, M. J. (2011). The circumplex structure of
+interpersonal sensitivities. <em>Journal of Personality, 79</em>(4), 707–740.
+<a href='https://doi.org/10/fsmn7d'>https://doi.org/10/fsmn7d</a></p>
+<p><a href='https://doi.org/10.1111/j.1467-6494.2011.00696.x'>https://doi.org/10.1111/j.1467-6494.2011.00696.x</a></p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -252,7 +304,79 @@
 #&gt; The ISC currently has 1 normative data set(s):
 #&gt; 1. 649 American college students
 #&gt;   Hopwood et al. (2011)
-#&gt;   &lt;https://doi.org/10.1111/j.1467-6494.2011.00696.x&gt;</div></pre>
+#&gt;   &lt;https://doi.org/10.1111/j.1467-6494.2011.00696.x&gt;</div><div class='input'><span class='fu'><a href='scales.html'>scales</a></span>(<span class='no'>isc</span>, <span class='kw'>items</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; The ISC contains 8 circumplex scales.
+#&gt; PA: Sensitive to Control (90 degrees)
+#&gt;     1. Thinks they are my boss
+#&gt;     9. Orders me around
+#&gt;     17. Talks down to me
+#&gt;     25. Will do anything to get what they want
+#&gt;     33. Has to call the shots
+#&gt;     41. Intimidates me
+#&gt;     49. Is bossy
+#&gt;     57. Always puts themselves first
+#&gt; BC: Sensitive to Antagonism (135 degrees)
+#&gt;     2. Disregards my feelings
+#&gt;     10. Doesn't respond to me
+#&gt;     18. Is hostile
+#&gt;     26. Is deceitful
+#&gt;     34. Mistrusts me
+#&gt;     42. Doesn't care about my feelings
+#&gt;     50. Expects the worst out of me
+#&gt;     58. Is mean-spirited
+#&gt; DE: Sensitive to Remoteness (180 degrees)
+#&gt;     3. Doesn't show any feelings
+#&gt;     11. Doesn't want to be friends
+#&gt;     19. Walls themselves off from me
+#&gt;     27. Won't share their feelings with me
+#&gt;     35. Is unresponsive
+#&gt;     43. Avoids me
+#&gt;     51. Never gets in touch with me
+#&gt;     59. Pulls away from me
+#&gt; FG: Sensitive to Timidity (225 degrees)
+#&gt;     4. Won't engage in conversation
+#&gt;     12. Is aloof
+#&gt;     20. Acts like a wallflower
+#&gt;     28. Won't step up to the plate
+#&gt;     36. Doesn't share their ideas
+#&gt;     44. Won't participate
+#&gt;     52. Is really shy
+#&gt;     60. Refuses to lead
+#&gt; HI: Sensitive to Passivity (270 degrees)
+#&gt;     5. Cannot assert themselves
+#&gt;     13. Doesn't have a backbone
+#&gt;     21. Is weak
+#&gt;     29. Allows themselves to be dominated by others
+#&gt;     37. Is always submissive
+#&gt;     45. Cannot make decisions
+#&gt;     53. Is very passive
+#&gt;     61. Is easily controlled
+#&gt; JK: Sensitive to Dependence (315 degrees)
+#&gt;     6. Avoids conflict at all costs
+#&gt;     14. Always needs support
+#&gt;     22. Always seems to need my help
+#&gt;     30. Acts helpless
+#&gt;     38. Laughs at all my jokes
+#&gt;     46. Is dependent on me
+#&gt;     54. Believes everything I say
+#&gt;     62. Is soft
+#&gt; LM: Sensitive to Affection (360 degrees)
+#&gt;     7. Wants to spend lots of time with me
+#&gt;     15. Tries to get close to me really fast
+#&gt;     23. Tells me they love me
+#&gt;     31. Expresses concern about me
+#&gt;     39. Acts like we're friends when we don't even know each other
+#&gt;     47. Humors me
+#&gt;     55. Believes I can do no wrong
+#&gt;     63. Is clingy
+#&gt; NO: Sensitive to Attention-Seeking (45 degrees)
+#&gt;     8. Doesn't respect my privacy
+#&gt;     16. Talks themselves up
+#&gt;     24. Shows off
+#&gt;     32. Talks about themselves
+#&gt;     40. Has to be right
+#&gt;     48. Interrupts
+#&gt;     56. Tries to show me how to do things
+#&gt;     64. Takes control</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -270,7 +394,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://www.jmgirard.com'>Jeffrey Girard</a>, <a href='https://www.psychologische-hochschule.de/prof-dr-johannes-zimmermann/'>Johannes Zimmermann</a>, <a href='https://www.personalityprocesses.com'>Aidan Wright</a>.</p>
+  <p>Developed by <a href='https://www.jmgirard.com'>Jeffrey Girard</a>, <a href='https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html'>Johannes Zimmermann</a>, <a href='https://www.personalityprocesses.com'>Aidan Wright</a>.</p>
 </div>
 
 <div class="pkgdown">

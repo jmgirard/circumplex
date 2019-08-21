@@ -4,7 +4,7 @@ authors:
   Jeffrey Girard:
     href: https://www.jmgirard.com
   Johannes Zimmermann:
-    href: https://www.psychologische-hochschule.de/prof-dr-johannes-zimmermann/
+    href: https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html
   Aidan Wright:
     href: https://www.personalityprocesses.com
 
@@ -19,22 +19,6 @@ development:
   mode: release
 
 reference:
-  - title: Instrument Data
-    desc: Information about circumplex instruments
-    contents:
-      - csie
-      - csig
-      - csip
-      - csiv
-      - igicr
-      - iip32
-      - iip64
-      - iipsc
-      - iis32
-      - iis64
-      - iitc
-      - ipipipc
-      - isc
   - title: Instrument Functions
     desc: Functions for importing and examining circumplex instruments
     contents:
@@ -84,6 +68,34 @@ navbar:
       href: index.html
     - text: Reference
       href: reference/index.html
+    - text: Instruments
+      menu:
+      - text: Circumplex Scales of Interpersonal Efficacy
+        href: reference/csie.html
+      - text: Circumplex Scales of Intergroup Goals
+        href: reference/csig.html
+      - text: Circumplex Scales of Interpersonal Problems
+        href: reference/csip.html
+      - text: Circumplex Scales of Interpersonal Values
+        href: reference/csiv.html
+      - text: Interpersonal Goals Inventory for Children, Revised Version
+        href: reference/igicr.html
+      - text: Inventory of Interpersonal Problems, Brief Version
+        href: reference/iip32.html
+      - text: Inventory of Interpersonal Problems
+        href: reference/iip64.html
+      - text: Inventory of Interpersonal Problems, Short Circumplex
+        href: reference/iipsc.html
+      - text: Inventory of Interpersonal Strengths, Brief Version
+        href: reference/iis32.html
+      - text: Inventory of Interpersonal Strengths
+        href: reference/iis64.html
+      - text: Inventory of Influence Tactics Circumplex
+        href: reference/iitc.html
+      - text: IPIP Interpersonal Circumplex
+        href: reference/ipipipc.html
+      - text: Interpersonal Sensitivities Circumplex
+        href: reference/isc.html
     - text: Vignettes
       menu:
       - text: Using Circumplex Instruments
