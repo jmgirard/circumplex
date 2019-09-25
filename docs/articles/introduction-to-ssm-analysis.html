@@ -6,9 +6,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Introduction to SSM Analysis • circumplex</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><!-- docsearch --><script src="../docsearch.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous">
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script><meta property="og:title" content="Introduction to SSM Analysis">
@@ -33,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
       </span>
     </div>
 
@@ -126,7 +133,7 @@
   </a>
 </li>
       </ul>
-<form class="navbar-form navbar-right" role="search">
+<form class="navbar-form navbar-right hidden-xs hidden-sm" role="search">
         <div class="form-group">
           <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
 </div>
@@ -140,6 +147,7 @@
 <!--/.navbar -->
 
       
+
       </header><script src="introduction-to-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -153,7 +161,7 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(circumplex)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(circumplex)</a></code></pre></div>
 <div id="background-and-motivation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#background-and-motivation" class="anchor"></a>1. Background and Motivation</h2>
@@ -194,8 +202,8 @@
 <h2 class="hasAnchor">
 <a href="#example-data-jz2017" class="anchor"></a>2. Example data: jz2017</h2>
 <p>To illustrate the SSM functions, we will use the example dataset <code>jz2017</code>, which was provided by Zimmermann &amp; Wright (2017) and reformatted for this package. This dataset includes self-report data from 1166 undergraduate students. Students completed a circumplex measure of interpersonal problems with eight subscales (PA, BC, DE, FG, HI, JK, LM, and NO) and a measure of personality disorder symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD, NARPD, AVPD, DPNPD, and OCPD). More information about these variables can be accessed using the <code><a href="../reference/jz2017.html">?jz2017</a></code> command in R.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(<span class="st">"jz2017"</span>)</a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(jz2017)</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"jz2017"</span>)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(jz2017)</a>
 <a class="sourceLine" id="cb2-3" title="3"><span class="co">#&gt; # A tibble: 1,166 x 19</span></a>
 <a class="sourceLine" id="cb2-4" title="4"><span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span></a>
 <a class="sourceLine" id="cb2-5" title="5"><span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span></a>
@@ -220,16 +228,16 @@
 <div id="conducting-ssm-for-a-groups-mean-scores" class="section level3">
 <h3 class="hasAnchor">
 <a href="#conducting-ssm-for-a-groups-mean-scores" class="anchor"></a>Conducting SSM for a group’s mean scores</h3>
-<p>To begin, let’s say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. Although it is possible to analyze the raw scores contained in <code>jz2017</code>, our results will be more interpretable if we standardize the scores first. We can do this using the <code><a href="../reference/standardize.html">standardize()</a></code> function. The first argument to this function is <code>.data</code>, a data frame frame containing the circumplex scales to be standardized. The second argument is <code>scales</code> and specifies where in <code>.data</code> the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is <code>angles</code> and specifies the angle of each of the circumplex scales included in <code>scales</code>. Note that the <code>scales</code> and <code>angles</code> arguments need to be vectors (hence the <code><a href="https://www.rdocumentation.org/packages/base/topics/c">c()</a></code> function) that have the same ordering and length. Finally, the fourth argument is <code>norms</code>, a data frame containing the normative data we will use to standardize the circumplex scales. Here, we will use normative data for the IIP-SC by loading the <code>iipsc</code> data frame.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(<span class="st">"iipsc"</span>)</a>
+<p>To begin, let’s say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. Although it is possible to analyze the raw scores contained in <code>jz2017</code>, our results will be more interpretable if we standardize the scores first. We can do this using the <code><a href="../reference/standardize.html">standardize()</a></code> function. The first argument to this function is <code>.data</code>, a data frame frame containing the circumplex scales to be standardized. The second argument is <code>scales</code> and specifies where in <code>.data</code> the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is <code>angles</code> and specifies the angle of each of the circumplex scales included in <code>scales</code>. Note that the <code>scales</code> and <code>angles</code> arguments need to be vectors (hence the <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> function) that have the same ordering and length. Finally, the fourth argument is <code>norms</code>, a data frame containing the normative data we will use to standardize the circumplex scales. Here, we will use normative data for the IIP-SC by loading the <code>iipsc</code> data frame.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"iipsc"</span>)</a>
 <a class="sourceLine" id="cb3-2" title="2">jz2017s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/standardize.html">standardize</a></span>(</a>
 <a class="sourceLine" id="cb3-3" title="3">  <span class="dt">.data =</span> jz2017,</a>
-<a class="sourceLine" id="cb3-4" title="4">  <span class="dt">scales =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(PA, BC, DE, FG, HI, JK, LM, NO),</a>
-<a class="sourceLine" id="cb3-5" title="5">  <span class="dt">angles =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>),</a>
+<a class="sourceLine" id="cb3-4" title="4">  <span class="dt">scales =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(PA, BC, DE, FG, HI, JK, LM, NO),</a>
+<a class="sourceLine" id="cb3-5" title="5">  <span class="dt">angles =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>),</a>
 <a class="sourceLine" id="cb3-6" title="6">  <span class="dt">instrument =</span> iipsc,</a>
 <a class="sourceLine" id="cb3-7" title="7">  <span class="dt">sample =</span> <span class="dv">1</span></a>
 <a class="sourceLine" id="cb3-8" title="8">)</a>
-<a class="sourceLine" id="cb3-9" title="9"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(jz2017s)</a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(jz2017s)</a>
 <a class="sourceLine" id="cb3-10" title="10"><span class="co">#&gt; # A tibble: 1,166 x 27</span></a>
 <a class="sourceLine" id="cb3-11" title="11"><span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span></a>
 <a class="sourceLine" id="cb3-12" title="12"><span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span></a>
@@ -250,11 +258,11 @@
 <p>Now we can use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function to perform the SSM analysis. The first three arguments are the same as the first three arguments to <code><a href="../reference/standardize.html">standardize()</a></code>. We can pass the new <code>jz2017s</code> data frame that contains standardized scores as <code>.data</code> and the same vectors to <code>scales</code> and <code>angles</code> since these haven’t changed.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(</a>
 <a class="sourceLine" id="cb4-2" title="2">  <span class="dt">.data =</span> jz2017s,</a>
-<a class="sourceLine" id="cb4-3" title="3">  <span class="dt">scales =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(PA_z, BC_z, DE_z, FG_z, HI_z, JK_z, LM_z, NO_z),</a>
-<a class="sourceLine" id="cb4-4" title="4">  <span class="dt">angles =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>)</a>
+<a class="sourceLine" id="cb4-3" title="3">  <span class="dt">scales =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(PA_z, BC_z, DE_z, FG_z, HI_z, JK_z, LM_z, NO_z),</a>
+<a class="sourceLine" id="cb4-4" title="4">  <span class="dt">angles =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">90</span>, <span class="dv">135</span>, <span class="dv">180</span>, <span class="dv">225</span>, <span class="dv">270</span>, <span class="dv">315</span>, <span class="dv">360</span>, <span class="dv">45</span>)</a>
 <a class="sourceLine" id="cb4-5" title="5">)</a></code></pre></div>
-<p>The output of the function has been saved in the <code>results</code> object, which we can examine in detail using the <code><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary()</a></code> function. This will output the call we made to create the output, as well as some of the default options that we didn’t bother changing (see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(results)</a>
+<p>The output of the function has been saved in the <code>results</code> object, which we can examine in detail using the <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> function. This will output the call we made to create the output, as well as some of the default options that we didn’t bother changing (see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(results)</a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="co">#&gt; Call:</span></a>
 <a class="sourceLine" id="cb5-3" title="3"><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = c(PA_z, BC_z, DE_z, FG_z, </span></a>
 <a class="sourceLine" id="cb5-4" title="4"><span class="co">#&gt;     HI_z, JK_z, LM_z, NO_z), angles = c(90, 135, 180, 225, 270, </span></a>
@@ -274,9 +282,9 @@
 <a class="sourceLine" id="cb5-18" title="18"><span class="co">#&gt; Amplitude         0.131      0.098      0.165</span></a>
 <a class="sourceLine" id="cb5-19" title="19"><span class="co">#&gt; Displacement    353.525    339.484      9.564</span></a>
 <a class="sourceLine" id="cb5-20" title="20"><span class="co">#&gt; Model Fit         0.710</span></a></code></pre></div>
-<p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017s</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputting their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed()</a></code> function to control the random number generator in R.)</p>
+<p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017s</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputting their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code><a href="https://rdrr.io/r/base/Random.html">set.seed()</a></code> function to control the random number generator in R.)</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">results2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017s, PA_z<span class="op">:</span>NO_z, <span class="kw"><a href="../reference/octants.html">octants</a></span>())</a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(results2)</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(results2)</a>
 <a class="sourceLine" id="cb6-3" title="3"><span class="co">#&gt; Call:</span></a>
 <a class="sourceLine" id="cb6-4" title="4"><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA_z:NO_z, angles = octants())</span></a>
 <a class="sourceLine" id="cb6-5" title="5"><span class="co">#&gt; </span></a>
@@ -365,7 +373,7 @@ All
 <p>Next, let’s say that we are interested in analyzing not the mean scores on the circumplex scales but rather their correlations with an external measure. This is sometimes referred to as “projecting” that external measure into the circumplex space. As an example, let’s project the NARPD variable, which captures symptoms of narcissistic personality disorder, into the circumplex space defined by the IIP-SC. Based on theory and previous findings, we can expect this measure to be associated with some general interpersonal distress and a style that is generally high in agency.</p>
 <p>To conduct this analysis, we can start with the syntax from the mean-based analysis. All SSM analyses use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function and the data, scales, and angles are the same as before. However, we also need to let the function know that we want to analyze correlations with NARPD as opposed to scale means. To do this, we add an additional argument <code>measures</code>. Note that since correlations are already standardized, we don’t need to worry about standardizing the circumplex scales when <code>measures</code> is used.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">results3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> NARPD)</a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(results3)</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(results3)</a>
 <a class="sourceLine" id="cb9-3" title="3"><span class="co">#&gt; Call:</span></a>
 <a class="sourceLine" id="cb9-4" title="4"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></a>
 <a class="sourceLine" id="cb9-5" title="5"><span class="co">#&gt;     measures = NARPD)</span></a>
@@ -466,6 +474,7 @@ NARPD
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -483,13 +492,15 @@ NARPD
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by <a href="https://www.jmgirard.com">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com">Aidan Wright</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 

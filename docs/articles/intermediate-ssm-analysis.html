@@ -6,9 +6,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Intermediate SSM Analysis • circumplex</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><!-- docsearch --><script src="../docsearch.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous">
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script><meta property="og:title" content="Intermediate SSM Analysis">
@@ -33,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
       </span>
     </div>
 
@@ -126,7 +133,7 @@
   </a>
 </li>
       </ul>
-<form class="navbar-form navbar-right" role="search">
+<form class="navbar-form navbar-right hidden-xs hidden-sm" role="search">
         <div class="form-group">
           <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
 </div>
@@ -140,6 +147,7 @@
 <!--/.navbar -->
 
       
+
       </header><script src="intermediate-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -153,7 +161,7 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(circumplex)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(circumplex)</a></code></pre></div>
 <div id="generalizing-the-basic-analyses" class="section level2">
 <h2 class="hasAnchor">
 <a href="#generalizing-the-basic-analyses" class="anchor"></a>1. Generalizing the basic analyses</h2>
@@ -161,11 +169,11 @@
 <h3 class="hasAnchor">
 <a href="#generalizing-to-multiple-means" class="anchor"></a>Generalizing to multiple means</h3>
 <p>We’ve already seen how adding the <code>measures</code> argument can change <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> from analyzing means to analyzing correlations. Similarly, we can change it from analyzing all observations as a single group to analyzing subgroups separately. This is done using the <code>grouping</code> argument. This argument needs to contain a single variable (name or column number) that specifies each observation’s group. For instance, the <code>Gender</code> variable in the <code>jz2017</code> dataset is a factor with two levels: Female and Male. To analyze each gender separately, we need to add the <code>grouping = Gender</code> argument to the function call.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(<span class="st">"jz2017"</span>)</a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(<span class="st">"iipsc"</span>)</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"jz2017"</span>)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"iipsc"</span>)</a>
 <a class="sourceLine" id="cb2-3" title="3">jz2017s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/standardize.html">standardize</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">instrument =</span> iipsc, <span class="dt">sample =</span> <span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb2-4" title="4">results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017s, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">grouping =</span> Gender)</a>
-<a class="sourceLine" id="cb2-5" title="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(results)</a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(results)</a>
 <a class="sourceLine" id="cb2-6" title="6"><span class="co">#&gt; Call:</span></a>
 <a class="sourceLine" id="cb2-7" title="7"><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA:NO, angles = octants(), </span></a>
 <a class="sourceLine" id="cb2-8" title="8"><span class="co">#&gt;     grouping = Gender)</span></a>
@@ -193,7 +201,7 @@
 <a class="sourceLine" id="cb2-30" title="30"><span class="co">#&gt; Amplitude         0.294      0.256      0.330</span></a>
 <a class="sourceLine" id="cb2-31" title="31"><span class="co">#&gt; Displacement    320.685    313.386    327.985</span></a>
 <a class="sourceLine" id="cb2-32" title="32"><span class="co">#&gt; Model Fit         0.824</span></a></code></pre></div>
-<p>Note that the output of <code><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary()</a></code> looks the same as previous mean-based analyses except that there are now two Profile blocks: one for Female and one for Male. A similar modification will occur if we generate a table and figure.</p>
+<p>Note that the output of <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> looks the same as previous mean-based analyses except that there are now two Profile blocks: one for Female and one for Male. A similar modification will occur if we generate a table and figure.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="../reference/ssm_table.html">ssm_table</a></span>(results)</a></code></pre></div>
 <table class="table table">
 <caption style="font-size: initial !important;">
@@ -280,9 +288,9 @@ Male
 <div id="generalizing-to-multiple-measures" class="section level3">
 <h3 class="hasAnchor">
 <a href="#generalizing-to-multiple-measures" class="anchor"></a>Generalizing to multiple measures</h3>
-<p>Similarly, we can analyze multiple external measures in a single function call by providing a vector of variables to the <code>measures</code> argument instead of a single variable. This can be done by wrapping the variable names or column numbers with the <code><a href="https://www.rdocumentation.org/packages/base/topics/c">c()</a></code> or, if they are adjacent columns, with the <code>:</code> shortcut. The package functions were written to analyze all measures and groups within a single bootstrap, so adding additional measures and groups should still be fast.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">results2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(NARPD, ASPD))</a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(results2)</a>
+<p>Similarly, we can analyze multiple external measures in a single function call by providing a vector of variables to the <code>measures</code> argument instead of a single variable. This can be done by wrapping the variable names or column numbers with the <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> or, if they are adjacent columns, with the <code>:</code> shortcut. The package functions were written to analyze all measures and groups within a single bootstrap, so adding additional measures and groups should still be fast.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">results2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(NARPD, ASPD))</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(results2)</a>
 <a class="sourceLine" id="cb6-3" title="3"><span class="co">#&gt; Call:</span></a>
 <a class="sourceLine" id="cb6-4" title="4"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></a>
 <a class="sourceLine" id="cb6-5" title="5"><span class="co">#&gt;     measures = c(NARPD, ASPD))</span></a>
@@ -395,7 +403,7 @@ ASPD
 <a href="#generalizing-to-multiple-groups-and-multiple-measures" class="anchor"></a>Generalizing to multiple groups and multiple measures</h3>
 <p>Finally, it is possible to analyze multiple measures within multiple groups. As you might expect, this requires providing both the <code>measures</code> and <code>grouping</code> arguments to the same function call. Again, any number of measures and groups is possible. The profiles in such an analysis will be named GROUP_MEASURE as below.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">results3 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">grouping =</span> Gender, <span class="dt">measures =</span> PARPD<span class="op">:</span>SZTPD)</a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(results3)</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(results3)</a>
 <a class="sourceLine" id="cb9-3" title="3"><span class="co">#&gt; Call:</span></a>
 <a class="sourceLine" id="cb9-4" title="4"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></a>
 <a class="sourceLine" id="cb9-5" title="5"><span class="co">#&gt;     measures = PARPD:SZTPD, grouping = Gender)</span></a>
@@ -641,7 +649,7 @@ Male_SZTPD
 <a href="#contrasts-between-groups-means" class="anchor"></a>Contrasts between groups’ means</h3>
 <p>To compare the mean profiles for females and males, we can start with the same syntax we had before and then add a <code>contrast</code> argument. For the sake of illustration, we will use a model contrast here, but for some purposes, a parameter contrast might be more appropriate.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">results4 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017s, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">grouping =</span> Gender, <span class="dt">contrast =</span> <span class="st">"model"</span>)</a>
-<a class="sourceLine" id="cb12-2" title="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(results4)</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(results4)</a>
 <a class="sourceLine" id="cb12-3" title="3"><span class="co">#&gt; Call:</span></a>
 <a class="sourceLine" id="cb12-4" title="4"><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA:NO, angles = octants(), </span></a>
 <a class="sourceLine" id="cb12-5" title="5"><span class="co">#&gt;     grouping = Gender, contrast = "model")</span></a>
@@ -720,9 +728,9 @@ Male - Female
 <h3 class="hasAnchor">
 <a href="#contrasts-between-measures-in-a-group" class="anchor"></a>Contrasts between measures in a group</h3>
 <p>Comparing measures in a group is very similar. Again, all we need to do is add the <code>contrast</code> argument to the function call containing <code>measures</code>. Here we will use a parameter contrast to see what they look like.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">results5 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(NARPD, ASPD),</a>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">results5 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(NARPD, ASPD),</a>
 <a class="sourceLine" id="cb15-2" title="2">  <span class="dt">contrast =</span> <span class="st">"test"</span>)</a>
-<a class="sourceLine" id="cb15-3" title="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(results5)</a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(results5)</a>
 <a class="sourceLine" id="cb15-4" title="4"><span class="co">#&gt; Call:</span></a>
 <a class="sourceLine" id="cb15-5" title="5"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></a>
 <a class="sourceLine" id="cb15-6" title="6"><span class="co">#&gt;     measures = c(NARPD, ASPD), contrast = "test")</span></a>
@@ -803,7 +811,7 @@ ASPD - NARPD
 <p>Finally, we might want to compare a single measure’s profiles in two different groups. To do so, we need to specify the <code>measures</code>, the <code>grouping</code> variable, and the type of <code>contrast</code>. In this case, we need to ensure that we are providing only a single measure and a grouping variable with just two levels (as again only two things can be contrasted at a time). Note that the contrast name in this case will take the form of MEASURE: GROUP2 - GROUP1.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">results6 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(jz2017, PA<span class="op">:</span>NO, <span class="kw"><a href="../reference/octants.html">octants</a></span>(), <span class="dt">measures =</span> BORPD, </a>
 <a class="sourceLine" id="cb18-2" title="2">  <span class="dt">grouping =</span> Gender, <span class="dt">contrast =</span> <span class="st">"test"</span>)</a>
-<a class="sourceLine" id="cb18-3" title="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(results6)</a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(results6)</a>
 <a class="sourceLine" id="cb18-4" title="4"><span class="co">#&gt; Call:</span></a>
 <a class="sourceLine" id="cb18-5" title="5"><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></a>
 <a class="sourceLine" id="cb18-6" title="6"><span class="co">#&gt;     measures = BORPD, grouping = Gender, contrast = "test")</span></a>
@@ -1175,6 +1183,7 @@ Male
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -1193,13 +1202,15 @@ Male
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by <a href="https://www.jmgirard.com">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com">Aidan Wright</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
