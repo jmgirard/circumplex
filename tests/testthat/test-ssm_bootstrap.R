@@ -11,7 +11,11 @@ test_that("Quantile for circular radians works", {
   b <- as_radian(a)
   qb <- quantile(b)
   expect_s3_class(qb, "radian")
-  expect_equivalent(qb, as_radian(as_degree(c(180, 225, 270, 315, 0))))
+  if (getRversion() >= "3.7.0") {
+    expect_equivalent(qb, as_radian(as_degree(c(180, 225, 270, 315, 360))))
+  } else {
+    expect_equivalent(qb, as_radian(as_degree(c(180, 225, 270, 315, 0))))
+  }
 
   a <- as_degree(c(270:360, 1:90))
   b <- as_radian(a)

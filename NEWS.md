@@ -4,6 +4,8 @@
 
 * Add "Instruments" menu to package website for viewing documentation pages.
 
+* Adjust the test of quantile.radian() to account for changes to %% in R 3.7.0
+
 ----
 
 # circumplex 0.3.2
