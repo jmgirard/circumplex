@@ -1,10 +1,17 @@
 # circumplex (development version)
 
+
+----
+
+# circumplex 0.3.3
+
+## Minor improvements and fixes
+
 * Add APA-style citations to instrument documentation in addition to DOI links.
 
 * Add "Instruments" menu to package website for viewing documentation pages.
 
-* Adjust the test of quantile.radian() to account for changes to %% in R 3.7.0
+* Adjust the test of `quantile.radian()` to account for changes to `%%` in R 3.7.0
 
 ----
 
