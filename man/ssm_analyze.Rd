@@ -7,7 +7,7 @@
 ssm_analyze(
   .data,
   scales,
-  angles,
+  angles = octants(),
   measures = NULL,
   grouping = NULL,
   contrast = c("none", "test", "model"),
@@ -22,8 +22,9 @@ ssm_analyze(
 \item{scales}{Required. The variable names or column numbers for the
 variables in \code{.data} that contain circumplex scales to be analyzed.}
 
-\item{angles}{Required. A numeric vector containing the angular displacement
-of each circumplex scale included in \code{scales} (in degrees).}
+\item{angles}{Optional. A numeric vector containing the angular displacement
+of each circumplex scale included in \code{scales} (in degrees). (default =
+\code{octants()}).}
 
 \item{measures}{Optional. The variable names or column numbers for one or
 more variables in \code{.data} to be correlated with the circumplex scales
