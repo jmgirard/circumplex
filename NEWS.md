@@ -1,12 +1,16 @@
 # circumplex (development version)
 
+----
+
+# circumplex 0.3.4
+
 ## Minor improvements and fixes
 
 * Adjust the test of `quantile.radian()` to account for changes to `%%` starting in R 3.6.1 Patched
 
-* Add the name of the package to the S3 class names to minimize the risk of overlapping classes between packages
+* Add the name of the package to the S3 class names (e.g., `circumplex_radian` instead of `radian`) to minimize the risk of overlapping classes between packages
 
-* Add some supplementary files to R build ignore list to avoid notes during CRAN check
+* Add some supplementary files to the R build ignore list to avoid notes during CRAN check
 
 ----
 
