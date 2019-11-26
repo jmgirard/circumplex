@@ -8,7 +8,7 @@ test_that("Single-group mean-based SSM results are correct", {
 
   # Test the output object
   expect_type(res, "list")
-  expect_s3_class(res, "ssm")
+  expect_s3_class(res, "circumplex_ssm")
 
   # Test the results subobject
   expect_equal(round(res$results$e_est, 3), 0.423)
@@ -59,7 +59,7 @@ test_that("Multiple-group mean-based SSM results are correct", {
 
   # Test the output object
   expect_type(res, "list")
-  expect_s3_class(res, "ssm")
+  expect_s3_class(res, "circumplex_ssm")
 
   # Test the results subobject
   expect_equal(round(res$results$e_est, 3), c(0.946, 0.884))
@@ -114,7 +114,7 @@ test_that("Multiple-group mean-based SSM contrast is correct", {
 
   # Test the output object
   expect_type(res, "list")
-  expect_s3_class(res, "ssm")
+  expect_s3_class(res, "circumplex_ssm")
 
   # Test the results subobject
   expect_equal(round(res$results$e_est, 3), -0.062)
@@ -175,7 +175,7 @@ test_that("Single-group correlation-based SSM results are correct", {
 
   # Test the output object
   expect_type(res, "list")
-  expect_s3_class(res, "ssm")
+  expect_s3_class(res, "circumplex_ssm")
 
   # Test the results subobject
   expect_equal(round(res$results$e_est, 3), 0.250)
@@ -276,7 +276,7 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
 
   # Test the output object
   expect_type(res, "list")
-  expect_s3_class(res, "ssm")
+  expect_s3_class(res, "circumplex_ssm")
 
   # Test the results subobject
   expect_equal(round(res$results$e_est, 3), 0.079)
@@ -333,7 +333,7 @@ test_that("Group-contrast correlation-based SSM results are correct", {
 
   # Test the output object
   expect_type(res, "list")
-  expect_s3_class(res, "ssm")
+  expect_s3_class(res, "circumplex_ssm")
 
   # Test the results subobject
   expect_equal(round(res$results$e_est, 3), 0.072)

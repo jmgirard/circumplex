@@ -6,16 +6,16 @@ new_instrument <- function(Scales, Anchors, Items, Norms, Details, ...) {
     Norms = Norms,
     Details = Details,
     ...,
-    class = "instrument"
+    class = "circumplex_instrument"
   )
 }
 
 is_instrument <- function(x) {
-  typeof(x) == "list" & class(x) == "instrument"
+  typeof(x) == "list" & class(x) == "circumplex_instrument"
 }
 
 #' @export
-print.instrument <- function(x, ...) {
+print.circumplex_instrument <- function(x, ...) {
   cat(
     glue("{x$Details$Abbrev}: {x$Details$Name}"), "\n",
     glue("{x$Details$Items} items, {x$Details$Scales} scales, {nrow(x$Norms[[2]])} normative data sets"), "\n",
@@ -26,7 +26,7 @@ print.instrument <- function(x, ...) {
 }
 
 #' @export
-summary.instrument <- function(object, scales = TRUE, anchors = TRUE,
+summary.circumplex_instrument <- function(object, scales = TRUE, anchors = TRUE,
                                items = TRUE, norms = TRUE, ...) {
   x <- object
   print(x)

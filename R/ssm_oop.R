@@ -82,13 +82,13 @@ new_ssm <- function(results, details, call, ...) {
     details = details,
     call = call,
     ...,
-    class = "ssm"
+    class = "circumplex_ssm"
   )
 }
 
 #  Print method for objects of ssm class
 #' @export
-print.ssm <- function(x, digits = 3, ...) {
+print.circumplex_ssm <- function(x, digits = 3, ...) {
   # Print function call
   cat("Call:\n",
     paste(deparse(x$call), sep = "\n", collapse = "\n"),
@@ -120,7 +120,7 @@ print.ssm <- function(x, digits = 3, ...) {
 
 # Summary method for objects of ssm class
 #' @export
-summary.ssm <- function(object, digits = 3, ...) {
+summary.circumplex_ssm <- function(object, digits = 3, ...) {
   # Print function call
   cat("Call:\n",
     paste(deparse(object$call), sep = "\n", collapse = "\n"),

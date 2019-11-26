@@ -3,7 +3,7 @@ context("test-instrument_oop")
 
 test_that("S3 class constructors for instrument class work as expected", {
   i <- new_instrument(list(), list(), list(), list(), list())
-  expect_s3_class(i, "instrument")
+  expect_s3_class(i, "circumplex_instrument")
   expect_equal(is_instrument(i), TRUE)
 })
 
