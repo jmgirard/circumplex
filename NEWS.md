@@ -1,5 +1,12 @@
 # circumplex (development version)
 
+## Minor improvements and fixes
+
+* Adjust the test of `quantile.radian()` to account for changes to `%%` starting in R 3.6.1 Patched
+
+* Add the name of the package to the S3 class names to minimize the risk of overlapping classes between packages
+
+* Add some supplementary files to R build ignore list to avoid notes during CRAN check
 
 ----
 
@@ -11,7 +18,7 @@
 
 * Add "Instruments" menu to package website for viewing documentation pages.
 
-* Adjust the test of `quantile.radian()` to account for changes to `%%` in R 3.7.0
+* Adjust the test of `quantile.radian()` to account for changes to `%%` starting in R 4.0.0
 
 ----
 
