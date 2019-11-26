@@ -87,7 +87,7 @@ function that calculates SSM parameters for each row of a data frame." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.4</span>
       </span>
     </div>
 
@@ -211,9 +211,18 @@ returns only the parameters. See <code><a href='ssm_score.html'>ssm_score</a>()<
 function that calculates SSM parameters for each row of a data frame.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ssm_parameters</span>(<span class='no'>scores</span>, <span class='no'>angles</span>, <span class='kw'>prefix</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>e_label</span> <span class='kw'>=</span> <span class='st'>"Elev"</span>, <span class='kw'>x_label</span> <span class='kw'>=</span> <span class='st'>"Xval"</span>, <span class='kw'>y_label</span> <span class='kw'>=</span> <span class='st'>"Yval"</span>,
-  <span class='kw'>a_label</span> <span class='kw'>=</span> <span class='st'>"Ampl"</span>, <span class='kw'>d_label</span> <span class='kw'>=</span> <span class='st'>"Disp"</span>, <span class='kw'>f_label</span> <span class='kw'>=</span> <span class='st'>"Fit"</span>)</pre>
+    <pre class="usage"><span class='fu'>ssm_parameters</span>(
+  <span class='no'>scores</span>,
+  <span class='no'>angles</span>,
+  <span class='kw'>prefix</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>e_label</span> <span class='kw'>=</span> <span class='st'>"Elev"</span>,
+  <span class='kw'>x_label</span> <span class='kw'>=</span> <span class='st'>"Xval"</span>,
+  <span class='kw'>y_label</span> <span class='kw'>=</span> <span class='st'>"Yval"</span>,
+  <span class='kw'>a_label</span> <span class='kw'>=</span> <span class='st'>"Ampl"</span>,
+  <span class='kw'>d_label</span> <span class='kw'>=</span> <span class='st'>"Disp"</span>,
+  <span class='kw'>f_label</span> <span class='kw'>=</span> <span class='st'>"Fit"</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -275,11 +284,15 @@ fit or R-squared value (default = "Fit").</p></td>
     <p>A tibble containing the SSM parameters calculated from <code>scores</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other ssm functions: <code><a href='ssm_analyze.html'>ssm_analyze</a></code>,
-  <code><a href='ssm_append.html'>ssm_append</a></code>, <code><a href='ssm_plot.html'>ssm_plot</a></code>,
-  <code><a href='ssm_score.html'>ssm_score</a></code>, <code><a href='ssm_table.html'>ssm_table</a></code></p>
-<p>Other analysis functions: <code><a href='ssm_analyze.html'>ssm_analyze</a></code>,
-  <code><a href='ssm_score.html'>ssm_score</a></code></p></div>
+    <div class='dont-index'><p>Other ssm functions: 
+<code><a href='ssm_analyze.html'>ssm_analyze</a>()</code>,
+<code><a href='ssm_append.html'>ssm_append</a>()</code>,
+<code><a href='ssm_plot.html'>ssm_plot</a>()</code>,
+<code><a href='ssm_score.html'>ssm_score</a>()</code>,
+<code><a href='ssm_table.html'>ssm_table</a>()</code></p>
+<p>Other analysis functions: 
+<code><a href='ssm_analyze.html'>ssm_analyze</a>()</code>,
+<code><a href='ssm_score.html'>ssm_score</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Manually enter octant scores</span>

@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.4</span>
       </span>
     </div>
 
@@ -251,10 +251,10 @@
 <a class="sourceLine" id="cb3-20" title="20"><span class="co">#&gt;  8 Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1</span></a>
 <a class="sourceLine" id="cb3-21" title="21"><span class="co">#&gt;  9 Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span></a>
 <a class="sourceLine" id="cb3-22" title="22"><span class="co">#&gt; 10 Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span></a>
-<a class="sourceLine" id="cb3-23" title="23"><span class="co">#&gt; # ... with 1,156 more rows, and 15 more variables: ASPD &lt;int&gt;,</span></a>
-<a class="sourceLine" id="cb3-24" title="24"><span class="co">#&gt; #   BORPD &lt;int&gt;, HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;,</span></a>
-<a class="sourceLine" id="cb3-25" title="25"><span class="co">#&gt; #   OCPD &lt;int&gt;, PA_z &lt;dbl&gt;, BC_z &lt;dbl&gt;, DE_z &lt;dbl&gt;, FG_z &lt;dbl&gt;,</span></a>
-<a class="sourceLine" id="cb3-26" title="26"><span class="co">#&gt; #   HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;, NO_z &lt;dbl&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-23" title="23"><span class="co">#&gt; # ... with 1,156 more rows, and 15 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,</span></a>
+<a class="sourceLine" id="cb3-24" title="24"><span class="co">#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;, PA_z &lt;dbl&gt;,</span></a>
+<a class="sourceLine" id="cb3-25" title="25"><span class="co">#&gt; #   BC_z &lt;dbl&gt;, DE_z &lt;dbl&gt;, FG_z &lt;dbl&gt;, HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;,</span></a>
+<a class="sourceLine" id="cb3-26" title="26"><span class="co">#&gt; #   NO_z &lt;dbl&gt;</span></a></code></pre></div>
 <p>Now we can use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function to perform the SSM analysis. The first three arguments are the same as the first three arguments to <code><a href="../reference/standardize.html">standardize()</a></code>. We can pass the new <code>jz2017s</code> data frame that contains standardized scores as <code>.data</code> and the same vectors to <code>scales</code> and <code>angles</code> since these haven’t changed.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">results &lt;-<span class="st"> </span><span class="kw"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(</a>
 <a class="sourceLine" id="cb4-2" title="2">  <span class="dt">.data =</span> jz2017s,</a>

@@ -82,7 +82,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.4</span>
       </span>
     </div>
 
@@ -203,17 +203,32 @@
 </h1>
 <hr>
 </div>
-    <div id="circumplex-033" class="section level1">
+    <div id="circumplex-034" class="section level1">
 <h1 class="page-header">
-<a href="#circumplex-033" class="anchor"></a>circumplex 0.3.3<small> Unreleased </small>
+<a href="#circumplex-034" class="anchor"></a>circumplex 0.3.4<small> Unreleased </small>
 </h1>
 <div id="minor-improvements-and-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#minor-improvements-and-fixes" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
+<li><p>Adjust the test of <code>quantile.radian()</code> to account for changes to <code><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></code> starting in R 3.6.1 Patched</p></li>
+<li><p>Add the name of the package to the S3 class names (e.g., <code>circumplex_radian</code> instead of <code>radian</code>) to minimize the risk of overlapping classes between packages</p></li>
+<li><p>Add some supplementary files to the R build ignore list to avoid notes during CRAN check</p></li>
+</ul>
+<hr>
+</div>
+</div>
+    <div id="circumplex-033" class="section level1">
+<h1 class="page-header">
+<a href="#circumplex-033" class="anchor"></a>circumplex 0.3.3<small> 2019-09-26 </small>
+</h1>
+<div id="minor-improvements-and-fixes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements-and-fixes-1" class="anchor"></a>Minor improvements and fixes</h2>
+<ul>
 <li><p>Add APA-style citations to instrument documentation in addition to DOI links.</p></li>
 <li><p>Add “Instruments” menu to package website for viewing documentation pages.</p></li>
-<li><p>Adjust the test of <code>quantile.radian()</code> to account for changes to <code><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></code> in R 3.7.0</p></li>
+<li><p>Adjust the test of <code>quantile.radian()</code> to account for changes to <code><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></code> starting in R 4.0.0</p></li>
 </ul>
 <hr>
 </div>
@@ -229,9 +244,9 @@
 <li>New <code>iitc</code> provides instrument information for the Inventory of Influence Tactics Circumplex.</li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-1" class="section level2">
+<div id="minor-improvements-and-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-1" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-2" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Fix CRAN warnings by setting <code>LazyData: true</code>.</p></li>
 <li><p>Fix CRAN note by replacing relative URLs with absolute URLs.</p></li>
@@ -245,9 +260,9 @@
 <h1 class="page-header">
 <a href="#circumplex-031" class="anchor"></a>circumplex 0.3.1<small> 2019-05-15 </small>
 </h1>
-<div id="minor-improvements-and-fixes-2" class="section level2">
+<div id="minor-improvements-and-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-2" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-3" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Avoid a bug with dplyr 0.8.1 and S3 methods on Linux systems.</p></li>
 <li><p>Update the web address for Johannes in the README document.</p></li>
@@ -268,9 +283,9 @@
 <li><p>Added support for older versions of R (3.3.x).</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-3" class="section level2">
+<div id="minor-improvements-and-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-3" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-4" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Updated the “Introduction to SSM” vignette’s figures.</p></li>
 <li><p>Replaced use of <code><a href="https://dplyr.tidyverse.org/reference/funs.html">dplyr::funs()</a></code> as this function is being deprecated.</p></li>
@@ -294,9 +309,9 @@
 <li><p>Added open-access (i.e., full item text) to the <code>iis32</code> and <code>iis64</code>.</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-4" class="section level2">
+<div id="minor-improvements-and-fixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-4" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-5" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p><code>iis32</code> item ordering and scoring now match the author’s version.</p></li>
 <li><p><code>iis32</code> response anchors now range from 1 to 6 and match norms.</p></li>
@@ -319,9 +334,9 @@
 <li><p>Added function for standardizing scale-level data using normative data.</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-5" class="section level2">
+<div id="minor-improvements-and-fixes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-5" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-6" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Changed OpenMP flags in Makevars to fix a compile problem on Debian machines.</p></li>
 <li><p>Fixed a bug related to calculating angular medians in the presence of NAs.</p></li>
@@ -346,9 +361,9 @@
 <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> now uses dashed borders to indicate that a profile has low prototypicality/fit.</li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-6" class="section level2">
+<div id="minor-improvements-and-fixes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-6" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-7" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Fixed bug that prevented compilation on Solaris systems.</p></li>
 <li><p>Fixed bug that prevented CRAN checks on old R versions.</p></li>
@@ -369,9 +384,9 @@
 <a href="https://circumplex.jmgirard.com">Package website</a> added using <a href="https://pkgdown.r-lib.org/">pkgdown</a>.</li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-7" class="section level2">
+<div id="minor-improvements-and-fixes-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-7" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-8" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li>Fixed documentation to meet CRAN standards.</li>
 </ul>
@@ -393,6 +408,7 @@
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
         <li><a href="#circumplex-development-version">development version</a></li>
+        <li><a href="#circumplex-034">0.3.4</a></li>
         <li><a href="#circumplex-033">0.3.3</a></li>
         <li><a href="#circumplex-032">0.3.2</a></li>
         <li><a href="#circumplex-031">0.3.1</a></li>
