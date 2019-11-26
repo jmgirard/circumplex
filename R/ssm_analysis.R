@@ -9,8 +9,9 @@
 #' @param .data Required. A data frame containing at least circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex scales to be analyzed.
-#' @param angles Required. A numeric vector containing the angular displacement
-#'   of each circumplex scale included in \code{scales} (in degrees).
+#' @param angles Optional. A numeric vector containing the angular displacement
+#'   of each circumplex scale included in \code{scales} (in degrees). (default =
+#'   \code{octants()}).
 #' @param measures Optional. The variable names or column numbers for one or
 #'   more variables in \code{.data} to be correlated with the circumplex scales
 #'   and analyzed using correlation-based SSM analyses. To analyze the
@@ -48,10 +49,10 @@
 #' @examples
 #' # Load example data
 #' data("jz2017")
-#' 
+#'
 #' # Single-group mean-based SSM
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants())
-#' 
+#'
 #' # Single-group correlation-based SSM
 #' ssm_analyze(jz2017,
 #'   scales = PA:NO, angles = octants(),
@@ -60,25 +61,25 @@
 #' \donttest{
 #' # Multiple-group mean-based SSM
 #' ssm_analyze(jz2017, scales = PA:NO, angles = octants(), grouping = Gender)
-#' 
+#'
 #' # Multiple-group mean-based SSM with contrast
 #' ssm_analyze(jz2017,
 #'   scales = PA:NO, angles = octants(), grouping = Gender,
 #'   contrast = "model"
 #' )
-#' 
+#'
 #' # Single-group correlation-based SSM with contrast
 #' ssm_analyze(jz2017,
 #'   scales = PA:NO, angles = octants(),
 #'   measures = c(NARPD, ASPD), contrast = "test"
 #' )
-#' 
+#'
 #' # Multiple-group correlation-based SSM
 #' ssm_analyze(jz2017,
 #'   scales = PA:NO, angles = octants(), measures = NARPD,
 #'   grouping = Gender
 #' )
-#' 
+#'
 #' # Multiple-group correlation-based SSM with contrast
 #' ssm_analyze(jz2017,
 #'   scales = PA:NO, angles = octants(), measures = NARPD,
@@ -86,8 +87,8 @@
 #' )
 #' }
 #' 
-ssm_analyze <- function(.data, scales, angles, measures = NULL, grouping = NULL,
-                        contrast = c("none", "test", "model"), 
+ssm_analyze <- function(.data, scales, angles = octants(), measures = NULL, 
+                        grouping = NULL, contrast = c("none", "test", "model"), 
                         boots = 2000, interval = 0.95, listwise = TRUE) {
   call <- match.call()
   contrast <- match.arg(contrast)
