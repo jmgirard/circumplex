@@ -9,7 +9,7 @@
 Locke, K. D., & Sadler, P. (2007). Self-efficacy, values, and
 complementarity in dyadic interactions: Integrating interpersonal and
 social-cognitive theory. \emph{Personality and Social Psychology Bulletin,
-33}(1), 94-109. \url{https://doi.org/10/bzgf6p}
+33}(1), 94-109.
 
 \url{https://www.webpages.uidaho.edu/klocke/csie.htm}
 }

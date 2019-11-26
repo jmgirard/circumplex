@@ -8,7 +8,7 @@
 \source{
 Bliton, C. F., & Pincus, A. L. (in press). Construction and
 Validation of the Interpersonal Influence Tactics Circumplex (IIT-C)
-Scales. \emph{Assessment}. \url{https://doi.org/10/gf5nf8}
+Scales. \emph{Assessment}.
 
 \url{https://doi.org/10.1177/1073191119864661}
 }

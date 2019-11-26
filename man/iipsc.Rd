@@ -8,7 +8,7 @@
 \source{
 Soldz, S., Budman, S., Demby, A., & Merry, J. (1995). A short form of
 the Inventory of Interpersonal Problems Circumplex Scales. \emph{Assessment,
-2}(1), 53-63. \url{https://doi.org/10/brb577}
+2}(1), 53-63.
 
 \url{https://doi.org/10.1080/00223890802388665}
 }

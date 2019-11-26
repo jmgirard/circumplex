@@ -8,8 +8,7 @@
 \source{
 Hopwood, C. J., Ansell, E. B., Pincus, A. L., Wright, A. G. C.,
 Lukowitsky, M. R., & Roche, M. J. (2011). The circumplex structure of
-interpersonal sensitivities. \emph{Journal of Personality, 79}(4), 707–740.
-\url{https://doi.org/10/fsmn7d}
+interpersonal sensitivities. \emph{Journal of Personality, 79}(4), 707-740.
 
 \url{https://doi.org/10.1111/j.1467-6494.2011.00696.x}
 }

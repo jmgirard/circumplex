@@ -7,8 +7,7 @@
 \format{An object of class \code{circumplex_instrument} of length 5.}
 \source{
 Markey, P. M., & Markey, C. N. (2009). A brief assessment of the
-interpersonal circumplex: The IPIP-IPC. \emph{Assessment, 16}(4), 352–361.
-\url{https://doi.org/10/fc6h8s}
+interpersonal circumplex: The IPIP-IPC. \emph{Assessment, 16}(4), 352-361.
 
 \url{https://doi.org/10.1177/1073191109340382}
 }
