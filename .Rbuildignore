@@ -13,5 +13,5 @@
 ^CONDUCT\.md$
 ^_pkgdown\.yml$
 ^docs$
-^revdep$
+^pkgdown$
 ^\.covrignore$
