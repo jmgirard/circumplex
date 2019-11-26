@@ -4,9 +4,18 @@
 \alias{ssm_parameters}
 \title{Calculate Structural Summary Method parameters for a set of scores}
 \usage{
-ssm_parameters(scores, angles, prefix = "", suffix = "",
-  e_label = "Elev", x_label = "Xval", y_label = "Yval",
-  a_label = "Ampl", d_label = "Disp", f_label = "Fit")
+ssm_parameters(
+  scores,
+  angles,
+  prefix = "",
+  suffix = "",
+  e_label = "Elev",
+  x_label = "Xval",
+  y_label = "Yval",
+  a_label = "Ampl",
+  d_label = "Disp",
+  f_label = "Fit"
+)
 }
 \arguments{
 \item{scores}{Required. A numeric vector (or single row data frame)
@@ -62,12 +71,16 @@ ssm_parameters(scores, angles = octants(), prefix = "IIP_")
 
 }
 \seealso{
-Other ssm functions: \code{\link{ssm_analyze}},
-  \code{\link{ssm_append}}, \code{\link{ssm_plot}},
-  \code{\link{ssm_score}}, \code{\link{ssm_table}}
+Other ssm functions: 
+\code{\link{ssm_analyze}()},
+\code{\link{ssm_append}()},
+\code{\link{ssm_plot}()},
+\code{\link{ssm_score}()},
+\code{\link{ssm_table}()}
 
-Other analysis functions: \code{\link{ssm_analyze}},
-  \code{\link{ssm_score}}
+Other analysis functions: 
+\code{\link{ssm_analyze}()},
+\code{\link{ssm_score}()}
 }
 \concept{analysis functions}
 \concept{ssm functions}

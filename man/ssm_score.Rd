@@ -34,12 +34,16 @@ ssm_score(aw2009, scales = PA:NO, angles = octants())
 
 }
 \seealso{
-Other ssm functions: \code{\link{ssm_analyze}},
-  \code{\link{ssm_append}}, \code{\link{ssm_parameters}},
-  \code{\link{ssm_plot}}, \code{\link{ssm_table}}
+Other ssm functions: 
+\code{\link{ssm_analyze}()},
+\code{\link{ssm_append}()},
+\code{\link{ssm_parameters}()},
+\code{\link{ssm_plot}()},
+\code{\link{ssm_table}()}
 
-Other analysis functions: \code{\link{ssm_analyze}},
-  \code{\link{ssm_parameters}}
+Other analysis functions: 
+\code{\link{ssm_analyze}()},
+\code{\link{ssm_parameters}()}
 }
 \concept{analysis functions}
 \concept{ssm functions}

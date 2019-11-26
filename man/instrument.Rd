@@ -30,8 +30,11 @@ instrument("iip32")
 x <- instrument(iip32)
 }
 \seealso{
-Other instrument functions: \code{\link{anchors}},
-  \code{\link{instruments}}, \code{\link{items}},
-  \code{\link{norms}}, \code{\link{scales}}
+Other instrument functions: 
+\code{\link{anchors}()},
+\code{\link{instruments}()},
+\code{\link{items}()},
+\code{\link{norms}()},
+\code{\link{scales}()}
 }
 \concept{instrument functions}

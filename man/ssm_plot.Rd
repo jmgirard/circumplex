@@ -44,9 +44,12 @@ p <- ssm_plot(res)
 \seealso{
 ggsave Function for saving plots to image files.
 
-Other ssm functions: \code{\link{ssm_analyze}},
-  \code{\link{ssm_append}}, \code{\link{ssm_parameters}},
-  \code{\link{ssm_score}}, \code{\link{ssm_table}}
+Other ssm functions: 
+\code{\link{ssm_analyze}()},
+\code{\link{ssm_append}()},
+\code{\link{ssm_parameters}()},
+\code{\link{ssm_score}()},
+\code{\link{ssm_table}()}
 }
 \concept{ssm functions}
 \concept{visualization functions}

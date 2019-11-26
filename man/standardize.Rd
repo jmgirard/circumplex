@@ -4,8 +4,15 @@
 \alias{standardize}
 \title{Standardize circumplex scales using normative data}
 \usage{
-standardize(.data, scales, angles, instrument, sample = 1, prefix = "",
-  suffix = "_z")
+standardize(
+  .data,
+  scales,
+  angles,
+  instrument,
+  sample = 1,
+  prefix = "",
+  suffix = "_z"
+)
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -49,7 +56,8 @@ instrument("iipsc")
 standardize(jz2017, PA:NO, octants(), instrument = iipsc, sample = 1)
 }
 \seealso{
-Other tidying functions: \code{\link{ipsatize}},
-  \code{\link{score}}
+Other tidying functions: 
+\code{\link{ipsatize}()},
+\code{\link{score}()}
 }
 \concept{tidying functions}

@@ -15,8 +15,11 @@ Individual instruments can be loaded using the \code{instrument} function.
 instruments()
 }
 \seealso{
-Other instrument functions: \code{\link{anchors}},
-  \code{\link{instrument}}, \code{\link{items}},
-  \code{\link{norms}}, \code{\link{scales}}
+Other instrument functions: 
+\code{\link{anchors}()},
+\code{\link{instrument}()},
+\code{\link{items}()},
+\code{\link{norms}()},
+\code{\link{scales}()}
 }
 \concept{instrument functions}

@@ -4,8 +4,14 @@
 \alias{ssm_plot_contrast}
 \title{Create a Difference Plot of SSM Contrast Results}
 \usage{
-ssm_plot_contrast(.ssm_object, axislabel = "Difference", xy = TRUE,
-  color = "red", linesize = 1.25, fontsize = 12)
+ssm_plot_contrast(
+  .ssm_object,
+  axislabel = "Difference",
+  xy = TRUE,
+  color = "red",
+  linesize = 1.25,
+  fontsize = 12
+)
 }
 \arguments{
 \item{.ssm_object}{Required. The results output of \code{ssm_analyze}.}

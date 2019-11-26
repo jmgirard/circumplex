@@ -2,7 +2,7 @@
 
 S3method(print,instrument)
 S3method(print,ssm)
-S3method(quantile,radian)
+S3method(quantile,circumplex_radian)
 S3method(summary,instrument)
 S3method(summary,ssm)
 export("%>%")

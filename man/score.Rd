@@ -4,8 +4,7 @@
 \alias{score}
 \title{Score circumplex scales from item responses}
 \usage{
-score(.data, items, instrument, na.rm = TRUE, prefix = "",
-  suffix = "")
+score(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = "")
 }
 \arguments{
 \item{.data}{Required. A data frame containing at least circumplex scales.}
@@ -44,7 +43,8 @@ instrument("iipsc")
 score(raw_iipsc, IIP01:IIP32, iipsc)
 }
 \seealso{
-Other tidying functions: \code{\link{ipsatize}},
-  \code{\link{standardize}}
+Other tidying functions: 
+\code{\link{ipsatize}()},
+\code{\link{standardize}()}
 }
 \concept{tidying functions}

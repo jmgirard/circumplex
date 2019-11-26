@@ -36,7 +36,8 @@ data("raw_iipsc")
 ipsatize(raw_iipsc, IIP01:IIP32)
 }
 \seealso{
-Other tidying functions: \code{\link{score}},
-  \code{\link{standardize}}
+Other tidying functions: 
+\code{\link{score}()},
+\code{\link{standardize}()}
 }
 \concept{tidying functions}
