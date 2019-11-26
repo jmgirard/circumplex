@@ -120,31 +120,31 @@ NARPD
 
 <td style="text-align:left;">
 
-0.20 \[0.17, 0.24\]
+0.20 [0.17, 0.24]
 
 </td>
 
 <td style="text-align:left;">
 
-\-0.06 \[-0.09, -0.03\]
+-0.06 [-0.09, -0.03]
 
 </td>
 
 <td style="text-align:left;">
 
-0.18 \[0.14, 0.21\]
+0.18 [0.14, 0.21]
 
 </td>
 
 <td style="text-align:left;">
 
-0.19 \[0.15, 0.23\]
+0.19 [0.15, 0.23]
 
 </td>
 
 <td style="text-align:left;">
 
-109.0 \[98.6, 118.5\]
+109.0 [98.6, 118.5]
 
 </td>
 
@@ -166,31 +166,31 @@ ASPD
 
 <td style="text-align:left;">
 
-0.12 \[0.09, 0.16\]
+0.12 [0.09, 0.16]
 
 </td>
 
 <td style="text-align:left;">
 
-\-0.10 \[-0.13, -0.06\]
+-0.10 [-0.13, -0.06]
 
 </td>
 
 <td style="text-align:left;">
 
-0.20 \[0.17, 0.24\]
+0.20 [0.17, 0.24]
 
 </td>
 
 <td style="text-align:left;">
 
-0.23 \[0.19, 0.26\]
+0.23 [0.19, 0.26]
 
 </td>
 
 <td style="text-align:left;">
 
-115.9 \[107.3, 124.2\]
+115.9 [107.3, 124.2]
 
 </td>
 
