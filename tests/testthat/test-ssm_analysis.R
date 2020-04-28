@@ -15,7 +15,7 @@ test_that("Single-group mean-based SSM results are correct", {
   expect_equal(round(res$results$x_est, 3), 0.945)
   expect_equal(round(res$results$y_est, 3), -0.264)
   expect_equal(round(res$results$a_est, 3), 0.981)
-  expect_equal(as.vector(round(res$results$d_est, 1)), 344.4)
+  expect_equal(round(res$results$d_est, 1), as_degree(344.4))
   expect_equal(round(res$results$fit_est, 3), 0.954)
   expect_equal(res$results$label, "All")
   expect_equal(round(res$results$e_lci, 3), 0.131)
@@ -26,8 +26,8 @@ test_that("Single-group mean-based SSM results are correct", {
   expect_equal(round(res$results$y_uci, 3), 0.300)
   expect_equal(round(res$results$a_lci, 3), 0.662)
   expect_equal(round(res$results$a_uci, 3), 1.370)
-  expect_equal(as.vector(round(res$results$d_lci, 3)), 316.480)
-  expect_equal(as.vector(round(res$results$d_uci, 3)), 17.194)
+  expect_equal(round(res$results$d_lci, 3), as_degree(316.480))
+  expect_equal(round(res$results$d_uci, 3), as_degree(17.194))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), 0.374)
@@ -66,7 +66,7 @@ test_that("Multiple-group mean-based SSM results are correct", {
   expect_equal(round(res$results$x_est, 3), c(0.459, 0.227))
   expect_equal(round(res$results$y_est, 3), c(-0.310, -0.186))
   expect_equal(round(res$results$a_est, 3), c(0.554, 0.294))
-  expect_equal(as.vector(round(res$results$d_est, 3)), c(325.963, 320.685))
+  expect_equal(round(res$results$d_est, 3), as_degree(c(325.963, 320.685)))
   expect_equal(round(res$results$fit_est, 3), c(0.889, 0.824))
   expect_equal(res$results$label, c("Female", "Male"))
   expect_equal(round(res$results$e_lci, 3), c(0.907, 0.843))
@@ -77,8 +77,8 @@ test_that("Multiple-group mean-based SSM results are correct", {
   expect_equal(round(res$results$y_uci, 3), c(-0.268, -0.149))
   expect_equal(round(res$results$a_lci, 3), c(0.511, 0.258))
   expect_equal(round(res$results$a_uci, 3), c(0.596, 0.331))
-  expect_equal(as.vector(round(res$results$d_lci, 3)), c(322.305, 313.424))
-  expect_equal(as.vector(round(res$results$d_uci, 3)), c(330.027, 327.915))
+  expect_equal(round(res$results$d_lci, 3), as_degree(c(322.305, 313.424)))
+  expect_equal(round(res$results$d_uci, 3), as_degree(c(330.027, 327.915)))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.519, 0.585))
@@ -121,7 +121,7 @@ test_that("Multiple-group mean-based SSM contrast is correct", {
   expect_equal(round(res$results$x_est, 3), -0.232)
   expect_equal(round(res$results$y_est, 3), 0.124)
   expect_equal(round(res$results$a_est, 3), 0.263)
-  expect_equal(round(res$results$d_est, 3), 151.858)
+  expect_equal(round(res$results$d_est, 3), as_degree(151.858))
   expect_equal(round(res$results$fit_est, 3), 0.855)
   expect_equal(res$results$label, "Male - Female")
   expect_equal(round(res$results$e_lci, 3), -0.116)
@@ -132,8 +132,8 @@ test_that("Multiple-group mean-based SSM contrast is correct", {
   expect_equal(round(res$results$y_uci, 3), 0.181)
   expect_equal(round(res$results$a_lci, 3), 0.211)
   expect_equal(round(res$results$a_uci, 3), 0.320)
-  expect_equal(round(res$results$d_lci, 3), 141.379)
-  expect_equal(round(res$results$d_uci, 3), 164.198)
+  expect_equal(round(res$results$d_lci, 3), as_degree(141.379))
+  expect_equal(round(res$results$d_uci, 3), as_degree(164.198))
 
   # Test the details subobject
   expect_equal(res$details$boots, 2000)
@@ -182,7 +182,7 @@ test_that("Single-group correlation-based SSM results are correct", {
   expect_equal(round(res$results$x_est, 3), -0.094)
   expect_equal(round(res$results$y_est, 3), 0.117)
   expect_equal(round(res$results$a_est, 3), 0.150)
-  expect_equal(as.vector(round(res$results$d_est, 1)), 128.9)
+  expect_equal(round(res$results$d_est, 1), as_degree(128.9))
   expect_equal(round(res$results$fit_est, 3), 0.802)
   expect_equal(res$scores$Group, factor("All"))
   expect_equal(res$scores$Measure, "PARPD")
@@ -195,8 +195,8 @@ test_that("Single-group correlation-based SSM results are correct", {
   expect_equal(round(res$results$y_uci, 3), 0.153)
   expect_equal(round(res$results$a_lci, 3), 0.115)
   expect_equal(round(res$results$a_uci, 3), 0.189)
-  expect_equal(as.vector(round(res$results$d_lci, 3)), 115.894)
-  expect_equal(as.vector(round(res$results$d_uci, 3)), 142.094)
+  expect_equal(round(res$results$d_lci, 3), as_degree(115.894))
+  expect_equal(round(res$results$d_uci, 3), as_degree(142.094))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), 0.329)
@@ -283,7 +283,7 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$x_est, 3), 0.037)
   expect_equal(round(res$results$y_est, 3), -0.024)
   expect_equal(round(res$results$a_est, 3), -0.037)
-  expect_equal(round(res$results$d_est, 1), -7.0)
+  expect_equal(round(res$results$d_est, 1), as_degree(-7.0))
   expect_equal(round(res$results$fit_est, 3), -0.007)
   expect_equal(res$results$label, "NARPD - ASPD")
   expect_equal(round(res$results$e_lci, 3), 0.039)
@@ -294,8 +294,8 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$y_uci, 3), 0.012)
   expect_equal(round(res$results$a_lci, 3), -0.075)
   expect_equal(round(res$results$a_uci, 3), 0.001)
-  expect_equal(round(res$results$d_lci, 3), -17.322)
-  expect_equal(round(res$results$d_uci, 3), 3.662)
+  expect_equal(round(res$results$d_lci, 3), as_degree(-17.322))
+  expect_equal(round(res$results$d_uci, 3), as_degree(3.662))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.368, 0.400))
@@ -340,7 +340,7 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$x_est, 3), 0.051)
   expect_equal(round(res$results$y_est, 3), -0.056)
   expect_equal(round(res$results$a_est, 3), -0.068)
-  expect_equal(round(res$results$d_est, 1), -10.4)
+  expect_equal(round(res$results$d_est, 1), as_degree(-10.4))
   expect_equal(round(res$results$fit_est, 3), -0.071)
   expect_equal(res$results$label, "NARPD: Male - Female")
   expect_equal(round(res$results$e_lci, 3), 0.004)
@@ -351,8 +351,8 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$y_uci, 3), 0.011)
   expect_equal(round(res$results$a_lci, 3), -0.134)
   expect_equal(round(res$results$a_uci, 3), 0.003)
-  expect_equal(round(res$results$d_lci, 3), -31.700)
-  expect_equal(round(res$results$d_uci, 3), 9.985)
+  expect_equal(round(res$results$d_lci, 3), as_degree(-31.700))
+  expect_equal(round(res$results$d_uci, 3), as_degree(9.985))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.385, 0.415))
