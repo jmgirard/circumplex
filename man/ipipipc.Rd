@@ -4,7 +4,9 @@
 \name{ipipipc}
 \alias{ipipipc}
 \title{IPIP Interpersonal Circumplex}
-\format{An object of class \code{circumplex_instrument} of length 5.}
+\format{
+An object of class \code{circumplex_instrument} of length 5.
+}
 \source{
 Markey, P. M., & Markey, C. N. (2009). A brief assessment of the
 interpersonal circumplex: The IPIP-IPC. \emph{Assessment, 16}(4), 352-361.

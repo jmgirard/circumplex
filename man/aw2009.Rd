@@ -4,7 +4,8 @@
 \name{aw2009}
 \alias{aw2009}
 \title{Standardized octant scores on hypothetical circumplex scales}
-\format{A data frame with 5 observations and 8 variables:
+\format{
+A data frame with 5 observations and 8 variables:
 \describe{
 \item{PA}{circumplex scale at 90 degrees}
 \item{BC}{circumplex scale at 135 degrees}
@@ -14,7 +15,8 @@
 \item{JK}{circumplex scale at 315 degrees}
 \item{LM}{circumplex scale at 360 degrees}
 \item{NO}{circumplex scale at 45 degrees}
-}}
+}
+}
 \source{
 \url{https://doi.org/10.1080/00223890902935696}
 }

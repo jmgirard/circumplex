@@ -4,7 +4,9 @@
 \name{csip}
 \alias{csip}
 \title{Circumplex Scales of Interpersonal Problems}
-\format{An object of class \code{circumplex_instrument} of length 5.}
+\format{
+An object of class \code{circumplex_instrument} of length 5.
+}
 \source{
 Boudreaux, M. J., Ozer, D. J., Oltmanns, T. F., & Wright, A. G. C.
 (2018). Development and validation of the circumplex scales of

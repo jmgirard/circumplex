@@ -4,7 +4,8 @@
 \name{jz2017}
 \alias{jz2017}
 \title{Raw octant scores on real circumplex scales with covariates}
-\format{A data frame with 1166 observations and 19 variables:
+\format{
+A data frame with 1166 observations and 19 variables:
 \describe{
 \item{Gender}{Self-reported Gender}
 \item{PA}{Domineering Problems (IIP-SC) 90 degrees}
@@ -25,7 +26,8 @@
 \item{AVPD}{Avoidant PD Symptoms (PDQ-4+)}
 \item{DPNPD}{Dependent PD Symptoms (PDQ-4+)}
 \item{OCPD}{Obsessive-Compulsive PD Symptoms (PDQ-4+)}
-}}
+}
+}
 \source{
 \url{https://doi.org/10.1177/1073191115621795}
 }

@@ -4,7 +4,9 @@
 \name{raw_iipsc}
 \alias{raw_iipsc}
 \title{Raw item responses on real circumplex scales}
-\format{A data frame with 10 observations and 32 variables.}
+\format{
+A data frame with 10 observations and 32 variables.
+}
 \usage{
 raw_iipsc
 }

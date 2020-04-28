@@ -4,7 +4,9 @@
 \name{iipsc}
 \alias{iipsc}
 \title{Inventory of Interpersonal Problems, Short Circumplex}
-\format{An object of class \code{circumplex_instrument} of length 5.}
+\format{
+An object of class \code{circumplex_instrument} of length 5.
+}
 \source{
 Soldz, S., Budman, S., Demby, A., & Merry, J. (1995). A short form of
 the Inventory of Interpersonal Problems Circumplex Scales. \emph{Assessment,
