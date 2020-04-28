@@ -27,21 +27,25 @@ new_degree <- function(x) {
 }
 
 # S3 generic for class 'degree'
+#' @export
 as_degree <- function(x, ...) {
   UseMethod("as_degree")
 }
 
 # Set numeric object to class 'degree'
+#' @export
 as_degree.default <- function(x, ...) {
   new_degree(x)
 }
 
 # Return object if already class 'degree'
+#' @export
 as_degree.circumplex_degree <- function(x, ...) {
   x
 }
 
 # Convert from class 'radian' to class 'degree'
+#' @export
 as_degree.circumplex_radian <- function(x, ...) {
   new_degree(x * (180 / pi))
 }
@@ -49,26 +53,31 @@ as_degree.circumplex_radian <- function(x, ...) {
 # Class radian -----------------------------------------------------------------
 
 # Set numeric object to class 'radian'
+#' @export
 new_radian <- function(x) {
   new_s3_num(x, class = c("circumplex_radian", "numeric"))
 }
 
 # S3 generic for class 'radian'
+#' @export
 as_radian <- function(x, ...) {
   UseMethod("as_radian")
 }
 
 # Set numeric object to class 'radian'
+#' @export
 as_radian.default <- function(x, ...) {
   new_radian(x)
 }
 
 # Return object if already class 'radian'
+#' @export
 as_radian.circumplex_radian <- function(x, ...) {
   x
 }
 
 # Convert from class 'degree' to class 'radian'
+#' @export
 as_radian.circumplex_degree <- function(x, ...) {
   new_radian(x * (pi / 180))
 }
