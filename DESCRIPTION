@@ -52,7 +52,7 @@ Suggests:
     testthat (>= 2.3.2)
 LinkingTo: 
     Rcpp (>= 1.0.4.6),
-    RcppArmadillo (>= 0.9.870.2.0)
+    RcppArmadillo (>= 0.9)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
