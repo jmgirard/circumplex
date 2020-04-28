@@ -176,18 +176,23 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
 
   # TODO: Check that these ifelse() statements are correct
 
-  res <- dplyr::mutate(res,
-    d_uci = ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci),
-    d_lci = ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci)
-  ) %>%
-    tidyr::gather(key, value, -label, -fit_est) %>%
-    tidyr::extract(key, c("Parameter", "Type"), "(.)_(...)") %>%
-    tidyr::spread(Type, value) %>%
-    dplyr::rename(Difference = est, Contrast = label) %>%
+  res <- 
+    res %>% 
     dplyr::mutate(
-      Parameter = factor(Parameter, levels = c("e", "x", "y", "a", "d"))
-    )
-  p <- ggplot2::ggplot(res) +
+      d_est = unclass(d_est),
+      d_uci = unclass(ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci)),
+      d_lci = unclass(ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci))
+    ) %>%
+    dplyr::select(-fit_est) %>% 
+    tidyr::pivot_longer(cols = e_est:d_uci, names_to = "key", values_to = "value") %>% 
+    tidyr::extract(col = key, into = c("Parameter", "Type"), "(.)_(...)") %>% 
+    tidyr::pivot_wider(names_from = Type, values_from = value) %>% 
+    dplyr::rename(Difference = est, Contrast = label) %>%
+    dplyr::mutate(Parameter = factor(Parameter, levels = c("e", "x", "y", "a", "d")))
+  
+  p <- 
+    res %>% 
+    ggplot2::ggplot() +
     ggplot2::theme_bw(base_size = fontsize) +
     ggplot2::theme(
       legend.position = "top",
