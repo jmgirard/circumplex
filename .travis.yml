@@ -10,14 +10,7 @@ before_install:
 matrix:
   include:
   - r: devel
-    r_binary_packages:
-    - dplyr
-    - rcpp
   - r: release
-    r_binary_packages:
-    - dplyr
-    - rcpp
     after_success:
     - Rscript -e 'covr::codecov()'
   - r: oldrel
-  - r: 3.3
