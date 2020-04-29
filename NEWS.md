@@ -2,11 +2,25 @@
 
 ----
 
+# circumplex 0.3.6
+
+## Minor improvements and fixes
+
+* Update dependency versions and require R >= 3.4.0
+
+* Fix issues related to how R 4.0.0 handles S3 methods
+
+* Modernize ssm_plot() function to use new tidyr syntax
+
+* Update travis CI configuration to be more explicit
+
+----
+
 # circumplex 0.3.5
 
 ## Minor improvements and fixes
 
-* Removed several unit tests that were causing problems for CRAN checks
+* Remove several unit tests that were causing problems for CRAN checks
 
 ----
 
