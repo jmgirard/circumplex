@@ -25,8 +25,8 @@ test_that("Single-group mean-based SSM results are correct", {
   expect_equal(round(res$results$y_uci, 3), 0.300)
   expect_equal(round(res$results$a_lci, 3), 0.662)
   expect_equal(round(res$results$a_uci, 3), 1.403)
-  expect_equal(round(res$results$d_lci, 3), as_degree(3.960))
-  expect_equal(round(res$results$d_uci, 3), as_degree(357.209))
+  expect_equal(round(res$results$d_lci, 3), as_degree(316.480))
+  expect_equal(round(res$results$d_uci, 3), as_degree(17.191))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), 0.374)
@@ -52,7 +52,6 @@ test_that("Multiple-group mean-based SSM results are correct", {
   skip_on_cran()
 
   data("jz2017")
-  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
 
@@ -68,16 +67,16 @@ test_that("Multiple-group mean-based SSM results are correct", {
   expect_equal(round(res$results$d_est, 3), as_degree(c(325.963, 320.685)))
   expect_equal(round(res$results$fit_est, 3), c(0.889, 0.824))
   expect_equal(res$results$label, c("Female", "Male"))
-  expect_equal(round(res$results$e_lci, 3), c(0.907, 0.843))
-  expect_equal(round(res$results$e_uci, 3), c(0.982, 0.925))
-  expect_equal(round(res$results$x_lci, 3), c(0.421, 0.192))
-  expect_equal(round(res$results$x_uci, 3), c(0.498, 0.261))
-  expect_equal(round(res$results$y_lci, 3), c(-0.350, -0.224))
-  expect_equal(round(res$results$y_uci, 3), c(-0.268, -0.149))
-  expect_equal(round(res$results$a_lci, 3), c(0.511, 0.258))
-  expect_equal(round(res$results$a_uci, 3), c(0.596, 0.331))
-  expect_equal(round(res$results$d_lci, 3), as_degree(c(322.305, 313.424)))
-  expect_equal(round(res$results$d_uci, 3), as_degree(c(330.027, 327.915)))
+  expect_equal(round(res$results$e_lci, 3), c(0.907, 0.839))
+  expect_equal(round(res$results$e_uci, 3), c(0.984, 0.928))
+  expect_equal(round(res$results$x_lci, 3), c(0.422, 0.191))
+  expect_equal(round(res$results$x_uci, 3), c(0.498, 0.262))
+  expect_equal(round(res$results$y_lci, 3), c(-0.357, -0.225))
+  expect_equal(round(res$results$y_uci, 3), c(-0.266, -0.147))
+  expect_equal(round(res$results$a_lci, 3), c(0.511, 0.256))
+  expect_equal(round(res$results$a_uci, 3), c(0.600, 0.330))
+  expect_equal(round(res$results$d_lci, 3), as_degree(c(321.834, 313.386)))
+  expect_equal(round(res$results$d_uci, 3), as_degree(c(329.805, 327.985)))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.519, 0.585))
@@ -104,7 +103,6 @@ test_that("Multiple-group mean-based SSM contrast is correct", {
   skip_on_cran()
 
   data("jz2017")
-  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     grouping = Gender,
@@ -123,16 +121,16 @@ test_that("Multiple-group mean-based SSM contrast is correct", {
   expect_equal(round(res$results$d_est, 3), as_degree(151.858))
   expect_equal(round(res$results$fit_est, 3), 0.855)
   expect_equal(res$results$label, "Male - Female")
-  expect_equal(round(res$results$e_lci, 3), -0.116)
-  expect_equal(round(res$results$e_uci, 3), -0.004)
-  expect_equal(round(res$results$x_lci, 3), -0.286)
-  expect_equal(round(res$results$x_uci, 3), -0.183)
-  expect_equal(round(res$results$y_lci, 3), 0.065)
-  expect_equal(round(res$results$y_uci, 3), 0.181)
-  expect_equal(round(res$results$a_lci, 3), 0.211)
-  expect_equal(round(res$results$a_uci, 3), 0.320)
-  expect_equal(round(res$results$d_lci, 3), as_degree(141.379))
-  expect_equal(round(res$results$d_uci, 3), as_degree(164.198))
+  expect_equal(round(res$results$e_lci, 3), -0.122)
+  expect_equal(round(res$results$e_uci, 3), -0.002)
+  expect_equal(round(res$results$x_lci, 3), -0.285)
+  expect_equal(round(res$results$x_uci, 3), -0.180)
+  expect_equal(round(res$results$y_lci, 3), 0.067)
+  expect_equal(round(res$results$y_uci, 3), 0.183)
+  expect_equal(round(res$results$a_lci, 3), 0.210)
+  expect_equal(round(res$results$a_uci, 3), 0.322)
+  expect_equal(round(res$results$d_lci, 3), as_degree(140.130))
+  expect_equal(round(res$results$d_uci, 3), as_degree(164.067))
 
   # Test the details subobject
   expect_equal(res$details$boots, 2000)
@@ -167,8 +165,9 @@ test_that("Providing more than two groups throws error", {
 })
 
 test_that("Single-group correlation-based SSM results are correct", {
+  skip_on_cran()
+  
   data("jz2017")
-  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
 
@@ -187,15 +186,15 @@ test_that("Single-group correlation-based SSM results are correct", {
   expect_equal(res$scores$Measure, "PARPD")
   expect_equal(res$scores$label, "PARPD")
   expect_equal(round(res$results$e_lci, 3), 0.218)
-  expect_equal(round(res$results$e_uci, 3), 0.280)
-  expect_equal(round(res$results$x_lci, 3), -0.129)
-  expect_equal(round(res$results$x_uci, 3), -0.060)
+  expect_equal(round(res$results$e_uci, 3), 0.282)
+  expect_equal(round(res$results$x_lci, 3), -0.128)
+  expect_equal(round(res$results$x_uci, 3), -0.062)
   expect_equal(round(res$results$y_lci, 3), 0.081)
   expect_equal(round(res$results$y_uci, 3), 0.153)
-  expect_equal(round(res$results$a_lci, 3), 0.115)
+  expect_equal(round(res$results$a_lci, 3), 0.113)
   expect_equal(round(res$results$a_uci, 3), 0.189)
-  expect_equal(round(res$results$d_lci, 3), as_degree(115.894))
-  expect_equal(round(res$results$d_uci, 3), as_degree(142.094))
+  expect_equal(round(res$results$d_lci, 3), as_degree(117.261))
+  expect_equal(round(res$results$d_uci, 3), as_degree(141.596))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), 0.329)
@@ -266,7 +265,6 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   skip_on_cran()
 
   data("jz2017")
-  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     measures = c(ASPD, NARPD),
@@ -285,16 +283,16 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$d_est, 1), as_degree(-7.0))
   expect_equal(round(res$results$fit_est, 3), -0.007)
   expect_equal(res$results$label, "NARPD - ASPD")
-  expect_equal(round(res$results$e_lci, 3), 0.039)
-  expect_equal(round(res$results$e_uci, 3), 0.116)
-  expect_equal(round(res$results$x_lci, 3), -0.003)
+  expect_equal(round(res$results$e_lci, 3), 0.042)
+  expect_equal(round(res$results$e_uci, 3), 0.117)
+  expect_equal(round(res$results$x_lci, 3), -0.001)
   expect_equal(round(res$results$x_uci, 3), 0.075)
-  expect_equal(round(res$results$y_lci, 3), -0.060)
-  expect_equal(round(res$results$y_uci, 3), 0.012)
-  expect_equal(round(res$results$a_lci, 3), -0.075)
-  expect_equal(round(res$results$a_uci, 3), 0.001)
-  expect_equal(round(res$results$d_lci, 3), as_degree(-17.322))
-  expect_equal(round(res$results$d_uci, 3), as_degree(3.662))
+  expect_equal(round(res$results$y_lci, 3), -0.063)
+  expect_equal(round(res$results$y_uci, 3), 0.014)
+  expect_equal(round(res$results$a_lci, 3), -0.077)
+  expect_equal(round(res$results$a_uci, 3), 0.003)
+  expect_equal(round(res$results$d_lci, 3), as_degree(-17.384))
+  expect_equal(round(res$results$d_uci, 3), as_degree(3.245))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.368, 0.400))
@@ -323,7 +321,6 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   skip_on_cran()
 
   data("jz2017")
-  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     measures = NARPD,
@@ -342,16 +339,16 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   expect_equal(round(res$results$d_est, 1), as_degree(-10.4))
   expect_equal(round(res$results$fit_est, 3), -0.071)
   expect_equal(res$results$label, "NARPD: Male - Female")
-  expect_equal(round(res$results$e_lci, 3), 0.004)
-  expect_equal(round(res$results$e_uci, 3), 0.140)
-  expect_equal(round(res$results$x_lci, 3), -0.009)
-  expect_equal(round(res$results$x_uci, 3), 0.113)
-  expect_equal(round(res$results$y_lci, 3), -0.122)
-  expect_equal(round(res$results$y_uci, 3), 0.011)
-  expect_equal(round(res$results$a_lci, 3), -0.134)
-  expect_equal(round(res$results$a_uci, 3), 0.003)
-  expect_equal(round(res$results$d_lci, 3), as_degree(-31.700))
-  expect_equal(round(res$results$d_uci, 3), as_degree(9.985))
+  expect_equal(round(res$results$e_lci, 3), 0.005)
+  expect_equal(round(res$results$e_uci, 3), 0.142)
+  expect_equal(round(res$results$x_lci, 3), -0.015)
+  expect_equal(round(res$results$x_uci, 3), 0.111)
+  expect_equal(round(res$results$y_lci, 3), -0.120)
+  expect_equal(round(res$results$y_uci, 3), 0.006)
+  expect_equal(round(res$results$a_lci, 3), -0.133)
+  expect_equal(round(res$results$a_uci, 3), -0.003)
+  expect_equal(round(res$results$d_lci, 3), as_degree(-30.168))
+  expect_equal(round(res$results$d_uci, 3), as_degree(12.302))
 
   # Test the scores subobject
   expect_equal(round(res$scores$PA, 3), c(0.385, 0.415))
