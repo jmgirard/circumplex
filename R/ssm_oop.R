@@ -99,6 +99,7 @@ new_ssm <- function(results, details, call, ...) {
 }
 
 #  Print method for objects of ssm class
+#' @method print circumplex_ssm
 #' @export
 print.circumplex_ssm <- function(x, digits = 3, ...) {
   # Print function call
@@ -131,6 +132,7 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
 }
 
 # Summary method for objects of ssm class
+#' @method summary circumplex_ssm
 #' @export
 summary.circumplex_ssm <- function(object, digits = 3, ...) {
   # Print function call
