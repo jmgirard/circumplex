@@ -17,10 +17,11 @@ is_instrument <- function(x) {
 #' @export
 print.circumplex_instrument <- function(x, ...) {
   cat(
-    glue("{x$Details$Abbrev}: {x$Details$Name}"), "\n",
-    glue("{x$Details$Items} items, {x$Details$Scales} scales, {nrow(x$Norms[[2]])} normative data sets"), "\n",
-    glue("{x$Details$Reference}"), "\n",
-    glue("<{x$Details$URL}>"), "\n",
+    x$Details$Abbrev, ": ", x$Details$Name, "\n",
+    x$Details$Items, " items, ", x$Details$Scales, " scales, ", 
+    nrow(x$Norms[[2]]), " normative data sets", "\n",
+    x$Details$Reference, "\n",
+    "<", x$Details$URL, ">", "\n",
     sep = ""
   )
 }
@@ -66,25 +67,17 @@ summary.circumplex_instrument <- function(object, scales = TRUE, anchors = TRUE,
 scales <- function(x, items = FALSE) {
   assert_that(is_instrument(x), is.flag(items))
 
-  cat(
-    glue(
-      "The {x$Details$Abbrev} contains {x$Details$Scales} circumplex scales."
-    )
-  )
-  cat("\n")
+  cat("The ", x$Details$Abbrev, " contains ", x$Details$Scales, 
+      " circumplex scales.\n", sep = "")
   for (i in 1:nrow(x$Scales)) {
     xi <- x$Scales[i, ]
-    cat(
-      glue("{xi$Abbrev}: {xi$Label} ({xi$Angle} degrees)"),
-      "\n",
-      sep = ""
-    )
+    cat(xi$Abbrev, ": ", xi$Label, " (", xi$Angle, " degrees)", "\n", sep = "")
     if (items == TRUE) {
       item_nums <- as.integer(strsplit(xi$Items, ",")[[1]])
       for (j in 1:length(item_nums)) {
         num_j <- item_nums[[j]]
-        item_j <- x$Items[num_j, "Text"]
-        cat(glue("    {num_j}. {item_j}"), "\n", sep = "")
+        item_j <- x$Items[[num_j, "Text"]]
+        cat("    ", num_j, ". ", item_j, "\n", sep = "")
       }
     }
   }
@@ -108,19 +101,14 @@ scales <- function(x, items = FALSE) {
 items <- function(x) {
   assert_that(is_instrument(x))
 
-  cat(
-    glue(
-      "The {x$Details$Abbrev} contains {x$Details$Items} items ({x$Details$Status}):"
-    ),
-    "\n",
-    sep = ""
-  )
+  cat("The ", x$Details$Abbrev, " contains ", x$Details$Items, " items (", 
+    x$Details$Status, "):\n", sep = "")
   for (i in 1:nrow(x$Items)) {
     xi <- x$Items[i, ]
     if (!is.na(xi$Number)) {
-      cat(glue("{xi$Number}. "))
+      cat(xi$Number, ". ", sep = "")
     }
-    cat(glue("{xi$Text}"), "\n", sep = "")
+    cat(xi$Text, "\n", sep = "")
   }
 
   invisible(x)
@@ -143,21 +131,11 @@ anchors <- function(x) {
   assert_that(is_instrument(x))
 
   cat(
-    glue(
-      "The {x$Details$Abbrev} is rated using the following ",
-      "{nrow(x$Anchors)}-point scale."
-    ),
-    "\n",
-    sep = ""
+    "The ", x$Details$Abbrev, " is rated using the following ",
+    nrow(x$Anchors), "-point scale.", "\n", sep = ""
   )
   for (i in seq_along(x$Anchors$Value)) {
-    cat(
-      glue(
-        "{x$Anchors$Value[[i]]}. {x$Anchors$Label[[i]]}"
-      ),
-      "\n",
-      sep = ""
-    )
+    cat(x$Anchors$Value[[i]], ". ", x$Anchors$Label[[i]], "\n",sep = "")
   }
 
   invisible(x)
@@ -184,33 +162,22 @@ norms <- function(x) {
   n_norms <- nrow(samples)
 
   if (n_norms == 0) {
-    cat(
-      glue("The {x$Details$Abbrev} currently has no normative data sets."),
-      "\n",
-      sep = ""
-    )
+    cat("The ", x$Details$Abbrev, " currently has no normative data sets.", 
+        "\n", sep = "")
     return()
   }
 
-  cat(
-    glue(
-      "The {x$Details$Abbrev} currently has {n_norms} normative data set(s):"
-    ),
-    "\n",
-    sep = ""
-  )
+  cat("The ", x$Details$Abbrev, " currently has ", n_norms, 
+      " normative data set(s):", "\n", sep = "")
 
   for (i in 1:n_norms) {
     sample_i <- samples$Sample[[i]]
     size_i <- samples$Size[[i]]
     pop_i <- samples$Population[[i]]
     cat(
-      glue("{sample_i}. {size_i} {pop_i}"),
-      "\n  ",
-      glue("{samples$Reference[[i]]}"),
-      "\n  ",
-      glue("<{samples$URL[[i]]}>"),
-      "\n",
+      sample_i, ". ", size_i, " ", pop_i, "\n",
+      samples$Reference[[i]], "\n",
+      "<", samples$URL[[i]], ">", "\n",
       sep = ""
     )
   }
