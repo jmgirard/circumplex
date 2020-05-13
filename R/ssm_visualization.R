@@ -67,7 +67,7 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
                             lowfit = TRUE) {
   df <- .ssm_object$results
-  angles <- as.numeric(.ssm_object$details$angles)
+  angles <- as.integer(round(.ssm_object$details$angles))
 
   assert_that(is.null(amax) || is.number(amax))
 
