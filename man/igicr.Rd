@@ -4,7 +4,9 @@
 \name{igicr}
 \alias{igicr}
 \title{Interpersonal Goals Inventory for Children, Revised Version}
-\format{An object of class \code{circumplex_instrument} of length 5.}
+\format{
+An object of class \code{circumplex_instrument} of length 5.
+}
 \source{
 Trucco, E. M., Wright, A. G. C., & Colder, C. R. (2013). A revised
 interpersonal circumplex inventory of children’s social goals. \emph{Assessment,

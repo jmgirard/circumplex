@@ -4,7 +4,9 @@
 \name{iitc}
 \alias{iitc}
 \title{Inventory of Influence Tactics Circumplex}
-\format{An object of class \code{circumplex_instrument} of length 5.}
+\format{
+An object of class \code{circumplex_instrument} of length 5.
+}
 \source{
 Bliton, C. F., & Pincus, A. L. (in press). Construction and
 Validation of the Interpersonal Influence Tactics Circumplex (IIT-C)

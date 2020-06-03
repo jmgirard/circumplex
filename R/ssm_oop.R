@@ -21,61 +21,73 @@ new_s3_scalar <- function(..., class) {
 
 # Class degree -----------------------------------------------------------------
 
-# Set numeric object to class 'degree'
+# S3 Constructor
 new_degree <- function(x) {
   new_s3_num(x, class = c("circumplex_degree", "numeric"))
 }
 
-# S3 generic for class 'degree'
+# S3 Generic
 as_degree <- function(x, ...) {
   UseMethod("as_degree")
 }
 
-# Set numeric object to class 'degree'
+# S3 Method
+#' @method as_degree default
+#' @export
 as_degree.default <- function(x, ...) {
   new_degree(x)
 }
 
-# Return object if already class 'degree'
+# S3 Method
+#' @method as_degree circumplex_degree
+#' @export
 as_degree.circumplex_degree <- function(x, ...) {
   x
 }
 
-# Convert from class 'radian' to class 'degree'
+# S3 Method
+#' @method as_degree circumplex_radian
+#' @export
 as_degree.circumplex_radian <- function(x, ...) {
   new_degree(x * (180 / pi))
 }
 
 # Class radian -----------------------------------------------------------------
 
-# Set numeric object to class 'radian'
+# S3 Constructor
 new_radian <- function(x) {
   new_s3_num(x, class = c("circumplex_radian", "numeric"))
 }
 
-# S3 generic for class 'radian'
+# S3 Generic
 as_radian <- function(x, ...) {
   UseMethod("as_radian")
 }
 
-# Set numeric object to class 'radian'
+# S3 Method
+#' @method as_radian default
+#' @export
 as_radian.default <- function(x, ...) {
   new_radian(x)
 }
 
-# Return object if already class 'radian'
+# S3 Method 
+#' @method as_radian circumplex_radian
+#' @export
 as_radian.circumplex_radian <- function(x, ...) {
   x
 }
 
-# Convert from class 'degree' to class 'radian'
+# S3 Method
+#' @method as_radian circumplex_degree
+#' @export
 as_radian.circumplex_degree <- function(x, ...) {
   new_radian(x * (pi / 180))
 }
 
 # Class ssm --------------------------------------------------------------------
 
-# Constructor function
+# S3 Constructor
 new_ssm <- function(results, details, call, ...) {
   new_s3_scalar(
     results = results,
@@ -87,6 +99,7 @@ new_ssm <- function(results, details, call, ...) {
 }
 
 #  Print method for objects of ssm class
+#' @method print circumplex_ssm
 #' @export
 print.circumplex_ssm <- function(x, digits = 3, ...) {
   # Print function call
@@ -119,6 +132,7 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
 }
 
 # Summary method for objects of ssm class
+#' @method summary circumplex_ssm
 #' @export
 summary.circumplex_ssm <- function(object, digits = 3, ...) {
   # Print function call

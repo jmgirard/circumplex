@@ -1,10 +1,11 @@
 pandoc: 2.7.2
-pkgdown: 1.4.1
+pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
   intermediate-ssm-analysis: intermediate-ssm-analysis.html
   introduction-to-ssm-analysis: introduction-to-ssm-analysis.html
   using-instruments: using-instruments.html
+last_built: 2020-04-30T00:15Z
 urls:
   reference: https://circumplex.jmgirard.com/reference
   article: https://circumplex.jmgirard.com/articles

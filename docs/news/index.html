@@ -17,23 +17,27 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -42,7 +46,7 @@
 
 <!-- docsearch -->
 <script src="../docsearch.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
 <link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
@@ -50,7 +54,6 @@
 
 <meta property="og:title" content="Changelog" />
 <meta property="og:image" content="https://circumplex.jmgirard.com/logo.png" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -68,7 +71,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -82,7 +85,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
       </span>
     </div>
 
@@ -193,36 +196,52 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
+      <h1 data-toc-skip>Changelog <small></small></h1>
       <small>Source: <a href='https://github.com/jmgirard/circumplex/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
     <div id="circumplex-development-version" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="development version">
 <a href="#circumplex-development-version" class="anchor"></a>circumplex (development version)<small> Unreleased </small>
 </h1>
 <hr>
 </div>
-    <div id="circumplex-035" class="section level1">
-<h1 class="page-header">
-<a href="#circumplex-035" class="anchor"></a>circumplex 0.3.5<small> Unreleased </small>
+    <div id="circumplex-036" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.6">
+<a href="#circumplex-036" class="anchor"></a>circumplex 0.3.6<small> 2020-04-29 </small>
 </h1>
 <div id="minor-improvements-and-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#minor-improvements-and-fixes" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
-<li>Removed several unit tests that were causing problems for CRAN checks</li>
+<li><p>Update dependency versions and require R &gt;= 3.4.0</p></li>
+<li><p>Fix issues related to how R 4.0.0 handles S3 methods</p></li>
+<li><p>Modernize ssm_plot() function to use new tidyr syntax</p></li>
+<li><p>Update travis CI configuration to be more explicit</p></li>
+</ul>
+<hr>
+</div>
+</div>
+    <div id="circumplex-035" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.5">
+<a href="#circumplex-035" class="anchor"></a>circumplex 0.3.5<small> 2020-01-10 </small>
+</h1>
+<div id="minor-improvements-and-fixes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements-and-fixes-1" class="anchor"></a>Minor improvements and fixes</h2>
+<ul>
+<li>Remove several unit tests that were causing problems for CRAN checks</li>
 </ul>
 <hr>
 </div>
 </div>
     <div id="circumplex-034" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3.4">
 <a href="#circumplex-034" class="anchor"></a>circumplex 0.3.4<small> 2019-12-05 </small>
 </h1>
-<div id="minor-improvements-and-fixes-1" class="section level2">
+<div id="minor-improvements-and-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-1" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-2" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Adjust the test of <code>quantile.radian()</code> to account for changes to <code><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></code> starting in R 3.6.1 Patched</p></li>
 <li><p>Add the name of the package to the S3 class names (e.g., <code>circumplex_radian</code> instead of <code>radian</code>) to minimize the risk of overlapping classes between packages</p></li>
@@ -232,12 +251,12 @@
 </div>
 </div>
     <div id="circumplex-033" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3.3">
 <a href="#circumplex-033" class="anchor"></a>circumplex 0.3.3<small> 2019-09-26 </small>
 </h1>
-<div id="minor-improvements-and-fixes-2" class="section level2">
+<div id="minor-improvements-and-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-2" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-3" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Add APA-style citations to instrument documentation in addition to DOI links.</p></li>
 <li><p>Add “Instruments” menu to package website for viewing documentation pages.</p></li>
@@ -247,7 +266,7 @@
 </div>
 </div>
     <div id="circumplex-032" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3.2">
 <a href="#circumplex-032" class="anchor"></a>circumplex 0.3.2<small> 2019-08-21 </small>
 </h1>
 <div id="new-features" class="section level2">
@@ -257,9 +276,9 @@
 <li>New <code>iitc</code> provides instrument information for the Inventory of Influence Tactics Circumplex.</li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-3" class="section level2">
+<div id="minor-improvements-and-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-3" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-4" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Fix CRAN warnings by setting <code>LazyData: true</code>.</p></li>
 <li><p>Fix CRAN note by replacing relative URLs with absolute URLs.</p></li>
@@ -270,12 +289,12 @@
 </div>
 </div>
     <div id="circumplex-031" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3.1">
 <a href="#circumplex-031" class="anchor"></a>circumplex 0.3.1<small> 2019-05-15 </small>
 </h1>
-<div id="minor-improvements-and-fixes-4" class="section level2">
+<div id="minor-improvements-and-fixes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-4" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-5" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Avoid a bug with dplyr 0.8.1 and S3 methods on Linux systems.</p></li>
 <li><p>Update the web address for Johannes in the README document.</p></li>
@@ -284,7 +303,7 @@
 </div>
 </div>
     <div id="circumplex-030" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.3.0">
 <a href="#circumplex-030" class="anchor"></a>circumplex 0.3.0<small> 2019-04-26 </small>
 </h1>
 <div id="new-features-1" class="section level2">
@@ -296,9 +315,9 @@
 <li><p>Added support for older versions of R (3.3.x).</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-5" class="section level2">
+<div id="minor-improvements-and-fixes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-5" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-6" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Updated the “Introduction to SSM” vignette’s figures.</p></li>
 <li><p>Replaced use of <code><a href="https://dplyr.tidyverse.org/reference/funs.html">dplyr::funs()</a></code> as this function is being deprecated.</p></li>
@@ -311,7 +330,7 @@
 </div>
 </div>
     <div id="circumplex-021" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.2.1">
 <a href="#circumplex-021" class="anchor"></a>circumplex 0.2.1<small> 2018-11-29 </small>
 </h1>
 <div id="new-features-2" class="section level2">
@@ -322,9 +341,9 @@
 <li><p>Added open-access (i.e., full item text) to the <code>iis32</code> and <code>iis64</code>.</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-6" class="section level2">
+<div id="minor-improvements-and-fixes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-6" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-7" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p><code>iis32</code> item ordering and scoring now match the author’s version.</p></li>
 <li><p><code>iis32</code> response anchors now range from 1 to 6 and match norms.</p></li>
@@ -335,7 +354,7 @@
 </div>
 </div>
     <div id="circumplex-020" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.2.0">
 <a href="#circumplex-020" class="anchor"></a>circumplex 0.2.0<small> 2018-10-26 </small>
 </h1>
 <div id="new-features-3" class="section level2">
@@ -347,9 +366,9 @@
 <li><p>Added function for standardizing scale-level data using normative data.</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-7" class="section level2">
+<div id="minor-improvements-and-fixes-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-7" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-8" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Changed OpenMP flags in Makevars to fix a compile problem on Debian machines.</p></li>
 <li><p>Fixed a bug related to calculating angular medians in the presence of NAs.</p></li>
@@ -363,7 +382,7 @@
 </div>
 </div>
     <div id="circumplex-012" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.1.2">
 <a href="#circumplex-012" class="anchor"></a>circumplex 0.1.2<small> 2018-08-06 </small>
 </h1>
 <div id="new-features-4" class="section level2">
@@ -374,9 +393,9 @@
 <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> now uses dashed borders to indicate that a profile has low prototypicality/fit.</li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-8" class="section level2">
+<div id="minor-improvements-and-fixes-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-8" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-9" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li><p>Fixed bug that prevented compilation on Solaris systems.</p></li>
 <li><p>Fixed bug that prevented CRAN checks on old R versions.</p></li>
@@ -386,7 +405,7 @@
 </div>
 </div>
     <div id="circumplex-011" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.1.1">
 <a href="#circumplex-011" class="anchor"></a>circumplex 0.1.1<small> 2018-07-31 </small>
 </h1>
 <div id="new-features-5" class="section level2">
@@ -397,9 +416,9 @@
 <a href="https://circumplex.jmgirard.com">Package website</a> added using <a href="https://pkgdown.r-lib.org/">pkgdown</a>.</li>
 </ul>
 </div>
-<div id="minor-improvements-and-fixes-9" class="section level2">
+<div id="minor-improvements-and-fixes-10" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-fixes-9" class="anchor"></a>Minor improvements and fixes</h2>
+<a href="#minor-improvements-and-fixes-10" class="anchor"></a>Minor improvements and fixes</h2>
 <ul>
 <li>Fixed documentation to meet CRAN standards.</li>
 </ul>
@@ -407,7 +426,7 @@
 </div>
 </div>
     <div id="circumplex-010" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="0.1.0">
 <a href="#circumplex-010" class="anchor"></a>circumplex 0.1.0<small> Unreleased </small>
 </h1>
 <ul>
@@ -416,24 +435,10 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#circumplex-development-version">development version</a></li>
-        <li><a href="#circumplex-035">0.3.5</a></li>
-        <li><a href="#circumplex-034">0.3.4</a></li>
-        <li><a href="#circumplex-033">0.3.3</a></li>
-        <li><a href="#circumplex-032">0.3.2</a></li>
-        <li><a href="#circumplex-031">0.3.1</a></li>
-        <li><a href="#circumplex-030">0.3.0</a></li>
-        <li><a href="#circumplex-021">0.2.1</a></li>
-        <li><a href="#circumplex-020">0.2.0</a></li>
-        <li><a href="#circumplex-012">0.1.2</a></li>
-        <li><a href="#circumplex-011">0.1.1</a></li>
-        <li><a href="#circumplex-010">0.1.0</a></li>
-      </ul>
-    </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>
@@ -445,7 +450,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

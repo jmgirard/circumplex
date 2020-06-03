@@ -51,7 +51,7 @@ test_that("The summary method for the S3 instrument class produces the right out
   )
   expect_output(
     summary(isc, scales = FALSE, anchors = FALSE, items = FALSE, norms = TRUE),
-    "ISC: Interpersonal Sensitivities Circumplex\\n64 items, 8 scales, 1 normative data sets\\nHopwood et al\\. \\(2011\\)\\n<https://doi\\.org/10\\.1111/j\\.1467-6494\\.2011\\.00696\\.x>\\n\\nThe ISC currently has 1 normative data set\\(s\\):\\n1\\. 649 American college students\\n  Hopwood et al\\. \\(2011\\)\\n  <https://doi\\.org/10\\.1111/j\\.1467-6494\\.2011\\.00696\\.x>"
+    "ISC: Interpersonal Sensitivities Circumplex\\n64 items, 8 scales, 1 normative data sets\\nHopwood et al\\. \\(2011\\)\\n<https://doi\\.org/10\\.1111/j\\.1467-6494\\.2011\\.00696\\.x>\\n\\nThe ISC currently has 1 normative data set\\(s\\):\\n1\\. 649 American college students\\nHopwood et al\\. \\(2011\\)\\n<https://doi\\.org/10\\.1111/j\\.1467-6494\\.2011\\.00696\\.x>"
   )
 })
 
@@ -76,7 +76,7 @@ test_that("The sub-summary functions produce the expected output", {
   )
   expect_output(
     norms(isc),
-    "The ISC currently has 1 normative data set\\(s\\):\\n1\\. 649 American college students\\n  Hopwood et al\\. \\(2011\\)\\n  <https://doi\\.org/10\\.1111/j\\.1467-6494\\.2011\\.00696\\.x>"
+    "The ISC currently has 1 normative data set\\(s\\):\\n1\\. 649 American college students\\nHopwood et al\\. \\(2011\\)\\n<https://doi\\.org/10\\.1111/j\\.1467-6494\\.2011\\.00696\\.x>"
   )
 })
 

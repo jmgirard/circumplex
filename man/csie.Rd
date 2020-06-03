@@ -4,7 +4,9 @@
 \name{csie}
 \alias{csie}
 \title{Circumplex Scales of Interpersonal Efficacy}
-\format{An object of class \code{circumplex_instrument} of length 5.}
+\format{
+An object of class \code{circumplex_instrument} of length 5.
+}
 \source{
 Locke, K. D., & Sadler, P. (2007). Self-efficacy, values, and
 complementarity in dyadic interactions: Integrating interpersonal and

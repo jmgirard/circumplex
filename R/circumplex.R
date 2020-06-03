@@ -20,7 +20,6 @@
 #'
 #' @useDynLib circumplex, .registration = TRUE
 #' @importFrom assertthat assert_that is.flag is.number is.count is.string
-#' @importFrom glue glue
 #' @importFrom Rcpp sourceCpp
 #' @importFrom stats cor quantile sd var
 "_PACKAGE"

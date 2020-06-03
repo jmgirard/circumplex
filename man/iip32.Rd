@@ -4,7 +4,9 @@
 \name{iip32}
 \alias{iip32}
 \title{Inventory of Interpersonal Problems, Brief Version}
-\format{An object of class \code{circumplex_instrument} of length 5.}
+\format{
+An object of class \code{circumplex_instrument} of length 5.
+}
 \source{
 Horowitz, L. M., Alden, L. E., Wiggins, J. S., & Pincus, A. L.
 (2000). \emph{IIP-64/IIP-32 professional manual.} San Antonio, TX: The
