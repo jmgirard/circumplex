@@ -93,7 +93,8 @@ score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = 
       stop("Key is asking for more items than were provided to function.")
     }
     scores <- item_data %>%
-      dplyr::transmute(!!new_name := rowMeans(item_data[, item_nums], na.rm))
+      dplyr::transmute(!!new_name := rowMeans(item_data[, item_nums], na.rm)) %>% 
+      dplyr::mutate_all(~dplyr::na_if(., "NaN"))
     .data <- dplyr::bind_cols(.data, scores)
   }
   .data
