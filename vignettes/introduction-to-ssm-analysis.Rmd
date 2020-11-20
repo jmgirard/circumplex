@@ -2,7 +2,7 @@
 title: "Introduction to SSM Analysis"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ssm-introduction}
+  %\VignetteIndexEntry{Introduction to SSM Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

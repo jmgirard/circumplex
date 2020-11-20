@@ -2,7 +2,7 @@
 title: "Intermediate SSM Analysis"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ssm-intermediate}
+  %\VignetteIndexEntry{Intermediate SSM Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

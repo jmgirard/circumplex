@@ -2,7 +2,7 @@
 title: "Using Circumplex Instruments"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{using-instruments}
+  %\VignetteIndexEntry{Using Circumplex Instruments}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
