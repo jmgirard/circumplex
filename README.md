@@ -3,15 +3,18 @@
 
 # circumplex <img src="man/figures/logo.png" align="right" alt="" />
 
+<!-- badges: start -->
+
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/circumplex)](https://cran.r-project.org/package=circumplex)
-[![Build
-Status](https://travis-ci.org/jmgirard/circumplex.svg?branch=master)](https://travis-ci.org/jmgirard/circumplex)
+[![R build
+status](https://github.com/jmgirard/circumplex/workflows/R-CMD-check/badge.svg)](https://github.com/jmgirard/circumplex/actions)
 [![Coverage
 status](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://codecov.io/github/jmgirard/circumplex?branch=master)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+<!-- badges: end -->
 
 The goal of *circumplex* is to provide a powerful, flexible, and
 user-friendly way to analyze and visualize circumplex data. It was
@@ -120,31 +123,31 @@ NARPD
 
 <td style="text-align:left;">
 
-0.20 [0.17, 0.24]
+0.20 \[0.17, 0.24\]
 
 </td>
 
 <td style="text-align:left;">
 
--0.06 [-0.09, -0.03]
+\-0.06 \[-0.09, -0.03\]
 
 </td>
 
 <td style="text-align:left;">
 
-0.18 [0.14, 0.21]
+0.18 \[0.14, 0.21\]
 
 </td>
 
 <td style="text-align:left;">
 
-0.19 [0.15, 0.23]
+0.19 \[0.15, 0.23\]
 
 </td>
 
 <td style="text-align:left;">
 
-109.0 [98.6, 118.5]
+109.0 \[98.6, 118.5\]
 
 </td>
 
@@ -166,31 +169,31 @@ ASPD
 
 <td style="text-align:left;">
 
-0.12 [0.09, 0.16]
+0.12 \[0.09, 0.16\]
 
 </td>
 
 <td style="text-align:left;">
 
--0.10 [-0.13, -0.06]
+\-0.10 \[-0.13, -0.06\]
 
 </td>
 
 <td style="text-align:left;">
 
-0.20 [0.17, 0.24]
+0.20 \[0.17, 0.24\]
 
 </td>
 
 <td style="text-align:left;">
 
-0.23 [0.19, 0.26]
+0.23 \[0.19, 0.26\]
 
 </td>
 
 <td style="text-align:left;">
 
-115.9 [107.3, 124.2]
+115.9 \[107.3, 124.2\]
 
 </td>
 
