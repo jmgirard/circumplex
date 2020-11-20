@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6.9000</span>
       </span>
     </div>
 
@@ -148,7 +148,9 @@
 
       
 
-      </header><script src="introduction-to-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><div class="row">
+      </header><script src="introduction-to-ssm-analysis_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="introduction-to-ssm-analysis_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="introduction-to-ssm-analysis_files/anchor-sections-1.0/anchor-sections.js"></script><script src="introduction-to-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><link href="introduction-to-ssm-analysis_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to SSM Analysis</h1>
@@ -161,7 +163,8 @@
 
     
     
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">circumplex</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex">circumplex</a></span><span class="op">)</span></code></pre></div>
 <div id="background-and-motivation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#background-and-motivation" class="anchor"></a>1. Background and Motivation</h2>
@@ -202,8 +205,9 @@
 <h2 class="hasAnchor">
 <a href="#example-data-jz2017" class="anchor"></a>2. Example data: jz2017</h2>
 <p>To illustrate the SSM functions, we will use the example dataset <code>jz2017</code>, which was provided by Zimmermann &amp; Wright (2017) and reformatted for this package. This dataset includes self-report data from 1166 undergraduate students. Students completed a circumplex measure of interpersonal problems with eight subscales (PA, BC, DE, FG, HI, JK, LM, and NO) and a measure of personality disorder symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD, NARPD, AVPD, DPNPD, and OCPD). More information about these variables can be accessed using the <code><a href="../reference/jz2017.html">?jz2017</a></code> command in R.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"jz2017"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">jz2017</span>)
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 1,166 x 19</span>
 <span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span>
 <span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span>
@@ -218,7 +222,7 @@
 <span class="co">#&gt;  9 Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span>
 <span class="co">#&gt; 10 Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span>
 <span class="co">#&gt; # ... with 1,156 more rows, and 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,</span>
-<span class="co">#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</span></pre></body></html></div>
+<span class="co">#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</span></code></pre></div>
 <p>The circumplex scales in <code>jz2017</code> come from the Inventory of Interpersonal Problems - Short Circumplex (IIP-SC). These scales can be arranged into the following circular model, which is organized around the two primary dimensions of agency (y-axis) and communion (x-axis). Note that the two-letter scale abbreviations and angular values are based in convention. A high score on PA indicates that one has interpersonal problems related to being “domineering” or too high on agency, whereas a high score on DE indicates problems related to being “cold” or too low on communion. Scales that are not directly on the y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency and communion.</p>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/iipsc-1.png" width="100%"></p>
 </div>
@@ -229,15 +233,16 @@
 <h3 class="hasAnchor">
 <a href="#conducting-ssm-for-a-groups-mean-scores" class="anchor"></a>Conducting SSM for a group’s mean scores</h3>
 <p>To begin, let’s say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. Although it is possible to analyze the raw scores contained in <code>jz2017</code>, our results will be more interpretable if we standardize the scores first. We can do this using the <code><a href="../reference/standardize.html">standardize()</a></code> function. The first argument to this function is <code>.data</code>, a data frame frame containing the circumplex scales to be standardized. The second argument is <code>scales</code> and specifies where in <code>.data</code> the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is <code>angles</code> and specifies the angle of each of the circumplex scales included in <code>scales</code>. Note that the <code>scales</code> and <code>angles</code> arguments need to be vectors (hence the <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> function) that have the same ordering and length. Finally, the fourth argument is <code>norms</code>, a data frame containing the normative data we will use to standardize the circumplex scales. Here, we will use normative data for the IIP-SC by loading the <code>iipsc</code> data frame.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"iipsc"</span>)
-<span class="no">jz2017s</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/standardize.html">standardize</a></span>(
-  <span class="kw">.data</span> <span class="kw">=</span> <span class="no">jz2017</span>,
-  <span class="kw">scales</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">PA</span>, <span class="no">BC</span>, <span class="no">DE</span>, <span class="no">FG</span>, <span class="no">HI</span>, <span class="no">JK</span>, <span class="no">LM</span>, <span class="no">NO</span>),
-  <span class="kw">angles</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span>),
-  <span class="kw">instrument</span> <span class="kw">=</span> <span class="no">iipsc</span>,
-  <span class="kw">sample</span> <span class="kw">=</span> <span class="fl">1</span>
-)
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">jz2017s</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"iipsc"</span><span class="op">)</span>
+<span class="va">jz2017s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/standardize.html">standardize</a></span><span class="op">(</span>
+  .data <span class="op">=</span> <span class="va">jz2017</span>,
+  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">PA</span>, <span class="va">BC</span>, <span class="va">DE</span>, <span class="va">FG</span>, <span class="va">HI</span>, <span class="va">JK</span>, <span class="va">LM</span>, <span class="va">NO</span><span class="op">)</span>,
+  angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span>,
+  instrument <span class="op">=</span> <span class="va">iipsc</span>,
+  sample <span class="op">=</span> <span class="fl">1</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">jz2017s</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 1,166 x 27</span>
 <span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span>
 <span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span>
@@ -254,15 +259,17 @@
 <span class="co">#&gt; # ... with 1,156 more rows, and 15 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,</span>
 <span class="co">#&gt; #   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;, PA_z &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   BC_z &lt;dbl&gt;, DE_z &lt;dbl&gt;, FG_z &lt;dbl&gt;, HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   NO_z &lt;dbl&gt;</span></pre></body></html></div>
+<span class="co">#&gt; #   NO_z &lt;dbl&gt;</span></code></pre></div>
 <p>Now we can use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function to perform the SSM analysis. The first three arguments are the same as the first three arguments to <code><a href="../reference/standardize.html">standardize()</a></code>. We can pass the new <code>jz2017s</code> data frame that contains standardized scores as <code>.data</code> and the same vectors to <code>scales</code> and <code>angles</code> since these haven’t changed.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">results</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(
-  <span class="kw">.data</span> <span class="kw">=</span> <span class="no">jz2017s</span>,
-  <span class="kw">scales</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">PA_z</span>, <span class="no">BC_z</span>, <span class="no">DE_z</span>, <span class="no">FG_z</span>, <span class="no">HI_z</span>, <span class="no">JK_z</span>, <span class="no">LM_z</span>, <span class="no">NO_z</span>),
-  <span class="kw">angles</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span>)
-)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span>
+  .data <span class="op">=</span> <span class="va">jz2017s</span>,
+  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">PA_z</span>, <span class="va">BC_z</span>, <span class="va">DE_z</span>, <span class="va">FG_z</span>, <span class="va">HI_z</span>, <span class="va">JK_z</span>, <span class="va">LM_z</span>, <span class="va">NO_z</span><span class="op">)</span>,
+  angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span>
+<span class="op">)</span></code></pre></div>
 <p>The output of the function has been saved in the <code>results</code> object, which we can examine in detail using the <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> function. This will output the call we made to create the output, as well as some of the default options that we didn’t bother changing (see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">results</span>)
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = c(PA_z, BC_z, DE_z, FG_z, </span>
 <span class="co">#&gt;     HI_z, JK_z, LM_z, NO_z), angles = c(90, 135, 180, 225, 270, </span>
@@ -281,10 +288,11 @@
 <span class="co">#&gt; Y-Value          -0.015     -0.048      0.020</span>
 <span class="co">#&gt; Amplitude         0.131      0.098      0.165</span>
 <span class="co">#&gt; Displacement    353.525    339.484      9.564</span>
-<span class="co">#&gt; Model Fit         0.710</span></pre></body></html></div>
+<span class="co">#&gt; Model Fit         0.710</span></code></pre></div>
 <p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017s</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputting their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code><a href="https://rdrr.io/r/base/Random.html">set.seed()</a></code> function to control the random number generator in R.)</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">results2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(<span class="no">jz2017s</span>, <span class="no">PA_z</span>:<span class="no">NO_z</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span>())
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">results2</span>)
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017s</span>, <span class="va">PA_z</span><span class="op">:</span><span class="va">NO_z</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA_z:NO_z, angles = octants())</span>
 <span class="co">#&gt; </span>
@@ -301,13 +309,14 @@
 <span class="co">#&gt; Y-Value          -0.015     -0.050      0.019</span>
 <span class="co">#&gt; Amplitude         0.131      0.101      0.167</span>
 <span class="co">#&gt; Displacement    353.525    339.560      8.994</span>
-<span class="co">#&gt; Model Fit         0.710</span></pre></body></html></div>
+<span class="co">#&gt; Model Fit         0.710</span></code></pre></div>
 </div>
 <div id="visualizing-the-results-with-a-table-and-figure" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visualizing-the-results-with-a-table-and-figure" class="anchor"></a>Visualizing the results with a table and figure</h3>
 <p>Next, we can produce a table to display our results. With only a single set of parameters, this table is probably overkill, but in future analyses we will see how this function saves a lot of time and effort. To create the table, simply pass the <code>results</code> (or <code>results2</code>) object to the <code><a href="../reference/ssm_table.html">ssm_table()</a></code> function.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span>(<span class="no">results2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></code></pre></div>
 <table class="table table">
 <caption style="font-size: initial !important;">
 Mean-based Structural Summary Statistics with 95% CIs
@@ -360,7 +369,8 @@ All
 </tr></tbody>
 </table>
 <p>Next, let’s leverage the fact that we are working within a circumplex space by creating a nice-looking circular plot by mapping the amplitude parameter to the points’ distance from the center of the circle and the displacement parameter to the points’ rotation from due-east (as is conventional). This, again, is as simple as passing the <code>results</code> object to the <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> function.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(<span class="no">results2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot1-1.png" width="100%"></p>
 </div>
 </div>
@@ -372,8 +382,9 @@ All
 <a href="#conducting-ssm-for-a-groups-correlations-with-an-external-measure" class="anchor"></a>Conducting SSM for a group’s correlations with an external measure</h3>
 <p>Next, let’s say that we are interested in analyzing not the mean scores on the circumplex scales but rather their correlations with an external measure. This is sometimes referred to as “projecting” that external measure into the circumplex space. As an example, let’s project the NARPD variable, which captures symptoms of narcissistic personality disorder, into the circumplex space defined by the IIP-SC. Based on theory and previous findings, we can expect this measure to be associated with some general interpersonal distress and a style that is generally high in agency.</p>
 <p>To conduct this analysis, we can start with the syntax from the mean-based analysis. All SSM analyses use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function and the data, scales, and angles are the same as before. However, we also need to let the function know that we want to analyze correlations with NARPD as opposed to scale means. To do this, we add an additional argument <code>measures</code>. Note that since correlations are already standardized, we don’t need to worry about standardizing the circumplex scales when <code>measures</code> is used.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">results3</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span>(<span class="no">jz2017</span>, <span class="no">PA</span>:<span class="no">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span>(), <span class="kw">measures</span> <span class="kw">=</span> <span class="no">NARPD</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">results3</span>)
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">results3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="va">NARPD</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
 <span class="co">#&gt;     measures = NARPD)</span>
@@ -391,14 +402,15 @@ All
 <span class="co">#&gt; Y-Value           0.179      0.144      0.211</span>
 <span class="co">#&gt; Amplitude         0.189      0.155      0.224</span>
 <span class="co">#&gt; Displacement    108.967     98.720    118.827</span>
-<span class="co">#&gt; Model Fit         0.957</span></pre></body></html></div>
+<span class="co">#&gt; Model Fit         0.957</span></code></pre></div>
 <p>Note that this output looks very similar to the mean-based output except that the statistical basis is now correlation scores instead of mean scores and instead of saying “Profile [All]” it now says “Profile [NARPD]”.</p>
 </div>
 <div id="visualizing-the-results-with-a-table-and-figure-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#visualizing-the-results-with-a-table-and-figure-1" class="anchor"></a>Visualizing the results with a table and figure</h3>
 <p>We can also create a similar table and figure using the exact same syntax as before. The <code><a href="../reference/ssm_table.html">ssm_table()</a></code> and <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> functions are smart enough to know whether the results are mean-based or correlation-based and will work in both cases.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span>(<span class="no">results3</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></code></pre></div>
 <table class="table table">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
@@ -451,7 +463,8 @@ NARPD
 </tr></tbody>
 </table>
 <p>From the table, we can see that the model fit is good (&gt;.80) and that all three SSM parameters are significantly different from zero, i.e., their confidence intervals do not include zero. Furthermore, the confidence intervals for the elevation and amplitude parameters are greater than or equal to 0.15, which can be interpreted as being “marked.” So, consistent with our hypotheses, NARPD was associated with marked general interpersonal distress (elevation) and was markedly distinctive in its profile (amplitude). The displacement parameter was somewhere between 100 and 120 degrees; to interpret this we would need to either consult the mapping between scales and angles or plot the results.</p>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span>(<span class="no">results3</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot2-1.png" width="100%"></p>
 <p>From this figure, it is very easy to see that, consistent with our hypotheses, the displacement for NARPD was associated with high agency and was somewhere between the “domineering” and “vindictive” octants.</p>
 </div>
@@ -488,7 +501,7 @@ NARPD
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

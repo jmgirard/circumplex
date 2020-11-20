@@ -87,7 +87,7 @@ desired formatting." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6.9000</span>
       </span>
     </div>
 
@@ -208,7 +208,7 @@ desired formatting." />
 desired formatting.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ssm_table</span>(<span class='no'>.ssm_object</span>, <span class='kw'>caption</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>xy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>render</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>ssm_table</span><span class='op'>(</span><span class='va'>.ssm_object</span>, caption <span class='op'>=</span> <span class='cn'>NULL</span>, xy <span class='op'>=</span> <span class='cn'>TRUE</span>, render <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -253,25 +253,26 @@ side-effect, may also output the HTML table to the web viewer.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='co'># Load example data</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"jz2017"</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"jz2017"</span><span class='op'>)</span>
 
 <span class='co'># Create table of profile results</span>
-<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>,
-  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>)
-)
-<span class='fu'>ssm_table</span>(<span class='no'>res</span>)</div><div class='output co'>#&gt; &lt;table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' &gt;
+<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span><span class='op'>(</span><span class='va'>jz2017</span>,
+  scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>,
+  measures <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>NARPD</span>, <span class='va'>ASPD</span><span class='op'>)</span>
+<span class='op'>)</span>
+<span class='fu'>ssm_table</span><span class='op'>(</span><span class='va'>res</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' &gt;
 #&gt; &lt;thead&gt;
 #&gt; &lt;tr&gt;&lt;td colspan='7' style='text-align: left;'&gt;
 #&gt; Correlation-based Structural Summary Statistics with 95% CIs&lt;/td&gt;&lt;/tr&gt;
 #&gt; &lt;tr&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Profile&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Elevation&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;X-Value&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Y-Value&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Amplitude&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Displacement&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Fit&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Profile&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Elevation&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;X-Value&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Y-Value&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Amplitude&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Displacement&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Fit&lt;/th&gt;
 #&gt; &lt;/tr&gt;
 #&gt; &lt;/thead&gt;
 #&gt; &lt;tbody&gt;
@@ -300,22 +301,23 @@ side-effect, may also output the HTML table to the web viewer.</p>
 #&gt; </span><span style='color: #555555;'>1</span><span> NARPD   0.20 [0.17,~ -0.06 [-0.1~ 0.18 [0.14~ 0.19 [0.15~ 109.0 [99.4, ~ 0.957
 #&gt; </span><span style='color: #555555;'>2</span><span> ASPD    0.12 [0.09,~ -0.10 [-0.1~ 0.20 [0.17~ 0.23 [0.19~ 115.9 [107.6,~ 0.964</div><div class='input'>
 <span class='co'># Create table of contrast results</span>
-<span class='no'>res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span>(<span class='no'>jz2017</span>,
-  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>
-)
-<span class='fu'>ssm_table</span>(<span class='no'>res</span>)</div><div class='output co'>#&gt; &lt;table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' &gt;
+<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ssm_analyze.html'>ssm_analyze</a></span><span class='op'>(</span><span class='va'>jz2017</span>,
+  scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>,
+  measures <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>NARPD</span>, <span class='va'>ASPD</span><span class='op'>)</span>, contrast <span class='op'>=</span> <span class='st'>"test"</span>
+<span class='op'>)</span>
+<span class='fu'>ssm_table</span><span class='op'>(</span><span class='va'>res</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' &gt;
 #&gt; &lt;thead&gt;
 #&gt; &lt;tr&gt;&lt;td colspan='7' style='text-align: left;'&gt;
 #&gt; Correlation-based Structural Summary Statistic Contrasts with 95% CIs&lt;/td&gt;&lt;/tr&gt;
 #&gt; &lt;tr&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Contrast&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Elevation&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; X-Value&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Y-Value&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Amplitude&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Displacement&lt;/th&gt;
-#&gt; &lt;th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Fit&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;Contrast&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Elevation&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; X-Value&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Y-Value&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Amplitude&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Displacement&lt;/th&gt;
+#&gt; &lt;th style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: left;'&gt;&amp;Delta; Fit&lt;/th&gt;
 #&gt; &lt;/tr&gt;
 #&gt; &lt;/thead&gt;
 #&gt; &lt;tbody&gt;
@@ -333,7 +335,7 @@ side-effect, may also output the HTML table to the web viewer.</p>
 #&gt;   Contrast `&amp;Delta; Elevat~ `&amp;Delta; X-Valu~ `&amp;Delta; Y-Valu~ `&amp;Delta; Amplit~
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>           
 #&gt; </span><span style='color: #555555;'>1</span><span> ASPD - ~ -0.08 [-0.11, -~ -0.04 [-0.08, -~ 0.02 [-0.01, 0.~ 0.04 [-0.00, 0.~
-#&gt; </span><span style='color: #555555;'># ... with 2 more variables: `&amp;Delta; Displacement` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, `&amp;Delta; Fit` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'># }
+#&gt; </span><span style='color: #555555;'># ... with 2 more variables: `&amp;Delta; Displacement` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, `&amp;Delta; Fit` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'><span class='co'># }</span>
 
 </div></span></pre>
   </div>
@@ -351,7 +353,7 @@ side-effect, may also output the HTML table to the web viewer.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

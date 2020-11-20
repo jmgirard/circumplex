@@ -89,7 +89,7 @@ scores (i.e., z-scores) based on comparison to the normative data." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6.9000</span>
       </span>
     </div>
 
@@ -212,15 +212,15 @@ data frame with each specified circumplex scale transformed into standard
 scores (i.e., z-scores) based on comparison to the normative data.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>standardize</span>(
-  <span class='no'>.data</span>,
-  <span class='no'>scales</span>,
-  <span class='no'>angles</span>,
-  <span class='no'>instrument</span>,
-  <span class='kw'>sample</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>prefix</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='st'>"_z"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>standardize</span><span class='op'>(</span>
+  <span class='va'>.data</span>,
+  <span class='va'>scales</span>,
+  <span class='va'>angles</span>,
+  <span class='va'>instrument</span>,
+  sample <span class='op'>=</span> <span class='fl'>1</span>,
+  prefix <span class='op'>=</span> <span class='st'>""</span>,
+  suffix <span class='op'>=</span> <span class='st'>"_z"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -277,9 +277,10 @@ variables will have the same name as <code>scales</code> but with a "_z" suffix.
 <code><a href='score.html'>score</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"jz2017"</span>)
-<span class='fu'><a href='instrument.html'>instrument</a></span>(<span class='st'>"iipsc"</span>)
-<span class='fu'>standardize</span>(<span class='no'>jz2017</span>, <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>instrument</span> <span class='kw'>=</span> <span class='no'>iipsc</span>, <span class='kw'>sample</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1,166 x 27</span><span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"jz2017"</span><span class='op'>)</span>
+<span class='fu'><a href='instrument.html'>instrument</a></span><span class='op'>(</span><span class='st'>"iipsc"</span><span class='op'>)</span>
+<span class='fu'>standardize</span><span class='op'>(</span><span class='va'>jz2017</span>, <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, instrument <span class='op'>=</span> <span class='va'>iipsc</span>, sample <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1,166 x 27</span><span>
 #&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7
@@ -311,7 +312,7 @@ variables will have the same name as <code>scales</code> but with a "_z" suffix.
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

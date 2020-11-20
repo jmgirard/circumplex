@@ -86,7 +86,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6.9000</span>
       </span>
     </div>
 
@@ -206,7 +206,7 @@
     <p>Information about the Circumplex Scales of Interpersonal Values (CSIV).</p>
     </div>
 
-    <pre class="usage"><span class='no'>csiv</span></pre>
+    <pre class="usage"><span class='va'>csiv</span></pre>
 
 
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
@@ -220,8 +220,9 @@ personality disorders. <em>Journal of Personality Assessment, 75</em>(2), 249-26
 <p><a href='https://www.webpages.uidaho.edu/klocke/csiv.htm'>https://www.webpages.uidaho.edu/klocke/csiv.htm</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='instrument.html'>instrument</a></span>(<span class='st'>"csiv"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>csiv</span>)</div><div class='output co'>#&gt; CSIV: Circumplex Scales of Interpersonal Values
+    <pre class="examples"><div class='input'><span class='fu'><a href='instrument.html'>instrument</a></span><span class='op'>(</span><span class='st'>"csiv"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>csiv</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; CSIV: Circumplex Scales of Interpersonal Values
 #&gt; 64 items, 8 scales, 1 normative data sets
 #&gt; Locke (2000)
 #&gt; &lt;https://doi.org/10.1207/S15327752JPA7502_6&gt;
@@ -311,8 +312,9 @@ personality disorders. <em>Journal of Personality Assessment, 75</em>(2), 249-26
 #&gt; 
 #&gt; The CSIV currently has 1 normative data set(s):
 #&gt; 1. 1200 American college students
-#&gt;   Locke (2000)
-#&gt;   &lt;https://www.webpages.uidaho.edu/klocke/csiv.htm&gt;</div><div class='input'><span class='fu'><a href='scales.html'>scales</a></span>(<span class='no'>csiv</span>, <span class='kw'>items</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; The CSIV contains 8 circumplex scales.
+#&gt; Locke (2000)
+#&gt; &lt;https://www.webpages.uidaho.edu/klocke/csiv.htm&gt;</div><div class='input'><span class='fu'><a href='scales.html'>scales</a></span><span class='op'>(</span><span class='va'>csiv</span>, items <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; The CSIV contains 8 circumplex scales.
 #&gt; PA: +A (90 degrees)
 #&gt;     1. That I appear confident
 #&gt;     9. That they acknowledge when I am right
@@ -400,7 +402,7 @@ personality disorders. <em>Journal of Personality Assessment, 75</em>(2), 249-26
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

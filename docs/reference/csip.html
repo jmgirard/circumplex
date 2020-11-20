@@ -86,7 +86,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6.9000</span>
       </span>
     </div>
 
@@ -206,7 +206,7 @@
     <p>Information about the Circumplex Scales of Interpersonal Problems (CSIP).</p>
     </div>
 
-    <pre class="usage"><span class='no'>csip</span></pre>
+    <pre class="usage"><span class='va'>csip</span></pre>
 
 
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
@@ -220,8 +220,9 @@ interpersonal problems. <em>Psychological Assessment, 30</em>(5), 594-609.</p>
 <p><a href='https://doi.org/10.1037/pas0000505'>https://doi.org/10.1037/pas0000505</a></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='instrument.html'>instrument</a></span>(<span class='st'>"csip"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>csip</span>)</div><div class='output co'>#&gt; CSIP: Circumplex Scales of Interpersonal Problems
+    <pre class="examples"><div class='input'><span class='fu'><a href='instrument.html'>instrument</a></span><span class='op'>(</span><span class='st'>"csip"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>csip</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; CSIP: Circumplex Scales of Interpersonal Problems
 #&gt; 64 items, 8 scales, 1 normative data sets
 #&gt; Boudreaux, Ozer, Oltmanns, &amp; Wright (2018)
 #&gt; &lt;https://doi.org/10.1037/pas0000505&gt;
@@ -310,8 +311,9 @@ interpersonal problems. <em>Psychological Assessment, 30</em>(5), 594-609.</p>
 #&gt; 
 #&gt; The CSIP currently has 1 normative data set(s):
 #&gt; 1. 712 American college students
-#&gt;   Boudreaux, Ozer, Oltmanns, &amp; Wright (2018)
-#&gt;   &lt;https://doi.org/10.1037/pas0000505&gt;</div><div class='input'><span class='fu'><a href='scales.html'>scales</a></span>(<span class='no'>csig</span>, <span class='kw'>items</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; The CSIG contains 8 circumplex scales.
+#&gt; Boudreaux, Ozer, Oltmanns, &amp; Wright (2018)
+#&gt; &lt;https://doi.org/10.1037/pas0000505&gt;</div><div class='input'><span class='fu'><a href='scales.html'>scales</a></span><span class='op'>(</span><span class='va'>csig</span>, items <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; The CSIG contains 8 circumplex scales.
 #&gt; PA: Be authoritative (90 degrees)
 #&gt;     8. We are assertive
 #&gt;     16. We appear confident
@@ -367,7 +369,7 @@ interpersonal problems. <em>Psychological Assessment, 30</em>(5), 594-609.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

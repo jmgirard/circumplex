@@ -90,7 +90,7 @@ measures will be calculated." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6.9000</span>
       </span>
     </div>
 
@@ -214,17 +214,17 @@ groups will be used to stratify the data, and contrasts between groups or
 measures will be calculated.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ssm_analyze</span>(
-  <span class='no'>.data</span>,
-  <span class='no'>scales</span>,
-  <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"none"</span>, <span class='st'>"test"</span>, <span class='st'>"model"</span>),
-  <span class='kw'>boots</span> <span class='kw'>=</span> <span class='fl'>2000</span>,
-  <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
-  <span class='kw'>listwise</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>ssm_analyze</span><span class='op'>(</span>
+  <span class='va'>.data</span>,
+  <span class='va'>scales</span>,
+  angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>,
+  measures <span class='op'>=</span> <span class='cn'>NULL</span>,
+  grouping <span class='op'>=</span> <span class='cn'>NULL</span>,
+  contrast <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"test"</span>, <span class='st'>"model"</span><span class='op'>)</span>,
+  boots <span class='op'>=</span> <span class='fl'>2000</span>,
+  interval <span class='op'>=</span> <span class='fl'>0.95</span>,
+  listwise <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -312,10 +312,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Load example data</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='st'>"jz2017"</span>)
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"jz2017"</span><span class='op'>)</span>
 
 <span class='co'># Single-group mean-based SSM</span>
-<span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>())</div><div class='output co'>#&gt; Call:
+<span class='fu'>ssm_analyze</span><span class='op'>(</span><span class='va'>jz2017</span>, scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Call:
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants())
 #&gt; 
 #&gt; Profile [All]:
@@ -328,10 +329,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Model Fit         0.878                      
 #&gt; </div><div class='input'>
 <span class='co'># Single-group correlation-based SSM</span>
-<span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>,
-  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>)
-)</div><div class='output co'>#&gt; Call:
+<span class='fu'>ssm_analyze</span><span class='op'>(</span><span class='va'>jz2017</span>,
+  scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>,
+  measures <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>NARPD</span>, <span class='va'>ASPD</span><span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; Call:
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     measures = c(NARPD, ASPD))
 #&gt; 
@@ -354,7 +356,8 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Model Fit         0.964                      
 #&gt; </div><div class='input'><span class='co'># \donttest{</span>
 <span class='co'># Multiple-group mean-based SSM</span>
-<span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>)</div><div class='output co'>#&gt; Call:
+<span class='fu'>ssm_analyze</span><span class='op'>(</span><span class='va'>jz2017</span>, scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, grouping <span class='op'>=</span> <span class='va'>Gender</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Call:
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     grouping = Gender)
 #&gt; 
@@ -377,10 +380,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Model Fit         0.824                      
 #&gt; </div><div class='input'>
 <span class='co'># Multiple-group mean-based SSM with contrast</span>
-<span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>,
-  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>,
-  <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"model"</span>
-)</div><div class='output co'>#&gt; Call:
+<span class='fu'>ssm_analyze</span><span class='op'>(</span><span class='va'>jz2017</span>,
+  scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, grouping <span class='op'>=</span> <span class='va'>Gender</span>,
+  contrast <span class='op'>=</span> <span class='st'>"model"</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; Call:
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     grouping = Gender, contrast = "model")
 #&gt; 
@@ -394,10 +398,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Model Fit         0.855                      
 #&gt; </div><div class='input'>
 <span class='co'># Single-group correlation-based SSM with contrast</span>
-<span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>,
-  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(),
-  <span class='kw'>measures</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>NARPD</span>, <span class='no'>ASPD</span>), <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>
-)</div><div class='output co'>#&gt; Call:
+<span class='fu'>ssm_analyze</span><span class='op'>(</span><span class='va'>jz2017</span>,
+  scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>,
+  measures <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>NARPD</span>, <span class='va'>ASPD</span><span class='op'>)</span>, contrast <span class='op'>=</span> <span class='st'>"test"</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; Call:
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     measures = c(NARPD, ASPD), contrast = "test")
 #&gt; 
@@ -411,10 +416,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Model Fit         0.007                      
 #&gt; </div><div class='input'>
 <span class='co'># Multiple-group correlation-based SSM</span>
-<span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>,
-  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>measures</span> <span class='kw'>=</span> <span class='no'>NARPD</span>,
-  <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>
-)</div><div class='output co'>#&gt; Call:
+<span class='fu'>ssm_analyze</span><span class='op'>(</span><span class='va'>jz2017</span>,
+  scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, measures <span class='op'>=</span> <span class='va'>NARPD</span>,
+  grouping <span class='op'>=</span> <span class='va'>Gender</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; Call:
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     measures = NARPD, grouping = Gender)
 #&gt; 
@@ -437,10 +443,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Model Fit         0.902                      
 #&gt; </div><div class='input'>
 <span class='co'># Multiple-group correlation-based SSM with contrast</span>
-<span class='fu'>ssm_analyze</span>(<span class='no'>jz2017</span>,
-  <span class='kw'>scales</span> <span class='kw'>=</span> <span class='no'>PA</span>:<span class='no'>NO</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>measures</span> <span class='kw'>=</span> <span class='no'>NARPD</span>,
-  <span class='kw'>grouping</span> <span class='kw'>=</span> <span class='no'>Gender</span>, <span class='kw'>contrast</span> <span class='kw'>=</span> <span class='st'>"test"</span>
-)</div><div class='output co'>#&gt; Call:
+<span class='fu'>ssm_analyze</span><span class='op'>(</span><span class='va'>jz2017</span>,
+  scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, measures <span class='op'>=</span> <span class='va'>NARPD</span>,
+  grouping <span class='op'>=</span> <span class='va'>Gender</span>, contrast <span class='op'>=</span> <span class='st'>"test"</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; Call:
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     measures = NARPD, grouping = Gender, contrast = "test")
 #&gt; 
@@ -452,7 +459,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Amplitude        -0.068     -0.138     -0.004
 #&gt; Displacement    -10.421    -30.538     10.798
 #&gt; Model Fit        -0.071                      
-#&gt; </div><div class='input'># }
+#&gt; </div><div class='input'><span class='co'># }</span>
 
 </div></pre>
   </div>
@@ -470,7 +477,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

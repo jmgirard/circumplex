@@ -90,7 +90,7 @@ function that calculates SSM parameters for each row of a data frame." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6.9000</span>
       </span>
     </div>
 
@@ -214,18 +214,18 @@ returns only the parameters. See <code><a href='ssm_score.html'>ssm_score</a>()<
 function that calculates SSM parameters for each row of a data frame.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ssm_parameters</span>(
-  <span class='no'>scores</span>,
-  <span class='no'>angles</span>,
-  <span class='kw'>prefix</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>e_label</span> <span class='kw'>=</span> <span class='st'>"Elev"</span>,
-  <span class='kw'>x_label</span> <span class='kw'>=</span> <span class='st'>"Xval"</span>,
-  <span class='kw'>y_label</span> <span class='kw'>=</span> <span class='st'>"Yval"</span>,
-  <span class='kw'>a_label</span> <span class='kw'>=</span> <span class='st'>"Ampl"</span>,
-  <span class='kw'>d_label</span> <span class='kw'>=</span> <span class='st'>"Disp"</span>,
-  <span class='kw'>f_label</span> <span class='kw'>=</span> <span class='st'>"Fit"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>ssm_parameters</span><span class='op'>(</span>
+  <span class='va'>scores</span>,
+  <span class='va'>angles</span>,
+  prefix <span class='op'>=</span> <span class='st'>""</span>,
+  suffix <span class='op'>=</span> <span class='st'>""</span>,
+  e_label <span class='op'>=</span> <span class='st'>"Elev"</span>,
+  x_label <span class='op'>=</span> <span class='st'>"Xval"</span>,
+  y_label <span class='op'>=</span> <span class='st'>"Yval"</span>,
+  a_label <span class='op'>=</span> <span class='st'>"Ampl"</span>,
+  d_label <span class='op'>=</span> <span class='st'>"Disp"</span>,
+  f_label <span class='op'>=</span> <span class='st'>"Fit"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -299,18 +299,21 @@ fit or R-squared value (default = "Fit").</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Manually enter octant scores</span>
-<span class='no'>scores</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.55</span>, <span class='fl'>0.58</span>, <span class='fl'>0.62</span>, <span class='fl'>0.76</span>, <span class='fl'>1.21</span>, <span class='fl'>1.21</span>, <span class='fl'>1.48</span>, <span class='fl'>0.90</span>)
-<span class='fu'>ssm_parameters</span>(<span class='no'>scores</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>())</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1 x 6</span><span>
+<span class='va'>scores</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.55</span>, <span class='fl'>0.58</span>, <span class='fl'>0.62</span>, <span class='fl'>0.76</span>, <span class='fl'>1.21</span>, <span class='fl'>1.21</span>, <span class='fl'>1.48</span>, <span class='fl'>0.90</span><span class='op'>)</span>
+<span class='fu'>ssm_parameters</span><span class='op'>(</span><span class='va'>scores</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1 x 6</span><span>
 #&gt;    Elev  Xval   Yval  Ampl  Disp   Fit
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> 0.914 0.351 -</span><span style='color: #BB0000;'>0.252</span><span> 0.432  324. 0.878</div><div class='input'>
 <span class='co'># Customize several of the labels</span>
-<span class='fu'>ssm_parameters</span>(<span class='no'>scores</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>x_label</span> <span class='kw'>=</span> <span class='st'>"LOV"</span>, <span class='kw'>y_label</span> <span class='kw'>=</span> <span class='st'>"DOM"</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 1 x 6</span><span>
+<span class='fu'>ssm_parameters</span><span class='op'>(</span><span class='va'>scores</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, x_label <span class='op'>=</span> <span class='st'>"LOV"</span>, y_label <span class='op'>=</span> <span class='st'>"DOM"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 1 x 6</span><span>
 #&gt;    Elev   LOV    DOM  Ampl  Disp   Fit
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> 0.914 0.351 -</span><span style='color: #BB0000;'>0.252</span><span> 0.432  324. 0.878</div><div class='input'>
 <span class='co'># Add a prefix to all labels</span>
-<span class='fu'>ssm_parameters</span>(<span class='no'>scores</span>, <span class='kw'>angles</span> <span class='kw'>=</span> <span class='fu'><a href='octants.html'>octants</a></span>(), <span class='kw'>prefix</span> <span class='kw'>=</span> <span class='st'>"IIP_"</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 1 x 6</span><span>
+<span class='fu'>ssm_parameters</span><span class='op'>(</span><span class='va'>scores</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, prefix <span class='op'>=</span> <span class='st'>"IIP_"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 1 x 6</span><span>
 #&gt;   IIP_Elev IIP_Xval IIP_Yval IIP_Ampl IIP_Disp IIP_Fit
 #&gt;      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span>    0.914    0.351   -</span><span style='color: #BB0000;'>0.252</span><span>    0.432     324.   0.878</div><div class='input'>
@@ -330,7 +333,7 @@ fit or R-squared value (default = "Fit").</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
