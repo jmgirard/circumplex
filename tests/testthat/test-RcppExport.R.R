@@ -1,5 +1,3 @@
-context("RcppExport.R")
-
 test_that("SSM parameters are correct", {
   data("aw2009")
   scores <- colMeans(aw2009)

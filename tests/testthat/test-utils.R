@@ -1,5 +1,3 @@
-context("test-utils.R")
-
 test_that("Percentages are converted to strings properly", {
   expect_equal(str_percent(0.95, 2), "95%")
   expect_equal(str_percent(0.999, 2), "99.9%")

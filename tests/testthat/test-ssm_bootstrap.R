@@ -1,11 +1,9 @@
-context("test-ssm_bootstrap.R")
-
 test_that("Quantile for circular radians works", {
   a <- as_degree(0:180)
   b <- as_radian(a)
   qb <- quantile(b)
   expect_s3_class(qb, "circumplex_radian")
-  expect_equivalent(qb, as_radian(as_degree(c(0, 45, 90, 135, 180))))
+  expect_equal(qb, as_radian(as_degree(c(0, 45, 90, 135, 180))), ignore_attr = TRUE)
 
   # a <- as_degree(180:360)
   # b <- as_radian(a)

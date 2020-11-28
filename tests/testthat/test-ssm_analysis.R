@@ -1,5 +1,3 @@
-context("test-ssm_analysis.R")
-
 test_that("Single-group mean-based SSM results are correct", {
   data("aw2009")
   set.seed(12345)
@@ -43,7 +41,7 @@ test_that("Single-group mean-based SSM results are correct", {
   expect_equal(res$details$boots, 2000)
   expect_equal(res$details$interval, 0.95)
   expect_true(res$details$listwise)
-  expect_equivalent(res$details$angles, octants())
+  expect_equal(res$details$angles, octants(), ignore_attr = TRUE)
   expect_equal(res$details$score_type, "Mean")
   expect_equal(res$details$results_type, "Profile")
 })
@@ -93,7 +91,7 @@ test_that("Multiple-group mean-based SSM results are correct", {
   expect_equal(res$details$boots, 2000)
   expect_equal(res$details$interval, 0.95)
   expect_true(res$details$listwise)
-  expect_equivalent(res$details$angles, octants())
+  expect_equal(res$details$angles, octants(), ignore_attr = TRUE)
   expect_equal(res$details$contrast, "none")
   expect_equal(res$details$score_type, "Mean")
   expect_equal(res$details$results_type, "Profile")
@@ -136,7 +134,7 @@ test_that("Multiple-group mean-based SSM contrast is correct", {
   expect_equal(res$details$boots, 2000)
   expect_equal(res$details$interval, 0.95)
   expect_true(res$details$listwise)
-  expect_equivalent(res$details$angles, octants())
+  expect_equal(res$details$angles, octants(), ignore_attr = TRUE)
   expect_equal(res$details$contrast, "model")
   expect_equal(res$details$score_type, "Mean")
   expect_equal(res$details$results_type, "Contrast")

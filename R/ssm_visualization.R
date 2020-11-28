@@ -156,13 +156,15 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
 
 ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
                               xy = TRUE, color = "red", linesize = 1.25, fontsize = 12) {
-  param_names <- c(
-    e = "\u0394 Elevation",
-    x = "\u0394 X-Value",
-    y = "\u0394 Y-Value",
-    a = "\u0394 Amplitude",
-    d = "\u0394 Displacement"
+  plabs <- c(
+    e = expression(paste(Delta, " Elevation")),
+    x = expression(paste(Delta, " X-Value")),
+    y = expression(paste(Delta, " Y-Value")),
+    a = expression(paste(Delta, " Amplitude")),
+    d = expression(paste(Delta, " Displacement"))
   )
+  
+  pvals <- c("e", "x", "y", "a", "d")
 
   res <- .ssm_object$results
 
@@ -171,7 +173,8 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
       res,
       -c(x_est, x_lci, x_uci, y_est, y_lci, y_uci)
     )
-    param_names <- param_names[-c(2, 3)]
+    plabs <- plabs[-c(2, 3)]
+    pvals <- pvals[-c(2, 3)]
   }
 
   # TODO: Check that these ifelse() statements are correct
@@ -188,7 +191,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     tidyr::extract(col = key, into = c("Parameter", "Type"), "(.)_(...)") %>% 
     tidyr::pivot_wider(names_from = Type, values_from = value) %>% 
     dplyr::rename(Difference = est, Contrast = label) %>%
-    dplyr::mutate(Parameter = factor(Parameter, levels = c("e", "x", "y", "a", "d")))
+    dplyr::mutate(Parameter = factor(Parameter, levels = pvals, labels = plabs))
   
   p <- 
     res %>% 
@@ -211,7 +214,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     ggplot2::labs(y = axislabel) +
     ggplot2::facet_wrap(~Parameter,
       nrow = 1, scales = "free",
-      labeller = ggplot2::as_labeller(param_names)
+      labeller = ggplot2::label_parsed
     )
 
   p

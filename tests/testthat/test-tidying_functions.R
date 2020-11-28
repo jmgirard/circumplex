@@ -1,5 +1,3 @@
-context("test-tidying_functions")
-
 test_that("ipsatize works", {
   data("aw2009")
   new <- ipsatize(aw2009, PA:NO)
@@ -24,45 +22,34 @@ test_that("ipsatize works", {
 })
 
 test_that("score works", {
-  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   old <- data.frame(
-    matrix(
-      sample(0:4, size = 32 * 5, replace = TRUE),
-      nrow = 5,
-      ncol = 32
-    )
+    matrix(sample(0:4, size = 32 * 5, replace = TRUE), nrow = 5, ncol = 32)
   )
   new <- score(old, X1:X32, instrument("iipsc"))
-  expect_equal(new$PA, c(3.00, 2.50, 1.75, 2.50, 1.50))
-  expect_equal(new$BC, c(1.50, 2.25, 1.00, 2.00, 2.50))
-  expect_equal(new$DE, c(2.00, 2.75, 2.00, 1.75, 2.75))
-  expect_equal(new$FG, c(2.50, 2.50, 1.25, 0.50, 2.50))
-  expect_equal(new$HI, c(2.00, 2.00, 3.25, 3.00, 2.25))
-  expect_equal(new$JK, c(2.50, 3.50, 2.00, 2.25, 2.00))
-  expect_equal(new$LM, c(3.25, 1.25, 1.75, 1.50, 1.25))
-  expect_equal(new$NO, c(2.75, 3.75, 2.75, 2.25, 1.00))
+  expect_equal(new$PA, c(0.5, 1.25, 2, 0.75, 3.5))
+  expect_equal(new$BC, c(1.75, 0.75, 1.5, 1.75, 1.75))
+  expect_equal(new$DE, c(1.75, 2.25, 1.75, 3, 3))
+  expect_equal(new$FG, c(2.5, 1.75, 3.5, 1.5, 1.75))
+  expect_equal(new$HI, c(2.25, 2.25, 3, 2, 1.25))
+  expect_equal(new$JK, c(1.5, 2.5, 1.75, 2.25, 1.75))
+  expect_equal(new$LM, c(2, 2.5, 1.5, 2.75, 1.5))
+  expect_equal(new$NO, c(1.75, 2, 1.75, 2.25, 2.5))
   expect_error(score(old, X1:X30, instrument("iipsc")))
 })
 
 test_that("standardize works", {
-  instrument("iipsc")
-  suppressWarnings(RNGversion("3.5.0"))
   set.seed(12345)
   old <- data.frame(
-    matrix(
-      runif(8 * 5, min = 0, max = 4),
-      nrow = 5,
-      ncol = 8
-    )
+    matrix(runif(8 * 5, min = 0, max = 4), nrow = 5, ncol = 8)
   )
-  new <- standardize(old, X1:X8, octants(), iipsc, sample = 1)
+  new <- standardize(old, X1:X8, octants(), instrument("iipsc"), sample = 1)
   expect_equal(round(new$X1_z, 4), c(3.2176, 4.1562, 3.4605, 4.2189, 1.6150))
-  expect_equal(round(new$X2_z, 4), c(-0.1841, 0.7361, 1.8035, 3.0700, 4.5891))
+  expect_equal(round(new$X2_z, 4), c(-0.1841, 0.7361, 1.8035, 3.07, 4.5891))
   expect_equal(round(new$X3_z, 4), c(-0.8911, -0.3398, 2.3892, -1.0473, 0.7776))
-  expect_equal(round(new$X4_z, 4), c(0.8469, 0.5331, 0.5936, -0.3500, 2.9120))
+  expect_equal(round(new$X4_z, 4), c(0.8469, 0.5331, 0.5936, -0.35, 2.912))
   expect_equal(round(new$X5_z, 4), c(0.4316, -0.1235, 2.6685, 1.5409, 1.2658))
-  expect_equal(round(new$X6_z, 4), c(0.2045, 1.6530, 0.9281, -0.5620, 0.6490))
+  expect_equal(round(new$X6_z, 4), c(0.2045, 1.653, 0.9281, -0.562, 0.649))
   expect_equal(round(new$X7_z, 4), c(2.0691, -1.7467, -0.8656, 1.5301, 0.0187))
   expect_equal(round(new$X8_z, 4), c(0.5269, 3.0627, 3.2395, 1.8059, -0.6111))
 })

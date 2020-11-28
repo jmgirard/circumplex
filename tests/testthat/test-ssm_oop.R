@@ -1,5 +1,3 @@
-context("test-ssm_oop.R")
-
 test_that("S3 degree functions work as expected", {
   x <- c(0, 90, 180, 360)
   y <- c(0, pi / 2, pi, pi * 2)
