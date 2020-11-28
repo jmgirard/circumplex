@@ -53,5 +53,5 @@ test_that("The norms function detects when no norms are available", {
 
 
 test_that("The instruments function produces the expected output", {
-  expect_snapshot_output(instruments)
+  expect_snapshot_output(instruments())
 })
