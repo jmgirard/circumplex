@@ -123,7 +123,7 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
       "Amplitude", "Displacement", "Model Fit"
     )
     colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
-    cat("\n", x$details$results_type, " (", dat$label, "):\n",
+    cat("\n", x$details$results_type, " [", dat$label, "]:\n",
       sep = ""
     )
     print.default(m, print.gap = 3L, na.print = "")
@@ -165,7 +165,7 @@ summary.circumplex_ssm <- function(object, digits = 3, ...) {
       "Amplitude", "Displacement", "Model Fit"
     )
     colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
-    cat("\n", object$details$results_type, " (", dat$label, "):\n",
+    cat("\n", object$details$results_type, " [", dat$label, "]:\n",
       sep = ""
     )
     print.default(m, print.gap = 3L, na.print = "")
