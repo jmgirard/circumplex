@@ -213,10 +213,13 @@ circular space quantified by displacement and amplitude.</p>
     <pre class="usage"><span class='fu'>ssm_plot_circle</span><span class='op'>(</span>
   <span class='va'>.ssm_object</span>,
   amax <span class='op'>=</span> <span class='cn'>NULL</span>,
-  fontsize <span class='op'>=</span> <span class='fl'>12</span>,
+  legend_font_size <span class='op'>=</span> <span class='fl'>12</span>,
+  scale_font_size <span class='op'>=</span> <span class='fl'>12</span>,
   lowfit <span class='op'>=</span> <span class='cn'>TRUE</span>,
   repel <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  angle_labels <span class='op'>=</span> <span class='cn'>NULL</span>
+  angle_labels <span class='op'>=</span> <span class='cn'>NULL</span>,
+  legend.box.spacing <span class='op'>=</span> <span class='fl'>1</span>,
+  <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -234,9 +237,15 @@ It is used to scale the amplitude values and will determine which amplitude
 labels are drawn.</p></td>
     </tr>
     <tr>
-      <th>fontsize</th>
-      <td><p>A positive real number corresponding to the size (in pt) of
-the text labels (default = 12).</p></td>
+      <th>legend_font_size</th>
+      <td><p>A positive real number corresponding to the size (in
+pt) of the text labels in the legend (default = 12).</p></td>
+    </tr>
+    <tr>
+      <th>scale_font_size</th>
+      <td><p>A positive real number corresponding to the size (in
+pt) of the text labels for the amplitude and displacement scales (default =
+12).</p></td>
     </tr>
     <tr>
       <th>lowfit</th>
@@ -255,6 +264,11 @@ the circle for each scale. Can also specify NULL to default to numerical
 angle labels or a vector of empty strings ("") to hide the labels. If not
 NULL, must have the same length and ordering as the <code>angles</code> argument
 to <code><a href='ssm_analyze.html'>ssm_analyze()</a></code>. (default = NULL)</p></td>
+    </tr>
+    <tr>
+      <th>legend.box.spacing</th>
+      <td><p>A double corresponding to the distance (in inches)
+between the data plot and the legend (default = 1).</p></td>
     </tr>
     </table>
 
