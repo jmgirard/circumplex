@@ -182,8 +182,39 @@
   .data <span class="op">=</span> <span class="va">jz2017</span>, 
   scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">PA</span>, <span class="va">BC</span>, <span class="va">DE</span>, <span class="va">FG</span>, <span class="va">HI</span>, <span class="va">JK</span>, <span class="va">LM</span>, <span class="va">NO</span><span class="op">)</span>, 
   angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span>, 
-  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span>,
+  measures_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Narcissistic PD"</span>, <span class="st">"Antisocial PD"</span><span class="op">)</span>
+<span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span>
+<span class="co">#&gt; Call:</span>
+<span class="co">#&gt; ssm_analyze(.data = jz2017, scales = c(PA, BC, DE, FG, HI, JK, </span>
+<span class="co">#&gt;     LM, NO), angles = c(90, 135, 180, 225, 270, 315, 360, 45), </span>
+<span class="co">#&gt;     measures = c(NARPD, ASPD), measures_labels = c("Narcissistic PD", </span>
+<span class="co">#&gt;         "Antisocial PD"))</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Statistical Basis:    Correlation Scores </span>
+<span class="co">#&gt; Bootstrap Resamples:  2000 </span>
+<span class="co">#&gt; Confidence Level:     0.95 </span>
+<span class="co">#&gt; Listwise Deletion:    TRUE </span>
+<span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Profile [Narcissistic PD]:</span>
+<span class="co">#&gt;                Estimate   Lower CI   Upper CI</span>
+<span class="co">#&gt; Elevation         0.202      0.169      0.238</span>
+<span class="co">#&gt; X-Value          -0.062     -0.094     -0.029</span>
+<span class="co">#&gt; Y-Value           0.179      0.145      0.213</span>
+<span class="co">#&gt; Amplitude         0.189      0.154      0.227</span>
+<span class="co">#&gt; Displacement    108.967     98.633    118.537</span>
+<span class="co">#&gt; Model Fit         0.957                      </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Profile [Antisocial PD]:</span>
+<span class="co">#&gt;                Estimate   Lower CI   Upper CI</span>
+<span class="co">#&gt; Elevation         0.124      0.087      0.158</span>
+<span class="co">#&gt; X-Value          -0.099     -0.133     -0.064</span>
+<span class="co">#&gt; Y-Value           0.203      0.170      0.239</span>
+<span class="co">#&gt; Amplitude         0.226      0.191      0.264</span>
+<span class="co">#&gt; Displacement    115.927    107.327    124.188</span>
+<span class="co">#&gt; Model Fit         0.964</span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results</span>, xy <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <table class="table table">
@@ -210,7 +241,7 @@ Fit
 <tbody>
 <tr>
 <td style="text-align:left;">
-NARPD
+Narcissistic PD
 </td>
 <td style="text-align:left;">
 0.20 (0.17, 0.24)
@@ -227,7 +258,7 @@ NARPD
 </tr>
 <tr>
 <td style="text-align:left;">
-ASPD
+Antisocial PD
 </td>
 <td style="text-align:left;">
 0.12 (0.09, 0.16)

@@ -328,7 +328,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 </div><div class='output co'>#&gt; Call:
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants())
 #&gt; 
-#&gt; Profile (All):
+#&gt; Profile [All]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.917      0.888      0.946
 #&gt; X-Value           0.351      0.324      0.378
@@ -346,7 +346,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     measures = c(NARPD, ASPD))
 #&gt; 
-#&gt; Profile (NARPD):
+#&gt; Profile [NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.202      0.169      0.236
 #&gt; X-Value          -0.062     -0.094     -0.030
@@ -355,7 +355,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Displacement    108.967     99.334    118.620
 #&gt; Model Fit         0.957                      
 #&gt; 
-#&gt; Profile (ASPD):
+#&gt; Profile [ASPD]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.124      0.089      0.159
 #&gt; X-Value          -0.099     -0.133     -0.063
@@ -370,7 +370,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     grouping = Gender)
 #&gt; 
-#&gt; Profile (Female):
+#&gt; Profile [Female]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.946      0.907      0.983
 #&gt; X-Value           0.459      0.420      0.499
@@ -379,7 +379,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Displacement    325.963    322.240    329.833
 #&gt; Model Fit         0.889                      
 #&gt; 
-#&gt; Profile (Male):
+#&gt; Profile [Male]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.884      0.842      0.925
 #&gt; X-Value           0.227      0.192      0.262
@@ -397,7 +397,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     grouping = Gender, contrast = "model")
 #&gt; 
-#&gt; Contrast (Male - Female):
+#&gt; Contrast [Male - Female]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation        -0.062     -0.118     -0.004
 #&gt; X-Value          -0.232     -0.286     -0.181
@@ -415,7 +415,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     measures = c(NARPD, ASPD), contrast = "test")
 #&gt; 
-#&gt; Contrast (ASPD - NARPD):
+#&gt; Contrast [ASPD - NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation        -0.079     -0.116     -0.041
 #&gt; X-Value          -0.037     -0.077      0.000
@@ -433,7 +433,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt;     measures = c(NARPD, ASPD), measures_labels = c("Narcissistic", 
 #&gt;         "Antisocial"))
 #&gt; 
-#&gt; Profile (Narcissistic):
+#&gt; Profile [Narcissistic]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.202      0.169      0.236
 #&gt; X-Value          -0.062     -0.094     -0.028
@@ -442,7 +442,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Displacement    108.967     99.182    118.263
 #&gt; Model Fit         0.957                      
 #&gt; 
-#&gt; Profile (Antisocial):
+#&gt; Profile [Antisocial]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.124      0.090      0.159
 #&gt; X-Value          -0.099     -0.133     -0.066
@@ -460,7 +460,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     measures = NARPD, grouping = Gender)
 #&gt; 
-#&gt; Profile (Female_NARPD):
+#&gt; Profile [Female_NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.172      0.127      0.215
 #&gt; X-Value          -0.080     -0.127     -0.034
@@ -469,7 +469,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Displacement    111.669     99.967    123.191
 #&gt; Model Fit         0.972                      
 #&gt; 
-#&gt; Profile (Male_NARPD):
+#&gt; Profile [Male_NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.244      0.192      0.295
 #&gt; X-Value          -0.029     -0.072      0.014
@@ -487,7 +487,7 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
 #&gt;     measures = NARPD, grouping = Gender, contrast = "test")
 #&gt; 
-#&gt; Contrast (NARPD: Male - Female):
+#&gt; Contrast [NARPD: Male - Female]:
 #&gt;                Estimate   Lower CI   Upper CI
 #&gt; Elevation         0.072      0.004      0.141
 #&gt; X-Value           0.051     -0.017      0.116
