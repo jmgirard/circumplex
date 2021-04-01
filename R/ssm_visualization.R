@@ -272,7 +272,7 @@ circle_base <- function(angles, labels = NULL,
   
   ggplot2::ggplot() +
     # Require plot to be square and remove default styling
-    ggplot2::coord_fixed() +
+    ggplot2::coord_fixed(clip = "off") +
     ggplot2::theme_void(base_size = fontsize) +
     # Expand the axes multiplicatively to fit labels
     ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
