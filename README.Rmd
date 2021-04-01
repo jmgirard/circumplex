@@ -47,8 +47,10 @@ results <- ssm_analyze(
   .data = jz2017, 
   scales = c(PA, BC, DE, FG, HI, JK, LM, NO), 
   angles = c(90, 135, 180, 225, 270, 315, 360, 45), 
-  measures = c(NARPD, ASPD)
+  measures = c(NARPD, ASPD),
+  measures_labels = c("Narcissistic PD", "Antisocial PD")
 )
+summary(results)
 ```
 
 ``` r

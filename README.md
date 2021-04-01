@@ -45,8 +45,39 @@ results <- ssm_analyze(
   .data = jz2017, 
   scales = c(PA, BC, DE, FG, HI, JK, LM, NO), 
   angles = c(90, 135, 180, 225, 270, 315, 360, 45), 
-  measures = c(NARPD, ASPD)
+  measures = c(NARPD, ASPD),
+  measures_labels = c("Narcissistic PD", "Antisocial PD")
 )
+summary(results)
+#> Call:
+#> ssm_analyze(.data = jz2017, scales = c(PA, BC, DE, FG, HI, JK, 
+#>     LM, NO), angles = c(90, 135, 180, 225, 270, 315, 360, 45), 
+#>     measures = c(NARPD, ASPD), measures_labels = c("Narcissistic PD", 
+#>         "Antisocial PD"))
+#> 
+#> Statistical Basis:    Correlation Scores 
+#> Bootstrap Resamples:  2000 
+#> Confidence Level:     0.95 
+#> Listwise Deletion:    TRUE 
+#> Scale Displacements:  90 135 180 225 270 315 360 45 
+#> 
+#> Profile [Narcissistic PD]:
+#>                Estimate   Lower CI   Upper CI
+#> Elevation         0.202      0.169      0.238
+#> X-Value          -0.062     -0.094     -0.029
+#> Y-Value           0.179      0.145      0.213
+#> Amplitude         0.189      0.154      0.227
+#> Displacement    108.967     98.633    118.537
+#> Model Fit         0.957                      
+#> 
+#> Profile [Antisocial PD]:
+#>                Estimate   Lower CI   Upper CI
+#> Elevation         0.124      0.087      0.158
+#> X-Value          -0.099     -0.133     -0.064
+#> Y-Value           0.203      0.170      0.239
+#> Amplitude         0.226      0.191      0.264
+#> Displacement    115.927    107.327    124.188
+#> Model Fit         0.964
 ```
 
 ``` r
@@ -79,7 +110,7 @@ Fit
 <tbody>
 <tr>
 <td style="text-align:left;">
-NARPD
+Narcissistic PD
 </td>
 <td style="text-align:left;">
 0.20 (0.17, 0.24)
@@ -96,7 +127,7 @@ NARPD
 </tr>
 <tr>
 <td style="text-align:left;">
-ASPD
+Antisocial PD
 </td>
 <td style="text-align:left;">
 0.12 (0.09, 0.16)
