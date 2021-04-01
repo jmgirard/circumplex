@@ -12,7 +12,8 @@ ssm_plot_circle(
   lowfit = TRUE,
   repel = FALSE,
   angle_labels = NULL,
-  legend.box.spacing = 1
+  legend.box.spacing = 1,
+  ...
 )
 }
 \arguments{

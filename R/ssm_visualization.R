@@ -81,7 +81,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
                             scale_font_size = 12,
                             lowfit = TRUE, repel = FALSE,
                             angle_labels = NULL,
-                            legend.box.spacing = 1) {
+                            legend.box.spacing = 1,
+                            ...) {
   df <- .ssm_object$results
   
   assert_that(
