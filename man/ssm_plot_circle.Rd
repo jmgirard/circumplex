@@ -12,7 +12,7 @@ ssm_plot_circle(
   lowfit = TRUE,
   repel = FALSE,
   angle_labels = NULL,
-  legend.box.spacing = 1,
+  legend.box.spacing = 0,
   ...
 )
 }
@@ -44,7 +44,7 @@ NULL, must have the same length and ordering as the \code{angles} argument
 to \code{ssm_analyze()}. (default = NULL)}
 
 \item{legend.box.spacing}{A double corresponding to the distance (in inches)
-between the data plot and the legend (default = 1).}
+to add between the data plot and the legend (default = 0).}
 }
 \value{
 A ggplot variable containing a completed circular plot.

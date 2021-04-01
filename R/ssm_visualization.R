@@ -73,7 +73,7 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'   NULL, must have the same length and ordering as the \code{angles} argument
 #'   to \code{ssm_analyze()}. (default = NULL)
 #' @param legend.box.spacing A double corresponding to the distance (in inches)
-#'   between the data plot and the legend (default = 1).
+#'   to add between the data plot and the legend (default = 0).
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, amax = NULL, 
@@ -81,7 +81,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
                             scale_font_size = 12,
                             lowfit = TRUE, repel = FALSE,
                             angle_labels = NULL,
-                            legend.box.spacing = 1,
+                            legend.box.spacing = 0,
                             ...) {
   df <- .ssm_object$results
   
