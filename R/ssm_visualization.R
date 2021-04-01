@@ -64,12 +64,25 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'   (<.70) should be plotted, with dashed borders (default = TRUE).
 #' @param repel An experimental argument for plotting text labels instead of
 #'   colors.
+#' @param angle_labels A character vector specifying text labels to plot around
+#'   the circle for each scale. Can also specify NULL to default to numerical
+#'   angle labels or a vector of empty strings ("") to hide the labels. If not
+#'   NULL, must have the same length and ordering as the \code{angles} argument
+#'   to \code{ssm_analyze()}. (default = NULL)
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
-                            lowfit = TRUE, repel = FALSE) {
+                            lowfit = TRUE, repel = FALSE,
+                            angle_labels = NULL) {
   df <- .ssm_object$results
+  
+  assert_that(
+    is.null(angle_labels) || 
+      rlang::is_character(angle_labels, n = length(.ssm_object$details$angles))
+  )
+  
   angles <- as.integer(round(.ssm_object$details$angles))
+  
 
   assert_that(is.null(amax) || is.number(amax))
 
@@ -104,7 +117,13 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
   df_plot <- df_plot %>%
     dplyr::mutate(lnty = dplyr::if_else(fit_est >= .70, "solid", "dashed"))
 
-  p <- circle_base(angles = angles, amax = amax, fontsize = fontsize) +
+  p <- 
+    circle_base(
+      angles = angles, 
+      amax = amax, 
+      fontsize = fontsize, 
+      labels = angle_labels
+    ) +
     ggplot2::scale_color_hue() +
     ggplot2::scale_fill_hue()
 
@@ -140,8 +159,10 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
         ggplot2::aes(x = x_est, y = y_est, label = label),
         nudge_x = -25 - df_plot$x_est,
         direction = "y",
-        hjust = 1
-      ) + ggplot2::theme(legend.position = "none")
+        hjust = 1,
+        size = fontsize / 2.8346438836889
+      ) + 
+      ggplot2::theme(legend.position = "none")
   }
   
   p
@@ -234,8 +255,11 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
 }
 
 # Create an Empty Circular Plot
-circle_base <- function(angles, labels = sprintf("%d\u00B0", angles),
+circle_base <- function(angles, labels = NULL,
                         amax = 0.5, fontsize = 12) {
+  
+  if (is.null(labels)) labels <- sprintf("%d\u00B0", angles)
+  
   ggplot2::ggplot() +
     # Require plot to be square and remove default styling
     ggplot2::coord_fixed() +

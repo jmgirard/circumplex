@@ -9,7 +9,8 @@ ssm_plot_circle(
   amax = NULL,
   fontsize = 12,
   lowfit = TRUE,
-  repel = FALSE
+  repel = FALSE,
+  angle_labels = NULL
 )
 }
 \arguments{
@@ -28,6 +29,12 @@ the text labels (default = 12).}
 
 \item{repel}{An experimental argument for plotting text labels instead of
 colors.}
+
+\item{angle_labels}{A character vector specifying text labels to plot around
+the circle for each scale. Can also specify NULL to default to numerical
+angle labels or a vector of empty strings ("") to hide the labels. If not
+NULL, must have the same length and ordering as the \code{angles} argument
+to \code{ssm_analyze()}. (default = NULL)}
 }
 \value{
 A ggplot variable containing a completed circular plot.
