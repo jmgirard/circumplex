@@ -248,7 +248,9 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     ggplot2::theme(
       legend.position = "top",
       axis.text.x = ggplot2::element_blank(),
-      axis.title.x = ggplot2::element_blank()
+      axis.title.x = ggplot2::element_blank(),
+      panel.grid.major.x = ggplot2::element_blank(),
+      panel.grid.minor.y = ggplot2::element_blank(linetype = "dashed")
     ) +
     ggplot2::geom_hline(yintercept = 0, size = linesize, color = "darkgray") +
     ggplot2::geom_point(
