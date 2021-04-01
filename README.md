@@ -50,163 +50,68 @@ results <- ssm_analyze(
 ```
 
 ``` r
-ssm_table(results)
+ssm_table(results, xy = FALSE)
 ```
 
 <table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
-
 <caption style="font-size: initial !important;">
-
 Correlation-based Structural Summary Statistics with 95% CIs
-
 </caption>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Profile
-
 </th>
-
 <th style="text-align:left;">
-
 Elevation
-
 </th>
-
 <th style="text-align:left;">
-
-X-Value
-
-</th>
-
-<th style="text-align:left;">
-
-Y-Value
-
-</th>
-
-<th style="text-align:left;">
-
 Amplitude
-
 </th>
-
 <th style="text-align:left;">
-
 Displacement
-
 </th>
-
 <th style="text-align:left;">
-
 Fit
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 NARPD
-
 </td>
-
 <td style="text-align:left;">
-
-0.20 \[0.17, 0.24\]
-
+0.20 (0.17, 0.24)
 </td>
-
 <td style="text-align:left;">
-
-\-0.06 \[-0.09, -0.03\]
-
+0.19 (0.15, 0.23)
 </td>
-
 <td style="text-align:left;">
-
-0.18 \[0.14, 0.21\]
-
+109.0 (98.6, 118.5)
 </td>
-
 <td style="text-align:left;">
-
-0.19 \[0.15, 0.23\]
-
-</td>
-
-<td style="text-align:left;">
-
-109.0 \[98.6, 118.5\]
-
-</td>
-
-<td style="text-align:left;">
-
 0.957
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ASPD
-
 </td>
-
 <td style="text-align:left;">
-
-0.12 \[0.09, 0.16\]
-
+0.12 (0.09, 0.16)
 </td>
-
 <td style="text-align:left;">
-
-\-0.10 \[-0.13, -0.06\]
-
+0.23 (0.19, 0.26)
 </td>
-
 <td style="text-align:left;">
-
-0.20 \[0.17, 0.24\]
-
+115.9 (107.3, 124.2)
 </td>
-
 <td style="text-align:left;">
-
-0.23 \[0.19, 0.26\]
-
-</td>
-
-<td style="text-align:left;">
-
-115.9 \[107.3, 124.2\]
-
-</td>
-
-<td style="text-align:left;">
-
 0.964
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 ``` r

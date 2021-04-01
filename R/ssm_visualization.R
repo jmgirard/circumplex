@@ -62,6 +62,8 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'   the text labels (default = 12).
 #' @param lowfit A logical determining whether profiles with low model fit
 #'   (<.70) should be plotted, with dashed borders (default = TRUE).
+#' @param repel An experimental argument for plotting text labels instead of
+#'   colors.
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
@@ -344,11 +346,11 @@ ssm_table <- function(.ssm_object, caption = NULL, xy = TRUE, render = TRUE) {
   # Format output data
   df <- dplyr::transmute(df,
     Label = label,
-    Elevation = sprintf("%.2f [%.2f, %.2f]", e_est, e_lci, e_uci),
-    `X-Value` = sprintf("%.2f [%.2f, %.2f]", x_est, x_lci, x_uci),
-    `Y-Value` = sprintf("%.2f [%.2f, %.2f]", y_est, y_lci, y_uci),
-    Amplitude = sprintf("%.2f [%.2f, %.2f]", a_est, a_lci, a_uci),
-    Displacement = sprintf("%.1f [%.1f, %.1f]", d_est, d_lci, d_uci),
+    Elevation = sprintf("%.2f (%.2f, %.2f)", e_est, e_lci, e_uci),
+    `X-Value` = sprintf("%.2f (%.2f, %.2f)", x_est, x_lci, x_uci),
+    `Y-Value` = sprintf("%.2f (%.2f, %.2f)", y_est, y_lci, y_uci),
+    Amplitude = sprintf("%.2f (%.2f, %.2f)", a_est, a_lci, a_uci),
+    Displacement = sprintf("%.1f (%.1f, %.1f)", d_est, d_lci, d_uci),
     Fit = sprintf("%.3f", fit_est)
   )
 

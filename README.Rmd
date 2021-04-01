@@ -52,11 +52,11 @@ results <- ssm_analyze(
 ```
 
 ``` r
-ssm_table(results)
+ssm_table(results, xy = FALSE)
 ```
 
 ```{r table1, echo = FALSE, results = "asis"}
-ssm_table(results, render = FALSE) %>%
+ssm_table(results, xy = FALSE, render = FALSE) %>%
   knitr::kable(caption = circumplex:::dcaption(results)) %>% 
   kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```

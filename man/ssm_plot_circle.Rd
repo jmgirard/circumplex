@@ -25,6 +25,9 @@ the text labels (default = 12).}
 
 \item{lowfit}{A logical determining whether profiles with low model fit
 (<.70) should be plotted, with dashed borders (default = TRUE).}
+
+\item{repel}{An experimental argument for plotting text labels instead of
+colors.}
 }
 \value{
 A ggplot variable containing a completed circular plot.
