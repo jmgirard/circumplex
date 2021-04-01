@@ -215,7 +215,8 @@ circular space quantified by displacement and amplitude.</p>
   amax <span class='op'>=</span> <span class='cn'>NULL</span>,
   fontsize <span class='op'>=</span> <span class='fl'>12</span>,
   lowfit <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  repel <span class='op'>=</span> <span class='cn'>FALSE</span>
+  repel <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  angle_labels <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -246,6 +247,14 @@ the text labels (default = 12).</p></td>
       <th>repel</th>
       <td><p>An experimental argument for plotting text labels instead of
 colors.</p></td>
+    </tr>
+    <tr>
+      <th>angle_labels</th>
+      <td><p>A character vector specifying text labels to plot around
+the circle for each scale. Can also specify NULL to default to numerical
+angle labels or a vector of empty strings ("") to hide the labels. If not
+NULL, must have the same length and ordering as the <code>angles</code> argument
+to <code><a href='ssm_analyze.html'>ssm_analyze()</a></code>. (default = NULL)</p></td>
     </tr>
     </table>
 
