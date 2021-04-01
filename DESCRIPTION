@@ -47,6 +47,7 @@ Suggests:
     ggrepel,
     kableExtra (>= 1.1.0),
     knitr (>= 1.28),
+    RColorBrewer,
     rmarkdown (>= 2.1),
     roxygen2 (>= 7.1.0),
     testthat (>= 3.0.0),

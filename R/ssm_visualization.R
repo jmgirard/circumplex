@@ -74,6 +74,8 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'   to \code{ssm_analyze()}. (default = NULL)
 #' @param legend.box.spacing A double corresponding to the distance (in inches)
 #'   to add between the data plot and the legend (default = 0).
+#' @param palette A string corresponding to the palette to be used from
+#'   ColorBrewer for the color and fill aesthetics.
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, amax = NULL, 
@@ -82,6 +84,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
                             lowfit = TRUE, repel = FALSE,
                             angle_labels = NULL,
                             legend.box.spacing = 0,
+                            palette = "Set1",
                             ...) {
   df <- .ssm_object$results
   
@@ -133,8 +136,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
       fontsize = scale_font_size, 
       labels = angle_labels
     ) +
-    ggplot2::scale_color_hue() +
-    ggplot2::scale_fill_hue()
+    ggplot2::scale_color_brewer(palette = palette) +
+    ggplot2::scale_fill_brewer(palette = palette)
 
   p <- p +
     ggforce::geom_arc_bar(

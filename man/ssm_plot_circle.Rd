@@ -13,6 +13,7 @@ ssm_plot_circle(
   repel = FALSE,
   angle_labels = NULL,
   legend.box.spacing = 0,
+  palette = "Set1",
   ...
 )
 }
@@ -45,6 +46,9 @@ to \code{ssm_analyze()}. (default = NULL)}
 
 \item{legend.box.spacing}{A double corresponding to the distance (in inches)
 to add between the data plot and the legend (default = 0).}
+
+\item{palette}{A string corresponding to the palette to be used from
+ColorBrewer for the color and fill aesthetics.}
 }
 \value{
 A ggplot variable containing a completed circular plot.
