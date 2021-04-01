@@ -151,9 +151,10 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
     ) +
     ggplot2::geom_point(
       data = df_plot,
-      ggplot2::aes(x = x_est, y = y_est, color = label),
-      shape = 16,
-      size = 3
+      ggplot2::aes(x = x_est, y = y_est, color = label, fill = label),
+      shape = 21,
+      size = 3,
+      color = "black"
     ) +
     ggplot2::guides(
       color = ggplot2::guide_legend(.ssm_object$details$results_type),
