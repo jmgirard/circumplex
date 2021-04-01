@@ -64,3 +64,15 @@ pretty_max <- function(v) {
   }
   out
 }
+
+count_measures <- function(.data, measures) {
+  ncol(dplyr::select(.data, {{measures}}))
+}
+
+count_levels <- function(.data, grouping) {
+  if (ncol(dplyr::select(.data, {{grouping}})) > 0) {
+    nlevels(factor(dplyr::pull(.data, {{grouping}})))
+  } else {
+    0
+  }
+}

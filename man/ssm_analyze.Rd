@@ -13,7 +13,8 @@ ssm_analyze(
   contrast = c("none", "test", "model"),
   boots = 2000,
   interval = 0.95,
-  listwise = TRUE
+  listwise = TRUE,
+  measures_labels = NULL
 )
 }
 \arguments{
@@ -55,6 +56,12 @@ confidence intervals (default = 0.95).}
 be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
 that pairwise deletion may result in different missing data patterns in
 each bootstrap resample and is slower to compute (default = TRUE).}
+
+\item{measures_labels}{Optional. A character vector providing a label for
+each measure provided in \code{measures} (in the same order) to appear in
+the results as well as tables and plots derived from the results. If
+omitted or set to NULL will default to using the measures variable names
+(default = NULL).}
 }
 \value{
 A list containing the results and description of the analysis.
@@ -98,6 +105,11 @@ ssm_analyze(jz2017,
 ssm_analyze(jz2017,
   scales = PA:NO, angles = octants(),
   measures = c(NARPD, ASPD), contrast = "test"
+)
+
+ssm_analyze(jz2017,
+  scales = PA:NO, angles = octants(), measures = c(NARPD, ASPD), 
+  measures_labels = c("Narcissistic", "Antisocial")
 )
 
 # Multiple-group correlation-based SSM

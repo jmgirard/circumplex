@@ -36,6 +36,11 @@
 #'   be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
 #'   that pairwise deletion may result in different missing data patterns in
 #'   each bootstrap resample and is slower to compute (default = TRUE).
+#' @param measures_labels Optional. A character vector providing a label for
+#'   each measure provided in \code{measures} (in the same order) to appear in
+#'   the results as well as tables and plots derived from the results. If
+#'   omitted or set to NULL will default to using the measures variable names
+#'   (default = NULL).
 #' @return A list containing the results and description of the analysis.
 #'   \item{results}{A tibble with the SSM parameter estimates} \item{details}{A
 #'   list with the number of bootstrap resamples (boots), the confidence
@@ -74,6 +79,11 @@
 #'   measures = c(NARPD, ASPD), contrast = "test"
 #' )
 #'
+#' ssm_analyze(jz2017,
+#'   scales = PA:NO, angles = octants(), measures = c(NARPD, ASPD), 
+#'   measures_labels = c("Narcissistic", "Antisocial")
+#' )
+#'
 #' # Multiple-group correlation-based SSM
 #' ssm_analyze(jz2017,
 #'   scales = PA:NO, angles = octants(), measures = NARPD,
@@ -89,15 +99,23 @@
 #' 
 ssm_analyze <- function(.data, scales, angles = octants(), measures = NULL, 
                         grouping = NULL, contrast = c("none", "test", "model"), 
-                        boots = 2000, interval = 0.95, listwise = TRUE) {
+                        boots = 2000, interval = 0.95, listwise = TRUE,
+                        measures_labels = NULL) {
   call <- match.call()
   contrast <- match.arg(contrast)
 
   # Check for valid input arguments
   assert_that(is_provided(.data), is_provided(angles))
   assert_that(is_provided(rlang::enquo(scales)))
-  assert_that(is.numeric(angles), is.flag(listwise))
+  assert_that(is.numeric(angles), rlang::is_logical(listwise, n = 1))
   assert_that(is.count(boots), is.number(interval), interval > 0, interval < 1)
+  assert_that(
+    is.null(measures_labels) || 
+      rlang::is_character(
+        measures_labels, 
+        n = count_measures(.data, {{measures}})
+      )
+    )
   # TODO: Check that scales and angles have same length
   # TODO: Check that grouping is missing, null, or single variable
   # TODO: Add a flag to flip contrast ordering
@@ -121,6 +139,7 @@ ssm_analyze <- function(.data, scales, angles = octants(), measures = NULL,
         boots = boots,
         interval = interval,
         listwise = listwise,
+        measures_labels = measures_labels,
         call = call
       )
     } else {
@@ -133,6 +152,7 @@ ssm_analyze <- function(.data, scales, angles = octants(), measures = NULL,
         boots = boots,
         interval = interval,
         listwise = listwise,
+        measures_labels = measures_labels,
         call = call
       )
     }
@@ -272,8 +292,9 @@ ssm_analyze_means <- function(.data, scales, angles,
 # Perform analyses using the correlation-based SSM -----------------------------
 
 ssm_analyze_corrs <- function(.data, scales, angles, 
-                              measures = NULL, grouping = NULL,
-                              contrast, boots, interval, listwise, call) {
+                              measures, grouping = NULL,
+                              contrast, boots, interval, listwise, 
+                              measures_labels, call) {
 
   # Select circumplex scales, measure variables, and grouping variable
   if (is_provided(rlang::enquo(grouping))) {
@@ -306,11 +327,16 @@ ssm_analyze_corrs <- function(.data, scales, angles,
 
   # Perform listwise deletion if requested
   if (listwise == TRUE) {
-    bs_input <- 
-      bs_input %>% 
-      tidyr::drop_na()
+    bs_input <- tidyr::drop_na(bs_input)
   }
 
+  # Select and label results
+  if (is.null(measures_labels)) {
+    measure_names <- names(dplyr::select(.data, {{measures}}))
+  } else {
+    measure_names <- measures_labels
+  }
+  
   # Calculate observed scores (i.e., correlations)
   cs <- as.matrix(bs_input[, 1:length(angles)])
   mv <- as.matrix(bs_input[, (length(angles) + 1):(ncol(bs_input) - 1)])
@@ -322,7 +348,7 @@ ssm_analyze_corrs <- function(.data, scales, angles,
     dplyr::mutate(
       Group = rep(unique(bs_input$Group), each = ncol(mv)),
       Measure = rep(
-        names(dplyr::select(bs_input, {{measures}})),
+        measure_names,
         times = nlevels(bs_input$Group)
       )
     ) %>%
@@ -357,8 +383,6 @@ ssm_analyze_corrs <- function(.data, scales, angles,
     strata = bs_input$Group
   )
 
-  # Select and label results
-  measure_names <- names(dplyr::select(.data, {{measures}}))
   group_names <- levels(bs_input$Group)
   if (contrast == "none") {
     row_data <- bs_output

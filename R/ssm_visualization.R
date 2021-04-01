@@ -65,7 +65,7 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
-                            lowfit = TRUE) {
+                            lowfit = TRUE, repel = FALSE) {
   df <- .ssm_object$results
   angles <- as.integer(round(.ssm_object$details$angles))
 
@@ -131,6 +131,17 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
     ) +
     ggplot2::scale_linetype_identity()
 
+  if (repel == TRUE) {
+    p <- p + 
+      ggrepel::geom_label_repel(
+        data = df_plot,
+        ggplot2::aes(x = x_est, y = y_est, label = label),
+        nudge_x = -25 - df_plot$x_est,
+        direction = "y",
+        hjust = 1
+      ) + ggplot2::theme(legend.position = "none")
+  }
+  
   p
 }
 

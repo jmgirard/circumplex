@@ -44,6 +44,7 @@ Imports:
     tidyr (>= 1.0.0)
 Suggests: 
     covr (>= 3.5.0),
+    ggrepel,
     kableExtra (>= 1.1.0),
     knitr (>= 1.28),
     rmarkdown (>= 2.1),

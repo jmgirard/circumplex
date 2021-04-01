@@ -1,5 +1,9 @@
 # circumplex (development version)
 
+## Minor improvements and fixes
+
+* R
+
 ----
 
 # circumplex 0.3.6
