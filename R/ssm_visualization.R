@@ -58,8 +58,11 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #' @param amax A positive real number corresponding to the radius of the circle.
 #'   It is used to scale the amplitude values and will determine which amplitude
 #'   labels are drawn.
-#' @param fontsize A positive real number corresponding to the size (in pt) of
-#'   the text labels (default = 12).
+#' @param legend_font_size A positive real number corresponding to the size (in
+#'   pt) of the text labels in the legend (default = 12).
+#' @param scale_font_size A positive real number corresponding to the size (in
+#'   pt) of the text labels for the amplitude and displacement scales (default =
+#'   12).
 #' @param lowfit A logical determining whether profiles with low model fit
 #'   (<.70) should be plotted, with dashed borders (default = TRUE).
 #' @param repel An experimental argument for plotting text labels instead of
@@ -69,11 +72,16 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'   angle labels or a vector of empty strings ("") to hide the labels. If not
 #'   NULL, must have the same length and ordering as the \code{angles} argument
 #'   to \code{ssm_analyze()}. (default = NULL)
+#' @param legend.box.spacing A double corresponding to the distance (in inches)
+#'   between the data plot and the legend (default = 1).
 #' @return A ggplot variable containing a completed circular plot.
 
-ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
+ssm_plot_circle <- function(.ssm_object, amax = NULL, 
+                            legend_font_size = 12,
+                            scale_font_size = 12,
                             lowfit = TRUE, repel = FALSE,
-                            angle_labels = NULL) {
+                            angle_labels = NULL,
+                            legend.box.spacing = 1) {
   df <- .ssm_object$results
   
   assert_that(
@@ -121,7 +129,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
     circle_base(
       angles = angles, 
       amax = amax, 
-      fontsize = fontsize, 
+      fontsize = scale_font_size, 
       labels = angle_labels
     ) +
     ggplot2::scale_color_hue() +
@@ -148,7 +156,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
       fill = ggplot2::guide_legend(.ssm_object$details$results_type)
     ) +
     ggplot2::theme(
-      legend.text = ggplot2::element_text(size = fontsize)
+      legend.text = ggplot2::element_text(size = legend_font_size),
+      legend.box.spacing = ggplot2::unit(legend.box.spacing, "in")
     ) +
     ggplot2::scale_linetype_identity()
 
@@ -160,7 +169,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL, fontsize = 12,
         nudge_x = -25 - df_plot$x_est,
         direction = "y",
         hjust = 1,
-        size = fontsize / 2.8346438836889
+        size = legend_font_size / 2.8346438836889
       ) + 
       ggplot2::theme(legend.position = "none")
   }

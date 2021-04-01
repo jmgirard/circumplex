@@ -7,10 +7,12 @@
 ssm_plot_circle(
   .ssm_object,
   amax = NULL,
-  fontsize = 12,
+  legend_font_size = 12,
+  scale_font_size = 12,
   lowfit = TRUE,
   repel = FALSE,
-  angle_labels = NULL
+  angle_labels = NULL,
+  legend.box.spacing = 1
 )
 }
 \arguments{
@@ -21,8 +23,12 @@ ssm_plot_circle(
 It is used to scale the amplitude values and will determine which amplitude
 labels are drawn.}
 
-\item{fontsize}{A positive real number corresponding to the size (in pt) of
-the text labels (default = 12).}
+\item{legend_font_size}{A positive real number corresponding to the size (in
+pt) of the text labels in the legend (default = 12).}
+
+\item{scale_font_size}{A positive real number corresponding to the size (in
+pt) of the text labels for the amplitude and displacement scales (default =
+12).}
 
 \item{lowfit}{A logical determining whether profiles with low model fit
 (<.70) should be plotted, with dashed borders (default = TRUE).}
@@ -35,6 +41,9 @@ the circle for each scale. Can also specify NULL to default to numerical
 angle labels or a vector of empty strings ("") to hide the labels. If not
 NULL, must have the same length and ordering as the \code{angles} argument
 to \code{ssm_analyze()}. (default = NULL)}
+
+\item{legend.box.spacing}{A double corresponding to the distance (in inches)
+between the data plot and the legend (default = 1).}
 }
 \value{
 A ggplot variable containing a completed circular plot.
