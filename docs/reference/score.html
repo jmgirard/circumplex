@@ -61,6 +61,8 @@ as a custom data frame." />
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -72,9 +74,18 @@ as a custom data frame." />
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -96,7 +107,7 @@ as a custom data frame." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -176,7 +187,7 @@ as a custom data frame." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jmgirard/circumplex">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -264,25 +275,25 @@ appended that contain mean scores on each variable included in <code>key</code>.
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"raw_iipsc"</span><span class='op'>)</span>
 <span class='fu'><a href='instrument.html'>instrument</a></span><span class='op'>(</span><span class='st'>"iipsc"</span><span class='op'>)</span>
 <span class='fu'>score</span><span class='op'>(</span><span class='va'>raw_iipsc</span>, <span class='va'>IIP01</span><span class='op'>:</span><span class='va'>IIP32</span>, <span class='va'>iipsc</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 10 x 40</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 10 x 40</span><span>
 #&gt;    IIP01 IIP02 IIP03 IIP04 IIP05 IIP06 IIP07 IIP08 IIP09 IIP10 IIP11 IIP12 IIP13
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span>     0     0     0     0     1     0     1     0     2     1     0     0     0
-#&gt; </span><span style='color: #555555;'> 2</span><span>     1     1     0     0     3     2     2     1     0     1     0     1     4
-#&gt; </span><span style='color: #555555;'> 3</span><span>     1     0     1     0     1     1     1     3     0     1     0     0     2
-#&gt; </span><span style='color: #555555;'> 4</span><span>     3     2     3    </span><span style='color: #BB0000;'>NA</span><span>     2     3     2     3     2     3     2     4     2
-#&gt; </span><span style='color: #555555;'> 5</span><span>     0     0     0     1     0     0     1     1     0     1     0     2     1
-#&gt; </span><span style='color: #555555;'> 6</span><span>     0     0     0     0     0     0     1     1     0     0     0     0     0
-#&gt; </span><span style='color: #555555;'> 7</span><span>     1     0     0     0     2     1     1     0     1     0     0     0     1
-#&gt; </span><span style='color: #555555;'> 8</span><span>     1     0     1     0     1     1     2     1     1     0     0     0     1
-#&gt; </span><span style='color: #555555;'> 9</span><span>     0     0     2     2     0     1     3     0     1     0     1     1     0
-#&gt; </span><span style='color: #555555;'>10</span><span>     0     0     0     0     0     0     2     0     0     0     0     0     0
-#&gt; </span><span style='color: #555555;'># ... with 27 more variables: IIP14 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP15 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP16 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   IIP17 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP18 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP19 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP20 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP21 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   IIP22 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP23 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP24 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP25 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP26 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   IIP27 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP28 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP29 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP30 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, IIP31 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   IIP32 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, PA </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, BC </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, DE </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, FG </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, HI </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, JK </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   LM </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, NO </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div></span></pre>
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>     0     0     0     0     1     0     1     0     2     1     0     0     0
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span>     1     1     0     0     3     2     2     1     0     1     0     1     4
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span>     1     0     1     0     1     1     1     3     0     1     0     0     2
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>     3     2     3    </span><span style='color: #BB0000;'>NA</span><span>     2     3     2     3     2     3     2     4     2
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span>     0     0     0     1     0     0     1     1     0     1     0     2     1
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>     0     0     0     0     0     0     1     1     0     0     0     0     0
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>     1     0     0     0     2     1     1     0     1     0     0     0     1
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>     1     0     1     0     1     1     2     1     1     0     0     0     1
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span>     0     0     2     2     0     1     3     0     1     0     1     1     0
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span>     0     0     0     0     0     0     2     0     0     0     0     0     0
+#&gt; </span><span style='color: #949494;'># ... with 27 more variables: IIP14 &lt;dbl&gt;, IIP15 &lt;dbl&gt;, IIP16 &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   IIP17 &lt;dbl&gt;, IIP18 &lt;dbl&gt;, IIP19 &lt;dbl&gt;, IIP20 &lt;dbl&gt;, IIP21 &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   IIP22 &lt;dbl&gt;, IIP23 &lt;dbl&gt;, IIP24 &lt;dbl&gt;, IIP25 &lt;dbl&gt;, IIP26 &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   IIP27 &lt;dbl&gt;, IIP28 &lt;dbl&gt;, IIP29 &lt;dbl&gt;, IIP30 &lt;dbl&gt;, IIP31 &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   IIP32 &lt;dbl&gt;, PA &lt;dbl&gt;, BC &lt;dbl&gt;, DE &lt;dbl&gt;, FG &lt;dbl&gt;, HI &lt;dbl&gt;, JK &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   LM &lt;dbl&gt;, NO &lt;dbl&gt;</span><span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -294,11 +305,11 @@ appended that contain mean scores on each variable included in <code>key</code>.
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://www.jmgirard.com'>Jeffrey Girard</a>, <a href='https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html'>Johannes Zimmermann</a>, <a href='https://www.personalityprocesses.com'>Aidan Wright</a>.</p>
+  <p><p>Developed by <a href="https://www.jmgirard.com" class="external-link">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html" class="external-link">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com" class="external-link">Aidan Wright</a>.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -323,6 +334,8 @@ appended that contain mean scores on each variable included in <code>key</code>.
 </script>
 
 
+
+  
 
   </body>
 </html>

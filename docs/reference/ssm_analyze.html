@@ -63,6 +63,8 @@ measures will be calculated." />
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -74,9 +76,18 @@ measures will be calculated." />
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -98,7 +109,7 @@ measures will be calculated." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -178,7 +189,7 @@ measures will be calculated." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jmgirard/circumplex">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -223,7 +234,8 @@ measures will be calculated.</p>
   contrast <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"none"</span>, <span class='st'>"test"</span>, <span class='st'>"model"</span><span class='op'>)</span>,
   boots <span class='op'>=</span> <span class='fl'>2000</span>,
   interval <span class='op'>=</span> <span class='fl'>0.95</span>,
-  listwise <span class='op'>=</span> <span class='cn'>TRUE</span>
+  listwise <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  measures_labels <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -285,6 +297,14 @@ confidence intervals (default = 0.95).</p></td>
 be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
 that pairwise deletion may result in different missing data patterns in
 each bootstrap resample and is slower to compute (default = TRUE).</p></td>
+    </tr>
+    <tr>
+      <th>measures_labels</th>
+      <td><p>Optional. A character vector providing a label for
+each measure provided in <code>measures</code> (in the same order) to appear in
+the results as well as tables and plots derived from the results. If
+omitted or set to NULL will default to using the measures variable names
+(default = NULL).</p></td>
     </tr>
     </table>
 
@@ -415,6 +435,33 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; Displacement      6.960     -3.385     18.057
 #&gt; Model Fit         0.007                      
 #&gt; </div><div class='input'>
+<span class='fu'>ssm_analyze</span><span class='op'>(</span><span class='va'>jz2017</span>,
+  scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, measures <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>NARPD</span>, <span class='va'>ASPD</span><span class='op'>)</span>, 
+  measures_labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Narcissistic"</span>, <span class='st'>"Antisocial"</span><span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; Call:
+#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), 
+#&gt;     measures = c(NARPD, ASPD), measures_labels = c("Narcissistic", 
+#&gt;         "Antisocial"))
+#&gt; 
+#&gt; Profile [Narcissistic]:
+#&gt;                Estimate   Lower CI   Upper CI
+#&gt; Elevation         0.202      0.169      0.236
+#&gt; X-Value          -0.062     -0.094     -0.028
+#&gt; Y-Value           0.179      0.146      0.214
+#&gt; Amplitude         0.189      0.156      0.226
+#&gt; Displacement    108.967     99.182    118.263
+#&gt; Model Fit         0.957                      
+#&gt; 
+#&gt; Profile [Antisocial]:
+#&gt;                Estimate   Lower CI   Upper CI
+#&gt; Elevation         0.124      0.090      0.159
+#&gt; X-Value          -0.099     -0.133     -0.066
+#&gt; Y-Value           0.203      0.168      0.237
+#&gt; Amplitude         0.226      0.191      0.263
+#&gt; Displacement    115.927    107.805    124.314
+#&gt; Model Fit         0.964                      
+#&gt; </div><div class='input'>
 <span class='co'># Multiple-group correlation-based SSM</span>
 <span class='fu'>ssm_analyze</span><span class='op'>(</span><span class='va'>jz2017</span>,
   scales <span class='op'>=</span> <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, angles <span class='op'>=</span> <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, measures <span class='op'>=</span> <span class='va'>NARPD</span>,
@@ -426,20 +473,20 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; 
 #&gt; Profile [Female_NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.172      0.128      0.218
-#&gt; X-Value          -0.080     -0.125     -0.033
-#&gt; Y-Value           0.202      0.153      0.250
-#&gt; Amplitude         0.217      0.168      0.268
-#&gt; Displacement    111.669     99.626    122.752
+#&gt; Elevation         0.172      0.127      0.215
+#&gt; X-Value          -0.080     -0.127     -0.034
+#&gt; Y-Value           0.202      0.152      0.250
+#&gt; Amplitude         0.217      0.167      0.269
+#&gt; Displacement    111.669     99.967    123.191
 #&gt; Model Fit         0.972                      
 #&gt; 
 #&gt; Profile [Male_NARPD]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.244      0.194      0.295
-#&gt; X-Value          -0.029     -0.074      0.017
-#&gt; Y-Value           0.146      0.097      0.192
-#&gt; Amplitude         0.149      0.102      0.195
-#&gt; Displacement    101.248     83.457    119.191
+#&gt; Elevation         0.244      0.192      0.295
+#&gt; X-Value          -0.029     -0.072      0.014
+#&gt; Y-Value           0.146      0.098      0.191
+#&gt; Amplitude         0.149      0.105      0.195
+#&gt; Displacement    101.248     84.228    119.052
 #&gt; Model Fit         0.902                      
 #&gt; </div><div class='input'>
 <span class='co'># Multiple-group correlation-based SSM with contrast</span>
@@ -453,11 +500,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 #&gt; 
 #&gt; Contrast [NARPD: Male - Female]:
 #&gt;                Estimate   Lower CI   Upper CI
-#&gt; Elevation         0.072      0.005      0.139
-#&gt; X-Value           0.051     -0.012      0.113
-#&gt; Y-Value          -0.056     -0.124      0.010
-#&gt; Amplitude        -0.068     -0.138     -0.004
-#&gt; Displacement    -10.421    -30.538     10.798
+#&gt; Elevation         0.072      0.004      0.141
+#&gt; X-Value           0.051     -0.017      0.116
+#&gt; Y-Value          -0.056     -0.119      0.010
+#&gt; Amplitude        -0.068     -0.133      0.002
+#&gt; Displacement    -10.421    -32.060     12.016
 #&gt; Model Fit        -0.071                      
 #&gt; </div><div class='input'><span class='co'># }</span>
 
@@ -473,11 +520,11 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://www.jmgirard.com'>Jeffrey Girard</a>, <a href='https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html'>Johannes Zimmermann</a>, <a href='https://www.personalityprocesses.com'>Aidan Wright</a>.</p>
+  <p><p>Developed by <a href="https://www.jmgirard.com" class="external-link">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html" class="external-link">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com" class="external-link">Aidan Wright</a>.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -502,6 +549,8 @@ scores</p></dd> <dt>type</dt><dd><p>A string indicating what type of SSM analysi
 </script>
 
 
+
+  
 
   </body>
 </html>

@@ -28,6 +28,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -48,7 +50,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -127,8 +129,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/jmgirard/circumplex">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/jmgirard/circumplex" class="external-link">
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -148,15 +150,14 @@
 
       
 
-      </header><script src="introduction-to-ssm-analysis_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="introduction-to-ssm-analysis_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="introduction-to-ssm-analysis_files/anchor-sections-1.0/anchor-sections.js"></script><script src="introduction-to-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><link href="introduction-to-ssm-analysis_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+      </header><script src="introduction-to-ssm-analysis_files/header-attrs-2.7/header-attrs.js"></script><script src="introduction-to-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><link href="introduction-to-ssm-analysis_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to SSM Analysis</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/introduction-to-ssm-analysis.Rmd"><code>vignettes/introduction-to-ssm-analysis.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/introduction-to-ssm-analysis.Rmd" class="external-link"><code>vignettes/introduction-to-ssm-analysis.Rmd</code></a></small>
       <div class="hidden name"><code>introduction-to-ssm-analysis.Rmd</code></div>
 
     </div>
@@ -164,7 +165,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex">circumplex</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></code></pre></div>
 <div id="background-and-motivation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#background-and-motivation" class="anchor"></a>1. Background and Motivation</h2>
@@ -206,8 +207,8 @@
 <a href="#example-data-jz2017" class="anchor"></a>2. Example data: jz2017</h2>
 <p>To illustrate the SSM functions, we will use the example dataset <code>jz2017</code>, which was provided by Zimmermann &amp; Wright (2017) and reformatted for this package. This dataset includes self-report data from 1166 undergraduate students. Students completed a circumplex measure of interpersonal problems with eight subscales (PA, BC, DE, FG, HI, JK, LM, and NO) and a measure of personality disorder symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD, NARPD, AVPD, DPNPD, and OCPD). More information about these variables can be accessed using the <code><a href="../reference/jz2017.html">?jz2017</a></code> command in R.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 1,166 x 19</span>
 <span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span>
 <span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span>
@@ -232,17 +233,17 @@
 <div id="conducting-ssm-for-a-groups-mean-scores" class="section level3">
 <h3 class="hasAnchor">
 <a href="#conducting-ssm-for-a-groups-mean-scores" class="anchor"></a>Conducting SSM for a group’s mean scores</h3>
-<p>To begin, let’s say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. Although it is possible to analyze the raw scores contained in <code>jz2017</code>, our results will be more interpretable if we standardize the scores first. We can do this using the <code><a href="../reference/standardize.html">standardize()</a></code> function. The first argument to this function is <code>.data</code>, a data frame frame containing the circumplex scales to be standardized. The second argument is <code>scales</code> and specifies where in <code>.data</code> the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is <code>angles</code> and specifies the angle of each of the circumplex scales included in <code>scales</code>. Note that the <code>scales</code> and <code>angles</code> arguments need to be vectors (hence the <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> function) that have the same ordering and length. Finally, the fourth argument is <code>norms</code>, a data frame containing the normative data we will use to standardize the circumplex scales. Here, we will use normative data for the IIP-SC by loading the <code>iipsc</code> data frame.</p>
+<p>To begin, let’s say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. Although it is possible to analyze the raw scores contained in <code>jz2017</code>, our results will be more interpretable if we standardize the scores first. We can do this using the <code><a href="../reference/standardize.html">standardize()</a></code> function. The first argument to this function is <code>.data</code>, a data frame frame containing the circumplex scales to be standardized. The second argument is <code>scales</code> and specifies where in <code>.data</code> the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is <code>angles</code> and specifies the angle of each of the circumplex scales included in <code>scales</code>. Note that the <code>scales</code> and <code>angles</code> arguments need to be vectors (hence the <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> function) that have the same ordering and length. Finally, the fourth argument is <code>norms</code>, a data frame containing the normative data we will use to standardize the circumplex scales. Here, we will use normative data for the IIP-SC by loading the <code>iipsc</code> data frame.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"iipsc"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"iipsc"</span><span class="op">)</span>
 <span class="va">jz2017s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/standardize.html">standardize</a></span><span class="op">(</span>
   .data <span class="op">=</span> <span class="va">jz2017</span>,
-  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">PA</span>, <span class="va">BC</span>, <span class="va">DE</span>, <span class="va">FG</span>, <span class="va">HI</span>, <span class="va">JK</span>, <span class="va">LM</span>, <span class="va">NO</span><span class="op">)</span>,
-  angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span>,
+  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">PA</span>, <span class="va">BC</span>, <span class="va">DE</span>, <span class="va">FG</span>, <span class="va">HI</span>, <span class="va">JK</span>, <span class="va">LM</span>, <span class="va">NO</span><span class="op">)</span>,
+  angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span>,
   instrument <span class="op">=</span> <span class="va">iipsc</span>,
   sample <span class="op">=</span> <span class="fl">1</span>
 <span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">jz2017s</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">jz2017s</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 1,166 x 27</span>
 <span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span>
 <span class="co">#&gt;    &lt;fct&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;</span>
@@ -264,12 +265,12 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span>
   .data <span class="op">=</span> <span class="va">jz2017s</span>,
-  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">PA_z</span>, <span class="va">BC_z</span>, <span class="va">DE_z</span>, <span class="va">FG_z</span>, <span class="va">HI_z</span>, <span class="va">JK_z</span>, <span class="va">LM_z</span>, <span class="va">NO_z</span><span class="op">)</span>,
-  angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span>
+  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">PA_z</span>, <span class="va">BC_z</span>, <span class="va">DE_z</span>, <span class="va">FG_z</span>, <span class="va">HI_z</span>, <span class="va">JK_z</span>, <span class="va">LM_z</span>, <span class="va">NO_z</span><span class="op">)</span>,
+  angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
-<p>The output of the function has been saved in the <code>results</code> object, which we can examine in detail using the <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> function. This will output the call we made to create the output, as well as some of the default options that we didn’t bother changing (see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.</p>
+<p>The output of the function has been saved in the <code>results</code> object, which we can examine in detail using the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> function. This will output the call we made to create the output, as well as some of the default options that we didn’t bother changing (see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> to learn how to change them) and, most importantly, the estimated SSM parameter values with bootstrapped confidence intervals.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = c(PA_z, BC_z, DE_z, FG_z, </span>
 <span class="co">#&gt;     HI_z, JK_z, LM_z, NO_z), angles = c(90, 135, 180, 225, 270, </span>
@@ -289,10 +290,10 @@
 <span class="co">#&gt; Amplitude         0.131      0.098      0.165</span>
 <span class="co">#&gt; Displacement    353.525    339.484      9.564</span>
 <span class="co">#&gt; Model Fit         0.710</span></code></pre></div>
-<p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017s</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputting their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code><a href="https://rdrr.io/r/base/Random.html">set.seed()</a></code> function to control the random number generator in R.)</p>
+<p>That was pretty easy! We can now write up these results. However, the <code>circumplex</code> package has some features that can make what we just did even easier. First, because the first three arguments of the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit their names. Second, because we organized the <code>jz2017s</code> data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the <code>PA:NO</code> shortcut. Finally, because the use of octant scales is so common, the <code>circumplex</code> package comes with a convenience function for outputting their angular displacements: <code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> function to control the random number generator in R.)</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017s</span>, <span class="va">PA_z</span><span class="op">:</span><span class="va">NO_z</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA_z:NO_z, angles = octants())</span>
 <span class="co">#&gt; </span>
@@ -317,7 +318,7 @@
 <p>Next, we can produce a table to display our results. With only a single set of parameters, this table is probably overkill, but in future analyses we will see how this function saves a lot of time and effort. To create the table, simply pass the <code>results</code> (or <code>results2</code>) object to the <code><a href="../reference/ssm_table.html">ssm_table()</a></code> function.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></code></pre></div>
-<table class="table table">
+<table class="table table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Mean-based Structural Summary Statistics with 95% CIs
 </caption>
@@ -349,19 +350,19 @@ Fit
 All
 </td>
 <td style="text-align:left;">
--0.23 [-0.26, -0.19]
+-0.23 (-0.26, -0.19)
 </td>
 <td style="text-align:left;">
-0.13 [0.10, 0.17]
+0.13 (0.10, 0.17)
 </td>
 <td style="text-align:left;">
--0.01 [-0.05, 0.02]
+-0.01 (-0.05, 0.02)
 </td>
 <td style="text-align:left;">
-0.13 [0.10, 0.17]
+0.13 (0.10, 0.17)
 </td>
 <td style="text-align:left;">
-353.5 [339.6, 9.0]
+353.5 (339.6, 9.0)
 </td>
 <td style="text-align:left;">
 0.710
@@ -384,7 +385,7 @@ All
 <p>To conduct this analysis, we can start with the syntax from the mean-based analysis. All SSM analyses use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function and the data, scales, and angles are the same as before. However, we also need to let the function know that we want to analyze correlations with NARPD as opposed to scale means. To do this, we add an additional argument <code>measures</code>. Note that since correlations are already standardized, we don’t need to worry about standardizing the circumplex scales when <code>measures</code> is used.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">results3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="va">NARPD</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
 <span class="co">#&gt;     measures = NARPD)</span>
@@ -411,7 +412,7 @@ All
 <p>We can also create a similar table and figure using the exact same syntax as before. The <code><a href="../reference/ssm_table.html">ssm_table()</a></code> and <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> functions are smart enough to know whether the results are mean-based or correlation-based and will work in both cases.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></code></pre></div>
-<table class="table table">
+<table class="table table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
 </caption>
@@ -443,19 +444,19 @@ Fit
 NARPD
 </td>
 <td style="text-align:left;">
-0.20 [0.17, 0.24]
+0.20 (0.17, 0.24)
 </td>
 <td style="text-align:left;">
--0.06 [-0.10, -0.03]
+-0.06 (-0.10, -0.03)
 </td>
 <td style="text-align:left;">
-0.18 [0.14, 0.21]
+0.18 (0.14, 0.21)
 </td>
 <td style="text-align:left;">
-0.19 [0.16, 0.22]
+0.19 (0.16, 0.22)
 </td>
 <td style="text-align:left;">
-109.0 [98.7, 118.8]
+109.0 (98.7, 118.8)
 </td>
 <td style="text-align:left;">
 0.957
@@ -497,11 +498,13 @@ NARPD
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.jmgirard.com">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com">Aidan Wright</a>.</p>
+  <p></p>
+<p>Developed by <a href="https://www.jmgirard.com" class="external-link external-link">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html" class="external-link external-link">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com" class="external-link external-link">Aidan Wright</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>

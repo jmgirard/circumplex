@@ -62,6 +62,8 @@ scores (i.e., z-scores) based on comparison to the normative data." />
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -73,9 +75,18 @@ scores (i.e., z-scores) based on comparison to the normative data." />
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -97,7 +108,7 @@ scores (i.e., z-scores) based on comparison to the normative data." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -177,7 +188,7 @@ scores (i.e., z-scores) based on comparison to the normative data." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jmgirard/circumplex">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -280,23 +291,23 @@ variables will have the same name as <code>scales</code> but with a "_z" suffix.
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"jz2017"</span><span class='op'>)</span>
 <span class='fu'><a href='instrument.html'>instrument</a></span><span class='op'>(</span><span class='st'>"iipsc"</span><span class='op'>)</span>
 <span class='fu'>standardize</span><span class='op'>(</span><span class='va'>jz2017</span>, <span class='va'>PA</span><span class='op'>:</span><span class='va'>NO</span>, <span class='fu'><a href='octants.html'>octants</a></span><span class='op'>(</span><span class='op'>)</span>, instrument <span class='op'>=</span> <span class='va'>iipsc</span>, sample <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1,166 x 27</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 1,166 x 27</span><span>
 #&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;fct&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7
-#&gt; </span><span style='color: #555555;'> 2</span><span> Female  0     0.25  0     0.25  1.25  1.75  2.25  2.25     1     0     2
-#&gt; </span><span style='color: #555555;'> 3</span><span> Female  0     0     0     0     0     0     0     0        0     1     0
-#&gt; </span><span style='color: #555555;'> 4</span><span> Male    2     1.75  1.75  2.5   2     1.75  2     2.5      1     0     0
-#&gt; </span><span style='color: #555555;'> 5</span><span> Female  0.25  0.5   0.25  0     0     0     0     0        0     0     0
-#&gt; </span><span style='color: #555555;'> 6</span><span> Male    1.5   1.75  2.25  1.75  2     1.25  2.25  2.5      5     5     7
-#&gt; </span><span style='color: #555555;'> 7</span><span> Male    2     1.75  1.75  2     1.5   1.25  1.25  1.75     3     6     7
-#&gt; </span><span style='color: #555555;'> 8</span><span> Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1
-#&gt; </span><span style='color: #555555;'> 9</span><span> Female  0     0     0     0     0.25  0.25  1     0        0     1     0
-#&gt; </span><span style='color: #555555;'>10</span><span> Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5
-#&gt; </span><span style='color: #555555;'># ... with 1,156 more rows, and 15 more variables: ASPD </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, BORPD </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   HISPD </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, NARPD </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, AVPD </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, DPNPD </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, OCPD </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, PA_z </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   BC_z </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, DE_z </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, FG_z </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, HI_z </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, JK_z </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, LM_z </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   NO_z </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div></span></pre>
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;fct&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> Female  0     0.25  0     0.25  1.25  1.75  2.25  2.25     1     0     2
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> Female  0     0     0     0     0     0     0     0        0     1     0
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> Male    2     1.75  1.75  2.5   2     1.75  2     2.5      1     0     0
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> Female  0.25  0.5   0.25  0     0     0     0     0        0     0     0
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> Male    1.5   1.75  2.25  1.75  2     1.25  2.25  2.5      5     5     7
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> Male    2     1.75  1.75  2     1.5   1.25  1.25  1.75     3     6     7
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Female  0     0     0     0     0.25  0.25  1     0        0     1     0
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5
+#&gt; </span><span style='color: #949494;'># ... with 1,156 more rows, and 15 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;, PA_z &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   BC_z &lt;dbl&gt;, DE_z &lt;dbl&gt;, FG_z &lt;dbl&gt;, HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   NO_z &lt;dbl&gt;</span><span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -308,11 +319,11 @@ variables will have the same name as <code>scales</code> but with a "_z" suffix.
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://www.jmgirard.com'>Jeffrey Girard</a>, <a href='https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html'>Johannes Zimmermann</a>, <a href='https://www.personalityprocesses.com'>Aidan Wright</a>.</p>
+  <p><p>Developed by <a href="https://www.jmgirard.com" class="external-link">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html" class="external-link">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com" class="external-link">Aidan Wright</a>.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -337,6 +348,8 @@ variables will have the same name as <code>scales</code> but with a "_z" suffix.
 </script>
 
 
+
+  
 
   </body>
 </html>
