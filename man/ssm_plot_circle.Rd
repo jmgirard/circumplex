@@ -13,7 +13,7 @@ ssm_plot_circle(
   repel = FALSE,
   angle_labels = NULL,
   legend.box.spacing = 0,
-  palette = "Set1",
+  palette = "Set2",
   ...
 )
 }
@@ -48,7 +48,9 @@ to \code{ssm_analyze()}. (default = NULL)}
 to add between the data plot and the legend (default = 0).}
 
 \item{palette}{A string corresponding to the palette to be used from
-ColorBrewer for the color and fill aesthetics.}
+ColorBrewer for the color and fill aesthetics. If set to NULL, all points
+will appear blue and no legend will be there (useful for showing the
+coverage of a high number of variables).}
 }
 \value{
 A ggplot variable containing a completed circular plot.

@@ -75,7 +75,9 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #' @param legend.box.spacing A double corresponding to the distance (in inches)
 #'   to add between the data plot and the legend (default = 0).
 #' @param palette A string corresponding to the palette to be used from
-#'   ColorBrewer for the color and fill aesthetics.
+#'   ColorBrewer for the color and fill aesthetics. If set to NULL, all points
+#'   will appear blue and no legend will be there (useful for showing the
+#'   coverage of a high number of variables).
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, amax = NULL, 
@@ -84,7 +86,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
                             lowfit = TRUE, repel = FALSE,
                             angle_labels = NULL,
                             legend.box.spacing = 0,
-                            palette = "Set1",
+                            palette = "Set2",
                             ...) {
   df <- .ssm_object$results
   
@@ -139,32 +141,59 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
     ggplot2::scale_color_brewer(palette = palette) +
     ggplot2::scale_fill_brewer(palette = palette)
 
-  p <- p +
-    ggforce::geom_arc_bar(
-      data = df_plot,
-      ggplot2::aes(
-        x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
-        fill = label, color = label, linetype = lnty
-      ),
-      alpha = 0.4,
-      size = 1
-    ) +
-    ggplot2::geom_point(
-      data = df_plot,
-      ggplot2::aes(x = x_est, y = y_est, color = label, fill = label),
-      shape = 21,
-      size = 3,
-      color = "black"
-    ) +
-    ggplot2::guides(
-      color = ggplot2::guide_legend(.ssm_object$details$results_type),
-      fill = ggplot2::guide_legend(.ssm_object$details$results_type)
-    ) +
-    ggplot2::theme(
-      legend.text = ggplot2::element_text(size = legend_font_size),
-      legend.box.spacing = ggplot2::unit(legend.box.spacing, "in")
-    ) +
-    ggplot2::scale_linetype_identity()
+  if (is.null(palette)) {
+    p <- p +
+      ggforce::geom_arc_bar(
+        data = df_plot,
+        ggplot2::aes(
+          x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
+          linetype = lnty
+        ),
+        fill = "cornflowerblue", 
+        color = "cornflowerblue", 
+        alpha = 0.4,
+        size = 1
+      ) +
+      ggplot2::geom_point(
+        data = df_plot,
+        ggplot2::aes(x = x_est, y = y_est),
+        shape = 21,
+        size = 3,
+        color = "black",
+        fill = "cornflowerblue"
+      ) +
+      ggplot2::scale_linetype_identity() +
+      ggplot2::theme(legend.position = "none")
+  } else {
+    p <- p +
+      ggforce::geom_arc_bar(
+        data = df_plot,
+        ggplot2::aes(
+          x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
+          fill = label, color = label, linetype = lnty
+        ),
+        alpha = 0.4,
+        size = 1
+      ) +
+      ggplot2::geom_point(
+        data = df_plot,
+        ggplot2::aes(x = x_est, y = y_est, color = label, fill = label),
+        shape = 21,
+        size = 3,
+        color = "black"
+      ) +
+      ggplot2::guides(
+        color = ggplot2::guide_legend(.ssm_object$details$results_type),
+        fill = ggplot2::guide_legend(.ssm_object$details$results_type)
+      ) +
+      ggplot2::theme(
+        legend.text = ggplot2::element_text(size = legend_font_size),
+        legend.box.spacing = ggplot2::unit(legend.box.spacing, "in")
+      ) +
+      ggplot2::scale_linetype_identity()
+  }
+  
+
 
   if (repel == TRUE) {
     p <- p + 
