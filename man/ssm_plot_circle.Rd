@@ -51,6 +51,8 @@ to add between the data plot and the legend (default = 0).}
 ColorBrewer for the color and fill aesthetics. If set to NULL, all points
 will appear blue and no legend will be there (useful for showing the
 coverage of a high number of variables).}
+
+\item{...}{Currently ignored.}
 }
 \value{
 A ggplot variable containing a completed circular plot.

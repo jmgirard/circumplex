@@ -78,6 +78,7 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'   ColorBrewer for the color and fill aesthetics. If set to NULL, all points
 #'   will appear blue and no legend will be there (useful for showing the
 #'   coverage of a high number of variables).
+#' @param ... Currently ignored.
 #' @return A ggplot variable containing a completed circular plot.
 
 ssm_plot_circle <- function(.ssm_object, amax = NULL, 
