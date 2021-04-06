@@ -1,4 +1,5 @@
 test_that("Single-group mean-based SSM plot is correct", {
+  skip_if(getRversion() > 4.0)
   data("aw2009")
   res <- ssm_analyze(aw2009, PA:NO, octants())
   p <- ssm_plot(res)
@@ -12,6 +13,7 @@ test_that("Single-group mean-based SSM plot is correct", {
 })
 
 test_that("Single-group correlation-based SSM plot is correct", {
+  skip_if(getRversion() > 4.0)
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
   p <- ssm_plot(res)
@@ -23,6 +25,7 @@ test_that("Single-group correlation-based SSM plot is correct", {
 })
 
 test_that("Measure-contrast SSM plot is correct", {
+  skip_if(getRversion() > 4.0)
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     measures = c(ASPD, NARPD),
@@ -37,6 +40,7 @@ test_that("Measure-contrast SSM plot is correct", {
 })
 
 test_that("Group-contrast correlation-based SSM plot is correct", {
+  skip_if(getRversion() > 4.0)
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     measures = NARPD,
