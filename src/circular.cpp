@@ -1,3 +1,5 @@
+#define STRICT_R_HEADERS
+#include <float.h>
 #include <Rcpp.h>
 
 using namespace Rcpp;
@@ -15,7 +17,7 @@ double angle_mean(NumericVector x) {
   }
   double R = (sqrt(pow(S, 2) + pow(C, 2)) / n);
   // A vector length of zero has no angular mean
-  if (R > DOUBLE_EPS) {
+  if (R > DBL_EPSILON) {
     out = std::atan2(S, C);
   } else {
     out = NA_REAL;
@@ -45,7 +47,7 @@ double angle_median(NumericVector x) {
   // Find candidates for the median (with the minimum average deviation)
   for(int i(0); i < n; i++) {
     dev_val = angle_dev(x, x[i]);
-    if(((dev_val - minimum) / n) < -DOUBLE_EPS) {
+    if(((dev_val - minimum) / n) < -DBL_EPSILON) {
       minimum = dev_val;
       candidates[0] = x[i];
     } else if (fabs(dev_val - minimum) <= 1e-8) {
