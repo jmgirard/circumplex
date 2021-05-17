@@ -1,8 +1,32 @@
 # circumplex (development version)
 
+----
+
+# circumplex 0.3.7
+
+## New features
+
+* Add `angle_labels` argument to `ssm_plot()` to allow users to customize the angle labels around a circular plot
+
+* Add `palette` argument to `ssm_plot()` to allow users to customize the color palette (from \{RColorBrewer\}) of a circular plot
+
+* Replaced the `font_size` argument to `ssm_plot()` with the `legend_font_size` and `scale_font_size` arguments to allow users to customize the font size of different elements of a circular plot
+
 ## Minor improvements and fixes
 
-* R
+* Update `ggsave()` documentatioan for future compatibility
+
+* Update \{Rcpp\} code for future compatibility
+
+* Added a black border to the points in a circular plot to greater distinguish them visually
+
+* Change CI notation from [] to () to play nice with pandoc
+
+* Update to \{testthat\} 3E and add `ssm_plot()` tests using \{vdiffr\}
+
+* Recompile vignettes with new version of \{roxygen2\}
+
+* Replace TravisCI with GitHub Actions
 
 ----
 
