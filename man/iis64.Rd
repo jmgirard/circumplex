@@ -12,7 +12,7 @@ Hatcher, R. L., & Rogers, D. T. (2009). Development and validation of
 a measure of interpersonal strengths: The Inventory of Interpersonal
 Strengths. \emph{Psychological Assessment, 21}(4), 554-569.
 
-\url{https://doi.org/10.1037/a0017269}
+\doi{10.1037/a0017269}
 }
 \usage{
 iis64

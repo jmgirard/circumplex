@@ -18,7 +18,7 @@ A data frame with 5 observations and 8 variables:
 }
 }
 \source{
-\url{https://doi.org/10.1080/00223890902935696}
+\doi{10.1080/00223890902935696}
 }
 \usage{
 aw2009

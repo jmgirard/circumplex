@@ -12,7 +12,7 @@ Trucco, E. M., Wright, A. G. C., & Colder, C. R. (2013). A revised
 interpersonal circumplex inventory of children’s social goals. \emph{Assessment,
 20}(1), 98-113.
 
-\url{https://doi.org/10.1177/1073191111411672}
+\doi{10.1177/1073191111411672}
 }
 \usage{
 igicr

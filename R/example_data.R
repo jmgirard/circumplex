@@ -14,7 +14,7 @@
 #'   \item{LM}{circumplex scale at 360 degrees}
 #'   \item{NO}{circumplex scale at 45 degrees}
 #' }
-#' @source \url{https://doi.org/10.1080/00223890902935696}
+#' @source \doi{10.1080/00223890902935696}
 "aw2009"
 
 #' Raw octant scores on real circumplex scales with covariates
@@ -45,7 +45,7 @@
 #'   \item{DPNPD}{Dependent PD Symptoms (PDQ-4+)}
 #'   \item{OCPD}{Obsessive-Compulsive PD Symptoms (PDQ-4+)}
 #' }
-#' @source \url{https://doi.org/10.1177/1073191115621795}
+#' @source \doi{10.1177/1073191115621795}
 "jz2017"
 
 #' Raw item responses on real circumplex scales

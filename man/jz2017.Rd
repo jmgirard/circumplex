@@ -29,7 +29,7 @@ A data frame with 1166 observations and 19 variables:
 }
 }
 \source{
-\url{https://doi.org/10.1177/1073191115621795}
+\doi{10.1177/1073191115621795}
 }
 \usage{
 jz2017

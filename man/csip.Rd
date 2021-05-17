@@ -12,7 +12,7 @@ Boudreaux, M. J., Ozer, D. J., Oltmanns, T. F., & Wright, A. G. C.
 (2018). Development and validation of the circumplex scales of
 interpersonal problems. \emph{Psychological Assessment, 30}(5), 594-609.
 
-\url{https://doi.org/10.1037/pas0000505}
+\doi{10.1037/pas0000505}
 }
 \usage{
 csip

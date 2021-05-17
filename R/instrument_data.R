@@ -34,7 +34,7 @@
 #' @source Boudreaux, M. J., Ozer, D. J., Oltmanns, T. F., & Wright, A. G. C.
 #'   (2018). Development and validation of the circumplex scales of
 #'   interpersonal problems. *Psychological Assessment, 30*(5), 594-609.
-#' @source \url{https://doi.org/10.1037/pas0000505}
+#' @source \doi{10.1037/pas0000505}
 #' @examples
 #' instrument("csip")
 #' summary(csip)
@@ -63,7 +63,7 @@
 #' @source Trucco, E. M., Wright, A. G. C., & Colder, C. R. (2013). A revised
 #'   interpersonal circumplex inventory of children’s social goals. *Assessment,
 #'   20*(1), 98-113.
-#' @source \url{https://doi.org/10.1177/1073191111411672}
+#' @source \doi{10.1177/1073191111411672}
 #' @examples
 #' instrument("igicr")
 #' summary(igicr)
@@ -109,7 +109,7 @@
 #' @source Soldz, S., Budman, S., Demby, A., & Merry, J. (1995). A short form of
 #'   the Inventory of Interpersonal Problems Circumplex Scales. *Assessment,
 #'   2*(1), 53-63.
-#' @source \url{https://doi.org/10.1080/00223890802388665}
+#' @source \doi{10.1080/00223890802388665}
 #' @examples
 #' instrument("iipsc")
 #' summary(iipsc)
@@ -123,7 +123,7 @@
 #' @source Hatcher, R. L., & Rogers, D. T. (2012). The IIS-32: A brief inventory
 #'   of interpersonal strengths. *Journal of Personality Assessment, 94*(6),
 #'   638-646.
-#' @source \url{https://doi.org/10.1080/00223891.2012.681818}
+#' @source \doi{10.1080/00223891.2012.681818}
 #' @examples
 #' instrument("iis32")
 #' summary(iis32)
@@ -137,7 +137,7 @@
 #' @source Hatcher, R. L., & Rogers, D. T. (2009). Development and validation of
 #'   a measure of interpersonal strengths: The Inventory of Interpersonal
 #'   Strengths. *Psychological Assessment, 21*(4), 554-569.
-#' @source \url{https://doi.org/10.1037/a0017269}
+#' @source \doi{10.1037/a0017269}
 #' @examples
 #' instrument("iis64")
 #' summary(iis64)
@@ -151,7 +151,7 @@
 #' @source Bliton, C. F., & Pincus, A. L. (in press). Construction and
 #'   Validation of the Interpersonal Influence Tactics Circumplex (IIT-C)
 #'   Scales. *Assessment*.
-#' @source \url{https://doi.org/10.1177/1073191119864661}
+#' @source \doi{10.1177/1073191119864661}
 #' @examples
 #' instrument("iitc")
 #' summary(iitc)
@@ -164,7 +164,7 @@
 #'
 #' @source Markey, P. M., & Markey, C. N. (2009). A brief assessment of the
 #'   interpersonal circumplex: The IPIP-IPC. *Assessment, 16*(4), 352-361.
-#' @source \url{https://doi.org/10.1177/1073191109340382}
+#' @source \doi{10.1177/1073191109340382}
 #' @examples
 #' instrument("ipipipc")
 #' summary(ipipipc)
@@ -178,7 +178,7 @@
 #' @source Hopwood, C. J., Ansell, E. B., Pincus, A. L., Wright, A. G. C.,
 #'   Lukowitsky, M. R., & Roche, M. J. (2011). The circumplex structure of
 #'   interpersonal sensitivities. *Journal of Personality, 79*(4), 707-740.
-#' @source \url{https://doi.org/10.1111/j.1467-6494.2011.00696.x}
+#' @source \doi{10.1111/j.1467-6494.2011.00696.x}
 #' @examples
 #' instrument("isc")
 #' summary(isc)
