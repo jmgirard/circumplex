@@ -9,7 +9,7 @@
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![R build
 status](https://github.com/jmgirard/circumplex/workflows/R-CMD-check/badge.svg)](https://github.com/jmgirard/circumplex/actions)
 [![Codecov test
@@ -21,8 +21,8 @@ user-friendly way to analyze and visualize circumplex data. It was
 created and is maintained by [Jeffrey Girard](https://jmgirard.com/); it
 was inspired by work from and was developed under advisement from
 [Johannes
-Zimmermann](https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html)
-and [Aidan Wright](https://personalityprocesses.com/). You can learn
+Zimmermann](https://www.uni-kassel.de/fb01/institute/institut-fuer-psychologie/fachgebiete/differentielle-psychologie/prof-dr-johannes-zimmermann)
+and [Aidan Wright](https://www.personalityprocesses.com/). You can learn
 more about using this package through the vignette articles available on
 the [package website](https://circumplex.jmgirard.com/) or through
 `?circumplex`.
