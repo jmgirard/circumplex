@@ -3,11 +3,6 @@
 \name{ggsave}
 \alias{ggsave}
 \title{Save a ggplot with sensible defaults}
-\usage{
-ggsave(filename, plot = last_plot(), device = NULL, path = NULL, scale
-  = 1, width = NA, height = NA, units = c("in", "cm", "mm", "px"), dpi = 300,
-  limitsize = TRUE, bg = NULL, ...)
-}
 \description{
 See \code{ggplot2} for details.
 }
