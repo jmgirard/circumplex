@@ -15,3 +15,5 @@
 ^docs$
 ^pkgdown$
 ^\.covrignore$
+^README\.md$
+^NEWS\.md$
