@@ -10,10 +10,9 @@
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![R build
-status](https://github.com/jmgirard/circumplex/workflows/R-CMD-check/badge.svg)](https://github.com/jmgirard/circumplex/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://codecov.io/gh/jmgirard/circumplex?branch=master)
+[![R-CMD-check](https://github.com/jmgirard/circumplex/workflows/R-CMD-check/badge.svg)](https://github.com/jmgirard/circumplex/actions)
 <!-- badges: end -->
 
 The goal of *circumplex* is to provide a powerful, flexible, and
