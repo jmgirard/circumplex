@@ -1,0 +1,79 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r, message=FALSE}
+library(tidyverse)
+library(circumplex)
+library(lavaan)
+library(correlation)
+jz2017
+```
+
+```{r}
+rmat <- 
+  correlation(
+    data = select(jz2017, PARPD),
+    data2 = select(jz2017, PA:NO),
+    method = "Pearson"
+  )
+print_md(rmat, digits = 3)
+```
+
+
+```{r}
+model <- '
+PA ~~ BC + DE + FG + HI + JK + LM + NO
+BC ~~ DE + FG + HI + JK + LM + NO
+DE ~~ FG + HI + JK + LM + NO
+FG ~~ HI + JK + LM + NO
+HI ~~ JK + LM + NO
+JK ~~ LM + NO
+LM ~~ NO
+
+PA ~ m1*1
+BC ~ m2*1
+DE ~ m3*1
+FG ~ m4*1
+HI ~ m5*1
+JK ~ m6*1
+LM ~ m7*1
+NO ~ m8*1
+
+PARPD ~~ s1*PA + s2*BC + s3*DE + s4*FG + s5*HI + s6*JK + s7*LM + s8*NO
+
+elev := mean(c(s1, s2, s3, s4, s5, s6, s7, s8))
+xval := 0.25 * sum(s2*-0.7071068 - s3 + s4*-0.7071068 + s6*0.7071068 + s7 + s8*0.7071068)
+yval := 0.25 * sum(s1 + s2*0.7071068 + s4*-0.7071068 - s5 + s6*-0.7071068 + s8*0.7071068)
+ampl := sqrt(xval^2 + yval^2)
+disp := atan2(yval, xval) * 57.29578
+'
+
+fit <- sem(model, data = jz2017, parameterization = "delta")
+summary(fit)
+```
+
+```{r}
+fit2 <- 
+  ssm_analyze(
+    .data = jz2017,
+    angles = octants(),
+    scales = PA:NO,
+    measures = PARPD
+  )
+fit2
+```
+
+```{r}
+tibble(
+  score = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+  old = as.numeric(fit2$scores[1, 3:10]),
+  new = coef(fit)[37:44]
+) %>% 
+  mutate(
+    diff = new - old
+  ) %>% 
+  knitr::kable(digits = 3)
+```
+
