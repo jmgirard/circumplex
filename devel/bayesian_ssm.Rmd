@@ -1,0 +1,123 @@
+---
+title: "R Notebook"
+output: html_document
+---
+
+```{r setup, message=FALSE}
+library(tidyverse)
+data("aw2009")
+```
+
+```{r}
+dat <- 
+  aw2009 %>% 
+  summarize(across(everything(), mean)) %>% 
+  pivot_longer(cols = everything(), names_to = "scale", values_to = "score") %>% 
+  mutate(
+    deg = octants(), 
+    rad = deg * pi/180
+  ) %>% 
+  print()
+```
+
+```{r}
+fit <- lm(score ~ cos(rad) + sin(rad), data = dat)
+summary(fit)
+```
+
+The classic formula for the SSM is 
+
+\begin{equation}
+S_p = 
+\end{equation}
+
+```{r}
+# (1) y ~ a + c*sin(x+b) 
+# (2) y ~ a + c*sin(b)*cos(x) + c*cos(b)*sin(x)
+# (3) y ~ b0 + b1*x1 + b2*x2
+# (4) x1 = cos(x)
+# (5) x2 = sin(x)
+# (6) b0 = a
+# (7) b1 = c*sin(b)
+# (8) b2 = c*cos(b)
+# (9) b = arctan(b1/b2) or atan2(b1, b2)
+a <- coef(fit)[[1]]
+b1 <- coef(fit)[[2]]
+b2 <- coef(fit)[[3]]
+b <- atan2(b2, b1)
+c <- sqrt(b1^2 + b2^2)
+c(elev = a, x = b1, y = b2, disp = (b*180/pi) %% 360, ampl = c, fit = summary(fit)$r.sq)
+```
+
+```{r}
+data("jz2017")
+dat2 <- 
+  jz2017 %>% 
+  select(PA:NO, ASPD)
+scores <- 
+  cor(dat2)["ASPD", 1:8] %>% 
+  as_tibble(rownames = "scale") %>%
+  rename(score = value) %>% 
+  mutate(angle = octants(), rad = angle * pi/180)
+fit2 <- lm(score ~ cos(rad) + sin(rad), data = scores)
+elev <- coef(fit2)[[1]]
+x <- coef(fit2)[[2]]
+y <- coef(fit2)[[3]]
+disp_rad <- atan2(y, x)
+disp <- (disp_rad * 180 / pi) %% 360
+ampl <- sqrt(x^2 + y^2)
+rsq <- summary(fit2)$r.sq
+c(e = elev, x = x, y = y, a = ampl, d = disp, r2 = rsq) %>% round(3)
+```
+
+
+```{r}
+library(boot)
+bs <- function(formula, data, indices) {
+  fit <- lm(formula, data = data[indiced, ])
+  coef(fit)
+}
+results <- boot(data = )
+
+```
+
+```{r}
+correlationBF(jz2017$PA, jz2017$ASPD, posterior = FALSE, iterations = 2000)
+post <- correlationBF(jz2017$PA, jz2017$ASPD, posterior = TRUE, iterations = 2000)
+```
+
+
+```{r}
+library(brms)
+bfit <- brm(
+  score ~ 1 + cos(rad) + sin(rad), 
+  data = scores,
+  prior = c(
+    set_prior("normal(0, 1)", class = "b"),
+    set_prior("normal(0, 1)", class = "Intercept"),
+    set_prior("normal(0, 1)", class = "sigma")
+  ),
+  chains = 8,
+  cores = 8
+)
+summary(bfit)
+bayes_R2(bfit)
+```
+
+```{r}
+post <- 
+  as_tibble(as.matrix(bfit$fit)) %>% 
+  transmute(
+    elev = b_Intercept,
+    xval = b_cosrad,
+    yval = b_sinrad,
+    disp = (atan2(yval, xval) * 180/pi) %% 360, #TODO: Account for 360 boundary
+    ampl = sqrt(xval^2 + yval^2)
+  )
+bayestestR::describe_posterior(post)
+```
+
+```{r}
+
+```
+

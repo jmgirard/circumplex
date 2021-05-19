@@ -12,6 +12,7 @@ jz2017
 ```
 
 ```{r}
+<<<<<<< HEAD
 rmat <- 
   correlation(
     data = select(jz2017, PARPD),
@@ -23,6 +24,8 @@ print_md(rmat, digits = 3)
 
 
 ```{r}
+=======
+>>>>>>> 53b2ea3d9bfeee039086dffaf893ef7e7d46023e
 model <- '
 PA ~~ BC + DE + FG + HI + JK + LM + NO
 BC ~~ DE + FG + HI + JK + LM + NO
@@ -32,6 +35,7 @@ HI ~~ JK + LM + NO
 JK ~~ LM + NO
 LM ~~ NO
 
+<<<<<<< HEAD
 PA ~ m1*1
 BC ~ m2*1
 DE ~ m3*1
@@ -41,6 +45,8 @@ JK ~ m6*1
 LM ~ m7*1
 NO ~ m8*1
 
+=======
+>>>>>>> 53b2ea3d9bfeee039086dffaf893ef7e7d46023e
 PARPD ~~ s1*PA + s2*BC + s3*DE + s4*FG + s5*HI + s6*JK + s7*LM + s8*NO
 
 elev := mean(c(s1, s2, s3, s4, s5, s6, s7, s8))
@@ -50,11 +56,16 @@ ampl := sqrt(xval^2 + yval^2)
 disp := atan2(yval, xval) * 57.29578
 '
 
+<<<<<<< HEAD
 fit <- sem(model, data = jz2017, parameterization = "delta")
+=======
+fit <- sem(model, data = jz2017, std.ov = TRUE, parameterization = "delta")
+>>>>>>> 53b2ea3d9bfeee039086dffaf893ef7e7d46023e
 summary(fit)
 ```
 
 ```{r}
+<<<<<<< HEAD
 fit2 <- 
   ssm_analyze(
     .data = jz2017,
@@ -75,5 +86,10 @@ tibble(
     diff = new - old
   ) %>% 
   knitr::kable(digits = 3)
+=======
+ssm_analyze(
+  jz2017, PA:NO, octants(), c(PARPD, NARPD)
+)
+>>>>>>> 53b2ea3d9bfeee039086dffaf893ef7e7d46023e
 ```
 

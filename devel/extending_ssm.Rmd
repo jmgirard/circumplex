@@ -1,0 +1,254 @@
+---
+title: "Extending the SSM"
+author: "Jeffrey Girard"
+date: "11/14/2020"
+output: 
+  bookdown::html_document2: default
+bibliography: ref.bib
+csl: apa.csl
+---
+
+```{r setup, message=FALSE}
+library(tidyverse)
+library(knitr)
+library(circumplex)
+library(lme4)
+library(lmerTest)
+library(brms)
+```
+
+# Implementing the SSM in the Linear Model
+
+## Mathematics
+
+The classic formula for the SSM is provided by
+
+\begin{equation}
+S_i = e + a \times \cos(\theta_i - \delta) + d_i,
+(\#eq:ssm)
+\end{equation}
+
+where $S_i$ is the score (e.g., individual's mean, group's mean, or correlation) for scale $i$, $e$ is the profile's elevation, $a$ is the profile's amplitude, $\theta_i$ is the angular position of scale $i$ (in radians), $\delta$ is the profile's angular displacement, and $d_i$ is the profile's error term or deviation from the curve on scale $i$.
+
+In order to estimate these parameters via the linear model, we need to use algebra and trigonometry to change this equation into the following form
+
+\begin{equation}
+y_i = b_0 + b_1 x_{1,i} + b_2 x_{2,i} + \cdots + b_p x_{p,i} + \varepsilon_i
+(\#eq:lm)
+\end{equation}
+
+where $y_i$ is the outcome variable for observation $i$, $b_0$ is the estimated model intercept, $b_.$ are the estimated model slopes, $x_{.,i}$ are predictor variables for observation $i$, and $\varepsilon_i$ is the model residual for observation $i$.
+
+Several pieces are quite easy to translate between \@ref(eq:ssm) and \@ref(eq:lm): we can substitute $S_i$ for $y_i$, $e$ for $b_0$, and $d_i$ for $\varepsilon_i$. This results in 
+
+\begin{equation}
+S_i = e + b_1 x_{1,i} + b_2 x_{2,i} + \cdots + b_p x_{p,i} + d_i,
+(\#eq:merge1)
+\end{equation}
+
+which means we just have to somehow transform $a \times \cos(\theta_i - \delta)$ into the $b_1 x_{1,i} + b_2 x_{2,i} + \cdots + b_p x_{p,i}$ format in such a way that the information we know (i.e., $\theta_i$) is represented by or derivable from $x$ values and the information we want to estimate (i.e., $a$ and $\delta$) is represented by or derivable from $b$ values. To achieve this, we can leverage the following trigonometric addition (i.e., prosthaphaeresis) formula to split $\cos(\theta_i - \delta)$ into two separate parts
+
+\begin{equation}
+\cos(\alpha-\beta) = \cos\alpha \cos\beta + \sin\alpha \sin\beta.
+(\#eq:cosadd)
+\end{equation}
+
+Substituting \@ref(eq:cosadd) into \@ref(eq:ssm), we get
+
+\begin{equation}
+S_i = e + a \cos\delta \cos\theta_i + a \sin\delta \sin\theta_i + d_i.
+(\#eq:merge2)
+\end{equation}
+
+\begin{equation}
+S_i = b_0 + b_1 \cos\theta_i + b_2 \sin\theta_i + d_i
+(\#eq:merge3)
+\end{equation}
+
+We can now fit a linear model \@ref(eq:lm) to \@ref(eq:merge2) by specifying $S_i$ as the outcome (i.e., $y$) variable and both $\cos\theta_i$ and $\sin\theta_i$ as the predictor (i.e., $x$) variables \@ref(eq:merge3). The estimated intercept (i.e., $b_0$) will represent $e$, the estimated slope for $\cos\theta_i$ (i.e., $b_1$) will represent $a \cos\delta$, the estimated slope for $\sin\theta_i$ (i.e., $b_2$) will represent $a \sin\delta$, and the estimated residuals (i.e., $\varepsilon_i$) will represent $d_i$.
+
+If we view the profile as a right-angled triangle in circular space with $\delta$ being its inner angle and $a$ being the length of its hypotenuse from the origin, then the length of its adjacent side (i.e., $X$ component) would be $a \cos\delta$ or $b_1$ and the length of its opposite side (i.e., $Y$ component), would be $a \sin\delta$ or $b_2$.
+
+To recover separate $a$ and $\delta$ estimates, we can apply further algebraic and trigonometric functions to $b_1$ and $b_2$. Given that $b_1$ represents the length of the adjacent side of the profile triangle and $b_2$ represents the length of the opposite side, we can use the Pythagorean theorum to solve for $a$ (i.e., the length of the hypotenuse).
+
+\begin{equation}
+hypotenuse = \sqrt{adjacent^2 + opposite^2}
+(\#eq:pythagorean)
+\end{equation}
+
+\begin{equation}
+a = \sqrt{b_1^2 + b_2^2}
+(\#eq:a)
+\end{equation}
+
+Now that we have the lengths of all three sides of the triangle, we can calculate each of its angles, including the inner angle or $\delta$. The arctangent function returns the angle when given the quotient of the opposite and adjacent side lengths. However, for this use we don't actually want the inner angle of the triangle (which can only range from $0$ to $\pi/2$ radians); we want the angle in circular space (which can range from $-\pi$ to $\pi$ radians). To get this, we can use the `atan2` function and provide the opposite and adjacent sides separately instead of their quotient.
+
+\begin{equation}
+\text{atan2}(Y, X) = 
+\begin{cases}
+    \arctan(Y/X)              & \text{if } X > 0 \\
+    \arctan(Y/X) + \pi        & \text{if } X < 0 \text{ and } Y \ge 0 \\
+    \arctan(Y/X) - \pi        & \text{if } X < 0 \text{ and } Y < 0 \\
+    +\pi/2                    & \text{if } X = 0 \text{ and } Y > 0 \\
+    -\pi/2                    & \text{if } X = 0 \text{ and } Y < 0 \\
+    \text{undefined}          & \text{if } X = 0 \text{ and } Y = 0
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\delta = \text{atan2}(a\sin\delta, a\cos\delta)
+\end{equation}
+
+## Testing with Sample Data
+
+To test this out, we can load some simple example data from the appendix of @wright2009.
+
+```{r}
+data("aw2009", package = "circumplex")
+kable(aw2009)
+```
+
+This data frame contains five rows representing individual profiles and eight columns representing octant scores on a circumplex scale. In the traditional SSM approach,  $S_i$ would represent the mean across all observations. So let's calculate that.
+
+```{r}
+mscores <- 
+  aw2009 %>% 
+  summarize(across(PA:NO, mean))
+kable(mscores)
+```
+
+To use our new lm-based SSM approach, we need to reshape the data such that each observation is one scale and information about its angle (in radians) is provided.
+
+```{r}
+readydat <- 
+  mscores %>% 
+  pivot_longer(cols = PA:NO, names_to = "scale", values_to = "score") %>% 
+  mutate(deg = octants(), rad = deg * pi/180)
+kable(readydat)
+```
+
+Now we can use any of the linear modeling implementations in R to estimate our SSM parameters. We'll start with the `stats::lm()` implementation. In this implementation, linear modeling formulas are specified in the following format where `1` is interpreted as an intercept and all `x` variables are given a slope: `y ~ 1 + x_1 + x_2 + ... + x_p`.
+
+```{r}
+fit <- lm(
+  formula = score ~ 1 + cos(rad) + sin(rad), 
+  data = readydat
+)
+summary(fit)
+```
+
+We can now calculate the SSM parameters.
+
+```{r}
+tibble(
+  elev = coef(fit)[[1]],
+  xval = coef(fit)[[2]],
+  yval = coef(fit)[[3]],
+  ampl = sqrt(xval^2 + yval^2),
+  disp = (atan2(yval, xval) * 180/pi) %% 360
+)
+performance::r2(fit)
+```
+
+The results here match those from the appendix of @wright2009 (within rounding error, as that paper rounded to 2 digits after each step, whereas here we only round to 2 digits after the final results). So this approach is working!
+
+We can also implement this within a Bayesian linear modeling framework.
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+bfit <- brm(
+  score ~ 1 + cos(rad) + sin(rad), 
+  data = readydat,
+  prior = c(
+    set_prior("student_t(3, 0, 1)", class = "b"),
+    set_prior("student_t(3, 0, 2.5)", class = "Intercept"),
+    set_prior("student_t(3, 0, 2.5)", class = "sigma")
+  ),
+  chains = 4,
+  cores = 4
+)
+summary(bfit, robust = TRUE)
+```
+
+```{r}
+bfit$fit %>% 
+  as.matrix() %>% 
+  as_tibble() %>% 
+  transmute(
+    elev = b_Intercept,
+    xval = b_cosrad,
+    yval = b_sinrad,
+    ampl = sqrt(xval^2 + yval^2),
+    disp = (atan2(yval, xval) * 180/pi) %% 360,
+  ) %>% 
+  bayestestR::describe_posterior(test = NULL)
+performance::r2_bayes(bfit)
+```
+
+# Varying Slopes Extension
+
+We can also estimate participant-varying slopes across all participants ($n=5$ in this case) and capture the distribution of these slopes.
+
+```{r}
+readydat2 <- 
+  aw2009 %>% 
+  mutate(id = row_number()) %>% 
+  pivot_longer(cols = PA:NO, names_to = "scale", values_to = "score") %>% 
+  mutate(
+    angle = rep(octants(), times = 5),
+    rad = angle * pi/180
+  ) %>% 
+  print()
+```
+
+```{r}
+rfit <- 
+  lmer(
+    formula = score ~ 1 + cos(rad) + sin(rad) + (1 + cos(rad) + sin(rad) | id),
+    data = readydat2
+  )
+summary(rfit)
+```
+
+```{r}
+tibble(
+  elev = fixef(rfit)[[1]],
+  xval = fixef(rfit)[[2]],
+  yval = fixef(rfit)[[3]],
+  ampl = sqrt(xval^2 + yval^2),
+  disp = (atan2(yval, xval) * 180/pi) %% 360
+)
+performance::r2(rfit)
+```
+
+```{r, message=FALSE, warning=FALSE, cache=TRUE}
+bfit2 <- brm(
+  score ~ 1 + cos(rad) + sin(rad) + (1 + cos(rad) + sin(rad) | id), 
+  data = readydat2,
+  prior = c(
+    set_prior("student_t(3, 0, 1)", class = "b"),
+    set_prior("student_t(3, 0, 2.5)", class = "Intercept"),
+    set_prior("student_t(3, 0, 2.5)", class = "sigma"),
+    set_prior("lkj(1)", class = "cor")
+  ),
+  chains = 4,
+  cores = 4
+)
+summary(bfit2, robust = TRUE)
+```
+
+```{r}
+bfit2$fit %>% 
+  as.matrix() %>% 
+  as_tibble() %>% 
+  transmute(
+    elev = b_Intercept,
+    xval = b_cosrad,
+    yval = b_sinrad,
+    ampl = sqrt(xval^2 + yval^2),
+    disp = (atan2(yval, xval) * 180/pi) %% 360,
+  ) %>% 
+  bayestestR::describe_posterior(test = NULL)
+performance::r2_bayes(bfit2)
+```
+
+# References
