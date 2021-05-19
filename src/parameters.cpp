@@ -4,6 +4,7 @@ using namespace Rcpp;
 using namespace arma;
 
 // [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::plugins(cpp11)]]
 
 // Calculate the inner product for matrix multiplication
 double inner(arma::vec x, arma::vec y) {
