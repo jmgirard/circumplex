@@ -14,7 +14,7 @@
 
 ## Minor improvements and fixes
 
-* Update `ggsave()` documentatioan for future compatibility
+* Update `ggsave()` documentation for future compatibility
 
 * Update \{Rcpp\} code for future compatibility
 
