@@ -1,4 +1,14 @@
-# circumplex (development version)
+# circumplex 0.3.8
+
+## Minor improvements and fixes
+
+* Fix testing error on Solaris systems
+
+* Update package description paragraph
+
+* Add cpp11 plugin for Rcpp
+
+* Exclude devel folder from linguist statistics
 
 ----
 

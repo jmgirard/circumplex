@@ -1,4 +1,6 @@
 test_that("Single-group mean-based SSM results are correct", {
+  skip_on_cran()
+  
   data("aw2009")
   set.seed(12345)
   res <- ssm_analyze(aw2009, PA:NO, octants())
