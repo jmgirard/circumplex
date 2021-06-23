@@ -313,6 +313,13 @@ circle_base <- function(angles, labels = NULL,
     # Expand the axes multiplicatively to fit labels
     ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
     ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
+    # Draw lowest circle
+    ggforce::geom_circle(
+      ggplot2::aes(x0 = 0, y0 = 0, r = 5),
+      color = "gray50",
+      fill = "white",
+      size = 1.5
+    ) +
     # Draw segments corresponding to displacement scale
     ggplot2::geom_segment(
       ggplot2::aes(
@@ -329,11 +336,6 @@ circle_base <- function(angles, labels = NULL,
       ggplot2::aes(x0 = 0, y0 = 0, r = 1:4),
       color = "gray60",
       size = 0.5
-    ) +
-    ggforce::geom_circle(
-      ggplot2::aes(x0 = 0, y0 = 0, r = 5),
-      color = "gray50",
-      size = 1.5
     ) +
     # Draw labels for amplitude scale
     ggplot2::geom_label(
@@ -357,6 +359,7 @@ circle_base <- function(angles, labels = NULL,
         label = labels
       ),
       color = "gray20",
+      fill = "transparent",
       label.size = NA,
       hjust = "outward",
       vjust = "outward",
