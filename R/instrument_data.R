@@ -38,7 +38,7 @@
 #' @examples
 #' instrument("csip")
 #' summary(csip)
-#' scales(csig, items = TRUE)
+#' scales(csip, items = TRUE)
 "csip"
 
 #' Circumplex Scales of Interpersonal Values

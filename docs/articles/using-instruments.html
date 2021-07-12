@@ -28,8 +28,6 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
-
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -42,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.8.9000</span>
       </span>
     </div>
 
@@ -50,7 +48,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -129,8 +127,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/jmgirard/circumplex" class="external-link">
-    <span class="fas fa-github fa-lg"></span>
+  <a href="https://github.com/jmgirard/circumplex">
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -150,13 +148,13 @@
 
       
 
-      </header><script src="using-instruments_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="using-instruments_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using Circumplex Instruments</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/using-instruments.Rmd" class="external-link"><code>vignettes/using-instruments.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/using-instruments.Rmd"><code>vignettes/using-instruments.Rmd</code></a></small>
       <div class="hidden name"><code>using-instruments.Rmd</code></div>
 
     </div>
@@ -164,12 +162,12 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex">circumplex</a></span><span class="op">)</span></code></pre></div>
 <div id="overview-of-instrument-related-functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#overview-of-instrument-related-functions" class="anchor"></a>1. Overview of Instrument-related Functions</h2>
 <p>Although the circumplex package is capable of analyzing and visualizing data in a “source-agnostic” manner (i.e., without knowing what the numbers correspond to), it can be helpful to both the user and the package to have more contextual information about which instrument/questionnaire the data come from. For example, knowing the specific instrument used can enable the package to automatically score item-level responses and standardize these scores using normative data. Furthermore, a centralized repository of information about circumplex instruments would provide a convenient and accessible way for users to discover and begin using new instruments. To address these needs, a suite of new instrument-related functions (and underlying data to power them) was added to the circumplex package in version 0.2.0.</p>
-<p>The first part of this vignette will discuss how to preview the instruments currently available in the circumplex package, how to load information about a specific instrument for use in analysis, and how to extract general and specific information about that instrument. The following functions will be discussed: <code><a href="../reference/instruments.html">instruments()</a></code>, <code><a href="../reference/instrument.html">instrument()</a></code>, <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, <code><a href="../reference/scales.html">scales()</a></code>, <code><a href="../reference/items.html">items()</a></code>, <code><a href="../reference/anchors.html">anchors()</a></code>, <code><a href="../reference/norms.html">norms()</a></code>, and <code><a href="https://rdrr.io/r/utils/View.html" class="external-link">View()</a></code>.</p>
+<p>The first part of this vignette will discuss how to preview the instruments currently available in the circumplex package, how to load information about a specific instrument for use in analysis, and how to extract general and specific information about that instrument. The following functions will be discussed: <code><a href="../reference/instruments.html">instruments()</a></code>, <code><a href="../reference/instrument.html">instrument()</a></code>, <code><a href="https://rdrr.io/r/base/print.html">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code>, <code><a href="../reference/scales.html">scales()</a></code>, <code><a href="../reference/items.html">items()</a></code>, <code><a href="../reference/anchors.html">anchors()</a></code>, <code><a href="../reference/norms.html">norms()</a></code>, and <code><a href="https://rdrr.io/r/utils/View.html">View()</a></code>.</p>
 <p>The second part of this vignette will discuss how to use the information about an instrument to transform and summarize circumplex data. It will demonstrate how to ipsatize item-level responses (i.e., apply deviation scoring across variables), how to calculate scale scores from item-level responses (with or without imputing/prorating missing values), and how to standardize scale scores using normative/comparison data. The following functions will be discussed: <code><a href="../reference/ipsatize.html">ipsatize()</a></code>, <code><a href="../reference/score.html">score()</a></code>, and <code><a href="../reference/standardize.html">standardize()</a></code>.</p>
 </div>
 <div id="loading-and-examining-instrument-objects" class="section level2">
@@ -200,24 +198,24 @@
 <div id="loading-a-specific-instrument" class="section level3">
 <h3 class="hasAnchor">
 <a href="#loading-a-specific-instrument" class="anchor"></a>Loading a specific instrument</h3>
-<p>To reduce loading time and memory usage, instrument information is not loaded into R’s memory when the circumplex package is loaded. Instead, instruments should be loaded into memory on an as-needed basis. As demonstrated below, this can be done by passing an instrument’s code (which we saw how to find in the last section) to the <code><a href="../reference/instrument.html">instrument()</a></code> function. We can then examine that instrument data using the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> function.</p>
+<p>To reduce loading time and memory usage, instrument information is not loaded into R’s memory when the circumplex package is loaded. Instead, instruments should be loaded into memory on an as-needed basis. As demonstrated below, this can be done by passing an instrument’s code (which we saw how to find in the last section) to the <code><a href="../reference/instrument.html">instrument()</a></code> function. We can then examine that instrument data using the <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> function.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/instrument.html">instrument</a></span><span class="op">(</span><span class="va">csip</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">csip</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">csip</span><span class="op">)</span>
 <span class="co">#&gt; CSIP: Circumplex Scales of Interpersonal Problems</span>
 <span class="co">#&gt; 64 items, 8 scales, 1 normative data sets</span>
 <span class="co">#&gt; Boudreaux, Ozer, Oltmanns, &amp; Wright (2018)</span>
 <span class="co">#&gt; &lt;https://doi.org/10.1037/pas0000505&gt;</span></code></pre></div>
-<p>Note, however, that an error will result if the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> function (or any of the functions to be described later) is called before the <code><a href="../reference/instrument.html">instrument()</a></code> function has loaded the data. Order of operations is important!</p>
+<p>Note, however, that an error will result if the <code><a href="https://rdrr.io/r/base/print.html">print()</a></code> function (or any of the functions to be described later) is called before the <code><a href="../reference/instrument.html">instrument()</a></code> function has loaded the data. Order of operations is important!</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">isc</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">isc</span><span class="op">)</span>
 <span class="co">#&gt; ISC: Interpersonal Sensitivities Circumplex</span>
 <span class="co">#&gt; 64 items, 8 scales, 1 normative data sets</span>
 <span class="co">#&gt; Hopwood et al. (2011)</span>
 <span class="co">#&gt; &lt;https://doi.org/10.1111/j.1467-6494.2011.00696.x&gt;</span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/instrument.html">instrument</a></span><span class="op">(</span><span class="va">isc</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">isc</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">isc</span><span class="op">)</span>
 <span class="co">#&gt; ISC: Interpersonal Sensitivities Circumplex</span>
 <span class="co">#&gt; 64 items, 8 scales, 1 normative data sets</span>
 <span class="co">#&gt; Hopwood et al. (2011)</span>
@@ -226,10 +224,10 @@
 <div id="examining-an-instrument-in-depth" class="section level3">
 <h3 class="hasAnchor">
 <a href="#examining-an-instrument-in-depth" class="anchor"></a>Examining an instrument in-depth</h3>
-<p>To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> function. This will return the same information returned by <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, followed by information about the instrument’s scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the package <a href="https://circumplex.jmgirard.com/reference/index.html#section-instrument-data">reference</a> page.</p>
+<p>To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> function. This will return the same information returned by <code><a href="https://rdrr.io/r/base/print.html">print()</a></code>, followed by information about the instrument’s scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the package <a href="https://circumplex.jmgirard.com/reference/index.html#section-instrument-data">reference</a> page.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/instrument.html">instrument</a></span><span class="op">(</span><span class="st">"ipipipc"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ipipipc</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">ipipipc</span><span class="op">)</span>
 <span class="co">#&gt; IPIP-IPC: IPIP Interpersonal Circumplex</span>
 <span class="co">#&gt; 32 items, 8 scales, 1 normative data sets</span>
 <span class="co">#&gt; Markey &amp; Markey (2009)</span>
@@ -349,9 +347,9 @@
 <span class="co">#&gt;     13. Start conversations</span>
 <span class="co">#&gt;     21. Talk to a lot of different people at parties</span>
 <span class="co">#&gt;     29. Love large parties</span></code></pre></div>
-<p>An additional, though advanced, option for examining the available information about an instrument is to explore the instrument object itself. This can be done within R using the <code><a href="https://rdrr.io/r/utils/View.html" class="external-link">View()</a></code> function. Note that the first letter in this function (V) must be capitalized. This will open up a data viewer window like the one shown below; it will give you full access to the information stored by the package, albeit in a “raw” format. Don’t worry if the image below is confusing or overwhelming; you never have to see it again unless you want to!</p>
+<p>An additional, though advanced, option for examining the available information about an instrument is to explore the instrument object itself. This can be done within R using the <code><a href="https://rdrr.io/r/utils/View.html">View()</a></code> function. Note that the first letter in this function (V) must be capitalized. This will open up a data viewer window like the one shown below; it will give you full access to the information stored by the package, albeit in a “raw” format. Don’t worry if the image below is confusing or overwhelming; you never have to see it again unless you want to!</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="va">ipipipc</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/View.html">View</a></span><span class="op">(</span><span class="va">ipipipc</span><span class="op">)</span></code></pre></div>
 <p><img src="view_ipipipc.png" width="100%"></p>
 </div>
 </div>
@@ -359,11 +357,11 @@
 <h2 class="hasAnchor">
 <a href="#instrument-related-tidying-functions" class="anchor"></a>3. Instrument-related Tidying Functions</h2>
 <p>It is a good idea in practice to digitize and save each participant’s response to each item on an instrument, rather than just their scores on each scale. Having access to item-level data will make it easier to spot and correct mistakes, will enable more advanced analysis of missing data, and will enable latent variable models that account for measurement error (e.g., structural equation modeling). Furthermore, the functions described below will make it easy to transform and summarize such item-level data into scale scores.</p>
-<p>First, however, we need to make sure the item-level data is in the expected format. Your data should be stored in a data frame where each row corresponds to one observation (e.g., participant, organization, or timepoint) and each column corresponds to one variable describing these observations (e.g., item responses, demographic characteristics, scale scores). The <a href="https://www.tidyverse.org" class="external-link">tidyverse</a> packages provide excellent tools for getting your data into this format from a variety of different file types and formats.</p>
+<p>First, however, we need to make sure the item-level data is in the expected format. Your data should be stored in a data frame where each row corresponds to one observation (e.g., participant, organization, or timepoint) and each column corresponds to one variable describing these observations (e.g., item responses, demographic characteristics, scale scores). The <a href="https://www.tidyverse.org">tidyverse</a> packages provide excellent tools for getting your data into this format from a variety of different file types and formats.</p>
 <p>For the purpose of illustration, we will work with a small-scale data set, which includes item-level responses to the Inventory of Interpersonal Problems, Short Circumplex (IIP-SC) for just 10 participants. As will become important later on, this data set contains a small amount of missing values (represented as <code>NA</code>). This data set is included as part of the circumplex package and can be loaded and previewed as follows:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"raw_iipsc"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">raw_iipsc</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"raw_iipsc"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">raw_iipsc</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 10 x 32</span>
 <span class="co">#&gt;    IIP01 IIP02 IIP03 IIP04 IIP05 IIP06 IIP07 IIP08 IIP09 IIP10 IIP11 IIP12 IIP13</span>
 <span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
@@ -388,7 +386,7 @@
 <p>For some forms of circumplex data analysis (e.g., analysis of circumplex fit) but not others (e.g., structural summary method), it can be helpful to transform item-level responses by subtracting each participant’s mean across all items from his or her response on each item. This practice is called “ipsatizing” or, more precisely, deviation scoring across variables. This practice will attenuate the general factor across all items and recasts the item-level responses as deviations from one’s own mean rather than absolute responses. To perform ipsatizing and create a new set of ipsatized responses to each item, use the <code><a href="../reference/ipsatize.html">ipsatize()</a></code> function.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ips_iipsc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ipsatize.html">ipsatize</a></span><span class="op">(</span>.data <span class="op">=</span> <span class="va">raw_iipsc</span>, items <span class="op">=</span> <span class="va">IIP01</span><span class="op">:</span><span class="va">IIP32</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ips_iipsc</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">ips_iipsc</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 10 x 32</span>
 <span class="co">#&gt;      IIP01   IIP02  IIP03  IIP04  IIP05   IIP06  IIP07   IIP08   IIP09   IIP10</span>
 <span class="co">#&gt;      &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;</span>
@@ -408,11 +406,11 @@
 <span class="co">#&gt; #   IIP24 &lt;dbl&gt;, IIP25 &lt;dbl&gt;, IIP26 &lt;dbl&gt;, IIP27 &lt;dbl&gt;, IIP28 &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   IIP29 &lt;dbl&gt;, IIP30 &lt;dbl&gt;, IIP31 &lt;dbl&gt;, IIP32 &lt;dbl&gt;</span></code></pre></div>
 <p>Above, we told the function to overwrite the original item variables with their ipsatized versions; new ipsatized variables (ending in <code>_i</code>) could have been appended to the data frame instead by changing the <code>overwrite</code> argument to <code>FALSE</code>. We also told it to calculate the mean for each observation after ignoring any missing values. We could have changed this by setting the <code>na.rm</code> argument to <code>FALSE</code>.</p>
-<p>We can check that the ipsatization was successful by calculating the mean of each row (i.e., each participant’s mean response) in the original and ipsatized data frames. We do this below using the <code><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans()</a></code> function; we also apply the <code><a href="https://rdrr.io/r/base/Round.html" class="external-link">round()</a></code> function to make the results fit on one row. As expected, we find below that the mean of each participant is zero in the ipsatized data frame but not in the original.</p>
+<p>We can check that the ipsatization was successful by calculating the mean of each row (i.e., each participant’s mean response) in the original and ipsatized data frames. We do this below using the <code><a href="https://rdrr.io/r/base/colSums.html">rowMeans()</a></code> function; we also apply the <code><a href="https://rdrr.io/r/base/Round.html">round()</a></code> function to make the results fit on one row. As expected, we find below that the mean of each participant is zero in the ipsatized data frame but not in the original.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">raw_iipsc</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowMeans</a></span><span class="op">(</span><span class="va">raw_iipsc</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>
 <span class="co">#&gt;  [1] 1.00 0.94 1.41 2.29 0.62 0.28 0.50 0.74 0.97 0.22</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">ips_iipsc</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowMeans</a></span><span class="op">(</span><span class="va">ips_iipsc</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>
 <span class="co">#&gt;  [1] 0 0 0 0 0 0 0 0 0 0</span></code></pre></div>
 </div>
 <div id="scoring-item-level-data" class="section level3">
@@ -435,7 +433,7 @@
 <p>To demonstrate, let’s return to the <code>raw_iipsc</code> data set. We need to give the <code><a href="../reference/score.html">score()</a></code> function a data frame containing the item-level data (i.e., the data set), a list of variables from that data frame that contain the item-level responses to be scored, and an instrument object containing instructions on how to score the data. In order for scoring to work properly, <strong>the list of items must be in ascending order from the first to the last item and the ordering of the items must be the same as that assumed by the package</strong>. Be sure to check your item numbers against those displayed by the <code><a href="../reference/items.html">items()</a></code> function, especially if you shuffle your items.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">scale_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/score.html">score</a></span><span class="op">(</span>.data <span class="op">=</span> <span class="va">raw_iipsc</span>, items <span class="op">=</span> <span class="va">IIP01</span><span class="op">:</span><span class="va">IIP32</span>, instrument <span class="op">=</span> <span class="va">iipsc</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">scale_scores</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">scale_scores</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 10 x 40</span>
 <span class="co">#&gt;    IIP01 IIP02 IIP03 IIP04 IIP05 IIP06 IIP07 IIP08 IIP09 IIP10 IIP11 IIP12 IIP13</span>
 <span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
@@ -498,7 +496,7 @@
   instrument <span class="op">=</span> <span class="va">iipsc</span>,
   sample <span class="op">=</span> <span class="fl">1</span>
 <span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">z_scales</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">z_scales</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 10 x 48</span>
 <span class="co">#&gt;    IIP01 IIP02 IIP03 IIP04 IIP05 IIP06 IIP07 IIP08 IIP09 IIP10 IIP11 IIP12 IIP13</span>
 <span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
@@ -556,13 +554,11 @@
 
 
       <footer><div class="copyright">
-  <p></p>
-<p>Developed by <a href="https://www.jmgirard.com" class="external-link external-link">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html" class="external-link external-link">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com" class="external-link external-link">Aidan Wright</a>.</p>
+  <p>Developed by <a href="https://www.jmgirard.com">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com">Aidan Wright</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

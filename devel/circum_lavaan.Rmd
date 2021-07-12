@@ -1,0 +1,37 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(circumplex)
+library(lavaan)
+```
+
+```{r}
+dat <- jz2017 %>% select(PA:NO)
+```
+
+```{r}
+model0 <- '
+fg =~ .71*PA + .71*BC + .71*DE + .71*FG + .71*HI + .71*JK + .71*LM + .71*NO
+fx =~ 0*PA + -.5*BC + -.71*DE + -.5*FG + 0*HI + .5*JK + .71*LM + .5*NO
+fy =~ .71*PA + .5*BC + 0*DE + -.5*FG + -.71*HI + -0.5*JK + 0*LM + .5*NO
+'
+fit <- lavaan::cfa(model0, dat)
+summary(fit, fit.measures = TRUE)
+```
+
+```{r}
+model1 <- '
+fg =~ PA + BC + DE + FG + 
+  HI + JK + LM + NO
+fx =~ x1*PA + x2*BC + x3*DE + x4*FG + 
+  x5*HI + x6*JK + x7*LM + x8*NO
+fy =~ y1*PA + y2*BC + y3*DE + y4*FG + 
+  y5*HI + y6*JK + y7*LM + y8*NO
+# constraints
+x1 > 
+'
+```
+

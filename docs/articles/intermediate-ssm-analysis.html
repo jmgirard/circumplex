@@ -28,8 +28,6 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
-
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -42,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.8.9000</span>
       </span>
     </div>
 
@@ -50,7 +48,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -129,8 +127,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/jmgirard/circumplex" class="external-link">
-    <span class="fas fa-github fa-lg"></span>
+  <a href="https://github.com/jmgirard/circumplex">
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -150,14 +148,14 @@
 
       
 
-      </header><script src="intermediate-ssm-analysis_files/header-attrs-2.8/header-attrs.js"></script><script src="intermediate-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><link href="intermediate-ssm-analysis_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+      </header><script src="intermediate-ssm-analysis_files/header-attrs-2.9/header-attrs.js"></script><script src="intermediate-ssm-analysis_files/kePrint-0.0.1/kePrint.js"></script><link href="intermediate-ssm-analysis_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Intermediate SSM Analysis</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/intermediate-ssm-analysis.Rmd" class="external-link"><code>vignettes/intermediate-ssm-analysis.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/intermediate-ssm-analysis.Rmd"><code>vignettes/intermediate-ssm-analysis.Rmd</code></a></small>
       <div class="hidden name"><code>intermediate-ssm-analysis.Rmd</code></div>
 
     </div>
@@ -165,7 +163,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex" class="external-link">circumplex</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jmgirard/circumplex">circumplex</a></span><span class="op">)</span></code></pre></div>
 <div id="generalizing-the-basic-analyses" class="section level2">
 <h2 class="hasAnchor">
 <a href="#generalizing-the-basic-analyses" class="anchor"></a>1. Generalizing the basic analyses</h2>
@@ -174,11 +172,11 @@
 <a href="#generalizing-to-multiple-means" class="anchor"></a>Generalizing to multiple means</h3>
 <p>We’ve already seen how adding the <code>measures</code> argument can change <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> from analyzing means to analyzing correlations. Similarly, we can change it from analyzing all observations as a single group to analyzing subgroups separately. This is done using the <code>grouping</code> argument. This argument needs to contain a single variable (name or column number) that specifies each observation’s group. For instance, the <code>Gender</code> variable in the <code>jz2017</code> dataset is a factor with two levels: Female and Male. To analyze each gender separately, we need to add the <code>grouping = Gender</code> argument to the function call.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"iipsc"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"iipsc"</span><span class="op">)</span>
 <span class="va">jz2017s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/standardize.html">standardize</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, instrument <span class="op">=</span> <span class="va">iipsc</span>, sample <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017s</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, grouping <span class="op">=</span> <span class="va">Gender</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA:NO, angles = octants(), </span>
 <span class="co">#&gt;     grouping = Gender)</span>
@@ -206,10 +204,10 @@
 <span class="co">#&gt; Amplitude         0.294      0.256      0.330</span>
 <span class="co">#&gt; Displacement    320.685    313.386    327.985</span>
 <span class="co">#&gt; Model Fit         0.824</span></code></pre></div>
-<p>Note that the output of <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> looks the same as previous mean-based analyses except that there are now two Profile blocks: one for Female and one for Male. A similar modification will occur if we generate a table and figure.</p>
+<p>Note that the output of <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> looks the same as previous mean-based analyses except that there are now two Profile blocks: one for Female and one for Male. A similar modification will occur if we generate a table and figure.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></code></pre></div>
-<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<table class="table table">
 <caption style="font-size: initial !important;">
 Mean-based Structural Summary Statistics with 95% CIs
 </caption>
@@ -296,10 +294,10 @@ Male
 <div id="generalizing-to-multiple-measures" class="section level3">
 <h3 class="hasAnchor">
 <a href="#generalizing-to-multiple-measures" class="anchor"></a>Generalizing to multiple measures</h3>
-<p>Similarly, we can analyze multiple external measures in a single function call by providing a vector of variables to the <code>measures</code> argument instead of a single variable. This can be done by wrapping the variable names or column numbers with the <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> or, if they are adjacent columns, with the <code><a href="https://rdrr.io/r/base/Colon.html" class="external-link">:</a></code> shortcut. The package functions were written to analyze all measures and groups within a single bootstrap, so adding additional measures and groups should still be fast.</p>
+<p>Similarly, we can analyze multiple external measures in a single function call by providing a vector of variables to the <code>measures</code> argument instead of a single variable. This can be done by wrapping the variable names or column numbers with the <code><a href="https://rdrr.io/r/base/c.html">c()</a></code> or, if they are adjacent columns, with the <code><a href="https://rdrr.io/r/base/Colon.html">:</a></code> shortcut. The package functions were written to analyze all measures and groups within a single bootstrap, so adding additional measures and groups should still be fast.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
 <span class="co">#&gt;     measures = c(NARPD, ASPD))</span>
@@ -329,7 +327,7 @@ Male
 <span class="co">#&gt; Model Fit         0.964</span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></code></pre></div>
-<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<table class="table table">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
 </caption>
@@ -415,7 +413,7 @@ ASPD
 <p>Finally, it is possible to analyze multiple measures within multiple groups. As you might expect, this requires providing both the <code>measures</code> and <code>grouping</code> arguments to the same function call. Again, any number of measures and groups is possible. The profiles in such an analysis will be named GROUP_MEASURE as below.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">results3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, grouping <span class="op">=</span> <span class="va">Gender</span>, measures <span class="op">=</span> <span class="va">PARPD</span><span class="op">:</span><span class="va">SZTPD</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
 <span class="co">#&gt;     measures = PARPD:SZTPD, grouping = Gender)</span>
@@ -481,7 +479,7 @@ ASPD
 <span class="co">#&gt; Model Fit         0.424</span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></code></pre></div>
-<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<table class="table table">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
 </caption>
@@ -664,7 +662,7 @@ Male_SZTPD
 <p>To compare the mean profiles for females and males, we can start with the same syntax we had before and then add a <code>contrast</code> argument. For the sake of illustration, we will use a model contrast here, but for some purposes, a parameter contrast might be more appropriate.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">results4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017s</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, grouping <span class="op">=</span> <span class="va">Gender</span>, contrast <span class="op">=</span> <span class="st">"model"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA:NO, angles = octants(), </span>
 <span class="co">#&gt;     grouping = Gender, contrast = "model")</span>
@@ -686,7 +684,7 @@ Male_SZTPD
 <p>Note that the profile blocks we are used to have been replaced by a contrast block. By default, the contrast is made by subtracting the first level of the grouping variable from the second level (e.g., Male - Female). This provides an indication of the direction of the contrast. We can again generate a table and figure to display the results. Note that, because we used a model contrast, the figure will be a circular figure and not a contrast figure which we will see below. However, we would get a contrast figure if we used a parameter contrast.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span></code></pre></div>
-<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<table class="table table">
 <caption style="font-size: initial !important;">
 Mean-based Structural Summary Statistic Contrasts with 95% CIs
 </caption>
@@ -746,9 +744,9 @@ Male - Female
 <a href="#contrasts-between-measures-in-a-group" class="anchor"></a>Contrasts between measures in a group</h3>
 <p>Comparing measures in a group is very similar. Again, all we need to do is add the <code>contrast</code> argument to the function call containing <code>measures</code>. Here we will use a parameter contrast to see what they look like.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">results5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span>,
+<code class="sourceCode R"><span class="va">results5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span>,
   contrast <span class="op">=</span> <span class="st">"test"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
 <span class="co">#&gt;     measures = c(NARPD, ASPD), contrast = "test")</span>
@@ -769,7 +767,7 @@ Male - Female
 <span class="co">#&gt; Model Fit         0.007</span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span></code></pre></div>
-<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<table class="table table">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistic Contrasts with 95% CIs
 </caption>
@@ -832,7 +830,7 @@ ASPD - NARPD
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">results6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="va">BORPD</span>, 
   grouping <span class="op">=</span> <span class="va">Gender</span>, contrast <span class="op">=</span> <span class="st">"test"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
 <span class="co">#&gt;     measures = BORPD, grouping = Gender, contrast = "test")</span>
@@ -853,7 +851,7 @@ ASPD - NARPD
 <span class="co">#&gt; Model Fit        -0.447</span></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></code></pre></div>
-<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<table class="table table">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistic Contrasts with 95% CIs
 </caption>
@@ -1091,7 +1089,7 @@ Compare groups’ correlation profiles
 <span class="va">tab1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">res1</span>, xy <span class="op">=</span> <span class="cn">FALSE</span>, render <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="va">tab2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">res2</span>, xy <span class="op">=</span> <span class="cn">FALSE</span>, render <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/ssm_append.html">ssm_append</a></span><span class="op">(</span><span class="va">tab1</span>, <span class="va">tab2</span><span class="op">)</span></code></pre></div>
-<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<table class="table table">
 <thead><tr>
 <th style="text-align:left;">
 Profile
@@ -1220,13 +1218,11 @@ Male
 
 
       <footer><div class="copyright">
-  <p></p>
-<p>Developed by <a href="https://www.jmgirard.com" class="external-link external-link">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html" class="external-link external-link">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com" class="external-link external-link">Aidan Wright</a>.</p>
+  <p>Developed by <a href="https://www.jmgirard.com">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com">Aidan Wright</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

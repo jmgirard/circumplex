@@ -59,8 +59,6 @@
 
 
 
-
-
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -72,18 +70,9 @@
 
 
 
-<!-- dependencies from examples -->
-
-
-  
-
-  
-
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    
-
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -97,7 +86,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">circumplex</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.8.9000</span>
       </span>
     </div>
 
@@ -105,7 +94,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -185,7 +174,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jmgirard/circumplex">
-    <span class="fas fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -323,48 +312,80 @@ interpersonal problems. <em>Psychological Assessment, 30</em>(5), 594-609.</p>
 #&gt; The CSIP currently has 1 normative data set(s):
 #&gt; 1. 712 American college students
 #&gt; Boudreaux, Ozer, Oltmanns, &amp; Wright (2018)
-#&gt; &lt;https://doi.org/10.1037/pas0000505&gt;</div><div class='input'><span class='fu'><a href='scales.html'>scales</a></span><span class='op'>(</span><span class='va'>csig</span>, items <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; The CSIG contains 8 circumplex scales.
-#&gt; PA: Be authoritative (90 degrees)
-#&gt;     8. We are assertive
-#&gt;     16. We appear confident
-#&gt;     24. We are decisive
-#&gt;     32. They see us as capable
-#&gt; BC: Be tough (135 degrees)
-#&gt;     5. We show that we can be tough
-#&gt;     13. We not appear vulnerable
-#&gt;     21. We are aggressive if necessary
-#&gt;     29. We not show our weaknesses
-#&gt; DE: Be self-protective (180 degrees)
-#&gt;     2. We are the winners in any argument or dispute
-#&gt;     10. We do whatever is in our best interest
-#&gt;     18. We are better than them
-#&gt;     26. We keep our guard up
-#&gt; FG: Be wary (225 degrees)
-#&gt;     7. We let them fend for themselves
-#&gt;     15. They stay out of our business
-#&gt;     23. We not trust them
-#&gt;     31. We not get entangled in their affairs
-#&gt; HI: Be conflict-avoidant (270 degrees)
-#&gt;     4. We avoid conflict
-#&gt;     12. They not get angry with us
-#&gt;     20. We not get into arguments
-#&gt;     28. We not make them angry
-#&gt; JK: Be cooperative (315 degrees)
-#&gt;     1. We are friendly
-#&gt;     9. We celebrate their achievements
-#&gt;     17. They feel we are all on the same team
-#&gt;     25. We are cooperative
-#&gt; LM: Be understanding (360 degrees)
-#&gt;     6. We appreciate what they have to offer
-#&gt;     14. We understand their point of view
-#&gt;     22. We show concern for their welfare
-#&gt;     30. We are able to compromise
-#&gt; NO: Be respected (45 degrees)
-#&gt;     3. They respect what we have to say
-#&gt;     11. We get the chance to express our views
-#&gt;     19. They listen to what we have to say
-#&gt;     27. They see us as responsible</div></pre>
+#&gt; &lt;https://doi.org/10.1037/pas0000505&gt;</div><div class='input'><span class='fu'><a href='scales.html'>scales</a></span><span class='op'>(</span><span class='va'>csip</span>, items <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; The CSIP contains 8 circumplex scales.
+#&gt; PA: Domineering (90 degrees)
+#&gt;     1. Bossing around other people too much
+#&gt;     9. Verbally or physically abusing others
+#&gt;     17. Starting arguments and conflicts with others
+#&gt;     25. Trying to influence or control other people too much
+#&gt;     33. Dominating or intimidating others
+#&gt;     41. Acting aggressively toward others
+#&gt;     49. Manipulating other people to get what I want
+#&gt;     57. Acting superior or condescending toward others
+#&gt; BC: Self-Centered (135 degrees)
+#&gt;     2. Acting rude and inconsiderate toward others
+#&gt;     10. Acting selfishly with others
+#&gt;     18. Being unable to feel guilt or remorse
+#&gt;     26. Lacking respect for other people's beliefs, attitudes, or opinions
+#&gt;     34. Having trouble getting along with others
+#&gt;     42. Being insensitive to the thoughts, feelings, and needs of others
+#&gt;     50. Disliking most people
+#&gt;     58. Having trouble giving emotional or moral support to others
+#&gt; DE: Distant (180 degrees)
+#&gt;     3. Pushing away from other people who get too close
+#&gt;     11. Difficulty showing love and affection to others
+#&gt;     19. Being unable to enjoy the company of others
+#&gt;     27. Feeling emotionally disconnected from others
+#&gt;     35. Difficulty developing close and lasting relationships
+#&gt;     43. Being unable to fully connect with others
+#&gt;     51. Difficulty opening up to others
+#&gt;     59. Feeling uncomfortable with being close or intimate with others
+#&gt; FG: Socially Inhibited (225 degrees)
+#&gt;     4. Difficulty making friends
+#&gt;     12. Having trouble fitting in with others
+#&gt;     20. Avoiding people or social situations
+#&gt;     28. Being unable to keep conversations going
+#&gt;     36. Feeling like an outsider in most social situations
+#&gt;     44. Being unable to be myself around others
+#&gt;     52. Feeling fearful or nervous in social situations
+#&gt;     60. Acting shy around others
+#&gt; HI: Nonassertive (270 degrees)
+#&gt;     5. Lacking self-confidence
+#&gt;     13. Getting easily embarrassed in front of others
+#&gt;     21. Difficulty taking the lead
+#&gt;     29. Having trouble asserting myself
+#&gt;     37. Feeling weak and insecure around dominant others
+#&gt;     45. Being unable to stand up to others
+#&gt;     53. Avoiding confrontation when problems arise
+#&gt;     61. Letting other people make decisions too often
+#&gt; JK: Exploitable (315 degrees)
+#&gt;     6. Letting other people boss me around too much
+#&gt;     14. Acting overly submissive with others
+#&gt;     22. Being unable to express anger toward others
+#&gt;     30. Being too concerned about what other people think
+#&gt;     38. Being easily taken advantage of
+#&gt;     46. Compromising with other people too much
+#&gt;     54. Being easily influenced by others
+#&gt;     62. Being unable to say 'no'
+#&gt; LM: Self-Sacrificing (360 degrees)
+#&gt;     7. Putting other people's needs before my own too much
+#&gt;     15. Giving too much to others
+#&gt;     23. Forgiving people too easily
+#&gt;     31. Being overly sentimental or tender-hearted
+#&gt;     39. Being easily affected by the pain and suffering of others
+#&gt;     47. Trusting people too easily
+#&gt;     55. Trying to solve other people's problems too much
+#&gt;     63. Getting too attached to others
+#&gt; NO: Intrusive (45 degrees)
+#&gt;     8. Being overly affectionate with others
+#&gt;     16. Difficulty keeping personal matters private from others
+#&gt;     24. Talking too much
+#&gt;     32. Flirting with other people too much
+#&gt;     40. Having trouble respecting other people's privacy
+#&gt;     48. Exaggerating so that other people will respect me
+#&gt;     56. Confronting people too quickly about problems
+#&gt;     64. Needing to be the center of attention</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -376,11 +397,11 @@ interpersonal problems. <em>Psychological Assessment, 30</em>(5), 594-609.</p>
 
       <footer>
       <div class="copyright">
-  <p><p>Developed by <a href="https://www.jmgirard.com" class="external-link">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html" class="external-link">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com" class="external-link">Aidan Wright</a>.</p></p>
+  <p>Developed by <a href='https://www.jmgirard.com'>Jeffrey Girard</a>, <a href='https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html'>Johannes Zimmermann</a>, <a href='https://www.personalityprocesses.com'>Aidan Wright</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
@@ -405,8 +426,6 @@ interpersonal problems. <em>Psychological Assessment, 30</em>(5), 594-609.</p>
 </script>
 
 
-
-  
 
   </body>
 </html>

@@ -23,6 +23,6 @@ Information about the Circumplex Scales of Interpersonal Problems (CSIP).
 \examples{
 instrument("csip")
 summary(csip)
-scales(csig, items = TRUE)
+scales(csip, items = TRUE)
 }
 \keyword{datasets}

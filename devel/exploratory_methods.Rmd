@@ -1,0 +1,96 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(circumplex)
+library(psych)
+```
+
+```{r}
+dat <- 
+  jz2017 %>% 
+  select(PA:NO) %>% 
+  mutate(across(everything(), ~scale(.)[, 1])) %>% 
+  print()
+```
+
+```{r}
+fa.parallel(dat, fa = "pc")
+```
+
+```{r}
+pca3 <- psych::pca(dat, nfactors = 3, rotate = "none")
+print(pca3)
+loadings <- 
+  pca3$loadings[1:8,] %>% 
+  as_tibble(rownames = "scale") %>% 
+  mutate(veclen = sqrt(PC2^2 + PC3^2)) %>% 
+  print()
+circle <- tibble(
+  x0 = mean(loadings$PC3), 
+  y0 = mean(loadings$PC2), 
+  r = mean(loadings$veclen)
+)
+ggplot(loadings) +
+  ggforce::geom_circle(
+    data = circle, 
+    aes(x0 = x0, y0 = y0, r = r),
+    size = 1,
+    color = "grey60"
+  ) +
+  geom_hline(
+    yintercept = circle$y0, 
+    size = 1, 
+    color = "grey60"
+  ) +
+  geom_vline(
+    xintercept = circle$x0, 
+    size = 1, 
+    color = "grey60"
+  ) +
+  geom_polygon(aes(x = PC3, y = PC2), alpha = 0.5) +
+  geom_point(aes(x = PC3, y = PC2), size = 2, shape = 21) +
+  ggrepel::geom_label_repel(
+    aes(label = scale, x = PC3, y = PC2),
+    nudge_x = c(0, -.2, -.2, -.2, 0, .2, .2, .2),
+    nudge_y = c(.2, .2, 0, -.2, -.2, -.2, 0, .2)
+  ) +
+  coord_fixed(xlim = c(-1, 1), ylim =c(-1, 1))
+```
+
+```{r}
+hyp <- matrix(
+  c(1, 0.7071068, 0, -0.7071068, -1, -0.7071068, 0, 0.7071068, 
+    0, -0.7071068, -1, -0.7071068, 0, 0.7071068, 1, 0.7071068), 
+  ncol = 2) %>% print()
+Procrustes(l)
+```
+
+## MDS / SSA
+
+```{r}
+rmat <- cor(dat) %>% print(digits = 2)
+dmat <- psych::cor2dist(rmat) %>% print(digits = 2)
+```
+
+```{r}
+mds1 <- MASS::isoMDS(d = dmat, k = 1)
+mds2 <- MASS::isoMDS(d = dmat, k = 2)
+mds3 <- MASS::isoMDS(d = dmat, k = 3)
+c(
+  k1 = mds1$stress, 
+  k2 = mds2$stress, 
+  k3 = mds3$stress
+) %>% round(5)
+mds2$points %>%
+  magrittr::set_colnames(c("V1", "V2")) %>% 
+  as_tibble(rownames = "Scale") %>% 
+  ggplot(aes(x = V2, y = V1*-1)) + 
+  geom_point() +
+  geom_text(aes(label = Scale)) +
+  coord_fixed()
+```
+
