@@ -94,7 +94,7 @@ score <- function(.data, items, instrument, na.rm = TRUE, prefix = "", suffix = 
     }
     scores <- item_data %>%
       dplyr::transmute(!!new_name := rowMeans(item_data[, item_nums], na.rm)) %>% 
-      dplyr::mutate_all(~dplyr::na_if(., "NaN"))
+      dplyr::mutate_all(~dplyr::na_if(., NaN))
     .data <- dplyr::bind_cols(.data, scores)
   }
   .data
