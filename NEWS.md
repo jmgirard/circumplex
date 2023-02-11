@@ -1,5 +1,9 @@
 # circumplex (development version)
 
+## Minor improvements and fixes
+
+* Fixed a bug related to `NaN` values and `dplyr::na_if()`
+
 # circumplex 0.3.8
 
 ## Minor improvements and fixes
