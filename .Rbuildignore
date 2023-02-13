@@ -16,3 +16,4 @@
 ^pkgdown$
 ^\.covrignore$
 ^README\.md$
+^CRAN-SUBMISSION$
