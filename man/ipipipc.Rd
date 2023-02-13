@@ -24,4 +24,4 @@ instrument("ipipipc")
 summary(ipipipc)
 scales(ipipipc, items = TRUE)
 }
-\keyword{datasets}
+\keyword{internal}

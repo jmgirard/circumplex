@@ -26,4 +26,4 @@ instrument("csie")
 summary(csie)
 scales(csie, items = TRUE)
 }
-\keyword{datasets}
+\keyword{internal}

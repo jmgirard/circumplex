@@ -1,5 +1,4 @@
 url: http://circumplex.jmgirard.com/
-
 authors:
   Jeffrey Girard:
     href: https://www.jmgirard.com
@@ -7,7 +6,6 @@ authors:
     href: https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html
   Aidan Wright:
     href: https://www.personalityprocesses.com
-
 template:
   bootstrap: 5
   params:
@@ -15,98 +13,96 @@ template:
     docsearch:
       api_key: ec4004481ba8d410e8e20c9e90fa5e60
       index_name: circumplex
-
 development:
   mode: auto
-
 reference:
-  - title: Instrument Functions
-    desc: Functions for importing and examining circumplex instruments
-    contents:
-      - instruments
-      - instrument
-      - scales
-      - anchors
-      - items
-      - norms
-  - title: Tidying Functions
-    desc: Functions for preparing data for analysis
-    contents:
-      - ipsatize
-      - score
-      - standardize
-  - title: Primary SSM Functions
-    desc: Functions for implementing the Structural Summary Method
-    contents: 
-      - ssm_analyze
-      - ssm_table
-      - ssm_plot
-      - ssm_parameters
-      - ssm_score
-  - title: Secondary SSM Functions
-    desc: Functions for customizing SSM results
-    contents:
-      - ssm_append
-      - ssm_plot_circle
-      - ssm_plot_contrast
-      - html_render
-  - title: Convenience Functions
-    desc: Functions that make your life easier
-    contents:
-      - octants
-      - poles
-      - quadrants
-  - title: Example Data
-    contents:
-      - aw2009
-      - jz2017
-      - raw_iipsc
-
+- title: Instrument Functions
+  desc: Functions for importing and examining circumplex instruments
+  contents:
+  - instruments
+  - instrument
+  - scales
+  - anchors
+  - items
+  - norms
+- title: Tidying Functions
+  desc: Functions for preparing data for analysis
+  contents:
+  - ipsatize
+  - score
+  - standardize
+- title: Primary SSM Functions
+  desc: Functions for implementing the Structural Summary Method
+  contents:
+  - ssm_analyze
+  - ssm_table
+  - ssm_plot
+  - ssm_parameters
+  - ssm_score
+- title: Secondary SSM Functions
+  desc: Functions for customizing SSM results
+  contents:
+  - ssm_append
+  - ssm_plot_circle
+  - ssm_plot_contrast
+  - html_render
+- title: Convenience Functions
+  desc: Functions that make your life easier
+  contents:
+  - octants
+  - poles
+  - quadrants
+- title: Example Data
+  contents:
+  - aw2009
+  - jz2017
+  - raw_iipsc
 navbar:
-  title: "circumplex"
+  title: circumplex
   left:
-    - icon: fa-home fa-lg
-      href: index.html
-    - text: Reference
-      href: reference/index.html
-    - text: Instruments
-      menu:
-      - text: Circumplex Scales of Interpersonal Efficacy
-        href: reference/csie.html
-      - text: Circumplex Scales of Intergroup Goals
-        href: reference/csig.html
-      - text: Circumplex Scales of Interpersonal Problems
-        href: reference/csip.html
-      - text: Circumplex Scales of Interpersonal Values
-        href: reference/csiv.html
-      - text: Interpersonal Goals Inventory for Children, Revised Version
-        href: reference/igicr.html
-      - text: Inventory of Interpersonal Problems, Brief Version
-        href: reference/iip32.html
-      - text: Inventory of Interpersonal Problems
-        href: reference/iip64.html
-      - text: Inventory of Interpersonal Problems, Short Circumplex
-        href: reference/iipsc.html
-      - text: Inventory of Interpersonal Strengths, Brief Version
-        href: reference/iis32.html
-      - text: Inventory of Interpersonal Strengths
-        href: reference/iis64.html
-      - text: Inventory of Influence Tactics Circumplex
-        href: reference/iitc.html
-      - text: IPIP Interpersonal Circumplex
-        href: reference/ipipipc.html
-      - text: Interpersonal Sensitivities Circumplex
-        href: reference/isc.html
-    - text: Vignettes
-      menu:
-      - text: Using Circumplex Instruments
-        href: articles/using-instruments.html
-      - text: Introduction to SSM Analysis
-        href: articles/introduction-to-ssm-analysis.html
-      - text: Intermediate SSM Analysis
-        href: articles/intermediate-ssm-analysis.html
-    - text: News
-      href: news/index.html
+  - icon: fa-home fa-lg
+    href: index.html
+  - text: Reference
+    href: reference/index.html
+  - text: Instruments
+    menu:
+    - text: Circumplex Scales of Interpersonal Efficacy
+      href: reference/csie.html
+    - text: Circumplex Scales of Intergroup Goals
+      href: reference/csig.html
+    - text: Circumplex Scales of Interpersonal Problems
+      href: reference/csip.html
+    - text: Circumplex Scales of Interpersonal Values
+      href: reference/csiv.html
+    - text: Interpersonal Goals Inventory for Children, Revised Version
+      href: reference/igicr.html
+    - text: Inventory of Interpersonal Problems, Brief Version
+      href: reference/iip32.html
+    - text: Inventory of Interpersonal Problems
+      href: reference/iip64.html
+    - text: Inventory of Interpersonal Problems, Short Circumplex
+      href: reference/iipsc.html
+    - text: Inventory of Interpersonal Strengths, Brief Version
+      href: reference/iis32.html
+    - text: Inventory of Interpersonal Strengths
+      href: reference/iis64.html
+    - text: Inventory of Influence Tactics Circumplex
+      href: reference/iitc.html
+    - text: IPIP Interpersonal Circumplex
+      href: reference/ipipipc.html
+    - text: Interpersonal Sensitivities Circumplex
+      href: reference/isc.html
+  - text: Vignettes
+    menu:
+    - text: Using Circumplex Instruments
+      href: articles/using-instruments.html
+    - text: Introduction to SSM Analysis
+      href: articles/introduction-to-ssm-analysis.html
+    - text: Intermediate SSM Analysis
+      href: articles/intermediate-ssm-analysis.html
+  - text: News
+    href: news/index.html
   right:
-    - icon: fa-github fa-lg
-      href: https://github.com/jmgirard/circumplex
+  - icon: fa-github fa-lg
+    href: https://github.com/jmgirard/circumplex
+

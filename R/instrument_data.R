@@ -7,6 +7,7 @@
 #'   social-cognitive theory. *Personality and Social Psychology Bulletin,
 #'   33*(1), 94-109.
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csie.htm}
+#' @keywords internal
 #' @examples
 #' instrument("csie")
 #' summary(csie)
@@ -21,6 +22,7 @@
 #'   interpersonal circle model of goals for interactions between groups.
 #'   *Personality and Social Psychology Bulletin, 40*(4), 433-449.
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csig.htm}
+#' @keywords internal
 #' @examples
 #' instrument("csig")
 #' summary(csig)
@@ -35,6 +37,7 @@
 #'   (2018). Development and validation of the circumplex scales of
 #'   interpersonal problems. *Psychological Assessment, 30*(5), 594-609.
 #' @source \doi{10.1037/pas0000505}
+#' @keywords internal
 #' @examples
 #' instrument("csip")
 #' summary(csip)
@@ -49,6 +52,7 @@
 #'   Reliability, validity, and applicability to interpersonal problems and
 #'   personality disorders. *Journal of Personality Assessment, 75*(2), 249-267.
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
+#' @keywords internal
 #' @examples
 #' instrument("csiv")
 #' summary(csiv)
@@ -64,6 +68,7 @@
 #'   interpersonal circumplex inventory of children’s social goals. *Assessment,
 #'   20*(1), 98-113.
 #' @source \doi{10.1177/1073191111411672}
+#' @keywords internal
 #' @examples
 #' instrument("igicr")
 #' summary(igicr)
@@ -81,6 +86,7 @@
 #'   (2000). *IIP-64/IIP-32 professional manual.* San Antonio, TX: The
 #'   Psychological Corporation.
 #' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
+#' @keywords internal
 #' @examples
 #' instrument("iip32")
 #' summary(iip32)
@@ -96,6 +102,7 @@
 #'   (2000). *IIP-64/IIP-32 professional manual.* San Antonio, TX: The
 #'   Psychological Corporation.
 #' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
+#' @keywords internal
 #' @examples
 #' instrument("iip64")
 #' summary(iip64)
@@ -110,6 +117,7 @@
 #'   the Inventory of Interpersonal Problems Circumplex Scales. *Assessment,
 #'   2*(1), 53-63.
 #' @source \doi{10.1080/00223890802388665}
+#' @keywords internal
 #' @examples
 #' instrument("iipsc")
 #' summary(iipsc)
@@ -124,6 +132,7 @@
 #'   of interpersonal strengths. *Journal of Personality Assessment, 94*(6),
 #'   638-646.
 #' @source \doi{10.1080/00223891.2012.681818}
+#' @keywords internal
 #' @examples
 #' instrument("iis32")
 #' summary(iis32)
@@ -138,6 +147,7 @@
 #'   a measure of interpersonal strengths: The Inventory of Interpersonal
 #'   Strengths. *Psychological Assessment, 21*(4), 554-569.
 #' @source \doi{10.1037/a0017269}
+#' @keywords internal
 #' @examples
 #' instrument("iis64")
 #' summary(iis64)
@@ -152,6 +162,7 @@
 #'   Validation of the Interpersonal Influence Tactics Circumplex (IIT-C)
 #'   Scales. *Assessment*.
 #' @source \doi{10.1177/1073191119864661}
+#' @keywords internal
 #' @examples
 #' instrument("iitc")
 #' summary(iitc)
@@ -165,6 +176,7 @@
 #' @source Markey, P. M., & Markey, C. N. (2009). A brief assessment of the
 #'   interpersonal circumplex: The IPIP-IPC. *Assessment, 16*(4), 352-361.
 #' @source \doi{10.1177/1073191109340382}
+#' @keywords internal
 #' @examples
 #' instrument("ipipipc")
 #' summary(ipipipc)
@@ -179,6 +191,7 @@
 #'   Lukowitsky, M. R., & Roche, M. J. (2011). The circumplex structure of
 #'   interpersonal sensitivities. *Journal of Personality, 79*(4), 707-740.
 #' @source \doi{10.1111/j.1467-6494.2011.00696.x}
+#' @keywords internal
 #' @examples
 #' instrument("isc")
 #' summary(isc)

@@ -25,4 +25,4 @@ instrument("csiv")
 summary(csiv)
 scales(csiv, items = TRUE)
 }
-\keyword{datasets}
+\keyword{internal}

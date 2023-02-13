@@ -29,6 +29,7 @@ To learn more about circumplex, start with the vignettes:
 Useful links:
 \itemize{
   \item \url{https://github.com/jmgirard/circumplex}
+  \item \url{http://circumplex.jmgirard.com/}
   \item Report bugs at \url{https://github.com/jmgirard/circumplex/issues}
 }
 
@@ -43,3 +44,4 @@ Authors:
 }
 
 }
+\keyword{internal}

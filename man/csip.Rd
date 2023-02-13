@@ -25,4 +25,4 @@ instrument("csip")
 summary(csip)
 scales(csip, items = TRUE)
 }
-\keyword{datasets}
+\keyword{internal}

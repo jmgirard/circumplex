@@ -26,4 +26,4 @@ IIP-64, Mind Garden Inc. has exclusive rights to distribute it in full.
 instrument("iip64")
 summary(iip64)
 }
-\keyword{datasets}
+\keyword{internal}

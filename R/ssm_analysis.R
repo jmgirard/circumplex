@@ -121,10 +121,7 @@ ssm_analyze <- function(.data, scales, angles = octants(), measures = NULL,
   # TODO: Add a flag to flip contrast ordering
 
   # Convert angles from degrees to radians
-  angles <- 
-    angles %>% 
-    as_degree() %>% 
-    as_radian()
+  angles <- as_radian(as_degree(angles))
 
   # Forward to the appropriate subfunction
   if (is_provided(rlang::enquo(measures))) {
@@ -263,9 +260,8 @@ ssm_analyze_means <- function(.data, scales, angles,
     row_data <- bs_output[nrow(bs_output), ]
     row_labels <- sprintf("%s - %s", group_levels[[2]], group_levels[[1]])
   }
-  results <- 
-    row_data %>%
-    dplyr::mutate(label = row_labels)
+  results <- row_data
+  results$label <- row_labels
 
   # Collect analysis details
   details <- list(
@@ -275,7 +271,7 @@ ssm_analyze_means <- function(.data, scales, angles,
     angles = as_degree(angles),
     contrast = contrast,
     score_type = "Mean",
-    results_type = dplyr::if_else(contrast == "none", "Profile", "Contrast")
+    results_type = ifelse(contrast == "none", "Profile", "Contrast")
   )
 
   # Create output ssm object

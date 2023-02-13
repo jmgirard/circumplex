@@ -25,4 +25,4 @@ instrument("csig")
 summary(csig)
 scales(csig, items = TRUE)
 }
-\keyword{datasets}
+\keyword{internal}

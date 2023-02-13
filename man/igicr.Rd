@@ -26,4 +26,4 @@ instrument("igicr")
 summary(igicr)
 scales(igicr, items = TRUE)
 }
-\keyword{datasets}
+\keyword{internal}

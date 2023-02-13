@@ -25,4 +25,4 @@ instrument("iitc")
 summary(iitc)
 scales(iitc, items = TRUE)
 }
-\keyword{datasets}
+\keyword{internal}

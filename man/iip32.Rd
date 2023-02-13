@@ -27,4 +27,4 @@ full.
 instrument("iip32")
 summary(iip32)
 }
-\keyword{datasets}
+\keyword{internal}

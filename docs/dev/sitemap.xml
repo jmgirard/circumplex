@@ -1,144 +1,186 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://circumplex.jmgirard.com/index.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/anchors.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/articles/intermediate-ssm-analysis.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/aw2009.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/articles/introduction-to-ssm-analysis.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/circumplex-package.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/articles/using-instruments.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/csie.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/authors.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/csig.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/CODE_OF_CONDUCT.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/csip.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/CONTRIBUTING.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/csiv.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/index.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ggsave.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/ISSUE_TEMPLATE.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/html_render.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/igicr.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/news/index.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/iip32.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/anchors.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/iip64.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/aw2009.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/iipsc.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/circumplex-package.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/iis32.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/csie.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/iis64.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/csig.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/iitc.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/csip.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/instrument.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/csiv.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/instruments.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/fit_fisher.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ipipipc.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/fit_gap.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ipsatize.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/fit_randall.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/isc.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/fit_rt.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/items.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/fit_vt.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/jz2017.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ggsave.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/mutate.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/html_render.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/norms.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/igicr.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/octants.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/iip32.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/pipe.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/iip64.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/poles.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/iipsc.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/quadrants.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/iis32.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/raw_iipsc.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/iis64.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/scales.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/iitc.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/score.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/select.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/instrument.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ssm_analyze.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/instruments.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ssm_append.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ipipipc.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ssm_parameters.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ipsatize.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ssm_plot.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/isc.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ssm_plot_circle.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/items.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ssm_plot_contrast.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/jz2017.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ssm_score.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/mutate.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/ssm_table.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/norms.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/standardize.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/octants.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/reference/tidyeval.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/pipe.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/articles/intermediate-ssm-analysis.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/poles.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/articles/introduction-to-ssm-analysis.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/quadrants.html</loc>
   </url>
   <url>
-    <loc>https://circumplex.jmgirard.com/articles/using-instruments.html</loc>
+    <loc>http://circumplex.jmgirard.com/dev/reference/raw_iipsc.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/scales.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/score.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/select.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ssm_analyze.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ssm_append.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ssm_parameters.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ssm_score.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ssm_table.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/standardize.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/tidyeval.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/SUPPORT.html</loc>
   </url>
 </urlset>

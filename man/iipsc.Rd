@@ -25,4 +25,4 @@ Information about the Inventory of Interpersonal Problems Short Circumplex
 instrument("iipsc")
 summary(iipsc)
 }
-\keyword{datasets}
+\keyword{internal}

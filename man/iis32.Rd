@@ -26,4 +26,4 @@ instrument("iis32")
 summary(iis32)
 scales(iis32, items = TRUE)
 }
-\keyword{datasets}
+\keyword{internal}

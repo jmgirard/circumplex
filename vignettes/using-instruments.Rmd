@@ -11,8 +11,9 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-```{r setup}
+```{r setup, message=FALSE}
 library(circumplex)
+library(dplyr)
 ```
 
 

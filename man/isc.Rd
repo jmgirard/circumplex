@@ -25,4 +25,4 @@ instrument("isc")
 summary(isc)
 scales(isc, items = TRUE)
 }
-\keyword{datasets}
+\keyword{internal}
