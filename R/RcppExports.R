@@ -2,42 +2,42 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 angle_mean <- function(x) {
-    .Call('_circumplex_angle_mean', PACKAGE = 'circumplex', x)
+    .Call(`_circumplex_angle_mean`, x)
 }
 
 angle_dev <- function(theta, xv) {
-    .Call('_circumplex_angle_dev', PACKAGE = 'circumplex', theta, xv)
+    .Call(`_circumplex_angle_dev`, theta, xv)
 }
 
 angle_median <- function(x) {
-    .Call('_circumplex_angle_median', PACKAGE = 'circumplex', x)
+    .Call(`_circumplex_angle_median`, x)
 }
 
 compare_pi <- function(x) {
-    .Call('_circumplex_compare_pi', PACKAGE = 'circumplex', x)
+    .Call(`_circumplex_compare_pi`, x)
 }
 
 ssm_parameters_cpp <- function(scores, angles) {
-    .Call('_circumplex_ssm_parameters_cpp', PACKAGE = 'circumplex', scores, angles)
+    .Call(`_circumplex_ssm_parameters_cpp`, scores, angles)
 }
 
 group_parameters <- function(scores, angles) {
-    .Call('_circumplex_group_parameters', PACKAGE = 'circumplex', scores, angles)
+    .Call(`_circumplex_group_parameters`, scores, angles)
 }
 
 col_means <- function(x) {
-    .Call('_circumplex_col_means', PACKAGE = 'circumplex', x)
+    .Call(`_circumplex_col_means`, x)
 }
 
 mean_scores <- function(cs, grp, lwd) {
-    .Call('_circumplex_mean_scores', PACKAGE = 'circumplex', cs, grp, lwd)
+    .Call(`_circumplex_mean_scores`, cs, grp, lwd)
 }
 
 pairwise_r <- function(x, y) {
-    .Call('_circumplex_pairwise_r', PACKAGE = 'circumplex', x, y)
+    .Call(`_circumplex_pairwise_r`, x, y)
 }
 
 corr_scores <- function(cs, mv, grp, lwd) {
-    .Call('_circumplex_corr_scores', PACKAGE = 'circumplex', cs, mv, grp, lwd)
+    .Call(`_circumplex_corr_scores`, cs, mv, grp, lwd)
 }
 
