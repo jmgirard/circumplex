@@ -18,9 +18,12 @@
 #' To learn more about circumplex, start with the vignettes:
 #' `browseVignettes(package = "circumplex")`
 #'
-#' @useDynLib circumplex, .registration = TRUE
 #' @importFrom assertthat assert_that is.flag is.number is.count is.string
-#' @importFrom Rcpp sourceCpp
 #' @importFrom stats cor quantile sd var
 #' @keywords internal
 "_PACKAGE"
+
+## usethis namespace: start
+#' @importFrom Rcpp sourceCpp
+## usethis namespace: end
+NULL

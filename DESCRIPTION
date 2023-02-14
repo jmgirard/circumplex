@@ -39,7 +39,7 @@ Imports:
     htmlTable (>= 1.13.3),
     magrittr (>= 1.5),
     purrr (>= 0.3.4),
-    Rcpp (>= 1.0.3),
+    Rcpp,
     rlang (>= 0.4.11),
     stats,
     tibble (>= 3.0.0),
@@ -55,8 +55,8 @@ Suggests:
     testthat (>= 3.0.0),
     vdiffr
 LinkingTo: 
-    Rcpp (>= 1.0.3),
-    RcppArmadillo (>= 0.9)
+    Rcpp,
+    RcppArmadillo (>= 0.11)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
