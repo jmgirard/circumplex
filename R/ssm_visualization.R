@@ -551,7 +551,7 @@ html_render <- function(df, caption = NULL, align = "l", ...) {
 #' @param pointsize An optional size for the points at the scale scores.
 #' @param ... Arguments passed on (currently unused)
 #' @export
-ssm_plot_scores <- function(x, ...) {
+ssm_plot_scores <- function(x, amin = NULL, amax = NULL, angle_labels = NULL, linewidth = 1, pointsize = 3, ...) {
   UseMethod("ssm_plot_scores")
 }
 
@@ -562,7 +562,8 @@ ssm_plot_scores.circumplex_ssm <- function(x,
                                            amax = NULL,
                                            angle_labels = NULL,
                                            linewidth = 1,
-                                           pointsize = 3) {
+                                           pointsize = 3,
+                                           ...) {
   
   # Get scores from SSM object
   scores <- x$scores
@@ -619,11 +620,12 @@ ssm_plot_scores.data.frame <- function(x,
                                        amax = NULL,
                                        angle_labels = NULL,
                                        linewidth = 1,
-                                       pointsize = 3) {
+                                       pointsize = 3,
+                                       ...) {
   
-  if (!is_enquo(group)) {
-    x$group <- "All"
-    group <- "group"
+  if (!is_provided(group)) {
+    x$Group <- as.character(1:nrow(x))
+    group <- rlang::quo(Group)
   }
   # Get scores from SSM object
   scores <- dplyr::select(x, {{group}}, {{scales}})
