@@ -541,6 +541,12 @@ html_render <- function(df, caption = NULL, align = "l", ...) {
 #' containing scale scores or the result of \code{ssm_analyze()}.
 #'
 #' @param x A dataframe or ssm result object.
+#' @param scales Which variables in the dataframe contain the circumplex scales?
+#'   Can be omitted if `x` is an ssm result object.
+#' @param angles What are the angles (in degrees) of each scale? Can be omitted
+#'   if `x` is an ssm result object.
+#' @param group Which variable labels each row's group? Can be omitted if `x` is
+#'   an ssm result object.
 #' @param amin An optional number to set as the minimum amplitude (center of
 #'   circle). If set to `NULL`, will try to detect a reasonable value.
 #' @param amax An optional number to set as the maximum amplitude (outer ring of
@@ -550,6 +556,7 @@ html_render <- function(df, caption = NULL, align = "l", ...) {
 #' @param linewidth An optional width for the lines of the profile polygons.
 #' @param pointsize An optional size for the points at the scale scores.
 #' @param ... Arguments passed on (currently unused)
+#' @return A spider/radar plot object
 #' @export
 ssm_plot_scores <- function(x, amin = NULL, amax = NULL, angle_labels = NULL, linewidth = 1, pointsize = 3, ...) {
   UseMethod("ssm_plot_scores")

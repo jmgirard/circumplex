@@ -4,12 +4,18 @@
 \alias{ssm_plot_scores}
 \title{Create a spider/radar plot of circumplex scores}
 \usage{
-ssm_plot_scores(x, ...)
+ssm_plot_scores(
+  x,
+  amin = NULL,
+  amax = NULL,
+  angle_labels = NULL,
+  linewidth = 1,
+  pointsize = 3,
+  ...
+)
 }
 \arguments{
 \item{x}{A dataframe or ssm result object.}
-
-\item{...}{Arguments passed on (currently unused)}
 
 \item{amin}{An optional number to set as the minimum amplitude (center of
 circle). If set to \code{NULL}, will try to detect a reasonable value.}
@@ -23,6 +29,20 @@ circle at each angle. Must be the same length as the number of angles.}
 \item{linewidth}{An optional width for the lines of the profile polygons.}
 
 \item{pointsize}{An optional size for the points at the scale scores.}
+
+\item{...}{Arguments passed on (currently unused)}
+
+\item{scales}{Which variables in the dataframe contain the circumplex scales?
+Can be omitted if \code{x} is an ssm result object.}
+
+\item{angles}{What are the angles (in degrees) of each scale? Can be omitted
+if \code{x} is an ssm result object.}
+
+\item{group}{Which variable labels each row's group? Can be omitted if \code{x} is
+an ssm result object.}
+}
+\value{
+A spider/radar plot object
 }
 \description{
 Create a spider/radar plot of circumplex scores, either from a data frame
