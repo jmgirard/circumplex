@@ -534,6 +534,22 @@ html_render <- function(df, caption = NULL, align = "l", ...) {
 }
 
 # S3 Generic
+
+#' Create a spider/radar plot of circumplex scores
+#'
+#' Create a spider/radar plot of circumplex scores, either from a data frame
+#' containing scale scores or the result of \code{ssm_analyze()}.
+#'
+#' @param x A dataframe or ssm result object.
+#' @param amin An optional number to set as the minimum amplitude (center of
+#'   circle). If set to `NULL`, will try to detect a reasonable value.
+#' @param amax An optional number to set as the maximum amplitude (outer ring of
+#'   circle). If set set to `NULL`, will try to detect a reasonable value.
+#' @param angle_labels An optional character vector to display outside the
+#'   circle at each angle. Must be the same length as the number of angles.
+#' @param linewidth An optional width for the lines of the profile polygons.
+#' @param pointsize An optional size for the points at the scale scores.
+#' @param ... Arguments passed on (currently unused)
 #' @export
 ssm_plot_scores <- function(x, ...) {
   UseMethod("ssm_plot_scores")
@@ -541,7 +557,7 @@ ssm_plot_scores <- function(x, ...) {
 
 #' @method ssm_plot_scores circumplex_ssm
 #' @export
-ssm_plot_scores.circumplex_ssm <- function(.ssm_object,
+ssm_plot_scores.circumplex_ssm <- function(x,
                                            amin = NULL, 
                                            amax = NULL,
                                            angle_labels = NULL,
@@ -549,7 +565,7 @@ ssm_plot_scores.circumplex_ssm <- function(.ssm_object,
                                            pointsize = 3) {
   
   # Get scores from SSM object
-  scores <- .ssm_object$scores
+  scores <- x$scores
   # Reshape scores for plotting
   scores_long <- tidyr::pivot_longer(
     scores, 
@@ -558,7 +574,7 @@ ssm_plot_scores.circumplex_ssm <- function(.ssm_object,
     values_to = "Score"
   )
   # Get angles from SSM object
-  angles <- .ssm_object$details$angles
+  angles <- x$details$angles
   if (is.null(amin)) amin <- pretty_min(scores_long$Score)
   if (is.null(amax)) amax <- pretty_max(scores_long$Score)
   scores_long$Angle <- rep(angles, times = nrow(scores_long) / length(angles))
@@ -595,7 +611,7 @@ ssm_plot_scores.circumplex_ssm <- function(.ssm_object,
 
 #' @method ssm_plot_scores data.frame
 #' @export
-ssm_plot_scores.data.frame <- function(.data, 
+ssm_plot_scores.data.frame <- function(x, 
                                        scales, 
                                        angles = octants(),
                                        group = NULL,
@@ -606,11 +622,11 @@ ssm_plot_scores.data.frame <- function(.data,
                                        pointsize = 3) {
   
   if (!is_enquo(group)) {
-    .data$group <- "All"
+    x$group <- "All"
     group <- "group"
   }
   # Get scores from SSM object
-  scores <- dplyr::select(.data, {{group}}, {{scales}})
+  scores <- dplyr::select(x, {{group}}, {{scales}})
   # Reshape scores for plotting
   scores_long <- tidyr::pivot_longer(
     scores, 

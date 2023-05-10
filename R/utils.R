@@ -66,7 +66,7 @@ pretty_max <- function(v) {
   if (sum(match) >= 1) {
     out <- options[match][[1]]
   } else {
-    out <- amax
+    out <- amax * scalar
   }
   out
 }
@@ -93,7 +93,7 @@ pretty_min <- function(v) {
     candidates <- options[match]
     out <- candidates[length(candidates)]
   } else {
-    out <- amin
+    out <- amin * scalar
   }
   out
 }

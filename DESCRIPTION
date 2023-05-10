@@ -41,6 +41,7 @@ Imports:
     purrr (>= 0.3.4),
     Rcpp,
     rlang (>= 0.4.11),
+    scales,
     stats,
     tibble (>= 3.0.0),
     tidyr (>= 1.0.0)

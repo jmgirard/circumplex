@@ -8,9 +8,9 @@ test_that("Percentages are converted to strings properly", {
 test_that("pretty max outputs the correct values", {
   expect_warning(pretty_max(NA))
   expect_equal(pretty_max(0), 0.05)
-  expect_equal(pretty_max(1), 1.25)
-  expect_equal(pretty_max(2.4), 2.5)
-  expect_equal(pretty_max(5), 8)
+  expect_equal(pretty_max(1), 2)
+  expect_equal(pretty_max(2.4), 4)
+  expect_equal(pretty_max(5), 7.5)
 })
 
 test_that("angle convenience functions work", {
