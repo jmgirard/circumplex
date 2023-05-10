@@ -301,7 +301,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
 }
 
 # Create an Empty Circular Plot
-circle_base <- function(angles, labels = NULL,
+circle_base <- function(angles, labels = NULL, amin = 0,
                         amax = 0.5, fontsize = 12) {
   
   if (is.null(labels)) labels <- sprintf("%d\u00B0", angles)
@@ -344,7 +344,7 @@ circle_base <- function(angles, labels = NULL,
         y = 0,
         label = sprintf(
           "%.2f",
-          seq(from = 0, to = amax, length.out = 6)[c(3, 5)]
+          seq(from = amin, to = amax, length.out = 6)[c(3, 5)]
         )
       ),
       color = "gray20",
@@ -531,4 +531,123 @@ html_render <- function(df, caption = NULL, align = "l", ...) {
     ...
   )
   print(t, type = "html")
+}
+
+# S3 Generic
+#' @export
+ssm_plot_scores <- function(x, ...) {
+  UseMethod("ssm_plot_scores")
+}
+
+#' @method ssm_plot_scores circumplex_ssm
+#' @export
+ssm_plot_scores.circumplex_ssm <- function(.ssm_object,
+                                           amin = NULL, 
+                                           amax = NULL,
+                                           angle_labels = NULL,
+                                           linewidth = 1,
+                                           pointsize = 3) {
+  
+  # Get scores from SSM object
+  scores <- .ssm_object$scores
+  # Reshape scores for plotting
+  scores_long <- tidyr::pivot_longer(
+    scores, 
+    cols = -c("Group", "Measure", "label"),
+    names_to = "Scale",
+    values_to = "Score"
+  )
+  # Get angles from SSM object
+  angles <- .ssm_object$details$angles
+  if (is.null(amin)) amin <- pretty_min(scores_long$Score)
+  if (is.null(amax)) amax <- pretty_max(scores_long$Score)
+  scores_long$Angle <- rep(angles, times = nrow(scores_long) / length(angles))
+  scores_long$Radian <- as_radian(as_degree(scores_long$Angle))
+  scores_long$pr <- scales::rescale(
+    scores_long$Score, 
+    to = c(0, 5), 
+    from = c(amin, amax)
+  )
+  scores_long$px <- scores_long$pr * cos(scores_long$Radian)
+  scores_long$py <- scores_long$pr * sin(scores_long$Radian)
+  
+  p <- circle_base(
+    angles = angles, 
+    amin = amin,
+    amax = amax,
+    labels = angle_labels
+  )
+  
+  p +
+    ggplot2::geom_polygon(
+      data = scores_long,
+      mapping = ggplot2::aes(x = px, y = py, color = label, linetype = label),
+      fill = NA,
+      linewidth = linewidth
+    ) +
+    ggplot2::geom_point(
+      data = scores_long,
+      mapping = ggplot2::aes(x = px, y = py, color = label),
+      size = pointsize
+    )
+  
+}
+
+#' @method ssm_plot_scores data.frame
+#' @export
+ssm_plot_scores.data.frame <- function(.data, 
+                                       scales, 
+                                       angles = octants(),
+                                       group = NULL,
+                                       amin = NULL, 
+                                       amax = NULL,
+                                       angle_labels = NULL,
+                                       linewidth = 1,
+                                       pointsize = 3) {
+  
+  if (!is_enquo(group)) {
+    .data$group <- "All"
+    group <- "group"
+  }
+  # Get scores from SSM object
+  scores <- dplyr::select(.data, {{group}}, {{scales}})
+  # Reshape scores for plotting
+  scores_long <- tidyr::pivot_longer(
+    scores, 
+    cols = {{scales}},
+    names_to = "Scale",
+    values_to = "Score"
+  )
+  if (is.null(amin)) amin <- pretty_min(scores_long$Score)
+  if (is.null(amax)) amax <- pretty_max(scores_long$Score)
+  scores_long$Angle <- rep(angles, times = nrow(scores_long) / length(angles))
+  scores_long$Radian <- as_radian(as_degree(scores_long$Angle))
+  scores_long$pr <- scales::rescale(
+    scores_long$Score, 
+    to = c(0, 5), 
+    from = c(amin, amax)
+  )
+  scores_long$px <- scores_long$pr * cos(scores_long$Radian)
+  scores_long$py <- scores_long$pr * sin(scores_long$Radian)
+  
+  p <- circle_base(
+    angles = angles, 
+    amin = amin, 
+    amax = amax,
+    labels = angle_labels
+  )
+  
+  p +
+    ggplot2::geom_polygon(
+      data = scores_long,
+      mapping = ggplot2::aes(x = px, y = py, color = {{group}}, linetype = {{group}}),
+      fill = NA,
+      linewidth = linewidth
+    ) +
+    ggplot2::geom_point(
+      data = scores_long,
+      mapping = ggplot2::aes(x = px, y = py, color = {{group}}),
+      size = pointsize
+    )
+  
 }

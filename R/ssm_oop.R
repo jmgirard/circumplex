@@ -172,3 +172,5 @@ summary.circumplex_ssm <- function(object, digits = 3, ...) {
   }
   cat("\n")
 }
+
+

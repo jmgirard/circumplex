@@ -49,15 +49,51 @@ str_percent <- function(x, digits = 2) {
 pretty_max <- function(v) {
   amax <- max(v, na.rm = TRUE)
   options <- c(
+    -5.00, -4.00, -3.00, -2.50, -2.00,
+    -1.50, -1.25, -1.00, -0.75, -0.50,
+    -0.25, -0.20, -0.15, -0.10, -0.05,
+    0,
     0.05, 0.10, 0.15, 0.20, 0.25,
     0.50, 0.75, 1.00, 1.25, 1.50,
     2.00, 2.50, 3.00, 4.00, 5.00
   )
-  match <- options > amax
+  if (amax < 0 ) {
+    scalar <- 0.5
+  } else {
+    scalar <- 1.5
+  }
+  match <- options > amax * scalar
   if (sum(match) >= 1) {
     out <- options[match][[1]]
   } else {
-    out <- ceiling(amax * 1.50)
+    out <- amax
+  }
+  out
+}
+
+# Determine good min amplitude value for circle plot ---------------------------
+pretty_min <- function(v) {
+  amin <- min(v, na.rm = TRUE)
+  options <- c(
+    -5.00, -4.00, -3.00, -2.50, -2.00,
+    -1.50, -1.25, -1.00, -0.75, -0.50,
+    -0.25, -0.20, -0.15, -0.10, -0.05,
+    0,
+    0.05, 0.10, 0.15, 0.20, 0.25,
+    0.50, 0.75, 1.00, 1.25, 1.50,
+    2.00, 2.50, 3.00, 4.00, 5.00
+  )
+  if (amin < 0) {
+    scalar <- 1.5
+  } else {
+    scalar <- 0.5
+  }
+  match <- options < amin * scalar
+  if (sum(match) >= 1) {
+    candidates <- options[match]
+    out <- candidates[length(candidates)]
+  } else {
+    out <- amin
   }
   out
 }
