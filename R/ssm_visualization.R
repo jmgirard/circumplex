@@ -577,7 +577,7 @@ ssm_plot_scores.circumplex_ssm <- function(x,
   # Reshape scores for plotting
   scores_long <- tidyr::pivot_longer(
     scores, 
-    cols = -c("Group", "Measure", "label"),
+    cols = dplyr::where(is.numeric),
     names_to = "Scale",
     values_to = "Score"
   )
