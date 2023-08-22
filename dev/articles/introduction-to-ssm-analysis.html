@@ -34,7 +34,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.3.8.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.3.10.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -159,8 +159,9 @@ interpersonal behaviors are associated with a trait (e.g.,
 extraversion).</p>
 <pre><code><span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
-<span><span class="co">#&gt; Warning: Using the `size` aesthetic in this geom was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` in the `default_aes` field and elsewhere instead.</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/model-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -177,7 +178,10 @@ that a cosine curve makes sense in this case. First, we can examine the
 scores with a bar chart ignoring the circular relationship among
 them.</p>
 <pre><code><span><span class="co">#&gt; Warning: The `size` argument of `element_line()` is deprecated as of ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `linewidth` argument instead.</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `linewidth` argument instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/column-1.png" width="100%"></p>
 <p>Next, we can leverage the fact that these subscales have specific
 angular displacements in the circumplex model (and that 0 and 360
@@ -265,8 +269,9 @@ can be accessed using the <code><a href="../reference/jz2017.html">?jz2017</a></
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 1,156 more rows, and 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,156 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;, HISPD &lt;int&gt;, NARPD &lt;int&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</span></span></span></code></pre></div>
 <p>The circumplex scales in <code>jz2017</code> come from the Inventory
 of Interpersonal Problems - Short Circumplex (IIP-SC). These scales can
 be arranged into the following circular model, which is organized around
@@ -327,10 +332,10 @@ scales. Here, we will use normative data for the IIP-SC by loading the
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 1,156 more rows, and 15 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   HISPD &lt;int&gt;, NARPD &lt;int&gt;, AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;, PA_z &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   BC_z &lt;dbl&gt;, DE_z &lt;dbl&gt;, FG_z &lt;dbl&gt;, HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   NO_z &lt;dbl&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,156 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 15 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;, HISPD &lt;int&gt;, NARPD &lt;int&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;, PA_z &lt;dbl&gt;, BC_z &lt;dbl&gt;, DE_z &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   FG_z &lt;dbl&gt;, HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;, NO_z &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>Now we can use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function to perform the
 SSM analysis. The first three arguments are the same as the first three
 arguments to <code><a href="../reference/standardize.html">standardize()</a></code>. We can pass the new

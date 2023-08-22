@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://circumplex.jmgirard.com/dev/CODE_OF_CONDUCT.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/CONTRIBUTING.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/ISSUE_TEMPLATE.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>http://circumplex.jmgirard.com/dev/SUPPORT.html</loc>
+  </url>
+  <url>
     <loc>http://circumplex.jmgirard.com/dev/articles/index.html</loc>
   </url>
   <url>
@@ -16,19 +31,7 @@
     <loc>http://circumplex.jmgirard.com/dev/authors.html</loc>
   </url>
   <url>
-    <loc>http://circumplex.jmgirard.com/dev/CODE_OF_CONDUCT.html</loc>
-  </url>
-  <url>
-    <loc>http://circumplex.jmgirard.com/dev/CONTRIBUTING.html</loc>
-  </url>
-  <url>
     <loc>http://circumplex.jmgirard.com/dev/index.html</loc>
-  </url>
-  <url>
-    <loc>http://circumplex.jmgirard.com/dev/ISSUE_TEMPLATE.html</loc>
-  </url>
-  <url>
-    <loc>http://circumplex.jmgirard.com/dev/LICENSE.html</loc>
   </url>
   <url>
     <loc>http://circumplex.jmgirard.com/dev/news/index.html</loc>
@@ -53,21 +56,6 @@
   </url>
   <url>
     <loc>http://circumplex.jmgirard.com/dev/reference/csiv.html</loc>
-  </url>
-  <url>
-    <loc>http://circumplex.jmgirard.com/dev/reference/fit_fisher.html</loc>
-  </url>
-  <url>
-    <loc>http://circumplex.jmgirard.com/dev/reference/fit_gap.html</loc>
-  </url>
-  <url>
-    <loc>http://circumplex.jmgirard.com/dev/reference/fit_randall.html</loc>
-  </url>
-  <url>
-    <loc>http://circumplex.jmgirard.com/dev/reference/fit_rt.html</loc>
-  </url>
-  <url>
-    <loc>http://circumplex.jmgirard.com/dev/reference/fit_vt.html</loc>
   </url>
   <url>
     <loc>http://circumplex.jmgirard.com/dev/reference/ggsave.html</loc>
@@ -121,9 +109,6 @@
     <loc>http://circumplex.jmgirard.com/dev/reference/jz2017.html</loc>
   </url>
   <url>
-    <loc>http://circumplex.jmgirard.com/dev/reference/mutate.html</loc>
-  </url>
-  <url>
     <loc>http://circumplex.jmgirard.com/dev/reference/norms.html</loc>
   </url>
   <url>
@@ -148,9 +133,6 @@
     <loc>http://circumplex.jmgirard.com/dev/reference/score.html</loc>
   </url>
   <url>
-    <loc>http://circumplex.jmgirard.com/dev/reference/select.html</loc>
-  </url>
-  <url>
     <loc>http://circumplex.jmgirard.com/dev/reference/ssm_analyze.html</loc>
   </url>
   <url>
@@ -169,6 +151,9 @@
     <loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.html</loc>
   </url>
   <url>
+    <loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_scores.html</loc>
+  </url>
+  <url>
     <loc>http://circumplex.jmgirard.com/dev/reference/ssm_score.html</loc>
   </url>
   <url>
@@ -179,8 +164,5 @@
   </url>
   <url>
     <loc>http://circumplex.jmgirard.com/dev/reference/tidyeval.html</loc>
-  </url>
-  <url>
-    <loc>http://circumplex.jmgirard.com/dev/SUPPORT.html</loc>
   </url>
 </urlset>
