@@ -25,6 +25,7 @@ set.seed(12345)
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Codecov test coverage](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/circumplex?branch=master)
 [![R-CMD-check](https://github.com/jmgirard/circumplex/workflows/R-CMD-check/badge.svg)](https://github.com/jmgirard/circumplex/actions)
+[![R-CMD-check](https://github.com/jmgirard/circumplex/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/circumplex/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by [Jeffrey Girard](https://jmgirard.com/); it was inspired by work from and was developed under advisement from [Johannes Zimmermann](https://www.uni-kassel.de/fb01/institute/institut-fuer-psychologie/fachgebiete/differentielle-psychologie/prof-dr-johannes-zimmermann) and [Aidan Wright](https://www.personalityprocesses.com/). You can learn more about using this package through the vignette articles available on the [package website](https://circumplex.jmgirard.com/) or through `?circumplex`.
