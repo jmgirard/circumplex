@@ -1,5 +1,5 @@
 test_that("Single-group mean-based SSM plot is correct", {
-  skip_if(getRversion() > 4.0)
+  #skip_if(getRversion() > "4.0.0")
   data("aw2009")
   res <- ssm_analyze(aw2009, PA:NO, octants())
   p <- ssm_plot(res)
@@ -7,13 +7,13 @@ test_that("Single-group mean-based SSM plot is correct", {
   # Test the output object
   expect_type(p, "list")
   expect_s3_class(p, "ggplot")
-  vdiffr::expect_doppelganger("single group mean ssm", p, path = "ssm-visualization")
+  vdiffr::expect_doppelganger("single group mean ssm", p)
 
   # TODO: Add tests of transformed data and legend
 })
 
 test_that("Single-group correlation-based SSM plot is correct", {
-  skip_if(getRversion() > 4.0)
+  #skip_if(getRversion() > "4.0.0")
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
   p <- ssm_plot(res)
@@ -21,11 +21,11 @@ test_that("Single-group correlation-based SSM plot is correct", {
   # Test the output object
   expect_type(p, "list")
   expect_s3_class(p, "ggplot")
-  vdiffr::expect_doppelganger("single group correlation ssm", p, path = "ssm-visualization")
+  vdiffr::expect_doppelganger("single group correlation ssm", p)
 })
 
 test_that("Measure-contrast SSM plot is correct", {
-  skip_if(getRversion() > 4.0)
+  #skip_if(getRversion() > "4.0.0")
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     measures = c(ASPD, NARPD),
@@ -36,11 +36,11 @@ test_that("Measure-contrast SSM plot is correct", {
   # Test the output object
   expect_type(p, "list")
   expect_s3_class(p, "ggplot")
-  vdiffr::expect_doppelganger("measure-contrast ssm", p, path = "ssm-visualization")
+  vdiffr::expect_doppelganger("measure-contrast ssm", p)
 })
 
 test_that("Group-contrast correlation-based SSM plot is correct", {
-  skip_if(getRversion() > 4.0)
+  #skip_if(getRversion() > "4.0.0")
   data("jz2017")
   res <- ssm_analyze(jz2017, PA:NO, octants(),
     measures = NARPD,
@@ -51,7 +51,7 @@ test_that("Group-contrast correlation-based SSM plot is correct", {
   # Test the output object
   expect_type(p, "list")
   expect_s3_class(p, "ggplot")
-  vdiffr::expect_doppelganger("group-constrast correlation ssm", p, path = "ssm-visualization")
+  vdiffr::expect_doppelganger("group-constrast correlation ssm", p)
 })
 
 test_that("Removing plots with low fit works as expected", {

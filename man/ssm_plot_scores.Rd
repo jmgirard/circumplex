@@ -30,16 +30,7 @@ circle at each angle. Must be the same length as the number of angles.}
 
 \item{pointsize}{An optional size for the points at the scale scores.}
 
-\item{...}{Arguments passed on (currently unused)}
-
-\item{scales}{Which variables in the dataframe contain the circumplex scales?
-Can be omitted if \code{x} is an ssm result object.}
-
-\item{angles}{What are the angles (in degrees) of each scale? Can be omitted
-if \code{x} is an ssm result object.}
-
-\item{group}{Which variable labels each row's group? Can be omitted if \code{x} is
-an ssm result object.}
+\item{...}{Additional arguments for the S3 methods}
 }
 \value{
 A spider/radar plot object

@@ -1,5 +1,15 @@
 # circumplex (development version)
 
+# circumplex 0.3.10
+
+## Minor improvements and fixes
+
+* Fixed a bug when comparing R versions
+
+* Updated \{vdiffr\} tests
+
+----
+
 # circumplex 0.3.9
 
 ## Minor improvements and fixes

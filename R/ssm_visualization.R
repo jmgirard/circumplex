@@ -147,13 +147,14 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
       ggforce::geom_arc_bar(
         data = df_plot,
         ggplot2::aes(
-          x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
+          x0 = 0, y0 = 0, 
+          r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
           linetype = lnty
         ),
         fill = "cornflowerblue", 
         color = "cornflowerblue", 
         alpha = 0.4,
-        size = 1
+        linewidth = 1
       ) +
       ggplot2::geom_point(
         data = df_plot,
@@ -170,11 +171,12 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
       ggforce::geom_arc_bar(
         data = df_plot,
         ggplot2::aes(
-          x0 = 0, y0 = 0, r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
+          x0 = 0, y0 = 0, 
+          r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
           fill = label, color = label, linetype = lnty
         ),
         alpha = 0.4,
-        size = 1
+        linewidth = 1
       ) +
       ggplot2::geom_point(
         data = df_plot,
@@ -282,14 +284,14 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
       panel.grid.major.x = ggplot2::element_blank(),
       panel.grid.minor.y = ggplot2::element_line(linetype = "dashed")
     ) +
-    ggplot2::geom_hline(yintercept = 0, size = linesize, color = "darkgray") +
+    ggplot2::geom_hline(yintercept = 0, linewidth = linesize, color = "darkgray") +
     ggplot2::geom_point(
       ggplot2::aes(x = Contrast, y = Difference),
       size = linesize * 3, color = color
     ) +
     ggplot2::geom_errorbar(
       ggplot2::aes(x = Contrast, ymin = lci, ymax = uci),
-      size = linesize, color = color, width = 0.1
+      linewidth = linesize, color = color, width = 0.1
     ) +
     ggplot2::labs(y = axislabel) +
     ggplot2::facet_wrap(~Parameter,
@@ -318,7 +320,7 @@ circle_base <- function(angles, labels = NULL, amin = 0,
       ggplot2::aes(x0 = 0, y0 = 0, r = 5),
       color = "gray50",
       fill = "white",
-      size = 1.5
+      linewidth = 1.5
     ) +
     # Draw segments corresponding to displacement scale
     ggplot2::geom_segment(
@@ -329,13 +331,13 @@ circle_base <- function(angles, labels = NULL, amin = 0,
         yend = 5 * sin(angles * pi / 180)
       ),
       color = "gray60",
-      size = 0.5
+      linewidth = 0.5
     ) +
     # Draw circles corresponding to amplitude scale
     ggforce::geom_circle(
       ggplot2::aes(x0 = 0, y0 = 0, r = 1:4),
       color = "gray60",
-      size = 0.5
+      linewidth = 0.5
     ) +
     # Draw labels for amplitude scale
     ggplot2::geom_label(
@@ -541,12 +543,6 @@ html_render <- function(df, caption = NULL, align = "l", ...) {
 #' containing scale scores or the result of \code{ssm_analyze()}.
 #'
 #' @param x A dataframe or ssm result object.
-#' @param scales Which variables in the dataframe contain the circumplex scales?
-#'   Can be omitted if `x` is an ssm result object.
-#' @param angles What are the angles (in degrees) of each scale? Can be omitted
-#'   if `x` is an ssm result object.
-#' @param group Which variable labels each row's group? Can be omitted if `x` is
-#'   an ssm result object.
 #' @param amin An optional number to set as the minimum amplitude (center of
 #'   circle). If set to `NULL`, will try to detect a reasonable value.
 #' @param amax An optional number to set as the maximum amplitude (outer ring of
@@ -555,10 +551,12 @@ html_render <- function(df, caption = NULL, align = "l", ...) {
 #'   circle at each angle. Must be the same length as the number of angles.
 #' @param linewidth An optional width for the lines of the profile polygons.
 #' @param pointsize An optional size for the points at the scale scores.
-#' @param ... Arguments passed on (currently unused)
+#' @param ... Additional arguments for the S3 methods
 #' @return A spider/radar plot object
 #' @export
-ssm_plot_scores <- function(x, amin = NULL, amax = NULL, angle_labels = NULL, linewidth = 1, pointsize = 3, ...) {
+ssm_plot_scores <- function(x, 
+                            amin = NULL, amax = NULL, angle_labels = NULL, 
+                            linewidth = 1, pointsize = 3, ...) {
   UseMethod("ssm_plot_scores")
 }
 
@@ -620,14 +618,14 @@ ssm_plot_scores.circumplex_ssm <- function(x,
 #' @method ssm_plot_scores data.frame
 #' @export
 ssm_plot_scores.data.frame <- function(x, 
-                                       scales, 
-                                       angles = octants(),
-                                       group = NULL,
                                        amin = NULL, 
                                        amax = NULL,
                                        angle_labels = NULL,
                                        linewidth = 1,
                                        pointsize = 3,
+                                       scales, 
+                                       angles = octants(),
+                                       group = NULL,
                                        ...) {
   
   if (!is_provided(group)) {
