@@ -12,7 +12,6 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Codecov test
 coverage](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/circumplex?branch=master)
-[![R-CMD-check](https://github.com/jmgirard/circumplex/workflows/R-CMD-check/badge.svg)](https://github.com/jmgirard/circumplex/actions)
 [![R-CMD-check](https://github.com/jmgirard/circumplex/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/circumplex/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
