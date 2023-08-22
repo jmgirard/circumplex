@@ -45,6 +45,7 @@ reference:
   - ssm_append
   - ssm_plot_circle
   - ssm_plot_contrast
+  - ssm_plot_scores
   - html_render
 - title: Convenience Functions
   desc: Functions that make your life easier
