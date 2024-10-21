@@ -27,8 +27,8 @@ scales(csip, items = TRUE)
 \seealso{
 Other instrument functions: 
 \code{\link{anchors}()},
-\code{\link{instruments}()},
 \code{\link{instrument}()},
+\code{\link{instruments}()},
 \code{\link{items}()},
 \code{\link{norms}()}
 }

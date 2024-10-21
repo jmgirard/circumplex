@@ -24,8 +24,8 @@ items(csip)
 \seealso{
 Other instrument functions: 
 \code{\link{anchors}()},
-\code{\link{instruments}()},
 \code{\link{instrument}()},
+\code{\link{instruments}()},
 \code{\link{norms}()},
 \code{\link{scales}()}
 }

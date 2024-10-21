@@ -23,8 +23,8 @@ anchors(csip)
 }
 \seealso{
 Other instrument functions: 
-\code{\link{instruments}()},
 \code{\link{instrument}()},
+\code{\link{instruments}()},
 \code{\link{items}()},
 \code{\link{norms}()},
 \code{\link{scales}()}

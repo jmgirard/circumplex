@@ -59,6 +59,22 @@
 #' scales(csiv, items = TRUE)
 "csiv"
 
+#' Interpersonal Emotion Inventory
+#'
+#' Information about the Interpersonal Emotion Inventory (IEI).
+#'
+#' @source Horner, M. S., Locke, K. D., & Hulsey, T. L. (in press). Assessing
+#'   affective dimensions of the interpersonal circumplex: development and
+#'   validation of the interpersonal emotion inventory. *Journal of Personality
+#'   Assessment*. Advanced online publication.
+#' @source \doi{10.1080/00223891.2024.2400266}
+#' @keywords internal
+#' @examples
+#' instrument("iei")
+#' summary(iei)
+#' scales(iei, items = TRUE)
+"iei"
+
 #' Interpersonal Goals Inventory for Children, Revised Version
 #'
 #' Information about the Interpersonal Goals Inventory for Children, Revised

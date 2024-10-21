@@ -54,6 +54,7 @@
     <https://doi.org/10.1111/j.1467-6494.2011.00696.x>
     
     The ISC contains 64 items (open-access):
+    Prefix: It bothers me when a person...
     1. Thinks they are my boss
     2. Disregards my feelings
     3. Doesn't show any feelings
@@ -222,6 +223,7 @@
 ---
 
     The ISC contains 64 items (open-access):
+    Prefix: It bothers me when a person...
     1. Thinks they are my boss
     2. Disregards my feelings
     3. Doesn't show any feelings
@@ -313,18 +315,19 @@
 
 # The instruments function produces the expected output
 
-    The circumplex package currently includes 13 instruments:
+    The circumplex package currently includes 14 instruments:
      1. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)
      2. CSIG: Circumplex Scales of Intergroup Goals (csig)
      3. CSIP: Circumplex Scales of Interpersonal Problems (csip)
      4. CSIV: Circumplex Scales of Interpersonal Values (csiv)
-     5. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)
-     6. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)
-     7. IIP-64: Inventory of Interpersonal Problems (iip64)
-     8. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)
-     9. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)
-     10. IIS-64: Inventory of Interpersonal Strengths (iis64)
-     11. IIT-C: Inventory of Influence Tactics Circumplex (iitc)
-     12. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)
-     13. ISC: Interpersonal Sensitivities Circumplex (isc)
+     5. IEI: Interpersonal Emotion Inventory (iei)
+     6. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)
+     7. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)
+     8. IIP-64: Inventory of Interpersonal Problems (iip64)
+     9. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)
+     10. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)
+     11. IIS-64: Inventory of Interpersonal Strengths (iis64)
+     12. IIT-C: Inventory of Influence Tactics Circumplex (iitc)
+     13. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)
+     14. ISC: Interpersonal Sensitivities Circumplex (isc)
 

@@ -102,7 +102,11 @@ items <- function(x) {
   assert_that(is_instrument(x))
 
   cat("The ", x$Details$Abbrev, " contains ", x$Details$Items, " items (", 
-    x$Details$Status, "):\n", sep = "")
+    x$Details$Status, "):\n",
+    ifelse(x$Details$Prefix != "", paste("Prefix: ", x$Details$Prefix, "\n", sep = ""), ""),
+    ifelse(x$Details$Suffix != "", paste("Suffix: ", x$Details$Suffix, "\n", sep = ""), ""),
+    sep = ""
+  )
   for (i in 1:nrow(x$Items)) {
     xi <- x$Items[i, ]
     if (!is.na(xi$Number)) {
@@ -201,20 +205,21 @@ instruments <- function() {
   # TODO: Find a way to automate this - maybe data$results minus example data?
 
   cat(
-    "The circumplex package currently includes 13 instruments:\n",
+    "The circumplex package currently includes 14 instruments:\n",
     "1. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)\n",
     "2. CSIG: Circumplex Scales of Intergroup Goals (csig)\n",
     "3. CSIP: Circumplex Scales of Interpersonal Problems (csip)\n",
     "4. CSIV: Circumplex Scales of Interpersonal Values (csiv)\n",
-    "5. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)\n",
-    "6. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)\n",
-    "7. IIP-64: Inventory of Interpersonal Problems (iip64)\n",
-    "8. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)\n",
-    "9. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)\n",
-    "10. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
-    "11. IIT-C: Inventory of Influence Tactics Circumplex (iitc)\n",
-    "12. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
-    "13. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
+    "5. IEI: Interpersonal Emotion Inventory (iei)\n",
+    "6. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)\n",
+    "7. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)\n",
+    "8. IIP-64: Inventory of Interpersonal Problems (iip64)\n",
+    "9. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)\n",
+    "10. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)\n",
+    "11. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
+    "12. IIT-C: Inventory of Influence Tactics Circumplex (iitc)\n",
+    "13. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
+    "14. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
   )
 }
 
