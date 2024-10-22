@@ -241,13 +241,10 @@ instruments <- function() {
 #' @family instrument functions
 #' @export
 #' @examples
-#' instrument(iip32)
 #' instrument("iip32")
-#' x <- instrument(iip32)
+#' x <- instrument("iip32")
 instrument <- function(code) {
-  code <- rlang::enquo(code)
-  assert_that(is_provided(code))
-  name_str <- rlang::quo_name(code)
-  utils::data(list = name_str)
-  invisible(get(name_str))
+  stopifnot(is.character(code), length(code) == 1)
+  utils::data(list = code)
+  invisible(get(code))
 }

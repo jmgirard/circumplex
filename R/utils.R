@@ -1,15 +1,3 @@
-#' Pipe operator
-#'
-#' See \code{magrittr} for details.
-#'
-#' @name %>%
-#' @rdname pipe
-#' @keywords internal
-#' @export
-#' @importFrom magrittr %>%
-#' @usage lhs \%>\% rhs
-NULL
-
 #' Save a ggplot with sensible defaults
 #'
 #' See \code{ggplot2} for details.
@@ -23,7 +11,8 @@ NULL
 
 # Compute differences between two sets of SSM parameters -----------------------
 param_diff <- function(p1, p2) {
-  assert_that(is.numeric(p1), is.numeric(p2))
+  stopifnot(is.numeric(p1))
+  stopifnot(is.numeric(p2))
   pd <- p1 - p2
   pd[[5]] <- angle_dist(as_radian(p1[[5]]), as_radian(p2[[5]]))
   pd
@@ -96,16 +85,4 @@ pretty_min <- function(v) {
     out <- amin * scalar
   }
   out
-}
-
-count_measures <- function(.data, measures) {
-  ncol(dplyr::select(.data, {{measures}}))
-}
-
-count_levels <- function(.data, grouping) {
-  if (ncol(dplyr::select(.data, {{grouping}})) > 0) {
-    nlevels(factor(dplyr::pull(.data, {{grouping}})))
-  } else {
-    0
-  }
 }

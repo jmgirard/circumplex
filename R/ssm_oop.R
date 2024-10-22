@@ -102,12 +102,6 @@ new_ssm <- function(results, details, call, ...) {
 #' @method print circumplex_ssm
 #' @export
 print.circumplex_ssm <- function(x, digits = 3, ...) {
-  # Print function call
-  cat("Call:\n",
-    paste(deparse(x$call), sep = "\n", collapse = "\n"),
-    "\n",
-    sep = ""
-  )
   # Print each result as a block
   for (i in 1:nrow(x$results)) {
     dat <- x$results[i, ]
@@ -135,12 +129,6 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
 #' @method summary circumplex_ssm
 #' @export
 summary.circumplex_ssm <- function(object, digits = 3, ...) {
-  # Print function call
-  cat("Call:\n",
-    paste(deparse(object$call), sep = "\n", collapse = "\n"),
-    "\n",
-    sep = ""
-  )
   # Print analysis details
   cat(
     "\nStatistical Basis:\t", object$details$score_type, "Scores",

@@ -1,3 +1,18 @@
+#' Two-letter abbreviations for octant circumplex scales
+#'
+#' Return a vector of abbreviations for octant circumplex scales, from PA to NO.
+#'
+#' @return A character vector with eight elements, each corresponding to the
+#'   abbreviation of an octant subscale: PA, BC, DE, FG, HI, JK, LM, NO.
+#' @export
+#' @usage PANO()
+#' @examples
+#' PANO()
+#' 
+PANO <- function() {
+  c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+}
+
 #' Angular displacements for octant circumplex scales
 #'
 #' Return a vector of angular displacements, in degrees, for eight equally

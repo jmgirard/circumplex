@@ -25,9 +25,8 @@ This function loads the information for a specific instrument into memory.
 See the \code{instruments} function to list all available instruments.
 }
 \examples{
-instrument(iip32)
 instrument("iip32")
-x <- instrument(iip32)
+x <- instrument("iip32")
 }
 \seealso{
 Other instrument functions: 

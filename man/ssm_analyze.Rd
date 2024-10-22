@@ -5,12 +5,12 @@
 \title{Perform analyses using the Structural Summary Method}
 \usage{
 ssm_analyze(
-  .data,
+  data,
   scales,
   angles = octants(),
   measures = NULL,
   grouping = NULL,
-  contrast = c("none", "test", "model"),
+  contrast = "none",
   boots = 2000,
   interval = 0.95,
   listwise = TRUE,
@@ -18,25 +18,22 @@ ssm_analyze(
 )
 }
 \arguments{
-\item{.data}{Required. A data frame containing at least circumplex scales.}
+\item{data}{Required. A data frame containing at least circumplex scales.}
 
-\item{scales}{Required. The variable names or column numbers for the
-variables in \code{.data} that contain circumplex scales to be analyzed.}
+\item{scales}{Required. A character vector of column names from \code{data} that
+contains the circumplex scale scores to be analyzed.}
 
 \item{angles}{Optional. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees). (default =
 \code{octants()}).}
 
-\item{measures}{Optional. The variable names or column numbers for one or
-more variables in \code{.data} to be correlated with the circumplex scales
-and analyzed using correlation-based SSM analyses. To analyze the
-circumplex scales using mean-based analyses, simply omit this argument or
-set it to NULL (default = NULL).}
+\item{measures}{Optional. Either \code{NULL} or a character vector of column names
+from \code{data} that contains one or more variables to be correlated with the
+circumplex scales and analyzed using correlation-based SSM analyses.}
 
-\item{grouping}{Optional. The variable name or column number for the variable
-in \code{.data} that indicates the group membership of each observation. To
-analyze all observations in a single group, simply omit this argument or
-set it to NULL (default = NULL).}
+\item{grouping}{Optional. Either \code{NULL} or a string that contains the column
+name from \code{data} of the variable that indicates the group membership of each
+observation.}
 
 \item{contrast}{Optional. A string indicating what type of contrast to run.
 Current options are "none" for no contrast, "model" to find SSM parameters
@@ -44,7 +41,7 @@ for the difference scores, or "test" to find the difference between the SSM
 parameters. Note that only two groups or measures can be contrasted at a
 time (default = "none").}
 
-\item{boots}{Optional. A single positive integer indicating how many
+\item{boots}{Optional. A single positive whole number indicating how many
 bootstrap resamples to use when estimating the confidence intervals
 (default = 2000).}
 
@@ -57,11 +54,10 @@ be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
 that pairwise deletion may result in different missing data patterns in
 each bootstrap resample and is slower to compute (default = TRUE).}
 
-\item{measures_labels}{Optional. A character vector providing a label for
-each measure provided in \code{measures} (in the same order) to appear in
-the results as well as tables and plots derived from the results. If
-omitted or set to NULL will default to using the measures variable names
-(default = NULL).}
+\item{measures_labels}{Optional. Either \code{NULL} or a character vector
+providing a label for each measure provided in \code{measures} (in the same
+order) to appear in the results as well as tables and plots derived from
+the results.}
 }
 \value{
 A list containing the results and description of the analysis.
@@ -84,44 +80,56 @@ measures will be calculated.
 data("jz2017")
 
 # Single-group mean-based SSM
-ssm_analyze(jz2017, scales = PA:NO, angles = octants())
+ssm_analyze(
+  jz2017, 
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+)
 
 # Single-group correlation-based SSM
-ssm_analyze(jz2017,
-  scales = PA:NO, angles = octants(),
-  measures = c(NARPD, ASPD)
+ssm_analyze(
+  jz2017,
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  measures = c("NARPD", "ASPD")
 )
 \donttest{
 # Multiple-group mean-based SSM
-ssm_analyze(jz2017, scales = PA:NO, angles = octants(), grouping = Gender)
+ssm_analyze(
+  jz2017, 
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  grouping = "Gender"
+)
 
 # Multiple-group mean-based SSM with contrast
-ssm_analyze(jz2017,
-  scales = PA:NO, angles = octants(), grouping = Gender,
+ssm_analyze(
+  jz2017,
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  grouping = "Gender",
   contrast = "model"
 )
 
 # Single-group correlation-based SSM with contrast
-ssm_analyze(jz2017,
-  scales = PA:NO, angles = octants(),
-  measures = c(NARPD, ASPD), contrast = "test"
-)
-
-ssm_analyze(jz2017,
-  scales = PA:NO, angles = octants(), measures = c(NARPD, ASPD), 
-  measures_labels = c("Narcissistic", "Antisocial")
+ssm_analyze(
+  jz2017,
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  measures = c("NARPD", "ASPD"), 
+  contrast = "test"
 )
 
 # Multiple-group correlation-based SSM
-ssm_analyze(jz2017,
-  scales = PA:NO, angles = octants(), measures = NARPD,
-  grouping = Gender
+ssm_analyze(
+  jz2017,
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  measures = "NARPD",
+  grouping = "Gender"
 )
 
 # Multiple-group correlation-based SSM with contrast
-ssm_analyze(jz2017,
-  scales = PA:NO, angles = octants(), measures = NARPD,
-  grouping = Gender, contrast = "test"
+ssm_analyze(
+  jz2017,
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  measures = "NARPD",
+  grouping = "Gender", 
+  contrast = "test"
 )
 }
 
