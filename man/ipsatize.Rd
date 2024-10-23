@@ -4,26 +4,33 @@
 \alias{ipsatize}
 \title{Ipsatize circumplex items using deviation scoring across variables}
 \usage{
-ipsatize(.data, items, na.rm = TRUE, overwrite = FALSE)
+ipsatize(data, items, na.rm = TRUE, prefix = "", suffix = "_i", append = TRUE)
 }
 \arguments{
-\item{.data}{Required. A data frame containing at least circumplex scales.}
+\item{data}{Required. A data frame or matrix containing at least circumplex
+scales.}
 
-\item{items}{Required. The variable names or column numbers for the
-variables in \code{.data} that contain circumplex items to be ipsatized.}
+\item{items}{Required. A character vector containing the column names, or a
+numeric vector containing column indexes, of item variables in \code{data} to be
+ipsatized.}
 
 \item{na.rm}{Optional. A logical that determines whether missing values
 should be ignored during the calculation of the mean during ipsatization
 (default = TRUE).}
 
-\item{overwrite}{Optional. A logical that determines whether the variables
-specified in \code{items} should be overwritten with ipsatized versions
-or alternatively preserved and new variables ending with "_i" should be
-added to the data frame (default = FALSE).}
+\item{prefix}{Optional. A string that will be added to the start of each
+\code{items} name in the output (default = "").}
+
+\item{suffix}{Optional. A string that will be added to the end of each
+\code{items} name in the output (default = "_i").}
+
+\item{append}{Optional. A logical that determines whether to append the
+ipsatized scores to \code{data} in the output or just return the ipsatized
+scores alone (default = TRUE).}
 }
 \value{
-A data frame that matches \code{.data} except that the variables
-specified in \code{items} have been rescored using ipsatization.
+A data frame that matches \code{data} except that the variables specified
+in \code{items} have been rescored using ipsatization.
 }
 \description{
 Rescore each circumplex item using deviation scoring across variables. In
@@ -33,11 +40,12 @@ certain circumplex fit analyses more powerful.
 }
 \examples{
 data("raw_iipsc")
-ipsatize(raw_iipsc, IIP01:IIP32)
+ipsatize(raw_iipsc, items = 1:32)
+ipsatize(raw_iipsc, items = sprintf("IIP\%02d", 1:32))
 }
 \seealso{
 Other tidying functions: 
-\code{\link{score}()},
-\code{\link{standardize}()}
+\code{\link{norm_standardize}()},
+\code{\link{score}()}
 }
 \concept{tidying functions}

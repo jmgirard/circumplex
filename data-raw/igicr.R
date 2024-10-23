@@ -1,4 +1,4 @@
-igicr_scales <- tibble::tibble(
+igicr_scales <- data.frame(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ igicr_scales <- tibble::tibble(
   )
 )
 
-igicr_norms <- tibble::tibble(
+igicr_norms <- data.frame(
   Sample = c(rep(1, 8), rep(2, 8), rep(3, 8)),
   Scale = rep(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 3),
   Angle = rep(c(90, 135, 180, 225, 270, 315, 360, 45), 3),
@@ -39,7 +39,7 @@ igicr_norms <- tibble::tibble(
   )
 )
 
-igicr_norms_src <- tibble::tibble(
+igicr_norms_src <- data.frame(
   Sample = c(1, 2, 3),
   Size = c(387, 174, 213),
   Population = c(
@@ -51,7 +51,7 @@ igicr_norms_src <- tibble::tibble(
   URL = "https://doi.org/10.1177/1073191111411672"
 )
 
-igicr_anchors <- tibble::tibble(
+igicr_anchors <- data.frame(
   Value = 0:4,
   Label = c(
     "Not at all important to me",
@@ -62,7 +62,7 @@ igicr_anchors <- tibble::tibble(
   )
 )
 
-igicr_details <- tibble::tibble(
+igicr_details <- data.frame(
   Name = "Interpersonal Goals Inventory for Children, Revised Version",
   Abbrev = "IGI-CR",
   Items = 32,
@@ -75,40 +75,42 @@ igicr_details <- tibble::tibble(
   URL = "https://doi.org/10.1177/1073191111411672"
 )
 
-igicr_items <- tibble::tribble(
-  ~Number, ~Text,
-  1, "Your peers respect and admire you",
-  2, "Your peers agree to do what you suggest",
-  3, "You do not show your feelings in front of your peers",
-  4, "You do not do anything ridiculous",
-  5, "Your peers do not get angry with you",
-  6, "Everyone feels good",
-  7, "You feel close to your peers",
-  8, "You say exactly what you want",
-  9, "You appear self-confident and make an impression on your peers",
-  10, "You get to decide what to play",
-  11, "You do not give away too much about yourself",
-  12, "You do not say stupid things when your peers are listening",
-  13, "You do not make your peers angry",
-  14, "You can put your peers in a good mood",
-  15, "Real friendship develops between you",
-  16, "Your peers listen to your opinion",
-  17, "Your peers think you are smart",
-  18, "The group does what you say",
-  19, "You keep your thoughts to yourself",
-  20, "Your peers do not laugh or make fun of you",
-  21, "You do not annoy your peers",
-  22, "You are able to please your peers",
-  23, "Your peers help you when you have a problem",
-  24, "You can state your opinion",
-  25, "You don't back down when there is a disagreement",
-  26, "You feel you have control over your peers",
-  27, "You do not let your peers get too close to you",
-  28, "You do not make a fool of yourself in front of your peers",
-  29, "You let your peers make decisions",
-  30, "You agree with your peers about things",
-  31, "Your peers come to you when they have a problem",
-  32, "You are able to tell your peers how you feel"
+igicr_items <- data.frame(
+  Number = 1:32,
+  Text = c(
+    "Your peers respect and admire you",
+    "Your peers agree to do what you suggest",
+    "You do not show your feelings in front of your peers",
+    "You do not do anything ridiculous",
+    "Your peers do not get angry with you",
+    "Everyone feels good",
+    "You feel close to your peers",
+    "You say exactly what you want",
+    "You appear self-confident and make an impression on your peers",
+    "You get to decide what to play",
+    "You do not give away too much about yourself",
+    "You do not say stupid things when your peers are listening",
+    "You do not make your peers angry",
+    "You can put your peers in a good mood",
+    "Real friendship develops between you",
+    "Your peers listen to your opinion",
+    "Your peers think you are smart",
+    "The group does what you say",
+    "You keep your thoughts to yourself",
+    "Your peers do not laugh or make fun of you",
+    "You do not annoy your peers",
+    "You are able to please your peers",
+    "Your peers help you when you have a problem",
+    "You can state your opinion",
+    "You don't back down when there is a disagreement",
+    "You feel you have control over your peers",
+    "You do not let your peers get too close to you",
+    "You do not make a fool of yourself in front of your peers",
+    "You let your peers make decisions",
+    "You agree with your peers about things",
+    "Your peers come to you when they have a problem",
+    "You are able to tell your peers how you feel"
+  )
 )
 
 igicr <- new_instrument(

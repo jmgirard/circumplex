@@ -31,7 +31,7 @@ test_that("The ssm display methods is working", {
   skip_on_cran()
 
   data("aw2009")
-  res <- ssm_analyze(aw2009, PA:NO, octants())
+  res <- ssm_analyze(aw2009, scales = 1:8)
   expect_output(print(res), "Profile \\[All\\]:")
   expect_output(summary(res), "Statistical Basis:\\t Mean Scores")
   expect_output(summary(res), "Bootstrap Resamples:\\t 2000")
@@ -40,19 +40,24 @@ test_that("The ssm display methods is working", {
   expect_output(summary(res), "Scale Displacements:\\t 90 135 180 225 270 315 360 45")
 
   data("jz2017")
-  res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
+  res <- ssm_analyze(jz2017, scales = 2:9, grouping = "Gender")
   expect_output(print(res), "Profile \\[Female\\]:")
   expect_output(print(res), "Profile \\[Male\\]:")
 
-  res <- ssm_analyze(jz2017, PA:NO, octants(),
-    grouping = Gender,
+  res <- ssm_analyze(
+    jz2017, 
+    scales = 2:9,
+    grouping = "Gender",
     contrast = "model"
   )
   expect_output(print(res), "Contrast \\[Male - Female\\]:")
 
-  res <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = PARPD,
-    grouping = Gender, contrast = "test"
+  res <- ssm_analyze(
+    jz2017, 
+    scales = 2:9,
+    measures = "PARPD",
+    grouping = "Gender", 
+    contrast = "test"
   )
   expect_output(print(res), "Contrast \\[PARPD: Male - Female\\]:")
   expect_output(summary(res), "Statistical Basis:\\t Correlation Scores")

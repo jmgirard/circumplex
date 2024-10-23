@@ -7,8 +7,9 @@
 #' measures will be calculated.
 #'
 #' @param data Required. A data frame containing at least circumplex scales.
-#' @param scales Required. A character vector of column names from `data` that
-#'   contains the circumplex scale scores to be analyzed.
+#' @param scales Required. A character vector of column names, or a numeric
+#'   vector of column indexes, from `data` that contains the circumplex scale
+#'   scores to be analyzed.
 #' @param angles Optional. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in `scales` (in degrees). (default =
 #'   `octants()`).
@@ -16,8 +17,8 @@
 #'   from `data` that contains one or more variables to be correlated with the
 #'   circumplex scales and analyzed using correlation-based SSM analyses.
 #' @param grouping Optional. Either `NULL` or a string that contains the column
-#'   name from `data` of the variable that indicates the group membership of each
-#'   observation.
+#'   name from `data` of the variable that indicates the group membership of
+#'   each observation.
 #' @param contrast Optional. A string indicating what type of contrast to run.
 #'   Current options are "none" for no contrast, "model" to find SSM parameters
 #'   for the difference scores, or "test" to find the difference between the SSM
@@ -38,12 +39,14 @@
 #'   order) to appear in the results as well as tables and plots derived from
 #'   the results.
 #' @return A list containing the results and description of the analysis.
-#'   \item{results}{A tibble with the SSM parameter estimates} \item{details}{A
-#'   list with the number of bootstrap resamples (boots), the confidence
-#'   interval percentage level (interval), and the angular displacement of
-#'   scales (angles)} \item{call}{A language object containing the function call
-#'   that created this object} \item{scores}{A tibble containing the mean scale
-#'   scores} \item{type}{A string indicating what type of SSM analysis was done}
+#'   \item{results}{A data frame with the SSM parameter estimates}
+#'   \item{details}{A list with the number of bootstrap resamples (boots),
+#'   the confidence interval percentage level (interval), and the angular
+#'   displacement of scales (angles)}
+#'   \item{call}{A language object containing the function call that created
+#'   this object}
+#'   \item{scores}{A data frame containing the mean scale scores} \item{type}{A
+#'   string indicating what type of SSM analysis was done}
 #' @family ssm functions
 #' @family analysis functions
 #' @export
@@ -53,28 +56,28 @@
 #'
 #' # Single-group mean-based SSM
 #' ssm_analyze(
-#'   jz2017, 
+#'   jz2017,
 #'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 #' )
 #'
 #' # Single-group correlation-based SSM
 #' ssm_analyze(
 #'   jz2017,
-#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
 #'   measures = c("NARPD", "ASPD")
 #' )
 #' \donttest{
 #' # Multiple-group mean-based SSM
 #' ssm_analyze(
-#'   jz2017, 
-#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+#'   jz2017,
+#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
 #'   grouping = "Gender"
 #' )
 #'
 #' # Multiple-group mean-based SSM with contrast
 #' ssm_analyze(
 #'   jz2017,
-#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
 #'   grouping = "Gender",
 #'   contrast = "model"
 #' )
@@ -82,15 +85,15 @@
 #' # Single-group correlation-based SSM with contrast
 #' ssm_analyze(
 #'   jz2017,
-#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
-#'   measures = c("NARPD", "ASPD"), 
+#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+#'   measures = c("NARPD", "ASPD"),
 #'   contrast = "test"
 #' )
 #'
 #' # Multiple-group correlation-based SSM
 #' ssm_analyze(
 #'   jz2017,
-#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
 #'   measures = "NARPD",
 #'   grouping = "Gender"
 #' )
@@ -98,9 +101,9 @@
 #' # Multiple-group correlation-based SSM with contrast
 #' ssm_analyze(
 #'   jz2017,
-#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
 #'   measures = "NARPD",
-#'   grouping = "Gender", 
+#'   grouping = "Gender",
 #'   contrast = "test"
 #' )
 #' }
@@ -114,8 +117,8 @@ ssm_analyze <- function(data, scales, angles = octants(),
   call <- match.call()
   
   # Validate arguments
-  stopifnot(is.data.frame(data))
-  stopifnot(is.character(scales))
+  stopifnot(is.data.frame(data) || is.matrix(data))
+  stopifnot(is.character(scales) || is.numeric(scales))
   stopifnot(is.numeric(angles))
   stopifnot(length(scales) == length(angles))
   stopifnot(is.null(measures) || is.character(measures))
@@ -125,7 +128,7 @@ ssm_analyze <- function(data, scales, angles = octants(),
   stopifnot(is.numeric(interval) && interval > 0 && interval < 1)
   stopifnot(is.logical(listwise) && length(listwise) == 1)
   stopifnot(is.null(measures_labels) || is.character(measures_labels))
-  stopifnot(length(measures_labels) == length(measures))
+  stopifnot(is.null(measures_labels) || (length(measures_labels) == length(measures)))
 
   # Convert angles from degrees to radians
   angles <- as_radian(as_degree(angles))
@@ -169,6 +172,7 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   
   # Select circumplex scales and grouping variable (if applicable)
   bs_input <- data[scales]
+  scales_names <- colnames(bs_input)
   if (is.null(grouping)) {
     bs_input <- cbind(bs_input, Group = rep("All", times = nrow(data)))
   } else {
@@ -183,11 +187,12 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   }
   
   # Set group to factor
-  bs_input$Group <- factor(bs_input$Group)
+  bs_input[[ncol(bs_input)]] <- factor(bs_input[[ncol(bs_input)]])
   
   # Get counts
   n_scales <- length(scales)
-  n_groups <- nlevels(bs_input$Group)
+  n_groups <- nlevels(bs_input[[ncol(bs_input)]])
+  group_levels <- levels(bs_input[[ncol(bs_input)]])
   
   # Check if more than one contrast is possible
   if (contrast != "none" && n_groups != 2) {
@@ -198,18 +203,25 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   }
   
   # Calculate mean observed scores
-  mat <- as.matrix(bs_input[scales])
-  grp <- as.integer(bs_input$Group)
+  mat <- as.matrix(bs_input[scales_names])
+  grp <- as.integer(bs_input[[ncol(bs_input)]])
   scores <- mean_scores(mat, grp, listwise)
-  colnames(scores) <- scales
-  scores <- cbind(label = levels(bs_input$Group), as.data.frame(scores))
-  # TODO: If contrast == "model" then scores should be diff
-  
+  colnames(scores) <- scales_names
+  if (contrast == "none") {
+    scores <- cbind(label = group_levels, as.data.frame(scores))
+  } else {
+    scores <- rbind(scores, scores[2, ] - scores[1, ])
+    scores <- cbind(
+      label = c(group_levels, paste0(group_levels[[2]], " - ", group_levels[[1]])),
+      as.data.frame(scores)
+    )
+  }
+
   # Create function that will perform bootstrapping
   bs_function <- function(.data, index, scales, angles, contrast, listwise, ...) {
     resample <- .data[index, ]
     mat <- as.matrix(resample[scales])
-    grp <- as.integer(resample$Group)
+    grp <- as.integer(resample[[ncol(resample)]])
     scores_r <- mean_scores(mat, grp, listwise)
     ssm_by_group(scores_r, angles, contrast)
   }
@@ -218,23 +230,26 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   bs_output <- ssm_bootstrap(
     bs_input = bs_input,
     bs_function = bs_function,
-    scales = scales,
+    scales = scales_names,
     angles = angles,
     boots = boots,
     interval = interval,
     contrast = contrast,
     listwise = listwise,
-    strata = bs_input$Group
+    strata = bs_input[[ncol(bs_input)]]
   )
   
   # Select and label results
-  group_names <- levels(bs_input$Group)
   if (contrast == "none") {
     row_data <- bs_output
-    row_labels <- group_names
+    row_labels <- group_levels
   } else {
-    row_data <- utils::tail(bs_output, n = 1)
-    row_labels <- paste0(group_names[[2]], " - ", group_names[[1]])
+    row_data <- bs_output[nrow(bs_output), ]
+    row_data[c("d_est", "d_lci", "d_uci")] <- lapply(
+      row_data[c("d_est", "d_lci", "d_uci")], 
+      as_degree
+    )
+    row_labels <- paste0(group_levels[[2]], " - ", group_levels[[1]])
   }
   results <- row_data
   results$label <- row_labels
@@ -268,7 +283,11 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
                               measures_labels, call) {
   
   # Select only the scales, measures, and grouping variables
-  bs_input <- data[c(scales, measures)]
+  scales_data <- data[scales]
+  scales_names <- colnames(scales_data)
+  measures_data <- data[measures]
+  measures_names <- colnames(measures_data)
+  bs_input <- cbind(scales_data, measures_data)
   if (is.null(grouping)) {
     newcol <- data.frame(Group = rep("All", nrow(data)))
     bs_input <- cbind(bs_input, newcol)
@@ -284,7 +303,7 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   }
   
   # Set group as factor
-  bs_input$Group <- factor(bs_input$Group)
+  bs_input[[ncol(bs_input)]] <- factor(bs_input[[ncol(bs_input)]])
   
   # Get counts
   n_scales <- length(scales)
@@ -308,38 +327,36 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   
   # Get names of measures (using labels if provided)
   if (is.null(measures_labels)) {
-    measure_names <- measures
-  } else {
-    measure_names <- measures_labels
+    measure_labels <- measures_names
   }
   
   # Calculate observed scores (i.e., correlations)
-  cs <- as.matrix(bs_input[scales])
-  mv <- as.matrix(bs_input[measures])
-  grp <- as.integer(bs_input$Group)
+  cs <- as.matrix(bs_input[scales_names])
+  mv <- as.matrix(bs_input[measures_names])
+  grp <- as.integer(bs_input[[ncol(bs_input)]])
   scores <- corr_scores(cs, mv, grp, listwise)
 
   # Format correlation data frame
-  colnames(scores) <- scales
+  colnames(scores) <- scales_names
   scores <- as.data.frame(scores)
-  Group <- rep(unique(bs_input$Group), each = n_measures)
-  Measure = rep(measure_names, times = n_groups)
+  Group <- rep(unique(bs_input[[ncol(bs_input)]]), each = n_measures)
+  Measure <- rep(measure_labels, times = n_groups)
   scores <- cbind(Group, Measure, scores)
 
   # Create label variable
   if (is.null(grouping)) {
-    scores$label <- scores$Measure
+    scores$label <- Measure
   } else {
-    scores$label <- paste0(scores$Group, "_", scores$Measure)
+    scores$label <- paste0(Group, "_", Measure)
   }
   
   # Create function that will perform bootstrapping
   bs_function <- function(.data, index, scales, measures, angles, contrast, 
                           listwise, ...) {
     resample <- .data[index, ]
-    grp <- as.integer(resample$Group)
     cs <- as.matrix(resample[scales])
     mv <- as.matrix(resample[measures])
+    grp <- as.integer(resample[[ncol(resample)]])
     scores_r <- corr_scores(cs, mv, grp, listwise)
     ssm_by_group(scores_r, angles, contrast)
   }
@@ -348,8 +365,8 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   bs_output <- ssm_bootstrap(
     bs_input = bs_input,
     bs_function = bs_function,
-    scales = scales,
-    measures = measures,
+    scales = scales_names,
+    measures = measures_names,
     angles = angles,
     boots = boots,
     interval = interval,
@@ -362,7 +379,7 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   if (contrast == "none") {
     row_data <- bs_output
     grp_labels <- rep(group_names, each = n_measures)
-    msr_labels <- rep(measure_names, times = n_groups)
+    msr_labels <- rep(measures_names, times = n_groups)
     if (is.null(grouping)) {
       lbl_labels <- msr_labels
     } else {
@@ -375,12 +392,16 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
       label = lbl_labels
     )
   } else {
-    row_data <- utils::tail(bs_output, n = 1)
+    row_data <- bs_output[nrow(bs_output), ]
+    row_data[c("d_est", "d_lci", "d_uci")] <- lapply(
+      row_data[c("d_est", "d_lci", "d_uci")], 
+      as_degree
+    )
     if (contrast_measures) {
-      row_labels <- paste0(measure_names[[2]], " - ", measure_names[[1]])
+      row_labels <- paste0(measures_names[[2]], " - ", measures_names[[1]])
     } else if (contrast_groups) {
       row_labels <- paste0(
-        measure_names[[1]], 
+        measures_names[[1]], 
         ": ", 
         group_names[[2]], 
         " - ", 
@@ -415,9 +436,9 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
 #' Calculate Structural Summary Method parameters for a set of scores
 #'
 #' Calculate SSM parameters (without confidence intervals) for a set of scores
-#' and generate a tibble with customizable labels for each parameter value. This
-#' function requires the input to be a numeric vector (or coercable to one) and
-#' returns only the parameters. See \code{\link{ssm_score}()} for a similar
+#' and generate a data frame with customizable labels for each parameter value.
+#' This function requires the input to be a numeric vector (or coercable to one)
+#' and returns only the parameters. See \code{\link{ssm_score}()} for a similar
 #' function that calculates SSM parameters for each row of a data frame.
 #'
 #' @param scores Required. A numeric vector (or single row data frame)
@@ -440,7 +461,7 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
 #'   displacement parameter (default = "Disp").
 #' @param f_label Optional. A string representing the variable name of the SSM
 #'   fit or R-squared value (default = "Fit").
-#' @return A tibble containing the SSM parameters calculated from `scores`.
+#' @return A data frame containing the SSM parameters calculated from `scores`.
 #' @family ssm functions
 #' @family analysis functions
 #' @export

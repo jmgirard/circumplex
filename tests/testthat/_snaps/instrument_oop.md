@@ -308,11 +308,6 @@
     Hopwood et al. (2011)
     <https://doi.org/10.1111/j.1467-6494.2011.00696.x>
 
-# The norms function detects when no norms are available
-
-    The ISC currently has no normative data sets.
-    NULL
-
 # The instruments function produces the expected output
 
     The circumplex package currently includes 14 instruments:

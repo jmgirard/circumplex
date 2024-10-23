@@ -65,7 +65,8 @@ summary.circumplex_instrument <- function(object, scales = TRUE, anchors = TRUE,
 #' scales(csip)
 #' scales(csip, items = TRUE)
 scales <- function(x, items = FALSE) {
-  assert_that(is_instrument(x), is.flag(items))
+  stopifnot(is_instrument(x))
+  stopifnot(is.logical(items) && length(items) == 1)
 
   cat("The ", x$Details$Abbrev, " contains ", x$Details$Scales, 
       " circumplex scales.\n", sep = "")
@@ -99,7 +100,7 @@ scales <- function(x, items = FALSE) {
 #' instrument(csip)
 #' items(csip)
 items <- function(x) {
-  assert_that(is_instrument(x))
+  stopifnot(is_instrument(x))
 
   cat("The ", x$Details$Abbrev, " contains ", x$Details$Items, " items (", 
     x$Details$Status, "):\n",
@@ -132,7 +133,7 @@ items <- function(x) {
 #' instrument(csip)
 #' anchors(csip)
 anchors <- function(x) {
-  assert_that(is_instrument(x))
+  stopifnot(is_instrument(x))
 
   cat(
     "The ", x$Details$Abbrev, " is rated using the following ",
@@ -160,7 +161,8 @@ anchors <- function(x) {
 #' instrument(csip)
 #' norms(csip)
 norms <- function(x) {
-  assert_that(is_instrument(x))
+  
+  stopifnot(is_instrument(x))
 
   samples <- x$Norms[[2]]
   n_norms <- nrow(samples)

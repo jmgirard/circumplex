@@ -3,7 +3,7 @@ test_that("Single-group mean-based SSM results are correct", {
   
   data("aw2009")
   set.seed(12345)
-  res <- ssm_analyze(aw2009, PA:NO, octants())
+  res <- ssm_analyze(aw2009, scales = 1:8)
 
   # Test the output object
   expect_type(res, "list")
@@ -53,7 +53,7 @@ test_that("Multiple-group mean-based SSM results are correct", {
 
   data("jz2017")
   set.seed(12345)
-  res <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
+  res <- ssm_analyze(jz2017, scales = 2:9, grouping = "Gender")
 
   # Test the output object
   expect_type(res, "list")
@@ -104,8 +104,10 @@ test_that("Multiple-group mean-based SSM contrast is correct", {
 
   data("jz2017")
   set.seed(12345)
-  res <- ssm_analyze(jz2017, PA:NO, octants(),
-    grouping = Gender,
+  res <- ssm_analyze(
+    jz2017, 
+    scales = 2:9,
+    grouping = "Gender",
     contrast = "model"
   )
 
@@ -144,24 +146,21 @@ test_that("Multiple-group mean-based SSM contrast is correct", {
 
 test_that("Providing one group throws error", {
   data("aw2009")
-  expect_error(
-    ssm_analyze(aw2009, PA:NO, octants(), contrast = "model"),
-    "Without specifying measures or grouping, *"
-  )
+  expect_error(ssm_analyze(aw2009, scales = 1:8, contrast = "model"))
 
   data("jz2017")
-  expect_error(ssm_analyze(jz2017, PA:NO, octants(),
-    measures = PARPD,
+  expect_error(ssm_analyze(jz2017, scales = 2:9,
+    measures = "PARPD",
     contrast = "test"
   ), "No valid contrasts were possible*")
 })
 
 test_that("Providing more than two groups throws error", {
   data("jz2017")
-  expect_error(ssm_analyze(jz2017, PA:NO, octants(),
-    grouping = PARPD,
+  expect_error(ssm_analyze(jz2017, scales = 2:9,
+    grouping = "PARPD",
     contrast = "test"
-  ), "Only two groups can be contrasted at a time.*")
+  ))
 })
 
 test_that("Single-group correlation-based SSM results are correct", {
@@ -169,7 +168,7 @@ test_that("Single-group correlation-based SSM results are correct", {
   
   data("jz2017")
   set.seed(12345)
-  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
+  res <- ssm_analyze(jz2017, scales = 2:9, measures = "PARPD")
 
   # Test the output object
   expect_type(res, "list")
@@ -223,40 +222,54 @@ test_that("Pairwise and listwise scores are the same with no missingness", {
 
   # Single-group mean
   data("jz2017")
-  res_lw <- ssm_analyze(jz2017, PA:NO, octants(), listwise = TRUE)
-  res_pw <- ssm_analyze(jz2017, PA:NO, octants(), listwise = FALSE)
+  res_lw <- ssm_analyze(jz2017, scales = 2:9, listwise = TRUE)
+  res_pw <- ssm_analyze(jz2017, scales = 2:9, listwise = FALSE)
   expect_equal(res_lw$scores, res_pw$scores)
 
   # Single-group correlation
-  res_lw <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = PARPD,
+  res_lw <- ssm_analyze(
+    jz2017, 
+    scales = 2:9,
+    measures = "PARPD",
     listwise = TRUE
   )
-  res_pw <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = PARPD,
+  res_pw <- ssm_analyze(
+    jz2017, 
+    scales = 2:9,
+    measures = "PARPD",
     listwise = FALSE
   )
   expect_equal(res_lw$scores, res_pw$scores)
 
   # Multiple-group mean
-  res_lw <- ssm_analyze(jz2017, PA:NO, octants(),
-    grouping = Gender,
+  res_lw <- ssm_analyze(
+    jz2017, 
+    scales = 2:9,
+    grouping = "Gender",
     listwise = TRUE
   )
-  res_pw <- ssm_analyze(jz2017, PA:NO, octants(),
-    grouping = Gender,
+  res_pw <- ssm_analyze(
+    jz2017, 
+    scales = 2:9, 
+    grouping = "Gender",
     listwise = FALSE
   )
   expect_equal(res_lw$scores, res_pw$scores)
 
   # Multiple-group correlation
-  res_lw <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = PARPD,
-    grouping = Gender, listwise = TRUE
+  res_lw <- ssm_analyze(
+    jz2017, 
+    scales = 2:9,
+    measures = "PARPD",
+    grouping = "Gender", 
+    listwise = TRUE
   )
-  res_pw <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = PARPD,
-    grouping = Gender, listwise = FALSE
+  res_pw <- ssm_analyze(
+    jz2017,
+    scales = 2:9,
+    measures = "PARPD",
+    grouping = "Gender", 
+    listwise = FALSE
   )
   expect_equal(res_lw$scores, res_pw$scores)
 })
@@ -266,8 +279,10 @@ test_that("Measure-contrast correlation-based SSM results are correct", {
 
   data("jz2017")
   set.seed(12345)
-  res <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = c(ASPD, NARPD),
+  res <- ssm_analyze(
+    jz2017, 
+    scales = 2:9,
+    measures = c("ASPD", "NARPD"),
     contrast = "test"
   )
 
@@ -322,9 +337,12 @@ test_that("Group-contrast correlation-based SSM results are correct", {
 
   data("jz2017")
   set.seed(12345)
-  res <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = NARPD,
-    grouping = Gender, contrast = "test"
+  res <- ssm_analyze(
+    jz2017, 
+    scales = 2:9,
+    measures = "NARPD",
+    grouping = "Gender", 
+    contrast = "test"
   )
 
   # Test the output object

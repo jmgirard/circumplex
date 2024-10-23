@@ -51,7 +51,7 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
   bs_uci <- reshape_params(bs_uci, suffix = "uci")
   bs_uci$fit_uci <- NULL
 
-  # Combine the results in one tibble and convert radians to degrees -----------
+  # Combine the results in one data frame and convert radians to degrees -------
   out <- cbind(bs_est, bs_lci, bs_uci)
   out[c("d_est", "d_lci", "d_uci")] <- lapply(
     out[c("d_est", "d_lci", "d_uci")], 

@@ -1,4 +1,4 @@
-iip32_scales <- tibble::tibble(
+iip32_scales <- data.frame(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ iip32_scales <- tibble::tibble(
   )
 )
 
-iip32_norms <- tibble::tibble(
+iip32_norms <- data.frame(
   Sample = c(rep(1, 8), rep(2, 8), rep(3, 8)),
   Scale = rep(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 3),
   Angle = rep(c(90, 135, 180, 225, 270, 315, 360, 45), 3),
@@ -39,7 +39,7 @@ iip32_norms <- tibble::tibble(
   ) / 4
 )
 
-iip32_norms_src <- tibble::tibble(
+iip32_norms_src <- data.frame(
   Sample = c(1, 2, 3),
   Size = c(800, 400, 400),
   Population = c(
@@ -51,7 +51,7 @@ iip32_norms_src <- tibble::tibble(
   URL = "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
 )
 
-iip32_anchors <- tibble::tibble(
+iip32_anchors <- data.frame(
   Value = 0:4,
   Label = c(
     "Not at all",
@@ -62,7 +62,7 @@ iip32_anchors <- tibble::tibble(
   )
 )
 
-iip32_details <- tibble::tibble(
+iip32_details <- data.frame(
   Name = "Inventory of Interpersonal Problems, Brief Version",
   Abbrev = "IIP-32",
   Items = 32,
@@ -75,7 +75,7 @@ iip32_details <- tibble::tibble(
   URL = "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
 )
 
-iip32_items <- tibble::tibble(
+iip32_items <- data.frame(
   Number = NA,
   Text = "Visit the Mind Garden Inc. website for item text and numbering."
 )

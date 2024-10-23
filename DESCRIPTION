@@ -37,9 +37,7 @@ Imports:
     htmlTable (>= 1.13.3),
     Rcpp,
     scales,
-    stats,
-    tibble (>= 3.0.0),
-    utils
+    stats
 Suggests: 
     covr (>= 3.5.0),
     ggrepel,

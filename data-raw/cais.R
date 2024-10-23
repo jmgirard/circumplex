@@ -1,4 +1,4 @@
-cais_scales <- tibble::tibble(
+cais_scales <- data.frame(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -24,7 +24,7 @@ cais_scales <- tibble::tibble(
 )
 
 # TODO: Confirm whether these are based on scale sums or scale means
-cais_norms <- tibble::tibble(
+cais_norms <- data.frame(
   Sample = c(rep(1, 8), rep(2, 8)),
   Scale = rep(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 2),
   Angle = rep(c(90, 135, 180, 225, 270, 315, 360, 45), 2),
@@ -38,7 +38,7 @@ cais_norms <- tibble::tibble(
   )
 )
 
-cais_norms_src <- tibble::tibble(
+cais_norms_src <- data.frame(
   Sample = c(1, 2),
   Size = c(213, 194),
   Population = c(
@@ -55,16 +55,12 @@ cais_norms_src <- tibble::tibble(
   )
 )
 
-cais_anchors <- tibble::tribble(
-  ~Value, ~Label,
-  1, "Never",
-  2, "A little",
-  3, "Some",
-  4, "A lot",
-  5, "Always"
+cais_anchors <- data.frame(
+  Value = 1:5,
+  Label = c("Never", "A little", "Some", "A lot", "Always")
 )
 
-cais_details <- tibble::tibble(
+cais_details <- data.frame(
   Name = "Child and Adolescent Interpersonal Survey",
   Abbrev = "CAIS",
   Items = 37,
@@ -78,45 +74,47 @@ cais_details <- tibble::tibble(
 )
 
 # TODO: Check permission to release item text
-cais_items <- tibble::tribble(
-  ~Number, ~Text,
-  1, "I am tough",
-  2, "I call people names",
-  3, "I hurt people",
-  4, "I am by myself a lot",
-  5, "I am shy",
-  6, "I am calm",
-  7, "I am kind to others",
-  8, "I am fun to be around",
-  9, "I know a lot",
-  10, "I like making trouble",
-  11, "I make people cry",
-  12, "I am alone",
-  13, "I am sad",
-  14, "I am quiet",
-  15, "I try to help others feel better",
-  16, "I am happy",
-  17, "I think I can do a lot",
-  18, "I trick people",
-  19, "I am mean to others",
-  20, "I am hard to get to know",
-  21, "I know very little",
-  22, "Tricking people is mean",
-  23, "I am friendly",
-  24, "I am giving",
-  25, "I speak up for myself",
-  26, "I tell people what to do",
-  27, "I like it when others feel bad",
-  28, "I play by myself",
-  29, "I give in easily",
-  30, "I help people",
-  31, "I play with others",
-  32, "I think I am right",
-  33, "I am sneaky",
-  34, "I am grumpy",
-  35, "I am afraid",
-  36, "I share",
-  37, "I have a lot of friends"
+cais_items <- data.frame(
+  Number = 1:37,
+  Text = c(
+    "I am tough",
+    "I call people names",
+    "I hurt people",
+    "I am by myself a lot",
+    "I am shy",
+    "I am calm",
+    "I am kind to others",
+    "I am fun to be around",
+    "I know a lot",
+    "I like making trouble",
+    "I make people cry",
+    "I am alone",
+    "I am sad",
+    "I am quiet",
+    "I try to help others feel better",
+    "I am happy",
+    "I think I can do a lot",
+    "I trick people",
+    "I am mean to others",
+    "I am hard to get to know",
+    "I know very little",
+    "Tricking people is mean",
+    "I am friendly",
+    "I am giving",
+    "I speak up for myself",
+    "I tell people what to do",
+    "I like it when others feel bad",
+    "I play by myself",
+    "I give in easily",
+    "I help people",
+    "I play with others",
+    "I think I am right",
+    "I am sneaky",
+    "I am grumpy",
+    "I am afraid",
+    "I share",
+    "I have a lot of friends"
+  )
 )
 
 cais <- new_instrument(

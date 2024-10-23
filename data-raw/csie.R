@@ -1,4 +1,4 @@
-csie_scales <- tibble::tibble(
+csie_scales <- data.frame(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ csie_scales <- tibble::tibble(
   )
 )
 
-csie_norms <- tibble::tibble(
+csie_norms <- data.frame(
   Sample = rep(1, 8),
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -31,7 +31,7 @@ csie_norms <- tibble::tibble(
   SD = c(1.68, 1.66, 1.82, 1.54, 1.53, 1.11, 1.20, 1.37)
 )
 
-csie_norms_src <- tibble::tibble(
+csie_norms_src <- data.frame(
   Sample = 1,
   Size = 367,
   Population = "American college students",
@@ -39,7 +39,7 @@ csie_norms_src <- tibble::tibble(
   URL = "https://www.webpages.uidaho.edu/klocke/csie.htm"
 )
 
-csie_anchors <- tibble::tibble(
+csie_anchors <- data.frame(
   Value = 0:10,
   Label = c(
     "I am not at all confident that",
@@ -56,7 +56,7 @@ csie_anchors <- tibble::tibble(
   )
 )
 
-csie_details <- tibble::tibble(
+csie_details <- data.frame(
   Name = "Circumplex Scales of Interpersonal Efficacy",
   Abbrev = "CSIE",
   Items = 32,
@@ -69,40 +69,42 @@ csie_details <- tibble::tibble(
   URL = "https://doi.org/10.1177/0146167206293375"
 )
 
-csie_items <- tibble::tribble(
-  ~Number, ~Text,
-  1, "I can express myself openly",
-  2, "I can be tough",
-  3, "I can follow the rules",
-  4, "I can be assertive",
-  5, "I can hide my thoughts and feelings",
-  6, "I can fit in",
-  7, "I can keep the upper hand",
-  8, "I can avoid getting into arguments",
-  9, "I can smooth over any difficulties",
-  10, "I can be cold and unfriendly when I want to",
-  11, "I can get along with them",
-  12, "I can speak up when I have something to say",
-  13, "I can be submissive",
-  14, "I can understand their feelings",
-  15, "I can win any arguments or competitions",
-  16, "I can be a follower",
-  17, "I can get them to listen to what I have to say",
-  18, "I can get them to leave me alone",
-  19, "I can be nice",
-  20, "I can take charge",
-  21, "I can disappear into the background when I want",
-  22, "I can soothe hurt feelings",
-  23, "I can be aggressive if I need to",
-  24, "I can avoid making them angry",
-  25, "I can be a leader",
-  26, "I can be cruel when the situation calls for it",
-  27, "I can be giving",
-  28, "I can be forceful",
-  29, "I can be quiet",
-  30, "I can be helpful",
-  31, "I can tell them when I am annoyed",
-  32, "I can let others take charge"
+csie_items <- data.frame(
+  Number = 1:32,
+  Text = c(
+    "I can express myself openly",
+    "I can be tough",
+    "I can follow the rules",
+    "I can be assertive",
+    "I can hide my thoughts and feelings",
+    "I can fit in",
+    "I can keep the upper hand",
+    "I can avoid getting into arguments",
+    "I can smooth over any difficulties",
+    "I can be cold and unfriendly when I want to",
+    "I can get along with them",
+    "I can speak up when I have something to say",
+    "I can be submissive",
+    "I can understand their feelings",
+    "I can win any arguments or competitions",
+    "I can be a follower",
+    "I can get them to listen to what I have to say",
+    "I can get them to leave me alone",
+    "I can be nice",
+    "I can take charge",
+    "I can disappear into the background when I want",
+    "I can soothe hurt feelings",
+    "I can be aggressive if I need to",
+    "I can avoid making them angry",
+    "I can be a leader",
+    "I can be cruel when the situation calls for it",
+    "I can be giving",
+    "I can be forceful",
+    "I can be quiet",
+    "I can be helpful",
+    "I can tell them when I am annoyed",
+    "I can let others take charge"
+  )
 )
 
 csie <- new_instrument(

@@ -1,4 +1,4 @@
-isc_scales <- tibble::tibble(
+isc_scales <- data.frame(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ isc_scales <- tibble::tibble(
   )
 )
 
-isc_norms <- tibble::tibble(
+isc_norms <- data.frame(
   Sample = rep(1, 8),
   Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -31,7 +31,7 @@ isc_norms <- tibble::tibble(
   SD = c(1.06, 1.10, 1.28, 1.16, 1.24, 0.99, 0.91, 1.00)
 )
 
-isc_norms_src <- tibble::tibble(
+isc_norms_src <- data.frame(
   Sample = 1,
   Size = 649,
   Population = "American college students",
@@ -39,7 +39,7 @@ isc_norms_src <- tibble::tibble(
   URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x"
 )
 
-isc_anchors <- tibble::tibble(
+isc_anchors <- data.frame(
   Value = 1:8,
   Label = c(
     "Not at all, never bothers me",
@@ -53,7 +53,7 @@ isc_anchors <- tibble::tibble(
   )
 )
 
-isc_details <- tibble::tibble(
+isc_details <- data.frame(
   Name = "Interpersonal Sensitivities Circumplex",
   Abbrev = "ISC",
   Items = 64,
@@ -66,72 +66,74 @@ isc_details <- tibble::tibble(
   URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x"
 )
 
-isc_items <- tibble::tribble(
-  ~Number, ~Text,
-  1, "Thinks they are my boss",
-  2, "Disregards my feelings",
-  3, "Doesn't show any feelings",
-  4, "Won't engage in conversation",
-  5, "Cannot assert themselves",
-  6, "Avoids conflict at all costs",
-  7, "Wants to spend lots of time with me",
-  8, "Doesn't respect my privacy",
-  9, "Orders me around",
-  10, "Doesn't respond to me",
-  11, "Doesn't want to be friends",
-  12, "Is aloof",
-  13, "Doesn't have a backbone",
-  14, "Always needs support",
-  15, "Tries to get close to me really fast",
-  16, "Talks themselves up",
-  17, "Talks down to me",
-  18, "Is hostile",
-  19, "Walls themselves off from me",
-  20, "Acts like a wallflower",
-  21, "Is weak",
-  22, "Always seems to need my help",
-  23, "Tells me they love me",
-  24, "Shows off",
-  25, "Will do anything to get what they want",
-  26, "Is deceitful",
-  27, "Won't share their feelings with me",
-  28, "Won't step up to the plate",
-  29, "Allows themselves to be dominated by others",
-  30, "Acts helpless",
-  31, "Expresses concern about me",
-  32, "Talks about themselves",
-  33, "Has to call the shots",
-  34, "Mistrusts me",
-  35, "Is unresponsive",
-  36, "Doesn't share their ideas",
-  37, "Is always submissive",
-  38, "Laughs at all my jokes",
-  39, "Acts like we're friends when we don't even know each other",
-  40, "Has to be right",
-  41, "Intimidates me",
-  42, "Doesn't care about my feelings",
-  43, "Avoids me",
-  44, "Won't participate",
-  45, "Cannot make decisions",
-  46, "Is dependent on me",
-  47, "Humors me",
-  48, "Interrupts",
-  49, "Is bossy",
-  50, "Expects the worst out of me",
-  51, "Never gets in touch with me",
-  52, "Is really shy",
-  53, "Is very passive",
-  54, "Believes everything I say",
-  55, "Believes I can do no wrong",
-  56, "Tries to show me how to do things",
-  57, "Always puts themselves first",
-  58, "Is mean-spirited",
-  59, "Pulls away from me",
-  60, "Refuses to lead",
-  61, "Is easily controlled",
-  62, "Is soft",
-  63, "Is clingy",
-  64, "Takes control"
+isc_items <- data.frame(
+  Number = 1:64,
+  Text = c(
+    "Thinks they are my boss",
+    "Disregards my feelings",
+    "Doesn't show any feelings",
+    "Won't engage in conversation",
+    "Cannot assert themselves",
+    "Avoids conflict at all costs",
+    "Wants to spend lots of time with me",
+    "Doesn't respect my privacy",
+    "Orders me around",
+    "Doesn't respond to me",
+    "Doesn't want to be friends",
+    "Is aloof",
+    "Doesn't have a backbone",
+    "Always needs support",
+    "Tries to get close to me really fast",
+    "Talks themselves up",
+    "Talks down to me",
+    "Is hostile",
+    "Walls themselves off from me",
+    "Acts like a wallflower",
+    "Is weak",
+    "Always seems to need my help",
+    "Tells me they love me",
+    "Shows off",
+    "Will do anything to get what they want",
+    "Is deceitful",
+    "Won't share their feelings with me",
+    "Won't step up to the plate",
+    "Allows themselves to be dominated by others",
+    "Acts helpless",
+    "Expresses concern about me",
+    "Talks about themselves",
+    "Has to call the shots",
+    "Mistrusts me",
+    "Is unresponsive",
+    "Doesn't share their ideas",
+    "Is always submissive",
+    "Laughs at all my jokes",
+    "Acts like we're friends when we don't even know each other",
+    "Has to be right",
+    "Intimidates me",
+    "Doesn't care about my feelings",
+    "Avoids me",
+    "Won't participate",
+    "Cannot make decisions",
+    "Is dependent on me",
+    "Humors me",
+    "Interrupts",
+    "Is bossy",
+    "Expects the worst out of me",
+    "Never gets in touch with me",
+    "Is really shy",
+    "Is very passive",
+    "Believes everything I say",
+    "Believes I can do no wrong",
+    "Tries to show me how to do things",
+    "Always puts themselves first",
+    "Is mean-spirited",
+    "Pulls away from me",
+    "Refuses to lead",
+    "Is easily controlled",
+    "Is soft",
+    "Is clingy",
+    "Takes control"
+  )
 )
 
 isc <- new_instrument(

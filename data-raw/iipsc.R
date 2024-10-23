@@ -1,4 +1,4 @@
-iipsc_scales <- tibble::tibble(
+iipsc_scales <- data.frame(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ iipsc_scales <- tibble::tibble(
   )
 )
 
-iipsc_norms <- tibble::tibble(
+iipsc_norms <- data.frame(
   Sample = c(rep(1, 8), rep(2, 8)),
   Scale = rep(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 2),
   Angle = rep(c(90, 135, 180, 225, 270, 315, 360, 45), 2),
@@ -37,7 +37,7 @@ iipsc_norms <- tibble::tibble(
   )
 )
 
-iipsc_norms_src <- tibble::tibble(
+iipsc_norms_src <- data.frame(
   Sample = c(1, 2),
   Size = c(872, 106),
   Population = c(
@@ -54,7 +54,7 @@ iipsc_norms_src <- tibble::tibble(
   )
 )
 
-iipsc_anchors <- tibble::tibble(
+iipsc_anchors <- data.frame(
   Value = 0:4,
   Label = c(
     "Not at all",
@@ -65,7 +65,7 @@ iipsc_anchors <- tibble::tibble(
   )
 )
 
-iipsc_details <- tibble::tibble(
+iipsc_details <- data.frame(
   Name = "Inventory of Interpersonal Problems Short Circumplex",
   Abbrev = "IIP-SC",
   Items = 32,
@@ -78,40 +78,42 @@ iipsc_details <- tibble::tibble(
   URL = "https://doi.org/10.1177/1073191195002001006"
 )
 
-iipsc_items <- tibble::tribble(
-  ~Number, ~Text,
-  1, "...point of view...",
-  2, "...supportive of another...",
-  3, "...show affection to...",
-  4, "...join in on...",
-  5, "...stop bothering me...",
-  6, "...I am angry...",
-  7, "...my own welfare...",
-  8, "...keep things private...",
-  9, "...too aggressive toward...",
-  10, "...another person's happiness...",
-  11, "...feeling of love...",
-  12, "...introduce myself to...",
-  13, "...confront people with...",
-  14, "...assertive without worrying...",
-  15, "...please other people...",
-  16, "...open up to...",
-  17, "...control other people...",
-  18, "...too suspicious of...",
-  19, "...feel close to...",
-  20, "...socialize with other...",
-  21, "...assertive with another...",
-  22, "...too easily persuaded...",
-  23, "...other people's needs...",
-  24, "...noticed too much...",
-  25, "...argue with other...",
-  26, "...revenge against people...",
-  27, "...at a distance...",
-  28, "...get together socially...",
-  29, "...to be firm...",
-  30, "...people take advantage...",
-  31, "...another person's misery...",
-  32, "...tell personal things..."
+iipsc_items <- data.frame(
+  Number = 1:32,
+  Text = c(
+    "...point of view...",
+    "...supportive of another...",
+    "...show affection to...",
+    "...join in on...",
+    "...stop bothering me...",
+    "...I am angry...",
+    "...my own welfare...",
+    "...keep things private...",
+    "...too aggressive toward...",
+    "...another person's happiness...",
+    "...feeling of love...",
+    "...introduce myself to...",
+    "...confront people with...",
+    "...assertive without worrying...",
+    "...please other people...",
+    "...open up to...",
+    "...control other people...",
+    "...too suspicious of...",
+    "...feel close to...",
+    "...socialize with other...",
+    "...assertive with another...",
+    "...too easily persuaded...",
+    "...other people's needs...",
+    "...noticed too much...",
+    "...argue with other...",
+    "...revenge against people...",
+    "...at a distance...",
+    "...get together socially...",
+    "...to be firm...",
+    "...people take advantage...",
+    "...another person's misery...",
+    "...tell personal things..."
+  )
 )
 
 iipsc <- new_instrument(

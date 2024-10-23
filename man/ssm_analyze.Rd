@@ -20,8 +20,9 @@ ssm_analyze(
 \arguments{
 \item{data}{Required. A data frame containing at least circumplex scales.}
 
-\item{scales}{Required. A character vector of column names from \code{data} that
-contains the circumplex scale scores to be analyzed.}
+\item{scales}{Required. A character vector of column names, or a numeric
+vector of column indexes, from \code{data} that contains the circumplex scale
+scores to be analyzed.}
 
 \item{angles}{Optional. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees). (default =
@@ -32,8 +33,8 @@ from \code{data} that contains one or more variables to be correlated with the
 circumplex scales and analyzed using correlation-based SSM analyses.}
 
 \item{grouping}{Optional. Either \code{NULL} or a string that contains the column
-name from \code{data} of the variable that indicates the group membership of each
-observation.}
+name from \code{data} of the variable that indicates the group membership of
+each observation.}
 
 \item{contrast}{Optional. A string indicating what type of contrast to run.
 Current options are "none" for no contrast, "model" to find SSM parameters
@@ -61,12 +62,14 @@ the results.}
 }
 \value{
 A list containing the results and description of the analysis.
-\item{results}{A tibble with the SSM parameter estimates} \item{details}{A
-list with the number of bootstrap resamples (boots), the confidence
-interval percentage level (interval), and the angular displacement of
-scales (angles)} \item{call}{A language object containing the function call
-that created this object} \item{scores}{A tibble containing the mean scale
-scores} \item{type}{A string indicating what type of SSM analysis was done}
+\item{results}{A data frame with the SSM parameter estimates}
+\item{details}{A list with the number of bootstrap resamples (boots),
+the confidence interval percentage level (interval), and the angular
+displacement of scales (angles)}
+\item{call}{A language object containing the function call that created
+this object}
+\item{scores}{A data frame containing the mean scale scores} \item{type}{A
+string indicating what type of SSM analysis was done}
 }
 \description{
 Calculate SSM parameters with bootstrapped confidence intervals for a variety
@@ -81,28 +84,28 @@ data("jz2017")
 
 # Single-group mean-based SSM
 ssm_analyze(
-  jz2017, 
+  jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 )
 
 # Single-group correlation-based SSM
 ssm_analyze(
   jz2017,
-  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = c("NARPD", "ASPD")
 )
 \donttest{
 # Multiple-group mean-based SSM
 ssm_analyze(
-  jz2017, 
-  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  jz2017,
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   grouping = "Gender"
 )
 
 # Multiple-group mean-based SSM with contrast
 ssm_analyze(
   jz2017,
-  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   grouping = "Gender",
   contrast = "model"
 )
@@ -110,15 +113,15 @@ ssm_analyze(
 # Single-group correlation-based SSM with contrast
 ssm_analyze(
   jz2017,
-  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
-  measures = c("NARPD", "ASPD"), 
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+  measures = c("NARPD", "ASPD"),
   contrast = "test"
 )
 
 # Multiple-group correlation-based SSM
 ssm_analyze(
   jz2017,
-  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = "NARPD",
   grouping = "Gender"
 )
@@ -126,9 +129,9 @@ ssm_analyze(
 # Multiple-group correlation-based SSM with contrast
 ssm_analyze(
   jz2017,
-  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = "NARPD",
-  grouping = "Gender", 
+  grouping = "Gender",
   contrast = "test"
 )
 }

@@ -49,13 +49,13 @@ displacement parameter (default = "Disp").}
 fit or R-squared value (default = "Fit").}
 }
 \value{
-A tibble containing the SSM parameters calculated from \code{scores}.
+A data frame containing the SSM parameters calculated from \code{scores}.
 }
 \description{
 Calculate SSM parameters (without confidence intervals) for a set of scores
-and generate a tibble with customizable labels for each parameter value. This
-function requires the input to be a numeric vector (or coercable to one) and
-returns only the parameters. See \code{\link{ssm_score}()} for a similar
+and generate a data frame with customizable labels for each parameter value.
+This function requires the input to be a numeric vector (or coercable to one)
+and returns only the parameters. See \code{\link{ssm_score}()} for a similar
 function that calculates SSM parameters for each row of a data frame.
 }
 \examples{

@@ -1,5 +1,9 @@
 # circumplex (development version)
 
+* Re-factor package to remove most dependencies
+
+* Breaking change: removed support for non-standard evaluation
+
 # circumplex 0.3.10
 
 ## Minor improvements and fixes

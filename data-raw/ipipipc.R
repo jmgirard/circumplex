@@ -1,4 +1,4 @@
-ipip_scales <- tibble::tibble(
+ipip_scales <- data.frame(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
   Items = c(
@@ -23,7 +23,7 @@ ipip_scales <- tibble::tibble(
   )
 )
 
-ipip_norms <- tibble::tibble(
+ipip_norms <- data.frame(
   Sample = rep(1, 8),
   Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -31,7 +31,7 @@ ipip_norms <- tibble::tibble(
   SD = c(0.71, 0.69, 0.58, 0.79, 0.63, 0.58, 0.47, 0.78)
 )
 
-ipip_norms_src <- tibble::tibble(
+ipip_norms_src <- data.frame(
   Sample = 1,
   Size = 274,
   Population = "American college students",
@@ -39,7 +39,7 @@ ipip_norms_src <- tibble::tibble(
   URL = "https://doi.org/10.1177/1073191109340382"
 )
 
-ipip_anchors <- tibble::tibble(
+ipip_anchors <- data.frame(
   Value = 1:5,
   Label = c(
     "Very Inaccurate",
@@ -50,7 +50,7 @@ ipip_anchors <- tibble::tibble(
   )
 )
 
-ipip_details <- tibble::tibble(
+ipip_details <- data.frame(
   Name = "IPIP Interpersonal Circumplex",
   Abbrev = "IPIP-IPC",
   Items = 32,
@@ -63,40 +63,42 @@ ipip_details <- tibble::tibble(
   URL = "https://doi.org/10.1177/1073191109340382"
 )
 
-ipip_items <- tibble::tribble(
-  ~Number, ~Text,
-  1, "Am quiet around strangers",
-  2, "Speak softly",
-  3, "Tolerate a lot from others",
-  4, "Am interested in people",
-  5, "Feel comfortable around people",
-  6, "Demand to be the center of interest",
-  7, "Cut others to pieces",
-  8, "Believe people should fend for themselves",
-  9, "Am a very private person",
-  10, "Let others finish what they are saying",
-  11, "Take things as they come",
-  12, "Reassure others",
-  13, "Start conversations",
-  14, "Do most of the talking",
-  15, "Contradict others",
-  16, "Don't fall for sob-stories",
-  17, "Don't talk a lot",
-  18, "Seldom toot my own horn",
-  19, "Think of others first",
-  20, "Inquire about others' well-being",
-  21, "Talk to a lot of different people at parties",
-  22, "Speak loudly",
-  23, "Snap at people",
-  24, "Don't put a lot of thought into things",
-  25, "Have little to say",
-  26, "Dislike being the center of attention",
-  27, "Seldom stretch the truth",
-  28, "Get along well with others",
-  29, "Love large parties",
-  30, "Demand attention",
-  31, "Have a sharp tongue",
-  32, "Am not interested in other people's problems"
+ipip_items <- data.frame(
+  Number = 1:32,
+  Text = c(
+    "Am quiet around strangers",
+    "Speak softly",
+    "Tolerate a lot from others",
+    "Am interested in people",
+    "Feel comfortable around people",
+    "Demand to be the center of interest",
+    "Cut others to pieces",
+    "Believe people should fend for themselves",
+    "Am a very private person",
+    "Let others finish what they are saying",
+    "Take things as they come",
+    "Reassure others",
+    "Start conversations",
+    "Do most of the talking",
+    "Contradict others",
+    "Don't fall for sob-stories",
+    "Don't talk a lot",
+    "Seldom toot my own horn",
+    "Think of others first",
+    "Inquire about others' well-being",
+    "Talk to a lot of different people at parties",
+    "Speak loudly",
+    "Snap at people",
+    "Don't put a lot of thought into things",
+    "Have little to say",
+    "Dislike being the center of attention",
+    "Seldom stretch the truth",
+    "Get along well with others",
+    "Love large parties",
+    "Demand attention",
+    "Have a sharp tongue",
+    "Am not interested in other people's problems"
+  )
 )
 
 ipipipc <- new_instrument(
