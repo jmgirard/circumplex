@@ -18,6 +18,16 @@ param_diff <- function(p1, p2) {
   pd
 }
 
+# Reshape parameters from wide to long format ----------------------------------
+reshape_params <- function(v, suffix) {
+  # Convert vector to matrix
+  out <- matrix(v, ncol = 6, byrow = TRUE)
+  # Add column names
+  colnames(out) <- paste0(c("e_", "x_", "y_", "a_", "d_", "fit_"), suffix)
+  # Convert to data frame
+  as.data.frame(out)
+}
+
 # Calculate angular distance ---------------------------------------------------
 angle_dist <- function(x, y) {
   ((x - y + pi) %% (2 * pi)) - pi
@@ -85,4 +95,15 @@ pretty_min <- function(v) {
     out <- amin * scalar
   }
   out
+}
+
+
+rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) {
+  min_to <- to[1]
+  max_to <- to[2]
+
+  min_from <- from[1]
+  max_from <- from[2]
+  
+  (x - min_from) / (max_from - min_from) * (max_to - min_to) + min_to
 }

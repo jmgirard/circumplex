@@ -1,8 +1,10 @@
 # circumplex (development version)
 
-* Re-factor package to remove most dependencies
+* Re-factor package to remove most external dependencies
 
 * Breaking change: removed support for non-standard evaluation
+
+* Breaking change: replaced model-based contrasts with test-based contrasts
 
 # circumplex 0.3.10
 

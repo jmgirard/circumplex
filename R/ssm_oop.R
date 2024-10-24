@@ -111,18 +111,27 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
       dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
     )
     m <- round(matrix(v, nrow = 6, ncol = 3), digits)
-    # TODO: Add delta symbols if parameter contrast
-    rownames(m) <- c(
+    prefix <- ifelse(
+      test = x$details$contrast && i == nrow(x$results),
+      yes = "\u0394 ",
+      no = ""
+    )
+    rownames(m) <- paste0(prefix, c(
       "Elevation", "X-Value", "Y-Value",
       "Amplitude", "Displacement", "Model Fit"
-    )
+    ))
     colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
-    cat("\n", x$details$results_type, " [", dat$label, "]:\n",
+    results_type <- ifelse(
+      test = x$details$contrast && i == nrow(x$results), 
+      yes = "Contrast", 
+      no = "Profile"
+    )
+    cat("\n# ", results_type, " [", dat$label, "]:\n\n",
       sep = ""
     )
     print.default(m, print.gap = 3L, na.print = "")
+    cat("\n")
   }
-  cat("\n")
 }
 
 # Summary method for objects of ssm class
@@ -136,29 +145,7 @@ summary.circumplex_ssm <- function(object, digits = 3, ...) {
     "\nConfidence Level:\t", object$details$interval,
     "\nListwise Deletion:\t", object$details$listwise,
     "\nScale Displacements:\t", as.numeric(object$details$angles),
-    "\n"
+    "\n\n"
   )
-  # Print each result as a block
-  for (i in 1:nrow(object$results)) {
-    dat <- object$results[i, ]
-    v <- c(
-      dat$e_est, dat$x_est, dat$y_est, dat$a_est, dat$d_est, dat$fit_est,
-      dat$e_lci, dat$x_lci, dat$y_lci, dat$a_lci, dat$d_lci, NA,
-      dat$e_uci, dat$x_uci, dat$y_uci, dat$a_uci, dat$d_uci, NA
-    )
-    m <- round(matrix(v, nrow = 6, ncol = 3), digits)
-    # TODO: Add delta symbols if parameter contrast
-    rownames(m) <- c(
-      "Elevation", "X-Value", "Y-Value",
-      "Amplitude", "Displacement", "Model Fit"
-    )
-    colnames(m) <- c("Estimate", "Lower CI", "Upper CI")
-    cat("\n", object$details$results_type, " [", dat$label, "]:\n",
-      sep = ""
-    )
-    print.default(m, print.gap = 3L, na.print = "")
-  }
-  cat("\n")
+  print(object)
 }
-
-

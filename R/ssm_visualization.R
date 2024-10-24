@@ -17,16 +17,19 @@
 #' data("jz2017")
 #' 
 #' # Plot profile results
-#' res <- ssm_analyze(jz2017,
-#'   scales = PA:NO, angles = octants(),
-#'   measures = c(NARPD, ASPD)
+#' res <- ssm_analyze(
+#'   jz2017,
+#'   scales = 2:9, 
+#'   measures = c("NARPD", "ASPD")
 #' )
 #' p <- ssm_plot(res)
 #' 
 #' # Plot contrast results
-#' res <- ssm_analyze(jz2017,
-#'   scales = PA:NO, angles = octants(),
-#'   measures = c(NARPD, ASPD), contrast = "test"
+#' res <- ssm_analyze(
+#'   jz2017,
+#'   scales = 2:9, 
+#'   measures = c("NARPD", "ASPD"), 
+#'   contrast = TRUE
 #' )
 #' p <- ssm_plot(res)
 #' }
@@ -34,11 +37,11 @@
 ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 
   # Check for valid input arguments
-  assert_that(is_provided(.ssm_object))
-  assert_that(is.number(fontsize), fontsize > 0)
+  stopifnot(class(.ssm_object) == "circumplex_ssm")
+  stopifnot(is.numeric(fontsize) && length(fontsize) == 1 && fontsize > 0)
 
   # Forward to the appropriate subfunction
-  if (.ssm_object$details$contrast == "test") {
+  if (.ssm_object$details$contrast) {
     ssm_plot_contrast(.ssm_object, fontsize = fontsize, ...)
   } else {
     ssm_plot_circle(.ssm_object, fontsize = fontsize, ...)
@@ -89,48 +92,52 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
                             legend.box.spacing = 0,
                             palette = "Set2",
                             ...) {
+  
   df <- .ssm_object$results
   
-  assert_that(
+  stopifnot(
     is.null(angle_labels) || 
-      rlang::is_character(angle_labels, n = length(.ssm_object$details$angles))
+      (is.character(angle_labels) && 
+         length(angle_labels) == length(.ssm_object$details$angles))
   )
+
   
   angles <- as.integer(round(.ssm_object$details$angles))
   
 
-  assert_that(is.null(amax) || is.number(amax))
+  stopifnot(is.null(amax) || is.number(amax))
 
   if (is.null(amax)) {
     amax <- pretty_max(.ssm_object$results$a_uci)
   }
 
   # Convert results to numbers usable by ggplot and ggforce
-  df_plot <- df %>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(
-      d_uci = ifelse(d_uci < d_lci, ggrad(d_uci + 360), ggrad(d_uci)),
-      d_lci = ggrad(d_lci),
-      a_lci = a_lci * 10 / (2 * amax),
-      a_uci = a_uci * 10 / (2 * amax),
-      x_est = x_est * 10 / (2 * amax),
-      y_est = y_est * 10 / (2 * amax)
-    ) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(label = factor(label, levels = unique(as.character(label))))
-
-  # Remove profiles with low model fit (unless overrided)
+  df_plot <- df
+  df_plot[["d_uci"]] <- ifelse(
+    test = df_plot[["d_uci"]] < df_plot[["d_lci"]], 
+    yes = ggrad(df_plot[["d_uci"]] + 360),
+    no = ggrad(df_plot[["d_uci"]])
+  )
+  df_plot[["d_lci"]] <- ggrad(df_plot[["d_lci"]])
+  df_plot[c("a_lci", "a_uci", "x_est", "y_est")] <- sapply(
+    df_plot[c("a_lci", "a_uci", "x_est", "y_est")],
+    function(x) x * 10 / (2 * amax)
+  )
+  df_plot$label <- factor(
+    df_plot$label, 
+    levels = unique(as.character(df_plot$label))
+  )
+  
+  # Remove profiles with low model fit (unless over-rided)
   n <- nrow(df_plot)
   if (lowfit == FALSE) {
-    df_plot <- df_plot %>%
-      dplyr::filter(fit_est >= .70)
-    n2 <- nrow(df_plot)
-    if (n2 < 1) {
-      stop("After removing profiles, there were none left to plot.")
+    df_plot <- df_plot[df_plot$fit_est >= .70, ]
+    if (nrow(df_plot) < 1) {
+      stop("After removing profiles with low fit, there were none left to plot.")
     }
   }
-  df_plot <- df_plot %>%
-    dplyr::mutate(lnty = dplyr::if_else(fit_est >= .70, "solid", "dashed"))
+  
+  df_plot[["lnty"]] <- ifelse(df_plot$fit_est >= .70, "solid", "dashed")
 
   p <- 
     circle_base(
@@ -167,6 +174,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
       ggplot2::scale_linetype_identity() +
       ggplot2::theme(legend.position = "none")
   } else {
+    results_type <- ifelse(.ssm_object$details$contrast, "Contrast", "Profile")
     p <- p +
       ggforce::geom_arc_bar(
         data = df_plot,
@@ -186,8 +194,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
         color = "black"
       ) +
       ggplot2::guides(
-        color = ggplot2::guide_legend(.ssm_object$details$results_type),
-        fill = ggplot2::guide_legend(.ssm_object$details$results_type)
+        color = ggplot2::guide_legend(results_type),
+        fill = ggplot2::guide_legend(results_type)
       ) +
       ggplot2::theme(
         legend.text = ggplot2::element_text(size = legend_font_size),
@@ -196,9 +204,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
       ggplot2::scale_linetype_identity()
   }
   
-
-
   if (repel == TRUE) {
+    require("ggrepel")
     p <- p + 
       ggrepel::geom_label_repel(
         data = df_plot,
@@ -236,6 +243,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
 
 ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
                               xy = TRUE, color = "red", linesize = 1.25, fontsize = 12) {
+  
+  # Prepare all estimates
   plabs <- c(
     e = expression(paste(Delta, " Elevation")),
     x = expression(paste(Delta, " X-Value")),
@@ -243,35 +252,37 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
     a = expression(paste(Delta, " Amplitude")),
     d = expression(paste(Delta, " Displacement"))
   )
-  
   pvals <- c("e", "x", "y", "a", "d")
-
   res <- .ssm_object$results
 
+  # Drop x and y estimates if requested
   if (xy == FALSE) {
-    res <- dplyr::select(
-      res,
-      -c(x_est, x_lci, x_uci, y_est, y_lci, y_uci)
-    )
+    res <- subset(res, select = -c(x_est, x_lci, x_uci, y_est, y_lci, y_uci))
     plabs <- plabs[-c(2, 3)]
     pvals <- pvals[-c(2, 3)]
   }
 
-  # TODO: Check that these ifelse() statements are correct
+  # TODO: REFACTORING UNTIL HERE - NEXT SECTION IN PROGRESS
 
-  res <- 
-    res %>% 
-    dplyr::mutate(
-      d_est = unclass(d_est),
-      d_uci = unclass(ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci)),
-      d_lci = unclass(ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci))
-    ) %>%
-    dplyr::select(-fit_est) %>% 
-    tidyr::pivot_longer(cols = e_est:d_uci, names_to = "key", values_to = "value") %>% 
-    tidyr::extract(col = key, into = c("Parameter", "Type"), "(.)_(...)") %>% 
-    tidyr::pivot_wider(names_from = Type, values_from = value) %>% 
-    dplyr::rename(Difference = est, Contrast = label) %>%
-    dplyr::mutate(Parameter = factor(Parameter, levels = pvals, labels = plabs))
+  res2 <- res
+  estcol <- c(res2$e_est, res2$x_est, res2$y_est, res2$a_est, res2$d_est)
+  ucicol <- c(res2$e_uci, res2$x_uci, res2$y_uci, res2$a_uci, res2$d_uci)
+  lcicol <- c(res2$e_lci, res2$x_lci, res2$y_lci, res2$a_lci, res2$d_lci)
+  labcol <- rep(res2$label, times = length(estcol))
+  
+  # res <- 
+  #   res %>% 
+  #   dplyr::mutate(
+  #     d_est = unclass(d_est),
+  #     d_uci = unclass(ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci)),
+  #     d_lci = unclass(ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci))
+  #   ) %>%
+  #   dplyr::select(-fit_est) %>% 
+  #   tidyr::pivot_longer(cols = e_est:d_uci, names_to = "key", values_to = "value") %>% 
+  #   tidyr::extract(col = key, into = c("Parameter", "Type"), "(.)_(...)") %>% 
+  #   tidyr::pivot_wider(names_from = Type, values_from = value) %>% 
+  #   dplyr::rename(Difference = est, Contrast = label) %>%
+  #   dplyr::mutate(Parameter = factor(Parameter, levels = pvals, labels = plabs))
   
   p <- 
     res %>% 
@@ -392,16 +403,19 @@ circle_base <- function(angles, labels = NULL, amin = 0,
 #' data("jz2017")
 #' 
 #' # Create table of profile results
-#' res <- ssm_analyze(jz2017,
-#'   scales = PA:NO, angles = octants(),
-#'   measures = c(NARPD, ASPD)
+#' res <- ssm_analyze(
+#'   jz2017,
+#'   scales = 2:9,
+#'   measures = c("NARPD", "ASPD")
 #' )
 #' ssm_table(res)
 #' 
 #' # Create table of contrast results
-#' res <- ssm_analyze(jz2017,
-#'   scales = PA:NO, angles = octants(),
-#'   measures = c(NARPD, ASPD), contrast = "test"
+#' res <- ssm_analyze(
+#'   jz2017,
+#'   scales = 2:9,
+#'   measures = c("NARPD", "ASPD"), 
+#'   contrast = TRUE
 #' )
 #' ssm_table(res)
 #' }
@@ -433,7 +447,7 @@ ssm_table <- function(.ssm_object, caption = NULL, xy = TRUE, render = TRUE) {
   colnames(df)[[1]] <- .ssm_object$details$results_type
 
   # Add delta symbol to column names if results are contrasts
-  if (.ssm_object$details$contrast == "test") {
+  if (.ssm_object$details$contrast) {
     colnames(df)[[2]] <- "&Delta; Elevation"
     colnames(df)[[3]] <- "&Delta; X-Value"
     colnames(df)[[4]] <- "&Delta; Y-Value"
@@ -455,15 +469,15 @@ ssm_table <- function(.ssm_object, caption = NULL, xy = TRUE, render = TRUE) {
 
 # Build the default caption for the ssm_table function
 dcaption <- function(.ssm_object) {
-  if (.ssm_object$details$results_type == "Profile") {
+  if (.ssm_object$details$contrast) {
     sprintf(
-      "%s-based Structural Summary Statistics with %s CIs",
+      "%s-based Structural Summary Statistic Contrasts with %s CIs",
       .ssm_object$details$score_type,
       str_percent(.ssm_object$details$interval)
     )
-  } else if (.ssm_object$details$results_type == "Contrast") {
+  } else {
     sprintf(
-      "%s-based Structural Summary Statistic Contrasts with %s CIs",
+      "%s-based Structural Summary Statistics with %s CIs",
       .ssm_object$details$score_type,
       str_percent(.ssm_object$details$interval)
     )
@@ -585,7 +599,7 @@ ssm_plot_scores.circumplex_ssm <- function(x,
   if (is.null(amax)) amax <- pretty_max(scores_long$Score)
   scores_long$Angle <- rep(angles, times = nrow(scores_long) / length(angles))
   scores_long$Radian <- as_radian(as_degree(scores_long$Angle))
-  scores_long$pr <- scales::rescale(
+  scores_long$pr <- rescale(
     scores_long$Score, 
     to = c(0, 5), 
     from = c(amin, amax)
@@ -645,7 +659,7 @@ ssm_plot_scores.data.frame <- function(x,
   if (is.null(amax)) amax <- pretty_max(scores_long$Score)
   scores_long$Angle <- rep(angles, times = nrow(scores_long) / length(angles))
   scores_long$Radian <- as_radian(as_degree(scores_long$Angle))
-  scores_long$pr <- scales::rescale(
+  scores_long$pr <- rescale(
     scores_long$Score, 
     to = c(0, 5), 
     from = c(amin, amax)

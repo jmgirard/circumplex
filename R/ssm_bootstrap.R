@@ -16,28 +16,21 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
       ...
     )
 
-  # Reshape parameters from wide to long format --------------------------------
-  reshape_params <- function(v, suffix) {
-    # Convert vector to matrix
-    out <- matrix(v, ncol = 6, byrow = TRUE)
-    # Add column names
-    colnames(out) <- paste0(c("e_", "x_", "y_", "a_", "d_", "fit_"), suffix)
-    # Convert to data frame
-    as.data.frame(out)
-  }
-
   # Extract point estimates from bootstrap results -----------------------------
   bs_est <- reshape_params(bs_results$t0, suffix = "est")
   bs_t <- bs_results$t
   bs_t <- as.data.frame(bs_t)
-  colnames(bs_t) <- paste0("t", 1:ncol(bs_t))
+  colnames(bs_t) <- paste0(
+    c("e", "x", "y", "a", "d", "fit"), 
+    rep(1:nrow(bs_est), each = 6)
+  )
   
   # Set the units of the displacement results to radians -----------------------
-
-  if (contrast == "none" || contrast == "model") {
-    d_vars <- 1:(ncol(bs_t) / 6) * 6 - 1
-  } else if (contrast == "test") {
+  if (contrast) {
+    # Don't set to rad for contrasted d parameter (we want to allow negatives)
     d_vars <- 1:((ncol(bs_t) - 6) / 6) * 6 - 1
+  } else {
+    d_vars <- 1:(ncol(bs_t) / 6) * 6 - 1
   }
   bs_t[d_vars] <- lapply(bs_t[d_vars], new_radian)
 
@@ -61,19 +54,14 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
   out
 }
 
-#
+# Calculate SSM parameters per group (or parameter differences)
 ssm_by_group <- function(scores, angles, contrast) {
-
-  # To model contrast, subtract scores then SSM --------------------------------
-  if (contrast == "model") {
-    scores <- rbind(scores, scores[2, ] - scores[1, ])
-  }
-
-  # Calculate parameters per group ---------------------------------------------
+  
+  # Calculate SSM parameters per group  
   results <- group_parameters(scores, angles)
-
-  # To test contrast, SSM then subtract parameters -----------------------------
-  if (contrast == "test") {
+  
+  # If contrasting, append SSM parameter differences
+  if (contrast) {
     results <- c(results, param_diff(results[7:12], results[1:6]))
   }
 

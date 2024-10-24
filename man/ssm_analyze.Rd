@@ -10,7 +10,7 @@ ssm_analyze(
   angles = octants(),
   measures = NULL,
   grouping = NULL,
-  contrast = "none",
+  contrast = FALSE,
   boots = 2000,
   interval = 0.95,
   listwise = TRUE,
@@ -36,11 +36,10 @@ circumplex scales and analyzed using correlation-based SSM analyses.}
 name from \code{data} of the variable that indicates the group membership of
 each observation.}
 
-\item{contrast}{Optional. A string indicating what type of contrast to run.
-Current options are "none" for no contrast, "model" to find SSM parameters
-for the difference scores, or "test" to find the difference between the SSM
-parameters. Note that only two groups or measures can be contrasted at a
-time (default = "none").}
+\item{contrast}{Optional. A logical indicating whether to output the
+difference between two measures' or two groups' SSM parameters. Can only be
+set to TRUE when there are exactly two measures and one group, one measure
+and two groups, or no measures and two groups (default = FALSE).}
 
 \item{boots}{Optional. A single positive whole number indicating how many
 bootstrap resamples to use when estimating the confidence intervals
@@ -107,7 +106,7 @@ ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   grouping = "Gender",
-  contrast = "model"
+  contrast = TRUE
 )
 
 # Single-group correlation-based SSM with contrast
@@ -115,7 +114,7 @@ ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = c("NARPD", "ASPD"),
-  contrast = "test"
+  contrast = TRUE
 )
 
 # Multiple-group correlation-based SSM
@@ -132,7 +131,7 @@ ssm_analyze(
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = "NARPD",
   grouping = "Gender",
-  contrast = "test"
+  contrast = TRUE
 )
 }
 

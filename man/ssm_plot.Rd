@@ -26,16 +26,19 @@ Take in the results of an SSM analysis function and create figure from it.
 data("jz2017")
 
 # Plot profile results
-res <- ssm_analyze(jz2017,
-  scales = PA:NO, angles = octants(),
-  measures = c(NARPD, ASPD)
+res <- ssm_analyze(
+  jz2017,
+  scales = 2:9, 
+  measures = c("NARPD", "ASPD")
 )
 p <- ssm_plot(res)
 
 # Plot contrast results
-res <- ssm_analyze(jz2017,
-  scales = PA:NO, angles = octants(),
-  measures = c(NARPD, ASPD), contrast = "test"
+res <- ssm_analyze(
+  jz2017,
+  scales = 2:9, 
+  measures = c("NARPD", "ASPD"), 
+  contrast = "test"
 )
 p <- ssm_plot(res)
 }

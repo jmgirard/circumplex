@@ -32,7 +32,7 @@ test_that("The ssm display methods is working", {
 
   data("aw2009")
   res <- ssm_analyze(aw2009, scales = 1:8)
-  expect_output(print(res), "Profile \\[All\\]:")
+  expect_output(print(res), "# Profile \\[All\\]:")
   expect_output(summary(res), "Statistical Basis:\\t Mean Scores")
   expect_output(summary(res), "Bootstrap Resamples:\\t 2000")
   expect_output(summary(res), "Confidence Level:\\t 0\\.95")
@@ -41,24 +41,27 @@ test_that("The ssm display methods is working", {
 
   data("jz2017")
   res <- ssm_analyze(jz2017, scales = 2:9, grouping = "Gender")
-  expect_output(print(res), "Profile \\[Female\\]:")
-  expect_output(print(res), "Profile \\[Male\\]:")
+  expect_output(print(res), "# Profile \\[Female\\]:")
+  expect_output(print(res), "# Profile \\[Male\\]:")
 
   res <- ssm_analyze(
     jz2017, 
     scales = 2:9,
     grouping = "Gender",
-    contrast = "model"
+    contrast = TRUE
   )
-  expect_output(print(res), "Contrast \\[Male - Female\\]:")
+  expect_output(print(res), "# Profile \\[Female\\]:")
+  expect_output(print(res), "# Profile \\[Male\\]:")
+  expect_output(print(res), "# Contrast \\[Male - Female\\]:")
+  expect_output(print(res), "\u0394 Elevation")
 
   res <- ssm_analyze(
     jz2017, 
     scales = 2:9,
     measures = "PARPD",
     grouping = "Gender", 
-    contrast = "test"
+    contrast = TRUE
   )
-  expect_output(print(res), "Contrast \\[PARPD: Male - Female\\]:")
+  expect_output(print(res), "# Contrast \\[PARPD: Male - Female\\]:")
   expect_output(summary(res), "Statistical Basis:\\t Correlation Scores")
 })

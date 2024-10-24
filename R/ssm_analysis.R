@@ -19,11 +19,10 @@
 #' @param grouping Optional. Either `NULL` or a string that contains the column
 #'   name from `data` of the variable that indicates the group membership of
 #'   each observation.
-#' @param contrast Optional. A string indicating what type of contrast to run.
-#'   Current options are "none" for no contrast, "model" to find SSM parameters
-#'   for the difference scores, or "test" to find the difference between the SSM
-#'   parameters. Note that only two groups or measures can be contrasted at a
-#'   time (default = "none").
+#' @param contrast Optional. A logical indicating whether to output the
+#'   difference between two measures' or two groups' SSM parameters. Can only be
+#'   set to TRUE when there are exactly two measures and one group, one measure
+#'   and two groups, or no measures and two groups (default = FALSE).
 #' @param boots Optional. A single positive whole number indicating how many
 #'   bootstrap resamples to use when estimating the confidence intervals
 #'   (default = 2000).
@@ -79,7 +78,7 @@
 #'   jz2017,
 #'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
 #'   grouping = "Gender",
-#'   contrast = "model"
+#'   contrast = TRUE
 #' )
 #'
 #' # Single-group correlation-based SSM with contrast
@@ -87,7 +86,7 @@
 #'   jz2017,
 #'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
 #'   measures = c("NARPD", "ASPD"),
-#'   contrast = "test"
+#'   contrast = TRUE
 #' )
 #'
 #' # Multiple-group correlation-based SSM
@@ -104,12 +103,12 @@
 #'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
 #'   measures = "NARPD",
 #'   grouping = "Gender",
-#'   contrast = "test"
+#'   contrast = TRUE
 #' )
 #' }
 #' 
 ssm_analyze <- function(data, scales, angles = octants(), 
-                        measures = NULL, grouping = NULL, contrast = "none", 
+                        measures = NULL, grouping = NULL, contrast = FALSE, 
                         boots = 2000, interval = 0.95, listwise = TRUE,
                         measures_labels = NULL) {
   
@@ -123,13 +122,24 @@ ssm_analyze <- function(data, scales, angles = octants(),
   stopifnot(length(scales) == length(angles))
   stopifnot(is.null(measures) || is.character(measures))
   stopifnot(is.null(grouping) || (is.character(grouping) && length(grouping) == 1))
-  stopifnot(tolower(contrast) %in% c("none", "test", "model"))
+  stopifnot(is.logical(contrast) && length(contrast) == 1)
   stopifnot(is.numeric(boots) && boots > 0 && ceiling(boots) == floor(boots))
   stopifnot(is.numeric(interval) && interval > 0 && interval < 1)
   stopifnot(is.logical(listwise) && length(listwise) == 1)
   stopifnot(is.null(measures_labels) || is.character(measures_labels))
   stopifnot(is.null(measures_labels) || (length(measures_labels) == length(measures)))
 
+  if (contrast) {
+    n_measures <- length(measures)
+    n_groups <- ifelse(is.null(grouping), 1, nlevels(factor(data[[grouping]])))
+    group_mean_contrast <- n_measures == 0 && n_groups == 2
+    group_corr_contrast <- n_measures == 1 && n_groups == 2
+    measure_corr_contrast <- n_measures == 2 && n_groups == 1
+    if (!any(group_mean_contrast, group_corr_contrast, measure_corr_contrast)) {
+      stop("Contrast can only be TRUE when comparing 2 groups or 2 measures.")
+    }
+  }
+  
   # Convert angles from degrees to radians
   angles <- as_radian(as_degree(angles))
 
@@ -194,27 +204,19 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   n_groups <- nlevels(bs_input[[ncol(bs_input)]])
   group_levels <- levels(bs_input[[ncol(bs_input)]])
   
-  # Check if more than one contrast is possible
-  if (contrast != "none" && n_groups != 2) {
-    stop(c(
-      "Only two groups can be contrasted at a time.\n\n  Hint: Set ",
-      "contrast = 'none' or use a dichotomous grouping variable."
-    ))
-  }
-  
   # Calculate mean observed scores
   mat <- as.matrix(bs_input[scales_names])
   grp <- as.integer(bs_input[[ncol(bs_input)]])
   scores <- mean_scores(mat, grp, listwise)
   colnames(scores) <- scales_names
-  if (contrast == "none") {
-    scores <- cbind(label = group_levels, as.data.frame(scores))
-  } else {
+  if (contrast) {
     scores <- rbind(scores, scores[2, ] - scores[1, ])
     scores <- cbind(
       label = c(group_levels, paste0(group_levels[[2]], " - ", group_levels[[1]])),
       as.data.frame(scores)
     )
+  } else {
+    scores <- cbind(label = group_levels, as.data.frame(scores))
   }
 
   # Create function that will perform bootstrapping
@@ -240,19 +242,14 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   )
   
   # Select and label results
-  if (contrast == "none") {
-    row_data <- bs_output
-    row_labels <- group_levels
-  } else {
-    row_data <- bs_output[nrow(bs_output), ]
-    row_data[c("d_est", "d_lci", "d_uci")] <- lapply(
-      row_data[c("d_est", "d_lci", "d_uci")], 
-      as_degree
+  row_labels <- group_levels
+  if (contrast) {
+    row_labels <- c(
+      row_labels, 
+      paste0(group_levels[[2]], " - ", group_levels[[1]])
     )
-    row_labels <- paste0(group_levels[[2]], " - ", group_levels[[1]])
   }
-  results <- row_data
-  results$label <- row_labels
+  results <- cbind(label = row_labels, bs_output)
   
   # Collect analysis details
   details <- list(
@@ -261,8 +258,7 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
     listwise = listwise,
     angles = as_degree(angles),
     contrast = contrast,
-    score_type = "Mean",
-    results_type = ifelse(contrast == "none", "Profile", "Contrast")
+    score_type = "Mean"
   )
   
   # Create output ssm object
@@ -310,46 +306,38 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   n_measures <- length(measures)
   n_groups <- nlevels(bs_input$Group)
   
-  # Check that this combination of arguments is executable
-  if (contrast != "none") {
-    contrast_measures <- (n_measures == 2 && n_groups == 1)
-    contrast_groups <- (n_measures == 1 && n_groups == 2)
-    valid_contrast <- contrast_measures || contrast_groups
-    if (valid_contrast == FALSE) {
-      stop(c(
-        "No valid contrasts were possible. To contrast measures, ensure ",
-        "there are 2 measures and no grouping variable. To contrast groups, ",
-        "ensure there is 1 measure and a dichotomous grouping variable."
-      ))
-      # TODO: Enable contrasting more than two measures or groups?
-    }
-  }
-  
   # Get names of measures (using labels if provided)
   if (is.null(measures_labels)) {
     measure_labels <- measures_names
   }
   
-  # Calculate observed scores (i.e., correlations)
+  # Calculate observed correlation scores
   cs <- as.matrix(bs_input[scales_names])
   mv <- as.matrix(bs_input[measures_names])
   grp <- as.integer(bs_input[[ncol(bs_input)]])
   scores <- corr_scores(cs, mv, grp, listwise)
-
-  # Format correlation data frame
   colnames(scores) <- scales_names
+  group_levels <- levels(bs_input[[ncol(bs_input)]])
+  if (contrast) {
+    scores <- rbind(scores, scores[2, ] - scores[1, ])
+  }
   scores <- as.data.frame(scores)
-  Group <- rep(unique(bs_input[[ncol(bs_input)]]), each = n_measures)
+  Group <- rep(group_levels, each = n_measures)
   Measure <- rep(measure_labels, times = n_groups)
+  if (contrast && is.null(grouping)) {
+    Group <- c(Group, Group[[1]])
+    Measure <- c(Measure, paste0(Measure[[2]], " - ", Measure[[1]]))
+  } else if (contrast && !is.null(grouping)) {
+    Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
+    Measure <- c(Measure, Measure[[1]])
+  }
   scores <- cbind(Group, Measure, scores)
-
-  # Create label variable
   if (is.null(grouping)) {
     scores$label <- Measure
   } else {
-    scores$label <- paste0(Group, "_", Measure)
+    scores$label <- paste0(Measure, ": ", Group)
   }
-  
+
   # Create function that will perform bootstrapping
   bs_function <- function(.data, index, scales, measures, angles, contrast, 
                           listwise, ...) {
@@ -375,42 +363,22 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     strata = bs_input$Group
   )
   
-  group_names <- levels(bs_input$Group)
-  if (contrast == "none") {
-    row_data <- bs_output
-    grp_labels <- rep(group_names, each = n_measures)
-    msr_labels <- rep(measures_names, times = n_groups)
-    if (is.null(grouping)) {
-      lbl_labels <- msr_labels
-    } else {
-      lbl_labels <- paste0(grp_labels, "_", msr_labels)
-    }
-    results <- cbind(
-      Group = grp_labels,
-      Measure = msr_labels,
-      row_data,
-      label = lbl_labels
-    )
-  } else {
-    row_data <- bs_output[nrow(bs_output), ]
-    row_data[c("d_est", "d_lci", "d_uci")] <- lapply(
-      row_data[c("d_est", "d_lci", "d_uci")], 
-      as_degree
-    )
-    if (contrast_measures) {
-      row_labels <- paste0(measures_names[[2]], " - ", measures_names[[1]])
-    } else if (contrast_groups) {
-      row_labels <- paste0(
-        measures_names[[1]], 
-        ": ", 
-        group_names[[2]], 
-        " - ", 
-        group_names[[1]]
-      )
-    }
-    results <- cbind(label = row_labels, row_data)
+  Group <- rep(group_levels, each = n_measures)
+  Measure <- rep(measure_labels, times = n_groups)
+  if (contrast && is.null(grouping)) {
+    Group <- c(Group, Group[[1]])
+    Measure <- c(Measure, paste0(Measure[[2]], " - ", Measure[[1]]))
+  } else if (contrast && !is.null(grouping)) {
+    Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
+    Measure <- c(Measure, Measure[[1]])
   }
-  
+  results <- cbind(Group, Measure, bs_output)
+  if (is.null(grouping)) {
+    results$label <- Measure
+  } else {
+    results$label <- paste0(Measure, ": ", Group)
+  }
+
   # Collect analysis details
   details <- list(
     boots = boots,
@@ -418,8 +386,7 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     listwise = listwise,
     angles = as_degree(angles),
     contrast = contrast,
-    score_type = "Correlation",
-    results_type = ifelse(contrast == "none", "Profile", "Contrast")
+    score_type = "Correlation"
   )
   
   # Create output ssm object
