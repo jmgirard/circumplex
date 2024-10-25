@@ -126,7 +126,7 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
       yes = "Contrast", 
       no = "Profile"
     )
-    cat("\n# ", results_type, " [", dat$label, "]:\n\n",
+    cat("\n# ", results_type, " [", dat$Label, "]:\n\n",
       sep = ""
     )
     print.default(m, print.gap = 3L, na.print = "")

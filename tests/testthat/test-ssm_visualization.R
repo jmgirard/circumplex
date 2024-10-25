@@ -1,7 +1,7 @@
 test_that("Single-group mean-based SSM plot is correct", {
   data("aw2009")
   res <- ssm_analyze(aw2009, scales = 1:8)
-  p <- ssm_plot(res)
+  p <- ssm_plot_circle(res)
 
   # Test the output object
   expect_type(p, "list")
@@ -14,7 +14,7 @@ test_that("Single-group mean-based SSM plot is correct", {
 test_that("Single-group correlation-based SSM plot is correct", {
   data("jz2017")
   res <- ssm_analyze(jz2017, scales = 2:9, measures = "PARPD")
-  p <- ssm_plot(res)
+  p <- ssm_plot_circle(res)
   
   # Test the output object
   expect_type(p, "list")
@@ -30,12 +30,19 @@ test_that("Measure-contrast SSM plot is correct", {
     measures = c("ASPD", "NARPD"),
     contrast = TRUE
   )
-  p <- ssm_plot(res, xy = FALSE)
+  p <- ssm_plot_contrast(res, xy = FALSE)
 
   # Test the output object
   expect_type(p, "list")
   expect_s3_class(p, "ggplot")
   vdiffr::expect_doppelganger("measure-contrast ssm", p)
+  
+  p2 <- ssm_plot_circle(res, xy = FALSE)
+  
+  # Test the output object
+  expect_type(p2, "list")
+  expect_s3_class(p2, "ggplot")
+  vdiffr::expect_doppelganger("measure-contrast-circle ssm", p2)
 })
 
 test_that("Group-contrast correlation-based SSM plot is correct", {
@@ -47,7 +54,7 @@ test_that("Group-contrast correlation-based SSM plot is correct", {
     grouping = "Gender",
     contrast = TRUE
   )
-  p <- ssm_plot(res)
+  p <- ssm_plot_contrast(res)
 
   # Test the output object
   expect_type(p, "list")

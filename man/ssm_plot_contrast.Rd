@@ -43,3 +43,15 @@ Take in the results of a Structural Summary Method analysis with pairwise
 contrasts and plot the point and interval estimates for each parameter's
 contrast (e.g., between groups or measures).
 }
+\examples{
+\donttest{
+data("jz2017")
+res <- ssm_analyze(
+  jz2017,
+  scales = 2:9, 
+  measures = c("NARPD", "ASPD"),
+  contrast = TRUE
+)
+ssm_plot_contrast(res)
+}
+}

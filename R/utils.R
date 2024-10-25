@@ -144,3 +144,7 @@ is_num <- function(x, n = NULL) {
     is.numeric(x) && length(x) == n
   }
 }
+
+is_null_or_num <- function(x, n = NULL) {
+  is.null(x) || is_num(x, n)
+}

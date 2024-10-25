@@ -208,15 +208,19 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   grp <- as.integer(bs_input[[ncol(bs_input)]])
   scores <- mean_scores(mat, grp, listwise)
   colnames(scores) <- scales_names
+  group_levels <- levels(bs_input[[ncol(bs_input)]])
   if (contrast) {
     scores <- rbind(scores, scores[2, ] - scores[1, ])
-    scores <- cbind(
-      label = c(group_levels, paste0(group_levels[[2]], " - ", group_levels[[1]])),
-      as.data.frame(scores)
-    )
-  } else {
-    scores <- cbind(label = group_levels, as.data.frame(scores))
   }
+  scores <- as.data.frame(scores)
+  Group <- group_levels
+  Measure <- rep(NA_character_, times = n_groups)
+  if (contrast && !is.null(grouping)) {
+    Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
+    Measure <- c(Measure, Measure[[1]])
+  }
+  Label <- Group
+  scores <- cbind(Label, Group, Measure, scores)
 
   # Create function that will perform bootstrapping
   bs_function <- function(.data, index, scales, angles, contrast, listwise, ...) {
@@ -240,15 +244,15 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
     strata = bs_input[[ncol(bs_input)]]
   )
   
-  # Select and label results
-  row_labels <- group_levels
-  if (contrast) {
-    row_labels <- c(
-      row_labels, 
-      paste0(group_levels[[2]], " - ", group_levels[[1]])
-    )
+  params <- bs_output
+  Group <- group_levels
+  Measure <- rep(NA_character_, times = n_groups)
+  if (contrast && !is.null(grouping)) {
+    Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
+    Measure <- c(Measure, Measure[[1]])
   }
-  results <- cbind(label = row_labels, bs_output)
+  Label <- Group
+  results <- cbind(Label, Group, Measure, params)
   
   # Collect analysis details
   details <- list(
@@ -330,12 +334,13 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
     Measure <- c(Measure, Measure[[1]])
   }
-  scores <- cbind(Group, Measure, scores)
   if (is.null(grouping)) {
-    scores$label <- Measure
+    Label <- Measure
   } else {
-    scores$label <- paste0(Measure, ": ", Group)
+    Label <- paste0(Measure, ": ", Group)
   }
+  scores <- cbind(Label, Group, Measure, scores)
+
 
   # Create function that will perform bootstrapping
   bs_function <- function(.data, index, scales, measures, angles, contrast, 
@@ -371,12 +376,13 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
     Measure <- c(Measure, Measure[[1]])
   }
-  results <- cbind(Group, Measure, bs_output)
   if (is.null(grouping)) {
-    results$label <- Measure
+    Label <- Measure
   } else {
-    results$label <- paste0(Measure, ": ", Group)
+    Label <- paste0(Measure, ": ", Group)
   }
+  results <- cbind(Label, Group, Measure, bs_output)
+
 
   # Collect analysis details
   details <- list(

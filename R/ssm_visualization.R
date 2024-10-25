@@ -1,54 +1,3 @@
-#' Create a figure from SSM results
-#'
-#' Take in the results of an SSM analysis function and create figure from it.
-#'
-#' @param .ssm_object Required. The results output of \code{\link{ssm_analyze}}.
-#' @param fontsize Optional. A single positive number indicating the font size
-#'   of text in the figure, in points (default = 12).
-#' @param ... Additional arguments to pass on to the plotting function.
-#' @return A ggplot2 object representing the figure
-#' @seealso ggsave Function for saving plots to image files.
-#' @family ssm functions
-#' @family visualization functions
-#' @export
-#' @examples
-#' \donttest{
-#' # Load example data
-#' data("jz2017")
-#' 
-#' # Plot profile results
-#' res <- ssm_analyze(
-#'   jz2017,
-#'   scales = 2:9, 
-#'   measures = c("NARPD", "ASPD")
-#' )
-#' p <- ssm_plot(res)
-#' 
-#' # Plot contrast results
-#' res <- ssm_analyze(
-#'   jz2017,
-#'   scales = 2:9, 
-#'   measures = c("NARPD", "ASPD"), 
-#'   contrast = TRUE
-#' )
-#' p <- ssm_plot(res)
-#' }
-#' 
-ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
-
-  # Check for valid input arguments
-  stopifnot(class(.ssm_object) == "circumplex_ssm")
-  stopifnot(is.numeric(fontsize) && length(fontsize) == 1 && fontsize > 0)
-
-  # Forward to the appropriate subfunction
-  if (.ssm_object$details$contrast) {
-    ssm_plot_contrast(.ssm_object, fontsize = fontsize, ...)
-  } else {
-    ssm_plot_circle(.ssm_object, fontsize = fontsize, ...)
-  }
-
-  # TODO: Add more explanation of the possible arguments in documentation.
-}
 
 #' Create a Circular Plot of SSM Results
 #'
@@ -83,11 +32,23 @@ ssm_plot <- function(.ssm_object, fontsize = 12, ...) {
 #'   coverage of a high number of variables).
 #' @param ... Currently ignored.
 #' @return A ggplot variable containing a completed circular plot.
-
-ssm_plot_circle <- function(.ssm_object, amax = NULL, 
+#' @export
+#' @examples
+#' \donttest{
+#' data("jz2017")
+#' res <- ssm_analyze(
+#'   jz2017,
+#'   scales = 2:9, 
+#'   measures = c("NARPD", "ASPD")
+#' )
+#' ssm_plot_circle(res)
+#' }
+ssm_plot_circle <- function(.ssm_object, 
+                            amax = NULL, 
                             legend_font_size = 12,
                             scale_font_size = 12,
-                            lowfit = TRUE, repel = FALSE,
+                            lowfit = TRUE, 
+                            repel = FALSE,
                             angle_labels = NULL,
                             legend.box.spacing = 0,
                             palette = "Set2",
@@ -105,10 +66,14 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
   angles <- as.integer(round(.ssm_object$details$angles))
   
 
-  stopifnot(is.null(amax) || is.number(amax))
+  stopifnot(is_null_or_num(amax, n = 1))
 
   if (is.null(amax)) {
     amax <- pretty_max(.ssm_object$results$a_uci)
+  }
+  
+  if (.ssm_object$details$contrast) {
+    df <- df[1:2, ]
   }
 
   # Convert results to numbers usable by ggplot and ggforce
@@ -123,12 +88,12 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
     df_plot[c("a_lci", "a_uci", "x_est", "y_est")],
     function(x) x * 10 / (2 * amax)
   )
-  df_plot$label <- factor(
-    df_plot$label, 
-    levels = unique(as.character(df_plot$label))
+  df_plot$Label <- factor(
+    df_plot$Label, 
+    levels = unique(as.character(df_plot$Label))
   )
   
-  # Remove profiles with low model fit (unless over-rided)
+  # Remove profiles with low model fit (unless overrided)
   n <- nrow(df_plot)
   if (lowfit == FALSE) {
     df_plot <- df_plot[df_plot$fit_est >= .70, ]
@@ -180,14 +145,14 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
         ggplot2::aes(
           x0 = 0, y0 = 0, 
           r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
-          fill = label, color = label, linetype = lnty
+          fill = Label, color = Label, linetype = lnty
         ),
         alpha = 0.4,
         linewidth = 1
       ) +
       ggplot2::geom_point(
         data = df_plot,
-        ggplot2::aes(x = x_est, y = y_est, color = label, fill = label),
+        ggplot2::aes(x = x_est, y = y_est, color = Label, fill = Label),
         shape = 21,
         size = 3,
         color = "black"
@@ -208,7 +173,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
     p <- p + 
       ggrepel::geom_label_repel(
         data = df_plot,
-        ggplot2::aes(x = x_est, y = y_est, label = label),
+        ggplot2::aes(x = x_est, y = y_est, label = Label),
         nudge_x = -8 - df_plot$x_est,
         direction = "y",
         hjust = 1,
@@ -240,7 +205,18 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
 #' @param ... Additional arguments will be ignored.
 #' @return A ggplot variable containing difference point-ranges faceted by SSM
 #'   parameter. An interval that does not contain the value of zero has p<.05.
-
+#' @export
+#' @examples
+#' \donttest{
+#' data("jz2017")
+#' res <- ssm_analyze(
+#'   jz2017,
+#'   scales = 2:9, 
+#'   measures = c("NARPD", "ASPD"),
+#'   contrast = TRUE
+#' )
+#' ssm_plot_contrast(res)
+#' }
 ssm_plot_contrast <- function(.ssm_object, drop_xy = FALSE, 
                               sig_color = "#fc8d62", ns_color = "white",
                               linesize = 1.25, fontsize = 12, ...) {
@@ -303,7 +279,7 @@ ssm_plot_contrast <- function(.ssm_object, drop_xy = FALSE,
       "Significant",
       values = c("TRUE" = sig_color, "FALSE" = ns_color)
     ) +
-    ggplot2::labs(y = paste0("Contrast (", res$label, ")")) +
+    ggplot2::labs(y = paste0("Contrast (", res$Label, ")")) +
     ggplot2::facet_wrap(~Parameter,
       nrow = 1, scales = "free",
       labeller = ggplot2::label_parsed
@@ -437,7 +413,7 @@ ssm_table <- function(.ssm_object, caption = NULL,
   # Format output data
   table_df <- 
     data.frame(
-      Profile = df$label,
+      Profile = df$Label,
       Elevation = sprintf("%.2f (%.2f, %.2f)", df$e_est, df$e_lci, df$e_uci),
       `X Value` = sprintf("%.2f (%.2f, %.2f)", df$x_est, df$x_lci, df$x_uci),
       `Y Value` = sprintf("%.2f (%.2f, %.2f)", df$y_est, df$y_lci, df$y_uci),
@@ -511,40 +487,32 @@ html_render <- function(df, caption = NULL, align = "l", ...) {
   print(t, type = "html")
 }
 
-# S3 Generic
+# TODO: Working on this now
 
-#' Create a spider/radar plot of circumplex scores
-#'
-#' Create a spider/radar plot of circumplex scores, either from a data frame
-#' containing scale scores or the result of \code{ssm_analyze()}.
-#'
-#' @param x A dataframe or ssm result object.
-#' @param amin An optional number to set as the minimum amplitude (center of
-#'   circle). If set to `NULL`, will try to detect a reasonable value.
-#' @param amax An optional number to set as the maximum amplitude (outer ring of
-#'   circle). If set set to `NULL`, will try to detect a reasonable value.
-#' @param angle_labels An optional character vector to display outside the
-#'   circle at each angle. Must be the same length as the number of angles.
-#' @param linewidth An optional width for the lines of the profile polygons.
-#' @param pointsize An optional size for the points at the scale scores.
-#' @param ... Additional arguments for the S3 methods
-#' @return A spider/radar plot object
-#' @export
-ssm_plot_scores <- function(x, 
-                            amin = NULL, amax = NULL, angle_labels = NULL, 
-                            linewidth = 1, pointsize = 3, ...) {
-  UseMethod("ssm_plot_scores")
+ssm_plot_curve <- function(.ssm_object, ...) {
+  
+  results <- .ssm_object$results
+  scores <- .ssm_object$scores
+  
+  if (.ssm_object$details$contrast) {
+    results <- results[1:2, ]
+    scores <- scores[1:2, ]
+  }
+  
+  scores_only <- subset(scores, select = -c(Label, Group, Measure))
+  score_vec <- as.vector(unlist(scores_only))
+
 }
 
-#' @method ssm_plot_scores circumplex_ssm
+
 #' @export
-ssm_plot_scores.circumplex_ssm <- function(x,
-                                           amin = NULL, 
-                                           amax = NULL,
-                                           angle_labels = NULL,
-                                           linewidth = 1,
-                                           pointsize = 3,
-                                           ...) {
+ssm_plot_scores <- function(x,
+                            amin = NULL, 
+                            amax = NULL,
+                            angle_labels = NULL,
+                            linewidth = 1,
+                            pointsize = 3,
+                            ...) {
   
   # Get scores from SSM object
   scores <- x$scores
@@ -579,73 +547,13 @@ ssm_plot_scores.circumplex_ssm <- function(x,
   p +
     ggplot2::geom_polygon(
       data = scores_long,
-      mapping = ggplot2::aes(x = px, y = py, color = label, linetype = label),
+      mapping = ggplot2::aes(x = px, y = py, color = Label, linetype = Label),
       fill = NA,
       linewidth = linewidth
     ) +
     ggplot2::geom_point(
       data = scores_long,
-      mapping = ggplot2::aes(x = px, y = py, color = label),
-      size = pointsize
-    )
-  
-}
-
-#' @method ssm_plot_scores data.frame
-#' @export
-ssm_plot_scores.data.frame <- function(x, 
-                                       amin = NULL, 
-                                       amax = NULL,
-                                       angle_labels = NULL,
-                                       linewidth = 1,
-                                       pointsize = 3,
-                                       scales, 
-                                       angles = octants(),
-                                       group = NULL,
-                                       ...) {
-  
-  if (!is_provided(group)) {
-    x$Group <- as.character(1:nrow(x))
-    group <- rlang::quo(Group)
-  }
-  # Get scores from SSM object
-  scores <- dplyr::select(x, {{group}}, {{scales}})
-  # Reshape scores for plotting
-  scores_long <- tidyr::pivot_longer(
-    scores, 
-    cols = {{scales}},
-    names_to = "Scale",
-    values_to = "Score"
-  )
-  if (is.null(amin)) amin <- pretty_min(scores_long$Score)
-  if (is.null(amax)) amax <- pretty_max(scores_long$Score)
-  scores_long$Angle <- rep(angles, times = nrow(scores_long) / length(angles))
-  scores_long$Radian <- as_radian(as_degree(scores_long$Angle))
-  scores_long$pr <- rescale(
-    scores_long$Score, 
-    to = c(0, 5), 
-    from = c(amin, amax)
-  )
-  scores_long$px <- scores_long$pr * cos(scores_long$Radian)
-  scores_long$py <- scores_long$pr * sin(scores_long$Radian)
-  
-  p <- circle_base(
-    angles = angles, 
-    amin = amin, 
-    amax = amax,
-    labels = angle_labels
-  )
-  
-  p +
-    ggplot2::geom_polygon(
-      data = scores_long,
-      mapping = ggplot2::aes(x = px, y = py, color = {{group}}, linetype = {{group}}),
-      fill = NA,
-      linewidth = linewidth
-    ) +
-    ggplot2::geom_point(
-      data = scores_long,
-      mapping = ggplot2::aes(x = px, y = py, color = {{group}}),
+      mapping = ggplot2::aes(x = px, y = py, color = Label),
       size = pointsize
     )
   

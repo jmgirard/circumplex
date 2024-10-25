@@ -62,3 +62,14 @@ Take in the results of a Structural Summary Method analysis and plot the
 point and interval estimate for each row (e.g., group or measure) in a
 circular space quantified by displacement and amplitude.
 }
+\examples{
+\donttest{
+data("jz2017")
+res <- ssm_analyze(
+  jz2017,
+  scales = 2:9, 
+  measures = c("NARPD", "ASPD")
+)
+ssm_plot_circle(res)
+}
+}

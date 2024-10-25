@@ -66,7 +66,7 @@ ssm_table(results, drop_xy = TRUE, render = FALSE) %>%
 ```
 
 ```{r plot}
-ssm_plot(results)
+ssm_plot_circle(results)
 ```
 
 ### Example 2
@@ -93,7 +93,7 @@ ssm_table(results2, drop_xy = TRUE, render = FALSE) %>%
 ```
 
 ```{r plot2}
-ssm_plot(results2)
+ssm_plot_contrast(results2)
 ```
 
 ## Code of Conduct

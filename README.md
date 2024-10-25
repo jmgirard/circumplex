@@ -146,7 +146,7 @@ Antisocial PD
 </table>
 
 ``` r
-ssm_plot(results)
+ssm_plot_circle(results)
 ```
 
 ![](man/figures/README-plot-1.png)<!-- -->
@@ -286,7 +286,7 @@ Male - Female
 </table>
 
 ``` r
-ssm_plot(results2)
+ssm_plot_contrast(results2)
 ```
 
 ![](man/figures/README-plot2-1.png)<!-- -->
