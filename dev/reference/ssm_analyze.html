@@ -73,12 +73,12 @@ measures will be calculated.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ssm_analyze</span><span class="op">(</span></span>
-<span>  <span class="va">.data</span>,</span>
+<span>  <span class="va">data</span>,</span>
 <span>  <span class="va">scales</span>,</span>
 <span>  angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  measures <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  grouping <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  contrast <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"test"</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
+<span>  contrast <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  boots <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>  interval <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  listwise <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -90,13 +90,14 @@ measures will be calculated.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg--data">.data<a class="anchor" aria-label="anchor" href="#arg--data"></a></dt>
+<dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>Required. A data frame containing at least circumplex scales.</p></dd>
 
 
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
-<dd><p>Required. The variable names or column numbers for the
-variables in <code>.data</code> that contain circumplex scales to be analyzed.</p></dd>
+<dd><p>Required. A character vector of column names, or a numeric
+vector of column indexes, from <code>data</code> that contains the circumplex scale
+scores to be analyzed.</p></dd>
 
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>
@@ -106,30 +107,26 @@ of each circumplex scale included in <code>scales</code> (in degrees). (default 
 
 
 <dt id="arg-measures">measures<a class="anchor" aria-label="anchor" href="#arg-measures"></a></dt>
-<dd><p>Optional. The variable names or column numbers for one or
-more variables in <code>.data</code> to be correlated with the circumplex scales
-and analyzed using correlation-based SSM analyses. To analyze the
-circumplex scales using mean-based analyses, simply omit this argument or
-set it to NULL (default = NULL).</p></dd>
+<dd><p>Optional. Either <code>NULL</code> or a character vector of column names
+from <code>data</code> that contains one or more variables to be correlated with the
+circumplex scales and analyzed using correlation-based SSM analyses.</p></dd>
 
 
 <dt id="arg-grouping">grouping<a class="anchor" aria-label="anchor" href="#arg-grouping"></a></dt>
-<dd><p>Optional. The variable name or column number for the variable
-in <code>.data</code> that indicates the group membership of each observation. To
-analyze all observations in a single group, simply omit this argument or
-set it to NULL (default = NULL).</p></dd>
+<dd><p>Optional. Either <code>NULL</code> or a string that contains the column
+name from <code>data</code> of the variable that indicates the group membership of
+each observation.</p></dd>
 
 
 <dt id="arg-contrast">contrast<a class="anchor" aria-label="anchor" href="#arg-contrast"></a></dt>
-<dd><p>Optional. A string indicating what type of contrast to run.
-Current options are "none" for no contrast, "model" to find SSM parameters
-for the difference scores, or "test" to find the difference between the SSM
-parameters. Note that only two groups or measures can be contrasted at a
-time (default = "none").</p></dd>
+<dd><p>Optional. A logical indicating whether to output the
+difference between two measures' or two groups' SSM parameters. Can only be
+set to TRUE when there are exactly two measures and one group, one measure
+and two groups, or no measures and two groups (default = FALSE).</p></dd>
 
 
 <dt id="arg-boots">boots<a class="anchor" aria-label="anchor" href="#arg-boots"></a></dt>
-<dd><p>Optional. A single positive integer indicating how many
+<dd><p>Optional. A single positive whole number indicating how many
 bootstrap resamples to use when estimating the confidence intervals
 (default = 2000).</p></dd>
 
@@ -148,37 +145,37 @@ each bootstrap resample and is slower to compute (default = TRUE).</p></dd>
 
 
 <dt id="arg-measures-labels">measures_labels<a class="anchor" aria-label="anchor" href="#arg-measures-labels"></a></dt>
-<dd><p>Optional. A character vector providing a label for
-each measure provided in <code>measures</code> (in the same order) to appear in
-the results as well as tables and plots derived from the results. If
-omitted or set to NULL will default to using the measures variable names
-(default = NULL).</p></dd>
+<dd><p>Optional. Either <code>NULL</code> or a character vector
+providing a label for each measure provided in <code>measures</code> (in the same
+order) to appear in the results as well as tables and plots derived from
+the results.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list containing the results and description of the analysis.</p>
 <dl><dt>results</dt>
-<dd><p>A tibble with the SSM parameter estimates</p></dd>
- <dt>details</dt>
-<dd><p>A
-list with the number of bootstrap resamples (boots), the confidence
-interval percentage level (interval), and the angular displacement of
-scales (angles)</p></dd>
- <dt>call</dt>
-<dd><p>A language object containing the function call
-that created this object</p></dd>
- <dt>scores</dt>
-<dd><p>A tibble containing the mean scale
-scores</p></dd>
+<dd><p>A data frame with the SSM parameter estimates</p></dd>
+
+<dt>details</dt>
+<dd><p>A list with the number of bootstrap resamples (boots),
+the confidence interval percentage level (interval), and the angular
+displacement of scales (angles)</p></dd>
+
+<dt>call</dt>
+<dd><p>A language object containing the function call that created
+this object</p></dd>
+
+<dt>scores</dt>
+<dd><p>A data frame containing the mean scale scores</p></dd>
  <dt>type</dt>
-<dd><p>A string indicating what type of SSM analysis was done</p></dd>
+<dd><p>A
+string indicating what type of SSM analysis was done</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other ssm functions:
-<code><a href="ssm_append.html">ssm_append</a>()</code>,
 <code><a href="ssm_parameters.html">ssm_parameters</a>()</code>,
 <code><a href="ssm_plot.html">ssm_plot</a>()</code>,
 <code><a href="ssm_score.html">ssm_score</a>()</code>,
@@ -194,11 +191,13 @@ scores</p></dd>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Single-group mean-based SSM</span></span></span>
-<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants())</span>
+<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">jz2017</span>,</span></span>
+<span class="r-in"><span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Profile [All]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [All]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.917      0.888      0.946</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.351      0.324      0.378</span>
@@ -209,15 +208,14 @@ scores</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Single-group correlation-based SSM</span></span></span>
-<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span><span class="va">jz2017</span>,</span></span>
-<span class="r-in"><span>  scales <span class="op">=</span> <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">jz2017</span>,</span></span>
+<span class="r-in"><span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NARPD"</span>, <span class="st">"ASPD"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     measures = c(NARPD, ASPD))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Profile [NARPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.202      0.169      0.236</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.062     -0.094     -0.030</span>
@@ -226,7 +224,9 @@ scores</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    108.967     99.334    118.620</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.957                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Profile [ASPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [ASPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.124      0.089      0.159</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.099     -0.133     -0.063</span>
@@ -237,12 +237,14 @@ scores</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Multiple-group mean-based SSM</span></span></span>
-<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, grouping <span class="op">=</span> <span class="va">Gender</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     grouping = Gender)</span>
+<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">jz2017</span>,</span></span>
+<span class="r-in"><span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  grouping <span class="op">=</span> <span class="st">"Gender"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Profile [Female]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [Female]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.946      0.907      0.983</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.459      0.420      0.499</span>
@@ -251,7 +253,9 @@ scores</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    325.963    322.240    329.833</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.889                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Profile [Male]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [Male]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.884      0.842      0.925</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.227      0.192      0.262</span>
@@ -262,116 +266,157 @@ scores</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple-group mean-based SSM with contrast</span></span></span>
-<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span><span class="va">jz2017</span>,</span></span>
-<span class="r-in"><span>  scales <span class="op">=</span> <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, grouping <span class="op">=</span> <span class="va">Gender</span>,</span></span>
-<span class="r-in"><span>  contrast <span class="op">=</span> <span class="st">"model"</span></span></span>
+<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">jz2017</span>,</span></span>
+<span class="r-in"><span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  grouping <span class="op">=</span> <span class="st">"Gender"</span>,</span></span>
+<span class="r-in"><span>  contrast <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     grouping = Gender, contrast = "model")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Contrast [Male - Female]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [Female]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation        -0.062     -0.118     -0.004</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.232     -0.286     -0.181</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.124      0.069      0.179</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.263      0.208      0.321</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    151.858    140.348    163.727</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.855                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.946      0.908      0.986</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.459      0.420      0.496</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.310     -0.355     -0.267</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.554      0.512      0.598</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    325.963    321.951    329.924</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.889                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [Male]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.884      0.842      0.929</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.227      0.192      0.263</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.186     -0.224     -0.148</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.294      0.258      0.333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    320.685    313.849    328.047</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.824                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Contrast [Male - Female]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  Estimate   Lower CI   Upper CI</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Elevation        -0.062     -0.118     -0.004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ X-Value          -0.232     -0.286     -0.181</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Y-Value           0.124      0.069      0.179</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Amplitude        -0.261     -0.317     -0.204</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Displacement     -5.278    -13.507      2.770</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Model Fit        -0.066                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Single-group correlation-based SSM with contrast</span></span></span>
-<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span><span class="va">jz2017</span>,</span></span>
-<span class="r-in"><span>  scales <span class="op">=</span> <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span>, contrast <span class="op">=</span> <span class="st">"test"</span></span></span>
+<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">jz2017</span>,</span></span>
+<span class="r-in"><span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NARPD"</span>, <span class="st">"ASPD"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  contrast <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     measures = c(NARPD, ASPD), contrast = "test")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Contrast [ASPD - NARPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation        -0.079     -0.116     -0.041</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.037     -0.077      0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.024     -0.014      0.060</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.037     -0.001      0.075</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement      6.960     -3.385     18.057</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.007                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span><span class="va">jz2017</span>,</span></span>
-<span class="r-in"><span>  scales <span class="op">=</span> <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span>, </span></span>
-<span class="r-in"><span>  measures_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Narcissistic"</span>, <span class="st">"Antisocial"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     measures = c(NARPD, ASPD), measures_labels = c("Narcissistic", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         "Antisocial"))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Profile [Narcissistic]:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.202      0.169      0.236</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.062     -0.094     -0.028</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.179      0.146      0.214</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.189      0.156      0.226</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    108.967     99.182    118.263</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.202      0.168      0.236</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.062     -0.095     -0.029</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.179      0.146      0.212</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.189      0.154      0.224</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    108.967     99.381    118.797</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.957                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Profile [Antisocial]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [ASPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.124      0.090      0.159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.099     -0.133     -0.066</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.203      0.168      0.237</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.226      0.191      0.263</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    115.927    107.805    124.314</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.124      0.089      0.158</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.099     -0.134     -0.066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.203      0.168      0.236</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.226      0.189      0.262</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    115.927    107.782    124.564</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.964                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Contrast [ASPD - NARPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  Estimate   Lower CI   Upper CI</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Elevation        -0.079     -0.116     -0.041</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ X-Value          -0.037     -0.077      0.000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Y-Value           0.024     -0.014      0.060</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Amplitude         0.037     -0.001      0.075</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Displacement      6.960     -3.385     18.057</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Model Fit         0.007                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple-group correlation-based SSM</span></span></span>
-<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span><span class="va">jz2017</span>,</span></span>
-<span class="r-in"><span>  scales <span class="op">=</span> <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="va">NARPD</span>,</span></span>
-<span class="r-in"><span>  grouping <span class="op">=</span> <span class="va">Gender</span></span></span>
+<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">jz2017</span>,</span></span>
+<span class="r-in"><span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  measures <span class="op">=</span> <span class="st">"NARPD"</span>,</span></span>
+<span class="r-in"><span>  grouping <span class="op">=</span> <span class="st">"Gender"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     measures = NARPD, grouping = Gender)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Profile [Female_NARPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD: Female]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.172      0.128      0.218</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.080     -0.125     -0.033</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.202      0.153      0.250</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.217      0.168      0.268</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    111.669     99.626    122.752</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.972                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD: Male]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.244      0.194      0.295</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.029     -0.074      0.017</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.146      0.097      0.192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.149      0.102      0.195</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    101.248     83.457    119.191</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.902                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Multiple-group correlation-based SSM with contrast</span></span></span>
+<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">jz2017</span>,</span></span>
+<span class="r-in"><span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  measures <span class="op">=</span> <span class="st">"NARPD"</span>,</span></span>
+<span class="r-in"><span>  grouping <span class="op">=</span> <span class="st">"Gender"</span>,</span></span>
+<span class="r-in"><span>  contrast <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD: Female]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.172      0.127      0.215</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.080     -0.127     -0.034</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.202      0.152      0.250</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.217      0.167      0.269</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    111.669     99.967    123.191</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    111.669     99.844    123.191</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.972                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Profile [Male_NARPD]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD: Male]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.244      0.192      0.295</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.029     -0.072      0.014</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.146      0.098      0.191</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.149      0.105      0.195</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    101.248     84.228    119.052</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    101.248     84.228    119.107</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.902                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Multiple-group correlation-based SSM with contrast</span></span></span>
-<span class="r-in"><span><span class="fu">ssm_analyze</span><span class="op">(</span><span class="va">jz2017</span>,</span></span>
-<span class="r-in"><span>  scales <span class="op">=</span> <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="va">NARPD</span>,</span></span>
-<span class="r-in"><span>  grouping <span class="op">=</span> <span class="va">Gender</span>, contrast <span class="op">=</span> <span class="st">"test"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     measures = NARPD, grouping = Gender, contrast = "test")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Contrast [NARPD: Male - Female]:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.072      0.004      0.141</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.051     -0.017      0.116</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.056     -0.119      0.010</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude        -0.068     -0.133      0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    -10.421    -32.060     12.016</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit        -0.071                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Contrast [NARPD: Male - Female]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  Estimate   Lower CI   Upper CI</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Elevation         0.072      0.005      0.139</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ X-Value           0.051     -0.012      0.113</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Y-Value          -0.056     -0.124      0.010</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Amplitude        -0.068     -0.138     -0.004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Displacement    -10.421    -30.538     10.798</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Model Fit        -0.071                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

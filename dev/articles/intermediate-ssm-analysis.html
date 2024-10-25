@@ -107,16 +107,16 @@ contain a single variable (name or column number) that specifies each
 observation’s group. For instance, the <code>Gender</code> variable in
 the <code>jz2017</code> dataset is a factor with two levels: Female and
 Male. To analyze each gender separately, we need to add the
-<code>grouping = Gender</code> argument to the function call.</p>
+<code>grouping = "Gender"</code> argument to the function call.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"iipsc"</span><span class="op">)</span></span>
-<span><span class="va">jz2017s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/standardize.html">standardize</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, instrument <span class="op">=</span> <span class="va">iipsc</span>, sample <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017s</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, grouping <span class="op">=</span> <span class="va">Gender</span><span class="op">)</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  grouping <span class="op">=</span> <span class="st">"Gender"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA:NO, angles = octants(), </span></span>
-<span><span class="co">#&gt;     grouping = Gender)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Mean Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -124,7 +124,9 @@ Male. To analyze each gender separately, we need to add the
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.946      0.907      0.984</span></span>
 <span><span class="co">#&gt; X-Value           0.459      0.422      0.498</span></span>
@@ -133,7 +135,9 @@ Male. To analyze each gender separately, we need to add the
 <span><span class="co">#&gt; Displacement    325.963    321.834    329.805</span></span>
 <span><span class="co">#&gt; Model Fit         0.889                      </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Male]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [Male]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.884      0.839      0.928</span></span>
 <span><span class="co">#&gt; X-Value           0.227      0.191      0.262</span></span>
@@ -159,10 +163,10 @@ Profile
 Elevation
 </th>
 <th style="text-align:left;">
-X-Value
+X.Value
 </th>
 <th style="text-align:left;">
-Y-Value
+Y.Value
 </th>
 <th style="text-align:left;">
 Amplitude
@@ -229,17 +233,8 @@ Male
 <p>Any number of groups can be analyzed in this way, and the output will
 contain additional profile blocks, the table will contain additional
 rows, and the figure will contain additional points. The grouping
-variable just needs to contain more than one level (i.e., unique value).
-Also notice how, in the plot above, the Male profile has a dashed border
-instead of the typical solid border. This is because the Male profile
-has low prototypicality (i.e.,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>&lt;</mo><mn>.70</mn></mrow><annotation encoding="application/x-tex">R^2&lt;.70</annotation></semantics></math>)
-and therefore its plot is untrustworthy. It is also possible to prevent
-profiles from low prototypicality from plotting using the
-<code>lowfit</code> argument.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results</span>, lowfit <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/group_plot_lowfit-1.png" width="100%"></p>
+variable just needs to contain more than one level (i.e., unique
+value).</p>
 </div>
 <div class="section level3">
 <h3 id="generalizing-to-multiple-measures">Generalizing to multiple measures<a class="anchor" aria-label="anchor" href="#generalizing-to-multiple-measures"></a>
@@ -248,16 +243,19 @@ profiles from low prototypicality from plotting using the
 function call by providing a vector of variables to the
 <code>measures</code> argument instead of a single variable. This can be
 done by wrapping the variable names or column numbers with the
-<code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> or, if they are adjacent columns, with the
-<code>:</code> shortcut. The package functions were written to analyze
-all measures and groups within a single bootstrap, so adding additional
-measures and groups should still be fast.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span><span class="op">)</span></span>
+<code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> or, if they are adjacent columns, with the column
+numbers and the <code>:</code> shortcut. The package functions were
+written to analyze all measures and groups within a single
+bootstrapping, so adding additional measures and groups should still be
+fast.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NARPD"</span>, <span class="st">"ASPD"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></span>
-<span><span class="co">#&gt;     measures = c(NARPD, ASPD))</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -265,7 +263,9 @@ measures and groups should still be fast.</p>
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [NARPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [NARPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.202      0.168      0.236</span></span>
 <span><span class="co">#&gt; X-Value          -0.062     -0.095     -0.026</span></span>
@@ -274,7 +274,9 @@ measures and groups should still be fast.</p>
 <span><span class="co">#&gt; Displacement    108.967     98.853    118.517</span></span>
 <span><span class="co">#&gt; Model Fit         0.957                      </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [ASPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [ASPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.124      0.090      0.157</span></span>
 <span><span class="co">#&gt; X-Value          -0.099     -0.134     -0.063</span></span>
@@ -282,7 +284,7 @@ measures and groups should still be fast.</p>
 <span><span class="co">#&gt; Amplitude         0.226      0.188      0.265</span></span>
 <span><span class="co">#&gt; Displacement    115.927    107.250    124.516</span></span>
 <span><span class="co">#&gt; Model Fit         0.964</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -296,10 +298,10 @@ Profile
 Elevation
 </th>
 <th style="text-align:left;">
-X-Value
+X.Value
 </th>
 <th style="text-align:left;">
-Y-Value
+Y.Value
 </th>
 <th style="text-align:left;">
 Amplitude
@@ -360,7 +362,7 @@ ASPD
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/measures_plot-1.png" width="100%"></p>
 </div>
@@ -371,13 +373,16 @@ ASPD
 groups. As you might expect, this requires providing both the
 <code>measures</code> and <code>grouping</code> arguments to the same
 function call. Again, any number of measures and groups is possible. The
-profiles in such an analysis will be named GROUP_MEASURE as below.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, grouping <span class="op">=</span> <span class="va">Gender</span>, measures <span class="op">=</span> <span class="va">PARPD</span><span class="op">:</span><span class="va">SZTPD</span><span class="op">)</span></span>
+profiles in such an analysis will be named “Measure: Group” as
+below.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  grouping <span class="op">=</span> <span class="st">"Gender"</span>, </span>
+<span>  measures <span class="op">=</span> <span class="fl">10</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></span>
-<span><span class="co">#&gt;     measures = PARPD:SZTPD, grouping = Gender)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -385,7 +390,9 @@ profiles in such an analysis will be named GROUP_MEASURE as below.</p>
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Female_PARPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [PARPD: Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.262      0.220      0.305</span></span>
 <span><span class="co">#&gt; X-Value          -0.146     -0.192     -0.100</span></span>
@@ -394,7 +401,9 @@ profiles in such an analysis will be named GROUP_MEASURE as below.</p>
 <span><span class="co">#&gt; Displacement    140.524    126.580    155.129</span></span>
 <span><span class="co">#&gt; Model Fit         0.870                      </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Female_SCZPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [SCZPD: Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.177      0.130      0.218</span></span>
 <span><span class="co">#&gt; X-Value          -0.230     -0.285     -0.173</span></span>
@@ -403,7 +412,9 @@ profiles in such an analysis will be named GROUP_MEASURE as below.</p>
 <span><span class="co">#&gt; Displacement    191.613    178.684    208.113</span></span>
 <span><span class="co">#&gt; Model Fit         0.845                      </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Female_SZTPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [SZTPD: Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.237      0.194      0.280</span></span>
 <span><span class="co">#&gt; X-Value          -0.130     -0.175     -0.087</span></span>
@@ -412,7 +423,9 @@ profiles in such an analysis will be named GROUP_MEASURE as below.</p>
 <span><span class="co">#&gt; Displacement    172.870    151.247    198.040</span></span>
 <span><span class="co">#&gt; Model Fit         0.812                      </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Male_PARPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [PARPD: Male]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.243      0.193      0.288</span></span>
 <span><span class="co">#&gt; X-Value          -0.035     -0.080      0.015</span></span>
@@ -421,7 +434,9 @@ profiles in such an analysis will be named GROUP_MEASURE as below.</p>
 <span><span class="co">#&gt; Displacement    106.881     82.677    129.996</span></span>
 <span><span class="co">#&gt; Model Fit         0.648                      </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Male_SCZPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [SCZPD: Male]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.204      0.145      0.260</span></span>
 <span><span class="co">#&gt; X-Value          -0.178     -0.220     -0.136</span></span>
@@ -430,7 +445,9 @@ profiles in such an analysis will be named GROUP_MEASURE as below.</p>
 <span><span class="co">#&gt; Displacement    185.351    167.551    203.091</span></span>
 <span><span class="co">#&gt; Model Fit         0.917                      </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Male_SZTPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [SZTPD: Male]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.240      0.186      0.293</span></span>
 <span><span class="co">#&gt; X-Value          -0.037     -0.084      0.011</span></span>
@@ -438,7 +455,7 @@ profiles in such an analysis will be named GROUP_MEASURE as below.</p>
 <span><span class="co">#&gt; Amplitude         0.047      0.013      0.101</span></span>
 <span><span class="co">#&gt; Displacement    142.345     68.178    218.702</span></span>
 <span><span class="co">#&gt; Model Fit         0.424</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -452,10 +469,10 @@ Profile
 Elevation
 </th>
 <th style="text-align:left;">
-X-Value
+X.Value
 </th>
 <th style="text-align:left;">
-Y-Value
+Y.Value
 </th>
 <th style="text-align:left;">
 Amplitude
@@ -470,7 +487,7 @@ Fit
 <tbody>
 <tr>
 <td style="text-align:left;">
-Female_PARPD
+PARPD: Female
 </td>
 <td style="text-align:left;">
 0.26 (0.22, 0.30)
@@ -493,7 +510,7 @@ Female_PARPD
 </tr>
 <tr>
 <td style="text-align:left;">
-Female_SCZPD
+SCZPD: Female
 </td>
 <td style="text-align:left;">
 0.18 (0.13, 0.22)
@@ -516,7 +533,7 @@ Female_SCZPD
 </tr>
 <tr>
 <td style="text-align:left;">
-Female_SZTPD
+SZTPD: Female
 </td>
 <td style="text-align:left;">
 0.24 (0.19, 0.28)
@@ -539,7 +556,7 @@ Female_SZTPD
 </tr>
 <tr>
 <td style="text-align:left;">
-Male_PARPD
+PARPD: Male
 </td>
 <td style="text-align:left;">
 0.24 (0.19, 0.29)
@@ -562,7 +579,7 @@ Male_PARPD
 </tr>
 <tr>
 <td style="text-align:left;">
-Male_SCZPD
+SCZPD: Male
 </td>
 <td style="text-align:left;">
 0.20 (0.15, 0.26)
@@ -585,7 +602,7 @@ Male_SCZPD
 </tr>
 <tr>
 <td style="text-align:left;">
-Male_SZTPD
+SZTPD: Male
 </td>
 <td style="text-align:left;">
 0.24 (0.19, 0.29)
@@ -608,41 +625,46 @@ Male_SZTPD
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/general_plot-1.png" width="100%"></p>
+<p>Note that the borders for the “PARDPD: Male” and “SZTPD: Male” blocks
+are dashed instead of solid. This indicates that these profiles have low
+fit (i.e.,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>&lt;</mo><mn>.7</mn></mrow><annotation encoding="application/x-tex">R^2&lt;.7</annotation></semantics></math>).
+We could alternatively hide these such profiles by adding
+<code>lowfit = FALSE</code> as below (noting that the color guide may
+change as profiles are dropped).</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results3</span>, lowfit <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="intermediate-ssm-analysis_files/figure-html/general_plot2-1.png" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="contrast-analyses">2. Contrast analyses<a class="anchor" aria-label="anchor" href="#contrast-analyses"></a>
 </h2>
-<p>The final argument to master is <code>contrast</code>, which allows
-us to compare two groups or measures. The value of this argument must be
-one of the following strings: “none” for no contrast (default), “model”
-for a model contrast, or “test” for a parameter contrast. A model
-contrast can be useful for mean-based analyses and first generates
-scores for each group (or measure), then calculates the difference
-between these scores, and finally estimates SSM parameters for these
-difference scores. A parameter contrast is typically what is desired for
-inferential comparison and first generates scores for each group (or
-measure), then estimates SSM parameters for these scores, and finally
-calculates the difference between the parameters. To keep the code
-simpler and to discourage “fishing expeditions,” only two groups or
+<p>The final argument to master in this vignette is
+<code>contrast</code>, which allows us to compare two groups or
+measures. Setting this argument to TRUE will first generate scores for
+each group (or measure), then estimate SSM parameters for these scores,
+and finally calculate the difference between the parameters. To keep the
+code simpler and to discourage “fishing expeditions,” only two groups or
 measures can be compared at a time.</p>
 <div class="section level3">
 <h3 id="contrasts-between-groups-means">Contrasts between groups’ means<a class="anchor" aria-label="anchor" href="#contrasts-between-groups-means"></a>
 </h3>
 <p>To compare the mean profiles for females and males, we can start with
 the same syntax we had before and then add a <code>contrast</code>
-argument. For the sake of illustration, we will use a model contrast
-here, but for some purposes, a parameter contrast might be more
-appropriate.</p>
+argument.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017s</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, grouping <span class="op">=</span> <span class="va">Gender</span>, contrast <span class="op">=</span> <span class="st">"model"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">results4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  grouping <span class="op">=</span> <span class="st">"Gender"</span>, </span>
+<span>  contrast <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA:NO, angles = octants(), </span></span>
-<span><span class="co">#&gt;     grouping = Gender, contrast = "model")</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Mean Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -650,22 +672,43 @@ appropriate.</p>
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Contrast [Male - Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
-<span><span class="co">#&gt; Elevation        -0.062     -0.119     -0.004</span></span>
-<span><span class="co">#&gt; X-Value          -0.232     -0.285     -0.181</span></span>
-<span><span class="co">#&gt; Y-Value           0.124      0.066      0.183</span></span>
-<span><span class="co">#&gt; Amplitude         0.263      0.209      0.321</span></span>
-<span><span class="co">#&gt; Displacement    151.858    141.234    164.387</span></span>
-<span><span class="co">#&gt; Model Fit         0.855</span></span></code></pre></div>
-<p>Note that the profile blocks we are used to have been replaced by a
-contrast block. By default, the contrast is made by subtracting the
-first level of the grouping variable from the second level (e.g., Male -
-Female). This provides an indication of the direction of the contrast.
-We can again generate a table and figure to display the results. Note
-that, because we used a model contrast, the figure will be a circular
-figure and not a contrast figure which we will see below. However, we
-would get a contrast figure if we used a parameter contrast.</p>
+<span><span class="co">#&gt; Elevation         0.946      0.908      0.984</span></span>
+<span><span class="co">#&gt; X-Value           0.459      0.419      0.498</span></span>
+<span><span class="co">#&gt; Y-Value          -0.310     -0.353     -0.269</span></span>
+<span><span class="co">#&gt; Amplitude         0.554      0.510      0.599</span></span>
+<span><span class="co">#&gt; Displacement    325.963    322.251    329.698</span></span>
+<span><span class="co">#&gt; Model Fit         0.889                      </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [Male]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
+<span><span class="co">#&gt; Elevation         0.884      0.841      0.925</span></span>
+<span><span class="co">#&gt; X-Value           0.227      0.191      0.261</span></span>
+<span><span class="co">#&gt; Y-Value          -0.186     -0.225     -0.148</span></span>
+<span><span class="co">#&gt; Amplitude         0.294      0.256      0.331</span></span>
+<span><span class="co">#&gt; Displacement    320.685    313.293    327.938</span></span>
+<span><span class="co">#&gt; Model Fit         0.824                      </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Contrast [Male - Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                  Estimate   Lower CI   Upper CI</span></span>
+<span><span class="co">#&gt; Δ Elevation        -0.062     -0.119     -0.004</span></span>
+<span><span class="co">#&gt; Δ X-Value          -0.232     -0.285     -0.181</span></span>
+<span><span class="co">#&gt; Δ Y-Value           0.124      0.066      0.183</span></span>
+<span><span class="co">#&gt; Δ Amplitude        -0.261     -0.318     -0.203</span></span>
+<span><span class="co">#&gt; Δ Displacement     -5.278    -13.627      2.178</span></span>
+<span><span class="co">#&gt; Δ Model Fit        -0.066</span></span></code></pre></div>
+<p>Note that we have the profile blocks for each group as well as a
+contrast block. The contrast is made by subtracting the first level of
+the grouping variable from the second level (e.g., Male - Female). This
+provides an indication of the direction of the contrast. We can again
+generate a table and figure to display the results.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -680,10 +723,10 @@ Contrast
 Elevation
 </th>
 <th style="text-align:left;">
-X-Value
+X.Value
 </th>
 <th style="text-align:left;">
-Y-Value
+Y.Value
 </th>
 <th style="text-align:left;">
 Amplitude
@@ -695,7 +738,54 @@ Displacement
 Fit
 </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+0.95 (0.91, 0.98)
+</td>
+<td style="text-align:left;">
+0.46 (0.42, 0.50)
+</td>
+<td style="text-align:left;">
+-0.31 (-0.35, -0.27)
+</td>
+<td style="text-align:left;">
+0.55 (0.51, 0.60)
+</td>
+<td style="text-align:left;">
+326.0 (322.3, 329.7)
+</td>
+<td style="text-align:left;">
+0.889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+0.88 (0.84, 0.93)
+</td>
+<td style="text-align:left;">
+0.23 (0.19, 0.26)
+</td>
+<td style="text-align:left;">
+-0.19 (-0.22, -0.15)
+</td>
+<td style="text-align:left;">
+0.29 (0.26, 0.33)
+</td>
+<td style="text-align:left;">
+320.7 (313.3, 327.9)
+</td>
+<td style="text-align:left;">
+0.824
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 Male - Female
 </td>
@@ -709,15 +799,16 @@ Male - Female
 0.12 (0.07, 0.18)
 </td>
 <td style="text-align:left;">
-0.26 (0.21, 0.32)
+-0.26 (-0.32, -0.20)
 </td>
 <td style="text-align:left;">
-151.9 (141.2, 164.4)
+-5.3 (-13.6, 2.2)
 </td>
 <td style="text-align:left;">
-0.855
+-0.066
 </td>
-</tr></tbody>
+</tr>
+</tbody>
 </table>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span></span></code></pre></div>
@@ -731,12 +822,14 @@ do is add the <code>contrast</code> argument to the function call
 containing <code>measures</code>. Here we will use a parameter contrast
 to see what they look like.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span>,</span>
-<span>  contrast <span class="op">=</span> <span class="st">"test"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">results5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NARPD"</span>, <span class="st">"ASPD"</span><span class="op">)</span>,</span>
+<span>  contrast <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></span>
-<span><span class="co">#&gt;     measures = c(NARPD, ASPD), contrast = "test")</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -744,14 +837,38 @@ to see what they look like.</p>
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Contrast [ASPD - NARPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [NARPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
-<span><span class="co">#&gt; Elevation        -0.079     -0.114     -0.043</span></span>
-<span><span class="co">#&gt; X-Value          -0.037     -0.074      0.002</span></span>
-<span><span class="co">#&gt; Y-Value           0.024     -0.014      0.061</span></span>
-<span><span class="co">#&gt; Amplitude         0.037     -0.002      0.075</span></span>
-<span><span class="co">#&gt; Displacement      6.960     -3.391     17.383</span></span>
-<span><span class="co">#&gt; Model Fit         0.007</span></span></code></pre></div>
+<span><span class="co">#&gt; Elevation         0.202      0.169      0.233</span></span>
+<span><span class="co">#&gt; X-Value          -0.062     -0.097     -0.029</span></span>
+<span><span class="co">#&gt; Y-Value           0.179      0.144      0.212</span></span>
+<span><span class="co">#&gt; Amplitude         0.189      0.154      0.226</span></span>
+<span><span class="co">#&gt; Displacement    108.967     99.122    118.902</span></span>
+<span><span class="co">#&gt; Model Fit         0.957                      </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [ASPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
+<span><span class="co">#&gt; Elevation         0.124      0.091      0.159</span></span>
+<span><span class="co">#&gt; X-Value          -0.099     -0.135     -0.065</span></span>
+<span><span class="co">#&gt; Y-Value           0.203      0.166      0.237</span></span>
+<span><span class="co">#&gt; Amplitude         0.226      0.190      0.265</span></span>
+<span><span class="co">#&gt; Displacement    115.927    107.571    124.311</span></span>
+<span><span class="co">#&gt; Model Fit         0.964                      </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Contrast [ASPD - NARPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                  Estimate   Lower CI   Upper CI</span></span>
+<span><span class="co">#&gt; Δ Elevation        -0.079     -0.114     -0.043</span></span>
+<span><span class="co">#&gt; Δ X-Value          -0.037     -0.074      0.002</span></span>
+<span><span class="co">#&gt; Δ Y-Value           0.024     -0.014      0.061</span></span>
+<span><span class="co">#&gt; Δ Amplitude         0.037     -0.002      0.075</span></span>
+<span><span class="co">#&gt; Δ Displacement      6.960     -3.391     17.383</span></span>
+<span><span class="co">#&gt; Δ Model Fit         0.007</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -763,25 +880,72 @@ Correlation-based Structural Summary Statistic Contrasts with 95% CIs
 Contrast
 </th>
 <th style="text-align:left;">
-&amp;Delta; Elevation
+Elevation
 </th>
 <th style="text-align:left;">
-&amp;Delta; X-Value
+X.Value
 </th>
 <th style="text-align:left;">
-&amp;Delta; Y-Value
+Y.Value
 </th>
 <th style="text-align:left;">
-&amp;Delta; Amplitude
+Amplitude
 </th>
 <th style="text-align:left;">
-&amp;Delta; Displacement
+Displacement
 </th>
 <th style="text-align:left;">
-&amp;Delta; Fit
+Fit
 </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
+<td style="text-align:left;">
+NARPD
+</td>
+<td style="text-align:left;">
+0.20 (0.17, 0.23)
+</td>
+<td style="text-align:left;">
+-0.06 (-0.10, -0.03)
+</td>
+<td style="text-align:left;">
+0.18 (0.14, 0.21)
+</td>
+<td style="text-align:left;">
+0.19 (0.15, 0.23)
+</td>
+<td style="text-align:left;">
+109.0 (99.1, 118.9)
+</td>
+<td style="text-align:left;">
+0.957
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ASPD
+</td>
+<td style="text-align:left;">
+0.12 (0.09, 0.16)
+</td>
+<td style="text-align:left;">
+-0.10 (-0.13, -0.06)
+</td>
+<td style="text-align:left;">
+0.20 (0.17, 0.24)
+</td>
+<td style="text-align:left;">
+0.23 (0.19, 0.26)
+</td>
+<td style="text-align:left;">
+115.9 (107.6, 124.3)
+</td>
+<td style="text-align:left;">
+0.964
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 ASPD - NARPD
 </td>
@@ -803,7 +967,8 @@ ASPD - NARPD
 <td style="text-align:left;">
 0.007
 </td>
-</tr></tbody>
+</tr>
+</tbody>
 </table>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span></span></code></pre></div>
@@ -823,15 +988,18 @@ different groups. To do so, we need to specify the
 of <code>contrast</code>. In this case, we need to ensure that we are
 providing only a single measure and a grouping variable with just two
 levels (as again only two things can be contrasted at a time). Note that
-the contrast name in this case will take the form of MEASURE: GROUP2 -
-GROUP1.</p>
+the contrast name in this case will take the form of “Measure: Group2 -
+Group1”.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="va">BORPD</span>, </span>
-<span>  grouping <span class="op">=</span> <span class="va">Gender</span>, contrast <span class="op">=</span> <span class="st">"test"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">results6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  measures <span class="op">=</span> <span class="st">"BORPD"</span>, </span>
+<span>  grouping <span class="op">=</span> <span class="st">"Gender"</span>, </span>
+<span>  contrast <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></span>
-<span><span class="co">#&gt;     measures = BORPD, grouping = Gender, contrast = "test")</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -839,14 +1007,38 @@ GROUP1.</p>
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Contrast [BORPD: Male - Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [BORPD: Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
-<span><span class="co">#&gt; Elevation         0.069      0.000      0.136</span></span>
-<span><span class="co">#&gt; X-Value           0.080      0.017      0.146</span></span>
-<span><span class="co">#&gt; Y-Value          -0.072     -0.152      0.010</span></span>
-<span><span class="co">#&gt; Amplitude        -0.088     -0.160     -0.003</span></span>
-<span><span class="co">#&gt; Displacement    -40.880   -105.533     19.259</span></span>
-<span><span class="co">#&gt; Model Fit        -0.447</span></span></code></pre></div>
+<span><span class="co">#&gt; Elevation         0.251      0.206      0.293</span></span>
+<span><span class="co">#&gt; X-Value          -0.068     -0.114     -0.021</span></span>
+<span><span class="co">#&gt; Y-Value           0.126      0.064      0.184</span></span>
+<span><span class="co">#&gt; Amplitude         0.143      0.084      0.203</span></span>
+<span><span class="co">#&gt; Displacement    118.247     99.973    138.946</span></span>
+<span><span class="co">#&gt; Model Fit         0.947                      </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [BORPD: Male]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
+<span><span class="co">#&gt; Elevation         0.320      0.267      0.370</span></span>
+<span><span class="co">#&gt; X-Value           0.012     -0.034      0.058</span></span>
+<span><span class="co">#&gt; Y-Value           0.054      0.004      0.106</span></span>
+<span><span class="co">#&gt; Amplitude         0.055      0.016      0.109</span></span>
+<span><span class="co">#&gt; Displacement     77.367     12.983    133.991</span></span>
+<span><span class="co">#&gt; Model Fit         0.500                      </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Contrast [BORPD: Male - Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                  Estimate   Lower CI   Upper CI</span></span>
+<span><span class="co">#&gt; Δ Elevation         0.069      0.000      0.136</span></span>
+<span><span class="co">#&gt; Δ X-Value           0.080      0.017      0.146</span></span>
+<span><span class="co">#&gt; Δ Y-Value          -0.072     -0.152      0.010</span></span>
+<span><span class="co">#&gt; Δ Amplitude        -0.088     -0.160     -0.003</span></span>
+<span><span class="co">#&gt; Δ Displacement    -40.880   -105.533     19.259</span></span>
+<span><span class="co">#&gt; Δ Model Fit        -0.447</span></span></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -858,25 +1050,72 @@ Correlation-based Structural Summary Statistic Contrasts with 95% CIs
 Contrast
 </th>
 <th style="text-align:left;">
-&amp;Delta; Elevation
+Elevation
 </th>
 <th style="text-align:left;">
-&amp;Delta; X-Value
+X.Value
 </th>
 <th style="text-align:left;">
-&amp;Delta; Y-Value
+Y.Value
 </th>
 <th style="text-align:left;">
-&amp;Delta; Amplitude
+Amplitude
 </th>
 <th style="text-align:left;">
-&amp;Delta; Displacement
+Displacement
 </th>
 <th style="text-align:left;">
-&amp;Delta; Fit
+Fit
 </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
+<td style="text-align:left;">
+BORPD: Female
+</td>
+<td style="text-align:left;">
+0.25 (0.21, 0.29)
+</td>
+<td style="text-align:left;">
+-0.07 (-0.11, -0.02)
+</td>
+<td style="text-align:left;">
+0.13 (0.06, 0.18)
+</td>
+<td style="text-align:left;">
+0.14 (0.08, 0.20)
+</td>
+<td style="text-align:left;">
+118.2 (100.0, 138.9)
+</td>
+<td style="text-align:left;">
+0.947
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BORPD: Male
+</td>
+<td style="text-align:left;">
+0.32 (0.27, 0.37)
+</td>
+<td style="text-align:left;">
+0.01 (-0.03, 0.06)
+</td>
+<td style="text-align:left;">
+0.05 (0.00, 0.11)
+</td>
+<td style="text-align:left;">
+0.06 (0.02, 0.11)
+</td>
+<td style="text-align:left;">
+77.4 (13.0, 134.0)
+</td>
+<td style="text-align:left;">
+0.500
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 BORPD: Male - Female
 </td>
@@ -898,7 +1137,8 @@ BORPD: Male - Female
 <td style="text-align:left;">
 -0.447
 </td>
-</tr></tbody>
+</tr>
+</tbody>
 </table>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span></code></pre></div>
@@ -924,8 +1164,6 @@ of seven and makes for a more intuitive user experience.</p>
 <tr>
 <th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
 </th>
-<th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
-</th>
 <th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
 Arguments Needed
@@ -933,9 +1171,6 @@ Arguments Needed
 </th>
 </tr>
 <tr>
-<th style="text-align:right;">
-#
-</th>
 <th style="text-align:left;">
 Usage
 </th>
@@ -952,122 +1187,101 @@ contrast
 </thead>
 <tbody>
 <tr>
-<td style="text-align:right;">
-1
-</td>
 <td style="text-align:left;width: 3in; ">
 Examine overall mean profile
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 </tr>
 <tr>
-<td style="text-align:right;">
-2
-</td>
 <td style="text-align:left;width: 3in; ">
 Examine groups’ mean profiles
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 </tr>
 <tr>
-<td style="text-align:right;">
-3
-</td>
 <td style="text-align:left;width: 3in; ">
 Compare groups’ mean profiles
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 </tr>
 <tr>
-<td style="text-align:right;">
-4
-</td>
 <td style="text-align:left;width: 3in; ">
 Examine variables’ correlation profiles
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 </tr>
 <tr>
-<td style="text-align:right;">
-5
-</td>
 <td style="text-align:left;width: 3in; ">
 Compare variables’ correlation profiles
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 </tr>
 <tr>
-<td style="text-align:right;">
-6
-</td>
 <td style="text-align:left;width: 3in; ">
 Examine groups’ correlation profiles
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: black !important;” &gt;FALSE&lt;/span&gt;
+FALSE
 </td>
 </tr>
 <tr>
-<td style="text-align:right;">
-7
-</td>
 <td style="text-align:left;width: 3in; ">
 Compare groups’ correlation profiles
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 <td style="text-align:left;">
-&lt;span style=” color: blue !important;” &gt;TRUE&lt;/span&gt;
+TRUE
 </td>
 </tr>
 </tbody>
@@ -1089,11 +1303,11 @@ each group (i.e., unique value of this variable). If no, we must omit
 the <code>grouping</code> argument, and a single set of results for all
 data will be output.</p></li>
 <li><p><strong>Do we want to contrast/compare two sets of
-results?</strong> If yes, we must specify a <code>contrast</code> type
-(i.e., “model” or “test”) and ensure that we are only requesting two
-sets of results (i.e., two groups or two measures). If no, we must omit
-the <code>contrast</code> argument, and the results themselves will be
-output, rather than their contrast.</p></li>
+results?</strong> If yes, we must specify <code>contrast</code> as TRUE
+and ensure that we are only requesting two sets of results (i.e., two
+groups or two measures). If no, we must omit the <code>contrast</code>
+argument or set it to FALSE, and the results themselves will be output,
+rather than their contrast.</p></li>
 </ol>
 </div>
 <div class="section level2">
@@ -1104,134 +1318,18 @@ output, rather than their contrast.</p></li>
 </h3>
 <p>Additional arguments to the <code><a href="../reference/ssm_table.html">ssm_table()</a></code> function can be
 explored using the <code><a href="../reference/ssm_table.html">?ssm_table</a></code> command. Two useful options
-are the <code>xy</code> argument, which shows or hides the x-value and
-y-value columns, and the <code>caption</code> argument which allows a
-custom string to be printed above the table. Note as well that the
+are the <code>drop_xy</code> argument, which shows or hides the x-value
+and y-value columns, and the <code>caption</code> argument which allows
+a custom string to be printed above the table. Note as well that the
 return object of this function is just a tibble or data frame, which can
 be easily edited to add, change, or remove text. To change the
 formatting of the table, see the <code>htmlTable</code> or
 <code>kableExtra</code> packages.</p>
 </div>
-<div class="section level3">
-<h3 id="combining-and-exporting-tables">Combining and exporting tables<a class="anchor" aria-label="anchor" href="#combining-and-exporting-tables"></a>
-</h3>
-<p>In some cases, such as multiple contrasts or groupings, we may want
-to combine several tables into one by joining them together as rows.
-This can be done using the <code><a href="../reference/ssm_append.html">ssm_append()</a></code> function.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017s</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017s</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, grouping <span class="op">=</span> <span class="va">Gender</span><span class="op">)</span></span>
-<span><span class="va">tab1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">res1</span>, xy <span class="op">=</span> <span class="cn">FALSE</span>, render <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">tab2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">res2</span>, xy <span class="op">=</span> <span class="cn">FALSE</span>, render <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/ssm_append.html">ssm_append</a></span><span class="op">(</span><span class="va">tab1</span>, <span class="va">tab2</span><span class="op">)</span></span></code></pre></div>
-<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
-<thead><tr>
-<th style="text-align:left;">
-Profile
-</th>
-<th style="text-align:left;">
-Elevation
-</th>
-<th style="text-align:left;">
-Amplitude
-</th>
-<th style="text-align:left;">
-Displacement
-</th>
-<th style="text-align:left;">
-Fit
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-All
-</td>
-<td style="text-align:left;">
-0.92 (0.89, 0.94)
-</td>
-<td style="text-align:left;">
-0.43 (0.40, 0.46)
-</td>
-<td style="text-align:left;">
-324.3 (320.7, 327.8)
-</td>
-<td style="text-align:left;">
-0.878
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Female
-</td>
-<td style="text-align:left;">
-0.95 (0.91, 0.98)
-</td>
-<td style="text-align:left;">
-0.55 (0.51, 0.60)
-</td>
-<td style="text-align:left;">
-326.0 (322.0, 330.0)
-</td>
-<td style="text-align:left;">
-0.889
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Male
-</td>
-<td style="text-align:left;">
-0.88 (0.84, 0.93)
-</td>
-<td style="text-align:left;">
-0.29 (0.26, 0.33)
-</td>
-<td style="text-align:left;">
-320.7 (313.5, 328.2)
-</td>
-<td style="text-align:left;">
-0.824
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 </div>
 <div class="section level2">
 <h2 id="working-with-ssm-figures">5. Working with SSM figures<a class="anchor" aria-label="anchor" href="#working-with-ssm-figures"></a>
 </h2>
-<div class="section level3">
-<h3 id="basic-customizations-of-figures">Basic customizations of figures<a class="anchor" aria-label="anchor" href="#basic-customizations-of-figures"></a>
-</h3>
-<p>Additional arguments to the <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> function can be
-explored using the <code><a href="../reference/ssm_plot.html">?ssm_plot</a></code>,
-<code><a href="../reference/ssm_plot_circle.html">?ssm_plot_circle</a></code>, and <code><a href="../reference/ssm_plot_contrast.html">?ssm_plot_contrast</a></code>
-commands. For both types of figures, the <code>fontsize</code> argument
-will control the baseline text size in pts (default = 12). Some text
-elements will be rescaled from the specified <code>fontsize</code>
-(e.g., multiplying it by 150%). For circle plots, we have already seen
-the <code>lowfit</code> argument for including points with low model
-fit. Another useful option is the <code>amax</code> argument for the
-maximum value of the amplitude scale. By default, the package picks a
-number that will fit all the points and generate “round” numbers at each
-1/5 tick; however, this default can be overwritten using the
-<code>amax</code> argument.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results4</span>, amax <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/amax-1.png" width="100%"></p>
-<p>For contrast plots, several arguments exist for customizing the
-output. We have already seen the <code>xy</code> argument for including
-or excluding the x-value and y-value contrasts. We can also change the
-<code>color</code> and <code>linesize</code> of the point range
-(linesize in mm). Finally, we can change the <code>axislabel</code>
-displayed to the left of the plots. More complex customizations will be
-the subject of an advanced vignette.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results6</span>, xy <span class="op">=</span> <span class="cn">FALSE</span>, color <span class="op">=</span> <span class="st">"blue"</span>, linesize <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  axislabel <span class="op">=</span> <span class="st">"BORPD: Male - Female"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="intermediate-ssm-analysis_files/figure-html/custom-1.png" width="100%"></p>
-</div>
 <div class="section level3">
 <h3 id="exporting-figures-as-files">Exporting figures as files<a class="anchor" aria-label="anchor" href="#exporting-figures-as-files"></a>
 </h3>
@@ -1248,11 +1346,9 @@ also control the exact width and height of the image in different units
 (i.e., “in”, “cm”, or “mm”). Because the underlying graphics are
 vectorized in R, they can be easily scaled to any size without loss of
 quality and used in manuscripts, presentations, or posters.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results6</span>, xy <span class="op">=</span> <span class="cn">FALSE</span>, color <span class="op">=</span> <span class="st">"blue"</span>, linesize <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  axislabel <span class="op">=</span> <span class="st">"BORPD: Male - Female"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/ggsave.html">ggsave</a></span><span class="op">(</span>filename <span class="op">=</span> <span class="st">"bordpd_gender.png"</span>, plot <span class="op">=</span> <span class="va">p</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>  units <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/ggsave.html">ggsave</a></span><span class="op">(</span><span class="st">"bordpd_gender.png"</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">4</span>, units <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

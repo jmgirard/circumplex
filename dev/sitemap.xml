@@ -11,6 +11,7 @@
 <url><loc>http://circumplex.jmgirard.com/dev/authors.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/index.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/news/index.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/PANO.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/anchors.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/aw2009.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/circumplex-package.html</loc></url>
@@ -36,16 +37,15 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/isc.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/items.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/jz2017.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/norm_standardize.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/norms.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/octants.html</loc></url>
-<url><loc>http://circumplex.jmgirard.com/dev/reference/pipe.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/poles.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/quadrants.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/raw_iipsc.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/scales.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/score.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_analyze.html</loc></url>
-<url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_append.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_parameters.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.html</loc></url>
@@ -53,7 +53,5 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_scores.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_score.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_table.html</loc></url>
-<url><loc>http://circumplex.jmgirard.com/dev/reference/standardize.html</loc></url>
-<url><loc>http://circumplex.jmgirard.com/dev/reference/tidyeval.html</loc></url>
 </urlset>
 

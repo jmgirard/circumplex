@@ -100,21 +100,19 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
+<div class="section level3">
+<h3 id="example-1">Example 1<a class="anchor" aria-label="anchor" href="#example-1"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
-<span>  .data <span class="op">=</span> <span class="va">jz2017</span>, </span>
-<span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">PA</span>, <span class="va">BC</span>, <span class="va">DE</span>, <span class="va">FG</span>, <span class="va">HI</span>, <span class="va">JK</span>, <span class="va">LM</span>, <span class="va">NO</span><span class="op">)</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span>, </span>
 <span>  angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span>, </span>
-<span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">NARPD</span>, <span class="va">ASPD</span><span class="op">)</span>,</span>
+<span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NARPD"</span>, <span class="st">"ASPD"</span><span class="op">)</span>,</span>
 <span>  measures_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Narcissistic PD"</span>, <span class="st">"Antisocial PD"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = c(PA, BC, DE, FG, HI, JK, </span></span>
-<span><span class="co">#&gt;     LM, NO), angles = c(90, 135, 180, 225, 270, 315, 360, 45), </span></span>
-<span><span class="co">#&gt;     measures = c(NARPD, ASPD), measures_labels = c("Narcissistic PD", </span></span>
-<span><span class="co">#&gt;         "Antisocial PD"))</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -122,7 +120,9 @@
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Narcissistic PD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [Narcissistic PD]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.202      0.169      0.238</span></span>
 <span><span class="co">#&gt; X-Value          -0.062     -0.094     -0.029</span></span>
@@ -131,7 +131,9 @@
 <span><span class="co">#&gt; Displacement    108.967     98.633    118.537</span></span>
 <span><span class="co">#&gt; Model Fit         0.957                      </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [Antisocial PD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [Antisocial PD]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.124      0.087      0.158</span></span>
 <span><span class="co">#&gt; X-Value          -0.099     -0.133     -0.064</span></span>
@@ -140,8 +142,8 @@
 <span><span class="co">#&gt; Displacement    115.927    107.327    124.188</span></span>
 <span><span class="co">#&gt; Model Fit         0.964</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results</span>, xy <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results</span>, drop_xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<table class="table table" style="font-size: 12px; color: black; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
 </caption>
@@ -202,6 +204,139 @@ Antisocial PD
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-plot-1.png"><!-- --></p>
+</div>
+<div class="section level3">
+<h3 id="example-2">Example 2<a class="anchor" aria-label="anchor" href="#example-2"></a>
+</h3>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  angles <span class="op">=</span> <span class="fu"><a href="reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  grouping <span class="op">=</span> <span class="st">"Gender"</span>,</span>
+<span>  contrast <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Statistical Basis:    Mean Scores </span></span>
+<span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
+<span><span class="co">#&gt; Confidence Level:     0.95 </span></span>
+<span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
+<span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
+<span><span class="co">#&gt; Elevation         0.946      0.909      0.984</span></span>
+<span><span class="co">#&gt; X-Value           0.459      0.421      0.498</span></span>
+<span><span class="co">#&gt; Y-Value          -0.310     -0.355     -0.267</span></span>
+<span><span class="co">#&gt; Amplitude         0.554      0.511      0.598</span></span>
+<span><span class="co">#&gt; Displacement    325.963    322.182    330.063</span></span>
+<span><span class="co">#&gt; Model Fit         0.889                      </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [Male]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
+<span><span class="co">#&gt; Elevation         0.884      0.843      0.923</span></span>
+<span><span class="co">#&gt; X-Value           0.227      0.192      0.262</span></span>
+<span><span class="co">#&gt; Y-Value          -0.186     -0.225     -0.148</span></span>
+<span><span class="co">#&gt; Amplitude         0.294      0.257      0.329</span></span>
+<span><span class="co">#&gt; Displacement    320.685    313.462    327.843</span></span>
+<span><span class="co">#&gt; Model Fit         0.824                      </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Contrast [Male - Female]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                  Estimate   Lower CI   Upper CI</span></span>
+<span><span class="co">#&gt; Δ Elevation        -0.062     -0.118     -0.005</span></span>
+<span><span class="co">#&gt; Δ X-Value          -0.232     -0.283     -0.181</span></span>
+<span><span class="co">#&gt; Δ Y-Value           0.124      0.067      0.183</span></span>
+<span><span class="co">#&gt; Δ Amplitude        -0.261     -0.318     -0.202</span></span>
+<span><span class="co">#&gt; Δ Displacement     -5.278    -13.353      2.755</span></span>
+<span><span class="co">#&gt; Δ Model Fit        -0.066</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results2</span>, drop_xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<table class="table table" style="font-size: 12px; color: black; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">
+Correlation-based Structural Summary Statistics with 95% CIs
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+Contrast
+</th>
+<th style="text-align:left;">
+Elevation
+</th>
+<th style="text-align:left;">
+Amplitude
+</th>
+<th style="text-align:left;">
+Displacement
+</th>
+<th style="text-align:left;">
+Fit
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+0.95 (0.91, 0.98)
+</td>
+<td style="text-align:left;">
+0.55 (0.51, 0.60)
+</td>
+<td style="text-align:left;">
+326.0 (322.2, 330.1)
+</td>
+<td style="text-align:left;">
+0.889
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+0.88 (0.84, 0.92)
+</td>
+<td style="text-align:left;">
+0.29 (0.26, 0.33)
+</td>
+<td style="text-align:left;">
+320.7 (313.5, 327.8)
+</td>
+<td style="text-align:left;">
+0.824
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male - Female
+</td>
+<td style="text-align:left;">
+-0.06 (-0.12, -0.01)
+</td>
+<td style="text-align:left;">
+-0.26 (-0.32, -0.20)
+</td>
+<td style="text-align:left;">
+-5.3 (-13.4, 2.8)
+</td>
+<td style="text-align:left;">
+-0.066
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-plot2-1.png"><!-- --></p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
