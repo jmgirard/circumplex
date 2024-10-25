@@ -73,7 +73,6 @@ ssm_parameters(scores, prefix = "IIP_")
 \seealso{
 Other ssm functions: 
 \code{\link{ssm_analyze}()},
-\code{\link{ssm_append}()},
 \code{\link{ssm_plot}()},
 \code{\link{ssm_score}()},
 \code{\link{ssm_table}()}

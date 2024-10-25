@@ -38,7 +38,7 @@ res <- ssm_analyze(
   jz2017,
   scales = 2:9, 
   measures = c("NARPD", "ASPD"), 
-  contrast = "test"
+  contrast = TRUE
 )
 p <- ssm_plot(res)
 }
@@ -49,7 +49,6 @@ ggsave Function for saving plots to image files.
 
 Other ssm functions: 
 \code{\link{ssm_analyze}()},
-\code{\link{ssm_append}()},
 \code{\link{ssm_parameters}()},
 \code{\link{ssm_score}()},
 \code{\link{ssm_table}()}

@@ -32,11 +32,11 @@ ipsatize <- function(data, items, na.rm = TRUE,
                      prefix = "", suffix = "_i", append = TRUE) {
   
   stopifnot(is.data.frame(data) || is.matrix(data))
-  stopifnot(is.character(items) || is.numeric(items))
-  stopifnot(is.logical(na.rm) && length(na.rm) == 1)
-  stopifnot(is.character(prefix) && length(prefix) == 1)
-  stopifnot(is.character(suffix) && length(suffix) == 1)
-  stopifnot(is.logical(append) && length(append) == 1)
+  stopifnot(is_var(items))
+  stopifnot(is_flag(na.rm))
+  stopifnot(is_char(prefix, n = 1))
+  stopifnot(is_char(suffix, n = 1))
+  stopifnot(is_flag(append))
 
   item_data <- data[items]
   item_names <- colnames(item_data)
@@ -87,12 +87,12 @@ score <- function(data, items, instrument, na.rm = TRUE,
                   prefix = "", suffix = "", append = TRUE) {
   
   stopifnot(is.data.frame(data) || is.matrix(data))
-  stopifnot(is.character(items) || is.numeric(items))
+  stopifnot(is_var(items))
   stopifnot(class(instrument) == "circumplex_instrument")
-  stopifnot(is.logical(na.rm) && length(na.rm) == 1)
-  stopifnot(is.character(prefix) && length(prefix) == 1)
-  stopifnot(is.character(suffix) && length(suffix) == 1)
-  stopifnot(is.logical(append) && length(append) == 1)
+  stopifnot(is_flag(na.rm))
+  stopifnot(is_char(prefix))
+  stopifnot(is_char(suffix))
+  stopifnot(is_flag(append))
   
   item_data <- data[items]
   n_items <- length(items)
@@ -159,14 +159,14 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
                        sample = 1, prefix = "", suffix = "_z", append = TRUE) {
   
   stopifnot(is.data.frame(data) || is.matrix(data))
-  stopifnot(is.character(scales) || is.numeric(scales))
+  stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
   stopifnot(length(scales) == length(angles))
   stopifnot(class(instrument) == "circumplex_instrument")
-  stopifnot(is.numeric(sample) && length(sample) == 1)
-  stopifnot(is.character(prefix) && length(prefix) == 1)
-  stopifnot(is.character(suffix) && length(suffix) == 1)
-  stopifnot(is.logical(append) && length(append) == 1)
+  stopifnot(is_num(sample, n = 1))
+  stopifnot(is_char(prefix, n = 1))
+  stopifnot(is_char(suffix, n = 1))
+  stopifnot(is_flag(append))
   
   
   key <- instrument$Norms[[1]]

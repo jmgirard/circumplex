@@ -174,7 +174,6 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
       ggplot2::scale_linetype_identity() +
       ggplot2::theme(legend.position = "none")
   } else {
-    results_type <- ifelse(.ssm_object$details$contrast, "Contrast", "Profile")
     p <- p +
       ggforce::geom_arc_bar(
         data = df_plot,
@@ -194,8 +193,8 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
         color = "black"
       ) +
       ggplot2::guides(
-        color = ggplot2::guide_legend(results_type),
-        fill = ggplot2::guide_legend(results_type)
+        color = ggplot2::guide_legend("Profile"),
+        fill = ggplot2::guide_legend("Profile")
       ) +
       ggplot2::theme(
         legend.text = ggplot2::element_text(size = legend_font_size),
@@ -210,7 +209,7 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
       ggrepel::geom_label_repel(
         data = df_plot,
         ggplot2::aes(x = x_est, y = y_est, label = label),
-        nudge_x = -25 - df_plot$x_est,
+        nudge_x = -8 - df_plot$x_est,
         direction = "y",
         hjust = 1,
         size = legend_font_size / 2.8346438836889
@@ -228,83 +227,83 @@ ssm_plot_circle <- function(.ssm_object, amax = NULL,
 #' contrast (e.g., between groups or measures).
 #'
 #' @param .ssm_object Required. The results output of \code{ssm_analyze}.
-#' @param axislabel Optional. A string to label the y-axis (default =
-#'   "Difference").
-#' @param xy A logical determining whether the X-Value and Y-Value parameters
-#'   should be included in the plot (default = TRUE).
-#' @param color Optional. A string corresponding to the color of the point range
-#'   (default = "red").
+#' @param drop_xy A logical determining whether the X-Value and Y-Value
+#'   parameters should be removed from the plot (default = FALSE).
+#' @param sig_color Optional. A string corresponding to the color to use to
+#'   denote significant contrasts (default = "#fc8d62").
+#' @param ns_color Optional. A string corresponding to the color to use to
+#'   denote non-significant contrasts (default = "white").
 #' @param linesize Optional. A positive number corresponding to the size of the
 #'   point range elements in mm (default = 1.5).
 #' @param fontsize Optional. A positive number corresponding to the size of the
 #'   axis labels, numbers, and facet headings in pt (default = 12).
+#' @param ... Additional arguments will be ignored.
 #' @return A ggplot variable containing difference point-ranges faceted by SSM
 #'   parameter. An interval that does not contain the value of zero has p<.05.
 
-ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
-                              xy = TRUE, color = "red", linesize = 1.25, fontsize = 12) {
+ssm_plot_contrast <- function(.ssm_object, drop_xy = FALSE, 
+                              sig_color = "#fc8d62", ns_color = "white",
+                              linesize = 1.25, fontsize = 12, ...) {
+  
+  stopifnot(.ssm_object$details$contrast)
   
   # Prepare all estimates
   plabs <- c(
     e = expression(paste(Delta, " Elevation")),
-    x = expression(paste(Delta, " X-Value")),
-    y = expression(paste(Delta, " Y-Value")),
+    x = expression(paste(Delta, " X Value")),
+    y = expression(paste(Delta, " Y Value")),
     a = expression(paste(Delta, " Amplitude")),
     d = expression(paste(Delta, " Displacement"))
   )
   pvals <- c("e", "x", "y", "a", "d")
-  res <- .ssm_object$results
-
+  res <- .ssm_object$results[nrow(.ssm_object$results), ]
+  
+  plot_df <- 
+    data.frame(
+      Parameter = factor(pvals, levels = pvals, labels = plabs),
+      Difference = c(res$e_est, res$x_est, res$y_est, res$a_est, res$d_est),
+      lci = c(res$e_lci, res$x_lci, res$y_lci, res$a_lci, res$d_lci),
+      uci = c(res$e_uci, res$x_uci, res$y_uci, res$a_uci, res$d_uci)
+    )
+  
+  plot_df$sig <- sign(plot_df$lci) == sign(plot_df$uci)
+  
   # Drop x and y estimates if requested
-  if (xy == FALSE) {
-    res <- subset(res, select = -c(x_est, x_lci, x_uci, y_est, y_lci, y_uci))
-    plabs <- plabs[-c(2, 3)]
-    pvals <- pvals[-c(2, 3)]
+  if (drop_xy) {
+    plot_df <- plot_df[-c(2, 3), ]
   }
 
-  # TODO: REFACTORING UNTIL HERE - NEXT SECTION IN PROGRESS
-
-  res2 <- res
-  estcol <- c(res2$e_est, res2$x_est, res2$y_est, res2$a_est, res2$d_est)
-  ucicol <- c(res2$e_uci, res2$x_uci, res2$y_uci, res2$a_uci, res2$d_uci)
-  lcicol <- c(res2$e_lci, res2$x_lci, res2$y_lci, res2$a_lci, res2$d_lci)
-  labcol <- rep(res2$label, times = length(estcol))
-  
-  # res <- 
-  #   res %>% 
-  #   dplyr::mutate(
-  #     d_est = unclass(d_est),
-  #     d_uci = unclass(ifelse(d_uci < d_lci && d_uci < 180, circ_dist(d_uci), d_uci)),
-  #     d_lci = unclass(ifelse(d_lci > d_uci && d_lci > 180, circ_dist(d_lci), d_lci))
-  #   ) %>%
-  #   dplyr::select(-fit_est) %>% 
-  #   tidyr::pivot_longer(cols = e_est:d_uci, names_to = "key", values_to = "value") %>% 
-  #   tidyr::extract(col = key, into = c("Parameter", "Type"), "(.)_(...)") %>% 
-  #   tidyr::pivot_wider(names_from = Type, values_from = value) %>% 
-  #   dplyr::rename(Difference = est, Contrast = label) %>%
-  #   dplyr::mutate(Parameter = factor(Parameter, levels = pvals, labels = plabs))
-  
   p <- 
-    res %>% 
-    ggplot2::ggplot() +
+    ggplot2::ggplot(plot_df) +
     ggplot2::theme_bw(base_size = fontsize) +
     ggplot2::theme(
       legend.position = "top",
       axis.text.x = ggplot2::element_blank(),
       axis.title.x = ggplot2::element_blank(),
       panel.grid.major.x = ggplot2::element_blank(),
-      panel.grid.minor.y = ggplot2::element_line(linetype = "dashed")
+      panel.grid.minor.y = ggplot2::element_line(linetype = "dashed"),
+      axis.ticks.x = ggplot2::element_blank()
     ) +
-    ggplot2::geom_hline(yintercept = 0, linewidth = linesize, color = "darkgray") +
-    ggplot2::geom_point(
-      ggplot2::aes(x = Contrast, y = Difference),
-      size = linesize * 3, color = color
+    ggplot2::geom_hline(
+      yintercept = 0, 
+      linewidth = linesize, 
+      color = "darkgray"
     ) +
     ggplot2::geom_errorbar(
-      ggplot2::aes(x = Contrast, ymin = lci, ymax = uci),
-      linewidth = linesize, color = color, width = 0.1
+      ggplot2::aes(x = "1", ymin = lci, ymax = uci),
+      linewidth = linesize, width = 0.1
     ) +
-    ggplot2::labs(y = axislabel) +
+    ggplot2::geom_point(
+      ggplot2::aes(x = "1", y = Difference, fill = sig),
+      size = linesize * 3,
+      stroke = linesize,
+      shape = 21
+    ) +
+    ggplot2::scale_fill_manual(
+      "Signficant",
+      values = c("TRUE" = sig_color, "FALSE" = ns_color)
+    ) +
+    ggplot2::labs(y = paste0("Contrast (", res$label, ")")) +
     ggplot2::facet_wrap(~Parameter,
       nrow = 1, scales = "free",
       labeller = ggplot2::label_parsed
@@ -317,7 +316,7 @@ ssm_plot_contrast <- function(.ssm_object, axislabel = "Difference",
 circle_base <- function(angles, labels = NULL, amin = 0,
                         amax = 0.5, fontsize = 12) {
   
-  if (is.null(labels)) labels <- sprintf("%d\u00B0", angles)
+  if (is.null(labels)) labels <- paste0(angles, "\u00B0")
   
   ggplot2::ggplot() +
     # Require plot to be square and remove default styling
@@ -420,10 +419,13 @@ circle_base <- function(angles, labels = NULL, amin = 0,
 #' ssm_table(res)
 #' }
 #' 
-ssm_table <- function(.ssm_object, caption = NULL, xy = TRUE, render = TRUE) {
-  assert_that(is_provided(.ssm_object))
-  assert_that(is.null(caption) || is.string(caption))
-  assert_that(is.flag(xy), is.flag(render))
+ssm_table <- function(.ssm_object, caption = NULL, 
+                      drop_xy = FALSE, render = TRUE) {
+  
+  stopifnot(class(.ssm_object) == "circumplex_ssm")
+  stopifnot(is.null(caption) || (is.character(caption) && length(caption) == 1))
+  stopifnot(is.logical(drop_xy) && length(drop_xy) == 1)
+  stopifnot(is.logical(render) && length(render) == 1)
 
   df <- .ssm_object$results
 
@@ -433,38 +435,48 @@ ssm_table <- function(.ssm_object, caption = NULL, xy = TRUE, render = TRUE) {
   }
 
   # Format output data
-  df <- dplyr::transmute(df,
-    Label = label,
-    Elevation = sprintf("%.2f (%.2f, %.2f)", e_est, e_lci, e_uci),
-    `X-Value` = sprintf("%.2f (%.2f, %.2f)", x_est, x_lci, x_uci),
-    `Y-Value` = sprintf("%.2f (%.2f, %.2f)", y_est, y_lci, y_uci),
-    Amplitude = sprintf("%.2f (%.2f, %.2f)", a_est, a_lci, a_uci),
-    Displacement = sprintf("%.1f (%.1f, %.1f)", d_est, d_lci, d_uci),
-    Fit = sprintf("%.3f", fit_est)
-  )
+  table_df <- 
+    data.frame(
+      Profile = df$label,
+      Elevation = sprintf("%.2f (%.2f, %.2f)", df$e_est, df$e_lci, df$e_uci),
+      `X Value` = sprintf("%.2f (%.2f, %.2f)", df$x_est, df$x_lci, df$x_uci),
+      `Y Value` = sprintf("%.2f (%.2f, %.2f)", df$y_est, df$y_lci, df$y_uci),
+      Amplitude = sprintf("%.2f (%.2f, %.2f)", df$a_est, df$a_lci, df$a_uci),
+      Displacement = sprintf("%.1f (%.1f, %.1f)", df$d_est, df$d_lci, df$d_uci),
+      Fit = sprintf("%.3f", df$fit_est)
+    )
 
   # Rename first column
-  colnames(df)[[1]] <- .ssm_object$details$results_type
+  colnames(table_df)[[1]] <- ifelse(
+    test = .ssm_object$details$contrast, 
+    yes = "Contrast", 
+    no = "Profile"
+  )
 
   # Add delta symbol to column names if results are contrasts
   if (.ssm_object$details$contrast) {
-    colnames(df)[[2]] <- "&Delta; Elevation"
-    colnames(df)[[3]] <- "&Delta; X-Value"
-    colnames(df)[[4]] <- "&Delta; Y-Value"
-    colnames(df)[[5]] <- "&Delta; Amplitude"
-    colnames(df)[[6]] <- "&Delta; Displacement"
-    colnames(df)[[7]] <- "&Delta; Fit"
+    colnames(table_df) <- c(
+      "Contrast",
+      "&Delta; Elevation",
+      "&Delta; X Value",
+      "&Delta; Y Value",
+      "&Delta; Amplitude",
+      "&Delta; Displacement",
+      "&Delta; Fit"
+    )
   }
 
   # Drop the x and y columns if requested
-  if (xy == FALSE) df <- df[, -c(3, 4)]
-
+  if (drop_xy) {
+    table_df <- table_df[, -c(3, 4)]
+  }
+  
   # Format and render HTML table if requested
   if (render == TRUE) {
-    html_render(df, caption)
+    html_render(table_df, caption)
   }
 
-  df
+  table_df
 }
 
 # Build the default caption for the ssm_table function
@@ -484,45 +496,6 @@ dcaption <- function(.ssm_object) {
   }
 }
 
-#' Combine SSM tables
-#'
-#' Combine SSM tables by appending them as rows.
-#'
-#' @param .ssm_table A data frame from the \code{ssm_table()} function to be the
-#'   first row(s) of the combined table.
-#' @param ... One or more additional data frames from the \code{ssm_table()}
-#'   function to be appended to \code{.ssm_table} in the order of input.
-#' @param caption A string to be displayed above the table if rendered.
-#' @param render A logical indicating whether the table should be displayed in
-#'   the RStudio viewer or web browser (default = TRUE).
-#' @return A tibble containing the information for the HTML table. As a
-#'  side-effect, may also output the HTML table to the web viewer.
-#' @family ssm functions
-#' @family table functions
-#' @export
-#' @examples
-#' data("jz2017")
-#' res1 <- ssm_analyze(jz2017, PA:NO, octants())
-#' res2 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender)
-#' tab1 <- ssm_table(res1, render = FALSE)
-#' tab2 <- ssm_table(res2, render = FALSE)
-#' ssm_append(tab1, tab2)
-ssm_append <- function(.ssm_table, ..., caption = NULL, render = TRUE) {
-
-  # TODO: Add more assertions
-  assert_that(is.flag(render))
-
-  # Bind the tibbles together by row
-  df <- dplyr::bind_rows(.ssm_table, ...)
-
-  # Format and render HTML table if requested
-  if (render == TRUE) {
-    html_render(df, caption)
-  }
-
-  df
-}
-
 #' Format and render data frame as HTML table
 #'
 #' Format a data frame as an HTML table and render it to the web viewer.
@@ -536,9 +509,11 @@ ssm_append <- function(.ssm_table, ..., caption = NULL, render = TRUE) {
 #' @export
 html_render <- function(df, caption = NULL, align = "l", ...) {
 
-  # TODO: Add assertions
+  stopifnot(is_null_or_char(caption, n = 1))
+  stopifnot(align %in% c("l", "c", "r"))
 
-  t <- htmlTable::htmlTable(df,
+  t <- htmlTable::htmlTable(
+    df,
     caption = caption,
     align = align,
     align.header = align,

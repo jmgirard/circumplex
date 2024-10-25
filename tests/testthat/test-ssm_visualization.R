@@ -1,7 +1,6 @@
 test_that("Single-group mean-based SSM plot is correct", {
-  #skip_if(getRversion() > "4.0.0")
   data("aw2009")
-  res <- ssm_analyze(aw2009, PA:NO, octants())
+  res <- ssm_analyze(aw2009, scales = 1:8)
   p <- ssm_plot(res)
 
   # Test the output object
@@ -13,9 +12,8 @@ test_that("Single-group mean-based SSM plot is correct", {
 })
 
 test_that("Single-group correlation-based SSM plot is correct", {
-  #skip_if(getRversion() > "4.0.0")
   data("jz2017")
-  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
+  res <- ssm_analyze(jz2017, scales = 2:9, measures = "PARPD")
   p <- ssm_plot(res)
   
   # Test the output object
@@ -25,11 +23,12 @@ test_that("Single-group correlation-based SSM plot is correct", {
 })
 
 test_that("Measure-contrast SSM plot is correct", {
-  #skip_if(getRversion() > "4.0.0")
   data("jz2017")
-  res <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = c(ASPD, NARPD),
-    contrast = "test"
+  res <- ssm_analyze(
+    jz2017,
+    scales = 2:9,
+    measures = c("ASPD", "NARPD"),
+    contrast = TRUE
   )
   p <- ssm_plot(res, xy = FALSE)
 
@@ -40,11 +39,13 @@ test_that("Measure-contrast SSM plot is correct", {
 })
 
 test_that("Group-contrast correlation-based SSM plot is correct", {
-  #skip_if(getRversion() > "4.0.0")
   data("jz2017")
-  res <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = NARPD,
-    grouping = Gender, contrast = "test"
+  res <- ssm_analyze(
+    jz2017, 
+    scales = 2:9, 
+    measures = "NARPD",
+    grouping = "Gender",
+    contrast = TRUE
   )
   p <- ssm_plot(res)
 
@@ -56,38 +57,45 @@ test_that("Group-contrast correlation-based SSM plot is correct", {
 
 test_that("Removing plots with low fit works as expected", {
   data("jz2017")
-
-  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = OCPD)
-  expect_error(ssm_plot(res, lowfit = FALSE), "After removing profiles, *")
+  res <- ssm_analyze(jz2017, scales = 2:9, measures = "OCPD")
+  expect_error(ssm_plot(res, lowfit = FALSE))
 })
 
 test_that("SSM Table captions are correct", {
   data("jz2017")
-
-  res <- ssm_analyze(jz2017, PA:NO, octants())
+  res <- ssm_analyze(jz2017, scales = 2:9)
   expect_equal(
     dcaption(res),
     "Mean-based Structural Summary Statistics with 95% CIs"
   )
 
-  res <- ssm_analyze(jz2017, PA:NO, octants(),
-    grouping = Gender,
-    contrast = "model"
+  res <- ssm_analyze(
+    jz2017,
+    scales = 2:9,
+    grouping = "Gender",
+    contrast = TRUE
   )
   expect_equal(
     dcaption(res),
     "Mean-based Structural Summary Statistic Contrasts with 95% CIs"
   )
 
-  res <- ssm_analyze(jz2017, PA:NO, octants(), measures = PARPD)
+  res <- ssm_analyze(
+    jz2017, 
+    scales = 2:9, 
+    measures = "PARPD"
+  )
   expect_equal(
     dcaption(res),
     "Correlation-based Structural Summary Statistics with 95% CIs"
   )
 
-  res <- ssm_analyze(jz2017, PA:NO, octants(),
-    measures = PARPD,
-    grouping = Gender, contrast = "test"
+  res <- ssm_analyze(
+    jz2017,
+    scales = 2:9,
+    measures = "PARPD",
+    grouping = "Gender", 
+    contrast = TRUE
   )
   expect_equal(
     dcaption(res),

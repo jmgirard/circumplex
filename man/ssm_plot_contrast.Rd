@@ -6,30 +6,33 @@
 \usage{
 ssm_plot_contrast(
   .ssm_object,
-  axislabel = "Difference",
-  xy = TRUE,
-  color = "red",
+  drop_xy = FALSE,
+  sig_color = "#fc8d62",
+  ns_color = "white",
   linesize = 1.25,
-  fontsize = 12
+  fontsize = 12,
+  ...
 )
 }
 \arguments{
 \item{.ssm_object}{Required. The results output of \code{ssm_analyze}.}
 
-\item{axislabel}{Optional. A string to label the y-axis (default =
-"Difference").}
+\item{drop_xy}{A logical determining whether the X-Value and Y-Value
+parameters should be removed from the plot (default = FALSE).}
 
-\item{xy}{A logical determining whether the X-Value and Y-Value parameters
-should be included in the plot (default = TRUE).}
+\item{sig_color}{Optional. A string corresponding to the color to use to
+denote significant contrasts (default = "#fc8d62").}
 
-\item{color}{Optional. A string corresponding to the color of the point range
-(default = "red").}
+\item{ns_color}{Optional. A string corresponding to the color to use to
+denote non-significant contrasts (default = "white").}
 
 \item{linesize}{Optional. A positive number corresponding to the size of the
 point range elements in mm (default = 1.5).}
 
 \item{fontsize}{Optional. A positive number corresponding to the size of the
 axis labels, numbers, and facet headings in pt (default = 12).}
+
+\item{...}{Additional arguments will be ignored.}
 }
 \value{
 A ggplot variable containing difference point-ranges faceted by SSM

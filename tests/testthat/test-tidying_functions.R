@@ -1,5 +1,12 @@
 test_that("ipsatize works", {
-  # TODO: Create test
+  data("raw_iipsc")
+  items <- 1:32
+  datin <- ipsatize(raw_iipsc, items = items, append = FALSE)
+  datia <- ipsatize(raw_iipsc, items = items, append = TRUE)
+  expect_equal(ncol(datin), length(items))
+  expect_equal(ncol(datia), ncol(raw_iipsc) + length(items))
+  expect_equal(datin[[1]][1], -1.0)
+  expect_equal(datin[[2]][7], -0.5)
 })
 
 test_that("score works", {

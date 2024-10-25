@@ -97,7 +97,6 @@ pretty_min <- function(v) {
   out
 }
 
-
 rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) {
   min_to <- to[1]
   max_to <- to[2]
@@ -106,4 +105,42 @@ rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) {
   max_from <- from[2]
   
   (x - min_from) / (max_from - min_from) * (max_to - min_to) + min_to
+}
+
+# Assertions --------------------------------------------------------------
+
+is_char <- function(x, n = NULL) {
+  if (is.null(n)) {
+    is.character(x)
+  } else {
+    is.character(x) && length(x) == n
+  }
+}
+
+is_null_or_char <- function(x, n = NULL) {
+  is.null(x) || is_char(x, n = NULL)
+}
+
+is_var <- function(x, n = NULL) {
+  if (is.null(n)) {
+    is.character(x) || is.numeric(x)
+  } else {
+    (is.character(x) || is.numeric(x)) && length(x) == n
+  }
+}
+
+is_null_or_var <- function(x, n = NULL) {
+  is.null(x) || is_var(x, n)
+}
+
+is_flag <- function(x) {
+  is.logical(x) && length(x) == 1
+}
+
+is_num <- function(x, n = NULL) {
+  if (is.null(n)) {
+    is.numeric(x)
+  } else {
+    is.numeric(x) && length(x) == n
+  }
 }
