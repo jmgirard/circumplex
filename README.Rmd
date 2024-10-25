@@ -41,6 +41,8 @@ devtools::install_github("jmgirard/circumplex")
 
 ## Usage
 
+### Example 1
+
 ```{r analysis1}
 data("jz2017")
 results <- ssm_analyze(
@@ -54,17 +56,44 @@ summary(results)
 ```
 
 ``` r
-ssm_table(results, xy = FALSE)
+ssm_table(results, drop_xy = TRUE)
 ```
 
 ```{r table1, echo = FALSE, results = "asis"}
-ssm_table(results, xy = FALSE, render = FALSE) %>%
+ssm_table(results, drop_xy = TRUE, render = FALSE) %>%
   knitr::kable(caption = circumplex:::dcaption(results)) %>% 
   kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r plot}
 ssm_plot(results)
+```
+
+### Example 2
+
+```{r analysis2}
+results2 <- ssm_analyze(
+  data = jz2017, 
+  scales = PANO(), 
+  angles = octants(), 
+  grouping = "Gender",
+  contrast = TRUE
+)
+summary(results2)
+```
+
+``` r
+ssm_table(results2, drop_xy = TRUE)
+```
+
+```{r table2, echo = FALSE, results = "asis"}
+ssm_table(results2, drop_xy = TRUE, render = FALSE) %>%
+  knitr::kable(caption = circumplex:::dcaption(results)) %>% 
+  kableExtra::kable_styling(full_width = TRUE, font_size = 12)
+```
+
+```{r plot2}
+ssm_plot(results2)
 ```
 
 ## Code of Conduct

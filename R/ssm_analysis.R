@@ -307,7 +307,7 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   
   # Get names of measures (using labels if provided)
   if (is.null(measures_labels)) {
-    measure_labels <- measures_names
+    measures_labels <- measures_names
   }
   
   # Calculate observed correlation scores
@@ -322,7 +322,7 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   }
   scores <- as.data.frame(scores)
   Group <- rep(group_levels, each = n_measures)
-  Measure <- rep(measure_labels, times = n_groups)
+  Measure <- rep(measures_labels, times = n_groups)
   if (contrast && is.null(grouping)) {
     Group <- c(Group, Group[[1]])
     Measure <- c(Measure, paste0(Measure[[2]], " - ", Measure[[1]]))
@@ -363,7 +363,7 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   )
   
   Group <- rep(group_levels, each = n_measures)
-  Measure <- rep(measure_labels, times = n_groups)
+  Measure <- rep(measures_labels, times = n_groups)
   if (contrast && is.null(grouping)) {
     Group <- c(Group, Group[[1]])
     Measure <- c(Measure, paste0(Measure[[2]], " - ", Measure[[1]]))

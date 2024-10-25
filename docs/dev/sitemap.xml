@@ -11,12 +11,16 @@
 <url><loc>http://circumplex.jmgirard.com/dev/LICENSE.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/news/index.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/anchors.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/as_label.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/as_name.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/aw2009.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/circumplex-package.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csie.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csig.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csip.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csiv.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/enquo.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/enquos.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/fit_fisher.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/fit_gap.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/fit_randall.html</loc></url>
@@ -42,7 +46,9 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/jz2017.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/mutate.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/norms.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/norm_standardize.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/octants.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/PANO.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/pipe.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/poles.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/quadrants.html</loc></url>

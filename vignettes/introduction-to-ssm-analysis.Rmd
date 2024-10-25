@@ -53,11 +53,11 @@ ggplot2::ggplot() +
       yend = 5 * sin(angles[c(1, 3, 5, 7)] * pi / 180)
     ),
     color = "gray60",
-    size = 1
+    linewidth = 1
   ) +
   # Draw inner labels for the octant angles
   ggplot2::geom_label(
-    aes(
+    ggplot2::aes(
       x = 3 * cos(angles * pi / 180),
       y = 3 * sin(angles * pi / 180),
       label = sprintf("%d\u00B0", angles)
@@ -106,7 +106,7 @@ dat_r <- tibble::tibble(
 
 # Create column plot
 ggplot2::ggplot(dat_r, ggplot2::aes(x = Scale, y = r)) +
-  ggplot2::geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
+  ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "darkgray") +
   ggplot2::geom_col(position = ggplot2::position_dodge(.9), fill = "red") +
   ggplot2::scale_y_continuous(
     limits = c(-0.02, 0.5)
@@ -135,10 +135,10 @@ dat_r <- tibble::tibble(
 
 # Plot correlations as connected point ranges with 95% CI ranges
 ggplot2::ggplot(dat_r, ggplot2::aes(x = Angle, y = est)) +
-  ggplot2::geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
+  ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "darkgray") +
   ggplot2::geom_point(size = 3, color = "red") +
-  ggplot2::geom_path(size = 1.25, color = "red") +
-  ggplot2::geom_label(aes(label = Scale), nudge_y = 0.075) +
+  ggplot2::geom_path(linewidth = 1.25, color = "red") +
+  ggplot2::geom_label(ggplot2::aes(label = Scale), nudge_y = 0.075) +
   ggplot2::scale_x_continuous(
     limits = c(0, 360),
     breaks = c(0, octants()),
@@ -171,9 +171,9 @@ f <- function(x) {
 
 # Plot correlations along with SSM cosine model
 ggplot2::ggplot(dat_r, ggplot2::aes(x = Angle, y = est)) +
-  ggplot2::geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
+  ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "darkgray") +
   ggplot2::geom_point(size = 3) +
-  ggplot2::geom_path(size = 1.25) +
+  ggplot2::geom_path(linewidth = 1.25) +
   ggplot2::stat_function(fun = f, size = 2, color = "red") +
   ggplot2::scale_x_continuous(
     limits = c(0, 360),
@@ -202,13 +202,13 @@ where $S_i$ and $\theta_i$ are the score and angle on scale $i$, respectively, a
 ```{r residuals, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 # Plot correlations as path, SSM cosine model, and differences
 ggplot2::ggplot(dat_r, ggplot2::aes(x = Angle, y = est)) +
-  ggplot2::geom_hline(yintercept = 0, size = 1.25, color = "darkgray") +
+  ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "darkgray") +
   ggplot2::stat_function(fun = f, size = 2, color = "gray20") +
   ggplot2::geom_point(size = 5.5, color = "black") +
-  ggplot2::geom_path(size = 1.25, color = "black") +
+  ggplot2::geom_path(linewidth = 1.25, color = "black") +
   ggplot2::geom_segment(
     ggplot2::aes(x = Angle, xend = Angle, y = est, yend = f(Angle)),
-    size = 4, linetype = "solid", color = "red"
+    linewidth = 4, linetype = "solid", color = "red"
   ) +
   ggplot2::scale_x_continuous(
     limits = c(0, 360),
@@ -256,7 +256,7 @@ To illustrate the SSM functions, we will use the example dataset `jz2017`, which
 
 ```{r jz2017}
 data("jz2017")
-print(jz2017)
+head(jz2017)
 ```
 
 The circumplex scales in `jz2017` come from the Inventory of Interpersonal Problems - Short Circumplex (IIP-SC). These scales can be arranged into the following circular model, which is organized around the two primary dimensions of agency (y-axis) and communion (x-axis). Note that the two-letter scale abbreviations and angular values are based in convention. A high score on PA indicates that one has interpersonal problems related to being "domineering" or too high on agency, whereas a high score on DE indicates problems related to being "cold" or too low on communion. Scales that are not directly on the y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency and communion.
@@ -293,7 +293,7 @@ ggplot2::ggplot() +
       yend = 5 * sin(angles * pi / 180)
     ),
     color = "gray60",
-    size = 0.5
+    linewidth = 0.5
   ) +
   # Draw inner labels for the octant abbreviations
   ggplot2::geom_label(
@@ -345,26 +345,14 @@ ggplot2::ggplot() +
 ## 3. Mean-based SSM Analysis
 
 ### Conducting SSM for a group's mean scores
-To begin, let's say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. Although it is possible to analyze the raw scores contained in `jz2017`, our results will be more interpretable if we standardize the scores first. We can do this using the `standardize()` function. The first argument to this function is `.data`, a data frame frame containing the circumplex scales to be standardized. The second argument is `scales` and specifies where in `.data` the circumplex scales are (either in terms of their variable names or their column numbers). The third argument is `angles` and specifies the angle of each of the circumplex scales included in `scales`. Note that the `scales` and `angles` arguments need to be vectors (hence the `c()` function) that have the same ordering and length. Finally, the fourth argument is `norms`, a data frame containing the normative data we will use to standardize the circumplex scales. Here, we will use normative data for the IIP-SC by loading the `iipsc` data frame.
+To begin, let's say that we want to use the SSM to describe the interpersonal problems of the average individual in the entire dataset. We will use the raw scores contained in `jz2017`, although note that the results may be more interpretable if we standardized the scores first (e.g., using the `norm_standardize()` function as described in the "Using Circumplex Instruments" vignette). 
 
-```{r}
-data("iipsc")
-jz2017s <- standardize(
-  .data = jz2017,
-  scales = c(PA, BC, DE, FG, HI, JK, LM, NO),
-  angles = c(90, 135, 180, 225, 270, 315, 360, 45),
-  instrument = iipsc,
-  sample = 1
-)
-print(jz2017s)
-```
-
-Now we can use the `ssm_analyze()` function to perform the SSM analysis. The first three arguments are the same as the first three arguments to `standardize()`. We can pass the new `jz2017s` data frame that contains standardized scores as `.data` and the same vectors to `scales` and `angles` since these haven't changed.
+We can use the `ssm_analyze()` function to perform the SSM analysis. The first three arguments to this function are `data` (the data frame containing our scores), `scales` (a vector of the names or numbers of columns containing the circumplex scales), and `angles` (a vector of the circular angle of each scale, in degrees). Below, I spell out the names of all the `scales` and the numbers of all the `angles` for teaching purposes. Later on, we will learn some shortcuts.
 
 ```{r analyze}
 results <- ssm_analyze(
-  .data = jz2017s,
-  scales = c(PA_z, BC_z, DE_z, FG_z, HI_z, JK_z, LM_z, NO_z),
+  data = jz2017,
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   angles = c(90, 135, 180, 225, 270, 315, 360, 45)
 )
 ```
@@ -375,10 +363,10 @@ The output of the function has been saved in the `results` object, which we can 
 summary(results)
 ```
 
-That was pretty easy! We can now write up these results. However, the `circumplex` package has some features that can make what we just did even easier. First, because the first three arguments of the `ssm_analyze()` function are always the same, we can omit their names. Second, because we organized the `jz2017s` data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the `PA:NO` shortcut. Finally, because the use of octant scales is so common, the `circumplex` package comes with a convenience function for outputting their angular displacements: `octants()`. Note how, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping. (To get the exact same results, we could use the `set.seed()` function to control the random number generator in R.)
+That was pretty easy! We can now write up these results. However, the `circumplex` package has some features that can make what we just did even easier. First, because we organized the `jz2017` data frame to have the circumplex scale variables adjacent and in order from PA to NO, we can simplify their specification by using the `PANO()` shortcut. Second, because the use of octant scales is so common, we can use the `octants()` shortcut. Note that, even when using these shortcuts, the results are the same except for minor stochastic differences in the confidence intervals due to the randomness inherent to bootstrapping.
 
 ```{r summary1b}
-results2 <- ssm_analyze(jz2017s, PA_z:NO_z, octants())
+results2 <- ssm_analyze(data = jz2017, scales = PANO(), angles = octants())
 summary(results2)
 ```
 
@@ -391,8 +379,8 @@ ssm_table(results2)
 
 ```{r table1, echo = FALSE}
 ssm_table(results2, render = FALSE) %>%
-  kable(caption = circumplex:::dcaption(results2)) %>%
-  kable_styling(full_width = TRUE, font_size = 14)
+  knitr::kable(caption = circumplex:::dcaption(results2)) %>%
+  kableExtra::kable_styling(full_width = TRUE, font_size = 14)
 ```
 
 Next, let's leverage the fact that we are working within a circumplex space by creating a nice-looking circular plot by mapping the amplitude parameter to the points' distance from the center of the circle and the displacement parameter to the points' rotation from due-east (as is conventional). This, again, is as simple as passing the `results` object to the `ssm_plot()` function.
@@ -406,10 +394,15 @@ ssm_plot(results2)
 ### Conducting SSM for a group's correlations with an external measure
 Next, let's say that we are interested in analyzing not the mean scores on the circumplex scales but rather their correlations with an external measure. This is sometimes referred to as "projecting" that external measure into the circumplex space. As an example, let's project the NARPD variable, which captures symptoms of narcissistic personality disorder, into the circumplex space defined by the IIP-SC. Based on theory and previous findings, we can expect this measure to be associated with some general interpersonal distress and a style that is generally high in agency.
 
-To conduct this analysis, we can start with the syntax from the mean-based analysis. All SSM analyses use the `ssm_analyze()` function and the data, scales, and angles are the same as before. However, we also need to let the function know that we want to analyze correlations with NARPD as opposed to scale means. To do this, we add an additional argument `measures`. Note that since correlations are already standardized, we don't need to worry about standardizing the circumplex scales when `measures` is used.
+To conduct this analysis, we can start with the syntax from the mean-based analysis. All SSM analyses use the `ssm_analyze()` function and the data, scales, and angles are the same as before. However, we also need to let the function know that we want to analyze correlations with NARPD as opposed to scale means. To do this, we add an additional argument `measures`.
 
 ```{r summary2}
-results3 <- ssm_analyze(jz2017, PA:NO, octants(), measures = NARPD)
+results3 <- ssm_analyze(
+  data = jz2017, 
+  scales = PANO(), 
+  angles = octants(),
+  measures = "NARPD"
+)
 summary(results3)
 ```
 
@@ -424,8 +417,8 @@ ssm_table(results3)
 
 ```{r table2, echo = FALSE}
 ssm_table(results3, render = FALSE) %>%
-  kable(caption = circumplex:::dcaption(results3)) %>%
-  kable_styling(full_width = TRUE, font_size = 14)
+  knitr::kable(caption = circumplex:::dcaption(results3)) %>%
+  kableExtra::kable_styling(full_width = TRUE, font_size = 14)
 ```
 
 From the table, we can see that the model fit is good (>.80) and that all three SSM parameters are significantly different from zero, i.e., their confidence intervals do not include zero. Furthermore, the confidence intervals for the elevation and amplitude parameters are greater than or equal to 0.15, which can be interpreted as being "marked." So, consistent with our hypotheses, NARPD was associated with marked general interpersonal distress (elevation) and was markedly distinctive in its profile (amplitude). The displacement parameter was somewhere between 100 and 120 degrees; to interpret this we would need to either consult the mapping between scales and angles or plot the results.

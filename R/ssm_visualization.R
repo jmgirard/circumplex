@@ -291,7 +291,7 @@ ssm_plot_contrast <- function(.ssm_object, drop_xy = FALSE,
     ) +
     ggplot2::geom_errorbar(
       ggplot2::aes(x = "1", ymin = lci, ymax = uci),
-      linewidth = linesize, width = 0.1
+      linewidth = linesize, width = 0.15
     ) +
     ggplot2::geom_point(
       ggplot2::aes(x = "1", y = Difference, fill = sig),
@@ -300,7 +300,7 @@ ssm_plot_contrast <- function(.ssm_object, drop_xy = FALSE,
       shape = 21
     ) +
     ggplot2::scale_fill_manual(
-      "Signficant",
+      "Significant",
       values = c("TRUE" = sig_color, "FALSE" = ns_color)
     ) +
     ggplot2::labs(y = paste0("Contrast (", res$label, ")")) +
@@ -452,19 +452,6 @@ ssm_table <- function(.ssm_object, caption = NULL,
     yes = "Contrast", 
     no = "Profile"
   )
-
-  # Add delta symbol to column names if results are contrasts
-  if (.ssm_object$details$contrast) {
-    colnames(table_df) <- c(
-      "Contrast",
-      "&Delta; Elevation",
-      "&Delta; X Value",
-      "&Delta; Y Value",
-      "&Delta; Amplitude",
-      "&Delta; Displacement",
-      "&Delta; Fit"
-    )
-  }
 
   # Drop the x and y columns if requested
   if (drop_xy) {

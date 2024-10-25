@@ -23,13 +23,16 @@ library(circumplex)
 ## 1. Generalizing the basic analyses
 
 ### Generalizing to multiple means
-We've already seen how adding the `measures` argument can change `ssm_analyze()` from analyzing means to analyzing correlations. Similarly, we can change it from analyzing all observations as a single group to analyzing subgroups separately. This is done using the `grouping` argument. This argument needs to contain a single variable (name or column number) that specifies each observation's group. For instance, the `Gender` variable in the `jz2017` dataset is a factor with two levels: Female and Male. To analyze each gender separately, we need to add the `grouping = Gender` argument to the function call.
+We've already seen how adding the `measures` argument can change `ssm_analyze()` from analyzing means to analyzing correlations. Similarly, we can change it from analyzing all observations as a single group to analyzing subgroups separately. This is done using the `grouping` argument. This argument needs to contain a single variable (name or column number) that specifies each observation's group. For instance, the `Gender` variable in the `jz2017` dataset is a factor with two levels: Female and Male. To analyze each gender separately, we need to add the `grouping = "Gender"` argument to the function call.
 
 ```{r group}
 data("jz2017")
-data("iipsc")
-jz2017s <- standardize(jz2017, PA:NO, octants(), instrument = iipsc, sample = 1)
-results <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
+results <- ssm_analyze(
+  data = jz2017, 
+  scales = PANO(), 
+  angles = octants(), 
+  grouping = "Gender"
+)
 summary(results)
 ```
 
@@ -41,25 +44,26 @@ ssm_table(results)
 
 ```{r group_table, echo = FALSE}
 ssm_table(results, render = FALSE) %>% 
-  kable(caption = circumplex:::dcaption(results)) %>% 
-  kable_styling(full_width = TRUE, font_size = 12)
+  knitr::kable(caption = circumplex:::dcaption(results)) %>% 
+  kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r group_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 ssm_plot(results)
 ```
 
-Any number of groups can be analyzed in this way, and the output will contain additional profile blocks, the table will contain additional rows, and the figure will contain additional points. The grouping variable just needs to contain more than one level (i.e., unique value). Also notice how, in the plot above, the Male profile has a dashed border instead of the typical solid border. This is because the Male profile has low prototypicality (i.e., $R^2<.70$) and therefore its plot is untrustworthy. It is also possible to prevent profiles from low prototypicality from plotting using the `lowfit` argument.
-
-```{r group_plot_lowfit, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results, lowfit = FALSE)
-```
+Any number of groups can be analyzed in this way, and the output will contain additional profile blocks, the table will contain additional rows, and the figure will contain additional points. The grouping variable just needs to contain more than one level (i.e., unique value).
 
 ### Generalizing to multiple measures
-Similarly, we can analyze multiple external measures in a single function call by providing a vector of variables to the `measures` argument instead of a single variable. This can be done by wrapping the variable names or column numbers with the `c()` or, if they are adjacent columns, with the `:` shortcut. The package functions were written to analyze all measures and groups within a single bootstrap, so adding additional measures and groups should still be fast.
+Similarly, we can analyze multiple external measures in a single function call by providing a vector of variables to the `measures` argument instead of a single variable. This can be done by wrapping the variable names or column numbers with the `c()` or, if they are adjacent columns, with the column numbers and the `:` shortcut. The package functions were written to analyze all measures and groups within a single bootstrapping, so adding additional measures and groups should still be fast.
 
 ```{r measures}
-results2 <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD))
+results2 <- ssm_analyze(
+  data = jz2017, 
+  scales = PANO(), 
+  angles = octants(),
+  measures = c("NARPD", "ASPD")
+)
 summary(results2)
 ```
 
@@ -69,8 +73,8 @@ ssm_table(results2)
 
 ```{r measures_table, echo = FALSE}
 ssm_table(results2, render = FALSE) %>% 
-  kable(caption = circumplex:::dcaption(results2)) %>% 
-  kable_styling(full_width = TRUE, font_size = 12)
+  knitr::kable(caption = circumplex:::dcaption(results2)) %>% 
+  kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r measures_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -78,10 +82,15 @@ ssm_plot(results2)
 ```
 
 ### Generalizing to multiple groups and multiple measures
-Finally, it is possible to analyze multiple measures within multiple groups. As you might expect, this requires providing both the `measures` and `grouping` arguments to the same function call. Again, any number of measures and groups is possible. The profiles in such an analysis will be named GROUP_MEASURE as below.
+Finally, it is possible to analyze multiple measures within multiple groups. As you might expect, this requires providing both the `measures` and `grouping` arguments to the same function call. Again, any number of measures and groups is possible. The profiles in such an analysis will be named "Measure: Group" as below.
 
 ```{r general}
-results3 <- ssm_analyze(jz2017, PA:NO, octants(), grouping = Gender, measures = PARPD:SZTPD)
+results3 <- ssm_analyze(
+  data = jz2017, 
+  scales = PANO(), 
+  angles = octants(), 
+  grouping = "Gender", 
+  measures = 10:12)
 summary(results3)
 ```
 
@@ -91,26 +100,38 @@ ssm_table(results3)
 
 ```{r general_table, echo = FALSE}
 ssm_table(results3, render = FALSE) %>% 
-  kable(caption = circumplex:::dcaption(results3)) %>% 
-  kable_styling(full_width = TRUE, font_size = 12)
+  knitr::kable(caption = circumplex:::dcaption(results3)) %>% 
+  kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r general_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 ssm_plot(results3)
 ```
 
+Note that the borders for the "PARDPD: Male" and "SZTPD: Male" blocks are dashed instead of solid. This indicates that these profiles have low fit (i.e., $R^2<.7$). We could alternatively hide these such profiles by adding `lowfit = FALSE` as below (noting that the color guide may change as profiles are dropped).
+
+```{r general_plot2, fig.width = 7.5, fig.height = 4, out.width = "100%"}
+ssm_plot(results3, lowfit = FALSE)
+```
+
 ## 2. Contrast analyses
-The final argument to master is `contrast`, which allows us to compare two groups or measures. The value of this argument must be one of the following strings: "none" for no contrast (default), "model" for a model contrast, or "test" for a parameter contrast. A model contrast can be useful for mean-based analyses and first generates scores for each group (or measure), then calculates the difference between these scores, and finally estimates SSM parameters for these difference scores. A parameter contrast is typically what is desired for inferential comparison and first generates scores for each group (or measure), then estimates SSM parameters for these scores, and finally calculates the difference between the parameters. To keep the code simpler and to discourage "fishing expeditions," only two groups or measures can be compared at a time.
+The final argument to master in this vignette is `contrast`, which allows us to compare two groups or measures. Setting this argument to TRUE will first generate scores for each group (or measure), then estimate SSM parameters for these scores, and finally calculate the difference between the parameters. To keep the code simpler and to discourage "fishing expeditions," only two groups or measures can be compared at a time.
 
 ### Contrasts between groups' means
-To compare the mean profiles for females and males, we can start with the same syntax we had before and then add a `contrast` argument. For the sake of illustration, we will use a model contrast here, but for some purposes, a parameter contrast might be more appropriate.
+To compare the mean profiles for females and males, we can start with the same syntax we had before and then add a `contrast` argument.
 
 ```{r model_contrast}
-results4 <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender, contrast = "model")
+results4 <- ssm_analyze(
+  data = jz2017, 
+  scales = PANO(), 
+  angles = octants(), 
+  grouping = "Gender", 
+  contrast = TRUE
+)
 summary(results4)
 ```
 
-Note that the profile blocks we are used to have been replaced by a contrast block. By default, the contrast is made by subtracting the first level of the grouping variable from the second level (e.g., Male - Female). This provides an indication of the direction of the contrast. We can again generate a table and figure to display the results. Note that, because we used a model contrast, the figure will be a circular figure and not a contrast figure which we will see below. However, we would get a contrast figure if we used a parameter contrast.
+Note that we have the profile blocks for each group as well as a contrast block. The contrast is made by subtracting the first level of the grouping variable from the second level (e.g., Male - Female). This provides an indication of the direction of the contrast. We can again generate a table and figure to display the results.
 
 ```r
 ssm_table(results4)
@@ -118,8 +139,8 @@ ssm_table(results4)
 
 ```{r model_table, echo = FALSE}
 ssm_table(results4, render = FALSE) %>% 
-  kable(caption = circumplex:::dcaption(results4)) %>% 
-  kable_styling(full_width = TRUE, font_size = 12)
+  knitr::kable(caption = circumplex:::dcaption(results4)) %>% 
+  kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r model_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -130,8 +151,13 @@ ssm_plot(results4)
 Comparing measures in a group is very similar. Again, all we need to do is add the `contrast` argument to the function call containing `measures`. Here we will use a parameter contrast to see what they look like.
 
 ```{r measure_contrast}
-results5 <- ssm_analyze(jz2017, PA:NO, octants(), measures = c(NARPD, ASPD),
-  contrast = "test")
+results5 <- ssm_analyze(
+  data = jz2017, 
+  scales = PANO(), 
+  angles = octants(), 
+  measures = c("NARPD", "ASPD"),
+  contrast = TRUE
+)
 summary(results5)
 ```
 
@@ -141,8 +167,8 @@ ssm_table(results5)
 
 ```{r measure_contrast_table, echo = FALSE, results = "asis"}
 ssm_table(results5, render = FALSE) %>% 
-  kable(caption = circumplex:::dcaption(results5)) %>% 
-  kable_styling(full_width = TRUE, font_size = 12)
+  knitr::kable(caption = circumplex:::dcaption(results5)) %>% 
+  kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r measure_contrast_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -152,11 +178,17 @@ ssm_plot(results5)
 Here, instead of a circle plot, we see a contrast plot showing the difference between the two measures' SSM parameters and their 95% confidence intervals. Because the confidence interval for the elevation parameter does not include zero, this parameter is significantly different between the measures.
 
 ### Contrasts between groups' correlations
-Finally, we might want to compare a single measure's profiles in two different groups. To do so, we need to specify the `measures`, the `grouping` variable, and the type of `contrast`. In this case, we need to ensure that we are providing only a single measure and a grouping variable with just two levels (as again only two things can be contrasted at a time). Note that the contrast name in this case will take the form of MEASURE: GROUP2 - GROUP1.
+Finally, we might want to compare a single measure's profiles in two different groups. To do so, we need to specify the `measures`, the `grouping` variable, and the type of `contrast`. In this case, we need to ensure that we are providing only a single measure and a grouping variable with just two levels (as again only two things can be contrasted at a time). Note that the contrast name in this case will take the form of "Measure: Group2 - Group1".
 
 ```{r group_contrast}
-results6 <- ssm_analyze(jz2017, PA:NO, octants(), measures = BORPD, 
-  grouping = Gender, contrast = "test")
+results6 <- ssm_analyze(
+  data = jz2017, 
+  scales = PANO(), 
+  angles = octants(), 
+  measures = "BORPD", 
+  grouping = "Gender", 
+  contrast = TRUE
+)
 summary(results6)
 ```
 
@@ -166,8 +198,8 @@ ssm_table(results6)
 
 ```{r group_contrast_table, echo = FALSE, results = "asis"}
 ssm_table(results6, render = FALSE) %>% 
-  kable(caption = circumplex:::dcaption(results6)) %>% 
-  kable_styling(full_width = TRUE, font_size = 12)
+  knitr::kable(caption = circumplex:::dcaption(results6)) %>% 
+  kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r group_contrast_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
@@ -181,8 +213,7 @@ Although all SSM analyses are based on the idea of decomposing circumplex scores
 msr <- c("FALSE", "FALSE", "FALSE", "TRUE",  "TRUE",  "TRUE",  "TRUE")
 grp <- c("FALSE", "TRUE",  "TRUE",  "FALSE", "FALSE", "TRUE",  "TRUE")
 ctr <- c("FALSE", "FALSE", "TRUE",  "FALSE", "TRUE",  "FALSE", "TRUE")
-tab <- tibble(
-  `#` = c(1, 2, 3, 4, 5, 6, 7),
+tab <- data.frame(
   Usage = c(
     "Examine overall mean profile",
     "Examine groups' mean profiles",
@@ -192,13 +223,13 @@ tab <- tibble(
     "Examine groups' correlation profiles",
     "Compare groups' correlation profiles"
   ),
-  measures = cell_spec(msr, color = ifelse(msr == "TRUE", "blue", "black")),
-  grouping = cell_spec(grp, color = ifelse(grp == "TRUE", "blue", "black")),
-  contrast = cell_spec(ctr, color = ifelse(ctr == "TRUE", "blue", "black"))
+  measures = msr,
+  grouping = grp,
+  contrast = ctr
 )
 knitr::kable(tab, escape = FALSE) %>% 
-  column_spec(2, width = "3in") %>% 
-  add_header_above(c("", "", "Arguments Needed" = 3))
+  column_spec(1, width = "3in") %>% 
+  add_header_above(c("", "Arguments Needed" = 3))
 ```
 
 The three main questions to ask when conducting a new SSM analysis are:
@@ -209,58 +240,21 @@ If yes, we must specify one or more `measures`, and the scores that get modeled 
 1. **Do we want to perform analyses separately for groups within the dataset?**
 If yes, we must specify a `grouping` variable, and the output will contain results for each group (i.e., unique value of this variable). If no, we must omit the `grouping` argument, and a single set of results for all data will be output.
 
-1. **Do we want to contrast/compare two sets of results?** If yes, we must specify a `contrast` type (i.e., "model" or "test") and ensure that we are only requesting two sets of results (i.e., two groups or two measures). If no, we must omit the `contrast` argument, and the results themselves will be output, rather than their contrast.
+1. **Do we want to contrast/compare two sets of results?** If yes, we must specify `contrast` as TRUE and ensure that we are only requesting two sets of results (i.e., two groups or two measures). If no, we must omit the `contrast` argument or set it to FALSE, and the results themselves will be output, rather than their contrast.
 
 ## 4. Working with SSM tables
 
 ### Basic customizations of tables
-Additional arguments to the `ssm_table()` function can be explored using the `?ssm_table` command. Two useful options are the `xy` argument, which shows or hides the x-value and y-value columns, and the `caption` argument which allows a custom string to be printed above the table. Note as well that the return object of this function is just a tibble or data frame, which can be easily edited to add, change, or remove text. To change the formatting of the table, see the `htmlTable` or `kableExtra` packages.
-
-### Combining and exporting tables
-In some cases, such as multiple contrasts or groupings, we may want to combine several tables into one by joining them together as rows. This can be done using the `ssm_append()` function.
-
-```r
-res1 <- ssm_analyze(jz2017s, PA:NO, octants())
-res2 <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
-tab1 <- ssm_table(res1, xy = FALSE, render = FALSE)
-tab2 <- ssm_table(res2, xy = FALSE, render = FALSE)
-ssm_append(tab1, tab2)
-```
-
-```{r append, echo = FALSE}
-res1 <- ssm_analyze(jz2017s, PA:NO, octants())
-res2 <- ssm_analyze(jz2017s, PA:NO, octants(), grouping = Gender)
-tab1 <- ssm_table(res1, xy = FALSE, render = FALSE)
-tab2 <- ssm_table(res2, xy = FALSE, render = FALSE)
-ssm_append(tab1, tab2, render = FALSE) %>% 
-  kable() %>% 
-  kable_styling(full_width = TRUE, font_size = 12)
-```
+Additional arguments to the `ssm_table()` function can be explored using the `?ssm_table` command. Two useful options are the `drop_xy` argument, which shows or hides the x-value and y-value columns, and the `caption` argument which allows a custom string to be printed above the table. Note as well that the return object of this function is just a tibble or data frame, which can be easily edited to add, change, or remove text. To change the formatting of the table, see the `htmlTable` or `kableExtra` packages.
 
 ## 5. Working with SSM figures
-
-### Basic customizations of figures
-Additional arguments to the `ssm_plot()` function can be explored using the `?ssm_plot`, `?ssm_plot_circle`, and `?ssm_plot_contrast` commands. For both types of figures, the `fontsize` argument will control the baseline text size in pts (default = 12). Some text elements will be rescaled from the specified `fontsize` (e.g., multiplying it by 150%). For circle plots, we have already seen the `lowfit` argument for including points with low model fit. Another useful option is the `amax` argument for the maximum value of the amplitude scale. By default, the package picks a number that will fit all the points and generate "round" numbers at each 1/5 tick; however, this default can be overwritten using the `amax` argument.
-
-```{r amax, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results4, amax = 0.6)
-```
-
-For contrast plots, several arguments exist for customizing the output. We have already seen the `xy` argument for including or excluding the x-value and y-value contrasts. We can also change the `color` and `linesize` of the point range (linesize in mm). Finally, we can change the `axislabel` displayed to the left of the plots. More complex customizations will be the subject of an advanced vignette.
-
-```{r custom, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results6, xy = FALSE, color = "blue", linesize = 1,
-  axislabel = "BORPD: Male - Female")
-```
 
 ### Exporting figures as files
 All SSM plots are created using the `ggplot2` package, which is incredibly flexible and powerful. It also offers the `ggsave()` function to export figures to external files of various types. See the documentation for this function (`?ggsave`) to learn more, but some useful arguments are `filename`, `plot`, `width`, `height`, and `units`. We can save the figure as a raster image file (e.g., "png", "jpeg", "tiff"), a vector image file (e.g., "svg"), or a portable document (e.g., "pdf" or "tex"). We can also control the exact width and height of the image in different units (i.e., "in", "cm", or "mm"). Because the underlying graphics are vectorized in R, they can be easily scaled to any size without loss of quality and used in manuscripts, presentations, or posters.
 
 ```r
-p <- ssm_plot(results6, xy = FALSE, color = "blue", linesize = 1,
-  axislabel = "BORPD: Male - Female")
-ggsave(filename = "bordpd_gender.png", plot = p, width = 7.5, height = 4,
-  units = "in")
+ssm_plot(results6)
+ggsave("bordpd_gender.png", width = 7.5, height = 4, units = "in")
 ```
 
 ## Wrap-up
