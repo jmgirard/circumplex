@@ -397,3 +397,40 @@ test_that("Group-contrast correlation-based SSM results are correct", {
   expect_true(res$details$contrast)
   expect_equal(res$details$score_type, "Correlation")
 })
+
+
+test_that("ssm_parameters works", {
+  data("aw2009")
+  scores <- unlist(aw2009[1, ])
+  expect_error(ssm_parameters(scores = PANO()))
+  expect_error(ssm_parameters(scores = scores, angles = PANO()))
+  expect_error(ssm_parameters(scores = scores, angles = quadrants()))
+  expect_equal(
+    round(ssm_parameters(scores), 2), 
+    data.frame(
+      Elev = 0.43,
+      Xval = 1.25, 
+      Yval = -1.31, 
+      Ampl = 1.81, 
+      Disp = 313.71, 
+      Fit = 0.97
+    )
+  )
+})
+
+test_that("ssm_score works", {
+  data("aw2009")
+  out <- ssm_score(aw2009, scales = PANO(), append = TRUE)
+  expect_equal(
+    round(out[1:2, 9:14], 2),
+    data.frame(
+      Elev = c(0.43, 0.23),
+      Xval = c(1.25, 1.42),
+      Yval = c(-1.31, 0.51),
+      Ampl = c(1.81, 1.51),
+      Disp = c(313.71, 19.67),
+      Fit = c(0.97, 0.92)
+    )
+  )
+})
+

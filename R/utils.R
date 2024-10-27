@@ -46,6 +46,8 @@ str_percent <- function(x, digits = 2) {
 
 # Determine good max amplitude value for circle plot ---------------------------
 pretty_max <- function(v) {
+  
+  # What is the largest value?
   amax <- max(v, na.rm = TRUE)
   options <- c(
     -5.00, -4.00, -3.00, -2.50, -2.00,
@@ -56,15 +58,20 @@ pretty_max <- function(v) {
     0.50, 0.75, 1.00, 1.25, 1.50,
     2.00, 2.50, 3.00, 4.00, 5.00
   )
+  # If negative, decrease scalar (how much buffer space to add)
   if (amax < 0 ) {
     scalar <- 0.5
   } else {
     scalar <- 1.5
   }
+  # Which options are good candidates?
   match <- options > amax * scalar
+  # Are there any candidates?
   if (sum(match) >= 1) {
+    # Take the smallest candidate 
     out <- options[match][[1]]
   } else {
+    # Multiply the max and scalar
     out <- amax * scalar
   }
   out
@@ -72,6 +79,8 @@ pretty_max <- function(v) {
 
 # Determine good min amplitude value for circle plot ---------------------------
 pretty_min <- function(v) {
+  
+  # What is the smallest value?
   amin <- min(v, na.rm = TRUE)
   options <- c(
     -5.00, -4.00, -3.00, -2.50, -2.00,
@@ -82,21 +91,28 @@ pretty_min <- function(v) {
     0.50, 0.75, 1.00, 1.25, 1.50,
     2.00, 2.50, 3.00, 4.00, 5.00
   )
+  # If negative, increase scalar (how much buffer space to add)
   if (amin < 0) {
     scalar <- 1.5
   } else {
     scalar <- 0.5
   }
+  # Which options are candidates?
   match <- options < amin * scalar
+  # Are there any candidates?
   if (sum(match) >= 1) {
+    # Take the largest candidate
     candidates <- options[match]
     out <- candidates[length(candidates)]
   } else {
+    # Multiply the min and scalar
     out <- amin * scalar
   }
   out
 }
 
+
+# Rescale numeric vector to specified min and max -------------------------
 rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) {
   min_to <- to[1]
   max_to <- to[2]
@@ -109,10 +125,19 @@ rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) {
 
 # Assertions --------------------------------------------------------------
 
+is_count <- function(x) {
+  all(
+    is.numeric(x),
+    ceiling(x) == floor(x),
+    x >= 0
+  )
+}
+
 is_char <- function(x, n = NULL) {
   if (is.null(n)) {
     is.character(x)
   } else {
+    stopifnot(is_count(n))
     is.character(x) && length(x) == n
   }
 }
@@ -125,6 +150,7 @@ is_var <- function(x, n = NULL) {
   if (is.null(n)) {
     is.character(x) || is.numeric(x)
   } else {
+    stopifnot(is_count(n))
     (is.character(x) || is.numeric(x)) && length(x) == n
   }
 }
@@ -141,6 +167,7 @@ is_num <- function(x, n = NULL) {
   if (is.null(n)) {
     is.numeric(x)
   } else {
+    stopifnot(is_count(n))
     is.numeric(x) && length(x) == n
   }
 }

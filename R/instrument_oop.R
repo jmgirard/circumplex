@@ -31,19 +31,19 @@ summary.circumplex_instrument <- function(object, scales = TRUE, anchors = TRUE,
                                items = TRUE, norms = TRUE, ...) {
   x <- object
   print(x)
-  if (scales == TRUE) {
+  if (scales) {
     cat("\n")
     scales(x)
   }
-  if (anchors == TRUE) {
+  if (anchors) {
     cat("\n")
     anchors(x)
   }
-  if (items == TRUE) {
+  if (items) {
     cat("\n")
     items(x)
   }
-  if (norms == TRUE) {
+  if (norms) {
     cat("\n")
     norms(x)
   }
@@ -166,12 +166,6 @@ norms <- function(x) {
 
   samples <- x$Norms[[2]]
   n_norms <- nrow(samples)
-
-  if (n_norms == 0) {
-    cat("The ", x$Details$Abbrev, " currently has no normative data sets.", 
-        "\n", sep = "")
-    return()
-  }
 
   cat("The ", x$Details$Abbrev, " currently has ", n_norms, 
       " normative data set(s):", "\n", sep = "")

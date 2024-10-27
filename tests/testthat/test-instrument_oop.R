@@ -19,6 +19,7 @@ test_that("The print method for the S3 instrument class produces the right outpu
 
 test_that("The summary method for the S3 instrument class produces the right output", {
   isc <- instrument("isc")
+  expect_snapshot_output(summary(isc))
   expect_snapshot_output(summary(isc, scales = FALSE, anchors = FALSE, items = FALSE, norms = FALSE))
   expect_snapshot_output(summary(isc, scales = TRUE, anchors = FALSE, items = FALSE, norms = FALSE))
   expect_snapshot_output(summary(isc, scales = FALSE, anchors = TRUE, items = FALSE, norms = FALSE))

@@ -30,14 +30,14 @@ test_that("Measure-contrast SSM plot is correct", {
     measures = c("ASPD", "NARPD"),
     contrast = TRUE
   )
-  p <- ssm_plot_contrast(res, xy = FALSE)
+  p <- ssm_plot_contrast(res, drop_xy = TRUE)
 
   # Test the output object
   expect_type(p, "list")
   expect_s3_class(p, "ggplot")
   vdiffr::expect_doppelganger("measure-contrast ssm", p)
   
-  p2 <- ssm_plot_circle(res, xy = FALSE)
+  p2 <- ssm_plot_circle(res, drop_xy = TRUE)
   
   # Test the output object
   expect_type(p2, "list")
@@ -65,7 +65,7 @@ test_that("Group-contrast correlation-based SSM plot is correct", {
 test_that("Removing plots with low fit works as expected", {
   data("jz2017")
   res <- ssm_analyze(jz2017, scales = 2:9, measures = "OCPD")
-  expect_error(ssm_plot(res, lowfit = FALSE))
+  expect_error(ssm_plot_circle(res, drop_lowfit = TRUE))
 })
 
 test_that("SSM Table captions are correct", {

@@ -18,3 +18,22 @@ test_that("angle convenience functions work", {
   expect_equal(poles(), as_degree(c(90, 180, 270, 360)))
   expect_equal(quadrants(), as_degree(c(135, 225, 315, 45)))
 })
+
+test_that("scales shortcut functions work", {
+  expect_equal(PANO(), c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"))
+})
+
+test_that("assertions work", {
+  expect_true(is_num(1))
+  expect_false(is_num("A"))
+  expect_false(is_count(-1))
+})
+
+test_that("rescale works", {
+  expect_equal(rescale(1:3), c(0.0, 0.5, 1.0))
+})
+
+test_that("prettifying works", {
+  expect_equal(pretty_min(0.5), 0.2)
+  expect_equal(pretty_min(-0.5), -1.0)
+})
