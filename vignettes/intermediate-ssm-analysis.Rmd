@@ -49,10 +49,14 @@ ssm_table(results, render = FALSE) %>%
 ```
 
 ```{r group_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results)
+ssm_plot_circle(results)
 ```
 
-Any number of groups can be analyzed in this way, and the output will contain additional profile blocks, the table will contain additional rows, and the figure will contain additional points. The grouping variable just needs to contain more than one level (i.e., unique value).
+```{r group_plot2, fig.width = 7.5, fig.height = 4, out.width = "100%"}
+ssm_plot_curve(results)
+```
+
+Any number of groups can be analyzed in this way, and the output will contain additional profile blocks, the table will contain additional rows, and the figures will contain additional points or curves. The grouping variable just needs to contain more than one level (i.e., unique value).
 
 ### Generalizing to multiple measures
 Similarly, we can analyze multiple external measures in a single function call by providing a vector of variables to the `measures` argument instead of a single variable. This can be done by wrapping the variable names or column numbers with the `c()` or, if they are adjacent columns, with the column numbers and the `:` shortcut. The package functions were written to analyze all measures and groups within a single bootstrapping, so adding additional measures and groups should still be fast.
@@ -78,7 +82,11 @@ ssm_table(results2, render = FALSE) %>%
 ```
 
 ```{r measures_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results2)
+ssm_plot_circle(results2)
+```
+
+```{r measures_plot2, fig.width = 7.5, fig.height = 4, out.width = "100%"}
+ssm_plot_curve(results2)
 ```
 
 ### Generalizing to multiple groups and multiple measures
@@ -105,13 +113,21 @@ ssm_table(results3, render = FALSE) %>%
 ```
 
 ```{r general_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results3)
+ssm_plot_circle(results3)
 ```
 
 Note that the borders for the "PARDPD: Male" and "SZTPD: Male" blocks are dashed instead of solid. This indicates that these profiles have low fit (i.e., $R^2<.7$). We could alternatively hide these such profiles by adding `lowfit = FALSE` as below (noting that the color guide may change as profiles are dropped).
 
 ```{r general_plot2, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results3, lowfit = FALSE)
+ssm_plot_circle(results3, drop_lowfit = TRUE)
+```
+
+```{r general_plot3, fig.width = 7.5, fig.height = 4, out.width = "100%"}
+ssm_plot_curve(results3)
+```
+
+```{r general_plot4, fig.width = 7.5, fig.height = 4, out.width = "100%"}
+ssm_plot_curve(results3, drop_lowfit = TRUE)
 ```
 
 ## 2. Contrast analyses
@@ -144,7 +160,7 @@ ssm_table(results4, render = FALSE) %>%
 ```
 
 ```{r model_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results4)
+ssm_plot_contrast(results4)
 ```
 
 ### Contrasts between measures in a group
@@ -172,7 +188,7 @@ ssm_table(results5, render = FALSE) %>%
 ```
 
 ```{r measure_contrast_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results5)
+ssm_plot_contrast(results5)
 ```
 
 Here, instead of a circle plot, we see a contrast plot showing the difference between the two measures' SSM parameters and their 95% confidence intervals. Because the confidence interval for the elevation parameter does not include zero, this parameter is significantly different between the measures.
@@ -203,7 +219,7 @@ ssm_table(results6, render = FALSE) %>%
 ```
 
 ```{r group_contrast_plot, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results6)
+ssm_plot_contrast(results6)
 ```
 
 ## 3. Taxonomy of analysis types

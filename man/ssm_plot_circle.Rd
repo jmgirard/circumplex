@@ -5,11 +5,11 @@
 \title{Create a Circular Plot of SSM Results}
 \usage{
 ssm_plot_circle(
-  .ssm_object,
+  ssm_object,
   amax = NULL,
   legend_font_size = 12,
   scale_font_size = 12,
-  lowfit = TRUE,
+  drop_lowfit = FALSE,
   repel = FALSE,
   angle_labels = NULL,
   legend.box.spacing = 0,
@@ -18,8 +18,7 @@ ssm_plot_circle(
 )
 }
 \arguments{
-\item{.ssm_object}{The output of \code{ssm_profiles()} or
-\code{ssm_measures()}.}
+\item{ssm_object}{Required. The output of \code{ssm_analyze()}.}
 
 \item{amax}{A positive real number corresponding to the radius of the circle.
 It is used to scale the amplitude values and will determine which amplitude
@@ -32,8 +31,8 @@ pt) of the text labels in the legend (default = 12).}
 pt) of the text labels for the amplitude and displacement scales (default =
 12).}
 
-\item{lowfit}{A logical determining whether profiles with low model fit
-(<.70) should be plotted, with dashed borders (default = TRUE).}
+\item{drop_lowfit}{A logical determining whether profiles with low model fit
+(<.70) should be omitted or plotted with dashed borders (default = FALSE).}
 
 \item{repel}{An experimental argument for plotting text labels instead of
 colors.}
@@ -41,8 +40,8 @@ colors.}
 \item{angle_labels}{A character vector specifying text labels to plot around
 the circle for each scale. Can also specify NULL to default to numerical
 angle labels or a vector of empty strings ("") to hide the labels. If not
-NULL, must have the same length and ordering as the \code{angles} argument
-to \code{ssm_analyze()}. (default = NULL)}
+NULL, must have the same length and ordering as the \code{angles} argument to
+\code{ssm_analyze()}. (default = NULL)}
 
 \item{legend.box.spacing}{A double corresponding to the distance (in inches)
 to add between the data plot and the legend (default = 0).}
@@ -67,7 +66,7 @@ circular space quantified by displacement and amplitude.
 data("jz2017")
 res <- ssm_analyze(
   jz2017,
-  scales = 2:9, 
+  scales = 2:9,
   measures = c("NARPD", "ASPD")
 )
 ssm_plot_circle(res)

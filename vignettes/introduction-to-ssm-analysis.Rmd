@@ -70,7 +70,7 @@ ggplot2::ggplot() +
   ) +
   # Draw the circle
   ggforce::geom_circle(ggplot2::aes(x0 = 0, y0 = 0, r = 5),
-    color = "gray50", size = 1.5
+    color = "gray50", linewidth = 1.5
   ) +
   # Draw outer labels for octant abbreviations
   ggplot2::geom_label(
@@ -383,10 +383,14 @@ ssm_table(results2, render = FALSE) %>%
   kableExtra::kable_styling(full_width = TRUE, font_size = 14)
 ```
 
-Next, let's leverage the fact that we are working within a circumplex space by creating a nice-looking circular plot by mapping the amplitude parameter to the points' distance from the center of the circle and the displacement parameter to the points' rotation from due-east (as is conventional). This, again, is as simple as passing the `results` object to the `ssm_plot()` function.
+Next, let's leverage the fact that we are working within a circumplex space by creating a nice-looking circular plot by mapping the amplitude parameter to the points' distance from the center of the circle and the displacement parameter to the points' rotation from due-east (as is conventional). This, again, is as simple as passing the `results` object to the `ssm_plot_circle()` or `ssm_plot_curve()` functions.
 
 ```{r plot1, fig.width = 7.2, fig.height = 4, out.width = "100%"}
-ssm_plot(results2)
+ssm_plot_circle(results2)
+```
+
+```{r plot2, fig.width = 7.2, fig.height = 4, out.width = "100%"}
+ssm_plot_curve(results2)
 ```
 
 ## 4. Correlation-based SSM Analysis
@@ -423,11 +427,15 @@ ssm_table(results3, render = FALSE) %>%
 
 From the table, we can see that the model fit is good (>.80) and that all three SSM parameters are significantly different from zero, i.e., their confidence intervals do not include zero. Furthermore, the confidence intervals for the elevation and amplitude parameters are greater than or equal to 0.15, which can be interpreted as being "marked." So, consistent with our hypotheses, NARPD was associated with marked general interpersonal distress (elevation) and was markedly distinctive in its profile (amplitude). The displacement parameter was somewhere between 100 and 120 degrees; to interpret this we would need to either consult the mapping between scales and angles or plot the results.
 
-```{r plot2, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-ssm_plot(results3)
+```{r plot3, fig.width = 7.5, fig.height = 4, out.width = "100%"}
+ssm_plot_circle(results3)
 ```
 
 From this figure, it is very easy to see that, consistent with our hypotheses, the displacement for NARPD was associated with high agency and was somewhere between the "domineering" and "vindictive" octants.
+
+```{r plot4, fig.width = 7.5, fig.height = 4, out.width = "100%"}
+ssm_plot_curve(results3)
+```
 
 ## 5. Wrap-up
 In this vignette, we learned about circumplex models, scales, and data as well as the Structural Summary Method (SSM) for analyzing such data. We learned about the `circumplex` package and how to use the `ssm_analyze()` function to generate SSM results for a single group's mean scores and for correlations with a single external measure. We learned several shortcuts for making calls to this function easier and then explored the basics of SSM visualization by creating simple tables and circular plots. In the next vignette, "Intermediate SSM Analysis", we will build upon this knowledge to learn how to (1) generalize our analyses to multiple groups and multiple measures, (2) perform contrast analyses to compare groups or measures, and (3) export and make basic changes to tables and figures.

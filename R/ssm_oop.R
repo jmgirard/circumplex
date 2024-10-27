@@ -85,6 +85,20 @@ as_radian.circumplex_degree <- function(x, ...) {
   new_radian(x * (pi / 180))
 }
 
+# S3 Method
+#' @method print circumplex_degree
+#' @export
+print.circumplex_degree <- function(x, digits = 3, ...) {
+  cat(round(x, digits = digits), "\nDegrees\n")
+}
+
+# S3 Method
+#' @method print circumplex_radian
+#' @export
+print.circumplex_radian <- function(x, digits = 3, ...) {
+  cat(round(x, digits = digits), "\nRadians\n")
+}
+
 # Class ssm --------------------------------------------------------------------
 
 # S3 Constructor

@@ -4,11 +4,10 @@
 \alias{ssm_table}
 \title{Create HTML table from SSM results or contrasts}
 \usage{
-ssm_table(.ssm_object, caption = NULL, drop_xy = FALSE, render = TRUE)
+ssm_table(ssm_object, caption = NULL, drop_xy = FALSE, render = TRUE)
 }
 \arguments{
-\item{.ssm_object}{The output of \code{ssm_profiles()} or
-\code{ssm_measures()}}
+\item{ssm_object}{Required. The results output of \code{ssm_analyze()}.}
 
 \item{caption}{A string to be displayed above the table (default = NULL).}
 

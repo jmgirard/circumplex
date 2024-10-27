@@ -5,8 +5,7 @@
 #' point and interval estimate for each row (e.g., group or measure) in a
 #' circular space quantified by displacement and amplitude.
 #'
-#' @param .ssm_object The output of \code{ssm_profiles()} or
-#'   \code{ssm_measures()}.
+#' @param ssm_object Required. The output of `ssm_analyze()`.
 #' @param amax A positive real number corresponding to the radius of the circle.
 #'   It is used to scale the amplitude values and will determine which amplitude
 #'   labels are drawn.
@@ -15,15 +14,15 @@
 #' @param scale_font_size A positive real number corresponding to the size (in
 #'   pt) of the text labels for the amplitude and displacement scales (default =
 #'   12).
-#' @param lowfit A logical determining whether profiles with low model fit
-#'   (<.70) should be plotted, with dashed borders (default = TRUE).
+#' @param drop_lowfit A logical determining whether profiles with low model fit
+#'   (<.70) should be omitted or plotted with dashed borders (default = FALSE).
 #' @param repel An experimental argument for plotting text labels instead of
 #'   colors.
 #' @param angle_labels A character vector specifying text labels to plot around
 #'   the circle for each scale. Can also specify NULL to default to numerical
 #'   angle labels or a vector of empty strings ("") to hide the labels. If not
-#'   NULL, must have the same length and ordering as the \code{angles} argument
-#'   to \code{ssm_analyze()}. (default = NULL)
+#'   NULL, must have the same length and ordering as the `angles` argument to
+#'   `ssm_analyze()`. (default = NULL)
 #' @param legend.box.spacing A double corresponding to the distance (in inches)
 #'   to add between the data plot and the legend (default = 0).
 #' @param palette A string corresponding to the palette to be used from
@@ -38,41 +37,33 @@
 #' data("jz2017")
 #' res <- ssm_analyze(
 #'   jz2017,
-#'   scales = 2:9, 
+#'   scales = 2:9,
 #'   measures = c("NARPD", "ASPD")
 #' )
 #' ssm_plot_circle(res)
 #' }
-ssm_plot_circle <- function(.ssm_object, 
+ssm_plot_circle <- function(ssm_object, 
                             amax = NULL, 
                             legend_font_size = 12,
                             scale_font_size = 12,
-                            lowfit = TRUE, 
+                            drop_lowfit = FALSE, 
                             repel = FALSE,
                             angle_labels = NULL,
                             legend.box.spacing = 0,
                             palette = "Set2",
                             ...) {
   
-  df <- .ssm_object$results
-  
-  stopifnot(
-    is.null(angle_labels) || 
-      (is.character(angle_labels) && 
-         length(angle_labels) == length(.ssm_object$details$angles))
-  )
-
-  
-  angles <- as.integer(round(.ssm_object$details$angles))
-  
+  df <- ssm_object$results
+  angles <- as.integer(round(ssm_object$details$angles))
 
   stopifnot(is_null_or_num(amax, n = 1))
+  stopifnot(is_null_or_char(angle_labels, n = length(angles)))
 
   if (is.null(amax)) {
-    amax <- pretty_max(.ssm_object$results$a_uci)
+    amax <- pretty_max(ssm_object$results$a_uci)
   }
   
-  if (.ssm_object$details$contrast) {
+  if (ssm_object$details$contrast) {
     df <- df[1:2, ]
   }
 
@@ -95,14 +86,14 @@ ssm_plot_circle <- function(.ssm_object,
   
   # Remove profiles with low model fit (unless overrided)
   n <- nrow(df_plot)
-  if (lowfit == FALSE) {
+  if (drop_lowfit) {
     df_plot <- df_plot[df_plot$fit_est >= .70, ]
     if (nrow(df_plot) < 1) {
       stop("After removing profiles with low fit, there were none left to plot.")
     }
   }
   
-  df_plot[["lnty"]] <- ifelse(df_plot$fit_est >= .70, "solid", "dashed")
+  df_plot[["lnty"]] <- ifelse(df_plot$fit_est >= .70, "solid", "dotted")
 
   p <- 
     circle_base(
@@ -185,13 +176,142 @@ ssm_plot_circle <- function(.ssm_object,
   p
 }
 
+#' Create a Curve Plot of SSM Results
+#'
+#' Take in the results of a Structural Summary Method analysis and plot the
+#' scores by angle and the estimated SSM curve.
+#'
+#' @param ssm_object Required. The results output of `ssm_analyze()`.
+#' @param angle_labels Optional. Either NULL or a character vector that
+#'   determines the x-axis labels. If NULL, the labels will be the angle
+#'   numbers. If a character vector, must be the same length and in the same
+#'   order as the `angles` argument to `ssm_analyze()` (default = NULL).
+#' @param base_size Optional. A positive number corresponding to the base font
+#'   size in pts (default = 11).
+#' @param drop_lowfit Optional. A logical indicating whether to omit profiles with
+#'   low fit (<.70) or include them with dashed lines (default = FALSE).
+#' @param ... Additional arguments will be ignored.
+#' @return A ggplot object depicting the SSM curve(s) of each profile.
+#' @export
+#' @examples
+#' \donttest{
+#' data("jz2017")
+#' res <- ssm_analyze(
+#'   jz2017,
+#'   scales = 2:9,
+#'   measures = 10:13
+#' )
+#' ssm_plot_curve(res)
+#' ssm_plot_curve(res, angle_lables = PANO())
+#' }
+ssm_plot_curve <- function(ssm_object, 
+                           angle_labels = NULL,
+                           base_size = 11,
+                           drop_lowfit = FALSE,
+                           ...) {
+  
+  stopifnot(class(ssm_object) == "circumplex_ssm")
+  
+  results <- ssm_object$results
+  scores <- ssm_object$scores
+  angles <- ssm_object$details$angles
+  
+  stopifnot(is_num(base_size, n = 1) && base_size > 0)
+  stopifnot(is_null_or_char(angle_labels, n = length(angles)))
+  stopifnot(is_flag(drop_lowfit))
+  
+  if (is.null(angle_labels)) {
+    angle_labels <- function(x) sprintf("%.0f\U00B0", x)
+    xlabel <- "Angle"
+  } else {
+    xlabel <- "Scale"
+  }
+  
+  # Drop the contrast row if contrast
+  if (ssm_object$details$contrast) {
+    results <- results[1:2, ]
+    scores <- scores[1:2, ]
+  }
+  
+  # Drop profiles with low fit if requested
+  if (drop_lowfit) {
+    idx <- results$fit_est >= .70
+    results <- results[idx, ]
+    scores <- scores[idx, ]
+  }
+  
+  # Drop the info columns
+  scores_only <- scores[, -c(1:3)]
+  
+  # Reshape scores to long format
+  score_df <- data.frame(
+    Label = rep(scores$Label, times = length(angles)),
+    Scale = rep(colnames(scores_only), each = nrow(scores)),
+    Angle = rep(angles, each = nrow(scores)),
+    Score = as.vector(unlist(scores_only))
+  )
+  curve_fit <- function(p, x) {
+    p$e_est + p$a_est * cos((x - p$d_est) * pi / 180)
+  }
+  all_angles <- seq(from = min(angles), to = max(angles), length.out = 100)
+  param_list <- split(results, results$Label)
+  pred_mat <- sapply(param_list, FUN = curve_fit, x = all_angles)
+  
+  pred_df <- data.frame(
+    Label = rep(colnames(pred_mat), each = nrow(pred_mat)),
+    Angle = rep(all_angles, times = ncol(pred_mat)),
+    Score = as.vector(pred_mat)
+  )
+  pred_df <- merge(pred_df, results[c("Label", "fit_est")])
+  pred_df$lnty <- ifelse(pred_df$fit_est >= .70, "solid", "dashed")
+  
+  # Create ggplot
+  ggplot2::ggplot() + 
+    ggplot2::facet_wrap(~Label) +
+    # Curve
+    ggplot2::geom_line(
+      data = pred_df,
+      mapping = ggplot2::aes(
+        x = Angle, 
+        y = Score, 
+        linetype = lnty, 
+        color = Label
+      ),
+      linewidth = 1.25
+    ) +
+    # Connectors
+    ggplot2::geom_line(
+      data = score_df,
+      mapping = ggplot2::aes(x = Angle, y = Score, group = Label),
+      color = "black"
+    ) +
+    # Points
+    ggplot2::geom_point(
+      data = score_df,
+      mapping = ggplot2::aes(x = Angle, y = Score, group = Label),
+      color = "black"
+    ) +
+    ggplot2::scale_x_continuous(
+      breaks = angles,
+      labels = angle_labels
+    ) +
+    ggplot2::scale_linetype_identity() +
+    ggplot2::labs(x = xlabel) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      legend.position = "none",
+      panel.grid.major.x = ggplot2::element_blank(),
+      panel.grid.minor.x = ggplot2::element_blank()
+    )
+}
+
 #' Create a Difference Plot of SSM Contrast Results
 #'
 #' Take in the results of a Structural Summary Method analysis with pairwise
 #' contrasts and plot the point and interval estimates for each parameter's
 #' contrast (e.g., between groups or measures).
 #'
-#' @param .ssm_object Required. The results output of \code{ssm_analyze}.
+#' @param ssm_object Required. The results output of \code{ssm_analyze()}.
 #' @param drop_xy A logical determining whether the X-Value and Y-Value
 #'   parameters should be removed from the plot (default = FALSE).
 #' @param sig_color Optional. A string corresponding to the color to use to
@@ -217,11 +337,11 @@ ssm_plot_circle <- function(.ssm_object,
 #' )
 #' ssm_plot_contrast(res)
 #' }
-ssm_plot_contrast <- function(.ssm_object, drop_xy = FALSE, 
+ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE, 
                               sig_color = "#fc8d62", ns_color = "white",
                               linesize = 1.25, fontsize = 12, ...) {
   
-  stopifnot(.ssm_object$details$contrast)
+  stopifnot(ssm_object$details$contrast)
   
   # Prepare all estimates
   plabs <- c(
@@ -232,7 +352,7 @@ ssm_plot_contrast <- function(.ssm_object, drop_xy = FALSE,
     d = expression(paste(Delta, " Displacement"))
   )
   pvals <- c("e", "x", "y", "a", "d")
-  res <- .ssm_object$results[nrow(.ssm_object$results), ]
+  res <- ssm_object$results[nrow(ssm_object$results), ]
   
   plot_df <- 
     data.frame(
@@ -360,8 +480,7 @@ circle_base <- function(angles, labels = NULL, amin = 0,
 #' Take in the results of an SSM analysis and return an HTML table with the
 #' desired formatting.
 #'
-#' @param .ssm_object The output of \code{ssm_profiles()} or
-#'   \code{ssm_measures()}
+#' @param ssm_object Required. The results output of `ssm_analyze()`.
 #' @param caption A string to be displayed above the table (default = NULL).
 #' @param xy A logical indicating whether the x-value and y-value parameters
 #'   should be included in the table as columns (default = TRUE).
@@ -395,19 +514,19 @@ circle_base <- function(angles, labels = NULL, amin = 0,
 #' ssm_table(res)
 #' }
 #' 
-ssm_table <- function(.ssm_object, caption = NULL, 
+ssm_table <- function(ssm_object, caption = NULL, 
                       drop_xy = FALSE, render = TRUE) {
   
-  stopifnot(class(.ssm_object) == "circumplex_ssm")
-  stopifnot(is.null(caption) || (is.character(caption) && length(caption) == 1))
-  stopifnot(is.logical(drop_xy) && length(drop_xy) == 1)
-  stopifnot(is.logical(render) && length(render) == 1)
+  stopifnot(class(ssm_object) == "circumplex_ssm")
+  stopifnot(is_null_or_char(caption, n = 1))
+  stopifnot(is_flag(drop_xy))
+  stopifnot(is_flag(render))
 
-  df <- .ssm_object$results
+  df <- ssm_object$results
 
   # Create default caption
   if (is.null(caption)) {
-    caption <- dcaption(.ssm_object)
+    caption <- dcaption(ssm_object)
   }
 
   # Format output data
@@ -424,7 +543,7 @@ ssm_table <- function(.ssm_object, caption = NULL,
 
   # Rename first column
   colnames(table_df)[[1]] <- ifelse(
-    test = .ssm_object$details$contrast, 
+    test = ssm_object$details$contrast, 
     yes = "Contrast", 
     no = "Profile"
   )
@@ -435,7 +554,7 @@ ssm_table <- function(.ssm_object, caption = NULL,
   }
   
   # Format and render HTML table if requested
-  if (render == TRUE) {
+  if (render) {
     html_render(table_df, caption)
   }
 
@@ -443,18 +562,18 @@ ssm_table <- function(.ssm_object, caption = NULL,
 }
 
 # Build the default caption for the ssm_table function
-dcaption <- function(.ssm_object) {
-  if (.ssm_object$details$contrast) {
+dcaption <- function(ssm_object) {
+  if (ssm_object$details$contrast) {
     sprintf(
       "%s-based Structural Summary Statistic Contrasts with %s CIs",
-      .ssm_object$details$score_type,
-      str_percent(.ssm_object$details$interval)
+      ssm_object$details$score_type,
+      str_percent(ssm_object$details$interval)
     )
   } else {
     sprintf(
       "%s-based Structural Summary Statistics with %s CIs",
-      .ssm_object$details$score_type,
-      str_percent(.ssm_object$details$interval)
+      ssm_object$details$score_type,
+      str_percent(ssm_object$details$interval)
     )
   }
 }
@@ -485,23 +604,6 @@ html_render <- function(df, caption = NULL, align = "l", ...) {
     ...
   )
   print(t, type = "html")
-}
-
-# TODO: Working on this now
-
-ssm_plot_curve <- function(.ssm_object, ...) {
-  
-  results <- .ssm_object$results
-  scores <- .ssm_object$scores
-  
-  if (.ssm_object$details$contrast) {
-    results <- results[1:2, ]
-    scores <- scores[1:2, ]
-  }
-  
-  scores_only <- subset(scores, select = -c(Label, Group, Measure))
-  score_vec <- as.vector(unlist(scores_only))
-
 }
 
 

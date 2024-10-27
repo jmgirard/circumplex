@@ -5,7 +5,7 @@
 \title{Create a Difference Plot of SSM Contrast Results}
 \usage{
 ssm_plot_contrast(
-  .ssm_object,
+  ssm_object,
   drop_xy = FALSE,
   sig_color = "#fc8d62",
   ns_color = "white",
@@ -15,7 +15,7 @@ ssm_plot_contrast(
 )
 }
 \arguments{
-\item{.ssm_object}{Required. The results output of \code{ssm_analyze}.}
+\item{ssm_object}{Required. The results output of \code{ssm_analyze()}.}
 
 \item{drop_xy}{A logical determining whether the X-Value and Y-Value
 parameters should be removed from the plot (default = FALSE).}
