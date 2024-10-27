@@ -14,6 +14,7 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/PANO.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/anchors.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/aw2009.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/cais.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/circumplex-package.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csie.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csig.html</loc></url>
@@ -47,10 +48,9 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/score.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_analyze.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_parameters.html</loc></url>
-<url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.html</loc></url>
-<url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_scores.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_score.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_table.html</loc></url>
 </urlset>

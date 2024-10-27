@@ -41,7 +41,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-instruments" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Instruments</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-instruments">
-<li><a class="dropdown-item" href="../reference/csie.html">Circumplex Scales of Interpersonal Efficacy</a></li>
+<li><a class="dropdown-item" href="../reference/cais.html">Child and Adolescent Interpersonal Survey</a></li>
+    <li><a class="dropdown-item" href="../reference/csie.html">Circumplex Scales of Interpersonal Efficacy</a></li>
     <li><a class="dropdown-item" href="../reference/csig.html">Circumplex Scales of Intergroup Goals</a></li>
     <li><a class="dropdown-item" href="../reference/csip.html">Circumplex Scales of Interpersonal Problems</a></li>
     <li><a class="dropdown-item" href="../reference/csiv.html">Circumplex Scales of Interpersonal Values</a></li>
@@ -228,13 +229,16 @@ Male
 </tbody>
 </table>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/group_plot-1.png" width="100%"></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
+<p><img src="intermediate-ssm-analysis_files/figure-html/group_plot2-1.png" width="100%"></p>
 <p>Any number of groups can be analyzed in this way, and the output will
 contain additional profile blocks, the table will contain additional
-rows, and the figure will contain additional points. The grouping
-variable just needs to contain more than one level (i.e., unique
-value).</p>
+rows, and the figures will contain additional points or curves. The
+grouping variable just needs to contain more than one level (i.e.,
+unique value).</p>
 </div>
 <div class="section level3">
 <h3 id="generalizing-to-multiple-measures">Generalizing to multiple measures<a class="anchor" aria-label="anchor" href="#generalizing-to-multiple-measures"></a>
@@ -248,7 +252,7 @@ numbers and the <code>:</code> shortcut. The package functions were
 written to analyze all measures and groups within a single
 bootstrapping, so adding additional measures and groups should still be
 fast.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
@@ -284,7 +288,7 @@ fast.</p>
 <span><span class="co">#&gt; Amplitude         0.226      0.188      0.265</span></span>
 <span><span class="co">#&gt; Displacement    115.927    107.250    124.516</span></span>
 <span><span class="co">#&gt; Model Fit         0.964</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -362,9 +366,12 @@ ASPD
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/measures_plot-1.png" width="100%"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="intermediate-ssm-analysis_files/figure-html/measures_plot2-1.png" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="generalizing-to-multiple-groups-and-multiple-measures">Generalizing to multiple groups and multiple measures<a class="anchor" aria-label="anchor" href="#generalizing-to-multiple-groups-and-multiple-measures"></a>
@@ -375,7 +382,7 @@ groups. As you might expect, this requires providing both the
 function call. Again, any number of measures and groups is possible. The
 profiles in such an analysis will be named “Measure: Group” as
 below.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
@@ -455,7 +462,7 @@ below.</p>
 <span><span class="co">#&gt; Amplitude         0.047      0.013      0.101</span></span>
 <span><span class="co">#&gt; Displacement    142.345     68.178    218.702</span></span>
 <span><span class="co">#&gt; Model Fit         0.424</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -625,8 +632,8 @@ SZTPD: Male
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/general_plot-1.png" width="100%"></p>
 <p>Note that the borders for the “PARDPD: Male” and “SZTPD: Male” blocks
 are dashed instead of solid. This indicates that these profiles have low
@@ -635,9 +642,15 @@ fit (i.e.,
 We could alternatively hide these such profiles by adding
 <code>lowfit = FALSE</code> as below (noting that the color guide may
 change as profiles are dropped).</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results3</span>, lowfit <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span>, drop_lowfit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/general_plot2-1.png" width="100%"></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
+<p><img src="intermediate-ssm-analysis_files/figure-html/general_plot3-1.png" width="100%"></p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results3</span>, drop_lowfit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="intermediate-ssm-analysis_files/figure-html/general_plot4-1.png" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -656,7 +669,7 @@ measures can be compared at a time.</p>
 <p>To compare the mean profiles for females and males, we can start with
 the same syntax we had before and then add a <code>contrast</code>
 argument.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
@@ -709,7 +722,7 @@ contrast block. The contrast is made by subtracting the first level of
 the grouping variable from the second level (e.g., Male - Female). This
 provides an indication of the direction of the contrast. We can again
 generate a table and figure to display the results.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -810,8 +823,8 @@ Male - Female
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast</a></span><span class="op">(</span><span class="va">results4</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/model_plot-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -821,7 +834,7 @@ Male - Female
 do is add the <code>contrast</code> argument to the function call
 containing <code>measures</code>. Here we will use a parameter contrast
 to see what they look like.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
@@ -869,7 +882,7 @@ to see what they look like.</p>
 <span><span class="co">#&gt; Δ Amplitude         0.037     -0.002      0.075</span></span>
 <span><span class="co">#&gt; Δ Displacement      6.960     -3.391     17.383</span></span>
 <span><span class="co">#&gt; Δ Model Fit         0.007</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -970,8 +983,8 @@ ASPD - NARPD
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast</a></span><span class="op">(</span><span class="va">results5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/measure_contrast_plot-1.png" width="100%"></p>
 <p>Here, instead of a circle plot, we see a contrast plot showing the
 difference between the two measures’ SSM parameters and their 95%
@@ -990,7 +1003,7 @@ providing only a single measure and a grouping variable with just two
 levels (as again only two things can be contrasted at a time). Note that
 the contrast name in this case will take the form of “Measure: Group2 -
 Group1”.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
@@ -1039,7 +1052,7 @@ Group1”.</p>
 <span><span class="co">#&gt; Δ Amplitude        -0.088     -0.160     -0.003</span></span>
 <span><span class="co">#&gt; Δ Displacement    -40.880   -105.533     19.259</span></span>
 <span><span class="co">#&gt; Δ Model Fit        -0.447</span></span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -1140,8 +1153,8 @@ BORPD: Male - Female
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/group_contrast_plot-1.png" width="100%"></p>
 </div>
 </div>
@@ -1321,10 +1334,10 @@ explored using the <code><a href="../reference/ssm_table.html">?ssm_table</a></c
 are the <code>drop_xy</code> argument, which shows or hides the x-value
 and y-value columns, and the <code>caption</code> argument which allows
 a custom string to be printed above the table. Note as well that the
-return object of this function is just a tibble or data frame, which can
-be easily edited to add, change, or remove text. To change the
-formatting of the table, see the <code>htmlTable</code> or
-<code>kableExtra</code> packages.</p>
+return object of this function is just a data frame, which can be easily
+edited to add, change, or remove text. To change the formatting of the
+table, see the <code>htmlTable</code> or <code>kableExtra</code>
+packages.</p>
 </div>
 </div>
 <div class="section level2">
@@ -1346,8 +1359,8 @@ also control the exact width and height of the image in different units
 (i.e., “in”, “cm”, or “mm”). Because the underlying graphics are
 vectorized in R, they can be easily scaled to any size without loss of
 quality and used in manuscripts, presentations, or posters.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ssm_plot</span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/ggsave.html">ggsave</a></span><span class="op">(</span><span class="st">"bordpd_gender.png"</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">4</span>, units <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
