@@ -19,7 +19,7 @@ population, and source reference and hyperlink. If another normative data set
 exists that is not yet included in the package, please let us know.
 }
 \examples{
-instrument(csip)
+instrument("csip")
 norms(csip)
 }
 \seealso{

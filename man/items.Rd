@@ -18,7 +18,7 @@ items and each item's number and text. The item ordering/numbering displayed
 here is the same ordering/numbering assumed by the \code{score()} function.
 }
 \examples{
-instrument(csip)
+instrument("csip")
 items(csip)
 }
 \seealso{

@@ -18,7 +18,7 @@ anchors and each anchor's numerical value and text label. Anchors are the
 response options that respondants select from (e.g., 0 = No, 1 = Yes).
 }
 \examples{
-instrument(csip)
+instrument("csip")
 anchors(csip)
 }
 \seealso{

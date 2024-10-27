@@ -93,29 +93,22 @@ The Structural Summary Method (SSM) is a technique for analyzing circumplex data
 
 ```{r column, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 data("jz2017")
-rmat <- jz2017 %>% 
-  dplyr::select(NARPD, PA:NO) %>% 
-  cor(method = "pearson")
+rmat <- stats::cor(jz2017[c("NARPD", PANO())], method = "pearson")
 r <- rmat[2:9, 1]
 
 # Format data for plotting
-dat_r <- tibble::tibble(
-  Scale = factor(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")),
-  r = r
-)
+dat_r <- data.frame(Scale = factor(PANO()), r = r)
 
 # Create column plot
-ggplot2::ggplot(dat_r, ggplot2::aes(x = Scale, y = r)) +
+ggplot2::ggplot(dat_r, ggplot2::aes(x = .data$Scale, y = .data$r)) +
   ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "darkgray") +
   ggplot2::geom_col(position = ggplot2::position_dodge(.9), fill = "red") +
-  ggplot2::scale_y_continuous(
-    limits = c(-0.02, 0.5)
-  ) +
+  ggplot2::scale_y_continuous(limits = c(-0.02, 0.5)) +
   ggplot2::labs(title = "Scores") +
   ggplot2::theme(
     axis.title = ggplot2::element_blank(),
-    panel.grid.major = ggplot2::element_line(size = 1.0),
-    panel.grid.minor.y = ggplot2::element_line(size = 0.5),
+    panel.grid.major = ggplot2::element_line(linewidth = 1.0),
+    panel.grid.minor.y = ggplot2::element_line(linewidth = 0.5),
     panel.grid.minor.x = ggplot2::element_blank()
   )
 ```
@@ -123,25 +116,22 @@ ggplot2::ggplot(dat_r, ggplot2::aes(x = Scale, y = r)) +
 Next, we can leverage the fact that these subscales have specific angular displacements in the circumplex model (and that 0 and 360 degrees are the same) to create a path diagram.
 
 ```{r path, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
-dat_r <- tibble::tibble(
-  Scale = factor(
-    c("LM", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
-    levels = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
-  ),
-  est = r[c(7, 1:8)],
-  Angle = c(0, octants())
-) %>% 
-  dplyr::arrange(Angle)
+dat_r <- data.frame(
+  Scale = factor(PANO()),
+  est = r,
+  Angle = octants()
+)
+
+dat_r <- dat_r[order(dat_r$Angle), ]
 
 # Plot correlations as connected point ranges with 95% CI ranges
-ggplot2::ggplot(dat_r, ggplot2::aes(x = Angle, y = est)) +
+ggplot2::ggplot(dat_r, ggplot2::aes(x = .data$Angle, y = .data$est)) +
   ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "darkgray") +
   ggplot2::geom_point(size = 3, color = "red") +
   ggplot2::geom_path(linewidth = 1.25, color = "red") +
   ggplot2::geom_label(ggplot2::aes(label = Scale), nudge_y = 0.075) +
   ggplot2::scale_x_continuous(
-    limits = c(0, 360),
-    breaks = c(0, octants()),
+    breaks = octants(),
     expand = c(0.05, 0),
     labels = function(x) sprintf("%.0f\U00B0", x)
   ) +
@@ -152,8 +142,8 @@ ggplot2::ggplot(dat_r, ggplot2::aes(x = Angle, y = est)) +
   ggplot2::theme(
     axis.title = ggplot2::element_blank(),
     plot.margin = ggplot2::unit(c(10, 30, 10, 10), "points"),
-    panel.grid.major = ggplot2::element_line(size = 1.0),
-    panel.grid.minor.y = ggplot2::element_line(size = 0.5),
+    panel.grid.major = ggplot2::element_line(linewidth = 1.0),
+    panel.grid.minor.y = ggplot2::element_line(linewidth = 0.5),
     panel.grid.minor.x = ggplot2::element_blank()
   )
 ```
@@ -170,14 +160,13 @@ f <- function(x) {
 }
 
 # Plot correlations along with SSM cosine model
-ggplot2::ggplot(dat_r, ggplot2::aes(x = Angle, y = est)) +
+ggplot2::ggplot(dat_r, ggplot2::aes(x = .data$Angle, y = .data$est)) +
   ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "darkgray") +
   ggplot2::geom_point(size = 3) +
   ggplot2::geom_path(linewidth = 1.25) +
-  ggplot2::stat_function(fun = f, size = 2, color = "red") +
+  ggplot2::stat_function(fun = f, linewidth = 2, color = "red") +
   ggplot2::scale_x_continuous(
-    limits = c(0, 360),
-    breaks = c(0, octants()),
+    breaks = octants(),
     expand = c(0.01, 0),
     labels = function(x) sprintf("%.0f\U00B0", x)
   ) +
@@ -188,8 +177,8 @@ ggplot2::ggplot(dat_r, ggplot2::aes(x = Angle, y = est)) +
   ggplot2::theme(
     axis.title = ggplot2::element_blank(),
     plot.margin = ggplot2::unit(c(10, 30, 10, 10), "points"),
-    panel.grid.major = ggplot2::element_line(size = 1.0),
-    panel.grid.minor.y = ggplot2::element_line(size = 0.5),
+    panel.grid.major = ggplot2::element_line(linewidth = 1.0),
+    panel.grid.minor.y = ggplot2::element_line(linewidth = 0.5),
     panel.grid.minor.x = ggplot2::element_blank()
   )
 ```
@@ -201,18 +190,24 @@ where $S_i$ and $\theta_i$ are the score and angle on scale $i$, respectively, a
 
 ```{r residuals, echo = FALSE, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 # Plot correlations as path, SSM cosine model, and differences
-ggplot2::ggplot(dat_r, ggplot2::aes(x = Angle, y = est)) +
+ggplot2::ggplot(dat_r, ggplot2::aes(x = .data$Angle, y = .data$est)) +
   ggplot2::geom_hline(yintercept = 0, linewidth = 1.25, color = "darkgray") +
-  ggplot2::stat_function(fun = f, size = 2, color = "gray20") +
+  ggplot2::stat_function(fun = f, linewidth = 2, color = "gray20") +
   ggplot2::geom_point(size = 5.5, color = "black") +
   ggplot2::geom_path(linewidth = 1.25, color = "black") +
   ggplot2::geom_segment(
-    ggplot2::aes(x = Angle, xend = Angle, y = est, yend = f(Angle)),
-    linewidth = 4, linetype = "solid", color = "red"
+    ggplot2::aes(
+      x = .data$Angle, 
+      xend = .data$Angle, 
+      y = .data$est, 
+      yend = f(.data$Angle)
+    ),
+    linewidth = 4, 
+    linetype = "solid", 
+    color = "red"
   ) +
   ggplot2::scale_x_continuous(
-    limits = c(0, 360),
-    breaks = c(0, octants()),
+    breaks = octants(),
     expand = c(0.01, 0),
     labels = function(x) sprintf("%.0f\U00B0", x)
   ) +
@@ -223,8 +218,8 @@ ggplot2::ggplot(dat_r, ggplot2::aes(x = Angle, y = est)) +
   ggplot2::theme(
     axis.title = ggplot2::element_blank(),
     plot.margin = ggplot2::unit(c(10, 30, 10, 10), "points"),
-    panel.grid.major = ggplot2::element_line(size = 1.0),
-    panel.grid.minor.y = ggplot2::element_line(size = 0.5),
+    panel.grid.major = ggplot2::element_line(linewidth = 1.0),
+    panel.grid.minor.y = ggplot2::element_line(linewidth = 0.5),
     panel.grid.minor.x = ggplot2::element_blank()
   )
 ```

@@ -20,7 +20,7 @@ Display the scales of a circumplex instrument including the total number of
 scales and each scale's abbreviation, hypothetical angle, and text label.
 }
 \examples{
-instrument(csip)
+instrument("csip")
 scales(csip)
 scales(csip, items = TRUE)
 }

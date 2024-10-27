@@ -22,6 +22,7 @@
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib circumplex, .registration = TRUE
 ## usethis namespace: end
-#' @importFrom stats cor quantile sd var
+#' @importFrom rlang .data
+#' @importFrom stats quantile
 #' @keywords internal
 "_PACKAGE"

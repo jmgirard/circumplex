@@ -28,7 +28,7 @@ test_that("Pairwise r is correct even with missing", {
   x[xidx] <- NA
   yidx <- sample(1:100, 10, replace = FALSE)
   y[yidx] <- NA
-  rcor <- cor(x, y, use = "pairwise.complete.obs")
+  rcor <- stats::cor(x, y, use = "pairwise.complete.obs")
   ccor <- pairwise_r(x, y)
   expect_equal(rcor, ccor)
 })

@@ -36,6 +36,7 @@ Imports:
     ggplot2 (>= 3.3.0),
     htmlTable (>= 1.13.3),
     Rcpp,
+    rlang,
     stats
 Suggests: 
     covr (>= 3.5.0),

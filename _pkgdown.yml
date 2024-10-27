@@ -67,6 +67,8 @@ navbar:
     href: reference/index.html
   - text: Instruments
     menu:
+    - text: Child and Adolescent Interpersonal Survey
+      href: reference/cais.html
     - text: Circumplex Scales of Interpersonal Efficacy
       href: reference/csie.html
     - text: Circumplex Scales of Intergroup Goals

@@ -61,7 +61,7 @@ summary.circumplex_instrument <- function(object, scales = TRUE, anchors = TRUE,
 #' @family instrument functions
 #' @export
 #' @examples
-#' instrument(csip)
+#' instrument("csip")
 #' scales(csip)
 #' scales(csip, items = TRUE)
 scales <- function(x, items = FALSE) {
@@ -97,7 +97,7 @@ scales <- function(x, items = FALSE) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' instrument(csip)
+#' instrument("csip")
 #' items(csip)
 items <- function(x) {
   stopifnot(is_instrument(x))
@@ -130,7 +130,7 @@ items <- function(x) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' instrument(csip)
+#' instrument("csip")
 #' anchors(csip)
 anchors <- function(x) {
   stopifnot(is_instrument(x))
@@ -158,7 +158,7 @@ anchors <- function(x) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' instrument(csip)
+#' instrument("csip")
 #' norms(csip)
 norms <- function(x) {
   

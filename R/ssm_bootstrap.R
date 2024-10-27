@@ -76,6 +76,6 @@ quantile.circumplex_radian <- function(x, na.rm = TRUE, ...) {
   tx <- (x - mdn) %% (2 * pi)
   tx <- compare_pi(tx)
   class(tx) <- "numeric"
-  qtl <- quantile(x = tx, na.rm = na.rm, ...)
+  qtl <- stats::quantile(x = tx, na.rm = na.rm, ...)
   as_radian((qtl + mdn) %% (2 * pi))
 }

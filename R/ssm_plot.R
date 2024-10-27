@@ -79,9 +79,9 @@ ssm_plot_circle <- function(ssm_object,
     df_plot[c("a_lci", "a_uci", "x_est", "y_est")],
     function(x) x * 10 / (2 * amax)
   )
-  df_plot$Label <- factor(
-    df_plot$Label, 
-    levels = unique(as.character(df_plot$Label))
+  df_plot[["Label"]] <- factor(
+    df_plot[["Label"]], 
+    levels = unique(as.character(df_plot[["Label"]]))
   )
   
   # Remove profiles with low model fit (unless overrided)
@@ -93,7 +93,7 @@ ssm_plot_circle <- function(ssm_object,
     }
   }
   
-  df_plot[["lnty"]] <- ifelse(df_plot$fit_est >= .70, "solid", "dotted")
+  df_plot[["lnty"]] <- ifelse(df_plot[["fit_est"]] >= .70, "solid", "dotted")
 
   p <- 
     circle_base(
@@ -109,10 +109,13 @@ ssm_plot_circle <- function(ssm_object,
     p <- p +
       ggforce::geom_arc_bar(
         data = df_plot,
-        ggplot2::aes(
-          x0 = 0, y0 = 0, 
-          r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
-          linetype = lnty
+        mapping = ggplot2::aes(
+          x0 = 0,
+          y0 = 0,
+          r0 = .data$a_lci, 
+          r = .data$a_uci, 
+          start = .data$d_lci, 
+          end = .data$d_uci
         ),
         fill = "cornflowerblue", 
         color = "cornflowerblue", 
@@ -121,7 +124,10 @@ ssm_plot_circle <- function(ssm_object,
       ) +
       ggplot2::geom_point(
         data = df_plot,
-        ggplot2::aes(x = x_est, y = y_est),
+        mapping = ggplot2::aes(
+          x = .data$x_est, 
+          y = .data$y_est
+        ),
         shape = 21,
         size = 3,
         color = "black",
@@ -133,17 +139,28 @@ ssm_plot_circle <- function(ssm_object,
     p <- p +
       ggforce::geom_arc_bar(
         data = df_plot,
-        ggplot2::aes(
-          x0 = 0, y0 = 0, 
-          r0 = a_lci, r = a_uci, start = d_lci, end = d_uci,
-          fill = Label, color = Label, linetype = lnty
+        mapping = ggplot2::aes(
+          x0 = 0,
+          y0 = 0,
+          r0 = .data$a_lci,
+          r = .data$a_uci,
+          start = .data$d_lci,
+          end = .data$d_uci,
+          fill = .data$Label,
+          color = .data$Label,
+          linetype = .data$lnty
         ),
         alpha = 0.4,
         linewidth = 1
       ) +
       ggplot2::geom_point(
         data = df_plot,
-        ggplot2::aes(x = x_est, y = y_est, color = Label, fill = Label),
+        mapping = ggplot2::aes(
+          x = .data$x_est,
+          y = .data$y_est,
+          color = .data$Label,
+          fill = .data$Label
+        ),
         shape = 21,
         size = 3,
         color = "black"
@@ -160,11 +177,15 @@ ssm_plot_circle <- function(ssm_object,
   }
   
   if (repel == TRUE) {
-    require("ggrepel")
+    requireNamespace("ggrepel")
     p <- p + 
       ggrepel::geom_label_repel(
         data = df_plot,
-        ggplot2::aes(x = x_est, y = y_est, label = Label),
+        mapping = ggplot2::aes(
+          x = .data$x_est,
+          y = .data$y_est,
+          label = .data$Label
+        ),
         nudge_x = -8 - df_plot$x_est,
         direction = "y",
         hjust = 1,
@@ -272,23 +293,31 @@ ssm_plot_curve <- function(ssm_object,
     ggplot2::geom_line(
       data = pred_df,
       mapping = ggplot2::aes(
-        x = Angle, 
-        y = Score, 
-        linetype = lnty, 
-        color = Label
+        x = .data$Angle,
+        y = .data$Score,
+        linetype = .data$lnty,
+        color = .data$Label
       ),
       linewidth = 1.25
     ) +
     # Connectors
     ggplot2::geom_line(
       data = score_df,
-      mapping = ggplot2::aes(x = Angle, y = Score, group = Label),
+      mapping = ggplot2::aes(
+        x = .data$Angle,
+        y = .data$Score,
+        group = .data$Label
+      ),
       color = "black"
     ) +
     # Points
     ggplot2::geom_point(
       data = score_df,
-      mapping = ggplot2::aes(x = Angle, y = Score, group = Label),
+      mapping = ggplot2::aes(
+        x = .data$Angle,
+        y = .data$Score,
+        group = .data$Label
+      ),
       color = "black"
     ) +
     ggplot2::scale_x_continuous(
@@ -371,6 +400,41 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 
   p <- 
     ggplot2::ggplot(plot_df) +
+    ggplot2::facet_wrap(
+      ~Parameter, 
+      nrow = 1, 
+      scales = "free",
+      labeller = ggplot2::label_parsed
+    ) +
+    ggplot2::geom_hline(
+      yintercept = 0, 
+      linewidth = linesize, 
+      color = "darkgray"
+    ) +
+    ggplot2::geom_errorbar(
+      ggplot2::aes(
+        x = "1", 
+        ymin = .data$lci, 
+        ymax = .data$uci
+      ),
+      linewidth = linesize, 
+      width = 0.15
+    ) +
+    ggplot2::geom_point(
+      ggplot2::aes(
+        x = "1", 
+        y = .data$Difference, 
+        fill = .data$sig
+      ),
+      size = linesize * 3,
+      stroke = linesize,
+      shape = 21
+    ) +
+    ggplot2::scale_fill_manual(
+      name = "Significant",
+      values = c("TRUE" = sig_color, "FALSE" = ns_color)
+    ) +
+    ggplot2::labs(y = paste0("Contrast (", res$Label, ")")) +
     ggplot2::theme_bw(base_size = fontsize) +
     ggplot2::theme(
       legend.position = "top",
@@ -379,30 +443,6 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
       panel.grid.major.x = ggplot2::element_blank(),
       panel.grid.minor.y = ggplot2::element_line(linetype = "dashed"),
       axis.ticks.x = ggplot2::element_blank()
-    ) +
-    ggplot2::geom_hline(
-      yintercept = 0, 
-      linewidth = linesize, 
-      color = "darkgray"
-    ) +
-    ggplot2::geom_errorbar(
-      ggplot2::aes(x = "1", ymin = lci, ymax = uci),
-      linewidth = linesize, width = 0.15
-    ) +
-    ggplot2::geom_point(
-      ggplot2::aes(x = "1", y = Difference, fill = sig),
-      size = linesize * 3,
-      stroke = linesize,
-      shape = 21
-    ) +
-    ggplot2::scale_fill_manual(
-      "Significant",
-      values = c("TRUE" = sig_color, "FALSE" = ns_color)
-    ) +
-    ggplot2::labs(y = paste0("Contrast (", res$Label, ")")) +
-    ggplot2::facet_wrap(~Parameter,
-      nrow = 1, scales = "free",
-      labeller = ggplot2::label_parsed
     )
 
   p
@@ -423,7 +463,7 @@ circle_base <- function(angles, labels = NULL, amin = 0,
     ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
     # Draw lowest circle
     ggforce::geom_circle(
-      ggplot2::aes(x0 = 0, y0 = 0, r = 5),
+      mapping = ggplot2::aes(x0 = 0, y0 = 0, r = 5),
       color = "gray50",
       fill = "white",
       linewidth = 1.5
@@ -473,190 +513,4 @@ circle_base <- function(angles, labels = NULL, amin = 0,
       vjust = "outward",
       size = fontsize / 2.8346438836889
     )
-}
-
-#' Create HTML table from SSM results or contrasts
-#'
-#' Take in the results of an SSM analysis and return an HTML table with the
-#' desired formatting.
-#'
-#' @param ssm_object Required. The results output of `ssm_analyze()`.
-#' @param caption A string to be displayed above the table (default = NULL).
-#' @param xy A logical indicating whether the x-value and y-value parameters
-#'   should be included in the table as columns (default = TRUE).
-#' @param render A logical indicating whether the table should be displayed in
-#'   the RStudio viewer or web browser (default = TRUE).
-#' @return A tibble containing the information for the HTML table. As a
-#'  side-effect, may also output the HTML table to the web viewer.
-#' @family ssm functions
-#' @family table functions
-#' @export
-#' @examples
-#' \donttest{
-#' # Load example data
-#' data("jz2017")
-#' 
-#' # Create table of profile results
-#' res <- ssm_analyze(
-#'   jz2017,
-#'   scales = 2:9,
-#'   measures = c("NARPD", "ASPD")
-#' )
-#' ssm_table(res)
-#' 
-#' # Create table of contrast results
-#' res <- ssm_analyze(
-#'   jz2017,
-#'   scales = 2:9,
-#'   measures = c("NARPD", "ASPD"), 
-#'   contrast = TRUE
-#' )
-#' ssm_table(res)
-#' }
-#' 
-ssm_table <- function(ssm_object, caption = NULL, 
-                      drop_xy = FALSE, render = TRUE) {
-  
-  stopifnot(class(ssm_object) == "circumplex_ssm")
-  stopifnot(is_null_or_char(caption, n = 1))
-  stopifnot(is_flag(drop_xy))
-  stopifnot(is_flag(render))
-
-  df <- ssm_object$results
-
-  # Create default caption
-  if (is.null(caption)) {
-    caption <- dcaption(ssm_object)
-  }
-
-  # Format output data
-  table_df <- 
-    data.frame(
-      Profile = df$Label,
-      Elevation = sprintf("%.2f (%.2f, %.2f)", df$e_est, df$e_lci, df$e_uci),
-      `X Value` = sprintf("%.2f (%.2f, %.2f)", df$x_est, df$x_lci, df$x_uci),
-      `Y Value` = sprintf("%.2f (%.2f, %.2f)", df$y_est, df$y_lci, df$y_uci),
-      Amplitude = sprintf("%.2f (%.2f, %.2f)", df$a_est, df$a_lci, df$a_uci),
-      Displacement = sprintf("%.1f (%.1f, %.1f)", df$d_est, df$d_lci, df$d_uci),
-      Fit = sprintf("%.3f", df$fit_est)
-    )
-
-  # Rename first column
-  colnames(table_df)[[1]] <- ifelse(
-    test = ssm_object$details$contrast, 
-    yes = "Contrast", 
-    no = "Profile"
-  )
-
-  # Drop the x and y columns if requested
-  if (drop_xy) {
-    table_df <- table_df[, -c(3, 4)]
-  }
-  
-  # Format and render HTML table if requested
-  if (render) {
-    html_render(table_df, caption)
-  }
-
-  table_df
-}
-
-# Build the default caption for the ssm_table function
-dcaption <- function(ssm_object) {
-  if (ssm_object$details$contrast) {
-    sprintf(
-      "%s-based Structural Summary Statistic Contrasts with %s CIs",
-      ssm_object$details$score_type,
-      str_percent(ssm_object$details$interval)
-    )
-  } else {
-    sprintf(
-      "%s-based Structural Summary Statistics with %s CIs",
-      ssm_object$details$score_type,
-      str_percent(ssm_object$details$interval)
-    )
-  }
-}
-
-#' Format and render data frame as HTML table
-#'
-#' Format a data frame as an HTML table and render it to the web viewer.
-#'
-#' @param df A data frame to be rendered as an HTML table.
-#' @param caption A string to be displayed above the table.
-#' @param align A string indicating the alignment of the cells (default = "l").
-#' @param ... Other arguments to pass to \code{htmlTable}.
-#' @return HTML syntax for the \code{df} table.
-#' @family table functions
-#' @export
-html_render <- function(df, caption = NULL, align = "l", ...) {
-
-  stopifnot(is_null_or_char(caption, n = 1))
-  stopifnot(align %in% c("l", "c", "r"))
-
-  t <- htmlTable::htmlTable(
-    df,
-    caption = caption,
-    align = align,
-    align.header = align,
-    rnames = FALSE,
-    css.cell = "padding-right: 1em; min-width: 3em; white-space: nowrap;",
-    ...
-  )
-  print(t, type = "html")
-}
-
-
-#' @export
-ssm_plot_scores <- function(x,
-                            amin = NULL, 
-                            amax = NULL,
-                            angle_labels = NULL,
-                            linewidth = 1,
-                            pointsize = 3,
-                            ...) {
-  
-  # Get scores from SSM object
-  scores <- x$scores
-  # Reshape scores for plotting
-  scores_long <- tidyr::pivot_longer(
-    scores, 
-    cols = dplyr::where(is.numeric),
-    names_to = "Scale",
-    values_to = "Score"
-  )
-  # Get angles from SSM object
-  angles <- x$details$angles
-  if (is.null(amin)) amin <- pretty_min(scores_long$Score)
-  if (is.null(amax)) amax <- pretty_max(scores_long$Score)
-  scores_long$Angle <- rep(angles, times = nrow(scores_long) / length(angles))
-  scores_long$Radian <- as_radian(as_degree(scores_long$Angle))
-  scores_long$pr <- rescale(
-    scores_long$Score, 
-    to = c(0, 5), 
-    from = c(amin, amax)
-  )
-  scores_long$px <- scores_long$pr * cos(scores_long$Radian)
-  scores_long$py <- scores_long$pr * sin(scores_long$Radian)
-  
-  p <- circle_base(
-    angles = angles, 
-    amin = amin,
-    amax = amax,
-    labels = angle_labels
-  )
-  
-  p +
-    ggplot2::geom_polygon(
-      data = scores_long,
-      mapping = ggplot2::aes(x = px, y = py, color = Label, linetype = Label),
-      fill = NA,
-      linewidth = linewidth
-    ) +
-    ggplot2::geom_point(
-      data = scores_long,
-      mapping = ggplot2::aes(x = px, y = py, color = Label),
-      size = pointsize
-    )
-  
 }
