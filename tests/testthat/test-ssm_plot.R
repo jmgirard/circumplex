@@ -8,7 +8,8 @@ test_that("Single-group mean-based SSM plot is correct", {
   expect_s3_class(p, "ggplot")
   vdiffr::expect_doppelganger("single group mean ssm", p)
 
-  # TODO: Add tests of transformed data and legend
+  p2 <- ssm_plot_circle(res, palette = NULL)
+  vdiffr::expect_doppelganger("single group mean ssm no palette", p2)
 })
 
 test_that("Single-group correlation-based SSM plot is correct", {
@@ -66,4 +67,13 @@ test_that("Removing plots with low fit works as expected", {
   data("jz2017")
   res <- ssm_analyze(jz2017, scales = 2:9, measures = "OCPD")
   expect_error(ssm_plot_circle(res, drop_lowfit = TRUE))
+})
+
+test_that("many plots works as expected", {
+  data("jz2017")
+  res <- ssm_analyze(jz2017, scales = 2:9, measures = 10:13)
+  p <- ssm_plot_circle(res)
+  vdiffr::expect_doppelganger("many_circle-plots", p)
+  p2 <- ssm_plot_curve(res)
+  vdiffr::expect_doppelganger("many_curve-plots", p2)
 })
