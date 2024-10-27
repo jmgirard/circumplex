@@ -10,6 +10,9 @@ test_that("Single-group mean-based SSM plot is correct", {
 
   p2 <- ssm_plot_circle(res, palette = NULL)
   vdiffr::expect_doppelganger("single group mean ssm no palette", p2)
+  
+  p3 <- ssm_plot_curve(res, angle_labels = PANO())
+  vdiffr::expect_doppelganger("single group mean ssm with labels", p3)
 })
 
 test_that("Single-group correlation-based SSM plot is correct", {
@@ -44,6 +47,9 @@ test_that("Measure-contrast SSM plot is correct", {
   expect_type(p2, "list")
   expect_s3_class(p2, "ggplot")
   vdiffr::expect_doppelganger("measure-contrast-circle ssm", p2)
+  
+  p3 <- ssm_plot_curve(res, drop_lowfit = TRUE)
+  vdiffr::expect_doppelganger("measure-contrast-curve ssm", p3)
 })
 
 test_that("Group-contrast correlation-based SSM plot is correct", {
