@@ -18,7 +18,7 @@ should be omitted from the output (default = FALSE).}
 the RStudio viewer or web browser (default = TRUE).}
 }
 \value{
-A tibble containing the information for the HTML table. As a
+A data frame containing the information for the HTML table. As a
 side-effect, may also output the HTML table to the web viewer.
 }
 \description{

@@ -9,7 +9,7 @@
 #'   should be omitted from the output (default = FALSE).
 #' @param render A logical indicating whether the table should be displayed in
 #'   the RStudio viewer or web browser (default = TRUE).
-#' @return A tibble containing the information for the HTML table. As a
+#' @return A data frame containing the information for the HTML table. As a
 #'  side-effect, may also output the HTML table to the web viewer.
 #' @family ssm functions
 #' @family table functions

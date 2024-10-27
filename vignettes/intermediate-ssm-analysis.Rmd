@@ -11,7 +11,6 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ggplot2)
 library(ggforce)
-library(tibble)
 library(kableExtra)
 set.seed(12345)
 ```
@@ -261,7 +260,7 @@ If yes, we must specify a `grouping` variable, and the output will contain resul
 ## 4. Working with SSM tables
 
 ### Basic customizations of tables
-Additional arguments to the `ssm_table()` function can be explored using the `?ssm_table` command. Two useful options are the `drop_xy` argument, which shows or hides the x-value and y-value columns, and the `caption` argument which allows a custom string to be printed above the table. Note as well that the return object of this function is just a tibble or data frame, which can be easily edited to add, change, or remove text. To change the formatting of the table, see the `htmlTable` or `kableExtra` packages.
+Additional arguments to the `ssm_table()` function can be explored using the `?ssm_table` command. Two useful options are the `drop_xy` argument, which shows or hides the x-value and y-value columns, and the `caption` argument which allows a custom string to be printed above the table. Note as well that the return object of this function is just a data frame, which can be easily edited to add, change, or remove text. To change the formatting of the table, see the `htmlTable` or `kableExtra` packages.
 
 ## 5. Working with SSM figures
 
