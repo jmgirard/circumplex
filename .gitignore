@@ -1,4 +1,3 @@
-inst/doc
 .Rproj.user
 .Rhistory
 .RData
@@ -8,4 +7,4 @@ src/*.so
 src/*.dll
 src-i386
 src-x64
-docs
+docs/

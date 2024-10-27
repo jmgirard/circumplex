@@ -36,4 +36,5 @@ test_that("rescale works", {
 test_that("prettifying works", {
   expect_equal(pretty_min(0.5), 0.2)
   expect_equal(pretty_min(-0.5), -1.0)
+  expect_equal(pretty_min(-10), -15)
 })

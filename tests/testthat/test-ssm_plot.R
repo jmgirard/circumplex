@@ -82,4 +82,6 @@ test_that("many plots works as expected", {
   vdiffr::expect_doppelganger("many_circle-plots", p)
   p2 <- ssm_plot_curve(res)
   vdiffr::expect_doppelganger("many_curve-plots", p2)
+  p3 <- ssm_plot_circle(res, repel = TRUE)
+  vdiffr::expect_doppelganger("many_circle repel", p3)
 })
