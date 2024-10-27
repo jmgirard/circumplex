@@ -43,8 +43,7 @@ reference:
   - ssm_score
 - title: Secondary SSM Functions
   desc: Functions for customizing SSM results
-  contents:
-  - html_render
+  contents: html_render
 - title: Convenience Functions
   desc: Functions that make your life easier
   contents:
