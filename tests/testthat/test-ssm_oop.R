@@ -65,3 +65,8 @@ test_that("The ssm display methods is working", {
   expect_output(print(res), "# Contrast \\[PARPD: Male - Female\\]:")
   expect_output(summary(res), "Statistical Basis:\\t Correlation Scores")
 })
+
+test_that("unit classes are working", {
+  expect_snapshot(octants())
+  expect_snapshot(as_radian(octants()))
+})
