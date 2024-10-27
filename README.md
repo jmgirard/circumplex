@@ -5,14 +5,14 @@
 
 <!-- badges: start -->
 
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/circumplex)](https://cran.r-project.org/package=circumplex)
-[![Project Status: Active – The project has reached a stable, usable
-state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![Codecov test
-coverage](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/circumplex?branch=master)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/circumplex)](https://CRAN.R-project.org/package=circumplex)
 [![R-CMD-check](https://github.com/jmgirard/circumplex/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/circumplex/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/jmgirard/circumplex/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/circumplex)
+[![test-coverage](https://github.com/jmgirard/circumplex/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/jmgirard/circumplex/actions/workflows/test-coverage.yaml)
+[![pkgdown](https://github.com/jmgirard/circumplex/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/jmgirard/circumplex/actions/workflows/pkgdown.yaml)
+
 <!-- badges: end -->
 
 The goal of *circumplex* is to provide a powerful, flexible, and
@@ -150,6 +150,12 @@ ssm_plot_circle(results)
 ```
 
 ![](man/figures/README-plot-1.png)<!-- -->
+
+``` r
+ssm_plot_curve(results)
+```
+
+![](man/figures/README-plot2-1.png)<!-- -->
 
 ### Example 2
 
@@ -289,7 +295,7 @@ Male - Female
 ssm_plot_contrast(results2)
 ```
 
-![](man/figures/README-plot2-1.png)<!-- -->
+![](man/figures/README-plot3-1.png)<!-- -->
 
 ## Code of Conduct
 

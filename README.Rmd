@@ -12,7 +12,6 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-"
 )
 library(circumplex)
-library(knitr)
 library(kableExtra)
 set.seed(12345)
 ```
@@ -20,11 +19,12 @@ set.seed(12345)
 # circumplex <img src="man/figures/logo.png" align="right" alt="" />
 
 <!-- badges: start -->
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/circumplex)](https://cran.r-project.org/package=circumplex)
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![Codecov test coverage](https://codecov.io/gh/jmgirard/circumplex/branch/master/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/circumplex?branch=master)
+[![CRAN status](https://www.r-pkg.org/badges/version/circumplex)](https://CRAN.R-project.org/package=circumplex)
 [![R-CMD-check](https://github.com/jmgirard/circumplex/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/circumplex/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/jmgirard/circumplex/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/circumplex)
+[![test-coverage](https://github.com/jmgirard/circumplex/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/jmgirard/circumplex/actions/workflows/test-coverage.yaml)
+[![pkgdown](https://github.com/jmgirard/circumplex/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/jmgirard/circumplex/actions/workflows/pkgdown.yaml)
+
 <!-- badges: end -->
 
 The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by [Jeffrey Girard](https://jmgirard.com/); it was inspired by work from and was developed under advisement from [Johannes Zimmermann](https://www.uni-kassel.de/fb01/institute/institut-fuer-psychologie/fachgebiete/differentielle-psychologie/prof-dr-johannes-zimmermann) and [Aidan Wright](https://www.personalityprocesses.com/). You can learn more about using this package through the vignette articles available on the [package website](https://circumplex.jmgirard.com/) or through `?circumplex`.
@@ -61,12 +61,16 @@ ssm_table(results, drop_xy = TRUE)
 
 ```{r table1, echo = FALSE, results = "asis"}
 ssm_table(results, drop_xy = TRUE, render = FALSE) %>%
-  knitr::kable(caption = circumplex:::dcaption(results)) %>% 
+  kableExtra::kbl(caption = circumplex:::dcaption(results)) %>% 
   kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
 ```{r plot}
 ssm_plot_circle(results)
+```
+
+```{r plot2}
+ssm_plot_curve(results)
 ```
 
 ### Example 2
@@ -88,11 +92,11 @@ ssm_table(results2, drop_xy = TRUE)
 
 ```{r table2, echo = FALSE, results = "asis"}
 ssm_table(results2, drop_xy = TRUE, render = FALSE) %>%
-  knitr::kable(caption = circumplex:::dcaption(results)) %>% 
+  kableExtra::kbl(caption = circumplex:::dcaption(results)) %>% 
   kableExtra::kable_styling(full_width = TRUE, font_size = 12)
 ```
 
-```{r plot2}
+```{r plot3}
 ssm_plot_contrast(results2)
 ```
 

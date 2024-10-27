@@ -23,7 +23,8 @@ circular space quantified by displacement and amplitude."><meta property="og:ima
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-instruments" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Instruments</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-instruments"><li><a class="dropdown-item" href="../reference/csie.html">Circumplex Scales of Interpersonal Efficacy</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-instruments"><li><a class="dropdown-item" href="../reference/cais.html">Child and Adolescent Interpersonal Survey</a></li>
+    <li><a class="dropdown-item" href="../reference/csie.html">Circumplex Scales of Interpersonal Efficacy</a></li>
     <li><a class="dropdown-item" href="../reference/csig.html">Circumplex Scales of Intergroup Goals</a></li>
     <li><a class="dropdown-item" href="../reference/csip.html">Circumplex Scales of Interpersonal Problems</a></li>
     <li><a class="dropdown-item" href="../reference/csiv.html">Circumplex Scales of Interpersonal Values</a></li>
@@ -54,7 +55,7 @@ circular space quantified by displacement and amplitude."><meta property="og:ima
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Create a Circular Plot of SSM Results</h1>
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/HEAD/R/ssm_visualization.R" class="external-link"><code>R/ssm_visualization.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/HEAD/R/ssm_plot.R" class="external-link"><code>R/ssm_plot.R</code></a></small>
       <div class="d-none name"><code>ssm_plot_circle.Rd</code></div>
     </div>
 
@@ -67,11 +68,11 @@ circular space quantified by displacement and amplitude.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ssm_plot_circle</span><span class="op">(</span></span>
-<span>  <span class="va">.ssm_object</span>,</span>
+<span>  <span class="va">ssm_object</span>,</span>
 <span>  amax <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  legend_font_size <span class="op">=</span> <span class="fl">12</span>,</span>
 <span>  scale_font_size <span class="op">=</span> <span class="fl">12</span>,</span>
-<span>  lowfit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  drop_lowfit <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  repel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  angle_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  legend.box.spacing <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -84,9 +85,8 @@ circular space quantified by displacement and amplitude.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg--ssm-object">.ssm_object<a class="anchor" aria-label="anchor" href="#arg--ssm-object"></a></dt>
-<dd><p>The output of <code>ssm_profiles()</code> or
-<code>ssm_measures()</code>.</p></dd>
+<dl><dt id="arg-ssm-object">ssm_object<a class="anchor" aria-label="anchor" href="#arg-ssm-object"></a></dt>
+<dd><p>Required. The output of <code><a href="ssm_analyze.html">ssm_analyze()</a></code>.</p></dd>
 
 
 <dt id="arg-amax">amax<a class="anchor" aria-label="anchor" href="#arg-amax"></a></dt>
@@ -106,9 +106,9 @@ pt) of the text labels for the amplitude and displacement scales (default =
 12).</p></dd>
 
 
-<dt id="arg-lowfit">lowfit<a class="anchor" aria-label="anchor" href="#arg-lowfit"></a></dt>
+<dt id="arg-drop-lowfit">drop_lowfit<a class="anchor" aria-label="anchor" href="#arg-drop-lowfit"></a></dt>
 <dd><p>A logical determining whether profiles with low model fit
-(&lt;.70) should be plotted, with dashed borders (default = TRUE).</p></dd>
+(&lt;.70) should be omitted or plotted with dashed borders (default = FALSE).</p></dd>
 
 
 <dt id="arg-repel">repel<a class="anchor" aria-label="anchor" href="#arg-repel"></a></dt>
@@ -120,8 +120,8 @@ colors.</p></dd>
 <dd><p>A character vector specifying text labels to plot around
 the circle for each scale. Can also specify NULL to default to numerical
 angle labels or a vector of empty strings ("") to hide the labels. If not
-NULL, must have the same length and ordering as the <code>angles</code> argument
-to <code><a href="ssm_analyze.html">ssm_analyze()</a></code>. (default = NULL)</p></dd>
+NULL, must have the same length and ordering as the <code>angles</code> argument to
+<code><a href="ssm_analyze.html">ssm_analyze()</a></code>. (default = NULL)</p></dd>
 
 
 <dt id="arg-legend-box-spacing">legend.box.spacing<a class="anchor" aria-label="anchor" href="#arg-legend-box-spacing"></a></dt>
@@ -145,6 +145,20 @@ coverage of a high number of variables).</p></dd>
     <p>A ggplot variable containing a completed circular plot.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">jz2017</span>,</span></span>
+<span class="r-in"><span>  scales <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">9</span>,</span></span>
+<span class="r-in"><span>  measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NARPD"</span>, <span class="st">"ASPD"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ssm_plot_circle</span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="ssm_plot_circle-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

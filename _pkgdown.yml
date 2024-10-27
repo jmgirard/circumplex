@@ -36,15 +36,14 @@ reference:
   contents:
   - ssm_analyze
   - ssm_table
-  - ssm_plot
+  - ssm_plot_circle
+  - ssm_plot_contrast
+  - ssm_plot_curve
   - ssm_parameters
   - ssm_score
 - title: Secondary SSM Functions
   desc: Functions for customizing SSM results
   contents:
-  - ssm_plot_circle
-  - ssm_plot_contrast
-  - ssm_plot_scores
   - html_render
 - title: Convenience Functions
   desc: Functions that make your life easier
