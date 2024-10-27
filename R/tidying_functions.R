@@ -172,9 +172,7 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
   key <- instrument$Norms[[1]]
   key <- key[key$Sample == sample, ]
   
-  if (length(scales) != nrow(key)) {
-    stop("Number of scales provided does not match the number of scales in the selected normative sample.")
-  }
+  stopifnot(length(scales) == nrow(key))
   
   scale_data <- data[scales]
   scale_names <- colnames(scale_data)

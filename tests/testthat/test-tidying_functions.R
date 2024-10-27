@@ -57,7 +57,7 @@ test_that("norm_standardize works", {
   expect_equal(round(new$X7_z, 4), c(2.0691, -1.7467, -0.8656, 1.5301, 0.0187))
   expect_equal(round(new$X8_z, 4), c(0.5269, 3.0627, 3.2395, 1.8059, -0.6111))
   expect_error(norm_standardize(
-    old, scales = 1:7, instrument = instrument("iipsc"), sample = 1
+    old, scales = 1:5, instrument = instrument("iipsc"), sample = 1
   ))
   expect_equal(ncol(new), ncol(new2) + ncol(old))
 })
