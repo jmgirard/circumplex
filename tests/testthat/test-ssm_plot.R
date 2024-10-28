@@ -85,3 +85,12 @@ test_that("many plots works as expected", {
   p3 <- ssm_plot_circle(res, repel = TRUE)
   vdiffr::expect_doppelganger("many_circle repel", p3)
 })
+
+test_that("things are working at 0/360", {
+  data("jz2017")
+  set.seed(12345)
+  dat <- jz2017[sample(1:nrow(jz2017), size = 100), ]
+  res <- ssm_analyze(dat, 2:9, measures = 19)
+  p <- ssm_plot_circle(res)
+  vdiffr::expect_doppelganger("cross-zero circle", p)
+})

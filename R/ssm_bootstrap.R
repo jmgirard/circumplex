@@ -72,10 +72,10 @@ ssm_by_group <- function(scores, angles, contrast) {
 #' @export
 quantile.circumplex_radian <- function(x, na.rm = TRUE, ...) {
   if (all(is.na(x))) return(NA)
-  mdn <- angle_median(x)
-  tx <- (x - mdn) %% (2 * pi)
-  tx <- compare_pi(tx)
-  class(tx) <- "numeric"
-  qtl <- stats::quantile(x = tx, na.rm = na.rm, ...)
-  as_radian((qtl + mdn) %% (2 * pi))
+  x <- unclass(x)
+  mean_angle <- atan2(mean(sin(x), na.rm = na.rm), mean(cos(x), na.rm = na.rm))
+  angles_centered <- (x - mean_angle + pi) %% (2 * pi) - pi
+  quantiles_centered <- stats::quantile(angles_centered, na.rm = na.rm, ...)
+  out <- (quantiles_centered + mean_angle) %% (2 * pi)
+  as_radian(out)
 }
