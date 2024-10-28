@@ -1,10 +1,50 @@
 # circumplex (development version)
 
-* Re-factor package to remove most external dependencies
+# circumplex 1.0.0
 
-* Breaking change: removed support for non-standard evaluation
+## Breaking changes
 
-* Breaking change: replaced model-based contrasts with test-based contrasts
+* Nearly all code rewritten/refactored to streamline and reduce dependencies.
+
+* Removed support for non-standard evaluation
+
+* The `contrast` argument to `ssm_plot()` is now TRUE or FALSE instead of "none", "model", or "test". Model contrasts were removed and TRUE yields test contrasts.
+
+* Many arguments renamed (e.g., `.data` to `data`, `.ssm_object` to `ssm_object`, `xy` to `drop_xy`)
+
+* Removed `ssm_plot()` function in favor of `ssm_plot_circle()`, `ssm_plot_curve()`, and `ssm_plot_contrast()`.
+
+* Renamed `standardize()` function to `norm_standardize()`
+
+## New features
+
+* Added `ssm_plot_curve()`
+
+* Added CAIS and IEI instrument data
+
+* Added profile scores, results, and plotting to models with contrasts
+
+* Added `PANO()` function for conveniently creating scale names
+
+* All internal and external data are now data frames instead of tibbles
+
+* Rewrote all vignettes to use the updated functions, arguments, etc.
+
+## Minor improvements and fixes
+
+* Harmonized the `results` and `scores` fields in the output of `ssm_analyze()`
+
+* Added many unit tests, increasing the package to 100% code coverage
+
+* Added many assertions to check for invalid input arguments
+
+* Harmonized the tidying function arguments (e.g., `prefix`, `suffix`, `append`)
+
+* Added print methods for degree and radian classes
+
+* Replace internal non-standard evaluation with `.data` references
+
+* Minor visual improvements to print and summary methods for ssm_objects
 
 # circumplex 0.3.10
 
