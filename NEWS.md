@@ -1,7 +1,5 @@
 # circumplex 1.0.0
 
-# circumplex 1.0.0
-
 ## Breaking changes
 
 * Nearly all code rewritten/refactored to streamline and reduce dependencies.
