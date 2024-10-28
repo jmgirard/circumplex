@@ -1,7 +1,7 @@
 Type: Package
 Package: circumplex
 Title: Analysis and Visualization of Circular Data
-Version: 1.0.0
+Version: 1.0.0.9000
 Authors@R: 
     c(person(given = "Jeffrey",
              family = "Girard",
