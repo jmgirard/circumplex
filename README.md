@@ -292,7 +292,7 @@ Male - Female
 </table>
 
 ``` r
-ssm_plot_contrast(results2)
+ssm_plot_contrast(results2, drop_xy = TRUE)
 ```
 
 ![](man/figures/README-plot3-1.png)<!-- -->

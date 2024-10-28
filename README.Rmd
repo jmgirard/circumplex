@@ -97,7 +97,7 @@ ssm_table(results2, drop_xy = TRUE, render = FALSE) %>%
 ```
 
 ```{r plot3}
-ssm_plot_contrast(results2)
+ssm_plot_contrast(results2, drop_xy = TRUE)
 ```
 
 ## Code of Conduct
