@@ -1,4 +1,4 @@
-# circumplex (development version)
+# circumplex 1.0.0
 
 # circumplex 1.0.0
 
