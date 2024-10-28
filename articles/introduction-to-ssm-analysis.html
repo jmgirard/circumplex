@@ -5,7 +5,6 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="circumplex">
 <title>Introduction to SSM Analysis • circumplex</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -14,88 +13,66 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to SSM Analysis">
-<meta property="og:description" content="circumplex">
-<meta property="og:image" content="http://circumplex.jmgirard.com/logo.png">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to SSM Analysis">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home fa-lg"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-instruments">Instruments</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-instruments">
-    <a class="dropdown-item" href="../reference/csie.html">Circumplex Scales of Interpersonal Efficacy</a>
-    <a class="dropdown-item" href="../reference/csig.html">Circumplex Scales of Intergroup Goals</a>
-    <a class="dropdown-item" href="../reference/csip.html">Circumplex Scales of Interpersonal Problems</a>
-    <a class="dropdown-item" href="../reference/csiv.html">Circumplex Scales of Interpersonal Values</a>
-    <a class="dropdown-item" href="../reference/igicr.html">Interpersonal Goals Inventory for Children, Revised Version</a>
-    <a class="dropdown-item" href="../reference/iip32.html">Inventory of Interpersonal Problems, Brief Version</a>
-    <a class="dropdown-item" href="../reference/iip64.html">Inventory of Interpersonal Problems</a>
-    <a class="dropdown-item" href="../reference/iipsc.html">Inventory of Interpersonal Problems, Short Circumplex</a>
-    <a class="dropdown-item" href="../reference/iis32.html">Inventory of Interpersonal Strengths, Brief Version</a>
-    <a class="dropdown-item" href="../reference/iis64.html">Inventory of Interpersonal Strengths</a>
-    <a class="dropdown-item" href="../reference/iitc.html">Inventory of Influence Tactics Circumplex</a>
-    <a class="dropdown-item" href="../reference/ipipipc.html">IPIP Interpersonal Circumplex</a>
-    <a class="dropdown-item" href="../reference/isc.html">Interpersonal Sensitivities Circumplex</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-instruments" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Instruments</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-instruments">
+<li><a class="dropdown-item" href="../reference/cais.html">Child and Adolescent Interpersonal Survey</a></li>
+    <li><a class="dropdown-item" href="../reference/csie.html">Circumplex Scales of Interpersonal Efficacy</a></li>
+    <li><a class="dropdown-item" href="../reference/csig.html">Circumplex Scales of Intergroup Goals</a></li>
+    <li><a class="dropdown-item" href="../reference/csip.html">Circumplex Scales of Interpersonal Problems</a></li>
+    <li><a class="dropdown-item" href="../reference/csiv.html">Circumplex Scales of Interpersonal Values</a></li>
+    <li><a class="dropdown-item" href="../reference/iei.html">Interpersonal Emotion Inventory</a></li>
+    <li><a class="dropdown-item" href="../reference/igicr.html">Interpersonal Goals Inventory for Children, Revised Version</a></li>
+    <li><a class="dropdown-item" href="../reference/iip32.html">Inventory of Interpersonal Problems, Brief Version</a></li>
+    <li><a class="dropdown-item" href="../reference/iip64.html">Inventory of Interpersonal Problems</a></li>
+    <li><a class="dropdown-item" href="../reference/iipsc.html">Inventory of Interpersonal Problems, Short Circumplex</a></li>
+    <li><a class="dropdown-item" href="../reference/iis32.html">Inventory of Interpersonal Strengths, Brief Version</a></li>
+    <li><a class="dropdown-item" href="../reference/iis64.html">Inventory of Interpersonal Strengths</a></li>
+    <li><a class="dropdown-item" href="../reference/iitc.html">Inventory of Influence Tactics Circumplex</a></li>
+    <li><a class="dropdown-item" href="../reference/ipipipc.html">IPIP Interpersonal Circumplex</a></li>
+    <li><a class="dropdown-item" href="../reference/isc.html">Interpersonal Sensitivities Circumplex</a></li>
+  </ul>
 </li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-vignettes">Vignettes</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-vignettes">
-    <a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a>
-    <a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a>
-    <a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-vignettes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Vignettes</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-vignettes">
+<li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
+    <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">News</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/jmgirard/circumplex">
-    <span class="fa fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmgirard/circumplex"><span class="fa fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -107,7 +84,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Introduction to SSM Analysis</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/HEAD/vignettes/introduction-to-ssm-analysis.Rmd" class="external-link"><code>vignettes/introduction-to-ssm-analysis.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/introduction-to-ssm-analysis.Rmd" class="external-link"><code>vignettes/introduction-to-ssm-analysis.Rmd</code></a></small>
       <div class="d-none name"><code>introduction-to-ssm-analysis.Rmd</code></div>
     </div>
 
@@ -156,11 +133,6 @@ experiences of a group of participants during an experiment, and a
 personality psychologist might want to understand what kind of
 interpersonal behaviors are associated with a trait (e.g.,
 extraversion).</p>
-<pre><code><span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/model-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -176,11 +148,6 @@ plotting a set of example scores below, we can gain a visual intuition
 that a cosine curve makes sense in this case. First, we can examine the
 scores with a bar chart ignoring the circular relationship among
 them.</p>
-<pre><code><span><span class="co">#&gt; Warning: The `size` argument of `element_line()` is deprecated as of ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `linewidth` argument instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/column-1.png" width="100%"></p>
 <p>Next, we can leverage the fact that these subscales have specific
 angular displacements in the circumplex model (and that 0 and 360
@@ -196,40 +163,61 @@ the model fits our example data.</p>
 <h3 id="understanding-the-ssm-parameters">Understanding the SSM parameters<a class="anchor" aria-label="anchor" href="#understanding-the-ssm-parameters"></a>
 </h3>
 <p>The SSM estimates a cosine curve to the data using the following
-equation: <span class="math display">\[S_i = e + a \times \cos(\theta_i
-- d)\]</span> where <span class="math inline">\(S_i\)</span> and <span class="math inline">\(\theta_i\)</span> are the score and angle on scale
-<span class="math inline">\(i\)</span>, respectively, and <span class="math inline">\(e\)</span>, <span class="math inline">\(a\)</span>, and <span class="math inline">\(d\)</span> are the elevation, amplitude, and
-displacement parameters, respectively. Before we discuss these
-parameters, however, we can also estimate the fit of the SSM model. This
-is essentially how close the cosine curve is to the observed data
-points. Deviations (in red, below) will lower model fit.</p>
+equation:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>i</mi></msub><mo>=</mo><mi>e</mi><mo>+</mo><mi>a</mi><mo>×</mo><mo>cos</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>θ</mi><mi>i</mi></msub><mo>−</mo><mi>d</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S_i = e + a \times \cos(\theta_i - d)</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>S</mi><mi>i</mi></msub><annotation encoding="application/x-tex">S_i</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\theta_i</annotation></semantics></math>
+are the score and angle on scale
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
+respectively, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>
+are the elevation, amplitude, and displacement parameters, respectively.
+Before we discuss these parameters, however, we can also estimate the
+fit of the SSM model. This is essentially how close the cosine curve is
+to the observed data points. Deviations (in red, below) will lower model
+fit.</p>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/residuals-1.png" width="100%"></p>
 <p>If fit is less than 0.70, it is considered “unacceptable” and only
 the elevation parameter should be interpreted. If fit is between 0.70
 and 0.80, it is considered “adequate,” and if it is greater than 0.80,
 it is considered “good.” Sometimes SSM model fit is called
-prototypicality or denoted using <span class="math inline">\(R^2\)</span>.</p>
-<p>The first SSM parameter is elevation or <span class="math inline">\(e\)</span>, which is calculated as the mean of all
-scores. It is the size of the general factor in the circumplex model and
-its interpretation varies from scale to scale. For measures of
-interpersonal problems, it is interpreted as generalized interpersonal
-distress. When using correlation-based SSM, <span class="math inline">\(|e|\ge.15\)</span> is considered “marked” and
-<span class="math inline">\(|e|&lt;.15\)</span> is considered
-“modest.”</p>
+prototypicality or denoted using
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>.</p>
+<p>The first SSM parameter is elevation or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>,
+which is calculated as the mean of all scores. It is the size of the
+general factor in the circumplex model and its interpretation varies
+from scale to scale. For measures of interpersonal problems, it is
+interpreted as generalized interpersonal distress. When using
+correlation-based SSM,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">|</mo><mi>e</mi><mo stretchy="true" form="postfix">|</mo></mrow><mo>≥</mo><mn>.15</mn></mrow><annotation encoding="application/x-tex">|e|\ge.15</annotation></semantics></math>
+is considered “marked” and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">|</mo><mi>e</mi><mo stretchy="true" form="postfix">|</mo></mrow><mo>&lt;</mo><mn>.15</mn></mrow><annotation encoding="application/x-tex">|e|&lt;.15</annotation></semantics></math>
+is considered “modest.”</p>
 <p><img src="VIG1-e.gif" width="100%"></p>
-<p>The second SSM parameter is amplitude or <span class="math inline">\(a\)</span>, which is calculated as the difference
-between the highest point of the curve and the curve’s mean. It is
-interpreted as the distinctiveness or differentiation of a profile: how
-much it is peaked versus flat. Similar to elevation, when using
-correlation-based SSM, <span class="math inline">\(a\ge.15\)</span> is
-considered “marked” and <span class="math inline">\(a&lt;.15\)</span> is
-considered “modest.”</p>
+<p>The second SSM parameter is amplitude or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
+which is calculated as the difference between the highest point of the
+curve and the curve’s mean. It is interpreted as the distinctiveness or
+differentiation of a profile: how much it is peaked versus flat. Similar
+to elevation, when using correlation-based SSM,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>≥</mo><mn>.15</mn></mrow><annotation encoding="application/x-tex">a\ge.15</annotation></semantics></math>
+is considered “marked” and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>&lt;</mo><mn>.15</mn></mrow><annotation encoding="application/x-tex">a&lt;.15</annotation></semantics></math>
+is considered “modest.”</p>
 <p><img src="VIG1-a.gif" width="100%"></p>
-<p>The final SSM parameter is displacement or <span class="math inline">\(d\)</span>, which is calculated as the angle at
-which the curve reaches its highest point. It is interpreted as the
-style of the profile. For instance, if <span class="math inline">\(d=90^\circ\)</span> and we are using a circumplex
-scale that defines 90 degrees as “domineering,” then the profile’s style
-is domineering.</p>
+<p>The final SSM parameter is displacement or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>,
+which is calculated as the angle at which the curve reaches its highest
+point. It is interpreted as the style of the profile. For instance, if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><msup><mn>90</mn><mo>∘</mo></msup></mrow><annotation encoding="application/x-tex">d=90^\circ</annotation></semantics></math>
+and we are using a circumplex scale that defines 90 degrees as
+“domineering,” then the profile’s style is domineering.</p>
 <p><img src="VIG1-d.gif" width="100%"></p>
 <p>By interpreting these three parameters, we can understand a profile
 much more parsimoniously than by trying to interpret all eight subscales
@@ -252,25 +240,23 @@ BC, DE, FG, HI, JK, LM, and NO) and a measure of personality disorder
 symptoms with ten subscales (PARPD, SCZPD, SZTPD, ASPD, BORPD, HISPD,
 NARPD, AVPD, DPNPD, and OCPD). More information about these variables
 can be accessed using the <code><a href="../reference/jz2017.html">?jz2017</a></code> command in R.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,166 × 19</span></span></span>
-<span><span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Female  0     0.25  0     0.25  1.25  1.75  2.25  2.25     1     0     2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Female  0     0     0     0     0     0     0     0        0     1     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Male    2     1.75  1.75  2.5   2     1.75  2     2.5      1     0     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Female  0.25  0.5   0.25  0     0     0     0     0        0     0     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Male    1.5   1.75  2.25  1.75  2     1.25  2.25  2.5      5     5     7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Male    2     1.75  1.75  2     1.5   1.25  1.25  1.75     3     6     7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,156 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 7 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;, HISPD &lt;int&gt;, NARPD &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;</span></span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   Gender   PA   BC   DE   FG   HI   JK   LM   NO PARPD SCZPD SZTPD ASPD BORPD</span></span>
+<span><span class="co">#&gt; 1 Female 1.50 1.50 1.25 1.00 2.00 2.50 2.25 2.50     4     3     7    7     8</span></span>
+<span><span class="co">#&gt; 2 Female 0.00 0.25 0.00 0.25 1.25 1.75 2.25 2.25     1     0     2    0     1</span></span>
+<span><span class="co">#&gt; 3 Female 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00     0     1     0    4     1</span></span>
+<span><span class="co">#&gt; 4   Male 2.00 1.75 1.75 2.50 2.00 1.75 2.00 2.50     1     0     0    0     1</span></span>
+<span><span class="co">#&gt; 5 Female 0.25 0.50 0.25 0.00 0.00 0.00 0.00 0.00     0     0     0    0     1</span></span>
+<span><span class="co">#&gt; 6   Male 1.50 1.75 2.25 1.75 2.00 1.25 2.25 2.50     5     5     7    5     4</span></span>
+<span><span class="co">#&gt;   HISPD NARPD AVPD DPNPD OCPD</span></span>
+<span><span class="co">#&gt; 1     4     6    3     4    6</span></span>
+<span><span class="co">#&gt; 2     2     3    0     1    0</span></span>
+<span><span class="co">#&gt; 3     5     4    0     0    1</span></span>
+<span><span class="co">#&gt; 4     0     0    0     0    0</span></span>
+<span><span class="co">#&gt; 5     0     0    1     0    0</span></span>
+<span><span class="co">#&gt; 6     4     7    2     0    3</span></span></code></pre></div>
 <p>The circumplex scales in <code>jz2017</code> come from the Inventory
 of Interpersonal Problems - Short Circumplex (IIP-SC). These scales can
 be arranged into the following circular model, which is organized around
@@ -282,6 +268,11 @@ agency, whereas a high score on DE indicates problems related to being
 “cold” or too low on communion. Scales that are not directly on the
 y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency
 and communion.</p>
+<pre><code><span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/iipsc-1.png" width="100%"></p>
 </div>
 <div class="section level2">
@@ -292,59 +283,23 @@ and communion.</p>
 </h3>
 <p>To begin, let’s say that we want to use the SSM to describe the
 interpersonal problems of the average individual in the entire dataset.
-Although it is possible to analyze the raw scores contained in
-<code>jz2017</code>, our results will be more interpretable if we
-standardize the scores first. We can do this using the
-<code><a href="../reference/standardize.html">standardize()</a></code> function. The first argument to this function
-is <code>.data</code>, a data frame frame containing the circumplex
-scales to be standardized. The second argument is <code>scales</code>
-and specifies where in <code>.data</code> the circumplex scales are
-(either in terms of their variable names or their column numbers). The
-third argument is <code>angles</code> and specifies the angle of each of
-the circumplex scales included in <code>scales</code>. Note that the
-<code>scales</code> and <code>angles</code> arguments need to be vectors
-(hence the <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> function) that have the same ordering and
-length. Finally, the fourth argument is <code>norms</code>, a data frame
-containing the normative data we will use to standardize the circumplex
-scales. Here, we will use normative data for the IIP-SC by loading the
-<code>iipsc</code> data frame.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"iipsc"</span><span class="op">)</span></span>
-<span><span class="va">jz2017s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/standardize.html">standardize</a></span><span class="op">(</span></span>
-<span>  .data <span class="op">=</span> <span class="va">jz2017</span>,</span>
-<span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">PA</span>, <span class="va">BC</span>, <span class="va">DE</span>, <span class="va">FG</span>, <span class="va">HI</span>, <span class="va">JK</span>, <span class="va">LM</span>, <span class="va">NO</span><span class="op">)</span>,</span>
-<span>  angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span>,</span>
-<span>  instrument <span class="op">=</span> <span class="va">iipsc</span>,</span>
-<span>  sample <span class="op">=</span> <span class="fl">1</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">jz2017s</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,166 × 27</span></span></span>
-<span><span class="co">#&gt;    Gender    PA    BC    DE    FG    HI    JK    LM    NO PARPD SCZPD SZTPD</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Female  1.5   1.5   1.25  1     2     2.5   2.25  2.5      4     3     7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Female  0     0.25  0     0.25  1.25  1.75  2.25  2.25     1     0     2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Female  0     0     0     0     0     0     0     0        0     1     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Male    2     1.75  1.75  2.5   2     1.75  2     2.5      1     0     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Female  0.25  0.5   0.25  0     0     0     0     0        0     0     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Male    1.5   1.75  2.25  1.75  2     1.25  2.25  2.5      5     5     7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Male    2     1.75  1.75  2     1.5   1.25  1.25  1.75     3     6     7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Female  0     0.25  0.25  0.25  1     1.25  1.25  1        0     0     1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Female  0     0     0     0     0.25  0.25  1     0        0     1     0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Male    0.75  2     1.75  2.5   2     1.5   2     2.25     4     5     5</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,156 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 15 more variables: ASPD &lt;int&gt;, BORPD &lt;int&gt;, HISPD &lt;int&gt;, NARPD &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   AVPD &lt;int&gt;, DPNPD &lt;int&gt;, OCPD &lt;int&gt;, PA_z &lt;dbl&gt;, BC_z &lt;dbl&gt;, DE_z &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   FG_z &lt;dbl&gt;, HI_z &lt;dbl&gt;, JK_z &lt;dbl&gt;, LM_z &lt;dbl&gt;, NO_z &lt;dbl&gt;</span></span></span></code></pre></div>
-<p>Now we can use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function to perform the
-SSM analysis. The first three arguments are the same as the first three
-arguments to <code><a href="../reference/standardize.html">standardize()</a></code>. We can pass the new
-<code>jz2017s</code> data frame that contains standardized scores as
-<code>.data</code> and the same vectors to <code>scales</code> and
-<code>angles</code> since these haven’t changed.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+We will use the raw scores contained in <code>jz2017</code>, although
+note that the results may be more interpretable if we standardized the
+scores first (e.g., using the <code><a href="../reference/norm_standardize.html">norm_standardize()</a></code> function
+as described in the “Using Circumplex Instruments” vignette).</p>
+<p>We can use the <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function to perform the SSM
+analysis. The first three arguments to this function are
+<code>data</code> (the data frame containing our scores),
+<code>scales</code> (a vector of the names or numbers of columns
+containing the circumplex scales), and <code>angles</code> (a vector of
+the circular angle of each scale, in degrees). Below, I spell out the
+names of all the <code>scales</code> and the numbers of all the
+<code>angles</code> for teaching purposes. Later on, we will learn some
+shortcuts.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
-<span>  .data <span class="op">=</span> <span class="va">jz2017s</span>,</span>
-<span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">PA_z</span>, <span class="va">BC_z</span>, <span class="va">DE_z</span>, <span class="va">FG_z</span>, <span class="va">HI_z</span>, <span class="va">JK_z</span>, <span class="va">LM_z</span>, <span class="va">NO_z</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>,</span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span>,</span>
 <span>  angles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">90</span>, <span class="fl">135</span>, <span class="fl">180</span>, <span class="fl">225</span>, <span class="fl">270</span>, <span class="fl">315</span>, <span class="fl">360</span>, <span class="fl">45</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The output of the function has been saved in the <code>results</code>
@@ -354,12 +309,8 @@ well as some of the default options that we didn’t bother changing (see
 <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> to learn how to change them) and, most
 importantly, the estimated SSM parameter values with bootstrapped
 confidence intervals.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = c(PA_z, BC_z, DE_z, FG_z, </span></span>
-<span><span class="co">#&gt;     HI_z, JK_z, LM_z, NO_z), angles = c(90, 135, 180, 225, 270, </span></span>
-<span><span class="co">#&gt;     315, 360, 45))</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Mean Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -367,34 +318,29 @@ confidence intervals.</p>
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [All]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [All]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
-<span><span class="co">#&gt; Elevation        -0.225     -0.258     -0.191</span></span>
-<span><span class="co">#&gt; X-Value           0.131      0.097      0.161</span></span>
-<span><span class="co">#&gt; Y-Value          -0.015     -0.048      0.020</span></span>
-<span><span class="co">#&gt; Amplitude         0.131      0.098      0.165</span></span>
-<span><span class="co">#&gt; Displacement    353.525    339.484      9.564</span></span>
-<span><span class="co">#&gt; Model Fit         0.710</span></span></code></pre></div>
+<span><span class="co">#&gt; Elevation         0.917      0.890      0.945</span></span>
+<span><span class="co">#&gt; X-Value           0.351      0.324      0.377</span></span>
+<span><span class="co">#&gt; Y-Value          -0.252     -0.280     -0.223</span></span>
+<span><span class="co">#&gt; Amplitude         0.432      0.402      0.461</span></span>
+<span><span class="co">#&gt; Displacement    324.292    320.827    327.766</span></span>
+<span><span class="co">#&gt; Model Fit         0.878</span></span></code></pre></div>
 <p>That was pretty easy! We can now write up these results. However, the
 <code>circumplex</code> package has some features that can make what we
-just did even easier. First, because the first three arguments of the
-<code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> function are always the same, we can omit
-their names. Second, because we organized the <code>jz2017s</code> data
-frame to have the circumplex scale variables adjacent and in order from
-PA to NO, we can simplify their specification by using the
-<code>PA:NO</code> shortcut. Finally, because the use of octant scales
-is so common, the <code>circumplex</code> package comes with a
-convenience function for outputting their angular displacements:
-<code><a href="../reference/octants.html">octants()</a></code>. Note how, even when using these shortcuts, the
-results are the same except for minor stochastic differences in the
-confidence intervals due to the randomness inherent to bootstrapping.
-(To get the exact same results, we could use the <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code>
-function to control the random number generator in R.)</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017s</span>, <span class="va">PA_z</span><span class="op">:</span><span class="va">NO_z</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+just did even easier. First, because we organized the
+<code>jz2017</code> data frame to have the circumplex scale variables
+adjacent and in order from PA to NO, we can simplify their specification
+by using the <code><a href="../reference/PANO.html">PANO()</a></code> shortcut. Second, because the use of
+octant scales is so common, we can use the <code><a href="../reference/octants.html">octants()</a></code>
+shortcut. Note that, even when using these shortcuts, the results are
+the same except for minor stochastic differences in the confidence
+intervals due to the randomness inherent to bootstrapping.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">jz2017</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017s, scales = PA_z:NO_z, angles = octants())</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Mean Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -402,14 +348,16 @@ function to control the random number generator in R.)</p>
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [All]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [All]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
-<span><span class="co">#&gt; Elevation        -0.225     -0.259     -0.192</span></span>
-<span><span class="co">#&gt; X-Value           0.131      0.100      0.165</span></span>
-<span><span class="co">#&gt; Y-Value          -0.015     -0.050      0.019</span></span>
-<span><span class="co">#&gt; Amplitude         0.131      0.101      0.167</span></span>
-<span><span class="co">#&gt; Displacement    353.525    339.560      8.994</span></span>
-<span><span class="co">#&gt; Model Fit         0.710</span></span></code></pre></div>
+<span><span class="co">#&gt; Elevation         0.917      0.889      0.945</span></span>
+<span><span class="co">#&gt; X-Value           0.351      0.326      0.380</span></span>
+<span><span class="co">#&gt; Y-Value          -0.252     -0.281     -0.225</span></span>
+<span><span class="co">#&gt; Amplitude         0.432      0.404      0.464</span></span>
+<span><span class="co">#&gt; Displacement    324.292    320.913    327.623</span></span>
+<span><span class="co">#&gt; Model Fit         0.878</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="visualizing-the-results-with-a-table-and-figure">Visualizing the results with a table and figure<a class="anchor" aria-label="anchor" href="#visualizing-the-results-with-a-table-and-figure"></a>
@@ -420,7 +368,7 @@ analyses we will see how this function saves a lot of time and effort.
 To create the table, simply pass the <code>results</code> (or
 <code>results2</code>) object to the <code><a href="../reference/ssm_table.html">ssm_table()</a></code>
 function.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -434,10 +382,10 @@ Profile
 Elevation
 </th>
 <th style="text-align:left;">
-X-Value
+X.Value
 </th>
 <th style="text-align:left;">
-Y-Value
+Y.Value
 </th>
 <th style="text-align:left;">
 Amplitude
@@ -454,22 +402,22 @@ Fit
 All
 </td>
 <td style="text-align:left;">
--0.23 (-0.26, -0.19)
+0.92 (0.89, 0.94)
 </td>
 <td style="text-align:left;">
-0.13 (0.10, 0.17)
+0.35 (0.33, 0.38)
 </td>
 <td style="text-align:left;">
--0.01 (-0.05, 0.02)
+-0.25 (-0.28, -0.23)
 </td>
 <td style="text-align:left;">
-0.13 (0.10, 0.17)
+0.43 (0.40, 0.46)
 </td>
 <td style="text-align:left;">
-353.5 (339.6, 9.0)
+324.3 (320.9, 327.6)
 </td>
 <td style="text-align:left;">
-0.710
+0.878
 </td>
 </tr></tbody>
 </table>
@@ -478,10 +426,14 @@ space by creating a nice-looking circular plot by mapping the amplitude
 parameter to the points’ distance from the center of the circle and the
 displacement parameter to the points’ rotation from due-east (as is
 conventional). This, again, is as simple as passing the
-<code>results</code> object to the <code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> function.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
+<code>results</code> object to the <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> or
+<code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code> functions.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot1-1.png" width="100%"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="introduction-to-ssm-analysis_files/figure-html/plot2-1.png" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -505,15 +457,15 @@ mean-based analysis. All SSM analyses use the <code><a href="../reference/ssm_an
 function and the data, scales, and angles are the same as before.
 However, we also need to let the function know that we want to analyze
 correlations with NARPD as opposed to scale means. To do this, we add an
-additional argument <code>measures</code>. Note that since correlations
-are already standardized, we don’t need to worry about standardizing the
-circumplex scales when <code>measures</code> is used.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span>, <span class="va">PA</span><span class="op">:</span><span class="va">NO</span>, <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, measures <span class="op">=</span> <span class="va">NARPD</span><span class="op">)</span></span>
+additional argument <code>measures</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>  angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  measures <span class="op">=</span> <span class="st">"NARPD"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt; ssm_analyze(.data = jz2017, scales = PA:NO, angles = octants(), </span></span>
-<span><span class="co">#&gt;     measures = NARPD)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Correlation Scores </span></span>
 <span><span class="co">#&gt; Bootstrap Resamples:  2000 </span></span>
@@ -521,7 +473,9 @@ circumplex scales when <code>measures</code> is used.</p>
 <span><span class="co">#&gt; Listwise Deletion:    TRUE </span></span>
 <span><span class="co">#&gt; Scale Displacements:  90 135 180 225 270 315 360 45 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Profile [NARPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Profile [NARPD]:</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                Estimate   Lower CI   Upper CI</span></span>
 <span><span class="co">#&gt; Elevation         0.202      0.170      0.237</span></span>
 <span><span class="co">#&gt; X-Value          -0.062     -0.096     -0.028</span></span>
@@ -539,10 +493,10 @@ mean scores and instead of saying “Profile [All]” it now says “Profile
 </h3>
 <p>We can also create a similar table and figure using the exact same
 syntax as before. The <code><a href="../reference/ssm_table.html">ssm_table()</a></code> and
-<code><a href="../reference/ssm_plot.html">ssm_plot()</a></code> functions are smart enough to know whether the
+<code>ssm_plot()</code> functions are smart enough to know whether the
 results are mean-based or correlation-based and will work in both
 cases.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -556,10 +510,10 @@ Profile
 Elevation
 </th>
 <th style="text-align:left;">
-X-Value
+X.Value
 </th>
 <th style="text-align:left;">
-Y-Value
+Y.Value
 </th>
 <th style="text-align:left;">
 Amplitude
@@ -606,13 +560,16 @@ distinctive in its profile (amplitude). The displacement parameter was
 somewhere between 100 and 120 degrees; to interpret this we would need
 to either consult the mapping between scales and angles or plot the
 results.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot.html">ssm_plot</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="introduction-to-ssm-analysis_files/figure-html/plot2-1.png" width="100%"></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
+<p><img src="introduction-to-ssm-analysis_files/figure-html/plot3-1.png" width="100%"></p>
 <p>From this figure, it is very easy to see that, consistent with our
 hypotheses, the displacement for NARPD was associated with high agency
 and was somewhere between the “domineering” and “vindictive”
 octants.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
+<p><img src="introduction-to-ssm-analysis_files/figure-html/plot4-1.png" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -654,28 +611,26 @@ circumplex Structural Summary Approach. <em>Assessment, 24</em>(1),
 3–23.</p></li>
 </ul>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by <a href="https://www.jmgirard.com" class="external-link">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html" class="external-link">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com" class="external-link">Aidan Wright</a>.</p>
+  <p>Developed by <a href="https://www.jmgirard.com" class="external-link">Jeffrey Girard</a>, <a href="https://www.uni-kassel.de/fb01/institute/psychologie/differentielle-psychologie/johannes-zimmermann-prof-dr.html" class="external-link">Johannes Zimmermann</a>, <a href="https://www.personalityprocesses.com" class="external-link">Aidan Wright</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>
