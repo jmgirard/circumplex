@@ -77,5 +77,6 @@ quantile.circumplex_radian <- function(x, na.rm = TRUE, ...) {
   angles_centered <- (x - mean_angle + pi) %% (2 * pi) - pi
   quantiles_centered <- stats::quantile(angles_centered, na.rm = na.rm, ...)
   out <- (quantiles_centered + mean_angle) %% (2 * pi)
+  out[abs(out - (2 * pi)) < (.Machine$double.eps * 2)] <- 0
   as_radian(out)
 }

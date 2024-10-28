@@ -17,14 +17,14 @@ coverage](https://codecov.io/gh/jmgirard/circumplex/graph/badge.svg)](https://ap
 
 The goal of *circumplex* is to provide a powerful, flexible, and
 user-friendly way to analyze and visualize circumplex data. It was
-created and is maintained by [Jeffrey Girard](https://jmgirard.com/); it
-was inspired by work from and was developed under advisement from
-[Johannes
+created and is maintained by [Jeffrey
+Girard](https://affcom.ku.edu/girard); it was inspired by work from and
+was developed under advisement from [Johannes
 Zimmermann](https://www.uni-kassel.de/fb01/institute/institut-fuer-psychologie/fachgebiete/differentielle-psychologie/prof-dr-johannes-zimmermann)
-and [Aidan Wright](https://www.personalityprocesses.com/). You can learn
-more about using this package through the vignette articles available on
-the [package website](https://circumplex.jmgirard.com/) or through
-`?circumplex`.
+and [Aidan Wright](https://sites.lsa.umich.edu/aidangcw-lab/). You can
+learn more about using this package through the vignette articles
+available on the [package website](https://circumplex.jmgirard.com/) or
+through `?circumplex`.
 
 ## Installation
 
@@ -84,7 +84,7 @@ summary(results)
 ssm_table(results, drop_xy = TRUE)
 ```
 
-<table class="table" style="font-size: 12px; color: black; margin-left: auto; margin-right: auto;">
+<table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
 </caption>
@@ -213,7 +213,7 @@ summary(results2)
 ssm_table(results2, drop_xy = TRUE)
 ```
 
-<table class="table" style="font-size: 12px; color: black; margin-left: auto; margin-right: auto;">
+<table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Correlation-based Structural Summary Statistics with 95% CIs
 </caption>
