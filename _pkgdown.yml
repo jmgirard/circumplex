@@ -20,7 +20,6 @@ reference:
   desc: Functions for importing and examining circumplex instruments
   contents:
   - instruments
-  - instrument
   - scales
   - anchors
   - items

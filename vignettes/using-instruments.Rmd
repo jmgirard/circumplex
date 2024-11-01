@@ -35,7 +35,7 @@ instruments()
 If there are additional circumplex instruments you would like to have added to the package (especially if you are the author/copyright-holder), please [contact me](mailto:me@jmgirard.com). Note that some information (e.g., item text and normative data) may not be available for all instruments due to copyright issues. However, many instruments are released as open-access and have full item text and normative data included in the package.
 
 ### Loading a specific instrument
-Instrument information is loaded into R's memory when the circumplex package is loaded. We can just refer to each by "code," such as the `csip` code for the Circumplex Scales of Interpersonal Problems.
+Instrument information is loaded into R's memory when the circumplex package is loaded. We can just refer to each by "code," such as the `csip` code for the Circumplex Scales of Interpersonal Problems. The code is an object in R's environment, so do not put it in quotes.
 
 ```{r}
 csip
