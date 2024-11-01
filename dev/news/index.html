@@ -56,6 +56,14 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="circumplex-development-version">circumplex (development version)<a class="anchor" aria-label="anchor" href="#circumplex-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>Add the <code><a href="../reference/self_standardize.html">self_standardize()</a></code> function for standardizing variables using sample means and SDs</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-fixes-development-version">Minor improvements and fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-development-version"></a></h3>
+<ul><li>Fix some typos in documentation</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="circumplex-100">circumplex 1.0.0<a class="anchor" aria-label="anchor" href="#circumplex-100"></a></h2><p class="text-muted">CRAN release: 2024-10-28</p>
@@ -63,7 +71,7 @@
 <h3 id="breaking-changes-1-0-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-1-0-0"></a></h3>
 <ul><li><p>Nearly all code rewritten/refactored to streamline and reduce dependencies.</p></li>
 <li><p>Removed support for non-standard evaluation</p></li>
-<li><p>The <code>contrast</code> argument to <code>ssm_plot()</code> is now TRUE or FALSE instead of “none”, “model”, or “test”. Model contrasts were removed and TRUE yields test contrasts.</p></li>
+<li><p>The <code>contrast</code> argument to <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> is now TRUE or FALSE instead of “none”, “model”, or “test”. Model contrasts were removed and TRUE yields test contrasts.</p></li>
 <li><p>Many arguments renamed (e.g., <code>.data</code> to <code>data</code>, <code>.ssm_object</code> to <code>ssm_object</code>, <code>xy</code> to <code>drop_xy</code>)</p></li>
 <li><p>Removed <code>ssm_plot()</code> function in favor of <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code>, and <code><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code>.</p></li>
 <li><p>Renamed <code>standardize()</code> function to <code><a href="../reference/norm_standardize.html">norm_standardize()</a></code></p></li>
@@ -101,7 +109,7 @@
 <h2 class="pkg-version" data-toc-text="0.3.9" id="circumplex-039">circumplex 0.3.9<a class="anchor" aria-label="anchor" href="#circumplex-039"></a></h2><p class="text-muted">CRAN release: 2023-02-14</p>
 <div class="section level3">
 <h3 id="minor-improvements-and-fixes-0-3-9">Minor improvements and fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-0-3-9"></a></h3>
-<ul><li><p>Fixed a bug related to <code>NaN</code> values and <code><a href="https://dplyr.tidyverse.org/reference/na_if.html" class="external-link">dplyr::na_if()</a></code></p></li>
+<ul><li><p>Fixed a bug related to <code>NaN</code> values and <code>dplyr::na_if()</code></p></li>
 <li><p>Updated package website using new version of {pkgdown}</p></li>
 </ul><hr></div>
 </div>
@@ -202,7 +210,7 @@
 <div class="section level3">
 <h3 id="minor-improvements-and-fixes-0-3-0">Minor improvements and fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-0-3-0"></a></h3>
 <ul><li><p>Updated the “Introduction to SSM” vignette’s figures.</p></li>
-<li><p>Replaced use of <code><a href="https://dplyr.tidyverse.org/reference/funs.html" class="external-link">dplyr::funs()</a></code> as this function is being deprecated.</p></li>
+<li><p>Replaced use of <code>dplyr::funs()</code> as this function is being deprecated.</p></li>
 <li><p>Fixed a bug in the normative data for <code>ipipipc</code> that prevented standardization.</p></li>
 <li><p>Fixed a bug caused by changes in how random numbers are generated in R 3.6.x.</p></li>
 <li><p>Fixed several broken links by running package through new version of <code>usethis</code>.</p></li>

@@ -269,11 +269,6 @@ agency, whereas a high score on DE indicates problems related to being
 “cold” or too low on communion. Scales that are not directly on the
 y-axis or x-axis (i.e., BC, FG, JK, and NO) represent blends of agency
 and communion.</p>
-<pre><code><span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/iipsc-1.png" width="100%"></p>
 </div>
 <div class="section level2">
@@ -297,7 +292,7 @@ the circular angle of each scale, in degrees). Below, I spell out the
 names of all the <code>scales</code> and the numbers of all the
 <code>angles</code> for teaching purposes. Later on, we will learn some
 shortcuts.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">jz2017</span>,</span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PA"</span>, <span class="st">"BC"</span>, <span class="st">"DE"</span>, <span class="st">"FG"</span>, <span class="st">"HI"</span>, <span class="st">"JK"</span>, <span class="st">"LM"</span>, <span class="st">"NO"</span><span class="op">)</span>,</span>
@@ -310,7 +305,7 @@ well as some of the default options that we didn’t bother changing (see
 <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> to learn how to change them) and, most
 importantly, the estimated SSM parameter values with bootstrapped
 confidence intervals.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Statistical Basis:    Mean Scores </span></span>
@@ -339,7 +334,7 @@ octant scales is so common, we can use the <code><a href="../reference/octants.h
 shortcut. Note that, even when using these shortcuts, the results are
 the same except for minor stochastic differences in the confidence
 intervals due to the randomness inherent to bootstrapping.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">jz2017</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, angles <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -369,7 +364,7 @@ analyses we will see how this function saves a lot of time and effort.
 To create the table, simply pass the <code>results</code> (or
 <code>results2</code>) object to the <code><a href="../reference/ssm_table.html">ssm_table()</a></code>
 function.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -429,10 +424,10 @@ displacement parameter to the points’ rotation from due-east (as is
 conventional). This, again, is as simple as passing the
 <code>results</code> object to the <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> or
 <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code> functions.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot1-1.png" width="100%"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot2-1.png" width="100%"></p>
 </div>
@@ -459,7 +454,7 @@ function and the data, scales, and angles are the same as before.
 However, we also need to let the function know that we want to analyze
 correlations with NARPD as opposed to scale means. To do this, we add an
 additional argument <code>measures</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">jz2017</span>, </span>
 <span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, </span>
@@ -497,7 +492,7 @@ syntax as before. The <code><a href="../reference/ssm_table.html">ssm_table()</a
 <code>ssm_plot()</code> functions are smart enough to know whether the
 results are mean-based or correlation-based and will work in both
 cases.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -561,14 +556,14 @@ distinctive in its profile (amplitude). The displacement parameter was
 somewhere between 100 and 120 degrees; to interpret this we would need
 to either consult the mapping between scales and angles or plot the
 results.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot3-1.png" width="100%"></p>
 <p>From this figure, it is very easy to see that, consistent with our
 hypotheses, the displacement for NARPD was associated with high agency
 and was somewhere between the “domineering” and “vindictive”
 octants.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_curve.html">ssm_plot_curve</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="introduction-to-ssm-analysis_files/figure-html/plot4-1.png" width="100%"></p>
 </div>

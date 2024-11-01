@@ -140,13 +140,13 @@ the standardized scores alone should be output (default = TRUE).</p></dd>
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other tidying functions:
 <code><a href="ipsatize.html">ipsatize</a>()</code>,
-<code><a href="score.html">score</a>()</code></p></div>
+<code><a href="score.html">score</a>()</code>,
+<code><a href="self_standardize.html">self_standardize</a>()</code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"jz2017"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="instrument.html">instrument</a></span><span class="op">(</span><span class="st">"iipsc"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">norm_standardize</span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">9</span>, instrument <span class="op">=</span> <span class="va">iipsc</span>, sample <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Gender   PA   BC   DE   FG   HI   JK   LM   NO PARPD SCZPD SZTPD ASPD</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    Female 1.50 1.50 1.25 1.00 2.00 2.50 2.25 2.50     4     3     7    7</span>

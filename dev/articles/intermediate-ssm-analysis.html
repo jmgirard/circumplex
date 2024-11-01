@@ -635,13 +635,13 @@ SZTPD: Male
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/general_plot-1.png" width="100%"></p>
-<p>Note that the borders for the “PARDPD: Male” and “SZTPD: Male” blocks
+<p>Note that the borders for the “PARPD: Male” and “SZTPD: Male” blocks
 are dashed instead of solid. This indicates that these profiles have low
 fit (i.e.,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>&lt;</mo><mn>.7</mn></mrow><annotation encoding="application/x-tex">R^2&lt;.7</annotation></semantics></math>).
 We could alternatively hide these such profiles by adding
-<code>lowfit = FALSE</code> as below (noting that the color guide may
-change as profiles are dropped).</p>
+<code>drop_lowfit = TRUE</code> as below (noting that the color guide
+may change as profiles are dropped).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_circle.html">ssm_plot_circle</a></span><span class="op">(</span><span class="va">results3</span>, drop_lowfit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="intermediate-ssm-analysis_files/figure-html/general_plot2-1.png" width="100%"></p>

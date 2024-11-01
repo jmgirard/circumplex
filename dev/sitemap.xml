@@ -31,7 +31,6 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/iis64.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/iitc.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/index.html</loc></url>
-<url><loc>http://circumplex.jmgirard.com/dev/reference/instrument.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/instruments.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ipipipc.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ipsatize.html</loc></url>
@@ -46,6 +45,7 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/raw_iipsc.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/scales.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/score.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/self_standardize.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_analyze.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_parameters.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.html</loc></url>
