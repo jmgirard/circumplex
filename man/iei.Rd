@@ -22,7 +22,6 @@ iei
 Information about the Interpersonal Emotion Inventory (IEI).
 }
 \examples{
-instrument("iei")
 summary(iei)
 scales(iei, items = TRUE)
 }

@@ -8,7 +8,6 @@
 #' @source \doi{10.1207/s15327752jpa8703_12}
 #' @keywords internal
 #' @examples
-#' instrument("cais")
 #' summary(cais)
 #' scales(cais, items = TRUE)
 "cais"
@@ -25,7 +24,6 @@
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csie.htm}
 #' @keywords internal
 #' @examples
-#' instrument("csie")
 #' summary(csie)
 #' scales(csie, items = TRUE)
 "csie"
@@ -40,7 +38,6 @@
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csig.htm}
 #' @keywords internal
 #' @examples
-#' instrument("csig")
 #' summary(csig)
 #' scales(csig, items = TRUE)
 "csig"
@@ -55,7 +52,6 @@
 #' @source \doi{10.1037/pas0000505}
 #' @keywords internal
 #' @examples
-#' instrument("csip")
 #' summary(csip)
 #' scales(csip, items = TRUE)
 "csip"
@@ -70,7 +66,6 @@
 #' @source \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
 #' @keywords internal
 #' @examples
-#' instrument("csiv")
 #' summary(csiv)
 #' scales(csiv, items = TRUE)
 "csiv"
@@ -86,7 +81,6 @@
 #' @source \doi{10.1080/00223891.2024.2400266}
 #' @keywords internal
 #' @examples
-#' instrument("iei")
 #' summary(iei)
 #' scales(iei, items = TRUE)
 "iei"
@@ -102,7 +96,6 @@
 #' @source \doi{10.1177/1073191111411672}
 #' @keywords internal
 #' @examples
-#' instrument("igicr")
 #' summary(igicr)
 #' scales(igicr, items = TRUE)
 "igicr"
@@ -120,7 +113,6 @@
 #' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
 #' @keywords internal
 #' @examples
-#' instrument("iip32")
 #' summary(iip32)
 "iip32"
 
@@ -136,7 +128,6 @@
 #' @source \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
 #' @keywords internal
 #' @examples
-#' instrument("iip64")
 #' summary(iip64)
 "iip64"
 
@@ -151,7 +142,6 @@
 #' @source \doi{10.1080/00223890802388665}
 #' @keywords internal
 #' @examples
-#' instrument("iipsc")
 #' summary(iipsc)
 "iipsc"
 
@@ -166,7 +156,6 @@
 #' @source \doi{10.1080/00223891.2012.681818}
 #' @keywords internal
 #' @examples
-#' instrument("iis32")
 #' summary(iis32)
 #' scales(iis32, items = TRUE)
 "iis32"
@@ -181,7 +170,6 @@
 #' @source \doi{10.1037/a0017269}
 #' @keywords internal
 #' @examples
-#' instrument("iis64")
 #' summary(iis64)
 #' scales(iis64, items = TRUE)
 "iis64"
@@ -196,7 +184,6 @@
 #' @source \doi{10.1177/1073191119864661}
 #' @keywords internal
 #' @examples
-#' instrument("iitc")
 #' summary(iitc)
 #' scales(iitc, items = TRUE)
 "iitc"
@@ -210,7 +197,6 @@
 #' @source \doi{10.1177/1073191109340382}
 #' @keywords internal
 #' @examples
-#' instrument("ipipipc")
 #' summary(ipipipc)
 #' scales(ipipipc, items = TRUE)
 "ipipipc"
@@ -225,7 +211,6 @@
 #' @source \doi{10.1111/j.1467-6494.2011.00696.x}
 #' @keywords internal
 #' @examples
-#' instrument("isc")
 #' summary(isc)
 #' scales(isc, items = TRUE)
 "isc"

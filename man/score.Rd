@@ -51,7 +51,6 @@ custom data frame.
 }
 \examples{
 data("raw_iipsc")
-instrument("iipsc")
 score(raw_iipsc, items = 1:32, instrument = iipsc, prefix = "IIPSC_")
 }
 \seealso{

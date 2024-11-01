@@ -21,7 +21,6 @@ csip
 Information about the Circumplex Scales of Interpersonal Problems (CSIP).
 }
 \examples{
-instrument("csip")
 summary(csip)
 scales(csip, items = TRUE)
 }

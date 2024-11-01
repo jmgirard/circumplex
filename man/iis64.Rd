@@ -21,7 +21,6 @@ iis64
 Information about the Inventory of Interpersonal Strengths (IIS-64).
 }
 \examples{
-instrument("iis64")
 summary(iis64)
 scales(iis64, items = TRUE)
 }

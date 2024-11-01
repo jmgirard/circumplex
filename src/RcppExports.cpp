@@ -45,17 +45,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// compare_pi
-NumericVector compare_pi(NumericVector x);
-RcppExport SEXP _circumplex_compare_pi(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(compare_pi(x));
-    return rcpp_result_gen;
-END_RCPP
-}
 // ssm_parameters_cpp
 arma::vec ssm_parameters_cpp(arma::vec scores, arma::vec angles);
 RcppExport SEXP _circumplex_ssm_parameters_cpp(SEXP scoresSEXP, SEXP anglesSEXP) {
@@ -135,7 +124,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_circumplex_angle_mean", (DL_FUNC) &_circumplex_angle_mean, 1},
     {"_circumplex_angle_dev", (DL_FUNC) &_circumplex_angle_dev, 2},
     {"_circumplex_angle_median", (DL_FUNC) &_circumplex_angle_median, 1},
-    {"_circumplex_compare_pi", (DL_FUNC) &_circumplex_compare_pi, 1},
     {"_circumplex_ssm_parameters_cpp", (DL_FUNC) &_circumplex_ssm_parameters_cpp, 2},
     {"_circumplex_group_parameters", (DL_FUNC) &_circumplex_group_parameters, 2},
     {"_circumplex_col_means", (DL_FUNC) &_circumplex_col_means, 1},

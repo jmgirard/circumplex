@@ -21,7 +21,6 @@ iitc
 Information about the Inventory of Influence Tactics Circumplex (IIT-C).
 }
 \examples{
-instrument("iitc")
 summary(iitc)
 scales(iitc, items = TRUE)
 }

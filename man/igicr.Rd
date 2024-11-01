@@ -22,7 +22,6 @@ Information about the Interpersonal Goals Inventory for Children, Revised
 Version (IGI-CR).
 }
 \examples{
-instrument("igicr")
 summary(igicr)
 scales(igicr, items = TRUE)
 }

@@ -57,7 +57,6 @@ scores (i.e., z-scores) based on comparison to the normative data.
 }
 \examples{
 data("jz2017")
-instrument("iipsc")
 norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
 }
 \seealso{

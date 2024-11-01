@@ -22,7 +22,6 @@ Information about the Inventory of Interpersonal Problems Short Circumplex
 (IIP-SC).
 }
 \examples{
-instrument("iipsc")
 summary(iipsc)
 }
 \keyword{internal}

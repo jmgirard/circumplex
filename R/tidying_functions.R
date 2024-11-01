@@ -81,7 +81,6 @@ ipsatize <- function(data, items, na.rm = TRUE,
 #' @export
 #' @examples
 #' data("raw_iipsc")
-#' instrument("iipsc")
 #' score(raw_iipsc, items = 1:32, instrument = iipsc, prefix = "IIPSC_")
 score <- function(data, items, instrument, na.rm = TRUE, 
                   prefix = "", suffix = "", append = TRUE) {
@@ -153,7 +152,6 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #' @family tidying functions
 #' @examples
 #' data("jz2017")
-#' instrument("iipsc")
 #' norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
 norm_standardize <- function(data, scales, angles = octants(), instrument, 
                        sample = 1, prefix = "", suffix = "_z", append = TRUE) {
@@ -236,15 +234,13 @@ self_standardize <- function(data, scales, na.rm = TRUE,
   
   scale_data <- data[scales]
   scale_names <- colnames(scale_data)
-  
-  scores <- matrix(NA, nrow = nrow(scale_data), ncol = length(scales))
-  colnames(scores) <- paste0(prefix, scale_names, suffix)
-  
-  for (i in 1:length(scales)) {
-    m_i <- mean(scale_data[[i]], na.rm = na.rm)
-    s_i <- sd(scale_data[[i]], na.rm = na.rm)
-    scores[, i] <- (scale_data[[i]] - m_i) / s_i
+
+  zscore <- function(x, na.rm = na.rm) {
+    (x - mean(x, na.rm = na.rm)) / stats::sd(x, na.rm = na.rm)
   }
+  
+  scores <- sapply(scale_data, FUN = zscore, na.rm = na.rm)
+  colnames(scores) <- paste0(prefix, scale_names, suffix)
   scores[is.nan(scores)] <- NA_real_
   
   if (append) {

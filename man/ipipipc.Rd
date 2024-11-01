@@ -20,7 +20,6 @@ ipipipc
 Information about the IPIP Interpersonal Circumplex (IPIP-IPC).
 }
 \examples{
-instrument("ipipipc")
 summary(ipipipc)
 scales(ipipipc, items = TRUE)
 }

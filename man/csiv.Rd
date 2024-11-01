@@ -21,7 +21,6 @@ csiv
 Information about the Circumplex Scales of Interpersonal Values (CSIV).
 }
 \examples{
-instrument("csiv")
 summary(csiv)
 scales(csiv, items = TRUE)
 }

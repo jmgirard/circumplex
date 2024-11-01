@@ -9,14 +9,14 @@ test_that("ipsatize works", {
   expect_equal(datin[[2]][7], -0.5)
 })
 
+
 test_that("score works", {
   set.seed(12345)
   old <- data.frame(
     matrix(sample(0:4, size = 32 * 5, replace = TRUE), nrow = 5, ncol = 32)
   )
-  new <- score(old, items = 1:32, instrument = instrument("iipsc"))
-  new2 <- score(old, items = 1:32, instrument = instrument("iipsc"), 
-                append = FALSE)
+  new <- score(old, items = 1:32, instrument = iipsc)
+  new2 <- score(old, items = 1:32, instrument = iipsc, append = FALSE)
     
   expect_equal(new$PA, c(0.5, 1.25, 2, 0.75, 3.5))
   expect_equal(new$BC, c(1.75, 0.75, 1.5, 1.75, 1.75))
@@ -26,9 +26,10 @@ test_that("score works", {
   expect_equal(new$JK, c(1.5, 2.5, 1.75, 2.25, 1.75))
   expect_equal(new$LM, c(2, 2.5, 1.5, 2.75, 1.5))
   expect_equal(new$NO, c(1.75, 2, 1.75, 2.25, 2.5))
-  expect_error(score(old, 1:30, instrument("iipsc")))
+  expect_error(score(old, 1:30, iipsc))
   expect_equal(ncol(new), ncol(new2) + ncol(old))
 })
+
 
 test_that("norm_standardize works", {
   set.seed(12345)
@@ -38,13 +39,13 @@ test_that("norm_standardize works", {
   new <- norm_standardize(
     old, 
     scales = 1:8, 
-    instrument = instrument("iipsc"), 
+    instrument = iipsc, 
     sample = 1
   )
   new2 <- norm_standardize(
     old, 
     scales = 1:8,
-    instrument = instrument("iipsc"),
+    instrument = iipsc,
     sample = 1,
     append = FALSE
   )
@@ -57,7 +58,25 @@ test_that("norm_standardize works", {
   expect_equal(round(new$X7_z, 4), c(2.0691, -1.7467, -0.8656, 1.5301, 0.0187))
   expect_equal(round(new$X8_z, 4), c(0.5269, 3.0627, 3.2395, 1.8059, -0.6111))
   expect_error(norm_standardize(
-    old, scales = 1:5, instrument = instrument("iipsc"), sample = 1
+    old, scales = 1:5, instrument = iipsc, sample = 1
   ))
+  expect_equal(ncol(new), ncol(new2) + ncol(old))
+})
+
+
+test_that("self_standardize works", {
+  old <- aw2009
+  new <- self_standardize(
+    old,
+    scales = 1:8
+  )
+  new2 <- self_standardize(
+    old,
+    scales = 1:8,
+    append = FALSE
+  )
+  expect_equal(round(new$PA_z, 4), c(-1.6857, 0.8705, 0.6172, 0.1105, 0.0875))
+  expect_equal(round(new$BC_z, 4), c(-0.8356, -0.8356, -0.1393, 0.2178, 1.5927))
+  expect_error(self_standardize(aw2009, 2:9))
   expect_equal(ncol(new), ncol(new2) + ncol(old))
 })

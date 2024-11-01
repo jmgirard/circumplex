@@ -13,10 +13,6 @@ angle_median <- function(x) {
     .Call(`_circumplex_angle_median`, x)
 }
 
-compare_pi <- function(x) {
-    .Call(`_circumplex_compare_pi`, x)
-}
-
 ssm_parameters_cpp <- function(scores, angles) {
     .Call(`_circumplex_ssm_parameters_cpp`, scores, angles)
 }

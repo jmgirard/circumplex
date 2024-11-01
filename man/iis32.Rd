@@ -22,7 +22,6 @@ Information about the Inventory of Interpersonal Strengths, Brief Version
 (IIS-32).
 }
 \examples{
-instrument("iis32")
 summary(iis32)
 scales(iis32, items = TRUE)
 }

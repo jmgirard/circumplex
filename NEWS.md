@@ -1,5 +1,11 @@
 # circumplex (development version)
 
+## New features
+
+* Add the `self_standardize()` function for standardizing variables using sample means and SDs
+
+## Minor improvements and fixes
+
 * Fix some typos in documentation
 
 # circumplex 1.0.0

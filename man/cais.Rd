@@ -21,7 +21,6 @@ cais
 Information about the Child and Adolescent Interpersonal Survey (CAIS).
 }
 \examples{
-instrument("cais")
 summary(cais)
 scales(cais, items = TRUE)
 }

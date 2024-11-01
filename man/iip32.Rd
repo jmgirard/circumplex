@@ -24,7 +24,6 @@ about the IIP-32, Mind Garden Inc. has exclusive rights to distribute it in
 full.
 }
 \examples{
-instrument("iip32")
 summary(iip32)
 }
 \keyword{internal}

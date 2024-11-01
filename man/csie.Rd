@@ -22,7 +22,6 @@ csie
 Information about the Circumplex Scales of Interpersonal Efficacy (CSIE).
 }
 \examples{
-instrument("csie")
 summary(csie)
 scales(csie, items = TRUE)
 }

@@ -21,7 +21,6 @@ csig
 Information about the Circumplex Scales of Intergroup Goals (CSIG).
 }
 \examples{
-instrument("csig")
 summary(csig)
 scales(csig, items = TRUE)
 }

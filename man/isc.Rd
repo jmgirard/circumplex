@@ -21,7 +21,6 @@ isc
 Information about the Interpersonal Sensitivities Circumplex (ISC).
 }
 \examples{
-instrument("isc")
 summary(isc)
 scales(isc, items = TRUE)
 }
