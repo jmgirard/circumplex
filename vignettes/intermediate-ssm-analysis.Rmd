@@ -115,7 +115,7 @@ ssm_table(results3, render = FALSE) %>%
 ssm_plot_circle(results3)
 ```
 
-Note that the borders for the "PARDPD: Male" and "SZTPD: Male" blocks are dashed instead of solid. This indicates that these profiles have low fit (i.e., $R^2<.7$). We could alternatively hide these such profiles by adding `lowfit = FALSE` as below (noting that the color guide may change as profiles are dropped).
+Note that the borders for the "PARPD: Male" and "SZTPD: Male" blocks are dashed instead of solid. This indicates that these profiles have low fit (i.e., $R^2<.7$). We could alternatively hide these such profiles by adding `drop_lowfit = TRUE` as below (noting that the color guide may change as profiles are dropped).
 
 ```{r general_plot2, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 ssm_plot_circle(results3, drop_lowfit = TRUE)

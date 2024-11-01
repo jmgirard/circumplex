@@ -35,29 +35,16 @@ instruments()
 If there are additional circumplex instruments you would like to have added to the package (especially if you are the author/copyright-holder), please [contact me](mailto:me@jmgirard.com). Note that some information (e.g., item text and normative data) may not be available for all instruments due to copyright issues. However, many instruments are released as open-access and have full item text and normative data included in the package.
 
 ### Loading a specific instrument
-To reduce loading time and memory usage, instrument information is not loaded into R's memory when the circumplex package is loaded. Instead, instruments should be loaded into memory on an as-needed basis. As demonstrated below, this can be done by passing an instrument's code (which we saw how to find in the last section) to the `instrument()` function. We can then examine that instrument data using the `print()` function.
+Instrument information is loaded into R's memory when the circumplex package is loaded. We can just refer to each by "code," such as the `csip` code for the Circumplex Scales of Interpersonal Problems.
 
 ```{r}
-instrument("csip")
-print(csip)
-```
-
-Note, however, that an error will result if the `print()` function (or any of the functions to be described later) is called before the `instrument()` function has loaded the data. Order of operations is important!
-
-```{r, error = TRUE, purl = FALSE}
-print(isc)
-```
-
-```{r}
-instrument("isc")
-print(isc)
+csip
 ```
 
 ### Examining an instrument in-depth
-To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the `summary()` function. This will return the same information returned by `print()`, followed by information about the instrument's scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the package  [reference](https://circumplex.jmgirard.com/reference/index.html#section-instrument-data) page.
+To examine the information available about a loaded instrument, there are several options. To print a long list of formatted information about the instrument, use the `summary()` function. This will return information about the instrument's scales, rating scale anchors, items, and normative data set(s). The summary of each instrument is also available from the package  [reference](https://circumplex.jmgirard.com/reference/index.html#section-instrument-data) page.
 
 ```{r}
-instrument("ipipipc")
 summary(ipipipc)
 ```
 
@@ -78,28 +65,15 @@ Some of these functions also have additional arguments to customize their output
 scales(ipipipc, items = TRUE)
 ```
 
-
-An additional, though advanced, option for examining the available information about an instrument is to explore the instrument object itself. This can be done within R using the `View()` function. Note that the first letter in this function (V) must be capitalized. This will open up a data viewer window like the one shown below; it will give you full access to the information stored by the package, albeit in a "raw" format. Don't worry if the image below is confusing or overwhelming; you never have to see it again unless you want to!
-
-```{r, eval=FALSE}
-View(ipipipc)
-```
-
-```{r, echo=FALSE, out.width='100%'}
-knitr::include_graphics("./view_ipipipc.png")
-```
-
-
 ## 3. Instrument-related Tidying Functions
 It is a good idea in practice to digitize and save each participant's response to each item on an instrument, rather than just their scores on each scale. Having access to item-level data will make it easier to spot and correct mistakes, will enable more advanced analysis of missing data, and will enable latent variable models that account for measurement error (e.g., structural equation modeling). Furthermore, the functions described below will make it easy to transform and summarize such item-level data into scale scores.
 
 First, however, we need to make sure the item-level data is in the expected format. Your data should be stored in a data frame where each row corresponds to one observation (e.g., participant, organization, or timepoint) and each column corresponds to one variable describing these observations (e.g., item responses, demographic characteristics, scale scores). The [tidyverse](https://www.tidyverse.org) packages provide excellent tools for getting your data into this format from a variety of different file types and formats.
 
-For the purpose of illustration, we will work with a small-scale data set, which includes item-level responses to the Inventory of Interpersonal Problems, Short Circumplex (IIP-SC) for just 10 participants. As will become important later on, this data set contains a small amount of missing values (represented as `NA`). This data set is included as part of the circumplex package and can be loaded and previewed as follows:
+For the purpose of illustration, we will work with a small-scale data set, which includes item-level responses to the Inventory of Interpersonal Problems, Short Circumplex (IIP-SC) for just 10 participants. As will become important later on, this data set contains a small amount of missing values (represented as `NA`). This data set is included as part of the circumplex package and can be previewed as follows:
 
 ```{r}
-data("raw_iipsc")
-print(raw_iipsc)
+raw_iipsc
 ```
 
 ### Ipsatizing item-level data
@@ -123,7 +97,6 @@ round(rowMeans(ips_iipsc, na.rm = TRUE), 2)
 For many forms of circumplex data analysis (e.g., structural summary method), it can be very helpful to summarize item-level responses by calculating scale scores. This is typically done by averaging a set of items that all measure the same underlying construct (e.g., location in the circumplex model). For example, the IIP-SC has 32 items in total that measure 8 scales representing octants of the interpersonal circumplex model. Thus, a participant's score on each scale is calculated as the arithmetic mean of his or her responses to four specific items. Using the aggregate of multiple similar items produces scale scores with higher reliability than would be achieved by using only a single item per scale. 
 
 ```{r}
-instrument("iipsc")
 scales(iipsc)
 ```
 

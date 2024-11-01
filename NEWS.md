@@ -1,5 +1,7 @@
 # circumplex (development version)
 
+* Fix some typos in documentation
+
 # circumplex 1.0.0
 
 ## Breaking changes
@@ -8,7 +10,7 @@
 
 * Removed support for non-standard evaluation
 
-* The `contrast` argument to `ssm_plot()` is now TRUE or FALSE instead of "none", "model", or "test". Model contrasts were removed and TRUE yields test contrasts.
+* The `contrast` argument to `ssm_analyze()` is now TRUE or FALSE instead of "none", "model", or "test". Model contrasts were removed and TRUE yields test contrasts.
 
 * Many arguments renamed (e.g., `.data` to `data`, `.ssm_object` to `ssm_object`, `xy` to `drop_xy`)
 

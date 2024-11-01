@@ -31,6 +31,7 @@ reference:
   - ipsatize
   - score
   - norm_standardize
+  - self_standardize
 - title: Primary SSM Functions
   desc: Functions for implementing the Structural Summary Method
   contents:

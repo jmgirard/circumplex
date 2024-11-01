@@ -18,13 +18,11 @@ items and each item's number and text. The item ordering/numbering displayed
 here is the same ordering/numbering assumed by the \code{score()} function.
 }
 \examples{
-instrument("csip")
 items(csip)
 }
 \seealso{
 Other instrument functions: 
 \code{\link{anchors}()},
-\code{\link{instrument}()},
 \code{\link{instruments}()},
 \code{\link{norms}()},
 \code{\link{scales}()}

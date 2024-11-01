@@ -61,7 +61,6 @@ summary.circumplex_instrument <- function(object, scales = TRUE, anchors = TRUE,
 #' @family instrument functions
 #' @export
 #' @examples
-#' instrument("csip")
 #' scales(csip)
 #' scales(csip, items = TRUE)
 scales <- function(x, items = FALSE) {
@@ -97,7 +96,6 @@ scales <- function(x, items = FALSE) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' instrument("csip")
 #' items(csip)
 items <- function(x) {
   stopifnot(is_instrument(x))
@@ -130,7 +128,6 @@ items <- function(x) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' instrument("csip")
 #' anchors(csip)
 anchors <- function(x) {
   stopifnot(is_instrument(x))
@@ -158,7 +155,6 @@ anchors <- function(x) {
 #' @family instrument functions
 #' @export
 #' @examples
-#' instrument("csip")
 #' norms(csip)
 norms <- function(x) {
   
@@ -202,45 +198,20 @@ instruments <- function() {
 
   cat(
     "The circumplex package currently includes 14 instruments:\n",
-    "1. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)\n",
-    "2. CSIG: Circumplex Scales of Intergroup Goals (csig)\n",
-    "3. CSIP: Circumplex Scales of Interpersonal Problems (csip)\n",
-    "4. CSIV: Circumplex Scales of Interpersonal Values (csiv)\n",
-    "5. IEI: Interpersonal Emotion Inventory (iei)\n",
-    "6. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)\n",
-    "7. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)\n",
-    "8. IIP-64: Inventory of Interpersonal Problems (iip64)\n",
-    "9. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)\n",
-    "10. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)\n",
-    "11. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
-    "12. IIT-C: Inventory of Influence Tactics Circumplex (iitc)\n",
-    "13. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
-    "14. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
+    "1. CAIS: Child and Adolescent Interpersonal Survey (cais)\n",
+    "2. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)\n",
+    "3. CSIG: Circumplex Scales of Intergroup Goals (csig)\n",
+    "4. CSIP: Circumplex Scales of Interpersonal Problems (csip)\n",
+    "5. CSIV: Circumplex Scales of Interpersonal Values (csiv)\n",
+    "6. IEI: Interpersonal Emotion Inventory (iei)\n",
+    "7. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)\n",
+    "8. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)\n",
+    "9. IIP-64: Inventory of Interpersonal Problems (iip64)\n",
+    "10. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)\n",
+    "11. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)\n",
+    "12. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
+    "13. IIT-C: Inventory of Influence Tactics Circumplex (iitc)\n",
+    "14. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
+    "15. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
   )
-}
-
-#' Load a specific instrument object
-#'
-#' The circumplex package includes information about numerous circumplex
-#' instruments including instructions for scoring and standardizing items to be
-#' used in conjunction with the \code{score} and \code{standardize} functions.
-#' This function loads the information for a specific instrument into memory.
-#' See the \code{instruments} function to list all available instruments.
-#'
-#' @param code Required. A string (e.g., "iip32") or text in non-standard
-#'   evaluation (e.g., iip32). The code of the instrument assigned by this
-#'   package and displayed in parentheses by \code{instruments()}.
-#' @return The instrument object for the requested circumplex instrument. If
-#'   the function is called without a name assignment (LHS), then the object
-#'   will be created in the global environment with the default name as above.
-#'   Or, if a name is assigned (LHS), the object will have that name instead.
-#' @family instrument functions
-#' @export
-#' @examples
-#' instrument("iip32")
-#' x <- instrument("iip32")
-instrument <- function(code) {
-  stopifnot(is.character(code), length(code) == 1)
-  utils::data(list = code)
-  invisible(get(code))
 }

@@ -17,7 +17,6 @@ instruments()
 \seealso{
 Other instrument functions: 
 \code{\link{anchors}()},
-\code{\link{instrument}()},
 \code{\link{items}()},
 \code{\link{norms}()},
 \code{\link{scales}()}

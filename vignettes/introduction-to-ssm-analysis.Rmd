@@ -318,7 +318,7 @@ ggplot2::ggplot() +
   ggforce::geom_circle(
     ggplot2::aes(x0 = 0, y0 = 0, r = 5),
     color = "gray50", 
-    size = 1.5
+    linewidth = 1.5
   ) +
   # Draw outer labels for the octant names
   ggplot2::geom_label(
