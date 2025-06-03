@@ -48,7 +48,7 @@ contrast (e.g., between groups or measures).
 data("jz2017")
 res <- ssm_analyze(
   jz2017,
-  scales = 2:9, 
+  scales = 2:9,
   measures = c("NARPD", "ASPD"),
   contrast = TRUE
 )
