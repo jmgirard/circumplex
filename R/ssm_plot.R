@@ -23,8 +23,6 @@
 #'   angle labels or a vector of empty strings ("") to hide the labels. If not
 #'   NULL, must have the same length and ordering as the `angles` argument to
 #'   `ssm_analyze()`. (default = NULL)
-#' @param legend.box.spacing A double corresponding to the distance (in inches)
-#'   to add between the data plot and the legend (default = 0).
 #' @param palette A string corresponding to the palette to be used from
 #'   ColorBrewer for the color and fill aesthetics. If set to NULL, all points
 #'   will appear blue and no legend will be there (useful for showing the
@@ -52,7 +50,6 @@ ssm_plot_circle <- function(ssm_object,
                             drop_lowfit = FALSE,
                             repel = FALSE,
                             angle_labels = NULL,
-                            legend.box.spacing = 0,
                             palette = "Set2",
                             vary_shapes = FALSE,
                             ...) {
@@ -87,7 +84,7 @@ ssm_plot_circle <- function(ssm_object,
     df_plot[["Label"]],
     levels = unique(as.character(df_plot[["Label"]]))
   )
-  nLabels <- nlevels(df_plot$Label)
+  n_labels <- nlevels(df_plot$Label)
 
   # Remove profiles with low model fit (unless overrided)
   n <- nrow(df_plot)
@@ -97,9 +94,9 @@ ssm_plot_circle <- function(ssm_object,
       stop("After removing profiles with low fit, there were none left to plot.")
     }
   }
-
   df_plot[["lnty"]] <- ifelse(df_plot[["fit_est"]] >= .70, "solid", "dotted")
 
+  ## Create circle base
   p <-
     circle_base(
       angles = angles,
@@ -108,60 +105,56 @@ ssm_plot_circle <- function(ssm_object,
       labels = angle_labels
     ) +
     ggplot2::scale_color_brewer(palette = palette) +
-    ggplot2::scale_fill_brewer(palette = palette)
+    ggplot2::scale_fill_brewer(palette = palette) +
+    ggplot2::scale_linetype_identity() +
+    ggplot2::theme(
+      legend.position = ifelse(repel | n_labels == 1, "none", "right"),
+      legend.text = ggplot2::element_text(size = legend_font_size)
+    )
 
-  if (is.null(palette)) {
-    p <- p +
-      ggforce::geom_arc_bar(
-        data = df_plot,
-        mapping = ggplot2::aes(
-          x0 = 0,
-          y0 = 0,
-          r0 = .data$a_lci,
-          r = .data$a_uci,
-          start = .data$d_lci,
-          end = .data$d_uci
-        ),
-        fill = "cornflowerblue",
-        color = "cornflowerblue",
-        alpha = 0.4,
-        linewidth = 1
-      ) +
-      ggplot2::geom_point(
-        data = df_plot,
-        mapping = ggplot2::aes(
-          x = .data$x_est,
-          y = .data$y_est
-        ),
-        shape = 21,
-        size = 3,
-        color = "black",
-        fill = "cornflowerblue"
-      ) +
-      ggplot2::scale_linetype_identity() +
-      ggplot2::theme(legend.position = "none")
+  ## Add arc bars
+  p <- p +
+    ggforce::geom_arc_bar(
+      data = df_plot,
+      mapping = ggplot2::aes(
+        x0 = 0,
+        y0 = 0,
+        r0 = .data$a_lci,
+        r = .data$a_uci,
+        start = .data$d_lci,
+        end = .data$d_uci,
+        fill = .data$Label,
+        color = .data$Label,
+        linetype = .data$lnty
+      ),
+      alpha = 0.4,
+      linewidth = 1
+    )
+
+  ## Add points
+  if (vary_shapes) {
+      stopifnot(n_labels <= 5)
+      p <- p +
+        ggplot2::geom_point(
+          data = df_plot,
+          mapping = ggplot2::aes(
+            x = .data$x_est,
+            y = .data$y_est,
+            fill = .data$Label,
+            shape = .data$Label
+          ),
+          size = 3,
+          color = "black"
+        ) +
+        ggplot2::scale_shape_manual(values = 21:(21 + n_labels - 1)) +
+        ggplot2::guides(
+          color = ggplot2::guide_legend("Profile"),
+          fill = ggplot2::guide_legend("Profile"),
+          shape = ggplot2::guide_legend("Profile")
+        )
   } else {
-    if (vary_shapes) {
-      stopifnot(nLabels <= 5)
-      point <- ggplot2::geom_point(
-        data = df_plot,
-        mapping = ggplot2::aes(
-          x = .data$x_est,
-          y = .data$y_est,
-          fill = .data$Label,
-          shape = .data$Label
-        ),
-        size = 3,
-        color = "black"
-      ) +
-        ggplot2::scale_shape_manual(values = 21:(21 + nlevels - 1))
-      guides <- ggplot2::guides(
-        color = ggplot2::guide_legend("Profile"),
-        fill = ggplot2::guide_legend("Profile"),
-        shape = ggplot2::guide_legend("Profile")
-      )
-    } else {
-      point <- ggplot2::geom_point(
+    p <- p +
+      ggplot2::geom_point(
         data = df_plot,
         mapping = ggplot2::aes(
           x = .data$x_est,
@@ -171,40 +164,14 @@ ssm_plot_circle <- function(ssm_object,
         shape = 21,
         size = 3,
         color = "black"
-      )
-      guides <- ggplot2::guides(
+      ) +
+      ggplot2::guides(
         color = ggplot2::guide_legend("Profile"),
         fill = ggplot2::guide_legend("Profile")
       )
-    }
-
-    p <- p +
-      ggforce::geom_arc_bar(
-        data = df_plot,
-        mapping = ggplot2::aes(
-          x0 = 0,
-          y0 = 0,
-          r0 = .data$a_lci,
-          r = .data$a_uci,
-          start = .data$d_lci,
-          end = .data$d_uci,
-          fill = .data$Label,
-          color = .data$Label,
-          linetype = .data$lnty
-        ),
-        alpha = 0.4,
-        linewidth = 1
-      ) +
-      point +
-      guides +
-      ggplot2::theme(
-        legend.text = ggplot2::element_text(size = legend_font_size),
-        legend.box.spacing = ggplot2::unit(legend.box.spacing, "in")
-      ) +
-      ggplot2::scale_linetype_identity()
   }
 
-  if (repel == TRUE) {
+  if (repel) {
     requireNamespace("ggrepel")
     p <- p +
       ggrepel::geom_label_repel(
@@ -218,8 +185,7 @@ ssm_plot_circle <- function(ssm_object,
         direction = "y",
         hjust = 1,
         size = legend_font_size / 2.8346438836889
-      ) +
-      ggplot2::theme(legend.position = "none")
+      )
   }
 
   p

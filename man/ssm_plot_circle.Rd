@@ -12,7 +12,6 @@ ssm_plot_circle(
   drop_lowfit = FALSE,
   repel = FALSE,
   angle_labels = NULL,
-  legend.box.spacing = 0,
   palette = "Set2",
   vary_shapes = FALSE,
   ...
@@ -43,9 +42,6 @@ the circle for each scale. Can also specify NULL to default to numerical
 angle labels or a vector of empty strings ("") to hide the labels. If not
 NULL, must have the same length and ordering as the \code{angles} argument to
 \code{ssm_analyze()}. (default = NULL)}
-
-\item{legend.box.spacing}{A double corresponding to the distance (in inches)
-to add between the data plot and the legend (default = 0).}
 
 \item{palette}{A string corresponding to the palette to be used from
 ColorBrewer for the color and fill aesthetics. If set to NULL, all points
