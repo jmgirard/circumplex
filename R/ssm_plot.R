@@ -29,9 +29,9 @@
 #'   ColorBrewer for the color and fill aesthetics. If set to NULL, all points
 #'   will appear blue and no legend will be there (useful for showing the
 #'   coverage of a high number of variables).
-#' @param vary_shape A logical determining whether profiles should each get
-#'   their own shape or vary only by fill color. This only works well when
-#'   the number of profiles is relatively small. (default = FALSE)
+#' @param vary_shapes A logical determining whether profiles should each get
+#'   their own shape or vary only by fill color. This only works when the number
+#'   of profiles is five or less. (default = FALSE)
 #' @param ... Currently ignored.
 #' @return A ggplot variable containing a completed circular plot.
 #' @export
@@ -54,7 +54,7 @@ ssm_plot_circle <- function(ssm_object,
                             angle_labels = NULL,
                             legend.box.spacing = 0,
                             palette = "Set2",
-                            vary_shape = FALSE,
+                            vary_shapes = FALSE,
                             ...) {
 
   df <- ssm_object$results
@@ -87,6 +87,7 @@ ssm_plot_circle <- function(ssm_object,
     df_plot[["Label"]],
     levels = unique(as.character(df_plot[["Label"]]))
   )
+  nLabels <- nlevels(df_plot$Label)
 
   # Remove profiles with low model fit (unless overrided)
   n <- nrow(df_plot)
@@ -140,7 +141,8 @@ ssm_plot_circle <- function(ssm_object,
       ggplot2::scale_linetype_identity() +
       ggplot2::theme(legend.position = "none")
   } else {
-    if (vary_shape) {
+    if (vary_shapes) {
+      stopifnot(nLabels <= 5)
       point <- ggplot2::geom_point(
         data = df_plot,
         mapping = ggplot2::aes(
@@ -151,7 +153,8 @@ ssm_plot_circle <- function(ssm_object,
         ),
         size = 3,
         color = "black"
-      )
+      ) +
+        ggplot2::scale_shape_manual(values = 21:(21 + nlevels - 1))
       guides <- ggplot2::guides(
         color = ggplot2::guide_legend("Profile"),
         fill = ggplot2::guide_legend("Profile"),

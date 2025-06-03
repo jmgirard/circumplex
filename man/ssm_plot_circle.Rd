@@ -14,7 +14,7 @@ ssm_plot_circle(
   angle_labels = NULL,
   legend.box.spacing = 0,
   palette = "Set2",
-  vary_shape = FALSE,
+  vary_shapes = FALSE,
   ...
 )
 }
@@ -52,9 +52,9 @@ ColorBrewer for the color and fill aesthetics. If set to NULL, all points
 will appear blue and no legend will be there (useful for showing the
 coverage of a high number of variables).}
 
-\item{vary_shape}{A logical determining whether profiles should each get
-their own shape or vary only by fill color. This only works well when
-the number of profiles is relatively small. (default = FALSE)}
+\item{vary_shapes}{A logical determining whether profiles should each get
+their own shape or vary only by fill color. This only works when the number
+of profiles is five or less. (default = FALSE)}
 
 \item{...}{Currently ignored.}
 }
