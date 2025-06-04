@@ -2,15 +2,20 @@
 #'
 #' Return a vector of abbreviations for octant circumplex scales, from PA to NO.
 #'
+#' @param case An optional string the determines whether the abbreviations should be
+#'   in uppercase or lowercase. (default = "upper")
 #' @return A character vector with eight elements, each corresponding to the
 #'   abbreviation of an octant subscale: PA, BC, DE, FG, HI, JK, LM, NO.
 #' @export
 #' @usage PANO()
 #' @examples
 #' PANO()
-#' 
-PANO <- function() {
-  c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+#'
+PANO <- function(case = c("upper", "lower")) {
+  case <- match.arg(case)
+  out <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  if (case == "lower") out <- tolower(out)
+  out
 }
 
 #' Angular displacements for octant circumplex scales

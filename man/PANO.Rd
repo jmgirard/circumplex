@@ -6,6 +6,10 @@
 \usage{
 PANO()
 }
+\arguments{
+\item{case}{An optional string the determines whether the abbreviations should be
+in uppercase or lowercase. (default = "upper")}
+}
 \value{
 A character vector with eight elements, each corresponding to the
 abbreviation of an octant subscale: PA, BC, DE, FG, HI, JK, LM, NO.
