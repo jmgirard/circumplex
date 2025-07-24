@@ -4,8 +4,7 @@ test_that("Single-group mean-based SSM plot is correct", {
   p <- ssm_plot_circle(res)
 
   # Test the output object
-  expect_type(p, "list")
-  expect_s3_class(p, "ggplot")
+  expect_true(ggplot2::is_ggplot(p))
   vdiffr::expect_doppelganger("single group mean ssm", p)
 
   p2 <- ssm_plot_circle(res, palette = NULL)
@@ -21,8 +20,7 @@ test_that("Single-group correlation-based SSM plot is correct", {
   p <- ssm_plot_circle(res)
   
   # Test the output object
-  expect_type(p, "list")
-  expect_s3_class(p, "ggplot")
+  expect_true(ggplot2::is_ggplot(p))
   vdiffr::expect_doppelganger("single group correlation ssm", p)
 })
 
@@ -37,15 +35,13 @@ test_that("Measure-contrast SSM plot is correct", {
   p <- ssm_plot_contrast(res, drop_xy = TRUE)
 
   # Test the output object
-  expect_type(p, "list")
-  expect_s3_class(p, "ggplot")
+  expect_true(ggplot2::is_ggplot(p))
   vdiffr::expect_doppelganger("measure-contrast ssm", p)
   
   p2 <- ssm_plot_circle(res, drop_xy = TRUE)
   
   # Test the output object
-  expect_type(p2, "list")
-  expect_s3_class(p2, "ggplot")
+  expect_true(ggplot2::is_ggplot(p))
   vdiffr::expect_doppelganger("measure-contrast-circle ssm", p2)
   
   p3 <- ssm_plot_curve(res, drop_lowfit = TRUE)
@@ -64,8 +60,7 @@ test_that("Group-contrast correlation-based SSM plot is correct", {
   p <- ssm_plot_contrast(res)
 
   # Test the output object
-  expect_type(p, "list")
-  expect_s3_class(p, "ggplot")
+  expect_true(ggplot2::is_ggplot(p))
   vdiffr::expect_doppelganger("group-constrast correlation ssm", p)
 })
 
