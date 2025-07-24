@@ -510,7 +510,7 @@ circle_base <- function(angles, labels = NULL, amin = 0,
       ),
       color = "gray20",
       fill = "white",
-      linewidth = NA,
+      label.size = NA,
       size = fontsize / 2.8346438836889
     ) +
     # Draw labels for displacement scale
@@ -522,7 +522,7 @@ circle_base <- function(angles, labels = NULL, amin = 0,
       ),
       color = "gray20",
       fill = "transparent",
-      linewidth = NA,
+      label.size = NA,
       hjust = "outward",
       vjust = "outward",
       size = fontsize / 2.8346438836889
