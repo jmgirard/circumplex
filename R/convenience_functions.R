@@ -7,12 +7,13 @@
 #' @return A character vector with eight elements, each corresponding to the
 #'   abbreviation of an octant subscale: PA, BC, DE, FG, HI, JK, LM, NO.
 #' @export
-#' @usage PANO()
+#' @usage PANO(case = "upper")
 #' @examples
 #' PANO()
+#' PANO(case = "lower")
 #'
-PANO <- function(case = c("upper", "lower")) {
-  case <- match.arg(case)
+PANO <- function(case = "upper") {
+  case <- match.arg(case, choices = c("upper", "lower"))
   out <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
   if (case == "lower") out <- tolower(out)
   out

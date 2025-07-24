@@ -85,64 +85,107 @@ ssm_table(results, drop_xy = TRUE)
 ```
 
 <table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+
 <caption style="font-size: initial !important;">
+
 Correlation-based Structural Summary Statistics with 95% CIs
 </caption>
+
 <thead>
+
 <tr>
+
 <th style="text-align:left;">
+
 Profile
 </th>
+
 <th style="text-align:left;">
+
 Elevation
 </th>
+
 <th style="text-align:left;">
+
 Amplitude
 </th>
+
 <th style="text-align:left;">
+
 Displacement
 </th>
+
 <th style="text-align:left;">
+
 Fit
 </th>
+
 </tr>
+
 </thead>
+
 <tbody>
+
 <tr>
+
 <td style="text-align:left;">
+
 Narcissistic PD
 </td>
+
 <td style="text-align:left;">
+
 0.20 (0.17, 0.24)
 </td>
+
 <td style="text-align:left;">
+
 0.19 (0.15, 0.23)
 </td>
+
 <td style="text-align:left;">
+
 109.0 (98.6, 118.5)
 </td>
+
 <td style="text-align:left;">
+
 0.957
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:left;">
+
 Antisocial PD
 </td>
+
 <td style="text-align:left;">
+
 0.12 (0.09, 0.16)
 </td>
+
 <td style="text-align:left;">
+
 0.23 (0.19, 0.26)
 </td>
+
 <td style="text-align:left;">
+
 115.9 (107.3, 124.2)
 </td>
+
 <td style="text-align:left;">
+
 0.964
 </td>
+
 </tr>
+
 </tbody>
+
 </table>
 
 ``` r
@@ -214,81 +257,136 @@ ssm_table(results2, drop_xy = TRUE)
 ```
 
 <table class="table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
+
 <caption style="font-size: initial !important;">
+
 Correlation-based Structural Summary Statistics with 95% CIs
 </caption>
+
 <thead>
+
 <tr>
+
 <th style="text-align:left;">
+
 Contrast
 </th>
+
 <th style="text-align:left;">
+
 Elevation
 </th>
+
 <th style="text-align:left;">
+
 Amplitude
 </th>
+
 <th style="text-align:left;">
+
 Displacement
 </th>
+
 <th style="text-align:left;">
+
 Fit
 </th>
+
 </tr>
+
 </thead>
+
 <tbody>
+
 <tr>
+
 <td style="text-align:left;">
+
 Female
 </td>
+
 <td style="text-align:left;">
+
 0.95 (0.91, 0.98)
 </td>
+
 <td style="text-align:left;">
+
 0.55 (0.51, 0.60)
 </td>
+
 <td style="text-align:left;">
+
 326.0 (322.2, 330.1)
 </td>
+
 <td style="text-align:left;">
+
 0.889
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:left;">
+
 Male
 </td>
+
 <td style="text-align:left;">
+
 0.88 (0.84, 0.92)
 </td>
+
 <td style="text-align:left;">
+
 0.29 (0.26, 0.33)
 </td>
+
 <td style="text-align:left;">
+
 320.7 (313.5, 327.8)
 </td>
+
 <td style="text-align:left;">
+
 0.824
 </td>
+
 </tr>
+
 <tr>
+
 <td style="text-align:left;">
+
 Male - Female
 </td>
+
 <td style="text-align:left;">
+
 -0.06 (-0.12, -0.01)
 </td>
+
 <td style="text-align:left;">
+
 -0.26 (-0.32, -0.20)
 </td>
+
 <td style="text-align:left;">
+
 -5.3 (-13.4, 2.8)
 </td>
+
 <td style="text-align:left;">
+
 -0.066
 </td>
+
 </tr>
+
 </tbody>
+
 </table>
 
 ``` r
