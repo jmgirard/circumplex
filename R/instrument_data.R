@@ -21,7 +21,7 @@
 #'   complementarity in dyadic interactions: Integrating interpersonal and
 #'   social-cognitive theory. *Personality and Social Psychology Bulletin,
 #'   33*(1), 94-109.
-#' @source \url{https://www.webpages.uidaho.edu/klocke/csie.htm}
+#' @source \url{https://kennethlocke.org/CSIE/CSIE.html}
 #' @keywords internal
 #' @examples
 #' summary(csie)
@@ -35,7 +35,7 @@
 #' @source Locke, K. D. (2014). Circumplex scales of intergroup goals: An
 #'   interpersonal circle model of goals for interactions between groups.
 #'   *Personality and Social Psychology Bulletin, 40*(4), 433-449.
-#' @source \url{https://www.webpages.uidaho.edu/klocke/csig.htm}
+#' @source \url{https://kennethlocke.org/CSIG/CSIG.html}
 #' @keywords internal
 #' @examples
 #' summary(csig)
@@ -63,7 +63,7 @@
 #' @source Locke, K. D. (2000). Circumplex scales of interpersonal values:
 #'   Reliability, validity, and applicability to interpersonal problems and
 #'   personality disorders. *Journal of Personality Assessment, 75*(2), 249-267.
-#' @source \url{https://www.webpages.uidaho.edu/klocke/csiv.htm}
+#' @source \url{https://kennethlocke.org/CSIV/CSIV.html}
 #' @keywords internal
 #' @examples
 #' summary(csiv)
@@ -79,6 +79,7 @@
 #'   validation of the interpersonal emotion inventory. *Journal of Personality
 #'   Assessment*. Advanced online publication.
 #' @source \doi{10.1080/00223891.2024.2400266}
+#' @source \url{https://kennethlocke.org/IEI/IEI.html}
 #' @keywords internal
 #' @examples
 #' summary(iei)

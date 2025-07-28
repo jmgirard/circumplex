@@ -18,7 +18,7 @@ coverage](https://codecov.io/gh/jmgirard/circumplex/graph/badge.svg)](https://ap
 The goal of *circumplex* is to provide a powerful, flexible, and
 user-friendly way to analyze and visualize circumplex data. It was
 created and is maintained by [Jeffrey
-Girard](https://affcom.ku.edu/girard); it was inspired by work from and
+Girard](https://affcom.ku.edu/girard/); it was inspired by work from and
 was developed under advisement from [Johannes
 Zimmermann](https://www.uni-kassel.de/fb01/institute/institut-fuer-psychologie/fachgebiete/differentielle-psychologie/prof-dr-johannes-zimmermann)
 and [Aidan Wright](https://sites.lsa.umich.edu/aidangcw-lab/). You can

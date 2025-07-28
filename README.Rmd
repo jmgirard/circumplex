@@ -27,7 +27,7 @@ set.seed(12345)
 
 <!-- badges: end -->
 
-The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by [Jeffrey Girard](https://affcom.ku.edu/girard); it was inspired by work from and was developed under advisement from [Johannes Zimmermann](https://www.uni-kassel.de/fb01/institute/institut-fuer-psychologie/fachgebiete/differentielle-psychologie/prof-dr-johannes-zimmermann) and [Aidan Wright](https://sites.lsa.umich.edu/aidangcw-lab/). You can learn more about using this package through the vignette articles available on the [package website](https://circumplex.jmgirard.com/) or through `?circumplex`.
+The goal of *circumplex* is to provide a powerful, flexible, and user-friendly way to analyze and visualize circumplex data. It was created and is maintained by [Jeffrey Girard](https://affcom.ku.edu/girard/); it was inspired by work from and was developed under advisement from [Johannes Zimmermann](https://www.uni-kassel.de/fb01/institute/institut-fuer-psychologie/fachgebiete/differentielle-psychologie/prof-dr-johannes-zimmermann) and [Aidan Wright](https://sites.lsa.umich.edu/aidangcw-lab/). You can learn more about using this package through the vignette articles available on the [package website](https://circumplex.jmgirard.com/) or through `?circumplex`.
 
 ## Installation
 
