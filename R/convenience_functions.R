@@ -7,7 +7,6 @@
 #' @return A character vector with eight elements, each corresponding to the
 #'   abbreviation of an octant subscale: PA, BC, DE, FG, HI, JK, LM, NO.
 #' @export
-#' @usage PANO(case = "upper")
 #' @examples
 #' PANO()
 #' PANO(case = "lower")
@@ -29,7 +28,6 @@ PANO <- function(case = "upper") {
 #'   angular displacement (in degrees) of a subscale, in the following order:
 #'   PA, BC, DE, FG, HI, JK, LM, NO.
 #' @export
-#' @usage octants()
 #' @examples
 #' octants()
 octants <- function() {
@@ -46,7 +44,6 @@ octants <- function() {
 #'   angular displacement (in degrees) of a subscale, in the following order:
 #'   PA, DE, HI, LM.
 #' @export
-#' @usage poles()
 #' @examples
 #' poles()
 poles <- function() {
@@ -63,7 +60,6 @@ poles <- function() {
 #'   angular displacement (in degrees) of a subscale, in the following order:
 #'   BC, FG, JK, NO.
 #' @export
-#' @usage quadrants()
 #' @examples
 #' quadrants()
 quadrants <- function() {
