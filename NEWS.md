@@ -1,5 +1,7 @@
 # circumplex (development version)
 
+# circumplex 1.0.1
+
 ## New features
 
 * Add the `self_standardize()` function for standardizing variables using sample means and SDs
@@ -7,6 +9,8 @@
 ## Minor improvements and fixes
 
 * Fix some typos in documentation
+
+* Change plot tests to accommodate changes to ggplot2
 
 # circumplex 1.0.0
 
