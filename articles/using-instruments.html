@@ -6,16 +6,15 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Using Circumplex Instruments • circumplex</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Using Circumplex Instruments">
 </head>
 <body>
@@ -26,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +83,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Using Circumplex Instruments</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/v1.0.0/vignettes/using-instruments.Rmd" class="external-link"><code>vignettes/using-instruments.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/using-instruments.Rmd" class="external-link"><code>vignettes/using-instruments.Rmd</code></a></small>
       <div class="d-none name"><code>using-instruments.Rmd</code></div>
     </div>
 
@@ -112,9 +111,9 @@ instruments currently available in the circumplex package, how to load
 information about a specific instrument for use in analysis, and how to
 extract general and specific information about that instrument. The
 following functions will be discussed: <code><a href="../reference/instruments.html">instruments()</a></code>,
-<code><a href="../reference/instrument.html">instrument()</a></code>, <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>,
-<code><a href="../reference/scales.html">scales()</a></code>, <code><a href="../reference/items.html">items()</a></code>, <code><a href="../reference/anchors.html">anchors()</a></code>,
-<code><a href="../reference/norms.html">norms()</a></code>, and <code><a href="https://rdrr.io/r/utils/View.html" class="external-link">View()</a></code>.</p>
+<code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, <code><a href="../reference/scales.html">scales()</a></code>,
+<code><a href="../reference/items.html">items()</a></code>, <code><a href="../reference/anchors.html">anchors()</a></code>, <code><a href="../reference/norms.html">norms()</a></code>, and
+<code><a href="https://rdrr.io/r/utils/View.html" class="external-link">View()</a></code>.</p>
 <p>The second part of this vignette will discuss how to use the
 information about an instrument to transform and summarize circumplex
 data. It will demonstrate how to ipsatize item-level responses (i.e.,
@@ -141,20 +140,21 @@ instrument. We will return to the code in the next section.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/instruments.html">instruments</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; The circumplex package currently includes 14 instruments:</span></span>
-<span><span class="co">#&gt;  1. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)</span></span>
-<span><span class="co">#&gt;  2. CSIG: Circumplex Scales of Intergroup Goals (csig)</span></span>
-<span><span class="co">#&gt;  3. CSIP: Circumplex Scales of Interpersonal Problems (csip)</span></span>
-<span><span class="co">#&gt;  4. CSIV: Circumplex Scales of Interpersonal Values (csiv)</span></span>
-<span><span class="co">#&gt;  5. IEI: Interpersonal Emotion Inventory (iei)</span></span>
-<span><span class="co">#&gt;  6. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)</span></span>
-<span><span class="co">#&gt;  7. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)</span></span>
-<span><span class="co">#&gt;  8. IIP-64: Inventory of Interpersonal Problems (iip64)</span></span>
-<span><span class="co">#&gt;  9. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)</span></span>
-<span><span class="co">#&gt;  10. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)</span></span>
-<span><span class="co">#&gt;  11. IIS-64: Inventory of Interpersonal Strengths (iis64)</span></span>
-<span><span class="co">#&gt;  12. IIT-C: Inventory of Influence Tactics Circumplex (iitc)</span></span>
-<span><span class="co">#&gt;  13. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)</span></span>
-<span><span class="co">#&gt;  14. ISC: Interpersonal Sensitivities Circumplex (isc)</span></span></code></pre></div>
+<span><span class="co">#&gt;  1. CAIS: Child and Adolescent Interpersonal Survey (cais)</span></span>
+<span><span class="co">#&gt;  2. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)</span></span>
+<span><span class="co">#&gt;  3. CSIG: Circumplex Scales of Intergroup Goals (csig)</span></span>
+<span><span class="co">#&gt;  4. CSIP: Circumplex Scales of Interpersonal Problems (csip)</span></span>
+<span><span class="co">#&gt;  5. CSIV: Circumplex Scales of Interpersonal Values (csiv)</span></span>
+<span><span class="co">#&gt;  6. IEI: Interpersonal Emotion Inventory (iei)</span></span>
+<span><span class="co">#&gt;  7. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)</span></span>
+<span><span class="co">#&gt;  8. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)</span></span>
+<span><span class="co">#&gt;  9. IIP-64: Inventory of Interpersonal Problems (iip64)</span></span>
+<span><span class="co">#&gt;  10. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)</span></span>
+<span><span class="co">#&gt;  11. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)</span></span>
+<span><span class="co">#&gt;  12. IIS-64: Inventory of Interpersonal Strengths (iis64)</span></span>
+<span><span class="co">#&gt;  13. IIT-C: Inventory of Influence Tactics Circumplex (iitc)</span></span>
+<span><span class="co">#&gt;  14. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)</span></span>
+<span><span class="co">#&gt;  15. ISC: Interpersonal Sensitivities Circumplex (isc)</span></span></code></pre></div>
 <p>If there are additional circumplex instruments you would like to have
 added to the package (especially if you are the
 author/copyright-holder), please <a href="mailto:me@jmgirard.com">contact me</a>. Note that some information
@@ -166,37 +166,17 @@ included in the package.</p>
 <div class="section level3">
 <h3 id="loading-a-specific-instrument">Loading a specific instrument<a class="anchor" aria-label="anchor" href="#loading-a-specific-instrument"></a>
 </h3>
-<p>To reduce loading time and memory usage, instrument information is
-not loaded into R’s memory when the circumplex package is loaded.
-Instead, instruments should be loaded into memory on an as-needed basis.
-As demonstrated below, this can be done by passing an instrument’s code
-(which we saw how to find in the last section) to the
-<code><a href="../reference/instrument.html">instrument()</a></code> function. We can then examine that instrument
-data using the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> function.</p>
+<p>Instrument information is loaded into R’s memory when the circumplex
+package is loaded. We can just refer to each by “code,” such as the
+<code>csip</code> code for the Circumplex Scales of Interpersonal
+Problems. The code is an object in R’s environment, so do not put it in
+quotes.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/instrument.html">instrument</a></span><span class="op">(</span><span class="st">"csip"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">csip</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">csip</span></span>
 <span><span class="co">#&gt; CSIP: Circumplex Scales of Interpersonal Problems</span></span>
 <span><span class="co">#&gt; 64 items, 8 scales, 1 normative data sets</span></span>
 <span><span class="co">#&gt; Boudreaux, Ozer, Oltmanns, &amp; Wright (2018)</span></span>
 <span><span class="co">#&gt; &lt;https://doi.org/10.1037/pas0000505&gt;</span></span></code></pre></div>
-<p>Note, however, that an error will result if the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>
-function (or any of the functions to be described later) is called
-before the <code><a href="../reference/instrument.html">instrument()</a></code> function has loaded the data. Order
-of operations is important!</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">isc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ISC: Interpersonal Sensitivities Circumplex</span></span>
-<span><span class="co">#&gt; 64 items, 8 scales, 1 normative data sets</span></span>
-<span><span class="co">#&gt; Hopwood et al. (2011)</span></span>
-<span><span class="co">#&gt; &lt;https://doi.org/10.1111/j.1467-6494.2011.00696.x&gt;</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/instrument.html">instrument</a></span><span class="op">(</span><span class="st">"isc"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">isc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ISC: Interpersonal Sensitivities Circumplex</span></span>
-<span><span class="co">#&gt; 64 items, 8 scales, 1 normative data sets</span></span>
-<span><span class="co">#&gt; Hopwood et al. (2011)</span></span>
-<span><span class="co">#&gt; &lt;https://doi.org/10.1111/j.1467-6494.2011.00696.x&gt;</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="examining-an-instrument-in-depth">Examining an instrument in-depth<a class="anchor" aria-label="anchor" href="#examining-an-instrument-in-depth"></a>
@@ -204,14 +184,12 @@ of operations is important!</p>
 <p>To examine the information available about a loaded instrument, there
 are several options. To print a long list of formatted information about
 the instrument, use the <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> function. This will
-return the same information returned by <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, followed
-by information about the instrument’s scales, rating scale anchors,
+return information about the instrument’s scales, rating scale anchors,
 items, and normative data set(s). The summary of each instrument is also
 available from the package <a href="https://circumplex.jmgirard.com/reference/index.html#section-instrument-data" class="external-link">reference</a>
 page.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/instrument.html">instrument</a></span><span class="op">(</span><span class="st">"ipipipc"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ipipipc</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">ipipipc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; IPIP-IPC: IPIP Interpersonal Circumplex</span></span>
 <span><span class="co">#&gt; 32 items, 8 scales, 1 normative data sets</span></span>
 <span><span class="co">#&gt; Markey &amp; Markey (2009)</span></span>
@@ -278,7 +256,7 @@ using the <code><a href="../reference/scales.html">scales()</a></code>, <code><a
 functions are especially useful when you need to know a specific bit of
 information about an instrument and don’t want the console to be flooded
 with unneeded information.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/anchors.html">anchors</a></span><span class="op">(</span><span class="va">ipipipc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; The IPIP-IPC is rated using the following 5-point scale.</span></span>
 <span><span class="co">#&gt; 1. Very Inaccurate</span></span>
@@ -286,7 +264,7 @@ with unneeded information.</p>
 <span><span class="co">#&gt; 3. Neither Inaccurate nor Accurate</span></span>
 <span><span class="co">#&gt; 4. Moderately Accurate</span></span>
 <span><span class="co">#&gt; 5. Very Accurate</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/norms.html">norms</a></span><span class="op">(</span><span class="va">ipipipc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; The IPIP-IPC currently has 1 normative data set(s):</span></span>
 <span><span class="co">#&gt; 1. 274 American college students</span></span>
@@ -296,7 +274,7 @@ with unneeded information.</p>
 their output. For instance, the <code><a href="../reference/scales.html">scales()</a></code> function has the
 <code>items</code> argument, which will display the items for each scale
 when set to <code>TRUE</code>.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/scales.html">scales</a></span><span class="op">(</span><span class="va">ipipipc</span>, items <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; The IPIP-IPC contains 8 circumplex scales.</span></span>
 <span><span class="co">#&gt; PA: Assured-Dominant (90 degrees)</span></span>
@@ -339,18 +317,6 @@ when set to <code>TRUE</code>.</p>
 <span><span class="co">#&gt;     13. Start conversations</span></span>
 <span><span class="co">#&gt;     21. Talk to a lot of different people at parties</span></span>
 <span><span class="co">#&gt;     29. Love large parties</span></span></code></pre></div>
-<p>An additional, though advanced, option for examining the available
-information about an instrument is to explore the instrument object
-itself. This can be done within R using the <code><a href="https://rdrr.io/r/utils/View.html" class="external-link">View()</a></code>
-function. Note that the first letter in this function (V) must be
-capitalized. This will open up a data viewer window like the one shown
-below; it will give you full access to the information stored by the
-package, albeit in a “raw” format. Don’t worry if the image below is
-confusing or overwhelming; you never have to see it again unless you
-want to!</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="va">ipipipc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="view_ipipipc.png" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -377,11 +343,10 @@ set, which includes item-level responses to the Inventory of
 Interpersonal Problems, Short Circumplex (IIP-SC) for just 10
 participants. As will become important later on, this data set contains
 a small amount of missing values (represented as <code>NA</code>). This
-data set is included as part of the circumplex package and can be loaded
-and previewed as follows:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"raw_iipsc"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">raw_iipsc</span><span class="op">)</span></span>
+data set is included as part of the circumplex package and can be
+previewed as follows:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">raw_iipsc</span></span>
 <span><span class="co">#&gt;    IIP01 IIP02 IIP03 IIP04 IIP05 IIP06 IIP07 IIP08 IIP09 IIP10 IIP11 IIP12</span></span>
 <span><span class="co">#&gt; 1      0     0     0     0     1     0     1     0     2     1     0     0</span></span>
 <span><span class="co">#&gt; 2      1     1     0     0     3     2     2     1     0     1     0     1</span></span>
@@ -428,7 +393,7 @@ factor across all items and recasts the item-level responses as
 deviations from one’s own mean rather than absolute responses. To
 perform ipsatizing and create a new set of ipsatized responses to each
 item, use the <code><a href="../reference/ipsatize.html">ipsatize()</a></code> function.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ips_iipsc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ipsatize.html">ipsatize</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">raw_iipsc</span>, items <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">32</span>, append <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ips_iipsc</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       IIP01_i    IIP02_i    IIP03_i    IIP04_i    IIP05_i    IIP06_i    IIP07_i</span></span>
@@ -502,7 +467,7 @@ original and ipsatized data frames. We do this below using the
 function to make the results fit on one row. As expected, we find below
 that the mean of each participant is zero in the ipsatized data frame
 but not in the original.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">raw_iipsc</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] 1.00 0.94 1.41 2.29 0.62 0.28 0.50 0.74 0.97 0.22</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">ips_iipsc</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
@@ -522,9 +487,8 @@ calculated as the arithmetic mean of his or her responses to four
 specific items. Using the aggregate of multiple similar items produces
 scale scores with higher reliability than would be achieved by using
 only a single item per scale.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/instrument.html">instrument</a></span><span class="op">(</span><span class="st">"iipsc"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/scales.html">scales</a></span><span class="op">(</span><span class="va">iipsc</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/scales.html">scales</a></span><span class="op">(</span><span class="va">iipsc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; The IIP-SC contains 8 circumplex scales.</span></span>
 <span><span class="co">#&gt; PA: Domineering (90 degrees)</span></span>
 <span><span class="co">#&gt; BC: Vindictive (135 degrees)</span></span>
@@ -551,7 +515,7 @@ ordering of the items must be the same as that assumed by the
 package</strong>. Be sure to check your item numbers against those
 displayed by the <code><a href="../reference/items.html">items()</a></code> function, especially if you
 shuffle your items.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scale_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/score.html">score</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">raw_iipsc</span>, </span>
 <span>  items <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">32</span>, </span>
@@ -607,7 +571,7 @@ sample.</p>
 the IIP-SC. Below we see that there are two options: a rather large
 sample of American college students and a rather small sample of
 American psychiatric outpatients.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/norms.html">norms</a></span><span class="op">(</span><span class="va">iipsc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; The IIP-SC currently has 2 normative data set(s):</span></span>
 <span><span class="co">#&gt; 1. 872 American college students</span></span>
@@ -628,7 +592,7 @@ we can call the <code><a href="../reference/norm_standardize.html">norm_standard
 output of this function to a data frame named <code>z_scales</code> to
 reflect the idea that standardized scores are often called
 “z-scores.”</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">z_scales</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/norm_standardize.html">norm_standardize</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">scale_scores</span>, </span>
 <span>  scales <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, </span>
@@ -696,7 +660,7 @@ MindGarden Inc.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
