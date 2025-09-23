@@ -1,6 +1,12 @@
 # circumplex (development version)
 
-# circumplex 1.0.1
+# circumplex 1.0.2
+
+## Minor improvements and fixes
+
+* Update RcppArmadillo dependency
+
+* Fix some deprecated ggplot args
 
 # circumplex 1.0.1
 
