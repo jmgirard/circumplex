@@ -98,7 +98,7 @@ double pairwise_r(arma::colvec x, arma::colvec y) {
   arma::uword n = x.size();
   arma::vec keep = arma::zeros<arma::vec>(n);
   for (arma::uword i = 0; i < n; i++) {
-    if (arma::is_finite(x(i)) && arma::is_finite(y(i))) {
+    if (std::isfinite(x(i)) && std::isfinite(y(i))) {
       keep(i) = 1;
     }
   }
