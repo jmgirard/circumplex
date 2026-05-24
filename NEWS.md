@@ -1,6 +1,16 @@
 # circumplex (development version)
 
-# circumplex 1.0.2
+# circumplex 1.1.0
+
+## Minor improvements and fixes
+
+* Improve handling of radian distributions crossing the 0/2pi boundary
+
+* Add unit tests regarding the above cases
+
+* Optimize pairwise correlation C++ code
+
+* Fix bug with angular median calculation retaining rejected candidates
 
 # circumplex 1.0.2
 
@@ -182,7 +192,7 @@
 
 ## New features
 
-* New `iitc` provides instrument information for the Inventory of Influence 
+* New `iitc` provides instrument information for the Inventory of Influence
   Tactics Circumplex.
 
 ## Minor improvements and fixes
@@ -211,9 +221,9 @@
 
 ## New features
 
-* New `ssm_parameters()` calculates SSM parameters (without 
+* New `ssm_parameters()` calculates SSM parameters (without
   confidence intervals) from a vector of scores.
-  
+
 * New `ssm_score()` calculates SSM parameters by row.
 
 * Added support for older versions of R (3.3.x).

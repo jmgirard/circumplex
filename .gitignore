@@ -8,3 +8,5 @@ src/*.dll
 src-i386
 src-x64
 docs/
+/doc/
+/Meta/

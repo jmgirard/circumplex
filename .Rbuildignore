@@ -17,3 +17,5 @@
 ^\.covrignore$
 ^README\.md$
 ^CRAN-SUBMISSION$
+^doc$
+^Meta$

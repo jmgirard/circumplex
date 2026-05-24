@@ -68,7 +68,7 @@ scales(ipipipc, items = TRUE)
 ## 3. Instrument-related Tidying Functions
 It is a good idea in practice to digitize and save each participant's response to each item on an instrument, rather than just their scores on each scale. Having access to item-level data will make it easier to spot and correct mistakes, will enable more advanced analysis of missing data, and will enable latent variable models that account for measurement error (e.g., structural equation modeling). Furthermore, the functions described below will make it easy to transform and summarize such item-level data into scale scores.
 
-First, however, we need to make sure the item-level data is in the expected format. Your data should be stored in a data frame where each row corresponds to one observation (e.g., participant, organization, or timepoint) and each column corresponds to one variable describing these observations (e.g., item responses, demographic characteristics, scale scores). The [tidyverse](https://www.tidyverse.org) packages provide excellent tools for getting your data into this format from a variety of different file types and formats.
+First, however, we need to make sure the item-level data is in the expected format. Your data should be stored in a data frame where each row corresponds to one observation (e.g., participant, organization, or timepoint) and each column corresponds to one variable describing these observations (e.g., item responses, demographic characteristics, scale scores). The [tidyverse](https://tidyverse.org) packages provide excellent tools for getting your data into this format from a variety of different file types and formats.
 
 For the purpose of illustration, we will work with a small-scale data set, which includes item-level responses to the Inventory of Interpersonal Problems, Short Circumplex (IIP-SC) for just 10 participants. As will become important later on, this data set contains a small amount of missing values (represented as `NA`). This data set is included as part of the circumplex package and can be previewed as follows:
 
@@ -94,7 +94,7 @@ round(rowMeans(ips_iipsc, na.rm = TRUE), 2)
 ```
 
 ### Scoring item-level data
-For many forms of circumplex data analysis (e.g., structural summary method), it can be very helpful to summarize item-level responses by calculating scale scores. This is typically done by averaging a set of items that all measure the same underlying construct (e.g., location in the circumplex model). For example, the IIP-SC has 32 items in total that measure 8 scales representing octants of the interpersonal circumplex model. Thus, a participant's score on each scale is calculated as the arithmetic mean of his or her responses to four specific items. Using the aggregate of multiple similar items produces scale scores with higher reliability than would be achieved by using only a single item per scale. 
+For many forms of circumplex data analysis (e.g., structural summary method), it can be very helpful to summarize item-level responses by calculating scale scores. This is typically done by averaging a set of items that all measure the same underlying construct (e.g., location in the circumplex model). For example, the IIP-SC has 32 items in total that measure 8 scales representing octants of the interpersonal circumplex model. Thus, a participant's score on each scale is calculated as the arithmetic mean of his or her responses to four specific items. Using the aggregate of multiple similar items produces scale scores with higher reliability than would be achieved by using only a single item per scale.
 
 ```{r}
 scales(iipsc)
@@ -106,9 +106,9 @@ To demonstrate, let's return to the `raw_iipsc` data set. We need to give the `s
 
 ```{r}
 scale_scores <- score(
-  data = raw_iipsc, 
-  items = 1:32, 
-  instrument = iipsc, 
+  data = raw_iipsc,
+  items = 1:32,
+  instrument = iipsc,
   append = FALSE
 )
 print(scale_scores)
@@ -116,7 +116,7 @@ print(scale_scores)
 
 Because we set `append` to FALSE, the `scale_scores` data frame contains only the scale score variables. These were named using the scale abbreviations shown by the `scales()` function (i.e., two-letter abbreviations from PA to NO). You can customize the naming of these variables by using the `prefix` and `suffix` arguments (e.g., to make them IIP_PA to IIP_NO).
 
-Note that the `na.rm` argument for the `score()` function defaulted to `TRUE`, which means that missing values were ignored in calculating the scale scores. This practice is common in the literature, but is technically a form of single imputation and thus can produce biased results when data are not missing completely at random (MCAR). Please examine and report the amount and patterns of missingness in your data. 
+Note that the `na.rm` argument for the `score()` function defaulted to `TRUE`, which means that missing values were ignored in calculating the scale scores. This practice is common in the literature, but is technically a form of single imputation and thus can produce biased results when data are not missing completely at random (MCAR). Please examine and report the amount and patterns of missingness in your data.
 
 ### Standardizing scale-level data
 Finally, it can often be helpful to transform scale-level data through reference to a normative or comparison sample. This is often called "norm standardizing" and involves subtracting the normative sample's mean score on a scale from each participant's score on that scale and then dividing this difference by the normative sample's standard deviation. This rescales the scale scores to be in standard deviation units and to describe the magnitude of each participant's difference from the normative average.
@@ -135,8 +135,8 @@ To transform the scale scores we calculated during the last section, we can call
 
 ```{r}
 z_scales <- norm_standardize(
-  data = scale_scores, 
-  scales = 1:8, 
+  data = scale_scores,
+  scales = 1:8,
   instrument = iipsc,
   sample = 1,
   append = FALSE
