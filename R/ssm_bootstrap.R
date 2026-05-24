@@ -1,9 +1,9 @@
 # Perform bootstrap to get confidence intervals around SSM parameters
-ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL, 
+ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
                           angles, boots, interval, contrast, listwise, ...) {
 
   # Perform bootstrapping ------------------------------------------------------
-  bs_results <- 
+  bs_results <-
     boot::boot(
       data = bs_input,
       statistic = bs_function,
@@ -21,14 +21,20 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
   bs_t <- bs_results$t
   bs_t <- as.data.frame(bs_t)
   colnames(bs_t) <- paste0(
-    c("e", "x", "y", "a", "d", "fit"), 
+    c("e", "x", "y", "a", "d", "fit"),
     rep(1:nrow(bs_est), each = 6)
   )
-  
+
   # Set the units of the displacement results to radians -----------------------
   if (contrast) {
-    # Don't set to rad for contrasted d parameter (we want to allow negatives)
+    # Convert individual group d variables to standard radian class
     d_vars <- 1:((ncol(bs_t) - 6) / 6) * 6 - 1
+
+    # Target the contrasted d parameter and apply the contrast class
+    contrast_d_vars <- ncol(bs_t) - 1
+    bs_t[contrast_d_vars] <- lapply(bs_t[contrast_d_vars], function(x) {
+      structure(x, class = c("circumplex_contrast_radian", "numeric"))
+    })
   } else {
     d_vars <- 1:(ncol(bs_t) / 6) * 6 - 1
   }
@@ -47,19 +53,19 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
   # Combine the results in one data frame and convert radians to degrees -------
   out <- cbind(bs_est, bs_lci, bs_uci)
   out[c("d_est", "d_lci", "d_uci")] <- lapply(
-    out[c("d_est", "d_lci", "d_uci")], 
+    out[c("d_est", "d_lci", "d_uci")],
     function(x) as_degree(as_radian(x))
   )
-  
+
   out
 }
 
 # Calculate SSM parameters per group (or parameter differences)
 ssm_by_group <- function(scores, angles, contrast) {
-  
-  # Calculate SSM parameters per group  
+
+  # Calculate SSM parameters per group
   results <- group_parameters(scores, angles)
-  
+
   # If contrasting, append SSM parameter differences
   if (contrast) {
     results <- c(results, param_diff(results[7:12], results[1:6]))
@@ -79,4 +85,15 @@ quantile.circumplex_radian <- function(x, na.rm = TRUE, ...) {
   out <- (quantiles_centered + mean_angle) %% (2 * pi)
   out[abs(out - (2 * pi)) < (.Machine$double.eps * 2)] <- 0
   as_radian(out)
+}
+
+# Calculate quantiles for circular contrast data in radians (allowing negatives)
+#' @export
+quantile.circumplex_contrast_radian <- function(x, na.rm = TRUE, ...) {
+  if (all(is.na(x))) return(NA)
+  x <- unclass(x)
+  mean_angle <- atan2(mean(sin(x), na.rm = na.rm), mean(cos(x), na.rm = na.rm))
+  angles_centered <- (x - mean_angle + pi) %% (2 * pi) - pi
+  quantiles_centered <- stats::quantile(angles_centered, na.rm = na.rm, ...)
+  quantiles_centered + mean_angle
 }
