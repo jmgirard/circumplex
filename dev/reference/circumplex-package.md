@@ -38,6 +38,9 @@ Useful links:
 
 Authors:
 
+- Jeffrey Girard <me@jmgirard.com>
+  ([ORCID](https://orcid.org/0000-0002-7359-3746))
+
 - Johannes Zimmermann ([ORCID](https://orcid.org/0000-0001-6975-2356))
 
 - Aidan Wright ([ORCID](https://orcid.org/0000-0002-2369-0601))
