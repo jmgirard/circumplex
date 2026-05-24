@@ -2,9 +2,17 @@
 
 ## circumplex (development version)
 
-## circumplex 1.0.2
+## circumplex 1.1.0
 
-CRAN release: 2025-09-23
+### Minor improvements and fixes
+
+- Improve handling of radian distributions crossing the 0/2pi boundary
+
+- Add unit tests regarding the above cases
+
+- Optimize pairwise correlation C++ code
+
+- Fix bug with angular median calculation retaining rejected candidates
 
 ## circumplex 1.0.2
 

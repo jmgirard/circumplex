@@ -278,7 +278,7 @@ expected format. Your data should be stored in a data frame where each
 row corresponds to one observation (e.g., participant, organization, or
 timepoint) and each column corresponds to one variable describing these
 observations (e.g., item responses, demographic characteristics, scale
-scores). The [tidyverse](https://www.tidyverse.org) packages provide
+scores). The [tidyverse](https://tidyverse.org) packages provide
 excellent tools for getting your data into this format from a variety of
 different file types and formats.
 
@@ -482,9 +482,9 @@ function, especially if you shuffle your items.
 ``` r
 
 scale_scores <- score(
-  data = raw_iipsc, 
-  items = 1:32, 
-  instrument = iipsc, 
+  data = raw_iipsc,
+  items = 1:32,
+  instrument = iipsc,
   append = FALSE
 )
 print(scale_scores)
@@ -571,8 +571,8 @@ reflect the idea that standardized scores are often called “z-scores.”
 ``` r
 
 z_scales <- norm_standardize(
-  data = scale_scores, 
-  scales = 1:8, 
+  data = scale_scores,
+  scales = 1:8,
   instrument = iipsc,
   sample = 1,
   append = FALSE

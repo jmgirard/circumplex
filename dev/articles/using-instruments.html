@@ -336,7 +336,7 @@ expected format. Your data should be stored in a data frame where each
 row corresponds to one observation (e.g., participant, organization, or
 timepoint) and each column corresponds to one variable describing these
 observations (e.g., item responses, demographic characteristics, scale
-scores). The <a href="https://www.tidyverse.org" class="external-link">tidyverse</a> packages
+scores). The <a href="https://tidyverse.org" class="external-link">tidyverse</a> packages
 provide excellent tools for getting your data into this format from a
 variety of different file types and formats.</p>
 <p>For the purpose of illustration, we will work with a small-scale data
@@ -518,9 +518,9 @@ displayed by the <code><a href="../reference/items.html">items()</a></code> func
 shuffle your items.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">scale_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/score.html">score</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">raw_iipsc</span>, </span>
-<span>  items <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">32</span>, </span>
-<span>  instrument <span class="op">=</span> <span class="va">iipsc</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">raw_iipsc</span>,</span>
+<span>  items <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">32</span>,</span>
+<span>  instrument <span class="op">=</span> <span class="va">iipsc</span>,</span>
 <span>  append <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">scale_scores</span><span class="op">)</span></span>
@@ -595,8 +595,8 @@ reflect the idea that standardized scores are often called
 “z-scores.”</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">z_scales</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/norm_standardize.html">norm_standardize</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">scale_scores</span>, </span>
-<span>  scales <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">scale_scores</span>,</span>
+<span>  scales <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>,</span>
 <span>  instrument <span class="op">=</span> <span class="va">iipsc</span>,</span>
 <span>  sample <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  append <span class="op">=</span> <span class="cn">FALSE</span></span>
