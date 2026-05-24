@@ -49,7 +49,7 @@ double angle_median(NumericVector x) {
     dev_val = angle_dev(x, x[i]);
     if(((dev_val - minimum) / n) < -DBL_EPSILON) {
       minimum = dev_val;
-      candidates[0] = x[i];
+      candidates = NumericVector::create(x[i]);
     } else if (fabs(dev_val - minimum) <= 1e-8) {
       candidates.push_back(x[i]);
     }

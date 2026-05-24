@@ -94,13 +94,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // pairwise_r
-double pairwise_r(arma::colvec x, arma::colvec y);
+double pairwise_r(const arma::colvec& x, const arma::colvec& y);
 RcppExport SEXP _circumplex_pairwise_r(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::colvec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::colvec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type y(ySEXP);
     rcpp_result_gen = Rcpp::wrap(pairwise_r(x, y));
     return rcpp_result_gen;
 END_RCPP

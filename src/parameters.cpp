@@ -10,7 +10,7 @@ using namespace arma;
 double inner(arma::vec x, arma::vec y) {
   arma::mat ip = x.t() * y;
   return ip(0);
-} 
+}
 
 // Calculate non-integer modulus
 double modu(double x, double y) {
@@ -54,7 +54,7 @@ arma::rowvec col_means(arma::mat x) {
     y = y.elem(find_finite(y));
     out(i) = arma::mean(y);
   }
-  return out; 
+  return out;
 }
 
 // Calculate the mean of each column in scales by group
@@ -72,7 +72,7 @@ arma::mat mean_scores(arma::mat cs, arma::vec grp, bool lwd) {
       // Single group and PWD
       out = col_means(cs);
     }
-  } else{ 
+  } else{
     if (lwd == true) {
       // Multiple groups and LWD
       for (int g(0); g < ng; g++) {
@@ -94,17 +94,26 @@ arma::mat mean_scores(arma::mat cs, arma::vec grp, bool lwd) {
 
 // Calculate the correlation of x and y vectors after pairwise deletion
 // [[Rcpp::export]]
-double pairwise_r(arma::colvec x, arma::colvec y) {
-  arma::uword n = x.size();
-  arma::vec keep = arma::zeros<arma::vec>(n);
+double pairwise_r(const arma::colvec& x, const arma::colvec& y) {
+  arma::uword n = x.n_elem;
+  arma::uvec keep(n);
+  arma::uword count = 0;
+
   for (arma::uword i = 0; i < n; i++) {
     if (std::isfinite(x(i)) && std::isfinite(y(i))) {
-      keep(i) = 1;
+      keep(count) = i;
+      count++;
     }
   }
-  arma::vec x2 = x.rows(arma::find(keep == 1));
-  arma::vec y2 = y.rows(arma::find(keep == 1));
-  arma::mat r = arma::cor(x2, y2);
+
+  // A valid correlation requires at least two data points
+  if (count < 2) {
+    return NA_REAL;
+  }
+
+  // Slice out exactly the number of matching indices found
+  arma::uvec valid_indices = keep.head(count);
+  arma::mat r = arma::cor(x.elem(valid_indices), y.elem(valid_indices));
   return r(0, 0);
 }
 
@@ -131,7 +140,7 @@ arma::mat corr_scores(arma::mat cs, arma::mat mv, arma::vec grp, bool lwd) {
         }
       }
     }
-  } else{ 
+  } else{
     if (lwd == true) {
       // Multiple groups and LWD
       for (arma::uword g = 0; g < ng; g++) {
