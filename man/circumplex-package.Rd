@@ -39,6 +39,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Jeffrey Girard \email{me@jmgirard.com} (\href{https://orcid.org/0000-0002-7359-3746}{ORCID})
   \item Johannes Zimmermann (\href{https://orcid.org/0000-0001-6975-2356}{ORCID})
   \item Aidan Wright (\href{https://orcid.org/0000-0002-2369-0601}{ORCID})
 }

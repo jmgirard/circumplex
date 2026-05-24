@@ -22,7 +22,7 @@ HTML syntax for the \code{df} table.
 Format a data frame as an HTML table and render it to the web viewer.
 }
 \seealso{
-Other table functions: 
-\code{\link{ssm_table}()}
+Other table functions:
+\code{\link[=ssm_table]{ssm_table()}}
 }
 \concept{table functions}

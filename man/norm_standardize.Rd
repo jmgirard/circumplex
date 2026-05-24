@@ -60,9 +60,9 @@ data("jz2017")
 norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
 }
 \seealso{
-Other tidying functions: 
-\code{\link{ipsatize}()},
-\code{\link{score}()},
-\code{\link{self_standardize}()}
+Other tidying functions:
+\code{\link[=ipsatize]{ipsatize()}},
+\code{\link[=score]{score()}},
+\code{\link[=self_standardize]{self_standardize()}}
 }
 \concept{tidying functions}

@@ -22,10 +22,10 @@ exists that is not yet included in the package, please let us know.
 norms(csip)
 }
 \seealso{
-Other instrument functions: 
-\code{\link{anchors}()},
-\code{\link{instruments}()},
-\code{\link{items}()},
-\code{\link{scales}()}
+Other instrument functions:
+\code{\link[=anchors]{anchors()}},
+\code{\link[=instruments]{instruments()}},
+\code{\link[=items]{items()}},
+\code{\link[=scales]{scales()}}
 }
 \concept{instrument functions}

@@ -21,10 +21,10 @@ here is the same ordering/numbering assumed by the \code{score()} function.
 items(csip)
 }
 \seealso{
-Other instrument functions: 
-\code{\link{anchors}()},
-\code{\link{instruments}()},
-\code{\link{norms}()},
-\code{\link{scales}()}
+Other instrument functions:
+\code{\link[=anchors]{anchors()}},
+\code{\link[=instruments]{instruments()}},
+\code{\link[=norms]{norms()}},
+\code{\link[=scales]{scales()}}
 }
 \concept{instrument functions}

@@ -24,10 +24,10 @@ scales(csip)
 scales(csip, items = TRUE)
 }
 \seealso{
-Other instrument functions: 
-\code{\link{anchors}()},
-\code{\link{instruments}()},
-\code{\link{items}()},
-\code{\link{norms}()}
+Other instrument functions:
+\code{\link[=anchors]{anchors()}},
+\code{\link[=instruments]{instruments()}},
+\code{\link[=items]{items()}},
+\code{\link[=norms]{norms()}}
 }
 \concept{instrument functions}

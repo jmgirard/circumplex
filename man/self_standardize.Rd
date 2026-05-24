@@ -50,9 +50,9 @@ same data frame with each specified variable transformed into standard scores
 self_standardize(aw2009, scales = 1:8)
 }
 \seealso{
-Other tidying functions: 
-\code{\link{ipsatize}()},
-\code{\link{norm_standardize}()},
-\code{\link{score}()}
+Other tidying functions:
+\code{\link[=ipsatize]{ipsatize()}},
+\code{\link[=norm_standardize]{norm_standardize()}},
+\code{\link[=score]{score()}}
 }
 \concept{tidying functions}

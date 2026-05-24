@@ -50,13 +50,13 @@ ssm_table(res)
 
 }
 \seealso{
-Other ssm functions: 
-\code{\link{ssm_analyze}()},
-\code{\link{ssm_parameters}()},
-\code{\link{ssm_score}()}
+Other ssm functions:
+\code{\link[=ssm_analyze]{ssm_analyze()}},
+\code{\link[=ssm_parameters]{ssm_parameters()}},
+\code{\link[=ssm_score]{ssm_score()}}
 
-Other table functions: 
-\code{\link{html_render}()}
+Other table functions:
+\code{\link[=html_render]{html_render()}}
 }
 \concept{ssm functions}
 \concept{table functions}

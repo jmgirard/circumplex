@@ -21,10 +21,10 @@ response options that respondants select from (e.g., 0 = No, 1 = Yes).
 anchors(csip)
 }
 \seealso{
-Other instrument functions: 
-\code{\link{instruments}()},
-\code{\link{items}()},
-\code{\link{norms}()},
-\code{\link{scales}()}
+Other instrument functions:
+\code{\link[=instruments]{instruments()}},
+\code{\link[=items]{items()}},
+\code{\link[=norms]{norms()}},
+\code{\link[=scales]{scales()}}
 }
 \concept{instrument functions}

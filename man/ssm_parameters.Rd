@@ -71,14 +71,14 @@ ssm_parameters(scores, prefix = "IIP_")
 
 }
 \seealso{
-Other ssm functions: 
-\code{\link{ssm_analyze}()},
-\code{\link{ssm_score}()},
-\code{\link{ssm_table}()}
+Other ssm functions:
+\code{\link[=ssm_analyze]{ssm_analyze()}},
+\code{\link[=ssm_score]{ssm_score()}},
+\code{\link[=ssm_table]{ssm_table()}}
 
-Other analysis functions: 
-\code{\link{ssm_analyze}()},
-\code{\link{ssm_score}()}
+Other analysis functions:
+\code{\link[=ssm_analyze]{ssm_analyze()}},
+\code{\link[=ssm_score]{ssm_score()}}
 }
 \concept{analysis functions}
 \concept{ssm functions}

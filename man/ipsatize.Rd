@@ -44,9 +44,9 @@ ipsatize(raw_iipsc, items = 1:32)
 ipsatize(raw_iipsc, items = sprintf("IIP\%02d", 1:32))
 }
 \seealso{
-Other tidying functions: 
-\code{\link{norm_standardize}()},
-\code{\link{score}()},
-\code{\link{self_standardize}()}
+Other tidying functions:
+\code{\link[=norm_standardize]{norm_standardize()}},
+\code{\link[=score]{score()}},
+\code{\link[=self_standardize]{self_standardize()}}
 }
 \concept{tidying functions}
