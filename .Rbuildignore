@@ -19,3 +19,9 @@
 ^CRAN-SUBMISSION$
 ^doc$
 ^Meta$
+^\.claude$
+^CLAUDE\.md$
+^DESIGN\.md$
+^ROADMAP\.md$
+^MILESTONES\.md$
+^\.DS_Store$
