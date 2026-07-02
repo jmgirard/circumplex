@@ -1,10 +1,46 @@
 # Active milestone
 
-## M1 — Correctness & robustness patch (v1.2.0)
+## M2 — Inference quality (v1.3.0)
 
-Source: ROADMAP.md Milestone 1 (2026-07 audit). Every bug fix lands with a
-regression test that fails on the pre-fix code. Order below is suggested
-(independent tasks; bugs before guardrails before docs).
+Source: ROADMAP.md Milestone 2. Upgrades to the existing bootstrap machinery;
+no new statistical scope. Per ROADMAP.md's CRAN release strategy, this
+milestone is bundled with M3 (ggplot2 extension) into a single v1.3.0 CRAN
+submission — keep both milestones' work on GitHub until both are done, then
+run `/release-checklist` once.
+
+### Tasks
+
+- [ ] **Parallel bootstrapping** via `boot`'s built-in `parallel`/`ncpus`
+  arguments, exposed through `ssm_analyze()`.
+- [ ] **BCa confidence intervals** as an option alongside percentile intervals
+  (default unchanged for reproducibility; BCa needs care for circular
+  displacement — likely percentile-only for `d`, BCa for e/x/y/a).
+- [ ] **Monte Carlo alternative to bootstrapping**: sample SSM parameters from
+  the asymptotic sampling distribution of the mean vector / correlation
+  vector (multivariate normal with estimated covariance), propagate through
+  the parameter transformation. Validate against bootstrap results on
+  `jz2017`.
+- [ ] **Vectorize `ssm_score()`** (currently row-wise `apply` + `rbind` of
+  data frames): elevation/x/y are single matrix products; amplitude,
+  displacement, and fit follow element-wise.
+- [ ] Seed/reproducibility documentation for all resampling paths.
+- [ ] **Continuous-track item to do first**: named, long-format internal
+  results assembly (`ssm_bootstrap()` identifies displacement columns by
+  positional arithmetic `d_vars <- 1:(ncol/6)*6 - 1`; `reshape_params()`
+  assumes a fixed 6-parameter block). Replace with named columns / one-row-
+  per-parameter internal format before starting the interval work above,
+  which touches exactly this code (per ROADMAP.md continuous track).
+
+## Log
+
+(none yet)
+
+# Completed milestones
+
+## M1 — Correctness & robustness patch (v1.2.0) — released 2026-07-02, CRAN-approved
+
+Source: ROADMAP.md Milestone 1 (2026-07 audit). Every bug fix landed with a
+regression test that failed on the pre-fix code.
 
 ### Bugs
 
@@ -71,7 +107,7 @@ regression test that fails on the pre-fix code. Order below is suggested
 - [x] R CMD check clean on CI matrix; NEWS.md updated per user-facing change;
   version to 1.2.0; `/release-checklist`.
 
-## Log
+### Final log
 
 - 2026-07-02 — Milestone opened from audit. Scaffolding added (CLAUDE.md,
   DESIGN.md, ROADMAP.md, MILESTONES.md, skills), `.Rbuildignore` updated.
@@ -245,7 +281,11 @@ regression test that fails on the pre-fix code. Order below is suggested
   test-coverage.yaml and pkgdown.yaml also green. M1 fully complete —
   package is CRAN-submission-ready pending the user's own
   `devtools::submit_cran()` (never run by the assistant).
-
-# Completed milestones
-
-(none yet — move finished milestones here with their final log)
+- 2026-07-02 — win-builder R-devel clean; cran-comments.md updated to record
+  it. ROADMAP.md gained a CRAN release strategy section (decouple GitHub
+  milestones from CRAN submissions; M1 solo, bundle M2+M3, flagship M4).
+  Fixed a NEWS.md line-wrap artifact (lone "0" digit on its own line).
+- 2026-07-02 — **v1.2.0 approved by CRAN.** Post-acceptance: tagged `v1.2.0`;
+  deleted the regenerated `CRAN-SUBMISSION` file; DESCRIPTION bumped to
+  `1.2.0.9000`; NEWS.md gained a fresh `# circumplex (development version)`
+  heading; milestone moved here to Completed; M2 promoted to the active slot.
