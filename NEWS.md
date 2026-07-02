@@ -1,5 +1,10 @@
 # circumplex (development version)
 
+* Printing an SSM object (via `print()` or `summary()`) now adds a note under
+  any profile whose model fit is inadequate (R-squared < .70; interpret only
+  elevation) or whose amplitude confidence interval includes zero (the
+  displacement is not interpretable). The notes apply to profiles only, not to
+  contrast rows.
 * Contrast displacement estimates and their confidence intervals are now
   always reported on the same angular branch. Previously, for contrasts near
   ±180 degrees, the estimate (reported in (-180, 180]) could fall numerically

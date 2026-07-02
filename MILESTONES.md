@@ -38,7 +38,7 @@ regression test that fails on the pre-fix code. Order below is suggested
 
 ### Guardrails & UX
 
-- [ ] **G1.** `print`/`summary.circumplex_ssm` note when fit < .70 or the
+- [x] **G1.** `print`/`summary.circumplex_ssm` note when fit < .70 or the
   amplitude CI includes 0 (displacement not interpretable).
 - [ ] **G2.** Document displacement boundary convention (0° prints as 360°),
   or normalize; decide once, record in DESIGN.md.
@@ -135,6 +135,17 @@ regression test that fails on the pre-fix code. Order below is suggested
   rotation equivariance. Review: 1 finding (stale CLAUDE.md invariant bullet)
   fixed. ALL M1 BUGS COMPLETE. (R/ssm_bootstrap.R, tests, CLAUDE.md,
   DESIGN.md, NEWS.md).
+- 2026-07-02 — G1 (Opus): print/summary.circumplex_ssm now note when a profile
+  has fit < .70 ("interpret only elevation") or amplitude CI includes 0
+  ("displacement not interpretable"). Profile rows only (contrast fit/amplitude
+  are differences, not prototypicality). "Includes 0" operationalized as
+  round(a_lci, digits) <= 0 since amplitude is structurally >= 0 (real profiles
+  ~0.003; flat ~6e-17) — note tracks the displayed precision, so it stays
+  consistent with the printed table. summary() inherits via print(). Non-ASCII
+  R-squared written as ² (check 0/0/0). Review: inline (proportionate to a
+  ~20-line print change); no other snapshot/expect_output affected; vignette
+  summaries will gain notes on low-fit profiles (non-breaking).
+  (R/ssm_oop.R, tests/testthat/test-ssm_oop.R, NEWS.md).
 
 # Completed milestones
 

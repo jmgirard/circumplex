@@ -144,6 +144,26 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
       sep = ""
     )
     print.default(m, print.gap = 3L, na.print = "")
+
+    # Interpretation guardrails (profiles only; a contrast's fit/amplitude are
+    # differences, not prototypicality measures, so these notes do not apply)
+    is_contrast_row <- x$details$contrast && i == nrow(x$results)
+    if (!is_contrast_row) {
+      if (is.na(dat$fit_est) || dat$fit_est < 0.70) {
+        cat(
+          "  Note: model fit is inadequate (R\u00b2 < .70); ",
+          "interpret only the elevation parameter.\n",
+          sep = ""
+        )
+      }
+      if (is.na(dat$a_lci) || round(dat$a_lci, digits) <= 0) {
+        cat(
+          "  Note: the amplitude CI includes zero; ",
+          "the displacement is not interpretable.\n",
+          sep = ""
+        )
+      }
+    }
     cat("\n")
   }
 }
