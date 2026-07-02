@@ -40,7 +40,14 @@ invocation unless the user names several.
    under the development version heading if user-facing.
 
 8. **Report.** Summarize what changed, test evidence, and what task is next.
-   Do not commit unless the user asked.
+
+9. **Offer to commit.** Do not commit automatically. End the report by offering
+   a commit with a proposed message (subject `<what> (M<milestone>/<task id>)`,
+   a short body, and the `Co-Authored-By` trailer), and wait for the user to
+   confirm. They may want to batch, squash, reword, or hold. If the user has
+   already said to commit (this task or as a standing instruction), just do it.
+   When committing, keep unrelated already-staged work out, and note anything
+   left uncommitted (e.g. untracked files not in scope).
 
 ## Rules
 
