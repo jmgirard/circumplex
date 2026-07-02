@@ -471,3 +471,46 @@ test_that("ssm_score forwards the angles argument", {
   )
 })
 
+test_that("measures_labels length is validated", {
+  data("jz2017")
+
+  # Wrong number of labels must error (regression: was silently accepted)
+  expect_error(
+    ssm_analyze(
+      jz2017,
+      scales = 2:9,
+      measures = c("NARPD", "ASPD"),
+      measures_labels = "Narcissistic",
+      boots = 1
+    ),
+    "measures_labels"
+  )
+
+  # Labels without measures must error rather than be silently ignored
+  expect_error(
+    ssm_analyze(jz2017, scales = 2:9, measures_labels = "Mean", boots = 1),
+    "measures_labels"
+  )
+
+  # Correct number of labels still works and is used in the output
+  set.seed(12345)
+  res <- ssm_analyze(
+    jz2017,
+    scales = 2:9,
+    measures = c("NARPD", "ASPD"),
+    measures_labels = c("Narcissistic", "Antisocial"),
+    boots = 1
+  )
+  expect_equal(res$results$Label, c("Narcissistic", "Antisocial"))
+
+  # NULL remains the default and works
+  set.seed(12345)
+  res_null <- ssm_analyze(
+    jz2017,
+    scales = 2:9,
+    measures = c("NARPD", "ASPD"),
+    boots = 1
+  )
+  expect_equal(res_null$results$Label, c("NARPD", "ASPD"))
+})
+

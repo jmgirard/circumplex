@@ -29,6 +29,20 @@ test_that("assertions work", {
   expect_false(is_count(-1))
 })
 
+test_that("is_null_or_char enforces the n argument", {
+  # NULL is always accepted, with or without n
+  expect_true(is_null_or_char(NULL))
+  expect_true(is_null_or_char(NULL, n = 2))
+  # Without n, any character vector is accepted
+  expect_true(is_null_or_char(c("a", "b")))
+  # With n, length must match (regression: n was silently dropped)
+  expect_true(is_null_or_char(c("a", "b"), n = 2))
+  expect_false(is_null_or_char(c("a", "b"), n = 1))
+  expect_false(is_null_or_char("a", n = 2))
+  # Non-character input is still rejected
+  expect_false(is_null_or_char(1, n = 1))
+})
+
 test_that("rescale works", {
   expect_equal(rescale(1:3), c(0.0, 0.5, 1.0))
 })

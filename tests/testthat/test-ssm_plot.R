@@ -1,5 +1,6 @@
 test_that("Single-group mean-based SSM plot is correct", {
   data("aw2009")
+  set.seed(12345)
   res <- ssm_analyze(aw2009, scales = 1:8)
   p <- ssm_plot_circle(res)
 
@@ -16,6 +17,7 @@ test_that("Single-group mean-based SSM plot is correct", {
 
 test_that("Single-group correlation-based SSM plot is correct", {
   data("jz2017")
+  set.seed(12345)
   res <- ssm_analyze(jz2017, scales = 2:9, measures = "PARPD")
   p <- ssm_plot_circle(res)
   
@@ -26,6 +28,7 @@ test_that("Single-group correlation-based SSM plot is correct", {
 
 test_that("Measure-contrast SSM plot is correct", {
   data("jz2017")
+  set.seed(12345)
   res <- ssm_analyze(
     jz2017,
     scales = 2:9,
@@ -50,6 +53,7 @@ test_that("Measure-contrast SSM plot is correct", {
 
 test_that("Group-contrast correlation-based SSM plot is correct", {
   data("jz2017")
+  set.seed(12345)
   res <- ssm_analyze(
     jz2017, 
     scales = 2:9, 
@@ -72,6 +76,7 @@ test_that("Removing plots with low fit works as expected", {
 
 test_that("many plots works as expected", {
   data("jz2017")
+  set.seed(12345)
   res <- ssm_analyze(jz2017, scales = 2:9, measures = 10:13)
   p <- ssm_plot_circle(res)
   vdiffr::expect_doppelganger("many_circle-plots", p)

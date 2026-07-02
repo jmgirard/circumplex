@@ -143,7 +143,7 @@ is_char <- function(x, n = NULL) {
 }
 
 is_null_or_char <- function(x, n = NULL) {
-  is.null(x) || is_char(x, n = NULL)
+  is.null(x) || is_char(x, n = n)
 }
 
 is_var <- function(x, n = NULL) {

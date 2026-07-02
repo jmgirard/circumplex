@@ -13,7 +13,7 @@ regression test that fails on the pre-fix code. Order below is suggested
   *Accept:* `ssm_score(aw2009, scales = PANO(), angles = rotated)` differs
   from octant results and matches row-wise `ssm_parameters(x, rotated)`;
   4-scale case with `poles()` works; existing tests still pass.
-- [ ] **B2. `is_null_or_char()` honors `n`** — `R/utils.R:146` passes
+- [x] **B2. `is_null_or_char()` honors `n`** — `R/utils.R:146` passes
   `n = NULL`.
   *Accept:* `ssm_analyze(..., measures = c("A","B"), measures_labels = "one label")`
   errors informatively; NULL still accepted; audit other call sites
@@ -84,6 +84,16 @@ regression test that fails on the pre-fix code. Order below is suggested
   NEWS.md). Review found pre-existing `scales` validation inconsistency →
   noted in G3. NB: dev env had lost ggforce/htmlTable + stale .so; reinstalled
   and rebuilt via clean_dll().
+- 2026-07-02 — B2: `is_null_or_char()` now forwards `n`; call-site audit
+  (measures_labels, angle_labels, caption) confirmed all tightenings only
+  reject previously-wrong inputs; check clean (R/utils.R, tests, NEWS.md).
+  Collateral fix: seeded the five unseeded vdiffr blocks in test-ssm_plot.R
+  and regenerated 11 snapshots — they had depended on RNG state leaking from
+  earlier test files, so ANY upstream test that consumes RNG broke them
+  (diagnosed when B2's bootstrap tests did exactly that; only arc coordinates
+  changed, rendering verified unchanged via the seeded cross-zero snapshot).
+  NB: test-ssm_plot.R is stored with CRLF line endings (repo outlier) —
+  preserved; normalize deliberately someday if desired.
 
 ---
 

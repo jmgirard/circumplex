@@ -1,5 +1,12 @@
 # circumplex (development version)
 
+* Fixed a bug where length requirements on character arguments were never
+  enforced (`is_null_or_char()` dropped its `n` argument). `ssm_analyze()` now
+  errors if `measures_labels` does not match the number of `measures` (or is
+  given without `measures`), `ssm_plot_circle()`/`ssm_plot_curve()` now error
+  if `angle_labels` does not match the number of angles (previously mismatched
+  labels could be silently recycled onto the wrong scales), and
+  `ssm_table()`/`html_render()` now require `caption` to be a single string.
 * Fixed a bug where `ssm_score()` silently ignored its `angles` argument and
   always used `octants()`: custom angle sets of the same length produced
   incorrect results without warning, and angle sets of a different length
