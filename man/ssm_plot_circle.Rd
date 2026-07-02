@@ -52,7 +52,7 @@ coverage of a high number of variables).}
 their own shape or vary only by fill color. This only works when the number
 of profiles is five or less. (default = FALSE)}
 
-\item{...}{Currently ignored.}
+\item{...}{Not used. Supplying an unrecognized argument produces a warning.}
 }
 \value{
 A ggplot variable containing a completed circular plot.

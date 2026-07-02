@@ -26,7 +26,7 @@ size in pts (default = 11).}
 \item{drop_lowfit}{Optional. A logical indicating whether to omit profiles with
 low fit (<.70) or include them with dashed lines (default = FALSE).}
 
-\item{...}{Additional arguments will be ignored.}
+\item{...}{Not used. Supplying an unrecognized argument produces a warning.}
 }
 \value{
 A ggplot object depicting the SSM curve(s) of each profile.
@@ -44,6 +44,6 @@ res <- ssm_analyze(
   measures = 10:13
 )
 ssm_plot_curve(res)
-ssm_plot_curve(res, angle_lables = PANO())
+ssm_plot_curve(res, angle_labels = PANO())
 }
 }

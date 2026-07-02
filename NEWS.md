@@ -1,5 +1,8 @@
 # circumplex (development version)
 
+* The SSM plotting functions (`ssm_plot_circle()`, `ssm_plot_curve()`,
+  `ssm_plot_contrast()`) now warn when given an unrecognized argument (e.g., a
+  misspelled parameter name) instead of silently ignoring it.
 * Matrix input now works wherever it is documented. `ssm_analyze()`,
   `ssm_score()`, `ipsatize()`, `score()`, `norm_standardize()`, and
   `self_standardize()` previously errored when given a matrix despite

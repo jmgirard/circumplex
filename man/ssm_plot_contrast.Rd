@@ -32,7 +32,7 @@ point range elements in mm (default = 1.5).}
 \item{fontsize}{Optional. A positive number corresponding to the size of the
 axis labels, numbers, and facet headings in pt (default = 12).}
 
-\item{...}{Additional arguments will be ignored.}
+\item{...}{Not used. Supplying an unrecognized argument produces a warning.}
 }
 \value{
 A ggplot variable containing difference point-ranges faceted by SSM

@@ -48,13 +48,14 @@ regression test that fails on the pre-fix code. Order below is suggested
   numeric column indexes, contradicting both its own roxygen ("variable names
   or column numbers") and `ssm_analyze()`'s `is_var()` validation — align on
   `is_var()`.
-- [ ] **G4.** Consider warning on unused `...` in plot functions.
+- [x] **G4.** Consider warning on unused `...` in plot functions.
 
 ### Docs
 
 - [ ] **D1.** Purge `ssm_plot()` references (intermediate vignette line ~271,
   introduction vignette line ~409).
-- [ ] **D2.** Fix `angle_lables` typo in `ssm_plot_curve()` example.
+- [x] **D2.** Fix `angle_lables` typo in `ssm_plot_curve()` example.
+  (Done with G4, since the typo would otherwise trip the new warning.)
 - [ ] **D3.** `instruments()` count: says 14, lists 15.
 - [ ] **D4.** Document contrast direction in `?ssm_analyze`.
 - [ ] **D5.** Document equal-spacing assumption of the closed-form estimator.
@@ -167,6 +168,17 @@ regression test that fails on the pre-fix code. Order below is suggested
   matrix+grouping and matrix+append. Review inline (mechanical + input
   coercion). check 0/0/0. (R/ssm_analysis.R, R/tidying_functions.R,
   R/instrument_oop.R, R/ssm_table.R, R/ssm_plot.R, man/*, tests, NEWS.md).
+- 2026-07-02 — G4 + D2 (Opus): DECISION = warn (not silent). Added base R
+  `chkDots(...)` to ssm_plot_circle/curve/contrast (`...` is a pure sink in all
+  three — no forwarding — so any arg landing there is a genuine typo; partial
+  matching routes valid abbreviations to formals first, so no false positives).
+  chkDots immediately surfaced a real latent bug: an existing test passed
+  `drop_xy = TRUE` to ssm_plot_circle (which has no such arg — silently
+  ignored); removed it (snapshot unchanged). Also fixed the D2 typo
+  `angle_lables` → `angle_labels` in the ssm_plot_curve example (would have
+  tripped the new warning). @param ... docs updated. check 0/0/0.
+  (R/ssm_plot.R, man/*, tests/testthat/test-ssm_plot.R [CRLF preserved],
+  NEWS.md).
 
 # Completed milestones
 

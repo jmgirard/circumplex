@@ -30,7 +30,7 @@
 #' @param vary_shapes A logical determining whether profiles should each get
 #'   their own shape or vary only by fill color. This only works when the number
 #'   of profiles is five or less. (default = FALSE)
-#' @param ... Currently ignored.
+#' @param ... Not used. Supplying an unrecognized argument produces a warning.
 #' @return A ggplot variable containing a completed circular plot.
 #' @export
 #' @examples
@@ -53,10 +53,12 @@ ssm_plot_circle <- function(ssm_object,
                             palette = "Set2",
                             vary_shapes = FALSE,
                             ...) {
-  
+
+  chkDots(...)
+
   df <- ssm_object$results
   angles <- as.integer(round(ssm_object$details$angles))
-  
+
   stopifnot(is_null_or_num(amax, n = 1))
   stopifnot(is_null_or_char(angle_labels, n = length(angles)))
   
@@ -224,7 +226,7 @@ ssm_plot_circle <- function(ssm_object,
 #'   size in pts (default = 11).
 #' @param drop_lowfit Optional. A logical indicating whether to omit profiles with
 #'   low fit (<.70) or include them with dashed lines (default = FALSE).
-#' @param ... Additional arguments will be ignored.
+#' @param ... Not used. Supplying an unrecognized argument produces a warning.
 #' @return A ggplot object depicting the SSM curve(s) of each profile.
 #' @export
 #' @examples
@@ -236,7 +238,7 @@ ssm_plot_circle <- function(ssm_object,
 #'   measures = 10:13
 #' )
 #' ssm_plot_curve(res)
-#' ssm_plot_curve(res, angle_lables = PANO())
+#' ssm_plot_curve(res, angle_labels = PANO())
 #' }
 ssm_plot_curve <- function(ssm_object,
                            angle_labels = NULL,
@@ -245,6 +247,7 @@ ssm_plot_curve <- function(ssm_object,
                            ...) {
 
   stopifnot(inherits(ssm_object, "circumplex_ssm"))
+  chkDots(...)
 
   results <- ssm_object$results
   scores <- ssm_object$scores
@@ -364,7 +367,7 @@ ssm_plot_curve <- function(ssm_object,
 #'   point range elements in mm (default = 1.5).
 #' @param fontsize Optional. A positive number corresponding to the size of the
 #'   axis labels, numbers, and facet headings in pt (default = 12).
-#' @param ... Additional arguments will be ignored.
+#' @param ... Not used. Supplying an unrecognized argument produces a warning.
 #' @return A ggplot variable containing difference point-ranges faceted by SSM
 #'   parameter. An interval that does not contain the value of zero has p<.05.
 #' @export
@@ -384,6 +387,7 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
                               linesize = 1.25, fontsize = 12, ...) {
 
   stopifnot(ssm_object$details$contrast)
+  chkDots(...)
 
   # Prepare all estimates
   plabs <- c(
