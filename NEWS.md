@@ -31,12 +31,12 @@
 * Degenerate profiles are now handled explicitly instead of returning
   numerical noise. A flat (zero-variance) profile returns `NA` displacement
   and fit with a warning (previously an arbitrary angle and `-Inf`); a profile
-  with real variance but zero amplitude returns `NA` displacement and a fit of
-  0. Bootstrap resamples that produce degenerate profiles (e.g., a resampled
-  measure with zero variance) no longer crash `ssm_analyze()`; they are
-  excluded from the confidence intervals with a warning reporting the count.
-  Genuinely small amplitudes are unaffected — the degeneracy test operates at
-  machine-noise scale only.
+  with real variance but zero amplitude returns `NA` displacement and a fit
+  of 0. Bootstrap resamples that produce degenerate profiles (e.g., a
+  resampled measure with zero variance) no longer crash `ssm_analyze()`; they
+  are excluded from the confidence intervals with a warning reporting the
+  count. Genuinely small amplitudes are unaffected — the degeneracy test
+  operates at machine-noise scale only.
 * Fixed a bug where a missing (`NA`) value in the `grouping` variable of
   `ssm_analyze()` crashed with a cryptic error under pairwise deletion
   (`listwise = FALSE`). Such observations are now dropped before analysis with
