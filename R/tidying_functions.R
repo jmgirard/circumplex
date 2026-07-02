@@ -132,7 +132,10 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #'   scores) to be standardized.
 #' @param angles Required. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in `scales` (in degrees). Can use the
-#'   `octants()`, `poles()`, or `quadrants()` convenience functions.
+#'   `octants()`, `poles()`, or `quadrants()` convenience functions. Each angle
+#'   is matched to the instrument's normative data by angular position, so 0
+#'   and 360 degrees are treated as the same angle; an angle with no matching
+#'   normative row (or with more than one) produces an informative error.
 #' @param instrument Required. An instrument object from the package. To see the
 #'   available circumplex instruments, see `instruments()`.
 #' @param sample Required. An integer corresponding to the normative sample to
@@ -177,9 +180,29 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
   
   scores <- matrix(NA, nrow = nrow(scale_data), ncol = length(scales))
   colnames(scores) <- paste0(prefix, scale_names, suffix)
-  
-  for (i in 1:length(scales)) {
-    index_i <- key$Angle == angles[[i]]
+
+  angles <- as.numeric(angles)
+  for (i in seq_along(scales)) {
+    # Match each scale to its norm row by circular angular distance, so that
+    # 0 and 360 degrees (the same angle) match and float noise is tolerated
+    dist_i <- abs(angles[[i]] - key$Angle) %% 360
+    dist_i <- pmin(dist_i, 360 - dist_i)
+    index_i <- which(dist_i < 1e-6)
+    if (length(index_i) == 0) {
+      stop(
+        "No normative data for a scale at ", angles[[i]], " degrees. ",
+        "Available angles: ", paste(sort(unique(key$Angle)), collapse = ", "),
+        ".",
+        call. = FALSE
+      )
+    }
+    if (length(index_i) > 1) {
+      stop(
+        "Multiple normative rows match ", angles[[i]], " degrees; the ",
+        "instrument's normative data has duplicate angles.",
+        call. = FALSE
+      )
+    }
     m_i <- key$M[index_i]
     s_i <- key$SD[index_i]
     scores[, i] <- (scale_data[[i]] - m_i) / s_i

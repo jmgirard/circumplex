@@ -27,7 +27,7 @@ regression test that fails on the pre-fix code. Order below is suggested
   *Accept:* flat profile returns NA displacement/fit with one warning;
   near-zero amplitude documented behavior decided and tested; bootstrap
   containing some degenerate replicates doesn't error.
-- [ ] **B5. `norm_standardize()` robust matching** — exact float equality on
+- [x] **B5. `norm_standardize()` robust matching** — exact float equality on
   `Angle` vs norms table (`R/tidying_functions.R:181-186`).
   *Accept:* 0° vs 360° convention mismatch either works or errors with a
   message naming the expected angles; duplicate-angle norms error clearly.
@@ -114,8 +114,13 @@ regression test that fails on the pre-fix code. Order below is suggested
   incl. NA-excluded CI == independent boot+filter reference (1e-10, 16/300
   degenerate). Seeded pins unchanged. Documented in roxygen + DESIGN.md
   (src/parameters.cpp, R/ssm_analysis.R, R/ssm_bootstrap.R, tests, NEWS.md).
-
----
+- 2026-07-02 — B5 (Opus): `norm_standardize()` matches scale→norm row by
+  circular angular distance (`pmin(|Δ| %% 360, 360 - ...) < 1e-6`) instead of
+  exact `==`, so 0≡360 just works; clear errors for zero matches (names
+  available angles) and >1 match (duplicate-angle norms). Fixes cryptic
+  "replacement has length zero". Seeded values unchanged; check 0/0/0; review
+  clean. Note: still uses `class(instrument) ==` — G3 scope.
+  (R/tidying_functions.R, man/norm_standardize.Rd, tests, NEWS.md).
 
 # Completed milestones
 

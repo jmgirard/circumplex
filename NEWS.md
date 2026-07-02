@@ -1,5 +1,10 @@
 # circumplex (development version)
 
+* `norm_standardize()` now matches each scale to its normative data by angular
+  position rather than exact numeric equality, so 0 and 360 degrees are treated
+  as the same angle (previously passing 0 for a scale stored at 360 failed with
+  a cryptic error). An angle with no matching normative row, or with more than
+  one, now produces an informative error naming the available angles.
 * Degenerate profiles are now handled explicitly instead of returning
   numerical noise. A flat (zero-variance) profile returns `NA` displacement
   and fit with a warning (previously an arbitrary angle and `-Inf`); a profile

@@ -63,6 +63,54 @@ test_that("norm_standardize works", {
   expect_equal(ncol(new), ncol(new2) + ncol(old))
 })
 
+test_that("norm_standardize matches 0 and 360 degrees as the same angle", {
+  set.seed(12345)
+  old <- data.frame(
+    matrix(runif(8 * 5, min = 0, max = 4), nrow = 5, ncol = 8)
+  )
+  # LM stored as 360 in the norms; passing 0 must give identical results
+  with360 <- norm_standardize(
+    old, scales = 1:8, angles = octants(), instrument = iipsc, sample = 1,
+    append = FALSE
+  )
+  with0 <- norm_standardize(
+    old, scales = 1:8, angles = c(90, 135, 180, 225, 270, 315, 0, 45),
+    instrument = iipsc, sample = 1, append = FALSE
+  )
+  expect_equal(with0, with360)
+})
+
+test_that("norm_standardize errors clearly on an unmatched angle", {
+  set.seed(12345)
+  old <- data.frame(
+    matrix(runif(8 * 5, min = 0, max = 4), nrow = 5, ncol = 8)
+  )
+  expect_error(
+    norm_standardize(
+      old, scales = 1:8,
+      angles = c(90, 135, 180, 225, 270, 315, 360, 100),
+      instrument = iipsc, sample = 1
+    ),
+    "100"
+  )
+})
+
+test_that("norm_standardize errors clearly on duplicate-angle norms", {
+  set.seed(12345)
+  old <- data.frame(
+    matrix(runif(8 * 5, min = 0, max = 4), nrow = 5, ncol = 8)
+  )
+  # Corrupt the norms so angle 90 appears twice (and 45 not at all)
+  dup <- iipsc
+  norms <- dup$Norms[[1]]
+  norms$Angle[norms$Sample == 1 & norms$Angle == 45] <- 90
+  dup$Norms[[1]] <- norms
+  expect_error(
+    norm_standardize(old, scales = 1:8, instrument = dup, sample = 1),
+    "[Mm]ultiple|[Dd]uplicate"
+  )
+})
+
 
 test_that("self_standardize works", {
   old <- aw2009

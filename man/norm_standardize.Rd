@@ -25,7 +25,10 @@ scores) to be standardized.}
 
 \item{angles}{Required. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees). Can use the
-\code{octants()}, \code{poles()}, or \code{quadrants()} convenience functions.}
+\code{octants()}, \code{poles()}, or \code{quadrants()} convenience functions. Each angle
+is matched to the instrument's normative data by angular position, so 0
+and 360 degrees are treated as the same angle; an angle with no matching
+normative row (or with more than one) produces an informative error.}
 
 \item{instrument}{Required. An instrument object from the package. To see the
 available circumplex instruments, see \code{instruments()}.}
