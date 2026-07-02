@@ -8,7 +8,7 @@ regression test that fails on the pre-fix code. Order below is suggested
 
 ### Bugs
 
-- [ ] **B1. `ssm_score()` forwards `angles`** — `R/ssm_analysis.R:517`
+- [x] **B1. `ssm_score()` forwards `angles`** — `R/ssm_analysis.R:517`
   passes `...` to `apply()` but never `angles`.
   *Accept:* `ssm_score(aw2009, scales = PANO(), angles = rotated)` differs
   from octant results and matches row-wise `ssm_parameters(x, rotated)`;
@@ -43,7 +43,11 @@ regression test that fails on the pre-fix code. Order below is suggested
 - [ ] **G2.** Document displacement boundary convention (0° prints as 360°),
   or normalize; decide once, record in DESIGN.md.
 - [ ] **G3.** `inherits()` instead of `class(x) ==` everywhere; fix or drop
-  matrix input support in `ssm_analyze()`/`ssm_score()`.
+  matrix input support in `ssm_analyze()`/`ssm_score()`. Also (found during
+  B1 review): `ssm_score()` validates `is.character(scales)` and so rejects
+  numeric column indexes, contradicting both its own roxygen ("variable names
+  or column numbers") and `ssm_analyze()`'s `is_var()` validation — align on
+  `is_var()`.
 - [ ] **G4.** Consider warning on unused `...` in plot functions.
 
 ### Docs
@@ -58,6 +62,8 @@ regression test that fails on the pre-fix code. Order below is suggested
   zero" phrasing.
 - [ ] **D7.** Delete stale `CRAN-SUBMISSION` file. (`.Rbuildignore` already
   updated for the md files and `.claude` — done 2026-07-02.)
+- [ ] **D8.** NEWS.md cleanup: remove the duplicated `# circumplex 1.1.0`
+  heading (lines 3/5); skim the rest for similar artifacts.
 
 ### Release
 
@@ -72,6 +78,12 @@ regression test that fails on the pre-fix code. Order below is suggested
   via CircE replacement, now M4), inserted ggplot2 extension as M3 (before
   fit stats so later milestones plot through it), renumbered M4-M6, added
   refactor verdict + targeted refactor list to continuous track.
+- 2026-07-02 — B1: `ssm_score()` now forwards `angles` to `ssm_parameters()`;
+  regression tests incl. 0°/360°-peak boundary; validated vs OLS at ~1e-13;
+  check clean 0/0/0 (R/ssm_analysis.R, tests/testthat/test-ssm_analysis.R,
+  NEWS.md). Review found pre-existing `scales` validation inconsistency →
+  noted in G3. NB: dev env had lost ggforce/htmlTable + stale .so; reinstalled
+  and rebuilt via clean_dll().
 
 ---
 

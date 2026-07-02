@@ -94,6 +94,8 @@ Task-level breakdown with acceptance criteria lives in MILESTONES.md.
       zero" — a displacement CI excluding 0° is not a meaningful hypothesis
       test for an angle.
 - [ ] Delete stale `CRAN-SUBMISSION` file (`.Rbuildignore` already updated).
+- [ ] NEWS.md cleanup: remove duplicated `# circumplex 1.1.0` heading; skim
+      for similar artifacts.
 
 ---
 
