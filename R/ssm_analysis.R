@@ -47,6 +47,14 @@
 #'   \item{scores}{A data frame containing the mean scale scores} \item{type}{A
 #'   string indicating what type of SSM analysis was done}
 #'
+#'   The profile displacement parameter is reported in the half-open interval
+#'   `[0, 360)` degrees. A profile that peaks exactly at the 0/360 degree
+#'   boundary is reported as approximately 360 (equivalently 0, the same
+#'   direction); which of the two appears is a floating-point detail and both
+#'   denote the same pole. Contrast displacements are instead reported as a
+#'   signed difference in `(-180, 180]` degrees (see the "Contrast" block in
+#'   the printed output).
+#'
 #'   Degenerate profiles (flat or zero-amplitude) have undefined displacement
 #'   (and fit, if flat), which is reported as `NA` with a warning. Bootstrap
 #'   resamples that produce degenerate profiles (e.g., a resampled measure

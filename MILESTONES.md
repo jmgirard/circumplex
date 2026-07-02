@@ -40,7 +40,7 @@ regression test that fails on the pre-fix code. Order below is suggested
 
 - [x] **G1.** `print`/`summary.circumplex_ssm` note when fit < .70 or the
   amplitude CI includes 0 (displacement not interpretable).
-- [ ] **G2.** Document displacement boundary convention (0° prints as 360°),
+- [x] **G2.** Document displacement boundary convention (0° prints as 360°),
   or normalize; decide once, record in DESIGN.md.
 - [ ] **G3.** `inherits()` instead of `class(x) ==` everywhere; fix or drop
   matrix input support in `ssm_analyze()`/`ssm_score()`. Also (found during
@@ -146,6 +146,15 @@ regression test that fails on the pre-fix code. Order below is suggested
   ~20-line print change); no other snapshot/expect_output affected; vignette
   summaries will gain notes on low-fit profiles (non-breaking).
   (R/ssm_oop.R, tests/testthat/test-ssm_oop.R, NEWS.md).
+- 2026-07-02 — G2 (Opus): DECISION = document, do not normalize. Profile
+  displacement range is [0°, 360°) (estimator modu(atan2,2π)). A peak exactly
+  at the boundary reports ≈360° deterministically (y ≈ −2.78e-17 → atan2 small
+  negative → wraps just under 2π), equivalently ≈0°, same pole. Not
+  canonicalized: measure-zero float artifact, any snap is an arbitrary
+  tie-break, ≈360 matches LM=360. Recorded in DESIGN.md conventions table,
+  ?ssm_analyze return docs, and intro vignette. B1 boundary test already
+  accepts {~0,~360}, so no test change. Doc-only; check 0/0/0.
+  (DESIGN.md, R/ssm_analysis.R, man/ssm_analyze.Rd, intro vignette).
 
 # Completed milestones
 

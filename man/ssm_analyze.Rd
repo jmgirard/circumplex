@@ -70,12 +70,22 @@ this object}
 \item{scores}{A data frame containing the mean scale scores} \item{type}{A
 string indicating what type of SSM analysis was done}
 
+The profile displacement parameter is reported in the half-open interval
+\verb{[0, 360)} degrees. A profile that peaks exactly at the 0/360 degree
+boundary is reported as approximately 360 (equivalently 0, the same
+direction); which of the two appears is a floating-point detail and both
+denote the same pole. Contrast displacements are instead reported as a
+signed difference in \verb{(-180, 180]} degrees (see the "Contrast" block in
+the printed output).
+
 Degenerate profiles (flat or zero-amplitude) have undefined displacement
 (and fit, if flat), which is reported as \code{NA} with a warning. Bootstrap
 resamples that produce degenerate profiles (e.g., a resampled measure
 with zero variance) are excluded from the confidence intervals with a
 warning reporting how many were dropped; the intervals are then
 conditional on estimability.
+
+[0, 360)\verb{degrees. A profile that peaks exactly at the 0/360 degree boundary is reported as approximately 360 (equivalently 0, the same direction); which of the two appears is a floating-point detail and both denote the same pole. Contrast displacements are instead reported as a signed difference in}(-180, 180]: R:0,\%20360)\%60\%20degrees.\%20A\%20profile\%20that\%20peaks\%20exactly\%20at\%20the\%200/360\%20degree\%0A\%20\%20boundary\%20is\%20reported\%20as\%20approximately\%20360\%20(equivalently\%200,\%20the\%20same\%0A\%20\%20direction);\%20which\%20of\%20the\%20two\%20appears\%20is\%20a\%20floating-point\%20detail\%20and\%20both\%0A\%20\%20denote\%20the\%20same\%20pole.\%20Contrast\%20displacements\%20are\%20instead\%20reported\%20as\%20a\%0A\%20\%20signed\%20difference\%20in\%20\%60(-180,\%20180
 }
 \description{
 Calculate SSM parameters with bootstrapped confidence intervals for a variety

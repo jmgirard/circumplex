@@ -236,7 +236,7 @@ The second SSM parameter is amplitude or $a$, which is calculated as the differe
 knitr::include_graphics("VIG1-a.gif")
 ```
 
-The final SSM parameter is displacement or $d$, which is calculated as the angle at which the curve reaches its highest point. It is interpreted as the style of the profile. For instance, if $d=90^\circ$ and we are using a circumplex scale that defines 90 degrees as "domineering," then the profile's style is domineering.
+The final SSM parameter is displacement or $d$, which is calculated as the angle at which the curve reaches its highest point. It is interpreted as the style of the profile. For instance, if $d=90^\circ$ and we are using a circumplex scale that defines 90 degrees as "domineering," then the profile's style is domineering. Displacement is reported on the $[0^\circ, 360^\circ)$ circle; a profile that peaks right at the $0^\circ$/$360^\circ$ boundary may be reported as either value, since both point in the same direction.
 
 ```{r disp, echo = FALSE, out.width = "100%"}
 knitr::include_graphics("VIG1-d.gif")
