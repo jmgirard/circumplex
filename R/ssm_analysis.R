@@ -13,7 +13,11 @@
 #'   scores to be analyzed.
 #' @param angles Optional. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in `scales` (in degrees). (default =
-#'   `octants()`).
+#'   `octants()`). The closed-form SSM estimator used here equals the
+#'   ordinary-least-squares cosine fit only when `angles` are equally spaced
+#'   around the circle (e.g., octants at 45-degree intervals); for unequally
+#'   spaced angles it is the conventional Gurtman estimator, not a
+#'   least-squares fit.
 #' @param measures Optional. Either `NULL` or a character vector of column names
 #'   from `data` that contains one or more variables to be correlated with the
 #'   circumplex scales and analyzed using correlation-based SSM analyses.
@@ -23,7 +27,13 @@
 #' @param contrast Optional. A logical indicating whether to output the
 #'   difference between two measures' or two groups' SSM parameters. Can only be
 #'   set to TRUE when there are exactly two measures and one group, one measure
-#'   and two groups, or no measures and two groups (default = FALSE).
+#'   and two groups, or no measures and two groups (default = FALSE). The
+#'   contrast is always the second level minus the first. For two groups, this
+#'   is the second level of `grouping` alphabetically, unless `grouping` is
+#'   already a factor with an explicit level order, in which case that order is
+#'   used. For two measures, this is simply the second entry of `measures` as
+#'   given (no reordering). The direction is shown in the result's Label (e.g.,
+#'   "Male - Female").
 #' @param boots Optional. A single positive whole number indicating how many
 #'   bootstrap resamples to use when estimating the confidence intervals
 #'   (default = 2000).

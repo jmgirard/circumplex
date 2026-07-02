@@ -27,7 +27,11 @@ scores to be analyzed.}
 
 \item{angles}{Optional. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees). (default =
-\code{octants()}).}
+\code{octants()}). The closed-form SSM estimator used here equals the
+ordinary-least-squares cosine fit only when \code{angles} are equally spaced
+around the circle (e.g., octants at 45-degree intervals); for unequally
+spaced angles it is the conventional Gurtman estimator, not a
+least-squares fit.}
 
 \item{measures}{Optional. Either \code{NULL} or a character vector of column names
 from \code{data} that contains one or more variables to be correlated with the
@@ -40,7 +44,13 @@ each observation.}
 \item{contrast}{Optional. A logical indicating whether to output the
 difference between two measures' or two groups' SSM parameters. Can only be
 set to TRUE when there are exactly two measures and one group, one measure
-and two groups, or no measures and two groups (default = FALSE).}
+and two groups, or no measures and two groups (default = FALSE). The
+contrast is always the second level minus the first. For two groups, this
+is the second level of \code{grouping} alphabetically, unless \code{grouping} is
+already a factor with an explicit level order, in which case that order is
+used. For two measures, this is simply the second entry of \code{measures} as
+given (no reordering). The direction is shown in the result's Label (e.g.,
+"Male - Female").}
 
 \item{boots}{Optional. A single positive whole number indicating how many
 bootstrap resamples to use when estimating the confidence intervals

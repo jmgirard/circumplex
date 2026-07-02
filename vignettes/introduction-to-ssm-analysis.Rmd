@@ -406,7 +406,7 @@ summary(results3)
 Note that this output looks very similar to the mean-based output except that the statistical basis is now correlation scores instead of mean scores and instead of saying "Profile [All]" it now says "Profile [NARPD]".
 
 ### Visualizing the results with a table and figure
-We can also create a similar table and figure using the exact same syntax as before. The `ssm_table()` and `ssm_plot()` functions are smart enough to know whether the results are mean-based or correlation-based and will work in both cases.
+We can also create a similar table and figure using the exact same syntax as before. The `ssm_table()`, `ssm_plot_circle()`, and `ssm_plot_curve()` functions are smart enough to know whether the results are mean-based or correlation-based and will work in both cases.
 
 ```r
 ssm_table(results3)
@@ -418,7 +418,7 @@ ssm_table(results3, render = FALSE) %>%
   kableExtra::kable_styling(full_width = TRUE, font_size = 14)
 ```
 
-From the table, we can see that the model fit is good (>.80) and that all three SSM parameters are significantly different from zero, i.e., their confidence intervals do not include zero. Furthermore, the confidence intervals for the elevation and amplitude parameters are greater than or equal to 0.15, which can be interpreted as being "marked." So, consistent with our hypotheses, NARPD was associated with marked general interpersonal distress (elevation) and was markedly distinctive in its profile (amplitude). The displacement parameter was somewhere between 100 and 120 degrees; to interpret this we would need to either consult the mapping between scales and angles or plot the results.
+From the table, we can see that the model fit is good (>.80) and that the elevation and amplitude parameters are significantly different from zero, i.e., their confidence intervals do not include zero (a "different from zero" test is not meaningful for the displacement parameter, since it is an angle and 0 degrees is just an arbitrary reference direction rather than a null value). Furthermore, the confidence intervals for the elevation and amplitude parameters are greater than or equal to 0.15, which can be interpreted as being "marked." So, consistent with our hypotheses, NARPD was associated with marked general interpersonal distress (elevation) and was markedly distinctive in its profile (amplitude). The displacement parameter was somewhere between 100 and 120 degrees; to interpret this we would need to either consult the mapping between scales and angles or plot the results.
 
 ```{r plot3, fig.width = 7.5, fig.height = 4, out.width = "100%"}
 ssm_plot_circle(results3)

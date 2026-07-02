@@ -52,18 +52,18 @@ regression test that fails on the pre-fix code. Order below is suggested
 
 ### Docs
 
-- [ ] **D1.** Purge `ssm_plot()` references (intermediate vignette line ~271,
+- [x] **D1.** Purge `ssm_plot()` references (intermediate vignette line ~271,
   introduction vignette line ~409).
 - [x] **D2.** Fix `angle_lables` typo in `ssm_plot_curve()` example.
   (Done with G4, since the typo would otherwise trip the new warning.)
-- [ ] **D3.** `instruments()` count: says 14, lists 15.
-- [ ] **D4.** Document contrast direction in `?ssm_analyze`.
-- [ ] **D5.** Document equal-spacing assumption of the closed-form estimator.
-- [ ] **D6.** Intro vignette: fix "displacement significantly different from
+- [x] **D3.** `instruments()` count: says 14, lists 15.
+- [x] **D4.** Document contrast direction in `?ssm_analyze`.
+- [x] **D5.** Document equal-spacing assumption of the closed-form estimator.
+- [x] **D6.** Intro vignette: fix "displacement significantly different from
   zero" phrasing.
-- [ ] **D7.** Delete stale `CRAN-SUBMISSION` file. (`.Rbuildignore` already
+- [x] **D7.** Delete stale `CRAN-SUBMISSION` file. (`.Rbuildignore` already
   updated for the md files and `.claude` — done 2026-07-02.)
-- [ ] **D8.** NEWS.md cleanup: remove the duplicated `# circumplex 1.1.0`
+- [x] **D8.** NEWS.md cleanup: remove the duplicated `# circumplex 1.1.0`
   heading (lines 3/5); skim the rest for similar artifacts.
 
 ### Release
@@ -179,6 +179,44 @@ regression test that fails on the pre-fix code. Order below is suggested
   tripped the new warning). @param ... docs updated. check 0/0/0.
   (R/ssm_plot.R, man/*, tests/testthat/test-ssm_plot.R [CRLF preserved],
   NEWS.md).
+- 2026-07-02 — D1 (Sonnet): purged the two stale `ssm_plot()` references
+  (deleted function, split into `ssm_plot_circle()`/`_curve()`/`_contrast()`).
+  Intermediate vignette line 271: `ssm_plot(results6)` → `ssm_plot_contrast(results6)`
+  (results6 is a contrast result, matching the `ssm_plot_contrast(results6)`
+  call already used earlier for the same object at line 221). Introduction
+  vignette line 409: prose updated to name `ssm_table()`, `ssm_plot_circle()`,
+  and `ssm_plot_curve()` instead of the single deleted function, matching the
+  plot3/plot4 code chunks that follow. Left NEWS.md's historical `ssm_plot()`
+  changelog entries untouched (accurate past-tense references) and the
+  gitignored `doc/` build artifacts alone (regenerate on next vignette build).
+  Doc-only; full test suite still 424/424 pass. (vignettes/intermediate-ssm-analysis.Rmd,
+  vignettes/introduction-to-ssm-analysis.Rmd).
+- 2026-07-02 — D3-D8 (Sonnet): remaining Docs batch.
+  D3: `instruments()` said "14 instruments" but listed 15 (verified against 15
+  `.rda` instrument files in data/); fixed the count string, regenerated the
+  vdiffr/testthat snapshot. D4: documented contrast direction on `@param
+  contrast` in `?ssm_analyze` — verified against code, not just restated from
+  CLAUDE.md: for two groups, second level minus first is alphabetical unless
+  `grouping` is already a factor (code coerces via `factor()`, which preserves
+  existing level order — R/ssm_analysis.R:243); for two measures, it's simply
+  `measures[2] - measures[1]` in the order given, never reordered
+  (R/ssm_analysis.R:373) — corrected an over-generalized first draft that
+  wrongly implied `measures` could also be alphabetized. D5: documented on
+  `@param angles` that the closed-form estimator equals OLS only for equally
+  spaced angles, wording matched to DESIGN.md's reviewed table entry (dropped
+  an unverified "may not be minimally biased" claim from a first draft — not
+  asserted anywhere in DESIGN.md, so cut per the statistical-correctness bar).
+  D6: intro vignette no longer describes the displacement CI as a
+  "significantly different from zero" test (displacement is angular; 0 degrees
+  is an arbitrary reference direction, not a null value) — elevation/amplitude
+  (linear, zero is meaningful) still described that way. D7: deleted the
+  stale, untracked `CRAN-SUBMISSION` file (recorded the old 1.1.0 submission;
+  already `.Rbuildignore`d). D8: removed the duplicated `# circumplex 1.1.0`
+  heading in NEWS.md (only duplicate found — checked all version headings).
+  Doc/roxygen-only; devtools::document() regenerated man/ssm_analyze.Rd; full
+  suite 424/424 pass. (R/instrument_oop.R, R/ssm_analysis.R, man/ssm_analyze.Rd,
+  tests/testthat/_snaps/instrument_oop.md, vignettes/introduction-to-ssm-analysis.Rmd,
+  NEWS.md, CRAN-SUBMISSION [deleted]). ALL M1 DOCS COMPLETE.
 
 # Completed milestones
 

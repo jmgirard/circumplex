@@ -57,8 +57,6 @@
 
 # circumplex 1.1.0
 
-# circumplex 1.1.0
-
 ## Minor improvements and fixes
 
 * Improve handling of radian distributions crossing the 0/2pi boundary

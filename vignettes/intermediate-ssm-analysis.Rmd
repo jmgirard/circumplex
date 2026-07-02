@@ -268,7 +268,7 @@ Additional arguments to the `ssm_table()` function can be explored using the `?s
 All SSM plots are created using the `ggplot2` package, which is incredibly flexible and powerful. It also offers the `ggsave()` function to export figures to external files of various types. See the documentation for this function (`?ggsave`) to learn more, but some useful arguments are `filename`, `plot`, `width`, `height`, and `units`. We can save the figure as a raster image file (e.g., "png", "jpeg", "tiff"), a vector image file (e.g., "svg"), or a portable document (e.g., "pdf" or "tex"). We can also control the exact width and height of the image in different units (i.e., "in", "cm", or "mm"). Because the underlying graphics are vectorized in R, they can be easily scaled to any size without loss of quality and used in manuscripts, presentations, or posters.
 
 ```r
-ssm_plot(results6)
+ssm_plot_contrast(results6)
 ggsave("bordpd_gender.png", width = 7.5, height = 4, units = "in")
 ```
 
