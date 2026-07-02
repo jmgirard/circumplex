@@ -18,7 +18,7 @@ regression test that fails on the pre-fix code. Order below is suggested
   *Accept:* `ssm_analyze(..., measures = c("A","B"), measures_labels = "one label")`
   errors informatively; NULL still accepted; audit other call sites
   (`caption`, `angle_labels`) for behavior changes.
-- [ ] **B3. NA grouping values handled** — NA in `grouping` with
+- [x] **B3. NA grouping values handled** — NA in `grouping` with
   `listwise = FALSE` crashes in `mean_scores()` (`unique(): detected NaN`).
   *Accept:* NA-group rows dropped with a `message()` reporting the count, in
   both deletion modes; results match manually pre-filtered data.
@@ -94,6 +94,15 @@ regression test that fails on the pre-fix code. Order below is suggested
   changed, rendering verified unchanged via the seeded cross-zero snapshot).
   NB: test-ssm_plot.R is stored with CRLF line endings (repo outlier) —
   preserved; normalize deliberately someday if desired.
+- 2026-07-02 — B3 (Opus): NA `grouping` rows now dropped in the `ssm_analyze()`
+  dispatcher (on the user's real grouping column, once) with a count message +
+  empty-data guard; fixes the pairwise `unique(): detected NaN` crash. No src/
+  change needed — the R-layer guard keeps NaN out of Armadillo. Review moved
+  the drop from a per-subfunction helper up to the dispatcher, which also
+  fixed a would-be column-name collision (a scale named "Group" vs the renamed
+  grouping column). Regression tests cover both modes, contrast, the collision
+  (expect_no_message), and the all-NA clean error. Check clean 0/0/0
+  (R/ssm_analysis.R, R/utils.R, tests, NEWS.md).
 
 ---
 

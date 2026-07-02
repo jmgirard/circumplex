@@ -128,6 +128,23 @@ ssm_analyze <- function(data, scales, angles = octants(),
   stopifnot(is_flag(listwise))
   stopifnot(is_null_or_char(measures_labels, n = length(measures)))
 
+  # Drop observations with missing grouping values (unusable in any group).
+  # Done here, on the user's actual grouping column, so both analysis paths
+  # inherit clean data and never pass NA group codes into the C++ estimators.
+  if (!is.null(grouping)) {
+    na_group <- is.na(data[[grouping]])
+    if (any(na_group)) {
+      message(
+        sum(na_group),
+        " observation(s) removed due to missing values in the grouping variable."
+      )
+      data <- data[!na_group, , drop = FALSE]
+      if (nrow(data) == 0) {
+        stop("No observations remain after removing missing grouping values.")
+      }
+    }
+  }
+
   if (contrast) {
     n_measures <- length(measures)
     n_groups <- ifelse(is.null(grouping), 1, nlevels(factor(data[[grouping]])))
@@ -189,12 +206,12 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
     colnames(Group) <- "Group"
     bs_input <- cbind(bs_input, Group)
   }
-  
+
   # Perform listwise deletion if requested
   if (listwise) {
     bs_input <- stats::na.omit(bs_input)
   }
-  
+
   # Set group to factor
   bs_input[[ncol(bs_input)]] <- factor(bs_input[[ncol(bs_input)]])
   
@@ -295,7 +312,7 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     colnames(newcol) <- "Group"
     bs_input <- cbind(bs_input, newcol)
   }
-  
+
   # Perform listwise deletion if requested
   if (listwise == TRUE) {
     bs_input <- stats::na.omit(bs_input)

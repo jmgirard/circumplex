@@ -1,5 +1,10 @@
 # circumplex (development version)
 
+* Fixed a bug where a missing (`NA`) value in the `grouping` variable of
+  `ssm_analyze()` crashed with a cryptic error under pairwise deletion
+  (`listwise = FALSE`). Such observations are now dropped before analysis with
+  a message reporting how many were removed, in both deletion modes; if no
+  observations remain, a clear error is given.
 * Fixed a bug where length requirements on character arguments were never
   enforced (`is_null_or_char()` dropped its `n` argument). `ssm_analyze()` now
   errors if `measures_labels` does not match the number of `measures` (or is

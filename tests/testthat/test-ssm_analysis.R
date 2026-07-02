@@ -471,6 +471,79 @@ test_that("ssm_score forwards the angles argument", {
   )
 })
 
+test_that("NA grouping values are dropped with a message in both modes", {
+  data("jz2017")
+  jz <- jz2017
+  jz$Gender[c(1, 5, 10)] <- NA
+  manual <- jz[!is.na(jz$Gender), ]
+
+  # Pairwise deletion previously crashed (unique(): detected NaN)
+  set.seed(1)
+  expect_message(
+    res_pw <- ssm_analyze(
+      jz, scales = 2:9, grouping = "Gender", listwise = FALSE, boots = 20
+    ),
+    "3 observation"
+  )
+  set.seed(1)
+  res_pw_manual <- ssm_analyze(
+    manual, scales = 2:9, grouping = "Gender", listwise = FALSE, boots = 20
+  )
+  expect_equal(res_pw$results, res_pw_manual$results)
+  expect_equal(res_pw$scores, res_pw_manual$scores)
+
+  # Listwise deletion also reports the dropped NA-group count
+  set.seed(1)
+  expect_message(
+    res_lw <- ssm_analyze(
+      jz, scales = 2:9, grouping = "Gender", listwise = TRUE, boots = 20
+    ),
+    "3 observation"
+  )
+  set.seed(1)
+  res_lw_manual <- ssm_analyze(
+    manual, scales = 2:9, grouping = "Gender", listwise = TRUE, boots = 20
+  )
+  expect_equal(res_lw$results, res_lw_manual$results)
+
+  # A contrast over two real levels plus NA still works and matches
+  set.seed(1)
+  res_c <- suppressMessages(ssm_analyze(
+    jz, scales = 2:9, grouping = "Gender", contrast = TRUE,
+    listwise = FALSE, boots = 20
+  ))
+  set.seed(1)
+  res_c_manual <- ssm_analyze(
+    manual, scales = 2:9, grouping = "Gender", contrast = TRUE,
+    listwise = FALSE, boots = 20
+  )
+  expect_equal(res_c$results, res_c_manual$results)
+
+  # A scale literally named "Group" must not be mistaken for the grouping
+  # column. Here Gender has no NA, so no grouping rows should be dropped and
+  # no message should fire, even though the "Group" scale has an NA.
+  jz_collide <- jz2017
+  jz_collide$Group <- jz_collide$PA
+  jz_collide$Group[2] <- NA
+  expect_no_message(
+    ssm_analyze(
+      jz_collide,
+      scales = c("Group", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+      grouping = "Gender", listwise = FALSE, boots = 5
+    )
+  )
+
+  # If every grouping value is missing, error clearly rather than crash
+  jz_allna <- jz2017
+  jz_allna$Gender <- NA
+  expect_error(
+    suppressMessages(
+      ssm_analyze(jz_allna, scales = 2:9, grouping = "Gender", boots = 5)
+    ),
+    "No observations remain"
+  )
+})
+
 test_that("measures_labels length is validated", {
   data("jz2017")
 
