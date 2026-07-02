@@ -217,6 +217,26 @@ regression test that fails on the pre-fix code. Order below is suggested
   suite 424/424 pass. (R/instrument_oop.R, R/ssm_analysis.R, man/ssm_analyze.Rd,
   tests/testthat/_snaps/instrument_oop.md, vignettes/introduction-to-ssm-analysis.Rmd,
   NEWS.md, CRAN-SUBMISSION [deleted]). ALL M1 DOCS COMPLETE.
+- 2026-07-02 — Release prep (Sonnet, `/release-checklist`): pre-flight clean
+  (working tree clean, all M1 Bugs/Guardrails/Docs boxes checked,
+  `devtools::document()` no-diff). Verification: `devtools::test()` 424/424;
+  `devtools::check(args = "--no-manual")` 0/0/0 locally. Ran
+  `/statistical-validation` as a final consolidated pass since B1/B4/B5/B6 all
+  touched estimation-adjacent code since v1.1.0: 22 independent reference
+  checks (OLS equivalence at equal spacing, hand-computed 2/n Gurtman formula
+  at unequal spacing, circular-quantile rotation invariance, angle_dist
+  sign/antisymmetry, C++ helpers vs base R, end-to-end jz2017 sanity, plus all
+  5 CLAUDE.md-mandated boundary cases: 0°/360° peak, flat profile, contrast
+  near +/-180°) — all passed at ~1e-9 to ~1e-16. No CRAN revdeps
+  (`tools::package_dependencies(reverse = TRUE)` returns none). Version bumped
+  1.1.0.9000 -> 1.2.0 (DESCRIPTION); NEWS.md dev heading renamed to `# circumplex
+  1.2.0` (no breaking changes to flag); cran-comments.md rewritten with test
+  environments, revdep summary, and a change summary.
+  NOT checking the Release box yet: local branch is 15 commits ahead of
+  `origin/master` (nothing from this milestone has been pushed), so the actual
+  GitHub Actions CI matrix has not run against this code — only the local
+  macOS/R-4.6.1 check has. Awaiting user decision on push before that box can
+  be honestly checked. (DESCRIPTION, NEWS.md, cran-comments.md).
 
 # Completed milestones
 

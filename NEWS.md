@@ -1,4 +1,4 @@
-# circumplex (development version)
+# circumplex 1.2.0
 
 * The SSM plotting functions (`ssm_plot_circle()`, `ssm_plot_curve()`,
   `ssm_plot_contrast()`) now warn when given an unrecognized argument (e.g., a
