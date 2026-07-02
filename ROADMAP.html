@@ -72,6 +72,23 @@
 </ol><p><strong>Design verdict from the audit:</strong> the architecture (thin R dispatch → C++ estimation core → <code>boot</code> resampling; S3 classes) is sound and does <em>not</em> warrant a rewrite. Needed refactors are localized and listed in the continuous track below; new capabilities should be added as new functions rather than more arguments on <code><a href="reference/ssm_analyze.html">ssm_analyze()</a></code>.</p>
 <hr></div>
 <div class="section level2">
+<h2 id="cran-release-strategy">CRAN release strategy<a class="anchor" aria-label="anchor" href="#cran-release-strategy"></a></h2>
+<p>Milestones are <strong>GitHub</strong> units of work; they are <em>not</em> one-to-one with CRAN submissions. CRAN asks maintainers not to submit more than roughly once every 1–2 months and pushes back on churn, so <strong>accumulate finished milestones on GitHub and submit to CRAN only when there is a coherent user-facing story a CRAN-only user needs</strong> (they will not <code>install_github</code>). Decoupling the two lets us keep shipping to GitHub continuously while spacing CRAN submissions.</p>
+<p><strong>Triage of the roadmap into CRAN submissions:</strong></p>
+<ul><li>
+<strong>Tier 1 — submit on its own, promptly. v1.2.0 (M1).</strong> Correctness fixes (silently-wrong results) justify interrupting cadence; ship alone, do not wait to bundle features.</li>
+<li>
+<strong>Tier 2 — flagship, its own slot. M4</strong> (fit statistics + Browne’s model / CircE replacement). Highest new-user value and strongest standalone story: CircE is archived on CRAN, so no R package currently estimates Browne’s model. Also the riskiest statistically, so it benefits from not sharing a release.</li>
+<li>
+<strong>Tier 3 — bundle, don’t spend a slot each. M2 + M3 → one release (~v1.3.0).</strong> M3 (ggplot2 extension) is mostly infrastructure whose payoff is realized by later milestones — weak as a solo CRAN submission; M2 (inference quality) is incremental. Together they make a substantial “faster, more flexible, composable plots + new visualization vignette” release. Caveat: both touch fragile internals (do the named-column results-assembly refactor before M2), so the bundle has a larger check/review surface — budget a <code>/code-review ultra</code> pass accordingly.</li>
+<li>
+<strong>Tier 4 — naturally their own releases; cadence is moot. M5</strong> (SEM) and <strong>M6</strong> (longitudinal, v2.0.0) are large and far enough out that no bundling decision is needed now.</li>
+<li>
+<strong>Never a CRAN submission on its own:</strong> the continuous/infra track below (refactors, test renames, CI upkeep, coverage). Ships to GitHub whenever convenient, folded into whichever milestone touches that code.</li>
+</ul><p><strong>Suggested submission train:</strong> (1) now — v1.2.0 (M1); (2) next slot — v1.3.0 (M2 + M3 bundled) once the viz extension is stable; (3) headline slot — M4 (CircE replacement); (4) M5, then M6/v2.0.0 as they land.</p>
+<p>Note: a quick <strong>patch</strong> (e.g. v1.2.1) shortly after a release is acceptable to CRAN when it fixes a real bug — bug-fixes are the accepted exception to the cadence rule. It is <em>feature</em> releases that must be spaced out.</p>
+<hr></div>
+<div class="section level2">
 <h2 id="milestone-1--correctness--robustness-patch-target-v120">Milestone 1 — Correctness &amp; robustness patch (target: v1.2.0)<a class="anchor" aria-label="anchor" href="#milestone-1--correctness--robustness-patch-target-v120"></a></h2>
 <p>Fixes for issues found in the 2026-07 audit. Small, high-value, low-risk. Task-level breakdown with acceptance criteria lives in MILESTONES.md.</p>
 <div class="section level3">
