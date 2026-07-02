@@ -125,7 +125,10 @@ The final SSM parameter is displacement or $`d`$, which is calculated as
 the angle at which the curve reaches its highest point. It is
 interpreted as the style of the profile. For instance, if $`d=90^\circ`$
 and we are using a circumplex scale that defines 90 degrees as
-“domineering,” then the profile’s style is domineering.
+“domineering,” then the profile’s style is domineering. Displacement is
+reported on the $`[0^\circ, 360^\circ)`$ circle; a profile that peaks
+right at the $`0^\circ`$/$`360^\circ`$ boundary may be reported as
+either value, since both point in the same direction.
 
 ![](VIG1-d.gif)
 
@@ -389,9 +392,12 @@ scores and instead of saying “Profile \[All\]” it now says “Profile
 
 We can also create a similar table and figure using the exact same
 syntax as before. The
-[`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md)
-and `ssm_plot()` functions are smart enough to know whether the results
-are mean-based or correlation-based and will work in both cases.
+[`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md),
+[`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md),
+and
+[`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md)
+functions are smart enough to know whether the results are mean-based or
+correlation-based and will work in both cases.
 
 ``` r
 
@@ -406,16 +412,18 @@ Correlation-based Structural Summary Statistics with 95% CIs {.table
 .table style="font-size: 14px; margin-left: auto; margin-right: auto;"}
 
 From the table, we can see that the model fit is good (\>.80) and that
-all three SSM parameters are significantly different from zero, i.e.,
-their confidence intervals do not include zero. Furthermore, the
-confidence intervals for the elevation and amplitude parameters are
-greater than or equal to 0.15, which can be interpreted as being
-“marked.” So, consistent with our hypotheses, NARPD was associated with
-marked general interpersonal distress (elevation) and was markedly
-distinctive in its profile (amplitude). The displacement parameter was
-somewhere between 100 and 120 degrees; to interpret this we would need
-to either consult the mapping between scales and angles or plot the
-results.
+the elevation and amplitude parameters are significantly different from
+zero, i.e., their confidence intervals do not include zero (a “different
+from zero” test is not meaningful for the displacement parameter, since
+it is an angle and 0 degrees is just an arbitrary reference direction
+rather than a null value). Furthermore, the confidence intervals for the
+elevation and amplitude parameters are greater than or equal to 0.15,
+which can be interpreted as being “marked.” So, consistent with our
+hypotheses, NARPD was associated with marked general interpersonal
+distress (elevation) and was markedly distinctive in its profile
+(amplitude). The displacement parameter was somewhere between 100 and
+120 degrees; to interpret this we would need to either consult the
+mapping between scales and angles or plot the results.
 
 ``` r
 

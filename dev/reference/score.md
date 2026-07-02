@@ -22,7 +22,8 @@ score(
 
 - data:
 
-  Required. A data frame containing at least circumplex scales.
+  Required. A data frame or matrix containing at least circumplex
+  scales.
 
 - items:
 

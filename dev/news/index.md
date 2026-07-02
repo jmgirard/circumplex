@@ -2,9 +2,95 @@
 
 ## circumplex (development version)
 
-## circumplex 1.1.0
+## circumplex 1.2.0
+
+- The SSM plotting functions
+  ([`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md),
+  [`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md),
+  [`ssm_plot_contrast()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.md))
+  now warn when given an unrecognized argument (e.g., a misspelled
+  parameter name) instead of silently ignoring it.
+- Matrix input now works wherever it is documented.
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
+  [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
+  [`ipsatize()`](http://circumplex.jmgirard.com/dev/reference/ipsatize.md),
+  [`score()`](http://circumplex.jmgirard.com/dev/reference/score.md),
+  [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md),
+  and
+  [`self_standardize()`](http://circumplex.jmgirard.com/dev/reference/self_standardize.md)
+  previously errored when given a matrix despite advertising matrix
+  support; they now coerce it to a data frame internally.
+- [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+  now accepts numeric column indexes for `scales` (e.g.,
+  `scales = 1:8`), consistent with its documentation and with
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md);
+  it previously required character names.
+- Printing an SSM object (via
+  [`print()`](https://rdrr.io/r/base/print.html) or
+  [`summary()`](https://rdrr.io/r/base/summary.html)) now adds a note
+  under any profile whose model fit is inadequate (R-squared \< .70;
+  interpret only elevation) or whose amplitude confidence interval
+  includes zero (the displacement is not interpretable). The notes apply
+  to profiles only, not to contrast rows.
+- Contrast displacement estimates and their confidence intervals are now
+  always reported on the same angular branch. Previously, for contrasts
+  near ±180 degrees, the estimate (reported in (-180, 180\]) could fall
+  numerically outside a confidence interval it was geometrically inside,
+  because the interval was centered on the bootstrap circular mean’s own
+  branch. The interval is now shifted by a full circle when needed (its
+  width and meaning are unchanged; results away from the boundary are
+  identical), so interval endpoints may exceed ±180 degrees when the
+  contrast straddles the boundary.
+- [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md)
+  now matches each scale to its normative data by angular position
+  rather than exact numeric equality, so 0 and 360 degrees are treated
+  as the same angle (previously passing 0 for a scale stored at 360
+  failed with a cryptic error). An angle with no matching normative row,
+  or with more than one, now produces an informative error naming the
+  available angles.
+- Degenerate profiles are now handled explicitly instead of returning
+  numerical noise. A flat (zero-variance) profile returns `NA`
+  displacement and fit with a warning (previously an arbitrary angle and
+  `-Inf`); a profile with real variance but zero amplitude returns `NA`
+  displacement and a fit of 0. Bootstrap resamples that produce
+  degenerate profiles (e.g., a resampled measure with zero variance) no
+  longer crash
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md);
+  they are excluded from the confidence intervals with a warning
+  reporting the count. Genuinely small amplitudes are unaffected — the
+  degeneracy test operates at machine-noise scale only.
+- Fixed a bug where a missing (`NA`) value in the `grouping` variable of
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  crashed with a cryptic error under pairwise deletion
+  (`listwise = FALSE`). Such observations are now dropped before
+  analysis with a message reporting how many were removed, in both
+  deletion modes; if no observations remain, a clear error is given.
+- Fixed a bug where length requirements on character arguments were
+  never enforced (`is_null_or_char()` dropped its `n` argument).
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  now errors if `measures_labels` does not match the number of
+  `measures` (or is given without `measures`),
+  [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)/[`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md)
+  now error if `angle_labels` does not match the number of angles
+  (previously mismatched labels could be silently recycled onto the
+  wrong scales), and
+  [`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md)/[`html_render()`](http://circumplex.jmgirard.com/dev/reference/html_render.md)
+  now require `caption` to be a single string.
+- Fixed a bug where
+  [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+  silently ignored its `angles` argument and always used
+  [`octants()`](http://circumplex.jmgirard.com/dev/reference/octants.md):
+  custom angle sets of the same length produced incorrect results
+  without warning, and angle sets of a different length (e.g.,
+  [`poles()`](http://circumplex.jmgirard.com/dev/reference/poles.md)
+  with four scales) errored. Results from
+  [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+  with the default `angles = octants()` are unaffected. (found in
+  2026-07 audit)
 
 ## circumplex 1.1.0
+
+CRAN release: 2026-05-24
 
 ### Minor improvements and fixes
 

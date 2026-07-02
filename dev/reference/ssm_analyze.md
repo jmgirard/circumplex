@@ -27,7 +27,8 @@ ssm_analyze(
 
 - data:
 
-  Required. A data frame containing at least circumplex scales.
+  Required. A data frame or matrix containing at least circumplex
+  scales.
 
 - scales:
 
@@ -40,6 +41,11 @@ ssm_analyze(
   Optional. A numeric vector containing the angular displacement of each
   circumplex scale included in `scales` (in degrees). (default =
   [`octants()`](http://circumplex.jmgirard.com/dev/reference/octants.md)).
+  The closed-form SSM estimator used here equals the
+  ordinary-least-squares cosine fit only when `angles` are equally
+  spaced around the circle (e.g., octants at 45-degree intervals); for
+  unequally spaced angles it is the conventional Gurtman estimator, not
+  a least-squares fit.
 
 - measures:
 
@@ -58,7 +64,13 @@ ssm_analyze(
   Optional. A logical indicating whether to output the difference
   between two measures' or two groups' SSM parameters. Can only be set
   to TRUE when there are exactly two measures and one group, one measure
-  and two groups, or no measures and two groups (default = FALSE).
+  and two groups, or no measures and two groups (default = FALSE). The
+  contrast is always the second level minus the first. For two groups,
+  this is the second level of `grouping` alphabetically, unless
+  `grouping` is already a factor with an explicit level order, in which
+  case that order is used. For two measures, this is simply the second
+  entry of `measures` as given (no reordering). The direction is shown
+  in the result's Label (e.g., "Male - Female").
 
 - boots:
 
@@ -111,6 +123,26 @@ A list containing the results and description of the analysis.
 - type:
 
   A string indicating what type of SSM analysis was done
+
+The profile displacement parameter is reported in the half-open interval
+`[0, 360)` degrees. A profile that peaks exactly at the 0/360 degree
+boundary is reported as approximately 360 (equivalently 0, the same
+direction); which of the two appears is a floating-point detail and both
+denote the same pole. Contrast displacements are instead reported as a
+signed difference in `(-180, 180]` degrees (see the "Contrast" block in
+the printed output).
+
+Degenerate profiles (flat or zero-amplitude) have undefined displacement
+(and fit, if flat), which is reported as `NA` with a warning. Bootstrap
+resamples that produce degenerate profiles (e.g., a resampled measure
+with zero variance) are excluded from the confidence intervals with a
+warning reporting how many were dropped; the intervals are then
+conditional on estimability.
+
+\[0,
+360)`degrees. A profile that peaks exactly at the 0/360 degree boundary is reported as approximately 360 (equivalently 0, the same direction); which of the two appears is a floating-point detail and both denote the same pole. Contrast displacements are instead reported as a signed difference in`(-180,
+180\]:
+R:0,%20360)%60%20degrees.%20A%20profile%20that%20peaks%20exactly%20at%20the%200/360%20degree%0A%20%20boundary%20is%20reported%20as%20approximately%20360%20(equivalently%200,%20the%20same%0A%20%20direction);%20which%20of%20the%20two%20appears%20is%20a%20floating-point%20detail%20and%20both%0A%20%20denote%20the%20same%20pole.%20Contrast%20displacements%20are%20instead%20reported%20as%20a%0A%20%20signed%20difference%20in%20%60(-180,%20180
 
 ## See also
 

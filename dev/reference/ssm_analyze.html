@@ -15,7 +15,7 @@ measures will be calculated."><meta property="og:image" content="http://circumpl
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,8 @@ measures will be calculated.</p>
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>Required. A data frame containing at least circumplex scales.</p></dd>
+<dd><p>Required. A data frame or matrix containing at least
+circumplex scales.</p></dd>
 
 
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
@@ -104,7 +105,11 @@ scores to be analyzed.</p></dd>
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>
 <dd><p>Optional. A numeric vector containing the angular displacement
 of each circumplex scale included in <code>scales</code> (in degrees). (default =
-<code><a href="octants.html">octants()</a></code>).</p></dd>
+<code><a href="octants.html">octants()</a></code>). The closed-form SSM estimator used here equals the
+ordinary-least-squares cosine fit only when <code>angles</code> are equally spaced
+around the circle (e.g., octants at 45-degree intervals); for unequally
+spaced angles it is the conventional Gurtman estimator, not a
+least-squares fit.</p></dd>
 
 
 <dt id="arg-measures">measures<a class="anchor" aria-label="anchor" href="#arg-measures"></a></dt>
@@ -123,7 +128,13 @@ each observation.</p></dd>
 <dd><p>Optional. A logical indicating whether to output the
 difference between two measures' or two groups' SSM parameters. Can only be
 set to TRUE when there are exactly two measures and one group, one measure
-and two groups, or no measures and two groups (default = FALSE).</p></dd>
+and two groups, or no measures and two groups (default = FALSE). The
+contrast is always the second level minus the first. For two groups, this
+is the second level of <code>grouping</code> alphabetically, unless <code>grouping</code> is
+already a factor with an explicit level order, in which case that order is
+used. For two measures, this is simply the second entry of <code>measures</code> as
+given (no reordering). The direction is shown in the result's Label (e.g.,
+"Male - Female").</p></dd>
 
 
 <dt id="arg-boots">boots<a class="anchor" aria-label="anchor" href="#arg-boots"></a></dt>
@@ -173,7 +184,22 @@ this object</p></dd>
 <dd><p>A
 string indicating what type of SSM analysis was done</p></dd>
 
-</dl></div>
+
+</dl><p>The profile displacement parameter is reported in the half-open interval
+<code>[0, 360)</code> degrees. A profile that peaks exactly at the 0/360 degree
+boundary is reported as approximately 360 (equivalently 0, the same
+direction); which of the two appears is a floating-point detail and both
+denote the same pole. Contrast displacements are instead reported as a
+signed difference in <code>(-180, 180]</code> degrees (see the "Contrast" block in
+the printed output).</p>
+<p>Degenerate profiles (flat or zero-amplitude) have undefined displacement
+(and fit, if flat), which is reported as <code>NA</code> with a warning. Bootstrap
+resamples that produce degenerate profiles (e.g., a resampled measure
+with zero variance) are excluded from the confidence intervals with a
+warning reporting how many were dropped; the intervals are then
+conditional on estimability.</p>
+<p>[0, 360)<code>degrees. A profile that peaks exactly at the 0/360 degree boundary is reported as approximately 360 (equivalently 0, the same direction); which of the two appears is a floating-point detail and both denote the same pole. Contrast displacements are instead reported as a signed difference in</code>(-180, 180]: R:0,%20360)%60%20degrees.%20A%20profile%20that%20peaks%20exactly%20at%20the%200/360%20degree%0A%20%20boundary%20is%20reported%20as%20approximately%20360%20(equivalently%200,%20the%20same%0A%20%20direction);%20which%20of%20the%20two%20appears%20is%20a%20floating-point%20detail%20and%20both%0A%20%20denote%20the%20same%20pole.%20Contrast%20displacements%20are%20instead%20reported%20as%20a%0A%20%20signed%20difference%20in%20%60(-180,%20180</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other ssm functions:

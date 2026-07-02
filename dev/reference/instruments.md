@@ -22,7 +22,7 @@ Other instrument functions:
 
 ``` r
 instruments()
-#> The circumplex package currently includes 14 instruments:
+#> The circumplex package currently includes 15 instruments:
 #>  1. CAIS: Child and Adolescent Interpersonal Survey (cais)
 #>  2. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)
 #>  3. CSIG: Circumplex Scales of Intergroup Goals (csig)

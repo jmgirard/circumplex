@@ -1,8 +1,12 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>http://circumplex.jmgirard.com/dev/CLAUDE.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/CODE_OF_CONDUCT.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/CONTRIBUTING.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/DESIGN.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/ISSUE_TEMPLATE.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/LICENSE.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/MILESTONES.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/ROADMAP.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/SUPPORT.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/index.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/intermediate-ssm-analysis.html</loc></url>

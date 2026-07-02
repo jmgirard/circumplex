@@ -15,7 +15,7 @@ function that calculates SSM parameters for each row of a data frame."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,7 +143,15 @@ fit or R-squared value (default = "Fit").</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data frame containing the SSM parameters calculated from <code>scores</code>.</p>
+    <p>A data frame containing the SSM parameters calculated from <code>scores</code>.
+For degenerate profiles the undefined parameters are returned as <code>NA</code>
+with a warning: a flat profile (zero variance) has undefined displacement
+and fit, and a profile with real variance but zero amplitude (i.e., no
+first-harmonic component) has undefined displacement and a fit of 0.
+Note that this applies only to amplitudes that are zero up to machine
+precision; small real amplitudes are always estimated, and their
+uncertainty is expressed through confidence intervals (see
+<code><a href="ssm_analyze.html">ssm_analyze()</a></code>).</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

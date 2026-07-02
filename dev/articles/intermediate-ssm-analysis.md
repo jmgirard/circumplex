@@ -244,6 +244,7 @@ summary(results3)
 #> Amplitude         0.120      0.075      0.171
 #> Displacement    106.881     82.677    129.996
 #> Model Fit         0.648                      
+#>   Note: model fit is inadequate (R² < .70); interpret only the elevation parameter.
 #> 
 #> 
 #> # Profile [SCZPD: Male]:
@@ -265,7 +266,8 @@ summary(results3)
 #> Y-Value           0.029     -0.018      0.079
 #> Amplitude         0.047      0.013      0.101
 #> Displacement    142.345     68.178    218.702
-#> Model Fit         0.424
+#> Model Fit         0.424                      
+#>   Note: model fit is inadequate (R² < .70); interpret only the elevation parameter.
 ```
 
 ``` r
@@ -547,6 +549,7 @@ summary(results6)
 #> Amplitude         0.055      0.016      0.109
 #> Displacement     77.367     12.983    133.991
 #> Model Fit         0.500                      
+#>   Note: model fit is inadequate (R² < .70); interpret only the elevation parameter.
 #> 
 #> 
 #> # Contrast [BORPD: Male - Female]:
@@ -657,7 +660,7 @@ manuscripts, presentations, or posters.
 
 ``` r
 
-ssm_plot(results6)
+ssm_plot_contrast(results6)
 ggsave("bordpd_gender.png", width = 7.5, height = 4, units = "in")
 ```
 

@@ -13,7 +13,7 @@ scores (i.e., z-scores) based on comparison to the normative data."><meta proper
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,7 +100,10 @@ scores) to be standardized.</p></dd>
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>
 <dd><p>Required. A numeric vector containing the angular displacement
 of each circumplex scale included in <code>scales</code> (in degrees). Can use the
-<code><a href="octants.html">octants()</a></code>, <code><a href="poles.html">poles()</a></code>, or <code><a href="quadrants.html">quadrants()</a></code> convenience functions.</p></dd>
+<code><a href="octants.html">octants()</a></code>, <code><a href="poles.html">poles()</a></code>, or <code><a href="quadrants.html">quadrants()</a></code> convenience functions. Each angle
+is matched to the instrument's normative data by angular position, so 0
+and 360 degrees are treated as the same angle; an angle with no matching
+normative row (or with more than one) produces an informative error.</p></dd>
 
 
 <dt id="arg-instrument">instrument<a class="anchor" aria-label="anchor" href="#arg-instrument"></a></dt>

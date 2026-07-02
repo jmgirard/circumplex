@@ -43,7 +43,7 @@ ssm_plot_curve(
 
 - ...:
 
-  Additional arguments will be ignored.
+  Not used. Supplying an unrecognized argument produces a warning.
 
 ## Value
 
@@ -61,7 +61,7 @@ res <- ssm_analyze(
 )
 ssm_plot_curve(res)
 
-ssm_plot_curve(res, angle_lables = PANO())
+ssm_plot_curve(res, angle_labels = PANO())
 
 # }
 ```

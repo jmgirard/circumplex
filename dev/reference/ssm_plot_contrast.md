@@ -52,7 +52,7 @@ ssm_plot_contrast(
 
 - ...:
 
-  Additional arguments will be ignored.
+  Not used. Supplying an unrecognized argument produces a warning.
 
 ## Value
 

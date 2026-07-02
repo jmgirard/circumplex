@@ -41,7 +41,10 @@ norm_standardize(
   [`octants()`](http://circumplex.jmgirard.com/dev/reference/octants.md),
   [`poles()`](http://circumplex.jmgirard.com/dev/reference/poles.md), or
   [`quadrants()`](http://circumplex.jmgirard.com/dev/reference/quadrants.md)
-  convenience functions.
+  convenience functions. Each angle is matched to the instrument's
+  normative data by angular position, so 0 and 360 degrees are treated
+  as the same angle; an angle with no matching normative row (or with
+  more than one) produces an informative error.
 
 - instrument:
 

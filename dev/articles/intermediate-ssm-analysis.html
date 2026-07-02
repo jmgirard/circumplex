@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -439,6 +439,7 @@ below.</p>
 <span><span class="co">#&gt; Amplitude         0.120      0.075      0.171</span></span>
 <span><span class="co">#&gt; Displacement    106.881     82.677    129.996</span></span>
 <span><span class="co">#&gt; Model Fit         0.648                      </span></span>
+<span><span class="co">#&gt;   Note: model fit is inadequate (R² &lt; .70); interpret only the elevation parameter.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Profile [SCZPD: Male]:</span></span>
@@ -460,7 +461,8 @@ below.</p>
 <span><span class="co">#&gt; Y-Value           0.029     -0.018      0.079</span></span>
 <span><span class="co">#&gt; Amplitude         0.047      0.013      0.101</span></span>
 <span><span class="co">#&gt; Displacement    142.345     68.178    218.702</span></span>
-<span><span class="co">#&gt; Model Fit         0.424</span></span></code></pre></div>
+<span><span class="co">#&gt; Model Fit         0.424                      </span></span>
+<span><span class="co">#&gt;   Note: model fit is inadequate (R² &lt; .70); interpret only the elevation parameter.</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -1040,6 +1042,7 @@ Group1”.</p>
 <span><span class="co">#&gt; Amplitude         0.055      0.016      0.109</span></span>
 <span><span class="co">#&gt; Displacement     77.367     12.983    133.991</span></span>
 <span><span class="co">#&gt; Model Fit         0.500                      </span></span>
+<span><span class="co">#&gt;   Note: model fit is inadequate (R² &lt; .70); interpret only the elevation parameter.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Contrast [BORPD: Male - Female]:</span></span>
@@ -1359,7 +1362,7 @@ also control the exact width and height of the image in different units
 vectorized in R, they can be easily scaled to any size without loss of
 quality and used in manuscripts, presentations, or posters.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ssm_plot</span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast</a></span><span class="op">(</span><span class="va">results6</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/ggsave.html">ggsave</a></span><span class="op">(</span><span class="st">"bordpd_gender.png"</span>, width <span class="op">=</span> <span class="fl">7.5</span>, height <span class="op">=</span> <span class="fl">4</span>, units <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>

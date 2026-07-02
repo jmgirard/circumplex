@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -222,7 +222,13 @@ which is calculated as the angle at which the curve reaches its highest
 point. It is interpreted as the style of the profile. For instance, if
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><msup><mn>90</mn><mo>∘</mo></msup></mrow><annotation encoding="application/x-tex">d=90^\circ</annotation></semantics></math>
 and we are using a circumplex scale that defines 90 degrees as
-“domineering,” then the profile’s style is domineering.</p>
+“domineering,” then the profile’s style is domineering. Displacement is
+reported on the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><msup><mn>0</mn><mo>∘</mo></msup><mo>,</mo><msup><mn>360</mn><mo>∘</mo></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">[0^\circ, 360^\circ)</annotation></semantics></math>
+circle; a profile that peaks right at the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>0</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">0^\circ</annotation></semantics></math>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>360</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">360^\circ</annotation></semantics></math>
+boundary may be reported as either value, since both point in the same
+direction.</p>
 <p><img src="VIG1-d.gif" class="r-plt" alt="" width="100%"></p>
 <p>By interpreting these three parameters, we can understand a profile
 much more parsimoniously than by trying to interpret all eight subscales
@@ -492,10 +498,10 @@ mean scores and instead of saying “Profile [All]” it now says “Profile
 <h3 id="visualizing-the-results-with-a-table-and-figure-1">Visualizing the results with a table and figure<a class="anchor" aria-label="anchor" href="#visualizing-the-results-with-a-table-and-figure-1"></a>
 </h3>
 <p>We can also create a similar table and figure using the exact same
-syntax as before. The <code><a href="../reference/ssm_table.html">ssm_table()</a></code> and
-<code>ssm_plot()</code> functions are smart enough to know whether the
-results are mean-based or correlation-based and will work in both
-cases.</p>
+syntax as before. The <code><a href="../reference/ssm_table.html">ssm_table()</a></code>,
+<code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, and <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code>
+functions are smart enough to know whether the results are mean-based or
+correlation-based and will work in both cases.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 14px; margin-left: auto; margin-right: auto;">
@@ -550,8 +556,11 @@ NARPD
 </tr></tbody>
 </table>
 <p>From the table, we can see that the model fit is good (&gt;.80) and
-that all three SSM parameters are significantly different from zero,
-i.e., their confidence intervals do not include zero. Furthermore, the
+that the elevation and amplitude parameters are significantly different
+from zero, i.e., their confidence intervals do not include zero (a
+“different from zero” test is not meaningful for the displacement
+parameter, since it is an angle and 0 degrees is just an arbitrary
+reference direction rather than a null value). Furthermore, the
 confidence intervals for the elevation and amplitude parameters are
 greater than or equal to 0.15, which can be interpreted as being
 “marked.” So, consistent with our hypotheses, NARPD was associated with

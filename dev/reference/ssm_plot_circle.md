@@ -78,7 +78,7 @@ ssm_plot_circle(
 
 - ...:
 
-  Currently ignored.
+  Not used. Supplying an unrecognized argument produces a warning.
 
 ## Value
 
