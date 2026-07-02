@@ -22,7 +22,7 @@ regression test that fails on the pre-fix code. Order below is suggested
   `listwise = FALSE` crashes in `mean_scores()` (`unique(): detected NaN`).
   *Accept:* NA-group rows dropped with a `message()` reporting the count, in
   both deletion modes; results match manually pre-filtered data.
-- [ ] **B4. Degenerate profiles return NA + warning** — zero-variance scores
+- [x] **B4. Degenerate profiles return NA + warning** — zero-variance scores
   give `Fit = -Inf` and noise displacement (`src/parameters.cpp`).
   *Accept:* flat profile returns NA displacement/fit with one warning;
   near-zero amplitude documented behavior decided and tested; bootstrap
@@ -103,6 +103,17 @@ regression test that fails on the pre-fix code. Order below is suggested
   grouping column). Regression tests cover both modes, contrast, the collision
   (expect_no_message), and the all-NA clean error. Check clean 0/0/0
   (R/ssm_analysis.R, R/utils.R, tests, NEWS.md).
+- 2026-07-02 — B4 (Fable): degenerate-profile handling. C++ detects flat
+  (sd ≤ 8·ε·n·max|s| — cannot test var==0 exactly; constant 0.1 gives ~2e-34)
+  → NA disp/fit, and zero-amplitude-with-variance (pure higher harmonic) →
+  NA disp, fit exactly 0. C++ silent; R warns once for observed profiles and
+  once with a count for degenerate bootstrap resamples (quantiles now na.rm;
+  CIs conditional on estimability, disclosed). Decision: NO threshold beyond
+  machine noise — small real amplitudes keep point estimates (validated to
+  1e-9 amplitude); their uncertainty is the CI's/G1's job. Validation: 15/15
+  incl. NA-excluded CI == independent boot+filter reference (1e-10, 16/300
+  degenerate). Seeded pins unchanged. Documented in roxygen + DESIGN.md
+  (src/parameters.cpp, R/ssm_analysis.R, R/ssm_bootstrap.R, tests, NEWS.md).
 
 ---
 

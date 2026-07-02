@@ -69,6 +69,13 @@ displacement of scales (angles)}
 this object}
 \item{scores}{A data frame containing the mean scale scores} \item{type}{A
 string indicating what type of SSM analysis was done}
+
+Degenerate profiles (flat or zero-amplitude) have undefined displacement
+(and fit, if flat), which is reported as \code{NA} with a warning. Bootstrap
+resamples that produce degenerate profiles (e.g., a resampled measure
+with zero variance) are excluded from the confidence intervals with a
+warning reporting how many were dropped; the intervals are then
+conditional on estimability.
 }
 \description{
 Calculate SSM parameters with bootstrapped confidence intervals for a variety

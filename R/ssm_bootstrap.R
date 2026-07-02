@@ -25,6 +25,24 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
     rep(1:nrow(bs_est), each = 6)
   )
 
+  # Degenerate profiles (flat or zero-amplitude) carry NA parameters -----------
+  if (any(is.na(bs_est$d_est))) {
+    warning(
+      "One or more observed profiles are flat or have zero amplitude; ",
+      "their displacement (and fit, if flat) is undefined and reported as NA.",
+      call. = FALSE
+    )
+  }
+  n_bad <- sum(!stats::complete.cases(bs_t))
+  if (n_bad > 0) {
+    warning(
+      n_bad, " of ", nrow(bs_t), " bootstrap resamples produced degenerate ",
+      "(flat or zero-amplitude) profiles and were excluded from the ",
+      "confidence intervals, which are therefore conditional on estimability.",
+      call. = FALSE
+    )
+  }
+
   # Set the units of the displacement results to radians -----------------------
   if (contrast) {
     # Convert individual group d variables to standard radian class
@@ -41,12 +59,12 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
   bs_t[d_vars] <- lapply(bs_t[d_vars], new_radian)
 
   # Calculate the lower bounds of the confidence intervals ---------------------
-  bs_lci <- sapply(bs_t, quantile, probs = ((1 - interval) / 2))
+  bs_lci <- sapply(bs_t, quantile, probs = ((1 - interval) / 2), na.rm = TRUE)
   bs_lci <- reshape_params(bs_lci, suffix = "lci")
   bs_lci$fit_lci <- NULL
 
   # Calculate the upper bounds of the confidence intervals ---------------------
-  bs_uci <- sapply(bs_t, quantile, probs = (1 - (1 - interval) / 2))
+  bs_uci <- sapply(bs_t, quantile, probs = (1 - (1 - interval) / 2), na.rm = TRUE)
   bs_uci <- reshape_params(bs_uci, suffix = "uci")
   bs_uci$fit_uci <- NULL
 

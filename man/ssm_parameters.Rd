@@ -50,6 +50,14 @@ fit or R-squared value (default = "Fit").}
 }
 \value{
 A data frame containing the SSM parameters calculated from \code{scores}.
+For degenerate profiles the undefined parameters are returned as \code{NA}
+with a warning: a flat profile (zero variance) has undefined displacement
+and fit, and a profile with real variance but zero amplitude (i.e., no
+first-harmonic component) has undefined displacement and a fit of 0.
+Note that this applies only to amplitudes that are zero up to machine
+precision; small real amplitudes are always estimated, and their
+uncertainty is expressed through confidence intervals (see
+\code{\link{ssm_analyze}()}).
 }
 \description{
 Calculate SSM parameters (without confidence intervals) for a set of scores

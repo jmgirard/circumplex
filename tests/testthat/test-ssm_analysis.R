@@ -418,6 +418,38 @@ test_that("ssm_parameters works", {
   )
 })
 
+test_that("degenerate profiles return NA with one warning", {
+  # Flat profile with an exactly representable value
+  expect_warning(out <- ssm_parameters(rep(1, 8)), "flat|amplitude|undefined")
+  expect_equal(out$Elev, 1)
+  expect_true(is.na(out$Disp))
+  expect_true(is.na(out$Fit))
+  expect_lt(abs(out$Ampl), 1e-12)
+
+  # Flat profile with a non-representable value (var is ~2e-34, not exactly 0)
+  expect_warning(out2 <- ssm_parameters(rep(0.1, 8)), "flat|amplitude|undefined")
+  expect_true(is.na(out2$Disp))
+  expect_true(is.na(out2$Fit))
+
+  # Pure second harmonic: real variance but zero first-harmonic amplitude, so
+  # displacement is undefined while fit is exactly 0 (model reduces to mean)
+  rad <- as.numeric(as_radian(octants()))
+  s2 <- cos(2 * rad)
+  expect_warning(out3 <- ssm_parameters(s2), "flat|amplitude|undefined")
+  expect_true(is.na(out3$Disp))
+  expect_equal(out3$Fit, 0)
+
+  # A small but real amplitude must NOT be treated as degenerate
+  s_small <- 1 + 0.001 * cos(rad - pi / 4)
+  expect_no_warning(out4 <- ssm_parameters(s_small))
+  expect_equal(out4$Disp, 45, tolerance = 1e-6)
+  expect_equal(out4$Fit, 1, tolerance = 1e-6)
+
+  # Missing scores propagate as NA without noise angles
+  expect_warning(out5 <- ssm_parameters(c(NA, rnorm(7))), "flat|amplitude|undefined|missing")
+  expect_true(is.na(out5$Disp))
+})
+
 test_that("ssm_score works", {
   data("aw2009")
   out <- ssm_score(aw2009, scales = PANO(), append = TRUE)

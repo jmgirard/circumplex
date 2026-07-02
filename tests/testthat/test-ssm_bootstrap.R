@@ -33,6 +33,35 @@ test_that("Quantile for circular radians works", {
 
 library(testthat)
 
+test_that("bootstrap with some degenerate replicates does not error", {
+  # A rare binary measure: some resamples are constant, giving NaN
+  # correlations and hence degenerate replicate profiles
+  set.seed(42)
+  n <- 100
+  dat <- data.frame(matrix(rnorm(n * 8), ncol = 8))
+  colnames(dat) <- PANO()
+  dat$rare <- c(rep(0, 97), rep(1, 3))
+
+  expect_warning(
+    res <- ssm_analyze(dat, scales = 1:8, measures = "rare", boots = 200),
+    "resamples"
+  )
+  # Point estimates and CIs for the observed (non-degenerate) profile exist
+  expect_true(is.finite(res$results$e_est))
+  expect_true(is.finite(res$results$d_lci) && is.finite(res$results$d_uci))
+  expect_true(is.finite(res$results$a_lci) && is.finite(res$results$a_uci))
+})
+
+test_that("fully flat data yields NA estimates without erroring", {
+  dat <- as.data.frame(matrix(1, nrow = 20, ncol = 8))
+  colnames(dat) <- PANO()
+  w <- capture_warnings(res <- ssm_analyze(dat, scales = 1:8, boots = 20))
+  expect_true(any(grepl("flat", w)))
+  expect_equal(res$results$e_est, 1)
+  expect_true(is.na(res$results$d_est))
+  expect_true(is.na(res$results$fit_est))
+})
+
 test_that("quantile.circumplex_contrast_radian handles 0/360 boundary crossings cleanly", {
   # Create mock bootstrap replicates that straddle the 0/2*pi boundary.
   # 0.01 and 0.02 rad are just above 0° (~0.57° and ~1.15°).

@@ -46,6 +46,13 @@
 #'   this object}
 #'   \item{scores}{A data frame containing the mean scale scores} \item{type}{A
 #'   string indicating what type of SSM analysis was done}
+#'
+#'   Degenerate profiles (flat or zero-amplitude) have undefined displacement
+#'   (and fit, if flat), which is reported as `NA` with a warning. Bootstrap
+#'   resamples that produce degenerate profiles (e.g., a resampled measure
+#'   with zero variance) are excluded from the confidence intervals with a
+#'   warning reporting how many were dropped; the intervals are then
+#'   conditional on estimability.
 #' @family ssm functions
 #' @family analysis functions
 #' @export
@@ -451,6 +458,14 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
 #' @param f_label Optional. A string representing the variable name of the SSM
 #'   fit or R-squared value (default = "Fit").
 #' @return A data frame containing the SSM parameters calculated from `scores`.
+#'   For degenerate profiles the undefined parameters are returned as `NA`
+#'   with a warning: a flat profile (zero variance) has undefined displacement
+#'   and fit, and a profile with real variance but zero amplitude (i.e., no
+#'   first-harmonic component) has undefined displacement and a fit of 0.
+#'   Note that this applies only to amplitudes that are zero up to machine
+#'   precision; small real amplitudes are always estimated, and their
+#'   uncertainty is expressed through confidence intervals (see
+#'   \code{\link{ssm_analyze}()}).
 #' @family ssm functions
 #' @family analysis functions
 #' @export
@@ -483,8 +498,15 @@ ssm_parameters <- function(scores, angles = octants(), prefix = "", suffix = "",
 
   angles <- as_radian(as_degree(angles))
   params <- ssm_parameters_cpp(scores, angles)
+  if (is.na(params[[5]])) {
+    warning(
+      "Displacement is undefined for this profile (flat scores, zero ",
+      "amplitude, or missing values); NA returned.",
+      call. = FALSE
+    )
+  }
   params[[5]] <- as_degree(as_radian(params[[5]]))
-  
+
   rownames(params) <- paste0(
     prefix, 
     c(e_label, x_label, y_label, a_label, d_label, f_label), 

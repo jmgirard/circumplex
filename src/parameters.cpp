@@ -1,4 +1,5 @@
 # include <RcppArmadillo.h>
+# include <limits>
 
 using namespace Rcpp;
 using namespace arma;
@@ -19,6 +20,11 @@ double modu(double x, double y) {
 }
 
 // Calculate structural summary parameters (angles and displacement in radians)
+// Degenerate profiles are numerically detected at a machine-noise tolerance:
+// a flat profile (sd below tolerance) has undefined displacement and fit; a
+// zero-amplitude profile with real variance (e.g., a pure higher harmonic)
+// has undefined displacement but a fit of exactly 0. NA is returned for the
+// undefined parameters; warnings are the R layer's responsibility.
 // [[Rcpp::export]]
 arma::vec ssm_parameters_cpp(arma::vec scores, arma::vec angles) {
   double n = scores.size();
@@ -26,9 +32,27 @@ arma::vec ssm_parameters_cpp(arma::vec scores, arma::vec angles) {
   double xval = (2 / n) * inner(scores, arma::cos(angles));
   double yval = (2 / n) * inner(scores, arma::sin(angles));
   double ampl = std::sqrt(std::pow(xval, 2) + std::pow(yval, 2));
-  double disp = modu(std::atan2(yval, xval), 2 * M_PI);
-  double gfit = 1 - ((arma::sum(arma::pow(elev + ampl *
-    arma::cos(angles - disp) - scores, 2))) / (arma::var(scores) * (n - 1)));
+  double disp;
+  double gfit;
+  double vars = arma::var(scores);
+  double sd = std::sqrt(vars);
+  // Scale-aware tolerance for float-cancellation noise (~13 orders of
+  // magnitude below any real variation, so genuinely small amplitudes pass)
+  double tol = 8 * std::numeric_limits<double>::epsilon() * n *
+    arma::abs(scores).max();
+  if (!(sd > tol)) {
+    // Flat profile (or NaN scores): no cosine structure to summarize
+    disp = NA_REAL;
+    gfit = NA_REAL;
+  } else if (ampl <= tol) {
+    // Zero first-harmonic amplitude: the model reduces to the mean
+    disp = NA_REAL;
+    gfit = 0;
+  } else {
+    disp = modu(std::atan2(yval, xval), 2 * M_PI);
+    gfit = 1 - ((arma::sum(arma::pow(elev + ampl *
+      arma::cos(angles - disp) - scores, 2))) / (vars * (n - 1)));
+  }
   arma::vec out = {elev, xval, yval, ampl, disp, gfit};
   return out;
 }
