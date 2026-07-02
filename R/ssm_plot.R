@@ -244,7 +244,7 @@ ssm_plot_curve <- function(ssm_object,
                            drop_lowfit = FALSE,
                            ...) {
 
-  stopifnot(class(ssm_object) == "circumplex_ssm")
+  stopifnot(inherits(ssm_object, "circumplex_ssm"))
 
   results <- ssm_object$results
   scores <- ssm_object$scores

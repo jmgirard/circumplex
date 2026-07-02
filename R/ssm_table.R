@@ -40,7 +40,7 @@
 ssm_table <- function(ssm_object, caption = NULL, 
                       drop_xy = FALSE, render = TRUE) {
   
-  stopifnot(class(ssm_object) == "circumplex_ssm")
+  stopifnot(inherits(ssm_object, "circumplex_ssm"))
   stopifnot(is_null_or_char(caption, n = 1))
   stopifnot(is_flag(drop_xy))
   stopifnot(is_flag(render))

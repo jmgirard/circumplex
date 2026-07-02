@@ -112,6 +112,16 @@ test_that("norm_standardize errors clearly on duplicate-angle norms", {
 })
 
 
+test_that("tidying functions accept matrix input", {
+  ref <- self_standardize(aw2009, scales = 1:8, append = FALSE)
+  out <- self_standardize(as.matrix(aw2009), scales = 1:8, append = FALSE)
+  expect_equal(out, ref)
+
+  ips_ref <- ipsatize(raw_iipsc, items = 1:32, append = FALSE)
+  ips_out <- ipsatize(as.matrix(raw_iipsc), items = 1:32, append = FALSE)
+  expect_equal(ips_out, ips_ref)
+})
+
 test_that("self_standardize works", {
   old <- aw2009
   new <- self_standardize(

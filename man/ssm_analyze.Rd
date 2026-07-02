@@ -18,7 +18,8 @@ ssm_analyze(
 )
 }
 \arguments{
-\item{data}{Required. A data frame containing at least circumplex scales.}
+\item{data}{Required. A data frame or matrix containing at least
+circumplex scales.}
 
 \item{scales}{Required. A character vector of column names, or a numeric
 vector of column indexes, from \code{data} that contains the circumplex scale

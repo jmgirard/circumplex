@@ -11,7 +11,7 @@ new_instrument <- function(Scales, Anchors, Items, Norms, Details, ...) {
 }
 
 is_instrument <- function(x) {
-  typeof(x) == "list" & class(x) == "circumplex_instrument"
+  is.list(x) && inherits(x, "circumplex_instrument")
 }
 
 #' @export

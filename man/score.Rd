@@ -15,7 +15,8 @@ score(
 )
 }
 \arguments{
-\item{data}{Required. A data frame containing at least circumplex scales.}
+\item{data}{Required. A data frame or matrix containing at least
+circumplex scales.}
 
 \item{items}{Required. The variable names or column numbers for the variables
 in \code{.data} that contain all the circumplex items from a single

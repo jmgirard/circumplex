@@ -38,6 +38,7 @@ ipsatize <- function(data, items, na.rm = TRUE,
   stopifnot(is_char(suffix, n = 1))
   stopifnot(is_flag(append))
 
+  if (is.matrix(data)) data <- as.data.frame(data)
   item_data <- data[items]
   item_names <- colnames(item_data)
   rmean <- rowMeans(item_data, na.rm = na.rm)
@@ -57,7 +58,8 @@ ipsatize <- function(data, items, na.rm = TRUE,
 #' of scoring instructions, which may be loaded from the package or created as a
 #' custom data frame.
 #'
-#' @param data Required. A data frame containing at least circumplex scales.
+#' @param data Required. A data frame or matrix containing at least
+#'   circumplex scales.
 #' @param items Required. The variable names or column numbers for the variables
 #'   in \code{.data} that contain all the circumplex items from a single
 #'   circumplex measure, in ascending order from item 1 to item N.
@@ -87,12 +89,13 @@ score <- function(data, items, instrument, na.rm = TRUE,
   
   stopifnot(is.data.frame(data) || is.matrix(data))
   stopifnot(is_var(items))
-  stopifnot(class(instrument) == "circumplex_instrument")
+  stopifnot(inherits(instrument, "circumplex_instrument"))
   stopifnot(is_flag(na.rm))
   stopifnot(is_char(prefix))
   stopifnot(is_char(suffix))
   stopifnot(is_flag(append))
-  
+
+  if (is.matrix(data)) data <- as.data.frame(data)
   item_data <- data[items]
   n_items <- length(items)
   key <- instrument$Scales
@@ -163,13 +166,13 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
   stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
   stopifnot(length(scales) == length(angles))
-  stopifnot(class(instrument) == "circumplex_instrument")
+  stopifnot(inherits(instrument, "circumplex_instrument"))
   stopifnot(is_num(sample, n = 1))
   stopifnot(is_char(prefix, n = 1))
   stopifnot(is_char(suffix, n = 1))
   stopifnot(is_flag(append))
-  
-  
+
+  if (is.matrix(data)) data <- as.data.frame(data)
   key <- instrument$Norms[[1]]
   key <- key[key$Sample == sample, ]
   
@@ -254,7 +257,8 @@ self_standardize <- function(data, scales, na.rm = TRUE,
   stopifnot(is_char(prefix, n = 1))
   stopifnot(is_char(suffix, n = 1))
   stopifnot(is_flag(append))
-  
+
+  if (is.matrix(data)) data <- as.data.frame(data)
   scale_data <- data[scales]
   scale_names <- colnames(scale_data)
 

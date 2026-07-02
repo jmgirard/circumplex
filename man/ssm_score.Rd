@@ -7,7 +7,8 @@
 ssm_score(data, scales, angles = octants(), append = TRUE, ...)
 }
 \arguments{
-\item{data}{Required. A data frame containing at least circumplex scales.}
+\item{data}{Required. A data frame or matrix containing at least
+circumplex scales.}
 
 \item{scales}{Required. The variable names or column numbers for the
 variables in \code{.data} that contain circumplex scales to be analyzed.}

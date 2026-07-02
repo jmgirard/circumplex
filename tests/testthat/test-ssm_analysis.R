@@ -418,6 +418,30 @@ test_that("ssm_parameters works", {
   )
 })
 
+test_that("ssm_score accepts matrix input and numeric scales", {
+  data("aw2009")
+  ref <- ssm_score(aw2009, scales = PANO(), append = FALSE)
+
+  # Matrix input (advertised in the docs) must work and match the data frame
+  m <- as.matrix(aw2009)
+  out_mat <- ssm_score(m, scales = PANO(), append = FALSE)
+  expect_equal(out_mat, ref)
+
+  # Numeric column indexes must work (roxygen promises "column numbers")
+  out_num <- ssm_score(aw2009, scales = 1:8, append = FALSE)
+  expect_equal(out_num, ref)
+})
+
+test_that("ssm_analyze accepts matrix input", {
+  skip_on_cran()
+  data("aw2009")
+  set.seed(12345)
+  ref <- ssm_analyze(aw2009, scales = 1:8, boots = 50)
+  set.seed(12345)
+  out <- ssm_analyze(as.matrix(aw2009), scales = 1:8, boots = 50)
+  expect_equal(out$results, ref$results)
+})
+
 test_that("degenerate profiles return NA with one warning", {
   # Flat profile with an exactly representable value
   expect_warning(out <- ssm_parameters(rep(1, 8)), "flat|amplitude|undefined")

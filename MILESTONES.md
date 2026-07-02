@@ -42,7 +42,7 @@ regression test that fails on the pre-fix code. Order below is suggested
   amplitude CI includes 0 (displacement not interpretable).
 - [x] **G2.** Document displacement boundary convention (0° prints as 360°),
   or normalize; decide once, record in DESIGN.md.
-- [ ] **G3.** `inherits()` instead of `class(x) ==` everywhere; fix or drop
+- [x] **G3.** `inherits()` instead of `class(x) ==` everywhere; fix or drop
   matrix input support in `ssm_analyze()`/`ssm_score()`. Also (found during
   B1 review): `ssm_score()` validates `is.character(scales)` and so rejects
   numeric column indexes, contradicting both its own roxygen ("variable names
@@ -155,6 +155,18 @@ regression test that fails on the pre-fix code. Order below is suggested
   ?ssm_analyze return docs, and intro vignette. B1 boundary test already
   accepts {~0,~360}, so no test change. Doc-only; check 0/0/0.
   (DESIGN.md, R/ssm_analysis.R, man/ssm_analyze.Rd, intro vignette).
+- 2026-07-02 — G3 (Opus): DECISION = support matrix input (not drop). Coerce
+  `if (is.matrix(data)) data <- as.data.frame(data)` at entry of ssm_analyze,
+  ssm_score, ipsatize, score, norm_standardize, self_standardize (guarded, so
+  data.frame path byte-identical → seeded pins unchanged). ssm_score scales
+  validation `is.character` → `is_var` (now accepts numeric indexes per its
+  roxygen). All 5 `class(x) ==` sites → `inherits()` (tidying×2, ssm_table,
+  ssm_plot_curve, is_instrument). Roxygen @param data aligned to "data frame
+  or matrix". Regression tests: matrix≡data.frame for ssm_score/ssm_analyze/
+  self_standardize/ipsatize, numeric scales for ssm_score; edge-checked
+  matrix+grouping and matrix+append. Review inline (mechanical + input
+  coercion). check 0/0/0. (R/ssm_analysis.R, R/tidying_functions.R,
+  R/instrument_oop.R, R/ssm_table.R, R/ssm_plot.R, man/*, tests, NEWS.md).
 
 # Completed milestones
 

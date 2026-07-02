@@ -6,7 +6,8 @@
 #' groups will be used to stratify the data, and contrasts between groups or
 #' measures will be calculated.
 #'
-#' @param data Required. A data frame containing at least circumplex scales.
+#' @param data Required. A data frame or matrix containing at least
+#'   circumplex scales.
 #' @param scales Required. A character vector of column names, or a numeric
 #'   vector of column indexes, from `data` that contains the circumplex scale
 #'   scores to be analyzed.
@@ -142,6 +143,9 @@ ssm_analyze <- function(data, scales, angles = octants(),
   stopifnot(is.numeric(interval) && interval > 0 && interval < 1)
   stopifnot(is_flag(listwise))
   stopifnot(is_null_or_char(measures_labels, n = length(measures)))
+
+  # Coerce matrix input to a data frame so column indexing behaves uniformly
+  if (is.matrix(data)) data <- as.data.frame(data)
 
   # Drop observations with missing grouping values (unusable in any group).
   # Done here, on the user's actual grouping column, so both analysis paths
@@ -531,7 +535,8 @@ ssm_parameters <- function(scores, angles = octants(), prefix = "", suffix = "",
 #' description or visualization of individual data points rather than for
 #' statistical inference on groups of data points.
 #'
-#' @param data Required. A data frame containing at least circumplex scales.
+#' @param data Required. A data frame or matrix containing at least
+#'   circumplex scales.
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex scales to be analyzed.
 #' @param angles Required. A numeric vector containing the angular displacement
@@ -555,10 +560,11 @@ ssm_parameters <- function(scores, angles = octants(), prefix = "", suffix = "",
 ssm_score <- function(data, scales, angles = octants(), append = TRUE, ...) {
 
   stopifnot(is.data.frame(data) || is.matrix(data))
-  stopifnot(is.character(scales))
+  stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
   stopifnot(length(scales) == length(angles))
 
+  if (is.matrix(data)) data <- as.data.frame(data)
   scales_mat <- as.matrix(data[scales])
   
   out <- do.call(

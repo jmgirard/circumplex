@@ -1,5 +1,12 @@
 # circumplex (development version)
 
+* Matrix input now works wherever it is documented. `ssm_analyze()`,
+  `ssm_score()`, `ipsatize()`, `score()`, `norm_standardize()`, and
+  `self_standardize()` previously errored when given a matrix despite
+  advertising matrix support; they now coerce it to a data frame internally.
+* `ssm_score()` now accepts numeric column indexes for `scales` (e.g.,
+  `scales = 1:8`), consistent with its documentation and with `ssm_analyze()`;
+  it previously required character names.
 * Printing an SSM object (via `print()` or `summary()`) now adds a note under
   any profile whose model fit is inadequate (R-squared < .70; interpret only
   elevation) or whose amplitude confidence interval includes zero (the
