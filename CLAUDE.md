@@ -54,6 +54,12 @@ design/review and anything where plausible-but-wrong statistics are possible;
 Opus for general implementation; Sonnet for mechanical edits, doc updates,
 and running checks.
 
+**Always recommend a tier when proposing or handing off a task** (e.g., in a
+`/next-task` "what's next" line, or whenever suggesting the next unit of work):
+name the tier and give a one-line why, mapped to the risk of the task. The
+human chooses the model; your job is to make the call explicit every time, not
+to wait to be asked.
+
 ## Style
 
 - Base R + minimal deps (rlang, ggplot2, boot, Rcpp/RcppArmadillo); no

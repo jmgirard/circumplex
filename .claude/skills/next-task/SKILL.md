@@ -40,6 +40,9 @@ invocation unless the user names several.
    under the development version heading if user-facing.
 
 8. **Report.** Summarize what changed, test evidence, and what task is next.
+   Always name the recommended model tier for that next task with a one-line
+   why (Fable for plausible-but-wrong-statistics risk; Opus for general
+   implementation; Sonnet for mechanical/doc work) — see CLAUDE.md model tiers.
 
 9. **Offer to commit.** Do not commit automatically. End the report by offering
    a commit with a proposed message (subject `<what> (M<milestone>/<task id>)`,
