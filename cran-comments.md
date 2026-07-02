@@ -1,9 +1,9 @@
 ## Test environments
 
 * local macOS (Darwin 25.5.0), R 4.6.1, via `devtools::check(args = "--no-manual")`
+* win-builder (R-devel), via `devtools::check_win_devel()`
 * GitHub Actions CI matrix (macOS-latest/release, windows-latest/release,
-  ubuntu-latest/devel, ubuntu-latest/release, ubuntu-latest/oldrel-1) — runs
-  automatically on push to master
+  ubuntu-latest/devel, ubuntu-latest/release, ubuntu-latest/oldrel-1)
 
 ## R CMD check results
 
