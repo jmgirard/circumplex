@@ -20,7 +20,9 @@ concerns; angular/boundary behavior is where bugs hide.
 - Contrasts: **second minus first** factor level (alphabetical unless factor),
   reported in (-180°, 180°] via `angle_dist()`.
 - Displacement CIs use circular quantiles (center on circular mean, unwrap,
-  quantile, re-wrap); contrast CIs may legitimately be negative.
+  quantile, re-wrap); contrast CIs may legitimately be negative, and are
+  reported on the same branch as their estimate (endpoints may exceed ±180°
+  near the boundary; see DESIGN.md).
 - Any change touching displacement, contrasts, or `src/` requires tests at:
   profiles peaking at 0°/360°, CIs straddling 0°/360°, contrasts near ±180°,
   flat (zero-variance) profiles.

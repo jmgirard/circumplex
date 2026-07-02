@@ -31,7 +31,7 @@ regression test that fails on the pre-fix code. Order below is suggested
   `Angle` vs norms table (`R/tidying_functions.R:181-186`).
   *Accept:* 0° vs 360° convention mismatch either works or errors with a
   message naming the expected angles; duplicate-angle norms error clearly.
-- [ ] **B6. Contrast displacement branch harmony at ±180°** — point estimate
+- [x] **B6. Contrast displacement branch harmony at ±180°** — point estimate
   in (-180°, 180°] can disagree with CI branch from circular centering.
   *Accept:* simulated contrast near ±180° has estimate inside its CI;
   test added at the boundary.
@@ -121,6 +121,20 @@ regression test that fails on the pre-fix code. Order below is suggested
   "replacement has length zero". Seeded values unchanged; check 0/0/0; review
   clean. Note: still uses `class(instrument) ==` — G3 scope.
   (R/tidying_functions.R, man/norm_standardize.Rd, tests, NEWS.md).
+- 2026-07-02 — B6 (Fable): contrast displacement CI now reported on the
+  estimate's branch. Defect: near ±180° the angle_dist estimate and the
+  circular-mean-centered CI could land on opposite branches (est +179.4 vs CI
+  (−196.6, −159.0) at data seed 70 — reproduced through the real pipeline
+  after a seed search; flip probability ~10% per boundary dataset, hence
+  intermittent). Fix: shift both CI endpoints by 2πk, k = round((est −
+  mid)/2π), in ssm_bootstrap before degree conversion — identity (k=0) away
+  from the boundary (all seeded pins byte-identical), width/contiguity
+  preserved, cannot fabricate coverage (|est − mid| ≤ π ⇒ k=0 for wide CIs).
+  Validation: pkg CI == independent reimplementation (same RNG stream) to
+  ~1e-13 on 3 boundary seeds; numeric ≡ geometric membership on 25 seeds;
+  rotation equivariance. Review: 1 finding (stale CLAUDE.md invariant bullet)
+  fixed. ALL M1 BUGS COMPLETE. (R/ssm_bootstrap.R, tests, CLAUDE.md,
+  DESIGN.md, NEWS.md).
 
 # Completed milestones
 

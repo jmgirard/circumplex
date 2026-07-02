@@ -62,6 +62,37 @@ test_that("fully flat data yields NA estimates without erroring", {
   expect_true(is.na(res$results$fit_est))
 })
 
+test_that("contrast displacement estimate and CI share a branch at +/-180", {
+  # Two groups with displacements ~180 degrees apart: the bootstrap
+  # distribution of the contrast straddles the +/-180 boundary. The estimate
+  # (from angle_dist, principal branch) and the CI (from circular-mean
+  # centering, its own branch) must be reported on the same branch so the
+  # estimate lies numerically inside its interval. This seed reproduces a
+  # branch disagreement in the pre-fix code (est +179.4, CI (-196.6, -159.0)).
+  rad <- as.numeric(as_radian(octants()))
+  set.seed(70)
+  A <- t(sapply(1:12, function(i) 1 + 2 * cos(rad - 90 * pi / 180) + rnorm(8, 0, 1.5)))
+  B <- t(sapply(1:12, function(i) 1 + 2 * cos(rad - 270 * pi / 180) + rnorm(8, 0, 1.5)))
+  dat <- as.data.frame(rbind(A, B))
+  colnames(dat) <- PANO()
+  dat$Group <- rep(c("A", "B"), each = 12)
+
+  set.seed(5070)
+  res <- suppressWarnings(ssm_analyze(
+    dat, scales = 1:8, grouping = "Group", contrast = TRUE, boots = 250
+  ))
+  r <- res$results[nrow(res$results), ]
+
+  # Estimate stays on the principal branch (-180, 180]
+  expect_true(r$d_est > -180 && r$d_est <= 180)
+  # Estimate lies numerically inside its own CI
+  expect_true(r$d_lci <= r$d_est && r$d_est <= r$d_uci)
+  # The interval is a sane width (not a wrapped-around artifact)
+  expect_lt(r$d_uci - r$d_lci, 90)
+  # And it is geometrically near the true contrast of 180 degrees
+  expect_lt(abs(abs(r$d_est) - 180), 10)
+})
+
 test_that("quantile.circumplex_contrast_radian handles 0/360 boundary crossings cleanly", {
   # Create mock bootstrap replicates that straddle the 0/2*pi boundary.
   # 0.01 and 0.02 rad are just above 0° (~0.57° and ~1.15°).

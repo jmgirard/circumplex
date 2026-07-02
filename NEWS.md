@@ -1,5 +1,13 @@
 # circumplex (development version)
 
+* Contrast displacement estimates and their confidence intervals are now
+  always reported on the same angular branch. Previously, for contrasts near
+  ±180 degrees, the estimate (reported in (-180, 180]) could fall numerically
+  outside a confidence interval it was geometrically inside, because the
+  interval was centered on the bootstrap circular mean's own branch. The
+  interval is now shifted by a full circle when needed (its width and meaning
+  are unchanged; results away from the boundary are identical), so interval
+  endpoints may exceed ±180 degrees when the contrast straddles the boundary.
 * `norm_standardize()` now matches each scale to its normative data by angular
   position rather than exact numeric equality, so 0 and 360 degrees are treated
   as the same angle (previously passing 0 for a scale stored at 360 failed with

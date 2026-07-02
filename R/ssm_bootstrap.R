@@ -70,6 +70,24 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
 
   # Combine the results in one data frame and convert radians to degrees -------
   out <- cbind(bs_est, bs_lci, bs_uci)
+
+  # Report the contrast displacement CI on the same branch as its estimate -----
+  # The estimate (angle_dist) lives on the principal branch (-pi, pi]; the CI
+  # (circular-mean centering) lives on its own contiguous branch. Near +/-pi
+  # these can disagree, leaving the estimate numerically outside an interval
+  # it is geometrically inside. Shifting both CI endpoints by the same
+  # multiple of 2*pi preserves the interval's width and contiguity and is the
+  # identity whenever the two already share a branch.
+  if (contrast) {
+    i <- nrow(out)
+    if (all(is.finite(c(out$d_est[i], out$d_lci[i], out$d_uci[i])))) {
+      mid <- (out$d_lci[i] + out$d_uci[i]) / 2
+      k <- round((out$d_est[i] - mid) / (2 * pi))
+      out$d_lci[i] <- out$d_lci[i] + 2 * pi * k
+      out$d_uci[i] <- out$d_uci[i] + 2 * pi * k
+    }
+  }
+
   out[c("d_est", "d_lci", "d_uci")] <- lapply(
     out[c("d_est", "d_lci", "d_uci")],
     function(x) as_degree(as_radian(x))
