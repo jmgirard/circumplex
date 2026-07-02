@@ -515,11 +515,12 @@ ssm_score <- function(data, scales, angles = octants(), append = TRUE, ...) {
   scales_mat <- as.matrix(data[scales])
   
   out <- do.call(
-    rbind, 
+    rbind,
     apply(
       scales_mat,
-      MARGIN = 1, 
-      FUN = ssm_parameters, 
+      MARGIN = 1,
+      FUN = ssm_parameters,
+      angles = angles,
       ...
     )
   )

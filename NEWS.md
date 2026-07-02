@@ -1,5 +1,11 @@
 # circumplex (development version)
 
+* Fixed a bug where `ssm_score()` silently ignored its `angles` argument and
+  always used `octants()`: custom angle sets of the same length produced
+  incorrect results without warning, and angle sets of a different length
+  (e.g., `poles()` with four scales) errored. Results from `ssm_score()` with
+  the default `angles = octants()` are unaffected. (found in 2026-07 audit)
+
 # circumplex 1.1.0
 
 # circumplex 1.1.0

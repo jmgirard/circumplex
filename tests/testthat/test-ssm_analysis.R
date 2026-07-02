@@ -434,3 +434,40 @@ test_that("ssm_score works", {
   )
 })
 
+test_that("ssm_score forwards the angles argument", {
+  data("aw2009")
+
+  # Same-length custom angles must change the results (regression: these were
+  # silently ignored and octants() used instead)
+  rotated <- c(0, 45, 90, 135, 180, 225, 270, 315)
+  out_rot <- ssm_score(aw2009, scales = PANO(), angles = rotated, append = FALSE)
+  out_oct <- ssm_score(aw2009, scales = PANO(), append = FALSE)
+  expect_false(isTRUE(all.equal(out_rot$Disp, out_oct$Disp)))
+
+  # Row-wise results must match ssm_parameters() given the same angles
+  expect_equal(
+    unlist(out_rot[1, ]),
+    unlist(ssm_parameters(unlist(aw2009[1, PANO()]), angles = rotated)),
+    ignore_attr = TRUE
+  )
+
+  # Four scales with poles() must work (regression: errored on length mismatch)
+  pano4 <- c("PA", "DE", "HI", "LM")
+  out_poles <- ssm_score(aw2009, scales = pano4, angles = poles(), append = FALSE)
+  expect_equal(
+    unlist(out_poles[2, ]),
+    unlist(ssm_parameters(unlist(aw2009[2, pano4]), angles = poles())),
+    ignore_attr = TRUE
+  )
+
+  # Boundary: profile peaking exactly at the 0/360 degree crossover
+  bdat <- as.data.frame(rbind(cos(rotated * pi / 180)))
+  colnames(bdat) <- PANO()
+  out_bound <- ssm_score(bdat, scales = PANO(), angles = rotated, append = FALSE)
+  expect_equal(out_bound$Ampl, 1)
+  expect_equal(out_bound$Fit, 1)
+  expect_true(
+    abs(out_bound$Disp - 360) < 1e-8 || abs(out_bound$Disp - 0) < 1e-8
+  )
+})
+
