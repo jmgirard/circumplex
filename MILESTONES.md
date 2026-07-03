@@ -1,6 +1,90 @@
 # Active milestone
 
-## M2 — Inference quality (v1.3.0)
+## M3 — Visualization layer: ggplot2 circumplex extension (v1.4.0)
+
+Source: ROADMAP.md Milestone 3. Turn the internal, single-purpose plotting
+code into a public ggplot2 extension so users (and later milestones) can
+compose arbitrary layers in circumplex space instead of rebuilding the
+circular canvas from scratch. Sequenced before the fit-statistics/SEM
+milestones, whose visualizations should build on it.
+
+Scope decision (2026-07-02, with Jeff): **full extension** as ROADMAP specifies
+— exported canvas constructor, custom ggproto geoms/stats, and scale helpers —
+not the lighter "public canvas + ggforce" alternative. Rationale: maximal
+composability for the M4+ visualizations that will depend on this layer.
+
+Per ROADMAP.md's CRAN release strategy, M3 is bundled with the (already
+GitHub-complete) M2 into a single v1.3.0 CRAN submission. Keep both on GitHub
+until M3 is done, then run `/release-checklist` once.
+
+Cross-cutting guardrails for every task below:
+- **Behavior of the three public `ssm_plot_*()` functions must not change**
+  until the explicit refactor task (V4); their vdiffr snapshots in
+  `tests/testthat/_snaps/ssm_plot/` are the regression pins — any snapshot
+  delta must be justified as an intended rendering change, not accepted blindly.
+- **Dependency policy** (DESIGN.md): new user-facing API is base R + ggplot2;
+  keep `ggforce` only where it genuinely simplifies arcs/circles. No tidyverse.
+- Everything exported gets roxygen with a runnable `@examples` block and enters
+  `_pkgdown`/reference cleanly (`devtools::document()` no-diff after).
+
+### Tasks
+
+- [ ] **V1. Public circular canvas.** Promote `circle_base()`
+  (`R/ssm_plot.R:469`) to an exported, documented API: a `ggcircumplex()`
+  constructor and/or `annotation_circumplex()` (rings, spokes, scale labels,
+  amplitude gridlines), with instrument-aware labeling from
+  `circumplex_instrument` objects.
+  *Accept:* exported + documented; a call reproducing the current
+  `circle_base(angles, amax, labels)` output is vdiffr-identical to a
+  snapshot of today's canvas (or the delta is justified); instrument input
+  auto-labels angles from the instrument's scales; invalid input errors via
+  the `is_*()` helpers.
+- [ ] **V2. Polar-native geoms/stats (ggproto).** `geom_ssm_point()` /
+  `geom_ssm_arc()` (or a unifying `stat_ssm()`) that accept
+  amplitude/displacement aesthetics directly and internalize the
+  degree→canvas transform (`ggrad()`), amplitude rescaling
+  (`* 10/(2*amax)`), and wrap-around arc handling now inline in
+  `ssm_plot_circle()` (`R/ssm_plot.R:75-84`).
+  *Accept:* a plot built from `ggcircumplex() + geom_ssm_*()` on an
+  `ssm_analyze()` result is vdiffr-equivalent to the corresponding
+  `ssm_plot_circle()` output (same arcs, points, wrap-around at the 0/360
+  boundary); boundary case — a profile arc spanning the 0/360 seam renders as
+  one contiguous arc; degenerate/NA-displacement rows are dropped or handled
+  without error.
+- [ ] **V3. Scales.** `scale_*_circumplex()` helpers for angle-labeled axes
+  and amplitude gridlines, with defaults matching the current appearance.
+  *Accept:* helpers produce the current tick/label placement on both the
+  circular canvas and the curve plot's angle axis; custom `angle_labels`
+  and instrument labels flow through; documented with examples.
+- [ ] **V4. Refactor existing plots onto the extension.** Reimplement
+  `ssm_plot_circle()`, `ssm_plot_curve()`, `ssm_plot_contrast()` on top of
+  V1–V3 with **behavior unchanged**.
+  *Accept:* every existing vdiffr snapshot in
+  `tests/testthat/_snaps/ssm_plot/` stays byte-identical, or each change is
+  individually justified and re-approved; `chkDots()`/argument surfaces of the
+  three functions are preserved; full suite green.
+- [ ] **V5. Vignette: "Advanced Circumplex Visualization."** The third
+  vignette, already announced as "still in progress" in the intermediate
+  vignette (`vignettes/intermediate-ssm-analysis.Rmd:276`). Demonstrate
+  composing raw data, SSM results, and annotations via the new extension.
+  *Accept:* builds clean; uses only exported API; teaching prose meets the
+  statistical-precision bar (CLAUDE.md — e.g., never describe an angular CI
+  excluding 0° as a significance test); intermediate vignette's "in progress"
+  note updated to point at it.
+- [ ] **V6. Design review vs. ggplot2 extension best practices.** Check
+  ggproto lifecycle, `after_stat()`/`after_scale()` usage, theme integration,
+  and the `ggforce` dependency decision (keep iff it simplifies arcs).
+  *Accept:* a short written verdict appended to DESIGN.md (a "Visualization
+  extension" subsection) recording the ggproto/scale architecture and the
+  ggforce keep/drop decision with rationale.
+
+## Log
+
+(none yet)
+
+# Completed milestones
+
+## M2 — Inference quality (v1.3.0) — GitHub-complete 2026-07-02 (bundled into v1.3.0 with M3)
 
 Source: ROADMAP.md Milestone 2. Upgrades to the existing bootstrap machinery;
 no new statistical scope. Per ROADMAP.md's CRAN release strategy, this
@@ -31,7 +115,7 @@ run `/release-checklist` once.
   per-parameter internal format before starting the interval work above,
   which touches exactly this code (per ROADMAP.md continuous track).
 
-## Log
+### Log
 
 - 2026-07-02 — Continuous-track refactor (Opus): replaced positional parameter
   arithmetic with name-driven assembly. New single source of truth
@@ -159,8 +243,6 @@ run `/release-checklist` once.
   check 0/0/0. M2 COMPLETE (all tasks checked or explicitly dropped with
   rationale). (DESIGN.md, R/ssm_analysis.R, man/ssm_analyze.Rd,
   vignettes/introduction-to-ssm-analysis.Rmd, MILESTONES.md).
-
-# Completed milestones
 
 ## M1 — Correctness & robustness patch (v1.2.0) — released 2026-07-02, CRAN-approved
 
