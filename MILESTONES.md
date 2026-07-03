@@ -20,7 +20,7 @@ run `/release-checklist` once.
   vector (multivariate normal with estimated covariance), propagate through
   the parameter transformation. Validate against bootstrap results on
   `jz2017`.
-- [ ] **Vectorize `ssm_score()`** (currently row-wise `apply` + `rbind` of
+- [x] **Vectorize `ssm_score()`** (currently row-wise `apply` + `rbind` of
   data frames): elevation/x/y are single matrix products; amplitude,
   displacement, and fit follow element-wise.
 - [ ] Seed/reproducibility documentation for all resampling paths.
@@ -47,6 +47,29 @@ run `/release-checklist` once.
   non-contrast case exercising multi-block name selection. Suite 432/432; check
   0/0/0. No NEWS.md (internal only). Unblocks BCa / Monte Carlo / parallel.
   (R/utils.R, R/ssm_bootstrap.R, tests/testthat/test-ssm_bootstrap.R,
+  MILESTONES.md).
+- 2026-07-02 — Vectorize `ssm_score()` (Sonnet): replaced row-wise
+  `apply(FUN = ssm_parameters) + do.call(rbind, ...)` (per-row data frame
+  construction and rbind, O(n) R-level overhead) with a single call to the
+  existing `group_parameters()` C++ routine (already used by
+  `ssm_bootstrap()`) plus one `matrix()` reshape keyed off
+  `ssm_param_names()`. Deliberately reused the already-tested compiled
+  degenerate-profile/tolerance logic (B4) rather than re-deriving it in R —
+  duplicating that tolerance math was the likelier place for a boundary bug,
+  per CLAUDE.md's correctness bar. Bit-for-bit identical to the pre-refactor
+  output on `aw2009` (max abs diff 0); ~68x faster at n=5000 (0.65s -> 0.0096s).
+  Two behavior changes made deliberately: (1) degenerate-row warnings
+  consolidated from one-per-row to a single "`n` of `total`" warning,
+  matching the precedent set by `ssm_bootstrap()`'s resample warning; (2)
+  found and fixed a regression introduced by the first draft of this refactor
+  — using `modifyList()` for label/prefix/suffix `...` forwarding silently
+  swallowed unrecognized argument names, where the old `apply(FUN =
+  ssm_parameters, ...)` used to error "unused argument" on a typo (verified
+  against pre-refactor code); added an explicit unknown-name check to restore
+  the error, with a regression test. Test-first: added coverage for label/
+  prefix forwarding (previously untested), the consolidated warning, and the
+  unused-argument error. Suite 441/441; check 0/0/0. No NEWS.md (internal
+  perf only, no API change). (R/ssm_analysis.R, tests/testthat/test-ssm_analysis.R,
   MILESTONES.md).
 
 # Completed milestones

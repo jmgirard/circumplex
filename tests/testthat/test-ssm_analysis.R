@@ -527,6 +527,57 @@ test_that("ssm_score forwards the angles argument", {
   )
 })
 
+test_that("ssm_score forwards prefix, suffix, and label arguments", {
+  data("aw2009")
+
+  out <- ssm_score(aw2009, scales = PANO(), append = FALSE, prefix = "IIP_")
+  expect_identical(
+    colnames(out),
+    c("IIP_Elev", "IIP_Xval", "IIP_Yval", "IIP_Ampl", "IIP_Disp", "IIP_Fit")
+  )
+
+  out2 <- ssm_score(
+    aw2009, scales = PANO(), append = FALSE,
+    x_label = "LOV", y_label = "DOM"
+  )
+  expect_identical(colnames(out2), c("Elev", "LOV", "DOM", "Ampl", "Disp", "Fit"))
+
+  # Values must match ssm_parameters() with the same labels, row for row
+  expect_equal(
+    unlist(out2[1, ]),
+    unlist(ssm_parameters(
+      unlist(aw2009[1, PANO()]), x_label = "LOV", y_label = "DOM"
+    )),
+    ignore_attr = TRUE
+  )
+})
+
+test_that("ssm_score warns once (with a count) for degenerate rows", {
+  dat <- as.data.frame(matrix(rnorm(3 * 8), ncol = 8))
+  colnames(dat) <- PANO()
+  dat[2, ] <- 1 # flat row: undefined displacement and fit
+
+  expect_warning(
+    out <- ssm_score(dat, scales = PANO(), append = FALSE),
+    "1 of 3"
+  )
+  expect_true(is.na(out$Disp[2]))
+  expect_true(is.na(out$Fit[2]))
+  expect_false(is.na(out$Disp[1]))
+  expect_false(is.na(out$Disp[3]))
+})
+
+test_that("ssm_score errors on an unrecognized ... argument", {
+  # Regression: forwarding ... via apply(FUN = ssm_parameters, ...) used to
+  # raise "unused argument" for typos (ssm_parameters() has no ...); a typo
+  # must still be caught, not silently ignored.
+  data("aw2009")
+  expect_error(
+    ssm_score(aw2009, scales = PANO(), append = FALSE, bogus_arg = "x"),
+    "unused argument"
+  )
+})
+
 test_that("NA grouping values are dropped with a message in both modes", {
   data("jz2017")
   jz <- jz2017

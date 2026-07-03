@@ -576,21 +576,56 @@ ssm_score <- function(data, scales, angles = octants(), append = TRUE, ...) {
 
   if (is.matrix(data)) data <- as.data.frame(data)
   scales_mat <- as.matrix(data[scales])
-  
-  out <- do.call(
-    rbind,
-    apply(
-      scales_mat,
-      MARGIN = 1,
-      FUN = ssm_parameters,
-      angles = angles,
-      ...
-    )
+  angles_rad <- as_radian(as_degree(angles))
+
+  # Label/prefix/suffix arguments are forwarded as they were when this called
+  # ssm_parameters() per row; ssm_parameters()'s formals supply the defaults
+  # so the two stay in sync.
+  label_names <- c(
+    "prefix", "suffix", "e_label", "x_label", "y_label",
+    "a_label", "d_label", "f_label"
   )
-  
+  label_defaults <- lapply(formals(ssm_parameters)[label_names], eval)
+  extra_args <- list(...)
+  unknown <- setdiff(names(extra_args), label_names)
+  if (length(unknown) > 0) {
+    stop("unused argument", if (length(unknown) > 1) "s" else "", " (",
+         paste(unknown, collapse = ", "), ")", call. = FALSE)
+  }
+  label_args <- utils::modifyList(label_defaults, extra_args)
+
+  # Elevation/x/y/amplitude/displacement/fit for every row in a single
+  # compiled pass (group_parameters(), already used by ssm_bootstrap() for the
+  # same estimator), replacing the previous row-wise apply() + rbind() of
+  # per-row data frames.
+  raw <- group_parameters(scales_mat, angles_rad)
+  pnames <- ssm_param_names()
+  out <- matrix(raw, ncol = length(pnames), byrow = TRUE)
+
+  d_col <- which(pnames == "d")
+  n_bad <- sum(is.na(out[, d_col]))
+  if (n_bad > 0) {
+    warning(
+      n_bad, " of ", nrow(out), " profile(s) have undefined displacement ",
+      "(flat scores, zero amplitude, or missing values); NA returned.",
+      call. = FALSE
+    )
+  }
+  out[, d_col] <- as.numeric(as_degree(as_radian(out[, d_col])))
+
+  colnames(out) <- paste0(
+    label_args$prefix,
+    c(
+      label_args$e_label, label_args$x_label, label_args$y_label,
+      label_args$a_label, label_args$d_label, label_args$f_label
+    ),
+    label_args$suffix
+  )
+  out <- as.data.frame(out)
+
   if (append) {
     out <- cbind(data, out)
   }
-  
+
   out
 }
