@@ -76,7 +76,10 @@ arma::rowvec col_means(arma::mat x) {
   for (arma::uword i = 0; i < p; i++) {
     arma::colvec y = x.col(i);
     y = y.elem(find_finite(y));
-    out(i) = arma::mean(y);
+    // A column with no finite values has no mean; return NA rather than calling
+    // arma::mean() on an empty vector (which throws). This mirrors pairwise_r()'s
+    // guard and lets the degenerate-replicate machinery absorb the resample.
+    out(i) = y.n_elem == 0 ? NA_REAL : arma::mean(y);
   }
   return out;
 }

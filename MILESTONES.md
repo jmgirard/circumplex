@@ -163,8 +163,70 @@ Cleanup (fold in where the bug fixes already touch the file; no behavior change)
   bootstrap contrasts share one convention implementation; boundary tests green;
   seeded pins unchanged.
 
+### Estimator-core audit findings (Brief C, Fable — fix before v1.3.0)
+
+From the Brief C independent estimator audit (2026-07-03; full report
+`devel/estimator-audit-2026-07-fable.md`). These are **pre-existing** (present in
+v1.2.0 on CRAN), not M2/M3 regressions, but decision (Jeff 2026-07-03): fix F1–F3
+before the v1.3.0 submission rather than shipping again over a reachable crash and
+a violated angular invariant. F4–F6 are nits deferred to a later cleanup. Each
+fix is test-first with a regression test reproducing the audit's executed failure.
+
+- [x] **F1. `col_means()` crashes on an all-NA resampled column** — under
+  `listwise = FALSE`, a bootstrap resample can draw a scale column that is
+  entirely NA; `col_means()` in `src/parameters.cpp` calls `mean()` on the empty
+  post-`na.omit` vector and aborts (`mean(): object has no elements`), where
+  `pairwise_r()` already guards this. Deterministic repro at seed 123 (6-row,
+  4/6-missing scale). *Touches `src/` → rebuild C++, run the boundary suite +
+  `/statistical-validation`.* *Accept:* the repro returns NA (or the documented
+  degenerate handling) instead of aborting; regression test added.
+- [ ] **F3. `angle_dist()` range is [−180, 180), not (−180, 180]** — exactly
+  opposed profiles yield a contrast `d_est` of exactly −180 rather than +180,
+  violating the CLAUDE.md invariant (contrasts reported in (−180°, 180°]) and an
+  existing test's asserted contract. Contrast-convention/danger-zone change.
+  *Touches the contrast convention → `/statistical-validation` + ±180° boundary
+  tests after; recommend a Fable review of the fix.* *Accept:* opposed-profile
+  contrasts report +180 on the documented branch; boundary tests green; seeded
+  pins reconciled (any snapshot delta justified).
+- [ ] **F2. Model-fit caveat is under-documented and fit can leave [0,1]** — with
+  unequally spaced angles the closed-form fit (R²) is unbounded below (−107
+  observed); the equal-spacing/Gurtman caveat lives only on `ssm_analyze()`.
+  Doc-only. *Accept:* the caveat (equal-spacing assumption; fit may be negative
+  and is not a bounded R² off equal spacing) is stated on `ssm_parameters()` and
+  `ssm_score()` too; no math change; no snapshot delta.
+
 ## Log
 
+- 2026-07-03 — F1 fix: `col_means()` all-NA-column crash (Opus, test-first). Under
+  `listwise = FALSE` a bootstrap resample can leave a scale column with no finite
+  values; `arma::mean()` on the empty post-`find_finite` vector aborted the whole
+  `ssm_analyze()` call (`mean(): object has no elements`). Guarded `col_means()`
+  in `src/parameters.cpp` to return `NA_REAL` for a zero-finite-element column,
+  mirroring `pairwise_r()`'s guard — the resample then degrades to a degenerate
+  profile absorbed by the existing exclusion + warning. Test-first: a tight unit
+  pin (`col_means` on an all-NA column → NA) and the audit's exact integration
+  repro (seed 123, 4/6-missing scale) — both failed pre-fix, pass post-fix.
+  `/statistical-validation` run: estimator math provably unchanged (col_means vs
+  colMeans to 4e-16 over 200 NA matrices; mean_scores PWD vs manual 1-/2-group;
+  SSM params vs lm() OLS to 1e-13; end-to-end ssm_analyze == ssm_parameters).
+  Suite 555/555, 0 warnings. NEWS.md bullet added. (src/parameters.cpp,
+  tests/testthat/test-RcppExport.R.R, test-ssm_bootstrap.R, NEWS.md, MILESTONES.md).
+- 2026-07-03 — Brief C estimator/angular-core audit (Fable). Wrote
+  `devel/estimator-audit-2026-07-fable.md`: 6 findings, none critical — F1
+  reachable crash (`col_means()` on an all-NA resampled column under
+  `listwise = FALSE`, `mean(): object has no elements`), F2 fit statistic
+  unbounded below (−107 observed) with unequally spaced angles and the
+  Gurtman-vs-OLS caveat documented only at `ssm_analyze()`, F3 `angle_dist()`
+  range is [−180, 180) not the documented (−180, 180] (exact −180 reachable
+  via sign-flipped groups), F4–F6 wording/consistency nits. Verified clean:
+  scale-aware tolerance across 0.1–1e6 scales, degenerate taxonomy, circular
+  CI machinery incl. 0/360 straddles and ±180 branch alignment, full Monte
+  Carlo covariance derivation (Hampel IF, Fisher-z delta) + empirical
+  bootstrap agreement on skewed data. Audit only — no package code touched.
+  Triage (Jeff): F1–F3 are now v1.3.0 pre-release fixes (added as tasks above,
+  test-first; F1 touches `src/` and F3 the contrast convention → both get
+  `/statistical-validation`); F4–F6 nits deferred. (devel/estimator-audit-2026-07-fable.md,
+  MILESTONES.md, ROADMAP.md unchanged).
 - 2026-07-03 — Pre-release review fixes R3 + C1–C4 (Opus). R3 (decision Jeff):
   removed the `amin` argument from the exported `ggcircumplex()` (kept
   `circle_base()`'s internal `amin = 0`), since it relabelled the rings on an

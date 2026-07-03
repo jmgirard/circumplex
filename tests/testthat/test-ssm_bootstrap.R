@@ -111,6 +111,29 @@ test_that("bootstrap with some degenerate replicates does not error", {
   expect_true(is.finite(res$results$a_lci) && is.finite(res$results$a_uci))
 })
 
+test_that("pairwise-deletion bootstrap tolerates an all-NA resampled column (F1)", {
+  # F1 (Brief C audit): under listwise = FALSE a resample can draw only NA rows
+  # for one scale, leaving an empty column for col_means(). Pre-fix this aborted
+  # the whole ssm_analyze() call with "mean(): object has no elements". The mean
+  # path should now degrade like the correlation path (pairwise_r): return NA for
+  # the empty column and let the degenerate-replicate exclusion + warning absorb
+  # it. Deterministic repro from the audit (seed 123, 4/6-missing scale).
+  set.seed(123)
+  df <- data.frame(
+    S1 = c(1, 2, NA, NA, NA, NA),
+    S2 = rnorm(6), S3 = rnorm(6), S4 = rnorm(6),
+    S5 = rnorm(6), S6 = rnorm(6), S7 = rnorm(6), S8 = rnorm(6)
+  )
+  expect_warning(
+    res <- ssm_analyze(df, scales = paste0("S", 1:8), boots = 500,
+                       listwise = FALSE),
+    "resamples"
+  )
+  # The observed profile is well-defined; only some resamples are degenerate.
+  expect_true(is.finite(res$results$e_est))
+  expect_true(is.finite(res$results$a_est))
+})
+
 test_that("fully flat data yields NA estimates without erroring", {
   dat <- as.data.frame(matrix(1, nrow = 20, ncol = 8))
   colnames(dat) <- PANO()

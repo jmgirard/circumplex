@@ -97,6 +97,12 @@
   (`listwise = FALSE`). Such observations are now dropped before analysis with
   a message reporting how many were removed, in both deletion modes; if no
   observations remain, a clear error is given.
+* Fixed a bug where a bootstrap resample under pairwise deletion
+  (`listwise = FALSE`) could crash `ssm_analyze()` with `mean(): object has no
+  elements` when the resample happened to draw only missing values for one
+  scale. Such a scale now yields an `NA` mean (matching the correlation path),
+  and the affected resample is excluded from the confidence intervals as a
+  degenerate profile, consistent with the existing degeneracy handling.
 * Fixed a bug where length requirements on character arguments were never
   enforced (`is_null_or_char()` dropped its `n` argument). `ssm_analyze()` now
   errors if `measures_labels` does not match the number of `measures` (or is

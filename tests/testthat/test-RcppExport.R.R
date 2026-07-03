@@ -21,6 +21,16 @@ test_that("Column means are correct even with missing", {
   expect_equal(rcm[2], ccm[[2]])
 })
 
+test_that("Column mean of an all-NA column is NA, not an error (F1)", {
+  # F1 (Brief C audit): a pairwise-deletion bootstrap resample can produce a
+  # scale column with no finite values; col_means() must return NA for it
+  # rather than aborting via arma::mean() on an empty vector.
+  mat <- cbind(c(NA_real_, NA_real_, NA_real_), c(1, 2, 3))
+  cm <- col_means(mat)
+  expect_true(is.na(cm[[1]]))
+  expect_equal(cm[[2]], 2)
+})
+
 test_that("Pairwise r is correct even with missing", {
   x <- runif(100)
   y <- runif(100)
