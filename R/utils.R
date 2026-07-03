@@ -18,13 +18,21 @@ param_diff <- function(p1, p2) {
   pd
 }
 
+# Canonical SSM parameter names -----------------------------------------------
+# The fixed order in which group_parameters()/ssm_parameters_cpp() (src/) emit
+# each group's parameters: elevation, x, y, amplitude, displacement, fit. Single
+# source of truth so the bootstrap assembly can locate parameters (notably
+# displacement) by name rather than by positional arithmetic over six-blocks.
+ssm_param_names <- function() {
+  c("e", "x", "y", "a", "d", "fit")
+}
+
 # Reshape parameters from wide to long format ----------------------------------
 reshape_params <- function(v, suffix) {
-  # Convert vector to matrix
-  out <- matrix(v, ncol = 6, byrow = TRUE)
-  # Add column names
-  colnames(out) <- paste0(c("e_", "x_", "y_", "a_", "d_", "fit_"), suffix)
-  # Convert to data frame
+  pnames <- ssm_param_names()
+  # One row per group; one column per parameter, named parameter_suffix
+  out <- matrix(v, ncol = length(pnames), byrow = TRUE)
+  colnames(out) <- paste(pnames, suffix, sep = "_")
   as.data.frame(out)
 }
 

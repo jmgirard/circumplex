@@ -18,11 +18,16 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
 
   # Extract point estimates from bootstrap results -----------------------------
   bs_est <- reshape_params(bs_results$t0, suffix = "est")
-  bs_t <- bs_results$t
-  bs_t <- as.data.frame(bs_t)
-  colnames(bs_t) <- paste0(
-    c("e", "x", "y", "a", "d", "fit"),
-    rep(1:nrow(bs_est), each = 6)
+  bs_t <- as.data.frame(bs_results$t)
+  # Name every replicate column by its parameter and group, so displacement
+  # columns can be located by name below instead of by positional arithmetic.
+  pnames <- ssm_param_names()
+  n_groups <- nrow(bs_est)
+  param_of_col <- rep(pnames, times = n_groups)
+  colnames(bs_t) <- paste(
+    param_of_col,
+    rep(seq_len(n_groups), each = length(pnames)),
+    sep = "_"
   )
 
   # Degenerate profiles (flat or zero-amplitude) carry NA parameters -----------
@@ -44,19 +49,18 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
   }
 
   # Set the units of the displacement results to radians -----------------------
+  # Locate displacement columns by name. When contrasting, the final group is
+  # the contrast: its displacement takes the contrast radian class (which
+  # permits negative values); every other displacement takes the standard class.
+  d_cols <- which(param_of_col == "d")
   if (contrast) {
-    # Convert individual group d variables to standard radian class
-    d_vars <- 1:((ncol(bs_t) - 6) / 6) * 6 - 1
-
-    # Target the contrasted d parameter and apply the contrast class
-    contrast_d_vars <- ncol(bs_t) - 1
-    bs_t[contrast_d_vars] <- lapply(bs_t[contrast_d_vars], function(x) {
+    contrast_d_col <- d_cols[length(d_cols)]
+    bs_t[contrast_d_col] <- lapply(bs_t[contrast_d_col], function(x) {
       structure(x, class = c("circumplex_contrast_radian", "numeric"))
     })
-  } else {
-    d_vars <- 1:(ncol(bs_t) / 6) * 6 - 1
+    d_cols <- d_cols[-length(d_cols)]
   }
-  bs_t[d_vars] <- lapply(bs_t[d_vars], new_radian)
+  bs_t[d_cols] <- lapply(bs_t[d_cols], new_radian)
 
   # Calculate the lower bounds of the confidence intervals ---------------------
   bs_lci <- sapply(bs_t, quantile, probs = ((1 - interval) / 2), na.rm = TRUE)

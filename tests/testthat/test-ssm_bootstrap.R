@@ -33,6 +33,45 @@ test_that("Quantile for circular radians works", {
 
 library(testthat)
 
+test_that("internal parameter layout is name-driven, not positional", {
+  # Contract with the C++ group_parameters()/ssm_parameters_cpp(): six
+  # parameters per group in this fixed order. The bootstrap assembly relies on
+  # these names (not positional arithmetic) to locate displacement, so pin them.
+  expect_identical(ssm_param_names(), c("e", "x", "y", "a", "d", "fit"))
+  expect_identical(which(ssm_param_names() == "d"), 5L)
+
+  # reshape_params() lays one group per row with parameter_suffix column names,
+  # derived from ssm_param_names() rather than a hardcoded six-block.
+  two_groups <- reshape_params(as.numeric(1:12), suffix = "est")
+  expect_identical(
+    colnames(two_groups),
+    c("e_est", "x_est", "y_est", "a_est", "d_est", "fit_est")
+  )
+  expect_equal(nrow(two_groups), 2)
+  expect_equal(two_groups$d_est, c(5, 11)) # 5th value of each six-block
+})
+
+test_that("displacement is classed by name across >2 groups (non-contrast)", {
+  # Three groups exercise the multi-block name-based displacement selection
+  # beyond the one/two-group cases covered elsewhere: every group's
+  # displacement must land on [0, 360) in degrees and be finite.
+  rad <- as.numeric(as_radian(octants()))
+  set.seed(2017)
+  mk <- function(peak) {
+    t(sapply(1:15, function(i) 1 + 2 * cos(rad - peak * pi / 180) + rnorm(8, 0, 1)))
+  }
+  dat <- as.data.frame(rbind(mk(45), mk(180), mk(315)))
+  colnames(dat) <- PANO()
+  dat$Group <- rep(c("A", "B", "C"), each = 15)
+
+  set.seed(1)
+  res <- ssm_analyze(dat, scales = 1:8, grouping = "Group", boots = 50)
+  d <- res$results$d_est
+  expect_length(d, 3)
+  expect_true(all(is.finite(d)))
+  expect_true(all(d >= 0 & d < 360))
+})
+
 test_that("bootstrap with some degenerate replicates does not error", {
   # A rare binary measure: some resamples are constant, giving NaN
   # correlations and hence degenerate replicate profiles

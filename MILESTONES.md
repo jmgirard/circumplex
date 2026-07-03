@@ -24,7 +24,7 @@ run `/release-checklist` once.
   data frames): elevation/x/y are single matrix products; amplitude,
   displacement, and fit follow element-wise.
 - [ ] Seed/reproducibility documentation for all resampling paths.
-- [ ] **Continuous-track item to do first**: named, long-format internal
+- [x] **Continuous-track item to do first**: named, long-format internal
   results assembly (`ssm_bootstrap()` identifies displacement columns by
   positional arithmetic `d_vars <- 1:(ncol/6)*6 - 1`; `reshape_params()`
   assumes a fixed 6-parameter block). Replace with named columns / one-row-
@@ -33,7 +33,21 @@ run `/release-checklist` once.
 
 ## Log
 
-(none yet)
+- 2026-07-02 — Continuous-track refactor (Opus): replaced positional parameter
+  arithmetic with name-driven assembly. New single source of truth
+  `ssm_param_names()` (canonical C++ order e/x/y/a/d/fit); `reshape_params()`
+  derives block width + names from it; `ssm_bootstrap()` names replicate columns
+  `<param>_<group>` and locates displacement via `param_of_col == "d"` (dropping
+  `1:(ncol/6)*6-1` and `contrast_d_vars <- ncol-1`). Behavior-preserving:
+  name-based selection is column-identical to the old arithmetic in both
+  contrast and non-contrast paths; all seeded bootstrap pins byte-identical.
+  Chose the named-columns route (not a full one-row-per-parameter melt) — lower
+  churn, and the interval work only needs to locate columns by name. Test-first:
+  added contract pins for `ssm_param_names()`/`reshape_params()` + a 3-group
+  non-contrast case exercising multi-block name selection. Suite 432/432; check
+  0/0/0. No NEWS.md (internal only). Unblocks BCa / Monte Carlo / parallel.
+  (R/utils.R, R/ssm_bootstrap.R, tests/testthat/test-ssm_bootstrap.R,
+  MILESTONES.md).
 
 # Completed milestones
 
