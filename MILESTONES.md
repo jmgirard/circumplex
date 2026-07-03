@@ -12,9 +12,9 @@ run `/release-checklist` once.
 
 - [x] **Parallel bootstrapping** via `boot`'s built-in `parallel`/`ncpus`
   arguments, exposed through `ssm_analyze()`.
-- [ ] **BCa confidence intervals** as an option alongside percentile intervals
-  (default unchanged for reproducibility; BCa needs care for circular
-  displacement — likely percentile-only for `d`, BCa for e/x/y/a).
+- ~~**BCa confidence intervals**~~ **DROPPED 2026-07-02** — see log entry and
+  ROADMAP.md; amplitude-coverage question folded into M4's CI-trustworthiness
+  diagnostic.
 - [ ] **Monte Carlo alternative to bootstrapping**: sample SSM parameters from
   the asymptotic sampling distribution of the mean vector / correlation
   vector (multivariate normal with estimated covariance), propagate through
@@ -90,6 +90,22 @@ run `/release-checklist` once.
   bullet, see correction above). (R/ssm_analysis.R, R/ssm_bootstrap.R,
   man/ssm_analyze.Rd, tests/testthat/test-ssm_analysis.R, NEWS.md,
   MILESTONES.md).
+- 2026-07-02 — BCa task DROPPED (decision: Jeff, on Fable analysis; no code).
+  Deciding fact: BCa is undefined for circular displacement — z0 =
+  qnorm(P(t* < t0)) and the jackknife acceleration are order-statistic
+  concepts requiring a linear scale; on a circle "below" depends on an
+  arbitrary branch cut. So any BCa option is necessarily mixed-method
+  per-parameter (BCa e/x/y/a, percentile d) forever. Costs judged not worth
+  it: per-parameter method labels on every CI surface (print/summary/
+  ssm_table/plots/vignettes) and in users' methods sections; against field
+  convention (Z&W 2017 percentile); boot.ci incompatible with our circular
+  quantiles and B4 NA-filtered degenerate resamples (hand-rolled BCa =
+  classic plausible-but-wrong trap); opt-in-only feature doubling the CI test
+  surface. Steelman acknowledged: amplitude (nonnegative, upward-biased,
+  skewed near zero, drives the G1 guardrail) is the one real beneficiary —
+  that question moved to M4's ssm_ci_accuracy diagnostic (ROADMAP.md updated
+  both ends). Monte Carlo task remains as the independent cross-check on
+  percentile CIs. (MILESTONES.md, ROADMAP.md).
 
 # Completed milestones
 

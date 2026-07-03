@@ -149,9 +149,18 @@ Upgrades to the existing bootstrap machinery; no new statistical scope.
 
 - [ ] **Parallel bootstrapping** via `boot`'s built-in `parallel`/`ncpus`
       arguments, exposed through `ssm_analyze()`.
-- [ ] **BCa confidence intervals** as an option alongside percentile intervals
-      (default unchanged for reproducibility; note BCa needs care for circular
-      displacement — likely percentile-only for `d`, BCa for e/x/y/a).
+- ~~**BCa confidence intervals**~~ **DROPPED 2026-07-02** (decision with
+      Jeff): BCa cannot apply to circular displacement (its bias-correction
+      and acceleration terms are order-statistic concepts that need a line,
+      not a circle), so the option would be permanently mixed-method
+      per-parameter — a standing communication burden in every table, plot,
+      and user methods section, against field convention (Z&W 2017 =
+      percentile), with real implementation risk (boot.ci handles neither our
+      circular quantiles nor NA-filtered degenerate resamples). The one
+      genuine beneficiary (amplitude: nonnegative, upward-biased, skewed near
+      zero) is instead folded into M4's CI-trustworthiness diagnostic, and the
+      Monte Carlo task below already provides an independent cross-check on
+      percentile CIs. Full rationale in MILESTONES.md log.
 - [ ] **Monte Carlo alternative to bootstrapping**: sample SSM parameters from
       the asymptotic sampling distribution of the mean vector / correlation
       vector (multivariate normal with estimated covariance), propagate through
@@ -222,7 +231,11 @@ dependency decision pending).
       paper + supplemental materials before implementation; depends on the
       CircE replacement above.* Surface as something like
       `ssm_ci_accuracy(ssm_object)` with a plain-language verdict in
-      `summary()`.
+      `summary()`. *Absorbed from the dropped M2 BCa task (2026-07-02): the
+      diagnostic should specifically assess percentile-CI coverage for
+      amplitude near zero (nonnegative, upward-biased, skewed — the one SSM
+      parameter where percentile intervals are theoretically weakest), since
+      the amplitude CI drives the "displacement not interpretable" guardrail.*
 - [ ] `ssm_fit()`-style API returning a typed object with `print`/`summary`/
       `plot` methods, consistent with `circumplex_ssm` (plots built on the M3
       extension).
