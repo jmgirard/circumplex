@@ -259,9 +259,20 @@ can simplify their specification by using the
 shortcut. Second, because the use of octant scales is so common, we can
 use the
 [`octants()`](http://circumplex.jmgirard.com/dev/reference/octants.md)
-shortcut. Note that, even when using these shortcuts, the results are
-the same except for minor stochastic differences in the confidence
-intervals due to the randomness inherent to bootstrapping.
+shortcut.
+[`PANO()`](http://circumplex.jmgirard.com/dev/reference/PANO.md) and
+[`octants()`](http://circumplex.jmgirard.com/dev/reference/octants.md)
+return exactly the same values as the vectors spelled out above, so
+`results2` below estimates the identical SSM parameters as `results`.
+Its confidence intervals will still differ slightly, though:
+[`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+draws bootstrap resamples from R’s random number stream, and this
+vignette only set a seed once, at the very top, so the two calls draw
+from different points in that stream. Call
+[`set.seed()`](https://rdrr.io/r/base/Random.html) again immediately
+before a call if you need its exact intervals to be reproducible (see
+the “Reproducibility” section of
+[`?ssm_analyze`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)).
 
 ``` r
 

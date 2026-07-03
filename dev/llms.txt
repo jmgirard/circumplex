@@ -238,6 +238,19 @@ Functions for implementing the Structural Summary Method
 - [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
   : Calculate SSM parameters by row and add results as new columns
 
+## Visualization Layer
+
+Composable ggplot2 components for building circumplex figures
+
+- [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  : Create a circumplex plotting canvas
+- [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
+  : Draw SSM profile points in circumplex space
+- [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
+  : Draw SSM confidence-region arcs in circumplex space
+- [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
+  : Angle-labeled x-axis scale for circumplex plots
+
 ## Secondary SSM Functions
 
 Functions for customizing SSM results
@@ -271,6 +284,8 @@ Functions that make your life easier
 
 ### All vignettes
 
+- [Advanced Circumplex
+  Visualization](http://circumplex.jmgirard.com/dev/articles/advanced-visualization.md):
 - [Intermediate SSM
   Analysis](http://circumplex.jmgirard.com/dev/articles/intermediate-ssm-analysis.md):
 - [Introduction to SSM

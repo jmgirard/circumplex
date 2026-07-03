@@ -40,6 +40,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-vignettes"><li><a class="dropdown-item" href="articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmgirard/circumplex"><span class="fa fa-github fa-lg"></span></a></li>
@@ -63,20 +64,38 @@
 --------                     --------                        ----------
 ssm_analyze()          -&gt;    ssm_analyze_means()       -&gt;    mean_scores()
   (dispatch on               ssm_analyze_corrs()       -&gt;    corr_scores(), pairwise_r()
-   measures=NULL)                 |
-                             ssm_bootstrap()  [boot::boot, stratified by Group]
-                                  |  statistic = bs_function
-                                  v
-                             ssm_by_group()            -&gt;    group_parameters()
+   measures=NULL;                  |
+   method chooses         [method = "bootstrap", default]
+   the engine below)            ssm_bootstrap()  [boot::boot, stratified by Group;
+                                       |            parallel/ncpus passed straight through --
+                                       |            master process draws all resample indices
+                                       |            before any dispatch, so results are seed-
+                                       |            reproducible regardless of parallelism]
+                                       |  statistic = bs_function -&gt; ssm_by_group()
+                                       v
+                            [method = "montecarlo"]
+                               ssm_montecarlo()  [asymptotic MVN draws per group: mean-vector
+                                       |            covariance (means) or empirical influence-
+                                       |            function covariance on the Fisher z scale
+                                       |            (correlations, joint across measures);
+                                       |            mvn_draws() is PSD-safe (eigendecomposition,
+                                       |            not Cholesky), consumes rnorm() once per
+                                       |            group in group_ids order]
+                                       v
+                             ssm_by_group()            -&gt;    group_parameters()  [vectorized]
                                   |                           -&gt; ssm_parameters_cpp()
                              param_diff() [if contrast]
                                   |
+                             ssm_replicate_intervals()  [shared by both engines: names replicate
+                                  |                        columns via ssm_param_names(), degenerate-
+                                  |                        replicate warning, radian class tagging]
                              quantile.circumplex_radian()          [profile d CIs]
                              quantile.circumplex_contrast_radian() [contrast d CIs]
                                   |
                              new_ssm()  -&gt;  circumplex_ssm object
 
-ssm_parameters() / ssm_score()  -&gt;  ssm_parameters_cpp()   [no bootstrap, descriptive]
+ssm_parameters() / ssm_score()  -&gt;  group_parameters() -&gt; ssm_parameters_cpp()  [descriptive,
+                                                            no resampling; deterministic]
 score(), ipsatize(), norm_standardize(), self_standardize()  [tidying, pre-analysis]
 ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]</code></pre>
 </div>
@@ -104,7 +123,7 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]<
 </tr><tr><td>Contrast = second minus first level</td>
 <td>Mirrors the “treatment minus reference” default; direction is printed in the Label (“Male - Female”).</td>
 </tr><tr><td>Percentile bootstrap CIs, stratified by group</td>
-<td>Zimmermann &amp; Wright (2017) generalization; stratification preserves group n’s. BCa is a planned option (ROADMAP M2) but percentile stays default for backward reproducibility.</td>
+<td>Zimmermann &amp; Wright (2017) generalization; stratification preserves group n’s. BCa was considered and dropped (ROADMAP M2, 2026-07): undefined for circular displacement, so it would be permanently mixed-method per parameter. A Monte Carlo alternative (asymptotic MVN sampling distribution, propagated through the SSM transformation) ships instead as an opt-in <code>method</code>; percentile bootstrap stays default for reproducibility and field convention.</td>
 </tr><tr><td>Circular CI method</td>
 <td>Bootstrap displacement replicates are centered on their circular mean, unwrapped to (-π, π], quantiled linearly, re-wrapped. Valid when replicates are concentrated (amplitude reliably &gt; 0); meaningless for flat profiles — hence the interpretation guardrails (fit ≥ .70, amplitude CI excluding 0).</td>
 </tr><tr><td>Fit = 1 − SSE/SST (R²)</td>
@@ -114,6 +133,57 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]<
 </tr><tr><td>Degenerate profiles → NA at machine-noise tolerance</td>
 <td>Flat profile (sd ≤ 8·ε·n·max|s|): displacement and fit are NA. Zero amplitude with real variance (pure higher harmonic): displacement NA, fit exactly 0. The tolerance is float-cancellation scale only (~13 orders below real variation) — small real amplitudes are never NA’d; their unreliability is the CI’s job (plus G1 guardrails). C++ returns NAs silently; R warns once (and once with a count for degenerate bootstrap resamples, whose exclusion makes CIs conditional on estimability). Cannot test <code>var == 0</code> exactly: a constant vector of a non-representable value (e.g., 0.1) has var ≈ 2e-34.</td>
 </tr></tbody></table></div>
+<div class="section level2">
+<h2 id="reproducibility">Reproducibility<a class="anchor" aria-label="anchor" href="#reproducibility"></a></h2>
+<p><code><a href="reference/ssm_analyze.html">ssm_analyze()</a></code> is the package’s only entry point that consumes R’s global RNG stream (<code><a href="reference/ssm_score.html">ssm_score()</a></code>/<code><a href="reference/ssm_parameters.html">ssm_parameters()</a></code> and the tidying functions are deterministic). Call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> immediately before <code><a href="reference/ssm_analyze.html">ssm_analyze()</a></code> to get reproducible confidence intervals. What that reproducibility covers, per engine:</p>
+<table class="table"><colgroup><col width="33%"><col width="33%"><col width="33%"></colgroup><thead><tr><th>Engine</th>
+<th>Seed guarantee</th>
+<th>RNG consumption</th>
+</tr></thead><tbody><tr><td>Bootstrap, serial (<code>parallel = "no"</code>, the default)</td>
+<td>Same seed -&gt; byte-identical <code>results</code>.</td>
+<td>
+<code><a href="https://rdrr.io/pkg/boot/man/boot.html" class="external-link">boot::boot()</a></code> draws all <code>R</code> resample index vectors from the master stream up front, then evaluates <code>bs_function</code> (deterministic) on each.</td>
+</tr><tr><td>Bootstrap, parallel (<code>parallel = "snow"</code>/<code>"multicore"</code>)</td>
+<td>Same seed -&gt; byte-identical <code>results</code>, <strong>regardless of <code>ncpus</code></strong>. Not a general property of parallel bootstrapping — it holds <em>because</em> index generation happens in the master process before any work is dispatched to workers (see table above); the workers only evaluate the deterministic statistic.</td>
+<td>Same as serial: one master-stream draw of the full index array. Workers consume no RNG state the results depend on.</td>
+</tr><tr><td>Monte Carlo (<code>method = "montecarlo"</code>)</td>
+<td>Same seed -&gt; byte-identical <code>results</code>.</td>
+<td>One <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code> block per group, consumed via <code>mvn_draws()</code> in <code>group_ids</code> sort order — see the data-flow diagram. For correlation-based analyses, one group’s block covers <em>all</em> of its measures jointly (a single draw from the stacked measure-scale correlation vector, then sliced per measure), not one block per measure. Adding a group, a measure, or reordering <code>scales</code>/<code>measures</code> changes the draw sequence, so results are seed-reproducible for a <em>fixed</em> call but not stable across such structural edits (expected: the RNG stream is being asked a different question, not violated).</td>
+</tr></tbody></table><p>What reproducibility does <strong>not</strong> mean:</p>
+<ul><li>
+<strong>Cross-engine agreement.</strong> Bootstrap and Monte Carlo draw from the RNG stream in unrelated ways (resample indices vs. MVN deviates); the same seed gives each engine internally-reproducible but mutually unrelated draws. Statistical agreement <em>between</em> engines is a separate, validated property (see the Monte Carlo log entry in MILESTONES.md) — not an RNG-identity one.</li>
+<li>
+<strong>Stability across <code>boots</code>.</strong> Increasing <code>boots</code> (draw/resample count) changes the draw sequence and therefore the exact CI, by design — more draws should tighten the Monte Carlo error, not reproduce the smaller run’s numbers. Only the <em>distribution</em> the CIs approximate is invariant.</li>
+<li>
+<strong>Stability across R/platform versions.</strong> Ordinary caveat: <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> reproducibility depends on <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">RNGkind()</a></code> defaults, which R occasionally changes across major versions.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="visualization-extension">Visualization extension<a class="anchor" aria-label="anchor" href="#visualization-extension"></a></h2>
+<p>The public ggplot2 extension (M3) turns the former inline plotting code into composable pieces: <code><a href="reference/ggcircumplex.html">ggcircumplex()</a></code> (canvas), <code><a href="reference/geom_ssm_point.html">geom_ssm_point()</a></code> / <code><a href="reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> (polar-native layers), and <code><a href="reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> (angle axis). <code><a href="reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>/<code>_curve()</code> are built on them; <code><a href="reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code> is a Cartesian difference plot and stays independent.</p>
+<p><strong>Architecture.</strong></p>
+<ul><li>
+<strong>Canvas</strong> (<code><a href="reference/ggcircumplex.html">ggcircumplex()</a></code> → internal <code>circle_base()</code>): the rings, spokes, and labels are <em>drawn geometry</em> (<code><a href="https://ggforce.data-imaginist.com/reference/geom_circle.html" class="external-link">ggforce::geom_circle</a></code>, <code>geom_segment</code>, <code>geom_label</code>) on a <code>theme_void()</code> base with hidden continuous x/y scales in a radius space of roughly <code>[-5, 5]</code>. It is a plot constructor, not a coord.</li>
+<li>
+<strong>Point geom</strong> (<code>GeomSsmPoint</code> ⊂ <code>GeomPoint</code>): the amplitude/displacement → Cartesian transform runs in <code>setup_data()</code>, which executes <em>before</em> position scale training, so the computed <code>x</code>/<code>y</code> train the panel range correctly.</li>
+<li>
+<strong>Arc stat</strong> (<code>StatSsmArc</code> ⊂ <code><a href="https://ggforce.data-imaginist.com/reference/ggforce-extensions.html" class="external-link">ggforce::StatArcBar</a></code>): <code>compute_panel()</code> injects <code>x0/y0/r0/r/start/end</code> from the SSM bounds (with the 0/360 unwrap) and then delegates to the parent via <code>ggproto_parent()</code> for the polygon tessellation. This is the idiomatic split (a Stat computes positions; the Geom draws).</li>
+<li>
+<strong>Label resolution</strong>: a shared <code>resolve_circumplex_labels()</code> backs both the canvas and the axis scale, so identical <code>angles</code>/<code>labels</code>/<code>instrument</code> inputs label both contexts consistently.</li>
+</ul><p><strong>Best-practices review (V6 verdict, 2026-07).</strong></p>
+<ul><li>
+<strong><code>after_stat()</code>/<code>after_scale()</code></strong>: not used, and correctly so. The arc’s Stat feeds <code>GeomArcBar</code>’s required aesthetics directly (as ggforce itself does), and no aesthetic needs post-scale remapping. Their absence is right, not a gap.</li>
+<li>
+<strong><code>ggforce</code> dependency: KEEP</strong> (the acceptance’s “keep iff it simplifies arcs”). It supplies (a) the annular-sector polygon tessellation (<code>StatArcBar</code>/<code>arcPaths</code>), which <code>StatSsmArc</code> reuses by inheritance rather than reimplementing — hand-rolling a wrap-aware annular-wedge tessellator is exactly the fiddly geometry worth <em>not</em> owning — and (b) <code>geom_circle</code> for the canvas rings. It is already a mature hard dependency (Imports, ≥ 0.3.0); dropping it would add risk for no benefit. See also Dependency policy above.</li>
+</ul><p><strong>Known limitations / accepted trade-offs (deliberate for M3, candidates for a later milestone; do not “fix” casually — each risks the V4 snapshot stability that byte-identical output depended on).</strong></p>
+<ul><li>
+<strong><code>amax</code> is a per-layer parameter, not shared state.</strong> The amplitude→radius scale factor lives on both <code><a href="reference/ggcircumplex.html">ggcircumplex()</a></code> and each geom, and the caller must keep them equal; a mismatch silently misaligns points from the rings. ggplot2 has no first-class way for a geom to read a plot-level constant. The idiomatic fix is a <code>CoordCircumplex</code> (or a carrier scale) that owns <code>amax</code> and the polar transform — a substantial rewrite of the drawn-geometry canvas, deferred.</li>
+<li>
+<strong>The canvas does not respond to themes.</strong> Because rings/spokes/labels are drawn geoms under <code>theme_void()</code>, <code>+ theme_bw()</code> etc. do not restyle them. Themed panel furniture would again require the coord/scale approach above. The data layers themselves theme and scale normally.</li>
+<li>
+<strong><code>na.rm</code> is effectively always TRUE.</strong> The geoms silently drop rows with a missing amplitude/displacement (degenerate profiles have no location), regardless of the flag — a minor deviation from the ggplot2 convention where <code>na.rm = FALSE</code> warns.</li>
+<li>
+<strong>The <code>GeomSsmPoint</code>/<code>StatSsmArc</code> ggproto generators are not exported</strong> (only the layer constructors are). Fine for use; exporting them (with <code>@format NULL</code>) would let others subclass — a cheap future addition.</li>
+</ul></div>
 <div class="section level2">
 <h2 id="key-references">Key references<a class="anchor" aria-label="anchor" href="#key-references"></a></h2>
 <ul><li>Gurtman (1992) JPSP — SSM foundations; Gurtman &amp; Pincus (2003) — methods.</li>

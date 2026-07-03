@@ -40,6 +40,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-vignettes"><li><a class="dropdown-item" href="articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmgirard/circumplex"><span class="fa fa-github fa-lg"></span></a></li>
@@ -78,7 +79,7 @@
 </ul></div>
 <div class="section level2">
 <h2 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a></h2>
-<p>Memory files: <code>ROADMAP.md</code> (multi-release direction), <code>MILESTONES.md</code> (active milestone: tasks, acceptance criteria, running log), <code>DESIGN.md</code> (architecture, conventions, decision rationale). Read MILESTONES.md before starting work; append to its log after finishing anything.</p>
+<p>Memory files: <code>ROADMAP.md</code> (multi-release direction and milestone-level status <em>only</em> — no task checkboxes; versioning lives in its CRAN release-strategy section), <code>MILESTONES.md</code> (the single active milestone: tasks, acceptance criteria, running log — the sole owner of task-level status), <code>DESIGN.md</code> (architecture, conventions, decision rationale), <code>MILESTONES-ARCHIVE.md</code> (finished milestones with their logs, moved out of MILESTONES.md on release so it stays cheap to re-read). Read MILESTONES.md before starting work; append to its log after finishing anything. Do not duplicate task status into ROADMAP.md.</p>
 <p>Process for each unit of work — follow this loop, don’t freestyle:</p>
 <ol style="list-style-type: decimal"><li>
 <strong>Pick/plan</strong>: use <code>/next-task</code> (or read MILESTONES.md and plan against its acceptance criteria). Non-trivial statistical changes get a written plan before code.</li>
@@ -87,7 +88,7 @@
 <li>
 <strong>Validate</strong>: if the change touches estimation code (<code>ssm_*</code> statistics, <code>src/</code>), run <code>/statistical-validation</code>.</li>
 <li>
-<strong>Review</strong>: <code>/code-review</code> before committing; <code>/code-review ultra</code> before CRAN releases.</li>
+<strong>Review</strong>: <code>/code-review</code> before committing; <code>/code-review high</code> (or <code>max</code> for a large or statistically risky release) before CRAN releases. The billed cloud <code>/code-review ultra</code> is reserved for a flagship release and only when the user asks for it — do not default to it.</li>
 <li>
 <strong>Log</strong>: check the box and append one line to the MILESTONES.md log (date, what, files). Update NEWS.md for user-facing changes.</li>
 </ol><p>Releases: use <code>/release-checklist</code>.</p>

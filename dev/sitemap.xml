@@ -5,9 +5,11 @@
 <url><loc>http://circumplex.jmgirard.com/dev/DESIGN.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/ISSUE_TEMPLATE.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/LICENSE.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/MILESTONES-ARCHIVE.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/MILESTONES.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/ROADMAP.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/SUPPORT.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/articles/advanced-visualization.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/index.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/intermediate-ssm-analysis.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/introduction-to-ssm-analysis.html</loc></url>
@@ -24,6 +26,9 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csig.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csip.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csiv.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/ggcircumplex.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ggsave.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/html_render.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/iei.html</loc></url>
@@ -47,6 +52,7 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/poles.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/quadrants.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/raw_iipsc.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/scales.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/score.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/self_standardize.html</loc></url>

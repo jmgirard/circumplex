@@ -1,10 +1,11 @@
 # Perform analyses using the Structural Summary Method
 
-Calculate SSM parameters with bootstrapped confidence intervals for a
-variety of different analysis types. Depending on what arguments are
-supplied, either mean-based or correlation-based analyses will be
-performed, one or more groups will be used to stratify the data, and
-contrasts between groups or measures will be calculated.
+Calculate SSM parameters with confidence intervals (bootstrapped by
+default, or Monte Carlo via `method`) for a variety of different
+analysis types. Depending on what arguments are supplied, either
+mean-based or correlation-based analyses will be performed, one or more
+groups will be used to stratify the data, and contrasts between groups
+or measures will be calculated.
 
 ## Usage
 
@@ -19,7 +20,10 @@ ssm_analyze(
   boots = 2000,
   interval = 0.95,
   listwise = TRUE,
-  measures_labels = NULL
+  measures_labels = NULL,
+  parallel = "no",
+  ncpus = 1,
+  method = "bootstrap"
 )
 ```
 
@@ -75,8 +79,8 @@ ssm_analyze(
 - boots:
 
   Optional. A single positive whole number indicating how many bootstrap
-  resamples to use when estimating the confidence intervals (default =
-  2000).
+  resamples (or, when `method = "montecarlo"`, Monte Carlo draws) to use
+  when estimating the confidence intervals (default = 2000).
 
 - interval:
 
@@ -97,6 +101,39 @@ ssm_analyze(
   each measure provided in `measures` (in the same order) to appear in
   the results as well as tables and plots derived from the results.
 
+- parallel:
+
+  Optional. A string indicating whether to distribute the bootstrap
+  computation across multiple CPU cores: "no" (default), "multicore"
+  (process forking; available on macOS and Linux, ignored on Windows),
+  or "snow" (a local PSOCK cluster; available on all platforms). Passed
+  to [`boot`](https://rdrr.io/pkg/boot/man/boot.html). Because the
+  bootstrap resample indices are drawn in the main R process before any
+  work is distributed, results for a given
+  [`set.seed()`](https://rdrr.io/r/base/Random.html) are identical
+  regardless of the `parallel` and `ncpus` settings.
+
+- ncpus:
+
+  Optional. A single positive whole number indicating how many CPU cores
+  to use when `parallel` is not "no" (default = 1).
+
+- method:
+
+  Optional. A string indicating how to estimate the confidence
+  intervals: "bootstrap" (default) resamples the data, whereas
+  "montecarlo" draws parameter replicates from the asymptotic sampling
+  distribution of the group mean vector (mean-based analyses) or the
+  measure-scale correlation vector (correlation-based analyses) – a
+  multivariate normal with empirically estimated covariance – and
+  propagates them through the SSM parameter transformation. The Monte
+  Carlo method is much faster for large samples but relies on the
+  asymptotic normality of the means or correlations, so prefer the
+  bootstrap for small samples; it also requires listwise-complete data.
+  Correlations are drawn jointly across measures within each group on
+  the Fisher z scale and back-transformed. The `parallel` and `ncpus`
+  arguments apply only to the bootstrap.
+
 ## Value
 
 A list containing the results and description of the analysis.
@@ -107,9 +144,10 @@ A list containing the results and description of the analysis.
 
 - details:
 
-  A list with the number of bootstrap resamples (boots), the confidence
-  interval percentage level (interval), and the angular displacement of
-  scales (angles)
+  A list with the number of bootstrap resamples or Monte Carlo draws
+  (boots), the confidence interval percentage level (interval), the
+  angular displacement of scales (angles), and the interval estimation
+  method (method)
 
 - call:
 
@@ -144,6 +182,37 @@ conditional on estimability.
 180\]:
 R:0,%20360)%60%20degrees.%20A%20profile%20that%20peaks%20exactly%20at%20the%200/360%20degree%0A%20%20boundary%20is%20reported%20as%20approximately%20360%20(equivalently%200,%20the%20same%0A%20%20direction);%20which%20of%20the%20two%20appears%20is%20a%20floating-point%20detail%20and%20both%0A%20%20denote%20the%20same%20pole.%20Contrast%20displacements%20are%20instead%20reported%20as%20a%0A%20%20signed%20difference%20in%20%60(-180,%20180
 
+## Reproducibility
+
+This is the only function in the package that consumes R's random number
+stream
+([`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)/[`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md)
+and the tidying functions are deterministic). Call
+[`set.seed()`](https://rdrr.io/r/base/Random.html) immediately before
+`ssm_analyze()` for reproducible confidence intervals:
+
+- **Bootstrap** (`method = "bootstrap"`, the default): the same seed
+  gives byte-identical `results`, *regardless of* the `parallel`/`ncpus`
+  settings (see their descriptions below), because
+  [`boot::boot()`](https://rdrr.io/pkg/boot/man/boot.html) draws all
+  resample indices from the seed before any work is parallelized.
+
+- **Monte Carlo** (`method = "montecarlo"`): the same seed gives
+  byte-identical `results`. Adding a group or measure, or reordering
+  `scales`/`measures`, changes the random draw sequence, so results are
+  reproducible for a fixed call but will not match after such structural
+  edits even with the same seed.
+
+- The two methods are **not** expected to agree numerically for the same
+  seed – they consume the random stream in unrelated ways. Their
+  statistical agreement (validated on real data; see
+  [`vignette("introduction-to-ssm-analysis")`](http://circumplex.jmgirard.com/dev/articles/introduction-to-ssm-analysis.md))
+  is a separate property from RNG reproducibility.
+
+- Increasing `boots` changes the CI by design (more resamples/draws
+  should tighten Monte Carlo error), so results are not expected to be
+  stable across different `boots` values, only within a fixed call.
+
 ## See also
 
 Other ssm functions:
@@ -170,11 +239,11 @@ ssm_analyze(
 #> # Profile [All]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.917      0.888      0.946
-#> X-Value           0.351      0.324      0.378
-#> Y-Value          -0.252     -0.282     -0.222
-#> Amplitude         0.432      0.402      0.462
-#> Displacement    324.292    320.907    327.921
+#> Elevation         0.917      0.888      0.945
+#> X-Value           0.351      0.324      0.377
+#> Y-Value          -0.252     -0.284     -0.222
+#> Amplitude         0.432      0.403      0.463
+#> Displacement    324.292    320.761    327.913
 #> Model Fit         0.878                      
 #> 
 
@@ -188,11 +257,11 @@ ssm_analyze(
 #> # Profile [NARPD]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.202      0.169      0.236
-#> X-Value          -0.062     -0.094     -0.030
-#> Y-Value           0.179      0.145      0.214
-#> Amplitude         0.189      0.153      0.226
-#> Displacement    108.967     99.334    118.620
+#> Elevation         0.202      0.170      0.236
+#> X-Value          -0.062     -0.094     -0.029
+#> Y-Value           0.179      0.145      0.212
+#> Amplitude         0.189      0.156      0.224
+#> Displacement    108.967     99.328    118.683
 #> Model Fit         0.957                      
 #> 
 #> 
@@ -200,11 +269,29 @@ ssm_analyze(
 #> 
 #>                Estimate   Lower CI   Upper CI
 #> Elevation         0.124      0.089      0.159
-#> X-Value          -0.099     -0.133     -0.063
-#> Y-Value           0.203      0.167      0.237
-#> Amplitude         0.226      0.190      0.263
-#> Displacement    115.927    107.451    124.435
+#> X-Value          -0.099     -0.136     -0.064
+#> Y-Value           0.203      0.170      0.241
+#> Amplitude         0.226      0.191      0.265
+#> Displacement    115.927    107.578    124.498
 #> Model Fit         0.964                      
+#> 
+
+# Monte Carlo confidence intervals (faster for large samples)
+ssm_analyze(
+  jz2017,
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+  method = "montecarlo"
+)
+#> 
+#> # Profile [All]:
+#> 
+#>                Estimate   Lower CI   Upper CI
+#> Elevation         0.917      0.889      0.945
+#> X-Value           0.351      0.325      0.378
+#> Y-Value          -0.252     -0.282     -0.223
+#> Amplitude         0.432      0.402      0.462
+#> Displacement    324.292    320.972    327.838
+#> Model Fit         0.878                      
 #> 
 # \donttest{
 # Multiple-group mean-based SSM
@@ -217,22 +304,22 @@ ssm_analyze(
 #> # Profile [Female]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.946      0.907      0.983
-#> X-Value           0.459      0.420      0.499
-#> Y-Value          -0.310     -0.355     -0.268
-#> Amplitude         0.554      0.509      0.599
-#> Displacement    325.963    322.240    329.833
+#> Elevation         0.946      0.905      0.983
+#> X-Value           0.459      0.422      0.498
+#> Y-Value          -0.310     -0.353     -0.265
+#> Amplitude         0.554      0.512      0.598
+#> Displacement    325.963    322.060    329.966
 #> Model Fit         0.889                      
 #> 
 #> 
 #> # Profile [Male]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.884      0.842      0.925
-#> X-Value           0.227      0.192      0.262
-#> Y-Value          -0.186     -0.225     -0.148
-#> Amplitude         0.294      0.258      0.332
-#> Displacement    320.685    313.267    327.988
+#> Elevation         0.884      0.843      0.928
+#> X-Value           0.227      0.191      0.263
+#> Y-Value          -0.186     -0.224     -0.148
+#> Amplitude         0.294      0.257      0.331
+#> Displacement    320.685    313.438    327.869
 #> Model Fit         0.824                      
 #> 
 
@@ -247,33 +334,33 @@ ssm_analyze(
 #> # Profile [Female]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.946      0.908      0.986
-#> X-Value           0.459      0.420      0.496
+#> Elevation         0.946      0.906      0.984
+#> X-Value           0.459      0.420      0.500
 #> Y-Value          -0.310     -0.355     -0.267
-#> Amplitude         0.554      0.512      0.598
-#> Displacement    325.963    321.951    329.924
+#> Amplitude         0.554      0.510      0.599
+#> Displacement    325.963    322.249    329.948
 #> Model Fit         0.889                      
 #> 
 #> 
 #> # Profile [Male]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.884      0.842      0.929
-#> X-Value           0.227      0.192      0.263
-#> Y-Value          -0.186     -0.224     -0.148
-#> Amplitude         0.294      0.258      0.333
-#> Displacement    320.685    313.849    328.047
+#> Elevation         0.884      0.841      0.925
+#> X-Value           0.227      0.191      0.261
+#> Y-Value          -0.186     -0.225     -0.149
+#> Amplitude         0.294      0.259      0.330
+#> Displacement    320.685    313.516    327.870
 #> Model Fit         0.824                      
 #> 
 #> 
 #> # Contrast [Male - Female]:
 #> 
 #>                  Estimate   Lower CI   Upper CI
-#> Δ Elevation        -0.062     -0.118     -0.004
-#> Δ X-Value          -0.232     -0.286     -0.181
-#> Δ Y-Value           0.124      0.069      0.179
-#> Δ Amplitude        -0.261     -0.317     -0.204
-#> Δ Displacement     -5.278    -13.507      2.770
+#> Δ Elevation        -0.062     -0.119     -0.003
+#> Δ X-Value          -0.232     -0.284     -0.179
+#> Δ Y-Value           0.124      0.065      0.181
+#> Δ Amplitude        -0.261     -0.319     -0.201
+#> Δ Displacement     -5.278    -13.691      2.691
 #> Δ Model Fit        -0.066                      
 #> 
 
@@ -288,33 +375,33 @@ ssm_analyze(
 #> # Profile [NARPD]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.202      0.168      0.236
-#> X-Value          -0.062     -0.095     -0.029
+#> Elevation         0.202      0.168      0.235
+#> X-Value          -0.062     -0.095     -0.027
 #> Y-Value           0.179      0.146      0.212
-#> Amplitude         0.189      0.154      0.224
-#> Displacement    108.967     99.381    118.797
+#> Amplitude         0.189      0.155      0.223
+#> Displacement    108.967     98.598    118.693
 #> Model Fit         0.957                      
 #> 
 #> 
 #> # Profile [ASPD]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.124      0.089      0.158
-#> X-Value          -0.099     -0.134     -0.066
-#> Y-Value           0.203      0.168      0.236
-#> Amplitude         0.226      0.189      0.262
-#> Displacement    115.927    107.782    124.564
+#> Elevation         0.124      0.089      0.159
+#> X-Value          -0.099     -0.134     -0.063
+#> Y-Value           0.203      0.169      0.237
+#> Amplitude         0.226      0.190      0.263
+#> Displacement    115.927    107.298    124.178
 #> Model Fit         0.964                      
 #> 
 #> 
 #> # Contrast [ASPD - NARPD]:
 #> 
 #>                  Estimate   Lower CI   Upper CI
-#> Δ Elevation        -0.079     -0.116     -0.041
-#> Δ X-Value          -0.037     -0.077      0.000
-#> Δ Y-Value           0.024     -0.014      0.060
-#> Δ Amplitude         0.037     -0.001      0.075
-#> Δ Displacement      6.960     -3.385     18.057
+#> Δ Elevation        -0.079     -0.114     -0.041
+#> Δ X-Value          -0.037     -0.076      0.001
+#> Δ Y-Value           0.024     -0.011      0.062
+#> Δ Amplitude         0.037     -0.001      0.076
+#> Δ Displacement      6.960     -2.979     17.504
 #> Δ Model Fit         0.007                      
 #> 
 
@@ -329,22 +416,22 @@ ssm_analyze(
 #> # Profile [NARPD: Female]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.172      0.128      0.218
-#> X-Value          -0.080     -0.125     -0.033
-#> Y-Value           0.202      0.153      0.250
-#> Amplitude         0.217      0.168      0.268
-#> Displacement    111.669     99.626    122.752
+#> Elevation         0.172      0.126      0.215
+#> X-Value          -0.080     -0.126     -0.032
+#> Y-Value           0.202      0.152      0.249
+#> Amplitude         0.217      0.165      0.267
+#> Displacement    111.669     99.534    122.727
 #> Model Fit         0.972                      
 #> 
 #> 
 #> # Profile [NARPD: Male]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.244      0.194      0.295
-#> X-Value          -0.029     -0.074      0.017
-#> Y-Value           0.146      0.097      0.192
-#> Amplitude         0.149      0.102      0.195
-#> Displacement    101.248     83.457    119.191
+#> Elevation         0.244      0.190      0.293
+#> X-Value          -0.029     -0.073      0.015
+#> Y-Value           0.146      0.098      0.189
+#> Amplitude         0.149      0.105      0.192
+#> Displacement    101.248     84.172    118.983
 #> Model Fit         0.902                      
 #> 
 
@@ -360,33 +447,33 @@ ssm_analyze(
 #> # Profile [NARPD: Female]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.172      0.127      0.215
-#> X-Value          -0.080     -0.127     -0.034
-#> Y-Value           0.202      0.152      0.250
-#> Amplitude         0.217      0.167      0.269
-#> Displacement    111.669     99.844    123.191
+#> Elevation         0.172      0.124      0.217
+#> X-Value          -0.080     -0.126     -0.034
+#> Y-Value           0.202      0.153      0.248
+#> Amplitude         0.217      0.168      0.267
+#> Displacement    111.669     99.706    122.613
 #> Model Fit         0.972                      
 #> 
 #> 
 #> # Profile [NARPD: Male]:
 #> 
 #>                Estimate   Lower CI   Upper CI
-#> Elevation         0.244      0.192      0.295
-#> X-Value          -0.029     -0.072      0.014
-#> Y-Value           0.146      0.098      0.191
-#> Amplitude         0.149      0.105      0.195
-#> Displacement    101.248     84.228    119.107
+#> Elevation         0.244      0.195      0.299
+#> X-Value          -0.029     -0.075      0.015
+#> Y-Value           0.146      0.099      0.191
+#> Amplitude         0.149      0.103      0.195
+#> Displacement    101.248     83.803    119.596
 #> Model Fit         0.902                      
 #> 
 #> 
 #> # Contrast [NARPD: Male - Female]:
 #> 
 #>                  Estimate   Lower CI   Upper CI
-#> Δ Elevation         0.072      0.005      0.139
-#> Δ X-Value           0.051     -0.012      0.113
-#> Δ Y-Value          -0.056     -0.124      0.010
-#> Δ Amplitude        -0.068     -0.138     -0.004
-#> Δ Displacement    -10.421    -30.538     10.798
+#> Δ Elevation         0.072      0.007      0.141
+#> Δ X-Value           0.051     -0.014      0.116
+#> Δ Y-Value          -0.056     -0.123      0.011
+#> Δ Amplitude        -0.068     -0.139      0.000
+#> Δ Displacement    -10.421    -31.365     11.597
 #> Δ Model Fit        -0.071                      
 #> 
 # }

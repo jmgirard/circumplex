@@ -2,7 +2,75 @@
 
 ## circumplex (development version)
 
+- New vignette “Advanced Circumplex Visualization” shows how to build
+  custom circumplex figures by composing
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
+  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
+  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md),
+  and
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
+  with other ggplot2 components.
+- New
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
+  provides an angle-labeled x-axis scale for linear circumplex plots
+  (such as the score-by-angle curve). It labels axis breaks with their
+  angle in degrees by default, or with custom labels or a
+  `circumplex_instrument`’s scale abbreviations, using the same
+  conventions as
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md).
+- New
+  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
+  and
+  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
+  layers draw SSM profile points and their confidence-region arcs
+  directly in circumplex space on a
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  canvas, taking amplitude and displacement as aesthetics and handling
+  the polar transform (including wrap-around at the 0/360 degree
+  boundary) internally. These make it possible to build custom
+  circumplex figures by composing ggplot2 layers.
+- New
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  function builds an empty circumplex plotting canvas (amplitude rings,
+  displacement spokes, and scale labels) as a ggplot2 object that you
+  can add layers to with `+`. It accepts a set of scale `angles` and
+  `labels`, or a `circumplex_instrument` object to derive both
+  automatically. This is the first piece of a public circumplex
+  visualization layer; the package’s own
+  [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  draws on the same canvas.
+- [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  gains a `method` argument offering a Monte Carlo alternative to the
+  bootstrap (`method = "montecarlo"`): SSM parameter replicates are
+  drawn from the asymptotic sampling distribution of the group mean
+  vector or measure-scale correlation vector (a multivariate normal with
+  empirically estimated covariance; correlations are drawn jointly
+  across measures on the Fisher z scale) and propagated through the SSM
+  transformation. It produces intervals closely matching the bootstrap
+  on large samples while running in a fraction of the time, but relies
+  on asymptotic normality and requires listwise-complete data, so the
+  bootstrap remains the default and the recommended choice for small
+  samples. [`summary()`](https://rdrr.io/r/base/summary.html) reports
+  which method produced the intervals.
+- [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  gains `parallel` and `ncpus` arguments (passed to
+  [`boot::boot()`](https://rdrr.io/pkg/boot/man/boot.html)) to
+  distribute the bootstrap computation across multiple CPU cores.
+  Because the resample indices are drawn in the main R process before
+  any work is distributed, results for a given
+  [`set.seed()`](https://rdrr.io/r/base/Random.html) are identical
+  regardless of these settings, so parallelizing never changes your
+  estimates or confidence intervals.
+- [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+  is now vectorized internally (one compiled call instead of a row-wise
+  loop), making it much faster on large data sets. Results are
+  unchanged. Rows whose profile has undefined displacement now produce a
+  single warning reporting how many such rows there are, rather than one
+  warning per row.
+
 ## circumplex 1.2.0
+
+CRAN release: 2026-07-02
 
 - The SSM plotting functions
   ([`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md),
