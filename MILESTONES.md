@@ -82,7 +82,7 @@ Cross-cutting guardrails for every task below:
   statistical-precision bar (CLAUDE.md — e.g., never describe an angular CI
   excluding 0° as a significance test); intermediate vignette's "in progress"
   note updated to point at it.
-- [ ] **V6. Design review vs. ggplot2 extension best practices.** Check
+- [x] **V6. Design review vs. ggplot2 extension best practices.** Check
   ggproto lifecycle, `after_stat()`/`after_scale()` usage, theme integration,
   and the `ggforce` dependency decision (keep iff it simplifies arcs).
   *Accept:* a short written verdict appended to DESIGN.md (a "Visualization
@@ -91,6 +91,23 @@ Cross-cutting guardrails for every task below:
 
 ## Log
 
+- 2026-07-02 — V6 Extension design review (Opus, doc-only). Audited the V1–V4
+  ggproto code against ggplot2 extension idioms; appended a "Visualization
+  extension" section to DESIGN.md recording architecture + verdict. Findings:
+  (1) after_stat/after_scale correctly unused (the arc Stat feeds GeomArcBar's
+  aes directly, ggforce-style; nothing needs post-scale remap). (2) ggforce =
+  KEEP (the acceptance's "iff it simplifies arcs"): StatSsmArc inherits its
+  annular-wedge polygon tessellation (StatArcBar/arcPaths) instead of
+  reimplementing a wrap-aware tessellator, and geom_circle draws the rings;
+  already a mature Import. (3) Recorded known trade-offs, each deliberate and
+  each risky to "fix" because it would threaten V4 byte-identical snapshots:
+  amax is a per-layer param not shared state (idiomatic fix = a CoordCircumplex
+  owning amax + the polar transform, deferred); the theme_void canvas doesn't
+  respond to themes; na.rm is effectively always TRUE (minor convention
+  deviation); the GeomSsmPoint/StatSsmArc generators aren't exported (cheap
+  future add for subclassers). No code/test/NEWS change (DESIGN.md is
+  .Rbuildignore'd internal memory). Verdict claims verified against code/
+  NAMESPACE. M3 COMPLETE — all V1–V6 done. (DESIGN.md, MILESTONES.md).
 - 2026-07-02 — V5 Advanced Visualization vignette (Sonnet). New
   vignettes/advanced-visualization.Rmd: builds custom circumplex figures by
   composing the exported extension — bare/instrument-labeled ggcircumplex()

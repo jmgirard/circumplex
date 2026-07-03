@@ -103,6 +103,67 @@ What reproducibility does **not** mean:
   reproducibility depends on `RNGkind()` defaults, which R occasionally
   changes across major versions.
 
+## Visualization extension
+
+The public ggplot2 extension (M3) turns the former inline plotting code into
+composable pieces: `ggcircumplex()` (canvas), `geom_ssm_point()` /
+`geom_ssm_arc()` (polar-native layers), and `scale_x_circumplex()` (angle
+axis). `ssm_plot_circle()`/`_curve()` are built on them; `ssm_plot_contrast()`
+is a Cartesian difference plot and stays independent.
+
+**Architecture.**
+
+- **Canvas** (`ggcircumplex()` → internal `circle_base()`): the rings, spokes,
+  and labels are *drawn geometry* (`ggforce::geom_circle`, `geom_segment`,
+  `geom_label`) on a `theme_void()` base with hidden continuous x/y scales in a
+  radius space of roughly `[-5, 5]`. It is a plot constructor, not a coord.
+- **Point geom** (`GeomSsmPoint` ⊂ `GeomPoint`): the amplitude/displacement →
+  Cartesian transform runs in `setup_data()`, which executes *before* position
+  scale training, so the computed `x`/`y` train the panel range correctly.
+- **Arc stat** (`StatSsmArc` ⊂ `ggforce::StatArcBar`): `compute_panel()` injects
+  `x0/y0/r0/r/start/end` from the SSM bounds (with the 0/360 unwrap) and then
+  delegates to the parent via `ggproto_parent()` for the polygon tessellation.
+  This is the idiomatic split (a Stat computes positions; the Geom draws).
+- **Label resolution**: a shared `resolve_circumplex_labels()` backs both the
+  canvas and the axis scale, so identical `angles`/`labels`/`instrument` inputs
+  label both contexts consistently.
+
+**Best-practices review (V6 verdict, 2026-07).**
+
+- **`after_stat()`/`after_scale()`**: not used, and correctly so. The arc's Stat
+  feeds `GeomArcBar`'s required aesthetics directly (as ggforce itself does),
+  and no aesthetic needs post-scale remapping. Their absence is right, not a
+  gap.
+- **`ggforce` dependency: KEEP** (the acceptance's "keep iff it simplifies
+  arcs"). It supplies (a) the annular-sector polygon tessellation
+  (`StatArcBar`/`arcPaths`), which `StatSsmArc` reuses by inheritance rather
+  than reimplementing — hand-rolling a wrap-aware annular-wedge tessellator is
+  exactly the fiddly geometry worth *not* owning — and (b) `geom_circle` for the
+  canvas rings. It is already a mature hard dependency (Imports, ≥ 0.3.0);
+  dropping it would add risk for no benefit. See also Dependency policy above.
+
+**Known limitations / accepted trade-offs (deliberate for M3, candidates for a
+later milestone; do not "fix" casually — each risks the V4 snapshot stability
+that byte-identical output depended on).**
+
+- **`amax` is a per-layer parameter, not shared state.** The amplitude→radius
+  scale factor lives on both `ggcircumplex()` and each geom, and the caller must
+  keep them equal; a mismatch silently misaligns points from the rings. ggplot2
+  has no first-class way for a geom to read a plot-level constant. The idiomatic
+  fix is a `CoordCircumplex` (or a carrier scale) that owns `amax` and the polar
+  transform — a substantial rewrite of the drawn-geometry canvas, deferred.
+- **The canvas does not respond to themes.** Because rings/spokes/labels are
+  drawn geoms under `theme_void()`, `+ theme_bw()` etc. do not restyle them.
+  Themed panel furniture would again require the coord/scale approach above. The
+  data layers themselves theme and scale normally.
+- **`na.rm` is effectively always TRUE.** The geoms silently drop rows with a
+  missing amplitude/displacement (degenerate profiles have no location),
+  regardless of the flag — a minor deviation from the ggplot2 convention where
+  `na.rm = FALSE` warns.
+- **The `GeomSsmPoint`/`StatSsmArc` ggproto generators are not exported** (only
+  the layer constructors are). Fine for use; exporting them (with
+  `@format NULL`) would let others subclass — a cheap future addition.
+
 ## Key references
 
 - Gurtman (1992) JPSP — SSM foundations; Gurtman & Pincus (2003) — methods.
