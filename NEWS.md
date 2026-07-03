@@ -1,5 +1,10 @@
 # circumplex (development version)
 
+* New `scale_x_circumplex()` provides an angle-labeled x-axis scale for linear
+  circumplex plots (such as the score-by-angle curve). It labels axis breaks
+  with their angle in degrees by default, or with custom labels or a
+  `circumplex_instrument`'s scale abbreviations, using the same conventions as
+  `ggcircumplex()`.
 * New `geom_ssm_point()` and `geom_ssm_arc()` layers draw SSM profile points
   and their confidence-region arcs directly in circumplex space on a
   `ggcircumplex()` canvas, taking amplitude and displacement as aesthetics and

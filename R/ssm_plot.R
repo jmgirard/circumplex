@@ -506,21 +506,14 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 ggcircumplex <- function(angles = octants(), labels = NULL, amin = 0,
                          amax = 0.5, font_size = 12, instrument = NULL) {
 
-  if (!is.null(instrument)) {
-    stopifnot(is_instrument(instrument))
-    angles <- instrument$Scales$Angle
-    if (is.null(labels)) labels <- instrument$Scales$Abbrev
-  }
-
-  stopifnot(is_num(angles))
-  stopifnot(is_null_or_char(labels, n = length(angles)))
+  resolved <- resolve_circumplex_labels(angles, labels, instrument)
   stopifnot(is_num(amin, n = 1))
   stopifnot(is_num(amax, n = 1) && amax > 0)
   stopifnot(is_num(font_size, n = 1) && font_size > 0)
 
   circle_base(
-    angles = as.integer(round(angles)),
-    labels = labels,
+    angles = as.integer(round(resolved$angles)),
+    labels = resolved$labels,
     amin = amin,
     amax = amax,
     fontsize = font_size

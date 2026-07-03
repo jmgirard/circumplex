@@ -51,11 +51,22 @@ Cross-cutting guardrails for every task below:
   boundary); boundary case — a profile arc spanning the 0/360 seam renders as
   one contiguous arc; degenerate/NA-displacement rows are dropped or handled
   without error.
-- [ ] **V3. Scales.** `scale_*_circumplex()` helpers for angle-labeled axes
+- [x] **V3. Scales.** `scale_*_circumplex()` helpers for angle-labeled axes
   and amplitude gridlines, with defaults matching the current appearance.
   *Accept:* helpers produce the current tick/label placement on both the
   circular canvas and the curve plot's angle axis; custom `angle_labels`
   and instrument labels flow through; documented with examples.
+  *Scope refined during implementation (2026-07-02):* only the curve plot's
+  linear angle axis is a genuine ggplot scale (`scale_x_circumplex()`). The
+  circular canvas's angle labels and amplitude rings are drawn geometry under
+  `theme_void()`, owned by `ggcircumplex()` (V1) — not ggplot scale breaks — so
+  they are NOT re-expressed as `scale_*` (that abstraction fits poorly over
+  drawn geometry and would jeopardize V4's snapshot stability). Consistency
+  across the two contexts is instead guaranteed by a shared internal
+  `resolve_circumplex_labels()` used by both `scale_x_circumplex()` and
+  `ggcircumplex()`, so identical angle/label/instrument inputs yield matching
+  labels on the axis and the canvas (asserted in tests). No `scale_y_*` shipped
+  (no linear circumplex plot has an amplitude axis; would be speculative API).
 - [ ] **V4. Refactor existing plots onto the extension.** Reimplement
   `ssm_plot_circle()`, `ssm_plot_curve()`, `ssm_plot_contrast()` on top of
   V1–V3 with **behavior unchanged**.
@@ -80,6 +91,25 @@ Cross-cutting guardrails for every task below:
 
 ## Log
 
+- 2026-07-02 — V3 Scales (Opus): exported `scale_x_circumplex()`, a ggplot2
+  continuous position scale for the angle axis of linear circumplex plots (the
+  ssm_plot_curve score-by-angle axis). Breaks at the scale angles; default
+  labels = degrees (sprintf "%.0f\\U00B0", matching ssm_plot_curve exactly);
+  accepts a labels vector or a circumplex_instrument (abbreviations). Extracted
+  a shared internal `resolve_circumplex_labels(angles, labels, instrument)` and
+  routed BOTH the new scale and `ggcircumplex()` (V1) through it, so identical
+  inputs label the linear axis and the circular canvas consistently — asserted
+  by a test comparing the scale's get_labels() to the canvas's drawn label
+  layer. ggcircumplex refactor verified output-identical (0 snapshot changes).
+  Scope call recorded in the V3 task entry: circular-canvas gridlines/labels
+  are theme_void drawn geometry (ggcircumplex's job), not ggplot scales, so no
+  scale_* is forced over them; no speculative scale_y_*. Non-ASCII degree sign
+  written as \\U00B0 per the R/ convention (avoids the R CMD check non-ASCII
+  note). Tests via standalone Scale$get_labels() (device-independent) plus a
+  build-level check that the curve plot's axis labels match. Suite 529/529;
+  check 0/0/0. NEWS.md added. (R/scale_circumplex.R [new], R/ssm_plot.R
+  [ggcircumplex refactor], man/scale_x_circumplex.Rd [new], NAMESPACE,
+  tests/testthat/test-scale_circumplex.R [new], NEWS.md, MILESTONES.md).
 - 2026-07-02 — V2 Polar-native geoms (Opus): exported `geom_ssm_point()` and
   `geom_ssm_arc()`, ggplot2 layers taking amplitude/displacement aesthetics and
   internalizing the polar transform formerly inline in ssm_plot_circle (radius
