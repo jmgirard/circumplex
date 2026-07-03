@@ -188,7 +188,7 @@ fix is test-first with a regression test reproducing the audit's executed failur
   tests after; recommend a Fable review of the fix.* *Accept:* opposed-profile
   contrasts report +180 on the documented branch; boundary tests green; seeded
   pins reconciled (any snapshot delta justified).
-- [ ] **F2. Model-fit caveat is under-documented and fit can leave [0,1]** — with
+- [x] **F2. Model-fit caveat is under-documented and fit can leave [0,1]** — with
   unequally spaced angles the closed-form fit (R²) is unbounded below (−107
   observed); the equal-spacing/Gurtman caveat lives only on `ssm_analyze()`.
   Doc-only. *Accept:* the caveat (equal-spacing assumption; fit may be negative
@@ -197,6 +197,18 @@ fix is test-first with a regression test reproducing the audit's executed failur
 
 ## Log
 
+- 2026-07-03 — F2 fix: model-fit caveat documentation (Opus, doc-only). The
+  closed-form estimator is the OLS projection (fit ∈ [0,1]) only for equally
+  spaced angles; off equal spacing it is the Gurtman estimator and the reported
+  fit can go negative (audit observed −107 through the full API). The
+  equal-spacing caveat previously lived only on `ssm_analyze()`'s `@param angles`
+  and never stated the fit-bounds consequence. Mirrored the caveat onto
+  `ssm_parameters()` and `ssm_score()` `@param angles`, added the "not a bounded
+  R² in [0,1]; can fall below 0" clause to all three, and noted it on
+  `ssm_parameters()`'s `f_label`. No math change; no snapshot delta. `document()`
+  regenerated only ssm_analyze/ssm_parameters/ssm_score .Rd; check 0/0/0. NEWS.md
+  bullet added. (R/ssm_analysis.R, man/ssm_analyze.Rd, man/ssm_parameters.Rd,
+  man/ssm_score.Rd, NEWS.md, MILESTONES.md).
 - 2026-07-03 — F1 fix: `col_means()` all-NA-column crash (Opus, test-first). Under
   `listwise = FALSE` a bootstrap resample can leave a scale column with no finite
   values; `arma::mean()` on the empty post-`find_finite` vector aborted the whole

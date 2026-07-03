@@ -34,7 +34,8 @@ of each circumplex scale included in \code{scales} (in degrees). (default =
 ordinary-least-squares cosine fit only when \code{angles} are equally spaced
 around the circle (e.g., octants at 45-degree intervals); for unequally
 spaced angles it is the conventional Gurtman estimator, not a
-least-squares fit.}
+least-squares fit, and the reported model fit is then no longer a bounded
+R-squared in \verb{[0, 1]} (it can fall below 0).}
 
 \item{measures}{Optional. Either \code{NULL} or a character vector of column names
 from \code{data} that contains one or more variables to be correlated with the

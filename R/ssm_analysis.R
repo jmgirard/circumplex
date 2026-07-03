@@ -18,7 +18,8 @@
 #'   ordinary-least-squares cosine fit only when `angles` are equally spaced
 #'   around the circle (e.g., octants at 45-degree intervals); for unequally
 #'   spaced angles it is the conventional Gurtman estimator, not a
-#'   least-squares fit.
+#'   least-squares fit, and the reported model fit is then no longer a bounded
+#'   R-squared in `[0, 1]` (it can fall below 0).
 #' @param measures Optional. Either `NULL` or a character vector of column names
 #'   from `data` that contains one or more variables to be correlated with the
 #'   circumplex scales and analyzed using correlation-based SSM analyses.
@@ -543,7 +544,12 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
 #' @param scores Required. A numeric vector (or single row data frame)
 #'   containing one score for each of a set of circumplex scales.
 #' @param angles Required. A numeric vector containing the angular displacement
-#'   of each circumplex scale included in `scores` (in degrees).
+#'   of each circumplex scale included in `scores` (in degrees). The closed-form
+#'   SSM estimator used here equals the ordinary-least-squares cosine fit only
+#'   when `angles` are equally spaced around the circle (e.g., octants at
+#'   45-degree intervals); for unequally spaced angles it is the conventional
+#'   Gurtman estimator, not a least-squares fit, and the reported fit is then no
+#'   longer a bounded R-squared in `[0, 1]` (it can fall below 0).
 #' @param prefix Optional. A string to append to the beginning of all of the SSM
 #'   parameters' variable names (default = "").
 #' @param suffix Optional. A string to append to the end of all of the SSM
@@ -559,7 +565,8 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
 #' @param d_label Optional. A string representing the variable name of the SSM
 #'   displacement parameter (default = "Disp").
 #' @param f_label Optional. A string representing the variable name of the SSM
-#'   fit or R-squared value (default = "Fit").
+#'   fit or R-squared value (default = "Fit"). This value is a bounded R-squared
+#'   in `[0, 1]` only for equally spaced `angles` (see `angles`).
 #' @return A data frame containing the SSM parameters calculated from `scores`.
 #'   For degenerate profiles the undefined parameters are returned as `NA`
 #'   with a warning: a flat profile (zero variance) has undefined displacement
@@ -631,7 +638,13 @@ ssm_parameters <- function(scores, angles = octants(), prefix = "", suffix = "",
 #' @param scales Required. The variable names or column numbers for the
 #'   variables in \code{.data} that contain circumplex scales to be analyzed.
 #' @param angles Required. A numeric vector containing the angular displacement
-#'   of each circumplex scale included in \code{scales} (in degrees).
+#'   of each circumplex scale included in \code{scales} (in degrees). The
+#'   closed-form SSM estimator used here equals the ordinary-least-squares
+#'   cosine fit only when \code{angles} are equally spaced around the circle
+#'   (e.g., octants at 45-degree intervals); for unequally spaced angles it is
+#'   the conventional Gurtman estimator, not a least-squares fit, and the
+#'   reported fit is then no longer a bounded R-squared in \code{[0, 1]} (it can
+#'   fall below 0).
 #' @param append Optional. A logical indicating whether to append the output to
 #'   `data` or simply return the output (default = "TRUE").
 #' @param ... Optional. Additional \strong{named} arguments passed to

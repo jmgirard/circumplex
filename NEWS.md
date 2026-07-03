@@ -103,6 +103,11 @@
   scale. Such a scale now yields an `NA` mean (matching the correlation path),
   and the affected resample is excluded from the confidence intervals as a
   degenerate profile, consistent with the existing degeneracy handling.
+* Clarified in the documentation of `ssm_parameters()`, `ssm_score()`, and
+  `ssm_analyze()` that the reported model fit is a bounded R-squared in
+  `[0, 1]` only when `angles` are equally spaced; for unequally spaced angles
+  the closed-form estimator is not a least-squares fit and the reported fit can
+  fall below 0.
 * Fixed a bug where length requirements on character arguments were never
   enforced (`is_null_or_char()` dropped its `n` argument). `ssm_analyze()` now
   errors if `measures_labels` does not match the number of `measures` (or is
