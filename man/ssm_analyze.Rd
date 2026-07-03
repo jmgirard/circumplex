@@ -14,7 +14,9 @@ ssm_analyze(
   boots = 2000,
   interval = 0.95,
   listwise = TRUE,
-  measures_labels = NULL
+  measures_labels = NULL,
+  parallel = "no",
+  ncpus = 1
 )
 }
 \arguments{
@@ -69,6 +71,18 @@ each bootstrap resample and is slower to compute (default = TRUE).}
 providing a label for each measure provided in \code{measures} (in the same
 order) to appear in the results as well as tables and plots derived from
 the results.}
+
+\item{parallel}{Optional. A string indicating whether to distribute the
+bootstrap computation across multiple CPU cores: "no" (default),
+"multicore" (process forking; available on macOS and Linux, ignored on
+Windows), or "snow" (a local PSOCK cluster; available on all platforms).
+Passed to \code{\link[boot]{boot}}. Because the bootstrap resample
+indices are drawn in the main R process before any work is distributed,
+results for a given \code{set.seed()} are identical regardless of the
+\code{parallel} and \code{ncpus} settings.}
+
+\item{ncpus}{Optional. A single positive whole number indicating how many
+CPU cores to use when \code{parallel} is not "no" (default = 1).}
 }
 \value{
 A list containing the results and description of the analysis.

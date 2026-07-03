@@ -48,6 +48,16 @@
 #'   providing a label for each measure provided in `measures` (in the same
 #'   order) to appear in the results as well as tables and plots derived from
 #'   the results.
+#' @param parallel Optional. A string indicating whether to distribute the
+#'   bootstrap computation across multiple CPU cores: "no" (default),
+#'   "multicore" (process forking; available on macOS and Linux, ignored on
+#'   Windows), or "snow" (a local PSOCK cluster; available on all platforms).
+#'   Passed to \code{\link[boot]{boot}}. Because the bootstrap resample
+#'   indices are drawn in the main R process before any work is distributed,
+#'   results for a given `set.seed()` are identical regardless of the
+#'   `parallel` and `ncpus` settings.
+#' @param ncpus Optional. A single positive whole number indicating how many
+#'   CPU cores to use when `parallel` is not "no" (default = 1).
 #' @return A list containing the results and description of the analysis.
 #'   \item{results}{A data frame with the SSM parameter estimates}
 #'   \item{details}{A list with the number of bootstrap resamples (boots),
@@ -133,14 +143,14 @@
 #' )
 #' }
 #' 
-ssm_analyze <- function(data, scales, angles = octants(), 
-                        measures = NULL, grouping = NULL, contrast = FALSE, 
+ssm_analyze <- function(data, scales, angles = octants(),
+                        measures = NULL, grouping = NULL, contrast = FALSE,
                         boots = 2000, interval = 0.95, listwise = TRUE,
-                        measures_labels = NULL) {
-  
+                        measures_labels = NULL, parallel = "no", ncpus = 1) {
+
   # Save function call
   call <- match.call()
-  
+
   # Validate arguments
   stopifnot(is.data.frame(data) || is.matrix(data))
   stopifnot(is_var(scales))
@@ -153,6 +163,8 @@ ssm_analyze <- function(data, scales, angles = octants(),
   stopifnot(is.numeric(interval) && interval > 0 && interval < 1)
   stopifnot(is_flag(listwise))
   stopifnot(is_null_or_char(measures_labels, n = length(measures)))
+  parallel <- match.arg(parallel, c("no", "multicore", "snow"))
+  stopifnot(is.numeric(ncpus) && ncpus >= 1 && ceiling(ncpus) == floor(ncpus))
 
   # Coerce matrix input to a data frame so column indexing behaves uniformly
   if (is.matrix(data)) data <- as.data.frame(data)
@@ -200,6 +212,8 @@ ssm_analyze <- function(data, scales, angles = octants(),
       boots = boots,
       interval = interval,
       listwise = listwise,
+      parallel = parallel,
+      ncpus = ncpus,
       call = call
     )
   } else {
@@ -215,6 +229,8 @@ ssm_analyze <- function(data, scales, angles = octants(),
       interval = interval,
       listwise = listwise,
       measures_labels = measures_labels,
+      parallel = parallel,
+      ncpus = ncpus,
       call = call
     )
   }
@@ -222,8 +238,9 @@ ssm_analyze <- function(data, scales, angles = octants(),
 
 # Perform analyses using the mean-based Structural Summary Method --------------
 
-ssm_analyze_means <- function(data, scales, angles, grouping, contrast, 
-                              boots, interval, listwise, call) {
+ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
+                              boots, interval, listwise, parallel, ncpus,
+                              call) {
   
   # Select circumplex scales and grouping variable (if applicable)
   bs_input <- data[scales]
@@ -287,6 +304,8 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
     interval = interval,
     contrast = contrast,
     listwise = listwise,
+    parallel = parallel,
+    ncpus = ncpus,
     strata = bs_input[[ncol(bs_input)]]
   )
   
@@ -324,8 +343,8 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
 # Perform analyses using the correlation-based SSM -----------------------------
 
 ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
-                              contrast, boots, interval, listwise, 
-                              measures_labels, call) {
+                              contrast, boots, interval, listwise,
+                              measures_labels, parallel, ncpus, call) {
   
   # Select only the scales, measures, and grouping variables
   scales_data <- data[scales]
@@ -410,6 +429,8 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     interval = interval,
     contrast = contrast,
     listwise = listwise,
+    parallel = parallel,
+    ncpus = ncpus,
     strata = bs_input$Group
   )
   

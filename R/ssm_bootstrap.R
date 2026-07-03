@@ -1,8 +1,13 @@
 # Perform bootstrap to get confidence intervals around SSM parameters
 ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
-                          angles, boots, interval, contrast, listwise, ...) {
+                          angles, boots, interval, contrast, listwise,
+                          parallel = "no", ncpus = 1, ...) {
 
   # Perform bootstrapping ------------------------------------------------------
+  # Note on parallel reproducibility: for this nonparametric bootstrap,
+  # boot::boot() draws the full resample index array in the master process
+  # (master RNG) before dispatching, and bs_function is deterministic, so
+  # results for a given seed are identical for any parallel/ncpus setting.
   bs_results <-
     boot::boot(
       data = bs_input,
@@ -13,6 +18,8 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
       angles = angles,
       contrast = contrast,
       listwise = listwise,
+      parallel = parallel,
+      ncpus = ncpus,
       ...
     )
 

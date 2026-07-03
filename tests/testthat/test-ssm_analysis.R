@@ -567,6 +567,64 @@ test_that("ssm_score warns once (with a count) for degenerate rows", {
   expect_false(is.na(out$Disp[3]))
 })
 
+test_that("parallel bootstrapping reproduces serial results exactly", {
+  skip_on_cran()
+  data("jz2017")
+  scales8 <- PANO()
+
+  # Serial reference: grouped contrast engages the displacement CI and
+  # contrast branch machinery, so equality here covers the angular paths
+  set.seed(12345)
+  ref <- ssm_analyze(jz2017, scales = scales8, grouping = "Gender",
+                     contrast = TRUE, boots = 100)
+
+  # Nonparametric boot::boot() draws all resample indices in the master
+  # process before dispatching to workers, and the SSM statistic is
+  # deterministic, so parallel results must be identical -- not just close
+  set.seed(12345)
+  out_snow <- ssm_analyze(jz2017, scales = scales8, grouping = "Gender",
+                          contrast = TRUE, boots = 100,
+                          parallel = "snow", ncpus = 2)
+  expect_identical(ref$results, out_snow$results)
+
+  if (.Platform$OS.type == "unix") { # forking is unavailable on Windows
+    set.seed(12345)
+    out_mc <- ssm_analyze(jz2017, scales = scales8, grouping = "Gender",
+                          contrast = TRUE, boots = 100,
+                          parallel = "multicore", ncpus = 2)
+    expect_identical(ref$results, out_mc$results)
+  }
+})
+
+test_that("parallel bootstrapping works on the correlation path", {
+  skip_on_cran()
+  data("jz2017")
+  scales8 <- PANO()
+
+  # Covers shipping the correlation-based statistic (a closure over package
+  # internals) to PSOCK workers
+  set.seed(2222)
+  ref <- ssm_analyze(jz2017, scales = scales8, measures = "NARPD",
+                     boots = 100)
+  set.seed(2222)
+  out <- ssm_analyze(jz2017, scales = scales8, measures = "NARPD",
+                     boots = 100, parallel = "snow", ncpus = 2)
+  expect_identical(ref$results, out$results)
+})
+
+test_that("parallel arguments are validated", {
+  data("aw2009")
+  expect_error(
+    ssm_analyze(aw2009, scales = 1:8, boots = 10, parallel = "bogus")
+  )
+  expect_error(
+    ssm_analyze(aw2009, scales = 1:8, boots = 10, ncpus = 0)
+  )
+  expect_error(
+    ssm_analyze(aw2009, scales = 1:8, boots = 10, ncpus = 1.5)
+  )
+})
+
 test_that("ssm_score errors on an unrecognized ... argument", {
   # Regression: forwarding ... via apply(FUN = ssm_parameters, ...) used to
   # raise "unused argument" for typos (ssm_parameters() has no ...); a typo

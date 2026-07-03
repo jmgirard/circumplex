@@ -10,7 +10,7 @@ run `/release-checklist` once.
 
 ### Tasks
 
-- [ ] **Parallel bootstrapping** via `boot`'s built-in `parallel`/`ncpus`
+- [x] **Parallel bootstrapping** via `boot`'s built-in `parallel`/`ncpus`
   arguments, exposed through `ssm_analyze()`.
 - [ ] **BCa confidence intervals** as an option alongside percentile intervals
   (default unchanged for reproducibility; BCa needs care for circular
@@ -70,6 +70,25 @@ run `/release-checklist` once.
   prefix forwarding (previously untested), the consolidated warning, and the
   unused-argument error. Suite 441/441; check 0/0/0. No NEWS.md (internal
   perf only, no API change). (R/ssm_analysis.R, tests/testthat/test-ssm_analysis.R,
+  MILESTONES.md). [Correction, same day: a NEWS.md bullet WAS added during the
+  parallel-bootstrapping task — the consolidated warning is user-visible and
+  the speedup worth announcing; "internal only" was the wrong call.]
+- 2026-07-02 — Parallel bootstrapping (Fable): `ssm_analyze()` gains
+  `parallel`/`ncpus` (validated via match.arg + boots-style stopifnot),
+  threaded explicitly through ssm_analyze_means/corrs -> ssm_bootstrap ->
+  boot::boot(). Key statistical fact, verified against the installed boot
+  source AND empirically: for this nonparametric bootstrap, boot draws the
+  full resample index array in the master process before dispatch and our
+  statistic is deterministic, so seeded results are BYTE-IDENTICAL for any
+  parallel/ncpus setting (tested: snow + multicore vs serial on the grouped
+  contrast path and the correlation path; master .Random.seed state identical
+  after serial vs parallel; B4 degenerate-resample warning + results identical
+  under PSOCK workers). Docs state the reproducibility guarantee on @param
+  parallel; multicore documented as ignored on Windows (boot silently falls
+  back to serial). Defaults unchanged -> all seeded pins intact. Suite
+  447/447; check 0/0/0. NEWS.md bullet added (plus the missing ssm_score
+  bullet, see correction above). (R/ssm_analysis.R, R/ssm_bootstrap.R,
+  man/ssm_analyze.Rd, tests/testthat/test-ssm_analysis.R, NEWS.md,
   MILESTONES.md).
 
 # Completed milestones

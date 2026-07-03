@@ -1,5 +1,17 @@
 # circumplex (development version)
 
+* `ssm_analyze()` gains `parallel` and `ncpus` arguments (passed to
+  `boot::boot()`) to distribute the bootstrap computation across multiple CPU
+  cores. Because the resample indices are drawn in the main R process before
+  any work is distributed, results for a given `set.seed()` are identical
+  regardless of these settings, so parallelizing never changes your estimates
+  or confidence intervals.
+* `ssm_score()` is now vectorized internally (one compiled call instead of a
+  row-wise loop), making it much faster on large data sets. Results are
+  unchanged. Rows whose profile has undefined displacement now produce a
+  single warning reporting how many such rows there are, rather than one
+  warning per row.
+
 # circumplex 1.2.0
 
 * The SSM plotting functions (`ssm_plot_circle()`, `ssm_plot_curve()`,
