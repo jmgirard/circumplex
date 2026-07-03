@@ -152,6 +152,12 @@ that byte-identical output depended on).**
   has no first-class way for a geom to read a plot-level constant. The idiomatic
   fix is a `CoordCircumplex` (or a carrier scale) that owns `amax` and the polar
   transform — a substantial rewrite of the drawn-geometry canvas, deferred.
+  A configurable amplitude *center* belongs in that same future scale/coord (as
+  its `limits`), not on the constructor: an early exported `ggcircumplex(amin=)`
+  relabelled the rings on an `amin..amax` scale while the geoms mapped amplitude
+  as `a*5/amax` (center = 0), silently mislabelling the axis. `amin` was removed
+  from the public constructor (2026-07-03, R3); `circle_base()` keeps an internal
+  `amin = 0` default only.
 - **The canvas does not respond to themes.** Because rings/spokes/labels are
   drawn geoms under `theme_void()`, `+ theme_bw()` etc. do not restyle them.
   Themed panel furniture would again require the coord/scale approach above. The
@@ -159,7 +165,10 @@ that byte-identical output depended on).**
 - **`na.rm` is effectively always TRUE.** The geoms silently drop rows with a
   missing amplitude/displacement (degenerate profiles have no location),
   regardless of the flag — a minor deviation from the ggplot2 convention where
-  `na.rm = FALSE` warns.
+  `na.rm = FALSE` warns. As of R2 (2026-07-03) the higher-level
+  `ssm_plot_circle()` compensates by detecting undefined-displacement profiles
+  itself and warning by name before the geoms drop them; the raw geoms remain
+  silent (they have no profile labels to name).
 - **The `GeomSsmPoint`/`StatSsmArc` ggproto generators are not exported** (only
   the layer constructors are). Fine for use; exporting them (with
   `@format NULL`) would let others subclass — a cheap future addition.

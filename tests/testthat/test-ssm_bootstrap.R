@@ -51,6 +51,26 @@ test_that("internal parameter layout is name-driven, not positional", {
   expect_equal(two_groups$d_est, c(5, 11)) # 5th value of each six-block
 })
 
+test_that("param_diff() generalizes to matrices row-wise (C1)", {
+  # The Monte Carlo engine contrasts an R x 6 draw matrix; param_diff() must
+  # give the same result row-by-row as the length-6 vector form (which the
+  # bootstrap path uses), so both engines share one contrast convention.
+  set.seed(1)
+  second <- matrix(rnorm(18, sd = 2), nrow = 3) # 3 draws x 6 params
+  first <- matrix(rnorm(18, sd = 2), nrow = 3)
+  mres <- param_diff(second, first)
+  expect_true(is.matrix(mres))
+  for (i in seq_len(nrow(second))) {
+    expect_equal(
+      unname(mres[i, ]),
+      unname(param_diff(second[i, ], first[i, ]))
+    )
+  }
+  # Displacement column (5) is an angular distance, not a plain difference
+  d <- which(ssm_param_names() == "d")
+  expect_false(isTRUE(all.equal(mres[, d], second[, d] - first[, d])))
+})
+
 test_that("displacement is classed by name across >2 groups (non-contrast)", {
   # Three groups exercise the multi-block name-based displacement selection
   # beyond the one/two-group cases covered elsewhere: every group's

@@ -10,6 +10,15 @@
 # Rescale an amplitude to canvas radius (outer ring at radius 5 = amax)
 ssm_radius <- function(amplitude, amax) amplitude * 5 / amax
 
+# Convert SSM parameters (amplitude, and displacement in degrees) to canvas
+# x/y coordinates. Shared by GeomSsmPoint$setup_data() and ssm_plot_circle()'s
+# repel branch so the polar->canvas transform lives in exactly one place.
+ssm_to_cartesian <- function(amplitude, displacement, amax) {
+  r <- ssm_radius(amplitude, amax)
+  rad <- displacement * pi / 180
+  list(x = r * cos(rad), y = r * sin(rad))
+}
+
 #' Draw SSM profile points in circumplex space
 #'
 #' A \pkg{ggplot2} layer that places a point for each profile at its
@@ -61,9 +70,9 @@ GeomSsmPoint <- ggplot2::ggproto(
   setup_data = function(data, params) {
     data <- data[!is.na(data$amplitude) & !is.na(data$displacement), ]
     amax <- if (is.null(params$amax)) 0.5 else params$amax
-    r <- ssm_radius(data$amplitude, amax)
-    data$x <- r * cos(data$displacement * pi / 180)
-    data$y <- r * sin(data$displacement * pi / 180)
+    xy <- ssm_to_cartesian(data$amplitude, data$displacement, amax)
+    data$x <- xy$x
+    data$y <- xy$y
     data
   }
 )

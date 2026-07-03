@@ -319,7 +319,8 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   # Calculate mean observed scores
   mat <- as.matrix(bs_input[scales_names])
   grp <- as.integer(bs_input[[ncol(bs_input)]])
-  scores <- mean_scores(mat, grp, listwise)
+  obs_scores <- mean_scores(mat, grp, listwise)
+  scores <- obs_scores
   colnames(scores) <- scales_names
   group_levels <- levels(bs_input[[ncol(bs_input)]])
   if (contrast) {
@@ -345,32 +346,23 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   }
   
   # Estimate confidence intervals with the requested engine
-  bs_output <- if (method == "montecarlo") {
-    ssm_montecarlo(
-      bs_input = bs_input,
-      scales = scales_names,
-      angles = angles,
-      boots = boots,
-      interval = interval,
-      contrast = contrast,
-      listwise = listwise
-    )
-  } else {
-    ssm_bootstrap(
-      bs_input = bs_input,
-      bs_function = bs_function,
-      scales = scales_names,
-      angles = angles,
-      boots = boots,
-      interval = interval,
-      contrast = contrast,
-      listwise = listwise,
-      parallel = parallel,
-      ncpus = ncpus,
-      strata = bs_input[[ncol(bs_input)]]
-    )
-  }
-  
+  bs_output <- ssm_estimate_intervals(
+    method = method,
+    bs_input = bs_input,
+    bs_function = bs_function,
+    scales = scales_names,
+    measures = NULL,
+    angles = angles,
+    boots = boots,
+    interval = interval,
+    contrast = contrast,
+    listwise = listwise,
+    parallel = parallel,
+    ncpus = ncpus,
+    strata = bs_input[[ncol(bs_input)]],
+    obs_scores = obs_scores
+  )
+
   params <- bs_output
   Group <- group_levels
   Measure <- rep(NA_character_, times = n_groups)
@@ -447,7 +439,8 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   cs <- as.matrix(bs_input[scales_names])
   mv <- as.matrix(bs_input[measures_names])
   grp <- as.integer(bs_input[[ncol(bs_input)]])
-  scores <- corr_scores(cs, mv, grp, listwise)
+  obs_scores <- corr_scores(cs, mv, grp, listwise)
+  scores <- obs_scores
   colnames(scores) <- scales_names
   group_levels <- levels(bs_input[[ncol(bs_input)]])
   if (contrast) {
@@ -483,33 +476,22 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   }
   
   # Estimate confidence intervals with the requested engine
-  bs_output <- if (method == "montecarlo") {
-    ssm_montecarlo(
-      bs_input = bs_input,
-      scales = scales_names,
-      measures = measures_names,
-      angles = angles,
-      boots = boots,
-      interval = interval,
-      contrast = contrast,
-      listwise = listwise
-    )
-  } else {
-    ssm_bootstrap(
-      bs_input = bs_input,
-      bs_function = bs_function,
-      scales = scales_names,
-      measures = measures_names,
-      angles = angles,
-      boots = boots,
-      interval = interval,
-      contrast = contrast,
-      listwise = listwise,
-      parallel = parallel,
-      ncpus = ncpus,
-      strata = bs_input$Group
-    )
-  }
+  bs_output <- ssm_estimate_intervals(
+    method = method,
+    bs_input = bs_input,
+    bs_function = bs_function,
+    scales = scales_names,
+    measures = measures_names,
+    angles = angles,
+    boots = boots,
+    interval = interval,
+    contrast = contrast,
+    listwise = listwise,
+    parallel = parallel,
+    ncpus = ncpus,
+    strata = bs_input$Group,
+    obs_scores = obs_scores
+  )
   
   Group <- rep(group_levels, each = n_measures)
   Measure <- rep(measures_labels, times = n_groups)

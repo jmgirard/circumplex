@@ -14,7 +14,16 @@ param_diff <- function(p1, p2) {
   stopifnot(is.numeric(p1))
   stopifnot(is.numeric(p2))
   pd <- p1 - p2
-  pd[[5]] <- angle_dist(as_radian(p1[[5]]), as_radian(p2[[5]]))
+  # Displacement is angular, so its contrast is the signed angular distance
+  # (second minus first), not a plain subtraction. Works for a single length-6
+  # parameter vector (bootstrap replicate) or an R x 6 matrix of draws (Monte
+  # Carlo), so both engines share one contrast convention.
+  d <- which(ssm_param_names() == "d")
+  if (is.matrix(p1)) {
+    pd[, d] <- angle_dist(as_radian(p1[, d]), as_radian(p2[, d]))
+  } else {
+    pd[[d]] <- angle_dist(as_radian(p1[[d]]), as_radian(p2[[d]]))
+  }
   pd
 }
 

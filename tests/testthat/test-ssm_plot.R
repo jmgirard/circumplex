@@ -136,6 +136,18 @@ test_that("ggcircumplex() validates its arguments", {
   expect_error(ggcircumplex(octants(), font_size = "big"))
 })
 
+test_that("ggcircumplex() no longer exposes amin, and rings are 0-centered (R3)", {
+  # amin relabelled the rings on an amin..amax scale while the geoms always
+  # map amplitude as a*5/amax (amin = 0), so any nonzero amin silently
+  # mislabelled the amplitude axis. The argument is removed; the amplitude
+  # scale is fixed at 0 (center) to amax (outer ring), matching the geoms.
+  expect_error(ggcircumplex(octants(), amin = 0.25), "unused argument")
+
+  # Ring labels (layer 4) reflect a 0..amax scale: seq(0, amax, 6)[c(3, 5)]
+  b <- ggplot2::ggplot_build(ggcircumplex(amax = 0.5))
+  expect_equal(b$data[[4]]$label, sprintf("%.2f", c(0.20, 0.40)))
+})
+
 test_that("plot functions warn about unrecognized arguments", {
   data("aw2009")
   set.seed(1)

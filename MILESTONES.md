@@ -113,7 +113,7 @@ Correctness (fix first):
   garbage column names instead of erroring via `is_char(x, n = 1)`.
   (`R/ssm_analysis.R:715`) *Accept:* `prefix = c("a_","b_")` errors again; test added.
   (R1+R4 are one root cause — the refactor's `...` handling — fix together.)
-- [ ] **R3. `ggcircumplex(amin=)` mislabels the amplitude axis** — `amin`
+- [x] **R3. `ggcircumplex(amin=)` mislabels the amplitude axis** — `amin`
   relabels rings on an `amin..amax` scale while the geoms map amplitude as
   `a*5/amax` (amin=0), so any nonzero `amin` silently misplaces every point/arc;
   `amin > amax` unvalidated. New/exported this cycle (unreachable in v1.2.0).
@@ -139,22 +139,22 @@ Correctness (fix first):
 
 Cleanup (fold in where the bug fixes already touch the file; no behavior change):
 
-- [ ] **C2. Duplicated engine-dispatch block** — the
+- [x] **C2. Duplicated engine-dispatch block** — the
   `if (method=="montecarlo") ssm_montecarlo() else ssm_bootstrap()` branch is
   near-verbatim in `ssm_analyze_means()` and `ssm_analyze_corrs()`
   (`R/ssm_analysis.R:348,486`); extract one dispatcher (method already validated
   once in `ssm_analyze()`). *Accept:* single helper, both callers routed, all
   seeded pins byte-identical.
-- [ ] **C4. Monte Carlo recomputes `t0` scores** — `ssm_montecarlo()` re-runs
+- [x] **C4. Monte Carlo recomputes `t0` scores** — `ssm_montecarlo()` re-runs
   `mean_scores()`/`corr_scores()` on the same unmutated `bs_input` the caller
   already computed (`R/ssm_montecarlo.R:43`); pass the caller's matrix in.
   *Accept:* one fewer O(n·p·q) pass; results byte-identical.
-- [ ] **C3. Repel-branch trig duplication** — `ssm_plot_circle()`'s repel branch
+- [x] **C3. Repel-branch trig duplication** — `ssm_plot_circle()`'s repel branch
   hand-recomputes the polar→canvas transform duplicated in
   `GeomSsmPoint$setup_data()` (`R/ssm_plot.R:192` vs `R/geom_ssm.R:64`); extract a
   shared `ssm_to_cartesian()` helper. *Accept:* both sites call it; snapshots
   byte-identical. (Natural companion to R2/R3, same files.)
-- [ ] **C1. Monte Carlo contrast re-derives `param_diff()`** — the MC replicate
+- [x] **C1. Monte Carlo contrast re-derives `param_diff()`** — the MC replicate
   contrast inlines "second minus first, disp via `angle_dist`" (`R/ssm_montecarlo.R:110`)
   that `param_diff()` owns for the bootstrap path. PLAUSIBLE, not a bug: fix by
   generalizing `param_diff()` to an R×6 matrix (named via `ssm_param_names()`) and
@@ -165,6 +165,31 @@ Cleanup (fold in where the bug fixes already touch the file; no behavior change)
 
 ## Log
 
+- 2026-07-03 — Pre-release review fixes R3 + C1–C4 (Opus). R3 (decision Jeff):
+  removed the `amin` argument from the exported `ggcircumplex()` (kept
+  `circle_base()`'s internal `amin = 0`), since it relabelled the rings on an
+  `amin..amax` scale the geoms never honored; recorded in DESIGN.md that a
+  configurable amplitude center belongs in the future radial scale/coord (the
+  same deferred CoordCircumplex as the `amax`-per-layer trade-off), not the
+  constructor. Test asserts `amin` is now rejected and rings are 0-centered.
+  Cleanups (all behavior-preserving, seeded pins byte-identical): C2 extracted
+  `ssm_estimate_intervals()` so both analysis paths share one engine dispatcher
+  (method already validated once in `ssm_analyze()`); C4 passes the caller's
+  observed score matrix into `ssm_montecarlo()` via a new `obs_scores` param,
+  dropping a duplicate `mean_scores()`/`corr_scores()` pass; C3 extracted
+  `ssm_to_cartesian()` shared by `GeomSsmPoint$setup_data()` and
+  `ssm_plot_circle()`'s repel branch; C1 generalized `param_diff()` to an R×6
+  matrix (named displacement column via `ssm_param_names()`, dropping the magic
+  `[[5]]`) and routed the Monte Carlo replicate contrast through it, so bootstrap
+  and MC share one contrast-convention implementation. C1 touches the contrast
+  convention → ran independent statistical-validation of the angular contrast
+  path (angle_dist vs a hand-rolled signed-distance reference, the skill's named
+  boundary cases, and param_diff's matrix displacement near ±180°): all agree to
+  ~1e-14. Suite 550/550, 0 warnings; `devtools::check()` run. No NEWS (C1–C4
+  internal; `amin` never shipped to CRAN). ALL 10 review findings resolved.
+  (R/ssm_analysis.R, R/ssm_bootstrap.R, R/ssm_montecarlo.R, R/ssm_plot.R,
+  R/geom_ssm.R, R/utils.R, man/ggcircumplex.Rd, DESIGN.md, tests/testthat/
+  test-ssm_plot.R, test-ssm_bootstrap.R, MILESTONES.md).
 - 2026-07-03 — Pre-release review fixes R1/R4/R5/R6/R2 (Opus, test-first). Five
   API-surface correctness bugs from the `/code-review high` pass, each with a
   regression test that failed on the pre-fix code. R1+R4 (`R/ssm_analysis.R`

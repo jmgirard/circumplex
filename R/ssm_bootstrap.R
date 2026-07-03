@@ -1,3 +1,29 @@
+# Dispatch to the requested confidence-interval engine. Both the mean-based and
+# correlation-based analysis paths call this so the engine choice lives in one
+# place; `method` is already validated (match.arg) in ssm_analyze(). The
+# bootstrap-only arguments (bs_function, parallel, ncpus, strata) are ignored by
+# the Monte Carlo engine, and obs_scores (the caller's already-computed observed
+# score matrix) is ignored by the bootstrap engine.
+ssm_estimate_intervals <- function(method, bs_input, bs_function, scales,
+                                   measures = NULL, angles, boots, interval,
+                                   contrast, listwise, parallel, ncpus, strata,
+                                   obs_scores) {
+  if (method == "montecarlo") {
+    ssm_montecarlo(
+      bs_input = bs_input, scales = scales, measures = measures,
+      angles = angles, boots = boots, interval = interval,
+      contrast = contrast, listwise = listwise, obs_scores = obs_scores
+    )
+  } else {
+    ssm_bootstrap(
+      bs_input = bs_input, bs_function = bs_function, scales = scales,
+      measures = measures, angles = angles, boots = boots, interval = interval,
+      contrast = contrast, listwise = listwise, parallel = parallel,
+      ncpus = ncpus, strata = strata
+    )
+  }
+}
+
 # Perform bootstrap to get confidence intervals around SSM parameters
 ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
                           angles, boots, interval, contrast, listwise,

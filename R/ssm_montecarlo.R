@@ -13,7 +13,7 @@
 # jointly (they share the sample and are dependent -- essential for measure
 # contrasts); distinct groups are independent.
 ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
-                           boots, interval, contrast, listwise) {
+                           boots, interval, contrast, listwise, obs_scores) {
 
   if (anyNA(bs_input)) {
     stop(
@@ -36,15 +36,14 @@ ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
 
   cs_all <- as.matrix(bs_input[scales])
   p <- length(scales)
+  if (!is.null(measures)) mv_all <- as.matrix(bs_input[measures])
 
-  # Observed scores and point-estimate parameter vector; matches the
-  # bootstrap's t0 (boot::boot evaluates the statistic on the full sample)
-  if (is.null(measures)) {
-    scores <- mean_scores(cs_all, grp, listwise)
-  } else {
-    mv_all <- as.matrix(bs_input[measures])
-    scores <- corr_scores(cs_all, mv_all, grp, listwise)
-  }
+  # Observed scores and point-estimate parameter vector; matches the bootstrap's
+  # t0 (boot::boot evaluates the statistic on the full sample). obs_scores is the
+  # caller's already-computed group mean/correlation score matrix (same inputs),
+  # reused here to avoid a second mean_scores()/corr_scores() pass. It also
+  # supplies the observed correlations used by the draw loop below.
+  scores <- obs_scores
   t0 <- ssm_by_group(scores, angles, contrast)
 
   # Generate score draws, one R x p matrix per profile row -------------------
@@ -108,16 +107,11 @@ ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
 
   t <- do.call(cbind, par_list)
   if (contrast) {
-    # Second profile row minus first, displacement via angular distance,
-    # matching param_diff()/ssm_by_group(). Contrasts are only allowed with
-    # exactly two profile rows (validated in ssm_analyze).
-    pd <- par_list[[2]] - par_list[[1]]
-    d_col <- which(ssm_param_names() == "d")
-    pd[, d_col] <- angle_dist(
-      as_radian(par_list[[2]][, d_col]),
-      as_radian(par_list[[1]][, d_col])
-    )
-    t <- cbind(t, pd)
+    # Second profile row minus first (displacement via angular distance),
+    # sharing param_diff() with the bootstrap path so the contrast convention
+    # has one definition. Contrasts require exactly two profile rows (validated
+    # in ssm_analyze).
+    t <- cbind(t, param_diff(par_list[[2]], par_list[[1]]))
   }
 
   ssm_replicate_intervals(

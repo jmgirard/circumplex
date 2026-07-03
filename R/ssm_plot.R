@@ -207,9 +207,9 @@ ssm_plot_circle <- function(ssm_object,
     # Point positions in canvas coordinates (matching geom_ssm_point()) for the
     # repelled labels and their horizontal nudge
     repel_df <- df_plot
-    r <- ssm_radius(repel_df$a_est, amax)
-    repel_df$.canvas_x <- r * cos(repel_df$d_est * pi / 180)
-    repel_df$.canvas_y <- r * sin(repel_df$d_est * pi / 180)
+    xy <- ssm_to_cartesian(repel_df$a_est, repel_df$d_est, amax)
+    repel_df$.canvas_x <- xy$x
+    repel_df$.canvas_y <- xy$y
     p <- p +
       ggrepel::geom_label_repel(
         data = repel_df,
@@ -492,10 +492,9 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 #'   to draw around the circle, one per angle and in the same order (default =
 #'   `NULL`, which draws the numeric angles). If `instrument` is supplied,
 #'   `NULL` uses the instrument's scale abbreviations.
-#' @param amin Optional. A single number giving the amplitude at the center of
-#'   the circle (default = 0).
 #' @param amax Optional. A single positive number giving the amplitude at the
-#'   outer ring, which sets the amplitude-axis labels (default = 0.5).
+#'   outer ring, which sets the amplitude-axis labels; the center of the circle
+#'   is fixed at amplitude 0 (default = 0.5).
 #' @param font_size Optional. A single positive number giving the size (in pt)
 #'   of the scale and amplitude labels (default = 12).
 #' @param instrument Optional. Either `NULL` or a `circumplex_instrument`
@@ -514,18 +513,20 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 #'
 #' # Derive the angles and labels from a circumplex instrument
 #' ggcircumplex(instrument = csip)
-ggcircumplex <- function(angles = octants(), labels = NULL, amin = 0,
+ggcircumplex <- function(angles = octants(), labels = NULL,
                          amax = 0.5, font_size = 12, instrument = NULL) {
 
   resolved <- resolve_circumplex_labels(angles, labels, instrument)
-  stopifnot(is_num(amin, n = 1))
   stopifnot(is_num(amax, n = 1) && amax > 0)
   stopifnot(is_num(font_size, n = 1) && font_size > 0)
 
+  # The amplitude axis runs from 0 at the center to `amax` at the outer ring,
+  # matching how geom_ssm_point()/geom_ssm_arc() map amplitude (a * 5 / amax).
+  # A configurable center belongs in a future radial scale/coord, not here (see
+  # DESIGN.md); circle_base()'s `amin` default of 0 is left as internal only.
   circle_base(
     angles = resolved$angles,
     labels = resolved$labels,
-    amin = amin,
     amax = amax,
     fontsize = font_size
   )

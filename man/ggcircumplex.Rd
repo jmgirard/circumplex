@@ -7,7 +7,6 @@
 ggcircumplex(
   angles = octants(),
   labels = NULL,
-  amin = 0,
   amax = 0.5,
   font_size = 12,
   instrument = NULL
@@ -23,11 +22,9 @@ to draw around the circle, one per angle and in the same order (default =
 \code{NULL}, which draws the numeric angles). If \code{instrument} is supplied,
 \code{NULL} uses the instrument's scale abbreviations.}
 
-\item{amin}{Optional. A single number giving the amplitude at the center of
-the circle (default = 0).}
-
 \item{amax}{Optional. A single positive number giving the amplitude at the
-outer ring, which sets the amplitude-axis labels (default = 0.5).}
+outer ring, which sets the amplitude-axis labels; the center of the circle
+is fixed at amplitude 0 (default = 0.5).}
 
 \item{font_size}{Optional. A single positive number giving the size (in pt)
 of the scale and amplitude labels (default = 12).}
