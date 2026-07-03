@@ -76,11 +76,25 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]
 
 ## Reproducibility
 
-`ssm_analyze()` is the package's only entry point that consumes R's global
-RNG stream (`ssm_score()`/`ssm_parameters()` and the tidying functions are
-deterministic). Call `set.seed()` immediately before `ssm_analyze()` to get
-reproducible confidence intervals. What that reproducibility covers, per
-engine:
+**RNG contract (an invariant, not an inventory):** a function consumes R's
+global RNG stream **iff its statistical output is stochastic** (resampling
+or simulation). Every such entry point documents that fact and follows the
+`set.seed()`-immediately-before convention; everything else — including
+internal conveniences such as optimizer multi-starts, jitter, or
+tie-breaking — must be deterministic and leave `.Random.seed` untouched.
+(Restated 2026-07-03 from the earlier "`ssm_analyze()` is the only entry
+point that consumes the RNG stream," which froze the then-true inventory
+instead of stating the rule that produced it.)
+
+RNG-consuming entry points, currently one (`ssm_score()`,
+`ssm_parameters()`, and the tidying functions are deterministic; M4 is
+designed to add `cpm_fit(ci_method = "bootstrap")` and `cpm_simulate()` to
+this list, and its default path is required to be RNG-silent — see
+devel/m4-browne-design.md §3.5/§8):
+
+- **`ssm_analyze()`** — call `set.seed()` immediately before it to get
+  reproducible confidence intervals. What that reproducibility covers, per
+  engine:
 
 | Engine | Seed guarantee | RNG consumption |
 |---|---|---|

@@ -2,7 +2,14 @@
 
 **Status:** design (Brief A of the 2026-07 Fable window). Not implementation.
 **Author:** Fable, 2026-07-03. Backend decision made with Jeff (see §3.6).
-**Awaiting:** Brief A-review (fresh-session adversarial review) before implementation.
+**Reviewed:** Brief A-review (fresh-session adversarial Fable review,
+`devel/m4-browne-design-review.md`, 2026-07-03) — verdict "needs changes";
+all required changes integrated the same day (see the change log at the end).
+The review computationally verified the core clean (model, discrepancy,
+gradient algebra, df accounting, identification invariances, fit-index
+definitions) and confirmed the backend decision; the integrated changes are
+confined to the CI-default, convergence-acceptance, canonicalization, and
+validation layers.
 
 This is the CircE replacement — the anchor feature of ROADMAP Milestone 4.
 CircE (Grassi, Luccio, & Di Blas, 2010) is archived on CRAN; no R package
@@ -114,10 +121,17 @@ are the ROADMAP's "free vs constrained item angles" deliverable.
 - df ≥ 1 required (df = 0 fits perfectly and tests nothing; report but warn).
   For variant A with m = 1 this needs p ≥ 6 (p = 5 gives df = 0; p = 4 is
   over-parameterized). Variants B–D fit smaller p.
-- `m ≤ floor((p − 1)/2)`. For equally spaced angles, frequencies k and p − k
-  alias exactly (`cos(k·2πj/p)` is the same grid function), so higher m is
-  never identified in variants B/D and is ill-conditioned in A. For p = 8
-  this cap is 3 — which is also the sensible default `m` (see §7).
+- `m ≤ floor((p − 1)/2)` as the default cap, `floor(p/2)` allowed for
+  variants B/D. For equally spaced angles, frequencies k and p − k alias
+  exactly (`cos(k·2πj/p)` is the same grid function), so `k > p/2` is never
+  identified in variants B/D and is ill-conditioned in A. At even p the
+  Nyquist harmonic `k = p/2` self-aliases but **is** identified (its sine
+  column vanishes; its cosine column — the alternating vector — survives;
+  rank verified computationally in the A-review), so the strict B/D cap is
+  `floor(p/2)`. The default cap of `floor((p−1)/2)` is a deliberately
+  conservative choice, not an identification bound: the Nyquist term is
+  fragile in variant A, where angles move off the grid. For p = 8 the
+  default cap is 3 — which is also the sensible default `m` (see §7).
 
 ### 1.5 Choosing m
 
@@ -157,12 +171,19 @@ mirror-image solutions always exist. Handle it twice:
 1. **At optimization:** run both starting orientations (`θ⁰` and its
    reflection) in the multi-start scheme (§3.5); they converge to the two
    mirror optima with identical `F̂`.
-2. **At reporting (deterministic canonicalization):** reflect the solution,
-   if necessary, so that the second scale in `scales` lies counterclockwise
-   of the reference — i.e., `(θ̂₂ − θ̂_ref) mod 360° ∈ (0°, 180°)`. This
-   matches the package's counterclockwise-positive convention and makes
-   output reproducible. If `θ̂₂ − θ̂_ref` is within numerical tolerance of 0°
-   or 180° (reflection undecidable by scale 2), fall through to the first
+2. **At reporting (deterministic canonicalization):** choose the reflection
+   that lies **closest to the theoretical/starting configuration** — the one
+   minimizing `Σ_i |angular distance(θ̂_i, θ_i^theory)|` (shortest arc per
+   scale). Do NOT canonicalize to a fixed counterclockwise orientation of
+   scale 2: that rule mirrors *perfectly theory-consistent* solutions
+   whenever the user supplies clockwise-keyed theoretical angles (e.g.
+   0°, 315°, 270°, …), reporting a scale theoretically at 270° as 90° and
+   making good data look catastrophically non-circumplex (A-review F3;
+   package instruments are CCW-keyed so defaults are safe, but user-supplied
+   `angles` are not constrained). When the two reflections tie (theory
+   reflection-symmetric, or summed distances equal within tolerance), fall
+   back to the CCW rule as the deterministic tie-break:
+   `(θ̂₂ − θ̂_ref) mod 360° ∈ (0°, 180°)`, falling through to the first
    subsequent scale that decides it; if none does, warn and report as-is.
 
 ### 2.4 Boundary/range behavior of angles (the 0°/360° danger zone)
@@ -313,22 +334,47 @@ diagonal leakage).
     LS system is singular: `(0.4, 0.3, 0.2, 0.1, …)` truncated to m+1 and
     renormalized.
 - **Multi-start:** (a) the start above; (b) its reflection (§2.3);
-  (c) 3–5 jittered starts (θ ± U(−30°, 30°) noise, ζ/β at defaults). Keep the
-  lowest `F̂`; if the best two distinct optima differ in `F̂` by > 1e-6,
-  record a multimodality flag in the output details. Reflection pairs with
-  identical `F̂` are expected and are *not* multimodality.
+  (c) 3–5 **deterministic** jittered starts — fixed, documented offset
+  patterns (e.g. alternating ±15° and ±30° across scales), never random
+  noise. **The default `cpm_fit()` path must not consume R's global RNG
+  stream** (A-review F4): point estimates must be byte-identical across
+  calls with no seed set. Only the documented bootstrap path (§5.2) and
+  `cpm_simulate()` consume RNG; DESIGN.md's reproducibility contract must be
+  restated accordingly at ship time (see §8). Keep the lowest `F̂`.
+  Multimodality flag: fires when the best two *non-mirror* optima either
+  differ in `F̂` by > 1e-6 **or** are distinct parameter points with equal
+  `F̂` (the non-identification signature). Mirror pairs with identical `F̂`
+  are expected and are *not* multimodality.
 - **β boundary polish:** softmax cannot reach `β_k = 0` exactly; a vanishing
   harmonic shows up as `v_k → −∞` (slow tail convergence). After
-  convergence, for any `β̂_k < 1e-4` (k ≥ 1): refit with that harmonic
+  convergence, for any `β̂_k < 1e-2` (k ≥ 1 — deliberately loose trigger,
+  because softmax tails stall slowly; A-review F9): refit with that harmonic
   removed (drop `v_k`, i.e. fix `β_k = 0`); if `F̂` increases by < 1e-8,
-  accept the reduced fit and **report it as the m-reduced model with the
-  corresponding df** (a parameter on the boundary is not a free parameter;
-  silently keeping its df is anti-conservative). Record the reduction in the
-  output details.
-- **Convergence reporting:** store `nlminb` convergence code, gradient norm
-  at the solution, Hessian condition number, boundary flags (ζ, β),
-  multimodality flag. `summary()` surfaces all of them (§5.4). Never return
-  estimates from a non-converged fit without a warning.
+  accept and **report the harmonic-removed model with the corresponding df**
+  (a parameter on the boundary is not a free parameter; silently keeping its
+  df is anti-conservative). Note the removed harmonic may be an *interior*
+  k (e.g. β̂₁ → 0 with β̂₂, β̂₃ > 0) — m itself decreases only when the top
+  harmonic drops. Implementers: do not "correct" the df convention — with a
+  parameter truly on the boundary, T is asymptotically a ~½χ²_df + ½χ²_df+1
+  mixture, so the reduced-df reference is the conservative-leaning choice,
+  on purpose. Record the reduction in the output details. (Validation
+  caution, cross-referenced in §6.3: published CIRCUM fits with active
+  boundary constraints likely report the *unreduced* df.)
+- **Convergence acceptance and reporting:** a fit is **accepted** iff (a)
+  the gradient at the solution passes a scaled-norm criterion,
+  `max_i |∂F/∂γ*_i| ≤ 1e-6 · max(1, |F̂|)` in the unconstrained coordinates,
+  and (b) when multi-starts ran, the best `F̂` is reproduced (± 1e-8) by at
+  least one other start or the mirror. **The `nlminb` convergence code is an
+  advisory diagnostic only — acceptance must never key on it**: at the
+  recommended tolerances, "singular convergence (7)" is the *normal* exit
+  for most demonstrably correct fits (A-review F2 measured 65–96% of fits
+  with gradient norms ~1e-8 and asymptotically exact CI coverage exiting
+  with code 7). Keying warnings or bootstrap-replicate exclusion on the code
+  would warn on good fits and silently discard the majority of bootstrap
+  replicates. Store: acceptance flag, advisory nlminb code, gradient norm,
+  Hessian condition number, boundary flags (ζ, β), multimodality flag.
+  `summary()` surfaces all of them (§5.4). Never return estimates from a fit
+  failing the acceptance criterion without a warning.
 
 ### 3.6 Backend decision (made with Jeff, 2026-07-03)
 
@@ -409,24 +455,49 @@ treatment.
 
 ### 5.2 Confidence intervals
 
-Two methods, both exposed; **analytic is the default** (matches CIRCUM's
-output, which is also how it gets validated), bootstrap is the package-native
-alternative:
+Two methods, both exposed. **Default: bootstrap on the raw-data path;
+analytic is the only option on the `cormat` path** (no raw data to
+resample). Decided with Jeff (2026-07-03) following A-review finding F1:
+the analytic (Wald) CIs are asymptotically correct — computationally
+verified — but **mis-cover materially at field-typical N**: empirical
+95% coverage as low as .66–.86 for ζ (and .74 for a trailing β) at N = 500
+with a small near-boundary harmonic, *over*-coverage (ζ at 1.000) with
+all-interior β, exact coverage only by N ≈ 50,000. The driver is the
+ill-conditioned discrepancy Hessian at octant-like truths (condition
+~2×10³), which shrinks the Wald quadratic regime. Crucially, the
+CIRCUM-matching validation gate (§6.3) is structurally unable to detect
+this, because CIRCUM's CIs use the same asymptotics — matching CIRCUM
+validates fidelity, not coverage. Hence the §6.4 coverage oracle.
 
-- **Analytic:** `avar(γ̂*) = (2/n)·H⁻¹`, where `H` is the Hessian of `F` in
-  the unconstrained coordinates at the optimum, computed by central finite
+- **Analytic (default on the `cormat` path; optional elsewhere):**
+  `avar(γ̂*) = (2/n)·H⁻¹`, where `H` is the Hessian of `F` in the
+  unconstrained coordinates at the optimum, computed by central finite
   differences **of the analytic gradient** (no numDeriv dependency; step
   1e-5, symmetrized). Delta-method back to natural parameters:
   `SE(ζ_i) = ζ_i(1−ζ_i)·SE(u_i)`; β via the softmax Jacobian;
   angles are already natural (Jacobian 1) — CI `θ̂_i ± z·SE`, wrapped for
-  display per §2.4. Subject to the §3.2 validation gate.
-- **Bootstrap (raw-data path only):** resample rows, recompute `R`, refit
-  warm-started from `γ̂` (warm starts make reflection re-handling
-  unnecessary); percentile intervals; **angle replicates go through the
-  existing `quantile.circumplex_radian` machinery** — center on circular
-  mean, unwrap, quantile, re-wrap. Non-converged or singular-R resamples are
-  excluded with a count warning (same conditional-on-estimability convention
-  as `ssm_analyze`). This path is the Phase-2 C++ trigger if slow (§8).
+  display per §2.4. Subject to the §3.2 validation gate **and the §6.4
+  coverage oracle**. Known limitation, stated in the user docs and enforced
+  in `summary()`: below an N threshold calibrated by the coverage oracle
+  (first estimate ~2000), `summary()` prints a caution that analytic CIs
+  may materially mis-cover and points to the bootstrap. Document the irony
+  deliberately: M4 exists partly because Wald-type CI trust is exactly what
+  Zimmermann & Wright showed needs checking — the CPM's own analytic CIs
+  get the same trustworthiness treatment (cross-link to Brief B:
+  `ssm_ci_accuracy()`'s machinery should cover CPM analytic CIs too).
+- **Bootstrap (raw-data path only; the default there):** resample rows,
+  recompute `R`, refit warm-started from `γ̂`; percentile intervals;
+  **angle replicates go through the existing `quantile.circumplex_radian`
+  machinery** — center on circular mean, unwrap, quantile, re-wrap.
+  Replicate exclusion keys on the §3.5 **acceptance criterion** (scaled
+  gradient norm), never on the nlminb code (A-review F2). **Per-replicate
+  mirror guard** (A-review F10): warm starts usually stay on `γ̂`'s branch,
+  but a weakly-determined resample's nearest optimum can be the mirror, and
+  one mirrored replicate corrupts the circular quantiles — reflect any
+  replicate that is angularly closer to the mirror of `γ̂` than to `γ̂`
+  (deterministic, no RNG) before pooling. Excluded/degenerate resamples get
+  the same count-warning, conditional-on-estimability convention as
+  `ssm_analyze`. This path is the Phase-2 C++ trigger if slow (§8).
 
 ### 5.3 Fit indices (all defined from the discrepancy)
 
@@ -437,8 +508,13 @@ With `T = n·F̂`, `n = N − 1`, model df from §1.4; null model = independence
 - **χ² test:** `T`, df, p-value.
 - **RMSEA:** `sqrt(max(F̂/df − 1/n, 0))`; 90% CI by inverting the noncentral
   χ²: find `λ_L, λ_U` with `pchisq(T, df, ncp = λ_U) = .05` and
-  `pchisq(T, df, ncp = λ_L) = .95` (uniroot; λ_L = 0 when
-  `pchisq(T, df) ≥ .95`), bounds `sqrt(λ/(n·df))`.
+  `pchisq(T, df, ncp = λ_L) = .95` (uniroot), bounds `sqrt(λ/(n·df))`.
+  **Both edge guards are required** (A-review F5): `λ_L = 0` when
+  `pchisq(T, df) ≥ .95`, and `λ_U = 0` when `pchisq(T, df) ≤ .05` — the
+  second arises for excellent fits (e.g. T = 20, df = 40), where the
+  `λ_U` equation has no root and an unguarded uniroot call errors; with the
+  guard the CI is correctly [0, 0]. With both guards the point estimate
+  always lies inside the interval (verified in the A-review).
 - **SRMR:** `sqrt( Σ_{i<j} (r_ij − p̂_ij)² / (p(p−1)/2) )`.
 - **CFI:** `1 − max(T − df, 0) / max(T₀ − df₀, T − df, 0)`.
 - **TLI:** `((T₀/df₀) − (T/df)) / ((T₀/df₀) − 1)`.
@@ -461,7 +537,7 @@ an open decision, §9.)
                 "equal-communality", "circulant"),
       reference = 1,                             # index into scales
       interval = 0.95,
-      ci_method = c("analytic", "bootstrap"),
+      ci_method = c("bootstrap", "analytic"),   # cormat path: analytic only
       boots = 2000, listwise = TRUE
     ) -> circumplex_cpm
 
@@ -474,10 +550,10 @@ an open decision, §9.)
               aic, bic, F, n, N
     corfun    function(delta_deg) -> rho_hat
     matrices  list: R, Phat, residuals
-    details   list: m (as fitted, after any boundary reduction), model,
-              reference, ci_method, interval, boots, convergence code,
-              gradient norm, hessian condition, boundary flags,
-              multimodality flag, call
+    details   list: m (as fitted, after any harmonic removal), model,
+              reference, ci_method, interval, boots, acceptance flag
+              (the §3.5 criterion), advisory nlminb code, gradient norm,
+              hessian condition, boundary flags, multimodality flag, call
 
 Methods:
 
@@ -542,11 +618,15 @@ Per-oracle test template (values transcribed at implementation):
 
 Published tables are rounded; optimizers differ in tail convergence. Targets:
 
-- angles: within **0.5°** of published values rounded to whole degrees
-  (0.05° if published to one decimal), compared as differences from the
-  reference (§2.1);
+- angles: compare **after rounding ours to the published precision**
+  (whole degrees or one decimal), as differences from the reference (§2.1);
+  a residual one-unit-in-last-place disagreement falls to the superiority
+  criterion below as the arbiter (a raw ±0.5° band allows zero slack beyond
+  rounding — A-review F8);
 - ζ, β: within **0.005** (published to 2 decimals) / 0.0005 (3 decimals);
-- χ²: within 0.5 or 0.1% relative, whichever is larger; RMSEA within 0.002;
+- χ²: within 0.5 or 0.1% relative, whichever is larger; RMSEA within
+  **0.005** when published to 2 decimals (0.002 was tighter than the
+  rounding half-width — A-review F8);
 - analytic CIs: endpoints within 0.5°/0.005 (this is the §3.2 gate — failure
   here means implement the correlation-structure asymptotics, not widen the
   tolerance);
@@ -558,16 +638,43 @@ Published tables are rounded; optimizers differ in tail convergence. Targets:
 When a target misses, diagnose in this order before touching the estimator:
 (1) reflection/rotation alignment (§2.1/2.3 — compare reference-relative
 differences, try the mirror); (2) `n = N − 1` vs `N` in `T` and RMSEA;
-(3) m mismatch or a boundary-reduced m (§3.5); (4) their matrix transcription
-(re-diff the input `R` against the paper); (5) ζ vs ζ² labeling; only then
-(6) suspect the code.
+(3) m mismatch or a removed harmonic (§3.5 — published fits with active
+boundary constraints likely report the *unreduced* df); (4) their matrix
+transcription (re-diff the input `R` against the paper); (5) ζ vs ζ²
+labeling; (6) SRMR denominator convention — off-diagonal-only `p(p−1)/2`
+(ours, §5.3) vs diagonal-inclusive `p(p+1)/2`: since diagonal residuals are
+identically 0 here, the two differ by `√((p−1)/(p+1))` ≈ 0.88 at p = 8, far
+beyond tolerance (A-review F6); (7) CI shape — symmetric on the natural
+scale vs back-transformed from an unconstrained scale (decides what the
+analytic-CI gate compares); (8) BIC's `ln N` vs `ln n`; only then
+(9) suspect the code.
 
 ### 6.4 Internal and cross-implementation oracles (no external numbers needed)
 
 These run in the regular test suite and catch most plausible-but-wrong math
 without any transcription:
 
-- **Gradient check** (§3.4): analytic vs finite-difference, ≤ 1e-7.
+- **Gradient check** (§3.4): analytic vs central finite differences
+  (step h = 1e-6) at ≥ 20 random feasible points, with a **mixed
+  absolute/relative criterion**: `|g_a − g_fd| ≤ 1e-7 · max(1, |g_fd|)` per
+  component. (A pure relative criterion at 1e-7 is flaky: FD truncation
+  error dominates on small-magnitude components — the A-review's own check
+  bottomed out at ~2e-6 *relative*, limited by the FD, not the analytic
+  gradient. A-review F8.)
+- **Coverage oracle (required — the test that separates "matches CIRCUM"
+  from "actually covers"; A-review F1):** simulate data from `P(γ₀)` at
+  N ∈ {250, 500, 1000} (≥ 500 seeded replications) under at least two β
+  configurations — one with a small trailing harmonic near the boundary,
+  one all-interior (the coverage error *flips direction* between these) —
+  fit, and check empirical coverage of nominal-95% CIs. Acceptance: the
+  **default** method's coverage in [.90, .98] at every N/parameter; the
+  analytic method's measured coverage calibrates the `summary()` N-threshold
+  caution (§5.2). Runs as a seeded, CI-tagged validation script (not on
+  every `R CMD check` — cost), invoked by `/statistical-validation`.
+- **T-calibration** (A-review F1): under in-family truth at N = 2000,
+  `T = n·F̂` consistent with χ²_df (seeded KS check). Cheap, and it detects
+  the near-boundary miscalibration the coverage oracle also sees at
+  smaller N.
 - **Exact-recovery round trip:** build `P(γ₀)` for known feasible `γ₀`
   (several: generic; angle at the 0/360 pole; near-equal angles; small β
   tail), feed it as the "sample" matrix — the fit must recover `γ₀` to 1e-6
@@ -597,6 +704,12 @@ without any transcription:
   `T` from a fixed small `R`.
 - Degrees at the API, radians inside — pinned by a test that `cpm_fit` with
   angles in degrees reproduces an internal radian call exactly.
+- SRMR denominator pinned to off-diagonal-only `p(p−1)/2` (§5.3), with the
+  diagonal-inclusive alternative named in the §6.3 checklist (A-review F6).
+- CI shape (symmetric-natural vs back-transformed) and BIC's `ln N` vs
+  `ln n` recorded per oracle before comparing (A-review F6).
+- Default-path RNG silence: `cpm_fit()` with `ci_method = "analytic"` leaves
+  `.Random.seed` untouched — pinned by a test (A-review F4).
 
 ### 6.6 Boundary suite (CLAUDE.md danger-zone requirements, adapted)
 
@@ -614,10 +727,10 @@ singular `R` refused with the documented error; df = 0 saturated fit warns.
 
 | Choice | Default | Rationale |
 |---|---|---|
-| m | `min(3, floor((p−1)/2))` | CIRCUM-literature convention at p = 8; §1.4 cap |
+| m | `min(3, floor((p−1)/2))` | CIRCUM-literature convention at p = 8; §1.4 conservative cap |
 | model | quasi-circumplex | The scientific question is usually "where are the items actually" |
 | reference | first scale, fixed at its theoretical angle | Deterministic, documented, matches user's mental model |
-| ci_method | analytic | Matches CIRCUM (validation), instant; bootstrap available |
+| ci_method | bootstrap (raw data); analytic (cormat, the only option there) | A-review F1: analytic Wald CIs mis-cover at field-typical N; analytic stays for large-N/matrix-input use with a `summary()` caution |
 | interval | 0.95 | Package convention |
 | listwise | TRUE (only) | §4; nPD risk |
 
@@ -636,7 +749,23 @@ those) to RcppArmadillo for the bootstrap and Brief-B simulation loops.
 Trigger: default-settings bootstrap (2000 refits) exceeding ~30 s on octant
 data, or the Brief-B diagnostic needing ≥ 10⁴ refits. The R implementation
 stays as the permanent oracle: `F_cpp == F_R` and `grad_cpp == grad_R` to
-1e-12 at ≥ 50 random feasible points.
+1e-12 at ≥ 50 random feasible points, **and the §3.5 convergence-acceptance
+decision (accepted/rejected) must agree exactly on the same inputs**
+(A-review addition — a port that changes which fits are accepted silently
+changes bootstrap CIs).
+
+**Ship-time documentation task:** DESIGN.md's reproducibility contract was
+already restated as the underlying principle (2026-07-03) — *a function
+consumes the global RNG stream iff its statistical output is stochastic
+(resampling or simulation); every such entry point documents it and follows
+the `set.seed()` convention; internal conveniences (multi-start jitter,
+§3.5) must be deterministic* — with an enumerated entry-point list. What
+remains at ship time: (a) add `cpm_fit(ci_method = "bootstrap")` and
+`cpm_simulate()` to that list with their own seed-guarantee rows; (b) update
+`ssm_analyze()`'s roxygen `@section Reproducibility`, whose "this is the
+only function in the package that consumes R's random number stream"
+sentence becomes false when these ship (true today, so deliberately left
+untouched until then to avoid man/-churn).
 
 **Out of scope for the first cut** (documented, not promised): OLS/GLS/ADF
 discrepancies; pairwise deletion; polychoric input (the `cormat` path is the
@@ -649,9 +778,7 @@ variants B–D.
 
 1. **Function/class name:** `cpm_fit()` / `circumplex_cpm` (proposed) vs
    `browne_fit()` vs other. Only naming; everything else is name-agnostic.
-2. **Default ci_method** analytic (proposed) vs bootstrap-by-default for
-   consistency with `ssm_analyze()`'s field-convention argument.
-3. Whether variants B–D ship in the first cut (proposed: yes — they are ~free
+2. Whether variants B–D ship in the first cut (proposed: yes — they are ~free
    given the parameterization, and B enables the equal-spacing test the fit
    milestone wants) or follow the quasi-circumplex.
 
@@ -659,7 +786,29 @@ variants B–D.
 
 - **Backend:** native optimization; R first, RcppArmadillo port gated on
   profiling with R retained as oracle; OpenMx/lavaan as Suggests test oracles
-  only. (Jeff, 2026-07-03 — see §3.6.)
+  only. (Jeff, 2026-07-03 — see §3.6. Confirmed on the merits by the
+  A-review, with direct evidence: a complete scratch implementation is
+  ~100 lines of base R with sub-second fits.)
+- **Default ci_method:** bootstrap on the raw-data path; analytic only on
+  the `cormat` path, with an N-conditional `summary()` caution. (Jeff,
+  2026-07-03, following A-review F1 — see §5.2.)
+
+## 11. Change log
+
+- 2026-07-03 — A-review revisions integrated (all findings F1–F10 of
+  `devel/m4-browne-design-review.md`): coverage oracle + T-calibration added
+  to §6.4 and bootstrap made the raw-data default (F1); convergence
+  acceptance respecified on scaled gradient norm with the nlminb code
+  advisory (F2); canonicalization now toward the theoretical configuration
+  with CCW as tie-break (F3); deterministic multi-start jitter + default-path
+  RNG-silence pin + DESIGN.md restatement task (F4); RMSEA λ_U = 0 guard
+  (F5); SRMR/CI-shape/BIC conventions pinned in §6.3/§6.5 (F6); m-cap
+  justification corrected, `floor(p/2)` allowed for B/D (F7); tolerance and
+  gradient-test criteria fixed (F8); boundary-polish trigger 1e-2,
+  "harmonic-removed" wording, χ²-mixture note (F9); per-replicate mirror
+  guard and equal-F̂ multimodality flag (F10); Phase-2 port criterion now
+  includes acceptance-decision agreement.
+- 2026-07-03 — Initial design (Brief A); backend decided with Jeff.
 
 ## References
 

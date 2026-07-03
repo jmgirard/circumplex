@@ -199,6 +199,110 @@ fix is test-first with a regression test reproducing the audit's executed failur
 
 ## Log
 
+- 2026-07-03 — Brief B: `ssm_ci_accuracy()` CI-trustworthiness spec (FRESH
+  Fable session, per the brief's context-hygiene rule; builds on the
+  committed Brief A design, decisions taken as given). Wrote
+  `devel/m4-ci-accuracy-spec.md`. Core design: a plug-in coverage simulation
+  — one `cpm_fit()` on the pooled within-group scale correlations defines
+  the population (structure = P̂), then reps×boots replays of the user's own
+  CI procedure (same engine/boots/interval) at the user's exact n tally
+  empirical coverage per parameter, with angular-membership coverage for
+  displacement (0/360-safe by construction) and certification-conditional
+  displacement coverage as the verdict-driving estimand. Amplitude-near-zero
+  module (the absorbed-M2 target): a first-harmonic-only amplitude ladder
+  c ∈ {1,.5,.25,0} holding residual harmonics fixed, measuring one-sided
+  amplitude-CI miss decomposition, guardrail false-certification rate at
+  a₀=0 vs nominal α/2, power up the ladder, and the contrast branch-pathology
+  frequency (ROADMAP F3-review note folded in). Verdicts classified against
+  Bradley's (1978) liberal band via Wilson intervals. **Central decision
+  surfaced for Jeff and DECIDED same day (spec §2/§13): simulation only in
+  code, with Z&W Studies 1–5 content as transcribed vignette context rather
+  than a nearest-condition lookup** (their grid is coarse; mapping quietly
+  becomes extrapolation; every hard ROADMAP requirement needs the
+  simulation; spec §6 retained as the requirements record if a lookup-lite
+  is ever revisited).
+  All Z&W numerics marked TBT under the oracle rule — none reproduced from
+  memory. A↔B contract pinned to A §5.4 fields with four flagged gaps
+  feeding back to A (G1 cpm_simulate return contract unspecified; G2 no
+  augmented scales+measures simulation path — cpm_simulate suffices for the
+  mean-based path only, proposed fix reduces the corr-path contract to
+  matrices$Phat; G3 dimnames unpinned; G4 A §8's "Brief-B ≥10⁴ refits"
+  Phase-2 trigger mis-anticipates B, which refits the CPM zero times) plus
+  one gap on the ssm side: `circumplex_ssm$details` stores no per-group n,
+  scale SDs, or correlation matrices, so a companion `ssm_analyze()`
+  sufficient-statistics storage change is a prerequisite task (with a
+  `data =` fallback + consistency check for old objects). Design only — no
+  package code. Remaining §12 open items (amplitude ladder default, naming,
+  per-group structure, CPM-CI assessment method) can wait for
+  implementation. Next: Brief E (M5/M6 design questions, Fable, time-boxed)
+  closes the window queue.
+  (devel/m4-ci-accuracy-spec.md [new], MILESTONES.md).
+- 2026-07-03 — RNG-contract restatement in DESIGN.md (Fable, follow-up to the
+  A-review integration; Jeff asked for it now rather than at M4 ship time).
+  Replaced the frozen-inventory sentence ("ssm_analyze() is the package's
+  only entry point that consumes R's global RNG stream") with the invariant
+  it stood for — a function consumes the global stream iff its statistical
+  output is stochastic (resampling/simulation); such entry points document it
+  and follow the set.seed() convention; internals (multi-start jitter,
+  tie-breaks) must be deterministic and leave .Random.seed untouched — plus
+  an enumerated entry-point list (currently one: ssm_analyze(), with the
+  existing per-engine table beneath it) noting M4's planned additions.
+  ssm_analyze()'s roxygen "only function" sentence is deliberately untouched
+  (true today; updating it is queued in devel/m4-browne-design.md §8 for ship
+  time to avoid man/-churn). Doc-only, internal memory file — no package
+  code, no check needed. (DESIGN.md, devel/m4-browne-design.md §8,
+  MILESTONES.md).
+- 2026-07-03 — Brief A-review integration (Fable, same session as Brief A).
+  All A-review findings F1–F10 integrated into `devel/m4-browne-design.md`
+  (change log §11 added to the doc): simulation coverage oracle +
+  T-calibration added as required §6.4 validation (the test that separates
+  "matches CIRCUM" from "actually covers"); **default ci_method decided with
+  Jeff: bootstrap on the raw-data path, analytic only on the cormat path
+  with an N-conditional summary() caution** (F1); convergence acceptance
+  respecified on a scaled gradient norm with the nlminb code advisory-only
+  (F2); reflection canonicalization now toward the theoretical configuration,
+  CCW rule demoted to tie-break (F3); multi-start jitter made deterministic —
+  default cpm_fit() path is RNG-silent, pinned by a planned .Random.seed
+  test (F4); RMSEA CI λ_U=0 guard (F5); SRMR/CI-shape/BIC conventions pinned
+  (F6); m-cap justification corrected, floor(p/2) allowed for fixed-angle
+  variants (F7); tolerance/gradient-test criteria fixed (F8); harmonic-removal
+  polish retriggered at 1e-2 with χ²-mixture rationale note (F9);
+  per-replicate mirror guard for the warm-started bootstrap + equal-F̂
+  multimodality flag (F10). Also queued a ship-time DESIGN.md task: restate
+  the "only ssm_analyze() consumes the RNG" contract as the principle
+  (stochastic-output functions only; internals deterministic) with an
+  entry-point table, since cpm_fit(bootstrap)/cpm_simulate() will make the
+  current sentence false. Design docs only — no package code. Next: Brief B
+  (Z&W ssm_ci_accuracy spec), which now also owns CPM analytic-CI
+  trustworthiness per F1. (devel/m4-browne-design.md, MILESTONES.md).
+- 2026-07-03 — Brief A-review: adversarial review of the Browne design (FRESH
+  Fable subagent, no memory of writing the doc). Report:
+  `devel/m4-browne-design-review.md`. Verdict: NEEDS CHANGES before
+  implementation, but the core is computationally verified correct — analytic
+  gradient incl. logit/softmax chains vs finite differences (25 random points,
+  max rel err 1.9e-6), df table (10/17/17/24 at p=8,m=3), F₀=−ln|R|, exact
+  reflection invariance, exact-recovery round trip (1e-10), the §3.2
+  scale-invariance identity (exact), large-N CI calibration. Backend decision
+  (native, R-first) CONFIRMED with direct evidence (~100 lines of base R,
+  sub-second fits). Required changes: (1) HIGH — analytic Hessian CIs
+  mis-cover at field-typical N (ζ coverage 66–86% at N=500 with a small third
+  harmonic; over-covers with all-interior β; exact only by N~50k) and the
+  CIRCUM-CI gate cannot detect it since CIRCUM shares the asymptotics → add a
+  simulation-based coverage oracle to §6.4 and revisit the analytic-default
+  decision; (2) HIGH/easy — nlminb "singular convergence (7)" is the normal
+  exit for 65–96% of demonstrably good fits at the doc's tolerances →
+  acceptance must key on scaled gradient norm, code advisory only, else the
+  bootstrap discards most replicates; (3) MED — the CCW canonicalization rule
+  mirrors theory for clockwise-keyed instruments → canonicalize toward the
+  theoretical configuration, CCW as tie-break; (4) MED — multi-start jitter
+  must not consume the global RNG on the default path (DESIGN.md contract);
+  RMSEA CI missing the λ_U=0 branch (uniroot errors on very good fits); SRMR
+  denominator convention unpinned (~12% at p=8, breaks CircE validation);
+  minor: even-p Nyquist harmonic is identified (m-cap merely conservative),
+  RMSEA tolerance looser (0.005), gradient-test tolerance flaky as specced,
+  per-replicate mirror guard for warm-started bootstrap. Review only — no
+  package code, design doc untouched. Next: integrate revisions into
+  devel/m4-browne-design.md. (devel/m4-browne-design-review.md, MILESTONES.md).
 - 2026-07-03 — Brief A: M4 Browne-model estimation design (Fable, Jeff-steered).
   Wrote `devel/m4-browne-design.md`, the CircE-replacement design doc for M4's
   anchor feature: the model (Fourier correlation function with the Herglotz
