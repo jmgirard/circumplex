@@ -67,7 +67,7 @@ Cross-cutting guardrails for every task below:
   `ggcircumplex()`, so identical angle/label/instrument inputs yield matching
   labels on the axis and the canvas (asserted in tests). No `scale_y_*` shipped
   (no linear circumplex plot has an amplitude axis; would be speculative API).
-- [ ] **V4. Refactor existing plots onto the extension.** Reimplement
+- [x] **V4. Refactor existing plots onto the extension.** Reimplement
   `ssm_plot_circle()`, `ssm_plot_curve()`, `ssm_plot_contrast()` on top of
   V1–V3 with **behavior unchanged**.
   *Accept:* every existing vdiffr snapshot in
@@ -91,6 +91,25 @@ Cross-cutting guardrails for every task below:
 
 ## Log
 
+- 2026-07-02 — V4 Refactor plots onto the extension (Opus). ssm_plot_circle:
+  removed the inline amplitude/displacement→canvas transform (rescale + ggrad +
+  0/360 wrap); now circle_base→ggcircumplex (V1), ggforce::geom_arc_bar→
+  geom_ssm_arc, geom_point(x_est,y_est)→geom_ssm_point(a_est,d_est) (V2); the
+  repel branch recomputes canvas coords from a_est/d_est via ssm_radius (the
+  formerly-precomputed x_est/y_est no longer exist post-transform-removal).
+  ssm_plot_curve: scale_x_continuous(breaks,labels)→scale_x_circumplex (V3);
+  dropped the inline degree-label function (the scale supplies it). All palette/
+  vary_shapes/drop_lowfit/guides/theme logic untouched. ssm_plot_contrast: NOT
+  refactored — it is a Cartesian faceted point-range difference plot with no
+  circular canvas, polar geom, or angle axis, so nothing in V1–V3 applies
+  (honest scope call, not an omission). Behavior-preserving: ALL 11 existing
+  ssm_plot vdiffr snapshots stayed byte-identical (incl. the stochastic repel
+  one and the cross-zero arc) — the V2 geometric-equality proof held at full
+  render. -7 net lines; ggrad no longer referenced in ssm_plot.R (still used
+  internally by geom_ssm.R); circle_base still reached via ggcircumplex. Suite
+  529/529; check 0/0/0. No NEWS (behavior unchanged; the plots are now built on
+  the public extension, but nothing user-visible changed). (R/ssm_plot.R,
+  MILESTONES.md).
 - 2026-07-02 — V3 Scales (Opus): exported `scale_x_circumplex()`, a ggplot2
   continuous position scale for the angle axis of linear circumplex plots (the
   ssm_plot_curve score-by-angle axis). Breaks at the scale angles; default

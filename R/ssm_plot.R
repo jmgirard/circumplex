@@ -69,20 +69,12 @@ ssm_plot_circle <- function(ssm_object,
   if (ssm_object$details$contrast) {
     df <- df[1:2, ]
   }
-  
-  # Convert results to numbers usable by ggplot and ggforce
+
+  # The amplitude/displacement-to-canvas transform (rescaling amplitudes and
+  # converting displacement to the ggforce arc convention, with wrap-around at
+  # the 0/360 boundary) is handled by geom_ssm_arc()/geom_ssm_point() below.
   df_plot <- df
-  df_plot[["d_uci"]] <- ifelse(
-    test = df_plot[["d_uci"]] < df_plot[["d_lci"]],
-    yes = ggrad(df_plot[["d_uci"]] + 360),
-    no = ggrad(df_plot[["d_uci"]])
-  )
-  df_plot[["d_lci"]] <- ggrad(df_plot[["d_lci"]])
-  df_plot[c("a_lci", "a_uci", "x_est", "y_est")] <- sapply(
-    df_plot[c("a_lci", "a_uci", "x_est", "y_est")],
-    function(x) x * 10 / (2 * amax)
-  )
-  
+
   if (!is.null(palette)) {
     df_plot[["Label"]] <- factor(
       df_plot[["Label"]],
@@ -105,11 +97,11 @@ ssm_plot_circle <- function(ssm_object,
   df_plot[["lnty"]] <- ifelse(df_plot[["fit_est"]] >= .70, "solid", "dotted")
   
   ## Create circle base
-  p <- circle_base(
+  p <- ggcircumplex(
     angles = angles,
+    labels = angle_labels,
     amax = amax,
-    fontsize = scale_font_size,
-    labels = angle_labels
+    font_size = scale_font_size
   )
   
   ## Set color scales depending on palette
@@ -134,35 +126,35 @@ ssm_plot_circle <- function(ssm_object,
   
   ## Add arc bars
   p <- p +
-    ggforce::geom_arc_bar(
+    geom_ssm_arc(
       data = df_plot,
       mapping = ggplot2::aes(
-        x0 = 0,
-        y0 = 0,
-        r0 = .data$a_lci,
-        r = .data$a_uci,
-        start = .data$d_lci,
-        end = .data$d_uci,
+        amplitude_min = .data$a_lci,
+        amplitude_max = .data$a_uci,
+        displacement_min = .data$d_lci,
+        displacement_max = .data$d_uci,
         fill = .data$Label,
         color = .data$Label,
         linetype = .data$lnty
       ),
+      amax = amax,
       alpha = 0.4,
       linewidth = 1
     )
-  
+
   ## Add points
   if (vary_shapes) {
     stopifnot(n_labels <= 5)
     p <- p +
-      ggplot2::geom_point(
+      geom_ssm_point(
         data = df_plot,
         mapping = ggplot2::aes(
-          x = .data$x_est,
-          y = .data$y_est,
+          amplitude = .data$a_est,
+          displacement = .data$d_est,
           fill = .data$Label,
           shape = .data$Label
         ),
+        amax = amax,
         size = 3,
         color = "black"
       ) +
@@ -174,13 +166,14 @@ ssm_plot_circle <- function(ssm_object,
       )
   } else {
     p <- p +
-      ggplot2::geom_point(
+      geom_ssm_point(
         data = df_plot,
         mapping = ggplot2::aes(
-          x = .data$x_est,
-          y = .data$y_est,
+          amplitude = .data$a_est,
+          displacement = .data$d_est,
           fill = .data$Label
         ),
+        amax = amax,
         shape = 21,
         size = 3,
         color = "black"
@@ -190,18 +183,24 @@ ssm_plot_circle <- function(ssm_object,
         fill = ggplot2::guide_legend("Profile")
       )
   }
-  
+
   if (repel) {
     requireNamespace("ggrepel")
+    # Point positions in canvas coordinates (matching geom_ssm_point()) for the
+    # repelled labels and their horizontal nudge
+    repel_df <- df_plot
+    r <- ssm_radius(repel_df$a_est, amax)
+    repel_df$.canvas_x <- r * cos(repel_df$d_est * pi / 180)
+    repel_df$.canvas_y <- r * sin(repel_df$d_est * pi / 180)
     p <- p +
       ggrepel::geom_label_repel(
-        data = df_plot,
+        data = repel_df,
         mapping = ggplot2::aes(
-          x = .data$x_est,
-          y = .data$y_est,
+          x = .data$.canvas_x,
+          y = .data$.canvas_y,
           label = .data$Label
         ),
-        nudge_x = -8 - df_plot$x_est,
+        nudge_x = -8 - repel_df$.canvas_x,
         direction = "y",
         hjust = 1,
         size = legend_font_size / 2.8346438836889
@@ -257,12 +256,9 @@ ssm_plot_curve <- function(ssm_object,
   stopifnot(is_null_or_char(angle_labels, n = length(angles)))
   stopifnot(is_flag(drop_lowfit))
 
-  if (is.null(angle_labels)) {
-    angle_labels <- function(x) sprintf("%.0f\U00B0", x)
-    xlabel <- "Angle"
-  } else {
-    xlabel <- "Scale"
-  }
+  # scale_x_circumplex() (added below) supplies the degree-formatted default
+  # labels when angle_labels is NULL; here we only pick the axis title.
+  xlabel <- if (is.null(angle_labels)) "Angle" else "Scale"
 
   # Drop the contrast row if contrast
   if (ssm_object$details$contrast) {
@@ -336,10 +332,7 @@ ssm_plot_curve <- function(ssm_object,
       ),
       color = "black"
     ) +
-    ggplot2::scale_x_continuous(
-      breaks = angles,
-      labels = angle_labels
-    ) +
+    scale_x_circumplex(angles, labels = angle_labels) +
     ggplot2::scale_linetype_identity() +
     ggplot2::labs(x = xlabel) +
     ggplot2::theme_bw() +
