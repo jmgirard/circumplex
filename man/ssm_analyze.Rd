@@ -16,7 +16,8 @@ ssm_analyze(
   listwise = TRUE,
   measures_labels = NULL,
   parallel = "no",
-  ncpus = 1
+  ncpus = 1,
+  method = "bootstrap"
 )
 }
 \arguments{
@@ -55,8 +56,8 @@ given (no reordering). The direction is shown in the result's Label (e.g.,
 "Male - Female").}
 
 \item{boots}{Optional. A single positive whole number indicating how many
-bootstrap resamples to use when estimating the confidence intervals
-(default = 2000).}
+bootstrap resamples (or, when \code{method = "montecarlo"}, Monte Carlo draws)
+to use when estimating the confidence intervals (default = 2000).}
 
 \item{interval}{Optional. A single positive number between 0 and 1
 (exclusive) that indicates what confidence level to use when estimating the
@@ -83,13 +84,27 @@ results for a given \code{set.seed()} are identical regardless of the
 
 \item{ncpus}{Optional. A single positive whole number indicating how many
 CPU cores to use when \code{parallel} is not "no" (default = 1).}
+
+\item{method}{Optional. A string indicating how to estimate the confidence
+intervals: "bootstrap" (default) resamples the data, whereas "montecarlo"
+draws parameter replicates from the asymptotic sampling distribution of
+the group mean vector (mean-based analyses) or the measure-scale
+correlation vector (correlation-based analyses) -- a multivariate normal
+with empirically estimated covariance -- and propagates them through the
+SSM parameter transformation. The Monte Carlo method is much faster for
+large samples but relies on the asymptotic normality of the means or
+correlations, so prefer the bootstrap for small samples; it also requires
+listwise-complete data. Correlations are drawn jointly across measures
+within each group on the Fisher z scale and back-transformed. The
+\code{parallel} and \code{ncpus} arguments apply only to the bootstrap.}
 }
 \value{
 A list containing the results and description of the analysis.
 \item{results}{A data frame with the SSM parameter estimates}
-\item{details}{A list with the number of bootstrap resamples (boots),
-the confidence interval percentage level (interval), and the angular
-displacement of scales (angles)}
+\item{details}{A list with the number of bootstrap resamples or Monte
+Carlo draws (boots), the confidence interval percentage level (interval),
+the angular displacement of scales (angles), and the interval estimation
+method (method)}
 \item{call}{A language object containing the function call that created
 this object}
 \item{scores}{A data frame containing the mean scale scores} \item{type}{A
@@ -113,11 +128,12 @@ conditional on estimability.
 [0, 360)\verb{degrees. A profile that peaks exactly at the 0/360 degree boundary is reported as approximately 360 (equivalently 0, the same direction); which of the two appears is a floating-point detail and both denote the same pole. Contrast displacements are instead reported as a signed difference in}(-180, 180]: R:0,\%20360)\%60\%20degrees.\%20A\%20profile\%20that\%20peaks\%20exactly\%20at\%20the\%200/360\%20degree\%0A\%20\%20boundary\%20is\%20reported\%20as\%20approximately\%20360\%20(equivalently\%200,\%20the\%20same\%0A\%20\%20direction);\%20which\%20of\%20the\%20two\%20appears\%20is\%20a\%20floating-point\%20detail\%20and\%20both\%0A\%20\%20denote\%20the\%20same\%20pole.\%20Contrast\%20displacements\%20are\%20instead\%20reported\%20as\%20a\%0A\%20\%20signed\%20difference\%20in\%20\%60(-180,\%20180
 }
 \description{
-Calculate SSM parameters with bootstrapped confidence intervals for a variety
-of different analysis types. Depending on what arguments are supplied, either
-mean-based or correlation-based analyses will be performed, one or more
-groups will be used to stratify the data, and contrasts between groups or
-measures will be calculated.
+Calculate SSM parameters with confidence intervals (bootstrapped by
+default, or Monte Carlo via \code{method}) for a variety of different analysis
+types. Depending on what arguments are supplied, either mean-based or
+correlation-based analyses will be performed, one or more groups will be
+used to stratify the data, and contrasts between groups or measures will be
+calculated.
 }
 \examples{
 # Load example data
@@ -134,6 +150,13 @@ ssm_analyze(
   jz2017,
   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   measures = c("NARPD", "ASPD")
+)
+
+# Monte Carlo confidence intervals (faster for large samples)
+ssm_analyze(
+  jz2017,
+  scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+  method = "montecarlo"
 )
 \donttest{
 # Multiple-group mean-based SSM

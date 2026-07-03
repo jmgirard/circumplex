@@ -1,10 +1,11 @@
 #' Perform analyses using the Structural Summary Method
 #'
-#' Calculate SSM parameters with bootstrapped confidence intervals for a variety
-#' of different analysis types. Depending on what arguments are supplied, either
-#' mean-based or correlation-based analyses will be performed, one or more
-#' groups will be used to stratify the data, and contrasts between groups or
-#' measures will be calculated.
+#' Calculate SSM parameters with confidence intervals (bootstrapped by
+#' default, or Monte Carlo via `method`) for a variety of different analysis
+#' types. Depending on what arguments are supplied, either mean-based or
+#' correlation-based analyses will be performed, one or more groups will be
+#' used to stratify the data, and contrasts between groups or measures will be
+#' calculated.
 #'
 #' @param data Required. A data frame or matrix containing at least
 #'   circumplex scales.
@@ -35,8 +36,8 @@
 #'   given (no reordering). The direction is shown in the result's Label (e.g.,
 #'   "Male - Female").
 #' @param boots Optional. A single positive whole number indicating how many
-#'   bootstrap resamples to use when estimating the confidence intervals
-#'   (default = 2000).
+#'   bootstrap resamples (or, when `method = "montecarlo"`, Monte Carlo draws)
+#'   to use when estimating the confidence intervals (default = 2000).
 #' @param interval Optional. A single positive number between 0 and 1
 #'   (exclusive) that indicates what confidence level to use when estimating the
 #'   confidence intervals (default = 0.95).
@@ -58,11 +59,24 @@
 #'   `parallel` and `ncpus` settings.
 #' @param ncpus Optional. A single positive whole number indicating how many
 #'   CPU cores to use when `parallel` is not "no" (default = 1).
+#' @param method Optional. A string indicating how to estimate the confidence
+#'   intervals: "bootstrap" (default) resamples the data, whereas "montecarlo"
+#'   draws parameter replicates from the asymptotic sampling distribution of
+#'   the group mean vector (mean-based analyses) or the measure-scale
+#'   correlation vector (correlation-based analyses) -- a multivariate normal
+#'   with empirically estimated covariance -- and propagates them through the
+#'   SSM parameter transformation. The Monte Carlo method is much faster for
+#'   large samples but relies on the asymptotic normality of the means or
+#'   correlations, so prefer the bootstrap for small samples; it also requires
+#'   listwise-complete data. Correlations are drawn jointly across measures
+#'   within each group on the Fisher z scale and back-transformed. The
+#'   `parallel` and `ncpus` arguments apply only to the bootstrap.
 #' @return A list containing the results and description of the analysis.
 #'   \item{results}{A data frame with the SSM parameter estimates}
-#'   \item{details}{A list with the number of bootstrap resamples (boots),
-#'   the confidence interval percentage level (interval), and the angular
-#'   displacement of scales (angles)}
+#'   \item{details}{A list with the number of bootstrap resamples or Monte
+#'   Carlo draws (boots), the confidence interval percentage level (interval),
+#'   the angular displacement of scales (angles), and the interval estimation
+#'   method (method)}
 #'   \item{call}{A language object containing the function call that created
 #'   this object}
 #'   \item{scores}{A data frame containing the mean scale scores} \item{type}{A
@@ -100,6 +114,13 @@
 #'   jz2017,
 #'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
 #'   measures = c("NARPD", "ASPD")
+#' )
+#'
+#' # Monte Carlo confidence intervals (faster for large samples)
+#' ssm_analyze(
+#'   jz2017,
+#'   scales = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
+#'   method = "montecarlo"
 #' )
 #' \donttest{
 #' # Multiple-group mean-based SSM
@@ -146,7 +167,8 @@
 ssm_analyze <- function(data, scales, angles = octants(),
                         measures = NULL, grouping = NULL, contrast = FALSE,
                         boots = 2000, interval = 0.95, listwise = TRUE,
-                        measures_labels = NULL, parallel = "no", ncpus = 1) {
+                        measures_labels = NULL, parallel = "no", ncpus = 1,
+                        method = "bootstrap") {
 
   # Save function call
   call <- match.call()
@@ -165,6 +187,7 @@ ssm_analyze <- function(data, scales, angles = octants(),
   stopifnot(is_null_or_char(measures_labels, n = length(measures)))
   parallel <- match.arg(parallel, c("no", "multicore", "snow"))
   stopifnot(is.numeric(ncpus) && ncpus >= 1 && ceiling(ncpus) == floor(ncpus))
+  method <- match.arg(method, c("bootstrap", "montecarlo"))
 
   # Coerce matrix input to a data frame so column indexing behaves uniformly
   if (is.matrix(data)) data <- as.data.frame(data)
@@ -214,6 +237,7 @@ ssm_analyze <- function(data, scales, angles = octants(),
       listwise = listwise,
       parallel = parallel,
       ncpus = ncpus,
+      method = method,
       call = call
     )
   } else {
@@ -231,6 +255,7 @@ ssm_analyze <- function(data, scales, angles = octants(),
       measures_labels = measures_labels,
       parallel = parallel,
       ncpus = ncpus,
+      method = method,
       call = call
     )
   }
@@ -240,7 +265,7 @@ ssm_analyze <- function(data, scales, angles = octants(),
 
 ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
                               boots, interval, listwise, parallel, ncpus,
-                              call) {
+                              method, call) {
   
   # Select circumplex scales and grouping variable (if applicable)
   bs_input <- data[scales]
@@ -294,20 +319,32 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
     ssm_by_group(scores_r, angles, contrast)
   }
   
-  # Perform bootstrapping
-  bs_output <- ssm_bootstrap(
-    bs_input = bs_input,
-    bs_function = bs_function,
-    scales = scales_names,
-    angles = angles,
-    boots = boots,
-    interval = interval,
-    contrast = contrast,
-    listwise = listwise,
-    parallel = parallel,
-    ncpus = ncpus,
-    strata = bs_input[[ncol(bs_input)]]
-  )
+  # Estimate confidence intervals with the requested engine
+  bs_output <- if (method == "montecarlo") {
+    ssm_montecarlo(
+      bs_input = bs_input,
+      scales = scales_names,
+      angles = angles,
+      boots = boots,
+      interval = interval,
+      contrast = contrast,
+      listwise = listwise
+    )
+  } else {
+    ssm_bootstrap(
+      bs_input = bs_input,
+      bs_function = bs_function,
+      scales = scales_names,
+      angles = angles,
+      boots = boots,
+      interval = interval,
+      contrast = contrast,
+      listwise = listwise,
+      parallel = parallel,
+      ncpus = ncpus,
+      strata = bs_input[[ncol(bs_input)]]
+    )
+  }
   
   params <- bs_output
   Group <- group_levels
@@ -326,7 +363,8 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
     listwise = listwise,
     angles = as_degree(angles),
     contrast = contrast,
-    score_type = "Mean"
+    score_type = "Mean",
+    method = method
   )
   
   # Create output ssm object
@@ -344,7 +382,8 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
 
 ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
                               contrast, boots, interval, listwise,
-                              measures_labels, parallel, ncpus, call) {
+                              measures_labels, parallel, ncpus, method,
+                              call) {
   
   # Select only the scales, measures, and grouping variables
   scales_data <- data[scales]
@@ -418,21 +457,34 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     ssm_by_group(scores_r, angles, contrast)
   }
   
-  # Perform bootstrapping
-  bs_output <- ssm_bootstrap(
-    bs_input = bs_input,
-    bs_function = bs_function,
-    scales = scales_names,
-    measures = measures_names,
-    angles = angles,
-    boots = boots,
-    interval = interval,
-    contrast = contrast,
-    listwise = listwise,
-    parallel = parallel,
-    ncpus = ncpus,
-    strata = bs_input$Group
-  )
+  # Estimate confidence intervals with the requested engine
+  bs_output <- if (method == "montecarlo") {
+    ssm_montecarlo(
+      bs_input = bs_input,
+      scales = scales_names,
+      measures = measures_names,
+      angles = angles,
+      boots = boots,
+      interval = interval,
+      contrast = contrast,
+      listwise = listwise
+    )
+  } else {
+    ssm_bootstrap(
+      bs_input = bs_input,
+      bs_function = bs_function,
+      scales = scales_names,
+      measures = measures_names,
+      angles = angles,
+      boots = boots,
+      interval = interval,
+      contrast = contrast,
+      listwise = listwise,
+      parallel = parallel,
+      ncpus = ncpus,
+      strata = bs_input$Group
+    )
+  }
   
   Group <- rep(group_levels, each = n_measures)
   Measure <- rep(measures_labels, times = n_groups)
@@ -458,7 +510,8 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     listwise = listwise,
     angles = as_degree(angles),
     contrast = contrast,
-    score_type = "Correlation"
+    score_type = "Correlation",
+    method = method
   )
   
   # Create output ssm object

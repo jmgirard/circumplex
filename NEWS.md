@@ -1,5 +1,16 @@
 # circumplex (development version)
 
+* `ssm_analyze()` gains a `method` argument offering a Monte Carlo alternative
+  to the bootstrap (`method = "montecarlo"`): SSM parameter replicates are
+  drawn from the asymptotic sampling distribution of the group mean vector or
+  measure-scale correlation vector (a multivariate normal with empirically
+  estimated covariance; correlations are drawn jointly across measures on the
+  Fisher z scale) and propagated through the SSM transformation. It produces
+  intervals closely matching the bootstrap on large samples while running in a
+  fraction of the time, but relies on asymptotic normality and requires
+  listwise-complete data, so the bootstrap remains the default and the
+  recommended choice for small samples. `summary()` reports which method
+  produced the intervals.
 * `ssm_analyze()` gains `parallel` and `ncpus` arguments (passed to
   `boot::boot()`) to distribute the bootstrap computation across multiple CPU
   cores. Because the resample indices are drawn in the main R process before

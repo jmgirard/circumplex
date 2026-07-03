@@ -23,9 +23,26 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
       ...
     )
 
-  # Extract point estimates from bootstrap results -----------------------------
-  bs_est <- reshape_params(bs_results$t0, suffix = "est")
-  bs_t <- as.data.frame(bs_results$t)
+  ssm_replicate_intervals(
+    t0 = bs_results$t0,
+    t = bs_results$t,
+    interval = interval,
+    contrast = contrast,
+    replicate_label = "bootstrap resamples"
+  )
+}
+
+# Turn a matrix of SSM parameter replicates into estimates and intervals ------
+# Shared interval-assembly back end for the bootstrap and Monte Carlo engines:
+# t0 is the observed parameter vector (6 per group, in ssm_param_names() order,
+# displacement in radians) and t is the replicate matrix with one row per
+# resample/draw and the same columns as t0.
+ssm_replicate_intervals <- function(t0, t, interval, contrast,
+                                    replicate_label) {
+
+  # Extract point estimates from the observed parameter vector ----------------
+  bs_est <- reshape_params(t0, suffix = "est")
+  bs_t <- as.data.frame(t)
   # Name every replicate column by its parameter and group, so displacement
   # columns can be located by name below instead of by positional arithmetic.
   pnames <- ssm_param_names()
@@ -48,7 +65,7 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
   n_bad <- sum(!stats::complete.cases(bs_t))
   if (n_bad > 0) {
     warning(
-      n_bad, " of ", nrow(bs_t), " bootstrap resamples produced degenerate ",
+      n_bad, " of ", nrow(bs_t), " ", replicate_label, " produced degenerate ",
       "(flat or zero-amplitude) profiles and were excluded from the ",
       "confidence intervals, which are therefore conditional on estimability.",
       call. = FALSE

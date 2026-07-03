@@ -172,10 +172,15 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
 #' @method summary circumplex_ssm
 #' @export
 summary.circumplex_ssm <- function(object, digits = 3, ...) {
-  # Print analysis details
+  # Print analysis details (objects predating the method option are bootstrap)
+  replicate_label <- if (identical(object$details$method, "montecarlo")) {
+    "\nMonte Carlo Draws:\t"
+  } else {
+    "\nBootstrap Resamples:\t"
+  }
   cat(
     "\nStatistical Basis:\t", object$details$score_type, "Scores",
-    "\nBootstrap Resamples:\t", object$details$boots,
+    replicate_label, object$details$boots,
     "\nConfidence Level:\t", object$details$interval,
     "\nListwise Deletion:\t", object$details$listwise,
     "\nScale Displacements:\t", as.numeric(object$details$angles),

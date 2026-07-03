@@ -15,7 +15,7 @@ run `/release-checklist` once.
 - ~~**BCa confidence intervals**~~ **DROPPED 2026-07-02** — see log entry and
   ROADMAP.md; amplitude-coverage question folded into M4's CI-trustworthiness
   diagnostic.
-- [ ] **Monte Carlo alternative to bootstrapping**: sample SSM parameters from
+- [x] **Monte Carlo alternative to bootstrapping**: sample SSM parameters from
   the asymptotic sampling distribution of the mean vector / correlation
   vector (multivariate normal with estimated covariance), propagate through
   the parameter transformation. Validate against bootstrap results on
@@ -106,6 +106,34 @@ run `/release-checklist` once.
   that question moved to M4's ssm_ci_accuracy diagnostic (ROADMAP.md updated
   both ends). Monte Carlo task remains as the independent cross-check on
   percentile CIs. (MILESTONES.md, ROADMAP.md).
+- 2026-07-02 — Monte Carlo engine (Fable): `ssm_analyze(method = "montecarlo")`.
+  Design decisions, each validated: (1) EMPIRICAL influence-function covariance
+  for correlations (psi_i = z_x z_y − (r/2)(z_x²+z_y²), acov = crossprod(psi)/n²)
+  instead of normal-theory Pearson–Filon — on non-normal simulated data psi
+  tracks direct simulation at max err .022 (n·acov units) where PF errs .39
+  (17x worse); matters because jz2017 measures are skewed counts. Verified psi
+  ≡ PF on MVN data (.003) and var(r) ≡ (1−ρ²)². (2) JOINT draws across measures
+  within group (they share the sample): measure-contrast e-CI width — bootstrap
+  .0741, MC joint .0759, independent draws would be .098 (32% too wide; the
+  main trap of this task). (3) Fisher-z sampling for correlations (delta-method
+  cov, tanh back-transform) — keeps draws in (−1,1). (4) PSD-safe eigen-based
+  MVN sampler (ipsatized/singular covariance tested). (5) Scope: MC + missing
+  data requires listwise (informative error); n_g ≥ 2 required; |r| = 1 errors.
+  Reuse: extracted ssm_replicate_intervals() from ssm_bootstrap() (behavior-
+  preserving; label param keeps bootstrap warning byte-identical) so MC shares
+  the validated circular-quantile/branch/degenerate machinery; propagation via
+  vectorized group_parameters(). t0 computed identically to boot's ⇒ point
+  estimates byte-equal. Validation: MC ≡ bootstrap CIs on jz2017 (means, corr
+  + measure contrast, group contrast; all endpoints within 15% of interval
+  width, encoded as tests); MC e/x CIs ≡ closed-form analytic normal-theory
+  CIs (<2% of width); rotation equivariance; 0/360 straddle; contrast branch
+  harmony at ±180 (est inside CI); flat data → NA + count warning via shared
+  machinery. details$method recorded; summary() label conditional ("Monte
+  Carlo Draws"), old objects default to bootstrap label. Suite 499/499; check
+  0/0/0; seeded pins untouched (default engine unchanged). NEWS.md added.
+  (R/ssm_montecarlo.R [new], R/ssm_bootstrap.R, R/ssm_analysis.R, R/ssm_oop.R,
+  man/ssm_analyze.Rd, tests/testthat/test-ssm_montecarlo.R [new], NEWS.md,
+  MILESTONES.md).
 
 # Completed milestones
 
