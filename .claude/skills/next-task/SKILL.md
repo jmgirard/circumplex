@@ -59,3 +59,8 @@ invocation unless the user names several.
   statistics changed, and that needs explicit justification in the report.
 - If acceptance criteria turn out to be wrong or incomplete, update
   MILESTONES.md to say what was actually done and why.
+- **Task status lives only in MILESTONES.md.** ROADMAP.md carries direction and
+  milestone-level status; never add or check task-level boxes there, and don't
+  copy acceptance criteria or logs into it. If a task reveals new work that is
+  out of scope for the active milestone, record it under the appropriate
+  ROADMAP milestone as a plain bullet (a future intention), not a checkbox.

@@ -23,9 +23,13 @@ outcome. Never submit to CRAN yourself — prepare everything and hand the final
       individually justified in cran-comments.md.
 - [ ] Run `/statistical-validation` if any estimation code changed since the
       last release.
-- [ ] Suggest to the user: `/code-review ultra` on the release diff, and
-      win-builder / R-devel via `devtools::check_win_devel()` (results arrive
-      by email to the maintainer address).
+- [ ] Suggest to the user a deep review of the release diff: **`/code-review high`**
+      by default, or **`/code-review max`** for a large or statistically risky
+      release (e.g. the M4 CircE work). Both run locally. Only mention the
+      billed cloud `/code-review ultra` if the user asks for the deepest possible
+      pass on a flagship release — it is expensive; do not default to it. Also
+      suggest win-builder / R-devel via `devtools::check_win_devel()` (results
+      arrive by email to the maintainer address).
 - [ ] Reverse dependencies: check CRAN for revdeps
       (`tools::package_dependencies("circumplex", reverse = TRUE)`); if any,
       run revdepcheck or justify skipping.
@@ -49,7 +53,11 @@ outcome. Never submit to CRAN yourself — prepare everything and hand the final
 
 - [ ] Git tag `vX.Y.Z`; delete `CRAN-SUBMISSION` if present.
 - [ ] Bump DESCRIPTION to X.Y.Z.9000; add new development heading to NEWS.md.
-- [ ] Move the finished milestone to MILESTONES.md "Completed" section;
-      promote the next ROADMAP milestone into the active slot.
+- [ ] Move the finished milestone (its task list + full log) from MILESTONES.md
+      to the top of MILESTONES-ARCHIVE.md (newest first). Update that
+      milestone's ROADMAP.md **Status:** line to "shipped in vX.Y.Z". Then
+      promote the next ROADMAP milestone into MILESTONES.md's active slot
+      (copy its scope, expand into tasks with acceptance criteria, start a
+      fresh log) so MILESTONES.md again holds exactly one active milestone.
 - [ ] Rebuild pkgdown site if not automated (`pkgdown` GitHub Action handles
       it on push).

@@ -54,5 +54,7 @@ package. Run it from a throwaway R script (scratchpad), not from tests.
 State pass/fail per check with the observed max discrepancy. Any failure
 blocks the change until explained: either the new code is wrong, or the
 reference comparison is invalid — say which and why. If a check reveals a
-pre-existing (not newly introduced) defect, record it in MILESTONES.md or
-ROADMAP.md instead of silently fixing it in passing.
+pre-existing (not newly introduced) defect, record it instead of silently
+fixing it in passing: as a task in MILESTONES.md if it belongs to the active
+milestone, otherwise as a plain bullet under the appropriate ROADMAP.md
+milestone (a future intention, not a checkbox).

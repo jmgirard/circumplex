@@ -1,11 +1,16 @@
 # circumplex Roadmap
 
-> **Status: PROPOSAL** — drafted 2026-07-02 from a full audit of the package
-> (v1.1.0.9000); revised same day to add the CI-trustworthiness diagnostic,
-> the ggplot2 extension milestone, and refactor targets. Sequencing and scope
-> are open to revision. Each milestone is intended to be a releasable unit:
-> correctness first, then inference quality, then new capabilities in order
-> of increasing scope.
+> **Forward direction across releases.** Drafted 2026-07-02 from a full audit
+> of the package (v1.1.0.9000). M1–M3 are done (M1 shipped v1.2.0; M2+M3 bundled
+> for v1.3.0); M4–M6 remain planned and their sequencing/scope are open to
+> revision. Each milestone is a releasable unit: correctness first, then
+> inference quality, then new capabilities in order of increasing scope.
+>
+> **This file carries direction and milestone-level status only.** Task-level
+> status (checkboxes, acceptance criteria, per-task logs) lives in MILESTONES.md
+> for the active milestone and MILESTONES-ARCHIVE.md for finished ones — never
+> duplicate task checkboxes here. Per-submission version numbers are decided by
+> the CRAN release strategy below, not by per-milestone tags.
 
 ## Guiding principles
 
@@ -55,7 +60,8 @@ lets us keep shipping to GitHub continuously while spacing CRAN submissions.
   flexible, composable plots + new visualization vignette" release. Caveat:
   both touch fragile internals (do the named-column results-assembly refactor
   before M2), so the bundle has a larger check/review surface — budget a
-  `/code-review ultra` pass accordingly.
+  `/code-review max` pass accordingly (the deepest local review; reserve the
+  billed cloud `/code-review ultra` for a flagship release like M4).
 - **Tier 4 — naturally their own releases; cadence is moot. M5** (SEM) and
   **M6** (longitudinal, v2.0.0) are large and far enough out that no bundling
   decision is needed now.
@@ -73,145 +79,52 @@ cadence rule. It is *feature* releases that must be spaced out.
 
 ---
 
-## Milestone 1 — Correctness & robustness patch (target: v1.2.0)
+## Milestone 1 — Correctness & robustness patch
 
-Fixes for issues found in the 2026-07 audit. Small, high-value, low-risk.
-Task-level breakdown with acceptance criteria lives in MILESTONES.md.
-
-### Bugs (each fix ships with a regression test)
-
-- [ ] **`ssm_score()` ignores its `angles` argument.** `apply(..., FUN =
-      ssm_parameters, ...)` never forwards `angles`, so custom angles of
-      matching length produce silently wrong results (verified: rotated angles
-      return octant-based estimates); mismatched lengths error confusingly.
-      (`R/ssm_analysis.R:508-532`)
-- [ ] **`is_null_or_char()` discards its `n` argument** (passes `n = NULL`
-      through), so `measures_labels` length is never validated in
-      `ssm_analyze()`. (`R/utils.R:145-147`)
-- [ ] **NA in `grouping` with `listwise = FALSE`** crashes with cryptic
-      Armadillo error `unique(): detected NaN`. Drop NA-group rows with an
-      informative message in both deletion modes. (`R/ssm_analysis.R`,
-      `src/parameters.cpp`)
-- [ ] **Degenerate (flat) profiles**: zero-variance scores return `Fit = -Inf`
-      and a numerical-noise displacement with no warning; near-zero amplitude
-      likewise yields an uninterpretable displacement. Return `NA` for
-      displacement/fit with a warning. (`src/parameters.cpp:23-34`)
-- [ ] **`norm_standardize()` angle matching** uses exact float equality against
-      the norm table's `Angle` column; passing 0° where norms store 360° fails
-      with `replacement has length zero`. Match scales by name/position or
-      normalize angles mod 360 before matching, and error informatively.
-      (`R/tidying_functions.R:181-186`)
-- [ ] **Contrast displacement near ±180°**: point estimate (signed angular
-      distance in (-180°, 180°]) and CI (circular-mean-centered quantiles) can
-      disagree in convention at the boundary. Harmonize by re-centering the
-      reported estimate to the CI's branch (or vice versa) and add tests at
-      ±180°.
-
-### Guardrails & UX
-
-- [ ] Warn (in `print`/`summary`) when displacement/amplitude are being
-      interpreted for a profile with inadequate fit (< .70) or an amplitude CI
-      that includes 0, per Zimmermann & Wright (2017) guidance.
-- [ ] Decide and document the boundary display convention: displacement of a
-      profile peaking at 0°/360° currently prints as 360.0. Either is
-      defensible; state it in `?ssm_analyze` and the intro vignette.
-- [ ] Replace `stopifnot(class(x) == "circumplex_ssm")` with `inherits()`
-      throughout; validate or drop the advertised-but-broken `matrix` input
-      support (`data[scales]` fails for matrices).
-- [ ] Consider warning on unused `...` arguments in plotting functions (a typo
-      like `angle_lables=` is currently swallowed silently).
-
-### Documentation corrections
-
-- [ ] Remove references to the deleted `ssm_plot()`: intermediate vignette §5
-      code block, introduction vignette §4 prose.
-- [ ] Fix `ssm_plot_curve()` example typo `angle_lables` → `angle_labels`.
-- [ ] `instruments()` says "14 instruments" but lists 15.
-- [ ] Document contrast direction (second minus first factor level, levels
-      sorted alphabetically unless the variable is a factor) in `?ssm_analyze`,
-      not just the vignette.
-- [ ] Document that the closed-form SSM estimator equals OLS only for equally
-      spaced angles; with unequal spacing it remains the conventional Gurtman
-      estimator but is not least-squares optimal (verified numerically:
-      disp 49.5° vs OLS 44.7° in a test case).
-- [ ] Intro vignette: rephrase "displacement significantly different from
-      zero" — a displacement CI excluding 0° is not a meaningful hypothesis
-      test for an angle.
-- [ ] Delete stale `CRAN-SUBMISSION` file (`.Rbuildignore` already updated).
-- [ ] NEWS.md cleanup: remove duplicated `# circumplex 1.1.0` heading; skim
-      for similar artifacts.
+**Status: shipped in v1.2.0** (CRAN-approved 2026-07-02). Fixes for the
+2026-07 audit: six correctness bugs (`ssm_score()` `angles` forwarding,
+`is_null_or_char()` length validation, NA-grouping crash, degenerate-profile
+NA handling, `norm_standardize()` angle matching, contrast branch harmony near
+±180°), guardrails (low-fit / zero-amplitude interpretation notes, `inherits()`
+cleanup, matrix input, unused-`...` warnings), and documentation corrections.
+Full task list, acceptance criteria, and log: **MILESTONES-ARCHIVE.md**.
 
 ---
 
-## Milestone 2 — Inference quality (target: v1.3.0)
+## Milestone 2 — Inference quality
 
-Upgrades to the existing bootstrap machinery; no new statistical scope.
+**Status: complete on GitHub** (bundled with M3 into the v1.3.0 CRAN
+submission). Parallel bootstrapping (`parallel`/`ncpus` on `ssm_analyze()`),
+a Monte Carlo alternative to the bootstrap, vectorized `ssm_score()`, and
+seed/reproducibility documentation. **BCa CIs were dropped** — undefined for
+circular displacement (bias-correction/acceleration are order-statistic
+concepts needing a line, not a circle); the one real beneficiary (amplitude
+coverage near zero) moved to M4's CI-trustworthiness diagnostic. Full task
+list and rationale: **MILESTONES-ARCHIVE.md**.
 
-- [ ] **Parallel bootstrapping** via `boot`'s built-in `parallel`/`ncpus`
-      arguments, exposed through `ssm_analyze()`.
-- ~~**BCa confidence intervals**~~ **DROPPED 2026-07-02** (decision with
-      Jeff): BCa cannot apply to circular displacement (its bias-correction
-      and acceleration terms are order-statistic concepts that need a line,
-      not a circle), so the option would be permanently mixed-method
-      per-parameter — a standing communication burden in every table, plot,
-      and user methods section, against field convention (Z&W 2017 =
-      percentile), with real implementation risk (boot.ci handles neither our
-      circular quantiles nor NA-filtered degenerate resamples). The one
-      genuine beneficiary (amplitude: nonnegative, upward-biased, skewed near
-      zero) is instead folded into M4's CI-trustworthiness diagnostic, and the
-      Monte Carlo task below already provides an independent cross-check on
-      percentile CIs. Full rationale in MILESTONES.md log.
-- [ ] **Monte Carlo alternative to bootstrapping**: sample SSM parameters from
-      the asymptotic sampling distribution of the mean vector / correlation
-      vector (multivariate normal with estimated covariance), propagate through
-      the parameter transformation. Much faster for large n, enables analytic
-      sensitivity checks. Validate against bootstrap results on `jz2017`.
-- [ ] **Vectorize `ssm_score()`** (currently row-wise `apply` + `rbind` of
-      data frames): elevation/x/y are single matrix products; amplitude,
-      displacement, and fit follow element-wise. Orders-of-magnitude faster on
-      large data.
-- [ ] Seed/reproducibility documentation for all resampling paths.
+## Milestone 3 — Visualization layer: ggplot2 circumplex extension
 
-## Milestone 3 — Visualization layer: ggplot2 circumplex extension (target: v1.4.0)
+**Status: complete on GitHub** (the active milestone in MILESTONES.md until the
+v1.3.0 submission ships; bundled with M2). Promoted the internal plotting code
+to a public ggplot2 extension: exported `ggcircumplex()` canvas, polar-native
+geoms (`geom_ssm_point()` / `geom_ssm_arc()`), `scale_x_circumplex()`, the three
+`ssm_plot_*()` functions refactored onto it (behavior unchanged, vdiffr
+snapshots byte-identical), an "Advanced Circumplex Visualization" vignette, and
+a design review recorded in DESIGN.md. Deliberately sequenced *before* the
+fit-statistics/SEM/longitudinal milestones, whose new visualizations build on
+this layer. Full task detail, acceptance criteria, and log: **MILESTONES.md**.
 
-Turn the internal, single-purpose plotting code into a public ggplot2
-extension so users (and later milestones) can compose arbitrary layers in
-circumplex space instead of rebuilding the circular canvas from scratch.
-Deliberately sequenced *before* the fit-statistics/SEM/longitudinal
-milestones, whose new visualizations should be built on it.
+## Milestone 4 — Circumplex fit & structure statistics
 
-- [ ] **Public circular canvas**: promote `circle_base()` to an exported,
-      documented API — e.g., `ggcircumplex()` constructor and/or
-      `annotation_circumplex()` (rings, spokes, scale labels, amplitude
-      gridlines), with instrument-aware labeling from
-      `circumplex_instrument` objects.
-- [ ] **Polar-native geoms/stats** (ggproto): `geom_ssm_point()` /
-      `geom_ssm_arc()` (or a `stat_ssm()`) that accept amplitude/displacement
-      aesthetics directly and handle the degree→canvas transform, wrap-around
-      arcs, and amplitude rescaling that `ssm_plot_circle()` currently does
-      inline.
-- [ ] **Scales**: `scale_*_circumplex()` helpers for angle-labeled axes and
-      amplitude gridlines; sensible defaults matching current appearance.
-- [ ] **Refactor existing plots onto the extension** (`ssm_plot_circle()`,
-      `ssm_plot_curve()`, `ssm_plot_contrast()` unchanged in behavior —
-      vdiffr snapshots must stay stable or changes justified).
-- [ ] **Vignette: "Advanced Circumplex Visualization"** — the long-promised
-      third vignette (the intermediate vignette already announces it);
-      demonstrates composing raw data, SSM results, and annotations.
-- [ ] Design review against ggplot2 extension best practices (ggproto
-      lifecycle, `after_stat`, theme integration); keep ggforce dependency if
-      it simplifies arcs.
-
-## Milestone 4 — Circumplex fit & structure statistics (target: v1.5.0)
-
+**Status: planned** (flagship; its own CRAN slot — see the release strategy).
 Revive and modernize the drafts in `devel/fit_analysis.R` / `devel/fit_oop.R`
 (currently written in superseded tidyverse-heavy style with a `psych`
 dependency decision pending).
 
-- [ ] Fisher test of equal axes (draft exists).
-- [ ] Gap test of equal spacing (draft exists).
-- [ ] Variance test of equal communalities / interstitiality indices.
-- [ ] **Browne's (1992) stochastic process model — native reimplementation
+- Fisher test of equal axes (draft exists).
+- Gap test of equal spacing (draft exists).
+- Variance test of equal communalities / interstitiality indices.
+- **Browne's (1992) stochastic process model — native reimplementation
       (CircE replacement).** CircE (Grassi, Luccio, & Di Blas, 2010) is
       archived on CRAN, leaving R users without an estimator for Browne's
       model. Implement estimation of the circular stochastic process model
@@ -220,7 +133,7 @@ dependency decision pending).
       discrepancy function). Decide backend: native optimization vs. OpenMx/
       lavaan. Validate against published CircE/CIRCUM output. This is the
       anchor feature of the milestone.
-- [ ] **SSM CI trustworthiness diagnostic (Zimmermann & Wright, 2017).**
+- **SSM CI trustworthiness diagnostic (Zimmermann & Wright, 2017).**
       Z&W's simulation studies show bootstrap SSM CI accuracy depends on
       sample size and the population circumplex structure; they used Browne-
       model estimates to characterize that structure. Reimplement as a
@@ -236,38 +149,39 @@ dependency decision pending).
       amplitude near zero (nonnegative, upward-biased, skewed — the one SSM
       parameter where percentile intervals are theoretically weakest), since
       the amplitude CI drives the "displacement not interpretable" guardrail.*
-- [ ] `ssm_fit()`-style API returning a typed object with `print`/`summary`/
+- `ssm_fit()`-style API returning a typed object with `print`/`summary`/
       `plot` methods, consistent with `circumplex_ssm` (plots built on the M3
       extension).
-- [ ] New vignette: "Evaluating Circumplex Structure" (fit statistics, CI
+- New vignette: "Evaluating Circumplex Structure" (fit statistics, CI
       trustworthiness, when to trust SSM parameters, ipsatization guidance).
 
-## Milestone 5 — SEM-based SSM (target: v1.6.0)
+## Milestone 5 — SEM-based SSM
 
-Builds on the lavaan explorations in `devel/lavaan_ssm.Rmd` and
-`devel/circum_lavaan.Rmd`.
+**Status: planned.** Builds on the lavaan explorations in `devel/lavaan_ssm.Rmd`
+and `devel/circum_lavaan.Rmd`.
 
-- [ ] Latent-variable SSM: estimate SSM parameters from a lavaan measurement
+- Latent-variable SSM: estimate SSM parameters from a lavaan measurement
       model (disattenuated correlations), with delta-method or bootstrap CIs.
-- [ ] Multi-group SEM contrasts (invariance-constrained comparisons as a more
+- Multi-group SEM contrasts (invariance-constrained comparisons as a more
       principled alternative to bootstrap group contrasts).
-- [ ] Tooling to generate lavaan syntax for circumplex measurement models from
+- Tooling to generate lavaan syntax for circumplex measurement models from
       `circumplex_instrument` objects.
-- [ ] `lavaan` moves to `Suggests`; features degrade gracefully without it.
-- [ ] Vignette: "SEM-based SSM Analysis" (adapt `devel/lavaan_ssm.Rmd`).
+- `lavaan` moves to `Suggests`; features degrade gracefully without it.
+- Vignette: "SEM-based SSM Analysis" (adapt `devel/lavaan_ssm.Rmd`).
 
-## Milestone 6 — Longitudinal & intraindividual SSM (target: v2.0.0)
+## Milestone 6 — Longitudinal & intraindividual SSM
 
-The largest extension; benefits from Milestones 2–5 (fast estimation, the
-visualization layer, fit diagnostics, SEM infrastructure).
+**Status: planned** (v2.0.0-scale). The largest extension; benefits from
+Milestones 2–5 (fast estimation, the visualization layer, fit diagnostics, SEM
+infrastructure).
 
-- [ ] Repeated-measures SSM: parameter trajectories over time (growth models
+- Repeated-measures SSM: parameter trajectories over time (growth models
       on e/a/d, with circular handling for d).
-- [ ] Intraindividual SSM: per-person parameters from intensive longitudinal
+- Intraindividual SSM: per-person parameters from intensive longitudinal
       data (builds on vectorized `ssm_score()`), with multilevel summaries.
-- [ ] Contrasts across timepoints (paired/dependent resampling — the current
+- Contrasts across timepoints (paired/dependent resampling — the current
       bootstrap assumes independent groups).
-- [ ] Optional Bayesian estimation (revisit `devel/bayesian_ssm.Rmd`; likely
+- Optional Bayesian estimation (revisit `devel/bayesian_ssm.Rmd`; likely
       a separate companion package if it drags in Stan).
 
 ## Continuous / infrastructure track (any release)
@@ -276,12 +190,10 @@ Targeted refactors — the 2026-07 audit's verdict is that these are worthwhile
 but none block feature work; fold each into whichever milestone first touches
 the relevant code:
 
-- **Named, long-format internal results assembly.** `ssm_bootstrap()`
-  identifies displacement columns by positional arithmetic
-  (`d_vars <- 1:(ncol/6)*6 - 1`) and `reshape_params()` assumes a fixed
-  6-parameter block; fragile the moment a parameter is added. Replace with
-  named columns / one-row-per-parameter internal format. (Do before M2's
-  interval work, which touches exactly this code.)
+- ~~**Named, long-format internal results assembly.**~~ **Done in M2** —
+  positional column arithmetic (`d_vars <- 1:(ncol/6)*6 - 1`, fixed 6-parameter
+  block) replaced with name-driven assembly via `ssm_param_names()`; done first
+  so the interval work could build on it. (See MILESTONES-ARCHIVE.md.)
 - **Deduplicate Group/Measure/Label construction** — the same block is built
   twice each in `ssm_analyze_means()`/`ssm_analyze_corrs()`; extract one
   helper. (Do with M1 or M2.)

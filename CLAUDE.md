@@ -30,10 +30,14 @@ concerns; angular/boundary behavior is where bugs hide.
 
 ## Workflow
 
-Memory files: `ROADMAP.md` (multi-release direction), `MILESTONES.md` (active
-milestone: tasks, acceptance criteria, running log), `DESIGN.md` (architecture,
-conventions, decision rationale). Read MILESTONES.md before starting work;
-append to its log after finishing anything.
+Memory files: `ROADMAP.md` (multi-release direction and milestone-level status
+*only* — no task checkboxes; versioning lives in its CRAN release-strategy
+section), `MILESTONES.md` (the single active milestone: tasks, acceptance
+criteria, running log — the sole owner of task-level status), `DESIGN.md`
+(architecture, conventions, decision rationale), `MILESTONES-ARCHIVE.md`
+(finished milestones with their logs, moved out of MILESTONES.md on release so
+it stays cheap to re-read). Read MILESTONES.md before starting work; append to
+its log after finishing anything. Do not duplicate task status into ROADMAP.md.
 
 Process for each unit of work — follow this loop, don't freestyle:
 
@@ -44,8 +48,10 @@ Process for each unit of work — follow this loop, don't freestyle:
    before the fix).
 3. **Validate**: if the change touches estimation code (`ssm_*` statistics,
    `src/`), run `/statistical-validation`.
-4. **Review**: `/code-review` before committing; `/code-review ultra` before
-   CRAN releases.
+4. **Review**: `/code-review` before committing; `/code-review high` (or `max`
+   for a large or statistically risky release) before CRAN releases. The billed
+   cloud `/code-review ultra` is reserved for a flagship release and only when
+   the user asks for it — do not default to it.
 5. **Log**: check the box and append one line to the MILESTONES.md log
    (date, what, files). Update NEWS.md for user-facing changes.
 
