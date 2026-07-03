@@ -1,5 +1,11 @@
 # circumplex (development version)
 
+* New `ggcircumplex()` function builds an empty circumplex plotting canvas
+  (amplitude rings, displacement spokes, and scale labels) as a ggplot2
+  object that you can add layers to with `+`. It accepts a set of scale
+  `angles` and `labels`, or a `circumplex_instrument` object to derive both
+  automatically. This is the first piece of a public circumplex visualization
+  layer; the package's own `ssm_plot_circle()` draws on the same canvas.
 * `ssm_analyze()` gains a `method` argument offering a Monte Carlo alternative
   to the bootstrap (`method = "montecarlo"`): SSM parameter replicates are
   drawn from the asymptotic sampling distribution of the group mean vector or

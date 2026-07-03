@@ -29,7 +29,7 @@ Cross-cutting guardrails for every task below:
 
 ### Tasks
 
-- [ ] **V1. Public circular canvas.** Promote `circle_base()`
+- [x] **V1. Public circular canvas.** Promote `circle_base()`
   (`R/ssm_plot.R:469`) to an exported, documented API: a `ggcircumplex()`
   constructor and/or `annotation_circumplex()` (rings, spokes, scale labels,
   amplitude gridlines), with instrument-aware labeling from
@@ -80,7 +80,26 @@ Cross-cutting guardrails for every task below:
 
 ## Log
 
-(none yet)
+- 2026-07-02 — V1 Public circular canvas (Opus): exported `ggcircumplex()`,
+  a documented ggplot2 canvas constructor, as a thin public wrapper over the
+  existing internal `circle_base()` (left untouched, so all 11 existing
+  ssm_plot vdiffr snapshots are structurally unable to regress — verified: git
+  shows only the two NEW ggcircumplex snapshots added, no existing snap
+  modified). Signature `ggcircumplex(angles, labels, amin, amax, font_size,
+  instrument)`; when an `instrument` is supplied it derives angles from
+  `Scales$Angle` and defaults labels to `Scales$Abbrev` (validated:
+  ggplot_build data of the instrument path == the explicit angles+labels path,
+  device-independent; LM=360 scale labels correctly). Deferred
+  `annotation_circumplex()` to V2 where the ggproto layer machinery is built
+  (a half-baked annotation now would be worse than focused). Dropped a
+  would-be single-member `@family`; used `@seealso ssm_plot_circle()` instead.
+  Validation via is_* helpers (labels length, is_instrument, scalar numerics).
+  Test-first (failed on missing function); one self-inflicted test bug fixed
+  mid-task (duplicate vdiffr snapshot name → replaced the second render with a
+  ggplot_build data-equality assertion). Suite 509/509; check 0/0/0. NEWS.md
+  added. (R/ssm_plot.R, man/ggcircumplex.Rd, NAMESPACE,
+  tests/testthat/test-ssm_plot.R, tests/testthat/_snaps/ssm_plot/*.svg [new],
+  NEWS.md, MILESTONES.md).
 
 # Completed milestones
 

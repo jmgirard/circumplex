@@ -465,6 +465,68 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
   p
 }
 
+#' Create a circumplex plotting canvas
+#'
+#' Build an empty circular canvas -- the amplitude rings, displacement spokes,
+#' and scale labels that circumplex figures are drawn on -- as a \pkg{ggplot2}
+#' object. Additional layers (points, arcs, annotations) can be added to it
+#' with `+`, so it serves as the reusable foundation for custom circumplex
+#' visualizations. The package's own `ssm_plot_circle()` draws on the same
+#' canvas.
+#'
+#' @param angles Optional. A numeric vector of the angular position (in
+#'   degrees) of each circumplex scale, going counterclockwise from the right
+#'   (default = `octants()`). Ignored if `instrument` is supplied.
+#' @param labels Optional. Either `NULL` or a character vector of text labels
+#'   to draw around the circle, one per angle and in the same order (default =
+#'   `NULL`, which draws the numeric angles). If `instrument` is supplied,
+#'   `NULL` uses the instrument's scale abbreviations.
+#' @param amin Optional. A single number giving the amplitude at the center of
+#'   the circle (default = 0).
+#' @param amax Optional. A single positive number giving the amplitude at the
+#'   outer ring, which sets the amplitude-axis labels (default = 0.5).
+#' @param font_size Optional. A single positive number giving the size (in pt)
+#'   of the scale and amplitude labels (default = 12).
+#' @param instrument Optional. Either `NULL` or a `circumplex_instrument`
+#'   object (see `instrument()`). When supplied, the scale `angles` and (unless
+#'   `labels` is given) the scale abbreviations are taken from the instrument
+#'   (default = `NULL`).
+#' @return A \pkg{ggplot2} object containing the empty circumplex canvas.
+#' @seealso [ssm_plot_circle()], which draws SSM results on this canvas.
+#' @export
+#' @examples
+#' # A default octant canvas
+#' ggcircumplex()
+#'
+#' # Label the scales with their circumplex pole abbreviations
+#' ggcircumplex(octants(), labels = PANO())
+#'
+#' # Derive the angles and labels from a circumplex instrument
+#' ggcircumplex(instrument = csip)
+ggcircumplex <- function(angles = octants(), labels = NULL, amin = 0,
+                         amax = 0.5, font_size = 12, instrument = NULL) {
+
+  if (!is.null(instrument)) {
+    stopifnot(is_instrument(instrument))
+    angles <- instrument$Scales$Angle
+    if (is.null(labels)) labels <- instrument$Scales$Abbrev
+  }
+
+  stopifnot(is_num(angles))
+  stopifnot(is_null_or_char(labels, n = length(angles)))
+  stopifnot(is_num(amin, n = 1))
+  stopifnot(is_num(amax, n = 1) && amax > 0)
+  stopifnot(is_num(font_size, n = 1) && font_size > 0)
+
+  circle_base(
+    angles = as.integer(round(angles)),
+    labels = labels,
+    amin = amin,
+    amax = amax,
+    fontsize = font_size
+  )
+}
+
 # Create an Empty Circular Plot
 circle_base <- function(angles, labels = NULL, amin = 0,
                         amax = 0.5, fontsize = 12) {

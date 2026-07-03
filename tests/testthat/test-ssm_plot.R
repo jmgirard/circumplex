@@ -95,6 +95,47 @@ test_that("things are working at 0/360", {
   vdiffr::expect_doppelganger("cross-zero circle", p)
 })
 
+test_that("ggcircumplex() builds a public circular canvas", {
+  p <- ggcircumplex(octants())
+  expect_true(ggplot2::is_ggplot(p))
+  vdiffr::expect_doppelganger("ggcircumplex octant canvas", p)
+})
+
+test_that("ggcircumplex() derives angles and labels from an instrument", {
+  data("csip")
+
+  # Instrument input must resolve to the same canvas as passing that
+  # instrument's angles and abbreviations explicitly (proves instrument-aware
+  # labeling, including the LM = 360 scale). Compare the built plot data rather
+  # than rendering twice, so the equivalence is exact and device-independent.
+  p_inst <- ggcircumplex(instrument = csip)
+  p_expl <- ggcircumplex(
+    angles = csip$Scales$Angle,
+    labels = csip$Scales$Abbrev
+  )
+  expect_true(ggplot2::is_ggplot(p_inst))
+  expect_equal(
+    ggplot2::ggplot_build(p_inst)$data,
+    ggplot2::ggplot_build(p_expl)$data
+  )
+  vdiffr::expect_doppelganger("ggcircumplex instrument canvas", p_inst)
+
+  # An explicit labels argument still overrides the instrument's abbreviations
+  p_override <- ggcircumplex(instrument = csip, labels = LETTERS[1:8])
+  expect_true(ggplot2::is_ggplot(p_override))
+})
+
+test_that("ggcircumplex() validates its arguments", {
+  data("csip")
+  # labels must match the number of angles
+  expect_error(ggcircumplex(octants(), labels = c("A", "B")))
+  # instrument must be an actual instrument object
+  expect_error(ggcircumplex(instrument = mtcars))
+  # scalar numeric requirements
+  expect_error(ggcircumplex(octants(), amax = c(0.5, 1)))
+  expect_error(ggcircumplex(octants(), font_size = "big"))
+})
+
 test_that("plot functions warn about unrecognized arguments", {
   data("aw2009")
   set.seed(1)
