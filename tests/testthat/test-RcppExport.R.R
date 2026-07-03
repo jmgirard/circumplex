@@ -65,3 +65,14 @@ test_that("Angluar deviation from mean is correct", {
   ad <- angle_dev(angles, angle_mean(angles))
   expect_equal(round(ad, 3), 1.178)
 })
+
+test_that("Angular median of all-NA or empty input is NA, not 0 (F5)", {
+  # F5 (Brief C audit): when every input is NA (or the input is empty), the
+  # post-NA-strip vector has no elements, so there is no candidate median;
+  # angle_median() must return NA_real_ rather than the stale default-
+  # initialized {0.0} candidate (which silently returned angle_mean(0) = 0).
+  amdn <- angle_median(c(NA_real_))
+  expect_true(is.na(amdn))
+  amdn <- angle_median(numeric(0))
+  expect_true(is.na(amdn))
+})

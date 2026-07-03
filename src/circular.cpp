@@ -41,9 +41,15 @@ double angle_dev(NumericVector theta, double xv) {
 double angle_median(NumericVector x) {
   x = x[!is_na(x)];
   double n = x.size();
+  // No data survives the NA strip (all-NA or empty input): there is no
+  // candidate median, so return NA rather than falling through to a
+  // default-initialized candidate.
+  if (n == 0) {
+    return NA_REAL;
+  }
   double dev_val;
   double minimum = M_PI;
-  NumericVector candidates(1);
+  NumericVector candidates(0);
   // Find candidates for the median (with the minimum average deviation)
   for(int i(0); i < n; i++) {
     dev_val = angle_dev(x, x[i]);

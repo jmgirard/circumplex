@@ -169,7 +169,9 @@ From the Brief C independent estimator audit (2026-07-03; full report
 `devel/estimator-audit-2026-07-fable.md`). These are **pre-existing** (present in
 v1.2.0 on CRAN), not M2/M3 regressions, but decision (Jeff 2026-07-03): fix F1–F3
 before the v1.3.0 submission rather than shipping again over a reachable crash and
-a violated angular invariant. F4–F6 are nits deferred to a later cleanup. Each
+a violated angular invariant. F4–F6 (nits) were addressed as a follow-up cleanup
+(2026-07-03), except the F6 0-vs-360 pole-snap *alignment* decision, which is a
+convention call parked for Jeff (cosmetic; every consumer handles the wrap). Each
 fix is test-first with a regression test reproducing the audit's executed failure.
 
 - [x] **F1. `col_means()` crashes on an all-NA resampled column** — under
@@ -197,6 +199,22 @@ fix is test-first with a regression test reproducing the audit's executed failur
 
 ## Log
 
+- 2026-07-03 — F4–F6 nit cleanup (Sonnet, propose-not-commit; Opus review + commit).
+  F4 (wording only, no behavior change): the degenerate-resample warning
+  (`R/ssm_bootstrap.R`) and the DESIGN.md degenerate-profiles row overstated
+  exclusion as per-replicate; reworded to per-parameter (only the undefined
+  displacement/fit is dropped, via `na.rm` per column; well-defined params still
+  enter their CIs — per-row exclusion would bias the near-zero amplitude CI). F5
+  (`src/circular.cpp` `angle_median()`, test-first): returned 0 for all-NA/empty
+  input due to a default-initialized `{0.0}` candidate; added an `n == 0 ->
+  NA_REAL` guard and changed `candidates(1)` to `candidates(0)`; regression test
+  in test-RcppExport.R.R (both inputs -> NA). F6 (DESIGN.md factual correction
+  only): the pole displacement is *exactly* 360.0 (modu fmod-at-edge), not
+  "≈359.9999". Deliberately NOT done: the F6 0-vs-360 snap *alignment* (convention
+  decision parked for Jeff) — snap direction, test pin, and quantile code
+  untouched. Suite 587/587; check 0/0/0. No NEWS (F5 internal/non-exported; F4 a
+  warning-wording precision fix; F6 internal doc). (src/circular.cpp,
+  R/ssm_bootstrap.R, DESIGN.md, tests/testthat/test-RcppExport.R.R, MILESTONES.md).
 - 2026-07-03 — F3 fix: `angle_dist()` ±180° branch (Fable tests + review, Opus
   fix, test-first). The plain wrap `((x-y+π) %% 2π) - π` has range [−π, π), so an
   exact half-turn (exactly opposed profiles) reported −180 instead of the

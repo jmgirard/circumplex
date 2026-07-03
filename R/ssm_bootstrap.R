@@ -92,8 +92,11 @@ ssm_replicate_intervals <- function(t0, t, interval, contrast,
   if (n_bad > 0) {
     warning(
       n_bad, " of ", nrow(bs_t), " ", replicate_label, " produced degenerate ",
-      "(flat or zero-amplitude) profiles and were excluded from the ",
-      "confidence intervals, which are therefore conditional on estimability.",
+      "(flat or zero-amplitude) profiles; their undefined parameter(s) ",
+      "(displacement, and fit if flat) were excluded from that parameter's ",
+      "confidence interval only, which is therefore conditional on ",
+      "estimability. Their other, well-defined parameters still contribute ",
+      "to their confidence intervals.",
       call. = FALSE
     )
   }
