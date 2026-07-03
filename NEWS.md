@@ -1,5 +1,11 @@
 # circumplex (development version)
 
+* New `geom_ssm_point()` and `geom_ssm_arc()` layers draw SSM profile points
+  and their confidence-region arcs directly in circumplex space on a
+  `ggcircumplex()` canvas, taking amplitude and displacement as aesthetics and
+  handling the polar transform (including wrap-around at the 0/360 degree
+  boundary) internally. These make it possible to build custom circumplex
+  figures by composing ggplot2 layers.
 * New `ggcircumplex()` function builds an empty circumplex plotting canvas
   (amplitude rings, displacement spokes, and scale labels) as a ggplot2
   object that you can add layers to with `+`. It accepts a set of scale

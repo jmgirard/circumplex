@@ -39,7 +39,7 @@ Cross-cutting guardrails for every task below:
   snapshot of today's canvas (or the delta is justified); instrument input
   auto-labels angles from the instrument's scales; invalid input errors via
   the `is_*()` helpers.
-- [ ] **V2. Polar-native geoms/stats (ggproto).** `geom_ssm_point()` /
+- [x] **V2. Polar-native geoms/stats (ggproto).** `geom_ssm_point()` /
   `geom_ssm_arc()` (or a unifying `stat_ssm()`) that accept
   amplitude/displacement aesthetics directly and internalize the
   degree→canvas transform (`ggrad()`), amplitude rescaling
@@ -80,6 +80,30 @@ Cross-cutting guardrails for every task below:
 
 ## Log
 
+- 2026-07-02 — V2 Polar-native geoms (Opus): exported `geom_ssm_point()` and
+  `geom_ssm_arc()`, ggplot2 layers taking amplitude/displacement aesthetics and
+  internalizing the polar transform formerly inline in ssm_plot_circle (radius
+  = amplitude*5/amax, angle = ggrad(displacement), 0/360 wrap = +360 when
+  d_max<d_min). Architecture: `GeomSsmPoint` subclasses GeomPoint and computes
+  x/y in setup_data (runs before scale training, so the canvas range picks the
+  points up); `StatSsmArc` subclasses `ggforce::StatArcBar`, injecting
+  x0/y0/r0/r/start/end in an overridden compute_panel then delegating to the
+  parent (ggproto_parent) for the arcPaths polygon expansion — reuses ggforce's
+  arc machinery rather than reimplementing it. `amax` is a layer param (ggplot
+  can't share canvas state with a geom; documented). NA-displacement/degenerate
+  rows dropped in setup_data/compute_panel (StatArcBar needed an nrow==0 guard —
+  scalar assignment to a 0-row frame errors). `extra_params` needed on the geom
+  so ggplot2 accepts `amax`. Correctness proven device-independently: the arc
+  and point layers' built x/y are byte-equal to ssm_plot_circle's (layers 6/7 in
+  both, since both share circle_base's 5 canvas layers) on single- and
+  multi-profile results and the cross-zero case; plus a synthetic wrap test
+  (350→10 arc has ~same vertex count as 170→190, not the ~17x of a long-way
+  span). ssm_plot_circle untouched → its 11 vdiffr snapshots unchanged (verified
+  via git). One example bug (Ampl/Disp vs a_est/d_est) caught before check.
+  Suite 518/518; check 0/0/0. NEWS.md added. (R/geom_ssm.R [new],
+  man/geom_ssm_point.Rd [new], man/geom_ssm_arc.Rd [new], NAMESPACE,
+  tests/testthat/test-geom_ssm.R [new],
+  tests/testthat/_snaps/geom_ssm/*.svg [new], NEWS.md, MILESTONES.md).
 - 2026-07-02 — V1 Public circular canvas (Opus): exported `ggcircumplex()`,
   a documented ggplot2 canvas constructor, as a thin public wrapper over the
   existing internal `circle_base()` (left untouched, so all 11 existing
