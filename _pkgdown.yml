@@ -41,6 +41,13 @@ reference:
   - ssm_plot_curve
   - ssm_parameters
   - ssm_score
+- title: Visualization Layer
+  desc: Composable ggplot2 components for building circumplex figures
+  contents:
+  - ggcircumplex
+  - geom_ssm_point
+  - geom_ssm_arc
+  - scale_x_circumplex
 - title: Secondary SSM Functions
   desc: Functions for customizing SSM results
   contents: html_render
@@ -103,6 +110,8 @@ navbar:
       href: articles/introduction-to-ssm-analysis.html
     - text: Intermediate SSM Analysis
       href: articles/intermediate-ssm-analysis.html
+    - text: Advanced Circumplex Visualization
+      href: articles/advanced-visualization.html
   - text: News
     href: news/index.html
   right:

@@ -74,7 +74,7 @@ Cross-cutting guardrails for every task below:
   `tests/testthat/_snaps/ssm_plot/` stays byte-identical, or each change is
   individually justified and re-approved; `chkDots()`/argument surfaces of the
   three functions are preserved; full suite green.
-- [ ] **V5. Vignette: "Advanced Circumplex Visualization."** The third
+- [x] **V5. Vignette: "Advanced Circumplex Visualization."** The third
   vignette, already announced as "still in progress" in the intermediate
   vignette (`vignettes/intermediate-ssm-analysis.Rmd:276`). Demonstrate
   composing raw data, SSM results, and annotations via the new extension.
@@ -91,6 +91,29 @@ Cross-cutting guardrails for every task below:
 
 ## Log
 
+- 2026-07-02 — V5 Advanced Visualization vignette (Sonnet). New
+  vignettes/advanced-visualization.Rmd: builds custom circumplex figures by
+  composing the exported extension — bare/instrument-labeled ggcircumplex()
+  canvas; geom_ssm_arc()+geom_ssm_point() on an ssm_analyze() result (with the
+  amax-must-match rule made explicit); a composed custom layer (per-person
+  ssm_score() point cloud behind a group point — the payoff no built-in
+  produces); scale_x_circumplex() for a linear angle axis; and a closing note
+  that ssm_plot_* are built on these same pieces. Every chunk verified to run;
+  render produces no warnings (per-person degenerate row filtered, chunk
+  warning=FALSE) and no chunk errors. Statistical-precision pass (CLAUDE.md):
+  the arc described as displaying two separate marginal CIs (amplitude radial,
+  displacement angular) shown together — explicitly NOT a joint confidence
+  region with its own coverage, NOT a significance test; angular extent framed
+  as plausible directions since 0 deg is an arbitrary reference, not a null
+  (consistent with the D6 intro-vignette fix and DESIGN.md). Intermediate
+  vignette's "still in progress" note replaced with a concrete pointer.
+  _pkgdown.yml: added the vignette to the navbar AND a new "Visualization Layer"
+  reference section for ggcircumplex/geom_ssm_point/geom_ssm_arc/
+  scale_x_circumplex (V1–V3 had exported these without listing them — they were
+  orphaned on the site and would trip a pkgdown missing-topics warning). Vignette
+  ASCII-clean; check builds all vignettes 0/0/0; suite 529/529 (doc-only).
+  (vignettes/advanced-visualization.Rmd [new],
+  vignettes/intermediate-ssm-analysis.Rmd, _pkgdown.yml, NEWS.md, MILESTONES.md).
 - 2026-07-02 — V4 Refactor plots onto the extension (Opus). ssm_plot_circle:
   removed the inline amplitude/displacement→canvas transform (rescale + ggrad +
   0/360 wrap); now circle_base→ggcircumplex (V1), ggforce::geom_arc_bar→

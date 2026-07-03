@@ -1,5 +1,8 @@
 # circumplex (development version)
 
+* New vignette "Advanced Circumplex Visualization" shows how to build custom
+  circumplex figures by composing `ggcircumplex()`, `geom_ssm_point()`,
+  `geom_ssm_arc()`, and `scale_x_circumplex()` with other ggplot2 components.
 * New `scale_x_circumplex()` provides an angle-labeled x-axis scale for linear
   circumplex plots (such as the score-by-angle curve). It labels axis breaks
   with their angle in degrees by default, or with custom labels or a
