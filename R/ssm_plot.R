@@ -57,7 +57,7 @@ ssm_plot_circle <- function(ssm_object,
   chkDots(...)
 
   df <- ssm_object$results
-  angles <- as.integer(round(ssm_object$details$angles))
+  angles <- ssm_object$details$angles
 
   stopifnot(is_null_or_num(amax, n = 1))
   stopifnot(is_null_or_char(angle_labels, n = length(angles)))
@@ -74,6 +74,24 @@ ssm_plot_circle <- function(ssm_object,
   # converting displacement to the ggforce arc convention, with wrap-around at
   # the 0/360 boundary) is handled by geom_ssm_arc()/geom_ssm_point() below.
   df_plot <- df
+
+  # Profiles with an undefined displacement (flat or zero-amplitude scores:
+  # d_est = NA) have no location on the circle. The arc/point geoms drop them,
+  # so remove them up front and name them rather than let them vanish silently.
+  undefined <- is.na(df_plot[["d_est"]])
+  if (any(undefined)) {
+    warning(
+      "Profile(s) omitted for undefined displacement ",
+      "(flat or zero-amplitude scores): ",
+      paste(df_plot[["Label"]][undefined], collapse = ", "), ".",
+      call. = FALSE
+    )
+    df_plot <- df_plot[!undefined, ]
+    if (nrow(df_plot) < 1) {
+      stop("After removing profiles with undefined displacement, ",
+           "there were none left to plot.", call. = FALSE)
+    }
+  }
 
   if (!is.null(palette)) {
     df_plot[["Label"]] <- factor(
@@ -505,7 +523,7 @@ ggcircumplex <- function(angles = octants(), labels = NULL, amin = 0,
   stopifnot(is_num(font_size, n = 1) && font_size > 0)
 
   circle_base(
-    angles = as.integer(round(resolved$angles)),
+    angles = resolved$angles,
     labels = resolved$labels,
     amin = amin,
     amax = amax,
@@ -517,7 +535,7 @@ ggcircumplex <- function(angles = octants(), labels = NULL, amin = 0,
 circle_base <- function(angles, labels = NULL, amin = 0,
                         amax = 0.5, fontsize = 12) {
 
-  if (is.null(labels)) labels <- paste0(angles, "\u00B0")
+  if (is.null(labels)) labels <- circumplex_degree_labels(angles)
 
   ggplot2::ggplot() +
     # Require plot to be square and remove default styling

@@ -5,12 +5,12 @@ test_that("scale_x_circumplex() places breaks at the scale angles", {
 })
 
 test_that("default labels match the curve plot's degree formatting", {
-  # ssm_plot_curve() labels its angle axis with sprintf("%.0f<degree>", x);
-  # the scale helper's default must reproduce that exactly
+  # The canvas and the axis share circumplex_degree_labels(); for the integer
+  # octant angles this is the same text the curve plot has always shown.
   s <- scale_x_circumplex(octants())
   expect_equal(
     s$get_labels(octants()),
-    sprintf("%.0f\U00B0", octants())
+    paste0(octants(), "\U00B0")
   )
 })
 
@@ -63,4 +63,28 @@ test_that("scale_x_circumplex() validates its arguments", {
   data("csip")
   expect_error(scale_x_circumplex(octants(), labels = c("A", "B")))
   expect_error(scale_x_circumplex(instrument = mtcars))
+})
+
+test_that("scale_x_circumplex() labels fractional angles without rounding (R6)", {
+  # sprintf("%.0f") rounded 22.5 -> "22" and 67.5 -> "68"; a 16-scale or custom
+  # instrument with half-degree spacing must label its true angles.
+  ang <- seq(22.5, 337.5, by = 45)
+  labs <- scale_x_circumplex(ang)$get_labels(ang)
+  expect_true("22.5\U00B0" %in% labs)
+  expect_false("22\U00B0" %in% labs)
+  expect_false("68\U00B0" %in% labs)
+})
+
+test_that("ggcircumplex() draws fractional angles exactly, not rounded (R5)", {
+  ang <- seq(22.5, 337.5, by = 45)
+  b <- ggplot2::ggplot_build(ggcircumplex(ang))
+  # Default degree labels (displacement-label layer 5) show the true angle
+  expect_true("22.5\U00B0" %in% b$data[[5]]$label)
+  expect_false("22\U00B0" %in% b$data[[5]]$label)
+  # Spokes (segment layer 2) end at the exact angle, not the rounded one
+  seg <- b$data[[2]]
+  expect_equal(
+    min(abs(seg$xend - 5 * cos(22.5 * pi / 180))), 0,
+    tolerance = 1e-9
+  )
 })

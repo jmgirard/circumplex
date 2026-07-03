@@ -636,6 +636,40 @@ test_that("ssm_score errors on an unrecognized ... argument", {
   )
 })
 
+test_that("ssm_score errors on an unnamed ... argument (R1)", {
+  # Regression: v1.2.0's apply(FUN = ssm_parameters, ...) matched a bare
+  # positional string to ssm_parameters()'s `prefix` formal; the vectorized
+  # path inspected only names(extra_args) and silently discarded unnamed
+  # elements, so ssm_score(aw2009, PANO(), octants(), FALSE, "IIP_") returned
+  # unprefixed columns with no error. Unnamed extras must now error, not be
+  # silently dropped nor silently forwarded.
+  data("aw2009")
+  expect_error(
+    ssm_score(aw2009, PANO(), octants(), FALSE, "IIP_"),
+    "must be named"
+  )
+  # The common, named form is unaffected.
+  expect_silent(
+    ssm_score(aw2009, scales = PANO(), append = FALSE, prefix = "IIP_")
+  )
+})
+
+test_that("ssm_score errors on a non-scalar or non-character label (R4)", {
+  # Regression: ssm_parameters() validated each label via is_char(x, n = 1);
+  # the vectorized path dropped that, so a vector prefix recycled through
+  # paste0() into interleaved garbage column names and a numeric prefix was
+  # coerced silently. Restore the per-argument scalar-character validation.
+  data("aw2009")
+  expect_error(
+    ssm_score(aw2009, scales = PANO(), append = FALSE, prefix = c("a_", "b_")),
+    "is_char"
+  )
+  expect_error(
+    ssm_score(aw2009, scales = PANO(), append = FALSE, prefix = 5),
+    "is_char"
+  )
+})
+
 test_that("NA grouping values are dropped with a message in both modes", {
   data("jz2017")
   jz <- jz2017

@@ -19,8 +19,10 @@ of each circumplex scale included in \code{scales} (in degrees).}
 \item{append}{Optional. A logical indicating whether to append the output to
 \code{data} or simply return the output (default = "TRUE").}
 
-\item{...}{Optional. Additional parameters to pass to
-\code{\link{ssm_parameters}()}, such as \code{prefix} and \code{suffix}.}
+\item{...}{Optional. Additional \strong{named} arguments passed to
+\code{\link{ssm_parameters}()}, such as \code{prefix} and \code{suffix};
+each must be a single string. Unnamed or non-scalar arguments raise an
+error.}
 }
 \value{
 A data frame containing \code{.data} plus six additional columns

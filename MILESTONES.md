@@ -89,8 +89,105 @@ Cross-cutting guardrails for every task below:
   extension" subsection) recording the ggproto/scale architecture and the
   ggforce keep/drop decision with rationale.
 
+### Pre-release review fixes (v1.3.0 bundle)
+
+From a `/code-review high` pass over `v1.2.0..HEAD` (2026-07-03, Fable finders +
+verifiers). 10 findings survived verification (9 CONFIRMED, 1 PLAUSIBLE); the
+statistical core — Monte Carlo covariance math, bootstrap named-column refactor,
+`ssm_param_names()`↔C++ ordering, circular-quantile/branch machinery — verified
+clean. All correctness findings sit at the new/changed **public API surface**
+introduced by M2+M3, so they must be fixed (with regression tests) before the
+v1.3.0 CRAN submission. Each fix ships with a test reproducing the reviewer's
+executed failure.
+
+Correctness (fix first):
+
+- [x] **R1. `ssm_score()` silently drops unnamed `...` args** — v1.2.0 forwarded
+  them positionally to `ssm_parameters()` (a bare `"IIP_"` filled `prefix`); the
+  vectorized path inspects only `names(extra_args)` + `modifyList()`, discarding
+  unnamed elements with no error. (`R/ssm_analysis.R:689`)
+  *Accept:* the v1.2.0 call form errors or works as before (decision below), never
+  silently returns unprefixed columns; regression test at the executed example.
+- [x] **R4. `ssm_score()` lost scalar validation on `prefix`/`suffix`/labels** —
+  non-scalar/non-character values recycle through `paste0()` into interleaved
+  garbage column names instead of erroring via `is_char(x, n = 1)`.
+  (`R/ssm_analysis.R:715`) *Accept:* `prefix = c("a_","b_")` errors again; test added.
+  (R1+R4 are one root cause — the refactor's `...` handling — fix together.)
+- [ ] **R3. `ggcircumplex(amin=)` mislabels the amplitude axis** — `amin`
+  relabels rings on an `amin..amax` scale while the geoms map amplitude as
+  `a*5/amax` (amin=0), so any nonzero `amin` silently misplaces every point/arc;
+  `amin > amax` unvalidated. New/exported this cycle (unreachable in v1.2.0).
+  (`R/ssm_plot.R:510`, `R/geom_ssm.R:11`) *Accept:* per the decision below —
+  geoms honor `amin`, or `amin` is gated/removed — plus a test that the labeled
+  ring radius and a same-amplitude point's radius agree.
+- [x] **R2. Flat / zero-amplitude profiles silently vanish from
+  `ssm_plot_circle()`** — geoms drop NA-displacement rows with no message;
+  v1.2.0 drew the point at the canvas origin with a "Removed N rows" warning.
+  (`R/geom_ssm.R:62`) *Accept:* per the display decision below; a flat-profile
+  test asserts the chosen behavior (origin point and/or explicit message).
+- [x] **R5. `ggcircumplex()` rounds angles to integers** —
+  `as.integer(round(resolved$angles))` shifts fractional angles (round-half-even)
+  on the canvas while geoms/scale use exact values, so 22.5° spokes draw at 22°.
+  (`R/ssm_plot.R:508`) *Accept:* fractional-angle canvas places spokes/labels at
+  exact angles; test on `seq(22.5, 337.5, 45)` (16-scale); ssm_plot snapshots stay
+  byte-identical (details$angles are integer octants, so no snapshot delta).
+- [x] **R6. `scale_x_circumplex()` rounds fractional angle labels** —
+  `sprintf("%.0f°", x)` labels 22.5→"22°", 67.5→"68°" while breaks sit at exact
+  angles. (`R/scale_circumplex.R:55`) *Accept:* fractional angles label without
+  misleading rounding (format decision with R5); test added. (R5+R6 share the
+  rounding root cause — fix together.)
+
+Cleanup (fold in where the bug fixes already touch the file; no behavior change):
+
+- [ ] **C2. Duplicated engine-dispatch block** — the
+  `if (method=="montecarlo") ssm_montecarlo() else ssm_bootstrap()` branch is
+  near-verbatim in `ssm_analyze_means()` and `ssm_analyze_corrs()`
+  (`R/ssm_analysis.R:348,486`); extract one dispatcher (method already validated
+  once in `ssm_analyze()`). *Accept:* single helper, both callers routed, all
+  seeded pins byte-identical.
+- [ ] **C4. Monte Carlo recomputes `t0` scores** — `ssm_montecarlo()` re-runs
+  `mean_scores()`/`corr_scores()` on the same unmutated `bs_input` the caller
+  already computed (`R/ssm_montecarlo.R:43`); pass the caller's matrix in.
+  *Accept:* one fewer O(n·p·q) pass; results byte-identical.
+- [ ] **C3. Repel-branch trig duplication** — `ssm_plot_circle()`'s repel branch
+  hand-recomputes the polar→canvas transform duplicated in
+  `GeomSsmPoint$setup_data()` (`R/ssm_plot.R:192` vs `R/geom_ssm.R:64`); extract a
+  shared `ssm_to_cartesian()` helper. *Accept:* both sites call it; snapshots
+  byte-identical. (Natural companion to R2/R3, same files.)
+- [ ] **C1. Monte Carlo contrast re-derives `param_diff()`** — the MC replicate
+  contrast inlines "second minus first, disp via `angle_dist`" (`R/ssm_montecarlo.R:110`)
+  that `param_diff()` owns for the bootstrap path. PLAUSIBLE, not a bug: fix by
+  generalizing `param_diff()` to an R×6 matrix (named via `ssm_param_names()`) and
+  calling it in both places. *Touches the contrast convention → run
+  `/statistical-validation` and boundary tests (±180°) after.* *Accept:* MC and
+  bootstrap contrasts share one convention implementation; boundary tests green;
+  seeded pins unchanged.
+
 ## Log
 
+- 2026-07-03 — Pre-release review fixes R1/R4/R5/R6/R2 (Opus, test-first). Five
+  API-surface correctness bugs from the `/code-review high` pass, each with a
+  regression test that failed on the pre-fix code. R1+R4 (`R/ssm_analysis.R`
+  `ssm_score()`): unnamed `...` args now error (was: silently dropped, losing a
+  column prefix vs v1.2.0) and each label/prefix/suffix is re-validated as a
+  length-1 string via `is_char()` (was: vectors recycled into garbled column
+  names). Decision (Jeff): error on unnamed rather than restore v1.2.0's fragile
+  positional forwarding. R5+R6 (`R/scale_circumplex.R`, `R/ssm_plot.R`): extracted
+  a shared `circumplex_degree_labels()` and routed both the canvas
+  (`ggcircumplex()`/`circle_base()`) and the axis (`scale_x_circumplex()`) through
+  it; removed the `as.integer(round())` coercion in `ggcircumplex()` AND the twin
+  at `ssm_plot_circle()`'s internal angle line, so fractional angles (e.g. 22.5°)
+  render exactly instead of rounding to 22°. R2 (`R/ssm_plot.R`): `ssm_plot_circle()`
+  now detects undefined-displacement profiles (flat/zero-amplitude, `d_est = NA`)
+  up front, warns naming them, and removes them cleanly (decision (Jeff): drop +
+  named warning, not v1.2.0's origin point) — also fixes the messy NA-row the
+  low-fit filter otherwise produced. No estimator math touched → no
+  `/statistical-validation` needed. All ssm_plot/geom_ssm vdiffr snapshots
+  byte-identical (built-in angles are integers). Suite 543/543, 0 warnings.
+  NEWS.md bullets added. R3 (amin) pending Jeff's confirm; C1–C4 cleanups next.
+  (R/ssm_analysis.R, R/scale_circumplex.R, R/ssm_plot.R, tests/testthat/
+  test-ssm_analysis.R, test-scale_circumplex.R, test-ssm_plot.R, NEWS.md,
+  MILESTONES.md).
 - 2026-07-02 — V6 Extension design review (Opus, doc-only). Audited the V1–V4
   ggproto code against ggplot2 extension idioms; appended a "Visualization
   extension" section to DESIGN.md recording architecture + verdict. Findings:

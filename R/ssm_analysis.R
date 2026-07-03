@@ -652,8 +652,10 @@ ssm_parameters <- function(scores, angles = octants(), prefix = "", suffix = "",
 #'   of each circumplex scale included in \code{scales} (in degrees).
 #' @param append Optional. A logical indicating whether to append the output to
 #'   `data` or simply return the output (default = "TRUE").
-#' @param ... Optional. Additional parameters to pass to
-#'   \code{\link{ssm_parameters}()}, such as \code{prefix} and \code{suffix}.
+#' @param ... Optional. Additional \strong{named} arguments passed to
+#'   \code{\link{ssm_parameters}()}, such as \code{prefix} and \code{suffix};
+#'   each must be a single string. Unnamed or non-scalar arguments raise an
+#'   error.
 #' @return A data frame containing \code{.data} plus six additional columns
 #'   containing the SSM parameters (calculated rowwise).
 #' @family ssm functions
@@ -686,11 +688,24 @@ ssm_score <- function(data, scales, angles = octants(), append = TRUE, ...) {
   )
   label_defaults <- lapply(formals(ssm_parameters)[label_names], eval)
   extra_args <- list(...)
-  unknown <- setdiff(names(extra_args), label_names)
+  # Unnamed extras: v1.2.0's apply(FUN = ssm_parameters, ...) matched a bare
+  # positional argument to ssm_parameters()'s `prefix` formal. modifyList()
+  # below silently drops unnamed elements, so require names explicitly rather
+  # than resurrect that error-prone positional matching.
+  arg_names <- names(extra_args)
+  if (length(extra_args) > 0 && (is.null(arg_names) || any(!nzchar(arg_names)))) {
+    stop("arguments passed via `...` must be named ",
+         "(e.g. prefix = \"IIP_\")", call. = FALSE)
+  }
+  unknown <- setdiff(arg_names, label_names)
   if (length(unknown) > 0) {
     stop("unused argument", if (length(unknown) > 1) "s" else "", " (",
          paste(unknown, collapse = ", "), ")", call. = FALSE)
   }
+  # Each label/prefix/suffix must be a single string, as ssm_parameters()
+  # enforced per row via is_char(x, n = 1); without this a vector recycles
+  # through paste0() into interleaved column names.
+  for (nm in arg_names) stopifnot(is_char(extra_args[[nm]], n = 1))
   label_args <- utils::modifyList(label_defaults, extra_args)
 
   # Elevation/x/y/amplitude/displacement/fit for every row in a single

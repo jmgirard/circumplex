@@ -16,6 +16,14 @@ resolve_circumplex_labels <- function(angles, labels, instrument) {
   list(angles = angles, labels = labels)
 }
 
+# Default degree labels for a set of scale angles, shared by the circular canvas
+# (ggcircumplex()/circle_base()) and the linear axis (scale_x_circumplex()) so
+# both render fractional angles identically (e.g. 22.5 -> "22.5 deg") instead
+# of rounding to whole degrees. Integer angles print without a decimal.
+circumplex_degree_labels <- function(angles) {
+  paste0(angles, "\u00B0")
+}
+
 #' Angle-labeled x-axis scale for circumplex plots
 #'
 #' A \pkg{ggplot2} continuous position scale for the angle axis of a linear
@@ -52,7 +60,7 @@ scale_x_circumplex <- function(angles = octants(), labels = NULL,
   resolved <- resolve_circumplex_labels(angles, labels, instrument)
   scale_labels <- resolved$labels
   if (is.null(scale_labels)) {
-    scale_labels <- function(x) sprintf("%.0f\U00B0", x)
+    scale_labels <- circumplex_degree_labels
   }
   ggplot2::scale_x_continuous(
     breaks = resolved$angles,

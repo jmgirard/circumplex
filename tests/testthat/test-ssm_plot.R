@@ -156,3 +156,31 @@ test_that("plot functions warn about unrecognized arguments", {
   w <- capture_warnings(ssm_plot_circle(res, angle_labels = PANO()))
   expect_false(any(grepl("disregarded", w)))
 })
+
+test_that("ssm_plot_circle warns by name and omits an undefined-displacement profile (R2)", {
+  # A flat (zero-amplitude) group has d_est = NA; v1.2.0 drew it at the origin
+  # with a ggplot 'Removed rows' warning, the new geoms dropped it silently.
+  # Decision: drop it, but warn naming the profile so it never vanishes silently.
+  set.seed(1)
+  n <- 30
+  g_normal <- matrix(rnorm(n * 8, mean = 3), nrow = n, ncol = 8)
+  v <- rnorm(n, mean = 3)
+  g_flat <- matrix(v, nrow = n, ncol = 8) # identical columns -> flat mean profile
+  dat <- as.data.frame(rbind(g_normal, g_flat))
+  names(dat) <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  dat$grp <- rep(c("normal", "flat"), each = n)
+
+  set.seed(2)
+  res <- suppressWarnings(
+    ssm_analyze(dat, scales = 1:8, grouping = "grp", boots = 50)
+  )
+  expect_true(any(is.na(res$results$d_est))) # the flat group is undefined
+
+  # ssm_plot_circle warns, names the omitted profile, and still builds
+  expect_warning(
+    p <- ssm_plot_circle(res),
+    "undefined displacement"
+  )
+  expect_true(ggplot2::is_ggplot(p))
+  expect_silent(invisible(ggplot2::ggplot_build(p)))
+})
