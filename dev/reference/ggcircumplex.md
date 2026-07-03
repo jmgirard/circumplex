@@ -14,7 +14,6 @@ draws on the same canvas.
 ggcircumplex(
   angles = octants(),
   labels = NULL,
-  amin = 0,
   amax = 0.5,
   font_size = 12,
   instrument = NULL
@@ -38,15 +37,11 @@ ggcircumplex(
   `NULL`, which draws the numeric angles). If `instrument` is supplied,
   `NULL` uses the instrument's scale abbreviations.
 
-- amin:
-
-  Optional. A single number giving the amplitude at the center of the
-  circle (default = 0).
-
 - amax:
 
   Optional. A single positive number giving the amplitude at the outer
-  ring, which sets the amplitude-axis labels (default = 0.5).
+  ring, which sets the amplitude-axis labels; the center of the circle
+  is fixed at amplitude 0 (default = 0.5).
 
 - font_size:
 

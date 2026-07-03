@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9999</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,11 @@
 <li>
 <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> gains <code>parallel</code> and <code>ncpus</code> arguments (passed to <code><a href="https://rdrr.io/pkg/boot/man/boot.html" class="external-link">boot::boot()</a></code>) to distribute the bootstrap computation across multiple CPU cores. Because the resample indices are drawn in the main R process before any work is distributed, results for a given <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> are identical regardless of these settings, so parallelizing never changes your estimates or confidence intervals.</li>
 <li>
-<code><a href="../reference/ssm_score.html">ssm_score()</a></code> is now vectorized internally (one compiled call instead of a row-wise loop), making it much faster on large data sets. Results are unchanged. Rows whose profile has undefined displacement now produce a single warning reporting how many such rows there are, rather than one warning per row.</li>
+<code><a href="../reference/ssm_score.html">ssm_score()</a></code> is now vectorized internally (one compiled call instead of a row-wise loop), making it much faster on large data sets. Results are unchanged. Rows whose profile has undefined displacement now produce a single warning reporting how many such rows there are, rather than one warning per row. Extra arguments passed through <code>...</code> must now be named (e.g. <code>prefix = "IIP_"</code>) and must be single strings; an unnamed or non-scalar argument is now an error rather than being silently ignored (previously it could yield unlabeled or garbled output columns).</li>
+<li>
+<code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> and <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> now label and place circumplex scales at their exact angles, including non-integer angles (for example, the 22.5-degree spacing of a 16-scale instrument), instead of rounding them to whole degrees.</li>
+<li>
+<code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> now warns and names any profile it cannot place on the circle because its displacement is undefined (a flat or zero-amplitude profile), instead of dropping it from the figure without notice.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.0" id="circumplex-120">circumplex 1.2.0<a class="anchor" aria-label="anchor" href="#circumplex-120"></a></h2><p class="text-muted">CRAN release: 2026-07-02</p>

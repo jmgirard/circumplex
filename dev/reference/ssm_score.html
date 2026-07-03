@@ -13,7 +13,7 @@ statistical inference on groups of data points."><meta property="og:image" conte
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9999</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,8 +99,10 @@ of each circumplex scale included in <code>scales</code> (in degrees).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Optional. Additional parameters to pass to
-<code><a href="ssm_parameters.html">ssm_parameters()</a></code>, such as <code>prefix</code> and <code>suffix</code>.</p></dd>
+<dd><p>Optional. Additional <strong>named</strong> arguments passed to
+<code><a href="ssm_parameters.html">ssm_parameters()</a></code>, such as <code>prefix</code> and <code>suffix</code>;
+each must be a single string. Unnamed or non-scalar arguments raise an
+error.</p></dd>
 
 </dl></div>
     <div class="section level2">

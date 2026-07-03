@@ -17,7 +17,7 @@ canvas."><meta property="og:image" content="http://circumplex.jmgirard.com/logo.
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9999</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,6 @@ canvas.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ggcircumplex</span><span class="op">(</span></span>
 <span>  angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  amin <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  amax <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">12</span>,</span>
 <span>  instrument <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -104,14 +103,10 @@ to draw around the circle, one per angle and in the same order (default =
 <code>NULL</code> uses the instrument's scale abbreviations.</p></dd>
 
 
-<dt id="arg-amin">amin<a class="anchor" aria-label="anchor" href="#arg-amin"></a></dt>
-<dd><p>Optional. A single number giving the amplitude at the center of
-the circle (default = 0).</p></dd>
-
-
 <dt id="arg-amax">amax<a class="anchor" aria-label="anchor" href="#arg-amax"></a></dt>
 <dd><p>Optional. A single positive number giving the amplitude at the
-outer ring, which sets the amplitude-axis labels (default = 0.5).</p></dd>
+outer ring, which sets the amplitude-axis labels; the center of the circle
+is fixed at amplitude 0 (default = 0.5).</p></dd>
 
 
 <dt id="arg-font-size">font_size<a class="anchor" aria-label="anchor" href="#arg-font-size"></a></dt>

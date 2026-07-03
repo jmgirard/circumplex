@@ -35,9 +35,10 @@ ssm_score(data, scales, angles = octants(), append = TRUE, ...)
 
 - ...:
 
-  Optional. Additional parameters to pass to
+  Optional. Additional **named** arguments passed to
   [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
-  such as `prefix` and `suffix`.
+  such as `prefix` and `suffix`; each must be a single string. Unnamed
+  or non-scalar arguments raise an error.
 
 ## Value
 

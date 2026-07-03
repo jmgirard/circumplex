@@ -66,7 +66,21 @@
   loop), making it much faster on large data sets. Results are
   unchanged. Rows whose profile has undefined displacement now produce a
   single warning reporting how many such rows there are, rather than one
-  warning per row.
+  warning per row. Extra arguments passed through `...` must now be
+  named (e.g. `prefix = "IIP_"`) and must be single strings; an unnamed
+  or non-scalar argument is now an error rather than being silently
+  ignored (previously it could yield unlabeled or garbled output
+  columns).
+- [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  and
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
+  now label and place circumplex scales at their exact angles, including
+  non-integer angles (for example, the 22.5-degree spacing of a 16-scale
+  instrument), instead of rounding them to whole degrees.
+- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  now warns and names any profile it cannot place on the circle because
+  its displacement is undefined (a flat or zero-amplitude profile),
+  instead of dropping it from the figure without notice.
 
 ## circumplex 1.2.0
 
