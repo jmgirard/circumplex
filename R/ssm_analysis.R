@@ -96,6 +96,31 @@
 #'   with zero variance) are excluded from the confidence intervals with a
 #'   warning reporting how many were dropped; the intervals are then
 #'   conditional on estimability.
+#' @section Reproducibility:
+#'   This is the only function in the package that consumes R's random number
+#'   stream (`ssm_score()`/`ssm_parameters()` and the tidying functions are
+#'   deterministic). Call `set.seed()` immediately before `ssm_analyze()` for
+#'   reproducible confidence intervals:
+#'   \itemize{
+#'     \item \strong{Bootstrap} (`method = "bootstrap"`, the default): the
+#'       same seed gives byte-identical `results`, *regardless of* the
+#'       `parallel`/`ncpus` settings (see their descriptions below), because
+#'       `boot::boot()` draws all resample indices from the seed before any
+#'       work is parallelized.
+#'     \item \strong{Monte Carlo} (`method = "montecarlo"`): the same seed
+#'       gives byte-identical `results`. Adding a group or measure, or
+#'       reordering `scales`/`measures`, changes the random draw sequence, so
+#'       results are reproducible for a fixed call but will not match after
+#'       such structural edits even with the same seed.
+#'     \item The two methods are \strong{not} expected to agree numerically
+#'       for the same seed -- they consume the random stream in unrelated
+#'       ways. Their statistical agreement (validated on real data; see
+#'       `vignette("introduction-to-ssm-analysis")`) is a separate property
+#'       from RNG reproducibility.
+#'     \item Increasing `boots` changes the CI by design (more resamples/draws
+#'       should tighten Monte Carlo error), so results are not expected to be
+#'       stable across different `boots` values, only within a fixed call.
+#'   }
 #' @family ssm functions
 #' @family analysis functions
 #' @export

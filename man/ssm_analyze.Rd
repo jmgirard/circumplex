@@ -135,6 +135,34 @@ correlation-based analyses will be performed, one or more groups will be
 used to stratify the data, and contrasts between groups or measures will be
 calculated.
 }
+\section{Reproducibility}{
+
+This is the only function in the package that consumes R's random number
+stream (\code{ssm_score()}/\code{ssm_parameters()} and the tidying functions are
+deterministic). Call \code{set.seed()} immediately before \code{ssm_analyze()} for
+reproducible confidence intervals:
+\itemize{
+\item \strong{Bootstrap} (\code{method = "bootstrap"}, the default): the
+same seed gives byte-identical \code{results}, \emph{regardless of} the
+\code{parallel}/\code{ncpus} settings (see their descriptions below), because
+\code{boot::boot()} draws all resample indices from the seed before any
+work is parallelized.
+\item \strong{Monte Carlo} (\code{method = "montecarlo"}): the same seed
+gives byte-identical \code{results}. Adding a group or measure, or
+reordering \code{scales}/\code{measures}, changes the random draw sequence, so
+results are reproducible for a fixed call but will not match after
+such structural edits even with the same seed.
+\item The two methods are \strong{not} expected to agree numerically
+for the same seed -- they consume the random stream in unrelated
+ways. Their statistical agreement (validated on real data; see
+\code{vignette("introduction-to-ssm-analysis")}) is a separate property
+from RNG reproducibility.
+\item Increasing \code{boots} changes the CI by design (more resamples/draws
+should tighten Monte Carlo error), so results are not expected to be
+stable across different \code{boots} values, only within a fixed call.
+}
+}
+
 \examples{
 # Load example data
 data("jz2017")

@@ -23,7 +23,7 @@ run `/release-checklist` once.
 - [x] **Vectorize `ssm_score()`** (currently row-wise `apply` + `rbind` of
   data frames): elevation/x/y are single matrix products; amplitude,
   displacement, and fit follow element-wise.
-- [ ] Seed/reproducibility documentation for all resampling paths.
+- [x] Seed/reproducibility documentation for all resampling paths.
 - [x] **Continuous-track item to do first**: named, long-format internal
   results assembly (`ssm_bootstrap()` identifies displacement columns by
   positional arithmetic `d_vars <- 1:(ncol/6)*6 - 1`; `reshape_params()`
@@ -134,6 +134,31 @@ run `/release-checklist` once.
   (R/ssm_montecarlo.R [new], R/ssm_bootstrap.R, R/ssm_analysis.R, R/ssm_oop.R,
   man/ssm_analyze.Rd, tests/testthat/test-ssm_montecarlo.R [new], NEWS.md,
   MILESTONES.md).
+- 2026-07-02 — Seed/reproducibility documentation (Sonnet, doc-only). Added a
+  DESIGN.md "Reproducibility" section: a per-engine table (serial bootstrap,
+  parallel bootstrap, Monte Carlo) of what a fixed seed guarantees and exactly
+  what RNG each consumes (index-array-then-dispatch for bootstrap; one
+  rnorm() block per group, groups jointly across measures, in group_ids order
+  for Monte Carlo — traced from R/ssm_montecarlo.R, not assumed), plus an
+  explicit "what this does NOT mean" list (no cross-engine agreement from a
+  shared seed; no stability across `boots`; ordinary cross-R-version caveat).
+  Refreshed DESIGN.md's data-flow diagram, stale since the continuous-track
+  refactor and Monte Carlo addition (now shows both engines and the shared
+  ssm_replicate_intervals() assembly). Fixed a second stale line found in the
+  same table (BCa listed as "planned" — dropped last task). Added a matching
+  `@section Reproducibility` to `?ssm_analyze` (was previously scattered
+  across the `parallel`/`method` @param entries only). Vignette: the
+  "randomness inherent to bootstrapping" sentence in the introduction
+  vignette was actually imprecise (implied the PANO()/octants() shortcuts
+  caused the CI difference between `results`/`results2`; they return
+  identical values to the manual vectors — the real cause is both calls
+  sharing one un-reseeded RNG stream from the vignette's single top-level
+  set.seed()) — corrected per CLAUDE.md's vignette-precision bar, with a
+  cross-reference to the new roxygen section. No code changes; doc-only, no
+  NEWS.md bullet. Suite 499/499 (unchanged); vignette re-rendered clean;
+  check 0/0/0. M2 COMPLETE (all tasks checked or explicitly dropped with
+  rationale). (DESIGN.md, R/ssm_analysis.R, man/ssm_analyze.Rd,
+  vignettes/introduction-to-ssm-analysis.Rmd, MILESTONES.md).
 
 # Completed milestones
 
