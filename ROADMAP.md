@@ -117,13 +117,26 @@ this layer. Full task detail, acceptance criteria, and log: **MILESTONES.md**.
 ## Milestone 4 — Circumplex fit & structure statistics
 
 **Status: planned** (flagship; its own CRAN slot — see the release strategy).
-Revive and modernize the drafts in `devel/fit_analysis.R` / `devel/fit_oop.R`
-(currently written in superseded tidyverse-heavy style with a `psych`
-dependency decision pending).
+Revive and modernize the drafts in `devel/fit_analysis.R` / `devel/fit_oop.R`.
 
-- Fisher test of equal axes (draft exists).
-- Gap test of equal spacing (draft exists).
-- Variance test of equal communalities / interstitiality indices.
+A Fable method-review of those drafts (2026-07-03; full report in
+`devel/fit-drafts-method-review.md`) found they are **mostly a rework, not a
+revival**, and traced every formula/threshold to their uncited source, Acton &
+Revelle (2004, *MPR-Online* 9(1)): Fisher test sound (needs citation +
+scoring-keyed cutoffs); gap test has a 0°/360° wrap-around omission (boundary
+bug) and nv-dependent cutoffs anti-conservative at the canonical nv=8; the
+variance test implements the *ineffective* variant and a mistranscribed
+threshold; the rotation test has an indexing bug corrupting the statistic; the
+randomization test isn't actually implemented. Cross-cutting M4 task: one
+simulation under A&R's generating model re-derives all cutoffs at nv=8. The
+`psych` dependency is unnecessary (a small base-R principal-axis FA replaces the
+one `psych::fa()` call; psych → Suggests as a test oracle) — **net new hard
+dependencies for the fit statistics: zero**.
+
+- Fisher test of equal axes (draft exists; sound, needs citation).
+- Gap test of equal spacing (draft exists; needs rework — boundary bug).
+- Variance test of equal communalities / interstitiality indices (draft needs
+      rework — wrong variant + mistranscribed threshold).
 - **Browne's (1992) stochastic process model — native reimplementation
       (CircE replacement).** CircE (Grassi, Luccio, & Di Blas, 2010) is
       archived on CRAN, leaving R users without an estimator for Browne's
@@ -149,6 +162,12 @@ dependency decision pending).
       amplitude near zero (nonnegative, upward-biased, skewed — the one SSM
       parameter where percentile intervals are theoretically weakest), since
       the amplitude CI drives the "displacement not interpretable" guardrail.*
+      *Related pre-existing observation (surfaced 2026-07-03 during the F3
+      review): for a contrast between two profiles whose contrast amplitude is
+      ~0 (near-uniform contrast draws), the displacement point estimate can fall
+      geometrically outside its very wide circular CI — the same amplitude-near-
+      zero regime this diagnostic targets, at the contrast level. Fold into the
+      diagnostic's scope rather than fixing the CI machinery ad hoc.*
 - `ssm_fit()`-style API returning a typed object with `print`/`summary`/
       `plot` methods, consistent with `circumplex_ssm` (plots built on the M3
       extension).

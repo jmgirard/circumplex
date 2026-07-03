@@ -199,6 +199,26 @@ fix is test-first with a regression test reproducing the audit's executed failur
 
 ## Log
 
+- 2026-07-03 — Brief A: M4 Browne-model estimation design (Fable, Jeff-steered).
+  Wrote `devel/m4-browne-design.md`, the CircE-replacement design doc for M4's
+  anchor feature: the model (Fourier correlation function with the Herglotz
+  β≥0 / Σβ=1 constraints, communality index, factor representation), ML
+  discrepancy with unconstrained reparameterization (logit ζ, softmax β,
+  angles free in ℝ, wrap at report only), analytic gradients + mandatory
+  finite-difference gradient test, identification (reference-angle fix,
+  reflection canonicalization, β-boundary polish with df reduction, Heywood
+  flags), df table for the four model variants, fit indices (χ², RMSEA+CI,
+  SRMR, CFI/TLI, AIC/BIC) defined from the discrepancy, `cpm_fit()` API
+  sketch (`circumplex_cpm`, print/summary/plot on the M3 extension,
+  `cpm_simulate()` as the Brief-B contract), and the validation strategy:
+  published CIRCUM/CircE oracles as blank transcription templates (no
+  expected values from memory or local files — g2xx1.txt explicitly banned)
+  plus internal oracles (exact-recovery round trip, circulant DFT check,
+  OpenMx/lavaan in Suggests as cross-implementation test oracles). Backend
+  DECIDED with Jeff: native optimization, R-first (nlminb), C++ port gated on
+  profiling with R kept as permanent oracle. Design only — no package code.
+  Next: Brief A-review in a fresh Fable session. (devel/m4-browne-design.md,
+  MILESTONES.md).
 - 2026-07-03 — F4–F6 nit cleanup (Sonnet, propose-not-commit; Opus review + commit).
   F4 (wording only, no behavior change): the degenerate-resample warning
   (`R/ssm_bootstrap.R`) and the DESIGN.md degenerate-profiles row overstated
