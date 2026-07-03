@@ -108,6 +108,10 @@
   `[0, 1]` only when `angles` are equally spaced; for unequally spaced angles
   the closed-form estimator is not a least-squares fit and the reported fit can
   fall below 0.
+* Fixed a bug where the displacement of a group contrast between two exactly
+  opposed profiles (a half-turn apart) was reported as `-180` degrees instead
+  of `+180`, inconsistent with the documented `(-180, 180]` convention for
+  contrasts. Such a contrast is now reported as `+180`.
 * Fixed a bug where length requirements on character arguments were never
   enforced (`is_null_or_char()` dropped its `n` argument). `ssm_analyze()` now
   errors if `measures_labels` does not match the number of `measures` (or is

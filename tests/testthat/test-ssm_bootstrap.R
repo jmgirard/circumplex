@@ -175,6 +175,38 @@ test_that("contrast displacement estimate and CI share a branch at +/-180", {
   expect_lt(abs(abs(r$d_est) - 180), 10)
 })
 
+test_that("exactly opposite profiles report a +180 contrast inside its CI (F3)", {
+  # Exactly sign-flipped group profiles: group b's mean vector is the exact
+  # negation of group a's, so the two displacements are atan2(-y, -x) vs
+  # atan2(y, x) -- a float-exact (or wrap-absorbed) half-turn. The (-180, 180]
+  # convention requires the contrast to be reported as +180, not -180
+  # (pre-fix it was exactly -180), and the CI branch-alignment shift must
+  # follow the estimate to the +180 branch so the estimate stays numerically
+  # inside its interval.
+  set.seed(42)
+  base <- matrix(rnorm(50 * 8), 50, 8) %*% diag(1:8 / 4)
+  dat <- data.frame(rbind(base, -base))
+  names(dat) <- paste0("S", 1:8)
+  dat$G <- rep(c("a", "b"), each = 50)
+
+  set.seed(24)
+  res <- suppressWarnings(ssm_analyze(
+    dat, scales = paste0("S", 1:8), grouping = "G", contrast = TRUE,
+    boots = 200
+  ))
+  r <- res$results[nrow(res$results), ]
+
+  # Contract: strictly inside (-180, 180] (pre-fix: exactly -180, failing this)
+  expect_true(r$d_est > -180 && r$d_est <= 180)
+  # The exact half-turn atom reports the +180 branch. NB: this seed lands on the
+  # bit-exact atom (remapped to +180); other seeds can leave the half-turn 1-2
+  # ulp off and report -179.9999...deg, so this +sign assertion is seed-specific.
+  expect_equal(abs(r$d_est), 180)
+  expect_gt(r$d_est, 0)
+  # Estimate lies numerically inside its own CI at the atom
+  expect_true(r$d_lci <= r$d_est && r$d_est <= r$d_uci)
+})
+
 test_that("quantile.circumplex_contrast_radian handles 0/360 boundary crossings cleanly", {
   # Create mock bootstrap replicates that straddle the 0/2*pi boundary.
   # 0.01 and 0.02 rad are just above 0° (~0.57° and ~1.15°).

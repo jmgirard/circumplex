@@ -19,6 +19,65 @@ test_that("angle convenience functions work", {
   expect_equal(quadrants(), as_degree(c(135, 225, 315, 45)))
 })
 
+test_that("angle_dist reports an exact half-turn as +pi, not -pi (F3)", {
+  # Contract: shortest signed rotation on the principal branch (-pi, pi].
+  # Pre-fix the wrap had range [-pi, pi), so the exact half-turn atom was
+  # reported as -pi. The half-turn must be +pi.
+  expect_identical(angle_dist(pi, 0), pi)
+  expect_identical(angle_dist(0, pi), pi)
+  expect_identical(angle_dist(-pi / 2, pi / 2), pi)
+  expect_identical(angle_dist(3 * pi / 2, pi / 2), pi)
+  # How the atom arises: displacements are atan2 outputs, and exactly
+  # sign-flipped profiles give atan2(-y, -x) vs atan2(y, x). These raw
+  # differences are float-exact +/-pi, so the wrap lands bit-exactly on the
+  # atom and they must all report +pi. (In the full pipeline, upstream wrapping
+  # to [0, 2pi) can leave some true half-turns 1-2 ulp off the atom; those are
+  # not remapped and correctly report just inside the branch -- see angle_dist.)
+  set.seed(42)
+  for (i in 1:8) {
+    y <- rnorm(1)
+    x <- rnorm(1)
+    expect_identical(angle_dist(atan2(-y, -x), atan2(y, x)), pi)
+  }
+  # Near-boundary values strictly inside (-pi, pi] are legitimate contrasts
+  # and must NOT be flipped by any tolerance band: a hair short of the
+  # half-turn stays on its own side.
+  eps <- 1e-12
+  d_neg <- angle_dist(-pi / 2 + eps, pi / 2) # true distance -pi + eps
+  expect_true(d_neg > -pi && d_neg < -pi + 1e-9)
+  d_pos <- angle_dist(-pi / 2 - eps, pi / 2) # true distance +pi - eps
+  expect_true(d_pos > pi - 1e-9 && d_pos <= pi)
+  # Non-boundary values are byte-identical to the plain wrap (no collateral
+  # change away from the atom)
+  x <- c(0.3, 5.9, -2.0, 10, -7.25)
+  y <- c(1.2, 0.1, 2.5, -3, 0.4)
+  expect_identical(angle_dist(x, y), ((x - y + pi) %% (2 * pi)) - pi)
+  # Standard shortest-rotation checks (statistical-validation #3)
+  expect_equal(as.numeric(angle_dist(10 * pi / 180, 350 * pi / 180)),
+               20 * pi / 180)
+  expect_equal(as.numeric(angle_dist(350 * pi / 180, 10 * pi / 180)),
+               -20 * pi / 180)
+  expect_equal(as.numeric(angle_dist(179 * pi / 180, -179 * pi / 180)),
+               -2 * pi / 180)
+  # NA propagates without erroring
+  expect_identical(angle_dist(NA_real_, 0), NA_real_)
+  # Vectorized input with one atom entry: only the atom is remapped
+  out <- angle_dist(c(pi, 0.5), c(0, 0.2))
+  expect_identical(out, c(pi, ((0.5 - 0.2 + pi) %% (2 * pi)) - pi))
+})
+
+test_that("param_diff reports an exact half-turn displacement contrast as +pi", {
+  # Parameter vectors in ssm_param_names() order: e, x, y, a, d, fit.
+  # Displacements exactly pi apart -> contrast displacement must be +pi.
+  p1 <- c(0.5, 0.0, 1.0, 1.0, pi, 0.9)
+  p2 <- c(0.2, 0.0, -1.0, 1.0, 0.0, 0.8)
+  expect_identical(param_diff(p1, p2)[[5]], pi)
+  # Matrix method (Monte Carlo replicate path) shares the same convention
+  m1 <- rbind(p1, p1)
+  m2 <- rbind(p2, p2)
+  expect_identical(unname(param_diff(m1, m2)[, 5]), c(pi, pi))
+})
+
 test_that("scales shortcut functions work", {
   expect_equal(PANO(), c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"))
 })

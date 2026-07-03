@@ -46,8 +46,21 @@ reshape_params <- function(v, suffix) {
 }
 
 # Calculate angular distance ---------------------------------------------------
+# Shortest signed rotation from y to x on the principal branch (-pi, pi], per
+# the contrast convention (second minus first, reported in (-180, 180]). The
+# plain wrap ((x - y + pi) %% 2pi) - pi has range [-pi, pi), so an exact
+# half-turn lands on -pi; the convention requires +pi. Remapping the exact -pi
+# atom is safe because the wrap yields exactly -pi only when x - y is exactly an
+# odd multiple of pi, which no genuine near-boundary (non-half-turn) contrast
+# ever produces -- so nothing legitimate is flipped. This catches the float-exact
+# half-turn (e.g. raw sign-flipped atan2 displacements, which are bit-exact
+# +/-pi). A true half-turn that upstream wrapping leaves 1-2 ulp off the atom is
+# not remapped and simply reports just inside the branch (e.g. -179.9999...deg,
+# which never rounds to -180) -- also correct. NA is preserved.
 angle_dist <- function(x, y) {
-  ((x - y + pi) %% (2 * pi)) - pi
+  d <- ((x - y + pi) %% (2 * pi)) - pi
+  d[!is.na(d) & d == -pi] <- pi
+  d
 }
 
 # Convert degrees to ggplot's radian format ------------------------------------

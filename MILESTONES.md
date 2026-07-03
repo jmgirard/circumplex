@@ -180,7 +180,7 @@ fix is test-first with a regression test reproducing the audit's executed failur
   4/6-missing scale). *Touches `src/` → rebuild C++, run the boundary suite +
   `/statistical-validation`.* *Accept:* the repro returns NA (or the documented
   degenerate handling) instead of aborting; regression test added.
-- [ ] **F3. `angle_dist()` range is [−180, 180), not (−180, 180]** — exactly
+- [x] **F3. `angle_dist()` range is [−180, 180), not (−180, 180]** — exactly
   opposed profiles yield a contrast `d_est` of exactly −180 rather than +180,
   violating the CLAUDE.md invariant (contrasts reported in (−180°, 180°]) and an
   existing test's asserted contract. Contrast-convention/danger-zone change.
@@ -197,6 +197,25 @@ fix is test-first with a regression test reproducing the audit's executed failur
 
 ## Log
 
+- 2026-07-03 — F3 fix: `angle_dist()` ±180° branch (Fable tests + review, Opus
+  fix, test-first). The plain wrap `((x-y+π) %% 2π) - π` has range [−π, π), so an
+  exact half-turn (exactly opposed profiles) reported −180 instead of the
+  documented (−180, 180] +180, violating the CLAUDE.md invariant. Fix: remap the
+  bit-exact −π atom to +π (`d[!is.na(d) & d == -pi] <- pi`) — minimal, no tolerance
+  band, byte-identical off the atom (so no seeded-pin drift). Process: the F3
+  implementer subagent (Fable) wrote the tests then hit its session limit before
+  the fix; Opus completed the one-liner by inferring intent from the tests and
+  verifying (independent complex-Arg oracle to 5e-15; suite 585/585). A FRESH
+  Fable adversarial review then attacked it (~440k half-turn constructions,
+  25-seed×2-engine sweep) and returned CLEAN — with one accuracy correction now
+  applied: the pipeline's `modu()` wrap ([0,2π)) leaves ~16% of true half-turns
+  1–2 ulp off the atom, landing harmlessly just inside the branch (never rounding
+  to −180), so the "bit-exact" comment was softened. Fixed-oracle branch-alignment
+  test untouched. Pre-existing out-of-scope observation surfaced (recorded
+  separately): in a degenerate zero-amplitude-contrast MC regime the estimate can
+  sit geometrically outside its wide CI (fix strictly improves the pre-fix case).
+  ALL F1–F3 pre-release fixes now done. (R/utils.R, tests/testthat/test-utils.R,
+  test-ssm_bootstrap.R, test-ssm_montecarlo.R, NEWS.md, MILESTONES.md).
 - 2026-07-03 — F2 fix: model-fit caveat documentation (Opus, doc-only). The
   closed-form estimator is the OLS projection (fit ∈ [0,1]) only for equally
   spaced angles; off equal spacing it is the Gurtman estimator and the reported

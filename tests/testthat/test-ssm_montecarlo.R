@@ -193,3 +193,29 @@ test_that("Monte Carlo results are reproducible with a seed", {
   r2 <- ssm_analyze(aw2009, scales = 1:8, boots = 100, method = "montecarlo")
   expect_identical(r1$results, r2$results)
 })
+
+test_that("Monte Carlo contrast at an exact half-turn reports +180 inside its CI (F3)", {
+  # Same exact-half-turn construction as the bootstrap F3 test: the Monte
+  # Carlo engine shares param_diff()/angle_dist() for its observed contrast,
+  # so the +180 convention and the estimate<->CI branch alignment must hold
+  # there too.
+  set.seed(42)
+  base <- matrix(rnorm(50 * 8), 50, 8) %*% diag(1:8 / 4)
+  dat <- data.frame(rbind(base, -base))
+  names(dat) <- paste0("S", 1:8)
+  dat$G <- rep(c("a", "b"), each = 50)
+
+  set.seed(24)
+  res <- suppressWarnings(ssm_analyze(
+    dat, scales = paste0("S", 1:8), grouping = "G", contrast = TRUE,
+    boots = 500, method = "montecarlo"
+  ))
+  r <- res$results[nrow(res$results), ]
+
+  expect_true(r$d_est > -180 && r$d_est <= 180)
+  expect_equal(abs(r$d_est), 180)
+  # This seed lands on the bit-exact atom (+180); the +sign is seed-specific
+  # (other seeds can leave the half-turn 1-2 ulp off, reporting -179.9999...deg).
+  expect_gt(r$d_est, 0)
+  expect_true(r$d_lci <= r$d_est && r$d_est <= r$d_uci)
+})
