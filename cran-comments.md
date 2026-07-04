@@ -16,9 +16,16 @@ No reverse dependencies on CRAN (checked via
 
 ## Summary of changes
 
-Correctness and robustness patch — see NEWS.md for the full list. Highlights:
-several estimation-adjacent bugs fixed (`ssm_score()` angle forwarding, NA
-grouping values, degenerate/zero-variance profiles, normative-data angle
-matching, contrast CI branch selection near +/-180 degrees), input validation
-tightened, matrix input support restored, and print/summary output now flags
-statistically uninterpretable profiles. No breaking changes to the public API.
+Inference-quality and visualization release — see NEWS.md for the full list.
+Highlights: a Monte Carlo alternative to the bootstrap for confidence intervals
+(`method = "montecarlo"`, faster on large samples), parallel bootstrapping
+(`parallel`/`ncpus`), a vectorized `ssm_score()`, and a new public ggplot2
+extension for circumplex visualization (`ggcircumplex()`, `geom_ssm_point()`,
+`geom_ssm_arc()`, `scale_x_circumplex()`) with an accompanying vignette. Also
+includes three bug fixes from a pre-release audit: a pairwise-deletion
+bootstrap crash on an all-missing resampled scale, a documentation gap where
+the reported model fit can fall outside [0, 1] for unequally spaced angles, and
+a contrast-displacement sign error at the exact +/-180 degree boundary. No
+breaking changes to the public API (a tightened validation path in
+`ssm_score()` now errors on previously-silently-mishandled unnamed/non-scalar
+arguments; the documented call forms are unaffected).

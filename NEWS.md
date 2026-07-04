@@ -1,4 +1,4 @@
-# circumplex (development version)
+# circumplex 1.3.0
 
 * New vignette "Advanced Circumplex Visualization" shows how to build custom
   circumplex figures by composing `ggcircumplex()`, `geom_ssm_point()`,
