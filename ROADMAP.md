@@ -227,6 +227,29 @@ the relevant code:
   boundary, contrasts near ±180°, flat profiles, single-scale edge cases.
 - Keep GitHub Actions workflows current; add R-devel to the check matrix.
 - Track code coverage on the statistical core (`ssm_*`, `src/`) specifically.
+- **Deferred `/code-review max` findings (2026-07-03, v1.3.0 bundle).** Non-blocking;
+  the review found no wrong-number correctness bugs and the one guard worth acting
+  on (C++ stride ↔ `ssm_param_names()`) shipped. Fold the rest in when the relevant
+  code is next touched (mostly M4):
+  - *Visualization extension robustness (fold into M4's new plots):* the three
+    degenerate-profile filters (`GeomSsmPoint` on the estimate, `StatSsmArc` on the
+    CI bounds, `ssm_plot_circle()` on `d_est`) use inconsistent NA criteria, so a
+    profile with a defined estimate but an undefined CI renders a point with no
+    wedge and no message — unify behind one plottability predicate. `StatSsmArc`
+    also returns a structurally wrong 0-row frame when all rows are dropped. The
+    now-exported `geom_ssm_arc()` needs documented/validated displacement input
+    range (a `min>max` span silently draws the short-way arc).
+  - *Monte Carlo engine efficiency (fold into M4's `ssm_ci_accuracy` work, which
+    hammers the MC path):* the `psi` inner double loop recomputes squares
+    per-element; per-profile `group_parameters()` + `do.call(cbind)` could be one
+    batched C++ call; the MC correlation path re-introduces positional block
+    indexing the M2 refactor retired elsewhere (name-drive it).
+  - *Minor cleanup (any release):* `ssm_replicate_intervals()` computes CI bounds in
+    two `sapply(quantile)` passes (re-sorting each displacement column twice) —
+    pass `probs = c(lo, hi)` once; drop the redundant `scores <- obs_scores` alias
+    in both analysis paths; tighten the `ssm_score()` roxygen (an unnamed extra
+    fills `angles` positionally and errors on `is.numeric`, not the documented
+    named-args message).
 
 Explicitly **not** planned: a ground-up rewrite. The R-dispatch → C++ core →
 `boot` architecture, the S3 class design, and the minimal dependency policy
