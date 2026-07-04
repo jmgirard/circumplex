@@ -199,6 +199,55 @@ fix is test-first with a regression test reproducing the audit's executed failur
 
 ## Log
 
+- 2026-07-03 — Brief B-revision: revised the `ssm_ci_accuracy()` spec against the
+  B-review findings (FRESH Fable session — not the B author, not the reviewer).
+  Resolved the review's F1–F9 with a per-finding revision log (fixed / rejected-
+  with-reason). Notably: adopted the *shipped* guardrail rule verbatim
+  (`round(a_lci, 3) <= 0`, R/ssm_oop.R:159) and redefined the contrast module on
+  the row-amplitude ladder (the regime where the branch pathology actually
+  occurs). **No new A-side interface gaps** — G1–G4 stand as previously flagged;
+  F6 was B's own omission (A's signature already carries `scales`/`angles`). One
+  NEW package-side decision surfaced for Jeff (§12.5 / F1.ii): the shipped
+  guardrail's certification threshold is a display-precision artifact (~0.0005
+  amplitude units at default digits, moving with a `print` argument) — keep the
+  display-coupled rule and just measure it, or give `print.circumplex_ssm()` a
+  principled print-independent rule. Deferred to a `print.circumplex_ssm()`
+  decision, outside B's scope. Revision only; nothing committed by the session.
+  Tier for the eventual build (future M4, once §12 decisions settle): Opus against
+  the spec, with the §4.3 guardrail-measurement module + §10 oracles reviewed by
+  Fable (the remaining plausible-but-wrong spots). (devel/m4-ci-accuracy-spec.md,
+  devel/fable-briefs-2026-07.md, MILESTONES.md).
+- 2026-07-03 — Brief B-review: adversarial review of the ssm_ci_accuracy()
+  spec (FRESH Fable session, no involvement in A/B/A-review). Report:
+  `devel/m4-ci-accuracy-spec-review.md`. Verdict: NEEDS CHANGE (F1–F3 before
+  implementation; F4–F9 cheap). Z&W number hygiene — the brief's top suspect
+  — came up CLEAN: every Z&W value TBT, illustrative numbers labeled, all
+  fixed numbers traced to shipped code/citations/arithmetic. A↔B contract
+  clean: every consumed field exists in A §5.4; gaps G1–G4 are genuine A
+  gaps, correctly flagged. Required changes: (1) HIGH — the certification
+  event "amplitude lci > 0" is degenerate (percentile lower bound of a
+  strictly positive statistic is > 0 a.s., so false-certification ≡ 1 at
+  a₀=0 and the §4.3 power curve ≡ 1) AND differs from the shipped guardrail,
+  which is round(a_lci, digits=3) <= 0 (R/ssm_oop.R:159) — a scale- and
+  display-precision-dependent threshold; the "nominal α/2" duality also
+  fails at the boundary. Spec must adopt the shipped rule verbatim and
+  surface the guardrail-threshold question to Jeff as a package decision.
+  (2) HIGH — the contrast ladder (profiles converge, rows stay realistic)
+  targets a regime where the branch pathology cannot occur: verified by
+  seeded simulation against the package — spec's regime gives a 14° contrast-d
+  CI; the actual pathology regime is ROW amplitude ≈ 0 vs sampling noise
+  (326° CI). Redefine the contrast module on the row ladder. (3) MED — the
+  ladder's truth claims (a₀=0 at c=0, a₀=c·â) hold only for equally spaced
+  angles; fix via the estimator functional (2×2 solve) or per-rung truths.
+  Plus: c=0 amplitude coverage is a theorem (≡0), not a measurement (F4);
+  Wilson level unpinned (F5); pinned cpm_fit() call omits scales/angles
+  (F6); Z&W-reproduction gate assumes MVN-reproducible generating process
+  (F7); (a)-vs-(b) rationale leans on remembered qualitative Z&W properties
+  — re-confirm at transcription (F8); multi-row ladder under-specified (F9).
+  Review only — spec substance untouched, nothing committed. Next: Fable
+  revision pass on the spec (F1.ii changes what the shipped guardrail
+  means; estimator-adjacent decision-rule design), Sonnet for F5/F6/F9 if
+  split out. (devel/m4-ci-accuracy-spec-review.md, MILESTONES.md).
 - 2026-07-03 — Brief B: `ssm_ci_accuracy()` CI-trustworthiness spec (FRESH
   Fable session, per the brief's context-hygiene rule; builds on the
   committed Brief A design, decisions taken as given). Wrote

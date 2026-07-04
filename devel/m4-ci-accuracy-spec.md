@@ -7,6 +7,9 @@ in particular the native, R-first backend and the `cpm_fit()`/`cpm_simulate()`
 sketch in its §5.4).
 **Central decision (§2): DECIDED with Jeff, 2026-07-03 — simulation only
 in code; Z&W content as transcribed vignette context (see §13).**
+**Revised 2026-07-03 against the B-review
+(`devel/m4-ci-accuracy-spec-review.md`, verdict NEEDS CHANGE): all findings
+F1–F9 resolved; see the "Revision log (vs B-review)" section near the end.**
 
 > ⚠️ **Oracle rule (inherited from Brief A §6.1, binding here):** no numeric
 > accuracy value from Zimmermann & Wright (2017) — coverage rates, bias
@@ -142,6 +145,14 @@ costs nothing.
 §6 is retained as the requirements record should (b)-lite ever be revisited
 (cheap to add later without rework — see the runner-up note above).
 
+*(B-review F8, accepted:* the case against (b) — "coarse and fixed grid",
+"specific instruments and n values", "their software stack" — is a
+qualitative, from-memory characterization of Studies 1–5. No numbers are
+involved and the decision was properly surfaced to Jeff, but the
+characterization is load-bearing: when the paper is transcribed for the
+vignette (§13), **re-confirm the grid characterization and record the
+confirmation in the change log**.)*
+
 ---
 
 ## 3. What is computed (option a)
@@ -171,10 +182,20 @@ within-group scale correlation matrices, R_w = Σ_g (n_g − 1) R_g / Σ_g
 (n_g − 1) (elementwise; groups share one circumplex structure — the standard
 assumption; a per-group option is deferred, §12). Fit
 
-    cpm <- cpm_fit(cormat = R_w, n = sum(n_g) - G + 1, m = <default or user>,
+    cpm <- cpm_fit(cormat = R_w, n = sum(n_g) - G + 1,
+                   scales = <the ssm object's scale names>,
+                   angles = <details$angles, degrees>,
+                   m = <default or user>,
                    model = "quasi-circumplex", ci_method = "analytic")
 
-taking P̂ = `cpm$matrices$Phat`. The CPM's CIs are irrelevant here (only P̂
+taking P̂ = `cpm$matrices$Phat`. `scales` and `angles` must be passed
+through explicitly (B-review F6): A's `angles` defaults to `octants()`, so a
+non-octant analysis would otherwise be started and canonicalized at the
+wrong theoretical configuration; the reference convention (first scale, per
+A's default) then follows from the user's own angle set. The `n` device is
+correct as written: A's internal multiplier is `n_passed − 1`, so passing
+Σn_g − G + 1 yields the pooled-within Wishart df Σ(n_g − 1) (verified in the
+B-review). The CPM's CIs are irrelevant here (only P̂
 and the fit indices are consumed); the cormat path's analytic-only CI
 restriction is therefore harmless. If `cpm$details` reports acceptance
 failure, boundary flags, or poor global fit, the verdict is downgraded and
@@ -216,10 +237,20 @@ cross-correlation vector (correlation-based; internal consistency demands
 truth be computed from the matrix actually simulated from, not the
 pre-repair observed block). Contrast truth uses `param_diff()` semantics:
 second minus first, displacement via `angle_dist()` in (−180°, 180°].
-If the population profile is degenerate (flat, or amplitude exactly 0 as in
-the §4 c = 0 condition), d₀ is undefined; displacement coverage is reported
-NA for that condition and the guardrail characteristics (§4.3) carry the
-inferential weight instead.
+
+Truths are **recomputed from the population profile vector at every §4
+ladder rung** — a₀(c) and d₀(c) are outputs of this section applied to
+profile(c), never assumed equal to c·â and d̂ (B-review F3; the §4.1
+construction makes the equality exact on the mean-based path, and the
+recomputation is the belt-and-suspenders that would surface any construction
+error as a visible a₀(c) ≠ c·â rather than a silent mis-conditioning of the
+§4.3 rates).
+
+If the population profile is degenerate (flat, or amplitude exactly 0, as at
+the §4 c = 0 rung on the mean-based path — §4.1 explains why the exact zero
+holds for any angle spacing, and the correlation-path post-repair caveat),
+d₀ is undefined; displacement coverage is reported NA for that condition and
+the guardrail characteristics (§4.3) carry the inferential weight instead.
 
 ### 3.4 Simulation loop
 
@@ -245,10 +276,20 @@ For k = 1 … `reps` (default 1000; §11 for the Monte Carlo error this buys):
    - one-sided miss side (below lci / above uci; for d, the shorter angular
      direction of the miss);
    - CI width (angular width for d, capped at 360°);
-   - guardrail events: amplitude lci > 0 (displacement certified); fit_est ≥
-     .70; and the **branch pathology counter** — displacement point estimate
-     geometrically outside its own reported CI (the ROADMAP's F3-review
-     observation, folded in here);
+   - guardrail events: **certification under the shipped decision rule** —
+     `!is.na(a_lci) && round(a_lci, digits) > 0`, exactly the rule
+     `print.circumplex_ssm()` applies (R/ssm_oop.R; B-review F1), evaluated
+     at the diagnostic's `digits` argument (default 3, matching print's
+     default). The implied threshold, a_lci ≥ 0.5·10^−digits, is in
+     **amplitude units and therefore scale-dependent** (it means something
+     different on a correlation-metric amplitude than on a raw-score
+     metric); the diagnostic echoes it in the output. The strict event
+     "a_lci > 0" must **not** be used: percentile quantiles of strictly
+     positive amplitude replicates are strictly positive, so the strict
+     event holds with probability 1 and is degenerate. Also recorded:
+     fit_est ≥ .70; and the **branch pathology counter** — displacement
+     point estimate geometrically outside its own reported CI (the ROADMAP's
+     F3-review observation, folded in here);
    - degenerate-replicate warnings raised (count only; warnings suppressed
      inside the loop and re-summarized).
 
@@ -258,8 +299,8 @@ Per profile row × parameter × condition (§4 adds conditions):
 
     coverage, mc_se (binomial), left_miss, right_miss, median_width
 
-plus, per profile row × condition: certification rate (amplitude lci > 0),
-fit-pass rate (fit_est ≥ .70), displacement-conditional coverage — coverage
+plus, per profile row × condition: certification rate (under the §3.4
+shipped rule), fit-pass rate (fit_est ≥ .70), displacement-conditional coverage — coverage
 of d **among the replicates where the guardrail certified it** (this is the
 estimand users actually live under: d is only interpreted when certified;
 unconditional d coverage is reported too, but the conditional number is the
@@ -278,34 +319,82 @@ the user's data rather than waiting for it.
 
 ### 4.1 Amplitude ladder
 
-Decompose the observed profile vector into SSM-implied first harmonic plus
-residual: with the fitted (ê, â, d̂) and scale angles θ_i,
+Define the ladder through the **estimator functional**, not the naive cosine
+decomposition (B-review F3). The closed-form SSM estimator is linear in the
+profile vector, and its (e, x, y) images of the basis {1, cos θ, sin θ} form
+a 3×3 linear system M (M_rc = the r-th functional applied to the c-th basis
+vector at the analysis angles θ_i). Solve
 
-    resid_i = profile_i − ê − â·cos(θ_i − d̂)   (the higher-harmonic content),
+    M · (γ, α, β)ᵀ = (0, x̂, ŷ)ᵀ
 
-and define condition-c populations by scaling only the first harmonic:
+and define the condition-c population profile as
 
-    profile_i(c) = ê + c·â·cos(θ_i − d̂) + resid_i ,   c ∈ amplitude_factors,
+    profile(c) = profile − (1 − c) · (γ·1 + α·cos θ + β·sin θ) ,
+    c ∈ amplitude_factors, default amplitude_factors = c(1, 0.5, 0.25, 0).
 
-default `amplitude_factors = c(1, 0.5, 0.25, 0)`. c = 1 is the as-estimated
-condition (§3 unchanged); c = 0 is a population with amplitude exactly 0 but
-*realistic residual harmonics* — deliberately the "pure higher harmonic"
-territory the estimator already treats as degenerate-with-real-variance, and
-deliberately not a flat profile. Keeping `resid` fixed keeps fit realistic
-across the ladder instead of silently setting population R² = 1. If â itself
-is ~0 (below, say, half its CI width), the ladder degenerates; the module
-then also runs an absolute rung at the certification margin — c chosen so
-c·â equals the half-width of the observed amplitude CI — and `summary()`
-notes that the user's own analysis already sits in the near-zero regime.
+By linearity the population truths are then exact **for any angle spacing**:
+e₀(c) = ê, (x₀(c), y₀(c)) = c·(x̂, ŷ), hence a₀(c) = c·â and d₀(c) = d̂ for
+c > 0, and a₀(0) = 0 exactly. For equally spaced angles this reduces to the
+naive "scale the fitted first harmonic" decomposition (γ = 0 and
+α·cos θ + β·sin θ = â·cos(θ − d̂), the residual being orthogonal to the
+estimator); off equal spacing the naive decomposition does **not** scale the
+closed-form amplitude — the closed form is not OLS there (the CLAUDE.md
+invariant §1 leans on), so the residual has a nonzero (x, y) image — which
+is why the functional-targeted solve is the definition, not an
+implementation option. (The B-review's F3 suggested a 2×2 solve in (α, β);
+the intercept γ is added here because off equal spacing mean(cos θ_i) ≠ 0,
+so an x/y-only correction would shift e₀ — the 3×3 keeps all three truths on
+target.) If M is singular (pathological angle sets, e.g. all angles
+coincident), the ladder is refused with a clear error. §3.3's per-rung truth
+recomputation remains in force regardless, so the reported rates are always
+keyed to the actual a₀(c), d₀(c).
+
+c = 1 is the as-estimated condition (§3 unchanged); c = 0 is a population
+whose closed-form amplitude is exactly 0 but with *realistic residual
+harmonics* — deliberately the "pure higher harmonic" territory the estimator
+already treats as degenerate-with-real-variance, and deliberately not a flat
+profile. Keeping the residual content fixed keeps fit realistic across the
+ladder instead of silently setting population R² = 1. If â itself is ~0
+(below, say, half its CI width), the ladder degenerates; the module then
+also runs an absolute rung at the certification margin — c chosen so c·â
+equals the half-width of the observed amplitude CI — and `summary()` notes
+that the user's own analysis already sits in the near-zero regime.
 Correlation-based profiles: `profile(c)` replaces the cross-correlation
-block, then the §3.2 PSD repair and |r| < 1 guard re-run per condition.
+block, then the §3.2 PSD repair and |r| < 1 guard re-run per condition. The
+repair runs *after* the ladder, so the post-repair truths (recomputed per
+§3.3) can deviate slightly from c·â — including a tiny nonzero a₀ at c = 0;
+the rates are keyed to the recomputed truths and the deviation is reported
+alongside max |ΔJ|.
 
-Contrast objects get the same ladder applied to the **contrast**: the second
-group's (or measure's) population profile is moved toward the first's so the
-population contrast amplitude is scaled by c while each row stays a
-realistic profile — this targets the ROADMAP's contrast-level pathology
-(near-uniform contrast draws; estimate outside a very wide circular CI) in
-exactly the regime it occurs.
+**Multi-row objects** (several groups, or several measures sharing one joint
+matrix; B-review F9): the ladder is applied to **every profile row jointly
+at the same c** — one condition set, not a per-row grid. For group rows this
+is exactly equivalent to laddering each row independently (their populations
+are independent) at a fraction of the conditions; for measure rows the
+conditions couple only through the single per-rung PSD repair of the shared
+joint matrix, which is recorded per rung as in §3.2.
+
+**Contrast objects** (B-review F2 — corrected from the initial draft, which
+moved the second profile toward the first so the population *contrast*
+amplitude scaled with c): that converging ladder targets a regime where the
+contrast pathology **does not occur**. The ROADMAP's near-uniform
+contrast-displacement draws are driven by a *row* amplitude that is small
+relative to its sampling error — each such row's displacement replicates go
+near-uniform, hence Δd does — not by the between-profile difference
+shrinking; two precisely-estimated displacements have a precisely-estimated
+difference however close the profiles are. (Verified by simulation in the
+B-review: population contrast amplitude ≈ 0 with row amplitudes 0.8 gave a
+14.3°-wide contrast CI, estimate comfortably inside; row amplitudes 0.02
+gave a 326°-wide CI — the pathology.) The contrast module therefore applies
+the **row ladder above to both rows jointly at the same c** (the F9 rule,
+unchanged), which manufactures the near-uniform-Δd regime exactly where the
+branch pathology (estimate geometrically outside a very wide circular CI)
+lives. The converging ladder is dropped, not merely demoted: what it
+measures — behavior when the contrast amplitude Δa is near zero while both
+rows stay precise — is a much milder question (Δa is a signed, unconstrained
+difference, so the boundary pathology motivating this module does not apply
+to it), and the joint row ladder drives the population Δa toward zero along
+the way anyway.
 
 ### 4.2 What is evaluated on the ladder
 
@@ -315,21 +404,52 @@ diagnostic signature, not just the total), amplitude CI width, displacement
 coverage (unconditional and certification-conditional; NA at c = 0), and the
 guardrail operating characteristics of §4.3.
 
+**At c = 0 (mean-based path) amplitude coverage is a theorem, not a
+measurement** (B-review F4): a percentile interval of strictly positive
+amplitude replicates cannot contain 0, so coverage is identically 0 with
+every miss on the truth-below-interval side. It is still reported, flagged
+in the output as structural; the informative rungs for amplitude coverage
+are the **small c > 0 ones**, where coverage of a₀(c) = c·â is a genuine,
+non-trivial quantity. (On the correlation path the post-repair a₀(0) can be
+tiny but nonzero; coverage there is near-0 for the same reason and equally
+uninformative.) An implementer must not "validate" the module against the
+c = 0 tautology — §10's oracles are keyed accordingly.
+
 ### 4.3 Guardrail operating characteristics
 
 The printed guardrail is a decision rule; near zero it has error rates, and
 the module measures them:
 
-- **False certification rate (c = 0):** P(amplitude lci > 0 | a₀ = 0). The
-  rule is the implicit one-sided test "lci > 0", nominal level
-  α/2 = (1 − interval)/2 (0.025 at the default). Percentile intervals for a
-  boundary-constrained, upward-biased estimator are expected to be
-  anti-conservative here — this rate *is* the headline number the absorbed-M2
-  task asked for.
-- **Certification rate (c > 0):** the rule's power curve up the ladder.
+- **False certification rate (c = 0):** P(certified | a₀ = 0) under the
+  §3.4 **shipped rule** (`round(a_lci, digits) > 0`). Two corrections from
+  the initial draft (B-review F1). (i) Under the *strict* event
+  "a_lci > 0" this rate is identically 1 — percentile quantiles of strictly
+  positive amplitude replicates are strictly positive — so the strict event
+  is degenerate and is not what the package ships; the shipped rounding
+  makes the event non-degenerate, at the price of a threshold
+  (0.5·10^−digits amplitude units) that is a display-precision artifact and
+  scale-dependent (surfaced as a package decision, §12). (ii) There is **no
+  test here with nominal level α/2**: the CI-excludes-0 ⟺
+  level-α/2-one-sided-test duality fails for a boundary-constrained
+  nonnegative parameter whose percentile interval cannot contain 0. The
+  measured rate is therefore compared to α/2 = (1 − interval)/2 only as a
+  **user-expectation benchmark** ("users read *the amplitude CI excludes
+  zero* as a 2.5%-level test"), never banded as if it had a nominal level
+  (§5.1). The theoretical prediction is stated up front so an implementer
+  does not mistake the result for a bug: the rate should sit **far above**
+  the benchmark — near 1 wherever the amplitude sampling noise dwarfs the
+  rounding threshold, i.e. in most configurations. That *is* the finding
+  the absorbed-M2 task exists to put in front of users: the shipped
+  guardrail provides little protection against a truly zero amplitude at
+  typical n, and quantifying that at the user's own configuration is the
+  headline number.
+- **Certification rate (c > 0):** the shipped rule's power curve up the
+  ladder.
 - **Conditional displacement coverage (c > 0):** coverage of d among
   certified replicates — the guardrail's promise ("when I certify, the d
-  interval is trustworthy") tested directly.
+  interval is trustworthy") tested directly. This is genuine coverage of a
+  genuine parameter, so it — not the false-certification rate — is the
+  guardrail quantity the §5.1 verdict machinery bands.
 - **Branch pathology frequency** per rung (expected to concentrate at small
   c, especially for contrasts).
 - **Fit-pass rate** per rung (context only; fit has no CI).
@@ -343,20 +463,27 @@ the module measures them:
 Per profile row and parameter, at the as-estimated condition (c = 1),
 compare empirical coverage to the nominal level using **Bradley's (1978)
 liberal robustness band** — coverage within [1 − 1.5α, 1 − 0.5α], i.e.
-[.925, .975] at 95% — the standard citable criterion, applied to the Wilson
-score interval of the empirical coverage (so `reps`-level Monte Carlo error
-cannot flip a verdict silently):
+[.925, .975] at 95% — the standard citable criterion, applied to the **95%
+Wilson score interval** of the empirical coverage (level pinned per B-review
+F5; the adequate/borderline boundary moves with it), so `reps`-level Monte
+Carlo error cannot flip a verdict silently:
 
 - **Adequate** — Wilson interval entirely inside the Bradley band;
 - **Borderline** — Wilson interval overlaps the band boundary;
 - **Inadequate** — Wilson interval entirely outside (direction reported:
   under- vs over-coverage).
 
-The displacement verdict uses the certification-conditional coverage. The
-false-certification rate at c = 0 is classified against its own nominal α/2
-with the analogous band [0.5·α/2, 1.5·α/2]. The profile verdict is the worst
-classification among {e, a, d(conditional), guardrail}; x and y are reported
-but do not drive the verdict (they are intermediate quantities users rarely
+The displacement verdict uses the certification-conditional coverage —
+genuine coverage of a genuine parameter, so the Bradley machinery applies to
+it unchanged. The false-certification rate does **not** enter the band
+machinery (B-review F1): it has no nominal level to be banded against
+(§4.3), so it is reported as a labeled caution line against the α/2
+user-expectation benchmark, with its own 95% Wilson interval, and it
+triggers the CAUTION wording whenever that interval's lower bound exceeds
+the benchmark — which theory predicts will be nearly always; the verdict
+text owns that plainly rather than burying it. The profile verdict is the
+worst classification among {e, a, d(conditional)}; x and y are reported but
+do not drive the verdict (they are intermediate quantities users rarely
 interpret with CIs).
 
 ### 5.2 Wording sketch (profile-level; numbers illustrative placeholders only)
@@ -370,11 +497,14 @@ interpret with CIs).
                         when the true amplitude is small)
         Displacement   coverage 96.1% when certified — adequate
         Guardrail      if the true amplitude were zero, displacement would
-                        be wrongly certified 8.9% of the time (nominal 2.5%)
+                        still be certified 97.4% of the time — the
+                        "amplitude CI excludes zero" rule is far weaker
+                        than the 2.5% error rate its wording suggests
 
-      Verdict: CAUTION — amplitude CIs and the interpretability guardrail
-      are less reliable than nominal at this sample size. Displacement CIs
-      are trustworthy when certified. Consider a larger sample or treat
+      Verdict: CAUTION — amplitude CIs are less reliable than nominal at
+      this sample size, and the interpretability guardrail provides almost
+      no protection against a truly zero amplitude. Displacement CIs are
+      trustworthy when certified. Consider a larger sample or treat
       near-zero amplitudes as inconclusive rather than absent.
 
     Structure note: population simulated from a Browne circular model fit
@@ -422,6 +552,9 @@ print both and never average them.
       m = NULL,                       # -> cpm_fit default min(3, floor((p-1)/2))
       cpm = NULL,                     # optional pre-fitted circumplex_cpm to reuse
       data = NULL,                    # fallback for objects predating §8.3 storage
+      digits = 3,                     # guardrail certification digits: the §3.4
+                                      #   shipped rule round(a_lci, digits) > 0;
+                                      #   default matches print.circumplex_ssm()
       parallel = "no", ncpus = 1
     ) -> circumplex_ci_accuracy
 
@@ -430,7 +563,9 @@ print both and never average them.
     coverage    data frame: Profile, Parameter, Condition (c), Coverage,
                 MC_se, Left_miss, Right_miss, Median_width,
                 Coverage_conditional (d rows only)
-    guardrail   data frame: Profile, Condition, Cert_rate, Nominal,
+    guardrail   data frame: Profile, Condition, Cert_rate, Benchmark
+                (the α/2 user-expectation benchmark — not a nominal level,
+                §4.3), Threshold (0.5·10^−digits, amplitude units),
                 Fit_pass_rate, Branch_pathology_rate
     verdict     data frame: Profile, Parameter, Class (adequate/borderline/
                 inadequate), plus one overall row per profile
@@ -456,6 +591,8 @@ mechanism), so results are byte-identical for a fixed seed **regardless of
 `ncpus`** — the same user-facing guarantee `ssm_analyze()`'s bootstrap
 gives, achieved by substreams rather than master-process pre-draw (pre-
 drawing all `reps` datasets centrally would be memory-hostile).
+Implementation note (from the B-review): selecting L'Ecuyer-CMRG requires
+saving and restoring the caller's `RNGkind` and `.Random.seed`.
 
 ---
 
@@ -564,13 +701,19 @@ estimation machinery and gets the same treatment.
   moderate n under MVN, percentile-bootstrap coverage is textbook-adequate.
   The diagnostic must classify it adequate (Bradley band) in a seeded run.
   A diagnostic that flags healthy elevation CIs is broken.
-- **Known-bad direction oracle:** at c = 0, the amplitude lower-tail miss
-  rate and false-certification rate must exceed nominal *in the predicted
-  direction* (one-sided binomial test at a seeded configuration). No
-  magnitude is pinned — magnitudes are configuration-dependent and pinning
-  one from expectation would violate the oracle rule; the *direction* is
-  theory (nonnegative, upward-biased estimator), and a diagnostic that
-  cannot detect the weakness it exists to detect fails its reason to exist.
+- **Known-bad direction oracle:** at a **small c > 0 rung** (not c = 0,
+  where amplitude coverage is a theorem, not a measurement — §4.2),
+  amplitude coverage must fall below nominal with misses concentrated on
+  the truth-below-interval side (one-sided binomial test at a seeded
+  configuration); and at c = 0 the false-certification rate under the
+  shipped rule must exceed the α/2 benchmark (theory predicts near 1; the
+  test is directional only). No magnitude is pinned — magnitudes are
+  configuration-dependent and pinning one from expectation would violate
+  the oracle rule; the *direction* is theory (nonnegative, upward-biased
+  estimator), and a diagnostic that cannot detect the weakness it exists to
+  detect fails its reason to exist. Separately, c = 0 amplitude coverage
+  identically 0 on the mean-based path is asserted as a **machinery pin**
+  — never presented as evidence the module works (§4.2).
 - **Brute-force cross-check:** one tiny configuration (p = 4, small n,
   reps = 200) reproduced by an independent flat script (no shared helpers
   beyond the package's public API) to the same coverage counts under the
@@ -578,17 +721,25 @@ estimation machinery and gets the same treatment.
 - **Z&W reproduction (the O5 bridge, all TBT):** configure the simulator to
   the transcribed conditions of at least one Z&W study; the diagnostic's
   coverage estimates must agree with the published values within combined
-  Monte Carlo error. Runs under `/statistical-validation` as a seeded,
-  CI-tagged script, not on every check (cost) — same tier as Brief A's
-  coverage oracle, and sharing its harness is an explicit implementation
-  suggestion.
+  Monte Carlo error. **Conditional gate** (B-review F7): this presumes
+  Z&W's generating process (TBT from the supplement) is expressible under
+  this simulator (MVN at their structures); if transcription shows they
+  generated non-MVN data or resampled real datasets, the gate is re-scoped
+  at that point — documented in the validation script, never silently
+  loosened. Runs under `/statistical-validation` as a seeded, CI-tagged
+  script, not on every check (cost) — same tier as Brief A's coverage
+  oracle, and sharing its harness is an explicit implementation suggestion.
 - **Boundary suite (CLAUDE.md danger zones):** population displacement at
   the 0°/360° pole (angular membership must make coverage insensitive to
   the 0-vs-360 report, per DESIGN G2); contrast truth near ±180° (branch-
   aligned membership correct on both sides); c = 0 rung (d coverage NA, no
   crash, guardrail rates produced); flat-profile population refused with a
-  clear error (nothing to assess); a contrast configured so the branch
-  pathology occurs (counter > 0 in a seeded run).
+  clear error (nothing to assess); a contrast at a small-c rung of the row
+  ladder so the branch pathology occurs (counter > 0 in a seeded run — the
+  regime the F2-corrected ladder targets); **unequally spaced angles:** the
+  §4.1 functional-targeted ladder recovers a₀(c) = c·â and d₀(c) = d̂ to
+  machine precision off the equal-spacing design (the F3 regression — the
+  naive decomposition fails this test by construction).
 - **Engine parity spot-check:** on one configuration, assessing
   `method = "montecarlo"` vs `"bootstrap"` yields coverage differing by no
   more than combined MC error — operationalizing DESIGN.md's "statistical
@@ -633,6 +784,31 @@ estimation machinery and gets the same treatment.
    (`ssm_ci_accuracy.circumplex_cpm`) in a later cut; it needs per-replicate
    CPM refits, which changes the cost class entirely (and would revive A's
    §8 trigger — see G4).
+5. **Package decision surfaced by B-review F1.ii — DECIDED (Jeff,
+   2026-07-03); recorded here, see also §13.** The shipped guardrail's
+   effective certification threshold is a display-precision artifact:
+   `print.circumplex_ssm()` certifies when `round(a_lci, digits) > 0`, i.e.
+   a_lci ≳ 0.0005 at the default digits — a threshold that moves with a
+   print argument and means different things on a correlation-metric
+   amplitude than on a raw-score metric (so the mean-based path on raw score
+   metrics over-certifies). The two options were: (a) keep the
+   display-coupled rule and have the diagnostic measure it as-is; (b) give
+   the package a principled, print-independent certification rule.
+   **Decision: (a) now, (b) as a recorded follow-up seeded by the
+   diagnostic's own output.** B assesses whatever `print.circumplex_ssm()`
+   ships — it pins `digits = 3`, echoes the implied scale-dependent
+   threshold, and reports (per §4.3/§5.2) that the shipped rule offers
+   little protection against a truly-zero amplitude at typical n. That
+   reported false-certification behavior across the §4 amplitude ladder is
+   the evidence base for designing rule (b), so it is deliberately ordered
+   after B rather than before it. The redesign is a separate
+   `print.circumplex_ssm()` change with its own tests, NEWS entry, and
+   snapshot updates — outside B's scope. Rationale for not blocking B on
+   (b): there is no obviously-correct *scale-free* fixed threshold (Z&W's
+   `a ≥ .15` "marked" cut is correlation-metric only and answers "worth
+   interpreting?", not "angle numerically stable?"); a relative rule (e.g.
+   `a_lci` as a fraction of the amplitude CI width, which is scale-free) is
+   the likely form, but its calibration is exactly what B's output informs.
 
 ## 13. Decided
 
@@ -643,6 +819,50 @@ estimation machinery and gets the same treatment.
   see §2.)
 - §8.3's companion sufficient-statistics storage change is a prerequisite
   requirement, recorded here rather than decided elsewhere.
+- **Guardrail certification threshold (B-review F1.ii; Jeff, 2026-07-03):**
+  ship (a) — the diagnostic assesses the current display-coupled
+  `round(a_lci, digits) > 0` rule as-is (digits pinned to 3). A principled,
+  print-independent replacement rule (b) is a **recorded follow-up package
+  task**, deliberately sequenced *after* this diagnostic so it can be
+  designed and calibrated from the diagnostic's own false-certification
+  output; likely a relative, scale-free rule, but its form is left to that
+  task. Not a B deliverable. See §12.5.
+
+Every finding of `devel/m4-ci-accuracy-spec-review.md` (2026-07-03, verdict
+NEEDS CHANGE), with its resolution. Nothing dropped; each was weighed on the
+merits (all were verified against the shipped code and the estimator's
+algebra before applying).
+
+| Finding | Resolution |
+|---|---|
+| **F1 (high)** — certification event "a_lci > 0" degenerate and not the shipped rule; "nominal α/2" framing invalid | **Fixed (all three required parts).** (i) Certification defined as the shipped rule `!is.na(a_lci) && round(a_lci, digits) > 0` with `digits` pinned as a diagnostic argument (default 3, print's default) and the implied scale-dependent threshold echoed in output (§3.4, §7). (ii) The principled-threshold question surfaced to Jeff as a **package** decision and resolved: ship the current rule now, redesign as a follow-up seeded by the diagnostic's output (§12.5, §13; Jeff, 2026-07-03). (iii) α/2 reframed as a user-expectation benchmark; the [0.5·α/2, 1.5·α/2] band dropped; verdict machinery re-keyed to {e, a, d-conditional} with the false-certification rate as a caution line carrying the stated theoretical prediction (near 1) (§4.3, §5.1, §5.2, §10). |
+| **F2 (high)** — contrast ladder targets a regime where the pathology cannot occur | **Fixed.** The contrast module now applies the row ladder to both rows jointly at the same c, manufacturing the near-uniform-Δd regime the branch pathology lives in; the "exactly the regime it occurs" claim corrected with the review's simulation evidence cited inline. The converging ladder is **dropped**, with the justification recorded rather than left implicit: Δa is a signed, unconstrained difference (no boundary pathology), and the joint row ladder drives population Δa toward zero anyway (§4.1, §4.3, §10). |
+| **F3 (medium)** — ladder truth claims hold only for equally spaced angles | **Fixed via the review's option (i), strengthened.** The ladder is defined through the estimator functional; the review's 2×2 solve is extended to a **3×3** on the basis {1, cos θ, sin θ}, because off equal spacing mean(cos θ_i) ≠ 0 and an x/y-only correction would shift e₀ — the review's fix as literally stated would trade one truth error for another. Reduces to the naive decomposition under equal spacing; singular-M refusal specified; option (ii)'s recomputed-truth keying retained as belt-and-suspenders; correlation-path post-repair caveat stated; machine-precision ladder regression added to the boundary suite (§3.3, §4.1, §10). |
+| **F4 (medium)** — c = 0 amplitude coverage is a theorem, not a measurement | **Fixed.** Stated in §4.2 (coverage ≡ 0, all misses truth-below-interval); informative rungs identified as small c > 0; §10's known-bad direction oracle moved off c = 0 for amplitude coverage; the c = 0 identity kept only as a machinery pin. |
+| **F5 (low)** — Wilson interval level unspecified | **Fixed.** Pinned at 95% (§5.1). |
+| **F6 (low)** — pinned `cpm_fit()` call incomplete against A's signature | **Fixed.** `scales` and `angles = details$angles` added to the §3.2 call with the rationale (non-octant starts/canonicalization; reference = first scale per A's default); the review's verification of the n = Σn_g − G + 1 device recorded. This was a **B-side omission, not an A-side gap** — A's signature already carries both parameters. |
+| **F7 (low)** — Z&W-reproduction gate assumes an MVN-reproducible generating process | **Fixed.** The O5 bridge is now a conditional gate: if transcription shows non-MVN generation or real-data resampling, it is re-scoped at that point, documented, never silently loosened (§10). |
+| **F8 (informational)** — (a)-vs-(b) rationale rests on remembered qualitative properties of Z&W | **Accepted as stated (no spec change to the decision).** The review itself notes the decision was properly surfaced to Jeff and the characterization is almost certainly right; the required follow-up — re-confirm the grid characterization at vignette-transcription time and log the confirmation — is now recorded in §2. |
+| **F9 (low)** — multi-row ladder under-specified | **Fixed.** Pinned in §4.1: all profile rows laddered jointly at the same c (exactly equivalent to independent laddering for group rows; couples only through the single per-rung PSD repair for measure rows, which is recorded). |
+
+Also folded in from the review's "clean" notes: the RNG implementation note
+(L'Ecuyer-CMRG selection must save/restore the caller's RNG state) added to
+§7.
+
+**Pushbacks:** none outright — every finding was verified correct before
+applying. Two resolutions deviate from the review's literal suggestion, with
+reasons: F3 is implemented as a 3×3 solve rather than the suggested 2×2
+(which would perturb e₀ off equal spacing), and F2's "keep the converging
+ladder only if separately justified" is resolved by dropping it, with the
+justification recorded in §4.1.
+
+**A-side items for Jeff:** none new from this revision. G1–G4 (§8.2) stand
+as the open A-side gaps; F6 turned out to be a B-side omission. The one new
+decision surfaced was **package-side**, not A-side — the shipped guardrail's
+certification threshold (B-review F1.ii) — and it is now **resolved**: ship
+the current display-coupled rule, assessed by B as-is, with a principled
+replacement recorded as a follow-up package task seeded by B's output
+(§12.5, §13; Jeff, 2026-07-03).
 
 ## References
 
@@ -658,6 +878,19 @@ estimation machinery and gets the same treatment.
 
 ## Change log
 
+- 2026-07-03 — B-review revisions integrated (all findings F1–F9 of
+  `devel/m4-ci-accuracy-spec-review.md`, verdict NEEDS CHANGE):
+  certification event redefined as the shipped rounded rule, α/2 reframed
+  as a user-expectation benchmark, guardrail threshold surfaced as a
+  package decision and resolved (a)-now/(b)-follow-up (F1); contrast ladder redirected from converging
+  profiles to row amplitudes (F2); ladder made exact for any angle spacing
+  via a functional-targeted 3×3 solve (F3); c = 0 amplitude-coverage
+  theorem stated and oracles re-keyed (F4); Wilson level pinned at 95%
+  (F5); pinned `cpm_fit()` call completed with scales/angles (F6);
+  Z&W-reproduction gate made conditional on their generating process (F7);
+  Z&W grid-characterization re-confirmation requirement added (F8);
+  multi-row joint ladder pinned (F9). Full mapping: "Revision log (vs
+  B-review)".
 - 2026-07-03 — Central §2 decision made with Jeff same day: simulation only
   ((a)-only); §12 renumbered, §13 updated.
 - 2026-07-03 — Initial spec (Brief B, fresh Fable session). Central §2
