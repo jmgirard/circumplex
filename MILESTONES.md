@@ -199,6 +199,24 @@ fix is test-first with a regression test reproducing the audit's executed failur
 
 ## Log
 
+- 2026-07-03 — Brief E: M5/M6 statistical design-questions memo (background Fable
+  subagent, Opus-reviewed). Wrote `devel/m5-m6-design-questions.md` — questions +
+  recommended directions only (not specs). Highlights: M5 CI construction must not
+  delegate a/d intervals to lavaan (delta method exact for e/x/y, but Rice/boundary
+  for amplitude and 1/a² Jacobian + branch-blindness for displacement) — route
+  (e,x,y) draws through the existing circular-quantile pipeline instead; the
+  invariance-constrained multi-group contrast is a *different estimand*
+  (disattenuated + conditional on invariance), ship as a separate named workflow.
+  M6: model the Cartesian (x,y) trajectory bivariately to sidestep the 0/360
+  boundary; person-level case (cluster) bootstrap for paired timepoint contrasts;
+  Bayes only for hierarchical/intraindividual pooling, in-package footprint limited
+  to a posterior-draws adapter + vignette (Stan in a companion if ever). Three
+  questions flagged [blocked on M4] (coverage of cheap MVN propagation, hybrid
+  estimated-angle workflows, displacement-trajectory usability — all need the M4
+  ssm_ci_accuracy harness / cpm_fit). Reviewed clean (sound math, real citations,
+  no fabricated figures). Closes the 2026-07 Fable-window brief queue (A, B+review+
+  revision, C, D, E). Design only; nothing else touched. (devel/m5-m6-design-questions.md,
+  MILESTONES.md).
 - 2026-07-03 — `/code-review max` over v1.2.0..HEAD (the v1.3.0 bundle) + the one
   finding acted on (Opus orchestration: 6 finder angles → verify → sweep). Result:
   **no confirmed wrong-number correctness bugs.** Three high-looking candidates
