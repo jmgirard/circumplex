@@ -35,7 +35,13 @@ ssm_parameters(
 - angles:
 
   Required. A numeric vector containing the angular displacement of each
-  circumplex scale included in `scores` (in degrees).
+  circumplex scale included in `scores` (in degrees). The closed-form
+  SSM estimator used here equals the ordinary-least-squares cosine fit
+  only when `angles` are equally spaced around the circle (e.g., octants
+  at 45-degree intervals); for unequally spaced angles it is the
+  conventional Gurtman estimator, not a least-squares fit, and the
+  reported fit is then no longer a bounded R-squared in `[0, 1]` (it can
+  fall below 0).
 
 - prefix:
 
@@ -75,7 +81,8 @@ ssm_parameters(
 - f_label:
 
   Optional. A string representing the variable name of the SSM fit or
-  R-squared value (default = "Fit").
+  R-squared value (default = "Fit"). This value is a bounded R-squared
+  in `[0, 1]` only for equally spaced `angles` (see `angles`).
 
 ## Value
 

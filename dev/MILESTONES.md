@@ -217,8 +217,383 @@ boundary tests (±180°) after.* *Accept:* MC and bootstrap contrasts
 share one convention implementation; boundary tests green; seeded pins
 unchanged.
 
+### Estimator-core audit findings (Brief C, Fable — fix before v1.3.0)
+
+From the Brief C independent estimator audit (2026-07-03; full report
+`devel/estimator-audit-2026-07-fable.md`). These are **pre-existing**
+(present in v1.2.0 on CRAN), not M2/M3 regressions, but decision (Jeff
+2026-07-03): fix F1–F3 before the v1.3.0 submission rather than shipping
+again over a reachable crash and a violated angular invariant. F4–F6
+(nits) were addressed as a follow-up cleanup (2026-07-03), except the F6
+0-vs-360 pole-snap *alignment* decision, which is a convention call
+parked for Jeff (cosmetic; every consumer handles the wrap). Each fix is
+test-first with a regression test reproducing the audit’s executed
+failure.
+
+**F1. `col_means()` crashes on an all-NA resampled column** — under
+`listwise = FALSE`, a bootstrap resample can draw a scale column that is
+entirely NA; `col_means()` in `src/parameters.cpp` calls
+[`mean()`](https://rdrr.io/r/base/mean.html) on the empty post-`na.omit`
+vector and aborts (`mean(): object has no elements`), where
+`pairwise_r()` already guards this. Deterministic repro at seed 123
+(6-row, 4/6-missing scale). *Touches `src/` → rebuild C++, run the
+boundary suite + `/statistical-validation`.* *Accept:* the repro returns
+NA (or the documented degenerate handling) instead of aborting;
+regression test added.
+
+**F3. `angle_dist()` range is \[−180, 180), not (−180, 180\]** — exactly
+opposed profiles yield a contrast `d_est` of exactly −180 rather than
++180, violating the CLAUDE.md invariant (contrasts reported in (−180°,
+180°\]) and an existing test’s asserted contract.
+Contrast-convention/danger-zone change. *Touches the contrast convention
+→ `/statistical-validation` + ±180° boundary tests after; recommend a
+Fable review of the fix.* *Accept:* opposed-profile contrasts report
++180 on the documented branch; boundary tests green; seeded pins
+reconciled (any snapshot delta justified).
+
+**F2. Model-fit caveat is under-documented and fit can leave \[0,1\]** —
+with unequally spaced angles the closed-form fit (R²) is unbounded below
+(−107 observed); the equal-spacing/Gurtman caveat lives only on
+[`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md).
+Doc-only. *Accept:* the caveat (equal-spacing assumption; fit may be
+negative and is not a bounded R² off equal spacing) is stated on
+[`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md)
+and
+[`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+too; no math change; no snapshot delta.
+
 ## Log
 
+- 2026-07-03 — Brief E: M5/M6 statistical design-questions memo
+  (background Fable subagent, Opus-reviewed). Wrote
+  `devel/m5-m6-design-questions.md` — questions + recommended directions
+  only (not specs). Highlights: M5 CI construction must not delegate a/d
+  intervals to lavaan (delta method exact for e/x/y, but Rice/boundary
+  for amplitude and 1/a² Jacobian + branch-blindness for displacement) —
+  route (e,x,y) draws through the existing circular-quantile pipeline
+  instead; the invariance-constrained multi-group contrast is a
+  *different estimand* (disattenuated + conditional on invariance), ship
+  as a separate named workflow. M6: model the Cartesian (x,y) trajectory
+  bivariately to sidestep the 0/360 boundary; person-level case
+  (cluster) bootstrap for paired timepoint contrasts; Bayes only for
+  hierarchical/intraindividual pooling, in-package footprint limited to
+  a posterior-draws adapter + vignette (Stan in a companion if ever).
+  Three questions flagged \[blocked on M4\] (coverage of cheap MVN
+  propagation, hybrid estimated-angle workflows, displacement-trajectory
+  usability — all need the M4 ssm_ci_accuracy harness / cpm_fit).
+  Reviewed clean (sound math, real citations, no fabricated figures).
+  Closes the 2026-07 Fable-window brief queue (A, B+review+ revision, C,
+  D, E). Design only; nothing else touched.
+  (devel/m5-m6-design-questions.md, MILESTONES.md).
+- 2026-07-03 — `/code-review max` over v1.2.0..HEAD (the v1.3.0
+  bundle) + the one finding acted on (Opus orchestration: 6 finder
+  angles → verify → sweep). Result: **no confirmed wrong-number
+  correctness bugs.** Three high-looking candidates were REFUTED under
+  runtime verification: MC contrast wrong-pair (pairing correct for
+  every contrast shape ssm_analyze permits), MC all-NA CI on a constant
+  scale (cov()=0 not NA; mvn_draws is PSD-tolerant), MC nonsense CI at
+  n=2 (the \|r\|\>=1 guard errors first with a “use bootstrap” message).
+  10 low-severity findings reported (plot NA-filter/exported-geom
+  robustness, Monte Carlo engine efficiency, minor cleanup, one doc
+  nuance) — recorded in the ROADMAP continuous/infra track, to be folded
+  in when the relevant code is next touched (mostly M4). Acted on now:
+  the C++ `group_parameters()` fixed 6-wide stride was tied to
+  `ssm_param_names()` only by the literal 6, with no assertion — a
+  future 7th-parameter edit on one side would silently misalign every
+  parameter column. Added a test pinning
+  `length(ssm_parameters_cpp) == length(ssm_param_names())` and the
+  `group_parameters` width (fails at check on any desync), a defensive
+  `stopifnot` in `reshape_params`, and a cross-reference comment at the
+  C++ stride. Suite 589/589; check 0/0/0. No NEWS (internal guard; no
+  user-facing behavior change). (src/parameters.cpp, R/utils.R,
+  tests/testthat/test-RcppExport.R.R, MILESTONES.md).
+- 2026-07-03 — Brief B-revision: revised the `ssm_ci_accuracy()` spec
+  against the B-review findings (FRESH Fable session — not the B author,
+  not the reviewer). Resolved the review’s F1–F9 with a per-finding
+  revision log (fixed / rejected- with-reason). Notably: adopted the
+  *shipped* guardrail rule verbatim (`round(a_lci, 3) <= 0`,
+  R/ssm_oop.R:159) and redefined the contrast module on the
+  row-amplitude ladder (the regime where the branch pathology actually
+  occurs). **No new A-side interface gaps** — G1–G4 stand as previously
+  flagged; F6 was B’s own omission (A’s signature already carries
+  `scales`/`angles`). One NEW package-side decision surfaced for Jeff
+  (§12.5 / F1.ii): the shipped guardrail’s certification threshold is a
+  display-precision artifact (~0.0005 amplitude units at default digits,
+  moving with a `print` argument) — keep the display-coupled rule and
+  just measure it, or give `print.circumplex_ssm()` a principled
+  print-independent rule. Deferred to a `print.circumplex_ssm()`
+  decision, outside B’s scope. Revision only; nothing committed by the
+  session. Tier for the eventual build (future M4, once §12 decisions
+  settle): Opus against the spec, with the §4.3 guardrail-measurement
+  module + §10 oracles reviewed by Fable (the remaining
+  plausible-but-wrong spots). (devel/m4-ci-accuracy-spec.md,
+  devel/fable-briefs-2026-07.md, MILESTONES.md).
+- 2026-07-03 — Brief B-review: adversarial review of the
+  ssm_ci_accuracy() spec (FRESH Fable session, no involvement in
+  A/B/A-review). Report: `devel/m4-ci-accuracy-spec-review.md`. Verdict:
+  NEEDS CHANGE (F1–F3 before implementation; F4–F9 cheap). Z&W number
+  hygiene — the brief’s top suspect — came up CLEAN: every Z&W value
+  TBT, illustrative numbers labeled, all fixed numbers traced to shipped
+  code/citations/arithmetic. A↔︎B contract clean: every consumed field
+  exists in A §5.4; gaps G1–G4 are genuine A gaps, correctly flagged.
+  Required changes: (1) HIGH — the certification event “amplitude lci \>
+  0” is degenerate (percentile lower bound of a strictly positive
+  statistic is \> 0 a.s., so false-certification ≡ 1 at a₀=0 and the
+  §4.3 power curve ≡ 1) AND differs from the shipped guardrail, which is
+  round(a_lci, digits=3) \<= 0 (R/ssm_oop.R:159) — a scale- and
+  display-precision-dependent threshold; the “nominal α/2” duality also
+  fails at the boundary. Spec must adopt the shipped rule verbatim and
+  surface the guardrail-threshold question to Jeff as a package
+  decision.
+  2.  HIGH — the contrast ladder (profiles converge, rows stay
+      realistic) targets a regime where the branch pathology cannot
+      occur: verified by seeded simulation against the package — spec’s
+      regime gives a 14° contrast-d CI; the actual pathology regime is
+      ROW amplitude ≈ 0 vs sampling noise (326° CI). Redefine the
+      contrast module on the row ladder. (3) MED — the ladder’s truth
+      claims (a₀=0 at c=0, a₀=c·â) hold only for equally spaced angles;
+      fix via the estimator functional (2×2 solve) or per-rung truths.
+      Plus: c=0 amplitude coverage is a theorem (≡0), not a measurement
+      (F4); Wilson level unpinned (F5); pinned cpm_fit() call omits
+      scales/angles (F6); Z&W-reproduction gate assumes MVN-reproducible
+      generating process (F7); (a)-vs-(b) rationale leans on remembered
+      qualitative Z&W properties — re-confirm at transcription (F8);
+      multi-row ladder under-specified (F9). Review only — spec
+      substance untouched, nothing committed. Next: Fable revision pass
+      on the spec (F1.ii changes what the shipped guardrail means;
+      estimator-adjacent decision-rule design), Sonnet for F5/F6/F9 if
+      split out. (devel/m4-ci-accuracy-spec-review.md, MILESTONES.md).
+- 2026-07-03 — Brief B: `ssm_ci_accuracy()` CI-trustworthiness spec
+  (FRESH Fable session, per the brief’s context-hygiene rule; builds on
+  the committed Brief A design, decisions taken as given). Wrote
+  `devel/m4-ci-accuracy-spec.md`. Core design: a plug-in coverage
+  simulation — one `cpm_fit()` on the pooled within-group scale
+  correlations defines the population (structure = P̂), then reps×boots
+  replays of the user’s own CI procedure (same engine/boots/interval) at
+  the user’s exact n tally empirical coverage per parameter, with
+  angular-membership coverage for displacement (0/360-safe by
+  construction) and certification-conditional displacement coverage as
+  the verdict-driving estimand. Amplitude-near-zero module (the
+  absorbed-M2 target): a first-harmonic-only amplitude ladder c ∈
+  {1,.5,.25,0} holding residual harmonics fixed, measuring one-sided
+  amplitude-CI miss decomposition, guardrail false-certification rate at
+  a₀=0 vs nominal α/2, power up the ladder, and the contrast
+  branch-pathology frequency (ROADMAP F3-review note folded in).
+  Verdicts classified against Bradley’s (1978) liberal band via Wilson
+  intervals. **Central decision surfaced for Jeff and DECIDED same day
+  (spec §2/§13): simulation only in code, with Z&W Studies 1–5 content
+  as transcribed vignette context rather than a nearest-condition
+  lookup** (their grid is coarse; mapping quietly becomes extrapolation;
+  every hard ROADMAP requirement needs the simulation; spec §6 retained
+  as the requirements record if a lookup-lite is ever revisited). All
+  Z&W numerics marked TBT under the oracle rule — none reproduced from
+  memory. A↔︎B contract pinned to A §5.4 fields with four flagged gaps
+  feeding back to A (G1 cpm_simulate return contract unspecified; G2 no
+  augmented scales+measures simulation path — cpm_simulate suffices for
+  the mean-based path only, proposed fix reduces the corr-path contract
+  to matrices\$Phat; G3 dimnames unpinned; G4 A §8's "Brief-B ≥10⁴
+  refits" Phase-2 trigger mis-anticipates B, which refits the CPM zero
+  times) plus one gap on the ssm side:
+  \`circumplex_ssm\$details`stores no per-group n, scale SDs, or correlation matrices, so a companion`ssm_analyze()`sufficient-statistics storage change is a prerequisite task (with a`data
+  =\` fallback + consistency check for old objects). Design only — no
+  package code. Remaining §12 open items (amplitude ladder default,
+  naming, per-group structure, CPM-CI assessment method) can wait for
+  implementation. Next: Brief E (M5/M6 design questions, Fable,
+  time-boxed) closes the window queue. (devel/m4-ci-accuracy-spec.md
+  \[new\], MILESTONES.md).
+- 2026-07-03 — RNG-contract restatement in DESIGN.md (Fable, follow-up
+  to the A-review integration; Jeff asked for it now rather than at M4
+  ship time). Replaced the frozen-inventory sentence (“ssm_analyze() is
+  the package’s only entry point that consumes R’s global RNG stream”)
+  with the invariant it stood for — a function consumes the global
+  stream iff its statistical output is stochastic
+  (resampling/simulation); such entry points document it and follow the
+  set.seed() convention; internals (multi-start jitter, tie-breaks) must
+  be deterministic and leave .Random.seed untouched — plus an enumerated
+  entry-point list (currently one: ssm_analyze(), with the existing
+  per-engine table beneath it) noting M4’s planned additions.
+  ssm_analyze()’s roxygen “only function” sentence is deliberately
+  untouched (true today; updating it is queued in
+  devel/m4-browne-design.md §8 for ship time to avoid man/-churn).
+  Doc-only, internal memory file — no package code, no check needed.
+  (DESIGN.md, devel/m4-browne-design.md §8, MILESTONES.md).
+- 2026-07-03 — Brief A-review integration (Fable, same session as Brief
+  A). All A-review findings F1–F10 integrated into
+  `devel/m4-browne-design.md` (change log §11 added to the doc):
+  simulation coverage oracle + T-calibration added as required §6.4
+  validation (the test that separates “matches CIRCUM” from “actually
+  covers”); **default ci_method decided with Jeff: bootstrap on the
+  raw-data path, analytic only on the cormat path with an N-conditional
+  summary() caution** (F1); convergence acceptance respecified on a
+  scaled gradient norm with the nlminb code advisory-only (F2);
+  reflection canonicalization now toward the theoretical configuration,
+  CCW rule demoted to tie-break (F3); multi-start jitter made
+  deterministic — default cpm_fit() path is RNG-silent, pinned by a
+  planned .Random.seed test (F4); RMSEA CI λ_U=0 guard (F5);
+  SRMR/CI-shape/BIC conventions pinned (F6); m-cap justification
+  corrected, floor(p/2) allowed for fixed-angle variants (F7);
+  tolerance/gradient-test criteria fixed (F8); harmonic-removal polish
+  retriggered at 1e-2 with χ²-mixture rationale note (F9); per-replicate
+  mirror guard for the warm-started bootstrap + equal-F̂ multimodality
+  flag (F10). Also queued a ship-time DESIGN.md task: restate the “only
+  ssm_analyze() consumes the RNG” contract as the principle
+  (stochastic-output functions only; internals deterministic) with an
+  entry-point table, since cpm_fit(bootstrap)/cpm_simulate() will make
+  the current sentence false. Design docs only — no package code. Next:
+  Brief B (Z&W ssm_ci_accuracy spec), which now also owns CPM
+  analytic-CI trustworthiness per F1. (devel/m4-browne-design.md,
+  MILESTONES.md).
+- 2026-07-03 — Brief A-review: adversarial review of the Browne design
+  (FRESH Fable subagent, no memory of writing the doc). Report:
+  `devel/m4-browne-design-review.md`. Verdict: NEEDS CHANGES before
+  implementation, but the core is computationally verified correct —
+  analytic gradient incl. logit/softmax chains vs finite differences (25
+  random points, max rel err 1.9e-6), df table (10/17/17/24 at p=8,m=3),
+  F₀=−ln\|R\|, exact reflection invariance, exact-recovery round trip
+  (1e-10), the §3.2 scale-invariance identity (exact), large-N CI
+  calibration. Backend decision (native, R-first) CONFIRMED with direct
+  evidence (~100 lines of base R, sub-second fits). Required
+  changes: (1) HIGH — analytic Hessian CIs mis-cover at field-typical N
+  (ζ coverage 66–86% at N=500 with a small third harmonic; over-covers
+  with all-interior β; exact only by N~50k) and the CIRCUM-CI gate
+  cannot detect it since CIRCUM shares the asymptotics → add a
+  simulation-based coverage oracle to §6.4 and revisit the
+  analytic-default decision; (2) HIGH/easy — nlminb “singular
+  convergence (7)” is the normal exit for 65–96% of demonstrably good
+  fits at the doc’s tolerances → acceptance must key on scaled gradient
+  norm, code advisory only, else the bootstrap discards most
+  replicates; (3) MED — the CCW canonicalization rule mirrors theory for
+  clockwise-keyed instruments → canonicalize toward the theoretical
+  configuration, CCW as tie-break; (4) MED — multi-start jitter must not
+  consume the global RNG on the default path (DESIGN.md contract); RMSEA
+  CI missing the λ_U=0 branch (uniroot errors on very good fits); SRMR
+  denominator convention unpinned (~12% at p=8, breaks CircE
+  validation); minor: even-p Nyquist harmonic is identified (m-cap
+  merely conservative), RMSEA tolerance looser (0.005), gradient-test
+  tolerance flaky as specced, per-replicate mirror guard for
+  warm-started bootstrap. Review only — no package code, design doc
+  untouched. Next: integrate revisions into devel/m4-browne-design.md.
+  (devel/m4-browne-design-review.md, MILESTONES.md).
+- 2026-07-03 — Brief A: M4 Browne-model estimation design (Fable,
+  Jeff-steered). Wrote `devel/m4-browne-design.md`, the
+  CircE-replacement design doc for M4’s anchor feature: the model
+  (Fourier correlation function with the Herglotz β≥0 / Σβ=1
+  constraints, communality index, factor representation), ML discrepancy
+  with unconstrained reparameterization (logit ζ, softmax β, angles free
+  in ℝ, wrap at report only), analytic gradients + mandatory
+  finite-difference gradient test, identification (reference-angle fix,
+  reflection canonicalization, β-boundary polish with df reduction,
+  Heywood flags), df table for the four model variants, fit indices (χ²,
+  RMSEA+CI, SRMR, CFI/TLI, AIC/BIC) defined from the discrepancy,
+  `cpm_fit()` API sketch (`circumplex_cpm`, print/summary/plot on the M3
+  extension, `cpm_simulate()` as the Brief-B contract), and the
+  validation strategy: published CIRCUM/CircE oracles as blank
+  transcription templates (no expected values from memory or local files
+  — g2xx1.txt explicitly banned) plus internal oracles (exact-recovery
+  round trip, circulant DFT check, OpenMx/lavaan in Suggests as
+  cross-implementation test oracles). Backend DECIDED with Jeff: native
+  optimization, R-first (nlminb), C++ port gated on profiling with R
+  kept as permanent oracle. Design only — no package code. Next: Brief
+  A-review in a fresh Fable session. (devel/m4-browne-design.md,
+  MILESTONES.md).
+- 2026-07-03 — F4–F6 nit cleanup (Sonnet, propose-not-commit; Opus
+  review + commit). F4 (wording only, no behavior change): the
+  degenerate-resample warning (`R/ssm_bootstrap.R`) and the DESIGN.md
+  degenerate-profiles row overstated exclusion as per-replicate;
+  reworded to per-parameter (only the undefined displacement/fit is
+  dropped, via `na.rm` per column; well-defined params still enter their
+  CIs — per-row exclusion would bias the near-zero amplitude CI). F5
+  (`src/circular.cpp` `angle_median()`, test-first): returned 0 for
+  all-NA/empty input due to a default-initialized `{0.0}` candidate;
+  added an `n == 0 -> NA_REAL` guard and changed `candidates(1)` to
+  `candidates(0)`; regression test in test-RcppExport.R.R (both inputs
+  -\> NA). F6 (DESIGN.md factual correction only): the pole displacement
+  is *exactly* 360.0 (modu fmod-at-edge), not “≈359.9999”. Deliberately
+  NOT done: the F6 0-vs-360 snap *alignment* (convention decision parked
+  for Jeff) — snap direction, test pin, and quantile code untouched.
+  Suite 587/587; check 0/0/0. No NEWS (F5 internal/non-exported; F4 a
+  warning-wording precision fix; F6 internal doc). (src/circular.cpp,
+  R/ssm_bootstrap.R, DESIGN.md, tests/testthat/test-RcppExport.R.R,
+  MILESTONES.md).
+- 2026-07-03 — F3 fix: `angle_dist()` ±180° branch (Fable tests +
+  review, Opus fix, test-first). The plain wrap `((x-y+π) %% 2π) - π`
+  has range \[−π, π), so an exact half-turn (exactly opposed profiles)
+  reported −180 instead of the documented (−180, 180\] +180, violating
+  the CLAUDE.md invariant. Fix: remap the bit-exact −π atom to +π
+  (`d[!is.na(d) & d == -pi] <- pi`) — minimal, no tolerance band,
+  byte-identical off the atom (so no seeded-pin drift). Process: the F3
+  implementer subagent (Fable) wrote the tests then hit its session
+  limit before the fix; Opus completed the one-liner by inferring intent
+  from the tests and verifying (independent complex-Arg oracle to 5e-15;
+  suite 585/585). A FRESH Fable adversarial review then attacked it
+  (~440k half-turn constructions, 25-seed×2-engine sweep) and returned
+  CLEAN — with one accuracy correction now applied: the pipeline’s
+  `modu()` wrap (\[0,2π)) leaves ~16% of true half-turns 1–2 ulp off the
+  atom, landing harmlessly just inside the branch (never rounding to
+  −180), so the “bit-exact” comment was softened. Fixed-oracle
+  branch-alignment test untouched. Pre-existing out-of-scope observation
+  surfaced (recorded separately): in a degenerate
+  zero-amplitude-contrast MC regime the estimate can sit geometrically
+  outside its wide CI (fix strictly improves the pre-fix case). ALL
+  F1–F3 pre-release fixes now done. (R/utils.R,
+  tests/testthat/test-utils.R, test-ssm_bootstrap.R,
+  test-ssm_montecarlo.R, NEWS.md, MILESTONES.md).
+- 2026-07-03 — F2 fix: model-fit caveat documentation (Opus, doc-only).
+  The closed-form estimator is the OLS projection (fit ∈ \[0,1\]) only
+  for equally spaced angles; off equal spacing it is the Gurtman
+  estimator and the reported fit can go negative (audit observed −107
+  through the full API). The equal-spacing caveat previously lived only
+  on
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)’s
+  `@param angles` and never stated the fit-bounds consequence. Mirrored
+  the caveat onto
+  [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md)
+  and
+  [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+  `@param angles`, added the “not a bounded R² in \[0,1\]; can fall
+  below 0” clause to all three, and noted it on
+  [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md)’s
+  `f_label`. No math change; no snapshot delta. `document()` regenerated
+  only ssm_analyze/ssm_parameters/ssm_score .Rd; check 0/0/0. NEWS.md
+  bullet added. (R/ssm_analysis.R, man/ssm_analyze.Rd,
+  man/ssm_parameters.Rd, man/ssm_score.Rd, NEWS.md, MILESTONES.md).
+- 2026-07-03 — F1 fix: `col_means()` all-NA-column crash (Opus,
+  test-first). Under `listwise = FALSE` a bootstrap resample can leave a
+  scale column with no finite values; `arma::mean()` on the empty
+  post-`find_finite` vector aborted the whole
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  call (`mean(): object has no elements`). Guarded `col_means()` in
+  `src/parameters.cpp` to return `NA_REAL` for a zero-finite-element
+  column, mirroring `pairwise_r()`’s guard — the resample then degrades
+  to a degenerate profile absorbed by the existing exclusion + warning.
+  Test-first: a tight unit pin (`col_means` on an all-NA column → NA)
+  and the audit’s exact integration repro (seed 123, 4/6-missing scale)
+  — both failed pre-fix, pass post-fix. `/statistical-validation` run:
+  estimator math provably unchanged (col_means vs colMeans to 4e-16 over
+  200 NA matrices; mean_scores PWD vs manual 1-/2-group; SSM params vs
+  lm() OLS to 1e-13; end-to-end ssm_analyze == ssm_parameters). Suite
+  555/555, 0 warnings. NEWS.md bullet added. (src/parameters.cpp,
+  tests/testthat/test-RcppExport.R.R, test-ssm_bootstrap.R, NEWS.md,
+  MILESTONES.md).
+- 2026-07-03 — Brief C estimator/angular-core audit (Fable). Wrote
+  `devel/estimator-audit-2026-07-fable.md`: 6 findings, none critical —
+  F1 reachable crash (`col_means()` on an all-NA resampled column under
+  `listwise = FALSE`, `mean(): object has no elements`), F2 fit
+  statistic unbounded below (−107 observed) with unequally spaced angles
+  and the Gurtman-vs-OLS caveat documented only at
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
+  F3 `angle_dist()` range is \[−180, 180) not the documented (−180,
+  180\] (exact −180 reachable via sign-flipped groups), F4–F6
+  wording/consistency nits. Verified clean: scale-aware tolerance across
+  0.1–1e6 scales, degenerate taxonomy, circular CI machinery incl. 0/360
+  straddles and ±180 branch alignment, full Monte Carlo covariance
+  derivation (Hampel IF, Fisher-z delta) + empirical bootstrap agreement
+  on skewed data. Audit only — no package code touched. Triage (Jeff):
+  F1–F3 are now v1.3.0 pre-release fixes (added as tasks above,
+  test-first; F1 touches `src/` and F3 the contrast convention → both
+  get `/statistical-validation`); F4–F6 nits deferred.
+  (devel/estimator-audit-2026-07-fable.md, MILESTONES.md, ROADMAP.md
+  unchanged).
 - 2026-07-03 — Pre-release review fixes R3 + C1–C4 (Opus). R3 (decision
   Jeff): removed the `amin` argument from the exported
   [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)

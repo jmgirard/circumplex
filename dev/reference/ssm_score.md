@@ -26,7 +26,13 @@ ssm_score(data, scales, angles = octants(), append = TRUE, ...)
 - angles:
 
   Required. A numeric vector containing the angular displacement of each
-  circumplex scale included in `scales` (in degrees).
+  circumplex scale included in `scales` (in degrees). The closed-form
+  SSM estimator used here equals the ordinary-least-squares cosine fit
+  only when `angles` are equally spaced around the circle (e.g., octants
+  at 45-degree intervals); for unequally spaced angles it is the
+  conventional Gurtman estimator, not a least-squares fit, and the
+  reported fit is then no longer a bounded R-squared in `[0, 1]` (it can
+  fall below 0).
 
 - append:
 

@@ -99,7 +99,12 @@ containing one score for each of a set of circumplex scales.</p></dd>
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>
 <dd><p>Required. A numeric vector containing the angular displacement
-of each circumplex scale included in <code>scores</code> (in degrees).</p></dd>
+of each circumplex scale included in <code>scores</code> (in degrees). The closed-form
+SSM estimator used here equals the ordinary-least-squares cosine fit only
+when <code>angles</code> are equally spaced around the circle (e.g., octants at
+45-degree intervals); for unequally spaced angles it is the conventional
+Gurtman estimator, not a least-squares fit, and the reported fit is then no
+longer a bounded R-squared in <code>[0, 1]</code> (it can fall below 0).</p></dd>
 
 
 <dt id="arg-prefix">prefix<a class="anchor" aria-label="anchor" href="#arg-prefix"></a></dt>
@@ -139,7 +144,8 @@ displacement parameter (default = "Disp").</p></dd>
 
 <dt id="arg-f-label">f_label<a class="anchor" aria-label="anchor" href="#arg-f-label"></a></dt>
 <dd><p>Optional. A string representing the variable name of the SSM
-fit or R-squared value (default = "Fit").</p></dd>
+fit or R-squared value (default = "Fit"). This value is a bounded R-squared
+in <code>[0, 1]</code> only for equally spaced <code>angles</code> (see <code>angles</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -141,12 +141,27 @@ detail, acceptance criteria, and log: **MILESTONES.md**.
 
 **Status: planned** (flagship; its own CRAN slot — see the release
 strategy). Revive and modernize the drafts in `devel/fit_analysis.R` /
-`devel/fit_oop.R` (currently written in superseded tidyverse-heavy style
-with a `psych` dependency decision pending).
+`devel/fit_oop.R`.
 
-- Fisher test of equal axes (draft exists).
-- Gap test of equal spacing (draft exists).
-- Variance test of equal communalities / interstitiality indices.
+A Fable method-review of those drafts (2026-07-03; full report in
+`devel/fit-drafts-method-review.md`) found they are **mostly a rework,
+not a revival**, and traced every formula/threshold to their uncited
+source, Acton & Revelle (2004, *MPR-Online* 9(1)): Fisher test sound
+(needs citation + scoring-keyed cutoffs); gap test has a 0°/360°
+wrap-around omission (boundary bug) and nv-dependent cutoffs
+anti-conservative at the canonical nv=8; the variance test implements
+the *ineffective* variant and a mistranscribed threshold; the rotation
+test has an indexing bug corrupting the statistic; the randomization
+test isn’t actually implemented. Cross-cutting M4 task: one simulation
+under A&R’s generating model re-derives all cutoffs at nv=8. The `psych`
+dependency is unnecessary (a small base-R principal-axis FA replaces the
+one `psych::fa()` call; psych → Suggests as a test oracle) — **net new
+hard dependencies for the fit statistics: zero**.
+
+- Fisher test of equal axes (draft exists; sound, needs citation).
+- Gap test of equal spacing (draft exists; needs rework — boundary bug).
+- Variance test of equal communalities / interstitiality indices (draft
+  needs rework — wrong variant + mistranscribed threshold).
 - **Browne’s (1992) stochastic process model — native reimplementation
   (CircE replacement).** CircE (Grassi, Luccio, & Di Blas, 2010) is
   archived on CRAN, leaving R users without an estimator for Browne’s
@@ -172,7 +187,14 @@ with a `psych` dependency decision pending).
   assess percentile-CI coverage for amplitude near zero (nonnegative,
   upward-biased, skewed — the one SSM parameter where percentile
   intervals are theoretically weakest), since the amplitude CI drives
-  the “displacement not interpretable” guardrail.*
+  the “displacement not interpretable” guardrail.* *Related pre-existing
+  observation (surfaced 2026-07-03 during the F3 review): for a contrast
+  between two profiles whose contrast amplitude is ~0 (near-uniform
+  contrast draws), the displacement point estimate can fall
+  geometrically outside its very wide circular CI — the same
+  amplitude-near- zero regime this diagnostic targets, at the contrast
+  level. Fold into the diagnostic’s scope rather than fixing the CI
+  machinery ad hoc.*
 - `ssm_fit()`-style API returning a typed object with `print`/`summary`/
   `plot` methods, consistent with `circumplex_ssm` (plots built on the
   M3 extension).
@@ -239,6 +261,37 @@ milestone first touches the relevant code:
   matrix.
 - Track code coverage on the statistical core (`ssm_*`, `src/`)
   specifically.
+- **Deferred `/code-review max` findings (2026-07-03, v1.3.0 bundle).**
+  Non-blocking; the review found no wrong-number correctness bugs and
+  the one guard worth acting on (C++ stride ↔︎ `ssm_param_names()`)
+  shipped. Fold the rest in when the relevant code is next touched
+  (mostly M4):
+  - *Visualization extension robustness (fold into M4’s new plots):* the
+    three degenerate-profile filters (`GeomSsmPoint` on the estimate,
+    `StatSsmArc` on the CI bounds,
+    [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+    on `d_est`) use inconsistent NA criteria, so a profile with a
+    defined estimate but an undefined CI renders a point with no wedge
+    and no message — unify behind one plottability predicate.
+    `StatSsmArc` also returns a structurally wrong 0-row frame when all
+    rows are dropped. The now-exported
+    [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
+    needs documented/validated displacement input range (a `min>max`
+    span silently draws the short-way arc).
+  - *Monte Carlo engine efficiency (fold into M4’s `ssm_ci_accuracy`
+    work, which hammers the MC path):* the `psi` inner double loop
+    recomputes squares per-element; per-profile `group_parameters()` +
+    `do.call(cbind)` could be one batched C++ call; the MC correlation
+    path re-introduces positional block indexing the M2 refactor retired
+    elsewhere (name-drive it).
+  - *Minor cleanup (any release):* `ssm_replicate_intervals()` computes
+    CI bounds in two `sapply(quantile)` passes (re-sorting each
+    displacement column twice) — pass `probs = c(lo, hi)` once; drop the
+    redundant `scores <- obs_scores` alias in both analysis paths;
+    tighten the
+    [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+    roxygen (an unnamed extra fills `angles` positionally and errors on
+    `is.numeric`, not the documented named-args message).
 
 Explicitly **not** planned: a ground-up rewrite. The R-dispatch → C++
 core → `boot` architecture, the S3 class design, and the minimal

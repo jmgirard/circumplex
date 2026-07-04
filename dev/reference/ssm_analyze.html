@@ -116,7 +116,8 @@ of each circumplex scale included in <code>scales</code> (in degrees). (default 
 ordinary-least-squares cosine fit only when <code>angles</code> are equally spaced
 around the circle (e.g., octants at 45-degree intervals); for unequally
 spaced angles it is the conventional Gurtman estimator, not a
-least-squares fit.</p></dd>
+least-squares fit, and the reported model fit is then no longer a bounded
+R-squared in <code>[0, 1]</code> (it can fall below 0).</p></dd>
 
 
 <dt id="arg-measures">measures<a class="anchor" aria-label="anchor" href="#arg-measures"></a></dt>

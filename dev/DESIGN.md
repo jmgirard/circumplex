@@ -65,25 +65,42 @@ conventions change (rare); day-to-day status lives in MILESTONES.md.
 | Convention | Rationale |
 |----|----|
 | LM at 360°, not 0° | Matches published SSM tradition (Wright et al. 2009 tables); keeps [`octants()`](http://circumplex.jmgirard.com/dev/reference/octants.md) monotone-free but consistent with norms tables, which store 360. Mixing 0 and 360 breaks [`norm_standardize()`](http://circumplex.jmgirard.com/dev/reference/norm_standardize.md) matching. |
-| Displacement in \[0, 360) for profiles | Standard compass-style reporting in the SSM literature. The estimator is `modu(atan2(y, x), 2π)`, whose range is exactly \[0°, 360°). **Boundary (G2 decision, 2026-07):** a profile peaking exactly at the 0°/360° pole is reported as ≈360° (deterministically: `y` computes to a tiny *negative* value ~−3e-17, so `atan2` returns a small negative angle that wraps to just under 2π; ≈359.9999°, displayed 360.0). Equivalent to ≈0° — the same direction, the LM pole under octant labeling. We do **not** canonicalize this: it is a measure-zero float artifact for real data, any snap is an arbitrary 0-vs-360 tie-break, and ≈360 matches the package’s LM=360 convention. Tests at the boundary accept either ~0 or ~360. |
+| Displacement in \[0, 360) for profiles | Standard compass-style reporting in the SSM literature. The estimator is `modu(atan2(y, x), 2π)`, whose range is exactly \[0°, 360°). **Boundary (G2 decision, 2026-07):** a profile peaking exactly at the 0°/360° pole is reported as exactly 360.0° (deterministically: `y` computes to a tiny *negative* value ~−3e-17, so `atan2` returns a small negative angle that `modu(·, 2π)` rounds up to exactly 2π — a classic fmod-at-the-edge artifact, not an underestimate). Equivalent to 0° — the same direction, the LM pole under octant labeling. We do **not** canonicalize this: it is a measure-zero float artifact for real data, any snap is an arbitrary 0-vs-360 tie-break, and exactly 360 matches the package’s LM=360 convention. Tests at the boundary accept either ~0 or ~360. |
 | Contrast displacement in (-180°, 180°\] | A signed angular difference is the shortest rotation; sign carries direction (positive = counterclockwise of comparison). Computed by `angle_dist()`. The contrast’s CI is reported on the estimate’s branch: near ±180° the circular-mean-centered interval can land on the opposite branch from the `angle_dist` estimate, so both endpoints are shifted by the same multiple of 360° (width and contiguity preserved; identity away from the boundary) so the estimate lies numerically inside an interval it is geometrically inside. Endpoints may therefore exceed ±180°. |
 | Contrast = second minus first level | Mirrors the “treatment minus reference” default; direction is printed in the Label (“Male - Female”). |
 | Percentile bootstrap CIs, stratified by group | Zimmermann & Wright (2017) generalization; stratification preserves group n’s. BCa was considered and dropped (ROADMAP M2, 2026-07): undefined for circular displacement, so it would be permanently mixed-method per parameter. A Monte Carlo alternative (asymptotic MVN sampling distribution, propagated through the SSM transformation) ships instead as an opt-in `method`; percentile bootstrap stays default for reproducibility and field convention. |
 | Circular CI method | Bootstrap displacement replicates are centered on their circular mean, unwrapped to (-π, π\], quantiled linearly, re-wrapped. Valid when replicates are concentrated (amplitude reliably \> 0); meaningless for flat profiles — hence the interpretation guardrails (fit ≥ .70, amplitude CI excluding 0). |
 | Fit = 1 − SSE/SST (R²) | Gurtman’s prototypicality; denominator `var(scores) * (n-1)`. Undefined for zero-variance profiles. |
 | Closed-form estimator (2/n Σ s·cos, 2/n Σ s·sin) | Equals OLS iff angles are equally spaced around the circle (orthogonal design). For unequal spacing it is the conventional Gurtman estimator, not least-squares; documented, with an OLS option under consideration. |
-| Degenerate profiles → NA at machine-noise tolerance | Flat profile (sd ≤ 8·ε·n·max\|s\|): displacement and fit are NA. Zero amplitude with real variance (pure higher harmonic): displacement NA, fit exactly 0. The tolerance is float-cancellation scale only (~13 orders below real variation) — small real amplitudes are never NA’d; their unreliability is the CI’s job (plus G1 guardrails). C++ returns NAs silently; R warns once (and once with a count for degenerate bootstrap resamples, whose exclusion makes CIs conditional on estimability). Cannot test `var == 0` exactly: a constant vector of a non-representable value (e.g., 0.1) has var ≈ 2e-34. |
+| Degenerate profiles → NA at machine-noise tolerance | Flat profile (sd ≤ 8·ε·n·max\|s\|): displacement and fit are NA. Zero amplitude with real variance (pure higher harmonic): displacement NA, fit exactly 0. The tolerance is float-cancellation scale only (~13 orders below real variation) — small real amplitudes are never NA’d; their unreliability is the CI’s job (plus G1 guardrails). C++ returns NAs silently; R warns once (and once with a count for degenerate bootstrap resamples). Exclusion from the confidence intervals is **per parameter, not per replicate**: `ssm_replicate_intervals()` quantiles each parameter column with `na.rm = TRUE`, so a degenerate replicate’s undefined displacement (and fit, if flat) is dropped only from that parameter’s CI, which is therefore conditional on estimability; its other, well-defined parameters (elevation/x/y/amplitude) still enter their own CIs undisturbed — dropping the whole replicate row would instead bias those CIs (e.g., pull a near-zero amplitude CI away from 0). Cannot test `var == 0` exactly: a constant vector of a non-representable value (e.g., 0.1) has var ≈ 2e-34. |
 
 ## Reproducibility
 
-[`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
-is the package’s only entry point that consumes R’s global RNG stream
-([`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)/[`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md)
-and the tidying functions are deterministic). Call
-[`set.seed()`](https://rdrr.io/r/base/Random.html) immediately before
-[`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
-to get reproducible confidence intervals. What that reproducibility
-covers, per engine:
+**RNG contract (an invariant, not an inventory):** a function consumes
+R’s global RNG stream **iff its statistical output is stochastic**
+(resampling or simulation). Every such entry point documents that fact
+and follows the
+[`set.seed()`](https://rdrr.io/r/base/Random.html)-immediately-before
+convention; everything else — including internal conveniences such as
+optimizer multi-starts, jitter, or tie-breaking — must be deterministic
+and leave `.Random.seed` untouched. (Restated 2026-07-03 from the
+earlier
+“[`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+is the only entry point that consumes the RNG stream,” which froze the
+then-true inventory instead of stating the rule that produced it.)
+
+RNG-consuming entry points, currently one
+([`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
+[`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
+and the tidying functions are deterministic; M4 is designed to add
+`cpm_fit(ci_method = "bootstrap")` and `cpm_simulate()` to this list,
+and its default path is required to be RNG-silent — see
+devel/m4-browne-design.md §3.5/§8):
+
+- **[`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)**
+  — call [`set.seed()`](https://rdrr.io/r/base/Random.html) immediately
+  before it to get reproducible confidence intervals. What that
+  reproducibility covers, per engine:
 
 | Engine | Seed guarantee | RNG consumption |
 |----|----|----|

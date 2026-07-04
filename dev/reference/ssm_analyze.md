@@ -49,7 +49,8 @@ ssm_analyze(
   ordinary-least-squares cosine fit only when `angles` are equally
   spaced around the circle (e.g., octants at 45-degree intervals); for
   unequally spaced angles it is the conventional Gurtman estimator, not
-  a least-squares fit.
+  a least-squares fit, and the reported model fit is then no longer a
+  bounded R-squared in `[0, 1]` (it can fall below 0).
 
 - measures:
 

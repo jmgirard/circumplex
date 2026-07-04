@@ -2,22 +2,16 @@
 
 ## circumplex (development version)
 
-- New vignette “Advanced Circumplex Visualization” shows how to build
-  custom circumplex figures by composing
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
-  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
-  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md),
-  and
-  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
-  with other ggplot2 components.
 - New
-  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
-  provides an angle-labeled x-axis scale for linear circumplex plots
-  (such as the score-by-angle curve). It labels axis breaks with their
-  angle in degrees by default, or with custom labels or a
-  `circumplex_instrument`’s scale abbreviations, using the same
-  conventions as
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md).
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  function builds an empty circumplex plotting canvas (amplitude rings,
+  displacement spokes, and scale labels) as a ggplot2 object that you
+  can add layers to with `+`. It accepts a set of scale `angles` and
+  `labels`, or a `circumplex_instrument` object to derive both
+  automatically. This is the first piece of a public circumplex
+  visualization layer; the package’s own
+  [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  draws on the same canvas.
 - New
   [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
   and
@@ -30,15 +24,31 @@
   boundary) internally. These make it possible to build custom
   circumplex figures by composing ggplot2 layers.
 - New
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
-  function builds an empty circumplex plotting canvas (amplitude rings,
-  displacement spokes, and scale labels) as a ggplot2 object that you
-  can add layers to with `+`. It accepts a set of scale `angles` and
-  `labels`, or a `circumplex_instrument` object to derive both
-  automatically. This is the first piece of a public circumplex
-  visualization layer; the package’s own
-  [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
-  draws on the same canvas.
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
+  provides an angle-labeled x-axis scale for linear circumplex plots
+  (such as the score-by-angle curve). It labels axis breaks with their
+  angle in degrees by default, or with custom labels or a
+  `circumplex_instrument`’s scale abbreviations, using the same
+  conventions as
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md).
+- New vignette “Advanced Circumplex Visualization” shows how to build
+  custom circumplex figures by composing
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
+  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
+  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md),
+  and
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
+  with other ggplot2 components.
+- [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  and
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
+  now label and place circumplex scales at their exact angles, including
+  non-integer angles (for example, the 22.5-degree spacing of a 16-scale
+  instrument), instead of rounding them to whole degrees.
+- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  now warns and names any profile it cannot place on the circle because
+  its displacement is undefined (a flat or zero-amplitude profile),
+  instead of dropping it from the figure without notice.
 - [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
   gains a `method` argument offering a Monte Carlo alternative to the
   bootstrap (`method = "montecarlo"`): SSM parameter replicates are
@@ -71,16 +81,28 @@
   or non-scalar argument is now an error rather than being silently
   ignored (previously it could yield unlabeled or garbled output
   columns).
-- [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+- Fixed a bug where a bootstrap resample under pairwise deletion
+  (`listwise = FALSE`) could crash
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  with `mean(): object has no elements` when the resample happened to
+  draw only missing values for one scale. Such a scale now yields an
+  `NA` mean (matching the correlation path), and the affected resample
+  is excluded from the confidence intervals as a degenerate profile,
+  consistent with the existing degeneracy handling.
+- Clarified in the documentation of
+  [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
+  [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
   and
-  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
-  now label and place circumplex scales at their exact angles, including
-  non-integer angles (for example, the 22.5-degree spacing of a 16-scale
-  instrument), instead of rounding them to whole degrees.
-- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
-  now warns and names any profile it cannot place on the circle because
-  its displacement is undefined (a flat or zero-amplitude profile),
-  instead of dropping it from the figure without notice.
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  that the reported model fit is a bounded R-squared in `[0, 1]` only
+  when `angles` are equally spaced; for unequally spaced angles the
+  closed-form estimator is not a least-squares fit and the reported fit
+  can fall below 0.
+- Fixed a bug where the displacement of a group contrast between two
+  exactly opposed profiles (a half-turn apart) was reported as `-180`
+  degrees instead of `+180`, inconsistent with the documented
+  `(-180, 180]` convention for contrasts. Such a contrast is now
+  reported as `+180`.
 
 ## circumplex 1.2.0
 
