@@ -39,6 +39,11 @@ ssm_param_names <- function() {
 # Reshape parameters from wide to long format ----------------------------------
 reshape_params <- function(v, suffix) {
   pnames <- ssm_param_names()
+  # The C++ ssm_parameters_cpp()/group_parameters() emit one value per entry in
+  # ssm_param_names(); a length that is not a whole multiple means the C++
+  # parameter count and ssm_param_names() have drifted out of sync (which would
+  # otherwise misalign every column). The contract is pinned in test-RcppExport.
+  stopifnot(length(v) %% length(pnames) == 0)
   # One row per group; one column per parameter, named parameter_suffix
   out <- matrix(v, ncol = length(pnames), byrow = TRUE)
   colnames(out) <- paste(pnames, suffix, sep = "_")

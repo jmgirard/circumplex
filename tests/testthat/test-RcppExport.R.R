@@ -21,6 +21,21 @@ test_that("Column means are correct even with missing", {
   expect_equal(rcm[2], ccm[[2]])
 })
 
+test_that("C++ parameter count stays in sync with ssm_param_names()", {
+  # group_parameters()/ssm_parameters_cpp() emit a fixed 6-wide block per
+  # profile, while the entire R assembly (reshape_params, ssm_replicate_intervals,
+  # ssm_score) is name-driven off ssm_param_names(). If a parameter is added or
+  # removed on one side only, the C++ stride and the R column names silently
+  # misalign. Pin the contract so any future desync fails at check time.
+  data("aw2009")
+  np <- length(ssm_param_names())
+  scores <- colMeans(aw2009)
+  expect_length(ssm_parameters_cpp(scores, as_radian(octants())), np)
+  mat <- as.matrix(aw2009)
+  gp <- group_parameters(mat, as_radian(octants()))
+  expect_equal(length(gp), nrow(mat) * np)
+})
+
 test_that("Column mean of an all-NA column is NA, not an error (F1)", {
   # F1 (Brief C audit): a pairwise-deletion bootstrap resample can produce a
   # scale column with no finite values; col_means() must return NA for it

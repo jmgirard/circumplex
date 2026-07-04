@@ -199,6 +199,24 @@ fix is test-first with a regression test reproducing the audit's executed failur
 
 ## Log
 
+- 2026-07-03 — `/code-review max` over v1.2.0..HEAD (the v1.3.0 bundle) + the one
+  finding acted on (Opus orchestration: 6 finder angles → verify → sweep). Result:
+  **no confirmed wrong-number correctness bugs.** Three high-looking candidates
+  were REFUTED under runtime verification: MC contrast wrong-pair (pairing correct
+  for every contrast shape ssm_analyze permits), MC all-NA CI on a constant scale
+  (cov()=0 not NA; mvn_draws is PSD-tolerant), MC nonsense CI at n=2 (the |r|>=1
+  guard errors first with a "use bootstrap" message). 10 low-severity findings
+  reported (plot NA-filter/exported-geom robustness, Monte Carlo engine efficiency,
+  minor cleanup, one doc nuance) — recorded in the ROADMAP continuous/infra track,
+  to be folded in when the relevant code is next touched (mostly M4). Acted on now:
+  the C++ `group_parameters()` fixed 6-wide stride was tied to `ssm_param_names()`
+  only by the literal 6, with no assertion — a future 7th-parameter edit on one
+  side would silently misalign every parameter column. Added a test pinning
+  `length(ssm_parameters_cpp) == length(ssm_param_names())` and the
+  `group_parameters` width (fails at check on any desync), a defensive `stopifnot`
+  in `reshape_params`, and a cross-reference comment at the C++ stride. Suite
+  589/589; check 0/0/0. No NEWS (internal guard; no user-facing behavior change).
+  (src/parameters.cpp, R/utils.R, tests/testthat/test-RcppExport.R.R, MILESTONES.md).
 - 2026-07-03 — Brief B-revision: revised the `ssm_ci_accuracy()` spec against the
   B-review findings (FRESH Fable session — not the B author, not the reviewer).
   Resolved the review's F1–F9 with a per-finding revision log (fixed / rejected-

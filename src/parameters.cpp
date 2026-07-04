@@ -61,6 +61,10 @@ arma::vec ssm_parameters_cpp(arma::vec scores, arma::vec angles) {
 // [[Rcpp::export]]
 arma::vec group_parameters(arma::mat scores, arma::vec angles) {
   double n = scores.n_rows;
+  // The stride 6 is the SSM parameter count. It MUST equal the length of
+  // ssm_parameters_cpp()'s output vector {elev,x,y,ampl,disp,gfit} above AND of
+  // R's ssm_param_names(); adding/removing a parameter means updating all three
+  // (test-RcppExport pins length(ssm_parameters_cpp) == length(ssm_param_names)).
   arma::vec out = arma::zeros<arma::vec>(n * 6);
   for (int i(0); i < n; i++) {
     out.subvec(i * 6, i * 6 + 5) = ssm_parameters_cpp(scores.row(i).t(), angles);
