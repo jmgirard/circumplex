@@ -2,6 +2,8 @@
 
 ## circumplex 1.2.0
 
+CRAN release: 2026-07-02
+
 - The SSM plotting functions
   ([`ssm_plot_circle()`](http://circumplex.jmgirard.com/reference/ssm_plot_circle.md),
   [`ssm_plot_curve()`](http://circumplex.jmgirard.com/reference/ssm_plot_curve.md),
@@ -50,13 +52,13 @@
   numerical noise. A flat (zero-variance) profile returns `NA`
   displacement and fit with a warning (previously an arbitrary angle and
   `-Inf`); a profile with real variance but zero amplitude returns `NA`
-  displacement and a fit of 0. Bootstrap resamples that produce
-  degenerate profiles (e.g., a resampled measure with zero variance) no
-  longer crash
-  [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md);
-  they are excluded from the confidence intervals with a warning
-  reporting the count. Genuinely small amplitudes are unaffected — the
-  degeneracy test operates at machine-noise scale only.
+  displacement and a fit of
+  0.  Bootstrap resamples that produce degenerate profiles (e.g., a
+      resampled measure with zero variance) no longer crash
+      [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md);
+      they are excluded from the confidence intervals with a warning
+      reporting the count. Genuinely small amplitudes are unaffected —
+      the degeneracy test operates at machine-noise scale only.
 - Fixed a bug where a missing (`NA`) value in the `grouping` variable of
   [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
   crashed with a cryptic error under pairwise deletion

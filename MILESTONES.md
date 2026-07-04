@@ -302,14 +302,6 @@ version to 1.2.0; `/release-checklist`.
   this code — only the local macOS/R-4.6.1 check has. Awaiting user
   decision on push before that box can be honestly checked.
   (DESCRIPTION, NEWS.md, cran-comments.md).
-- 2026-07-02 — Release box checked (Sonnet): user approved commit +
-  push. Committed DESCRIPTION/NEWS.md/cran-comments.md/MILESTONES.md
-  (f08248e), pushed 16 commits to `origin/master`. GitHub Actions
-  R-CMD-check matrix green on all 5 legs (macos-latest/release,
-  windows-latest/release, ubuntu-latest/devel, ubuntu-latest/release,
-  ubuntu-latest/oldrel-1); test-coverage.yaml and pkgdown.yaml also
-  green. M1 fully complete — package is CRAN-submission-ready pending
-  the user’s own `devtools::submit_cran()` (never run by the assistant).
 
 # Completed milestones
 
