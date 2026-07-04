@@ -52,6 +52,21 @@
 * `ssm_plot_circle()` now warns and names any profile it cannot place on the
   circle because its displacement is undefined (a flat or zero-amplitude
   profile), instead of dropping it from the figure without notice.
+* Fixed a bug where a bootstrap resample under pairwise deletion
+  (`listwise = FALSE`) could crash `ssm_analyze()` with `mean(): object has no
+  elements` when the resample happened to draw only missing values for one
+  scale. Such a scale now yields an `NA` mean (matching the correlation path),
+  and the affected resample is excluded from the confidence intervals as a
+  degenerate profile, consistent with the existing degeneracy handling.
+* Clarified in the documentation of `ssm_parameters()`, `ssm_score()`, and
+  `ssm_analyze()` that the reported model fit is a bounded R-squared in
+  `[0, 1]` only when `angles` are equally spaced; for unequally spaced angles
+  the closed-form estimator is not a least-squares fit and the reported fit can
+  fall below 0.
+* Fixed a bug where the displacement of a group contrast between two exactly
+  opposed profiles (a half-turn apart) was reported as `-180` degrees instead
+  of `+180`, inconsistent with the documented `(-180, 180]` convention for
+  contrasts. Such a contrast is now reported as `+180`.
 
 # circumplex 1.2.0
 
@@ -97,21 +112,6 @@
   (`listwise = FALSE`). Such observations are now dropped before analysis with
   a message reporting how many were removed, in both deletion modes; if no
   observations remain, a clear error is given.
-* Fixed a bug where a bootstrap resample under pairwise deletion
-  (`listwise = FALSE`) could crash `ssm_analyze()` with `mean(): object has no
-  elements` when the resample happened to draw only missing values for one
-  scale. Such a scale now yields an `NA` mean (matching the correlation path),
-  and the affected resample is excluded from the confidence intervals as a
-  degenerate profile, consistent with the existing degeneracy handling.
-* Clarified in the documentation of `ssm_parameters()`, `ssm_score()`, and
-  `ssm_analyze()` that the reported model fit is a bounded R-squared in
-  `[0, 1]` only when `angles` are equally spaced; for unequally spaced angles
-  the closed-form estimator is not a least-squares fit and the reported fit can
-  fall below 0.
-* Fixed a bug where the displacement of a group contrast between two exactly
-  opposed profiles (a half-turn apart) was reported as `-180` degrees instead
-  of `+180`, inconsistent with the documented `(-180, 180]` convention for
-  contrasts. Such a contrast is now reported as `+180`.
 * Fixed a bug where length requirements on character arguments were never
   enforced (`is_null_or_char()` dropped its `n` argument). `ssm_analyze()` now
   errors if `measures_labels` does not match the number of `measures` (or is
