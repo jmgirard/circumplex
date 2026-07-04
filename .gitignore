@@ -10,3 +10,6 @@ src-x64
 docs/
 /doc/
 /Meta/
+
+# Internal AI-workflow process notes (kept local, not published)
+devel/fable-briefs-2026-07.md
