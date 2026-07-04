@@ -1,25 +1,32 @@
 # circumplex 1.3.0
 
-* New vignette "Advanced Circumplex Visualization" shows how to build custom
-  circumplex figures by composing `ggcircumplex()`, `geom_ssm_point()`,
-  `geom_ssm_arc()`, and `scale_x_circumplex()` with other ggplot2 components.
-* New `scale_x_circumplex()` provides an angle-labeled x-axis scale for linear
-  circumplex plots (such as the score-by-angle curve). It labels axis breaks
-  with their angle in degrees by default, or with custom labels or a
-  `circumplex_instrument`'s scale abbreviations, using the same conventions as
-  `ggcircumplex()`.
-* New `geom_ssm_point()` and `geom_ssm_arc()` layers draw SSM profile points
-  and their confidence-region arcs directly in circumplex space on a
-  `ggcircumplex()` canvas, taking amplitude and displacement as aesthetics and
-  handling the polar transform (including wrap-around at the 0/360 degree
-  boundary) internally. These make it possible to build custom circumplex
-  figures by composing ggplot2 layers.
 * New `ggcircumplex()` function builds an empty circumplex plotting canvas
   (amplitude rings, displacement spokes, and scale labels) as a ggplot2
   object that you can add layers to with `+`. It accepts a set of scale
   `angles` and `labels`, or a `circumplex_instrument` object to derive both
   automatically. This is the first piece of a public circumplex visualization
   layer; the package's own `ssm_plot_circle()` draws on the same canvas.
+* New `geom_ssm_point()` and `geom_ssm_arc()` layers draw SSM profile points
+  and their confidence-region arcs directly in circumplex space on a
+  `ggcircumplex()` canvas, taking amplitude and displacement as aesthetics and
+  handling the polar transform (including wrap-around at the 0/360 degree
+  boundary) internally. These make it possible to build custom circumplex
+  figures by composing ggplot2 layers.
+* New `scale_x_circumplex()` provides an angle-labeled x-axis scale for linear
+  circumplex plots (such as the score-by-angle curve). It labels axis breaks
+  with their angle in degrees by default, or with custom labels or a
+  `circumplex_instrument`'s scale abbreviations, using the same conventions as
+  `ggcircumplex()`.
+* New vignette "Advanced Circumplex Visualization" shows how to build custom
+  circumplex figures by composing `ggcircumplex()`, `geom_ssm_point()`,
+  `geom_ssm_arc()`, and `scale_x_circumplex()` with other ggplot2 components.
+* `ggcircumplex()` and `scale_x_circumplex()` now label and place circumplex
+  scales at their exact angles, including non-integer angles (for example,
+  the 22.5-degree spacing of a 16-scale instrument), instead of rounding them
+  to whole degrees.
+* `ssm_plot_circle()` now warns and names any profile it cannot place on the
+  circle because its displacement is undefined (a flat or zero-amplitude
+  profile), instead of dropping it from the figure without notice.
 * `ssm_analyze()` gains a `method` argument offering a Monte Carlo alternative
   to the bootstrap (`method = "montecarlo"`): SSM parameter replicates are
   drawn from the asymptotic sampling distribution of the group mean vector or
@@ -45,13 +52,6 @@
   (e.g. `prefix = "IIP_"`) and must be single strings; an unnamed or
   non-scalar argument is now an error rather than being silently ignored
   (previously it could yield unlabeled or garbled output columns).
-* `ggcircumplex()` and `scale_x_circumplex()` now label and place circumplex
-  scales at their exact angles, including non-integer angles (for example,
-  the 22.5-degree spacing of a 16-scale instrument), instead of rounding them
-  to whole degrees.
-* `ssm_plot_circle()` now warns and names any profile it cannot place on the
-  circle because its displacement is undefined (a flat or zero-amplitude
-  profile), instead of dropping it from the figure without notice.
 * Fixed a bug where a bootstrap resample under pairwise deletion
   (`listwise = FALSE`) could crash `ssm_analyze()` with `mean(): object has no
   elements` when the resample happened to draw only missing values for one
