@@ -1,4 +1,4 @@
-# circumplex 1.3.0
+# circumplex (development version)
 
 * New `ggcircumplex()` function builds an empty circumplex plotting canvas
   (amplitude rings, displacement spokes, and scale labels) as a ggplot2
