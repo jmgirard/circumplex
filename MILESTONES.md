@@ -110,6 +110,16 @@ inlined so the reference survives archiving):
 
 ## Log
 
+- 2026-07-07 — M4.5 PR (#28) CI fix: the milestone-close PR surfaced a
+  pre-existing **red on master's R-CMD-check** (not caused by M4.5) — the
+  `summary.circumplex_cpm` "Largest absolute residual" line used `which.max()`
+  over residuals that `misfit_octant_P()`'s symmetric `v %o% v` pattern ties
+  four-ways to ~1e-16, so the reported pair broke on sub-ULP BLAS differences
+  and differed local (DE-LM) vs CI (PA-HI). Fixed to take the first tied
+  maximum in fixed column-major order (PA-HI everywhere); snapshot regenerated
+  (value unchanged), platform-independent regression test added. Full suite
+  1406 pass. (R/cpm_oop.R, tests/testthat/test-cpm_api.R,
+  tests/testthat/_snaps/cpm_api.md.)
 - 2026-07-07 — M5 opened as the active milestone on M4.5's close. Promoted the
   ROADMAP Milestone 5 summary into an active task list (T1–T5: design spec →
   lavaan-syntax generator → latent-variable estimation+CIs → invariance
