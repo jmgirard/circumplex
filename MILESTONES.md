@@ -86,7 +86,7 @@ archived:
   extension), consistent with `circumplex_ssm` conventions.
   *Accept:* one coherent entry point documented with runnable examples;
   print/summary snapshots; pkgdown reference section added.
-- [ ] **T8. Vignette extension.** Add the structure-test section to the
+- [x] **T8. Vignette extension.** Add the structure-test section to the
   "Evaluating Circumplex Structure" vignette written in M4/W1 (which covers
   CPM fitting and CI trustworthiness): what each A&R test asks, the nv=8
   cutoff provenance (T2), and how the tests complement the CPM fit indices.
@@ -95,6 +95,30 @@ archived:
 
 ## Log
 
+- 2026-07-07 — T8 (Sonnet): added the "Does the instrument have circumplex
+  structure at all?" section to the evaluating-circumplex-structure vignette
+  (new §4, existing §4/§5 renumbered to §5/§6): what each of the five
+  `fit_structure()` tests asks (Fisher/Gap/VT2/Rotation from A&R's ten, plus
+  RANDALL — explicitly *not* one of A&R's ten, since A&R's own footnote 3
+  excluded correspondence-index methods from their simulation because the
+  null is known analytically), a runnable `fit_structure()`/`summary()`/
+  `plot()` example on the jz2017 octants, the nv=8 cutoff provenance (traces
+  to T2's `data-raw/structure-test-cutoffs.R` sanity-gate-then-rederive
+  design, citing A&R p. 9/13/18 and Eqs. 11.1-11.3), the heuristic-not-
+  significance-test caveat (CLAUDE.md precision bar), and how the exploratory
+  criteria complement `cpm_fit()`'s confirmatory fit from Section 2. Exported
+  API only (`fit_structure()`, `PANO()`, `octants()`); three new references
+  added (Acton & Revelle 2004, Hubert & Arabie 1987, Tracey 1997). One
+  drafting correction caught by /code-review: the intro originally claimed
+  fit_structure() ships "the five [criteria] that survived A&R's own
+  evaluation," which is wrong on two counts (RANDALL isn't an A&R criterion;
+  only 4 of A&R's ten are implemented, chosen by this package's own method
+  review, not simply "A&R's winners") -- corrected against
+  devel/ar2004-transcription.md and devel/fit-drafts-method-review.md.
+  Rendered clean with `rmarkdown::render()`; full test suite still 1390 pass
+  (no R/ or src/ changed, so no /statistical-validation run). M4.5 is now
+  complete (T1-T8 all checked). No NEWS bullet (vignette-only).
+  (vignettes/evaluating-circumplex-structure.Rmd.)
 - 2026-07-07 — T7 (Opus): shipped the user-facing `fit_structure()` entry
   point and its `circumplex_structure` object (print/summary/plot), the one
   coherent API over all five A&R tests. Maintainer decisions (AskUserQuestion):
