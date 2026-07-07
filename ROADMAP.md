@@ -78,11 +78,21 @@ outlive individual milestones' MILESTONES.md sections):
   transcribed via two automated channels but still need the §6.1 protocol's
   second independent *human* re-read against the paper (Jeff). Only a
   transcription typo is at risk. Fold into the pre-release review.
+  Same status and treatment for the Zimmermann & Wright (2017) transcription
+  from M4/W1 (`devel/m4-zw-transcription.md`, feeding the "Evaluating
+  Circumplex Structure" vignette and the O5 bridge) — two automated channels
+  diffed and internally cross-validated, human re-read pending; the record
+  flags one verified coincidence (15.5% appears for two distinct quantities)
+  for explicit attention.
 - **B6 analytic-CI caution — Jeff to confirm/veto** (adopted default,
   reversible until release): the `cpm_boundary_markers()` marker set and the
   N-conditional `summary()` caution wording in R/cpm_fit.R / R/cpm_oop.R.
   Natural review point: when the M4 vignette (W1) documents CI
-  trustworthiness.
+  trustworthiness. *W1 review outcome (2026-07-07, advisory): confirmed —
+  the wording is hedged, directional, and names its markers; the vignette
+  now teaches the same guidance ("prefer the bootstrap on the raw-data
+  path", caution below N = 2000 and marker-conditional above). Jeff's veto
+  window stays open until release.*
 - **Release review depth:** `/code-review max` minimum; this is now the
   single flagship release, so it is *the* candidate for the billed
   `/code-review ultra` — but only if Jeff asks for it.

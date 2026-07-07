@@ -1,5 +1,21 @@
 # circumplex (development version)
 
+* New vignette, "Evaluating Circumplex Structure": how to test whether an
+  instrument fits a circumplex in your sample with `cpm_fit()` (reading and
+  benchmarking the fit indices, comparing the constrained model variants,
+  and the boundary-solution/chi-square cautions from the package's
+  validation simulations), and how to check whether SSM confidence
+  intervals can be trusted at your sample size and profile with
+  `ssm_ci_accuracy()`. Summarizes Zimmermann & Wright's (2017) simulation
+  findings as cited context (transcribed from the published article),
+  reproduces their Study 5 analyses on the bundled `jz2017` data, and adds
+  guidance on when to trust each SSM parameter and on what ipsatizing
+  octant scores costs an SSM analysis. The diagnostic itself was validated
+  against the article: configured to transcribed Zimmermann & Wright
+  simulation conditions, it reproduces their published accuracy
+  classifications (validation scripts and results are recorded in the
+  package's development repository).
+
 * New `ssm_ci_accuracy()` function assesses, by simulation, whether the
   confidence intervals of an `ssm_analyze()` result would cover the true SSM
   parameters at their nominal rate if the population looked like the fitted

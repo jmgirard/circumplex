@@ -194,7 +194,7 @@ Cross-cutting guardrails for every task:
 
 ### Tasks — Ship
 
-- [ ] **W1. Vignette: "Evaluating Circumplex Structure".** Fit statistics,
+- [x] **W1. Vignette: "Evaluating Circumplex Structure".** Fit statistics,
   CI trustworthiness, when to trust SSM parameters, ipsatization guidance;
   Z&W Studies 1–5 transcribed as cited context (re-confirm the grid
   characterization at transcription time and log it — spec §2/F8). Also
@@ -289,6 +289,63 @@ dependency policy, model tiers) apply unchanged.
 
 ## Log
 
+- 2026-07-07 — W1 vignette + Z&W transcription + O5 bridge (Fable,
+  plan-first; 8-angle /code-review high, 10 findings fixed + 3 refuted/
+  declined with rationale, 1 verified-coincidence recorded). **Transcription
+  (oracle rule, two-session protocol):** Zimmermann & Wright (2017) Studies
+  1–5 transcribed from the publisher PDF into devel/m4-zw-transcription.md
+  (channel 1 visual read + channel 2 pdftotext, diffed; one text-layer
+  artifact — Eq. A7's √2 — resolved by reproducing all five published
+  scaling factors and all three Eq. 3 worked values from the transcribed
+  parameters; Table 4 PARPD/OCPD rows recorded with the jz2017
+  reproduction cross-check, every point estimate matching published
+  rounding; Jeff's independent human re-read pending, folded into the
+  ROADMAP pre-release re-read item). F8 grid characterization re-confirmed
+  and logged ("coarse and fixed" stands: 2 matrices, 7-value n grid,
+  octants only, one engine). **Transcription finding: the article has NO
+  supplemental materials** (Europe PMC + text itself) — the spec's assumed
+  per-condition value source never existed, so the O5 bridge was re-scoped
+  per the F7 mechanism (documented in the record, never loosened):
+  published per-condition coverage values don't exist; the sharpest
+  published anchors are Bradley-band accurate/inaccurate classifications
+  and the Eq. 3 frontier. **O5 bridge (devel/m4-zw-bridge.R + results
+  rds):** MVN gate passes (their generation is explicitly MVN); exact
+  Study-3 populations (Note 3 circulant + cosine target row, E=0, DOM=0,
+  R²=1, peak at our 0/360 pole) fed through structure="observed" via
+  exact-sample-correlation data; 4 conditions × 5000 reps (their own MC
+  precision), both matrices × clearly-accurate/clearly-inaccurate per the
+  frontier: **4/4 published classifications reproduced** (accurate
+  conditions 93.7–94.5% inside the band; inaccurate conditions one-sided
+  truth-below under-coverage a 88.9/81.1%, d|cert 85.9/80.4%; elevation
+  adequate everywhere at n=100). **Vignette** (evaluating-circumplex-
+  structure.Rmd, M4 scope only — CPM + CI trustworthiness, no A&R):
+  cpm_fit on jz2017 with fit-index benchmarks (constants match the
+  package's cited ones), variant comparison qualitatively reproducing
+  Z&W's CircE pair (our .956 CFI free-angles vs their .958; model
+  difference documented per B6), B6 cautions taught (boundary solutions
+  common, χ² descriptive only), ssm_ci_accuracy demo at n=250
+  (PARPD-vs-OCPD contrast; 100% false-certification guardrail line as the
+  central teaching point), Z&W thresholds table + Eq. 3 as transcribed
+  cited context, when-to-trust checklist, ipsatization section (raw-vs-
+  ipsatized comparison chunk; elevation .250→.007). Wording bar held (no
+  "significan*", grep-asserted). Analytic-CI caution wording CONFIRMED
+  (advisory) — recorded on the ROADMAP pre-release item, Jeff's veto open.
+  Review fixes: dangling ".25" cross-reference now computed in-document;
+  OCPD .012 made record-traceable; bridge summary borderline/NA logic
+  robust (stored results unaffected, still 4/4); pkgdown reference section
+  for the M4 exports (pre-existing index gaps for instrument pages left
+  for W2/release); NEWS devel-path citation genericized; seed-brittle
+  prose made rerender-robust; boots=500 in the demo (vignette build 28s →
+  12s); precision hedges (essentially unbiased; MC-SE claim qualified near
+  nominal). Refuted/declined with rationale: per-call set.seed flagged as
+  anti-convention (intro vignette line 359 explicitly endorses it; matches
+  the new APIs' Reproducibility docs), circulant-loop vectorization and
+  single-vapply table (validation-script/teaching clarity preferred).
+  Checks: devtools::check 0/0/0 (pre-fix run; post-fix run repeated),
+  vignette renders clean, exported API only. (vignettes/evaluating-
+  circumplex-structure.Rmd [new], devel/m4-zw-transcription.md [new],
+  devel/m4-zw-bridge.R [new], devel/m4-zw-bridge-results.rds [new],
+  NEWS.md, _pkgdown.yml, ROADMAP.md, MILESTONES.md.)
 - 2026-07-07 — Between-releases working practice adopted (Jeff + Fable):
   real versions/annotated tags/GitHub Releases only at CRAN submissions;
   per milestone close — dev-suffix bump, lightweight `mX-complete` tag, and

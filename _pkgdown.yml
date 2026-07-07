@@ -41,6 +41,17 @@ reference:
   - ssm_plot_curve
   - ssm_parameters
   - ssm_score
+- title: Structure Evaluation Functions
+  desc: Functions for evaluating circumplex structure and CI trustworthiness
+  contents:
+  - cpm_fit
+  - cpm_simulate
+  - print.circumplex_cpm
+  - summary.circumplex_cpm
+  - plot.circumplex_cpm
+  - ssm_ci_accuracy
+  - summary.circumplex_ci_accuracy
+  - plot.circumplex_ci_accuracy
 - title: Visualization Layer
   desc: Composable ggplot2 components for building circumplex figures
   contents:
@@ -112,6 +123,8 @@ navbar:
       href: articles/intermediate-ssm-analysis.html
     - text: Advanced Circumplex Visualization
       href: articles/advanced-visualization.html
+    - text: Evaluating Circumplex Structure
+      href: articles/evaluating-circumplex-structure.html
   - text: News
     href: news/index.html
   right:
