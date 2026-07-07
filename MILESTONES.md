@@ -64,7 +64,7 @@ archived:
   addendum). Internal `structure_fisher()` + nv=8 cutoffs already exist from
   T2; T3 wraps them with scoring-keyed cutoff interpretation and roxygen
   citing A&R (including the scale adjudication).
-- [ ] **T4. Gap test of equal spacing.** Fix the wrap-around omission (the
+- [x] **T4. Gap test of equal spacing.** Fix the wrap-around omission (the
   0°/360° gap must participate) and the fragile `sign·acos` at 180°/h²=0;
   correct the "equal axes" roxygen error.
   *Accept:* regression test where the wrap-around gap is the largest gap
@@ -95,6 +95,20 @@ archived:
 
 ## Log
 
+- 2026-07-07 — T4 (Opus, test-first): added `structure_gap_test()`, the
+  interpretation wrapper over the T2 `structure_gap()` internal, mirroring
+  T3's Fisher wrapper and reusing `structure_interpret` with the "gap" cutoff
+  key. `@noRd` roxygen cites A&R, corrects the draft's copy-pasted "equal
+  axes" description to equal *spacing* (A&R p. 17: the Gap Test is insensitive
+  to unequal axes), and records the wrap-around-gap fix and the large nv effect
+  (raw "almost" .01 at nv=64/128 → .35 at nv=8). The wrap-around-gap regression,
+  the exact-axis 180° sign·acos guard, and the h²≈0 degeneracy policy required
+  by T4's acceptance already ship as statistic-level tests from T2; T4 adds
+  wrapper-level tests (statistic parity, jz2017 raw gap ~2.4 → "weak",
+  ipsatized ~.15 → "thrice", scoring validation). No estimation math changed,
+  so no /statistical-validation. Full suite 1297 pass; /code-review high: 0
+  findings. Internal only, no NEWS bullet. (R/fit_structure.R,
+  tests/testthat/test-fit_structure.R.)
 - 2026-07-07 — T3 (Opus, test-first): added the scoring-keyed interpretation
   layer over the T2 Fisher internal. New shared `structure_interpret(stat,
   test, nv, scoring)` classifies any criterion statistic against

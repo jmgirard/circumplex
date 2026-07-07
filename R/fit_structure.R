@@ -335,3 +335,64 @@ structure_fisher_test <- function(data, scales, scoring = "raw", ridge = 0) {
     loadings = loadings
   )
 }
+
+#' Gap Test of equal spacing (Acton & Revelle, 2004)
+#'
+#' Internal wrapper tying the Gap criterion statistic to its scoring-keyed,
+#' number-of-scales-specific interpretation. Not yet exported -- the user-facing
+#' fit-statistics API is a later task; this returns a plain list the API will
+#' consume, mirroring `structure_fisher_test()`.
+#'
+#' The Gap Test of equal *spacing* asks whether the circumplex variables are
+#' evenly distributed around the circle, as opposed to clustering into simple
+#' structure. It detects interstitiality, **not** equal axes -- Acton & Revelle
+#' (2004, p. 17) note it is insensitive to unequal axes, and the draft that
+#' preceded this code carried a copy-pasted "equal axes" description that is
+#' corrected here. The statistic is the variance of the angular gaps between
+#' angularly adjacent variables, *including the wrap-around gap* across the
+#' 0/360 degree branch cut (A&R Eq. 2); omitting that gap (the draft/psych bug,
+#' fixed in `structure_gap()`) deflates the variance for simple structure,
+#' where the wrap-around gap is often the largest, and biases the test toward
+#' declaring circumplexity. Gaps are invariant to rotation of the factor pair,
+#' so the arbitrary principal-axis orientation is immaterial.
+#'
+#' Cutoffs are keyed to the *declared* `scoring` (A&R report different cutoffs
+#' for raw and deviation, i.e. [ipsatize()]d, data) and are nv-specific: A&R
+#' found a substantial number-of-scales effect on the Gap Test (p. 18; the
+#' raw "almost certainly" cutoff moves from .01 at nv = 64/128 to .35 at
+#' nv = 8), so their published cutoffs must not be reused at another scale
+#' count. Only nv = 8 is calibrated (see `structure_cutoffs`); any other scale
+#' count returns an undefined category. This function does not transform the
+#' data -- the caller declares which scoring the passed scales are already on.
+#'
+#' @param data A data frame containing the circumplex scales.
+#' @param scales Variable names or column numbers of the circumplex scales.
+#' @param scoring Declared scoring of `scales`, `"raw"` or `"deviation"`; picks
+#'   the matching cutoffs (default `"raw"`).
+#' @param ridge Non-negative ridge added to the correlation matrix diagonal to
+#'   repair a non-positive-definite matrix; default `0`. See
+#'   `structure_loadings()`.
+#' @return A list with the criterion `statistic` (gap variance in radians^2),
+#'   the `test` name, declared `scoring`, number of scales `nv`, the `cutoffs`
+#'   used (or `NULL` at an uncalibrated nv), the interpretation `category`, and
+#'   the `loadings`.
+#' @references Acton, G. S., & Revelle, W. (2004). Evaluation of ten
+#'   psychometric criteria for circumplex structure. \emph{Methods of
+#'   Psychological Research Online}, 9(1), 1-27.
+#' @noRd
+structure_gap_test <- function(data, scales, scoring = "raw", ridge = 0) {
+  scoring <- match.arg(scoring, c("raw", "deviation"))
+  loadings <- structure_loadings(data, scales, ridge = ridge)
+  statistic <- structure_gap(loadings)
+  nv <- nrow(loadings)
+  interp <- structure_interpret(statistic, "gap", nv, scoring)
+  list(
+    test = "gap",
+    statistic = statistic,
+    scoring = scoring,
+    nv = nv,
+    cutoffs = interp$cutoffs,
+    category = interp$category,
+    loadings = loadings
+  )
+}

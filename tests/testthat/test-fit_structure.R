@@ -323,3 +323,37 @@ test_that("structure_fisher_test validates the declared scoring", {
   data("jz2017")
   expect_error(structure_fisher_test(jz2017, octants_jz, scoring = "ipsative"))
 })
+
+# Gap test wrapper (T4): equal spacing, not equal axes -------------------------
+
+test_that("structure_gap_test wraps the internal statistic and interpretation", {
+  data("jz2017")
+  res <- structure_gap_test(jz2017, octants_jz, scoring = "raw")
+  # The statistic is exactly the internal gap variance on the same loadings --
+  # the wrapper adds interpretation, it does not recompute (and it carries the
+  # T2 wrap-around-gap fix, so a general factor is not mistaken for even spacing).
+  expect_equal(res$statistic, structure_gap(structure_loadings(jz2017, octants_jz)))
+  expect_identical(res$test, "gap")
+  expect_identical(res$scoring, "raw")
+  expect_identical(res$nv, 8L)
+  # jz2017 raw octant scales carry a general factor: gap variance ~ 2.4 rad^2,
+  # far past the raw "twice" cutoff, so even spacing is not clearly supported.
+  expect_identical(res$category, "weak")
+})
+
+test_that("structure_gap_test reflects deviation scoring on ipsatized data", {
+  data("jz2017")
+  di <- ipsatize(jz2017, items = octants_jz, append = FALSE)
+  ip <- paste0(octants_jz, "_i")
+  res <- structure_gap_test(di, ip, scoring = "deviation", ridge = 0.1)
+  # Ipsatizing collapses the gap variance from ~2.4 to ~.15, which the deviation
+  # cutoffs read as even spacing being at least three times as likely. The
+  # statistic sits just above the .15 "almost" cutoff, so a flip to "almost"
+  # here would signal that the loadings (not the interpretation) changed.
+  expect_identical(res$category, "thrice")
+})
+
+test_that("structure_gap_test validates the declared scoring", {
+  data("jz2017")
+  expect_error(structure_gap_test(jz2017, octants_jz, scoring = "ipsative"))
+})
