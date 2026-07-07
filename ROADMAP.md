@@ -93,6 +93,24 @@ outlive individual milestones' MILESTONES.md sections):
   now teaches the same guidance ("prefer the bootstrap on the raw-data
   path", caution below N = 2000 and marker-conditional above). Jeff's veto
   window stays open until release.*
+- **Cross-platform CI portability (release blocker; surfaced 2026-07-07 by
+  the M4.5 PR #28).** `R-CMD-check` has been **red on every platform on master
+  since M4** (M4 landed without a green multi-platform gate); the M4.5 code is
+  clean (macOS check green, all `fit_structure` tests pass everywhere) but the
+  branch inherits the failures. Ten failures in three classes, all in M4 code:
+  (1) **estimator boundary — `cpm_pack: all(b_keep > 0)` errors**
+  (`test-cpm_fit.R` exact-recovery/mirror/multimodal/free-angle tests): the CPM
+  optimizer converges to a harmonic weight *exactly* on the β = 0 boundary on
+  Linux/Windows, which `cpm_pack`'s softmax-inverse log-parameterization
+  deliberately refuses (`R/cpm_fit.R:170`) — a real cross-platform estimator
+  robustness bug, **Fable-tier**, not reproducible on macOS (needs the Linux
+  values captured via a CI debug run); (2) **seeded-bootstrap snapshots**
+  (`test-cpm_api.R`, `test-ci_accuracy.R`) whose printed CI endpoints differ at
+  the 3rd decimal by BLAS — need `skip_on_ci()`/`skip_on_cran()` (local-only
+  regression pins) or numeric masking; (3) **vdiffr** plot snapshots
+  (`test-cpm_plot.R`, `test-ci_accuracy.R`) — platform font/rendering, standard
+  `skip_on_ci()`. This MUST be green before the v2.0.0 CRAN submission (CRAN is
+  multi-platform). Classes 2–3 are mechanical; class 1 is the real work.
 - **Release review depth:** `/code-review max` minimum; this is now the
   single flagship release, so it is *the* candidate for the billed
   `/code-review ultra` — but only if Jeff asks for it.
