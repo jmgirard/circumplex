@@ -101,11 +101,12 @@ outlive individual milestones' MILESTONES.md sections):
   (1) **estimator boundary — `cpm_pack: all(b_keep > 0)` errors**
   (`test-cpm_fit.R` exact-recovery/mirror/multimodal/free-angle tests): the CPM
   optimizer converges to a harmonic weight *exactly* on the β = 0 boundary on
-  Linux/Windows, which `cpm_pack`'s softmax-inverse log-parameterization
-  deliberately refuses (`R/cpm_fit.R:170`) — a real cross-platform estimator
-  robustness bug, **Fable-tier**, not reproducible on macOS (needs the Linux
-  values captured via a CI debug run); handoff brief in
-  `devel/cpm-pack-boundary-brief.md`; (2) **seeded-bootstrap snapshots**
+  the **ubuntu runners only** (macOS and Windows pass), which `cpm_pack`'s
+  softmax-inverse log-parameterization deliberately refuses (`R/cpm_fit.R:170`)
+  — a real Linux-BLAS estimator robustness bug, **Fable-tier**, not reproducible
+  on macOS (reproduce under a `rocker/r-ver` container / capture the values via
+  a CI debug run); handoff brief in `devel/cpm-pack-boundary-brief.md`;
+  (2) **seeded-bootstrap snapshots**
   (`test-cpm_api.R`, `test-ci_accuracy.R`) whose printed CI endpoints differ at
   the 3rd decimal by BLAS — need `skip_on_ci()`/`skip_on_cran()` (local-only
   regression pins) or numeric masking; (3) **vdiffr** plot snapshots

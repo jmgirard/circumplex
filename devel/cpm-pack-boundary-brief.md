@@ -1,4 +1,4 @@
-# Fable brief — `cpm_pack` β-boundary error on Linux/Windows (CI portability)
+# Fable brief — `cpm_pack` β-boundary error on Linux (CI portability)
 
 **Status:** handoff brief for a Fable session (estimator/canonicalization work;
 plausible-but-wrong statistics are possible here). **Tier: Fable.** Surfaced
@@ -7,7 +7,12 @@ ROADMAP (`## CRAN release strategy` → v2.0.0 pre-release items, class 1).
 
 ## Symptom
 
-`R-CMD-check` on **ubuntu (release, oldrel-1) and windows** fails with:
+**Linux only.** After the class-2/3 skips landed (PR #29), macOS and
+**Windows R-CMD-check pass**; the error persists on **ubuntu (release, oldrel-1,
+devel) and the covr `test-coverage` job**. So this is specific to the ubuntu
+runners' BLAS/LAPACK, which narrows the reproduction target: reproduce under a
+`rocker/r-ver` (Debian/OpenBLAS) container, not just "a non-mac platform."
+`R-CMD-check` on those Linux jobs fails with:
 
 ```
 Error ('test-cpm_fit.R:195'): exact recovery: an angle exactly at the 0/360 pole
@@ -39,9 +44,10 @@ v <- log(b_keep) - log(b_keep[1])     # v_0 = 0; v_k = log(beta_k) - log(beta_0)
 
 The log-parameterization requires **every kept β strictly positive** (a zero has
 no finite preimage — the comment at 166-168 says so and fails loudly rather than
-emit `-Inf`). On Linux/Windows BLAS the estimator lands on (or the test's
+emit `-Inf`). On the ubuntu-runner BLAS the estimator lands on (or the test's
 start/fitted values `sv$beta` carry) a kept β **at or below the β = 0 boundary**;
-on macOS the same fit stays just positive. A vanishing harmonic weight is a
+on macOS and Windows the same fit stays just positive. A vanishing harmonic
+weight is a
 *documented CPM boundary* (see `cpm_boundary_markers()` and the "harmonic weight
 at 0" language in the CI-trustworthiness vignette), so this is a real boundary
 the estimator must survive, not a data error.
@@ -90,8 +96,8 @@ point.
 
 ## Acceptance
 
-- The four `test-cpm_fit.R` tests pass on ubuntu + windows + macOS `R-CMD-check`
-  (and under `covr` in `test-coverage`).
+- The four `test-cpm_fit.R` tests pass on the ubuntu `R-CMD-check` jobs (macOS
+  and Windows already pass) and under `covr` in `test-coverage`.
 - A regression test exercising the β = 0 (vanishing-harmonic) boundary directly,
   so the case is pinned platform-independently rather than only caught by the
   cross-platform CI matrix.
