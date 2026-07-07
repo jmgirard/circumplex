@@ -583,6 +583,11 @@ test_that("summary()'s analytic-CI caution follows the coverage-oracle calibrati
 })
 
 test_that("print and summary render a bootstrap fit as expected", {
+  # Bootstrap CI endpoints differ across platforms at the 3rd decimal (BLAS),
+  # so this exact-value snapshot is a local-only regression pin, not a CI/CRAN
+  # gate. The estimator/formatting are covered by platform-stable tests above.
+  skip_on_ci()
+  skip_on_cran()
   d <- sim_octant_data(300, 42)
   on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
   set.seed(1)

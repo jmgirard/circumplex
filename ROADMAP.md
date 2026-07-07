@@ -104,7 +104,8 @@ outlive individual milestones' MILESTONES.md sections):
   Linux/Windows, which `cpm_pack`'s softmax-inverse log-parameterization
   deliberately refuses (`R/cpm_fit.R:170`) — a real cross-platform estimator
   robustness bug, **Fable-tier**, not reproducible on macOS (needs the Linux
-  values captured via a CI debug run); (2) **seeded-bootstrap snapshots**
+  values captured via a CI debug run); handoff brief in
+  `devel/cpm-pack-boundary-brief.md`; (2) **seeded-bootstrap snapshots**
   (`test-cpm_api.R`, `test-ci_accuracy.R`) whose printed CI endpoints differ at
   the 3rd decimal by BLAS — need `skip_on_ci()`/`skip_on_cran()` (local-only
   regression pins) or numeric masking; (3) **vdiffr** plot snapshots
