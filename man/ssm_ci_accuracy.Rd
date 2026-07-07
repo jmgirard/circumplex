@@ -63,17 +63,28 @@ Reproducibility).}
 A \code{circumplex_ci_accuracy} object: a list with \code{coverage} (per
 Profile x Parameter x Condition: coverage, its Monte Carlo SE, the
 one-sided miss rates, median CI width, and for displacement the
-certification-conditional coverage), \code{guardrail} (per Profile x
-Condition: certification rate, the user-expectation benchmark
-\code{(1 - interval) / 2}, the implied threshold, fit-pass rate, and the
+certification-conditional coverage with the number of certified
+replicates behind it; \code{Structural} flags the amplitude rows whose zero
+coverage is a theorem rather than a measurement), \code{guardrail} (per
+Profile x Condition: certification rate with its 95\% Wilson score
+interval, the user-expectation benchmark \code{(1 - interval) / 2}, the
+stored false-certification caution decision at the \code{c = 0} rung
+(\code{Caution}, true when the Wilson lower bound exceeds the benchmark;
+\code{NA} off that rung), the implied threshold, fit-pass rate, and the
 branch-pathology rate -- the rate at which a displacement point estimate
-falls geometrically outside its own interval), \code{verdict} (Wilson-vs-
-Bradley classification of elevation, amplitude, and conditional
-displacement coverage at the as-estimated condition, plus an overall
-worst-of row per profile), \code{cpm} (the embedded \code{\link[=cpm_fit]{cpm_fit()}} object, or
-\code{NULL} when \code{structure = "observed"}), \code{population} (per profile row:
-the population profile vectors, truth parameters, and any
-positive-semidefiniteness repair magnitude, by condition), and \code{details}.
+falls geometrically outside its own interval), \code{verdict}
+(Wilson-vs-Bradley classification of elevation, amplitude, and
+conditional displacement coverage at the as-estimated condition, plus an
+overall worst-of row per profile; note the printed verdict headline
+additionally elevates to CAUTION whenever the guardrail \code{Caution} fired,
+so it can read worse than the overall coverage class),
+\code{cpm} (the embedded \code{\link[=cpm_fit]{cpm_fit()}} object, or \code{NULL} when
+\code{structure = "observed"}), \code{population} (per profile row: the population
+profile vectors, truth parameters, and any positive-semidefiniteness
+repair magnitude, by condition), and \code{details}. The \code{plot()} method
+draws coverage against the amplitude ladder with the Bradley band
+shaded; \code{summary()} adds a plain-language verdict (see
+\code{\link[=summary.circumplex_ci_accuracy]{summary.circumplex_ci_accuracy()}}).
 }
 \description{
 Estimate, by simulation, whether the confidence intervals of a fitted
@@ -111,9 +122,18 @@ exact for any angle spacing: elevation is unchanged and the amplitude is
 exactly \code{c} times the estimate. Truths are nevertheless recomputed from
 each condition's population profile. At \code{c = 0} amplitude coverage is
 structurally zero (a percentile interval of strictly positive amplitude
-replicates cannot contain 0) and displacement truth is undefined (reported
-\code{NA}); the guardrail certification rate carries the inferential weight
-there.
+replicates cannot contain 0; such rows are flagged in the \code{Structural}
+column) and displacement truth is undefined (reported \code{NA}); the guardrail
+certification rate carries the inferential weight there, and the
+informative rungs for amplitude coverage are the small \code{c > 0} ones.
+
+When a profile row's amplitude estimate is itself below half its observed
+CI width, the relative ladder degenerates: the analysis already sits in
+the near-zero regime. One absolute rung is then added at the certification
+margin (\code{c} chosen so \code{c} times the amplitude estimate equals the observed
+amplitude-CI half-width, the largest such \code{c} across affected rows) and
+\code{summary()} notes the regime. On the correlation path this rung is dropped
+with a warning if it would push a population correlation to +/-1.
 }
 \section{Reproducibility}{
 
@@ -168,6 +188,7 @@ and Statistical Psychology, 31}(2), 144-152.
 }
 \seealso{
 Other ssm functions:
+\code{\link[=plot.circumplex_ci_accuracy]{plot.circumplex_ci_accuracy()}},
 \code{\link[=ssm_analyze]{ssm_analyze()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
 \code{\link[=ssm_score]{ssm_score()}},

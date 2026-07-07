@@ -1,7 +1,10 @@
-# Tests for ssm_ci_accuracy() (M4/Z1, spec devel/m4-ci-accuracy-spec.md).
-# The amplitude-near-zero analysis layer and verdict wording are Z2; these
-# tests cover the sec. 3 core loop, the sec. 4.1 ladder construction, the
-# c = 0 machinery pin, the RNG contract, and the engine-replay equivalences.
+# Tests for ssm_ci_accuracy() (M4/Z1 + Z2, spec devel/m4-ci-accuracy-spec.md).
+# Z1 sections cover the sec. 3 core loop, the sec. 4.1 ladder construction,
+# the c = 0 machinery pin, the RNG contract, and the engine-replay
+# equivalences. Z2 sections cover the sec. 4-5 analysis layer: the sec. 10
+# direction oracles, band-edge verdict classification, the degenerate-ladder
+# margin rung, the guardrail false-certification measurement, the sec. 5.2
+# verdict wording (and its wording bar), and the plot method.
 
 deg2rad <- function(x) x * pi / 180
 
@@ -410,4 +413,327 @@ test_that("input validation rejects bad arguments", {
   expect_error(ssm_ci_accuracy(obj, amplitude_factors = c(1, 2)))
   expect_error(ssm_ci_accuracy(obj, digits = -1))
   expect_error(ssm_ci_accuracy(obj, parallel = "bogus"))
+})
+
+# ==== Z2: amplitude-near-zero module + verdict (spec sec. 4-5, sec. 10) =======
+
+# ---- Bradley/Wilson classification at the band edges (sec. 5.1) --------------
+
+test_that("Bradley classification is correct at the band edges", {
+  # Nominal .95 -> Bradley liberal band [.925, .975]
+  # Wilson interval entirely inside the band
+  expect_identical(ssm_ci_bradley_class(950, 1000, 0.95),
+                   c("adequate", NA_character_))
+  # Wilson interval overlapping the lower band edge
+  expect_identical(ssm_ci_bradley_class(930, 1000, 0.95)[1], "borderline")
+  # Wilson interval overlapping the upper band edge
+  expect_identical(ssm_ci_bradley_class(975, 1000, 0.95)[1], "borderline")
+  # Entirely below the band: inadequate with under-coverage direction
+  expect_identical(ssm_ci_bradley_class(880, 1000, 0.95),
+                   c("inadequate", "under"))
+  # Entirely above the band: inadequate with over-coverage direction
+  expect_identical(ssm_ci_bradley_class(999, 1000, 0.95),
+                   c("inadequate", "over"))
+  # Small reps rarely clear the band: 19/20 = .95 must not come back adequate
+  expect_identical(ssm_ci_bradley_class(19, 20, 0.95)[1], "borderline")
+  # Not assessable
+  expect_identical(ssm_ci_bradley_class(NA, 0, 0.95),
+                   c(NA_character_, NA_character_))
+  # The classification is keyed to the nominal level: the same counts move
+  # with the band ([.85, .95] at 90% nominal)
+  expect_identical(ssm_ci_bradley_class(900, 1000, 0.90)[1], "adequate")
+})
+
+# ---- sec. 10 known-good oracle ------------------------------------------------
+
+test_that("known-good oracle: healthy elevation CIs are classified adequate", {
+  # Mean-based elevation is a plain mean of means; at moderate n under MVN,
+  # percentile-bootstrap coverage is textbook-adequate. A diagnostic that
+  # flags healthy elevation CIs is broken (spec sec. 10).
+  skip_on_cran()
+  theta <- deg2rad(as.numeric(octants()))
+  set.seed(1001)
+  dat <- as.data.frame(t(sapply(1:300, function(i) {
+    2 + 1.5 * cos(theta - 2) + rnorm(8, 0, 1)
+  })))
+  colnames(dat) <- PANO()
+  set.seed(1002)
+  obj <- ssm_analyze(dat, scales = PANO(), boots = 1000)
+  set.seed(1003)
+  res <- ssm_ci_accuracy(obj, reps = 1000, amplitude_factors = 1,
+                         structure = "observed")
+  ev <- res$verdict[res$verdict$Parameter == "e", ]
+  expect_identical(ev$Class, "adequate")
+})
+
+# ---- sec. 10 known-bad direction oracle ----------------------------------------
+
+test_that("known-bad direction oracle: near-zero amplitude under-covers, misses below; c = 0 false-certifies above benchmark", {
+  # At a small c > 0 rung (NOT c = 0, where amplitude coverage is a theorem,
+  # not a measurement -- sec. 4.2) the nonnegative, upward-biased amplitude
+  # estimator makes percentile CIs sit above a small truth: coverage must fall
+  # below nominal (one-sided binomial test) with misses concentrated on the
+  # truth-below-interval side. At c = 0 the shipped guardrail's
+  # false-certification rate must exceed the alpha/2 user-expectation
+  # benchmark (directional only; no magnitude is pinned -- oracle rule).
+  skip_on_cran()
+  theta <- deg2rad(as.numeric(octants()))
+  set.seed(1101)
+  dat <- as.data.frame(t(sapply(1:80, function(i) {
+    1 + 0.5 * cos(theta - 2) + rnorm(8, 0, 1)
+  })))
+  colnames(dat) <- PANO()
+  set.seed(1102)
+  obj <- ssm_analyze(dat, scales = PANO(), boots = 200)
+  set.seed(1103)
+  res <- ssm_ci_accuracy(obj, reps = 200, amplitude_factors = c(1, 0.15, 0),
+                         structure = "observed")
+
+  arow <- res$coverage[res$coverage$Parameter == "a" &
+                         res$coverage$Condition == 0.15, ]
+  k <- round(arow$Coverage * arow$N_reps)
+  bt <- stats::binom.test(k, arow$N_reps, p = 0.95, alternative = "less")
+  expect_lt(bt$p.value, 0.05)
+  expect_gt(arow$Left_miss, arow$Right_miss)
+
+  g0 <- res$guardrail[res$guardrail$Condition == 0, ]
+  expect_gt(g0$Cert_lci, g0$Benchmark)
+})
+
+# ---- sec. 10 boundary: branch pathology manufactured at a small-c rung --------
+
+test_that("a contrast at a small-c rung produces branch-pathology events", {
+  # The F2-corrected joint row ladder drives both rows' amplitudes toward
+  # zero, manufacturing the near-uniform contrast-displacement regime where
+  # the point estimate falls geometrically outside its own reported interval.
+  # The pathology is a rare event even where it lives (rates of a few per
+  # thousand at near-zero rungs; measured while pinning this seed), so the
+  # rung set includes c = 0 and the counter is summed over the two
+  # near-zero rungs of the contrast row.
+  skip_on_cran()
+  theta <- deg2rad(as.numeric(octants()))
+  set.seed(3001)
+  dat1 <- t(sapply(1:30, function(i) 1 + 0.8 * cos(theta - 1) + rnorm(8, 0, 1)))
+  dat2 <- t(sapply(1:30, function(i) 1 + 0.8 * cos(theta - 3) + rnorm(8, 0, 1)))
+  dat <- as.data.frame(rbind(dat1, dat2))
+  colnames(dat) <- PANO()
+  dat$Group <- factor(rep(c("A", "B"), each = 30))
+  set.seed(3002)
+  obj <- ssm_analyze(dat, scales = PANO(), grouping = "Group",
+                     contrast = TRUE, boots = 60)
+  set.seed(3003)
+  res <- ssm_ci_accuracy(obj, reps = 300, amplitude_factors = c(1, 0.05, 0),
+                         structure = "observed")
+  con_lab <- res$guardrail$Profile[nrow(res$guardrail)]
+  br <- res$guardrail[res$guardrail$Profile == con_lab &
+                        res$guardrail$Condition %in% c(0.05, 0), ]
+  expect_gt(sum(br$Branch_pathology_rate), 0)
+})
+
+# ---- sec. 10 engine parity spot-check ------------------------------------------
+
+test_that("bootstrap and Monte Carlo engines agree within combined MC error", {
+  skip_on_cran()
+  theta <- deg2rad(as.numeric(octants()))
+  set.seed(1301)
+  dat <- as.data.frame(t(sapply(1:150, function(i) {
+    1 + 1.2 * cos(theta - 2) + rnorm(8, 0, 1)
+  })))
+  colnames(dat) <- PANO()
+  set.seed(1302)
+  obj_b <- ssm_analyze(dat, scales = PANO(), boots = 200)
+  set.seed(1302)
+  obj_m <- ssm_analyze(dat, scales = PANO(), boots = 200,
+                       method = "montecarlo")
+  set.seed(1303)
+  res_b <- ssm_ci_accuracy(obj_b, reps = 150, amplitude_factors = 1,
+                           structure = "observed")
+  set.seed(1304)
+  res_m <- ssm_ci_accuracy(obj_m, reps = 150, amplitude_factors = 1,
+                           structure = "observed")
+  for (pm in c("e", "a")) {
+    cb <- res_b$coverage[res_b$coverage$Parameter == pm, "Coverage"]
+    cm <- res_m$coverage[res_m$coverage$Parameter == pm, "Coverage"]
+    expect_lt(abs(cb - cm), 0.12)
+  }
+})
+
+# ---- degenerate ladder: the sec. 4.1 margin rung -------------------------------
+
+test_that("an amplitude estimate below half its CI width adds the margin rung", {
+  theta <- deg2rad(as.numeric(octants()))
+  set.seed(1401)
+  dat <- as.data.frame(t(sapply(1:60, function(i) {
+    1 + 0.05 * cos(theta - 2) + rnorm(8, 0, 1)
+  })))
+  colnames(dat) <- PANO()
+  set.seed(1402)
+  obj <- ssm_analyze(dat, scales = PANO(), boots = 100)
+  # Precondition for the trigger: a_hat below half the observed CI width
+  stopifnot(obj$results$a_est < (obj$results$a_uci - obj$results$a_lci) / 2)
+  set.seed(1403)
+  res <- ssm_ci_accuracy(obj, reps = 8, amplitude_factors = c(1, 0),
+                         structure = "observed")
+  mr <- res$details$margin_rung
+  expect_true(is.numeric(mr) && length(mr) == 1 && mr > 1)
+  # c * a_hat equals the observed amplitude-CI half-width
+  expect_equal(mr * obj$results$a_est,
+               (obj$results$a_uci - obj$results$a_lci) / 2,
+               tolerance = 1e-10)
+  expect_true(mr %in% res$coverage$Condition)
+  expect_true(mr %in% res$guardrail$Condition)
+  # details$conditions is the full simulated ladder, margin rung included
+  expect_identical(res$details$conditions, c(1, 0, mr))
+  # The population truth at the margin rung is the half-width (linearity)
+  tr <- res$population[[1]]$truths
+  expect_equal(tr$a[tr$Condition == mr],
+               (obj$results$a_uci - obj$results$a_lci) / 2,
+               tolerance = 1e-8)
+  # summary() names the regime (whitespace normalized: the phrase may wrap)
+  out <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
+  expect_match(out, "near-zero regime")
+  # The verdict stays keyed to c = 1 (margin rung adds no verdict rows)
+  expect_identical(unique(res$verdict$Profile), res$coverage$Profile[1])
+})
+
+test_that("healthy amplitudes add no margin rung", {
+  data("jz2017")
+  jz <- jz2017[1:150, ]
+  set.seed(1451)
+  obj <- ssm_analyze(jz, scales = PANO(), boots = 60)
+  set.seed(1452)
+  res <- ssm_ci_accuracy(obj, reps = 3, amplitude_factors = 1,
+                         structure = "observed")
+  expect_null(res$details$margin_rung)
+  expect_identical(sort(unique(res$coverage$Condition)), 1)
+})
+
+# ---- guardrail measurement columns (sec. 4.3) ----------------------------------
+
+test_that("guardrail table carries Wilson bounds and reps; coverage carries N_conditional and Structural", {
+  theta <- deg2rad(as.numeric(octants()))
+  set.seed(1501)
+  dat <- as.data.frame(t(sapply(1:100, function(i) {
+    1 + 1.2 * cos(theta - 2) + 0.4 * cos(2 * theta) + rnorm(8, 0, 1)
+  })))
+  colnames(dat) <- PANO()
+  set.seed(1502)
+  obj <- ssm_analyze(dat, scales = PANO(), boots = 60)
+  set.seed(1503)
+  res <- ssm_ci_accuracy(obj, reps = 20, amplitude_factors = c(1, 0),
+                         structure = "observed")
+
+  gr <- res$guardrail
+  expect_true(all(c("Cert_lci", "Cert_uci", "N_reps") %in% names(gr)))
+  ok <- !is.na(gr$Cert_rate)
+  expect_true(all(gr$Cert_lci[ok] <= gr$Cert_rate[ok] + 1e-12))
+  expect_true(all(gr$Cert_uci[ok] >= gr$Cert_rate[ok] - 1e-12))
+  expect_true(all(gr$N_reps == 20))
+  # Wilson bounds match the shared helper at the observed counts
+  g1 <- gr[gr$Condition == 1, ]
+  w <- ssm_ci_wilson(round(g1$Cert_rate * g1$N_reps), g1$N_reps)
+  expect_equal(c(g1$Cert_lci, g1$Cert_uci), w, tolerance = 1e-12)
+  # The false-certification caution decision is stored, and only at c = 0
+  expect_true(all(is.na(gr$Caution[gr$Condition != 0])))
+  g0 <- gr[gr$Condition == 0, ]
+  expect_identical(g0$Caution, unname(g0$Cert_lci > g0$Benchmark))
+
+  cov <- res$coverage
+  expect_true(all(c("N_conditional", "Structural") %in% names(cov)))
+  # Structural flags exactly the mean-path amplitude rows at a zero truth
+  expect_identical(cov$Structural,
+                   cov$Parameter == "a" & cov$Condition == 0)
+  # N_conditional exists only on displacement rows, bounded by N_reps
+  d_rows <- cov$Parameter == "d"
+  expect_true(all(is.na(cov$N_conditional[!d_rows])))
+  expect_true(all(cov$N_conditional[d_rows & cov$Condition == 1] <=
+                    cov$N_reps[d_rows & cov$Condition == 1]))
+})
+
+test_that("a contrast row's zero-amplitude condition is not flagged structural", {
+  # The contrast amplitude is a signed, unconstrained difference: its
+  # percentile interval CAN contain 0, so the c = 0 theorem does not apply
+  data("jz2017")
+  jz <- jz2017[1:200, ]
+  set.seed(1551)
+  obj <- ssm_analyze(jz, scales = PANO(), grouping = "Gender",
+                     contrast = TRUE, boots = 60)
+  set.seed(1552)
+  res <- ssm_ci_accuracy(obj, reps = 10, amplitude_factors = c(1, 0),
+                         structure = "observed")
+  cov <- res$coverage
+  con_lab <- utils::tail(cov$Profile, 1)
+  con_a0 <- cov$Profile == con_lab & cov$Parameter == "a" & cov$Condition == 0
+  expect_false(any(cov$Structural[con_a0]))
+  # And the contrast's amplitude-difference interval can in fact cover 0
+  expect_gt(cov$Coverage[con_a0], 0)
+})
+
+# ---- verdict wording (sec. 5.2) -------------------------------------------------
+
+test_that("summary() carries the false-certification caution and wording bar", {
+  theta <- deg2rad(as.numeric(octants()))
+  set.seed(1601)
+  dat <- as.data.frame(t(sapply(1:100, function(i) {
+    1 + 0.6 * cos(theta - 2) + rnorm(8, 0, 1)
+  })))
+  colnames(dat) <- PANO()
+  set.seed(1602)
+  obj <- ssm_analyze(dat, scales = PANO(), boots = 100)
+  set.seed(1603)
+  res <- ssm_ci_accuracy(obj, reps = 40, amplitude_factors = c(1, 0.25, 0),
+                         structure = "observed")
+  # Whitespace normalized: the wrapped verdict lines may break mid-phrase
+  out <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
+  # The false-certification caution line is present (theory predicts the
+  # rate far exceeds the benchmark at this configuration)
+  expect_match(out, "if the true amplitude were zero")
+  # The user-expectation benchmark is named as such, never as a nominal level
+  expect_match(out, "its wording suggests")
+  # Wording bar (sec. 5.2): an angular CI excluding 0 is never described as
+  # a significance test, anywhere in the printed verdict
+  expect_false(grepl("significan", out, ignore.case = TRUE))
+  # Structural c = 0 note present
+  expect_match(out, "structurally")
+  # print() shows the per-profile verdict lines
+  pout <- paste(capture.output(print(res)), collapse = "\n")
+  expect_match(pout, "Elevation")
+  expect_match(pout, "Verdict")
+  expect_false(grepl("significan", pout, ignore.case = TRUE))
+})
+
+test_that("print and summary snapshots (seeded)", {
+  data("jz2017")
+  jz <- jz2017[1:120, ]
+  set.seed(1701)
+  obj <- ssm_analyze(jz, scales = PANO(), boots = 60)
+  set.seed(1702)
+  res <- ssm_ci_accuracy(obj, reps = 30, amplitude_factors = c(1, 0.25, 0))
+  mask_elapsed <- function(lines) {
+    sub("Elapsed:.*$", "Elapsed:\t\t<masked>", lines)
+  }
+  expect_snapshot(print(res))
+  expect_snapshot(summary(res), transform = mask_elapsed)
+})
+
+# ---- plot method (spec sec. 7) --------------------------------------------------
+
+test_that("plot.circumplex_ci_accuracy builds a faceted coverage plot", {
+  theta <- deg2rad(as.numeric(octants()))
+  set.seed(1801)
+  dat <- as.data.frame(t(sapply(1:100, function(i) {
+    1 + 1.0 * cos(theta - 2) + rnorm(8, 0, 1)
+  })))
+  colnames(dat) <- PANO()
+  set.seed(1802)
+  obj <- ssm_analyze(dat, scales = PANO(), boots = 60)
+  set.seed(1803)
+  res <- ssm_ci_accuracy(obj, reps = 25, amplitude_factors = c(1, 0.5, 0.25, 0),
+                         structure = "observed")
+  p <- plot(res)
+  expect_s3_class(p, "ggplot")
+  built <- ggplot2::ggplot_build(p)
+  # One panel per parameter, including the certified-displacement panel
+  expect_equal(length(unique(built$layout$layout$PANEL)), 6)
+  vdiffr::expect_doppelganger("ci accuracy ladder plot", p)
 })

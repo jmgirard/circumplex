@@ -14,9 +14,19 @@
   amplitude intervals are theoretically weakest — along with one-sided miss
   rates, interval widths, the certification rate of the printed
   "amplitude CI excludes zero" guardrail, and displacement coverage
-  conditional on certification. `print()` classifies coverage at the
-  as-estimated condition against Bradley's (1978) liberal robustness band
-  using 95% Wilson score intervals; `summary()` adds the full tables.
+  conditional on certification. Coverage at the as-estimated condition is
+  classified against Bradley's (1978) liberal robustness band using 95%
+  Wilson score intervals, and `print()`/`summary()` translate the
+  classifications into a plain-language verdict, including a caution line
+  measuring how often the guardrail would still certify displacement if the
+  true amplitude were zero (theory predicts far more often than the
+  interval's wording suggests). `summary()` also annotates the realism of
+  the simulated population (structural-model convergence and fit, against
+  conventional RMSEA/SRMR benchmarks with citations) and, when an amplitude
+  estimate is itself below half its CI width, notes that the analysis
+  already sits in the near-zero regime and adds a ladder rung at the
+  certification margin. A `plot()` method draws coverage across the
+  amplitude ladder with the Bradley band shaded.
   Simulation replicates can be parallelized (`parallel`/`ncpus`) with
   seed-identical results, and the caller's random-number state is restored
   on exit. To support the diagnostic, `ssm_analyze()` now stores per-group

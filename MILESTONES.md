@@ -44,7 +44,19 @@ conditional-displacement coverage — the spec left it unpinned);
 classifies e/a/d-conditional only, with x/y reported in `coverage` but not
 verdict-driving (spec §5.1 as written); `structure=` selects one population
 per call — the §3.2 cpm-vs-observed sensitivity comparison is two calls,
-with any cross-call `summary()` wording left to Z2.
+with any cross-call `summary()` wording left to Z2. Added by Z2
+(2026-07-07): the §4.1 margin rung is one joint rung at the LARGEST
+half-width/â ratio among near-zero rows (the neediest row lands exactly at
+its margin, others at or above; on the correlation path a rung that pushes a
+population correlation to ±1 is dropped with a warning, not fatal); the
+`Structural` coverage flag keys off the population displacement truth being
+undefined (exactly the mean-path zero-amplitude case; contrast rows never
+flagged — their amplitude difference is unconstrained); the §3.2 cpm-vs-
+observed cross-call comparison ships as wording only (each `summary()` names
+the other configuration as a sensitivity check; no cross-call state); the
+§5.2 structure-note fit benchmarks are RMSEA ≤ .08 / > .10 (Browne & Cudeck,
+1993) and SRMR ≤ .08 (Hu & Bentler, 1999), as constants with provenance
+comments.
 
 Cross-cutting guardrails for every task:
 
@@ -158,7 +170,7 @@ Cross-cutting guardrails for every task:
   which for real octant instruments (jz2017 included) is often exactly this
   regime, so budget against the slow figure and expect the Phase-2
   RcppArmadillo trigger (design §8) to fire at or before Z1 scale.
-- [ ] **Z2. Amplitude-near-zero module + verdict.** Spec §4–§5: the joint
+- [x] **Z2. Amplitude-near-zero module + verdict.** Spec §4–§5: the joint
   row-amplitude ladder via the 3×3 estimator-functional solve (B-review
   F3), one-sided amplitude-CI miss decomposition, guardrail
   false-certification measurement of the shipped rule (digits pinned 3,
@@ -169,6 +181,10 @@ Cross-cutting guardrails for every task:
   oracles, off c=0 for amplitude); false-certification caution line present;
   verdict classification tested at band edges; Fable review of the
   guardrail-measurement module and oracles (per the B-revision tier note).
+  *Scope note (2026-07-07):* the §10 Z&W-reproduction gate (O5 bridge) is
+  transcription-bound (all values TBT under the two-session protocol) and
+  moves to W1, where the Z&W transcription happens anyway — recorded in the
+  W1 bullet below; everything else in §10 executed here or at Z1.
 
 ### Tasks — Structure tests (Acton & Revelle 2004)
 
@@ -220,7 +236,12 @@ Cross-cutting guardrails for every task:
 - [ ] **W1. Vignette: "Evaluating Circumplex Structure".** Fit statistics,
   CI trustworthiness, when to trust SSM parameters, ipsatization guidance;
   Z&W Studies 1–5 transcribed as cited context (re-confirm the grid
-  characterization at transcription time and log it — spec §2/F8).
+  characterization at transcription time and log it — spec §2/F8). Also
+  carries the §10 O5 bridge deferred from Z2: once the Z&W generating
+  conditions are transcribed, run the diagnostic at (at least) one of their
+  conditions and compare to their published coverage within combined MC
+  error — a conditional gate (spec F7): if their generating process is not
+  MVN-expressible, re-scope and document, never silently loosen.
   *Accept:* builds clean; exported API only; statistical-precision bar
   (CLAUDE.md); Z&W numerics transcribed, never from memory. Also the natural
   point to confirm/veto the B6 analytic-CI caution wording (see the
@@ -257,6 +278,73 @@ at release time, not this branch's.
 
 ## Log
 
+- 2026-07-07 — Z2 amplitude-near-zero module + verdict (Fable, plan-first,
+  test-first; /statistical-validation 8/8; 8-angle /code-review high, 8
+  findings fixed + 2 refuted with rationale). The spec §4–§5 analysis layer
+  over Z1's tables. In ssm_ci_accuracy(): the §4.1 degenerate-ladder margin
+  rung — when a profile row's â is below half its own CI width, one absolute
+  rung at the certification margin (c = halfwidth/â; exact by ladder
+  linearity for any c and spacing; max over affected rows on the joint
+  ladder; a corr-path |r|≥1 refusal drops the rung with a warning while user
+  rungs still fail hard — policy stated in a comment) with
+  details$margin_rung/near_zero_rows/conditions; the guardrail table gains
+  Cert_lci/Cert_uci (95% Wilson), N_reps, and the STORED false-certification
+  Caution decision (c=0 rung: Wilson lower bound > the (1−interval)/2
+  user-expectation benchmark — never banded as a nominal level); the
+  coverage table gains N_conditional (certified-replicate count behind
+  conditional-d coverage) and Structural (the §4.2 theorem flag, keyed to an
+  undefined displacement truth ⟺ mean-path zero amplitude; contrast rows
+  never flagged — their amplitude difference is unconstrained); details adds
+  row_n and max_psd_delta (threshold shared with the construction warning
+  via ssm_ci_psd_warn). New §5.2 reporting layer (R/ssm_ci_oop.R): shared
+  per-profile verdict blocks in print()+summary() (coverage lines with
+  miss-direction phrasing for inadequate amplitude; the guardrail caution
+  line consuming the stored decision; plain-language CAUTION/BORDERLINE/
+  ADEQUATE paragraph — the printed headline elevates to CAUTION when the
+  caution fires, documented against the coverage-only verdict table);
+  structure note with cited fit benchmarks (RMSEA ≤.08/>.10, Browne & Cudeck
+  1993; SRMR ≤.08, Hu & Bentler 1999; constants with provenance comments),
+  acceptance/marker/PSD downgrade annotations, and the observed-vs-cpm
+  sensitivity advice (the cross-call wording Z1 deferred: each call names
+  the other configuration, no cross-call state); near-zero-regime note;
+  structural-zero footnote; wording bar held (no "significan*" anywhere,
+  asserted by test). New plot() method: coverage vs ladder, six facets
+  (e/x/y/a/d/d-certified; drop=FALSE so a never-certified panel shows empty
+  rather than vanishing), Wilson error bars, Bradley band shaded, nominal
+  dashed, structural zeros as open symbols; vdiffr snapshot. §10 executed:
+  known-good oracle (elevation adequate, seeded n=300/boots=1000/reps=1000);
+  known-bad direction oracle OFF c=0 (amplitude coverage below nominal by
+  one-sided binomial test with truth-below misses at c=.15; c=0 false-cert
+  Wilson lower bound > benchmark, directional only); band-edge unit tests;
+  seeded contrast branch-pathology counter > 0 at the near-zero rungs
+  (measured rare, ~0.3–0.7% even where it lives — test sums the c=.05 and
+  c=0 rungs); engine parity spot-check (bootstrap vs Monte Carlo coverage
+  within 0.12); the Z&W O5 bridge is transcription-bound (oracle rule) and
+  moved to W1 — recorded in both task bullets. /statistical-validation 8/8:
+  Wilson ≡ prop.test to 1e-16 incl. k=0/k=n; Bradley classifier brute-forced
+  against an independent prop.test rule over every k for n ∈ {20,100,500,
+  1000} × 3 nominal levels; caution trigger ≡ independent rule; c>1 ladder
+  linearity by hand 2/n·Σ formulas ≤ 5.7e-14 (equal/unequal/pole); end-to-
+  end margin-rung truth ≡ observed half-width to 2.8e-17; guardrail columns
+  ≡ prop.test from the table's own counts; verdict↔coverage accounting
+  identity; Structural rows exactly the zero-truth mean-path a-rows. Review
+  (8 finder angles, self-verified with evidence): fixed — stored-vs-printed
+  verdict disagreement (Caution now in the guardrail table), summary ladder
+  line now enumerates all simulated conditions (details$conditions), facet
+  drop=FALSE, PSD threshold+max stored once, contrast identity from
+  details$contrast rather than NA-n, unused digits arg dropped, guardrail-
+  line/rounding duplication folded; refuted with rationale — ssm_ci_pct vs
+  str_percent (floor-vs-round semantics, different consumers) and Set2
+  palette (8-level cap; package palette policy is the recorded ROADMAP
+  follow-up); no-action, recorded — a large margin rung legitimately
+  stretches the plot x-axis (it reflects a true â ≪ half-width regime), and
+  duplicate-label lookup risk is the object's pre-existing unique-label
+  keying. Suite 1206/1206; check 0/0/0; document() clean. NEWS extended.
+  (R/ssm_ci_accuracy.R, R/ssm_ci_oop.R, NAMESPACE,
+  man/plot.circumplex_ci_accuracy.Rd [new],
+  man/summary.circumplex_ci_accuracy.Rd [new], man/, NEWS.md,
+  tests/testthat/test-ci_accuracy.R, tests/testthat/_snaps/ci_accuracy.md
+  [new], tests/testthat/_snaps/ci_accuracy/ [new], MILESTONES.md.)
 - 2026-07-07 — Z1 `ssm_ci_accuracy()` core loop (Fable, plan-first, test-first;
   /statistical-validation; 8-angle /code-review high, 6 findings fixed + 1
   refuted by benchmark). New exported `ssm_ci_accuracy()` (R/ssm_ci_accuracy.R)

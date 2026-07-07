@@ -50,6 +50,7 @@ ssm_score(
 }
 \seealso{
 Other ssm functions:
+\code{\link[=plot.circumplex_ci_accuracy]{plot.circumplex_ci_accuracy()}},
 \code{\link[=ssm_analyze]{ssm_analyze()}},
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},

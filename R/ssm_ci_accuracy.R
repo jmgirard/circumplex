@@ -44,9 +44,18 @@
 #' exactly `c` times the estimate. Truths are nevertheless recomputed from
 #' each condition's population profile. At `c = 0` amplitude coverage is
 #' structurally zero (a percentile interval of strictly positive amplitude
-#' replicates cannot contain 0) and displacement truth is undefined (reported
-#' `NA`); the guardrail certification rate carries the inferential weight
-#' there.
+#' replicates cannot contain 0; such rows are flagged in the `Structural`
+#' column) and displacement truth is undefined (reported `NA`); the guardrail
+#' certification rate carries the inferential weight there, and the
+#' informative rungs for amplitude coverage are the small `c > 0` ones.
+#'
+#' When a profile row's amplitude estimate is itself below half its observed
+#' CI width, the relative ladder degenerates: the analysis already sits in
+#' the near-zero regime. One absolute rung is then added at the certification
+#' margin (`c` chosen so `c` times the amplitude estimate equals the observed
+#' amplitude-CI half-width, the largest such `c` across affected rows) and
+#' `summary()` notes the regime. On the correlation path this rung is dropped
+#' with a warning if it would push a population correlation to +/-1.
 #'
 #' @param ssm_object Required. A `circumplex_ssm` object from [ssm_analyze()].
 #' @param reps Optional. The number of simulated datasets per amplitude
@@ -82,17 +91,28 @@
 #' @return A `circumplex_ci_accuracy` object: a list with `coverage` (per
 #'   Profile x Parameter x Condition: coverage, its Monte Carlo SE, the
 #'   one-sided miss rates, median CI width, and for displacement the
-#'   certification-conditional coverage), `guardrail` (per Profile x
-#'   Condition: certification rate, the user-expectation benchmark
-#'   `(1 - interval) / 2`, the implied threshold, fit-pass rate, and the
+#'   certification-conditional coverage with the number of certified
+#'   replicates behind it; `Structural` flags the amplitude rows whose zero
+#'   coverage is a theorem rather than a measurement), `guardrail` (per
+#'   Profile x Condition: certification rate with its 95% Wilson score
+#'   interval, the user-expectation benchmark `(1 - interval) / 2`, the
+#'   stored false-certification caution decision at the `c = 0` rung
+#'   (`Caution`, true when the Wilson lower bound exceeds the benchmark;
+#'   `NA` off that rung), the implied threshold, fit-pass rate, and the
 #'   branch-pathology rate -- the rate at which a displacement point estimate
-#'   falls geometrically outside its own interval), `verdict` (Wilson-vs-
-#'   Bradley classification of elevation, amplitude, and conditional
-#'   displacement coverage at the as-estimated condition, plus an overall
-#'   worst-of row per profile), `cpm` (the embedded [cpm_fit()] object, or
-#'   `NULL` when `structure = "observed"`), `population` (per profile row:
-#'   the population profile vectors, truth parameters, and any
-#'   positive-semidefiniteness repair magnitude, by condition), and `details`.
+#'   falls geometrically outside its own interval), `verdict`
+#'   (Wilson-vs-Bradley classification of elevation, amplitude, and
+#'   conditional displacement coverage at the as-estimated condition, plus an
+#'   overall worst-of row per profile; note the printed verdict headline
+#'   additionally elevates to CAUTION whenever the guardrail `Caution` fired,
+#'   so it can read worse than the overall coverage class),
+#'   `cpm` (the embedded [cpm_fit()] object, or `NULL` when
+#'   `structure = "observed"`), `population` (per profile row: the population
+#'   profile vectors, truth parameters, and any positive-semidefiniteness
+#'   repair magnitude, by condition), and `details`. The `plot()` method
+#'   draws coverage against the amplitude ladder with the Bradley band
+#'   shaded; `summary()` adds a plain-language verdict (see
+#'   [summary.circumplex_ci_accuracy()]).
 #' @section Reproducibility:
 #'   This function is stochastic: call `set.seed()` immediately before it.
 #'   It draws one `sample.int()` value from the caller's random number stream
@@ -256,26 +276,41 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     P <- Rw
   }
 
+  # ---- degenerate-ladder check (spec sec. 4.1): the margin rung ----
+  # If a profile row's amplitude estimate is below half its own CI width, the
+  # user's analysis already sits in the near-zero regime and the relative
+  # ladder degenerates (every rung is small next to the amplitude's sampling
+  # error). One absolute rung is then added at the certification margin: c
+  # chosen so c * a_hat equals the observed amplitude-CI half-width. With
+  # several such rows the joint ladder takes the largest such c (the neediest
+  # row lands exactly at its margin, the others at or above theirs) -- an
+  # adopted default recorded in MILESTONES.md.
+  res_prof <- ssm_object$results[seq_len(n_prof), , drop = FALSE]
+  a_half <- (res_prof$a_uci - res_prof$a_lci) / 2
+  near_zero <- is.finite(a_half) & is.finite(res_prof$a_est) &
+    res_prof$a_est > 1e-12 & res_prof$a_est < a_half
+  margin_rung <- if (any(near_zero)) {
+    max(a_half[near_zero] / res_prof$a_est[near_zero])
+  }
+  near_zero_rows <- row_labels[seq_len(n_prof)][near_zero]
+
   # ---- amplitude ladder (spec sec. 4.1, functional-targeted 3x3 solve) ----
-  conds <- amplitude_factors
-  n_cond <- length(conds)
   corr_vecs <- t(vapply(
     seq_len(n_prof),
     function(i) ssm_ci_ladder_correction(prof_mat[i, ], theta),
     numeric(p)
   ))
 
-  # Per condition: population profiles (post-repair on the correlation path),
-  # recomputed truths (spec sec. 3.3), and simulation ingredients
-  pop_cond <- vector("list", n_cond)
-  for (k in seq_len(n_cond)) {
-    profk <- prof_mat - (1 - conds[k]) * corr_vecs
+  # One condition's population: profiles (post-repair on the correlation
+  # path), recomputed truths (spec sec. 3.3), and simulation ingredients
+  build_pop <- function(cc) {
+    profk <- prof_mat - (1 - cc) * corr_vecs
     if (!corr_based) {
       truths <- t(apply(profk, 1, function(v) {
         as.numeric(ssm_parameters_cpp(v, theta))
       }))
-      pop_cond[[k]] <- list(profiles = profk, truths = truths,
-                            deltas = stats::setNames(rep(0, G), names(n_g)))
+      list(profiles = profk, truths = truths,
+           deltas = stats::setNames(rep(0, G), names(n_g)))
     } else {
       roots <- vector("list", G)
       deltas <- stats::setNames(numeric(G), names(n_g))
@@ -297,11 +332,11 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
         }
         repair <- ssm_ci_psd_repair(J)
         deltas[g] <- repair$delta
-        if (repair$delta > 0.01) {
+        if (repair$delta > ssm_ci_psd_warn) {
           warning("The positive-semidefiniteness repair of the joint ",
                   "population matrix changed a correlation by ",
                   round(repair$delta, 4), " (group ", names(n_g)[g],
-                  ", c = ", conds[k], "); population realism is reduced.",
+                  ", c = ", cc, "); population realism is reduced.",
                   call. = FALSE)
         }
         # Truth is computed from the matrix actually simulated from
@@ -314,10 +349,31 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
       truths <- t(apply(prof_rep, 1, function(v) {
         as.numeric(ssm_parameters_cpp(v, theta))
       }))
-      pop_cond[[k]] <- list(profiles = prof_rep, truths = truths,
-                            deltas = deltas, roots = roots)
+      list(profiles = prof_rep, truths = truths,
+           deltas = deltas, roots = roots)
     }
   }
+
+  conds <- amplitude_factors
+  pop_cond <- lapply(conds, build_pop)
+  if (!is.null(margin_rung)) {
+    # The margin rung amplifies the first-harmonic content (c > 1), which on
+    # the correlation path can push a population cross-correlation past the
+    # |r| < 1 guard; the rung is then dropped, not the whole run. The
+    # asymmetry with the unguarded lapply above is deliberate: a rung the
+    # user asked for must fail hard rather than silently vanish from the
+    # tables, while this rung is an automatic addition.
+    mp <- tryCatch(build_pop(margin_rung), error = function(e) e)
+    if (inherits(mp, "error")) {
+      warning("The near-zero margin rung (c = ", round(margin_rung, 3),
+              ") was dropped: ", conditionMessage(mp), call. = FALSE)
+      margin_rung <- NULL
+    } else {
+      conds <- c(conds, margin_rung)
+      pop_cond <- c(pop_cond, list(mp))
+    }
+  }
+  n_cond <- length(conds)
   truth_con <- if (contrast) {
     lapply(pop_cond, function(pc) {
       as.numeric(param_diff(pc$truths[2, ], pc$truths[1, ]))
@@ -538,11 +594,13 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
       cvg <- if (n_eff > 0) mean(cv, na.rm = TRUE) else NA_real_
       w <- width_a[r, j, ]
       if (is_d) w <- w * 180 / pi
-      dcc <- if (is_d && sum(!is.na(dcov_m[r, ])) > 0) {
+      n_cnd <- if (is_d) sum(!is.na(dcov_m[r, ])) else NA_integer_
+      dcc <- if (is_d && n_cnd > 0) {
         mean(dcov_m[r, ], na.rm = TRUE)
       } else {
         NA_real_
       }
+      tr <- if (r <= n_prof) pop_cond[[k]]$truths[r, ] else truth_con[[k]]
       data.frame(
         Profile = row_labels[r], Parameter = param_keys[j],
         Condition = conds[k],
@@ -554,6 +612,14 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
                      else NA_real_,
         Median_width = stats::median(w, na.rm = TRUE),
         Coverage_conditional = dcc,
+        N_conditional = n_cnd,
+        # The sec. 4.2 theorem flag: a percentile interval of strictly
+        # positive amplitude replicates cannot contain a zero truth, so this
+        # row's coverage is structural, not informative. Zero-amplitude
+        # populations are exactly those with an undefined displacement truth
+        # (flat populations are refused up front); a contrast's amplitude
+        # difference is unconstrained, so its rows are never structural.
+        Structural = param_keys[j] == "a" && r <= n_prof && is.na(tr[d_col]),
         N_reps = n_eff,
         stringsAsFactors = FALSE
       )
@@ -567,14 +633,34 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
       out[is.nan(out)] <- NA_real_
       out
     }
+    # False-certification measurement (spec sec. 4.3): the certification
+    # rate carries its own 95% Wilson interval so the summary() caution can
+    # trigger on the interval's lower bound exceeding the user-expectation
+    # benchmark, never on Monte Carlo noise
+    cert_k <- rowSums(cert_m, na.rm = TRUE)
+    cert_n <- rowSums(!is.na(cert_m))
+    cert_w <- t(vapply(seq_len(n_rows), function(r) {
+      ssm_ci_wilson(cert_k[r], cert_n[r])
+    }, numeric(2)))
     grd_frames[[k]] <- data.frame(
       Profile = row_labels[seq_len(n_rows)],
       Condition = conds[k],
       Cert_rate = rate(cert_m),
+      Cert_lci = cert_w[, 1],
+      Cert_uci = cert_w[, 2],
       Benchmark = (1 - interval) / 2,
+      # The false-certification caution is a property of the c = 0 rung
+      # (P(certified | a0 = 0)); it is stored here so print()/summary() and
+      # any programmatic consumer share one decision (NA off that rung)
+      Caution = if (conds[k] == 0) {
+        ssm_ci_guardrail_caution(cert_w[, 1], (1 - interval) / 2)
+      } else {
+        NA
+      },
       Threshold = 0.5 * 10^-digits,
       Fit_pass_rate = rate(fitp_m),
       Branch_pathology_rate = rate(branch_m),
+      N_reps = cert_n,
       stringsAsFactors = FALSE
     )
   }
@@ -616,9 +702,21 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
   })
   names(population) <- row_labels[seq_len(n_rows)]
 
+  # Per-row sample size for the verdict blocks (NA on the contrast row: its
+  # inputs are the two profile rows' samples)
+  row_n <- vapply(seq_len(n_rows), function(r) {
+    if (r > n_prof) return(NA_real_)
+    g <- if (corr_based) (r - 1) %/% q + 1 else r
+    as.numeric(n_g[[g]])
+  }, numeric(1))
+  names(row_n) <- row_labels
+
   details <- list(
     reps = reps,
-    amplitude_factors = conds,
+    amplitude_factors = amplitude_factors,
+    conditions = conds,
+    margin_rung = margin_rung,
+    near_zero_rows = near_zero_rows,
     structure = structure,
     method = method,
     boots = boots,
@@ -629,6 +727,9 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     digits = digits,
     threshold = 0.5 * 10^-digits,
     n = n_g,
+    row_n = row_n,
+    max_psd_delta = max(vapply(pop_cond, function(pc) max(pc$deltas),
+                               numeric(1))),
     structure_matrix = P,
     cpm_diagnostics = if (!is.null(cpm_obj)) {
       list(
@@ -656,6 +757,22 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     call = call
   )
 }
+
+# Conventional global-fit benchmarks for the structure-note wording of
+# summary.circumplex_ci_accuracy() (spec sec. 5.2 -- cited, not invented):
+# RMSEA <= .08 indicates reasonable and > .10 poor fit (Browne & Cudeck,
+# 1993, "Alternative ways of assessing model fit", in Bollen & Long, Testing
+# Structural Equation Models, pp. 136-162); SRMR <= .08 indicates good fit
+# (Hu & Bentler, 1999, Structural Equation Modeling, 6(1), 1-55). They gate
+# wording only, never estimation.
+ssm_ci_rmsea_reasonable <- 0.08
+ssm_ci_rmsea_poor <- 0.10
+ssm_ci_srmr_good <- 0.08
+
+# PSD-repair magnitude above which population realism is flagged (spec
+# sec. 3.2's 0.01 bar), shared by the construction-time warning and the
+# summary() structure-note annotation so the two cannot drift
+ssm_ci_psd_warn <- 0.01
 
 # Amplitude-ladder correction vector (spec sec. 4.1) ---------------------------
 # The closed-form SSM estimator is linear in the profile, so its (e, x, y)
