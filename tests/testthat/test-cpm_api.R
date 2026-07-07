@@ -119,6 +119,23 @@ test_that("SRMR uses the off-diagonal-only denominator p(p-1)/2", {
   expect_false(isTRUE(all.equal(fit$fit$srmr, alt)))
 })
 
+test_that("CFI/TLI degrade to 1 (not NaN/Inf) when the baseline has no misfit", {
+  # Near-independence data: -ln|R| ~ 0 so the independence baseline misfit
+  # T0 - df0 <= 0. With a well-fitting model the standard CFI ratio is 0/0 and
+  # the TLI ratio divides by ~0; convention returns perfect incremental fit (1)
+  # rather than NaN/Inf (milestone-close review finding).
+  p <- 8L
+  R <- diag(p)
+  R[upper.tri(R)] <- R[lower.tri(R)] <- 0.01     # PD, near identity
+  fi <- circumplex:::cpm_fit_indices(
+    Fhat = 1e-6, df = 10L, p = p, N = 500L, R = R, Phat = R, q = 17L
+  )
+  expect_true(is.finite(fi$cfi))                 # was NaN (0/0) before the guard
+  expect_true(is.finite(fi$tli))
+  expect_equal(fi$cfi, 1)
+  expect_equal(fi$tli, 1)
+})
+
 test_that("AIC/BIC follow T + 2q and T + q ln(N)", {
   R <- misfit_octant_P()
   N <- 250L

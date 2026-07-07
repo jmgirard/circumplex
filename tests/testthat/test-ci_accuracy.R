@@ -195,6 +195,29 @@ test_that("c = 0 amplitude coverage is identically 0 with all misses below (mach
   expect_true(is.finite(g0$Cert_rate))
 })
 
+test_that("suff-stats fallback resolves recorded-call args from the caller's env", {
+  # Regression (milestone-close review): a pre-storage object whose ssm_analyze()
+  # call referenced a *local* variable for `scales`. The fallback must evaluate
+  # that symbol in the caller's frame, not ssm_ci_accuracy()'s -- else it aborts
+  # "object not found" even though `data =` was supplied as instructed.
+  theta <- deg2rad(as.numeric(octants()))
+  set.seed(701)
+  dat <- as.data.frame(t(sapply(1:120, function(i) {
+    1 + 1.5 * cos(theta - 2) + 0.5 * cos(2 * theta) + rnorm(8, 0, 1)
+  })))
+  colnames(dat) <- PANO()
+
+  run <- function(d) {
+    sc <- PANO()                       # local var, NOT in globalenv
+    obj <- ssm_analyze(d, scales = sc, boots = 40)
+    obj$details$suff_stats <- NULL     # emulate an object predating Z0 storage
+    set.seed(702)
+    ssm_ci_accuracy(obj, data = d, reps = 2, amplitude_factors = 1,
+                    structure = "observed")
+  }
+  expect_no_error(run(dat))
+})
+
 # ---- end-to-end: mean-based group contrast on octant data --------------------
 
 test_that("end-to-end run on octant data: object contract (sec. 7)", {

@@ -656,7 +656,7 @@ ssm_compute_suff_stats <- function(data, scales, measures = NULL,
 # arguments from the recorded call, recomputes the statistics from `data`, and
 # verifies the recomputed profile vectors match the stored `scores` within 1e-8
 # -- the guard against handing the diagnostic the wrong dataset.
-ssm_suff_stats <- function(object, data = NULL) {
+ssm_suff_stats <- function(object, data = NULL, envir = parent.frame()) {
   stopifnot(inherits(object, "circumplex_ssm"))
 
   if (!is.null(object$details$suff_stats)) {
@@ -672,12 +672,15 @@ ssm_suff_stats <- function(object, data = NULL) {
   }
   stopifnot(is.data.frame(data) || is.matrix(data))
 
-  # Recover the analysis arguments from the recorded call
+  # Recover the analysis arguments from the recorded call, evaluating any
+  # symbols in `envir` (the original caller's scope, forwarded by ssm_ci_accuracy)
+  # rather than this function's frame, so variables the user passed to
+  # ssm_analyze() resolve where they were defined.
   cl <- object$call
-  scales <- eval(cl$scales, envir = parent.frame())
-  measures <- if (is.null(cl$measures)) NULL else eval(cl$measures, parent.frame())
-  grouping <- if (is.null(cl$grouping)) NULL else eval(cl$grouping, parent.frame())
-  listwise <- if (is.null(cl$listwise)) TRUE else isTRUE(eval(cl$listwise, parent.frame()))
+  scales <- eval(cl$scales, envir = envir)
+  measures <- if (is.null(cl$measures)) NULL else eval(cl$measures, envir)
+  grouping <- if (is.null(cl$grouping)) NULL else eval(cl$grouping, envir)
+  listwise <- if (is.null(cl$listwise)) TRUE else isTRUE(eval(cl$listwise, envir))
 
   recomputed <- ssm_compute_suff_stats(
     data, scales, measures, grouping, listwise, compute_profiles = TRUE

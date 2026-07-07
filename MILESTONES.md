@@ -289,6 +289,45 @@ dependency policy, model tiers) apply unchanged.
 
 ## Log
 
+- 2026-07-07 — M4 milestone-close review (Opus; `/code-review max` over the
+  full cumulative diff `master..HEAD`, per ROADMAP's between-releases practice
+  — pinned at max because the milestone is statistically risky). Five parallel
+  finder angles + inline verification against source; two angles (fit indices,
+  resampling/RNG) were execution-backed and returned clean, and the shared
+  Monte Carlo refactor was reconfirmed byte-identical to the pre-refactor
+  engine (pin at 1e-10). **No release-blocking bug.** Verified sound: the
+  analytic CPM gradient FD-checks to ~1e-9 across all variants/boundaries; the
+  sec. 5.3 fit indices numerically (T=(N−1)F̂, RMSEA CI, analytic-vs-bootstrap
+  SE ratios, Heywood→NA, LM=360 echo); the RNG contract on error paths; the
+  c=0 amplitude-coverage identity; pole/branch-safe displacement coverage.
+  9 findings reported; Jeff's disposition: fix the safe set, defer the
+  statistical/judgment ones. **Fixed (test-first for the behavioral ones):**
+  (i) CFI/TLI now return 1 rather than NaN (0/0) / Inf when the independence
+  baseline has no misfit — near-independence + good-fitting model
+  (R/cpm_fit.R `cpm_fit_indices`; regression test in test-cpm_api.R);
+  (ii) `cpm_gradient()` no longer recomputes `outer(theta,theta)`/`cpm_rho()`
+  twice on the hottest path (P built inline from a single Rho — provably
+  bit-identical, FD-reconfirmed to ~1e-9, all gradient/oracle tests green);
+  (iii) `ssm_suff_stats()` gained an `envir` argument and `ssm_ci_accuracy()`
+  forwards `parent.frame()`, so the pre-Z0 `data=` fallback resolves the
+  recorded call's scales/measures/grouping symbols from the *user's* scope,
+  not the function's frame (regression test in test-ci_accuracy.R);
+  (iv) the unreachable "Hessian is singular" else-if was folded into the
+  ill-conditioned branch (message adapts on finiteness); (v) `cpm_simulate()`
+  was factored into `cpm_sim_root()`/`cpm_sim_draw()` so `ssm_ci_accuracy()`
+  precomputes the CPM loadings once per call instead of once per replicate
+  (draw order preserved → seeded ci-accuracy pins byte-identical, snapshot
+  unchanged); (vi) `boots`/`interval` validation switched to
+  `is_count()`/`is_num()` per house style. **Deferred to ROADMAP's continuous
+  track (2026-07-07 M4 entry):** the free-angle "reproduced" vacuous-
+  acceptance guard (Fable), the contrast-certification print/diagnostic
+  consistency (Jeff's call), and the analytic-path double-Hessian
+  (reclassified during fixing as not behavior-neutral — the SE path is
+  test-pinned to `cpm_hessian_fd`). Full suite 0 failed / 0 skipped
+  (NOT_CRAN; 3 pre-existing ill-conditioned-Hessian warnings on real octant
+  data); `document()` no man/NAMESPACE diff. (R/cpm_fit.R, R/ssm_analysis.R,
+  R/ssm_ci_accuracy.R, tests/testthat/test-cpm_api.R,
+  tests/testthat/test-ci_accuracy.R, ROADMAP.md, MILESTONES.md.)
 - 2026-07-07 — W2 ship-time documentation (doc-only task, no plan/test-first
   steps per next-task's step-2 exemption). DESIGN.md's RNG-consuming
   entry-point inventory (Reproducibility section) updated from one entry to

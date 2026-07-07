@@ -196,7 +196,10 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
   p <- length(theta)
   corr_based <- identical(dts$score_type, "Correlation")
 
-  stats_ss <- ssm_suff_stats(ssm_object, data = data)
+  # Forward the caller's environment so the fallback can resolve any recorded
+  # ssm_analyze() call arguments (scales/measures/grouping) that were passed as
+  # variables in the user's scope, not this function's frame.
+  stats_ss <- ssm_suff_stats(ssm_object, data = data, envir = parent.frame())
   n_g <- stats_ss$n
   G <- length(n_g)
 
@@ -385,10 +388,15 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     sds <- lapply(seq_len(G), function(g) {
       as.numeric(stats_ss$sds[[g]][scale_names])
     })
+    # Precompute the draw-invariant ingredients once, mirroring the observed
+    # path's root_P: the CPM loadings depend only on the fitted object, not on n
+    # or the draw, so cpm_sim_draw() consumes the same RNG stream cpm_simulate()
+    # would (results unchanged at a fixed seed).
     root_P <- if (structure == "observed") mvn_root(P)
+    sim_root <- if (structure == "cpm") cpm_sim_root(cpm_obj)
     sim_scales <- function(n) {
       if (structure == "cpm") {
-        cpm_simulate(cpm_obj, n)
+        cpm_sim_draw(sim_root, n)
       } else {
         matrix(stats::rnorm(n * p), n, p) %*% root_P
       }

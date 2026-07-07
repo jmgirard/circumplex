@@ -390,6 +390,46 @@ the relevant code:
   matching the point estimator and the package's LM=360 convention, is the
   natural choice) and align both call sites.
 
+- **Milestone-close review deferrals (2026-07-07, M4).** The M4-close
+  `/code-review max` over the cumulative diff found no release-blocking bug;
+  most findings were fixed in the close commit (CFI/TLI degenerate-baseline
+  guard, `cpm_gradient()` hot-path recompute dedup, suff-stats fallback
+  environment forwarding, dead Hessian-singular branch, `cpm_simulate()`
+  draw-root factoring, `is_*()` scalar validation). Three were deferred:
+  - *CPM convergence-acceptance vacuous "reproduced" (Fable-tier;
+    `R/cpm_fit.R` ~592).* For free-angle variants (A/C, incl. the default
+    "quasi-circumplex") the multi-start acceptance check
+    `reproduced = (>= 2 starts hit min F)` is satisfied by the theory start
+    and its own mirror, whose F is identical by reflection isometry — so it
+    passes off a single basin and a start-dependent *local* optimum can be
+    reported `accepted` with no warning (the comment at ~496-498 documents
+    this exact hazard for B/D but the mirror start reintroduces it for A/C;
+    finder reproduced on ~8% of random p=8 matrices). Fix: count *distinct*
+    basins toward reproduction (reuse the circular mirror detection already
+    implemented for the multimodality flag), or require a non-mirror start to
+    reproduce. Estimator-acceptance semantics — Fable.
+  - *Contrast certification consistency (`R/ssm_ci_accuracy.R` ~508 /
+    `R/ssm_oop.R` ~161).* `ssm_ci_accuracy()` certifies the contrast row as
+    `cert[1] && cert[2]` (a deliberate Z1 definition for conditioning the
+    contrast's conditional-displacement coverage) and emits a
+    false-certification CAUTION for it, but `print.circumplex_ssm()` applies
+    no certification rule to contrasts — so the "shipped guardrail rule,
+    shared with `print.circumplex_ssm()`" comment is inaccurate for
+    contrasts and the diagnostic reports the operating characteristics of a
+    gate the package never displays for contrasts. Decide: gate contrasts in
+    `print()` too, or scope the contrast's guardrail/false-cert framing to
+    the conditional-coverage use only and correct the comment. Reporting
+    semantics — Jeff's call (Fable if the certification rule itself changes).
+  - *Analytic-CI Hessian recomputation (`R/cpm_fit.R` ~619/843, minor perf).*
+    On the analytic (cormat) path the Hessian at the solution is computed
+    twice — `optimHess` for the condition-number diagnostic and
+    `cpm_hessian_fd` for the SEs. Not fixed at close because the two are
+    deliberately separate (Richardson-robust conditioning vs the FD Hessian
+    pinned to 1e-8 by the delta-method SE test, which calls `cpm_analytic_se`
+    with an engine that has no stored Hessian); unifying them shifts either
+    the reported analytic SEs or the default-path ill-conditioning warning.
+    Fold in only alongside a redesign of that SE-test contract.
+
 Explicitly **not** planned: a ground-up rewrite. The R-dispatch → C++ core →
 `boot` architecture, the S3 class design, and the minimal dependency policy
 all hold up; inefficiencies found in the audit are local (see M2 vectorization

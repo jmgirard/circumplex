@@ -234,7 +234,13 @@ cpm_gradient <- function(gstar, R, spec) {
   theta <- nat$theta; zeta <- nat$zeta; beta <- nat$beta
 
   Delta <- outer(theta, theta, `-`)
-  P <- cpm_implied_cor(theta, zeta, beta)
+  # Build P inline from a single cpm_rho() so the harmonic matrix and outer()
+  # are computed once, not again inside cpm_implied_cor(): Rho is reused for
+  # dF/dzeta below, and this is the package's hottest path (every nlminb
+  # iteration x multi-start x bootstrap/CI-accuracy replicate).
+  Rho <- cpm_rho(Delta, beta)               # p x p, diag 1 (zeroed for dF/dzeta)
+  P <- (zeta %o% zeta) * Rho
+  diag(P) <- 1                              # I - D_zeta^2 restores the unit diag
   Pinv <- solve(P)
   A <- Pinv - Pinv %*% R %*% Pinv           # symmetric
   A <- (A + t(A)) / 2
@@ -243,7 +249,6 @@ cpm_gradient <- function(gstar, R, spec) {
   B <- A * (zeta %o% zeta)
   diag(B) <- 0
 
-  Rho <- cpm_rho(Delta, beta)               # p x p (diag 1, but zeroed below)
   Rhod <- cpm_rho_deriv(Delta, beta)        # p x p
 
   # ---- natural-scale gradients ----
@@ -624,21 +629,19 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   H <- (H + t(H)) / 2
   hev <- eigen(H, symmetric = TRUE, only.values = TRUE)$values
   hcond <- if (min(abs(hev)) > 0) max(abs(hev)) / min(abs(hev)) else Inf
-  # isTRUE(> threshold), not is.finite() &&: an exactly singular Hessian
+  # isTRUE(> threshold) catches Inf too: an exactly singular Hessian
   # (hcond = Inf) is the limiting case of ill-conditioning and must warn
-  # (B6 review fix -- the old is.finite() guard silently excluded it)
+  # (B6 review fix -- the old is.finite() guard silently excluded it). The
+  # message distinguishes the singular case; a separate is.finite() branch
+  # would be unreachable, since Inf already satisfies this condition.
   if (isTRUE(hcond > cpm_hessian_condition_warn)) {
+    lead <- if (is.finite(hcond)) {
+      sprintf("CPM Hessian is ill-conditioned (condition number %.2e): ", hcond)
+    } else {
+      "CPM Hessian is singular: "
+    }
     warning(
-      sprintf(
-        "CPM Hessian is ill-conditioned (condition number %.2e): angles may ",
-        hcond
-      ),
-      "be clustered or parameters weakly determined.",
-      call. = FALSE
-    )
-  } else if (!is.finite(hcond)) {
-    warning(
-      "CPM Hessian is singular (ill-conditioned): parameters weakly determined.",
+      lead, "angles may be clustered or parameters weakly determined.",
       call. = FALSE
     )
   }
@@ -816,9 +819,25 @@ cpm_fit_indices <- function(Fhat, df, p, N, R, Phat, q) {
   resid <- R - Phat
   srmr <- sqrt(sum(resid[upper.tri(resid)]^2) / npair)
 
-  # Incremental indices vs the independence null.
-  cfi <- if (has_df) 1 - max(Tstat - df, 0) / max(T0 - df0, Tstat - df, 0) else NA_real_
-  tli <- if (has_df) ((T0 / df0) - (Tstat / df)) / ((T0 / df0) - 1) else NA_real_
+  # Incremental indices vs the independence null. When the baseline itself has
+  # essentially no misfit (T0 <= df0, e.g. near-independence data) the standard
+  # ratios degenerate to 0/0 (CFI) or a divide-by-~0 (TLI); by convention the
+  # incremental fit is then perfect (return 1) rather than NaN/Inf, since a null
+  # that already fits leaves nothing for the model to improve on.
+  cfi <- if (!has_df) {
+    NA_real_
+  } else if (max(T0 - df0, Tstat - df, 0) <= 0) {
+    1
+  } else {
+    1 - max(Tstat - df, 0) / max(T0 - df0, Tstat - df, 0)
+  }
+  tli <- if (!has_df) {
+    NA_real_
+  } else if (T0 / df0 <= 1) {
+    1
+  } else {
+    ((T0 / df0) - (Tstat / df)) / ((T0 / df0) - 1)
+  }
 
   aic <- Tstat + 2 * q
   bic <- Tstat + q * log(N)
@@ -1264,10 +1283,9 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
   # Scalar-argument validation via the house is_*() helpers.
   stopifnot(is_count(reference), reference >= 1)
   stopifnot(is_count(m), m >= 1)
-  stopifnot(is.numeric(interval), length(interval) == 1, interval > 0, interval < 1)
+  stopifnot(is_num(interval, n = 1), interval > 0, interval < 1)
   stopifnot(is_flag(listwise))
-  stopifnot(is.numeric(boots), length(boots) == 1, boots > 0,
-            ceiling(boots) == floor(boots))
+  stopifnot(is_count(boots), boots > 0)
   if (!isTRUE(listwise)) {
     stop("Only listwise deletion is supported (`listwise = TRUE`).", call. = FALSE)
   }
@@ -1495,7 +1513,18 @@ cpm_simulate <- function(object, n) {
   stopifnot(inherits(object, "circumplex_cpm"))
   stopifnot(is_count(n), length(n) == 1, n >= 1)
   n <- as.integer(n)
+  cpm_sim_draw(cpm_sim_root(object), n)
+}
 
+#' Build the draw-invariant simulation ingredients from a fitted CPM (design sec. 1.3)
+#'
+#' The factor loadings and uniquenesses depend only on the fitted object, not on
+#' `n` or the random draw, so a repeated simulator (e.g. [ssm_ci_accuracy()]'s
+#' replicate loop) builds this once via `cpm_sim_root()` and draws many times via
+#' `cpm_sim_draw()`. [cpm_simulate()] composes the two for the one-shot case.
+#'
+#' @noRd
+cpm_sim_root <- function(object) {
   spec <- object$details$spec
   # Rebuild the natural parameters from the stored (canonicalized, post-polish)
   # gamma-hat and spec, so Lambda is built from exactly the parameters behind
@@ -1517,14 +1546,25 @@ cpm_simulate <- function(object, n) {
                     sb[k + 1L] * cos(k * theta),
                     sb[k + 1L] * sin(k * theta))
   }
-  Lambda <- zeta * common                            # D_zeta scales each row
-  uniq <- sqrt(pmax(1 - zeta^2, 0))                  # (I - D_zeta^2)^{1/2}, diag
+  list(
+    Lambda = zeta * common,                          # D_zeta scales each row
+    uniq = sqrt(pmax(1 - zeta^2, 0)),                # (I - D_zeta^2)^{1/2}, diag
+    p = p,
+    scales = object$details$scales
+  )
+}
 
-  # Common-factor scores then unique deviates, in that fixed order (see the
-  # Reproducibility section). Cov(X) = Lambda Lambda^T + diag(uniq^2) = Phat.
-  Z <- matrix(stats::rnorm(n * ncol(Lambda)), nrow = n)
-  E <- matrix(stats::rnorm(n * p), nrow = n)
-  X <- Z %*% t(Lambda) + E * rep(uniq, each = n)
-  colnames(X) <- object$details$scales
+#' Draw n standardized rows from a `cpm_sim_root()` (design sec. 1.3)
+#'
+#' Consumes the RNG stream in the fixed documented order (common-factor scores,
+#' then unique deviates), so a given seed reproduces the draw exactly and this is
+#' byte-identical to the pre-refactor [cpm_simulate()] body.
+#'
+#' @noRd
+cpm_sim_draw <- function(root, n) {
+  Z <- matrix(stats::rnorm(n * ncol(root$Lambda)), nrow = n)
+  E <- matrix(stats::rnorm(n * root$p), nrow = n)
+  X <- Z %*% t(root$Lambda) + E * rep(root$uniq, each = n)  # Cov(X) = Phat
+  colnames(X) <- root$scales
   X
 }
