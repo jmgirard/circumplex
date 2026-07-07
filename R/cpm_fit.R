@@ -499,8 +499,7 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   g0 <- cpm_pack(theta_theory, sv$zeta, sv$beta, spec)
 
   # Mirror start only when angles are free: with fixed angles (B/D) the
-  # reflection is a no-op and would duplicate g0, letting the acceptance
-  # criterion's "reproduced by >= 2 starts" pass vacuously off the duplicate.
+  # reflection is a no-op and would merely duplicate g0.
   starts <- list(g0)
   if (spec$free_angles > 0) {
     starts[[2L]] <- cpm_reflect_par(g0, spec)
@@ -519,6 +518,13 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
         cpm_pack(theta_theory, z, sv$beta, spec)
     }
   }
+  # Independence groups for the acceptance criterion below: only group
+  # DISTINCTNESS is consumed, so every start is its own group except the
+  # mirror (starts[[2]] when angles are free), which is a deterministic image
+  # of g0 under an exact F-isometry (rho is even) -- its run can only echo
+  # g0's evidence, so it is folded into g0's group.
+  start_group <- seq_along(starts)
+  if (spec$free_angles > 0) start_group[2L] <- 1L
 
   runs <- lapply(starts, cpm_optimize_one, R = R, spec = spec)
   Fs <- vapply(runs, function(r) r$F, numeric(1))
@@ -583,7 +589,15 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
 
   # ---- convergence acceptance (design sec. 3.5) ----
   # (a) scaled gradient norm at the REPORTED (possibly polished) solution;
-  # (b) the multi-start best F-hat reproduced (+/- 1e-8) by >= 2 starts.
+  # (b) the multi-start best F-hat reproduced (+/- 1e-8) by >= 2 INDEPENDENT
+  # start groups (start_group above). The g0/mirror pair shares one group:
+  # F(reflect(g)) == F(g) exactly, so the mirror run reaching min F is
+  # guaranteed given g0's and certifies nothing -- counting it as a second
+  # "start" accepted start-dependent local optima with no warning whenever
+  # every independent jitter landed in a worse basin (M4 review #1).
+  # Reproduction is on F, not the parameter point: on clean data all jitters
+  # reach g0's optimum (or its mirror image -- same F), and that is a valid
+  # confirmation; requiring distinct optima would wrongly reject clean data.
   # (b) deliberately uses the pre-polish Fs: the reduced model is NESTED in
   # the full one (beta_k = 0 is a boundary point of the full space), so its
   # optimum cannot undercut the full-model minimum, and the polish gate
@@ -594,7 +608,8 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   # here (advisory only, design sec. 3.5).
   gnorm <- max(abs(cpm_gradient(fit$par, R, spec)))
   grad_ok <- gnorm <= 1e-6 * max(1, abs(fit$F))
-  reproduced <- sum(abs(Fs - min(Fs)) <= 1e-8) >= 2
+  at_min <- abs(Fs - min(Fs)) <= 1e-8
+  reproduced <- length(unique(start_group[at_min])) >= 2L
   accepted <- grad_ok && reproduced
 
   if (!accepted) {

@@ -82,6 +82,17 @@ archived:
 
 ## Log
 
+- 2026-07-07 — M4 review #1 fix (Fable, test-first; /statistical-validation):
+  the convergence-acceptance "reproduced" criterion in `cpm_engine()` counted
+  the g0/mirror start pair as two starts, but reflection is an exact
+  F-isometry (rho even), so the pair self-certified start-dependent local
+  optima on ~8% of random noisy p=8 matrices with no warning. Now counts
+  independent start groups (g0+mirror share one; each jitter its own); B/D
+  unchanged. Point estimates byte-identical before/after (seed-pinned engine
+  fits, all variants, and full `cpm_fit()` on jz2017) — only the
+  `accepted` flag/warning moves. Regression test pins seed 19 (g0+mirror at
+  min F, all jitters strictly worse). `m4-complete` tag moved to include this
+  and review #3. (R/cpm_fit.R, tests/testthat/test-cpm_fit.R.)
 - 2026-07-07 — M4.5 opened as the active milestone on M4's close. Promoted the
   queued M4.5 section (T1–T8 + vignette extension) to active, copying M4's
   cross-cutting guardrails block inline so archiving M4 did not orphan the

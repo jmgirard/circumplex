@@ -591,3 +591,67 @@ test_that("analytic gradient matches FD for variants C and D (shared zeta)", {
     }
   }
 })
+
+# ---- M4 review #1: vacuous "reproduced" via the g0+mirror pair ---------------
+
+test_that("g0+mirror alone cannot certify convergence acceptance (A/C)", {
+  # Reflection is an exact F-isometry (rho is even), so the mirror start is a
+  # deterministic image of g0 and always ties its F. "Reproduced by >= 2
+  # starts" must mean >= 2 INDEPENDENT starts: the g0/mirror pair counts once.
+  # Seed 19 gives a random R where g0 and its mirror share the multi-start
+  # min F but every independent jitter lands in a strictly worse basin --
+  # a start-dependent optimum that must NOT be reported as accepted.
+  set.seed(19)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  R <- rand_cor(8)
+  octant_deg <- c(90, 135, 180, 225, 270, 315, 360, 45)
+
+  # Pin the vacuous pattern itself (guards against the seed silently drifting
+  # to a case where a jitter also reaches min F): rebuild the engine's
+  # multi-start set and check g0+mirror are at min F, all jitters worse.
+  spec <- cpm_spec(8, 3, "A", 1)
+  # Same wrapping as the engine (LM = 360 must become 0 here as it does there,
+  # or the rebuilt start set is not the one the engine optimizes).
+  theta_theory <- (octant_deg * pi / 180) %% (2 * pi)
+  spec$theta_ref_val <- theta_theory[1]
+  spec$theta_fixed <- theta_theory
+  sv <- cpm_start_values((R + t(R)) / 2, theta_theory, 3)
+  starts <- list(
+    cpm_pack(theta_theory, sv$zeta, sv$beta, spec),
+    cpm_reflect_par(cpm_pack(theta_theory, sv$zeta, sv$beta, spec), spec)
+  )
+  for (off in cpm_jitter_offsets_deg(spec$free_angles)) {
+    theta_j <- theta_theory
+    theta_j[spec$free_pos] <- theta_theory[spec$free_pos] + off * pi / 180
+    starts[[length(starts) + 1]] <- cpm_pack(theta_j, sv$zeta, sv$beta, spec)
+  }
+  Fs <- vapply(starts, function(g) cpm_optimize_one(g, (R + t(R)) / 2, spec)$F,
+               numeric(1))
+  at_min <- abs(Fs - min(Fs)) <= 1e-8
+  expect_true(all(at_min[1:2]))
+  expect_false(any(at_min[-(1:2)]))
+
+  # The engine must warn and report accepted = FALSE. Collect all warnings
+  # (this R also fires the unrelated Hessian ill-conditioning warning).
+  ws <- character(0)
+  fit <- withCallingHandlers(
+    cpm_engine(R, angles = octant_deg, m = 3, variant = "A"),
+    warning = function(w) {
+      ws <<- c(ws, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_true(any(grepl("convergence acceptance", ws)))
+  expect_false(fit$accepted)
+})
+
+test_that("free-angle acceptance still holds when a jitter confirms g0", {
+  # Clean in-family data: jitter starts converge to the same optimum as g0,
+  # which IS a valid independent reproduction -- must stay accepted.
+  theta0 <- c(0, 0.8, 1.7, 2.6, 3.5, 4.4, 5.3, 6.0)
+  P0 <- cpm_implied_cor(theta0, rep(0.78, 8), c(0.5, 0.3, 0.2))
+  for (v in c("A", "C")) {
+    fit <- cpm_engine(P0, angles = theta0 * 180 / pi, m = 3, variant = v)
+    expect_true(fit$accepted, info = paste("variant", v))
+  }
+})

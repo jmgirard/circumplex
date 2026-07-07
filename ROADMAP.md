@@ -188,6 +188,16 @@ Scope and state:
   O5 reproduction bridge) and ship-time documentation. Task detail:
   MILESTONES.md.
 
+Known limitation recorded at the M4 review-#1 fix (2026-07-07, pre-existing,
+not introduced by that fix): in `cpm_engine()`'s fixed-angle branch (B/D),
+the deterministic zeta-jitter starts (`sv$zeta * c(0.85, 1.1, 0.7)` clamped
+to [0.05, 0.99]) can collapse to identical start vectors when `sv$zeta` sits
+at a clamp boundary, and identical starts still count as separate independent
+reproductions in the convergence-acceptance criterion — the same
+duplicate-start hazard the review-#1 fix closed for the free-angle g0/mirror
+pair. Revisit if B/D acceptance behavior is ever reworked (e.g., dedupe
+byte-identical starts before grouping).
+
 Post-M4 (agreed with Jeff, 2026-07-06): draft a publication-grade simulation
 study design as a devel/ brief (Fable-tier design task) extending the B6
 coverage oracle — factorial over zeta level/heterogeneity, p, m
