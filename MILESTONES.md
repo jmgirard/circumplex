@@ -126,7 +126,7 @@ Cross-cutting guardrails for every task:
 
 ### Tasks — SSM CI trustworthiness (Zimmermann & Wright 2017)
 
-- [ ] **Z0. `ssm_analyze()` sufficient-statistics storage** (prerequisite;
+- [x] **Z0. `ssm_analyze()` sufficient-statistics storage** (prerequisite;
   Brief B §8.3). Store per-group n, scale SDs, and correlation matrices in
   `circumplex_ssm$details`, with a `data =` fallback + consistency check for
   old objects.
@@ -250,6 +250,33 @@ at release time, not this branch's.
 
 ## Log
 
+- 2026-07-07 — Z0 sufficient-statistics storage (Opus, test-first; 2-angle
+  /code-review high, 1 confirmed correctness bug fixed). New internal
+  `ssm_compute_suff_stats()` in R/ssm_analysis.R computes per-group n, per-scale
+  SDs (mean path only), and the within-group correlation matrix (scale-only for
+  the mean path; joint scales+measures for the correlation path), keyed by
+  sorted factor level (= ssm_analyze() row order) on within-group complete cases
+  (assessed-as-listwise per spec §9). Both analysis paths now store the result
+  as `details$suff_stats` (a pure list addition — no estimate or seeded pin
+  changed; print/summary read only named fields). New internal
+  `ssm_suff_stats(object, data =)` returns the stored stats, or for objects
+  predating storage recomputes from re-supplied data (recovering scales/measures/
+  grouping/listwise from the recorded `match.call()`, so name-normalized
+  regardless of how args were passed) and rejects the wrong dataset via a 1e-8
+  profile-vector consistency check against `object$scores`. **Review-fixed
+  correctness bug:** the fallback's profile recomputation skipped the up-front
+  listwise `na.omit` that ssm_analyze() applies before the C++ estimator, so
+  under the default `listwise = TRUE` any NA in a scale/measure turned recomputed
+  profiles NaN and made the check reject the *correct* data; fixed by omitting
+  over scales(+measures)+group before the estimator, and gated the profile pass
+  behind `compute_profiles =` so the live path (which already holds the profiles
+  as obs_scores) skips the redundant C++ estimator entirely. Tests
+  (test-suff_stats.R, +9): field contract on both paths, contrast keyed by real
+  groups only, internal profile↔scores consistency, stored-vs-fallback identity,
+  no-data + wrong-data errors, and the listwise+NA regression on both paths.
+  Suite 1016/1016; check 0/0/0; document() no-diff. Internal only — no NEWS
+  (user-facing entry lands with Z1). (R/ssm_analysis.R,
+  tests/testthat/test-suff_stats.R [new], MILESTONES.md.)
 - 2026-07-07 — B6 CPM validation battery (Fable, plan-first; /statistical-
   validation; 3-finder×8-angle /code-review high, 6 confirmed findings fixed).
   **Published oracles:** the full text of Grassi, Luccio & Di Blas (2010, BRM

@@ -374,7 +374,8 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   Label <- Group
   results <- cbind(Label, Group, Measure, params)
   
-  # Collect analysis details
+  # Collect analysis details (suff_stats is a pure list addition for the
+  # CI-accuracy diagnostic; see ssm_compute_suff_stats() and spec sec. 8.3)
   details <- list(
     boots = boots,
     interval = interval,
@@ -382,7 +383,11 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
     angles = as_degree(angles),
     contrast = contrast,
     score_type = "Mean",
-    method = method
+    method = method,
+    suff_stats = ssm_compute_suff_stats(
+      data = data, scales = scales, measures = NULL,
+      grouping = grouping, listwise = listwise
+    )$stats
   )
   
   # Create output ssm object
@@ -511,7 +516,8 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   results <- cbind(Label, Group, Measure, bs_output)
 
 
-  # Collect analysis details
+  # Collect analysis details (suff_stats is a pure list addition for the
+  # CI-accuracy diagnostic; see ssm_compute_suff_stats() and spec sec. 8.3)
   details <- list(
     boots = boots,
     interval = interval,
@@ -519,7 +525,11 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     angles = as_degree(angles),
     contrast = contrast,
     score_type = "Correlation",
-    method = method
+    method = method,
+    suff_stats = ssm_compute_suff_stats(
+      data = data, scales = scales, measures = measures,
+      grouping = grouping, listwise = listwise
+    )$stats
   )
   
   # Create output ssm object
@@ -531,6 +541,166 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
   )
   
   out
+}
+
+# Sufficient statistics for the CI-accuracy diagnostic -------------------------
+
+# Compute, from the raw analysis inputs, the per-group sufficient statistics the
+# CI-accuracy diagnostic needs (spec devel/m4-ci-accuracy-spec.md sec. 8.3):
+# per-group sample size, per-scale SDs (mean-based path only), and the
+# within-group correlation matrix (scale-only for the mean-based path; joint
+# scales + measures for the correlation-based path). Also returns the profile
+# vectors, computed with the same C++ estimators ssm_analyze() uses, so a
+# `data =` fallback can verify it was handed the object's own dataset.
+#
+# Groups are ordered by sorted factor level, matching ssm_analyze()'s row order.
+# The n/SD/correlation statistics use complete cases within each group: the
+# diagnostic assesses the complete-data procedure (spec sec. 9), so they are
+# exact under the default listwise deletion and assessed-as-listwise otherwise.
+# The profile vectors honor the object's `listwise` setting via the C++
+# estimators, so the fallback's consistency check is exact under either method.
+ssm_compute_suff_stats <- function(data, scales, measures = NULL,
+                                   grouping = NULL, listwise = TRUE,
+                                   compute_profiles = FALSE) {
+  if (is.matrix(data)) data <- as.data.frame(data)
+
+  # Mirror ssm_analyze(): drop rows with a missing grouping value
+  if (!is.null(grouping)) {
+    data <- data[!is.na(data[[grouping]]), , drop = FALSE]
+  }
+
+  scales_data <- data[scales]
+  scales_names <- colnames(scales_data)
+  corr_based <- !is.null(measures)
+  if (corr_based) {
+    measures_data <- data[measures]
+  }
+
+  # Group vector (sorted factor levels = ssm_analyze() row/report order)
+  if (is.null(grouping)) {
+    group <- factor(rep("All", times = nrow(data)))
+  } else {
+    group <- factor(data[[grouping]])
+  }
+  group_levels <- levels(group)
+
+  # Profile vectors, only when a data = fallback needs them for its consistency
+  # check (the live ssm_analyze() path already holds the profiles as obs_scores
+  # and keeps only $stats). Computed with the same C++ estimators ssm_analyze()
+  # uses, under the same deletion method: when listwise, the full analysis
+  # matrix is na.omit-ed before the estimator (matching ssm_analyze_means()/
+  # ssm_analyze_corrs(), which omit over scales(+measures)+group up front), so
+  # the recomputed profiles are bit-exact with the object's stored scores.
+  profiles <- NULL
+  if (compute_profiles) {
+    cs <- as.matrix(scales_data)
+    grp_fac <- group
+    if (corr_based) mv <- as.matrix(measures_data)
+    if (listwise) {
+      keep <- if (corr_based) {
+        stats::complete.cases(cs, mv)
+      } else {
+        stats::complete.cases(cs)
+      }
+      cs <- cs[keep, , drop = FALSE]
+      if (corr_based) mv <- mv[keep, , drop = FALSE]
+      grp_fac <- droplevels(grp_fac[keep])
+    }
+    grp <- as.integer(grp_fac)
+    if (corr_based) {
+      profiles <- corr_scores(cs, mv, grp, listwise)
+    } else {
+      profiles <- mean_scores(cs, grp, listwise)
+    }
+    colnames(profiles) <- scales_names
+  }
+
+  # Per-group sufficient statistics on complete cases within the group
+  n <- stats::setNames(integer(length(group_levels)), group_levels)
+  cormats <- stats::setNames(vector("list", length(group_levels)), group_levels)
+  sds <- if (corr_based) {
+    NULL
+  } else {
+    stats::setNames(vector("list", length(group_levels)), group_levels)
+  }
+
+  for (g in seq_along(group_levels)) {
+    idx <- which(group == group_levels[[g]])
+    if (corr_based) {
+      block <- cbind(
+        scales_data[idx, , drop = FALSE],
+        measures_data[idx, , drop = FALSE]
+      )
+    } else {
+      block <- scales_data[idx, , drop = FALSE]
+    }
+    block <- as.matrix(block)
+    block <- block[stats::complete.cases(block), , drop = FALSE]
+    n[[g]] <- nrow(block)
+    cormats[[g]] <- stats::cor(block)
+    if (!corr_based) {
+      sds[[g]] <- apply(block, 2, stats::sd)
+    }
+  }
+
+  list(
+    stats = list(n = n, sds = sds, cormats = cormats),
+    profiles = profiles
+  )
+}
+
+# Retrieve the CI-accuracy sufficient statistics (spec sec. 8.3) from an ssm
+# object, falling back to recomputation from re-supplied data for objects
+# created before ssm_analyze() stored them. The fallback recovers the analysis
+# arguments from the recorded call, recomputes the statistics from `data`, and
+# verifies the recomputed profile vectors match the stored `scores` within 1e-8
+# -- the guard against handing the diagnostic the wrong dataset.
+ssm_suff_stats <- function(object, data = NULL) {
+  stopifnot(inherits(object, "circumplex_ssm"))
+
+  if (!is.null(object$details$suff_stats)) {
+    return(object$details$suff_stats)
+  }
+
+  if (is.null(data)) {
+    stop(
+      "This ssm object predates sufficient-statistics storage; supply the ",
+      "original data via `data = ` so they can be recomputed.",
+      call. = FALSE
+    )
+  }
+  stopifnot(is.data.frame(data) || is.matrix(data))
+
+  # Recover the analysis arguments from the recorded call
+  cl <- object$call
+  scales <- eval(cl$scales, envir = parent.frame())
+  measures <- if (is.null(cl$measures)) NULL else eval(cl$measures, parent.frame())
+  grouping <- if (is.null(cl$grouping)) NULL else eval(cl$grouping, parent.frame())
+  listwise <- if (is.null(cl$listwise)) TRUE else isTRUE(eval(cl$listwise, parent.frame()))
+
+  recomputed <- ssm_compute_suff_stats(
+    data, scales, measures, grouping, listwise, compute_profiles = TRUE
+  )
+
+  # Consistency check: recomputed profiles must match the stored profile vectors
+  # (the non-contrast rows of `scores`) within 1e-8, NA pattern included.
+  np <- nrow(recomputed$profiles)
+  stored <- as.matrix(
+    object$scores[seq_len(np), colnames(recomputed$profiles), drop = FALSE]
+  )
+  same_na <- all(is.na(stored) == is.na(recomputed$profiles))
+  maxdiff <- suppressWarnings(max(abs(stored - recomputed$profiles), na.rm = TRUE))
+  if (!is.finite(maxdiff)) maxdiff <- 0
+  if (!same_na || maxdiff > 1e-8) {
+    stop(
+      "The supplied `data` is inconsistent with this ssm object (recomputed ",
+      "profile vectors differ from the stored scores); supply the original ",
+      "dataset.",
+      call. = FALSE
+    )
+  }
+
+  recomputed$stats
 }
 
 #' Calculate Structural Summary Method parameters for a set of scores
