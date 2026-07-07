@@ -69,7 +69,7 @@ archived:
   correct the "equal axes" roxygen error.
   *Accept:* regression test where the wrap-around gap is the largest gap
   (pre-fix code gets it wrong); boundary tests at 180° and h²≈0; T2 cutoffs.
-- [ ] **T5. Variance test (VT2) + rotation test.** Implement the *effective*
+- [x] **T5. Variance test (VT2) + rotation test.** Implement the *effective*
   VT2 variant (not the draft's raw-loading no-op) with the correct 0.58-
   derived threshold from T2; fix the RT `criterion[0]` indexing bug and the
   orientation-dependent 0–45° grid (re-derived grid from T2).
@@ -95,6 +95,22 @@ archived:
 
 ## Log
 
+- 2026-07-07 — T5 (Opus, test-first): added `structure_vt_test()` and
+  `structure_rt_test()`, the interpretation wrappers over the T2
+  `structure_vt()`/`structure_rt()` internals, mirroring T3/T4 and reusing
+  `structure_interpret` with the "vt"/"rt" cutoff keys. `@noRd` roxygen cites
+  A&R and records the effective-VT2 fix (squared factor-1 loading over own
+  communality, not the draft's raw-loading no-op VT1), the RT `criterion[0]`
+  indexing fix, and the full-period grids (180°/90° → orientation invariance).
+  The VT2-computes-the-A&R-quantity check and the RT rotation-grid/label
+  alignment pin required by T5's acceptance already ship as T2's closed-form
+  full-period-grid tests on the statistics; T5 adds wrapper-level tests
+  (statistic parity, jz2017 raw VT ~.38/RT ~.56 → "weak", ipsatized VT ~.18 →
+  "almost"/RT ~.33 → "thrice", scoring validation; near-boundary categories
+  flagged as loadings-change sentinels). No estimation math changed, so no
+  /statistical-validation. Full suite 1311 pass; /code-review high: 0 findings.
+  Internal only, no NEWS bullet. (R/fit_structure.R,
+  tests/testthat/test-fit_structure.R.)
 - 2026-07-07 — T4 (Opus, test-first): added `structure_gap_test()`, the
   interpretation wrapper over the T2 `structure_gap()` internal, mirroring
   T3's Fisher wrapper and reusing `structure_interpret` with the "gap" cutoff

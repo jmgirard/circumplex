@@ -357,3 +357,71 @@ test_that("structure_gap_test validates the declared scoring", {
   data("jz2017")
   expect_error(structure_gap_test(jz2017, octants_jz, scoring = "ipsative"))
 })
+
+# Variance test (VT2) wrapper (T5) --------------------------------------------
+
+test_that("structure_vt_test wraps the internal statistic and interpretation", {
+  data("jz2017")
+  res <- structure_vt_test(jz2017, octants_jz, scoring = "raw")
+  # The statistic is exactly the internal VT2 (effective variant: squared
+  # factor-1 loading over own communality, CV over a full-period rotation grid)
+  # on the same loadings -- the wrapper adds interpretation, it does not
+  # recompute.
+  expect_equal(res$statistic, structure_vt(structure_loadings(jz2017, octants_jz)))
+  expect_identical(res$test, "vt")
+  expect_identical(res$scoring, "raw")
+  expect_identical(res$nv, 8L)
+  # jz2017 raw octant scales: VT ~ .38, just past the raw "twice" cutoff (.37),
+  # so interstitiality is not clearly supported. (Near the cutoff by design:
+  # a flip signals the loadings changed, not the interpretation.)
+  expect_identical(res$category, "weak")
+})
+
+test_that("structure_vt_test reflects deviation scoring on ipsatized data", {
+  data("jz2017")
+  di <- ipsatize(jz2017, items = octants_jz, append = FALSE)
+  ip <- paste0(octants_jz, "_i")
+  res <- structure_vt_test(di, ip, scoring = "deviation", ridge = 0.1)
+  # Ipsatizing pulls VT below the deviation "almost" cutoff (.19), so
+  # interstitiality is almost certain -- A&R "strongly recommend" deviation
+  # scoring for VT2 in every case, and this is why.
+  expect_identical(res$category, "almost")
+})
+
+test_that("structure_vt_test validates the declared scoring", {
+  data("jz2017")
+  expect_error(structure_vt_test(jz2017, octants_jz, scoring = "ipsative"))
+})
+
+# Rotation test wrapper (T5) --------------------------------------------------
+
+test_that("structure_rt_test wraps the internal statistic and interpretation", {
+  data("jz2017")
+  res <- structure_rt_test(jz2017, octants_jz, scoring = "raw")
+  # The statistic is exactly the internal RT (quartimax-like sum, CV over the
+  # full-period 0-85 grid -- the grid/label alignment that the draft's
+  # criterion[0] indexing bug corrupted is pinned at the statistic level in the
+  # closed-form structure_rt test above) on the same loadings.
+  expect_equal(res$statistic, structure_rt(structure_loadings(jz2017, octants_jz)))
+  expect_identical(res$test, "rt")
+  expect_identical(res$scoring, "raw")
+  expect_identical(res$nv, 8L)
+  # jz2017 raw octant scales: RT ~ .56, well past the raw "twice" cutoff (.35).
+  expect_identical(res$category, "weak")
+})
+
+test_that("structure_rt_test reflects deviation scoring on ipsatized data", {
+  data("jz2017")
+  di <- ipsatize(jz2017, items = octants_jz, append = FALSE)
+  ip <- paste0(octants_jz, "_i")
+  res <- structure_rt_test(di, ip, scoring = "deviation", ridge = 0.1)
+  # Ipsatizing pulls RT to ~.33, just past the deviation "almost" cutoff (.32),
+  # which reads as interstitiality at least three times as likely. (Near the
+  # cutoff by design: a flip signals a loadings change.)
+  expect_identical(res$category, "thrice")
+})
+
+test_that("structure_rt_test validates the declared scoring", {
+  data("jz2017")
+  expect_error(structure_rt_test(jz2017, octants_jz, scoring = "ipsative"))
+})

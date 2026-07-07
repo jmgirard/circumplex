@@ -396,3 +396,117 @@ structure_gap_test <- function(data, scales, scoring = "raw", ridge = 0) {
     loadings = loadings
   )
 }
+
+#' Variance Test of interstitiality, VT2 (Acton & Revelle, 2004)
+#'
+#' Internal wrapper tying the VT2 criterion statistic to its scoring-keyed,
+#' number-of-scales-specific interpretation. Not yet exported -- the user-facing
+#' fit-statistics API is a later task; this returns a plain list the API will
+#' consume, mirroring `structure_fisher_test()`.
+#'
+#' The Variance Test of interstitiality (VT2) asks whether the variables are
+#' evenly spread in angle rather than clustered on a few axes. For each rotation
+#' theta it takes the across-variable variance of the squared factor-1 loading
+#' normalized by the variable's own communality (geometrically cos^2 of the
+#' variable's angle to the rotated axis); the statistic is the coefficient of
+#' variation of that variance over rotations (A&R Eq. 8). This is the
+#' *effective* VT2: the draft computed the raw (unsquared) loading normalized by
+#' a rotation-invariant scalar total, which is A&R's ineffective VT1 with a
+#' no-op normalization -- see `structure_vt()`. The cross-variable variance has
+#' period 180 degrees in theta, so the default grid spans a full period (0-175
+#' by 5), making the statistic exactly invariant to the arbitrary
+#' principal-axis orientation.
+#'
+#' Cutoffs are keyed to the *declared* `scoring` (A&R report different cutoffs
+#' for raw and deviation, i.e. [ipsatize()]d, data) and are nv-specific; only
+#' nv = 8 is calibrated (see `structure_cutoffs`), and any other scale count
+#' returns an undefined category. A&R strongly recommend deviation scoring for
+#' VT2 in every case, since a large general factor can make it mislabel simple
+#' structure. This function does not transform the data -- the caller declares
+#' which scoring the passed scales are already on.
+#'
+#' @param data A data frame containing the circumplex scales.
+#' @param scales Variable names or column numbers of the circumplex scales.
+#' @param scoring Declared scoring of `scales`, `"raw"` or `"deviation"`; picks
+#'   the matching cutoffs (default `"raw"`).
+#' @param ridge Non-negative ridge added to the correlation matrix diagonal to
+#'   repair a non-positive-definite matrix; default `0`. See
+#'   `structure_loadings()`.
+#' @return A list with the criterion `statistic`, the `test` name, declared
+#'   `scoring`, number of scales `nv`, the `cutoffs` used (or `NULL` at an
+#'   uncalibrated nv), the interpretation `category`, and the `loadings`.
+#' @references Acton, G. S., & Revelle, W. (2004). Evaluation of ten
+#'   psychometric criteria for circumplex structure. \emph{Methods of
+#'   Psychological Research Online}, 9(1), 1-27.
+#' @noRd
+structure_vt_test <- function(data, scales, scoring = "raw", ridge = 0) {
+  scoring <- match.arg(scoring, c("raw", "deviation"))
+  loadings <- structure_loadings(data, scales, ridge = ridge)
+  statistic <- structure_vt(loadings)
+  nv <- nrow(loadings)
+  interp <- structure_interpret(statistic, "vt", nv, scoring)
+  list(
+    test = "vt",
+    statistic = statistic,
+    scoring = scoring,
+    nv = nv,
+    cutoffs = interp$cutoffs,
+    category = interp$category,
+    loadings = loadings
+  )
+}
+
+#' Rotation Test of interstitiality (Acton & Revelle, 2004)
+#'
+#' Internal wrapper tying the Rotation Test statistic to its scoring-keyed,
+#' number-of-scales-specific interpretation. Not yet exported -- the user-facing
+#' fit-statistics API is a later task; this returns a plain list the API will
+#' consume, mirroring `structure_fisher_test()`.
+#'
+#' The Rotation Test of interstitiality asks whether a quartimax-like simple-
+#' structure criterion is indifferent to rotation, as it is for a true
+#' circumplex. For each rotation theta it sums across variables the variance
+#' across the two factors of the squared loadings; the statistic is the
+#' coefficient of variation of that sum over rotations (A&R Eq. 9). The draft's
+#' `criterion[0] <- ...` was a silent no-op that dropped the 0-degree rotation
+#' and left a spurious zero in the last slot, badly inflating the CV; the
+#' summand has period 90 degrees, so the default grid spans a full period (0-85
+#' by 5), fixing the indexing and making the statistic orientation-invariant --
+#' see `structure_rt()`.
+#'
+#' Cutoffs are keyed to the *declared* `scoring` (A&R report different cutoffs
+#' for raw and deviation, i.e. [ipsatize()]d, data) and are nv-specific; only
+#' nv = 8 is calibrated (see `structure_cutoffs`), and any other scale count
+#' returns an undefined category. This function does not transform the data --
+#' the caller declares which scoring the passed scales are already on.
+#'
+#' @param data A data frame containing the circumplex scales.
+#' @param scales Variable names or column numbers of the circumplex scales.
+#' @param scoring Declared scoring of `scales`, `"raw"` or `"deviation"`; picks
+#'   the matching cutoffs (default `"raw"`).
+#' @param ridge Non-negative ridge added to the correlation matrix diagonal to
+#'   repair a non-positive-definite matrix; default `0`. See
+#'   `structure_loadings()`.
+#' @return A list with the criterion `statistic`, the `test` name, declared
+#'   `scoring`, number of scales `nv`, the `cutoffs` used (or `NULL` at an
+#'   uncalibrated nv), the interpretation `category`, and the `loadings`.
+#' @references Acton, G. S., & Revelle, W. (2004). Evaluation of ten
+#'   psychometric criteria for circumplex structure. \emph{Methods of
+#'   Psychological Research Online}, 9(1), 1-27.
+#' @noRd
+structure_rt_test <- function(data, scales, scoring = "raw", ridge = 0) {
+  scoring <- match.arg(scoring, c("raw", "deviation"))
+  loadings <- structure_loadings(data, scales, ridge = ridge)
+  statistic <- structure_rt(loadings)
+  nv <- nrow(loadings)
+  interp <- structure_interpret(statistic, "rt", nv, scoring)
+  list(
+    test = "rt",
+    statistic = statistic,
+    scoring = scoring,
+    nv = nv,
+    cutoffs = interp$cutoffs,
+    category = interp$category,
+    loadings = loadings
+  )
+}
