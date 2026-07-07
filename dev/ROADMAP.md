@@ -1,11 +1,13 @@
 # circumplex Roadmap
 
 > **Forward direction across releases.** Drafted 2026-07-02 from a full
-> audit of the package (v1.1.0.9000). M1–M3 are done (M1 shipped v1.2.0;
-> M2+M3 bundled for v1.3.0); M4–M6 remain planned and their
-> sequencing/scope are open to revision. Each milestone is a releasable
-> unit: correctness first, then inference quality, then new capabilities
-> in order of increasing scope.
+> audit of the package (v1.1.0.9000). M1 shipped as v1.2.0; M2+M3 are
+> GitHub-complete; M4 was split on 2026-07-07 (Browne model + CI
+> trustworthiness stay in M4, nearly done; structure tests moved to a
+> new M4.5); M5–M6 remain planned. M2 through M5 accumulate into a
+> single v2.0.0 release with M6 as its own later release (see the CRAN
+> release strategy below): correctness first, then inference quality,
+> then new capabilities in order of increasing scope.
 >
 > **This file carries direction and milestone-level status only.**
 > Task-level status (checkboxes, acceptance criteria, per-task logs)
@@ -50,39 +52,84 @@ user-facing story a CRAN-only user needs** (they will not
 `install_github`). Decoupling the two lets us keep shipping to GitHub
 continuously while spacing CRAN submissions.
 
-**Triage of the roadmap into CRAN submissions:**
+**Current plan (Jeff, 2026-07-07 — supersedes the original tiered
+submission train):** progress has been much faster than the original
+plan budgeted (M4’s Browne model and CI-trustworthiness diagnostic were
+built, validated, and reviewed in days, not weeks), so instead of
+spacing three or four feature submissions we fold **M2 through M5 into
+one v2.0.0 release**: the held v1.3.0 content (M2 + M3 — never submitted
+separately), M4 (Browne model + CI trustworthiness), M4.5 (structure
+tests), and M5 (SEM). Target: **~2026-08-02**, one month after the
+v1.2.0 submission (CRAN-approved 2026-07-02) — comfortably inside CRAN’s
+cadence expectations precisely because everything ships as one
+submission. **Freeze rule (agreed 2026-07-07): code freeze ~2026-07-26**
+— whatever milestones are GitHub-complete *and reviewed* by freeze get
+on the train; anything not ready rides the next release. Scope, never
+the date and never the statistics, is the variable: the likely outcome
+is v2.0.0 = M2–M5, and a surprise in M5 degrades the release to M2–M4.5,
+not the quality bar. **M6 (longitudinal) is deliberately excluded** and
+becomes its own ~v2.1.0 on its own schedule: it is the largest and
+least-designed milestone, its new statistical machinery
+(paired/dependent circular resampling, growth models on displacement)
+must not be compressed by a release date, and it explicitly benefits
+from field feedback on the fit diagnostics and SEM layer it builds on —
+a design brief precedes it (see devel/m5-m6-design-questions.md).
+Milestones remain GitHub units of work: each completes, gets archived,
+and accumulates on the branch/master until the v2.0.0 train leaves.
 
-- **Tier 1 — submit on its own, promptly. v1.2.0 (M1).** Correctness
-  fixes (silently-wrong results) justify interrupting cadence; ship
-  alone, do not wait to bundle features.
-- **Tier 2 — flagship, its own slot. M4** (fit statistics + Browne’s
-  model / CircE replacement). Highest new-user value and strongest
-  standalone story: CircE is archived on CRAN, so no R package currently
-  estimates Browne’s model. Also the riskiest statistically, so it
-  benefits from not sharing a release.
-- **Tier 3 — bundle, don’t spend a slot each. M2 + M3 → one release
-  (~v1.3.0).** M3 (ggplot2 extension) is mostly infrastructure whose
-  payoff is realized by later milestones — weak as a solo CRAN
-  submission; M2 (inference quality) is incremental. Together they make
-  a substantial “faster, more flexible, composable plots + new
-  visualization vignette” release. Caveat: both touch fragile internals
-  (do the named-column results-assembly refactor before M2), so the
-  bundle has a larger check/review surface — budget a `/code-review max`
-  pass accordingly (the deepest local review; reserve the billed cloud
-  `/code-review ultra` for a flagship release like M4).
-- **Tier 4 — naturally their own releases; cadence is moot. M5** (SEM)
-  and **M6** (longitudinal, v2.0.0) are large and far enough out that no
-  bundling decision is needed now.
-- **Never a CRAN submission on its own:** the continuous/infra track
-  below (refactors, test renames, CI upkeep, coverage). Ships to GitHub
-  whenever convenient, folded into whichever milestone touches that
-  code.
+**v2.0.0 pre-release items** (release-gating, collected here because
+they outlive individual milestones’ MILESTONES.md sections):
 
-**Suggested submission train:** (1) now — v1.2.0 (M1); (2) next slot —
-v1.3.0 (M2 + M3 bundled) once the viz extension is stable; (3) headline
-slot — M4 (CircE replacement); (4) M5, then M6/v2.0.0 as they land.
+- **CircE published-oracle second re-read (from M4/B6).** The Grassi et
+  al.
+  2010. fixture values in `tests/testthat/helper-cpm-oracles.R` were
+        transcribed via two automated channels but still need the §6.1
+        protocol’s second independent *human* re-read against the paper
+        (Jeff). Only a transcription typo is at risk. Fold into the
+        pre-release review. Same status and treatment for the Zimmermann
+        & Wright (2017) transcription from M4/W1
+        (`devel/m4-zw-transcription.md`, feeding the “Evaluating
+        Circumplex Structure” vignette and the O5 bridge) — two
+        automated channels diffed and internally cross-validated, human
+        re-read pending; the record flags one verified coincidence
+        (15.5% appears for two distinct quantities) for explicit
+        attention.
+- **B6 analytic-CI caution — Jeff to confirm/veto** (adopted default,
+  reversible until release): the `cpm_boundary_markers()` marker set and
+  the N-conditional [`summary()`](https://rdrr.io/r/base/summary.html)
+  caution wording in R/cpm_fit.R / R/cpm_oop.R. Natural review point:
+  when the M4 vignette (W1) documents CI trustworthiness. *W1 review
+  outcome (2026-07-07, advisory): confirmed — the wording is hedged,
+  directional, and names its markers; the vignette now teaches the same
+  guidance (“prefer the bootstrap on the raw-data path”, caution below N
+  = 2000 and marker-conditional above). Jeff’s veto window stays open
+  until release.*
+- **Release review depth:** `/code-review max` minimum; this is now the
+  single flagship release, so it is *the* candidate for the billed
+  `/code-review ultra` — but only if Jeff asks for it.
+- v2.0.0 is a major-version bump carrying multiple feature families; run
+  `/release-checklist` once, after the last milestone (or a deliberate
+  descope) lands.
 
-Note: a quick **patch** (e.g. v1.2.1) shortly after a release is
+**Between releases (working practice, adopted 2026-07-07).** Real
+version numbers, annotated tags, and GitHub Releases are bound to CRAN
+submissions only — never mint a real version that CRAN won’t see. At
+each milestone close instead: (1) archive the milestone to
+MILESTONES-ARCHIVE.md; (2) bump the DESCRIPTION dev suffix (restart the
+discipline at 2.0.0.9000 after the v2.0.0 release; one increment per
+milestone) so `install_github` users’
+[`sessionInfo()`](https://rdrr.io/r/utils/sessionInfo.html) identifies
+the milestone-state they run; (3) add a lightweight git tag
+(e.g. `m4-complete`) so milestone diffs are stable review scopes; (4)
+run a **milestone-close `/code-review` over the milestone’s full
+cumulative diff** — `high` for ordinary milestones, `max` for
+statistically risky ones. The milestone-close review is the layer that
+buys release-review depth: the CRAN-release review (`max`/ultra) then
+verifies already-reviewed strata and the seams between them rather than
+making a first deep pass over everything, and the freeze rule’s
+“reviewed by freeze” means this review is done.
+
+Note: a quick **patch** (e.g. v2.0.1) shortly after a release is
 acceptable to CRAN when it fixes a real bug — bug-fixes are the accepted
 exception to the cadence rule. It is *feature* releases that must be
 spaced out.
@@ -137,10 +184,70 @@ Deliberately sequenced *before* the fit-statistics/SEM/longitudinal
 milestones, whose new visualizations build on this layer. Full task
 detail, acceptance criteria, and log: **MILESTONES.md**.
 
-## Milestone 4 — Circumplex fit & structure statistics
+## Milestone 4 — Browne model & SSM CI trustworthiness
 
-**Status: planned** (flagship; its own CRAN slot — see the release
-strategy). Revive and modernize the drafts in `devel/fit_analysis.R` /
+**Status: in progress on GitHub** (branch `m4-fit-statistics`; active
+milestone in MILESTONES.md). **Rescoped 2026-07-07:** the original M4
+also carried the Acton & Revelle structure tests; with the Browne/CI
+work complete much faster than planned, the structure tests split off
+into **M4.5** (below) so M4 can close as a coherent unit. Folds into the
+v2.0.0 release (no longer its own CRAN slot — see the release strategy).
+
+Scope and state:
+
+- **Browne’s (1992) circular process model — native reimplementation
+  (CircE replacement), complete.**
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  (raw data or cormat; variants A–D; analytic + bootstrap CIs; fit
+  indices),
+  [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md),
+  [`plot.circumplex_cpm()`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_cpm.md)
+  on the M3 extension, and the full validation battery (published
+  CIRCUM/CircE oracles, OpenMx/lavaan cross-implementation oracles,
+  simulation coverage oracle recorded in DESIGN.md). The anchor feature:
+  CircE is archived on CRAN, so no other R package estimates this model.
+- **SSM CI trustworthiness diagnostic (Zimmermann & Wright, 2017),
+  complete.**
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+  (spec `devel/m4-ci-accuracy-spec.md`): simulation-only plug-in
+  coverage assessment at the user’s own n/engine/ settings, the
+  amplitude-near-zero ladder with guardrail false-certification
+  measurement, plain-language verdicts, plot method. Absorbed the M2 BCa
+  follow-up (amplitude-near-zero percentile coverage) and the contrast
+  branch-pathology observation.
+- **Remaining:** the “Evaluating Circumplex Structure” vignette scoped
+  to the above (CPM fitting, CI trustworthiness, Z&W transcription + the
+  §10 O5 reproduction bridge) and ship-time documentation. Task detail:
+  MILESTONES.md.
+
+Known limitation recorded at the M4 review-#1 fix (2026-07-07,
+pre-existing, not introduced by that fix): in `cpm_engine()`’s
+fixed-angle branch (B/D), the deterministic zeta-jitter starts
+(`sv$zeta * c(0.85, 1.1, 0.7)` clamped to \[0.05, 0.99\]) can collapse
+to identical start vectors when `sv$zeta` sits at a clamp boundary, and
+identical starts still count as separate independent reproductions in
+the convergence-acceptance criterion — the same duplicate-start hazard
+the review-#1 fix closed for the free-angle g0/mirror pair. Revisit if
+B/D acceptance behavior is ever reworked (e.g., dedupe byte-identical
+starts before grouping).
+
+Post-M4 (agreed with Jeff, 2026-07-06): draft a publication-grade
+simulation study design as a devel/ brief (Fable-tier design task)
+extending the B6 coverage oracle — factorial over zeta
+level/heterogeneity, p, m (mis)specification, and N; competitor
+intervals (BCa at minimum, motivated by the observed one-sided
+percentile under-coverage from the zeta boundary bias); MC error budget;
+candidate venues Behavior Research Methods (CircE successor + simulation
+core) or Assessment (CI-trustworthiness framing with the
+[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+work). The B6 script and Z1/Z2 machinery are the intended simulation
+engine.
+
+## Milestone 4.5 — Structure tests (Acton & Revelle, 2004)
+
+**Status: queued** (split from M4 on 2026-07-07; opens as the active
+milestone when M4’s vignette/ship tasks close; folds into v2.0.0).
+Revive and modernize the drafts in `devel/fit_analysis.R` /
 `devel/fit_oop.R`.
 
 A Fable method-review of those drafts (2026-07-03; full report in
@@ -152,54 +259,43 @@ wrap-around omission (boundary bug) and nv-dependent cutoffs
 anti-conservative at the canonical nv=8; the variance test implements
 the *ineffective* variant and a mistranscribed threshold; the rotation
 test has an indexing bug corrupting the statistic; the randomization
-test isn’t actually implemented. Cross-cutting M4 task: one simulation
+test isn’t actually implemented. Cross-cutting task: one simulation
 under A&R’s generating model re-derives all cutoffs at nv=8. The `psych`
 dependency is unnecessary (a small base-R principal-axis FA replaces the
 one `psych::fa()` call; psych → Suggests as a test oracle) — **net new
 hard dependencies for the fit statistics: zero**.
 
-- Fisher test of equal axes (draft exists; sound, needs citation).
-- Gap test of equal spacing (draft exists; needs rework — boundary bug).
-- Variance test of equal communalities / interstitiality indices (draft
-  needs rework — wrong variant + mistranscribed threshold).
-- **Browne’s (1992) stochastic process model — native reimplementation
-  (CircE replacement).** CircE (Grassi, Luccio, & Di Blas, 2010) is
-  archived on CRAN, leaving R users without an estimator for Browne’s
-  model. Implement estimation of the circular stochastic process model
-  (free/constrained item angles, communality index, Fourier correlation
-  function; point estimates, CIs, fit indices such as RMSEA/CFI from the
-  discrepancy function). Decide backend: native optimization vs. OpenMx/
-  lavaan. Validate against published CircE/CIRCUM output. This is the
-  anchor feature of the milestone.
-- **SSM CI trustworthiness diagnostic (Zimmermann & Wright, 2017).**
-  Z&W’s simulation studies show bootstrap SSM CI accuracy depends on
-  sample size and the population circumplex structure; they used Browne-
-  model estimates to characterize that structure. Reimplement as a
-  user-facing diagnostic: fit Browne’s model to the user’s data (item-
-  or scale-level), then either (a) simulate from the fitted model to
-  estimate empirical CI coverage for the user’s n, or (b) map the
-  estimated parameters onto the accuracy results of Z&W Studies 1–5.
-  *Spec from the paper + supplemental materials before implementation;
-  depends on the CircE replacement above.* Surface as something like
-  `ssm_ci_accuracy(ssm_object)` with a plain-language verdict in
-  [`summary()`](https://rdrr.io/r/base/summary.html). *Absorbed from the
-  dropped M2 BCa task (2026-07-02): the diagnostic should specifically
-  assess percentile-CI coverage for amplitude near zero (nonnegative,
-  upward-biased, skewed — the one SSM parameter where percentile
-  intervals are theoretically weakest), since the amplitude CI drives
-  the “displacement not interpretable” guardrail.* *Related pre-existing
-  observation (surfaced 2026-07-03 during the F3 review): for a contrast
-  between two profiles whose contrast amplitude is ~0 (near-uniform
-  contrast draws), the displacement point estimate can fall
-  geometrically outside its very wide circular CI — the same
-  amplitude-near- zero regime this diagnostic targets, at the contrast
-  level. Fold into the diagnostic’s scope rather than fixing the CI
-  machinery ad hoc.*
-- `ssm_fit()`-style API returning a typed object with `print`/`summary`/
-  `plot` methods, consistent with `circumplex_ssm` (plots built on the
-  M3 extension).
-- New vignette: “Evaluating Circumplex Structure” (fit statistics, CI
-  trustworthiness, when to trust SSM parameters, ipsatization guidance).
+- Base-R principal-axis loadings + shared infrastructure (fix the
+  ridge-on-wrong-matrix bug; psych → Suggests as oracle).
+- Cutoff re-derivation simulation at nv=8 (fixes the Gap nv-dependence
+  and VT/RT threshold provenance in one reproducible, committed run).
+- Fisher test of equal axes; gap test of equal spacing (wrap-around
+  fix); variance test (the *effective* VT2 variant) + rotation test
+  (indexing and grid fixes); RANDALL correspondence index with an actual
+  randomization inference.
+- `ssm_fit()`-style user-facing API returning a typed object with
+  `print`/`summary`/`plot` (plots on the M3 extension), consistent with
+  `circumplex_ssm` conventions; pkgdown reference section.
+- Extend the “Evaluating Circumplex Structure” vignette (written in M4
+  for the CPM/CI-trustworthiness content) with the structure-test
+  section.
+
+The detailed task list with acceptance criteria (T1–T7 + the vignette
+extension) is parked verbatim in MILESTONES.md under the
+queued-milestone heading and becomes the active task list when M4.5
+opens — milestone-level status only here, per this file’s contract.
+
+Post-M4 (agreed with Jeff, 2026-07-06): draft a publication-grade
+simulation study design as a devel/ brief (Fable-tier design task)
+extending the B6 coverage oracle — factorial over zeta
+level/heterogeneity, p, m (mis)specification, and N; competitor
+intervals (BCa at minimum, motivated by the observed one-sided
+percentile under-coverage from the zeta boundary bias); MC error budget;
+candidate venues Behavior Research Methods (CircE successor + simulation
+core) or Assessment (CI-trustworthiness framing with the
+[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+work). The B6 script and Z1/Z2 machinery are the intended simulation
+engine.
 
 ## Milestone 5 — SEM-based SSM
 
@@ -218,9 +314,13 @@ hard dependencies for the fit statistics: zero**.
 
 ## Milestone 6 — Longitudinal & intraindividual SSM
 
-**Status: planned** (v2.0.0-scale). The largest extension; benefits from
-Milestones 2–5 (fast estimation, the visualization layer, fit
-diagnostics, SEM infrastructure).
+**Status: planned.** The largest extension; benefits from Milestones 2–5
+(fast estimation, the visualization layer, fit diagnostics, SEM
+infrastructure). Deliberately NOT on the v2.0.0 train (decided
+2026-07-07; see the CRAN release strategy): ships as its own ~v2.1.0
+after a design brief, so its new statistical machinery —
+paired/dependent circular resampling, growth models on displacement —
+gets a full design window and the benefit of v2.0.0 field feedback.
 
 - Repeated-measures SSM: parameter trajectories over time (growth models
   on e/a/d, with circular handling for d).
@@ -244,28 +344,37 @@ milestone first touches the relevant code:
   6-parameter block) replaced with name-driven assembly via
   `ssm_param_names()`; done first so the interval work could build on
   it. (See MILESTONES-ARCHIVE.md.)
+
 - **Deduplicate Group/Measure/Label construction** — the same block is
   built twice each in `ssm_analyze_means()`/`ssm_analyze_corrs()`;
   extract one helper. (Do with M1 or M2.)
+
 - **Move degree/radian/contrast classes onto `vctrs`** (or S7) so
   arithmetic, printing, and quantile behavior are centralized and harder
   to misuse. (Nice-to-have; natural companion to M2.)
+
 - **Rewrite the `devel/` fit drafts in current package style** (base R,
   no dplyr/rlang quasiquotation) when M4 begins — they predate the
   package’s tidyverse-ectomy.
+
 - Rename `tests/testthat/test-RcppExport.R.R` (double extension).
+
 - Boundary-condition test suite: displacement at 0°/360°, CIs straddling
   the boundary, contrasts near ±180°, flat profiles, single-scale edge
   cases.
+
 - Keep GitHub Actions workflows current; add R-devel to the check
   matrix.
+
 - Track code coverage on the statistical core (`ssm_*`, `src/`)
   specifically.
+
 - **Deferred `/code-review max` findings (2026-07-03, v1.3.0 bundle).**
   Non-blocking; the review found no wrong-number correctness bugs and
   the one guard worth acting on (C++ stride ↔︎ `ssm_param_names()`)
   shipped. Fold the rest in when the relevant code is next touched
   (mostly M4):
+
   - *Visualization extension robustness (fold into M4’s new plots):* the
     three degenerate-profile filters (`GeomSsmPoint` on the estimate,
     `StatSsmArc` on the CI bounds,
@@ -277,13 +386,41 @@ milestone first touches the relevant code:
     rows are dropped. The now-exported
     [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
     needs documented/validated displacement input range (a `min>max`
-    span silently draws the short-way arc).
+    span silently draws the short-way arc). \[Closed in M4/B5,
+    2026-07-06.\] Residual, package-wide: both
+    [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+    and
+    [`plot.circumplex_cpm()`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_cpm.md)
+    colour by a Set2 brewer palette (max 8 colours), so a fit/analysis
+    with \>8 keyed levels warns and recycles/NA-fills — a single palette
+    policy (hue fallback beyond 8, or a `palette=` hook like
+    [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)’s)
+    belongs here, not per-plot.
   - *Monte Carlo engine efficiency (fold into M4’s `ssm_ci_accuracy`
     work, which hammers the MC path):* the `psi` inner double loop
     recomputes squares per-element; per-profile `group_parameters()` +
     `do.call(cbind)` could be one batched C++ call; the MC correlation
     path re-introduces positional block indexing the M2 refactor retired
-    elsewhere (name-drive it).
+    elsewhere (name-drive it). \[Closed in M4/Z1, 2026-07-07: vectorized
+    psi, one batched `group_parameters()` call, name-driven keys with an
+    ambiguity guard; seeded output pinned byte-identical to the
+    pre-refactor engine.\]
+  - *[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+    Phase-2 performance (design §8/§11 trigger fired 2026-07-07 at
+    full-jz2017 scale):* clean seeded defaults take 111 s at the spec’s
+    n≈300 cost-model scale (inside the ~5-min envelope) but 427 s serial
+    at n=1166 (274 s at `ncpus = 4`). Profiling: ~75% of the loop is
+    [`rmultinom()`](https://rdrr.io/r/stats/Multinom.html) RNG draws,
+    and
+    [`sample.int()`](https://rdrr.io/r/base/sample.html)+[`tabulate()`](https://rdrr.io/r/base/tabulate.html)
+    benchmarked only ~10% faster — the loop is RNG-bound, so the
+    anticipated “port the inner simulate-and-quantile loop to C++” will
+    NOT clear the envelope while it consumes R’s RNG at one draw per
+    resampled row. Any Phase-2 design must first decide the draw
+    strategy (and its reproducibility contract) before porting; the R
+    loop stays the permanent oracle either way. Not release-blocking:
+    verdicts are correct, `parallel=` exists, and the envelope holds at
+    the scale the spec budgeted.
   - *Minor cleanup (any release):* `ssm_replicate_intervals()` computes
     CI bounds in two `sapply(quantile)` passes (re-sorting each
     displacement column twice) — pass `probs = c(lo, hi)` once; drop the
@@ -291,7 +428,107 @@ milestone first touches the relevant code:
     tighten the
     [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
     roxygen (an unnamed extra fills `angles` positionally and errors on
-    `is.numeric`, not the documented named-args message).
+    `is.numeric`, not the documented named-args message); bump the
+    testthat Suggests floor — DESCRIPTION declares `>= 3.0.0` but the
+    suite has long used `expect_no_error()`/`expect_no_warning()`
+    (testthat 3.1.5+), so the declared floor understates the real
+    requirement (noticed in the B6 review, 2026-07-07).
+
+- **CIRCUM-compatibility mode for
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)**
+  (surfaced by M4/B6’s published- oracle triage, 2026-07-06):
+  CIRCUM/CircE fit Browne’s *free-scaling* covariance structure
+  `Σ = D_σ P(γ) D_σ`, so their fitted diagonal is not constrained to 1
+  and their finite-sample estimates/χ² differ from our
+  correlation-structure fit (same df, asymptotically equivalent; details
+  in devel/m4-browne-design.md §11). A `free_scaling = TRUE` option
+  would let users reproduce published CIRCUM/CircE output exactly; the
+  OpenMx test oracle already demonstrates the parameterization. Decide
+  post-M4 whether the reproduction value justifies a second fitted
+  family.
+
+- **Guardrail certification-rule replacement** (surfaced by M4/Z2’s
+  false-certification measurements; `devel/m4-ci-accuracy-spec.md`
+  §12.5/§13; Jeff, 2026-07-03). `print.circumplex_ssm()`’s
+  displacement-certification rule (`round(a_lci, digits) > 0`, `digits`
+  pinned to 3) is a display-precision artifact: its implied threshold
+  moves with a print argument and means different things on a
+  correlation-metric amplitude than a raw-score one (the mean-based path
+  on raw-score metrics over-certifies). Decided as a two-phase package
+  decision: ship the current rule now
+  ([`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+  assesses it as-is, digits echoed in output), design a principled,
+  print-independent, scale-free replacement later, informed by the
+  diagnostic’s own false-certification output (Z2 measured near-100%
+  false certification at true zero amplitude on real data). Likely form:
+  a relative rule (e.g., `a_lci` as a fraction of the amplitude CI
+  width) rather than a fixed absolute cut — Z&W’s `a ≥ .15` “marked”
+  threshold is correlation-metric only and answers a different question.
+  Own tests, NEWS entry, and `print.circumplex_ssm()` snapshot updates
+  when it lands; not an M4 deliverable.
+
+- **0-vs-360 pole-snap alignment**
+  (`devel/estimator-audit-2026-07-fable.md` F6, low/cosmetic, still
+  parked). The point estimator emits exactly `360.0` for a profile
+  peaking on the 0°/360° pole (the G2 decision; see DESIGN.md’s
+  displacement-boundary entry), but `quantile.circumplex_radian()`
+  (R/ssm_bootstrap.R) snaps a re-wrapped confidence interval endpoint
+  within 2ε of 2π to `0` instead — the opposite pole label — so a
+  pole-hugging profile can print `d_est = 360.0` with a CI endpoint of
+  `0.0`. Both values name the same direction and every consumer already
+  handles the wrap (`StatSsmArc` unwraps `d_uci < d_lci`; tests accept
+  either pole label), so this is cosmetic, not a bug. Follow-up: pick
+  one snap direction (360, matching the point estimator and the
+  package’s LM=360 convention, is the natural choice) and align both
+  call sites.
+
+- **Milestone-close review deferrals (2026-07-07, M4).** The M4-close
+  `/code-review max` over the cumulative diff found no release-blocking
+  bug; most findings were fixed in the close commit (CFI/TLI
+  degenerate-baseline guard, `cpm_gradient()` hot-path recompute dedup,
+  suff-stats fallback environment forwarding, dead Hessian-singular
+  branch,
+  [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md)
+  draw-root factoring, `is_*()` scalar validation). Three were deferred:
+
+  - *CPM convergence-acceptance vacuous “reproduced” (Fable-tier;
+    `R/cpm_fit.R` ~592).* For free-angle variants (A/C, incl. the
+    default “quasi-circumplex”) the multi-start acceptance check
+    `reproduced = (>= 2 starts hit min F)` is satisfied by the theory
+    start and its own mirror, whose F is identical by reflection
+    isometry — so it passes off a single basin and a start-dependent
+    *local* optimum can be reported `accepted` with no warning (the
+    comment at ~496-498 documents this exact hazard for B/D but the
+    mirror start reintroduces it for A/C; finder reproduced on ~8% of
+    random p=8 matrices). Fix: count *distinct* basins toward
+    reproduction (reuse the circular mirror detection already
+    implemented for the multimodality flag), or require a non-mirror
+    start to reproduce. Estimator-acceptance semantics — Fable.
+  - *Contrast certification consistency (`R/ssm_ci_accuracy.R` ~508 /
+    `R/ssm_oop.R` ~161).*
+    [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+    certifies the contrast row as `cert[1] && cert[2]` (a deliberate Z1
+    definition for conditioning the contrast’s conditional-displacement
+    coverage) and emits a false-certification CAUTION for it, but
+    `print.circumplex_ssm()` applies no certification rule to contrasts
+    — so the “shipped guardrail rule, shared with
+    `print.circumplex_ssm()`” comment is inaccurate for contrasts and
+    the diagnostic reports the operating characteristics of a gate the
+    package never displays for contrasts. Decide: gate contrasts in
+    [`print()`](https://rdrr.io/r/base/print.html) too, or scope the
+    contrast’s guardrail/false-cert framing to the conditional-coverage
+    use only and correct the comment. Reporting semantics — Jeff’s call
+    (Fable if the certification rule itself changes).
+  - *Analytic-CI Hessian recomputation (`R/cpm_fit.R` ~619/843, minor
+    perf).* On the analytic (cormat) path the Hessian at the solution is
+    computed twice — `optimHess` for the condition-number diagnostic and
+    `cpm_hessian_fd` for the SEs. Not fixed at close because the two are
+    deliberately separate (Richardson-robust conditioning vs the FD
+    Hessian pinned to 1e-8 by the delta-method SE test, which calls
+    `cpm_analytic_se` with an engine that has no stored Hessian);
+    unifying them shifts either the reported analytic SEs or the
+    default-path ill-conditioning warning. Fold in only alongside a
+    redesign of that SE-test contract.
 
 Explicitly **not** planned: a ground-up rewrite. The R-dispatch → C++
 core → `boot` architecture, the S3 class design, and the minimal

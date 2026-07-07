@@ -2,6 +2,162 @@
 
 ## circumplex (development version)
 
+This version’s flagship addition is
+[`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md),
+a native reimplementation of Browne’s (1992) circular stochastic process
+model for the correlational structure of circumplex scales — filling the
+gap left by the archived CircE package, the previous R implementation.
+It ships alongside
+[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
+a new diagnostic for whether an
+[`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+result’s confidence intervals can be trusted at your sample size and
+profile (Zimmermann & Wright, 2017). See the new vignette, “Evaluating
+Circumplex Structure”, for a worked introduction to both.
+
+- New vignette, “Evaluating Circumplex Structure”: how to test whether
+  an instrument fits a circumplex in your sample with
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  (reading and benchmarking the fit indices, comparing the constrained
+  model variants, and the boundary-solution/chi-square cautions from the
+  package’s validation simulations), and how to check whether SSM
+  confidence intervals can be trusted at your sample size and profile
+  with
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md).
+  Summarizes Zimmermann & Wright’s (2017) simulation findings as cited
+  context (transcribed from the published article), reproduces their
+  Study 5 analyses on the bundled `jz2017` data, and adds guidance on
+  when to trust each SSM parameter and on what ipsatizing octant scores
+  costs an SSM analysis. The diagnostic itself was validated against the
+  article: configured to transcribed Zimmermann & Wright simulation
+  conditions, it reproduces their published accuracy classifications
+  (validation scripts and results are recorded in the package’s
+  development repository).
+
+- New
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+  function assesses, by simulation, whether the confidence intervals of
+  an
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  result would cover the true SSM parameters at their nominal rate if
+  the population looked like the fitted estimates, at the observed
+  sample size(s) — the CI-trustworthiness diagnostic of Zimmermann &
+  Wright (2017), generalized to the user’s own configuration (grouping,
+  contrasts, measures, engine, resample count, and interval level). The
+  population’s scale structure is characterized by a
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  model (or, optionally, the observed correlations); each simulated
+  dataset replays the object’s own interval procedure. Coverage is
+  reported per profile row, parameter, and amplitude condition — a
+  ladder of populations with the amplitude scaled toward zero, where
+  percentile amplitude intervals are theoretically weakest — along with
+  one-sided miss rates, interval widths, the certification rate of the
+  printed “amplitude CI excludes zero” guardrail, and displacement
+  coverage conditional on certification. Coverage at the as-estimated
+  condition is classified against Bradley’s (1978) liberal robustness
+  band using 95% Wilson score intervals, and
+  [`print()`](https://rdrr.io/r/base/print.html)/[`summary()`](https://rdrr.io/r/base/summary.html)
+  translate the classifications into a plain-language verdict, including
+  a caution line measuring how often the guardrail would still certify
+  displacement if the true amplitude were zero (theory predicts far more
+  often than the interval’s wording suggests).
+  [`summary()`](https://rdrr.io/r/base/summary.html) also annotates the
+  realism of the simulated population (structural-model convergence and
+  fit, against conventional RMSEA/SRMR benchmarks with citations) and,
+  when an amplitude estimate is itself below half its CI width, notes
+  that the analysis already sits in the near-zero regime and adds a
+  ladder rung at the certification margin. A
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method draws
+  coverage across the amplitude ladder with the Bradley band shaded.
+  Simulation replicates can be parallelized (`parallel`/`ncpus`) with
+  seed-identical results, and the caller’s random-number state is
+  restored on exit. To support the diagnostic,
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  now stores per-group sufficient statistics (sizes, scale SDs, and
+  correlation matrices) in its output; objects created by earlier
+  versions can be assessed by re-supplying the original data via
+  `ssm_ci_accuracy(..., data = )`, which is checked for consistency
+  against the stored profiles.
+
+- The Monte Carlo interval engine (`ssm_analyze(method = "montecarlo")`)
+  is faster on correlation-based analyses: the influence-function
+  covariance is built in one vectorized pass and all profile rows are
+  propagated through the SSM transformation in a single compiled call.
+  Results are unchanged (byte-identical for a fixed seed).
+
+- New
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  function estimates Browne’s (1992) circular stochastic process model
+  for the correlational structure of circumplex scales or items, a
+  native replacement for the archived CircE package. It accepts either
+  raw data or a correlation matrix, estimates item angles and
+  communality indices (with four model variants), and reports the usual
+  covariance-structure fit indices (chi-square, RMSEA with a 90%
+  confidence interval, SRMR, CFI, TLI, AIC, BIC). The returned
+  `circumplex_cpm` object has
+  [`print()`](https://rdrr.io/r/base/print.html) and
+  [`summary()`](https://rdrr.io/r/base/summary.html) methods. On the
+  raw-data path, confidence intervals are estimated by a nonparametric
+  bootstrap by default (resampling rows and refitting the model, with
+  percentile intervals; angle intervals use the package’s circular
+  quantile machinery, so an interval straddling the 0/360 degree
+  boundary is reported wrapped, as with displacement intervals).
+  Resamples that are degenerate or fail the convergence criterion are
+  excluded with a warning and counted in the output. Only the bootstrap
+  consumes R’s random number stream: call
+  [`set.seed()`](https://rdrr.io/r/base/Random.html) immediately before
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  for reproducible intervals (point estimates are deterministic). On the
+  correlation-matrix path, intervals are analytic (Wald) — there is no
+  raw data to resample — and
+  [`summary()`](https://rdrr.io/r/base/summary.html) cautions when the
+  sample size is small enough that these may mis-cover.
+
+- The
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  estimator has been validated against the published CIRCUM/CircE
+  literature (Grassi, Luccio, & Di Blas, 2010, reanalyzing Browne’s 1992
+  vocational-interest example) and against independent OpenMx and lavaan
+  implementations of the same model (both now in Suggests as test
+  oracles only). One documented difference: CIRCUM and CircE fit
+  Browne’s covariance parameterization with free variance scalings, so
+  their finite-sample estimates and chi-square differ slightly from
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)’s
+  correlation-structure fit (same degrees of freedom, asymptotically
+  equivalent); see the package’s design notes for details. A large
+  seeded simulation study measured the coverage of both interval
+  methods: based on its results,
+  [`summary()`](https://rdrr.io/r/base/summary.html) now also cautions
+  about analytic intervals at any sample size below 50,000 when the
+  fitted solution is near a parameter boundary or weakly identified
+  (Heywood case, removed harmonic, very small correlation-function
+  weight, ill-conditioning, or competing near-tied optima — the caution
+  names which), the regime where they measurably mis-covered. Percentile
+  bootstrap intervals were confirmed as the better default but are
+  themselves conservative-liberal in spots (notably for near-boundary
+  correlation-function weights); improving them is planned follow-up
+  work.
+
+- New
+  [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md)
+  function draws standardized observations from a fitted
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  model’s implied correlation matrix, using the model’s exact
+  positive-semidefinite factor representation. It returns a numeric
+  matrix with one column per scale (in fitted order, named), whose
+  population correlation matrix is the fitted `Phat`. Call
+  [`set.seed()`](https://rdrr.io/r/base/Random.html) immediately before
+  it for reproducible draws.
+
+- New [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method
+  for `circumplex_cpm` objects draws the estimated item configuration on
+  the
+  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+  canvas: each scale appears at its estimated angle and at a radius
+  given by its communality, with a wedge spanning its angle and
+  communality confidence intervals where these are estimable (scales
+  with an inestimable interval are drawn as a point only and named).
+
 - New
   [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
   function builds an empty circumplex plotting canvas (amplitude rings,
@@ -12,6 +168,7 @@
   visualization layer; the package’s own
   [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
   draws on the same canvas.
+
 - New
   [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
   and
@@ -23,6 +180,7 @@
   the polar transform (including wrap-around at the 0/360 degree
   boundary) internally. These make it possible to build custom
   circumplex figures by composing ggplot2 layers.
+
 - New
   [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
   provides an angle-labeled x-axis scale for linear circumplex plots
@@ -31,6 +189,7 @@
   `circumplex_instrument`’s scale abbreviations, using the same
   conventions as
   [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md).
+
 - New vignette “Advanced Circumplex Visualization” shows how to build
   custom circumplex figures by composing
   [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
@@ -39,16 +198,19 @@
   and
   [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
   with other ggplot2 components.
+
 - [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
   and
   [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
   now label and place circumplex scales at their exact angles, including
   non-integer angles (for example, the 22.5-degree spacing of a 16-scale
   instrument), instead of rounding them to whole degrees.
+
 - [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
   now warns and names any profile it cannot place on the circle because
   its displacement is undefined (a flat or zero-amplitude profile),
   instead of dropping it from the figure without notice.
+
 - [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
   gains a `method` argument offering a Monte Carlo alternative to the
   bootstrap (`method = "montecarlo"`): SSM parameter replicates are
@@ -62,6 +224,7 @@
   bootstrap remains the default and the recommended choice for small
   samples. [`summary()`](https://rdrr.io/r/base/summary.html) reports
   which method produced the intervals.
+
 - [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
   gains `parallel` and `ncpus` arguments (passed to
   [`boot::boot()`](https://rdrr.io/pkg/boot/man/boot.html)) to
@@ -71,6 +234,7 @@
   [`set.seed()`](https://rdrr.io/r/base/Random.html) are identical
   regardless of these settings, so parallelizing never changes your
   estimates or confidence intervals.
+
 - [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
   is now vectorized internally (one compiled call instead of a row-wise
   loop), making it much faster on large data sets. Results are
@@ -81,6 +245,7 @@
   or non-scalar argument is now an error rather than being silently
   ignored (previously it could yield unlabeled or garbled output
   columns).
+
 - Fixed a bug where a bootstrap resample under pairwise deletion
   (`listwise = FALSE`) could crash
   [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
@@ -89,6 +254,7 @@
   `NA` mean (matching the correlation path), and the affected resample
   is excluded from the confidence intervals as a degenerate profile,
   consistent with the existing degeneracy handling.
+
 - Clarified in the documentation of
   [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
   [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
@@ -98,6 +264,7 @@
   when `angles` are equally spaced; for unequally spaced angles the
   closed-form estimator is not a least-squares fit and the reported fit
   can fall below 0.
+
 - Fixed a bug where the displacement of a group contrast between two
   exactly opposed profiles (a half-turn apart) was reported as `-180`
   degrees instead of `+180`, inconsistent with the documented

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9999</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.3.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,7 @@
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmgirard/circumplex"><span class="fa fa-github fa-lg"></span></a></li>
@@ -193,6 +194,71 @@
 
         </dt>
         <dd>Calculate SSM parameters by row and add results as new columns</dd>
+      </dl></div><div class="section level2">
+      <h2 id="structure-evaluation-functions">Structure Evaluation Functions<a class="anchor" aria-label="anchor" href="#structure-evaluation-functions"></a></h2>
+
+      <div class="section-desc"><p>Functions for evaluating circumplex structure and CI trustworthiness</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="cpm_fit.html">cpm_fit()</a></code>
+
+        </dt>
+        <dd>Fit Browne's circular stochastic process model (circumplex fit statistics)</dd>
+
+        <dt>
+
+          <code><a href="cpm_simulate.html">cpm_simulate()</a></code>
+
+        </dt>
+        <dd>Simulate data from a fitted circular process model</dd>
+
+        <dt>
+
+          <code><a href="print.circumplex_cpm.html">print(<i>&lt;circumplex_cpm&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Print a circular process model fit</dd>
+
+        <dt>
+
+          <code><a href="summary.circumplex_cpm.html">summary(<i>&lt;circumplex_cpm&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summarize a circular process model fit</dd>
+
+        <dt>
+
+          <code><a href="plot.circumplex_cpm.html">plot(<i>&lt;circumplex_cpm&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot a circular process model fit</dd>
+
+        <dt>
+
+          <code><a href="ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>
+
+        </dt>
+        <dd>Assess the accuracy of SSM confidence intervals by simulation</dd>
+
+        <dt>
+
+          <code><a href="summary.circumplex_ci_accuracy.html">summary(<i>&lt;circumplex_ci_accuracy&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Summarize the accuracy of SSM confidence intervals</dd>
+
+        <dt>
+
+          <code><a href="plot.circumplex_ci_accuracy.html">plot(<i>&lt;circumplex_ci_accuracy&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot SSM CI accuracy across the amplitude ladder</dd>
       </dl></div><div class="section level2">
       <h2 id="visualization-layer">Visualization Layer<a class="anchor" aria-label="anchor" href="#visualization-layer"></a></h2>
 

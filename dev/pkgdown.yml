@@ -3,10 +3,11 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   advanced-visualization: advanced-visualization.html
+  evaluating-circumplex-structure: evaluating-circumplex-structure.html
   intermediate-ssm-analysis: intermediate-ssm-analysis.html
   introduction-to-ssm-analysis: introduction-to-ssm-analysis.html
   using-instruments: using-instruments.html
-last_built: 2026-07-04T01:32Z
+last_built: 2026-07-07T17:24Z
 urls:
   reference: http://circumplex.jmgirard.com/reference
   article: http://circumplex.jmgirard.com/articles

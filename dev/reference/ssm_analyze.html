@@ -17,7 +17,7 @@ calculated."><meta property="og:image" content="http://circumplex.jmgirard.com/l
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9999</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.3.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,7 @@ calculated."><meta property="og:image" content="http://circumplex.jmgirard.com/l
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmgirard/circumplex"><span class="fa fa-github fa-lg"></span></a></li>
@@ -244,10 +245,11 @@ conditional on estimability.</p>
     <h2 id="reproducibility">Reproducibility<a class="anchor" aria-label="anchor" href="#reproducibility"></a></h2>
 
 
-<p>This is the only function in the package that consumes R's random number
-stream (<code><a href="ssm_score.html">ssm_score()</a></code>/<code><a href="ssm_parameters.html">ssm_parameters()</a></code> and the tidying functions are
-deterministic). Call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> immediately before <code>ssm_analyze()</code> for
-reproducible confidence intervals:</p><ul><li><p><strong>Bootstrap</strong> (<code>method = "bootstrap"</code>, the default): the
+<p>This function consumes R's random number stream (so do
+<code>cpm_fit(ci_method = "bootstrap")</code>, <code><a href="cpm_simulate.html">cpm_simulate()</a></code>, and
+<code><a href="ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>; <code><a href="ssm_score.html">ssm_score()</a></code>/<code><a href="ssm_parameters.html">ssm_parameters()</a></code> and the tidying
+functions are deterministic). Call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> immediately before
+<code>ssm_analyze()</code> for reproducible confidence intervals:</p><ul><li><p><strong>Bootstrap</strong> (<code>method = "bootstrap"</code>, the default): the
 same seed gives byte-identical <code>results</code>, <em>regardless of</em> the
 <code>parallel</code>/<code>ncpus</code> settings (see their descriptions below), because
 <code><a href="https://rdrr.io/pkg/boot/man/boot.html" class="external-link">boot::boot()</a></code> draws all resample indices from the seed before any
@@ -269,10 +271,15 @@ stable across different <code>boots</code> values, only within a fixed call.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other ssm functions:
+<code><a href="plot.circumplex_ci_accuracy.html">plot.circumplex_ci_accuracy()</a></code>,
+<code><a href="ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>,
 <code><a href="ssm_parameters.html">ssm_parameters()</a></code>,
 <code><a href="ssm_score.html">ssm_score()</a></code>,
 <code><a href="ssm_table.html">ssm_table()</a></code></p>
 <p>Other analysis functions:
+<code><a href="cpm_fit.html">cpm_fit()</a></code>,
+<code><a href="cpm_simulate.html">cpm_simulate()</a></code>,
+<code><a href="ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>,
 <code><a href="ssm_parameters.html">ssm_parameters()</a></code>,
 <code><a href="ssm_score.html">ssm_score()</a></code></p></div>
     </div>
@@ -291,11 +298,11 @@ stable across different <code>boots</code> values, only within a fixed call.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [All]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.917      0.888      0.945</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.351      0.324      0.377</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.252     -0.284     -0.222</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.432      0.403      0.463</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    324.292    320.761    327.913</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.917      0.889      0.946</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.351      0.324      0.378</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.252     -0.281     -0.224</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.432      0.402      0.461</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    324.292    320.751    327.676</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.878                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -309,22 +316,22 @@ stable across different <code>boots</code> values, only within a fixed call.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.202      0.170      0.236</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.062     -0.094     -0.029</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.179      0.145      0.212</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.189      0.156      0.224</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    108.967     99.328    118.683</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.202      0.169      0.237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.062     -0.094     -0.028</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.179      0.145      0.214</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.189      0.155      0.226</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    108.967     99.002    118.680</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.957                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [ASPD]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.124      0.089      0.159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.099     -0.136     -0.064</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.203      0.170      0.241</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.226      0.191      0.265</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    115.927    107.578    124.498</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.124      0.090      0.157</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.099     -0.134     -0.064</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.203      0.168      0.240</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.226      0.190      0.266</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    115.927    107.286    124.541</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.964                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -339,10 +346,10 @@ stable across different <code>boots</code> values, only within a fixed call.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.917      0.889      0.945</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.351      0.325      0.378</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.351      0.323      0.379</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.252     -0.282     -0.223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.432      0.402      0.462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    324.292    320.972    327.838</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.432      0.403      0.463</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    324.292    320.840    327.907</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.878                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
@@ -356,22 +363,22 @@ stable across different <code>boots</code> values, only within a fixed call.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [Female]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.946      0.905      0.983</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.459      0.422      0.498</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.946      0.908      0.983</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.459      0.419      0.497</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.310     -0.353     -0.265</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.554      0.512      0.598</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    325.963    322.060    329.966</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.554      0.509      0.598</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    325.963    322.036    329.958</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.889                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [Male]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.884      0.843      0.928</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.227      0.191      0.263</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.186     -0.224     -0.148</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.294      0.257      0.331</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    320.685    313.438    327.869</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.884      0.843      0.926</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.227      0.194      0.261</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.186     -0.227     -0.149</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.294      0.259      0.331</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    320.685    313.535    327.870</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.824                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -386,33 +393,33 @@ stable across different <code>boots</code> values, only within a fixed call.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [Female]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.946      0.906      0.984</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.459      0.420      0.500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.310     -0.355     -0.267</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.554      0.510      0.599</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    325.963    322.249    329.948</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.946      0.906      0.985</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.459      0.419      0.499</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.310     -0.354     -0.269</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.554      0.509      0.601</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    325.963    322.085    329.738</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.889                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [Male]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.884      0.841      0.925</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.227      0.191      0.261</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.186     -0.225     -0.149</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.294      0.259      0.330</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    320.685    313.516    327.870</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.884      0.843      0.926</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value           0.227      0.190      0.262</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value          -0.186     -0.224     -0.149</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.294      0.255      0.332</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    320.685    313.633    327.912</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.824                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Contrast [Male - Female]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Elevation        -0.062     -0.119     -0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ X-Value          -0.232     -0.284     -0.179</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Y-Value           0.124      0.065      0.181</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Amplitude        -0.261     -0.319     -0.201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Displacement     -5.278    -13.691      2.691</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Elevation        -0.062     -0.117     -0.004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ X-Value          -0.232     -0.285     -0.179</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Y-Value           0.124      0.066      0.180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Amplitude        -0.261     -0.318     -0.200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Displacement     -5.278    -13.287      2.978</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Δ Model Fit        -0.066                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -427,33 +434,33 @@ stable across different <code>boots</code> values, only within a fixed call.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.202      0.168      0.235</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.062     -0.095     -0.027</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.179      0.146      0.212</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.189      0.155      0.223</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    108.967     98.598    118.693</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.202      0.170      0.233</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.062     -0.097     -0.029</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.179      0.145      0.213</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.189      0.154      0.225</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    108.967     99.181    119.113</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.957                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [ASPD]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.124      0.089      0.159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.099     -0.134     -0.063</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.203      0.169      0.237</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.226      0.190      0.263</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    115.927    107.298    124.178</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.124      0.090      0.159</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.099     -0.134     -0.064</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.203      0.165      0.239</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.226      0.189      0.265</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    115.927    107.395    124.309</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.964                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Contrast [ASPD - NARPD]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Elevation        -0.079     -0.114     -0.041</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ X-Value          -0.037     -0.076      0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Y-Value           0.024     -0.011      0.062</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Amplitude         0.037     -0.001      0.076</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Displacement      6.960     -2.979     17.504</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Elevation        -0.079     -0.114     -0.042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ X-Value          -0.037     -0.074      0.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Y-Value           0.024     -0.014      0.061</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Amplitude         0.037     -0.001      0.075</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Displacement      6.960     -3.617     17.108</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Δ Model Fit         0.007                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -468,22 +475,22 @@ stable across different <code>boots</code> values, only within a fixed call.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD: Female]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.172      0.126      0.215</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.080     -0.126     -0.032</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.172      0.128      0.217</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.080     -0.126     -0.034</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.202      0.152      0.249</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.217      0.165      0.267</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    111.669     99.534    122.727</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.217      0.166      0.266</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    111.669     99.779    123.161</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.972                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD: Male]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.244      0.190      0.293</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.029     -0.073      0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.146      0.098      0.189</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.149      0.105      0.192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    101.248     84.172    118.983</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.244      0.192      0.296</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.029     -0.075      0.014</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.146      0.098      0.191</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.149      0.105      0.196</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    101.248     84.330    119.449</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.902                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
@@ -499,33 +506,33 @@ stable across different <code>boots</code> values, only within a fixed call.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD: Female]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.172      0.124      0.217</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.080     -0.126     -0.034</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.202      0.153      0.248</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.217      0.168      0.267</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    111.669     99.706    122.613</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.172      0.128      0.217</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.080     -0.128     -0.038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.202      0.152      0.249</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.217      0.167      0.269</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    111.669    100.674    123.270</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.972                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Profile [NARPD: Male]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.244      0.195      0.299</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.029     -0.075      0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.146      0.099      0.191</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.149      0.103      0.195</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    101.248     83.803    119.596</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Elevation         0.244      0.192      0.296</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X-Value          -0.029     -0.074      0.013</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Y-Value           0.146      0.099      0.192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Amplitude         0.149      0.103      0.196</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Displacement    101.248     85.069    118.602</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Fit         0.902                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Contrast [NARPD: Male - Female]:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  Estimate   Lower CI   Upper CI</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Elevation         0.072      0.007      0.141</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ X-Value           0.051     -0.014      0.116</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Y-Value          -0.056     -0.123      0.011</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Amplitude        -0.068     -0.139      0.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Displacement    -10.421    -31.365     11.597</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Elevation         0.072      0.003      0.140</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ X-Value           0.051     -0.011      0.114</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Y-Value          -0.056     -0.127      0.011</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Amplitude        -0.068     -0.139     -0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Δ Displacement    -10.421    -30.566     10.325</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Δ Model Fit        -0.071                      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

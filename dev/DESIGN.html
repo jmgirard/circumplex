@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.2.0.9999</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.3.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,7 @@
     <li><a class="dropdown-item" href="articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
     <li><a class="dropdown-item" href="articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
+    <li><a class="dropdown-item" href="articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmgirard/circumplex"><span class="fa fa-github fa-lg"></span></a></li>
@@ -132,11 +133,75 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]<
 <td>Equals OLS iff angles are equally spaced around the circle (orthogonal design). For unequal spacing it is the conventional Gurtman estimator, not least-squares; documented, with an OLS option under consideration.</td>
 </tr><tr><td>Degenerate profiles → NA at machine-noise tolerance</td>
 <td>Flat profile (sd ≤ 8·ε·n·max|s|): displacement and fit are NA. Zero amplitude with real variance (pure higher harmonic): displacement NA, fit exactly 0. The tolerance is float-cancellation scale only (~13 orders below real variation) — small real amplitudes are never NA’d; their unreliability is the CI’s job (plus G1 guardrails). C++ returns NAs silently; R warns once (and once with a count for degenerate bootstrap resamples). Exclusion from the confidence intervals is <strong>per parameter, not per replicate</strong>: <code>ssm_replicate_intervals()</code> quantiles each parameter column with <code>na.rm = TRUE</code>, so a degenerate replicate’s undefined displacement (and fit, if flat) is dropped only from that parameter’s CI, which is therefore conditional on estimability; its other, well-defined parameters (elevation/x/y/amplitude) still enter their own CIs undisturbed — dropping the whole replicate row would instead bias those CIs (e.g., pull a near-zero amplitude CI away from 0). Cannot test <code>var == 0</code> exactly: a constant vector of a non-representable value (e.g., 0.1) has var ≈ 2e-34.</td>
-</tr></tbody></table></div>
+</tr></tbody></table><div class="section level3">
+<h3 id="cpm-confidence-intervals-measured-coverage-m4b6-coverage-oracle">CPM confidence intervals: measured coverage (M4/B6 coverage oracle)<a class="anchor" aria-label="anchor" href="#cpm-confidence-intervals-measured-coverage-m4b6-coverage-oracle"></a></h3>
+<p>Recorded 2026-07-07 from <code>devel/m4-coverage-oracle.R</code> (seeded; results in <code>devel/m4-coverage-oracle-results.rds</code> / <code>-analytic.rds</code>): 500 replications per cell, nominal-95% CIs, p = 8 octant truths with ζ = .75 and two β configurations — “boundary” (.45/.35/.15/<strong>.05</strong>, small trailing harmonic) and “interior” (.35/.30/.20/<strong>.15</strong>). Bootstrap cells used 1000 resamples.</p>
+<table style="width:100%;" class="table"><colgroup><col width="14%"><col width="14%"><col width="14%"><col width="14%"><col width="14%"><col width="14%"><col width="14%"></colgroup><thead><tr><th>Cell</th>
+<th>Boot angle</th>
+<th>Boot ζ</th>
+<th>Boot β</th>
+<th>Analytic angle</th>
+<th>Analytic ζ</th>
+<th>Analytic β</th>
+</tr></thead><tbody><tr><td>boundary N=250</td>
+<td>.900</td>
+<td>.820</td>
+<td>.792</td>
+<td>.800</td>
+<td>.851</td>
+<td>.875</td>
+</tr><tr><td>boundary N=500</td>
+<td>.906</td>
+<td>.884</td>
+<td>.767</td>
+<td>.801</td>
+<td>.904</td>
+<td>.849</td>
+</tr><tr><td>boundary N=1000</td>
+<td>.931</td>
+<td>.920</td>
+<td>.771</td>
+<td>.764</td>
+<td>.909</td>
+<td>.876</td>
+</tr><tr><td>interior N=250</td>
+<td>.934</td>
+<td>.758</td>
+<td>.894</td>
+<td>.821</td>
+<td>.782</td>
+<td>.922</td>
+</tr><tr><td>interior N=500</td>
+<td>.940</td>
+<td>.870</td>
+<td>.882</td>
+<td>.869</td>
+<td>.902</td>
+<td>.922</td>
+</tr><tr><td>interior N=1000</td>
+<td>.949</td>
+<td>.936</td>
+<td>.881</td>
+<td>.876</td>
+<td>.948</td>
+<td>.944</td>
+</tr></tbody></table><p>Analytic-only ladder: interior truths reach the [.90, .98] band at <strong>N = 2000</strong> and stay; boundary truths stay badly outside it through <strong>N = 20000</strong> (angle .70–.81) and recover only by <strong>N = 50000</strong> (.934) — matching the A-review F1 finding. What this record decides:</p>
+<ul><li>
+<strong>Bootstrap default affirmed, with a documented failure.</strong> The bootstrap dominates the analytic method for angles everywhere (.90–.95 vs .76–.88; analytic angle coverage does not improve 250→1000 at boundary truths) and for ζ at N ≥ 500. But the design’s acceptance band ([.90, .98] for the default at every N/parameter) <strong>fails</strong>: ζ under-covers at N ≤ 500 (down to .758, misses one-sided above truth — ζ̂’s boundary bias, which percentile intervals inherit), and β under-covers at boundary truths at every N (~.77, flat in N — the classic percentile-bootstrap failure for a parameter near its boundary, structural rather than small-sample). The BCa/alternative-interval follow-up is recorded in ROADMAP (post-M4 note).</li>
+<li>
+<strong><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> caution calibrated</strong> (constants in R/cpm_fit.R): unconditional below N = 2000; between 2000 and 50000 conditional on the fit’s own boundary/weak-identification markers (Heywood, removed harmonics, min β̂ &lt; .10, Hessian condition &gt; 1e8 — the markers that separated the two regimes above — plus the multimodality flag, not separately measured but the same regime), with the fired markers named in the caution text.</li>
+<li>
+<strong>T = n·F̂ is not χ²_df at these truths at field N</strong>: seeded KS rejects in 5 of 6 cells (only interior N=1000 passes, p = .255), tracking the Heywood rates (.21–.91 across cells; boundary pile-up makes T a mixture). At a well-identified non-octant truth at N = 2000 the KS check passes (test-cpm_oracles.R) — this is a boundary-regime effect, not a broken statistic, but χ²/RMSEA on octant instruments at field N should be read accordingly (W1 vignette material).</li>
+<li>
+<strong>Heywood solutions are the norm, not the exception, at field N</strong> for octant-like truths at ζ = .75: 59–91% of fits at N ≤ 500 contain at least one ζ̂ &gt; .995 (driven by the weakly identified alternating/Nyquist mode of equally spaced grids interacting with β₀).</li>
+<li>Replicate exclusions were small (used 411–494 of 500 per cell; acceptance criterion; zero worker errors) and are counted in the RDS.</li>
+<li>Measurement caveats, checked: the recorded run scored circular-CI membership with an estimate-anchored rule that could in principle mis-score intervals whose endpoints sit &gt; 180° from the point estimate; re-running the most-affected cell (boundary N=250, Heywood rate .79) under the anchor-free span rule reproduced every coverage number to all printed decimals, so the table is insensitive to the rule. The boundary-cell β coverage is not a polish artifact: fit-level polish rates were ≤ .04 (boundary N=250) and 0.00 elsewhere, so the flat ~.77 reflects percentile intervals at a near-boundary β truth, not degenerate zero-width intervals from removed harmonics.</li>
+</ul></div>
+</div>
 <div class="section level2">
 <h2 id="reproducibility">Reproducibility<a class="anchor" aria-label="anchor" href="#reproducibility"></a></h2>
 <p><strong>RNG contract (an invariant, not an inventory):</strong> a function consumes R’s global RNG stream <strong>iff its statistical output is stochastic</strong> (resampling or simulation). Every such entry point documents that fact and follows the <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code>-immediately-before convention; everything else — including internal conveniences such as optimizer multi-starts, jitter, or tie-breaking — must be deterministic and leave <code>.Random.seed</code> untouched. (Restated 2026-07-03 from the earlier “<code><a href="reference/ssm_analyze.html">ssm_analyze()</a></code> is the only entry point that consumes the RNG stream,” which froze the then-true inventory instead of stating the rule that produced it.)</p>
-<p>RNG-consuming entry points, currently one (<code><a href="reference/ssm_score.html">ssm_score()</a></code>, <code><a href="reference/ssm_parameters.html">ssm_parameters()</a></code>, and the tidying functions are deterministic; M4 is designed to add <code>cpm_fit(ci_method = "bootstrap")</code> and <code>cpm_simulate()</code> to this list, and its default path is required to be RNG-silent — see devel/m4-browne-design.md §3.5/§8):</p>
+<p>RNG-consuming entry points, now four (<code><a href="reference/ssm_score.html">ssm_score()</a></code>, <code><a href="reference/ssm_parameters.html">ssm_parameters()</a></code>, and the tidying functions are deterministic): <code><a href="reference/ssm_analyze.html">ssm_analyze()</a></code>, <code>cpm_fit(ci_method = "bootstrap")</code>, <code><a href="reference/cpm_simulate.html">cpm_simulate()</a></code>, and <code><a href="reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code> (the latter three landed in M4 — see devel/m4-browne-design.md §3.5/§8 and devel/m4-ci-accuracy-spec.md §3).</p>
 <ul><li>
 <strong><code><a href="reference/ssm_analyze.html">ssm_analyze()</a></code></strong> — call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> immediately before it to get reproducible confidence intervals. What that reproducibility covers, per engine:</li>
 </ul><table class="table"><colgroup><col width="33%"><col width="33%"><col width="33%"></colgroup><thead><tr><th>Engine</th>
@@ -152,7 +217,13 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]<
 </tr><tr><td>Monte Carlo (<code>method = "montecarlo"</code>)</td>
 <td>Same seed -&gt; byte-identical <code>results</code>.</td>
 <td>One <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code> block per group, consumed via <code>mvn_draws()</code> in <code>group_ids</code> sort order — see the data-flow diagram. For correlation-based analyses, one group’s block covers <em>all</em> of its measures jointly (a single draw from the stacked measure-scale correlation vector, then sliced per measure), not one block per measure. Adding a group, a measure, or reordering <code>scales</code>/<code>measures</code> changes the draw sequence, so results are seed-reproducible for a <em>fixed</em> call but not stable across such structural edits (expected: the RNG stream is being asked a different question, not violated).</td>
-</tr></tbody></table><p>What reproducibility does <strong>not</strong> mean:</p>
+</tr></tbody></table><ul><li>
+<strong><code>cpm_fit(ci_method = "bootstrap")</code></strong> — call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> immediately before it for reproducible bootstrap intervals. All point estimates, fit indices, and the correlation-matrix path’s analytic (Wald) intervals are deterministic and never touch the stream; only the raw-data path’s bootstrap does. As with <code><a href="reference/ssm_analyze.html">ssm_analyze()</a></code>’s bootstrap engine, all resample indices are drawn from the master stream in one block before any refitting, so a given seed yields the same intervals regardless of how many replicates are later excluded as degenerate or non-convergent.</li>
+<li>
+<strong><code><a href="reference/cpm_simulate.html">cpm_simulate()</a></code></strong> — consumes the stream directly (not via <code><a href="https://rdrr.io/pkg/boot/man/boot.html" class="external-link">boot::boot()</a></code>): draws the common-factor scores, then the unique deviates, in that fixed order, so a given seed reproduces the draw exactly. The fit it simulates from is itself deterministic.</li>
+<li>
+<strong><code><a href="reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code></strong> — call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> immediately before it. It draws one <code><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int()</a></code> value from the caller’s stream to seed an internal L’Ecuyer-CMRG generator, gives every simulated (condition × replicate) dataset its own deterministic substream via <code>nextRNGStream()</code>, and restores the caller’s <code>.Random.seed</code> and RNG kind on exit — so results for a given seed are identical regardless of <code>parallel</code>/<code>ncpus</code>, and the caller’s stream is left advanced by exactly that one <code><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int()</a></code> draw.</li>
+</ul><p>What reproducibility does <strong>not</strong> mean:</p>
 <ul><li>
 <strong>Cross-engine agreement.</strong> Bootstrap and Monte Carlo draw from the RNG stream in unrelated ways (resample indices vs. MVN deviates); the same seed gives each engine internally-reproducible but mutually unrelated draws. Statistical agreement <em>between</em> engines is a separate, validated property (see the Monte Carlo log entry in MILESTONES.md) — not an RNG-identity one.</li>
 <li>
@@ -197,7 +268,7 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]<
 </ul></div>
 <div class="section level2">
 <h2 id="dependency-policy">Dependency policy<a class="anchor" aria-label="anchor" href="#dependency-policy"></a></h2>
-<p>Imports kept minimal (boot, ggplot2, ggforce, htmlTable, Rcpp, rlang, stats). Heavier or optional functionality goes to Suggests with graceful degradation (ggrepel, kableExtra; lavaan planned for M4). No tidyverse in package code.</p>
+<p>Imports kept minimal (boot, ggplot2, ggforce, htmlTable, Rcpp, rlang, stats). Heavier or optional functionality goes to Suggests with graceful degradation (ggrepel, kableExtra). OpenMx and lavaan are in Suggests as <strong>test oracles only</strong> (cross-implementation checks in test-cpm_oracles.R, skipped when not installed) — never as runtime paths. No tidyverse in package code.</p>
 </div>
 <div class="section level2">
 <h2 id="testing-strategy">Testing strategy<a class="anchor" aria-label="anchor" href="#testing-strategy"></a></h2>
@@ -205,6 +276,7 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]<
 <li>vdiffr snapshots for plots; snapshot tests for print methods.</li>
 <li>C++ helpers are tested against base-R equivalents (colMeans, cor pairwise).</li>
 <li>Boundary suite (0°/360°, ±180° contrasts, flat profiles) — being expanded under ROADMAP M1; required for any estimation change.</li>
+<li>CPM validation battery (M4/B6, test-cpm_oracles.R + helper-cpm-oracles.R): published CIRCUM/CircE oracles transcribed from Grassi et al. (2010) with the model-difference triage documented in devel/m4-browne-design.md §11; OpenMx/lavaan cross-implementation oracles (Suggests, skip-if-absent); sampling-consistency and T-calibration simulation checks (skip-on-CRAN); the heavy coverage oracle lives in devel/m4-coverage-oracle.R and is run by /statistical-validation, never by R CMD check.</li>
 </ul></div>
 </div>
 

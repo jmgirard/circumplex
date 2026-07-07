@@ -238,6 +238,28 @@ Functions for implementing the Structural Summary Method
 - [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
   : Calculate SSM parameters by row and add results as new columns
 
+## Structure Evaluation Functions
+
+Functions for evaluating circumplex structure and CI trustworthiness
+
+- [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  : Fit Browne's circular stochastic process model (circumplex fit
+  statistics)
+- [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md)
+  : Simulate data from a fitted circular process model
+- [`print(`*`<circumplex_cpm>`*`)`](http://circumplex.jmgirard.com/dev/reference/print.circumplex_cpm.md)
+  : Print a circular process model fit
+- [`summary(`*`<circumplex_cpm>`*`)`](http://circumplex.jmgirard.com/dev/reference/summary.circumplex_cpm.md)
+  : Summarize a circular process model fit
+- [`plot(`*`<circumplex_cpm>`*`)`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_cpm.md)
+  : Plot a circular process model fit
+- [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+  : Assess the accuracy of SSM confidence intervals by simulation
+- [`summary(`*`<circumplex_ci_accuracy>`*`)`](http://circumplex.jmgirard.com/dev/reference/summary.circumplex_ci_accuracy.md)
+  : Summarize the accuracy of SSM confidence intervals
+- [`plot(`*`<circumplex_ci_accuracy>`*`)`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_ci_accuracy.md)
+  : Plot SSM CI accuracy across the amplitude ladder
+
 ## Visualization Layer
 
 Composable ggplot2 components for building circumplex figures
@@ -286,6 +308,8 @@ Functions that make your life easier
 
 - [Advanced Circumplex
   Visualization](http://circumplex.jmgirard.com/dev/articles/advanced-visualization.md):
+- [Evaluating Circumplex
+  Structure](http://circumplex.jmgirard.com/dev/articles/evaluating-circumplex-structure.md):
 - [Intermediate SSM
   Analysis](http://circumplex.jmgirard.com/dev/articles/intermediate-ssm-analysis.md):
 - [Introduction to SSM

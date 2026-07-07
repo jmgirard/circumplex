@@ -54,12 +54,17 @@ the SSM parameters (calculated rowwise).
 ## See also
 
 Other ssm functions:
+[`plot.circumplex_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_ci_accuracy.md),
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
+[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
 [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
 [`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md)
 
 Other analysis functions:
+[`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md),
+[`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md),
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
+[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
 [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md)
 
 ## Examples

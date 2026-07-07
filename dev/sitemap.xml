@@ -10,6 +10,7 @@
 <url><loc>http://circumplex.jmgirard.com/dev/ROADMAP.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/SUPPORT.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/advanced-visualization.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/articles/evaluating-circumplex-structure.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/index.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/intermediate-ssm-analysis.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/introduction-to-ssm-analysis.html</loc></url>
@@ -22,6 +23,8 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/aw2009.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/cais.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/circumplex-package.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/cpm_fit.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/cpm_simulate.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csie.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csig.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/csip.html</loc></url>
@@ -49,7 +52,10 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/norm_standardize.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/norms.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/octants.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/plot.circumplex_ci_accuracy.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/plot.circumplex_cpm.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/poles.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/print.circumplex_cpm.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/quadrants.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/raw_iipsc.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.html</loc></url>
@@ -57,11 +63,14 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/score.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/self_standardize.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_analyze.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_parameters.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_score.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_table.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/summary.circumplex_ci_accuracy.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/summary.circumplex_cpm.html</loc></url>
 </urlset>
 
