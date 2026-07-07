@@ -525,6 +525,18 @@ test_that("print and summary render as expected", {
   expect_snapshot(summary(fit))
 })
 
+test_that("the largest-residual tie-break is platform-deterministic", {
+  # misfit_octant_P()'s symmetric v %o% v pattern ties four pairs at the
+  # largest |residual| (PA-HI, BC-JK, DE-LM, FG-NO, equal to ~1e-16), so the
+  # old which.max() reported a BLAS/platform-dependent pair (the cause of a
+  # cross-platform snapshot failure). The reporting now takes the first in
+  # column-major order, PA-HI, on every platform.
+  fit <- cpm_fit(cormat = misfit_octant_P(), scales = oct_labels(),
+                 angles = oct_angles(), n = 300)
+  out <- paste(capture.output(summary(fit)), collapse = "\n")
+  expect_match(out, "Largest absolute residual: 0.046 \\(PA – HI\\)")
+})
+
 test_that("summary()'s analytic-CI caution follows the coverage-oracle calibration", {
   # Calibrated by devel/m4-coverage-oracle.R (M4/B6; DESIGN.md): analytic CIs
   # mis-covered for every studied truth below N = 2000; between 2000 and

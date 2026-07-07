@@ -58,6 +58,16 @@ verified below per test.
 **Verdict: SOUND — needs citation only (plus one naming nit and one
 denominator caveat).**
 
+> **ADDENDUM 2026-07-07 (M4.5/T2): the h²-vs-prose ruling below is
+> overturned.** The T2 sanity gate reproduced A&R's own simulation design and
+> found their published .10/.15 cutoffs attach to the CV of *vector lengths*
+> (the prose), not the CV of communalities (Eq. 6 as printed) — CV(h²) lands
+> at roughly double the published values. The shipped `structure_fisher()`
+> computes CV(√h²). Do **not** follow the "do not 'fix' it to match the
+> prose" instruction below; see devel/ar2004-transcription.md ("Empirical
+> adjudications"). The rest of this section (thresholds' source, naming nit,
+> denominator caveat, rotation invariance) stands.
+
 - A&R Eq. 6: Fisher Test = σ(X_v)/mean(X_v) with X_v = Σ_f φ_fv² (the two-factor
   communality). Draft computes `radius <- λ1² + λ2²; sd(radius)/mean(radius)` —
   **exactly Eq. 6**. Note A&R's *prose* describes SD of vector lengths (√h²)

@@ -210,9 +210,10 @@ intended simulation engine.
 
 ## Milestone 4.5 — Structure tests (Acton & Revelle, 2004)
 
-**Status: queued** (split from M4 on 2026-07-07; opens as the active
-milestone when M4's vignette/ship tasks close; folds into v2.0.0). Revive and
-modernize the drafts in `devel/fit_analysis.R` / `devel/fit_oop.R`.
+**Status: GitHub-complete 2026-07-07** (split from M4 and promoted the same
+day on M4's close; folds into v2.0.0; archived to MILESTONES-ARCHIVE.md with
+its full T1–T8 log). Revived and modernized the drafts in
+`devel/fit_analysis.R` / `devel/fit_oop.R`.
 
 A Fable method-review of those drafts (2026-07-03; full report in
 `devel/fit-drafts-method-review.md`) found they are **mostly a rework, not a
@@ -241,11 +242,37 @@ dependencies for the fit statistics: zero**.
   `circumplex_ssm` conventions; pkgdown reference section.
 - Extend the "Evaluating Circumplex Structure" vignette (written in M4 for
   the CPM/CI-trustworthiness content) with the structure-test section.
+- Future intention (out of the active task list, surfaced by T2's review):
+  calibrate structure-test cutoffs for non-octant scale counts (nv = 4
+  poles/quadrants, nv = 16 instruments) — the derivation script is
+  nv-generic, and the package constant is already keyed by nv so uncalibrated
+  counts fail the lookup rather than borrowing nv = 8 cutoffs.
+- Future intention (surfaced by T7's scoping): a correlation-matrix input
+  path for `fit_structure()` (CircE-style, as `cpm_fit(cormat = )` offers),
+  for users who have only a published correlation matrix. Data-only for now;
+  the factor-analytic criteria and RANDALL need only the correlations, but
+  deviation scoring needs the raw observations, so a cormat path would be
+  raw-scoring only.
+- Follow-ups deferred from the M4.5 close-review (`/code-review max`,
+  2026-07-07; the 6 fix-now findings already landed — see the archived M4.5
+  log). For the v2.0.0 train: (#4) `structure_rt()`'s degeneracy guard is on a
+  loadings⁴ scale, so it voids a valid but weak circumplex where VT/Fisher stay
+  defined — make the guard scale-invariant/consistent across the four tests;
+  (#5) missingness is silently pairwise-deleted before the complete-data
+  cutoffs are applied, with no `listwise` control or warning — decide a
+  missing-data policy; (#13) `fit_structure()` at nv ≥ 10 without `n_perm`
+  errors only after computing the four criteria, discarding them — validate
+  up front or return the criteria with RANDALL marked unavailable. Test/quality
+  hardening: assert the `almost < thrice < twice` cutoff ordering end-to-end
+  (script `stopifnot` + a test over `structure_cutoffs`); a marginal-circumplex
+  MC-p reproducibility test that isn't pinned at the add-one floor; an
+  exact-path `.Random.seed`-not-created test; the `data[scales]` matrix-misindex
+  in the two internal helpers; and DRY the duplicated angle/communality
+  geometry (summary/plot) and the double `cor(scored)`.
 
-The detailed task list with acceptance criteria (T1–T7 + the vignette
-extension) is parked verbatim in MILESTONES.md under the queued-milestone
-heading and becomes the active task list when M4.5 opens — milestone-level
-status only here, per this file's contract.
+The detailed task list with acceptance criteria (T1–T8) and its full running
+log are archived in MILESTONES-ARCHIVE.md — milestone-level status only here,
+per this file's contract.
 
 Post-M4 (agreed with Jeff, 2026-07-06): draft a publication-grade simulation
 study design as a devel/ brief (Fable-tier design task) extending the B6
@@ -259,8 +286,11 @@ intended simulation engine.
 
 ## Milestone 5 — SEM-based SSM
 
-**Status: planned.** Builds on the lavaan explorations in `devel/lavaan_ssm.Rmd`
-and `devel/circum_lavaan.Rmd`.
+**Status: active** (promoted 2026-07-07 on M4.5's close; folds into v2.0.0).
+Builds on the lavaan explorations in `devel/lavaan_ssm.Rmd` and
+`devel/circum_lavaan.Rmd`; the statistical design questions are scoped in
+`devel/m5-m6-design-questions.md` (Brief E §M5). The detailed task list with
+acceptance criteria (T1–T5) is the active list in MILESTONES.md.
 
 - Latent-variable SSM: estimate SSM parameters from a lavaan measurement
       model (disattenuated correlations), with delta-method or bootstrap CIs.

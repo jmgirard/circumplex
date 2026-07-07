@@ -1,3 +1,13 @@
+# SUPERSEDED (2026-07-07, M4.5): do not port statistics or thresholds from
+# this draft. The shared infrastructure and the Fisher/Gap/VT/RT statistics
+# now live in R/fit_structure.R, implemented against the adjudicated readings
+# in devel/ar2004-transcription.md; this file retains every bug catalogued in
+# devel/fit-drafts-method-review.md (ridge applied to the data matrix, no
+# wrap-around gap, sign*acos angles, the x[0] indexing no-op, quarter-period
+# rotation grids, thresholds attached to the wrong Fisher scale and to the
+# wrong nv). It stays only as the reference for T6 (fit_randall's
+# correspondence-index machinery) and as the historical draft record.
+
 # Class fit --------------------------------------------------------------------
 
 # Constructor function

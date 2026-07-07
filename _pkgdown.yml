@@ -49,6 +49,10 @@ reference:
   - print.circumplex_cpm
   - summary.circumplex_cpm
   - plot.circumplex_cpm
+  - fit_structure
+  - print.circumplex_structure
+  - summary.circumplex_structure
+  - plot.circumplex_structure
   - ssm_ci_accuracy
   - summary.circumplex_ci_accuracy
   - plot.circumplex_ci_accuracy
