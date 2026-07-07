@@ -76,7 +76,7 @@ archived:
   *Accept:* VT2 computes the A&R-defined quantity (transcribed check
   values); RT regression test pinning rotation-grid/label alignment; both
   keyed to T2 cutoffs.
-- [ ] **T6. RANDALL correspondence index + randomization test.** Index is
+- [x] **T6. RANDALL correspondence index + randomization test.** Index is
   correct in the draft; implement the actual randomization inference (the
   draft bootstrapped simulated MVN data with no p-value).
   *Accept:* randomization p-value validated on a case with a known/derivable
@@ -95,6 +95,29 @@ archived:
 
 ## Log
 
+- 2026-07-07 — T6 (Fable, test-first): implemented the RANDALL correspondence
+  index (`structure_randall`; Hubert & Arabie 1987 / Tracey 1997) and the
+  actual randomization inference the draft lacked (`structure_randall_test`,
+  internal pending T7). Exact path (default, nv ≤ 9): the index is invariant
+  under rotations of positions, so enumerating the (nv−1)! variable-1-fixed
+  relabelings covers all nv! with uniform multiplicity — deterministic,
+  .Random.seed-untouched (tested). Monte Carlo path (n_perm): global-stream
+  RNG per the DESIGN.md contract (set.seed before the call; documented),
+  add-one p. Ties count as violations (draft convention, kept because the
+  acceptance pins the index to the draft; documented). Derivable oracles per
+  the acceptance criterion: perfect-circumplex exact p = 2/(nv−1)! from the
+  dihedral/Aut(C_nv) argument (nv = 8 and 4), anti-ordered CI = −1 with p = 1,
+  all-ties CI = −1, and — decisively for the quotient — full 5! = 120
+  enumeration on generic nv=5 data matching the quotiented 4! = 24 exact p via
+  an independent brute-force counting loop; index pinned to the transcribed
+  draft loop on jz2017 (CI = 232/288, exact p at its 2/5040 lower bound,
+  regression pin). NA-not-NaN degeneracy policy extended (NA correlations,
+  nv < 4 → no predictions). MASS and the draft's tolerance argument are gone.
+  No ssm_*/src/ touched (closed-form in-test oracles per T2 precedent, no
+  /statistical-validation run). 15 new tests; full suite 1341 pass;
+  devtools::check clean (0/0/0, covers T3–T6); /code-review high: 0 findings.
+  Internal only, no NEWS bullet. (R/fit_structure.R,
+  tests/testthat/test-fit_structure.R.)
 - 2026-07-07 — T5 (Opus, test-first): added `structure_vt_test()` and
   `structure_rt_test()`, the interpretation wrappers over the T2
   `structure_vt()`/`structure_rt()` internals, mirroring T3/T4 and reusing

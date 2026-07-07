@@ -425,3 +425,196 @@ test_that("structure_rt_test validates the declared scoring", {
   data("jz2017")
   expect_error(structure_rt_test(jz2017, octants_jz, scoring = "ipsative"))
 })
+
+# RANDALL correspondence index + randomization test (T6) -----------------------
+# Unlike the four A&R criteria there are no simulated cutoffs here: the
+# randomization test yields an exact (or Monte Carlo) p-value against the
+# random-relabeling null, which is why A&R excluded RANDALL from their
+# simulation (footnote 3). Oracles below are the draft's verified counting
+# loop (index) and closed forms derived from the dihedral symmetry of the
+# circle (p-values) -- nothing enters from memory.
+
+# A data frame of nv scales whose *sample* correlations are exactly
+# cos(angular difference): x_k = cos(a_k) f1 + sin(a_k) f2 with f1, f2
+# exactly uncorrelated, equal-variance columns. Correlations then decrease
+# strictly in circular distance -- a perfect circumplex.
+perfect_circumplex_df <- function(nv) {
+  f1 <- c(1, -1, 1, -1)
+  f2 <- c(1, 1, -1, -1)
+  ang <- (seq_len(nv) - 1) * 2 * pi / nv
+  dat <- as.data.frame(lapply(ang, function(a) cos(a) * f1 + sin(a) * f2))
+  names(dat) <- paste0("V", seq_len(nv))
+  dat
+}
+
+test_that("structure_randall matches the draft's counting loop on jz2017", {
+  data("jz2017")
+  r <- stats::cor(as.matrix(jz2017[octants_jz]))
+  # Independent oracle: the draft's counting machinery (devel/fit_analysis.R),
+  # transcribed verbatim. Method-review §5 verified it computes the Hubert &
+  # Arabie correspondence index with ties counted as violations.
+  n_away <- function(a, b, nv) {
+    s <- rep(1:nv, 2)
+    min(abs(outer(which(s == a), which(s == b), "-")))
+  }
+  m <- matrix(NA, 8, 8)
+  for (i in 1:8) for (j in 1:8) m[i, j] <- n_away(i, j, 8)
+  hyp <- m[lower.tri(m)]
+  vals <- r[lower.tri(r)]
+  nc <- 0
+  nt <- 0
+  for (i in seq_along(vals)) {
+    lr <- hyp > hyp[i]
+    nc <- nc + sum(vals[i] > vals[lr])
+    nt <- nt + sum(lr)
+  }
+  expect_equal(structure_randall(r), (nc / nt) - ((nt - nc) / nt))
+  # nv = 8 has 288 order predictions (pairs of pair-slots with unequal
+  # circular distance: 8/8/8/4 slots at distances 1-4).
+  expect_identical(nt, 288)
+})
+
+test_that("structure_randall closed forms: perfect, anti-ordered, and tied matrices", {
+  ang <- (0:7) * 2 * pi / 8
+  # Perfect circumplex: correlations strictly decrease in circular distance,
+  # so every prediction is correct.
+  r_perf <- cos(outer(ang, ang, "-"))
+  expect_equal(structure_randall(r_perf), 1)
+  # Anti-ordered: correlations strictly *increase* in circular distance, so
+  # every prediction is violated. (The index only reads the lower triangle,
+  # so the -1 diagonal of -r_perf is immaterial.)
+  expect_equal(structure_randall(-r_perf), -1)
+  # Constant off-diagonal: every prediction is a tie, and ties count as
+  # violations (the draft's convention, measure-zero for continuous data).
+  r_tied <- matrix(0.5, 8, 8)
+  diag(r_tied) <- 1
+  expect_equal(structure_randall(r_tied), -1)
+  # NA correlations (e.g. no jointly observed rows) give NA, never NaN.
+  r_na <- r_tied
+  r_na[2, 1] <- r_na[1, 2] <- NA
+  expect_identical(structure_randall(r_na), NA_real_)
+  # Fewer than 4 variables have no unequal-distance pairs, hence no
+  # predictions: NA, not NaN.
+  expect_identical(structure_randall(diag(3)), NA_real_)
+})
+
+test_that("structure_randall_test exact p equals the dihedral closed form", {
+  # For a perfect circumplex the index is 1, and (by strict monotonicity in
+  # distance) a relabeling reaches 1 iff it preserves every circular-distance
+  # class; class-preserving relabelings of a cycle are exactly its graph
+  # automorphisms, the dihedral group. With variable 1 held at position 1 the
+  # enumeration quotients out rotations, leaving {identity, reflection through
+  # position 1}: exact p = 2 / (nv - 1)!.
+  dat8 <- perfect_circumplex_df(8)
+  res8 <- structure_randall_test(dat8, names(dat8))
+  expect_equal(res8$statistic, 1)
+  expect_equal(res8$p_value, 2 / factorial(7))
+  expect_identical(res8$method, "exact")
+  expect_identical(res8$nv, 8L)
+  # Same closed form at nv = 4 (6 relabelings, hand-checkable).
+  dat4 <- perfect_circumplex_df(4)
+  res4 <- structure_randall_test(dat4, names(dat4))
+  expect_equal(res4$statistic, 1)
+  expect_equal(res4$p_value, 2 / factorial(3))
+  # Anti-ordered data (reverse the hypothesized order... flipping the sign of
+  # every correlation at odd distance is not constructible from data, so use
+  # the tied-matrix route instead): constant scales are degenerate, so instead
+  # check the always-true lower bound: dihedral relabelings preserve the index
+  # for ANY matrix (they permute values only within distance classes), so the
+  # exact p can never fall below 2 / (nv - 1)!.
+  data("jz2017")
+  res_jz <- structure_randall_test(jz2017, octants_jz)
+  expect_gte(res_jz$p_value, 2 / factorial(7))
+})
+
+test_that("structure_randall_test on jz2017 pins the index and exact p", {
+  data("jz2017")
+  res <- structure_randall_test(jz2017, octants_jz)
+  # Index: 260 of 288 order predictions correct -> (260 - 28)/288.
+  expect_equal(res$statistic, (260 - 28) / 288)
+  # Regression pin (first derivation run, 2026-07-07): the observed index is
+  # high enough that only the two dihedral relabelings that always reproduce
+  # it reach it, so the exact p sits at its lower bound.
+  expect_equal(res$p_value, 2 / factorial(7))
+})
+
+test_that("exact p from the rotation quotient equals full nv! enumeration", {
+  # The exact path enumerates only the (nv-1)! relabelings with variable 1
+  # held at position 1, claiming rotations of positions preserve the index
+  # with uniform multiplicity. Validate that claim wholesale on generic
+  # (fixed, unstructured) data at nv = 5 against an independent brute force
+  # over ALL 5! = 120 relabelings, using the draft-style counting loop rather
+  # than the package's prediction machinery.
+  dat <- data.frame(
+    a = c(2, 5, 1, 4, 3, 6),
+    b = c(4, 1, 3, 5, 6, 2),
+    c = c(1, 3, 6, 2, 4, 5),
+    d = c(5, 6, 2, 3, 1, 4),
+    e = c(3, 2, 4, 6, 5, 1)
+  )
+  res <- structure_randall_test(dat, names(dat))
+  expect_identical(res$n_perm, 24L)
+
+  r <- stats::cor(as.matrix(dat))
+  d5 <- outer(1:5, 1:5, function(i, j) pmin(abs(i - j), 5 - abs(i - j)))
+  hyp <- d5[lower.tri(d5)]
+  brute_index <- function(rp) {
+    vals <- rp[lower.tri(rp)]
+    nc <- 0
+    nt <- 0
+    for (i in seq_along(vals)) {
+      lr <- hyp > hyp[i]
+      nc <- nc + sum(vals[i] > vals[lr])
+      nt <- nt + sum(lr)
+    }
+    (nc / nt) - ((nt - nc) / nt)
+  }
+  perms <- rbind(
+    cbind(1L, all_perms(2:5)), cbind(2L, all_perms(c(1L, 3:5))),
+    cbind(3L, all_perms(c(1:2, 4:5))), cbind(4L, all_perms(c(1:3, 5L))),
+    cbind(5L, all_perms(1:4))
+  )
+  ci_full <- vapply(
+    seq_len(nrow(perms)),
+    function(k) brute_index(r[perms[k, ], perms[k, ]]),
+    numeric(1)
+  )
+  expect_identical(nrow(perms), 120L)
+  expect_equal(res$statistic, brute_index(r))
+  expect_equal(res$p_value, mean(ci_full >= brute_index(r)))
+})
+
+test_that("structure_randall_test Monte Carlo path: add-one p, seed convention", {
+  dat <- perfect_circumplex_df(8)
+  # Monte Carlo p uses the add-one convention (1 + #{CI* >= CI})/(n_perm + 1),
+  # so it can never be zero and is reproducible under a set.seed() call
+  # (global-stream RNG contract, DESIGN.md -- no seed argument).
+  set.seed(20260707)
+  res <- structure_randall_test(dat, names(dat), n_perm = 199)
+  expect_identical(res$method, "monte carlo")
+  expect_identical(res$n_perm, 199L)
+  expect_gte(res$p_value, 1 / 200)
+  expect_lt(res$p_value, 0.05)
+  set.seed(20260707)
+  res2 <- structure_randall_test(dat, names(dat), n_perm = 199)
+  expect_identical(res2$p_value, res$p_value)
+})
+
+test_that("structure_randall_test RNG contract: exact path leaves the stream untouched", {
+  data("jz2017")
+  set.seed(42)
+  seed_before <- .Random.seed
+  invisible(structure_randall_test(jz2017, octants_jz))
+  expect_identical(.Random.seed, seed_before)
+  # The Monte Carlo path consumes the global stream.
+  invisible(structure_randall_test(jz2017, octants_jz, n_perm = 9))
+  expect_false(identical(.Random.seed, seed_before))
+})
+
+test_that("structure_randall_test validates its arguments", {
+  data("jz2017")
+  # RANDALL needs unequal circular distances: at least 4 scales.
+  expect_error(structure_randall_test(jz2017, octants_jz[1:3]))
+  expect_error(structure_randall_test(jz2017, octants_jz, n_perm = 0))
+  expect_error(structure_randall_test(jz2017, octants_jz, n_perm = c(10, 20)))
+})

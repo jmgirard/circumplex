@@ -510,3 +510,151 @@ structure_rt_test <- function(data, scales, scoring = "raw", ridge = 0) {
     loadings = loadings
   )
 }
+
+# RANDALL correspondence index + randomization test ----------------------------
+# Hubert & Arabie's (1987) correspondence index for a hypothesized circular
+# order, as popularized by Tracey's (1997) RANDALL, with the actual
+# randomization inference the draft lacked (it bootstrapped one simulated MVN
+# dataset and produced no p-value; method-review S5). Unlike the four A&R
+# criteria above, RANDALL needs no simulated cutoffs: its null distribution is
+# available by construction, which is why A&R excluded it from their
+# simulation (their footnote 3). It operates on the correlations directly --
+# no factor extraction, no scoring-keyed cutoffs.
+
+# Order predictions for nv variables in hypothesized circular order: each pair
+# of lower-triangle slots (a, b) with circular distance d(a) < d(b) predicts
+# r[a] > r[b]. Returned as parallel index vectors into the lower-triangle
+# correlation vector (column-major, matching r[lower.tri(r)]).
+randall_predictions <- function(nv) {
+  pos <- seq_len(nv)
+  d <- outer(pos, pos, function(i, j) pmin(abs(i - j), nv - abs(i - j)))
+  dv <- d[lower.tri(d)]
+  idx <- which(outer(dv, dv, "<"), arr.ind = TRUE)
+  list(ia = idx[, 1], ib = idx[, 2])
+}
+
+# The correspondence index of a correlation matrix whose variables are in the
+# hypothesized circular order: (agreements - violations) / predictions, i.e.
+# 2 * P(agree) - 1. A tie counts as a violation (the draft's convention,
+# retained because the acceptance criterion pins the index to the draft;
+# measure-zero for continuous data, but it makes an all-tied matrix score -1).
+# No predictions (nv < 4) or NA correlations return NA_real_, never NaN,
+# matching the degeneracy policy above.
+structure_randall <- function(r, pred = randall_predictions(ncol(r))) {
+  vals <- r[lower.tri(r)]
+  if (length(pred$ia) == 0 || anyNA(vals)) {
+    return(NA_real_)
+  }
+  2 * mean(vals[pred$ia] > vals[pred$ib]) - 1
+}
+
+# All permutations of x, one per row (base R; used only for nv <= 9, i.e. at
+# most 8! = 40320 rows).
+all_perms <- function(x) {
+  n <- length(x)
+  if (n == 1L) {
+    return(matrix(x, 1L, 1L))
+  }
+  do.call(rbind, lapply(seq_len(n), function(k) cbind(x[k], all_perms(x[-k]))))
+}
+
+#' RANDALL randomization test of hypothesized circular order
+#'
+#' Internal wrapper computing the Hubert & Arabie (1987) correspondence index
+#' for the hypothesized circular order and its randomization-test p-value
+#' (Tracey, 1997, RANDALL). Not yet exported -- the user-facing fit-statistics
+#' API is a later task; this returns a plain list the API will consume.
+#'
+#' The order of `scales` *is* the hypothesis: the index counts, over every
+#' pair of variable pairs with unequal circular distance, how often the
+#' correlation of the closer pair exceeds that of the farther pair, scaled to
+#' \[-1, 1\] (ties count as violations; measure-zero for continuous data). The
+#' null hypothesis is that the assignment of variables to circular positions
+#' is random; the p-value is the proportion of relabelings whose index reaches
+#' the observed one.
+#'
+#' With `n_perm = NULL` (default) and nv <= 9 the null distribution is
+#' enumerated *exactly*: the index is invariant under rotations of the
+#' positions (circular distances are unchanged), so enumerating the (nv-1)!
+#' relabelings with variable 1 held at position 1 covers all nv! relabelings
+#' with uniform multiplicity. The identity relabeling is included, so the
+#' exact p is always positive; dihedral relabelings preserve the index for any
+#' matrix, so the exact p is never below 2/(nv-1)!. This path is deterministic
+#' and consumes no RNG. For nv > 9 exact enumeration is infeasible and
+#' `n_perm` must be supplied: `n_perm` random relabelings are drawn from the
+#' global RNG stream (set a seed with [set.seed()] beforehand; per the
+#' package's RNG contract there is no seed argument) and the p-value uses the
+#' add-one convention (1 + #\{index* >= index\}) / (n_perm + 1).
+#'
+#' @param data A data frame containing the circumplex scales.
+#' @param scales Variable names or column numbers of the circumplex scales,
+#'   **in the hypothesized circular order**. At least 4 (fewer have no
+#'   unequal-distance pairs, hence no order predictions).
+#' @param n_perm `NULL` for the exact test (nv <= 9), or a single positive
+#'   whole number of Monte Carlo relabelings.
+#' @return A list with the correspondence-index `statistic`, the `test` name,
+#'   number of scales `nv`, the `p_value`, the `method` (`"exact"` or
+#'   `"monte carlo"`), and `n_perm` (relabelings evaluated). All-NA outputs
+#'   (never NaN) if the correlations are incomplete.
+#' @references Hubert, L., & Arabie, P. (1987). Evaluating order hypotheses
+#'   within proximity matrices. \emph{Psychological Bulletin}, 102(1),
+#'   172-178. Tracey, T. J. G. (1997). RANDALL: A Microsoft FORTRAN program
+#'   for a randomization test of hypothesized order relations.
+#'   \emph{Educational and Psychological Measurement}, 57(1), 164-168.
+#' @noRd
+structure_randall_test <- function(data, scales, n_perm = NULL) {
+  stopifnot(is_var(scales))
+  stopifnot(length(scales) >= 4)
+  if (!is.null(n_perm)) {
+    stopifnot(is_num(n_perm, n = 1), n_perm >= 1, n_perm == round(n_perm))
+    n_perm <- as.integer(n_perm)
+  }
+
+  mat <- as.matrix(data[scales])
+  r <- stats::cor(mat, use = "pairwise.complete.obs")
+  nv <- ncol(r)
+  pred <- randall_predictions(nv)
+  observed <- structure_randall(r, pred)
+
+  if (is.na(observed)) {
+    return(list(
+      test = "randall", statistic = NA_real_, nv = nv,
+      p_value = NA_real_, method = NA_character_, n_perm = NA_integer_
+    ))
+  }
+
+  # Index of the matrix relabeled by `perm` (position k holds variable
+  # perm[k]): the lower-triangle value of slot (i, j) is r[perm[i], perm[j]].
+  # Same arithmetic as structure_randall, so the identity relabeling
+  # reproduces `observed` exactly and the >= comparisons below are exact.
+  ii <- row(r)[lower.tri(r)]
+  jj <- col(r)[lower.tri(r)]
+  index_of <- function(perm) {
+    v <- r[cbind(perm[ii], perm[jj])]
+    2 * mean(v[pred$ia] > v[pred$ib]) - 1
+  }
+
+  if (is.null(n_perm)) {
+    if (nv > 9) {
+      stop("exact enumeration is infeasible for more than 9 scales; supply n_perm")
+    }
+    perms <- cbind(1L, all_perms(seq(2L, nv)))
+    null_index <- vapply(
+      seq_len(nrow(perms)), function(k) index_of(perms[k, ]), numeric(1)
+    )
+    p_value <- mean(null_index >= observed)
+    method <- "exact"
+    n_perm <- nrow(perms)
+  } else {
+    null_index <- vapply(
+      seq_len(n_perm), function(k) index_of(sample.int(nv)), numeric(1)
+    )
+    p_value <- (1 + sum(null_index >= observed)) / (n_perm + 1)
+    method <- "monte carlo"
+  }
+
+  list(
+    test = "randall", statistic = observed, nv = nv,
+    p_value = p_value, method = method, n_perm = n_perm
+  )
+}
