@@ -246,6 +246,12 @@ dependencies for the fit statistics: zero**.
   poles/quadrants, nv = 16 instruments) — the derivation script is
   nv-generic, and the package constant is already keyed by nv so uncalibrated
   counts fail the lookup rather than borrowing nv = 8 cutoffs.
+- Future intention (surfaced by T7's scoping): a correlation-matrix input
+  path for `fit_structure()` (CircE-style, as `cpm_fit(cormat = )` offers),
+  for users who have only a published correlation matrix. Data-only for now;
+  the factor-analytic criteria and RANDALL need only the correlations, but
+  deviation scoring needs the raw observations, so a cormat path would be
+  raw-scoring only.
 
 The detailed task list with acceptance criteria (T1–T7 + the vignette
 extension) is parked verbatim in MILESTONES.md under the queued-milestone

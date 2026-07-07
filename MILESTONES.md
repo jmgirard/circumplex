@@ -81,7 +81,7 @@ archived:
   draft bootstrapped simulated MVN data with no p-value).
   *Accept:* randomization p-value validated on a case with a known/derivable
   answer; index matches draft on reference data; seed convention documented.
-- [ ] **T7. Fit-statistics API.** `ssm_fit()`-style user-facing wrapper(s)
+- [x] **T7. Fit-statistics API.** `ssm_fit()`-style user-facing wrapper(s)
   returning a typed object with print/summary/plot (plots on the M3
   extension), consistent with `circumplex_ssm` conventions.
   *Accept:* one coherent entry point documented with runnable examples;
@@ -95,6 +95,31 @@ archived:
 
 ## Log
 
+- 2026-07-07 — T7 (Opus): shipped the user-facing `fit_structure()` entry
+  point and its `circumplex_structure` object (print/summary/plot), the one
+  coherent API over all five A&R tests. Maintainer decisions (AskUserQuestion):
+  name `fit_structure()`; deviation scoring is the default (row-mean-center =
+  ipsatize) with a `scoring = "raw"` opt-out; plot in scope. Grounded the
+  default against the T2 derivation — the deviation cutoffs were calibrated on
+  `paf2(cor(x - rowMeans(x)))` at **ridge 0**, so the deviation path ipsatizes
+  at ridge 0 (not the 0.1 the T1 repair test used), verified by a
+  statistic-parity test. One scoring decision applies to all five tests
+  (RANDALL included). Uncalibrated nv reports statistics but withholds
+  interpretation (dash + plain-language note); RANDALL still runs at any nv >= 4.
+  print shows prose interpretations + the heuristic-not-significance caveat
+  (CLAUDE.md precision bar); summary adds cutoffs, per-scale angle/communality
+  geometry, ridge; plot draws the loading configuration on the ggcircumplex
+  canvas (angle = atan2, radius = communality). New files R/fit_structure_oop.R
+  (mirrors cpm_oop.R) + test-fit_structure_api.R (49 tests: object contract,
+  scoring parity, uncalibrated path, MC RANDALL + RNG contract, validation,
+  print/summary snapshots, plot build + vdiffr). NEWS bullet + pkgdown section
+  added. /code-review (parallel finder agent): 2 findings, both fixed — a
+  numeric-column validation gap (cryptic downstream error) and Set2's 8-colour
+  cap degrading plots at nv > 8 (hue fallback added), each with a regression
+  test. Full suite 1390 pass; devtools::check clean (0/0/0). (R/fit_structure.R,
+  R/fit_structure_oop.R, tests/testthat/test-fit_structure_api.R,
+  tests/testthat/_snaps/fit_structure_api*, NAMESPACE, NEWS.md, _pkgdown.yml,
+  man/.)
 - 2026-07-07 — T6 (Fable, test-first): implemented the RANDALL correspondence
   index (`structure_randall`; Hubert & Arabie 1987 / Tracey 1997) and the
   actual randomization inference the draft lacked (`structure_randall_test`,

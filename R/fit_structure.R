@@ -658,3 +658,150 @@ structure_randall_test <- function(data, scales, n_perm = NULL) {
     p_value = p_value, method = method, n_perm = n_perm
   )
 }
+
+# User-facing entry point ------------------------------------------------------
+
+#' Evaluate circumplex structure (Acton & Revelle, 2004)
+#'
+#' Run the exploratory circumplex-structure criteria of Acton and Revelle
+#' (2004) on a set of scales and return one object bundling all of the tests.
+#' Four criteria are computed from the first two unrotated principal-axis
+#' factors of the scales' correlation matrix -- the **Fisher Test** of equal
+#' axes, the **Gap Test** of equal spacing, the **Variance Test** (VT2) and
+#' **Rotation Test** of interstitiality -- and each statistic is classified
+#' against simulation-derived, scoring- and scale-count-specific cutoffs. A
+#' fifth test, **RANDALL** (Hubert & Arabie, 1987; Tracey, 1997), evaluates the
+#' hypothesised circular *order* of the scales with a randomization test that
+#' yields a genuine p-value.
+#'
+#' @details
+#' The four factor-analytic criteria have the most power when there is no large
+#' general factor, which *deviation scoring* (centering each respondent on their
+#' own mean across the scales, exactly what [ipsatize()] does) approximates by
+#' removing it (Acton & Revelle, 2004, p. 9). Deviation scoring is therefore the
+#' default and is applied to all five tests; pass `scoring = "raw"` to leave the
+#' scores untouched. The two scorings carry different cutoffs, matched
+#' automatically.
+#'
+#' The interpretive cutoffs are **heuristic likelihood classifications read off
+#' simulated distributions, not significance tests**, and they are specific to
+#' the number of scales. Only eight scales (the canonical octant instrument) are
+#' calibrated; with any other count the statistics are still reported but no
+#' interpretation is attached (see [print()]/[summary()]). The cutoffs were
+#' re-derived under Acton and Revelle's own generating model at eight scales;
+#' see `vignette("evaluating-circumplex-structure")`. RANDALL needs no cutoffs:
+#' with up to nine scales its null distribution is enumerated exactly, so its
+#' p-value is available at any scale count of four or more.
+#'
+#' @param data A data frame (or matrix) containing the circumplex scales.
+#' @param scales A character vector of column names (or a numeric vector of
+#'   column indexes) selecting the circumplex scales, **in hypothesised circular
+#'   order** (the order is RANDALL's order hypothesis). At least four scales are
+#'   required.
+#' @param scoring Either `"deviation"` (the default; row-mean-center the scales
+#'   before analysis) or `"raw"` (analyze the scores as given). Selects the
+#'   matching interpretive cutoffs.
+#' @param ridge A non-negative ridge added to the diagonal of the correlation
+#'   matrix (then rescaled to a unit diagonal) to repair a non-positive-definite
+#'   matrix before factoring; default `0`, which matches the cutoff calibration.
+#'   Raise it only if factoring fails, noting that a nonzero ridge moves the
+#'   statistics off the calibrated scale.
+#' @param n_perm `NULL` (the default) to compute RANDALL's p-value by exact
+#'   enumeration, available for up to nine scales; otherwise a single positive
+#'   whole number of Monte Carlo relabelings (required for ten or more scales).
+#'   The Monte Carlo path draws from the global RNG stream, so set a seed with
+#'   [set.seed()] beforehand for reproducibility.
+#' @return An object of class `circumplex_structure` with `print()`,
+#'   [summary()], and [plot()] methods. Its components are `results` (a data
+#'   frame with one row per factor-analytic criterion: statistic, cutoffs, and
+#'   interpretive category), `randall` (the RANDALL index, p-value, and method),
+#'   `loadings` (the two unrotated principal-axis factors), and `details`.
+#' @references
+#' Acton, G. S., & Revelle, W. (2004). Evaluation of ten psychometric criteria
+#' for circumplex structure. \emph{Methods of Psychological Research Online},
+#' 9(1), 1-27.
+#'
+#' Hubert, L., & Arabie, P. (1987). Evaluating order hypotheses within proximity
+#' matrices. \emph{Psychological Bulletin}, 102(1), 172-178.
+#'
+#' Tracey, T. J. G. (1997). RANDALL: A Microsoft FORTRAN program for a
+#' randomization test of hypothesized order relations. \emph{Educational and
+#' Psychological Measurement}, 57(1), 164-168.
+#' @seealso [cpm_fit()] for a confirmatory circumplex model; [ipsatize()] for
+#'   deviation scoring.
+#' @family structure functions
+#' @export
+#' @examples
+#' data("jz2017")
+#' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+#' res <- fit_structure(jz2017, scales = scales)
+#' res
+#' summary(res)
+fit_structure <- function(data, scales, scoring = c("deviation", "raw"),
+                          ridge = 0, n_perm = NULL) {
+  call <- match.call()
+  scoring <- match.arg(scoring)
+  stopifnot(is.data.frame(data) || is.matrix(data))
+  stopifnot(is_var(scales))
+  stopifnot(length(scales) >= 4)
+  stopifnot(is_num(ridge, n = 1), ridge >= 0)
+
+  mat <- as.matrix(data[, scales, drop = FALSE])
+  if (!is.numeric(mat)) {
+    stop("`scales` must select numeric columns.", call. = FALSE)
+  }
+  # Deviation scoring = row-mean-centering across the selected scales (what
+  # ipsatize() does): it removes a general factor so the first two PA factors
+  # span the circumplex plane (A&R p. 9). This is the calibration scoring for
+  # the deviation cutoffs -- data-raw/structure-test-cutoffs.R deviation-scores
+  # with `x - rowMeans(x)` and factors at ridge 0.
+  if (scoring == "deviation") {
+    mat <- mat - rowMeans(mat, na.rm = TRUE)
+  }
+  scored <- as.data.frame(mat)
+  sel <- colnames(scored)
+
+  loadings <- structure_loadings(scored, sel, ridge = ridge)
+  nv <- nrow(loadings)
+
+  # The four factor-analytic criteria share one loadings matrix; classify each
+  # against its scoring- and nv-keyed cutoffs (structure_interpret returns an
+  # undefined category, and NULL cutoffs, at an uncalibrated nv).
+  criteria <- list(
+    Fisher   = list(fn = structure_fisher, key = "fisher", hyp = "equal axes"),
+    Gap      = list(fn = structure_gap,    key = "gap",    hyp = "equal spacing"),
+    Variance = list(fn = structure_vt,     key = "vt",     hyp = "interstitiality"),
+    Rotation = list(fn = structure_rt,     key = "rt",     hyp = "interstitiality")
+  )
+  rows <- lapply(names(criteria), function(nm) {
+    cr <- criteria[[nm]]
+    stat <- cr$fn(loadings)
+    interp <- structure_interpret(stat, cr$key, nv, scoring)
+    cuts <- interp$cutoffs
+    data.frame(
+      Test = nm, Hypothesis = cr$hyp, Statistic = stat,
+      Almost = if (is.null(cuts)) NA_real_ else cuts[["almost"]],
+      Thrice = if (is.null(cuts)) NA_real_ else cuts[["thrice"]],
+      Twice  = if (is.null(cuts)) NA_real_ else cuts[["twice"]],
+      Category = interp$category,
+      stringsAsFactors = FALSE
+    )
+  })
+  results <- do.call(rbind, rows)
+
+  randall <- structure_randall_test(scored, sel, n_perm = n_perm)
+
+  new_structure(
+    results = results,
+    randall = randall,
+    loadings = loadings,
+    details = list(
+      nv = nv,
+      scoring = scoring,
+      ridge = ridge,
+      calibrated = !is.null(structure_cutoffs[[as.character(nv)]]),
+      scales = sel
+    ),
+    call = call
+  )
+}
