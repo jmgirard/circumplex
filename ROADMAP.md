@@ -4,10 +4,10 @@
 > of the package (v1.1.0.9000). M1 shipped as v1.2.0; M2+M3 are
 > GitHub-complete; M4 was split on 2026-07-07 (Browne model + CI
 > trustworthiness stay in M4, nearly done; structure tests moved to a new
-> M4.5); M5–M6 remain planned. Everything since v1.2.0 accumulates into a
-> single v2.0.0 release (see the CRAN release strategy below): correctness
-> first, then inference quality, then new capabilities in order of
-> increasing scope.
+> M4.5); M5–M6 remain planned. M2 through M5 accumulate into a single
+> v2.0.0 release with M6 as its own later release (see the CRAN release
+> strategy below): correctness first, then inference quality, then new
+> capabilities in order of increasing scope.
 >
 > **This file carries direction and milestone-level status only.** Task-level
 > status (checkboxes, acceptance criteria, per-task logs) lives in MILESTONES.md
@@ -50,12 +50,23 @@ lets us keep shipping to GitHub continuously while spacing CRAN submissions.
 submission train):** progress has been much faster than the original plan
 budgeted (M4's Browne model and CI-trustworthiness diagnostic were built,
 validated, and reviewed in days, not weeks), so instead of spacing three or
-four feature submissions we fold **everything since v1.2.0 into one giant
-v2.0.0 release**: the held v1.3.0 content (M2 + M3 — never submitted
-separately), M4 (Browne model + CI trustworthiness), M4.5 (structure tests),
-M5 (SEM), and M6 (longitudinal). Target: **~2026-08-02**, one month after the
-v1.2.0 submission (CRAN-approved 2026-07-02) — comfortably inside CRAN's
-cadence expectations precisely because everything ships as one submission.
+four feature submissions we fold **M2 through M5 into one v2.0.0 release**:
+the held v1.3.0 content (M2 + M3 — never submitted separately), M4 (Browne
+model + CI trustworthiness), M4.5 (structure tests), and M5 (SEM). Target:
+**~2026-08-02**, one month after the v1.2.0 submission (CRAN-approved
+2026-07-02) — comfortably inside CRAN's cadence expectations precisely
+because everything ships as one submission. **Freeze rule (agreed
+2026-07-07): code freeze ~2026-07-26** — whatever milestones are
+GitHub-complete *and reviewed* by freeze get on the train; anything not
+ready rides the next release. Scope, never the date and never the
+statistics, is the variable: the likely outcome is v2.0.0 = M2–M5, and a
+surprise in M5 degrades the release to M2–M4.5, not the quality bar.
+**M6 (longitudinal) is deliberately excluded** and becomes its own ~v2.1.0
+on its own schedule: it is the largest and least-designed milestone, its new
+statistical machinery (paired/dependent circular resampling, growth models
+on displacement) must not be compressed by a release date, and it explicitly
+benefits from field feedback on the fit diagnostics and SEM layer it builds
+on — a design brief precedes it (see devel/m5-m6-design-questions.md).
 Milestones remain GitHub units of work: each completes, gets archived, and
 accumulates on the branch/master until the v2.0.0 train leaves.
 
@@ -228,9 +239,11 @@ and `devel/circum_lavaan.Rmd`.
 
 **Status: planned.** The largest extension; benefits from Milestones 2–5
 (fast estimation, the visualization layer, fit diagnostics, SEM
-infrastructure). The last milestone of the v2.0.0 train (the version number
-now belongs to the combined release, not to M6 specifically — see the CRAN
-release strategy).
+infrastructure). Deliberately NOT on the v2.0.0 train (decided 2026-07-07;
+see the CRAN release strategy): ships as its own ~v2.1.0 after a design
+brief, so its new statistical machinery — paired/dependent circular
+resampling, growth models on displacement — gets a full design window and
+the benefit of v2.0.0 field feedback.
 
 - Repeated-measures SSM: parameter trajectories over time (growth models
       on e/a/d, with circular handling for d).

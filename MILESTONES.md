@@ -7,10 +7,11 @@ GitHub-complete-but-held v1.3.0 state (master @ c8525a3, 2026-07-06).
 **Rescoped 2026-07-07 (Jeff):** the structure tests (T1–T7) split off into
 M4.5 (queued section below) — M4 closes with the Browne model, the CI
 diagnostic, and their vignette/ship docs. **Release change (same day):** no
-own CRAN slot; the held v1.3.0 is never submitted separately — M2 through M6
-all fold into one v2.0.0 targeted ~2026-08-02 (see ROADMAP's CRAN release
-strategy, which also now holds the v2.0.0 pre-release items formerly listed
-at the bottom of this section).
+own CRAN slot; the held v1.3.0 is never submitted separately — M2 through M5
+fold into one v2.0.0 targeted ~2026-08-02 with a ~2026-07-26 code freeze,
+and M6 ships later as its own release (see ROADMAP's CRAN release strategy,
+which also now holds the v2.0.0 pre-release items formerly listed at the
+bottom of this section).
 
 Design inputs (all committed, reviewed, and revised during the 2026-07 Fable
 window — read before implementing the corresponding task):
@@ -285,6 +286,14 @@ dependency policy, model tiers) apply unchanged.
 
 ## Log
 
+- 2026-07-07 — v2.0.0 scope refined (Jeff + Fable, same discussion as the
+  split): the train is M2–M5, not M2–M6 — M6 is deliberately excluded (its
+  paired/dependent circular resampling and displacement growth models need
+  a design brief and their own release, ~v2.1.0, informed by v2.0.0 field
+  feedback). Freeze rule adopted: code freeze ~2026-07-26; milestones
+  GitHub-complete and reviewed by freeze ship, the rest ride the next
+  release — scope is the variable, never the date or the statistics.
+  (ROADMAP.md, MILESTONES.md.)
 - 2026-07-07 — M4 split + release-strategy change (Jeff's call; Fable
   executed the restructure). M4 rescoped to the Browne model + CI
   trustworthiness + their vignette/ship docs (W1 rescoped accordingly);
