@@ -87,6 +87,7 @@ ssm_parameters(scores, prefix = "IIP_")
 \seealso{
 Other ssm functions:
 \code{\link[=ssm_analyze]{ssm_analyze()}},
+\code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_score]{ssm_score()}},
 \code{\link[=ssm_table]{ssm_table()}}
 
@@ -94,6 +95,7 @@ Other analysis functions:
 \code{\link[=cpm_fit]{cpm_fit()}},
 \code{\link[=cpm_simulate]{cpm_simulate()}},
 \code{\link[=ssm_analyze]{ssm_analyze()}},
+\code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_score]{ssm_score()}}
 }
 \concept{analysis functions}

@@ -25,7 +25,6 @@ ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
   }
 
   grp <- as.integer(bs_input[[ncol(bs_input)]])
-  group_ids <- sort(unique(grp))
   if (min(tabulate(grp)) < 2) {
     stop(
       "The Monte Carlo method requires at least two observations per group ",
@@ -35,33 +34,80 @@ ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
   }
 
   cs_all <- as.matrix(bs_input[scales])
-  p <- length(scales)
-  if (!is.null(measures)) mv_all <- as.matrix(bs_input[measures])
+  mv_all <- if (is.null(measures)) NULL else as.matrix(bs_input[measures])
 
   # Observed scores and point-estimate parameter vector; matches the bootstrap's
   # t0 (boot::boot evaluates the statistic on the full sample). obs_scores is the
   # caller's already-computed group mean/correlation score matrix (same inputs),
   # reused here to avoid a second mean_scores()/corr_scores() pass. It also
-  # supplies the observed correlations used by the draw loop below.
-  scores <- obs_scores
-  t0 <- ssm_by_group(scores, angles, contrast)
+  # supplies the observed correlations used by the draw core below.
+  t0 <- ssm_by_group(obs_scores, angles, contrast)
+  t <- ssm_mc_replicates(cs_all, mv_all, grp, obs_scores, boots, angles,
+                         contrast)
 
-  # Generate score draws, one R x p matrix per profile row -------------------
+  ssm_replicate_intervals(
+    t0 = t0,
+    t = t,
+    interval = interval,
+    contrast = contrast,
+    replicate_label = "Monte Carlo draws"
+  )
+}
+
+# Generate the Monte Carlo SSM parameter replicate matrix ----------------------
+# The draw core of ssm_montecarlo(), separated so the CI-accuracy diagnostic
+# (ssm_ci_accuracy) replays exactly the same procedure on simulated data: one
+# asymptotic draw block per group in sorted-group order, jointly across a
+# group's measures, propagated through the closed-form SSM transformation.
+# Returns the replicate matrix t (one row per draw; 6 columns per profile row
+# in ssm_param_names() order, plus a contrast block when contrasting).
+# `scores` is the observed group mean/correlation score matrix (one row per
+# profile row); it is consumed only on the correlation path.
+ssm_mc_replicates <- function(cs, mv = NULL, grp, scores, boots, angles,
+                              contrast) {
+  group_ids <- sort(unique(grp))
+  p <- ncol(cs)
+  q <- if (is.null(mv)) 0L else ncol(mv)
+
+  # Name the profile rows and the stacked correlation vector once, so every
+  # block extraction below is name-driven rather than positional arithmetic
+  # (the M2 results-assembly convention, extended to this path). Name lookup
+  # trades positional robustness for readability, so ambiguity must be an
+  # error, never a silent first-match: keys are required to be unique (they
+  # could collide if a variable name contained the separator, or if a caller
+  # passed duplicate column names).
+  if (!is.null(mv)) {
+    if (is.null(colnames(mv))) colnames(mv) <- paste0("M", seq_len(q))
+    if (is.null(colnames(cs))) colnames(cs) <- paste0("S", seq_len(p))
+    row_keys <- paste(rep(group_ids, each = q),
+                      rep(colnames(mv), times = length(group_ids)),
+                      sep = " ~ ")
+    r_keys <- paste(colnames(mv)[rep(seq_len(q), each = p)],
+                    colnames(cs)[rep(seq_len(p), times = q)], sep = " ~ ")
+    if (anyDuplicated(row_keys) || anyDuplicated(r_keys)) {
+      stop("Scale/measure names produce ambiguous internal keys (duplicate ",
+           "names, or a name containing \" ~ \"); rename the columns.",
+           call. = FALSE)
+    }
+    rownames(scores) <- row_keys
+  }
+
+  # Generate score draws, one boots x p matrix per profile row ---------------
   draw_list <- list()
   for (g in seq_along(group_ids)) {
     rows_g <- grp == group_ids[g]
     n_g <- sum(rows_g)
-    cs_g <- cs_all[rows_g, , drop = FALSE]
-    if (is.null(measures)) {
+    cs_g <- cs[rows_g, , drop = FALSE]
+    if (is.null(mv)) {
       # Sampling distribution of the group mean vector (CLT): the sample
       # covariance of the observations scaled by 1/n
       draw_list[[length(draw_list) + 1]] <-
         mvn_draws(boots, colMeans(cs_g), stats::cov(cs_g) / n_g)
     } else {
-      q <- length(measures)
-      mv_g <- mv_all[rows_g, , drop = FALSE]
+      mv_g <- mv[rows_g, , drop = FALSE]
       # This group's observed correlations (rows = measures, cols = scales)
-      rmat <- scores[((g - 1) * q + 1):(g * q), , drop = FALSE]
+      rmat <- scores[paste(group_ids[g], colnames(mv), sep = " ~ "), ,
+                     drop = FALSE]
       if (any(!is.finite(rmat)) || any(abs(rmat) >= 1 - 1e-12)) {
         stop(
           "One or more scale-measure correlations are undefined or equal to ",
@@ -76,33 +122,45 @@ ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
       # (Hampel), whose sample mean is exactly zero at the estimate; for
       # multivariate normal data its covariance reduces to the classic
       # Pearson-Filon expressions, but the empirical version stays valid for
-      # non-normal data (like the bootstrap it is compared against).
+      # non-normal data (like the bootstrap it is compared against). Built in
+      # one vectorized pass over precomputed squares; per element this is the
+      # same arithmetic (a*b - c*(d+e)) as the original per-column loop.
       zc <- scale(cs_g)
       zm <- scale(mv_g)
-      psi <- matrix(NA_real_, n_g, q * p)
-      for (m in seq_len(q)) {
-        for (j in seq_len(p)) {
-          psi[, (m - 1) * p + j] <- zm[, m] * zc[, j] -
-            (rmat[m, j] / 2) * (zm[, m]^2 + zc[, j]^2)
-        }
-      }
+      zc2 <- zc^2
+      zm2 <- zm^2
+      mi <- rep(seq_len(q), each = p)
+      ji <- rep(seq_len(p), times = q)
+      r_vec <- as.vector(t(rmat))
+      names(r_vec) <- paste(colnames(mv)[mi], colnames(cs)[ji], sep = " ~ ")
+      psi <- zm[, mi, drop = FALSE] * zc[, ji, drop = FALSE] -
+        (zm2[, mi, drop = FALSE] + zc2[, ji, drop = FALSE]) *
+          matrix(r_vec / 2, n_g, q * p, byrow = TRUE)
       acov_r <- crossprod(psi) / n_g^2
       # Draw on the Fisher z scale (delta-method covariance), back-transform
-      r_vec <- as.vector(t(rmat))
       dz <- 1 / (1 - r_vec^2)
       acov_z <- acov_r * tcrossprod(dz)
       r_draws <- tanh(mvn_draws(boots, atanh(r_vec), acov_z))
+      colnames(r_draws) <- names(r_vec)
       for (m in seq_len(q)) {
+        cols <- paste(colnames(mv)[m], colnames(cs), sep = " ~ ")
         draw_list[[length(draw_list) + 1]] <-
-          r_draws[, ((m - 1) * p + 1):(m * p), drop = FALSE]
+          r_draws[, cols, drop = FALSE]
       }
     }
   }
 
-  # Propagate each profile row's draws through the SSM transformation --------
+  # Propagate every profile row's draws through the SSM transformation in one
+  # batched compiled call (row order within each block is unchanged, so the
+  # values are identical to per-block calls). The fixed-stride split below
+  # requires every block to hold exactly `boots` rows.
   n_par <- length(ssm_param_names())
-  par_list <- lapply(draw_list, function(draws) {
-    matrix(group_parameters(draws, angles), ncol = n_par, byrow = TRUE)
+  all_draws <- do.call(rbind, draw_list)
+  stopifnot(nrow(all_draws) == length(draw_list) * boots)
+  all_pars <- matrix(group_parameters(all_draws, angles), ncol = n_par,
+                     byrow = TRUE)
+  par_list <- lapply(seq_along(draw_list), function(i) {
+    all_pars[(i - 1) * boots + seq_len(boots), , drop = FALSE]
   })
 
   t <- do.call(cbind, par_list)
@@ -113,25 +171,25 @@ ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
     # in ssm_analyze).
     t <- cbind(t, param_diff(par_list[[2]], par_list[[1]]))
   }
-
-  ssm_replicate_intervals(
-    t0 = t0,
-    t = t,
-    interval = interval,
-    contrast = contrast,
-    replicate_label = "Monte Carlo draws"
-  )
+  t
 }
 
-# Draw R samples from a multivariate normal via the symmetric eigendecomposition
-# square root, which tolerates positive-semidefinite covariances (e.g.,
-# ipsatized scales are sum-constrained, making the covariance singular) where a
-# Cholesky factor would fail. Negative eigenvalues from floating-point noise
-# are clamped to zero.
+# Symmetric eigendecomposition square root with PSD clamping: tolerates
+# positive-semidefinite covariances (e.g., ipsatized scales are sum-
+# constrained, making the covariance singular) where a Cholesky factor would
+# fail; negative eigenvalues from floating-point noise are clamped to zero.
+# THE single draw-root convention -- shared by the Monte Carlo engine's
+# mvn_draws() and ssm_ci_accuracy()'s plug-in population generator, so the
+# populations the diagnostic simulates from cannot drift numerically from the
+# engine it assesses.
+mvn_root <- function(sigma) {
+  eig <- eigen(sigma, symmetric = TRUE)
+  eig$vectors %*% (sqrt(pmax(eig$values, 0)) * t(eig$vectors))
+}
+
+# Draw R samples from a multivariate normal via mvn_root()
 mvn_draws <- function(R, mu, sigma) {
   p <- length(mu)
-  eig <- eigen(sigma, symmetric = TRUE)
-  root <- eig$vectors %*% (sqrt(pmax(eig$values, 0)) * t(eig$vectors))
   z <- matrix(stats::rnorm(R * p), nrow = R, ncol = p)
-  sweep(z %*% root, 2, mu, "+")
+  sweep(z %*% mvn_root(sigma), 2, mu, "+")
 }

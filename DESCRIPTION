@@ -35,6 +35,7 @@ Imports:
     ggforce (>= 0.3.0),
     ggplot2 (>= 3.3.0),
     htmlTable (>= 1.13.3),
+    parallel,
     Rcpp,
     rlang,
     stats

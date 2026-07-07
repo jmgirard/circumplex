@@ -37,7 +37,14 @@ flag to Jeff in the first review): names `cpm_fit()` / `circumplex_cpm` /
 `circumplex_ci_accuracy` with the embedded CPM fit exposed as `$cpm`
 (§12.2); per-group CPM structure deferred (§12.3); CPM-analytic-CI
 assessment deferred to a later `ssm_ci_accuracy.circumplex_cpm` method
-(§12.4).
+(§12.4). Added by Z1 (2026-07-07): a contrast row's certification event =
+both constituent profile rows certified (this conditions the contrast's
+conditional-displacement coverage — the spec left it unpinned);
+`amplitude_factors` must include 1 (the verdict rung); the verdict table
+classifies e/a/d-conditional only, with x/y reported in `coverage` but not
+verdict-driving (spec §5.1 as written); `structure=` selects one population
+per call — the §3.2 cpm-vs-observed sensitivity comparison is two calls,
+with any cross-call `summary()` wording left to Z2.
 
 Cross-cutting guardrails for every task:
 
@@ -132,7 +139,7 @@ Cross-cutting guardrails for every task:
   old objects.
   *Accept:* new fields populated on both analysis paths; old-object fallback
   tested; no change to any estimate or seeded pin.
-- [ ] **Z1. `ssm_ci_accuracy()` core loop.** Spec §3: one `cpm_fit()` on
+- [x] **Z1. `ssm_ci_accuracy()` core loop.** Spec §3: one `cpm_fit()` on
   pooled within-group correlations defines the population; reps×boots
   replay of the user's own CI procedure at their n; angular-membership
   coverage for displacement; certification-conditional displacement
@@ -250,6 +257,69 @@ at release time, not this branch's.
 
 ## Log
 
+- 2026-07-07 — Z1 `ssm_ci_accuracy()` core loop (Fable, plan-first, test-first;
+  /statistical-validation; 8-angle /code-review high, 6 findings fixed + 1
+  refuted by benchmark). New exported `ssm_ci_accuracy()` (R/ssm_ci_accuracy.R)
+  + `circumplex_ci_accuracy` class with print/summary (R/ssm_ci_oop.R): spec §3
+  in full — pooled within-group R_w (Wishart-df n device), one analytic
+  `cpm_fit()` (or `structure = "observed"`, or a validated pre-fit via `cpm=`),
+  plug-in populations per group (mean path: `cpm_simulate()` rescaled by stored
+  SDs; corr path: joint matrix with scale block ← P̂, eigenvalue-clamp PSD
+  repair with max|ΔJ| recorded and a >.01 warning, |r|≥1 refusal), per-rung
+  truth recomputation, and a reps×conditions replay of the object's own CI
+  procedure. The §4.1 amplitude-ladder *construction* ships here (needed for
+  the c=0 pin): the estimator-functional 3×3 solve, exact for any spacing
+  (machine-precision tests incl. unequal angles; independent lm()/hand-formula
+  validation; the naive decomposition demonstrably fails off equal spacing) —
+  §4's analysis layer (miss-decomposition reporting, false-cert benchmark line,
+  §5.2 verdict wording, plot) stays Z2. Replay: bootstrap via per-group
+  multinomial resample counts (exact same law as boot's iid index draw; one
+  BLAS crossproduct per replicate for means, centered weighted moments for
+  correlations with a relative variance floor mapping true-constant resamples
+  to NA) or the extracted `ssm_mc_replicates()` — the MC engine core now
+  SHARED with the production path, where the three deferred ROADMAP efficiency
+  findings landed (vectorized psi with precomputed squares, one batched
+  `group_parameters()` call, name-driven block keys hardened by a uniqueness
+  guard); user-path MC output pinned byte-identical to a pre-refactor seeded
+  fixture (tests/testthat/fixtures/mc-seeded-pins.rds). Interval assembly via a
+  lean radian-domain assembler pinned equal to `ssm_replicate_intervals()`
+  (shared quantile.circumplex_*radian methods, same contrast branch-alignment);
+  displacement coverage is angular arc membership mod 360 (pole + branch-shift
+  safe, validated against independent geometry over 20k cases); certification
+  via new shared `ssm_certified()` (R/ssm_oop.R — print and diagnostic now one
+  rule); Wilson-95 (validated vs prop.test) × Bradley band verdicts at c=1,
+  d conditional on certification. RNG: one documented `sample.int()` from the
+  caller's stream seeds a CMRG master, per-(condition×rep) `nextRNGStream`
+  substreams, caller `.Random.seed`/kind restored on exit;
+  serial ≡ multicore ≡ snow at fixed seed (multicore tested; full-scale
+  serial≡parallel also verified on jz2017). Machinery pins green: c=0
+  amplitude coverage ≡ 0, all misses truth-below, d coverage NA, guardrail
+  rates still produced. Cost (clean, seeded): n=300 defaults 111 s — inside
+  the §11 envelope at the spec's own cost-model scale; full jz2017 (n=1166)
+  427 s serial / 274 s ncpus=4 → the §8/§11 Phase-2 trigger fires at
+  full-jz2017 scale; recorded in ROADMAP with the profiling constraint (75%
+  of the loop is rmultinom RNG draws; sample.int+tabulate benchmarked only
+  ~10% faster, so a straight C++ port won't clear it — needs a draw-strategy
+  decision). jz2017 verdict at n=1166: e/a/d-cond all adequate (94.7/95.0/
+  95.8%). /statistical-validation: 10/10 independent checks (lm + hand-formula
+  ladder, prop.test Wilson, PSD-repair properties, 20k-case membership
+  geometry, independent flat-script end-to-end coverage replication at a pole
+  truth agreeing within MC error, elevation near-nominal both ways, psi ==
+  fresh Hampel loop). Review fixes: undeclared `parallel` dependency
+  (DESCRIPTION); contrast-row Fit_pass_rate NaN → NA; name-key ambiguity now
+  errors instead of silently first-matching; clear error when pooled n ≤ p;
+  hard-coded parameter columns → `ssm_param_names()`-driven; shared
+  `mvn_root()` (engine + population generator can't drift); refuted with
+  evidence: sample.int+tabulate swap (benchmarked ~10%, not the claimed 3-8×,
+  and it would re-key seeds). Deliberate, recorded: lean-vs-real assembler
+  duplication (perf; pinned by test, more oracles in Z2), bootstrap replay not
+  driving boot::boot (spec §3.4 freedom — the §11 cost note exists for exactly
+  this), micro-optimizations ≤3% declined. Suite 1156/1156; check 0/0/0;
+  document() no-diff. NEWS updated (diagnostic + MC speedup). (DESCRIPTION,
+  R/ssm_ci_accuracy.R [new], R/ssm_ci_oop.R [new], R/ssm_montecarlo.R,
+  R/ssm_oop.R, NAMESPACE, man/ssm_ci_accuracy.Rd [new], man/,
+  tests/testthat/test-ci_accuracy.R [new], tests/testthat/fixtures/ [new],
+  tests/testthat/test-ssm_montecarlo.R, NEWS.md, ROADMAP.md, MILESTONES.md.)
 - 2026-07-07 — Z0 sufficient-statistics storage (Opus, test-first; 2-angle
   /code-review high, 1 confirmed correctness bug fixed). New internal
   `ssm_compute_suff_stats()` in R/ssm_analysis.R computes per-group n, per-scale

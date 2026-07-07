@@ -185,6 +185,33 @@ test_that("Monte Carlo with missing data requires listwise deletion", {
   )
 })
 
+test_that("seeded Monte Carlo output matches the pre-Z1 pin (engine refactor guard)", {
+  # Captured 2026-07-07, immediately before the Z1 MC-engine efficiency
+  # refactor (vectorized psi, batched group_parameters, name-driven block
+  # indexing). Those changes must not alter any value: same draws, same
+  # arithmetic per element. Tolerance covers cross-platform BLAS ulp noise
+  # only; on the capture machine the refactor is byte-identical.
+  fixture <- readRDS(test_path("fixtures", "mc-seeded-pins.rds"))
+  data("jz2017")
+  num <- function(x) unlist(x$results[sapply(x$results, is.numeric)])
+
+  set.seed(2026)
+  mc1 <- ssm_analyze(jz2017[1:150, ], scales = PANO(), boots = 100,
+                     method = "montecarlo")
+  expect_equal(num(mc1), fixture$mc1, tolerance = 1e-10)
+
+  set.seed(2026)
+  mc2 <- ssm_analyze(jz2017[1:150, ], scales = PANO(),
+                     measures = c("NARPD", "ASPD"), contrast = TRUE,
+                     boots = 100, method = "montecarlo")
+  expect_equal(num(mc2), fixture$mc2, tolerance = 1e-10)
+
+  set.seed(2026)
+  mc3 <- ssm_analyze(jz2017[1:150, ], scales = PANO(), grouping = "Gender",
+                     contrast = TRUE, boots = 100, method = "montecarlo")
+  expect_equal(num(mc3), fixture$mc3, tolerance = 1e-10)
+})
+
 test_that("Monte Carlo results are reproducible with a seed", {
   data("aw2009")
   set.seed(42)

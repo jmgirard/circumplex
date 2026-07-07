@@ -68,6 +68,7 @@ Browne, M. W. (1992). Circumplex models for correlation matrices.
 Other analysis functions:
 \code{\link[=cpm_fit]{cpm_fit()}},
 \code{\link[=ssm_analyze]{ssm_analyze()}},
+\code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
 \code{\link[=ssm_score]{ssm_score()}}
 }

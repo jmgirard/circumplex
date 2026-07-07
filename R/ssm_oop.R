@@ -99,6 +99,16 @@ print.circumplex_radian <- function(x, digits = 3, ...) {
   cat(round(x, digits = digits), "\nRadians\n")
 }
 
+# The shipped displacement-interpretability guardrail: displacement is
+# certified as interpretable when the amplitude CI's lower bound, rounded at
+# the print precision, exceeds zero. THE single definition of the rule --
+# print.circumplex_ssm() applies it and ssm_ci_accuracy() measures its
+# operating characteristics; if the rule ever changes, both must move
+# together (spec devel/m4-ci-accuracy-spec.md sec. 3.4/12.5). Vectorized.
+ssm_certified <- function(a_lci, digits = 3) {
+  !is.na(a_lci) & round(a_lci, digits) > 0
+}
+
 # Class ssm --------------------------------------------------------------------
 
 # S3 Constructor
@@ -156,7 +166,7 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
           sep = ""
         )
       }
-      if (is.na(dat$a_lci) || round(dat$a_lci, digits) <= 0) {
+      if (!ssm_certified(dat$a_lci, digits)) {
         cat(
           "  Note: the amplitude CI includes zero; ",
           "the displacement is not interpretable.\n",

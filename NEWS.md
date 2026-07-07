@@ -1,5 +1,36 @@
 # circumplex (development version)
 
+* New `ssm_ci_accuracy()` function assesses, by simulation, whether the
+  confidence intervals of an `ssm_analyze()` result would cover the true SSM
+  parameters at their nominal rate if the population looked like the fitted
+  estimates, at the observed sample size(s) — the CI-trustworthiness
+  diagnostic of Zimmermann & Wright (2017), generalized to the user's own
+  configuration (grouping, contrasts, measures, engine, resample count, and
+  interval level). The population's scale structure is characterized by a
+  `cpm_fit()` model (or, optionally, the observed correlations); each
+  simulated dataset replays the object's own interval procedure. Coverage is
+  reported per profile row, parameter, and amplitude condition — a ladder of
+  populations with the amplitude scaled toward zero, where percentile
+  amplitude intervals are theoretically weakest — along with one-sided miss
+  rates, interval widths, the certification rate of the printed
+  "amplitude CI excludes zero" guardrail, and displacement coverage
+  conditional on certification. `print()` classifies coverage at the
+  as-estimated condition against Bradley's (1978) liberal robustness band
+  using 95% Wilson score intervals; `summary()` adds the full tables.
+  Simulation replicates can be parallelized (`parallel`/`ncpus`) with
+  seed-identical results, and the caller's random-number state is restored
+  on exit. To support the diagnostic, `ssm_analyze()` now stores per-group
+  sufficient statistics (sizes, scale SDs, and correlation matrices) in its
+  output; objects created by earlier versions can be assessed by re-supplying
+  the original data via `ssm_ci_accuracy(..., data = )`, which is checked
+  for consistency against the stored profiles.
+
+* The Monte Carlo interval engine (`ssm_analyze(method = "montecarlo")`) is
+  faster on correlation-based analyses: the influence-function covariance is
+  built in one vectorized pass and all profile rows are propagated through
+  the SSM transformation in a single compiled call. Results are unchanged
+  (byte-identical for a fixed seed).
+
 * New `cpm_fit()` function estimates Browne's (1992) circular stochastic
   process model for the correlational structure of circumplex scales or items,
   a native replacement for the archived CircE package. It accepts either raw

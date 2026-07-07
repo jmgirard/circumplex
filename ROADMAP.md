@@ -259,6 +259,21 @@ the relevant code:
     per-element; per-profile `group_parameters()` + `do.call(cbind)` could be one
     batched C++ call; the MC correlation path re-introduces positional block
     indexing the M2 refactor retired elsewhere (name-drive it).
+    [Closed in M4/Z1, 2026-07-07: vectorized psi, one batched
+    `group_parameters()` call, name-driven keys with an ambiguity guard;
+    seeded output pinned byte-identical to the pre-refactor engine.]
+  - *`ssm_ci_accuracy()` Phase-2 performance (design §8/§11 trigger fired
+    2026-07-07 at full-jz2017 scale):* clean seeded defaults take 111 s at the
+    spec's n≈300 cost-model scale (inside the ~5-min envelope) but 427 s
+    serial at n=1166 (274 s at `ncpus = 4`). Profiling: ~75% of the loop is
+    `rmultinom()` RNG draws, and `sample.int()`+`tabulate()` benchmarked only
+    ~10% faster — the loop is RNG-bound, so the anticipated "port the inner
+    simulate-and-quantile loop to C++" will NOT clear the envelope while it
+    consumes R's RNG at one draw per resampled row. Any Phase-2 design must
+    first decide the draw strategy (and its reproducibility contract) before
+    porting; the R loop stays the permanent oracle either way. Not
+    release-blocking: verdicts are correct, `parallel=` exists, and the
+    envelope holds at the scale the spec budgeted.
   - *Minor cleanup (any release):* `ssm_replicate_intervals()` computes CI bounds in
     two `sapply(quantile)` passes (re-sorting each displacement column twice) —
     pass `probs = c(lo, hi)` once; drop the redundant `scores <- obs_scores` alias
