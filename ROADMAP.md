@@ -210,8 +210,9 @@ intended simulation engine.
 
 ## Milestone 4.5 — Structure tests (Acton & Revelle, 2004)
 
-**Status: active** (split from M4 on 2026-07-07 and promoted the same day on
-M4's close; folds into v2.0.0). Revive and modernize the drafts in
+**Status: GitHub-complete 2026-07-07** (split from M4 and promoted the same
+day on M4's close; folds into v2.0.0; archived to MILESTONES-ARCHIVE.md with
+its full T1–T8 log). Revived and modernized the drafts in
 `devel/fit_analysis.R` / `devel/fit_oop.R`.
 
 A Fable method-review of those drafts (2026-07-03; full report in
@@ -253,10 +254,9 @@ dependencies for the fit statistics: zero**.
   deviation scoring needs the raw observations, so a cormat path would be
   raw-scoring only.
 
-The detailed task list with acceptance criteria (T1–T7 + the vignette
-extension) is parked verbatim in MILESTONES.md under the queued-milestone
-heading and becomes the active task list when M4.5 opens — milestone-level
-status only here, per this file's contract.
+The detailed task list with acceptance criteria (T1–T8) and its full running
+log are archived in MILESTONES-ARCHIVE.md — milestone-level status only here,
+per this file's contract.
 
 Post-M4 (agreed with Jeff, 2026-07-06): draft a publication-grade simulation
 study design as a devel/ brief (Fable-tier design task) extending the B6
@@ -270,8 +270,11 @@ intended simulation engine.
 
 ## Milestone 5 — SEM-based SSM
 
-**Status: planned.** Builds on the lavaan explorations in `devel/lavaan_ssm.Rmd`
-and `devel/circum_lavaan.Rmd`.
+**Status: active** (promoted 2026-07-07 on M4.5's close; folds into v2.0.0).
+Builds on the lavaan explorations in `devel/lavaan_ssm.Rmd` and
+`devel/circum_lavaan.Rmd`; the statistical design questions are scoped in
+`devel/m5-m6-design-questions.md` (Brief E §M5). The detailed task list with
+acceptance criteria (T1–T5) is the active list in MILESTONES.md.
 
 - Latent-variable SSM: estimate SSM parameters from a lavaan measurement
       model (disattenuated correlations), with delta-method or bootstrap CIs.
