@@ -1,11 +1,16 @@
 # Active milestone
 
-## M4 — Circumplex fit & structure statistics (flagship; own CRAN slot)
+## M4 — Browne model & SSM CI trustworthiness
 
 Source: ROADMAP.md Milestone 4. Branch: `m4-fit-statistics`, cut from the
-GitHub-complete-but-held v1.3.0 state (master @ c8525a3, 2026-07-06). The
-v1.3.0 (M2+M3) CRAN submission remains held on master; this branch must not
-assume it shipped.
+GitHub-complete-but-held v1.3.0 state (master @ c8525a3, 2026-07-06).
+**Rescoped 2026-07-07 (Jeff):** the structure tests (T1–T7) split off into
+M4.5 (queued section below) — M4 closes with the Browne model, the CI
+diagnostic, and their vignette/ship docs. **Release change (same day):** no
+own CRAN slot; the held v1.3.0 is never submitted separately — M2 through M6
+all fold into one v2.0.0 targeted ~2026-08-02 (see ROADMAP's CRAN release
+strategy, which also now holds the v2.0.0 pre-release items formerly listed
+at the bottom of this section).
 
 Design inputs (all committed, reviewed, and revised during the 2026-07 Fable
 window — read before implementing the corresponding task):
@@ -186,7 +191,48 @@ Cross-cutting guardrails for every task:
   moves to W1, where the Z&W transcription happens anyway — recorded in the
   W1 bullet below; everything else in §10 executed here or at Z1.
 
-### Tasks — Structure tests (Acton & Revelle 2004)
+### Tasks — Ship
+
+- [ ] **W1. Vignette: "Evaluating Circumplex Structure".** Fit statistics,
+  CI trustworthiness, when to trust SSM parameters, ipsatization guidance;
+  Z&W Studies 1–5 transcribed as cited context (re-confirm the grid
+  characterization at transcription time and log it — spec §2/F8). Also
+  carries the §10 O5 bridge deferred from Z2: once the Z&W generating
+  conditions are transcribed, run the diagnostic at (at least) one of their
+  conditions and compare to their published coverage within combined MC
+  error — a conditional gate (spec F7): if their generating process is not
+  MVN-expressible, re-scope and document, never silently loosen.
+  *Rescoped by the 2026-07-07 split:* covers the M4 content only (CPM
+  fitting + CI trustworthiness); the structure-test section is M4.5's
+  vignette-extension task. "Fit statistics" here means the CPM fit indices,
+  not the A&R tests.
+  *Accept:* builds clean; exported API only; statistical-precision bar
+  (CLAUDE.md); Z&W numerics transcribed, never from memory. Also the natural
+  point to confirm/veto the B6 analytic-CI caution wording (now tracked in
+  ROADMAP's v2.0.0 pre-release items).
+- [ ] **W2. Ship-time documentation.** DESIGN.md RNG entry-point list gains
+  `cpm_fit(ci_method="bootstrap")`, `cpm_simulate()`, `ssm_ci_accuracy()`
+  rows; update `ssm_analyze()`'s "only function that consumes R's RNG"
+  roxygen (false once these ship); NEWS.md flagship entry; record the
+  guardrail-replacement follow-up (B §12.5) and the F6 0-vs-360 pole-snap
+  alignment decision (still parked) in ROADMAP's continuous track.
+  *Accept:* document() no-diff; DESIGN.md consistent; follow-ups recorded
+  where ROADMAP says they live.
+
+Milestone close: when W1+W2 land, `/code-review` the vignette/doc diff as
+usual, archive this section to MILESTONES-ARCHIVE.md (GitHub-complete; the
+CRAN review/checklist now belongs to the v2.0.0 release — see ROADMAP), and
+promote the queued M4.5 section below to active — copying the cross-cutting
+guardrails block into it, since M4.5 references it and archiving M4 would
+otherwise orphan that reference.
+
+# Queued milestone: M4.5 — Structure tests (Acton & Revelle 2004)
+
+Split from M4 on 2026-07-07. Becomes the active milestone when M4's W tasks
+close (kept here rather than ROADMAP so the drafted acceptance criteria
+survive verbatim; ROADMAP carries the milestone-level summary). The M4
+cross-cutting guardrails above (oracle rule, boundary suites, RNG contract,
+dependency policy, model tiers) apply unchanged.
 
 - [ ] **T1. Base-R principal-axis loadings + shared infrastructure.**
   Replace `psych::fa()` with an internal PAF; fix the ridge-on-wrong-matrix
@@ -230,54 +276,29 @@ Cross-cutting guardrails for every task:
   extension), consistent with `circumplex_ssm` conventions.
   *Accept:* one coherent entry point documented with runnable examples;
   print/summary snapshots; pkgdown reference section added.
-
-### Tasks — Ship
-
-- [ ] **W1. Vignette: "Evaluating Circumplex Structure".** Fit statistics,
-  CI trustworthiness, when to trust SSM parameters, ipsatization guidance;
-  Z&W Studies 1–5 transcribed as cited context (re-confirm the grid
-  characterization at transcription time and log it — spec §2/F8). Also
-  carries the §10 O5 bridge deferred from Z2: once the Z&W generating
-  conditions are transcribed, run the diagnostic at (at least) one of their
-  conditions and compare to their published coverage within combined MC
-  error — a conditional gate (spec F7): if their generating process is not
-  MVN-expressible, re-scope and document, never silently loosen.
+- [ ] **T8. Vignette extension.** Add the structure-test section to the
+  "Evaluating Circumplex Structure" vignette written in M4/W1 (which covers
+  CPM fitting and CI trustworthiness): what each A&R test asks, the nv=8
+  cutoff provenance (T2), and how the tests complement the CPM fit indices.
   *Accept:* builds clean; exported API only; statistical-precision bar
-  (CLAUDE.md); Z&W numerics transcribed, never from memory. Also the natural
-  point to confirm/veto the B6 analytic-CI caution wording (see the
-  pre-release open-items list below).
-- [ ] **W2. Ship-time documentation.** DESIGN.md RNG entry-point list gains
-  `cpm_fit(ci_method="bootstrap")`, `cpm_simulate()`, `ssm_ci_accuracy()`
-  rows; update `ssm_analyze()`'s "only function that consumes R's RNG"
-  roxygen (false once these ship); NEWS.md flagship entry; record the
-  guardrail-replacement follow-up (B §12.5) and the F6 0-vs-360 pole-snap
-  alignment decision (still parked) in ROADMAP's continuous track.
-  *Accept:* document() no-diff; DESIGN.md consistent; follow-ups recorded
-  where ROADMAP says they live.
-
-Open items to resolve before the M4 release (do not block later M4 tasks):
-
-- **B6 published-oracle re-read.** The CircE (Grassi et al. 2010) fixture
-  values in `tests/testthat/helper-cpm-oracles.R` were transcribed via two
-  automated channels (visual + pdftotext) but still need the §6.1 protocol's
-  *second independent human re-read* against the paper before release. Only a
-  transcription typo is at risk (the cross-implementation and simulation
-  oracles are transcription-independent and already agree). Fold into the
-  pre-release `/code-review high`.
-- **B6 analytic-CI caution — Jeff to confirm/veto** (reversible until
-  release, per the adopted-by-default policy above). The marker set for the
-  N∈[2000,50000) boundary caution (`cpm_boundary_markers()` in R/cpm_fit.R:
-  Heywood / removed harmonic / min β̂ < .10 / condition > 1e8 / multimodal)
-  and its `summary()` wording are an adopted default; confirm or adjust when
-  W1 documents CI trustworthiness (natural review point).
-
-Release: after all tasks, `/code-review max` minimum (flagship —
-`/code-review ultra` only if Jeff asks), then `/release-checklist` for the
-M4 CRAN slot. The held v1.3.0 must ship first or be folded in — Jeff's call
-at release time, not this branch's.
+  (CLAUDE.md); every reported threshold traces to T2 or a cited page.
 
 ## Log
 
+- 2026-07-07 — M4 split + release-strategy change (Jeff's call; Fable
+  executed the restructure). M4 rescoped to the Browne model + CI
+  trustworthiness + their vignette/ship docs (W1 rescoped accordingly);
+  structure tests T1–T7 moved verbatim, with acceptance criteria, to a
+  queued M4.5 section in this file (ROADMAP gets the milestone-level summary
+  and a new M4.5 entry). CRAN plan superseded: the held v1.3.0 is never
+  submitted separately — M2 through M6 fold into one v2.0.0 targeted
+  ~2026-08-02 (one month after the v1.2.0 submission, CRAN-approved
+  2026-07-02), on the strength of much-faster-than-planned progress; the
+  M4 pre-release open items (CircE second re-read, analytic-CI caution
+  confirm/veto) moved to a v2.0.0 pre-release list in ROADMAP's CRAN
+  release-strategy section, which also carries the release-review depth
+  (`/code-review max` minimum; ultra only if Jeff asks) and the single
+  `/release-checklist` run. (ROADMAP.md, MILESTONES.md.)
 - 2026-07-07 — Z2 amplitude-near-zero module + verdict (Fable, plan-first,
   test-first; /statistical-validation 8/8; 8-angle /code-review high, 8
   findings fixed + 2 refuted with rationale). The spec §4–§5 analysis layer
