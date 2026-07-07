@@ -46,6 +46,7 @@ Suggests:
     knitr (>= 1.28),
     lavaan,
     OpenMx,
+    psych,
     RColorBrewer,
     rmarkdown (>= 2.1),
     roxygen2 (>= 7.1.0),

@@ -31,7 +31,7 @@ archived:
   `/statistical-validation` after every task touching `ssm_*` statistics or
   `src/`.
 
-- [ ] **T1. Base-R principal-axis loadings + shared infrastructure.**
+- [x] **T1. Base-R principal-axis loadings + shared infrastructure.**
   Replace `psych::fa()` with an internal PAF; fix the ridge-on-wrong-matrix
   bug (ridge to R, not the data; no ridge⇒ML conflation); psych → Suggests
   as a test oracle. Rewrite in package style (base R, `is_*()` validation —
@@ -82,6 +82,22 @@ archived:
 
 ## Log
 
+- 2026-07-07 — T1 (Opus, test-first): added shared structure-test
+  infrastructure. New internal `paf2()` (iterated base-R principal-axis
+  factoring of the first two unrotated factors: SMC start, eigen-based,
+  NPD-safe eigenvalue clip + Heywood cap, psych sign convention) and
+  `structure_loadings()` (scale selection + correlation + ridge). Fixed the
+  method-review §7 ridge bug: ridge is now added to the diagonal of the
+  correlation matrix and rescaled to unit diagonal via `cov2cor()`, not added
+  to the raw data; extraction is always PA (dropped the draft's ridge⇒ML
+  conflation). `psych` added to Suggests as a test oracle only (no hard dep).
+  Validated three ways: psych::fa oracle match on jz2017 (tol 0.01), a
+  psych-independent exact-two-factor communality-recovery oracle, and
+  fixed-point self-consistency; plus the NPD ipsatized matrix repaired by ridge
+  and a row-order-invariance regression guarding the old data-perturbation bug.
+  14 new tests, full suite 1236 pass, check clean. Not user-facing yet (exported
+  API is T7), so no NEWS bullet. (R/fit_structure.R,
+  tests/testthat/test-fit_structure.R, DESCRIPTION.)
 - 2026-07-07 — M4 review #1 fix (Fable, test-first; /statistical-validation):
   the convergence-acceptance "reproduced" criterion in `cpm_engine()` counted
   the g0/mirror start pair as two starts, but reflection is an exact
