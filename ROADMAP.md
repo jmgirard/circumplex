@@ -210,9 +210,9 @@ intended simulation engine.
 
 ## Milestone 4.5 — Structure tests (Acton & Revelle, 2004)
 
-**Status: queued** (split from M4 on 2026-07-07; opens as the active
-milestone when M4's vignette/ship tasks close; folds into v2.0.0). Revive and
-modernize the drafts in `devel/fit_analysis.R` / `devel/fit_oop.R`.
+**Status: active** (split from M4 on 2026-07-07 and promoted the same day on
+M4's close; folds into v2.0.0). Revive and modernize the drafts in
+`devel/fit_analysis.R` / `devel/fit_oop.R`.
 
 A Fable method-review of those drafts (2026-07-03; full report in
 `devel/fit-drafts-method-review.md`) found they are **mostly a rework, not a
@@ -241,6 +241,11 @@ dependencies for the fit statistics: zero**.
   `circumplex_ssm` conventions; pkgdown reference section.
 - Extend the "Evaluating Circumplex Structure" vignette (written in M4 for
   the CPM/CI-trustworthiness content) with the structure-test section.
+- Future intention (out of the active task list, surfaced by T2's review):
+  calibrate structure-test cutoffs for non-octant scale counts (nv = 4
+  poles/quadrants, nv = 16 instruments) — the derivation script is
+  nv-generic, and the package constant is already keyed by nv so uncalibrated
+  counts fail the lookup rather than borrowing nv = 8 cutoffs.
 
 The detailed task list with acceptance criteria (T1–T7 + the vignette
 extension) is parked verbatim in MILESTONES.md under the queued-milestone

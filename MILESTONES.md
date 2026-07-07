@@ -38,7 +38,7 @@ archived:
   the drafts predate the tidyverse-ectomy).
   *Accept:* internal loadings match `psych::fa()` oracle within tolerance on
   reference data; ridge applied to the correlation matrix with a test.
-- [ ] **T2. Cutoff re-derivation simulation (nv=8).** One simulation under
+- [x] **T2. Cutoff re-derivation simulation (nv=8).** One simulation under
   A&R's generating model (their Eqs. 11.1–11.3) re-derives all test cutoffs
   at the package's scale-level nv=8 use — fixes the Gap nv-dependence and
   the VT/RT threshold/grid provenance in one run. Committed as a
@@ -47,10 +47,23 @@ archived:
   *Accept:* script reruns to the stored constants under its seed; A&R's
   published nv-conditions reproduced within simulation error as a sanity
   gate; every threshold in T3–T6 traces to this run or a cited page.
+  *Accept-note (what "reproduced" turned out to mean):* A&R's cutoffs are
+  one-sided conservative plot reads, so the gate checks their claims'
+  logical content (F_competing ≤ .031 at "almost" cutoffs; CDF ratio ≥ k/√2
+  at "k-times" cutoffs) — 14/17 published claims reproduce; three left-tail
+  "almost" claims are documented reproduction limits (two marginal, one a
+  genuine tail difference traceable to CIRC_STRUC's unstated extraction
+  pipeline; see the script's KNOWN_LIMITS block and
+  devel/ar2004-transcription.md).
 - [ ] **T3. Fisher test of equal axes.** Sound per review — port with
   citation, scoring-keyed cutoffs (raw vs deviation declared), T2 thresholds.
-  *Accept:* matches A&R Eq. 6 on transcribed reference values; cutoff
-  keyed to declared scoring; roxygen cites A&R.
+  *Accept (amended by T2's empirical adjudication):* the statistic is the CV
+  of **vector lengths** √h², not Eq. 6's printed CV of h² — the T2 gate
+  showed the published cutoffs only reproduce on the vector-length scale
+  (devel/ar2004-transcription.md "Empirical adjudications"; method-review §1
+  addendum). Internal `structure_fisher()` + nv=8 cutoffs already exist from
+  T2; T3 wraps them with scoring-keyed cutoff interpretation and roxygen
+  citing A&R (including the scale adjudication).
 - [ ] **T4. Gap test of equal spacing.** Fix the wrap-around omission (the
   0°/360° gap must participate) and the fragile `sign·acos` at 180°/h²=0;
   correct the "equal axes" roxygen error.
@@ -82,6 +95,29 @@ archived:
 
 ## Log
 
+- 2026-07-07 — T2 (Fable, test-first): transcribed A&R 2004 under the
+  two-channel protocol (devel/ar2004-transcription.md; no between-channel
+  discrepancies; ε_v≡0 and repeated-Z ambiguities documented); implemented
+  the four criterion statistics as internals with closed-form oracles and
+  the adapted boundary suite (wrap-around-gap regression, exact-axis 180°
+  sign·acos guard, orientation invariance via full-period grids, unified
+  NA-not-NaN degeneracy policy); wrote data-raw/structure-test-cutoffs.R
+  (seed 20260707), which empirically adjudicated two transcription
+  ambiguities (standardized uniqueness; Fisher = CV of vector lengths,
+  overturning method-review §1 — addendum added there), gate-reproduced
+  14/17 published claims (3 documented left-tail limits), and derived the
+  nv=8 cutoffs into the nv-keyed `structure_cutoffs` constant (Gap raw
+  "almost" moves .01→.35 vs the published nv=64/128 value; Fisher barely
+  moves, cross-validating A&R's nv claim). Slim derivation record committed
+  (data-raw/structure-test-cutoffs.rds) with a testthat pin; seed-stability
+  confirmed across two full independent script executions. T3's acceptance
+  amended per the adjudication. /code-review high: 10 findings, all fixed
+  (incl. a vacuous 180° test guard and a VT 0/0 NaN on bipolar scale
+  pairs). Full suite + check clean. Internal only, no NEWS bullet.
+  (R/fit_structure.R, tests/testthat/test-fit_structure.R,
+  data-raw/structure-test-cutoffs.R, data-raw/structure-test-cutoffs.rds,
+  devel/ar2004-transcription.md, devel/fit-drafts-method-review.md,
+  devel/fit_analysis.R, devel/fit_oop.R, .gitignore, ROADMAP.md.)
 - 2026-07-07 — T1 (Opus, test-first): added shared structure-test
   infrastructure. New internal `paf2()` (iterated base-R principal-axis
   factoring of the first two unrotated factors: SMC start, eigen-based,

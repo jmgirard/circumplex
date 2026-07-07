@@ -62,6 +62,111 @@ paf2 <- function(r, max_iter = 100L, tol = 1e-4) {
 # A&R thresholds were calibrated under PA, so (unlike the drafts) ridge does not
 # switch the estimator to maximum likelihood -- it is an orthogonal correlation-
 # matrix repair only.
+# Criterion statistics ---------------------------------------------------------
+# The four effective Acton & Revelle (2004) criteria, each computed from a
+# p x 2 loadings matrix (the first two unrotated principal-axis factors from
+# `structure_loadings()`). Definitions follow the adjudicated readings in
+# devel/ar2004-transcription.md -- A&R's equations, with the Fisher scale
+# settled empirically by the T2 sanity gate (see structure_fisher below).
+# Interpretive cutoffs are *not* applied here; they are nv-dependent and live
+# in `structure_cutoffs`.
+#
+# Degenerate-loadings policy (one epsilon, DEGEN_TOL): a variable whose
+# communality is negligible has no defined angle (Gap) and no defined
+# normalized loading (VT), so those return NA_real_ if *any* variable is
+# degenerate. Fisher and RT need no per-variable angle and stay defined
+# unless the *whole solution* is degenerate (all communalities negligible for
+# Fisher; a zero rotation profile for RT and VT), where a coefficient of
+# variation would be 0/0 or a ratio of floating-point noise -- also NA_real_,
+# never NaN.
+DEGEN_TOL <- 1e-12
+
+# Fisher Test of equal axes: the coefficient of variation of the variables'
+# vector lengths sqrt(h2). A&R's Eq. 6 as printed uses the communalities h2
+# themselves, but their prose describes vector lengths, and the two differ by
+# about a factor of two in CV -- only one can carry the published .10/.15
+# cutoffs. The T2 sanity gate (data-raw/structure-test-cutoffs.R) settled
+# this empirically: reproducing A&R's design yields the published cutoffs for
+# CV(sqrt(h2)) and roughly doubled values for CV(h2), so CIRC_STRUC evidently
+# computed vector lengths (as does psych::circ.tests). Rotation-invariant, so
+# the arbitrary PA orientation is immaterial.
+structure_fisher <- function(loadings) {
+  h2 <- rowSums(loadings^2)
+  if (all(h2 < DEGEN_TOL)) {
+    return(NA_real_)
+  }
+  h <- sqrt(h2)
+  stats::sd(h) / mean(h)
+}
+
+# Gap Test of equal spacing (A&R Eq. 2): the variance of the angular gaps
+# between adjacent variables, *including the wrap-around gap* between the last
+# and first variable (2*pi + theta_1 - theta_nv), which is part of A&R's
+# definition. With the wrap gap the gaps always sum to 2*pi; without it (the
+# draft/psych bug) the statistic certifies a quarter-circle as perfectly
+# spaced. Angles are recovered with atan2, which is exact at 180 degrees where
+# sign(0)*acos() collapses to 0. Radians^2, on the A&R cutoff scale.
+structure_gap <- function(loadings) {
+  h2 <- rowSums(loadings^2)
+  if (any(h2 < DEGEN_TOL)) {
+    return(NA_real_)
+  }
+  theta <- sort(atan2(loadings[, 2], loadings[, 1]) %% (2 * pi))
+  gaps <- c(diff(theta), 2 * pi + theta[1] - theta[length(theta)])
+  stats::var(gaps)
+}
+
+# Rotate a p x 2 loadings matrix by theta radians.
+rotate_loadings <- function(loadings, theta) {
+  loadings %*% cbind(c(cos(theta), sin(theta)), c(-sin(theta), cos(theta)))
+}
+
+# Variance Test 2 of interstitiality (A&R Eq. 8): at each rotation theta, take
+# the variance across variables of Y = (squared factor-1 loading) / (own
+# communality); the statistic is the CV of that variance over rotations. Y is
+# cos^2 of the variable's angle to the rotated axis, whose cross-variable
+# variance has period 180 degrees in theta, so the default grid spans one full
+# period (0-175 by 5 degrees); this makes the statistic exactly invariant to
+# the arbitrary orientation of the unrotated solution (A&R leave their grid
+# range unstated). The default grid is part of the statistic's definition --
+# the `structure_cutoffs` calibration assumes it; non-default grids exist only
+# for the calibration script's provenance diagnostics.
+structure_vt <- function(loadings, grid_deg = seq(0, 175, by = 5)) {
+  h2 <- rowSums(loadings^2)
+  if (any(h2 < DEGEN_TOL)) {
+    return(NA_real_)
+  }
+  x <- vapply(grid_deg * pi / 180, function(theta) {
+    rl <- rotate_loadings(loadings, theta)
+    stats::var(rl[, 1]^2 / h2)
+  }, numeric(1))
+  # Constant Y across variables (e.g. only two, or all collinear scales)
+  # makes every per-rotation variance zero: 0/0, not a defined CV.
+  if (mean(x) < DEGEN_TOL) {
+    return(NA_real_)
+  }
+  stats::sd(x) / mean(x)
+}
+
+# Rotation Test of interstitiality (A&R Eq. 9): at each rotation theta, sum
+# across variables the variance across the two factors of the squared
+# loadings (a quartimax-like criterion); the statistic is the CV of that sum
+# over rotations. The summand has period 90 degrees in theta, so the default
+# grid spans one full period (0-85 by 5 degrees), again giving exact
+# orientation invariance; the same definition-and-calibration caveat as
+# structure_vt applies to the grid.
+structure_rt <- function(loadings, grid_deg = seq(0, 85, by = 5)) {
+  x <- vapply(grid_deg * pi / 180, function(theta) {
+    rl2 <- rotate_loadings(loadings, theta)^2
+    sum((rl2[, 1] - rl2[, 2])^2 / 2)
+  }, numeric(1))
+  # A zero rotation profile (all communalities negligible) is 0/0.
+  if (mean(x) < DEGEN_TOL) {
+    return(NA_real_)
+  }
+  stats::sd(x) / mean(x)
+}
+
 structure_loadings <- function(data, scales, ridge = 0) {
   stopifnot(is_var(scales))
   stopifnot(length(scales) >= 2)
@@ -81,3 +186,54 @@ structure_loadings <- function(data, scales, ridge = 0) {
 
   paf2(r)
 }
+
+# Interpretive cutoffs, keyed by number of scales -------------------------------
+# Acton & Revelle's published cutoffs were calibrated at nv = 64/128 variables
+# and do not transfer to 8 octant scales (their p. 18 documents a substantial
+# nv effect on the Gap Test; e.g. the raw-scored Gap "almost certainly"
+# cutoff moves from .01 at nv = 64/128 to .35 at nv = 8). These constants were
+# re-derived under the A&R generating model on exactly the criterion
+# statistics above, by data-raw/structure-test-cutoffs.R (seed 20260707,
+# standardized-uniqueness reading, 2026-07-07; derivation record in
+# data-raw/structure-test-cutoffs.rds, source transcription in
+# devel/ar2004-transcription.md). The published nv = 64/128 record was
+# reproduced as a sanity gate first (14/17 one-sided claims; three left-tail
+# limits documented in the script).
+#
+# The outer key is the number of scales the cutoffs were calibrated for --
+# cutoffs are valid ONLY at their calibrated nv, so consumers must look up
+# structure_cutoffs[[as.character(nrow(loadings))]] and treat NULL as "no
+# calibrated cutoffs; print none" (the Gap nv effect above is exactly the
+# error this guards against). Only nv = 8 is calibrated so far; the
+# derivation script's design is nv-generic if more are needed (e.g. 4- or
+# 16-scale instruments).
+#
+# Inner keys: declared scoring ("raw" vs "deviation" = row-mean centered,
+# what ipsatize() does) because A&R's cutoffs differ by scoring. Semantics
+# follow A&R's own likelihood phrasing, pooled over their general-factor,
+# axes/structure, and sample-size conditions: below `almost`, essentially no
+# competing structure occurred (1st percentile); below `thrice`/`twice`, the
+# named structure was at least 3x/2x as likely as its competitor. These are
+# heuristic classification cutoffs read off simulated distributions -- never
+# describe them as significance tests. Fisher certifies equal axes; gap, vt,
+# and rt certify interstitiality vs simple structure.
+structure_cutoffs <- list(
+  "8" = list(
+    fisher = list(
+      raw = c(almost = 0.10, thrice = 0.13, twice = 0.15),
+      deviation = c(almost = 0.07, thrice = 0.12, twice = 0.15)
+    ),
+    gap = list(
+      raw = c(almost = 0.35, thrice = 0.51, twice = 0.55),
+      deviation = c(almost = 0.15, thrice = 0.40, twice = 0.46)
+    ),
+    vt = list(
+      raw = c(almost = 0.12, thrice = 0.33, twice = 0.37),
+      deviation = c(almost = 0.19, thrice = 0.59, twice = 0.64)
+    ),
+    rt = list(
+      raw = c(almost = 0.13, thrice = 0.30, twice = 0.35),
+      deviation = c(almost = 0.32, thrice = 0.64, twice = 0.67)
+    )
+  )
+)
