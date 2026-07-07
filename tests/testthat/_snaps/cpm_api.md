@@ -85,7 +85,7 @@
       
       # Residuals
       
-        Largest absolute residual: 0.046 (DE – LM)
+        Largest absolute residual: 0.046 (PA – HI)
       
       # Diagnostics
       

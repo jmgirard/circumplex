@@ -191,7 +191,13 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
   ut <- upper.tri(resid)
   rvals <- resid[ut]
   idx <- which(ut, arr.ind = TRUE)
-  worst <- which.max(abs(rvals))
+  # Symmetric misfit patterns can tie several pairs at the maximum to within
+  # floating-point noise (~1e-16); which.max() would then break the tie on
+  # sub-ULP differences that vary by BLAS/platform, making the reported pair
+  # non-deterministic across machines. Take the first (fixed column-major
+  # order) of the pairs within a tolerance of the maximum instead.
+  aresid <- abs(rvals)
+  worst <- which(aresid >= max(aresid) - 1e-9)[1]
   i <- idx[worst, 1]
   j <- idx[worst, 2]
   cat(
