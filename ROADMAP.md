@@ -239,6 +239,11 @@ the relevant code:
     also returns a structurally wrong 0-row frame when all rows are dropped. The
     now-exported `geom_ssm_arc()` needs documented/validated displacement input
     range (a `min>max` span silently draws the short-way arc).
+    [Closed in M4/B5, 2026-07-06.] Residual, package-wide: both
+    `ssm_plot_circle()` and `plot.circumplex_cpm()` colour by a Set2 brewer
+    palette (max 8 colours), so a fit/analysis with >8 keyed levels warns and
+    recycles/NA-fills — a single palette policy (hue fallback beyond 8, or a
+    `palette=` hook like `ssm_plot_circle()`'s) belongs here, not per-plot.
   - *Monte Carlo engine efficiency (fold into M4's `ssm_ci_accuracy` work, which
     hammers the MC path):* the `psi` inner double loop recomputes squares
     per-element; per-profile `group_parameters()` + `do.call(cbind)` could be one

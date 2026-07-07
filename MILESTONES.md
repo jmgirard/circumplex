@@ -95,7 +95,7 @@ Cross-cutting guardrails for every task:
   resolution in `devel/m4-browne-design.md` §11.
   *Accept:* return contract documented and pinned by tests; consumed
   successfully by a prototype of the Z1 loop; RNG contract row added.
-- [ ] **B5. `plot.circumplex_cpm` on the M3 extension.** Estimated item
+- [x] **B5. `plot.circumplex_cpm` on the M3 extension.** Estimated item
   angles/communalities on the `ggcircumplex()` canvas. Fold in the deferred
   viz-robustness findings (ROADMAP continuous track): one plottability
   predicate across the degenerate-profile filters, `StatSsmArc` 0-row frame
@@ -225,6 +225,41 @@ at release time, not this branch's.
 
 ## Log
 
+- 2026-07-06 — B5 `plot.circumplex_cpm` + viz-robustness findings (Opus,
+  test-first; inline /code-review high, 1 low-severity finding recorded to
+  ROADMAP not fixed). New exported `plot()` method (R/cpm_oop.R): draws each
+  scale on the `ggcircumplex()` canvas at its estimated angle and a radius =
+  communality (ζ²), canvas spokes at the theoretical angles, and a joint
+  angle×communality CI wedge where estimable; communality CI = squared
+  [0,1]-clamped ζ bounds (monotone map); a single fill aesthetic + `limits =
+  levels` so the reference scale's zero-width wedge (which drops from the arc
+  layer's computed data) keeps its Set2 colour rather than training last as
+  grey; scales with an inestimable/full-circle interval draw as a point only
+  and are named in a warning. Folded in the three ROADMAP continuous-track
+  viz-robustness findings (R/geom_ssm.R): one plottability predicate pair
+  (`ssm_has_location`/`ssm_has_region`) now shared by `GeomSsmPoint`,
+  `StatSsmArc`, `ssm_plot_circle()`, and the new plot; `StatSsmArc`'s all-rows-
+  dropped case routes the empty frame through the parent (rep_len(0, nr) not a
+  scalar) so it returns the parent's structure, not the raw input columns; and
+  a shared `ssm_arc_span()` documents+validates the displacement input range
+  (CCW min→max, min>max = seam-crossing, span must be <360° or the stat errors)
+  — geometry byte-identical for valid input (end = ggrad(min+span) = ggrad(upper)
+  as before), existing ssm_plot vdiffr snapshots unchanged. Verified: ssm's own
+  displacement CIs stay in [0,360) with span <360 (unwrap-around-mean bound;
+  worst observed 335° over noisy sims), so the new stat validation never fires
+  on `ssm_plot_circle()`; cpm's analytic angle CIs can exceed 360° span but are
+  pre-filtered to point-only. Recorded to ROADMAP continuous track (not fixed):
+  Set2 caps at 8 colours, so both circle plots degrade for >8 keyed levels — a
+  package-wide palette policy, not a per-plot patch. Tests: test-cpm_plot.R
+  (+5: build/geometry, vdiffr hero + no-legend snapshots, inestimable-CI
+  point-only warning, arg validation); test-geom_ssm.R (+3: parent-structured
+  empty arc frame, sub-circle span rejection + seam-crossing still accepted,
+  defined-estimate/undefined-CI renders point-no-wedge). Suite 892/892; check
+  0/0/0; document() no-diff (pre-existing internal-link warnings only). NEWS
+  updated. (R/cpm_oop.R, R/geom_ssm.R, R/ssm_plot.R,
+  tests/testthat/test-cpm_plot.R [new], tests/testthat/_snaps/cpm_plot/ [new],
+  tests/testthat/test-geom_ssm.R, man/plot.circumplex_cpm.Rd [new],
+  man/geom_ssm_arc.Rd, NAMESPACE, NEWS.md, ROADMAP.md, MILESTONES.md.)
 - 2026-07-06 — B4 `cpm_simulate()` (Opus, test-first; inline /code-review,
   clean). New exported `cpm_simulate(object, n)` in R/cpm_fit.R: draws n
   standardized rows from the fitted P̂ via the exact-PSD factor form

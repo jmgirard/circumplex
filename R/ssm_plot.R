@@ -75,10 +75,11 @@ ssm_plot_circle <- function(ssm_object,
   # the 0/360 boundary) is handled by geom_ssm_arc()/geom_ssm_point() below.
   df_plot <- df
 
-  # Profiles with an undefined displacement (flat or zero-amplitude scores:
-  # d_est = NA) have no location on the circle. The arc/point geoms drop them,
-  # so remove them up front and name them rather than let them vanish silently.
-  undefined <- is.na(df_plot[["d_est"]])
+  # Profiles with an undefined location (flat or zero-amplitude scores:
+  # d_est = NA) have no place on the circle. The arc/point geoms drop them, so
+  # remove them up front and name them rather than let them vanish silently.
+  # Uses the same plottability predicate as the geoms (ssm_has_location()).
+  undefined <- !ssm_has_location(df_plot[["a_est"]], df_plot[["d_est"]])
   if (any(undefined)) {
     warning(
       "Profile(s) omitted for undefined displacement ",

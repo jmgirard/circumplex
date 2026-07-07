@@ -27,6 +27,13 @@
   matrix is the fitted `Phat`. Call `set.seed()` immediately before it for
   reproducible draws.
 
+* New `plot()` method for `circumplex_cpm` objects draws the estimated item
+  configuration on the `ggcircumplex()` canvas: each scale appears at its
+  estimated angle and at a radius given by its communality, with a wedge
+  spanning its angle and communality confidence intervals where these are
+  estimable (scales with an inestimable interval are drawn as a point only and
+  named).
+
 * New `ggcircumplex()` function builds an empty circumplex plotting canvas
   (amplitude rings, displacement spokes, and scale labels) as a ggplot2
   object that you can add layers to with `+`. It accepts a set of scale

@@ -214,3 +214,128 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
   cat("\n")
   invisible(object)
 }
+
+# ---- plot -------------------------------------------------------------------
+
+#' Plot a circular process model fit
+#'
+#' Draw the estimated item configuration of a [cpm_fit()] object on the circular
+#' canvas from [ggcircumplex()]. Each scale is placed at its *estimated* angle
+#' (`θ`), at a radius given by its communality (`ζ²`, the share of
+#' its variance explained by the common circumplex factors), so items that the
+#' model explains well sit near the outer ring and items it explains poorly sit
+#' near the centre. The canvas spokes mark the *theoretical* angles supplied to
+#' [cpm_fit()], so the gap between a point and its spoke shows how far the
+#' estimated angle departed from the hypothesised one. Where the confidence
+#' intervals are estimable, a wedge spans each item's angle CI (angularly) and
+#' communality CI (radially).
+#'
+#' @param x A `circumplex_cpm` object from [cpm_fit()].
+#' @param amax A single positive number giving the communality represented by
+#'   the canvas's outer ring (default = 1, the maximum possible communality).
+#' @param angle_labels Either `NULL` or a character vector of spoke labels, one
+#'   per scale in the fitted order. `NULL` (default) labels the spokes with the
+#'   scale names.
+#' @param legend A logical: draw a legend keying the colours to the scale names
+#'   (default = `TRUE`).
+#' @param ... Not used. Supplying an unrecognized argument produces a warning.
+#' @return A \pkg{ggplot2} object.
+#' @seealso [cpm_fit()], [ggcircumplex()]
+#' @method plot circumplex_cpm
+#' @export
+#' @examples
+#' \donttest{
+#' data("jz2017")
+#' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+#' set.seed(12345)
+#' fit <- cpm_fit(jz2017, scales = scales, boots = 100)
+#' plot(fit)
+#' }
+plot.circumplex_cpm <- function(x, amax = 1, angle_labels = NULL,
+                                legend = TRUE, ...) {
+  chkDots(...)
+  df <- x$results
+  # Canvas spokes mark the theoretical angles the user supplied to cpm_fit().
+  angles <- df$Angle_theory
+
+  stopifnot(is_num(amax, n = 1) && amax > 0)
+  stopifnot(is_flag(legend))
+  stopifnot(is_null_or_char(angle_labels, n = nrow(df)))
+
+  # Radial axis = communality (zeta^2, in [0, 1]). The communality CI comes from
+  # squaring the zeta bounds; squaring is monotone on [0, 1] so the order is
+  # preserved, and the zeta bounds are first clamped to [0, 1] because an
+  # analytic (Wald) interval can overshoot the boundary.
+  df$comm_est <- df$Communality
+  df$comm_lci <- pmin(pmax(df$Zeta_lci, 0), 1)^2
+  df$comm_uci <- pmin(pmax(df$Zeta_uci, 0), 1)^2
+
+  # A scale is drawn as a point whenever it has a location (cpm angles are
+  # always estimated, so this holds unless a future path yields NA) and as a
+  # wedge only when its CI region is estimable AND names a proper arc (< 360
+  # deg span). A Heywood/weakly-identified fit can leave the CI NA (no region)
+  # or produce a near-full-circle angle CI; such scales render as a point with
+  # no wedge, and we name them rather than let the wedge vanish silently.
+  df$Scale <- factor(df$Scale, levels = unique(as.character(df$Scale)))
+  span <- ssm_arc_span(df$Angle_lci, df$Angle_uci)
+  drawable <- ssm_has_region(df$comm_lci, df$comm_uci,
+                             df$Angle_lci, df$Angle_uci) &
+    is.finite(span) & span >= 0 & span < 360
+  pointable <- ssm_has_location(df$comm_est, df$Angle)
+  no_wedge <- pointable & !drawable
+  if (any(no_wedge)) {
+    warning(
+      "Confidence wedge omitted for scale(s) with an inestimable or ",
+      "full-circle interval: ",
+      paste(as.character(df$Scale)[no_wedge], collapse = ", "),
+      "; drawn as a point only.",
+      call. = FALSE
+    )
+  }
+
+  labels <- if (is.null(angle_labels)) as.character(df$Scale) else angle_labels
+
+  # A single fill aesthetic keys the colour so points and wedges share one
+  # legend (a colour aesthetic on the wedges would split it into two guides).
+  # Pin the fill order to the scale levels: the reference scale's wedge has zero
+  # angular width and so drops out of the arc layer's computed data, which would
+  # otherwise let scale training append it last (and colour it grey).
+  p <- ggcircumplex(angles = angles, labels = labels, amax = amax) +
+    ggplot2::scale_fill_brewer(palette = "Set2", limits = levels(df$Scale)) +
+    ggplot2::theme(
+      legend.position = if (legend) "right" else "none"
+    )
+
+  if (any(drawable)) {
+    p <- p +
+      geom_ssm_arc(
+        data = df[drawable, ],
+        mapping = ggplot2::aes(
+          amplitude_min = .data$comm_lci,
+          amplitude_max = .data$comm_uci,
+          displacement_min = .data$Angle_lci,
+          displacement_max = .data$Angle_uci,
+          fill = .data$Scale
+        ),
+        amax = amax,
+        alpha = 0.4,
+        color = "grey40",
+        linewidth = 0.5
+      )
+  }
+
+  p +
+    geom_ssm_point(
+      data = df[pointable, ],
+      mapping = ggplot2::aes(
+        amplitude = .data$comm_est,
+        displacement = .data$Angle,
+        fill = .data$Scale
+      ),
+      amax = amax,
+      shape = 21,
+      size = 3,
+      color = "black"
+    ) +
+    ggplot2::guides(fill = ggplot2::guide_legend("Scale"))
+}

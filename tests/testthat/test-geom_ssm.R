@@ -132,6 +132,84 @@ test_that("geoms drop NA-displacement (degenerate) rows without error", {
   expect_equal(nrow(ggplot2::ggplot_build(p)$data[[7]]), 0)
 })
 
+test_that("StatSsmArc returns a parent-structured frame when all rows drop", {
+  # ROADMAP viz-robustness: when every arc row is dropped as degenerate, the
+  # stat used to short-circuit and return the raw (filtered) input frame --
+  # lacking the arc geometry columns the parent emits -- a structurally wrong
+  # 0-row frame. It must instead route the empty frame through the parent, so
+  # its structure matches the populated path (the parent's x/y), not the input
+  # aesthetics.
+  cols <- c("amplitude_min", "amplitude_max",
+            "displacement_min", "displacement_max")
+  all_na <- data.frame(
+    amplitude_min = NA_real_, amplitude_max = NA_real_,
+    displacement_min = NA_real_, displacement_max = NA_real_,
+    PANEL = factor(1L), group = 1L
+  )
+  empty <- StatSsmArc$compute_panel(all_na, scales = NULL, n = 360, amax = 0.5)
+  expect_equal(nrow(empty), 0)
+  # Parent (StatArcBar) output has x/y; the raw input columns must not survive
+  # as the whole frame.
+  expect_true(all(c("x", "y") %in% names(empty)))
+  expect_false(all(cols %in% names(empty)))
+})
+
+test_that("geom_ssm_arc rejects a displacement interval that is not a sub-circle", {
+  # A span >= 360 deg (here from bounds outside [0, 360)) no longer names a
+  # unique arc; the stat must reject it rather than silently draw a wrong wedge.
+  bad <- data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = -100, d_uci = 300)
+  p <- ggcircumplex(octants(), amax = 0.5) +
+    geom_ssm_arc(
+      data = bad,
+      mapping = ggplot2::aes(
+        amplitude_min = a_lci, amplitude_max = a_uci,
+        displacement_min = d_lci, displacement_max = d_uci
+      ),
+      amax = 0.5
+    )
+  expect_error(ggplot2::ggplot_build(p), "full circle")
+
+  # A genuine seam-crossing interval (min > max, short way) is still accepted.
+  ok <- data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 350, d_uci = 10)
+  p_ok <- ggcircumplex(octants(), amax = 0.5) +
+    geom_ssm_arc(
+      data = ok,
+      mapping = ggplot2::aes(
+        amplitude_min = a_lci, amplitude_max = a_uci,
+        displacement_min = d_lci, displacement_max = d_uci
+      ),
+      amax = 0.5
+    )
+  expect_no_error(ggplot2::ggplot_build(p_ok))
+})
+
+test_that("a defined estimate with an undefined CI renders as a point, no wedge", {
+  # The shared predicates split location (point) from region (wedge): a row with
+  # a defined amplitude/displacement but NA CI bounds draws its point and drops
+  # only its wedge. plot.circumplex_cpm() is the layer that then names it.
+  df <- data.frame(
+    a_est = 0.3, d_est = 90,
+    a_lci = NA_real_, a_uci = NA_real_, d_lci = NA_real_, d_uci = NA_real_
+  )
+  p <- ggcircumplex(octants(), amax = 0.5) +
+    geom_ssm_arc(
+      data = df,
+      mapping = ggplot2::aes(
+        amplitude_min = a_lci, amplitude_max = a_uci,
+        displacement_min = d_lci, displacement_max = d_uci
+      ),
+      amax = 0.5
+    ) +
+    geom_ssm_point(
+      data = df,
+      mapping = ggplot2::aes(amplitude = a_est, displacement = d_est),
+      amax = 0.5
+    )
+  b <- ggplot2::ggplot_build(p)
+  expect_equal(nrow(b$data[[6]]), 0)  # no wedge
+  expect_equal(nrow(b$data[[7]]), 1)  # one point
+})
+
 test_that("a canvas-plus-geoms plot renders (visual regression)", {
   data("jz2017")
   set.seed(12345)
