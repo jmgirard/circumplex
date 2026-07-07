@@ -174,6 +174,16 @@ dependencies for the fit statistics: zero**.
 - New vignette: "Evaluating Circumplex Structure" (fit statistics, CI
       trustworthiness, when to trust SSM parameters, ipsatization guidance).
 
+Post-M4 (agreed with Jeff, 2026-07-06): draft a publication-grade simulation
+study design as a devel/ brief (Fable-tier design task) extending the B6
+coverage oracle — factorial over zeta level/heterogeneity, p, m
+(mis)specification, and N; competitor intervals (BCa at minimum, motivated by
+the observed one-sided percentile under-coverage from the zeta boundary
+bias); MC error budget; candidate venues Behavior Research Methods (CircE
+successor + simulation core) or Assessment (CI-trustworthiness framing with
+the `ssm_ci_accuracy()` work). The B6 script and Z1/Z2 machinery are the
+intended simulation engine.
+
 ## Milestone 5 — SEM-based SSM
 
 **Status: planned.** Builds on the lavaan explorations in `devel/lavaan_ssm.Rmd`
@@ -254,7 +264,19 @@ the relevant code:
     pass `probs = c(lo, hi)` once; drop the redundant `scores <- obs_scores` alias
     in both analysis paths; tighten the `ssm_score()` roxygen (an unnamed extra
     fills `angles` positionally and errors on `is.numeric`, not the documented
-    named-args message).
+    named-args message); bump the testthat Suggests floor — DESCRIPTION declares
+    `>= 3.0.0` but the suite has long used `expect_no_error()`/`expect_no_warning()`
+    (testthat 3.1.5+), so the declared floor understates the real requirement
+    (noticed in the B6 review, 2026-07-07).
+- **CIRCUM-compatibility mode for `cpm_fit()`** (surfaced by M4/B6's published-
+  oracle triage, 2026-07-06): CIRCUM/CircE fit Browne's *free-scaling*
+  covariance structure `Σ = D_σ P(γ) D_σ`, so their fitted diagonal is not
+  constrained to 1 and their finite-sample estimates/χ² differ from our
+  correlation-structure fit (same df, asymptotically equivalent; details in
+  devel/m4-browne-design.md §11). A `free_scaling = TRUE` option would let
+  users reproduce published CIRCUM/CircE output exactly; the OpenMx test
+  oracle already demonstrates the parameterization. Decide post-M4 whether
+  the reproduction value justifies a second fitted family.
 
 Explicitly **not** planned: a ground-up rewrite. The R-dispatch → C++ core →
 `boot` architecture, the S3 class design, and the minimal dependency policy

@@ -103,7 +103,7 @@ Cross-cutting guardrails for every task:
   *Accept:* vdiffr snapshots for the new plot; existing ssm_plot snapshots
   byte-identical or individually justified; robustness findings closed with
   tests.
-- [ ] **B6. CPM validation battery.** Brief A §6 in full: published
+- [x] **B6. CPM validation battery.** Brief A §6 in full: published
   CIRCUM/CircE oracle transcription (blank templates → transcribed values),
   OpenMx/lavaan cross-implementation oracles in Suggests, the simulation
   coverage oracle + T-calibration (A-review F1 — the test that separates
@@ -144,6 +144,13 @@ Cross-cutting guardrails for every task:
   envelope; L'Ecuyer-CMRG save/restore of caller RNG state; machinery pins
   (c=0 amplitude-coverage identity) green; parallel path yields identical
   results to serial at fixed seed.
+  *Cost input from B6 (2026-07-06/07):* bootstrap refits on data simulated
+  from octant-like, near-boundary truths cost ~20–35 ms each (3–5× the
+  clean-data ~6.5 ms measured in B3) — Heywood drift, softmax-tail stalls,
+  and acceptance restarts. Z1 simulates from the user's own fitted CPM,
+  which for real octant instruments (jz2017 included) is often exactly this
+  regime, so budget against the slow figure and expect the Phase-2
+  RcppArmadillo trigger (design §8) to fire at or before Z1 scale.
 - [ ] **Z2. Amplitude-near-zero module + verdict.** Spec §4–§5: the joint
   row-amplitude ladder via the 3×3 estimator-functional solve (B-review
   F3), one-sided amplitude-CI miss decomposition, guardrail
@@ -208,7 +215,9 @@ Cross-cutting guardrails for every task:
   Z&W Studies 1–5 transcribed as cited context (re-confirm the grid
   characterization at transcription time and log it — spec §2/F8).
   *Accept:* builds clean; exported API only; statistical-precision bar
-  (CLAUDE.md); Z&W numerics transcribed, never from memory.
+  (CLAUDE.md); Z&W numerics transcribed, never from memory. Also the natural
+  point to confirm/veto the B6 analytic-CI caution wording (see the
+  pre-release open-items list below).
 - [ ] **W2. Ship-time documentation.** DESIGN.md RNG entry-point list gains
   `cpm_fit(ci_method="bootstrap")`, `cpm_simulate()`, `ssm_ci_accuracy()`
   rows; update `ssm_analyze()`'s "only function that consumes R's RNG"
@@ -218,6 +227,22 @@ Cross-cutting guardrails for every task:
   *Accept:* document() no-diff; DESIGN.md consistent; follow-ups recorded
   where ROADMAP says they live.
 
+Open items to resolve before the M4 release (do not block later M4 tasks):
+
+- **B6 published-oracle re-read.** The CircE (Grassi et al. 2010) fixture
+  values in `tests/testthat/helper-cpm-oracles.R` were transcribed via two
+  automated channels (visual + pdftotext) but still need the §6.1 protocol's
+  *second independent human re-read* against the paper before release. Only a
+  transcription typo is at risk (the cross-implementation and simulation
+  oracles are transcription-independent and already agree). Fold into the
+  pre-release `/code-review high`.
+- **B6 analytic-CI caution — Jeff to confirm/veto** (reversible until
+  release, per the adopted-by-default policy above). The marker set for the
+  N∈[2000,50000) boundary caution (`cpm_boundary_markers()` in R/cpm_fit.R:
+  Heywood / removed harmonic / min β̂ < .10 / condition > 1e8 / multimodal)
+  and its `summary()` wording are an adopted default; confirm or adjust when
+  W1 documents CI trustworthiness (natural review point).
+
 Release: after all tasks, `/code-review max` minimum (flagship —
 `/code-review ultra` only if Jeff asks), then `/release-checklist` for the
 M4 CRAN slot. The held v1.3.0 must ship first or be folded in — Jeff's call
@@ -225,6 +250,72 @@ at release time, not this branch's.
 
 ## Log
 
+- 2026-07-07 — B6 CPM validation battery (Fable, plan-first; /statistical-
+  validation; 3-finder×8-angle /code-review high, 6 confirmed findings fixed).
+  **Published oracles:** the full text of Grassi, Luccio & Di Blas (2010, BRM
+  42, 55–73 — oracle O2, which reanalyzes Browne 1992's own vocational data
+  and states its m=1..3 results coincide with CIRCUM, transitively covering
+  O1) was obtained and transcribed via two diffed channels (visual page read
+  + pdftotext layer; second independent human re-read pending: Jeff) into
+  tests/testthat/helper-cpm-oracles.R fixtures. Triage finding (design-doc
+  §11 entry): CIRCUM/CircE fit Browne's *free-scaling covariance* structure
+  (their published variance ratios .963–1.042 prove it), so the §3.2
+  "σ̂ = 1 when fitted to R" claim is false at finite N and published
+  comparisons carry a documented model difference (same df, nested families,
+  F_ours ≥ F_pub asserted both ways); our discrepancy function reproduces
+  their published F̂ = 0.089815 at their reconstructed Σ̂ to ~4e-7. Their m=2
+  double-Heywood and m=3 β₃→0 boundary rows reproduce in our engine (flags +
+  polish). Convention traps decoded and pinned: CircE ζ-CIs are ln-v-Wald
+  back-transforms (shape-different from ours by design), SRMR is
+  diagonal-inclusive (ours ×√(6/8) matches), published F₀ is truncated not
+  rounded, CIRCUM-compat free-scaling mode recorded in ROADMAP continuous
+  track. **Cross-implementation oracles** (OpenMx + lavaan added to Suggests,
+  test-only): OpenMx on our diag-constrained model matches the engine to
+  dF ≈ 3e-14 / ≤5e-3° / ≤1e-5 (found+neutralized: OpenMx cov-path applies an
+  internal (N−1)/N rescale that *shifts* the diag-constrained optimum — feed
+  R·N/(N−1)); OpenMx on the free-scaling model reproduces published CircE to
+  its printed precision (closing the attribution loop); lavaan constrained
+  3-factor m=1 lands on our optimum to ~4e-7 in F̂. **Simulation oracles:**
+  sampling consistency + suite-level T-calibration (KS, N=2000,
+  well-identified truth) green; the full coverage oracle
+  (devel/m4-coverage-oracle.R, seeded scheduling-independent, 500 reps ×
+  {250,500,1000} × {boundary,interior β} × boots=1000, ~3.2 h, + an
+  analytic-only ladder to N=50000) is committed with results
+  (devel/m4-coverage-oracle-*.rds) and recorded in DESIGN.md. Headline:
+  bootstrap-default AFFIRMED (dominates analytic for angles/ζ) but the
+  [.90,.98] acceptance band FAILS — ζ under-covers at N ≤ 500 (one-sided,
+  boundary bias) and β at near-boundary truths under-covers ~.77 flat in N
+  (structural percentile failure; BCa follow-up already in ROADMAP);
+  analytic CIs recover at N=2000 for interior truths but only at N≈50000
+  for near-boundary ones; T = n·F̂ is NOT χ²_df at octant-like truths at
+  field N (KS rejects 5/6 cells; Heywood rates .21–.91 — W1 vignette
+  material); Heywood solutions are the NORM at field N for octant truths.
+  **Calibration shipped** (R/cpm_fit.R, R/cpm_oop.R): summary()'s analytic
+  caution is now unconditional below N=2000 and marker-conditional to
+  N=50000 via new cpm_boundary_markers() (Heywood / removed harmonic /
+  min β̂ < .10 / condition > 1e8 / multimodal), named in the caution text.
+  **Review fixes** (6 confirmed): Inf (singular) Hessian excluded by
+  is.finite() in both the new marker AND the pre-existing B1 engine warning
+  (fixed together via shared cpm_hessian_condition_warn constant, flagged
+  here as a pre-existing defect fixed in place); NA-β crash surface in
+  summary(); knife-edge fixture (truth β₃ exactly at the .10 marker,
+  fitted margin 1e-9 — cpm_clean_truth trailing β now .15);
+  expect_no_match needed testthat 3.1.8 vs declared 3.0.0 (replaced;
+  pre-existing stale floor recorded in ROADMAP); dangling "see the
+  diagnostics above" (markers now printed inline); stale summary() roxygen.
+  Coverage-script hardening quantified before adoption: whole-worker try()
+  + error accounting (recorded run had zero errors, provably unaffected);
+  est-anchored circular membership replaced by the anchor-free span rule and
+  the most-affected cell re-run — every number reproduced to all printed
+  decimals. Suite 984/984; check 0/0/0; document() no-diff beyond
+  man/summary.circumplex_cpm.Rd. NEWS updated. Z1 cost note added above.
+  (DESCRIPTION, R/cpm_fit.R, R/cpm_oop.R, DESIGN.md, NEWS.md, ROADMAP.md,
+  devel/m4-browne-design.md, devel/m4-coverage-oracle.R [new],
+  devel/m4-coverage-oracle-results.rds [new],
+  devel/m4-coverage-oracle-analytic.rds [new],
+  tests/testthat/test-cpm_oracles.R [new],
+  tests/testthat/helper-cpm-oracles.R [new], tests/testthat/test-cpm_api.R,
+  man/summary.circumplex_cpm.Rd, MILESTONES.md.)
 - 2026-07-06 — B5 `plot.circumplex_cpm` + viz-robustness findings (Opus,
   test-first; inline /code-review high, 1 low-severity finding recorded to
   ROADMAP not fixed). New exported `plot()` method (R/cpm_oop.R): draws each

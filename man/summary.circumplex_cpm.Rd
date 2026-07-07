@@ -20,7 +20,12 @@
 Fuller display of a \code{\link[=cpm_fit]{cpm_fit()}} object: adds the correlation-function weights,
 the full set of fit indices, a residual summary (the largest absolute
 residual and the pair it belongs to), and all boundary/identification
-diagnostics in plain language. When the confidence intervals are analytic and
-the sample size is modest, prints a caution that Wald intervals may materially
-mis-cover (see \code{\link[=cpm_fit]{cpm_fit()}}).
+diagnostics in plain language. When the confidence intervals are analytic,
+prints a coverage caution calibrated by simulation: unconditionally when the
+sample size is modest (N < 2000, where Wald intervals mis-covered for every
+configuration studied), and up to N = 50000 when the fitted solution shows a
+boundary or weak-identification marker (Heywood communality, removed
+harmonic, small correlation-function weight, ill-conditioning, or competing
+near-tied optima), the regime where they mis-covered even at large N (see
+\code{\link[=cpm_fit]{cpm_fit()}}).
 }

@@ -74,6 +74,69 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]
 | Closed-form estimator (2/n Σ s·cos, 2/n Σ s·sin) | Equals OLS iff angles are equally spaced around the circle (orthogonal design). For unequal spacing it is the conventional Gurtman estimator, not least-squares; documented, with an OLS option under consideration. |
 | Degenerate profiles → NA at machine-noise tolerance | Flat profile (sd ≤ 8·ε·n·max\|s\|): displacement and fit are NA. Zero amplitude with real variance (pure higher harmonic): displacement NA, fit exactly 0. The tolerance is float-cancellation scale only (~13 orders below real variation) — small real amplitudes are never NA'd; their unreliability is the CI's job (plus G1 guardrails). C++ returns NAs silently; R warns once (and once with a count for degenerate bootstrap resamples). Exclusion from the confidence intervals is **per parameter, not per replicate**: `ssm_replicate_intervals()` quantiles each parameter column with `na.rm = TRUE`, so a degenerate replicate's undefined displacement (and fit, if flat) is dropped only from that parameter's CI, which is therefore conditional on estimability; its other, well-defined parameters (elevation/x/y/amplitude) still enter their own CIs undisturbed — dropping the whole replicate row would instead bias those CIs (e.g., pull a near-zero amplitude CI away from 0). Cannot test `var == 0` exactly: a constant vector of a non-representable value (e.g., 0.1) has var ≈ 2e-34. |
 
+### CPM confidence intervals: measured coverage (M4/B6 coverage oracle)
+
+Recorded 2026-07-07 from `devel/m4-coverage-oracle.R` (seeded; results in
+`devel/m4-coverage-oracle-results.rds` / `-analytic.rds`): 500 replications
+per cell, nominal-95% CIs, p = 8 octant truths with ζ = .75 and two β
+configurations — "boundary" (.45/.35/.15/**.05**, small trailing harmonic)
+and "interior" (.35/.30/.20/**.15**). Bootstrap cells used 1000 resamples.
+
+| Cell | Boot angle | Boot ζ | Boot β | Analytic angle | Analytic ζ | Analytic β |
+|---|---|---|---|---|---|---|
+| boundary N=250 | .900 | .820 | .792 | .800 | .851 | .875 |
+| boundary N=500 | .906 | .884 | .767 | .801 | .904 | .849 |
+| boundary N=1000 | .931 | .920 | .771 | .764 | .909 | .876 |
+| interior N=250 | .934 | .758 | .894 | .821 | .782 | .922 |
+| interior N=500 | .940 | .870 | .882 | .869 | .902 | .922 |
+| interior N=1000 | .949 | .936 | .881 | .876 | .948 | .944 |
+
+Analytic-only ladder: interior truths reach the [.90, .98] band at
+**N = 2000** and stay; boundary truths stay badly outside it through
+**N = 20000** (angle .70–.81) and recover only by **N = 50000** (.934) —
+matching the A-review F1 finding. What this record decides:
+
+- **Bootstrap default affirmed, with a documented failure.** The bootstrap
+  dominates the analytic method for angles everywhere (.90–.95 vs .76–.88;
+  analytic angle coverage does not improve 250→1000 at boundary truths) and
+  for ζ at N ≥ 500. But the design's acceptance band ([.90, .98] for the
+  default at every N/parameter) **fails**: ζ under-covers at N ≤ 500 (down
+  to .758, misses one-sided above truth — ζ̂'s boundary bias, which
+  percentile intervals inherit), and β under-covers at boundary truths at
+  every N (~.77, flat in N — the classic percentile-bootstrap failure for a
+  parameter near its boundary, structural rather than small-sample). The
+  BCa/alternative-interval follow-up is recorded in ROADMAP (post-M4 note).
+- **`summary()` caution calibrated** (constants in R/cpm_fit.R):
+  unconditional below N = 2000; between 2000 and 50000 conditional on the
+  fit's own boundary/weak-identification markers (Heywood, removed
+  harmonics, min β̂ < .10, Hessian condition > 1e8 — the markers that
+  separated the two regimes above — plus the multimodality flag, not
+  separately measured but the same regime), with the fired markers named in
+  the caution text.
+- **T = n·F̂ is not χ²_df at these truths at field N**: seeded KS rejects in
+  5 of 6 cells (only interior N=1000 passes, p = .255), tracking the Heywood
+  rates (.21–.91 across cells; boundary pile-up makes T a mixture). At a
+  well-identified non-octant truth at N = 2000 the KS check passes
+  (test-cpm_oracles.R) — this is a boundary-regime effect, not a broken
+  statistic, but χ²/RMSEA on octant instruments at field N should be read
+  accordingly (W1 vignette material).
+- **Heywood solutions are the norm, not the exception, at field N** for
+  octant-like truths at ζ = .75: 59–91% of fits at N ≤ 500 contain at least
+  one ζ̂ > .995 (driven by the weakly identified alternating/Nyquist mode of
+  equally spaced grids interacting with β₀).
+- Replicate exclusions were small (used 411–494 of 500 per cell; acceptance
+  criterion; zero worker errors) and are counted in the RDS.
+- Measurement caveats, checked: the recorded run scored circular-CI
+  membership with an estimate-anchored rule that could in principle
+  mis-score intervals whose endpoints sit > 180° from the point estimate;
+  re-running the most-affected cell (boundary N=250, Heywood rate .79) under
+  the anchor-free span rule reproduced every coverage number to all printed
+  decimals, so the table is insensitive to the rule. The boundary-cell β
+  coverage is not a polish artifact: fit-level polish rates were ≤ .04
+  (boundary N=250) and 0.00 elsewhere, so the flat ~.77 reflects percentile
+  intervals at a near-boundary β truth, not degenerate zero-width intervals
+  from removed harmonics.
+
 ## Reproducibility
 
 **RNG contract (an invariant, not an inventory):** a function consumes R's
@@ -201,7 +264,9 @@ that byte-identical output depended on).**
 
 Imports kept minimal (boot, ggplot2, ggforce, htmlTable, Rcpp, rlang, stats).
 Heavier or optional functionality goes to Suggests with graceful degradation
-(ggrepel, kableExtra; lavaan planned for M4). No tidyverse in package code.
+(ggrepel, kableExtra). OpenMx and lavaan are in Suggests as **test oracles
+only** (cross-implementation checks in test-cpm_oracles.R, skipped when not
+installed) — never as runtime paths. No tidyverse in package code.
 
 ## Testing strategy
 
@@ -211,3 +276,10 @@ Heavier or optional functionality goes to Suggests with graceful degradation
 - C++ helpers are tested against base-R equivalents (colMeans, cor pairwise).
 - Boundary suite (0°/360°, ±180° contrasts, flat profiles) — being expanded
   under ROADMAP M1; required for any estimation change.
+- CPM validation battery (M4/B6, test-cpm_oracles.R + helper-cpm-oracles.R):
+  published CIRCUM/CircE oracles transcribed from Grassi et al. (2010) with
+  the model-difference triage documented in devel/m4-browne-design.md §11;
+  OpenMx/lavaan cross-implementation oracles (Suggests, skip-if-absent);
+  sampling-consistency and T-calibration simulation checks (skip-on-CRAN);
+  the heavy coverage oracle lives in devel/m4-coverage-oracle.R and is run
+  by /statistical-validation, never by R CMD check.

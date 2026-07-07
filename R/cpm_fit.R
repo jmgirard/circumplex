@@ -624,7 +624,10 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   H <- (H + t(H)) / 2
   hev <- eigen(H, symmetric = TRUE, only.values = TRUE)$values
   hcond <- if (min(abs(hev)) > 0) max(abs(hev)) / min(abs(hev)) else Inf
-  if (is.finite(hcond) && hcond > 1e8) {
+  # isTRUE(> threshold), not is.finite() &&: an exactly singular Hessian
+  # (hcond = Inf) is the limiting case of ill-conditioning and must warn
+  # (B6 review fix -- the old is.finite() guard silently excluded it)
+  if (isTRUE(hcond > cpm_hessian_condition_warn)) {
     warning(
       sprintf(
         "CPM Hessian is ill-conditioned (condition number %.2e): angles may ",
@@ -1086,10 +1089,56 @@ cpm_bootstrap <- function(engine, sdata, boots, interval) {
 
 # ---- cpm_fit(): the user-facing constructor ---------------------------------
 
-# Below this N, summary() cautions that analytic CIs may materially mis-cover
-# and points to the bootstrap (design sec. 5.2). Provisional value pending the
-# B6 coverage-oracle calibration.
+# Analytic-CI caution thresholds for summary() (design sec. 5.2), calibrated
+# by the B6 coverage oracle (devel/m4-coverage-oracle.R; results in DESIGN.md
+# and devel/m4-coverage-oracle-*.rds, 2026-07-07). Measured nominal-95%
+# coverage of the analytic (Wald) intervals: below N = 2000 they mis-covered
+# for every truth configuration studied (angle coverage .76-.88 at
+# N <= 1000); from N = 2000 to N = 20000 they mis-covered only in
+# near-boundary regimes (angle coverage .70-.81 with a small trailing
+# harmonic, vs .92-.95 for well-identified truths), recovering by
+# N = 50000. Hence: unconditional caution below the first threshold,
+# boundary-marker-conditional caution below the second.
 cpm_analytic_ci_n_caution <- 2000L
+cpm_analytic_ci_n_boundary_caution <- 50000L
+
+# One threshold for "weakly determined": the engine's fit-time conditioning
+# warning and the summary() boundary-proximity marker must fire together.
+cpm_hessian_condition_warn <- 1e8
+
+# Which boundary/weak-identification markers does a fitted solution show, in
+# the sense that separated the mis-covering from the well-covered truth
+# configurations in the coverage oracle? Returns a character vector of fired
+# markers (empty = none), which summary() prints so the caution never points
+# at a diagnostic the user cannot see. The beta marker (0.10) is deliberately
+# looser than the 1e-2 polish trigger: it flags the oracle's near-boundary
+# configuration (trailing beta truth .05) with margin while passing its
+# all-interior configuration (smallest truth .15). All comparisons are
+# isTRUE()-guarded so a malformed or legacy object degrades to "no marker",
+# never to an NA crash inside summary(). The multimodality flag was not
+# measured separately by the coverage oracle; it is included because it
+# signals the same weak-identification regime (near-tied optima), and
+# omitting it would let summary() print "may be weakly identified" while
+# staying silent about the CI consequence.
+cpm_boundary_markers <- function(object) {
+  d <- object$details
+  b <- object$betas$Beta
+  as.character(c(
+    if (isTRUE(d$heywood)) "Heywood communality",
+    if (length(d$removed_harmonics) > 0) "boundary harmonic removed",
+    if (length(b) > 0 && isTRUE(min(b) < 0.10)) {
+      "small correlation-function weight"
+    },
+    if (isTRUE(d$hessian_condition > cpm_hessian_condition_warn)) {
+      "ill-conditioned Hessian"
+    },
+    if (isTRUE(d$multimodal)) "competing near-tied optima"
+  ))
+}
+
+cpm_boundary_proximity <- function(object) {
+  length(cpm_boundary_markers(object)) > 0
+}
 
 #' Fit Browne's circular stochastic process model (circumplex fit statistics)
 #'

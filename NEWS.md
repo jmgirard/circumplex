@@ -20,6 +20,26 @@
   `summary()` cautions when the sample size is small enough that these may
   mis-cover.
 
+* The `cpm_fit()` estimator has been validated against the published
+  CIRCUM/CircE literature (Grassi, Luccio, & Di Blas, 2010, reanalyzing
+  Browne's 1992 vocational-interest example) and against independent
+  OpenMx and lavaan implementations of the same model (both now in Suggests
+  as test oracles only). One documented difference: CIRCUM and CircE fit
+  Browne's covariance parameterization with free variance scalings, so their
+  finite-sample estimates and chi-square differ slightly from `cpm_fit()`'s
+  correlation-structure fit (same degrees of freedom, asymptotically
+  equivalent); see the package's design notes for details. A large seeded
+  simulation study measured the coverage of both interval methods: based on
+  its results, `summary()` now also cautions about analytic intervals at any
+  sample size below 50,000 when the fitted solution is near a parameter
+  boundary or weakly identified (Heywood case, removed harmonic, very small
+  correlation-function weight, ill-conditioning, or competing near-tied
+  optima — the caution names which), the regime where they measurably
+  mis-covered.
+  Percentile bootstrap intervals were confirmed as the better default but are
+  themselves conservative-liberal in spots (notably for near-boundary
+  correlation-function weights); improving them is planned follow-up work.
+
 * New `cpm_simulate()` function draws standardized observations from a fitted
   `cpm_fit()` model's implied correlation matrix, using the model's exact
   positive-semidefinite factor representation. It returns a numeric matrix with

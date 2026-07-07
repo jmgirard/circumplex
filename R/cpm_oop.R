@@ -134,9 +134,14 @@ print.circumplex_cpm <- function(x, digits = 3, ...) {
 #' Fuller display of a [cpm_fit()] object: adds the correlation-function weights,
 #' the full set of fit indices, a residual summary (the largest absolute
 #' residual and the pair it belongs to), and all boundary/identification
-#' diagnostics in plain language. When the confidence intervals are analytic and
-#' the sample size is modest, prints a caution that Wald intervals may materially
-#' mis-cover (see [cpm_fit()]).
+#' diagnostics in plain language. When the confidence intervals are analytic,
+#' prints a coverage caution calibrated by simulation: unconditionally when the
+#' sample size is modest (N < 2000, where Wald intervals mis-covered for every
+#' configuration studied), and up to N = 50000 when the fitted solution shows a
+#' boundary or weak-identification marker (Heywood communality, removed
+#' harmonic, small correlation-function weight, ill-conditioning, or competing
+#' near-tied optima), the regime where they mis-covered even at large N (see
+#' [cpm_fit()]).
 #'
 #' @param object A `circumplex_cpm` object.
 #' @param digits The number of decimal places to display (default = 3).
@@ -202,14 +207,32 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
     for (line in diag_lines) cat(line)
   }
 
-  # N-conditional analytic-CI caution (design sec. 5.2).
-  if (identical(d$ci_method, "analytic") && d$N < cpm_analytic_ci_n_caution) {
-    cat(
-      "\n  Note: analytic (Wald) confidence intervals may materially mis-cover ",
-      "at this sample size\n  (N < ", cpm_analytic_ci_n_caution,
-      "); prefer the bootstrap on the raw-data path when available.\n",
-      sep = ""
-    )
+  # N-conditional analytic-CI caution (design sec. 5.2), calibrated by the B6
+  # coverage oracle: unconditional below cpm_analytic_ci_n_caution;
+  # boundary-marker-conditional below cpm_analytic_ci_n_boundary_caution
+  # (see the constants in R/cpm_fit.R for the measured coverage behind both).
+  if (identical(d$ci_method, "analytic")) {
+    if (d$N < cpm_analytic_ci_n_caution) {
+      cat(
+        "\n  Note: analytic (Wald) confidence intervals may materially mis-cover ",
+        "at this sample size\n  (N < ", cpm_analytic_ci_n_caution,
+        "); prefer the bootstrap on the raw-data path when available.\n",
+        sep = ""
+      )
+    } else if (d$N < cpm_analytic_ci_n_boundary_caution) {
+      markers <- cpm_boundary_markers(object)
+      if (length(markers) > 0) {
+        cat(
+          "\n  Note: this solution is near a parameter boundary or weakly ",
+          "identified\n  (", paste(markers, collapse = "; "), ");\n  ",
+          "analytic (Wald) confidence intervals mis-covered for such fits ",
+          "in validation\n  even at N in the tens of thousands. Interpret ",
+          "them with caution and prefer\n  the bootstrap on the raw-data ",
+          "path when available.\n",
+          sep = ""
+        )
+      }
+    }
   }
   cat("\n")
   invisible(object)

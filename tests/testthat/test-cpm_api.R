@@ -508,6 +508,51 @@ test_that("print and summary render as expected", {
   expect_snapshot(summary(fit))
 })
 
+test_that("summary()'s analytic-CI caution follows the coverage-oracle calibration", {
+  # Calibrated by devel/m4-coverage-oracle.R (M4/B6; DESIGN.md): analytic CIs
+  # mis-covered for every studied truth below N = 2000; between 2000 and
+  # ~50000 they mis-covered only in near-boundary regimes, which the fit's
+  # own diagnostics (Heywood, removed harmonics, small beta, conditioning)
+  # signal. The caution is therefore unconditional below 2000 and
+  # marker-conditional up to 50000.
+  # (1) N >= 2000, well-identified fit: no caution. (cpm_clean_truth()'s
+  # smallest beta, .15, keeps clear margin above the .10 marker.)
+  tr <- cpm_clean_truth()
+  P0 <- cpm_implied_cor(as.numeric(as_radian(as_degree(tr$angles))),
+                        tr$zeta, tr$beta)
+  clean <- cpm_fit(cormat = P0, scales = paste0("V", 1:8), angles = tr$angles,
+                   n = 5000, m = 3)
+  expect_identical(cpm_boundary_markers(clean), character(0))
+  expect_false(grepl("mis-cover",
+                     paste(capture.output(summary(clean)), collapse = "\n"),
+                     fixed = TRUE))
+  # (2) N >= 2000 but a Heywood (boundary) solution: caution fires and names
+  # the marker it fired on (never a dangling "see the diagnostics above").
+  voc <- cpm_oracle_voc()
+  hey <- suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
+                                  angles = voc$th_start, n = 5000, m = 2))
+  expect_true(hey$details$heywood)
+  expect_true(cpm_boundary_proximity(hey))
+  out <- paste(capture.output(summary(hey)), collapse = "\n")
+  expect_match(out, "near a parameter boundary")
+  expect_match(out, "Heywood communality")
+  # (3) N < 2000: unconditional caution, regardless of markers.
+  small <- cpm_fit(cormat = P0, scales = paste0("V", 1:8), angles = tr$angles,
+                   n = 300, m = 3)
+  expect_match(paste(capture.output(summary(small)), collapse = "\n"),
+               "mis-cover")
+  # (4) Marker edge cases (B6 review fixes): an exactly singular Hessian
+  # (condition Inf) IS a marker, and an NA beta degrades to "no marker"
+  # rather than an NA crash inside summary().
+  sing <- clean
+  sing$details$hessian_condition <- Inf
+  expect_true("ill-conditioned Hessian" %in% cpm_boundary_markers(sing))
+  nab <- clean
+  nab$betas$Beta[2] <- NA_real_
+  expect_identical(cpm_boundary_markers(nab), character(0))
+  expect_no_error(summary(nab))
+})
+
 test_that("print and summary render a bootstrap fit as expected", {
   d <- sim_octant_data(300, 42)
   on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)

@@ -43,6 +43,8 @@ Suggests:
     ggrepel,
     kableExtra (>= 1.1.0),
     knitr (>= 1.28),
+    lavaan,
+    OpenMx,
     RColorBrewer,
     rmarkdown (>= 2.1),
     roxygen2 (>= 7.1.0),

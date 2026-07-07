@@ -803,6 +803,40 @@ variants B–D.
 
 ## 11. Change log
 
+- 2026-07-06 — B6 validation battery: **the §3.2 scale-invariance claim is
+  half-wrong, and CIRCUM/CircE comparisons carry a documented model
+  difference.** §3.2 asserts that embedding `Σ = D_σ P(γ) D_σ` with free
+  scalings yields `σ̂ = 1` at the ML optimum when fitted to `R`. Empirically
+  false at finite N: CIRCUM/CircE fit exactly that free-scaling covariance
+  structure, and their published vocational-interest solution (Grassi et al.,
+  2010, Appendix A) has fitted variance ratios of .963–1.042 — the published
+  `F̂ = 0.089815` is our own discrepancy function evaluated at a Σ̂ with
+  non-unit diagonal (reproduced to ~4e-7 in `test-cpm_oracles.R`), and it is
+  *below* our diag-constrained optimum (0.09596) because our family is nested
+  in theirs (set s = 1). Consequences, all encoded as tests: (i) published
+  CIRCUM/CircE targets are compared with model-difference allowances (ζ ±.005,
+  β ±.005, angles mirror-aware ±1.5–3°, T ±1.5, F̂ bracketed by the nesting
+  direction), not the §6.3 same-model tolerances; (ii) the §6.3 analytic-CI
+  gate ("endpoints within 0.5°") is unmeetable against CIRCUM for the same
+  reason — CI half-widths agree within ~2° — and the coverage oracle, not
+  CIRCUM fidelity, carries the CI-correctness burden (which was already the
+  post-F1 position); (iii) the exactness anchor moved to cross-implementation
+  oracles: OpenMx on *our* diag-constrained model matches the engine to
+  dF ≈ 3e-14 / 1.4e-5° / 7e-8 (ζ, β), lavaan (m = 1 factor form) to ~4e-7 in
+  F̂, while OpenMx on Browne's *free-scaling* model reproduces the published
+  CircE output to its printed precision (ζ/β to 4 decimals, angles to ~0.01°),
+  closing the attribution loop. A CIRCUM-compatibility mode (free variance
+  scaling) is recorded in ROADMAP's continuous track as a possible follow-up,
+  not implemented. Also pinned while transcribing: OpenMx's cov-path ML
+  applies an internal (N−1)/N rescale that *shifts* the diag-constrained
+  optimum (the family is not closed under scalar rescaling) — the test
+  oracles pre-multiply the observed matrix by N/(N−1); CircE's communality-
+  index CIs are back-transformed symmetric Wald intervals on ln v (decoded
+  and verified in-test), so ζ-CI endpoints are convention-different from our
+  symmetric-natural CIs per the §6.3 item-7 protocol; CircE's SRMR uses the
+  diagonal-inclusive p(p+1)/2 denominator (§6.3 item 6 confirmed: ours ×
+  √(6/8) reproduces their .04); CircE's published F₀ appears truncated, not
+  rounded (.04958 → ".049").
 - 2026-07-06 — B4 implementation (`cpm_simulate()`). Exported the simulate
   method sketched in §5.4 and resolved the three A-side interface gaps §8.2
   flagged, in code and here. **G1 (return contract):** pinned to a numeric
