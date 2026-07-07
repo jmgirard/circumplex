@@ -218,6 +218,37 @@ test_that("suff-stats fallback resolves recorded-call args from the caller's env
   expect_no_error(run(dat))
 })
 
+test_that("contrast row carries no false-certification guardrail (print never gates it)", {
+  # Milestone-close review #3: print.circumplex_ssm() applies no certification
+  # gate to a contrast, so the diagnostic must not report a false-cert verdict
+  # for the contrast row -- only the joint-certification rate that conditions
+  # its certified-displacement coverage.
+  data("jz2017")
+  jz <- jz2017[1:240, ]
+  set.seed(311)
+  obj <- ssm_analyze(jz, scales = PANO(), grouping = "Gender",
+                     contrast = TRUE, boots = 60)
+  set.seed(312)
+  res <- ssm_ci_accuracy(obj, reps = 12, amplitude_factors = c(1, 0),
+                         structure = "observed")
+
+  con_lab <- names(res$details$row_n)[length(res$details$row_n)]
+  con_g <- res$guardrail[res$guardrail$Profile == con_lab, ]
+  prof_g0 <- res$guardrail[res$guardrail$Profile != con_lab &
+                             res$guardrail$Condition == 0, ]
+  # Contrast Caution is NA at every rung; profile rows still carry the c = 0
+  # logical decision; the contrast's conditioning Cert_rate is still reported.
+  expect_true(all(is.na(con_g$Caution)))
+  expect_true(all(!is.na(prof_g0$Caution)))
+  expect_true(all(is.finite(con_g$Cert_rate[con_g$Condition == 0])))
+
+  # print()/summary() never frame the contrast as certified; wording bar holds.
+  out <- paste(c(capture.output(print(res)), capture.output(summary(res))),
+               collapse = "\n")
+  expect_false(any(grepl("contrast displacement would", out, fixed = TRUE)))
+  expect_false(any(grepl("significan", out)))
+})
+
 # ---- end-to-end: mean-based group contrast on octant data --------------------
 
 test_that("end-to-end run on octant data: object contract (sec. 7)", {

@@ -107,26 +107,30 @@ ssm_ci_verdict_blocks <- function(x) {
       ))
     }
 
+    # Guardrail false-certification line: profiles only. print.circumplex_ssm()
+    # gates a profile's displacement on "amplitude CI excludes zero" but applies
+    # no such gate to a contrast, so the diagnostic reports no false-cert verdict
+    # for the contrast row (its certified-displacement coverage line above still
+    # uses the joint-certification conditioning).
     gr0 <- gr[gr$Profile == lab & gr$Condition == 0, ]
     guard_fired <- FALSE
     guard_rate <- NA_real_
-    if (nrow(gr0) == 1 && !is.na(gr0$Cert_rate)) {
+    if (!is_con && nrow(gr0) == 1 && !is.na(gr0$Cert_rate)) {
       guard_rate <- gr0$Cert_rate
       # The stored decision (guardrail$Caution, computed once at run time)
       guard_fired <- isTRUE(gr0$Caution)
-      subject <- if (is_con) "the contrast displacement" else "displacement"
       ssm_ci_cat_line("Guardrail", if (guard_fired) {
         paste0(
-          "if the true amplitude", if (is_con) "s" else "", " were zero, ",
-          subject, " would still be certified ", ssm_ci_pct(guard_rate),
+          "if the true amplitude were zero, displacement would still be ",
+          "certified ", ssm_ci_pct(guard_rate),
           " of the time -- the \"amplitude CI excludes zero\" rule is far ",
           "weaker than the ", ssm_ci_pct(gr0$Benchmark),
           " error rate its wording suggests"
         )
       } else {
         paste0(
-          "under a truly zero amplitude, ", subject,
-          " would be certified ", ssm_ci_pct(guard_rate),
+          "under a truly zero amplitude, displacement would be certified ",
+          ssm_ci_pct(guard_rate),
           " of the time (user-expectation benchmark ",
           ssm_ci_pct(gr0$Benchmark), ")"
         )

@@ -98,7 +98,9 @@
 #'   interval, the user-expectation benchmark `(1 - interval) / 2`, the
 #'   stored false-certification caution decision at the `c = 0` rung
 #'   (`Caution`, true when the Wilson lower bound exceeds the benchmark;
-#'   `NA` off that rung), the implied threshold, fit-pass rate, and the
+#'   `NA` off that rung, and `NA` for a contrast row, which
+#'   `print.circumplex_ssm()` never gates), the implied threshold, fit-pass
+#'   rate, and the
 #'   branch-pathology rate -- the rate at which a displacement point estimate
 #'   falls geometrically outside its own interval), `verdict`
 #'   (Wilson-vs-Bradley classification of elevation, amplitude, and
@@ -511,7 +513,12 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
           miss[r, d_col] <- dc$side
           width[r, d_col] <- dc$width
         }
-        # The shipped guardrail rule, shared with print.circumplex_ssm()
+        # Profile rows: the shipped guardrail rule, identical to the one
+        # print.circumplex_ssm() applies. The contrast row is NOT gated by print
+        # (a contrast's amplitude is a difference, not a prototypicality
+        # measure), so cert[1] && cert[2] here is only the diagnostic's own
+        # conditioning device for the contrast's certified-displacement coverage
+        # -- not a rule the package displays. Its guardrail Caution is NA'd below.
         cert <- ssm_certified(lean$lci[, a_col], digits)
         if (contrast) cert[n_rows] <- cert[1] && cert[2]
         fitpass <- !is.na(t0_all[, fit_col]) & t0_all[, fit_col] >= 0.70
@@ -650,6 +657,20 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     cert_w <- t(vapply(seq_len(n_rows), function(r) {
       ssm_ci_wilson(cert_k[r], cert_n[r])
     }, numeric(2)))
+    # The false-certification caution is a property of the c = 0 rung
+    # (P(certified | a0 = 0)); it is stored here so print()/summary() and any
+    # programmatic consumer share one decision (NA off that rung). The contrast
+    # row is NA'd even at c = 0: print.circumplex_ssm() applies no certification
+    # gate to a contrast, so a false-certification verdict does not apply to it
+    # (its Cert_rate is only the conditioning rate for certified-displacement
+    # coverage, and is still reported).
+    caution_col <- if (conds[k] == 0) {
+      cau <- ssm_ci_guardrail_caution(cert_w[, 1], (1 - interval) / 2)
+      if (contrast) cau[n_rows] <- NA
+      cau
+    } else {
+      NA
+    }
     grd_frames[[k]] <- data.frame(
       Profile = row_labels[seq_len(n_rows)],
       Condition = conds[k],
@@ -657,14 +678,7 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
       Cert_lci = cert_w[, 1],
       Cert_uci = cert_w[, 2],
       Benchmark = (1 - interval) / 2,
-      # The false-certification caution is a property of the c = 0 rung
-      # (P(certified | a0 = 0)); it is stored here so print()/summary() and
-      # any programmatic consumer share one decision (NA off that rung)
-      Caution = if (conds[k] == 0) {
-        ssm_ci_guardrail_caution(cert_w[, 1], (1 - interval) / 2)
-      } else {
-        NA
-      },
+      Caution = caution_col,
       Threshold = 0.5 * 10^-digits,
       Fit_pass_rate = rate(fitp_m),
       Branch_pathology_rate = rate(branch_m),
