@@ -739,3 +739,433 @@ cpm_polish_beta <- function(fit, R, spec) {
   }
   list(fit = fit, spec = spec, removed = integer(0))
 }
+
+# =============================================================================
+# cpm_fit() user-facing API (design sec. 4-5, sec. 7) and the fit-index / analytic-CI
+# machinery it needs. The engine above is internal; this layer adds input
+# handling, fit indices from the discrepancy, analytic (Wald) confidence
+# intervals, and the circumplex_cpm object (constructor + methods in
+# R/cpm_oop.R).
+# =============================================================================
+
+# ---- fit indices (design sec. 5.3) ------------------------------------------
+
+#' RMSEA 90% confidence interval by noncentral chi-square inversion
+#'
+#' Finds `lambda_L`, `lambda_U` with `pchisq(T, df, ncp = lambda_L) = 1 - a` and
+#' `pchisq(T, df, ncp = lambda_U) = a` (a = .05 for a 90% interval), then maps
+#' to the RMSEA scale via `sqrt(lambda / (n * df))` (design sec. 5.3). BOTH edge
+#' guards are applied: the lower ncp collapses to 0 for good fits
+#' (`pchisq(T, df) < 1 - a`), and the upper ncp collapses to 0 for excellent
+#' fits (`pchisq(T, df) < a`), for which the `lambda_U` equation has no positive
+#' root and an unguarded uniroot would error -- with the guard the interval is
+#' correctly `[0, 0]`.
+#'
+#' Note: the design doc sec. 5.3 states the lower-guard inequality as
+#' "lambda_L = 0 when pchisq(T, df) >= .95", which is the opposite of the
+#' condition its own worked example (T = 20, df = 40 -> [0, 0]) requires. The
+#' standard condition implemented here (`pchisq(T, df) < 1 - a`) reproduces that
+#' example; the design change log records the correction.
+#'
+#' @noRd
+cpm_rmsea_ci <- function(Tstat, df, n, level = 0.90) {
+  a <- (1 - level) / 2
+  lower_fun <- function(l) stats::pchisq(Tstat, df, ncp = l) - (1 - a)
+  upper_fun <- function(l) stats::pchisq(Tstat, df, ncp = l) - a
+
+  # Both functions are strictly decreasing in the ncp; a guarded uniroot with an
+  # expanding upper bracket locates the root when f(0) > 0.
+  find_ncp <- function(f) {
+    hi <- 1
+    while (f(hi) > 0 && hi < 1e7) hi <- hi * 2
+    if (f(hi) > 0) return(hi)                 # capped (pathological); rare
+    stats::uniroot(f, c(0, hi))$root
+  }
+
+  lambda_l <- if (lower_fun(0) < 0) 0 else find_ncp(lower_fun)
+  lambda_u <- if (upper_fun(0) < 0) 0 else find_ncp(upper_fun)
+  c(sqrt(lambda_l / (n * df)), sqrt(lambda_u / (n * df)))
+}
+
+#' Fit indices from the ML discrepancy (design sec. 5.3)
+#'
+#' `T = n * F_hat` with `n = N - 1` (Wishart df; design sec. 3.1). The null model
+#' is independence (`P0 = I`), for which `F0 = -ln|R|` and `df0 = p(p-1)/2`.
+#' SRMR uses the off-diagonal-only denominator `p(p-1)/2` (design sec. 5.3;
+#' the diagonal residuals are identically 0 here). AIC/BIC use `ln N`.
+#'
+#' @param q number of free parameters (as fitted, after any boundary polish).
+#' @noRd
+cpm_fit_indices <- function(Fhat, df, p, N, R, Phat, q) {
+  n <- N - 1L                                 # Wishart multiplier (design sec. 3.1)
+  Tstat <- n * Fhat
+  npair <- p * (p - 1) / 2
+  F0 <- -as.numeric(determinant(R, logarithm = TRUE)$modulus)  # tr(R) = p
+  T0 <- n * F0
+  df0 <- npair
+
+  has_df <- df >= 1
+  pvalue <- if (has_df) stats::pchisq(Tstat, df, lower.tail = FALSE) else NA_real_
+  rmsea <- if (has_df) sqrt(max(Fhat / df - 1 / n, 0)) else NA_real_
+  rmsea_ci <- if (has_df) cpm_rmsea_ci(Tstat, df, n) else c(NA_real_, NA_real_)
+
+  # SRMR: off-diagonal only, denominator p(p-1)/2 (design sec. 5.3 / sec. 6.3).
+  resid <- R - Phat
+  srmr <- sqrt(sum(resid[upper.tri(resid)]^2) / npair)
+
+  # Incremental indices vs the independence null.
+  cfi <- if (has_df) 1 - max(Tstat - df, 0) / max(T0 - df0, Tstat - df, 0) else NA_real_
+  tli <- if (has_df) ((T0 / df0) - (Tstat / df)) / ((T0 / df0) - 1) else NA_real_
+
+  aic <- Tstat + 2 * q
+  bic <- Tstat + q * log(N)
+
+  list(
+    chisq = Tstat, df = df, pvalue = pvalue,
+    rmsea = rmsea, rmsea_ci = rmsea_ci, srmr = srmr,
+    cfi = cfi, tli = tli, aic = aic, bic = bic,
+    F = Fhat, n = n, N = N
+  )
+}
+
+# ---- analytic (Wald) confidence intervals (design sec. 5.2) -----------------
+
+#' Hessian of F in the unconstrained coordinates via FD of the analytic gradient
+#'
+#' Central finite differences of [cpm_gradient()] (step 1e-5), symmetrized
+#' (design sec. 5.2). Computed fresh at the reported (canonicalized) solution;
+#' the engine's own condition-number Hessian is left untouched.
+#'
+#' @noRd
+cpm_hessian_fd <- function(par, R, spec, step = 1e-5) {
+  q <- length(par)
+  H <- matrix(0, q, q)
+  for (i in seq_len(q)) {
+    pp <- par; pm <- par
+    pp[i] <- pp[i] + step
+    pm[i] <- pm[i] - step
+    H[, i] <- (cpm_gradient(pp, R, spec) - cpm_gradient(pm, R, spec)) / (2 * step)
+  }
+  (H + t(H)) / 2
+}
+
+#' Analytic standard errors for the natural parameters (design sec. 5.2)
+#'
+#' `avar(gamma*) = (2/n) H^-1`, `n = N - 1`, delta-method back to natural
+#' parameters: angles have Jacobian 1 (SE reported in degrees); zeta via the
+#' logit Jacobian `zeta(1 - zeta)`; beta via the softmax Jacobian. Returns
+#' per-scale angle/zeta SEs and a length-(m+1) beta SE vector (0 for the
+#' reference angle and any polished-out harmonic). These are Wald SEs and may
+#' imply intervals outside the natural range near a boundary -- that is itself a
+#' signal the analytic CI is untrustworthy (design sec. 5.2; the N-conditional
+#' `summary()` caution).
+#'
+#' @noRd
+cpm_analytic_se <- function(engine, R, N) {
+  spec <- engine$spec
+  par <- engine$par
+  p <- spec$p
+  n <- N - 1L
+
+  H <- cpm_hessian_fd(par, R, spec)
+  Hinv <- tryCatch(solve(H), error = function(e) NULL)
+  if (is.null(Hinv)) {
+    # Singular information: SEs undefined. Return NA so CIs surface as NA rather
+    # than crash (the Hessian-condition warning already fired in the engine).
+    return(list(
+      angle = rep(NA_real_, p), zeta = rep(NA_real_, p),
+      beta = rep(NA_real_, spec$m + 1L)
+    ))
+  }
+  avar <- (2 / n) * Hinv
+  se_g <- sqrt(pmax(diag(avar), 0))
+
+  # angles (degrees); reference is fixed => SE 0
+  se_angle <- numeric(p)
+  if (spec$free_angles > 0) {
+    se_angle[spec$free_pos] <- se_g[spec$i_angle] * (180 / pi)
+  }
+
+  # zeta via logit Jacobian
+  zeta <- engine$zeta
+  se_zeta <- numeric(p)
+  if (spec$n_zeta == p) {
+    se_u <- se_g[spec$i_zeta]
+    se_zeta <- zeta * (1 - zeta) * se_u
+  } else {
+    z <- zeta[1]
+    se_zeta <- rep(z * (1 - z) * se_g[spec$i_zeta], p)
+  }
+
+  # beta via the softmax Jacobian over the KEPT harmonics
+  beta <- engine$beta                         # length m+1 (0 at removed k)
+  se_beta <- numeric(spec$m + 1L)
+  if (spec$n_beta_free > 0) {
+    keep <- spec$keep_k
+    bk <- beta[keep + 1L]                      # kept betas, length L
+    L <- length(bk)
+    avar_v <- avar[spec$i_beta, spec$i_beta, drop = FALSE]  # (L-1) x (L-1)
+    # J[a, l] = d beta_a / d v_l, column l -> kept position l + 1 (v_0 fixed).
+    J <- matrix(0, L, L - 1L)
+    for (a in seq_len(L)) {
+      for (l in seq_len(L - 1L)) {
+        J[a, l] <- bk[a] * ((a == (l + 1L)) - bk[l + 1L])
+      }
+    }
+    covb <- J %*% avar_v %*% t(J)
+    se_beta[keep + 1L] <- sqrt(pmax(diag(covb), 0))
+  }
+
+  list(angle = se_angle, zeta = se_zeta, beta = se_beta)
+}
+
+# ---- cpm_fit(): the user-facing constructor ---------------------------------
+
+# Below this N, summary() cautions that analytic CIs may materially mis-cover
+# and points to the bootstrap (design sec. 5.2). Provisional value pending the
+# B6 coverage-oracle calibration.
+cpm_analytic_ci_n_caution <- 2000L
+
+#' Fit Browne's circular stochastic process model (circumplex fit statistics)
+#'
+#' Estimate Browne's (1992) circular stochastic process model (CPM) for the
+#' correlational structure of a set of circumplex scales or items, the native
+#' replacement for the archived CircE package. Each variable is modeled as a
+#' point on a circle at an estimated angle, with a communality index and a
+#' shared correlation function; the fit of that structure is summarized with the
+#' usual covariance-structure indices (chi-square, RMSEA, SRMR, CFI, TLI).
+#'
+#' @param data A data frame or matrix containing the circumplex scales (raw-data
+#'   path). Supply exactly one of `data` or `cormat`.
+#' @param scales For the raw-data path, a character vector of column names (or a
+#'   numeric vector of column indexes) selecting the circumplex scales. For the
+#'   `cormat` path, optional labels for the variables (defaults to the matrix
+#'   dimnames, or `V1`, `V2`, ...).
+#' @param angles A numeric vector of the theoretical angular displacement of
+#'   each scale, in degrees, used both as the reference/identifying angle and as
+#'   optimization start values (default = [octants()]). Its length must match
+#'   the number of scales.
+#' @param cormat A correlation matrix (the matrix-input path, CircE-style).
+#'   Supply exactly one of `data` or `cormat`. Must be symmetric with a unit
+#'   diagonal and positive definite.
+#' @param n For the `cormat` path, the sample size (number of observations) the
+#'   correlation matrix was computed from. The test statistic uses `N - 1` (the
+#'   Wishart degrees of freedom); pass the raw sample size here.
+#' @param m The number of harmonics in the correlation function (default = 3,
+#'   the octant-scale convention). Capped at `floor((p - 1) / 2)` for the
+#'   free-angle variants and `floor(p / 2)` for the fixed-angle variants.
+#' @param model The model variant (design of Browne 1992): `"quasi-circumplex"`
+#'   (default; free angles and communalities), `"constrained-angles"` (angles
+#'   fixed at their theoretical values), `"equal-communality"` (a single shared
+#'   communality), or `"circulant"` (both constraints).
+#' @param reference The index into `scales` of the variable whose angle is fixed
+#'   at its theoretical value to identify the rotation (default = 1).
+#' @param interval The confidence level for the parameter intervals (default =
+#'   0.95). The RMSEA interval is always the conventional 90 percent.
+#' @param ci_method How to construct confidence intervals: `"analytic"`
+#'   (default) uses Wald intervals from the information matrix. `"bootstrap"`
+#'   (raw-data path) is added in a later release. On the `cormat` path only
+#'   `"analytic"` is available (there is no raw data to resample).
+#' @param boots The number of bootstrap resamples (reserved for the bootstrap
+#'   method; default = 2000).
+#' @param listwise Whether to handle missing values by listwise deletion. Only
+#'   listwise deletion is supported in this release (default = TRUE).
+#' @return A `circumplex_cpm` object: a list with `results` (a data frame of
+#'   estimated angles and communality indices with confidence intervals),
+#'   `betas` (the correlation-function weights), `fit` (the fit indices),
+#'   `corfun` (the estimated correlation function), `matrices` (the sample and
+#'   model-implied matrices and residuals), and `details` (model, diagnostics,
+#'   and settings). See [print.circumplex_cpm()] and [summary.circumplex_cpm()].
+#' @section Confidence intervals:
+#'   Analytic (Wald) intervals are asymptotically valid but can materially
+#'   mis-cover at field-typical sample sizes; `summary()` prints a caution below
+#'   `n = 2000`. Prefer the bootstrap on the raw-data path when available.
+#' @references Browne, M. W. (1992). Circumplex models for correlation matrices.
+#'   \emph{Psychometrika, 57}(4), 469-497.
+#' @family analysis functions
+#' @export
+#' @examples
+#' # Raw-data path on the eight IIP-SC octant scales
+#' data("jz2017")
+#' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+#' fit <- cpm_fit(jz2017, scales = scales)
+#' fit
+#'
+#' # Matrix-input path (supply the sample size)
+#' R <- cor(jz2017[scales])
+#' cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
+#'
+cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
+                    cormat = NULL, n = NULL, m = 3,
+                    model = c("quasi-circumplex", "constrained-angles",
+                              "equal-communality", "circulant"),
+                    reference = 1, interval = 0.95,
+                    ci_method = c("analytic", "bootstrap"),
+                    boots = 2000, listwise = TRUE) {
+
+  call <- match.call()
+  model <- match.arg(model)
+  ci_method <- match.arg(ci_method)
+  variant <- switch(model,
+    "quasi-circumplex"   = "A",
+    "constrained-angles" = "B",
+    "equal-communality"  = "C",
+    "circulant"          = "D"
+  )
+
+  # Exactly one of data / cormat (design sec. 4).
+  has_data <- !is.null(data)
+  has_cormat <- !is.null(cormat)
+  if (has_data == has_cormat) {
+    stop("Supply exactly one of `data` or `cormat`.", call. = FALSE)
+  }
+
+  # Scalar-argument validation via the house is_*() helpers.
+  stopifnot(is_count(reference), reference >= 1)
+  stopifnot(is_count(m), m >= 1)
+  stopifnot(is.numeric(interval), length(interval) == 1, interval > 0, interval < 1)
+  stopifnot(is_flag(listwise))
+  stopifnot(is.numeric(boots), length(boots) == 1, boots > 0,
+            ceiling(boots) == floor(boots))
+  if (!isTRUE(listwise)) {
+    stop("Only listwise deletion is supported (`listwise = TRUE`).", call. = FALSE)
+  }
+
+  angles <- as.numeric(angles)                # accept circumplex_degree or numeric
+  stopifnot(is.numeric(angles))
+
+  if (has_cormat) {
+    R <- as.matrix(cormat)
+    stopifnot(is.matrix(R), nrow(R) == ncol(R))
+    p <- nrow(R)
+    if (!isSymmetric(unname(R), tol = 1e-8)) {
+      stop("`cormat` must be symmetric.", call. = FALSE)
+    }
+    if (max(abs(diag(R) - 1)) > 1e-8) {
+      stop("`cormat` must have a unit diagonal (a correlation matrix).",
+           call. = FALSE)
+    }
+    if (is.null(n)) {
+      stop("`n` (the sample size) is required with `cormat`.", call. = FALSE)
+    }
+    stopifnot(is_count(n), length(n) == 1, n > p)
+    N <- as.integer(n)
+    if (is.null(scales)) {
+      scales <- if (!is.null(colnames(R))) colnames(R) else paste0("V", seq_len(p))
+    }
+    stopifnot(length(scales) == p)
+    if (ci_method == "bootstrap") {
+      stop("`ci_method = \"bootstrap\"` needs raw `data`; the `cormat` path ",
+           "supports only \"analytic\".", call. = FALSE)
+    }
+  } else {
+    stopifnot(is.data.frame(data) || is.matrix(data))
+    if (is.matrix(data)) data <- as.data.frame(data)
+    stopifnot(is_var(scales))
+    sdata <- data[scales]
+    p <- ncol(sdata)
+    sdata <- stats::na.omit(sdata)            # listwise (only option; design sec. 4)
+    N <- nrow(sdata)
+    if (N <= p) {
+      stop("Too few complete observations (", N, ") for ", p, " scales.",
+           call. = FALSE)
+    }
+    R <- stats::cor(as.matrix(sdata))
+    scales <- colnames(sdata)
+  }
+
+  stopifnot(length(angles) == p)
+  if (reference > p) {
+    stop("`reference` (", reference, ") exceeds the number of scales (", p, ").",
+         call. = FALSE)
+  }
+
+  # Bootstrap CIs arrive in a later milestone task (M4/B3); until then the
+  # raw-data path also uses analytic CIs, and this branch is unreachable via the
+  # default. (When B3 lands, bootstrap becomes the raw-data default per the
+  # design sec. 5.2 / sec. 10 decision.)
+  if (ci_method == "bootstrap") {
+    stop("bootstrap confidence intervals are not yet implemented; ",
+         "use `ci_method = \"analytic\"`.", call. = FALSE)
+  }
+
+  # ---- fit the engine (deterministic; no RNG on this path) ----
+  engine <- cpm_engine(R, angles = angles, m = m, variant = variant,
+                       reference = reference)
+
+  # ---- fit indices and analytic CIs ----
+  q <- engine$spec$q
+  fit <- cpm_fit_indices(engine$F, engine$df, p, N, R, engine$P, q)
+  se <- cpm_analytic_se(engine, R, N)
+  z <- stats::qnorm(1 - (1 - interval) / 2)
+
+  # ---- results table (design sec. 5.4) ----
+  # Angle CIs are Wald on the branch of the reported estimate (estimate always
+  # inside; endpoints may print < 0 or >= 360 near the 0/360 pole, mirroring the
+  # unwrapped-branch convention of the displacement CIs; design sec. 2.4).
+  results <- data.frame(
+    Scale = scales,
+    # Echo the user's supplied theoretical angles (LM = 360 per octants() and
+    # the CLAUDE.md convention); the engine wraps 360 -> 0 internally for the
+    # trig, which would otherwise misreport the top pole as 0.
+    Angle_theory = angles,
+    Angle = engine$theta,
+    Angle_lci = engine$theta - z * se$angle,
+    Angle_uci = engine$theta + z * se$angle,
+    Zeta = engine$zeta,
+    Zeta_lci = engine$zeta - z * se$zeta,
+    Zeta_uci = engine$zeta + z * se$zeta,
+    Communality = engine$zeta^2,
+    stringsAsFactors = FALSE
+  )
+
+  betas <- data.frame(
+    k = 0:engine$spec$m,
+    Beta = engine$beta,
+    Beta_lci = engine$beta - z * se$beta,
+    Beta_uci = engine$beta + z * se$beta
+  )
+
+  corfun <- local({
+    beta_hat <- engine$beta
+    function(delta_deg) cpm_rho(as.numeric(delta_deg) * (pi / 180), beta_hat)
+  })
+
+  matrices <- list(R = R, Phat = engine$P, residuals = R - engine$P)
+
+  details <- list(
+    m = engine$m,                             # as fitted (after any polish)
+    m_requested = m,
+    model = model,
+    variant = variant,
+    reference = reference,
+    scales = scales,
+    ci_method = ci_method,
+    interval = interval,
+    boots = boots,
+    listwise = listwise,
+    N = N,
+    accepted = engine$accepted,
+    nlminb_code = engine$nlminb_code,         # advisory only (design sec. 3.5)
+    gradient_norm = engine$gradient_norm,
+    hessian_condition = engine$hessian_condition,
+    heywood = engine$heywood,
+    removed_harmonics = engine$removed_harmonics,
+    multimodal = engine$multimodal,
+    # internal handles for the later bootstrap / simulate tasks (B3/B4)
+    spec = engine$spec,
+    par = engine$par,
+    theta_rad = engine$theta_rad,
+    theta_rad_unwrapped = engine$theta_rad_unwrapped
+  )
+
+  new_cpm(
+    results = results,
+    betas = betas,
+    fit = fit,
+    corfun = corfun,
+    matrices = matrices,
+    details = details,
+    call = call
+  )
+}

@@ -1,5 +1,15 @@
 # circumplex (development version)
 
+* New `cpm_fit()` function estimates Browne's (1992) circular stochastic
+  process model for the correlational structure of circumplex scales or items,
+  a native replacement for the archived CircE package. It accepts either raw
+  data or a correlation matrix, estimates item angles and communality indices
+  (with four model variants), and reports the usual covariance-structure fit
+  indices (chi-square, RMSEA with a 90% confidence interval, SRMR, CFI, TLI,
+  AIC, BIC). The returned `circumplex_cpm` object has `print()` and `summary()`
+  methods. Confidence intervals are currently analytic (Wald); `summary()`
+  cautions when the sample size is small enough that these may mis-cover.
+
 * New `ggcircumplex()` function builds an empty circumplex plotting canvas
   (amplitude rings, displacement spokes, and scale labels) as a ggplot2
   object that you can add layers to with `+`. It accepts a set of scale

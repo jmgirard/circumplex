@@ -72,7 +72,7 @@ Cross-cutting guardrails for every task:
   scale-invariance identity exact; circulant DFT check; df table pinned at
   p=8, m=3 for all four variants; default path RNG-silent
   (`.Random.seed` untouched); boundary suite green.
-- [ ] **B2. `cpm_fit()` API + `circumplex_cpm` class.** Input handling (raw
+- [x] **B2. `cpm_fit()` API + `circumplex_cpm` class.** Input handling (raw
   data / cormat, listwise-only; §4), reference-angle fix, fit indices from
   the discrepancy (χ², RMSEA + CI with λ_U=0 guard, SRMR with pinned
   convention, CFI/TLI, AIC/BIC; §5.3), analytic CIs on the cormat path
@@ -214,6 +214,34 @@ at release time, not this branch's.
 
 ## Log
 
+- 2026-07-06 — B2 `cpm_fit()` API + `circumplex_cpm` class (Opus, test-first;
+  inline /code-review). New exported `cpm_fit()` wrapping the B1 engine: raw-data
+  (Pearson R, listwise-only) and cormat paths with `is_*()`/`stopifnot()`
+  validation (exactly-one-of data/cormat, symmetric unit-diagonal cormat, n > p,
+  angle-length match, PD refusal via the engine); reference-angle fix; the §5.3
+  fit indices (T = (N−1)·F̂, χ², RMSEA + 90% CI with BOTH λ guards, off-diagonal
+  SRMR, CFI/TLI, AIC/BIC with ln N); §5.2 analytic (Wald) CIs from
+  avar = (2/n)H⁻¹ (fresh FD-of-analytic-gradient Hessian at the reported par;
+  logit/softmax/angle delta method); the §5.4 `circumplex_cpm` object
+  (results/betas/fit/corfun/matrices/details, incl. the Brief-B contract fields
+  θ/ζ/β, N, m + programmatic spec/par handles). New R/cpm_oop.R: `new_cpm()`
+  constructor (new_ssm style) + print/summary with the boundary/convergence
+  diagnostics and the N-conditional (< 2000) analytic-CI caution. Scope split
+  with B3: bootstrap CIs deferred; `ci_method` defaults to "analytic" and an
+  explicit bootstrap request errors (B3 flips the raw-data default to bootstrap
+  per §5.2/§10). Review finding fixed: `Angle_theory` echoed the engine's wrapped
+  angle, misreporting the LM top pole as 0 — now echoes the user's supplied
+  angles (LM = 360 per CLAUDE.md). Design-doc correction recorded (§11): the
+  §5.3 RMSEA lower-guard inequality was stated backwards; implemented the
+  standard `pchisq(T,df) < .95 → λ_L = 0` (reproduces the section's own
+  [0,0] example). Independent validations in-test: brute-force delta-method SE
+  cross-check to ~1e-12 (ζ/β), hand-derived N−1 multiplier, SRMR denominator
+  (vs the p(p+1)/2 trap), RMSEA noncentral-tail reconstruction, degrees/numeric
+  API equivalence, raw↔cormat agreement, Heywood→NA-CI, df=0 saturated warning;
+  print/summary snapshots. Suite 805/805; check 0/0/0; document() no-diff.
+  NEWS updated (user-facing). (R/cpm_fit.R, R/cpm_oop.R [new],
+  tests/testthat/test-cpm_api.R [new], tests/testthat/_snaps/cpm_api.md [new],
+  NEWS.md, NAMESPACE, man/, devel/m4-browne-design.md, MILESTONES.md).
 - 2026-07-06 — B1 CPM engine core (Opus implementation against the Brief-A
   spec, test-first; Fable statistical review + fixes; Sonnet/Opus finder
   swarm for /code-review high). New R/cpm_fit.R (internal only, nothing

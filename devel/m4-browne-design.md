@@ -795,6 +795,23 @@ variants B–D.
 
 ## 11. Change log
 
+- 2026-07-06 — B2 implementation (`cpm_fit()` + `circumplex_cpm`). Correction
+  to §5.3: the RMSEA-CI lower-edge guard is stated there as "λ_L = 0 when
+  pchisq(T, df) ≥ .95", which is the opposite of what the section's own worked
+  example (T = 20, df = 40 → CI [0, 0]) requires. The lower ncp collapses to 0
+  for *good* fits, i.e. when `pchisq(T, df) < 1 − a` (= .95); `cpm_rmsea_ci()`
+  implements this standard (lavaan-consistent) condition, which reproduces the
+  [0, 0] example. The upper-edge guard ("λ_U = 0 when pchisq(T, df) ≤ .05") is
+  correct as written. No change to the numbers the section intends — only the
+  prose inequality was backwards. Also settled by adoption (reversible until
+  release): the `cormat`-path `n` argument is the sample size N (the statistic
+  uses N − 1); `Angle_theory` echoes the user's supplied angles so the top pole
+  reads LM = 360 (the engine wraps 360 → 0 internally); analytic ζ/β CIs are
+  Wald-symmetric on the natural scale (may fall outside the natural range near a
+  boundary — itself a mis-coverage signal); a singular information matrix
+  (Heywood) yields NA CIs rather than an error. Bootstrap CIs (B3) are the
+  raw-data default per §5.2/§10; until B3 lands, `cpm_fit()` defaults to
+  `ci_method = "analytic"` and an explicit bootstrap request errors.
 - 2026-07-06 — B1 implementation refinement (Fable review pass, flagged for
   Jeff): the §3.5 multimodality flag's "best two non-mirror optima differ in
   F̂ by > 1e-6" limb fires, as literally written, whenever any deterministic
