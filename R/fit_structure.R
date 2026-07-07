@@ -237,3 +237,101 @@ structure_cutoffs <- list(
     )
   )
 )
+
+# Classify a criterion statistic against A&R's cutoffs ------------------------
+# Shared interpretation layer for all four tests (Fisher/Gap/VT/RT). Selects
+# the cutoff triple for the given test, number of scales (`nv`), and *declared*
+# scoring, then returns the strongest likelihood claim the statistic supports.
+# A&R's cutoffs are ordered almost < thrice < twice, so a statistic below
+# `almost` almost certainly matches the criterion, below `thrice` the criterion
+# is at least three times as likely as its competitor, below `twice` at least
+# twice as likely, and otherwise the criterion is not clearly supported
+# ("weak"). The category is a bare code; the phrasing (equal axes vs
+# interstitiality) is the caller's, since it differs by test.
+#
+# Two guards implement the "never apply the wrong cutoffs" rule from the method
+# review (devel/fit-drafts-method-review.md): if no cutoffs are calibrated at
+# this `nv` (only 8 is, so far) the category is NA -- A&R's substantial nv
+# effect means the published nv = 64/128 cutoffs must not be reused at another
+# scale count. And a degenerate (NA) statistic stays NA rather than being forced
+# into a bin. The cutoffs, when they exist, are always returned so the caller
+# can report them even when the class is undefined.
+structure_interpret <- function(stat, test, nv, scoring) {
+  test <- match.arg(test, c("fisher", "gap", "vt", "rt"))
+  scoring <- match.arg(scoring, c("raw", "deviation"))
+
+  cuts <- structure_cutoffs[[as.character(nv)]][[test]][[scoring]]
+  if (is.null(cuts) || is.na(stat)) {
+    return(list(cutoffs = cuts, category = NA_character_))
+  }
+
+  category <- if (stat < cuts[["almost"]]) {
+    "almost"
+  } else if (stat < cuts[["thrice"]]) {
+    "thrice"
+  } else if (stat < cuts[["twice"]]) {
+    "twice"
+  } else {
+    "weak"
+  }
+  list(cutoffs = cuts, category = category)
+}
+
+#' Fisher Test of equal axes (Acton & Revelle, 2004)
+#'
+#' Internal wrapper tying the Fisher criterion statistic to its scoring-keyed,
+#' number-of-scales-specific interpretation. Not yet exported -- the user-facing
+#' fit-statistics API (a single typed entry point with print/summary/plot) is a
+#' later task; this returns a plain list the API will consume.
+#'
+#' The Fisher Test of equal axes asks whether the circumplex variables have
+#' comparable communalities (vector lengths) rather than one axis dominating.
+#' The statistic is the coefficient of variation of the variables' vector
+#' lengths sqrt(h2). Acton & Revelle's (2004) Eq. 6 as printed uses the
+#' communalities h2 themselves, but their prose describes vector lengths; the
+#' two differ by roughly a factor of two in CV, and only one scale can carry
+#' their published cutoffs. The T2 re-derivation (data-raw/structure-test-
+#' cutoffs.R) reproduced A&R's own simulation and found the published cutoffs
+#' attach to the vector-length scale, so `structure_fisher()` and this wrapper
+#' use CV(sqrt(h2)) (see devel/ar2004-transcription.md, "Empirical
+#' adjudications"). The criterion is invariant to rotation of the factor pair,
+#' so the arbitrary principal-axis orientation is immaterial.
+#'
+#' Cutoffs are keyed to the *declared* `scoring`: A&R report different cutoffs
+#' for raw and deviation (row-mean-centered, i.e. [ipsatize()]d) data, and the
+#' test has the most power without a large general factor, which deviation
+#' scoring approximates. This function does not transform the data -- the caller
+#' declares which scoring the passed scales are already on. Cutoffs are also
+#' nv-specific (A&R p. 18); only nv = 8 is calibrated, and any other scale count
+#' returns an undefined category (see `structure_cutoffs`).
+#'
+#' @param data A data frame containing the circumplex scales.
+#' @param scales Variable names or column numbers of the circumplex scales.
+#' @param scoring Declared scoring of `scales`, `"raw"` or `"deviation"`; picks
+#'   the matching cutoffs (default `"raw"`).
+#' @param ridge Non-negative ridge added to the correlation matrix diagonal to
+#'   repair a non-positive-definite matrix (e.g. deviation-scored scales, whose
+#'   correlation matrix is singular); default `0`. See `structure_loadings()`.
+#' @return A list with the criterion `statistic`, the `test` name, declared
+#'   `scoring`, number of scales `nv`, the `cutoffs` used (or `NULL` at an
+#'   uncalibrated nv), the interpretation `category`, and the `loadings`.
+#' @references Acton, G. S., & Revelle, W. (2004). Evaluation of ten
+#'   psychometric criteria for circumplex structure. \emph{Methods of
+#'   Psychological Research Online}, 9(1), 1-27.
+#' @noRd
+structure_fisher_test <- function(data, scales, scoring = "raw", ridge = 0) {
+  scoring <- match.arg(scoring, c("raw", "deviation"))
+  loadings <- structure_loadings(data, scales, ridge = ridge)
+  statistic <- structure_fisher(loadings)
+  nv <- nrow(loadings)
+  interp <- structure_interpret(statistic, "fisher", nv, scoring)
+  list(
+    test = "fisher",
+    statistic = statistic,
+    scoring = scoring,
+    nv = nv,
+    cutoffs = interp$cutoffs,
+    category = interp$category,
+    loadings = loadings
+  )
+}

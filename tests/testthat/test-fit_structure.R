@@ -257,3 +257,69 @@ test_that("criterion statistics separate circumplex from simple structure", {
   expect_lt(structure_vt(circ), structure_vt(simple))
   expect_lt(structure_rt(circ), structure_rt(simple))
 })
+
+# Interpretation layer (T3): scoring-keyed, nv-specific cutoff classification --
+
+test_that("structure_interpret classifies against the scoring-keyed cutoffs", {
+  # fisher nv = 8: raw = (.10, .13, .15); deviation = (.07, .12, .15).
+  expect_identical(structure_interpret(0.05, "fisher", 8, "raw")$category, "almost")
+  expect_identical(structure_interpret(0.20, "fisher", 8, "raw")$category, "weak")
+  # A statistic of 0.09 is classified differently under the two declared
+  # scorings: below the raw "almost" cutoff (.10) but past the deviation one
+  # (.07). This is the interpretive trap the method review flags -- the same
+  # number means different things depending on whether the data were ipsatized.
+  expect_identical(structure_interpret(0.09, "fisher", 8, "raw")$category, "almost")
+  expect_identical(structure_interpret(0.09, "fisher", 8, "deviation")$category, "thrice")
+  # The returned cutoffs are the ones actually used for the classification.
+  expect_identical(
+    structure_interpret(0.09, "fisher", 8, "deviation")$cutoffs,
+    structure_cutoffs[["8"]]$fisher$deviation
+  )
+})
+
+test_that("structure_interpret refuses to classify at an uncalibrated nv", {
+  # Only nv = 8 is calibrated; A&R's nv effect means the nv = 64/128 cutoffs
+  # must NOT be silently applied to another scale count. No cutoffs -> no
+  # category, but the statistic itself is untouched by the caller.
+  res <- structure_interpret(0.05, "fisher", 6, "raw")
+  expect_null(res$cutoffs)
+  expect_true(is.na(res$category))
+})
+
+test_that("structure_interpret propagates a degenerate (NA) statistic", {
+  res <- structure_interpret(NA_real_, "fisher", 8, "raw")
+  expect_true(is.na(res$category))
+  # Cutoffs are still reported (they exist at nv = 8); only the class is undefined.
+  expect_identical(res$cutoffs, structure_cutoffs[["8"]]$fisher$raw)
+})
+
+test_that("structure_fisher_test wraps the internal statistic and interpretation", {
+  data("jz2017")
+  res <- structure_fisher_test(jz2017, octants_jz, scoring = "raw")
+  # The statistic is exactly the internal CV of vector lengths on the same
+  # loadings -- the wrapper adds interpretation, it does not recompute.
+  expect_equal(res$statistic, structure_fisher(structure_loadings(jz2017, octants_jz)))
+  expect_identical(res$test, "fisher")
+  expect_identical(res$scoring, "raw")
+  expect_identical(res$nv, 8L)
+  # jz2017 raw octant scales carry a general factor: Fisher ~ .29, well past the
+  # raw "twice" cutoff, so equal axes are not clearly supported.
+  expect_identical(res$category, "weak")
+})
+
+test_that("structure_fisher_test reflects deviation scoring on ipsatized data", {
+  data("jz2017")
+  di <- ipsatize(jz2017, items = octants_jz, append = FALSE)
+  ip <- paste0(octants_jz, "_i")
+  res <- structure_fisher_test(di, ip, scoring = "deviation", ridge = 0.1)
+  # Removing the general factor by ipsatizing pulls the statistic down into the
+  # supported range (~.10), which the deviation cutoffs read as equal axes being
+  # at least three times as likely -- the power gain A&R attribute to deviation
+  # scoring.
+  expect_identical(res$category, "thrice")
+})
+
+test_that("structure_fisher_test validates the declared scoring", {
+  data("jz2017")
+  expect_error(structure_fisher_test(jz2017, octants_jz, scoring = "ipsative"))
+})

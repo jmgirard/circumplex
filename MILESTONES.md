@@ -55,7 +55,7 @@ archived:
   genuine tail difference traceable to CIRC_STRUC's unstated extraction
   pipeline; see the script's KNOWN_LIMITS block and
   devel/ar2004-transcription.md).
-- [ ] **T3. Fisher test of equal axes.** Sound per review — port with
+- [x] **T3. Fisher test of equal axes.** Sound per review — port with
   citation, scoring-keyed cutoffs (raw vs deviation declared), T2 thresholds.
   *Accept (amended by T2's empirical adjudication):* the statistic is the CV
   of **vector lengths** √h², not Eq. 6's printed CV of h² — the T2 gate
@@ -95,6 +95,23 @@ archived:
 
 ## Log
 
+- 2026-07-07 — T3 (Opus, test-first): added the scoring-keyed interpretation
+  layer over the T2 Fisher internal. New shared `structure_interpret(stat,
+  test, nv, scoring)` classifies any criterion statistic against
+  `structure_cutoffs` into an ordered category (almost/thrice/twice/weak),
+  returning NA both at an uncalibrated nv (guards the "don't apply nv=64/128
+  cutoffs to 8 scales" trap) and on a degenerate NA statistic — reused by
+  T4–T6. New `structure_fisher_test()` wrapper ties `structure_loadings()` →
+  `structure_fisher()` → interpretation into a plain list (T7 owns the S3
+  typed object); `@noRd` roxygen cites A&R and records the vector-length-scale
+  adjudication. Scoring is user-*declared* (no data transform); default "raw".
+  8 new tests, incl. the raw-vs-deviation split on a fixed statistic (0.09 →
+  "almost" raw, "thrice" deviation) and the jz2017 general-factor case (raw
+  Fisher ~.29 "weak"; ipsatized ~.10 "thrice", showing deviation scoring's
+  power gain). No estimation math changed (structure_fisher untouched), so no
+  /statistical-validation. Full suite 1290 pass; /code-review high: 0 findings.
+  Internal only, no NEWS bullet. (R/fit_structure.R,
+  tests/testthat/test-fit_structure.R.)
 - 2026-07-07 — T2 (Fable, test-first): transcribed A&R 2004 under the
   two-channel protocol (devel/ar2004-transcription.md; no between-channel
   discrepancies; ε_v≡0 and repeated-Z ambiguities documented); implemented
