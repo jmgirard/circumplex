@@ -79,6 +79,32 @@ Circumplex Structure”, for a worked introduction to both.
   `ssm_ci_accuracy(..., data = )`, which is checked for consistency
   against the stored profiles.
 
+- New
+  [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+  function evaluates whether a set of scales forms a circumplex using
+  the exploratory criteria of Acton & Revelle (2004). Four criteria are
+  computed from the first two unrotated principal-axis factors of the
+  scales’ correlations — the Fisher Test of equal axes, the Gap Test of
+  equal spacing, and the Variance (VT2) and Rotation tests of
+  interstitiality — and a fifth, the RANDALL correspondence index
+  (Hubert & Arabie, 1987; Tracey, 1997), tests the hypothesized circular
+  *order* of the scales with a randomization test that yields an exact
+  p-value. The factor-analytic statistics are classified against
+  interpretive cutoffs that were re-derived by simulation under Acton &
+  Revelle’s own generating model for eight (octant) scales — their
+  published cutoffs were calibrated on far more variables and do not
+  transfer — and that are keyed to the scoring, since these criteria
+  work best with a general factor removed.
+  [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+  deviation-scores (ipsatizes) by default for that reason, with a raw
+  opt-out. The returned `circumplex_structure` object has
+  [`print()`](https://rdrr.io/r/base/print.html),
+  [`summary()`](https://rdrr.io/r/base/summary.html), and
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) methods;
+  interpretations are presented as the heuristic likelihood
+  classifications they are, never as significance tests. See the
+  “Evaluating Circumplex Structure” vignette.
+
 - The Monte Carlo interval engine (`ssm_analyze(method = "montecarlo")`)
   is faster on correlation-based analyses: the influence-function
   covariance is built in one vectorized pass and all profile rows are

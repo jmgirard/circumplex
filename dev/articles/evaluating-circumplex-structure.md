@@ -28,6 +28,8 @@ often left untested:
 
 This vignette shows how to answer both questions with
 [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+and
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
 (question 1) and
 [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
 (question 2), using the `jz2017` dataset — the same sample of 1,166
@@ -381,7 +383,7 @@ summary(acc)
 #> Population Structure:     Browne circular model (CPM) 
 #> Group Sizes:      All = 250 
 #> Certification Rule:   round(a_lci, 3) > 0 (threshold 0.0005 amplitude units) 
-#> Elapsed:      13.9 s
+#> Elapsed:      13.6 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).
@@ -648,7 +650,236 @@ Putting Sections 2 and 3 together into a checklist:
     multivariate normality, with complete data. It is a strong check,
     not a certificate.
 
-## 4. Ipsatization and what it costs
+## 4. Does the instrument have circumplex structure at all?
+
+Section 2’s confirmatory model
+([`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md))
+fits one theory-driven circular model and asks how well it fits. A
+complementary, more exploratory question is whether the scales’
+correlations show circumplex structure *at all*, without committing to
+the theoretical angles: are the scales spread evenly around a circle,
+with comparable communalities, rather than clustering into a small
+number of independent clusters (simple structure)? Acton and Revelle
+(2004) evaluated ten such criteria by simulation;
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+implements four of them — Fisher, Gap, VT2, and Rotation — leaving out a
+variance-test variant A&R found ineffective (VT1) and a criterion so
+highly correlated with Rotation as to be redundant (MT, r = .99 with RT
+in their Table 1). A fifth test, RANDALL, is not one of A&R’s ten at
+all: it is an independent order-correspondence test (Hubert & Arabie,
+1987; Tracey, 1997) that A&R excluded from their own simulation because,
+unlike their criteria, its null distribution is known analytically
+rather than needing simulated cutoffs (their footnote 3).
+
+### The five tests
+
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+extracts the first two unrotated principal-axis factors of the scales’
+correlation matrix (Acton & Revelle, 2004, p. 13) and computes four
+criteria from that two-factor solution, plus a fifth test that works
+directly on the correlations:
+
+- **Fisher Test** (equal axes). Are the scales’ communalities on the
+  two-factor solution comparable, rather than one axis dominating? The
+  statistic is the coefficient of variation of the scales’ vector
+  lengths $`\sqrt{h^2}`$.
+- **Gap Test** (equal spacing). Are the scales evenly distributed in
+  angle around the circle, rather than bunched together? The statistic
+  is the variance of the angular gaps between angularly adjacent scales,
+  including the gap that wraps from the last scale back around to the
+  first.
+- **Variance Test (VT2)** and **Rotation Test** (interstitiality). Both
+  ask whether the scales sit *between* a small number of dominant axes
+  rather than on them — the signature of a genuine circumplex, as
+  opposed to simple structure. Each takes a criterion computed at many
+  rotations of the two-factor solution and summarizes it as a
+  coefficient of variation across rotations; a true circumplex is
+  indifferent to rotation, so both criteria stay low.
+- **RANDALL** (Hubert & Arabie, 1987; Tracey, 1997). Does the
+  *hypothesized circular order* you supplied (the order of `scales`)
+  match the observed correlations, in the sense that closer-together
+  scales correlate more strongly? Unlike the other four, this is a
+  genuine randomization test: its null distribution (scales randomly
+  relabeled onto the hypothesized positions) is enumerated exactly for
+  up to nine scales, or estimated by Monte Carlo relabeling for more, so
+  it returns an exact or Monte Carlo p value rather than a simulated
+  cutoff.
+
+The four factor-analytic criteria (Fisher, Gap, VT2, Rotation) have the
+most power to detect simple structure when there is no large general
+factor across the scales. *Deviation scoring* — centering each
+respondent on their own mean across the selected scales, exactly what
+[`ipsatize()`](http://circumplex.jmgirard.com/dev/reference/ipsatize.md)
+does — approximates removing that general factor (Acton & Revelle, 2004,
+p. 9), so it is
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)’s
+default; pass `scoring = "raw"` to analyze the scores as given. Each of
+the two scorings carries its own set of cutoffs (next section), matched
+automatically.
+
+``` r
+
+res <- fit_structure(jz2017, scales = PANO())
+res
+#> 
+#> Circumplex Structure Tests (Acton & Revelle, 2004)
+#> Scales (nv):  8
+#> Scoring:      deviation (row-mean centered)
+#> 
+#> # Exploratory criteria
+#> 
+#>  Test     Statistic Interpretation                                           
+#>  Fisher   0.102     equal axes: at least 3x as likely as the alternative     
+#>  Gap      0.152     equal spacing: at least 3x as likely as the alternative  
+#>  Variance 0.180     interstitiality: almost certain                          
+#>  Rotation 0.325     interstitiality: at least 3x as likely as the alternative
+#> 
+#> # Order hypothesis (RANDALL)
+#> 
+#>   Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)
+#> 
+#>   Interpretations are heuristic likelihood classifications from simulation, not
+#>   significance tests (Acton & Revelle, 2004). RANDALL's p-value is exact.
+```
+
+``` r
+
+summary(res)
+#> 
+#> Circumplex Structure Tests (Acton & Revelle, 2004)
+#> Scales (nv):  8
+#> Scoring:      deviation (row-mean centered)
+#> Ridge:        0
+#> 
+#> # Exploratory criteria
+#> 
+#>  Test     Statistic Almost Thrice Twice Verdict       
+#>  Fisher   0.102     0.07   0.12   0.15  3x+ likely    
+#>  Gap      0.152     0.15   0.40   0.46  3x+ likely    
+#>  Variance 0.180     0.19   0.59   0.64  almost certain
+#>  Rotation 0.325     0.32   0.64   0.67  3x+ likely    
+#> 
+#> # Estimated scale geometry
+#> 
+#>  Scale Angle   Communality
+#>  PA    339.635 0.642      
+#>  BC    359.858 0.571      
+#>  DE     48.584 0.500      
+#>  FG     81.337 0.522      
+#>  HI    161.662 0.690      
+#>  JK    183.339 0.713      
+#>  LM    215.503 0.388      
+#>  NO    287.119 0.474      
+#> 
+#> # Order hypothesis (RANDALL)
+#> 
+#>   Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)
+#> 
+#>   Interpretations are heuristic likelihood classifications from simulation, not
+#>   significance tests (Acton & Revelle, 2004). RANDALL's p-value is exact.
+```
+
+[`summary()`](https://rdrr.io/r/base/summary.html) adds the numeric
+cutoffs behind each classification and the estimated angle and
+communality of every scale on the two-factor solution — the same
+geometry the plot below draws. A clean circumplex shows scales at
+roughly the theoretical octant spacing with broadly similar
+communalities; `Fisher` measures departures in communality,
+`Gap`/`VT2`/`Rotation` measure departures in even angular spread.
+
+``` r
+
+plot(res)
+```
+
+![](evaluating-circumplex-structure_files/figure-html/fit_structure_plot-1.png)
+
+For the IIP-SC octants the picture agrees with Section 2’s CPM fit: the
+scales keep their theoretical circular *ordering* with comparable
+communalities and roughly even spacing, and the Fisher, Gap, and
+interstitiality criteria all classify the configuration as consistent
+with (or close to) a circumplex under deviation scoring. One caveat when
+reading the angles: the two-factor solution is *unrotated*, so its
+absolute orientation is arbitrary — it is the scales’ ordering and
+relative spacing that agree with theory, not their absolute angles
+(which is why [`summary()`](https://rdrr.io/r/base/summary.html) places
+PA well away from its nominal 90°). RANDALL’s p value confirms the
+hypothesized circular order directly, independent of the factor-analytic
+criteria.
+
+### Where the cutoffs come from
+
+The four factor-analytic criteria are only as good as the thresholds
+used to classify them, and this is where the published article cannot be
+used as-is. Acton and Revelle calibrated their cutoffs by simulation at
+64 and 128 variables and reported (their p. 18) that the Gap Test’s
+cutoffs shift sharply with the number of scales — far too sharply to
+reuse at the eight scales a typical circumplex instrument has. This
+package’s development process re-derived every cutoff at $`n_v = 8`$
+under Acton and Revelle’s own generating model (their Eqs. 11.1–11.3),
+in a script committed at `data-raw/structure-test-cutoffs.R`: it first
+reproduced their published 64/128-variable design as a sanity gate on
+the simulation machinery, then reran the same design at $`n_v = 8`$ to
+derive the constants
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+actually uses. The nv effect the re-derivation found is large — the raw-
+scored Gap Test’s “almost certain” cutoff moves from .01 at
+$`n_v = 64/128`$ to .35 at $`n_v = 8`$ — which is exactly why
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+refuses to interpret any scale count it has not calibrated: at any
+$`n_v \ne 8`$ the statistics are still reported, but the classification
+column prints a dash rather than guessing.
+
+RANDALL needs no such calibration; its p value comes from enumerating
+(or Monte Carlo sampling) the randomization null directly on your data,
+so it is available at any scale count of four or more.
+
+### Reading the classifications
+
+The classification categories describe where a statistic falls among the
+simulated distributions for competing structures (circumplex vs. simple
+structure): “almost certain” (below the 1st percentile of the competing
+distribution), “at least 3x/2x as likely as the alternative” (the
+criterion’s structure is at least three/two times as likely as its
+competitor at that statistic value), and “not clearly supported”. Those
+ratios are *likelihood ratios*, not posterior probabilities or p values.
+They are **heuristic classifications read off simulated distributions,
+not significance tests**, and
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)’s
+[`print()`](https://rdrr.io/r/base/print.html)/[`summary()`](https://rdrr.io/r/base/summary.html)
+output repeats that caveat every time an interpretation is shown. Treat
+a “weak” or unsupported classification as a caution to inspect the
+loading configuration (the plot above) and Section 2’s CPM fit together,
+not as a rejection of any specific hypothesis.
+
+### How this complements the CPM fit
+
+[`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+(Section 2) and
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+ask related but different questions.
+[`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+commits to the theoretical angles and communality model and tests
+goodness of fit against that specific structure; a good overall
+RMSEA/CFI can still hide unequal spacing or a dominant general factor,
+both of which
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+is built to detect. Conversely,
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)’s
+exploratory criteria say nothing about how well the scales match *your*
+theoretical angles — only RANDALL, via the order you supply, references
+a hypothesis at all, and even that is an order hypothesis, not the
+specific angles
+[`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+estimates. Running both is more informative than either alone: agreement
+between a good CPM fit and circumplex-supporting
+[`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+classifications is stronger evidence than either result on its own, and
+disagreement (for example, adequate CPM fit alongside a Fisher Test
+flagging unequal axes) points to exactly which aspect of circumplex
+structure to examine further.
+
+## 5. Ipsatization and what it costs
 
 Ipsatizing — subtracting each respondent’s own mean across the octant
 scales from each of their scale scores
@@ -713,7 +944,7 @@ shape parameters shift somewhat too. Guidance:
   that a construct is “not generally interpersonal” — the preprocessing
   made that value uninformative.
 
-## 5. Wrap-up
+## 6. Wrap-up
 
 Evaluating circumplex structure has two layers: whether the instrument
 behaves like a circumplex in your sample
@@ -727,6 +958,10 @@ particular, earn their trust only when the profile is genuinely
 differentiated relative to the precision your sample size affords.
 
 ## References
+
+- Acton, G. S., & Revelle, W. (2004). Evaluation of ten psychometric
+  criteria for circumplex structure. *Methods of Psychological Research
+  Online, 9*(1), 1–27.
 
 - Bradley, J. V. (1978). Robustness? *British Journal of Mathematical
   and Statistical Psychology, 31*(2), 144–152.
@@ -750,6 +985,13 @@ differentiated relative to the precision your sample size affords.
 - Hu, L., & Bentler, P. M. (1999). Cutoff criteria for fit indexes in
   covariance structure analysis: Conventional criteria versus new
   alternatives. *Structural Equation Modeling, 6*(1), 1–55.
+
+- Hubert, L., & Arabie, P. (1987). Evaluating order hypotheses within
+  proximity matrices. *Psychological Bulletin, 102*(1), 172–178.
+
+- Tracey, T. J. G. (1997). RANDALL: A Microsoft FORTRAN program for a
+  randomization test of hypothesized order relations. *Educational and
+  Psychological Measurement, 57*(1), 164–168.
 
 - Zimmermann, J., & Wright, A. G. C. (2017). Beyond description in
   interpersonal construct validation: Methodological advances in the

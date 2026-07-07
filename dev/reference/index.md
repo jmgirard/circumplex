@@ -62,6 +62,14 @@ Functions for evaluating circumplex structure and CI trustworthiness
   : Summarize a circular process model fit
 - [`plot(`*`<circumplex_cpm>`*`)`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_cpm.md)
   : Plot a circular process model fit
+- [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
+  : Evaluate circumplex structure (Acton & Revelle, 2004)
+- [`print(`*`<circumplex_structure>`*`)`](http://circumplex.jmgirard.com/dev/reference/print.circumplex_structure.md)
+  : Print circumplex-structure test results
+- [`summary(`*`<circumplex_structure>`*`)`](http://circumplex.jmgirard.com/dev/reference/summary.circumplex_structure.md)
+  : Summarize circumplex-structure test results
+- [`plot(`*`<circumplex_structure>`*`)`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_structure.md)
+  : Plot a circumplex-structure configuration
 - [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
   : Assess the accuracy of SSM confidence intervals by simulation
 - [`summary(`*`<circumplex_ci_accuracy>`*`)`](http://circumplex.jmgirard.com/dev/reference/summary.circumplex_ci_accuracy.md)

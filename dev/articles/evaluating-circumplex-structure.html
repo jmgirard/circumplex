@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.3.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.3.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -117,11 +117,11 @@ Intervals that are accurate for one construct in your table can be
 inaccurate for the construct printed directly below it.</p></li>
 </ol>
 <p>This vignette shows how to answer both questions with
-<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> (question 1) and <code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>
-(question 2), using the <code>jz2017</code> dataset — the same sample of
-1,166 undergraduates analyzed in Zimmermann and Wright (2017, Study 5),
-with octant scores on the IIP-SC and personality disorder (PD) scales
-from the PDQ-4+.</p>
+<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> and <code><a href="../reference/fit_structure.html">fit_structure()</a></code> (question 1) and
+<code><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code> (question 2), using the
+<code>jz2017</code> dataset — the same sample of 1,166 undergraduates
+analyzed in Zimmermann and Wright (2017, Study 5), with octant scores on
+the IIP-SC and personality disorder (PD) scales from the PDQ-4+.</p>
 </div>
 <div class="section level2">
 <h2 id="does-the-instrument-fit-a-circumplex">2. Does the instrument fit a circumplex?<a class="anchor" aria-label="anchor" href="#does-the-instrument-fit-a-circumplex"></a>
@@ -531,7 +531,7 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; Population Structure:     Browne circular model (CPM) </span></span>
 <span><span class="co">#&gt; Group Sizes:      All = 250 </span></span>
 <span><span class="co">#&gt; Certification Rule:   round(a_lci, 3) &gt; 0 (threshold 0.0005 amplitude units) </span></span>
-<span><span class="co">#&gt; Elapsed:      13.9 s</span></span>
+<span><span class="co">#&gt; Elapsed:      13.6 s</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
 <span><span class="co">#&gt; RMSEA = 0.064, SRMR = 0.038).</span></span>
@@ -811,7 +811,228 @@ not a certificate.</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="ipsatization-and-what-it-costs">4. Ipsatization and what it costs<a class="anchor" aria-label="anchor" href="#ipsatization-and-what-it-costs"></a>
+<h2 id="does-the-instrument-have-circumplex-structure-at-all">4. Does the instrument have circumplex structure at all?<a class="anchor" aria-label="anchor" href="#does-the-instrument-have-circumplex-structure-at-all"></a>
+</h2>
+<p>Section 2’s confirmatory model (<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code>) fits one
+theory-driven circular model and asks how well it fits. A complementary,
+more exploratory question is whether the scales’ correlations show
+circumplex structure <em>at all</em>, without committing to the
+theoretical angles: are the scales spread evenly around a circle, with
+comparable communalities, rather than clustering into a small number of
+independent clusters (simple structure)? Acton and Revelle (2004)
+evaluated ten such criteria by simulation; <code><a href="../reference/fit_structure.html">fit_structure()</a></code>
+implements four of them — Fisher, Gap, VT2, and Rotation — leaving out a
+variance-test variant A&amp;R found ineffective (VT1) and a criterion so
+highly correlated with Rotation as to be redundant (MT, r = .99 with RT
+in their Table 1). A fifth test, RANDALL, is not one of A&amp;R’s ten at
+all: it is an independent order-correspondence test (Hubert &amp;
+Arabie, 1987; Tracey, 1997) that A&amp;R excluded from their own
+simulation because, unlike their criteria, its null distribution is
+known analytically rather than needing simulated cutoffs (their footnote
+3).</p>
+<div class="section level3">
+<h3 id="the-five-tests">The five tests<a class="anchor" aria-label="anchor" href="#the-five-tests"></a>
+</h3>
+<p><code><a href="../reference/fit_structure.html">fit_structure()</a></code> extracts the first two unrotated
+principal-axis factors of the scales’ correlation matrix (Acton &amp;
+Revelle, 2004, p. 13) and computes four criteria from that two-factor
+solution, plus a fifth test that works directly on the correlations:</p>
+<ul>
+<li>
+<strong>Fisher Test</strong> (equal axes). Are the scales’
+communalities on the two-factor solution comparable, rather than one
+axis dominating? The statistic is the coefficient of variation of the
+scales’ vector lengths
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msqrt><msup><mi>h</mi><mn>2</mn></msup></msqrt><annotation encoding="application/x-tex">\sqrt{h^2}</annotation></semantics></math>.</li>
+<li>
+<strong>Gap Test</strong> (equal spacing). Are the scales evenly
+distributed in angle around the circle, rather than bunched together?
+The statistic is the variance of the angular gaps between angularly
+adjacent scales, including the gap that wraps from the last scale back
+around to the first.</li>
+<li>
+<strong>Variance Test (VT2)</strong> and <strong>Rotation
+Test</strong> (interstitiality). Both ask whether the scales sit
+<em>between</em> a small number of dominant axes rather than on them —
+the signature of a genuine circumplex, as opposed to simple structure.
+Each takes a criterion computed at many rotations of the two-factor
+solution and summarizes it as a coefficient of variation across
+rotations; a true circumplex is indifferent to rotation, so both
+criteria stay low.</li>
+<li>
+<strong>RANDALL</strong> (Hubert &amp; Arabie, 1987; Tracey, 1997).
+Does the <em>hypothesized circular order</em> you supplied (the order of
+<code>scales</code>) match the observed correlations, in the sense that
+closer-together scales correlate more strongly? Unlike the other four,
+this is a genuine randomization test: its null distribution (scales
+randomly relabeled onto the hypothesized positions) is enumerated
+exactly for up to nine scales, or estimated by Monte Carlo relabeling
+for more, so it returns an exact or Monte Carlo p value rather than a
+simulated cutoff.</li>
+</ul>
+<p>The four factor-analytic criteria (Fisher, Gap, VT2, Rotation) have
+the most power to detect simple structure when there is no large general
+factor across the scales. <em>Deviation scoring</em> — centering each
+respondent on their own mean across the selected scales, exactly what
+<code><a href="../reference/ipsatize.html">ipsatize()</a></code> does — approximates removing that general factor
+(Acton &amp; Revelle, 2004, p. 9), so it is
+<code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s default; pass
+<code>scoring = "raw"</code> to analyze the scores as given. Each of the
+two scorings carries its own set of cutoffs (next section), matched
+automatically.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_structure.html">fit_structure</a></span><span class="op">(</span><span class="va">jz2017</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">res</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Circumplex Structure Tests (Acton &amp; Revelle, 2004)</span></span>
+<span><span class="co">#&gt; Scales (nv):  8</span></span>
+<span><span class="co">#&gt; Scoring:      deviation (row-mean centered)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Exploratory criteria</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Test     Statistic Interpretation                                           </span></span>
+<span><span class="co">#&gt;  Fisher   0.102     equal axes: at least 3x as likely as the alternative     </span></span>
+<span><span class="co">#&gt;  Gap      0.152     equal spacing: at least 3x as likely as the alternative  </span></span>
+<span><span class="co">#&gt;  Variance 0.180     interstitiality: almost certain                          </span></span>
+<span><span class="co">#&gt;  Rotation 0.325     interstitiality: at least 3x as likely as the alternative</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Order hypothesis (RANDALL)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Interpretations are heuristic likelihood classifications from simulation, not</span></span>
+<span><span class="co">#&gt;   significance tests (Acton &amp; Revelle, 2004). RANDALL's p-value is exact.</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Circumplex Structure Tests (Acton &amp; Revelle, 2004)</span></span>
+<span><span class="co">#&gt; Scales (nv):  8</span></span>
+<span><span class="co">#&gt; Scoring:      deviation (row-mean centered)</span></span>
+<span><span class="co">#&gt; Ridge:        0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Exploratory criteria</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Test     Statistic Almost Thrice Twice Verdict       </span></span>
+<span><span class="co">#&gt;  Fisher   0.102     0.07   0.12   0.15  3x+ likely    </span></span>
+<span><span class="co">#&gt;  Gap      0.152     0.15   0.40   0.46  3x+ likely    </span></span>
+<span><span class="co">#&gt;  Variance 0.180     0.19   0.59   0.64  almost certain</span></span>
+<span><span class="co">#&gt;  Rotation 0.325     0.32   0.64   0.67  3x+ likely    </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Estimated scale geometry</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Scale Angle   Communality</span></span>
+<span><span class="co">#&gt;  PA    339.635 0.642      </span></span>
+<span><span class="co">#&gt;  BC    359.858 0.571      </span></span>
+<span><span class="co">#&gt;  DE     48.584 0.500      </span></span>
+<span><span class="co">#&gt;  FG     81.337 0.522      </span></span>
+<span><span class="co">#&gt;  HI    161.662 0.690      </span></span>
+<span><span class="co">#&gt;  JK    183.339 0.713      </span></span>
+<span><span class="co">#&gt;  LM    215.503 0.388      </span></span>
+<span><span class="co">#&gt;  NO    287.119 0.474      </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; # Order hypothesis (RANDALL)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Correspondence index = 0.868, p = 0.000397 (exact, 5040 relabelings)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Interpretations are heuristic likelihood classifications from simulation, not</span></span>
+<span><span class="co">#&gt;   significance tests (Acton &amp; Revelle, 2004). RANDALL's p-value is exact.</span></span></code></pre></div>
+<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> adds the numeric cutoffs behind each
+classification and the estimated angle and communality of every scale on
+the two-factor solution — the same geometry the plot below draws. A
+clean circumplex shows scales at roughly the theoretical octant spacing
+with broadly similar communalities; <code>Fisher</code> measures
+departures in communality,
+<code>Gap</code>/<code>VT2</code>/<code>Rotation</code> measure
+departures in even angular spread.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
+<p><img src="evaluating-circumplex-structure_files/figure-html/fit_structure_plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p>For the IIP-SC octants the picture agrees with Section 2’s CPM fit:
+the scales keep their theoretical circular <em>ordering</em> with
+comparable communalities and roughly even spacing, and the Fisher, Gap,
+and interstitiality criteria all classify the configuration as
+consistent with (or close to) a circumplex under deviation scoring. One
+caveat when reading the angles: the two-factor solution is
+<em>unrotated</em>, so its absolute orientation is arbitrary — it is the
+scales’ ordering and relative spacing that agree with theory, not their
+absolute angles (which is why <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> places PA well away
+from its nominal 90°). RANDALL’s p value confirms the hypothesized
+circular order directly, independent of the factor-analytic
+criteria.</p>
+</div>
+<div class="section level3">
+<h3 id="where-the-cutoffs-come-from">Where the cutoffs come from<a class="anchor" aria-label="anchor" href="#where-the-cutoffs-come-from"></a>
+</h3>
+<p>The four factor-analytic criteria are only as good as the thresholds
+used to classify them, and this is where the published article cannot be
+used as-is. Acton and Revelle calibrated their cutoffs by simulation at
+64 and 128 variables and reported (their p. 18) that the Gap Test’s
+cutoffs shift sharply with the number of scales — far too sharply to
+reuse at the eight scales a typical circumplex instrument has. This
+package’s development process re-derived every cutoff at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v = 8</annotation></semantics></math>
+under Acton and Revelle’s own generating model (their Eqs. 11.1–11.3),
+in a script committed at <code>data-raw/structure-test-cutoffs.R</code>:
+it first reproduced their published 64/128-variable design as a sanity
+gate on the simulation machinery, then reran the same design at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v = 8</annotation></semantics></math>
+to derive the constants <code><a href="../reference/fit_structure.html">fit_structure()</a></code> actually uses. The
+nv effect the re-derivation found is large — the raw- scored Gap Test’s
+“almost certain” cutoff moves from .01 at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>64</mn><mi>/</mi><mn>128</mn></mrow><annotation encoding="application/x-tex">n_v = 64/128</annotation></semantics></math>
+to .35 at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v = 8</annotation></semantics></math>
+— which is exactly why <code><a href="../reference/fit_structure.html">fit_structure()</a></code> refuses to interpret
+any scale count it has not calibrated: at any
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>≠</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">n_v \ne 8</annotation></semantics></math>
+the statistics are still reported, but the classification column prints
+a dash rather than guessing.</p>
+<p>RANDALL needs no such calibration; its p value comes from enumerating
+(or Monte Carlo sampling) the randomization null directly on your data,
+so it is available at any scale count of four or more.</p>
+</div>
+<div class="section level3">
+<h3 id="reading-the-classifications">Reading the classifications<a class="anchor" aria-label="anchor" href="#reading-the-classifications"></a>
+</h3>
+<p>The classification categories describe where a statistic falls among
+the simulated distributions for competing structures (circumplex
+vs. simple structure): “almost certain” (below the 1st percentile of the
+competing distribution), “at least 3x/2x as likely as the alternative”
+(the criterion’s structure is at least three/two times as likely as its
+competitor at that statistic value), and “not clearly supported”. Those
+ratios are <em>likelihood ratios</em>, not posterior probabilities or p
+values. They are <strong>heuristic classifications read off simulated
+distributions, not significance tests</strong>, and
+<code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s
+<code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>/<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> output repeats that caveat
+every time an interpretation is shown. Treat a “weak” or unsupported
+classification as a caution to inspect the loading configuration (the
+plot above) and Section 2’s CPM fit together, not as a rejection of any
+specific hypothesis.</p>
+</div>
+<div class="section level3">
+<h3 id="how-this-complements-the-cpm-fit">How this complements the CPM fit<a class="anchor" aria-label="anchor" href="#how-this-complements-the-cpm-fit"></a>
+</h3>
+<p><code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> (Section 2) and <code><a href="../reference/fit_structure.html">fit_structure()</a></code>
+ask related but different questions. <code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> commits to
+the theoretical angles and communality model and tests goodness of fit
+against that specific structure; a good overall RMSEA/CFI can still hide
+unequal spacing or a dominant general factor, both of which
+<code><a href="../reference/fit_structure.html">fit_structure()</a></code> is built to detect. Conversely,
+<code><a href="../reference/fit_structure.html">fit_structure()</a></code>’s exploratory criteria say nothing about
+how well the scales match <em>your</em> theoretical angles — only
+RANDALL, via the order you supply, references a hypothesis at all, and
+even that is an order hypothesis, not the specific angles
+<code><a href="../reference/cpm_fit.html">cpm_fit()</a></code> estimates. Running both is more informative than
+either alone: agreement between a good CPM fit and circumplex-supporting
+<code><a href="../reference/fit_structure.html">fit_structure()</a></code> classifications is stronger evidence than
+either result on its own, and disagreement (for example, adequate CPM
+fit alongside a Fisher Test flagging unequal axes) points to exactly
+which aspect of circumplex structure to examine further.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="ipsatization-and-what-it-costs">5. Ipsatization and what it costs<a class="anchor" aria-label="anchor" href="#ipsatization-and-what-it-costs"></a>
 </h2>
 <p>Ipsatizing — subtracting each respondent’s own mean across the octant
 scales from each of their scale scores (<code><a href="../reference/ipsatize.html">ipsatize()</a></code>) — is a
@@ -824,7 +1045,7 @@ construction, and the covariances between the ipsatized scales and any
 external measure sum to exactly zero — forcing the mean correlation
 toward zero regardless of how strongly the construct relates to the
 instrument’s general factor (Zimmermann &amp; Wright, 2017, p. 4).</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">45678</span><span class="op">)</span></span>
 <span><span class="va">res_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  <span class="va">jz2017</span>,</span>
@@ -871,7 +1092,7 @@ preprocessing made that value uninformative.</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="wrap-up">5. Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
+<h2 id="wrap-up">6. Wrap-up<a class="anchor" aria-label="anchor" href="#wrap-up"></a>
 </h2>
 <p>Evaluating circumplex structure has two layers: whether the
 instrument behaves like a circumplex in your sample
@@ -887,6 +1108,9 @@ sample size affords.</p>
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <ul>
+<li><p>Acton, G. S., &amp; Revelle, W. (2004). Evaluation of ten
+psychometric criteria for circumplex structure. <em>Methods of
+Psychological Research Online, 9</em>(1), 1–27.</p></li>
 <li><p>Bradley, J. V. (1978). Robustness? <em>British Journal of
 Mathematical and Statistical Psychology, 31</em>(2), 144–152.</p></li>
 <li><p>Browne, M. W. (1992). Circumplex models for correlation matrices.
@@ -906,6 +1130,12 @@ perspectives. <em>Personality and Social Psychology Bulletin,
 indexes in covariance structure analysis: Conventional criteria versus
 new alternatives. <em>Structural Equation Modeling, 6</em>(1),
 1–55.</p></li>
+<li><p>Hubert, L., &amp; Arabie, P. (1987). Evaluating order hypotheses
+within proximity matrices. <em>Psychological Bulletin, 102</em>(1),
+172–178.</p></li>
+<li><p>Tracey, T. J. G. (1997). RANDALL: A Microsoft FORTRAN program for
+a randomization test of hypothesized order relations. <em>Educational
+and Psychological Measurement, 57</em>(1), 164–168.</p></li>
 <li><p>Zimmermann, J., &amp; Wright, A. G. C. (2017). Beyond description
 in interpersonal construct validation: Methodological advances in the
 circumplex Structural Summary Approach. <em>Assessment, 24</em>(1),
