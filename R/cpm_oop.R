@@ -75,6 +75,18 @@ cpm_diagnostic_lines <- function(details) {
       "weakly identified.\n"
     ))
   }
+  # Bootstrap replicate accounting (design sec. 5.2): surface exclusions.
+  if (identical(details$ci_method, "bootstrap") &&
+      isTRUE(details$boots_used < details$boots)) {
+    n_bad <- details$boots - details$boots_used
+    msg <- c(msg, paste0(
+      "  Note: ", n_bad, " of ", details$boots, " bootstrap resamples were ",
+      "excluded (", details$boots_degenerate, " degenerate, ",
+      details$boots_nonconvergent, " non-convergent); the intervals are ",
+      "based on ", details$boots_used, " replicates and are conditional on ",
+      "estimability.\n"
+    ))
+  }
   msg
 }
 

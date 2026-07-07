@@ -919,6 +919,171 @@ cpm_analytic_se <- function(engine, R, N) {
   list(angle = se_angle, zeta = se_zeta, beta = se_beta)
 }
 
+# ---- bootstrap confidence intervals (design sec. 5.2) -----------------------
+
+#' Per-replicate mirror guard (design sec. 5.2, A-review F10)
+#'
+#' Warm starts usually keep a bootstrap replicate on gamma-hat's reflection
+#' branch, but a weakly-determined resample's nearest optimum can be the
+#' mirror, and one mirrored replicate corrupts the circular quantiles. Reflect
+#' any replicate whose reference-relative angles are circularly closer to the
+#' mirror of gamma-hat than to gamma-hat (deterministic, no RNG). Reflection
+#' negates the reference-relative angles, so the mirror comparison target is
+#' `-ref_rel_hat`; distances are circular via `angle_dist()` (the +/-pi atom).
+#'
+#' @param ref_rel_hat reference-relative angles of gamma-hat, from
+#'   `cpm_ref_relative()`.
+#' @noRd
+cpm_mirror_guard <- function(par, spec, ref_rel_hat) {
+  if (spec$free_angles == 0) {
+    return(list(par = par, reflected = FALSE))
+  }
+  rr <- cpm_ref_relative(par, spec)
+  d_same <- sum(abs(as.numeric(
+    angle_dist(as_radian(rr), as_radian(ref_rel_hat))
+  )))
+  d_mirror <- sum(abs(as.numeric(
+    angle_dist(as_radian(rr), as_radian(-ref_rel_hat))
+  )))
+  if (d_mirror < d_same) {
+    return(list(par = cpm_reflect_par(par, spec), reflected = TRUE))
+  }
+  list(par = par, reflected = FALSE)
+}
+
+#' Warm-started nonparametric bootstrap CIs (design sec. 5.2)
+#'
+#' Resample rows, recompute the Pearson correlation matrix, and refit
+#' warm-started from the reported (canonicalized) gamma-hat under the reported
+#' post-polish spec: the intervals describe the model the user was shown, so a
+#' polished-out harmonic stays fixed at 0 in every replicate (its interval is
+#' degenerate at 0 by construction). Replicate exclusion keys on the sec. 3.5
+#' scaled-gradient-norm acceptance criterion, never on the nlminb code
+#' (A-review F2); degenerate resamples (NA or non-PD correlation matrices,
+#' e.g. rank-deficient at small N) are excluded with the same
+#' count-warning, conditional-on-estimability convention as `ssm_analyze()`.
+#' Angle replicates go through the existing circular quantile machinery
+#' (`quantile.circumplex_radian()`), so a CI straddling 0/360 is reported
+#' wrapped (lci > uci), the displacement-CI convention; zeta and beta get
+#' plain percentile intervals.
+#'
+#' RNG: the full resample-index array is drawn up front in one block (the
+#' `boot::boot()` convention), so consumption is a fixed function of
+#' `(nrow(sdata), boots)` and results at a given seed do not depend on how
+#' many replicates are later discarded. Everything after the draw is
+#' deterministic.
+#'
+#' @param engine a `cpm_engine()` result (reported par/spec, post-polish).
+#' @param sdata numeric matrix of complete-case scale scores (rows resampled).
+#' @noRd
+cpm_bootstrap <- function(engine, sdata, boots, interval) {
+  spec <- engine$spec
+  par_hat <- engine$par
+  N <- nrow(sdata)
+  p <- spec$p
+
+  idx <- matrix(sample.int(N, N * boots, replace = TRUE), nrow = boots)
+
+  ref_rel_hat <- cpm_ref_relative(par_hat, spec)
+
+  theta_reps <- matrix(NA_real_, boots, p)
+  zeta_reps <- matrix(NA_real_, boots, p)
+  beta_reps <- matrix(NA_real_, boots, spec$m + 1L)
+  reflected <- logical(boots)
+  n_degenerate <- 0L
+  n_nonconvergent <- 0L
+
+  for (b in seq_len(boots)) {
+    # cor() warns on zero-variance resampled columns and returns NA entries;
+    # those resamples are counted as degenerate below, not warned one by one.
+    Rb <- suppressWarnings(stats::cor(sdata[idx[b, ], , drop = FALSE]))
+    if (anyNA(Rb) ||
+        min(eigen(Rb, symmetric = TRUE, only.values = TRUE)$values) <= 1e-10) {
+      n_degenerate <- n_degenerate + 1L
+      next
+    }
+    Rb <- (Rb + t(Rb)) / 2
+    run <- cpm_optimize_one(par_hat, Rb, spec)
+    gnorm <- max(abs(cpm_gradient(run$par, Rb, spec)))
+    if (gnorm > 1e-6 * max(1, abs(run$F))) {
+      # One deterministic restart from the stalled point before excluding:
+      # ~1% of warm refits stop with the gradient norm just above the sec. 3.5
+      # threshold (nlminb rel.tol exit), and a restart polishes some of them
+      # through. Acceptance still keys ONLY on the scaled gradient norm.
+      run <- cpm_optimize_one(run$par, Rb, spec)
+      gnorm <- max(abs(cpm_gradient(run$par, Rb, spec)))
+      if (gnorm > 1e-6 * max(1, abs(run$F))) {
+        n_nonconvergent <- n_nonconvergent + 1L
+        next
+      }
+    }
+    guard <- cpm_mirror_guard(run$par, spec, ref_rel_hat)
+    reflected[b] <- guard$reflected
+    nat <- cpm_unpack(guard$par, spec)
+    theta_reps[b, ] <- nat$theta %% (2 * pi)
+    zeta_reps[b, ] <- nat$zeta
+    beta_reps[b, ] <- nat$beta
+  }
+
+  # A replicate is used iff ALL of its parameters are finite; unpacking a
+  # finite accepted par cannot produce NA today, but quantile()'s na.rm
+  # default is FALSE, so a future NA would otherwise corrupt CIs silently.
+  ok <- stats::complete.cases(theta_reps, zeta_reps, beta_reps)
+  n_ok <- sum(ok)
+  n_reflected <- sum(reflected[ok])           # among the USED replicates
+  n_bad <- n_degenerate + n_nonconvergent
+  if (n_ok == 0) {
+    warning(
+      "All ", boots, " bootstrap resamples were excluded (",
+      n_degenerate, " degenerate, ", n_nonconvergent,
+      " failed the convergence acceptance criterion); ",
+      "bootstrap confidence intervals are unavailable (NA).",
+      call. = FALSE
+    )
+  } else if (n_bad > 0) {
+    warning(
+      n_bad, " of ", boots, " bootstrap resamples were excluded (",
+      n_degenerate, " with a degenerate or non-positive-definite correlation ",
+      "matrix, ", n_nonconvergent, " failing the convergence acceptance ",
+      "criterion); the confidence intervals are based on the remaining ",
+      n_ok, " replicates and are conditional on estimability.",
+      call. = FALSE
+    )
+  }
+
+  probs <- c((1 - interval) / 2, 1 - (1 - interval) / 2)
+  angle_lci <- angle_uci <- rep(NA_real_, p)
+  zeta_lci <- zeta_uci <- rep(NA_real_, p)
+  beta_lci <- beta_uci <- rep(NA_real_, spec$m + 1L)
+  if (n_ok > 0) {
+    for (i in seq_len(p)) {
+      q <- quantile.circumplex_radian(new_radian(theta_reps[ok, i]),
+                                      probs = probs)
+      q <- as.numeric(as_degree(q))
+      angle_lci[i] <- q[1]
+      angle_uci[i] <- q[2]
+      zq <- stats::quantile(zeta_reps[ok, i], probs = probs, names = FALSE)
+      zeta_lci[i] <- zq[1]
+      zeta_uci[i] <- zq[2]
+    }
+    for (k in seq_len(spec$m + 1L)) {
+      bq <- stats::quantile(beta_reps[ok, k], probs = probs, names = FALSE)
+      beta_lci[k] <- bq[1]
+      beta_uci[k] <- bq[2]
+    }
+  }
+
+  list(
+    angle_lci = angle_lci, angle_uci = angle_uci,
+    zeta_lci = zeta_lci, zeta_uci = zeta_uci,
+    beta_lci = beta_lci, beta_uci = beta_uci,
+    boots_used = n_ok,
+    boots_degenerate = n_degenerate,
+    boots_nonconvergent = n_nonconvergent,
+    boots_reflected = n_reflected
+  )
+}
+
 # ---- cpm_fit(): the user-facing constructor ---------------------------------
 
 # Below this N, summary() cautions that analytic CIs may materially mis-cover
@@ -962,12 +1127,14 @@ cpm_analytic_ci_n_caution <- 2000L
 #'   at its theoretical value to identify the rotation (default = 1).
 #' @param interval The confidence level for the parameter intervals (default =
 #'   0.95). The RMSEA interval is always the conventional 90 percent.
-#' @param ci_method How to construct confidence intervals: `"analytic"`
-#'   (default) uses Wald intervals from the information matrix. `"bootstrap"`
-#'   (raw-data path) is added in a later release. On the `cormat` path only
-#'   `"analytic"` is available (there is no raw data to resample).
-#' @param boots The number of bootstrap resamples (reserved for the bootstrap
-#'   method; default = 2000).
+#' @param ci_method How to construct the parameter confidence intervals:
+#'   `"bootstrap"` (the default on the raw-data path) resamples rows,
+#'   recomputes the correlation matrix, and refits the model warm-started from
+#'   the reported solution; `"analytic"` uses Wald intervals from the
+#'   information matrix. On the `cormat` path only `"analytic"` is available
+#'   (there is no raw data to resample), and it is the default there.
+#' @param boots The number of bootstrap resamples for
+#'   `ci_method = "bootstrap"` (default = 2000).
 #' @param listwise Whether to handle missing values by listwise deletion. Only
 #'   listwise deletion is supported in this release (default = TRUE).
 #' @return A `circumplex_cpm` object: a list with `results` (a data frame of
@@ -977,21 +1144,42 @@ cpm_analytic_ci_n_caution <- 2000L
 #'   model-implied matrices and residuals), and `details` (model, diagnostics,
 #'   and settings). See [print.circumplex_cpm()] and [summary.circumplex_cpm()].
 #' @section Confidence intervals:
-#'   Analytic (Wald) intervals are asymptotically valid but can materially
-#'   mis-cover at field-typical sample sizes; `summary()` prints a caution below
-#'   `n = 2000`. Prefer the bootstrap on the raw-data path when available.
+#'   The bootstrap (the raw-data default) refits the model to each resampled
+#'   correlation matrix, warm-started from the reported solution, and forms
+#'   percentile intervals; angle replicates are pooled with the package's
+#'   circular quantile machinery, so an angle interval that straddles the
+#'   0/360 boundary is reported wrapped (its lower limit numerically exceeds
+#'   its upper limit, as with displacement intervals in [ssm_analyze()]).
+#'   Resamples with a degenerate (non-positive-definite) correlation matrix or
+#'   a refit failing the convergence acceptance criterion are excluded with a
+#'   warning reporting how many; the intervals are then conditional on
+#'   estimability. Analytic (Wald) intervals are asymptotically valid but can
+#'   materially mis-cover at field-typical sample sizes; `summary()` prints a
+#'   caution below `n = 2000`. Analytic angle intervals are reported on the
+#'   unwrapped branch of the estimate (endpoints may fall outside [0, 360)
+#'   near the boundary).
+#' @section Reproducibility:
+#'   Only the bootstrap consumes R's random number stream; the engine's point
+#'   estimates, fit indices, and the analytic intervals are deterministic, so
+#'   the estimates are identical across seeds and the default `cormat`-path
+#'   fit never touches the stream. Call `set.seed()` immediately before
+#'   `cpm_fit()` for reproducible bootstrap intervals. All resample indices
+#'   are drawn in one block before any refitting, so a given seed yields the
+#'   same intervals regardless of how many replicates are later excluded.
 #' @references Browne, M. W. (1992). Circumplex models for correlation matrices.
 #'   \emph{Psychometrika, 57}(4), 469-497.
 #' @family analysis functions
 #' @export
 #' @examples
-#' # Raw-data path on the eight IIP-SC octant scales
+#' # Raw-data path on the eight IIP-SC octant scales (bootstrap CIs; a small
+#' # `boots` keeps the example fast -- the default is 2000)
 #' data("jz2017")
 #' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
-#' fit <- cpm_fit(jz2017, scales = scales)
+#' set.seed(12345)
+#' fit <- cpm_fit(jz2017, scales = scales, boots = 100)
 #' fit
 #'
-#' # Matrix-input path (supply the sample size)
+#' # Matrix-input path (supply the sample size; analytic CIs)
 #' R <- cor(jz2017[scales])
 #' cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
 #'
@@ -1000,11 +1188,15 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
                     model = c("quasi-circumplex", "constrained-angles",
                               "equal-communality", "circulant"),
                     reference = 1, interval = 0.95,
-                    ci_method = c("analytic", "bootstrap"),
+                    ci_method = c("bootstrap", "analytic"),
                     boots = 2000, listwise = TRUE) {
 
   call <- match.call()
   model <- match.arg(model)
+  # Path-conditional default (design sec. 5.2): bootstrap on the raw-data
+  # path, analytic on the cormat path (nothing to resample there). Only an
+  # EXPLICIT bootstrap request with `cormat` is an error.
+  ci_missing <- missing(ci_method)
   ci_method <- match.arg(ci_method)
   variant <- switch(model,
     "quasi-circumplex"   = "A",
@@ -1054,10 +1246,13 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
       scales <- if (!is.null(colnames(R))) colnames(R) else paste0("V", seq_len(p))
     }
     stopifnot(length(scales) == p)
-    if (ci_method == "bootstrap") {
+    if (ci_missing) {
+      ci_method <- "analytic"
+    } else if (ci_method == "bootstrap") {
       stop("`ci_method = \"bootstrap\"` needs raw `data`; the `cormat` path ",
            "supports only \"analytic\".", call. = FALSE)
     }
+    sdata_mat <- NULL
   } else {
     stopifnot(is.data.frame(data) || is.matrix(data))
     if (is.matrix(data)) data <- as.data.frame(data)
@@ -1070,7 +1265,8 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
       stop("Too few complete observations (", N, ") for ", p, " scales.",
            call. = FALSE)
     }
-    R <- stats::cor(as.matrix(sdata))
+    sdata_mat <- as.matrix(sdata)             # resampled by the bootstrap
+    R <- stats::cor(sdata_mat)
     scales <- colnames(sdata)
   }
 
@@ -1080,29 +1276,43 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
          call. = FALSE)
   }
 
-  # Bootstrap CIs arrive in a later milestone task (M4/B3); until then the
-  # raw-data path also uses analytic CIs, and this branch is unreachable via the
-  # default. (When B3 lands, bootstrap becomes the raw-data default per the
-  # design sec. 5.2 / sec. 10 decision.)
-  if (ci_method == "bootstrap") {
-    stop("bootstrap confidence intervals are not yet implemented; ",
-         "use `ci_method = \"analytic\"`.", call. = FALSE)
-  }
-
-  # ---- fit the engine (deterministic; no RNG on this path) ----
+  # ---- fit the engine (deterministic; RNG is consumed only by the bootstrap) ----
   engine <- cpm_engine(R, angles = angles, m = m, variant = variant,
                        reference = reference)
 
-  # ---- fit indices and analytic CIs ----
+  # ---- fit indices ----
   q <- engine$spec$q
   fit <- cpm_fit_indices(engine$F, engine$df, p, N, R, engine$P, q)
-  se <- cpm_analytic_se(engine, R, N)
-  z <- stats::qnorm(1 - (1 - interval) / 2)
+
+  # ---- confidence intervals (design sec. 5.2) ----
+  if (ci_method == "bootstrap") {
+    # Percentile intervals from warm-started replicates; angle CIs are wrapped
+    # to [0, 360) by the circular quantile machinery, so a CI straddling the
+    # 0/360 pole has lci > uci (the displacement-CI convention).
+    bs <- cpm_bootstrap(engine, sdata_mat, boots, interval)
+    ci <- list(
+      angle_lci = bs$angle_lci, angle_uci = bs$angle_uci,
+      zeta_lci = bs$zeta_lci, zeta_uci = bs$zeta_uci,
+      beta_lci = bs$beta_lci, beta_uci = bs$beta_uci
+    )
+  } else {
+    # Wald intervals on the branch of the reported estimate (estimate always
+    # inside; endpoints may print < 0 or >= 360 near the 0/360 pole, mirroring
+    # the unwrapped-branch convention of the displacement CIs; design sec. 2.4).
+    se <- cpm_analytic_se(engine, R, N)
+    z <- stats::qnorm(1 - (1 - interval) / 2)
+    ci <- list(
+      angle_lci = engine$theta - z * se$angle,
+      angle_uci = engine$theta + z * se$angle,
+      zeta_lci = engine$zeta - z * se$zeta,
+      zeta_uci = engine$zeta + z * se$zeta,
+      beta_lci = engine$beta - z * se$beta,
+      beta_uci = engine$beta + z * se$beta
+    )
+    bs <- NULL
+  }
 
   # ---- results table (design sec. 5.4) ----
-  # Angle CIs are Wald on the branch of the reported estimate (estimate always
-  # inside; endpoints may print < 0 or >= 360 near the 0/360 pole, mirroring the
-  # unwrapped-branch convention of the displacement CIs; design sec. 2.4).
   results <- data.frame(
     Scale = scales,
     # Echo the user's supplied theoretical angles (LM = 360 per octants() and
@@ -1110,11 +1320,11 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     # trig, which would otherwise misreport the top pole as 0.
     Angle_theory = angles,
     Angle = engine$theta,
-    Angle_lci = engine$theta - z * se$angle,
-    Angle_uci = engine$theta + z * se$angle,
+    Angle_lci = ci$angle_lci,
+    Angle_uci = ci$angle_uci,
     Zeta = engine$zeta,
-    Zeta_lci = engine$zeta - z * se$zeta,
-    Zeta_uci = engine$zeta + z * se$zeta,
+    Zeta_lci = ci$zeta_lci,
+    Zeta_uci = ci$zeta_uci,
     Communality = engine$zeta^2,
     stringsAsFactors = FALSE
   )
@@ -1122,8 +1332,8 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
   betas <- data.frame(
     k = 0:engine$spec$m,
     Beta = engine$beta,
-    Beta_lci = engine$beta - z * se$beta,
-    Beta_uci = engine$beta + z * se$beta
+    Beta_lci = ci$beta_lci,
+    Beta_uci = ci$beta_uci
   )
 
   corfun <- local({
@@ -1142,7 +1352,14 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     scales = scales,
     ci_method = ci_method,
     interval = interval,
-    boots = boots,
+    boots = as.integer(boots),
+    # Replicate accounting (bootstrap only; design sec. 5.2): used + degenerate
+    # + nonconvergent = boots. `boots_reflected` counts mirror-guard
+    # reflections (A-review F10) among the USED replicates.
+    boots_used = if (is.null(bs)) NA_integer_ else bs$boots_used,
+    boots_degenerate = if (is.null(bs)) NA_integer_ else bs$boots_degenerate,
+    boots_nonconvergent = if (is.null(bs)) NA_integer_ else bs$boots_nonconvergent,
+    boots_reflected = if (is.null(bs)) NA_integer_ else bs$boots_reflected,
     listwise = listwise,
     N = N,
     accepted = engine$accepted,

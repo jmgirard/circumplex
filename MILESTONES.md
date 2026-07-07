@@ -82,7 +82,7 @@ Cross-cutting guardrails for every task:
   Brief-B contract fields); print/summary snapshot tests; invalid input
   errors via `is_*()` helpers; roxygen with runnable examples;
   `devtools::document()` no-diff after.
-- [ ] **B3. Bootstrap CIs (raw-data default).** Warm-started replicates with
+- [x] **B3. Bootstrap CIs (raw-data default).** Warm-started replicates with
   the per-replicate mirror guard (§5.2, A-review F10), acceptance keyed on
   scaled gradient norm (F2), circular handling for angle CIs via the
   existing circular-quantile machinery, seed convention documented.
@@ -112,6 +112,17 @@ Cross-cutting guardrails for every task:
   oracle mismatches triaged per the §6.3 checklist; coverage-oracle results
   recorded in DESIGN.md (they justify the bootstrap-default decision);
   `/statistical-validation` pass.
+  *Inputs from B3's validation (2026-07-06), for the coverage oracle to
+  quantify properly:* smoke test at N = 300, boots = 200–300, octant truth
+  (ζ = .75, β = .45/.35/.15/.05), nominal .95: angle coverage ≈ .84, zeta
+  coverage ≈ .80 with misses 15:1 one-sided (interval above truth — ζ̂ biased
+  toward the boundary; percentile CIs inherit the bias; if confirmed at scale,
+  a BCa follow-up may be warranted). Also observed: resampled likelihood
+  surfaces at octant-like truths have genuinely competing near-tied basins
+  (warm-started and cold multi-start optima differ with |ΔF| up to ~0.02 on
+  ~1/3 of replicates, both directions, all passing the acceptance criterion,
+  even on clean N = 1000 data whose sample fit is χ²-consistent) — the
+  warm-start same-basin tracking of §5.2 is doing real work there.
 
 ### Tasks — SSM CI trustworthiness (Zimmermann & Wright 2017)
 
@@ -214,6 +225,38 @@ at release time, not this branch's.
 
 ## Log
 
+- 2026-07-06 — B3 bootstrap CIs, raw-data default (Fable, test-first;
+  /statistical-validation; 8-finder /code-review high). New internal
+  `cpm_bootstrap()` + `cpm_mirror_guard()` in R/cpm_fit.R: full index array
+  drawn up front in one RNG block (boot::boot convention — discards don't
+  shift the stream), per-replicate Pearson R with NA/non-PD refusal, warm
+  start from the canonicalized γ̂ under the post-polish spec, acceptance
+  keyed ONLY on the §3.5 scaled gradient norm (F2; one deterministic restart
+  from a stalled point before excluding — rescues ~1/3 of the ~1% of stalls),
+  mirror guard per A-review F10 (reflect when circularly closer to −γ̂ via
+  angle_dist; F-isometry + involution pinned by tests), angle CIs through
+  quantile.circumplex_radian (straddling CIs wrapped, lci > uci, displacement
+  convention), ζ/β percentile CIs, ssm_analyze-style exclusion warning +
+  boots_used/degenerate/nonconvergent/reflected accounting in details and a
+  summary() diagnostic line. `ci_method` default now path-conditional
+  (bootstrap on raw data, analytic on cormat) per §5.2; roxygen gains
+  Reproducibility + expanded CI sections (seed convention: only the bootstrap
+  consumes RNG; point estimates seed-invariant). Timing: default 2000-rep
+  bootstrap on jz2017 octants ≈ 13 s (under the ~30 s Phase-2 C++ trigger;
+  ~6.4 ms/replicate). Validation: circular-quantile rotation invariance
+  ≤ 2e-15; every pooled replicate confirmed a genuine local optimum by an
+  independent BFGS oracle (worst improvement 7.7e-08); jz2017 end-to-end
+  circular bracketing; coverage smoke + resample-multimodality findings
+  recorded under B6 (they are the coverage oracle's to quantify). Review:
+  8-finder swarm; 2 low-severity findings fixed (complete.cases over all
+  three replicate matrices — quantile's na.rm=FALSE would silently corrupt
+  on a future NA; boots_reflected now counted over used replicates);
+  refuted with evidence: dropping the eigen PD check (load-bearing — the
+  gradient never sees ln|R|, nlminb would silently pool a singular-resample
+  fit) and keying acceptance on the nlminb code (F2 forbids). Suite 842/842;
+  check 0/0/0; document() clean. NEWS updated. (R/cpm_fit.R, R/cpm_oop.R,
+  tests/testthat/test-cpm_api.R, tests/testthat/_snaps/cpm_api.md,
+  man/cpm_fit.Rd, NEWS.md, MILESTONES.md.)
 - 2026-07-06 — B2 `cpm_fit()` API + `circumplex_cpm` class (Opus, test-first;
   inline /code-review). New exported `cpm_fit()` wrapping the B1 engine: raw-data
   (Pearson R, listwise-only) and cormat paths with `is_*()`/`stopifnot()`

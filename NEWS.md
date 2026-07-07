@@ -7,8 +7,18 @@
   (with four model variants), and reports the usual covariance-structure fit
   indices (chi-square, RMSEA with a 90% confidence interval, SRMR, CFI, TLI,
   AIC, BIC). The returned `circumplex_cpm` object has `print()` and `summary()`
-  methods. Confidence intervals are currently analytic (Wald); `summary()`
-  cautions when the sample size is small enough that these may mis-cover.
+  methods. On the raw-data path, confidence intervals are estimated by a
+  nonparametric bootstrap by default (resampling rows and refitting the model,
+  with percentile intervals; angle intervals use the package's circular
+  quantile machinery, so an interval straddling the 0/360 degree boundary is
+  reported wrapped, as with displacement intervals). Resamples that are
+  degenerate or fail the convergence criterion are excluded with a warning and
+  counted in the output. Only the bootstrap consumes R's random number stream:
+  call `set.seed()` immediately before `cpm_fit()` for reproducible intervals
+  (point estimates are deterministic). On the correlation-matrix path,
+  intervals are analytic (Wald) — there is no raw data to resample — and
+  `summary()` cautions when the sample size is small enough that these may
+  mis-cover.
 
 * New `ggcircumplex()` function builds an empty circumplex plotting canvas
   (amplitude rings, displacement spokes, and scale labels) as a ggplot2

@@ -14,7 +14,7 @@ cpm_fit(
   model = c("quasi-circumplex", "constrained-angles", "equal-communality", "circulant"),
   reference = 1,
   interval = 0.95,
-  ci_method = c("analytic", "bootstrap"),
+  ci_method = c("bootstrap", "analytic"),
   boots = 2000,
   listwise = TRUE
 )
@@ -56,13 +56,15 @@ at its theoretical value to identify the rotation (default = 1).}
 \item{interval}{The confidence level for the parameter intervals (default =
 0.95). The RMSEA interval is always the conventional 90 percent.}
 
-\item{ci_method}{How to construct confidence intervals: \code{"analytic"}
-(default) uses Wald intervals from the information matrix. \code{"bootstrap"}
-(raw-data path) is added in a later release. On the \code{cormat} path only
-\code{"analytic"} is available (there is no raw data to resample).}
+\item{ci_method}{How to construct the parameter confidence intervals:
+\code{"bootstrap"} (the default on the raw-data path) resamples rows,
+recomputes the correlation matrix, and refits the model warm-started from
+the reported solution; \code{"analytic"} uses Wald intervals from the
+information matrix. On the \code{cormat} path only \code{"analytic"} is available
+(there is no raw data to resample), and it is the default there.}
 
-\item{boots}{The number of bootstrap resamples (reserved for the bootstrap
-method; default = 2000).}
+\item{boots}{The number of bootstrap resamples for
+\code{ci_method = "bootstrap"} (default = 2000).}
 
 \item{listwise}{Whether to handle missing values by listwise deletion. Only
 listwise deletion is supported in this release (default = TRUE).}
@@ -85,19 +87,43 @@ usual covariance-structure indices (chi-square, RMSEA, SRMR, CFI, TLI).
 }
 \section{Confidence intervals}{
 
-Analytic (Wald) intervals are asymptotically valid but can materially
-mis-cover at field-typical sample sizes; \code{summary()} prints a caution below
-\code{n = 2000}. Prefer the bootstrap on the raw-data path when available.
+The bootstrap (the raw-data default) refits the model to each resampled
+correlation matrix, warm-started from the reported solution, and forms
+percentile intervals; angle replicates are pooled with the package's
+circular quantile machinery, so an angle interval that straddles the
+0/360 boundary is reported wrapped (its lower limit numerically exceeds
+its upper limit, as with displacement intervals in \code{\link[=ssm_analyze]{ssm_analyze()}}).
+Resamples with a degenerate (non-positive-definite) correlation matrix or
+a refit failing the convergence acceptance criterion are excluded with a
+warning reporting how many; the intervals are then conditional on
+estimability. Analytic (Wald) intervals are asymptotically valid but can
+materially mis-cover at field-typical sample sizes; \code{summary()} prints a
+caution below \code{n = 2000}. Analytic angle intervals are reported on the
+unwrapped branch of the estimate (endpoints may fall outside [0, 360)
+near the boundary).
+}
+
+\section{Reproducibility}{
+
+Only the bootstrap consumes R's random number stream; the engine's point
+estimates, fit indices, and the analytic intervals are deterministic, so
+the estimates are identical across seeds and the default \code{cormat}-path
+fit never touches the stream. Call \code{set.seed()} immediately before
+\code{cpm_fit()} for reproducible bootstrap intervals. All resample indices
+are drawn in one block before any refitting, so a given seed yields the
+same intervals regardless of how many replicates are later excluded.
 }
 
 \examples{
-# Raw-data path on the eight IIP-SC octant scales
+# Raw-data path on the eight IIP-SC octant scales (bootstrap CIs; a small
+# `boots` keeps the example fast -- the default is 2000)
 data("jz2017")
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
-fit <- cpm_fit(jz2017, scales = scales)
+set.seed(12345)
+fit <- cpm_fit(jz2017, scales = scales, boots = 100)
 fit
 
-# Matrix-input path (supply the sample size)
+# Matrix-input path (supply the sample size; analytic CIs)
 R <- cor(jz2017[scales])
 cpm_fit(cormat = R, scales = scales, n = nrow(jz2017))
 

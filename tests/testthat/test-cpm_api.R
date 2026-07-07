@@ -45,6 +45,18 @@ misfit_octant_P <- function() {
 oct_labels <- function() c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 oct_angles <- function() c(0, 45, 90, 135, 180, 225, 270, 315)
 
+# Simulated raw data from a clean in-family octant model (Cholesky route,
+# independent of any package simulation code). Consumes the RNG: callers seed
+# and clean up .Random.seed per the test-cpm_fit.R convention.
+sim_octant_data <- function(N, seed) {
+  set.seed(seed)
+  theta <- oct_angles() * pi / 180
+  P <- api_ref_P(theta, rep(0.75, 8), c(0.45, 0.35, 0.15, 0.05))
+  X <- matrix(stats::rnorm(N * 8), N) %*% chol(P)
+  colnames(X) <- oct_labels()
+  as.data.frame(X)
+}
+
 # ---- object shape (design sec. 5.4) -----------------------------------------
 
 test_that("cpm_fit returns a circumplex_cpm matching the design sec. 5.4 sketch", {
@@ -166,7 +178,8 @@ test_that("analytic CIs are finite and centered on the estimates", {
 test_that("a singular information matrix (Heywood) yields NA CIs, not an error", {
   data("jz2017")
   fit <- suppressWarnings(
-    cpm_fit(jz2017, scales = oct_labels())     # NO scale Heywoods at zeta = 1
+    # NO scale Heywoods at zeta = 1; analytic CIs are the object under test.
+    cpm_fit(jz2017, scales = oct_labels(), ci_method = "analytic")
   )
   expect_true(fit$details$heywood)
   expect_true(all(is.na(fit$results$Zeta_lci)))
@@ -260,7 +273,12 @@ test_that("raw-data and cormat paths agree on identical inputs", {
   sdata <- stats::na.omit(jz2017[oct_labels()])
   N <- nrow(sdata)
   R <- stats::cor(sdata)
-  f_raw <- suppressWarnings(cpm_fit(jz2017, scales = oct_labels()))
+  # Analytic on both paths so the comparison is deterministic (the raw-data
+  # default is bootstrap once B3 lands; point-estimate agreement across CI
+  # methods is pinned in the bootstrap section below).
+  f_raw <- suppressWarnings(
+    cpm_fit(jz2017, scales = oct_labels(), ci_method = "analytic")
+  )
   f_cm <- suppressWarnings(cpm_fit(cormat = R, scales = oct_labels(), n = N))
   expect_equal(f_raw$results$Angle, f_cm$results$Angle)
   expect_equal(f_raw$results$Zeta, f_cm$results$Zeta)
@@ -292,14 +310,10 @@ test_that("invalid input is rejected with clear errors", {
   expect_error(cpm_fit(cormat = R, scales = s, angles = a, n = 5), "n > p|n >")
   # angle length mismatch
   expect_error(cpm_fit(cormat = R, scales = s, angles = a[1:7], n = 100))
-  # ci_method restrictions
+  # ci_method restrictions: no raw data to resample on the cormat path
   expect_error(
     cpm_fit(cormat = R, scales = s, angles = a, n = 100, ci_method = "bootstrap"),
     "cormat"
-  )
-  expect_error(
-    suppressWarnings(cpm_fit(jz2017, scales = s, ci_method = "bootstrap")),
-    "not yet implemented"
   )
   # listwise = FALSE unsupported
   expect_error(cpm_fit(jz2017, scales = s, listwise = FALSE), "listwise")
@@ -323,11 +337,177 @@ test_that("saturated model (df = 0) warns and returns NA fit indices", {
   expect_true(is.na(fit$fit$pvalue))
 })
 
+# ---- bootstrap CIs (design sec. 5.2, M4/B3) ----------------------------------
+
+test_that("bootstrap is the raw-data default and is seed-reproducible", {
+  d <- sim_octant_data(300, 42)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+
+  set.seed(1)
+  f1 <- suppressWarnings(
+    cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 100)
+  )
+  expect_identical(f1$details$ci_method, "bootstrap")
+
+  set.seed(1)
+  f2 <- suppressWarnings(
+    cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 100)
+  )
+  expect_equal(f1$results, f2$results)
+  expect_equal(f1$betas, f2$betas)
+
+  # A different seed changes the CIs but never the point estimates (the
+  # engine runs before, and independently of, the resampling).
+  set.seed(2)
+  f3 <- suppressWarnings(
+    cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 100)
+  )
+  expect_equal(f3$results$Angle, f1$results$Angle)
+  expect_equal(f3$results$Zeta, f1$results$Zeta)
+  expect_equal(f3$betas$Beta, f1$betas$Beta)
+  expect_false(identical(f3$results$Angle_lci, f1$results$Angle_lci))
+})
+
+test_that("bootstrap point estimates and fit indices match the analytic path", {
+  d <- sim_octant_data(300, 42)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+
+  set.seed(1)
+  f_bs <- suppressWarnings(
+    cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 50)
+  )
+  f_an <- cpm_fit(d, scales = oct_labels(), angles = oct_angles(), ci_method = "analytic")
+  expect_equal(f_bs$results$Angle, f_an$results$Angle)
+  expect_equal(f_bs$results$Zeta, f_an$results$Zeta)
+  expect_equal(f_bs$betas$Beta, f_an$betas$Beta)
+  expect_equal(f_bs$fit, f_an$fit)
+})
+
+test_that("bootstrap angle CIs straddling 0/360 are wrapped and contain the estimate", {
+  # PA's true angle is 0; with seed 42 at N = 300 its fitted angle lands near
+  # the pole (~353 degrees), so the replicate distribution straddles 0/360.
+  # reference = 3 keeps PA's angle free. The circular quantile machinery
+  # (quantile.circumplex_radian) reports the interval wrapped to [0, 360),
+  # so a straddling CI has lci > uci, the displacement-CI convention.
+  d <- sim_octant_data(300, 42)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+
+  set.seed(3)
+  fit <- suppressWarnings(
+    cpm_fit(d, scales = oct_labels(), angles = oct_angles(), reference = 3,
+            boots = 200)
+  )
+  est <- fit$results$Angle[1]
+  lci <- fit$results$Angle_lci[1]
+  uci <- fit$results$Angle_uci[1]
+
+  # The construction must actually straddle, or the test has rotted.
+  expect_gt(est, 270)
+  expect_gt(lci, uci)
+  expect_true(lci >= 0 && lci < 360 && uci >= 0 && uci < 360)
+  # Circular containment: est lies in [lci, 360) U [0, uci].
+  expect_true(est >= lci || est <= uci)
+  # The wrapped interval is short (a genuine CI, not a near-full circle).
+  expect_lt((uci - lci) %% 360, 90)
+
+  # The reference angle is fixed: its interval is degenerate at the estimate.
+  expect_equal(fit$results$Angle_lci[3], fit$results$Angle[3])
+  expect_equal(fit$results$Angle_uci[3], fit$results$Angle[3])
+
+  # Zeta/beta percentile intervals respect their natural (closed) ranges;
+  # near-boundary replicates may round to the boundary itself.
+  expect_true(all(fit$results$Zeta_lci >= 0 & fit$results$Zeta_uci <= 1))
+  expect_true(all(fit$results$Zeta_lci <= fit$results$Zeta_uci))
+  expect_true(all(fit$betas$Beta_lci >= 0 & fit$betas$Beta_uci <= 1))
+  expect_true(all(fit$betas$Beta_lci <= fit$betas$Beta_uci))
+})
+
+test_that("discarded bootstrap replicates are counted, warned, and surfaced", {
+  # N = 12 rows on p = 8 scales: most resamples are rank-deficient (non-PD),
+  # and some warm refits fail the scaled-gradient acceptance criterion.
+  d <- sim_octant_data(12, 5)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+
+  set.seed(9)
+  w <- capture_warnings(fit <- cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 100))
+  expect_true(any(grepl("excluded", w)))
+
+  det <- fit$details
+  expect_identical(
+    det$boots_used + det$boots_degenerate + det$boots_nonconvergent,
+    100L
+  )
+  expect_gt(det$boots_degenerate, 0)
+  expect_lt(det$boots_used, 100)
+  expect_gt(det$boots_used, 0)
+
+  # Surviving replicates still yield finite intervals (conditional on
+  # estimability, the ssm_analyze convention).
+  expect_true(all(is.finite(fit$results$Zeta_lci)))
+
+  # The accounting reaches the user: summary() prints the exclusion note.
+  out <- paste(utils::capture.output(summary(fit)), collapse = "\n")
+  expect_match(out, "excluded")
+})
+
+test_that("the per-replicate mirror guard reflects a mirrored solution back", {
+  # A-review F10: reflect any replicate angularly closer to the mirror of
+  # gamma-hat than to gamma-hat. Reflection is an involution, so guarding the
+  # mirrored gamma-hat must restore it exactly; gamma-hat itself is untouched.
+  fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
+                 angles = oct_angles(), n = 500)
+  spec <- fit$details$spec
+  par_hat <- fit$details$par
+  ref_rel <- circumplex:::cpm_ref_relative(par_hat, spec)
+
+  same <- circumplex:::cpm_mirror_guard(par_hat, spec, ref_rel)
+  expect_false(same$reflected)
+  expect_identical(same$par, par_hat)
+
+  mirrored <- circumplex:::cpm_reflect_par(par_hat, spec)
+  guarded <- circumplex:::cpm_mirror_guard(mirrored, spec, ref_rel)
+  expect_true(guarded$reflected)
+  expect_equal(guarded$par, par_hat)
+})
+
+test_that("RNG contract: analytic path is RNG-silent, bootstrap consumes the stream", {
+  d <- sim_octant_data(300, 42)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+
+  # cormat path (analytic default): .Random.seed untouched.
+  set.seed(11)
+  before <- .Random.seed
+  invisible(cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
+                    angles = oct_angles(), n = 500))
+  expect_identical(.Random.seed, before)
+
+  # raw-data path with analytic CIs: also RNG-silent.
+  invisible(cpm_fit(d, scales = oct_labels(), angles = oct_angles(), ci_method = "analytic"))
+  expect_identical(.Random.seed, before)
+
+  # bootstrap path: consumes the stream (documented entry point).
+  invisible(suppressWarnings(
+    cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 25)
+  ))
+  expect_false(identical(.Random.seed, before))
+})
+
 # ---- print / summary snapshots ----------------------------------------------
 
 test_that("print and summary render as expected", {
   fit <- cpm_fit(cormat = misfit_octant_P(), scales = oct_labels(),
                  angles = oct_angles(), n = 300)
+  expect_snapshot(print(fit))
+  expect_snapshot(summary(fit))
+})
+
+test_that("print and summary render a bootstrap fit as expected", {
+  d <- sim_octant_data(300, 42)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  set.seed(1)
+  fit <- suppressWarnings(
+    cpm_fit(d, scales = oct_labels(), angles = oct_angles(), boots = 100)
+  )
   expect_snapshot(print(fit))
   expect_snapshot(summary(fit))
 })
