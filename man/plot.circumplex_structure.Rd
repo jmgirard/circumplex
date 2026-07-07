@@ -10,7 +10,10 @@
 \item{x}{A \code{circumplex_structure} object from \code{\link[=fit_structure]{fit_structure()}}.}
 
 \item{amax}{A single positive number giving the communality represented by
-the canvas's outer ring (default = 1, the maximum possible communality).}
+the canvas's outer ring (default = 1). Principal-axis communalities can
+exceed 1 in a Heywood case; when any scale's communality exceeds \code{amax}
+the ring is expanded to contain it, so no point is ever drawn outside the
+canvas.}
 
 \item{legend}{A logical: draw a legend keying the colours to the scale names
 (default = \code{TRUE}).}

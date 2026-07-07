@@ -15,6 +15,17 @@
 # a Suggests-level test oracle.
 paf2 <- function(r, max_iter = 100L, tol = 1e-4) {
   p <- ncol(r)
+  # An undefined correlation matrix (a zero-variance scale, or a pair of scales
+  # never jointly observed, makes cor() return NA) has no factor solution:
+  # eigen() would abort with a cryptic "infinite or missing values in 'x'".
+  # Return NA loadings so every criterion returns NA_real_ (the degeneracy
+  # policy), matching how structure_randall() already handles the same input.
+  if (anyNA(r)) {
+    return(matrix(
+      NA_real_, nrow = p, ncol = 2,
+      dimnames = list(rownames(r), c("PA1", "PA2"))
+    ))
+  }
   # SMC starting communalities: 1 - 1/diag(R^-1). A singular R (e.g. deviation-
   # scored scales, whose correlation matrix is rank-deficient) has no inverse;
   # fall back to a unit (identity) start, then let ridge repair supply a proper
@@ -91,6 +102,9 @@ DEGEN_TOL <- 1e-12
 # computed vector lengths (as does psych::circ.tests). Rotation-invariant, so
 # the arbitrary PA orientation is immaterial.
 structure_fisher <- function(loadings) {
+  if (anyNA(loadings)) {
+    return(NA_real_)
+  }
   h2 <- rowSums(loadings^2)
   if (all(h2 < DEGEN_TOL)) {
     return(NA_real_)
@@ -107,6 +121,9 @@ structure_fisher <- function(loadings) {
 # spaced. Angles are recovered with atan2, which is exact at 180 degrees where
 # sign(0)*acos() collapses to 0. Radians^2, on the A&R cutoff scale.
 structure_gap <- function(loadings) {
+  if (anyNA(loadings)) {
+    return(NA_real_)
+  }
   h2 <- rowSums(loadings^2)
   if (any(h2 < DEGEN_TOL)) {
     return(NA_real_)
@@ -132,6 +149,9 @@ rotate_loadings <- function(loadings, theta) {
 # the `structure_cutoffs` calibration assumes it; non-default grids exist only
 # for the calibration script's provenance diagnostics.
 structure_vt <- function(loadings, grid_deg = seq(0, 175, by = 5)) {
+  if (anyNA(loadings)) {
+    return(NA_real_)
+  }
   h2 <- rowSums(loadings^2)
   if (any(h2 < DEGEN_TOL)) {
     return(NA_real_)
@@ -156,6 +176,9 @@ structure_vt <- function(loadings, grid_deg = seq(0, 175, by = 5)) {
 # orientation invariance; the same definition-and-calibration caveat as
 # structure_vt applies to the grid.
 structure_rt <- function(loadings, grid_deg = seq(0, 85, by = 5)) {
+  if (anyNA(loadings)) {
+    return(NA_real_)
+  }
   x <- vapply(grid_deg * pi / 180, function(theta) {
     rl2 <- rotate_loadings(loadings, theta)^2
     sum((rl2[, 1] - rl2[, 2])^2 / 2)

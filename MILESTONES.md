@@ -121,9 +121,11 @@ inlined so the reference survives archiving):
   MILESTONES-ARCHIVE.md with its full log; DESCRIPTION dev suffix bumped
   1.3.0.9000 → 1.3.0.9001; lightweight `m4.5-complete` tag cut at the close
   commit; ROADMAP M4.5 → GitHub-complete, M5 → active. The milestone-close
-  `/code-review` over M4.5's full cumulative diff (`max`, statistically risky
-  milestone) is the one remaining close-step. First task is **T1** (Fable —
-  the estimator/CI design where plausible-but-wrong statistics are possible).
+  `/code-review max` over M4.5's full cumulative diff is **done** (2026-07-07;
+  entry in the archived M4.5 log): core statistics confirmed correct, 6
+  fix-now findings landed, the rest deferred to the ROADMAP M4.5 follow-up
+  bullets for the v2.0.0 train. First task is **T1** (Fable — the estimator/CI
+  design where plausible-but-wrong statistics are possible).
   (MILESTONES.md, MILESTONES-ARCHIVE.md, DESCRIPTION, ROADMAP.md.)
 
 # Completed milestones

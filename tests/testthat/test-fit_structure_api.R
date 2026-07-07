@@ -169,6 +169,30 @@ test_that("print names the uncalibrated case in plain language", {
   expect_match(out, "no interpretive cutoffs are calibrated for 6 scales")
 })
 
+test_that("summary at an uncalibrated nv shows dashes, not literal NA", {
+  data("jz2017")
+  # 6 scales: statistics are computed but no cutoffs are calibrated, so the
+  # Almost/Thrice/Twice columns are NA and must render as "-" (na.print on a
+  # numeric column is a no-op), matching the "-" Verdict.
+  res <- fit_structure(jz2017, scales = octants_jz[1:6])
+  out <- paste(capture.output(summary(res)), collapse = "\n")
+  expect_false(grepl("NA", out))
+  expect_match(out, "-")
+})
+
+test_that("a zero-variance scale yields a graceful object, not a crash", {
+  data("jz2017")
+  d <- jz2017[octants_jz]
+  d[[1]] <- 5 # constant scale -> cor() has an NA column
+  res <- suppressWarnings(fit_structure(d, scales = octants_jz, scoring = "raw"))
+  expect_s3_class(res, "circumplex_structure")
+  expect_true(all(is.na(res$results$Statistic)))
+  expect_true(is.na(res$randall$statistic))
+  # print/summary must render the fully-undefined object without error.
+  expect_output(print(res))
+  expect_output(summary(res))
+})
+
 # ---- plot -------------------------------------------------------------------
 
 test_that("plot draws one point per scale at its communality radius", {
@@ -182,6 +206,20 @@ test_that("plot draws one point per scale at its communality radius", {
   # Radius = communality * 5 / amax with amax = 1 (the canvas transform).
   r <- sqrt(pts$x^2 + pts$y^2)
   expect_equal(sort(r), sort(unname(rowSums(res$loadings^2)) * 5), tolerance = 1e-6)
+})
+
+test_that("Heywood communalities (>1) stay inside the canvas ring", {
+  data("jz2017")
+  # A 4-scale subset drives paf2 into a Heywood case (a communality > 1), which
+  # the plot must contain by expanding amax rather than drawing outside the ring.
+  res <- fit_structure(jz2017, scales = c("PA", "DE", "HI", "LM"), scoring = "raw")
+  expect_true(any(rowSums(res$loadings^2) > 1)) # precondition
+  p <- plot(res)
+  b <- ggplot2::ggplot_build(p)
+  pts <- b$data[[length(b$data)]]
+  r <- sqrt(pts$x^2 + pts$y^2)
+  # 5 is the fixed outer-ring radius of the ggcircumplex canvas.
+  expect_lte(max(r), 5 + 1e-6)
 })
 
 test_that("plot is a stable visual and warns on unknown dots", {

@@ -253,6 +253,22 @@ dependencies for the fit statistics: zero**.
   the factor-analytic criteria and RANDALL need only the correlations, but
   deviation scoring needs the raw observations, so a cormat path would be
   raw-scoring only.
+- Follow-ups deferred from the M4.5 close-review (`/code-review max`,
+  2026-07-07; the 6 fix-now findings already landed — see the archived M4.5
+  log). For the v2.0.0 train: (#4) `structure_rt()`'s degeneracy guard is on a
+  loadings⁴ scale, so it voids a valid but weak circumplex where VT/Fisher stay
+  defined — make the guard scale-invariant/consistent across the four tests;
+  (#5) missingness is silently pairwise-deleted before the complete-data
+  cutoffs are applied, with no `listwise` control or warning — decide a
+  missing-data policy; (#13) `fit_structure()` at nv ≥ 10 without `n_perm`
+  errors only after computing the four criteria, discarding them — validate
+  up front or return the criteria with RANDALL marked unavailable. Test/quality
+  hardening: assert the `almost < thrice < twice` cutoff ordering end-to-end
+  (script `stopifnot` + a test over `structure_cutoffs`); a marginal-circumplex
+  MC-p reproducibility test that isn't pinned at the add-one floor; an
+  exact-path `.Random.seed`-not-created test; the `data[scales]` matrix-misindex
+  in the two internal helpers; and DRY the duplicated angle/communality
+  geometry (summary/plot) and the double `cor(scored)`.
 
 The detailed task list with acceptance criteria (T1–T8) and its full running
 log are archived in MILESTONES-ARCHIVE.md — milestone-level status only here,

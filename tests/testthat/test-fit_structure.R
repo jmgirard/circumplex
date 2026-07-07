@@ -173,8 +173,10 @@ test_that("structure_gap angles are exact on the axes (sign*acos regression)", {
 test_that("degenerate loadings return NA_real_, never NaN", {
   l <- loadings_at(seq(45, 360, by = 45))
   l[3, ] <- 0 # no defined angle for one variable
-  expect_true(is.na(structure_gap(l)))
-  expect_true(is.na(structure_vt(l)))
+  # expect_identical(..., NA_real_) discriminates NA from NaN -- the degeneracy
+  # policy promises NA, never NaN, and is.na() alone would pass on a NaN.
+  expect_identical(structure_gap(l), NA_real_)
+  expect_identical(structure_vt(l), NA_real_)
   # Fisher and RT remain defined (neither needs a per-variable angle).
   expect_true(is.finite(structure_fisher(l)))
   expect_true(is.finite(structure_rt(l)))
@@ -188,6 +190,22 @@ test_that("degenerate loadings return NA_real_, never NaN", {
   expect_identical(structure_fisher(matrix(1e-9, 8, 2)), NA_real_)
   # Constant Y across variables (a bipolar pair of scales): VT is 0/0.
   expect_identical(structure_vt(rbind(c(-0.975, 0), c(0.975, 0))), NA_real_)
+})
+
+test_that("NA loadings propagate to NA_real_ statistics, never an error", {
+  # A zero-variance scale (or a never-jointly-observed pair) makes cor() return
+  # NA; structure_loadings/paf2 must hand back NA loadings and every criterion
+  # must return NA_real_ rather than crashing in eigen() or an `if (any(NA))`.
+  na_l <- matrix(NA_real_, 8, 2)
+  for (f in list(structure_fisher, structure_gap, structure_vt, structure_rt)) {
+    expect_identical(f(na_l), NA_real_)
+  }
+  # End to end: a constant scale reaches paf2 through cor() as an NA matrix.
+  d <- as.data.frame(matrix(stats::rnorm(80), nrow = 10, ncol = 8))
+  d[[3]] <- 5 # zero variance
+  L <- suppressWarnings(structure_loadings(d, names(d)))
+  expect_true(all(is.na(L)))
+  expect_identical(dim(L), c(8L, 2L))
 })
 
 test_that("structure_vt matches A&R Eq. 8 closed forms on the full-period grid", {

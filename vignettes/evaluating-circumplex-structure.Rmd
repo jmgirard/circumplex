@@ -445,10 +445,14 @@ plot(res)
 ```
 
 For the IIP-SC octants the picture agrees with Section 2's CPM fit: the
-scales land close to their evenly spaced theoretical positions with
-comparable communalities, and the Fisher, Gap, and interstitiality criteria
-all classify the configuration as consistent with (or close to) a
-circumplex under deviation scoring. RANDALL's p value confirms the
+scales keep their theoretical circular *ordering* with comparable
+communalities and roughly even spacing, and the Fisher, Gap, and
+interstitiality criteria all classify the configuration as consistent with
+(or close to) a circumplex under deviation scoring. One caveat when reading
+the angles: the two-factor solution is *unrotated*, so its absolute
+orientation is arbitrary — it is the scales' ordering and relative spacing
+that agree with theory, not their absolute angles (which is why `summary()`
+places PA well away from its nominal 90°). RANDALL's p value confirms the
 hypothesized circular order directly, independent of the factor-analytic
 criteria.
 
@@ -478,13 +482,16 @@ is available at any scale count of four or more.
 
 ### Reading the classifications
 
-The classification categories — "almost certain", "at least 3x/2x more
-likely than not", "not clearly supported" — are Acton and Revelle's own
-likelihood phrasing for where a statistic falls among the simulated
-distributions for competing structures (circumplex vs. simple structure).
-They are **heuristic classifications read off simulated distributions, not
-significance tests**, and `fit_structure()`'s `print()`/`summary()` output
-repeats that caveat every time an interpretation is shown. Treat a "weak"
+The classification categories describe where a statistic falls among the
+simulated distributions for competing structures (circumplex vs. simple
+structure): "almost certain" (below the 1st percentile of the competing
+distribution), "at least 3x/2x as likely as the alternative" (the criterion's
+structure is at least three/two times as likely as its competitor at that
+statistic value), and "not clearly supported". Those ratios are *likelihood
+ratios*, not posterior probabilities or p values. They are **heuristic
+classifications read off simulated distributions, not significance tests**,
+and `fit_structure()`'s `print()`/`summary()` output repeats that caveat
+every time an interpretation is shown. Treat a "weak"
 or unsupported classification as a caution to inspect the loading
 configuration (the plot above) and Section 2's CPM fit together, not as a
 rejection of any specific hypothesis.

@@ -102,6 +102,43 @@ archived:
 
 ## Log
 
+- 2026-07-07 — M4.5 close-review (Opus; /code-review max over the full
+  m4-complete..HEAD diff, 5 parallel finder angles + sweep). Core statistics
+  confirmed correct by every finder (exact/MC RANDALL match brute-force nv!
+  enumeration; VT/RT exactly rotation-invariant; degeneracy returns NA-not-NaN;
+  all six draft bugs genuinely fixed; nv=8 cutoffs correctly ordered and
+  reproduce the .rds pin). 14 findings, all edge/robustness/precision — no
+  wrong-number-on-valid-data bug. Fixed the "fix-now" wave (6): (#1) paf2()
+  crashed with a cryptic eigen() error on an NA correlation matrix (constant
+  scale / non-overlapping missingness) instead of returning NA — added an
+  anyNA(r) guard in paf2 returning NA loadings and an anyNA(loadings) guard in
+  all four criterion statistics, so a degenerate input now yields a graceful
+  all-"-" object like the RANDALL half already did; (#2) Heywood communalities
+  (>1) drew points outside the plot ring and the docstring falsely called
+  amax=1 "the maximum possible communality" — plot() now expands amax to
+  contain them, docstring corrected; (#3) summary()'s na.print="-" was a no-op
+  on numeric columns (swallowed by ...), so uncalibrated-nv cutoffs printed
+  literal "NA" — added a structure_dash() formatter (shared by print/summary)
+  rendering NA as "-"; (#6) print/summary and the vignette said "at least
+  3x/2x more likely than not", glossing a likelihood ratio as a posterior —
+  reworded to "as likely as the alternative" with a vignette note that the
+  ratios are likelihood ratios, not p-values (CLAUDE.md precision bar); (#7)
+  the vignette overstated the estimated geometry ("scales land close to their
+  evenly spaced theoretical positions") when the unrotated-PAF frame is
+  orientation-arbitrary — reworded to ordering/relative-spacing with an
+  explicit arbitrary-frame caveat; (#8) the "never NaN" degeneracy test used
+  is.na() (passes on NaN) for the single-degenerate case — switched to
+  expect_identical(., NA_real_). +15 test assertions (NA-loadings propagation,
+  graceful-object, uncalibrated dashes, Heywood-in-canvas); print snapshot
+  re-accepted for the reworded interpretation. Full suite 1405 pass;
+  devtools::check clean (0/0/0, the Rplots.pdf note is a transient artifact).
+  Deferred to ROADMAP as v2.0.0 follow-ups: #4 (RT degeneracy guard on a
+  loadings^4 scale, inconsistent with VT), #5 (silent pairwise-deletion under
+  missingness + no listwise control), #13 (nv>=10 without n_perm errors late),
+  and the test-hardening/guard-gap set (#9-#12, #14). (R/fit_structure.R,
+  R/fit_structure_oop.R, man/plot.circumplex_structure.Rd,
+  tests/testthat/test-fit_structure*.R, tests/testthat/_snaps/fit_structure_api.md,
+  vignettes/evaluating-circumplex-structure.Rmd.)
 - 2026-07-07 — T8 (Sonnet): added the "Does the instrument have circumplex
   structure at all?" section to the evaluating-circumplex-structure vignette
   (new §4, existing §4/§5 renumbered to §5/§6): what each of the five

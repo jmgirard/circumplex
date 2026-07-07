@@ -32,13 +32,29 @@ structure_phrase <- function(hypothesis, category) {
   if (is.na(category)) {
     return("-")
   }
+  # The cutoffs are likelihood ratios of the target vs the competing structure
+  # (a CDF ratio F_target/F_other), not posterior probabilities, so the phrasing
+  # is "as likely as the alternative", never "more likely than not" (which would
+  # read as a >50% posterior or a significance claim -- the caveat and the
+  # CLAUDE.md vignette-precision rule both forbid that reading).
   claim <- switch(category,
     almost = "almost certain",
-    thrice = "at least 3x more likely than not",
-    twice  = "at least 2x more likely than not",
+    thrice = "at least 3x as likely as the alternative",
+    twice  = "at least 2x as likely as the alternative",
     weak   = "not clearly supported"
   )
   paste0(hypothesis, ": ", claim)
+}
+
+# Format a numeric vector for display, rendering NA as a dash. print.data.frame's
+# `na.print` argument does not apply to numeric columns (it is silently swallowed
+# by `...`), so any NA -- an undefined statistic (a degenerate scale) or an
+# uncalibrated cutoff (no cutoffs at this nv) -- is pre-formatted here to "-",
+# matching the Verdict/Interpretation columns instead of printing a bare "NA".
+structure_dash <- function(x, digits) {
+  out <- format(round(x, digits))
+  out[is.na(x)] <- "-"
+  out
 }
 
 # Terse verdict for summary()'s cutoff table, which is already wide with the
@@ -104,7 +120,7 @@ print.circumplex_structure <- function(x, digits = 3, ...) {
 
   disp <- data.frame(
     Test = x$results$Test,
-    Statistic = round(x$results$Statistic, digits),
+    Statistic = structure_dash(x$results$Statistic, digits),
     Interpretation = mapply(
       structure_phrase, x$results$Hypothesis, x$results$Category
     ),
@@ -159,14 +175,14 @@ summary.circumplex_structure <- function(object, digits = 3, ...) {
   res <- object$results
   tab <- data.frame(
     Test = res$Test,
-    Statistic = round(res$Statistic, digits),
-    Almost = round(res$Almost, digits),
-    Thrice = round(res$Thrice, digits),
-    Twice = round(res$Twice, digits),
+    Statistic = structure_dash(res$Statistic, digits),
+    Almost = structure_dash(res$Almost, digits),
+    Thrice = structure_dash(res$Thrice, digits),
+    Twice = structure_dash(res$Twice, digits),
     Verdict = vapply(res$Category, structure_verdict, character(1)),
     stringsAsFactors = FALSE
   )
-  print(tab, row.names = FALSE, right = FALSE, na.print = "-")
+  print(tab, row.names = FALSE, right = FALSE)
 
   # Estimated per-scale geometry: angle (degrees, [0, 360)) and communality.
   L <- object$loadings
@@ -216,7 +232,10 @@ summary.circumplex_structure <- function(object, digits = 3, ...) {
 #'
 #' @param x A `circumplex_structure` object from [fit_structure()].
 #' @param amax A single positive number giving the communality represented by
-#'   the canvas's outer ring (default = 1, the maximum possible communality).
+#'   the canvas's outer ring (default = 1). Principal-axis communalities can
+#'   exceed 1 in a Heywood case; when any scale's communality exceeds `amax`
+#'   the ring is expanded to contain it, so no point is ever drawn outside the
+#'   canvas.
 #' @param legend A logical: draw a legend keying the colours to the scale names
 #'   (default = `TRUE`).
 #' @param ... Not used. Supplying an unrecognized argument produces a warning.
@@ -236,6 +255,11 @@ plot.circumplex_structure <- function(x, amax = 1, legend = TRUE, ...) {
   L <- x$loadings
   scales <- rownames(L)
   h2 <- rowSums(L^2)
+  # Un-rescaled PAF communalities can exceed 1 (a Heywood case), which would put
+  # a point past the outer ring; expand the ring to contain the largest so no
+  # point is clipped (never shrink a user-supplied amax; ignore NA communalities
+  # from a degenerate solution).
+  amax <- max(amax, h2, na.rm = TRUE)
   angle <- (atan2(L[, 2], L[, 1]) * 180 / pi) %% 360
   df <- data.frame(
     Scale = factor(scales, levels = scales),

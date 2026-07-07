@@ -10,11 +10,11 @@
       
       # Exploratory criteria
       
-       Test     Statistic Interpretation                                   
-       Fisher   0.102     equal axes: at least 3x more likely than not     
-       Gap      0.152     equal spacing: at least 3x more likely than not  
-       Variance 0.180     interstitiality: almost certain                  
-       Rotation 0.325     interstitiality: at least 3x more likely than not
+       Test     Statistic Interpretation                                           
+       Fisher   0.102     equal axes: at least 3x as likely as the alternative     
+       Gap      0.152     equal spacing: at least 3x as likely as the alternative  
+       Variance 0.180     interstitiality: almost certain                          
+       Rotation 0.325     interstitiality: at least 3x as likely as the alternative
       
       # Order hypothesis (RANDALL)
       
