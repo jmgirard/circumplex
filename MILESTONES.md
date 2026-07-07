@@ -220,12 +220,15 @@ Cross-cutting guardrails for every task:
   *Accept:* document() no-diff; DESIGN.md consistent; follow-ups recorded
   where ROADMAP says they live.
 
-Milestone close: when W1+W2 land, `/code-review` the vignette/doc diff as
-usual, archive this section to MILESTONES-ARCHIVE.md (GitHub-complete; the
-CRAN review/checklist now belongs to the v2.0.0 release — see ROADMAP), and
-promote the queued M4.5 section below to active — copying the cross-cutting
-guardrails block into it, since M4.5 references it and archiving M4 would
-otherwise orphan that reference.
+Milestone close: when W1+W2 land, follow ROADMAP's between-releases
+practice — milestone-close `/code-review` over M4's full cumulative diff
+(`max`: this milestone is statistically risky — the CPM estimator and the
+CI diagnostic), dev-version bump, lightweight `m4-complete` tag, archive
+this section to MILESTONES-ARCHIVE.md (GitHub-complete; the CRAN
+review/checklist belongs to the v2.0.0 release), and promote the queued
+M4.5 section below to active — copying the cross-cutting guardrails block
+into it, since M4.5 references it and archiving M4 would otherwise orphan
+that reference.
 
 # Queued milestone: M4.5 — Structure tests (Acton & Revelle 2004)
 
@@ -286,6 +289,14 @@ dependency policy, model tiers) apply unchanged.
 
 ## Log
 
+- 2026-07-07 — Between-releases working practice adopted (Jeff + Fable):
+  real versions/annotated tags/GitHub Releases only at CRAN submissions;
+  per milestone close — dev-suffix bump, lightweight `mX-complete` tag, and
+  a milestone-close /code-review over the cumulative milestone diff (high
+  normally, max for statistically risky milestones) so the release review
+  verifies reviewed strata + seams instead of first-passing everything.
+  Recorded in ROADMAP's release-strategy section; M4's close note updated
+  to follow it (M4 close review pinned at max). (ROADMAP.md, MILESTONES.md.)
 - 2026-07-07 — v2.0.0 scope refined (Jeff + Fable, same discussion as the
   split): the train is M2–M5, not M2–M6 — M6 is deliberately excluded (its
   paired/dependent circular resampling and displacement growth models need

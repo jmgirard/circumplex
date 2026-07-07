@@ -90,6 +90,22 @@ outlive individual milestones' MILESTONES.md sections):
   `/release-checklist` once, after the last milestone (or a deliberate
   descope) lands.
 
+**Between releases (working practice, adopted 2026-07-07).** Real version
+numbers, annotated tags, and GitHub Releases are bound to CRAN submissions
+only — never mint a real version that CRAN won't see. At each milestone
+close instead: (1) archive the milestone to MILESTONES-ARCHIVE.md; (2) bump
+the DESCRIPTION dev suffix (restart the discipline at 2.0.0.9000 after the
+v2.0.0 release; one increment per milestone) so `install_github` users'
+`sessionInfo()` identifies the milestone-state they run; (3) add a
+lightweight git tag (e.g. `m4-complete`) so milestone diffs are stable
+review scopes; (4) run a **milestone-close `/code-review` over the
+milestone's full cumulative diff** — `high` for ordinary milestones, `max`
+for statistically risky ones. The milestone-close review is the layer that
+buys release-review depth: the CRAN-release review (`max`/ultra) then
+verifies already-reviewed strata and the seams between them rather than
+making a first deep pass over everything, and the freeze rule's "reviewed by
+freeze" means this review is done.
+
 Note: a quick **patch** (e.g. v2.0.1) shortly after a release is acceptable
 to CRAN when it fixes a real bug — bug-fixes are the accepted exception to
 the cadence rule. It is *feature* releases that must be spaced out.
