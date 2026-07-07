@@ -795,7 +795,24 @@ variants B–D.
 
 ## 11. Change log
 
-- 2026-07-03 — A-review revisions integrated (all findings F1–F10 of
+- 2026-07-06 — B1 implementation refinement (Fable review pass, flagged for
+  Jeff): the §3.5 multimodality flag's "best two non-mirror optima differ in
+  F̂ by > 1e-6" limb fires, as literally written, whenever any deterministic
+  jitter start converges into any strictly worse local basin — verified
+  concretely on clean in-family exact-octant data, where the ±30° jitter
+  finds a secondary basin at ΔF̂ ≈ 0.095 and the letter of the rule flags a
+  perfectly identified fit. Refined rule as implemented: flag iff a
+  non-mirror run lands on a *distinct* parameter point with F̂ competitive
+  with the best (within max(1e-6, 1e-6·|F̂|)) — near-tied distinct optima
+  (start-dependence; the equal-F̂ non-identification signature; the hazard
+  for §5.2's warm-started bootstrap replicates). Strictly worse secondary
+  basins are ordinary nonconvexity of a periodic objective and do not flag;
+  the §3.5 acceptance criterion (b) already guarantees the winner is
+  reproduced. Mirror detection is done circularly via `angle_dist` (a scale
+  exactly opposite the reference has relative angle +π in *both* mirrors, so
+  a sign test misreads true mirrors on exact-octant configurations), and for
+  variants B/D (no free angles) runs are compared on full parameter vectors
+  since reflection is a no-op there. (all findings F1–F10 of
   `devel/m4-browne-design-review.md`): coverage oracle + T-calibration added
   to §6.4 and bootstrap made the raw-data default (F1); convergence
   acceptance respecified on scaled gradient norm with the nlminb code

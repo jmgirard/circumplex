@@ -61,7 +61,7 @@ Cross-cutting guardrails for every task:
 
 ### Tasks — Browne model (anchor feature)
 
-- [ ] **B1. CPM engine core (R).** Model-implied correlation matrix (§1),
+- [x] **B1. CPM engine core (R).** Model-implied correlation matrix (§1),
   unconstrained parameterization (logit ζ, softmax β, free angles; §3.3), ML
   discrepancy F (§3.1), analytic gradient (§3.4), nlminb optimization with
   deterministic multi-start, scaled-gradient-norm acceptance, β-boundary
@@ -214,6 +214,36 @@ at release time, not this branch's.
 
 ## Log
 
+- 2026-07-06 — B1 CPM engine core (Opus implementation against the Brief-A
+  spec, test-first; Fable statistical review + fixes; Sonnet/Opus finder
+  swarm for /code-review high). New R/cpm_fit.R (internal only, nothing
+  exported): rho/rho', implied P, variants A-D with df table, logit/softmax
+  unconstrained parameterization, ML discrepancy + analytic gradient,
+  deterministic multi-start (mirror start only when angles are free),
+  scaled-gradient-norm acceptance (nlminb code advisory), beta boundary
+  polish via a shared cpm_spec_reduce() (df increases, m-as-fitted decreases
+  iff the top harmonic drops), theory-first canonicalization with CCW
+  tie-break, diagnostics (Heywood, Hessian condition, multimodality).
+  Fable review found+fixed: diag(scalar) crash when polish removes ALL
+  harmonics; false multimodality flag on exact-octant data (mirror detection
+  now circular via angle_dist — the ±pi atom); logit-scale comparison
+  exploding near Heywood boundaries (natural-scale now); B/D duplicate
+  mirror start making "reproduced" vacuous; m reported as nominal after
+  top-harmonic removal; plus a DESIGN DEVIATION recorded in
+  devel/m4-browne-design.md sec. 11 and flagged for Jeff: the multimodality
+  flag now fires only on COMPETITIVE distinct optima (near-tied), not on any
+  strictly-worse jitter basin (the spec's literal rule fired on clean octant
+  data). Refuted after analysis: "reproduced uses pre-polish Fs" (nested-
+  model gate pins the polished F-hat transitively; argument now in the
+  code comment). /statistical-validation: 16/16 independent checks pass
+  (scratch factor-form P, Cholesky-route F, scratch-objective BFGS optimizer
+  agreement to 7e-13, fft() circulant oracle, Richardson-FD gradient 2e-11,
+  pole/general-factor/unequal-spacing boundaries, SSM pipeline untouched).
+  Deferred with rationale: objective/gradient shared-factorization cache
+  (Phase-2 profiling gate, R stays the audit oracle). Suite 735/735;
+  check 0/0/0. No NEWS (internal; user-facing entry lands with B2).
+  (R/cpm_fit.R [new], tests/testthat/test-cpm_fit.R [new],
+  devel/m4-browne-design.md, MILESTONES.md).
 - 2026-07-06 — M4 milestone opened (Fable). Branched `m4-fit-statistics` off
   master @ c8525a3 (the held v1.3.0 state). Moved the completed M3 section +
   full log to MILESTONES-ARCHIVE.md (before release, deviating from the
