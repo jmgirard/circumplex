@@ -574,7 +574,15 @@ Methods:
   representation `x = Λz + (I − D_ζ²)^{1/2} ε` (exactly PSD by construction;
   consistent with the package's PSD-safe `mvn_draws()` philosophy). **This is
   the dependency contract with Brief B** (`ssm_ci_accuracy()` needs: `γ̂` =
-  θ/ζ/β, N, m, and a simulate method — all present above).
+  θ/ζ/β, N, m, and a simulate method — all present above). **Return contract
+  (gap G1, pinned in B4):** a numeric matrix `n × p`, columns in the fitted
+  scale order with `colnames` set to the scale names (`rownames` NULL),
+  zero-mean unit-variance population margins so `cor(·) → P̂`; consumes R's
+  global RNG stream once (common-factor scores then unique deviates, fixed
+  order). **Sufficient for Brief B's mean-based path only** (gap G2): the
+  correlation-based (augmented scales-plus-measures) draw is not produced here
+  — it reduces to `matrices$Phat`, from which B assembles and repairs its own
+  joint matrix (§8.2 resolution (i); no signature extension needed).
 
 ---
 
@@ -795,6 +803,32 @@ variants B–D.
 
 ## 11. Change log
 
+- 2026-07-06 — B4 implementation (`cpm_simulate()`). Exported the simulate
+  method sketched in §5.4 and resolved the three A-side interface gaps §8.2
+  flagged, in code and here. **G1 (return contract):** pinned to a numeric
+  `n × p` matrix, columns in fitted scale order with `colnames` = scale names
+  and `rownames` NULL, zero-mean unit-variance population margins (so
+  `cor(·) → P̂`), one documented RNG consumption (common-factor scores then
+  unique deviates, fixed order; `set.seed()`-before convention, §5.4). Built
+  from the exact-PSD factor form `x = Λz + (I − D_ζ²)^{1/2} ε` with Λ, ζ, β
+  reconstructed from the stored canonicalized post-polish γ̂/spec, so the
+  generative covariance equals `matrices$Phat` to machine precision (a
+  polished-out harmonic has β_k = 0, hence zero Λ columns that contribute
+  nothing — no column dropping). **G2 (augmented path):** resolved by option
+  (i) of §8.2 — `cpm_simulate()` is documented as sufficient for the
+  *mean-based* path only; the correlation-based path reduces to
+  `matrices$Phat` and B owns the augmentation/PSD-repair, so no signature
+  change. §5.4's "dependency contract with Brief B" sentence corrected
+  accordingly. **G3 (dimnames):** `cpm_fit()` now sets scale-name dimnames on
+  `matrices$R`, `matrices$Phat`, and `matrices$residuals` in fitted order.
+  Tests (test-cpm_api.R): return-contract shape/names/type, machine-precision
+  factor-form covariance identity, large-n `cor(X) → Phat` + standardized
+  margins, seed reproducibility + seed-sensitivity + RNG-consumption, 0/360
+  pole boundary, polished-out-harmonic covariance preservation, a Z1
+  mean-based-loop prototype (rescale to μ/SD → `ssm_analyze()` recovers the
+  profile), and `inherits()`/`is_count()` input validation. RNG contract
+  documented in a `@section Reproducibility` on `cpm_simulate()` (the
+  DESIGN.md master-list row remains W2's ship-time task, matching B3).
 - 2026-07-06 — B2 implementation (`cpm_fit()` + `circumplex_cpm`). Correction
   to §5.3: the RMSEA-CI lower-edge guard is stated there as "λ_L = 0 when
   pchisq(T, df) ≥ .95", which is the opposite of what the section's own worked

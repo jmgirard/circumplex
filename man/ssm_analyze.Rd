@@ -238,6 +238,7 @@ Other ssm functions:
 
 Other analysis functions:
 \code{\link[=cpm_fit]{cpm_fit()}},
+\code{\link[=cpm_simulate]{cpm_simulate()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
 \code{\link[=ssm_score]{ssm_score()}}
 }

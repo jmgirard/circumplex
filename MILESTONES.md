@@ -89,7 +89,7 @@ Cross-cutting guardrails for every task:
   *Accept:* CI plumbing validated on a fast-settings run; angle CIs
   straddling 0°/360° handled; discarded-replicate accounting surfaced;
   seeded reproducibility test.
-- [ ] **B4. `cpm_simulate()`.** Simulation from a fitted model per the
+- [x] **B4. `cpm_simulate()`.** Simulation from a fitted model per the
   Brief-B contract; resolves A-side gaps G1–G3 (return contract, corr-path
   reduction to `matrices$Phat`, dimnames pinned) in code and records the
   resolution in `devel/m4-browne-design.md` §11.
@@ -225,6 +225,29 @@ at release time, not this branch's.
 
 ## Log
 
+- 2026-07-06 — B4 `cpm_simulate()` (Opus, test-first; inline /code-review,
+  clean). New exported `cpm_simulate(object, n)` in R/cpm_fit.R: draws n
+  standardized rows from the fitted P̂ via the exact-PSD factor form
+  x = Λz + (I − D_ζ²)^{1/2} ε, with Λ/ζ/β rebuilt from the stored canonicalized
+  post-polish γ̂/spec (cpm_unpack) so the generative covariance equals
+  matrices$Phat to machine precision (independently verified in-test to 1e-10);
+  a polished-out harmonic has β_k = 0 ⇒ zero Λ columns, no dropping. Resolves
+  the three §8.2 A-side gaps: G1 return contract (numeric n×p, fitted scale
+  order, colnames = scales, rownames NULL, zero-mean unit-variance margins so
+  cor→P̂, one RNG consumption — scores then uniques, fixed order); G2 (documented
+  mean-based-path-only; correlation path reduces to matrices$Phat, B augments
+  itself — no signature change); G3 (dimnames on matrices$R/Phat/residuals in
+  fitted order, set in cpm_fit()). RNG contract in a @section Reproducibility
+  (DESIGN.md master-list row deferred to W2, matching B3). Tests
+  (test-cpm_api.R, +12): shape/type/names contract, factor-form covariance
+  identity 1e-10, large-n cor→P̂ + standardized margins, seed reproducibility +
+  sensitivity + .Random.seed consumption, 0/360-pole boundary, polished-harmonic
+  covariance preservation, a Z1 mean-based-loop prototype (rescale to μ/SD →
+  ssm_analyze recovers the profile), inherits()/is_count() validation; updated
+  the existing Phat-diagonal test for the new dimnames. Suite 869/869; check
+  0/0/0; document() no-diff. NEWS + design-doc §5.4/§11 updated.
+  (R/cpm_fit.R, tests/testthat/test-cpm_api.R, man/cpm_simulate.Rd [new],
+  man/, NAMESPACE, NEWS.md, devel/m4-browne-design.md, MILESTONES.md.)
 - 2026-07-06 — B3 bootstrap CIs, raw-data default (Fable, test-first;
   /statistical-validation; 8-finder /code-review high). New internal
   `cpm_bootstrap()` + `cpm_mirror_guard()` in R/cpm_fit.R: full index array

@@ -20,6 +20,13 @@
   `summary()` cautions when the sample size is small enough that these may
   mis-cover.
 
+* New `cpm_simulate()` function draws standardized observations from a fitted
+  `cpm_fit()` model's implied correlation matrix, using the model's exact
+  positive-semidefinite factor representation. It returns a numeric matrix with
+  one column per scale (in fitted order, named), whose population correlation
+  matrix is the fitted `Phat`. Call `set.seed()` immediately before it for
+  reproducible draws.
+
 * New `ggcircumplex()` function builds an empty circumplex plotting canvas
   (amplitude rings, displacement spokes, and scale labels) as a ggplot2
   object that you can add layers to with `+`. It accepts a set of scale

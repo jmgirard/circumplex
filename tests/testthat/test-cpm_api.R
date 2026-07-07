@@ -251,9 +251,16 @@ test_that("corfun returns rho-hat in degrees; rho(0) = 1", {
 test_that("matrices: Phat is a correlation matrix and residuals = R - Phat", {
   R <- misfit_octant_P()
   fit <- cpm_fit(cormat = R, scales = oct_labels(), angles = oct_angles(), n = 300)
-  expect_equal(diag(fit$matrices$Phat), rep(1, 8))
+  # diag() carries the matrix dimnames now that R/Phat/residuals are named
+  # (design gap G3); unname before comparing to the bare unit diagonal.
+  expect_equal(unname(diag(fit$matrices$Phat)), rep(1, 8))
   expect_true(isSymmetric(unname(fit$matrices$Phat), tol = 1e-8))
   expect_equal(fit$matrices$residuals, fit$matrices$R - fit$matrices$Phat)
+  # G3: R/Phat/residuals carry the scale names in fitted order.
+  expect_identical(dimnames(fit$matrices$R), list(oct_labels(), oct_labels()))
+  expect_identical(dimnames(fit$matrices$Phat), list(oct_labels(), oct_labels()))
+  expect_identical(dimnames(fit$matrices$residuals),
+                   list(oct_labels(), oct_labels()))
 })
 
 # ---- convention traps (design sec. 6.5) -------------------------------------
@@ -510,4 +517,140 @@ test_that("print and summary render a bootstrap fit as expected", {
   )
   expect_snapshot(print(fit))
   expect_snapshot(summary(fit))
+})
+
+# ---- cpm_simulate(): return contract, population recovery, RNG (M4/B4) -------
+#
+# Brief-A gap G1 (return contract), G2 (mean-based path only; the augmented
+# correlation path reduces to matrices$Phat and is B's own job), G3 (dimnames)
+# resolved here. Oracle rule holds: every expected value is derived in-test by
+# construction, not from memory.
+
+test_that("cpm_simulate: G1 return contract (matrix, dims, names, numeric)", {
+  fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
+                 angles = oct_angles(), n = 500)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  set.seed(1)
+  X <- cpm_simulate(fit, n = 50)
+  expect_true(is.matrix(X))
+  expect_type(X, "double")
+  expect_identical(dim(X), c(50L, 8L))
+  expect_identical(colnames(X), oct_labels())     # fitted scale order
+  expect_null(rownames(X))
+  expect_false(anyNA(X))
+})
+
+test_that("cpm_simulate: population covariance is exactly Phat (factor form)", {
+  # The generative covariance must equal matrices$Phat to machine precision:
+  # rebuild Lambda Lambda^T + (I - D_zeta^2) independently from the reported
+  # estimates and check it against Phat -- the contract that makes cor(X) -> Phat.
+  fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
+                 angles = oct_angles(), n = 500)
+  theta <- fit$details$theta_rad
+  zeta <- fit$results$Zeta
+  beta <- fit$betas$Beta
+  m <- fit$details$m
+  sb <- sqrt(beta)
+  Lam <- sb[1] * rep(1, 8)
+  for (k in seq_len(m)) {
+    Lam <- cbind(Lam, sb[k + 1] * cos(k * theta), sb[k + 1] * sin(k * theta))
+  }
+  Lam <- zeta * Lam
+  Sigma <- Lam %*% t(Lam) + diag(1 - zeta^2)
+  expect_equal(unname(Sigma), unname(fit$matrices$Phat), tolerance = 1e-10)
+})
+
+test_that("cpm_simulate: large-n sample cor -> Phat, margins ~ standardized", {
+  fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
+                 angles = oct_angles(), n = 500)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  set.seed(20260706)
+  X <- cpm_simulate(fit, n = 40000)
+  expect_equal(unname(cor(X)), unname(fit$matrices$Phat), tolerance = 0.03)
+  expect_lt(max(abs(colMeans(X))), 0.05)          # zero-mean population
+  expect_lt(max(abs(apply(X, 2, sd) - 1)), 0.05)  # unit-variance population
+})
+
+test_that("cpm_simulate: RNG contract -- reproducible and seed-sensitive", {
+  fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
+                 angles = oct_angles(), n = 500)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  set.seed(7)
+  a <- cpm_simulate(fit, n = 100)
+  set.seed(7)
+  b <- cpm_simulate(fit, n = 100)
+  expect_identical(a, b)                           # same seed -> identical
+  set.seed(8)
+  cc <- cpm_simulate(fit, n = 100)
+  expect_false(isTRUE(all.equal(a, cc)))           # different seed -> different
+  # A fit with analytic CIs is RNG-silent; only cpm_simulate consumes the stream.
+  set.seed(99)
+  before <- .Random.seed
+  invisible(cpm_simulate(fit, n = 10))
+  expect_false(identical(.Random.seed, before))
+})
+
+test_that("cpm_simulate: boundary -- angle at the 0/360 pole recovers Phat", {
+  # Generating angle exactly at the pole (LM at 360). The factor form is pure
+  # trig, so the pole is not special; cor(X) must still track Phat.
+  theta <- c(0, 45, 90, 135, 180, 225, 270, 360) * pi / 180
+  P <- api_ref_P(theta, rep(0.78, 8), c(0.45, 0.35, 0.15, 0.05))
+  fit <- cpm_fit(cormat = P, scales = oct_labels(),
+                 angles = c(0, 45, 90, 135, 180, 225, 270, 360), n = 500)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  set.seed(3)
+  X <- cpm_simulate(fit, n = 30000)
+  expect_equal(unname(cor(X)), unname(fit$matrices$Phat), tolerance = 0.03)
+})
+
+test_that("cpm_simulate: a polished-out harmonic still reproduces Phat", {
+  # An in-family model with beta_3 == 0 makes cpm_fit polish k = 3 out; the
+  # sqrt(beta_3) = 0 columns of Lambda then contribute nothing and the
+  # generative covariance must remain exactly Phat.
+  theta <- oct_angles() * pi / 180
+  P <- api_ref_P(theta, rep(0.78, 8), c(0.5, 0.35, 0.15, 0))
+  fit <- suppressWarnings(
+    cpm_fit(cormat = P, scales = oct_labels(), angles = oct_angles(), n = 500)
+  )
+  expect_true(length(fit$details$removed_harmonics) >= 1)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  set.seed(5)
+  X <- cpm_simulate(fit, n = 40000)
+  expect_equal(unname(cor(X)), unname(fit$matrices$Phat), tolerance = 0.03)
+})
+
+test_that("cpm_simulate: prototype of the Z1 (ssm_ci_accuracy) mean-based loop", {
+  # The mean-based plug-in population (spec sec. 3.2): standardized draws Z from
+  # cpm_simulate, rescaled X_g = Z D_s + 1 mu^T, then the user's SSM procedure
+  # is rerun on the simulated data. Exercises the exact consumption Z1 needs and
+  # confirms the SSM profile is recovered at large n.
+  fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
+                 angles = oct_angles(), n = 500)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  set.seed(101)
+  sds <- c(1.2, 0.9, 1.1, 1.0, 1.3, 0.8, 1.05, 0.95)
+  mu <- c(0.4, 0.1, -0.2, 0.0, 0.3, -0.1, 0.2, 0.05)
+  Z <- cpm_simulate(fit, n = 5000)
+  Xg <- sweep(Z * rep(sds, each = nrow(Z)), 2, mu, "+")
+  df <- as.data.frame(Xg)
+  res <- ssm_analyze(df, scales = oct_labels(), angles = oct_angles())
+  expect_s3_class(res, "circumplex_ssm")
+  # Truth: closed-form SSM on the population mean profile mu at these angles
+  # (ssm_parameters takes degrees and returns Elev/Ampl/... columns).
+  truth <- ssm_parameters(mu, oct_angles())
+  est <- res$results
+  # Absolute margins: these SSM parameters are near zero, where a relative
+  # tolerance is meaninglessly tight; a loose absolute bound is the sanity gate.
+  expect_lt(abs(est$e_est - truth$Elev), 0.04)
+  expect_lt(abs(est$a_est - truth$Ampl), 0.04)
+})
+
+test_that("cpm_simulate: input validation via inherits()/is_count()", {
+  fit <- cpm_fit(cormat = clean_octant_P(), scales = oct_labels(),
+                 angles = oct_angles(), n = 500)
+  expect_error(cpm_simulate(list(), n = 10), "circumplex_cpm")
+  expect_error(cpm_simulate(fit, n = 0))
+  expect_error(cpm_simulate(fit, n = -5))
+  expect_error(cpm_simulate(fit, n = 2.5))
+  expect_error(cpm_simulate(fit, n = c(10, 20)))
 })

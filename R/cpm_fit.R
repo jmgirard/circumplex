@@ -1341,7 +1341,12 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     function(delta_deg) cpm_rho(as.numeric(delta_deg) * (pi / 180), beta_hat)
   })
 
-  matrices <- list(R = R, Phat = engine$P, residuals = R - engine$P)
+  # Gap G3 (design sec. 11): R, Phat, and residuals all carry the scale names
+  # in fitted order, so downstream consumers (e.g. ssm_ci_accuracy()'s augmented
+  # correlation path) can index the scale block by name.
+  Phat <- engine$P
+  dimnames(R) <- dimnames(Phat) <- list(scales, scales)
+  matrices <- list(R = R, Phat = Phat, residuals = R - Phat)
 
   details <- list(
     m = engine$m,                             # as fitted (after any polish)
@@ -1385,4 +1390,92 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     details = details,
     call = call
   )
+}
+
+# ---- cpm_simulate(): draw data from a fitted model (design sec. 5.4) ---------
+
+#' Simulate data from a fitted circular process model
+#'
+#' Draw `n` standardized observations from the model-implied correlation matrix
+#' \eqn{\hat{P}} of a fitted [cpm_fit()] object, using the low-rank factor
+#' representation \eqn{P = \Lambda\Lambda^\top + (I - D_\zeta^2)} (Browne, 1992;
+#' design sec. 1.3/sec. 5.4). Each observation is generated as
+#' \eqn{x = \Lambda z + (I - D_\zeta^2)^{1/2}\varepsilon} with independent
+#' standard-normal common-factor scores \eqn{z} and unique deviates
+#' \eqn{\varepsilon}, so the draws are exactly positive semidefinite by
+#' construction (no eigenvalue clamping) and their population correlation matrix
+#' is \eqn{\hat{P}} exactly.
+#'
+#' This is the mean-based simulation path of the SSM CI-trustworthiness
+#' diagnostic (`ssm_ci_accuracy()`; the M4 Brief-B contract): a caller draws
+#' standardized data here and rescales it to a group's means and SDs. The
+#' correlation-based (augmented scales-plus-measures) path is **not** produced
+#' here -- it reduces to the returned population block `object$matrices$Phat`,
+#' from which the caller assembles and repairs its own joint matrix.
+#'
+#' @param object A `circumplex_cpm` object from [cpm_fit()].
+#' @param n The number of observations (rows) to simulate; a positive whole
+#'   number.
+#' @return A numeric matrix with `n` rows and one column per fitted scale,
+#'   columns in the fitted scale order with `colnames` set to the scale names
+#'   (`rownames` are `NULL`). The population margins are zero-mean and
+#'   unit-variance, so `cor()` of the returned matrix converges to
+#'   `object$matrices$Phat` as `n` grows.
+#' @section Reproducibility:
+#'   `cpm_simulate()` consumes R's global random number stream (the
+#'   common-factor scores then the unique deviates, drawn in that fixed order),
+#'   so it follows the package's `set.seed()`-immediately-before convention: a
+#'   given seed reproduces the draw exactly. It is one of the package's
+#'   stochastic entry points (alongside `ssm_analyze()` and the bootstrap path
+#'   of [cpm_fit()]); the fit itself is deterministic.
+#' @references Browne, M. W. (1992). Circumplex models for correlation matrices.
+#'   \emph{Psychometrika, 57}(4), 469-497.
+#' @seealso [cpm_fit()]
+#' @family analysis functions
+#' @export
+#' @examples
+#' data("jz2017")
+#' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+#' fit <- cpm_fit(cormat = cor(jz2017[scales]), scales = scales,
+#'                n = nrow(jz2017))
+#' set.seed(1)
+#' x <- cpm_simulate(fit, n = 500)
+#' round(cor(x) - fit$matrices$Phat, 2)
+#'
+cpm_simulate <- function(object, n) {
+  stopifnot(inherits(object, "circumplex_cpm"))
+  stopifnot(is_count(n), length(n) == 1, n >= 1)
+  n <- as.integer(n)
+
+  spec <- object$details$spec
+  # Rebuild the natural parameters from the stored (canonicalized, post-polish)
+  # gamma-hat and spec, so Lambda is built from exactly the parameters behind
+  # object$matrices$Phat -- keeping the generative covariance identical to it.
+  nat <- cpm_unpack(object$details$par, spec)
+  theta <- nat$theta
+  zeta <- nat$zeta
+  beta <- nat$beta                          # length m + 1; 0 at any removed k
+  p <- spec$p
+  m <- spec$m
+
+  # Factor loadings Lambda = D_zeta [ sqrt(b0) 1, sqrt(b1) c1, sqrt(b1) s1, ... ]
+  # (design sec. 1.3). A polished-out harmonic has beta_k = 0, so its two
+  # columns are exactly 0 and contribute nothing -- no column dropping needed.
+  sb <- sqrt(beta)
+  common <- matrix(sb[1L], nrow = p, ncol = 1L)     # k = 0 (cosine only; sin 0)
+  for (k in seq_len(m)) {
+    common <- cbind(common,
+                    sb[k + 1L] * cos(k * theta),
+                    sb[k + 1L] * sin(k * theta))
+  }
+  Lambda <- zeta * common                            # D_zeta scales each row
+  uniq <- sqrt(pmax(1 - zeta^2, 0))                  # (I - D_zeta^2)^{1/2}, diag
+
+  # Common-factor scores then unique deviates, in that fixed order (see the
+  # Reproducibility section). Cov(X) = Lambda Lambda^T + diag(uniq^2) = Phat.
+  Z <- matrix(stats::rnorm(n * ncol(Lambda)), nrow = n)
+  E <- matrix(stats::rnorm(n * p), nrow = n)
+  X <- Z %*% t(Lambda) + E * rep(uniq, each = n)
+  colnames(X) <- object$details$scales
+  X
 }
