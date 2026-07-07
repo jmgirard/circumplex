@@ -211,7 +211,7 @@ Cross-cutting guardrails for every task:
   (CLAUDE.md); Z&W numerics transcribed, never from memory. Also the natural
   point to confirm/veto the B6 analytic-CI caution wording (now tracked in
   ROADMAP's v2.0.0 pre-release items).
-- [ ] **W2. Ship-time documentation.** DESIGN.md RNG entry-point list gains
+- [x] **W2. Ship-time documentation.** DESIGN.md RNG entry-point list gains
   `cpm_fit(ci_method="bootstrap")`, `cpm_simulate()`, `ssm_ci_accuracy()`
   rows; update `ssm_analyze()`'s "only function that consumes R's RNG"
   roxygen (false once these ship); NEWS.md flagship entry; record the
@@ -289,6 +289,37 @@ dependency policy, model tiers) apply unchanged.
 
 ## Log
 
+- 2026-07-07 — W2 ship-time documentation (doc-only task, no plan/test-first
+  steps per next-task's step-2 exemption). DESIGN.md's RNG-consuming
+  entry-point inventory (Reproducibility section) updated from one entry to
+  four: `ssm_analyze()`'s existing table kept as-is, and new prose entries
+  added for `cpm_fit(ci_method = "bootstrap")` (bootstrap-only stream
+  consumption, resample indices drawn in one master-stream block matching
+  `ssm_analyze()`'s convention), `cpm_simulate()` (direct stream consumption,
+  factor scores then unique deviates in fixed order), and `ssm_ci_accuracy()`
+  (one `sample.int()` draw seeds an internal L'Ecuyer-CMRG generator with
+  per-replicate substreams, caller state restored on exit) — content matches
+  each function's own `@section Reproducibility` roxygen (added in B3/B4/Z1).
+  `ssm_analyze()`'s roxygen "only function in the package that consumes R's
+  random number stream" claim (now false) corrected to name the other three
+  RNG-consuming entry points; `devtools::document()` re-run, diff confined to
+  that one section of `man/ssm_analyze.Rd` (pre-existing internal-link
+  warnings only, unrelated). NEWS.md gained a short flagship-summary
+  paragraph atop the development-version section naming `cpm_fit()`
+  (CircE replacement) and `ssm_ci_accuracy()` as the release's headline
+  additions, pointing to the new vignette — ahead of the existing detailed
+  per-feature bullets, which are unchanged. ROADMAP's continuous track
+  gained two recorded follow-ups per the W2 acceptance criteria: the
+  guardrail certification-rule replacement (B-review F1.ii / spec §12.5–§13,
+  Jeff's 2026-07-03 ship-now-redesign-later decision, informed by Z2's
+  near-100% false-certification measurement) and the 0-vs-360 pole-snap
+  alignment decision (estimator-audit-2026-07-fable.md F6 — point estimator
+  emits exactly 360.0 at the pole, `quantile.circumplex_radian()` still
+  snaps a re-wrapped CI endpoint to 0, confirmed still live by reading
+  R/ssm_bootstrap.R; cosmetic per F6, single-snap-direction fix parked).
+  Suite 1206/1206 (unchanged, doc-only); `document()` diff confined to the
+  intended section. (DESIGN.md, NEWS.md, R/ssm_analysis.R, man/ssm_analyze.Rd,
+  ROADMAP.md, MILESTONES.md.)
 - 2026-07-07 — W1 vignette + Z&W transcription + O5 bridge (Fable,
   plan-first; 8-angle /code-review high, 10 findings fixed + 3 refuted/
   declined with rationale, 1 verified-coincidence recorded). **Transcription

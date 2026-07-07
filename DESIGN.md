@@ -149,11 +149,11 @@ tie-breaking — must be deterministic and leave `.Random.seed` untouched.
 point that consumes the RNG stream," which froze the then-true inventory
 instead of stating the rule that produced it.)
 
-RNG-consuming entry points, currently one (`ssm_score()`,
-`ssm_parameters()`, and the tidying functions are deterministic; M4 is
-designed to add `cpm_fit(ci_method = "bootstrap")` and `cpm_simulate()` to
-this list, and its default path is required to be RNG-silent — see
-devel/m4-browne-design.md §3.5/§8):
+RNG-consuming entry points, now four (`ssm_score()`, `ssm_parameters()`, and
+the tidying functions are deterministic): `ssm_analyze()`,
+`cpm_fit(ci_method = "bootstrap")`, `cpm_simulate()`, and
+`ssm_ci_accuracy()` (the latter three landed in M4 — see
+devel/m4-browne-design.md §3.5/§8 and devel/m4-ci-accuracy-spec.md §3).
 
 - **`ssm_analyze()`** — call `set.seed()` immediately before it to get
   reproducible confidence intervals. What that reproducibility covers, per
@@ -164,6 +164,26 @@ devel/m4-browne-design.md §3.5/§8):
 | Bootstrap, serial (`parallel = "no"`, the default) | Same seed -> byte-identical `results`. | `boot::boot()` draws all `R` resample index vectors from the master stream up front, then evaluates `bs_function` (deterministic) on each. |
 | Bootstrap, parallel (`parallel = "snow"`/`"multicore"`) | Same seed -> byte-identical `results`, **regardless of `ncpus`**. Not a general property of parallel bootstrapping — it holds *because* index generation happens in the master process before any work is dispatched to workers (see table above); the workers only evaluate the deterministic statistic. | Same as serial: one master-stream draw of the full index array. Workers consume no RNG state the results depend on. |
 | Monte Carlo (`method = "montecarlo"`) | Same seed -> byte-identical `results`. | One `rnorm()` block per group, consumed via `mvn_draws()` in `group_ids` sort order — see the data-flow diagram. For correlation-based analyses, one group's block covers *all* of its measures jointly (a single draw from the stacked measure-scale correlation vector, then sliced per measure), not one block per measure. Adding a group, a measure, or reordering `scales`/`measures` changes the draw sequence, so results are seed-reproducible for a *fixed* call but not stable across such structural edits (expected: the RNG stream is being asked a different question, not violated). |
+
+- **`cpm_fit(ci_method = "bootstrap")`** — call `set.seed()` immediately
+  before it for reproducible bootstrap intervals. All point estimates, fit
+  indices, and the correlation-matrix path's analytic (Wald) intervals are
+  deterministic and never touch the stream; only the raw-data path's
+  bootstrap does. As with `ssm_analyze()`'s bootstrap engine, all resample
+  indices are drawn from the master stream in one block before any
+  refitting, so a given seed yields the same intervals regardless of how
+  many replicates are later excluded as degenerate or non-convergent.
+- **`cpm_simulate()`** — consumes the stream directly (not via `boot::boot()`):
+  draws the common-factor scores, then the unique deviates, in that fixed
+  order, so a given seed reproduces the draw exactly. The fit it simulates
+  from is itself deterministic.
+- **`ssm_ci_accuracy()`** — call `set.seed()` immediately before it. It draws
+  one `sample.int()` value from the caller's stream to seed an internal
+  L'Ecuyer-CMRG generator, gives every simulated (condition × replicate)
+  dataset its own deterministic substream via `nextRNGStream()`, and
+  restores the caller's `.Random.seed` and RNG kind on exit — so results for
+  a given seed are identical regardless of `parallel`/`ncpus`, and the
+  caller's stream is left advanced by exactly that one `sample.int()` draw.
 
 What reproducibility does **not** mean:
 

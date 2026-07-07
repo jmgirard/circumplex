@@ -1,5 +1,14 @@
 # circumplex (development version)
 
+This version's flagship addition is `cpm_fit()`, a native reimplementation
+of Browne's (1992) circular stochastic process model for the correlational
+structure of circumplex scales — filling the gap left by the archived CircE
+package, the previous R implementation. It ships alongside
+`ssm_ci_accuracy()`, a new diagnostic for whether an `ssm_analyze()` result's
+confidence intervals can be trusted at your sample size and profile
+(Zimmermann & Wright, 2017). See the new vignette, "Evaluating Circumplex
+Structure", for a worked introduction to both.
+
 * New vignette, "Evaluating Circumplex Structure": how to test whether an
   instrument fits a circumplex in your sample with `cpm_fit()` (reading and
   benchmarking the fit indices, comparing the constrained model variants,

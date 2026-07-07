@@ -138,10 +138,11 @@ calculated.
 }
 \section{Reproducibility}{
 
-This is the only function in the package that consumes R's random number
-stream (\code{ssm_score()}/\code{ssm_parameters()} and the tidying functions are
-deterministic). Call \code{set.seed()} immediately before \code{ssm_analyze()} for
-reproducible confidence intervals:
+This function consumes R's random number stream (so do
+\code{cpm_fit(ci_method = "bootstrap")}, \code{cpm_simulate()}, and
+\code{ssm_ci_accuracy()}; \code{ssm_score()}/\code{ssm_parameters()} and the tidying
+functions are deterministic). Call \code{set.seed()} immediately before
+\code{ssm_analyze()} for reproducible confidence intervals:
 \itemize{
 \item \strong{Bootstrap} (\code{method = "bootstrap"}, the default): the
 same seed gives byte-identical \code{results}, \emph{regardless of} the

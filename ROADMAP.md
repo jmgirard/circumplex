@@ -360,6 +360,36 @@ the relevant code:
   oracle already demonstrates the parameterization. Decide post-M4 whether
   the reproduction value justifies a second fitted family.
 
+- **Guardrail certification-rule replacement** (surfaced by M4/Z2's
+  false-certification measurements; `devel/m4-ci-accuracy-spec.md` §12.5/§13;
+  Jeff, 2026-07-03). `print.circumplex_ssm()`'s displacement-certification
+  rule (`round(a_lci, digits) > 0`, `digits` pinned to 3) is a
+  display-precision artifact: its implied threshold moves with a print
+  argument and means different things on a correlation-metric amplitude than
+  a raw-score one (the mean-based path on raw-score metrics over-certifies).
+  Decided as a two-phase package decision: ship the current rule now
+  (`ssm_ci_accuracy()` assesses it as-is, digits echoed in output), design a
+  principled, print-independent, scale-free replacement later, informed by
+  the diagnostic's own false-certification output (Z2 measured near-100%
+  false certification at true zero amplitude on real data). Likely form: a
+  relative rule (e.g., `a_lci` as a fraction of the amplitude CI width)
+  rather than a fixed absolute cut — Z&W's `a ≥ .15` "marked" threshold is
+  correlation-metric only and answers a different question. Own tests, NEWS
+  entry, and `print.circumplex_ssm()` snapshot updates when it lands; not an
+  M4 deliverable.
+- **0-vs-360 pole-snap alignment** (`devel/estimator-audit-2026-07-fable.md`
+  F6, low/cosmetic, still parked). The point estimator emits exactly `360.0`
+  for a profile peaking on the 0°/360° pole (the G2 decision; see DESIGN.md's
+  displacement-boundary entry), but `quantile.circumplex_radian()`
+  (R/ssm_bootstrap.R) snaps a re-wrapped confidence interval endpoint within
+  2ε of 2π to `0` instead — the opposite pole label — so a pole-hugging
+  profile can print `d_est = 360.0` with a CI endpoint of `0.0`. Both values
+  name the same direction and every consumer already handles the wrap
+  (`StatSsmArc` unwraps `d_uci < d_lci`; tests accept either pole label), so
+  this is cosmetic, not a bug. Follow-up: pick one snap direction (360,
+  matching the point estimator and the package's LM=360 convention, is the
+  natural choice) and align both call sites.
+
 Explicitly **not** planned: a ground-up rewrite. The R-dispatch → C++ core →
 `boot` architecture, the S3 class design, and the minimal dependency policy
 all hold up; inefficiencies found in the audit are local (see M2 vectorization

@@ -98,10 +98,11 @@
 #'   warning reporting how many were dropped; the intervals are then
 #'   conditional on estimability.
 #' @section Reproducibility:
-#'   This is the only function in the package that consumes R's random number
-#'   stream (`ssm_score()`/`ssm_parameters()` and the tidying functions are
-#'   deterministic). Call `set.seed()` immediately before `ssm_analyze()` for
-#'   reproducible confidence intervals:
+#'   This function consumes R's random number stream (so do
+#'   `cpm_fit(ci_method = "bootstrap")`, `cpm_simulate()`, and
+#'   `ssm_ci_accuracy()`; `ssm_score()`/`ssm_parameters()` and the tidying
+#'   functions are deterministic). Call `set.seed()` immediately before
+#'   `ssm_analyze()` for reproducible confidence intervals:
 #'   \itemize{
 #'     \item \strong{Bootstrap} (`method = "bootstrap"`, the default): the
 #'       same seed gives byte-identical `results`, *regardless of* the
