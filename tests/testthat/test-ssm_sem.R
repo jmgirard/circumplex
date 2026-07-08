@@ -797,30 +797,31 @@ test_that("engine preconditions on user-supplied fits fail with actionable error
 
 test_that("a bootstrap-covariance fit meeting the mvn engine gets an advisory", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
-  sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  # The advisory is keyed solely on the fit's recorded `se` option, so test it
+  # deterministically: fit with se = "standard" (fast, stable, real stored
+  # vcov) and relabel the stored option to "bootstrap". This exercises the
+  # exact advisory branch without invoking lavaan's small-sample bootstrap,
+  # which is environment-fragile for models built from generated syntax -- a
+  # degenerate resample surfaces (inside lavaan's own vcov recomputation) as an
+  # internal "model is NULL" error, unrelated to this advisory.
+  a <- rep(0.7, 8)
+  cc <- rep(0.75, 8)
+  theta <- rep(0.4, 8)
+  pop <- sem_pop(a, cc, theta, oct, cbind(c(0.3, 0.35, 0.25)), v_m = 1)
   set.seed(42)
-  n <- 400
-  z <- matrix(stats::rnorm(n * nrow(pop$sigma)), n)
-  dat <- as.data.frame(z %*% chol(pop$sigma))
+  n <- 800
+  dat <- as.data.frame(
+    matrix(stats::rnorm(n * nrow(pop$sigma)), n) %*% chol(pop$sigma)
+  )
   names(dat) <- colnames(pop$sigma)
   syn <- ssm_sem_syntax(
     scales = pop$scales, angles = oct, measures = pop$measures
   )
-  fit_boot <- suppressWarnings(
-    lavaan::cfa(syn, data = dat, se = "bootstrap", bootstrap = 20)
-  )
-  set.seed(7)
-  # The advisory is keyed on the fit's se option, so it fires deterministically
-  # regardless of the bootstrap draws; capture ALL warnings and assert ours is
-  # among them, since lavaan may add an incidental singular-vcov note from the
-  # small (bootstrap = 20) replicate set that varies by platform.
+  fit <- suppressWarnings(lavaan::cfa(syn, data = dat, se = "standard"))
+  fit@Options$se <- "bootstrap"
   w <- testthat::capture_warnings(
     ssm_sem_parameters(
-      fit_boot,
+      fit,
       scales = pop$scales, angles = oct, measures = pop$measures, boots = 50
     )
   )
