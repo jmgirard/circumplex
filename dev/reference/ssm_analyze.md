@@ -46,11 +46,13 @@ ssm_analyze(
   circumplex scale included in `scales` (in degrees). (default =
   [`octants()`](http://circumplex.jmgirard.com/dev/reference/octants.md)).
   The closed-form SSM estimator used here equals the
-  ordinary-least-squares cosine fit only when `angles` are equally
-  spaced around the circle (e.g., octants at 45-degree intervals); for
-  unequally spaced angles it is the conventional Gurtman estimator, not
-  a least-squares fit, and the reported model fit is then no longer a
-  bounded R-squared in `[0, 1]` (it can fall below 0).
+  ordinary-least-squares cosine fit for equally spaced `angles` (e.g.,
+  octants at 45-degree intervals) – more generally, for any angle set
+  satisfying first- and second-harmonic balance. For angle sets
+  violating that balance (generic unequally spaced sets), it is the
+  conventional Gurtman estimator, not a least-squares fit, and the
+  reported model fit is then no longer a bounded R-squared in `[0, 1]`
+  (it can fall below 0).
 
 - measures:
 
@@ -224,6 +226,8 @@ Other ssm functions:
 [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
 [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
 [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
+[`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md),
+[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md),
 [`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md)
 
 Other analysis functions:
@@ -231,7 +235,9 @@ Other analysis functions:
 [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md),
 [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
 [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
-[`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+[`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
+[`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md),
+[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md)
 
 ## Examples
 

@@ -76,7 +76,9 @@ Other analysis functions:
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
 [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
 [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
-[`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+[`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
+[`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md),
+[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md)
 
 ## Examples
 

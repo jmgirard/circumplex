@@ -212,6 +212,8 @@ Other ssm functions:
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
 [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
 [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
+[`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md),
+[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md),
 [`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md)
 
 Other analysis functions:
@@ -219,7 +221,9 @@ Other analysis functions:
 [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md),
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
 [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
-[`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+[`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
+[`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md),
+[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md)
 
 ## Examples
 

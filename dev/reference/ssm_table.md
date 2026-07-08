@@ -42,7 +42,9 @@ Other ssm functions:
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
 [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
 [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md),
-[`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
+[`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
+[`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md),
+[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md)
 
 Other table functions:
 [`html_render()`](http://circumplex.jmgirard.com/dev/reference/html_render.md)
@@ -81,8 +83,8 @@ ssm_table(res)
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.20 (0.17, 0.24)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>-0.06 (-0.10, -0.03)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.18 (0.14, 0.21)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.19 (0.16, 0.23)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>109.0 (99.0, 119.1)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.19 (0.15, 0.23)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>109.0 (98.8, 118.6)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.957</td>
 #> </tr>
 #> <tr>
@@ -90,8 +92,8 @@ ssm_table(res)
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.12 (0.09, 0.16)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>-0.10 (-0.13, -0.06)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.20 (0.17, 0.24)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.23 (0.19, 0.26)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>115.9 (107.5, 124.5)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.23 (0.19, 0.27)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>115.9 (107.5, 124.3)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.964</td>
 #> </tr>
 #> </tbody>
@@ -100,8 +102,8 @@ ssm_table(res)
 #> 1   NARPD 0.20 (0.17, 0.24) -0.06 (-0.10, -0.03) 0.18 (0.14, 0.21)
 #> 2    ASPD 0.12 (0.09, 0.16) -0.10 (-0.13, -0.06) 0.20 (0.17, 0.24)
 #>           Amplitude         Displacement   Fit
-#> 1 0.19 (0.16, 0.23)  109.0 (99.0, 119.1) 0.957
-#> 2 0.23 (0.19, 0.26) 115.9 (107.5, 124.5) 0.964
+#> 1 0.19 (0.15, 0.23)  109.0 (98.8, 118.6) 0.957
+#> 2 0.23 (0.19, 0.27) 115.9 (107.5, 124.3) 0.964
 
 # Create table of contrast results
 res <- ssm_analyze(
@@ -129,10 +131,10 @@ ssm_table(res)
 #> <tr>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>NARPD</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.20 (0.17, 0.24)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>-0.06 (-0.10, -0.03)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>-0.06 (-0.09, -0.03)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.18 (0.14, 0.21)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.19 (0.16, 0.22)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>109.0 (99.0, 118.6)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.19 (0.16, 0.23)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>109.0 (99.2, 118.4)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.957</td>
 #> </tr>
 #> <tr>
@@ -140,28 +142,28 @@ ssm_table(res)
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.12 (0.09, 0.16)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>-0.10 (-0.13, -0.06)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.20 (0.17, 0.24)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.23 (0.19, 0.26)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>115.9 (107.3, 124.2)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.23 (0.19, 0.27)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>115.9 (107.3, 124.4)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; text-align: left;'>0.964</td>
 #> </tr>
 #> <tr>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>ASPD - NARPD</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>-0.08 (-0.12, -0.04)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>-0.04 (-0.07, 0.00)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>-0.04 (-0.08, 0.00)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.02 (-0.01, 0.06)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.04 (-0.00, 0.08)</td>
-#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>7.0 (-3.4, 17.2)</td>
+#> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>7.0 (-3.4, 17.4)</td>
 #> <td style='padding-right: 1em; min-width: 3em; white-space: nowrap; border-bottom: 2px solid grey; text-align: left;'>0.007</td>
 #> </tr>
 #> </tbody>
 #> </table>
 #>       Contrast            Elevation              X.Value            Y.Value
-#> 1        NARPD    0.20 (0.17, 0.24) -0.06 (-0.10, -0.03)  0.18 (0.14, 0.21)
+#> 1        NARPD    0.20 (0.17, 0.24) -0.06 (-0.09, -0.03)  0.18 (0.14, 0.21)
 #> 2         ASPD    0.12 (0.09, 0.16) -0.10 (-0.13, -0.06)  0.20 (0.17, 0.24)
-#> 3 ASPD - NARPD -0.08 (-0.12, -0.04)  -0.04 (-0.07, 0.00) 0.02 (-0.01, 0.06)
+#> 3 ASPD - NARPD -0.08 (-0.12, -0.04)  -0.04 (-0.08, 0.00) 0.02 (-0.01, 0.06)
 #>            Amplitude         Displacement   Fit
-#> 1  0.19 (0.16, 0.22)  109.0 (99.0, 118.6) 0.957
-#> 2  0.23 (0.19, 0.26) 115.9 (107.3, 124.2) 0.964
-#> 3 0.04 (-0.00, 0.08)     7.0 (-3.4, 17.2) 0.007
+#> 1  0.19 (0.16, 0.23)  109.0 (99.2, 118.4) 0.957
+#> 2  0.23 (0.19, 0.27) 115.9 (107.3, 124.4) 0.964
+#> 3 0.04 (-0.00, 0.08)     7.0 (-3.4, 17.4) 0.007
 # }
 ```

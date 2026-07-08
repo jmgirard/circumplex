@@ -15,7 +15,7 @@ function that calculates SSM parameters for each row of a data frame."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.3.0.9001</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.3.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,6 +50,7 @@ function that calculates SSM parameters for each row of a data frame."><meta pro
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
     <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmgirard/circumplex"><span class="fa fa-github fa-lg"></span></a></li>
@@ -101,11 +102,13 @@ containing one score for each of a set of circumplex scales.</p></dd>
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>
 <dd><p>Required. A numeric vector containing the angular displacement
 of each circumplex scale included in <code>scores</code> (in degrees). The closed-form
-SSM estimator used here equals the ordinary-least-squares cosine fit only
-when <code>angles</code> are equally spaced around the circle (e.g., octants at
-45-degree intervals); for unequally spaced angles it is the conventional
-Gurtman estimator, not a least-squares fit, and the reported fit is then no
-longer a bounded R-squared in <code>[0, 1]</code> (it can fall below 0).</p></dd>
+SSM estimator used here equals the ordinary-least-squares cosine fit for
+equally spaced <code>angles</code> (e.g., octants at 45-degree intervals) – more
+generally, for any angle set satisfying first- and second-harmonic
+balance. For angle sets violating that balance (generic unequally spaced
+sets), it is the conventional Gurtman estimator, not a least-squares fit,
+and the reported fit is then no longer a bounded R-squared in <code>[0, 1]</code>
+(it can fall below 0).</p></dd>
 
 
 <dt id="arg-prefix">prefix<a class="anchor" aria-label="anchor" href="#arg-prefix"></a></dt>
@@ -145,8 +148,10 @@ displacement parameter (default = "Disp").</p></dd>
 
 <dt id="arg-f-label">f_label<a class="anchor" aria-label="anchor" href="#arg-f-label"></a></dt>
 <dd><p>Optional. A string representing the variable name of the SSM
-fit or R-squared value (default = "Fit"). This value is a bounded R-squared
-in <code>[0, 1]</code> only for equally spaced <code>angles</code> (see <code>angles</code>).</p></dd>
+fit or R-squared value (default = "Fit"). This value is a bounded
+R-squared in <code>[0, 1]</code> when the closed form coincides with the
+least-squares fit (equally spaced or otherwise harmonic-balanced
+<code>angles</code>; see <code>angles</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -168,13 +173,17 @@ uncertainty is expressed through confidence intervals (see
 <code><a href="ssm_analyze.html">ssm_analyze()</a></code>,
 <code><a href="ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>,
 <code><a href="ssm_score.html">ssm_score()</a></code>,
+<code><a href="ssm_sem.html">ssm_sem()</a></code>,
+<code><a href="ssm_sem_parameters.html">ssm_sem_parameters()</a></code>,
 <code><a href="ssm_table.html">ssm_table()</a></code></p>
 <p>Other analysis functions:
 <code><a href="cpm_fit.html">cpm_fit()</a></code>,
 <code><a href="cpm_simulate.html">cpm_simulate()</a></code>,
 <code><a href="ssm_analyze.html">ssm_analyze()</a></code>,
 <code><a href="ssm_ci_accuracy.html">ssm_ci_accuracy()</a></code>,
-<code><a href="ssm_score.html">ssm_score()</a></code></p></div>
+<code><a href="ssm_score.html">ssm_score()</a></code>,
+<code><a href="ssm_sem.html">ssm_sem()</a></code>,
+<code><a href="ssm_sem_parameters.html">ssm_sem_parameters()</a></code></p></div>
     </div>
 
     <div class="section level2">

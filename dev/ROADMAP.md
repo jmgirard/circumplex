@@ -106,10 +106,13 @@ they outlive individual milestones’ MILESTONES.md sections):
   until release.*
 - **Cross-platform CI portability (release blocker; surfaced 2026-07-07
   by the M4.5 PR \#28).** `R-CMD-check` has been **red on every platform
-  on master since M4** (M4 landed without a green multi-platform gate);
-  the M4.5 code is clean (macOS check green, all `fit_structure` tests
-  pass everywhere) but the branch inherits the failures. Ten failures in
-  three classes, all in M4 code:
+  on master since M4** (M4 landed without a green multi-platform gate).
+  **Status 2026-07-08: classes 2–3 below are DONE — the
+  `skip_on_ci()`/`skip_on_cran()` guards landed on the
+  `ci-cross-platform` branch = the open draft [PR
+  \#29](https://github.com/jmgirard/circumplex/pull/29). The class-1
+  `cpm_pack` β-boundary error is the SOLE remaining red and the one
+  thing gating PR \#29.** Ten failures in three classes, all in M4 code:
   1.  **estimator boundary — `cpm_pack: all(b_keep > 0)` errors**
       (`test-cpm_fit.R` exact-recovery/mirror/multimodal/free-angle
       tests): the CPM optimizer converges to a harmonic weight *exactly*
@@ -127,7 +130,15 @@ they outlive individual milestones’ MILESTONES.md sections):
       (`test-cpm_plot.R`, `test-ci_accuracy.R`) — platform
       font/rendering, standard `skip_on_ci()`. This MUST be green before
       the v2.0.0 CRAN submission (CRAN is multi-platform). Classes 2–3
-      are mechanical; class 1 is the real work.
+      are done; **class 1 (`cpm_pack`) is the remaining work — a
+      dedicated Fable session**, with a Linux reproduction set up first
+      (per the brief; not reproducible on the macOS dev machine).
+      **Branch note (2026-07-08):** M5 development moved to its own
+      `m5-sem-ssm` branch, stacked on this CI fix, so M5’s own CI
+      inherits the class-1 red — fixing `cpm_pack` is on the critical
+      path for **both** PR \#29 and M5’s green merge to master.
+      (`ci-cross-platform` itself is parked at PR \#29’s scope; the
+      class-1 fix belongs there.)
 - **Release review depth:** `/code-review max` minimum; this is now the
   single flagship release, so it is *the* candidate for the billed
   `/code-review ultra` — but only if Jeff asks for it.
@@ -357,12 +368,13 @@ engine.
 
 ## Milestone 5 — SEM-based SSM
 
-**Status: active** (promoted 2026-07-07 on M4.5’s close; folds into
-v2.0.0). Builds on the lavaan explorations in `devel/lavaan_ssm.Rmd` and
-`devel/circum_lavaan.Rmd`; the statistical design questions are scoped
-in `devel/m5-m6-design-questions.md` (Brief E §M5). The detailed task
-list with acceptance criteria (T1–T5) is the active list in
-MILESTONES.md.
+**Status: GitHub-complete 2026-07-08** (all T1–T5 tasks done and
+close-reviewed; folds into v2.0.0). Full task list and log archived in
+MILESTONES-ARCHIVE.md. Builds on the lavaan explorations in
+`devel/lavaan_ssm.Rmd` and `devel/circum_lavaan.Rmd`; the statistical
+design questions are scoped in `devel/m5-m6-design-questions.md` (Brief
+E §M5). The detailed task list with acceptance criteria (T1–T5) is the
+active list in MILESTONES.md.
 
 - Latent-variable SSM: estimate SSM parameters from a lavaan measurement
   model (disattenuated correlations), with delta-method or bootstrap
@@ -373,6 +385,33 @@ MILESTONES.md.
   from `circumplex_instrument` objects.
 - `lavaan` moves to `Suggests`; features degrade gracefully without it.
 - Vignette: “SEM-based SSM Analysis” (adapt `devel/lavaan_ssm.Rmd`).
+- Follow-ups deferred from the M5 close-review (`/code-review max`,
+  2026-07-08; the statistics were confirmed clean — two correctness
+  angles returned empty after empirical validation — and the 9 fix-now
+  findings landed same-day, see the M5 log). Post-v2.0.0, deliberately
+  not pre-freeze because they churn validated code: (a) vectorize
+  `sem_estimate()`’s per-draw
+  [`apply()`](https://rdrr.io/r/base/apply.html) into one matrix pass
+  (spec §9’s stated form) — floating point reorders, so every seeded pin
+  must be re-verified in the same change; (b) `make_pop_2g()` in
+  `devel/m5-coverage-oracle.R` should call `sem_pop()` (the one-copy
+  truth-algebra discipline its own header claims), re-recording the
+  affected two-group cells; (c) one shared contrast-arity validator for
+  [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)/[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md); (d)
+  a fit-this-syntax chokepoint owning the estimator/se/missing
+  translation and `group.label` protection for the two
+  [`lavaan::cfa()`](https://rdrr.io/pkg/lavaan/man/cfa.html) sites; (e)
+  `summary.circumplex_ssm_sem()` delegating shared detail lines through
+  a label seam instead of re-implementing them; (f) a package-wide
+  scalar-count validation helper (`is_count(x, n = 1)`-style) adopted
+  uniformly across the
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)/[`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)/[`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)
+  families, which today interpret the CLAUDE.md `is_*()` rule two
+  different ways;
+  7.  minor: strict-tier syntax emission single-sourced across the
+      single-/multi-group branches, test-fixture consolidation, the
+      unused `npar` struct field, `sem_details()`’s always-overwritten
+      `score_type`.
 
 ## Milestone 6 — Longitudinal & intraindividual SSM
 

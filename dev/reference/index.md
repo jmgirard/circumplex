@@ -47,6 +47,19 @@ Functions for implementing the Structural Summary Method
 - [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
   : Calculate SSM parameters by row and add results as new columns
 
+## SEM-Based SSM Functions
+
+Latent-variable (disattenuated) SSM via structural equation modeling
+
+- [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)
+  : Perform SEM-based (latent-variable) SSM analyses
+- [`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md)
+  : Calculate latent SSM parameters from a fitted lavaan measurement
+  model
+- [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_syntax.md)
+  : Generate lavaan syntax for a fixed-angle circumplex measurement
+  model
+
 ## Structure Evaluation Functions
 
 Functions for evaluating circumplex structure and CI trustworthiness

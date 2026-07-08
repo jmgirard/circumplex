@@ -14,6 +14,7 @@
 <url><loc>http://circumplex.jmgirard.com/dev/articles/index.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/intermediate-ssm-analysis.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/introduction-to-ssm-analysis.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/articles/sem-based-ssm-analysis.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/articles/using-instruments.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/authors.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/index.html</loc></url>
@@ -72,6 +73,9 @@
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_score.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_sem.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.html</loc></url>
+<url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_sem_syntax.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/ssm_table.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/summary.circumplex_ci_accuracy.html</loc></url>
 <url><loc>http://circumplex.jmgirard.com/dev/reference/summary.circumplex_cpm.html</loc></url>
