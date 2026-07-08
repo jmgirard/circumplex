@@ -11,9 +11,12 @@ with its full log; its milestone-close `/code-review max` is done (statistics
 confirmed clean, 9 findings fixed, 5 deferred to ROADMAP's M5 follow-up
 bullets).
 
-- [ ] **R1. cpm_pack β-boundary fix (Fable-tier; release blocker).** The sole
+- [x] **R1. cpm_pack β-boundary fix (Fable-tier; release blocker).** The sole
   remaining red on the cross-platform CI matrix (the `ci-cross-platform`
-  branch / draft PR #29). Linux-only `cpm_pack: all(b_keep > 0)` error when the
+  branch / draft PR #29). **Verified green 2026-07-08: PR #29 all 7 checks
+  SUCCESS on the real runners (all three ubuntu R-CMD-check jobs + covr's
+  test-coverage, the four that carried the cpm_pack red since M4, plus
+  macOS/Windows/pkgdown).** Linux-only `cpm_pack: all(b_keep > 0)` error when the
   CPM optimizer lands a harmonic weight exactly on the β = 0 boundary; the
   handoff brief is `devel/cpm-pack-boundary-brief.md`. Not reproducible on the
   macOS dev machine, so it needs a Linux reproduction (rocker/r-ver container
