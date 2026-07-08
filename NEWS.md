@@ -35,6 +35,13 @@
   observed-score group contrast in `ssm_analyze()` remains the right tool when
   invariance cannot be assumed; it answers its own, different question.
 
+* New vignette, "SEM-Based SSM Analysis," teaching the latent SSM: the
+  disattenuated estimand and how it differs from the observed profile, why
+  amplitude and displacement intervals are built in-package rather than by
+  lavaan, the two group-difference estimands (observed vs. invariance-gated
+  latent) side by side, and the model-conditional assumptions that make the
+  latent parameters interpretable.
+
 This version's flagship addition is `cpm_fit()`, a native reimplementation
 of Browne's (1992) circular stochastic process model for the correlational
 structure of circumplex scales — filling the gap left by the archived CircE

@@ -122,7 +122,7 @@ inlined so the reference survives archiving):
   tests on the latent displacement contrast; the invariance-failure path
   returns a stated non-comparison rather than a number; `/statistical-
   validation` run.
-- [ ] **T5. Vignette: "SEM-based SSM Analysis" (Opus/Sonnet).** Adapt
+- [x] **T5. Vignette: "SEM-based SSM Analysis" (Opus/Sonnet).** Adapt
   `devel/lavaan_ssm.Rmd` into a vignette teaching both estimands, the CI
   architecture (why nonlinear-parameter intervals go through the package, not
   lavaan), and the boundary caveats.
@@ -146,6 +146,35 @@ inlined so the reference survives archiving):
 
 ## Log
 
+- 2026-07-08 — T5: added the "SEM-Based SSM Analysis" vignette
+  (vignettes/sem-based-ssm-analysis.Rmd), adapting devel/lavaan_ssm.Rmd into
+  a teaching document. Covers both estimands (P1 latent profile via
+  `ssm_sem()`, disattenuated analog of the observed correlation profile; P2
+  invariance-gated latent contrast) with worked jz2017 examples: NARPD
+  latent vs observed profile (larger amplitude, higher fit, shifted d — the
+  removal of attenuation and reliability heterogeneity, §4.2/§4.3); the
+  generated measurement model (`ssm_sem_syntax()`) with the fixed-angle
+  direction constraints and the φ_g = 0 / atan2 NOTE; the CI architecture
+  (why a/d intervals go through the package's circular quantiles, not
+  lavaan's delta/percentile — spec §2.2/§5, mvn+sandwich default per §5.1);
+  the two-estimand side-by-side table (§6.1); a computed two-measure
+  contrast and the Gender non-comparison path (metric invariance rejected,
+  Δχ²(14)=54.78 — the honest "cannot compare" output); §10's limitations
+  verbatim in spirit. Literature per the T5 acceptance: Wendt et al. (2019)
+  strict-tier/CFA-PC correspondence, RMSEA .075–.111 benchmark, replicated
+  g–agency r ≈ −.3; the CFA-PC ≡ m=1 CIRCUM equivalence at φ_g=0 bridging
+  the two model families; Moss (2026) coverage-collapse (~.35) motivating
+  propagation, with the both-sides vs scale-side disattenuation caveat;
+  latent SSM positioned as novel. Doc-only (no R/ or src/ change): exported
+  API only (no `:::`), lavaan-gated so it builds without the Suggests dep,
+  renders clean. Also listed in the pkgdown navbar (_pkgdown.yml) and a NEWS
+  bullet added. Statistical-precision fixes during self-review: RMSEA
+  "similar range" softened to an honest not-like-for-like benchmark; the
+  amplitude-gate wording changed from "reliable" to "well-defined direction"
+  (term collision); Moss reference marked advance-online (Jeff supplied the
+  full citation + DOI 10.1177/01466216261440511, folded in).
+  (vignettes/sem-based-ssm-analysis.Rmd,
+  _pkgdown.yml, NEWS.md, MILESTONES.md.)
 - 2026-07-08 — T4: shipped the multi-group invariance-gated latent contrast
   workflow. Fable core: group-aware estimand maps (per-group ρ*_g; the
   latent-mean path μ*_g = ν + Λα_g), the configural→metric→scalar ladder

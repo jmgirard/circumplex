@@ -129,6 +129,8 @@ navbar:
       href: articles/advanced-visualization.html
     - text: Evaluating Circumplex Structure
       href: articles/evaluating-circumplex-structure.html
+    - text: SEM-Based SSM Analysis
+      href: articles/sem-based-ssm-analysis.html
   - text: News
     href: news/index.html
   right:
