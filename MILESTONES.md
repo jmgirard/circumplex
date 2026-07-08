@@ -57,7 +57,7 @@ inlined so the reference survives archiving):
   mechanical edits and doc runs. `/statistical-validation` after every task
   that produces SSM parameters or their intervals.
 
-- [ ] **T1. Design spec: latent-variable SSM + SEM contrasts (Fable).**
+- [x] **T1. Design spec: latent-variable SSM + SEM contrasts (Fable).**
   Turn Brief E §M5 (Q5.1/Q5.2/Q5.3) into an implementation spec the way
   Brief B did for `ssm_ci_accuracy()`: the draws-through-the-transform CI
   architecture; the per-parameter delta-vs-bootstrap decision (e exact, a with
@@ -76,19 +76,41 @@ inlined so the reference survives archiving):
   scale weights per the Q5.1 equal-spacing trap. `lavaan` → Suggests with
   graceful degradation.
   *Accept:* generated syntax fits under `lavaan` on a reference instrument;
-  a test asserting the emitted weights equal the closed-form only when angles
-  are equally spaced and the OLS weights otherwise; a clear error (not a load
-  failure) when `lavaan` is absent.
+  a test asserting the emitted weights (the always-present weights
+  attribute, plus `:=` lines when emitted) equal the closed form at equally
+  spaced angles and equal the OLS weights — differing from the closed
+  form — at an angle set violating the harmonic-balance condition (spec
+  §2.1/§3.5: equal spacing is sufficient, not necessary, for closed-form ≡
+  OLS, so the test's "differs" arm must use a balance-violating set); a
+  clear error (not a load failure) when `lavaan` is absent.
+  *(Wording amended 2026-07-07 per the fresh-session review F9: the
+  original "equal the closed-form only when angles are equally spaced" is
+  falsified by balanced-but-unequal angle sets — see
+  devel/m5-sem-design-review.md and spec §2.1.)*
 - [ ] **T3. Latent-variable SSM estimation + circular-aware CIs
   (Fable-critical).** Estimate SSM parameters from the fitted measurement
-  model and construct CIs by the inherited draws-through-the-transform route:
-  printed delta/Wald SE for elevation (exact) and amplitude (guardrail
-  caveat); a and d interval construction via `ssm_replicate_intervals()` +
-  circular quantiles. Full boundary suite.
-  *Accept:* coverage validated with `ssm_ci_accuracy()` against a
-  `cpm_simulate()` plug-in population (delta/MVN-propagation vs bootstrap
-  compared, per Q5.1's blocked-on-M4 question, now answerable); boundary tests
-  at a ≈ 0 and d near 0°/360°; `/statistical-validation` run.
+  model and construct CIs by the inherited draws-through-the-transform
+  route: all parameters reported as estimate + interval via
+  `ssm_replicate_intervals()` + circular quantiles (no printed SEs — the
+  package has no SE surface; delta-method status per parameter is
+  documentation guidance, spec §5.2, where elevation's delta SE is
+  asymptotic, not exact, under the disattenuated estimand — Brief E's
+  "exact" held only for its linear saturated sketch). Full boundary suite.
+  *Accept:* coverage validated with the `ssm_ci_accuracy()` **machinery**
+  (its Bradley/Wilson verdict conventions and plug-in-population design)
+  via a seeded `devel/` harness per spec §8.3 — the exported function
+  itself replays observed-data procedures and cannot assess a latent
+  estimand; populations built from `cpm_fit()`'s P̂ with joint
+  scales+measure draws (`cpm_simulate()` is scale-only per the B-spec G2
+  contract); delta/MVN-propagation vs bootstrap compared, per Q5.1's
+  blocked-on-M4 question, now answerable; boundary tests at a ≈ 0 and d
+  near 0°/360°; the spec §7.3 method audit (summary override,
+  ssm_ci_accuracy guard); `/statistical-validation` run.
+  *(Wording amended 2026-07-07 with T1: the original "printed delta/Wald SE
+  for elevation (exact)" and "validated with `ssm_ci_accuracy()`" were
+  inherited from Brief E's saturated sketch and are unmeetable/imprecise
+  under the spec's estimand — see devel/m5-sem-design.md §5.2, §8.3 and its
+  review change log.)*
 - [ ] **T4. Multi-group invariance-constrained latent contrasts
   (Fable-critical; Opus plumbing).** A separately named workflow (not a
   replacement for the observed contrast) computing the contrast on latent SSM
@@ -110,6 +132,29 @@ inlined so the reference survives archiving):
 
 ## Log
 
+- 2026-07-07 — T1: committed devel/m5-sem-design.md — the M5 implementation
+  spec (estimand = profile-then-transform on model-implied disattenuated
+  profiles; OLS weights with the harmonic-balance identity; scaled/strict
+  fixed-angle model tiers; MVN-draws/bootstrap dual engine feeding
+  ssm_replicate_intervals verbatim; adapted invariance ladder with an
+  explicit non-comparison path; API, validation, phasing, open decisions).
+  Same-day 4-angle review: 16 findings, all accepted and folded in (see the
+  spec's review change-log entry) — including two statistical corrections
+  (closed-form ≡ OLS is harmonic-balance, not iff-equal-spacing;
+  exact-cosine mean recovery is strict-tier-only) and two MILESTONES T3
+  wording amendments (no printed SEs; ssm_ci_accuracy machinery via a
+  devel/ harness). Next: T2 (Opus). (devel/m5-sem-design.md,
+  MILESTONES.md.)
+- 2026-07-07 — T1 fresh-session review (the Brief A/B house pattern):
+  committed devel/m5-sem-design-review.md, verdict ACCEPT WITH CHANGES —
+  architecture, estimand, weights, identification, CI reuse, invariance
+  gating, and all shipped-code claims held under adversarial checking; 12
+  findings (1 high: §4.3's direction-integrity claim — stationarity
+  necessary but not sufficient, heterogeneous saturations rotate d* with
+  fit still high) all resolved into the spec same day (see its revision
+  log). MILESTONES T2 acceptance amended per F9 (harmonic-balance test
+  aim). T2 is unblocked. (devel/m5-sem-design.md,
+  devel/m5-sem-design-review.md, MILESTONES.md.)
 - 2026-07-07 — M4.5 PR (#28) CI fix: the milestone-close PR surfaced a
   pre-existing **red on master's R-CMD-check** (not caused by M4.5) — the
   `summary.circumplex_cpm` "Largest absolute residual" line used `which.max()`
