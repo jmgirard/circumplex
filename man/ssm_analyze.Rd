@@ -31,11 +31,12 @@ scores to be analyzed.}
 \item{angles}{Optional. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees). (default =
 \code{octants()}). The closed-form SSM estimator used here equals the
-ordinary-least-squares cosine fit only when \code{angles} are equally spaced
-around the circle (e.g., octants at 45-degree intervals); for unequally
-spaced angles it is the conventional Gurtman estimator, not a
-least-squares fit, and the reported model fit is then no longer a bounded
-R-squared in \verb{[0, 1]} (it can fall below 0).}
+ordinary-least-squares cosine fit for equally spaced \code{angles} (e.g.,
+octants at 45-degree intervals) -- more generally, for any angle set
+satisfying first- and second-harmonic balance. For angle sets violating
+that balance (generic unequally spaced sets), it is the conventional
+Gurtman estimator, not a least-squares fit, and the reported model fit
+is then no longer a bounded R-squared in \verb{[0, 1]} (it can fall below 0).}
 
 \item{measures}{Optional. Either \code{NULL} or a character vector of column names
 from \code{data} that contains one or more variables to be correlated with the
@@ -237,6 +238,8 @@ Other ssm functions:
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
 \code{\link[=ssm_score]{ssm_score()}},
+\code{\link[=ssm_sem]{ssm_sem()}},
+\code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}},
 \code{\link[=ssm_table]{ssm_table()}}
 
 Other analysis functions:
@@ -244,7 +247,9 @@ Other analysis functions:
 \code{\link[=cpm_simulate]{cpm_simulate()}},
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
-\code{\link[=ssm_score]{ssm_score()}}
+\code{\link[=ssm_score]{ssm_score()}},
+\code{\link[=ssm_sem]{ssm_sem()}},
+\code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}}
 }
 \concept{analysis functions}
 \concept{ssm functions}

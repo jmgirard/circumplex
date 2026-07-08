@@ -1,5 +1,47 @@
 # circumplex (development version)
 
+* New SEM-based (latent-variable) SSM analysis: `ssm_sem()` estimates the
+  Structural Summary Method profile of one or more external measures against
+  the *latent* circumplex content of the scales — the disattenuated analog of
+  the correlation-based `ssm_analyze()` — from a fixed-theoretical-angle
+  measurement model fitted with lavaan (now a runtime Suggests dependency for
+  this feature family; everything else works without it). Confidence
+  intervals for all parameters are built in-package by propagating draws of
+  the model's free parameters (multivariate-normal by default, or a full
+  lavaan bootstrap via `ci_method = "boot"`) through the profile and SSM
+  transforms and the same circular-quantile machinery as `ssm_analyze()` —
+  never lavaan's delta-method or percentile intervals, which ignore the
+  angular branch cut. The default draws propagate lavaan's robust
+  (sandwich) covariance, which the package's coverage validation found
+  necessary to keep the intervals calibrated when the fixed-angle model
+  only approximates the data; the default estimator is MLR, so the global
+  fit indices `print()` reports are likewise the robust/scaled versions
+  (circumplex scale scores are typically skewed). Includes `ssm_sem_syntax()` (an inspectable lavaan
+  model-syntax generator that works without lavaan installed) and
+  `ssm_sem_parameters()` (estimate from a lavaan fit you have modified or
+  fitted yourself). Results are `circumplex_ssm` objects, so `ssm_table()`
+  and the `ssm_plot_*` functions work on them unchanged. With a `grouping`
+  variable, `ssm_sem()` fits the measurement model across groups and gates a
+  latent group contrast on measurement invariance: it tests a
+  configural-metric-scalar ladder using lavaan's own nested-model test (the
+  scaled difference test under robust estimators) at the `invariance` rung
+  (defaulting to each path's required level) and the `invariance_alpha` level,
+  and computes the disattenuated contrast only when the required rung is
+  retained. When invariance is rejected it reports an honest non-comparison —
+  the verdict plus each group's separate configural profile — rather than a
+  contrast that would confound structural difference with measurement
+  non-invariance. Supplying `grouping` without `measures` analyzes the latent
+  mean path (each group's model-implied latent mean profile). The
+  observed-score group contrast in `ssm_analyze()` remains the right tool when
+  invariance cannot be assumed; it answers its own, different question.
+
+* New vignette, "SEM-Based SSM Analysis," teaching the latent SSM: the
+  disattenuated estimand and how it differs from the observed profile, why
+  amplitude and displacement intervals are built in-package rather than by
+  lavaan, the two group-difference estimands (observed vs. invariance-gated
+  latent) side by side, and the model-conditional assumptions that make the
+  latent parameters interpretable.
+
 This version's flagship addition is `cpm_fit()`, a native reimplementation
 of Browne's (1992) circular stochastic process model for the correlational
 structure of circumplex scales — filling the gap left by the archived CircE

@@ -23,11 +23,13 @@ containing one score for each of a set of circumplex scales.}
 
 \item{angles}{Required. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scores} (in degrees). The closed-form
-SSM estimator used here equals the ordinary-least-squares cosine fit only
-when \code{angles} are equally spaced around the circle (e.g., octants at
-45-degree intervals); for unequally spaced angles it is the conventional
-Gurtman estimator, not a least-squares fit, and the reported fit is then no
-longer a bounded R-squared in \verb{[0, 1]} (it can fall below 0).}
+SSM estimator used here equals the ordinary-least-squares cosine fit for
+equally spaced \code{angles} (e.g., octants at 45-degree intervals) -- more
+generally, for any angle set satisfying first- and second-harmonic
+balance. For angle sets violating that balance (generic unequally spaced
+sets), it is the conventional Gurtman estimator, not a least-squares fit,
+and the reported fit is then no longer a bounded R-squared in \verb{[0, 1]}
+(it can fall below 0).}
 
 \item{prefix}{Optional. A string to append to the beginning of all of the SSM
 parameters' variable names (default = "").}
@@ -51,8 +53,10 @@ amplitude parameter (default = "Ampl").}
 displacement parameter (default = "Disp").}
 
 \item{f_label}{Optional. A string representing the variable name of the SSM
-fit or R-squared value (default = "Fit"). This value is a bounded R-squared
-in \verb{[0, 1]} only for equally spaced \code{angles} (see \code{angles}).}
+fit or R-squared value (default = "Fit"). This value is a bounded
+R-squared in \verb{[0, 1]} when the closed form coincides with the
+least-squares fit (equally spaced or otherwise harmonic-balanced
+\code{angles}; see \code{angles}).}
 }
 \value{
 A data frame containing the SSM parameters calculated from \code{scores}.
@@ -90,6 +94,8 @@ Other ssm functions:
 \code{\link[=ssm_analyze]{ssm_analyze()}},
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_score]{ssm_score()}},
+\code{\link[=ssm_sem]{ssm_sem()}},
+\code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}},
 \code{\link[=ssm_table]{ssm_table()}}
 
 Other analysis functions:
@@ -97,7 +103,9 @@ Other analysis functions:
 \code{\link[=cpm_simulate]{cpm_simulate()}},
 \code{\link[=ssm_analyze]{ssm_analyze()}},
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
-\code{\link[=ssm_score]{ssm_score()}}
+\code{\link[=ssm_score]{ssm_score()}},
+\code{\link[=ssm_sem]{ssm_sem()}},
+\code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}}
 }
 \concept{analysis functions}
 \concept{ssm functions}

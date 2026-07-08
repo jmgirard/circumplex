@@ -45,6 +45,8 @@ Other ssm functions:
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
 \code{\link[=ssm_score]{ssm_score()}},
+\code{\link[=ssm_sem]{ssm_sem()}},
+\code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}},
 \code{\link[=ssm_table]{ssm_table()}}
 }
 \concept{ssm functions}

@@ -171,6 +171,16 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
 
   # ---- validate arguments ----
   stopifnot(inherits(ssm_object, "circumplex_ssm"))
+  if (inherits(ssm_object, "circumplex_ssm_sem")) {
+    stop(
+      "ssm_ci_accuracy() replays observed-data resampling procedures and ",
+      "cannot assess the latent (SEM-based) estimand of an ssm_sem() ",
+      "object; assessing it requires a lavaan refit per simulated dataset. ",
+      "A seeded coverage harness for the SEM layer lives in the package's ",
+      "development repository (devel/m5-coverage-oracle.R on GitHub).",
+      call. = FALSE
+    )
+  }
   stopifnot(is_count(reps), length(reps) == 1, reps >= 1)
   stopifnot(is.numeric(amplitude_factors), length(amplitude_factors) >= 1,
             all(is.finite(amplitude_factors)),
@@ -190,6 +200,26 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
   # ---- unpack the analysis to be assessed ----
   dts <- ssm_object$details
   method <- if (is.null(dts$method)) "bootstrap" else dts$method
+  # Positive capability check, not fall-through defaults: this function
+  # replays the object's own procedure, so an unknown method or score type
+  # must refuse rather than silently replay the wrong procedure (the subclass
+  # guard above catches today's known case; this catches the next one).
+  if (!method %in% c("bootstrap", "montecarlo")) {
+    stop(
+      "ssm_ci_accuracy() does not know how to replay method \"", method,
+      "\"; only \"bootstrap\" and \"montecarlo\" analyses can be assessed.",
+      call. = FALSE
+    )
+  }
+  if (!identical(dts$score_type, "Mean") &&
+    !identical(dts$score_type, "Correlation")) {
+    stop(
+      "ssm_ci_accuracy() does not know how to replay score type \"",
+      dts$score_type, "\"; only mean-based and correlation-based analyses ",
+      "can be assessed.",
+      call. = FALSE
+    )
+  }
   boots <- dts$boots
   interval <- dts$interval
   contrast <- isTRUE(dts$contrast)

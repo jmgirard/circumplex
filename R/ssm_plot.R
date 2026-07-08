@@ -398,7 +398,28 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
                               sig_color = "#fc8d62", ns_color = "white",
                               linesize = 1.25, fontsize = 12, ...) {
 
-  stopifnot(ssm_object$details$contrast)
+  if (!isTRUE(ssm_object$details$contrast)) {
+    # A gate-rejected latent contrast (ssm_sem(contrast = TRUE) whose
+    # invariance gate failed) deliberately carries details$contrast = FALSE
+    # so no inherited method renders a contrast; the refusal here must
+    # restate that verdict, not contradict the user's contrast = TRUE call
+    # with a bare condition failure.
+    inv <- ssm_object$invariance
+    if (isTRUE(inv$contrast_requested) && !isTRUE(inv$comparable)) {
+      stop(
+        "The requested latent contrast was not computed, so there is no ",
+        "contrast to plot: ", inv$verdict, ". The object carries each ",
+        "group's separate (configural) latent profile instead; see ",
+        "print() for the invariance ladder.",
+        call. = FALSE
+      )
+    }
+    stop(
+      "This SSM object contains no contrast to plot; request one with ",
+      "`contrast = TRUE` (exactly two groups or two measures).",
+      call. = FALSE
+    )
+  }
   chkDots(...)
 
   # Prepare all estimates
