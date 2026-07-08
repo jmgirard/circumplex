@@ -87,6 +87,13 @@
 <strong>B6 analytic-CI caution — Jeff to confirm/veto</strong> (adopted default, reversible until release): the <code>cpm_boundary_markers()</code> marker set and the N-conditional <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> caution wording in R/cpm_fit.R / R/cpm_oop.R. Natural review point: when the M4 vignette (W1) documents CI trustworthiness. <em>W1 review outcome (2026-07-07, advisory): confirmed — the wording is hedged, directional, and names its markers; the vignette now teaches the same guidance (“prefer the bootstrap on the raw-data path”, caution below N = 2000 and marker-conditional above). Jeff’s veto window stays open until release.</em>
 </li>
 <li>
+<strong>Cross-platform CI portability (release blocker; surfaced 2026-07-07 by the M4.5 PR #28).</strong> <code>R-CMD-check</code> has been <strong>red on every platform on master since M4</strong> (M4 landed without a green multi-platform gate); the M4.5 code is clean (macOS check green, all <code>fit_structure</code> tests pass everywhere) but the branch inherits the failures. Ten failures in three classes, all in M4 code:
+<ol style="list-style-type: decimal"><li>
+<strong>estimator boundary — <code>cpm_pack: all(b_keep &gt; 0)</code> errors</strong> (<code>test-cpm_fit.R</code> exact-recovery/mirror/multimodal/free-angle tests): the CPM optimizer converges to a harmonic weight <em>exactly</em> on the β = 0 boundary on the <strong>ubuntu runners only</strong> (macOS and Windows pass), which <code>cpm_pack</code>’s softmax-inverse log-parameterization deliberately refuses (<code>R/cpm_fit.R:170</code>) — a real Linux-BLAS estimator robustness bug, <strong>Fable-tier</strong>, not reproducible on macOS (reproduce under a <code>rocker/r-ver</code> container / capture the values via a CI debug run); handoff brief in <code>devel/cpm-pack-boundary-brief.md</code>;</li>
+<li>
+<strong>seeded-bootstrap snapshots</strong> (<code>test-cpm_api.R</code>, <code>test-ci_accuracy.R</code>) whose printed CI endpoints differ at the 3rd decimal by BLAS — need <code>skip_on_ci()</code>/<code>skip_on_cran()</code> (local-only regression pins) or numeric masking; (3) <strong>vdiffr</strong> plot snapshots (<code>test-cpm_plot.R</code>, <code>test-ci_accuracy.R</code>) — platform font/rendering, standard <code>skip_on_ci()</code>. This MUST be green before the v2.0.0 CRAN submission (CRAN is multi-platform). Classes 2–3 are mechanical; class 1 is the real work.</li>
+</ol></li>
+<li>
 <strong>Release review depth:</strong> <code>/code-review max</code> minimum; this is now the single flagship release, so it is <em>the</em> candidate for the billed <code>/code-review ultra</code> — but only if Jeff asks for it.</li>
 <li>v2.0.0 is a major-version bump carrying multiple feature families; run <code>/release-checklist</code> once, after the last milestone (or a deliberate descope) lands.</li>
 </ul><p><strong>Between releases (working practice, adopted 2026-07-07).</strong> Real version numbers, annotated tags, and GitHub Releases are bound to CRAN submissions only — never mint a real version that CRAN won’t see. At each milestone close instead: (1) archive the milestone to MILESTONES-ARCHIVE.md; (2) bump the DESCRIPTION dev suffix (restart the discipline at 2.0.0.9000 after the v2.0.0 release; one increment per milestone) so <code>install_github</code> users’ <code><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo()</a></code> identifies the milestone-state they run; (3) add a lightweight git tag (e.g. <code>m4-complete</code>) so milestone diffs are stable review scopes; (4) run a <strong>milestone-close <code>/code-review</code> over the milestone’s full cumulative diff</strong> — <code>high</code> for ordinary milestones, <code>max</code> for statistically risky ones. The milestone-close review is the layer that buys release-review depth: the CRAN-release review (<code>max</code>/ultra) then verifies already-reviewed strata and the seams between them rather than making a first deep pass over everything, and the freeze rule’s “reviewed by freeze” means this review is done.</p>
@@ -198,7 +205,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>
