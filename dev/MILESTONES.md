@@ -33,7 +33,14 @@ green across platforms: bump DESCRIPTION to 2.0.0, rename NEWS.md’s
 development heading to 2.0.0, refresh cran-comments.md (test
 environments, 0/0/0 check, no revdeps, and the Moss DOI 403 = SAGE
 bot-block note from the urlchecker run), run win-builder / R-devel, then
-hand `submit_cran()` to Jeff. Do not submit autonomously.
+hand `submit_cran()` to Jeff. Do not submit autonomously. **Groundwork
+staged 2026-07-08 and HELD for CRAN cadence** (v1.2.0 was approved
+2026-07-02 — only ~1 week ago; CRAN wants ~1 month between submissions,
+ROADMAP target ~2026-08-02): the accurate cran-comments.md summary and
+the urlchecker DOI note are already written; the version bump / NEWS
+heading rename / win-builder / submit are deliberately NOT done yet.
+Repo stays at the 1.3.0.9002 dev version until the submission window
+opens.
 
 ## Log
 

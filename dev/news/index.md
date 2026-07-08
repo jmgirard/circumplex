@@ -342,10 +342,11 @@ Circumplex Structure”, for a worked introduction to both.
   [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
   and
   [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
-  that the reported model fit is a bounded R-squared in `[0, 1]` only
-  when `angles` are equally spaced; for unequally spaced angles the
-  closed-form estimator is not a least-squares fit and the reported fit
-  can fall below 0.
+  that the reported model fit is a bounded R-squared in `[0, 1]` for
+  equally spaced `angles` (more generally, for any angle set satisfying
+  first- and second-harmonic balance); for angle sets violating that
+  balance the closed-form estimator is not a least-squares fit and the
+  reported fit can fall below 0.
 
 - Fixed a bug where the displacement of a group contrast between two
   exactly opposed profiles (a half-turn apart) was reported as `-180`
