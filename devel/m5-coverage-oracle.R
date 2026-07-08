@@ -148,6 +148,77 @@ cells$g_lean_strict <- make_pop(
   model = "strict", phi = phi_lean
 )
 
+# ---- T4 two-group cells (spec sec. 8.1 contrast cells) --------------------------
+# Metric-invariant two-group populations (shared loadings; per-group factor
+# metric per the amended sec. 6.2: var(g_k), isotropic plane scale phi_k,
+# g-plane covariances 0 everywhere); measure path with the group contrast at
+# the +/-180 branch cut, and the latent mean path. Replayed through the
+# SHIPPED ssm_sem(grouping=) procedure including the invariance ladder, so
+# the coverage measured includes the gating step's stochastic behavior.
+
+make_pop_2g <- function(a, cc, theta1, theta2, sigma_m1, sigma_m2,
+                        vg = c(1, 1.3), phi_pl = c(1, 0.8)) {
+  lambda <- cbind(a, cc * cos(th), cc * sin(th))
+  one <- function(theta, sigma_m, vgk, phik) {
+    phi <- diag(c(vgk, phik, phik))
+    sigma_ss <- lambda %*% phi %*% t(lambda) + diag(theta)
+    sigma_sm <- lambda %*% sigma_m
+    sigma <- rbind(cbind(sigma_ss, sigma_sm), cbind(t(sigma_sm), 1))
+    nm <- c(scales, "m1")
+    dimnames(sigma) <- list(nm, nm)
+    var_t <- rowSums((lambda %*% phi) * lambda)
+    rho <- as.numeric(t(sigma_sm)) / sqrt(var_t)
+    list(sigma = sigma, rho = rho)
+  }
+  g1 <- one(theta1, sigma_m1, vg[1], phi_pl[1])
+  g2 <- one(theta2, sigma_m2, vg[2], phi_pl[2])
+  tr <- lapply(list(g1$rho, g2$rho), function(r) {
+    unlist(suppressWarnings(ssm_parameters(r, angles)))
+  })
+  dtruth <- as.numeric(angle_dist(
+    as_radian(as_degree(tr[[2]][["Disp"]])),
+    as_radian(as_degree(tr[[1]][["Disp"]]))
+  )) * 180 / pi
+  list(
+    type = "2g_measures", sigma = list(A = g1$sigma, B = g2$sigma),
+    truth = tr, d_contrast = dtruth,
+    e_contrast = tr[[2]][["Elev"]] - tr[[1]][["Elev"]],
+    measures = "m1", model = "scaled"
+  )
+}
+
+cells$grp_contrast_pm180 <- make_pop_2g(
+  a = seq(0.5, 0.7, length.out = p), cc = seq(0.65, 0.55, length.out = p),
+  theta1 = seq(0.3, 0.6, length.out = p),
+  theta2 = seq(0.4, 0.7, length.out = p),
+  sigma_m1 = cbind(dir3(0.15, 0.4, 5)), sigma_m2 = cbind(dir3(0.15, 0.4, 186))
+)
+
+make_pop_2g_means <- function() {
+  lambda <- cbind(1, cos(th), sin(th)) # strict tier
+  phi <- diag(c(0.8, 0.5, 0.5))
+  theta <- seq(0.3, 0.6, length.out = p)
+  sig <- lambda %*% phi %*% t(lambda) + diag(theta)
+  dimnames(sig) <- list(scales, scales)
+  nu <- seq(1, 1.6, length.out = p)
+  alpha2 <- c(0.3, 0.25, -0.15)
+  mu2 <- nu + as.numeric(lambda %*% alpha2)
+  tr <- lapply(list(nu, mu2), function(mu) {
+    unlist(suppressWarnings(ssm_parameters(mu, angles)))
+  })
+  dtruth <- as.numeric(angle_dist(
+    as_radian(as_degree(tr[[2]][["Disp"]])),
+    as_radian(as_degree(tr[[1]][["Disp"]]))
+  )) * 180 / pi
+  list(
+    type = "2g_means", sigma = list(A = sig, B = sig),
+    mu = list(A = nu, B = mu2), truth = tr, d_contrast = dtruth,
+    e_contrast = tr[[2]][["Elev"]] - tr[[1]][["Elev"]],
+    measures = NULL, model = "strict"
+  )
+}
+cells$grp_means <- make_pop_2g_means()
+
 # realism: cpm_fit() P-hat on jz2017 octants + observed measure block,
 # PSD-repaired; pseudo-true target under the scaled tier (misspecification
 # cell -- the fixed-cosine structure only approximates real data)
@@ -194,9 +265,72 @@ d_covered <- function(lci_deg, uci_deg, truth_deg, contrast = FALSE) {
   )$cover
 }
 
-root_cache <- lapply(cells, function(cl) mvn_root(cl$sigma))
+root_cache <- lapply(cells, function(cl) {
+  if (is.list(cl$sigma)) lapply(cl$sigma, mvn_root) else mvn_root(cl$sigma)
+})
+
+# One replicate of a T4 two-group cell: simulate both groups, replay the
+# SHIPPED multi-group procedure (ladder + gating + contrast). A replicate
+# whose gating rejects (Type I of the gate, ~alpha under these
+# invariance-true cells) yields NA contrast indicators, which the counting
+# excludes -- coverage is conditional on the gate passing, and the gate_fail
+# rate is reported alongside.
+one_rep_2g <- function(cell_name, cl, N, engine, boots, i) {
+  set.seed(BASE_SEED + 1e7 * match(engine, c("mvn", "boot")) +
+             1e6 * match(cell_name, names(cells)) + 1e3 * match(N, NS) + i)
+  roots <- root_cache[[cell_name]]
+  mk <- function(g, grp) {
+    q <- ncol(cl$sigma[[g]])
+    X <- matrix(stats::rnorm(N * q), N, q) %*% roots[[g]]
+    if (identical(cl$type, "2g_means")) X <- sweep(X, 2, cl$mu[[g]], "+")
+    colnames(X) <- colnames(cl$sigma[[g]])
+    X <- as.data.frame(X)
+    X$grp <- grp
+    X
+  }
+  dat <- rbind(mk("A", "A"), mk("B", "B"))
+  res <- try(silent = TRUE, suppressWarnings(
+    ssm_sem(
+      dat, scales = scales, angles = angles, measures = cl$measures,
+      grouping = "grp", model = cl$model, ci_method = engine,
+      boots = boots, contrast = TRUE
+    )
+  ))
+  if (inherits(res, "try-error")) {
+    return(list(ok = FALSE, why = attr(res, "condition")$message))
+  }
+  r <- res$results
+  # First-class gating state (not inferred from details$contrast, which
+  # conflates "not requested" with "gated out")
+  gated_out <- !isTRUE(res$invariance$comparable)
+  out <- list(ok = TRUE, gate_fail = gated_out)
+  for (g in 1:2) {
+    tr <- cl$truth[[g]]
+    out[[paste0("e", g)]] <- r$e_lci[g] <= tr[["Elev"]] &
+      tr[["Elev"]] <= r$e_uci[g]
+    out[[paste0("a", g)]] <- r$a_lci[g] <= tr[["Ampl"]] &
+      tr[["Ampl"]] <= r$a_uci[g]
+    out[[paste0("d", g)]] <- d_covered(
+      as.numeric(r$d_lci[g]), as.numeric(r$d_uci[g]), tr[["Disp"]] %% 360
+    )
+  }
+  if (gated_out) {
+    out$e_c <- out$d_c <- NA
+  } else {
+    i3 <- nrow(r)
+    out$e_c <- r$e_lci[i3] <= cl$e_contrast & cl$e_contrast <= r$e_uci[i3]
+    out$d_c <- d_covered(
+      as.numeric(r$d_lci[i3]), as.numeric(r$d_uci[i3]), cl$d_contrast,
+      contrast = TRUE
+    )
+  }
+  out
+}
 
 one_rep <- function(cell_name, cl, N, engine, boots, i) {
+  if (identical(cl$type, "2g_measures") || identical(cl$type, "2g_means")) {
+    return(one_rep_2g(cell_name, cl, N, engine, boots, i))
+  }
   set.seed(BASE_SEED + 1e7 * match(engine, c("mvn", "boot")) +
              1e6 * match(cell_name, names(cells)) + 1e3 * match(N, NS) + i)
   q <- ncol(cl$sigma)
@@ -273,6 +407,12 @@ run_cell <- function(cell_name, cl, N, engine, reps, boots) {
 t0 <- proc.time()[["elapsed"]]
 grid <- expand.grid(cell = names(cells), N = NS, engine = c("mvn", "boot"),
                     stringsAsFactors = FALSE)
+# The two-group cells refit an invariance ladder per replicate, so their boot
+# arm (boots lavaan refits of the gate model on top) is restricted to the
+# smallest N to keep the run tractable; the mvn arm covers the full grid.
+is_2g <- vapply(grid$cell, function(cn) !is.null(cells[[cn]]$type),
+                logical(1))
+grid <- grid[!(is_2g & grid$engine == "boot" & grid$N > min(NS)), ]
 results <- vector("list", nrow(grid))
 for (g in seq_len(nrow(grid))) {
   cell_name <- grid$cell[g]
@@ -299,7 +439,13 @@ for (r in results) {
   for (j in seq_len(ncol(r$coverage))) {
     k <- r$coverage[1, j]
     n <- r$coverage[2, j]
-    cls <- ssm_ci_bradley_class(k, n, 0.95)
+    # gate_fail is a RATE (the invariance gate's Type I under these
+    # invariance-true cells, expected ~ alpha), not a coverage: no verdict
+    if (identical(colnames(r$coverage)[j], "gate_fail")) {
+      cls <- c("(rate)", NA_character_)
+    } else {
+      cls <- ssm_ci_bradley_class(k, n, 0.95)
+    }
     w <- ssm_ci_wilson(k, n)
     rows[[length(rows) + 1]] <- data.frame(
       cell = r$cell, N = r$N, engine = r$engine,

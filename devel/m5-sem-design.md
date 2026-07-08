@@ -718,13 +718,32 @@ stated in the docs exactly as §3.1 states the single-group one (listed in
 §10), emitted by the generator's `invariance =` branch (§3.5 contract),
 and covered by the §3.4 identification gate extended to the multi-group
 constrained models (a T2 acceptance item alongside the single-group df
-derivation). *(T3 note, 2026-07-07: with §3.1's g–plane flip, the reference
-group now has φ_g fixed at 0. The non-reference groups' free g–plane
-covariances are expected to remain identified — the a↔φ_g ridge needs a_i
-to move, and the metric-invariance constraint pins a_i through the
-reference group's first-order-identified block — but T4 must verify this
-empirically before shipping, exactly as T3 did for the single-group model,
-because the same trade reopens if the constraint is relaxed.)*
+derivation).
+
+**AMENDED 2026-07-07 at T4 (supersedes both the original pinned
+parameterization above and the T3 note that stood here): under the scaled
+tier, the g–plane covariances are fixed to 0 in ALL groups at ALL rungs —
+non-reference groups free only var(g_g) and the single isotropic plane
+scale φ_g.** Reason: nesting. Post-T3, the configural rung is the §3.1
+model per group, with φ_g = 0 fixed everywhere. A metric rung that frees
+non-reference φ_g can express g-lean structures configural cannot, so
+metric would not be nested in configural and the §6.2 nested-Δχ² machinery
+(lavaan `anova()`, Satorra–Bentler under robust estimators) would be
+invalid for exactly the comparison that gates the latent contrast. With
+φ_g ≡ 0, nesting holds by the classic rescaling argument (a metric-rung
+point with var(g₂) = v and plane scale φ₂ is reproduced in configural by
+a_i√v and c_i√φ₂), and the ladder is a pure sequence of equality
+constraints plus metric-freeing — well-ordered. Consequences: (i)
+cross-group differences in g-lean load into misfit under the scaled tier,
+stated in the docs exactly like the single-group g ⊥ plane assumption
+(§3.1/§10) — the strict tier, whose fully free per-group Φ has no ridge
+and whose ladder involves only equality constraints (its metric rung being
+vacuous, §6.2 table), remains the tier that can express and compare
+g-lean; (ii) the T3 note's deferred empirical identification check of the
+free-φ_g non-reference block is moot — the remaining metric-rung blocks
+(shared loadings anchored by the reference group's fixed metric; var(g_g)
+and φ_g absorbing group scale) still get the standard empirical SE-sanity
+check in T4's tests, per the T3 lesson that counting is not enough.
 
 **Gating rule:** the latent *mean-based* group contrast requires step 3; the
 latent *measure-profile* group contrast requires step 2 (correlations carry
@@ -1195,6 +1214,14 @@ are as stated).
 
 ## Change log
 
+- 2026-07-07 — T4 opening amendment (§6.2): scaled-tier multi-group metric
+  re-pinned with g–plane covariances fixed to 0 in all groups at all rungs
+  (non-reference groups free var(g_g) + isotropic plane scale φ_g only).
+  The T3 φ_g flip made the originally pinned free-φ_g non-reference block
+  non-nested against the configural rung, invalidating the ladder's Δχ²
+  tests; the amendment restores exact nesting via the rescaling argument.
+  Cross-group g-lean comparisons are a strict-tier capability, documented.
+  The deferred free-φ_g identification check is moot.
 - 2026-07-07 — Primary-source verification pass (Jeff supplied the Wendt
   et al. supplements, Moss 2026, Cheung & Rensvold 2002, Gurtman & Pincus
   2003 in full; devel/m5-wendt-discrepancies.md §8): §3.2 pedigree

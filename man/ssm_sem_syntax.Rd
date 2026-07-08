@@ -10,6 +10,8 @@ ssm_sem_syntax(
   angles = NULL,
   measures = NULL,
   model = c("scaled", "strict"),
+  n_groups = 1,
+  invariance = c("configural", "metric", "scalar", "strict_residuals"),
   include_defined = NULL
 )
 }
@@ -30,7 +32,27 @@ measure (column) names to relate to the circumplex factors.}
 \item{model}{Optional. The measurement-model tier: \code{"scaled"} (default) or
 \code{"strict"}. See Details.}
 
-\item{include_defined}{Optional. Whether to append inspection-only \verb{:=}
+\item{n_groups}{Optional. A single positive whole number: the number of
+groups for a multi-group model. \code{1} (default) emits the single-group
+model. When \code{n_groups >= 2} the generator emits multi-group syntax with a
+mean structure and the invariance constraints selected by \code{invariance};
+fitting it requires \code{\link[lavaan:cfa]{lavaan::cfa()}} called with \verb{group = } a grouping
+variable whose number of levels equals \code{n_groups}. Group ordering follows
+the factor-level order of that variable: the \strong{first} level is the
+reference group, whose factor metric (and, from the scalar rung, whose
+latent means) is fixed.}
+
+\item{invariance}{Optional. The cross-group invariance rung to emit when
+\code{n_groups >= 2}: \code{"configural"} (default), \code{"metric"}, \code{"scalar"}, or
+\code{"strict_residuals"}. Must be left at its default when \code{n_groups == 1}
+(supplying it there is an error). Under the \code{"strict"} tier the \code{"metric"}
+rung is vacuous (all loadings are fixed) and emits the configural
+structure with an explanatory comment. See the package design notes
+(section 6.2) for the adapted fixed-angle invariance ladder.}
+
+\item{include_defined}{Optional. (Single-group models only: for
+\code{n_groups >= 2} the lines are unavailable and an explicit \code{TRUE} is
+ignored with a warning.) Whether to append inspection-only \verb{:=}
 definitions of the covariance-metric \verb{(e, x, y)} coordinates for each
 measure. \code{NULL} (default) emits them automatically under the \code{"strict"}
 tier when at least one measure is present (there they are linear), and
@@ -39,8 +61,9 @@ where they would be nonlinear); \code{FALSE} always suppresses them.}
 }
 \value{
 A single character string of \pkg{lavaan} model syntax, with
-attributes \code{angles} (a \code{circumplex_degree} vector), \code{scales}, \code{model}, and
-\code{weights} (the 3-by-p OLS projection matrix, rows \code{e}, \code{x}, \code{y}).
+attributes \code{angles} (a \code{circumplex_degree} vector), \code{scales}, \code{model},
+\code{weights} (the 3-by-p OLS projection matrix, rows \code{e}, \code{x}, \code{y}),
+\code{n_groups}, and (when \code{n_groups >= 2}) \code{invariance}.
 }
 \description{
 Emit \pkg{lavaan} model syntax for a structural-equation-model formulation of

@@ -8,7 +8,7 @@ ssm_sem_parameters(
   fit,
   scales,
   angles = octants(),
-  measures,
+  measures = NULL,
   ci_method = c("mvn", "boot"),
   boots = 2000,
   interval = 0.95,
@@ -33,9 +33,17 @@ names, in the same order as \code{angles}.}
 in degrees (default = \code{octants()}). Must be the angles the model was
 generated with.}
 
-\item{measures}{Required. A character vector of the measure names.}
+\item{measures}{Optional for multi-group fits, required otherwise. A
+character vector of the measure names; \code{NULL} on a multi-group fit
+selects the latent MEAN path (the fit must carry the mean structure:
+scale intercepts and latent means).}
 
-\item{ci_method, boots, interval, contrast, parallel, ncpus}{See \code{\link[=ssm_sem]{ssm_sem()}}.}
+\item{ci_method, boots, interval, contrast, parallel, ncpus}{See \code{\link[=ssm_sem]{ssm_sem()}}.
+Note that for a multi-group fit the CONTRAST DIRECTION (and the group
+labels in the output) follows the fit's own group order -- lavaan's
+default is order of appearance in the data unless \code{group.label} was
+supplied at fitting time -- so read the direction from the output's
+\code{Group} column, not from factor-level conventions.}
 }
 \value{
 A \code{circumplex_ssm_sem} object; see \code{\link[=ssm_sem]{ssm_sem()}}.
@@ -49,6 +57,16 @@ estimates with in-package confidence intervals. Compatibility with the
 expected parameter structure is checked structurally (the named loading,
 factor-covariance, and measure-covariance parameters must be present), not
 by provenance.
+}
+\details{
+\strong{Important:} multi-group fits are supported here as the partial-invariance
+escape hatch, and this path \emph{bypasses} the invariance gating that
+\code{\link[=ssm_sem]{ssm_sem()}} applies. Where \code{\link[=ssm_sem]{ssm_sem()}} fits a configural-metric-scalar
+ladder and refuses a latent group contrast when the required rung is
+rejected, \code{ssm_sem_parameters()} computes the contrast from whatever
+multi-group fit you supply without testing invariance at all. You own the
+comparability claim: the groups are compared on this instrument's latent
+metric only to the extent the model you fitted makes them comparable.
 }
 \section{Reproducibility}{
 

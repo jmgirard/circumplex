@@ -111,7 +111,7 @@ inlined so the reference survives archiving):
   inherited from Brief E's saturated sketch and are unmeetable/imprecise
   under the spec's estimand — see devel/m5-sem-design.md §5.2, §8.3 and its
   review change log.)*
-- [ ] **T4. Multi-group invariance-constrained latent contrasts
+- [x] **T4. Multi-group invariance-constrained latent contrasts
   (Fable-critical; Opus plumbing).** A separately named workflow (not a
   replacement for the observed contrast) computing the contrast on latent SSM
   parameters under a configural→metric→scalar invariance sequence; the
@@ -146,6 +146,48 @@ inlined so the reference survives archiving):
 
 ## Log
 
+- 2026-07-08 — T4: shipped the multi-group invariance-gated latent contrast
+  workflow. Fable core: group-aware estimand maps (per-group ρ*_g; the
+  latent-mean path μ*_g = ν + Λα_g), the configural→metric→scalar ladder
+  fitted per rung with lavaan's own nested test (scaled under MLR) and
+  CUMULATIVE gating (every tested rung ≤ the path's required rung must be
+  retained; rungs above are reported, never required), the honest
+  non-comparison path (verdict + separate configural profiles, no contrast
+  rendered), joint-draw contrasts through the unchanged
+  ssm_replicate_intervals machinery, and print's invariance block. Opus
+  agents: multi-group syntax emission (per-group c() labels, ==-constraint
+  reference fixing, mean structure per rung, df-verified counting; the
+  repeated-vector label form silences lavaan's intentionality warning) and
+  the docs/NEWS surfaces (side-by-side estimand documentation per §6.1).
+  **Design amendment opened with the task (spec §6.2 change log): scaled-tier
+  g–plane covariances fixed 0 in ALL groups at ALL rungs — the T3 φ_g flip
+  made the originally pinned free-φ_g non-reference block non-nested against
+  configural, which would have invalidated every ladder Δχ² test; nesting
+  restored via the rescaling argument, g-lean comparisons are strict-tier.**
+  /statistical-validation (10 checks): ladder Δχ²/p ≡ lavaan::anova exactly;
+  contrast rotation-invariance and constructed-truth identity at population
+  moments (1e-6°); relabeling antisymmetry — **which caught a real bug:
+  lavaan orders groups by appearance, not factor levels; fixed by passing
+  group.label = levels() (CLAUDE.md contrast contract), regression-tested**;
+  configural ≡ single-group fits; reference-choice invariance (mean path).
+  Coverage harness extended with two-group ±180° measure-path and mean-path
+  cells replaying the shipped procedure incl. gating: zero inadequate
+  verdicts; contrast coverage 0.925–0.964; **gate Type I measured at
+  0.030–0.070 vs nominal α = .05** (the Δχ² gate is calibrated under MLR).
+  /code-review high (6 angles, 10 findings, all fixed): the cumulative-gating
+  bug (gate tested only its own increment — anti-conservative on the mean
+  path, falsely-required above the gate), NA-p verdicts asserting
+  never-run tests, the plain-label accidental cross-group equality guard
+  (spurious ~0 contrasts through the escape hatch), empty-group-after-
+  listwise, include_defined multi-group no-op, mandated multi-group boundary
+  tests (pole straddle, flat group), stale-docs batch, first-class
+  contrast_requested state, helper single-sourcing. Full suite 1724 pass;
+  R CMD check 0/0/0. Boundary suite: ±180° contrast on-branch, pole
+  straddle, flat group, metric-violating non-comparison, cumulative-gating
+  and reported-only-rung regressions. (R/ssm_sem.R, R/ssm_sem_syntax.R,
+  tests/testthat/test-ssm_sem_groups.R, tests/testthat/test-ssm_sem.R,
+  tests/testthat/test-ssm_sem_syntax.R, devel/m5-coverage-oracle.R + .rds,
+  devel/m5-sem-design.md, NEWS.md, man/, MILESTONES.md.)
 - 2026-07-07 — Primary-source verification pass (Jeff supplied Wendt et
   al.'s supplements, Moss 2026, Cheung & Rensvold 2002, and Gurtman &
   Pincus 2003 in full): equal-g ridge-blocking inference confirmed

@@ -13,6 +13,7 @@ ssm_sem(
   contrast = FALSE,
   model = c("scaled", "strict"),
   invariance = NULL,
+  invariance_alpha = 0.05,
   ci_method = c("mvn", "boot"),
   boots = 2000,
   interval = 0.95,
@@ -37,23 +38,52 @@ of each circumplex scale included in \code{scales}, in degrees
 (default = \code{octants()}). The angles are fixed theoretical constants in the
 measurement model, never free parameters.}
 
-\item{measures}{Required. A character vector (or numeric indexes) of one or
-more columns of \code{data} to be related to the latent circumplex content.
-(The single-group latent SSM is the correlation path; latent mean-based
-comparisons are a multi-group product and arrive with the invariance
-workflow.)}
+\item{measures}{Optional with \code{grouping}, required otherwise. A character
+vector (or numeric indexes) of one or more columns of \code{data} to be
+related to the latent circumplex content (the disattenuated correlation
+path). With \code{grouping} and \code{measures = NULL}, the latent MEAN path is
+analyzed instead: each group's model-implied latent mean profile, on the
+raw-score metric. (A single-group latent mean profile is not a product:
+factor means are not identified in one group.)}
 
-\item{grouping, invariance}{Not yet available: the multi-group
-invariance-gated latent contrast workflow is under development, and these
-arguments currently raise an error if set.}
+\item{grouping}{Optional. A string naming the column of \code{data} indicating
+group membership. With \code{grouping}, the fixed-angle measurement model is
+fitted as a multi-group model under an invariance ladder
+(configural, then metric, then -- when required -- scalar), and the
+latent SSM profiles are reported per group. The FIRST factor level is
+the reference group. With \code{measures = NULL} and \code{grouping}, the latent
+MEAN path is analyzed (each group's model-implied latent mean profile).}
 
-\item{contrast}{Optional. A logical indicating whether to output the
-difference between exactly two measures' latent SSM parameters (second
-minus first, displacement contrast in \verb{(-180, 180]} degrees; default =
-FALSE).}
+\item{contrast}{Optional. A logical (default = FALSE) requesting a
+difference of latent SSM parameters, always second minus first with the
+displacement contrast in \verb{(-180, 180]} degrees. Without \code{grouping}:
+exactly two \code{measures} (second measure minus first). With \code{grouping}:
+exactly two groups (second factor level minus first) and at most one
+measure -- one measure gives the group contrast on that measure's
+latent profile, none gives the latent mean-path group contrast. The
+group contrast is invariance-gated; see \code{invariance}.}
 
 \item{model}{Optional. The measurement-model tier passed to
 \code{\link[=ssm_sem_syntax]{ssm_sem_syntax()}}: \code{"scaled"} (default) or \code{"strict"}.}
+
+\item{invariance}{Optional. The highest invariance rung to fit and REPORT
+(\code{"configural"}, \code{"metric"}, \code{"scalar"}, or \code{"strict_residuals"}).
+\code{NULL} (default) uses the path's required rung: \code{"metric"} for the
+measure-profile path, \code{"scalar"} for the latent mean path. A group
+contrast is only computed if EVERY tested rung up through the path's
+required rung is retained by lavaan's own nested test (the scaled
+difference test under robust estimators) -- a rejection at any lower
+rung rejects the constraints the contrast would be computed under.
+Rungs fitted ABOVE the required one are reported but never gate the
+contrast. On rejection, the returned object states the non-comparison
+and reports each group's separate configural profile instead (no
+contrast is rendered by any method). Under the strict tier the metric
+rung is vacuous (all loadings fixed) and is reported as such.}
+
+\item{invariance_alpha}{Optional. The alpha level for the invariance
+gating decision (default = 0.05). The gate is a modeling decision with
+a default test, not an oracle; the invariance table is always returned
+so other criteria can be applied.}
 
 \item{ci_method}{Optional. How to generate parameter replicates: \code{"mvn"}
 (default) draws from a multivariate normal with lavaan's asymptotic
@@ -106,9 +136,13 @@ the \code{"mvn"} engine.}
 A \code{circumplex_ssm_sem} object (a subclass of \code{circumplex_ssm}, so
 \code{\link[=ssm_table]{ssm_table()}} and the \verb{ssm_plot_*} functions work on it), containing
 \code{results} (estimates and intervals), \code{scores} (the latent profile
-vectors), \code{details}, \code{call}, plus \code{sem} (the fitted lavaan model),
-\code{invariance} (reserved; \code{NULL}), and \code{model} (tier, generated syntax, and
-the OLS projection weights).
+vectors), \code{details}, \code{call}, plus \code{sem} (the fitted lavaan model: the
+gate rung's fit for grouped analyses, or the configural fit when the
+gate was rejected), \code{invariance} (for grouped analyses: the ladder
+table, the \code{comparable} flag, the verdict text, the gate rung, and the
+alpha used; \code{NULL} for single-group analyses), and \code{model} (tier,
+generated syntax for single-group fits, and the OLS projection
+weights).
 
 Inadmissible parameter draws (a nonpositive common-part or measure
 variance, or a disattenuated correlation at or beyond 1) are dropped
@@ -157,6 +191,34 @@ spaced angles the two functionals genuinely differ (they coincide exactly
 for equally spaced angles, and more generally under first- and
 second-harmonic balance); under OLS the fit value is a bounded R-squared in
 \verb{[0, 1]} at any spacing.
+
+With \code{grouping}, the latent contrast this function computes and the observed
+contrast that \code{\link[=ssm_analyze]{ssm_analyze()}} computes answer different questions and are not
+substitutes. The \emph{observed} contrast (\code{\link[=ssm_analyze]{ssm_analyze()}} with grouping) asks
+whether the groups' \emph{measured} profiles differ: it is a difference of SSM
+parameters computed from each group's observed scores or correlations. It
+confounds structural difference, differential reliability, and measurement
+non-invariance -- that is a property of its estimand, documented rather than
+a defect, and it requires no invariance assumption. The \emph{latent} contrast
+(\code{ssm_sem()} with grouping) asks whether the groups' \emph{constructs} differ,
+granted the instrument measures the same thing in both groups: it is a
+contrast on latent SSM parameters computed under cross-group equality
+constraints, disattenuated and conditional on measurement invariance. When
+the required invariance rung is rejected the latent contrast is not "more
+principled" -- it is misspecified, and the function therefore returns an
+explicit non-comparison (the verdict plus each group's separate configural
+profile; no contrast is computed or rendered by any method). Neither estimand
+replaces the other; they answer different questions and can legitimately
+disagree.
+
+The displacement contrast is reported as the second group level minus the
+first, in \verb{(-180, 180]} degrees, with branch-aligned circular intervals
+(endpoints may legitimately exceed +/-180 degrees near the boundary). Under
+the scaled tier the general-plane covariances are fixed to zero in all groups
+at all rungs (a stationarity-type assumption): a cross-group difference in a
+general factor's lean into the plane surfaces as misfit, and the strict tier
+is the tier that can express it. Under the strict tier the metric rung is
+vacuous (all loadings fixed) and is reported as such.
 }
 \section{Reproducibility}{
 

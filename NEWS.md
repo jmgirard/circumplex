@@ -20,7 +20,20 @@
   model-syntax generator that works without lavaan installed) and
   `ssm_sem_parameters()` (estimate from a lavaan fit you have modified or
   fitted yourself). Results are `circumplex_ssm` objects, so `ssm_table()`
-  and the `ssm_plot_*` functions work on them unchanged.
+  and the `ssm_plot_*` functions work on them unchanged. With a `grouping`
+  variable, `ssm_sem()` fits the measurement model across groups and gates a
+  latent group contrast on measurement invariance: it tests a
+  configural-metric-scalar ladder using lavaan's own nested-model test (the
+  scaled difference test under robust estimators) at the `invariance` rung
+  (defaulting to each path's required level) and the `invariance_alpha` level,
+  and computes the disattenuated contrast only when the required rung is
+  retained. When invariance is rejected it reports an honest non-comparison —
+  the verdict plus each group's separate configural profile — rather than a
+  contrast that would confound structural difference with measurement
+  non-invariance. Supplying `grouping` without `measures` analyzes the latent
+  mean path (each group's model-implied latent mean profile). The
+  observed-score group contrast in `ssm_analyze()` remains the right tool when
+  invariance cannot be assumed; it answers its own, different question.
 
 This version's flagship addition is `cpm_fit()`, a native reimplementation
 of Browne's (1992) circular stochastic process model for the correlational

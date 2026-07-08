@@ -484,12 +484,14 @@ test_that("ssm_sem() validates its arguments (sec. 7.2)", {
   skip_if_not_installed("lavaan")
   data("jz2017", envir = environment())
   scales <- names(jz2017)[2:9]
-  # No measures: the single-group mean path has no product (sec. 1.3)
+  # No measures without grouping: the single-group mean path has no product
+  # (sec. 1.3)
   expect_error(ssm_sem(jz2017, scales = scales), "measures")
-  # Multi-group workflow arrives with T4
+  # The invariance ladder is a multi-group workflow (T4)
   expect_error(
-    ssm_sem(jz2017, scales = scales, measures = "PARPD", grouping = "Gender"),
-    "T4|invariance|multi-group"
+    ssm_sem(jz2017, scales = scales, measures = "PARPD",
+      invariance = "metric"),
+    "grouping"
   )
   # Contrast arity: exactly two measures
   expect_error(
@@ -537,7 +539,7 @@ test_that("ssm_sem_parameters() refuses angles that do not match the fitted mode
   expect_s3_class(res, "circumplex_ssm_sem")
 })
 
-test_that("ssm_sem_parameters() refuses multi-group lavaan fits (T4 scope)", {
+test_that("ssm_sem_parameters() handles user-supplied multi-group fits per group (T4 escape hatch)", {
   skip_if_not_installed("lavaan")
   a <- rep(0.55, 8)
   cc <- rep(0.6, 8)
@@ -546,20 +548,27 @@ test_that("ssm_sem_parameters() refuses multi-group lavaan fits (T4 scope)", {
   pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
   set.seed(5)
   dat <- as.data.frame(
-    matrix(rnorm(400 * 9), 400, 9) %*% chol(pop$sigma)
+    matrix(rnorm(800 * 9), 800, 9) %*% chol(pop$sigma)
   )
   colnames(dat) <- colnames(pop$sigma)
-  dat$grp <- rep(c("A", "B"), each = 200)
+  dat$grp <- rep(c("A", "B"), each = 400)
   syn <- ssm_sem_syntax(
-    scales = pop$scales, angles = oct, measures = pop$measures
+    scales = pop$scales, angles = oct, measures = pop$measures,
+    n_groups = 2, invariance = "metric"
   )
   fit <- suppressWarnings(lavaan::cfa(syn, data = dat, group = "grp"))
-  expect_error(
-    ssm_sem_parameters(fit,
-      scales = pop$scales, angles = oct,
-      measures = pop$measures, boots = 20
-    ),
-    "[Mm]ulti-group"
+  set.seed(6)
+  res <- suppressWarnings(ssm_sem_parameters(fit,
+    scales = pop$scales, angles = oct,
+    measures = pop$measures, boots = 50
+  ))
+  # One profile row per lavaan group, labeled by the group labels
+  expect_equal(nrow(res$results), 2)
+  expect_setequal(res$results$Group, c("A", "B"))
+  # Both groups were simulated from the same population: profiles agree
+  expect_lt(
+    max(abs(as.numeric(res$scores[1, pop$scales]) -
+      as.numeric(res$scores[2, pop$scales]))), 0.15
   )
 })
 
