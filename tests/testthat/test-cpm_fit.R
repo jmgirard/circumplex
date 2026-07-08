@@ -655,3 +655,48 @@ test_that("free-angle acceptance still holds when a jitter confirms g0", {
     expect_true(fit$accepted, info = paste("variant", v))
   }
 })
+
+# ---- 12. beta = 0 start boundary (Linux-CI regression, 2026-07) --------------
+# The LS start coefficient for a harmonic absent from the population is
+# analytically zero; floating point lands it at exactly 0.0 or +/-1e-16
+# DEPENDING ON THE BLAS (exact 0.0 under the runners' reference BLAS, which
+# crashed cpm_pack's softmax inverse). These tests are platform-independent:
+# the helper is pinned with a literal exact zero, and the engine-level pin
+# asserts the invariant (strictly interior starts) that every platform must
+# satisfy.
+
+test_that("cpm_beta_start_interior() floors exact zeros like their negative twins", {
+  fb <- c(0.4, 0.3, 0.2, 0.1)
+  # the CI crash case: a literal exact-zero trailing coefficient
+  out0 <- cpm_beta_start_interior(c(0.5, 0.3, 0.2, 0), fb)
+  expect_true(all(out0 > 0))
+  expect_equal(out0, c(0.5, 0.3, 0.2, 0.01) / 1.01)
+  # analytically identical epsilon-negative twin takes the same path
+  outn <- cpm_beta_start_interior(c(0.5, 0.3, 0.2, -1e-16), fb)
+  expect_identical(out0, outn)
+  # strictly positive input is untouched (only normalized)
+  pos <- c(0.6, 0.35, 0.049, 0.001)
+  expect_identical(cpm_beta_start_interior(pos, fb), pos / sum(pos))
+  # undefined LS solve and the all-zero corner keep the documented fallback
+  expect_identical(
+    cpm_beta_start_interior(c(NA_real_, 0.3, 0.2, 0.1), fb), fb / sum(fb)
+  )
+  expect_identical(cpm_beta_start_interior(rep(0, 4), fb), fb / sum(fb))
+})
+
+test_that("vanishing-harmonic populations yield strictly interior starts that pack", {
+  # Both CI-failing populations: true beta has m = 2 harmonics, fitted m = 3,
+  # so the m = 3 start coefficient is analytically zero (BLAS-knife-edge).
+  cases <- list(
+    pole = list(theta = c(0, 0, 0.9, 1.8, 2.7, 3.6, 4.5, 5.4), zeta = rep(0.75, 8)),
+    mirror = list(theta = c(0, 0.8, 1.7, 2.6, 3.5, 4.4, 5.3, 6.0), zeta = rep(0.78, 8))
+  )
+  for (nm in names(cases)) {
+    cs <- cases[[nm]]
+    P0 <- cpm_implied_cor(cs$theta, cs$zeta, c(0.5, 0.3, 0.2))
+    sv <- cpm_start_values(P0, cs$theta, m = 3)
+    expect_true(all(sv$beta > 0), label = paste0(nm, ": all(sv$beta > 0)"))
+    spec <- cpm_spec(8, 3, "A", 1)
+    expect_silent(cpm_pack(cs$theta, sv$zeta, sv$beta, spec))
+  }
+})
