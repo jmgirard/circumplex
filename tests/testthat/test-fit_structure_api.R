@@ -153,6 +153,50 @@ test_that("fit_structure validates its arguments", {
   )
 })
 
+# ---- ten-or-more scales require n_perm --------------------------------------
+
+test_that("ten or more scales without n_perm error up front, naming n_perm", {
+  set.seed(7)
+  nv <- 10
+  ang <- (seq_len(nv) - 1) * 2 * pi / nv
+  f1 <- stats::rnorm(150)
+  f2 <- stats::rnorm(150)
+  dat <- as.data.frame(lapply(ang, function(a) {
+    cos(a) * f1 + sin(a) * f2 + 0.4 * stats::rnorm(150)
+  }))
+  names(dat) <- paste0("V", seq_len(nv))
+  # RANDALL's exact null cannot be enumerated beyond nine scales; the error must
+  # name n_perm (and is raised before the four criteria are computed).
+  expect_error(fit_structure(dat, scales = names(dat)), "n_perm")
+  # With n_perm supplied it succeeds on the Monte Carlo RANDALL path.
+  set.seed(7)
+  res <- fit_structure(dat, scales = names(dat), n_perm = 99)
+  expect_identical(res$randall$method, "monte carlo")
+  expect_identical(res$details$nv, 10L)
+})
+
+# ---- missing-data policy ----------------------------------------------------
+
+test_that("listwise deletion is the default and matches the complete-case fit", {
+  data("jz2017")
+  d <- jz2017[octants_jz]
+  d[1, "PA"] <- NA
+  d[2, "BC"] <- NA
+  complete <- d[stats::complete.cases(d), ]
+  # Default listwise = TRUE drops the two incomplete rows, so the result equals
+  # fitting the complete-case data directly (one shared correlation matrix).
+  res_lw <- fit_structure(d, scales = octants_jz, scoring = "raw")
+  res_cc <- fit_structure(complete, scales = octants_jz, scoring = "raw")
+  expect_equal(res_lw$loadings, res_cc$loadings)
+  expect_equal(res_lw$results$Statistic, res_cc$results$Statistic)
+  expect_equal(res_lw$randall$statistic, res_cc$randall$statistic)
+  # listwise = FALSE keeps pairwise deletion, a different correlation matrix.
+  res_pw <- fit_structure(d, scales = octants_jz, scoring = "raw", listwise = FALSE)
+  expect_false(isTRUE(all.equal(res_pw$loadings, res_cc$loadings)))
+  # listwise must be a flag.
+  expect_error(fit_structure(jz2017, scales = octants_jz, listwise = "yes"))
+})
+
 # ---- print / summary snapshots ----------------------------------------------
 
 test_that("print and summary render as expected", {

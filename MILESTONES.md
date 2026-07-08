@@ -41,6 +41,30 @@ bullets).
 
 ## Log
 
+- 2026-07-08 — **M4.5 pre-freeze deferral block CLEARED (v2.0.0 train).**
+  Worked the entire ROADMAP M4.5 close-review follow-up set (not R1/R2; a
+  pre-freeze quality pass on the unreleased structure-test feature). #4:
+  `structure_rt()`'s degeneracy guard moved off the loadings⁴ rotation-profile
+  scale onto the communalities (`all(h2 < DEGEN_TOL)`, matching Fisher),
+  restoring RT's scale invariance — it was voiding valid-but-weak circumplexes
+  to NA that Fisher/VT still define (regression test: RT of rescaled loadings).
+  #5: missing-data policy = listwise deletion by default via a new `listwise`
+  arg matching `ssm_analyze()` (jz2017 octants are complete, so every pin and
+  snapshot is unchanged). #13: `fit_structure()` now errors up front when
+  nv > 9 without `n_perm`, before computing the four criteria, instead of
+  erroring inside RANDALL. Test/quality: a `structure_cutoffs`
+  almost<thrice<twice ordering test + a `stopifnot` in the derivation script;
+  a marginal-circumplex *interior* MC-p reproducibility test (index ≈ .04,
+  p ≈ .40, not pinned at the add-one floor); an exact-path
+  `.Random.seed`-not-created test; the `data[scales]` matrix-misindex fixed via
+  a shared `structure_cormat()` (which also single-sources the correlation
+  construction, retiring the double `cor`); and the summary/plot
+  angle-communality geometry DRY'd into `structure_geometry()`. Evidence: full
+  suite 0F/1773P, print/summary snapshots byte-identical, R CMD check 0/0/0,
+  `/code-review` high-recall pass clean. (R/fit_structure.R,
+  R/fit_structure_oop.R, data-raw/structure-test-cutoffs.R,
+  tests/testthat/test-fit_structure.R, tests/testthat/test-fit_structure_api.R,
+  NEWS.md, man/fit_structure.Rd, ROADMAP.md.)
 - 2026-07-08 — **B6 analytic-CI caution CLOSED.** Jeff ratified the
   marker-validation memo's verdict: ship `cpm_boundary_markers()` unchanged
   (β = 0.10 cut and the `multimodal` marker both confirmed empirically; see

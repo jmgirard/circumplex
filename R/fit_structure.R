@@ -87,7 +87,7 @@ paf2 <- function(r, max_iter = 100L, tol = 1e-4) {
 # normalized loading (VT), so those return NA_real_ if *any* variable is
 # degenerate. Fisher and RT need no per-variable angle and stay defined
 # unless the *whole solution* is degenerate (all communalities negligible for
-# Fisher; a zero rotation profile for RT and VT), where a coefficient of
+# Fisher and RT; a zero rotation profile for VT), where a coefficient of
 # variation would be 0/0 or a ratio of floating-point noise -- also NA_real_,
 # never NaN.
 DEGEN_TOL <- 1e-12
@@ -179,15 +179,35 @@ structure_rt <- function(loadings, grid_deg = seq(0, 85, by = 5)) {
   if (anyNA(loadings)) {
     return(NA_real_)
   }
+  # Like Fisher, RT is a rotation-invariant sum over variables and stays defined
+  # unless the *whole* solution is degenerate. Guard on the communalities (the
+  # loadings^2 scale the other three tests use), not on the rotation profile `x`
+  # below: `x` is on a loadings^4 scale, so a `mean(x) < DEGEN_TOL` cutoff would
+  # void a valid-but-weak circumplex (small communalities) that Fisher and VT
+  # still define -- and since RT is a CV, hence invariant to rescaling the
+  # loadings, that guard would also break its scale invariance. Whenever at least
+  # one communality clears DEGEN_TOL, mean(x) is strictly positive, so this also
+  # rules out the 0/0 the profile guard was protecting against.
+  h2 <- rowSums(loadings^2)
+  if (all(h2 < DEGEN_TOL)) {
+    return(NA_real_)
+  }
   x <- vapply(grid_deg * pi / 180, function(theta) {
     rl2 <- rotate_loadings(loadings, theta)^2
     sum((rl2[, 1] - rl2[, 2])^2 / 2)
   }, numeric(1))
-  # A zero rotation profile (all communalities negligible) is 0/0.
-  if (mean(x) < DEGEN_TOL) {
-    return(NA_real_)
-  }
   stats::sd(x) / mean(x)
+}
+
+# Correlation matrix of the selected circumplex scales, single-sourced so the
+# column selection and the pairwise-deletion policy live in one place for both
+# the factor extraction and RANDALL. Selection MUST be `data[, scales]`, not
+# `data[scales]`: the latter element-indexes a matrix (silently wrong for the
+# matrix inputs these helpers accept), while the former selects columns for both
+# data frames and matrices.
+structure_cormat <- function(data, scales) {
+  mat <- as.matrix(data[, scales, drop = FALSE])
+  stats::cor(mat, use = "pairwise.complete.obs")
 }
 
 structure_loadings <- function(data, scales, ridge = 0) {
@@ -195,8 +215,7 @@ structure_loadings <- function(data, scales, ridge = 0) {
   stopifnot(length(scales) >= 2)
   stopifnot(is_num(ridge, n = 1), ridge >= 0)
 
-  mat <- as.matrix(data[scales])
-  r <- stats::cor(mat, use = "pairwise.complete.obs")
+  r <- structure_cormat(data, scales)
 
   if (ridge > 0) {
     # Add the ridge to the diagonal of the *correlation matrix* (not the data,
@@ -633,8 +652,7 @@ structure_randall_test <- function(data, scales, n_perm = NULL) {
     n_perm <- as.integer(n_perm)
   }
 
-  mat <- as.matrix(data[scales])
-  r <- stats::cor(mat, use = "pairwise.complete.obs")
+  r <- structure_cormat(data, scales)
   nv <- ncol(r)
   pred <- randall_predictions(nv)
   observed <- structure_randall(r, pred)
@@ -733,7 +751,15 @@ structure_randall_test <- function(data, scales, n_perm = NULL) {
 #'   enumeration, available for up to nine scales; otherwise a single positive
 #'   whole number of Monte Carlo relabelings (required for ten or more scales).
 #'   The Monte Carlo path draws from the global RNG stream, so set a seed with
-#'   [set.seed()] beforehand for reproducibility.
+#'   [set.seed()] beforehand for reproducibility. Ten or more scales require
+#'   `n_perm` (exact enumeration is infeasible); supplying it is validated up
+#'   front, before any criteria are computed.
+#' @param listwise A logical indicating whether missing values are handled by
+#'   listwise deletion (`TRUE`, the default) or pairwise deletion (`FALSE`),
+#'   matching [ssm_analyze()]. Listwise deletion gives all five tests one
+#'   complete-case correlation matrix, which is the metric the interpretive
+#'   cutoffs were calibrated on; pairwise deletion can yield a non-positive-
+#'   definite matrix and moves the statistics off that calibrated scale.
 #' @return An object of class `circumplex_structure` with `print()`,
 #'   [summary()], and [plot()] methods. Its components are `results` (a data
 #'   frame with one row per factor-analytic criterion: statistic, cutoffs, and
@@ -761,17 +787,34 @@ structure_randall_test <- function(data, scales, n_perm = NULL) {
 #' res
 #' summary(res)
 fit_structure <- function(data, scales, scoring = c("deviation", "raw"),
-                          ridge = 0, n_perm = NULL) {
+                          ridge = 0, n_perm = NULL, listwise = TRUE) {
   call <- match.call()
   scoring <- match.arg(scoring)
   stopifnot(is.data.frame(data) || is.matrix(data))
   stopifnot(is_var(scales))
   stopifnot(length(scales) >= 4)
   stopifnot(is_num(ridge, n = 1), ridge >= 0)
+  stopifnot(is_flag(listwise))
+  # RANDALL's exact null is enumerable only up to nine scales; catch the missing
+  # n_perm here rather than after computing the four factor-analytic criteria.
+  if (length(scales) > 9 && is.null(n_perm)) {
+    stop(
+      "`n_perm` is required for ten or more scales: RANDALL's null ",
+      "distribution can be enumerated exactly only up to nine scales. ",
+      "Supply a positive whole number of Monte Carlo relabelings.",
+      call. = FALSE
+    )
+  }
 
   mat <- as.matrix(data[, scales, drop = FALSE])
   if (!is.numeric(mat)) {
     stop("`scales` must select numeric columns.", call. = FALSE)
+  }
+  # Missing-data policy matches ssm_analyze(): listwise deletion by default, so
+  # all five tests share one complete-case correlation matrix (the scale the
+  # cutoffs were calibrated on). listwise = FALSE keeps pairwise deletion.
+  if (listwise) {
+    mat <- stats::na.omit(mat)
   }
   # Deviation scoring = row-mean-centering across the selected scales (what
   # ipsatize() does): it removes a general factor so the first two PA factors

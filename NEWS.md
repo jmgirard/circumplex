@@ -115,7 +115,10 @@ Structure", for a worked introduction to both.
   scales — their published cutoffs were calibrated on far more variables and do
   not transfer — and that are keyed to the scoring, since these criteria work
   best with a general factor removed. `fit_structure()` deviation-scores
-  (ipsatizes) by default for that reason, with a raw opt-out. The returned
+  (ipsatizes) by default for that reason, with a raw opt-out. Missing values
+  are handled by listwise deletion by default (a `listwise` argument, matching
+  `ssm_analyze()`), so all five tests share one complete-case correlation
+  matrix — the metric the cutoffs were calibrated on. The returned
   `circumplex_structure` object has `print()`, `summary()`, and `plot()`
   methods; interpretations are presented as the heuristic likelihood
   classifications they are, never as significance tests. See the "Evaluating

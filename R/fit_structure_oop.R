@@ -22,6 +22,21 @@ new_structure <- function(results, randall, loadings, details, call) {
   )
 }
 
+# ---- shared geometry --------------------------------------------------------
+
+# Per-scale circular geometry from a loadings matrix: each scale's estimated
+# angle (degrees in [0, 360), the atan2 of its two principal-axis loadings) and
+# its communality h2 (rowSums of squared loadings). Single-sourced so summary()
+# and plot() share one definition of the displayed/plotted geometry.
+structure_geometry <- function(loadings) {
+  data.frame(
+    Scale = rownames(loadings),
+    Angle = (atan2(loadings[, 2], loadings[, 1]) * 180 / pi) %% 360,
+    Communality = rowSums(loadings^2),
+    stringsAsFactors = FALSE
+  )
+}
+
 # ---- shared formatting helpers ----------------------------------------------
 
 # Map an interpretation category to Acton & Revelle's likelihood phrasing,
@@ -185,13 +200,11 @@ summary.circumplex_structure <- function(object, digits = 3, ...) {
   print(tab, row.names = FALSE, right = FALSE)
 
   # Estimated per-scale geometry: angle (degrees, [0, 360)) and communality.
-  L <- object$loadings
-  h2 <- rowSums(L^2)
-  angle <- (atan2(L[, 2], L[, 1]) * 180 / pi) %% 360
+  g <- structure_geometry(object$loadings)
   geom <- data.frame(
-    Scale = rownames(L),
-    Angle = round(angle, digits),
-    Communality = round(h2, digits),
+    Scale = g$Scale,
+    Angle = round(g$Angle, digits),
+    Communality = round(g$Communality, digits),
     stringsAsFactors = FALSE
   )
   cat("\n# Estimated scale geometry\n\n")
@@ -252,19 +265,16 @@ plot.circumplex_structure <- function(x, amax = 1, legend = TRUE, ...) {
   stopifnot(is_num(amax, n = 1) && amax > 0)
   stopifnot(is_flag(legend))
 
-  L <- x$loadings
-  scales <- rownames(L)
-  h2 <- rowSums(L^2)
+  g <- structure_geometry(x$loadings)
   # Un-rescaled PAF communalities can exceed 1 (a Heywood case), which would put
   # a point past the outer ring; expand the ring to contain the largest so no
   # point is clipped (never shrink a user-supplied amax; ignore NA communalities
   # from a degenerate solution).
-  amax <- max(amax, h2, na.rm = TRUE)
-  angle <- (atan2(L[, 2], L[, 1]) * 180 / pi) %% 360
+  amax <- max(amax, g$Communality, na.rm = TRUE)
   df <- data.frame(
-    Scale = factor(scales, levels = scales),
-    angle = angle,
-    comm = h2
+    Scale = factor(g$Scale, levels = g$Scale),
+    angle = g$Angle,
+    comm = g$Communality
   )
 
   # Canvas spokes at the estimated angles, in angular order, labelled by scale.

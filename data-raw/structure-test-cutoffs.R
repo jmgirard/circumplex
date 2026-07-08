@@ -399,6 +399,15 @@ nv8_tab <- cutoff_table(nv8,
 )
 print(round(nv8_tab, 3))
 
+# The interpretation layer (structure_interpret) walks almost -> thrice -> twice
+# and reports the first band a statistic clears, so a mis-ordered triple would
+# make a band unreachable. The derivation must not emit one. (A testthat pin,
+# test-fit_structure.R, asserts the same on the committed constants.)
+stopifnot(all(
+  nv8_tab[, "almost"] < nv8_tab[, "thrice"],
+  nv8_tab[, "thrice"] < nv8_tab[, "twice"]
+))
+
 # Split-half stability check (Monte Carlo error indicator, printed for the
 # record): cutoffs re-derived on each half of the replications, split by rep
 # so the two scorings of one generated sample stay together.

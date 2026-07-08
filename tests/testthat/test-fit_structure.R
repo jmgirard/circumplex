@@ -268,6 +268,44 @@ test_that("stored nv = 8 cutoffs match the committed derivation record", {
   }
 })
 
+test_that("structure_rt is scale-invariant down to weak communalities (loadings^4 guard)", {
+  # RT is a coefficient of variation, so rescaling every loading must leave it
+  # unchanged. The degeneracy guard used to test the rotation profile on a
+  # loadings^4 scale, so a valid-but-weak circumplex -- small communalities that
+  # Fisher and VT still define -- was wrongly voided to NA. Guarding on the
+  # communalities (loadings^2, the scale the other three tests use) restores the
+  # invariance and the cross-test consistency.
+  circ <- loadings_at(seq(45, 360, by = 45), 0.7)
+  base <- structure_rt(circ)
+  weak <- structure_rt(circ * 1e-4) # communalities ~ 5e-9, well above DEGEN_TOL
+  expect_false(is.na(weak))
+  expect_equal(weak, base, tolerance = 1e-8)
+  # Fisher and VT stay defined on the same weak loadings, so RT must too.
+  expect_false(is.na(structure_fisher(circ * 1e-4)))
+  expect_false(is.na(structure_vt(circ * 1e-4)))
+  # A genuinely flat solution is still NA (never NaN), exactly as before.
+  expect_identical(structure_rt(matrix(0, 8, 2)), NA_real_)
+})
+
+test_that("stored cutoffs are strictly ordered almost < thrice < twice", {
+  # structure_interpret walks almost -> thrice -> twice and reports the first
+  # band a statistic clears, so a mis-ordered triple would make a band
+  # unreachable. Assert the invariant over every stored nv/test/scoring (the
+  # derivation script asserts the same before writing these constants).
+  for (nv in names(structure_cutoffs)) {
+    for (test in names(structure_cutoffs[[nv]])) {
+      for (scoring in names(structure_cutoffs[[nv]][[test]])) {
+        cuts <- structure_cutoffs[[nv]][[test]][[scoring]]
+        expect_true(
+          cuts[["almost"]] < cuts[["thrice"]] &&
+            cuts[["thrice"]] < cuts[["twice"]],
+          info = paste(nv, test, scoring)
+        )
+      }
+    }
+  }
+})
+
 test_that("criterion statistics separate circumplex from simple structure", {
   circ <- loadings_at(seq(45, 360, by = 45), 0.7)
   simple <- loadings_at(rep(c(0, 90, 180, 270), each = 2), 0.7)
@@ -627,6 +665,64 @@ test_that("structure_randall_test RNG contract: exact path leaves the stream unt
   # The Monte Carlo path consumes the global stream.
   invisible(structure_randall_test(jz2017, octants_jz, n_perm = 9))
   expect_false(identical(.Random.seed, seed_before))
+})
+
+test_that("structure_randall_test exact path does not create .Random.seed", {
+  data("jz2017")
+  # Stronger than the "stream untouched" test above: with no RNG state present,
+  # the exact path must consume no randomness at all -- it must not even bring
+  # .Random.seed into existence.
+  if (exists(".Random.seed", envir = globalenv())) {
+    old_seed <- get(".Random.seed", envir = globalenv())
+    rm(".Random.seed", envir = globalenv())
+    on.exit(assign(".Random.seed", old_seed, envir = globalenv()), add = TRUE)
+  }
+  invisible(structure_randall_test(jz2017, octants_jz))
+  expect_false(exists(".Random.seed", envir = globalenv()))
+})
+
+test_that("Monte Carlo RANDALL p is reproducible and interior on a marginal circumplex", {
+  # A noisy circumplex whose order is only partially recovered, so the Monte
+  # Carlo p lands strictly inside (add-one floor, 1) rather than pinned at the
+  # 1/(n_perm + 1) floor -- making seed reproducibility a non-trivial check.
+  set.seed(101)
+  nv <- 8
+  ang <- (seq_len(nv) - 1) * 2 * pi / nv
+  f1 <- stats::rnorm(120)
+  f2 <- stats::rnorm(120)
+  dat <- as.data.frame(lapply(ang, function(a) {
+    cos(a) * f1 + sin(a) * f2 + 5 * stats::rnorm(120)
+  }))
+  names(dat) <- paste0("V", seq_len(nv))
+
+  set.seed(2024)
+  res <- structure_randall_test(dat, names(dat), n_perm = 999)
+  set.seed(2024)
+  res2 <- structure_randall_test(dat, names(dat), n_perm = 999)
+  expect_identical(res$method, "monte carlo")
+  expect_identical(res$p_value, res2$p_value) # reproducible under the seed
+  expect_gt(res$p_value, 2 / 1000) # strictly above the add-one floor
+  expect_lt(res$p_value, 0.9) # still an interior value (index ~ .04, p ~ .40)
+})
+
+test_that("internal helpers select columns correctly from a matrix input", {
+  data("jz2017")
+  m <- as.matrix(jz2017[octants_jz])
+  # `data[scales]` element-indexes a matrix (wrong); `data[, scales]` selects
+  # columns. Loadings and RANDALL from a matrix must match the data-frame path,
+  # for both name and numeric-index selection.
+  expect_equal(
+    structure_loadings(m, octants_jz),
+    structure_loadings(as.data.frame(m), octants_jz)
+  )
+  expect_equal(
+    structure_loadings(m, 1:8),
+    structure_loadings(as.data.frame(m), octants_jz)
+  )
+  expect_equal(
+    structure_randall_test(m, octants_jz)$statistic,
+    structure_randall_test(as.data.frame(m), octants_jz)$statistic
+  )
 })
 
 test_that("structure_randall_test validates its arguments", {

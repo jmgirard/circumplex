@@ -9,7 +9,8 @@ fit_structure(
   scales,
   scoring = c("deviation", "raw"),
   ridge = 0,
-  n_perm = NULL
+  n_perm = NULL,
+  listwise = TRUE
 )
 }
 \arguments{
@@ -34,7 +35,16 @@ statistics off the calibrated scale.}
 enumeration, available for up to nine scales; otherwise a single positive
 whole number of Monte Carlo relabelings (required for ten or more scales).
 The Monte Carlo path draws from the global RNG stream, so set a seed with
-\code{\link[=set.seed]{set.seed()}} beforehand for reproducibility.}
+\code{\link[=set.seed]{set.seed()}} beforehand for reproducibility. Ten or more scales require
+\code{n_perm} (exact enumeration is infeasible); supplying it is validated up
+front, before any criteria are computed.}
+
+\item{listwise}{A logical indicating whether missing values are handled by
+listwise deletion (\code{TRUE}, the default) or pairwise deletion (\code{FALSE}),
+matching \code{\link[=ssm_analyze]{ssm_analyze()}}. Listwise deletion gives all five tests one
+complete-case correlation matrix, which is the metric the interpretive
+cutoffs were calibrated on; pairwise deletion can yield a non-positive-
+definite matrix and moves the statistics off that calibrated scale.}
 }
 \value{
 An object of class \code{circumplex_structure} with \code{print()},
