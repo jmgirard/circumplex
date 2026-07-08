@@ -32,8 +32,37 @@ bullets).
 
 ## Log
 
-- (fresh log for the release-preparation unit; append one line per task on
-  completion, per the workflow loop)
+- 2026-07-08 — R1 (local + container evidence complete; box stays open until
+  the ubuntu CI jobs verify it post-push): diagnosed and fixed the cpm_pack
+  β-boundary error. Root cause found by container reproduction (rocker/r-ver
+  amd64, R 4.6.1): the LS start coefficient for a harmonic absent from the
+  population is analytically zero, and the BLAS decides its floating-point
+  fate — exact 0.0 under the reference netlib BLAS (the ubuntu runners;
+  reproduced: raw LS β₃ = 0.0e0 on the pole population), ±1e-16 under
+  OpenBLAS/Accelerate (verified: +1.7e-16). The start-value clamp
+  `beta0[beta0 < 0] <- 0.01` missed exact zeros, which reached cpm_pack's
+  softmax inverse (`stopifnot(all(b_keep > 0))`) — brief question 2 answered:
+  case (c) start values, the ONLY hole (optimizer works in softmax space,
+  interior by construction; converged solutions are never re-packed — the
+  three production cpm_pack callers are all start sites); question 3: the
+  stopifnot is the right invariant, fix belongs upstream. Fix: extracted
+  `cpm_beta_start_interior()`, flooring surviving exact zeros to 0.01 (same
+  treatment as their analytically identical negative twins), clamp order
+  chosen so every previously non-crashing input is byte-identical (negatives,
+  all-zero fallback, NA fallback preserved exactly). Evidence: byte-identical
+  parity on seeded raw-bootstrap + cormat + engine fits vs saved pre-fix
+  references; container full suite under reference BLAS with CI=true green
+  (0 fail / 101 skip / 1143 pass — the runner config); OpenBLAS + macOS
+  suites green (local 1744 pass); R CMD check 0/0/0;
+  /statistical-validation 7/7 on both platforms vs a hand-written
+  implied-correlation reference (one initial sweep failure was the
+  validation script violating cpm_spec's identification cap — invalid
+  reference, corrected); platform-independent regression tests pin the
+  exact-zero helper contract and the vanishing-harmonic start invariant.
+  Fix committed on ci-cross-platform (924601c, where PR #29's CI verifies
+  it); m5-sem-ssm rebased onto it, m5-complete retagged to the rebased tip.
+  /code-review high: no findings. (R/cpm_fit.R,
+  tests/testthat/test-cpm_fit.R, MILESTONES.md.)
 
 # Completed milestones
 
