@@ -383,7 +383,7 @@ summary(acc)
 #> Population Structure:     Browne circular model (CPM) 
 #> Group Sizes:      All = 250 
 #> Certification Rule:   round(a_lci, 3) > 0 (threshold 0.0005 amplitude units) 
-#> Elapsed:      13.9 s
+#> Elapsed:      13.6 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).

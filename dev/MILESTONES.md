@@ -37,6 +37,34 @@ hand `submit_cran()` to Jeff. Do not submit autonomously.
 
 ## Log
 
+- 2026-07-08 — R1 VERIFIED + M5 landed on master. PR \#29 (cpm_pack
+  fix + CI-portability skips) merged green; PR \#30 (all of M5, rebased
+  on \#29) opened, and its first pass through the full CI matrix — which
+  the CI-blocked m5-sem-ssm branch had never had — surfaced three real,
+  previously-hidden portability defects, each fixed and reproduced under
+  reference (netlib) BLAS in a rocker/r-ver container: (a) the three
+  `ssm_sem*` exports were missing from `_pkgdown.yml`’s reference index
+  (build_reference_index() error); (b) a knife-edge boundary test built
+  a population with ρ\*\_1 == 1 exactly, recovered as 1 ± ~1e-7, so
+  which sec-4.5 guard fired (point-guard vs draw escalation) flipped by
+  platform — rebuilt so ρ\*\_1 ≈ 1.05, robustly over the boundary; (c)
+  [`ssm_sem_syntax()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_syntax.md)
+  emitted mathematically-zero cos/sin loadings (e.g. cos 90°) as ~1e-16
+  libm noise whose low bits differ across platforms’ math libraries,
+  breaking the byte-identical emission on Windows — added `snap_trig()`
+  to snap exact 0/±1 loadings (cleaner and more correct too; verified
+  the snapped syntax still fits). Also hardened the bootstrap-covariance
+  advisory test to be deterministic (a se=“standard” fit relabeled to
+  “bootstrap”) after lavaan’s small-sample bootstrap vcov recomputation
+  threw an internal “model is NULL” on generated-syntax models in the
+  full-suite RNG state. PR \#30 merged green across the full matrix
+  (macOS/Windows/ubuntu ×3/covr/pkgdown); master is now green on all
+  platforms for the first time since M4, clearing the ROADMAP
+  CI-portability release blocker. Only R2 (the v2.0.0 release checklist)
+  remains before the CRAN submission. (R/cpm_fit.R, R/ssm_sem_syntax.R,
+  tests/testthat/test-cpm_fit.R, tests/testthat/test-ssm_sem.R,
+  tests/testthat/test-ssm_sem_syntax.R, \_pkgdown.yml, ROADMAP.md,
+  MILESTONES.md.)
 - 2026-07-08 — R1 (local + container evidence complete; box stays open
   until the ubuntu CI jobs verify it post-push): diagnosed and fixed the
   cpm_pack β-boundary error. Root cause found by container reproduction
