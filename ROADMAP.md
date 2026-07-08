@@ -316,7 +316,7 @@ intended simulation engine.
 
 ## Milestone 5 — SEM-based SSM
 
-**Status: active** (promoted 2026-07-07 on M4.5's close; folds into v2.0.0).
+**Status: GitHub-complete 2026-07-08** (all T1–T5 tasks done and close-reviewed; folds into v2.0.0). Full task list and log archived in MILESTONES-ARCHIVE.md.
 Builds on the lavaan explorations in `devel/lavaan_ssm.Rmd` and
 `devel/circum_lavaan.Rmd`; the statistical design questions are scoped in
 `devel/m5-m6-design-questions.md` (Brief E §M5). The detailed task list with
