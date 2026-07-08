@@ -128,7 +128,12 @@ inlined so the reference survives archiving):
   lavaan), and the boundary caveats.
   *Accept:* builds clean; exported API only; statistical-precision bar
   (CLAUDE.md); every reported CI/estimand claim traces to T1's spec or a cited
-  source.
+  source. Draw on the post-T3 literature note (spec §3.2, change log
+  2026-07-07): cite Gurtman & Pincus (2003)/Locke (2010) for the strict
+  tier's "perfect circumplex" pedigree, and Wendt et al. (2019) for a
+  real-data magnitude of the fixed-angle model's approximation (their
+  CFA-PC RMSEA .075–.111) and independent support for the scaled tier as
+  default.
 
 ## Log
 

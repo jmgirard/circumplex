@@ -257,6 +257,34 @@ and (b) at small p the scaled model is not identified (§3.4) and strict is
 what remains. Its equal-saturation assumption is stated in its
 documentation, not discovered by users.
 
+**Published pedigree (added post-T3, informational).** Up to the .71
+rescaling above, this is Gurtman & Pincus's (2003) "perfect circumplex"
+CFA — equal spacing, equal communalities, i.e. the same fixed unit-cosine
+loadings — and it is the model Locke (2010) derives the standard IPC
+scoring weights from. Wendt et al. (2019, *J. Abnormal Psychology*) fit
+this exact model (their CFA-PC) across four large clinical/community
+samples (N = 5,400/491/656/712) alongside a less-restrictive dimensional
+variant with spacing and communalities both freed (CFA-QC — closer in
+spirit to this spec's scaled tier, though angles remain estimated rather
+than fixed there) and categorical/hybrid alternatives; the fully
+dimensional model won on fit, prediction, robustness, and parsimony
+throughout. Two results are directly useful for T5's docs: (a) CFA-PC's
+measured real-data fit (CFI .938–.957, RMSEA .075–.111 across samples) is
+published evidence that the fixed-loading, fixed-angle model is a real
+but imperfect approximation — exactly the model-conditional caveat §10
+states, now with a citable magnitude; (b) their finding that relaxing the
+perfect-circumplex constraints (their CFA-QC) improved fit without
+sacrificing external validity is independent support for offering the
+scaled tier as this package's default rather than strict. They estimated
+throughout with MLR (robust SEs under nonnormality) — the same
+misspecification-consistent-covariance logic behind this spec's §5.1
+sandwich-vcov decision, arrived at independently for a different
+inferential target (their factor-score SEs, not ours). Not a validation
+oracle for M5 (they model the octants' latent structure per se — persons'
+factor scores on severity/agency/communion — not an external measure's
+disattenuated SSM profile, a different estimand), so no numeric value is
+taken from it; cited for context and the strict-tier correspondence only.
+
 ### 3.3 The measure block (correlation path, P1)
 
 Each external measure M_k enters as an observed variable covarying freely
@@ -1081,6 +1109,16 @@ are as stated).
 - Cudeck, R. (1989). Analysis of correlation matrices using covariance
   structure models. *Psychological Bulletin, 105*(2), 317–327. (§4.4's
   trap; citation details to re-verify at implementation.)
+- Gurtman, M. B., & Pincus, A. L. (2003). The circumplex model: Methods and
+  research applications. In J. A. Schinka & W. F. Velicer (Eds.),
+  *Handbook of psychology: Research methods in psychology* (Vol. 2,
+  pp. 407–428). Wiley. (§3.2: the "perfect circumplex" CFA the strict tier
+  matches up to the .71 rescaling — post-T3 addition, informational only,
+  no numeric value taken from it.)
+- Locke, K. D. (2010). Circumplex measures of interpersonal constructs. In
+  L. M. Horowitz & S. Strack (Eds.), *Handbook of interpersonal
+  psychology* (pp. 313–324). Wiley. (§3.2: the standard IPC scoring weights
+  derived from the perfect-circumplex CFA — post-T3 addition.)
 - Mardia, K. V., & Jupp, P. E. (2000). *Directional Statistics*. Wiley.
   (Concentrated-angle asymptotics behind §5.2's d row.)
 - Meredith, W. (1993). Measurement invariance, factor analysis and factorial
@@ -1095,12 +1133,32 @@ are as stated).
   direction citation.)
 - Vandenberg, R. J., & Lance, C. E. (2000). A review and synthesis of the
   measurement invariance literature. *ORM, 3*(1), 4–70.
+- Wendt, L. P., Wright, A. G. C., Pilkonis, P. A., Nolte, T., Fonagy, P.,
+  Montague, P. R., Benecke, C., Krieger, T., & Zimmermann, J. (2019). The
+  latent structure of interpersonal problems: Validity of dimensional,
+  categorical, and hybrid models. *Journal of Abnormal Psychology, 128*(8),
+  823–839. (§3.2: large-sample CFA-PC/-QC comparison — informational
+  context and the strict-tier correspondence, not a validation oracle for
+  M5's disattenuated-profile estimand — post-T3 addition.)
 - Zimmermann, J., & Wright, A. G. C. (2017). Beyond description in
   interpersonal construct validation. *Assessment, 24*(1), 3–23.
   (Interpretation benchmarks; coverage-study framing.)
 
 ## Change log
 
+- 2026-07-07 — Post-T3 literature note (§3.2, References; no code, no
+  numeric values taken): identified that the strict tier is, up to the
+  documented .71 rescaling, Gurtman & Pincus's (2003) "perfect circumplex"
+  CFA (the basis of Locke's 2010 standard IPC scoring weights), and that
+  Wendt et al. (2019) fit exactly this model across four large samples
+  alongside a less-restrictive dimensional variant, categorical, and hybrid
+  alternatives — the fully dimensional model won throughout. Two results
+  flagged for T5: their measured CFA-PC fit (RMSEA .075–.111) is a citable
+  real-data magnitude for §10's model-conditional-approximation caveat, and
+  their finding that relaxing perfect-circumplex constraints improved fit
+  without losing validity independently supports the scaled tier as
+  default. Not a validation oracle (their estimand is factor scores on the
+  octants themselves, not an external measure's disattenuated profile).
 - 2026-07-07 — T3 engine decision (§5.1, §8.3): coverage study run
   (devel/m5-coverage-oracle.R, seeded; results .rds committed alongside).
   `"mvn"` confirmed as the default engine with the sandwich-vcov amendment
