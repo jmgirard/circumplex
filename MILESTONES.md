@@ -146,6 +146,43 @@ inlined so the reference survives archiving):
 
 ## Log
 
+- 2026-07-08 — M5 milestone-close `/code-review max` over the full cumulative
+  diff (ci-cross-platform...HEAD; 10 finder angles + verify + sweep).
+  **Statistics confirmed clean:** both heavyweight correctness angles
+  returned empty after empirical validation (free-parameter indexing vs an
+  independent implied-moments computation at 5.5e-17; MVN draws satisfy
+  lavaan's equality constraints ~1e-9; contrast direction exercised live
+  under non-alphabetical group appearance; every subclass consumer seam
+  traced with real executions). 15 findings reported, all in the
+  doc/guard/display layer; 9 fixed same-day: (1) the falsified
+  "closed-form ≡ OLS only when equally spaced" necessity claim corrected in
+  4 CRAN-facing roxygen passages (ssm_analyze/ssm_parameters/ssm_score —
+  the F11 sharpening had stopped at the memory files); (2) `sem_fmt_p()` so
+  no verdict/ladder/global-fit line ever prints the improper "p = 0"
+  (now "p < 0.001"); (3) ssm_plot_contrast() on a gate-rejected latent
+  contrast now restates the invariance verdict instead of a bare stopifnot
+  (the old loose test regex matched the cryptic message — pin
+  strengthened); (4) ssm_sem_parameters() now runs the shared
+  sem_health_gate() (post.check caution parity with ssm_sem, spec §4.5);
+  (5/6) actionable engine-precondition errors for se="none"+mvn and
+  summary-moment+boot; (7) advisory when a bootstrap-covariance fit meets
+  the mvn engine; (8) intentional-equality hedge in the cross-group
+  equality guard's message; (9) vignette chunk gating corrected so
+  lavaan-free content (ssm_sem_syntax, the estimand table) builds without
+  lavaan — verified by a simulated lavaan-less render. One finding
+  no_change_needed (the is_count() inline form matches ssm_analyze(), the
+  direct family sibling; uniform helper deferred). Five cleanup findings +
+  below-cap batch deferred to ROADMAP M5 follow-up bullets (vectorization
+  and harness-algebra items need FP-parity/oracle re-record care, wrong
+  week pre-freeze). Two candidates refuted as deliberate design
+  (spec-mandated point-vs-draw thresholds; independent oracle weights in
+  tests). New regression tests: sem_fmt_p unit, both engine-precondition
+  errors, the bootstrap-vcov advisory, strict non-comparison plot-refusal
+  pins. Full suite green post-fix; both vignette build modes render.
+  (R/ssm_sem.R, R/ssm_plot.R, R/ssm_analysis.R,
+  tests/testthat/test-ssm_sem.R, tests/testthat/test-ssm_sem_groups.R,
+  vignettes/sem-based-ssm-analysis.Rmd, man/ssm_analyze.Rd,
+  man/ssm_parameters.Rd, man/ssm_score.Rd, ROADMAP.md, MILESTONES.md.)
 - 2026-07-08 — T5: added the "SEM-Based SSM Analysis" vignette
   (vignettes/sem-based-ssm-analysis.Rmd), adapting devel/lavaan_ssm.Rmd into
   a teaching document. Covers both estimands (P1 latent profile via

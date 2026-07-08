@@ -9,14 +9,16 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-# This vignette uses lavaan, which circumplex only Suggests. Every code chunk
-# is gated on lavaan being installed so the vignette still builds without it.
+# This vignette uses lavaan, which circumplex only Suggests. Chunks that FIT
+# models are gated on lavaan being installed so the vignette still builds
+# without it; chunks that need no lavaan (the syntax generator, which works
+# without it by design, and plain tables) carry an explicit eval = TRUE.
 has_lavaan <- requireNamespace("lavaan", quietly = TRUE)
 knitr::opts_chunk$set(eval = has_lavaan)
 library(ggplot2)
 ```
 
-```{r setup}
+```{r setup, eval = TRUE}
 library(circumplex)
 ```
 
@@ -84,7 +86,7 @@ below:
 worth seeing the model it generates. `ssm_sem_syntax()` returns that model as
 a string:
 
-```{r syntax}
+```{r syntax, eval = TRUE}
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
 syntax <- ssm_sem_syntax(scales = scales, angles = octants(), measures = "NARPD")
 cat(syntax)
@@ -269,7 +271,7 @@ profiles.
 When you have groups, there are **two** distinct estimands, and `circumplex`
 keeps them separate on purpose.
 
-```{r estimand-table, echo = FALSE}
+```{r estimand-table, echo = FALSE, eval = TRUE}
 tab <- data.frame(
   Question = c(
     "Do the groups' *measured* profiles differ?",

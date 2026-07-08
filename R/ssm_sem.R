@@ -32,6 +32,27 @@ sem_fm_pick <- function(fm, ...) {
   NA_real_
 }
 
+# p-value display, shared by the verdict strings, the ladder table, and the
+# print method: a p that rounds to zero at `digits` is displayed as a bound
+# ("< 0.001"), never as the statistically improper "p = 0". With
+# prose = TRUE the comparator is included ("= 0.043" / "< 0.001") so callers
+# can write sprintf("p %s", ...).
+sem_fmt_p <- function(p, digits = 3, prose = FALSE) {
+  thr <- 10^(-digits)
+  vapply(p, function(pi) {
+    if (is.na(pi)) {
+      return(NA_character_)
+    }
+    if (pi < thr) {
+      paste0("< ", format(thr, scientific = FALSE))
+    } else if (prose) {
+      paste0("= ", format(round(pi, digits)))
+    } else {
+      format(round(pi, digits))
+    }
+  }, character(1))
+}
+
 # Structure extraction (spec section 4.1 / 7.2) ---------------------------------
 
 # Locate one parameter-table row by (lhs, op, rhs) within one group's block,
@@ -384,7 +405,10 @@ sem_estimate <- function(fit, scales, angles_deg, measures, ci_method, boots,
           "fitted with `group =`; the group profiles are then forced equal ",
           "by construction and no group contrast is estimable. Regenerate ",
           "the model with ssm_sem_syntax(n_groups = ", G, ", invariance = ",
-          "...) or use ssm_sem(grouping = ).",
+          "...) or use ssm_sem(grouping = ). If the equality was ",
+          "intentional, note that it makes the groups' latent profiles ",
+          "identical up to a variance rescaling, so neither separate ",
+          "profiles nor a contrast are meaningful to report.",
           call. = FALSE
         )
       }
@@ -722,8 +746,8 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   req_i <- match(required, rung_order)
   fmt_test <- function(row) {
     sprintf(
-      "%s(%g) = %s, p = %s", "\u0394\u03c7\u00b2", row$ddf,
-      format(round(row$dchisq, 2)), format(round(row$p, 4))
+      "%s(%g) = %s, p %s", "\u0394\u03c7\u00b2", row$ddf,
+      format(round(row$dchisq, 2)), sem_fmt_p(row$p, 4, prose = TRUE)
     )
   }
   gating <- table[match(table$rung, rung_order) <= req_i &
@@ -1362,14 +1386,44 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
       )
     }
   }
-  if (!lavaan::lavInspect(fit, "converged")) {
-    stop("The supplied lavaan fit did not converge; no latent SSM ",
-      "parameters can be reported.",
+  # The same health gate ssm_sem() applies: convergence is a hard stop, and
+  # lavaan's post-estimation flags (e.g., a negative variance estimate) get
+  # the same caution here -- a user-supplied fit is not exempt from
+  # "global model health is surfaced before any SSM output" (spec 4.5).
+  sem_health_gate(fit)
+  parallel <- match.arg(parallel, c("no", "multicore", "snow"))
+  stopifnot(is.numeric(ncpus) && ncpus >= 1 && ceiling(ncpus) == floor(ncpus))
+
+  # Engine preconditions checked up front with actionable errors, rather
+  # than letting lavaan abort mid-engine with an internal message: the mvn
+  # engine needs a parameter covariance (absent under se = "none"), and the
+  # bootstrap engine needs raw data to resample (absent for summary-moment
+  # fits).
+  fit_se <- tryCatch(
+    lavaan::lavInspect(fit, "options")$se,
+    error = function(e) NULL
+  )
+  has_raw_data <- !inherits(
+    tryCatch(lavaan::lavInspect(fit, "data"), error = function(e) e),
+    "error"
+  )
+  if (ci_method == "mvn" && identical(fit_se, "none")) {
+    stop(
+      "This lavaan fit was made with se = \"none\", so it carries no ",
+      "parameter covariance and the \"mvn\" engine cannot draw from it. ",
+      "Refit with standard errors (se = \"robust.huber.white\", ssm_sem()'s ",
+      "default, is recommended) or use ci_method = \"boot\".",
       call. = FALSE
     )
   }
-  parallel <- match.arg(parallel, c("no", "multicore", "snow"))
-  stopifnot(is.numeric(ncpus) && ncpus >= 1 && ceiling(ncpus) == floor(ncpus))
+  if (ci_method == "boot" && !has_raw_data) {
+    stop(
+      "Bootstrap resampling requires a fit made from raw data; this fit ",
+      "was made from summary moments (sample.cov), which cannot be ",
+      "resampled. Use ci_method = \"mvn\".",
+      call. = FALSE
+    )
+  }
 
   est <- sem_estimate(
     fit,
@@ -1385,15 +1439,8 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
   # (after the hard guards, so refusals are not preceded by advice about
   # intervals that will never exist). Only raw-data fits are warned: with
   # summary-moment (sample.cov) input, lavaan cannot compute a sandwich, so
-  # the plain covariance is all there is.
-  fit_se <- tryCatch(
-    lavaan::lavInspect(fit, "options")$se,
-    error = function(e) NULL
-  )
-  has_raw_data <- !inherits(
-    tryCatch(lavaan::lavInspect(fit, "data"), error = function(e) e),
-    "error"
-  )
+  # the plain covariance is all there is. (fit_se and has_raw_data were
+  # extracted with the engine preconditions above.)
   if (ci_method == "mvn" && identical(fit_se, "standard") && has_raw_data) {
     warning(
       "This lavaan fit uses se = \"standard\", so the \"mvn\" intervals ",
@@ -1401,6 +1448,16 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
       "validation found to undercover displacement when the fixed-angle ",
       "model is only an approximation. Refit with ",
       "se = \"robust.huber.white\" (ssm_sem()'s default).",
+      call. = FALSE
+    )
+  }
+  if (ci_method == "mvn" && identical(fit_se, "bootstrap")) {
+    warning(
+      "This lavaan fit uses se = \"bootstrap\", so the \"mvn\" intervals ",
+      "propagate a bootstrap-estimated covariance: their quality depends ",
+      "on the number of bootstrap draws behind that estimate. With few ",
+      "draws, prefer refitting with se = \"robust.huber.white\" or using ",
+      "ci_method = \"boot\" directly.",
       call. = FALSE
     )
   }
@@ -1451,10 +1508,12 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
     cat(
       sprintf("Global fit (N = %d%s):", n, if (robust) ", robust" else ""),
       sprintf(
-        "chisq(%g) = %s, p = %s",
+        "chisq(%g) = %s, p %s",
         sem_fm_pick(fm, "df.scaled", "df"),
         format(round(sem_fm_pick(fm, "chisq.scaled", "chisq"), digits)),
-        format(round(sem_fm_pick(fm, "pvalue.scaled", "pvalue"), digits))
+        sem_fmt_p(sem_fm_pick(fm, "pvalue.scaled", "pvalue"), digits,
+          prose = TRUE
+        )
       ), "\n"
     )
     cat(sprintf(
@@ -1480,7 +1539,7 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
       rmsea = round(tab$rmsea, digits),
       dchisq = round(tab$dchisq, digits),
       ddf = tab$ddf,
-      p = round(tab$p, digits)
+      p = sem_fmt_p(tab$p, digits)
     )
     print(show, row.names = FALSE, na.print = "")
     if (any(nzchar(tab$note))) {

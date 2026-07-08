@@ -330,6 +330,27 @@ acceptance criteria (T1–T5) is the active list in MILESTONES.md.
       `circumplex_instrument` objects.
 - `lavaan` moves to `Suggests`; features degrade gracefully without it.
 - Vignette: "SEM-based SSM Analysis" (adapt `devel/lavaan_ssm.Rmd`).
+- Follow-ups deferred from the M5 close-review (`/code-review max`,
+  2026-07-08; the statistics were confirmed clean — two correctness angles
+  returned empty after empirical validation — and the 9 fix-now findings
+  landed same-day, see the M5 log). Post-v2.0.0, deliberately not pre-freeze
+  because they churn validated code: (a) vectorize `sem_estimate()`'s
+  per-draw `apply()` into one matrix pass (spec §9's stated form) — floating
+  point reorders, so every seeded pin must be re-verified in the same
+  change; (b) `make_pop_2g()` in `devel/m5-coverage-oracle.R` should call
+  `sem_pop()` (the one-copy truth-algebra discipline its own header claims),
+  re-recording the affected two-group cells; (c) one shared contrast-arity
+  validator for `ssm_sem()`/`ssm_sem_parameters()`; (d) a
+  fit-this-syntax chokepoint owning the estimator/se/missing translation and
+  `group.label` protection for the two `lavaan::cfa()` sites; (e)
+  `summary.circumplex_ssm_sem()` delegating shared detail lines through a
+  label seam instead of re-implementing them; (f) a package-wide
+  scalar-count validation helper (`is_count(x, n = 1)`-style) adopted
+  uniformly across the `ssm_analyze()`/`cpm_fit()`/`ssm_sem()` families,
+  which today interpret the CLAUDE.md `is_*()` rule two different ways;
+  (g) minor: strict-tier syntax emission single-sourced across the
+  single-/multi-group branches, test-fixture consolidation, the unused
+  `npar` struct field, `sem_details()`'s always-overwritten `score_type`.
 
 ## Milestone 6 — Longitudinal & intraindividual SSM
 

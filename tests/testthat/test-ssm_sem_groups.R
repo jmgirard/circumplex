@@ -169,9 +169,12 @@ test_that("non-comparison path: metric failure yields a stated non-comparison, n
   # No contrast row; per-group (configural) profiles may still be reported
   expect_false(any(grepl(" - ", res$results$Label, fixed = TRUE)))
   expect_false(isTRUE(res$details$contrast))
-  # print states the non-comparison; contrast plot refuses
+  # print states the non-comparison; contrast plot refuses BY RESTATING THE
+  # VERDICT (the pre-review bare stopifnot matched the old loose "contrast"
+  # pattern here while telling the user nothing -- keep this pin strict)
   expect_output(print(res), "cannot be compared|not computed|rejected")
-  expect_error(ssm_plot_contrast(res), "contrast|invariance|compare")
+  expect_error(ssm_plot_contrast(res), "not computed")
+  expect_error(ssm_plot_contrast(res), "cannot be compared")
 })
 
 # The +/-180 branch cut on the latent group contrast (sec. 5.5/6.4) ---------------

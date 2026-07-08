@@ -738,3 +738,73 @@ test_that("inherited consumers render latent results sensibly: ssm_table() and p
   p2 <- ssm_plot_curve(res)
   expect_s3_class(p2, "ggplot")
 })
+
+# M5 milestone-close review fixes (2026-07-08) --------------------------------
+
+test_that("sem_fmt_p() never renders a p-value as exactly zero", {
+  # Decisive p-values display as a bound, not the improper "p = 0"
+  expect_identical(sem_fmt_p(9.4e-7, 4), "< 0.0001")
+  expect_identical(sem_fmt_p(9.4e-7, 4, prose = TRUE), "< 0.0001")
+  expect_identical(sem_fmt_p(0.0432, 3, prose = TRUE), "= 0.043")
+  expect_identical(sem_fmt_p(0.0432, 3), "0.043")
+  expect_identical(sem_fmt_p(NA_real_, 3), NA_character_)
+  # Boundary: exactly at the threshold is representable, not bounded
+  expect_identical(sem_fmt_p(1e-3, 3), "0.001")
+})
+
+test_that("engine preconditions on user-supplied fits fail with actionable errors", {
+  skip_if_not_installed("lavaan")
+  a <- rep(0.55, 8)
+  cc <- rep(0.6, 8)
+  theta <- seq(0.3, 0.6, length.out = 8)
+  sigma_m <- cbind(c(0.2, 0.3, 0.2))
+  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+
+  # A summary-moment (sample.cov) fit cannot be resampled
+  fit_cov <- sem_pop_fit(pop, n = 500)
+  expect_error(
+    ssm_sem_parameters(
+      fit_cov,
+      scales = pop$scales, angles = oct, measures = pop$measures,
+      ci_method = "boot", boots = 10
+    ),
+    "summary moments"
+  )
+
+  # A fit with se = "none" carries no covariance for the mvn engine
+  fit_none <- sem_pop_fit(pop, n = 500, se = "none")
+  expect_error(
+    ssm_sem_parameters(
+      fit_none,
+      scales = pop$scales, angles = oct, measures = pop$measures,
+      ci_method = "mvn", boots = 10
+    ),
+    "se = \"none\""
+  )
+})
+
+test_that("a bootstrap-covariance fit meeting the mvn engine gets an advisory", {
+  skip_if_not_installed("lavaan")
+  a <- rep(0.55, 8)
+  cc <- rep(0.6, 8)
+  theta <- seq(0.3, 0.6, length.out = 8)
+  sigma_m <- cbind(c(0.2, 0.3, 0.2))
+  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  set.seed(42)
+  n <- 400
+  z <- matrix(stats::rnorm(n * nrow(pop$sigma)), n)
+  dat <- as.data.frame(z %*% chol(pop$sigma))
+  names(dat) <- colnames(pop$sigma)
+  syn <- ssm_sem_syntax(
+    scales = pop$scales, angles = oct, measures = pop$measures
+  )
+  fit_boot <- lavaan::cfa(syn, data = dat, se = "bootstrap", bootstrap = 20)
+  set.seed(7)
+  expect_warning(
+    ssm_sem_parameters(
+      fit_boot,
+      scales = pop$scales, angles = oct, measures = pop$measures, boots = 50
+    ),
+    "bootstrap-estimated covariance"
+  )
+})
