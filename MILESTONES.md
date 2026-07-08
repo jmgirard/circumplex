@@ -129,18 +129,39 @@ inlined so the reference survives archiving):
   *Accept:* builds clean; exported API only; statistical-precision bar
   (CLAUDE.md); every reported CI/estimand claim traces to T1's spec or a cited
   source. Draw on the post-T3 literature notes (spec §3.2 and
-  devel/m5-wendt-discrepancies.md): cite Gurtman & Pincus (2003)/Locke
-  (2010) for the strict tier's "perfect circumplex" pedigree; Wendt et
-  al. (2019) for a real-data magnitude of the fixed-angle model's
-  approximation (CFA-PC RMSEA .075–.111) and of the scaled tier's
-  g ⊥ plane assumption being violated on IIP data (replicated g–agency
-  r ≈ −.3; the strict tier estimates it); Moss (2026) for
-  disattenuated-correlation inference context; and position the latent
-  SSM estimand as novel (no prior latent-level SSM work found,
-  2026-07-07 search).
+  devel/m5-wendt-discrepancies.md, incl. its §8 source verification):
+  cite Wendt et al. (2019) for the strict tier's CFA-PC correspondence
+  (their R Code S25; "perfect circumplex" terminology via Gurtman &
+  Pincus 2003, whose own confirmatory model is Browne's CIRCUM — the
+  `cpm_fit()` family), for a real-data magnitude of the fixed-angle
+  model's approximation (CFA-PC RMSEA .075–.111), and for the scaled
+  tier's g ⊥ plane assumption being violated on IIP data (replicated
+  g–agency r ≈ −.3; the strict tier estimates it); the CFA-PC ≡ m = 1
+  CIRCUM equivalence at φ_g = 0 as the bridge between the package's two
+  model families; Moss (2026) for why standardization/reliability
+  uncertainty must be propagated (his Hunter–Schmidt coverage collapse
+  to ~0.35), minding the both-sides vs scale-side disattenuation
+  estimand difference; and position the latent SSM estimand as novel
+  (no prior latent-level SSM work found, 2026-07-07 search).
 
 ## Log
 
+- 2026-07-07 — Primary-source verification pass (Jeff supplied Wendt et
+  al.'s supplements, Moss 2026, Cheung & Rensvold 2002, and Gurtman &
+  Pincus 2003 in full): equal-g ridge-blocking inference confirmed
+  verbatim (supplement R Code S25); spec §3.2 pedigree corrected — G&P
+  2003's confirmatory model is Browne's CIRCUM, so the fixed-cosine CFA
+  is Wendt et al.'s own construction, and CFA-PC ≡ m = 1 equal-ζ CIRCUM
+  at φ_g = 0 (the meeting point of the package's two model families,
+  candidate T5/M6 cross-model pin); C&R 2002 ΔGFI criteria transcribed
+  (devel/cr2002-transcription.md — resolves spec §12.2's TBT; the
+  source's internally contradictory p. 251 sentence and its
+  two-group/plain-ML/normality scope caveats documented); Moss 2026 read
+  in full (independent endorsement of the fit-and-propagate
+  architecture; citable Hunter–Schmidt coverage-collapse magnitudes;
+  both-sides vs scale-side disattenuation estimand caution for T5). Docs
+  only — no code changed. (devel/m5-wendt-discrepancies.md §8,
+  devel/cr2002-transcription.md, devel/m5-sem-design.md, MILESTONES.md.)
 - 2026-07-07 — Wendt et al. (2019) discrepancy evaluation (post-T3;
   devel/m5-wendt-discrepancies.md): all departures from the closest
   published neighbor assessed — one fixed (ssm_sem() defaults to

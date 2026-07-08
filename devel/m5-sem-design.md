@@ -257,18 +257,35 @@ and (b) at small p the scaled model is not identified (§3.4) and strict is
 what remains. Its equal-saturation assumption is stated in its
 documentation, not discovered by users.
 
-**Published pedigree (added post-T3, informational).** Up to the .71
-rescaling above, this is Gurtman & Pincus's (2003) "perfect circumplex"
-CFA — equal spacing, equal communalities, i.e. the same fixed unit-cosine
-loadings — and it is the model Locke (2010) derives the standard IPC
-scoring weights from. Wendt et al. (2019, *J. Abnormal Psychology*) fit
-this exact model (their CFA-PC) across four large clinical/community
-samples (N = 5,400/491/656/712) alongside a less-restrictive dimensional
-variant with spacing and communalities both freed (CFA-QC — closer in
-spirit to this spec's scaled tier, though angles remain estimated rather
-than fixed there) and categorical/hybrid alternatives; the fully
-dimensional model won on fit, prediction, robustness, and parsimony
-throughout. Two results are directly useful for T5's docs: (a) CFA-PC's
+**Published pedigree (added post-T3, informational; source-verified
+2026-07-07 against the primary documents — see
+devel/m5-wendt-discrepancies.md §8).** The explicit three-factor CFA with
+fixed unit-cosine plane loadings — this tier's shape — is **Wendt et
+al.'s (2019) CFA-PC**, whose exact lavaan specification (their supplement,
+R Code S25: one equality-labeled general loading `L1` on all eight
+octants; style loadings `L2` with off-axis `L3 == 0.707*L2`;
+`AG ~~ 0*COM`; free g–style covariances) matches the strict tier up to
+rescaling, up to their 3-digit `0.707` literal (this generator emits exact
+cos/sin at full double precision instead), and up to the strict tier
+additionally freeing the plane block of Φ. Wendt et al. attribute the
+"perfect circumplex" constraint language to Gurtman & Pincus (2003), but
+that chapter's confirmatory model is **Browne's (1992) CIRCUM** — the
+Fourier-series circulant, this package's `cpm_fit()` family — where "equal
+spacing" and "equal communalities" name CIRCUM variants, not a factor
+parameterization. The connection is nonetheless real and unifying: at
+φ_g = 0, equal saturations, and equally spaced angles, CFA-PC's implied
+structure **is** the m = 1 equal-ζ equally-spaced circumplex (β₀ ↔ the
+general variance, β₁ ↔ the plane variance) — the point where this
+package's two model families (fixed-angle SEM tier and `cpm_fit()`) meet —
+and the free g–style covariances are exactly what breaks the circulant
+symmetry (Σ_ij gains cosθ_i + cosθ_j terms). Locke (2010) is cited by
+Wendt et al. for the corresponding IPC scoring formulas (secondhand here;
+not independently verified). Their CFA-QC is a mild relaxation of CFA-PC
+(κ 20 → 23; its exact specification is not in their supplements), **not**
+a per-scale free-saturation model like this spec's scaled tier. Across
+four large clinical/community samples (N = 5,400/491/656/712), the fully
+dimensional models won on fit, prediction, robustness, and parsimony
+against categorical/hybrid alternatives throughout. Two results are directly useful for T5's docs: (a) CFA-PC's
 measured real-data fit (CFI .938–.957, RMSEA .075–.111 across samples) is
 published evidence that the fixed-loading, fixed-angle model is a real
 but imperfect approximation — exactly the model-conditional caveat §10
@@ -1063,6 +1080,13 @@ the machinery pins pass — it consumes the working estimator.
 2. **Invariance verdict statistic** (§6.2): Δχ² default now, ΔCFI (TBT)
    added later as an option — or hold the whole verdict machinery until the
    transcription lands and print indices only? Proposed: Δχ² default now.
+   **Update 2026-07-07: the transcription has landed**
+   (`devel/cr2002-transcription.md`, from the full Cheung & Rensvold 2002
+   text; includes the source's internally contradictory p. 251 sentence,
+   the operational rule, and the binding scope caveats — two groups,
+   plain ML, normality, never validated for robust indices). Offering the
+   ΔCFI flag as a labeled secondary criterion is now unblocked; whether to
+   offer it remains Jeff's call at T4. Δχ² stays the default either way.
 3. **g–plane covariances free by default** (§3.1): proposed yes, pending
    T2's identification check; flip recorded here if it fails.
    **RESOLVED 2026-07-07 (T3): the check failed — flipped to 0-fixed, no
@@ -1134,13 +1158,16 @@ are as stated).
 - Gurtman, M. B., & Pincus, A. L. (2003). The circumplex model: Methods and
   research applications. In J. A. Schinka & W. F. Velicer (Eds.),
   *Handbook of psychology: Research methods in psychology* (Vol. 2,
-  pp. 407–428). Wiley. (§3.2: the "perfect circumplex" CFA the strict tier
-  matches up to the .71 rescaling — post-T3 addition, informational only,
-  no numeric value taken from it.)
+  pp. 407–428). Wiley. (§3.2: source of the "equal spacing / equal
+  communalities" constraint taxonomy — verified 2026-07-07: its
+  confirmatory model is Browne's CIRCUM, the `cpm_fit()` family, not a
+  factor parameterization; also useful CPM-side background. Informational
+  only, no numeric value taken from it.)
 - Locke, K. D. (2010). Circumplex measures of interpersonal constructs. In
   L. M. Horowitz & S. Strack (Eds.), *Handbook of interpersonal
-  psychology* (pp. 313–324). Wiley. (§3.2: the standard IPC scoring weights
-  derived from the perfect-circumplex CFA — post-T3 addition.)
+  psychology* (pp. 313–324). Wiley. (§3.2: cited by Wendt et al. (2019)
+  for the IPC scoring formulas corresponding to their CFA-PC — secondhand,
+  not independently verified.)
 - Mardia, K. V., & Jupp, P. E. (2000). *Directional Statistics*. Wiley.
   (Concentrated-angle asymptotics behind §5.2's d row.)
 - Meredith, W. (1993). Measurement invariance, factor analysis and factorial
@@ -1168,6 +1195,19 @@ are as stated).
 
 ## Change log
 
+- 2026-07-07 — Primary-source verification pass (Jeff supplied the Wendt
+  et al. supplements, Moss 2026, Cheung & Rensvold 2002, Gurtman & Pincus
+  2003 in full; devel/m5-wendt-discrepancies.md §8): §3.2 pedigree
+  re-corrected — G&P 2003's confirmatory model is Browne's CIRCUM (the
+  `cpm_fit()` family), so the fixed-cosine three-factor CFA is Wendt et
+  al.'s own construction (their R Code S25, which confirms the equal-g
+  ridge-blocking inference verbatim); the CFA-PC ≡ m = 1 equal-ζ CIRCUM
+  equivalence at φ_g = 0 recorded as the meeting point of the package's
+  two model families; §12.2's ΔCFI TBT resolved by transcription
+  (devel/cr2002-transcription.md, with the source's internal
+  contradiction and scope caveats documented); Locke (2010) demoted to
+  secondhand-via-Wendt; Moss (2026) magnitudes and estimand caution
+  recorded for T5.
 - 2026-07-07 — Wendt et al. discrepancy evaluation
   (devel/m5-wendt-discrepancies.md): every departure from the closest
   published neighbor assessed. One partially unjustified discrepancy fixed

@@ -159,6 +159,65 @@ be novel, and T5 should position it explicitly. The neighbors:
 - **Zimmermann & Wright (2017):** the observed-score SSM inference tradition
   M5 extends; already a spec reference.
 
+## 8. Source verification against the primary documents (2026-07-07, same day)
+
+Jeff supplied the Wendt et al. supplements, Moss (2026), Cheung & Rensvold
+(2002), and Gurtman & Pincus (2003) in full. Every secondhand claim above
+was checked; two required correction, and everything else firmed up:
+
+- **§1's equal-g inference: CONFIRMED verbatim.** Supplement R Code S25
+  (CFA-PC lavaan syntax): `GF =~ L1*pa + L1*bc + ... + L1*no` — a single
+  equality-labeled general loading — with style loadings `L2` and
+  `L3 == 0.707*L2`, `AG ~~ 0*COM`, and free g–style covariances. The same
+  `(lg)` equality label appears in the skew-t and SP-FA Mplus code, so
+  **every** dimensional model they specify constrains the general factor's
+  loadings equal — the ridge-blocking condition. Their CFA-QC's exact
+  specification appears in neither supplement; its κ = 23 (vs PC's 20)
+  cannot contain eight free general loadings, so the conclusion holds for
+  QC regardless. Also noted: their spec transcribes the plane geometry as
+  the 3-digit literal `0.707`; our generator's full-precision cos/sin
+  emission (spec §3.5) avoids that (tiny, deliberate) geometry error.
+- **Pedigree attribution: CORRECTED.** Gurtman & Pincus (2003), read
+  firsthand, present **Browne's (1992) CIRCUM** (the Fourier-series
+  circulant — this package's `cpm_fit()` family) as their confirmatory
+  method; "equal spacing" and "equal communalities" there name CIRCUM
+  variants, not a factor model. The explicit fixed-cosine three-factor
+  CFA is Wendt et al.'s own construction; they borrowed the constraint
+  taxonomy. Spec §3.2 amended. A unifying corollary worth keeping: at
+  φ_g = 0, equal saturations, and equal spacing, CFA-PC's implied
+  structure equals the m = 1 equal-ζ equally-spaced CIRCUM — the exact
+  meeting point of this package's two model families — and freeing the
+  g–style covariances is what breaks the circulant symmetry. (Candidate
+  cheap cross-model pin for T5/M6: strict-tier fit with φ_g = 0 and
+  equality-constrained saturations vs `cpm_fit(m = 1)` on the same
+  moments.) Locke (2010) remains cited via Wendt et al. only
+  (scoring-formula correspondence; not independently verified).
+- **Moss (2026): read in full; assessment above unchanged, sharpened.**
+  His corrected interval is a *summary-statistics* delta method for
+  τ = ρ/√(r₁r₂); his own concluding recommendation for raw data is
+  latent-variable modeling in lavaan — M5's architecture. Citable
+  magnitudes for T5: Hunter–Schmidt (reliability-as-known-constant)
+  coverage falls to ~0.35 (α = .60, n_a = 100, n_ρ = 5000) while his
+  corrected interval holds ~0.94–0.96 — the §4.4
+  standardization-uncertainty trap in miniature. Estimand caution for T5:
+  his τ disattenuates **both** variables; M5's ρ* disattenuates the scale
+  side only (the measure stays observed) — same family, different
+  estimand, no equivalence claim.
+- **Cheung & Rensvold (2002): transcribed** into
+  `devel/cr2002-transcription.md`, resolving the spec's TBT item
+  (§6.2/§12.2). The paper's operative sentence (p. 251) is internally
+  contradictory as printed ("ΔCFI smaller than or equal to −.01 indicates
+  that the null hypothesis of invariance should **not** be rejected" —
+  against its own 1%-null-tail construction on p. 250); the transcription
+  note records the quote, the contradiction, the operational rule
+  (ΔCFI < −.01 rejects the step; ΔGamma-hat < −.001; ΔMcDonald's NCI
+  < −.02), and the binding scope caveats (two groups, plain ML,
+  multivariate normality, Type I error only — the criterion was never
+  validated for robust indices, which matters because this package's
+  default estimator is MLR). Δχ² remains T4's default verdict statistic;
+  offering the ΔCFI flag as a labeled secondary criterion is now
+  unblocked and remains Jeff's call at T4.
+
 ## Actions taken with this note
 
 1. `ssm_sem()` default `estimator = "MLR"`; robust/scaled fit indices in
@@ -168,3 +227,11 @@ be novel, and T5 should position it explicitly. The neighbors:
 3. MILESTONES T5 pointer wording corrected to match.
 4. No harness rerun needed: vcov bit-identity means the recorded coverage
    evidence is unchanged.
+5. (Same-day, after Jeff supplied the primary sources — §8:) spec §3.2
+   pedigree re-corrected against Gurtman & Pincus (2003) read firsthand;
+   equal-g inference confirmed verbatim from supplement R Code S25;
+   Cheung & Rensvold (2002) ΔGFI criteria transcribed to
+   `devel/cr2002-transcription.md` (spec §12.2's TBT resolved, with the
+   source's internal contradiction documented); Moss (2026) assessed in
+   full with citable magnitudes and the both-sides vs scale-side
+   disattenuation estimand caution for T5.
