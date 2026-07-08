@@ -282,17 +282,29 @@ test_that("a disattenuated point correlation at/above 1 is refused with the scal
   a <- rep(0.55, 8)
   cc <- rep(0.6, 8)
   theta <- seq(0.3, 0.6, length.out = 8)
-  # M is exactly the common part t_1 of scale 1: sigma_m = Phi lambda_1,
-  # v_m = Var(t_1) makes rho*_1 exactly 1.
+  # M is the common part t_1 of scale 1 (sigma_m = Phi lambda_1). Shrinking
+  # Var(M) below Var(t_1) drives the model-implied disattenuated rho*_1
+  # comfortably above 1 (~1.05), so the point guard fires ROBUSTLY on every
+  # platform. The earlier construction set rho*_1 == 1 exactly, which the fit
+  # recovered as 1 +/- ~1e-7; whether that cleared the >= 1 - 1e-12 guard was
+  # platform-dependent (the CI runners landed just under, so the draw-engine
+  # escalation fired instead of the point guard) -- the M5 CI portability fix.
   th <- oct * pi / 180
   lambda1 <- c(a[1], cc[1] * cos(th[1]), cc[1] * sin(th[1]))
   pop <- sem_pop(a, cc, theta, oct, cbind(lambda1), v_m = sum(lambda1^2))
-  fit <- sem_pop_fit(pop)
+  sig <- pop$sigma
+  sig[pop$measures, pop$measures] <- 0.9 * sig[pop$measures, pop$measures]
+  syn <- ssm_sem_syntax(
+    scales = pop$scales, angles = oct, measures = pop$measures, model = "scaled"
+  )
+  fit <- suppressWarnings(
+    lavaan::cfa(syn, sample.cov = sig, sample.nobs = 10000)
+  )
   expect_error(
-    ssm_sem_parameters(
+    suppressWarnings(ssm_sem_parameters(
       fit,
       scales = pop$scales, angles = oct, measures = pop$measures, boots = 50
-    ),
+    )),
     "s1"
   )
 })
@@ -798,13 +810,19 @@ test_that("a bootstrap-covariance fit meeting the mvn engine gets an advisory", 
   syn <- ssm_sem_syntax(
     scales = pop$scales, angles = oct, measures = pop$measures
   )
-  fit_boot <- lavaan::cfa(syn, data = dat, se = "bootstrap", bootstrap = 20)
+  fit_boot <- suppressWarnings(
+    lavaan::cfa(syn, data = dat, se = "bootstrap", bootstrap = 20)
+  )
   set.seed(7)
-  expect_warning(
+  # The advisory is keyed on the fit's se option, so it fires deterministically
+  # regardless of the bootstrap draws; capture ALL warnings and assert ours is
+  # among them, since lavaan may add an incidental singular-vcov note from the
+  # small (bootstrap = 20) replicate set that varies by platform.
+  w <- testthat::capture_warnings(
     ssm_sem_parameters(
       fit_boot,
       scales = pop$scales, angles = oct, measures = pop$measures, boots = 50
-    ),
-    "bootstrap-estimated covariance"
+    )
   )
+  expect_true(any(grepl("bootstrap-estimated covariance", w)))
 })
