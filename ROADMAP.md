@@ -94,13 +94,21 @@ outlive individual milestones' MILESTONES.md sections):
   path", caution below N = 2000 and marker-conditional above). Jeff's veto
   window stays open until release.*
 - **Cross-platform CI portability (release blocker; surfaced 2026-07-07 by
-  the M4.5 PR #28).** `R-CMD-check` has been **red on every platform on master
-  since M4** (M4 landed without a green multi-platform gate). **Status
-  2026-07-08: classes 2–3 below are DONE — the `skip_on_ci()`/`skip_on_cran()`
-  guards landed on the `ci-cross-platform` branch = the open draft
-  [PR #29](https://github.com/jmgirard/circumplex/pull/29). The class-1
-  `cpm_pack` β-boundary error is the SOLE remaining red and the one thing
-  gating PR #29.** Ten failures in three classes, all in M4 code:
+  the M4.5 PR #28). RESOLVED 2026-07-08 — master is green on all platforms.**
+  All three classes fixed and merged: classes 2–3 via `skip_on_ci()` guards
+  ([PR #29](https://github.com/jmgirard/circumplex/pull/29), merged), and the
+  class-1 `cpm_pack` β = 0 boundary via the start-value interior floor
+  (`cpm_beta_start_interior()`, in PR #29). The M5 merge
+  ([PR #30](https://github.com/jmgirard/circumplex/pull/30)) then surfaced and
+  fixed three further portability issues the CI-blocked branch had hidden: the
+  `ssm_sem*` pkgdown reference-index gap, a knife-edge |ρ*| = 1 guard test, and
+  non-byte-portable `ssm_sem_syntax()` emission of libm-noise near-zero cos/sin
+  loadings (`snap_trig()`). Both PRs are green across the full matrix
+  (macOS/Windows/ubuntu release+devel+oldrel, covr, pkgdown). The reproduction
+  method that unblocked class 1 is worth keeping: a `rocker/r-ver` amd64
+  container switched to reference (netlib) BLAS reproduces the ubuntu-runner
+  numerics the macOS dev machine cannot. Historical detail follows.
+  Ten original failures in three classes, all in M4 code:
   (1) **estimator boundary — `cpm_pack: all(b_keep > 0)` errors**
   (`test-cpm_fit.R` exact-recovery/mirror/multimodal/free-angle tests): the CPM
   optimizer converges to a harmonic weight *exactly* on the β = 0 boundary on
