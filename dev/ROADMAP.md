@@ -94,16 +94,38 @@ they outlive individual milestones’ MILESTONES.md sections):
         re-read pending; the record flags one verified coincidence
         (15.5% appears for two distinct quantities) for explicit
         attention.
-- **B6 analytic-CI caution — Jeff to confirm/veto** (adopted default,
-  reversible until release): the `cpm_boundary_markers()` marker set and
-  the N-conditional [`summary()`](https://rdrr.io/r/base/summary.html)
+- **B6 analytic-CI caution — RATIFIED, CLOSED (2026-07-08)** (adopted
+  default): the `cpm_boundary_markers()` marker set and the
+  N-conditional [`summary()`](https://rdrr.io/r/base/summary.html)
   caution wording in R/cpm_fit.R / R/cpm_oop.R. Natural review point:
   when the M4 vignette (W1) documents CI trustworthiness. *W1 review
   outcome (2026-07-07, advisory): confirmed — the wording is hedged,
   directional, and names its markers; the vignette now teaches the same
   guidance (“prefer the bootstrap on the raw-data path”, caution below N
   = 2000 and marker-conditional above). Jeff’s veto window stays open
-  until release.*
+  until release.* *Ratification (Jeff, 2026-07-08): the two N thresholds
+  (2000 / 50000) and the caution tone are confirmed. The one open piece
+  is the marker set itself as a runtime predictor of mis-coverage — Jeff
+  flagged he lacks the expertise to adjudicate the two calibration
+  judgments (the β = 0.10 “small weight” cut and including `multimodal`,
+  which the B6 oracle never measured). Resolution is empirical, not by
+  judgment: a release-scoped, analytic-only marker- validation run
+  (~10–20 min, no bootstrap) measures coverage conditional on each fired
+  marker across the 2000–50000 band, plus β-cut and multimodality
+  sensitivity sweeps. Spec: `devel/cpm-marker-validation-brief.md`
+  (Fable brief G in `devel/fable-briefs-2026-07.md`). Subsumed later by
+  the post-M4 CPM simulation paper; this is the release subset. Since
+  the caution is advisory (over-inclusion costs one spurious line),
+  “ship the conservative marker superset as-is” is a defensible fallback
+  if the run isn’t done by freeze.* ***RATIFIED (Jeff, 2026-07-08): ship
+  the marker set unchanged.*** The validation run (70k analytic-only
+  fits, `devel/cpm-marker-validation.md`) confirmed both calibration
+  judgments: β = 0.10 is the only swept cut that discriminates in the
+  right direction (0.05 discriminates *backwards* — mis-coverage peaks
+  near the boundary, not at it; 0.15 is dominated), and `multimodal`
+  fits mis-cover ζ (.815 vs .933) with ~zero false alarms. No code,
+  constant, or [`summary()`](https://rdrr.io/r/base/summary.html)
+  wording change follows. **B6 item CLOSED.**
 - **Cross-platform CI portability (release blocker; surfaced 2026-07-07
   by the M4.5 PR \#28). RESOLVED 2026-07-08 — master is green on all
   platforms.** All three classes fixed and merged: classes 2–3 via
