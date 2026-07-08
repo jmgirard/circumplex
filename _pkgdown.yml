@@ -41,6 +41,12 @@ reference:
   - ssm_plot_curve
   - ssm_parameters
   - ssm_score
+- title: SEM-Based SSM Functions
+  desc: Latent-variable (disattenuated) SSM via structural equation modeling
+  contents:
+  - ssm_sem
+  - ssm_sem_parameters
+  - ssm_sem_syntax
 - title: Structure Evaluation Functions
   desc: Functions for evaluating circumplex structure and CI trustworthiness
   contents:
