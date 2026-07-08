@@ -20,3 +20,9 @@ data-raw/structure-test-cutoffs-gate.rds
 
 # Regenerable R Notebook renders (keep the .Rmd sources, not the output)
 devel/*.nb.html
+
+# OS / editor artifacts
+.DS_Store
+Thumbs.db
+*~
+*.swp
