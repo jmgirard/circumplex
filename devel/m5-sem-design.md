@@ -272,10 +272,18 @@ throughout. Two results are directly useful for T5's docs: (a) CFA-PC's
 measured real-data fit (CFI .938–.957, RMSEA .075–.111 across samples) is
 published evidence that the fixed-loading, fixed-angle model is a real
 but imperfect approximation — exactly the model-conditional caveat §10
-states, now with a citable magnitude; (b) their finding that relaxing the
-perfect-circumplex constraints (their CFA-QC) improved fit without
-sacrificing external validity is independent support for offering the
-scaled tier as this package's default rather than strict. They estimated
+states, now with a citable magnitude; (b) their latent general–agency
+correlation was negative and replicated across all four samples (−.267 to
+−.324), so the g ⊥ plane assumption the scaled tier fixes for
+identification is known to be violated on IIP-family data at a citable
+magnitude — the strict tier (or the misfit channel) carries it, and the
+T3 realism cell's coverage verdict covers exactly this regime. *(Corrected
+2026-07-07, same day: point (b) originally credited them with finding that
+relaxing the perfect-circumplex constraints improves fit without losing
+validity — that was their citation of PRIOR work (Acton & Revelle, 2002;
+Gurtman & Pincus, 2000); their own CFA-QC showed no consistent improvement
+and "virtually identical" estimates. See
+devel/m5-wendt-discrepancies.md §7.)* They estimated
 throughout with MLR (robust SEs under nonnormality) — the same
 misspecification-consistent-covariance logic behind this spec's §5.1
 sandwich-vcov decision, arrived at independently for a different
@@ -1072,6 +1080,20 @@ the machinery pins pass — it consumes the working estimator.
    without insight). Note this decision cannot affect the weights
    invariant or its T2 test, which target the always-present weights
    attribute (§3.5).
+6. **(Added post-T3, from the Wendt et al. comparison —
+   devel/m5-wendt-discrepancies.md §1.) An "equal-g" middle tier?**
+   Constrain the general saturations equal (a_i ≡ a), keep the circumplex
+   saturations free with fixed directions, and free the g–plane
+   covariances — Wendt et al.'s parameterization transplanted onto fixed
+   theoretical angles. Counting-identified, and the §3.1 ridge is blocked
+   by the equality constraint, so it would restore the estimable g-lean
+   channel (empirically real on IIP data: their replicated g–agency
+   r ≈ −.3) inside a mostly-scaled model, at the cost of a
+   tau-equivalence assumption on g. Not implemented: it needs its own
+   empirical local-identification check (T3's lesson — counting is not
+   enough), and no new tier lands during T4's invariance work. Proposed:
+   revisit at T5/M6 if real-data misfit of the scaled tier proves to be
+   dominated by the g-lean channel.
 
 ## Revision log (vs the fresh-session review, `devel/m5-sem-design-review.md`)
 
@@ -1146,6 +1168,23 @@ are as stated).
 
 ## Change log
 
+- 2026-07-07 — Wendt et al. discrepancy evaluation
+  (devel/m5-wendt-discrepancies.md): every departure from the closest
+  published neighbor assessed. One partially unjustified discrepancy fixed
+  same-day — `ssm_sem()` now defaults to `estimator = "MLR"` and
+  `print.circumplex_ssm_sem()` reports robust/scaled fit indices with
+  fallback (the naive chi-square over-rejects on skewed octant data; the
+  vcov the CI engines consume is verified bit-identical to the previous
+  ML+sandwich default, so the recorded coverage evidence is unchanged).
+  §3.2's note corrected (their CFA-QC did NOT consistently improve fit —
+  the improvement claim was their citation of prior work); §12.6 records
+  the identified-but-deferred "equal-g" middle tier their parameterization
+  suggests; their replicated g–agency correlation (≈ −.3) recorded as the
+  citable real-data magnitude of the scaled tier's φ_g = 0 violation.
+  Search for other SEM-based circumplex/SSM work found no prior
+  latent-level SSM estimand (nearest: Weide et al. 2021; Moss 2026 on
+  disattenuated-correlation inference; the Browne/CSPM free-angle
+  tradition) — T5 should position the layer as novel.
 - 2026-07-07 — Post-T3 literature note (§3.2, References; no code, no
   numeric values taken): identified that the strict tier is, up to the
   documented .71 rescaling, Gurtman & Pincus's (2003) "perfect circumplex"

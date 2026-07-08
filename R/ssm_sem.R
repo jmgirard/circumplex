@@ -549,7 +549,14 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   draws or bootstrap refits to use (default = 2000).
 #' @param interval Optional. A single number between 0 and 1 (exclusive)
 #'   indicating the confidence level (default = 0.95).
-#' @param estimator Optional. The lavaan estimator (default = "ML").
+#' @param estimator Optional. The lavaan estimator (default = "MLR": maximum
+#'   likelihood with robust "Huber-White" standard errors and a scaled test
+#'   statistic, the standard choice for the skewed distributions typical of
+#'   circumplex scale scores). The parameter estimates are identical to
+#'   `"ML"`; what changes is the covariance the `"mvn"` engine propagates
+#'   (already robust via `se`) and the test statistic behind the global fit
+#'   indices that `print()` reports (robust/scaled versions are used when
+#'   available).
 #' @param se Optional. The lavaan standard-error method for the fitted model
 #'   (default = "robust.huber.white", the sandwich estimator). This does not
 #'   affect the parameter estimates, only the covariance the `"mvn"` engine
@@ -612,7 +619,7 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
                     grouping = NULL, contrast = FALSE,
                     model = c("scaled", "strict"), invariance = NULL,
                     ci_method = c("mvn", "boot"), boots = 2000,
-                    interval = 0.95, estimator = "ML",
+                    interval = 0.95, estimator = "MLR",
                     se = "robust.huber.white",
                     missing = c("listwise", "fiml"),
                     parallel = "no", ncpus = 1, ...) {
@@ -857,22 +864,30 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
   cat("Measurement model:\t", x$model$tier, "fixed-angle circumplex\n")
   if (has_lavaan()) {
     n <- lavaan::lavInspect(x$sem, "ntotal")
-    fm <- lavaan::fitMeasures(
-      x$sem, c("chisq", "df", "pvalue", "cfi", "rmsea", "srmr")
-    )
+    fm <- lavaan::fitMeasures(x$sem)
+    # Prefer the robust/scaled fit statistics when the fit carries them
+    # (estimator = "MLR", ssm_sem()'s default): under the skewed
+    # distributions typical of circumplex scores, the naive chi-square
+    # over-rejects and the indices computed from it are distorted.
+    pick <- function(...) {
+      for (nm in c(...)) if (nm %in% names(fm)) return(fm[[nm]])
+      NA_real_
+    }
+    robust <- "chisq.scaled" %in% names(fm)
     cat(
-      "Global fit (N =", paste0(n, "):"),
+      sprintf("Global fit (N = %d%s):", n, if (robust) ", robust" else ""),
       sprintf(
         "chisq(%g) = %s, p = %s",
-        fm[["df"]], format(round(fm[["chisq"]], digits)),
-        format(round(fm[["pvalue"]], digits))
+        pick("df.scaled", "df"),
+        format(round(pick("chisq.scaled", "chisq"), digits)),
+        format(round(pick("pvalue.scaled", "pvalue"), digits))
       ), "\n"
     )
     cat(sprintf(
       "\t\t\tCFI = %s, RMSEA = %s, SRMR = %s\n",
-      format(round(fm[["cfi"]], digits)),
-      format(round(fm[["rmsea"]], digits)),
-      format(round(fm[["srmr"]], digits))
+      format(round(pick("cfi.robust", "cfi.scaled", "cfi"), digits)),
+      format(round(pick("rmsea.robust", "rmsea.scaled", "rmsea"), digits)),
+      format(round(pick("srmr"), digits))
     ))
   }
   NextMethod()

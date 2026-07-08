@@ -14,7 +14,9 @@
   angular branch cut. The default draws propagate lavaan's robust
   (sandwich) covariance, which the package's coverage validation found
   necessary to keep the intervals calibrated when the fixed-angle model
-  only approximates the data. Includes `ssm_sem_syntax()` (an inspectable lavaan
+  only approximates the data; the default estimator is MLR, so the global
+  fit indices `print()` reports are likewise the robust/scaled versions
+  (circumplex scale scores are typically skewed). Includes `ssm_sem_syntax()` (an inspectable lavaan
   model-syntax generator that works without lavaan installed) and
   `ssm_sem_parameters()` (estimate from a lavaan fit you have modified or
   fitted yourself). Results are `circumplex_ssm` objects, so `ssm_table()`

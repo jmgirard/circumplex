@@ -128,15 +128,32 @@ inlined so the reference survives archiving):
   lavaan), and the boundary caveats.
   *Accept:* builds clean; exported API only; statistical-precision bar
   (CLAUDE.md); every reported CI/estimand claim traces to T1's spec or a cited
-  source. Draw on the post-T3 literature note (spec §3.2, change log
-  2026-07-07): cite Gurtman & Pincus (2003)/Locke (2010) for the strict
-  tier's "perfect circumplex" pedigree, and Wendt et al. (2019) for a
-  real-data magnitude of the fixed-angle model's approximation (their
-  CFA-PC RMSEA .075–.111) and independent support for the scaled tier as
-  default.
+  source. Draw on the post-T3 literature notes (spec §3.2 and
+  devel/m5-wendt-discrepancies.md): cite Gurtman & Pincus (2003)/Locke
+  (2010) for the strict tier's "perfect circumplex" pedigree; Wendt et
+  al. (2019) for a real-data magnitude of the fixed-angle model's
+  approximation (CFA-PC RMSEA .075–.111) and of the scaled tier's
+  g ⊥ plane assumption being violated on IIP data (replicated g–agency
+  r ≈ −.3; the strict tier estimates it); Moss (2026) for
+  disattenuated-correlation inference context; and position the latent
+  SSM estimand as novel (no prior latent-level SSM work found,
+  2026-07-07 search).
 
 ## Log
 
+- 2026-07-07 — Wendt et al. (2019) discrepancy evaluation (post-T3;
+  devel/m5-wendt-discrepancies.md): all departures from the closest
+  published neighbor assessed — one fixed (ssm_sem() defaults to
+  estimator = "MLR"; print reports robust/scaled fit indices with
+  fallback; vcov verified bit-identical to the prior default, so T3's
+  coverage evidence stands), one earlier spec-note misattribution
+  corrected (their CFA-QC did not consistently improve fit), the rest
+  justified by the estimand difference. Equal-g middle tier recorded as
+  spec §12.6 (deferred; needs its own identification check). Web search
+  found no prior latent-level SSM work (nearest: Weide et al. 2021, Moss
+  2026); T5 to position the layer as novel. (R/ssm_sem.R,
+  tests/testthat/test-ssm_sem.R, NEWS.md, devel/m5-wendt-discrepancies.md,
+  devel/m5-sem-design.md, MILESTONES.md, man/ssm_sem.Rd.)
 - 2026-07-07 — T3: shipped the latent-variable SSM estimation layer —
   exported `ssm_sem()` (fits the generated syntax, estimates the
   disattenuated profile, all parameters as estimate + interval via

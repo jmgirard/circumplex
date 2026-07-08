@@ -16,7 +16,7 @@ ssm_sem(
   ci_method = c("mvn", "boot"),
   boots = 2000,
   interval = 0.95,
-  estimator = "ML",
+  estimator = "MLR",
   se = "robust.huber.white",
   missing = c("listwise", "fiml"),
   parallel = "no",
@@ -68,7 +68,14 @@ draws or bootstrap refits to use (default = 2000).}
 \item{interval}{Optional. A single number between 0 and 1 (exclusive)
 indicating the confidence level (default = 0.95).}
 
-\item{estimator}{Optional. The lavaan estimator (default = "ML").}
+\item{estimator}{Optional. The lavaan estimator (default = "MLR": maximum
+likelihood with robust "Huber-White" standard errors and a scaled test
+statistic, the standard choice for the skewed distributions typical of
+circumplex scale scores). The parameter estimates are identical to
+\code{"ML"}; what changes is the covariance the \code{"mvn"} engine propagates
+(already robust via \code{se}) and the test statistic behind the global fit
+indices that \code{print()} reports (robust/scaled versions are used when
+available).}
 
 \item{se}{Optional. The lavaan standard-error method for the fitted model
 (default = "robust.huber.white", the sandwich estimator). This does not

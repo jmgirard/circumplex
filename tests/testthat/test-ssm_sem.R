@@ -459,8 +459,14 @@ test_that("ssm_sem() runs end-to-end on real data and matches the observed SSM d
   expect_identical(res$model$tier, "scaled")
   expect_equal(dim(res$model$weights), c(3L, 8L))
   # The mvn engine propagates the sandwich vcov by default (coverage study:
-  # plain ML vcov undercovers displacement under realistic misspecification)
+  # plain ML vcov undercovers displacement under realistic misspecification),
+  # and the default estimator is MLR so the printed fit block is robust too
+  # (vcov verified bit-identical between ML+robust-se and MLR)
   expect_match(lavaan::lavInspect(res$sem, "options")$se, "robust")
+  # (lavaan stores MLR internally as ML + a scaled test, so pin the behavior:
+  # the scaled test statistic exists and print() uses the robust block)
+  expect_true("chisq.scaled" %in% names(lavaan::fitMeasures(res$sem)))
+  expect_output(print(res), "robust")
 
   # Same construct: the latent displacement should be near the observed one
   set.seed(20260707)
