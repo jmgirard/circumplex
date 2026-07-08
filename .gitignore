@@ -17,3 +17,6 @@ devel/fable-briefs-2026-07.md
 # Local diagnostic artifact of data-raw/structure-test-cutoffs.R (full gate
 # frame for failed-gate forensics; regenerate by rerunning the script)
 data-raw/structure-test-cutoffs-gate.rds
+
+# Regenerable R Notebook renders (keep the .Rmd sources, not the output)
+devel/*.nb.html
