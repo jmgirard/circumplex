@@ -26,7 +26,10 @@ concerns; angular/boundary behavior is where bugs hide.
 - Any change touching displacement, contrasts, or `src/` requires tests at:
   profiles peaking at 0°/360°, CIs straddling 0°/360°, contrasts near ±180°,
   flat (zero-variance) profiles.
-- Closed-form SSM estimator equals OLS **only for equally spaced angles**.
+- Closed-form SSM estimator equals OLS **for equally spaced angles** (exact
+  condition: first+second harmonic balance — equal spacing is sufficient, not
+  necessary; DESIGN.md). The SEM layer (`ssm_sem*`) always uses the OLS
+  projection instead.
 
 ## Workflow
 

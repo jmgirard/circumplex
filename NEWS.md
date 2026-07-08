@@ -1,5 +1,25 @@
 # circumplex (development version)
 
+* New SEM-based (latent-variable) SSM analysis: `ssm_sem()` estimates the
+  Structural Summary Method profile of one or more external measures against
+  the *latent* circumplex content of the scales — the disattenuated analog of
+  the correlation-based `ssm_analyze()` — from a fixed-theoretical-angle
+  measurement model fitted with lavaan (now a runtime Suggests dependency for
+  this feature family; everything else works without it). Confidence
+  intervals for all parameters are built in-package by propagating draws of
+  the model's free parameters (multivariate-normal by default, or a full
+  lavaan bootstrap via `ci_method = "boot"`) through the profile and SSM
+  transforms and the same circular-quantile machinery as `ssm_analyze()` —
+  never lavaan's delta-method or percentile intervals, which ignore the
+  angular branch cut. The default draws propagate lavaan's robust
+  (sandwich) covariance, which the package's coverage validation found
+  necessary to keep the intervals calibrated when the fixed-angle model
+  only approximates the data. Includes `ssm_sem_syntax()` (an inspectable lavaan
+  model-syntax generator that works without lavaan installed) and
+  `ssm_sem_parameters()` (estimate from a lavaan fit you have modified or
+  fitted yourself). Results are `circumplex_ssm` objects, so `ssm_table()`
+  and the `ssm_plot_*` functions work on them unchanged.
+
 This version's flagship addition is `cpm_fit()`, a native reimplementation
 of Browne's (1992) circular stochastic process model for the correlational
 structure of circumplex scales — filling the gap left by the archived CircE

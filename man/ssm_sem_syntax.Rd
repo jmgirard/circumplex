@@ -52,10 +52,15 @@ the emitted model does).
 }
 \details{
 Two model tiers are available. The \code{"scaled"} tier frees a general saturation
-and a circumplex saturation per scale while fixing each scale's angle (the
-circumplex plane is held isotropic and orthogonal). The \code{"strict"} tier fixes
-every loading to the unit cosine pattern \verb{(1, cos(angle), sin(angle))} and
-frees the 3x3 factor covariance matrix. The angles enter only as evaluated
+and a circumplex saturation per scale while fixing each scale's angle; the
+circumplex plane is held isotropic and orthogonal, and the general factor is
+held orthogonal to the plane (freeing the general-plane covariances
+alongside free saturations makes the model locally unidentified exactly at
+zero covariance, so they cannot be estimated in this tier). The \code{"strict"}
+tier fixes every loading to the unit cosine pattern
+\verb{(1, cos(angle), sin(angle))} and frees the 3x3 factor covariance matrix --
+including the general-plane covariances, making it the tier that can model
+a general factor leaning into the plane. The angles enter only as evaluated
 cosine and sine constants; no angle is ever a free parameter.
 
 The returned string always carries a \code{weights} attribute: the

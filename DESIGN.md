@@ -71,7 +71,7 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]
 | Percentile bootstrap CIs, stratified by group | Zimmermann & Wright (2017) generalization; stratification preserves group n's. BCa was considered and dropped (ROADMAP M2, 2026-07): undefined for circular displacement, so it would be permanently mixed-method per parameter. A Monte Carlo alternative (asymptotic MVN sampling distribution, propagated through the SSM transformation) ships instead as an opt-in `method`; percentile bootstrap stays default for reproducibility and field convention. |
 | Circular CI method | Bootstrap displacement replicates are centered on their circular mean, unwrapped to (-π, π], quantiled linearly, re-wrapped. Valid when replicates are concentrated (amplitude reliably > 0); meaningless for flat profiles — hence the interpretation guardrails (fit ≥ .70, amplitude CI excluding 0). |
 | Fit = 1 − SSE/SST (R²) | Gurtman's prototypicality; denominator `var(scores) * (n-1)`. Undefined for zero-variance profiles. |
-| Closed-form estimator (2/n Σ s·cos, 2/n Σ s·sin) | Equals OLS iff angles are equally spaced around the circle (orthogonal design). For unequal spacing it is the conventional Gurtman estimator, not least-squares; documented, with an OLS option under consideration. |
+| Closed-form estimator (2/n Σ s·cos, 2/n Σ s·sin) | Equals OLS exactly when the angle set satisfies first- and second-harmonic balance (Σcos = Σsin = Σcos2θ = Σsin2θ = 0); equal spacing (p ≥ 3) implies the condition but is not necessary — structured unequal sets can satisfy it (sharpened 2026-07-07 per the M5 spec §2.1; the safe sufficient direction "equally spaced ⇒ identical" that all existing uses rely on is unchanged). Off the balance condition it is the conventional Gurtman estimator, not least-squares; documented. The SEM-based SSM layer (`ssm_sem()`) instead always uses the OLS projection `(BᵀB)⁻¹Bᵀ` — the two functionals coincide for all shipped (equally spaced) instruments and genuinely differ off balance. |
 | Degenerate profiles → NA at machine-noise tolerance | Flat profile (sd ≤ 8·ε·n·max\|s\|): displacement and fit are NA. Zero amplitude with real variance (pure higher harmonic): displacement NA, fit exactly 0. The tolerance is float-cancellation scale only (~13 orders below real variation) — small real amplitudes are never NA'd; their unreliability is the CI's job (plus G1 guardrails). C++ returns NAs silently; R warns once (and once with a count for degenerate bootstrap resamples). Exclusion from the confidence intervals is **per parameter, not per replicate**: `ssm_replicate_intervals()` quantiles each parameter column with `na.rm = TRUE`, so a degenerate replicate's undefined displacement (and fit, if flat) is dropped only from that parameter's CI, which is therefore conditional on estimability; its other, well-defined parameters (elevation/x/y/amplitude) still enter their own CIs undisturbed — dropping the whole replicate row would instead bias those CIs (e.g., pull a near-zero amplitude CI away from 0). Cannot test `var == 0` exactly: a constant vector of a non-representable value (e.g., 0.1) has var ≈ 2e-34. |
 
 ### CPM confidence intervals: measured coverage (M4/B6 coverage oracle)
@@ -149,11 +149,16 @@ tie-breaking — must be deterministic and leave `.Random.seed` untouched.
 point that consumes the RNG stream," which froze the then-true inventory
 instead of stating the rule that produced it.)
 
-RNG-consuming entry points, now four (`ssm_score()`, `ssm_parameters()`, and
+RNG-consuming entry points, now six (`ssm_score()`, `ssm_parameters()`, and
 the tidying functions are deterministic): `ssm_analyze()`,
-`cpm_fit(ci_method = "bootstrap")`, `cpm_simulate()`, and
+`cpm_fit(ci_method = "bootstrap")`, `cpm_simulate()`,
 `ssm_ci_accuracy()` (the latter three landed in M4 — see
-devel/m4-browne-design.md §3.5/§8 and devel/m4-ci-accuracy-spec.md §3).
+devel/m4-browne-design.md §3.5/§8 and devel/m4-ci-accuracy-spec.md §3), and
+`ssm_sem()` / `ssm_sem_parameters()` (M5 T3): both `ci_method` settings
+consume the global stream — `"mvn"` through `mvn_draws()` (one `rnorm`
+block over the free-parameter vector), `"boot"` through a lavaan bootstrap
+seed drawn from the global stream — and the lavaan model *fit* itself is
+deterministic.
 
 - **`ssm_analyze()`** — call `set.seed()` immediately before it to get
   reproducible confidence intervals. What that reproducibility covers, per
@@ -284,9 +289,14 @@ that byte-identical output depended on).**
 
 Imports kept minimal (boot, ggplot2, ggforce, htmlTable, Rcpp, rlang, stats).
 Heavier or optional functionality goes to Suggests with graceful degradation
-(ggrepel, kableExtra). OpenMx and lavaan are in Suggests as **test oracles
-only** (cross-implementation checks in test-cpm_oracles.R, skipped when not
-installed) — never as runtime paths. No tidyverse in package code.
+(ggrepel, kableExtra). OpenMx is in Suggests as a **test oracle only**
+(cross-implementation checks in test-cpm_oracles.R, skipped when not
+installed). lavaan is in Suggests both as a test oracle and — since M5 — as
+the **runtime engine of the SEM-based SSM feature family** (`ssm_sem()`,
+`ssm_sem_parameters()`): those entry points gate on `requireNamespace()`
+with a clear install-hint error, the package loads and all non-SEM
+functionality runs without lavaan, and it is never load-required (amended
+2026-07-07 per the M5 spec §7.4). No tidyverse in package code.
 
 ## Testing strategy
 

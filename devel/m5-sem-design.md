@@ -209,12 +209,29 @@ factors — g (general/elevation content) and the plane axes (cx, cy):
   variant is deliberately not offered in v1: freeing Φ_plane reintroduces
   exactly the direction distortion §4.3 exists to prevent, and its
   interaction with free c_i needs its own identification analysis.
-- **g–plane covariances** cov(g, cx), cov(g, cy): free by default (a general
-  distress/acquiescence factor may genuinely lean toward a region of the
-  plane; fixing it to 0 would misfit real data silently). T2 must verify
-  local identification with these free (§3.4); if the check fails at
-  realistic p, the default flips to 0-fixed with a documented `free_g_plane`
-  switch, and this spec's §12 records the flip.
+- **g–plane covariances** cov(g, cx), cov(g, cy): **fixed to 0** (amended
+  2026-07-07 at T3; originally "free by default" pending the empirical
+  identification check this spec required). T3's check **failed, and not at
+  small p**: with free per-scale saturations, the perturbation
+  {a_i += δ·c_i·cosθ_i, φ_gx −= δ, σ_Mx −= δ·σ_Mg} changes every model-implied
+  moment only at O(δ·φ + δ²), so the Jacobian is exactly rank-deficient at
+  φ_g = 0 — the natural null point — and near-singular in its neighborhood
+  (verified analytically and numerically: nlminb stalls, SEs of the a_i
+  reach ~200, and MVN draws run down the flat ridge into inadmissible
+  parameter space; a second ridge pairs φ_gy with the sinθ pattern). Because
+  the singularity sits at the null itself rather than at unrealistic p, a
+  documented `free_g_plane` switch is **not offered**: it would hand users a
+  model that is unidentified exactly when their data look ordinary. The
+  estimand map is ridge-invariant (profile-then-transform absorbs the trade,
+  the §3.4 robustness property again), so point estimates were never wrong —
+  but no interval engine can survive an information-singular parameterization.
+  A general factor leaning into the plane remains expressible under the
+  **strict** tier, whose fixed loadings remove the trade dimension and leave
+  the full Φ free; the scaled tier's docs state g ⊥ plane as an assumption,
+  exactly like plane isotropy. §4.2's second latent-fit channel is therefore
+  strict-tier-only as an estimated quantity; under the scaled tier a true
+  g-lean surfaces as misfit (a §8.3 misspecification cell, pseudo-true
+  target).
 
 Rationale over the literal `model0` of `devel/circum_lavaan.Rmd`: fixing
 all loadings to a common saturation scaling of the unit cosine pattern
@@ -253,14 +270,16 @@ freely with each other. The model is fitted to **raw covariances** (never
 ### 3.4 Identification and size gates (indicative counts — T2 re-derives)
 
 Indicative single-group covariance-structure counting at p = 8 (octant
-instruments), no measures: 36 observed moments; scaled model frees
-2p + 2 + p = 26 (→ df ≈ 10); strict frees 6 + p = 14 (→ df ≈ 22). At p = 4
-the scaled model's count exceeds the moments (14 > 10): **not identified**.
-These counts are order-of-magnitude guides only — T2's acceptance includes
-deriving the exact df from `lavaan` and adding an explicit minimum-p gate
-per model tier (expected: scaled needs roughly p ≥ 6; strict works at
-smaller p), plus an empirical local-identification check (information-matrix
-rank / lavaan's own warnings surfaced as errors, not passed through
+instruments), no measures — **amended 2026-07-07 at T3 with the §3.1
+g–plane flip (original text counted 2p + 2 + p = 26 → df ≈ 10 with free
+g–plane covariances)**: 36 observed moments; scaled model frees
+3p = 24 (→ df = 12); strict frees 6 + p = 14 (→ df = 22). At p = 4
+the scaled model's count exceeds the moments (12 > 10): **not identified**;
+p = 5 is just-identified (15 = 15, df = 0), so the counting gate is p ≥ 5
+(pinned on both sides by the T2 tests). These counts are order-of-magnitude
+guides only — the exact df is derived from `lavaan` in the T2 tests, and
+the empirical local-identification check ran at T3 (finding the g–plane
+flip recorded in §3.1/§12.3; lavaan's warnings surfaced, not passed through
 silently). One footnote for that check (review F12): the scaled tier has
 two discrete **reflection indeterminacies** (g → −g with a_i, σ_Mg
 negated; (cx, cy) → −(cx, cy) with c_i, σ_Mx, σ_My negated). Both leave
@@ -362,10 +381,13 @@ fit measures how far the measure's latent profile departs from a pure
 cosine wave. Two channels feed that departure (review F2, both verified):
 **differential saturation** of the scales, and **Var(t_i) modulation from
 the g–plane covariances** — Var(t_i) carries a first harmonic whenever the
-g factor leans into the plane (which §3.1 deliberately allows), so a user
-with perfectly uniform saturations can still see latent fit < 1 (probe:
-equal saturations, φ_gx = .4, φ_gy = .2 → fit = .988); under the strict
-tier, anisotropic Φ̂ is a third channel. What the latent fit removes is the
+g factor leans into the plane, so a user with perfectly uniform saturations
+can still see latent fit < 1 (probe: equal saturations, φ_gx = .4,
+φ_gy = .2 → fit = .988); under the strict tier, anisotropic Φ̂ is a third
+channel. (Amended 2026-07-07 at T3: the g-lean channel is expressible as an
+*estimated* quantity under the **strict tier only** — the scaled tier now
+fixes φ_g = 0 for identification, §3.1 — so under the scaled tier a true
+g-lean feeds misfit, not the fitted latent fit.) What the latent fit removes is the
 attenuation-heterogeneity component that contaminates the *observed*
 profile's fit — that removal, not "removing sampling error", is the
 improvement (both estimands are population quantities and contain no
@@ -485,6 +507,29 @@ refit bootstrap is Q5.1's empirical question, now answerable: §8.3's
 coverage study compares the two engines and is the evidence that either
 confirms `"mvn"` as default or flips it. The default is provisional until
 that study runs (T3 acceptance).
+
+**ANSWERED 2026-07-07 (T3; `devel/m5-coverage-oracle-results.rds`, seeded):
+`"mvn"` confirmed as default, with one amendment — the propagated vcov must
+be the sandwich.** On correctly specified populations (all §8.1 analytic
+cells, N ∈ {250, 1000}, 500 reps/cell) mvn coverage sat at 0.918–0.976 for
+every parameter including pole-straddling and ±180°-contrast displacement,
+statistically indistinguishable from the 100-rep boot arm. On the §8.3
+realism cell (fixed-angle model misspecified for jz2017's structure), mvn
+with the plain ML vcov undercovered displacement at 0.886 (N = 250) and
+0.878 (N = 1000) — N-stable, the signature of variance underestimation for
+a pseudo-true target — while boot held 0.94/0.92. A directed probe (300
+reps/N) confirmed the mechanism and the fix: with lavaan's
+`se = "robust.huber.white"` sandwich vcov, mvn displacement coverage rose
+to 0.937 (N = 250) and 0.960 (N = 1000), amplitude 0.943/0.960, nothing
+degraded. `ssm_sem()` therefore fits with the sandwich by default (an `se`
+argument, overridable); `ssm_sem_parameters()` warns when a raw-data
+`se = "standard"` fit meets the mvn engine. This is White (1982) operating
+as §8.3 anticipated: coverage of the model-conditional estimand under
+misspecification requires misspecification-consistent variance. The final
+recorded run replays the shipped `ssm_sem()` procedure end to end (post
+review fixes, sandwich default active): **zero inadequate verdicts across
+all cells, parameters, N, and both engines**; realism-cell mvn displacement
+0.948 (N = 250) / 0.920 (N = 1000), all other mvn cells 0.916–0.970.
 
 ### 5.2 Per-parameter delta-method status and what is reported (refining Brief E)
 
@@ -620,7 +665,13 @@ stated in the docs exactly as §3.1 states the single-group one (listed in
 §10), emitted by the generator's `invariance =` branch (§3.5 contract),
 and covered by the §3.4 identification gate extended to the multi-group
 constrained models (a T2 acceptance item alongside the single-group df
-derivation).
+derivation). *(T3 note, 2026-07-07: with §3.1's g–plane flip, the reference
+group now has φ_g fixed at 0. The non-reference groups' free g–plane
+covariances are expected to remain identified — the a↔φ_g ridge needs a_i
+to move, and the metric-invariance constraint pins a_i through the
+reference group's first-order-identified block — but T4 must verify this
+empirically before shipping, exactly as T3 did for the single-group model,
+because the same trade reopens if the constraint is relaxed.)*
 
 **Gating rule:** the latent *mean-based* group contrast requires step 3; the
 latent *measure-profile* group contrast requires step 2 (correlations carry
@@ -932,6 +983,12 @@ MILESTONES guardrail), covering §8.1–8.4's seeded scripts.
   fixes the plane factors isotropic and orthogonal (§3.1) — and, in
   multi-group models, per group up to a common scale (§6.2) — and
   anisotropic latent dispersion surfaces only as global misfit.
+- **The scaled tier additionally assumes the general factor is orthogonal
+  to the plane** (φ_g = 0, fixed for identification — §3.1's T3
+  amendment): a true g-lean under the scaled tier surfaces as global
+  misfit, not as an estimated covariance. To model the lean, use the
+  strict tier, whose fixed loadings leave the full factor covariance
+  matrix free.
 - **Latent displacement is the first-harmonic direction of the
   saturation-modulated disattenuated profile** (§4.3), not "the measure's
   angle in factor space": heterogeneous saturations and g–plane lean
@@ -972,6 +1029,11 @@ the machinery pins pass — it consumes the working estimator.
    transcription lands and print indices only? Proposed: Δχ² default now.
 3. **g–plane covariances free by default** (§3.1): proposed yes, pending
    T2's identification check; flip recorded here if it fails.
+   **RESOLVED 2026-07-07 (T3): the check failed — flipped to 0-fixed, no
+   `free_g_plane` switch.** The model is locally unidentified exactly at
+   φ_g = 0 (rank-deficient Jacobian along the a↔φ_g trade; §3.1 has the
+   direction and evidence), so the free variant fails at its own null and
+   cannot be offered responsibly. g-lean is modeled via the strict tier.
 4. **Default model tier:** `"scaled"` (proposed) with `"strict"` documented
    for small p — or `"strict"` default for maximal theory-fidelity?
    Proposed: `"scaled"`; equal-saturation is an assumption users should opt
@@ -1039,6 +1101,25 @@ are as stated).
 
 ## Change log
 
+- 2026-07-07 — T3 engine decision (§5.1, §8.3): coverage study run
+  (devel/m5-coverage-oracle.R, seeded; results .rds committed alongside).
+  `"mvn"` confirmed as the default engine with the sandwich-vcov amendment
+  (`se = "robust.huber.white"` default in `ssm_sem()`): plain-ML mvn
+  undercovered displacement (0.88, N-stable) only under the realism cell's
+  misspecification; sandwich mvn restored 0.94–0.96 everywhere; boot arm
+  comparable throughout. Full numbers in §5.1's ANSWERED block.
+- 2026-07-07 — T3 identification amendment (§3.1, §4.2, §6.2, §12.3): the
+  empirical local-identification check this spec required found the scaled
+  tier's free g–plane covariances **locally unidentified exactly at
+  φ_g = 0** (exact first-order ridge {a_i += δ·c_i·cosθ_i, φ_gx −= δ,
+  σ_Mx −= δ·σ_Mg}; verified analytically and numerically — nlminb
+  nonconvergence, SE(a_i) ≈ 200, MVN draws inadmissible along the ridge).
+  Default flipped to φ_g = 0-fixed per §3.1's pre-decided fallback; no
+  `free_g_plane` switch (the failure is at the null, not at small p);
+  g-lean modeled via the strict tier; §4.2's g-lean fit channel scoped to
+  strict; T4 must re-verify the multi-group non-reference free-φ_g block.
+  Generator (`ssm_sem_syntax()`) and `sem_free_params()` updated (scaled
+  free count 3p + 2 → 3p; df at p = 8, m = 0 now 12).
 - 2026-07-07 — Fresh-session review revisions (all findings F1–F12 of
   `devel/m5-sem-design-review.md`, verdict ACCEPT WITH CHANGES): §4.3's
   direction claim corrected to the saturation-modulated first-harmonic

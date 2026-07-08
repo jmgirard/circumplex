@@ -87,7 +87,7 @@ inlined so the reference survives archiving):
   original "equal the closed-form only when angles are equally spaced" is
   falsified by balanced-but-unequal angle sets — see
   devel/m5-sem-design-review.md and spec §2.1.)*
-- [ ] **T3. Latent-variable SSM estimation + circular-aware CIs
+- [x] **T3. Latent-variable SSM estimation + circular-aware CIs
   (Fable-critical).** Estimate SSM parameters from the fitted measurement
   model and construct CIs by the inherited draws-through-the-transform
   route: all parameters reported as estimate + interval via
@@ -132,6 +132,43 @@ inlined so the reference survives archiving):
 
 ## Log
 
+- 2026-07-07 — T3: shipped the latent-variable SSM estimation layer —
+  exported `ssm_sem()` (fits the generated syntax, estimates the
+  disattenuated profile, all parameters as estimate + interval via
+  `ssm_replicate_intervals()` + circular quantiles, no printed SEs) and
+  `ssm_sem_parameters()` (user-fit adapter with structural compatibility,
+  fitted-angle, multi-group, and unidentified-configuration guards);
+  `circumplex_ssm_sem` subclass with print/summary overrides; engine-side
+  admissibility filter (per-cause warning, >5% escalation); method audit
+  complete (ssm_ci_accuracy refusal + positive capability check; all other
+  inherited consumers verified). **Two statistical findings, both spec
+  amendments:** (1) the scaled tier's free g–plane covariances are locally
+  unidentified exactly at φ_g = 0 (exact first-order ridge; verified
+  analytically + numerically) — default flipped to 0-fixed per the spec's
+  pre-decided fallback, no `free_g_plane` switch, g-lean modeled via the
+  strict tier (spec §3.1/§12.3); (2) Q5.1 answered — `"mvn"` confirmed as
+  default engine but only with lavaan's sandwich vcov
+  (`se = "robust.huber.white"` default): plain-ML mvn undercovered
+  displacement (0.88, N-stable) under the realism cell's misspecification
+  (spec §5.1 ANSWERED block). Coverage validated with the ssm_ci_accuracy
+  machinery via the seeded devel/m5-coverage-oracle.R harness (7 cells ×
+  N ∈ {250, 1000} × both engines, shipped-procedure replay): zero
+  inadequate verdicts, mvn 0.916–0.970 everywhere, realism-d 0.948/0.920.
+  /statistical-validation run (transform ≡ lm() at both spacings 1e-14;
+  estimand map ≡ lavaan implied moments 1e-16; pole/±180°/flat/rotation
+  boundary checks all pass). Full boundary suite in tests; /code-review
+  high (8 angles): fixes landed for the lavaan bootstrapLavaan NA-row
+  contract, the boot inadmissibility denominator, the double-Heywood point
+  guard, angles/multi-group/unidentified-fit guards, stale docs, and
+  harness arc-rule reuse (ssm_ci_d_cover) + all-fail robustness. Full
+  suite + R CMD check clean. NEWS.md entry added (SEM feature family now
+  end-to-end); CLAUDE.md/DESIGN.md harmonic-balance sharpening and
+  lavaan-runtime-Suggests amendments applied (spec §7.4, overdue from T2).
+  (R/ssm_sem.R, R/ssm_sem_syntax.R, R/ssm_ci_accuracy.R,
+  tests/testthat/test-ssm_sem.R, tests/testthat/helper-ssm-sem.R,
+  tests/testthat/test-ssm_sem_syntax.R, devel/m5-coverage-oracle.R,
+  devel/m5-coverage-oracle-results.rds, devel/m5-sem-design.md, NEWS.md,
+  DESIGN.md, CLAUDE.md, man/, NAMESPACE.)
 - 2026-07-07 — T2: shipped `ssm_sem_syntax()`, the exported lavaan-syntax
   generator for the fixed-theoretical-angle circumplex measurement model
   (scaled + strict tiers, optional external measures), plus the always-present

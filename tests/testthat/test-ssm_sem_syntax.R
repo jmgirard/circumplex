@@ -135,12 +135,21 @@ test_that("ssm_sem_syntax() validates inputs and gates model size (§3.4)", {
     ssm_sem_syntax(scales = c("a", "b", "c"), angles = c(0, 90)),
     "length|match"
   )
-  # Scaled model under-identified at small p (spec §3.4: needs roughly p >= 6).
+  # Scaled-model identification gate boundary (with the g-plane covariances
+  # fixed per the T3 amendment, the scaled tier frees 3p, so the counting
+  # gate moves to p >= 5): p = 4 is refused, p = 5 (just-identified, df = 0)
+  # is emitted. Pins the boundary on BOTH sides so a future miscount of
+  # sem_free_params() cannot ship silently.
   expect_error(
     ssm_sem_syntax(scales = paste0("s", 1:4), angles = c(0, 90, 180, 270),
       model = "scaled"),
     "identif|too few|at least|p ="
   )
+  syn5 <- ssm_sem_syntax(
+    scales = paste0("s", 1:5), angles = c(0, 72, 144, 216, 288),
+    model = "scaled"
+  )
+  expect_type(syn5, "character")
 })
 
 # lavaan gate / graceful degradation (spec §7.1/§7.4) -------------------------

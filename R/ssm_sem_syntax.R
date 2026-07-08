@@ -79,14 +79,17 @@ sem_resolve_scales_angles <- function(instrument, scales, angles) {
 
 # Free-parameter counts (covariance/mean structure not needed here: T2 emits the
 # single-group correlation-path model). scaled: a_i (p) + direction-constrained
-# plane loadings (p effective) + residual variances (p) + two g-plane
-# covariances = 3p + 2. strict: residual variances (p) + free 3x3 factor
+# plane loadings (p effective) + residual variances (p) = 3p, with the g-plane
+# covariances FIXED to zero -- freeing them makes the model locally
+# unidentified exactly at phi_g = 0 (see the emitted syntax comment; found by
+# T3's empirical identification check, recorded in devel/m5-sem-design.md
+# section 12.3). strict: residual variances (p) + free 3x3 factor
 # covariance (6) = p + 6. Each measure adds its variance (1) + three
 # factor covariances (3); measures covary pairwise (m(m-1)/2). This coarse
 # count gates syntax generation; the empirical local-identification check runs
 # at fit time (T3).
 sem_free_params <- function(model, p, m) {
-  scale_block <- if (model == "scaled") 3L * p + 2L else p + 6L
+  scale_block <- if (model == "scaled") 3L * p else p + 6L
   measure_block <- 4L * m + m * (m - 1L) / 2L
   scale_block + measure_block
 }
@@ -108,10 +111,15 @@ fmt <- function(x) vapply(x, function(v) sprintf("%.17g", v), character(1))
 #' the emitted model does).
 #'
 #' Two model tiers are available. The `"scaled"` tier frees a general saturation
-#' and a circumplex saturation per scale while fixing each scale's angle (the
-#' circumplex plane is held isotropic and orthogonal). The `"strict"` tier fixes
-#' every loading to the unit cosine pattern `(1, cos(angle), sin(angle))` and
-#' frees the 3x3 factor covariance matrix. The angles enter only as evaluated
+#' and a circumplex saturation per scale while fixing each scale's angle; the
+#' circumplex plane is held isotropic and orthogonal, and the general factor is
+#' held orthogonal to the plane (freeing the general-plane covariances
+#' alongside free saturations makes the model locally unidentified exactly at
+#' zero covariance, so they cannot be estimated in this tier). The `"strict"`
+#' tier fixes every loading to the unit cosine pattern
+#' `(1, cos(angle), sin(angle))` and frees the 3x3 factor covariance matrix --
+#' including the general-plane covariances, making it the tier that can model
+#' a general factor leaning into the plane. The angles enter only as evaluated
 #' cosine and sine constants; no angle is ever a free parameter.
 #'
 #' The returned string always carries a `weights` attribute: the
@@ -242,9 +250,14 @@ ssm_sem_syntax <- function(instrument = NULL, scales = NULL, angles = NULL,
       "cx ~~ 1*cx",
       "cy ~~ 1*cy",
       "cx ~~ 0*cy",
-      "# general-plane covariances (free by default)",
-      "g ~~ cx",
-      "g ~~ cy"
+      "# general-plane covariances fixed to zero: with free per-scale",
+      "# saturations, freeing these is locally unidentified exactly at",
+      "# phi_g = 0 (the trade a_i +/- d*c_i*cos/sin(angle_i) <-> phi_g is",
+      "# first-order flat there), so they cannot be estimated. To model a",
+      "# general factor leaning into the plane, use the strict tier, whose",
+      "# fixed loadings leave the full factor covariance matrix free.",
+      "g ~~ 0*cx",
+      "g ~~ 0*cy"
     )
   } else {
     lines <- c(
