@@ -293,12 +293,39 @@ cpm_gradient <- function(gstar, R, spec) {
 
 # ---- starting values (design sec. 3.5) ------------------------------------------
 
+#' Floor a raw LS beta start to the strict interior (design sec. 3.5)
+#'
+#' cpm_pack's softmax inverse needs every kept beta STRICTLY positive, but
+#' the LS start coefficient for a harmonic absent from the population is
+#' analytically ZERO: floating point lands it at exactly 0.0 or +/-1e-16
+#' depending on the BLAS (exact 0.0 under the reference BLAS on the Linux CI
+#' runners -- the 2026-07 beta-boundary error; +/-1e-16 under
+#' Accelerate/OpenBLAS). Exact zeros therefore get the same 0.01 floor as
+#' their analytically identical negative twins, applied after the
+#' pre-existing clamps so every previously working input is unchanged
+#' byte-for-byte: negatives are clipped first, an all-zero or undefined (NA)
+#' solve falls back to the documented degenerate pattern, and only then are
+#' surviving exact zeros floored (previously a downstream stopifnot failure
+#' in cpm_pack, so no working behavior is altered).
+#'
+#' @noRd
+cpm_beta_start_interior <- function(beta0, fallback) {
+  if (anyNA(beta0)) {
+    beta0 <- fallback
+  }
+  beta0[beta0 < 0] <- 0.01
+  if (sum(beta0) <= 0) beta0 <- fallback
+  beta0[beta0 <= 0] <- 0.01
+  beta0 / sum(beta0)
+}
+
 #' Starting values for one orientation (design sec. 3.5)
 #'
 #' theta0 = user angles; zeta0_i = sqrt(max_{j!=i} |r_ij|) clipped to
 #' [0.3, 0.95]; beta0 = LS fit of off-diagonal r_ij on {cos(k delta0_ij)},
-#' negatives clipped to 0.01 and renormalized; singular-LS fallback
-#' (0.4, 0.3, 0.2, 0.1, ...) truncated to m+1 and renormalized.
+#' nonpositives floored to 0.01 and renormalized (strict interior; see
+#' cpm_beta_start_interior); singular-LS fallback (0.4, 0.3, 0.2, 0.1, ...)
+#' truncated to m+1 and renormalized.
 #'
 #' @noRd
 cpm_start_values <- function(R, theta0, m) {
@@ -329,12 +356,7 @@ cpm_start_values <- function(R, theta0, m) {
   } else {
     fallback <- c(patt, rep(0.05, (m + 1) - length(patt)))
   }
-  if (anyNA(beta0)) {
-    beta0 <- fallback
-  }
-  beta0[beta0 < 0] <- 0.01
-  if (sum(beta0) <= 0) beta0 <- fallback
-  beta0 <- beta0 / sum(beta0)
+  beta0 <- cpm_beta_start_interior(beta0, fallback)
 
   list(zeta = zeta0, beta = beta0)
 }

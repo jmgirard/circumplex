@@ -757,6 +757,11 @@ test_that("summary() carries the false-certification caution and wording bar", {
 })
 
 test_that("print and summary snapshots (seeded)", {
+  # Coverage/bootstrap figures differ across platforms at the last digit (BLAS),
+  # so this exact-value snapshot is a local-only regression pin, not a CI/CRAN
+  # gate. The verdict logic and formatting are covered by the tests above.
+  skip_on_ci()
+  skip_on_cran()
   data("jz2017")
   jz <- jz2017[1:120, ]
   set.seed(1701)
@@ -773,6 +778,7 @@ test_that("print and summary snapshots (seeded)", {
 # ---- plot method (spec sec. 7) --------------------------------------------------
 
 test_that("plot.circumplex_ci_accuracy builds a faceted coverage plot", {
+  skip_on_ci() # vdiffr snapshot is platform-dependent (fonts/rendering)
   theta <- deg2rad(as.numeric(octants()))
   set.seed(1801)
   dat <- as.data.frame(t(sapply(1:100, function(i) {
