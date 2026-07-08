@@ -70,7 +70,7 @@ inlined so the reference survives archiving):
   *Accept:* a committed `devel/m5-sem-design.md` covering estimator/CI design,
   the API surface, the validation strategy, and phasing; every downstream task
   (T2–T5) traces to a section of it; no code yet.
-- [ ] **T2. lavaan-syntax generator from `circumplex_instrument` (Opus).**
+- [x] **T2. lavaan-syntax generator from `circumplex_instrument` (Opus).**
   Tooling to emit a fixed-theoretical-angle circumplex measurement model
   (Q5.3's `model0` shape) from an instrument object, emitting the correct OLS
   scale weights per the Q5.1 equal-spacing trap. `lavaan` → Suggests with
@@ -132,6 +132,34 @@ inlined so the reference survives archiving):
 
 ## Log
 
+- 2026-07-07 — T2: shipped `ssm_sem_syntax()`, the exported lavaan-syntax
+  generator for the fixed-theoretical-angle circumplex measurement model
+  (scaled + strict tiers, optional external measures), plus the always-present
+  OLS `weights` attribute and the `require_lavaan()` graceful-degradation gate.
+  Encodes fixed angles via a *direction constraint* per scale
+  (`0 == sin(θ)·lx − cos(θ)·ly`), which pins each scale's plane angle while
+  freeing its saturation with no tan singularity at axis-aligned scales.
+  Bug found and fixed during review: the emitted scaled model was silently
+  mis-fit by lavaan's default `auto.fix.first` (it fixed each factor's first
+  loading to 1, colliding with the unit-variance identification, giving df=12
+  instead of the intended 10); fixed by making the syntax self-identifying
+  (leading `NA*<first scale>` frees the first loading), so the bare string fits
+  correctly under default `cfa()`/`sem()`. Tests strengthened to pin the
+  *intended* model (df = moments − `sem_free_params()`; recovered plane
+  directions equal the theoretical angles), not merely "converges". Symbolic
+  identification gate refuses under-identified requests at generation time
+  (scaled needs p ≥ 6; the empirical local-ID check rides with T3's fit
+  function). Weights identity verified at octants (equals the closed form),
+  at a harmonic-balance-violating set (differs; OLS still recovers an exact
+  cosine profile where the closed form does not), and as a left inverse of B.
+  48 new tests; full suite 1454 pass; `R CMD check` clean (0/0/0).
+  Scope deferred to later tasks (non-breaking): `grouping`/`invariance`
+  multi-group emission → T4; the inspection `:=` lines are emitted only under
+  strict+measure (linear there) and refused if forced under scaled. Per spec
+  §8.5, T2 produces no SSM parameters/intervals, so `/statistical-validation`
+  runs at T3/T4, not here. NEWS.md entry deferred until T3 makes the SEM
+  feature a usable end-to-end workflow. (R/ssm_sem_syntax.R,
+  tests/testthat/test-ssm_sem_syntax.R, man/ssm_sem_syntax.Rd, NAMESPACE.)
 - 2026-07-07 — T1: committed devel/m5-sem-design.md — the M5 implementation
   spec (estimand = profile-then-transform on model-implied disattenuated
   profiles; OLS weights with the harmonic-balance identity; scaled/strict
