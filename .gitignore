@@ -26,3 +26,6 @@ devel/*.nb.html
 Thumbs.db
 *~
 *.swp
+devel/cpm-marker-validation-results.rds
+devel/cpm-marker-validation-smoke.rds
+devel/cpm-marker-validation-custom.rds

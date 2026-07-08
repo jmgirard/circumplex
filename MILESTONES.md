@@ -41,6 +41,35 @@ bullets).
 
 ## Log
 
+- 2026-07-08 — Marker-validation run executed (Fable, per the brief): the
+  measurement the B6 pre-release item was waiting on is done, verdict
+  **ship-unchanged** — the item itself stays open until Jeff ratifies. 70k
+  analytic-only cormat-path fits (7 configs × 5 N × 2000 reps, ~1 h) measured
+  per-marker conditional coverage across the 2000–50000 band. Both judgment
+  calls survive: β = 0.10 is the only cut that discriminates in the right
+  direction (0.05 is affirmatively backwards — mis-coverage peaks *near* the
+  boundary at trailing β ≈ .05, not at it; at-boundary truths cover nominally),
+  and `multimodal` fits mis-cover ζ (.815 vs .933) with ~zero false alarms.
+  New finding: heywood/illcond fits' Wald CIs are 65–78% NaN (indefinite
+  Hessian) — the markers flag CIs that often don't exist. `removed` is a
+  predictive null but behaviorally inert (implies the β marker) — kept.
+  Any-marker discrimination vanishes exactly at the 50000 gate. Scope
+  addition per the brief's provision: one ζ = 0.97 provocation config, since
+  heywood/illcond fire ≤ 4% under ζ = 0.75. Awaiting Jeff's sign-off on the
+  memo verdict; no code change follows. (devel/cpm-marker-validation.R, .md,
+  -summary.rds; per-fit record regenerable from BASE_SEED 20260708.)
+- 2026-07-08 — B6 analytic-CI caution partially ratified + marker-validation
+  brief written (release-gating, pre-freeze). Jeff confirmed the two N
+  thresholds (2000 / 50000) and the caution tone; the open piece is the
+  `cpm_boundary_markers()` set as a runtime predictor (the β = 0.10 cut and the
+  reasoned-in `multimodal` marker), which he lacked the expertise to adjudicate
+  by judgment. Reframed as an empirical question and scoped a release-sized,
+  analytic-only run (no bootstrap, ~10–20 min vs the 3–4 h B6 run) that measures
+  coverage conditional on each fired marker across the 2000–50000 band, plus
+  β-cut and multimodality sweeps. Wrote the Fable brief and queued it. Fallback
+  if not run by freeze: ship the conservative marker superset as-is (the caution
+  is advisory). (devel/cpm-marker-validation-brief.md,
+  devel/fable-briefs-2026-07.md, ROADMAP.md.)
 - 2026-07-08 — R1 VERIFIED + M5 landed on master. PR #29 (cpm_pack fix +
   CI-portability skips) merged green; PR #30 (all of M5, rebased on #29)
   opened, and its first pass through the full CI matrix — which the

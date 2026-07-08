@@ -93,6 +93,20 @@ outlive individual milestones' MILESTONES.md sections):
   now teaches the same guidance ("prefer the bootstrap on the raw-data
   path", caution below N = 2000 and marker-conditional above). Jeff's veto
   window stays open until release.*
+  *Ratification (Jeff, 2026-07-08): the two N thresholds (2000 / 50000) and
+  the caution tone are confirmed. The one open piece is the marker set itself
+  as a runtime predictor of mis-coverage — Jeff flagged he lacks the expertise
+  to adjudicate the two calibration judgments (the β = 0.10 "small weight" cut
+  and including `multimodal`, which the B6 oracle never measured). Resolution
+  is empirical, not by judgment: a release-scoped, analytic-only marker-
+  validation run (~10–20 min, no bootstrap) measures coverage conditional on
+  each fired marker across the 2000–50000 band, plus β-cut and multimodality
+  sensitivity sweeps. Spec: `devel/cpm-marker-validation-brief.md` (Fable
+  brief G in `devel/fable-briefs-2026-07.md`). Subsumed later by the post-M4
+  CPM simulation paper; this is the release subset. Since the caution is
+  advisory (over-inclusion costs one spurious line), "ship the conservative
+  marker superset as-is" is a defensible fallback if the run isn't done by
+  freeze.*
 - **Cross-platform CI portability (release blocker; surfaced 2026-07-07 by
   the M4.5 PR #28). RESOLVED 2026-07-08 — master is green on all platforms.**
   All three classes fixed and merged: classes 2–3 via `skip_on_ci()` guards
