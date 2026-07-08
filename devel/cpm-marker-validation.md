@@ -158,7 +158,7 @@ re-measure it on a wider factorial.
    with an advisory, one-line consequence; it buys fired-set coverage
    discrimination at every band N.
 
-## Verdict (for Jeff)
+## Verdict — RATIFIED (Jeff, 2026-07-08)
 
 **The shipped marker set is defensible as-is; no change is supported, let
 alone required.** Both judgment calls survive measurement: 0.10 is the

@@ -84,8 +84,8 @@ outlive individual milestones' MILESTONES.md sections):
   diffed and internally cross-validated, human re-read pending; the record
   flags one verified coincidence (15.5% appears for two distinct quantities)
   for explicit attention.
-- **B6 analytic-CI caution — Jeff to confirm/veto** (adopted default,
-  reversible until release): the `cpm_boundary_markers()` marker set and the
+- **B6 analytic-CI caution — RATIFIED, CLOSED (2026-07-08)** (adopted
+  default): the `cpm_boundary_markers()` marker set and the
   N-conditional `summary()` caution wording in R/cpm_fit.R / R/cpm_oop.R.
   Natural review point: when the M4 vignette (W1) documents CI
   trustworthiness. *W1 review outcome (2026-07-07, advisory): confirmed —
@@ -107,6 +107,13 @@ outlive individual milestones' MILESTONES.md sections):
   advisory (over-inclusion costs one spurious line), "ship the conservative
   marker superset as-is" is a defensible fallback if the run isn't done by
   freeze.*
+  ***RATIFIED (Jeff, 2026-07-08): ship the marker set unchanged.*** The
+  validation run (70k analytic-only fits, `devel/cpm-marker-validation.md`)
+  confirmed both calibration judgments: β = 0.10 is the only swept cut that
+  discriminates in the right direction (0.05 discriminates *backwards* —
+  mis-coverage peaks near the boundary, not at it; 0.15 is dominated), and
+  `multimodal` fits mis-cover ζ (.815 vs .933) with ~zero false alarms. No
+  code, constant, or `summary()` wording change follows. **B6 item CLOSED.**
 - **Cross-platform CI portability (release blocker; surfaced 2026-07-07 by
   the M4.5 PR #28). RESOLVED 2026-07-08 — master is green on all platforms.**
   All three classes fixed and merged: classes 2–3 via `skip_on_ci()` guards

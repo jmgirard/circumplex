@@ -41,6 +41,13 @@ bullets).
 
 ## Log
 
+- 2026-07-08 — **B6 analytic-CI caution CLOSED.** Jeff ratified the
+  marker-validation memo's verdict: ship `cpm_boundary_markers()` unchanged
+  (β = 0.10 cut and the `multimodal` marker both confirmed empirically; see
+  the prior log entry and `devel/cpm-marker-validation.md`). No code,
+  constant, or `summary()` wording change follows. ROADMAP.md's B6 item
+  marked RATIFIED, CLOSED. This was the last open piece of the v2.0.0
+  pre-release B6 item.
 - 2026-07-08 — Marker-validation run executed (Fable, per the brief): the
   measurement the B6 pre-release item was waiting on is done, verdict
   **ship-unchanged** — the item itself stays open until Jeff ratifies. 70k
