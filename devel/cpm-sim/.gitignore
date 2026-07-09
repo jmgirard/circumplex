@@ -1,0 +1,5 @@
+# Machine-specific build artifacts and run output — never committed (plan §7.3:
+# the package repo carries only release-scoped oracles; the study's aggregates
+# live in the separate research-compendium repo). The config table is
+# BLAS-dependent and must be rebuilt on the run machine.
+cache/
