@@ -153,7 +153,12 @@ Circumplex Structure”, for a worked introduction to both.
   work best with a general factor removed.
   [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
   deviation-scores (ipsatizes) by default for that reason, with a raw
-  opt-out. The returned `circumplex_structure` object has
+  opt-out. Missing values are handled by listwise deletion by default (a
+  `listwise` argument, matching
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)),
+  so all five tests share one complete-case correlation matrix — the
+  metric the cutoffs were calibrated on. The returned
+  `circumplex_structure` object has
   [`print()`](https://rdrr.io/r/base/print.html),
   [`summary()`](https://rdrr.io/r/base/summary.html), and
   [`plot()`](https://rdrr.io/r/graphics/plot.default.html) methods;

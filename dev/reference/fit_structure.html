@@ -96,7 +96,8 @@ yields a genuine p-value.</p>
 <span>  <span class="va">scales</span>,</span>
 <span>  scoring <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"deviation"</span>, <span class="st">"raw"</span><span class="op">)</span>,</span>
 <span>  ridge <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  n_perm <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  n_perm <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  listwise <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -134,7 +135,18 @@ statistics off the calibrated scale.</p></dd>
 enumeration, available for up to nine scales; otherwise a single positive
 whole number of Monte Carlo relabelings (required for ten or more scales).
 The Monte Carlo path draws from the global RNG stream, so set a seed with
-<code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> beforehand for reproducibility.</p></dd>
+<code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> beforehand for reproducibility. Ten or more scales require
+<code>n_perm</code> (exact enumeration is infeasible); supplying it is validated up
+front, before any criteria are computed.</p></dd>
+
+
+<dt id="arg-listwise">listwise<a class="anchor" aria-label="anchor" href="#arg-listwise"></a></dt>
+<dd><p>A logical indicating whether missing values are handled by
+listwise deletion (<code>TRUE</code>, the default) or pairwise deletion (<code>FALSE</code>),
+matching <code><a href="ssm_analyze.html">ssm_analyze()</a></code>. Listwise deletion gives all five tests one
+complete-case correlation matrix, which is the metric the interpretive
+cutoffs were calibrated on; pairwise deletion can yield a non-positive-
+definite matrix and moves the statistics off that calibrated scale.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -19,7 +19,8 @@ fit_structure(
   scales,
   scoring = c("deviation", "raw"),
   ridge = 0,
-  n_perm = NULL
+  n_perm = NULL,
+  listwise = TRUE
 )
 ```
 
@@ -57,7 +58,20 @@ fit_structure(
   positive whole number of Monte Carlo relabelings (required for ten or
   more scales). The Monte Carlo path draws from the global RNG stream,
   so set a seed with [`set.seed()`](https://rdrr.io/r/base/Random.html)
-  beforehand for reproducibility.
+  beforehand for reproducibility. Ten or more scales require `n_perm`
+  (exact enumeration is infeasible); supplying it is validated up front,
+  before any criteria are computed.
+
+- listwise:
+
+  A logical indicating whether missing values are handled by listwise
+  deletion (`TRUE`, the default) or pairwise deletion (`FALSE`),
+  matching
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md).
+  Listwise deletion gives all five tests one complete-case correlation
+  matrix, which is the metric the interpretive cutoffs were calibrated
+  on; pairwise deletion can yield a non-positive- definite matrix and
+  moves the statistics off that calibrated scale.
 
 ## Value
 

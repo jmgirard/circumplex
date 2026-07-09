@@ -59,7 +59,7 @@ res <- ssm_analyze(
 )
 set.seed(23456)
 acc <- ssm_ci_accuracy(res, reps = 25)
-#> Warning: CPM Hessian is ill-conditioned (condition number 6.69e+17): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 3.53e+17): angles may be clustered or parameters weakly determined.
 plot(acc)
 
 # }

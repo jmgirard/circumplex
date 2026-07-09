@@ -363,24 +363,25 @@ statistics: zero**.
   only.
 - Follow-ups deferred from the M4.5 close-review (`/code-review max`,
   2026-07-07; the 6 fix-now findings already landed — see the archived
-  M4.5 log). For the v2.0.0 train: (#4) `structure_rt()`’s degeneracy
-  guard is on a loadings⁴ scale, so it voids a valid but weak circumplex
-  where VT/Fisher stay defined — make the guard
-  scale-invariant/consistent across the four tests; (#5) missingness is
-  silently pairwise-deleted before the complete-data cutoffs are
-  applied, with no `listwise` control or warning — decide a missing-data
-  policy; (#13)
+  M4.5 log). The v2.0.0-train follow-up block is **DONE (2026-07-08)** —
+  see the MILESTONES.md log for evidence. Resolutions: (#4)
+  `structure_rt()`’s degeneracy guard moved off the loadings⁴
+  rotation-profile scale onto the communalities (`all(h2 < DEGEN_TOL)`,
+  matching Fisher), restoring RT’s scale invariance; (#5) missing-data
+  policy = listwise deletion by default via a new `listwise` argument
+  matching
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md);
+  (#13)
   [`fit_structure()`](http://circumplex.jmgirard.com/dev/reference/fit_structure.md)
-  at nv ≥ 10 without `n_perm` errors only after computing the four
-  criteria, discarding them — validate up front or return the criteria
-  with RANDALL marked unavailable. Test/quality hardening: assert the
-  `almost < thrice < twice` cutoff ordering end-to-end (script
-  `stopifnot` + a test over `structure_cutoffs`); a marginal-circumplex
-  MC-p reproducibility test that isn’t pinned at the add-one floor; an
-  exact-path `.Random.seed`-not-created test; the `data[scales]`
-  matrix-misindex in the two internal helpers; and DRY the duplicated
-  angle/communality geometry (summary/plot) and the double
-  `cor(scored)`.
+  validates that nv ≥ 10 needs `n_perm` up front, before the criteria
+  are computed. Test/quality hardening all landed: the
+  `almost < thrice < twice` ordering assertion (derivation-script
+  `stopifnot` + a `structure_cutoffs` test), a marginal-circumplex
+  interior MC-p reproducibility test, an exact-path
+  `.Random.seed`-not-created test, the `data[scales]` matrix-misindex
+  fix (a shared `structure_cormat()` that also single-sources the
+  correlation construction), and the summary/plot angle/communality
+  geometry DRY’d into `structure_geometry()`.
 
 The detailed task list with acceptance criteria (T1–T8) and its full
 running log are archived in MILESTONES-ARCHIVE.md — milestone-level
