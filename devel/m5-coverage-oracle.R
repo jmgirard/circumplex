@@ -158,17 +158,16 @@ cells$g_lean_strict <- make_pop(
 
 make_pop_2g <- function(a, cc, theta1, theta2, sigma_m1, sigma_m2,
                         vg = c(1, 1.3), phi_pl = c(1, 0.8)) {
-  lambda <- cbind(a, cc * cos(th), cc * sin(th))
+  # Each group is the shared sem_pop() (helper-ssm-sem.R) with a per-group
+  # factor metric phi = diag(var(g), plane scale, plane scale) and a single
+  # unit-variance measure (v_m = 1). Composing sem_pop() is bit-identical to
+  # the former hand-built algebra (verified sigma/rho/truth identical), so the
+  # two-group coverage cells are unchanged.
   one <- function(theta, sigma_m, vgk, phik) {
-    phi <- diag(c(vgk, phik, phik))
-    sigma_ss <- lambda %*% phi %*% t(lambda) + diag(theta)
-    sigma_sm <- lambda %*% sigma_m
-    sigma <- rbind(cbind(sigma_ss, sigma_sm), cbind(t(sigma_sm), 1))
-    nm <- c(scales, "m1")
-    dimnames(sigma) <- list(nm, nm)
-    var_t <- rowSums((lambda %*% phi) * lambda)
-    rho <- as.numeric(t(sigma_sm)) / sqrt(var_t)
-    list(sigma = sigma, rho = rho)
+    pop <- sem_pop(a, cc, theta, angles, sigma_m, v_m = 1,
+                   phi = diag(c(vgk, phik, phik)),
+                   scales = scales, measures = "m1")
+    list(sigma = pop$sigma, rho = as.numeric(pop$rho0))
   }
   g1 <- one(theta1, sigma_m1, vg[1], phi_pl[1])
   g2 <- one(theta2, sigma_m2, vg[2], phi_pl[2])

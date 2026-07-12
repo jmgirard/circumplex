@@ -313,6 +313,39 @@ sem_ssm_transform <- function(profile, weights, angles_rad) {
   c(e = e, x = x, y = y, a = a, d = d, fit = fit)
 }
 
+# Vectorized form of sem_ssm_transform() over a draws x k matrix of profiles
+# (spec section 9: the transform is vectorized R over a boots x k matrix, no
+# per-draw apply). Returns a draws x 6 matrix of (e, x, y, a, d, fit) in
+# ssm_param_names() order, reproducing the scalar reference row for row,
+# including the section 5.5 degenerate-NA semantics. sem_ssm_transform() stays
+# the reference (tested against ssm_parameters()); this is its matrix pass.
+sem_ssm_transform_mat <- function(profiles, weights, angles_rad) {
+  exy <- profiles %*% t(weights) # draws x 3 = (e, x, y)
+  e <- exy[, 1L]
+  x <- exy[, 2L]
+  y <- exy[, 3L]
+  a <- sqrt(x^2 + y^2)
+  n <- ncol(profiles)
+  mu <- rowMeans(profiles)
+  sst <- rowSums((profiles - mu)^2) # (n - 1) * var per row
+  sdev <- sqrt(sst / (n - 1))
+  # per-row max(abs()) via a column-wise reduction (n small; no per-draw apply,
+  # and no asplit() so R (>= 3.4) holds)
+  rowmax <- do.call(pmax, lapply(seq_len(n), function(j) abs(profiles[, j])))
+  tol <- 8 * .Machine$double.eps * n * rowmax
+  d <- atan2(y, x) %% (2 * pi)
+  pred <- e + outer(x, cos(angles_rad)) + outer(y, sin(angles_rad))
+  fit <- 1 - rowSums((pred - profiles)^2) / sst
+  # Degenerate branches mirror the scalar path: flat (no real variance) ->
+  # d, fit NA; else zero first-harmonic amplitude -> d NA, fit 0.
+  flat <- !(sdev > tol)
+  zeroamp <- !flat & (a <= tol)
+  d[flat | zeroamp] <- NA_real_
+  fit[flat] <- NA_real_
+  fit[zeroamp] <- 0
+  cbind(e = e, x = x, y = y, a = a, d = d, fit = fit)
+}
+
 # Draw engines (spec section 5.1) -------------------------------------------------
 
 # MVN propagation: psi ~ MVN(psi-hat, V-hat) via the package's single
@@ -589,9 +622,7 @@ sem_estimate <- function(fit, scales, angles_deg, measures, ci_method, boots,
   t0_list <- vector("list", n_blocks)
   for (b in seq_len(n_blocks)) {
     pk <- prof_draws[[b]][keep, , drop = FALSE]
-    par_list[[b]] <- t(apply(pk, 1, sem_ssm_transform,
-      weights = weights, angles_rad = th
-    ))
+    par_list[[b]] <- sem_ssm_transform_mat(pk, weights, th)
     t0_list[[b]] <- sem_ssm_transform(profiles0[b, ], weights, th)
   }
   t <- do.call(cbind, par_list)

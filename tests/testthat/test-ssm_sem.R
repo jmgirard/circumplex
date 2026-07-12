@@ -68,6 +68,27 @@ test_that("sem transform inherits the degenerate-NA semantics (sec. 5.5)", {
   expect_lt(second[["a"]], 1e-12)
 })
 
+test_that("vectorized sem transform matches the scalar reference row-by-row (M9)", {
+  # The scalar sem_ssm_transform() is the validated reference (tested above vs
+  # ssm_parameters()); the matrix pass used in sem_estimate() must reproduce it
+  # row for row, including the sec. 5.5 degenerate-NA semantics.
+  W <- sem_ols_weights(oct * pi / 180, names = oct_scales)
+  th <- oct * pi / 180
+  set.seed(1)
+  P <- rbind(
+    c(0.55, 0.58, 0.62, 0.76, 1.21, 1.21, 1.48, 0.90), # normal
+    rep(0.3, 8), # flat -> displacement and fit NA
+    cos(2 * oct * pi / 180), # zero first-harmonic amplitude -> d NA, fit 0
+    matrix(stats::rnorm(8 * 20, 0.5, 0.2), ncol = 8) # random interior rows
+  )
+  got <- sem_ssm_transform_mat(P, W, th)
+  ref <- t(apply(P, 1, sem_ssm_transform, weights = W, angles_rad = th))
+  expect_equal(colnames(got), c("e", "x", "y", "a", "d", "fit"))
+  expect_equal(unname(got), unname(ref), tolerance = 1e-12)
+  expect_true(is.na(got[2, "d"]) && is.na(got[2, "fit"])) # flat row
+  expect_true(is.na(got[3, "d"]) && got[3, "fit"] == 0) # zero-amplitude row
+})
+
 # Analytic-truth recovery (spec sec. 4.1/8.1) ------------------------------------
 
 test_that("latent SSM parameters recover the closed-form truth from population moments (sec. 8.1)", {
