@@ -10,3 +10,4 @@ Append-only; one line per lesson: `- YYYY-MM-DD (M<NN>): <lesson>`. Capped at
 <!-- lessons appended below by /milestone-review post-merge hygiene -->
 
 - 2026-07-12 (migration): pre-cairn build/CI lessons live in the entombed `cairn/legacy/` and in `cairn/DESIGN.md` (e.g. Linux-only netlib-BLAS reproduction via a `rocker/r-ver` container for the `cpm_pack` β=0 boundary; `skip_on_ci()` for BLAS-sensitive snapshot/vdiffr tests). Not re-transcribed here — cited from legacy.
+- 2026-07-12 (M8): behaviour-preserving SEM refactors are fenced by two byte-pinned guardrails — the `exp_strict_*` syntax snapshots (`test-ssm_sem_syntax.R`) and the `summary()` label strings (tabs/casing) — so DRY extraction there is safe to verify by "existing suite stays green". The single/multi-group emitters in `ssm_sem_syntax.R` are NOT a shared extraction (plain vs `c()`-vector cross-group labels); don't try to unify them.
