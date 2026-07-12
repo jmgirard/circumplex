@@ -289,6 +289,39 @@ ssm_analyze <- function(data, scales, angles = octants(),
   }
 }
 
+# Build the Label/Group/Measure identifier columns ----------------------------
+
+# Construct the Label/Group/Measure columns shared by the observed-score and
+# CI tables of both analysis paths. Extracted (M12) from four byte-identical
+# inline blocks (two per path, pre- and post-CI); the output must stay
+# identical across every branch, so the branch logic lives here unchanged.
+# `measures_labels`/`n_measures` are unused on the mean path (pass NULL).
+build_result_labels <- function(score_type, group_levels, measures_labels,
+                                 n_groups, n_measures, contrast, grouping) {
+  if (score_type == "Mean") {
+    Group <- group_levels
+    Measure <- rep(NA_character_, times = n_groups)
+    if (contrast && !is.null(grouping)) {
+      Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
+      Measure <- c(Measure, Measure[[1]])
+    }
+    Label <- Group
+  } else {
+    Group <- rep(group_levels, each = n_measures)
+    Measure <- rep(measures_labels, times = n_groups)
+    if (contrast && is.null(grouping)) {
+      Group <- c(Group, Group[[1]])
+      Measure <- c(Measure, paste0(Measure[[2]], " - ", Measure[[1]]))
+    } else if (contrast && !is.null(grouping)) {
+      Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
+      Measure <- c(Measure, Measure[[1]])
+    }
+    Label <- if (is.null(grouping)) Measure else paste0(Measure, ": ", Group)
+  }
+  data.frame(Label = Label, Group = Group, Measure = Measure,
+             stringsAsFactors = FALSE)
+}
+
 # Perform analyses using the mean-based Structural Summary Method --------------
 
 ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
@@ -330,14 +363,10 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
     scores <- rbind(scores, scores[2, ] - scores[1, ])
   }
   scores <- as.data.frame(scores)
-  Group <- group_levels
-  Measure <- rep(NA_character_, times = n_groups)
-  if (contrast && !is.null(grouping)) {
-    Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
-    Measure <- c(Measure, Measure[[1]])
-  }
-  Label <- Group
-  scores <- cbind(Label, Group, Measure, scores)
+  labels <- build_result_labels(
+    "Mean", group_levels, NULL, n_groups, NULL, contrast, grouping
+  )
+  scores <- cbind(labels, scores)
 
   # Create function that will perform bootstrapping
   bs_function <- function(.data, index, scales, angles, contrast, listwise, ...) {
@@ -367,14 +396,10 @@ ssm_analyze_means <- function(data, scales, angles, grouping, contrast,
   )
 
   params <- bs_output
-  Group <- group_levels
-  Measure <- rep(NA_character_, times = n_groups)
-  if (contrast && !is.null(grouping)) {
-    Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
-    Measure <- c(Measure, Measure[[1]])
-  }
-  Label <- Group
-  results <- cbind(Label, Group, Measure, params)
+  labels <- build_result_labels(
+    "Mean", group_levels, NULL, n_groups, NULL, contrast, grouping
+  )
+  results <- cbind(labels, params)
   
   # Collect analysis details (suff_stats is a pure list addition for the
   # CI-accuracy diagnostic; see ssm_compute_suff_stats() and spec sec. 8.3)
@@ -455,21 +480,11 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     scores <- rbind(scores, scores[2, ] - scores[1, ])
   }
   scores <- as.data.frame(scores)
-  Group <- rep(group_levels, each = n_measures)
-  Measure <- rep(measures_labels, times = n_groups)
-  if (contrast && is.null(grouping)) {
-    Group <- c(Group, Group[[1]])
-    Measure <- c(Measure, paste0(Measure[[2]], " - ", Measure[[1]]))
-  } else if (contrast && !is.null(grouping)) {
-    Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
-    Measure <- c(Measure, Measure[[1]])
-  }
-  if (is.null(grouping)) {
-    Label <- Measure
-  } else {
-    Label <- paste0(Measure, ": ", Group)
-  }
-  scores <- cbind(Label, Group, Measure, scores)
+  labels <- build_result_labels(
+    "Correlation", group_levels, measures_labels, n_groups, n_measures,
+    contrast, grouping
+  )
+  scores <- cbind(labels, scores)
 
 
   # Create function that will perform bootstrapping
@@ -501,21 +516,11 @@ ssm_analyze_corrs <- function(data, scales, angles, measures, grouping,
     obs_scores = obs_scores
   )
   
-  Group <- rep(group_levels, each = n_measures)
-  Measure <- rep(measures_labels, times = n_groups)
-  if (contrast && is.null(grouping)) {
-    Group <- c(Group, Group[[1]])
-    Measure <- c(Measure, paste0(Measure[[2]], " - ", Measure[[1]]))
-  } else if (contrast && !is.null(grouping)) {
-    Group <- c(Group, paste0(Group[[2]], " - ", Group[[1]]))
-    Measure <- c(Measure, Measure[[1]])
-  }
-  if (is.null(grouping)) {
-    Label <- Measure
-  } else {
-    Label <- paste0(Measure, ": ", Group)
-  }
-  results <- cbind(Label, Group, Measure, bs_output)
+  labels <- build_result_labels(
+    "Correlation", group_levels, measures_labels, n_groups, n_measures,
+    contrast, grouping
+  )
+  results <- cbind(labels, bs_output)
 
 
   # Collect analysis details (suff_stats is a pure list addition for the

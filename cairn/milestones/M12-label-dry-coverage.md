@@ -3,10 +3,10 @@
      Per-section owners are tagged below. -->
 # M12: Result-label DRY + statistical-core coverage tracking
 
-- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
-- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create -->
+- **Branch/PR:** m12-label-dry-coverage · https://github.com/jmgirard/circumplex/pull/36   <!-- owner: implement (branch) / review (PR URL) · create -->
 
 ## Goal
 
@@ -37,7 +37,7 @@ master before the v2.0.0 freeze.
 ## Acceptance criteria
 <!-- owner: plan · create/amend-via-gate; review reads, never reinterprets -->
 
-- [ ] **AC1** — The four inline Group/Measure/Label blocks in
+- [x] **AC1** — The four inline Group/Measure/Label blocks in
       `R/ssm_analysis.R` are replaced by calls to one helper, and
       `ssm_analyze()` `results`/`scores` are byte-identical to pre-refactor.
       Evidence: existing `ssm_analyze` snapshot/print tests stay green **under
@@ -45,11 +45,11 @@ master before the v2.0.0 freeze.
       scope-leak masking), plus a new targeted test asserting the helper's
       `Label`/`Group`/`Measure` across the branch matrix (mean+contrast+group;
       corr+group; corr+no-group+contrast; corr+no-group+no-contrast).
-- [ ] **AC2** — `codecov.yml` defines a statistical-core component/flag whose
+- [x] **AC2** — `codecov.yml` defines a statistical-core component/flag whose
       path globs all resolve to existing `R/` files (no dead globs), and the
       config is valid. Evidence: every listed path matches ≥1 real file, and
       the `test-coverage.yaml` workflow still succeeds (config parses).
-- [ ] **AC3** — `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+- [x] **AC3** — `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
 
 ## Coverage
 <!-- owner: plan · create/amend-via-gate -->
@@ -61,23 +61,35 @@ master before the v2.0.0 freeze.
 ## Tasks
 <!-- owner: plan (create) / implement (check-off, minor edits) -->
 
-- [ ] **T1** — Test-first: add a targeted test pinning the current
+- [x] **T1** — Test-first: add a targeted test pinning the current
       `Label`/`Group`/`Measure` output across the branch matrix (mean+contrast
       with grouping; corr with grouping; corr no-grouping with contrast; corr
       no-grouping no-contrast), asserted against present behavior before any
       refactor.
-- [ ] **T2** — Extract one helper (e.g. `build_result_labels()`) covering both
+- [x] **T2** — Extract one helper (e.g. `build_result_labels()`) covering both
       score paths, parametrized by `score_type`/`grouping`/`contrast`; replace
       the four inline blocks at `R/ssm_analysis.R:333`, `:370`, `:458`, `:504`.
       Verify T1 + existing snapshot/print tests green.
-- [ ] **T3** — Add the statistical-core component/flag to `codecov.yml`; confirm
+- [x] **T3** — Add the statistical-core component/flag to `codecov.yml`; confirm
       each path glob resolves to a real `R/` file and the config validates.
-- [ ] **T4** — Full `devtools::check()` (clean-env, not `load_all()`); confirm
+- [x] **T4** — Full `devtools::check()` (clean-env, not `load_all()`); confirm
       0/0/0.
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T4 — `devtools::check(args="--no-manual")` clean: 0 errors / 0
+  warnings / 0 notes (3m40s; testthat 109s OK). All tasks done → status review.
+- 2026-07-12: T3 — added a `statistical_core` codecov component (7 R estimation
+  sources + `src/circular.cpp` + `src/parameters.cpp`; excludes OOP/plot/tidy/
+  generated layers). YAML parses; all 9 paths resolve on disk. The "workflow
+  still succeeds" half of AC2 confirms on CI after push (test-coverage.yaml).
+- 2026-07-12: T1+T2 — extracted `build_result_labels()` in `R/ssm_analysis.R`,
+  replaced all four inline Label/Group/Measure blocks; added a direct helper
+  unit test covering all branches (incl. corr no-contrast+grouping and corr
+  multi-measure no-contrast, which weren't asserted end-to-end). Full
+  `devtools::test()` byte-identical green (1823 pass, 0 fail); verified result/
+  score row names + column types unchanged. The 3 suite WARNs are pre-existing.
 - 2026-07-12: created by /milestone-plan. Promoted from the "Continuous /
   infrastructure refactors" candidate row (items: Group/Measure/Label dedup +
   statistical-core coverage tracking). Decided to **land pre-freeze** (v2.0.0
@@ -94,4 +106,42 @@ master before the v2.0.0 freeze.
 <!-- owner: implement / review · append-only -->
 
 ## Review
-<!-- owner: review · exclusive -->
+
+_Reviewed 2026-07-12 (PR #36). Fresh evidence per criterion:_
+
+- **AC1 (label DRY, byte-identical)** — ✓ The four inline blocks are gone;
+  `build_result_labels()` is called at all four sites in `R/ssm_analysis.R`.
+  Fresh `devtools::test()`: **1823 pass / 0 fail**; the new helper unit test
+  asserts every branch (mean single/multi/contrast; corr single, multi-measure
+  no-contrast, measure-contrast, grouping no-contrast, group-contrast).
+  Output byte-identical — result/score row names + column types verified
+  unchanged.
+- **AC2 (statistical-core coverage component)** — ✓ `codecov.yml` parses
+  (R `yaml::read_yaml`); the `statistical_core` component lists 9 paths, all
+  resolving on disk (7 R estimation sources + `src/circular.cpp` +
+  `src/parameters.cpp`). `pkgdown::check_pkgdown()`: no problems. The
+  "workflow still succeeds" half confirms on the PR's test-coverage CI run.
+- **AC3 (check clean)** — ✓ Fresh `devtools::check(--no-manual)`: **0 errors /
+  0 warnings / 0 notes**.
+
+_Consistency gate:_ `cairn_validate.py` exit 0; Coverage map complete
+(AC1→T1,T2; AC2→T3; AC3→T4, all tasks present); `devtools::document()` no diff;
+`codecov.yml` already in `.Rbuildignore`; no new top-level files; **no NEWS.md
+entry** — the milestone has no user-visible changes (byte-identical refactor +
+CI-config only). README.Rmd/README.md untouched by this milestone.
+
+_Independent two-lens review (both fresh-context):_
+- **[O] diff-bug (Opus):** 0 findings. Transcribed the four original blocks from
+  `master` and confirmed the helper is byte-identical across all 8 branches
+  (incl. the mean-path `c(Measure, Measure[[1]])` NA append and the
+  `is.null(grouping)` contrast-branch ordering); verified the `cbind(df, df)`
+  swap is `identical()` to the old `cbind(vec…, df)` — names, character types,
+  row names — under default and non-default row names; new test is a genuine
+  pin, not a tautology.
+- **[S] blame-history (Sonnet):** 0 findings. Four blocks trace to `8c08945`
+  (2024-10-25, "Make scores and results columns uniform") which deliberately
+  made them identical; no later commit diverged them; no fixed bug resurrected;
+  no D-entry contradicted. Empirically re-confirmed `identical()` incl. row names.
+
+Both reviewers surfaced zero findings → nothing to score or triage; scorer step
+moot. No excluded (sub-80) findings.

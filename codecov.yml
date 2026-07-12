@@ -13,6 +13,25 @@ coverage:
         threshold: 1%
         informational: true
 
+# Track the statistical core (SSM/CPM estimators and their CI machinery)
+# separately from the whole package, so a coverage regression in the math is
+# visible on its own. Paths are the estimation sources only — not the OOP,
+# plotting, tidying, or generated (RcppExports) layers.
+component_management:
+  individual_components:
+    - component_id: statistical_core
+      name: statistical-core
+      paths:
+        - R/ssm_analysis.R
+        - R/ssm_bootstrap.R
+        - R/ssm_montecarlo.R
+        - R/ssm_ci_accuracy.R
+        - R/ssm_sem.R
+        - R/ssm_sem_syntax.R
+        - R/cpm_fit.R
+        - src/circular.cpp
+        - src/parameters.cpp
+
 codecov: 
  token: b885341a-69e3-47b3-906c-665b458579c6
  
