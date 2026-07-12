@@ -32,8 +32,14 @@
 #' `round(a_lci, digits) > 0` (the rule the printed [ssm_analyze()] output
 #' applies); the
 #' implied certification threshold, `0.5 * 10^-digits` in amplitude units, is
-#' echoed in the output because it is scale-dependent. For a contrast row,
-#' "certified" means both profile rows were certified.
+#' echoed in the output because it is scale-dependent. A contrast row is a
+#' signed difference, not a prototypicality measure, so
+#' `print.circumplex_ssm()` never certification-gates it; its displacement
+#' verdict and printed coverage are therefore reported unconditionally
+#' (matching that profiles-only stance). Its certification-conditional
+#' coverage -- where "certified" means both profile rows were certified -- is
+#' still computed and retained in the returned object as a descriptive that no
+#' display consumes.
 #'
 #' The `amplitude_factors` ladder manufactures populations whose closed-form
 #' amplitude is scaled toward zero (the regime where percentile amplitude
@@ -92,7 +98,9 @@
 #'   Profile x Parameter x Condition: coverage, its Monte Carlo SE, the
 #'   one-sided miss rates, median CI width, and for displacement the
 #'   certification-conditional coverage with the number of certified
-#'   replicates behind it; `Structural` flags the amplitude rows whose zero
+#'   replicates behind it -- for a contrast row this conditional column is
+#'   retained as a joint-certification descriptive that no display consumes;
+#'   `Structural` flags the amplitude rows whose zero
 #'   coverage is a theorem rather than a measurement), `guardrail` (per
 #'   Profile x Condition: certification rate with its 95% Wilson score
 #'   interval, the user-expectation benchmark `(1 - interval) / 2`, the
@@ -104,7 +112,10 @@
 #'   branch-pathology rate -- the rate at which a displacement point estimate
 #'   falls geometrically outside its own interval), `verdict`
 #'   (Wilson-vs-Bradley classification of elevation, amplitude, and
-#'   conditional displacement coverage at the as-estimated condition, plus an
+#'   displacement coverage at the as-estimated condition -- a profile's
+#'   displacement is classified certification-conditionally (`Parameter`
+#'   `"d_conditional"`), a contrast's unconditionally (`Parameter` `"d"`) --
+#'   plus an
 #'   overall worst-of row per profile; note the printed verdict headline
 #'   additionally elevates to CAUTION whenever the guardrail `Caution` fired,
 #'   so it can read worse than the overall coverage class),
@@ -546,9 +557,10 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
         # Profile rows: the shipped guardrail rule, identical to the one
         # print.circumplex_ssm() applies. The contrast row is NOT gated by print
         # (a contrast's amplitude is a difference, not a prototypicality
-        # measure), so cert[1] && cert[2] here is only the diagnostic's own
-        # conditioning device for the contrast's certified-displacement coverage
-        # -- not a rule the package displays. Its guardrail Caution is NA'd below.
+        # measure; M15-D1), so cert[1] && cert[2] here conditions no displayed
+        # number -- it only populates the retained `Coverage_conditional` /
+        # `Cert_rate` object columns (documented joint-certification
+        # descriptives). Its guardrail Caution is NA'd below.
         cert <- ssm_certified(lean$lci[, a_col], digits)
         if (contrast) cert[n_rows] <- cert[1] && cert[2]
         fitpass <- !is.na(t0_all[, fit_col]) & t0_all[, fit_col] >= 0.70
@@ -692,8 +704,9 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     # programmatic consumer share one decision (NA off that rung). The contrast
     # row is NA'd even at c = 0: print.circumplex_ssm() applies no certification
     # gate to a contrast, so a false-certification verdict does not apply to it
-    # (its Cert_rate is only the conditioning rate for certified-displacement
-    # coverage, and is still reported).
+    # (M15-D1). Its Cert_rate is retained as the documented joint-certification
+    # rate -- the denominator provenance for the retained Coverage_conditional
+    # column -- not a conditioning device for any displayed number.
     caution_col <- if (conds[k] == 0) {
       cau <- ssm_ci_guardrail_caution(cert_w[, 1], (1 - interval) / 2)
       if (contrast) cau[n_rows] <- NA
@@ -723,7 +736,8 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
 
   # ---- verdict at c = 1 (spec sec. 5.1): Wilson-95 vs Bradley liberal ----
   verdict <- ssm_ci_verdict(coverage, dcond_at_1, row_labels[seq_len(n_rows)],
-                            interval)
+                            interval,
+                            contrast_lab = if (contrast) row_labels[n_rows])
 
   # ---- population record (spec sec. 7) ----
   population <- lapply(seq_len(n_rows), function(r) {
@@ -1020,10 +1034,14 @@ ssm_ci_bradley_class <- function(k, n, nominal) {
 }
 
 # Assemble the verdict table at the as-estimated condition (spec sec. 5.1):
-# elevation and amplitude unconditional, displacement conditional on
-# certification; x and y are reported in `coverage` but do not drive the
-# verdict; the overall row is the worst classification of the three.
-ssm_ci_verdict <- function(coverage, dcond_at_1, labels, interval) {
+# elevation and amplitude unconditional; a profile's displacement is
+# conditional on certification, but the contrast's displacement is
+# UNCONDITIONAL (M15-D1: print.circumplex_ssm() never certification-gates a
+# contrast, so the verdict classifies the coverage the package actually shows
+# -- Parameter "d", not "d_conditional"). x and y are reported in `coverage`
+# but do not drive the verdict; the overall row is the worst of the three.
+ssm_ci_verdict <- function(coverage, dcond_at_1, labels, interval,
+                           contrast_lab = NULL) {
   rank <- c(adequate = 1, borderline = 2, inadequate = 3)
   rows <- list()
   for (r in seq_along(labels)) {
@@ -1035,12 +1053,20 @@ ssm_ci_verdict <- function(coverage, dcond_at_1, labels, interval) {
       k <- if (is.na(cc$Coverage)) NA_real_ else round(cc$Coverage * cc$N_reps)
       cells[[pm]] <- list(param = pm, cov = cc$Coverage, k = k, n = cc$N_reps)
     }
-    dv <- dcond_at_1[r, ]
-    nd <- sum(!is.na(dv))
-    kd <- if (nd > 0) sum(dv, na.rm = TRUE) else NA_real_
-    cells[["d"]] <- list(param = "d_conditional",
-                         cov = if (nd > 0) kd / nd else NA_real_,
-                         k = kd, n = nd)
+    if (!is.null(contrast_lab) && identical(lab, contrast_lab)) {
+      # Contrast: classify on the unconditional displacement coverage row.
+      cd <- coverage[coverage$Profile == lab & coverage$Parameter == "d" &
+                       coverage$Condition == 1, ]
+      kd <- if (is.na(cd$Coverage)) NA_real_ else round(cd$Coverage * cd$N_reps)
+      cells[["d"]] <- list(param = "d", cov = cd$Coverage, k = kd, n = cd$N_reps)
+    } else {
+      dv <- dcond_at_1[r, ]
+      nd <- sum(!is.na(dv))
+      kd <- if (nd > 0) sum(dv, na.rm = TRUE) else NA_real_
+      cells[["d"]] <- list(param = "d_conditional",
+                           cov = if (nd > 0) kd / nd else NA_real_,
+                           k = kd, n = nd)
+    }
     classes <- lapply(cells, function(cl) {
       ssm_ci_bradley_class(cl$k, cl$n, interval)
     })

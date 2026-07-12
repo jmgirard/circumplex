@@ -64,7 +64,9 @@ A \code{circumplex_ci_accuracy} object: a list with \code{coverage} (per
 Profile x Parameter x Condition: coverage, its Monte Carlo SE, the
 one-sided miss rates, median CI width, and for displacement the
 certification-conditional coverage with the number of certified
-replicates behind it; \code{Structural} flags the amplitude rows whose zero
+replicates behind it -- for a contrast row this conditional column is
+retained as a joint-certification descriptive that no display consumes;
+\code{Structural} flags the amplitude rows whose zero
 coverage is a theorem rather than a measurement), \code{guardrail} (per
 Profile x Condition: certification rate with its 95\% Wilson score
 interval, the user-expectation benchmark \code{(1 - interval) / 2}, the
@@ -76,7 +78,10 @@ rate, and the
 branch-pathology rate -- the rate at which a displacement point estimate
 falls geometrically outside its own interval), \code{verdict}
 (Wilson-vs-Bradley classification of elevation, amplitude, and
-conditional displacement coverage at the as-estimated condition, plus an
+displacement coverage at the as-estimated condition -- a profile's
+displacement is classified certification-conditionally (\code{Parameter}
+\code{"d_conditional"}), a contrast's unconditionally (\code{Parameter} \code{"d"}) --
+plus an
 overall worst-of row per profile; note the printed verdict headline
 additionally elevates to CAUTION whenever the guardrail \code{Caution} fired,
 so it can read worse than the overall coverage class),
@@ -112,8 +117,14 @@ also reported conditional on certification under the shipped decision rule
 \code{round(a_lci, digits) > 0} (the rule the printed \code{\link[=ssm_analyze]{ssm_analyze()}} output
 applies); the
 implied certification threshold, \code{0.5 * 10^-digits} in amplitude units, is
-echoed in the output because it is scale-dependent. For a contrast row,
-"certified" means both profile rows were certified.
+echoed in the output because it is scale-dependent. A contrast row is a
+signed difference, not a prototypicality measure, so
+\code{print.circumplex_ssm()} never certification-gates it; its displacement
+verdict and printed coverage are therefore reported unconditionally
+(matching that profiles-only stance). Its certification-conditional
+coverage -- where "certified" means both profile rows were certified -- is
+still computed and retained in the returned object as a descriptive that no
+display consumes.
 
 The \code{amplitude_factors} ladder manufactures populations whose closed-form
 amplitude is scaled toward zero (the regime where percentile amplitude

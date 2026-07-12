@@ -79,14 +79,18 @@ ssm_ci_verdict_blocks <- function(x) {
       sep = ""
     )
 
+    # A profile's displacement verdict is certification-conditional
+    # ("d_conditional"); the contrast's is unconditional ("d") -- M15-D1.
+    dkey <- if (is_con) "d" else "d_conditional"
     cls <- list()
-    for (pm in c("e", "a", "d_conditional")) {
+    for (pm in c("e", "a", dkey)) {
       row <- vp[vp$Parameter == pm, ]
       cls[[pm]] <- row
+      is_dcond <- pm == "d_conditional"
       leader <- switch(pm, e = "Elevation", a = "Amplitude",
-                       d_conditional = "Displacement")
+                       d = "Displacement", d_conditional = "Displacement")
       if (nrow(row) == 0 || is.na(row$Class)) {
-        txt <- if (pm == "d_conditional") {
+        txt <- if (is_dcond) {
           "never certified at the as-estimated condition (not assessable)"
         } else {
           "not assessable"
@@ -103,15 +107,16 @@ ssm_ci_verdict_blocks <- function(x) {
       }
       ssm_ci_cat_line(leader, paste0(
         "coverage ", ssm_ci_pct(row$Coverage),
-        if (pm == "d_conditional") " when certified", " -- ", shown, qual
+        if (is_dcond) " when certified", " -- ", shown, qual
       ))
     }
 
     # Guardrail false-certification line: profiles only. print.circumplex_ssm()
     # gates a profile's displacement on "amplitude CI excludes zero" but applies
     # no such gate to a contrast, so the diagnostic reports no false-cert verdict
-    # for the contrast row (its certified-displacement coverage line above still
-    # uses the joint-certification conditioning).
+    # for the contrast row -- and, since M15-D1, no certification-conditional
+    # displacement line either (the contrast's displacement line above is
+    # unconditional). The retained contrast Cert_rate is object-only provenance.
     gr0 <- gr[gr$Profile == lab & gr$Condition == 0, ]
     guard_fired <- FALSE
     guard_rate <- NA_real_
@@ -138,7 +143,7 @@ ssm_ci_verdict_blocks <- function(x) {
     }
 
     ssm_ci_cat_para(
-      ssm_ci_verdict_text(cls, guard_fired, guard_rate), indent = 2
+      ssm_ci_verdict_text(cls, guard_fired, guard_rate, dkey = dkey), indent = 2
     )
   }
   invisible(x)
@@ -166,7 +171,16 @@ ssm_ci_miss_phrase <- function(cov, lab) {
 # three classifications and the guardrail caution. The headline is CAUTION
 # whenever any coverage verdict is inadequate OR the false-certification
 # caution fired (sec. 5.1: the caution triggers the CAUTION wording).
-ssm_ci_verdict_text <- function(cls, guard_fired, guard_rate) {
+# `dkey` selects the displacement verdict key: "d_conditional" for a profile
+# (certification-conditional) or "d" for the contrast (unconditional; M15-D1).
+# `certified` drives the "when certified" / "certified displacement" wording,
+# which is omitted for the contrast.
+ssm_ci_verdict_text <- function(cls, guard_fired, guard_rate,
+                                dkey = "d_conditional") {
+  certified <- dkey == "d_conditional"
+  d_label <- if (certified) "certified displacement" else "displacement"
+  labmap <- c(e = "elevation", a = "amplitude")
+  labmap[[dkey]] <- d_label
   class_of <- function(pm) {
     row <- cls[[pm]]
     if (is.null(row) || nrow(row) == 0) NA_character_ else row$Class
@@ -175,7 +189,7 @@ ssm_ci_verdict_text <- function(cls, guard_fired, guard_rate) {
     row <- cls[[pm]]
     if (is.null(row) || nrow(row) == 0) NA_character_ else row$Direction
   }
-  cl <- vapply(c("e", "a", "d_conditional"), class_of, character(1))
+  cl <- vapply(c("e", "a", dkey), class_of, character(1))
   if (all(is.na(cl)) && !guard_fired) {
     return("Verdict: not assessable at this number of replications.")
   }
@@ -197,11 +211,11 @@ ssm_ci_verdict_text <- function(cls, guard_fired, guard_rate) {
       "amplitude CIs cover more often than nominal (they are conservative)"
     })
   }
-  if (identical(cl[["d_conditional"]], "inadequate")) {
-    bad <- c(bad, if (identical(dir_of("d_conditional"), "under")) {
-      "displacement CIs mis-cover even when certified"
+  if (identical(cl[[dkey]], "inadequate")) {
+    bad <- c(bad, if (identical(dir_of(dkey), "under")) {
+      paste0("displacement CIs mis-cover", if (certified) " even when certified")
     } else {
-      "displacement CIs over-cover when certified"
+      paste0("displacement CIs over-cover", if (certified) " when certified")
     })
   }
   if (guard_fired) {
@@ -231,22 +245,20 @@ ssm_ci_verdict_text <- function(cls, guard_fired, guard_rate) {
   sentences <- character(0)
   if (length(bad) > 0) {
     sentences <- paste0(join_and(bad), ".")
-    if (identical(cl[["d_conditional"]], "adequate")) {
-      sentences <- c(sentences,
-                     "Displacement CIs are trustworthy when certified.")
+    if (identical(cl[[dkey]], "adequate")) {
+      sentences <- c(sentences, paste0(
+        "Displacement CIs are trustworthy",
+        if (certified) " when certified", "."
+      ))
     }
   } else if (!any(cl == "borderline", na.rm = TRUE)) {
-    ok <- c(e = "elevation", a = "amplitude",
-            d_conditional = "certified displacement")[
-              names(cl)[which(cl == "adequate")]]
+    ok <- labmap[names(cl)[which(cl == "adequate")]]
     sentences <- paste0(
       "coverage is consistent with the nominal level for ", join_and(ok),
       " at this sample size."
     )
   }
-  bord <- c(e = "elevation", a = "amplitude",
-            d_conditional = "certified displacement")[
-              names(cl)[which(cl == "borderline")]]
+  bord <- labmap[names(cl)[which(cl == "borderline")]]
   if (length(bord) > 0) {
     sentences <- c(sentences, paste0(
       join_and(bord), " coverage ", if (length(bord) > 1) "rates are"
@@ -511,6 +523,13 @@ plot.circumplex_ci_accuracy <- function(x, ...) {
     N_reps = dcond$N_conditional, Structural = FALSE,
     stringsAsFactors = FALSE
   )
+  # The "Displacement (certified)" panel is a presentation surface, so it
+  # follows print's profiles-only certification stance (M15-D1): the contrast's
+  # displacement is unconditional and appears only in the "Displacement" panel.
+  if (isTRUE(x$details$contrast)) {
+    con_lab <- names(x$details$row_n)[length(x$details$row_n)]
+    dcond <- dcond[dcond$Profile != con_lab, , drop = FALSE]
+  }
   df <- rbind(base, dcond)
   df <- df[!is.na(df$Coverage) & df$N_reps > 0, , drop = FALSE]
   wl <- t(vapply(seq_len(nrow(df)), function(i) {

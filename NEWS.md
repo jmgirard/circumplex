@@ -81,7 +81,11 @@ Structure", for a worked introduction to both.
   amplitude intervals are theoretically weakest — along with one-sided miss
   rates, interval widths, the certification rate of the printed
   "amplitude CI excludes zero" guardrail, and displacement coverage
-  conditional on certification. Coverage at the as-estimated condition is
+  conditional on certification. For a contrast row — a signed difference that
+  `print.circumplex_ssm()` never certification-gates — the displacement
+  verdict and printed coverage are reported unconditionally, matching that
+  profiles-only stance (its conditional coverage is retained in the object as
+  a descriptive). Coverage at the as-estimated condition is
   classified against Bradley's (1978) liberal robustness band using 95%
   Wilson score intervals, and `print()`/`summary()` translate the
   classifications into a plain-language verdict, including a caution line
