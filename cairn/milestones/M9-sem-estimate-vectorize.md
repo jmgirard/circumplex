@@ -2,10 +2,10 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M9: sem_estimate() vectorization + oracle single-sourcing
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
-- **Branch/PR:** —
+- **Branch/PR:** m9-sem-estimate-vectorize
 
 ## Goal
 
@@ -52,9 +52,9 @@ items a, b):
 
 ## Tasks
 
-- [ ] **T1** — Vectorize `sem_estimate()` (`R/ssm_sem.R:553-559`) to spec §9's
-      single matrix pass; confirm both call sites unchanged.
-- [ ] **T2** — Re-verify every seeded pin in the SEM suite in the same change;
+- [x] **T1** — Vectorize `sem_estimate()` (draw loop, now `R/ssm_sem.R:~624-628`)
+      to spec §9's single matrix pass; confirm both call sites unchanged.
+- [x] **T2** — Re-verify every seeded pin in the SEM suite in the same change;
       document any FP-driven re-pins in the work-log with their oracle trace.
 - [ ] **T3** — Refactor `make_pop_2g()` → compose `sem_pop()`; re-record the
       two-group cells in `devel/m5-coverage-oracle-results.rds`.
@@ -72,6 +72,18 @@ items a, b):
   running it before the v2.0.0 freeze (~2026-07-26) risks destabilizing the
   release, so confirm timing before starting. Review tier: Fable + hard re-pin
   AC (user gate, 2026-07-12); no RB — the target form is fixed by spec §9.
+- 2026-07-12: started; user gate chose proceed-now despite the plan's pre-freeze
+  churn caution (owns the release-window risk). Branch m9-sem-estimate-vectorize
+  cut from master.
+- 2026-07-12 (T1/T2): added vectorized `sem_ssm_transform_mat()` (draws x k ->
+  draws x 6 matrix pass, spec section 9) and swapped it into the `sem_estimate()`
+  draw loop; scalar `sem_ssm_transform()` kept untouched as the reference (it is
+  directly tested vs `ssm_parameters()`). New equivalence test pins the matrix
+  pass to the scalar reference row-by-row incl. section 5.5 degenerate-NA
+  semantics. No re-pins needed: full SEM suite (336 pass) and full
+  `devtools::test()` (1784 pass, 0 fail) stay green within existing tolerances
+  (the bit-for-bit branch of AC2). Prior line refs were stale: the draw loop is
+  now at R/ssm_sem.R:~624, not 553.
 
 ## Decisions
 
