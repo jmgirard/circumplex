@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — | high | milestones/M7-v2-release-prep.md |
-| M12 | Result-label DRY + statistical-core coverage tracking | in-progress | — | normal | milestones/M12-label-dry-coverage.md |
+| M12 | Result-label DRY + statistical-core coverage tracking | review | — | normal | milestones/M12-label-dry-coverage.md |
 | M11 | Boundary-coverage hardening + test-suite tidiness | done | — | normal | milestones/archive/M11-boundary-coverage-hardening.md |
 | M8 | SEM-layer DRY single-sourcing | done | — | normal | milestones/archive/M8-sem-dry-single-sourcing.md |
 | M9 | sem_estimate() vectorization + oracle single-sourcing | done | — | normal | milestones/archive/M9-sem-estimate-vectorize.md |

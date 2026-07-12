@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M12: Result-label DRY + statistical-core coverage tracking
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Branch/PR:** m12-label-dry-coverage   <!-- owner: implement (branch) / review (PR URL) · create -->
@@ -72,12 +72,14 @@ master before the v2.0.0 freeze.
       Verify T1 + existing snapshot/print tests green.
 - [x] **T3** — Add the statistical-core component/flag to `codecov.yml`; confirm
       each path glob resolves to a real `R/` file and the config validates.
-- [ ] **T4** — Full `devtools::check()` (clean-env, not `load_all()`); confirm
+- [x] **T4** — Full `devtools::check()` (clean-env, not `load_all()`); confirm
       0/0/0.
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T4 — `devtools::check(args="--no-manual")` clean: 0 errors / 0
+  warnings / 0 notes (3m40s; testthat 109s OK). All tasks done → status review.
 - 2026-07-12: T3 — added a `statistical_core` codecov component (7 R estimation
   sources + `src/circular.cpp` + `src/parameters.cpp`; excludes OOP/plot/tidy/
   generated layers). YAML parses; all 9 paths resolve on disk. The "workflow
