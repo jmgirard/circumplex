@@ -6,7 +6,7 @@
 - **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
-- **Branch/PR:** m12-label-dry-coverage   <!-- owner: implement (branch) / review (PR URL) · create -->
+- **Branch/PR:** m12-label-dry-coverage · https://github.com/jmgirard/circumplex/pull/36   <!-- owner: implement (branch) / review (PR URL) · create -->
 
 ## Goal
 
@@ -37,7 +37,7 @@ master before the v2.0.0 freeze.
 ## Acceptance criteria
 <!-- owner: plan · create/amend-via-gate; review reads, never reinterprets -->
 
-- [ ] **AC1** — The four inline Group/Measure/Label blocks in
+- [x] **AC1** — The four inline Group/Measure/Label blocks in
       `R/ssm_analysis.R` are replaced by calls to one helper, and
       `ssm_analyze()` `results`/`scores` are byte-identical to pre-refactor.
       Evidence: existing `ssm_analyze` snapshot/print tests stay green **under
@@ -45,11 +45,11 @@ master before the v2.0.0 freeze.
       scope-leak masking), plus a new targeted test asserting the helper's
       `Label`/`Group`/`Measure` across the branch matrix (mean+contrast+group;
       corr+group; corr+no-group+contrast; corr+no-group+no-contrast).
-- [ ] **AC2** — `codecov.yml` defines a statistical-core component/flag whose
+- [x] **AC2** — `codecov.yml` defines a statistical-core component/flag whose
       path globs all resolve to existing `R/` files (no dead globs), and the
       config is valid. Evidence: every listed path matches ≥1 real file, and
       the `test-coverage.yaml` workflow still succeeds (config parses).
-- [ ] **AC3** — `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+- [x] **AC3** — `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
 
 ## Coverage
 <!-- owner: plan · create/amend-via-gate -->
@@ -106,4 +106,26 @@ master before the v2.0.0 freeze.
 <!-- owner: implement / review · append-only -->
 
 ## Review
-<!-- owner: review · exclusive -->
+
+_Reviewed 2026-07-12 (PR #36). Fresh evidence per criterion:_
+
+- **AC1 (label DRY, byte-identical)** — ✓ The four inline blocks are gone;
+  `build_result_labels()` is called at all four sites in `R/ssm_analysis.R`.
+  Fresh `devtools::test()`: **1823 pass / 0 fail**; the new helper unit test
+  asserts every branch (mean single/multi/contrast; corr single, multi-measure
+  no-contrast, measure-contrast, grouping no-contrast, group-contrast).
+  Output byte-identical — result/score row names + column types verified
+  unchanged.
+- **AC2 (statistical-core coverage component)** — ✓ `codecov.yml` parses
+  (R `yaml::read_yaml`); the `statistical_core` component lists 9 paths, all
+  resolving on disk (7 R estimation sources + `src/circular.cpp` +
+  `src/parameters.cpp`). `pkgdown::check_pkgdown()`: no problems. The
+  "workflow still succeeds" half confirms on the PR's test-coverage CI run.
+- **AC3 (check clean)** — ✓ Fresh `devtools::check(--no-manual)`: **0 errors /
+  0 warnings / 0 notes**.
+
+_Consistency gate:_ `cairn_validate.py` exit 0; Coverage map complete
+(AC1→T1,T2; AC2→T3; AC3→T4, all tasks present); `devtools::document()` no diff;
+`codecov.yml` already in `.Rbuildignore`; no new top-level files; **no NEWS.md
+entry** — the milestone has no user-visible changes (byte-identical refactor +
+CI-config only). README.Rmd/README.md untouched by this milestone.
