@@ -27,6 +27,25 @@ test_that("S3 degree functions work as expected", {
   expect_equal(as.numeric(y3), x)
 })
 
+test_that("new_contrast_radian() is byte-identical to the former inline tag", {
+  x <- c(-3, 0, 1.5, NA_real_)
+
+  cr <- new_contrast_radian(x)
+  expect_s3_class(cr, "circumplex_contrast_radian")
+  expect_equal(as.numeric(cr), x)
+
+  # The constructor must reproduce the exact object the two call sites used to
+  # build inline (ssm_bootstrap.R / ssm_ci_accuracy.R), so the DRY extraction
+  # is provably behaviour-preserving.
+  inline <- structure(x, class = c("circumplex_contrast_radian", "numeric"))
+  expect_identical(cr, inline)
+
+  # And its plain-radian sibling likewise dispatches to the standard method.
+  r <- new_radian(x)
+  expect_s3_class(r, "circumplex_radian")
+  expect_identical(r, structure(x, class = c("circumplex_radian", "numeric")))
+})
+
 test_that("The ssm display methods is working", {
   skip_on_cran()
 

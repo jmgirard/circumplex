@@ -108,9 +108,7 @@ ssm_replicate_intervals <- function(t0, t, interval, contrast,
   d_cols <- which(param_of_col == "d")
   if (contrast) {
     contrast_d_col <- d_cols[length(d_cols)]
-    bs_t[contrast_d_col] <- lapply(bs_t[contrast_d_col], function(x) {
-      structure(x, class = c("circumplex_contrast_radian", "numeric"))
-    })
+    bs_t[contrast_d_col] <- lapply(bs_t[contrast_d_col], new_contrast_radian)
     d_cols <- d_cols[-length(d_cols)]
   }
   bs_t[d_cols] <- lapply(bs_t[d_cols], new_radian)
@@ -170,7 +168,7 @@ ssm_by_group <- function(scores, angles, contrast) {
 # Calculate quantiles for circular data in radians
 #' @export
 quantile.circumplex_radian <- function(x, na.rm = TRUE, ...) {
-  if (all(is.na(x))) return(NA)
+  if (all(is.na(x))) return(NA_real_)
   x <- unclass(x)
   mean_angle <- atan2(mean(sin(x), na.rm = na.rm), mean(cos(x), na.rm = na.rm))
   angles_centered <- (x - mean_angle + pi) %% (2 * pi) - pi
@@ -183,7 +181,7 @@ quantile.circumplex_radian <- function(x, na.rm = TRUE, ...) {
 # Calculate quantiles for circular contrast data in radians (allowing negatives)
 #' @export
 quantile.circumplex_contrast_radian <- function(x, na.rm = TRUE, ...) {
-  if (all(is.na(x))) return(NA)
+  if (all(is.na(x))) return(NA_real_)
   x <- unclass(x)
   mean_angle <- atan2(mean(sin(x), na.rm = na.rm), mean(cos(x), na.rm = na.rm))
   angles_centered <- (x - mean_angle + pi) %% (2 * pi) - pi

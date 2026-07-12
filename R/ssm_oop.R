@@ -26,7 +26,12 @@ new_degree <- function(x) {
   new_s3_num(x, class = c("circumplex_degree", "numeric"))
 }
 
-# S3 Generic
+# S3 Generic. Deliberately internal: the generic is NOT exported (only its
+# methods are S3-registered), so `as_degree`/`as_radian` are boundary-conversion
+# helpers, not public API. Keep-internal was chosen over promoting them to a
+# documented converter API (M13, D-006 follow-up): minimal-API doctrine, no
+# API-maintenance commitment, reversible. Reopen only if a public deg<->rad
+# converter is genuinely wanted.
 as_degree <- function(x, ...) {
   UseMethod("as_degree")
 }
@@ -59,7 +64,16 @@ new_radian <- function(x) {
   new_s3_num(x, class = c("circumplex_radian", "numeric"))
 }
 
-# S3 Generic
+# S3 Constructor for the contrast variant (a signed radian difference whose
+# circular quantiles are allowed to stay negative; see
+# quantile.circumplex_contrast_radian). Single-sources the class tag applied
+# to contrast displacement columns in ssm_bootstrap.R and ssm_ci_accuracy.R.
+new_contrast_radian <- function(x) {
+  new_s3_num(x, class = c("circumplex_contrast_radian", "numeric"))
+}
+
+# S3 Generic. Deliberately internal (see as_degree above): generic unexported,
+# methods registered; boundary-conversion helper, not public API (M13).
 as_radian <- function(x, ...) {
   UseMethod("as_radian")
 }
