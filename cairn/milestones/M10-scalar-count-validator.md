@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M10: Package-wide scalar-count validator
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** low
 - **Depends on:** —
 - **Branch/PR:** m10-scalar-count-validator
@@ -58,7 +58,9 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
       `R/cpm_fit.R`, `R/ssm_sem.R`; reconcile `R/ssm_sem_syntax.R:254-256`.
       Assert each validation still aborts on bad input. 15 sites converted;
       length>1 regression tests added for all three families.
-- [ ] **T4** — `devtools::document()` (if roxygen touched) + `devtools::check()`.
+- [x] **T4** — `devtools::check()` clean (0/0/0). No roxygen touched
+      (`is_scalar_count()` is internal, plain-comment documented), so
+      `devtools::document()` was not required.
 
 ## Work log
 
@@ -68,6 +70,11 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
   sequencing choice; behaviour is validation-message-only, low freeze risk.
   Carries a convention decision (canonical `is_*()` reading) deferred to a
   question-gate at implement, not pre-decided here.
+- 2026-07-12: implemented. `is_scalar_count(x, min=1L)` added (T1), D-005
+  recorded (T2), 15 sites converted across `ssm_ci_accuracy`/`cpm_fit`/`ssm_sem`/
+  `ssm_sem_syntax` + length>1 regression tests for all three families (T3),
+  `devtools::check()` clean 0/0/0 (T4). Plan line numbers had drifted post-M8/M9;
+  actual sites resolved by grep. Status → review.
 
 ## Decisions
 
