@@ -371,7 +371,7 @@ changing results for a given seed.
 
 set.seed(34567)
 acc <- ssm_ci_accuracy(res, reps = 200, amplitude_factors = c(1, 0.5, 0))
-#> Warning: CPM Hessian is ill-conditioned (condition number 9.17e+16): angles may
+#> Warning: CPM Hessian is ill-conditioned (condition number 1.29e+17): angles may
 #> be clustered or parameters weakly determined.
 summary(acc)
 #> 
@@ -383,7 +383,7 @@ summary(acc)
 #> Population Structure:     Browne circular model (CPM) 
 #> Group Sizes:      All = 250 
 #> Certification Rule:   round(a_lci, 3) > 0 (threshold 0.0005 amplitude units) 
-#> Elapsed:      13.8 s
+#> Elapsed:      8.6 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).
