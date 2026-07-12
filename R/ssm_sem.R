@@ -20,6 +20,15 @@ sem_invariance_rungs <- function() {
   c("configural", "metric", "scalar", "strict_residuals")
 }
 
+# Under the strict tier every loading is fixed, so the "metric" rung (which
+# only constrains loadings across groups) is VACUOUS: it holds by
+# construction, is never fitted, and the configural fit already IS the metric
+# model. THE single source of that rule, shared by the ladder loop, the
+# comparability verdict, and the estimation-fit selection (spec section 6.2).
+sem_strict_metric_vacuous <- function(model, rung) {
+  model == "strict" && rung == "metric"
+}
+
 # THE single source of the contrast-arity messages shared by ssm_sem() and
 # ssm_sem_parameters(). A second-minus-first contrast is defined only for
 # exactly two things: two groups (with the latent-mean path, or a single
@@ -751,7 +760,7 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   rows <- list()
   prev_fit <- NULL
   for (r in rungs) {
-    if (model == "strict" && r == "metric") {
+    if (sem_strict_metric_vacuous(model, r)) {
       rows[[r]] <- data.frame(
         rung = r, chisq = NA_real_, df = NA_real_, cfi = NA_real_,
         rmsea = NA_real_, dchisq = NA_real_, ddf = NA_real_, p = NA_real_,
@@ -826,7 +835,7 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   # rather than assert a hypothesis test that never happened.
   comparable <- nrow(failed) == 0 && nrow(untestable) == 0
   if (required == "configural" ||
-    (model == "strict" && required == "metric")) {
+    sem_strict_metric_vacuous(model, required)) {
     # Nothing testable at or below the required rung
     comparable <- TRUE
     verdict <- if (required == "configural") {
@@ -879,7 +888,7 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   # vacuous metric requirement, the configural fit IS the metric model);
   # the configural fit -- separate per-group profiles only -- when the gate
   # fails (spec section 6.3).
-  req_fit_name <- if (model == "strict" && required == "metric") {
+  req_fit_name <- if (sem_strict_metric_vacuous(model, required)) {
     "configural"
   } else {
     required

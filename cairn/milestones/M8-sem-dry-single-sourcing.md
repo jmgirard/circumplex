@@ -43,9 +43,12 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
       byte-identical (current `ssm_sem()` tests + snapshots pass unchanged).
 - [ ] `summary.circumplex_ssm_sem()` output is snapshot-identical, with detail
       lines produced by the shared label seam.
-- [ ] Strict-tier syntax is single-sourced; the pinned strings
-      `exp_strict_nomeas` / `exp_strict_meas` (`tests/testthat/test-ssm_sem_syntax.R:242,244`)
-      remain byte-identical.
+- [ ] The strict-tier vacuous-metric rule (`model=="strict" && rung=="metric"`)
+      is single-sourced across the three ladder sites via one predicate; the
+      pinned strings `exp_strict_nomeas` / `exp_strict_meas`
+      (`tests/testthat/test-ssm_sem_syntax.R:242,244`) remain byte-identical.
+      (Amended 2026-07-12 via gate: cross-branch *emission* unification
+      descoped as not-worth-the-snapshot-risk → candidate row; see work log.)
 - [ ] Micro-cleanups landed (`npar` field removed, `score_type` overwrite
       removed) with no behaviour change; suite green.
 - [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
@@ -67,8 +70,9 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
       sites (`R/ssm_sem.R:689-704,1170-1178`); assert identical fits.
 - [x] **T3** — Route `summary.circumplex_ssm_sem()` detail lines
       (`R/ssm_sem.R:1583-1600`) through a shared label seam; snapshot unchanged.
-- [ ] **T4** — Single-source strict-tier syntax across single/multi-group
-      branches; keep `exp_strict_*` snapshots byte-identical.
+- [x] **T4** — Single-source the strict-tier vacuous-metric rule via
+      `sem_strict_metric_vacuous()` (ladder sites `ssm_sem.R:754,829,882`);
+      `exp_strict_*` snapshots byte-identical. (Emission unification descoped.)
 - [ ] **T5** — Micro-cleanups: remove unused `npar` field, drop
       `sem_details()`'s overwritten `score_type`, consolidate test fixtures.
 - [ ] **T6** — `devtools::document()` (if roxygen touched) + full
@@ -100,6 +104,15 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
   (method, missing) to display labels; `summary()` delegates to it. Added a
   direct unit test locking both branches (the existing integration test only
   hit mvn/fiml). Output unchanged.
+
+- 2026-07-12: T4 done (narrowed) — `sem_strict_metric_vacuous()` single-sources
+  the vacuous-metric rule at the three ladder sites; strict snapshots unchanged.
+  AC4 amendment (user-gated 2026-07-12): the single-group and multi-group
+  strict *emitters* in `ssm_sem_syntax.R` are structurally distinct (plain
+  labels vs `c()`-vector cross-group labels) and byte-pinned; unifying them is a
+  high-risk rewrite of statistical output for minor gain, so it was descoped to
+  a candidate row (`ROADMAP.md`). Roxygen "metric rung is vacuous" prose left as
+  is (can't single-source across separate doc blocks without templating).
 
 ## Decisions
 
