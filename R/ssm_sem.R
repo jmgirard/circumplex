@@ -629,6 +629,27 @@ sem_details <- function(boots, interval, missing, angles_deg, contrast,
   )
 }
 
+# THE label seam for the ssm_sem summary detail lines: maps the stored detail
+# CODES (method, missing) to their display labels, so the display vocabulary
+# lives in one place rather than inline in summary(). `replicate` is the
+# tab-aligned label for the replicate-count line; `missing` names the
+# missing-data scheme. Kept out of sem_details() (which stores codes, not
+# prose) so the seam is independently testable.
+sem_detail_labels <- function(details) {
+  list(
+    replicate = if (identical(details$method, "mvn")) {
+      "\nMVN Draws:\t\t"
+    } else {
+      "\nBootstrap Refits:\t"
+    },
+    missing = if (identical(details$missing, "fiml")) {
+      "FIML"
+    } else {
+      "Listwise deletion"
+    }
+  )
+}
+
 # Assemble the labeled results/scores data frames (one row per profile block
 # in group-major order plus an optional contrast row), mirroring
 # ssm_analyze_means()/ssm_analyze_corrs()'s labeling conventions.
@@ -1592,21 +1613,12 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
 #' @method summary circumplex_ssm_sem
 #' @export
 summary.circumplex_ssm_sem <- function(object, digits = 3, ...) {
-  replicate_label <- if (identical(object$details$method, "mvn")) {
-    "\nMVN Draws:\t\t"
-  } else {
-    "\nBootstrap Refits:\t"
-  }
-  missing_label <- if (identical(object$details$missing, "fiml")) {
-    "FIML"
-  } else {
-    "Listwise deletion"
-  }
+  labs <- sem_detail_labels(object$details)
   cat(
     "\nStatistical Basis:\t", object$details$score_type, "Scores",
-    replicate_label, object$details$boots,
+    labs$replicate, object$details$boots,
     "\nConfidence Level:\t", object$details$interval,
-    "\nMissing Data:\t\t", missing_label,
+    "\nMissing Data:\t\t", labs$missing,
     "\nScale Displacements:\t", as.numeric(object$details$angles),
     "\n\n"
   )

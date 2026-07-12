@@ -65,7 +65,7 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
       (`R/ssm_sem.R:1099-1103,1134-1150,1366-1388`) through it; keep messages.
 - [x] **T2** — Extract internal fit chokepoint for the two `lavaan::cfa()`
       sites (`R/ssm_sem.R:689-704,1170-1178`); assert identical fits.
-- [ ] **T3** — Route `summary.circumplex_ssm_sem()` detail lines
+- [x] **T3** — Route `summary.circumplex_ssm_sem()` detail lines
       (`R/ssm_sem.R:1583-1600`) through a shared label seam; snapshot unchanged.
 - [ ] **T4** — Single-source strict-tier syntax across single/multi-group
       branches; keep `exp_strict_*` snapshots byte-identical.
@@ -95,6 +95,11 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
   `missing` translation and the multi-group `group.label` ordering; both former
   `lavaan::cfa()` sites route through it. Existing single- and multi-group fit
   tests pass unchanged (identical fits).
+
+- 2026-07-12: T3 done — `sem_detail_labels()` seam maps the stored detail codes
+  (method, missing) to display labels; `summary()` delegates to it. Added a
+  direct unit test locking both branches (the existing integration test only
+  hit mvn/fiml). Output unchanged.
 
 ## Decisions
 

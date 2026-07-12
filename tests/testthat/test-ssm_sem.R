@@ -723,6 +723,16 @@ test_that("summary.circumplex_ssm_sem() states the actual inferential method (se
   expect_no_match(out, "Listwise Deletion:")
 })
 
+test_that("sem_detail_labels() single-sources the summary detail-line labels", {
+  # Locks both branches of the label seam that summary() delegates to.
+  mvn_fiml <- sem_detail_labels(list(method = "mvn", missing = "fiml"))
+  expect_match(mvn_fiml$replicate, "MVN Draws")
+  expect_identical(mvn_fiml$missing, "FIML")
+  boot_lw <- sem_detail_labels(list(method = "boot", missing = "listwise"))
+  expect_match(boot_lw$replicate, "Bootstrap Refits")
+  expect_identical(boot_lw$missing, "Listwise deletion")
+})
+
 test_that("print.circumplex_ssm_sem() prepends the measurement-model block (sec. 7.3)", {
   skip_if_not_installed("lavaan")
   a <- rep(0.55, 8)
