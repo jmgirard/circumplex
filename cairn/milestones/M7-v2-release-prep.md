@@ -16,6 +16,9 @@ trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
 - Version bump to 2.0.0; NEWS.md development heading → 2.0.0.
 - Refresh `cran-comments.md` (test environments, clean check (0 errors / 0 warnings / 0 notes), no revdeps, the
   Moss DOI 403 = SAGE bot-block note from urlchecker).
+- Second independent human re-read of the Grassi et al. (2010) CircE and
+  Zimmermann & Wright (2017) transcriptions against their primary sources
+  (a pre-submission oracle gate; absorbed from a ROADMAP candidate 2026-07-12).
 - win-builder / R-devel checks; then hand `submit_cran()` to Jeff (never submit
   autonomously).
 
@@ -28,6 +31,10 @@ trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
 - [ ] DESCRIPTION at 2.0.0; NEWS.md heading renamed; `cran-comments.md` accurate.
 - [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
       win-builder / R-devel green across platforms.
+- [ ] Second independent human re-read of the Grassi et al. (2010) CircE and
+      Zimmermann & Wright (2017) norm/structure transcriptions against their
+      primary sources completed before submission, with any discrepancies
+      resolved (Jeff-attested in the work log).
 - [ ] Release handed to Jeff for `submit_cran()` (not self-submitted).
 
 ## Coverage
@@ -35,6 +42,7 @@ trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
 - AC1 → T1
 - AC2 → T2
 - AC3 → T3
+- AC4 → T4
 
 ## Tasks
 
@@ -42,7 +50,10 @@ trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
       (groundwork staged 2026-07-08; the accurate summary + urlchecker DOI note
       already written per legacy MILESTONES.md R2).
 - [ ] **T2** — Full `check()` + win-builder / R-devel.
-- [ ] **T3** — Hand `submit_cran()` to Jeff.
+- [ ] **T3** — Second independent human re-read of the Grassi et al. (2010) and
+      Zimmermann & Wright (2017) transcriptions vs primary sources; gates
+      submission. Human task (Jeff); discrepancies resolved before T4.
+- [ ] **T4** — Hand `submit_cran()` to Jeff.
 
 ## Work log
 
@@ -56,6 +67,11 @@ trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
   version bump / NEWS rename / win-builder / submit are deliberately deferred
   until ~2026-08-02 (freeze ~2026-07-26). Repo stays at 1.3.0.9002 until then
   (legacy MILESTONES.md R2).
+- 2026-07-12: AMENDED (gated) — absorbed the "v2.0.0 pre-release oracle
+  re-reads" ROADMAP candidate as AC3/T3 (second independent human re-read of
+  the Grassi 2010 + Zimmermann & Wright 2017 transcriptions, gating submission);
+  old submit-handoff task renumbered T3→T4. Candidate row retired. Scope
+  unchanged otherwise; still blocked on the CRAN cadence window.
 
 ## Decisions
 
