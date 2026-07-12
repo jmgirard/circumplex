@@ -74,11 +74,9 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
 ## Tasks
 <!-- owner: plan (create) / implement (check-off, minor edits) -->
 
-- [ ] **T1** — Audit boundary coverage and author the matrix (4 classes × 6
-      entry points) with `file:line` citations, in a `cairn/` reference file.
-      Read the existing boundary tests in `test-ssm_bootstrap.R`,
-      `test-ssm_montecarlo.R`, `test-ci_accuracy.R`, `test-ssm_sem.R`,
-      `test-ssm_analysis.R` before writing cells.
+- [x] **T1** — Boundary coverage matrix authored at `cairn/boundary-coverage.md`
+      (4 classes × 6 entry points, every cell cited by `file:line`; no empty
+      cells). Shared-engine cells documented as deliberately-once, not per-path.
 - [x] **T2** — Add tests for any genuine gap. Audit showed the mean path fully
       covered (incl. the pole point-estimate at `test-ssm_analysis.R:519`); the
       genuine gaps were on the **correlation** entry point. Added two

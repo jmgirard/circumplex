@@ -1,0 +1,43 @@
+# Boundary-condition coverage matrix
+
+_Repo-specific assurance artifact (M11). Not a status/decision file._
+_Authored 2026-07-12. Owner: whichever milestone next touches boundary
+behaviour — re-audit and re-cite when the line numbers move._
+
+The four angular/boundary invariant **classes** are the ones CLAUDE.md
+"Statistical invariants" requires testing whenever displacement, contrasts, or
+`src/` change:
+
+- **A** — profiles peaking exactly at 0°/360° (point estimate lands on the pole)
+- **B** — displacement CIs straddling 0°/360°
+- **C** — contrasts near ±180° (branch-cut agreement)
+- **D** — flat / zero-variance profiles (graceful NA, no crash)
+
+The **entry points** are the six places a user reaches the estimator. Each cell
+cites a test by `file:line`, or records why the cell is covered elsewhere.
+`ssm_parameters()` is the shared point-estimate engine, so class A/D at the
+point-estimate level is an engine property tested once, not re-proved per path.
+
+| Entry point | A — peak at 0/360 | B — CI straddles 0/360 | C — contrast near ±180 | D — flat / zero-variance |
+|---|---|---|---|---|
+| `ssm_analyze()` mean | `test-ssm_analysis.R:562` (pole via `ssm_score`) | `test-ssm_montecarlo.R:94`; `test-ssm_bootstrap.R:210` | `test-ssm_bootstrap.R:147`, `:178`; `test-ssm_montecarlo.R:117`, `:224` | `test-ssm_bootstrap.R:137` (end-to-end); `test-ssm_analysis.R:488`, `:598` |
+| `ssm_analyze()` correlation | `test-ssm_analysis.R:253` (**M11**, profile assembly at pole) | shared displacement/quantile engine (see mean B); correlation profile at pole → `:253` | `test-ssm_analysis.R:329`, `:386`; `test-ci_accuracy.R:72`, `:303` (correlation branch pathology) | `test-ssm_analysis.R:229` (**M11**, flat correlation profile) |
+| Bootstrap engine | quantile handles the pole → `test-ssm_bootstrap.R:210` | `test-ssm_bootstrap.R:210`, `:1` | `test-ssm_bootstrap.R:147`, `:178` | `test-ssm_bootstrap.R:137`, `:95`, `:114` (all-NA column) |
+| Monte Carlo engine | engine-level point estimate (see mean A); pole interval → `:94` | `test-ssm_montecarlo.R:94` | `test-ssm_montecarlo.R:117`, `:224` | `test-ssm_montecarlo.R:141` (flat + singular covariance) |
+| `ssm_ci_accuracy()` | `test-ci_accuracy.R:343` (population peaks at 0/360) | `test-ci_accuracy.R:50` (membership mod 360) | `test-ci_accuracy.R:72`, `:562` | `test-ci_accuracy.R:419` (flat population refused) |
+| SEM (`ssm_sem`) | `test-ssm_sem.R:181`; `test-ssm_sem_groups.R:442` | `test-ssm_sem.R:181`; `test-ssm_sem_groups.R:442`, `:463` | `test-ssm_sem_groups.R:182` (group contrast) | `test-ssm_sem.R:239`, `:58`, `:209`; `test-ssm_sem_groups.R:466` |
+
+## Audit notes (M11)
+
+- No empty cells. The **mean** path was already complete before M11; the two
+  gaps were the **correlation** entry point's flat (D) and pole (A) corners,
+  which run distinct profile-assembly plumbing — closed by
+  `test-ssm_analysis.R:229` and `:253`.
+- Cells marked "shared … engine" are deliberately not re-tested per path: the
+  displacement value, its circular-quantile CI, and the ±180° branch cut are
+  computed by one shared code path (`ssm_parameters()` / the displacement
+  quantile / `angle_dist()`). Re-testing them per entry point would test the
+  implementation, not the contract (tracking-rules "What gets a test").
+- SEM class C lives only on the grouped path (`ssm_sem` contrasts require
+  ≥2 groups); the single-group SEM path has no contrast estimand, so no C cell
+  is expected there.
