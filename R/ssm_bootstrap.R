@@ -168,7 +168,7 @@ ssm_by_group <- function(scores, angles, contrast) {
 # Calculate quantiles for circular data in radians
 #' @export
 quantile.circumplex_radian <- function(x, na.rm = TRUE, ...) {
-  if (all(is.na(x))) return(NA)
+  if (all(is.na(x))) return(NA_real_)
   x <- unclass(x)
   mean_angle <- atan2(mean(sin(x), na.rm = na.rm), mean(cos(x), na.rm = na.rm))
   angles_centered <- (x - mean_angle + pi) %% (2 * pi) - pi
@@ -181,7 +181,7 @@ quantile.circumplex_radian <- function(x, na.rm = TRUE, ...) {
 # Calculate quantiles for circular contrast data in radians (allowing negatives)
 #' @export
 quantile.circumplex_contrast_radian <- function(x, na.rm = TRUE, ...) {
-  if (all(is.na(x))) return(NA)
+  if (all(is.na(x))) return(NA_real_)
   x <- unclass(x)
   mean_angle <- atan2(mean(sin(x), na.rm = na.rm), mean(cos(x), na.rm = na.rm))
   angles_centered <- (x - mean_angle + pi) %% (2 * pi) - pi

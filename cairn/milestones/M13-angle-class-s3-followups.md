@@ -79,7 +79,7 @@ decision for the `as_degree`/`as_radian` generics.
       `structure()` at `R/ssm_bootstrap.R:112` and the `cls` branch at
       `R/ssm_ci_accuracy.R:899`. Verify with `identical()` on both call sites'
       output (default + contrast row-name cases) per the M12 byte-identity idiom.
-- [ ] **T2** — Change `return(NA)` → `return(NA_real_)` in both quantile methods
+- [x] **T2** — Change `return(NA)` → `return(NA_real_)` in both quantile methods
       (`R/ssm_bootstrap.R:173,186`); add a direct all-NA return-type test and a
       flat-profile regression test exercising the displacement CI path (test
       first: assert `NA_real_` before the fix).
@@ -108,6 +108,11 @@ decision for the `as_degree`/`as_radian` generics.
   inline `structure()` sites routed through it; byte-identity pinned by
   `expect_identical()` in `test-ssm_oop.R`; affected suites (ssm_oop,
   ssm_bootstrap, ci_accuracy) green.
+
+- 2026-07-12: T2 done — both `quantile.circumplex_*` methods now return
+  `NA_real_` (length-1) on all-NA input; test-first (red on logical `NA`, green
+  after). 166 consumer tests (bootstrap, ci_accuracy, oop, analysis, cpm) green;
+  the `ssm_ci_accuracy.R:903` length==1 guard is preserved.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->

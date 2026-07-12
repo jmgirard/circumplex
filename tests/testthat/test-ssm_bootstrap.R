@@ -234,6 +234,20 @@ test_that("quantile.circumplex_contrast_radian handles 0/360 boundary crossings 
   expect_true(res_quantiles[["25%"]] < 0)
 })
 
+test_that("quantile.circumplex_* return NA_real_ on an all-NA column (M13)", {
+  # A flat / zero-variance displacement column arrives all-NA; the circular
+  # quantile methods must return a numeric NA (NA_real_), not a logical NA, so
+  # downstream numeric CI assembly stays type-stable (sapply/rbind, cpm_fit's
+  # q[1]/q[2]).
+  r <- new_radian(rep(NA_real_, 4))
+  cr <- new_contrast_radian(rep(NA_real_, 4))
+  expect_identical(quantile(r), NA_real_)
+  expect_identical(quantile(cr), NA_real_)
+  # length-1 return is preserved (the ssm_ci_accuracy.R length==1 guard depends
+  # on it)
+  expect_length(quantile(r), 1L)
+})
+
 test_that("SSM class conversions preserve negative degrees for contrasts", {
   # Ensure that passing a negative contrast radian through the pipeline
   # cleanly converts to a negative degree value instead of wrapping back to +350°+
