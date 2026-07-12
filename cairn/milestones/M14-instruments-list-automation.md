@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M14: Automate the instruments() list
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
