@@ -32,15 +32,15 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
 
 ## Acceptance criteria
 
-- [ ] `R/utils.R` defines a scalar-count predicate checking integer-ness, the
+- [x] `R/utils.R` defines a scalar-count predicate checking integer-ness, the
       appropriate `>= 0` / `>= 1` floor, **and** length-1; unit-tested directly
       (rejects length-2, `NA`, non-integer, negative; accepts a valid scalar).
-- [ ] All identified duplicated scalar-count sites use the helper; each retains
+- [x] All identified duplicated scalar-count sites use the helper; each retains
       an equivalent abort on bad input (a test fires each family's validation:
       `ssm_ci_accuracy()`, `cpm_fit()`, `ssm_sem()`).
-- [ ] A `cairn/DECISIONS.md` D-entry records the canonical `is_*()`
+- [x] A `cairn/DECISIONS.md` D-entry records the canonical `is_*()`
       interpretation and which reading was superseded.
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
 
 ## Coverage
 
@@ -96,3 +96,48 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
   stricter (rejects length>1 args that today partially slip through).
 
 ## Review
+
+**Evidence (2026-07-12, branch `m10-scalar-count-validator` @ PR #34):**
+
+- **AC1** ✓ — `is_scalar_count(x, min=1L)` defined at `R/utils.R:178`. Direct unit
+  test (`test-utils.R`, block "is_scalar_count validates…"): accepts valid scalar
+  (`1`, `3L`, `1000`), rejects length-2, `integer(0)`, `NA`/`NA_real_`/`NA_integer_`
+  (returns `FALSE` not `NA`), non-integer (`1.5`), negative (`-1`), non-numeric
+  (`"1"`, `TRUE`); `min=0L` accepts `0`. `devtools::test()` via `check()`: all pass.
+- **AC2** ✓ — 20 call sites use the helper (`grep is_scalar_count( R/` = 20 excl.
+  definition: ssm_ci_accuracy 4, cpm_fit 9, ssm_sem 4, ssm_sem_syntax 1,
+  ssm_analysis 2). Each family's validation fires on bad input via passing tests:
+  `ssm_ci_accuracy()` (`test-ci_accuracy.R`: `reps=0`, `digits=-1`, `reps=c(5,10)`,
+  `digits=c(1,2)`); `cpm_fit()`/`cpm_simulate()` (`test-cpm_api.R`:
+  `reference/m/boots=c(.,.)`, `n=c(10,20)`); `ssm_sem()`/`ssm_sem_syntax()`
+  (`boots/ncpus=c(.,.)`, `n_groups=0/2.5/c(2,3)`); `ssm_analyze()`
+  (`test-ssm_analysis.R`: `boots/ncpus=c(.,.)`).
+- **AC3** ✓ — `cairn/DECISIONS.md:58` D-005 records the canonical `is_*()` reading
+  (length in the predicate name/argument; `is_count()` retained only as the
+  internal `n=` guard) and the superseded reading.
+- **AC4** ✓ — `devtools::check(args="--no-manual")` on the final tree: 0 errors,
+  0 warnings, 0 notes (5m34s).
+
+**Consistency gate:** `cairn_validate.py` exit 0 (all checks pass);
+Coverage complete (AC1→T1, AC2→T3, AC3→T2, AC4→T4, all tasks present);
+no DESIGN principle changed (impact report N/A); `devtools::document()` no diff;
+README.md already newer than README.Rmd, change is internal (no rebuild);
+`is_scalar_count()` internal (no export → no `_pkgdown.yml`/NAMESPACE row);
+NEWS.md bullet added (user-visible stricter count-arg validation, no milestone #);
+no new top-level files.
+
+**Independent review (two lenses + scorer):**
+- **[O] diff-bug (Opus)** and **[S] blame-history (Sonnet)** independently
+  converged on ONE finding (score ~95, CONFIRMED): the NEWS bullet named
+  `ssm_analyze()` but its own count validators (`R/ssm_analysis.R:212,217`) were
+  left on the old inline pattern — an overclaim, and a gap against the plan-owned
+  Goal (which names the `ssm_analyze()` family). **Fixed now:** converted both to
+  `is_scalar_count()` + length>1 regression tests; NEWS now accurate.
+- Both reviewers verified the other 18 conversions preserve semantics: all floors
+  correct (`digits` → `min=0L`; positive counts → default `min=1L`), all domain
+  bounds retained (`p>=3`, `reference<=p`, `n>p`), `is_scalar_count()` short-circuit
+  order safe (no NA/length leak). Blame lens: no site ever deliberately accepted a
+  vector; the strictening is intended; no D-entry/CLAUDE.md contradiction. (Noted,
+  <80, not actioned: pre-existing `Inf` acceptance in `is_count`/`is_scalar_count`,
+  untouched by this diff.)
+- Findings below 80 excluded from action: 1 (the `Inf` note above).
