@@ -5,7 +5,7 @@
 - **Status:** review
 - **Priority:** low
 - **Depends on:** —
-- **Branch/PR:** m10-scalar-count-validator
+- **Branch/PR:** m10-scalar-count-validator / #34
 
 ## Goal
 
@@ -56,9 +56,9 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
       author the D-entry recording the canonical interpretation (D-005).
 - [x] **T3** — Adopt the helper across the sites in `R/ssm_ci_accuracy.R`,
       `R/cpm_fit.R`, `R/ssm_sem.R`; reconcile `R/ssm_sem_syntax.R:254-256`.
-      Assert each validation still aborts on bad input. 15 sites converted;
+      Assert each validation still aborts on bad input. 18 call sites converted;
       length>1 regression tests added for all three families.
-- [x] **T4** — `devtools::check()` clean (0/0/0). No roxygen touched
+- [x] **T4** — `devtools::check()` clean (0 errors, 0 warnings, 0 notes). No roxygen touched
       (`is_scalar_count()` is internal, plain-comment documented), so
       `devtools::document()` was not required.
 
@@ -71,10 +71,12 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
   Carries a convention decision (canonical `is_*()` reading) deferred to a
   question-gate at implement, not pre-decided here.
 - 2026-07-12: implemented. `is_scalar_count(x, min=1L)` added (T1), D-005
-  recorded (T2), 15 sites converted across `ssm_ci_accuracy`/`cpm_fit`/`ssm_sem`/
-  `ssm_sem_syntax` + length>1 regression tests for all three families (T3),
-  `devtools::check()` clean 0/0/0 (T4). Plan line numbers had drifted post-M8/M9;
-  actual sites resolved by grep. Status → review.
+  recorded (T2), 18 call sites converted across `ssm_ci_accuracy`/`cpm_fit`/
+  `ssm_sem`/`ssm_sem_syntax` + length>1 regression tests for all three families
+  (T3), `devtools::check()` clean (0 errors, 0 warnings, 0 notes) (T4). Plan line
+  numbers had drifted post-M8/M9; actual sites resolved by grep.
+  (Earlier commit messages said "15 sites"; the true count is 18 — the amended
+  cpm_fit sites were undercounted. No code impact.) Status → review.
 
 ## Decisions
 

@@ -252,6 +252,12 @@ Structure", for a worked introduction to both.
   opposed profiles (a half-turn apart) was reported as `-180` degrees instead
   of `+180`, inconsistent with the documented `(-180, 180]` convention for
   contrasts. Such a contrast is now reported as `+180`.
+* Count-valued arguments (e.g. `boots`, `reps`, `ncpus`, `digits`, and the
+  sample size `n`) across `ssm_analyze()`, `ssm_ci_accuracy()`, `cpm_fit()`,
+  `cpm_simulate()`, and `ssm_sem()` are now uniformly validated as a single
+  non-negative whole number. A few of these previously accepted a
+  length-greater-than-one vector without complaint; such input now raises a
+  clear error.
 
 # circumplex 1.2.0
 
