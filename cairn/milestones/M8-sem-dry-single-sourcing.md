@@ -63,7 +63,7 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
 
 - [x] **T1** — Extract shared contrast-arity validator; route the three sites
       (`R/ssm_sem.R:1099-1103,1134-1150,1366-1388`) through it; keep messages.
-- [ ] **T2** — Extract internal fit chokepoint for the two `lavaan::cfa()`
+- [x] **T2** — Extract internal fit chokepoint for the two `lavaan::cfa()`
       sites (`R/ssm_sem.R:689-704,1170-1178`); assert identical fits.
 - [ ] **T3** — Route `summary.circumplex_ssm_sem()` detail lines
       (`R/ssm_sem.R:1583-1600`) through a shared label seam; snapshot unchanged.
@@ -90,6 +90,11 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
   `stop(call.=FALSE)`, not `cli_abort()` — preserved verbatim to keep messages
   byte-identical (converting would change the output). AC1's intent (each arity
   branch fires an unchanged message) is unchanged.
+
+- 2026-07-12: T2 done — `sem_fit_cfa()` chokepoint owns the fiml/listwise
+  `missing` translation and the multi-group `group.label` ordering; both former
+  `lavaan::cfa()` sites route through it. Existing single- and multi-group fit
+  tests pass unchanged (identical fits).
 
 ## Decisions
 

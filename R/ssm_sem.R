@@ -673,6 +673,29 @@ sem_assemble <- function(est, scales, measures, contrast) {
 
 # The invariance ladder (spec section 6.2, as amended at T4) -----------------------
 
+# THE single lavaan::cfa chokepoint for the SEM fit paths: owns the fiml ->
+# "ml" / listwise `missing` translation and, for multi-group fits, the explicit
+# `group.label` ordering. lavaan's default group order is order of APPEARANCE
+# in the data, not factor-level order -- pinning group.label = levels(...)
+# keeps the reference group (and the second-minus-first contrast direction)
+# tied to factor-level order, per the package's grouping contract (CLAUDE.md).
+# `syn` is a ready ssm_sem_syntax() string; `grouping` is a column name in
+# `dat` or NULL for the single-group path; `...` forwards user cfa arguments.
+sem_fit_cfa <- function(syn, dat, grouping = NULL, estimator, se, missing,
+                        ...) {
+  args <- list(
+    model = syn, data = dat,
+    estimator = estimator, se = se,
+    missing = if (missing == "fiml") "ml" else "listwise",
+    ...
+  )
+  if (!is.null(grouping)) {
+    args$group <- grouping
+    args$group.label <- levels(dat[[grouping]])
+  }
+  do.call(lavaan::cfa, args)
+}
+
 # Fit the rung sequence up to `gate`, run lavaan's own nested-model test
 # between adjacent rungs (the scaled difference test under robust estimators,
 # via lavTestLRT), and return the table, the verdict, and the fit the
@@ -719,17 +742,9 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
       scales = scales, angles = angles_deg, measures = measures,
       model = model, n_groups = n_groups, invariance = r
     )
-    fit <- lavaan::cfa(
-      syn,
-      data = dat, group = grouping,
-      # Explicit group order: lavaan's default is order of APPEARANCE in the
-      # data, not factor-level order -- without this, the reference group
-      # (and the second-minus-first contrast direction) would silently
-      # depend on row order, contradicting the package's grouping contract
-      # (factor levels, alphabetical unless an explicit factor; CLAUDE.md).
-      group.label = levels(dat[[grouping]]),
-      estimator = estimator, se = se,
-      missing = if (missing == "fiml") "ml" else "listwise", ...
+    fit <- sem_fit_cfa(
+      syn, dat, grouping = grouping,
+      estimator = estimator, se = se, missing = missing, ...
     )
     if (!lavaan::lavInspect(fit, "converged")) {
       stop(
@@ -1187,10 +1202,8 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
       scales = scales_names, angles = as.numeric(angles),
       measures = measures_names, model = model
     )
-    fit <- lavaan::cfa(
-      syn,
-      data = dat, estimator = estimator, se = se,
-      missing = if (missing == "fiml") "ml" else "listwise", ...
+    fit <- sem_fit_cfa(
+      syn, dat, estimator = estimator, se = se, missing = missing, ...
     )
     sem_health_gate(fit)
     ladder <- NULL
