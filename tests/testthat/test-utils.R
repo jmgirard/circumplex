@@ -88,6 +88,30 @@ test_that("assertions work", {
   expect_false(is_count(-1))
 })
 
+test_that("is_scalar_count validates a single non-negative whole number", {
+  # Accepts a valid scalar count
+  expect_true(is_scalar_count(1))
+  expect_true(is_scalar_count(3L))
+  expect_true(is_scalar_count(1000))
+  # min floor: default 1L rejects 0; min = 0L accepts it
+  expect_false(is_scalar_count(0))
+  expect_true(is_scalar_count(0, min = 0L))
+  expect_true(is_scalar_count(5, min = 0L))
+  # Rejects length != 1 (the guard is_count() lacks)
+  expect_false(is_scalar_count(c(1, 2)))
+  expect_false(is_scalar_count(integer(0)))
+  # Rejects NA, returning FALSE rather than NA (usable in && / stopifnot)
+  expect_false(is_scalar_count(NA))
+  expect_false(is_scalar_count(NA_real_))
+  expect_identical(is_scalar_count(NA_integer_), FALSE)
+  # Rejects non-integer and negative
+  expect_false(is_scalar_count(1.5))
+  expect_false(is_scalar_count(-1))
+  # Rejects non-numeric
+  expect_false(is_scalar_count("1"))
+  expect_false(is_scalar_count(TRUE))
+})
+
 test_that("is_null_or_char enforces the n argument", {
   # NULL is always accepted, with or without n
   expect_true(is_null_or_char(NULL))

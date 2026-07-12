@@ -51,7 +51,7 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
 
 ## Tasks
 
-- [ ] **T1** — Add the scalar-count predicate to `R/utils.R` + direct tests.
+- [x] **T1** — Add the scalar-count predicate to `R/utils.R` + direct tests.
 - [ ] **T2** — Resolve the two `is_*()` readings (question-gate at implement);
       author the D-entry recording the canonical interpretation.
 - [ ] **T3** — Adopt the helper across the sites in `R/ssm_ci_accuracy.R`,
@@ -69,5 +69,12 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
   question-gate at implement, not pre-decided here.
 
 ## Decisions
+
+- 2026-07-12: question gate — (1) predicate shape: new `is_scalar_count(x, min=1L)`
+  helper, leaving `is_count()` unchanged as the vectorized `n=` guard; (2) adoption
+  scope amended (minor) to also cover the `is_count()`-only scalar sites in
+  `R/cpm_fit.R` (107,108,109,479,1321,1322,1325 — p, m, reference, boots) that lack
+  a length-1 guard, for cpm_fit internal consistency. Behaviour change is strictly
+  stricter (rejects length>1 args that today partially slip through).
 
 ## Review

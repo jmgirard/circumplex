@@ -168,6 +168,21 @@ is_count <- function(x) {
   )
 }
 
+# A single non-negative whole number: the scalar sibling of is_count(). Unlike
+# is_count() (a vectorized non-negative-integer test used only as the internal
+# `n=` guard in is_char/is_var/is_num), this bakes in length-1 the way is_flag()
+# does, so user-facing count arguments (reps, boots, ncpus, digits, sample n)
+# validate with one predicate instead of a hand-bolted `length(x) == 1`. `min`
+# sets the floor: 1L for a positive count, 0L where zero is allowed (digits).
+# Returns FALSE (never NA) for NA, length != 1, non-numeric, or non-integer.
+is_scalar_count <- function(x, min = 1L) {
+  is.numeric(x) &&
+    length(x) == 1 &&
+    !is.na(x) &&
+    ceiling(x) == floor(x) &&
+    x >= min
+}
+
 is_char <- function(x, n = NULL) {
   if (is.null(n)) {
     is.character(x)
