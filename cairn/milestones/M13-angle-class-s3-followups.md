@@ -52,7 +52,7 @@ decision for the `as_degree`/`as_radian` generics.
       `NA`) on an all-NA input, asserted by a direct test; the flat/zero-variance
       displacement path through `ssm_analyze()`/`ssm_ci_accuracy()` still yields
       NA CIs without error (regression test at the boundary).
-- [ ] AC3 — the CPM bootstrap angle CI (`cpm_fit.R:1119`) is verified against an
+- [x] AC3 — the CPM bootstrap angle CI (`cpm_fit.R:1119`) is verified against an
       independent oracle for a 0/360-straddling displacement, backed by ≥2
       oracle types (invariant agreement with `quantile.circumplex_radian` +
       a live deliberately-dumb circular-quantile recomputation).
@@ -115,24 +115,30 @@ decision for the `as_degree`/`as_radian` generics.
 ## Review
 <!-- owner: review · exclusive -->
 
-### Round 1 — 2026-07-12 (PR #37) → SENT BACK (AC3 not met)
+### Round 1 — 2026-07-12 (PR #37) → SENT BACK
 
-**Criteria (fresh evidence):** AC1 ✓ byte-identity test + suite 392 0F/0E/0S;
-AC2 ✓ `NA_real_` all-NA test (red→green), consumers green, D-003 snap untouched;
-**AC3 ✗** — see F1; AC4 ✓ NAMESPACE exports no generic, comments + M13-D1;
-AC5 ✓ fresh `check()` 0/0/0.
+AC1/2/4/5 verified (byte-identity, `NA_real_` all-NA red→green, NAMESPACE
+generic-free, `check()` 0/0/0); consistency gate clean. **AC3 ✗ = F1 (diff-bug,
+score 93):** `test-cpm_angle_ci.R` didn't guard `cpm_fit.R:1119` — test 2's
+`jz2017` fixture had no pole-straddle, so a linearized call-site quantile passed.
+Blame-history: no findings. → sent back; fixed by the T3 redo (work log).
 
-**Consistency gate:** `cairn_validate.py` exit 0; Coverage complete (AC1–5→T1–5);
-`document()` no diff; `check_pkgdown()` passes (no new exports); README
-unaffected; no NEWS entry (internal cleanup — documented CI output unchanged);
-`cairn` `.Rbuildignore`d.
+### Round 2 — 2026-07-12 (PR #37) → clean (AC3 now met)
 
-**Independent review:** [S] blame-history — no findings (snap/contrast-method
-routing/D-003/D-006 all respected). [O] diff-bug — **F1 (score 93, CONFIRMED,
-actioned via send-back):** `test-cpm_angle_ci.R` doesn't guard `cpm_fit.R:1119`
-against linearization — test 1 re-types the primitive without calling
-`cpm_bootstrap()`; test 2's `jz2017`/`octants()`/seed-42 fixture has no
-pole-straddle, so both its assertions pass under a linearized call-site quantile
-(scorer reproduced via `assignInNamespace`). Fix: feed a deterministically
-straddling config through `cpm_fit()`'s real path, verified red under a
-temporary linearization.
+**AC3 ✓** — the rewritten test 2 drives a deterministic 0/360-straddle through
+`cpm_fit()`'s real bootstrap path (`cpm_fit.R:1119`) and asserts the pole item's
+CI wraps (lci>uci) + short-arc + inside; both round-2 reviewers independently
+reproduced that a linearized call-site quantile flips all three to FAIL (teeth),
+and that a 1e-4 perturbation (≫ BLAS drift) leaves the ~25–44° wrap margins
+unmoved (not flaky). Fresh: `test-cpm_angle_ci.R` 2/2 green, full suite 392
+0F/0E/0S, `check()` 0/0/0. AC1/2/4/5 unchanged since r1 (R/ byte-identical).
+Consistency gate re-run clean (`cairn_validate` exit 0, no doc diff).
+
+**Independent review:** [O] diff-bug — no findings (straddle/teeth/robustness/
+fixture all confirmed). [S] blame-history — **F2 (score 35, LOGGED, NOT
+actioned):** proposed adding `skip_on_ci()` (matching `test-cpm_api.R:596`
+BLAS-snapshot precedent). Scorer 35 — the precedent is a byte-exact snapshot
+(different failure mode); this test's threshold assertion has a demonstrated
+~25–44° margin robust to perturbations ≫ BLAS drift, so keeping it running in CI
+retains real guard coverage without material flakiness risk. CI matrix
+(macOS/Windows/Ubuntu×3) green on PR #37 corroborates.
