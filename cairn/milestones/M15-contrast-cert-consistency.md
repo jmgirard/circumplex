@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M15: Contrast certification-conditional reporting consistency (ci_accuracy ↔ print)
 
-- **Status:** planned
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
@@ -93,6 +93,8 @@ milestone-close review.
   the certification-conditional half of Milestone-close review #3
   (`test-ci_accuracy.R:221`), a deliberate prior decision — flagged for the
   blame-history reviewer.
+- 2026-07-12: blocked on RB02 (contrast certification-conditional object
+  contract) — T1 escalation drafted; awaiting RR02.
 
 ## Decisions
 
