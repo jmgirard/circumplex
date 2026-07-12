@@ -6,7 +6,7 @@
 - **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
-- **Branch/PR:** m11-boundary-coverage-hardening   <!-- owner: implement (branch) / review (PR URL) · create -->
+- **Branch/PR:** m11-boundary-coverage-hardening · https://github.com/jmgirard/circumplex/pull/35   <!-- owner: implement (branch) / review (PR URL) · create -->
 
 ## Goal
 
@@ -43,23 +43,23 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
 ## Acceptance criteria
 <!-- owner: plan · create/amend-via-gate; review reads, never reinterprets -->
 
-- [ ] A boundary coverage matrix is committed under `cairn/` mapping each of
+- [x] A boundary coverage matrix is committed under `cairn/` mapping each of
       the 4 invariant classes (CLAUDE.md "Statistical invariants") to each of
       the 6 estimation entry points; every cell cites a test by `file:line` (or
       records a documented not-applicable with reason). No empty cells.
-- [ ] Every gap the matrix reveals is closed by a new test that asserts the
+- [x] Every gap the matrix reveals is closed by a new test that asserts the
       boundary result (the correct value/branch/NA-semantics at the boundary),
       not a smoke test; `devtools::test()` passes. If the audit finds zero
       gaps, the matrix's all-cited state is itself the evidence.
-- [ ] The 8-scale canonical SEM population is constructed by a single shared
+- [x] The 8-scale canonical SEM population is constructed by a single shared
       `sem_canonical_pop()` helper; the `test-ssm_sem*.R` rebuild sites call
       it; the produced population is bit-identical to the prior inline
       construction (`identical()`), so no snapshot/coverage re-pin is needed.
-- [ ] `scales()` validates `items` via `is_flag(items)` at
+- [x] `scales()` validates `items` via `is_flag(items)` at
       `R/instrument_oop.R:68`; a test fires the invalid-`items` error branch.
-- [ ] `tests/testthat/test-RcppExport.R.R` is renamed to `test-RcppExports.R`
+- [x] `tests/testthat/test-RcppExport.R.R` is renamed to `test-RcppExports.R`
       and is discovered/run by testthat.
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
 
 ## Coverage
 <!-- owner: plan · create/amend-via-gate -->
@@ -131,4 +131,36 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
   rewrites with `check()`, not just `test()`.
 
 ## Review
-<!-- owner: review · exclusive -->
+
+**PR:** https://github.com/jmgirard/circumplex/pull/35 (draft → ready at merge).
+
+### Acceptance-criteria evidence (fresh, this session)
+
+- **AC1** ✓ `cairn/boundary-coverage.md` present; 6 entry-point rows × 4
+  invariant classes; no empty cells (grep for `||`/blank cells: none). Every
+  cell cites a `file:line` or a documented shared-engine/N-A reason.
+- **AC2** ✓ Two correlation-path tests pass by name:
+  "…flat profile returns NA displacement…" (3 assertions) and "…peaking at the
+  0/360 pole…" (1). `test-ssm_analysis.R`: 0 failed.
+- **AC3** ✓ "sem_canonical_pop() equals the inline canonical construction"
+  (`identical()`) passes; `test-ssm_sem.R` 125 pass / 0 fail; the 15 canonical
+  rebuilds route through the helper, 9 non-canonical `sem_pop()` sites left.
+- **AC4** ✓ "scales() rejects a non-flag items argument (is_flag guard)" passes
+  (2 `expect_error`); `R/instrument_oop.R:68` now `is_flag(items)`.
+- **AC5** ✓ `test-RcppExports.R` discovered and run (20 tests); old name gone
+  (git rename recorded).
+- **AC6** ✓ `devtools::check()` clean: **0 errors / 0 warnings / 0 notes**
+  (this session, on the fixed tree). Full suite 387 tests, 0 failed.
+
+### Consistency gate
+
+- `cairn_validate.py` exit 0 (all 10 checks pass).
+- Coverage completeness: AC1→T1 … AC6→T6, every AC maps to an existing task.
+- `devtools::document()` no diff; README.md not stale; `pkgdown::check_pkgdown()`
+  no problems; no new exports (no `_pkgdown.yml`/NEWS entry owed —
+  M11 is internal/test-only, no user-visible change); no new top-level tracked
+  files outside the already-ignored `cairn/`.
+- No DESIGN.md principle changed → impact scan skipped.
+
+### Independent review
+
