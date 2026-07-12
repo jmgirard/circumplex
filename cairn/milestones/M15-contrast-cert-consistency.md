@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M15: Contrast certification-conditional reporting consistency (ci_accuracy ↔ print)
 
-- **Status:** blocked
+- **Status:** planned
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
@@ -18,28 +18,41 @@ milestone-close review.
 
 ## Scope
 
+The object contract is settled by RR02 (see M15-D1): **measured quantities
+stay in the returned object; only interpretive/presentation surfaces follow
+`print.circumplex_ssm()`'s profiles-only certification stance.**
+
 **In:**
-- In the ci_accuracy print/summary path (`R/ssm_ci_oop.R`), for the contrast
-  row, report displacement coverage **unconditionally** — drop the "when
-  certified" (joint-certification) framing that `print.circumplex_ssm()` never
-  exposes for a contrast (`R/ssm_oop.R:172-190`, contrasts are not
-  certification-gated because Δa is a signed difference, not a prototypicality
-  measure; M4 spec §4.1). Profiles keep both unconditional and
-  certification-conditional lines plus the profiles-only guardrail line.
-- Settle and apply the residual object-contract question: whether the
-  contrast's certification-conditional coverage value is suppressed from
-  print only, or also dropped/NA'd from the returned `ssm_ci_accuracy` object
-  (`res$coverage` / guardrail `Cert_rate`). (RB tripwire: no-oracle)
-- Supersede the "Milestone-close review #3" split decision now encoded in
-  `tests/testthat/test-ci_accuracy.R:221-250`; update that test to the new
-  expectation and add a regression test pinning the contrast's
-  unconditional-only displacement line.
-- Re-pin the `ci_accuracy` snapshot; roxygen note in `R/ssm_ci_accuracy.R`
-  documenting the contrast exception.
+- **Verdict (interpretation).** Recompute the contrast's displacement Class on
+  the **unconditional** coverage (k = round(Coverage × N_reps), n = N_reps at
+  Condition 1) in `ssm_ci_verdict()` (`R/ssm_ci_accuracy.R` ~L1026), and
+  relabel that verdict row's `Parameter` `"d_conditional"` → `"d"`; profiles
+  keep `"d_conditional"`.
+- **Print/summary (presentation).** In `ssm_ci_verdict_blocks()`
+  (`R/ssm_ci_oop.R:83`) key the contrast displacement line to `"d"` (drops the
+  " when certified" suffix); in `ssm_ci_verdict_text()`
+  (`R/ssm_ci_oop.R:169-262`) use plain "displacement" wording for the contrast
+  (never "certified displacement"/"trustworthy when certified"); make the
+  "never certified (not assessable)" fallback (`R/ssm_ci_oop.R:89-93`)
+  unreachable for the contrast.
+- **Plot (presentation, fourth surface — RR02 Beyond-the-brief #1).** Exclude
+  the contrast series from the "Displacement (certified)" panel in
+  `plot.circumplex_ci_accuracy()` (`R/ssm_ci_oop.R:501-527`).
+- **Object (measurement) — retained, not dropped.** Keep the contrast's
+  `coverage$Coverage_conditional`/`N_conditional` and `guardrail$Cert_rate`
+  (`Caution` stays NA) as documented joint-certification descriptives; rewrite
+  the three now-stale comments (`R/ssm_ci_accuracy.R:546-551`,
+  `R/ssm_ci_accuracy.R:690-696`, `R/ssm_ci_oop.R:110-114`).
+- Supersede the "Milestone-close review #3" split (`test-ci_accuracy.R:221-250`);
+  re-pin the `ci_accuracy` snapshot (contrast-only churn; profiles
+  byte-identical); update the roxygen `@return` and add one clause to the
+  existing `NEWS.md` development bullet.
 
 **Out:**
 - Any change to `print.circumplex_ssm()` — already correct; Direction A leaves
   it untouched (Direction B/C rejected at the plan gate 2026-07-12).
+- NA'ing/removing the contrast's conditional *measurement* fields (RR02 rejects
+  option (b) — destroys a valid selection-effect diagnostic).
 - Guardrail certification-**rule** replacement (print-precision dependence /
   scale-free rule) → stays its own ROADMAP candidate.
 
@@ -47,42 +60,52 @@ milestone-close review.
 
 - [ ] For a contrast object, `print()`/`summary()` of `ssm_ci_accuracy()`
       report the contrast's displacement coverage unconditionally — no "when
-      certified" framing on the contrast displacement line. Evidence: updated
-      `ci_accuracy` snapshot + a test asserting the contrast displacement line
-      carries no certification-conditional wording.
-- [ ] Profile rows unchanged — both unconditional and certification-conditional
-      coverage and the profiles-only guardrail line still emitted. Evidence:
-      profile portions of the snapshot unchanged; existing profile assertions
-      green.
-- [ ] The returned `ssm_ci_accuracy` object handles the contrast
-      certification-conditional value per the RR02 disposition, pinned by a
-      regression test. (RB tripwire: no-oracle) Evidence: RR02 ingested; test
-      pins the agreed object contract.
-- [ ] Roxygen documents the contrast exception; `devtools::check()` clean
-      (0 errors / 0 warnings / 0 notes).
+      certified" framing on the line and no "certified displacement" wording in
+      the verdict paragraph. Evidence: updated `ci_accuracy` snapshot + a test.
+- [ ] The returned object follows M15-D1: the contrast's `verdict` displacement
+      row is recomputed unconditionally with `Parameter == "d"` and
+      `N_reps == reps`, while its `coverage$Coverage_conditional`/`N_conditional`
+      and `guardrail$Cert_rate` are retained (populated, `Caution` NA). Evidence:
+      regression tests pin each field; profiles keep `Parameter == "d_conditional"`.
+- [ ] `plot.circumplex_ci_accuracy()` excludes the contrast series from the
+      "Displacement (certified)" panel. Evidence: a test on the built plot data.
+- [ ] Profile-side output is byte-unchanged (`ssm_certified()` and profile
+      reporting untouched). Evidence: profile portions of the snapshot identical.
+- [ ] Roxygen `@return` documents the contrast rule on all surfaces; the
+      `NEWS.md` development bullet gains the contrast clause; `devtools::check()`
+      clean (0 errors / 0 warnings / 0 notes).
 
 ## Coverage
 
-- AC1 → T2, T3
-- AC2 → T3
-- AC3 → T1, T4
-- AC4 → T5
+- AC1 → T3, T5
+- AC2 → T2, T3
+- AC3 → T4
+- AC4 → T3, T5
+- AC5 → T5
 
 ## Tasks
 
-- [ ] **T1** — Draft RB02 and ingest RR02 (via `/milestone-brief`): settle the
-      residual object-contract question (suppress-print-only vs drop/NA the
-      contrast's certification-conditional value) and confirm unconditional-only
-      supersedes Milestone-close review #3. (RB tripwire: no-oracle)
-- [ ] **T2** — Regression test first: add/adjust tests pinning the contrast's
-      unconditional-only displacement reporting (red before the change); revise
-      the `test-ci_accuracy.R:221` expectation to the superseding behavior.
-- [ ] **T3** — Modify `R/ssm_ci_oop.R` print/summary path so the contrast row
-      reports displacement coverage unconditionally; profiles byte-unchanged.
-- [ ] **T4** — Apply the RR02 object-contract disposition and pin it with a
-      regression test.
-- [ ] **T5** — Re-pin the `ci_accuracy` snapshot; roxygen note in
-      `R/ssm_ci_accuracy.R`; `devtools::document()`; `devtools::check()` clean.
+- [x] **T1** — RB02 drafted + RR02 ingested: object contract settled (M15-D1);
+      unconditional-only supersedes Milestone-close review #3. Done 2026-07-12.
+- [ ] **T2** — Regression tests first (red before the change): supersede
+      `test-ci_accuracy.R:221-250` — pin contrast verdict `Parameter == "d"`
+      with `N_reps == reps`, profiles keep `"d_conditional"`, contrast printed
+      displacement line has no "when certified", contrast `Coverage_conditional`
+      still populated; keep the surviving assertions (contrast `Caution` all-NA,
+      finite `Cert_rate`, wording bars).
+- [ ] **T3** — Verdict + wording: recompute the contrast displacement Class on
+      unconditional coverage and relabel `Parameter` → `"d"`
+      (`ssm_ci_verdict()`); key the contrast to `"d"` in `ssm_ci_verdict_blocks()`
+      and use plain "displacement" wording in `ssm_ci_verdict_text()`; make the
+      not-assessable fallback unreachable for the contrast. Profiles unchanged.
+- [ ] **T4** — Object comments + retention: rewrite the three stale comments
+      (`R/ssm_ci_accuracy.R:546-551`, `:690-696`; `R/ssm_ci_oop.R:110-114`) to
+      say the joint-cert rate is provenance for the retained object columns, not
+      a conditioning device for any displayed line; add object-contract tests.
+- [ ] **T5** — Plot fix (exclude contrast from the `d_cert` panel,
+      `R/ssm_ci_oop.R:501-527`); re-pin the `ci_accuracy` snapshot; roxygen
+      `@return` + `NEWS.md` clause; `devtools::document()`; `devtools::check()`
+      clean.
 
 ## Work log
 
@@ -95,7 +118,27 @@ milestone-close review.
   blame-history reviewer.
 - 2026-07-12: blocked on RB02 (contrast certification-conditional object
   contract) — T1 escalation drafted; awaiting RR02.
+- 2026-07-12: RR02 ingested → back to planned. Object contract settled
+  (M15-D1); scope amended — verdict recompute+relabel, plot fourth surface
+  added (AC3/T5), measurement fields retained (RR02 rejects the drop/NA
+  option). RB02/RR02 archived. T1 done.
 
 ## Decisions
+
+### M15-D1 (2026-07-12, from RR02): contrast ci_accuracy object contract
+
+Under Direction A, the rule is **measured quantities stay in the returned
+object; interpretive/presentation surfaces follow `print.circumplex_ssm()`'s
+profiles-only certification stance.** Concretely, for the contrast row:
+`verdict` displacement Class is recomputed on the *unconditional* coverage and
+its `Parameter` relabeled `"d_conditional"` → `"d"` (print/summary/plot render
+from it, so it must move); `coverage$Coverage_conditional`/`N_conditional` and
+`guardrail$Cert_rate` are *retained* as documented joint-certification
+descriptives (they measure a real selection-effect quantity — P(Δd CI covers |
+both rows certified) — that no display consumes). Dropping/NA'ing them
+(option b) is rejected: destroys information, buys no consistency suppression
+doesn't already give. Supersedes "Milestone-close review #3". Milestone-local
+(display-layer contract of one function family); promote to DECISIONS.md only
+if the "presentation follows print" rule recurs. Source: RR02.
 
 ## Review
