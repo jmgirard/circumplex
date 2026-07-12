@@ -3,10 +3,10 @@
      Per-section owners are tagged below. -->
 # M13: Angle-class S3 follow-ups (RR01)
 
-- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
-- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create -->
+- **Branch/PR:** m13-angle-class-s3-followups   <!-- owner: implement (branch) / review (PR URL) · create -->
 
 ## Goal
 
