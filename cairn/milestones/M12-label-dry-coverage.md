@@ -129,3 +129,19 @@ _Consistency gate:_ `cairn_validate.py` exit 0; Coverage map complete
 `codecov.yml` already in `.Rbuildignore`; no new top-level files; **no NEWS.md
 entry** — the milestone has no user-visible changes (byte-identical refactor +
 CI-config only). README.Rmd/README.md untouched by this milestone.
+
+_Independent two-lens review (both fresh-context):_
+- **[O] diff-bug (Opus):** 0 findings. Transcribed the four original blocks from
+  `master` and confirmed the helper is byte-identical across all 8 branches
+  (incl. the mean-path `c(Measure, Measure[[1]])` NA append and the
+  `is.null(grouping)` contrast-branch ordering); verified the `cbind(df, df)`
+  swap is `identical()` to the old `cbind(vec…, df)` — names, character types,
+  row names — under default and non-default row names; new test is a genuine
+  pin, not a tautology.
+- **[S] blame-history (Sonnet):** 0 findings. Four blocks trace to `8c08945`
+  (2024-10-25, "Make scores and results columns uniform") which deliberately
+  made them identical; no later commit diverged them; no fixed bug resurrected;
+  no D-entry contradicted. Empirically re-confirmed `identical()` incl. row names.
+
+Both reviewers surfaced zero findings → nothing to score or triage; scorer step
+moot. No excluded (sub-80) findings.
