@@ -218,11 +218,14 @@ test_that("suff-stats fallback resolves recorded-call args from the caller's env
   expect_no_error(run(dat))
 })
 
-test_that("contrast row carries no false-certification guardrail (print never gates it)", {
-  # Milestone-close review #3: print.circumplex_ssm() applies no certification
-  # gate to a contrast, so the diagnostic must not report a false-cert verdict
-  # for the contrast row -- only the joint-certification rate that conditions
-  # its certified-displacement coverage.
+test_that("contrast displacement is reported unconditionally, matching print (M15/M15-D1)", {
+  # M15 supersedes Milestone-close review #3: print.circumplex_ssm() applies no
+  # certification gate to a contrast (Delta-a is a signed difference, not a
+  # prototypicality measure), so ssm_ci_accuracy() reports the contrast's
+  # displacement UNCONDITIONALLY. Per M15-D1 the interpretive/presentation
+  # surfaces move (verdict Class recomputed unconditionally, Parameter "d"),
+  # while the measurement columns (Coverage_conditional, Cert_rate) are
+  # retained as documented joint-certification descriptives.
   data("jz2017")
   jz <- jz2017[1:240, ]
   set.seed(311)
@@ -233,18 +236,41 @@ test_that("contrast row carries no false-certification guardrail (print never ga
                          structure = "observed")
 
   con_lab <- names(res$details$row_n)[length(res$details$row_n)]
+  prof_labs <- setdiff(unique(res$verdict$Profile), con_lab)
+
+  # Verdict (interpretation moves): contrast displacement row is unconditional
+  # -- Parameter "d", n = reps; profiles keep the certification-conditional "d".
+  con_v <- res$verdict[res$verdict$Profile == con_lab, ]
+  expect_true("d" %in% con_v$Parameter)
+  expect_false("d_conditional" %in% con_v$Parameter)
+  expect_equal(con_v$N_reps[con_v$Parameter == "d"], 12)
+  prof_v <- res$verdict[res$verdict$Profile %in% prof_labs, ]
+  expect_true("d_conditional" %in% prof_v$Parameter)
+  expect_false("d" %in% prof_v$Parameter)
+
+  # Object (measurement stays): the contrast keeps its conditional coverage and
+  # its joint-certification rate; Caution is NA (no false-cert verdict).
+  con_cov <- res$coverage[res$coverage$Profile == con_lab &
+                            res$coverage$Parameter == "d", ]
+  expect_true(any(!is.na(con_cov$Coverage_conditional)))
   con_g <- res$guardrail[res$guardrail$Profile == con_lab, ]
   prof_g0 <- res$guardrail[res$guardrail$Profile != con_lab &
                              res$guardrail$Condition == 0, ]
-  # Contrast Caution is NA at every rung; profile rows still carry the c = 0
-  # logical decision; the contrast's conditioning Cert_rate is still reported.
   expect_true(all(is.na(con_g$Caution)))
   expect_true(all(!is.na(prof_g0$Caution)))
   expect_true(all(is.finite(con_g$Cert_rate[con_g$Condition == 0])))
 
-  # print()/summary() never frame the contrast as certified; wording bar holds.
-  out <- paste(c(capture.output(print(res)), capture.output(summary(res))),
-               collapse = "\n")
+  # print()/summary() (presentation follows print): the CONTRAST block reports
+  # displacement with no "when certified" and no "certified displacement"
+  # wording; profile blocks still may. Wording bar (no significance framing).
+  po <- capture.output(print(res))
+  ci <- grep("# Contrast \\[", po)
+  expect_length(ci, 1)
+  con_block <- po[ci:length(po)]
+  expect_false(any(grepl("when certified", con_block, fixed = TRUE)))
+  expect_false(any(grepl("certified displacement", con_block, fixed = TRUE)))
+
+  out <- paste(c(po, capture.output(summary(res))), collapse = "\n")
   expect_false(any(grepl("contrast displacement would", out, fixed = TRUE)))
   expect_false(any(grepl("significan", out)))
 })
@@ -778,6 +804,23 @@ test_that("print and summary snapshots (seeded)", {
   expect_snapshot(summary(res), transform = mask_elapsed)
 })
 
+test_that("contrast print block reports displacement unconditionally (M15 snapshot)", {
+  # Local-only format pin for the contrast block: the displacement line carries
+  # no "when certified" suffix and the verdict paragraph no "certified
+  # displacement" wording (M15-D1). Profile blocks are covered above.
+  skip_on_ci()
+  skip_on_cran()
+  data("jz2017")
+  jz <- jz2017[1:240, ]
+  set.seed(311)
+  obj <- ssm_analyze(jz, scales = PANO(), grouping = "Gender",
+                     contrast = TRUE, boots = 60)
+  set.seed(312)
+  res <- ssm_ci_accuracy(obj, reps = 12, amplitude_factors = c(1, 0),
+                         structure = "observed")
+  expect_snapshot(print(res))
+})
+
 # ---- plot method (spec sec. 7) --------------------------------------------------
 
 test_that("plot.circumplex_ci_accuracy builds a faceted coverage plot", {
@@ -799,4 +842,24 @@ test_that("plot.circumplex_ci_accuracy builds a faceted coverage plot", {
   # One panel per parameter, including the certified-displacement panel
   expect_equal(length(unique(built$layout$layout$PANEL)), 6)
   vdiffr::expect_doppelganger("ci accuracy ladder plot", p)
+})
+
+test_that("plot excludes the contrast from the certified-displacement panel (M15)", {
+  # Presentation surface follows print's profiles-only certification (M15-D1):
+  # the contrast appears in "Displacement" (unconditional) but not in
+  # "Displacement (certified)". Data-level assertion -- no vdiffr/platform dep.
+  data("jz2017")
+  jz <- jz2017[1:240, ]
+  set.seed(311)
+  obj <- ssm_analyze(jz, scales = PANO(), grouping = "Gender",
+                     contrast = TRUE, boots = 60)
+  set.seed(312)
+  res <- ssm_ci_accuracy(obj, reps = 12, amplitude_factors = c(1, 0),
+                         structure = "observed")
+  con_lab <- names(res$details$row_n)[length(res$details$row_n)]
+  dfp <- plot(res)$data
+  dcert <- dfp[dfp$Panel == "Displacement (certified)", ]
+  expect_false(con_lab %in% as.character(dcert$Profile))
+  disp <- dfp[dfp$Panel == "Displacement", ]
+  expect_true(con_lab %in% as.character(disp$Profile))
 })

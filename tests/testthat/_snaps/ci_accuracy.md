@@ -109,3 +109,57 @@
                    0                     0     30
                    0                     0     30
 
+# contrast print block reports displacement unconditionally (M15 snapshot)
+
+    Code
+      print(res)
+    Output
+      
+      SSM CI accuracy, simulated at your n and settings (12 replications per condition; bootstrap intervals with 60 replicates at level 0.95)
+      
+        # Profile [Female] (n = 118; 95% bootstrap CIs, 60 replicates):
+          Elevation      coverage 91.7% -- borderline
+          Amplitude      coverage 75.0% -- INADEQUATE (under-coverage; misses fall
+                         on both sides of the interval)
+          Displacement   coverage 83.3% when certified -- borderline
+          Guardrail      if the true amplitude were zero, displacement would still
+                         be certified 100.0% of the time -- the "amplitude CI
+                         excludes zero" rule is far weaker than the 2.5% error rate
+                         its wording suggests
+        Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this
+        sample size and the interpretability guardrail provides almost no
+        protection against a truly zero amplitude. Elevation and certified
+        displacement coverage rates are borderline at this number of replications;
+        a larger `reps` would sharpen the verdict. Consider a larger sample or
+        treat near-zero amplitudes as inconclusive rather than absent.
+      
+        # Profile [Male] (n = 122; 95% bootstrap CIs, 60 replicates):
+          Elevation      coverage 91.7% -- borderline
+          Amplitude      coverage 75.0% -- INADEQUATE (under-coverage; misses are
+                         almost all below the interval: the amplitude CI tends to
+                         sit above the truth)
+          Displacement   coverage 66.7% when certified -- INADEQUATE
+                         (under-coverage)
+          Guardrail      if the true amplitude were zero, displacement would still
+                         be certified 100.0% of the time -- the "amplitude CI
+                         excludes zero" rule is far weaker than the 2.5% error rate
+                         its wording suggests
+        Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this
+        sample size, displacement CIs mis-cover even when certified, and the
+        interpretability guardrail provides almost no protection against a truly
+        zero amplitude. Elevation coverage is borderline at this number of
+        replications; a larger `reps` would sharpen the verdict. Consider a larger
+        sample or treat near-zero amplitudes as inconclusive rather than absent.
+      
+        # Contrast [Male - Female] (95% bootstrap CIs, 60 replicates):
+          Elevation      coverage 100.0% -- borderline
+          Amplitude      coverage 75.0% -- INADEQUATE (under-coverage; misses are
+                         almost all below the interval: the amplitude CI tends to
+                         sit above the truth)
+          Displacement   coverage 91.7% -- borderline
+        Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this
+        sample size. Elevation and displacement coverage rates are borderline at
+        this number of replications; a larger `reps` would sharpen the verdict.
+        Consider a larger sample or treat near-zero amplitudes as inconclusive
+        rather than absent.
+

@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M15: Contrast certification-conditional reporting consistency (ci_accuracy ↔ print)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
@@ -22,31 +22,22 @@ The object contract is settled by RR02 (see M15-D1): **measured quantities
 stay in the returned object; only interpretive/presentation surfaces follow
 `print.circumplex_ssm()`'s profiles-only certification stance.**
 
+Per M15-D1, the contrast's interpretive/presentation surfaces (verdict,
+print/summary, plot) go unconditional; its measurement columns stay. Concrete
+sites in Tasks below.
+
 **In:**
-- **Verdict (interpretation).** Recompute the contrast's displacement Class on
-  the **unconditional** coverage (k = round(Coverage × N_reps), n = N_reps at
-  Condition 1) in `ssm_ci_verdict()` (`R/ssm_ci_accuracy.R` ~L1026), and
-  relabel that verdict row's `Parameter` `"d_conditional"` → `"d"`; profiles
-  keep `"d_conditional"`.
-- **Print/summary (presentation).** In `ssm_ci_verdict_blocks()`
-  (`R/ssm_ci_oop.R:83`) key the contrast displacement line to `"d"` (drops the
-  " when certified" suffix); in `ssm_ci_verdict_text()`
-  (`R/ssm_ci_oop.R:169-262`) use plain "displacement" wording for the contrast
-  (never "certified displacement"/"trustworthy when certified"); make the
-  "never certified (not assessable)" fallback (`R/ssm_ci_oop.R:89-93`)
-  unreachable for the contrast.
-- **Plot (presentation, fourth surface — RR02 Beyond-the-brief #1).** Exclude
-  the contrast series from the "Displacement (certified)" panel in
-  `plot.circumplex_ci_accuracy()` (`R/ssm_ci_oop.R:501-527`).
-- **Object (measurement) — retained, not dropped.** Keep the contrast's
+- **Verdict + print/summary + plot** made unconditional for the contrast
+  (Parameter `"d"`, no "when certified"/"certified displacement" wording;
+  excluded from the "Displacement (certified)" plot panel — the fourth
+  surface RR02 surfaced). Profiles unchanged.
+- **Object measurements retained** (not dropped): contrast
   `coverage$Coverage_conditional`/`N_conditional` and `guardrail$Cert_rate`
-  (`Caution` stays NA) as documented joint-certification descriptives; rewrite
-  the three now-stale comments (`R/ssm_ci_accuracy.R:546-551`,
-  `R/ssm_ci_accuracy.R:690-696`, `R/ssm_ci_oop.R:110-114`).
-- Supersede the "Milestone-close review #3" split (`test-ci_accuracy.R:221-250`);
-  re-pin the `ci_accuracy` snapshot (contrast-only churn; profiles
-  byte-identical); update the roxygen `@return` and add one clause to the
-  existing `NEWS.md` development bullet.
+  (`Caution` NA) kept as documented joint-certification descriptives; three
+  now-stale comments rewritten.
+- Supersede "Milestone-close review #3" (`test-ci_accuracy.R:221-250`); re-pin
+  the `ci_accuracy` snapshot (profiles byte-identical); update roxygen
+  `@return` + the `NEWS.md` development bullet.
 
 **Out:**
 - Any change to `print.circumplex_ssm()` — already correct; Direction A leaves
@@ -87,22 +78,22 @@ stay in the returned object; only interpretive/presentation surfaces follow
 
 - [x] **T1** — RB02 drafted + RR02 ingested: object contract settled (M15-D1);
       unconditional-only supersedes Milestone-close review #3. Done 2026-07-12.
-- [ ] **T2** — Regression tests first (red before the change): supersede
+- [x] **T2** — Regression tests first (red before the change): supersede
       `test-ci_accuracy.R:221-250` — pin contrast verdict `Parameter == "d"`
       with `N_reps == reps`, profiles keep `"d_conditional"`, contrast printed
       displacement line has no "when certified", contrast `Coverage_conditional`
       still populated; keep the surviving assertions (contrast `Caution` all-NA,
       finite `Cert_rate`, wording bars).
-- [ ] **T3** — Verdict + wording: recompute the contrast displacement Class on
+- [x] **T3** — Verdict + wording: recompute the contrast displacement Class on
       unconditional coverage and relabel `Parameter` → `"d"`
       (`ssm_ci_verdict()`); key the contrast to `"d"` in `ssm_ci_verdict_blocks()`
       and use plain "displacement" wording in `ssm_ci_verdict_text()`; make the
       not-assessable fallback unreachable for the contrast. Profiles unchanged.
-- [ ] **T4** — Object comments + retention: rewrite the three stale comments
+- [x] **T4** — Object comments + retention: rewrite the three stale comments
       (`R/ssm_ci_accuracy.R:546-551`, `:690-696`; `R/ssm_ci_oop.R:110-114`) to
       say the joint-cert rate is provenance for the retained object columns, not
       a conditioning device for any displayed line; add object-contract tests.
-- [ ] **T5** — Plot fix (exclude contrast from the `d_cert` panel,
+- [x] **T5** — Plot fix (exclude contrast from the `d_cert` panel,
       `R/ssm_ci_oop.R:501-527`); re-pin the `ci_accuracy` snapshot; roxygen
       `@return` + `NEWS.md` clause; `devtools::document()`; `devtools::check()`
       clean.
@@ -124,6 +115,12 @@ stay in the returned object; only interpretive/presentation surfaces follow
   option). RB02/RR02 archived. T1 done.
 - 2026-07-12: in-progress on m15-contrast-cert-consistency (cut from synced
   master); no open implementation gate (design fully settled by M15-D1).
+- 2026-07-12: T2–T5 done → review. Contrast verdict now classified on
+  unconditional coverage (Parameter "d"); print/summary/plot follow print's
+  profiles-only stance; conditional measurement columns + Cert_rate retained;
+  3 stale comments rewritten; roxygen + NEWS updated. Full suite FAIL 0 /
+  PASS 1881; `check()` 0/0/0. Added a contrast print snapshot + a data-level
+  plot-exclusion test (existing snapshot/plot fixtures were profile-only).
 
 ## Decisions
 
