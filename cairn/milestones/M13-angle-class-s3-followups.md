@@ -97,94 +97,40 @@ decision for the `as_degree`/`as_radian` generics.
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
-- 2026-07-12: created by /milestone-plan. Promotes the RR01 "Angle-class S3
-  follow-ups" candidate row (lineage: D-006). Gate decisions: keep generics
-  internal; all-NA return normalized type-only to NA_real_ (length-1, guard
-  intact); CPM angle-CI oracle included in scope. No RB tripwire fires (the
-  irreversible-api export path was declined). Targets landing before the
-  ~2026-07-26 v2.0.0 freeze.
-
-- 2026-07-12: T1 done — `new_contrast_radian()` added in `R/ssm_oop.R`; both
-  inline `structure()` sites routed through it; byte-identity pinned by
-  `expect_identical()` in `test-ssm_oop.R`; affected suites (ssm_oop,
-  ssm_bootstrap, ci_accuracy) green.
-
-- 2026-07-12: T2 done — both `quantile.circumplex_*` methods now return
-  `NA_real_` (length-1) on all-NA input; test-first (red on logical `NA`, green
-  after). 166 consumer tests (bootstrap, ci_accuracy, oop, analysis, cpm) green;
-  the `ssm_ci_accuracy.R:903` length==1 guard is preserved.
-
-- 2026-07-12: T3 done — new `test-cpm_angle_ci.R` covers the CPM angle-CI
-  transform (`cpm_fit.R:1119-1121`) at a 0/360 straddle with two independent
-  oracle types (live dumb circular-quantile-in-degrees recompute + rotation-
-  equivariance invariant), plus an end-to-end `cpm_fit()` bootstrap guard
-  (estimate-within-CI-on-circle + short-arc width) that fails on linearization.
-  Verified running (not just skipped) under `NOT_CRAN=true`.
-
-- 2026-07-12: T4 done — keep-internal decision recorded (M13-D1 below) + code
-  comments at the `as_degree`/`as_radian` generics; NAMESPACE exports no generic
-  (verified); load_all clean.
-
-- 2026-07-12: T5 done — `document()` produced no NAMESPACE/man changes; full
-  suite 392 tests 0F/0E/0S (3 expected degenerate warnings); `devtools::check()`
-  clean (0 errors / 0 warnings / 0 notes). All tasks complete → status review.
-- 2026-07-12: REVIEW round 1 (PR #37) SENT BACK → in-progress. AC1/2/4/5
-  verified; AC3 fails — diff-bug reviewer finding F1 (score 93, confirmed): the
-  T3 tests don't guard `cpm_fit.R:1119` (test 2's fixture has no pole straddle,
-  so a linearized call-site quantile passes both assertions). T3 reopened; fix
-  is to feed a deterministically straddling config through `cpm_fit()` and
-  verify the guard is red under a temporary linearization. Blame-history
-  reviewer: no findings.
+- 2026-07-12: created by /milestone-plan from the RR01 candidate (D-006); gate: keep generics internal, all-NA→NA_real_ type-only, CPM oracle in scope; no RB tripwire; targets the ~2026-07-26 v2.0.0 freeze.
+- 2026-07-12: T1 done — `new_contrast_radian()` DRYs both inline `structure()` sites; byte-identity pinned in `test-ssm_oop.R`.
+- 2026-07-12: T2 done — both `quantile.circumplex_*` return `NA_real_` (length-1) on all-NA; test-first; the ci_accuracy length==1 guard preserved.
+- 2026-07-12: T3 done — `test-cpm_angle_ci.R` (dumb recompute + rotation invariant + end-to-end guard). [superseded by the r1 send-back below]
+- 2026-07-12: T4 done — M13-D1 keep-internal recorded + generic comments; NAMESPACE unchanged.
+- 2026-07-12: T5 done — `document()` no diff; 392 tests 0F/0E/0S; `check()` 0/0/0 → status review.
+- 2026-07-12: REVIEW r1 (PR #37) SENT BACK → in-progress. AC1/2/4/5 verified; AC3 fails on F1 (diff-bug, score 93): T3 tests don't guard `cpm_fit.R:1119` — test 2's fixture has no straddle, so a linearized quantile passes both assertions. T3 reopened. Blame-history: no findings.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
 
-- 2026-07-12 (M13-D1): `as_degree`/`as_radian` stay **deliberately internal** —
-  the generics are not exported (methods remain S3-registered). Chosen at the
-  plan gate over promoting them to a documented public converter API: fits the
-  minimal-API / base-R doctrine, adds no API-maintenance commitment, and is
-  reversible. Not cross-cutting enough for a D-entry (it changes no exported
-  surface); recorded here + as a code comment at the generic definitions
-  (`R/ssm_oop.R`). Reopen only if a public deg<->rad converter is wanted.
+- 2026-07-12 (M13-D1): `as_degree`/`as_radian` stay **deliberately internal** (generics unexported, methods S3-registered) — minimal-API doctrine, no API-maintenance commitment, reversible; changes no exported surface (not a D-entry). Recorded here + code comments in `R/ssm_oop.R`. Reopen only if a public deg↔rad converter is wanted.
 
 ## Review
 <!-- owner: review · exclusive -->
 
 ### Round 1 — 2026-07-12 (PR #37) → SENT BACK (AC3 not met)
 
-**Criterion evidence (fresh, this session):**
-- AC1 ✓ — `new_contrast_radian()` in `R/ssm_oop.R`; both inline `structure()`
-  sites route through it; `test-ssm_oop.R` `expect_identical(cr, inline)` pins
-  byte-identity; full suite 392 tests 0F/0E/0S. Diff-bug reviewer confirmed the
-  `is.numeric` guard rejects nothing the old code accepted.
-- AC2 ✓ — both `quantile.circumplex_*` return `NA_real_` on all-NA input
-  (`test-ssm_bootstrap.R`, red on logical NA → green after); length-1 preserved;
-  flat-path consumers (bootstrap sapply, ci_accuracy length==1 guard, cpm_fit
-  q[1]/q[2]) all green. D-003 360→0 snap untouched.
-- AC3 ✗ — NOT MET (see F1). Tests do not guard the real `cpm_fit.R:1119` call
-  site against linearization.
-- AC4 ✓ — NAMESPACE exports no `as_degree`/`as_radian` generic (only S3method
-  registrations); comments added; M13-D1 recorded.
-- AC5 ✓ — fresh `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+**Criteria (fresh evidence):** AC1 ✓ byte-identity test + suite 392 0F/0E/0S;
+AC2 ✓ `NA_real_` all-NA test (red→green), consumers green, D-003 snap untouched;
+**AC3 ✗** — see F1; AC4 ✓ NAMESPACE exports no generic, comments + M13-D1;
+AC5 ✓ fresh `check()` 0/0/0.
 
-**Consistency gate:** `cairn_validate.py` exit 0; Coverage map complete (AC1–5 →
-T1–5, all tasks present); `document()` no diff; `check_pkgdown()` passes (no new
-exports); README unaffected; no NEWS entry warranted (internal cleanup — the
-all-NA type-fix leaves every documented CI output identical); `cairn` is
-`.Rbuildignore`d.
+**Consistency gate:** `cairn_validate.py` exit 0; Coverage complete (AC1–5→T1–5);
+`document()` no diff; `check_pkgdown()` passes (no new exports); README
+unaffected; no NEWS entry (internal cleanup — documented CI output unchanged);
+`cairn` `.Rbuildignore`d.
 
-**Independent review (two lenses + scorer):**
-- [S] blame-history: **No findings** — 360→0 snap untouched, contrast columns
-  still route through the non-`%%2π` method, D-003/D-006 respected, no M11-style
-  scoping regression.
-- [O] diff-bug: **F1** (below); AC1/AC2/AC4 verified correct by this lens too.
-- **F1 (score 93/100, CONFIRMED — actioned via send-back):** AC3's
-  `test-cpm_angle_ci.R` does not protect `R/cpm_fit.R:1119` against a
-  linear-quantile regression. Test 1 re-types the primitive expression without
-  calling `cpm_bootstrap()`; test 2 (the only test driving line 1119) uses a
-  `jz2017`/`octants()`/seed-42 fixture with **no pole-straddling variable**, so
-  both its assertions (`inside`, `width<180`) pass even when the call-site
-  quantile is linearized (scorer reproduced this via `assignInNamespace`). Fix:
-  test 2 needs a deterministically pole-straddling configuration fed through
-  `cpm_fit()`'s real path, verified red under a temporary linearization.
-  AC1/2/4/5 stand as verified.
+**Independent review:** [S] blame-history — no findings (snap/contrast-method
+routing/D-003/D-006 all respected). [O] diff-bug — **F1 (score 93, CONFIRMED,
+actioned via send-back):** `test-cpm_angle_ci.R` doesn't guard `cpm_fit.R:1119`
+against linearization — test 1 re-types the primitive without calling
+`cpm_bootstrap()`; test 2's `jz2017`/`octants()`/seed-42 fixture has no
+pole-straddle, so both its assertions pass under a linearized call-site quantile
+(scorer reproduced via `assignInNamespace`). Fix: feed a deterministically
+straddling config through `cpm_fit()`'s real path, verified red under a
+temporary linearization.
