@@ -2,7 +2,7 @@
 
 - **Status:** blocked
 - **Priority:** high
-- **Depends on:** —
+- **Depends on:** M16
 - **Branch/PR:** —
 
 ## Goal
@@ -72,6 +72,9 @@ trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
   the Grassi 2010 + Zimmermann & Wright 2017 transcriptions, gating submission);
   old submit-handoff task renumbered T3→T4. Candidate row retired. Scope
   unchanged otherwise; still blocked on the CRAN cadence window.
+- 2026-07-12: gained `Depends on: M16` (/milestone-plan) — the v2.0.0 bundle
+  now includes the print-independent certification-rule replacement, which the
+  user placed before the ~2026-07-26 freeze. No release-prep task change.
 
 ## Decisions
 
