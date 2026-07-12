@@ -42,7 +42,7 @@ reshape_params <- function(v, suffix) {
   # The C++ ssm_parameters_cpp()/group_parameters() emit one value per entry in
   # ssm_param_names(); a length that is not a whole multiple means the C++
   # parameter count and ssm_param_names() have drifted out of sync (which would
-  # otherwise misalign every column). The contract is pinned in test-RcppExport.
+  # otherwise misalign every column). The contract is pinned in test-RcppExports.R.
   stopifnot(length(v) %% length(pnames) == 0)
   # One row per group; one column per parameter, named parameter_suffix
   out <- matrix(v, ncol = length(pnames), byrow = TRUE)

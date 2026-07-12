@@ -164,3 +164,25 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
 
 ### Independent review
 
+Two-lens fresh-context review (both parallel, distinct evidence bases):
+
+- **[O] diff-bug (Opus)** — **0 findings.** Verified: `is_flag(items)` is
+  character-identical to the replaced predicate; `sem_canonical_pop()` is
+  bit-identical (default `angles_deg == oct`, named `...` forwarding, all 15
+  converted sites genuinely canonical); the two new tests are valid
+  deterministic oracles (flat test's ~1e-17 profile SD falls under the C++
+  scale-aware flat tolerance `8·eps·n·max|scores|`, so it truly hits the NA
+  branch; pole test's data/analysis angles align, LM=360 honored); matrix
+  citations accurate.
+- **[S] blame-history (Sonnet)** — **0 findings.** `is_flag` swap aligns with
+  D-005 (the deferred sliver, not an exemption); every converted SEM site
+  preserved its pinned population; the one context-needing block correctly
+  restored `a`/`cc`; new tests consistent with D-003 (accept ~0 or ~360) and
+  the degenerate→NA convention.
+
+No surviving findings from either lens → the confidence scorer was not needed
+(nothing to score). Both lenses independently surfaced one out-of-taxonomy
+observation: the T5 rename orphaned a comment reference at `R/utils.R:45`
+("pinned in test-RcppExport.") — fixed review-side to `test-RcppExports.R`
+(trivial, milestone-introduced staleness).
+
