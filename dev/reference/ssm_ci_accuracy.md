@@ -103,22 +103,25 @@ A `circumplex_ci_accuracy` object: a list with `coverage` (per Profile x
 Parameter x Condition: coverage, its Monte Carlo SE, the one-sided miss
 rates, median CI width, and for displacement the
 certification-conditional coverage with the number of certified
-replicates behind it; `Structural` flags the amplitude rows whose zero
-coverage is a theorem rather than a measurement), `guardrail` (per
-Profile x Condition: certification rate with its 95% Wilson score
-interval, the user-expectation benchmark `(1 - interval) / 2`, the
-stored false-certification caution decision at the `c = 0` rung
-(`Caution`, true when the Wilson lower bound exceeds the benchmark; `NA`
-off that rung, and `NA` for a contrast row, which
-`print.circumplex_ssm()` never gates), the implied threshold, fit-pass
-rate, and the branch-pathology rate – the rate at which a displacement
-point estimate falls geometrically outside its own interval), `verdict`
-(Wilson-vs-Bradley classification of elevation, amplitude, and
-conditional displacement coverage at the as-estimated condition, plus an
-overall worst-of row per profile; note the printed verdict headline
-additionally elevates to CAUTION whenever the guardrail `Caution` fired,
-so it can read worse than the overall coverage class), `cpm` (the
-embedded
+replicates behind it – for a contrast row this conditional column is
+retained as a joint-certification descriptive that no display consumes;
+`Structural` flags the amplitude rows whose zero coverage is a theorem
+rather than a measurement), `guardrail` (per Profile x Condition:
+certification rate with its 95% Wilson score interval, the
+user-expectation benchmark `(1 - interval) / 2`, the stored
+false-certification caution decision at the `c = 0` rung (`Caution`,
+true when the Wilson lower bound exceeds the benchmark; `NA` off that
+rung, and `NA` for a contrast row, which `print.circumplex_ssm()` never
+gates), the implied threshold, fit-pass rate, and the branch-pathology
+rate – the rate at which a displacement point estimate falls
+geometrically outside its own interval), `verdict` (Wilson-vs-Bradley
+classification of elevation, amplitude, and displacement coverage at the
+as-estimated condition – a profile's displacement is classified
+certification-conditionally (`Parameter` `"d_conditional"`), a
+contrast's unconditionally (`Parameter` `"d"`) – plus an overall
+worst-of row per profile; note the printed verdict headline additionally
+elevates to CAUTION whenever the guardrail `Caution` fired, so it can
+read worse than the overall coverage class), `cpm` (the embedded
 [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
 object, or `NULL` when `structure = "observed"`), `population` (per
 profile row: the population profile vectors, truth parameters, and any
@@ -142,8 +145,13 @@ printed
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
 output applies); the implied certification threshold, `0.5 * 10^-digits`
 in amplitude units, is echoed in the output because it is
-scale-dependent. For a contrast row, "certified" means both profile rows
-were certified.
+scale-dependent. A contrast row is a signed difference, not a
+prototypicality measure, so `print.circumplex_ssm()` never
+certification-gates it; its displacement verdict and printed coverage
+are therefore reported unconditionally (matching that profiles-only
+stance). Its certification-conditional coverage – where "certified"
+means both profile rows were certified – is still computed and retained
+in the returned object as a descriptive that no display consumes.
 
 The `amplitude_factors` ladder manufactures populations whose
 closed-form amplitude is scaled toward zero (the regime where percentile
