@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — | high | milestones/M7-v2-release-prep.md |
-| M15 | Contrast certification-conditional reporting consistency (ci_accuracy ↔ print) | planned | — | normal | milestones/M15-contrast-cert-consistency.md |
+| M15 | Contrast certification-conditional reporting consistency (ci_accuracy ↔ print) | in-progress | — | normal | milestones/M15-contrast-cert-consistency.md |
 | M14 | Automate the instruments() list | done | — | normal | milestones/archive/M14-instruments-list-automation.md |
 | M13 | Angle-class S3 follow-ups (RR01) | done | — | normal | milestones/archive/M13-angle-class-s3-followups.md |
 | M12 | Result-label DRY + statistical-core coverage tracking | done | — | normal | milestones/archive/M12-label-dry-coverage.md |

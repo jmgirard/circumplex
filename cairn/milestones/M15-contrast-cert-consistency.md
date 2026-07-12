@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M15: Contrast certification-conditional reporting consistency (ci_accuracy ↔ print)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m15-contrast-cert-consistency
 
 ## Goal
 
@@ -122,6 +122,8 @@ stay in the returned object; only interpretive/presentation surfaces follow
   (M15-D1); scope amended — verdict recompute+relabel, plot fourth surface
   added (AC3/T5), measurement fields retained (RR02 rejects the drop/NA
   option). RB02/RR02 archived. T1 done.
+- 2026-07-12: in-progress on m15-contrast-cert-consistency (cut from synced
+  master); no open implementation gate (design fully settled by M15-D1).
 
 ## Decisions
 
