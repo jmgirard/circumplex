@@ -6,7 +6,7 @@
 - **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
-- **Branch/PR:** m13-angle-class-s3-followups   <!-- owner: implement (branch) / review (PR URL) · create -->
+- **Branch/PR:** m13-angle-class-s3-followups · https://github.com/jmgirard/circumplex/pull/37   <!-- owner: implement (branch) / review (PR URL) · create -->
 
 ## Goal
 
