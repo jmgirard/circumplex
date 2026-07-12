@@ -10,6 +10,9 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — | high | milestones/M7-v2-release-prep.md |
+| M8 | SEM-layer DRY single-sourcing | planned | — | normal | milestones/M8-sem-dry-single-sourcing.md |
+| M9 | sem_estimate() vectorization + oracle single-sourcing | planned | — | normal | milestones/M9-sem-estimate-vectorize.md |
+| M10 | Package-wide scalar-count validator | planned | — | low | milestones/M10-scalar-count-validator.md |
 
 ## Candidates
 
@@ -19,4 +22,4 @@ _New cairn IDs continue from the legacy maximum (M6); M7 is the first cairn-era 
 - v2.0.0 pre-release oracle re-reads: second independent human re-read of the Grassi et al. (2010) CircE and Zimmermann & Wright (2017) transcriptions before release (legacy ROADMAP "v2.0.0 pre-release items").
 - Statistical follow-ups deferred to post-v2.0.0 (Fable-tier where noted): CPM convergence-acceptance vacuous "reproduced" for free-angle variants; contrast certification consistency between `ssm_ci_accuracy()` and `print.circumplex_ssm()`; guardrail certification-rule replacement (print-independent, scale-free); CIRCUM free-scaling compatibility mode for `cpm_fit()`; post-M4 publication-grade simulation study design (legacy ROADMAP M4/M5 blocks).
 - Continuous / infrastructure refactors (fold into the milestone that next touches the code): dedup Group/Measure/Label construction; move degree/radian/contrast classes onto vctrs/S7; rename `test-RcppExport.R.R`; boundary-condition test suite; add R-devel to CI matrix; statistical-core coverage tracking; 0-vs-360 pole-snap alignment (cosmetic); analytic-CI Hessian recomputation (minor perf) (legacy ROADMAP "Continuous / infrastructure track" + deferred `/code-review` findings).
-- M5 post-v2.0.0 close-review follow-ups: vectorize `sem_estimate()` per-draw apply; `make_pop_2g()` → `sem_pop()`; shared contrast-arity validator; fit-this-syntax chokepoint; `summary.circumplex_ssm_sem()` label seam; package-wide scalar-count validator; strict-tier syntax single-sourcing (legacy ROADMAP "Milestone 5" follow-ups).
+- M5 close-review follow-ups (items a–g) promoted 2026-07-12 to M8 (DRY: c/d/e/g), M9 (numeric: a/b), M10 (scalar validator: f). Remaining sliver: the `is_flag()` length-1-logical sibling at `R/instrument_oop.R:68` (a different predicate from scalar-count) — fold into whatever milestone next touches that validation.
