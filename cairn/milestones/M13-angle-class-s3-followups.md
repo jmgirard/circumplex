@@ -88,7 +88,7 @@ decision for the `as_degree`/`as_radian` generics.
       between `cpm_fit()`'s reported `angle_lci/uci` and a direct
       `quantile.circumplex_radian` recompute, plus a dumb explicit
       circular-quantile oracle. Cite the design-sec anchor.
-- [ ] **T4** — Add a one-line code comment at `as_degree`/`as_radian` marking
+- [x] **T4** — Add a one-line code comment at `as_degree`/`as_radian` marking
       them deliberately internal (generic unexported, methods registered);
       record the decision in this file's Decisions section.
 - [ ] **T5** — `devtools::document()` (no NAMESPACE change expected) + full
@@ -121,8 +121,20 @@ decision for the `as_degree`/`as_radian` generics.
   (estimate-within-CI-on-circle + short-arc width) that fails on linearization.
   Verified running (not just skipped) under `NOT_CRAN=true`.
 
+- 2026-07-12: T4 done — keep-internal decision recorded (M13-D1 below) + code
+  comments at the `as_degree`/`as_radian` generics; NAMESPACE exports no generic
+  (verified); load_all clean.
+
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
+
+- 2026-07-12 (M13-D1): `as_degree`/`as_radian` stay **deliberately internal** —
+  the generics are not exported (methods remain S3-registered). Chosen at the
+  plan gate over promoting them to a documented public converter API: fits the
+  minimal-API / base-R doctrine, adds no API-maintenance commitment, and is
+  reversible. Not cross-cutting enough for a D-entry (it changes no exported
+  surface); recorded here + as a code comment at the generic definitions
+  (`R/ssm_oop.R`). Reopen only if a public deg<->rad converter is wanted.
 
 ## Review
 <!-- owner: review · exclusive -->
