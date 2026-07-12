@@ -54,9 +54,10 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
 - [x] **T1** — Add the scalar-count predicate to `R/utils.R` + direct tests.
 - [x] **T2** — Resolve the two `is_*()` readings (question-gate at implement);
       author the D-entry recording the canonical interpretation (D-005).
-- [ ] **T3** — Adopt the helper across the sites in `R/ssm_ci_accuracy.R`,
+- [x] **T3** — Adopt the helper across the sites in `R/ssm_ci_accuracy.R`,
       `R/cpm_fit.R`, `R/ssm_sem.R`; reconcile `R/ssm_sem_syntax.R:254-256`.
-      Assert each validation still aborts on bad input.
+      Assert each validation still aborts on bad input. 15 sites converted;
+      length>1 regression tests added for all three families.
 - [ ] **T4** — `devtools::document()` (if roxygen touched) + `devtools::check()`.
 
 ## Work log

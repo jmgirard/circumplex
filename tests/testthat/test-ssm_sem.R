@@ -517,6 +517,11 @@ test_that("ssm_sem() validates its arguments (sec. 7.2)", {
   skip_if_not_installed("lavaan")
   data("jz2017", envir = environment())
   scales <- names(jz2017)[2:9]
+  # Scalar-count args reject length > 1 (is_scalar_count hardening, M10 D-005):
+  # boots/ncpus previously used an inline is.numeric && ceiling==floor check
+  # with no length guard, so a length-2 vector slipped through.
+  expect_error(ssm_sem(jz2017, scales = scales, boots = c(100, 200)))
+  expect_error(ssm_sem(jz2017, scales = scales, ncpus = c(1, 2)))
   # No measures without grouping: the single-group mean path has no product
   # (sec. 1.3)
   expect_error(ssm_sem(jz2017, scales = scales), "measures")

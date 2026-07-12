@@ -181,7 +181,7 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
       call. = FALSE
     )
   }
-  stopifnot(is_count(reps), length(reps) == 1, reps >= 1)
+  stopifnot(is_scalar_count(reps))
   stopifnot(is.numeric(amplitude_factors), length(amplitude_factors) >= 1,
             all(is.finite(amplitude_factors)),
             all(amplitude_factors >= 0), all(amplitude_factors <= 1))
@@ -191,11 +191,11 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
          "that the verdict is keyed to).", call. = FALSE)
   }
   structure <- match.arg(structure)
-  stopifnot(is.null(m) || (is_count(m) && length(m) == 1 && m >= 1))
+  stopifnot(is.null(m) || is_scalar_count(m))
   stopifnot(is.null(cpm) || inherits(cpm, "circumplex_cpm"))
-  stopifnot(is_count(digits), length(digits) == 1)
+  stopifnot(is_scalar_count(digits, min = 0L))
   parallel <- match.arg(parallel, c("no", "multicore", "snow"))
-  stopifnot(is_count(ncpus), length(ncpus) == 1, ncpus >= 1)
+  stopifnot(is_scalar_count(ncpus))
 
   # ---- unpack the analysis to be assessed ----
   dts <- ssm_object$details

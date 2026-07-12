@@ -251,9 +251,7 @@ ssm_sem_syntax <- function(instrument = NULL, scales = NULL, angles = NULL,
   stopifnot(is_null_or_char(measures))
   stopifnot(is.null(include_defined) || is_flag(include_defined))
   # n_groups: a single positive whole number.
-  stopifnot(
-    is_num(n_groups, n = 1L), is_count(n_groups), n_groups >= 1
-  )
+  stopifnot(is_scalar_count(n_groups))
   n_groups <- as.integer(n_groups)
   # invariance is only meaningful for multi-group models. When n_groups == 1 it
   # must be left at its default; supplying it there is a clear error (rather

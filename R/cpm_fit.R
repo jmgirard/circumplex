@@ -104,9 +104,9 @@ cpm_discrepancy <- function(R, P, ldR = NULL) {
 #' @noRd
 cpm_spec <- function(p, m, variant = c("A", "B", "C", "D"), reference = 1) {
   variant <- match.arg(variant)
-  stopifnot(is_count(p), p >= 3)
-  stopifnot(is_count(m), m >= 1)
-  stopifnot(is_count(reference), reference >= 1, reference <= p)
+  stopifnot(is_scalar_count(p), p >= 3)
+  stopifnot(is_scalar_count(m))
+  stopifnot(is_scalar_count(reference), reference <= p)
 
   # m-cap (design sec. 1.4): default floor((p-1)/2) for A/C; floor(p/2) for B/D.
   cap <- if (variant %in% c("B", "D")) floor(p / 2) else floor((p - 1) / 2)
@@ -476,7 +476,7 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   # ---- input validation (house style) ----
   stopifnot(is.matrix(R), nrow(R) == ncol(R), isSymmetric(unname(R), tol = 1e-8))
   stopifnot(is_num(angles, n = p))
-  stopifnot(is_count(reference), reference >= 1, reference <= p)
+  stopifnot(is_scalar_count(reference), reference <= p)
 
   # PD check (design sec. 4): smallest eigenvalue > 1e-10, else refuse.
   ev <- eigen(R, symmetric = TRUE, only.values = TRUE)$values
@@ -1318,11 +1318,11 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
   }
 
   # Scalar-argument validation via the house is_*() helpers.
-  stopifnot(is_count(reference), reference >= 1)
-  stopifnot(is_count(m), m >= 1)
+  stopifnot(is_scalar_count(reference))
+  stopifnot(is_scalar_count(m))
   stopifnot(is_num(interval, n = 1), interval > 0, interval < 1)
   stopifnot(is_flag(listwise))
-  stopifnot(is_count(boots), boots > 0)
+  stopifnot(is_scalar_count(boots))
   if (!isTRUE(listwise)) {
     stop("Only listwise deletion is supported (`listwise = TRUE`).", call. = FALSE)
   }
@@ -1344,7 +1344,7 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     if (is.null(n)) {
       stop("`n` (the sample size) is required with `cormat`.", call. = FALSE)
     }
-    stopifnot(is_count(n), length(n) == 1, n > p)
+    stopifnot(is_scalar_count(n), n > p)
     N <- as.integer(n)
     if (is.null(scales)) {
       scales <- if (!is.null(colnames(R))) colnames(R) else paste0("V", seq_len(p))
@@ -1548,7 +1548,7 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
 #'
 cpm_simulate <- function(object, n) {
   stopifnot(inherits(object, "circumplex_cpm"))
-  stopifnot(is_count(n), length(n) == 1, n >= 1)
+  stopifnot(is_scalar_count(n))
   n <- as.integer(n)
   cpm_sim_draw(cpm_sim_root(object), n)
 }
