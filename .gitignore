@@ -29,3 +29,7 @@ Thumbs.db
 devel/cpm-marker-validation-results.rds
 devel/cpm-marker-validation-smoke.rds
 devel/cpm-marker-validation-custom.rds
+
+# cairn tracking
+cairn/references/pdf/
+cairn/.merge-approved
