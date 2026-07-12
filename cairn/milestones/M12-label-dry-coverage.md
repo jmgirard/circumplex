@@ -61,12 +61,12 @@ master before the v2.0.0 freeze.
 ## Tasks
 <!-- owner: plan (create) / implement (check-off, minor edits) -->
 
-- [ ] **T1** — Test-first: add a targeted test pinning the current
+- [x] **T1** — Test-first: add a targeted test pinning the current
       `Label`/`Group`/`Measure` output across the branch matrix (mean+contrast
       with grouping; corr with grouping; corr no-grouping with contrast; corr
       no-grouping no-contrast), asserted against present behavior before any
       refactor.
-- [ ] **T2** — Extract one helper (e.g. `build_result_labels()`) covering both
+- [x] **T2** — Extract one helper (e.g. `build_result_labels()`) covering both
       score paths, parametrized by `score_type`/`grouping`/`contrast`; replace
       the four inline blocks at `R/ssm_analysis.R:333`, `:370`, `:458`, `:504`.
       Verify T1 + existing snapshot/print tests green.
@@ -78,6 +78,12 @@ master before the v2.0.0 freeze.
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T1+T2 — extracted `build_result_labels()` in `R/ssm_analysis.R`,
+  replaced all four inline Label/Group/Measure blocks; added a direct helper
+  unit test covering all branches (incl. corr no-contrast+grouping and corr
+  multi-measure no-contrast, which weren't asserted end-to-end). Full
+  `devtools::test()` byte-identical green (1823 pass, 0 fail); verified result/
+  score row names + column types unchanged. The 3 suite WARNs are pre-existing.
 - 2026-07-12: created by /milestone-plan. Promoted from the "Continuous /
   infrastructure refactors" candidate row (items: Group/Measure/Label dedup +
   statistical-core coverage tracking). Decided to **land pre-freeze** (v2.0.0

@@ -836,3 +836,76 @@ test_that("measures_labels length is validated", {
   expect_equal(res_null$results$Label, c("NARPD", "ASPD"))
 })
 
+test_that("build_result_labels() covers every mean/correlation branch (M12)", {
+  lab <- function(...) build_result_labels(...)
+
+  # --- Mean path (no measures) ---------------------------------------------
+  # Single group: Measure is NA, Label mirrors Group.
+  expect_equal(
+    lab("Mean", "All", NULL, 1L, NULL, FALSE, NULL),
+    data.frame(Label = "All", Group = "All", Measure = NA_character_,
+               stringsAsFactors = FALSE)
+  )
+  # Multiple groups, no contrast.
+  expect_equal(
+    lab("Mean", c("Female", "Male"), NULL, 2L, NULL, FALSE, "gender"),
+    data.frame(Label = c("Female", "Male"), Group = c("Female", "Male"),
+               Measure = c(NA_character_, NA_character_),
+               stringsAsFactors = FALSE)
+  )
+  # Multiple groups, contrast appends the "second - first" row.
+  expect_equal(
+    lab("Mean", c("Female", "Male"), NULL, 2L, NULL, TRUE, "gender"),
+    data.frame(
+      Label = c("Female", "Male", "Male - Female"),
+      Group = c("Female", "Male", "Male - Female"),
+      Measure = c(NA_character_, NA_character_, NA_character_),
+      stringsAsFactors = FALSE
+    )
+  )
+
+  # --- Correlation path (measures present) ---------------------------------
+  # Single group, single measure: Label is the measure.
+  expect_equal(
+    lab("Correlation", "All", "PARPD", 1L, 1L, FALSE, NULL),
+    data.frame(Label = "PARPD", Group = "All", Measure = "PARPD",
+               stringsAsFactors = FALSE)
+  )
+  # Multiple measures, no grouping, no contrast (not asserted end-to-end).
+  expect_equal(
+    lab("Correlation", "All", c("ASPD", "NARPD"), 1L, 2L, FALSE, NULL),
+    data.frame(Label = c("ASPD", "NARPD"), Group = c("All", "All"),
+               Measure = c("ASPD", "NARPD"), stringsAsFactors = FALSE)
+  )
+  # Measure contrast (no grouping): "second - first" measure appended.
+  expect_equal(
+    lab("Correlation", "All", c("ASPD", "NARPD"), 1L, 2L, TRUE, NULL),
+    data.frame(
+      Label = c("ASPD", "NARPD", "NARPD - ASPD"),
+      Group = c("All", "All", "All"),
+      Measure = c("ASPD", "NARPD", "NARPD - ASPD"),
+      stringsAsFactors = FALSE
+    )
+  )
+  # Grouping, no contrast (not asserted end-to-end): Label is "measure: group".
+  expect_equal(
+    lab("Correlation", c("Female", "Male"), "NARPD", 2L, 1L, FALSE, "gender"),
+    data.frame(
+      Label = c("NARPD: Female", "NARPD: Male"),
+      Group = c("Female", "Male"),
+      Measure = c("NARPD", "NARPD"),
+      stringsAsFactors = FALSE
+    )
+  )
+  # Group contrast: "second - first" group appended, Label is "measure: group".
+  expect_equal(
+    lab("Correlation", c("Female", "Male"), "NARPD", 2L, 1L, TRUE, "gender"),
+    data.frame(
+      Label = c("NARPD: Female", "NARPD: Male", "NARPD: Male - Female"),
+      Group = c("Female", "Male", "Male - Female"),
+      Measure = c("NARPD", "NARPD", "NARPD"),
+      stringsAsFactors = FALSE
+    )
+  )
+})
+
