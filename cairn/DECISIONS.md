@@ -77,3 +77,33 @@ non-negative-integer test used as the internal `n=` guard inside
 `ssm_sem` and extra `cpm_fit` sites that lacked a length guard are now strictly
 stricter (reject length>1). The `is_flag()` length-1-logical sibling
 (`R/instrument_oop.R:68`) already conforms to idiom (b) and is out of scope.
+
+### D-006 (2026-07-12): keep S3 for the angle classes — vctrs/S7 migration dropped
+
+**Context:** A candidate proposed migrating `circumplex_degree`,
+`circumplex_radian`, and `circumplex_contrast_radian` from S3 numeric
+subclasses to vctrs or S7. Flagged `ip-touching` + `irreversible-api`;
+escalated to independent Fable review (RB01 → RR01, 2026-07-12).
+**Decision:** Keep S3. The classes are transient boundary dispatch tags, not
+persistent data types — every consumer converts at the boundary
+(`as_radian(as_degree(x))`) and both custom `quantile` methods `unclass()`
+their input immediately, so no generic vctrs/S7 benefit (class-loss safety,
+mixed-unit guarding, validators) is a live problem here. vctrs' strictness is
+*anti-fit*: it errors on the transparent numeric arithmetic `angle_dist()`
+(`R/utils.R:65–69`) and the unit converters rely on, and reaching behavioral
+parity would triple the class code (`vec_arith`/`vec_math`/`vec_ptype2`/
+`vec_cast`/`format`). S7 is the wrong tool for vector classes and is pre-1.0. A
+direct vctrs Import breaches the minimal-deps / no-tidyverse-in-package-code
+doctrine and raises the R floor. For code implementing the package's hardest
+invariants (pole-snap, contrast continuous branch, branch alignment) the only
+possible numeric outcome is "identical or worse."
+**Re-trigger:** reopen only on a concrete, test-demonstrated defect traceable
+to the S3 tag design (a real mixed-unit bug the convert-at-boundary idiom
+missed, or a hard requirement for angle vectors as first-class tibble columns).
+Modernization alone never re-triggers.
+**Consequences:** D-003 (pole reported as exactly 360.0) is explicitly
+unaffected and stands. Small S3-local follow-ups surfaced by RR01 are spun off
+as a ROADMAP candidate (a `new_contrast_radian()` constructor for the two
+inline `structure()` sites; deciding the export status of the internal
+`as_degree`/`as_radian` generics; `NA_real_` all-NA return + CPM angle-CI
+oracle path when the quantile methods are next touched). Source: RR01.
