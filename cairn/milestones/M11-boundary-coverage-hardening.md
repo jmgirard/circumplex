@@ -83,11 +83,12 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
       deterministic tests: flat correlation profile → NA displacement (class D)
       and a correlation profile peaking at the 0/360 pole (class A/B), at
       `test-ssm_analysis.R:229` and `:250`.
-- [ ] **T3** — Add `sem_canonical_pop()` to `helper-ssm-sem.R`; grep the whole
-      `sem_pop(` canonical-population family across `test-ssm_sem*.R` (do not
-      trust a fixed site count) and route each canonical rebuild through it;
-      confirm bit-identical population via `identical()` (M9 lesson: no
-      stochastic rerun needed).
+- [x] **T3** — Added `sem_canonical_pop()` to `helper-ssm-sem.R`; a
+      context-aware pass converted 15 canonical single-pop rebuilds in
+      `test-ssm_sem.R` (the 9 non-canonical `sem_pop()` sites — different
+      loadings, attenuated theta, 5-scale, 2-group — left direct). Bit-identical
+      guarded by a new `identical()` test; full SEM suite green, no re-pin. The
+      groups/syntax files already route 2-group pops through `make_pop_2g()`.
 - [ ] **T4** — Replace `is.logical(items) && length(items) == 1` at
       `R/instrument_oop.R:68` with `is_flag(items)`; keep/confirm the
       invalid-`items` error-path test.

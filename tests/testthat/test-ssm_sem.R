@@ -22,6 +22,19 @@ angle_covered <- function(lci, uci, value) {
 oct <- as.numeric(octants())
 oct_scales <- paste0("s", 1:8)
 
+# sem_canonical_pop() must be bit-identical to the inline construction it
+# replaced across this file (M11 T3), so the consolidation needs no re-pin.
+test_that("sem_canonical_pop() equals the inline canonical construction", {
+  sm <- cbind(c(0.2, 0.35, 0.15))
+  expect_identical(
+    sem_canonical_pop(sm, v_m = 1),
+    sem_pop(
+      rep(0.55, 8), rep(0.6, 8), seq(0.3, 0.6, length.out = 8),
+      oct, sm, v_m = 1
+    )
+  )
+})
+
 # The SSM transform (spec sec. 2/8.2) -------------------------------------------
 
 test_that("sem transform equals ssm_parameters() at equally spaced angles (sec. 8.2)", {
@@ -180,12 +193,9 @@ test_that("as residual variance -> 0 the latent profile converges to the observe
 
 test_that("latent displacement at the 0/360 pole is reported on the package convention with a contiguous straddling CI (sec. 5.5)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   # Measure aligned exactly with the +x axis: d* = 0 (equivalently 360)
   sigma_m <- cbind(c(0.15, 0.45, 0))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   fit <- sem_pop_fit(pop, n = 500) # modest n so the CI has real width
   set.seed(20260707)
   res <- ssm_sem_parameters(
@@ -208,12 +218,9 @@ test_that("latent displacement at the 0/360 pole is reported on the package conv
 
 test_that("latent amplitude near zero degrades gracefully: guardrail path, no crash (sec. 5.5)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   # Measure orthogonal to the plane: pure elevation, a* = 0, d* undefined
   sigma_m <- cbind(c(0.4, 0, 0))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   fit <- sem_pop_fit(pop, n = 400)
   set.seed(20260707)
   res <- suppressWarnings(ssm_sem_parameters(
@@ -238,11 +245,8 @@ test_that("latent amplitude near zero degrades gracefully: guardrail path, no cr
 
 test_that("a flat latent profile (measure independent of everything) degrades like the observed path (sec. 5.5)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0, 0, 0))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   fit <- sem_pop_fit(pop, n = 400)
   set.seed(20260707)
   res <- suppressWarnings(ssm_sem_parameters(
@@ -264,16 +268,13 @@ test_that("a flat latent profile (measure independent of everything) degrades li
 
 test_that("two-measure latent contrast near +/-180 stays on the estimate's branch (sec. 5.5/6.4)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   d1 <- 5 * pi / 180
   d2 <- 186 * pi / 180
   sigma_m <- cbind(
     c(0.15, 0.4 * cos(d1), 0.4 * sin(d1)),
     c(0.15, 0.4 * cos(d2), 0.4 * sin(d2))
   )
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = c(1, 1))
+  pop <- sem_canonical_pop(sigma_m, v_m = c(1, 1))
   fit <- sem_pop_fit(pop, n = 500)
   set.seed(20260707)
   res <- ssm_sem_parameters(
@@ -300,9 +301,6 @@ test_that("two-measure latent contrast near +/-180 stays on the estimate's branc
 
 test_that("a disattenuated point correlation at/above 1 is refused with the scale named (sec. 4.5)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   # M is the common part t_1 of scale 1 (sigma_m = Phi lambda_1). Shrinking
   # Var(M) below Var(t_1) drives the model-implied disattenuated rho*_1
   # comfortably above 1 (~1.05), so the point guard fires ROBUSTLY on every
@@ -312,7 +310,7 @@ test_that("a disattenuated point correlation at/above 1 is refused with the scal
   # escalation fired instead of the point guard) -- the M5 CI portability fix.
   th <- oct * pi / 180
   lambda1 <- c(a[1], cc[1] * cos(th[1]), cc[1] * sin(th[1]))
-  pop <- sem_pop(a, cc, theta, oct, cbind(lambda1), v_m = sum(lambda1^2))
+  pop <- sem_canonical_pop(cbind(lambda1), v_m = sum(lambda1^2))
   sig <- pop$sigma
   sig[pop$measures, pop$measures] <- 0.9 * sig[pop$measures, pop$measures]
   syn <- ssm_sem_syntax(
@@ -377,11 +375,8 @@ test_that("an inadmissible-draw share above the threshold escalates to an error 
 
 test_that("MVN draws respect the linear fixed-angle direction constraints (sec. 5.1)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   fit <- sem_pop_fit(pop, n = 300)
   psi <- lavaan::coef(fit)
   set.seed(1)
@@ -399,11 +394,8 @@ test_that("MVN draws respect the linear fixed-angle direction constraints (sec. 
 
 test_that("mvn results are reproducible from a seed (RNG contract, sec. 5.4)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   fit <- sem_pop_fit(pop, n = 300)
   set.seed(42)
   r1 <- ssm_sem_parameters(
@@ -621,11 +613,8 @@ test_that("ssm_sem_parameters() refuses angles that do not match the fitted mode
 
 test_that("ssm_sem_parameters() handles user-supplied multi-group fits per group (T4 escape hatch)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   set.seed(5)
   dat <- as.data.frame(
     matrix(rnorm(800 * 9), 800, 9) %*% chol(pop$sigma)
@@ -654,11 +643,8 @@ test_that("ssm_sem_parameters() handles user-supplied multi-group fits per group
 
 test_that("ssm_sem_parameters() refuses the unidentified free-g-plane scaled configuration", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   syn <- ssm_sem_syntax(
     scales = pop$scales, angles = oct, measures = pop$measures
   )
@@ -682,11 +668,8 @@ test_that("ssm_sem_parameters() refuses the unidentified free-g-plane scaled con
 
 test_that("ssm_sem_parameters() warns when a raw-data se='standard' fit meets the mvn engine", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   set.seed(6)
   dat <- as.data.frame(matrix(rnorm(400 * 9), 400, 9) %*% chol(pop$sigma))
   colnames(dat) <- colnames(pop$sigma)
@@ -731,11 +714,8 @@ test_that("ssm_sem_parameters() refuses a structurally incompatible lavaan fit (
 
 test_that("summary.circumplex_ssm_sem() states the actual inferential method (sec. 7.3)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   fit <- sem_pop_fit(pop, n = 300)
   set.seed(1)
   res <- ssm_sem_parameters(
@@ -761,11 +741,8 @@ test_that("sem_detail_labels() single-sources the summary detail-line labels", {
 
 test_that("print.circumplex_ssm_sem() prepends the measurement-model block (sec. 7.3)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   fit <- sem_pop_fit(pop, n = 300)
   set.seed(1)
   res <- ssm_sem_parameters(
@@ -780,11 +757,8 @@ test_that("print.circumplex_ssm_sem() prepends the measurement-model block (sec.
 
 test_that("ssm_ci_accuracy() refuses latent (SEM) objects with a pointer to the harness (sec. 7.3)", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   fit <- sem_pop_fit(pop, n = 300)
   set.seed(1)
   res <- ssm_sem_parameters(
@@ -809,11 +783,8 @@ test_that("inherited consumers render latent results sensibly: ssm_table() and p
   #   ssm_suff_stats()        -> internal; unreachable for the subclass
   #                              (only caller is behind the guard)
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
   fit <- sem_pop_fit(pop, n = 300)
   set.seed(1)
   res <- ssm_sem_parameters(
@@ -844,11 +815,8 @@ test_that("sem_fmt_p() never renders a p-value as exactly zero", {
 
 test_that("engine preconditions on user-supplied fits fail with actionable errors", {
   skip_if_not_installed("lavaan")
-  a <- rep(0.55, 8)
-  cc <- rep(0.6, 8)
-  theta <- seq(0.3, 0.6, length.out = 8)
   sigma_m <- cbind(c(0.2, 0.3, 0.2))
-  pop <- sem_pop(a, cc, theta, oct, sigma_m, v_m = 1)
+  pop <- sem_canonical_pop(sigma_m, v_m = 1)
 
   # A summary-moment (sample.cov) fit cannot be resampled
   fit_cov <- sem_pop_fit(pop, n = 500)
