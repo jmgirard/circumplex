@@ -359,6 +359,18 @@ Circumplex Structure”, for a worked introduction to both.
   `(-180, 180]` convention for contrasts. Such a contrast is now
   reported as `+180`.
 
+- Count-valued arguments (e.g. `boots`, `reps`, `ncpus`, `digits`, and
+  the sample size `n`) across
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md),
+  [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md),
+  and
+  [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)
+  are now uniformly validated as a single non-negative whole number. A
+  few of these previously accepted a length-greater-than-one vector
+  without complaint; such input now raises a clear error.
+
 ## circumplex 1.2.0
 
 CRAN release: 2026-07-02
