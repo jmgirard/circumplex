@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-12 (M9 merged)_
+_Last hygiene check: 2026-07-12 (M10 merged)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -12,7 +12,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M7 | v2.0.0 CRAN release preparation | blocked | — | high | milestones/M7-v2-release-prep.md |
 | M8 | SEM-layer DRY single-sourcing | done | — | normal | milestones/archive/M8-sem-dry-single-sourcing.md |
 | M9 | sem_estimate() vectorization + oracle single-sourcing | done | — | normal | milestones/archive/M9-sem-estimate-vectorize.md |
-| M10 | Package-wide scalar-count validator | review | — | low | milestones/M10-scalar-count-validator.md |
+| M10 | Package-wide scalar-count validator | done | — | low | milestones/archive/M10-scalar-count-validator.md |
 
 ## Candidates
 
