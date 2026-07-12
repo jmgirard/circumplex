@@ -70,7 +70,7 @@ master before the v2.0.0 freeze.
       score paths, parametrized by `score_type`/`grouping`/`contrast`; replace
       the four inline blocks at `R/ssm_analysis.R:333`, `:370`, `:458`, `:504`.
       Verify T1 + existing snapshot/print tests green.
-- [ ] **T3** — Add the statistical-core component/flag to `codecov.yml`; confirm
+- [x] **T3** — Add the statistical-core component/flag to `codecov.yml`; confirm
       each path glob resolves to a real `R/` file and the config validates.
 - [ ] **T4** — Full `devtools::check()` (clean-env, not `load_all()`); confirm
       0/0/0.
@@ -78,6 +78,10 @@ master before the v2.0.0 freeze.
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T3 — added a `statistical_core` codecov component (7 R estimation
+  sources + `src/circular.cpp` + `src/parameters.cpp`; excludes OOP/plot/tidy/
+  generated layers). YAML parses; all 9 paths resolve on disk. The "workflow
+  still succeeds" half of AC2 confirms on CI after push (test-coverage.yaml).
 - 2026-07-12: T1+T2 — extracted `build_result_labels()` in `R/ssm_analysis.R`,
   replaced all four inline Label/Group/Measure blocks; added a direct helper
   unit test covering all branches (incl. corr no-contrast+grouping and corr
