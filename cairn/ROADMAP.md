@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-12 (candidate audit; pre-release oracle re-reads → M7 AC3/T3; contrast-cert consistency → M15)_
+_Last hygiene check: 2026-07-12 (M15 done → archived; terminal-row retention pruned M9)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — | high | milestones/M7-v2-release-prep.md |
-| M15 | Contrast certification-conditional reporting consistency (ci_accuracy ↔ print) | review | — | normal | milestones/M15-contrast-cert-consistency.md |
+| M15 | Contrast certification-conditional reporting consistency (ci_accuracy ↔ print) | done | — | normal | milestones/archive/M15-contrast-cert-consistency.md |
 | M14 | Automate the instruments() list | done | — | normal | milestones/archive/M14-instruments-list-automation.md |
 | M13 | Angle-class S3 follow-ups (RR01) | done | — | normal | milestones/archive/M13-angle-class-s3-followups.md |
 | M12 | Result-label DRY + statistical-core coverage tracking | done | — | normal | milestones/archive/M12-label-dry-coverage.md |
 | M11 | Boundary-coverage hardening + test-suite tidiness | done | — | normal | milestones/archive/M11-boundary-coverage-hardening.md |
-| M9 | sem_estimate() vectorization + oracle single-sourcing | done | — | normal | milestones/archive/M9-sem-estimate-vectorize.md |
 
 ## Candidates
 
