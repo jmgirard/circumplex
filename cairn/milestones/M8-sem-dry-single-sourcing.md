@@ -83,49 +83,29 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
 
 ## Work log
 
-- 2026-07-12: created by /milestone-plan from the legacy M5 close-review
-  follow-ups (items c/d/e/g), grounded on file:line locations verified this
-  session. Planned free-standing (no `Depends on: M7`) per user's sequencing
-  choice — note the M5 close-review deferred these "post-v2.0.0, not pre-freeze
-  because they churn validated code"; behaviour-preserving, so freeze risk is
-  low, but implement should still confirm timing against the v2.0.0 freeze
-  (~2026-07-26).
+_All 2026-07-12; per-task detail preserved in the branch commits._
 
-- 2026-07-12: T1 done — `sem_check_contrast_arity()` single-sources the three
-  duplicated arity blocks; added a characterization test locking every branch's
-  message. Minor AC1 wording fix: the existing conditions are base
-  `stop(call.=FALSE)`, not `cli_abort()` — preserved verbatim to keep messages
-  byte-identical (converting would change the output). AC1's intent (each arity
-  branch fires an unchanged message) is unchanged.
-
-- 2026-07-12: T2 done — `sem_fit_cfa()` chokepoint owns the fiml/listwise
-  `missing` translation and the multi-group `group.label` ordering; both former
-  `lavaan::cfa()` sites route through it. Existing single- and multi-group fit
-  tests pass unchanged (identical fits).
-
-- 2026-07-12: T3 done — `sem_detail_labels()` seam maps the stored detail codes
-  (method, missing) to display labels; `summary()` delegates to it. Added a
-  direct unit test locking both branches (the existing integration test only
-  hit mvn/fiml). Output unchanged.
-
-- 2026-07-12: T4 done (narrowed) — `sem_strict_metric_vacuous()` single-sources
-  the vacuous-metric rule at the three ladder sites; strict snapshots unchanged.
-  AC4 amendment (user-gated 2026-07-12): the single-group and multi-group
-  strict *emitters* in `ssm_sem_syntax.R` are structurally distinct (plain
-  labels vs `c()`-vector cross-group labels) and byte-pinned; unifying them is a
-  high-risk rewrite of statistical output for minor gain, so it was descoped to
-  a candidate row (`ROADMAP.md`). Roxygen "metric rung is vacuous" prose left as
-  is (can't single-source across separate doc blocks without templating).
-
-- 2026-07-12: T5 done — dead `npar` field removed (never read); `score_type`
-  single-sourced into `sem_details()` via a new `path` param, deleting the two
-  identical overwrites (`ssm_sem.R` former 1297/1518) and the dead default.
-  Suite green. Test-fixture consolidation deferred to a ROADMAP candidate
-  (AC5 covers only npar + score_type; consolidation is ~17-block test churn
-  with no behavioural payoff).
-
-- 2026-07-12: T6 done — `check()` clean (0 errors, 0 warnings, 0 notes). All
-  tasks complete; status → review.
+- Created by /milestone-plan from the legacy M5 close-review follow-ups
+  (items c/d/e/g). Planned free-standing (no `Depends on: M7`) per user's
+  sequencing choice — the M5 review deferred these "post-v2.0.0, not pre-freeze";
+  behaviour-preserving so freeze risk is low, but confirm timing vs the v2.0.0
+  freeze (~2026-07-26).
+- T1 — `sem_check_contrast_arity()` single-sources the three arity blocks +
+  characterization test. AC1 says "cli_abort()" but the conditions are base
+  `stop(call.=FALSE)`, preserved verbatim; AC1's intent (unchanged message per
+  branch) holds.
+- T2 — `sem_fit_cfa()` chokepoint (fiml/listwise + multi-group `group.label`);
+  both `cfa()` sites route through it; fits identical.
+- T3 — `sem_detail_labels()` seam for `summary()` method/missing labels + direct
+  unit test on both branches; output unchanged.
+- T4 (narrowed, user-gated) — `sem_strict_metric_vacuous()` single-sources the
+  vacuous-metric rule at three ladder sites; strict snapshots unchanged.
+  Cross-branch strict *emission* unification descoped (structurally distinct,
+  byte-pinned emitters) → ROADMAP candidate.
+- T5 — dead `npar` field removed; `score_type` single-sourced into
+  `sem_details()` (new `path` param), deleting two identical overwrites + dead
+  default. Test-fixture consolidation deferred → ROADMAP candidate (not in AC5).
+- T6 — `document()` no drift; `check()` clean; status → review.
 
 ## Decisions
 
