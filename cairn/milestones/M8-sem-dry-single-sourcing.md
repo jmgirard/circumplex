@@ -73,8 +73,11 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
 - [x] **T4** — Single-source the strict-tier vacuous-metric rule via
       `sem_strict_metric_vacuous()` (ladder sites `ssm_sem.R:754,829,882`);
       `exp_strict_*` snapshots byte-identical. (Emission unification descoped.)
-- [ ] **T5** — Micro-cleanups: remove unused `npar` field, drop
-      `sem_details()`'s overwritten `score_type`, consolidate test fixtures.
+- [x] **T5** — Micro-cleanups: removed unused `npar` field (`ssm_sem.R:198`);
+      moved `score_type` into `sem_details()` (added `path` param), removing the
+      two duplicated overwrites and the dead "Latent" default. Test-fixture
+      consolidation deferred to a candidate (not in AC5; ~17-block churn, pure
+      test tidiness).
 - [ ] **T6** — `devtools::document()` (if roxygen touched) + full
       `devtools::check()`.
 
@@ -113,6 +116,13 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
   high-risk rewrite of statistical output for minor gain, so it was descoped to
   a candidate row (`ROADMAP.md`). Roxygen "metric rung is vacuous" prose left as
   is (can't single-source across separate doc blocks without templating).
+
+- 2026-07-12: T5 done — dead `npar` field removed (never read); `score_type`
+  single-sourced into `sem_details()` via a new `path` param, deleting the two
+  identical overwrites (`ssm_sem.R` former 1297/1518) and the dead default.
+  Suite green. Test-fixture consolidation deferred to a ROADMAP candidate
+  (AC5 covers only npar + score_type; consolidation is ~17-block test churn
+  with no behavioural payoff).
 
 ## Decisions
 

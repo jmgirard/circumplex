@@ -195,7 +195,6 @@ sem_structure <- function(fit, scales, measures, group = 1L, means = FALSE) {
     phi = shape(phi_row, 3),
     sm = shape(sm_row, 3),
     vm = shape(vm_row, 1),
-    npar = max(pt$free),
     tier = tier
   )
   if (means) {
@@ -625,7 +624,7 @@ sem_estimate <- function(fit, scales, angles_deg, measures, ci_method, boots,
 # Shared details constructor for the two entry points, so the fields the
 # subclass print/summary methods read can never drift between them.
 sem_details <- function(boots, interval, missing, angles_deg, contrast,
-                        ci_method) {
+                        ci_method, path) {
   list(
     boots = boots,
     interval = interval,
@@ -633,7 +632,7 @@ sem_details <- function(boots, interval, missing, angles_deg, contrast,
     missing = missing,
     angles = as_degree(angles_deg),
     contrast = contrast,
-    score_type = "Latent",
+    score_type = if (path == "means") "Latent mean" else "Latent",
     method = ci_method
   )
 }
@@ -1292,9 +1291,9 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
   parts <- sem_assemble(est, scales_names, measures_names, eff_contrast)
 
   details <- sem_details(
-    boots, interval, missing, as.numeric(angles), eff_contrast, ci_method
+    boots, interval, missing, as.numeric(angles), eff_contrast, ci_method,
+    path
   )
-  details$score_type <- if (path == "means") "Latent mean" else "Latent"
 
   new_ssm_sem(
     results = parts$results,
@@ -1513,9 +1512,8 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
     identical(lav_missing, "ml.x")) "fiml" else "listwise"
 
   details <- sem_details(
-    boots, interval, missing, as.numeric(angles), contrast, ci_method
+    boots, interval, missing, as.numeric(angles), contrast, ci_method, path
   )
-  details$score_type <- if (path == "means") "Latent mean" else "Latent"
 
   new_ssm_sem(
     results = parts$results,
