@@ -37,3 +37,31 @@ test_that("scales() rejects a non-flag items argument (is_flag guard)", {
 test_that("The instruments function produces the expected output", {
   expect_snapshot_output(instruments())
 })
+
+test_that("instruments() output is derived from the instrument datasets, not hardcoded", {
+  # Independently enumerate the packaged circumplex_instrument datasets.
+  nms <- utils::data(package = "circumplex")$results[, "Item"]
+  insts <- Filter(function(nm) {
+    e <- new.env()
+    utils::data(list = nm, package = "circumplex", envir = e)
+    inherits(get(nm, envir = e), "circumplex_instrument")
+  }, nms)
+
+  out <- paste(capture.output(instruments()), collapse = "\n")
+
+  # The count line reflects the actual number of instrument datasets, so
+  # adding or removing an instrument changes the output with no code edit.
+  expect_match(out, sprintf("includes %d instruments", length(insts)))
+
+  # Every instrument's abbreviation and full name (from its own $Details)
+  # appears in the listing -- the list is data-derived, not a literal.
+  for (nm in insts) {
+    e <- new.env()
+    utils::data(list = nm, package = "circumplex", envir = e)
+    d <- get(nm, envir = e)$Details
+    expect_true(grepl(d$Abbrev, out, fixed = TRUE),
+      info = paste("missing Abbrev for", nm))
+    expect_true(grepl(d$Name, out, fixed = TRUE),
+      info = paste("missing Name for", nm))
+  }
+})

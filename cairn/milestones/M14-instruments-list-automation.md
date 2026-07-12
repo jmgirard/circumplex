@@ -7,7 +7,7 @@
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m14-instruments-list-automation
 
 ## Goal
 
@@ -55,7 +55,7 @@ Derive `instruments()`' printed list and count from the package's
 
 ## Tasks
 
-- [ ] **T1** — Test-first: add a testthat test that enumerates the
+- [x] **T1** — Test-first: add a testthat test that enumerates the
       `circumplex_instrument` datasets (via `utils::data(package = "circumplex")`,
       filtered by class) and asserts `instruments()` output contains the
       derived count line and each instrument's Abbrev/Name. Written against the
@@ -77,6 +77,9 @@ Derive `instruments()`' printed list and count from the package's
   opportunistic fold-ins at the user's direction (question gate). Derivation
   feasibility confirmed: all 15 entries reproduce from `$Details$Abbrev/$Name`;
   the only text delta is the IIP-SC comma (the drift this fixes).
+- 2026-07-12: branch cut. T1 — data-derived drift-guard test added
+  (`test-instrument_oop.R`); confirmed red against the hardcoded body
+  ("missing Name for iipsc", the comma delta).
 
 ## Decisions
 
