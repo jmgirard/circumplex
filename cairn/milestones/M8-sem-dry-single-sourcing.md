@@ -139,15 +139,10 @@ T1–6, all present); `document()` no diff; README in sync (untouched); pkgdown
 `check_pkgdown()` clean; no new exports; no NEWS entry (no user-visible change);
 no new top-level files; no DESIGN principle changed (impact report skipped).
 
-Independent fresh-context review (two distinct-evidence lenses):
-- [O] diff-bug reviewer (Opus): **0 findings** — every extraction reproduces
-  exact branch logic, `cfa()` args, and message strings.
-- [S] blame-history reviewer (Sonnet): **0 findings** — `group.label`
-  protection (added in `6375452` for the second-minus-first contract,
-  CLAUDE.md/DESIGN.md) preserved exactly; no prior intent undone; no D-entry
-  contradicted.
-- Nothing survived to the scorer (no findings). Both lenses independently noted
-  one non-issue — `do.call` vs direct `cfa()` for a pathological user-supplied
-  `group.label`/`model`/`data` in `...` — classified as a non-regression (both
-  raise the same duplicate-argument error; the blame lens noted it *strengthens*
-  the ordering protection). Logged, not actioned.
+Independent fresh-context review (two distinct-evidence lenses): [O] diff-bug
+(Opus) **0 findings** — every extraction reproduces exact branch logic, `cfa()`
+args, message strings; [S] blame-history (Sonnet) **0 findings** — `group.label`
+second-minus-first protection (added `6375452`) preserved, no prior intent
+undone, no D-entry contradicted. Nothing reached the scorer. Both noted one
+non-issue (`do.call` vs direct `cfa()` for pathological `...` args) as a
+non-regression — the blame lens found it *strengthens* the ordering protection.
