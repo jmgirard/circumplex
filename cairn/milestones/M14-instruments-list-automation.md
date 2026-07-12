@@ -62,7 +62,7 @@ Derive `instruments()`' printed list and count from the package's
       intended data-derived output (note the IIP-SC string resolves to the
       data's `$Details$Name`, without the current comma). Fails against the
       present hardcoded body where the two diverge.
-- [ ] **T2** — Rewrite `instruments()` (`R/instrument_oop.R:195`) to enumerate,
+- [x] **T2** — Rewrite `instruments()` (`R/instrument_oop.R:195`) to enumerate,
       sort by dataset name, format `"N. ABBREV: Name (obj)\n"`, and compute the
       count from the data; delete the hardcoded block and the `TODO`. Keep it a
       `cat()` printer returning invisibly as today.
@@ -80,7 +80,19 @@ Derive `instruments()`' printed list and count from the package's
 - 2026-07-12: branch cut. T1 — data-derived drift-guard test added
   (`test-instrument_oop.R`); confirmed red against the hardcoded body
   ("missing Name for iipsc", the comma delta).
+- 2026-07-12: T2 — `instruments()` now enumerates via `utils::data()`,
+  filters by class, formats from `$Details$Abbrev/$Name`, count from data;
+  TODO removed. Output byte-identical to the old format except the IIP-SC
+  line (see M14-D1). Snapshot regenerated; structural test green.
 
 ## Decisions
+
+- **M14-D1** (2026-07-12): the data is the source of truth for the printed
+  strings. This changes one line vs. the old hardcoded list — IIP-SC's name
+  resolves to its `$Details$Name` "Inventory of Interpersonal Problems Short
+  Circumplex" (no comma), where the hardcoded literal had "Problems, Short".
+  This is a cosmetic console-text change to an informational printer (no
+  return-value/API contract), and is exactly the drift the automation
+  prevents; not treated as a breaking change. Snapshot updated to match.
 
 ## Review
