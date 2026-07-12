@@ -309,6 +309,11 @@ test_that("a disattenuated point correlation at/above 1 is refused with the scal
   # platform-dependent (the CI runners landed just under, so the draw-engine
   # escalation fired instead of the point guard) -- the M5 CI portability fix.
   th <- oct * pi / 180
+  # This block reconstructs the measure loading from the canonical latent
+  # values explicitly, so it needs a[1]/cc[1] even though sem_canonical_pop()
+  # supplies the same a/cc internally (kept consistent: 0.55 / 0.6).
+  a <- rep(0.55, 8)
+  cc <- rep(0.6, 8)
   lambda1 <- c(a[1], cc[1] * cos(th[1]), cc[1] * sin(th[1]))
   pop <- sem_canonical_pop(cbind(lambda1), v_m = sum(lambda1^2))
   sig <- pop$sigma

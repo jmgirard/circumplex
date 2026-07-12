@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M11: Boundary-coverage hardening + test-suite tidiness
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Branch/PR:** m11-boundary-coverage-hardening   <!-- owner: implement (branch) / review (PR URL) · create -->
@@ -94,8 +94,11 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
       error-path test to `test-instrument_oop.R`.
 - [x] **T5** — `git mv test-RcppExport.R.R → test-RcppExports.R`; testthat
       discovers and runs it.
-- [ ] **T6** — `devtools::document()` (if any roxygen touched),
-      `devtools::test()`, then `devtools::check()`.
+- [x] **T6** — Full `devtools::test()` (387 tests, 0 failed) and
+      `devtools::check()` **clean (0 errors / 0 warnings / 0 notes)**. No
+      roxygen touched, so no `document()`. The 3 residual testthat warnings are
+      pre-existing CPM ill-conditioned-Hessian advisories in the untouched
+      `test-ci_accuracy.R` (not R CMD check warnings).
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
@@ -112,9 +115,20 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
   new test line numbers). Audit finding: mean-path boundary coverage already
   complete; the two real gaps were the correlation entry point's flat and pole
   corners. Two deterministic tests added, suite green (0 failed, 0 warnings).
+- 2026-07-12: all tasks done. `check()` clean (0/0/0). Fixed a T3 regression at
+  `test-ssm_sem.R:312` (block reconstructs `lambda1` from `a[1]`/`cc[1]`; those
+  locals had been removed by the canonical-pop consolidation). Status → review.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
+
+- 2026-07-12 (implement): T3 near-miss worth a LESSON at review — the
+  `sem_canonical_pop()` consolidation removed a block's `a`/`cc` locals that it
+  still referenced (`test-ssm_sem.R:312`, `lambda1 <- c(a[1], ...)`).
+  `devtools::load_all()` + `test()`/`test_file()` **masked** the resulting
+  `object 'a' not found` (an env leak put `a` in scope); only the clean-env
+  `devtools::check()` caught it. Lesson: validate mechanical test-fixture
+  rewrites with `check()`, not just `test()`.
 
 ## Review
 <!-- owner: review · exclusive -->
