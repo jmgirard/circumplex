@@ -7,7 +7,7 @@
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** m14-instruments-list-automation
+- **Branch/PR:** m14-instruments-list-automation / #38
 
 ## Goal
 
@@ -87,6 +87,10 @@ Derive `instruments()`' printed list and count from the package's
 - 2026-07-12: T3 — full `devtools::test()` green (0 failures / 1869 pass);
   `devtools::check()` clean (0 errors / 0 warnings / 0 notes, 3m34s). No
   roxygen change → no `document()` needed. Status → review.
+- 2026-07-12: review in progress — draft PR #38 opened. Consistency gate
+  green: `cairn_validate` all-pass (coverage complete), `document()` no diff,
+  `pkgdown::check_pkgdown()` clean, NEWS.md entry added, no principle change.
+  Fresh `check()` + 3-lens independent review running (checkpoint).
 
 ## Decisions
 
