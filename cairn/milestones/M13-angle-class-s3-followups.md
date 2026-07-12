@@ -83,7 +83,7 @@ decision for the `as_degree`/`as_radian` generics.
       (`R/ssm_bootstrap.R:173,186`); add a direct all-NA return-type test and a
       flat-profile regression test exercising the displacement CI path (test
       first: assert `NA_real_` before the fix).
-- [ ] **T3** — Add a CPM angle-CI oracle test (in `test-cpm_oracles.R` or a
+- [x] **T3** — Add a CPM angle-CI oracle test (in `test-cpm_oracles.R` or a
       dedicated file) for a 0/360-straddling displacement: invariant agreement
       between `cpm_fit()`'s reported `angle_lci/uci` and a direct
       `quantile.circumplex_radian` recompute, plus a dumb explicit
@@ -104,6 +104,7 @@ decision for the `as_degree`/`as_radian` generics.
 - 2026-07-12: T4 done — M13-D1 keep-internal recorded + generic comments; NAMESPACE unchanged.
 - 2026-07-12: T5 done — `document()` no diff; 392 tests 0F/0E/0S; `check()` 0/0/0 → status review.
 - 2026-07-12: REVIEW r1 (PR #37) SENT BACK → in-progress. AC1/2/4/5 verified; AC3 fails on F1 (diff-bug, score 93): T3 tests don't guard `cpm_fit.R:1119` — test 2's fixture has no straddle, so a linearized quantile passes both assertions. T3 reopened. Blame-history: no findings.
+- 2026-07-12: T3 REDONE (F1 fix) — test 2 now drives a deterministic pole-straddle (item at 360°, `cpm_implied_cor`+`chol`+`rnorm`, seed 42, N=80, boots=300) through the real `cpm_fit()` path and asserts the pole item's CI WRAPS (lci>uci) + short-arc + inside. Teeth verified out-of-band: linearizing line 1119 flips all three assertions to FAIL (CI→[0.8,358.4], width 357.6). No MASS dep (base-R sampler). Full suite 392 0F/0E/0S. → back to review.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->

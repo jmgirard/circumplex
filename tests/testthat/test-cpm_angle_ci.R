@@ -46,25 +46,41 @@ test_that("CPM angle-CI transform matches a dumb circular-quantile oracle at the
   expect_lt((align(got[2]) - align(got[1])) %% 360, 30)
 })
 
-test_that("cpm_fit() bootstrap angle CIs are circular-consistent across scales (M13)", {
+test_that("cpm_fit() bootstrap angle CI wraps a pole-straddling item, not linearizes it (M13)", {
   skip_on_cran()
-  # End-to-end guard on the real cpm_fit.R:1119 call site: every reported angle
-  # CI must be a short arc that contains its point estimate ON THE CIRCLE. A
-  # linear quantile at a near-pole straddle would push the estimate outside its
-  # interval and inflate the width -- both caught here.
-  data("jz2017")
+  # End-to-end guard with teeth on the real cpm_fit.R:1119 call site. We drive a
+  # population whose last item sits at the 0/360 pole (Angle_theory = 360, a
+  # non-reference item so it is estimated, not fixed) and sample enough noise
+  # that its bootstrap angle replicates straddle the pole. The CIRCULAR quantile
+  # then reports that item's CI as a WRAPPED short arc (Angle_lci > Angle_uci,
+  # crossing 0/360); a LINEAR quantile at the call site would instead report a
+  # ~357deg non-wrapped span [~1, ~358] with the estimate outside it. Verified
+  # out-of-band (assignInNamespace linearization) that all three pole-row
+  # assertions below flip to FAIL when line 1119 is linearized.
+  deg <- c(45, 90, 135, 180, 225, 270, 315, 360)   # item 8 on the pole
+  th  <- as.numeric(as_radian(as_degree(deg)))
+  P   <- cpm_implied_cor(th, rep(0.7, 8), c(0.6, 0.25, 0.15))
+  Lc  <- chol(P)                                    # base-R sampler, cov = P
   set.seed(42)
-  fit <- suppressWarnings(cpm_fit(jz2017, scales = 2:9, angles = octants(),
+  X <- as.data.frame(matrix(stats::rnorm(80 * 8), 80, 8) %*% Lc)
+  colnames(X) <- paste0("V", seq_len(8))
+
+  fit <- suppressWarnings(cpm_fit(X, scales = seq_len(8), angles = as_degree(deg),
                                   ci_method = "bootstrap", boots = 300,
                                   reference = 1))
   res <- fit$results
-  est <- res$Angle
-  lci <- res$Angle_lci
-  uci <- res$Angle_uci
-  ok  <- is.finite(est) & is.finite(lci) & is.finite(uci)
+  pole <- which(res$Angle_theory == 360)            # the straddling item
+  lci <- res$Angle_lci[pole]
+  uci <- res$Angle_uci[pole]
+  est <- res$Angle[pole]
 
-  width  <- (uci - lci) %% 360
-  inside <- ((est - lci) %% 360) <= width + 1e-8
-  expect_true(all(inside[ok]))       # estimate within its CI on the circle
-  expect_true(all(width[ok] < 180))  # each CI is a short arc, not a wrapped span
+  # The circular signature of a genuine 0/360 straddle:
+  expect_gt(lci, uci)                               # WRAPPED (lci > uci)
+  expect_lt((uci - lci) %% 360, 180)                # short arc, not a ~357deg span
+  expect_lte((est - lci) %% 360, (uci - lci) %% 360 + 1e-8)  # estimate inside, on the circle
+
+  # And no scale's estimate falls outside its own CI on the circle.
+  e <- res$Angle; l <- res$Angle_lci; u <- res$Angle_uci
+  ok <- is.finite(e) & is.finite(l) & is.finite(u)
+  expect_true(all(((e - l) %% 360)[ok] <= ((u - l) %% 360)[ok] + 1e-8))
 })
