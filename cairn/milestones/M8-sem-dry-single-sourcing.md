@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M8: SEM-layer DRY single-sourcing
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Branch/PR:** m8-sem-dry-single-sourcing
@@ -78,8 +78,8 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
       two duplicated overwrites and the dead "Latent" default. Test-fixture
       consolidation deferred to a candidate (not in AC5; ~17-block churn, pure
       test tidiness).
-- [ ] **T6** — `devtools::document()` (if roxygen touched) + full
-      `devtools::check()`.
+- [x] **T6** — `devtools::document()` (no man/NAMESPACE drift) + full
+      `devtools::check()`: 0 errors / 0 warnings / 0 notes (3m33s).
 
 ## Work log
 
@@ -123,6 +123,9 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
   Suite green. Test-fixture consolidation deferred to a ROADMAP candidate
   (AC5 covers only npar + score_type; consolidation is ~17-block test churn
   with no behavioural payoff).
+
+- 2026-07-12: T6 done — `check()` clean (0/0/0). All tasks complete; status →
+  review.
 
 ## Decisions
 
