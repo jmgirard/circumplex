@@ -77,6 +77,14 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
   numbers had drifted post-M8/M9; actual sites resolved by grep.
   (Earlier commit messages said "15 sites"; the true count is 18 — the amended
   cpm_fit sites were undercounted. No code impact.) Status → review.
+- 2026-07-12: review scope-completion amendment. Both independent reviewers
+  flagged that the Goal names the `ssm_analyze()` family but the enumerated
+  Scope/Tasks omitted `ssm_analyze()`'s own count validators
+  (`R/ssm_analysis.R:212` boots, `:217` ncpus — the identical old inline
+  pattern), so the NEWS entry naming `ssm_analyze()` overclaimed. Converted both
+  to `is_scalar_count()` + added length>1 regression tests (test-ssm_analysis.R).
+  Total now 20 call sites; NEWS is accurate. This completes the plan-owned Goal
+  rather than expanding beyond it (Scope Out never excluded `ssm_analyze()`).
 
 ## Decisions
 

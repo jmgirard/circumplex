@@ -209,12 +209,12 @@ ssm_analyze <- function(data, scales, angles = octants(),
   stopifnot(is_null_or_var(measures))
   stopifnot(is_null_or_var(grouping, n = 1))
   stopifnot(is_flag(contrast))
-  stopifnot(is.numeric(boots) && boots > 0 && ceiling(boots) == floor(boots))
+  stopifnot(is_scalar_count(boots))
   stopifnot(is.numeric(interval) && interval > 0 && interval < 1)
   stopifnot(is_flag(listwise))
   stopifnot(is_null_or_char(measures_labels, n = length(measures)))
   parallel <- match.arg(parallel, c("no", "multicore", "snow"))
-  stopifnot(is.numeric(ncpus) && ncpus >= 1 && ceiling(ncpus) == floor(ncpus))
+  stopifnot(is_scalar_count(ncpus))
   method <- match.arg(method, c("bootstrap", "montecarlo"))
 
   # Coerce matrix input to a data frame so column indexing behaves uniformly
