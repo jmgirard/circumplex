@@ -5,7 +5,7 @@
 - **Status:** review
 - **Priority:** normal
 - **Depends on:** —
-- **Branch/PR:** m8-sem-dry-single-sourcing
+- **Branch/PR:** m8-sem-dry-single-sourcing / https://github.com/jmgirard/circumplex/pull/32
 
 ## Goal
 
@@ -34,24 +34,24 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
 
 ## Acceptance criteria
 
-- [ ] Contrast-arity validation lives in one internal validator called by all
+- [x] Contrast-arity validation lives in one internal validator called by all
       three former sites; each `cli_abort()` arity branch still fires with an
       unchanged message (a test exercises every arity-failure branch:
       wrong #groups, wrong #measures, single- and user-fit paths).
-- [ ] The two `lavaan::cfa()` fit sites route through one internal fit helper
+- [x] The two `lavaan::cfa()` fit sites route through one internal fit helper
       (estimator/se/missing translation + `group.label`); existing SEM fits are
       byte-identical (current `ssm_sem()` tests + snapshots pass unchanged).
-- [ ] `summary.circumplex_ssm_sem()` output is snapshot-identical, with detail
+- [x] `summary.circumplex_ssm_sem()` output is snapshot-identical, with detail
       lines produced by the shared label seam.
-- [ ] The strict-tier vacuous-metric rule (`model=="strict" && rung=="metric"`)
+- [x] The strict-tier vacuous-metric rule (`model=="strict" && rung=="metric"`)
       is single-sourced across the three ladder sites via one predicate; the
       pinned strings `exp_strict_nomeas` / `exp_strict_meas`
       (`tests/testthat/test-ssm_sem_syntax.R:242,244`) remain byte-identical.
       (Amended 2026-07-12 via gate: cross-branch *emission* unification
       descoped as not-worth-the-snapshot-risk → candidate row; see work log.)
-- [ ] Micro-cleanups landed (`npar` field removed, `score_type` overwrite
+- [x] Micro-cleanups landed (`npar` field removed, `score_type` overwrite
       removed) with no behaviour change; suite green.
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
 
 ## Coverage
 
@@ -124,9 +124,50 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
   (AC5 covers only npar + score_type; consolidation is ~17-block test churn
   with no behavioural payoff).
 
-- 2026-07-12: T6 done — `check()` clean (0/0/0). All tasks complete; status →
-  review.
+- 2026-07-12: T6 done — `check()` clean (0 errors, 0 warnings, 0 notes). All
+  tasks complete; status → review.
 
 ## Decisions
 
 ## Review
+
+**Reviewed 2026-07-12. PR #32. Consistency gate + full suite + two-lens review.**
+
+Fresh evidence per criterion (full suite: 381 test groups, 0 failed, 2 warnings
+[pre-existing CPM-Hessian in `test-ci_accuracy.R`, unrelated], 51 skipped `On CRAN`):
+
+- AC1 — `test-ssm_sem.R` "contrast arity is validated at every branch" +
+  "validates its arguments" pass; validator reproduces all three sites' messages
+  verbatim (both reviewers confirmed byte-identical). Note: the criterion says
+  "cli_abort()" but the existing conditions are base `stop(call.=FALSE)`,
+  preserved as-is (documented at T1); substantive requirement (every branch
+  fires an unchanged message) is met and tested.
+- AC2 — single- and multi-group SEM fit tests (`test-ssm_sem.R`,
+  `test-ssm_sem_groups.R`) green; reviewers confirmed both `cfa()` arg sets
+  identical (single-group: no group/group.label; multi-group: both, incl.
+  `group.label = levels(...)`), `...` and `missing` translation preserved.
+- AC3 — summary integration test (`test-ssm_sem.R:719`) + new
+  `sem_detail_labels()` unit test pass; label strings byte-identical.
+- AC4 — `test-ssm_sem_syntax.R` green incl. pinned `exp_strict_*` snapshots;
+  strict-ladder groups tests green. (Emission unification descoped per gate.)
+- AC5 — full suite green; reviewers confirmed `npar` genuinely dead (no readers)
+  and `score_type` value identical at both call sites (`path` in scope).
+- AC6 — `devtools::check()` fresh re-run: 0 errors, 0 warnings, 0 notes (3m40s).
+
+Consistency gate: `cairn_validate.py` PASS; Coverage map complete (AC1–6 →
+T1–6, all present); `document()` no diff; README in sync (untouched); pkgdown
+`check_pkgdown()` clean; no new exports; no NEWS entry (no user-visible change);
+no new top-level files; no DESIGN principle changed (impact report skipped).
+
+Independent fresh-context review (two distinct-evidence lenses):
+- [O] diff-bug reviewer (Opus): **0 findings** — every extraction reproduces
+  exact branch logic, `cfa()` args, and message strings.
+- [S] blame-history reviewer (Sonnet): **0 findings** — `group.label`
+  protection (added in `6375452` for the second-minus-first contract,
+  CLAUDE.md/DESIGN.md) preserved exactly; no prior intent undone; no D-entry
+  contradicted.
+- Nothing survived to the scorer (no findings). Both lenses independently noted
+  one non-issue — `do.call` vs direct `cfa()` for a pathological user-supplied
+  `group.label`/`model`/`data` in `...` — classified as a non-regression (both
+  raise the same duplicate-argument error; the blame lens noted it *strengthens*
+  the ordering protection). Logged, not actioned.
