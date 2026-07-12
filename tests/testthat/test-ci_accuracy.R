@@ -467,6 +467,9 @@ test_that("input validation rejects bad arguments", {
   expect_error(ssm_ci_accuracy(obj, amplitude_factors = c(1, 2)))
   expect_error(ssm_ci_accuracy(obj, digits = -1))
   expect_error(ssm_ci_accuracy(obj, parallel = "bogus"))
+  # scalar-count args reject length > 1 (is_scalar_count, M10 D-005)
+  expect_error(ssm_ci_accuracy(obj, reps = c(5, 10)))
+  expect_error(ssm_ci_accuracy(obj, digits = c(1, 2)))
 })
 
 # ==== Z2: amplitude-near-zero module + verdict (spec sec. 4-5, sec. 10) =======

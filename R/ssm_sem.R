@@ -1168,14 +1168,14 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
   missing <- match.arg(missing)
   stopifnot(is_char(se, n = 1))
   parallel <- match.arg(parallel, c("no", "multicore", "snow"))
-  stopifnot(is.numeric(ncpus) && ncpus >= 1 && ceiling(ncpus) == floor(ncpus))
+  stopifnot(is_scalar_count(ncpus))
   stopifnot(is.data.frame(data) || is.matrix(data))
   stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
   stopifnot(length(scales) == length(angles))
   stopifnot(is_null_or_var(measures))
   stopifnot(is_flag(contrast))
-  stopifnot(is.numeric(boots) && boots > 0 && ceiling(boots) == floor(boots))
+  stopifnot(is_scalar_count(boots))
   stopifnot(is.numeric(interval) && interval > 0 && interval < 1)
   stopifnot(is_char(estimator, n = 1))
   stopifnot(is_null_or_var(grouping, n = 1))
@@ -1439,7 +1439,7 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
   stopifnot(is.numeric(angles))
   stopifnot(length(scales) == length(angles))
   stopifnot(is_null_or_char(measures))
-  stopifnot(is.numeric(boots) && boots > 0 && ceiling(boots) == floor(boots))
+  stopifnot(is_scalar_count(boots))
   stopifnot(is.numeric(interval) && interval > 0 && interval < 1)
   stopifnot(is_flag(contrast))
   ngroups <- lavaan::lavInspect(fit, "ngroups")
@@ -1464,7 +1464,7 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
   # "global model health is surfaced before any SSM output" (spec 4.5).
   sem_health_gate(fit)
   parallel <- match.arg(parallel, c("no", "multicore", "snow"))
-  stopifnot(is.numeric(ncpus) && ncpus >= 1 && ceiling(ncpus) == floor(ncpus))
+  stopifnot(is_scalar_count(ncpus))
 
   # Engine preconditions checked up front with actionable errors, rather
   # than letting lavaan abort mid-engine with an internal message: the mvn

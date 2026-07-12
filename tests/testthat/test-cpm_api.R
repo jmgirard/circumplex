@@ -341,6 +341,13 @@ test_that("invalid input is rejected with clear errors", {
   )
   # listwise = FALSE unsupported
   expect_error(cpm_fit(jz2017, scales = s, listwise = FALSE), "listwise")
+  # scalar-count args reject length > 1 (is_scalar_count hardening, M10 D-005):
+  # these sites previously used is_count() alone and let a length-2 vector pass
+  expect_error(cpm_fit(cormat = R, scales = s, angles = a, n = 100,
+                       reference = c(1, 2)))
+  expect_error(cpm_fit(cormat = R, scales = s, angles = a, n = 100,
+                       m = c(2, 3)))
+  expect_error(cpm_fit(jz2017, scales = s, boots = c(100, 200)))
 })
 
 test_that("saturated model (df = 0) warns and returns NA fit indices", {

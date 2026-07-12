@@ -623,6 +623,13 @@ test_that("parallel arguments are validated", {
   expect_error(
     ssm_analyze(aw2009, scales = 1:8, boots = 10, ncpus = 1.5)
   )
+  # scalar-count args reject length > 1 (is_scalar_count hardening, M10 D-005):
+  # ssm_analyze()'s boots/ncpus previously used an inline check with no length
+  # guard, so a length-2 vector slipped through.
+  expect_error(ssm_analyze(aw2009, scales = 1:8, boots = c(10, 20)))
+  expect_error(
+    ssm_analyze(aw2009, scales = 1:8, boots = 10, ncpus = c(1, 2))
+  )
 })
 
 test_that("ssm_score errors on an unrecognized ... argument", {
