@@ -11,7 +11,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | — | high | milestones/M7-v2-release-prep.md |
 | M8 | SEM-layer DRY single-sourcing | done | — | normal | milestones/archive/M8-sem-dry-single-sourcing.md |
-| M9 | sem_estimate() vectorization + oracle single-sourcing | in-progress | — | normal | milestones/M9-sem-estimate-vectorize.md |
+| M9 | sem_estimate() vectorization + oracle single-sourcing | review | — | normal | milestones/M9-sem-estimate-vectorize.md |
 | M10 | Package-wide scalar-count validator | planned | — | low | milestones/M10-scalar-count-validator.md |
 
 ## Candidates

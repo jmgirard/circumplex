@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M9: sem_estimate() vectorization + oracle single-sourcing
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Branch/PR:** m9-sem-estimate-vectorize
@@ -58,7 +58,7 @@ items a, b):
       document any FP-driven re-pins in the work-log with their oracle trace.
 - [x] **T3** — Refactor `make_pop_2g()` → compose `sem_pop()`; re-record the
       two-group cells in `devel/m5-coverage-oracle-results.rds`.
-- [ ] **T4** — `devtools::check()`; recommend **Fable-tier** `/milestone-review`
+- [x] **T4** — `devtools::check()`; recommend **Fable-tier** `/milestone-review`
       (estimator-touching numeric churn, per CLAUDE.md model tiers).
 
 ## Work log
@@ -94,6 +94,10 @@ items a, b):
   committed artifact (md5 a730d99, 500/100-rep full run) is left intact.
   Refactored oracle exercised end-to-end via a smoke single-cell run (executes
   clean; rds restored from backup afterward). AC3 met at tolerance 0.
+- 2026-07-12 (T4): `devtools::check(--no-manual)` clean — 0 errors / 0 warnings /
+  0 notes (3m 32s; testthat 1784 pass). All ACs met; status → review. Review
+  tier: Fable-tier advised per plan (estimator-touching numeric churn); no RB
+  tripwire (oracle exists), so no /milestone-brief escalation required.
 
 ## Decisions
 
