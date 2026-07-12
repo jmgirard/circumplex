@@ -1,0 +1,62 @@
+# M7: v2.0.0 CRAN release preparation
+
+- **Status:** blocked
+- **Priority:** high
+- **Depends on:** —
+- **Branch/PR:** —
+
+## Goal
+
+Ship the accumulated M2–M5 work (inference, visualization, Browne model + CI
+trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
+
+## Scope
+
+**In:**
+- Version bump to 2.0.0; NEWS.md development heading → 2.0.0.
+- Refresh `cran-comments.md` (test environments, clean check (0 errors / 0 warnings / 0 notes), no revdeps, the
+  Moss DOI 403 = SAGE bot-block note from urlchecker).
+- win-builder / R-devel checks; then hand `submit_cran()` to Jeff (never submit
+  autonomously).
+
+**Out:**
+- New features (M6 longitudinal → its own ~v2.1.0).
+- The billed `/code-review ultra` unless Jeff asks (legacy CLAUDE workflow).
+
+## Acceptance criteria
+
+- [ ] DESCRIPTION at 2.0.0; NEWS.md heading renamed; `cran-comments.md` accurate.
+- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
+      win-builder / R-devel green across platforms.
+- [ ] Release handed to Jeff for `submit_cran()` (not self-submitted).
+
+## Coverage
+
+- AC1 → T1
+- AC2 → T2
+- AC3 → T3
+
+## Tasks
+
+- [ ] **T1** — Version bump + NEWS heading + refresh `cran-comments.md`
+      (groundwork staged 2026-07-08; the accurate summary + urlchecker DOI note
+      already written per legacy MILESTONES.md R2).
+- [ ] **T2** — Full `check()` + win-builder / R-devel.
+- [ ] **T3** — Hand `submit_cran()` to Jeff.
+
+## Work log
+
+- 2026-07-12: created by /cairn-init migration from circumplex's legacy
+  MILESTONES.md active unit ("v2.0.0 release preparation", task R2). R1
+  (`cpm_pack` β-boundary fix, the last cross-platform CI red) is DONE — verified
+  green 2026-07-08 (PR #29, all 7 checks). No-invention: criteria/tasks
+  translated from R2's written accept text, not inferred.
+- 2026-07-12: BLOCKED — held for the CRAN cadence window. v1.2.0 was
+  CRAN-approved 2026-07-02; CRAN wants ~1 month between submissions, so the
+  version bump / NEWS rename / win-builder / submit are deliberately deferred
+  until ~2026-08-02 (freeze ~2026-07-26). Repo stays at 1.3.0.9002 until then
+  (legacy MILESTONES.md R2).
+
+## Decisions
+
+## Review

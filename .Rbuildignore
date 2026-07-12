@@ -21,8 +21,5 @@
 ^Meta$
 ^\.claude$
 ^CLAUDE\.md$
-^DESIGN\.md$
-^ROADMAP\.md$
-^MILESTONES\.md$
-^MILESTONES-ARCHIVE\.md$
+^cairn$
 ^\.DS_Store$
