@@ -20,6 +20,44 @@ sem_invariance_rungs <- function() {
   c("configural", "metric", "scalar", "strict_residuals")
 }
 
+# Under the strict tier every loading is fixed, so the "metric" rung (which
+# only constrains loadings across groups) is VACUOUS: it holds by
+# construction, is never fitted, and the configural fit already IS the metric
+# model. THE single source of that rule, shared by the ladder loop, the
+# comparability verdict, and the estimation-fit selection (spec section 6.2).
+sem_strict_metric_vacuous <- function(model, rung) {
+  model == "strict" && rung == "metric"
+}
+
+# THE single source of the contrast-arity messages shared by ssm_sem() and
+# ssm_sem_parameters(). A second-minus-first contrast is defined only for
+# exactly two things: two groups (with the latent-mean path, or a single
+# measure) or, ungrouped, two measures. `n_groups` is 1 on the single-group
+# path; `path` is "means" or "measures"; `n_measures` is length(measures)
+# (0 for the latent-mean path). Preserves the original base `stop(call. =
+# FALSE)` conditions verbatim -- callers keep their surrounding checks and
+# call this only when `contrast` is TRUE.
+sem_check_contrast_arity <- function(n_groups, path, n_measures) {
+  if (n_groups > 1) {
+    if (n_groups != 2) {
+      stop("Contrast requires exactly two groups (second level minus ",
+        "first).",
+        call. = FALSE
+      )
+    }
+    if (path == "measures" && n_measures != 1) {
+      stop("A group contrast requires exactly one measure (or none, for ",
+        "the latent mean path).",
+        call. = FALSE
+      )
+    }
+  } else if (n_measures != 2) {
+    stop("Contrast requires exactly two measures (second minus first).",
+      call. = FALSE
+    )
+  }
+}
+
 # Robust-preferring fitMeasures lookup, shared by the invariance-ladder table
 # and the print method so the two surfaces cannot report different flavors of
 # the same index for the same object.
@@ -157,7 +195,6 @@ sem_structure <- function(fit, scales, measures, group = 1L, means = FALSE) {
     phi = shape(phi_row, 3),
     sm = shape(sm_row, 3),
     vm = shape(vm_row, 1),
-    npar = max(pt$free),
     tier = tier
   )
   if (means) {
@@ -587,7 +624,7 @@ sem_estimate <- function(fit, scales, angles_deg, measures, ci_method, boots,
 # Shared details constructor for the two entry points, so the fields the
 # subclass print/summary methods read can never drift between them.
 sem_details <- function(boots, interval, missing, angles_deg, contrast,
-                        ci_method) {
+                        ci_method, path) {
   list(
     boots = boots,
     interval = interval,
@@ -595,8 +632,29 @@ sem_details <- function(boots, interval, missing, angles_deg, contrast,
     missing = missing,
     angles = as_degree(angles_deg),
     contrast = contrast,
-    score_type = "Latent",
+    score_type = if (path == "means") "Latent mean" else "Latent",
     method = ci_method
+  )
+}
+
+# THE label seam for the ssm_sem summary detail lines: maps the stored detail
+# CODES (method, missing) to their display labels, so the display vocabulary
+# lives in one place rather than inline in summary(). `replicate` is the
+# tab-aligned label for the replicate-count line; `missing` names the
+# missing-data scheme. Kept out of sem_details() (which stores codes, not
+# prose) so the seam is independently testable.
+sem_detail_labels <- function(details) {
+  list(
+    replicate = if (identical(details$method, "mvn")) {
+      "\nMVN Draws:\t\t"
+    } else {
+      "\nBootstrap Refits:\t"
+    },
+    missing = if (identical(details$missing, "fiml")) {
+      "FIML"
+    } else {
+      "Listwise deletion"
+    }
   )
 }
 
@@ -644,6 +702,29 @@ sem_assemble <- function(est, scales, measures, contrast) {
 
 # The invariance ladder (spec section 6.2, as amended at T4) -----------------------
 
+# THE single lavaan::cfa chokepoint for the SEM fit paths: owns the fiml ->
+# "ml" / listwise `missing` translation and, for multi-group fits, the explicit
+# `group.label` ordering. lavaan's default group order is order of APPEARANCE
+# in the data, not factor-level order -- pinning group.label = levels(...)
+# keeps the reference group (and the second-minus-first contrast direction)
+# tied to factor-level order, per the package's grouping contract (CLAUDE.md).
+# `syn` is a ready ssm_sem_syntax() string; `grouping` is a column name in
+# `dat` or NULL for the single-group path; `...` forwards user cfa arguments.
+sem_fit_cfa <- function(syn, dat, grouping = NULL, estimator, se, missing,
+                        ...) {
+  args <- list(
+    model = syn, data = dat,
+    estimator = estimator, se = se,
+    missing = if (missing == "fiml") "ml" else "listwise",
+    ...
+  )
+  if (!is.null(grouping)) {
+    args$group <- grouping
+    args$group.label <- levels(dat[[grouping]])
+  }
+  do.call(lavaan::cfa, args)
+}
+
 # Fit the rung sequence up to `gate`, run lavaan's own nested-model test
 # between adjacent rungs (the scaled difference test under robust estimators,
 # via lavTestLRT), and return the table, the verdict, and the fit the
@@ -678,7 +759,7 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   rows <- list()
   prev_fit <- NULL
   for (r in rungs) {
-    if (model == "strict" && r == "metric") {
+    if (sem_strict_metric_vacuous(model, r)) {
       rows[[r]] <- data.frame(
         rung = r, chisq = NA_real_, df = NA_real_, cfi = NA_real_,
         rmsea = NA_real_, dchisq = NA_real_, ddf = NA_real_, p = NA_real_,
@@ -690,17 +771,9 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
       scales = scales, angles = angles_deg, measures = measures,
       model = model, n_groups = n_groups, invariance = r
     )
-    fit <- lavaan::cfa(
-      syn,
-      data = dat, group = grouping,
-      # Explicit group order: lavaan's default is order of APPEARANCE in the
-      # data, not factor-level order -- without this, the reference group
-      # (and the second-minus-first contrast direction) would silently
-      # depend on row order, contradicting the package's grouping contract
-      # (factor levels, alphabetical unless an explicit factor; CLAUDE.md).
-      group.label = levels(dat[[grouping]]),
-      estimator = estimator, se = se,
-      missing = if (missing == "fiml") "ml" else "listwise", ...
+    fit <- sem_fit_cfa(
+      syn, dat, grouping = grouping,
+      estimator = estimator, se = se, missing = missing, ...
     )
     if (!lavaan::lavInspect(fit, "converged")) {
       stop(
@@ -761,7 +834,7 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   # rather than assert a hypothesis test that never happened.
   comparable <- nrow(failed) == 0 && nrow(untestable) == 0
   if (required == "configural" ||
-    (model == "strict" && required == "metric")) {
+    sem_strict_metric_vacuous(model, required)) {
     # Nothing testable at or below the required rung
     comparable <- TRUE
     verdict <- if (required == "configural") {
@@ -814,7 +887,7 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   # vacuous metric requirement, the configural fit IS the metric model);
   # the configural fit -- separate per-group profiles only -- when the gate
   # fails (spec section 6.3).
-  req_fit_name <- if (model == "strict" && required == "metric") {
+  req_fit_name <- if (sem_strict_metric_vacuous(model, required)) {
     "configural"
   } else {
     required
@@ -1096,10 +1169,8 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
         call. = FALSE
       )
     }
-    if (contrast && length(measures) != 2) {
-      stop("Contrast requires exactly two measures (second minus first).",
-        call. = FALSE
-      )
+    if (contrast) {
+      sem_check_contrast_arity(1L, "measures", length(measures))
     }
   }
 
@@ -1135,18 +1206,7 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
       stop("`grouping` must have at least two levels.", call. = FALSE)
     }
     if (contrast) {
-      if (n_groups != 2) {
-        stop("Contrast requires exactly two groups (second level minus ",
-          "first).",
-          call. = FALSE
-        )
-      }
-      if (path == "measures" && length(measures) != 1) {
-        stop("A group contrast requires exactly one measure (or none, for ",
-          "the latent mean path).",
-          call. = FALSE
-        )
-      }
+      sem_check_contrast_arity(n_groups, path, length(measures))
     }
   }
   if (missing == "listwise") dat <- stats::na.omit(dat)
@@ -1171,10 +1231,8 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
       scales = scales_names, angles = as.numeric(angles),
       measures = measures_names, model = model
     )
-    fit <- lavaan::cfa(
-      syn,
-      data = dat, estimator = estimator, se = se,
-      missing = if (missing == "fiml") "ml" else "listwise", ...
+    fit <- sem_fit_cfa(
+      syn, dat, estimator = estimator, se = se, missing = missing, ...
     )
     sem_health_gate(fit)
     ladder <- NULL
@@ -1233,9 +1291,9 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
   parts <- sem_assemble(est, scales_names, measures_names, eff_contrast)
 
   details <- sem_details(
-    boots, interval, missing, as.numeric(angles), eff_contrast, ci_method
+    boots, interval, missing, as.numeric(angles), eff_contrast, ci_method,
+    path
   )
-  details$score_type <- if (path == "means") "Latent mean" else "Latent"
 
   new_ssm_sem(
     results = parts$results,
@@ -1364,27 +1422,10 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
     )
   }
   if (contrast) {
-    if (ngroups > 1) {
-      # Group contrast on a user-supplied fit: NOTE this bypasses the
-      # invariance gating that ssm_sem() applies -- that is the escape
-      # hatch's documented purpose (partial-invariance respecifications).
-      if (ngroups != 2) {
-        stop("Contrast requires exactly two groups (second level minus ",
-          "first).",
-          call. = FALSE
-        )
-      }
-      if (path == "measures" && length(measures) != 1) {
-        stop("A group contrast requires exactly one measure (or none, for ",
-          "the latent mean path).",
-          call. = FALSE
-        )
-      }
-    } else if (length(measures) != 2) {
-      stop("Contrast requires exactly two measures (second minus first).",
-        call. = FALSE
-      )
-    }
+    # NOTE a grouped user-supplied fit bypasses the invariance gating that
+    # ssm_sem() applies -- that is the escape hatch's documented purpose
+    # (partial-invariance respecifications).
+    sem_check_contrast_arity(ngroups, path, length(measures))
   }
   # The same health gate ssm_sem() applies: convergence is a hard stop, and
   # lavaan's post-estimation flags (e.g., a negative variance estimate) get
@@ -1471,9 +1512,8 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
     identical(lav_missing, "ml.x")) "fiml" else "listwise"
 
   details <- sem_details(
-    boots, interval, missing, as.numeric(angles), contrast, ci_method
+    boots, interval, missing, as.numeric(angles), contrast, ci_method, path
   )
-  details$score_type <- if (path == "means") "Latent mean" else "Latent"
 
   new_ssm_sem(
     results = parts$results,
@@ -1580,21 +1620,12 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
 #' @method summary circumplex_ssm_sem
 #' @export
 summary.circumplex_ssm_sem <- function(object, digits = 3, ...) {
-  replicate_label <- if (identical(object$details$method, "mvn")) {
-    "\nMVN Draws:\t\t"
-  } else {
-    "\nBootstrap Refits:\t"
-  }
-  missing_label <- if (identical(object$details$missing, "fiml")) {
-    "FIML"
-  } else {
-    "Listwise deletion"
-  }
+  labs <- sem_detail_labels(object$details)
   cat(
     "\nStatistical Basis:\t", object$details$score_type, "Scores",
-    replicate_label, object$details$boots,
+    labs$replicate, object$details$boots,
     "\nConfidence Level:\t", object$details$interval,
-    "\nMissing Data:\t\t", missing_label,
+    "\nMissing Data:\t\t", labs$missing,
     "\nScale Displacements:\t", as.numeric(object$details$angles),
     "\n\n"
   )
