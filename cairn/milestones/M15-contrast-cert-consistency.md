@@ -7,7 +7,7 @@
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** m15-contrast-cert-consistency
+- **Branch/PR:** m15-contrast-cert-consistency · https://github.com/jmgirard/circumplex/pull/39
 
 ## Goal
 
@@ -70,7 +70,7 @@ sites in Tasks below.
 
 - AC1 → T3, T5
 - AC2 → T2, T3
-- AC3 → T4
+- AC3 → T5
 - AC4 → T3, T5
 - AC5 → T5
 
@@ -121,6 +121,9 @@ sites in Tasks below.
   3 stale comments rewritten; roxygen + NEWS updated. Full suite FAIL 0 /
   PASS 1881; `check()` 0/0/0. Added a contrast print snapshot + a data-level
   plot-exclusion test (existing snapshot/plot fixtures were profile-only).
+- 2026-07-12: review consistency gate found a Coverage mis-map (AC3 pointed at
+  T4, but the plot-exclusion work is T5). Gated Coverage amendment: AC3 → T5
+  (authoring slip from RR-ingest). No code/criteria change; back to review.
 
 ## Decisions
 
