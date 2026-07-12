@@ -371,6 +371,13 @@ Circumplex Structure”, for a worked introduction to both.
   few of these previously accepted a length-greater-than-one vector
   without complaint; such input now raises a clear error.
 
+- [`instruments()`](http://circumplex.jmgirard.com/dev/reference/instruments.md)
+  now derives its listing from the bundled instrument data rather than a
+  hardcoded table, so it always reflects the instruments actually
+  shipped. As part of this, the listed name for the IIP-SC now reads
+  “Inventory of Interpersonal Problems Short Circumplex” (matching its
+  stored metadata).
+
 ## circumplex 1.2.0
 
 CRAN release: 2026-07-02
