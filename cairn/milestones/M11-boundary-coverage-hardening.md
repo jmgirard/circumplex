@@ -79,10 +79,12 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
       Read the existing boundary tests in `test-ssm_bootstrap.R`,
       `test-ssm_montecarlo.R`, `test-ci_accuracy.R`, `test-ssm_sem.R`,
       `test-ssm_analysis.R` before writing cells.
-- [ ] **T2** — Add tests for any genuine gap (suspected: a `ssm_analyze()`
-      point-estimate at the exact 0°/360° pole at the user entry point — verify
-      against the bootstrap/ci_accuracy pole tests before assuming it is
-      missing). Assertions at the boundary value, per the validation doctrine.
+- [x] **T2** — Add tests for any genuine gap. Audit showed the mean path fully
+      covered (incl. the pole point-estimate at `test-ssm_analysis.R:519`); the
+      genuine gaps were on the **correlation** entry point. Added two
+      deterministic tests: flat correlation profile → NA displacement (class D)
+      and a correlation profile peaking at the 0/360 pole (class A/B), at
+      `test-ssm_analysis.R:229` and `:250`.
 - [ ] **T3** — Add `sem_canonical_pop()` to `helper-ssm-sem.R`; grep the whole
       `sem_pop(` canonical-population family across `test-ssm_sem*.R` (do not
       trust a fixed site count) and route each canonical rebuild through it;
@@ -106,6 +108,11 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
   not a from-scratch suite. Absorbs ROADMAP candidates: boundary-condition
   test suite, SEM test-fixture consolidation (M8 T5 sliver), `is_flag()` sliver
   (M5 close-review remainder), and the `test-RcppExport.R.R` rename.
+- 2026-07-12: branch cut, status → in-progress.
+- 2026-07-12: T2 done before T1 (minor reorder — the coverage matrix cites the
+  new test line numbers). Audit finding: mean-path boundary coverage already
+  complete; the two real gaps were the correlation entry point's flat and pole
+  corners. Two deterministic tests added, suite green (0 failed, 0 warnings).
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
