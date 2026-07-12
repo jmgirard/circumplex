@@ -89,11 +89,11 @@ riders — all internal-only, to land before the v2.0.0 freeze (~2026-07-26).
       loadings, attenuated theta, 5-scale, 2-group — left direct). Bit-identical
       guarded by a new `identical()` test; full SEM suite green, no re-pin. The
       groups/syntax files already route 2-group pops through `make_pop_2g()`.
-- [ ] **T4** — Replace `is.logical(items) && length(items) == 1` at
-      `R/instrument_oop.R:68` with `is_flag(items)`; keep/confirm the
-      invalid-`items` error-path test.
-- [ ] **T5** — `git mv tests/testthat/test-RcppExport.R.R
-      tests/testthat/test-RcppExports.R`.
+- [x] **T4** — Replaced the hand-rolled predicate at `R/instrument_oop.R:68`
+      with `is_flag(items)` (behavior-identical); added an invalid-`items`
+      error-path test to `test-instrument_oop.R`.
+- [x] **T5** — `git mv test-RcppExport.R.R → test-RcppExports.R`; testthat
+      discovers and runs it.
 - [ ] **T6** — `devtools::document()` (if any roxygen touched),
       `devtools::test()`, then `devtools::check()`.
 
