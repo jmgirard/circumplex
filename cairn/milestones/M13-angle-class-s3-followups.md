@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M13: Angle-class S3 follow-ups (RR01)
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Branch/PR:** m13-angle-class-s3-followups   <!-- owner: implement (branch) / review (PR URL) · create -->
@@ -91,7 +91,7 @@ decision for the `as_degree`/`as_radian` generics.
 - [x] **T4** — Add a one-line code comment at `as_degree`/`as_radian` marking
       them deliberately internal (generic unexported, methods registered);
       record the decision in this file's Decisions section.
-- [ ] **T5** — `devtools::document()` (no NAMESPACE change expected) + full
+- [x] **T5** — `devtools::document()` (no NAMESPACE change expected) + full
       `devtools::test()` + `devtools::check()`; confirm 0/0/0.
 
 ## Work log
@@ -124,6 +124,10 @@ decision for the `as_degree`/`as_radian` generics.
 - 2026-07-12: T4 done — keep-internal decision recorded (M13-D1 below) + code
   comments at the `as_degree`/`as_radian` generics; NAMESPACE exports no generic
   (verified); load_all clean.
+
+- 2026-07-12: T5 done — `document()` produced no NAMESPACE/man changes; full
+  suite 392 tests 0F/0E/0S (3 expected degenerate warnings); `devtools::check()`
+  clean (0 errors / 0 warnings / 0 notes). All tasks complete → status review.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
