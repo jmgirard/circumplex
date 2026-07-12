@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M13: Angle-class S3 follow-ups (RR01)
 
-- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Branch/PR:** m13-angle-class-s3-followups · https://github.com/jmgirard/circumplex/pull/37   <!-- owner: implement (branch) / review (PR URL) · create -->
@@ -43,12 +43,12 @@ decision for the `as_degree`/`as_radian` generics.
 ## Acceptance criteria
 <!-- owner: plan · create/amend-via-gate; review reads, never reinterprets -->
 
-- [ ] AC1 — `new_contrast_radian()` exists in `R/ssm_oop.R`; both former inline
+- [x] AC1 — `new_contrast_radian()` exists in `R/ssm_oop.R`; both former inline
       `structure()` sites call it; the produced objects are `identical()` to the
       pre-change objects (byte-identical class + values), and the full existing
       suite (incl. `test-ci_accuracy.R` equality pins and contrast-CI snapshots)
       stays green.
-- [ ] AC2 — both `quantile.circumplex_*` methods return `NA_real_` (not logical
+- [x] AC2 — both `quantile.circumplex_*` methods return `NA_real_` (not logical
       `NA`) on an all-NA input, asserted by a direct test; the flat/zero-variance
       displacement path through `ssm_analyze()`/`ssm_ci_accuracy()` still yields
       NA CIs without error (regression test at the boundary).
@@ -56,10 +56,10 @@ decision for the `as_degree`/`as_radian` generics.
       independent oracle for a 0/360-straddling displacement, backed by ≥2
       oracle types (invariant agreement with `quantile.circumplex_radian` +
       a live deliberately-dumb circular-quantile recomputation).
-- [ ] AC4 — the keep-internal decision for `as_degree`/`as_radian` is recorded in
+- [x] AC4 — the keep-internal decision for `as_degree`/`as_radian` is recorded in
       this milestone's Decisions section and as a code comment at the generic
       definitions (`R/ssm_oop.R:30,63`); NAMESPACE still exports no such generic.
-- [ ] AC5 — `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+- [x] AC5 — `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
 
 ## Coverage
 <!-- owner: plan · create/amend-via-gate -->
@@ -83,7 +83,7 @@ decision for the `as_degree`/`as_radian` generics.
       (`R/ssm_bootstrap.R:173,186`); add a direct all-NA return-type test and a
       flat-profile regression test exercising the displacement CI path (test
       first: assert `NA_real_` before the fix).
-- [x] **T3** — Add a CPM angle-CI oracle test (in `test-cpm_oracles.R` or a
+- [ ] **T3** — Add a CPM angle-CI oracle test (in `test-cpm_oracles.R` or a
       dedicated file) for a 0/360-straddling displacement: invariant agreement
       between `cpm_fit()`'s reported `angle_lci/uci` and a direct
       `quantile.circumplex_radian` recompute, plus a dumb explicit
@@ -128,6 +128,13 @@ decision for the `as_degree`/`as_radian` generics.
 - 2026-07-12: T5 done — `document()` produced no NAMESPACE/man changes; full
   suite 392 tests 0F/0E/0S (3 expected degenerate warnings); `devtools::check()`
   clean (0 errors / 0 warnings / 0 notes). All tasks complete → status review.
+- 2026-07-12: REVIEW round 1 (PR #37) SENT BACK → in-progress. AC1/2/4/5
+  verified; AC3 fails — diff-bug reviewer finding F1 (score 93, confirmed): the
+  T3 tests don't guard `cpm_fit.R:1119` (test 2's fixture has no pole straddle,
+  so a linearized call-site quantile passes both assertions). T3 reopened; fix
+  is to feed a deterministically straddling config through `cpm_fit()` and
+  verify the guard is red under a temporary linearization. Blame-history
+  reviewer: no findings.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
@@ -142,3 +149,42 @@ decision for the `as_degree`/`as_radian` generics.
 
 ## Review
 <!-- owner: review · exclusive -->
+
+### Round 1 — 2026-07-12 (PR #37) → SENT BACK (AC3 not met)
+
+**Criterion evidence (fresh, this session):**
+- AC1 ✓ — `new_contrast_radian()` in `R/ssm_oop.R`; both inline `structure()`
+  sites route through it; `test-ssm_oop.R` `expect_identical(cr, inline)` pins
+  byte-identity; full suite 392 tests 0F/0E/0S. Diff-bug reviewer confirmed the
+  `is.numeric` guard rejects nothing the old code accepted.
+- AC2 ✓ — both `quantile.circumplex_*` return `NA_real_` on all-NA input
+  (`test-ssm_bootstrap.R`, red on logical NA → green after); length-1 preserved;
+  flat-path consumers (bootstrap sapply, ci_accuracy length==1 guard, cpm_fit
+  q[1]/q[2]) all green. D-003 360→0 snap untouched.
+- AC3 ✗ — NOT MET (see F1). Tests do not guard the real `cpm_fit.R:1119` call
+  site against linearization.
+- AC4 ✓ — NAMESPACE exports no `as_degree`/`as_radian` generic (only S3method
+  registrations); comments added; M13-D1 recorded.
+- AC5 ✓ — fresh `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+
+**Consistency gate:** `cairn_validate.py` exit 0; Coverage map complete (AC1–5 →
+T1–5, all tasks present); `document()` no diff; `check_pkgdown()` passes (no new
+exports); README unaffected; no NEWS entry warranted (internal cleanup — the
+all-NA type-fix leaves every documented CI output identical); `cairn` is
+`.Rbuildignore`d.
+
+**Independent review (two lenses + scorer):**
+- [S] blame-history: **No findings** — 360→0 snap untouched, contrast columns
+  still route through the non-`%%2π` method, D-003/D-006 respected, no M11-style
+  scoping regression.
+- [O] diff-bug: **F1** (below); AC1/AC2/AC4 verified correct by this lens too.
+- **F1 (score 93/100, CONFIRMED — actioned via send-back):** AC3's
+  `test-cpm_angle_ci.R` does not protect `R/cpm_fit.R:1119` against a
+  linear-quantile regression. Test 1 re-types the primitive expression without
+  calling `cpm_bootstrap()`; test 2 (the only test driving line 1119) uses a
+  `jz2017`/`octants()`/seed-42 fixture with **no pole-straddling variable**, so
+  both its assertions (`inside`, `width<180`) pass even when the call-site
+  quantile is linearized (scorer reproduced this via `assignInNamespace`). Fix:
+  test 2 needs a deterministically pole-straddling configuration fed through
+  `cpm_fit()`'s real path, verified red under a temporary linearization.
+  AC1/2/4/5 stand as verified.
