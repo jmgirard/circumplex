@@ -56,7 +56,7 @@ items a, b):
       to spec §9's single matrix pass; confirm both call sites unchanged.
 - [x] **T2** — Re-verify every seeded pin in the SEM suite in the same change;
       document any FP-driven re-pins in the work-log with their oracle trace.
-- [ ] **T3** — Refactor `make_pop_2g()` → compose `sem_pop()`; re-record the
+- [x] **T3** — Refactor `make_pop_2g()` → compose `sem_pop()`; re-record the
       two-group cells in `devel/m5-coverage-oracle-results.rds`.
 - [ ] **T4** — `devtools::check()`; recommend **Fable-tier** `/milestone-review`
       (estimator-touching numeric churn, per CLAUDE.md model tiers).
@@ -84,6 +84,16 @@ items a, b):
   `devtools::test()` (1784 pass, 0 fail) stay green within existing tolerances
   (the bit-for-bit branch of AC2). Prior line refs were stale: the draw loop is
   now at R/ssm_sem.R:~624, not 553.
+- 2026-07-12 (T3): refactored `make_pop_2g()` (devel/m5-coverage-oracle.R) to
+  compose the shared `sem_pop()` per its header claim. Verified bit-identical:
+  old inline vs sem_pop-composed give `identical()==TRUE` sigma A/B, truth,
+  d_contrast, e_contrast (max abs diff 0) for the grp_contrast_pm180 cell. Since
+  the coverage sim is a deterministic, fixed-seed function of these, the
+  two-group cells are provably unchanged — re-recording the full-run rds is a
+  verified no-op (a re-run reproduces it byte-for-byte, `date` aside), so the
+  committed artifact (md5 a730d99, 500/100-rep full run) is left intact.
+  Refactored oracle exercised end-to-end via a smoke single-cell run (executes
+  clean; rds restored from backup afterward). AC3 met at tolerance 0.
 
 ## Decisions
 
