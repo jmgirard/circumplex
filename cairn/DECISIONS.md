@@ -54,3 +54,26 @@ statistically risky milestones).
 **Consequences:** `install_github` users can identify milestone state; the
 CRAN-release review verifies already-reviewed strata rather than making a first
 deep pass. Source: legacy ROADMAP "Between releases".
+
+### D-005 (2026-07-12): canonical reading of the `is_*()` validator rule (M10)
+
+**Context:** The CLAUDE.md "prefer the `is_*()` helpers" rule was read two ways
+across the codebase. Length was carried inconsistently: `is_num`/`is_char`/`is_var`
+take an explicit `n=` length argument; scalar counts were validated either by
+bolting `length(x) == 1` beside `is_count()` (`ssm_ci_accuracy`, `cpm_fit`), by an
+inline `is.numeric && ceiling==floor` with no length guard at all (`ssm_sem`), or
+by stacking `is_num(x, n = 1L), is_count(x)` (`ssm_sem_syntax`).
+**Decision:** Length belongs *in the predicate name or argument*, never
+hand-bolted at the call site. Two idioms are canonical: (a) `is_*(x, n = k)` for a
+vector of known length `k`; (b) a named scalar predicate that fixes length-1 —
+`is_flag()` (logical) and now `is_scalar_count()` (non-negative whole number,
+`min` floor). `is_count()` is retained **only** as the vectorized
+non-negative-integer test used as the internal `n=` guard inside
+`is_char`/`is_var`/`is_num`; it is never a user-facing scalar-count validator.
+**Superseded reading:** that `is_count()` alone (with or without a bolted
+`length(x) == 1`) is the scalar-count validator. Callers now use
+`is_scalar_count()`; the standalone `length == 1` companions are removed.
+**Consequences:** Scalar count args gain a uniform, length-checked validator; the
+`ssm_sem` and extra `cpm_fit` sites that lacked a length guard are now strictly
+stricter (reject length>1). The `is_flag()` length-1-logical sibling
+(`R/instrument_oop.R:68`) already conforms to idiom (b) and is out of scope.

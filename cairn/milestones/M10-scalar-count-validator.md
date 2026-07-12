@@ -52,8 +52,8 @@ different predicate; leave to a candidate row. SEM DRY → M8; numeric → M9.
 ## Tasks
 
 - [x] **T1** — Add the scalar-count predicate to `R/utils.R` + direct tests.
-- [ ] **T2** — Resolve the two `is_*()` readings (question-gate at implement);
-      author the D-entry recording the canonical interpretation.
+- [x] **T2** — Resolve the two `is_*()` readings (question-gate at implement);
+      author the D-entry recording the canonical interpretation (D-005).
 - [ ] **T3** — Adopt the helper across the sites in `R/ssm_ci_accuracy.R`,
       `R/cpm_fit.R`, `R/ssm_sem.R`; reconcile `R/ssm_sem_syntax.R:254-256`.
       Assert each validation still aborts on bad input.
