@@ -83,7 +83,7 @@ decision for the `as_degree`/`as_radian` generics.
       (`R/ssm_bootstrap.R:173,186`); add a direct all-NA return-type test and a
       flat-profile regression test exercising the displacement CI path (test
       first: assert `NA_real_` before the fix).
-- [ ] **T3** — Add a CPM angle-CI oracle test (in `test-cpm_oracles.R` or a
+- [x] **T3** — Add a CPM angle-CI oracle test (in `test-cpm_oracles.R` or a
       dedicated file) for a 0/360-straddling displacement: invariant agreement
       between `cpm_fit()`'s reported `angle_lci/uci` and a direct
       `quantile.circumplex_radian` recompute, plus a dumb explicit
@@ -113,6 +113,13 @@ decision for the `as_degree`/`as_radian` generics.
   `NA_real_` (length-1) on all-NA input; test-first (red on logical `NA`, green
   after). 166 consumer tests (bootstrap, ci_accuracy, oop, analysis, cpm) green;
   the `ssm_ci_accuracy.R:903` length==1 guard is preserved.
+
+- 2026-07-12: T3 done — new `test-cpm_angle_ci.R` covers the CPM angle-CI
+  transform (`cpm_fit.R:1119-1121`) at a 0/360 straddle with two independent
+  oracle types (live dumb circular-quantile-in-degrees recompute + rotation-
+  equivariance invariant), plus an end-to-end `cpm_fit()` bootstrap guard
+  (estimate-within-CI-on-circle + short-arc width) that fails on linearization.
+  Verified running (not just skipped) under `NOT_CRAN=true`.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
