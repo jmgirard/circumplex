@@ -194,24 +194,29 @@ norms <- function(x) {
 #' instruments()
 instruments <- function() {
 
-  # TODO: Find a way to automate this - maybe data$results minus example data?
+  # Enumerate the packaged instruments from the data itself so this listing
+  # can never drift from the shipped datasets. Each instrument is a
+  # circumplex_instrument object carrying its abbreviation and full name in
+  # $Details; example datasets (e.g. aw2009, jz2017, raw) are filtered out by
+  # class.
+  nms <- utils::data(package = "circumplex")$results[, "Item"]
+  insts <- sort(Filter(function(nm) {
+    e <- new.env()
+    utils::data(list = nm, package = "circumplex", envir = e)
+    inherits(get(nm, envir = e), "circumplex_instrument")
+  }, nms))
 
-  cat(
-    "The circumplex package currently includes 15 instruments:\n",
-    "1. CAIS: Child and Adolescent Interpersonal Survey (cais)\n",
-    "2. CSIE: Circumplex Scales of Interpersonal Efficacy (csie)\n",
-    "3. CSIG: Circumplex Scales of Intergroup Goals (csig)\n",
-    "4. CSIP: Circumplex Scales of Interpersonal Problems (csip)\n",
-    "5. CSIV: Circumplex Scales of Interpersonal Values (csiv)\n",
-    "6. IEI: Interpersonal Emotion Inventory (iei)\n",
-    "7. IGI-CR: Interpersonal Goals Inventory for Children, Revised Version (igicr)\n",
-    "8. IIP-32: Inventory of Interpersonal Problems, Brief Version (iip32)\n",
-    "9. IIP-64: Inventory of Interpersonal Problems (iip64)\n",
-    "10. IIP-SC: Inventory of Interpersonal Problems, Short Circumplex (iipsc)\n",
-    "11. IIS-32: Inventory of Interpersonal Strengths, Brief Version (iis32)\n",
-    "12. IIS-64: Inventory of Interpersonal Strengths (iis64)\n",
-    "13. IIT-C: Inventory of Influence Tactics Circumplex (iitc)\n",
-    "14. IPIP-IPC: IPIP Interpersonal Circumplex (ipipipc)\n",
-    "15. ISC: Interpersonal Sensitivities Circumplex (isc)\n"
+  header <- sprintf(
+    "The circumplex package currently includes %d instruments:\n",
+    length(insts)
   )
+  lines <- vapply(seq_along(insts), function(i) {
+    nm <- insts[[i]]
+    e <- new.env()
+    utils::data(list = nm, package = "circumplex", envir = e)
+    d <- get(nm, envir = e)$Details
+    sprintf("%d. %s: %s (%s)\n", i, d$Abbrev, d$Name, nm)
+  }, character(1))
+
+  cat(c(header, lines))
 }

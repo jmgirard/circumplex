@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M14: Automate the instruments() list
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m14-instruments-list-automation / #38
 
 ## Goal
 
@@ -36,16 +36,16 @@ Derive `instruments()`' printed list and count from the package's
 
 ## Acceptance criteria
 
-- [ ] `instruments()` contains no hardcoded instrument names or count: the
+- [x] `instruments()` contains no hardcoded instrument names or count: the
       list and the "N instruments" count are computed at call time from the
       package's `circumplex_instrument` datasets (evidence: source inspection;
       the `TODO` is gone).
-- [ ] A test asserts the printed output is data-derived — the count line
+- [x] A test asserts the printed output is data-derived — the count line
       equals the number of `circumplex_instrument` datasets, and every such
       dataset's `$Details$Abbrev` and `$Details$Name` appears in the output —
       so adding or removing an instrument would change `instruments()` without
       a code edit (evidence: test passes; demonstrably keys off the data).
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
 
 ## Coverage
 
@@ -55,18 +55,18 @@ Derive `instruments()`' printed list and count from the package's
 
 ## Tasks
 
-- [ ] **T1** — Test-first: add a testthat test that enumerates the
+- [x] **T1** — Test-first: add a testthat test that enumerates the
       `circumplex_instrument` datasets (via `utils::data(package = "circumplex")`,
       filtered by class) and asserts `instruments()` output contains the
       derived count line and each instrument's Abbrev/Name. Written against the
       intended data-derived output (note the IIP-SC string resolves to the
       data's `$Details$Name`, without the current comma). Fails against the
       present hardcoded body where the two diverge.
-- [ ] **T2** — Rewrite `instruments()` (`R/instrument_oop.R:195`) to enumerate,
+- [x] **T2** — Rewrite `instruments()` (`R/instrument_oop.R:195`) to enumerate,
       sort by dataset name, format `"N. ABBREV: Name (obj)\n"`, and compute the
       count from the data; delete the hardcoded block and the `TODO`. Keep it a
       `cat()` printer returning invisibly as today.
-- [ ] **T3** — `devtools::document()` if roxygen changed; `devtools::test()`
+- [x] **T3** — `devtools::document()` if roxygen changed; `devtools::test()`
       then `devtools::check()` clean; update any snapshot.
 
 ## Work log
@@ -77,7 +77,61 @@ Derive `instruments()`' printed list and count from the package's
   opportunistic fold-ins at the user's direction (question gate). Derivation
   feasibility confirmed: all 15 entries reproduce from `$Details$Abbrev/$Name`;
   the only text delta is the IIP-SC comma (the drift this fixes).
+- 2026-07-12: branch cut. T1 — data-derived drift-guard test added
+  (`test-instrument_oop.R`); confirmed red against the hardcoded body
+  ("missing Name for iipsc", the comma delta).
+- 2026-07-12: T2 — `instruments()` now enumerates via `utils::data()`,
+  filters by class, formats from `$Details$Abbrev/$Name`, count from data;
+  TODO removed. Output byte-identical to the old format except the IIP-SC
+  line (see M14-D1). Snapshot regenerated; structural test green.
+- 2026-07-12: T3 — full `devtools::test()` green (0 failures / 1869 pass);
+  `devtools::check()` clean (0 errors / 0 warnings / 0 notes, 3m34s). No
+  roxygen change → no `document()` needed. Status → review.
+- 2026-07-12: review in progress — draft PR #38 opened. Consistency gate
+  green: `cairn_validate` all-pass (coverage complete), `document()` no diff,
+  `pkgdown::check_pkgdown()` clean, NEWS.md entry added, no principle change.
+  Fresh `check()` + 3-lens independent review running (checkpoint).
 
 ## Decisions
 
+- **M14-D1** (2026-07-12): the data is the source of truth for the printed
+  strings. This changes one line vs. the old hardcoded list — IIP-SC's name
+  resolves to its `$Details$Name` "Inventory of Interpersonal Problems Short
+  Circumplex" (no comma), where the hardcoded literal had "Problems, Short".
+  This is a cosmetic console-text change to an informational printer (no
+  return-value/API contract), and is exactly the drift the automation
+  prevents; not treated as a breaking change. Snapshot updated to match.
+
 ## Review
+
+**Acceptance evidence (fresh, 2026-07-12):**
+- AC1 → source inspection: `instruments()` body has no instrument literals,
+  count, or `TODO` (grep of the function is empty); list + count computed from
+  `utils::data()`. Confirmed by both the diff-bug and prior-PR reviewers.
+- AC2 → `test_file("test-instrument_oop.R")` green; the drift-guard test
+  independently re-enumerates the `circumplex_instrument` datasets and asserts
+  the count line and each Abbrev/Name — verified red against the old hardcoded
+  body during implement (teeth).
+- AC3 → fresh `devtools::check()` = Status OK, 0 errors / 0 warnings / 0 notes
+  (3m33s).
+
+**Consistency gate:** `cairn_validate` all-pass (incl. coverage complete);
+`document()` no diff; `pkgdown::check_pkgdown()` clean (`instruments` already
+indexed); NEWS.md entry added; no DESIGN principle change (cairn_impact
+skipped); no new top-level files.
+
+**Independent review — 3 lenses, all clean, zero findings:**
+- [O] diff-bug (Opus): no defects; AC1/AC2 met; enumeration sound (correct
+  class filter, deterministic sort, no global-env pollution). Dropped as
+  non-defects: pre-existing undeclared `utils::` use (already elsewhere; check
+  clean), and a minor double dataset-load in an interactive printer (efficiency,
+  not correctness).
+- [S] blame-history (Sonnet): no findings; the hardcoded list carried an
+  8-year-old "automate this" TODO (never deliberate), and the IIP-SC comma
+  lived only in the hand-typed string — the data's `$Details$Name` was always
+  comma-free. Consistent with M14-D1.
+- [S] prior-PR-comments (Sonnet): no prior-PR evidence bears against the diff;
+  corroborated that a prior "14 vs 15" hardcoded-drift bug (legacy, 2026-07-02)
+  is the exact class M14 structurally eliminates.
+
+No findings scored; nothing below-threshold to log.
