@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M13: Angle-class S3 follow-ups (RR01)
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Branch/PR:** m13-angle-class-s3-followups · https://github.com/jmgirard/circumplex/pull/37   <!-- owner: implement (branch) / review (PR URL) · create -->
@@ -105,6 +105,7 @@ decision for the `as_degree`/`as_radian` generics.
 - 2026-07-12: T5 done — `document()` no diff; 392 tests 0F/0E/0S; `check()` 0/0/0 → status review.
 - 2026-07-12: REVIEW r1 (PR #37) SENT BACK → in-progress. AC1/2/4/5 verified; AC3 fails on F1 (diff-bug, score 93): T3 tests don't guard `cpm_fit.R:1119` — test 2's fixture has no straddle, so a linearized quantile passes both assertions. T3 reopened. Blame-history: no findings.
 - 2026-07-12: T3 REDONE (F1 fix) — test 2 now drives a deterministic pole-straddle (item at 360°, `cpm_implied_cor`+`chol`+`rnorm`, seed 42, N=80, boots=300) through the real `cpm_fit()` path and asserts the pole item's CI WRAPS (lci>uci) + short-arc + inside. Teeth verified out-of-band: linearizing line 1119 flips all three assertions to FAIL (CI→[0.8,358.4], width 357.6). No MASS dep (base-R sampler). Full suite 392 0F/0E/0S. → back to review.
+- 2026-07-12: fresh `check()` 0/0/0 after the T3 fix; all tasks done → status review (round 2).
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
