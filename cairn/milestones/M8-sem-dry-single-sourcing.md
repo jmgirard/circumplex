@@ -5,7 +5,7 @@
 - **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
-- **Branch/PR:** —
+- **Branch/PR:** m8-sem-dry-single-sourcing
 
 ## Goal
 
@@ -61,7 +61,7 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
 
 ## Tasks
 
-- [ ] **T1** — Extract shared contrast-arity validator; route the three sites
+- [x] **T1** — Extract shared contrast-arity validator; route the three sites
       (`R/ssm_sem.R:1099-1103,1134-1150,1366-1388`) through it; keep messages.
 - [ ] **T2** — Extract internal fit chokepoint for the two `lavaan::cfa()`
       sites (`R/ssm_sem.R:689-704,1170-1178`); assert identical fits.
@@ -83,6 +83,13 @@ scalar-count validator → M10. No new exports; no user-visible behaviour change
   because they churn validated code"; behaviour-preserving, so freeze risk is
   low, but implement should still confirm timing against the v2.0.0 freeze
   (~2026-07-26).
+
+- 2026-07-12: T1 done — `sem_check_contrast_arity()` single-sources the three
+  duplicated arity blocks; added a characterization test locking every branch's
+  message. Minor AC1 wording fix: the existing conditions are base
+  `stop(call.=FALSE)`, not `cli_abort()` — preserved verbatim to keep messages
+  byte-identical (converting would change the output). AC1's intent (each arity
+  branch fires an unchanged message) is unchanged.
 
 ## Decisions
 

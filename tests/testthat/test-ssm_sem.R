@@ -517,6 +517,48 @@ test_that("ssm_sem() validates its arguments (sec. 7.2)", {
   )
 })
 
+test_that("contrast arity is validated at every branch (sec. 7.2)", {
+  # Characterization test for the shared contrast-arity validator: locks the
+  # message on each failure branch across both entry points. The grouped
+  # branches error before any lavaan fit, so raw jz2017 suffices; the
+  # ssm_sem_parameters() grouped branch routes through the same validated
+  # helper exercised here via ssm_sem().
+  skip_if_not_installed("lavaan")
+  data("jz2017", envir = environment())
+  scales <- names(jz2017)[2:9]
+
+  # Grouped contrast requires exactly two groups
+  d3 <- jz2017
+  d3$G3 <- factor(rep_len(c("a", "b", "c"), nrow(d3)))
+  expect_error(
+    ssm_sem(d3, scales = scales, grouping = "G3", measures = "PARPD",
+      contrast = TRUE),
+    "exactly two groups"
+  )
+
+  # Grouped measure-path contrast requires exactly one measure
+  expect_error(
+    ssm_sem(jz2017, scales = scales, grouping = "Gender",
+      measures = c("PARPD", "SCZPD"), contrast = TRUE),
+    "exactly one measure"
+  )
+
+  # User-supplied single-group fit: the ungrouped branch still needs two
+  # measures (second minus first)
+  th_deg <- c(0, 30, 90, 200, 290)
+  a <- rep(0.55, 5)
+  cc <- rep(0.6, 5)
+  theta <- seq(0.3, 0.6, length.out = 5)
+  sigma_m <- cbind(c(0.2, 0.3, 0.2))
+  pop <- sem_pop(a, cc, theta, th_deg, sigma_m, v_m = 1)
+  fit <- sem_pop_fit(pop, model = "strict")
+  expect_error(
+    ssm_sem_parameters(fit, scales = pop$scales, angles = th_deg,
+      measures = pop$measures[1], contrast = TRUE),
+    "two measures"
+  )
+})
+
 test_that("ssm_sem() gates on lavaan with a clear install hint (sec. 7.4)", {
   testthat::local_mocked_bindings(has_lavaan = function() FALSE)
   expect_error(

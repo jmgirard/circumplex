@@ -20,6 +20,35 @@ sem_invariance_rungs <- function() {
   c("configural", "metric", "scalar", "strict_residuals")
 }
 
+# THE single source of the contrast-arity messages shared by ssm_sem() and
+# ssm_sem_parameters(). A second-minus-first contrast is defined only for
+# exactly two things: two groups (with the latent-mean path, or a single
+# measure) or, ungrouped, two measures. `n_groups` is 1 on the single-group
+# path; `path` is "means" or "measures"; `n_measures` is length(measures)
+# (0 for the latent-mean path). Preserves the original base `stop(call. =
+# FALSE)` conditions verbatim -- callers keep their surrounding checks and
+# call this only when `contrast` is TRUE.
+sem_check_contrast_arity <- function(n_groups, path, n_measures) {
+  if (n_groups > 1) {
+    if (n_groups != 2) {
+      stop("Contrast requires exactly two groups (second level minus ",
+        "first).",
+        call. = FALSE
+      )
+    }
+    if (path == "measures" && n_measures != 1) {
+      stop("A group contrast requires exactly one measure (or none, for ",
+        "the latent mean path).",
+        call. = FALSE
+      )
+    }
+  } else if (n_measures != 2) {
+    stop("Contrast requires exactly two measures (second minus first).",
+      call. = FALSE
+    )
+  }
+}
+
 # Robust-preferring fitMeasures lookup, shared by the invariance-ladder table
 # and the print method so the two surfaces cannot report different flavors of
 # the same index for the same object.
@@ -1096,10 +1125,8 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
         call. = FALSE
       )
     }
-    if (contrast && length(measures) != 2) {
-      stop("Contrast requires exactly two measures (second minus first).",
-        call. = FALSE
-      )
+    if (contrast) {
+      sem_check_contrast_arity(1L, "measures", length(measures))
     }
   }
 
@@ -1135,18 +1162,7 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
       stop("`grouping` must have at least two levels.", call. = FALSE)
     }
     if (contrast) {
-      if (n_groups != 2) {
-        stop("Contrast requires exactly two groups (second level minus ",
-          "first).",
-          call. = FALSE
-        )
-      }
-      if (path == "measures" && length(measures) != 1) {
-        stop("A group contrast requires exactly one measure (or none, for ",
-          "the latent mean path).",
-          call. = FALSE
-        )
-      }
+      sem_check_contrast_arity(n_groups, path, length(measures))
     }
   }
   if (missing == "listwise") dat <- stats::na.omit(dat)
@@ -1364,27 +1380,10 @@ ssm_sem_parameters <- function(fit, scales, angles = octants(),
     )
   }
   if (contrast) {
-    if (ngroups > 1) {
-      # Group contrast on a user-supplied fit: NOTE this bypasses the
-      # invariance gating that ssm_sem() applies -- that is the escape
-      # hatch's documented purpose (partial-invariance respecifications).
-      if (ngroups != 2) {
-        stop("Contrast requires exactly two groups (second level minus ",
-          "first).",
-          call. = FALSE
-        )
-      }
-      if (path == "measures" && length(measures) != 1) {
-        stop("A group contrast requires exactly one measure (or none, for ",
-          "the latent mean path).",
-          call. = FALSE
-        )
-      }
-    } else if (length(measures) != 2) {
-      stop("Contrast requires exactly two measures (second minus first).",
-        call. = FALSE
-      )
-    }
+    # NOTE a grouped user-supplied fit bypasses the invariance gating that
+    # ssm_sem() applies -- that is the escape hatch's documented purpose
+    # (partial-invariance respecifications).
+    sem_check_contrast_arity(ngroups, path, length(measures))
   }
   # The same health gate ssm_sem() applies: convergence is a hard stop, and
   # lavaan's post-estimation flags (e.g., a negative variance estimate) get
