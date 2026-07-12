@@ -896,10 +896,8 @@ ssm_ci_intervals_lean <- function(t0, t, interval, contrast) {
       if (all(is.na(col))) next
       if (j == d_col) {
         is_con <- contrast && r == n_rows
-        cls <- if (is_con) c("circumplex_contrast_radian", "numeric")
-               else c("circumplex_radian", "numeric")
-        qs <- quantile(structure(col, class = cls), probs = probs,
-                       na.rm = TRUE)
+        col_obj <- if (is_con) new_contrast_radian(col) else new_radian(col)
+        qs <- quantile(col_obj, probs = probs, na.rm = TRUE)
         if (length(qs) == 1 && is.na(qs)) next
         qs <- as.numeric(qs)
         if (is_con && all(is.finite(c(est[r, j], qs)))) {

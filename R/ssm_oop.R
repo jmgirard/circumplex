@@ -59,6 +59,14 @@ new_radian <- function(x) {
   new_s3_num(x, class = c("circumplex_radian", "numeric"))
 }
 
+# S3 Constructor for the contrast variant (a signed radian difference whose
+# circular quantiles are allowed to stay negative; see
+# quantile.circumplex_contrast_radian). Single-sources the class tag applied
+# to contrast displacement columns in ssm_bootstrap.R and ssm_ci_accuracy.R.
+new_contrast_radian <- function(x) {
+  new_s3_num(x, class = c("circumplex_contrast_radian", "numeric"))
+}
+
 # S3 Generic
 as_radian <- function(x, ...) {
   UseMethod("as_radian")

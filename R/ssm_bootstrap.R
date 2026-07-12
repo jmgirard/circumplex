@@ -108,9 +108,7 @@ ssm_replicate_intervals <- function(t0, t, interval, contrast,
   d_cols <- which(param_of_col == "d")
   if (contrast) {
     contrast_d_col <- d_cols[length(d_cols)]
-    bs_t[contrast_d_col] <- lapply(bs_t[contrast_d_col], function(x) {
-      structure(x, class = c("circumplex_contrast_radian", "numeric"))
-    })
+    bs_t[contrast_d_col] <- lapply(bs_t[contrast_d_col], new_contrast_radian)
     d_cols <- d_cols[-length(d_cols)]
   }
   bs_t[d_cols] <- lapply(bs_t[d_cols], new_radian)

@@ -73,7 +73,7 @@ decision for the `as_degree`/`as_radian` generics.
 ## Tasks
 <!-- owner: plan (create) / implement (check-off, minor edits) -->
 
-- [ ] **T1** — Add `new_contrast_radian()` beside `new_radian()`/`new_degree()`
+- [x] **T1** — Add `new_contrast_radian()` beside `new_radian()`/`new_degree()`
       in `R/ssm_oop.R` (use `new_s3_num` with class
       `c("circumplex_contrast_radian", "numeric")`); replace the inline
       `structure()` at `R/ssm_bootstrap.R:112` and the `cls` branch at
@@ -103,6 +103,11 @@ decision for the `as_degree`/`as_radian` generics.
   intact); CPM angle-CI oracle included in scope. No RB tripwire fires (the
   irreversible-api export path was declined). Targets landing before the
   ~2026-07-26 v2.0.0 freeze.
+
+- 2026-07-12: T1 done — `new_contrast_radian()` added in `R/ssm_oop.R`; both
+  inline `structure()` sites routed through it; byte-identity pinned by
+  `expect_identical()` in `test-ssm_oop.R`; affected suites (ssm_oop,
+  ssm_bootstrap, ci_accuracy) green.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
