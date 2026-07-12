@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M14: Automate the instruments() list
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
@@ -66,7 +66,7 @@ Derive `instruments()`' printed list and count from the package's
       sort by dataset name, format `"N. ABBREV: Name (obj)\n"`, and compute the
       count from the data; delete the hardcoded block and the `TODO`. Keep it a
       `cat()` printer returning invisibly as today.
-- [ ] **T3** — `devtools::document()` if roxygen changed; `devtools::test()`
+- [x] **T3** — `devtools::document()` if roxygen changed; `devtools::test()`
       then `devtools::check()` clean; update any snapshot.
 
 ## Work log
@@ -84,6 +84,9 @@ Derive `instruments()`' printed list and count from the package's
   filters by class, formats from `$Details$Abbrev/$Name`, count from data;
   TODO removed. Output byte-identical to the old format except the IIP-SC
   line (see M14-D1). Snapshot regenerated; structural test green.
+- 2026-07-12: T3 — full `devtools::test()` green (0 failures / 1869 pass);
+  `devtools::check()` clean (0 errors / 0 warnings / 0 notes, 3m34s). No
+  roxygen change → no `document()` needed. Status → review.
 
 ## Decisions
 
