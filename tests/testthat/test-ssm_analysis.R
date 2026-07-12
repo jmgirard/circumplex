@@ -226,6 +226,49 @@ test_that("Single-group correlation-based SSM results are correct", {
   expect_match(res$details$score_type, "Correlation")
 })
 
+test_that("correlation path: a flat profile returns NA displacement with a warning", {
+  # Boundary class D (flat / zero-variance) on the correlation entry point: the
+  # mean path is covered at ssm_parameters()/ssm_analyze() (this file's
+  # degenerate tests and test-ssm_bootstrap.R "fully flat data"); the
+  # correlation path assembles the profile from measure-scale correlations and
+  # has its own NA/warning plumbing. Adding a distinct constant to a shared
+  # base leaves every correlation identical (a constant shift does not change
+  # cor), so the correlation profile is exactly flat -> amplitude 0 -> NA.
+  set.seed(101)
+  n <- 60
+  base <- rnorm(n)
+  m <- rnorm(n)
+  mat <- sapply(seq_len(8), function(j) base + j)
+  dat <- as.data.frame(cbind(mat, m))
+  colnames(dat) <- c(PANO(), "M")
+
+  w <- capture_warnings(
+    res <- ssm_analyze(dat, scales = PANO(), measures = "M", boots = 50)
+  )
+  expect_true(any(grepl("flat|amplitude|undefined", w)))
+  expect_true(is.na(res$results$d_est))
+  expect_true(is.na(res$results$fit_est))
+})
+
+test_that("correlation path: a profile peaking at the 0/360 pole reports displacement at the pole", {
+  # Boundary class A (peak at 0/360) reaching the estimator through the
+  # correlation-path profile assembly, not mean scoring. scale_j correlates
+  # with the measure as cos(angle_j), so the correlation profile peaks at the
+  # LM scale (360 degrees) and displacement lands on the pole.
+  set.seed(202)
+  n <- 300
+  rad <- as.numeric(as_radian(octants()))
+  z <- rnorm(n)
+  mat <- sapply(rad, function(a) cos(a) * z + rnorm(n, 0, 1))
+  dat <- as.data.frame(cbind(mat, z))
+  colnames(dat) <- c(PANO(), "M")
+
+  res <- ssm_analyze(dat, scales = PANO(), measures = "M", boots = 100)
+  # LM = 360 convention: the estimate sits on the 0/360 pole (either label).
+  dd <- as.numeric(res$results$d_est) %% 360
+  expect_lt(min(dd, 360 - dd), 15)
+})
+
 test_that("Pairwise and listwise scores are the same with no missingness", {
   skip_on_cran()
 

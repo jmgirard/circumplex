@@ -65,7 +65,7 @@ summary.circumplex_instrument <- function(object, scales = TRUE, anchors = TRUE,
 #' scales(csip, items = TRUE)
 scales <- function(x, items = FALSE) {
   stopifnot(is_instrument(x))
-  stopifnot(is.logical(items) && length(items) == 1)
+  stopifnot(is_flag(items))
 
   cat("The ", x$Details$Abbrev, " contains ", x$Details$Scales, 
       " circumplex scales.\n", sep = "")

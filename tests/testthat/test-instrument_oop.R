@@ -28,6 +28,12 @@ test_that("The sub-summary functions produce the expected output", {
 })
 
 
+test_that("scales() rejects a non-flag items argument (is_flag guard)", {
+  expect_error(scales(isc, items = c(TRUE, FALSE)))
+  expect_error(scales(isc, items = "yes"))
+})
+
+
 test_that("The instruments function produces the expected output", {
   expect_snapshot_output(instruments())
 })

@@ -46,6 +46,24 @@ sem_pop <- function(a, cc, theta, angles_deg, sigma_m, v_m,
   )
 }
 
+# The canonical single-measure population reused across test-ssm_sem.R: the
+# balanced 8-scale octant latent structure (a = 0.55, cc = 0.6, and the
+# theta ramp 0.3..0.6) with the measure block (sigma_m, v_m, ...) supplied per
+# test. Identical by construction to the inline
+#   sem_pop(rep(0.55, 8), rep(0.6, 8), seq(0.3, 0.6, length.out = 8),
+#           oct, sigma_m, ...)
+# it replaces (oct == as.numeric(octants())), so no snapshot or coverage re-pin
+# is needed. Non-canonical populations (different loadings, attenuated theta, a
+# general-factor lean, the 5-scale or 2-group fixtures) keep calling sem_pop()
+# or make_pop_2g() directly.
+sem_canonical_pop <- function(sigma_m, ..., angles_deg = as.numeric(octants())) {
+  sem_pop(
+    a = rep(0.55, 8), cc = rep(0.6, 8),
+    theta = seq(0.3, 0.6, length.out = 8),
+    angles_deg = angles_deg, sigma_m = sigma_m, ...
+  )
+}
+
 # Fit a model tier to exact population moments (deterministic; the optimum
 # reproduces the generating values because misfit is exactly zero).
 sem_pop_fit <- function(pop, model = "scaled", n = 10000, ...) {
