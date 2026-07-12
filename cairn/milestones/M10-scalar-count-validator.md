@@ -2,10 +2,10 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M10: Package-wide scalar-count validator
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** low
 - **Depends on:** —
-- **Branch/PR:** —
+- **Branch/PR:** m10-scalar-count-validator
 
 ## Goal
 
