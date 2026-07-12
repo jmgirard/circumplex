@@ -36,16 +36,16 @@ Derive `instruments()`' printed list and count from the package's
 
 ## Acceptance criteria
 
-- [ ] `instruments()` contains no hardcoded instrument names or count: the
+- [x] `instruments()` contains no hardcoded instrument names or count: the
       list and the "N instruments" count are computed at call time from the
       package's `circumplex_instrument` datasets (evidence: source inspection;
       the `TODO` is gone).
-- [ ] A test asserts the printed output is data-derived — the count line
+- [x] A test asserts the printed output is data-derived — the count line
       equals the number of `circumplex_instrument` datasets, and every such
       dataset's `$Details$Abbrev` and `$Details$Name` appears in the output —
       so adding or removing an instrument would change `instruments()` without
       a code edit (evidence: test passes; demonstrably keys off the data).
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
 
 ## Coverage
 
@@ -103,3 +103,35 @@ Derive `instruments()`' printed list and count from the package's
   prevents; not treated as a breaking change. Snapshot updated to match.
 
 ## Review
+
+**Acceptance evidence (fresh, 2026-07-12):**
+- AC1 → source inspection: `instruments()` body has no instrument literals,
+  count, or `TODO` (grep of the function is empty); list + count computed from
+  `utils::data()`. Confirmed by both the diff-bug and prior-PR reviewers.
+- AC2 → `test_file("test-instrument_oop.R")` green; the drift-guard test
+  independently re-enumerates the `circumplex_instrument` datasets and asserts
+  the count line and each Abbrev/Name — verified red against the old hardcoded
+  body during implement (teeth).
+- AC3 → fresh `devtools::check()` = Status OK, 0 errors / 0 warnings / 0 notes
+  (3m33s).
+
+**Consistency gate:** `cairn_validate` all-pass (incl. coverage complete);
+`document()` no diff; `pkgdown::check_pkgdown()` clean (`instruments` already
+indexed); NEWS.md entry added; no DESIGN principle change (cairn_impact
+skipped); no new top-level files.
+
+**Independent review — 3 lenses, all clean, zero findings:**
+- [O] diff-bug (Opus): no defects; AC1/AC2 met; enumeration sound (correct
+  class filter, deterministic sort, no global-env pollution). Dropped as
+  non-defects: pre-existing undeclared `utils::` use (already elsewhere; check
+  clean), and a minor double dataset-load in an interactive printer (efficiency,
+  not correctness).
+- [S] blame-history (Sonnet): no findings; the hardcoded list carried an
+  8-year-old "automate this" TODO (never deliberate), and the IIP-SC comma
+  lived only in the hand-typed string — the data's `$Details$Name` was always
+  comma-free. Consistent with M14-D1.
+- [S] prior-PR-comments (Sonnet): no prior-PR evidence bears against the diff;
+  corroborated that a prior "14 vs 15" hardcoded-drift bug (legacy, 2026-07-02)
+  is the exact class M14 structurally eliminates.
+
+No findings scored; nothing below-threshold to log.
