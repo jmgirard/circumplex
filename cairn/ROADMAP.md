@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-13 (surfaced M18's four deferred free-scaling extensions as one grouped candidate — coverage oracle is a pre-ship gate; M18 done → archived; M7 unblocked)_
+_Last hygiene check: 2026-07-13 (promoted free-scaling candidate item (1) → M19 planned; M7 re-pointed M18→M19 as the pre-ship gate; item (3) annotated — T_free measurement folded into M19, decision still deferred)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,7 +9,8 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M7 | v2.0.0 CRAN release preparation | planned | M18 | high | milestones/M7-v2-release-prep.md |
+| M7 | v2.0.0 CRAN release preparation | planned | M19 | high | milestones/M7-v2-release-prep.md |
+| M19 | CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration | planned | M18 | high | milestones/M19-free-family-coverage-oracle.md |
 | M18 | CIRCUM free-scaling — implementation + oracle validation | done | M17 | high | milestones/archive/M18-circum-free-scaling-build.md |
 | M17 | CIRCUM free-scaling — Fable-reviewed design decision + spec | done | — | high | milestones/archive/M17-circum-free-scaling-design.md |
 | M16 | Print-independent, scale-free displacement-certification rule | done | — | high | milestones/archive/M16-cert-rule-replacement.md |
@@ -24,4 +25,4 @@ _Candidates carry no milestone ID — an `M<NN>` is assigned only at planning ti
 - Post-M4 publication-grade simulation study design (legacy ROADMAP M4/M5 blocks; Fable-tier). This is a research-paper track — the CPM simulation paper engine is already written in `devel/cpm-sim/` (reviewed, not yet run), separate from any package milestone. _(contrast certification consistency promoted → M15; guardrail cert-rule replacement → M16; CIRCUM free-scaling promoted → M17/M18 per D-008; "CPM convergence-acceptance vacuous reproduced" struck — already fixed in M4 review #1, tested at `test-cpm_fit.R:595`, 2026-07-12.)_
 - Continuous / infrastructure refactors (fold into the milestone that next touches the code): 0-vs-360 pole-snap alignment (cosmetic, D-003 parked); analytic-CI Hessian recomputation (minor perf; oracle-validate when done) (legacy ROADMAP "Continuous / infrastructure track" + deferred `/code-review` findings). _(vctrs/S7 angle-class migration dropped 2026-07-12 → D-006, RR01.)_
 - Strict-tier syntax *emission* single-sourcing across the single/multi-group branches in `R/ssm_sem_syntax.R` (descoped from M8 T4, 2026-07-12): the two emitters are structurally distinct (plain vs `c()`-vector cross-group labels) and byte-pinned by `exp_strict_*` snapshots — a high-risk rewrite of statistical output for minor DRY gain. Revisit only if that emitter is reworked for another reason.
-- CIRCUM free-scaling post-v2.0.0 extensions (deferred out of M18; see `milestones/archive/M18-circum-free-scaling-build.md` + D-009): (1) **free-family coverage oracle** — the simulation-coverage oracle validating analytic-CI coverage for `scaling = "free"`, a pre-ship gate that M18-D3 replaced with an unconditional caution on free+analytic CIs; (2) bootstrap σ CIs; (3) T_diag-vs-T_free calibration; (4) covariance-matrix input. The point-estimate oracle (frozen Grassi App. A + live OpenMx) already shipped in M18. Promote (1) to a milestone before any free-family CI is presented as coverage-validated.
+- CIRCUM free-scaling post-v2.0.0 extensions (deferred out of M18; see `milestones/archive/M18-circum-free-scaling-build.md` + D-009): (2) bootstrap σ CIs; (3) T_diag-vs-T_free calibration — the **decision** of which family is the preferable inference default; the **T_free measurement** is folded into M19's coverage runs, so this needs no re-run of the oracle; (4) covariance-matrix input. The point-estimate oracle (frozen Grassi App. A + live OpenMx) already shipped in M18. _(Item (1) free-family coverage oracle promoted → M19, 2026-07-13.)_

@@ -2,7 +2,7 @@
 
 - **Status:** planned
 - **Priority:** high
-- **Depends on:** M18
+- **Depends on:** M19
 - **Branch/PR:** —
 
 ## Goal
@@ -80,6 +80,11 @@ release ships when its bundle is complete and validated (D-008).
 - 2026-07-12: dependency M16 is now **done** (PR #40 merged, squash `cd0c140`).
   M7 stays `blocked` on the external CRAN cadence window (~2026-08-02), not on
   any remaining milestone.
+- 2026-07-13: dependency re-pointed M18→M19 (/milestone-plan). M18 is done; the
+  free-family analytic-CI **coverage** claim is not yet settled. Per D-009's
+  "mandatory pre-ship gate before any analytic-CI-trust claim", M7 now depends on
+  M19 (free-family coverage oracle + caution calibration). No release-prep task
+  change.
 - 2026-07-12: AMENDED (gated, /milestone-plan) — **the CRAN cadence window is no
   longer a constraint (D-008).** Jeff confirmed there is no release-time
   pressure: v2.0.0 has no target date and ships when its bundle is complete and
