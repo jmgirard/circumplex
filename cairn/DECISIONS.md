@@ -107,3 +107,50 @@ as a ROADMAP candidate (a `new_contrast_radian()` constructor for the two
 inline `structure()` sites; deciding the export status of the internal
 `as_degree`/`as_radian` generics; `NA_real_` all-NA return + CPM angle-CI
 oracle path when the quantile methods are next touched). Source: RR01.
+
+### D-007 (2026-07-12): displacement certification rule = scale-free lower-bound ratio (M16)
+
+**Context:** The shipped displacement-interpretability guardrail
+`ssm_certified(a_lci, digits) = round(a_lci, digits) > 0` (`R/ssm_oop.R:122`)
+is print-dependent (moves with the display `digits`) and scale-dependent (its
+implied threshold `0.5·10⁻ᵈⁱᵍⁱᵗˢ` is in amplitude units). The M4 CI-accuracy
+spec (§12.5/§13) shipped it as-is and scheduled a principled replacement seeded
+by the diagnostic's own output. The M16 seed
+(`devel/m16-cert-rule-seed.{R,rds,md}`) showed it false-certifies a *truly
+zero* amplitude ≈100% of the time in every metric (structural: a percentile
+interval of positive amplitude replicates cannot contain 0). Escalated to
+independent Fable review (RB03 → RR03, 2026-07-12).
+**Decision:** Certify a **profile** row's displacement iff
+`is.finite(r) && r >= 0.35`, where `r = a_lci / (a_uci − a_lci)` — a pure,
+vectorized, base-R function of the amplitude CI **pair only** (`a_est` never
+consulted). Print-independent (no `digits`), scale-free (numerator and
+denominator carry the same scale factor). Equivalent to `a_lci >= 0.259·a_uci`.
+Edge contract: `NA` lower bound → not certified; degenerate zero-width CI
+(`Inf`/`NaN`) → not certified, fail-closed. Contrast rows stay ungated
+(M15-D1). k = 0.35 is a pinned package constant
+**calibrated to the 95% default interval**: it is ≈ the 97.5% point of the
+statistic's asymptotically-pivotal c=0 null (Rayleigh) distribution, giving
+false-certification ≈ 0.007–0.025 (≤ α/2) across n = 50–1166 while genuine
+signals (seed 2.58, 6.24) pass by 7–18×.
+**Acceptance target (AC4):** two-part gate — observed false-cert at the c=0
+ladder rung ≤ 0.05 (point) AND the diagnostic's Wilson-LCI `Caution` not
+firing — verified at reps = 1000 across COR_healthy / COR_nearzero / RAW_means
+plus one small-n (≈100) config; ≥2 oracle types (simulation-coverage +
+closed-form Rayleigh-tail cross-check `exp(−t*²/2)`, t* ≈ z(1+2k) ≈ 3.33).
+**Rejected:** form (b) `a_lci/a_est` (null statistic diverges as amplitude→0,
+no viable threshold); replicate-vector / ROPE rules (reparameterizations of the
+same quantile info; the `circumplex_ssm` object stores no replicate matrix, so
+they break legacy objects for zero gain); α/2 as a hard nominal-level claim
+(the rule has no nominal level; α/2 survives only as the Caution benchmark).
+**Consequences:** exported print behavior changes (a strictly-positive-but-
+near-zero amplitude now prints the not-interpretable note; a v2.0.0
+major-version change, NEWS-documented). The print note, verdict, guardrail, and
+vignette wording must change from "the amplitude CI includes zero" (never
+literally true of a positive-replicate percentile interval) to a
+CI-lower-bound-relative-to-width phrasing. `ssm_ci_accuracy()`'s `digits`
+argument and `Threshold` output column become vestigial and are **removed**
+(not deprecated): the diagnostic is unreleased (new in the dev line toward
+v2.0.0; latest CRAN is v1.2.0), so no lifecycle shim is owed — this corrects
+RR03's contrary assumption. The k=0.35 calibration is pinned to interval=0.95;
+a `k(interval)` generalization is documented as available but deferred (D-003
+pole reporting unaffected). Source: RR03.

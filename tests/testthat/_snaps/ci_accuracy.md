@@ -10,15 +10,12 @@
           Elevation      coverage 100.0% -- borderline
           Amplitude      coverage 96.7% -- borderline
           Displacement   coverage 93.3% when certified -- borderline
-          Guardrail      if the true amplitude were zero, displacement would still
-                         be certified 100.0% of the time -- the "amplitude CI
-                         excludes zero" rule is far weaker than the 2.5% error rate
-                         its wording suggests
-        Verdict: CAUTION -- the interpretability guardrail provides almost no
-        protection against a truly zero amplitude. Elevation, amplitude, and
-        certified displacement coverage rates are borderline at this number of
-        replications; a larger `reps` would sharpen the verdict. Consider a larger
-        sample or treat near-zero amplitudes as inconclusive rather than absent.
+          Guardrail      under a truly zero amplitude, displacement would be
+                         certified 0.0% of the time (user-expectation benchmark
+                         2.5%)
+        Verdict: BORDERLINE -- elevation, amplitude, and certified displacement
+        coverage rates are borderline at this number of replications; a larger
+        `reps` would sharpen the verdict.
 
 ---
 
@@ -33,7 +30,7 @@
       Amplitude Ladder:	 1 0.25 0 
       Population Structure:	 Browne circular model (CPM) 
       Group Sizes:		 All = 120 
-      Certification Rule:	 round(a_lci, 3) > 0 (threshold 0.0005 amplitude units) 
+      Certification Rule:	 a_lci / (a_uci - a_lci) >= 0.35 (scale-free, print-independent) 
       Elapsed:		<masked>
       
       Structure note: population simulated from a Browne circular model fit (m = 3,
@@ -51,15 +48,12 @@
           Elevation      coverage 100.0% -- borderline
           Amplitude      coverage 96.7% -- borderline
           Displacement   coverage 93.3% when certified -- borderline
-          Guardrail      if the true amplitude were zero, displacement would still
-                         be certified 100.0% of the time -- the "amplitude CI
-                         excludes zero" rule is far weaker than the 2.5% error rate
-                         its wording suggests
-        Verdict: CAUTION -- the interpretability guardrail provides almost no
-        protection against a truly zero amplitude. Elevation, amplitude, and
-        certified displacement coverage rates are borderline at this number of
-        replications; a larger `reps` would sharpen the verdict. Consider a larger
-        sample or treat near-zero amplitudes as inconclusive rather than absent.
+          Guardrail      under a truly zero amplitude, displacement would be
+                         certified 0.0% of the time (user-expectation benchmark
+                         2.5%)
+        Verdict: BORDERLINE -- elevation, amplitude, and certified displacement
+        coverage rates are borderline at this number of replications; a larger
+        `reps` would sharpen the verdict.
       
       Coverage by profile, parameter, and amplitude condition:
        Profile Parameter Condition Coverage MC_se Left_miss Right_miss Median_width
@@ -88,7 +82,7 @@
                          NA            NA      FALSE     30
                          NA            NA      FALSE     30
                          NA            NA      FALSE     30
-                      0.933            30      FALSE     30
+                      0.818            11      FALSE     30
                          NA            NA      FALSE     30
                          NA            NA      FALSE     30
                          NA            NA      FALSE     30
@@ -100,14 +94,14 @@
         near-zero rungs are the small c > 0 ones.
       
       Guardrail operating characteristics:
-       Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Threshold
-           All      1.00         1    0.886        1     0.025      NA     5e-04
-           All      0.25         1    0.886        1     0.025      NA     5e-04
-           All      0.00         1    0.886        1     0.025    TRUE     5e-04
-       Fit_pass_rate Branch_pathology_rate N_reps
-                   1                     0     30
-                   0                     0     30
-                   0                     0     30
+       Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Fit_pass_rate
+           All      1.00     1.000    0.886    1.000     0.025      NA             1
+           All      0.25     0.367    0.219    0.545     0.025      NA             0
+           All      0.00     0.000    0.000    0.114     0.025   FALSE             0
+       Branch_pathology_rate N_reps
+                           0     30
+                           0     30
+                           0     30
 
 # contrast print block reports displacement unconditionally (M15 snapshot)
 
@@ -123,12 +117,11 @@
                          on both sides of the interval)
           Displacement   coverage 83.3% when certified -- borderline
           Guardrail      if the true amplitude were zero, displacement would still
-                         be certified 100.0% of the time -- the "amplitude CI
-                         excludes zero" rule is far weaker than the 2.5% error rate
-                         its wording suggests
+                         be certified 16.7% of the time -- far more often than the
+                         2.5% error rate the guardrail's wording suggests
         Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this
-        sample size and the interpretability guardrail provides almost no
-        protection against a truly zero amplitude. Elevation and certified
+        sample size and the interpretability guardrail certifies a truly zero
+        amplitude more often than its wording suggests. Elevation and certified
         displacement coverage rates are borderline at this number of replications;
         a larger `reps` would sharpen the verdict. Consider a larger sample or
         treat near-zero amplitudes as inconclusive rather than absent.
@@ -141,13 +134,12 @@
           Displacement   coverage 66.7% when certified -- INADEQUATE
                          (under-coverage)
           Guardrail      if the true amplitude were zero, displacement would still
-                         be certified 100.0% of the time -- the "amplitude CI
-                         excludes zero" rule is far weaker than the 2.5% error rate
-                         its wording suggests
+                         be certified 16.7% of the time -- far more often than the
+                         2.5% error rate the guardrail's wording suggests
         Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this
         sample size, displacement CIs mis-cover even when certified, and the
-        interpretability guardrail provides almost no protection against a truly
-        zero amplitude. Elevation coverage is borderline at this number of
+        interpretability guardrail certifies a truly zero amplitude more often than
+        its wording suggests. Elevation coverage is borderline at this number of
         replications; a larger `reps` would sharpen the verdict. Consider a larger
         sample or treat near-zero amplitudes as inconclusive rather than absent.
       

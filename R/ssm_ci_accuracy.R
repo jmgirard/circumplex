@@ -29,10 +29,12 @@
 #' handled without special-casing. Because displacement is only interpreted
 #' when the printed amplitude guardrail certifies it, displacement coverage is
 #' also reported conditional on certification under the shipped decision rule
-#' `round(a_lci, digits) > 0` (the rule the printed [ssm_analyze()] output
-#' applies); the
-#' implied certification threshold, `0.5 * 10^-digits` in amplitude units, is
-#' echoed in the output because it is scale-dependent. A contrast row is a
+#' `a_lci / (a_uci - a_lci) >= 0.35` (the rule the printed [ssm_analyze()]
+#' output applies): the amplitude CI's lower bound must sit at least 0.35 CI
+#' widths above zero. The rule is scale-free (invariant to the score metric)
+#' and print-independent, so no scale-dependent threshold is reported; the
+#' 0.35 constant is calibrated for the default 95% confidence interval. A
+#' contrast row is a
 #' signed difference, not a prototypicality measure, so
 #' `print.circumplex_ssm()` never certification-gates it; its displacement
 #' verdict and printed coverage are therefore reported unconditionally
@@ -85,9 +87,6 @@
 #'   created before sufficient statistics were stored at analysis time; the
 #'   statistics are then recomputed and checked against the stored profile
 #'   vectors.
-#' @param digits Optional. The rounding digits of the certification rule
-#'   `round(a_lci, digits) > 0` (default = 3, matching the printed
-#'   [ssm_analyze()] output).
 #' @param parallel Optional. `"no"` (default), `"multicore"`, or `"snow"`;
 #'   distributes the simulation replicates across `ncpus` cores. Results are
 #'   identical for a given seed regardless of these settings (see
@@ -107,7 +106,7 @@
 #'   stored false-certification caution decision at the `c = 0` rung
 #'   (`Caution`, true when the Wilson lower bound exceeds the benchmark;
 #'   `NA` off that rung, and `NA` for a contrast row, which
-#'   `print.circumplex_ssm()` never gates), the implied threshold, fit-pass
+#'   `print.circumplex_ssm()` never gates), fit-pass
 #'   rate, and the
 #'   branch-pathology rate -- the rate at which a displacement point estimate
 #'   falls geometrically outside its own interval), `verdict`
@@ -175,7 +174,7 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
                             amplitude_factors = c(1, 0.5, 0.25, 0),
                             structure = c("cpm", "observed"),
                             m = NULL, cpm = NULL, data = NULL,
-                            digits = 3, parallel = "no", ncpus = 1) {
+                            parallel = "no", ncpus = 1) {
 
   call <- match.call()
   t_start <- proc.time()[["elapsed"]]
@@ -204,9 +203,14 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
   structure <- match.arg(structure)
   stopifnot(is.null(m) || is_scalar_count(m))
   stopifnot(is.null(cpm) || inherits(cpm, "circumplex_cpm"))
-  stopifnot(is_scalar_count(digits, min = 0L))
   parallel <- match.arg(parallel, c("no", "multicore", "snow"))
   stopifnot(is_scalar_count(ncpus))
+  # The dimensionless certification constant, single-sourced from the rule it
+  # measures (ssm_certified, R/ssm_oop.R): r = a_lci/(a_uci - a_lci) >= rule_k
+  # (D-007). Echoed in the summary header; the rule is print-independent and
+  # scale-free, so there is no scale-dependent threshold to report. (Named
+  # rule_k, not cert_k -- the loop below reuses cert_k for a certified count.)
+  rule_k <- eval(formals(ssm_certified)$k)
 
   # ---- unpack the analysis to be assessed ----
   dts <- ssm_object$details
@@ -561,7 +565,7 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
         # number -- it only populates the retained `Coverage_conditional` /
         # `Cert_rate` object columns (documented joint-certification
         # descriptives). Its guardrail Caution is NA'd below.
-        cert <- ssm_certified(lean$lci[, a_col], digits)
+        cert <- ssm_certified(lean$lci[, a_col], lean$uci[, a_col])
         if (contrast) cert[n_rows] <- cert[1] && cert[2]
         fitpass <- !is.na(t0_all[, fit_col]) & t0_all[, fit_col] >= 0.70
         if (contrast) fitpass[n_rows] <- NA
@@ -722,7 +726,6 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
       Cert_uci = cert_w[, 2],
       Benchmark = (1 - interval) / 2,
       Caution = caution_col,
-      Threshold = 0.5 * 10^-digits,
       Fit_pass_rate = rate(fitp_m),
       Branch_pathology_rate = rate(branch_m),
       N_reps = cert_n,
@@ -790,8 +793,7 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     score_type = dts$score_type,
     contrast = contrast,
     angles = dts$angles,
-    digits = digits,
-    threshold = 0.5 * 10^-digits,
+    cert_k = rule_k,
     n = n_g,
     row_n = row_n,
     max_psd_delta = max(vapply(pop_cond, function(pc) max(pc$deltas),

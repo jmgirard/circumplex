@@ -51,6 +51,20 @@ confidence intervals can be trusted at your sample size and profile
 (Zimmermann & Wright, 2017). See the new vignette, "Evaluating Circumplex
 Structure", for a worked introduction to both.
 
+* The displacement-interpretability guardrail in `print()` and `summary()`
+  now uses a scale-free rule: a profile's displacement is certified as
+  interpretable only when the amplitude confidence interval's lower bound sits
+  at least 0.35 interval-widths above zero. This replaces the rule introduced
+  in 1.2.0, which certified whenever the lower bound rounded above zero at the
+  display precision — a threshold that moved with the print `digits` and meant
+  different things on different score metrics, and that (as the new
+  `ssm_ci_accuracy()` diagnostic makes visible) certified a genuinely zero
+  amplitude almost every time. The new rule holds false-certification near the
+  interval's one-sided error rate regardless of scale or display settings. As a
+  result, some near-zero-amplitude profiles that were previously certified are
+  now flagged uninterpretable. The threshold is calibrated for the default 95%
+  confidence interval.
+
 * New vignette, "Evaluating Circumplex Structure": how to test whether an
   instrument fits a circumplex in your sample with `cpm_fit()` (reading and
   benchmarking the fit indices, comparing the constrained model variants,
@@ -80,7 +94,7 @@ Structure", for a worked introduction to both.
   populations with the amplitude scaled toward zero, where percentile
   amplitude intervals are theoretically weakest — along with one-sided miss
   rates, interval widths, the certification rate of the printed
-  "amplitude CI excludes zero" guardrail, and displacement coverage
+  displacement-interpretability guardrail, and displacement coverage
   conditional on certification. For a contrast row — a signed difference that
   `print.circumplex_ssm()` never certification-gates — the displacement
   verdict and printed coverage are reported unconditionally, matching that
@@ -88,10 +102,10 @@ Structure", for a worked introduction to both.
   a descriptive). Coverage at the as-estimated condition is
   classified against Bradley's (1978) liberal robustness band using 95%
   Wilson score intervals, and `print()`/`summary()` translate the
-  classifications into a plain-language verdict, including a caution line
-  measuring how often the guardrail would still certify displacement if the
-  true amplitude were zero (theory predicts far more often than the
-  interval's wording suggests). `summary()` also annotates the realism of
+  classifications into a plain-language verdict, including a line reporting
+  how often the guardrail would certify displacement if the true amplitude
+  were zero (the scale-free rule holds this near the interval's one-sided
+  error rate, and a caution is raised only if it materially exceeds that). `summary()` also annotates the realism of
   the simulated population (structural-model convergence and fit, against
   conventional RMSEA/SRMR benchmarks with citations) and, when an amplitude
   estimate is itself below half its CI width, notes that the analysis
