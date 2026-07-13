@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-12 (M17/M18 CIRCUM planned; M7 re-pointed to M18, date-block removed per D-008; stale CPM-"reproduced" candidate struck)_
+_Last hygiene check: 2026-07-13 (M17 done → archived, GO on CIRCUM free-scaling per D-009; M18 now unblocked; pruned M12 to hold 5-row terminal retention)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -11,12 +11,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M18 | high | milestones/M7-v2-release-prep.md |
 | M18 | CIRCUM free-scaling — implementation + oracle validation | planned | M17 | high | milestones/M18-circum-free-scaling-build.md |
-| M17 | CIRCUM free-scaling — Fable-reviewed design decision + spec | review | — | high | milestones/M17-circum-free-scaling-design.md |
+| M17 | CIRCUM free-scaling — Fable-reviewed design decision + spec | done | — | high | milestones/archive/M17-circum-free-scaling-design.md |
 | M16 | Print-independent, scale-free displacement-certification rule | done | — | high | milestones/archive/M16-cert-rule-replacement.md |
 | M15 | Contrast certification-conditional reporting consistency (ci_accuracy ↔ print) | done | — | normal | milestones/archive/M15-contrast-cert-consistency.md |
 | M14 | Automate the instruments() list | done | — | normal | milestones/archive/M14-instruments-list-automation.md |
 | M13 | Angle-class S3 follow-ups (RR01) | done | — | normal | milestones/archive/M13-angle-class-s3-followups.md |
-| M12 | Result-label DRY + statistical-core coverage tracking | done | — | normal | milestones/archive/M12-label-dry-coverage.md |
 
 ## Candidates
 
