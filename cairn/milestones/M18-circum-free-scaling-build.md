@@ -7,7 +7,7 @@
 - **Priority:** high
 - **Depends on:** M17
 - **Principles touched:** — (no formal IP/GP ids yet; works under DESIGN.md "Statistical conventions" and "CPM confidence intervals: measured coverage")
-- **Branch/PR:** m18-circum-free-scaling / —
+- **Branch/PR:** m18-circum-free-scaling / #42
 
 ## Goal
 
@@ -39,22 +39,22 @@ published CIRCUM/CircE solution.
 
 ## Acceptance criteria
 
-- [ ] `cpm_fit(..., scaling = "free")` fits the covariance family and returns
+- [x] `cpm_fit(..., scaling = "free")` fits the covariance family and returns
       σ̂; a regression test in `tests/testthat/test-cpm_fit.R` exercises the path
       end-to-end. (AC1 wording amended 2026-07-13: `scaling = c("unit","free")`
       per spec §7, superseding the plan's `free_scaling = TRUE`.)
-- [ ] Reproduces the OpenMx free-scaling oracle to the tolerance fixed by the
+- [x] Reproduces the OpenMx free-scaling oracle to the tolerance fixed by the
       M17 spec, in `tests/testthat/test-cpm_oracles.R` (the free-scaling OpenMx
       transcription already present there is the oracle).
-- [ ] Reproduces the published Grassi et al. (2010, Appendix A) CircE solution
+- [x] Reproduces the published Grassi et al. (2010, Appendix A) CircE solution
       to its printed precision (ζ/β to 4 decimals, angles to ~0.01°, F̂ per the
       §11 nesting/allowance protocol) — test in `test-cpm_oracles.R`.
       Source: Grassi et al. (2010), Appendix A.
-- [ ] The free-family analytic gradient agrees with finite differences to the
+- [x] The free-family analytic gradient agrees with finite differences to the
       spec tolerance at ≥ 50 random feasible points, and the boundary suite
       (peak at 0/360; flat) passes on the free-scaling path — tests in
       `test-cpm_fit.R` / `test-cpm_boundary.R`.
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
       `devtools::test()` green (run with `NOT_CRAN=true`, per M16 lesson).
 
 ## Coverage
@@ -140,3 +140,31 @@ published CIRCUM/CircE solution.
   no analytic CI ever (spec §4). Jeff, 2026-07-13.
 
 ## Review
+
+**AC evidence (fresh, 2026-07-13; OpenMx live, `NOT_CRAN=true`).** CPM suites:
+test-cpm_fit.R 294 pass, test-cpm_oracles.R 102 pass, test-cpm_boundary.R 9
+pass — 0 fail / 0 skip.
+
+- **AC1** — PASS. `test-cpm_fit.R` "free-scaling cpm_fit end-to-end: VarRatio
+  column, no CI, df unchanged" + "unit-scaling cpm_fit is unchanged": free path
+  returns σ̂ (VarRatio = σ̂²), unit path bit-identical (no VarRatio, σ≡1).
+- **AC2** — PASS. `test-cpm_oracles.R` "free-scaling live oracle: our engine
+  agrees with OpenMx free-scaling" (OpenMx CSOLNP live): θ/ζ/β agree; σ̂² offset
+  = exactly (N−1)/N, F̂ to 5e-4.
+- **AC3** — PASS. `test-cpm_oracles.R` "free-scaling frozen oracle: our engine
+  reproduces Grassi App. A" (angles ≤0.01°, ζ/β/σ² to printed precision,
+  F̂/χ²/RMSEA/RMSEA-CI/CFI/TLI/SRMR-converted) + "fixed-grid (variant B)
+  reproduces Table 2 model 3c".
+- **AC4** — PASS. `test-cpm_fit.R` "free-scaling analytic gradient matches
+  central FD at >= 50 points" (55 feasible pts incl pole/near-equal/non-unit-
+  diagonal/polished; err ≤1e-7) + σ=1 legacy identity (exact) + boundary suite
+  `test-cpm_boundary.R` (class A pole recovery, class D flat/singular refusal).
+- **AC5** — PASS. `devtools::check(args="--no-manual")` `NOT_CRAN=true`:
+  **0 errors / 0 warnings / 0 notes**; full `test()` green.
+
+**Consistency gate (by command).** `cairn_validate.py` exit 0 (all 15 checks
+PASS incl coverage-complete, mirror, single in-progress, caps). Coverage map:
+AC1→T2,T3 · AC2→T4 · AC3→T4 · AC4→T1,T5 · AC5→T6 — every criterion maps to an
+existing task. No DESIGN.md principle changed → `cairn_impact` N/A. Toolchain
+(r-package consistency-gate): R CMD check 0/0/0, roxygen/NAMESPACE regenerated
+and committed.
