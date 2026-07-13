@@ -112,7 +112,8 @@ also reported conditional on certification under the shipped decision rule
 \code{a_lci / (a_uci - a_lci) >= 0.35} (the rule the printed \code{\link[=ssm_analyze]{ssm_analyze()}}
 output applies): the amplitude CI's lower bound must sit at least 0.35 CI
 widths above zero. The rule is scale-free (invariant to the score metric)
-and print-independent, so no scale-dependent threshold is reported. A
+and print-independent, so no scale-dependent threshold is reported; the
+0.35 constant is calibrated for the default 95\% confidence interval. A
 contrast row is a
 signed difference, not a prototypicality measure, so
 \code{print.circumplex_ssm()} never certification-gates it; its displacement

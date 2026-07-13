@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M16: Print-independent, scale-free displacement-certification rule
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** high   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Principles touched:** —   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
@@ -129,7 +129,7 @@ output — propagated consistently across every certification surface, in time f
       (certified)" panel) and the vignette wording
       (`vignettes/evaluating-circumplex-structure.Rmd:245,313,359`); refresh
       snapshots; add the cross-surface consistency test (AC5).
-- [ ] **T7** — NEWS entry (behavior change + the near-zero flip), docs/pkgdown
+- [x] **T7** — NEWS entry (behavior change + the near-zero flip), docs/pkgdown
       consistency, a doc sentence pinning k=0.35 to interval=0.95 (k(interval)
       generalization noted-but-deferred, D-007), full `devtools::check()`
       (AC6, AC7).
@@ -137,6 +137,14 @@ output — propagated consistently across every certification surface, in time f
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T7 done → status **review**. NEWS bullet documents the behavior
+  change (scale-free rule replacing the 1.2.0 round-based guardrail + the
+  near-zero flip) and the dev-section `ssm_ci_accuracy` descriptions updated off
+  the old-rule wording; doc sentence pins k=0.35 to the 95% interval. Full
+  `devtools::check(--no-manual)` clean: 0 errors / 0 warnings / 0 notes. No new
+  exports (rule helper internal; `ssm_ci_accuracy` already in pkgdown), so no
+  `_pkgdown.yml` change. All seven tasks complete; ACs left unticked for the
+  review gate (AC fencing).
 - 2026-07-12: T6 done. Rewrote the certification wording across the vignettes
   (`evaluating-circumplex-structure.Rmd` guardrail intro + margin-rung + table
   bullets + the two-profile narrative, now reflecting that the scale-free rule
