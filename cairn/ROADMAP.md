@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-13 (M18 done → archived; free scaling shipped into v2.0.0 dev line; M7 now unblocked; pruned M13 to hold 5-row terminal retention)_
+_Last hygiene check: 2026-07-13 (surfaced M18's four deferred free-scaling extensions as one grouped candidate — coverage oracle is a pre-ship gate; M18 done → archived; M7 unblocked)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -24,3 +24,4 @@ _Candidates carry no milestone ID — an `M<NN>` is assigned only at planning ti
 - Post-M4 publication-grade simulation study design (legacy ROADMAP M4/M5 blocks; Fable-tier). This is a research-paper track — the CPM simulation paper engine is already written in `devel/cpm-sim/` (reviewed, not yet run), separate from any package milestone. _(contrast certification consistency promoted → M15; guardrail cert-rule replacement → M16; CIRCUM free-scaling promoted → M17/M18 per D-008; "CPM convergence-acceptance vacuous reproduced" struck — already fixed in M4 review #1, tested at `test-cpm_fit.R:595`, 2026-07-12.)_
 - Continuous / infrastructure refactors (fold into the milestone that next touches the code): 0-vs-360 pole-snap alignment (cosmetic, D-003 parked); analytic-CI Hessian recomputation (minor perf; oracle-validate when done) (legacy ROADMAP "Continuous / infrastructure track" + deferred `/code-review` findings). _(vctrs/S7 angle-class migration dropped 2026-07-12 → D-006, RR01.)_
 - Strict-tier syntax *emission* single-sourcing across the single/multi-group branches in `R/ssm_sem_syntax.R` (descoped from M8 T4, 2026-07-12): the two emitters are structurally distinct (plain vs `c()`-vector cross-group labels) and byte-pinned by `exp_strict_*` snapshots — a high-risk rewrite of statistical output for minor DRY gain. Revisit only if that emitter is reworked for another reason.
+- CIRCUM free-scaling post-v2.0.0 extensions (deferred out of M18; see `milestones/archive/M18-circum-free-scaling-build.md` + D-009): (1) **free-family coverage oracle** — the simulation-coverage oracle validating analytic-CI coverage for `scaling = "free"`, a pre-ship gate that M18-D3 replaced with an unconditional caution on free+analytic CIs; (2) bootstrap σ CIs; (3) T_diag-vs-T_free calibration; (4) covariance-matrix input. The point-estimate oracle (frozen Grassi App. A + live OpenMx) already shipped in M18. Promote (1) to a milestone before any free-family CI is presented as coverage-validated.
