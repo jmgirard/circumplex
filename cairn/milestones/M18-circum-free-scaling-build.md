@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M18: CIRCUM free-scaling — implementation + oracle validation
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M17
 - **Principles touched:** — (no formal IP/GP ids yet; works under DESIGN.md "Statistical conventions" and "CPM confidence intervals: measured coverage")
-- **Branch/PR:** —
+- **Branch/PR:** m18-circum-free-scaling / —
 
 ## Goal
 
