@@ -309,7 +309,8 @@ test_that("end-to-end run on octant data: object contract (sec. 7)", {
   expect_true(all(e1$Coverage > 0.5))
 
   gr <- res$guardrail
-  expect_equal(unique(gr$Threshold), 0.5 * 10^-3)
+  # The scale-free rule (D-007) has no scale-dependent threshold column.
+  expect_false("Threshold" %in% names(gr))
   expect_equal(unique(gr$Benchmark), 0.025)
   expect_true(all(gr$Cert_rate >= 0 & gr$Cert_rate <= 1, na.rm = TRUE))
 
@@ -491,11 +492,9 @@ test_that("input validation rejects bad arguments", {
   expect_error(ssm_ci_accuracy(obj, reps = 0))
   expect_error(ssm_ci_accuracy(obj, amplitude_factors = c(0.5, 0)), "1")
   expect_error(ssm_ci_accuracy(obj, amplitude_factors = c(1, 2)))
-  expect_error(ssm_ci_accuracy(obj, digits = -1))
   expect_error(ssm_ci_accuracy(obj, parallel = "bogus"))
   # scalar-count args reject length > 1 (is_scalar_count, M10 D-005)
   expect_error(ssm_ci_accuracy(obj, reps = c(5, 10)))
-  expect_error(ssm_ci_accuracy(obj, digits = c(1, 2)))
 })
 
 # ==== Z2: amplitude-near-zero module + verdict (spec sec. 4-5, sec. 10) =======
@@ -551,14 +550,15 @@ test_that("known-good oracle: healthy elevation CIs are classified adequate", {
 
 # ---- sec. 10 known-bad direction oracle ----------------------------------------
 
-test_that("known-bad direction oracle: near-zero amplitude under-covers, misses below; c = 0 false-certifies above benchmark", {
+test_that("known-bad direction oracle: near-zero amplitude under-covers, misses below; scale-free rule controls c = 0 false-certification", {
   # At a small c > 0 rung (NOT c = 0, where amplitude coverage is a theorem,
   # not a measurement -- sec. 4.2) the nonnegative, upward-biased amplitude
   # estimator makes percentile CIs sit above a small truth: coverage must fall
   # below nominal (one-sided binomial test) with misses concentrated on the
-  # truth-below-interval side. At c = 0 the shipped guardrail's
-  # false-certification rate must exceed the alpha/2 user-expectation
-  # benchmark (directional only; no magnitude is pinned -- oracle rule).
+  # truth-below-interval side. At c = 0 the scale-free rule (D-007) must NOT
+  # over-certify a truly zero amplitude: unlike the superseded
+  # round(a_lci, digits) > 0 rule (false-cert ~ 1.000), its c = 0 rate is small
+  # and the Wilson-LCI Caution does not fire (directional oracle; D-007).
   skip_on_cran()
   theta <- deg2rad(as.numeric(octants()))
   set.seed(1101)
@@ -580,7 +580,10 @@ test_that("known-bad direction oracle: near-zero amplitude under-covers, misses 
   expect_gt(arow$Left_miss, arow$Right_miss)
 
   g0 <- res$guardrail[res$guardrail$Condition == 0, ]
-  expect_gt(g0$Cert_lci, g0$Benchmark)
+  # The superseded rule sat at Cert_rate ~ 1.000 here; the scale-free rule
+  # drives it far down (well below the old pathology) and the Caution stays off.
+  expect_lt(g0$Cert_rate, 0.2)
+  expect_false(isTRUE(g0$Caution))
 })
 
 # ---- sec. 10 boundary: branch pathology manufactured at a small-c rung --------
@@ -768,13 +771,13 @@ test_that("summary() carries the false-certification caution and wording bar", {
                          structure = "observed")
   # Whitespace normalized: the wrapped verdict lines may break mid-phrase
   out <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
-  # The false-certification caution line is present (theory predicts the
-  # rate far exceeds the benchmark at this configuration)
-  expect_match(out, "if the true amplitude were zero")
-  # The user-expectation benchmark is named as such, never as a nominal level
-  expect_match(out, "its wording suggests")
-  # Wording bar (sec. 5.2): an angular CI excluding 0 is never described as
-  # a significance test, anywhere in the printed verdict
+  # Under the scale-free rule (D-007) this config no longer over-certifies at
+  # c = 0, so the guardrail line takes its benign branch: a plain report of the
+  # zero-amplitude certification rate against the user-expectation benchmark.
+  expect_match(out, "under a truly zero amplitude, displacement would be certified")
+  expect_match(out, "user-expectation benchmark")
+  # Wording bar (sec. 5.2): an angular CI is never described as a significance
+  # test, anywhere in the printed verdict
   expect_false(grepl("significan", out, ignore.case = TRUE))
   # Structural c = 0 note present
   expect_match(out, "structurally")
@@ -783,6 +786,16 @@ test_that("summary() carries the false-certification caution and wording bar", {
   expect_match(pout, "Elevation")
   expect_match(pout, "Verdict")
   expect_false(grepl("significan", pout, ignore.case = TRUE))
+
+  # Fired branch (presentation path): the scale-free rule is calibrated not to
+  # over-certify, so force the stored Caution to confirm the caution wording
+  # still renders when a guardrail does fire.
+  fired <- res
+  fired$guardrail$Caution[fired$guardrail$Condition == 0] <- TRUE
+  fout <- gsub("\\s+", " ", paste(capture.output(summary(fired)), collapse = " "))
+  expect_match(fout, "if the true amplitude were zero")
+  expect_match(fout, "the guardrail's wording suggests")
+  expect_false(grepl("significan", fout, ignore.case = TRUE))
 })
 
 test_that("print and summary snapshots (seeded)", {

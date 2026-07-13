@@ -12,7 +12,6 @@ ssm_ci_accuracy(
   m = NULL,
   cpm = NULL,
   data = NULL,
-  digits = 3,
   parallel = "no",
   ncpus = 1
 )
@@ -47,10 +46,6 @@ created before sufficient statistics were stored at analysis time; the
 statistics are then recomputed and checked against the stored profile
 vectors.}
 
-\item{digits}{Optional. The rounding digits of the certification rule
-\code{round(a_lci, digits) > 0} (default = 3, matching the printed
-\code{\link[=ssm_analyze]{ssm_analyze()}} output).}
-
 \item{parallel}{Optional. \code{"no"} (default), \code{"multicore"}, or \code{"snow"};
 distributes the simulation replicates across \code{ncpus} cores. Results are
 identical for a given seed regardless of these settings (see
@@ -73,7 +68,7 @@ interval, the user-expectation benchmark \code{(1 - interval) / 2}, the
 stored false-certification caution decision at the \code{c = 0} rung
 (\code{Caution}, true when the Wilson lower bound exceeds the benchmark;
 \code{NA} off that rung, and \code{NA} for a contrast row, which
-\code{print.circumplex_ssm()} never gates), the implied threshold, fit-pass
+\code{print.circumplex_ssm()} never gates), fit-pass
 rate, and the
 branch-pathology rate -- the rate at which a displacement point estimate
 falls geometrically outside its own interval), \code{verdict}
@@ -114,10 +109,11 @@ as an arc (membership modulo 360 degrees), so populations peaking at the
 handled without special-casing. Because displacement is only interpreted
 when the printed amplitude guardrail certifies it, displacement coverage is
 also reported conditional on certification under the shipped decision rule
-\code{round(a_lci, digits) > 0} (the rule the printed \code{\link[=ssm_analyze]{ssm_analyze()}} output
-applies); the
-implied certification threshold, \code{0.5 * 10^-digits} in amplitude units, is
-echoed in the output because it is scale-dependent. A contrast row is a
+\code{a_lci / (a_uci - a_lci) >= 0.35} (the rule the printed \code{\link[=ssm_analyze]{ssm_analyze()}}
+output applies): the amplitude CI's lower bound must sit at least 0.35 CI
+widths above zero. The rule is scale-free (invariant to the score metric)
+and print-independent, so no scale-dependent threshold is reported. A
+contrast row is a
 signed difference, not a prototypicality measure, so
 \code{print.circumplex_ssm()} never certification-gates it; its displacement
 verdict and printed coverage are therefore reported unconditionally

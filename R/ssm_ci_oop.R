@@ -128,9 +128,8 @@ ssm_ci_verdict_blocks <- function(x) {
         paste0(
           "if the true amplitude were zero, displacement would still be ",
           "certified ", ssm_ci_pct(guard_rate),
-          " of the time -- the \"amplitude CI excludes zero\" rule is far ",
-          "weaker than the ", ssm_ci_pct(gr0$Benchmark),
-          " error rate its wording suggests"
+          " of the time -- far more often than the ", ssm_ci_pct(gr0$Benchmark),
+          " error rate the guardrail's wording suggests"
         )
       } else {
         paste0(
@@ -415,8 +414,8 @@ summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
     else "observed correlations",
     "\nGroup Sizes:\t\t", paste0(names(d$n), " = ", d$n, collapse = ", "),
     "\nCertification Rule:\t",
-    paste0("round(a_lci, ", d$digits, ") > 0 (threshold ",
-           format(d$threshold, scientific = FALSE), " amplitude units)"),
+    paste0("a_lci / (a_uci - a_lci) >= ", d$cert_k,
+           " (scale-free, print-independent)"),
     "\nElapsed:\t\t", round(d$elapsed, 1), "s\n\n",
     sep = " "
   )
@@ -469,9 +468,6 @@ summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
   }
   cat("\nGuardrail operating characteristics:\n")
   gr <- round_numeric(object$guardrail)
-  # The certification threshold (0.5 * 10^-digits amplitude units) would
-  # round to 0 at the display precision; keep it exact
-  gr$Threshold <- object$guardrail$Threshold
   print(gr, row.names = FALSE)
   invisible(object)
 }

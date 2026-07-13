@@ -115,7 +115,7 @@ output — propagated consistently across every certification surface, in time f
       to pass `dat$a_uci`, and rewrite the note wording (`R/ssm_oop.R:185`)
       from "amplitude CI includes zero" to a lower-bound-relative-to-width
       phrasing (never a significance-test framing).
-- [ ] **T5** — Verify via `ssm_ci_accuracy()` (AC4, D-007 two-part gate):
+- [x] **T5** — Verify via `ssm_ci_accuracy()` (AC4, D-007 two-part gate):
       false-cert@c=0 ≤ 0.05 AND Wilson-LCI `Caution` not firing, at reps=1000
       across COR_healthy / COR_nearzero / RAW_means + one small-n (≈100) config;
       record the c>0 power curve. Cross-check against the closed-form
@@ -137,6 +137,20 @@ output — propagated consistently across every certification surface, in time f
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T5 done. AC4 two-part gate PASSES at reps=1000 across all five
+  configs (COR_healthy/nearzero, RAW_means, RAW/COR small-n): false-cert@c=0
+  0.008–0.023 (all ≤0.05, below the 0.025 benchmark), Caution never fires;
+  the closed-form Rayleigh oracle (0.0039) agrees as the 2nd type
+  (`devel/m16-cert-rule-verify.{R,rds,md}`). Removed the vestigial `digits`
+  arg + `Threshold` column from `ssm_ci_accuracy()` (clean removal — unreleased),
+  echo the dimensionless `k` in the summary header, rewrote the guardrail
+  caution wording off the "amplitude CI excludes zero" phrasing. Caught+fixed a
+  scope bug: my `cert_k` echo constant collided with the loop's certified-count
+  `cert_k` (renamed `rule_k`); affected only the cosmetic echo, not the
+  certification, so the verification numbers stand. Refreshed the `ci_accuracy`
+  snapshot (all changes explained by the rule); `test-ssm_oop`/`test-ci_accuracy`
+  green. Two behavior tests re-pointed from the old over-certification pathology
+  to the fixed behavior.
 - 2026-07-12: T4 done. `ssm_certified(a_lci, a_uci, k = 0.35)` implements
   D-007 (`is.finite(r) & r >= k`, `r = a_lci/(a_uci-a_lci)`); print note
   reworded to the CI-lower-bound-vs-width phrasing; both call sites
