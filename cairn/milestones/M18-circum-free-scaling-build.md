@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M18: CIRCUM free-scaling — implementation + oracle validation
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M17
 - **Principles touched:** — (no formal IP/GP ids yet; works under DESIGN.md "Statistical conventions" and "CPM confidence intervals: measured coverage")
@@ -99,9 +99,13 @@ published CIRCUM/CircE solution.
       pattern; class D singular/zero-variance/near-flat refusal fail-closed).
       B is the shared circular-quantile engine (σ orthogonal to angles); C is
       not a CPM estimand. boundary-coverage.md row + audit note added.
-- [ ] **T6** — `devtools::document()` (if the API surface changed), full
+- [x] **T6** — `devtools::document()` (if the API surface changed), full
       `devtools::check()` + `devtools::test()` (`NOT_CRAN=true`); NEWS entry for
-      the new `free_scaling` argument.
+      the new `scaling` argument. Done 2026-07-13: docs regenerated (`scaling`
+      param in cpm_fit.Rd); NEWS entry (scaling="free"/VarRatio; CIRCUM/CircE
+      now reproducible); design-doc debt cleared (m4-browne-design.md §3.2
+      correction + §6.3 SRMR conversion). `check()` clean: 0 errors / 0 warnings
+      / 0 notes (`NOT_CRAN=true`); full `test()` green.
 
 ## Work log
 
@@ -113,6 +117,9 @@ published CIRCUM/CircE solution.
   synced master. Question gate settled (see Decisions M18-D1..D3).
 - 2026-07-13 (amendment, minor): AC1 wording `free_scaling = TRUE` →
   `scaling = "free"` per spec §7 (M18-D1).
+- 2026-07-13: all tasks done; status → review. Free-scaling covariance family
+  reproduces published CircE fit to printed precision (F̂/χ²/RMSEA/CFI/TLI/σ²);
+  FD gradient err 2.4e-9; check clean 0/0/0 (NOT_CRAN); full test() green.
 
 ## Decisions
 

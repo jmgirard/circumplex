@@ -233,7 +233,7 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
         "\n  Note: analytic (Wald) confidence intervals for the free-scaling ",
         "family have not\n  been coverage-validated; interpret them with ",
         "caution and prefer the bootstrap\n  on the raw-data path when ",
-        "available. The variance ratios (σ²) carry no interval.\n",
+        "available. The variance ratios (\u03c3\u00b2) carry no interval.\n",
         sep = ""
       )
     } else if (d$N < cpm_analytic_ci_n_caution) {
