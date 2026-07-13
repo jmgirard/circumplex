@@ -7,7 +7,7 @@
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** — (no formal IP/GP ids yet; works under DESIGN.md "Statistical conventions" and "CPM confidence intervals: measured coverage")
-- **Branch/PR:** m17-circum-free-scaling-design
+- **Branch/PR:** m17-circum-free-scaling-design · PR #41
 
 ## Goal
 
@@ -48,14 +48,14 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
 
 ## Acceptance criteria
 
-- [ ] A self-contained Review Brief escalating the free-scaling design (with the
+- [x] A self-contained Review Brief escalating the free-scaling design (with the
       (a)–(e) targets above) exists, and its Review Report is ingested under
       `cairn/reviews/` — evidence: the RB and RR files.
-- [ ] A `cairn/DECISIONS.md` entry records the Fable-attested go/no-go on the
+- [x] A `cairn/DECISIONS.md` entry records the Fable-attested go/no-go on the
       second fitted family, with rationale weighing reproduction value against a
       second estimation family. (No-go is a valid outcome: it retires M18 and the
       CIRCUM candidate.)
-- [ ] **If go:** a written spec exists specifying, at implementable detail: the σ
+- [x] **If go:** a written spec exists specifying, at implementable detail: the σ
       parameterization (map + Jacobian) and identification; the covariance
       discrepancy `F(S, Σ)`; the free-family analytic gradient (the diagonal
       terms derived, replacing the `diag P = 1` simplification); the df/χ²/CI
@@ -89,6 +89,9 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
 
 ## Work log
 
+- 2026-07-12: review — PR #41; ACs 1–3 verified with fresh evidence;
+  cairn_validate clean; 3-lens independent review found one spec transcription
+  slip (κ(Σ) → Hessian condition number, scored 92), fixed on branch.
 - 2026-07-12: T4 done — recorded **GO** as `cairn/DECISIONS.md` D-009 (extends
   D-008; supersedes nothing). M18 stays `planned`. All tasks complete; no R/src
   code touched (docs/design-only), so the r-package test/check verify slot has
@@ -142,3 +145,52 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
     a *consider* future measurement (not this milestone).
 
 ## Review
+
+**2026-07-12 (PR #41).** Design-gate milestone; diff touches **zero package
+files** (only `cairn/` + `devel/` markdown), so the built package is
+byte-identical to master.
+
+Acceptance-criteria evidence (fresh):
+- **AC1 — RB + RR ingested.** `cairn/reviews/archive/RB04-circum-free-scaling.md`
+  and `RR04-circum-free-scaling.md` both present; working `cairn/reviews/` holds
+  only `archive/`. RB covers all (a)–(e) targets; RR answers 1–6 with a GO
+  verdict. ✓
+- **AC2 — go/no-go recorded.** `cairn/DECISIONS.md` D-009 (line 188), "Decision:
+  GO", rationale weighs reproduction value (diag family provably cannot
+  reproduce published output) against the second-family cost (found tame).
+  Extends D-008; M18 stays planned. ✓
+- **AC3 — implementable spec.** `devel/circum-free-scaling-spec.md`: σ map +
+  Jacobian + identification (§2), covariance discrepancy + full free-family
+  gradient with the σ block and diagonal terms derived (§3), df/χ²/CI treatment
+  incl. no-analytic-σ-CI + coverage-oracle gate (§4), canonicalization pins
+  (§5), and a validation plan (§6) naming the OpenMx free-scaling oracle
+  (`test-cpm_oracles.R:329`) and Grassi et al. (2010) App. A targets with
+  same-model tolerances. Value-citing criteria name their source (RR04 §n,
+  Grassi App. A). ✓
+
+Consistency gate:
+- `cairn_validate.py` — all 14 checks PASS (exit 0), incl. coverage-complete,
+  single-in-progress, weight caps, terminal-row retention.
+- Coverage completeness — AC1→T1,T2 / AC2→T3,T4 / AC3→T3; all mapped tasks
+  exist. (cairn_validate "coverage complete" PASS.)
+- `cairn_impact` — skipped (no IP/GP principle changed; header "Principles
+  touched: —").
+- Toolchain (r-package) consistency-gate — no package files changed, so the
+  build is unchanged from green master; full R CMD check runs on PR #41 CI
+  (required green at merge).
+
+Independent fresh-context review (3 lenses + scorer):
+- **[O] diff-bug** — verified the spec faithfully distills RR04 on every
+  load-bearing point (σ-block gradient, Ã substitution, df-unchanged, no-σ-CI,
+  layout pin, fixture arithmetic) and D-009 doesn't contradict D-008/D-001.
+  One finding (scored **92**, actioned): spec §2 conditioning caveat wrote
+  "κ(Σ)" where RR04 §2 / design-doc §2.5 mean the **Hessian** condition number
+  (distinct quantity) — internally inconsistent with its own §2.5 cross-ref.
+  **Fixed on branch** (`circum-free-scaling-spec.md` §2 now says Hessian, with
+  the κ(Σ) distinction spelled out).
+- **[S] blame-history** — no findings; the §11 change-log addition builds on
+  (not contradicts) the 2026-07-06 B6 entry, D-009 properly extends D-008,
+  all append-only.
+- **[S] prior-PR-comments** — no prior-PR evidence (touching commits predate
+  GitHub PRs; tracking files carry no line review comments).
+- No findings scored below 80 (only one finding total).

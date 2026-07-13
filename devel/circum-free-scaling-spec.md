@@ -62,9 +62,12 @@ the ML projection preserves `diag(Σ̂⁻¹R) = 1`, **not** `diag Σ̂ = 1` — 
 the exact mathematical content of the B6 refutation of the old §3.2 claim.
 
 **Conditioning caveat (not a failure):** σ_i and ζ_i are correlated coordinates,
-so κ(Σ) worsens somewhat vs the diag fit, most at Heywood-adjacent fits
-(ζ̂_i → 1). The existing §2.5 condition-number warning covers it; the
-coverage-oracle extension (§5) must include a Heywood-prone cell.
+so the **Hessian** condition number (SE/CI reliability, `avar = (2/n)H⁻¹`)
+worsens somewhat vs the diag fit, most at Heywood-adjacent fits (ζ̂_i → 1). The
+existing §2.5 Hessian condition-number warning covers it; the coverage-oracle
+extension (§5) must include a Heywood-prone cell. (Distinct from κ(Σ), the
+model-matrix conditioning that governs `solve(Σ)`/FD accuracy in §6's gradient
+test — RR04 §2.)
 
 ## 3. Discrepancy and the analytic gradient
 
