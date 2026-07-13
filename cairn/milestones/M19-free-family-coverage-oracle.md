@@ -107,17 +107,16 @@ unconditional caution with the coverage-validated statement the data support.
 - [x] **T4** — Record the measured coverage in `cairn/DESIGN.md` (new subsection
       mirroring "CPM confidence intervals: measured coverage"); update the CPM-CI
       section prose.
-- [ ] **T5** — Update `R/cpm_oop.R` free caution branch + `R/cpm_fit.R` roxygen
+- [x] **T5** — Update `R/cpm_oop.R` free caution branch + `R/cpm_fit.R` roxygen
       to the validated statement (new free-family constants if N-conditional);
       add the in-suite coverage smoke test + register the oracle; update the
       caution-wording snapshot. Promote the T3 decision to DECISIONS.md
       (supersedes M18-D3's deferral).
       (RB tripwire: no-oracle — the coverage oracle IS the oracle here, so this
       is *not* a tripwire hit; noted to pre-empt a false escalation.)
-- [ ] **T6** — Live SE cross-check on one spot cell (OpenMx free-model SEs
-      and/or parametric-bootstrap SE vs. FD-Hessian SE); assert agreement in the
-      suite (`skip_if_not_installed("OpenMx")` where OpenMx-based). Run
-      `devtools::check()`; confirm 0/0/0.
+- [x] **T6** — Live SE cross-check on one spot cell (parametric-bootstrap SE vs.
+      FD-Hessian SE — self-contained, no OpenMx parameterization-matching);
+      asserts agreement in the suite. Run `devtools::check()`; confirm 0/0/0.
 
 ## Work log
 
@@ -163,6 +162,26 @@ unconditional caution with the coverage-validated statement the data support.
   N-thresholds are the correct, now-validated free thresholds; retire M18-D3's
   placeholder unconditional caution (→ D-010 at T5).
 
+- 2026-07-13: T5+T6 done — code: merged the free branch into the shared
+  N-conditional analytic-CI caution in `R/cpm_oop.R` (diag thresholds now
+  coverage-validated for free, D-010; M18-D3 placeholder removed) + always-print
+  σ² no-interval note; updated `R/cpm_fit.R` roxygen + the caution-constant
+  comment; documented. Chose parametric-bootstrap (not OpenMx) for the live SE
+  cross-check — self-contained, avoids OpenMx parameterization/delta-method
+  matching. Tests: added the free caution-wording test (`test-cpm_api.R`, closing
+  a gap — M18-D3's free caution shipped untested) + free coverage smoke + SE
+  cross-check (`test-cpm_oracles.R`); registered O-M19-cov / O-M19-se in
+  DESIGN.md. Appended D-010. Full suite 422 tests, 0 fail / 0 error.
+
 ## Decisions
+
+- **M19-D1 (parametric bootstrap for the SE cross-check):** the ≥2-types live
+  oracle uses a parametric bootstrap (refit the free model on data drawn from
+  the fitted Σ̂), not OpenMx's SEs. OpenMx parameterizes in (θ_raw, w, s) and its
+  SEs would need a delta-method map through its own Jacobian to reach natural
+  θ/ζ/β — error-prone and OpenMx-version-dependent. The parametric bootstrap is
+  fully independent of the FD-Hessian route, self-contained (base R), and
+  deterministic under seeding. Promoted to DECISIONS as part of D-010's oracle
+  record.
 
 ## Review

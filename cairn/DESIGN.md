@@ -182,11 +182,19 @@ Analytic-only ladder (angle / ζ / β): **boundary** .70/.88/.85 (N=2000) →
 - **T = n·F̂ is χ²_df only for well-identified interior truths at N ≥ 5000**
   (KS p .84/.76/.88), rejecting at every boundary cell and interior N ≤ 2000 —
   the same boundary-regime effect as the diag family, read the same way.
-- **≥2 oracle types.** The coverage numbers are simulation-coverage (this
-  record); the analytic SE that produces the CIs is independently cross-checked
-  live against a parametric-bootstrap SE at an interior cell
-  (`test-cpm_oracles.R`, M19), so the CI machinery rests on two independent
-  oracle types, not one.
+- **≥2 oracle types (registry).** Two independent oracle types back these CIs,
+  recorded here (this repo records oracles by distributed test headers, not a
+  central file):
+  - **O-M19-cov** — *simulation-coverage*. The full run above
+    (`devel/m19-free-coverage-results.rds`, frozen) + a fast live reproduction
+    asserting `test-cpm_oracles.R` "free-scaling coverage smoke: interior N=2000
+    analytic CIs cover in-band". Source: injected circumplex-correlation truths.
+  - **O-M19-se** — *live*. An independent parametric-bootstrap SE (refit the free
+    model on data drawn from the fitted Σ̂) cross-checks the FD-Hessian analytic
+    SE, asserting `test-cpm_oracles.R` "free-scaling SE cross-check: analytic
+    Wald SE agrees with parametric bootstrap". Source: parametric bootstrap.
+  The M18 point-estimate ≥2-types bar (frozen Grassi App. A + live OpenMx) is
+  separate and already met.
 
 ## Reproducibility
 

@@ -223,20 +223,14 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
   # coverage oracle: unconditional below cpm_analytic_ci_n_caution;
   # boundary-marker-conditional below cpm_analytic_ci_n_boundary_caution
   # (see the constants in R/cpm_fit.R for the measured coverage behind both).
+  # The SAME thresholds apply to the free-scaling family: the M19 coverage
+  # oracle measured its theta/zeta/beta coverage regime to be the diag family's
+  # (sigma-hat ~= 1 at correlation truths), so the diag thresholds are
+  # coverage-validated for the free family too, not silently reused (D-010,
+  # superseding M18-D3's placeholder unconditional caution). The free family's
+  # variance ratios carry no interval, so that note is appended for it below.
   if (identical(d$ci_method, "analytic")) {
-    if (identical(d$scaling, "free")) {
-      # Free-scaling analytic CIs are NOT yet coverage-validated (M18-D3): the
-      # free-family coverage oracle is a deferred pre-ship gate, so the
-      # diag-calibrated N thresholds below are not reused as a trust boundary
-      # here. Unconditional caution instead.
-      cat(
-        "\n  Note: analytic (Wald) confidence intervals for the free-scaling ",
-        "family have not\n  been coverage-validated; interpret them with ",
-        "caution and prefer the bootstrap\n  on the raw-data path when ",
-        "available. The variance ratios (\u03c3\u00b2) carry no interval.\n",
-        sep = ""
-      )
-    } else if (d$N < cpm_analytic_ci_n_caution) {
+    if (d$N < cpm_analytic_ci_n_caution) {
       cat(
         "\n  Note: analytic (Wald) confidence intervals may materially mis-cover ",
         "at this sample size\n  (N < ", cpm_analytic_ci_n_caution,
@@ -256,6 +250,17 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
           sep = ""
         )
       }
+    }
+    if (identical(d$scaling, "free")) {
+      # The free family reports sigma^2 as an uncertainty-free variance-ratio
+      # diagnostic (D-009); no analytic interval is offered for it, ever. (Its
+      # bordered information is also singular below N ~ 2000, so those CIs are
+      # often NA -- an independent reason the N < ...n_caution note above holds.)
+      cat(
+        "\n  Note: the free-scaling variance ratios (\u03c3\u00b2) carry no ",
+        "confidence interval.\n",
+        sep = ""
+      )
     }
   }
   cat("\n")
