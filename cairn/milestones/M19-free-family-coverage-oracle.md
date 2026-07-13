@@ -120,68 +120,20 @@ unconditional caution with the coverage-validated statement the data support.
 
 ## Work log
 
-- 2026-07-13: created by /milestone-plan. Promotes free-scaling candidate item
-  (1) (the free-family coverage oracle); lineage D-009 finding (5) + M18-D3.
-  Gate decisions: analytic-CI coverage only; emit T_free but defer the
-  inference-default decision; add a live SE cross-check as the 2nd oracle type;
-  M19 blocks M7. Machinery pre-exists (`cpm_analytic_se`, `cpm_simulate` already
-  free-scaling-aware) — this milestone runs + calibrates, it does not build SEs.
-
-- 2026-07-13: AMENDED (correctness refinement, no gate) — corrected AC1/Scope/T1
-  wording from "non-unit σ truths (Σ = D_σ P D_σ)" to circumplex-**correlation**
-  truths with σ_pop = 1. The engine always fits a unit-diagonal correlation
-  matrix (`R/cpm_fit.R:1451-1460` cormat; `:1490` `cor(sdata_mat)`) — there is no
-  covariance-input path (deferred candidate 4) — so the only well-posed
-  free-family truth is a circumplex correlation P(γ); σ is a free nuisance
-  parameter that equals 1 only at perfect fit (`devel/m4-browne-design.md:259-266`,
-  RR04/D-009). Deliverable and acceptance bar (θ/ζ/β analytic-CI coverage under
-  `scaling="free"`) unchanged.
-
-- 2026-07-13: T1 done — added stage 3 (free-scaling analytic-CI coverage) to
-  `devel/m4-coverage-oracle.R`, gated by `CPM_COV_FREE_ONLY=1` so it runs
-  without re-running the ~5h diag stages. Reuses M4's correlation truths (σ_pop
-  = 1); draws X ~ N(0, P0) via `chol`, fits `cpm_engine(..., scaling="free")`,
-  scores θ/ζ/β Wald coverage + collects T_free. Smoke (25 reps) verified: the
-  expected boundary angle under-coverage (~.66–.79 to N=20000) reproduces and
-  the free bordered-Hessian SE fails often at N=250 (a finding). Smoke/partial
-  rds gitignored; full-run rds will be committed at T2.
-
-- 2026-07-13: T2 done — full 500-rep run (3.5 min, deterministic per-rep seeds)
-  → `devel/m19-free-coverage-results.rds`. Findings: (1) coverage tracks the
-  diag family (med max var-ratio ≈1.00 ⇒ σ̂≈1 at correlation truths) — interior
-  reaches [.90,.98] at N=2000 (angle .928), boundary only near N=50000 (.912),
-  the diag regime; (2) NEW: bordered σ-Hessian singular (NA SE) in 55–58% of
-  N=250 fits, 12–18% at N=1000, ~0% at N≥2000. ⇒ diag N-thresholds (2000/50000)
-  are the correct free thresholds, now coverage-validated (not silently reused);
-  small-N fragility reinforces the N<2000 caution. Feeds T3/T4/T5.
-
-- 2026-07-13: T4 done — recorded the free-family coverage in `cairn/DESIGN.md`
-  as a new "CPM free-scaling analytic CIs: measured coverage (M19)" subsection
-  (table + 4 what-it-decides bullets) after the M4/B6 subsection; updated the
-  validation-battery note to cite stage 3. T3 interpretation folded in: the diag
-  N-thresholds are the correct, now-validated free thresholds; retire M18-D3's
-  placeholder unconditional caution (→ D-010 at T5).
-
-- 2026-07-13: T5+T6 done — code: merged the free branch into the shared
-  N-conditional analytic-CI caution in `R/cpm_oop.R` (diag thresholds now
-  coverage-validated for free, D-010; M18-D3 placeholder removed) + always-print
-  σ² no-interval note; updated `R/cpm_fit.R` roxygen + the caution-constant
-  comment; documented. Chose parametric-bootstrap (not OpenMx) for the live SE
-  cross-check — self-contained, avoids OpenMx parameterization/delta-method
-  matching. Tests: added the free caution-wording test (`test-cpm_api.R`, closing
-  a gap — M18-D3's free caution shipped untested) + free coverage smoke + SE
-  cross-check (`test-cpm_oracles.R`); registered O-M19-cov / O-M19-se in
-  DESIGN.md. Appended D-010. Full suite 422 tests, 0 fail / 0 error.
+- 2026-07-13: created by /milestone-plan. Promotes free-scaling candidate (1); lineage D-009 finding (5) + M18-D3. Gate: analytic-CI coverage only, emit T_free (defer decision), live SE cross-check as 2nd oracle, M19 blocks M7. Machinery pre-exists — runs + calibrates, does not build SEs.
+- 2026-07-13: AMENDED (correctness, no gate) — AC1/Scope/T1 "non-unit σ truths" → circumplex-correlation truths (σ_pop=1). Engine only ever fits a unit-diagonal R (`cpm_fit.R:1451-1460`,`:1490`); no covariance-input path, so σ is a free nuisance = 1 only at perfect fit (`m4-browne-design.md:259-266`). Deliverable/acceptance unchanged.
+- 2026-07-13: T1 done — stage 3 added to `devel/m4-coverage-oracle.R` (`CPM_COV_FREE_ONLY=1`, no diag re-run); draws X~N(0,P0) via chol, fits `scaling="free"`, scores θ/ζ/β Wald coverage + T_free. Smoke reproduced the boundary under-coverage + small-N SE fragility.
+- 2026-07-13: T2 done — full 500-rep run (3.5 min, seeded) → `devel/m19-free-coverage-results.rds`. Coverage tracks the diag family (σ̂≈1); interior in-band at N=2000, boundary near N=50000; NEW: σ-Hessian singular in 55–58% of N=250 fits, ~0% at N≥2000.
+- 2026-07-13: T3+T4 done — recorded the coverage subsection in `cairn/DESIGN.md` (table + what-it-decides) + validation-battery cite. Decision: diag N-thresholds are the correct, now-validated free thresholds; retire M18-D3 → D-010.
+- 2026-07-13: T5+T6 done — merged free into the shared N-conditional caution in `R/cpm_oop.R` (D-010; M18-D3 placeholder removed) + σ² note; updated `cpm_fit.R` roxygen/constant comment. Tests: free caution-wording (closes an M18 gap) + coverage smoke + parametric-bootstrap SE cross-check; O-M19-cov/O-M19-se registered. D-010 appended. Suite 422, 0 fail/0 error.
 
 ## Decisions
 
-- **M19-D1 (parametric bootstrap for the SE cross-check):** the ≥2-types live
-  oracle uses a parametric bootstrap (refit the free model on data drawn from
-  the fitted Σ̂), not OpenMx's SEs. OpenMx parameterizes in (θ_raw, w, s) and its
-  SEs would need a delta-method map through its own Jacobian to reach natural
-  θ/ζ/β — error-prone and OpenMx-version-dependent. The parametric bootstrap is
-  fully independent of the FD-Hessian route, self-contained (base R), and
-  deterministic under seeding. Promoted to DECISIONS as part of D-010's oracle
-  record.
+- **M19-D1 (parametric bootstrap for the SE cross-check):** the 2nd (live)
+  oracle type uses a parametric bootstrap (refit free on data drawn from the
+  fitted Σ̂), not OpenMx SEs — OpenMx's (θ_raw, w, s) parameterization would need
+  a delta-method map through its own Jacobian to reach natural θ/ζ/β
+  (error-prone, version-dependent). The bootstrap is independent of the
+  FD-Hessian, base-R, and deterministic under seeding. Part of D-010's record.
 
 ## Review
