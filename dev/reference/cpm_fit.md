@@ -86,10 +86,13 @@ cpm_fit(
   parameters but leaves the degrees of freedom unchanged (it fits the
   `p` extra diagonal covariance moments). The fitted \\\hat\sigma^2\\
   are reported as a `VarRatio` column (the ratio of reproduced to input
-  variance); they carry no confidence interval, and the analytic
-  intervals for the remaining parameters are not yet coverage-validated
-  for this family ([`summary()`](https://rdrr.io/r/base/summary.html)
-  cautions). The input is still a correlation matrix (unit diagonal).
+  variance); they carry no confidence interval. The analytic intervals
+  for the remaining parameters follow the same sample-size caution as
+  the default family: their coverage regime was measured (the
+  free-family coverage oracle) to match it, so
+  [`summary()`](https://rdrr.io/r/base/summary.html) cautions below
+  `n = 2000` and in near-boundary fits. The input is still a correlation
+  matrix (unit diagonal).
 
 - reference:
 

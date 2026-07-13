@@ -154,9 +154,11 @@ their published output exactly. Free scaling adds <code>p</code> parameters but 
 the degrees of freedom unchanged (it fits the <code>p</code> extra diagonal
 covariance moments). The fitted \(\hat\sigma^2\) are reported as a
 <code>VarRatio</code> column (the ratio of reproduced to input variance); they carry
-no confidence interval, and the analytic intervals for the remaining
-parameters are not yet coverage-validated for this family (<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>
-cautions). The input is still a correlation matrix (unit diagonal).</p></dd>
+no confidence interval. The analytic intervals for the remaining parameters
+follow the same sample-size caution as the default family: their coverage
+regime was measured (the free-family coverage oracle) to match it, so
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> cautions below <code>n = 2000</code> and in near-boundary fits. The input
+is still a correlation matrix (unit diagonal).</p></dd>
 
 
 <dt id="arg-reference">reference<a class="anchor" aria-label="anchor" href="#arg-reference"></a></dt>
