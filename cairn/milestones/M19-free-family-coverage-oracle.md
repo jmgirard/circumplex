@@ -96,7 +96,7 @@ unconditional caution with the coverage-validated statement the data support.
       coverage pass fitting `cpm_engine(cor(X), scaling = "free")` + scoring θ/ζ/β
       via `cpm_analytic_se()` (already returns the σ-free bordered-Hessian SEs),
       with per-replicate `T_free` collection. Seeded/reproducible; smoke env var.
-- [ ] **T2** — Run the full seeded free-family oracle; commit the `.rds`
+- [x] **T2** — Run the full seeded free-family oracle; commit the `.rds`
       results (analytic-only ⇒ session-runnable, no per-fit bootstrap).
 - [ ] **T3** — Interpret the coverage table: decide N-conditional vs. justified-
       unconditional caution for the free family; do **not** silently reuse the
@@ -143,6 +143,15 @@ unconditional caution with the coverage-validated statement the data support.
   expected boundary angle under-coverage (~.66–.79 to N=20000) reproduces and
   the free bordered-Hessian SE fails often at N=250 (a finding). Smoke/partial
   rds gitignored; full-run rds will be committed at T2.
+
+- 2026-07-13: T2 done — full 500-rep run (3.5 min, deterministic per-rep seeds)
+  → `devel/m19-free-coverage-results.rds`. Findings: (1) coverage tracks the
+  diag family (med max var-ratio ≈1.00 ⇒ σ̂≈1 at correlation truths) — interior
+  reaches [.90,.98] at N=2000 (angle .928), boundary only near N=50000 (.912),
+  the diag regime; (2) NEW: bordered σ-Hessian singular (NA SE) in 55–58% of
+  N=250 fits, 12–18% at N=1000, ~0% at N≥2000. ⇒ diag N-thresholds (2000/50000)
+  are the correct free thresholds, now coverage-validated (not silently reused);
+  small-N fragility reinforces the N<2000 caution. Feeds T3/T4/T5.
 
 ## Decisions
 
