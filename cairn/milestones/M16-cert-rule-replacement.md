@@ -91,11 +91,12 @@ output — propagated consistently across every certification surface, in time f
 ## Tasks
 <!-- owner: plan (create) / implement (check-off, minor edits) -->
 
-- [ ] **T1** — Assemble the RB seed: collect `ssm_ci_accuracy()`
+- [x] **T1** — Assemble the RB seed: collect `ssm_ci_accuracy()`
       false-certification output across the §4 amplitude ladder and ≥2 score
       metrics (correlation vs raw), tabulating how the current rule behaves;
       draft the candidate rule (relative-to-CI-width leading family) and a
       proposed false-certification target. `(RB tripwire: no-oracle | irreversible-api)`
+      → `devel/m16-cert-rule-seed.{R,rds,md}`.
 - [ ] **T2** — Escalate via `/milestone-brief` (RB → RR) to decide the rule's
       final form + false-certification target; ingest the RR and record a
       `cairn/DECISIONS.md` entry. `(RB tripwire: no-oracle)`
@@ -118,6 +119,14 @@ output — propagated consistently across every certification surface, in time f
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T1 done. Seed (`devel/m16-cert-rule-seed.{R,rds,md}`, reps=500,
+  seed 2026) shows the current rule false-certifies a *zero* population
+  amplitude 100% of the time across correlation-healthy, correlation-nearzero,
+  and raw metrics (structural: c=0 amplitude coverage is theorem-zero, so
+  a_lci>0 always clears the 5e-4 threshold). Scale-free `a_lci/CI_width`
+  separates signal (2.58, 6.24) from near-zero noise (0.10) where the current
+  rule cannot. Leading candidate: relative rule `a_lci/CI_width ≥ k`; proposed
+  target false-cert@c=0 ≤ α/2.
 - 2026-07-12: created by /milestone-plan. Promotes the "guardrail
   certification-rule replacement (print-independent, scale-free)" ROADMAP
   candidate (Statistical follow-ups line). Targets v2.0.0 (freeze ~2026-07-26)
