@@ -93,8 +93,12 @@ published CIRCUM/CircE solution.
       into σ — confirms equivariance) + Table 2 model-3c fixed-grid row. Plus
       engine invariants in test-cpm_fit.R: FD gradient ≥50 pts, σ=1 legacy
       identity, stationarity, exact recovery σ̂=1, rescale-equivariance, nesting.
-- [ ] **T5** — Boundary suite on the free-scaling path (peak at 0/360; flat);
-      update `cairn/boundary-coverage.md` with the new cells.
+- [x] **T5** — Boundary suite on the free-scaling path (peak at 0/360; flat);
+      update `cairn/boundary-coverage.md` with the new cells. Done 2026-07-13:
+      new `test-cpm_boundary.R` (class A pole recovery incl a genuine σ≠1
+      pattern; class D singular/zero-variance/near-flat refusal fail-closed).
+      B is the shared circular-quantile engine (σ orthogonal to angles); C is
+      not a CPM estimand. boundary-coverage.md row + audit note added.
 - [ ] **T6** — `devtools::document()` (if the API surface changed), full
       `devtools::check()` + `devtools::test()` (`NOT_CRAN=true`); NEWS entry for
       the new `free_scaling` argument.
