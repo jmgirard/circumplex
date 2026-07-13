@@ -589,6 +589,37 @@ test_that("summary()'s analytic-CI caution follows the coverage-oracle calibrati
   expect_no_error(summary(nab))
 })
 
+test_that("summary()'s free-scaling caution is the coverage-validated N-conditional rule", {
+  # M19 (D-010): the free-family coverage oracle measured scaling = "free"'s
+  # theta/zeta/beta analytic-CI coverage regime to be the diag family's
+  # (sigma-hat ~= 1 at correlation truths), so the free family uses the SAME
+  # N-conditional caution -- NOT the M18-D3 placeholder "not yet
+  # coverage-validated" unconditional caution (retired). The free family always
+  # additionally prints the variance-ratios-carry-no-interval note.
+  tr <- cpm_clean_truth()
+  P0 <- cpm_implied_cor(as.numeric(as_radian(as_degree(tr$angles))),
+                        tr$zeta, tr$beta)
+  # (1) N >= 2000, well-identified free fit: NO mis-coverage caution (coverage
+  # is validated in-band there), only the sigma^2 no-interval note.
+  clean <- cpm_fit(cormat = P0, scales = paste0("V", 1:8), angles = tr$angles,
+                   n = 5000, m = 3, scaling = "free")
+  expect_identical(cpm_boundary_markers(clean), character(0))
+  out_clean <- paste(capture.output(summary(clean)), collapse = "\n")
+  expect_false(grepl("mis-cover", out_clean, fixed = TRUE))
+  expect_false(grepl("near a parameter boundary", out_clean, fixed = TRUE))
+  expect_match(out_clean, "variance ratios (σ²) carry no", fixed = TRUE)
+  # The retired M18-D3 wording must be gone.
+  expect_false(grepl("coverage-validated", out_clean, fixed = TRUE))
+  expect_false(grepl("have not", out_clean, fixed = TRUE))
+  # (2) N < 2000 free fit: the shared unconditional caution fires, and the
+  # sigma^2 note still prints.
+  small <- cpm_fit(cormat = P0, scales = paste0("V", 1:8), angles = tr$angles,
+                   n = 300, m = 3, scaling = "free")
+  out_small <- paste(capture.output(summary(small)), collapse = "\n")
+  expect_match(out_small, "mis-cover")
+  expect_match(out_small, "variance ratios (σ²) carry no", fixed = TRUE)
+})
+
 test_that("print and summary render a bootstrap fit as expected", {
   # Bootstrap CI endpoints differ across platforms at the 3rd decimal (BLAS),
   # so this exact-value snapshot is a local-only regression pin, not a CI/CRAN

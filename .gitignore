@@ -29,6 +29,12 @@ Thumbs.db
 devel/cpm-marker-validation-results.rds
 devel/cpm-marker-validation-smoke.rds
 devel/cpm-marker-validation-custom.rds
+# M19 free-family coverage oracle: full-run result IS committed
+# (m19-free-coverage-results.rds); the smoke/partial artifacts are regenerable
+devel/m19-free-coverage-smoke.rds
+devel/m4-coverage-oracle-smoke.rds
+devel/m4-coverage-oracle-smoke-ana.rds
+devel/m4-coverage-oracle-partial.rds
 
 # cairn tracking
 cairn/references/pdf/

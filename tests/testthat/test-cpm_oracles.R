@@ -572,3 +572,108 @@ test_that("free-scaling: fixed-grid (variant B) reproduces Table 2 model 3c", {
   expect_equal(fB$betas$Beta, c(.704, .296), tolerance = 2e-3, ignore_attr = TRUE)
   expect_equal(fB$fit$F, .574, tolerance = 1e-3)
 })
+
+# ---- free-scaling analytic-CI coverage oracle (M19) -------------------------
+#
+# The heavy oracle (devel/m4-coverage-oracle.R stage 3, CPM_COV_FREE_ONLY=1;
+# 500 reps, recorded in DESIGN.md and devel/m19-free-coverage-results.rds)
+# validates the free family's analytic (Wald) CI coverage. These two in-suite
+# tests are its fast reproductions: (1) a small seeded coverage smoke that
+# catches a broken SE (which would tank coverage), and (2) an INDEPENDENT
+# oracle type for the SE that feeds those CIs -- a live parametric-bootstrap SE
+# cross-check -- so the coverage claim meets the >=2-oracle-types bar
+# (simulation-coverage + live). D-010.
+
+# signed shortest rotation a -> b in degrees, in (-180, 180]
+cpm_ang_signed <- function(a, b) -((a - b + 180) %% 360 - 180)
+
+test_that("free-scaling coverage smoke: interior N=2000 analytic CIs cover in-band", {
+  skip_on_cran()
+  # Interior correlation truth (the DESIGN.md free record's interior cell:
+  # sigma_pop = 1, so this is a pure circumplex correlation). Recorded full-run
+  # coverage at N = 2000 is angle .928 / zeta .954 / beta .948; a small seeded
+  # reproduction must land in-band. A broken free SE would collapse coverage.
+  angles <- octants()
+  arad <- as.numeric(as_radian(as_degree(angles)))
+  zeta <- rep(0.75, 8L); beta <- c(.35, .30, .20, .15)
+  P0 <- cpm_implied_cor(arad, zeta, beta)
+  U <- chol(P0)
+  z <- stats::qnorm(0.975)
+  N <- 2000L; reps <- 80L
+  cov <- matrix(NA, reps, 3L, dimnames = list(NULL, c("angle", "zeta", "beta")))
+  for (i in seq_len(reps)) {
+    set.seed(20260713L + i)
+    X <- matrix(stats::rnorm(N * 8L), N) %*% U
+    R <- stats::cor(X)
+    eng <- suppressWarnings(cpm_engine(R, angles = angles, m = 3,
+                                       variant = "A", scaling = "free"))
+    if (!isTRUE(eng$accepted)) next
+    se <- tryCatch(suppressWarnings(cpm_analytic_se(eng, R, N)),
+                   error = function(e) NULL)
+    if (is.null(se) || anyNA(se$angle) || anyNA(se$zeta)) next
+    fp <- eng$spec$free_pos
+    cov[i, "angle"] <- mean(abs(cpm_ang_signed(eng$theta[fp], angles[fp] %% 360))
+                            <= z * se$angle[fp])
+    cov[i, "zeta"] <- mean(abs(eng$zeta - zeta) <= z * se$zeta)
+    cov[i, "beta"] <- mean(abs(eng$beta - beta) <= z * se$beta)
+  }
+  rates <- colMeans(cov, na.rm = TRUE)
+  # In-band with generous Monte-Carlo slack (recorded ~.93-.95 at 500 reps): a
+  # working SE keeps every type comfortably above .85; a broken one falls far
+  # below. Upper fence guards against a degenerate always-cover SE.
+  expect_gt(min(rates), 0.85)
+  expect_lt(max(rates), 0.995)
+  # The free bordered Hessian is well-conditioned at N = 2000 (DESIGN.md:
+  # ~0% SE-failure), so nearly every replicate is usable.
+  expect_gt(sum(!is.na(cov[, "zeta"])), 0.9 * reps)
+})
+
+test_that("free-scaling SE cross-check: analytic Wald SE agrees with parametric bootstrap (live oracle)", {
+  skip_on_cran()
+  # Second, INDEPENDENT oracle type for the SEs behind the free-family CIs: draw
+  # one interior dataset, fit free, take the FD-Hessian analytic SE, then a
+  # parametric bootstrap (refit free on data drawn from the fitted model) as a
+  # fully independent SE estimate. At a clean interior N they must agree to
+  # sampling error -- validating the SE machinery the coverage oracle relies on.
+  angles <- octants()
+  arad <- as.numeric(as_radian(as_degree(angles)))
+  zeta <- rep(0.75, 8L); beta <- c(.35, .30, .20, .15)
+  P0 <- cpm_implied_cor(arad, zeta, beta)
+  N <- 2000L
+  set.seed(424242L)
+  X <- matrix(stats::rnorm(N * 8L), N) %*% chol(P0)
+  R <- stats::cor(X)
+  eng <- suppressWarnings(cpm_engine(R, angles = angles, m = 3, variant = "A",
+                                     scaling = "free"))
+  se <- cpm_analytic_se(eng, R, N)
+  expect_false(anyNA(se$zeta))
+  # Parametric bootstrap SE from the fitted model Sigma-hat (= eng$P).
+  Uhat <- chol(eng$P)
+  B <- 200L
+  fp <- eng$spec$free_pos
+  th <- matrix(NA, B, length(fp)); zt <- matrix(NA, B, 8L)
+  bt <- matrix(NA, B, length(eng$beta))
+  for (b in seq_len(B)) {
+    set.seed(70000L + b)
+    Xb <- matrix(stats::rnorm(N * 8L), N) %*% Uhat
+    eb <- suppressWarnings(tryCatch(
+      cpm_engine(stats::cor(Xb), angles = angles, m = 3, variant = "A",
+                 scaling = "free"),
+      error = function(e) NULL))
+    if (is.null(eb) || !isTRUE(eb$accepted)) next
+    th[b, ] <- cpm_ang_signed(eb$theta[fp], eng$theta[fp])  # residual vs fit
+    zt[b, ] <- eb$zeta
+    bt[b, ] <- eb$beta
+  }
+  se_boot_angle <- apply(th, 2, stats::sd, na.rm = TRUE)
+  se_boot_zeta <- apply(zt, 2, stats::sd, na.rm = TRUE)
+  se_boot_beta <- apply(bt, 2, stats::sd, na.rm = TRUE)
+  keep <- se$beta > 0                                  # kept harmonics only
+  # Median ratio analytic/bootstrap per type; agree to sampling error at B=200.
+  # A broken analytic SE would be off by a factor, not ~1.
+  r_ang <- stats::median(se$angle[fp] / se_boot_angle)
+  r_zeta <- stats::median(se$zeta / se_boot_zeta)
+  r_beta <- stats::median(se$beta[keep] / se_boot_beta[keep])
+  expect_gt(min(r_ang, r_zeta, r_beta), 0.7)
+  expect_lt(max(r_ang, r_zeta, r_beta), 1.4)
+})

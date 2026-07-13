@@ -137,6 +137,66 @@ matching the A-review F1 finding. What this record decides:
   intervals at a near-boundary β truth, not degenerate zero-width intervals
   from removed harmonics.
 
+### CPM free-scaling analytic CIs: measured coverage (M19 coverage oracle)
+
+Recorded 2026-07-13 from `devel/m4-coverage-oracle.R` stage 3 (`CPM_COV_FREE_ONLY=1`;
+seeded; results in `devel/m19-free-coverage-results.rds`): 500 replications per
+cell, nominal-95% **analytic (Wald)** CIs for θ/ζ/β under `scaling = "free"`, the
+same p = 8 octant correlation truths (ζ = .75, boundary and interior β) as the
+diag record above. The correlation-input contract forces σ_pop = 1 — the free
+family fits σ as free **nuisance** parameters absorbing finite-N correlation
+misfit (median max variance-ratio ≈ 1.00 across every cell confirms σ̂ ≈ 1), so
+these truths are the diag truths and the only change is the p bordered σ
+parameters. Coverage is conditional on acceptance **and** on a non-singular
+information matrix (`cpm_analytic_se` returns NA otherwise); both conditioning
+events are counted.
+
+| Cell | used/500 | SE-fail | Angle | ζ | β | KS(T,df) |
+|---|---|---|---|---|---|---|
+| boundary N=250 | 176 | 277 | .831 | .863 | .851 | .000 |
+| boundary N=1000 | 422 | 72 | .760 | .914 | .875 | .000 |
+| interior N=250 | 146 | 259 | .804 | .754 | .897 | .194 |
+| interior N=1000 | 434 | 63 | .884 | .946 | .929 | .042 |
+
+Analytic-only ladder (angle / ζ / β): **boundary** .72/.89/.84 (N=2000) →
+.69/.86/.84 (5000) → .80/.87/.89 (20000) → .91/.93/.93 (50000); **interior**
+.92/.95/.94 (N=2000) → .94/.96/.95 (5000) → .94/.95/.95 (20000) →
+.95/.95/.96 (50000). What this record decides:
+
+- **The free family's coverage regime is the diag family's.** Interior truths
+  reach the [.90, .98] band at **N = 2000** (angle .915) and stay; boundary
+  truths stay badly outside it through **N = 20000** (angle .69–.80) and recover
+  only by **N = 50000** (.914) — the same two-regime pattern the diag B6 record
+  found, as expected once σ̂ ≈ 1. So the diag `summary()` caution constants
+  (`cpm_analytic_ci_n_caution = 2000`, `cpm_analytic_ci_n_boundary_caution =
+  50000`, boundary markers) are **the correct free-family thresholds — now
+  coverage-validated for the free family, not silently reused** (spec §4;
+  M18-D3's placeholder unconditional free caution is retired, D-010).
+- **The free bordered information matrix is fragile below N ≈ 2000.** The p extra
+  σ nuisance parameters make `cpm_analytic_se`'s Hessian singular (NA SE) in
+  **52–55% of N = 250 fits** and 13–14% at N = 1000, but ~0% at N ≥ 2000. A free
+  analytic CI is therefore often simply undefined at small N — an *independent*
+  reason to distrust free analytic CIs below the N = 2000 threshold, reinforcing
+  (not weakening) the unconditional caution there. σ̂² itself carries no interval
+  ever (D-009).
+- **T = n·F̂ tracks χ²_df for interior truths at N ≥ 2000** (KS p .36/.65/.16/.46
+  at N = 2000/5000/20000/50000), rejecting at every boundary cell below
+  N = 50000 and at interior N ≤ 1000 — the same boundary-regime effect as the
+  diag family, read the same way.
+- **≥2 oracle types (registry).** Two independent oracle types back these CIs,
+  recorded here (this repo records oracles by distributed test headers, not a
+  central file):
+  - **O-M19-cov** — *simulation-coverage*. The full run above
+    (`devel/m19-free-coverage-results.rds`, frozen) + a fast live reproduction
+    asserting `test-cpm_oracles.R` "free-scaling coverage smoke: interior N=2000
+    analytic CIs cover in-band". Source: injected circumplex-correlation truths.
+  - **O-M19-se** — *live*. An independent parametric-bootstrap SE (refit the free
+    model on data drawn from the fitted Σ̂) cross-checks the FD-Hessian analytic
+    SE, asserting `test-cpm_oracles.R` "free-scaling SE cross-check: analytic
+    Wald SE agrees with parametric bootstrap". Source: parametric bootstrap.
+  The M18 point-estimate ≥2-types bar (frozen Grassi App. A + live OpenMx) is
+  separate and already met.
+
 ## Reproducibility
 
 **RNG contract (an invariant, not an inventory):** a function consumes R's
@@ -311,5 +371,8 @@ functionality runs without lavaan, and it is never load-required (amended
   the model-difference triage documented in devel/m4-browne-design.md §11;
   OpenMx/lavaan cross-implementation oracles (Suggests, skip-if-absent);
   sampling-consistency and T-calibration simulation checks (skip-on-CRAN);
-  the heavy coverage oracle lives in devel/m4-coverage-oracle.R and is run
-  by /statistical-validation, never by R CMD check.
+  the heavy coverage oracle lives in devel/m4-coverage-oracle.R (stage 3 adds
+  the free-scaling analytic-CI coverage, M19; `CPM_COV_FREE_ONLY=1` runs it
+  standalone) and is run out-of-band, never by R CMD check; a fast in-suite
+  smoke reproduction + the parametric-bootstrap SE cross-check assert in
+  test-cpm_oracles.R.

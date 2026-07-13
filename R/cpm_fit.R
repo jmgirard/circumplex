@@ -1257,7 +1257,11 @@ cpm_bootstrap <- function(engine, sdata, boots, interval) {
 # near-boundary regimes (angle coverage .70-.81 with a small trailing
 # harmonic, vs .92-.95 for well-identified truths), recovering by
 # N = 50000. Hence: unconditional caution below the first threshold,
-# boundary-marker-conditional caution below the second.
+# boundary-marker-conditional caution below the second. The M19 free-family
+# coverage oracle (devel/m4-coverage-oracle.R stage 3; DESIGN.md, D-010)
+# measured the same two-regime pattern for scaling = "free" (interior in-band
+# at N = 2000, boundary only near N = 50000; sigma-hat ~= 1 at correlation
+# truths), so BOTH thresholds are coverage-validated for both families.
 cpm_analytic_ci_n_caution <- 2000L
 cpm_analytic_ci_n_boundary_caution <- 50000L
 
@@ -1340,9 +1344,11 @@ cpm_boundary_proximity <- function(object) {
 #'   the degrees of freedom unchanged (it fits the `p` extra diagonal
 #'   covariance moments). The fitted \eqn{\hat\sigma^2} are reported as a
 #'   `VarRatio` column (the ratio of reproduced to input variance); they carry
-#'   no confidence interval, and the analytic intervals for the remaining
-#'   parameters are not yet coverage-validated for this family (`summary()`
-#'   cautions). The input is still a correlation matrix (unit diagonal).
+#'   no confidence interval. The analytic intervals for the remaining parameters
+#'   follow the same sample-size caution as the default family: their coverage
+#'   regime was measured (the free-family coverage oracle) to match it, so
+#'   `summary()` cautions below `n = 2000` and in near-boundary fits. The input
+#'   is still a correlation matrix (unit diagonal).
 #' @param reference The index into `scales` of the variable whose angle is fixed
 #'   at its theoretical value to identify the rotation (default = 1).
 #' @param interval The confidence level for the parameter intervals (default =

@@ -215,3 +215,38 @@ committed to v2.0.0: bootstrap σ CIs, and a T_diag-vs-T_free calibration that
 could make the free family the preferable inference default in a future major
 version (measure in M18's coverage runs, decide later). D-008 stands. Source:
 RR04 (Fable, 2026-07-12).
+
+### D-010 (2026-07-13): free-scaling analytic CIs use the diag N-conditional caution, coverage-validated (M19)
+
+**Context:** M18-D3 shipped an **unconditional** "not yet coverage-validated"
+caution on the free-scaling family's analytic (Wald) CIs, because the
+free-family coverage oracle was a deferred pre-ship gate (D-009 finding 5): the
+diag family's N-conditional caution constants (`cpm_analytic_ci_n_caution =
+2000`, `cpm_analytic_ci_n_boundary_caution = 50000`, boundary markers) were
+calibrated on the diag family and **must not be silently reused** (spec §4). M19
+built and ran that oracle (`devel/m4-coverage-oracle.R` stage 3;
+`devel/m19-free-coverage-results.rds`, 500 reps).
+**Decision:** Apply the **same** N-conditional caution to the free family,
+**now coverage-validated for it** rather than silently reused. The M19 oracle
+measured the free family's θ/ζ/β coverage regime to be the diag family's —
+interior truths reach the [.90, .98] band at N = 2000 (angle .915), boundary
+truths only near N = 50000 (.914) — because the correlation-input contract
+forces σ_pop = 1 and σ̂ ≈ 1 at these truths (median max variance-ratio ≈ 1.00
+every cell). The `summary()` free branch's placeholder unconditional caution is
+removed; free and diag now share the N-conditional ladder, with the free family
+additionally always printing the σ²-carries-no-interval note (D-009).
+**Second finding (reinforces, not weakens):** the free family's bordered
+information matrix (p extra σ nuisance parameters) is singular (NA SE) in 52–55%
+of N = 250 fits and 13–14% at N = 1000, ~0% at N ≥ 2000 — an independent reason
+its analytic CIs are untrustworthy below N = 2000.
+**Oracle types (≥2 bar):** simulation-coverage (the M19 run) + a live
+parametric-bootstrap SE cross-check at an interior cell
+(`test-cpm_oracles.R`); registered there.
+**Supersedes:** M18-D3's "unconditional, not-yet-coverage-validated" free
+caution (the deferral is discharged, not a standing rejection). σ̂² still carries
+no interval, ever (D-009 unaffected).
+**Consequences:** a well-identified free fit at N ≥ 2000 now prints no θ/ζ/β
+mis-coverage caution (only the σ² note) — exported `summary()` output change,
+NEWS-documented at the v2.0.0 (M7) release. The T_diag-vs-T_free
+inference-default decision stays deferred (T_free statistics were collected in
+the same runs; ROADMAP candidate). Source: M19 coverage oracle, this session.
