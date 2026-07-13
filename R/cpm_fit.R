@@ -72,6 +72,20 @@ cpm_implied_cor <- function(theta, zeta, beta) {
   P
 }
 
+#' Model-implied covariance matrix Sigma = D_sigma P D_sigma (spec sec. 1, M18)
+#'
+#' The free-scaling family's model matrix: rescale the model-implied correlation
+#' `P` by the variance scales `sigma` (Sigma_ij = sigma_i sigma_j P_ij, so
+#' Sigma_ii = sigma_i^2 -- CIRCUM's "reproduced variance"). With `sigma == 1`
+#' this is `P` bit-for-bit (each entry multiplied by 1.0), so the unit path is
+#' unchanged.
+#'
+#' @noRd
+cpm_implied_cov <- function(theta, zeta, beta, sigma) {
+  P <- cpm_implied_cor(theta, zeta, beta)
+  (sigma %o% sigma) * P
+}
+
 # ---- ML discrepancy ---------------------------------------------------------
 
 #' ML discrepancy F (design sec. 3.1)
@@ -99,11 +113,21 @@ cpm_discrepancy <- function(R, P, ldR = NULL) {
 #'   D circulant         : 0 free angles, 1 free zeta, m free beta
 #'
 #' The free-parameter vector gamma* is laid out as
-#'   [ free-angle radians ] [ zeta logits u ] [ beta free logits v_1..v_m ].
+#'   [ free-angle radians ] [ zeta logits u ] [ sigma logs s ] [ beta free logits v_1..v_m ].
+#' The `s` (log-scale) block is present only under `scaling = "free"` (M18); it
+#' sits BETWEEN zeta and beta so beta stays the trailing block that the boundary
+#' polish (`cpm_spec_reduce`) shrinks from the tail (spec sec. 5, mechanical pin
+#' 1). Under `scaling = "unit"` (default) n_sigma = 0 and every index/count is
+#' bit-identical to the pre-M18 correlation-structure family.
 #'
+#' @param scaling "unit" (Sigma = P, correlation structure; the default and the
+#'   pre-M18 behavior) or "free" (Sigma = D_sigma P D_sigma; CIRCUM's covariance
+#'   structure with p free variance scales, spec sec. 1-2).
 #' @noRd
-cpm_spec <- function(p, m, variant = c("A", "B", "C", "D"), reference = 1) {
+cpm_spec <- function(p, m, variant = c("A", "B", "C", "D"), reference = 1,
+                     scaling = c("unit", "free")) {
   variant <- match.arg(variant)
+  scaling <- match.arg(scaling)
   stopifnot(is_scalar_count(p), p >= 3)
   stopifnot(is_scalar_count(m))
   stopifnot(is_scalar_count(reference), reference <= p)
@@ -122,24 +146,36 @@ cpm_spec <- function(p, m, variant = c("A", "B", "C", "D"), reference = 1) {
 
   free_angles <- if (variant %in% c("A", "C")) (p - 1L) else 0L
   n_zeta <- if (variant %in% c("A", "B")) p else 1L
+  # Free scaling adds p log-variance parameters, all free, no identification pin
+  # (spec sec. 2: the map sigma_i = exp(s_i) is injective and F is coercive in
+  # each sigma_i, so diag P = 1 already identifies the decomposition).
+  n_sigma <- if (scaling == "free") p else 0L
   n_beta_free <- m
 
-  q <- free_angles + n_zeta + n_beta_free
-  df <- p * (p - 1L) / 2L - q
+  q <- free_angles + n_zeta + n_sigma + n_beta_free
+  # df is UNCHANGED by free scaling (spec sec. 4): the free family fits the full
+  # p(p+1)/2 covariance moments with q_corr + p parameters, so
+  # p(p+1)/2 - (q_corr + p) = p(p-1)/2 - q_corr = df_unit. Carry the moment count
+  # explicitly and take df = n_moments - q so both families share one formula
+  # (and cpm_spec_reduce cannot drift from it).
+  n_moments <- if (scaling == "free") p * (p + 1L) / 2L else p * (p - 1L) / 2L
+  df <- n_moments - q
 
-  # index blocks within gamma*
+  # index blocks within gamma* ([angle][u][s][v]); i_sigma is empty under unit.
   i_angle <- if (free_angles > 0) seq_len(free_angles) else integer(0)
   i_zeta <- if (n_zeta > 0) free_angles + seq_len(n_zeta) else integer(0)
-  i_beta <- free_angles + n_zeta + seq_len(n_beta_free)
+  i_sigma <- if (n_sigma > 0) free_angles + n_zeta + seq_len(n_sigma) else integer(0)
+  i_beta <- free_angles + n_zeta + n_sigma + seq_len(n_beta_free)
 
   # which theta positions are free (all but the reference), in order
   free_pos <- if (free_angles > 0) setdiff(seq_len(p), reference) else integer(0)
 
   list(
-    p = p, m = m, variant = variant, reference = reference,
-    free_angles = free_angles, n_zeta = n_zeta, n_beta_free = n_beta_free,
-    q = q, df = df,
-    i_angle = i_angle, i_zeta = i_zeta, i_beta = i_beta,
+    p = p, m = m, variant = variant, reference = reference, scaling = scaling,
+    free_angles = free_angles, n_zeta = n_zeta, n_sigma = n_sigma,
+    n_beta_free = n_beta_free,
+    q = q, df = df, n_moments = n_moments,
+    i_angle = i_angle, i_zeta = i_zeta, i_sigma = i_sigma, i_beta = i_beta,
     free_pos = free_pos,
     keep_k = 0:m,             # harmonics with a free beta (0..m unless polished)
     theta_ref_val = NA_real_  # filled by cpm_engine (reference theoretical angle)
@@ -151,10 +187,12 @@ cpm_spec <- function(p, m, variant = c("A", "B", "C", "D"), reference = 1) {
 #' Pack natural parameters into the unconstrained vector gamma* (design sec. 3.3)
 #'
 #' zeta -> logit u; beta -> softmax free logits v (v_0 = 0 fixed); free angles
-#' pass through unchanged (identity map, held on the real line).
+#' pass through unchanged (identity map, held on the real line); sigma -> log s
+#' (free scaling only; s_i = log sigma_i, spec sec. 2). `sigma` defaults to all
+#' ones (s = 0), the starts convention and a no-op under unit scaling.
 #'
 #' @noRd
-cpm_pack <- function(theta, zeta, beta, spec) {
+cpm_pack <- function(theta, zeta, beta, spec, sigma = rep(1, spec$p)) {
   g <- numeric(spec$q)
   if (spec$free_angles > 0) {
     g[spec$i_angle] <- theta[spec$free_pos]
@@ -162,6 +200,10 @@ cpm_pack <- function(theta, zeta, beta, spec) {
   if (spec$n_zeta > 0) {
     z <- if (spec$n_zeta == 1L) zeta[[1]] else zeta
     g[spec$i_zeta] <- stats::qlogis(z)
+  }
+  if (spec$n_sigma > 0) {
+    stopifnot(all(sigma > 0))
+    g[spec$i_sigma] <- log(sigma)
   }
   # softmax inverse with v_0 = 0 over the KEPT harmonics (keep_k; identity
   # 0..m unless polished): v_k = log(beta_k) - log(beta_0). A zero kept beta
@@ -198,6 +240,8 @@ cpm_unpack <- function(gstar, spec) {
   } else {
     zeta <- rep(stats::plogis(gstar[spec$i_zeta]), p)
   }
+  # sigma = exp(s) (free scaling); unit scaling has no s block => sigma == 1.
+  sigma <- if (spec$n_sigma > 0) exp(gstar[spec$i_sigma]) else rep(1, p)
   v <- c(0, gstar[spec$i_beta])
   ev <- exp(v - max(v))                     # softmax (max-shift for stability)
   b_keep <- ev / sum(ev)
@@ -205,7 +249,7 @@ cpm_unpack <- function(gstar, spec) {
   # (polished-out) harmonics are 0. When keep_k == 0:m this is the identity.
   beta <- numeric(spec$m + 1L)
   beta[spec$keep_k + 1L] <- b_keep
-  list(theta = theta, zeta = zeta, beta = beta)
+  list(theta = theta, zeta = zeta, beta = beta, sigma = sigma)
 }
 
 # ---- objective and gradient in unconstrained coordinates --------------------
@@ -214,8 +258,15 @@ cpm_unpack <- function(gstar, spec) {
 #' @noRd
 cpm_objective <- function(gstar, R, spec, ldR = NULL) {
   nat <- cpm_unpack(gstar, spec)
-  P <- cpm_implied_cor(nat$theta, nat$zeta, nat$beta)
-  cpm_discrepancy(R, P, ldR = ldR)
+  # Unit scaling fits P (correlation structure); free scaling fits
+  # Sigma = D_sigma P D_sigma (spec sec. 1). cpm_discrepancy accepts a non-unit
+  # diagonal model matrix (the published-F-hat identity test proves it).
+  M <- if (spec$n_sigma > 0) {
+    cpm_implied_cov(nat$theta, nat$zeta, nat$beta, nat$sigma)
+  } else {
+    cpm_implied_cor(nat$theta, nat$zeta, nat$beta)
+  }
+  cpm_discrepancy(R, M, ldR = ldR)
 }
 
 #' Analytic gradient of F at gamma* (design sec. 3.4)
@@ -233,6 +284,7 @@ cpm_gradient <- function(gstar, R, spec) {
   nat <- cpm_unpack(gstar, spec)
   theta <- nat$theta; zeta <- nat$zeta; beta <- nat$beta
 
+  sigma <- nat$sigma
   Delta <- outer(theta, theta, `-`)
   # Build P inline from a single cpm_rho() so the harmonic matrix and outer()
   # are computed once, not again inside cpm_implied_cor(): Rho is reused for
@@ -241,12 +293,30 @@ cpm_gradient <- function(gstar, R, spec) {
   Rho <- cpm_rho(Delta, beta)               # p x p, diag 1 (zeroed for dF/dzeta)
   P <- (zeta %o% zeta) * Rho
   diag(P) <- 1                              # I - D_zeta^2 restores the unit diag
-  Pinv <- solve(P)
-  A <- Pinv - Pinv %*% R %*% Pinv           # symmetric
-  A <- (A + t(A)) / 2
 
-  # B = A * (zeta zeta^T), diagonal zeroed (only off-diagonal dP enter).
-  B <- A * (zeta %o% zeta)
+  # Core differential (spec sec. 3): dF = tr(A dM), A = M^-1 - M^-1 R M^-1 for
+  # the model matrix M. The gamma (theta/zeta/beta) blocks read a WEIGHTED A:
+  # A-tilde = D_sigma A D_sigma (because dM = D_sigma dP D_sigma; diag dP = 0
+  # since diag P = 1 identically in the gamma parameterization). Under free
+  # scaling M = Sigma and the essential substitution is Sigma^-1 for P^-1 --
+  # they differ EVERYWHERE, not just on the diagonal. Under unit scaling M = P,
+  # A-tilde = A, and every line below is bit-identical to the pre-M18 path
+  # (sigma == 1 makes each `sigma %o% sigma` a multiply by 1.0).
+  if (spec$n_sigma > 0) {
+    Sigma <- (sigma %o% sigma) * P
+    Minv <- solve(Sigma)
+    A <- Minv - Minv %*% R %*% Minv         # symmetric
+    A <- (A + t(A)) / 2
+    At <- (sigma %o% sigma) * A             # A-tilde weights the gamma blocks
+  } else {
+    Minv <- solve(P)
+    A <- Minv - Minv %*% R %*% Minv         # symmetric
+    A <- (A + t(A)) / 2
+    At <- A
+  }
+
+  # B = A-tilde * (zeta zeta^T), diagonal zeroed (only off-diagonal dP enter).
+  B <- At * (zeta %o% zeta)
   diag(B) <- 0
 
   Rhod <- cpm_rho_deriv(Delta, beta)        # p x p
@@ -255,19 +325,27 @@ cpm_gradient <- function(gstar, R, spec) {
   # dF/dtheta_i (length p); reference component is dropped later.
   dF_dtheta <- 2 * rowSums(B * Rhod)
 
-  # dF/dzeta_i: 2 * (A * rho with diag 0) %*% zeta
-  Azero <- A * Rho
+  # dF/dzeta_i: 2 * (A-tilde * rho with diag 0) %*% zeta
+  Azero <- At * Rho
   diag(Azero) <- 0
   dF_dzeta <- 2 * as.numeric(Azero %*% zeta)
 
   # dF/dbeta_k over the kept harmonics (keep_k; identity 0..m unless polished)
   dF_dbeta <- vapply(spec$keep_k, function(k) sum(B * cos(k * Delta)), numeric(1))
 
+  # dF/ds_i = 2 (1 - (Sigma^-1 R)_ii) (spec sec. 3; free scaling only). The log
+  # map is already chained in. (Sigma^-1 R)_ii = rowSums(Minv * R) by symmetry.
+  dF_ds <- if (spec$n_sigma > 0) 2 * (1 - rowSums(Minv * R)) else numeric(0)
+
   # ---- chain to unconstrained coordinates ----
   g <- numeric(spec$q)
 
   if (spec$free_angles > 0) {
     g[spec$i_angle] <- dF_dtheta[spec$free_pos]   # angle Jacobian = 1
+  }
+
+  if (spec$n_sigma > 0) {
+    g[spec$i_sigma] <- dF_ds                      # log-map Jacobian already in dF_ds
   }
 
   if (spec$n_zeta == p) {
@@ -468,8 +546,9 @@ cpm_canonicalize <- function(gstar, spec, theta_theory) {
 #' @param reference index of the scale whose angle is fixed (design sec. 2.1).
 #' @noRd
 cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
-                       reference = 1) {
+                       reference = 1, scaling = c("unit", "free")) {
   variant <- match.arg(variant)
+  scaling <- match.arg(scaling)
   R <- as.matrix(R)
   p <- nrow(R)
 
@@ -493,7 +572,7 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   # making F(R, R) != 0 by the asymmetry magnitude.
   R <- (R + t(R)) / 2
 
-  spec <- cpm_spec(p, m, variant, reference)
+  spec <- cpm_spec(p, m, variant, reference, scaling = scaling)
 
   # df >= 1 required; df = 0 allowed but warns (design sec. 1.4/sec. 4).
   if (spec$df < 0) {
@@ -573,11 +652,15 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   for (i in setdiff(seq_along(runs), best)) {
     par_i <- runs[[i]]$par
     nat_i <- cpm_unpack(par_i, spec)
-    # zeta/beta compared on the NATURAL scale: an absolute tolerance on the
-    # logit scale explodes near a Heywood boundary (d logit/d zeta ~ 200 at
-    # zeta = 0.995), where a true mirror would be misread as distinct.
+    # zeta/beta/sigma compared on the NATURAL scale: an absolute tolerance on
+    # the logit scale explodes near a Heywood boundary (d logit/d zeta ~ 200 at
+    # zeta = 0.995), where a true mirror would be misread as distinct. The sigma
+    # block MUST enter (spec sec. 5, pin 3): two optima differing only in sigma
+    # is a genuine non-identification signature the angle/zeta/beta comparison
+    # would miss. Under unit scaling sigma == 1 for both, so this is a no-op.
     other_eq <- max(abs(nat_i$zeta - nat_best$zeta)) < 1e-4 &&
-      max(abs(nat_i$beta - nat_best$beta)) < 1e-4
+      max(abs(nat_i$beta - nat_best$beta)) < 1e-4 &&
+      max(abs(nat_i$sigma - nat_best$sigma)) < 1e-4
     if (spec$free_angles > 0) {
       # Angle comparisons must be circular: a scale exactly opposite the
       # reference has relative angle +pi in BOTH mirrors (angle_dist maps the
@@ -684,6 +767,12 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   }
 
   heywood <- any(nat$zeta > 0.995)
+  # Data-pathology note (free scaling only; spec sec. 5, pin 5): a fitted
+  # variance ratio sigma^2 far from 1 on unit-diagonal input signals a
+  # scale/model mismatch. NOT a boundary flag (the optimum is interior by
+  # coercivity) and NOT wired into the CI-coverage markers.
+  sigma_pathology <- spec$n_sigma > 0 &&
+    any(nat$sigma^2 < 0.5 | nat$sigma^2 > 2)
 
   # wrapped-to-[0,360) reported angles; keep unwrapped radians too.
   theta_deg <- as.numeric(as_degree(as_radian(nat$theta %% (2 * pi))))
@@ -695,6 +784,9 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
     theta_theory = as.numeric(as_degree(as_radian(theta_theory %% (2 * pi)))),
     zeta = nat$zeta,
     beta = nat$beta,
+    sigma = nat$sigma,                 # length p; all 1 under unit scaling
+    scaling = spec$scaling,
+    sigma_pathology = sigma_pathology,
     F = fit$F,
     df = spec$df,
     # m as FITTED (design sec. 3.5/sec. 5.4): decreases iff the polish removed the
@@ -702,7 +794,11 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
     m = max(spec$keep_k),
     variant = spec$variant,
     reference = reference,
-    P = cpm_implied_cor(nat$theta, nat$zeta, nat$beta),
+    # Model-implied matrix: Sigma = D_sigma P D_sigma under free scaling
+    # (non-unit diagonal), P under unit scaling. Used as Phat downstream, so the
+    # reported residuals R - Phat and SRMR carry the free family's non-zero
+    # diagonal residuals (1 - sigma^2; spec sec. 4).
+    P = cpm_implied_cov(nat$theta, nat$zeta, nat$beta, nat$sigma),
     accepted = accepted,
     nlminb_code = fit$code,            # ADVISORY only
     gradient_norm = gnorm,
@@ -734,9 +830,14 @@ cpm_spec_reduce <- function(spec, keep_k) {
   rspec <- spec
   rspec$keep_k <- keep_k
   rspec$n_beta_free <- length(keep_k) - 1L
-  rspec$q <- spec$free_angles + spec$n_zeta + rspec$n_beta_free
-  rspec$df <- spec$p * (spec$p - 1L) / 2L - rspec$q
-  rspec$i_beta <- spec$free_angles + spec$n_zeta + seq_len(rspec$n_beta_free)
+  # Polish only removes trailing beta harmonics; the sigma block is untouched
+  # (position-stable, ahead of beta -- spec sec. 5, mechanical pin 1), so it
+  # stays in q and i_sigma is unchanged. Reuse the spec's moment count so df
+  # cannot drift from cpm_spec (unit p(p-1)/2, free p(p+1)/2).
+  rspec$q <- spec$free_angles + spec$n_zeta + spec$n_sigma + rspec$n_beta_free
+  rspec$df <- spec$n_moments - rspec$q
+  rspec$i_beta <- spec$free_angles + spec$n_zeta + spec$n_sigma +
+    seq_len(rspec$n_beta_free)
   rspec
 }
 
@@ -772,6 +873,8 @@ cpm_polish_beta <- function(fit, R, spec) {
   g0 <- numeric(rspec$q)
   if (spec$free_angles > 0) g0[rspec$i_angle] <- fit$par[spec$i_angle]
   if (spec$n_zeta > 0) g0[rspec$i_zeta] <- fit$par[spec$i_zeta]
+  # sigma block is position-stable across the reduce (spec sec. 5, pin 1).
+  if (spec$n_sigma > 0) g0[rspec$i_sigma] <- fit$par[spec$i_sigma]
   v <- log(beta_keep) - log(beta_keep[1])
   g0[rspec$i_beta] <- v[-1]
 
@@ -1228,6 +1331,18 @@ cpm_boundary_proximity <- function(object) {
 #'   (default; free angles and communalities), `"constrained-angles"` (angles
 #'   fixed at their theoretical values), `"equal-communality"` (a single shared
 #'   communality), or `"circulant"` (both constraints).
+#' @param scaling The covariance-scaling family, orthogonal to `model`:
+#'   `"unit"` (default) fits the correlation structure with a unit model-implied
+#'   diagonal (the historical behaviour); `"free"` fits Browne's covariance
+#'   structure \eqn{\Sigma = D_\sigma P D_\sigma} with `p` free variance scales,
+#'   the parameterization CIRCUM and CircE use, so `cpm_fit()` can reproduce
+#'   their published output exactly. Free scaling adds `p` parameters but leaves
+#'   the degrees of freedom unchanged (it fits the `p` extra diagonal
+#'   covariance moments). The fitted \eqn{\hat\sigma^2} are reported as a
+#'   `VarRatio` column (the ratio of reproduced to input variance); they carry
+#'   no confidence interval, and the analytic intervals for the remaining
+#'   parameters are not yet coverage-validated for this family (`summary()`
+#'   cautions). The input is still a correlation matrix (unit diagonal).
 #' @param reference The index into `scales` of the variable whose angle is fixed
 #'   at its theoretical value to identify the rotation (default = 1).
 #' @param interval The confidence level for the parameter intervals (default =
@@ -1292,12 +1407,14 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
                     cormat = NULL, n = NULL, m = 3,
                     model = c("quasi-circumplex", "constrained-angles",
                               "equal-communality", "circulant"),
+                    scaling = c("unit", "free"),
                     reference = 1, interval = 0.95,
                     ci_method = c("bootstrap", "analytic"),
                     boots = 2000, listwise = TRUE) {
 
   call <- match.call()
   model <- match.arg(model)
+  scaling <- match.arg(scaling)
   # Path-conditional default (design sec. 5.2): bootstrap on the raw-data
   # path, analytic on the cormat path (nothing to resample there). Only an
   # EXPLICIT bootstrap request with `cormat` is an error.
@@ -1382,7 +1499,7 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
 
   # ---- fit the engine (deterministic; RNG is consumed only by the bootstrap) ----
   engine <- cpm_engine(R, angles = angles, m = m, variant = variant,
-                       reference = reference)
+                       reference = reference, scaling = scaling)
 
   # ---- fit indices ----
   q <- engine$spec$q
@@ -1432,6 +1549,13 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     Communality = engine$zeta^2,
     stringsAsFactors = FALSE
   )
+  # Free scaling reports sigma^2 = Sigma_ii, CIRCUM's ratio of reproduced to
+  # input variance (M18-D2). Estimate-only (no CI ever; spec sec. 4), and the
+  # column is present ONLY under free scaling -- under unit scaling sigma^2 == 1
+  # by construction (a fixed constraint, not an estimate), so it is omitted.
+  if (identical(scaling, "free")) {
+    results$VarRatio <- engine$sigma^2
+  }
 
   betas <- data.frame(
     k = 0:engine$spec$m,
@@ -1457,6 +1581,9 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
     m_requested = m,
     model = model,
     variant = variant,
+    scaling = scaling,
+    sigma = engine$sigma,                     # length p (all 1 under unit)
+    sigma_pathology = engine$sigma_pathology,
     reference = reference,
     scales = scales,
     ci_method = ci_method,
@@ -1522,9 +1649,12 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
 #'   number.
 #' @return A numeric matrix with `n` rows and one column per fitted scale,
 #'   columns in the fitted scale order with `colnames` set to the scale names
-#'   (`rownames` are `NULL`). The population margins are zero-mean and
-#'   unit-variance, so `cor()` of the returned matrix converges to
-#'   `object$matrices$Phat` as `n` grows.
+#'   (`rownames` are `NULL`). The population covariance is
+#'   `object$matrices$Phat`, so `cov()` of the returned matrix converges to it
+#'   as `n` grows. Under the default unit scaling `Phat` is a correlation matrix
+#'   (zero-mean, unit-variance margins), so `cor()` converges to it too; under
+#'   `scaling = "free"` the margins carry the fitted variance ratios
+#'   \eqn{\hat\sigma^2}.
 #' @section Reproducibility:
 #'   `cpm_simulate()` consumes R's global random number stream (the
 #'   common-factor scores then the unique deviates, drawn in that fixed order),
@@ -1570,6 +1700,7 @@ cpm_sim_root <- function(object) {
   theta <- nat$theta
   zeta <- nat$zeta
   beta <- nat$beta                          # length m + 1; 0 at any removed k
+  sigma <- nat$sigma                        # length p; all 1 under unit scaling
   p <- spec$p
   m <- spec$m
 
@@ -1583,9 +1714,12 @@ cpm_sim_root <- function(object) {
                     sb[k + 1L] * cos(k * theta),
                     sb[k + 1L] * sin(k * theta))
   }
+  # Free scaling generates Sigma = D_sigma P D_sigma: scale each variable's
+  # loadings and uniqueness by sigma_i (spec sec. 1). Under unit scaling
+  # sigma == 1, so this is byte-identical to the correlation-structure draw.
   list(
-    Lambda = zeta * common,                          # D_zeta scales each row
-    uniq = sqrt(pmax(1 - zeta^2, 0)),                # (I - D_zeta^2)^{1/2}, diag
+    Lambda = sigma * zeta * common,                  # D_sigma D_zeta scales rows
+    uniq = sigma * sqrt(pmax(1 - zeta^2, 0)),        # D_sigma (I - D_zeta^2)^{1/2}
     p = p,
     scales = object$details$scales
   )

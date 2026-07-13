@@ -67,17 +67,24 @@ published CIRCUM/CircE solution.
 
 ## Tasks
 
-- [ ] **T1** — Implement the free-family discrepancy `F(S, Σ)` and its analytic
+- [x] **T1** — Implement the free-family discrepancy `F(S, Σ)` and its analytic
       gradient (diagonal terms per the M17 spec) as internal functions;
       test-first against finite differences at ≥ 50 random feasible points.
       (RB tripwire: no-oracle for the gradient derivation until the FD check and
       the OpenMx oracle both pass — treat FD agreement as the first gate.)
-- [ ] **T2** — Add the σ parameterization/packing and the `free_scaling`
+      Done 2026-07-13: `Ã = D_σ A D_σ` weight + `∂F/∂s = 2(1−(Σ⁻¹R)_ii)`; FD
+      err 2.4e-9, σ=1 legacy identity exact 0. Tests pending (T4/below).
+- [x] **T2** — Add the σ parameterization/packing and the `scaling = "free"`
       argument plumbing through `cpm_fit()` (spec/pack/unpack/starts), holding
-      the existing correlation path bit-identical when `free_scaling = FALSE`.
-- [ ] **T3** — Wire the fit path: canonicalization/identification of σ, df/χ²,
+      the existing correlation path bit-identical when `scaling = "unit"`.
+      Done 2026-07-13: `[angle][u][s][v]` layout, `n_moments`-driven df, s⁰=0
+      starts; full existing suite green (unit path unchanged).
+- [x] **T3** — Wire the fit path: canonicalization/identification of σ, df/χ²,
       CI treatment per spec, and the output surface (σ̂ in the returned object;
-      print/summary). Regression test the end-to-end fit.
+      print/summary). Regression test the end-to-end fit. Done 2026-07-13:
+      `VarRatio` column (free only), free-path analytic caution (M18-D3), σ
+      pathology note, σ-aware `cpm_sim_root`. End-to-end free fit reproduces
+      published fit indices (χ²/RMSEA/CFI/TLI). Formal regression tests below.
 - [ ] **T4** — Validation tests: OpenMx free-scaling oracle to spec tolerance;
       Grassi et al. (2010) published CircE targets to printed precision.
 - [ ] **T5** — Boundary suite on the free-scaling path (peak at 0/360; flat);

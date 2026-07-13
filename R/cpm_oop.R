@@ -62,6 +62,12 @@ cpm_diagnostic_lines <- function(details) {
       "(\u03b6 > 0.995, a Heywood-type solution).\n"
     ))
   }
+  if (isTRUE(details$sigma_pathology)) {
+    msg <- c(msg, paste0(
+      "  Note: a fitted variance ratio (\u03c3\u00b2) departs materially from 1 ",
+      "(outside [0.5, 2]);\n  the scaling or model may be misspecified.\n"
+    ))
+  }
   if (length(details$removed_harmonics) > 0) {
     msg <- c(msg, paste0(
       "  Note: harmonic(s) ",
@@ -218,7 +224,19 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
   # boundary-marker-conditional below cpm_analytic_ci_n_boundary_caution
   # (see the constants in R/cpm_fit.R for the measured coverage behind both).
   if (identical(d$ci_method, "analytic")) {
-    if (d$N < cpm_analytic_ci_n_caution) {
+    if (identical(d$scaling, "free")) {
+      # Free-scaling analytic CIs are NOT yet coverage-validated (M18-D3): the
+      # free-family coverage oracle is a deferred pre-ship gate, so the
+      # diag-calibrated N thresholds below are not reused as a trust boundary
+      # here. Unconditional caution instead.
+      cat(
+        "\n  Note: analytic (Wald) confidence intervals for the free-scaling ",
+        "family have not\n  been coverage-validated; interpret them with ",
+        "caution and prefer the bootstrap\n  on the raw-data path when ",
+        "available. The variance ratios (σ²) carry no interval.\n",
+        sep = ""
+      )
+    } else if (d$N < cpm_analytic_ci_n_caution) {
       cat(
         "\n  Note: analytic (Wald) confidence intervals may materially mis-cover ",
         "at this sample size\n  (N < ", cpm_analytic_ci_n_caution,
