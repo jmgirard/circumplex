@@ -39,9 +39,10 @@ published CIRCUM/CircE solution.
 
 ## Acceptance criteria
 
-- [ ] `cpm_fit(..., free_scaling = TRUE)` fits the covariance family and returns
+- [ ] `cpm_fit(..., scaling = "free")` fits the covariance family and returns
       σ̂; a regression test in `tests/testthat/test-cpm_fit.R` exercises the path
-      end-to-end.
+      end-to-end. (AC1 wording amended 2026-07-13: `scaling = c("unit","free")`
+      per spec §7, superseding the plan's `free_scaling = TRUE`.)
 - [ ] Reproduces the OpenMx free-scaling oracle to the tolerance fixed by the
       M17 spec, in `tests/testthat/test-cpm_oracles.R` (the free-scaling OpenMx
       transcription already present there is the oracle).
@@ -91,7 +92,27 @@ published CIRCUM/CircE solution.
   free-scaling split (design gate = M17). Depends on M17's ratified spec and
   go decision — if M17 decides no-go, this milestone is retired unbuilt. In
   v2.0.0 scope per D-008.
+- 2026-07-13: status → in-progress; branch m18-circum-free-scaling cut from
+  synced master. Question gate settled (see Decisions M18-D1..D3).
+- 2026-07-13 (amendment, minor): AC1 wording `free_scaling = TRUE` →
+  `scaling = "free"` per spec §7 (M18-D1).
 
 ## Decisions
+
+- **M18-D1 (API name):** the free-scaling flag is `scaling = c("unit","free")`,
+  default `"unit"` (bit-identical to today), orthogonal to `model` — spec §7's
+  preferred form over the plan's boolean `free_scaling`. Jeff, 2026-07-13.
+- **M18-D2 (σ̂² surface):** report σ̂² (reproduced/input variance ratios) as a
+  `VarRatio` column in `results`, populated/printed **only** on the free path
+  (identically 1 under unit → omitted), no CI. Rationale: unit-mode σ²≡1 is a
+  fixed constraint, not an estimate; column presence is the honest "σ estimated"
+  signal. Jeff leaned toward always-present for assumption transparency — a
+  trivial pre-review flip if preferred. 2026-07-13.
+- **M18-D3 (free-path analytic caution):** on `scaling="free"` + analytic CIs,
+  `summary()` prints an **unconditional** caution that free-family Wald CIs for
+  θ/ζ/β are not yet coverage-validated (the free-family coverage oracle is a
+  deferred pre-ship gate, out of M18 scope per spec §4/§6), never reusing the
+  diag-calibrated N=2000/50000 thresholds as a validated trust boundary. σ has
+  no analytic CI ever (spec §4). Jeff, 2026-07-13.
 
 ## Review
