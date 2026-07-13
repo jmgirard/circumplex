@@ -254,10 +254,18 @@ rules out.
 
 Fitting a *correlation* structure with the Wishart (covariance) likelihood is
 the classic trap (Cudeck, 1989, *Psych Bull*): χ² and SEs are only valid if
-the model is scale-invariant. This model is: `diag P(γ) = 1` identically, and
-embedding `Σ = D_σ P(γ) D_σ` with free scale factors `σ` reproduces any
-rescaling, with `σ̂ = 1` at the optimum when fitted to `R`. All parameters
-(θ, ζ, β) are scale-free. So:
+the model is scale-invariant. The invariance device is the free-scaling family
+`Σ = D_σ P(γ) D_σ` with `diag P(γ) = 1` identically: θ, ζ, β are all scale-free
+(RR04 §4i). **Correction (RR04 / D-009, 2026-07-13):** the earlier claim that
+`σ̂ = 1` at the optimum when the free family is fitted to `R` is false at finite
+N — it holds *only* at perfect fit. The finite-N ML projection preserves
+`diag(Σ̂⁻¹R) = 1`, **not** `diag Σ̂ = 1` (the B6 refutation, changelog below);
+that is the exact content of the free family's stationarity condition. The
+scale-invariance ⇒ χ²/Wald-validity argument therefore has its true home in the
+*free* family (now `cpm_fit(scaling = "free")`, M18), not in the σ ≡ 1
+*correlation-structure* family that ships as the default — for which the
+argument does not hold and analytic-CI trust rests on the §6.3 gate and the
+measured coverage instead. So:
 
 - point estimates and `T = n·F̂` are asymptotically valid;
 - information-based SEs for θ, ζ, β are justified by the same invariance
@@ -650,9 +658,13 @@ differences, try the mirror); (2) `n = N − 1` vs `N` in `T` and RMSEA;
 boundary constraints likely report the *unreduced* df); (4) their matrix
 transcription (re-diff the input `R` against the paper); (5) ζ vs ζ²
 labeling; (6) SRMR denominator convention — off-diagonal-only `p(p−1)/2`
-(ours, §5.3) vs diagonal-inclusive `p(p+1)/2`: since diagonal residuals are
-identically 0 here, the two differ by `√((p−1)/(p+1))` ≈ 0.88 at p = 8, far
-beyond tolerance (A-review F6); (7) CI shape — symmetric on the natural
+(ours, §5.3) vs diagonal-inclusive `p(p+1)/2`. Under the **σ ≡ 1**
+correlation-structure fit the diagonal residuals are identically 0, so the two
+differ by a fixed `√((p−1)/(p+1))` ≈ 0.88 at p = 8, far beyond tolerance
+(A-review F6). Under **free scaling** (M18) the diagonal residuals are
+`1 − σ̂_i²` and no longer vanish, so the exact conversion is
+`SRMR_CircE² = [ (p(p−1)/2)·SRMR_ours² + Σ_i (1 − σ̂_i²)² ] / (p(p+1)/2)`
+(RR04 §4iii; encoded in `test-cpm_oracles.R`, not as a fixed allowance); (7) CI shape — symmetric on the natural
 scale vs back-transformed from an unconstrained scale (decides what the
 analytic-CI gate compares); (8) BIC's `ln N` vs `ln n`; only then
 (9) suspect the code.
