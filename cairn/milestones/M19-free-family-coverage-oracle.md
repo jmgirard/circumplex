@@ -98,10 +98,13 @@ unconditional caution with the coverage-validated statement the data support.
       with per-replicate `T_free` collection. Seeded/reproducible; smoke env var.
 - [x] **T2** — Run the full seeded free-family oracle; commit the `.rds`
       results (analytic-only ⇒ session-runnable, no per-fit bootstrap).
-- [ ] **T3** — Interpret the coverage table: decide N-conditional vs. justified-
+- [x] **T3** — Interpret the coverage table: decide N-conditional vs. justified-
       unconditional caution for the free family; do **not** silently reuse the
       diag constants (spec §4). Draft the milestone-local decision.
-- [ ] **T4** — Record the measured coverage in `cairn/DESIGN.md` (new subsection
+      **Outcome:** N-conditional — the diag thresholds (2000/50000) are the
+      correct free thresholds, now coverage-validated (not silently reused);
+      small-N SE-fragility reinforces the N<2000 caution. → D-010 (T5).
+- [x] **T4** — Record the measured coverage in `cairn/DESIGN.md` (new subsection
       mirroring "CPM confidence intervals: measured coverage"); update the CPM-CI
       section prose.
 - [ ] **T5** — Update `R/cpm_oop.R` free caution branch + `R/cpm_fit.R` roxygen
@@ -152,6 +155,13 @@ unconditional caution with the coverage-validated statement the data support.
   N=250 fits, 12–18% at N=1000, ~0% at N≥2000. ⇒ diag N-thresholds (2000/50000)
   are the correct free thresholds, now coverage-validated (not silently reused);
   small-N fragility reinforces the N<2000 caution. Feeds T3/T4/T5.
+
+- 2026-07-13: T4 done — recorded the free-family coverage in `cairn/DESIGN.md`
+  as a new "CPM free-scaling analytic CIs: measured coverage (M19)" subsection
+  (table + 4 what-it-decides bullets) after the M4/B6 subsection; updated the
+  validation-battery note to cite stage 3. T3 interpretation folded in: the diag
+  N-thresholds are the correct, now-validated free thresholds; retire M18-D3's
+  placeholder unconditional caution (→ D-010 at T5).
 
 ## Decisions
 
