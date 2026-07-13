@@ -75,6 +75,9 @@ trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
 - 2026-07-12: gained `Depends on: M16` (/milestone-plan) — the v2.0.0 bundle
   now includes the print-independent certification-rule replacement, which the
   user placed before the ~2026-07-26 freeze. No release-prep task change.
+- 2026-07-12: dependency M16 is now **done** (PR #40 merged, squash `cd0c140`).
+  M7 stays `blocked` on the external CRAN cadence window (~2026-08-02), not on
+  any remaining milestone.
 
 ## Decisions
 
