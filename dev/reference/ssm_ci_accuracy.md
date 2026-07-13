@@ -70,7 +70,11 @@ ssm_ci_accuracy(
 
   Optional. A pre-fitted `circumplex_cpm` object to reuse for the
   population structure instead of refitting (its scales must match the
-  ssm object's). Ignored when `structure = "observed"`.
+  ssm object's). Must be a unit-scaling fit (the default
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  scaling); a free-scaling fit models a covariance structure and is not
+  a valid population correlation structure for this diagnostic. Ignored
+  when `structure = "observed"`.
 
 - data:
 

@@ -34,9 +34,13 @@ cpm_simulate(object, n)
 
 A numeric matrix with `n` rows and one column per fitted scale, columns
 in the fitted scale order with `colnames` set to the scale names
-(`rownames` are `NULL`). The population margins are zero-mean and
-unit-variance, so [`cor()`](https://rdrr.io/r/stats/cor.html) of the
-returned matrix converges to `object$matrices$Phat` as `n` grows.
+(`rownames` are `NULL`). The population covariance is
+`object$matrices$Phat`, so [`cov()`](https://rdrr.io/r/stats/cor.html)
+of the returned matrix converges to it as `n` grows. Under the default
+unit scaling `Phat` is a correlation matrix (zero-mean, unit-variance
+margins), so [`cor()`](https://rdrr.io/r/stats/cor.html) converges to it
+too; under `scaling = "free"` the margins carry the fitted variance
+ratios \\\hat\sigma^2\\.
 
 ## Details
 

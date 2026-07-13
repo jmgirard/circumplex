@@ -108,9 +108,12 @@ number.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A numeric matrix with <code>n</code> rows and one column per fitted scale,
 columns in the fitted scale order with <code>colnames</code> set to the scale names
-(<code>rownames</code> are <code>NULL</code>). The population margins are zero-mean and
-unit-variance, so <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor()</a></code> of the returned matrix converges to
-<code>object$matrices$Phat</code> as <code>n</code> grows.</p>
+(<code>rownames</code> are <code>NULL</code>). The population covariance is
+<code>object$matrices$Phat</code>, so <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov()</a></code> of the returned matrix converges to it
+as <code>n</code> grows. Under the default unit scaling <code>Phat</code> is a correlation matrix
+(zero-mean, unit-variance margins), so <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor()</a></code> converges to it too; under
+<code>scaling = "free"</code> the margins carry the fitted variance ratios
+\(\hat\sigma^2\).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

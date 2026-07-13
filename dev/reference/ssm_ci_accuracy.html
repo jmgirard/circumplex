@@ -147,7 +147,10 @@ itself material).</p></dd>
 <dt id="arg-cpm">cpm<a class="anchor" aria-label="anchor" href="#arg-cpm"></a></dt>
 <dd><p>Optional. A pre-fitted <code>circumplex_cpm</code> object to reuse for the
 population structure instead of refitting (its scales must match the ssm
-object's). Ignored when <code>structure = "observed"</code>.</p></dd>
+object's). Must be a unit-scaling fit (the default <code><a href="cpm_fit.html">cpm_fit()</a></code> scaling);
+a free-scaling fit models a covariance structure and is not a valid
+population correlation structure for this diagnostic. Ignored when
+<code>structure = "observed"</code>.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>

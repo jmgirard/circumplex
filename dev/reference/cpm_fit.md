@@ -19,6 +19,7 @@ cpm_fit(
   n = NULL,
   m = 3,
   model = c("quasi-circumplex", "constrained-angles", "equal-communality", "circulant"),
+  scaling = c("unit", "free"),
   reference = 1,
   interval = 0.95,
   ci_method = c("bootstrap", "analytic"),
@@ -73,6 +74,22 @@ cpm_fit(
   (default; free angles and communalities), `"constrained-angles"`
   (angles fixed at their theoretical values), `"equal-communality"` (a
   single shared communality), or `"circulant"` (both constraints).
+
+- scaling:
+
+  The covariance-scaling family, orthogonal to `model`: `"unit"`
+  (default) fits the correlation structure with a unit model-implied
+  diagonal (the historical behaviour); `"free"` fits Browne's covariance
+  structure \\\Sigma = D\_\sigma P D\_\sigma\\ with `p` free variance
+  scales, the parameterization CIRCUM and CircE use, so `cpm_fit()` can
+  reproduce their published output exactly. Free scaling adds `p`
+  parameters but leaves the degrees of freedom unchanged (it fits the
+  `p` extra diagonal covariance moments). The fitted \\\hat\sigma^2\\
+  are reported as a `VarRatio` column (the ratio of reproduced to input
+  variance); they carry no confidence interval, and the analytic
+  intervals for the remaining parameters are not yet coverage-validated
+  for this family ([`summary()`](https://rdrr.io/r/base/summary.html)
+  cautions). The input is still a correlation matrix (unit diagonal).
 
 - reference:
 
