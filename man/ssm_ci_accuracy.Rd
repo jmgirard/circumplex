@@ -39,7 +39,10 @@ itself material).}
 
 \item{cpm}{Optional. A pre-fitted \code{circumplex_cpm} object to reuse for the
 population structure instead of refitting (its scales must match the ssm
-object's). Ignored when \code{structure = "observed"}.}
+object's). Must be a unit-scaling fit (the default \code{cpm_fit()} scaling);
+a free-scaling fit models a covariance structure and is not a valid
+population correlation structure for this diagnostic. Ignored when
+\code{structure = "observed"}.}
 
 \item{data}{Optional. The original data set, required only for ssm objects
 created before sufficient statistics were stored at analysis time; the

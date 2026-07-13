@@ -120,6 +120,10 @@ published CIRCUM/CircE solution.
 - 2026-07-13: all tasks done; status → review. Free-scaling covariance family
   reproduces published CircE fit to printed precision (F̂/χ²/RMSEA/CFI/TLI/σ²);
   FD gradient err 2.4e-9; check clean 0/0/0 (NOT_CRAN); full test() green.
+- 2026-07-13 (review): fresh-context fan-out found 1 finding (scored 90):
+  free-scaled Phat (=Σ) fed to `ssm_ci_accuracy(cpm=)` corrupts the correlation
+  population. Fixed on-branch: guard refusing non-unit cpm + roxygen note +
+  regression test. Re-verified: ci_accuracy suite green, cpm suites green.
 
 ## Decisions
 
@@ -168,3 +172,27 @@ AC1→T2,T3 · AC2→T4 · AC3→T4 · AC4→T1,T5 · AC5→T6 — every criteri
 existing task. No DESIGN.md principle changed → `cairn_impact` N/A. Toolchain
 (r-package consistency-gate): R CMD check 0/0/0, roxygen/NAMESPACE regenerated
 and committed.
+
+**Independent fresh-context review (3 lenses + scorer).**
+- **[O] diff-bug:** no correctness findings in the M18 diff — verified unit path
+  bit-identical, gradient (Σ⁻¹/Ã) correct, df/AIC/q counting, σ-index integrity,
+  both oracles. (It cleared the `ssm_ci_accuracy` consumer by checking only the
+  internal unit-fit path and missed the user-supplied `cpm=` path — caught by
+  the blame lens below.)
+- **[S] blame-history:** **1 finding (scored 90, actioned/fixed).** M18 changed
+  `cpm_fit()`'s `matrices$Phat` from a correlation matrix to Σ (diagonal σ²)
+  under free scaling. `ssm_ci_accuracy(structure="cpm", cpm=<free fit>)` embeds
+  that Phat as the scale block of a joint *correlation* matrix (line 371) whose
+  measure↔scale cross-blocks assume unit-variance scales → internally
+  inconsistent population → silently miscalibrated coverage. Reachable only via
+  the user-supplied `cpm=` arg (internal fit is always unit); PSD repair does
+  **not** neutralize it (unit-diag rescale runs only on the eigen-clamp branch).
+  Independently code-verified + fresh-scorer-confirmed (90).
+  **Fix:** `ssm_ci_accuracy()` now refuses a non-unit `cpm` object with a clear
+  message (`R/ssm_ci_accuracy.R`); roxygen documents the unit-scaling
+  requirement; regression test in `test-ci_accuracy.R`. A legacy object with no
+  `scaling` field passes (unit by construction).
+- **[S] prior-PR-comments:** no prior-PR evidence (repo reviews via cairn
+  commits, not GitHub threads) — clean no-op.
+- Sub-threshold findings excluded: none (only the one finding surfaced, scored
+  ≥80).

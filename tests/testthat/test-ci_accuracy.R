@@ -520,6 +520,24 @@ test_that("a pre-fitted CPM is reused rather than refit", {
   expect_identical(res$cpm$matrices$Phat, pre$matrices$Phat)
 })
 
+test_that("a free-scaling CPM is refused (correlation-structure diagnostic)", {
+  # M18 review: a free-scaling fit's Phat is a covariance (non-unit diagonal),
+  # which would embed inconsistent variances into the simulated population and
+  # silently miscalibrate coverage. Refuse it up front rather than corrupt.
+  data("jz2017")
+  jz <- jz2017[1:200, ]
+  set.seed(913)
+  obj <- ssm_analyze(jz, scales = PANO(), boots = 40)
+  stats <- obj$details$suff_stats
+  free_fit <- cpm_fit(cormat = stats$cormats[[1]], n = stats$n[[1]],
+                      scales = PANO(), angles = as.numeric(octants()),
+                      scaling = "free")
+  expect_error(
+    ssm_ci_accuracy(obj, reps = 3, amplitude_factors = 1, cpm = free_fit),
+    regexp = "unit-scaling|scaling"
+  )
+})
+
 test_that("input validation rejects bad arguments", {
   data("aw2009")
   set.seed(921)

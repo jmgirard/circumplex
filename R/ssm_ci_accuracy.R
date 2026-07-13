@@ -82,7 +82,10 @@
 #'   `NULL` uses `min(3, floor((p - 1) / 2))`).
 #' @param cpm Optional. A pre-fitted `circumplex_cpm` object to reuse for the
 #'   population structure instead of refitting (its scales must match the ssm
-#'   object's). Ignored when `structure = "observed"`.
+#'   object's). Must be a unit-scaling fit (the default `cpm_fit()` scaling);
+#'   a free-scaling fit models a covariance structure and is not a valid
+#'   population correlation structure for this diagnostic. Ignored when
+#'   `structure = "observed"`.
 #' @param data Optional. The original data set, required only for ssm objects
 #'   created before sufficient statistics were stored at analysis time; the
 #'   statistics are then recomputed and checked against the stored profile
@@ -203,6 +206,20 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
   structure <- match.arg(structure)
   stopifnot(is.null(m) || is_scalar_count(m))
   stopifnot(is.null(cpm) || inherits(cpm, "circumplex_cpm"))
+  # This diagnostic characterizes the population *correlation* structure and
+  # embeds the cpm's model-implied scale matrix into a joint correlation matrix
+  # (unit-variance scales). A free-scaling fit's `matrices$Phat` is a covariance
+  # (Sigma = D_sigma P D_sigma, diagonal sigma^2 != 1), which would make that
+  # joint matrix internally inconsistent and silently miscalibrate the simulated
+  # coverage. Refuse it (M18 review). A legacy object predating the `scaling`
+  # field (NULL) is a unit fit by construction and passes.
+  if (!is.null(cpm) && !is.null(cpm$details$scaling) &&
+      !identical(cpm$details$scaling, "unit")) {
+    stop("`cpm` must be a unit-scaling fit: ssm_ci_accuracy() characterizes the ",
+         "population correlation structure, but the supplied cpm_fit() object ",
+         "was fitted with scaling = \"", cpm$details$scaling, "\". Refit with the ",
+         "default scaling = \"unit\".", call. = FALSE)
+  }
   parallel <- match.arg(parallel, c("no", "multicore", "snow"))
   stopifnot(is_scalar_count(ncpus))
   # The dimensionless certification constant, single-sourced from the rule it
