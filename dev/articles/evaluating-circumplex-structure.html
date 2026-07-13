@@ -503,12 +503,16 @@ studies would consider respectable.</p>
 <span><span class="co">#&gt; Amplitude         0.021      0.009      0.096</span></span>
 <span><span class="co">#&gt; Displacement    188.695     29.052    335.755</span></span>
 <span><span class="co">#&gt; Model Fit         0.150                      </span></span>
-<span><span class="co">#&gt;   Note: model fit is inadequate (R² &lt; .70); interpret only the elevation parameter.</span></span></code></pre></div>
+<span><span class="co">#&gt;   Note: model fit is inadequate (R² &lt; .70); interpret only the elevation parameter.</span></span>
+<span><span class="co">#&gt;   Note: the amplitude CI lower bound is under 0.35 CI-widths above zero; the displacement is not interpretable.</span></span></code></pre></div>
 <p>Note the guardrail in the printed output: when a profile’s amplitude
-interval includes zero, <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> marks the
-displacement as uninterpretable rather than certifying its direction.
-The diagnostic below measures, among other things, how well that
-certification rule performs at your configuration.</p>
+CI lower bound sits less than 0.35 CI-widths above zero,
+<code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> marks the displacement as uninterpretable
+rather than certifying its direction. That rule is scale-free (it
+compares the lower bound to the interval’s own width, so it means the
+same thing on any score metric) and does not depend on the display
+precision. The diagnostic below measures, among other things, how well
+that certification rule performs at your configuration.</p>
 <p>We again use reduced settings (<code>reps = 200</code>, a short
 amplitude ladder, and the smaller <code>boots</code> above) to keep the
 vignette fast; the defaults (<code>reps = 1000</code>, four ladder
@@ -520,7 +524,7 @@ without changing results for a given seed.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">34567</span><span class="op">)</span></span>
 <span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy</a></span><span class="op">(</span><span class="va">res</span>, reps <span class="op">=</span> <span class="fl">200</span>, amplitude_factors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: CPM Hessian is ill-conditioned (condition number 1.29e+17): angles may</span></span>
+<span><span class="co">#&gt; Warning: CPM Hessian is ill-conditioned (condition number 9.17e+16): angles may</span></span>
 <span><span class="co">#&gt; be clustered or parameters weakly determined.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -531,8 +535,8 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; Amplitude Ladder:     1 0.5 0 2.077 </span></span>
 <span><span class="co">#&gt; Population Structure:     Browne circular model (CPM) </span></span>
 <span><span class="co">#&gt; Group Sizes:      All = 250 </span></span>
-<span><span class="co">#&gt; Certification Rule:   round(a_lci, 3) &gt; 0 (threshold 0.0005 amplitude units) </span></span>
-<span><span class="co">#&gt; Elapsed:      14 s</span></span>
+<span><span class="co">#&gt; Certification Rule:   a_lci / (a_uci - a_lci) &gt;= 0.35 (scale-free, print-independent) </span></span>
+<span><span class="co">#&gt; Elapsed:      13.8 s</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
 <span><span class="co">#&gt; RMSEA = 0.064, SRMR = 0.038).</span></span>
@@ -552,34 +556,29 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt;   # Profile [PARPD] (n = 250; 95% bootstrap CIs, 500 replicates):</span></span>
 <span><span class="co">#&gt;     Elevation      coverage 94.0% -- borderline</span></span>
 <span><span class="co">#&gt;     Amplitude      coverage 94.0% -- borderline</span></span>
-<span><span class="co">#&gt;     Displacement   coverage 92.0% when certified -- borderline</span></span>
-<span><span class="co">#&gt;     Guardrail      if the true amplitude were zero, displacement would still</span></span>
-<span><span class="co">#&gt;                    be certified 100.0% of the time -- the "amplitude CI</span></span>
-<span><span class="co">#&gt;                    excludes zero" rule is far weaker than the 2.5% error rate</span></span>
-<span><span class="co">#&gt;                    its wording suggests</span></span>
-<span><span class="co">#&gt;   Verdict: CAUTION -- the interpretability guardrail provides almost no</span></span>
-<span><span class="co">#&gt;   protection against a truly zero amplitude. Elevation, amplitude, and</span></span>
-<span><span class="co">#&gt;   certified displacement coverage rates are borderline at this number of</span></span>
-<span><span class="co">#&gt;   replications; a larger `reps` would sharpen the verdict. Consider a larger</span></span>
-<span><span class="co">#&gt;   sample or treat near-zero amplitudes as inconclusive rather than absent.</span></span>
+<span><span class="co">#&gt;     Displacement   coverage 89.6% when certified -- borderline</span></span>
+<span><span class="co">#&gt;     Guardrail      under a truly zero amplitude, displacement would be</span></span>
+<span><span class="co">#&gt;                    certified 1.0% of the time (user-expectation benchmark</span></span>
+<span><span class="co">#&gt;                    2.5%)</span></span>
+<span><span class="co">#&gt;   Verdict: BORDERLINE -- elevation, amplitude, and certified displacement</span></span>
+<span><span class="co">#&gt;   coverage rates are borderline at this number of replications; a larger</span></span>
+<span><span class="co">#&gt;   `reps` would sharpen the verdict.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   # Profile [OCPD] (n = 250; 95% bootstrap CIs, 500 replicates):</span></span>
 <span><span class="co">#&gt;     Elevation      coverage 94.0% -- borderline</span></span>
 <span><span class="co">#&gt;     Amplitude      coverage 85.0% -- INADEQUATE (under-coverage; misses are</span></span>
 <span><span class="co">#&gt;                    almost all below the interval: the amplitude CI tends to</span></span>
 <span><span class="co">#&gt;                    sit above the truth)</span></span>
-<span><span class="co">#&gt;     Displacement   coverage 82.5% when certified -- INADEQUATE</span></span>
+<span><span class="co">#&gt;     Displacement   coverage 60.0% when certified -- INADEQUATE</span></span>
 <span><span class="co">#&gt;                    (under-coverage)</span></span>
-<span><span class="co">#&gt;     Guardrail      if the true amplitude were zero, displacement would still</span></span>
-<span><span class="co">#&gt;                    be certified 100.0% of the time -- the "amplitude CI</span></span>
-<span><span class="co">#&gt;                    excludes zero" rule is far weaker than the 2.5% error rate</span></span>
-<span><span class="co">#&gt;                    its wording suggests</span></span>
+<span><span class="co">#&gt;     Guardrail      under a truly zero amplitude, displacement would be</span></span>
+<span><span class="co">#&gt;                    certified 1.0% of the time (user-expectation benchmark</span></span>
+<span><span class="co">#&gt;                    2.5%)</span></span>
 <span><span class="co">#&gt;   Verdict: CAUTION -- amplitude CIs are less reliable than nominal at this</span></span>
-<span><span class="co">#&gt;   sample size, displacement CIs mis-cover even when certified, and the</span></span>
-<span><span class="co">#&gt;   interpretability guardrail provides almost no protection against a truly</span></span>
-<span><span class="co">#&gt;   zero amplitude. Elevation coverage is borderline at this number of</span></span>
-<span><span class="co">#&gt;   replications; a larger `reps` would sharpen the verdict. Consider a larger</span></span>
-<span><span class="co">#&gt;   sample or treat near-zero amplitudes as inconclusive rather than absent.</span></span>
+<span><span class="co">#&gt;   sample size and displacement CIs mis-cover even when certified. Elevation</span></span>
+<span><span class="co">#&gt;   coverage is borderline at this number of replications; a larger `reps`</span></span>
+<span><span class="co">#&gt;   would sharpen the verdict. Consider a larger sample or treat near-zero</span></span>
+<span><span class="co">#&gt;   amplitudes as inconclusive rather than absent.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coverage by profile, parameter, and amplitude condition:</span></span>
 <span><span class="co">#&gt;  Profile Parameter Condition Coverage MC_se Left_miss Right_miss Median_width</span></span>
@@ -628,22 +627,22 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.920           200      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.896           144      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.825           200      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.600            10      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.915           200      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.926            27      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.710           200      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.000             3      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
@@ -663,31 +662,31 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
 <span><span class="co">#&gt;                    NA            NA      FALSE    200</span></span>
-<span><span class="co">#&gt;                 0.885           200      FALSE    200</span></span>
+<span><span class="co">#&gt;                 0.882            17      FALSE    200</span></span>
 <span><span class="co">#&gt;   Note: amplitude coverage on rows flagged Structural is structurally 0 (a</span></span>
 <span><span class="co">#&gt;   percentile interval of strictly positive amplitude replicates cannot</span></span>
 <span><span class="co">#&gt;   contain a zero truth) -- a theorem, not a measurement; the informative</span></span>
 <span><span class="co">#&gt;   near-zero rungs are the small c &gt; 0 ones.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Guardrail operating characteristics:</span></span>
-<span><span class="co">#&gt;  Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Threshold</span></span>
-<span><span class="co">#&gt;    PARPD     1.000         1    0.981        1     0.025      NA     5e-04</span></span>
-<span><span class="co">#&gt;     OCPD     1.000         1    0.981        1     0.025      NA     5e-04</span></span>
-<span><span class="co">#&gt;    PARPD     0.500         1    0.981        1     0.025      NA     5e-04</span></span>
-<span><span class="co">#&gt;     OCPD     0.500         1    0.981        1     0.025      NA     5e-04</span></span>
-<span><span class="co">#&gt;    PARPD     0.000         1    0.981        1     0.025    TRUE     5e-04</span></span>
-<span><span class="co">#&gt;     OCPD     0.000         1    0.981        1     0.025    TRUE     5e-04</span></span>
-<span><span class="co">#&gt;    PARPD     2.077         1    0.981        1     0.025      NA     5e-04</span></span>
-<span><span class="co">#&gt;     OCPD     2.077         1    0.981        1     0.025      NA     5e-04</span></span>
-<span><span class="co">#&gt;  Fit_pass_rate Branch_pathology_rate N_reps</span></span>
-<span><span class="co">#&gt;          0.555                     0    200</span></span>
-<span><span class="co">#&gt;          0.075                     0    200</span></span>
-<span><span class="co">#&gt;          0.115                     0    200</span></span>
-<span><span class="co">#&gt;          0.045                     0    200</span></span>
-<span><span class="co">#&gt;          0.020                     0    200</span></span>
-<span><span class="co">#&gt;          0.070                     0    200</span></span>
-<span><span class="co">#&gt;          0.985                     0    200</span></span>
-<span><span class="co">#&gt;          0.115                     0    200</span></span></code></pre></div>
+<span><span class="co">#&gt;  Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Fit_pass_rate</span></span>
+<span><span class="co">#&gt;    PARPD     1.000     0.720    0.654    0.778     0.025      NA         0.555</span></span>
+<span><span class="co">#&gt;     OCPD     1.000     0.050    0.027    0.090     0.025      NA         0.075</span></span>
+<span><span class="co">#&gt;    PARPD     0.500     0.135    0.094    0.189     0.025      NA         0.115</span></span>
+<span><span class="co">#&gt;     OCPD     0.500     0.015    0.005    0.043     0.025      NA         0.045</span></span>
+<span><span class="co">#&gt;    PARPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.020</span></span>
+<span><span class="co">#&gt;     OCPD     0.000     0.010    0.003    0.036     0.025   FALSE         0.070</span></span>
+<span><span class="co">#&gt;    PARPD     2.077     1.000    0.981    1.000     0.025      NA         0.985</span></span>
+<span><span class="co">#&gt;     OCPD     2.077     0.085    0.054    0.132     0.025      NA         0.115</span></span>
+<span><span class="co">#&gt;  Branch_pathology_rate N_reps</span></span>
+<span><span class="co">#&gt;                      0    200</span></span>
+<span><span class="co">#&gt;                      0    200</span></span>
+<span><span class="co">#&gt;                      0    200</span></span>
+<span><span class="co">#&gt;                      0    200</span></span>
+<span><span class="co">#&gt;                      0    200</span></span>
+<span><span class="co">#&gt;                      0    200</span></span>
+<span><span class="co">#&gt;                      0    200</span></span>
+<span><span class="co">#&gt;                      0    200</span></span></code></pre></div>
 <p>How to read this output:</p>
 <ul>
 <li>
@@ -707,17 +706,17 @@ flat-profile case, where displacement has no true value at all and the
 amplitude interval cannot cover the boundary truth (its printed zero
 coverage is structural, flagged in the table). When a profile’s
 estimated amplitude is smaller than half its own CI width — as for
-obsessive–compulsive PD here — the diagnostic adds one more rung at the
-<em>certification margin</em> (a scaling factor above 1), the amplitude
-at which the certification threshold would sit exactly at the observed
-half-width.</li>
+obsessive–compulsive PD here — the diagnostic adds one more rung at a
+scaling factor above 1, the amplitude at which the population would sit
+exactly at the observed CI half-width.</li>
 <li>
 <strong>The guardrail table</strong> reports how often profiles were
-<em>certified</em> (amplitude CI excluding zero) at each rung. At the 0
-rung, any certification is a false certification: the summary prints a
-caution when the false-certification rate is materially above the rate a
-user would expect from the interval level. This is a measured property
-of the shipped display rule, not a hypothesis test.</li>
+<em>certified</em> (amplitude CI lower bound at least 0.35 CI-widths
+above zero) at each rung. At the 0 rung, any certification is a false
+certification: the summary prints a caution when the false-certification
+rate is materially above the rate a user would expect from the interval
+level. This is a measured property of the shipped display rule, not a
+hypothesis test.</li>
 <li>
 <strong>The verdict</strong> classifies elevation, amplitude, and
 certification-conditional displacement coverage at your as-estimated
@@ -728,26 +727,31 @@ conclusion per profile.</li>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="evaluating-circumplex-structure_files/figure-html/accuracy_plot-1.png" class="r-plt" alt="" width="100%"></p>
-<p>The two profiles tell usefully different stories. For paranoid PD the
-intervals themselves behave: nothing in its coverage table clearly
-leaves the Bradley band, at the as-estimated amplitude or with the
-population amplitude halved. For obsessive–compulsive PD, amplitude and
-certified-displacement coverage fall well below the Bradley band already
-at the profile’s own estimated amplitude — its intervals under-cover, in
-the direction of missing below the truth.</p>
-<p>Yet <em>both</em> verdicts lead with a caution, and the reason is the
-guardrail line: at this configuration
+<p>The two profiles tell usefully different stories. Paranoid PD is
+certified: its amplitude CI lower bound clears the 0.35-CI-width margin,
+so <code><a href="../reference/ssm_analyze.html">ssm_analyze()</a></code> reports its displacement, and nothing in
+its coverage table clearly leaves the Bradley band at the as-estimated
+amplitude or with the population amplitude halved. Obsessive–compulsive
+PD is <em>not</em> certified — its amplitude (about .02 here) is far too
+close to zero relative to its CI width — so the printed output already
+withholds its displacement as uninterpretable, before any coverage
+question is asked. On top of that, the diagnostic shows its amplitude
+and displacement CIs under-cover badly at this sample size (missing
+below the truth), so its verdict is a caution for a genuine reason: the
+intervals themselves are unreliable, not merely the point on the
+circle.</p>
+<p>The guardrail line confirms the rule is doing its job. At this
+configuration
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>250</mn></mrow><annotation encoding="application/x-tex">n = 250</annotation></semantics></math>,
 eight octant correlations), a profile whose true amplitude is exactly
-zero would still be certified essentially every time. The “amplitude CI
-excludes zero” rule offers almost no protection here — certification is
-not, by itself, evidence of real differentiation. What carries the
-reassurance for paranoid PD is the coverage evidence across the ladder,
-not the certificate. This is the same phenomenon Zimmermann and Wright
-flagged from the estimation side: at modest
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
-a sample amplitude large enough to clear zero is the <em>expected</em>
-outcome even from a flat population profile.</p>
+zero would be certified only about the benchmark rate — roughly the
+one-sided error a user reading the guardrail would expect — so no
+caution fires from the guardrail itself. This is the scale-free rule’s
+payoff: unlike a fixed amplitude-unit cutoff, it holds
+false-certification near its intended rate even in the near-zero regime
+Zimmermann and Wright flagged, where a sample amplitude large enough to
+look non-zero is otherwise the <em>expected</em> outcome from a flat
+population.</p>
 <p>One reading note: at reduced <code>reps</code>, classes tend to print
 as <code>borderline</code> — the Wilson interval around the estimated
 coverage is too wide to place it clearly inside or outside the Bradley
@@ -793,8 +797,9 @@ rungs.</li>
 <li>
 <strong>Only interpret displacement when amplitude is
 credible.</strong> The package already withholds the displacement
-interval when the amplitude interval includes zero; the diagnostic tells
-you how reliable that certification is at your configuration.</li>
+interval when the amplitude CI lower bound sits less than 0.35 CI-widths
+above zero; the diagnostic tells you how reliable that certification is
+at your configuration.</li>
 <li>
 <strong>Do not build claims on the fit parameter’s
 interval.</strong> Zimmermann and Wright found bootstrap

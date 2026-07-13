@@ -268,6 +268,7 @@ summary(results3)
 #> Displacement    142.345     68.178    218.702
 #> Model Fit         0.424                      
 #>   Note: model fit is inadequate (R² < .70); interpret only the elevation parameter.
+#>   Note: the amplitude CI lower bound is under 0.35 CI-widths above zero; the displacement is not interpretable.
 ```
 
 ``` r
@@ -550,6 +551,7 @@ summary(results6)
 #> Displacement     77.367     12.983    133.991
 #> Model Fit         0.500                      
 #>   Note: model fit is inadequate (R² < .70); interpret only the elevation parameter.
+#>   Note: the amplitude CI lower bound is under 0.35 CI-widths above zero; the displacement is not interpretable.
 #> 
 #> 
 #> # Contrast [BORPD: Male - Female]:

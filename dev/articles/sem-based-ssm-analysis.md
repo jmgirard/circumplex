@@ -347,11 +347,11 @@ is the honest description of what `d` estimates here.
 
 The interpretation aids you already know carry over unchanged. Amplitude
 is the gate for interpreting displacement: when the amplitude confidence
-interval includes (or nearly reaches) zero, the profile has no
-well-defined direction and the displacement is not interpretable — the
-low-fit dashing on plots and the displacement caution in
-[`print()`](https://rdrr.io/r/base/print.html) behave exactly as they do
-for observed profiles.
+interval’s lower bound sits too close to zero relative to its width, the
+profile has no well-defined direction and the displacement is not
+interpretable — the low-fit dashing on plots and the displacement
+caution in [`print()`](https://rdrr.io/r/base/print.html) behave exactly
+as they do for observed profiles.
 
 ## 6. Two questions about group differences
 

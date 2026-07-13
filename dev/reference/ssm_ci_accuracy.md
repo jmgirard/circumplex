@@ -27,7 +27,6 @@ ssm_ci_accuracy(
   m = NULL,
   cpm = NULL,
   data = NULL,
-  digits = 3,
   parallel = "no",
   ncpus = 1
 )
@@ -80,13 +79,6 @@ ssm_ci_accuracy(
   statistics are then recomputed and checked against the stored profile
   vectors.
 
-- digits:
-
-  Optional. The rounding digits of the certification rule
-  `round(a_lci, digits) > 0` (default = 3, matching the printed
-  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
-  output).
-
 - parallel:
 
   Optional. `"no"` (default), `"multicore"`, or `"snow"`; distributes
@@ -112,16 +104,16 @@ user-expectation benchmark `(1 - interval) / 2`, the stored
 false-certification caution decision at the `c = 0` rung (`Caution`,
 true when the Wilson lower bound exceeds the benchmark; `NA` off that
 rung, and `NA` for a contrast row, which `print.circumplex_ssm()` never
-gates), the implied threshold, fit-pass rate, and the branch-pathology
-rate – the rate at which a displacement point estimate falls
-geometrically outside its own interval), `verdict` (Wilson-vs-Bradley
-classification of elevation, amplitude, and displacement coverage at the
-as-estimated condition – a profile's displacement is classified
-certification-conditionally (`Parameter` `"d_conditional"`), a
-contrast's unconditionally (`Parameter` `"d"`) – plus an overall
-worst-of row per profile; note the printed verdict headline additionally
-elevates to CAUTION whenever the guardrail `Caution` fired, so it can
-read worse than the overall coverage class), `cpm` (the embedded
+gates), fit-pass rate, and the branch-pathology rate – the rate at which
+a displacement point estimate falls geometrically outside its own
+interval), `verdict` (Wilson-vs-Bradley classification of elevation,
+amplitude, and displacement coverage at the as-estimated condition – a
+profile's displacement is classified certification-conditionally
+(`Parameter` `"d_conditional"`), a contrast's unconditionally
+(`Parameter` `"d"`) – plus an overall worst-of row per profile; note the
+printed verdict headline additionally elevates to CAUTION whenever the
+guardrail `Caution` fired, so it can read worse than the overall
+coverage class), `cpm` (the embedded
 [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
 object, or `NULL` when `structure = "observed"`), `population` (per
 profile row: the population profile vectors, truth parameters, and any
@@ -140,18 +132,20 @@ peaking at the 0/360 boundary and contrast intervals reported beyond
 +/-180 degrees are handled without special-casing. Because displacement
 is only interpreted when the printed amplitude guardrail certifies it,
 displacement coverage is also reported conditional on certification
-under the shipped decision rule `round(a_lci, digits) > 0` (the rule the
-printed
+under the shipped decision rule `a_lci / (a_uci - a_lci) >= 0.35` (the
+rule the printed
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
-output applies); the implied certification threshold, `0.5 * 10^-digits`
-in amplitude units, is echoed in the output because it is
-scale-dependent. A contrast row is a signed difference, not a
-prototypicality measure, so `print.circumplex_ssm()` never
-certification-gates it; its displacement verdict and printed coverage
-are therefore reported unconditionally (matching that profiles-only
-stance). Its certification-conditional coverage – where "certified"
-means both profile rows were certified – is still computed and retained
-in the returned object as a descriptive that no display consumes.
+output applies): the amplitude CI's lower bound must sit at least 0.35
+CI widths above zero. The rule is scale-free (invariant to the score
+metric) and print-independent, so no scale-dependent threshold is
+reported; the 0.35 constant is calibrated for the default 95% confidence
+interval. A contrast row is a signed difference, not a prototypicality
+measure, so `print.circumplex_ssm()` never certification-gates it; its
+displacement verdict and printed coverage are therefore reported
+unconditionally (matching that profiles-only stance). Its
+certification-conditional coverage – where "certified" means both
+profile rows were certified – is still computed and retained in the
+returned object as a descriptive that no display consumes.
 
 The `amplitude_factors` ladder manufactures populations whose
 closed-form amplitude is scaled toward zero (the regime where percentile
@@ -247,7 +241,7 @@ res <- ssm_analyze(
 # Small reps/boots keep the example fast; use the defaults in practice
 set.seed(23456)
 acc <- ssm_ci_accuracy(res, reps = 25, amplitude_factors = c(1, 0.25))
-#> Warning: CPM Hessian is ill-conditioned (condition number 3.53e+17): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 6.69e+17): angles may be clustered or parameters weakly determined.
 acc
 #> 
 #> SSM CI accuracy, simulated at your n and settings (25 replications per condition; bootstrap intervals with 100 replicates at level 0.95)
@@ -268,7 +262,7 @@ summary(acc)
 #> Amplitude Ladder:     1 0.25 
 #> Population Structure:     Browne circular model (CPM) 
 #> Group Sizes:      All = 200 
-#> Certification Rule:   round(a_lci, 3) > 0 (threshold 0.0005 amplitude units) 
+#> Certification Rule:   a_lci / (a_uci - a_lci) >= 0.35 (scale-free, print-independent) 
 #> Elapsed:      0.3 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
@@ -307,19 +301,19 @@ summary(acc)
 #>                    NA            NA      FALSE     25
 #>                    NA            NA      FALSE     25
 #>                    NA            NA      FALSE     25
-#>                  0.92            25      FALSE     25
+#>                 0.920            25      FALSE     25
 #>                    NA            NA      FALSE     25
 #>                    NA            NA      FALSE     25
 #>                    NA            NA      FALSE     25
 #>                    NA            NA      FALSE     25
-#>                  0.96            25      FALSE     25
+#>                 0.957            23      FALSE     25
 #> 
 #> Guardrail operating characteristics:
-#>  Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Threshold
-#>      All      1.00         1    0.867        1     0.025      NA     5e-04
-#>      All      0.25         1    0.867        1     0.025      NA     5e-04
-#>  Fit_pass_rate Branch_pathology_rate N_reps
-#>              1                     0     25
-#>              0                     0     25
+#>  Profile Condition Cert_rate Cert_lci Cert_uci Benchmark Caution Fit_pass_rate
+#>      All      1.00      1.00    0.867    1.000     0.025      NA             1
+#>      All      0.25      0.92    0.750    0.978     0.025      NA             0
+#>  Branch_pathology_rate N_reps
+#>                      0     25
+#>                      0     25
 # }
 ```
