@@ -166,17 +166,24 @@ Structure", for a worked introduction to both.
   (point estimates are deterministic). On the correlation-matrix path,
   intervals are analytic (Wald) — there is no raw data to resample — and
   `summary()` cautions when the sample size is small enough that these may
-  mis-cover.
+  mis-cover. A `scaling` argument selects the covariance-scaling family:
+  `"unit"` (the default) fits the correlation structure, while `"free"` fits
+  Browne's covariance structure with `p` free variance scales — the
+  parameterization CIRCUM and CircE use — so `cpm_fit()` can reproduce their
+  published output exactly. Free scaling adds `p` parameters without changing
+  the degrees of freedom, and reports the fitted variance ratios in a
+  `VarRatio` column (without confidence intervals).
 
 * The `cpm_fit()` estimator has been validated against the published
   CIRCUM/CircE literature (Grassi, Luccio, & Di Blas, 2010, reanalyzing
   Browne's 1992 vocational-interest example) and against independent
   OpenMx and lavaan implementations of the same model (both now in Suggests
-  as test oracles only). One documented difference: CIRCUM and CircE fit
-  Browne's covariance parameterization with free variance scalings, so their
-  finite-sample estimates and chi-square differ slightly from `cpm_fit()`'s
-  correlation-structure fit (same degrees of freedom, asymptotically
-  equivalent); see the package's design notes for details. A large seeded
+  as test oracles only). CIRCUM and CircE fit Browne's covariance
+  parameterization with free variance scalings; `cpm_fit(scaling = "free")`
+  fits that same family and reproduces their published estimates, chi-square,
+  and fit indices to printed precision, while the default correlation-structure
+  fit differs from them slightly in finite samples (same degrees of freedom,
+  asymptotically equivalent); see the package's design notes for details. A large seeded
   simulation study measured the coverage of both interval methods: based on
   its results, `summary()` now also cautions about analytic intervals at any
   sample size below 50,000 when the fitted solution is near a parameter

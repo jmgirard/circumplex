@@ -15,9 +15,12 @@ number.}
 \value{
 A numeric matrix with \code{n} rows and one column per fitted scale,
 columns in the fitted scale order with \code{colnames} set to the scale names
-(\code{rownames} are \code{NULL}). The population margins are zero-mean and
-unit-variance, so \code{cor()} of the returned matrix converges to
-\code{object$matrices$Phat} as \code{n} grows.
+(\code{rownames} are \code{NULL}). The population covariance is
+\code{object$matrices$Phat}, so \code{cov()} of the returned matrix converges to it
+as \code{n} grows. Under the default unit scaling \code{Phat} is a correlation matrix
+(zero-mean, unit-variance margins), so \code{cor()} converges to it too; under
+\code{scaling = "free"} the margins carry the fitted variance ratios
+\eqn{\hat\sigma^2}.
 }
 \description{
 Draw \code{n} standardized observations from the model-implied correlation matrix

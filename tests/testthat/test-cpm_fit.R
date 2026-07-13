@@ -700,3 +700,225 @@ test_that("vanishing-harmonic populations yield strictly interior starts that pa
     expect_silent(cpm_pack(cs$theta, sv$zeta, sv$beta, spec))
   }
 })
+
+# =============================================================================
+# Free-scaling covariance family (M18): Sigma = D_sigma P D_sigma, sigma free.
+# Oracle rule unchanged: every expected value is closed-form, an internal
+# invariant, or an independent recomputation -- never from memory.
+# =============================================================================
+
+# A random PD matrix with a NON-unit diagonal (covariance, not correlation),
+# for exercising cpm_discrepancy / the gradient on general S in free mode.
+rand_cov <- function(p) {
+  A <- matrix(stats::rnorm(p * (p + 2)), nrow = p)
+  S <- tcrossprod(A)
+  (S + t(S)) / 2
+}
+
+test_that("free-scaling spec: layout [angle][u][s][v], df unchanged, q += p", {
+  for (v in c("A", "B", "C", "D")) {
+    su <- cpm_spec(8, 3, v, 1, scaling = "unit")
+    sf <- cpm_spec(8, 3, v, 1, scaling = "free")
+    # df is identical (free fits p extra moments with p extra parameters).
+    expect_equal(sf$df, su$df, info = paste("variant", v))
+    expect_equal(sf$q, su$q + 8L)
+    expect_equal(sf$n_sigma, 8L)
+    expect_equal(su$n_sigma, 0L)
+    # s block sits between zeta and beta, beta trailing.
+    expect_true(all(sf$i_sigma > max(c(sf$i_angle, sf$i_zeta), 0)))
+    expect_true(all(sf$i_beta > max(sf$i_sigma)))
+    expect_equal(sf$n_moments, 8L * 9L / 2L)
+    expect_equal(su$n_moments, 8L * 7L / 2L)
+  }
+})
+
+test_that("free-scaling pack/unpack round-trips sigma (log map)", {
+  spec <- cpm_spec(p = 6, m = 2, variant = "A", reference = 1, scaling = "free")
+  spec$theta_ref_val <- 0
+  theta <- c(0, 0.7, 1.4, 2.1, 2.8, 3.5)
+  zeta <- c(0.9, 0.8, 0.7, 0.6, 0.85, 0.75)
+  beta <- c(0.5, 0.3, 0.2)
+  sigma <- c(0.8, 1.2, 1.0, 0.95, 1.1, 0.7)
+  g <- cpm_pack(theta, zeta, beta, spec, sigma = sigma)
+  nat <- cpm_unpack(g, spec)
+  expect_equal(nat$sigma, sigma, tolerance = 1e-12)
+  expect_equal(nat$zeta, zeta, tolerance = 1e-10)
+  expect_equal(nat$beta, beta, tolerance = 1e-10)
+  # default sigma = 1 (s = 0) when omitted
+  expect_equal(cpm_unpack(cpm_pack(theta, zeta, beta, spec), spec)$sigma,
+               rep(1, 6), tolerance = 1e-14)
+})
+
+test_that("free-scaling analytic gradient matches central FD at >= 50 points", {
+  # spec sec. 6: theta random (incl a 0/360-pole and a near-equal-angles
+  # config), zeta in (.3,.95), beta interior via v ~ U(-1,1), s ~ U(-.35,.35),
+  # random PD R incl a few non-unit-diagonal, and one reduced (polished) spec.
+  # Criterion (A-review F8 mixed): |g_a - g_fd| <= 1e-7 max(1, |g_fd|); central
+  # diff, step 1e-6; redraw any point with kappa(Sigma) > 1e6 (FD, not the
+  # gradient, degrades there).
+  set.seed(20260713)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  h <- 1e-6
+  p <- 7; m <- 2
+  full <- cpm_spec(p, m, "A", 1, scaling = "free"); full$theta_ref_val <- 0
+  reduced <- cpm_spec_reduce(full, c(0, 1))       # drop k = 2 (polished spec)
+  n_pts <- 55L
+  npass <- 0L
+  t <- 0L
+  while (npass < n_pts) {
+    t <- t + 1L
+    stopifnot(t < 5000L)
+    spec <- if (t %% 7L == 0L) reduced else full
+    # angle config: pole every 11th, near-equal every 13th, else random
+    theta <- if (t %% 11L == 0L) {
+      c(0, sort(stats::runif(p - 1, 0, 2 * pi)))    # reference at the 0/360 pole
+    } else if (t %% 13L == 0L) {
+      c(0, 0.01 * (1:(p - 1)) + stats::runif(p - 1, -1e-3, 1e-3))  # near-equal
+    } else {
+      c(0, sort(stats::runif(p - 1, 0, 2 * pi)))
+    }
+    zeta <- stats::runif(p, 0.3, 0.95)
+    nb <- length(spec$keep_k) - 1L
+    v <- c(0, stats::runif(nb, -1, 1))
+    beta_keep <- exp(v) / sum(exp(v))
+    beta <- numeric(m + 1L); beta[spec$keep_k + 1L] <- beta_keep
+    sigma <- exp(stats::runif(p, -0.35, 0.35))
+    R <- if (t %% 5L == 0L) rand_cov(p) else rand_cor(p)
+    g <- cpm_pack(theta, zeta, beta, spec, sigma = sigma)
+    Sig <- cpm_implied_cov(cpm_unpack(g, spec)$theta, cpm_unpack(g, spec)$zeta,
+                           cpm_unpack(g, spec)$beta, cpm_unpack(g, spec)$sigma)
+    kappa <- kappa(Sig, exact = TRUE)
+    if (!is.finite(kappa) || kappa > 1e6) next      # redraw: FD degrades here
+    ga <- cpm_gradient(g, R, spec)
+    gfd <- numeric(spec$q)
+    for (i in seq_len(spec$q)) {
+      gp <- g; gm <- g; gp[i] <- gp[i] + h; gm[i] <- gm[i] - h
+      gfd[i] <- (cpm_objective(gp, R, spec) - cpm_objective(gm, R, spec)) / (2 * h)
+    }
+    expect_true(
+      all(abs(ga - gfd) <= 1e-7 * pmax(1, abs(gfd))),
+      info = paste0("free gradient point ", t, ": max err ",
+                    max(abs(ga - gfd) / pmax(1, abs(gfd))))
+    )
+    npass <- npass + 1L
+  }
+  expect_gte(npass, 50L)
+})
+
+test_that("free-scaling gradient at sigma = 1 equals the unit gradient exactly", {
+  # spec sec. 6: at s = 0 the gamma-block gradient must equal the legacy unit
+  # gradient bit-for-bit -- kills the 'used A not A-tilde' and 'used P^-1 not
+  # Sigma^-1' error classes in one assertion.
+  set.seed(11)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  p <- 7; m <- 2
+  uf <- cpm_spec(p, m, "A", 1, scaling = "unit"); uf$theta_ref_val <- 0
+  ff <- cpm_spec(p, m, "A", 1, scaling = "free"); ff$theta_ref_val <- 0
+  for (rep in 1:20) {
+    R <- rand_cor(p)
+    theta <- c(0, sort(stats::runif(p - 1, 0, 2 * pi)))
+    zeta <- stats::runif(p, 0.3, 0.95)
+    v <- c(0, stats::rnorm(m)); beta <- exp(v) / sum(exp(v))
+    gu <- cpm_pack(theta, zeta, beta, uf)
+    gf <- cpm_pack(theta, zeta, beta, ff, sigma = rep(1, p))   # s = 0
+    grad_u <- cpm_gradient(gu, R, uf)
+    grad_f <- cpm_gradient(gf, R, ff)
+    # gamma blocks identical (indices differ only by the inserted s block)
+    expect_identical(grad_f[c(ff$i_angle, ff$i_zeta, ff$i_beta)],
+                     grad_u[c(uf$i_angle, uf$i_zeta, uf$i_beta)])
+  }
+})
+
+test_that("free-scaling: stationarity diag(Sigma^-1 R) = 1 at the optimum", {
+  voc <- cpm_oracle_voc()
+  fit <- cpm_engine(voc$R, angles = voc$th_start, m = 1, variant = "A",
+                    reference = 1, scaling = "free")
+  # At any accepted optimum the sigma first-order condition dF/ds = 0 gives
+  # (Sigma^-1 R)_ii = 1 for all i (spec sec. 3) -- an internal invariant with
+  # no external source. Sigma-hat = fit$P (the reported model matrix).
+  expect_equal(diag(solve(fit$P) %*% voc$R), rep(1, 7), tolerance = 1e-6,
+               ignore_attr = TRUE)
+  # ... which implies tr(Sigma^-1 R) = p, so F-hat = ln|Sigma| - ln|R| (to
+  # optimizer-tail precision: tr - p ~ sum(diag(Sigma^-1 R) - 1) ~ 1e-6).
+  ld <- function(M) as.numeric(determinant(M, logarithm = TRUE)$modulus)
+  expect_equal(fit$F, ld(fit$P) - ld(voc$R), tolerance = 1e-5)
+})
+
+test_that("free-scaling exact recovery: in-family Sigma gives F = 0, sigma = 1", {
+  # Population exactly in the correlation family (sigma = 1) => F-hat ~ 0 and,
+  # crucially, sigma-hat = 1 to 1e-6 (a free family that could not recover
+  # sigma = 1 on in-family data would be mis-specified).
+  theta <- c(0, 40, 95, 150, 190, 230, 285, 330) * pi / 180
+  zeta <- c(.85, .7, .8, .65, .75, .8, .7, .6)
+  beta <- c(.35, .30, .20, .15)
+  P0 <- cpm_implied_cor(theta, zeta, beta)
+  fit <- cpm_engine(P0, angles = theta * 180 / pi, m = 3, variant = "A",
+                    reference = 1, scaling = "free")
+  expect_lt(fit$F, 1e-8)
+  expect_equal(fit$sigma, rep(1, 8), tolerance = 1e-6)
+})
+
+test_that("free-scaling rescale-equivariance: fit(D R D) => sigma -> D sigma", {
+  # The sharpest single test of the whole construction (spec sec. 6): scaling
+  # the input by a positive diagonal D scales sigma-hat by D and leaves
+  # theta/zeta/beta/F-hat invariant. No diag-constrained analog exists.
+  voc <- cpm_oracle_voc()
+  base <- cpm_engine(voc$R, angles = voc$th_start, m = 1, variant = "A",
+                     reference = 1, scaling = "free")
+  set.seed(7)
+  on.exit(rm(".Random.seed", envir = globalenv()), add = TRUE)
+  D <- exp(stats::runif(7, -0.5, 0.5))
+  S <- (D %o% D) * voc$R                              # D R D (non-unit diagonal)
+  scaled <- cpm_engine(S, angles = voc$th_start, m = 1, variant = "A",
+                       reference = 1, scaling = "free")
+  expect_equal(scaled$sigma, base$sigma * D, tolerance = 1e-6, ignore_attr = TRUE)
+  expect_equal(scaled$F, base$F, tolerance = 1e-8)
+  expect_equal(scaled$zeta, base$zeta, tolerance = 1e-6)
+  expect_equal(scaled$beta, base$beta, tolerance = 1e-6)
+  expect_lt(max(cpm_angdiff_deg(scaled$theta, base$theta)), 1e-4)
+})
+
+test_that("free-scaling nesting: F_free <= F_unit on every fixture", {
+  # sigma = 1 is a feasible point of the free family (nested), so its optimum
+  # cannot be worse: F-hat_free <= F-hat_unit + 1e-8. Checked on the published
+  # vocational matrix (m = 1) and a well-identified clean in-family R (m = 3).
+  voc <- cpm_oracle_voc()
+  ct <- cpm_clean_truth()
+  P0 <- cpm_implied_cor(as.numeric(as_radian(as_degree(ct$angles))),
+                        ct$zeta, ct$beta)
+  for (fx in list(list(R = voc$R, a = voc$th_start, m = 1),
+                  list(R = P0, a = ct$angles, m = 3))) {
+    fu <- cpm_engine(fx$R, angles = fx$a, m = fx$m, variant = "A", reference = 1)
+    ff <- cpm_engine(fx$R, angles = fx$a, m = fx$m, variant = "A", reference = 1,
+                     scaling = "free")
+    expect_lte(ff$F, fu$F + 1e-8)
+  }
+})
+
+test_that("unit-scaling cpm_fit is unchanged by the free-scaling machinery", {
+  # Regression guard: the default (unit) path must be byte-identical to before.
+  voc <- cpm_oracle_voc()
+  fu <- cpm_fit(cormat = voc$R, scales = voc$names, angles = voc$th_start,
+                n = voc$N, m = 1)
+  # no VarRatio column, sigma all 1, scaling recorded as unit
+  expect_false("VarRatio" %in% names(fu$results))
+  expect_equal(fu$details$sigma, rep(1, 7))
+  expect_identical(fu$details$scaling, "unit")
+  expect_false(isTRUE(fu$details$sigma_pathology))
+})
+
+test_that("free-scaling cpm_fit end-to-end: VarRatio column, no CI, df unchanged", {
+  voc <- cpm_oracle_voc()
+  ff <- cpm_fit(cormat = voc$R, scales = voc$names, angles = voc$th_start,
+                n = voc$N, m = 1, scaling = "free")
+  expect_true("VarRatio" %in% names(ff$results))
+  expect_equal(ff$results$VarRatio, ff$details$sigma^2, tolerance = 1e-12)
+  # df identical to the unit fit on the same (p, m, variant)
+  fu <- cpm_fit(cormat = voc$R, scales = voc$names, angles = voc$th_start,
+                n = voc$N, m = 1)
+  expect_equal(ff$fit$df, fu$fit$df)
+  # sigma carries no CI surface (no VarRatio_lci/uci columns)
+  expect_false(any(grepl("VarRatio_", names(ff$results))))
+  # AIC/BIC penalize the full parameter count (q includes the p sigmas)
+  expect_gt(ff$details$spec$q, fu$details$spec$q)
+})

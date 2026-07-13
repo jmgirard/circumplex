@@ -492,3 +492,83 @@ test_that("zeta is the communality index; Communality is its square", {
   app <- cpm_oracle_voc_appendix()
   expect_gt(max(abs(fit$results$Communality - app$comm)), 0.05)
 })
+
+# ---- free-scaling family (M18): OUR engine vs the published/CircE oracles ----
+# The payoff of scaling = "free": compare at SAME-MODEL tolerances (spec sec. 6),
+# retiring the B6 model-difference allowances -- our covariance fit is the same
+# estimand CIRCUM/CircE report. Two independent oracle types back every value:
+# published program output (frozen; Grassi App. A) and an independent
+# cross-implementation (live; the OpenMx free-scaling fit).
+
+test_that("free-scaling frozen oracle: our engine reproduces Grassi App. A", {
+  voc <- cpm_oracle_voc()
+  app <- cpm_oracle_voc_appendix()
+  fit <- cpm_fit(cormat = voc$R, scales = voc$names, angles = voc$th_start,
+                 n = voc$N, m = 1, scaling = "free")
+  # Angles to published precision (mirror-aware, reference-relative; sec. 6.5).
+  expect_lt(cpm_mirror_diff_deg(fit$results$Angle, app$theta), 0.01)
+  # Communality index zeta = 1/sqrt(1 + v) to their 4 printed decimals.
+  expect_equal(fit$results$Zeta, round(1 / sqrt(1 + app$v), 4),
+               tolerance = 5e-4, ignore_attr = TRUE)
+  # Correlation-function weights to 4 decimals.
+  expect_equal(fit$betas$Beta, app$beta, tolerance = 5e-4, ignore_attr = TRUE)
+  # Variance ratios sigma^2 = reproduced/input variance (Appendix A .963-1.042).
+  expect_equal(fit$results$VarRatio, app$var_ratios, tolerance = 5e-4,
+               ignore_attr = TRUE)
+  # Discrepancy and the full fit-index set, now at same-model tolerances.
+  expect_equal(fit$fit$F, app$Fhat, tolerance = 1e-4)
+  expect_equal(fit$fit$chisq, app$Tstat, tolerance = 5e-3)
+  expect_equal(fit$fit$df, app$df)
+  expect_lt(abs(fit$fit$pvalue - app$pvalue), 1e-3)   # published to 3 dp
+  # RMSEA .0842 -> published .084 (spec sec. 4); published to 3 dp, so compare
+  # within half a printed unit (absolute), like the RMSEA-CI below.
+  expect_lt(abs(fit$fit$rmsea - app$rmsea), 1e-3)
+  expect_lt(max(abs(fit$fit$rmsea_ci - app$rmsea_ci)), 1e-3)
+  expect_equal(fit$fit$cfi, app$cfi, tolerance = 1e-3)
+  expect_equal(fit$fit$tli, app$tli, tolerance = 1e-3)
+  # SRMR: our off-diagonal convention converted to CircE's diagonal-inclusive
+  # value (spec sec. 4). The free family's diagonal residuals are 1 - sigma^2.
+  # Published SRMR is printed to 2 dp, so compare within half a printed unit.
+  p <- 7
+  srmr_circe <- sqrt((p * (p - 1) / 2 * fit$fit$srmr^2 +
+                        sum((1 - fit$results$VarRatio)^2)) / (p * (p + 1) / 2))
+  expect_lt(abs(srmr_circe - app$srmr), 5e-3)
+})
+
+test_that("free-scaling live oracle: our engine agrees with OpenMx free-scaling", {
+  skip_if_not_installed("OpenMx")
+  skip_on_cran()
+  voc <- cpm_oracle_voc()
+  fit <- cpm_fit(cormat = voc$R, scales = voc$names, angles = voc$th_start,
+                 n = voc$N, m = 1, scaling = "free")
+  mx <- cpm_mx_run(cpm_mx_model(voc$R, voc$N, m = 1,
+                                th0_rad = voc$th_start * pi / 180,
+                                free_scaling = TRUE))
+  # Independent optimizer (CSOLNP), independent model code, same covariance
+  # discrepancy: agreement to publication precision.
+  expect_lt(cpm_mirror_diff_deg(fit$results$Angle, mx$theta_deg), 0.02)
+  expect_equal(fit$results$Zeta, mx$zeta, tolerance = 1e-3, ignore_attr = TRUE)
+  expect_equal(fit$betas$Beta, mx$beta, tolerance = 1e-3, ignore_attr = TRUE)
+  # sigma^2 vs diag(Sigma_mx): OpenMx fits R un-premultiplied on the free path
+  # (the family is closed under rescaling), so its ML (N-1)/N rescale of the
+  # observed matrix is absorbed ENTIRELY into sigma-hat -- diag(Sigma_mx) =
+  # VarRatio * (N-1)/N -- while theta/zeta/beta/F stay invariant (asserted
+  # above). A clean cross-implementation confirmation of the rescale-
+  # equivariance property. cpm_discrepancy at Sigma_mx matches our F to CSOLNP's
+  # optimizer tail (its p free scales + p zeta stop a hair short of our optimum).
+  expect_equal(fit$results$VarRatio * (voc$N - 1) / voc$N, diag(mx$Sigma),
+               tolerance = 1e-3, ignore_attr = TRUE)
+  expect_lt(abs(cpm_discrepancy(voc$R, mx$Sigma) - fit$fit$F), 5e-4)
+})
+
+test_that("free-scaling: fixed-grid (variant B) reproduces Table 2 model 3c", {
+  # Table 2 model 3c: equally spaced angles, free scaling. Our variant-B free
+  # fit lands on the published beta and F at same-model tolerances (the B6
+  # model-difference allowance that variant B needed against the diag family is
+  # retired for its own free-scaling comparison).
+  voc <- cpm_oracle_voc()
+  fB <- cpm_fit(cormat = voc$R, scales = voc$names, angles = 360 * (0:6) / 7,
+                n = voc$N, m = 1, model = "constrained-angles", scaling = "free")
+  expect_equal(fB$betas$Beta, c(.704, .296), tolerance = 2e-3, ignore_attr = TRUE)
+  expect_equal(fB$fit$F, .574, tolerance = 1e-3)
+})

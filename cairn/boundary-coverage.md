@@ -26,6 +26,7 @@ point-estimate level is an engine property tested once, not re-proved per path.
 | Monte Carlo engine | engine-level point estimate (see mean A); pole interval → `:94` | `test-ssm_montecarlo.R:94` | `test-ssm_montecarlo.R:117`, `:224` | `test-ssm_montecarlo.R:141` (flat + singular covariance) |
 | `ssm_ci_accuracy()` | `test-ci_accuracy.R:343` (population peaks at 0/360) | `test-ci_accuracy.R:50` (membership mod 360) | `test-ci_accuracy.R:72`, `:562` | `test-ci_accuracy.R:419` (flat population refused) |
 | SEM (`ssm_sem`) | `test-ssm_sem.R:181`; `test-ssm_sem_groups.R:442` | `test-ssm_sem.R:181`; `test-ssm_sem_groups.R:442`, `:463` | `test-ssm_sem_groups.R:182` (group contrast) | `test-ssm_sem.R:239`, `:58`, `:209`; `test-ssm_sem_groups.R:466` |
+| `cpm_fit()` free scaling (**M18**) | `test-cpm_boundary.R:22`, `:40` (pole item recovers; σ̂ untouched) | shared circular-quantile engine (angle CIs reuse `quantile.circumplex_radian`; σ block orthogonal to angles) → unit-path B | N/A — a CPM fit has no angular contrast estimand | `test-cpm_boundary.R:60`, `:72`, `:86` (singular / zero-variance / near-flat refused, fail-closed) |
 
 ## Audit notes (M11)
 
@@ -41,3 +42,9 @@ point-estimate level is an engine property tested once, not re-proved per path.
 - SEM class C lives only on the grouped path (`ssm_sem` contrasts require
   ≥2 groups); the single-group SEM path has no contrast estimand, so no C cell
   is expected there.
+- **CPM free scaling (M18):** the σ (variance-scale) block is orthogonal to the
+  angle block (spec sec. 5, pins 2–3), so the pole (A) and flat (D) behaviour is
+  the estimator's, exercised on the new `scaling = "free"` path in
+  `test-cpm_boundary.R`. Class B reuses the shared circular-quantile machinery
+  unchanged; class C is not a CPM estimand (no angular contrast). The unit-path
+  CPM pole/flat coverage stays in `test-cpm_fit.R:190`, `:245`.

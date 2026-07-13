@@ -12,6 +12,7 @@ cpm_fit(
   n = NULL,
   m = 3,
   model = c("quasi-circumplex", "constrained-angles", "equal-communality", "circulant"),
+  scaling = c("unit", "free"),
   reference = 1,
   interval = 0.95,
   ci_method = c("bootstrap", "analytic"),
@@ -49,6 +50,19 @@ free-angle variants and \code{floor(p / 2)} for the fixed-angle variants.}
 (default; free angles and communalities), \code{"constrained-angles"} (angles
 fixed at their theoretical values), \code{"equal-communality"} (a single shared
 communality), or \code{"circulant"} (both constraints).}
+
+\item{scaling}{The covariance-scaling family, orthogonal to \code{model}:
+\code{"unit"} (default) fits the correlation structure with a unit model-implied
+diagonal (the historical behaviour); \code{"free"} fits Browne's covariance
+structure \eqn{\Sigma = D_\sigma P D_\sigma} with \code{p} free variance scales,
+the parameterization CIRCUM and CircE use, so \code{cpm_fit()} can reproduce
+their published output exactly. Free scaling adds \code{p} parameters but leaves
+the degrees of freedom unchanged (it fits the \code{p} extra diagonal
+covariance moments). The fitted \eqn{\hat\sigma^2} are reported as a
+\code{VarRatio} column (the ratio of reproduced to input variance); they carry
+no confidence interval, and the analytic intervals for the remaining
+parameters are not yet coverage-validated for this family (\code{summary()}
+cautions). The input is still a correlation matrix (unit diagonal).}
 
 \item{reference}{The index into \code{scales} of the variable whose angle is fixed
 at its theoretical value to identify the rotation (default = 1).}

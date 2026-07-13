@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M18: CIRCUM free-scaling — implementation + oracle validation
 
-- **Status:** planned
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M17
 - **Principles touched:** — (no formal IP/GP ids yet; works under DESIGN.md "Statistical conventions" and "CPM confidence intervals: measured coverage")
-- **Branch/PR:** —
+- **Branch/PR:** m18-circum-free-scaling / #42
 
 ## Goal
 
@@ -39,21 +39,22 @@ published CIRCUM/CircE solution.
 
 ## Acceptance criteria
 
-- [ ] `cpm_fit(..., free_scaling = TRUE)` fits the covariance family and returns
+- [x] `cpm_fit(..., scaling = "free")` fits the covariance family and returns
       σ̂; a regression test in `tests/testthat/test-cpm_fit.R` exercises the path
-      end-to-end.
-- [ ] Reproduces the OpenMx free-scaling oracle to the tolerance fixed by the
+      end-to-end. (AC1 wording amended 2026-07-13: `scaling = c("unit","free")`
+      per spec §7, superseding the plan's `free_scaling = TRUE`.)
+- [x] Reproduces the OpenMx free-scaling oracle to the tolerance fixed by the
       M17 spec, in `tests/testthat/test-cpm_oracles.R` (the free-scaling OpenMx
       transcription already present there is the oracle).
-- [ ] Reproduces the published Grassi et al. (2010, Appendix A) CircE solution
+- [x] Reproduces the published Grassi et al. (2010, Appendix A) CircE solution
       to its printed precision (ζ/β to 4 decimals, angles to ~0.01°, F̂ per the
       §11 nesting/allowance protocol) — test in `test-cpm_oracles.R`.
       Source: Grassi et al. (2010), Appendix A.
-- [ ] The free-family analytic gradient agrees with finite differences to the
+- [x] The free-family analytic gradient agrees with finite differences to the
       spec tolerance at ≥ 50 random feasible points, and the boundary suite
       (peak at 0/360; flat) passes on the free-scaling path — tests in
       `test-cpm_fit.R` / `test-cpm_boundary.R`.
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
       `devtools::test()` green (run with `NOT_CRAN=true`, per M16 lesson).
 
 ## Coverage
@@ -66,24 +67,45 @@ published CIRCUM/CircE solution.
 
 ## Tasks
 
-- [ ] **T1** — Implement the free-family discrepancy `F(S, Σ)` and its analytic
+- [x] **T1** — Implement the free-family discrepancy `F(S, Σ)` and its analytic
       gradient (diagonal terms per the M17 spec) as internal functions;
       test-first against finite differences at ≥ 50 random feasible points.
       (RB tripwire: no-oracle for the gradient derivation until the FD check and
       the OpenMx oracle both pass — treat FD agreement as the first gate.)
-- [ ] **T2** — Add the σ parameterization/packing and the `free_scaling`
+      Done 2026-07-13: `Ã = D_σ A D_σ` weight + `∂F/∂s = 2(1−(Σ⁻¹R)_ii)`; FD
+      err 2.4e-9, σ=1 legacy identity exact 0. Tests pending (T4/below).
+- [x] **T2** — Add the σ parameterization/packing and the `scaling = "free"`
       argument plumbing through `cpm_fit()` (spec/pack/unpack/starts), holding
-      the existing correlation path bit-identical when `free_scaling = FALSE`.
-- [ ] **T3** — Wire the fit path: canonicalization/identification of σ, df/χ²,
+      the existing correlation path bit-identical when `scaling = "unit"`.
+      Done 2026-07-13: `[angle][u][s][v]` layout, `n_moments`-driven df, s⁰=0
+      starts; full existing suite green (unit path unchanged).
+- [x] **T3** — Wire the fit path: canonicalization/identification of σ, df/χ²,
       CI treatment per spec, and the output surface (σ̂ in the returned object;
-      print/summary). Regression test the end-to-end fit.
-- [ ] **T4** — Validation tests: OpenMx free-scaling oracle to spec tolerance;
+      print/summary). Regression test the end-to-end fit. Done 2026-07-13:
+      `VarRatio` column (free only), free-path analytic caution (M18-D3), σ
+      pathology note, σ-aware `cpm_sim_root`. End-to-end free fit reproduces
+      published fit indices (χ²/RMSEA/CFI/TLI). Formal regression tests below.
+- [x] **T4** — Validation tests: OpenMx free-scaling oracle to spec tolerance;
       Grassi et al. (2010) published CircE targets to printed precision.
-- [ ] **T5** — Boundary suite on the free-scaling path (peak at 0/360; flat);
-      update `cairn/boundary-coverage.md` with the new cells.
-- [ ] **T6** — `devtools::document()` (if the API surface changed), full
+      Done 2026-07-13: frozen oracle (App. A angles/ζ/β/σ²/F̂/χ²/RMSEA/RMSEA-CI/
+      CFI/TLI/SRMR-converted to printed precision) + live OpenMx cross-check
+      (θ/ζ/β/σ² agree; σ² offset = exactly (N−1)/N, OpenMx's ML rescale absorbed
+      into σ — confirms equivariance) + Table 2 model-3c fixed-grid row. Plus
+      engine invariants in test-cpm_fit.R: FD gradient ≥50 pts, σ=1 legacy
+      identity, stationarity, exact recovery σ̂=1, rescale-equivariance, nesting.
+- [x] **T5** — Boundary suite on the free-scaling path (peak at 0/360; flat);
+      update `cairn/boundary-coverage.md` with the new cells. Done 2026-07-13:
+      new `test-cpm_boundary.R` (class A pole recovery incl a genuine σ≠1
+      pattern; class D singular/zero-variance/near-flat refusal fail-closed).
+      B is the shared circular-quantile engine (σ orthogonal to angles); C is
+      not a CPM estimand. boundary-coverage.md row + audit note added.
+- [x] **T6** — `devtools::document()` (if the API surface changed), full
       `devtools::check()` + `devtools::test()` (`NOT_CRAN=true`); NEWS entry for
-      the new `free_scaling` argument.
+      the new `scaling` argument. Done 2026-07-13: docs regenerated (`scaling`
+      param in cpm_fit.Rd); NEWS entry (scaling="free"/VarRatio; CIRCUM/CircE
+      now reproducible); design-doc debt cleared (m4-browne-design.md §3.2
+      correction + §6.3 SRMR conversion). `check()` clean: 0 errors / 0 warnings
+      / 0 notes (`NOT_CRAN=true`); full `test()` green.
 
 ## Work log
 
@@ -91,7 +113,86 @@ published CIRCUM/CircE solution.
   free-scaling split (design gate = M17). Depends on M17's ratified spec and
   go decision — if M17 decides no-go, this milestone is retired unbuilt. In
   v2.0.0 scope per D-008.
+- 2026-07-13: status → in-progress; branch m18-circum-free-scaling cut from
+  synced master. Question gate settled (see Decisions M18-D1..D3).
+- 2026-07-13 (amendment, minor): AC1 wording `free_scaling = TRUE` →
+  `scaling = "free"` per spec §7 (M18-D1).
+- 2026-07-13: all tasks done; status → review. Free-scaling covariance family
+  reproduces published CircE fit to printed precision (F̂/χ²/RMSEA/CFI/TLI/σ²);
+  FD gradient err 2.4e-9; check clean 0/0/0 (NOT_CRAN); full test() green.
+- 2026-07-13 (review): fresh-context fan-out found 1 finding (scored 90):
+  free-scaled Phat (=Σ) fed to `ssm_ci_accuracy(cpm=)` corrupts the correlation
+  population. Fixed on-branch: guard refusing non-unit cpm + roxygen note +
+  regression test. Re-verified: ci_accuracy suite green, cpm suites green.
 
 ## Decisions
 
+- **M18-D1 (API name):** the free-scaling flag is `scaling = c("unit","free")`,
+  default `"unit"` (bit-identical to today), orthogonal to `model` — spec §7's
+  preferred form over the plan's boolean `free_scaling`. Jeff, 2026-07-13.
+- **M18-D2 (σ̂² surface):** report σ̂² (reproduced/input variance ratios) as a
+  `VarRatio` column in `results`, populated/printed **only** on the free path
+  (identically 1 under unit → omitted), no CI. Rationale: unit-mode σ²≡1 is a
+  fixed constraint, not an estimate; column presence is the honest "σ estimated"
+  signal. Jeff leaned toward always-present for assumption transparency — a
+  trivial pre-review flip if preferred. 2026-07-13.
+- **M18-D3 (free-path analytic caution):** on `scaling="free"` + analytic CIs,
+  `summary()` prints an **unconditional** caution that free-family Wald CIs for
+  θ/ζ/β are not yet coverage-validated (the free-family coverage oracle is a
+  deferred pre-ship gate, out of M18 scope per spec §4/§6), never reusing the
+  diag-calibrated N=2000/50000 thresholds as a validated trust boundary. σ has
+  no analytic CI ever (spec §4). Jeff, 2026-07-13.
+
 ## Review
+
+**AC evidence (fresh, 2026-07-13; OpenMx live, `NOT_CRAN=true`).** CPM suites:
+test-cpm_fit.R 294 pass, test-cpm_oracles.R 102 pass, test-cpm_boundary.R 9
+pass — 0 fail / 0 skip.
+
+- **AC1** — PASS. `test-cpm_fit.R` "free-scaling cpm_fit end-to-end: VarRatio
+  column, no CI, df unchanged" + "unit-scaling cpm_fit is unchanged": free path
+  returns σ̂ (VarRatio = σ̂²), unit path bit-identical (no VarRatio, σ≡1).
+- **AC2** — PASS. `test-cpm_oracles.R` "free-scaling live oracle: our engine
+  agrees with OpenMx free-scaling" (OpenMx CSOLNP live): θ/ζ/β agree; σ̂² offset
+  = exactly (N−1)/N, F̂ to 5e-4.
+- **AC3** — PASS. `test-cpm_oracles.R` "free-scaling frozen oracle: our engine
+  reproduces Grassi App. A" (angles ≤0.01°, ζ/β/σ² to printed precision,
+  F̂/χ²/RMSEA/RMSEA-CI/CFI/TLI/SRMR-converted) + "fixed-grid (variant B)
+  reproduces Table 2 model 3c".
+- **AC4** — PASS. `test-cpm_fit.R` "free-scaling analytic gradient matches
+  central FD at >= 50 points" (55 feasible pts incl pole/near-equal/non-unit-
+  diagonal/polished; err ≤1e-7) + σ=1 legacy identity (exact) + boundary suite
+  `test-cpm_boundary.R` (class A pole recovery, class D flat/singular refusal).
+- **AC5** — PASS. `devtools::check(args="--no-manual")` `NOT_CRAN=true`:
+  **0 errors / 0 warnings / 0 notes**; full `test()` green.
+
+**Consistency gate (by command).** `cairn_validate.py` exit 0 (all 15 checks
+PASS incl coverage-complete, mirror, single in-progress, caps). Coverage map:
+AC1→T2,T3 · AC2→T4 · AC3→T4 · AC4→T1,T5 · AC5→T6 — every criterion maps to an
+existing task. No DESIGN.md principle changed → `cairn_impact` N/A. Toolchain
+(r-package consistency-gate): R CMD check 0/0/0, roxygen/NAMESPACE regenerated
+and committed.
+
+**Independent fresh-context review (3 lenses + scorer).**
+- **[O] diff-bug:** no correctness findings in the M18 diff — verified unit path
+  bit-identical, gradient (Σ⁻¹/Ã) correct, df/AIC/q counting, σ-index integrity,
+  both oracles. (It cleared the `ssm_ci_accuracy` consumer by checking only the
+  internal unit-fit path and missed the user-supplied `cpm=` path — caught by
+  the blame lens below.)
+- **[S] blame-history:** **1 finding (scored 90, actioned/fixed).** M18 changed
+  `cpm_fit()`'s `matrices$Phat` from a correlation matrix to Σ (diagonal σ²)
+  under free scaling. `ssm_ci_accuracy(structure="cpm", cpm=<free fit>)` embeds
+  that Phat as the scale block of a joint *correlation* matrix (line 371) whose
+  measure↔scale cross-blocks assume unit-variance scales → internally
+  inconsistent population → silently miscalibrated coverage. Reachable only via
+  the user-supplied `cpm=` arg (internal fit is always unit); PSD repair does
+  **not** neutralize it (unit-diag rescale runs only on the eigen-clamp branch).
+  Independently code-verified + fresh-scorer-confirmed (90).
+  **Fix:** `ssm_ci_accuracy()` now refuses a non-unit `cpm` object with a clear
+  message (`R/ssm_ci_accuracy.R`); roxygen documents the unit-scaling
+  requirement; regression test in `test-ci_accuracy.R`. A legacy object with no
+  `scaling` field passes (unit by construction).
+- **[S] prior-PR-comments:** no prior-PR evidence (repo reviews via cairn
+  commits, not GitHub threads) — clean no-op.
+- Sub-threshold findings excluded: none (only the one finding surfaced, scored
+  ≥80).
