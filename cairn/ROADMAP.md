@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-13 (promoted free-scaling candidate item (1) → M19 planned; M7 re-pointed M18→M19 as the pre-ship gate; item (3) annotated — T_free measurement folded into M19, decision still deferred)_
+_Last hygiene check: 2026-07-13 (M19 done → archived, PR #43; M7 unblocked — its only dependency is now complete; pruned M14 under terminal-row retention)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M19 | high | milestones/M7-v2-release-prep.md |
-| M19 | CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration | review | M18 | high | milestones/M19-free-family-coverage-oracle.md |
+| M19 | CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration | done | M18 | high | milestones/archive/M19-free-family-coverage-oracle.md |
 | M18 | CIRCUM free-scaling — implementation + oracle validation | done | M17 | high | milestones/archive/M18-circum-free-scaling-build.md |
 | M17 | CIRCUM free-scaling — Fable-reviewed design decision + spec | done | — | high | milestones/archive/M17-circum-free-scaling-design.md |
 | M16 | Print-independent, scale-free displacement-certification rule | done | — | high | milestones/archive/M16-cert-rule-replacement.md |
 | M15 | Contrast certification-conditional reporting consistency (ci_accuracy ↔ print) | done | — | normal | milestones/archive/M15-contrast-cert-consistency.md |
-| M14 | Automate the instruments() list | done | — | normal | milestones/archive/M14-instruments-list-automation.md |
 
 ## Candidates
 
