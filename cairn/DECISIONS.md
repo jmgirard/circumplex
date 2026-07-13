@@ -184,3 +184,34 @@ was already fixed in M4 review #1 (folding the g0/mirror pair into one start
 group, `R/cpm_fit.R:548-549`; `reproduced` now requires ≥2 independent start
 groups at min F, `:634`) and is regression-tested at
 `tests/testthat/test-cpm_fit.R:595`. Source: Jeff, this session.
+
+### D-009 (2026-07-12): GO on the CIRCUM free-scaling covariance family (M17)
+
+**Context:** D-008 admitted the CIRCUM free-scaling family (`Σ = D_σ P(γ) D_σ`,
+for exact reproduction of published CIRCUM/CircE output) into v2.0.0 scope as
+M17 (design) → M18 (build), M17 free to decide *no-go*. M17 escalated the design
+to an independent Fable review (RB04 → RR04, archived under
+`cairn/reviews/archive/`); the central statistical risk was the free-family
+analytic gradient (the current gradient's `diag P = 1` simplification no longer
+holds once σ is free).
+**Decision: GO.** Build the free-scaling family in M18 per the build-ready spec
+`devel/circum-free-scaling-spec.md`. Fable-attested load-bearing findings:
+(1) reproducing published output *requires* fitting σ — the diag-constrained
+family provably cannot (B6); (2) `σ_i = e^{s_i}`, all p free, **no identification
+pin** (map injective, F coercive in each σ_i); (3) gradient
+`∂F/∂s_i = 2(1 − (Σ⁻¹R)_ii)`, γ blocks = design §3.4 with `A → Ã = D_σ A D_σ`
+built from `Σ⁻¹` not `P⁻¹` — derived and FD-verified (worst err 3.6e-9);
+(4) **df unchanged** (covariance moment count `p(p+1)/2`); (5) **no analytic σ
+CIs ever**, bootstrap stays default, and a free-family coverage-oracle extension
+is a **mandatory pre-ship gate** before any analytic-CI-trust claim;
+(6) canonicalization untouched (σ invariant under rotation+reflection);
+(7) validation anchor already green (OpenMx free-scaling oracle,
+`test-cpm_oracles.R:329`) + Grassi et al. (2010) App. A at same-model tolerances.
+**Consequences:** M18 stays `planned` (not retired); the flag is orthogonal to
+variants A–D (8 combinations). Design-doc §3.2's "scale-invariance ⇒ χ²
+validity" claim is refuted for the *diag* family (its true home is the free
+family) and is rewritten at M18 doc time. Two items are deferred, **not**
+committed to v2.0.0: bootstrap σ CIs, and a T_diag-vs-T_free calibration that
+could make the free family the preferable inference default in a future major
+version (measure in M18's coverage runs, decide later). D-008 stands. Source:
+RR04 (Fable, 2026-07-12).

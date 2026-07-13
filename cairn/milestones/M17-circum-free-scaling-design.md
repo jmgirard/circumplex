@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M17: CIRCUM free-scaling — Fable-reviewed design decision + spec
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** — (no formal IP/GP ids yet; works under DESIGN.md "Statistical conventions" and "CPM confidence intervals: measured coverage")
@@ -83,12 +83,16 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
 - [x] **T3** — Author `devel/circum-free-scaling-spec.md` (or the §-addendum)
       from the RR: parameterization, discrepancy, gradient (with diagonal terms),
       identification/canonicalization, df/χ²/CI treatment, validation plan.
-- [ ] **T4** — Record the go/no-go decision in `cairn/DECISIONS.md`
+- [x] **T4** — Record the go/no-go decision in `cairn/DECISIONS.md`
       (extend/supersede as the RR dictates); if no-go, retire M18 and the CIRCUM
-      candidate in the same commit.
+      candidate in the same commit. → **GO** (D-009); M18 stays planned.
 
 ## Work log
 
+- 2026-07-12: T4 done — recorded **GO** as `cairn/DECISIONS.md` D-009 (extends
+  D-008; supersedes nothing). M18 stays `planned`. All tasks complete; no R/src
+  code touched (docs/design-only), so the r-package test/check verify slot has
+  no runtime surface to exercise — not re-run (nothing changed). Status → review.
 - 2026-07-12: T3 done — authored `devel/circum-free-scaling-spec.md`
   (build-ready: model, σ map+Jacobian+identification, discrepancy, full
   free-family gradient with the σ block and Ã substitution, df/χ²/CI treatment
