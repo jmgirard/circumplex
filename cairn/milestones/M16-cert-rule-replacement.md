@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M16: Print-independent, scale-free displacement-certification rule
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** blocked   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** high   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Principles touched:** —   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
@@ -119,6 +119,12 @@ output — propagated consistently across every certification surface, in time f
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T2 — blocked on RB03 (`cairn/reviews/RB03-cert-rule-form.md`),
+  Fable escalation for the rule form (no-oracle | irreversible-api). Deviation
+  from /milestone-brief's default (commit brief to master): kept the RB/RR
+  cycle on branch `m16-cert-rule-replacement` because T1 is already committed
+  there — committing to master would diverge the milestone file. Tracking
+  stays with code.
 - 2026-07-12: T1 done. Seed (`devel/m16-cert-rule-seed.{R,rds,md}`, reps=500,
   seed 2026) shows the current rule false-certifies a *zero* population
   amplitude 100% of the time across correlation-healthy, correlation-nearzero,
