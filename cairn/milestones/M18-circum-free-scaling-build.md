@@ -1,0 +1,97 @@
+<!-- Section ownership + write-modes: see tracking-rules.md "Milestone-file
+     section ownership". A phase skill never rewrites another phase's section.
+     Per-section owners are tagged below. -->
+# M18: CIRCUM free-scaling — implementation + oracle validation
+
+- **Status:** planned
+- **Priority:** high
+- **Depends on:** M17
+- **Principles touched:** — (no formal IP/GP ids yet; works under DESIGN.md "Statistical conventions" and "CPM confidence intervals: measured coverage")
+- **Branch/PR:** —
+
+## Goal
+
+Implement the free-scaling covariance estimation family in `cpm_fit()` per the
+M17 spec and validate it against the OpenMx free-scaling oracle and the
+published CIRCUM/CircE solution.
+
+## Scope
+
+**In:**
+- A `free_scaling = TRUE` code path through `cpm_fit()` per the M17 spec: σ
+  parameterization/packing, the covariance discrepancy, the free-family analytic
+  gradient (diagonal terms included), identification/canonicalization of σ,
+  df/χ²/CI treatment, and the output surface (report σ̂; print/summary).
+- Validation against two oracles: the OpenMx free-scaling fit (already
+  parameterized in `tests/testthat/test-cpm_oracles.R`) and the published
+  Grassi et al. (2010, Appendix A) CircE vocational-interest solution.
+- The four boundary invariant classes exercised on the free-scaling path where
+  they apply (peak at 0/360; flat/zero-variance), per CLAUDE.md danger-zone
+  requirements and `cairn/boundary-coverage.md`.
+
+**Out:**
+- Any analytic-CI trustworthiness guarantee the M17 spec does *not* grant
+  (bootstrap remains the fallback CI path per `devel/m4-browne-design.md` §3.2,
+  §5.2) — scope follows the spec.
+- Multi-group free-scaling, OLS/GLS/ADF, polychoric input, correlated
+  uniquenesses (documented, not promised; `devel/m4-browne-design.md` §8).
+- The RcppArmadillo port (Phase 2, profiling-gated; §8) — R stays the oracle.
+
+## Acceptance criteria
+
+- [ ] `cpm_fit(..., free_scaling = TRUE)` fits the covariance family and returns
+      σ̂; a regression test in `tests/testthat/test-cpm_fit.R` exercises the path
+      end-to-end.
+- [ ] Reproduces the OpenMx free-scaling oracle to the tolerance fixed by the
+      M17 spec, in `tests/testthat/test-cpm_oracles.R` (the free-scaling OpenMx
+      transcription already present there is the oracle).
+- [ ] Reproduces the published Grassi et al. (2010, Appendix A) CircE solution
+      to its printed precision (ζ/β to 4 decimals, angles to ~0.01°, F̂ per the
+      §11 nesting/allowance protocol) — test in `test-cpm_oracles.R`.
+      Source: Grassi et al. (2010), Appendix A.
+- [ ] The free-family analytic gradient agrees with finite differences to the
+      spec tolerance at ≥ 50 random feasible points, and the boundary suite
+      (peak at 0/360; flat) passes on the free-scaling path — tests in
+      `test-cpm_fit.R` / `test-cpm_boundary.R`.
+- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
+      `devtools::test()` green (run with `NOT_CRAN=true`, per M16 lesson).
+
+## Coverage
+
+- AC1 → T2, T3
+- AC2 → T4
+- AC3 → T4
+- AC4 → T1, T5
+- AC5 → T6
+
+## Tasks
+
+- [ ] **T1** — Implement the free-family discrepancy `F(S, Σ)` and its analytic
+      gradient (diagonal terms per the M17 spec) as internal functions;
+      test-first against finite differences at ≥ 50 random feasible points.
+      (RB tripwire: no-oracle for the gradient derivation until the FD check and
+      the OpenMx oracle both pass — treat FD agreement as the first gate.)
+- [ ] **T2** — Add the σ parameterization/packing and the `free_scaling`
+      argument plumbing through `cpm_fit()` (spec/pack/unpack/starts), holding
+      the existing correlation path bit-identical when `free_scaling = FALSE`.
+- [ ] **T3** — Wire the fit path: canonicalization/identification of σ, df/χ²,
+      CI treatment per spec, and the output surface (σ̂ in the returned object;
+      print/summary). Regression test the end-to-end fit.
+- [ ] **T4** — Validation tests: OpenMx free-scaling oracle to spec tolerance;
+      Grassi et al. (2010) published CircE targets to printed precision.
+- [ ] **T5** — Boundary suite on the free-scaling path (peak at 0/360; flat);
+      update `cairn/boundary-coverage.md` with the new cells.
+- [ ] **T6** — `devtools::document()` (if the API surface changed), full
+      `devtools::check()` + `devtools::test()` (`NOT_CRAN=true`); NEWS entry for
+      the new `free_scaling` argument.
+
+## Work log
+
+- 2026-07-12: created by /milestone-plan. The build half of the CIRCUM
+  free-scaling split (design gate = M17). Depends on M17's ratified spec and
+  go decision — if M17 decides no-go, this milestone is retired unbuilt. In
+  v2.0.0 scope per D-008.
+
+## Decisions
+
+## Review

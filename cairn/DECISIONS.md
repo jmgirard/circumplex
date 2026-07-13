@@ -154,3 +154,33 @@ v2.0.0; latest CRAN is v1.2.0), so no lifecycle shim is owed — this corrects
 RR03's contrary assumption. The k=0.35 calibration is pinned to interval=0.95;
 a `k(interval)` generalization is documented as available but deferred (D-003
 pole reporting unaffected). Source: RR03.
+
+### D-008 (2026-07-12): CIRCUM free-scaling promoted into v2.0.0 scope; the release date is not a constraint
+
+**Context:** D-001 bundled M2–M5 as v2.0.0, excluded new features (→ v2.1.0),
+and targeted a CRAN cadence window (~2026-08-02 submission, ~07-26 freeze). Two
+things changed. (1) Jeff asked to add the CIRCUM free-scaling covariance
+estimation family (`Σ = D_σ P(γ) D_σ`, for exact reproduction of published
+CIRCUM/CircE output; the legacy "decide post-M4" candidate) to v2.0.0. (2) Jeff
+confirmed there is **no release-time pressure** — v2.0.0 ships when the
+statistics are ready, not on a date.
+**Decision:** (a) Supersede D-001's new-features-excluded clause **insofar as it
+bars CIRCUM**: the CIRCUM free-scaling family enters v2.0.0 scope as M17
+(Fable-reviewed design decision + spec) → M18 (implementation + oracle
+validation). M17 may still decide *no-go*, retiring M18. (b) The ~2026-08-02
+CRAN window and ~07-26 freeze are **not constraints**; v2.0.0 carries no target
+date and ships when its bundle (now including M18, if built) is complete and
+validated. D-001's core invariant — *scope is the variable, never the
+statistics* — survives and is **extended to the date**: the date, too, yields to
+the statistics, never the reverse.
+**Scope of the supersession:** narrow. M6 (longitudinal) remains excluded from
+v2.0.0 (→ its own ~v2.1.0); this promotes **only** CIRCUM. All other D-001
+consequences stand.
+**Consequences:** M7 loses its date-anchored block reason — it depends on M18
+instead and stays a planned release milestone (no date language). The "CIRCUM
+free-scaling compatibility mode" ROADMAP candidate is retired into M17/M18. The
+stale "CPM convergence-acceptance vacuous 'reproduced'" candidate is struck: it
+was already fixed in M4 review #1 (folding the g0/mirror pair into one start
+group, `R/cpm_fit.R:548-549`; `reproduced` now requires ≥2 independent start
+groups at min F, `:634`) and is regression-tested at
+`tests/testthat/test-cpm_fit.R:595`. Source: Jeff, this session.

@@ -1,14 +1,16 @@
 # M7: v2.0.0 CRAN release preparation
 
-- **Status:** blocked
+- **Status:** planned
 - **Priority:** high
-- **Depends on:** M16
+- **Depends on:** M18
 - **Branch/PR:** —
 
 ## Goal
 
 Ship the accumulated M2–M5 work (inference, visualization, Browne model + CI
-trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
+trustworthiness, structure tests, SEM) plus the CIRCUM free-scaling family
+(M17/M18, per D-008) to CRAN as one v2.0.0 release. **No target date** — the
+release ships when its bundle is complete and validated (D-008).
 
 ## Scope
 
@@ -78,6 +80,13 @@ trustworthiness, structure tests, SEM) to CRAN as one v2.0.0 release.
 - 2026-07-12: dependency M16 is now **done** (PR #40 merged, squash `cd0c140`).
   M7 stays `blocked` on the external CRAN cadence window (~2026-08-02), not on
   any remaining milestone.
+- 2026-07-12: AMENDED (gated, /milestone-plan) — **the CRAN cadence window is no
+  longer a constraint (D-008).** Jeff confirmed there is no release-time
+  pressure: v2.0.0 has no target date and ships when its bundle is complete and
+  validated. All the ~2026-08-02 / ~07-26 framing in the entries above is
+  superseded (left as the historical record). Status blocked→planned. Dependency
+  re-pointed M16→M18: the v2.0.0 bundle now includes the CIRCUM free-scaling
+  family (M17 design → M18 build, per D-008). No release-prep task change.
 
 ## Decisions
 
