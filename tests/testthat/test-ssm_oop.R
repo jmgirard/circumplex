@@ -135,6 +135,107 @@ test_that("interpretation notes are not applied to the contrast row", {
                          ignore.case = TRUE)))
 })
 
+test_that("ssm_certified() applies the scale-free lower-bound ratio rule (D-007)", {
+  # r = a_lci / (a_uci - a_lci); certify iff is.finite(r) & r >= k (k = 0.35).
+  # Pure function of the amplitude CI *pair* -- no `digits`, no `a_est`.
+  expect_false("digits" %in% names(formals(ssm_certified)))
+  expect_true(all(c("a_lci", "a_uci") %in% names(formals(ssm_certified))))
+
+  # Certify above the threshold, refuse below it, include the boundary (>=).
+  expect_true(ssm_certified(0.5, 1.0))          # r = 1.00
+  expect_true(ssm_certified(0.35, 1.35))        # r = 0.35 exactly -> certified
+  expect_false(ssm_certified(0.1, 1.0))         # r = 0.111 -> refused
+
+  # Scale-free: multiplying the amplitude metric by any positive constant
+  # leaves the verdict unchanged (numerator and denominator co-scale).
+  expect_identical(ssm_certified(0.5, 1.0), ssm_certified(500, 1000))
+  expect_identical(ssm_certified(0.1, 1.0), ssm_certified(100, 1000))
+
+  # Vectorized.
+  expect_equal(
+    ssm_certified(c(0.5, 0.1), c(1.0, 1.0)),
+    c(TRUE, FALSE)
+  )
+
+  # Edge contract (RR03 Q6): NA lower bound and degenerate zero-width CIs
+  # fail closed (a guardrail's failure mode is silence, not endorsement).
+  expect_false(ssm_certified(NA_real_, 1.0))    # flat / zero-variance profile
+  expect_false(ssm_certified(0.5, 0.5))         # width 0 -> Inf -> not finite
+  expect_false(ssm_certified(0.0, 0.0))         # width 0 at 0 -> NaN -> not finite
+
+  # Equivalent closed form a_lci >= (k/(1+k)) * a_uci = 0.259 * a_uci.
+  expect_equal(ssm_certified(0.26, 1.0), 0.26 >= 0.35 / 1.35 * 1.0)
+})
+
+test_that("displacement certification is print-independent and scale-free (AC1, AC2)", {
+  skip_on_cran()
+  data("jz2017")
+  amp_note <- function(res, ...) {
+    any(grepl("displacement is not interpretable",
+              capture.output(print(res, ...)), ignore.case = TRUE))
+  }
+
+  # AC1 print-independence: the certification verdict does not move with the
+  # display `digits`. (Under the superseded rule OCPD's note flipped between
+  # digits = 2 and 3.)
+  set.seed(1)
+  near0 <- suppressWarnings(
+    ssm_analyze(jz2017, scales = 2:9, measures = "OCPD", boots = 200)
+  )
+  notes <- vapply(c(2, 3, 5), function(d) amp_note(near0, digits = d), logical(1))
+  expect_true(all(notes == notes[[1]]))
+
+  # AC2 scale-invariance: rescaling the score metric by a positive constant
+  # leaves the verdict unchanged. aw2009 (well-differentiated) stays certified
+  # at raw scale and at x1000.
+  data("aw2009")
+  set.seed(1); base <- ssm_analyze(aw2009, scales = 1:8, boots = 200)
+  big <- aw2009; big[, 1:8] <- big[, 1:8] * 1000
+  set.seed(1); scaled <- ssm_analyze(big, scales = 1:8, boots = 200)
+  expect_identical(amp_note(base), amp_note(scaled))
+})
+
+test_that("near-zero amplitude now flips certified -> not interpretable (D-007 regression)", {
+  skip_on_cran()
+  data("jz2017"); data("aw2009")
+  amp_note <- function(res) {
+    any(grepl("displacement is not interpretable",
+              capture.output(print(res)), ignore.case = TRUE))
+  }
+
+  # OCPD: a_lci/width ~ 0.06 << 0.35 -> the displacement is NOT interpretable.
+  # The superseded round(a_lci, 3) > 0 rule certified it (a_lci ~ 0.003).
+  set.seed(1)
+  near0 <- suppressWarnings(
+    ssm_analyze(jz2017, scales = 2:9, measures = "OCPD", boots = 200)
+  )
+  expect_true(amp_note(near0))
+
+  # aw2009: a_lci/width ~ 1.07 >= 0.35 -> stays certified (no amplitude note).
+  set.seed(1)
+  healthy <- ssm_analyze(aw2009, scales = 1:8, boots = 200)
+  expect_false(amp_note(healthy))
+})
+
+test_that("certification is angle-blind at the 0/360 pole (D-007)", {
+  skip_on_cran()
+  data("aw2009")
+  amp_note <- function(res) {
+    any(grepl("displacement is not interpretable",
+              capture.output(print(res)), ignore.case = TRUE))
+  }
+  # Cyclically rotating the scale->angle assignment rotates the profile's peak
+  # (its displacement) by whole octants while leaving amplitude, its CI, and
+  # model fit exactly invariant per resample. The rule reads only the amplitude
+  # CI, so certification must be identical regardless of where the peak sits --
+  # including on the 0/360 pole.
+  set.seed(1); plain <- ssm_analyze(aw2009, scales = 1:8, boots = 200)
+  rot <- aw2009[, c(8, 1:7)]
+  set.seed(1); rotated <- ssm_analyze(rot, scales = 1:8, boots = 200)
+  expect_identical(plain$results$a_lci, rotated$results$a_lci)
+  expect_identical(amp_note(plain), amp_note(rotated))
+})
+
 test_that("unit classes are working", {
   expect_snapshot(octants())
   expect_snapshot(as_radian(octants()))

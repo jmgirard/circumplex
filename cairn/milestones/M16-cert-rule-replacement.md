@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M16: Print-independent, scale-free displacement-certification rule
 
-- **Status:** blocked   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** high   <!-- owner: plan · create/amend-via-gate; high | normal | low -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate; M<xx>, M<yy> or — -->
 - **Principles touched:** —   <!-- owner: plan · create/amend-via-gate; comma-separated IPn/GPn ids this milestone touches, or — -->
@@ -97,28 +97,58 @@ output — propagated consistently across every certification surface, in time f
       draft the candidate rule (relative-to-CI-width leading family) and a
       proposed false-certification target. `(RB tripwire: no-oracle | irreversible-api)`
       → `devel/m16-cert-rule-seed.{R,rds,md}`.
-- [ ] **T2** — Escalate via `/milestone-brief` (RB → RR) to decide the rule's
+- [x] **T2** — Escalate via `/milestone-brief` (RB → RR) to decide the rule's
       final form + false-certification target; ingest the RR and record a
-      `cairn/DECISIONS.md` entry. `(RB tripwire: no-oracle)`
-- [ ] **T3** — Test-first: write the print-independence (AC1) and
-      scale-invariance (AC2) property tests, red before the change; add a
-      regression test superseding the pre-change behavior it replaces.
-- [ ] **T4** — Implement the decided rule in `ssm_certified()`
-      (`R/ssm_oop.R:122`); drop its `digits` param; update the note call site
-      in `print.circumplex_ssm()` (`R/ssm_oop.R:183`).
-- [ ] **T5** — Recalibrate/verify via `ssm_ci_accuracy()` (AC4): false-cert at
-      `c = 0` hits the target, conditional coverage adequate; update the
-      diagnostic's guardrail `digits` arg + threshold-echo text
-      (`R/ssm_ci_accuracy.R`, `R/ssm_ci_oop.R`).
+      `cairn/DECISIONS.md` entry. `(RB tripwire: no-oracle)` → RB03/RR03,
+      **D-007**: `r = a_lci/(a_uci − a_lci) ≥ 0.35`.
+- [x] **T3** — Test-first (red before the change): print-independence (AC1,
+      verdict identical across `digits`), scale-invariance (AC2, ×1000 rescale
+      identical), plus the boundary/invariance battery from RR03 §Beyond-4 —
+      profile peaking at 0°/360° (angle-blind), flat-profile `NA` → FALSE,
+      degenerate zero-width CI → FALSE (fail-closed), and the *intended*
+      regression: a near-zero-amplitude fixture (COR_nearzero-style) flips
+      certified → not-certified.
+- [ ] **T4** — Implement D-007 in `ssm_certified()` (`R/ssm_oop.R:122`):
+      `ssm_certified(a_lci, a_uci, k = 0.35)` returning
+      `is.finite(r) & r >= k`, `r = a_lci/(a_uci-a_lci)`; drop the `digits`
+      param. Update the `print.circumplex_ssm()` call site (`R/ssm_oop.R:183`)
+      to pass `dat$a_uci`, and rewrite the note wording (`R/ssm_oop.R:185`)
+      from "amplitude CI includes zero" to a lower-bound-relative-to-width
+      phrasing (never a significance-test framing).
+- [ ] **T5** — Verify via `ssm_ci_accuracy()` (AC4, D-007 two-part gate):
+      false-cert@c=0 ≤ 0.05 AND Wilson-LCI `Caution` not firing, at reps=1000
+      across COR_healthy / COR_nearzero / RAW_means + one small-n (≈100) config;
+      record the c>0 power curve. Cross-check against the closed-form
+      Rayleigh-tail oracle `exp(−t*²/2)` (2nd oracle type). **Remove** the now-
+      vestigial `digits` arg + `Threshold` column from `ssm_ci_accuracy()`
+      (unreleased → clean removal, not deprecation; D-007), replacing the
+      threshold echo with a `k` echo (`R/ssm_ci_accuracy.R`, `R/ssm_ci_oop.R`).
+      Extend the seed generator into a committed `devel/` verification script.
 - [ ] **T6** — Propagate to the remaining surfaces (verdict wording,
-      `Cert_rate`, plot panel), refresh snapshots, add the cross-surface
-      consistency test (AC5).
-- [ ] **T7** — NEWS entry, docs/pkgdown consistency, full `devtools::check()`
+      `Cert_rate`, guardrail text `R/ssm_ci_oop.R:127-142`, plot "Displacement
+      (certified)" panel) and the vignette wording
+      (`vignettes/evaluating-circumplex-structure.Rmd:245,313,359`); refresh
+      snapshots; add the cross-surface consistency test (AC5).
+- [ ] **T7** — NEWS entry (behavior change + the near-zero flip), docs/pkgdown
+      consistency, a doc sentence pinning k=0.35 to interval=0.95 (k(interval)
+      generalization noted-but-deferred, D-007), full `devtools::check()`
       (AC6, AC7).
 
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T3 done (tests-first, red before T4). Added to
+  `test-ssm_oop.R`: unit tests of `ssm_certified(a_lci, a_uci, k)` (threshold,
+  scale-invariance, vectorized, NA/degenerate fail-closed), AC1
+  print-independence + AC2 scale-invariance end-to-end, the D-007 near-zero
+  certified→not-interpretable regression, and 0/360 angle-blindness. Confirmed
+  red: 5 unit + AC1/AC2 + regression fail under the current rule (angle-blind
+  already green as a structural guard).
+- 2026-07-12: T2 done — RR03 ingested. Fable review resolved the crux
+  affirmatively: a lower-bound ratio `r = a_lci/(a_uci−a_lci)` is asymptotically
+  pivotal at c=0 (Rayleigh null), so `r ≥ 0.35` drives false-cert to ≈α/2 where
+  the shipped rule sits at 1.000. Decisions → D-007. RB03/RR03 archived; status
+  back to in-progress. Next: T3 (tests-first).
 - 2026-07-12: T2 — blocked on RB03 (`cairn/reviews/RB03-cert-rule-form.md`),
   Fable escalation for the rule form (no-oracle | irreversible-api). Deviation
   from /milestone-brief's default (commit brief to master): kept the RB/RR
@@ -144,6 +174,19 @@ output — propagated consistently across every certification surface, in time f
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local -->
+
+- 2026-07-12 (RR03 ingest): rule form + target decided → **D-007** (promoted
+  cross-cutting). Rule `r = a_lci/(a_uci − a_lci) ≥ 0.35`, CI-pair-pure,
+  contrast rows ungated (M15-D1).
+- 2026-07-12 (RR03 triage): RR03 recommended *deprecating*
+  `ssm_ci_accuracy(digits=)`; **corrected to clean removal** — the diagnostic
+  is unreleased (new in the dev line toward v2.0.0; latest CRAN v1.2.0), so no
+  lifecycle shim is owed. Confirms the implement-gate default.
+- 2026-07-12 (RR03 triage): all other RR03 recommendations applied
+  (form (a)/k=0.35, two-part target, wording rewrite, boundary tests,
+  Rayleigh-tail oracle cross-check); replicate-vector/ROPE and form (b)
+  rejected with RR03's reasons; k pinned to interval=0.95 with the
+  k(interval) generalization deferred (noted in T7/D-007).
 
 ## Review
 <!-- owner: review · exclusive -->
