@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M19: CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M18
 - **Principles touched:** —
@@ -74,8 +74,10 @@ unconditional caution with the coverage-validated statement the data support.
       unconditional free branch and `R/cpm_fit.R`'s "not yet coverage-validated"
       roxygen are replaced by the statement the measurements support (new
       constants if N-conditional, or a justified unconditional caution), recorded
-      as a DECISIONS.md entry superseding M18-D3's deferral; a snapshot pins the
-      new caution wording. Source: spec §4 (lines 159-163); M18-D3.
+      as a DECISIONS.md entry superseding M18-D3's deferral; a test pins the
+      new caution wording (per the diag-caution convention at `test-cpm_api.R` —
+      `expect_match`, not a snapshot; analytic CI endpoints are BLAS-sensitive).
+      Source: spec §4 (lines 159-163); M18-D3.
 - [ ] An in-suite asserting smoke test (small seeded reps, in-band coverage
       assertion, `skip_on_cran()`) exercises the free-family coverage path;
       `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
@@ -126,6 +128,8 @@ unconditional caution with the coverage-validated statement the data support.
 - 2026-07-13: T2 done — full 500-rep run (3.5 min, seeded) → `devel/m19-free-coverage-results.rds`. Coverage tracks the diag family (σ̂≈1); interior in-band at N=2000, boundary near N=50000; NEW: σ-Hessian singular in 55–58% of N=250 fits, ~0% at N≥2000.
 - 2026-07-13: T3+T4 done — recorded the coverage subsection in `cairn/DESIGN.md` (table + what-it-decides) + validation-battery cite. Decision: diag N-thresholds are the correct, now-validated free thresholds; retire M18-D3 → D-010.
 - 2026-07-13: T5+T6 done — merged free into the shared N-conditional caution in `R/cpm_oop.R` (D-010; M18-D3 placeholder removed) + σ² note; updated `cpm_fit.R` roxygen/constant comment. Tests: free caution-wording (closes an M18 gap) + coverage smoke + parametric-bootstrap SE cross-check; O-M19-cov/O-M19-se registered. D-010 appended. Suite 422, 0 fail/0 error.
+- 2026-07-13: AMENDED (gated, minor) — AC4 "a snapshot pins the caution wording" → "a test pins" it, matching the repo's diag-caution convention (`test-cpm_api.R` pins via `expect_match`, not snapshot, because analytic CI endpoints are BLAS-sensitive). Deliverable unchanged (wording is pinned by a test).
+- 2026-07-13: all tasks done; `devtools::check(--no-manual)` clean 0/0/0. Status → review.
 
 ## Decisions
 
