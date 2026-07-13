@@ -241,11 +241,13 @@ res <- ssm_analyze(
 summary(res)
 ```
 
-Note the guardrail in the printed output: when a profile's amplitude
-interval includes zero, `ssm_analyze()` marks the displacement as
-uninterpretable rather than certifying its direction. The diagnostic below
-measures, among other things, how well that certification rule performs at
-your configuration.
+Note the guardrail in the printed output: when a profile's amplitude CI
+lower bound sits less than 0.35 CI-widths above zero, `ssm_analyze()` marks
+the displacement as uninterpretable rather than certifying its direction.
+That rule is scale-free (it compares the lower bound to the interval's own
+width, so it means the same thing on any score metric) and does not depend
+on the display precision. The diagnostic below measures, among other things,
+how well that certification rule performs at your configuration.
 
 We again use reduced settings (`reps = 200`, a short amplitude ladder, and
 the smaller `boots` above) to keep the vignette fast; the defaults
@@ -278,15 +280,14 @@ How to read this output:
   truth (its printed zero coverage is structural, flagged in the table).
   When a profile's estimated amplitude is smaller than half its own CI
   width — as for obsessive–compulsive PD here — the diagnostic adds one
-  more rung at the *certification margin* (a scaling factor above 1),
-  the amplitude at which the certification threshold would sit exactly at
-  the observed half-width.
+  more rung at a scaling factor above 1, the amplitude at which the
+  population would sit exactly at the observed CI half-width.
 - **The guardrail table** reports how often profiles were *certified*
-  (amplitude CI excluding zero) at each rung. At the 0 rung, any
-  certification is a false certification: the summary prints a caution
-  when the false-certification rate is materially above the rate a user
-  would expect from the interval level. This is a measured property of the
-  shipped display rule, not a hypothesis test.
+  (amplitude CI lower bound at least 0.35 CI-widths above zero) at each
+  rung. At the 0 rung, any certification is a false certification: the
+  summary prints a caution when the false-certification rate is materially
+  above the rate a user would expect from the interval level. This is a
+  measured property of the shipped display rule, not a hypothesis test.
 - **The verdict** classifies elevation, amplitude, and
   certification-conditional displacement coverage at your as-estimated
   amplitude, and the plain-language paragraph states the overall
@@ -298,25 +299,28 @@ For a visual summary across the ladder:
 plot(acc)
 ```
 
-The two profiles tell usefully different stories. For paranoid PD the
-intervals themselves behave: nothing in its coverage table clearly leaves
-the Bradley band, at the as-estimated amplitude or with the population
-amplitude halved. For
-obsessive–compulsive PD, amplitude and certified-displacement coverage
-fall well below the Bradley band already at the profile's own estimated
-amplitude — its intervals under-cover, in the direction of missing below
-the truth.
+The two profiles tell usefully different stories. Paranoid PD is
+certified: its amplitude CI lower bound clears the 0.35-CI-width margin, so
+`ssm_analyze()` reports its displacement, and nothing in its coverage table
+clearly leaves the Bradley band at the as-estimated amplitude or with the
+population amplitude halved. Obsessive–compulsive PD is *not* certified —
+its amplitude (about .02 here) is far too close to zero relative to its CI
+width — so the printed output already withholds its displacement as
+uninterpretable, before any coverage question is asked. On top of that, the
+diagnostic shows its amplitude and displacement CIs under-cover badly at
+this sample size (missing below the truth), so its verdict is a caution for
+a genuine reason: the intervals themselves are unreliable, not merely the
+point on the circle.
 
-Yet *both* verdicts lead with a caution, and the reason is the guardrail
-line: at this configuration ($n = 250$, eight octant correlations), a
-profile whose true amplitude is exactly zero would still be certified
-essentially every time. The "amplitude CI excludes zero" rule offers
-almost no protection here — certification is not, by itself, evidence of
-real differentiation. What carries the reassurance for paranoid PD is the
-coverage evidence across the ladder, not the certificate. This is the
-same phenomenon Zimmermann and Wright flagged from the estimation side:
-at modest $n$, a sample amplitude large enough to clear zero is the
-*expected* outcome even from a flat population profile.
+The guardrail line confirms the rule is doing its job. At this
+configuration ($n = 250$, eight octant correlations), a profile whose true
+amplitude is exactly zero would be certified only about the benchmark rate
+— roughly the one-sided error a user reading the guardrail would expect —
+so no caution fires from the guardrail itself. This is the scale-free
+rule's payoff: unlike a fixed amplitude-unit cutoff, it holds
+false-certification near its intended rate even in the near-zero regime
+Zimmermann and Wright flagged, where a sample amplitude large enough to
+look non-zero is otherwise the *expected* outcome from a flat population.
 
 One reading note: at reduced `reps`, classes tend to print as
 `borderline` — the Wilson interval around the estimated coverage is too
@@ -355,9 +359,9 @@ Putting Sections 2 and 3 together into a checklist:
    "marked" amplitude at modest $n$, run `ssm_ci_accuracy()` and look at
    the sub-1 ladder rungs.
 4. **Only interpret displacement when amplitude is credible.** The package
-   already withholds the displacement interval when the amplitude interval
-   includes zero; the diagnostic tells you how reliable that certification
-   is at your configuration.
+   already withholds the displacement interval when the amplitude CI lower
+   bound sits less than 0.35 CI-widths above zero; the diagnostic tells you
+   how reliable that certification is at your configuration.
 5. **Do not build claims on the fit parameter's interval.** Zimmermann and
    Wright found bootstrap $R^2$ intervals accurate only when population
    fit was mediocre — near-perfect prototypicality cannot be bracketed

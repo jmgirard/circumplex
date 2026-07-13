@@ -8,6 +8,42 @@
 
 deg2rad <- function(x) x * pi / 180
 
+test_that("certification rule is single-sourced across print and the diagnostic (AC5, D-007)", {
+  skip_on_cran()
+  data("jz2017")
+  amp_note <- function(res) {
+    any(grepl("displacement is not interpretable",
+              capture.output(print(res)), ignore.case = TRUE))
+  }
+
+  # A near-zero fit (OCPD, ratio ~ 0.06) and a strongly-certified fit
+  # (ASPD, ratio ~ 2.6); both on jz2017 so the diagnostic's CPM fit has
+  # adequate n. print's note and the pure rule agree.
+  set.seed(1)
+  near0 <- suppressWarnings(
+    ssm_analyze(jz2017, scales = 2:9, measures = "OCPD", boots = 200)
+  )
+  set.seed(1)
+  healthy <- suppressWarnings(
+    ssm_analyze(jz2017, scales = 2:9, measures = "ASPD", boots = 200)
+  )
+  for (r in list(near0, healthy)) {
+    d <- r$results
+    expect_equal(amp_note(r), !ssm_certified(d$a_lci, d$a_uci))
+  }
+  expect_false(ssm_certified(near0$results$a_lci, near0$results$a_uci))
+  expect_true(ssm_certified(healthy$results$a_lci, healthy$results$a_uci))
+
+  # The diagnostic echoes the *same* pinned constant the rule uses (single
+  # definition), and measures that rule: at c = 1 the healthy fit's
+  # certification rate far exceeds the near-zero fit's.
+  set.seed(2); acc_h <- suppressWarnings(ssm_ci_accuracy(healthy, reps = 60))
+  set.seed(2); acc_0 <- suppressWarnings(ssm_ci_accuracy(near0, reps = 60))
+  expect_equal(acc_h$details$cert_k, eval(formals(ssm_certified)$k))
+  rate <- function(a) a$guardrail$Cert_rate[a$guardrail$Condition == 1]
+  expect_gt(rate(acc_h), rate(acc_0))
+})
+
 # ---- ladder construction (sec. 4.1 functional-targeted 3x3 solve) -----------
 
 test_that("ladder correction hits the estimator functional exactly, any spacing (F3)", {

@@ -124,7 +124,7 @@ output — propagated consistently across every certification surface, in time f
       (unreleased → clean removal, not deprecation; D-007), replacing the
       threshold echo with a `k` echo (`R/ssm_ci_accuracy.R`, `R/ssm_ci_oop.R`).
       Extend the seed generator into a committed `devel/` verification script.
-- [ ] **T6** — Propagate to the remaining surfaces (verdict wording,
+- [x] **T6** — Propagate to the remaining surfaces (verdict wording,
       `Cert_rate`, guardrail text `R/ssm_ci_oop.R:127-142`, plot "Displacement
       (certified)" panel) and the vignette wording
       (`vignettes/evaluating-circumplex-structure.Rmd:245,313,359`); refresh
@@ -137,6 +137,16 @@ output — propagated consistently across every certification surface, in time f
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T6 done. Rewrote the certification wording across the vignettes
+  (`evaluating-circumplex-structure.Rmd` guardrail intro + margin-rung + table
+  bullets + the two-profile narrative, now reflecting that the scale-free rule
+  *works*: OCPD is correctly refused and the guardrail no longer over-certifies;
+  `sem-based-ssm-analysis.Rmd` amplitude-gate wording). Plot certified panel is
+  data-driven (updates for free — RR03). Added the AC5 cross-surface
+  consistency test (print note ⇔ `ssm_certified()`; diagnostic echoes the same
+  pinned `k` and measures the same rule). Full suite green (0 failed / 0 error);
+  fixed an errored first draft of the AC5 test (used `aw2009`, too small for the
+  diagnostic's CPM fit → switched the healthy fit to jz2017/ASPD).
 - 2026-07-12: T5 done. AC4 two-part gate PASSES at reps=1000 across all five
   configs (COR_healthy/nearzero, RAW_means, RAW/COR small-n): false-cert@c=0
   0.008–0.023 (all ≤0.05, below the 0.025 benchmark), Caution never fires;
