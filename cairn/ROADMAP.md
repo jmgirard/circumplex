@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M19 | high | milestones/M7-v2-release-prep.md |
-| M19 | CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration | planned | M18 | high | milestones/M19-free-family-coverage-oracle.md |
+| M19 | CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration | in-progress | M18 | high | milestones/M19-free-family-coverage-oracle.md |
 | M18 | CIRCUM free-scaling — implementation + oracle validation | done | M17 | high | milestones/archive/M18-circum-free-scaling-build.md |
 | M17 | CIRCUM free-scaling — Fable-reviewed design decision + spec | done | — | high | milestones/archive/M17-circum-free-scaling-design.md |
 | M16 | Print-independent, scale-free displacement-certification rule | done | — | high | milestones/archive/M16-cert-rule-replacement.md |

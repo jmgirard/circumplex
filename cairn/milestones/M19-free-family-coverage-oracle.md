@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M19: CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M18
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m19-free-family-coverage-oracle
 
 ## Goal
 
