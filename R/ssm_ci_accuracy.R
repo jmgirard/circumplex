@@ -561,7 +561,7 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
         # number -- it only populates the retained `Coverage_conditional` /
         # `Cert_rate` object columns (documented joint-certification
         # descriptives). Its guardrail Caution is NA'd below.
-        cert <- ssm_certified(lean$lci[, a_col], digits)
+        cert <- ssm_certified(lean$lci[, a_col], lean$uci[, a_col])
         if (contrast) cert[n_rows] <- cert[1] && cert[2]
         fitpass <- !is.na(t0_all[, fit_col]) & t0_all[, fit_col] >= 0.70
         if (contrast) fitpass[n_rows] <- NA

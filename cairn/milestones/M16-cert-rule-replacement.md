@@ -108,7 +108,7 @@ output — propagated consistently across every certification surface, in time f
       degenerate zero-width CI → FALSE (fail-closed), and the *intended*
       regression: a near-zero-amplitude fixture (COR_nearzero-style) flips
       certified → not-certified.
-- [ ] **T4** — Implement D-007 in `ssm_certified()` (`R/ssm_oop.R:122`):
+- [x] **T4** — Implement D-007 in `ssm_certified()` (`R/ssm_oop.R:122`):
       `ssm_certified(a_lci, a_uci, k = 0.35)` returning
       `is.finite(r) & r >= k`, `r = a_lci/(a_uci-a_lci)`; drop the `digits`
       param. Update the `print.circumplex_ssm()` call site (`R/ssm_oop.R:183`)
@@ -137,6 +137,12 @@ output — propagated consistently across every certification surface, in time f
 ## Work log
 <!-- owner: any skill · append-only; one line per entry; absolute dates -->
 
+- 2026-07-12: T4 done. `ssm_certified(a_lci, a_uci, k = 0.35)` implements
+  D-007 (`is.finite(r) & r >= k`, `r = a_lci/(a_uci-a_lci)`); print note
+  reworded to the CI-lower-bound-vs-width phrasing; both call sites
+  (`R/ssm_oop.R:195`, `R/ssm_ci_accuracy.R:564`) moved to the new signature.
+  `test-ssm_oop.R` green; diagnostic smoke shows OCPD false-cert@c=0
+  1.000→0.033. Snapshot/vignette/diagnostic-arg cleanup deferred to T5/T6.
 - 2026-07-12: T3 done (tests-first, red before T4). Added to
   `test-ssm_oop.R`: unit tests of `ssm_certified(a_lci, a_uci, k)` (threshold,
   scale-invariance, vectorized, NA/degenerate fail-closed), AC1

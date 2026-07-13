@@ -113,14 +113,26 @@ print.circumplex_radian <- function(x, digits = 3, ...) {
   cat(round(x, digits = digits), "\nRadians\n")
 }
 
-# The shipped displacement-interpretability guardrail: displacement is
-# certified as interpretable when the amplitude CI's lower bound, rounded at
-# the print precision, exceeds zero. THE single definition of the rule --
+# The displacement-interpretability guardrail: a profile's displacement is
+# certified as interpretable when the amplitude CI's lower bound sits at least
+# k = 0.35 CI-widths above zero -- r = a_lci / (a_uci - a_lci) >= k. Scale-free
+# (numerator and denominator carry the same scale factor, so the verdict is
+# invariant to the score metric) and print-independent (no display rounding).
+# k is a pinned constant calibrated to the 95% default interval: approximately
+# the 97.5% point of r's asymptotically-pivotal zero-amplitude (Rayleigh) null,
+# giving false-certification ~ alpha/2 where the superseded
+# round(a_lci, digits) > 0 rule sat at 1.000 (D-007, RR03;
+# spec devel/m4-ci-accuracy-spec.md sec. 3.4/12.5). Equivalent to
+# a_lci >= (k / (1 + k)) * a_uci = 0.259 * a_uci; do not "simplify" into that
+# form thinking it a different rule. THE single definition of the rule --
 # print.circumplex_ssm() applies it and ssm_ci_accuracy() measures its
-# operating characteristics; if the rule ever changes, both must move
-# together (spec devel/m4-ci-accuracy-spec.md sec. 3.4/12.5). Vectorized.
-ssm_certified <- function(a_lci, digits = 3) {
-  !is.na(a_lci) & round(a_lci, digits) > 0
+# operating characteristics; both move together. Pure function of the amplitude
+# CI pair (a_est is never consulted); an NA lower bound and degenerate
+# zero-width CIs fail closed via the is.finite() guard. Vectorized. Contrast
+# rows are never certification-gated (M15-D1).
+ssm_certified <- function(a_lci, a_uci, k = 0.35) {
+  ratio <- a_lci / (a_uci - a_lci)
+  is.finite(ratio) & ratio >= k
 }
 
 # Class ssm --------------------------------------------------------------------
@@ -180,9 +192,10 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
           sep = ""
         )
       }
-      if (!ssm_certified(dat$a_lci, digits)) {
+      if (!ssm_certified(dat$a_lci, dat$a_uci)) {
         cat(
-          "  Note: the amplitude CI includes zero; ",
+          "  Note: the amplitude is not reliably distinguishable from zero ",
+          "(its CI lower bound is under 0.35 CI-widths above zero); ",
           "the displacement is not interpretable.\n",
           sep = ""
         )
