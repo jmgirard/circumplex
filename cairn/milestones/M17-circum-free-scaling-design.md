@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M17: CIRCUM free-scaling — Fable-reviewed design decision + spec
 
-- **Status:** planned
+- **Status:** blocked
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** — (no formal IP/GP ids yet; works under DESIGN.md "Statistical conventions" and "CPM confidence intervals: measured coverage")
-- **Branch/PR:** —
+- **Branch/PR:** m17-circum-free-scaling-design
 
 ## Goal
 
@@ -73,7 +73,7 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
 
 ## Tasks
 
-- [ ] **T1** — Draft the Review Brief per `/milestone-brief`: assemble the
+- [x] **T1** — Draft the Review Brief per `/milestone-brief`: assemble the
       free-scaling model context (`devel/m4-browne-design.md` §3.2, §11; the
       existing OpenMx free-scaling oracle in `test-cpm_oracles.R`), state the
       (a)–(e) design questions, and frame the gradient re-derivation as the
@@ -89,6 +89,11 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
 
 ## Work log
 
+- 2026-07-12: T1 done — drafted `cairn/reviews/RB04-circum-free-scaling.md`
+  (self-contained: model context, the §11/B6 refutation of σ̂=1, the OpenMx
+  free-scaling oracle at `test-cpm_oracles.R:329`, Grassi et al. 2010 App. A
+  targets; six questions (a)–(e)+spec-adequacy, gradient re-derivation framed
+  as the central risk). Status → blocked on RB04 pending Fable escalation.
 - 2026-07-12: created by /milestone-plan. Promoted from the "CIRCUM free-scaling
   compatibility mode" ROADMAP candidate (legacy ROADMAP continuous track,
   surfaced 2026-07-06 by M4/B6 published-oracle triage). Split design-from-build
