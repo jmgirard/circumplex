@@ -194,9 +194,8 @@ print.circumplex_ssm <- function(x, digits = 3, ...) {
       }
       if (!ssm_certified(dat$a_lci, dat$a_uci)) {
         cat(
-          "  Note: the amplitude is not reliably distinguishable from zero ",
-          "(its CI lower bound is under 0.35 CI-widths above zero); ",
-          "the displacement is not interpretable.\n",
+          "  Note: the amplitude CI lower bound is under 0.35 CI-widths ",
+          "above zero; the displacement is not interpretable.\n",
           sep = ""
         )
       }

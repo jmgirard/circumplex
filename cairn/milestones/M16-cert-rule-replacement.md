@@ -170,3 +170,21 @@ output — propagated consistently across every certification surface, in time f
 - Toolchain (R profile): `devtools::check()` clean (above); full `test_dir`
   0 failed / 0 error.
 - No DESIGN.md principle touched (Principles slot `—`) → impact scan skipped.
+
+### Independent review (three lenses + scorer, fresh context)
+- **[O] diff-bug:** no correctness defects (edge-cases fail-closed, all surfaces
+  single-sourced, contrasts ungated, no dangling `digits`/`Threshold`, tests
+  have teeth, vignette prose matches computed output). Two findings raised.
+- **[S] blame-history:** no findings (D-003, M15-D1, all-surfaces, honest
+  snapshot, fail-closed all confirmed).
+- **[S] prior-PR-comments:** no prior-PR evidence (repo reviews via RB/RR +
+  `/code-review`, not GitHub comments) — clean no-op.
+- **Scorer + triage:**
+  - **F1 (88, FIXED):** the print note lead clause "not reliably
+    distinguishable from zero" was NHST framing — violates the package
+    doctrine and T4. Reworded to the CI-lower-bound-vs-width phrasing (matching
+    the vignette); `test-ssm_oop.R` green, note substring preserved.
+  - **F2 (20, not actioned — logged):** `k` pinned to interval=0.95 is
+    anti-conservative at non-default `interval`; explicitly deferred by D-007
+    (`k(interval)`), and `summary()` prints the Confidence Level directly above
+    the rule line. Out of scope by design.
