@@ -85,8 +85,14 @@ published CIRCUM/CircE solution.
       `VarRatio` column (free only), free-path analytic caution (M18-D3), σ
       pathology note, σ-aware `cpm_sim_root`. End-to-end free fit reproduces
       published fit indices (χ²/RMSEA/CFI/TLI). Formal regression tests below.
-- [ ] **T4** — Validation tests: OpenMx free-scaling oracle to spec tolerance;
+- [x] **T4** — Validation tests: OpenMx free-scaling oracle to spec tolerance;
       Grassi et al. (2010) published CircE targets to printed precision.
+      Done 2026-07-13: frozen oracle (App. A angles/ζ/β/σ²/F̂/χ²/RMSEA/RMSEA-CI/
+      CFI/TLI/SRMR-converted to printed precision) + live OpenMx cross-check
+      (θ/ζ/β/σ² agree; σ² offset = exactly (N−1)/N, OpenMx's ML rescale absorbed
+      into σ — confirms equivariance) + Table 2 model-3c fixed-grid row. Plus
+      engine invariants in test-cpm_fit.R: FD gradient ≥50 pts, σ=1 legacy
+      identity, stationarity, exact recovery σ̂=1, rescale-equivariance, nesting.
 - [ ] **T5** — Boundary suite on the free-scaling path (peak at 0/360; flat);
       update `cairn/boundary-coverage.md` with the new cells.
 - [ ] **T6** — `devtools::document()` (if the API surface changed), full
