@@ -153,20 +153,20 @@ events are counted.
 
 | Cell | used/500 | SE-fail | Angle | ζ | β | KS(T,df) |
 |---|---|---|---|---|---|---|
-| boundary N=250 | 175 | 288 | .829 | .864 | .874 | .000 |
-| boundary N=1000 | 403 | 91 | .733 | .906 | .858 | .000 |
-| interior N=250 | 127 | 277 | .841 | .767 | .911 | .034 |
-| interior N=1000 | 431 | 61 | .889 | .957 | .947 | .001 |
+| boundary N=250 | 176 | 277 | .831 | .863 | .851 | .000 |
+| boundary N=1000 | 422 | 72 | .760 | .914 | .875 | .000 |
+| interior N=250 | 146 | 259 | .804 | .754 | .897 | .194 |
+| interior N=1000 | 434 | 63 | .884 | .946 | .929 | .042 |
 
-Analytic-only ladder (angle / ζ / β): **boundary** .70/.88/.85 (N=2000) →
-.71/.86/.86 (5000) → .83/.89/.91 (20000) → .91/.92/.94 (50000); **interior**
-.93/.95/.95 (N=2000) → .94/.95/.95 (5000) → .95/.95/.94 (20000) →
-.95/.95/.95 (50000). What this record decides:
+Analytic-only ladder (angle / ζ / β): **boundary** .72/.89/.84 (N=2000) →
+.69/.86/.84 (5000) → .80/.87/.89 (20000) → .91/.93/.93 (50000); **interior**
+.92/.95/.94 (N=2000) → .94/.96/.95 (5000) → .94/.95/.95 (20000) →
+.95/.95/.96 (50000). What this record decides:
 
 - **The free family's coverage regime is the diag family's.** Interior truths
-  reach the [.90, .98] band at **N = 2000** (angle .928) and stay; boundary
-  truths stay badly outside it through **N = 20000** (angle .70–.83) and recover
-  only by **N = 50000** (.912) — the same two-regime pattern the diag B6 record
+  reach the [.90, .98] band at **N = 2000** (angle .915) and stay; boundary
+  truths stay badly outside it through **N = 20000** (angle .69–.80) and recover
+  only by **N = 50000** (.914) — the same two-regime pattern the diag B6 record
   found, as expected once σ̂ ≈ 1. So the diag `summary()` caution constants
   (`cpm_analytic_ci_n_caution = 2000`, `cpm_analytic_ci_n_boundary_caution =
   50000`, boundary markers) are **the correct free-family thresholds — now
@@ -174,14 +174,15 @@ Analytic-only ladder (angle / ζ / β): **boundary** .70/.88/.85 (N=2000) →
   M18-D3's placeholder unconditional free caution is retired, D-010).
 - **The free bordered information matrix is fragile below N ≈ 2000.** The p extra
   σ nuisance parameters make `cpm_analytic_se`'s Hessian singular (NA SE) in
-  **55–58% of N = 250 fits** and 12–18% at N = 1000, but ~0% at N ≥ 2000. A free
+  **52–55% of N = 250 fits** and 13–14% at N = 1000, but ~0% at N ≥ 2000. A free
   analytic CI is therefore often simply undefined at small N — an *independent*
   reason to distrust free analytic CIs below the N = 2000 threshold, reinforcing
   (not weakening) the unconditional caution there. σ̂² itself carries no interval
   ever (D-009).
-- **T = n·F̂ is χ²_df only for well-identified interior truths at N ≥ 5000**
-  (KS p .84/.76/.88), rejecting at every boundary cell and interior N ≤ 2000 —
-  the same boundary-regime effect as the diag family, read the same way.
+- **T = n·F̂ tracks χ²_df for interior truths at N ≥ 2000** (KS p .36/.65/.16/.46
+  at N = 2000/5000/20000/50000), rejecting at every boundary cell below
+  N = 50000 and at interior N ≤ 1000 — the same boundary-regime effect as the
+  diag family, read the same way.
 - **≥2 oracle types (registry).** Two independent oracle types back these CIs,
   recorded here (this repo records oracles by distributed test headers, not a
   central file):

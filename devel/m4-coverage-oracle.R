@@ -347,8 +347,13 @@ free_one <- function(i, cfg_name, cfg, N, chol0, truth_deg, seed_base) {
 }
 
 run_free_cell <- function(cfg_name, cfg, N, chol0, truth_deg) {
+  # Seed by N's INDEX, not N itself: 1e3 * N would collide the config term
+  # (1e6 * cfg-index) with the N term whenever 1e3 * N == 1e6 (i.e. the
+  # boundary/N=2000 vs interior/N=1000 pair), coupling those two cells'
+  # replicate streams. Indexing keeps every (cfg, N) cell's seeds disjoint.
+  all_ns <- c(NS_FREE, NS_FREE_LADDER)
   seed_base <- BASE_SEED + 8e7 +
-    1e6 * match(cfg_name, names(configs)) + 1e3 * N
+    1e6 * match(cfg_name, names(configs)) + 1e3 * match(N, all_ns)
   out <- parallel::mclapply(seq_len(REPS), free_one, cfg_name = cfg_name,
                             cfg = cfg, N = N, chol0 = chol0,
                             truth_deg = truth_deg, seed_base = seed_base,

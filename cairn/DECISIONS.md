@@ -229,15 +229,15 @@ built and ran that oracle (`devel/m4-coverage-oracle.R` stage 3;
 **Decision:** Apply the **same** N-conditional caution to the free family,
 **now coverage-validated for it** rather than silently reused. The M19 oracle
 measured the free family's θ/ζ/β coverage regime to be the diag family's —
-interior truths reach the [.90, .98] band at N = 2000 (angle .928), boundary
-truths only near N = 50000 (.912) — because the correlation-input contract
+interior truths reach the [.90, .98] band at N = 2000 (angle .915), boundary
+truths only near N = 50000 (.914) — because the correlation-input contract
 forces σ_pop = 1 and σ̂ ≈ 1 at these truths (median max variance-ratio ≈ 1.00
 every cell). The `summary()` free branch's placeholder unconditional caution is
 removed; free and diag now share the N-conditional ladder, with the free family
 additionally always printing the σ²-carries-no-interval note (D-009).
 **Second finding (reinforces, not weakens):** the free family's bordered
-information matrix (p extra σ nuisance parameters) is singular (NA SE) in 55–58%
-of N = 250 fits and 12–18% at N = 1000, ~0% at N ≥ 2000 — an independent reason
+information matrix (p extra σ nuisance parameters) is singular (NA SE) in 52–55%
+of N = 250 fits and 13–14% at N = 1000, ~0% at N ≥ 2000 — an independent reason
 its analytic CIs are untrustworthy below N = 2000.
 **Oracle types (≥2 bar):** simulation-coverage (the M19 run) + a live
 parametric-bootstrap SE cross-check at an interior cell
