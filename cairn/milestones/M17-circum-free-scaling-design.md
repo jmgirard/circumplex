@@ -80,7 +80,7 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
       central statistical-correctness risk. (RB tripwire: ip-touching — this task
       *is* the escalation.)
 - [x] **T2** — Escalate to Fable; ingest the RR into `cairn/reviews/`.
-- [ ] **T3** — Author `devel/circum-free-scaling-spec.md` (or the §-addendum)
+- [x] **T3** — Author `devel/circum-free-scaling-spec.md` (or the §-addendum)
       from the RR: parameterization, discrepancy, gradient (with diagonal terms),
       identification/canonicalization, df/χ²/CI treatment, validation plan.
 - [ ] **T4** — Record the go/no-go decision in `cairn/DECISIONS.md`
@@ -89,6 +89,13 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
 
 ## Work log
 
+- 2026-07-12: T3 done — authored `devel/circum-free-scaling-spec.md`
+  (build-ready: model, σ map+Jacobian+identification, discrepancy, full
+  free-family gradient with the σ block and Ã substitution, df/χ²/CI treatment
+  incl. no-analytic-σ-CI + coverage-oracle gate, canonicalization pins,
+  validation plan naming the OpenMx oracle + Grassi App. A targets, deferred
+  items). Chose a new standalone spec file over a §-addendum (design doc already
+  ~930 lines). Added a §11 change-log pointer in `m4-browne-design.md`.
 - 2026-07-12: T2 done — spawned Fable (user-approved), ingested RR04. Verdict
   **GO**, gradient FD-verified (worst err 3.6e-9). Archived RB04/RR04 pair →
   `cairn/reviews/archive/`; status blocked → in-progress. Answers recorded in

@@ -803,6 +803,14 @@ variants B–D.
 
 ## 11. Change log
 
+- 2026-07-12 — CIRCUM free-scaling family promoted to v2.0.0 (D-008) and
+  **GO** after Fable review (RR04). Build-ready spec:
+  `devel/circum-free-scaling-spec.md`. Headline results: `σ_i = e^{s_i}`, all p
+  free, no identification pin; `∂F/∂s_i = 2(1 − (Σ⁻¹R)_ii)` with the γ blocks
+  = §3.4 with `A → Ã = D_σ A D_σ` (A from `Σ⁻¹`, not `P⁻¹`); **df unchanged**;
+  no analytic σ CIs. §3.2's scale-invariance→χ² claim is refuted for the *diag*
+  family (its true home is the free family) and must be rewritten at M18 doc
+  time. See the spec + RR04 for the full derivation and validation plan.
 - 2026-07-06 — B6 validation battery: **the §3.2 scale-invariance claim is
   half-wrong, and CIRCUM/CircE comparisons carry a documented model
   difference.** §3.2 asserts that embedding `Σ = D_σ P(γ) D_σ` with free
