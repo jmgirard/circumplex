@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M17: CIRCUM free-scaling — Fable-reviewed design decision + spec
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** — (no formal IP/GP ids yet; works under DESIGN.md "Statistical conventions" and "CPM confidence intervals: measured coverage")
@@ -79,7 +79,7 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
       (a)–(e) design questions, and frame the gradient re-derivation as the
       central statistical-correctness risk. (RB tripwire: ip-touching — this task
       *is* the escalation.)
-- [ ] **T2** — Escalate to Fable; ingest the RR into `cairn/reviews/`.
+- [x] **T2** — Escalate to Fable; ingest the RR into `cairn/reviews/`.
 - [ ] **T3** — Author `devel/circum-free-scaling-spec.md` (or the §-addendum)
       from the RR: parameterization, discrepancy, gradient (with diagonal terms),
       identification/canonicalization, df/χ²/CI treatment, validation plan.
@@ -89,6 +89,10 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
 
 ## Work log
 
+- 2026-07-12: T2 done — spawned Fable (user-approved), ingested RR04. Verdict
+  **GO**, gradient FD-verified (worst err 3.6e-9). Archived RB04/RR04 pair →
+  `cairn/reviews/archive/`; status blocked → in-progress. Answers recorded in
+  Decisions below; formal go/no-go D-entry lands at T4.
 - 2026-07-12: T1 done — drafted `cairn/reviews/RB04-circum-free-scaling.md`
   (self-contained: model context, the §11/B6 refutation of σ̂=1, the OpenMx
   free-scaling oracle at `test-cpm_oracles.R:329`, Grassi et al. 2010 App. A
@@ -103,5 +107,27 @@ to `cpm_fit()`, so that M18 can build it without re-opening design questions.
   release date as a constraint).
 
 ## Decisions
+
+- 2026-07-12 (RR04, archived): Fable answers to the (a)–(e) brief targets.
+  Cross-cutting go/no-go promoted to DECISIONS.md **D-009** (T4). Key findings:
+  - **(a) GO.** Reproducing published CIRCUM/CircE output requires actually
+    fitting σ (B6 proved the diag family cannot); extension found statistically
+    tame, validation anchor already green.
+  - **(b) σ = e^{s}**, all p free, **no identification pin** (map injective, F
+    coercive in each σ_i). σ̂=1 only at perfect fit; finite-N ML preserves
+    diag(Σ̂⁻¹R)=1, not diag Σ̂ — the precise content of the B6 refutation.
+  - **(c) Gradient** `∂F/∂s_i = 2(1 − (Σ⁻¹R)_ii)`; γ blocks = §3.4 verbatim
+    with A → Ã = D_σ A D_σ and A from Σ⁻¹ (not P⁻¹). "Only off-diagonal ∂P"
+    still holds for θ/ζ/β; moving diagonal lives in the σ block. FD-verified.
+  - **(d) df UNCHANGED** (covariance moment count p(p+1)/2; the brief's "df
+    shrinks" premise was wrong). Wald-CI invariance argument is *stronger* for
+    the free family (Cudeck exact); **no analytic σ CIs ever**; bootstrap stays
+    default; free-family coverage-oracle extension is a mandatory pre-ship gate.
+  - **(e)** σ invariant under rotation+reflection; canonicalization untouched;
+    5 mechanical layout/guard pins (notably s block *before* β).
+  - **Beyond brief:** §3.2's χ²-validity-via-scale-invariance claim is wrong
+    for the *diag* family (its true home is the free family) — rewrite at M18
+    doc time; ΔT is not a calibrated σ=1 test; T_diag-vs-T_free calibration is
+    a *consider* future measurement (not this milestone).
 
 ## Review
