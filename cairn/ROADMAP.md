@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-13 (M19 done → archived, PR #43; M7 unblocked — its only dependency is now complete; pruned M14 under terminal-row retention)_
+_Last hygiene check: 2026-07-16 (all validate checks green; no open issues/PRs/RBs; git reconciled — nothing since M19 close)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
