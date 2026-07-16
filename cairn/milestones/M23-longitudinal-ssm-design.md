@@ -4,7 +4,7 @@
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** m23-longitudinal-ssm-design
+- **Branch/PR:** m23-longitudinal-ssm-design · https://github.com/jmgirard/circumplex/pull/47
 
 ## Goal
 
@@ -49,16 +49,16 @@ build milestones can be planned without re-opening design questions.
 
 ## Acceptance criteria
 
-- [ ] `devel/longitudinal-ssm-spec.md` exists at build-ready detail: each of
+- [x] `devel/longitudinal-ssm-spec.md` exists at build-ready detail: each of
       the five In-scope components has an argued decision, an API sketch,
       and a named oracle strategy (≥2 independent oracle types per numeric
       result; simulation-coverage for interval methods).
-- [ ] Independent Fable review completed via RB/RR (RB06→RR06, archived);
+- [x] Independent Fable review completed via RB/RR (RB06→RR06, archived);
       every finding weighed in a spec revision log (fixed /
       rejected-with-reason), none silently dropped.
-- [ ] Cross-cutting design decision recorded in `cairn/DECISIONS.md`;
+- [x] Cross-cutting design decision recorded in `cairn/DECISIONS.md`;
       ROADMAP carries the build-milestone candidate row(s) with lineage.
-- [ ] Docs/design only: the PR diff touches no `R/`, `src/`, `tests/`,
+- [x] Docs/design only: the PR diff touches no `R/`, `src/`, `tests/`,
       `man/`, or `NAMESPACE` (release surface unaffected).
 
 ## Coverage
@@ -118,3 +118,45 @@ build milestones can be planned without re-opening design questions.
   |Δd| > 90°) — promoted to D-013 as part of the binding build contract.
 
 ## Review
+
+### Acceptance-criteria evidence (2026-07-16, fresh)
+
+- **AC1** — `devel/longitudinal-ssm-spec.md` exists (9 sections); §1–§5 each
+  carry an argued decision + API sketch; §2.3/§3.3/§4.2/§5.5 each name ≥2
+  independent oracle types (simulation-coverage + invariant + closed-form
+  for stochastic components; closed-form + strengthened invariants for the
+  deterministic per-person layer). Independently confirmed by the [O]
+  diff-bug reviewer ("AC1: Satisfied", 8/8 file:line citations verified,
+  all statistical statements re-derived and confirmed).
+- **AC2** — RB06 + RR06 present in `cairn/reviews/archive/`; spec §9 maps
+  all 15 RR06 recommendations (12 applied incl. 4 promoted from consider;
+  3 rejections accepted) + 6 beyond-the-brief items; reviewer confirmed no
+  finding silently dropped and the refuted unconditional efficiency claim
+  appears nowhere in the revised spec.
+- **AC3** — D-013 recorded (`cairn/DECISIONS.md:311`); ROADMAP carries the
+  refined build-family candidate row (A/B/C cut, lineage noted). Blame
+  reviewer verified D-013 contradicts no prior D-entry and the candidate
+  rewrite conserves the old row's full content.
+- **AC4** — `git diff --name-only master..HEAD`: 5 `cairn/` files +
+  `devel/longitudinal-ssm-spec.md` only; no `R/`, `src/`, `tests/`, `man/`,
+  `NAMESPACE`. Both dirs are `.Rbuildignore`d (`^devel$`, `^cairn$`).
+
+### Consistency gate
+
+- `cairn_validate.py`: all checks pass (exit 0).
+- No DESIGN.md principle changed → `cairn_impact` n/a.
+- Profile (r-package) gate: `document()` no-diff clean; pkgdown
+  `check_pkgdown()` no problems; full `devtools::check(--no-manual)`
+  **0 errors / 0 warnings / 0 notes** (4m23s); NEWS n/a (no user-visible
+  change — docs-only in build-ignored dirs); no new top-level files.
+
+### Independent review (3 lenses → scorer)
+
+- [O] diff-bug: 2 findings; [S] blame-history: 0; [S] prior-PR-comments:
+  no prior-PR evidence, 0. Scorer ([S]): F1 = 85, F2 = 25.
+- **F1 (85, fixed now):** spec §6 pinned build artifacts to the stale
+  legacy prefix `devel/m6-*-results.rds`; corrected to the producing build
+  milestone's own ID (`m<NN>-*`).
+- **F2 (25, logged, not actioned):** CLAUDE.md's contrast invariant will
+  need an occasion-order clause once Build A ships — self-labeled optional,
+  unmodified file; owned by Build A's own review gate.

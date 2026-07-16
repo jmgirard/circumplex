@@ -507,8 +507,10 @@ hoc.
   bar holds per component, not merely in aggregate.
 - Coverage runs follow the M19/M21 pattern: seeded, cell-indexed by level
   (LESSONS 2026-07-13: index the level, never the raw value), smoke-first,
-  results committed as `devel/m6-*-results.rds` with regeneration scripts
-  (reproducibility hard stop).
+  results committed as `devel/m<NN>-*-results.rds` named per the *producing
+  build milestone's* own ID — never the legacy "m6" prefix (IDs ≤ M6 are
+  reserved legacy citations) — with regeneration scripts (reproducibility
+  hard stop).
 - **Gap flagged for the build milestones:** DESIGN.md's Conventions section
   does not yet declare the oracle-registry pointer required by the
   validation doctrine ("Oracle records: …" line). The build milestone that
