@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M22: Free-engine multi-start nesting seed (T_free ≤ T_unit by construction)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
@@ -94,7 +94,7 @@ construction, eliminating the optimizer-tail violations RR05 measured
       group. Resolve and record the `reproduced`/multimodality-flag
       interaction (milestone-local decision). T1 goes green; unit-path
       behavior untouched.
-- [ ] **T3** — Oracle + gate: re-run `test-cpm_oracles.R` (M18 lesson:
+- [x] **T3** — Oracle + gate: re-run `test-cpm_oracles.R` (M18 lesson:
       OpenMx `type="cov"` needs the (N−1)/N factor; CSOLNP agrees only to
       ~5e-4) and full `devtools::check()`.
 - [x] **T4** — Docs: nesting note in the `scaling` roxygen block
@@ -127,6 +127,10 @@ construction, eliminating the optimizer-tail violations RR05 measured
   bit-identical pre/post; deviant replicates are genuine better-F
   permutation basins found by native starts too). Fixed via sentinel group
   0 (see Decisions); NEWS refined; re-running nesting + oracle files.
+
+- 2026-07-16: T3 done — nesting file 20/20, oracle file 108/108, full
+  check() 0 errors / 0 warnings / 0 notes. All tasks complete; status →
+  review.
 
 ## Decisions
 
