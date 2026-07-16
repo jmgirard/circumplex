@@ -7,7 +7,7 @@
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate -->
 - **Principles touched:** —   <!-- no numbered IP/GP exist yet (deferred to /design-interview); governs DESIGN.md "Dependency policy" prose -->
-- **Branch/PR:** m24-nse-evaluation   <!-- owner: implement (branch) / review (PR URL) · create -->
+- **Branch/PR:** m24-nse-evaluation · https://github.com/jmgirard/circumplex/pull/48   <!-- owner: implement (branch) / review (PR URL) · create -->
 
 ## Goal
 <!-- owner: plan · create; a wrong goal returns to plan, never edited in place -->
@@ -40,7 +40,7 @@ memo's spike snippets are evidence, not shipped code).
 ## Acceptance criteria
 <!-- owner: plan · create/amend-via-gate; review reads, never reinterprets -->
 
-- [ ] AC1: `devel/m24-nse-evaluation.md` exists and covers all four strata:
+- [x] AC1: `devel/m24-nse-evaluation.md` exists and covers all four strata:
       (a) column-spec interfaces of ≥6 comparable CRAN statistics packages,
       each with a citation to its documentation; (b) the exact Imports
       closure and R-version floor tidyselect would add (computed from
@@ -48,16 +48,16 @@ memo's spike snippets are evidence, not shipped code).
       shipped vignettes rewritten in hypothetical NSE form beside the
       current SE form, including one programming/wrapper case requiring
       embracing; (d) back-compat analysis vs the v1.0.0 removal.
-- [ ] AC2: the memo's ambiguity spike is runnable R (data-mask
+- [x] AC2: the memo's ambiguity spike is runnable R (data-mask
       column/env-variable collision + the embracing case), with output
       shown — evidence, not vibes.
-- [ ] AC3: the decision is recorded per the plan-gate answers: NO → a
+- [x] AC3: the decision is recorded per the plan-gate answers: NO → a
       full-rejection D-entry (re-trigger clause included) + the DESIGN.md
       Dependency-policy one-liner citing it; GO → a superseding D-entry
       (v1.0.0 removal explicitly superseded) + a build-candidate ROADMAP
       row, with the `irreversible-api` RB gate honored before the GO is
       final.
-- [ ] AC4: docs-only — `git diff` for the milestone touches no files under
+- [x] AC4: docs-only — `git diff` for the milestone touches no files under
       R/, src/, or tests/.
 
 ## Coverage
@@ -119,3 +119,23 @@ memo's spike snippets are evidence, not shipped code).
 ## Review
 <!-- owner: review · exclusive; evidence per criterion, consistency-gate
      results, review findings + triage. EXEMPT from the 150-line cap (M55). -->
+
+Review 2026-07-16 (PR #48). Evidence gathered fresh, by command.
+
+- AC1: memo exists with all four strata as `## §1–§4` headers (grep); §1
+  table has 7 packages each with a citation column entry (6 inspected
+  locally with versions, rstatix via CRAN); §2 shows the
+  `tools::package_dependencies()` method and CRAN Depends floors; §3 has 3
+  vignette sites (grep "Site N" = 3) incl. the embracing wrapper case; §4
+  carries the back-compat stratum. PASS.
+- AC2: both spikes re-run fresh in a clean Rscript session; all five
+  documented outcomes asserted via `stopifnot()` (collision selects column
+  `sel`; `all_of()` corrects; direct NSE works; naive wrapper errors
+  "object 'PA' not found"; embraced wrapper works) — "AC2 spikes: all five
+  assertions hold". PASS.
+- AC3: NO path taken — `D-014` present in DECISIONS.md (line 341) with an
+  explicit **Re-trigger** clause; DESIGN.md Dependency policy cites D-014
+  (line 361). RB gate n/a (rejection leaves the shipped API untouched, per
+  the task's tripwire condition). PASS.
+- AC4: `git diff --name-only master..HEAD` = 5 files, all under `cairn/` or
+  `devel/`; 0 files under R/, src/, tests/. PASS.
