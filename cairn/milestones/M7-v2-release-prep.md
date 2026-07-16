@@ -2,7 +2,7 @@
 
 - **Status:** planned
 - **Priority:** high
-- **Depends on:** M20, M21
+- **Depends on:** M22
 - **Branch/PR:** —
 
 ## Goal
@@ -99,6 +99,12 @@ release ships when its bundle is complete and validated (D-008).
   change cheapest bundled into the major release) and M21 (T_diag-vs-T_free
   inference-default decision + application, superseding D-009's deferral). No
   release-prep task change.
+
+- 2026-07-16: dependency re-pointed {M20, M21}→M22 (/milestone-plan, gated).
+  Both are done; Jeff routed one more pre-release item into the v2.0.0 bundle
+  at the plan gate: M22 (free-engine multi-start nesting seed, RR05 B2/R5 —
+  an exported-results improvement cheapest shipped before the free family's
+  CRAN debut). No release-prep task change.
 
 ## Decisions
 
