@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M24: Tidyverse NSE in the user API — evaluation + standing decision
 
-- **Status:** planned   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate -->
 - **Principles touched:** —   <!-- no numbered IP/GP exist yet (deferred to /design-interview); governs DESIGN.md "Dependency policy" prose -->
-- **Branch/PR:** —   <!-- owner: implement (branch) / review (PR URL) · create -->
+- **Branch/PR:** m24-nse-evaluation   <!-- owner: implement (branch) / review (PR URL) · create -->
 
 ## Goal
 <!-- owner: plan · create; a wrong goal returns to plan, never edited in place -->
@@ -73,7 +73,7 @@ memo's spike snippets are evidence, not shipped code).
 <!-- owner: plan (create) / implement (check-off, minor edits); substantive
      change is amend-via-gate -->
 
-- [ ] T1: Prior-art survey — how do ≥6 comparable CRAN statistics packages
+- [x] T1: Prior-art survey — how do ≥6 comparable CRAN statistics packages
       (candidates: lavaan, psych, lme4, survey, mirt, semTools, easystats
       family; pick for comparability, not convenience) accept variable/
       column specifications; memo §1 with doc citations. (Sonnet-suitable.)
@@ -96,6 +96,9 @@ memo's spike snippets are evidence, not shipped code).
 
 - 2026-07-16: created by /milestone-plan (plan-gate: deeper decision
   milestone; rejection-scope = full; DESIGN.md one-liner = yes).
+- 2026-07-16: T1 done — 7-package survey (6 inspected locally, rstatix via
+  CRAN), memo §1; peer modeling packages are SE/formula, tidy-eval NSE only
+  in tidyverse-identity or in-house-reimplementation packages.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote
