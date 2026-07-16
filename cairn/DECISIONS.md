@@ -285,3 +285,26 @@ covariance input T_free is a different, unmeasured statistic.
 **Supersedes:** D-009 item 3's deferral (discharged). D-009's other holdings
 and D-010 stand. Source: RR05 (Fable, 2026-07-16); M21 T1 analysis.
 
+### D-012 (2026-07-16): longitudinal build merges are not gated behind the v2.0.0 submission (M23 plan gate)
+
+**Context:** D-001 excluded longitudinal (legacy "Milestone 6") from v2.0.0 —
+"its own ~v2.1.0" — and D-008 narrowed that exclusion once, for CIRCUM only.
+At the M23 plan gate Jeff was asked whether longitudinal *build* milestones
+should be merge-gated behind M7 (`Depends on: M7`), keeping the v2.0.0 bundle
+frozen. Jeff chose no gate.
+**Decision:** Longitudinal build milestones carry no dependency on M7;
+longitudinal code merges to master as it becomes complete and validated.
+Whichever release train is open at merge time carries it: a build merging
+before the v2.0.0 submission expands the v2.0.0 bundle (D-001's exclusion
+clause is superseded insofar as it gates merges); after submission, it rides
+~v2.1.0. This extends D-008's doctrine — scope is the variable, never the
+statistics or the date.
+**Scope of the supersession:** merge gating only. The M23 design milestone is
+docs-only regardless; every build still requires its own plan, oracle
+validation per the validation doctrine, and the normal review gate before
+merging — "not gated behind M7" never means "less validated".
+**Consequences:** M7's check/win-builder validation surface at submission
+time covers whatever has merged, including any longitudinal code that lands
+first; the "v2.1.0 benefits from v2.0.0 field feedback" deferral rationale is
+dropped. Source: Jeff, M23 plan gate, 2026-07-16.
+
