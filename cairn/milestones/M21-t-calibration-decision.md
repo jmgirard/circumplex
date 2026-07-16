@@ -61,7 +61,7 @@ deferral with a D-entry, and apply the decided outcome in the package.
 
 ## Tasks
 
-- [ ] **T1** — Assemble the calibration analysis (`devel/m21-t-calibration.R`
+- [x] **T1** — Assemble the calibration analysis (`devel/m21-t-calibration.R`
       + summary md): read both rds files; decide whether `ks_T` summaries
       suffice or per-replicate T re-dump is needed; compare calibration
       (KS, rejection rates at α=.05) per cell/family.
@@ -76,6 +76,12 @@ deferral with a D-entry, and apply the decided outcome in the package.
 - 2026-07-16: created by /milestone-plan (promoted from the free-scaling
   extensions candidate row, item 3). Decide-and-apply scope + mandatory
   Fable RB chosen at the plan gate; supersedes-D-009 requirement noted.
+- 2026-07-16: T1 done — ks_T summaries insufficient (one-family, unpaired,
+  partial N overlap), so ran the paired per-replicate design instead
+  (`devel/m21-t-calibration.{R,md}` + results rds; 500 reps × 12 cells,
+  ~3.7 min, reproduced bit-identically). Result: families
+  calibration-indistinguishable everywhere (paired ΔT̄ ≤ 0.5% of df, cor
+  ≥ .998); evidence points to keep-unit-default. RB next.
 
 ## Decisions
 
