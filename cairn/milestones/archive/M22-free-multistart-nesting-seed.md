@@ -17,10 +17,9 @@ acceptance count (sentinel group 0, `cpm_reproduced()` helper, unit-tested)
 — the initial own-group choice silently liberalized acceptance and was
 caught by the free-family SE cross-check oracle (3 permutation-basin
 replicates with exactly 1 native group at min F); acceptance semantics
-match the pre-seed engine exactly. A seed-rescued fit reports the better
+match the pre-seed engine exactly; a seed-rescued fit reports the better
 optimum WITH the acceptance warning (NEWS-documented). (2) Docs wording:
 "never exceeds … beyond numerical tolerance" (post-polish caveat), inside
-D-011's scoping. Review triage: F1 (82) fixed; F3 (68) fixed voluntarily;
+D-011's scoping. Review triage: F1 (82) fixed, F3 (68) fixed voluntarily,
 F2 (42) logged (belt fallback vs multimodality loop; conservative-erring).
-
 **PR:** https://github.com/jmgirard/circumplex/pull/46 (squash ec1f78f).
