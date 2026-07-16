@@ -172,7 +172,11 @@ Structure", for a worked introduction to both.
   parameterization CIRCUM and CircE use — so `cpm_fit()` can reproduce their
   published output exactly. Free scaling adds `p` parameters without changing
   the degrees of freedom, and reports the fitted variance ratios in a
-  `VarRatio` column (without confidence intervals).
+  `VarRatio` column (without confidence intervals). With correlation input the
+  two families' model-test statistics are calibration-indistinguishable
+  (paired simulation at sample sizes 250–50,000), so the default remains the
+  recommended family for routine inference; use `scaling = "free"` when the
+  goal is reproducing published CIRCUM/CircE output.
 
 * The `cpm_fit()` estimator has been validated against the published
   CIRCUM/CircE literature (Grassi, Luccio, & Di Blas, 2010, reanalyzing

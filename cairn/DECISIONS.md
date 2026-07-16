@@ -250,3 +250,38 @@ mis-coverage caution (only the σ² note) — exported `summary()` output change
 NEWS-documented at the v2.0.0 (M7) release. The T_diag-vs-T_free
 inference-default decision stays deferred (T_free statistics were collected in
 the same runs; ROADMAP candidate). Source: M19 coverage oracle, this session.
+
+### D-011 (2026-07-16): unit family stays the CPM model-test inference default (M21)
+
+**Context:** D-009 deferred whether a T_diag-vs-T_free calibration could make
+the free-scaling family "the preferable inference default." M21 measured it
+(paired design: both engines fit to the same `R = cor(X)` per replicate, 500
+reps × 12 cells at the stage-1 circumplex correlation truths, N ∈
+[250, 50000], df = 10, p = 8, m = 3, variant A;
+`devel/m21-t-calibration.{R,md}` + results rds) and escalated the decision to
+independent Fable review (RB05 → RR05, 2026-07-16; evidence re-verified
+against the rds, worst-exclusion cells regenerated from seed).
+**Decision:** The **unit family remains the CPM model-test inference
+default**; the free family remains opt-in for exact reproduction of published
+CIRCUM/CircE output. No conditional default. Grounds (RR05): (1) the measured
+tie is decisive — no cell separates the families in any metric (paired ΔT̄ ≤
+0.5% of df, paired cor ≥ .998; per-cell SE ≈ 0.013 T-units would have
+detected a 1%-of-df difference); (2) the tie is structurally expected under
+the correlation-input contract — `diag(R) = 1` makes the p added moments
+degenerate and σ̂ ≈ 1, and the df bookkeeping exactly cancels, so neither
+family can be better calibrated at correlation input; (3) against a null
+benefit stand the free family's costs (bordered-Hessian NA SEs in ~52–55% of
+N = 250 fits per D-010, p extra parameters, no σ² intervals per D-009).
+**Scope of every equivalence claim** (docs and this entry): the *model test*
+only, at *correlation input* only, within the measured envelope — both
+families are mildly conservative at small/mid N (rejection .02–.04), reaching
+nominal by boundary N ≈ 50000 / interior N ≈ 2000; never "identical"
+(T_free ≤ T_unit by nesting, ≤ 0.5% of df).
+**Re-trigger (gate, not revisit):** any future milestone shipping
+covariance-matrix input (D-009 item 4) must re-run the paired T calibration
+at non-unit σ truths **before** that feature ships; the reopened decision
+covers both the default and the docs' equivalence wording — at genuine
+covariance input T_free is a different, unmeasured statistic.
+**Supersedes:** D-009 item 3's deferral (discharged). D-009's other holdings
+and D-010 stand. Source: RR05 (Fable, 2026-07-16); M21 T1 analysis.
+
