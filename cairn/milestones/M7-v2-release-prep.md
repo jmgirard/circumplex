@@ -2,7 +2,7 @@
 
 - **Status:** planned
 - **Priority:** high
-- **Depends on:** M19
+- **Depends on:** M20, M21
 - **Branch/PR:** —
 
 ## Goal
@@ -92,6 +92,13 @@ release ships when its bundle is complete and validated (D-008).
   superseded (left as the historical record). Status blocked→planned. Dependency
   re-pointed M16→M18: the v2.0.0 bundle now includes the CIRCUM free-scaling
   family (M17 design → M18 build, per D-008). No release-prep task change.
+
+- 2026-07-16: dependency re-pointed M19→{M20, M21} (/milestone-plan). M19 is
+  done; Jeff routed two pre-release items into the v2.0.0 bundle at the
+  /milestone status gate: M20 (pole CI-endpoint alignment — an exported print
+  change cheapest bundled into the major release) and M21 (T_diag-vs-T_free
+  inference-default decision + application, superseding D-009's deferral). No
+  release-prep task change.
 
 ## Decisions
 
