@@ -1,6 +1,6 @@
 # M23: Longitudinal & intraindividual SSM — Fable-reviewed design + build-ready spec
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
@@ -96,6 +96,8 @@ build milestones can be planned without re-opening design questions.
   adapter serves Bayesian + growth pipelines; listwise-only for occasions
   (pairwise deferred); flagged the missing DESIGN.md oracle-registry pointer
   for the build milestone. Docs-only, no verify run needed.
+- 2026-07-16: blocked on RB06 (adversarial Fable review of the spec, T2);
+  brief committed on the milestone branch per RB05 precedent.
 
 ## Decisions
 
