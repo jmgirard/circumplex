@@ -163,3 +163,28 @@ Consistency gate: cairn_validate all pass (after trimming the milestone file
 back under the 150-line cap); document() no diff; pkgdown::check_pkgdown()
 clean; NEWS.md entry present (no milestone numbers); no new top-level files;
 no principle change (cairn_impact skipped).
+
+Independent review (three lenses + scorer): blame-history [S] — clean (M4
+mirror-fold invariant preserved; D-011 wording guardrails honored; bootstrap
+isolation verified). Prior-PR [S] — no prior-PR evidence (no GitHub-native
+review comments exist); cross-checks clean. Diff-bug [O] — deep checks clean
+(refactor byte-equivalent, embedding bit-identity verified empirically,
+mirror interaction safe); 3 findings. Scorer triage:
+
+- F1 (82, actioned → fixed): the sentinel-group-0 exclusion had no
+  deterministic test — pinned only by the stochastic SE oracle. Fixed by
+  extracting `cpm_reproduced()` and unit-testing the group-0 filter
+  directly (6 cases) + acceptance pins on the clean battery fits
+  (platform-robust; deliberately NOT asserting the RR05 fit's accepted
+  flag, which rides knife-edge optimizer luck across BLAS builds).
+- F2 (42, logged, not actioned): belt fallback would inject a
+  non-stationary point into the multimodality comparison — requires the
+  never-observed fallback AND a ≤1e-6 F-gap; errs conservative (spurious
+  warning at worst).
+- F3 (68, sub-threshold but fixed voluntarily — CLAUDE.md vignette-precision
+  doctrine, two-line change): "never exceeds — by construction" overstated
+  the post-polish guarantee; roxygen/vignette/NEWS now say "beyond numerical
+  tolerance" with the polish caveat in the roxygen.
+
+Post-fix: nesting file 34/34; full check() re-run after these edits (result
+recorded below).

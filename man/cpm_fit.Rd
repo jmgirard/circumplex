@@ -66,7 +66,9 @@ family's chi-square is more trustworthy than the other's. (The two
 statistics are close but not interchangeable digit-for-digit: the free
 family nests the unit family, and its optimizer is additionally started
 from the unit solution, so on the same input the free statistic never
-exceeds the unit statistic — by construction.) \code{"unit"} remains
+exceeds the unit statistic beyond the engine's numerical tolerance —
+fits whose boundary harmonics are polished away are compared on their
+own reduced model.) \code{"unit"} remains
 the default because free scaling buys no inferential benefit for
 correlation input while adding \code{p} parameters whose analytic standard
 errors are frequently undefined below \code{n = 2000}; choose \code{"free"} when the

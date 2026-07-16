@@ -67,6 +67,30 @@ test_that("nesting holds across a small deterministic battery (variants A and C)
       expect_length(ef$removed_harmonics, 0)
       expect_identical(ef$df, eu$df)
       expect_lte(ef$F, eu$F + 1e-8)
+      # The seed must not DISTURB acceptance on clean data: the data-blind
+      # battery reproduces the optimum here, so both families stay accepted.
+      expect_true(eu$accepted)
+      expect_true(ef$accepted)
     }
   }
+})
+
+test_that("the nesting seed's sentinel group never certifies reproduction", {
+  # Deterministic pin of the group-0 exclusion in the convergence-acceptance
+  # criterion. The seed is a warm start: it certifies nesting, never
+  # start-independent reproduction. A refactor that drops the group > 0
+  # filter (letting the seed count as an independent group) flips the first
+  # two cases and silently accepts start-dependent optima that only the
+  # warm start can reach — the failure mode the free-family SE cross-check
+  # oracle caught when the seed briefly carried its own group.
+  # Seed (group 0) alone at min F: not reproduced.
+  expect_false(cpm_reproduced(c(1L, 1L, 2L, 3L, 0L), c(FALSE, FALSE, FALSE, FALSE, TRUE)))
+  # Seed plus exactly ONE native group at min F: still not reproduced.
+  expect_false(cpm_reproduced(c(1L, 1L, 2L, 3L, 0L), c(TRUE, FALSE, FALSE, FALSE, TRUE)))
+  # Two native groups at min F: reproduced, with or without the seed.
+  expect_true(cpm_reproduced(c(1L, 1L, 2L, 3L, 0L), c(TRUE, FALSE, TRUE, FALSE, FALSE)))
+  expect_true(cpm_reproduced(c(1L, 1L, 2L, 3L, 0L), c(TRUE, FALSE, TRUE, FALSE, TRUE)))
+  # Unit family (no group 0 present): pre-seed semantics, unchanged.
+  expect_true(cpm_reproduced(c(1L, 1L, 2L, 3L), c(TRUE, FALSE, TRUE, FALSE)))
+  expect_false(cpm_reproduced(c(1L, 1L, 2L, 3L), c(TRUE, TRUE, FALSE, FALSE)))
 })

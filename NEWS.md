@@ -2,7 +2,8 @@
 
 * `cpm_fit(scaling = "free")` now also starts its optimizer from the
   unit-scaling solution, so the free family's fit statistic can never exceed
-  the default family's on the same input (the free family mathematically
+  the default family's on the same input beyond numerical tolerance (the
+  free family mathematically
   nests the default; previously a rare multi-start tail — about 1 in 2,000
   fits in simulation — could land the free optimizer on a slightly worse
   optimum). Results change only in those rare cases, and only for the

@@ -491,6 +491,17 @@ cpm_start_set <- function(spec, theta_theory, sv) {
   list(starts = starts, start_group = start_group)
 }
 
+# Reproduction half of the convergence acceptance criterion (design sec. 3.5):
+# the multi-start best F-hat must be reproduced by >= 2 INDEPENDENT start
+# groups. Group 0 is the sentinel for the unit-solution nesting seed (M22)
+# and never counts: a warm start certifies nesting, not start-independent
+# reproduction. Factored out so the group-0 exclusion is directly unit-tested
+# (test-cpm_nesting.R) rather than pinned only by the stochastic SE oracle.
+cpm_reproduced <- function(start_group, at_min) {
+  grp_min <- start_group[at_min]
+  length(unique(grp_min[grp_min > 0L])) >= 2L
+}
+
 # ---- single optimization run ------------------------------------------------
 
 cpm_optimize_one <- function(gstar0, R, spec) {
@@ -787,8 +798,7 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   # start-independent reproduction (see the seed block above). Acceptance
   # semantics are therefore identical to the unit family's and to the
   # pre-seed engine: only data-blind battery groups certify.
-  grp_min <- start_group[at_min]
-  reproduced <- length(unique(grp_min[grp_min > 0L])) >= 2L
+  reproduced <- cpm_reproduced(start_group, at_min)
   accepted <- grad_ok && reproduced
 
   if (!accepted) {
@@ -1434,7 +1444,9 @@ cpm_boundary_proximity <- function(object) {
 #'   statistics are close but not interchangeable digit-for-digit: the free
 #'   family nests the unit family, and its optimizer is additionally started
 #'   from the unit solution, so on the same input the free statistic never
-#'   exceeds the unit statistic — by construction.) `"unit"` remains
+#'   exceeds the unit statistic beyond the engine's numerical tolerance —
+#'   fits whose boundary harmonics are polished away are compared on their
+#'   own reduced model.) `"unit"` remains
 #'   the default because free scaling buys no inferential benefit for
 #'   correlation input while adding `p` parameters whose analytic standard
 #'   errors are frequently undefined below `n = 2000`; choose `"free"` when the
