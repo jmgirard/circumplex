@@ -167,4 +167,30 @@ learn `{{ }}`. The current SE interface makes the naive wrapper just work.
 
 ## §4 Synthesis and verdict
 
-(to follow — T4)
+**Back-compat vs the v1.0.0 removal (stratum d).** CRAN users absorbed one
+API-philosophy reversal at v1.0.0 (NSE removed, arguments renamed, NEWS
+"Breaking changes"). Re-adding NSE now would be a second reversal of the
+same axis within two major versions: every vignette, the pkgdown site, and
+published tutorials teach the SE idiom; a dual interface (strings still
+work, bare names added) avoids breakage but imports §3.2's collision
+ambiguity into a package where a silently wrong column selection feeds a
+statistical estimate. The 1.0.0 rationale — streamline, reduce dependencies
+— is *strengthened* by the current evidence (§2's floor jump did not exist
+then; D-006 had not yet refused vctrs).
+
+**Weighing.** For adoption: unquoted ergonomics for tidyverse-native users;
+selection helpers for long item lists. Against: the ergonomic win is
+already captured by instrument helpers (`PANO()` is shorter than the NSE
+call, §3.1); the helper win is a mis-scoring channel at the one site it
+would matter (`score()`'s ascending-order contract, §3.1); 6 net-new
+Imports incl. D-006-refused vctrs and an R-floor jump to 4.1 (§2); a
+data-mask wrong-answer channel SE cannot produce plus `{{ }}` literacy
+demanded of exactly this package's power users (§3.2); and a peer group
+that is uniformly SE/formula (§1).
+
+**Verdict: NO — full rejection** (bare-name capture *and* tidyselect-style
+helpers, whether via a tidyselect Import, bare-rlang `enquo()`, or an
+in-house parser), per the M24 plan-gate scope answer. Recorded as
+DECISIONS.md **D-014** with a re-trigger clause; DESIGN.md Dependency
+policy carries the one-line doctrine. The v1.0.0 removal stands, now with
+recorded evidence rather than NEWS-line archaeology.

@@ -356,7 +356,10 @@ the **runtime engine of the SEM-based SSM feature family** (`ssm_sem()`,
 `ssm_sem_parameters()`): those entry points gate on `requireNamespace()`
 with a clear install-hint error, the package loads and all non-SEM
 functionality runs without lavaan, and it is never load-required (amended
-2026-07-07 per the M5 spec §7.4). No tidyverse in package code.
+2026-07-07 per the M5 spec §7.4). No tidyverse in package code. The user
+API is standard evaluation by design — character names / numeric indices,
+never tidy-eval NSE (v1.0.0 removal re-affirmed with evidence: D-014,
+`devel/m24-nse-evaluation.md`).
 
 ## Testing strategy
 

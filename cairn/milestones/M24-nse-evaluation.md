@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M24: Tidyverse NSE in the user API — evaluation + standing decision
 
-- **Status:** in-progress   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
+- **Status:** review   <!-- owner: transitioning skill · mirror-update; cairn/ROADMAP.md is the authority -->
 - **Priority:** normal   <!-- owner: plan · create/amend-via-gate -->
 - **Depends on:** —   <!-- owner: plan · create/amend-via-gate -->
 - **Principles touched:** —   <!-- no numbered IP/GP exist yet (deferred to /design-interview); governs DESIGN.md "Dependency policy" prose -->
@@ -85,7 +85,7 @@ memo's spike snippets are evidence, not shipped code).
       `intermediate-ssm-analysis.Rmd` measures/grouping calls, a long
       `score()` items case) in NSE form; runnable snippets for the
       column/env collision and embracing cases; memo §3.
-- [ ] T4: Synthesis + decision — memo §4 verdict weighing all strata against
+- [x] T4: Synthesis + decision — memo §4 verdict weighing all strata against
       the v1.0.0 rationale; append the D-entry and DESIGN.md line (NO path)
       or superseding D-entry + build candidate (GO path). (RB tripwire:
       irreversible-api — offer Fable escalation before finalizing a GO;
@@ -106,6 +106,11 @@ memo's spike snippets are evidence, not shipped code).
   beats NSE; score()'s ascending-order contract makes starts_with() a
   mis-scoring channel); both spikes run with verbatim output (collision
   silently selects the wrong column; naive wrappers error without {{ }}).
+- 2026-07-16: T4 done — memo §4 verdict NO (all four strata against; RB
+  tripwire not fired — rejection leaves the shipped API untouched); D-014
+  appended (full rejection + re-trigger clause); DESIGN.md Dependency-policy
+  one-liner added. Verify slot vacuously clean (docs-only diff: devel/ +
+  cairn/ only; R/, src/, tests/ untouched). Status → review.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote
