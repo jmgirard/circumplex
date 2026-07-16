@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M22 | high | milestones/M7-v2-release-prep.md |
-| M23 | Longitudinal & intraindividual SSM — Fable-reviewed design + build-ready spec | planned | — | high | milestones/M23-longitudinal-ssm-design.md |
+| M23 | Longitudinal & intraindividual SSM — Fable-reviewed design + build-ready spec | in-progress | — | high | milestones/M23-longitudinal-ssm-design.md |
 | M22 | Free-engine multi-start nesting seed (T_free ≤ T_unit by construction) | done | — | high | milestones/archive/M22-free-multistart-nesting-seed.md |
 | M20 | 0-vs-360 pole CI-endpoint alignment | done | — | high | milestones/archive/M20-pole-endpoint-alignment.md |
 | M21 | T_diag-vs-T_free inference-default decision + application | done | — | high | milestones/archive/M21-t-calibration-decision.md |

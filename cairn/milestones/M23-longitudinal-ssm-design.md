@@ -1,10 +1,10 @@
 # M23: Longitudinal & intraindividual SSM — Fable-reviewed design + build-ready spec
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m23-longitudinal-ssm-design
 
 ## Goal
 
