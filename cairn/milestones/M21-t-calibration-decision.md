@@ -1,6 +1,6 @@
 # M21: T_diag-vs-T_free inference-default decision + application
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
@@ -82,6 +82,8 @@ deferral with a D-entry, and apply the decided outcome in the package.
   ~3.7 min, reproduced bit-identically). Result: families
   calibration-indistinguishable everywhere (paired ΔT̄ ≤ 0.5% of df, cor
   ≥ .998); evidence points to keep-unit-default. RB next.
+- 2026-07-16: blocked on RB05 (`cairn/reviews/RB05-t-calibration-default.md`,
+  the mandatory T2 Fable escalation; RB tripwire: irreversible-api).
 
 ## Decisions
 
