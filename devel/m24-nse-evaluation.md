@@ -43,7 +43,41 @@ not the tidyverse-workflow column.
 
 ## §2 Dependency delta
 
-(to follow — T2)
+Method: recursive Imports closure from live CRAN metadata (2026-07-16),
+
+```r
+ap <- available.packages(repos = "https://cloud.r-project.org")
+tools::package_dependencies("tidyselect", db = ap,
+                            which = "Imports", recursive = TRUE)
+```
+
+then subtract base packages and circumplex's current Imports (DESCRIPTION:
+boot, ggforce, ggplot2, htmlTable, parallel, Rcpp, rlang, stats; rlang is
+imported today **only** for the ggplot2 `.data` pronoun — zero user-facing
+NSE machinery in package code).
+
+**Net-new Imports** (6): `tidyselect`, `vctrs`, `cli`, `glue`, `lifecycle`,
+`withr`.
+
+**R-version floors** (CRAN Depends fields): tidyselect ≥ 3.4, cli ≥ 3.4,
+lifecycle ≥ 3.6, withr ≥ 3.6, **vctrs ≥ 4.0.0, glue ≥ 4.1** — adopting
+tidyselect raises circumplex's floor from `R (>= 3.4)` to `R (>= 4.1)`.
+
+Two aggravating precedents:
+
+- **vctrs is in the closure.** D-006 (2026-07-12, Fable-reviewed RB01→RR01)
+  explicitly refused a direct vctrs Import as breaching the minimal-deps /
+  no-tidyverse-in-package-code doctrine (`cairn/DESIGN.md` "Dependency
+  policy"). Taking it transitively via tidyselect lands the same dependency
+  weight the same decision refused.
+- **The no-dependency alternatives are not free.** (a) Bare-rlang NSE
+  (`enquo()`/`eval_tidy`, no tidyselect) adds no packages — rlang is already
+  imported — but delivers only bare-name capture (no `starts_with()`), while
+  importing the full ambiguity surface of §3. (b) The datawizard route
+  (in-house re-implementation) avoids the stack but means owning a parser
+  for ~8 input forms in a package whose doctrine is that statistical
+  correctness outranks all other concerns — maintenance surface in exactly
+  the wrong place.
 
 ## §3 Ergonomics and ambiguity on real call sites
 

@@ -77,7 +77,7 @@ memo's spike snippets are evidence, not shipped code).
       (candidates: lavaan, psych, lme4, survey, mirt, semTools, easystats
       family; pick for comparability, not convenience) accept variable/
       column specifications; memo §1 with doc citations. (Sonnet-suitable.)
-- [ ] T2: Dependency-delta — tidyselect's transitive Imports closure and
+- [x] T2: Dependency-delta — tidyselect's transitive Imports closure and
       minimum R version vs current DESCRIPTION (R >= 3.4, rlang already
       imported for `.data` only); note D-006's vctrs refusal; memo §2.
 - [ ] T3: Ergonomics + ambiguity spike — rewrite ≥3 vignette call sites
@@ -99,6 +99,9 @@ memo's spike snippets are evidence, not shipped code).
 - 2026-07-16: T1 done — 7-package survey (6 inspected locally, rstatix via
   CRAN), memo §1; peer modeling packages are SE/formula, tidy-eval NSE only
   in tidyverse-identity or in-house-reimplementation packages.
+- 2026-07-16: T2 done — memo §2: 6 net-new Imports (incl. vctrs, refused by
+  D-006) and an R-floor jump 3.4 → 4.1 (glue ≥ 4.1); closure computed from
+  live CRAN metadata, method shown.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote
