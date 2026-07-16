@@ -1342,7 +1342,16 @@ cpm_boundary_proximity <- function(object) {
 #'   the parameterization CIRCUM and CircE use, so `cpm_fit()` can reproduce
 #'   their published output exactly. Free scaling adds `p` parameters but leaves
 #'   the degrees of freedom unchanged (it fits the `p` extra diagonal
-#'   covariance moments). The fitted \eqn{\hat\sigma^2} are reported as a
+#'   covariance moments). For the model test the two families are
+#'   calibration-indistinguishable at correlation input — in paired simulation
+#'   at the measured truths (`n` from 250 to 50,000) their test statistics
+#'   differed by well under 1 percent of the degrees of freedom — so neither
+#'   family's chi-square is more trustworthy than the other's. `"unit"` remains
+#'   the default because free scaling buys no inferential benefit for
+#'   correlation input while adding `p` parameters whose analytic standard
+#'   errors are frequently undefined below `n = 2000`; choose `"free"` when the
+#'   goal is reproducing published CIRCUM/CircE results. The fitted
+#'   \eqn{\hat\sigma^2} are reported as a
 #'   `VarRatio` column (the ratio of reproduced to input variance); they carry
 #'   no confidence interval. The analytic intervals for the remaining parameters
 #'   follow the same sample-size caution as the default family: their coverage

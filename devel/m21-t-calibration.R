@@ -30,10 +30,14 @@
 #
 # Usage:  Rscript devel/m21-t-calibration.R                 # full run
 #         CPM_T_SMOKE=1 Rscript devel/m21-t-calibration.R   # quick smoke
+#         CPM_T_VARIANT=C CPM_T_SMOKE=1 Rscript ...  # non-A variant spot check
+#           (RR05 R6 belt-and-suspenders; the equal-communality truths are
+#           inside variant C, so C is the natural non-A check)
 
 devtools::load_all(".", quiet = TRUE)
 
 smoke <- nzchar(Sys.getenv("CPM_T_SMOKE"))
+VARIANT <- Sys.getenv("CPM_T_VARIANT", "A")
 REPS <- if (smoke) 25 else 500
 NS_ALL <- if (smoke) c(250, 2000) else c(250, 1000, 2000, 5000, 20000, 50000)
 BASE_SEED <- 20260706
@@ -59,9 +63,9 @@ pair_one <- function(i, cfg_idx, N_idx, N, chol0) {
     X <- matrix(stats::rnorm(N * p), nrow = N) %*% chol0     # Cov = P0
     R <- stats::cor(X)
     eu <- suppressWarnings(cpm_engine(R, angles = angles, m = 3,
-                                      variant = "A", scaling = "unit"))
+                                      variant = VARIANT, scaling = "unit"))
     ef <- suppressWarnings(cpm_engine(R, angles = angles, m = 3,
-                                      variant = "A", scaling = "free"))
+                                      variant = VARIANT, scaling = "free"))
     list(
       ok_u = isTRUE(eu$accepted), ok_f = isTRUE(ef$accepted),
       pol_u = length(eu$removed_harmonics) > 0,
@@ -87,7 +91,7 @@ calib <- function(Ts, df) {
     q95_emp = unname(stats::quantile(Ts, 0.95)) / stats::qchisq(0.95, df))
 }
 
-cat("M21 T-calibration; reps =", REPS, "; cells =",
+cat("M21 T-calibration; variant =", VARIANT, "; reps =", REPS, "; cells =",
     length(configs) * length(NS_ALL), "; cores =", CORES, "\n")
 
 results <- list()
@@ -153,9 +157,10 @@ echo_committed <- function() {
 }
 
 out <- list(results = results, reps = REPS, ns = NS_ALL, configs = configs,
-            base_seed = BASE_SEED, offset = OFFSET,
+            base_seed = BASE_SEED, offset = OFFSET, variant = VARIANT,
             committed = echo_committed(), date = Sys.Date())
-path <- if (smoke) "devel/m21-t-calibration-smoke.rds" else
-  "devel/m21-t-calibration-results.rds"
+suffix <- if (VARIANT == "A") "" else paste0("-", VARIANT)
+path <- if (smoke) paste0("devel/m21-t-calibration-smoke", suffix, ".rds") else
+  paste0("devel/m21-t-calibration-results", suffix, ".rds")
 saveRDS(out, path)
 cat("saved:", path, "\n")

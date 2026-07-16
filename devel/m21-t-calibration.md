@@ -75,3 +75,16 @@ truths with σ_pop = 1 (there is no covariance-input path; `cor()` discards
 variances). If a covariance-matrix input ever ships (deferred candidate,
 D-009 item 4), the free family's T at non-unit σ truths is unmeasured and
 this decision should be revisited there.
+
+## Appendix: variant-C spot check (RR05 R6, post-decision belt-and-suspenders)
+
+RR05 answered the variant question structurally (the σ block is orthogonal
+to variant structure; shared df formula) and marked a non-A smoke *consider,
+not gate*. Run 2026-07-16 (`CPM_T_VARIANT=C CPM_T_SMOKE=1`, 25 reps × 4
+cells, df = 17, equal-communality truths — inside variant C;
+`devel/m21-t-calibration-smoke-C.rds`): same tie — paired mean
+`T_free − T_unit` ∈ [−0.22, −0.05] (≤ 1.3% of df at smoke precision),
+rejection decisions discordant in 1/95 used replicates, both families in
+the same KS regime cell-by-cell. Consistent with the variant-independence
+argument; decision unchanged. The variant-A smoke reproduces bit-identically
+under the parameterized script (`CPM_T_VARIANT` defaults to `"A"`).

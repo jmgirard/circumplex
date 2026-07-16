@@ -1,6 +1,6 @@
 # M21: T_diag-vs-T_free inference-default decision + application
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
@@ -68,7 +68,7 @@ deferral with a D-entry, and apply the decided outcome in the package.
 - [x] **T2** — Draft the RB with the analysis attached → /milestone-brief;
       ingest the RR (RB tripwire: irreversible-api).
 - [x] **T3** — Append the superseding D-entry to `cairn/DECISIONS.md`.
-- [ ] **T4** — Apply the decided outcome (code/docs/`summary()` wording/NEWS
+- [x] **T4** — Apply the decided outcome (code/docs/`summary()` wording/NEWS
       as decided) with tests; run full `devtools::check()`.
 
 ## Work log
@@ -89,6 +89,12 @@ deferral with a D-entry, and apply the decided outcome in the package.
   discharging D-009 item 3; T3 done in the same stroke). Pair archived;
   unblocked. R6 (variant-C smoke) scheduled into T4; R5 (unit-seeded free
   multi-start) → infra candidate row; R7 rejected per RR05 reasoning.
+- 2026-07-16: T4 done — D-011 applied as docs under the RR05 guardrails
+  (`@param scaling` roxygen, evaluating-circumplex-structure vignette §2,
+  NEWS free-scaling bullet; no code-behavior change, so guidance-only NEWS).
+  Variant-C paired smoke run (R6): same tie at df = 17, appendix added to the
+  analysis md; variant-A smoke reproduces bit-identically. `document()` +
+  `check()` clean (0 errors / 0 warnings / 0 notes). Status → review.
 
 ## Decisions
 
