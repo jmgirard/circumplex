@@ -1,6 +1,6 @@
 # M23: Longitudinal & intraindividual SSM — Fable-reviewed design + build-ready spec
 
-- **Status:** blocked
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
@@ -76,11 +76,11 @@ build milestones can be planned without re-opening design questions.
       `devel/bayesian_ssm.Rmd` incl. its 360-boundary TODO).
       (RB tripwire: no-oracle — circular growth-model/dependent-resampling
       design; RB tripwire: irreversible-api — repeated-measures API shape.)
-- [ ] **T2** — `/milestone-brief` RB06: adversarial Fable review of the spec
+- [x] **T2** — `/milestone-brief` RB06: adversarial Fable review of the spec
       (fresh session; per-instance approval gate at spawn).
-- [ ] **T3** — Ingest RR06: weigh each finding (fix or push back with
+- [x] **T3** — Ingest RR06: weigh each finding (fix or push back with
       reason, revision log), finalize the spec, record the design D-entry.
-- [ ] **T4** — Register build-milestone candidate row(s) in ROADMAP
+- [x] **T4** — Register build-milestone candidate row(s) in ROADMAP
       (split per the spec's own sizing), each noting D-012.
 
 ## Work log
@@ -98,7 +98,23 @@ build milestones can be planned without re-opening design questions.
   for the build milestone. Docs-only, no verify run needed.
 - 2026-07-16: blocked on RB06 (adversarial Fable review of the spec, T2);
   brief committed on the milestone branch per RB05 precedent.
+- 2026-07-16: T2 done — Fable spawned (user-approved), RR06 returned:
+  "needs change (targeted)", architecture confirmed. T3 done — spec revised
+  (§9 revision log: 12 applied incl. 4 promoted from consider, 3 rejections
+  accepted); D-013 recorded. T4 done — build-family candidate row refined
+  (A/B/C cut) + ssm_ci_accuracy-occasions extension noted. RB06/RR06
+  archived; status → review.
 
 ## Decisions
+
+- 2026-07-16 (RR06 ingestion): all 8 apply recommendations adopted; R9–R12
+  promoted from consider to apply (one-line costs, real discriminating
+  power); R13–R15 rejections accepted with Fable's reasons. Author's call
+  where RR06 offered either: `Occasion` result column is
+  conditional-presence, not always-present-NA (avoids soft-breaking every
+  existing `results` consumer in a minor release; in-package consumers
+  branch for occasions anyway). Headline statistical correction: the
+  paired-efficiency claim is conditional (∇g₂ᵀC∇g₁ > 0; reverses at
+  |Δd| > 90°) — promoted to D-013 as part of the binding build contract.
 
 ## Review

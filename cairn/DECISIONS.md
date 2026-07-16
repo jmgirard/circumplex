@@ -308,3 +308,33 @@ time covers whatever has merged, including any longitudinal code that lands
 first; the "v2.1.0 benefits from v2.0.0 field feedback" deferral rationale is
 dropped. Source: Jeff, M23 plan gate, 2026-07-16.
 
+### D-013 (2026-07-16): the RR06-reviewed longitudinal SSM spec is the binding build contract (M23)
+
+**Context:** M23 turned Brief E's longitudinal/intraindividual directions
+into `devel/longitudinal-ssm-spec.md` and escalated it to independent Fable
+review (RB06 → RR06, 2026-07-16; archived under `cairn/reviews/archive/`).
+Verdict: needs change (targeted), architecture confirmed; the spec was
+revised per RR06 (§9 revision log — 12 applied, 3 rejections accepted).
+**Decision:** Longitudinal build milestones implement the revised spec
+without re-opening its reviewed decisions. Fable-attested load-bearing
+holdings: (1) the paired occasion analysis rides the existing row resampler
+(wide person-rows; case bootstrap = `boot::boot` over rows) and the stacked-
+occasions MC covariance (sample covariance of stacked person vectors / n)
+is the correct asymptotic object; (2) **the paired-efficiency claim is
+conditional** — exact for Δe iff within-person elevation correlation > 0;
+for Δa/Δd paired is narrower iff the gradient-projected cross-covariance
+∇g₂ᵀC∇g₁ > 0 (∝ cos Δd under isotropic dependence), **reversing for
+|Δd| > 90°** — docs may never print the unconditional claim; (3) growth
+recipes must fit (x, y) **jointly** (independent univariate LMMs zero
+Cov(x̂, ŷ) — wrong d(t) intervals), with a per-t D-007 amplitude
+certification caution; (4) the draws adapter requires an explicit type in
+the ncol = 3/no-angles cell; (5) cross-occasion column alignment is
+stem-validated (the rotation channel); (6) listwise-only for occasions, on
+estimand grounds; (7) `ssm_ci_accuracy()` errors informatively on occasions
+objects.
+**Re-trigger:** a build milestone may amend the spec only through its own
+gate with a work-log line; challenges to reviewed holdings need a new RB.
+**Consequences:** build candidates registered (spec §7 cut A/B/C; ROADMAP);
+none merge-gated behind M7 (D-012). D-002/D-003/D-006/D-007 reinforced,
+none superseded. Source: RR06 (Fable, 2026-07-16); M23 T3.
+
