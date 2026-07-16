@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-16 (candidate cleanup: promoted/struck breadcrumbs trimmed, sim-study row reworded to paper-track pointer, D-006's RR01 S3 follow-ups folded into the infra row)_
+_Last hygiene check: 2026-07-16 (candidate cleanup pass 2: dropped dangling M18 deferred-list numerals from the CIRCUM-extensions row; all 5 rows re-checked — each keeps its reason and re-trigger, none stale)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -24,4 +24,4 @@ _Candidates carry no milestone ID — an `M<NN>` is assigned only at planning ti
 - CPM simulation paper (research-paper track, not a package milestone): the engine is written, reviewed, and ratified in `devel/cpm-sim/` (registered plan `devel/cpm-simulation-paper-plan.md`; not yet run). A package-side milestone (e.g., sim-backed guidance in docs/vignettes) is replanned only if the paper's results motivate one.
 - Continuous / infrastructure refactors (fold into the milestone that next touches the code): analytic-CI Hessian recomputation (minor perf; oracle-validate when done); seed the free engine's multi-start with the unit solution to enforce T_free ≤ T_unit nesting by construction (RR05 B2/R5, 2026-07-16); RR01 S3-local follow-ups per D-006 — a `new_contrast_radian()` constructor for the two inline `structure()` sites, deciding export status of the internal `as_degree`/`as_radian` generics, and `NA_real_` all-NA return + CPM angle-CI oracle path when the quantile methods are next touched.
 - Strict-tier syntax *emission* single-sourcing across the single/multi-group branches in `R/ssm_sem_syntax.R` (descoped from M8 T4, 2026-07-12): the two emitters are structurally distinct (plain vs `c()`-vector cross-group labels) and byte-pinned by `exp_strict_*` snapshots — a high-risk rewrite of statistical output for minor DRY gain. Revisit only if that emitter is reworked for another reason.
-- CIRCUM free-scaling post-v2.0.0 extensions (deferred out of M18; see `milestones/archive/M18-circum-free-scaling-build.md` + D-009): (2) bootstrap σ CIs; (4) covariance-matrix input — shipping it re-triggers the D-011 paired T calibration at non-unit σ truths first. The point-estimate oracle (frozen Grassi App. A + live OpenMx) already shipped in M18.
+- CIRCUM free-scaling post-v2.0.0 extensions (deferred out of M18; see `milestones/archive/M18-circum-free-scaling-build.md` + D-009): bootstrap σ CIs; covariance-matrix input — shipping it re-triggers the D-011 paired T calibration at non-unit σ truths first. The point-estimate oracle (frozen Grassi App. A + live OpenMx) already shipped in M18.
