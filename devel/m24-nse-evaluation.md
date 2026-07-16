@@ -81,7 +81,89 @@ Two aggravating precedents:
 
 ## §3 Ergonomics and ambiguity on real call sites
 
-(to follow — T3)
+### 3.1 Shipped vignette call sites, rewritten in hypothetical NSE form
+
+Site 1 — `introduction-to-ssm-analysis.Rmd:362` (the canonical call):
+
+```r
+# current SE                                   # hypothetical NSE
+ssm_analyze(jz2017, scales = PANO())           ssm_analyze(jz2017, scales = c(PA, BC, DE, FG, HI, JK, LM, NO))
+```
+
+The instrument helper is *shorter than the NSE form*: the main ergonomic
+argument for NSE ("stop typing quoted names") was already solved in 1.0.0 by
+`PANO()`-style helpers, which every vignette teaches.
+
+Site 2 — `intermediate-ssm-analysis.Rmd:66-68, 97-100` (measures/grouping):
+
+```r
+# current SE                                   # hypothetical NSE
+ssm_analyze(jz2017, scales = PANO(),           ssm_analyze(jz2017, scales = PANO(),
+  measures = c("NARPD", "ASPD"),                 measures = c(NARPD, ASPD),
+  grouping = "Gender")                           grouping = Gender)
+ssm_analyze(jz2017, scales = PANO(),           # NSE cannot express measures = 10:12
+  grouping = "Gender", measures = 10:12)       #   without all_of()/positional helpers
+```
+
+Saving: four quote characters per call. Cost: the vignette's own
+`measures = 10:12` numeric-index idiom now needs tidyselect position
+semantics or a dual interface (§3.2's ambiguity).
+
+Site 3 — `using-instruments.Rmd:83,108-110` (long item selections):
+
+```r
+# current SE                                   # hypothetical NSE
+ipsatize(raw_iipsc, items = 1:32)              ipsatize(raw_iipsc, items = starts_with("IIP"))
+score(raw_iipsc, items = 1:32, iipsc)          score(raw_iipsc, items = num_range("IIP", 1:32), iipsc)
+```
+
+This is NSE's best case — but it is *worse than useless here*: `score()`'s
+contract requires items **in ascending instrument order**
+(using-instruments.Rmd:105); `starts_with()` returns data-frame column
+order, silently mis-scoring shuffled items that `items = 1:32`-style
+explicit indexing forces the user to confront. The one site where
+tidyselect helpers shine is the one site whose statistical contract they
+undermine.
+
+### 3.2 Runnable ambiguity spikes
+
+Run 2026-07-16, R 4.x, tidyselect 1.2.1 / rlang (session library); output
+verbatim.
+
+Spike A — data-mask collision (env variable shadowed by a same-named
+column). The user's `sel` holds the intended scale names, but the data
+happen to contain a column named `sel`:
+
+```r
+library(tidyselect); library(rlang)
+df  <- data.frame(PA = 1, BC = 2, sel = 3)
+sel <- c("PA", "BC")
+eval_select(expr(sel), df)          # sel
+                                    #   3    <- silently selects COLUMN sel
+eval_select(expr(all_of(sel)), df)  # PA BC
+                                    #  1  2   <- correct, but only via all_of()
+```
+
+A wrong-columns silent selection feeding an SSM fit is a *statistical*
+wrong-answer channel that the SE interface cannot produce (`data[sel]` uses
+the env variable, always).
+
+Spike B — programming against an NSE API requires embracing. A toy NSE
+front-end and a user's perfectly natural wrapper around it:
+
+```r
+toy_nse       <- function(data, scales) names(eval_select(enquo(scales), data))
+wrap_naive    <- function(data, v) toy_nse(data, v)
+wrap_embraced <- function(data, v) toy_nse(data, {{ v }})
+d2 <- data.frame(PA = 1, BC = 2, DE = 3)
+toy_nse(d2, c(PA, BC))         # [1] "PA" "BC"
+wrap_naive(d2, c(PA, BC))      # ERROR: object 'PA' not found
+wrap_embraced(d2, c(PA, BC))   # [1] "PA" "BC"
+```
+
+Every user who loops SSM analyses over scale sets or wraps `ssm_analyze()`
+in a lab utility — the package's research audience does exactly this — must
+learn `{{ }}`. The current SE interface makes the naive wrapper just work.
 
 ## §4 Synthesis and verdict
 

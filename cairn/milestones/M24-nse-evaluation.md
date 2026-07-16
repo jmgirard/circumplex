@@ -80,7 +80,7 @@ memo's spike snippets are evidence, not shipped code).
 - [x] T2: Dependency-delta — tidyselect's transitive Imports closure and
       minimum R version vs current DESCRIPTION (R >= 3.4, rlang already
       imported for `.data` only); note D-006's vctrs refusal; memo §2.
-- [ ] T3: Ergonomics + ambiguity spike — rewrite ≥3 vignette call sites
+- [x] T3: Ergonomics + ambiguity spike — rewrite ≥3 vignette call sites
       (e.g., `ssm_analyze(jz2017, scales = PANO())`,
       `intermediate-ssm-analysis.Rmd` measures/grouping calls, a long
       `score()` items case) in NSE form; runnable snippets for the
@@ -102,6 +102,10 @@ memo's spike snippets are evidence, not shipped code).
 - 2026-07-16: T2 done — memo §2: 6 net-new Imports (incl. vctrs, refused by
   D-006) and an R-floor jump 3.4 → 4.1 (glue ≥ 4.1); closure computed from
   live CRAN metadata, method shown.
+- 2026-07-16: T3 done — memo §3: 3 vignette sites rewritten (PANO() already
+  beats NSE; score()'s ascending-order contract makes starts_with() a
+  mis-scoring channel); both spikes run with verbatim output (collision
+  silently selects the wrong column; naive wrappers error without {{ }}).
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote
