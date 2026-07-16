@@ -70,7 +70,7 @@ build milestones can be planned without re-opening design questions.
 
 ## Tasks
 
-- [ ] **T1** — Draft `devel/longitudinal-ssm-spec.md` from Brief E's
+- [x] **T1** — Draft `devel/longitudinal-ssm-spec.md` from Brief E's
       recommended directions + code reading (`R/ssm_bootstrap.R` strata
       design, `R/ssm_montecarlo.R`, `quantile.circumplex_contrast_radian`,
       `devel/bayesian_ssm.Rmd` incl. its 360-boundary TODO).
@@ -89,6 +89,13 @@ build milestones can be planned without re-opening design questions.
   "Milestone 6" candidate row; design-gate milestone mirroring M17. Plan-gate
   decisions (Jeff): one unified spec; Bayesian = draws adapter + vignette
   only; builds NOT merge-gated behind M7 (D-012); Fable review via RB06.
+
+- 2026-07-16: T1 done — spec drafted (8 sections, 5 components + oracle plan
+  + build-cut recommendation + 5 open questions for RB06). Key moves: wide
+  person-rows make the case bootstrap the existing row resampler; one draws
+  adapter serves Bayesian + growth pipelines; listwise-only for occasions
+  (pairwise deferred); flagged the missing DESIGN.md oracle-registry pointer
+  for the build milestone. Docs-only, no verify run needed.
 
 ## Decisions
 
