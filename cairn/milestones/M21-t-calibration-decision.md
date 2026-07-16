@@ -1,6 +1,6 @@
 # M21: T_diag-vs-T_free inference-default decision + application
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
@@ -65,9 +65,9 @@ deferral with a D-entry, and apply the decided outcome in the package.
       + summary md): read both rds files; decide whether `ks_T` summaries
       suffice or per-replicate T re-dump is needed; compare calibration
       (KS, rejection rates at α=.05) per cell/family.
-- [ ] **T2** — Draft the RB with the analysis attached → /milestone-brief;
+- [x] **T2** — Draft the RB with the analysis attached → /milestone-brief;
       ingest the RR (RB tripwire: irreversible-api).
-- [ ] **T3** — Append the superseding D-entry to `cairn/DECISIONS.md`.
+- [x] **T3** — Append the superseding D-entry to `cairn/DECISIONS.md`.
 - [ ] **T4** — Apply the decided outcome (code/docs/`summary()` wording/NEWS
       as decided) with tests; run full `devtools::check()`.
 
@@ -84,7 +84,24 @@ deferral with a D-entry, and apply the decided outcome in the package.
   ≥ .998); evidence points to keep-unit-default. RB next.
 - 2026-07-16: blocked on RB05 (`cairn/reviews/RB05-t-calibration-default.md`,
   the mandatory T2 Fable escalation; RB tripwire: irreversible-api).
+- 2026-07-16: RR05 returned same-session (Fable subagent, user-approved) and
+  ingested; T2 done. Decision: keep unit default (promoted → D-011,
+  discharging D-009 item 3; T3 done in the same stroke). Pair archived;
+  unblocked. R6 (variant-C smoke) scheduled into T4; R5 (unit-seeded free
+  multi-start) → infra candidate row; R7 rejected per RR05 reasoning.
 
 ## Decisions
+
+- 2026-07-16 (M21-D1, from RR05): keep the unit family as the CPM model-test
+  inference default — promoted to `cairn/DECISIONS.md` **D-011** (supersedes
+  D-009 item 3's deferral; re-trigger = a gate inside any future
+  covariance-input milestone).
+- 2026-07-16 (RR05 triage): R1–R4 apply (D-011 + T4 wording guardrails:
+  equivalence scoped to model test + correlation input, never "identical",
+  no invalid-p implication for free, conservatism-at-small-N note kept, no
+  extrapolation beyond the measured envelope; B1 phrasing adopted). R5
+  (unit-seeded free multi-start, B2) → infra candidate row. R6 (variant-C
+  paired smoke) → run during T4 as belt-and-suspenders. R7 (more reps /
+  truths / polish stratification) rejected — RR05's reasoning logged.
 
 ## Review
