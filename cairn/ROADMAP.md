@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-16 (M23 done + archived, PR #47; M18 terminal row pruned per retention — archive file stays authoritative)_
+_Last hygiene check: 2026-07-16 (M24 done + archived, PR #48; M19 terminal row pruned per retention — archive file stays authoritative)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M22 | high | milestones/M7-v2-release-prep.md |
-| M24 | Tidyverse NSE in the user API — evaluation + standing decision | review | — | normal | milestones/M24-nse-evaluation.md |
+| M24 | Tidyverse NSE in the user API — evaluation + standing decision | done | — | normal | milestones/archive/M24-nse-evaluation.md |
 | M23 | Longitudinal & intraindividual SSM — Fable-reviewed design + build-ready spec | done | — | high | milestones/archive/M23-longitudinal-ssm-design.md |
 | M22 | Free-engine multi-start nesting seed (T_free ≤ T_unit by construction) | done | — | high | milestones/archive/M22-free-multistart-nesting-seed.md |
 | M20 | 0-vs-360 pole CI-endpoint alignment | done | — | high | milestones/archive/M20-pole-endpoint-alignment.md |
 | M21 | T_diag-vs-T_free inference-default decision + application | done | — | high | milestones/archive/M21-t-calibration-decision.md |
-| M19 | CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration | done | M18 | high | milestones/archive/M19-free-family-coverage-oracle.md |
 
 ## Candidates
 
