@@ -338,3 +338,38 @@ gate with a work-log line; challenges to reviewed holdings need a new RB.
 none merge-gated behind M7 (D-012). D-002/D-003/D-006/D-007 reinforced,
 none superseded. Source: RR06 (Fable, 2026-07-16); M23 T3.
 
+### D-014 (2026-07-16): tidyverse-style NSE stays out of the user API (M24)
+
+**Context:** Pre-1.0 circumplex had rlang tidy-eval NSE; the v1.0.0
+breaking release removed it ("streamline and reduce dependencies",
+NEWS.md:412–416). M24 re-evaluated adoption on four evidence strata
+(`devel/m24-nse-evaluation.md`).
+**Decision:** The user-facing API remains standard evaluation — character
+names / numeric indices via `is_var()` — with instrument helpers
+(`PANO()`-family) as the ergonomic layer. **Full rejection**: bare-name
+capture AND tidyselect-style select helpers, whether via a tidyselect
+Import, bare-rlang `enquo()`, or an in-house parser (the datawizard route).
+Grounds: (1) peer group — the modeling packages circumplex interoperates
+with (lavaan engine, OpenMx oracle, psych) are SE/formula; tidy-eval NSE
+marks tidyverse-identity packages (memo §1); (2) dependency delta — 6
+net-new Imports incl. vctrs (refused by D-006); the closure's R floors are
+neutral — circumplex's effective install floor is already 4.1 via
+ggplot2/htmlTable (memo §2, corrected at review); (3) measured ergonomics — `PANO()` is already
+shorter than the NSE form at the canonical call, and NSE's best case
+(`starts_with()` for items) undermines `score()`'s ascending-order
+contract, a silent mis-scoring channel (memo §3.1); (4) ambiguity spikes —
+data-mask column/env collision silently selects wrong columns (a
+statistical wrong-answer channel SE cannot produce) and user wrappers
+require `{{ }}` (memo §3.2, runnable); (5) back-compat — a second
+API-philosophy reversal for users who absorbed v1.0.0 (memo §4).
+**Re-trigger:** reopen only on concrete evidence the SE interface fails
+users — recurring user reports that name-vector/instrument helpers cannot
+solve, or a hard interop requirement from a downstream tidyverse-native
+consumer. Modernization or style advocacy alone never re-triggers. Any
+reopening supersedes this entry and passes the `irreversible-api` RB gate
+(Fable) before any build.
+**Consequences:** DESIGN.md Dependency policy gains the one-line doctrine;
+rlang stays imported solely for the ggplot2 `.data` pronoun; no NEWS entry
+(no user-facing change). Confirms and evidences the v1.0.0 removal; D-006
+reinforced. Source: M24 memo; plan-gate answers (Jeff, 2026-07-16).
+

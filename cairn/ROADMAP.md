@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M22 | high | milestones/M7-v2-release-prep.md |
-| M24 | Tidyverse NSE in the user API — evaluation + standing decision | planned | — | normal | milestones/M24-nse-evaluation.md |
+| M24 | Tidyverse NSE in the user API — evaluation + standing decision | review | — | normal | milestones/M24-nse-evaluation.md |
 | M23 | Longitudinal & intraindividual SSM — Fable-reviewed design + build-ready spec | done | — | high | milestones/archive/M23-longitudinal-ssm-design.md |
 | M22 | Free-engine multi-start nesting seed (T_free ≤ T_unit by construction) | done | — | high | milestones/archive/M22-free-multistart-nesting-seed.md |
 | M20 | 0-vs-360 pole CI-endpoint alignment | done | — | high | milestones/archive/M20-pole-endpoint-alignment.md |
