@@ -186,5 +186,7 @@ mirror interaction safe); 3 findings. Scorer triage:
   the post-polish guarantee; roxygen/vignette/NEWS now say "beyond numerical
   tolerance" with the polish caveat in the roxygen.
 
-Post-fix: nesting file 34/34; full check() re-run after these edits (result
-recorded below).
+Post-fix: nesting file 34/34; full check() re-run after these edits —
+0 errors / 0 warnings / 0 notes (4m 9s, on 768c0b9's tree). CI on the
+pre-fix review commit was green across all 7 checks (macOS/Linux×3/Windows/
+coverage/pkgdown); final-commit CI gates the merge.
