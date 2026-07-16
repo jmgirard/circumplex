@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-16 (M21 done → archived, PR #44; pruned M15 under terminal-row retention; M7 now waits only on M20)_
+_Last hygiene check: 2026-07-16 (M20 done → archived, PR #45; pruned M16 under terminal-row retention; M7's dependencies all done — workable)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M20, M21 | high | milestones/M7-v2-release-prep.md |
-| M20 | 0-vs-360 pole CI-endpoint alignment | review | — | high | milestones/M20-pole-endpoint-alignment.md |
+| M20 | 0-vs-360 pole CI-endpoint alignment | done | — | high | milestones/archive/M20-pole-endpoint-alignment.md |
 | M21 | T_diag-vs-T_free inference-default decision + application | done | — | high | milestones/archive/M21-t-calibration-decision.md |
 | M19 | CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration | done | M18 | high | milestones/archive/M19-free-family-coverage-oracle.md |
 | M18 | CIRCUM free-scaling — implementation + oracle validation | done | M17 | high | milestones/archive/M18-circum-free-scaling-build.md |
 | M17 | CIRCUM free-scaling — Fable-reviewed design decision + spec | done | — | high | milestones/archive/M17-circum-free-scaling-design.md |
-| M16 | Print-independent, scale-free displacement-certification rule | done | — | high | milestones/archive/M16-cert-rule-replacement.md |
 
 ## Candidates
 
