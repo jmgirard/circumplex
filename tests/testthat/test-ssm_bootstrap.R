@@ -272,7 +272,12 @@ test_that("a pole-peaking profile reports its degenerate CI at 360, not 0 (M20)"
   set.seed(1)
   res <- suppressWarnings(ssm_analyze(dat, scales = 1:8, boots = 25))
   r <- res$results
-  expect_identical(as.numeric(r$d_est), 360)
+  # The ESTIMATE path is unchanged by M20: per DESIGN.md G2 (D-003) a
+  # pole-peaking estimate may carry either float label (~0 or ~360, a
+  # platform libm detail), so assert only that it denotes the pole.
+  expect_lt(min(abs(r$d_est), abs(r$d_est - 360)), 1e-9)
+  # The CI ENDPOINTS carry the M20 contract: a pole-denoting endpoint is
+  # relabeled to exactly 360, never 0 (the pre-M20 snap reported 0 here).
   expect_identical(as.numeric(r$d_lci), 360)
   expect_identical(as.numeric(r$d_uci), 360)
 })

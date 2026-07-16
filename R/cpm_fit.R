@@ -535,9 +535,11 @@ cpm_canonicalize <- function(gstar, spec, theta_theory) {
 #' CPM engine: fit Browne's circular process model to a correlation matrix
 #'
 #' Internal engine core (the exported `cpm_fit()` API is a later task). Returns
-#' a plain list with the natural-scale estimates (angles wrapped to [0, 360],
-#' pole labeled 360, only in the reported fields; unwrapped radians kept for
-#' downstream tasks) and the full diagnostic set required by design sec. 5.4.
+#' a plain list with the natural-scale estimates (estimated angles wrapped to
+#' [0, 360] with the pole labeled 360, only in the reported degrees field;
+#' `theta_theory` echoes the plain [0, 360) wrap, and `cpm_fit()`'s results
+#' table echoes the user's supplied angles verbatim) and the full diagnostic
+#' set required by design sec. 5.4.
 #'
 #' @param R p x p sample correlation matrix (positive definite).
 #' @param angles length-p numeric, theoretical/start angles in DEGREES.
@@ -780,8 +782,10 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   # computational radians (theta_rad, theta_rad_unwrapped) stay untouched so
   # fitted matrices are unchanged (M20-D1).
   theta_wrapped <- nat$theta %% (2 * pi)
-  pole <- theta_wrapped < (.Machine$double.eps * 2) |
-    (2 * pi - theta_wrapped) < (.Machine$double.eps * 2)
+  # Same 16*eps pole window as quantile.circumplex_radian (M20) — see the
+  # tolerance rationale there.
+  pole <- theta_wrapped < (16 * .Machine$double.eps) |
+    (2 * pi - theta_wrapped) < (16 * .Machine$double.eps)
   theta_deg <- as.numeric(as_degree(as_radian(theta_wrapped)))
   theta_deg[pole] <- 360
 

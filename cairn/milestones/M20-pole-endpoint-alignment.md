@@ -155,3 +155,26 @@ Consistency gate: cairn_validate all-pass (exit 0). r-package toolchain
 checks: document() no package diff; README.Rmd untouched by branch; 
 pkgdown::check_pkgdown() no problems; NEWS entry present; no new top-level
 files; full check clean (AC4).
+
+Independent review (three lenses + scorer, 2026-07-16): prior-PR-comments
+lens — no prior-PR evidence (no GitHub review threads), zero findings;
+blame-history lens — no findings (one cosmetic non-finding: stale [0,360)
+comment in untouched test-cpm_api.R:421); diff-bug lens — 3 findings.
+Scored (Sonnet scorer): F1 = 85, F2 = 72, F3 = 65.
+
+- **F1 (85, actioned — fixed):** e2e pole test pinned platform-dependent
+  libm rounding (expect_identical on the *unchanged* estimate path;
+  endpoint snap window of 2*eps thinner than 1 ulp of 2π). Fix: snap window
+  widened to 16*eps (~4 ulp of 2π, ~2e-13°; both quantile and CPM theta_deg
+  sites) with an honest tolerance comment; d_est assertion relaxed to the
+  G2-sanctioned either-label pole check; endpoint assertions stay exact-360.
+  Suite green (0/2095), teeth re-proven red under reverted snap, full check
+  re-run clean post-fix (4m01s, 0/0/0).
+- **F2 (72, sub-threshold — logged):** engine-internal theta_theory still
+  wraps 360→0 while the branch's new roxygen claimed pole=360 for reported
+  fields. Behavior untouched (internal, results table echoes user angles);
+  the overbroad roxygen sentence this branch introduced was scoped to the
+  estimated angles.
+- **F3 (65, sub-threshold — logged):** snap-comment tolerance semantics
+  wrong on the 2π side (claimed ~2 ulp, actually exact-2π-only). Substance
+  folded into the F1 tolerance/comment rework.
