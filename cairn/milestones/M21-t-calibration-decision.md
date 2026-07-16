@@ -142,3 +142,26 @@ Consistency gate (2026-07-16): `cairn_validate` pass; Coverage complete
 `cairn_impact`); `document()` no diff to `man/`/`NAMESPACE`; README
 untouched; `pkgdown::check_pkgdown()` no problems; `devel/` is
 `.Rbuildignore`d; suite 2083 pass / 0 fail (work log).
+
+Independent review (2026-07-16, three fresh-context lenses + scorer):
+
+- **[S] blame-history**: no findings — M21's roxygen edit is a pure
+  insertion preserving M19's caution sentence verbatim; D-008–D-011 all
+  respected; RR05 guardrails verified in place.
+- **[S] prior-PR-comments**: no literal GitHub review comments exist on any
+  merged PR touching these files (repo reviews via the cairn RB/RR archive);
+  supplementary cross-check of RR03/RR04 clean — the diff discharges RR04's
+  own "Beyond the brief" item 9 recommendation.
+- **[O] diff-bug**: script statistics, seeds, pairing, and md accuracy all
+  verified clean; one finding — the vignette equivalence sentence omitted
+  the measured N-envelope (RR05 guardrail 5) that roxygen/NEWS state.
+- **[S] scorer**: finding scored **78** (< 80) — documentation-precision
+  nit, low over-generalization risk in context. Sub-threshold, so logged
+  here rather than actioned; **fixed anyway** (one-line parenthetical,
+  "at sample sizes 250–50,000") because the AC4 evidence above asserts the
+  envelope at every doc location — fixing the text keeps that evidence
+  literally accurate instead of weakening it. `check()` re-run over the
+  final text: 0 errors / 0 warnings / 0 notes (4m13s). (A standalone
+  `rmarkdown::render` of the vignette fails on the *installed* 1.2.0.9999
+  package — `fit_structure()` is dev-line; `check()` is the authoritative
+  vignette build.)
