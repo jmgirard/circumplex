@@ -4,7 +4,7 @@
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** m21-t-calibration-decision
+- **Branch/PR:** m21-t-calibration-decision · https://github.com/jmgirard/circumplex/pull/44
 
 ## Goal
 
@@ -37,18 +37,18 @@ deferral with a D-entry, and apply the decided outcome in the package.
 
 ## Acceptance criteria
 
-- [ ] Calibration comparison recorded as a committed `devel/` artifact
+- [x] Calibration comparison recorded as a committed `devel/` artifact
       (script + summary), citing the M19/M4 rds provenance and seeds; any
       re-dump uses the analytic-only paths with disjoint documented seeds.
-- [ ] Fable RB/RR pair completed and ingested for the inference-default
+- [x] Fable RB/RR pair completed and ingested for the inference-default
       decision (RB tripwire: irreversible-api).
-- [ ] Superseding D-entry appended to `cairn/DECISIONS.md` recording the
+- [x] Superseding D-entry appended to `cairn/DECISIONS.md` recording the
       decision and its evidence, whichever direction it lands.
-- [ ] The decided outcome is applied and tested: user-facing inference
+- [x] The decided outcome is applied and tested: user-facing inference
       guidance (docs/caution/`summary()` wording, and the default itself if
       GO) matches the D-entry; a keep-diag decision is applied as documented
       rationale in the CPM docs.
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes); NEWS.md
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes); NEWS.md
       entry if exported behavior changes.
 
 ## Coverage
@@ -111,3 +111,34 @@ deferral with a D-entry, and apply the decided outcome in the package.
   truths / polish stratification) rejected — RR05's reasoning logged.
 
 ## Review
+
+Fresh evidence, 2026-07-16, PR #44 (draft while reviewing):
+
+- **AC1** — `devel/m21-t-calibration.{R,md}` + results/smoke rds all in the
+  branch diff (`git diff --name-only origin/master..HEAD -- devel/`). Script
+  header documents the paired design, M19/M4 provenance, and seeds
+  (`BASE_SEED + 12e7 + 1e6·cfg_idx + 1e4·N_idx + i`, disjoint from stages
+  1–3; level-indexed per the M19 lesson). Engine-only analytic paths; full
+  run ~3.7 min, reproduced bit-identically twice (work log).
+- **AC2** — `cairn/reviews/archive/{RB05,RR05}-t-calibration-default.md`
+  exist; RR05 ingested 2026-07-16 (M21-D1 + triage in Decisions; commit
+  `1291842`). Tripwire tagged on T2 as planned.
+- **AC3** — D-011 appended to `cairn/DECISIONS.md` (grep: 1 heading match),
+  recording keep-unit-default, grounds, envelope, and the covariance-input
+  re-trigger gate; supersedes D-009 item 3.
+- **AC4** — keep-diag outcome applied as documented rationale:
+  `R/cpm_fit.R:1346` (`@param scaling`), regenerated `man/cpm_fit.Rd:62`,
+  `vignettes/evaluating-circumplex-structure.Rmd:164`, `NEWS.md:176` — all
+  carry the D-011-scoped wording (model test + correlation input, never
+  "identical", envelope stated, no invalid-p implication, small-N
+  conservatism note retained in the existing caution text).
+- **AC5** — `devtools::check(args = "--no-manual")`: 0 errors / 0 warnings /
+  0 notes (5m15s, this session, on the final code state). NEWS guidance
+  added (no exported behavior change; no milestone numbers in user-facing
+  text).
+
+Consistency gate (2026-07-16): `cairn_validate` pass; Coverage complete
+(AC1–5 → T1–T4, all tasks exist); no DESIGN principle touched (skip
+`cairn_impact`); `document()` no diff to `man/`/`NAMESPACE`; README
+untouched; `pkgdown::check_pkgdown()` no problems; `devel/` is
+`.Rbuildignore`d; suite 2083 pass / 0 fail (work log).
