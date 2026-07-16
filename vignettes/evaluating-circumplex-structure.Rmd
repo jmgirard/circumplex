@@ -162,8 +162,11 @@ sizes; pass `scaling = "free"` to fit their covariance parameterization and
 reproduce published CIRCUM/CircE output exactly. For the model test the choice
 does not matter here: with correlation input the two families' test statistics
 are calibration-indistinguishable (differing by well under 1% of the model
-degrees of freedom in paired simulation at sample sizes 250–50,000), and the
-default is recommended for
+degrees of freedom in paired simulation at sample sizes 250–50,000; the free
+statistic never exceeds the default's on the same input beyond numerical
+tolerance, since the free family nests the default and is additionally
+started from its solution), and
+the default is recommended for
 routine inference because free scaling adds parameters whose analytic standard
 errors are often undefined at small-to-moderate samples. The
 *conclusion* — ordered octants with unequal spacing, adequate approximate
