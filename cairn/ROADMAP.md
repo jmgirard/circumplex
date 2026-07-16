@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M20, M21 | high | milestones/M7-v2-release-prep.md |
-| M20 | 0-vs-360 pole CI-endpoint alignment | planned | — | high | milestones/M20-pole-endpoint-alignment.md |
+| M20 | 0-vs-360 pole CI-endpoint alignment | review | — | high | milestones/M20-pole-endpoint-alignment.md |
 | M21 | T_diag-vs-T_free inference-default decision + application | done | — | high | milestones/archive/M21-t-calibration-decision.md |
 | M19 | CIRCUM free-scaling — analytic-CI coverage oracle + caution calibration | done | M18 | high | milestones/archive/M19-free-family-coverage-oracle.md |
 | M18 | CIRCUM free-scaling — implementation + oracle validation | done | M17 | high | milestones/archive/M18-circum-free-scaling-build.md |

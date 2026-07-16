@@ -13,9 +13,9 @@
 #     canonicalization, and the diagnostics (sec. 2.3, sec. 3.5)
 #
 # All angle handling internal to the engine is in RADIANS on the unwrapped
-# real line; angles are wrapped to [0, 360) only in the reported fields. The
-# engine never touches R's global RNG stream (multi-start jitter is
-# deterministic).
+# real line; angles are wrapped to [0, 360] only in the reported fields (the
+# 0/360 pole is labeled 360, LM = 360; M20). The engine never touches R's
+# global RNG stream (multi-start jitter is deterministic).
 # =============================================================================
 
 # ---- correlation function ---------------------------------------------------
@@ -535,9 +535,11 @@ cpm_canonicalize <- function(gstar, spec, theta_theory) {
 #' CPM engine: fit Browne's circular process model to a correlation matrix
 #'
 #' Internal engine core (the exported `cpm_fit()` API is a later task). Returns
-#' a plain list with the natural-scale estimates (angles wrapped to [0, 360)
-#' only in the reported fields; unwrapped radians kept for downstream tasks)
-#' and the full diagnostic set required by design sec. 5.4.
+#' a plain list with the natural-scale estimates (estimated angles wrapped to
+#' [0, 360] with the pole labeled 360, only in the reported degrees field;
+#' `theta_theory` echoes the plain [0, 360) wrap, and `cpm_fit()`'s results
+#' table echoes the user's supplied angles verbatim) and the full diagnostic
+#' set required by design sec. 5.4.
 #'
 #' @param R p x p sample correlation matrix (positive definite).
 #' @param angles length-p numeric, theoretical/start angles in DEGREES.
@@ -774,12 +776,22 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   sigma_pathology <- spec$n_sigma > 0 &&
     any(nat$sigma^2 < 0.5 | nat$sigma^2 > 2)
 
-  # wrapped-to-[0,360) reported angles; keep unwrapped radians too.
-  theta_deg <- as.numeric(as_degree(as_radian(nat$theta %% (2 * pi))))
+  # Wrapped reported angles; keep unwrapped radians too. An angle on the 0/360
+  # pole (deterministic for a reference item with theory angle 360) reports the
+  # LM = 360 label in degrees (M20, matching D-003 and the CI endpoints); the
+  # computational radians (theta_rad, theta_rad_unwrapped) stay untouched so
+  # fitted matrices are unchanged (M20-D1).
+  theta_wrapped <- nat$theta %% (2 * pi)
+  # Same 16*eps pole window as quantile.circumplex_radian (M20) — see the
+  # tolerance rationale there.
+  pole <- theta_wrapped < (16 * .Machine$double.eps) |
+    (2 * pi - theta_wrapped) < (16 * .Machine$double.eps)
+  theta_deg <- as.numeric(as_degree(as_radian(theta_wrapped)))
+  theta_deg[pole] <- 360
 
   list(
-    theta = theta_deg,                 # degrees in [0, 360), canonicalized
-    theta_rad = nat$theta %% (2 * pi), # wrapped radians (reported)
+    theta = theta_deg,                 # degrees in [0, 360], LM = 360 (M20)
+    theta_rad = theta_wrapped,         # wrapped radians (reported)
     theta_rad_unwrapped = nat$theta,   # unwrapped radians (later tasks)
     theta_theory = as.numeric(as_degree(as_radian(theta_theory %% (2 * pi)))),
     zeta = nat$zeta,
@@ -1523,8 +1535,9 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
   # ---- confidence intervals (design sec. 5.2) ----
   if (ci_method == "bootstrap") {
     # Percentile intervals from warm-started replicates; angle CIs are wrapped
-    # to [0, 360) by the circular quantile machinery, so a CI straddling the
-    # 0/360 pole has lci > uci (the displacement-CI convention).
+    # to (0, 360] by the circular quantile machinery (a pole-denoting endpoint
+    # reports 360; M20), so a CI straddling the 0/360 pole has lci > uci (the
+    # displacement-CI convention).
     bs <- cpm_bootstrap(engine, sdata_mat, boots, interval)
     ci <- list(
       angle_lci = bs$angle_lci, angle_uci = bs$angle_uci,

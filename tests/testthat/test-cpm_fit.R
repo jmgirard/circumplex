@@ -289,10 +289,11 @@ test_that("degree API call reproduces an internal radian construction exactly", 
   theta_rad <- theta_deg * pi / 180
   P0 <- cpm_implied_cor(theta_rad, rep(0.8, 8), c(0.5, 0.3, 0.2))
   fit <- cpm_engine(P0, angles = theta_deg, m = 3, variant = "A")
-  # Reported angles are in [0, 360); reference-relative directions match input.
+  # Reported angles are in [0, 360] with the pole labeled 360 (LM = 360; M20);
+  # reference-relative directions match input.
   # Compare via (cos, sin) of the reference-relative angle (robust to the
   # exact-half-turn +/-pi atom at the antipode).
-  expect_true(all(fit$theta >= 0 & fit$theta < 360))
+  expect_true(all(fit$theta > 0 & fit$theta <= 360))
   rr_fit <- fit$theta_rad - fit$theta_rad[1]
   rr_in <- theta_rad - theta_rad[1]
   expect_lt(max(abs(cos(rr_fit) - cos(rr_in))), 1e-4)

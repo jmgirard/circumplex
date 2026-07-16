@@ -1,22 +1,23 @@
 test_that("Quantile for circular radians works", {
+  # A quantile landing on the 0/360 pole reports the LM = 360 label (M20).
   a <- as_degree(0:180)
   b <- as_radian(a)
   qb <- stats::quantile(b)
   expect_s3_class(qb, "circumplex_radian")
-  expect_equal(qb, as_radian(as_degree(c(0, 45, 90, 135, 180))),
+  expect_equal(qb, as_radian(as_degree(c(360, 45, 90, 135, 180))),
                ignore_attr = TRUE)
 
   a <- as_degree(180:360)
   b <- as_radian(a)
   qb <- quantile(b)
   expect_s3_class(qb, "circumplex_radian")
-  expect_equal(qb, as_radian(as_degree(c(180, 225, 270, 315, 0))),
+  expect_equal(qb, as_radian(as_degree(c(180, 225, 270, 315, 360))),
                ignore_attr = TRUE)
 
   a <- as_degree(c(270:360, 1:90))
   b <- as_radian(a)
   qb <- quantile(b)
-  expect_equal(qb, as_radian(as_degree(c(270, 315, 0, 45, 90))),
+  expect_equal(qb, as_radian(as_degree(c(270, 315, 360, 45, 90))),
                ignore_attr = TRUE)
 
   a <- as_degree(c(NA_real_, NA_real_, NA_real_))
@@ -232,6 +233,53 @@ test_that("quantile.circumplex_contrast_radian handles 0/360 boundary crossings 
 
   # The lower quantile should correctly cross into negative space
   expect_true(res_quantiles[["25%"]] < 0)
+})
+
+test_that("quantile.circumplex_radian reports a pole-denoting endpoint as 2*pi, never 0 (M20)", {
+  # A CI endpoint that denotes the 0/360 pole must report the LM = 360 label
+  # (D-003's convention for the estimate path, extended to CI endpoints by
+  # M20). Both float representations of the pole are exercised: exact 0 (what
+  # R's %% emits on this platform) and exact 2*pi (the fmod-at-the-edge
+  # artifact D-003 documents for the estimate path).
+  probs <- c(0.025, 0.975)
+  q0 <- as.numeric(quantile(new_radian(rep(0, 8)), probs = probs))
+  expect_identical(q0, rep(2 * pi, 2L))
+  q2 <- as.numeric(quantile(new_radian(rep(2 * pi, 8)), probs = probs))
+  expect_identical(q2, rep(2 * pi, 2L))
+  qm <- as.numeric(quantile(new_radian(c(rep(0, 4), rep(2 * pi, 4))), probs = probs))
+  expect_identical(qm, rep(2 * pi, 2L))
+
+  # No over-fire: a genuinely near-pole (but not pole-denoting) endpoint keeps
+  # its value. These straddling replicates put the lower endpoint ~0.0224 rad
+  # below 2*pi and the upper ~0.0193 rad above 0 -- far outside the
+  # float-artifact tolerance, so neither may be snapped to 2*pi.
+  qs <- as.numeric(quantile(new_radian(c(0.01, 0.02, 6.26, 6.27)), probs = probs))
+  expect_true(qs[1] < 2 * pi && (2 * pi - qs[1]) > 0.01)
+  expect_true(qs[2] > 0 && qs[2] < 0.1)
+})
+
+test_that("a pole-peaking profile reports its degenerate CI at 360, not 0 (M20)", {
+  # Identical rows tracing an exact cosine peaking at 0/360: every bootstrap
+  # resample reproduces the same profile, so the displacement replicates all
+  # land on the pole and the CI collapses onto it. The estimate path reports
+  # the pole as 360 (D-003); pre-M20 the quantile path snapped the same pole
+  # to 0, printing est 360 with CI [0, 0]. Both endpoints must now agree with
+  # the estimate's LM = 360 label.
+  rad <- as.numeric(as_radian(octants()))
+  row <- 1 + 2 * cos(rad)                 # peak at 0 deg == the 360 pole
+  dat <- as.data.frame(matrix(rep(row, each = 20), nrow = 20))
+  colnames(dat) <- PANO()
+  set.seed(1)
+  res <- suppressWarnings(ssm_analyze(dat, scales = 1:8, boots = 25))
+  r <- res$results
+  # The ESTIMATE path is unchanged by M20: per DESIGN.md G2 (D-003) a
+  # pole-peaking estimate may carry either float label (~0 or ~360, a
+  # platform libm detail), so assert only that it denotes the pole.
+  expect_lt(min(abs(r$d_est), abs(r$d_est - 360)), 1e-9)
+  # The CI ENDPOINTS carry the M20 contract: a pole-denoting endpoint is
+  # relabeled to exactly 360, never 0 (the pre-M20 snap reported 0 here).
+  expect_identical(as.numeric(r$d_lci), 360)
+  expect_identical(as.numeric(r$d_uci), 360)
 })
 
 test_that("quantile.circumplex_* return NA_real_ on an all-NA column (M13)", {
