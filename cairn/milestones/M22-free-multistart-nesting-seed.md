@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M22: Free-engine multi-start nesting seed (T_free ≤ T_unit by construction)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m22-nesting-seed
 
 ## Goal
 
@@ -80,25 +80,28 @@ construction, eliminating the optimizer-tail violations RR05 measured
 
 ## Tasks
 
-- [ ] **T1** — Tests first: regression test regenerating the RR05
+- [x] **T1** — Tests first: regression test regenerating the RR05
       boundary_N2000 violating replicate from its exact seed, asserting
       T_free ≤ T_unit + 1e-8 (red against current code — record the red
       run); plus a small deterministic nesting property battery (a few
       seeds × variants A and C). Runtime-budget with `skip_on_cran()` if
       needed; remember bare `Rscript` needs `NOT_CRAN=true` (M16 lesson).
-- [ ] **T2** — Implement the seed in `cpm_fit()` (`R/cpm_fit.R:600–630`):
+- [x] **T2** — Implement the seed in `cpm_engine()` (`R/cpm_fit.R`):
       when `scaling == "free"`, run the unit-family fit internally
-      (unit spec, existing battery machinery) and append its winning
-      solution — packed into the free spec, σ = 1 — as one extra start in
-      its own independence group. Resolve and record the `reproduced`/
-      multimodality-flag interaction (milestone-local decision). T1 goes
-      green; unit-path behavior untouched.
+      (unit spec, existing battery machinery via the factored
+      `cpm_start_set()`) and append its winning solution — block-exact
+      embedding, s block = 0 — as one extra start in its own independence
+      group. Resolve and record the `reproduced`/multimodality-flag
+      interaction (milestone-local decision). T1 goes green; unit-path
+      behavior untouched.
 - [ ] **T3** — Oracle + gate: re-run `test-cpm_oracles.R` (M18 lesson:
       OpenMx `type="cov"` needs the (N−1)/N factor; CSOLNP agrees only to
       ~5e-4) and full `devtools::check()`.
-- [ ] **T4** — Docs: nesting note in the `scaling` roxygen block
+- [x] **T4** — Docs: nesting note in the `scaling` roxygen block
       (`R/cpm_fit.R:1358`) and the vignette passage
       (`evaluating-circumplex-structure.Rmd:164`); `devtools::document()`.
+      Plus a NEWS.md entry (consistency-gate requirement; no milestone
+      numbers in user-facing text).
 
 ## Work log
 
@@ -110,6 +113,25 @@ construction, eliminating the optimizer-tail violations RR05 measured
   shipped in M13 (PR #37, squash 95936f2); the stale infra-row clause
   re-added by the 2026-07-16 candidate cleanup was struck.
 
+- 2026-07-16: T1+T2 done (one checkpoint: red test committed with the fix so
+  every branch commit keeps the suite green). Red run recorded: pre-fix, the
+  RR05 replicate (seed 20260706+12e7+1e6·1+1e4·3+29, identified by a 500-rep
+  scan of the boundary_N2000 cell) failed with F_free 0.0069 > F_unit 0.0041
+  (diff ×(N−1) = +5.52 T-units, matching RR05's recorded max exactly);
+  post-fix the file is 20/20 green. T4 done: roxygen + vignette + NEWS
+  nesting notes, document() clean.
+
 ## Decisions
+
+- 2026-07-16 (T2): the unit-solution seed gets its **own independence group**
+  in the `reproduced` acceptance criterion — it is a data-derived point (the
+  unit objective's optimum), not an F-isometric image of g0 like the mirror,
+  so its run reaching min F is genuine reproduction evidence. Multimodality
+  flag: the seeded run is compared like any other; landing distinct-but-
+  competitive correctly fires the flag. Belt: if the seeded run's final F
+  ever exceeds its start value (PORT is monotone in practice but not by
+  contract), the engine falls back to the seed point itself, whose objective
+  equals F̂_unit bit-identically (block-exact embedding, s = 0) — nesting is
+  unconditional.
 
 ## Review

@@ -454,6 +454,43 @@ cpm_jitter_offsets_deg <- function(n_free) {
   )
 }
 
+# ---- multi-start battery construction (design sec. 3.5) --------------------
+
+# Build the deterministic start set and its independence groups for one spec.
+# Factored out of cpm_engine() so the free-scaling path can run the same
+# battery under its unit-family twin to obtain the nesting seed (M22).
+cpm_start_set <- function(spec, theta_theory, sv) {
+  g0 <- cpm_pack(theta_theory, sv$zeta, sv$beta, spec)
+  # Mirror start only when angles are free: with fixed angles (B/D) the
+  # reflection is a no-op and would merely duplicate g0.
+  starts <- list(g0)
+  if (spec$free_angles > 0) {
+    starts[[2L]] <- cpm_reflect_par(g0, spec)
+    offs <- cpm_jitter_offsets_deg(spec$free_angles)
+    for (off in offs) {
+      theta_j <- theta_theory
+      theta_j[spec$free_pos] <- theta_theory[spec$free_pos] + off * pi / 180
+      starts[[length(starts) + 1L]] <-
+        cpm_pack(theta_j, sv$zeta, sv$beta, spec)
+    }
+  } else {
+    # No free angles: jitter zeta start instead (deterministic).
+    for (fac in c(0.85, 1.1, 0.7)) {
+      z <- pmin(pmax(sv$zeta * fac, 0.05), 0.99)
+      starts[[length(starts) + 1L]] <-
+        cpm_pack(theta_theory, z, sv$beta, spec)
+    }
+  }
+  # Independence groups for the acceptance criterion: only group
+  # DISTINCTNESS is consumed, so every start is its own group except the
+  # mirror (starts[[2]] when angles are free), which is a deterministic image
+  # of g0 under an exact F-isometry (rho is even) -- its run can only echo
+  # g0's evidence, so it is folded into g0's group.
+  start_group <- seq_along(starts)
+  if (spec$free_angles > 0) start_group[2L] <- 1L
+  list(starts = starts, start_group = start_group)
+}
+
 # ---- single optimization run ------------------------------------------------
 
 cpm_optimize_one <- function(gstar0, R, spec) {
@@ -599,37 +636,60 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
 
   # ---- starting values and multi-start set ----
   sv <- cpm_start_values(R, theta_theory, m)
-  g0 <- cpm_pack(theta_theory, sv$zeta, sv$beta, spec)
+  battery <- cpm_start_set(spec, theta_theory, sv)
+  starts <- battery$starts
+  start_group <- battery$start_group
 
-  # Mirror start only when angles are free: with fixed angles (B/D) the
-  # reflection is a no-op and would merely duplicate g0.
-  starts <- list(g0)
-  if (spec$free_angles > 0) {
-    starts[[2L]] <- cpm_reflect_par(g0, spec)
-    offs <- cpm_jitter_offsets_deg(spec$free_angles)
-    for (off in offs) {
-      theta_j <- theta_theory
-      theta_j[spec$free_pos] <- theta_theory[spec$free_pos] + off * pi / 180
-      starts[[length(starts) + 1L]] <-
-        cpm_pack(theta_j, sv$zeta, sv$beta, spec)
-    }
-  } else {
-    # No free angles: jitter zeta start instead (deterministic).
-    for (fac in c(0.85, 1.1, 0.7)) {
-      z <- pmin(pmax(sv$zeta * fac, 0.05), 0.99)
-      starts[[length(starts) + 1L]] <-
-        cpm_pack(theta_theory, z, sv$beta, spec)
-    }
+  # ---- unit-solution nesting seed (M22; RR05 B2/rec 5) ----
+  # The free family nests the unit family: sigma = 1 recovers it, and the
+  # discrepancy at (theta, zeta, beta, sigma = 1) is bit-identical to the
+  # unit family's at (theta, zeta, beta) (cpm_implied_cov multiplies P by
+  # exactly 1). Embedding the unit fit's pre-polish optimum into the free
+  # layout (s block = 0) therefore starts one run AT F-hat_unit, so the
+  # reported free optimum can only match or undercut it: T_free <= T_unit
+  # holds by construction rather than up to multi-start luck (the M21 paired
+  # calibration measured 3/5,751 optimizer-tail violations without the seed,
+  # worst +5.52 T-units). Top-level fits only by design (M22 plan gate):
+  # cpm_bootstrap() warm-starts replicates from gamma-hat and never
+  # re-enters this battery.
+  seed_idx <- 0L
+  unit_F <- NA_real_
+  if (spec$n_sigma > 0) {
+    spec_unit <- cpm_spec(p, m, variant, reference, scaling = "unit")
+    spec_unit$theta_ref_val <- spec$theta_ref_val
+    spec_unit$theta_fixed <- spec$theta_fixed
+    bat_u <- cpm_start_set(spec_unit, theta_theory, sv)
+    runs_u <- lapply(bat_u$starts, cpm_optimize_one, R = R, spec = spec_unit)
+    Fs_u <- vapply(runs_u, function(r) r$F, numeric(1))
+    gu <- runs_u[[which.min(Fs_u)]]$par
+    unit_F <- min(Fs_u)
+    # Block-exact embedding ([angle][u][v] -> [angle][u][s = 0][v]): no
+    # natural-scale roundtrip, so F(seed) == unit_F to the bit.
+    seed <- numeric(spec$q)
+    seed[spec$i_angle] <- gu[spec_unit$i_angle]
+    seed[spec$i_zeta] <- gu[spec_unit$i_zeta]
+    seed[spec$i_sigma] <- 0
+    seed[spec$i_beta] <- gu[spec_unit$i_beta]
+    starts[[length(starts) + 1L]] <- seed
+    # Own independence group: the seed is a data-derived point (the unit
+    # objective's optimum), not an F-isometric image of g0 like the mirror,
+    # so its run reaching min F is genuine reproduction evidence.
+    start_group <- c(start_group, max(start_group) + 1L)
+    seed_idx <- length(starts)
   }
-  # Independence groups for the acceptance criterion below: only group
-  # DISTINCTNESS is consumed, so every start is its own group except the
-  # mirror (starts[[2]] when angles are free), which is a deterministic image
-  # of g0 under an exact F-isometry (rho is even) -- its run can only echo
-  # g0's evidence, so it is folded into g0's group.
-  start_group <- seq_along(starts)
-  if (spec$free_angles > 0) start_group[2L] <- 1L
 
   runs <- lapply(starts, cpm_optimize_one, R = R, spec = spec)
+
+  # Belt for the by-construction guarantee: nlminb's PORT core is monotone in
+  # practice, but nothing contractual forbids a final iterate above the start.
+  # If the seeded run ends above its own start value, fall back to the seed
+  # point itself, whose objective is exactly unit_F (bit-identical embedding
+  # above) -- nesting then holds unconditionally.
+  if (seed_idx > 0L && runs[[seed_idx]]$F > unit_F) {
+    runs[[seed_idx]] <- list(par = starts[[seed_idx]], F = unit_F,
+                             code = 0L, message = "unit-seed fallback")
+  }
+
   Fs <- vapply(runs, function(r) r$F, numeric(1))
   best <- which.min(Fs)
   fit <- runs[[best]]
@@ -1358,7 +1418,11 @@ cpm_boundary_proximity <- function(object) {
 #'   calibration-indistinguishable at correlation input — in paired simulation
 #'   at the measured truths (`n` from 250 to 50,000) their test statistics
 #'   differed by well under 1 percent of the degrees of freedom — so neither
-#'   family's chi-square is more trustworthy than the other's. `"unit"` remains
+#'   family's chi-square is more trustworthy than the other's. (The two
+#'   statistics are close but not interchangeable digit-for-digit: the free
+#'   family nests the unit family, and its optimizer is additionally started
+#'   from the unit solution, so on the same input the free statistic never
+#'   exceeds the unit statistic — by construction.) `"unit"` remains
 #'   the default because free scaling buys no inferential benefit for
 #'   correlation input while adding `p` parameters whose analytic standard
 #'   errors are frequently undefined below `n = 2000`; choose `"free"` when the
