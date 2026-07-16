@@ -41,7 +41,8 @@ ssm_has_region <- function(amplitude_min, amplitude_max,
 # to displacement_max, unwrapping a min > max pair across the 0/360 seam (the
 # package's CI convention stores a straddling interval that way; DESIGN.md).
 # A proper interval has a span in [0, 360); anything else (bounds outside
-# [0, 360), or reversed the long way) does not name a unique arc. Shared by
+# [0, 360] -- 360 is the pole's LM = 360 label (M20) -- or reversed the long
+# way) does not name a unique arc. Shared by
 # StatSsmArc's geometry/validation and plot.circumplex_cpm()'s pre-filter.
 ssm_arc_span <- function(displacement_min, displacement_max) {
   upper <- ifelse(
@@ -119,13 +120,14 @@ GeomSsmPoint <- ggplot2::ggproto(
 #' internally, so the bounds are supplied directly in SSM units.
 #'
 #' Each arc spans **counterclockwise** from `displacement_min` to
-#' `displacement_max` (both in degrees). Supply them in `[0, 360)`. A
+#' `displacement_max` (both in degrees). Supply them in `[0, 360]` (a bound of
+#' exactly 360 is the 0/360 pole under the package's LM = 360 labeling). A
 #' `displacement_min` greater than `displacement_max` is read as an interval
 #' that crosses the 0/360 seam and is drawn the short way across it (e.g.
 #' `350 -> 10` is a 20 degree arc, matching how the package stores a
 #' displacement CI that straddles the boundary). The interval must describe
 #' less than a full circle; bounds that imply a span of 360 degrees or more
-#' (for example, values outside `[0, 360)`) are rejected, since they do not
+#' (for example, values outside `[0, 360]`) are rejected, since they do not
 #' name a unique arc.
 #'
 #' @param mapping,data,stat,position,show.legend,inherit.aes,... Standard
@@ -193,7 +195,7 @@ StatSsmArc <- ggplot2::ggproto(
       stop(
         "geom_ssm_arc(): each displacement interval must span less than a ",
         "full circle. Supply displacement_min and displacement_max in ",
-        "[0, 360); a min greater than max is read as an interval crossing ",
+        "[0, 360]; a min greater than max is read as an interval crossing ",
         "the 0/360 seam.",
         call. = FALSE
       )

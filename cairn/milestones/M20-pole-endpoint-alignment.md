@@ -72,7 +72,7 @@ in the stored object), matching the estimate path's LM=360 convention
 - [x] **T2** — Implement the value-level snap in `quantile.circumplex_radian`
       (`R/ssm_bootstrap.R:177`): pole-adjacent endpoints → 2π; tests green.
       (+ CPM reported-angle pole alignment per the 2026-07-16 amendment.)
-- [ ] **T3** — Consumer audit: grep all displacement-CI endpoint readers
+- [x] **T3** — Consumer audit: grep all displacement-CI endpoint readers
       (`ssm_ci_accuracy.R`, print/summary/plot, straddle logic); update any
       that assumed the 0 label, with tests.
 - [ ] **T4** — Update `cairn/boundary-coverage.md` + NEWS.md; run full
@@ -102,6 +102,20 @@ in the stored object), matching the estimate path's LM=360 convention
   (test-cpm_fit.R:295), M13 Oracle A snap convention, 4 cpm_api snapshot rows
   (pole row only, byte-identical otherwise). devtools::test(): 0 fail /
   2095 pass (4 warnings pre-existing).
+- 2026-07-16: T3 done — consumer audit (AC2). Arithmetic-invariant to the
+  0→360 relabel, verified unaffected: ssm_ci_d_cover arc membership
+  (ssm_ci_accuracy.R:893, mod-2π; tested test-ci_accuracy.R:50), the straddle
+  lci>uci convention ((uci−lci) %% 360 identical; M13 e2e tests green),
+  ssm_arc_span + StatSsmArc (geom_ssm.R:46/:191; smoke-rendered a 360→20 seam
+  arc), plot.circumplex_cpm pre-filter (cpm_oop.R:332; [360,360] → zero-width
+  wedge, smoke-rendered), ggrad (utils.R:72, linear map), print/summary/table
+  formatting surfaces (smoke-verified 360 rows), plot.circumplex_ssm contrast
+  panel (contrast quantile untouched). Doc surfaces updated to the [0,360]/
+  pole=360 wording: geom_ssm_arc roxygen + error message, cpm_fit.R engine
+  comments, ssm_analyze roxygen CI-endpoint sentence, DESIGN.md G2 row
+  (M20 completion note). fit_structure angles are a separate estimate surface
+  (no displacement-CI reader) — out of scope. devtools::document() clean
+  (2 pre-existing cpm link warnings, untouched lines).
 
 ## Decisions
 

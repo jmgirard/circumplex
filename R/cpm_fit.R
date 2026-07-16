@@ -13,9 +13,9 @@
 #     canonicalization, and the diagnostics (sec. 2.3, sec. 3.5)
 #
 # All angle handling internal to the engine is in RADIANS on the unwrapped
-# real line; angles are wrapped to [0, 360) only in the reported fields. The
-# engine never touches R's global RNG stream (multi-start jitter is
-# deterministic).
+# real line; angles are wrapped to [0, 360] only in the reported fields (the
+# 0/360 pole is labeled 360, LM = 360; M20). The engine never touches R's
+# global RNG stream (multi-start jitter is deterministic).
 # =============================================================================
 
 # ---- correlation function ---------------------------------------------------
@@ -535,9 +535,9 @@ cpm_canonicalize <- function(gstar, spec, theta_theory) {
 #' CPM engine: fit Browne's circular process model to a correlation matrix
 #'
 #' Internal engine core (the exported `cpm_fit()` API is a later task). Returns
-#' a plain list with the natural-scale estimates (angles wrapped to [0, 360)
-#' only in the reported fields; unwrapped radians kept for downstream tasks)
-#' and the full diagnostic set required by design sec. 5.4.
+#' a plain list with the natural-scale estimates (angles wrapped to [0, 360],
+#' pole labeled 360, only in the reported fields; unwrapped radians kept for
+#' downstream tasks) and the full diagnostic set required by design sec. 5.4.
 #'
 #' @param R p x p sample correlation matrix (positive definite).
 #' @param angles length-p numeric, theoretical/start angles in DEGREES.
@@ -1531,8 +1531,9 @@ cpm_fit <- function(data = NULL, scales = NULL, angles = octants(),
   # ---- confidence intervals (design sec. 5.2) ----
   if (ci_method == "bootstrap") {
     # Percentile intervals from warm-started replicates; angle CIs are wrapped
-    # to [0, 360) by the circular quantile machinery, so a CI straddling the
-    # 0/360 pole has lci > uci (the displacement-CI convention).
+    # to (0, 360] by the circular quantile machinery (a pole-denoting endpoint
+    # reports 360; M20), so a CI straddling the 0/360 pole has lci > uci (the
+    # displacement-CI convention).
     bs <- cpm_bootstrap(engine, sdata_mat, boots, interval)
     ci <- list(
       angle_lci = bs$angle_lci, angle_uci = bs$angle_uci,

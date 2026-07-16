@@ -45,13 +45,14 @@ internally, so the bounds are supplied directly in SSM units.
 }
 \details{
 Each arc spans \strong{counterclockwise} from \code{displacement_min} to
-\code{displacement_max} (both in degrees). Supply them in \verb{[0, 360)}. A
+\code{displacement_max} (both in degrees). Supply them in \verb{[0, 360]} (a bound of
+exactly 360 is the 0/360 pole under the package's LM = 360 labeling). A
 \code{displacement_min} greater than \code{displacement_max} is read as an interval
 that crosses the 0/360 seam and is drawn the short way across it (e.g.
 \code{350 -> 10} is a 20 degree arc, matching how the package stores a
 displacement CI that straddles the boundary). The interval must describe
 less than a full circle; bounds that imply a span of 360 degrees or more
-(for example, values outside \verb{[0, 360)}) are rejected, since they do not
+(for example, values outside \verb{[0, 360]}) are rejected, since they do not
 name a unique arc.
 }
 \examples{
