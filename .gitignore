@@ -39,3 +39,4 @@ devel/m4-coverage-oracle-partial.rds
 # cairn tracking
 cairn/references/pdf/
 cairn/.merge-approved
+cairn/.merge-approved.pending
