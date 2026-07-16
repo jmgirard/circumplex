@@ -60,10 +60,16 @@ NSE machinery in package code).
 `withr`.
 
 **R-version floors** (CRAN Depends fields): tidyselect ≥ 3.4, cli ≥ 3.4,
-lifecycle ≥ 3.6, withr ≥ 3.6, **vctrs ≥ 4.0.0, glue ≥ 4.1** — adopting
-tidyselect raises circumplex's floor from `R (>= 3.4)` to `R (>= 4.1)`.
+lifecycle ≥ 3.6, withr ≥ 3.6, vctrs ≥ 4.0.0, glue ≥ 4.1. The closure's
+floors are **neutral, not aggravating**: applying the same method to
+circumplex's *existing* Imports shows ggplot2 and htmlTable already carry
+`Depends: R (>= 4.1)` on current CRAN, so the effective install floor is
+4.1 today and tidyselect adds no floor increase (the declared
+`R (>= 3.4)` in DESCRIPTION is also unaffected — transitive floors are not
+declared). [Corrected at review: the draft claimed a 3.4 → 4.1 "floor
+jump"; the M24 diff-bug reviewer refuted it by the memo's own method.]
 
-Two aggravating precedents:
+One aggravating precedent:
 
 - **vctrs is in the closure.** D-006 (2026-07-12, Fable-reviewed RB01→RR01)
   explicitly refused a direct vctrs Import as breaching the minimal-deps /
@@ -175,15 +181,16 @@ published tutorials teach the SE idiom; a dual interface (strings still
 work, bare names added) avoids breakage but imports §3.2's collision
 ambiguity into a package where a silently wrong column selection feeds a
 statistical estimate. The 1.0.0 rationale — streamline, reduce dependencies
-— is *strengthened* by the current evidence (§2's floor jump did not exist
-then; D-006 had not yet refused vctrs).
+— is *strengthened* by the current evidence (the closure is now quantified
+at 6 packages, and D-006's vctrs refusal postdates it).
 
 **Weighing.** For adoption: unquoted ergonomics for tidyverse-native users;
 selection helpers for long item lists. Against: the ergonomic win is
 already captured by instrument helpers (`PANO()` is shorter than the NSE
 call, §3.1); the helper win is a mis-scoring channel at the one site it
 would matter (`score()`'s ascending-order contract, §3.1); 6 net-new
-Imports incl. D-006-refused vctrs and an R-floor jump to 4.1 (§2); a
+Imports incl. D-006-refused vctrs (§2; the closure's R floors are neutral —
+the effective floor is already 4.1); a
 data-mask wrong-answer channel SE cannot produce plus `{{ }}` literacy
 demanded of exactly this package's power users (§3.2); and a peer group
 that is uniformly SE/formula (§1).

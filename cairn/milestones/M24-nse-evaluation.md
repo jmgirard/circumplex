@@ -111,6 +111,10 @@ memo's spike snippets are evidence, not shipped code).
   appended (full rejection + re-trigger clause); DESIGN.md Dependency-policy
   one-liner added. Verify slot vacuously clean (docs-only diff: devel/ +
   cairn/ only; R/, src/, tests/ untouched). Status → review.
+- 2026-07-16: review correction (supersedes the T2 line's floor claim): the
+  "R-floor jump 3.4 → 4.1" was false — ggplot2/htmlTable already put the
+  effective floor at 4.1 (diff-bug reviewer, scored 84); memo §2/§4 and
+  D-014 corrected pre-merge, verdict unaffected.
 
 ## Decisions
 <!-- owner: implement / review · append-only; milestone-local; promote
@@ -139,3 +143,29 @@ Review 2026-07-16 (PR #48). Evidence gathered fresh, by command.
   the task's tripwire condition). PASS.
 - AC4: `git diff --name-only master..HEAD` = 5 files, all under `cairn/` or
   `devel/`; 0 files under R/, src/, tests/. PASS.
+
+Consistency gate 2026-07-16: `cairn_validate.py` all checks passed;
+`cairn_impact` skipped (no IP/GP changed — none exist yet);
+`devtools::document()` no diff; pkgdown `check_pkgdown()` no problems;
+`^devel$`/`^cairn$` in .Rbuildignore; NEWS entry not owed (no user-visible
+change; docs-only); README untouched (inherited state); full
+`devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes.
+
+Independent review (3 lenses + scorer):
+- [S] prior-PR-comments: no prior-PR evidence (no review comments on any of
+  the 20 milestone-pattern PRs). Zero findings.
+- [S] blame-history: zero findings; NEWS citations, D-006 quote, DESIGN.md
+  section history, and the rlang-only-for-.data claim all verified accurate;
+  legacy "tidyverse-ectomy" records corroborate the memo narrative.
+- [O] diff-bug: ONE finding — the memo/D-014 "R-floor jump 3.4 → 4.1" claim
+  is false by the memo's own method (ggplot2 and htmlTable already Depend on
+  R ≥ 4.1 on current CRAN, so the effective floor is already 4.1 and
+  tidyselect adds no floor increase). Independently re-verified by the
+  orchestrator against live CRAN metadata. All other memo claims verified
+  correct by the reviewer (closure, spikes, citations, survey table, D-006
+  consistency, ACs).
+- [S] scorer: finding scored 84 (≥ 80 → actioned). Sub-80 findings: none.
+- Triage: FIX NOW — floor-jump clause corrected in memo §2/§4 (marked as a
+  review correction) and in D-014 ground 2 (pre-merge, entry unpublished);
+  the NO verdict stands on the remaining independently verified grounds.
+  Verdict unaffected; no other changes.

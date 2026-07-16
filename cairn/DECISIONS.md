@@ -352,8 +352,9 @@ Import, bare-rlang `enquo()`, or an in-house parser (the datawizard route).
 Grounds: (1) peer group — the modeling packages circumplex interoperates
 with (lavaan engine, OpenMx oracle, psych) are SE/formula; tidy-eval NSE
 marks tidyverse-identity packages (memo §1); (2) dependency delta — 6
-net-new Imports incl. vctrs (refused by D-006) and an R-floor jump
-3.4 → 4.1 via glue (memo §2); (3) measured ergonomics — `PANO()` is already
+net-new Imports incl. vctrs (refused by D-006); the closure's R floors are
+neutral — circumplex's effective install floor is already 4.1 via
+ggplot2/htmlTable (memo §2, corrected at review); (3) measured ergonomics — `PANO()` is already
 shorter than the NSE form at the canonical call, and NSE's best case
 (`starts_with()` for items) undermines `score()`'s ascending-order
 contract, a silent mis-scoring channel (memo §3.1); (4) ambiguity spikes —
