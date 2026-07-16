@@ -1,10 +1,10 @@
 # M20: 0-vs-360 pole CI-endpoint alignment
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m20-pole-endpoint-alignment
 
 ## Goal
 
@@ -24,6 +24,10 @@ in the stored object), matching the estimate path's LM=360 convention
   `ssm_ci_accuracy()` arc-membership code (`R/ssm_ci_accuracy.R:888` ff),
   print/summary/plot surfaces, `lci > uci` straddle logic — verified
   unaffected or updated.
+- CPM reported-angle pole alignment (2026-07-16 amendment): `theta_deg`
+  (`R/cpm_fit.R:778`) reports the exact pole as 360 (degrees surface only;
+  computational radians untouched), so a reference item at theory 360 stays
+  internally consistent with its snapped CI.
 - Mandatory boundary tests (CLAUDE.md): profiles peaking at 0°/360°, CIs
   straddling 0/360, flat profiles; guard teeth proven per the M13 recipe.
 - `cairn/boundary-coverage.md` matrix update; NEWS.md entry (exported CI
@@ -47,10 +51,14 @@ in the stored object), matching the estimate path's LM=360 convention
 - [ ] `cairn/boundary-coverage.md` updated for the new pole-endpoint cells.
 - [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
 - [ ] NEWS.md documents the exported change.
+- [ ] A CPM angle denoting the 0/360 pole reports 360 in the results table
+      (`Angle` column), consistent with its snapped CI endpoints, with a
+      regression test (reference item at theory 360) that fails pre-change.
 
 ## Coverage
 
 - AC1 → T1, T2
+- AC6 → T1, T2
 - AC2 → T3
 - AC3 → T4
 - AC4 → T4
@@ -58,11 +66,12 @@ in the stored object), matching the estimate path's LM=360 convention
 
 ## Tasks
 
-- [ ] **T1** — Write the red boundary regression tests first (SSM + CPM
+- [x] **T1** — Write the red boundary regression tests first (SSM + CPM
       end-to-end pole cases; prove teeth by confirming they fail against the
       current snap-to-0).
-- [ ] **T2** — Implement the value-level snap in `quantile.circumplex_radian`
+- [x] **T2** — Implement the value-level snap in `quantile.circumplex_radian`
       (`R/ssm_bootstrap.R:177`): pole-adjacent endpoints → 2π; tests green.
+      (+ CPM reported-angle pole alignment per the 2026-07-16 amendment.)
 - [ ] **T3** — Consumer audit: grep all displacement-CI endpoint readers
       (`ssm_ci_accuracy.R`, print/summary/plot, straddle logic); update any
       that assumed the 0 label, with tests.
@@ -74,7 +83,32 @@ in the stored object), matching the estimate path's LM=360 convention
 - 2026-07-16: created by /milestone-plan (promoted from the infra candidate
   row's pole-snap item; D-003's parked follow-up — completes, does not
   supersede, D-003). Value-level snap chosen over print-only at the plan gate.
+- 2026-07-16: /milestone-implement started; branch m20-pole-endpoint-alignment.
+- 2026-07-16: substantive amendment (gated): discovered the CPM estimate path
+  wraps to [0, 360) — a reference item at theory 360 reports Angle = 0
+  (deterministic, not measure-zero), contradicting the plan's "estimate already
+  reports 360" premise (SSM-only). User approved extending scope: align the CPM
+  reported angle at the exact pole to 360 (AC6 added).
+- 2026-07-16: T1 done — red tests proven (6 pre-fix failures: primitive quantile
+  pole cases + SSM deterministic pole-peaking e2e in test-ssm_bootstrap.R; CPM
+  reference-at-360 e2e in test-cpm_angle_ci.R; no-over-fire straddle assertions
+  included). Empirical finding: on this platform every pole-denoting input
+  reaches the endpoint stage as exact 0 (R's %% clamps the fmod edge); the 2π
+  side of the snap is defensive for other platforms.
+- 2026-07-16: T2 done — snap to 2π in quantile.circumplex_radian (both pole
+  representations, ~2-ulp tolerance) + CPM theta_deg pole → 360 (M20-D1;
+  radians untouched). Old-label consumers updated with the change: 3 quantile
+  unit expectations (test-ssm_bootstrap.R:1-25), the [0,360) domain pin
+  (test-cpm_fit.R:295), M13 Oracle A snap convention, 4 cpm_api snapshot rows
+  (pole row only, byte-identical otherwise). devtools::test(): 0 fail /
+  2095 pass (4 warnings pre-existing).
 
 ## Decisions
+
+- M20-D1 (2026-07-16): CPM pole-angle alignment snaps the *reported degrees*
+  only (`theta_deg`/`Angle`); computational radians (`theta_rad`,
+  `theta_rad_unwrapped`) stay as-is so fitted matrices (`Phat`, residuals) are
+  byte-identical. Chosen at the amendment gate over CI-snap-only (would ship
+  Angle = 0 with CI [360, 360]) and re-planning.
 
 ## Review

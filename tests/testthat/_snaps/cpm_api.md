@@ -11,7 +11,7 @@
       Reference scale:   PA 
       
        Scale Angle_theory Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci
-          PA            0     0     0.000     0.000 0.666    0.524    0.809
+          PA            0   360   360.000   360.000 0.666    0.524    0.809
           BC           45    45    20.816    69.184 0.666    0.524    0.809
           DE           90    90    60.671   119.329 0.666    0.524    0.809
           FG          135   135   105.425   164.575 0.666    0.524    0.809
@@ -49,7 +49,7 @@
       # Estimated angles and communality indices
       
        Scale Angle_theory Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci
-          PA            0     0     0.000     0.000 0.666    0.524    0.809
+          PA            0   360   360.000   360.000 0.666    0.524    0.809
           BC           45    45    20.816    69.184 0.666    0.524    0.809
           DE           90    90    60.671   119.329 0.666    0.524    0.809
           FG          135   135   105.425   164.575 0.666    0.524    0.809
@@ -108,7 +108,7 @@
       Reference scale:   PA 
       
        Scale Angle_theory   Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci
-          PA            0   0.000     0.000     0.000 0.585    0.444    0.763
+          PA            0 360.000   360.000   360.000 0.585    0.444    0.763
           BC           45  29.176     7.249    52.683 0.806    0.605    1.000
           DE           90  97.256    69.267   114.967 0.986    0.663    1.000
           FG          135 159.337   122.910   185.096 0.840    0.614    1.000
@@ -146,7 +146,7 @@
       # Estimated angles and communality indices
       
        Scale Angle_theory   Angle Angle_lci Angle_uci  Zeta Zeta_lci Zeta_uci
-          PA            0   0.000     0.000     0.000 0.585    0.444    0.763
+          PA            0 360.000   360.000   360.000 0.585    0.444    0.763
           BC           45  29.176     7.249    52.683 0.806    0.605    1.000
           DE           90  97.256    69.267   114.967 0.986    0.663    1.000
           FG          135 159.337   122.910   185.096 0.840    0.614    1.000

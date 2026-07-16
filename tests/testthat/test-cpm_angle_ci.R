@@ -19,14 +19,15 @@ test_that("CPM angle-CI transform matches a dumb circular-quantile oracle at the
 
   # Oracle A (live, deliberately-dumb): a circular quantile recomputed from
   # scratch in DEGREES -- center on the circular mean, unwrap to (-180, 180],
-  # type-7 quantile, rewrap to [0, 360), snapping a 360 pole to 0 as the method
-  # does. Independent of the package's radian implementation.
+  # type-7 quantile, rewrap to [0, 360], snapping a pole-denoting endpoint to
+  # 360 as the method does (M20). Independent of the package's radian
+  # implementation.
   deg <- reps * 180 / pi
   mu  <- atan2(mean(sin(reps)), mean(cos(reps))) * 180 / pi
   cen <- ((deg - mu + 180) %% 360) - 180
   qc  <- as.numeric(stats::quantile(cen, probs = probs))
   oracle <- (qc + mu) %% 360
-  oracle[abs(oracle - 360) < 1e-9] <- 0
+  oracle[abs(oracle) < 1e-9 | abs(oracle - 360) < 1e-9] <- 360
   expect_equal(got, oracle, tolerance = 1e-9)
 
   # Oracle B (invariant, rotation-equivariance): rotate every replicate by a
@@ -44,6 +45,34 @@ test_that("CPM angle-CI transform matches a dumb circular-quantile oracle at the
   # The interval is a TIGHT arc, not the ~357deg span a linear quantile would
   # (wrongly) report for these straddling replicates.
   expect_lt((align(got[2]) - align(got[1])) %% 360, 30)
+})
+
+test_that("cpm_fit() reports a pole-fixed reference angle and its CI as 360, not 0 (M20)", {
+  skip_on_cran()
+  # A reference item whose theory angle is 360 sits deterministically on the
+  # 0/360 pole: its fitted angle is fixed there in every bootstrap replicate,
+  # so its degenerate angle CI denotes the pole exactly. Pre-M20 the row
+  # printed Angle = 0 with CI [0, 0] (the engine wraps to [0, 360) and the
+  # circular quantile snapped the pole to 0); the LM = 360 convention
+  # (D-003, extended by M20) requires all three to report 360.
+  deg <- c(45, 90, 135, 180, 225, 270, 315, 360)
+  th  <- as.numeric(as_radian(as_degree(deg)))
+  P   <- cpm_implied_cor(th, rep(0.7, 8), c(0.6, 0.25, 0.15))
+  Lc  <- chol(P)
+  set.seed(42)
+  X <- as.data.frame(matrix(stats::rnorm(80 * 8), 80, 8) %*% Lc)
+  colnames(X) <- paste0("V", seq_len(8))
+
+  fit <- suppressWarnings(cpm_fit(X, scales = seq_len(8), angles = as_degree(deg),
+                                  ci_method = "bootstrap", boots = 50,
+                                  reference = 8))
+  ref <- which(fit$results$Angle_theory == 360)
+  expect_identical(as.numeric(fit$results$Angle[ref]), 360)
+  expect_identical(as.numeric(fit$results$Angle_lci[ref]), 360)
+  expect_identical(as.numeric(fit$results$Angle_uci[ref]), 360)
+  # The non-reference items' angles stay in [0, 360) as before (no over-fire).
+  other <- setdiff(seq_len(8), ref)
+  expect_true(all(fit$results$Angle[other] >= 0 & fit$results$Angle[other] < 360))
 })
 
 test_that("cpm_fit() bootstrap angle CI wraps a pole-straddling item, not linearizes it (M13)", {

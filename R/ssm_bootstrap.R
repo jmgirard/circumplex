@@ -174,7 +174,15 @@ quantile.circumplex_radian <- function(x, na.rm = TRUE, ...) {
   angles_centered <- (x - mean_angle + pi) %% (2 * pi) - pi
   quantiles_centered <- stats::quantile(angles_centered, na.rm = na.rm, ...)
   out <- (quantiles_centered + mean_angle) %% (2 * pi)
-  out[abs(out - (2 * pi)) < (.Machine$double.eps * 2)] <- 0
+  # An endpoint denoting the 0/360 pole reports the LM = 360 label (2*pi),
+  # matching the estimate path's convention (D-003; value-level per M20).
+  # Both float representations of the pole are caught: exact/near-0 (what R's
+  # %% emits at the seam) and within-a-hair-of-2*pi (the fmod-at-the-edge
+  # artifact). The tolerance is float-artifact-sized (~2 ulp), so genuinely
+  # near-pole endpoints from real replicates are never relabeled.
+  pole <- out < (.Machine$double.eps * 2) |
+    (2 * pi - out) < (.Machine$double.eps * 2)
+  out[pole] <- 2 * pi
   as_radian(out)
 }
 

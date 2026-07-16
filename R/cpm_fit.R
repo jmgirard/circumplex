@@ -774,12 +774,20 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   sigma_pathology <- spec$n_sigma > 0 &&
     any(nat$sigma^2 < 0.5 | nat$sigma^2 > 2)
 
-  # wrapped-to-[0,360) reported angles; keep unwrapped radians too.
-  theta_deg <- as.numeric(as_degree(as_radian(nat$theta %% (2 * pi))))
+  # Wrapped reported angles; keep unwrapped radians too. An angle on the 0/360
+  # pole (deterministic for a reference item with theory angle 360) reports the
+  # LM = 360 label in degrees (M20, matching D-003 and the CI endpoints); the
+  # computational radians (theta_rad, theta_rad_unwrapped) stay untouched so
+  # fitted matrices are unchanged (M20-D1).
+  theta_wrapped <- nat$theta %% (2 * pi)
+  pole <- theta_wrapped < (.Machine$double.eps * 2) |
+    (2 * pi - theta_wrapped) < (.Machine$double.eps * 2)
+  theta_deg <- as.numeric(as_degree(as_radian(theta_wrapped)))
+  theta_deg[pole] <- 360
 
   list(
-    theta = theta_deg,                 # degrees in [0, 360), canonicalized
-    theta_rad = nat$theta %% (2 * pi), # wrapped radians (reported)
+    theta = theta_deg,                 # degrees in [0, 360], LM = 360 (M20)
+    theta_rad = theta_wrapped,         # wrapped radians (reported)
     theta_rad_unwrapped = nat$theta,   # unwrapped radians (later tasks)
     theta_theory = as.numeric(as_degree(as_radian(theta_theory %% (2 * pi)))),
     zeta = nat$zeta,
