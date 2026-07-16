@@ -230,7 +230,11 @@ Circumplex Structure”, for a worked introduction to both.
   can reproduce their published output exactly. Free scaling adds `p`
   parameters without changing the degrees of freedom, and reports the
   fitted variance ratios in a `VarRatio` column (without confidence
-  intervals).
+  intervals). With correlation input the two families’ model-test
+  statistics are calibration-indistinguishable (paired simulation at
+  sample sizes 250–50,000), so the default remains the recommended
+  family for routine inference; use `scaling = "free"` when the goal is
+  reproducing published CIRCUM/CircE output.
 
 - The
   [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)

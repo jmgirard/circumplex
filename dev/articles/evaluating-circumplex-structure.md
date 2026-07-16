@@ -227,14 +227,22 @@ for these data with CircE: the fully constrained model (equal spacing
 relaxing the equal-spacing constraint improves fit to the edge of the
 conventional benchmarks (marginal by RMSEA, acceptable by SRMR and CFI);
 they reported CFI = .824, TLI = .795, RMSEA = .169 for the former and
-CFI = .958, TLI = .931, RMSEA = .098 for the latter. Do not expect our
-indices to match theirs to the digit: CIRCUM/CircE fit a covariance
-version of the model with free scaling constants, whereas
+CFI = .958, TLI = .931, RMSEA = .098 for the latter. Do not expect the
+default fit’s indices to match theirs to the digit: CIRCUM/CircE fit a
+covariance version of the model with free scaling constants, whereas
 [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
-fits the correlation structure directly, and the two differ slightly at
-finite sample sizes. The *conclusion* — ordered octants with unequal
-spacing, adequate approximate fit once equal spacing is not forced — is
-the same.
+by default fits the correlation structure directly, and the two differ
+slightly at finite sample sizes; pass `scaling = "free"` to fit their
+covariance parameterization and reproduce published CIRCUM/CircE output
+exactly. For the model test the choice does not matter here: with
+correlation input the two families’ test statistics are
+calibration-indistinguishable (differing by well under 1% of the model
+degrees of freedom in paired simulation at sample sizes 250–50,000), and
+the default is recommended for routine inference because free scaling
+adds parameters whose analytic standard errors are often undefined at
+small-to-moderate samples. The *conclusion* — ordered octants with
+unequal spacing, adequate approximate fit once equal spacing is not
+forced — is the same.
 
 A poor CPM fit does not make SSM output uncomputable; it makes the
 summary less meaningful, because the profile is being referred to scale
@@ -387,7 +395,7 @@ summary(acc)
 #> Population Structure:     Browne circular model (CPM) 
 #> Group Sizes:      All = 250 
 #> Certification Rule:   a_lci / (a_uci - a_lci) >= 0.35 (scale-free, print-independent) 
-#> Elapsed:      13.7 s
+#> Elapsed:      13.5 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).
