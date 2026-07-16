@@ -121,8 +121,29 @@ construction, eliminating the optimizer-tail violations RR05 measured
   post-fix the file is 20/20 green. T4 done: roxygen + vignette + NEWS
   nesting notes, document() clean.
 
+- 2026-07-16: T3 first full-suite run caught a real interaction (1 FAIL:
+  free-family SE cross-check, test-cpm_oracles.R:677) — diagnosed to the
+  seed's group semantics, not the oracle or the estimates (top-level fits
+  bit-identical pre/post; deviant replicates are genuine better-F
+  permutation basins found by native starts too). Fixed via sentinel group
+  0 (see Decisions); NEWS refined; re-running nesting + oracle files.
+
 ## Decisions
 
+- 2026-07-16 (T3, supersedes the T2 entry below): the seed gets **sentinel
+  group 0, excluded from the `reproduced` acceptance count**. The own-group
+  choice below was empirically wrong: the full suite caught the free-family
+  SE cross-check oracle failing (ratio 0.34 vs > 0.7) because the seeded run
+  — a warm start that at correlation input begins essentially at the free
+  optimum — counted as the second "independent" group, silently accepting
+  replicates whose optimum only ONE data-blind group could reach (verified:
+  the 3 inflating replicates each had exactly 1 native group at min F, and
+  the pre-seed commit passes the oracle file 108/108). The seed certifies
+  nesting, never reproduction; acceptance semantics now match the pre-seed
+  engine exactly. The seeded run still competes on F and participates in the
+  multimodality comparison. Consequence (NEWS-documented): a fit whose
+  better optimum only the seed reaches now reports that optimum WITH the
+  acceptance warning, where pre-seed it reported a worse optimum silently.
 - 2026-07-16 (T2): the unit-solution seed gets its **own independence group**
   in the `reproduced` acceptance criterion — it is a data-derived point (the
   unit objective's optimum), not an F-isometric image of g0 like the mirror,

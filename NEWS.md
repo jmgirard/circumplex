@@ -6,7 +6,11 @@
   nests the default; previously a rare multi-start tail — about 1 in 2,000
   fits in simulation — could land the free optimizer on a slightly worse
   optimum). Results change only in those rare cases, and only for the
-  better; the default family is unaffected.
+  better; the default family is unaffected. The convergence-acceptance
+  criterion is unchanged and still requires the multi-start battery itself
+  to reproduce the reported optimum, so a fit rescued by the new start may
+  now carry the (accurate) acceptance warning where it previously reported
+  a slightly worse optimum silently.
 
 * Displacement and angle confidence-interval endpoints that land exactly on
   the 0/360 pole are now reported as 360, never 0, matching how the package

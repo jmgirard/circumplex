@@ -671,10 +671,16 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
     seed[spec$i_sigma] <- 0
     seed[spec$i_beta] <- gu[spec_unit$i_beta]
     starts[[length(starts) + 1L]] <- seed
-    # Own independence group: the seed is a data-derived point (the unit
-    # objective's optimum), not an F-isometric image of g0 like the mirror,
-    # so its run reaching min F is genuine reproduction evidence.
-    start_group <- c(start_group, max(start_group) + 1L)
+    # Sentinel group 0: EXCLUDED from the reproduced acceptance count. The
+    # seed is a warm start from a data-derived optimum -- at correlation
+    # input sigma-hat ~= 1, so it starts essentially AT the free optimum and
+    # reaching min F certifies nesting, never reproduction. Counting it
+    # would silently accept start-dependent optima that the data-blind
+    # battery cannot reproduce (observed: the free-family SE cross-check
+    # oracle admitted rare permutation-basin replicates the shipped
+    # criterion excludes). The seeded run still competes on F (nesting) and
+    # participates in the multimodality comparison (it visits real optima).
+    start_group <- c(start_group, 0L)
     seed_idx <- length(starts)
   }
 
@@ -776,7 +782,13 @@ cpm_engine <- function(R, angles, m = 3, variant = c("A", "B", "C", "D"),
   gnorm <- max(abs(cpm_gradient(fit$par, R, spec)))
   grad_ok <- gnorm <= 1e-6 * max(1, abs(fit$F))
   at_min <- abs(Fs - min(Fs)) <= 1e-8
-  reproduced <- length(unique(start_group[at_min])) >= 2L
+  # Group 0 (the unit-solution nesting seed, free scaling only) never counts:
+  # it is a warm start whose convergence to min F certifies nesting, not
+  # start-independent reproduction (see the seed block above). Acceptance
+  # semantics are therefore identical to the unit family's and to the
+  # pre-seed engine: only data-blind battery groups certify.
+  grp_min <- start_group[at_min]
+  reproduced <- length(unique(grp_min[grp_min > 0L])) >= 2L
   accepted <- grad_ok && reproduced
 
   if (!accepted) {
