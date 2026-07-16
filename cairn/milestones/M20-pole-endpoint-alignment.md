@@ -4,7 +4,7 @@
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** m20-pole-endpoint-alignment
+- **Branch/PR:** m20-pole-endpoint-alignment · https://github.com/jmgirard/circumplex/pull/45
 
 ## Goal
 
@@ -40,18 +40,18 @@ in the stored object), matching the estimate path's LM=360 convention
 
 ## Acceptance criteria
 
-- [ ] A CI endpoint denoting the 0/360 pole reports 360 (never 0) from
+- [x] A CI endpoint denoting the 0/360 pole reports 360 (never 0) from
       `quantile.circumplex_radian`, exercised end-to-end through both
       `ssm_analyze()` bootstrap CIs and `cpm_fit()` bootstrap angle CIs, with
       regression tests at the mandatory boundary set (pole-peaking profile,
       pole-straddling CI, flat profile) that fail on the pre-change snap.
-- [ ] Consumer audit recorded in the work log: all `*_lci`/`*_uci` readers
+- [x] Consumer audit recorded in the work log: all `*_lci`/`*_uci` readers
       (incl. `ssm_ci_accuracy` arc membership and the straddle `lci > uci`
       convention) verified unaffected or updated with tests.
-- [ ] `cairn/boundary-coverage.md` updated for the new pole-endpoint cells.
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
-- [ ] NEWS.md documents the exported change.
-- [ ] A CPM angle denoting the 0/360 pole reports 360 in the results table
+- [x] `cairn/boundary-coverage.md` updated for the new pole-endpoint cells.
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes).
+- [x] NEWS.md documents the exported change.
+- [x] A CPM angle denoting the 0/360 pole reports 360 in the results table
       (`Angle` column), consistent with its snapped CI endpoints, with a
       regression test (reference item at theory 360) that fails pre-change.
 
@@ -130,3 +130,28 @@ in the stored object), matching the estimate path's LM=360 convention
   Angle = 0 with CI [360, 360]) and re-planning.
 
 ## Review
+
+Reviewed 2026-07-16 (PR #45). Fresh evidence per criterion:
+
+- **AC1**: full suite fresh at review: 0 fail / 2095 pass (NOT_CRAN). Teeth
+  re-proven fresh: pre-M20 snap reverted in-memory (assignInNamespace) → the
+  two new SSM pole tests go red (primitive 3 failures, e2e 2 failures);
+  restore → green. Boundary set in the green suite: pole-peaking
+  (test-ssm_bootstrap.R:238, :261), pole-straddling (M13 tests
+  test-cpm_angle_ci.R:8/:78 + test-ssm_bootstrap.R:210 unchanged), flat
+  (test-ssm_bootstrap.R:137 + M13 all-NA quantile test).
+- **AC2**: audit recorded in work log (T3 entry, 2026-07-16) — every reader
+  verified invariant or doc-updated; smoke run of print/summary/table/plot
+  surfaces with pole-valued CIs recorded there.
+- **AC3**: boundary-coverage.md carries the M20 cells + "Audit notes (M20)"
+  (6 M20 anchors; cited pre-M20 line numbers re-verified after insertions).
+- **AC4**: devtools::check(--no-manual) after all package changes:
+  0 errors / 0 warnings / 0 notes (4m42s); only cairn/ tracking edits since.
+- **AC5**: NEWS.md dev-version entry present (no milestone numbers in text).
+- **AC6**: CPM e2e regression test (test-cpm_angle_ci.R:50) green in the
+  fresh suite; pre-fix red proven at T1 (3 failures, logged 2026-07-16).
+
+Consistency gate: cairn_validate all-pass (exit 0). r-package toolchain
+checks: document() no package diff; README.Rmd untouched by branch; 
+pkgdown::check_pkgdown() no problems; NEWS entry present; no new top-level
+files; full check clean (AC4).
