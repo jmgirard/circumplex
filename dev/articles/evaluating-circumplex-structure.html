@@ -326,12 +326,15 @@ covariance parameterization and reproduce published CIRCUM/CircE output
 exactly. For the model test the choice does not matter here: with
 correlation input the two families’ test statistics are
 calibration-indistinguishable (differing by well under 1% of the model
-degrees of freedom in paired simulation at sample sizes 250–50,000), and
-the default is recommended for routine inference because free scaling
-adds parameters whose analytic standard errors are often undefined at
-small-to-moderate samples. The <em>conclusion</em> — ordered octants
-with unequal spacing, adequate approximate fit once equal spacing is not
-forced — is the same.</p>
+degrees of freedom in paired simulation at sample sizes 250–50,000; the
+free statistic never exceeds the default’s on the same input beyond
+numerical tolerance, since the free family nests the default and is
+additionally started from its solution), and the default is recommended
+for routine inference because free scaling adds parameters whose
+analytic standard errors are often undefined at small-to-moderate
+samples. The <em>conclusion</em> — ordered octants with unequal spacing,
+adequate approximate fit once equal spacing is not forced — is the
+same.</p>
 <p>A poor CPM fit does not make SSM output uncomputable; it makes the
 summary less meaningful, because the profile is being referred to scale
 positions the data contradict. If the ordering itself fails (scales out
@@ -545,7 +548,7 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; Population Structure:     Browne circular model (CPM) </span></span>
 <span><span class="co">#&gt; Group Sizes:      All = 250 </span></span>
 <span><span class="co">#&gt; Certification Rule:   a_lci / (a_uci - a_lci) &gt;= 0.35 (scale-free, print-independent) </span></span>
-<span><span class="co">#&gt; Elapsed:      13.4 s</span></span>
+<span><span class="co">#&gt; Elapsed:      14 s</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
 <span><span class="co">#&gt; RMSEA = 0.064, SRMR = 0.038).</span></span>

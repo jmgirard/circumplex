@@ -89,18 +89,24 @@ cpm_fit(
   paired simulation at the measured truths (`n` from 250 to 50,000)
   their test statistics differed by well under 1 percent of the degrees
   of freedom — so neither family's chi-square is more trustworthy than
-  the other's. `"unit"` remains the default because free scaling buys no
-  inferential benefit for correlation input while adding `p` parameters
-  whose analytic standard errors are frequently undefined below
-  `n = 2000`; choose `"free"` when the goal is reproducing published
-  CIRCUM/CircE results. The fitted \\\hat\sigma^2\\ are reported as a
-  `VarRatio` column (the ratio of reproduced to input variance); they
-  carry no confidence interval. The analytic intervals for the remaining
-  parameters follow the same sample-size caution as the default family:
-  their coverage regime was measured (the free-family coverage oracle)
-  to match it, so [`summary()`](https://rdrr.io/r/base/summary.html)
-  cautions below `n = 2000` and in near-boundary fits. The input is
-  still a correlation matrix (unit diagonal).
+  the other's. (The two statistics are close but not interchangeable
+  digit-for-digit: the free family nests the unit family, and its
+  optimizer is additionally started from the unit solution, so on the
+  same input the free statistic never exceeds the unit statistic beyond
+  the engine's numerical tolerance — fits whose boundary harmonics are
+  polished away are compared on their own reduced model.) `"unit"`
+  remains the default because free scaling buys no inferential benefit
+  for correlation input while adding `p` parameters whose analytic
+  standard errors are frequently undefined below `n = 2000`; choose
+  `"free"` when the goal is reproducing published CIRCUM/CircE results.
+  The fitted \\\hat\sigma^2\\ are reported as a `VarRatio` column (the
+  ratio of reproduced to input variance); they carry no confidence
+  interval. The analytic intervals for the remaining parameters follow
+  the same sample-size caution as the default family: their coverage
+  regime was measured (the free-family coverage oracle) to match it, so
+  [`summary()`](https://rdrr.io/r/base/summary.html) cautions below
+  `n = 2000` and in near-boundary fits. The input is still a correlation
+  matrix (unit diagonal).
 
 - reference:
 
