@@ -1,10 +1,10 @@
 # M21: T_diag-vs-T_free inference-default decision + application
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m21-t-calibration-decision
 
 ## Goal
 
