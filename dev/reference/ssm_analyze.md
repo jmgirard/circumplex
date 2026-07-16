@@ -169,9 +169,11 @@ The profile displacement parameter is reported in the half-open interval
 `[0, 360)` degrees. A profile that peaks exactly at the 0/360 degree
 boundary is reported as approximately 360 (equivalently 0, the same
 direction); which of the two appears is a floating-point detail and both
-denote the same pole. Contrast displacements are instead reported as a
-signed difference in `(-180, 180]` degrees (see the "Contrast" block in
-the printed output).
+denote the same pole. A displacement *confidence-interval endpoint* that
+lands exactly on that pole is always reported as 360 (never 0), matching
+the package's LM = 360 labeling. Contrast displacements are instead
+reported as a signed difference in `(-180, 180]` degrees (see the
+"Contrast" block in the printed output).
 
 Degenerate profiles (flat or zero-amplitude) have undefined displacement
 (and fit, if flat), which is reported as `NA` with a warning. Bootstrap
@@ -181,9 +183,9 @@ warning reporting how many were dropped; the intervals are then
 conditional on estimability.
 
 \[0,
-360)`degrees. A profile that peaks exactly at the 0/360 degree boundary is reported as approximately 360 (equivalently 0, the same direction); which of the two appears is a floating-point detail and both denote the same pole. Contrast displacements are instead reported as a signed difference in`(-180,
+360)`degrees. A profile that peaks exactly at the 0/360 degree boundary is reported as approximately 360 (equivalently 0, the same direction); which of the two appears is a floating-point detail and both denote the same pole. A displacement *confidence-interval endpoint* that lands exactly on that pole is always reported as 360 (never 0), matching the package's LM = 360 labeling. Contrast displacements are instead reported as a signed difference in`(-180,
 180\]:
-R:0,%20360)%60%20degrees.%20A%20profile%20that%20peaks%20exactly%20at%20the%200/360%20degree%0A%20%20boundary%20is%20reported%20as%20approximately%20360%20(equivalently%200,%20the%20same%0A%20%20direction);%20which%20of%20the%20two%20appears%20is%20a%20floating-point%20detail%20and%20both%0A%20%20denote%20the%20same%20pole.%20Contrast%20displacements%20are%20instead%20reported%20as%20a%0A%20%20signed%20difference%20in%20%60(-180,%20180
+R:0,%20360)%60%20degrees.%20A%20profile%20that%20peaks%20exactly%20at%20the%200/360%20degree%0A%20%20boundary%20is%20reported%20as%20approximately%20360%20(equivalently%200,%20the%20same%0A%20%20direction);%20which%20of%20the%20two%20appears%20is%20a%20floating-point%20detail%20and%20both%0A%20%20denote%20the%20same%20pole.%20A%20displacement%20*confidence-interval%20endpoint*%20that%0A%20%20lands%20exactly%20on%20that%20pole%20is%20always%20reported%20as%20360%20(never%200),%20matching%0A%20%20the%20package's%20LM%20=%20360%20labeling.%20Contrast%20displacements%20are%20instead%0A%20%20reported%20as%20a%20signed%20difference%20in%20%60(-180,%20180
 
 ## Reproducibility
 

@@ -2,6 +2,21 @@
 
 ## circumplex (development version)
 
+- Displacement and angle confidence-interval endpoints that land exactly
+  on the 0/360 pole are now reported as 360, never 0, matching how the
+  package labels that pole everywhere else (LM = 360):
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  bootstrap displacement CIs and
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
+  bootstrap angle CIs both use the shared circular-quantile machinery
+  that now applies this labeling.
+  [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)’s
+  reported `Angle` column likewise labels the pole 360 — a reference
+  scale with a theory angle of 360 previously printed `Angle = 0` with a
+  degenerate CI of `[0, 0]`, and now prints 360 throughout. An
+  exact-pole endpoint is a measure-zero floating-point corner for real
+  data, so numeric results are otherwise unchanged.
+
 - New SEM-based (latent-variable) SSM analysis:
   [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md)
   estimates the Structural Summary Method profile of one or more

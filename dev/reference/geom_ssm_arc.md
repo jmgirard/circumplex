@@ -58,13 +58,14 @@ A ggplot2 layer.
 ## Details
 
 Each arc spans **counterclockwise** from `displacement_min` to
-`displacement_max` (both in degrees). Supply them in `[0, 360)`. A
-`displacement_min` greater than `displacement_max` is read as an
+`displacement_max` (both in degrees). Supply them in `[0, 360]` (a bound
+of exactly 360 is the 0/360 pole under the package's LM = 360 labeling).
+A `displacement_min` greater than `displacement_max` is read as an
 interval that crosses the 0/360 seam and is drawn the short way across
 it (e.g. `350 -> 10` is a 20 degree arc, matching how the package stores
 a displacement CI that straddles the boundary). The interval must
 describe less than a full circle; bounds that imply a span of 360
-degrees or more (for example, values outside `[0, 360)`) are rejected,
+degrees or more (for example, values outside `[0, 360]`) are rejected,
 since they do not name a unique arc.
 
 ## See also
