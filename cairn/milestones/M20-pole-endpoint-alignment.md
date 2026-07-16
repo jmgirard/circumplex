@@ -1,6 +1,6 @@
 # M20: 0-vs-360 pole CI-endpoint alignment
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
@@ -75,7 +75,7 @@ in the stored object), matching the estimate path's LM=360 convention
 - [x] **T3** — Consumer audit: grep all displacement-CI endpoint readers
       (`ssm_ci_accuracy.R`, print/summary/plot, straddle logic); update any
       that assumed the 0 label, with tests.
-- [ ] **T4** — Update `cairn/boundary-coverage.md` + NEWS.md; run full
+- [x] **T4** — Update `cairn/boundary-coverage.md` + NEWS.md; run full
       `devtools::check()`.
 
 ## Work log
@@ -116,6 +116,10 @@ in the stored object), matching the estimate path's LM=360 convention
   (M20 completion note). fit_structure angles are a separate estimate surface
   (no displacement-CI reader) — out of scope. devtools::document() clean
   (2 pre-existing cpm link warnings, untouched lines).
+- 2026-07-16: T4 done — boundary-coverage.md M20 cells + audit note (cited
+  lines re-verified after test insertions); NEWS.md behavior-change entry;
+  devtools::check(--no-manual): 0 errors / 0 warnings / 0 notes. All tasks
+  complete → status review.
 
 ## Decisions
 
