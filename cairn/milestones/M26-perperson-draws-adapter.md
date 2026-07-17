@@ -1,6 +1,6 @@
 # M26: Longitudinal Build B — per-person layer + draws adapter + Bayesian vignette
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
@@ -122,7 +122,7 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
 - [x] **T6** — `bayesian-ssm-analysis.Rmd` precomputed + brms `Suggests` +
       D-entry (dependency gate satisfied at the 2026-07-16 plan gate);
       untrusted-sketch note honored; prior-predictive exhibit.
-- [ ] **T7** — Docs + NEWS; full `devtools::check()`.
+- [x] **T7** — Docs + NEWS; full `devtools::check()`.
 
 ## Work log
 
@@ -134,6 +134,8 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
 - 2026-07-16: T5 done — oracle suite: run's bootstrap replicates reproduce intervals bit-exactly; shape B ≡ shape A; pole-straddle wrap fixture (hand type-7 arithmetic); all-flat all-NA contract; exact-pole 360; found+fixed R `%%` vs kernel modu() tiny-negative pole disparity (single-correction wrap, regression-tested).
 - 2026-07-16: minor amendment — vignette filename follows repo kebab-case (`bayesian-ssm-analysis.Rmd`; spec's `bayesian_ssm.Rmd` was a working name); AC6/Scope wording updated.
 - 2026-07-16: T6 done — precomputed vignette (only the `brm()` chunk frozen; executable atan2 known-direction pin + Rayleigh prior-predictive exhibit live); seeded fixture `vignettes/bayesian_ssm_draws.rds` + generator `data-raw/bayesian_ssm_draws.R`; brms → Suggests (D-015); pkgdown navbar; dev-namespace render verified.
+
+- 2026-07-16: T7 done — NEWS (both features), DESIGN.md data-flow/class/RNG rows; `devtools::check()` clean (0 errors / 0 warnings / 0 notes, 4m28s, vignettes rebuilt); pkgdown::check_pkgdown() clean; status → review.
 
 ## Decisions
 
