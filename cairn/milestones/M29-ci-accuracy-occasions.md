@@ -84,7 +84,7 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 
 ## Tasks
 
-- [ ] **T1** — Design note: how the stacked cross-occasion covariance (§2.2)
+- [x] **T1** — Design note: how the stacked cross-occasion covariance (§2.2)
       becomes the diagnostic's plug-in simulation population, and how
       per-occasion + contrast accuracy rows are reported. Written before code,
       grounded in [[D-017]] (RR07: construction (a), per-group observed stacked
@@ -123,6 +123,9 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 - 2026-07-17: amendment gate (user-approved) — AC2 boundary/contrast, AC3 →
   width + closed-form arms, AC4 → flat-occasion refusal; Scope oracle-battery
   line + T1/T4 synced. Coverage map unchanged.
+- 2026-07-17: T1 done — `devel/m29-design.md` implementation blueprint
+  (population + loop, storage shape, the `(r−1) %/% k + 1` row↔group refactor,
+  structure-refusal, boundary/ladder/contrast unchanged, oracle plan).
 
 ## Decisions
 
