@@ -216,11 +216,11 @@ for displacement changes under 90 degrees and can be \emph{wider} than
 independent-groups CIs for changes beyond 90 degrees, even with
 strongly positive within-person correlation.
 
-With \code{method = "montecarlo"} the per-group draw is (k\emph{p)-dimensional;
-group sizes should comfortably exceed k}p for the asymptotic covariance
-to be well estimated (the percentile bootstrap is the safer
-small-sample choice). Grouping is time-invariant by construction (one
-group per person-row).
+With \code{method = "montecarlo"} the per-group draw has dimension k x p
+(occasions times scales); group sizes should comfortably exceed k x p
+for the asymptotic covariance to be well estimated (the percentile
+bootstrap is the safer small-sample choice). Grouping is time-invariant
+by construction (one group per person-row).
 }
 
 \examples{

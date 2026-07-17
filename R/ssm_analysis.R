@@ -172,11 +172,11 @@
 #'   independent-groups CIs for changes beyond 90 degrees, even with
 #'   strongly positive within-person correlation.
 #'
-#'   With `method = "montecarlo"` the per-group draw is (k*p)-dimensional;
-#'   group sizes should comfortably exceed k*p for the asymptotic covariance
-#'   to be well estimated (the percentile bootstrap is the safer
-#'   small-sample choice). Grouping is time-invariant by construction (one
-#'   group per person-row).
+#'   With `method = "montecarlo"` the per-group draw has dimension k x p
+#'   (occasions times scales); group sizes should comfortably exceed k x p
+#'   for the asymptotic covariance to be well estimated (the percentile
+#'   bootstrap is the safer small-sample choice). Grouping is time-invariant
+#'   by construction (one group per person-row).
 #' @family ssm functions
 #' @family analysis functions
 #' @export
@@ -383,14 +383,43 @@ ssm_analyze <- function(data, scales = NULL, angles = octants(),
 
   # Occasions = repeated-measures mean analysis
   if (!is.null(occasions)) {
-    # Resolve numeric column indices to names, then validate cross-occasion
-    # column alignment by stem matching (the rotation channel; spec sec. 1.1)
-    occ_cols <- lapply(occasions, function(x) {
-      if (is.numeric(x)) colnames(data)[x] else x
+    # Resolve every block to column POSITIONS: numeric blocks stay positional
+    # (resolving them to names first-match-collapses duplicated column names
+    # -- e.g. cbind()ed waves that both keep PA..NO -- silently copying one
+    # occasion over another; review F1, 2026-07-16), and character blocks
+    # resolve via match() with unknown names errored. Names are derived from
+    # the positions afterwards, for stem validation and display only.
+    cn <- colnames(data)
+    occ_idx <- lapply(occasions, function(x) {
+      if (is.numeric(x)) {
+        ix <- as.integer(x)
+        if (any(ix < 1 | ix > ncol(data))) {
+          stop("`occasions` column indices out of range.", call. = FALSE)
+        }
+        ix
+      } else {
+        ix <- match(x, cn)
+        if (anyNA(ix)) {
+          stop("Unknown column name(s) in `occasions`: ",
+               paste(x[is.na(ix)], collapse = ", "), call. = FALSE)
+        }
+        ix
+      }
     })
+    if (anyDuplicated(unlist(occ_idx))) {
+      stop(
+        "`occasions` blocks select overlapping columns; each occasion must ",
+        "select its own distinct columns.",
+        call. = FALSE
+      )
+    }
+    # Validate cross-occasion column alignment by stem matching (the rotation
+    # channel; spec sec. 1.1)
+    occ_cols <- lapply(occ_idx, function(ix) cn[ix])
     occ_validate_alignment(occ_cols, occ_labels)
     return(ssm_analyze_occasions(
       data = data,
+      occ_idx = occ_idx,
       occ_cols = occ_cols,
       occ_labels = occ_labels,
       angles = angles,
@@ -694,9 +723,9 @@ occ_scores <- function(mat, grp, k, p, listwise) {
   out
 }
 
-ssm_analyze_occasions <- function(data, occ_cols, occ_labels, angles, grouping,
-                                  contrast, boots, interval, parallel, ncpus,
-                                  method, call) {
+ssm_analyze_occasions <- function(data, occ_idx, occ_cols, occ_labels, angles,
+                                  grouping, contrast, boots, interval,
+                                  parallel, ncpus, method, call) {
 
   k <- length(occ_cols)
   p <- length(angles)
@@ -712,9 +741,11 @@ ssm_analyze_occasions <- function(data, occ_cols, occ_labels, angles, grouping,
   }
 
   # Assemble the wide person-row input: k contiguous occasion blocks, then
-  # Group. The person-row IS the resampling unit, so the existing row
-  # resampler is the person-level case bootstrap (spec sec. 2.1).
-  bs_input <- data[unlist(occ_cols)]
+  # Group. Subset by POSITION (occ_idx), never by name -- duplicated column
+  # names would first-match-collapse the blocks (review F1). The person-row
+  # IS the resampling unit, so the existing row resampler is the
+  # person-level case bootstrap (spec sec. 2.1).
+  bs_input <- data[unlist(occ_idx)]
   if (is.null(grouping)) {
     bs_input <- cbind(bs_input, Group = rep("All", times = nrow(data)))
   } else {

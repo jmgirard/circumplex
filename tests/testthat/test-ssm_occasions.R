@@ -148,6 +148,64 @@ test_that("no stem structure falls back to a positional-alignment message", {
   expect_s3_class(res, "circumplex_ssm")
 })
 
+test_that("numeric occasion indices stay positional under duplicated names", {
+  # Review F1 regression (2026-07-16): cbind-ing two waves that keep the SAME
+  # scale names is a natural wide layout; numeric blocks must subset by
+  # position, never by resolved name (name resolution collapses every block
+  # onto the first match and silently zeroes the contrast)
+  scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  base <- make_occ_data(n = 60, seed = 51)
+  wave1 <- base[occ_names(1)]
+  wave2 <- base[occ_names(2)] + 1 # true elevation shift of +1
+  names(wave1) <- scales
+  names(wave2) <- scales
+  dat <- cbind(wave1, wave2)
+  set.seed(52)
+  res <- suppressMessages(ssm_analyze(dat,
+    occasions = list(T1 = 1:8, T2 = 9:16),
+    contrast = TRUE, boots = 50
+  ))
+  # the occasions must be genuinely distinct blocks, not first-match copies
+  exp_de <- mean(as.matrix(dat[9:16])) - mean(as.matrix(dat[1:8]))
+  expect_equal(res$results$e_est[[3]], exp_de, tolerance = 1e-12)
+  # truth ~ 1.5 (make_occ_data's built-in +0.5 shift plus the +1 here);
+  # the broken name-resolution path reported exactly 0
+  expect_gt(exp_de, 1)
+  expect_false(isTRUE(all.equal(res$results$e_est[[1]],
+                                res$results$e_est[[2]])))
+})
+
+test_that("occasions blocks selecting overlapping columns error", {
+  data <- make_occ_data()
+  expect_error(
+    ssm_analyze(data,
+      occasions = list(T1 = 1:8, T2 = c(3, 9:15))
+    ),
+    "overlap"
+  )
+  # same literal column name in two blocks is the same trap via characters
+  expect_error(
+    ssm_analyze(data,
+      occasions = list(T1 = occ_names(1), T2 = c("PA_1", occ_names(2)[-1]))
+    ),
+    "overlap"
+  )
+})
+
+test_that("bad occasion column references error informatively", {
+  data <- make_occ_data()
+  expect_error(
+    ssm_analyze(data, occasions = list(T1 = 1:8, T2 = 11:18)),
+    "out of range"
+  )
+  expect_error(
+    ssm_analyze(data,
+      occasions = list(T1 = occ_names(1), T2 = c("NOPE_2", occ_names(2)[-1]))
+    ),
+    "NOPE_2"
+  )
+})
+
 # Scoring and result assembly (spec sec. 1.1/1.2) ------------------------------
 
 test_that("occasions profiles are correct and ordered occasion-minor", {

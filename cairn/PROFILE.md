@@ -68,6 +68,10 @@ Followed by `/cairn-release` — a CRAN release walk (never self-submits):
 - Handoff checklist (user runs): `devtools::submit_cran()`, confirm the CRAN
   email, then `usethis::use_github_release()` + `usethis::use_dev_version()`.
 
+## changelog
+The repo's changelog file, read by `/hotfix`, the release-walk, and the
+consistency-gate: **`NEWS.md`** (the R-package convention).
+
 ## init-detection
 Recognized by `cairn-init` when a **`DESCRIPTION` file is present** at the repo
 root. Carries the `.Rbuildignore` `^cairn$` entry (keeps the tracking dir out

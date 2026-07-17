@@ -4,33 +4,31 @@
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** `m25-occasions-core`
+- **Branch/PR:** `m25-occasions-core` · PR #49 (https://github.com/jmgirard/circumplex/pull/49)
 
 ## Goal
 
 Add wide-format `occasions` analyses to `ssm_analyze()` — per-occasion
 mean-based profiles (k ≥ 2, crossable with grouping) and the paired
-two-occasion contrast through both inference engines — oracle-validated and
-output-surface complete, per the binding D-013 spec
+two-occasion contrast through both engines — oracle-validated and
+output-surface complete per the binding D-013 spec
 (`devel/longitudinal-ssm-spec.md` §§1–2, §7 Build A).
 
 ## Scope
 
 **In:**
-- `occasions` argument per spec §1.1: named list of same-length blocks, wide
-  person-rows, mutually exclusive with `scales` (`stopifnot(is_var(scales))`
-  at `R/ssm_analysis.R:208` becomes conditional); k ≥ 2 (plan gate
-  2026-07-16), default labels `T1..Tk`.
+- `occasions` argument per spec §1.1: named list of same-length blocks,
+  wide person-rows, mutually exclusive with `scales` (its `stopifnot`
+  becomes conditional); k ≥ 2 (plan gate); default labels `T1..Tk`.
 - Stem-matching cross-occasion alignment validation + one-time positional
   message when no stem is detectable (spec §1.1, the rotation channel).
 - Listwise-only for occasions (pairwise + occasions errors with the estimand
   message); dropped-persons count messaged; selection-bias docs caution
   (spec §1.3).
 - Composition cells (spec §1.2): occasions × mean-based × {1 group,
-  grouping}; occasions × `contrast = TRUE` (exactly 2 occasions, 1 group).
-  Contrast order = `names(occasions)` list order (temporal), never
-  alphabetical; occasion-major row order; conditional-presence `Occasion`
-  column; `details` occasions metadata.
+  grouping}; occasions × `contrast = TRUE` (exactly 2 occasions, 1 group);
+  contrast order = `names(occasions)` list order (never alphabetical);
+  occasion-major rows; conditional `Occasion` column; details metadata.
 - Bootstrap engine: wide person-rows through the existing row resampler,
   contrast via `param_diff(occ2, occ1)` (spec §2.1). Monte Carlo engine:
   stacked k·p mean vector, sample covariance of stacked person vectors / n,
@@ -49,31 +47,29 @@ output-surface complete, per the binding D-013 spec
   NEWS entry incl. the `Occasion` schema note.
 
 **Out:**
-- occasions × measures (correlation path) → ROADMAP candidate (spec §1.2).
-- occasions × contrast × grouping (difference-of-differences) → ROADMAP
-  candidate (spec §1.2).
-- Pairwise-deletion occasions semantics → ROADMAP candidate (spec §1.3).
-- `ssm_ci_accuracy()` occasions extension → ROADMAP candidate (spec §1.4).
-- `ssm_analyze_long()` sugar → ROADMAP candidate (spec §1.1).
+- ROADMAP candidates (the "Longitudinal deferrals" row): occasions ×
+  measures and occasions × contrast × grouping (spec §1.2);
+  pairwise-deletion semantics (§1.3); `ssm_ci_accuracy()` occasions
+  extension (§1.4); `ssm_analyze_long()` sugar (§1.1).
 - Per-person layer + draws adapter → M26; growth support → M27.
 
 ## Acceptance criteria
 
-- [ ] AC1 — Intake contract per spec §1.1/§1.3, test-evidenced: `scales`/
+- [x] AC1 — Intake contract per spec §1.1/§1.3, test-evidenced: `scales`/
       `occasions` mutual exclusivity; equal-length block validation;
       stem-order mismatch errors naming the offending block; no-stem
       positional message fires (fixtures both ways); pairwise + occasions
       errors with the estimand message; listwise drop count messaged.
-- [ ] AC2 — Occasions profiles correct: occasion-major rows within group,
+- [x] AC2 — Occasions profiles correct: occasion-major rows within group,
       conditional-presence `Occasion` column, k = 3 supported; on
       complete-case data each occasion's profile row equals the equivalent
       single-`scales` run (exact invariant, fixture-tested).
-- [ ] AC3 — Paired contrast is second-listed minus first-listed by
+- [x] AC3 — Paired contrast is second-listed minus first-listed by
       `names(occasions)` list order (a `T10`/`T2` name pair regression test
       proves alphabetical sorting would flip it), through **both** engines;
       the contrast validation rule admits exactly the (1 group, 0 measures,
       2 occasions) triple and errors on > 2 occasions with contrast.
-- [ ] AC4 — Oracle battery per spec §2.3 green: paired-contrast CI coverage
+- [x] AC4 — Oracle battery per spec §2.3 green: paired-contrast CI coverage
       at nominal (band pre-registered in the script before the run, M19
       precedent) across the named cells (Δd near 0° and ±180°, truths
       straddling 0/360, small-n ≈ 25–50, k = 3, and the ρ > 0 / Δd ≈ 135°
@@ -83,14 +79,14 @@ output-surface complete, per the binding D-013 spec
       boot-vs-MC within the pre-registered tolerance. Results rds + seeded
       regeneration script committed as `devel/m25-*` (level-indexed seeds).
       ≥ 2 independent oracle types per numeric result.
-- [ ] AC5 — CLAUDE.md boundary battery for the new paths: contrast near
+- [x] AC5 — CLAUDE.md boundary battery for the new paths: contrast near
       ±180°, CIs straddling 0°/360° (wrap asserted), flat/zero-variance
       occasion, one occasion degenerate — tested on both engines.
-- [ ] AC6 — Output surface: print snapshots cover occasions `details`;
+- [x] AC6 — Output surface: print snapshots cover occasions `details`;
       `ssm_table()` and each `ssm_plot_*()` either supports occasions
       objects or rejects with an informative error (tested);
       `ssm_ci_accuracy()` errors informatively on occasions objects.
-- [ ] AC7 — Docs/NEWS carry only the conditional efficiency statement (grep
+- [x] AC7 — Docs/NEWS carry only the conditional efficiency statement (grep
       evidence: no unconditional "paired is narrower" anywhere), plus the
       selection-bias and paired-interpretability cautions; DESIGN.md gains
       the occasions RNG row + oracle-registry pointer; CLAUDE.md gains the
@@ -139,57 +135,105 @@ output-surface complete, per the binding D-013 spec
 
 ## Work log
 
-- 2026-07-16: created by /milestone-plan (Build A of the D-013 contract;
-  promoted from the "Longitudinal SSM build family" candidate row). Plan-gate
-  decisions: full k ≥ 2 ships (contrast stays exactly-2); all builds precede
-  M7 in work order (priority high).
-- 2026-07-16: T1 done — occasions intake validation (mutual exclusivity,
-  block shape, labels, listwise-only estimand error, stem-matching alignment
-  incl. rotation error + positional-fallback message path) + contrast rule
-  extension in `ssm_analyze`; 12 new tests; full suite green (2141 pass).
-  Implement question gate skipped: plan/spec pin all substantive choices.
-- 2026-07-16: T2 done — `occ_scores()` + `ssm_analyze_occasions()` +
-  `build_result_labels()` occasion branch (conditional Occasion column,
-  group-major/occasion-minor); AC2 exact single-`scales` equivalence
-  fixtures (k = 3, and per-cell under grouping); drop-count message +
-  no-stem positional message tests. Includes the MC `occ_k` plumbing
-  (stacked-draw split), engine-validated at T5. Suite green (2164).
-- 2026-07-16: T3 done — contrast conventions locked: second-listed minus
-  first-listed with the T10/T2 alphabetical-flip regression; hand-computed
-  Δe exactness; Δd = angle_dist of the profile rows; composition errors
-  (k = 3, grouping x contrast); both engines agree on point estimates and
-  cover the construction truths.
-- 2026-07-16: T4+T5 done (one commit — engines were built in T2; these are
-  their boundary batteries): pole-straddling CI wraps (lci > uci), ±175°
-  contrast keeps sign/branch/coverage, flat occasion → NA d + warning with
-  healthy occasion untouched, k = 3 engine agreement — all parametrized
-  over both engines. No engine fixes needed. n_g ≫ k·p docs note pending
-  in T8 roxygen.
-- 2026-07-16: T6 done — coverage oracle green on all pre-registered gates
-  (coverage [.922,.974] every gated cell/engine; reversal observed:
-  Δd̂-var ratio 0.526 at Δd=30° vs 1.365 at 135°, theory 0.480/1.424;
-  Δe identity 1.03/1.04; k3 .946–.950). First full run caught an ORACLE
-  bug: within-sample re-pairing is mean-invariant, so the independence
-  baseline had paired estimator spread with independent CIs (base .99
-  over-, reversal .87 under-coverage) — rebuilt as fresh-person draws;
-  the reversal-expecting registered design flagged it (M23 lesson paid).
-  Results rds + analysis md committed; registered bands pinned by a
-  testthat that reads the rds.
-- 2026-07-16: T7 done — print/summary handle occasions (conditional
-  Occasions line, byte-identical otherwise; snapshots), ssm_table labels
-  occasion rows, plots accept occasions objects, ssm_ci_accuracy errors
-  informatively. Consumer sweep (M18 lesson) caught one real bug:
-  ssm_plot_curve dropped info columns positionally (-c(1:3)) and would
-  have leaked the Occasion column into the scale reshape — now name-based.
-  Tests/snapshots landed with T6's commit (file-level staging).
-- 2026-07-16: T8 done — roxygen Occasions section (conditional efficiency
-  statement, paired-interpretability sentence, n_g ≫ k·p MC note), NEWS
-  entry (incl. Occasion schema note), DESIGN.md occasions RNG row +
-  oracle-registry pointer line, CLAUDE.md occasion-order clause. AC7 grep:
-  every "narrower" is inside the conditional formulation. Full
-  `devtools::check()` on the final tree: 0 errors / 0 warnings / 0 notes;
-  suite 2346 pass. All tasks complete → status review.
+- 2026-07-16: created by /milestone-plan (D-013 Build A; candidate promoted). Gate: full k ≥ 2; builds precede M7.
+- 2026-07-16: T1 done — intake validation + stem matching + contrast rule; 12 tests; suite 2141. Implement gate skipped (spec pins all choices).
+- 2026-07-16: T2 done — occ_scores/ssm_analyze_occasions/labels + MC occ_k plumbing (validated T5); exact equivalence fixtures; suite 2164.
+- 2026-07-16: T3 done — list-order contrast locked (T10/T2 regression, hand-computed Δe, both engines cover construction truths).
+- 2026-07-16: T4+T5 done (one commit; engines built in T2) — boundary battery both engines: pole wrap, ±175° branch, flat occasion NA, k=3 agreement; no engine fixes.
+- 2026-07-16: T6 done — oracle green on all pre-registered gates (coverage [.922,.974]; reversal 0.526@30° vs 1.365@135°, theory 0.480/1.424). First run exposed an oracle bug (within-sample re-pairing is mean-invariant) → baseline rebuilt as fresh-person draws; rds + md committed, bands pinned by testthat.
+- 2026-07-16: T7 done — output surfaces; consumer sweep caught ssm_plot_curve positional info-column drop (Occasion leak) → name-based.
+- 2026-07-16: T8 done — roxygen/NEWS/DESIGN/CLAUDE docs; no unconditional claim (grep); check() 0 errors / 0 warnings / 0 notes; suite 2346 → review.
+- 2026-07-16: review — work-log compressed to one line each (cap remedy; verbose in git history). PR #49 (draft). Mid-session cairn plugin update added the `## changelog` profile slot; PROFILE.md backfilled from the shipped reference (NEWS.md).
+- 2026-07-16: review findings F1 (96, positional occasion-index fix + overlap guard + cbind regression test) and F2 (85, k x p Rd emph fix) applied on the branch; suite 2353, check clean re-run.
 
 ## Decisions
 
 ## Review
+
+### Acceptance-criteria evidence (fresh, by command, 2026-07-16)
+
+All commands run this session against the final branch tree (HEAD =
+`M25 T8`, identical package content to the checked tree).
+
+- **AC1** — `testthat::test_file("tests/testthat/test-ssm_occasions.R")`
+  (NOT_CRAN): 217 pass / 0 fail. Covers: mutual-exclusivity + both-absent
+  errors; measures×occasions error; non-list/short/unequal/partial-name/
+  duplicate-label shape errors; listwise=FALSE estimand error;
+  rotation error naming block T2; different-stem error; no-stem positional
+  message (fixtures both ways); listwise drop-count message ("2 person(s)…"
+  with drop-equivalence fixture). ✔
+- **AC2** — same run: k=3 profiles ordered occasion-minor, conditional
+  `Occasion` column, `details$occasions` metadata; per-occasion estimates
+  equal the single-`scales` runs exactly (1e-12) with and without grouping;
+  group-major/occasion-minor rows and Labels ("T1: F" …) asserted. ✔
+- **AC3** — same run: contrast = second-listed − first-listed via list
+  order; T10/T2 name-pair regression (alphabetical sorting would flip);
+  hand-computed Δe exact; Δd = angle_dist of profile rows; composition
+  errors (k=3+contrast "2 occasions"; grouping+contrast "single group");
+  both engines identical point estimates, CIs cover construction truths. ✔
+- **AC4** — full oracle run committed (`devel/m25-paired-coverage-results.rds`,
+  reps=500 boots=600, seeds level-indexed; analysis
+  `devel/m25-paired-coverage.md`): every gated cell/engine coverage in
+  [.922, .974] ⊂ [.91, .98]; small-n bootstrap [.922, .962] ⊂ [.89, .98]
+  (MC small-n measured: worst .928); reversal observed (Δd̂ paired/indep
+  var ratio 0.526 @30° / 1.365 @135°, theory 0.480/1.424; Δâ 0.440/1.294);
+  Δe exact identity 1.032/1.044; k=3 .946–.950; degenerate-dependence
+  (fresh-person) baseline covers nominally through the same code path.
+  Registered bands pinned by the rds-reading test (passes in the 217).
+  Closed-form textbook Δe interval agreement (0.15·SE at B=5000) and
+  boot-vs-MC endpoint tolerance (0.30·SE) tests pass. ≥2 oracle types per
+  result: coverage + closed-form + invariants. ✔
+- **AC5** — same run, parametrized over both engines: pole-straddling CI
+  wraps (lci > uci, est within 15° of pole); ±175° contrasts keep
+  sign/branch and cover truth (width < 90°); flat occasion → NA d/fit +
+  degeneracy warning, healthy occasion and linear contrast params intact;
+  k=3 engine agreement 1e-12. ✔
+- **AC6** — same run: print + summary snapshots (occasions details line;
+  Δ contrast block); `ssm_table()` rows T1/T2/"T2 - T1"; plot_circle/
+  curve accept occasions (curve data has 2 groups, no leaked Occasion/info
+  columns — the fixed positional-drop bug); plot_contrast plots occasion
+  contrast and refuses profiles-only with the occasions-aware message;
+  `ssm_ci_accuracy()` errors "occasion by occasion". ✔
+- **AC7** — grep: every "narrower" in R/, man/, NEWS.md sits inside the
+  conditional formulation (cos-dependence, reversal past 90°) — no
+  unconditional claim; selection-bias + paired-interpretability cautions in
+  roxygen (`@param listwise`, Occasions section); DESIGN.md has the
+  occasions RNG row + "Oracle records" pointer line; CLAUDE.md has the
+  occasion-order clause; NEWS entry present (6 occasions mentions).
+  `devtools::check(args = "--no-manual")`: **0 errors / 0 warnings /
+  0 notes** (4m54s). ✔
+
+### Independent review (three lenses + scorer, 2026-07-16)
+
+- **[O] diff-bug**: 2 findings. **F1 (scored 96, fixed)** — numeric occasion
+  indices were resolved to names and subset by name; with duplicated column
+  names (cbind-ed waves both keeping PA..NO) every block first-match
+  collapsed onto wave 1: a true Δe of 1 reported exactly 0 with the
+  positional-fallback message giving false reassurance. Fixed: blocks
+  resolve to positions (numeric stays positional; characters via match()
+  with unknown-name errors), an overlapping-columns error covers the
+  character variant, and the cbind regression test asserts the exact truth.
+  **F2 (scored 85, fixed)** — the roxygen `k*p` asterisk pair rendered as a
+  garbled `\emph{}` span in the Rd; reworded to "k x p", re-documented,
+  span verified gone.
+- **[S] blame-history**: zero findings (M12 label-builder branches verified
+  byte-identical; cat() separator artifact verified; occ_k additive; D-003/
+  M20 pole convention untouched).
+- **[S] prior-PR-comments**: no prior-PR evidence repo-wide (review runs
+  through cairn, not GitHub comments) — clean no-op, zero findings.
+- Sub-threshold findings logged: none (both findings scored ≥ 80 and were
+  fixed; nothing dropped).
+- Post-fix evidence: occasions file 224 pass; full suite 2353 pass;
+  `check()` re-run clean (0 errors / 0 warnings / 0 notes); CI 8/8 green
+  on the pre-fix head, re-verified after the fix push.
+
+### Consistency gate
+
+- `cairn_validate.py`: pass (exit 0) after the work-log cap remedy
+  (one-line compression; logged).
+- No DESIGN.md IP/GP changed → `cairn_impact` skipped (none exist yet).
+- Profile slot: `document()` no diff ✔; generated files untouched by hand ✔;
+  README.Rmd/md untouched by this milestone ✔; `pkgdown::check_pkgdown()`
+  "No problems found" ✔ (no new exports — occasions is an argument);
+  NEWS entry present ✔; no new top-level files needing .Rbuildignore
+  (devel/ already ignored) ✔; full `check()` clean (AC7) ✔.
