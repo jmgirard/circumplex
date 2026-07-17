@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M29: `ssm_ci_accuracy()` occasions extension
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M25
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m29-ci-accuracy-occasions
 
 ## Goal
 
@@ -106,6 +106,8 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
   from the "Longitudinal deferrals" ROADMAP candidate). Extends the M25
   occasions core's diagnostic; full §2.3 oracle battery set as the acceptance
   bar at the plan gate. Sibling M28 planned in the same run (§1.1 sugar).
+- 2026-07-17: /milestone-implement — status → in-progress; branch
+  m29-ci-accuracy-occasions cut from master (in sync with origin).
 
 ## Decisions
 
