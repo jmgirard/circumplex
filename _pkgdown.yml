@@ -40,6 +40,9 @@ reference:
   - ssm_plot_contrast
   - ssm_plot_curve
   - ssm_parameters
+  - ssm_parameters_id
+  - summary.circumplex_ssm_id
+  - ssm_draws
   - ssm_score
 - title: SEM-Based SSM Functions
   desc: Latent-variable (disattenuated) SSM via structural equation modeling
@@ -137,6 +140,8 @@ navbar:
       href: articles/evaluating-circumplex-structure.html
     - text: SEM-Based SSM Analysis
       href: articles/sem-based-ssm-analysis.html
+    - text: Bayesian SSM Analysis
+      href: articles/bayesian-ssm-analysis.html
   - text: News
     href: news/index.html
   right:

@@ -65,7 +65,9 @@ ssm_bootstrap <- function(bs_input, bs_function, scales, measures = NULL,
 # displacement in radians) and t is the replicate matrix with one row per
 # resample/draw and the same columns as t0.
 ssm_replicate_intervals <- function(t0, t, interval, contrast,
-                                    replicate_label) {
+                                    replicate_label, t0_warning = NULL,
+                                    interval_label = "confidence interval",
+                                    structural_na = character(0)) {
 
   # Extract point estimates from the observed parameter vector ----------------
   bs_est <- reshape_params(t0, suffix = "est")
@@ -82,22 +84,33 @@ ssm_replicate_intervals <- function(t0, t, interval, contrast,
   )
 
   # Degenerate profiles (flat or zero-amplitude) carry NA parameters -----------
-  if (any(is.na(bs_est$d_est))) {
-    warning(
+  # t0_warning lets a caller whose t0 is not an observed profile (the draws
+  # adapter, whose t0 is its own point summaries) supply honest wording; the
+  # default keeps the bootstrap/Monte Carlo message byte-identical.
+  if (is.null(t0_warning)) {
+    t0_warning <- paste0(
       "One or more observed profiles are flat or have zero amplitude; ",
-      "their displacement (and fit, if flat) is undefined and reported as NA.",
-      call. = FALSE
+      "their displacement (and fit, if flat) is undefined and reported as NA."
     )
   }
-  n_bad <- sum(!stats::complete.cases(bs_t))
+  if (any(is.na(bs_est$d_est))) {
+    warning(t0_warning, call. = FALSE)
+  }
+  # structural_na names parameters that are NA by construction for this
+  # caller (the draws adapter's shape A synthesizes fit = NA in every row);
+  # they are no evidence of a degenerate replicate, so they are excluded
+  # from the degeneracy count. interval_label keeps the wording honest for
+  # credible intervals; defaults keep existing callers byte-identical.
+  count_cols <- !(param_of_col %in% structural_na)
+  n_bad <- sum(!stats::complete.cases(bs_t[, count_cols, drop = FALSE]))
   if (n_bad > 0) {
     warning(
       n_bad, " of ", nrow(bs_t), " ", replicate_label, " produced degenerate ",
       "(flat or zero-amplitude) profiles; their undefined parameter(s) ",
       "(displacement, and fit if flat) were excluded from that parameter's ",
-      "confidence interval only, which is therefore conditional on ",
+      interval_label, " only, which is therefore conditional on ",
       "estimability. Their other, well-defined parameters still contribute ",
-      "to their confidence intervals.",
+      "to their ", interval_label, "s.",
       call. = FALSE
     )
   }
