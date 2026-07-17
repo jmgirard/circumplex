@@ -94,7 +94,7 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
 
 - [x] **T1** — `angle_unwrap()` + closed-form fixtures, tests first
       (`angle_dist()` at `R/utils.R:65-69` is the building block).
-- [ ] **T2** — Per-t certification caution mechanism (small helper applying
+- [x] **T2** — Per-t certification caution mechanism (small helper applying
       the D-007 rule to a(t) draw summaries) + tests that it flags a
       constructed uncertified t and stays silent on a certified one.
 - [ ] **T3** — Reference joint glmmTMB recipe + adapter pipeline as a dev
@@ -123,6 +123,10 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
 - 2026-07-16: T1 done — `angle_unwrap()` exported (degree-exact arithmetic,
   +180 half-turn convention, NA-propagation), 22 fixtures green; full suite
   2562 pass / 4 pre-existing warnings (test-ci_accuracy.R).
+- 2026-07-16: T2 done — `circumplex_ssm_draws` gains `details$certified`
+  (D-007 rule via `ssm_certified()`, single definition) + print/summary
+  caution note; 5 new tests (certified silent / uncertified flags /
+  zero-width fails closed / both shapes / flag≡rule); suite 2571 green.
 
 ## Decisions
 

@@ -63,7 +63,11 @@
 #'   SSM parameter draws, one row per posterior draw, columns e, x, y, a, d,
 #'   fit, displacement in degrees \[0, 360\], pole reported as
 #'   360), `results` (the point summaries
-#'   and credible bounds), and `details`. Printing shows the summary table;
+#'   and credible bounds), and `details`, whose `certified` field records the
+#'   package's displacement-interpretability certification applied to the
+#'   amplitude credible interval (`a_lci / (a_uci - a_lci) >= 0.35`): when it
+#'   fails, the displacement interval is not interpretable and printing adds
+#'   a note saying so. Printing shows the summary table;
 #'   `summary()` adds the analysis details.
 #' @family ssm functions
 #' @family analysis functions
@@ -245,7 +249,15 @@ ssm_draws <- function(draws, angles = NULL, interval = 0.95, type = NULL) {
       n_draws = nrow(draws_out),
       interval = interval,
       shape = shape,
-      angles = if (shape == "profiles") as_degree(angles) else NULL
+      angles = if (shape == "profiles") as_degree(angles) else NULL,
+      # D-007 displacement-interpretability certification applied to the
+      # credible interval: a pure function of the amplitude interval pair, so
+      # it gates posterior summaries exactly as it gates estimated profiles
+      # (ssm_certified() in R/ssm_oop.R is THE single definition; the print
+      # method recomputes from the same results columns). Stored for
+      # programmatic access -- e.g., flagging uncertified timepoints in a
+      # growth-trajectory table (see the growth vignette).
+      certified = unname(ssm_certified(results$a_lci, results$a_uci))
     ),
     call = match.call(),
     class = "circumplex_ssm_draws"
@@ -270,6 +282,17 @@ print.circumplex_ssm_draws <- function(x, digits = 3, ...) {
   colnames(m) <- c("Estimate", "Lower CrI", "Upper CrI")
   cat("\n# Posterior Summary:\n\n")
   print.default(m, print.gap = 3L, na.print = "")
+
+  # Interpretation guardrail: the D-007 certification rule applied to the
+  # credible interval (recomputed here from the results columns, exactly as
+  # print.circumplex_ssm does, so the note can never disagree with the rule)
+  if (!ssm_certified(dat$a_lci, dat$a_uci)) {
+    cat(
+      "  Note: the amplitude CrI lower bound is under 0.35 CrI-widths ",
+      "above zero; the displacement is not interpretable.\n",
+      sep = ""
+    )
+  }
   cat("\n")
   invisible(x)
 }

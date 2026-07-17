@@ -202,6 +202,64 @@ test_that("print and summary output for draws objects is stable", {
   expect_snapshot(summary(resb))
 })
 
+# M27 T2: per-draws D-007 certification caution ---------------------------------
+
+test_that("a certified draws object stores the flag and prints no caution", {
+  # Handcrafted amplitude draws in [0.5, 1.5]: a_lci ~ 0.525, width ~ 0.95,
+  # r = a_lci / (a_uci - a_lci) ~ 0.55 >= 0.35 -- certified under D-007
+  draws <- cbind(0, seq(0.5, 1.5, length.out = 200), 0)
+  res <- ssm_draws(draws, type = "parameters")
+  expect_true(res$details$certified)
+  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  expect_no_match(out, "not interpretable")
+})
+
+test_that("an uncertified draws object is flagged and prints the caution", {
+  # Amplitude CrI hugging zero: a_lci ~ 0.026, width ~ 0.95, r ~ 0.03 << 0.35
+  draws <- cbind(0, seq(0.001, 1, length.out = 200), 0)
+  res <- ssm_draws(draws, type = "parameters")
+  expect_false(res$details$certified)
+  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  expect_match(out, "not interpretable")
+  # summary() prints the same table, so it carries the caution too
+  outs <- paste(utils::capture.output(summary(res)), collapse = "\n")
+  expect_match(outs, "not interpretable")
+})
+
+test_that("a degenerate zero-width amplitude CrI fails certification closed", {
+  # All draws at exactly zero amplitude: a_lci = a_uci = 0, ratio NaN -> the
+  # is.finite() guard in ssm_certified() fails closed (D-007 edge contract)
+  draws <- rbind(c(1, 0, 0), c(2, 0, 0))
+  suppressWarnings(res <- ssm_draws(draws, type = "parameters"))
+  expect_false(res$details$certified)
+  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  expect_match(out, "not interpretable")
+})
+
+test_that("profile-shape draws objects carry the certification flag too", {
+  # The rule is a pure function of the amplitude interval, so both adapter
+  # shapes are gated identically
+  theta <- as.numeric(octants()) * pi / 180
+  pdraws <- rbind(
+    1 + 2 * cos(theta) + 2 * sin(theta),
+    2 - 1 * cos(theta),
+    1 + 1 * cos(theta) + 1 * sin(theta)
+  )
+  res <- ssm_draws(pdraws, angles = octants(), interval = 0.9)
+  expect_true(res$details$certified)
+})
+
+test_that("the draws caution and flag agree with ssm_certified by construction", {
+  # Single-definition rule (D-007): the stored flag must equal ssm_certified()
+  # applied to the object's own amplitude interval
+  draws <- cbind(0, seq(0.001, 1, length.out = 50), 0)
+  res <- ssm_draws(draws, type = "parameters")
+  expect_identical(
+    res$details$certified,
+    unname(ssm_certified(res$results$a_lci, res$results$a_uci))
+  )
+})
+
 # T5: adapter oracle suite (spec sec. 5.5) --------------------------------------
 
 test_that("feeding a run's bootstrap replicates reproduces its intervals exactly", {

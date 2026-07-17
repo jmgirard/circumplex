@@ -26,7 +26,11 @@ An object of class \code{"circumplex_ssm_draws"} holding \code{draws} (the
 SSM parameter draws, one row per posterior draw, columns e, x, y, a, d,
 fit, displacement in degrees [0, 360], pole reported as
 360), \code{results} (the point summaries
-and credible bounds), and \code{details}. Printing shows the summary table;
+and credible bounds), and \code{details}, whose \code{certified} field records the
+package's displacement-interpretability certification applied to the
+amplitude credible interval (\code{a_lci / (a_uci - a_lci) >= 0.35}): when it
+fails, the displacement interval is not interpretable and printing adds
+a note saying so. Printing shows the summary table;
 \code{summary()} adds the analysis details.
 }
 \description{
