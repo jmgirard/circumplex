@@ -2,6 +2,18 @@
 
 ## circumplex (development version)
 
+- New
+  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md)
+  provides a long-format (one row per person per occasion) interface to
+  the repeated-measures occasions analysis. It reshapes the data to the
+  wide layout
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  expects and delegates to it, so the estimation, paired within-person
+  contrasts, and listwise missing-wave handling are unchanged. Occasion
+  order is taken from the factor levels (or first appearance) of the
+  `occasion` column and is never sorted alphabetically, so a `T10`/`T2`
+  pair keeps its temporal order.
+
 - New growth-model support for repeated-measures SSM analysis. A new
   vignette (“Growth Models on SSM Parameters”) documents the recommended
   recipe for modeling change in SSM parameters over time: fit a *joint*

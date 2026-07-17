@@ -225,6 +225,8 @@ Functions for implementing the Structural Summary Method
 
 - [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
   : Perform analyses using the Structural Summary Method
+- [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md)
+  : Perform SSM analyses on long-format repeated-measures data
 - [`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md)
   : Create HTML table from SSM results or contrasts
 - [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
