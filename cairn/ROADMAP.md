@@ -14,7 +14,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M27 | Longitudinal Build C — growth-model support on displacement | done | M25, M26 | high | milestones/archive/M27-growth-model-support.md |
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27 | high | milestones/M7-v2-release-prep.md |
 | M28 | Occasions long-format sugar (`ssm_analyze_long()`) | done | M25 | normal | milestones/archive/M28-occasions-long-format-sugar.md |
-| M29 | `ssm_ci_accuracy()` occasions extension | blocked | M25 | normal | milestones/M29-ci-accuracy-occasions.md |
+| M29 | `ssm_ci_accuracy()` occasions extension | in-progress | M25 | normal | milestones/M29-ci-accuracy-occasions.md |
 | M24 | Tidyverse NSE in the user API — evaluation + standing decision | done | — | normal | milestones/archive/M24-nse-evaluation.md |
 
 ## Candidates

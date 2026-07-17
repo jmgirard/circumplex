@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M29: `ssm_ci_accuracy()` occasions extension
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M25
 - **Principles touched:** —
@@ -108,21 +108,37 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
   bar at the plan gate. Sibling M28 planned in the same run (§1.1 sugar).
 - 2026-07-17: /milestone-implement — status → in-progress; branch
   m29-ci-accuracy-occasions cut from master (in sync with origin).
-- 2026-07-17: question gate. Storage settled — store the stacked person-level
-  stats (per-group mean + k·p covariance) in the occasions object at analysis
-  time (parallel to the mean/corr suff_stats paths); exact field shape fixed at
-  T2 once the population structure is decided. Population structure (T1
-  ip-touching tripwire) ESCALATED to a fresh Fable RB per user decision — the
-  live question is observed-stacked-covariance vs CPM-diagonal-blocks +
-  observed cross-blocks, whose real tension is k·p covariance noise vs
-  circumplex-smoothing fidelity at the small-n (≈25–50) regime the diagnostic
-  most targets. Implement paused pending the RR.
-- 2026-07-17: blocked on RB07 (occasions plug-in population design;
-  cairn/reviews/RB07-occasions-ci-accuracy-population.md). 6 questions:
-  population structure (central), small-n rank-deficiency, ladder coherence,
-  contrast/certification stance, the AC3 independence-invariant construction,
-  and the degenerate-occasion boundary contract.
+- 2026-07-17: question gate. Storage settled (store stacked per-group stats at
+  analysis time). Population structure (T1 ip-touching tripwire) escalated to a
+  fresh Fable RB per user decision; implement paused pending the RR.
+- 2026-07-17: blocked on RB07 (occasions plug-in population design; 6 questions).
+- 2026-07-17: ingested RR07 (Fable) → M29-D1 + [[D-017]]; RB07/RR07 archived;
+  status → in-progress. No standing D-entry contradicted.
 
 ## Decisions
+
+### M29-D1 (2026-07-17): RR07 ingested — occasions population design settled
+
+The occasions plug-in population design (RB07 → RR07, Fable, 2026-07-17) is
+promoted to [[D-017]]. Triage: **apply** R1–R11 (construction (a); refuse
+explicit CPM on occasions; `occ_k`-tagged storage; rank-deficiency
+warn-not-refuse; ladder unchanged + asymmetric-regime doc; contrast unconditional
+`d`, occasion rows D-007 conditional, §2.2 caveat → joint-cert columns; AC3
+three-arm battery; AC4 flat refusal; ≥1 AC2 contrast cell; `(r−1) %/% k + 1`
+row↔group mapping at `run_one`/`row_n`/`sds`/`build_pop`; legacy
+`suff_stats = NULL` refused with a re-run message). **consider** R12 (`summary()`
+breadcrumb when the c=1 joint-cert rate ≪ 1−α — decide T2/T5). **reject** R13
+(occasions `data=` fallback — no such objects off the dev line), R14 (construction
+b, 98% non-PSD), R15 (shrinkage — attenuates the dependence under test), R16
+(pooling — replay is per-group).
+
+Two **plan-owned amendments** deferred to the `/milestone-implement` amendment
+gate at resume (not made here): **AC3** relabel "deterministic" → "invariant +
+closed-form" and add the dependent-vs-zeroed `Median_width` arm + closed-form Δe
+width target + a reversal-side Δd cell (coverage is provably blind to
+dependence-dropping — the adaptive procedures cover at nominal even from a
+wrongly-independent population; width carries the signal); **AC4** → informative
+flat-occasion refusal (extend `R/ssm_ci_accuracy.R:314-317` row-wise);
+pole-straddling + near-zero occasions run and are tested.
 
 ## Review

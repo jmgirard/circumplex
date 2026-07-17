@@ -412,3 +412,54 @@ chunks (standard for Suggests; chunks are `eval`-guarded on availability).
 The M27 coverage oracle simulates from and fits the glmmTMB family. A future
 engine swap is a docs-level change gated the same way.
 
+### D-017 (2026-07-17): the occasions `ssm_ci_accuracy()` plug-in population is the per-group observed stacked covariance — no CPM on the occasions path (M29)
+
+**Context:** M29 removes `ssm_ci_accuracy()`'s occasions error guard and builds
+an occasions-aware plug-in population. The construction was tagged `ip-touching`
+("its own design", spec §1.4) and escalated to independent Fable review
+(RB07 → RR07, 2026-07-17). Central risk: the classic diagnostic CPM-smooths a
+single p×p circumplex correlation, but the occasions object's stacked k·p matrix
+is not a single circumplex (only the k diagonal blocks are; the cross-occasion
+blocks are arbitrary), and the diagnostic is most needed at the small n where a
+raw k·p covariance is near-singular.
+**Decision:** For occasions objects the diagnostic simulates persons from
+`MVN(stacked occasion-profile means, per-group observed stacked k·p covariance)`
+via the shared `mvn_root()`, at every n, with **no CPM anywhere on the occasions
+path**. Fable-attested load-bearing findings: (1) everything the verdict is keyed
+to (per-occasion parameters, the paired contrast, both replayed procedures)
+depends on the k·p covariance only through a fixed 3k-dimensional harmonic
+projection `A Σ A'`, whose estimation error is `O(sqrt(2/(n−1)))` regardless of
+k·p (measured 28.7% at n=25) — so the "near-singular 16×16" objection targets the
+wrong object; only the fit statistic escapes the projection. (2) Construction (b)
+(CPM-diagonal + observed cross) is affirmatively broken: at n=25, ρ=0.6 the
+reassembled matrix was non-PSD in 98% of replicates, median PSD-repair 0.020
+(> the 0.01 realism bar), and the repair perturbs the cross-blocks under test
+while destroying the CPM diagonals — an unvalidated hybrid; no coherent joint
+Browne family exists (cross-occasion blocks are lagged auto-correlations the
+single-circumplex family does not model). Shrinkage (c) attenuates the
+cross-dependence toward independence (the very failure M29 guards) and is
+unnecessary by (1). Both rejected. (3) Per-group `Σ̂_g`, not pooled: the diagnostic
+replays the per-group MC engine; pooling had a Z&W/CPM-fidelity rationale that
+does not transfer, and the projection argument removes the df motivation.
+**Storage** (store-at-analysis-time was settled at the M29 gate; this fixes the
+shape): the occasions object stores, per group, `n_g` + the stacked k·p mean +
+the stacked k·p covariance (+ `occ_k`, occasion labels, stacked column names),
+shape-tagged with `occ_k` so classic-path p×p consumers refuse it rather than
+silently pool a k·p matrix. Not the raw person matrix (sufficiency); not a
+correlation+SD decomposition (that existed only to interpose CPM). Rank
+deficiency (`n_g ≤ k·p`) warns, never refuses (a singular Σ is a proper degenerate
+MVN whose projected dependence rides through exactly); the fit-statistic caveat
+is documented. An explicit `structure = "cpm"` or `cpm =` on an occasions object
+is refused informatively (refuse-don't-coerce, M18 lesson); the default call runs
+and records `details$structure = "observed"`.
+**Consequences:** exported behavior change — `ssm_ci_accuracy()` errors → runs on
+occasions objects (NEWS-documented at v2.0.0/M7). Assessing occasion-by-occasion
+via `scales=` uses the CPM default and can give slightly different per-occasion
+verdicts than the joint occasions run — a documented structure-sensitivity fact,
+not a bug. The M29 acceptance bar is amended (see the M29 file): AC3 gains a
+width-based discrimination arm + closed-form Δe width target (coverage alone is
+provably blind to dependence-dropping — the discriminating observable is interval
+width), and AC4's flat-occasion contract becomes informative refusal (not
+"non-erroring"). D-013 reinforced (per-group stacked object; listwise-only), none
+superseded. Source: RR07 (Fable, 2026-07-17); M29.
+
