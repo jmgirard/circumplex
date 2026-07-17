@@ -35,6 +35,7 @@ reference:
   desc: Functions for implementing the Structural Summary Method
   contents:
   - ssm_analyze
+  - ssm_analyze_long
   - ssm_table
   - ssm_plot_circle
   - ssm_plot_contrast
