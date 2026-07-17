@@ -126,42 +126,14 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
 
 ## Work log
 
-- 2026-07-16: created by /milestone-plan (Build B of the D-013 contract;
-  promoted from the "Longitudinal SSM build family" candidate row). brms
-  `Suggests` pre-cleared at the plan gate (D-entry lands with T6).
-- 2026-07-16: implementation started; branch cut; pre-implementation gate
-  resolved the wrapper name, summary home, and draws return class (see
-  Decisions).
-- 2026-07-16: T1 done — `ssm_parameters_id()` exported (tests first;
-  closed-form fixtures for first-harmonic/flat/second-harmonic persons,
-  id aggregation, na_rate column, NA-id error, 0-row edge); full suite green.
-- 2026-07-16: T2 done — `summary.circumplex_ssm_id()` (circular mean +
-  resultant length, NA-d strip with n_na_d count) + the §3.3 invariant suite
-  (linearity, Jensen, identical-profiles, hand-recomputed circular mean,
-  differ-fixture anti-confusion regression).
-- 2026-07-16: T3+T4 done — `ssm_draws()` with the §5.1 dispatch contract
-  (every branch tested first), summaries via `ssm_replicate_intervals()`;
-  that internal gained honest-wording args (t0_warning, interval_label,
-  structural_na — byte-identical defaults) so posterior output never says
-  "bootstrap resamples"/"confidence interval" and shape A's synthesized NA
-  fit is not miscounted as degenerate; print/summary snapshots.
-- 2026-07-16: T5 done — oracle suite: run's bootstrap replicates reproduce
-  intervals bit-exactly (boot reconstruction, same seed); shape B ≡ shape A
-  on per-row (e,x,y); pole-straddle wrap fixture (340.75/19.25, hand type-7
-  arithmetic); all-flat all-NA contract; exact-pole 360. Found + fixed:
-  R's `%%` second-reduces a tiny-negative atan2 to 0 where the kernel's
-  modu() gives 2π — adapter + id-summary now use the single-correction wrap
-  (modu parity at the pole, regression-tested).
-- 2026-07-16: minor amendment — vignette filename follows the repo's
-  kebab-case convention (`bayesian-ssm-analysis.Rmd`); AC6/Scope wording
-  updated (spec's `bayesian_ssm.Rmd` was a working name).
-- 2026-07-16: T6 done — precomputed vignette (only the `brm()` chunk frozen;
-  everything else live incl. the known-direction atan2 pin as executable
-  `stopifnot()` and the Rayleigh prior-predictive exhibit); fixture
-  `vignettes/bayesian_ssm_draws.rds` from seeded generator
-  `data-raw/bayesian_ssm_draws.R` (4000 draws, provenance attribute);
-  brms → Suggests (D-015); pkgdown navbar entry; render verified against
-  the dev namespace.
+- 2026-07-16: created by /milestone-plan (Build B of the D-013 contract; promoted from the "Longitudinal SSM build family" candidate row); brms `Suggests` pre-cleared at the plan gate (D-entry lands with T6).
+- 2026-07-16: implementation started; branch cut; pre-implementation gate resolved the wrapper name, summary home, and draws return class (see Decisions).
+- 2026-07-16: T1 done — `ssm_parameters_id()` tests-first (closed-form fixtures incl. flat + pure-second-harmonic, id aggregation, na_rate column, NA-id error, 0-row edge); full suite green.
+- 2026-07-16: T2 done — `summary.circumplex_ssm_id()` (circular mean + resultant length, NA-d strip with count) + the §3.3 invariant suite (linearity, Jensen, identical-profiles, hand-recomputed circular mean, differ-fixture).
+- 2026-07-16: T3+T4 done — `ssm_draws()` with the §5.1 dispatch contract (every branch tested first); `ssm_replicate_intervals()` gained honest-wording args (t0_warning, interval_label, structural_na; byte-identical defaults); print/summary snapshots.
+- 2026-07-16: T5 done — oracle suite: run's bootstrap replicates reproduce intervals bit-exactly; shape B ≡ shape A; pole-straddle wrap fixture (hand type-7 arithmetic); all-flat all-NA contract; exact-pole 360; found+fixed R `%%` vs kernel modu() tiny-negative pole disparity (single-correction wrap, regression-tested).
+- 2026-07-16: minor amendment — vignette filename follows repo kebab-case (`bayesian-ssm-analysis.Rmd`; spec's `bayesian_ssm.Rmd` was a working name); AC6/Scope wording updated.
+- 2026-07-16: T6 done — precomputed vignette (only the `brm()` chunk frozen; executable atan2 known-direction pin + Rayleigh prior-predictive exhibit live); seeded fixture `vignettes/bayesian_ssm_draws.rds` + generator `data-raw/bayesian_ssm_draws.R`; brms → Suggests (D-015); pkgdown navbar; dev-namespace render verified.
 
 ## Decisions
 

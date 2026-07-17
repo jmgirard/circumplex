@@ -42,6 +42,16 @@ ssm_analyze()          ->    ssm_analyze_means()       ->    mean_scores()
 
 ssm_parameters() / ssm_score()  ->  group_parameters() -> ssm_parameters_cpp()  [descriptive,
                                                             no resampling; deterministic]
+ssm_parameters_id()  ->  group_parameters()  [per-person layer: within-person means
+      |                                        by id, then per-person transform;
+      v                                        deterministic; NA semantics + na_rate]
+summary.circumplex_ssm_id()  [circular mean + resultant length of d_i, NA-d strip]
+ssm_draws()  ->  [shape A: (e,x,y) per-draw transform (modu-parity wrap);
+      |           shape B: group_parameters() per draw]
+      v
+ssm_replicate_intervals()  [same interval machinery; replicate_label
+                            "posterior draws", credible-interval wording,
+                            t0 = the adapter's own point summaries]
 score(), ipsatize(), norm_standardize(), self_standardize()  [tidying, pre-analysis]
 ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]
 ```
@@ -57,6 +67,13 @@ ssm_table(), ssm_plot_circle(), ssm_plot_curve(), ssm_plot_contrast()  [output]
 - `circumplex_ssm` — list: `results` (data frame, one row per profile plus
   optional contrast row last), `scores`, `details` (boots, interval, listwise,
   angles, contrast, score_type), `call`.
+- `circumplex_ssm_id` — a lightly classed data frame (per-person parameter
+  table from `ssm_parameters_id()`); the class exists only to carry the
+  circular-statistics `summary()` method, so data-frame semantics survive.
+- `circumplex_ssm_draws` — standalone list (draws, results, details, call)
+  from `ssm_draws()`; deliberately NOT a `circumplex_ssm` subclass so no
+  inherited method can mislabel posterior draws as bootstrap output
+  (M26 gate decision; subclassing later would be additive, not breaking).
 - `circumplex_instrument` — list: Scales, Anchors, Items, Norms, Details.
   Instrument data objects live in data/ and are built from data-raw/.
 
@@ -210,8 +227,10 @@ tie-breaking — must be deterministic and leave `.Random.seed` untouched.
 point that consumes the RNG stream," which froze the then-true inventory
 instead of stating the rule that produced it.)
 
-RNG-consuming entry points, now six (`ssm_score()`, `ssm_parameters()`, and
-the tidying functions are deterministic): `ssm_analyze()`,
+RNG-consuming entry points, now six (`ssm_score()`, `ssm_parameters()`,
+`ssm_parameters_id()`, `ssm_draws()` (deterministic transform of draws the
+*user* supplies), and the tidying functions are deterministic):
+`ssm_analyze()`,
 `cpm_fit(ci_method = "bootstrap")`, `cpm_simulate()`,
 `ssm_ci_accuracy()` (the latter three landed in M4 — see
 devel/m4-browne-design.md §3.5/§8 and devel/m4-ci-accuracy-spec.md §3), and
