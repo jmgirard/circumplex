@@ -240,3 +240,113 @@ test_that("listwise deletion across waves is messaged with the count", {
   )
   expect_equal(res$results$e_est, ref$results$e_est, tolerance = 1e-12)
 })
+
+# Paired occasion contrasts (spec sec. 1.2/2.1) --------------------------------
+
+# Wide data with known within-person change: occasion 1 is a cosine profile
+# peaked at d1 with elevation e1; occasion 2 is peaked at d2 = d1 + dd with
+# elevation e1 + de. Shared person effect induces within-person dependence.
+make_contrast_data <- function(n = 200, d1 = 90, dd = 45, e1 = 2, de = 0.5,
+                               amp = 1.5, seed = 42) {
+  set.seed(seed)
+  scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  ang <- octants() * pi / 180
+  person <- rnorm(n, 0, 0.3)
+  block <- function(d, e) {
+    profile <- e + amp * cos(ang - d * pi / 180)
+    t(vapply(seq_len(n), function(i) {
+      profile + person[i] + rnorm(8, 0, 0.2)
+    }, numeric(8)))
+  }
+  b1 <- block(d1, e1)
+  b2 <- block(d1 + dd, e1 + de)
+  colnames(b1) <- paste0(scales, "_1")
+  colnames(b2) <- paste0(scales, "_2")
+  cbind(as.data.frame(b1), as.data.frame(b2))
+}
+
+test_that("occasion contrast is second listed minus first listed", {
+  data <- make_contrast_data(de = 0.5, dd = 45)
+  set.seed(3)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 100
+  )
+  expect_equal(nrow(res$results), 3)
+  expect_equal(res$results$Occasion[[3]], "T2 - T1")
+  expect_equal(res$results$Label[[3]], "T2 - T1")
+  # elevation contrast equals the hand-computed occasion-2-minus-occasion-1
+  # grand mean difference exactly (linear statistic, complete data)
+  exp_de <- mean(as.matrix(data[occ_names(2)])) -
+    mean(as.matrix(data[occ_names(1)]))
+  expect_equal(res$results$e_est[[3]], exp_de, tolerance = 1e-12)
+  expect_gt(res$results$e_est[[3]], 0) # sign: T2 is higher by construction
+  # displacement contrast is the signed angular distance d2 - d1 (~ +45)
+  expect_equal(res$results$d_est[[3]], 45, tolerance = 5)
+  # and matches angle_dist of the two profile rows exactly
+  exp_dd <- ((res$results$d_est[[2]] - res$results$d_est[[1]] + 180) %%
+               360) - 180
+  expect_equal(res$results$d_est[[3]], exp_dd, tolerance = 1e-9)
+})
+
+test_that("contrast order is list order, never alphabetical (T10 vs T2)", {
+  data <- make_contrast_data(de = 0.5)
+  names(data) <- c(paste0(occ_names(""), "T2"), paste0(occ_names(""), "T10"))
+  # supplied order: T2 first, T10 second; alphabetical sorting would put
+  # "T10" before "T2" and silently flip the contrast sign
+  set.seed(3)
+  res <- ssm_analyze(data,
+    occasions = list(
+      T2 = paste0(occ_names(""), "T2"),
+      T10 = paste0(occ_names(""), "T10")
+    ),
+    contrast = TRUE, boots = 10
+  )
+  expect_equal(res$results$Occasion, c("T2", "T10", "T10 - T2"))
+  # T10 (the later-listed occasion) has the higher elevation by construction
+  expect_gt(res$results$e_est[[3]], 0)
+})
+
+test_that("contrast composition rules for occasions are enforced", {
+  data3 <- make_occ_data(k = 3)
+  expect_error(
+    ssm_analyze(data3,
+      occasions = list(T1 = occ_names(1), T2 = occ_names(2),
+                       T3 = occ_names(3)),
+      contrast = TRUE
+    ),
+    "2 occasions"
+  )
+  data2 <- make_occ_data()
+  expect_error(
+    ssm_analyze(data2,
+      occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+      grouping = "Gender", contrast = TRUE
+    ),
+    "single group"
+  )
+})
+
+test_that("occasion contrast runs through both engines consistently", {
+  data <- make_contrast_data(n = 300)
+  set.seed(4)
+  res_bs <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 200
+  )
+  set.seed(4)
+  res_mc <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 200, method = "montecarlo"
+  )
+  # identical point estimates (same closed-form transform of the same means)
+  expect_equal(res_bs$results$d_est, res_mc$results$d_est, tolerance = 1e-12)
+  expect_equal(res_bs$results$e_est, res_mc$results$e_est, tolerance = 1e-12)
+  # both engines' contrast CIs cover the construction truths (de = 0.5,
+  # dd = 45) and agree on sign
+  for (res in list(res_bs, res_mc)) {
+    expect_lt(res$results$e_lci[[3]], 0.5 + 0.2)
+    expect_gt(res$results$e_uci[[3]], 0.5 - 0.2)
+    expect_true(res$results$d_lci[[3]] < 45 && res$results$d_uci[[3]] > 45)
+  }
+})

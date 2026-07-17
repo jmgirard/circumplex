@@ -117,7 +117,7 @@ output-surface complete, per the binding D-013 spec
       `build_result_labels()` occasion dimension (`R/ssm_analysis.R:301`),
       occasion-major order, conditional `Occasion` column, `details`
       metadata; exact single-`scales` equivalence fixture.
-- [ ] **T3** — Contrast rule extension + list-order convention (T10/T2
+- [x] **T3** — Contrast rule extension + list-order convention (T10/T2
       regression; `ssm_by_group()` slice `R/ssm_bootstrap.R:162` reached
       only in the 2-occasion/1-group cell).
 - [ ] **T4** — Bootstrap engine path (existing row resampler; `param_diff`
@@ -154,6 +154,11 @@ output-surface complete, per the binding D-013 spec
   fixtures (k = 3, and per-cell under grouping); drop-count message +
   no-stem positional message tests. Includes the MC `occ_k` plumbing
   (stacked-draw split), engine-validated at T5. Suite green (2164).
+- 2026-07-16: T3 done — contrast conventions locked: second-listed minus
+  first-listed with the T10/T2 alphabetical-flip regression; hand-computed
+  Δe exactness; Δd = angle_dist of the profile rows; composition errors
+  (k = 3, grouping x contrast); both engines agree on point estimates and
+  cover the construction truths.
 
 ## Decisions
 
