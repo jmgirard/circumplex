@@ -100,7 +100,7 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
 - [x] **T3** — Reference joint glmmTMB recipe + adapter pipeline as a dev
       script; record the engine-swap gated amendment (work-log line per
       D-013 re-trigger) and the glmmTMB `Suggests` D-entry.
-- [ ] **T4** — Coverage oracle: seeded script (smoke-first, level-indexed
+- [x] **T4** — Coverage oracle: seeded script (smoke-first, level-indexed
       seeds, pre-registered band/tolerances), three cells + both invariants,
       committed `devel/m27-*` rds + analysis; deterministic pieces into
       testthat.
@@ -132,6 +132,16 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
   tracks truth; all waves certified). **Gated spec amendment** (D-013
   re-trigger): spec §4.1/§4.2 reference engine nlme → glmmTMB, joint-fitting
   holding untouched; glmmTMB → Suggests; D-016 recorded.
+- 2026-07-17: T4 done — coverage oracle green on all 5 pre-registered gates
+  (`devel/m27-coverage-oracle.{R,md}` + results rds): pole .948–.962;
+  lowamp caution fires .98 at the degraded wave (its coverage .854,
+  reported); xycor joint .932–.944 vs univariate-shortcut .856 (fails, as
+  designed); unwrap agreement ≤0.34° mean; two-occasion vs M25 paired
+  0.021° mean diff. **Run-1 miss recorded**: first full run had lowamp
+  truth a(2)=0.02 (~0.9 SE, rule's power-onset region) → cert rate .058 >
+  .05 gate; cell truth moved to 0.01 (the named a→0 regime), gates
+  unchanged, re-run green. Deterministic miniatures →
+  `test-growth_invariants.R` (5 tests); suite 2576 green.
 
 ## Decisions
 
