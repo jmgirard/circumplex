@@ -1,6 +1,6 @@
 # M26: Longitudinal Build B — per-person layer + draws adapter + Bayesian vignette
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —

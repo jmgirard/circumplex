@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M25 | Longitudinal Build A — occasions API + paired contrasts | done | — | high | milestones/archive/M25-occasions-core.md |
-| M26 | Longitudinal Build B — per-person layer + draws adapter + Bayesian vignette | planned | — | high | milestones/M26-perperson-draws-adapter.md |
+| M26 | Longitudinal Build B — per-person layer + draws adapter + Bayesian vignette | in-progress | — | high | milestones/M26-perperson-draws-adapter.md |
 | M27 | Longitudinal Build C — growth-model support on displacement | planned | M25, M26 | high | milestones/M27-growth-model-support.md |
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27 | high | milestones/M7-v2-release-prep.md |
 | M24 | Tidyverse NSE in the user API — evaluation + standing decision | done | — | normal | milestones/archive/M24-nse-evaluation.md |
