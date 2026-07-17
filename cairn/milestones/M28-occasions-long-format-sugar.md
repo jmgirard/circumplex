@@ -7,7 +7,7 @@
 - **Priority:** normal
 - **Depends on:** M25
 - **Principles touched:** —
-- **Branch/PR:** m28-occasions-long-format-sugar
+- **Branch/PR:** m28-occasions-long-format-sugar · https://github.com/jmgirard/circumplex/pull/52
 
 ## Goal
 
