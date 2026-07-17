@@ -109,12 +109,12 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
 - [x] **T2** — Summary layer: circular stats, NA stripping + counts, the
       §3.3 invariant suite (linearity, Jensen, hand-recomputed circular
       mean, differ-fixture).
-- [ ] **T3** — `ssm_draws()` core: shape A/B transforms + dispatch rules,
+- [x] **T3** — `ssm_draws()` core: shape A/B transforms + dispatch rules,
       tests first for every dispatch branch.
-- [ ] **T4** — Adapter summary path through `ssm_replicate_intervals()`
+- [x] **T4** — Adapter summary path through `ssm_replicate_intervals()`
       (`R/ssm_bootstrap.R:136-144`) with the managed leaks; print/summary
       snapshots.
-- [ ] **T5** — Adapter oracle suite: bootstrap-replicate exact reproduction,
+- [x] **T5** — Adapter oracle suite: bootstrap-replicate exact reproduction,
       shape A/B consistency, 4-row fixtures, boundary regressions
       (pole-straddle wrap, all-flat, pole = 360).
 - [ ] **T6** — `bayesian_ssm.Rmd` precomputed + brms `Suggests` + D-entry
@@ -137,6 +137,19 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
   resultant length, NA-d strip with n_na_d count) + the §3.3 invariant suite
   (linearity, Jensen, identical-profiles, hand-recomputed circular mean,
   differ-fixture anti-confusion regression).
+- 2026-07-16: T3+T4 done — `ssm_draws()` with the §5.1 dispatch contract
+  (every branch tested first), summaries via `ssm_replicate_intervals()`;
+  that internal gained honest-wording args (t0_warning, interval_label,
+  structural_na — byte-identical defaults) so posterior output never says
+  "bootstrap resamples"/"confidence interval" and shape A's synthesized NA
+  fit is not miscounted as degenerate; print/summary snapshots.
+- 2026-07-16: T5 done — oracle suite: run's bootstrap replicates reproduce
+  intervals bit-exactly (boot reconstruction, same seed); shape B ≡ shape A
+  on per-row (e,x,y); pole-straddle wrap fixture (340.75/19.25, hand type-7
+  arithmetic); all-flat all-NA contract; exact-pole 360. Found + fixed:
+  R's `%%` second-reduces a tiny-negative atan2 to 0 where the kernel's
+  modu() gives 2π — adapter + id-summary now use the single-correction wrap
+  (modu parity at the pole, regression-tested).
 
 ## Decisions
 

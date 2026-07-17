@@ -187,9 +187,11 @@ summary.circumplex_ssm_id <- function(object, ...) {
 
   # Circular aggregation of displacement: strip undefined d_i first (count
   # reported as n_na_d; angle_mean() in src/circular.cpp has no na.rm), then
-  # take the circular mean and the mean resultant length. The %% (2 * pi)
-  # wrap shares R's fmod-at-the-edge semantics with the estimate path's
-  # modu(), so an exact-pole circular mean reports 360 (D-003 convention).
+  # take the circular mean and the mean resultant length. The wrap adds
+  # 2*pi to a negative circular mean (exactly the estimate path's modu()
+  # over atan2's range, where R's %% would second-reduce a tiny-negative
+  # mean to 0), and the quantile method's pole window maps both float
+  # representations of the 0/360 pole to 360 (D-003/M20 convention).
   d_rad <- object$Disp * (pi / 180)
   n_na_d <- sum(is.na(d_rad))
   d_ok <- d_rad[!is.na(d_rad)]
@@ -197,7 +199,14 @@ summary.circumplex_ssm_id <- function(object, ...) {
     d_mean <- NA_real_
     d_res <- NA_real_
   } else {
-    d_mean <- as.numeric(angle_mean(d_ok)) %% (2 * pi) * (180 / pi)
+    d_mean <- as.numeric(angle_mean(d_ok))
+    if (!is.na(d_mean)) {
+      if (d_mean < 0) d_mean <- d_mean + 2 * pi
+      pole <- d_mean < (16 * .Machine$double.eps) |
+        (2 * pi - d_mean) < (16 * .Machine$double.eps)
+      if (pole) d_mean <- 2 * pi
+    }
+    d_mean <- d_mean * (180 / pi)
     d_res <- sqrt(mean(cos(d_ok))^2 + mean(sin(d_ok))^2)
   }
 
