@@ -69,20 +69,22 @@ within-person contrasts, and the listwise-only handling of missing waves
 (a person missing any occasion is dropped from all occasions).
 }
 \examples{
-# Reshape the built-in wide example to long, then analyze it directly.
-data("aw2009")
-wide <- aw2009
-wide$id <- seq_len(nrow(wide))
-long <- stats::reshape(
-  wide,
-  direction = "long",
-  varying = list(names(aw2009)),
-  v.names = "score",
-  times = names(aw2009),
-  timevar = "scale",
-  idvar = "id"
-)
-# (In practice `data` already stores repeated occasions in long form.)
+# Build a small two-occasion dataset in long format (one row per person per
+# occasion). In practice `data` already stores the repeated occasions this
+# way; here we stack two copies of jz2017 as an illustration.
+data("jz2017")
+scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+t1 <- jz2017[, scales]
+t1$id <- seq_len(nrow(t1))
+t1$occasion <- "T1"
+t2 <- t1
+t2$occasion <- "T2"
+long <- rbind(t1, t2)
+
+\donttest{
+# Per-occasion SSM profiles from long-format data
+ssm_analyze_long(long, scales = scales, id = "id", occasion = "occasion")
+}
 }
 \seealso{
 \code{\link[=ssm_analyze]{ssm_analyze()}} for the wide-format interface and the analysis

@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M28: Occasions long-format sugar (`ssm_analyze_long()`)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M25
 - **Principles touched:** —
@@ -76,8 +76,8 @@ id/occasion long data to wide and delegates to the validated
       numeric-index), the `T10`/`T2` ordering regression, factor-level order,
       and the validation errors (duplicate wave, < 2 occasions, time-varying
       grouping, unknown column, NA-row drop).
-- [ ] **T3** — NEWS.md entry; `devtools::document()`; `@export`; add to
-      `_pkgdown.yml` reference index if maintained; `devtools::check()` clean.
+- [x] **T3** — NEWS.md entry; `devtools::document()`; `@export`; added to
+      `_pkgdown.yml` reference index; `devtools::check()` clean.
 
 ## Work log
 
@@ -100,6 +100,13 @@ id/occasion long data to wide and delegates to the validated
   `test-ssm_analyze_long.R` green; full `devtools::test()` clean (0 failed / 0
   errors; the 4 CPM-Hessian warnings are pre-existing in `test-ci_accuracy.R`,
   untouched here).
+- 2026-07-17: T3 done → status review. NEWS entry added; `@export` +
+  `_pkgdown.yml` reference; roxygen `@family` back-links regenerated across
+  siblings. `devtools::check(--no-manual)` clean: 0 errors / 0 warnings / 0
+  notes. (The doc example was then corrected to a real two-occasion long
+  fixture in a `\donttest` block — example-only, not run in a default check;
+  runnable data-construction verified.) All acceptance criteria met; ready for
+  /milestone-review.
 
 ## Decisions
 
