@@ -4,7 +4,7 @@
 - **Priority:** high
 - **Depends on:** M25, M26
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m27-growth-model-support`
 
 ## Goal
 
@@ -92,7 +92,7 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
 
 ## Tasks
 
-- [ ] **T1** — `angle_unwrap()` + closed-form fixtures, tests first
+- [x] **T1** — `angle_unwrap()` + closed-form fixtures, tests first
       (`angle_dist()` at `R/utils.R:65-69` is the building block).
 - [ ] **T2** — Per-t certification caution mechanism (small helper applying
       the D-007 rule to a(t) draw summaries) + tests that it flags a
@@ -115,6 +115,14 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
   needs the paired machinery — a plan-level refinement of spec §7's
   "depends on B"). Engine choice glmmTMB-over-nlme made at the plan gate
   (Jeff); recorded as a gated spec amendment + D-entry at T3.
+- 2026-07-16: implement gate (Jeff): per-t caution surfaces as a
+  print/summary note + stored flag on `circumplex_ssm_draws` (D-007 rule);
+  growth vignette uses live conditional glmmTMB chunks; vignette named
+  `growth-ssm-analysis`. Branch cut; spec's DESIGN oracle-registry gap
+  already closed at M25.
+- 2026-07-16: T1 done — `angle_unwrap()` exported (degree-exact arithmetic,
+  +180 half-turn convention, NA-propagation), 22 fixtures green; full suite
+  2562 pass / 4 pre-existing warnings (test-ci_accuracy.R).
 
 ## Decisions
 

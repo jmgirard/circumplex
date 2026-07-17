@@ -78,6 +78,7 @@ reference:
 - title: Convenience Functions
   desc: Functions that make your life easier
   contents:
+  - angle_unwrap
   - octants
   - poles
   - quadrants
