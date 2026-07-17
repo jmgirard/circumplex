@@ -1,6 +1,6 @@
 # M27: Longitudinal Build C — growth-model support on displacement
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M25, M26
 - **Principles touched:** —
@@ -104,7 +104,7 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
       seeds, pre-registered band/tolerances), three cells + both invariants,
       committed `devel/m27-*` rds + analysis; deterministic pieces into
       testthat.
-- [ ] **T5** — Growth vignette (precomputed or conditional chunks per the
+- [x] **T5** — Growth vignette (precomputed or conditional chunks per the
       r-package profile) + docs + NEWS; full `devtools::check()`.
 
 ## Work log
@@ -142,6 +142,13 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
   .05 gate; cell truth moved to 0.01 (the named a→0 regime), gates
   unchanged, re-run green. Deterministic miniatures →
   `test-growth_invariants.R` (5 tests); suite 2576 green.
+- 2026-07-17: T5 done — `vignettes/growth-ssm-analysis.Rmd` (live
+  conditional glmmTMB chunks; joint recipe only; per-t certification demo
+  fires on the worked origin-proximal example; REML caution + KR/t-scale
+  remedy; unwrap failure modes; both Brief E caveats; nlme one-liner;
+  bpnreg upgrade); NEWS (3 entries) + pkgdown nav/reference rows;
+  `pkgdown::check_pkgdown()` clean; `devtools::check()` 0/0/0. Status →
+  review.
 
 ## Decisions
 

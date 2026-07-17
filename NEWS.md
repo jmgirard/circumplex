@@ -1,5 +1,31 @@
 # circumplex (development version)
 
+* New growth-model support for repeated-measures SSM analysis. A new
+  vignette ("Growth Models on SSM Parameters") documents the recommended
+  recipe for modeling change in SSM parameters over time: fit a *joint*
+  mixed model to the per-person Cartesian coordinates from
+  `ssm_parameters_id()` (the reference recipe uses glmmTMB, now in
+  Suggests; fitting the coordinates with separate univariate models
+  silently zeroes their cross-covariance and produces wrong displacement
+  intervals), then convert fixed-effect draws to amplitude/displacement
+  trajectories with `ssm_draws()`. The recipe was validated by simulation:
+  pointwise displacement coverage is nominal in a pole-crossing design,
+  and the univariate shortcut demonstrably fails coverage under correlated
+  person effects.
+
+* New `angle_unwrap()` helper unwraps a temporally ordered sequence of
+  angles onto a continuous branch (350, 10, 30 becomes 350, 370, 390),
+  supporting the vignette's alternative unwrap-then-model recipe. Inputs
+  are wrapped to [0, 360) first; an exact 180-degree step ascends (the
+  package's half-turn convention); `NA` makes later waves branch-ambiguous
+  and so propagates onward.
+
+* `ssm_draws()` objects now apply the package's displacement-certification
+  rule to the amplitude credible interval: when the interval's lower bound
+  sits under 0.35 interval-widths above zero, printing notes that the
+  displacement is not interpretable, and the verdict is stored in
+  `$details$certified` (used per-timepoint by the growth vignette).
+
 * New per-person (intraindividual) SSM scoring: `ssm_parameters_id()` scores
   each person's own circumplex profile through the closed-form SSM transform
   and returns a per-person parameter table -- one row per person, with an
