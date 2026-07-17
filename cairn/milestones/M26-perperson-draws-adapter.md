@@ -37,7 +37,8 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
   the 6-column `ssm_param_names()` layout with `fit = NA`); point summaries
   = medians + circular mean for d, coherence caveat documented.
 - Oracles per spec §3.3 + §5.5 (detailed in the ACs).
-- `bayesian_ssm.Rmd`: precomputed (brms never runs on CRAN builders); brms →
+- `bayesian-ssm-analysis.Rmd` (spec working name `bayesian_ssm.Rmd`):
+  precomputed (brms never runs on CRAN builders); brms →
   `Suggests` (pre-cleared at the 2026-07-16 plan gate; **D-entry recorded in
   this milestone**); the devel sketch treated as untrusted (its line-43
   derivation comment has swapped atan2 args); mapping derived fresh;
@@ -83,10 +84,11 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
       draws" (never "bootstrap resamples"); `t0` is the adapter's own point
       summaries; a summarized by median, d by circular mean, with the
       coherence caveat in the docs.
-- [ ] AC6 — `bayesian_ssm.Rmd` builds under `devtools::check()` precomputed;
-      brms in `Suggests` with the D-entry recorded; the vignette contains
-      the prior-predictive Rayleigh exhibit and a fresh (not sketch-copied)
-      atan2 derivation pinned by a known-direction fixture.
+- [ ] AC6 — `bayesian-ssm-analysis.Rmd` builds under `devtools::check()`
+      precomputed; brms in `Suggests` with the D-entry recorded; the
+      vignette contains the prior-predictive Rayleigh exhibit and a fresh
+      (not sketch-copied) atan2 derivation pinned by a known-direction
+      fixture.
 - [ ] AC7 — NEWS documents both features; `devtools::check()` clean
       (0 errors / 0 warnings / 0 notes).
 
@@ -117,9 +119,9 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
 - [x] **T5** — Adapter oracle suite: bootstrap-replicate exact reproduction,
       shape A/B consistency, 4-row fixtures, boundary regressions
       (pole-straddle wrap, all-flat, pole = 360).
-- [ ] **T6** — `bayesian_ssm.Rmd` precomputed + brms `Suggests` + D-entry
-      (dependency gate satisfied at the 2026-07-16 plan gate); untrusted-
-      sketch note honored; prior-predictive exhibit.
+- [x] **T6** — `bayesian-ssm-analysis.Rmd` precomputed + brms `Suggests` +
+      D-entry (dependency gate satisfied at the 2026-07-16 plan gate);
+      untrusted-sketch note honored; prior-predictive exhibit.
 - [ ] **T7** — Docs + NEWS; full `devtools::check()`.
 
 ## Work log
@@ -150,6 +152,16 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
   R's `%%` second-reduces a tiny-negative atan2 to 0 where the kernel's
   modu() gives 2π — adapter + id-summary now use the single-correction wrap
   (modu parity at the pole, regression-tested).
+- 2026-07-16: minor amendment — vignette filename follows the repo's
+  kebab-case convention (`bayesian-ssm-analysis.Rmd`); AC6/Scope wording
+  updated (spec's `bayesian_ssm.Rmd` was a working name).
+- 2026-07-16: T6 done — precomputed vignette (only the `brm()` chunk frozen;
+  everything else live incl. the known-direction atan2 pin as executable
+  `stopifnot()` and the Rayleigh prior-predictive exhibit); fixture
+  `vignettes/bayesian_ssm_draws.rds` from seeded generator
+  `data-raw/bayesian_ssm_draws.R` (4000 draws, provenance attribute);
+  brms → Suggests (D-015); pkgdown navbar entry; render verified against
+  the dev namespace.
 
 ## Decisions
 

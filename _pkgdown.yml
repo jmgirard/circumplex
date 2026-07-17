@@ -140,6 +140,8 @@ navbar:
       href: articles/evaluating-circumplex-structure.html
     - text: SEM-Based SSM Analysis
       href: articles/sem-based-ssm-analysis.html
+    - text: Bayesian SSM Analysis
+      href: articles/bayesian-ssm-analysis.html
   - text: News
     href: news/index.html
   right:
