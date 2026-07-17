@@ -54,16 +54,28 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 - [ ] **AC2** — simulation-coverage oracle: across occasions populations with
       known cross-occasion dependence, the diagnostic's reported coverage
       tracks the true empirical coverage within a pre-registered tolerance, at
-      ≥1 interior cell plus a boundary cell (pole-straddling or flat occasion);
-      seeded `devel/m29-*-results.rds` + regeneration script committed.
-      (RB tripwire: ip-touching)
-- [ ] **AC3** — a second, deterministic oracle type: an invariant
-      (independent-re-paired occasion blocks reproduce the independent-groups
-      diagnostic within Monte Carlo error) corroborates the occasions path,
-      meeting the ≥2-independent-oracle-types bar.
-- [ ] **AC4** — boundary regressions per CLAUDE.md: a pole-straddling occasion
-      and a flat/zero-variance occasion each produce a sensible (non-erroring,
-      correctly-wrapped) diagnostic; tested.
+      ≥1 interior cell plus a boundary cell (pole-straddling or
+      near-zero-amplitude occasion), with ≥1 cell exercising the paired-contrast
+      row; seeded `devel/m29-*-results.rds` + regeneration script committed.
+      (RB tripwire resolved: RR07 → [[D-017]])
+- [ ] **AC3** — a discriminating oracle beyond coverage: coverage alone is
+      provably blind to a dependence-dropping population (the adaptive replayed
+      procedures cover at nominal even from a wrongly-independent population —
+      RR07/[[D-017]]), so the discriminating observable is interval width. Two
+      arms: **(invariant)** an occasions run with the cross-occasion blocks
+      zeroed reproduces the already-validated two-group independent-groups
+      diagnostic (same marginals) on both coverage and `Median_width` within a
+      pre-registered SE-based band; **(closed-form)** the dependent-vs-zeroed
+      paired-contrast `Median_width` ratio matches the closed-form Δe width
+      target √(w′Σw / w′Σ₀w), with a reversal-side Δd cell (|Δd| > 90°)
+      expecting the paired-wider reversal. Meets the ≥2-independent-oracle-types
+      bar (simulation-coverage + invariant + closed-form).
+- [ ] **AC4** — boundary contract per CLAUDE.md and [[D-017]]: a
+      flat/zero-variance occasion is refused up front with an error naming the
+      occasion (the shipped flat-profile refusal extended row-wise); a
+      pole-straddling occasion produces a correctly-wrapped, non-erroring
+      diagnostic; a near-zero-amplitude occasion runs, flags its `Structural`
+      rows, and reports certification honestly; all tested.
 - [ ] **AC5** — the removed error guard's test is updated to the new contract;
       the exported behavior change is documented (NEWS, roxygen);
       `devtools::test()` clean and `devtools::check()` clean (0 errors /
@@ -81,9 +93,10 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 
 - [ ] **T1** — Design note: how the stacked cross-occasion covariance (§2.2)
       becomes the diagnostic's plug-in simulation population, and how
-      per-occasion + contrast accuracy rows are reported. Written before code.
-      (RB tripwire: ip-touching — the extension is "its own design" per spec
-      §1.4; decide at implement whether it needs a fresh Fable RB.)
+      per-occasion + contrast accuracy rows are reported. Written before code,
+      grounded in [[D-017]] (RR07: construction (a), per-group observed stacked
+      covariance, no CPM; `occ_k`-tagged storage; rank-deficiency
+      warn-not-refuse; `(r−1) %/% k + 1` row↔group mapping).
 - [ ] **T2** — Implement the occasions path in `R/ssm_ci_accuracy.R`: remove
       the guard (:197), wire the stacked-MC population + wide-row simulation +
       per-occasion/contrast accuracy rows. Test-first (regression fixture
@@ -93,9 +106,11 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
       `devel/m29-*-results.rds`, seeded, cell-indexed by level, smoke-first;
       interior + boundary cells; pre-registered acceptance in the script
       header; asserting test with a provenance comment.
-- [ ] **T4** — Deterministic invariant oracle: independent-re-paired occasion
-      blocks reproduce the independent-groups diagnostic within Monte Carlo
-      error (the genuinely-discriminating dependence check, §2.3.2).
+- [ ] **T4** — Discrimination oracle (§2.3.2 + RR07): the zeroed-cross-blocks
+      occasions run ≡ the two-group independent diagnostic on coverage +
+      `Median_width` (SE band); plus the dependent-vs-zeroed contrast
+      `Median_width` ratio vs the closed-form Δe width target and a
+      reversal-side Δd cell. Committed script + results, asserting test.
 - [ ] **T5** — NEWS.md entry (error → runs behavior change); update the
       informative-error test; `devtools::document()`; `devtools::check()`
       clean.
@@ -114,6 +129,9 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 - 2026-07-17: blocked on RB07 (occasions plug-in population design; 6 questions).
 - 2026-07-17: ingested RR07 (Fable) → M29-D1 + [[D-017]]; RB07/RR07 archived;
   status → in-progress. No standing D-entry contradicted.
+- 2026-07-17: amendment gate (user-approved) — AC2 boundary/contrast
+  consistency, AC3 → width + closed-form arms, AC4 → flat-occasion refusal; T1
+  grounded in D-017, T4 → two-arm discrimination oracle. Coverage map unchanged.
 
 ## Decisions
 
