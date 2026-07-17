@@ -136,6 +136,7 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
 
 - 2026-07-16: T7 done — NEWS (both features), DESIGN.md data-flow/class/RNG rows; `devtools::check()` clean (0 errors / 0 warnings / 0 notes, 4m28s, vignettes rebuilt); pkgdown::check_pkgdown() clean; status → review.
 - 2026-07-16 (review): plan-owned body hit the 150-line cap at the gate; the standalone minor-amendment work-log line was folded losslessly into the T6 line (same facts, one fewer line); cairn_validate green after.
+- 2026-07-16 (review): three-lens review — 4 minor findings from the diff-bug lens, scored; F1 (id-name collision, 93) and F3 (pole-360 doc range, 82) fixed on the branch with a regression test; F2/F4 (72/76) logged sub-threshold (see Review).
 
 ## Decisions
 
@@ -208,4 +209,38 @@ Consistency gate (2026-07-16, by command):
   0 notes); full check clean (above).
 - Review-side cap fix logged: work-log amendment fold (see work log).
 
-Independent review: [pending — three-lens fan-out running]
+Independent review (2026-07-16, three lenses + scorer):
+- [S] prior-PR lens: "no prior-PR evidence" (all 27 merged PRs have empty
+  review threads; reviews live in cairn) — clean no-op, 0 findings.
+- [S] blame-history lens: no findings (verified the three new
+  `ssm_replicate_intervals()` args keep both existing callers
+  byte-identical against the warning wording's origin commits; D-003/
+  D-013/D-014/D-015 honored; no NSE, base-R-only package code).
+- [O] diff-bug lens: 4 minor findings, all live-reproduced; also verified
+  sound: modu-parity wrap (10^6-value sweep), full dispatch grid, pole
+  windows, vignette derivation + fixture/eval=FALSE consistency.
+- [S] scorer: F1=93, F3=82 (actioned); F2=72, F4=76 (below 80 — logged,
+  excluded from the actioned list, never silently dropped).
+
+Actioned:
+- F1 (93, fixed): id variable named like an output column ("Disp", ...)
+  duplicated the column name; summary()'s `$Disp` then silently aggregated
+  person ids. Fix: reserved-name collision error in `ssm_parameters_id()`
+  + regression test.
+- F3 (82, fixed): roxygen said displacement in "[0, 360)" while the code
+  deliberately reports the pole as exactly 360 (D-003/M20). Fix: the three
+  @return/description spots now say "[0, 360], pole reported as 360".
+
+Logged (sub-threshold):
+- F2 (72): shape A NAs displacement only at exactly a == 0 while shape B
+  inherits the kernel's scale-aware tolerance — the A≡B equivalence can
+  diverge at machine-eps cancellation inputs no genuine posterior
+  produces; documented exact-zero rule stands.
+- F4 (76): at zero circular resultant (antipodal draws) the d point
+  summary is honestly NA but quantile.circumplex_radian still returns a
+  noise-centered interval — NA estimate beside a defined-looking CrI;
+  near-measure-zero for real posteriors; quantile method pre-existing.
+
+Post-fix evidence: affected files 75 + 112 pass / 0 fail; full suite
+rerun after fixes: 2540 pass / 0 fail (same 4-warning baseline);
+document() no-diff re-verified in the fix commit.

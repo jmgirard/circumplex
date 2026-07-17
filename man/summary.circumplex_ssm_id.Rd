@@ -16,7 +16,8 @@ by \code{\link[=ssm_parameters_id]{ssm_parameters_id()}}.}
 A one-row data frame with columns \code{n} (persons), \code{n_na_d}
 (persons with undefined displacement, excluded from the circular
 summaries), \code{e_mean}, \code{x_mean}, \code{y_mean}, \code{a_mean} (arithmetic means),
-\code{d_mean} (circular mean of displacement, degrees in [0, 360)), and
+\code{d_mean} (circular mean of displacement, degrees in [0, 360], the
+0/360 pole reported as 360), and
 \code{d_res} (mean resultant length in [0, 1]; \code{NA} when no displacement
 is defined, and undefined direction at zero resultant reports
 \code{d_mean = NA}).

@@ -155,6 +155,15 @@ test_that("ssm_parameters_id validates its inputs", {
     ssm_parameters_id(dat2, scales = 1:8, id = "person"),
     "missing values in `id`"
   )
+  # an id variable named like an output column would duplicate that column
+  # name and be silently picked up by `$Disp` in summary() (a circular mean
+  # of person ids); refuse the collision instead
+  dat3 <- dat
+  dat3$Disp <- "A"
+  expect_error(
+    ssm_parameters_id(dat3, scales = 1:8, id = "Disp"),
+    "reserved"
+  )
 })
 
 test_that("ssm_parameters_id handles zero rows and matrix input", {

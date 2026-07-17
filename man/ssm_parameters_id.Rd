@@ -32,7 +32,8 @@ person, in order of first appearance: the id column (named after \code{id},
 or \code{id} when \code{NULL}), \code{n_obs} (rows contributing to that person),
 \code{na_rate} (proportion of missing scale cells among those rows), and the
 SSM parameters \code{Elev}, \code{Xval}, \code{Yval}, \code{Ampl}, \code{Disp} (degrees in
-[0, 360)), and \code{Fit}. Use \code{\link[=summary.circumplex_ssm_id]{summary.circumplex_ssm_id()}} for
+[0, 360], with the 0/360 pole reported as 360 per the package's
+LM = 360 convention), and \code{Fit}. Use \code{\link[=summary.circumplex_ssm_id]{summary.circumplex_ssm_id()}} for
 group-level summaries with circular statistics for displacement.
 }
 \description{

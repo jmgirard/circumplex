@@ -24,7 +24,8 @@ given elsewhere it must not contradict \code{angles}.}
 \value{
 An object of class \code{"circumplex_ssm_draws"} holding \code{draws} (the
 SSM parameter draws, one row per posterior draw, columns e, x, y, a, d,
-fit, displacement in degrees [0, 360)), \code{results} (the point summaries
+fit, displacement in degrees [0, 360], pole reported as
+360), \code{results} (the point summaries
 and credible bounds), and \code{details}. Printing shows the summary table;
 \code{summary()} adds the analysis details.
 }
@@ -41,7 +42,8 @@ matrix or data frame with exactly three columns interpreted \strong{in column
 order} as (e, x, y) -- elevation (intercept), the cosine coefficient
 (x), and the sine coefficient (y). Each row is mapped to amplitude
 \code{a = sqrt(x^2 + y^2)} and displacement \code{d = atan2(y, x)} wrapped to
-[0, 360). Column names are not used to reorder: when names are present
+[0, 360] (the 0/360 pole is reported as 360, the package's LM = 360
+convention). Column names are not used to reorder: when names are present
 but do not look (intercept, cos, sin)-like, a message states the
 assumed mapping. A row with exactly zero amplitude has undefined
 displacement (\code{NA}); model fit is undefined for parameter draws

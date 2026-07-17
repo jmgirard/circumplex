@@ -39,7 +39,8 @@
 #'   or `id` when `NULL`), `n_obs` (rows contributing to that person),
 #'   `na_rate` (proportion of missing scale cells among those rows), and the
 #'   SSM parameters `Elev`, `Xval`, `Yval`, `Ampl`, `Disp` (degrees in
-#'   \[0, 360)), and `Fit`. Use [summary.circumplex_ssm_id()] for
+#'   \[0, 360\], with the 0/360 pole reported as 360 per the package's
+#'   LM = 360 convention), and `Fit`. Use [summary.circumplex_ssm_id()] for
 #'   group-level summaries with circular statistics for displacement.
 #' @family ssm functions
 #' @family analysis functions
@@ -79,6 +80,21 @@ ssm_parameters_id <- function(data, scales, angles = octants(), id = NULL) {
     if (anyNA(ids)) {
       stop("missing values in `id`; persons cannot be silently dropped",
            call. = FALSE)
+    }
+    # An id variable named like an output column would duplicate that column
+    # name, and `$`/`[[` on the duplicated name silently resolve to the id
+    # column -- summary()'s circular mean of `Disp` would then aggregate
+    # person ids (plausible-but-wrong output). Refuse the collision.
+    reserved <- c(
+      "n_obs", "na_rate", "Elev", "Xval", "Yval", "Ampl", "Disp", "Fit"
+    )
+    if (id_name %in% reserved) {
+      stop(
+        "`id` variable name \"", id_name, "\" collides with a reserved ",
+        "output column name (", paste(reserved, collapse = ", "),
+        "); rename the id variable first.",
+        call. = FALSE
+      )
     }
   }
   fid <- factor(ids, levels = unique(ids))
@@ -161,7 +177,8 @@ ssm_parameters_id <- function(data, scales, angles = octants(), id = NULL) {
 #' @return A one-row data frame with columns `n` (persons), `n_na_d`
 #'   (persons with undefined displacement, excluded from the circular
 #'   summaries), `e_mean`, `x_mean`, `y_mean`, `a_mean` (arithmetic means),
-#'   `d_mean` (circular mean of displacement, degrees in \[0, 360)), and
+#'   `d_mean` (circular mean of displacement, degrees in \[0, 360\], the
+#'   0/360 pole reported as 360), and
 #'   `d_res` (mean resultant length in \[0, 1\]; `NA` when no displacement
 #'   is defined, and undefined direction at zero resultant reports
 #'   `d_mean = NA`).
