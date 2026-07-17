@@ -29,13 +29,11 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 - Remove the `details$occasions` error guard
   ([R/ssm_ci_accuracy.R:197](R/ssm_ci_accuracy.R:197)); replace the
   informative-error test with the new run-don't-error contract.
-- Full oracle battery (§2.3), the acceptance bar set at plan gate:
-  simulation-coverage (occasions population with known cross-occasion
-  dependence, interior + boundary cells) **plus** a deterministic invariant
-  (independent-re-paired blocks reproduce the independent-groups diagnostic
-  within Monte Carlo error). Seeded, cell-indexed by level (LESSONS
-  2026-07-13), committed `devel/m29-*-results.rds` + regeneration script with
-  pre-registered acceptance in the header.
+- Full oracle battery (§2.3, amended per [[D-017]]): simulation-coverage + a
+  width-based discrimination arm (zeroed-cross-blocks ≡ independent-groups
+  diagnostic) + a closed-form Δe width target. Seeded, cell-indexed by level
+  (LESSONS 2026-07-13), committed `devel/m29-*-results.rds` + regeneration
+  script with pre-registered acceptance in the header.
 - NEWS entry (exported behavior change: error → runs).
 
 **Out:**
@@ -117,38 +115,33 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 
 ## Work log
 
-- 2026-07-17: created by /milestone-plan (longitudinal deferral §1.4, promoted
-  from the "Longitudinal deferrals" ROADMAP candidate). Extends the M25
-  occasions core's diagnostic; full §2.3 oracle battery set as the acceptance
-  bar at the plan gate. Sibling M28 planned in the same run (§1.1 sugar).
+- 2026-07-17: created by /milestone-plan (longitudinal deferral §1.4). Sibling
+  M28 planned in the same run (§1.1 sugar).
 - 2026-07-17: /milestone-implement — status → in-progress; branch
-  m29-ci-accuracy-occasions cut from master (in sync with origin).
-- 2026-07-17: question gate. Storage settled (store stacked per-group stats at
-  analysis time). Population structure (T1 ip-touching tripwire) escalated to a
-  fresh Fable RB per user decision; implement paused pending the RR.
+  m29-ci-accuracy-occasions cut from master.
+- 2026-07-17: question gate — storage settled (store stacked per-group stats at
+  analysis time); population structure (T1 ip-touching tripwire) escalated to a
+  fresh Fable RB.
 - 2026-07-17: blocked on RB07 (occasions plug-in population design; 6 questions).
 - 2026-07-17: ingested RR07 (Fable) → M29-D1 + [[D-017]]; RB07/RR07 archived;
   status → in-progress. No standing D-entry contradicted.
-- 2026-07-17: amendment gate (user-approved) — AC2 boundary/contrast
-  consistency, AC3 → width + closed-form arms, AC4 → flat-occasion refusal; T1
-  grounded in D-017, T4 → two-arm discrimination oracle. Coverage map unchanged.
+- 2026-07-17: amendment gate (user-approved) — AC2 boundary/contrast, AC3 →
+  width + closed-form arms, AC4 → flat-occasion refusal; Scope oracle-battery
+  line + T1/T4 synced. Coverage map unchanged.
 
 ## Decisions
 
 ### M29-D1 (2026-07-17): RR07 ingested — occasions population design settled
 
 The occasions plug-in population design (RB07 → RR07, Fable, 2026-07-17) is
-promoted to [[D-017]]. Triage: **apply** R1–R11 (construction (a); refuse
-explicit CPM on occasions; `occ_k`-tagged storage; rank-deficiency
-warn-not-refuse; ladder unchanged + asymmetric-regime doc; contrast unconditional
-`d`, occasion rows D-007 conditional, §2.2 caveat → joint-cert columns; AC3
-three-arm battery; AC4 flat refusal; ≥1 AC2 contrast cell; `(r−1) %/% k + 1`
-row↔group mapping at `run_one`/`row_n`/`sds`/`build_pop`; legacy
-`suff_stats = NULL` refused with a re-run message). **consider** R12 (`summary()`
-breadcrumb when the c=1 joint-cert rate ≪ 1−α — decide T2/T5). **reject** R13
-(occasions `data=` fallback — no such objects off the dev line), R14 (construction
-b, 98% non-PSD), R15 (shrinkage — attenuates the dependence under test), R16
-(pooling — replay is per-group).
+promoted to [[D-017]]; the **apply** items (R1–R11) are now encoded in that
+D-entry and the amended AC2/AC3/AC4 + T1/T4. **consider** R12 (`summary()`
+breadcrumb when the c=1 joint-cert rate ≪ 1−α — decide T2/T5). Standing
+**rejects** (do not revisit without a superseding entry): R13 occasions `data=`
+fallback (no such objects off the dev line — refuse legacy `suff_stats = NULL`
+with a re-run message instead); R14 construction b, CPM-diagonal + observed cross
+(98% non-PSD at n=25); R15 shrinkage (attenuates the dependence under test); R16
+pooling the stacked covariance across groups (replay is per-group).
 
 Two **plan-owned amendments** deferred to the `/milestone-implement` amendment
 gate at resume (not made here): **AC3** relabel "deterministic" → "invariant +
