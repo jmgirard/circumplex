@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M28: Occasions long-format sugar (`ssm_analyze_long()`)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M25
 - **Principles touched:** —
