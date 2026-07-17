@@ -220,6 +220,12 @@ summary.circumplex_ssm <- function(object, digits = 3, ...) {
     "\nConfidence Level:\t", object$details$interval,
     "\nListwise Deletion:\t", object$details$listwise,
     "\nScale Displacements:\t", as.numeric(object$details$angles),
+    # Occasions metadata (conditional; occasions analyses only). The inline
+    # `if` yields NULL otherwise, which cat() drops without a separator, so
+    # non-occasions output stays byte-identical.
+    if (!is.null(object$details$occasions)) {
+      c("\nOccasions:\t\t", object$details$occasions)
+    },
     "\n\n"
   )
   print(object)

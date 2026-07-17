@@ -131,7 +131,7 @@ output-surface complete, per the binding D-013 spec
       run, committed `devel/m25-*` rds + analysis; degenerate-dependence
       invariant, closed-form Δe, boot-vs-MC tolerance tests into testthat
       where deterministic.
-- [ ] **T7** — Output surfaces: print/snapshots, `ssm_table()`,
+- [x] **T7** — Output surfaces: print/snapshots, `ssm_table()`,
       `ssm_plot_circle/curve/contrast()` support-or-reject,
       `ssm_ci_accuracy()` informative error.
 - [ ] **T8** — Docs + NEWS + DESIGN.md (RNG row, oracle-registry pointer) +
@@ -175,6 +175,13 @@ output-surface complete, per the binding D-013 spec
   the reversal-expecting registered design flagged it (M23 lesson paid).
   Results rds + analysis md committed; registered bands pinned by a
   testthat that reads the rds.
+- 2026-07-16: T7 done — print/summary handle occasions (conditional
+  Occasions line, byte-identical otherwise; snapshots), ssm_table labels
+  occasion rows, plots accept occasions objects, ssm_ci_accuracy errors
+  informatively. Consumer sweep (M18 lesson) caught one real bug:
+  ssm_plot_curve dropped info columns positionally (-c(1:3)) and would
+  have leaked the Occasion column into the scale reshape — now name-based.
+  Tests/snapshots landed with T6's commit (file-level staging).
 
 ## Decisions
 
