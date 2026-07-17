@@ -113,7 +113,7 @@ output-surface complete, per the binding D-013 spec
       mutual exclusivity, block checks, stem-matching alignment (+ no-stem
       message), listwise-only enforcement + drop-count message
       (`R/ssm_analysis.R:197-208`, `is_*()` helpers).
-- [ ] **T2** — Scoring + result assembly: per-occasion per-group scoring,
+- [x] **T2** — Scoring + result assembly: per-occasion per-group scoring,
       `build_result_labels()` occasion dimension (`R/ssm_analysis.R:301`),
       occasion-major order, conditional `Occasion` column, `details`
       metadata; exact single-`scales` equivalence fixture.
@@ -148,6 +148,12 @@ output-surface complete, per the binding D-013 spec
   incl. rotation error + positional-fallback message path) + contrast rule
   extension in `ssm_analyze`; 12 new tests; full suite green (2141 pass).
   Implement question gate skipped: plan/spec pin all substantive choices.
+- 2026-07-16: T2 done — `occ_scores()` + `ssm_analyze_occasions()` +
+  `build_result_labels()` occasion branch (conditional Occasion column,
+  group-major/occasion-minor); AC2 exact single-`scales` equivalence
+  fixtures (k = 3, and per-cell under grouping); drop-count message +
+  no-stem positional message tests. Includes the MC `occ_k` plumbing
+  (stacked-draw split), engine-validated at T5. Suite green (2164).
 
 ## Decisions
 

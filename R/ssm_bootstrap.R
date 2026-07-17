@@ -7,12 +7,13 @@
 ssm_estimate_intervals <- function(method, bs_input, bs_function, scales,
                                    measures = NULL, angles, boots, interval,
                                    contrast, listwise, parallel, ncpus, strata,
-                                   obs_scores) {
+                                   obs_scores, occ_k = NULL) {
   if (method == "montecarlo") {
     ssm_montecarlo(
       bs_input = bs_input, scales = scales, measures = measures,
       angles = angles, boots = boots, interval = interval,
-      contrast = contrast, listwise = listwise, obs_scores = obs_scores
+      contrast = contrast, listwise = listwise, obs_scores = obs_scores,
+      occ_k = occ_k
     )
   } else {
     ssm_bootstrap(

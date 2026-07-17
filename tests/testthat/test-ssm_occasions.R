@@ -131,3 +131,112 @@ test_that("stem mismatch (different stems) errors naming the block", {
     "stem"
   )
 })
+
+test_that("no stem structure falls back to a positional-alignment message", {
+  data <- make_occ_data()
+  # occasion-2 names with no common prefix or suffix
+  flat <- c("alpha", "bravo", "charlie", "delta",
+            "echo", "foxtrot", "golf", "hotel")
+  names(data)[9:16] <- flat
+  expect_message(
+    res <- ssm_analyze(data,
+      occasions = list(T1 = occ_names(1), T2 = flat),
+      boots = 10
+    ),
+    "positional"
+  )
+  expect_s3_class(res, "circumplex_ssm")
+})
+
+# Scoring and result assembly (spec sec. 1.1/1.2) ------------------------------
+
+test_that("occasions profiles are correct and ordered occasion-minor", {
+  data <- make_occ_data(n = 60, k = 3)
+  occ <- list(T1 = occ_names(1), T2 = occ_names(2), T3 = occ_names(3))
+  set.seed(1)
+  res <- ssm_analyze(data, occasions = occ, boots = 10)
+  expect_s3_class(res, "circumplex_ssm")
+  expect_true("Occasion" %in% names(res$results))
+  expect_equal(res$results$Occasion, c("T1", "T2", "T3"))
+  expect_equal(res$results$Label, c("T1", "T2", "T3"))
+  # per-occasion point estimates equal the equivalent single-scales run
+  # exactly (complete data, same rows) -- the exact invariant of AC2
+  for (j in 1:3) {
+    set.seed(2)
+    ref <- ssm_analyze(data, scales = occ_names(j), boots = 10)
+    expect_equal(
+      unlist(res$results[j, c("e_est", "x_est", "y_est", "a_est", "d_est",
+                              "fit_est")]),
+      unlist(ref$results[1, c("e_est", "x_est", "y_est", "a_est", "d_est",
+                              "fit_est")]),
+      tolerance = 1e-12
+    )
+  }
+  # details carry the occasions metadata
+  expect_equal(res$details$occasions, c("T1", "T2", "T3"))
+})
+
+test_that("unnamed occasions default to T1..Tk labels", {
+  data <- make_occ_data()
+  set.seed(1)
+  res <- ssm_analyze(data,
+    occasions = list(occ_names(1), occ_names(2)), boots = 10
+  )
+  expect_equal(res$results$Occasion, c("T1", "T2"))
+})
+
+test_that("occasions cross grouping: group-major, occasion-minor rows", {
+  data <- make_occ_data(n = 80)
+  set.seed(1)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    grouping = "Gender", boots = 10
+  )
+  expect_equal(res$results$Group, c("F", "F", "M", "M"))
+  expect_equal(res$results$Occasion, c("T1", "T2", "T1", "T2"))
+  expect_equal(res$results$Label, c("T1: F", "T2: F", "T1: M", "T2: M"))
+  # per-cell estimates equal the single-scales grouped run, occasion by
+  # occasion (complete data)
+  for (j in 1:2) {
+    set.seed(2)
+    ref <- ssm_analyze(data,
+      scales = occ_names(j), grouping = "Gender", boots = 10
+    )
+    got <- res$results[res$results$Occasion == paste0("T", j), ]
+    expect_equal(got$e_est, ref$results$e_est, tolerance = 1e-12)
+    expect_equal(got$d_est, ref$results$d_est, tolerance = 1e-12)
+  }
+})
+
+test_that("scores table has one profile row per group x occasion", {
+  data <- make_occ_data(n = 80)
+  set.seed(1)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    grouping = "Gender", boots = 10
+  )
+  expect_equal(nrow(res$scores), 4)
+  expect_equal(res$scores$Occasion, c("T1", "T2", "T1", "T2"))
+  # scale columns are the validated stems
+  expect_true(all(c("PA", "BC", "NO") %in% names(res$scores)))
+})
+
+test_that("listwise deletion across waves is messaged with the count", {
+  data <- make_occ_data(n = 50)
+  data[1, "PA_2"] <- NA # person 1 missing only occasion 2
+  data[2, "NO_1"] <- NA # person 2 missing only occasion 1
+  set.seed(1)
+  expect_message(
+    res <- ssm_analyze(data,
+      occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+      boots = 10
+    ),
+    "2 person"
+  )
+  # a person missing any occasion is dropped from all occasions
+  set.seed(1)
+  ref <- ssm_analyze(data[-c(1, 2), ],
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)), boots = 10
+  )
+  expect_equal(res$results$e_est, ref$results$e_est, tolerance = 1e-12)
+})
