@@ -131,23 +131,13 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 
 ### M29-D1 (2026-07-17): RR07 ingested — occasions population design settled
 
-The occasions plug-in population design (RB07 → RR07, Fable, 2026-07-17) is
-promoted to [[D-017]]; the **apply** items (R1–R11) are now encoded in that
-D-entry and the amended AC2/AC3/AC4 + T1/T4. **consider** R12 (`summary()`
-breadcrumb when the c=1 joint-cert rate ≪ 1−α — decide T2/T5). Standing
-**rejects** (do not revisit without a superseding entry): R13 occasions `data=`
-fallback (no such objects off the dev line — refuse legacy `suff_stats = NULL`
-with a re-run message instead); R14 construction b, CPM-diagonal + observed cross
-(98% non-PSD at n=25); R15 shrinkage (attenuates the dependence under test); R16
-pooling the stacked covariance across groups (replay is per-group).
-
-Two **plan-owned amendments** deferred to the `/milestone-implement` amendment
-gate at resume (not made here): **AC3** relabel "deterministic" → "invariant +
-closed-form" and add the dependent-vs-zeroed `Median_width` arm + closed-form Δe
-width target + a reversal-side Δd cell (coverage is provably blind to
-dependence-dropping — the adaptive procedures cover at nominal even from a
-wrongly-independent population; width carries the signal); **AC4** → informative
-flat-occasion refusal (extend `R/ssm_ci_accuracy.R:314-317` row-wise);
-pole-straddling + near-zero occasions run and are tested.
+Design promoted to [[D-017]] (apply R1–R11, now encoded in the amended
+AC2/AC3/AC4 + T1/T4; the AC amendments landed at the 2026-07-17 amendment gate).
+**consider** R12 (`summary()` breadcrumb when the c=1 joint-cert rate ≪ 1−α —
+decide T2/T5). Standing **rejects** (do not revisit without a superseding
+entry): R13 occasions `data=` fallback (refuse legacy `suff_stats = NULL` with a
+re-run message instead); R14 CPM-diagonal + observed-cross (98% non-PSD at
+n=25); R15 shrinkage (attenuates the dependence under test); R16 pooling across
+groups (replay is per-group).
 
 ## Review
