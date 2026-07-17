@@ -2,6 +2,32 @@
 
 ## circumplex (development version)
 
+- New repeated-measures (longitudinal) SSM analyses:
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  gains an `occasions` argument taking a named list of column blocks,
+  one per occasion, each selecting the same circumplex scales measured
+  at that occasion (wide data, one row per person). Every occasion
+  yields its own profile row, occasions cross with `grouping`, and
+  `contrast = TRUE` with exactly two occasions (single group) estimates
+  the paired within-person contrast – second listed occasion minus first
+  – through both engines: the bootstrap resamples persons (preserving
+  within-person dependence nonparametrically) and the Monte Carlo engine
+  draws the stacked occasion mean vectors jointly. Cross-occasion column
+  alignment is validated by stem matching (a reordered occasion block
+  errors instead of silently rotating displacement). Occasions analyses
+  are listwise-only across waves, with the dropped-person count messaged
+  and a selection caution documented. Results from occasions analyses
+  carry a new `Occasion` column that is present only for such analyses –
+  downstream code should test for the column by name. Coverage of the
+  paired contrasts was validated by simulation at nominal rate across
+  boundary cells (displacement changes near 0 and 180 degrees, CIs
+  straddling the 0/360 pole, small samples, three occasions); note that
+  paired contrasts are not unconditionally more efficient than
+  independent-groups designs (see the new Occasions section in
+  [`?ssm_analyze`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)).
+  [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
+  errors informatively on occasions objects for now.
+
 - `cpm_fit(scaling = "free")` now also starts its optimizer from the
   unit-scaling solution, so the free family’s fit statistic can never
   exceed the default family’s on the same input beyond numerical

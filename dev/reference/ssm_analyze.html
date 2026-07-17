@@ -81,7 +81,7 @@ calculated.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ssm_analyze</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
-<span>  <span class="va">scales</span>,</span>
+<span>  scales <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  angles <span class="op">=</span> <span class="fu"><a href="octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  measures <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  grouping <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -92,7 +92,8 @@ calculated.</p>
 <span>  measures_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="st">"no"</span>,</span>
 <span>  ncpus <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"bootstrap"</span></span>
+<span>  method <span class="op">=</span> <span class="st">"bootstrap"</span>,</span>
+<span>  occasions <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -106,9 +107,10 @@ circumplex scales.</p></dd>
 
 
 <dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
-<dd><p>Required. A character vector of column names, or a numeric
-vector of column indexes, from <code>data</code> that contains the circumplex scale
-scores to be analyzed.</p></dd>
+<dd><p>Required unless <code>occasions</code> is supplied (the two are mutually
+exclusive). A character vector of column names, or a numeric vector of
+column indexes, from <code>data</code> that contains the circumplex scale scores to
+be analyzed.</p></dd>
 
 
 <dt id="arg-angles">angles<a class="anchor" aria-label="anchor" href="#arg-angles"></a></dt>
@@ -137,14 +139,17 @@ each observation.</p></dd>
 
 <dt id="arg-contrast">contrast<a class="anchor" aria-label="anchor" href="#arg-contrast"></a></dt>
 <dd><p>Optional. A logical indicating whether to output the
-difference between two measures' or two groups' SSM parameters. Can only be
-set to TRUE when there are exactly two measures and one group, one measure
-and two groups, or no measures and two groups (default = FALSE). The
-contrast is always the second level minus the first. For two groups, this
-is the second level of <code>grouping</code> alphabetically, unless <code>grouping</code> is
-already a factor with an explicit level order, in which case that order is
-used. For two measures, this is simply the second entry of <code>measures</code> as
-given (no reordering). The direction is shown in the result's Label (e.g.,
+difference between two measures', two groups', or two occasions' SSM
+parameters. Can only be set to TRUE when exactly one of these holds: two
+measures and one group; one measure and two groups; no measures and two
+groups; or two occasions and one group (default = FALSE). The contrast is
+always the second level minus the first. For two groups, this is the
+second level of <code>grouping</code> alphabetically, unless <code>grouping</code> is already a
+factor with an explicit level order, in which case that order is used.
+For two measures, this is simply the second entry of <code>measures</code> as given
+(no reordering). For two occasions, it is the second listed element of
+<code>occasions</code> minus the first (list order as supplied – temporal order –
+never alphabetical). The direction is shown in the result's Label (e.g.,
 "Male - Female").</p></dd>
 
 
@@ -164,7 +169,12 @@ confidence intervals (default = 0.95).</p></dd>
 <dd><p>Optional. A logical indicating whether missing values should
 be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
 that pairwise deletion may result in different missing data patterns in
-each bootstrap resample and is slower to compute (default = TRUE).</p></dd>
+each bootstrap resample and is slower to compute (default = TRUE).
+Occasions analyses require <code>listwise = TRUE</code>: a person missing any
+occasion is dropped from all occasions (complete cases across waves), so
+the paired contrast stays a within-person comparison. Note the selection
+caution: complete-cases-across-waves estimates completers' change, which
+can differ from population change when dropout relates to the outcome.</p></dd>
 
 
 <dt id="arg-measures-labels">measures_labels<a class="anchor" aria-label="anchor" href="#arg-measures-labels"></a></dt>
@@ -203,6 +213,21 @@ correlations, so prefer the bootstrap for small samples; it also requires
 listwise-complete data. Correlations are drawn jointly across measures
 within each group on the Fisher z scale and back-transformed. The
 <code>parallel</code> and <code>ncpus</code> arguments apply only to the bootstrap.</p></dd>
+
+
+<dt id="arg-occasions">occasions<a class="anchor" aria-label="anchor" href="#arg-occasions"></a></dt>
+<dd><p>Optional. Either <code>NULL</code> or a named list of character or
+numeric vectors, each selecting the same circumplex scales measured at
+one occasion, in the same scale order, all of length <code>length(angles)</code>
+(e.g., <code>occasions = list(T1 = c("PA_1", ..., "NO_1"), T2 = c("PA_2", ..., "NO_2"))</code>). Mutually exclusive with <code>scales</code> (and not combinable with
+<code>measures</code>). Data must be wide – one row per person – so persons remain
+the resampling unit and within-person dependence across occasions is
+preserved in both engines. Results gain an <code>Occasion</code> column (labels are
+<code>names(occasions)</code>, defaulting to <code>T1..Tk</code>); this column is present only
+for occasions analyses. Grouping is time-invariant by construction (one
+group per person-row). Cross-occasion column alignment is validated by
+stem matching; when the columns have no common stem structure, positional
+alignment is assumed and messaged.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -272,6 +297,37 @@ from RNG reproducibility.</p></li>
 should tighten Monte Carlo error), so results are not expected to be
 stable across different <code>boots</code> values, only within a fixed call.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="occasions-repeated-measures-">Occasions (repeated measures)<a class="anchor" aria-label="anchor" href="#occasions-repeated-measures-"></a></h2>
+
+
+<p>Supplying <code>occasions</code> analyzes the same circumplex scales measured at
+k &gt;= 2 occasions on the same persons (wide data, one row per person).
+Each occasion yields its own profile row; with <code>contrast = TRUE</code>
+(exactly 2 occasions, single group) the paired within-person contrast
+is estimated with both engines preserving the within-person dependence
+(the bootstrap resamples persons; the Monte Carlo engine draws the
+stacked occasion mean vectors jointly).</p>
+<p>Interpretation notes. A paired displacement-contrast CI is
+interpretable only when <em>both</em> occasions' amplitudes are reliably
+nonzero (both profiles print without the amplitude note); if only one
+occasion's profile is interpretable, do not read the contrast as
+directional change. Paired designs are not unconditionally more
+efficient than independent groups: the paired elevation contrast has a
+narrower CI exactly when the within-person elevation correlation is
+positive, while for the amplitude and displacement contrasts the paired
+CI is narrower only when the gradient-projected cross-occasion
+covariance is positive – under isotropic dependence this is
+proportional to cos(displacement change), so paired CIs are narrower
+for displacement changes under 90 degrees and can be <em>wider</em> than
+independent-groups CIs for changes beyond 90 degrees, even with
+strongly positive within-person correlation.</p>
+<p>With <code>method = "montecarlo"</code> the per-group draw has dimension k x p
+(occasions times scales); group sizes should comfortably exceed k x p
+for the asymptotic covariance to be well estimated (the percentile
+bootstrap is the safer small-sample choice). Grouping is time-invariant
+by construction (one group per person-row).</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other ssm functions:
