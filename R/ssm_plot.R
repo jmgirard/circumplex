@@ -292,8 +292,11 @@ ssm_plot_curve <- function(ssm_object,
     scores <- scores[idx, ]
   }
 
-  # Drop the info columns
-  scores_only <- scores[, -c(1:3)]
+  # Drop the info columns by name (occasions objects carry a fourth,
+  # conditional-presence Occasion column; a positional -c(1:3) would leak it
+  # into the scale columns and corrupt the reshape below)
+  scores_only <-
+    scores[, setdiff(names(scores), c("Label", "Group", "Measure", "Occasion"))]
 
   # Reshape scores to long format
   score_df <- data.frame(
@@ -416,7 +419,8 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
     }
     stop(
       "This SSM object contains no contrast to plot; request one with ",
-      "`contrast = TRUE` (exactly two groups or two measures).",
+      "`contrast = TRUE` (exactly two groups, two measures, or two ",
+      "occasions).",
       call. = FALSE
     )
   }

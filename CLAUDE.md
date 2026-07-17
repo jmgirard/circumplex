@@ -18,7 +18,9 @@ concerns; angular/boundary behavior is where bugs hide.
   and `octants()` both use 360). Radians internally via
   `circumplex_degree`/`circumplex_radian` S3 classes.
 - Contrasts: **second minus first** factor level (alphabetical unless factor),
-  reported in (-180°, 180°] via `angle_dist()`.
+  reported in (-180°, 180°] via `angle_dist()`. **Occasion contrasts:
+  second listed minus first listed** (`names(occasions)` list order,
+  temporal), never alphabetical — a `T10`/`T2` pair must not flip.
 - Displacement CIs use circular quantiles (center on circular mean, unwrap,
   quantile, re-wrap); contrast CIs may legitimately be negative, and are
   reported on the same branch as their estimate (endpoints may exceed ±180°

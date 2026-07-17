@@ -13,7 +13,8 @@
 # jointly (they share the sample and are dependent -- essential for measure
 # contrasts); distinct groups are independent.
 ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
-                           boots, interval, contrast, listwise, obs_scores) {
+                           boots, interval, contrast, listwise, obs_scores,
+                           occ_k = NULL) {
 
   if (anyNA(bs_input)) {
     stop(
@@ -43,7 +44,7 @@ ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
   # supplies the observed correlations used by the draw core below.
   t0 <- ssm_by_group(obs_scores, angles, contrast)
   t <- ssm_mc_replicates(cs_all, mv_all, grp, obs_scores, boots, angles,
-                         contrast)
+                         contrast, occ_k = occ_k)
 
   ssm_replicate_intervals(
     t0 = t0,
@@ -64,7 +65,7 @@ ssm_montecarlo <- function(bs_input, scales, measures = NULL, angles,
 # `scores` is the observed group mean/correlation score matrix (one row per
 # profile row); it is consumed only on the correlation path.
 ssm_mc_replicates <- function(cs, mv = NULL, grp, scores, boots, angles,
-                              contrast) {
+                              contrast, occ_k = NULL) {
   group_ids <- sort(unique(grp))
   p <- ncol(cs)
   q <- if (is.null(mv)) 0L else ncol(mv)
@@ -100,9 +101,23 @@ ssm_mc_replicates <- function(cs, mv = NULL, grp, scores, boots, angles,
     cs_g <- cs[rows_g, , drop = FALSE]
     if (is.null(mv)) {
       # Sampling distribution of the group mean vector (CLT): the sample
-      # covariance of the observations scaled by 1/n
-      draw_list[[length(draw_list) + 1]] <-
-        mvn_draws(boots, colMeans(cs_g), stats::cov(cs_g) / n_g)
+      # covariance of the observations scaled by 1/n. For occasions (occ_k
+      # occasion blocks in contiguous strides), cs holds the stacked k*p
+      # person vectors: the joint draw's off-diagonal p x p blocks carry the
+      # within-person cross-occasion covariance (spec sec. 2.2), and the
+      # draw matrix is then split back into per-occasion blocks so each
+      # profile row's block holds exactly `boots` rows for the batched
+      # transform below.
+      d_g <- mvn_draws(boots, colMeans(cs_g), stats::cov(cs_g) / n_g)
+      if (is.null(occ_k)) {
+        draw_list[[length(draw_list) + 1]] <- d_g
+      } else {
+        p_occ <- ncol(cs) / occ_k
+        for (j in seq_len(occ_k)) {
+          draw_list[[length(draw_list) + 1]] <-
+            d_g[, (j - 1) * p_occ + seq_len(p_occ), drop = FALSE]
+        }
+      }
     } else {
       mv_g <- mv[rows_g, , drop = FALSE]
       # This group's observed correlations (rows = measures, cols = scales)

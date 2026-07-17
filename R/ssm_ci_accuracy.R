@@ -194,6 +194,17 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
       call. = FALSE
     )
   }
+  if (!is.null(ssm_object$details$occasions)) {
+    stop(
+      "ssm_ci_accuracy() does not yet support occasions analyses: its ",
+      "plug-in population is built from per-group sufficient statistics ",
+      "that ignore the within-person cross-occasion dependence, so it ",
+      "would silently simulate from the wrong population. Assess the ",
+      "profile CIs occasion by occasion instead (re-run ssm_analyze() ",
+      "with scales = one occasion's columns).",
+      call. = FALSE
+    )
+  }
   stopifnot(is_scalar_count(reps))
   stopifnot(is.numeric(amplitude_factors), length(amplitude_factors) >= 1,
             all(is.finite(amplitude_factors)),
