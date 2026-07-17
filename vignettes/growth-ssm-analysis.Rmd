@@ -130,7 +130,7 @@ covariance matrices, which silently sets
 $\mathrm{Cov}(\hat{x}(t), \hat{y}(t)) = 0$. In our validation simulations,
 a design with strongly correlated $x$–$y$ person effects (a realistic
 situation — profile tilts are rarely axis-aligned) drops the shortcut's
-pointwise $d(t)$ coverage from the nominal 95% to roughly 84%, while the
+pointwise $d(t)$ coverage from the nominal 95% to roughly 86%, while the
 joint recipe stays at nominal. Do not fit the coordinates separately.
 
 ## 4. From fixed effects to $(a(t), d(t))$ with intervals
@@ -193,12 +193,17 @@ branch with `angle_unwrap()`:
 
 ```{r plot, eval = has_glmmTMB, fig.width = 5, fig.height = 3.5}
 d_branch <- angle_unwrap(trajectory$d_est)
-shift <- d_branch - trajectory$d_est
+# Each credible bound is reported independently wrapped into [0, 360), so an
+# interval straddling the 0/360 seam has d_lci > d_uci. Move each bound onto
+# the estimate's unwrapped branch by its *signed* distance from the estimate
+# (not by the estimate's branch offset, which would throw a straddling bound
+# a full turn off).
+rel <- function(a) ((a - trajectory$d_est + 180) %% 360) - 180
 plot_dat <- data.frame(
   wave = waves,
   d = d_branch,
-  lci = trajectory$d_lci + shift,
-  uci = trajectory$d_uci + shift
+  lci = d_branch + rel(trajectory$d_lci),
+  uci = d_branch + rel(trajectory$d_uci)
 )
 ggplot(plot_dat, aes(x = wave, y = d)) +
   geom_ribbon(aes(ymin = lci, ymax = uci), alpha = 0.25) +
@@ -208,9 +213,9 @@ ggplot(plot_dat, aes(x = wave, y = d)) +
   theme_minimal()
 ```
 
-(The interval endpoints are shifted onto the same branch as their
-estimate; near the boundary they may legitimately fall outside
-$[0°, 360°)$.)
+(Each interval endpoint is placed on the same branch as its estimate by its
+signed circular distance from it; near the boundary the endpoints may
+legitimately fall outside $[0°, 360°)$.)
 
 ## 5. Certification: when $d(t)$ intervals are not interpretable
 
@@ -273,10 +278,10 @@ estimated variance components: it ignores their uncertainty. At small
 sample sizes this makes the resulting intervals anticonservative (too
 narrow). This is a property of the mixed-model machinery, not of the SSM
 transform, and the remedy is user-side: with modest N, prefer
-degrees-of-freedom-adjusted inference — the Kenward–Roger adjustment
-(available for `lme4` fits via **pbkrtest**, or in `nlme`) or
-$t$-quantile-based intervals — or a parametric bootstrap of the fixed
-effects, over raw normal-approximation draws.
+degrees-of-freedom-adjusted inference — the Kenward–Roger adjustment for
+`lme4` fits via **pbkrtest**, the approximate denominator degrees of
+freedom `nlme` supplies, or $t$-quantile-based intervals — or a parametric
+bootstrap of the fixed effects, over raw normal-approximation draws.
 
 ## 7. The unwrap alternative: `angle_unwrap()`
 
