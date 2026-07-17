@@ -50,6 +50,7 @@ shapes are accepted, distinguished explicitly (never guessed):"><meta property="
     <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
     <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmgirard/circumplex"><span class="fa fa-github fa-lg"></span></a></li>
@@ -109,7 +110,11 @@ given elsewhere it must not contradict <code>angles</code>.</p></dd>
 SSM parameter draws, one row per posterior draw, columns e, x, y, a, d,
 fit, displacement in degrees [0, 360], pole reported as
 360), <code>results</code> (the point summaries
-and credible bounds), and <code>details</code>. Printing shows the summary table;
+and credible bounds), and <code>details</code>, whose <code>certified</code> field records the
+package's displacement-interpretability certification applied to the
+amplitude credible interval (<code>a_lci / (a_uci - a_lci) &gt;= 0.35</code>): when it
+fails, the displacement interval is not interpretable and printing adds
+a note saying so. Printing shows the summary table;
 <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> adds the analysis details.</p>
     </div>
     <div class="section level2">

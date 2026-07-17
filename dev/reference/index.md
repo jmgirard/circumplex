@@ -120,6 +120,8 @@ Functions for customizing SSM results
 
 Functions that make your life easier
 
+- [`angle_unwrap()`](http://circumplex.jmgirard.com/dev/reference/angle_unwrap.md)
+  : Unwrap a sequence of angles onto a continuous branch
 - [`octants()`](http://circumplex.jmgirard.com/dev/reference/octants.md)
   : Angular displacements for octant circumplex scales
 - [`poles()`](http://circumplex.jmgirard.com/dev/reference/poles.md) :

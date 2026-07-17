@@ -40,9 +40,14 @@ ssm_draws(draws, angles = NULL, interval = 0.95, type = NULL)
 An object of class `"circumplex_ssm_draws"` holding `draws` (the SSM
 parameter draws, one row per posterior draw, columns e, x, y, a, d, fit,
 displacement in degrees \[0, 360\], pole reported as 360), `results`
-(the point summaries and credible bounds), and `details`. Printing shows
-the summary table; [`summary()`](https://rdrr.io/r/base/summary.html)
-adds the analysis details.
+(the point summaries and credible bounds), and `details`, whose
+`certified` field records the package's displacement-interpretability
+certification applied to the amplitude credible interval
+(`a_lci / (a_uci - a_lci) >= 0.35`): when it fails, the displacement
+interval is not interpretable and printing adds a note saying so.
+Printing shows the summary table;
+[`summary()`](https://rdrr.io/r/base/summary.html) adds the analysis
+details.
 
 ## Details
 

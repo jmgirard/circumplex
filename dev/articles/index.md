@@ -8,6 +8,8 @@
   Analysis](http://circumplex.jmgirard.com/dev/articles/bayesian-ssm-analysis.md):
 - [Evaluating Circumplex
   Structure](http://circumplex.jmgirard.com/dev/articles/evaluating-circumplex-structure.md):
+- [Growth Models on SSM
+  Parameters](http://circumplex.jmgirard.com/dev/articles/growth-ssm-analysis.md):
 - [Intermediate SSM
   Analysis](http://circumplex.jmgirard.com/dev/articles/intermediate-ssm-analysis.md):
 - [Introduction to SSM
