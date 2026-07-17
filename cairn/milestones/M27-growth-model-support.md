@@ -4,7 +4,7 @@
 - **Priority:** high
 - **Depends on:** M25, M26
 - **Principles touched:** —
-- **Branch/PR:** `m27-growth-model-support`
+- **Branch/PR:** `m27-growth-model-support` · [PR #51](https://github.com/jmgirard/circumplex/pull/51)
 
 ## Goal
 
@@ -132,23 +132,14 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
   tracks truth; all waves certified). **Gated spec amendment** (D-013
   re-trigger): spec §4.1/§4.2 reference engine nlme → glmmTMB, joint-fitting
   holding untouched; glmmTMB → Suggests; D-016 recorded.
-- 2026-07-17: T4 done — coverage oracle green on all 5 pre-registered gates
-  (`devel/m27-coverage-oracle.{R,md}` + results rds): pole .948–.962;
-  lowamp caution fires .98 at the degraded wave (its coverage .854,
-  reported); xycor joint .932–.944 vs univariate-shortcut .856 (fails, as
-  designed); unwrap agreement ≤0.34° mean; two-occasion vs M25 paired
-  0.021° mean diff. **Run-1 miss recorded**: first full run had lowamp
-  truth a(2)=0.02 (~0.9 SE, rule's power-onset region) → cert rate .058 >
-  .05 gate; cell truth moved to 0.01 (the named a→0 regime), gates
-  unchanged, re-run green. Deterministic miniatures →
-  `test-growth_invariants.R` (5 tests); suite 2576 green.
-- 2026-07-17: T5 done — `vignettes/growth-ssm-analysis.Rmd` (live
-  conditional glmmTMB chunks; joint recipe only; per-t certification demo
-  fires on the worked origin-proximal example; REML caution + KR/t-scale
-  remedy; unwrap failure modes; both Brief E caveats; nlme one-liner;
-  bpnreg upgrade); NEWS (3 entries) + pkgdown nav/reference rows;
-  `pkgdown::check_pkgdown()` clean; `devtools::check()` 0/0/0. Status →
-  review.
+- 2026-07-17: T4 done — oracle green on all 5 pre-registered gates
+  (`devel/m27-coverage-oracle.{R,md}` + rds; deterministic miniatures →
+  `test-growth_invariants.R`). Run-1 miss recorded (lowamp cert .058 > .05
+  at a(2)=0.02, the rule's power-onset region; truth moved to 0.01 = the
+  named a→0 regime, gates unchanged, re-run green; details in the md).
+- 2026-07-17: T5 done — growth vignette (all AC4 elements; live conditional
+  glmmTMB chunks) + NEWS + pkgdown; `check_pkgdown()` clean; `check()`
+  0/0/0. Status → review.
 
 ## Decisions
 
