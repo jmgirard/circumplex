@@ -126,7 +126,7 @@ output-surface complete, per the binding D-013 spec
 - [x] **T5** — MC engine: stacked k·p covariance, joint draws, per-block
       transform, contrast (`R/ssm_montecarlo.R:119-149`) + its boundary
       regressions; docs note n_g ≫ k·p.
-- [ ] **T6** — Coverage oracle: seeded script (smoke-first, level-indexed
+- [x] **T6** — Coverage oracle: seeded script (smoke-first, level-indexed
       seeds, pre-registered band/tolerances written before the run), full
       run, committed `devel/m25-*` rds + analysis; degenerate-dependence
       invariant, closed-form Δe, boot-vs-MC tolerance tests into testthat
@@ -165,6 +165,16 @@ output-surface complete, per the binding D-013 spec
   healthy occasion untouched, k = 3 engine agreement — all parametrized
   over both engines. No engine fixes needed. n_g ≫ k·p docs note pending
   in T8 roxygen.
+- 2026-07-16: T6 done — coverage oracle green on all pre-registered gates
+  (coverage [.922,.974] every gated cell/engine; reversal observed:
+  Δd̂-var ratio 0.526 at Δd=30° vs 1.365 at 135°, theory 0.480/1.424;
+  Δe identity 1.03/1.04; k3 .946–.950). First full run caught an ORACLE
+  bug: within-sample re-pairing is mean-invariant, so the independence
+  baseline had paired estimator spread with independent CIs (base .99
+  over-, reversal .87 under-coverage) — rebuilt as fresh-person draws;
+  the reversal-expecting registered design flagged it (M23 lesson paid).
+  Results rds + analysis md committed; registered bands pinned by a
+  testthat that reads the rds.
 
 ## Decisions
 

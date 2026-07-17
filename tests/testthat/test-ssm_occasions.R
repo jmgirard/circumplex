@@ -327,6 +327,193 @@ test_that("contrast composition rules for occasions are enforced", {
   )
 })
 
+# Oracle: closed-form paired-elevation interval (spec sec. 2.3 item 3) --------
+
+test_that("MC paired-elevation CI matches the textbook paired interval", {
+  skip_on_cran()
+  # The paired de contrast is a linear statistic: its MC interval must match
+  # the paired-difference normal interval computed with deliberately dumb
+  # code on the same data. Pre-registered tolerance: quantile MC error at
+  # B = 5000 has sd ~ 0.038 * SE_D per endpoint; we allow 4x that (0.15).
+  data <- make_contrast_data(n = 150, de = 0.5, seed = 21)
+  D <- rowMeans(data[occ_names(2)]) - rowMeans(data[occ_names(1)])
+  se_d <- sd(D) / sqrt(length(D))
+  cf_lci <- mean(D) - qnorm(0.975) * se_d
+  cf_uci <- mean(D) + qnorm(0.975) * se_d
+  set.seed(22)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 5000, method = "montecarlo"
+  )
+  expect_equal(res$results$e_est[[3]], mean(D), tolerance = 1e-12)
+  expect_lt(abs(res$results$e_lci[[3]] - cf_lci), 0.15 * se_d)
+  expect_lt(abs(res$results$e_uci[[3]] - cf_uci), 0.15 * se_d)
+})
+
+test_that("bootstrap and MC paired-contrast CIs agree within tolerance", {
+  skip_on_cran()
+  # Pre-registered SE-based tolerance (spec sec. 2.3 item 2, never a
+  # build-time judgment call): at n = 500 and B = 2000 the two engines'
+  # contrast CI endpoints must agree within 0.30 * SE (SE = the parameter's
+  # replicate spread, proxied by CI width / 3.92). Not an independent oracle
+  # for the shared downstream quantile path (both engines flow through
+  # param_diff and the same interval assembly); the coverage oracle in
+  # devel/m25-paired-coverage.R carries the branch-handling weight.
+  data <- make_contrast_data(n = 500, de = 0.5, dd = 45, seed = 23)
+  set.seed(24)
+  res_bs <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 2000
+  )
+  set.seed(25)
+  res_mc <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 2000, method = "montecarlo"
+  )
+  for (par in c("e", "a", "d")) {
+    lci_b <- res_bs$results[[paste0(par, "_lci")]][[3]]
+    uci_b <- res_bs$results[[paste0(par, "_uci")]][[3]]
+    lci_m <- res_mc$results[[paste0(par, "_lci")]][[3]]
+    uci_m <- res_mc$results[[paste0(par, "_uci")]][[3]]
+    se <- (uci_b - lci_b) / 3.92
+    expect_lt(abs(lci_b - lci_m), 0.30 * se)
+    expect_lt(abs(uci_b - uci_m), 0.30 * se)
+  }
+})
+
+test_that("committed coverage-oracle results satisfy the registered bands", {
+  # Pins the devel/m25-paired-coverage.R run (reps = 500, boots = 600): a
+  # regenerated rds that drifted out of its pre-registered acceptance would
+  # fail here. Skipped where devel/ is absent (built tarball).
+  rds <- testthat::test_path("..", "..", "devel",
+                             "m25-paired-coverage-results.rds")
+  skip_if_not(file.exists(rds), "devel oracle results not present")
+  x <- readRDS(rds)
+  skip_if(isTRUE(x$smoke), "smoke-run rds carries no evidence")
+  getm <- function(cell, method, field) {
+    vapply(x$results[[cell]], function(r) r[[method]][[field]], numeric(1))
+  }
+  n100 <- c("base", "dd_near0", "dd_178", "pole", "reversal",
+            "base_repaired", "reversal_repaired")
+  for (nm in n100) {
+    for (method in c("bootstrap", "montecarlo")) {
+      for (f in c("de_cov", "da_cov", "dd_cov")) {
+        cov <- mean(getm(nm, method, f))
+        expect_gte(cov, 0.91)
+        expect_lte(cov, 0.98)
+      }
+    }
+  }
+  # small-n: bootstrap gated at [.89, .98]; MC measured, not gated
+  for (f in c("de_cov", "da_cov", "dd_cov")) {
+    cov <- mean(getm("small_n", "bootstrap", f))
+    expect_gte(cov, 0.89)
+    expect_lte(cov, 0.98)
+  }
+  # k = 3 profile displacement coverage (MC)
+  for (i in 1:3) {
+    cov <- mean(vapply(x$k3, `[`, logical(1), i))
+    expect_gte(cov, 0.91)
+    expect_lte(cov, 0.98)
+  }
+  # conditional-efficiency identities, discriminating: Var(dd-hat)
+  # paired/re-paired tracks 1 - rho*cos(dd); direction must REVERSE at 135
+  for (nm in c("base", "reversal")) {
+    theory <- 1 - x$cells[[nm]]$rho * cos(x$cells[[nm]]$dd * pi / 180)
+    for (par in c("dd_est", "da_est")) {
+      ratio <- var(getm(nm, "montecarlo", par)) /
+        var(getm(paste0(nm, "_repaired"), "montecarlo", par))
+      expect_gt(ratio / theory, 0.70)
+      expect_lt(ratio / theory, 1.30)
+    }
+  }
+  # paired is NARROWER at dd = 30 and WIDER at dd = 135 (the reversal):
+  # the unconditional claim fails here by design
+  r30 <- var(getm("base", "montecarlo", "dd_est")) /
+    var(getm("base_repaired", "montecarlo", "dd_est"))
+  r135 <- var(getm("reversal", "montecarlo", "dd_est")) /
+    var(getm("reversal_repaired", "montecarlo", "dd_est"))
+  expect_lt(r30, 1)
+  expect_gt(r135, 1)
+  # exact paired-elevation variance identity (isotropic population)
+  for (nm in c("base", "reversal")) {
+    theory <- 2 * (1 - x$cells[[nm]]$rho) / (8 * x$cells[[nm]]$n)
+    ratio <- var(getm(nm, "montecarlo", "de_est")) / theory
+    expect_gt(ratio, 0.80)
+    expect_lt(ratio, 1.25)
+  }
+})
+
+# Output surfaces (spec sec. 7 Build A acceptance; RR06 R12) ------------------
+
+test_that("print and summary render occasions objects (snapshots)", {
+  data <- make_contrast_data(n = 100, seed = 31)
+  set.seed(32)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 100
+  )
+  expect_snapshot(print(res))
+  expect_snapshot(summary(res))
+})
+
+test_that("ssm_table renders occasion rows with occasion labels", {
+  data <- make_contrast_data(n = 100, seed = 33)
+  set.seed(34)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 50
+  )
+  tab <- ssm_table(res, render = FALSE)
+  expect_equal(nrow(tab), 3)
+  expect_equal(tab[[1]], c("T1", "T2", "T2 - T1"))
+  expect_equal(names(tab)[[1]], "Contrast")
+})
+
+test_that("ssm_plot_circle and ssm_plot_curve accept occasions objects", {
+  data <- make_contrast_data(n = 100, seed = 35)
+  set.seed(36)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)), boots = 50
+  )
+  p1 <- ssm_plot_circle(res)
+  expect_s3_class(p1, "ggplot")
+  p2 <- ssm_plot_curve(res)
+  expect_s3_class(p2, "ggplot")
+  # data-level check (M15 lesson): the curve layer carries both occasions
+  # and only genuine scale columns (no leaked Occasion info column)
+  curve_data <- ggplot2::ggplot_build(p2)$data[[1]]
+  expect_equal(length(unique(curve_data$group)), 2)
+  point_layer <- p2$layers[[3]]$data
+  expect_false(any(c("Occasion", "T1", "T2") %in% point_layer$Scale))
+})
+
+test_that("ssm_plot_contrast plots an occasion contrast", {
+  data <- make_contrast_data(n = 100, seed = 37)
+  set.seed(38)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 50
+  )
+  p <- ssm_plot_contrast(res)
+  expect_s3_class(p, "ggplot")
+  # and a profiles-only occasions object refuses with the updated message
+  set.seed(39)
+  res2 <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)), boots = 50
+  )
+  expect_error(ssm_plot_contrast(res2), "two occasions")
+})
+
+test_that("ssm_ci_accuracy errors informatively on occasions objects", {
+  data <- make_contrast_data(n = 100, seed = 40)
+  set.seed(41)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)), boots = 50
+  )
+  expect_error(ssm_ci_accuracy(res), "occasion by occasion")
+})
+
 # Boundary battery (CLAUDE.md; spec sec. 2.3 item 4) --------------------------
 
 test_that("occasion profile CI straddling the 0/360 pole wraps, both engines", {
