@@ -143,8 +143,7 @@ output-surface complete per the binding D-013 spec
 - 2026-07-16: T6 done — oracle green on all pre-registered gates (coverage [.922,.974]; reversal 0.526@30° vs 1.365@135°, theory 0.480/1.424). First run exposed an oracle bug (within-sample re-pairing is mean-invariant) → baseline rebuilt as fresh-person draws; rds + md committed, bands pinned by testthat.
 - 2026-07-16: T7 done — output surfaces; consumer sweep caught ssm_plot_curve positional info-column drop (Occasion leak) → name-based.
 - 2026-07-16: T8 done — roxygen/NEWS/DESIGN/CLAUDE docs; no unconditional claim (grep); check() 0 errors / 0 warnings / 0 notes; suite 2346 → review.
-- 2026-07-16: review — work-log compressed to one line each (cap remedy; verbose in git history). PR #49 (draft). Mid-session cairn plugin update added the `## changelog` profile slot; PROFILE.md backfilled from the shipped reference (NEWS.md).
-- 2026-07-16: review findings F1 (96, positional occasion-index fix + overlap guard + cbind regression test) and F2 (85, k x p Rd emph fix) applied on the branch; suite 2353, check clean re-run.
+- 2026-07-16: review — work-log compressed (cap remedy; verbose in git history); PR #49; PROFILE.md `## changelog` slot backfilled (mid-session plugin update); findings F1 (96, positional occasion indices + overlap guard + cbind regression) and F2 (85, k x p Rd emph) fixed; suite 2353, check clean re-run.
 
 ## Decisions
 
