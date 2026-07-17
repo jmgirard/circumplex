@@ -108,6 +108,15 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
   bar at the plan gate. Sibling M28 planned in the same run (§1.1 sugar).
 - 2026-07-17: /milestone-implement — status → in-progress; branch
   m29-ci-accuracy-occasions cut from master (in sync with origin).
+- 2026-07-17: question gate. Storage settled — store the stacked person-level
+  stats (per-group mean + k·p covariance) in the occasions object at analysis
+  time (parallel to the mean/corr suff_stats paths); exact field shape fixed at
+  T2 once the population structure is decided. Population structure (T1
+  ip-touching tripwire) ESCALATED to a fresh Fable RB per user decision — the
+  live question is observed-stacked-covariance vs CPM-diagonal-blocks +
+  observed cross-blocks, whose real tension is k·p covariance noise vs
+  circumplex-smoothing fidelity at the small-n (≈25–50) regime the diagnostic
+  most targets. Implement paused pending the RR.
 
 ## Decisions
 
