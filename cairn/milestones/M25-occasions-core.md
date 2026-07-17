@@ -1,6 +1,6 @@
 # M25: Longitudinal Build A — occasions API + paired contrasts
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
