@@ -1,6 +1,6 @@
 # M27: Longitudinal Build C — growth-model support on displacement
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M25, M26
 - **Principles touched:** —
