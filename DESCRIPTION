@@ -43,6 +43,7 @@ Suggests:
     brms,
     covr (>= 3.5.0),
     ggrepel,
+    glmmTMB,
     kableExtra (>= 1.1.0),
     knitr (>= 1.28),
     lavaan,

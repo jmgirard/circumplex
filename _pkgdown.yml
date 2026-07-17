@@ -78,6 +78,7 @@ reference:
 - title: Convenience Functions
   desc: Functions that make your life easier
   contents:
+  - angle_unwrap
   - octants
   - poles
   - quadrants
@@ -142,6 +143,8 @@ navbar:
       href: articles/sem-based-ssm-analysis.html
     - text: Bayesian SSM Analysis
       href: articles/bayesian-ssm-analysis.html
+    - text: Growth Models on SSM Parameters
+      href: articles/growth-ssm-analysis.html
   - text: News
     href: news/index.html
   right:
