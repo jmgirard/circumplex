@@ -97,7 +97,7 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
 - [x] **T2** — Per-t certification caution mechanism (small helper applying
       the D-007 rule to a(t) draw summaries) + tests that it flags a
       constructed uncertified t and stays silent on a certified one.
-- [ ] **T3** — Reference joint glmmTMB recipe + adapter pipeline as a dev
+- [x] **T3** — Reference joint glmmTMB recipe + adapter pipeline as a dev
       script; record the engine-swap gated amendment (work-log line per
       D-013 re-trigger) and the glmmTMB `Suggests` D-entry.
 - [ ] **T4** — Coverage oracle: seeded script (smoke-first, level-indexed
@@ -127,6 +127,11 @@ D-013 spec (`devel/longitudinal-ssm-spec.md` §4, §7 Build C).
   (D-007 rule via `ssm_certified()`, single definition) + print/summary
   caution note; 5 new tests (certified silent / uncertified flags /
   zero-width fails closed / both shapes / flag≡rule); suite 2571 green.
+- 2026-07-16: T3 done — reference joint glmmTMB recipe end-to-end in
+  `devel/m27-growth-recipe.R` (joint fit carries Cov(x̂,ŷ) ≠ 0; trajectory
+  tracks truth; all waves certified). **Gated spec amendment** (D-013
+  re-trigger): spec §4.1/§4.2 reference engine nlme → glmmTMB, joint-fitting
+  holding untouched; glmmTMB → Suggests; D-016 recorded.
 
 ## Decisions
 

@@ -325,8 +325,12 @@ halves it is uniquely positioned to get right:
    summaries and CIs at each t.
 
 **Hard requirement the recipes must state [RR06 R4]: the LMM is fit
-*jointly* on (x, y)** (in nlme, the stacked-outcome dummy-coded multivariate
-formulation). d(t) depends on the joint distribution of (x̂(t), ŷ(t)); the
+*jointly* on (x, y)** (the stacked-outcome dummy-coded multivariate
+formulation). *[M27 amendment, 2026-07-16, gated: the vignette's reference
+engine is glmmTMB (`us(0 + dv | person)` gives the correlated cross-outcome
+random effects directly), with nlme named as the base-R alternative. The
+RR06-reviewed holding — joint fitting — is engine-agnostic and unchanged;
+D-016.]* d(t) depends on the joint distribution of (x̂(t), ŷ(t)); the
 plausible-but-wrong shortcut — two univariate LMMs with independent vcovs —
 zeroes Cov(x̂(t), ŷ(t)) and produces wrong d(t) intervals. The §4.2 oracle
 grid includes a cell that makes this shortcut *fail* (below).
@@ -362,7 +366,8 @@ wrapped.
 1. **simulation-coverage**: simulate person-level (x, y) trajectories from
    known linear growth truths, **from the same model family the reference
    recipe fits** (so a coverage failure indicts the adapter, not
-   misspecification), fit the vignette's reference joint nlme model, push
+   misspecification), fit the vignette's reference joint model (glmmTMB per
+   the M27 amendment above), push
    draws through the adapter, and check d(t) pointwise CIs cover the true
    direction at nominal rate at each t. Three named cells [RR06 R4/Q8]:
    - **pole-crossing** (true d(t) drifting 350°→10°) — the *boundary-

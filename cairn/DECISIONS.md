@@ -390,3 +390,25 @@ lineage) is untouched — a user without brms loses nothing but the ability to
 re-run the frozen chunk. Regenerating the fixture requires a local Stan
 toolchain.
 
+### D-016 (2026-07-16): glmmTMB enters Suggests; the growth vignette's reference engine is glmmTMB, not nlme (M27)
+
+**Context:** The D-013 spec (§4.1) named nlme for the growth vignette's
+reference joint recipe (it ships with R). The RR06-reviewed *holding* is that
+the model must be fit **jointly** on (x, y) — engine-agnostic. At the M27
+plan gate (2026-07-16) Jeff chose glmmTMB: its `us(0 + dv | person)` syntax
+expresses the correlated cross-outcome random-effects structure directly,
+where nlme requires the error-prone `varIdent`/`corSymm` dummy-coding
+contortion.
+**Decision:** glmmTMB is added to `Suggests` only; the growth vignette's
+reference joint recipe fits with glmmTMB (live conditional chunks — glmmTMB
+is CRAN-hosted, no special toolchain), with nlme named in one line as the
+base-R alternative. The package never Imports a mixed-model engine (spec
+§4.1 minimal-deps holding unchanged); package code and tests stay
+unconditional on glmmTMB. The spec is amended in place (§4.1/§4.2, marked
+`[M27 amendment]`) per D-013's re-trigger clause — the joint-fitting holding
+itself is untouched.
+**Consequences:** CRAN builders need glmmTMB available to run the vignette
+chunks (standard for Suggests; chunks are `eval`-guarded on availability).
+The M27 coverage oracle simulates from and fits the glmmTMB family. A future
+engine swap is a docs-level change gated the same way.
+
