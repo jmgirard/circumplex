@@ -1,0 +1,12 @@
+# M25: Longitudinal Build A — occasions API + paired contrasts (done)
+
+- **Status:** done · **PR:** #49 (squash `d08dce3`, merged 2026-07-16) · D-013 Build A.
+- **Goal:** wide-format `occasions` analyses in `ssm_analyze()` — per-occasion profiles (k ≥ 2, crossable with grouping) + paired two-occasion contrast, both engines, oracle-validated, output-surface complete.
+
+**Outcome:** shipped per spec §§1–2. Intake: scales/occasions mutual exclusivity, stem-matching alignment (rotation → error naming the block; no stem → positional message), listwise-only across waves (estimand grounds, drop count messaged), positional column resolution with an overlapping-blocks error. Contrast = second **listed** minus first (list order; T10/T2 regression). Bootstrap rides the person-row resampler; MC draws the stacked k·p group mean jointly and splits per occasion (`occ_k`). Conditional-presence `Occasion` column (NEWS-documented schema); print/summary/table/plots support-or-cleanly-reject; `ssm_ci_accuracy()` errors informatively.
+
+**Oracle (devel/m25-paired-coverage.{R,md,rds}; bands pre-registered, pinned by a testthat reading the rds):** coverage [.922, .974] every gated cell/engine (Δd near 0/178°, pole straddle, small-n, k = 3, fresh-person independence baseline); **RR06 conditional-efficiency reversal observed** — paired/independent Var(Δd̂) 0.526 @Δd=30° vs 1.365 @135° (theory 0.480/1.424); exact paired-Δe identity 1.03/1.04; closed-form textbook-Δe + boot-vs-MC tolerance tests in testthat. First run exposed an oracle-construction bug (within-sample re-pairing is mean-invariant) → baseline rebuilt as fresh-person draws.
+
+**Review:** all 7 ACs fresh-evidenced; gate green (cairn_validate, document() no-diff, pkgdown, check() 0 errors / 0 warnings / 0 notes, CI 9/9). 3-lens review → scorer: F1 (96) numeric occasion indices degraded to names silently collapsed duplicated-name blocks — fixed positional + overlap guard + cbind regression; F2 (85) roxygen `k*p` emph-span — fixed. Blame-history and prior-PR lenses: zero findings; nothing sub-threshold.
+
+**Notes:** docs carry only the conditional efficiency claim (grep-evidenced); DESIGN.md gained the occasions RNG row + the oracle-registry pointer line; CLAUDE.md gained the occasion-order clause (M23 F2 discharged). PROFILE.md `## changelog` slot backfilled mid-review (plugin update). Deferrals live in the "Longitudinal deferrals" candidate row; Builds B/C are M26/M27.
