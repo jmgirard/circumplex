@@ -2,15 +2,16 @@
 
 - **Status:** planned
 - **Priority:** high
-- **Depends on:** M22
+- **Depends on:** M25, M26, M27
 - **Branch/PR:** —
 
 ## Goal
 
 Ship the accumulated M2–M5 work (inference, visualization, Browne model + CI
 trustworthiness, structure tests, SEM) plus the CIRCUM free-scaling family
-(M17/M18, per D-008) to CRAN as one v2.0.0 release. **No target date** — the
-release ships when its bundle is complete and validated (D-008).
+(M17/M18, per D-008) and the longitudinal SSM builds (M25–M27, per D-012 +
+the 2026-07-16 plan gate) to CRAN as one v2.0.0 release. **No target date** —
+the release ships when its bundle is complete and validated (D-008).
 
 ## Scope
 
@@ -25,7 +26,8 @@ release ships when its bundle is complete and validated (D-008).
   autonomously).
 
 **Out:**
-- New features (M6 longitudinal → its own ~v2.1.0).
+- New features beyond the bundled milestones (longitudinal deferrals stay
+  ROADMAP candidates; D-012 governs any late-merging build).
 - The billed `/code-review ultra` unless Jeff asks (legacy CLAUDE workflow).
 
 ## Acceptance criteria
@@ -105,6 +107,14 @@ release ships when its bundle is complete and validated (D-008).
   at the plan gate: M22 (free-engine multi-start nesting seed, RR05 B2/R5 —
   an exported-results improvement cheapest shipped before the free family's
   CRAN debut). No release-prep task change.
+
+- 2026-07-16: AMENDED (gated, /milestone-plan) — dependency re-pointed
+  M22→{M25, M26, M27}. M22 is done; Jeff chose "all builds before M7" at the
+  longitudinal plan gate, so the v2.0.0 bundle now includes the longitudinal
+  SSM builds (one submission carries everything, per D-001's anti-churn
+  rationale + D-012). Goal/Out wording updated to match; the stale "M6
+  longitudinal → its own ~v2.1.0" Out clause is superseded. No release-prep
+  task change.
 
 ## Decisions
 
