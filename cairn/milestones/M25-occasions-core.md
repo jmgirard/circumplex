@@ -120,10 +120,10 @@ output-surface complete, per the binding D-013 spec
 - [x] **T3** — Contrast rule extension + list-order convention (T10/T2
       regression; `ssm_by_group()` slice `R/ssm_bootstrap.R:162` reached
       only in the 2-occasion/1-group cell).
-- [ ] **T4** — Bootstrap engine path (existing row resampler; `param_diff`
+- [x] **T4** — Bootstrap engine path (existing row resampler; `param_diff`
       contrast; quantile/branch machinery untouched) + its boundary
       regressions.
-- [ ] **T5** — MC engine: stacked k·p covariance, joint draws, per-block
+- [x] **T5** — MC engine: stacked k·p covariance, joint draws, per-block
       transform, contrast (`R/ssm_montecarlo.R:119-149`) + its boundary
       regressions; docs note n_g ≫ k·p.
 - [ ] **T6** — Coverage oracle: seeded script (smoke-first, level-indexed
@@ -159,6 +159,12 @@ output-surface complete, per the binding D-013 spec
   Δe exactness; Δd = angle_dist of the profile rows; composition errors
   (k = 3, grouping x contrast); both engines agree on point estimates and
   cover the construction truths.
+- 2026-07-16: T4+T5 done (one commit — engines were built in T2; these are
+  their boundary batteries): pole-straddling CI wraps (lci > uci), ±175°
+  contrast keeps sign/branch/coverage, flat occasion → NA d + warning with
+  healthy occasion untouched, k = 3 engine agreement — all parametrized
+  over both engines. No engine fixes needed. n_g ≫ k·p docs note pending
+  in T8 roxygen.
 
 ## Decisions
 

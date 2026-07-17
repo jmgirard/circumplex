@@ -327,6 +327,86 @@ test_that("contrast composition rules for occasions are enforced", {
   )
 })
 
+# Boundary battery (CLAUDE.md; spec sec. 2.3 item 4) --------------------------
+
+test_that("occasion profile CI straddling the 0/360 pole wraps, both engines", {
+  # occasion 1 peaks exactly on the pole; with this n and noise the CI is
+  # several degrees wide on each side, so it must straddle and wrap
+  data <- make_contrast_data(n = 40, d1 = 0, dd = 90, seed = 7)
+  # inflate noise for a wide displacement CI
+  set.seed(8)
+  noisy <- data + matrix(rnorm(prod(dim(data)), 0, 0.6), nrow(data))
+  for (method in c("bootstrap", "montecarlo")) {
+    set.seed(9)
+    res <- ssm_analyze(noisy,
+      occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+      boots = 500, method = method
+    )
+    d_est <- res$results$d_est[[1]]
+    # estimate reports near the pole on either label (D-003/M20 convention)
+    expect_true(d_est < 15 || d_est > 345)
+    # a wrapped CI reports lci > uci (e.g., 350 to 8)
+    expect_gt(res$results$d_lci[[1]], res$results$d_uci[[1]])
+    # and the occasion-2 profile (90 degrees) is unaffected
+    expect_equal(res$results$d_est[[2]], 90, tolerance = 10)
+  }
+})
+
+test_that("occasion contrast near +/-180 keeps sign and branch, both engines", {
+  for (dd in c(175, -175)) {
+    data <- make_contrast_data(n = 200, d1 = 90, dd = dd, seed = 11)
+    for (method in c("bootstrap", "montecarlo")) {
+      set.seed(12)
+      res <- ssm_analyze(data,
+        occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+        contrast = TRUE, boots = 300, method = method
+      )
+      d_con <- res$results$d_est[[3]]
+      expect_equal(d_con, dd, tolerance = 5)
+      # CI is on the same branch as its estimate and covers the truth
+      # (endpoints may legitimately exceed +/-180 near the boundary)
+      expect_true(res$results$d_lci[[3]] < dd && res$results$d_uci[[3]] > dd)
+      expect_lt(res$results$d_uci[[3]] - res$results$d_lci[[3]], 90)
+    }
+  }
+})
+
+test_that("a flat occasion reports NA displacement with a warning, both engines", {
+  data <- make_contrast_data(n = 60, seed = 13)
+  # occasion 2 becomes exactly flat: constant score for every person and scale
+  data[occ_names(2)] <- 2
+  for (method in c("bootstrap", "montecarlo")) {
+    set.seed(14)
+    w <- testthat::capture_warnings(
+      res <- ssm_analyze(data,
+        occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+        contrast = TRUE, boots = 50, method = method
+      )
+    )
+    expect_true(any(grepl("flat or.*zero", w)))
+    # the flat occasion's displacement (and fit) are NA; the healthy
+    # occasion is untouched; the contrast inherits NA displacement
+    expect_true(is.na(res$results$d_est[[2]]))
+    expect_true(is.na(res$results$fit_est[[2]]))
+    expect_false(is.na(res$results$d_est[[1]]))
+    expect_true(is.na(res$results$d_est[[3]]))
+    # linear contrast parameters stay defined
+    expect_false(is.na(res$results$e_est[[3]]))
+  }
+})
+
+test_that("k = 3 occasions agree across engines on point estimates", {
+  data <- make_occ_data(n = 60, k = 3, seed = 15)
+  occ <- list(T1 = occ_names(1), T2 = occ_names(2), T3 = occ_names(3))
+  set.seed(16)
+  res_bs <- ssm_analyze(data, occasions = occ, boots = 20)
+  set.seed(16)
+  res_mc <- ssm_analyze(data, occasions = occ, boots = 20,
+                        method = "montecarlo")
+  expect_equal(res_bs$results$d_est, res_mc$results$d_est, tolerance = 1e-12)
+  expect_equal(res_bs$results$a_est, res_mc$results$a_est, tolerance = 1e-12)
+})
+
 test_that("occasion contrast runs through both engines consistently", {
   data <- make_contrast_data(n = 300)
   set.seed(4)
