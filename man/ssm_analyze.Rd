@@ -6,7 +6,7 @@
 \usage{
 ssm_analyze(
   data,
-  scales,
+  scales = NULL,
   angles = octants(),
   measures = NULL,
   grouping = NULL,
@@ -17,16 +17,18 @@ ssm_analyze(
   measures_labels = NULL,
   parallel = "no",
   ncpus = 1,
-  method = "bootstrap"
+  method = "bootstrap",
+  occasions = NULL
 )
 }
 \arguments{
 \item{data}{Required. A data frame or matrix containing at least
 circumplex scales.}
 
-\item{scales}{Required. A character vector of column names, or a numeric
-vector of column indexes, from \code{data} that contains the circumplex scale
-scores to be analyzed.}
+\item{scales}{Required unless \code{occasions} is supplied (the two are mutually
+exclusive). A character vector of column names, or a numeric vector of
+column indexes, from \code{data} that contains the circumplex scale scores to
+be analyzed.}
 
 \item{angles}{Optional. A numeric vector containing the angular displacement
 of each circumplex scale included in \code{scales} (in degrees). (default =
@@ -47,14 +49,17 @@ name from \code{data} of the variable that indicates the group membership of
 each observation.}
 
 \item{contrast}{Optional. A logical indicating whether to output the
-difference between two measures' or two groups' SSM parameters. Can only be
-set to TRUE when there are exactly two measures and one group, one measure
-and two groups, or no measures and two groups (default = FALSE). The
-contrast is always the second level minus the first. For two groups, this
-is the second level of \code{grouping} alphabetically, unless \code{grouping} is
-already a factor with an explicit level order, in which case that order is
-used. For two measures, this is simply the second entry of \code{measures} as
-given (no reordering). The direction is shown in the result's Label (e.g.,
+difference between two measures', two groups', or two occasions' SSM
+parameters. Can only be set to TRUE when exactly one of these holds: two
+measures and one group; one measure and two groups; no measures and two
+groups; or two occasions and one group (default = FALSE). The contrast is
+always the second level minus the first. For two groups, this is the
+second level of \code{grouping} alphabetically, unless \code{grouping} is already a
+factor with an explicit level order, in which case that order is used.
+For two measures, this is simply the second entry of \code{measures} as given
+(no reordering). For two occasions, it is the second listed element of
+\code{occasions} minus the first (list order as supplied -- temporal order --
+never alphabetical). The direction is shown in the result's Label (e.g.,
 "Male - Female").}
 
 \item{boots}{Optional. A single positive whole number indicating how many
@@ -68,7 +73,12 @@ confidence intervals (default = 0.95).}
 \item{listwise}{Optional. A logical indicating whether missing values should
 be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
 that pairwise deletion may result in different missing data patterns in
-each bootstrap resample and is slower to compute (default = TRUE).}
+each bootstrap resample and is slower to compute (default = TRUE).
+Occasions analyses require \code{listwise = TRUE}: a person missing any
+occasion is dropped from all occasions (complete cases across waves), so
+the paired contrast stays a within-person comparison. Note the selection
+caution: complete-cases-across-waves estimates completers' change, which
+can differ from population change when dropout relates to the outcome.}
 
 \item{measures_labels}{Optional. Either \code{NULL} or a character vector
 providing a label for each measure provided in \code{measures} (in the same
@@ -99,6 +109,19 @@ correlations, so prefer the bootstrap for small samples; it also requires
 listwise-complete data. Correlations are drawn jointly across measures
 within each group on the Fisher z scale and back-transformed. The
 \code{parallel} and \code{ncpus} arguments apply only to the bootstrap.}
+
+\item{occasions}{Optional. Either \code{NULL} or a named list of character or
+numeric vectors, each selecting the same circumplex scales measured at
+one occasion, in the same scale order, all of length \code{length(angles)}
+(e.g., \code{occasions = list(T1 = c("PA_1", ..., "NO_1"), T2 = c("PA_2", ..., "NO_2"))}). Mutually exclusive with \code{scales} (and not combinable with
+\code{measures}). Data must be wide -- one row per person -- so persons remain
+the resampling unit and within-person dependence across occasions is
+preserved in both engines. Results gain an \code{Occasion} column (labels are
+\code{names(occasions)}, defaulting to \code{T1..Tk}); this column is present only
+for occasions analyses. Grouping is time-invariant by construction (one
+group per person-row). Cross-occasion column alignment is validated by
+stem matching; when the columns have no common stem structure, positional
+alignment is assumed and messaged.}
 }
 \value{
 A list containing the results and description of the analysis.

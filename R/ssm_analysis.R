@@ -9,9 +9,10 @@
 #'
 #' @param data Required. A data frame or matrix containing at least
 #'   circumplex scales.
-#' @param scales Required. A character vector of column names, or a numeric
-#'   vector of column indexes, from `data` that contains the circumplex scale
-#'   scores to be analyzed.
+#' @param scales Required unless `occasions` is supplied (the two are mutually
+#'   exclusive). A character vector of column names, or a numeric vector of
+#'   column indexes, from `data` that contains the circumplex scale scores to
+#'   be analyzed.
 #' @param angles Optional. A numeric vector containing the angular displacement
 #'   of each circumplex scale included in `scales` (in degrees). (default =
 #'   `octants()`). The closed-form SSM estimator used here equals the
@@ -28,14 +29,17 @@
 #'   name from `data` of the variable that indicates the group membership of
 #'   each observation.
 #' @param contrast Optional. A logical indicating whether to output the
-#'   difference between two measures' or two groups' SSM parameters. Can only be
-#'   set to TRUE when there are exactly two measures and one group, one measure
-#'   and two groups, or no measures and two groups (default = FALSE). The
-#'   contrast is always the second level minus the first. For two groups, this
-#'   is the second level of `grouping` alphabetically, unless `grouping` is
-#'   already a factor with an explicit level order, in which case that order is
-#'   used. For two measures, this is simply the second entry of `measures` as
-#'   given (no reordering). The direction is shown in the result's Label (e.g.,
+#'   difference between two measures', two groups', or two occasions' SSM
+#'   parameters. Can only be set to TRUE when exactly one of these holds: two
+#'   measures and one group; one measure and two groups; no measures and two
+#'   groups; or two occasions and one group (default = FALSE). The contrast is
+#'   always the second level minus the first. For two groups, this is the
+#'   second level of `grouping` alphabetically, unless `grouping` is already a
+#'   factor with an explicit level order, in which case that order is used.
+#'   For two measures, this is simply the second entry of `measures` as given
+#'   (no reordering). For two occasions, it is the second listed element of
+#'   `occasions` minus the first (list order as supplied -- temporal order --
+#'   never alphabetical). The direction is shown in the result's Label (e.g.,
 #'   "Male - Female").
 #' @param boots Optional. A single positive whole number indicating how many
 #'   bootstrap resamples (or, when `method = "montecarlo"`, Monte Carlo draws)
@@ -47,6 +51,11 @@
 #'   be handled by listwise deletion (TRUE) or pairwise deletion (FALSE). Note
 #'   that pairwise deletion may result in different missing data patterns in
 #'   each bootstrap resample and is slower to compute (default = TRUE).
+#'   Occasions analyses require `listwise = TRUE`: a person missing any
+#'   occasion is dropped from all occasions (complete cases across waves), so
+#'   the paired contrast stays a within-person comparison. Note the selection
+#'   caution: complete-cases-across-waves estimates completers' change, which
+#'   can differ from population change when dropout relates to the outcome.
 #' @param measures_labels Optional. Either `NULL` or a character vector
 #'   providing a label for each measure provided in `measures` (in the same
 #'   order) to appear in the results as well as tables and plots derived from
@@ -61,6 +70,19 @@
 #'   `parallel` and `ncpus` settings.
 #' @param ncpus Optional. A single positive whole number indicating how many
 #'   CPU cores to use when `parallel` is not "no" (default = 1).
+#' @param occasions Optional. Either `NULL` or a named list of character or
+#'   numeric vectors, each selecting the same circumplex scales measured at
+#'   one occasion, in the same scale order, all of length `length(angles)`
+#'   (e.g., `occasions = list(T1 = c("PA_1", ..., "NO_1"), T2 = c("PA_2", ...,
+#'   "NO_2"))`). Mutually exclusive with `scales` (and not combinable with
+#'   `measures`). Data must be wide -- one row per person -- so persons remain
+#'   the resampling unit and within-person dependence across occasions is
+#'   preserved in both engines. Results gain an `Occasion` column (labels are
+#'   `names(occasions)`, defaulting to `T1..Tk`); this column is present only
+#'   for occasions analyses. Grouping is time-invariant by construction (one
+#'   group per person-row). Cross-occasion column alignment is validated by
+#'   stem matching; when the columns have no common stem structure, positional
+#'   alignment is assumed and messaged.
 #' @param method Optional. A string indicating how to estimate the confidence
 #'   intervals: "bootstrap" (default) resamples the data, whereas "montecarlo"
 #'   draws parameter replicates from the asymptotic sampling distribution of
@@ -194,20 +216,88 @@
 #' )
 #' }
 #' 
-ssm_analyze <- function(data, scales, angles = octants(),
+ssm_analyze <- function(data, scales = NULL, angles = octants(),
                         measures = NULL, grouping = NULL, contrast = FALSE,
                         boots = 2000, interval = 0.95, listwise = TRUE,
                         measures_labels = NULL, parallel = "no", ncpus = 1,
-                        method = "bootstrap") {
+                        method = "bootstrap", occasions = NULL) {
 
   # Save function call
   call <- match.call()
 
   # Validate arguments
   stopifnot(is.data.frame(data) || is.matrix(data))
-  stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
-  stopifnot(length(scales) == length(angles))
+  if (is.null(occasions)) {
+    # `scales` and `occasions` are mutually exclusive spellings of "which
+    # columns hold the circumplex scores" (spec devel/longitudinal-ssm-spec.md
+    # sec. 1.1); exactly one must be supplied.
+    if (is.null(scales)) {
+      stop("Supply either `scales` or `occasions`.", call. = FALSE)
+    }
+    stopifnot(is_var(scales))
+    stopifnot(length(scales) == length(angles))
+  } else {
+    if (!is.null(scales)) {
+      stop(
+        "`scales` and `occasions` are mutually exclusive: `occasions` names ",
+        "the same circumplex scales measured at each occasion, so supply ",
+        "only one of the two.",
+        call. = FALSE
+      )
+    }
+    if (!is.null(measures)) {
+      stop(
+        "`occasions` cannot be combined with `measures`: the ",
+        "occasions-by-measures correlation analysis is not supported.",
+        call. = FALSE
+      )
+    }
+    if (!isTRUE(listwise)) {
+      stop(
+        "Occasions analyses require listwise = TRUE: with pairwise deletion ",
+        "the paired contrast would compare partially overlapping ",
+        "subpopulations (T1-completers vs T2-completers) instead of ",
+        "within-person change.",
+        call. = FALSE
+      )
+    }
+    if (!is.list(occasions)) {
+      stop(
+        "`occasions` must be a list of character or numeric vectors, one ",
+        "per occasion, each selecting the same circumplex scales in the ",
+        "same order.",
+        call. = FALSE
+      )
+    }
+    if (length(occasions) < 2) {
+      stop("`occasions` must select at least two occasions.", call. = FALSE)
+    }
+    if (!all(vapply(occasions, is_var, logical(1)))) {
+      stop(
+        "Each element of `occasions` must be a character or numeric vector ",
+        "of column names or indices.",
+        call. = FALSE
+      )
+    }
+    if (!all(lengths(occasions) == length(angles))) {
+      stop(
+        "Each `occasions` block must have the same length as `angles` ",
+        "(one column per circumplex scale, in the same scale order).",
+        call. = FALSE
+      )
+    }
+    occ_labels <- names(occasions)
+    if (is.null(occ_labels)) {
+      occ_labels <- paste0("T", seq_along(occasions))
+    } else if (any(!nzchar(occ_labels)) || anyDuplicated(occ_labels)) {
+      stop(
+        "`occasions` names must be either absent (labels default to T1..Tk) ",
+        "or complete and unique.",
+        call. = FALSE
+      )
+    }
+  }
   stopifnot(is_null_or_var(measures))
   stopifnot(is_null_or_var(grouping, n = 1))
   stopifnot(is_flag(contrast))
@@ -240,18 +330,51 @@ ssm_analyze <- function(data, scales, angles = octants(),
   }
 
   if (contrast) {
+    # Contrast requires exactly two of one dimension: 2 groups, 2 measures,
+    # or 2 occasions (the occasions triple is 1 group, 0 measures,
+    # 2 occasions; spec sec. 1.2).
     n_measures <- length(measures)
+    n_occasions <- length(occasions)
     n_groups <- ifelse(is.null(grouping), 1, nlevels(factor(data[[grouping]])))
-    group_mean_contrast <- n_measures == 0 && n_groups == 2
-    group_corr_contrast <- n_measures == 1 && n_groups == 2
-    measure_corr_contrast <- n_measures == 2 && n_groups == 1
-    if (!any(group_mean_contrast, group_corr_contrast, measure_corr_contrast)) {
-      stop("Contrast can only be TRUE when comparing 2 groups or 2 measures.")
+    group_mean_contrast <- n_measures == 0 && n_groups == 2 && n_occasions == 0
+    group_corr_contrast <- n_measures == 1 && n_groups == 2 && n_occasions == 0
+    measure_corr_contrast <- n_measures == 2 && n_groups == 1 && n_occasions == 0
+    occasion_mean_contrast <- n_measures == 0 && n_groups == 1 && n_occasions == 2
+    if (!any(group_mean_contrast, group_corr_contrast, measure_corr_contrast,
+             occasion_mean_contrast)) {
+      stop(
+        "Contrast can only be TRUE when comparing 2 groups, 2 measures, ",
+        "or 2 occasions (occasion contrasts require a single group)."
+      )
     }
   }
-  
+
   # Convert angles from degrees to radians
   angles <- as_radian(as_degree(angles))
+
+  # Occasions = repeated-measures mean analysis
+  if (!is.null(occasions)) {
+    # Resolve numeric column indices to names, then validate cross-occasion
+    # column alignment by stem matching (the rotation channel; spec sec. 1.1)
+    occ_cols <- lapply(occasions, function(x) {
+      if (is.numeric(x)) colnames(data)[x] else x
+    })
+    occ_validate_alignment(occ_cols, occ_labels)
+    return(ssm_analyze_occasions(
+      data = data,
+      occ_cols = occ_cols,
+      occ_labels = occ_labels,
+      angles = angles,
+      grouping = grouping,
+      contrast = contrast,
+      boots = boots,
+      interval = interval,
+      parallel = parallel,
+      ncpus = ncpus,
+      method = method,
+      call = call
+    ))
+  }
 
   # Forward to the appropriate subfunction
   if (is.null(measures)) {
@@ -289,6 +412,77 @@ ssm_analyze <- function(data, scales, angles = octants(),
       call = call
     )
   }
+}
+
+# Cross-occasion column-alignment validation (spec sec. 1.1) ------------------
+
+# Longest common prefix of a character vector ("" when none)
+str_common_prefix <- function(x) {
+  if (length(x) < 2) return("")
+  chars <- strsplit(x, "", fixed = TRUE)
+  n <- min(lengths(chars))
+  i <- 0
+  while (i < n) {
+    if (length(unique(vapply(chars, `[[`, character(1), i + 1))) > 1) break
+    i <- i + 1
+  }
+  substr(x[[1]], 1, i)
+}
+
+str_reverse <- function(x) {
+  vapply(strsplit(x, "", fixed = TRUE),
+         function(ch) paste(rev(ch), collapse = ""), character(1))
+}
+
+# Validate that every occasion block selects the same scales in the same order,
+# by stem matching: strip each block's own longest common prefix and suffix
+# from its column names; comparable stems must agree in order across blocks.
+# Same stems in a different order is exactly the silent-rotation bug (a rotated
+# occasion block silently rotates displacement), so it is an error, never a
+# message. When any block has no detectable stem structure (no common prefix
+# or suffix, or stripped stems that are empty/duplicated), the contract is not
+# checkable by name: fall back to a one-time message naming the assumed
+# positional alignment. Literal column names can never match across occasions
+# (PA_1 vs PA_2), which is why stems are compared instead.
+occ_validate_alignment <- function(occ_cols, occ_labels) {
+  stems <- lapply(occ_cols, function(nm) {
+    prefix <- str_common_prefix(nm)
+    suffix <- str_reverse(str_common_prefix(str_reverse(nm)))
+    if (!nzchar(prefix) && !nzchar(suffix)) return(NULL) # no stem structure
+    out <- substr(nm, nchar(prefix) + 1, nchar(nm) - nchar(suffix))
+    if (any(!nzchar(out)) || anyDuplicated(out)) return(NULL)
+    out
+  })
+  if (any(vapply(stems, is.null, logical(1)))) {
+    message(
+      "Occasion columns could not be stem-matched; assuming positional ",
+      "alignment (e.g., '", occ_cols[[1]][[1]], "' ~ '", occ_cols[[2]][[1]],
+      "' aligned by position 1). Verify every occasion lists the same ",
+      "scales in the same order."
+    )
+    return(invisible(NULL))
+  }
+  ref <- stems[[1]]
+  for (j in seq_along(stems)[-1]) {
+    if (identical(stems[[j]], ref)) next
+    if (setequal(stems[[j]], ref)) {
+      stop(
+        "Occasion block '", occ_labels[[j]], "' lists the same scale stems ",
+        "as '", occ_labels[[1]], "' but in a different order; a reordered ",
+        "occasion block would silently rotate displacement. Reorder its ",
+        "columns to match.",
+        call. = FALSE
+      )
+    }
+    stop(
+      "Occasion block '", occ_labels[[j]], "' has column stems (",
+      paste(stems[[j]], collapse = ", "), ") that do not match ",
+      "'", occ_labels[[1]], "' (", paste(ref, collapse = ", "), "); every ",
+      "occasion must list the same scales in the same order.",
+      call. = FALSE
+    )
+  }
+  invisible(NULL)
 }
 
 # Build the Label/Group/Measure identifier columns ----------------------------

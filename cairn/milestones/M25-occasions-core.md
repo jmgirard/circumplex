@@ -4,7 +4,7 @@
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m25-occasions-core`
 
 ## Goal
 
@@ -109,7 +109,7 @@ output-surface complete, per the binding D-013 spec
 
 ## Tasks
 
-- [ ] **T1** — Intake/validation layer, tests first: `occasions` parsing,
+- [x] **T1** — Intake/validation layer, tests first: `occasions` parsing,
       mutual exclusivity, block checks, stem-matching alignment (+ no-stem
       message), listwise-only enforcement + drop-count message
       (`R/ssm_analysis.R:197-208`, `is_*()` helpers).
@@ -143,6 +143,11 @@ output-surface complete, per the binding D-013 spec
   promoted from the "Longitudinal SSM build family" candidate row). Plan-gate
   decisions: full k ≥ 2 ships (contrast stays exactly-2); all builds precede
   M7 in work order (priority high).
+- 2026-07-16: T1 done — occasions intake validation (mutual exclusivity,
+  block shape, labels, listwise-only estimand error, stem-matching alignment
+  incl. rotation error + positional-fallback message path) + contrast rule
+  extension in `ssm_analyze`; 12 new tests; full suite green (2141 pass).
+  Implement question gate skipped: plan/spec pin all substantive choices.
 
 ## Decisions
 
