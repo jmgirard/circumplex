@@ -3,7 +3,7 @@
      Per-section owners are tagged below. -->
 # M29: `ssm_ci_accuracy()` occasions extension
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** M25
 - **Principles touched:** —
@@ -117,6 +117,11 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
   observed cross-blocks, whose real tension is k·p covariance noise vs
   circumplex-smoothing fidelity at the small-n (≈25–50) regime the diagnostic
   most targets. Implement paused pending the RR.
+- 2026-07-17: blocked on RB07 (occasions plug-in population design;
+  cairn/reviews/RB07-occasions-ci-accuracy-population.md). 6 questions:
+  population structure (central), small-n rank-deficiency, ladder coherence,
+  contrast/certification stance, the AC3 independence-invariant construction,
+  and the degenerate-occasion boundary contract.
 
 ## Decisions
 
