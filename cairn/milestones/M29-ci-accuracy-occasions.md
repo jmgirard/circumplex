@@ -1,6 +1,3 @@
-<!-- Section ownership + write-modes: see tracking-rules.md "Milestone-file
-     section ownership". A phase skill never rewrites another phase's section.
-     Per-section owners are tagged below. -->
 # M29: `ssm_ci_accuracy()` occasions extension
 
 - **Status:** in-progress
@@ -19,13 +16,11 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 ## Scope
 
 **In:**
-- Design + implement the occasions plug-in population: build the diagnostic's
-  simulation population from the stacked person-level score covariance —
-  within-person cross-occasion dependence entering through the off-diagonal
-  p×p blocks (§2.2, the same object the occasions Monte Carlo engine already
-  uses) — draw wide person-rows, re-run `ssm_analyze(occasions = )` per
-  simulated dataset, and report per-occasion CI-accuracy rows (plus the
-  paired-contrast row when the object carried `contrast = TRUE`).
+- Design + implement the occasions plug-in population (§2.2, [[D-017]]): draw
+  wide person-rows from the per-group stacked person-level score covariance
+  (cross-occasion dependence in the off-diagonal p×p blocks), re-run
+  `ssm_analyze(occasions = )` per simulated dataset, and report per-occasion
+  CI-accuracy rows plus the paired-contrast row (when `contrast = TRUE`).
 - Remove the `details$occasions` error guard
   ([R/ssm_ci_accuracy.R:197](R/ssm_ci_accuracy.R:197)); replace the
   informative-error test with the new run-don't-error contract.
