@@ -1,6 +1,6 @@
 # M25: Longitudinal Build A — occasions API + paired contrasts
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
@@ -134,7 +134,7 @@ output-surface complete, per the binding D-013 spec
 - [x] **T7** — Output surfaces: print/snapshots, `ssm_table()`,
       `ssm_plot_circle/curve/contrast()` support-or-reject,
       `ssm_ci_accuracy()` informative error.
-- [ ] **T8** — Docs + NEWS + DESIGN.md (RNG row, oracle-registry pointer) +
+- [x] **T8** — Docs + NEWS + DESIGN.md (RNG row, oracle-registry pointer) +
       CLAUDE.md occasion-order clause; full `devtools::check()`.
 
 ## Work log
@@ -182,6 +182,13 @@ output-surface complete, per the binding D-013 spec
   ssm_plot_curve dropped info columns positionally (-c(1:3)) and would
   have leaked the Occasion column into the scale reshape — now name-based.
   Tests/snapshots landed with T6's commit (file-level staging).
+- 2026-07-16: T8 done — roxygen Occasions section (conditional efficiency
+  statement, paired-interpretability sentence, n_g ≫ k·p MC note), NEWS
+  entry (incl. Occasion schema note), DESIGN.md occasions RNG row +
+  oracle-registry pointer line, CLAUDE.md occasion-order clause. AC7 grep:
+  every "narrower" is inside the conditional formulation. Full
+  `devtools::check()` on the final tree: 0 errors / 0 warnings / 0 notes;
+  suite 2346 pass. All tasks complete → status review.
 
 ## Decisions
 

@@ -191,6 +191,38 @@ stable across different \code{boots} values, only within a fixed call.
 }
 }
 
+\section{Occasions (repeated measures)}{
+
+Supplying \code{occasions} analyzes the same circumplex scales measured at
+k >= 2 occasions on the same persons (wide data, one row per person).
+Each occasion yields its own profile row; with \code{contrast = TRUE}
+(exactly 2 occasions, single group) the paired within-person contrast
+is estimated with both engines preserving the within-person dependence
+(the bootstrap resamples persons; the Monte Carlo engine draws the
+stacked occasion mean vectors jointly).
+
+Interpretation notes. A paired displacement-contrast CI is
+interpretable only when \emph{both} occasions' amplitudes are reliably
+nonzero (both profiles print without the amplitude note); if only one
+occasion's profile is interpretable, do not read the contrast as
+directional change. Paired designs are not unconditionally more
+efficient than independent groups: the paired elevation contrast has a
+narrower CI exactly when the within-person elevation correlation is
+positive, while for the amplitude and displacement contrasts the paired
+CI is narrower only when the gradient-projected cross-occasion
+covariance is positive -- under isotropic dependence this is
+proportional to cos(displacement change), so paired CIs are narrower
+for displacement changes under 90 degrees and can be \emph{wider} than
+independent-groups CIs for changes beyond 90 degrees, even with
+strongly positive within-person correlation.
+
+With \code{method = "montecarlo"} the per-group draw is (k\emph{p)-dimensional;
+group sizes should comfortably exceed k}p for the asymptotic covariance
+to be well estimated (the percentile bootstrap is the safer
+small-sample choice). Grouping is time-invariant by construction (one
+group per person-row).
+}
+
 \examples{
 # Load example data
 data("jz2017")
