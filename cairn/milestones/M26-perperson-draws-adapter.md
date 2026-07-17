@@ -4,7 +4,7 @@
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m26-perperson-draws-adapter`
 
 ## Goal
 
@@ -102,11 +102,11 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
 
 ## Tasks
 
-- [ ] **T1** — Per-person wrapper, tests first (closed-form fixtures);
+- [x] **T1** — Per-person wrapper, tests first (closed-form fixtures);
       exported name settled at the pre-implementation gate
       (RB tripwire: irreversible-api). `ssm_score()`/`ssm_parameters()`
       (`R/ssm_analysis.R:779,854`) are the building blocks.
-- [ ] **T2** — Summary layer: circular stats, NA stripping + counts, the
+- [x] **T2** — Summary layer: circular stats, NA stripping + counts, the
       §3.3 invariant suite (linearity, Jensen, hand-recomputed circular
       mean, differ-fixture).
 - [ ] **T3** — `ssm_draws()` core: shape A/B transforms + dispatch rules,
@@ -127,7 +127,26 @@ binding D-013 spec (`devel/longitudinal-ssm-spec.md` §§3, 5, §7 Build B).
 - 2026-07-16: created by /milestone-plan (Build B of the D-013 contract;
   promoted from the "Longitudinal SSM build family" candidate row). brms
   `Suggests` pre-cleared at the plan gate (D-entry lands with T6).
+- 2026-07-16: implementation started; branch cut; pre-implementation gate
+  resolved the wrapper name, summary home, and draws return class (see
+  Decisions).
+- 2026-07-16: T1 done — `ssm_parameters_id()` exported (tests first;
+  closed-form fixtures for first-harmonic/flat/second-harmonic persons,
+  id aggregation, na_rate column, NA-id error, 0-row edge); full suite green.
+- 2026-07-16: T2 done — `summary.circumplex_ssm_id()` (circular mean +
+  resultant length, NA-d strip with n_na_d count) + the §3.3 invariant suite
+  (linearity, Jensen, identical-profiles, hand-recomputed circular mean,
+  differ-fixture anti-confusion regression).
 
 ## Decisions
+
+- 2026-07-16 (pre-implementation gate): exported per-person wrapper named
+  `ssm_parameters_id()` (spec §3.2 sketch confirmed; the irreversible-api
+  tripwire resolved without escalation). Group-level circular summaries live
+  in a `summary()` method on the lightly classed per-person table (class
+  `circumplex_ssm_id` on a plain data frame; no second exported name).
+  `ssm_draws()` returns a standalone `circumplex_ssm_draws` object with its
+  own print/summary saying "posterior draws"/"credible interval";
+  `circumplex_ssm` subclassing deferred as a non-breaking future addition.
 
 ## Review

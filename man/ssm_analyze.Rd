@@ -294,19 +294,23 @@ Other ssm functions:
 \code{\link[=plot.circumplex_ci_accuracy]{plot.circumplex_ci_accuracy()}},
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
+\code{\link[=ssm_parameters_id]{ssm_parameters_id()}},
 \code{\link[=ssm_score]{ssm_score()}},
 \code{\link[=ssm_sem]{ssm_sem()}},
 \code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}},
-\code{\link[=ssm_table]{ssm_table()}}
+\code{\link[=ssm_table]{ssm_table()}},
+\code{\link[=summary.circumplex_ssm_id]{summary.circumplex_ssm_id()}}
 
 Other analysis functions:
 \code{\link[=cpm_fit]{cpm_fit()}},
 \code{\link[=cpm_simulate]{cpm_simulate()}},
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
+\code{\link[=ssm_parameters_id]{ssm_parameters_id()}},
 \code{\link[=ssm_score]{ssm_score()}},
 \code{\link[=ssm_sem]{ssm_sem()}},
-\code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}}
+\code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}},
+\code{\link[=summary.circumplex_ssm_id]{summary.circumplex_ssm_id()}}
 }
 \concept{analysis functions}
 \concept{ssm functions}

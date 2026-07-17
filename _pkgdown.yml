@@ -40,6 +40,8 @@ reference:
   - ssm_plot_contrast
   - ssm_plot_curve
   - ssm_parameters
+  - ssm_parameters_id
+  - summary.circumplex_ssm_id
   - ssm_score
 - title: SEM-Based SSM Functions
   desc: Latent-variable (disattenuated) SSM via structural equation modeling
