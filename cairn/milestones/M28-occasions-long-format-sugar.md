@@ -7,7 +7,7 @@
 - **Priority:** normal
 - **Depends on:** M25
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m28-occasions-long-format-sugar
 
 ## Goal
 
@@ -51,8 +51,9 @@ id/occasion long data to wide and delegates to the validated
 - [ ] **AC2** — occasion ordering follows factor levels / first appearance,
       never alphabetical: a fixture with a `T10`/`T2`-style occasion pair
       produces the temporal (not sign-flipped) contrast.
-- [ ] **AC3** — input validation: duplicate `(id, occasion)` rows and ragged
-      occasion scale sets each error informatively; tested.
+- [ ] **AC3** — input validation: duplicate `(id, occasion)` rows, fewer than
+      two distinct occasions, and time-varying grouping within an `id` each
+      error informatively; tested.
 - [ ] **AC4** — `ssm_analyze_long()` exported and documented (roxygen, NEWS
       entry, `devtools::document()` clean); `devtools::test()` clean and
       `devtools::check()` clean (0 errors / 0 warnings; NOTEs justified).
@@ -66,14 +67,15 @@ id/occasion long data to wide and delegates to the validated
 
 ## Tasks
 
-- [ ] **T1** — Implement `ssm_analyze_long()` (`R/ssm_analyze_long.R` or in
-      `R/ssm_analysis.R`): signature, `id`/`occasion` validation, long → wide
-      reshape (base R, no new deps), temporal occasion ordering, delegation to
-      `ssm_analyze(occasions = )`; roxygen docs. Test-first.
-- [ ] **T2** — Tests (`tests/testthat/test-ssm_occasions.R` or a new file):
-      the wide/long equivalence invariant (incl. `contrast = TRUE`), the
-      `T10`/`T2` ordering regression, the duplicate-wave error, the
-      ragged-scale error.
+- [x] **T1** — Implement `ssm_analyze_long()` (`R/ssm_analyze_long.R`):
+      signature, `id`/`occasion` validation, long → wide reshape (base R, no new
+      deps), temporal occasion ordering, delegation to `ssm_analyze(occasions =
+      )`; roxygen docs.
+- [x] **T2** — Tests (`tests/testthat/test-ssm_analyze_long.R`): the wide/long
+      equivalence invariant (bootstrap + Monte Carlo + `contrast = TRUE` +
+      numeric-index), the `T10`/`T2` ordering regression, factor-level order,
+      and the validation errors (duplicate wave, < 2 occasions, time-varying
+      grouping, unknown column, NA-row drop).
 - [ ] **T3** — NEWS.md entry; `devtools::document()`; `@export`; add to
       `_pkgdown.yml` reference index if maintained; `devtools::check()` clean.
 
@@ -83,6 +85,21 @@ id/occasion long data to wide and delegates to the validated
   from the "Longitudinal deferrals" ROADMAP candidate). Sugar over the M25
   occasions core; no new statistical surface. Sibling M29 planned in the same
   run (§1.4).
+- 2026-07-17: in-progress (/milestone-implement). Branch
+  m28-occasions-long-format-sugar. Gate: signature confirmed
+  `ssm_analyze_long(data, scales, angles, id, occasion, grouping, contrast,
+  ...)` with `id`/`occasion` as character/numeric column references (D-014 SE);
+  occasion order = factor levels else first-appearance, never alphabetical.
+  AC3 amended (substantive) — replaced the wide-format "ragged occasion scale
+  sets" case (inapplicable: long input shares one score-column set) with the
+  long-format validation surface: duplicate `(id, occasion)` rows, < 2
+  occasions, and time-varying grouping within an `id`.
+- 2026-07-17: T1 + T2 done. `ssm_analyze_long()` implemented in
+  `R/ssm_analyze_long.R` (reshape-and-delegate; scores extracted by position
+  per the M25 duplicate-name lesson). 15 tests in
+  `test-ssm_analyze_long.R` green; full `devtools::test()` clean (0 failed / 0
+  errors; the 4 CPM-Hessian warnings are pre-existing in `test-ci_accuracy.R`,
+  untouched here).
 
 ## Decisions
 

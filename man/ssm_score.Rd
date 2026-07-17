@@ -54,6 +54,7 @@ ssm_score(
 Other ssm functions:
 \code{\link[=plot.circumplex_ci_accuracy]{plot.circumplex_ci_accuracy()}},
 \code{\link[=ssm_analyze]{ssm_analyze()}},
+\code{\link[=ssm_analyze_long]{ssm_analyze_long()}},
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_draws]{ssm_draws()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
@@ -67,6 +68,7 @@ Other analysis functions:
 \code{\link[=cpm_fit]{cpm_fit()}},
 \code{\link[=cpm_simulate]{cpm_simulate()}},
 \code{\link[=ssm_analyze]{ssm_analyze()}},
+\code{\link[=ssm_analyze_long]{ssm_analyze_long()}},
 \code{\link[=ssm_ci_accuracy]{ssm_ci_accuracy()}},
 \code{\link[=ssm_draws]{ssm_draws()}},
 \code{\link[=ssm_parameters]{ssm_parameters()}},
