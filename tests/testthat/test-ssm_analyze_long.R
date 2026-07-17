@@ -197,6 +197,29 @@ test_that("time-varying grouping errors informatively", {
   )
 })
 
+test_that("grouping recorded only at a later occasion is retained (not dropped)", {
+  # Regression (M28 review, diff-bug + blame-history lenses): a person whose
+  # group is NA at the first-listed occasion but known later must keep that
+  # known group -- taking the first physical row would assign NA and silently
+  # drop the person. Blanking one person's first-occasion group must not change
+  # the result at all.
+  long_full <- make_long_data(occ = c("T1", "T2"), group = TRUE)
+  long_gap <- long_full
+  long_gap$Gender[long_gap$id == 1 & long_gap$occasion == "T1"] <- NA
+
+  set.seed(29)
+  a <- suppressMessages(ssm_analyze_long(
+    long_full, scales = SC8, id = "id", occasion = "occasion",
+    grouping = "Gender", boots = 200
+  ))
+  set.seed(29)
+  b <- suppressMessages(ssm_analyze_long(
+    long_gap, scales = SC8, id = "id", occasion = "occasion",
+    grouping = "Gender", boots = 200
+  ))
+  expect_equal(a$results, b$results)
+})
+
 test_that("unknown column references error", {
   long <- make_long_data(occ = c("T1", "T2"), group = FALSE)
   expect_error(

@@ -177,7 +177,17 @@ ssm_analyze_long <- function(data, scales, angles = octants(),
     occasions[[k]] <- block_cols
   }
   if (!is.null(grp_name)) {
-    wide[[grp_name]] <- data[[grp_name]][match(ids, data[[id_name]])]
+    # Take each person's first *non-missing* grouping value (the validation
+    # above is NA-tolerant, so a group recorded only at a later occasion is
+    # valid); index the original column to preserve its type. `match()` on the
+    # id alone would pick the first physical row, dropping a known value when
+    # that row's group is NA.
+    rows_by_id <- split(seq_len(nrow(data)), id_index)
+    first_valid <- vapply(rows_by_id, function(rows) {
+      nna <- rows[!is.na(data[[grp_name]][rows])]
+      if (length(nna)) nna[[1]] else rows[[1]]
+    }, integer(1))
+    wide[[grp_name]] <- data[[grp_name]][first_valid]
   }
 
   # Delegate to the validated wide-format occasions path. Estimation, missing-
