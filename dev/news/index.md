@@ -2,6 +2,48 @@
 
 ## circumplex (development version)
 
+- New per-person (intraindividual) SSM scoring:
+  [`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md)
+  scores each person’s own circumplex profile through the closed-form
+  SSM transform and returns a per-person parameter table – one row per
+  person, with an `id` argument that first averages a person’s rows
+  (e.g., occasions of intensive longitudinal data) within person before
+  scoring. Degenerate profiles keep their row with `NA` parameters
+  (never a silent drop), and an `na_rate` column exposes each person’s
+  share of missing scale cells. A
+  [`summary()`](https://rdrr.io/r/base/summary.html) method aggregates
+  the table at the group level using circular statistics for
+  displacement (circular mean and mean resultant length, never
+  arithmetic means of angles), reporting how many undefined
+  displacements were excluded. Two documented caveats: the circular mean
+  of per-person displacements (equal weight per person) is a different
+  quantity from the displacement of the group mean profile
+  (amplitude-weighted), and by the triangle inequality the group
+  profile’s amplitude is at most the mean per-person amplitude, strictly
+  smaller when directions disperse.
+
+- New Bayesian draws adapter:
+  [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md)
+  converts posterior draws from a user-fitted Bayesian model (e.g., a
+  brms cosine regression) into SSM parameter draws and summarizes them
+  with the package’s circular-statistics machinery – circular quantiles
+  for displacement (credible intervals that straddle 0/360 wrap instead
+  of inverting), posterior medians for the linear parameters (the
+  amplitude posterior is right-skewed), and the circular mean for
+  displacement, with the marginal-coherence caveat documented. Two draw
+  shapes are accepted and never guessed: (e, x, y) parameter draws
+  (`type = "parameters"`, required because a 3-column matrix is
+  ambiguous) and profile draws (one column per scale, with `angles`).
+  Draws with undefined displacement are excluded from the displacement
+  summaries only, with an honest warning that says “posterior draws” and
+  “credible interval”. A new precomputed vignette, *Bayesian SSM
+  Analysis*, derives the cosine-regression mapping (pinning the atan2
+  argument order with an executable known-direction check), walks a brms
+  random-intercept example whose posterior draws ship with the package,
+  and exhibits the Rayleigh-shaped prior that independent (x, y) priors
+  induce on amplitude (brms is a new optional `Suggests` dependency used
+  only by that vignette’s frozen model-fitting chunk).
+
 - New repeated-measures (longitudinal) SSM analyses:
   [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
   gains an `occasions` argument taking a named list of column blocks,
@@ -679,7 +721,8 @@ CRAN release: 2023-02-14
 
 ### Minor improvements and fixes
 
-- Fixed a bug related to `NaN` values and `dplyr::na_if()`
+- Fixed a bug related to `NaN` values and
+  [`dplyr::na_if()`](https://dplyr.tidyverse.org/reference/na_if.html)
 
 - Updated package website using new version of {pkgdown}
 
@@ -854,7 +897,9 @@ CRAN release: 2019-04-26
 
 - Updated the “Introduction to SSM” vignette’s figures.
 
-- Replaced use of `dplyr::funs()` as this function is being deprecated.
+- Replaced use of
+  [`dplyr::funs()`](https://dplyr.tidyverse.org/reference/funs.html) as
+  this function is being deprecated.
 
 - Fixed a bug in the normative data for `ipipipc` that prevented
   standardization.

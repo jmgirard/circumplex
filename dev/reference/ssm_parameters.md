@@ -105,19 +105,25 @@ Other ssm functions:
 [`plot.circumplex_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_ci_accuracy.md),
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
 [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
+[`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md),
+[`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md),
 [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
 [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md),
 [`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md),
-[`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md)
+[`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md),
+[`summary.circumplex_ssm_id()`](http://circumplex.jmgirard.com/dev/reference/summary.circumplex_ssm_id.md)
 
 Other analysis functions:
 [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md),
 [`cpm_simulate()`](http://circumplex.jmgirard.com/dev/reference/cpm_simulate.md),
 [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md),
 [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md),
+[`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md),
+[`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md),
 [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md),
 [`ssm_sem()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem.md),
-[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md)
+[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_sem_parameters.md),
+[`summary.circumplex_ssm_id()`](http://circumplex.jmgirard.com/dev/reference/summary.circumplex_ssm_id.md)
 
 ## Examples
 

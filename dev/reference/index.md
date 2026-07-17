@@ -44,6 +44,12 @@ Functions for implementing the Structural Summary Method
   : Create a Curve Plot of SSM Results
 - [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md)
   : Calculate Structural Summary Method parameters for a set of scores
+- [`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md)
+  : Calculate SSM parameters for each person
+- [`summary(`*`<circumplex_ssm_id>`*`)`](http://circumplex.jmgirard.com/dev/reference/summary.circumplex_ssm_id.md)
+  : Summarize per-person SSM parameters at the group level
+- [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md)
+  : Summarize posterior draws as SSM parameters
 - [`ssm_score()`](http://circumplex.jmgirard.com/dev/reference/ssm_score.md)
   : Calculate SSM parameters by row and add results as new columns
 

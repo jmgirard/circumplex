@@ -4,6 +4,8 @@
 
 - [Advanced Circumplex
   Visualization](http://circumplex.jmgirard.com/dev/articles/advanced-visualization.md):
+- [Bayesian SSM
+  Analysis](http://circumplex.jmgirard.com/dev/articles/bayesian-ssm-analysis.md):
 - [Evaluating Circumplex
   Structure](http://circumplex.jmgirard.com/dev/articles/evaluating-circumplex-structure.md):
 - [Intermediate SSM
