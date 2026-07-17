@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-17 (M27 done + archived, PR #51; M22 terminal row pruned per retention — archive file stays authoritative)_
+_Last hygiene check: 2026-07-17 (M28 done + archived, PR #52; M27 done + archived, PR #51; M22 terminal row pruned per retention — archive file stays authoritative)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -13,7 +13,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M26 | Longitudinal Build B — per-person layer + draws adapter + Bayesian vignette | done | — | high | milestones/archive/M26-perperson-draws-adapter.md |
 | M27 | Longitudinal Build C — growth-model support on displacement | done | M25, M26 | high | milestones/archive/M27-growth-model-support.md |
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27 | high | milestones/M7-v2-release-prep.md |
-| M28 | Occasions long-format sugar (`ssm_analyze_long()`) | review | M25 | normal | milestones/M28-occasions-long-format-sugar.md |
+| M28 | Occasions long-format sugar (`ssm_analyze_long()`) | done | M25 | normal | milestones/archive/M28-occasions-long-format-sugar.md |
 | M29 | `ssm_ci_accuracy()` occasions extension | planned | M25 | normal | milestones/M29-ci-accuracy-occasions.md |
 | M24 | Tidyverse NSE in the user API — evaluation + standing decision | done | — | normal | milestones/archive/M24-nse-evaluation.md |
 | M23 | Longitudinal & intraindividual SSM — Fable-reviewed design + build-ready spec | done | — | high | milestones/archive/M23-longitudinal-ssm-design.md |
