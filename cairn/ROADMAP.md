@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-18 (M36 + M37 planned — the viz-track remainders: legend key glyph + non-finite guards, and static on-circle movement paths; both added to M7's dependencies, animation stays a candidate. Earlier: M34 done + archived, PR #59 — plotting vignette rewritten over the M31–M33 API; pkgdown visualization groups + roxygen families. The M33-review `@family` candidate is resolved by M34 and struck. M30 terminal row pruned per retention. Terminal-row retention keeps the 5 most recent: M31–M35)_
+_Last hygiene check: 2026-07-18 (M36 done + archived, PR #60 — the certification legend now draws both keys and coord_circumplex() rejects non-finite amax/center; the review removed an inert presence layer the fix had shipped with. M31 terminal row pruned per retention (keeps M32–M36). Earlier: M36 + M37 planned — the viz-track remainders: legend key glyph + non-finite guards, and static on-circle movement paths; both added to M7's dependencies, animation stays a candidate. Earlier: M34 done + archived, PR #59 — plotting vignette rewritten over the M31–M33 API; pkgdown visualization groups + roxygen families. The M33-review `@family` candidate is resolved by M34 and struck. M30 terminal row pruned per retention. Terminal-row retention keeps the 5 most recent: M31–M35)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,9 +10,8 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37 | high | milestones/M7-v2-release-prep.md |
-| M36 | Visualization polish — certification legend key + non-finite guards | review | — | normal | milestones/M36-viz-polish-legend-guards.md |
+| M36 | Visualization polish — certification legend key + non-finite guards | done | — | normal | milestones/archive/M36-viz-polish-legend-guards.md |
 | M37 | On-circle movement paths across occasions | planned | M31, M32, M33 | normal | milestones/M37-on-circle-movement-paths.md |
-| M31 | Circumplex coordinate-system build | done | M30 | high | milestones/archive/M31-coord-system-build.md |
 | M32 | Circumplex geom & layer ergonomics | done | M31 | normal | milestones/archive/M32-geom-ergonomics.md |
 | M33 | Longitudinal trajectory visualization (occasions objects) | done | — | high | milestones/archive/M33-trajectory-visualization.md |
 | M34 | Plotting vignette + pkgdown reference | done | M31, M32, M33 | normal | milestones/archive/M34-plotting-vignette-pkgdown.md |
