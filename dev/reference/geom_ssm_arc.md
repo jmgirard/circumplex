@@ -2,12 +2,12 @@
 
 A ggplot2 layer that draws, for each profile, the wedge spanning its
 amplitude confidence interval (radially) and its displacement confidence
-interval (angularly), on the canvas produced by
-[`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md).
-The amplitude/displacement-to-canvas transform – including the
-wrap-around when a displacement interval crosses the 0/360 degree
-boundary – is handled internally, so the bounds are supplied directly in
-SSM units.
+interval (angularly) on a circumplex canvas built with
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+(for example the canvas from
+[`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)).
+The bounds are supplied directly in SSM units; the coordinate system
+bends the (displacement, amplitude) rectangle into an annular wedge.
 
 ## Usage
 
@@ -15,11 +15,11 @@ SSM units.
 geom_ssm_arc(
   mapping = NULL,
   data = NULL,
-  stat = StatSsmArc,
+  stat = "identity",
   position = "identity",
   ...,
-  amax = 0.5,
-  n = 360,
+  amax = NULL,
+  n = NULL,
   na.rm = TRUE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -36,15 +36,16 @@ geom_ssm_arc(
 
 - amax:
 
-  A single positive number giving the amplitude represented by the
-  canvas's outer ring; must match the `amax` used for
-  [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
-  (default = 0.5).
+  (Deprecated) The amplitude represented by the outer ring is now owned
+  by
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md);
+  a value supplied here is ignored with a one-time note.
 
 - n:
 
-  The number of points used to draw each arc's curved edges (default =
-  360).
+  (Deprecated) Arc smoothness is now owned by the coordinate system,
+  which curves the wedge automatically; a value supplied here is ignored
+  with a one-time note.
 
 - na.rm:
 
@@ -70,6 +71,7 @@ since they do not name a unique arc.
 
 ## See also
 
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
 [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
 [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
 
@@ -78,14 +80,13 @@ since they do not name a unique arc.
 ``` r
 data("jz2017")
 res <- ssm_analyze(jz2017, scales = 2:9, measures = "NARPD")
-amax <- 0.5
-ggcircumplex(octants(), amax = amax) +
+ggcircumplex(octants(), amax = 0.5) +
   geom_ssm_arc(
     data = res$results,
     mapping = ggplot2::aes(
       amplitude_min = a_lci, amplitude_max = a_uci,
       displacement_min = d_lci, displacement_max = d_uci
     ),
-    amax = amax, alpha = 0.4
+    alpha = 0.4
   )
 ```

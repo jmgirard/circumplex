@@ -201,7 +201,12 @@ it:</p>
 <span>    data <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">results</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span>,</span>
 <span>    amax <span class="op">=</span> <span class="va">amax</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> The `amax` argument of `geom_ssm_arc()` is deprecated and ignored.</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Amplitude scaling is now owned by `coord_circumplex()`; set `amax` there (or via `ggcircumplex(amax = )`).</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> The `amax` argument of `geom_ssm_point()` is deprecated and ignored.</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Amplitude scaling is now owned by `coord_circumplex()`; set `amax` there (or via `ggcircumplex(amax = )`).</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This message is displayed once per session.</span></span></span></code></pre></div>
 <p><img src="advanced-visualization_files/figure-html/results-plot-1.png" class="r-plt" alt="" width="100%"></p>
 <p>Each arc displays two separate confidence intervals for one profile
 at once: its radial extent is the amplitude interval and its angular

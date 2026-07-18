@@ -131,6 +131,11 @@ ggcircumplex(octants(), labels = PANO(), amax = amax) +
     mapping = aes(amplitude = a_est, displacement = d_est, fill = Label),
     amax = amax
   )
+#> ! The `amax` argument of `geom_ssm_arc()` is deprecated and ignored.
+#> ℹ Amplitude scaling is now owned by `coord_circumplex()`; set `amax` there (or via `ggcircumplex(amax = )`).
+#> ! The `amax` argument of `geom_ssm_point()` is deprecated and ignored.
+#> ℹ Amplitude scaling is now owned by `coord_circumplex()`; set `amax` there (or via `ggcircumplex(amax = )`).
+#> This message is displayed once per session.
 ```
 
 ![](advanced-visualization_files/figure-html/results-plot-1.png)

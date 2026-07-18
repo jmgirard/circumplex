@@ -61,6 +61,8 @@ A ggplot2 object containing the empty circumplex canvas.
 
 ## See also
 
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
+which owns the transform this canvas is built on;
 [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md),
 which draws SSM results on this canvas.
 

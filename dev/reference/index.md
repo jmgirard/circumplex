@@ -104,6 +104,8 @@ Composable ggplot2 components for building circumplex figures
 
 - [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
   : Create a circumplex plotting canvas
+- [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+  : Circumplex coordinate system
 - [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
   : Draw SSM profile points in circumplex space
 - [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
