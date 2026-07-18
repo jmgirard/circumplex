@@ -2,13 +2,13 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M31: Circumplex coordinate-system build
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M30
 - **Principles touched:** — (implements under the CLAUDE.md angle invariants:
   [0,360), LM=360; ip-touching re-owns the polar transform — the AC4 boundary
   battery is its discharge. IP/GP formalization deferred to /design-interview.)
-- **Branch/PR:** —
+- **Branch/PR:** m31-coord-system-build
 
 ## Goal
 
