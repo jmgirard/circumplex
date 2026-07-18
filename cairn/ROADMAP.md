@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-18 (M31 done + archived, PR #55 — coord_circumplex() build; ggforce removed / D-020. M26 terminal row pruned per retention. Terminal-row retention keeps the 5 most recent: M27–M31)_
+_Last hygiene check: 2026-07-18 (M32 done + archived, PR #56 — geom/layer ergonomics: exported ggproto generators, off-spoke amplitude axis, `theme_circumplex()`, na.rm opt-in parity. M27 terminal row pruned per retention. Terminal-row retention keeps the 5 most recent: M28–M32)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,13 +9,12 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M27 | Longitudinal Build C — growth-model support on displacement | done | M25, M26 | high | milestones/archive/M27-growth-model-support.md |
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27, M31, M32, M33, M34 | high | milestones/M7-v2-release-prep.md |
 | M28 | Occasions long-format sugar (`ssm_analyze_long()`) | done | M25 | normal | milestones/archive/M28-occasions-long-format-sugar.md |
 | M29 | `ssm_ci_accuracy()` occasions extension | done | M25 | normal | milestones/archive/M29-ci-accuracy-occasions.md |
 | M30 | Circumplex coordinate-system design (Fable-reviewed) | done | — | high | milestones/archive/M30-coord-system-design.md |
 | M31 | Circumplex coordinate-system build | done | M30 | high | milestones/archive/M31-coord-system-build.md |
-| M32 | Circumplex geom & layer ergonomics | review | M31 | normal | milestones/M32-geom-ergonomics.md |
+| M32 | Circumplex geom & layer ergonomics | done | M31 | normal | milestones/archive/M32-geom-ergonomics.md |
 | M33 | Longitudinal trajectory visualization | planned | — | high | milestones/M33-trajectory-visualization.md |
 | M34 | Plotting vignette + pkgdown reference | planned | M31, M32, M33 | normal | milestones/M34-plotting-vignette-pkgdown.md |
 
