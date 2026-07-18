@@ -60,6 +60,77 @@ ssm_interval_on_branch <- function(lci, uci, est, branch) {
   list(lo = lo, hi = lo + ssm_arc_span(as.numeric(lci), as.numeric(uci)))
 }
 
+# Reshape a wide per-time-point table into the long per-panel frame the
+# trajectory plot draws: one row per (Group, <time_col>, Parameter).
+#
+# THE single definition of the displacement unwrap, the certification carry, and
+# the melt, shared by both entry points (an occasions object and a user-supplied
+# trajectory table). The two paths differ only in how they assemble `dat` and in
+# whether the time axis is discrete; everything statistically load-bearing
+# happens here exactly once.
+#
+# `dat` arrives with a `Group` factor, a time column named `time_col` (already
+# ordered -- a factor on the occasions path, numeric on the table path), a
+# logical `Certified` column (all-NA when the caller supplied no verdict), and
+# `<p>_est`/`<p>_lci`/`<p>_uci` triples for some subset of the canonical
+# parameters. Which panels appear is read off the triples present, so a table
+# carrying only amplitude and displacement yields only those two panels.
+ssm_trajectory_long <- function(dat, time_col, drop_xy = FALSE) {
+  # A profile has a defined displacement iff it has a location; the shared
+  # predicate keeps this agreeing with the circular geoms rather than rolling a
+  # second is.na() criterion. A flat (zero-amplitude) profile fails it.
+  located <- ssm_has_location(dat$a_est, dat$d_est)
+  dat$d_est[!located] <- NA_real_
+
+  # Displacement onto a continuous branch, per group series, in time order.
+  # Done before the melt so the unwrap sees the temporally ordered sequence.
+  dat <- dat[order(dat$Group, dat[[time_col]]), , drop = FALSE]
+  by_group <- split(seq_len(nrow(dat)), dat$Group, drop = TRUE)
+  d_branch <- rep(NA_real_, nrow(dat))
+  d_low <- rep(NA_real_, nrow(dat))
+  d_high <- rep(NA_real_, nrow(dat))
+  for (idx in by_group) {
+    est <- as.numeric(dat$d_est[idx])
+    branch <- ssm_unwrap_gapped(est)
+    interval <- ssm_interval_on_branch(
+      dat$d_lci[idx], dat$d_uci[idx], est, branch
+    )
+    d_branch[idx] <- branch
+    d_low[idx] <- interval$lo
+    d_high[idx] <- interval$hi
+  }
+  dat$d_est <- d_branch
+  dat$d_lci <- d_low
+  dat$d_uci <- d_high
+
+  params <- names(ssm_trajectory_panels())
+  params <- params[vapply(
+    params, function(p) all(paste0(p, c("_est", "_lci", "_uci")) %in% names(dat)),
+    logical(1)
+  )]
+  if (drop_xy) params <- setdiff(params, c("x", "y"))
+
+  out <- do.call(rbind, lapply(params, function(p) {
+    df <- data.frame(
+      Group = dat$Group,
+      Parameter = p,
+      est = as.numeric(dat[[paste0(p, "_est")]]),
+      lci = as.numeric(dat[[paste0(p, "_lci")]]),
+      uci = as.numeric(dat[[paste0(p, "_uci")]]),
+      Certified = dat$Certified,
+      stringsAsFactors = FALSE
+    )
+    # Inserted by name rather than in the data.frame() call so the time column
+    # keeps the caller's own name ("Occasion", "wave") without a rename step.
+    df[[time_col]] <- dat[[time_col]]
+    df[c("Group", time_col, "Parameter", "est", "lci", "uci", "Certified")]
+  }))
+
+  panels <- ssm_trajectory_panels()
+  out$Panel <- factor(panels[out$Parameter], levels = panels[params])
+  out
+}
+
 # Reshape an occasions object into the long per-panel frame the trajectory plot
 # draws: one row per (Group, Occasion, Parameter).
 ssm_trajectory_frame <- function(ssm_object, drop_xy = FALSE) {
@@ -84,57 +155,12 @@ ssm_trajectory_frame <- function(ssm_object, drop_xy = FALSE) {
   results$Occasion <- factor(results$Occasion, levels = details$occasions)
   results$Group <- factor(results$Group, levels = unique(results$Group))
 
-  # A profile has a defined displacement iff it has a location; the shared
-  # predicate keeps this agreeing with the circular geoms rather than rolling a
-  # second is.na() criterion. A flat (zero-amplitude) occasion fails it.
-  located <- ssm_has_location(results$a_est, results$d_est)
-  results$d_est[!located] <- NA_real_
-
-  # Displacement onto a continuous branch, per group series, in occasion order.
-  # Done before the melt so the unwrap sees the temporally ordered sequence.
-  results <- results[order(results$Group, results$Occasion), , drop = FALSE]
-  by_group <- split(seq_len(nrow(results)), results$Group, drop = TRUE)
-  d_branch <- rep(NA_real_, nrow(results))
-  d_low <- rep(NA_real_, nrow(results))
-  d_high <- rep(NA_real_, nrow(results))
-  for (idx in by_group) {
-    est <- as.numeric(results$d_est[idx])
-    branch <- ssm_unwrap_gapped(est)
-    interval <- ssm_interval_on_branch(
-      results$d_lci[idx], results$d_uci[idx], est, branch
-    )
-    d_branch[idx] <- branch
-    d_low[idx] <- interval$lo
-    d_high[idx] <- interval$hi
-  }
-  results$d_est <- d_branch
-  results$d_lci <- d_low
-  results$d_uci <- d_high
-
-  params <- names(ssm_trajectory_panels())
-  if (drop_xy) params <- setdiff(params, c("x", "y"))
-
   # D-007 displacement-interpretability guardrail, per profile row: a pure
   # function of the amplitude CI pair. Carried on every row so the plot can
   # mark it where it applies (the displacement panel) without a second join.
-  certified <- ssm_certified(results$a_lci, results$a_uci)
+  results$Certified <- ssm_certified(results$a_lci, results$a_uci)
 
-  out <- do.call(rbind, lapply(params, function(p) {
-    data.frame(
-      Group = results$Group,
-      Occasion = results$Occasion,
-      Parameter = p,
-      est = as.numeric(results[[paste0(p, "_est")]]),
-      lci = as.numeric(results[[paste0(p, "_lci")]]),
-      uci = as.numeric(results[[paste0(p, "_uci")]]),
-      Certified = certified,
-      stringsAsFactors = FALSE
-    )
-  }))
-
-  panels <- ssm_trajectory_panels()
-  out$Panel <- factor(panels[out$Parameter], levels = panels[params])
-  out
+  ssm_trajectory_long(results, time_col = "Occasion", drop_xy = drop_xy)
 }
 
 #' Create a Trajectory Plot of SSM Results Across Occasions

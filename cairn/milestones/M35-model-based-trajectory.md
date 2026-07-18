@@ -76,7 +76,7 @@ in the growth vignette.
 
 ## Tasks
 
-- [ ] **T1** — Factor M33's reshape/unwrap/certification internals so both paths
+- [x] **T1** — Factor M33's reshape/unwrap/certification internals so both paths
       call one implementation; confirm no behavior change to `ssm_plot_trajectory()`
       on occasions objects (M33's suite stays green as the fence).
 - [ ] **T2** — Decide and build the entry point (generic + `data.frame` method, or
@@ -96,6 +96,11 @@ in the growth vignette.
   occasions object, so it needs its own input contract. Extends the D-018
   visualization expansion (M30–M34) with a fifth milestone; M7 gains the
   dependency per the same gate.
+- 2026-07-18: T1 — extracted `ssm_trajectory_long()` as the single unwrap /
+  certification / melt implementation, parameterized by the time column's
+  *name* so the occasions path keeps its `Occasion` column and M33's suite
+  stayed green with zero test edits (the fence held literally). Full suite
+  0 failures / 2812 passes.
 
 ## Decisions
 
