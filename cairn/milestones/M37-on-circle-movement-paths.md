@@ -1,10 +1,10 @@
 # M37: On-circle movement paths across occasions
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M31, M32, M33
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m37-on-circle-movement-paths`
 
 ## Goal
 
