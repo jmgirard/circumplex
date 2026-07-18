@@ -7,7 +7,6 @@
 - **Depends on:** —
 - **Principles touched:** — (works under the CLAUDE.md angle invariants: LM=360,
   displacement seam unwrap, occasion order = list order, never alphabetical)
-
 - **Branch/PR:** `m33-trajectory-viz`
 
 ## Goal
@@ -19,43 +18,26 @@ unwrapping, and D-007 certification marking on the displacement panel.
 ## Scope
 
 **In:**
-- A new exported `ssm_plot_trajectory()` for occasions objects — the output of
-  `ssm_analyze(occasions = )` and of `ssm_analyze_long()` — faceting the SSM
-  parameters (e/x/y/a/d) over occasions with ribbon CIs, `drop_xy` mirroring
-  `ssm_plot_contrast()` ([ssm_plot.R:462](../../R/ssm_plot.R)). A plain Cartesian
-  ggplot, not a circumplex canvas; house conventions per M31/M32
-  (`chkDots()`, `is_*()` + `!is.finite()` guards, `na.rm` opt-in parity, shared
-  `ssm_has_location()`/`ssm_has_region()` predicates, `theme_bw()`).
-- **Temporal occasion ordering.** `results$Occasion` is character, so a naive
-  discrete scale re-sorts alphabetically and flips a `T10`/`T2` pair; the plot
-  factors it against `details$occasions` (the canonical order —
-  [ssm_analysis.R:319](../../R/ssm_analysis.R),
-  [ssm_analyze_long.R:114](../../R/ssm_analyze_long.R)).
-- **Displacement seam handling.** Per group series: `angle_unwrap(d_est)` for the
-  branch, then place each bound by its *signed* circular distance from its own
-  estimate — `((bound - d_est + 180) %% 360) - 180` — because non-contrast bounds
-  are each independently wrapped into [0, 360] and a straddling interval has
-  `d_lci > d_uci` ([ssm_bootstrap.R:190](../../R/ssm_bootstrap.R); LESSONS M27).
-- **Certification marking.** Uncertified occasions (`ssm_certified(a_lci, a_uci)`,
-  [ssm_oop.R:132](../../R/ssm_oop.R)) render hollow on the displacement panel —
-  the `shape = Structural` idiom of `plot.circumplex_ci_accuracy()`
-  ([ssm_ci_oop.R:610](../../R/ssm_ci_oop.R)) — per D-013/RR06's per-t caution.
-- **Contrast row dropped**, documented, with users pointed at
-  `ssm_plot_contrast()`: it is not a time point and rides the opposite branch
-  convention (`circumplex_contrast_radian`, contiguous, may be negative or > 360).
-  Detected positionally (`details$contrast` && last row) as the print method does
-  ([ssm_oop.R:164](../../R/ssm_oop.R)) — never `ssm_plot_circle()`'s `df[1:2, ]`
-  slice, which truncates k>2 and grouped objects.
-- Grouping supported: one series per `Group` level.
+- Exported `ssm_plot_trajectory()` for occasions objects (`ssm_analyze(occasions
+  = )`, `ssm_analyze_long()`): a Cartesian ggplot faceting e/x/y/a/d over
+  occasions with ribbon CIs and `drop_xy`, in the M31/M32 house conventions
+  (`chkDots()`, `is_*()`/`!is.finite()`, `na.rm` parity, `theme_bw()`).
+- **Temporal occasion ordering** — factor `Occasion` against
+  `details$occasions`; the column is character, so an unfactored discrete scale
+  re-sorts alphabetically and flips a `T10`/`T2` pair.
+- **Displacement seam handling** — per group series, `angle_unwrap(d_est)` for
+  the branch, then each bound placed by its *signed* circular distance from its
+  own estimate: bounds are stored wrapped, so a straddler has `d_lci > d_uci`
+  (LESSONS M27).
+- **Certification marking** — uncertified occasions (`ssm_certified()`) draw
+  hollow on the displacement panel (D-013/RR06 per-t caution).
+- **Contrast row dropped**, documented, users pointed at `ssm_plot_contrast()`;
+  grouping supported, one series per `Group` level.
 
 **Out:**
-- Model-based trajectories from an `ssm_draws()` per-time-point table, and the
-  `vignettes/growth-ssm-analysis.Rmd` figure swap → **M35** (planned this run;
-  that figure comes from glmmTMB + `ssm_draws()`, not an occasions object, so
-  it is not this function's input).
+- Model-based trajectories from an `ssm_draws()` table + growth vignette swap → **M35**.
 - On-circle animated/arrow movement paths across occasions → ROADMAP candidate.
-- `coord_circumplex()` `amax`/`center` non-finite guard → stays a ROADMAP
-  candidate (M33 is Cartesian and does not touch that file).
+- `coord_circumplex()` `amax`/`center` non-finite guard → ROADMAP candidate.
 - Plotting vignette + pkgdown reorg → M34.
 
 ## Acceptance criteria
@@ -104,28 +86,20 @@ unwrapping, and D-007 certification marking on the displacement panel.
 ## Tasks
 
 - [x] **T1** — Internal reshape helper: occasions object → long frame keyed on
-      (Group × Occasion × Parameter). Strip info columns **by name**
-      (`setdiff(names(x), c("Label","Group","Measure","Occasion"))`, the
-      [ssm_plot.R:309](../../R/ssm_plot.R) idiom — never positional); factor
-      `Occasion` to `details$occasions`; drop the contrast row positionally; build
-      the `Panel` factor from a named label vector as
-      `plot.circumplex_ci_accuracy()` does ([ssm_ci_oop.R:582](../../R/ssm_ci_oop.R)).
-      Unit-test the helper directly (independent logic).
-- [x] **T2** — Displacement branch: per-group `angle_unwrap(d_est)` + per-bound
-      signed-distance placement, applied *after* T1's temporal ordering (the
-      unwrap chain is order-dependent) and NA-tolerant across a degenerate
-      occasion. Reuse the existing idiom, do not retype a fresh `%%`.
-- [x] **T3** — `ssm_plot_trajectory()` itself: signature + roxygen, argument
-      validation, `chkDots()`, `drop_xy`, grouping series, ribbon/line/point
-      layers, certification shape mapping, `facet_wrap(~Panel, drop = FALSE)`,
-      `theme_bw()` + bottom legend, `@family visualization functions`.
-- [x] **T4** — Tests: seam continuity with a fixture forced to straddle (prove
-      teeth by breaking the guarded line); T2/T10 ordering; certification shapes;
-      flat-occasion gap + `na.rm` parity; contrast-row drop; every error branch;
-      both object constructors and a grouped object.
-- [x] **T5** — `devtools::document()`, NEWS entry, vdiffr baseline (delete stale
-      snaps, run under `NOT_CRAN=true` or the comparison auto-skips — LESSONS
-      M31), full `test()` + `check()`.
+      (Group × Occasion × Parameter); info columns stripped by name, `Occasion`
+      factored to `details$occasions`, contrast row dropped positionally,
+      `Panel` factor from a named label vector. Unit-tested directly.
+- [x] **T2** — Displacement branch: per-group `angle_unwrap()` + per-bound
+      signed-distance placement, after T1's ordering (the unwrap chain is
+      order-dependent) and NA-tolerant across a degenerate occasion.
+- [x] **T3** — `ssm_plot_trajectory()`: roxygen, argument validation,
+      `chkDots()`, `drop_xy`, grouping series, ribbon/line/point layers,
+      certification shape mapping, `facet_wrap(~Panel, drop = FALSE)`.
+- [x] **T4** — Tests: seam continuity on a forced-straddle fixture (teeth proven
+      by breaking the guarded line); T2/T10 ordering; certification shapes;
+      flat-occasion gap + `na.rm` parity; contrast drop; every error branch.
+- [x] **T5** — `document()`, NEWS entry, vdiffr baselines, full `test()` +
+      `check()`.
 
 ## Work log
 
@@ -167,6 +141,9 @@ unwrapping, and D-007 certification marking on the displacement panel.
   CI positions are BLAS-sensitive). `devtools::document()` produces no diff.
   Full `devtools::test()` and `devtools::check()` clean: 0 errors / 0 warnings /
   0 notes.
+- 2026-07-18: minor amendment — Scope compressed (no In/Out item changed, only
+  rationale now carried by code comments) to bring the plan-owned body under
+  the 150-line cap.
 
 ## Decisions
 
