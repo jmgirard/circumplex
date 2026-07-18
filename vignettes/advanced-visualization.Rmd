@@ -274,7 +274,10 @@ people <- people[!is.na(people$Disp), ]
 # Group-level profile for the same subset
 group <- ssm_analyze(jz2017[1:100, ], scales = PANO())
 
-ggcircumplex(octants(), labels = PANO(), amax = 3) +
+# The group amplitude is shorter than a typical individual amplitude
+c(group = group$results$a_est, median_individual = median(people$Ampl))
+
+ggcircumplex(octants(), labels = PANO(), amax = 1.75) +
   geom_ssm_point(
     data = people,
     mapping = aes(amplitude = Ampl, displacement = Disp),
@@ -287,10 +290,17 @@ ggcircumplex(octants(), labels = PANO(), amax = 3) +
   )
 ```
 
-The individual points spread around the circle while the group summary sits near
-their center of mass, a picture that none of the built-in functions produce
-directly. Any other `ggplot2` layer --- text annotations, additional geoms,
-faceting --- can be added the same way.
+The individual points spread widely around the circle while the group summary
+sits close to the origin, a picture that none of the built-in functions produce
+directly. That contrast is not an artifact: the group profile is the SSM of the
+*mean* scale scores, so its position is the average of the individual positions
+in (x, y) --- and averaging vectors that point in different directions yields a
+resultant shorter than the typical individual vector, as the two amplitudes
+printed above show. A group
+amplitude smaller than a typical person's therefore indicates disagreement about
+*direction* among the respondents, not that each person's profile is flat. Any
+other `ggplot2` layer --- text annotations, additional geoms, faceting --- can be
+added the same way.
 
 ## Trajectories across occasions
 
@@ -343,11 +353,23 @@ continues past 360, so values outside \[0, 360) are expected there. Second,
 occasions appear in the order they were supplied, never in alphabetical order,
 so a `T2`/`T10` pair cannot silently swap.
 
+The unwrap carries an assumption that no data can check: that the profile
+rotates less than a half-turn between consecutive occasions. Waves that are far
+apart in time, or a series with a gap, could rotate further than that and would
+be drawn as the shorter rotation regardless, so read widely spaced occasions
+with that in mind.
+
 A time point whose amplitude interval is too close to zero for its displacement
 to be interpretable is drawn as a hollow point --- a marker of an
 interpretability precondition, not a significance test. `drop_xy = TRUE` above
 omits the X-value and Y-value panels, leaving elevation, amplitude, and
 displacement.
+
+The bands are the per-occasion confidence intervals, one per time point. They
+are not a simultaneous confidence band for the trajectory as a whole, and
+overlap (or its absence) between two occasions' bands is not a test of change
+between them; for that, estimate the contrast directly (see `?ssm_analyze` and
+`ssm_plot_contrast()`).
 
 `ssm_plot_trajectory()` also accepts a trajectory table --- a data frame of
 `a_est`/`a_lci`/`a_uci` and `d_est`/`d_lci`/`d_uci` triples at numeric time

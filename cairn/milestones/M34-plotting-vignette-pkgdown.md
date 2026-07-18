@@ -59,14 +59,15 @@ plots, and organize the pkgdown reference so the plotting API is discoverable.
       example rendered from actual output.
 - [x] **T2** — Reorganize `_pkgdown.yml` visualization reference groups; run
       `pkgdown::check_pkgdown()` for orphaned/missing topics.
-- [ ] **T3** — Statistical-precision prose pass; full `check()`.
+- [x] **T3** — Statistical-precision prose pass; full `check()`.
 
 ## Work log
 
 - 2026-07-17: created by /milestone-plan (viz expansion, area D).
 - 2026-07-18: gate — single rewritten vignette; occasions trajectory path only (growth vignette keeps the table path); two pkgdown viz groups; M35 legend-glyph defect stays a candidate (no scope amendment).
-- 2026-07-18: T2 done — `_pkgdown.yml` split into "Visualization - Complete Plots" (the four `ssm_plot_*`, moved out of Primary SSM Functions) and "Visualization - Building Blocks"; added `@family visualization functions` to the plot trio and a new `@family circumplex layers` across the six building blocks, replacing their incomplete hand-kept `@seealso` lists. `check_pkgdown()`: no problems found.
 - 2026-07-18: T1 done — vignette rewritten (stale per-layer `amax` teaching removed; coord/center/r_axis_angle, theming, geom subclassing, occasions trajectory added). Render-and-inspect fixed an illegible center demo and two "Coordinate system already present" messages. Suite 2886 pass.
+- 2026-07-18: T2 done — `_pkgdown.yml` split into "Visualization - Complete Plots" (the four `ssm_plot_*`, moved out of Primary SSM Functions) and "Visualization - Building Blocks"; added `@family visualization functions` to the plot trio and a new `@family circumplex layers` across the six building blocks, replacing their incomplete hand-kept `@seealso` lists. `check_pkgdown()`: no problems found.
+- 2026-07-18: T3 done — precision pass added the unwrap's unverifiable half-turn assumption, the bands-are-pointwise-not-simultaneous caveat, and the vector-averaging reading of a short group amplitude (printed live, not asserted in prose); rescaled the individuals figure (amax 3 -> 1.75) so the shrinkage it describes is actually visible. NEWS entry added. `devtools::check()`: 0 errors / 0 warnings / 0 notes.
 
 ## Decisions
 
