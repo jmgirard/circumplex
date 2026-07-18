@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M35: Model-based trajectory plotting (`ssm_draws()` tables)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M33
 - **Principles touched:** — (works under the CLAUDE.md angle invariants: LM=360,
@@ -84,7 +84,7 @@ in the growth vignette.
       *(RB tripwire: irreversible-api — settle at the pre-implementation gate.)*
 - [x] **T3** — Tests: continuous-axis happy path, partial-column table,
       seam continuity, certification shapes, every error branch.
-- [ ] **T4** — Rewrite the growth vignette figure chunk; NEWS entry;
+- [x] **T4** — Rewrite the growth vignette figure chunk; NEWS entry;
       `devtools::document()`; vdiffr baseline if the figure warrants one
       (delete stale snaps, run under `NOT_CRAN=true` — LESSONS M31); full
       `test()` + `check()`.
@@ -99,47 +99,53 @@ in the growth vignette.
 - 2026-07-18: T1 — extracted `ssm_trajectory_long()` as the single unwrap /
   certification / melt implementation, parameterized by the time column's
   *name* so the occasions path keeps its `Occasion` column and M33's suite
-  stayed green with zero test edits (the fence held literally). Full suite
-  0 failures / 2812 passes.
-- 2026-07-18: T2 — pre-implementation gate settled all three open choices
-  (S3 generic; explicit `time =`; absent `certified` shows no claim). Built the
-  generic + `circumplex_ssm`/`data.frame`/`default` methods and the table
-  validator; see M35-D1/M35-D2. Code landed before its tests (T3) — the
-  validation surface was settled against a working prototype; all nine error
-  branches exercised by hand before commit, then pinned in T3.
+  stayed green with zero test edits (fence held literally). 0 failures / 2812.
+- 2026-07-18: T2 — gate settled all three open choices (S3 generic; explicit
+  `time =`; absent `certified` shows no claim). Built the generic +
+  `circumplex_ssm`/`data.frame`/`default` methods and the table validator; see
+  M35-D1/M35-D2. Code landed before its tests (T3): the validation surface was
+  settled against a working prototype, all nine error branches exercised by
+  hand before commit, then pinned in T3.
 - 2026-07-18: T3 — 63 tests in `test-ssm_trajectory_table.R`; full suite
   0 failures / 2875 passes. Teeth proven by mutation: swapping
   `ssm_interval_on_branch()` for the naive M27 per-bound expression turns the
-  new suite red (4 failures) and M33's red (3) — both fence the one shared
-  implementation. The first wide-arc fixture had NO teeth (its estimate sat at
-  the arc's centre, where the clamping expression agrees by symmetry); moved
-  the estimate off-centre, which is the real diffuse-draws case.
+  new suite red (4) and M33's red (3) — both fence the one shared
+  implementation. The first wide-arc fixture had NO teeth (estimate at the
+  arc's centre, where the clamping expression agrees by symmetry); moved it
+  off-centre, the real diffuse-draws case.
+- 2026-07-18: T4 — vignette Section 4 figure is now one `ssm_plot_trajectory()`
+  call (inline `rel()`/`%% 360` deleted, grep-clean); new Section 5 figure
+  surfaces the `certified` column the vignette computed but could not show.
+  NEWS; 3 vdiffr baselines; `document()` no diff; `check()` Status: OK
+  (0 errors / 0 warnings / 0 notes); `check_pkgdown()` clean.
+- 2026-07-18: render-and-inspect pass (LESSONS M33) over all four new figures.
+  Real vignette data validates the wide-arc path end to end: Section 5's wave 2
+  is uncertified at a_est = 0.028 with a 182.6-degree arc — wider than a
+  half-turn, the regime the naive recipe cannot represent — drawn hollow at
+  full width. One cosmetic M33-inherited defect left out of scope (legend FALSE
+  key: label, no glyph, when no uncertified point exists) → ROADMAP candidate.
 
 ## Decisions
 
 ### M35-D1 (2026-07-18): the table entry point is an S3 generic, not a constructor
 
 `ssm_plot_trajectory()` becomes an S3 generic with `circumplex_ssm`,
-`data.frame`, and `default` methods, rather than shipping an `ssm_trajectory()`
-constructor that validates a table into a class the existing function dispatches
-on. Settled at the pre-implementation gate (the plan tagged T2 `RB tripwire:
-irreversible-api`); Jeff chose the generic, no Fable escalation. Rationale: one
-entry point users already know and no new user-facing concept, against a class
-with no second use today (no print/summary planned) — the constructor would be
-ceremony charged to every caller. Reversible-ish in one direction only: a
-constructor could still be added later as an alternative input, but the
-`data.frame` method could not be withdrawn without a deprecation cycle.
-Consequence: the first formal is renamed `ssm_object` -> `x` (generic
-dispatch); safe because M33 is unreleased and no caller passes it by name.
+`data.frame`, and `default` methods, rather than an `ssm_trajectory()`
+constructor validating a table into a class the function dispatches on. Settled
+at the pre-implementation gate (T2 was tagged `RB tripwire: irreversible-api`);
+Jeff chose the generic, no Fable escalation. One entry point users already know
+and no new user-facing concept, against a class with no second use today
+(no print/summary planned). Reversible one way only: a constructor could still
+be added later, but the `data.frame` method could not be withdrawn without a
+deprecation cycle. First formal renamed `ssm_object` -> `x`; safe because M33
+is unreleased and no caller passes it by name.
 
 ### M35-D2 (2026-07-18): new error conditions use base `stop()`, matching the package
 
-The `r-package` profile's `test-doctrine` slot says new user-facing conditions
-use `cli::cli_abort()`/rlang. This milestone uses base `stop(..., call. = FALSE)`
-instead: `cli` is not in DESCRIPTION Imports, so adopting it is a dependency
-change needing its own question gate and D-entry, and the package has zero
-`cli_abort()` call sites — all existing conditions are base `stop()`.
-CLAUDE.md's "Base R + minimal deps" and "match existing code style" rules bind
-here. A package-wide migration to cli, if wanted, is its own milestone.
+The `r-package` profile's `test-doctrine` slot asks for `cli::cli_abort()`; this
+milestone uses base `stop(..., call. = FALSE)`. `cli` is not in DESCRIPTION
+Imports, so adopting it is a dependency change needing its own gate + D-entry,
+and the package has zero `cli_abort()` call sites. CLAUDE.md's "Base R + minimal
+deps" and "match existing code style" bind; a cli migration is its own milestone.
 
 ## Review

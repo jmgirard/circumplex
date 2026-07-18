@@ -305,3 +305,27 @@ test_that("the shared argument checks fire on the data frame method too", {
   expect_error(ssm_plot_trajectory(tbl, time = "wave", na.rm = "yes"), "is_flag\\(na.rm\\)")
   expect_warning(ssm_plot_trajectory(tbl, time = "wave", nonsense = 1), "nonsense")
 })
+
+# Rendered appearance ---------------------------------------------------------
+
+test_that("the trajectory-table plot renders as expected", {
+  # Secondary to the data-level assertions above: a passing baseline is a
+  # rendering guard against unintended drift, never the fence for a behavioral
+  # criterion (LESSONS M31). Unlike the occasions baselines these fixtures are
+  # literal, not bootstrapped, so they carry no BLAS sensitivity.
+  vdiffr::expect_doppelganger(
+    "trajectory table",
+    ssm_plot_trajectory(traj_table(), time = "wave")
+  )
+  vdiffr::expect_doppelganger(
+    "trajectory table uncertified",
+    ssm_plot_trajectory(
+      transform(traj_table(), certified = c(TRUE, FALSE, FALSE, TRUE, TRUE)),
+      time = "wave"
+    )
+  )
+  vdiffr::expect_doppelganger(
+    "trajectory table no certification",
+    ssm_plot_trajectory(traj_table(certified = NULL), time = "wave")
+  )
+})
