@@ -39,19 +39,19 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 
 ## Acceptance criteria
 
-- [ ] **AC1** — `ssm_ci_accuracy()` on a ≥2-occasion object returns a valid
+- [x] **AC1** — `ssm_ci_accuracy()` on a ≥2-occasion object returns a valid
       accuracy object whose simulation population is the stacked cross-occasion
       covariance (off-diagonal within-person blocks non-zero), **not** the
       dependence-ignoring per-group sufficient statistics; asserted
       structurally on a fixture.
-- [ ] **AC2** — simulation-coverage oracle: across occasions populations with
+- [x] **AC2** — simulation-coverage oracle: across occasions populations with
       known cross-occasion dependence, the diagnostic's reported coverage
       tracks the true empirical coverage within a pre-registered tolerance, at
       ≥1 interior cell plus a boundary cell (pole-straddling or
       near-zero-amplitude occasion), with ≥1 cell exercising the paired-contrast
       row; seeded `devel/m29-*-results.rds` + regeneration script committed.
       (RB tripwire resolved: RR07 → [[D-017]])
-- [ ] **AC3** — a discriminating oracle beyond coverage: coverage alone is
+- [x] **AC3** — a discriminating oracle beyond coverage: coverage alone is
       provably blind to a dependence-dropping population (the adaptive replayed
       procedures cover at nominal even from a wrongly-independent population —
       RR07/[[D-017]]), so the discriminating observable is interval width. Two
@@ -63,13 +63,13 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
       target √(w′Σw / w′Σ₀w), with a reversal-side Δd cell (|Δd| > 90°)
       expecting the paired-wider reversal. Meets the ≥2-independent-oracle-types
       bar (simulation-coverage + invariant + closed-form).
-- [ ] **AC4** — boundary contract per CLAUDE.md and [[D-017]]: a
+- [x] **AC4** — boundary contract per CLAUDE.md and [[D-017]]: a
       flat/zero-variance occasion is refused up front with an error naming the
       occasion (the shipped flat-profile refusal extended row-wise); a
       pole-straddling occasion produces a correctly-wrapped, non-erroring
       diagnostic; a near-zero-amplitude occasion runs, flags its `Structural`
       rows, and reports certification honestly; all tested.
-- [ ] **AC5** — the removed error guard's test is updated to the new contract;
+- [x] **AC5** — the removed error guard's test is updated to the new contract;
       the exported behavior change is documented (NEWS, roxygen);
       `devtools::test()` clean and `devtools::check()` clean (0 errors /
       0 warnings; NOTEs justified).
@@ -149,3 +149,69 @@ weight path with one shared person-resample `W` across all k occasion blocks
 (same law as the person-row bootstrap); MC reuses `ssm_mc_replicates(occ_k=)`.
 
 ## Review
+
+_2026-07-17, PR #53 (branch cut from master @ 8dd2806; master unmoved, no merge needed)._
+
+### Acceptance-criteria evidence (fresh)
+
+- **AC1** ✓ — test "occasions ci_accuracy population is the stacked cross-occasion
+  covariance (AC1)" (`test-ssm_occasions.R`): on a dependent fixture (ρ=0.7) the
+  stored `suff_stats$groups$cov` is 16×16 with same-scale cross-occasion diagonal
+  mean > 0.3, vs < 0.15 for an independent (ρ=0) fixture; the diagnostic runs,
+  `structure=="observed"`, `occ_k==2`, `cpm` NULL. Passes.
+- **AC2** ✓ — `devel/m29-ci-accuracy-occasions-oracle.R` (committed rds,
+  `smoke=FALSE`, R1=1000/R2=800/boots=300). Diagnostic reported coverage vs direct
+  empirical coverage of the real `ssm_analyze` procedure at the plug-in, cells
+  interior (both engines) + pole (bootstrap), every cell exercising the contrast
+  row: **27/27** within the pre-registered 4-SE band, max |Δ| 0.032. Pinned by the
+  asserting test; provenance in the `.md`. Passes.
+- **AC3** ✓ — `devel/m29-ci-accuracy-occasions-discrimination.R` (committed rds,
+  `smoke=FALSE`, reps=1000/boots=400). (invariant) zeroed-occasions ≡ two-group
+  reference on contrast coverage (4-SE) + `Median_width` ([0.90,1.11]);
+  (closed-form) dependent/zeroed Δe width ratio = √(w′Σw/w′Σ₀w) to <1% (0.701 vs
+  0.697; 0.725 vs 0.727); (reversal) Δd width ratio 0.69 at Δd=40 → 1.13 at Δd=135.
+  ≥2 oracle types met. Pinned by the asserting test. Passes.
+- **AC4** ✓ — boundary tests (`test-ssm_occasions.R`): flat occasion refused by
+  name ("T2"); pole-straddling occasion → finite displacement coverage, both
+  engines; rank-deficient (n≤k·p) warns not refuses + records `deficient`;
+  near-zero/c=0 rung flags occasion amplitude rows `Structural` with zero coverage
+  and reports certification honestly; a near-zero-amplitude occasion runs. All
+  pass (test added at review to close a discovered gap — see work log).
+- **AC5** ✓ — removed-guard test rewritten to the run-don't-error contract (T2);
+  NEWS + roxygen (occasions Limitations sibling, `structure`/`cpm` refusal notes);
+  `devtools::document()` no diff. `devtools::check()` **Status OK — 0 errors / 0
+  warnings / 0 notes** (fresh, incl. the AC4 test). Full suite FAIL 0 / PASS 2620.
+
+### Consistency gate
+
+- Universal cairn checks: `cairn_validate.py` **all checks passed** (coverage
+  complete, weight caps, mirror agreement, one-in-progress, ISO dates, …).
+  No DESIGN principle changed → `cairn_impact` skipped.
+- Toolchain (`r-package` profile): `document()` no diff; generated files
+  unchanged (only `man/ssm_ci_accuracy.Rd` regenerated); README/pkgdown unaffected
+  (no new exports); NEWS entry present; no new top-level files; `check()` 0/0/0.
+
+### Independent fresh-context review (three lenses + scorer)
+
+- **[O] diff-bug (Opus):** no real defects. Traced column/row ordering
+  (occasion-major covariance vs group-major/occasion-minor profile rows) consistent
+  end-to-end, contrast = T2−T1 on all three paths, shared-W bootstrap reproduces
+  the person-row case bootstrap, plug-in vs interval covariances correctly
+  distinguished, rank threshold correct, R12 reads the right quantity, classic path
+  untouched. Two benign non-findings noted.
+- **[S] blame-history (Sonnet):** no findings. The `suff_stats=NULL`→stacked-stats
+  reversal is correct (not a resurrected M25 hazard); classic path behaviorally
+  untouched; D-017/D-007/M15-D1/D-003 honored. One non-finding: the `@return`
+  "no display consumes" phrasing sits near the new breadcrumb but is not
+  contradicted (coverage-table conditional column vs guardrail `Cert_rate` — distinct
+  objects).
+- **[S] prior-PR-comments (Sonnet):** no prior-PR evidence — every merged PR
+  touching these files carries zero GitHub review comments (solo-maintainer; the
+  review record lives in the cairn RB/RR archive). Clean no-op, zero findings.
+
+**Actioned findings: none.** No lens produced a finding ≥80 (none produced any
+finding at all), so the scorer step is a no-op. The lone doc-clarity non-finding
+is **rejected**: the docstring is technically accurate (the coverage table's
+`Coverage_conditional` column genuinely has no display consumer; the breadcrumb
+reads the distinct `guardrail$Cert_rate`), and editing it risks introducing
+inaccuracy.
