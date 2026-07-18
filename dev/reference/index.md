@@ -117,6 +117,8 @@ Composable ggplot2 components for building custom circumplex figures
   : Draw SSM profile points in circumplex space
 - [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
   : Draw SSM confidence-region arcs in circumplex space
+- [`geom_ssm_path()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_path.md)
+  : Draw a profile's movement across occasions in circumplex space
 - [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
   : Angle-labeled x-axis scale for circumplex plots
 - [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md)

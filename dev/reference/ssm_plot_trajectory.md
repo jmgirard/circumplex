@@ -127,6 +127,11 @@ for it.
 
 ## See also
 
+[`geom_ssm_path()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_path.md)
+and `ssm_plot_circle(path = TRUE)`, which draw the same change across
+occasions as movement on the circumplex canvas rather than as
+parameter-by-time panels.
+
 Other visualization functions:
 [`plot.circumplex_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_ci_accuracy.md),
 [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md),

@@ -82,6 +82,7 @@ circular space quantified by displacement and amplitude.</p>
 <span>  angle_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  palette <span class="op">=</span> <span class="st">"Set2"</span>,</span>
 <span>  vary_shapes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  path <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -143,6 +144,18 @@ coverage of a high number of variables).</p></dd>
 <dd><p>A logical determining whether profiles should each get
 their own shape or vary only by fill color. This only works when the number
 of profiles is five or less. (default = FALSE)</p></dd>
+
+
+<dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
+<dd><p>A logical determining whether each series' movement across
+occasions is drawn as an arrowed path on the circle (default = <code>FALSE</code>).
+Requires an SSM object with occasions, from <code><a href="ssm_analyze.html">ssm_analyze()</a></code> with the
+<code>occasions</code> argument or from <code><a href="ssm_analyze_long.html">ssm_analyze_long()</a></code>; supplying <code>TRUE</code> for any
+other object is an error. Occasions are connected in the order they were
+supplied, never alphabetically, and the path is drawn the short way across
+the 0/360 boundary. An occasion whose displacement is undefined (a flat or
+zero-amplitude profile) breaks the path rather than being interpolated
+through. See <code><a href="geom_ssm_path.html">geom_ssm_path()</a></code> for the underlying layer.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

@@ -17,6 +17,7 @@ ssm_plot_circle(
   angle_labels = NULL,
   palette = "Set2",
   vary_shapes = FALSE,
+  path = FALSE,
   ...
 )
 ```
@@ -80,6 +81,22 @@ ssm_plot_circle(
   A logical determining whether profiles should each get their own shape
   or vary only by fill color. This only works when the number of
   profiles is five or less. (default = FALSE)
+
+- path:
+
+  A logical determining whether each series' movement across occasions
+  is drawn as an arrowed path on the circle (default = `FALSE`).
+  Requires an SSM object with occasions, from
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+  with the `occasions` argument or from
+  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md);
+  supplying `TRUE` for any other object is an error. Occasions are
+  connected in the order they were supplied, never alphabetically, and
+  the path is drawn the short way across the 0/360 boundary. An occasion
+  whose displacement is undefined (a flat or zero-amplitude profile)
+  breaks the path rather than being interpolated through. See
+  [`geom_ssm_path()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_path.md)
+  for the underlying layer.
 
 - ...:
 

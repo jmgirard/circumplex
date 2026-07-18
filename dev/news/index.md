@@ -2,6 +2,31 @@
 
 ## circumplex (development version)
 
+- The new
+  [`geom_ssm_path()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_path.md)
+  layer draws a profile’s movement across occasions as a path on the
+  circumplex canvas, so change in amplitude and displacement reads as
+  motion in circumplex space rather than only as separate parameter
+  panels. Each segment is curved along the circle by
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md).
+  Consecutive occasions are joined the short way around the 0/360
+  boundary, so a step from 350 to 10 degrees is drawn as a 20 degree arc
+  across the pole rather than a 340 degree sweep the long way round.
+  Occasions are connected in data order, with `group` separating one
+  series from another and an optional `order` aesthetic to sort within a
+  series; an optional `arrow` marks the direction of time. An occasion
+  with no defined displacement (a flat or zero-amplitude profile) breaks
+  the path rather than being interpolated through, and the segment after
+  the gap is still drawn on the correct branch.
+
+- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  gains a `path` argument that adds this movement path to its usual
+  points and confidence wedges, for results from
+  `ssm_analyze(occasions = )` and
+  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md).
+  Occasions are connected in the order they were supplied, never
+  alphabetically.
+
 - [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)’s
   “Displacement interpretable” legend now draws both of its keys.
   Previously, when no occasion was flagged as uninterpretable, the
