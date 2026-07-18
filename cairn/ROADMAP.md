@@ -16,7 +16,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M32 | Circumplex geom & layer ergonomics | done | M31 | normal | milestones/archive/M32-geom-ergonomics.md |
 | M33 | Longitudinal trajectory visualization (occasions objects) | done | — | high | milestones/archive/M33-trajectory-visualization.md |
 | M34 | Plotting vignette + pkgdown reference | planned | M31, M32, M33 | normal | milestones/M34-plotting-vignette-pkgdown.md |
-| M35 | Model-based trajectory plotting (`ssm_draws()` tables) | planned | M33 | normal | milestones/M35-model-based-trajectory.md |
+| M35 | Model-based trajectory plotting (`ssm_draws()` tables) | in-progress | M33 | normal | milestones/M35-model-based-trajectory.md |
 
 ## Candidates
 

@@ -2,12 +2,12 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M35: Model-based trajectory plotting (`ssm_draws()` tables)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M33
 - **Principles touched:** — (works under the CLAUDE.md angle invariants: LM=360,
   displacement seam unwrap)
-- **Branch/PR:** —
+- **Branch/PR:** `m35-model-based-trajectory`
 
 ## Goal
 
