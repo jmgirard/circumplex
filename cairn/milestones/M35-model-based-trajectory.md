@@ -79,7 +79,7 @@ in the growth vignette.
 - [x] **T1** — Factor M33's reshape/unwrap/certification internals so both paths
       call one implementation; confirm no behavior change to `ssm_plot_trajectory()`
       on occasions objects (M33's suite stays green as the fence).
-- [ ] **T2** — Decide and build the entry point (generic + `data.frame` method, or
+- [x] **T2** — Decide and build the entry point (generic + `data.frame` method, or
       `ssm_trajectory()` constructor); validation, roxygen, NAMESPACE.
       *(RB tripwire: irreversible-api — settle at the pre-implementation gate.)*
 - [ ] **T3** — Tests: continuous-axis happy path, partial-column table,
@@ -101,7 +101,38 @@ in the growth vignette.
   *name* so the occasions path keeps its `Occasion` column and M33's suite
   stayed green with zero test edits (the fence held literally). Full suite
   0 failures / 2812 passes.
+- 2026-07-18: T2 — pre-implementation gate settled all three open choices
+  (S3 generic; explicit `time =`; absent `certified` shows no claim). Built the
+  generic + `circumplex_ssm`/`data.frame`/`default` methods and the table
+  validator; see M35-D1/M35-D2. Code landed before its tests (T3) — the
+  validation surface was settled against a working prototype; all nine error
+  branches exercised by hand before commit, then pinned in T3.
 
 ## Decisions
+
+### M35-D1 (2026-07-18): the table entry point is an S3 generic, not a constructor
+
+`ssm_plot_trajectory()` becomes an S3 generic with `circumplex_ssm`,
+`data.frame`, and `default` methods, rather than shipping an `ssm_trajectory()`
+constructor that validates a table into a class the existing function dispatches
+on. Settled at the pre-implementation gate (the plan tagged T2 `RB tripwire:
+irreversible-api`); Jeff chose the generic, no Fable escalation. Rationale: one
+entry point users already know and no new user-facing concept, against a class
+with no second use today (no print/summary planned) — the constructor would be
+ceremony charged to every caller. Reversible-ish in one direction only: a
+constructor could still be added later as an alternative input, but the
+`data.frame` method could not be withdrawn without a deprecation cycle.
+Consequence: the first formal is renamed `ssm_object` -> `x` (generic
+dispatch); safe because M33 is unreleased and no caller passes it by name.
+
+### M35-D2 (2026-07-18): new error conditions use base `stop()`, matching the package
+
+The `r-package` profile's `test-doctrine` slot says new user-facing conditions
+use `cli::cli_abort()`/rlang. This milestone uses base `stop(..., call. = FALSE)`
+instead: `cli` is not in DESCRIPTION Imports, so adopting it is a dependency
+change needing its own question gate and D-entry, and the package has zero
+`cli_abort()` call sites — all existing conditions are base `stop()`.
+CLAUDE.md's "Base R + minimal deps" and "match existing code style" rules bind
+here. A package-wide migration to cli, if wanted, is its own milestone.
 
 ## Review
