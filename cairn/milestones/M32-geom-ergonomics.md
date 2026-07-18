@@ -2,11 +2,11 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M32: Circumplex geom & layer ergonomics
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M31
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m32-geom-ergonomics
 
 ## Goal
 
