@@ -77,7 +77,7 @@ users need to compose custom figures.
 
 ## Tasks
 
-- [ ] **T1** — Export `GeomSsmPoint`, `GeomSsmArc`, `CoordCircumplex` with
+- [x] **T1** — Export `GeomSsmPoint`, `GeomSsmArc`, `CoordCircumplex` with
       `@format NULL` roxygen; add a downstream-subclass test (trivial subclass of
       each, rendered). Sweep the stale `StatSsmArc` phrase from DESIGN.md:319.
 - [ ] **T2** — Implement `na.rm = FALSE` warn-by-count in `GeomSsmPoint$setup_data`
@@ -101,6 +101,11 @@ users need to compose custom figures.
   user gate); folded in the M31 handoff (`0.5`/`LM` label overlap + repel/label
   ergonomics, archive:24-25); pinned `na.rm` to opt-in parity (default stays TRUE,
   user gate). Tasks 4→6.
+- 2026-07-18: T1 — exported `GeomSsmPoint`/`GeomSsmArc`/`CoordCircumplex` under
+  shared `circumplex-ggproto` Rd page (`@keywords internal`, `@format/@usage
+  NULL`); swept stale `StatSsmArc ⊂ ggforce::StatArcBar` from DESIGN.md; updated
+  DESIGN.md export note. Added test-ggproto-classes.R (export + subclass-render
+  for all three). Viz test files green.
 
 ## Decisions
 

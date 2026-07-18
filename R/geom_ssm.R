@@ -103,6 +103,25 @@ geom_ssm_point <- function(mapping = NULL, data = NULL, stat = "identity",
   )
 }
 
+#' Circumplex ggproto classes
+#'
+#' These are the \pkg{ggplot2} [ggplot2::ggproto()] classes that back the
+#' circumplex layers and coordinate system: `GeomSsmPoint` (the profile-point
+#' geom), `GeomSsmArc` (the confidence-region arc geom), and `CoordCircumplex`
+#' (the coordinate system). They are exported so that downstream packages can
+#' subclass them to build custom circumplex layers; most users should use the
+#' [geom_ssm_point()], [geom_ssm_arc()], and [coord_circumplex()] constructors
+#' instead.
+#'
+#' @seealso [geom_ssm_point()], [geom_ssm_arc()], [coord_circumplex()]
+#' @name circumplex-ggproto
+#' @keywords internal
+NULL
+
+#' @rdname circumplex-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
 GeomSsmPoint <- ggplot2::ggproto(
   "GeomSsmPoint", ggplot2::GeomPoint,
   required_aes = c("amplitude", "displacement"),
@@ -179,6 +198,10 @@ geom_ssm_arc <- function(mapping = NULL, data = NULL, stat = "identity",
   )
 }
 
+#' @rdname circumplex-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
 GeomSsmArc <- ggplot2::ggproto(
   "GeomSsmArc", ggplot2::GeomRect,
   required_aes = c(

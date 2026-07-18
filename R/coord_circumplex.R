@@ -81,6 +81,10 @@ coord_circumplex <- function(amax = NULL, center = 0, ...) {
   )
 }
 
+#' @rdname circumplex-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
 CoordCircumplex <- ggplot2::ggproto(
   "CoordCircumplex", ggplot2::CoordRadial,
 
