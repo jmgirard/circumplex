@@ -329,3 +329,45 @@ test_that("the trajectory-table plot renders as expected", {
     ssm_plot_trajectory(traj_table(certified = NULL), time = "wave")
   )
 })
+
+# Review findings, M35 (both confirmed wrong-answer channels) -----------------
+
+test_that("a non-finite estimate is refused rather than blanking the series", {
+  # is.na(Inf) is FALSE, so an infinite estimate slips past the NA-based
+  # located predicate, reaches `Inf %% 360` -> NaN in the unwrap, and cumsum
+  # propagates that NaN over every LATER time point -- four good waves vanish
+  # with no error and no warning. Same family as the M32 lesson: guard
+  # user-facing numerics with !is.finite(), never is.na().
+  tbl <- traj_table()
+  expect_error(
+    ssm_plot_trajectory(transform(tbl, d_est = c(350, Inf, 2, 8, 12)), time = "wave"),
+    "`d_est` is not finite at 1 row"
+  )
+  expect_error(
+    ssm_plot_trajectory(transform(tbl, a_est = c(.6, .55, -Inf, .58, .63)), time = "wave"),
+    "`a_est` is not finite at 1 row"
+  )
+  # NaN still reads as missing (is.na(NaN) is TRUE), leaving a gap, not an error.
+  gap <- transform(tbl, d_est = c(350, NaN, 2, 8, 12))
+  gap$d_lci[[2]] <- NA
+  gap$d_uci[[2]] <- NA
+  p <- ssm_plot_trajectory(gap, time = "wave")
+  d <- p$data[p$data$Parameter == "d", ]
+  expect_equal(sum(is.na(d$est)), 1L)
+  expect_equal(sum(!is.na(d$est)), 4L)
+})
+
+test_that("a time column naming a parameter column is refused, not clobbered", {
+  # `dat[[time]] <- tv` runs before the parameter loop, so a time column named
+  # after a parameter is silently overwritten by that parameter's values: the
+  # real time variable disappears and the figure draws a meaningless diagonal
+  # with no error. The reserved-name guard exists to refuse exactly this.
+  tbl <- traj_table()
+  for (nm in c("a_est", "a_lci", "d_uci", "certified")) {
+    expect_error(
+      ssm_plot_trajectory(tbl, time = nm),
+      "collides with a name",
+      info = nm
+    )
+  }
+})

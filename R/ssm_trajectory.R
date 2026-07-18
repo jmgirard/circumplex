@@ -169,12 +169,21 @@ ssm_trajectory_frame <- function(ssm_object, drop_xy = FALSE) {
 # optional extra panels.
 ssm_trajectory_required <- c("a", "d")
 
-# Column names ssm_trajectory_long() puts in its output. A time column sharing
-# one of these would be silently overwritten by the melt, so the name is
-# refused rather than clobbered.
-ssm_trajectory_reserved <- c(
-  "Group", "Parameter", "est", "lci", "uci", "Certified", "Panel"
-)
+# Column names a time column may not take. Two groups, both of which would be
+# silently overwritten rather than honoured: the names ssm_trajectory_long()
+# puts in its output, and the input's own parameter/verdict columns -- the time
+# column is placed into `dat` BEFORE the parameter loop, so a time column named
+# `a_est` is clobbered by the amplitude values and the figure draws a
+# meaningless diagonal with no error. Refuse the collision rather than perform
+# it (caught by review, M35).
+ssm_trajectory_reserved <- function() {
+  suffixes <- c("_est", "_lci", "_uci")
+  c(
+    "Group", "Parameter", "est", "lci", "uci", "Certified", "Panel",
+    as.vector(t(outer(names(ssm_trajectory_panels()), suffixes, paste0))),
+    "certified"
+  )
+}
 
 # Validate a user-supplied per-time-point trajectory table -- the shape a
 # model-based workflow assembles from ssm_draws() evaluated at each time point
@@ -208,11 +217,14 @@ ssm_trajectory_table_frame <- function(x, time, drop_xy = FALSE) {
       call. = FALSE
     )
   }
-  if (time %in% ssm_trajectory_reserved) {
+  if (time %in% ssm_trajectory_reserved()) {
     stop(
       sprintf(
-        "`time` column \"%s\" collides with a name the plot data uses (%s); rename it.",
-        time, paste(ssm_trajectory_reserved, collapse = ", ")
+        paste(
+          "`time` column \"%s\" collides with a name the trajectory table or",
+          "the plot data already uses; rename the time column."
+        ),
+        time
       ),
       call. = FALSE
     )
@@ -314,10 +326,29 @@ ssm_trajectory_table_frame <- function(x, time, drop_xy = FALSE) {
       }
       dat[[col]] <- as.numeric(v)
     }
+    # An estimate is either a real number or missing -- never infinite.
+    # is.na(Inf) is FALSE, so an infinite estimate slips past the NA-based
+    # ssm_has_location() predicate, reaches `Inf %% 360` -> NaN in the unwrap,
+    # and cumsum() then propagates that NaN over every LATER time point,
+    # silently blanking the rest of a perfectly good series. Guard with
+    # !is.finite(), never is.na() (LESSONS M32; caught by review, M35). NaN is
+    # left to read as missing, since is.na(NaN) is TRUE.
+    est <- dat[[paste0(p, "_est")]]
+    bad_est <- !is.na(est) & !is.finite(est)
+    if (any(bad_est)) {
+      stop(
+        sprintf(
+          "Column `%s_est` is not finite at %d row(s); an estimate must be a number or NA.",
+          p, sum(bad_est)
+        ),
+        call. = FALSE
+      )
+    }
+
     # A bound is allowed to be missing only where its estimate is: an
     # undefined time point leaves a gap, but a defined one with a broken
     # interval would draw a ribbon that silently loses that row.
-    est_ok <- is.finite(dat[[paste0(p, "_est")]])
+    est_ok <- is.finite(est)
     for (s in c("_lci", "_uci")) {
       bad <- est_ok & !is.finite(dat[[paste0(p, s)]])
       if (any(bad)) {
