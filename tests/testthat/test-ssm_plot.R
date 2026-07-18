@@ -149,6 +149,27 @@ test_that("ggcircumplex() no longer exposes amin, and rings are 0-centered (R3)"
   expect_equal(pp$r.range, c(0, 0.5))
 })
 
+test_that("the canvas furniture responds to theme elements (R3, AC3)", {
+  # The rings/spokes are the coord's themed panel grid, not frozen drawn geoms:
+  # a theme() change must reach them (the old theme_void() canvas could not be
+  # restyled). Assert at the grob level that panel.grid recolouring lands.
+  collect_col <- function(gr) {
+    out <- if (is.null(gr$gp$col)) character(0) else gr$gp$col
+    if (!is.null(gr$children)) {
+      out <- c(out, unlist(lapply(gr$children, collect_col)))
+    }
+    out
+  }
+  p <- ggcircumplex(octants(), amax = 0.5) +
+    ggplot2::theme(
+      panel.grid.major = ggplot2::element_line(colour = "red", linewidth = 2)
+    )
+  g <- ggplot2::ggplotGrob(p)
+  panel <- g$grobs[[which(g$layout$name == "panel")]]
+  cols <- collect_col(panel)
+  expect_true(any(grepl("red|FF0000", cols, ignore.case = TRUE)))
+})
+
 test_that("plot functions warn about unrecognized arguments", {
   data("aw2009")
   set.seed(1)

@@ -8,7 +8,7 @@
 - **Principles touched:** — (implements under the CLAUDE.md angle invariants:
   [0,360), LM=360; ip-touching re-owns the polar transform — the AC4 boundary
   battery is its discharge. IP/GP formalization deferred to /design-interview.)
-- **Branch/PR:** m31-coord-system-build
+- **Branch/PR:** m31-coord-system-build · [PR #55](https://github.com/jmgirard/circumplex/pull/55)
 
 ## Goal
 
@@ -140,6 +140,7 @@ now-unused `ggforce` dependency.
 - 2026-07-17: T1 — exported `coord_circumplex()` (⊂ `CoordRadial`, `R/coord_circumplex.R`) hard-pinning the LM=360/CCW convention; live-verified identical-pole (I3) + periodic seam-wrap (350↔370); 22 coord tests; DESCRIPTION ggplot2 `>= 4.0.0` (D-019); pkgdown row.
 - 2026-07-17: T2–T6 — geoms onto the coord (`GeomSsmPoint`→x/y; `GeomSsmArc`⊂`GeomRect`, extension-unwrap+validation in `setup_data`, `StatSsmArc` dropped); `amax`/`n` soft-deprecated (one-time inform); `ggcircumplex()` rebuilt (themed, `circle_base()` gone); coord-aware `repel`; two consumers ported; AC4 data+grob battery + structural tests by-geom; vdiffr regenerated. Suite green (2709). Renders live-eyeballed.
 - 2026-07-17: T7–T8 — `ggforce` removed (D-020, supersedes V6 KEEP); checklist verified (grep-clean incl. vignettes → `annotate`; T-arc0). Dead `ggrad`/`ssm_to_cartesian`/`ssm_radius` swept. DESIGN.md viz rewritten; NEWS added. `check()` 0/0/0 (a transient Rplots.pdf note, deleted). Status → review.
+- 2026-07-17: review evidence prep caught AC3 (theme-responsiveness) lacked a fencing test; briefly back to in-progress to add a grob-level "theme recolours the panel furniture" test (test-ssm_plot.R), then re-review.
 
 ## Decisions
 
