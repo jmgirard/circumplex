@@ -112,10 +112,11 @@ plots, and organize the pkgdown reference so the plotting API is discoverable.
 produces no diff; README.md in sync; `pkgdown::check_pkgdown()` clean; NEWS.md
 entry present; no new top-level files; `check()` clean.
 
-CI on PR #59: 8 of 9 checks pass (R CMD check on macOS, Windows, Ubuntu release
-and oldrel-1; pkgdown; test-coverage; both codecov gates). `ubuntu-latest (devel)`
-fails in `setup-r-dependencies` — upstream infrastructure, not this diff: the
-`pak` binary for R-4.7 is unpublished ("cannot open URL ... pak_0.11.0_R-4-7").
+CI on PR #59: all 9 checks green (R CMD check on macOS, Windows, Ubuntu devel /
+release / oldrel-1; pkgdown; test-coverage; both codecov gates). An earlier run
+failed `ubuntu-latest (devel)` in `setup-r-dependencies` — a transient upstream
+outage ("cannot open URL ... pak_0.11.0_R-4-7"), which passed on re-run,
+confirming it was never related to this diff.
 
 ### Independent review — three lenses + scorer
 
