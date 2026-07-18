@@ -249,8 +249,11 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
   )
 ```
 
-Everything the parent geom does --- the polar placement, the dropping of
-profiles with no defined location --- is inherited; only the defaults change.
+Everything the parent geom does --- mapping amplitude and displacement onto the
+positional aesthetics, and dropping profiles with no defined location --- is
+inherited; only the defaults change. The polar transform itself is not part of
+the geom: as above, `coord_circumplex()` owns it, which is why the subclass
+needs no circular arithmetic of its own.
 
 ## Composing custom layers
 
@@ -350,8 +353,11 @@ Two things about the displacement panel are worth reading carefully. First, it
 is drawn on an *unwrapped* branch: the profile crosses the 0/360 boundary
 between the second and third wave, and rather than jumping a full turn the panel
 continues past 360, so values outside \[0, 360) are expected there. Second,
-occasions appear in the order they were supplied, never in alphabetical order,
-so a `T2`/`T10` pair cannot silently swap.
+the occasion order comes from the data rather than from the plot: for a
+character occasion column it is first-appearance order, and for a factor it is
+the factor's level order. Note that `factor()` sorts its levels alphabetically
+by default, which would place `T10` before `T2` --- so if your occasion column
+is a factor, set its levels in temporal order.
 
 The unwrap carries an assumption that no data can check: that the profile
 rotates less than a half-turn between consecutive occasions. Waves that are far
@@ -386,6 +392,7 @@ by default with the angle in degrees, or with custom labels or an instrument's
 abbreviations.
 
 ```{r curve-axis}
+angles <- octants()
 curve <- data.frame(
   angle = angles,
   score = 1 + 0.8 * cos((angles - 135) * pi / 180)
@@ -425,5 +432,3 @@ take, the coordinates are computed the same way, so the results line up.
 * Zimmermann, J., & Wright, A. G. C. (2017). Beyond description in interpersonal
   construct validation: Methodological advances in the circumplex Structural
   Summary Approach. _Assessment, 24_(1), 3--23.
-</content>
-</invoke>
