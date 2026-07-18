@@ -2,7 +2,7 @@
 
 - **Status:** planned
 - **Priority:** high
-- **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35
+- **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37
 - **Branch/PR:** —
 
 ## Goal
@@ -122,6 +122,10 @@ complete and validated (D-008).
   of M33 at that milestone's re-plan gate (the growth vignette's trajectory
   figure is model-based, not an occasions object). Extends the D-018 viz
   expansion to M30–M35. No release-prep task change.
+- 2026-07-18: gated amendment — `Depends on:` gains M36 (viz polish: legend key
+  glyph + non-finite guards) and M37 (static on-circle movement paths), the
+  M31–M35 viz-track remainders. Jeff's plan-gate decision: both ship in v2.0.0
+  under D-018's fold-in. No release-prep task change.
 
 ## Decisions
 
