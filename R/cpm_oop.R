@@ -369,7 +369,6 @@ plot.circumplex_cpm <- function(x, amax = 1, angle_labels = NULL,
           displacement_max = .data$Angle_uci,
           fill = .data$Scale
         ),
-        amax = amax,
         alpha = 0.4,
         color = "grey40",
         linewidth = 0.5
@@ -384,7 +383,6 @@ plot.circumplex_cpm <- function(x, amax = 1, angle_labels = NULL,
         displacement = .data$Angle,
         fill = .data$Scale
       ),
-      amax = amax,
       shape = 21,
       size = 3,
       color = "black"

@@ -247,9 +247,9 @@ test_that("plot draws one point per scale at its communality radius", {
   b <- ggplot2::ggplot_build(p)
   pts <- b$data[[length(b$data)]]
   expect_equal(nrow(pts), 8)
-  # Radius = communality * 5 / amax with amax = 1 (the canvas transform).
-  r <- sqrt(pts$x^2 + pts$y^2)
-  expect_equal(sort(r), sort(unname(rowSums(res$loadings^2)) * 5), tolerance = 1e-6)
+  # The coord owns the transform: the point layer carries communality as the
+  # radial (y) aesthetic directly.
+  expect_equal(sort(pts$y), sort(unname(rowSums(res$loadings^2))), tolerance = 1e-6)
 })
 
 test_that("Heywood communalities (>1) stay inside the canvas ring", {
@@ -257,13 +257,16 @@ test_that("Heywood communalities (>1) stay inside the canvas ring", {
   # A 4-scale subset drives paf2 into a Heywood case (a communality > 1), which
   # the plot must contain by expanding amax rather than drawing outside the ring.
   res <- fit_structure(jz2017, scales = c("PA", "DE", "HI", "LM"), scoring = "raw")
-  expect_true(any(rowSums(res$loadings^2) > 1)) # precondition
+  max_comm <- max(rowSums(res$loadings^2))
+  expect_true(max_comm > 1) # precondition
   p <- plot(res)
   b <- ggplot2::ggplot_build(p)
   pts <- b$data[[length(b$data)]]
-  r <- sqrt(pts$x^2 + pts$y^2)
-  # 5 is the fixed outer-ring radius of the ggcircumplex canvas.
-  expect_lte(max(r), 5 + 1e-6)
+  # The coord's outer radial limit expands to contain the largest communality,
+  # so no point falls outside the ring (its amplitude never exceeds r.range).
+  pp <- b$layout$panel_params[[1]]
+  expect_gte(pp$r.range[[2]], max_comm - 1e-6)
+  expect_lte(max(pts$y), pp$r.range[[2]] + 1e-6)
 })
 
 test_that("plot is a stable visual and warns on unknown dots", {

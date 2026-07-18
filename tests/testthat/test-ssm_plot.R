@@ -143,9 +143,10 @@ test_that("ggcircumplex() no longer exposes amin, and rings are 0-centered (R3)"
   # scale is fixed at 0 (center) to amax (outer ring), matching the geoms.
   expect_error(ggcircumplex(octants(), amin = 0.25), "unused argument")
 
-  # Ring labels (layer 4) reflect a 0..amax scale: seq(0, amax, 6)[c(3, 5)]
-  b <- ggplot2::ggplot_build(ggcircumplex(amax = 0.5))
-  expect_equal(b$data[[4]]$label, sprintf("%.2f", c(0.20, 0.40)))
+  # The amplitude (r) axis runs from 0 at the center to amax at the outer ring,
+  # owned by coord_circumplex() -- rings are 0-centered, matching the geoms.
+  pp <- ggplot2::ggplot_build(ggcircumplex(amax = 0.5))$layout$panel_params[[1]]
+  expect_equal(pp$r.range, c(0, 0.5))
 })
 
 test_that("plot functions warn about unrecognized arguments", {

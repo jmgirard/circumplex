@@ -56,5 +56,6 @@ ggcircumplex(octants(), labels = PANO())
 ggcircumplex(instrument = csip)
 }
 \seealso{
-\code{\link[=ssm_plot_circle]{ssm_plot_circle()}}, which draws SSM results on this canvas.
+\code{\link[=coord_circumplex]{coord_circumplex()}}, which owns the transform this canvas is built
+on; \code{\link[=ssm_plot_circle]{ssm_plot_circle()}}, which draws SSM results on this canvas.
 }

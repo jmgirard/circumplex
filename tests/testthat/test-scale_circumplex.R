@@ -53,9 +53,10 @@ test_that("scale_x_circumplex() and ggcircumplex() resolve labels identically", 
   data("csip")
   # The shared resolver must give the axis the same labels the canvas draws
   s <- scale_x_circumplex(instrument = csip)
-  # ggcircumplex draws the abbreviations as the displacement labels (layer 5)
+  # ggcircumplex() labels the displacement spokes via the theta (x) scale; both
+  # go through resolve_circumplex_labels(), so the labels must match.
   p <- ggcircumplex(instrument = csip)
-  canvas_labels <- ggplot2::ggplot_build(p)$data[[5]]$label
+  canvas_labels <- ggplot2::ggplot_build(p)$layout$panel_scales_x[[1]]$get_labels()
   expect_setequal(s$get_labels(csip$Scales$Angle), canvas_labels)
 })
 
@@ -78,13 +79,10 @@ test_that("scale_x_circumplex() labels fractional angles without rounding (R6)",
 test_that("ggcircumplex() draws fractional angles exactly, not rounded (R5)", {
   ang <- seq(22.5, 337.5, by = 45)
   b <- ggplot2::ggplot_build(ggcircumplex(ang))
-  # Default degree labels (displacement-label layer 5) show the true angle
-  expect_true("22.5\U00B0" %in% b$data[[5]]$label)
-  expect_false("22\U00B0" %in% b$data[[5]]$label)
-  # Spokes (segment layer 2) end at the exact angle, not the rounded one
-  seg <- b$data[[2]]
-  expect_equal(
-    min(abs(seg$xend - 5 * cos(22.5 * pi / 180))), 0,
-    tolerance = 1e-9
-  )
+  # Default degree labels on the theta (x) scale show the true angle.
+  labs <- b$layout$panel_scales_x[[1]]$get_labels()
+  expect_true("22.5\U00B0" %in% labs)
+  expect_false("22\U00B0" %in% labs)
+  # Spokes are placed at the exact angle (theta breaks), not the rounded one.
+  expect_true(22.5 %in% b$layout$panel_params[[1]]$theta.major)
 })

@@ -156,7 +156,6 @@ ssm_plot_circle <- function(ssm_object,
         color = .data$Label,
         linetype = .data$lnty
       ),
-      amax = amax,
       alpha = 0.4,
       linewidth = 1
     )
@@ -173,7 +172,6 @@ ssm_plot_circle <- function(ssm_object,
           fill = .data$Label,
           shape = .data$Label
         ),
-        amax = amax,
         size = 3,
         color = "black"
       ) +
@@ -192,7 +190,6 @@ ssm_plot_circle <- function(ssm_object,
           displacement = .data$d_est,
           fill = .data$Label
         ),
-        amax = amax,
         shape = 21,
         size = 3,
         color = "black"
@@ -205,27 +202,23 @@ ssm_plot_circle <- function(ssm_object,
 
   if (repel) {
     requireNamespace("ggrepel")
-    # Point positions in canvas coordinates (matching geom_ssm_point()) for the
-    # repelled labels and their horizontal nudge
-    repel_df <- df_plot
-    xy <- ssm_to_cartesian(repel_df$a_est, repel_df$d_est, amax)
-    repel_df$.canvas_x <- xy$x
-    repel_df$.canvas_y <- xy$y
+    # Coord-aware label repelling (M31): map the labels to the same
+    # amplitude/displacement aesthetics as the points and let coord_circumplex()
+    # place them, so ggrepel repels in the rendered panel space. (The old branch
+    # hand-computed canvas cartesian coordinates, which are meaningless once the
+    # coord owns the transform.)
     p <- p +
       ggrepel::geom_label_repel(
-        data = repel_df,
+        data = df_plot,
         mapping = ggplot2::aes(
-          x = .data$.canvas_x,
-          y = .data$.canvas_y,
+          x = .data$d_est,
+          y = .data$a_est,
           label = .data$Label
         ),
-        nudge_x = -8 - repel_df$.canvas_x,
-        direction = "y",
-        hjust = 1,
         size = legend_font_size / 2.8346438836889
       )
   }
-  
+
   p
 }
 
@@ -528,7 +521,8 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 #'   `labels` is given) the scale abbreviations are taken from the instrument
 #'   (default = `NULL`).
 #' @return A \pkg{ggplot2} object containing the empty circumplex canvas.
-#' @seealso [ssm_plot_circle()], which draws SSM results on this canvas.
+#' @seealso [coord_circumplex()], which owns the transform this canvas is built
+#'   on; [ssm_plot_circle()], which draws SSM results on this canvas.
 #' @export
 #' @examples
 #' # A default octant canvas
@@ -546,82 +540,41 @@ ggcircumplex <- function(angles = octants(), labels = NULL,
   stopifnot(is_num(amax, n = 1) && amax > 0)
   stopifnot(is_num(font_size, n = 1) && font_size > 0)
 
-  # The amplitude axis runs from 0 at the center to `amax` at the outer ring,
-  # matching how geom_ssm_point()/geom_ssm_arc() map amplitude (a * 5 / amax).
-  # A configurable center belongs in a future radial scale/coord, not here (see
-  # DESIGN.md); circle_base()'s `amin` default of 0 is left as internal only.
-  circle_base(
-    angles = resolved$angles,
-    labels = resolved$labels,
-    amax = amax,
-    fontsize = font_size
-  )
+  ang <- resolved$angles
+  lab <- resolved$labels
+  if (is.null(lab)) lab <- circumplex_degree_labels(ang)
+
+  # coord_circumplex() owns the amplitude->radius scaling and the polar
+  # transform, so the canvas and any data layers added later share one amax and
+  # cannot disagree. The displacement spokes/labels are the theta-axis breaks
+  # (set here to the scale angles) and the amplitude rings are the r-axis
+  # breaks, both drawn as themed panel furniture -- so `+ theme_*()` restyles
+  # them. Note: no x-scale limits (they would censor a seam-straddling arc's
+  # unwrapped xmax > 360 to NA); the coord's thetalim owns the [0, 360] range.
+  # geom_blank establishes the [0, 360] x [0, amax] extent so the empty canvas's
+  # rings/spokes/labels train and draw; it censors nothing, so a seam-straddling
+  # arc added later (unwrapped xmax > 360) still extends the range freely.
+  ggplot2::ggplot() +
+    coord_circumplex(amax = amax, center = 0) +
+    ggplot2::geom_blank(
+      data = data.frame(.x = c(0, 360), .y = c(0, amax)),
+      mapping = ggplot2::aes(x = .data$.x, y = .data$.y),
+      inherit.aes = FALSE
+    ) +
+    ggplot2::scale_x_continuous(breaks = ang, labels = lab) +
+    ggplot2::scale_y_continuous(name = NULL) +
+    circumplex_theme(base_size = font_size)
 }
 
-# Create an Empty Circular Plot
-circle_base <- function(angles, labels = NULL, amin = 0,
-                        amax = 0.5, fontsize = 12) {
-
-  if (is.null(labels)) labels <- circumplex_degree_labels(angles)
-
-  ggplot2::ggplot() +
-    # Require plot to be square and remove default styling
-    ggplot2::coord_fixed(clip = "off") +
-    ggplot2::theme_void(base_size = fontsize) +
-    # Expand the axes multiplicatively to fit labels
-    ggplot2::scale_x_continuous(expand = c(0.25, 0)) +
-    ggplot2::scale_y_continuous(expand = c(0.10, 0)) +
-    # Draw lowest circle
-    ggforce::geom_circle(
-      mapping = ggplot2::aes(x0 = 0, y0 = 0, r = 5),
-      color = "gray50",
-      fill = "white",
-      linewidth = 1.5
-    ) +
-    # Draw segments corresponding to displacement scale
-    ggplot2::geom_segment(
-      ggplot2::aes(
-        x = 0,
-        y = 0,
-        xend = 5 * cos(angles * pi / 180),
-        yend = 5 * sin(angles * pi / 180)
-      ),
-      color = "gray60",
-      linewidth = 0.5
-    ) +
-    # Draw circles corresponding to amplitude scale
-    ggforce::geom_circle(
-      ggplot2::aes(x0 = 0, y0 = 0, r = 1:4),
-      color = "gray60",
-      linewidth = 0.5
-    ) +
-    # Draw labels for amplitude scale
-    ggplot2::geom_label(
-      ggplot2::aes(
-        x = c(2, 4),
-        y = 0,
-        label = sprintf(
-          "%.2f",
-          seq(from = amin, to = amax, length.out = 6)[c(3, 5)]
-        )
-      ),
-      color = "gray20",
-      fill = "white",
-      linewidth = NA,
-      size = fontsize / 2.8346438836889
-    ) +
-    # Draw labels for displacement scale
-    ggplot2::geom_label(
-      ggplot2::aes(
-        x = 5.1 * cos(angles * pi / 180),
-        y = 5.1 * sin(angles * pi / 180),
-        label = labels
-      ),
-      color = "gray20",
-      fill = "transparent",
-      linewidth = NA,
-      hjust = "outward",
-      vjust = "outward",
-      size = fontsize / 2.8346438836889
+# Themed furniture for the circumplex canvas. Kept internal (M31); the exported
+# styling surface is deferred to M32. Built on theme_minimal so the polar grid
+# (rings + spokes) and axis labels respond to further theme() calls, replacing
+# the old theme_void() + drawn-geometry furniture that could not be restyled.
+circumplex_theme <- function(base_size = 12) {
+  ggplot2::theme_minimal(base_size = base_size) +
+    ggplot2::theme(
+      axis.title = ggplot2::element_blank(),
+      panel.grid.major = ggplot2::element_line(color = "gray80"),
+      panel.grid.minor = ggplot2::element_blank()
     )
 }

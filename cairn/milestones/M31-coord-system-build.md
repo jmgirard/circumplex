@@ -110,21 +110,21 @@ now-unused `ggforce` dependency.
       `rlim = c(center, amax)` center, decoupled `inner.radius = 0`, themed
       `render_bg()` furniture, `setup_panel_params()`/`transform()` pinning
       LM=360 + CCW-from-right. Re-pin `DESCRIPTION` `ggplot2 (>= 4.0.0)`.
-- [ ] **T2** — Refactor `geom_ssm_point` → map amplitude/displacement to the
+- [x] **T2** — Refactor `geom_ssm_point` → map amplitude/displacement to the
       coord's `x/y`; delete cartesian compute; `amax` soft-deprecate (sentinel +
       `inform(.frequency = "once")`).
-- [ ] **T3** — Refactor `geom_ssm_arc` → coord-bent `GeomRect`; move seam-unwrap
+- [x] **T3** — Refactor `geom_ssm_arc` → coord-bent `GeomRect`; move seam-unwrap
       by extension (`xmax <- xmin + ssm_arc_span(...)`), span validation, and the
       full-circle rejection into `setup_data()`; `n` soft-deprecate; drop the
       `StatSsmArc`/`ggforce` arc path.
-- [ ] **T4** — Refactor `ggcircumplex()`/`circle_base()` + `ssm_plot_circle/
+- [x] **T4** — Refactor `ggcircumplex()`/`circle_base()` + `ssm_plot_circle/
       curve/contrast()` onto the coord (signatures unchanged); coord-aware
       `repel = TRUE` redesign (keep it working; `scale_x_circumplex()` behavior
       under `theta="x"` noted for M34).
-- [ ] **T5** — Port the two hidden consumers: `plot.circumplex_cpm`
+- [x] **T5** — Port the two hidden consumers: `plot.circumplex_cpm`
       (`amax=1` → `rlim=c(0,1)`; `drawable` pre-filter `R/cpm_oop.R:335`;
       legend-order coupling `:350-354`) and `plot.circumplex_fit_structure`.
-- [ ] **T6** — AC4 boundary battery (T-i1b/T-i2/T-i2b/T-i2c/T-i3/T-arc0/T-r1/
+- [x] **T6** — AC4 boundary battery (T-i1b/T-i2/T-i2b/T-i2c/T-i3/T-arc0/T-r1/
       T-r2) at data + grob level; drive real values through the transform, not
       re-typed expressions (M13 teeth lesson).
 - [ ] **T7** — `ggforce` removal capstone: verification checklist, drop the
@@ -146,6 +146,17 @@ now-unused `ggforce` dependency.
   carries LM=360/CCW, the identical-pole (I3), and periodic seam-wrap (350↔370); 22
   coord-unit tests (incl. T-i1b panel-range pin). `DESCRIPTION` ggplot2 `>= 4.0.0`
   (D-019); pkgdown row added. Full suite green (2248 pass).
+- 2026-07-17: T2–T6 — geoms refactored onto the coord (`geom_ssm_point` → `x/y`;
+  `geom_ssm_arc` → coord-bent `GeomRect` with extension-unwrap + validation in
+  `setup_data`, `StatSsmArc`/ggforce arc path dropped); `amax`/`n` soft-deprecated
+  (one-time `inform`, never errors). `ggcircumplex()` rebuilt on the coord (themed
+  furniture; `circle_base()` removed); `ssm_plot_circle()` amax args dropped;
+  `repel=TRUE` redesigned coord-aware (ggrepel works under the coord). Two hidden
+  consumers ported. AC4 boundary battery (data+grob) in a rewritten test-geom_ssm.R;
+  structural plot tests rewritten to locate layers by geom; circumplex vdiffr
+  baselines regenerated (curve/ci-accuracy unchanged). Full suite green
+  (2709 pass, 0 fail, vdiffr included). Live-eyeballed canvas/circle/repel/wedges/
+  seam/cpm/fit_structure renders.
 
 ## Decisions
 

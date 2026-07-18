@@ -15,21 +15,30 @@ clean_cpm_fit <- function() {
   cpm_fit(cormat = P, angles = octants(), n = 1000)
 }
 
+# Locate a layer's built data by its geom class (the canvas is now the coord's
+# panel furniture, not drawn layers, so indices shifted; find by content).
+cpm_layer <- function(b, p, geom_class) {
+  idx <- which(vapply(p$layers, function(l) inherits(l$geom, geom_class),
+                      logical(1)))
+  if (length(idx) == 0) return(NULL)
+  b$data[[idx[[1]]]]
+}
+
 test_that("plot.circumplex_cpm builds a circular canvas with points and wedges", {
   fit <- clean_cpm_fit()
   p <- plot(fit)
   expect_true(ggplot2::is_ggplot(p))
 
   b <- ggplot2::ggplot_build(p)
-  # Canvas (5 layers) + arc + point
-  arc <- b$data[[6]]
-  pts <- b$data[[7]]
+  arc <- cpm_layer(b, p, "GeomSsmArc")
+  pts <- cpm_layer(b, p, "GeomSsmPoint")
   expect_gt(nrow(arc), 0)
   expect_equal(nrow(pts), 8)  # one point per scale, all locations defined
 
-  # Points sit at radius proportional to communality (a * 5 / amax, amax = 1).
-  r <- sqrt(pts$x^2 + pts$y^2)
-  expect_equal(sort(r), sort(fit$results$Communality * 5), tolerance = 1e-6)
+  # The coord owns the polar transform, so the point layer carries communality
+  # as the radial (y) aesthetic and the estimated angle as the angular (x) one.
+  expect_equal(sort(pts$y), sort(fit$results$Communality), tolerance = 1e-6)
+  expect_setequal(round(pts$x, 6), round(fit$results$Angle, 6))
 })
 
 test_that("plot.circumplex_cpm is a stable visual", {
@@ -54,9 +63,10 @@ test_that("plot.circumplex_cpm names scales whose CI wedge is inestimable", {
   expect_true(ggplot2::is_ggplot(p))
 
   b <- ggplot2::ggplot_build(p)
-  # No arc layer is added when nothing is drawable: canvas (5) + point (1)
-  expect_equal(length(b$data), 6L)
-  expect_equal(nrow(b$data[[6]]), 8L)  # all eight points still drawn
+  # No arc layer is added when nothing is drawable; every scale still draws a
+  # point.
+  expect_null(cpm_layer(b, p, "GeomSsmArc"))
+  expect_equal(nrow(cpm_layer(b, p, "GeomSsmPoint")), 8L)
 })
 
 test_that("plot.circumplex_cpm validates its arguments", {

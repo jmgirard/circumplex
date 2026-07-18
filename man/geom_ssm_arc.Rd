@@ -7,11 +7,11 @@
 geom_ssm_arc(
   mapping = NULL,
   data = NULL,
-  stat = StatSsmArc,
+  stat = "identity",
   position = "identity",
   ...,
-  amax = 0.5,
-  n = 360,
+  amax = NULL,
+  n = NULL,
   na.rm = TRUE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -22,12 +22,13 @@ geom_ssm_arc(
 \pkg{ggplot2} layer arguments. \code{mapping} must supply the \code{amplitude_min},
 \code{amplitude_max}, \code{displacement_min}, and \code{displacement_max} aesthetics.}
 
-\item{amax}{A single positive number giving the amplitude represented by the
-canvas's outer ring; must match the \code{amax} used for \code{\link[=ggcircumplex]{ggcircumplex()}}
-(default = 0.5).}
+\item{amax}{(Deprecated) The amplitude represented by
+the outer ring is now owned by \code{\link[=coord_circumplex]{coord_circumplex()}}; a value supplied here
+is ignored with a one-time note.}
 
-\item{n}{The number of points used to draw each arc's curved edges (default
-= 360).}
+\item{n}{(Deprecated) Arc smoothness is now owned by the
+coordinate system, which curves the wedge automatically; a value supplied
+here is ignored with a one-time note.}
 
 \item{na.rm}{Ignored; profiles with a missing displacement or amplitude
 bound (degenerate profiles) are always dropped.}
@@ -38,10 +39,10 @@ A \pkg{ggplot2} layer.
 \description{
 A \pkg{ggplot2} layer that draws, for each profile, the wedge spanning its
 amplitude confidence interval (radially) and its displacement confidence
-interval (angularly), on the canvas produced by \code{\link[=ggcircumplex]{ggcircumplex()}}. The
-amplitude/displacement-to-canvas transform -- including the wrap-around when
-a displacement interval crosses the 0/360 degree boundary -- is handled
-internally, so the bounds are supplied directly in SSM units.
+interval (angularly) on a circumplex canvas built with \code{\link[=coord_circumplex]{coord_circumplex()}}
+(for example the canvas from \code{\link[=ggcircumplex]{ggcircumplex()}}). The bounds are supplied
+directly in SSM units; the coordinate system bends the (displacement,
+amplitude) rectangle into an annular wedge.
 }
 \details{
 Each arc spans \strong{counterclockwise} from \code{displacement_min} to
@@ -58,17 +59,16 @@ name a unique arc.
 \examples{
 data("jz2017")
 res <- ssm_analyze(jz2017, scales = 2:9, measures = "NARPD")
-amax <- 0.5
-ggcircumplex(octants(), amax = amax) +
+ggcircumplex(octants(), amax = 0.5) +
   geom_ssm_arc(
     data = res$results,
     mapping = ggplot2::aes(
       amplitude_min = a_lci, amplitude_max = a_uci,
       displacement_min = d_lci, displacement_max = d_uci
     ),
-    amax = amax, alpha = 0.4
+    alpha = 0.4
   )
 }
 \seealso{
-\code{\link[=ggcircumplex]{ggcircumplex()}}, \code{\link[=geom_ssm_point]{geom_ssm_point()}}
+\code{\link[=coord_circumplex]{coord_circumplex()}}, \code{\link[=ggcircumplex]{ggcircumplex()}}, \code{\link[=geom_ssm_point]{geom_ssm_point()}}
 }
