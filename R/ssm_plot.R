@@ -170,6 +170,16 @@ ssm_plot_circle <- function(ssm_object,
     if (nrow(df_plot) < 1) {
       stop("After removing profiles with low fit, there were none left to plot.")
     }
+    # The path must honour the same removal. Blanking the occasion (rather than
+    # dropping its row) makes the path BREAK there, exactly as it does at an
+    # undefined displacement: dropping the row would connect the occasions on
+    # either side, asserting a movement through a position the function just
+    # said it would not show. Caught by review, M37.
+    if (path) {
+      lowfit <- !is.na(df_path$fit_est) & df_path$fit_est < .70
+      df_path$a_est[lowfit] <- NA_real_
+      df_path$d_est[lowfit] <- NA_real_
+    }
   }
   df_plot[["lnty"]] <- ifelse(df_plot[["fit_est"]] >= .70, "solid", "dotted")
   

@@ -181,10 +181,10 @@ GeomSsmPoint <- ggplot2::ggproto(
 #'
 #' Points are connected in the order the rows appear in the data, exactly as
 #' [ggplot2::geom_path()] does, and the `group` aesthetic separates one series
-#' from another. Supplying the optional `order` aesthetic sorts the rows within
-#' each group before drawing, which is the safer choice when the data are
-#' assembled by hand: an occasion label sorted as text puts `T10` before `T2`
-#' and silently reverses time.
+#' from another. Sort the data into time order before plotting: an occasion
+#' label sorted as text puts `T10` before `T2`, which silently reverses time.
+#' `ssm_plot_circle(path = TRUE)` does this sorting for you, taking the order
+#' from the object's own occasion list.
 #'
 #' Consecutive occasions are joined the **short** way around the circle. The
 #' displacements of each group are unwrapped onto a continuous branch before the
@@ -203,7 +203,7 @@ GeomSsmPoint <- ggplot2::ggproto(
 #'
 #' @param mapping,data,stat,position,show.legend,inherit.aes,... Standard
 #'   \pkg{ggplot2} layer arguments. `mapping` must supply the `amplitude` and
-#'   `displacement` aesthetics, and may supply `order`.
+#'   `displacement` aesthetics.
 #' @param arrow An arrow specification produced by [ggplot2::arrow()], or `NULL`
 #'   (the default) for a path drawn without arrowheads. Arrowheads mark the
 #'   direction of time along the path.
@@ -216,19 +216,31 @@ GeomSsmPoint <- ggplot2::ggproto(
 #' @examples
 #' data("jz2017")
 #' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
-#' t1 <- jz2017[, scales]
-#' t1$id <- seq_len(nrow(t1))
-#' t1$occasion <- "T1"
-#' t2 <- t1
-#' t2$occasion <- "T2"
-#' res <- ssm_analyze_long(rbind(t1, t2),
+#' # Three occasions that actually move: shifting the octant scores by one
+#' # position rotates the fitted profile by 45 degrees per occasion.
+#' waves <- lapply(1:3, function(k) {
+#'   idx <- ((seq_along(scales) - 1 + (k - 1)) %% length(scales)) + 1
+#'   d <- jz2017[, scales[idx]]
+#'   names(d) <- scales
+#'   d$id <- seq_len(nrow(d))
+#'   d$occasion <- paste0("T", k)
+#'   d
+#' })
+#' res <- ssm_analyze_long(do.call(rbind, waves),
 #'   scales = scales, id = "id", occasion = "occasion"
 #' )
 #' ggcircumplex(octants(), amax = 0.5) +
+#'   geom_ssm_point(
+#'     data = res$results,
+#'     mapping = ggplot2::aes(amplitude = a_est, displacement = d_est),
+#'     size = 2
+#'   ) +
 #'   geom_ssm_path(
 #'     data = res$results,
 #'     mapping = ggplot2::aes(amplitude = a_est, displacement = d_est),
-#'     arrow = ggplot2::arrow(length = ggplot2::unit(0.1, "inches"))
+#'     arrow = ggplot2::arrow(
+#'       length = ggplot2::unit(0.18, "inches"), type = "closed"
+#'     )
 #'   )
 geom_ssm_path <- function(mapping = NULL, data = NULL, stat = "identity",
                           position = "identity", ..., arrow = NULL,
@@ -248,7 +260,6 @@ geom_ssm_path <- function(mapping = NULL, data = NULL, stat = "identity",
 GeomSsmPath <- ggplot2::ggproto(
   "GeomSsmPath", ggplot2::GeomPath,
   required_aes = c("amplitude", "displacement"),
-  optional_aes = "order",
   setup_data = function(data, params) {
     # Non-finite guard, BEFORE the unwrap. ssm_has_location() is an is.na()
     # test, and is.na(Inf) is FALSE -- an infinite displacement would sail
@@ -262,14 +273,6 @@ GeomSsmPath <- ggplot2::ggproto(
     data$displacement[unplottable] <- NA_real_
 
     if (is.null(data$group)) data$group <- -1L
-
-    # The `order` aesthetic, when supplied, sorts within each series. order()
-    # is stable, so rows tied on `order` keep their data order, and sorting by
-    # group first keeps each series contiguous (GeomPath sorts by group again
-    # at draw time, also stably, so within-series order survives).
-    if (!is.null(data$order)) {
-      data <- data[order(data$group, data$order), , drop = FALSE]
-    }
 
     # Unwrap each series onto a continuous branch, in row order, so the coord's
     # periodic transform carries each step the short way across the 0/360 seam.

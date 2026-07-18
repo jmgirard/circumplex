@@ -415,11 +415,11 @@ the second to the third wave is drawn as the short 25 degree arc across the
 because `coord_circumplex()` munches each segment along the polar geodesic ---
 the layer supplies the ordering, not the drawing.
 
-Occasions are connected in the order the rows appear in the data. When you
-assemble a data frame by hand, the optional `order` aesthetic sorts within each
-series, which is the safer choice for the reason noted above: sorted as text,
-`T10` lands before `T2` and silently reverses time. Mapping `group` draws one
-path per series.
+Occasions are connected in the order the rows appear in the data, exactly as
+`geom_path()` does, and mapping `group` draws one path per series. When you
+assemble a data frame by hand, sort it into time order first --- for the reason
+noted above, sorting occasion labels as text puts `T10` before `T2` and
+silently reverses time. The wrapper below does that sorting for you.
 
 The same figure is available ready-made from `ssm_plot_circle()`, which adds the
 path to its usual points and confidence wedges:

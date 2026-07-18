@@ -111,28 +111,24 @@ test_that("an all-undefined series yields no drawable path (AC3)", {
 
 # --- T3/AC1: ordering and series separation -----------------------------------
 
-test_that("the order aesthetic sorts within a series (AC1)", {
-  # Occasions supplied out of time order, with `order` naming the true order.
-  # T10 sorted as text lands before T2; the order aesthetic is the defence.
-  df <- data.frame(
-    a_est = c(0.3, 0.4, 0.5),
-    d_est = c(30, 10, 20),
-    step = c(3, 1, 2)
-  )
-  p <- ggcircumplex(octants(), amax = 0.6) +
-    geom_ssm_path(
-      data = df,
-      mapping = ggplot2::aes(
-        amplitude = .data$a_est, displacement = .data$d_est,
-        order = .data$step
-      )
-    )
-  d <- path_layer_data(p)
-  expect_equal(d$x, c(10, 20, 30))
-  expect_equal(d$y, c(0.4, 0.5, 0.3))
+test_that("there is no order aesthetic to mis-group the layer (AC1)", {
+  # An `order` aesthetic was tried and removed (M37 review): ggplot2's
+  # add_group() builds `group` from every discrete column when the user has not
+  # mapped one, so a character `order` put each row in its own group and the
+  # layer rendered as a zeroGrob -- drawing nothing -- while sorting the rows
+  # alphabetically into the exact T1/T10/T2 misordering the aesthetic existed to
+  # prevent. Ordering is the caller's job (and ssm_plot_circle(path = TRUE)
+  # does it from details$occasions). This locks the aesthetic out.
+  expect_false("order" %in% GeomSsmPath$optional_aes)
+  expect_false("order" %in% GeomSsmPath$required_aes)
+  # A discrete column mapped to a real aesthetic still groups normally, and a
+  # multi-row series still draws an actual polyline rather than a zeroGrob.
+  df <- data.frame(a_est = c(0.3, 0.4, 0.5), d_est = c(30, 10, 20))
+  gr <- ggplot2::layer_grob(path_plot(df), path_layer_index(path_plot(df)))[[1]]
+  expect_false(inherits(gr, "zeroGrob"))
 })
 
-test_that("without an order aesthetic the data row order is honoured (AC1)", {
+test_that("the data row order is honoured (AC1)", {
   d <- path_layer_data(path_plot(
     data.frame(a_est = c(0.3, 0.4, 0.5), d_est = c(30, 10, 20))
   ))
@@ -254,6 +250,33 @@ test_that("path = TRUE is refused for an object with no occasions (AC5)", {
   data("jz2017")
   res <- ssm_analyze(jz2017, scales = 2:9, measures = "NARPD")
   expect_error(ssm_plot_circle(res, path = TRUE), "needs an SSM object with occasions")
+})
+
+test_that("drop_lowfit breaks the path at the dropped occasion (AC5)", {
+  # Regression, M37 review: df_path is snapshotted before the drop_lowfit
+  # filter (so an undefined-displacement occasion survives as NA and breaks the
+  # path). That snapshot must not also smuggle a low-fit occasion past the
+  # filter -- the path would route visibly through a position the function just
+  # said it would not draw. The occasion is blanked, not dropped, so the path
+  # BREAKS there rather than connecting across it.
+  data("jz2017")
+  scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  res <- ssm_analyze_long(
+    occasions_fixture(c("T1", "T2", "T3")),
+    scales = scales, id = "id", occasion = "occasion"
+  )
+  res$results$fit_est[[2]] <- 0.5
+
+  d <- path_layer_of(ssm_plot_circle(res, path = TRUE, drop_lowfit = TRUE))
+  expect_equal(nrow(d), 3)
+  expect_true(is.na(d$x[[2]]))
+  expect_true(is.na(d$y[[2]]))
+  # The surviving occasions are still drawn, on the correct branch.
+  expect_false(any(is.na(d$x[c(1, 3)])))
+
+  # Without drop_lowfit the low-fit occasion is still part of the path.
+  d2 <- path_layer_of(ssm_plot_circle(res, path = TRUE))
+  expect_false(any(is.na(d2$x)))
 })
 
 test_that("path = FALSE adds no path layer (AC5)", {

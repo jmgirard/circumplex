@@ -19,7 +19,7 @@ geom_ssm_path(
 \arguments{
 \item{mapping, data, stat, position, show.legend, inherit.aes, ...}{Standard
 \pkg{ggplot2} layer arguments. \code{mapping} must supply the \code{amplitude} and
-\code{displacement} aesthetics, and may supply \code{order}.}
+\code{displacement} aesthetics.}
 
 \item{arrow}{An arrow specification produced by \code{\link[ggplot2:arrow]{ggplot2::arrow()}}, or \code{NULL}
 (the default) for a path drawn without arrowheads. Arrowheads mark the
@@ -43,10 +43,10 @@ the ordering, the 0/360 seam handling, and the optional arrowheads.
 \details{
 Points are connected in the order the rows appear in the data, exactly as
 \code{\link[ggplot2:geom_path]{ggplot2::geom_path()}} does, and the \code{group} aesthetic separates one series
-from another. Supplying the optional \code{order} aesthetic sorts the rows within
-each group before drawing, which is the safer choice when the data are
-assembled by hand: an occasion label sorted as text puts \code{T10} before \code{T2}
-and silently reverses time.
+from another. Sort the data into time order before plotting: an occasion
+label sorted as text puts \code{T10} before \code{T2}, which silently reverses time.
+\code{ssm_plot_circle(path = TRUE)} does this sorting for you, taking the order
+from the object's own occasion list.
 
 Consecutive occasions are joined the \strong{short} way around the circle. The
 displacements of each group are unwrapped onto a continuous branch before the
@@ -66,19 +66,31 @@ way, since an infinite angle names no position on the circle.
 \examples{
 data("jz2017")
 scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
-t1 <- jz2017[, scales]
-t1$id <- seq_len(nrow(t1))
-t1$occasion <- "T1"
-t2 <- t1
-t2$occasion <- "T2"
-res <- ssm_analyze_long(rbind(t1, t2),
+# Three occasions that actually move: shifting the octant scores by one
+# position rotates the fitted profile by 45 degrees per occasion.
+waves <- lapply(1:3, function(k) {
+  idx <- ((seq_along(scales) - 1 + (k - 1)) \%\% length(scales)) + 1
+  d <- jz2017[, scales[idx]]
+  names(d) <- scales
+  d$id <- seq_len(nrow(d))
+  d$occasion <- paste0("T", k)
+  d
+})
+res <- ssm_analyze_long(do.call(rbind, waves),
   scales = scales, id = "id", occasion = "occasion"
 )
 ggcircumplex(octants(), amax = 0.5) +
+  geom_ssm_point(
+    data = res$results,
+    mapping = ggplot2::aes(amplitude = a_est, displacement = d_est),
+    size = 2
+  ) +
   geom_ssm_path(
     data = res$results,
     mapping = ggplot2::aes(amplitude = a_est, displacement = d_est),
-    arrow = ggplot2::arrow(length = ggplot2::unit(0.1, "inches"))
+    arrow = ggplot2::arrow(
+      length = ggplot2::unit(0.18, "inches"), type = "closed"
+    )
   )
 }
 \seealso{
