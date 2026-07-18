@@ -77,7 +77,8 @@
 #'   model's model-implied scale correlations; `"observed"` bypasses the model
 #'   and uses the pooled within-group correlation matrix directly (a
 #'   sensitivity switch: if the two verdicts differ, structure uncertainty is
-#'   itself material).
+#'   itself material). Not accepted for occasions analyses, whose population is
+#'   always the observed stacked cross-occasion covariance (no model is fit).
 #' @param m Optional. The number of harmonics passed to [cpm_fit()] (default
 #'   `NULL` uses `min(3, floor((p - 1) / 2))`).
 #' @param cpm Optional. A pre-fitted `circumplex_cpm` object to reuse for the
@@ -85,7 +86,7 @@
 #'   object's). Must be a unit-scaling fit (the default `cpm_fit()` scaling);
 #'   a free-scaling fit models a covariance structure and is not a valid
 #'   population correlation structure for this diagnostic. Ignored when
-#'   `structure = "observed"`.
+#'   `structure = "observed"`; not accepted for occasions analyses.
 #' @param data Optional. The original data set, required only for ssm objects
 #'   created before sufficient statistics were stored at analysis time; the
 #'   statistics are then recomputed and checked against the stored profile
@@ -146,6 +147,21 @@
 #'   and groups are assumed to share one circumplex structure. When the
 #'   Browne model fits poorly, the simulated population may misrepresent the
 #'   data; the embedded fit and its diagnostics are returned for inspection.
+#'
+#'   For an occasions (repeated-measures) analysis the population is instead a
+#'   multivariate normal with the *observed* stacked cross-occasion covariance
+#'   (no circular-model idealization): the within-person dependence across
+#'   occasions is carried directly, and no `structure`/`cpm` alternative is
+#'   offered. When the stacked covariance is rank-deficient (per-group sample
+#'   size at or below the number of occasions times scales) the simulated
+#'   population is a proper degenerate normal, so the reported coverage and
+#'   width remain valid but the fit-statistic pass rate is descriptive only.
+#'   For a paired contrast, the joint-certification rate (both occasions
+#'   certified) is reported as a descriptive caveat on the contrast's
+#'   interpretability. Assessing the occasions object per occasion via
+#'   `scales =` one occasion's columns instead uses the default `"cpm"`
+#'   structure and can give slightly different per-occasion verdicts -- a
+#'   structure-sensitivity fact, not a bug.
 #' @references Zimmermann, J., & Wright, A. G. C. (2017). Beyond description
 #'   in interpersonal construct validation: Methodological advances in the
 #'   circumplex Structural Summary Approach. \emph{Assessment, 24}(1), 3-23.

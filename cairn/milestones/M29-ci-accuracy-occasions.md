@@ -1,6 +1,6 @@
 # M29: `ssm_ci_accuracy()` occasions extension
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M25
 - **Principles touched:** —
@@ -104,32 +104,30 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
       `Median_width` (SE band); plus the dependent-vs-zeroed contrast
       `Median_width` ratio vs the closed-form Δe width target and a
       reversal-side Δd cell. Committed script + results, asserting test.
-- [ ] **T5** — NEWS.md entry (error → runs behavior change); update the
+- [x] **T5** — NEWS.md entry (error → runs behavior change); update the
       informative-error test; `devtools::document()`; `devtools::check()`
       clean.
 
 ## Work log
 
-- 2026-07-17: created by /milestone-plan (deferral §1.4; sibling M28 §1.1).
-  /milestone-implement → in-progress; branch cut from master.
-- 2026-07-17: gate — storage settled (stacked per-group stats at analysis
-  time); population structure (T1 ip-touching) → RB07; blocked on RB07.
-- 2026-07-17: ingested RR07 (Fable) → M29-D1 + [[D-017]]; RB07/RR07 archived;
-  in-progress. Amendment gate (user-approved): AC2 boundary/contrast, AC3 →
-  width + closed-form arms, AC4 → flat-refusal; Scope + T1/T4 synced.
-- 2026-07-17: T1 done — `devel/m29-design.md` blueprint (population/loop,
-  storage, `(r−1) %/% k + 1` row↔group refactor, oracle plan); per [[D-017]].
+- 2026-07-17: created by /milestone-plan (deferral §1.4; sibling M28 §1.1);
+  implement → in-progress, branch cut. Gate: storage settled (stacked per-group
+  stats at analysis time); T1 ip-touching → RB07; blocked; ingested RR07 (Fable)
+  → M29-D1 + [[D-017]], archived. Amendment gate (approved): AC2/AC3/AC4 +
+  T1/T4 synced. T1 done — `devel/m29-design.md` blueprint per [[D-017]].
 - 2026-07-17: implement gate → M29-D2 (R12 add; shared-W bootstrap replay).
 - 2026-07-17: T2 done — occasions branch in `ssm_ci_accuracy.R` (stored stacked
   `(n,μ,Σ)`; guard removed; `MVN(μ,Σ̂_g)` via `mvn_root`; shared-W bootstrap +
   `ssm_mc_replicates(occ_k=)` MC; flat/rank/structure/legacy refusals;
   occasions-aware `summary()` + R12). AC1/AC4 tests; `test()` clean.
 - 2026-07-17: T3 done — AC2 simulation-coverage oracle (`m29-*-oracle.{R,md}` +
-  committed rds): diagnostic-reported vs direct empirical coverage of the real
-  `ssm_analyze` procedure at the plug-in; 27/27 within the 4-SE band.
+  rds): diagnostic-reported vs direct empirical coverage at the plug-in; 27/27
+  within the 4-SE band.
 - 2026-07-17: T4 done — AC3 discrimination oracle (`m29-*-discrimination.{R,md}`
-  + committed rds): invariant (zeroed-occasions ≡ two-group ref) + closed-form Δe
-  width √(w′Σw/w′Σ₀w) <1% + Δd reversal sign; ≥2 oracle types met.
+  + rds): invariant (zeroed-occasions ≡ two-group ref) + closed-form Δe width
+  √(w′Σw/w′Σ₀w) <1% + Δd reversal sign; ≥2 oracle types met.
+- 2026-07-17: T5 done — NEWS (error→runs); roxygen occasions Limitations + refusal
+  note; `document()`; `check()` clean (0/0/0). Status → review.
 
 ## Decisions
 

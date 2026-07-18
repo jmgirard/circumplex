@@ -1,5 +1,15 @@
 # circumplex (development version)
 
+* `ssm_ci_accuracy()` now assesses repeated-measures occasions analyses
+  instead of stopping with an error. Its plug-in population is a multivariate
+  normal with the observed stacked cross-occasion covariance, so the
+  within-person dependence across occasions is carried into the simulation
+  (rather than ignored); it reports CI trustworthiness per occasion and for
+  the paired within-person contrast. A flat occasion is refused by name, a
+  rank-deficient stacked covariance is flagged (the fit-statistic pass rate
+  becomes descriptive), and because the occasions population is the observed
+  covariance the `structure`/`cpm` arguments are not accepted on that path.
+
 * New `ssm_analyze_long()` provides a long-format (one row per person per
   occasion) interface to the repeated-measures occasions analysis. It reshapes
   the data to the wide layout `ssm_analyze()` expects and delegates to it, so
