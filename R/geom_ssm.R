@@ -42,6 +42,26 @@ ssm_arc_span <- function(displacement_min, displacement_max) {
   upper - displacement_min
 }
 
+# Opt-in ggplot2 na.rm warn-parity. The geoms always drop rows that cannot be
+# placed (no location / no region); this makes that drop *speak* when the caller
+# opts out of silent removal. na.rm = TRUE (the geom default) stays silent -- no
+# new warnings in existing plots, and ssm_plot_circle() keeps naming dropped
+# profiles itself; na.rm = FALSE warns once with the dropped-row count before the
+# drop, matching the ggplot2 convention. Scoped to missing/incomplete (NA) rows,
+# the ggplot2 sense of "missing values"; a complete-but-zero-width arc is a
+# separate geometry rule and stays silent.
+ssm_warn_dropped <- function(n_dropped, na.rm, fn, what) {
+  if (n_dropped > 0L && isFALSE(na.rm)) {
+    warning(
+      sprintf(
+        "Removed %d row%s with %s (`%s()`). Use `na.rm = TRUE` to silence this.",
+        n_dropped, if (n_dropped == 1L) "" else "s", what, fn
+      ),
+      call. = FALSE
+    )
+  }
+}
+
 # One-time soft-deprecation note for the retired per-layer `amax`/`n` geom
 # arguments (M31): amplitude scaling and arc smoothness are now owned by
 # coord_circumplex(). Unconditional (fires whenever the argument is supplied,
@@ -78,8 +98,9 @@ ssm_deprecate_geom_arg <- function(value, arg, fn) {
 #' @param amax (Deprecated) The amplitude represented by
 #'   the outer ring is now owned by [coord_circumplex()]; a value supplied here
 #'   is ignored with a one-time note.
-#' @param na.rm Ignored; profiles with a missing displacement or amplitude
-#'   (degenerate profiles) are always dropped, since they have no location.
+#' @param na.rm If `FALSE`, warn (with the dropped-row count) before removing
+#'   profiles with a missing displacement or amplitude, since they have no
+#'   location on the circle; if `TRUE` (the default) remove them silently.
 #' @return A \pkg{ggplot2} layer.
 #' @seealso [coord_circumplex()], [ggcircumplex()], [geom_ssm_arc()]
 #' @export
@@ -103,6 +124,25 @@ geom_ssm_point <- function(mapping = NULL, data = NULL, stat = "identity",
   )
 }
 
+#' Circumplex ggproto classes
+#'
+#' These are the \pkg{ggplot2} [ggplot2::ggproto()] classes that back the
+#' circumplex layers and coordinate system: `GeomSsmPoint` (the profile-point
+#' geom), `GeomSsmArc` (the confidence-region arc geom), and `CoordCircumplex`
+#' (the coordinate system). They are exported so that downstream packages can
+#' subclass them to build custom circumplex layers; most users should use the
+#' [geom_ssm_point()], [geom_ssm_arc()], and [coord_circumplex()] constructors
+#' instead.
+#'
+#' @seealso [geom_ssm_point()], [geom_ssm_arc()], [coord_circumplex()]
+#' @name circumplex-ggproto
+#' @keywords internal
+NULL
+
+#' @rdname circumplex-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
 GeomSsmPoint <- ggplot2::ggproto(
   "GeomSsmPoint", ggplot2::GeomPoint,
   required_aes = c("amplitude", "displacement"),
@@ -113,7 +153,12 @@ GeomSsmPoint <- ggplot2::ggproto(
   setup_data = function(data, params) {
     # Drop profiles with no location, then hand amplitude/displacement to the
     # coord as y/x (the coord owns the polar transform; no cartesian math here).
-    data <- data[ssm_has_location(data$amplitude, data$displacement), ]
+    keep <- ssm_has_location(data$amplitude, data$displacement)
+    ssm_warn_dropped(
+      sum(!keep), params$na.rm, "geom_ssm_point",
+      "a missing amplitude or displacement"
+    )
+    data <- data[keep, ]
     data$x <- data$displacement
     data$y <- data$amplitude
     data
@@ -149,8 +194,9 @@ GeomSsmPoint <- ggplot2::ggproto(
 #' @param n (Deprecated) Arc smoothness is now owned by the
 #'   coordinate system, which curves the wedge automatically; a value supplied
 #'   here is ignored with a one-time note.
-#' @param na.rm Ignored; profiles with a missing displacement or amplitude
-#'   bound (degenerate profiles) are always dropped.
+#' @param na.rm If `FALSE`, warn (with the dropped-row count) before removing
+#'   profiles with an incomplete confidence region (a missing amplitude or
+#'   displacement bound); if `TRUE` (the default) remove them silently.
 #' @return A \pkg{ggplot2} layer.
 #' @seealso [coord_circumplex()], [ggcircumplex()], [geom_ssm_point()]
 #' @export
@@ -179,6 +225,10 @@ geom_ssm_arc <- function(mapping = NULL, data = NULL, stat = "identity",
   )
 }
 
+#' @rdname circumplex-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
 GeomSsmArc <- ggplot2::ggproto(
   "GeomSsmArc", ggplot2::GeomRect,
   required_aes = c(
@@ -187,10 +237,15 @@ GeomSsmArc <- ggplot2::ggproto(
   setup_data = function(data, params) {
     # Drop rows without a complete CI region (one predicate, shared with the
     # point geom and the plot-level callers).
-    data <- data[ssm_has_region(
+    keep_region <- ssm_has_region(
       data$amplitude_min, data$amplitude_max,
       data$displacement_min, data$displacement_max
-    ), ]
+    )
+    ssm_warn_dropped(
+      sum(!keep_region), params$na.rm, "geom_ssm_arc",
+      "an incomplete confidence region"
+    )
+    data <- data[keep_region, ]
     # Unwrap a displacement interval that crosses the 0/360 seam by *extension*:
     # xmax = xmin + span may exceed 360, and the polar coord's periodic
     # transform carries it the short way across the pole. Range must stay

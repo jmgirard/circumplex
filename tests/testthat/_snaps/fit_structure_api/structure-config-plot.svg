@@ -57,11 +57,11 @@
 <text x='397.11' y='517.45' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='14.41px' lengthAdjust='spacingAndGlyphs'>NO</text>
 <text x='538.29' y='379.65' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='12.81px' lengthAdjust='spacingAndGlyphs'>PA</text>
 <text x='552.66' y='301.31' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>BC</text>
-<text x='329.21' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.00</text>
-<text x='383.73' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.25</text>
-<text x='438.25' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.50</text>
-<text x='492.76' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.75</text>
-<text x='547.28' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>1.00</text>
+<text x='331.25' y='296.19' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.00</text>
+<text x='302.77' y='249.71' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.25</text>
+<text x='274.28' y='203.22' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.50</text>
+<text x='245.80' y='156.74' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.75</text>
+<text x='217.31' y='110.26' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>1.00</text>
 <text x='619.73' y='229.46' style='font-size: 12.00px; font-family: sans;' textLength='30.02px' lengthAdjust='spacingAndGlyphs'>Scale</text>
 <circle cx='628.37' cy='245.32' r='3.59' style='stroke-width: 0.77; fill: #66C2A5;' />
 <circle cx='628.37' cy='262.60' r='3.59' style='stroke-width: 0.77; fill: #FC8D62;' />

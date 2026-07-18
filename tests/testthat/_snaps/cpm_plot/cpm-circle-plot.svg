@@ -64,11 +64,11 @@
 <text x='485.57' y='461.08' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='11.21px' lengthAdjust='spacingAndGlyphs'>JK</text>
 <text x='552.66' y='300.74' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>LM</text>
 <text x='485.10' y='140.41' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='14.41px' lengthAdjust='spacingAndGlyphs'>NO</text>
-<text x='329.21' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.00</text>
-<text x='383.73' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.25</text>
-<text x='438.25' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.50</text>
-<text x='492.76' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.75</text>
-<text x='547.28' y='306.44' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>1.00</text>
+<text x='330.13' y='306.25' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.00</text>
+<text x='380.50' y='285.39' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.25</text>
+<text x='430.86' y='264.53' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.50</text>
+<text x='481.23' y='243.67' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.75</text>
+<text x='531.60' y='222.80' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>1.00</text>
 <text x='619.73' y='229.46' style='font-size: 12.00px; font-family: sans;' textLength='30.02px' lengthAdjust='spacingAndGlyphs'>Scale</text>
 <circle cx='628.37' cy='245.32' r='3.59' style='stroke-width: 0.77; fill: #66C2A5;' />
 <rect x='620.44' y='254.67' width='15.86' height='15.86' style='stroke-width: 1.07; stroke: #666666; stroke-linecap: butt; stroke-linejoin: miter; fill: #FC8D62; fill-opacity: 0.40;' />

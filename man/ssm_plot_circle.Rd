@@ -34,8 +34,11 @@ pt) of the text labels for the amplitude and displacement scales (default =
 \item{drop_lowfit}{A logical determining whether profiles with low model fit
 (<.70) should be omitted or plotted with dashed borders (default = FALSE).}
 
-\item{repel}{An experimental argument for plotting text labels instead of
-colors.}
+\item{repel}{A logical determining whether each profile is labelled with a
+repelled text label (placed on the circumplex canvas by
+\code{\link[=coord_circumplex]{coord_circumplex()}}, so labels avoid overlapping each other and the
+points) instead of distinguished by colour and a legend (default = FALSE).
+Requires the \pkg{ggrepel} package.}
 
 \item{angle_labels}{A character vector specifying text labels to plot around
 the circle for each scale. Can also specify NULL to default to numerical

@@ -315,8 +315,7 @@ is a Cartesian difference plot and stays independent.
 - **Arc geom** (`GeomSsmArc` ⊂ `GeomRect`): `setup_data()` drops incomplete and
   zero-width regions, unwraps a seam-straddling interval by extension
   (`xmax = xmin + span`, may exceed 360) and validates the span; the polar coord
-  bends the rectangle into an annular wedge. Replaces the former
-  `StatSsmArc ⊂ ggforce::StatArcBar`.
+  bends the rectangle into an annular wedge.
 - **Label resolution**: a shared `resolve_circumplex_labels()` backs both the
   canvas theta axis and `scale_x_circumplex()`, so identical
   `angles`/`labels`/`instrument` inputs label both contexts consistently.
@@ -327,11 +326,13 @@ each is structurally impossible to reintroduce once the coord owns the transform
 (M30 design; D-019). `ggforce` is no longer a dependency (D-020) — the arc is a
 coord-bent `GeomRect` and the rings are the coord's r-gridlines; the dead
 cartesian helpers `ggrad()`/`ssm_to_cartesian()`/`ssm_radius()` went with it.
-Two behaviors are unchanged: `na.rm` is effectively always TRUE (the geoms drop
-rows with a missing amplitude/displacement, and `ssm_plot_circle()` names such
-profiles before dropping them), and the `GeomSsmPoint`/`GeomSsmArc`/coord
-ggproto generators stay unexported (only the layer/coord constructors are) —
-exporting them for subclassing is deferred to M32.
+The `GeomSsmPoint` / `GeomSsmArc` / `CoordCircumplex` ggproto generators are
+exported for downstream subclassing (M32; documented under `circumplex-ggproto`
+with `@keywords internal`), alongside the layer/coord constructors that most
+users call. `na.rm` follows the ggplot2 convention as an opt-in (M32): the geom
+default `na.rm = TRUE` drops degenerate rows silently (and `ssm_plot_circle()`
+still names dropped profiles itself), while `na.rm = FALSE` warns with the
+dropped-row count before dropping missing/incomplete rows.
 
 ## Key references
 

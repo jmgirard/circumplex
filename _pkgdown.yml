@@ -74,6 +74,7 @@ reference:
   - geom_ssm_point
   - geom_ssm_arc
   - scale_x_circumplex
+  - theme_circumplex
 - title: Secondary SSM Functions
   desc: Functions for customizing SSM results
   contents: html_render

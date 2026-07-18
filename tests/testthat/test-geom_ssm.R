@@ -174,6 +174,57 @@ test_that("supplying the retired amax/n geom arguments notes once and never erro
   expect_no_error(ggplot2::ggplot_build(p))
 })
 
+# --- T2: na.rm opt-in warn-parity ---------------------------------------------
+# Default na.rm = TRUE drops degenerate rows silently (unchanged); na.rm = FALSE
+# warns with the dropped-row count before dropping (ggplot2 convention).
+
+test_that("geom_ssm_point warns by count under na.rm = FALSE, silent under TRUE (T2)", {
+  df <- data.frame(a_est = c(0.3, NA, 0.2), d_est = c(90, NA, 45)) # one degenerate
+  build <- function(na.rm) {
+    ggplot2::ggplot_build(
+      ggcircumplex(octants(), amax = 0.5) +
+        geom_ssm_point(
+          data = df, na.rm = na.rm,
+          mapping = ggplot2::aes(amplitude = .data$a_est, displacement = .data$d_est)
+        )
+    )
+  }
+  expect_warning(build(FALSE), "[Rr]emoved 1 row")
+  expect_no_warning(build(TRUE))
+})
+
+test_that("geom_ssm_arc warns by count under na.rm = FALSE, silent under TRUE (T2)", {
+  # Two incomplete-CI rows (missing bounds) among three.
+  df <- data.frame(
+    a_lci = c(0.2, NA, 0.1), a_uci = c(0.3, 0.4, 0.2),
+    d_lci = c(40, 50, NA), d_uci = c(60, 70, 30)
+  )
+  build <- function(na.rm) {
+    ggplot2::ggplot_build(
+      ggcircumplex(octants(), amax = 0.5) +
+        geom_ssm_arc(
+          data = df, na.rm = na.rm,
+          mapping = ggplot2::aes(
+            amplitude_min = .data$a_lci, amplitude_max = .data$a_uci,
+            displacement_min = .data$d_lci, displacement_max = .data$d_uci
+          )
+        )
+    )
+  }
+  expect_warning(build(FALSE), "[Rr]emoved 2 row")
+  expect_no_warning(build(TRUE))
+})
+
+test_that("na.rm = FALSE with no degenerate rows does not warn (T2)", {
+  df <- data.frame(a_est = c(0.3, 0.2), d_est = c(90, 45))
+  p <- ggcircumplex(octants(), amax = 0.5) +
+    geom_ssm_point(
+      data = df, na.rm = FALSE,
+      mapping = ggplot2::aes(amplitude = .data$a_est, displacement = .data$d_est)
+    )
+  expect_no_warning(ggplot2::ggplot_build(p))
+})
+
 # --- visual regression --------------------------------------------------------
 
 test_that("a canvas-plus-geoms plot renders (visual regression)", {

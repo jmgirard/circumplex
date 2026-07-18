@@ -4,7 +4,7 @@
 \alias{coord_circumplex}
 \title{Circumplex coordinate system}
 \usage{
-coord_circumplex(amax = NULL, center = 0, ...)
+coord_circumplex(amax = NULL, center = 0, r_axis_angle = NULL, ...)
 }
 \arguments{
 \item{amax}{Optional. A single positive number giving the amplitude
@@ -14,6 +14,12 @@ represented by the outer ring. \code{NULL} (the default) trains it from the data
 \item{center}{Optional. A single number giving the amplitude at the center of
 the circle (default = 0). Ring labels and the amplitude-to-radius mapping
 are guaranteed to agree.}
+
+\item{r_axis_angle}{Optional. A single number giving the displacement (in
+degrees) along which the amplitude (radial) axis and its labels are drawn.
+\code{NULL} (the default) places it automatically in the widest gap between the
+displacement spokes, so the amplitude labels never collide with a spoke
+label.}
 
 \item{...}{Reserved for future extensions; currently unused.}
 }

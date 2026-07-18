@@ -25,8 +25,9 @@ geom_ssm_point(
 the outer ring is now owned by \code{\link[=coord_circumplex]{coord_circumplex()}}; a value supplied here
 is ignored with a one-time note.}
 
-\item{na.rm}{Ignored; profiles with a missing displacement or amplitude
-(degenerate profiles) are always dropped, since they have no location.}
+\item{na.rm}{If \code{FALSE}, warn (with the dropped-row count) before removing
+profiles with a missing displacement or amplitude, since they have no
+location on the circle; if \code{TRUE} (the default) remove them silently.}
 }
 \value{
 A \pkg{ggplot2} layer.
