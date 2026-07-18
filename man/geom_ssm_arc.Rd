@@ -30,8 +30,9 @@ is ignored with a one-time note.}
 coordinate system, which curves the wedge automatically; a value supplied
 here is ignored with a one-time note.}
 
-\item{na.rm}{Ignored; profiles with a missing displacement or amplitude
-bound (degenerate profiles) are always dropped.}
+\item{na.rm}{If \code{FALSE}, warn (with the dropped-row count) before removing
+profiles with an incomplete confidence region (a missing amplitude or
+displacement bound); if \code{TRUE} (the default) remove them silently.}
 }
 \value{
 A \pkg{ggplot2} layer.

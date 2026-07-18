@@ -80,7 +80,7 @@ users need to compose custom figures.
 - [x] **T1** — Export `GeomSsmPoint`, `GeomSsmArc`, `CoordCircumplex` with
       `@format NULL` roxygen; add a downstream-subclass test (trivial subclass of
       each, rendered). Sweep the stale `StatSsmArc` phrase from DESIGN.md:319.
-- [ ] **T2** — Implement `na.rm = FALSE` warn-by-count in `GeomSsmPoint$setup_data`
+- [x] **T2** — Implement `na.rm = FALSE` warn-by-count in `GeomSsmPoint$setup_data`
       and `GeomSsmArc$setup_data` (default TRUE stays silent); test all four
       geom×flag cases.
 - [ ] **T3** — Fix the due-East `0.5`/`LM` label overlap in `coord_circumplex()` /
@@ -106,6 +106,11 @@ users need to compose custom figures.
   NULL`); swept stale `StatSsmArc ⊂ ggforce::StatArcBar` from DESIGN.md; updated
   DESIGN.md export note. Added test-ggproto-classes.R (export + subclass-render
   for all three). Viz test files green.
+- 2026-07-18: T2 — `na.rm` opt-in warn-parity via shared `ssm_warn_dropped()`
+  helper wired into both geoms' `setup_data` (reads `params$na.rm`; default TRUE
+  silent, FALSE warns by count on NA-drops; zero-width arc stays a silent
+  geometry rule). Updated both `@param na.rm` docs + DESIGN.md. 4 geom×flag test
+  cases; no double-warn in `ssm_plot_circle`/`plot.circumplex_cpm`.
 
 ## Decisions
 

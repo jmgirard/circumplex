@@ -329,7 +329,10 @@ cartesian helpers `ggrad()`/`ssm_to_cartesian()`/`ssm_radius()` went with it.
 The `GeomSsmPoint` / `GeomSsmArc` / `CoordCircumplex` ggproto generators are
 exported for downstream subclassing (M32; documented under `circumplex-ggproto`
 with `@keywords internal`), alongside the layer/coord constructors that most
-users call.
+users call. `na.rm` follows the ggplot2 convention as an opt-in (M32): the geom
+default `na.rm = TRUE` drops degenerate rows silently (and `ssm_plot_circle()`
+still names dropped profiles itself), while `na.rm = FALSE` warns with the
+dropped-row count before dropping missing/incomplete rows.
 
 ## Key references
 
