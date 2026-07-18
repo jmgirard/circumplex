@@ -4,18 +4,21 @@
 \alias{CoordCircumplex}
 \alias{circumplex-ggproto}
 \alias{GeomSsmPoint}
+\alias{GeomSsmPath}
 \alias{GeomSsmArc}
 \title{Circumplex ggproto classes}
 \description{
 These are the \pkg{ggplot2} \code{\link[ggplot2:ggproto]{ggplot2::ggproto()}} classes that back the
 circumplex layers and coordinate system: \code{GeomSsmPoint} (the profile-point
-geom), \code{GeomSsmArc} (the confidence-region arc geom), and \code{CoordCircumplex}
-(the coordinate system). They are exported so that downstream packages can
-subclass them to build custom circumplex layers; most users should use the
-\code{\link[=geom_ssm_point]{geom_ssm_point()}}, \code{\link[=geom_ssm_arc]{geom_ssm_arc()}}, and \code{\link[=coord_circumplex]{coord_circumplex()}} constructors
+geom), \code{GeomSsmArc} (the confidence-region arc geom), \code{GeomSsmPath} (the
+movement-path geom), and \code{CoordCircumplex} (the coordinate system). They are
+exported so that downstream packages can subclass them to build custom
+circumplex layers; most users should use the \code{\link[=geom_ssm_point]{geom_ssm_point()}},
+\code{\link[=geom_ssm_arc]{geom_ssm_arc()}}, \code{\link[=geom_ssm_path]{geom_ssm_path()}}, and \code{\link[=coord_circumplex]{coord_circumplex()}} constructors
 instead.
 }
 \seealso{
-\code{\link[=geom_ssm_point]{geom_ssm_point()}}, \code{\link[=geom_ssm_arc]{geom_ssm_arc()}}, \code{\link[=coord_circumplex]{coord_circumplex()}}
+\code{\link[=geom_ssm_point]{geom_ssm_point()}}, \code{\link[=geom_ssm_arc]{geom_ssm_arc()}}, \code{\link[=geom_ssm_path]{geom_ssm_path()}},
+\code{\link[=coord_circumplex]{coord_circumplex()}}
 }
 \keyword{internal}

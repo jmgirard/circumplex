@@ -383,6 +383,56 @@ points --- which is how you plot a *model-based* trajectory evaluated from a
 fitted growth model rather than one estimated separately at each wave. That
 workflow is the subject of the "Growth Models on SSM Parameters" vignette.
 
+### The same change as movement on the circle
+
+The panels above show each parameter against time separately, which is the right
+figure for reading a confidence interval but a poor one for seeing *motion*: the
+amplitude and displacement of a single occasion are split across two panels.
+`geom_ssm_path()` draws the same series as a path on the circular canvas, so a
+change in (amplitude, displacement) reads as movement through circumplex space.
+
+```{r occasions-path}
+ggcircumplex(angles, amax = 0.8) +
+  geom_ssm_point(
+    data = results_long$results,
+    mapping = aes(amplitude = a_est, displacement = d_est),
+    size = 2
+  ) +
+  # Drawn after the points so the terminal arrowhead is not covered by the
+  # final occasion's marker, and sized to clear it
+  geom_ssm_path(
+    data = results_long$results,
+    mapping = aes(amplitude = a_est, displacement = d_est),
+    arrow = arrow(length = unit(0.18, "inches"), type = "closed"),
+    linewidth = 0.7
+  )
+```
+
+The arrowhead marks the direction of time. Note what the layer does at the
+boundary: this profile moves from 330 to 355 to 20 degrees, and the step from
+the second to the third wave is drawn as the short 25 degree arc across the
+0/360 pole rather than a 335 degree sweep the long way round. The path is curved
+because `coord_circumplex()` munches each segment along the polar geodesic ---
+the layer supplies the ordering, not the drawing.
+
+Occasions are connected in the order the rows appear in the data, exactly as
+`geom_path()` does, and mapping `group` draws one path per series. When you
+assemble a data frame by hand, sort it into time order first --- for the reason
+noted above, sorting occasion labels as text puts `T10` before `T2` and
+silently reverses time. The wrapper below does that sorting for you.
+
+The same figure is available ready-made from `ssm_plot_circle()`, which adds the
+path to its usual points and confidence wedges:
+
+```{r occasions-path-wrapper}
+ssm_plot_circle(results_long, path = TRUE)
+```
+
+An occasion whose displacement is undefined --- a flat or zero-amplitude profile
+--- *breaks* the path rather than being interpolated through, and the segment
+after the gap is still drawn on the correct branch. A path that skipped such an
+occasion would draw a movement that never happened.
+
 ## The angle axis for linear plots
 
 Not every circumplex figure is circular. The score-by-angle curve drawn by

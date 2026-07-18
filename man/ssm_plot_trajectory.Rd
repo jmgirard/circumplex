@@ -126,6 +126,10 @@ trajectory <- data.frame(
 ssm_plot_trajectory(trajectory, time = "wave")
 }
 \seealso{
+\code{\link[=geom_ssm_path]{geom_ssm_path()}} and \code{ssm_plot_circle(path = TRUE)}, which draw the
+same change across occasions as movement on the circumplex canvas rather
+than as parameter-by-time panels.
+
 Other visualization functions:
 \code{\link[=plot.circumplex_ci_accuracy]{plot.circumplex_ci_accuracy()}},
 \code{\link[=ssm_plot_circle]{ssm_plot_circle()}},

@@ -46,6 +46,7 @@ scale_x_circumplex(instrument = csip)
 Other circumplex layers:
 \code{\link[=coord_circumplex]{coord_circumplex()}},
 \code{\link[=geom_ssm_arc]{geom_ssm_arc()}},
+\code{\link[=geom_ssm_path]{geom_ssm_path()}},
 \code{\link[=geom_ssm_point]{geom_ssm_point()}},
 \code{\link[=ggcircumplex]{ggcircumplex()}},
 \code{\link[=theme_circumplex]{theme_circumplex()}}
