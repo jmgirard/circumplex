@@ -103,7 +103,7 @@ unwrapping, and D-007 certification marking on the displacement panel.
 
 ## Tasks
 
-- [ ] **T1** — Internal reshape helper: occasions object → long frame keyed on
+- [x] **T1** — Internal reshape helper: occasions object → long frame keyed on
       (Group × Occasion × Parameter). Strip info columns **by name**
       (`setdiff(names(x), c("Label","Group","Measure","Occasion"))`, the
       [ssm_plot.R:309](../../R/ssm_plot.R) idiom — never positional); factor
@@ -111,7 +111,7 @@ unwrapping, and D-007 certification marking on the displacement panel.
       the `Panel` factor from a named label vector as
       `plot.circumplex_ci_accuracy()` does ([ssm_ci_oop.R:582](../../R/ssm_ci_oop.R)).
       Unit-test the helper directly (independent logic).
-- [ ] **T2** — Displacement branch: per-group `angle_unwrap(d_est)` + per-bound
+- [x] **T2** — Displacement branch: per-group `angle_unwrap(d_est)` + per-bound
       signed-distance placement, applied *after* T1's temporal ordering (the
       unwrap chain is order-dependent) and NA-tolerant across a degenerate
       occasion. Reuse the existing idiom, do not retype a fresh `%%`.
@@ -140,6 +140,18 @@ unwrapping, and D-007 certification marking on the displacement panel.
   gate — the plan was written this session against a fresh investigation and
   left nothing open; conventions settled by precedent (`drop_xy = FALSE` per
   `ssm_plot_contrast()`, `scales = "free_y"`, legend hidden when ungrouped).
+- 2026-07-18: T1+T2 done together (the unwrap runs inside the reshape, before
+  the melt, so it sees the ordered series — splitting the commit would have
+  split one unit). `ssm_trajectory_frame()` + `ssm_unwrap_gapped()` +
+  `ssm_bound_on_branch()` in `R/ssm_trajectory.R`; 31 direct tests. Both guards
+  proven to bite by mutation (naive branch-offset placement → ribbon assertions
+  red; unfactored Occasion → T2/T10 order red). Fixture retuned to
+  `d = c(350, 359, 8, 16)`, noise 1.0 after the first choice produced no
+  stored-reversed interval — the seam assertions would have been vacuous.
+  Deviation from plan: `ssm_unwrap_gapped()` bridges a gap rather than
+  inheriting `angle_unwrap()`'s NA-onward policy, which would blank the whole
+  post-gap tail (AC5 requires a gap, not a broken chain); the widened
+  assumption is documented at the helper. Full suite 0 failures / 2782 pass.
 
 ## Decisions
 

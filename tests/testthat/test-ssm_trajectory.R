@@ -1,0 +1,230 @@
+# Trajectory plotting for occasions objects (M33).
+#
+# Fixture provenance: every fixture below is generated in-file by
+# make_traj_data() from a named seed; no committed data files. Each occasion is
+# a cosine profile with a KNOWN displacement, so the recovered trajectory
+# crosses the 0/360 seam deterministically rather than by luck -- the M13 teeth
+# rule (a seam guard whose fixture never straddles has no teeth).
+#
+# Invariants are asserted at the data level, never by eye: devtools::check()
+# runs clean on a visually wrong figure.
+
+make_traj_data <- function(d = c(350, 359, 8, 16), n = 60, e = 2, a = 1,
+                           noise = 1, seed = 33,
+                           scales = c(
+                             "PA", "BC", "DE", "FG",
+                             "HI", "JK", "LM", "NO"
+                           )) {
+  set.seed(seed)
+  ang <- as.numeric(octants())
+  blocks <- lapply(seq_along(d), function(j) {
+    mu <- e + a * cos((ang - d[[j]]) * pi / 180)
+    block <- matrix(rnorm(n * length(ang), sd = noise), n, length(ang)) +
+      matrix(mu, n, length(ang), byrow = TRUE)
+    colnames(block) <- paste0(scales, "_", j)
+    block
+  })
+  df <- as.data.frame(do.call(cbind, blocks))
+  df$Gender <- factor(rep(c("F", "M"), length.out = n))
+  df
+}
+
+occ_list <- function(labels, n_occ = length(labels),
+                     scales = c(
+                       "PA", "BC", "DE", "FG",
+                       "HI", "JK", "LM", "NO"
+                     )) {
+  out <- lapply(seq_len(n_occ), function(j) paste0(scales, "_", j))
+  names(out) <- labels
+  out
+}
+
+traj_fit <- function(d = c(350, 359, 8, 16), labels = paste0("T", seq_along(d)),
+                     boots = 200, seed = 33, ...) {
+  data <- make_traj_data(d = d, seed = seed)
+  set.seed(seed)
+  ssm_analyze(data, occasions = occ_list(labels), boots = boots, ...)
+}
+
+# ssm_trajectory_frame(): reshape ---------------------------------------------
+
+test_that("the reshape emits one row per group, occasion, and parameter", {
+  res <- traj_fit()
+  df <- ssm_trajectory_frame(res)
+
+  expect_equal(nrow(df), 4 * 5)
+  expect_setequal(unique(df$Parameter), c("e", "x", "y", "a", "d"))
+  expect_setequal(levels(df$Panel), unname(ssm_trajectory_panels()))
+  expect_true(all(c("Group", "Occasion", "est", "lci", "uci", "Certified")
+  %in% names(df)))
+})
+
+test_that("drop_xy removes only the x and y panels", {
+  res <- traj_fit()
+  df <- ssm_trajectory_frame(res, drop_xy = TRUE)
+
+  expect_setequal(unique(df$Parameter), c("e", "a", "d"))
+  expect_equal(levels(df$Panel), c("Elevation", "Amplitude", "Displacement"))
+})
+
+test_that("a grouped object yields one series per group level", {
+  res <- traj_fit(grouping = "Gender")
+  df <- ssm_trajectory_frame(res)
+
+  expect_setequal(levels(df$Group), c("F", "M"))
+  expect_equal(nrow(df), 2 * 4 * 5)
+})
+
+# Occasion ordering is temporal, never alphabetical (AC2) ----------------------
+
+test_that("occasions keep their list order when labels sort the other way", {
+  # T10 is listed second but sorts FIRST alphabetically. An implementation that
+  # lets the character Occasion column reach a discrete scale unfactored
+  # silently reverses the time axis.
+  res <- traj_fit(d = c(350, 10), labels = c("T2", "T10"))
+  df <- ssm_trajectory_frame(res)
+
+  expect_equal(levels(df$Occasion), c("T2", "T10"))
+  expect_false(identical(levels(df$Occasion), sort(c("T2", "T10"))))
+})
+
+test_that("the long-format path preserves its occasion ordering too", {
+  scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  wide <- make_traj_data(d = c(350, 10))
+  long <- rbind(
+    within(
+      setNames(wide[, paste0(scales, "_1")], scales),
+      {
+        id <- seq_len(nrow(wide))
+        occasion <- "T2"
+      }
+    ),
+    within(
+      setNames(wide[, paste0(scales, "_2")], scales),
+      {
+        id <- seq_len(nrow(wide))
+        occasion <- "T10"
+      }
+    )
+  )
+  long$occasion <- factor(long$occasion, levels = c("T2", "T10"))
+  set.seed(33)
+  res <- ssm_analyze_long(long,
+    scales = scales, id = "id",
+    occasion = "occasion", boots = 200
+  )
+  df <- ssm_trajectory_frame(res)
+
+  expect_equal(levels(df$Occasion), c("T2", "T10"))
+})
+
+# Displacement seam continuity (AC3) ------------------------------------------
+
+test_that("the fixture really does straddle the 0/360 seam", {
+  # Guards the guard: if this stops holding, every seam assertion below goes
+  # vacuous and would pass against a linear implementation.
+  res <- traj_fit()
+  d <- as.numeric(res$results$d_est)
+
+  expect_true(any(d > 270) && any(d < 90))
+  # and at least one interval is stored reversed (lower > upper)
+  expect_true(any(as.numeric(res$results$d_lci) >
+    as.numeric(res$results$d_uci)))
+})
+
+test_that("the displacement branch is continuous across the seam", {
+  res <- traj_fit()
+  df <- ssm_trajectory_frame(res)
+  d <- df[df$Parameter == "d", ]
+  d <- d[order(d$Occasion), ]
+
+  # No occasion-to-occasion step approaches a full turn. A naive wrap leaves a
+  # ~344 degree jump between the pre- and post-seam occasions.
+  steps <- abs(diff(d$est))
+  expect_true(all(steps < 90))
+  expect_true(max(steps) < 180)
+})
+
+test_that("each CI bound lands on its own estimate's branch", {
+  res <- traj_fit()
+  df <- ssm_trajectory_frame(res)
+  d <- df[df$Parameter == "d", ]
+
+  # The ribbon is well formed: lower below the estimate, upper above it, and
+  # the interval never a near-full turn wide. Placing a straddling bound by the
+  # estimate's branch offset instead inverts the ribbon (lci > uci) and blows
+  # the width past 300 degrees.
+  expect_true(all(d$lci <= d$est))
+  expect_true(all(d$est <= d$uci))
+  expect_true(all(d$uci - d$lci < 180))
+})
+
+test_that("the seam guard has teeth against a linear implementation", {
+  # Mutation check, not eyeballing: recompute the displacement panel the naive
+  # way (bounds carried by the estimate's branch offset rather than their own
+  # signed distance) and confirm the assertions above go red.
+  res <- traj_fit()
+  results <- res$results
+  est <- as.numeric(results$d_est)
+  branch <- angle_unwrap(est)
+  offset <- branch - est
+  naive_lci <- as.numeric(results$d_lci) + offset
+  naive_uci <- as.numeric(results$d_uci) + offset
+
+  # At least one interval is inverted or absurdly wide under the naive rule.
+  expect_true(any(naive_lci > branch | branch > naive_uci |
+    (naive_uci - naive_lci) >= 180))
+})
+
+# Certification marking (AC4) -------------------------------------------------
+
+test_that("certification is carried per occasion from the amplitude CI pair", {
+  res <- traj_fit()
+  df <- ssm_trajectory_frame(res)
+
+  expect_type(df$Certified, "logical")
+  expect_equal(
+    df$Certified[df$Parameter == "d"],
+    unname(ssm_certified(res$results$a_lci, res$results$a_uci))
+  )
+  # the fixture has a genuine signal, so every occasion certifies
+  expect_true(all(df$Certified))
+})
+
+test_that("a near-zero-amplitude occasion fails certification", {
+  # a = 0 in one occasion: the amplitude CI lower bound collapses toward zero
+  # relative to the interval width, so D-007 declines to certify its
+  # displacement.
+  res <- traj_fit()
+  results <- res$results
+  results$a_lci[[2]] <- 0.001
+  results$a_uci[[2]] <- 1
+  expect_false(ssm_certified(results$a_lci[[2]], results$a_uci[[2]]))
+})
+
+# Degenerate occasions and the contrast row (AC5) ------------------------------
+
+test_that("an occasion with no location leaves a gap, not a broken tail", {
+  res <- traj_fit()
+  res$results$a_est[[2]] <- NA_real_ # flat occasion: no location
+  df <- ssm_trajectory_frame(res)
+  d <- df[df$Parameter == "d", ]
+  d <- d[order(d$Occasion), ]
+
+  expect_true(is.na(d$est[[2]]))
+  # the occasions after the gap keep a defined, continuous branch -- the whole
+  # point of bridging rather than letting angle_unwrap()'s NA policy run on
+  expect_false(any(is.na(d$est[c(1, 3, 4)])))
+  expect_true(all(abs(diff(d$est[c(1, 3, 4)])) < 90))
+})
+
+test_that("the contrast row is dropped, not plotted as a time point", {
+  res <- traj_fit(d = c(350, 10), labels = c("T1", "T2"), contrast = TRUE)
+  expect_true(res$details$contrast)
+  expect_equal(nrow(res$results), 3) # two occasions + the contrast row
+
+  df <- ssm_trajectory_frame(res)
+  expect_equal(nrow(df), 2 * 5)
+  expect_setequal(levels(droplevels(df$Occasion)), c("T1", "T2"))
+  expect_false(any(grepl("-", as.character(df$Occasion), fixed = TRUE)))
+})
