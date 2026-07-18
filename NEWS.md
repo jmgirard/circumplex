@@ -1,5 +1,16 @@
 # circumplex (development version)
 
+* The new `ssm_plot_trajectory()` plots how each SSM parameter changes across
+  occasions, one panel per parameter with its confidence interval as a band, for
+  results from `ssm_analyze(occasions = )` and `ssm_analyze_long()`. The
+  displacement panel is drawn on an unwrapped branch, so a profile whose
+  displacement crosses the 0/360 boundary is shown as one continuous path
+  instead of jumping a full turn, and each confidence bound is placed on its own
+  estimate's branch. Occasions appear in the order they were supplied, never
+  alphabetically. An occasion whose amplitude is too close to zero for its
+  displacement to be interpretable is marked with a hollow point, and a profile
+  with no defined displacement leaves a gap rather than a spurious segment.
+
 * Circumplex figures are now built on a real ggplot2 coordinate system. The new
   `coord_circumplex()` owns the amplitude-to-radius scaling and the
   displacement-to-angle transform in one place, so a canvas and its data layers

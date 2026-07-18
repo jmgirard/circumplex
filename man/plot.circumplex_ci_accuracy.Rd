@@ -52,6 +52,9 @@ Other ssm functions:
 \code{\link[=ssm_sem_parameters]{ssm_sem_parameters()}},
 \code{\link[=ssm_table]{ssm_table()}},
 \code{\link[=summary.circumplex_ssm_id]{summary.circumplex_ssm_id()}}
+
+Other visualization functions:
+\code{\link[=ssm_plot_trajectory]{ssm_plot_trajectory()}}
 }
 \concept{ssm functions}
 \concept{visualization functions}
