@@ -101,18 +101,14 @@ in the growth vignette.
   *name* so the occasions path keeps its `Occasion` column and M33's suite
   stayed green with zero test edits (fence held literally). 0 failures / 2812.
 - 2026-07-18: T2 — gate settled all three open choices (S3 generic; explicit
-  `time =`; absent `certified` shows no claim). Built the generic +
-  `circumplex_ssm`/`data.frame`/`default` methods and the table validator; see
-  M35-D1/M35-D2. Code landed before its tests (T3): the validation surface was
-  settled against a working prototype, all nine error branches exercised by
-  hand before commit, then pinned in T3.
-- 2026-07-18: T3 — 63 tests in `test-ssm_trajectory_table.R`; full suite
-  0 failures / 2875 passes. Teeth proven by mutation: swapping
-  `ssm_interval_on_branch()` for the naive M27 per-bound expression turns the
-  new suite red (4) and M33's red (3) — both fence the one shared
-  implementation. The first wide-arc fixture had NO teeth (estimate at the
-  arc's centre, where the clamping expression agrees by symmetry); moved it
-  off-centre, the real diffuse-draws case.
+  `time =`; absent `certified` shows no claim). Built the generic + three
+  methods and the table validator; see M35-D1/M35-D2. Code landed before its
+  tests (T3), branches exercised by hand before commit, then pinned in T3.
+- 2026-07-18: T3 — 63 tests in `test-ssm_trajectory_table.R`; suite 0 failures
+  / 2875. Teeth proven by mutation: swapping `ssm_interval_on_branch()` for the
+  naive M27 per-bound expression turns the new suite red (4) and M33's red (3).
+  The first wide-arc fixture had NO teeth (estimate at the arc's centre, where
+  clamping agrees by symmetry); moved it off-centre, the diffuse-draws case.
 - 2026-07-18: T4 — vignette Section 4 figure is now one `ssm_plot_trajectory()`
   call (inline `rel()`/`%% 360` deleted, grep-clean); new Section 5 figure
   surfaces the `certified` column the vignette computed but could not show.
