@@ -4,7 +4,7 @@
 - **Priority:** normal
 - **Depends on:** M25
 - **Principles touched:** —
-- **Branch/PR:** m29-ci-accuracy-occasions
+- **Branch/PR:** m29-ci-accuracy-occasions · [PR #53](https://github.com/jmgirard/circumplex/pull/53)
 
 ## Goal
 
@@ -126,8 +126,10 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 - 2026-07-17: T4 done — AC3 discrimination oracle (`m29-*-discrimination.{R,md}`
   + rds): invariant (zeroed-occasions ≡ two-group ref) + closed-form Δe width
   √(w′Σw/w′Σ₀w) <1% + Δd reversal sign; ≥2 oracle types met.
-- 2026-07-17: T5 done — NEWS (error→runs); roxygen occasions Limitations + refusal
-  note; `document()`; `check()` clean (0/0/0). Status → review.
+- 2026-07-17: T5 done — NEWS (error→runs); roxygen occasions Limitations +
+  refusal note; `document()`; `check()` clean (0/0/0).
+- 2026-07-17: review (PR #53) — AC4 gap (near-zero/c=0 Structural untested) sent
+  back + test added; `test()` clean (307 pass).
 
 ## Decisions
 

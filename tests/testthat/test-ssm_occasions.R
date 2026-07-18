@@ -672,6 +672,48 @@ test_that("occasions ci_accuracy warns (not refuses) on a rank-deficient stacked
   expect_true(isTRUE(acc$details$rank_deficiency[["All"]]$deficient))
 })
 
+test_that("occasions ci_accuracy flags Structural rows at c=0 and runs a near-zero occasion honestly (AC4)", {
+  # (a) the c = 0 amplitude-ladder rung zeroes every occasion's amplitude, so
+  # each occasion's amplitude coverage is structurally 0 (a percentile interval
+  # of positive amplitude replicates cannot contain a zero truth) and must be
+  # flagged Structural; the run does not error and reports certification.
+  data <- make_contrast_data(n = 100, seed = 22)
+  set.seed(23)
+  res <- ssm_analyze(data,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+    contrast = TRUE, boots = 100
+  )
+  set.seed(24)
+  acc <- suppressWarnings(
+    ssm_ci_accuracy(res, reps = 20, amplitude_factors = c(1, 0))
+  )
+  struct0 <- acc$coverage[acc$coverage$Condition == 0 &
+                            acc$coverage$Parameter == "a" &
+                            acc$coverage$Profile %in% c("T1", "T2"), ]
+  expect_true(all(struct0$Structural))       # occasion amplitude rows flagged
+  expect_true(all(struct0$Coverage == 0))    # structural-zero coverage
+  # certification is reported honestly at c = 0 (the guardrail Caution column
+  # is populated for the occasion rows on that rung, NA for the contrast)
+  g0 <- acc$guardrail[acc$guardrail$Condition == 0, ]
+  expect_true(all(is.finite(g0$Cert_rate)))
+  expect_false(any(is.na(g0$Caution[g0$Profile %in% c("T1", "T2")])))
+
+  # (b) a genuinely near-zero-amplitude occasion (occasion 2 nearly flat, but
+  # not zero-variance) runs without erroring and reports a certification rate.
+  set.seed(25)
+  data2 <- make_contrast_data(n = 100, seed = 25)
+  data2[occ_names(2)] <- 2 + matrix(rnorm(100 * 8, 0, 0.5), 100, 8)  # amp ~ 0
+  res2 <- suppressWarnings(ssm_analyze(data2,
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)), boots = 100
+  ))
+  set.seed(26)
+  acc2 <- suppressWarnings(ssm_ci_accuracy(res2, reps = 20,
+                                           amplitude_factors = c(1)))
+  expect_s3_class(acc2, "circumplex_ci_accuracy")
+  cr <- acc2$guardrail$Cert_rate[acc2$guardrail$Profile == "T2"]
+  expect_true(all(is.finite(cr)))  # every condition rung reports a rate
+})
+
 test_that("occasions ci_accuracy handles a pole-straddling occasion without error (AC4)", {
   # occasion 1 peaks on the 0/360 pole; the diagnostic's angular coverage
   # (mod-360 arc membership) must run and report a finite displacement row
