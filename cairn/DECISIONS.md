@@ -463,3 +463,39 @@ width), and AC4's flat-occasion contract becomes informative refusal (not
 "non-erroring"). D-013 reinforced (per-group stacked object; listwise-only), none
 superseded. Source: RR07 (Fable, 2026-07-17); M29.
 
+### D-018 (2026-07-17): the visualization expansion enters v2.0.0 scope; `ssm_plot_*` stay as convenience wrappers
+
+**Context:** The "Plotting/visualization expansion on the `ggcircumplex()`
+ggplot2 extension" ROADMAP candidate (2026-07-17) was promoted. At the plan gate
+Jeff chose to (i) fold the whole expansion into v2.0.0 rather than ride ~v2.1.0,
+and picked all four areas — the `CoordCircumplex`/carrier-scale architectural
+rewrite, geom/layer ergonomics, longitudinal trajectory viz, and a plotting
+vignette + pkgdown reorg; and (ii) asked what to do with the existing
+`ssm_plot_circle/curve/contrast()`.
+**Decision:**
+**(a)** Supersede D-001's new-features-excluded clause **insofar as it bars the
+visualization expansion** (narrowly, exactly as D-008 did for CIRCUM): the viz
+overhaul enters v2.0.0 scope as M30 (coord-system design, Fable-reviewed) → M31
+(coord-system build), M32 (geom/layer ergonomics), M33 (longitudinal trajectory
+viz), and M34 (plotting vignette + pkgdown). This extends D-008/D-012's doctrine
+— scope is the variable, the date yields to the statistics — there is no release
+date pressure; v2.0.0 grows and ships when its bundle is complete and validated.
+**Scope of the supersession:** narrow — promotes **only** the viz expansion; all
+other D-001 consequences and exclusions stand (longitudinal deferrals stay
+ROADMAP candidates; D-012 governs any late-merging build).
+**(b)** `ssm_plot_circle/curve/contrast()` (and `ggcircumplex()`) are **retained
+as thin convenience wrappers** over the improved composable coord/layers — no
+deprecation, no breaking change. The two-tier API (one-liner wrappers + the
+composable coord/geoms for power users) is the standing design; M31's back-compat
+contract enforces it. The alternative (fold them into `plot()` S3 methods and
+deprecate the standalone names) is rejected as a needless breaking change for no
+user benefit.
+**Consequences:** M7 gains `Depends on: M31, M32, M33, M34` — the v2.0.0
+submission waits on the merged viz, and M7's check/win-builder surface covers
+whatever merged (D-012 lineage). The coord rewrite is `irreversible-api` +
+`ip-touching` (it re-owns the 0/360 polar transform), so M30 escalates to Fable
+(RB→RR) and records its own GO/NO-GO D-entry before M31 builds; on a M30 NO-GO,
+M31 is retired and only M32/M33/M34 remain (M7's dependency on M31 is then
+dropped). D-001/D-008/D-012 lineage extended; D-006/D-014 (minimal-deps) untouched
+— ggforce is already an Import (DESIGN.md V6). Source: Jeff, plan gate, 2026-07-17.
+

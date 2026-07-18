@@ -2,7 +2,7 @@
 
 - **Status:** planned
 - **Priority:** high
-- **Depends on:** M25, M26, M27
+- **Depends on:** M25, M26, M27, M31, M32, M33, M34
 - **Branch/PR:** —
 
 ## Goal
@@ -10,8 +10,10 @@
 Ship the accumulated M2–M5 work (inference, visualization, Browne model + CI
 trustworthiness, structure tests, SEM) plus the CIRCUM free-scaling family
 (M17/M18, per D-008) and the longitudinal SSM builds (M25–M27, per D-012 +
-the 2026-07-16 plan gate) to CRAN as one v2.0.0 release. **No target date** —
-the release ships when its bundle is complete and validated (D-008).
+the 2026-07-16 plan gate) plus the visualization expansion (M30 design → M31
+build, M32 ergonomics, M33 trajectory viz, M34 docs, per D-018) to CRAN as one
+v2.0.0 release. **No target date** — the release ships when its bundle is
+complete and validated (D-008).
 
 ## Scope
 
