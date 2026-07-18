@@ -122,3 +122,176 @@ ssm_trajectory_frame <- function(ssm_object, drop_xy = FALSE) {
   out$Panel <- factor(panels[out$Parameter], levels = panels[params])
   out
 }
+
+#' Create a Trajectory Plot of SSM Results Across Occasions
+#'
+#' Plot each Structural Summary Method parameter against occasion, one facet per
+#' parameter, with its confidence interval as a band. This is a Cartesian
+#' diagnostic plot, not a circumplex figure: the horizontal axis is time, not
+#' angle.
+#'
+#' The displacement panel is drawn on an *unwrapped* branch, so a profile whose
+#' displacement crosses the 0/360 boundary renders as one continuous path rather
+#' than jumping a full turn. Values on that panel may therefore fall outside
+#' \[0, 360); each confidence bound is placed at its signed angular distance
+#' from its own estimate. Unwrapping assumes the profile rotates less than a
+#' half-turn between consecutive occasions at which its displacement is defined
+#' -- no data can verify this, so occasions that are far apart in time, or a
+#' series with a gap, should be read with that in mind.
+#'
+#' Occasions appear in the order they were supplied to [ssm_analyze()] (or in
+#' the occasion factor's level order for [ssm_analyze_long()]), never in
+#' alphabetical order.
+#'
+#' On the displacement panel, an occasion whose amplitude confidence interval is
+#' too close to zero for its displacement to be interpretable is drawn as a
+#' hollow point; see [ssm_analyze()] for the certification rule. A profile with
+#' no defined displacement at all (a flat profile) leaves a gap in that panel.
+#'
+#' A contrast row is never plotted as an occasion -- it is a difference, not a
+#' time point. Use [ssm_plot_contrast()] for it.
+#'
+#' @param ssm_object An SSM results object produced by [ssm_analyze()] with the
+#'   `occasions` argument, or by [ssm_analyze_long()].
+#' @param drop_xy A logical determining whether the X-value and Y-value panels
+#'   should be omitted (default = `FALSE`), leaving elevation, amplitude, and
+#'   displacement.
+#' @param base_size A positive number determining the base font size of the plot
+#'   (default = 11).
+#' @param na.rm A logical determining whether occasions that cannot be plotted
+#'   (no defined displacement) are dropped silently (default = `TRUE`) or with a
+#'   warning naming how many were removed (`FALSE`).
+#' @param ... Not used. Supplying an unrecognized argument produces a warning.
+#' @return A ggplot object depicting each SSM parameter's trajectory across
+#'   occasions, with confidence bands.
+#' @family visualization functions
+#' @export
+#' @examples
+#' \donttest{
+#' data("jz2017")
+#' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+#' t1 <- jz2017[, scales]
+#' t1$id <- seq_len(nrow(t1))
+#' t1$occasion <- "T1"
+#' t2 <- t1
+#' t2$occasion <- "T2"
+#' res <- ssm_analyze_long(rbind(t1, t2),
+#'   scales = scales, id = "id", occasion = "occasion"
+#' )
+#' ssm_plot_trajectory(res)
+#' ssm_plot_trajectory(res, drop_xy = TRUE)
+#' }
+ssm_plot_trajectory <- function(ssm_object,
+                                drop_xy = FALSE,
+                                base_size = 11,
+                                na.rm = TRUE,
+                                ...) {
+  stopifnot(inherits(ssm_object, "circumplex_ssm"))
+  if (is.null(ssm_object$details$occasions)) {
+    stop(
+      "This SSM object contains no occasions to plot a trajectory across; ",
+      "produce one with `ssm_analyze(occasions = )` or `ssm_analyze_long()`. ",
+      "For a single-occasion profile see `ssm_plot_circle()`.",
+      call. = FALSE
+    )
+  }
+  chkDots(...)
+
+  stopifnot(is_flag(drop_xy), !is.na(drop_xy))
+  stopifnot(is_flag(na.rm), !is.na(na.rm))
+  # !is.finite() catches NA, NaN, and +/-Inf alike: an infinite base_size slips
+  # past an is.na() guard and only surfaces as a cryptic error during render,
+  # never naming this argument (M32).
+  stopifnot(is_num(base_size, n = 1))
+  if (!is.finite(base_size) || base_size <= 0) {
+    stop("`base_size` must be a single positive finite number.", call. = FALSE)
+  }
+
+  df <- ssm_trajectory_frame(ssm_object, drop_xy = drop_xy)
+
+  # Occasions that cannot be placed (a flat profile has no displacement). The
+  # geoms would drop these anyway; routing the count through the shared warn
+  # helper makes the drop speak when the caller opts out of silent removal,
+  # matching the circular layers' na.rm convention. Counted on the displacement
+  # panel so the number is one per *profile* -- counting melted rows would
+  # report the same flat occasion once per affected parameter.
+  unplottable <- is.na(df$est[df$Parameter == "d"])
+  ssm_warn_dropped(
+    sum(unplottable), na.rm, "ssm_plot_trajectory", "no defined displacement"
+  )
+
+  grouped <- nlevels(df$Group) > 1L
+  d_rows <- df[df$Parameter == "d" & !is.na(df$est), , drop = FALSE]
+  other_rows <- df[df$Parameter != "d" & !is.na(df$est), , drop = FALSE]
+
+  p <-
+    ggplot2::ggplot(
+      df,
+      ggplot2::aes(
+        x = .data$Occasion,
+        y = .data$est,
+        color = .data$Group,
+        fill = .data$Group,
+        group = .data$Group
+      )
+    ) +
+    ggplot2::geom_ribbon(
+      ggplot2::aes(ymin = .data$lci, ymax = .data$uci),
+      alpha = 0.2,
+      color = NA,
+      na.rm = TRUE
+    ) +
+    ggplot2::geom_line(na.rm = TRUE) +
+    # Points are split by panel so certification -- a displacement-only
+    # guardrail -- marks only where it applies, instead of implying every
+    # parameter carries an interpretability verdict.
+    ggplot2::geom_point(data = other_rows, size = 2, na.rm = TRUE) +
+    ggplot2::geom_point(
+      data = d_rows,
+      mapping = ggplot2::aes(shape = .data$Certified),
+      size = 2,
+      na.rm = TRUE
+    ) +
+    ggplot2::scale_shape_manual(
+      name = "Displacement interpretable",
+      values = c("TRUE" = 16, "FALSE" = 1),
+      limits = c("TRUE", "FALSE"),
+      drop = FALSE
+    ) +
+    # drop = FALSE keeps a requested parameter's panel visible even when every
+    # one of its occasions was dropped, rather than letting it vanish silently.
+    ggplot2::facet_wrap(~Panel, scales = "free_y", drop = FALSE) +
+    ggplot2::labs(
+      x = "Occasion",
+      y = NULL,
+      caption = paste(
+        "Displacement is shown on an unwrapped branch and may fall",
+        "outside [0, 360)."
+      )
+    ) +
+    # The shape keys carry no group identity, so pin them to black; inheriting
+    # the colour aesthetic leaves the hollow key effectively invisible once a
+    # grouping supplies pale series colours.
+    ggplot2::guides(
+      shape = ggplot2::guide_legend(
+        override.aes = list(color = "black", linetype = 0)
+      )
+    ) +
+    ggplot2::theme_bw(base_size = base_size) +
+    ggplot2::theme(
+      legend.position = "bottom",
+      panel.grid.minor = ggplot2::element_blank()
+    )
+
+  if (!grouped) {
+    # A single ungrouped series carries no information in a colour legend, and
+    # a hue that encodes nothing invites reading one into it -- draw it black,
+    # as the package's other Cartesian plots do.
+    p <- p +
+      ggplot2::scale_color_manual(values = "black") +
+      ggplot2::scale_fill_manual(values = "black") +
+      ggplot2::guides(color = "none", fill = "none")
+  }
+
+  p
+}

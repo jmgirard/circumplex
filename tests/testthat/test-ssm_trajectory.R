@@ -228,3 +228,136 @@ test_that("the contrast row is dropped, not plotted as a time point", {
   expect_setequal(levels(droplevels(df$Occasion)), c("T1", "T2"))
   expect_false(any(grepl("-", as.character(df$Occasion), fixed = TRUE)))
 })
+
+# ssm_plot_trajectory(): the plot itself --------------------------------------
+
+# Locate a layer's built data by geom class rather than by index: the layer
+# order is an implementation detail and an added layer would silently shift a
+# hardcoded index onto the wrong data (M31).
+traj_layer <- function(p, geom_class, which = 1L) {
+  built <- ggplot2::ggplot_build(p)
+  idx <- which(vapply(
+    p$layers, function(l) inherits(l$geom, geom_class), logical(1)
+  ))
+  built$data[[idx[[which]]]]
+}
+
+test_that("both occasions constructors yield a ggplot", {
+  expect_true(ggplot2::is_ggplot(ssm_plot_trajectory(traj_fit())))
+
+  scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+  wide <- make_traj_data(d = c(350, 10))
+  long <- rbind(
+    transform(setNames(wide[, paste0(scales, "_1")], scales),
+      id = seq_len(nrow(wide)), occasion = "T1"
+    ),
+    transform(setNames(wide[, paste0(scales, "_2")], scales),
+      id = seq_len(nrow(wide)), occasion = "T2"
+    )
+  )
+  set.seed(33)
+  res <- ssm_analyze_long(long,
+    scales = scales, id = "id",
+    occasion = "occasion", boots = 200
+  )
+  expect_true(ggplot2::is_ggplot(ssm_plot_trajectory(res)))
+})
+
+test_that("every requested parameter gets its own panel", {
+  p <- ssm_plot_trajectory(traj_fit())
+  built <- ggplot2::ggplot_build(p)
+  expect_equal(length(unique(built$layout$layout$PANEL)), 5)
+
+  p2 <- ssm_plot_trajectory(traj_fit(), drop_xy = TRUE)
+  built2 <- ggplot2::ggplot_build(p2)
+  expect_equal(length(unique(built2$layout$layout$PANEL)), 3)
+})
+
+test_that("a grouped object draws one series per group", {
+  p <- ssm_plot_trajectory(traj_fit(grouping = "Gender"))
+  line <- traj_layer(p, "GeomLine")
+
+  expect_equal(length(unique(line$group)), 2)
+})
+
+test_that("confidence bands are drawn per occasion", {
+  p <- ssm_plot_trajectory(traj_fit())
+  ribbon <- traj_layer(p, "GeomRibbon")
+
+  expect_true(all(c("ymin", "ymax") %in% names(ribbon)))
+  expect_equal(nrow(ribbon), 4 * 5)
+  expect_true(all(ribbon$ymin <= ribbon$ymax))
+})
+
+test_that("the plotted displacement path is continuous across the seam", {
+  # The load-bearing assertion, at the data level: check() runs clean on a
+  # visually wrong figure, so the built layer data is the only honest witness.
+  p <- ssm_plot_trajectory(traj_fit())
+  built <- ggplot2::ggplot_build(p)
+  panels <- built$layout$layout
+  d_panel <- panels$PANEL[panels$Panel == "Displacement"]
+
+  line <- traj_layer(p, "GeomLine")
+  d_line <- line[line$PANEL == d_panel, ]
+  d_line <- d_line[order(d_line$x), ]
+
+  expect_true(all(abs(diff(d_line$y)) < 90))
+})
+
+test_that("uncertified occasions render hollow and certified ones filled", {
+  res <- traj_fit()
+  # Force occasion 2 below the D-007 certification ratio by widening its
+  # amplitude interval down toward zero; every other occasion keeps its signal.
+  res$results$a_lci[[2]] <- 0.001
+  res$results$a_uci[[2]] <- 1
+  expect_false(ssm_certified(res$results$a_lci[[2]], res$results$a_uci[[2]]))
+
+  p <- ssm_plot_trajectory(res)
+  pts <- traj_layer(p, "GeomPoint", which = 2L) # the displacement-panel layer
+
+  expect_setequal(unique(pts$shape), c(16, 1))
+  expect_equal(sum(pts$shape == 1), 1) # exactly the uncensored occasion
+})
+
+test_that("na.rm = FALSE names the dropped occasion count", {
+  res <- traj_fit()
+  res$results$a_est[[2]] <- NA_real_
+
+  expect_silent(ggplot2::ggplot_build(ssm_plot_trajectory(res)))
+  expect_warning(
+    ssm_plot_trajectory(res, na.rm = FALSE),
+    "Removed 1 row with no defined displacement"
+  )
+})
+
+# Error branches (AC6) --------------------------------------------------------
+
+test_that("a non-SSM object is refused", {
+  expect_error(ssm_plot_trajectory(data.frame(a = 1)))
+})
+
+test_that("an SSM object without occasions is refused informatively", {
+  data("jz2017")
+  set.seed(33)
+  res <- ssm_analyze(jz2017, scales = 2:9, boots = 50)
+
+  expect_error(ssm_plot_trajectory(res), "no occasions")
+  expect_error(ssm_plot_trajectory(res), "ssm_analyze_long")
+})
+
+test_that("non-finite and non-scalar arguments are refused by name", {
+  res <- traj_fit()
+
+  # is.na() would let Inf through, and it would only surface as a cryptic
+  # render-time failure that never names the argument (M32).
+  expect_error(ssm_plot_trajectory(res, base_size = Inf), "base_size")
+  expect_error(ssm_plot_trajectory(res, base_size = NA_real_), "base_size")
+  expect_error(ssm_plot_trajectory(res, base_size = 0), "base_size")
+  expect_error(ssm_plot_trajectory(res, base_size = c(10, 12)))
+  expect_error(ssm_plot_trajectory(res, drop_xy = NA))
+  expect_error(ssm_plot_trajectory(res, na.rm = "yes"))
+})
+
+test_that("an unrecognized argument warns rather than passing silently", {
+  expect_warning(ssm_plot_trajectory(traj_fit(), colour = "red"), "disregarded")
+})

@@ -115,11 +115,11 @@ unwrapping, and D-007 certification marking on the displacement panel.
       signed-distance placement, applied *after* T1's temporal ordering (the
       unwrap chain is order-dependent) and NA-tolerant across a degenerate
       occasion. Reuse the existing idiom, do not retype a fresh `%%`.
-- [ ] **T3** — `ssm_plot_trajectory()` itself: signature + roxygen, argument
+- [x] **T3** — `ssm_plot_trajectory()` itself: signature + roxygen, argument
       validation, `chkDots()`, `drop_xy`, grouping series, ribbon/line/point
       layers, certification shape mapping, `facet_wrap(~Panel, drop = FALSE)`,
       `theme_bw()` + bottom legend, `@family visualization functions`.
-- [ ] **T4** — Tests: seam continuity with a fixture forced to straddle (prove
+- [x] **T4** — Tests: seam continuity with a fixture forced to straddle (prove
       teeth by breaking the guarded line); T2/T10 ordering; certification shapes;
       flat-occasion gap + `na.rm` parity; contrast-row drop; every error branch;
       both object constructors and a grouped object.
@@ -152,6 +152,16 @@ unwrapping, and D-007 certification marking on the displacement panel.
   inheriting `angle_unwrap()`'s NA-onward policy, which would blank the whole
   post-gap tail (AC5 requires a gap, not a broken chain); the widened
   assumption is documented at the helper. Full suite 0 failures / 2782 pass.
+- 2026-07-18: T3+T4 done. `ssm_plot_trajectory()` exported (roxygen, NAMESPACE,
+  `_pkgdown.yml` row); 55 tests in `test-ssm_trajectory.R`, 0 failures.
+  Rendered and inspected the real figures rather than trusting the suite: the
+  displacement panel runs 353->380 continuously across the seam, the forced
+  uncertified occasion draws hollow. Two cosmetic defects found only by looking
+  and fixed -- an ungrouped series drew in a hue encoding nothing (now black,
+  matching the other Cartesian plots), and the grouped shape legend's hollow key
+  was invisible (now pinned black via override.aes). `na.rm = FALSE` count
+  corrected to one per profile; it had reported a flat occasion once per
+  affected panel.
 
 ## Decisions
 
