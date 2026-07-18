@@ -36,17 +36,28 @@ ssm_unwrap_gapped <- function(x) {
   out
 }
 
-# Place a CI bound on its estimate's unwrapped branch.
+# Place a CI interval on its estimate's unwrapped branch.
 #
 # Non-contrast displacement bounds are each independently wrapped into
 # [0, 360] by quantile.circumplex_radian() (R/ssm_bootstrap.R), so a
-# seam-straddling interval is stored with lower > upper. The bound belongs at
-# its *signed* circular distance from its own estimate -- never at the
-# estimate's branch offset, which throws a straddling bound a full turn off and
-# inverts the ribbon (LESSONS M27; the same expression the growth vignette and
-# the M27 coverage oracle use).
-ssm_bound_on_branch <- function(bound, est, branch) {
-  branch + (((as.numeric(bound) - as.numeric(est) + 180) %% 360) - 180)
+# seam-straddling interval is stored with lower > upper. Never place a bound at
+# the estimate's branch offset -- that throws a straddling bound a full turn off
+# and inverts the ribbon (LESSONS M27).
+#
+# The lower bound goes at its counterclockwise distance *below* the estimate,
+# and the upper bound is then derived from the interval's stored arc span rather
+# than placed independently. Placing each bound by its own signed distance
+# (LESSONS M27's expression, which is correct for the contrast rows and coverage
+# checks it was written for) silently clamps every bound into (-180, 180] of its
+# estimate, so it cannot represent an interval whose arc exceeds a half-turn --
+# exactly the near-zero-amplitude case D-007 certification exists to flag, where
+# it rendered a 337-degree "displacement unknown" interval as a 23-degree
+# INVERTED band that read as the most precise occasion in the series. Reading
+# the pair as the counterclockwise arc from lower to upper is the package's
+# standing convention (ssm_arc_span(), R/geom_ssm.R). Caught by review, M33.
+ssm_interval_on_branch <- function(lci, uci, est, branch) {
+  lo <- branch - ((as.numeric(est) - as.numeric(lci)) %% 360)
+  list(lo = lo, hi = lo + ssm_arc_span(as.numeric(lci), as.numeric(uci)))
 }
 
 # Reshape an occasions object into the long per-panel frame the trajectory plot
@@ -89,9 +100,12 @@ ssm_trajectory_frame <- function(ssm_object, drop_xy = FALSE) {
   for (idx in by_group) {
     est <- as.numeric(results$d_est[idx])
     branch <- ssm_unwrap_gapped(est)
+    interval <- ssm_interval_on_branch(
+      results$d_lci[idx], results$d_uci[idx], est, branch
+    )
     d_branch[idx] <- branch
-    d_low[idx] <- ssm_bound_on_branch(results$d_lci[idx], est, branch)
-    d_high[idx] <- ssm_bound_on_branch(results$d_uci[idx], est, branch)
+    d_low[idx] <- interval$lo
+    d_high[idx] <- interval$hi
   }
   results$d_est <- d_branch
   results$d_lci <- d_low

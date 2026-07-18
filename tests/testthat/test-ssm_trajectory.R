@@ -17,8 +17,9 @@ make_traj_data <- function(d = c(350, 359, 8, 16), n = 60, e = 2, a = 1,
                            )) {
   set.seed(seed)
   ang <- as.numeric(octants())
+  a <- rep_len(a, length(d)) # per-occasion amplitude (a = 0 is a flat profile)
   blocks <- lapply(seq_along(d), function(j) {
-    mu <- e + a * cos((ang - d[[j]]) * pi / 180)
+    mu <- e + a[[j]] * cos((ang - d[[j]]) * pi / 180)
     block <- matrix(rnorm(n * length(ang), sd = noise), n, length(ang)) +
       matrix(mu, n, length(ang), byrow = TRUE)
     colnames(block) <- paste0(scales, "_", j)
@@ -150,13 +151,50 @@ test_that("each CI bound lands on its own estimate's branch", {
   df <- ssm_trajectory_frame(res)
   d <- df[df$Parameter == "d", ]
 
-  # The ribbon is well formed: lower below the estimate, upper above it, and
-  # the interval never a near-full turn wide. Placing a straddling bound by the
-  # estimate's branch offset instead inverts the ribbon (lci > uci) and blows
-  # the width past 300 degrees.
+  # The ribbon is well formed: lower below the estimate, upper above it.
+  # Placing a straddling bound by the estimate's branch offset instead inverts
+  # the ribbon.
   expect_true(all(d$lci <= d$est))
   expect_true(all(d$est <= d$uci))
-  expect_true(all(d$uci - d$lci < 180))
+
+  # The plotted width is the interval's stored counterclockwise arc span. This
+  # is the real invariant and holds at every width; asserting merely that the
+  # width is under 180 degrees would be vacuous, since placing each bound by its
+  # own signed distance from the estimate guarantees that arithmetically even
+  # when the ribbon is inverted (review finding, M33).
+  expect_equal(
+    d$uci - d$lci,
+    ssm_arc_span(
+      as.numeric(res$results$d_lci), as.numeric(res$results$d_uci)
+    ),
+    tolerance = 1e-9
+  )
+})
+
+test_that("an interval wider than a half-turn stays upright", {
+  # The regime D-007 certification exists to flag: a zero-amplitude occasion
+  # whose displacement is essentially unknown. Its stored interval spans most of
+  # the circle, which an implementation that places each bound independently
+  # cannot represent -- it clamps both into (-180, 180] of the estimate and
+  # renders a near-total-uncertainty band as a narrow INVERTED one that reads as
+  # the most precise occasion in the series.
+  data <- make_traj_data(d = c(20, 0, 40), a = c(1.2, 0, 1.2), noise = 1.5,
+                         n = 40, seed = 23)
+  set.seed(23)
+  res <- ssm_analyze(data, occasions = occ_list(c("T1", "T2", "T3")),
+                     boots = 400)
+
+  spans <- ssm_arc_span(
+    as.numeric(res$results$d_lci), as.numeric(res$results$d_uci)
+  )
+  expect_true(any(spans > 180)) # the fixture reaches the regime at all
+
+  df <- ssm_trajectory_frame(res)
+  d <- df[df$Parameter == "d", ]
+
+  expect_true(all(d$uci >= d$lci)) # never inverted
+  expect_true(all(d$lci <= d$est & d$est <= d$uci)) # estimate inside its band
+  expect_equal(d$uci - d$lci, spans, tolerance = 1e-9)
 })
 
 test_that("the seam guard has teeth against a linear implementation", {
