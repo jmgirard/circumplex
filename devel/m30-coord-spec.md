@@ -1,6 +1,8 @@
 # M30 — Circumplex coordinate-system design spec
 
-_Status: DRAFT for Fable review (M30 T1). Milestone: M30 (design) → M31 (build)._
+_Status: REVISED per RR08 (Fable, 2026-07-17); **read §11 first** — it is the
+authoritative outcome and M31 punch-list and supersedes any conflicting detail
+in §3–§7 below. Milestone: M30 (design) → M31 (build)._
 _Author: /milestone-implement M30, 2026-07-17. Binding once M30 records its
 GO/NO-GO D-entry (M30 T3)._
 
@@ -224,16 +226,26 @@ become M31's AC3 boundary tests):
 
 ## 7. Dependency implications
 
-Option A re-pins **`ggplot2 (>= 3.3.0)` → `(>= 3.5.0)`** (for `coord_radial`).
-This is a dependency change → **question gate + D-entry, at M30 T3** (tracking
-rules; D-006/D-014 minimal-deps doctrine). Assessment for that gate:
+**[CORRECTED per RR08 §6 gap 1 / B1 — the original 3.5.0 claim was wrong.]**
+Option A re-pins **`ggplot2 (>= 3.3.0)` → `(>= 4.0.0)`**. The tabled parameters
+`thetalim`, `rlim`, and `reverse` **do not exist in ggplot2 3.5.x** (verified by
+Fable against the v3.5.2 source); the `r.axis.inside` numeric placement used for
+ring labels is also 4.0.0-only. The design as specced therefore requires
+**ggplot2 ≥ 4.0.0** (released 2025-09-11). This is a dependency change →
+**question gate + D-entry, at M30 T3** (tracking rules; D-006/D-014 minimal-deps
+doctrine). Assessment for that gate:
 
-- 3.5.0 shipped 2024; it is old relative to the current release line (installed
-  here: 4.0.3). Anyone on a current ggplot2 already satisfies it.
+- 4.0.0 shipped 2025-09-11; installed here is 4.0.3. A user on a current ggplot2
+  already satisfies it.
 - Per the D-014 lesson, the *effective* floor must be measured, not the declared
   one: circumplex's install floor is already R ≥ 4.1 via ggplot2/htmlTable, and
-  a user on R ≥ 4.1 installing from CRAN gets current ggplot2 (≥ 3.5). So the
-  practical exclusion set is ~empty; the declared bump is bookkeeping.
+  a user on R ≥ 4.1 installing from CRAN gets current ggplot2 (≥ 4.0). The
+  honestly-named excluded cohort is environments *pinned* to pre-S7 ggplot2
+  (e.g. an renv lock avoiding the 4.0.0 transition).
+- Supporting 3.5.x *as well* is rejected (RR08 R-12): it would mean writing the
+  subclass against two incompatible coord/guide generations (pre/post S7) in the
+  exact layer that carries the angle invariants — where cross-version render
+  drift is least acceptable.
 - No **new** package enters Imports (ggplot2 and ggforce are already Imports);
   Option A may *reduce* `ggforce` reliance on the arc path (the coord curves a
   `GeomRect`), though `geom_circle` and other uses may remain — M31 measures
@@ -276,6 +288,93 @@ the A-vs-B choice* and is recorded together with the GO/NO-GO in M30 T3.
 
 ## 10. Decision record (filled at M30 T3)
 
-- A-vs-B outcome: _pending Fable RR._
-- ggplot2 floor bump GO/NO-GO: _pending (contingent on A-vs-B)._
-- GO/NO-GO for M31: _pending — recorded as a DECISIONS.md D-entry._
+- A-vs-B outcome: **Option A** (subclass `CoordRadial`), RR08 verdict GO —
+  empirically verified on ggplot2 4.0.3 that `CoordRadial` expresses every
+  circumplex convention natively; Option B is higher total risk (owns more
+  unstable internal API + re-derives the annular tessellation).
+- ggplot2 floor bump: **≥ 4.0.0** (corrected from 3.5.0), gated + recorded as
+  DECISIONS.md **D-019**.
+- GO/NO-GO for M31: **GO** — see D-019.
+
+## 11. Authoritative outcome & M31 punch-list (RR08-applied, 2026-07-17)
+
+This section is binding for M31 and supersedes any conflicting detail above.
+
+**Mechanism (RR08 R-1, R-3, R-4).**
+
+- `coord_circumplex()` subclasses `CoordRadial`; ggplot2 floor **≥ 4.0.0**.
+- The coord **hard-pins internally** (none exposed as user args):
+  `thetalim = c(0, 360)`, `expand = FALSE`, `start = pi/2`, `reverse = "theta"`.
+  Range pinning is **coord-side** (`thetalim` zooms), never scale-limits (which
+  censor out-of-range x to NA and would break the seam mechanism).
+- **Configurable center = `rlim = c(center, amax)` ALONE** (RR08 gap 10):
+  amplitude = center lands at the exact panel center. `inner.radius` is an
+  independent donut-hole visual and **defaults to 0** (points reach the center,
+  preserving the current look). Do not wire `center` through `inner.radius`.
+- **Seam-straddle (I2)** unwrap by **extension** in the arc geom's
+  `setup_data()`: `xmax <- xmin + ssm_arc_span(xmin, xmax)` (may exceed 360);
+  emit **one** `GeomRect`; the coord's periodic transform carries it across the
+  pole (verified: 350→370 renders one clean 20° wedge). The span validation +
+  full-circle (`span >= 360`) rejection move from `StatSsmArc` into this
+  `setup_data()` with the same message contract.
+- **`amax` and `geom_ssm_arc(n=)`** become inert: **unconditional**
+  soft-deprecation with a **sentinel default** (`= NULL`/`deprecated()`) and a
+  one-time `rlang::inform(.frequency = "once")` naming the coord as owner. Do
+  not error (breaks the package's own documented examples — RR08 R-10).
+
+**Back-compat / R4 keep-working set (RR08 R-7, gap 7)** — all must render
+correctly and be in the snapshot/boundary sweep:
+`ggcircumplex()`, `geom_ssm_point()`, `geom_ssm_arc()`, `scale_x_circumplex()`,
+`ssm_plot_circle/curve/contrast()`, **`plot.circumplex_cpm`**
+(`R/cpm_oop.R:355-392`; maps communality with `amax = 1` → `rlim = c(0, 1)`),
+and **`plot.circumplex_fit_structure`** (`R/fit_structure_oop.R:290-297`).
+
+**Two M31 tasks the spec originally missed (RR08 gap 6, R-7).**
+
+- **`ssm_plot_circle(repel = TRUE)`** hand-computes canvas cartesian coords
+  (`ssm_to_cartesian()`, `R/ssm_plot.R:211-213`) and nudges in canvas units —
+  meaningless under the coord (x-nudge becomes angular). Needs a redesign
+  (coord-aware annotation / ggrepel npc-space hooks), not a mechanical port.
+- **Dead-code sweep** (RR08 B3): `ggrad()` (`R/utils.R:72`) and
+  `ssm_to_cartesian()` become dead once the repel branch is off cartesian
+  coords — confirm the polar transform lives in exactly one place (the coord).
+  `ssm_arc_span`/`ssm_has_location`/`ssm_has_region` stay load-bearing.
+
+**M31 boundary/regression test list (RR08 R-6; extends §6 T-i1…T-r2).**
+
+- **T-i1b** panel-range pin: built `panel_params$theta.range == c(0, 360)` with
+  expansion off, **regardless of the data's displacement range** (the guard both
+  the seam and pole mechanisms hang on).
+- **T-i2** seam-straddle `(350, 10)`: arc-layer data has `xmax == 370` after
+  build; grob-level angular coverage is `(330,360] ∪ (0,30]` (via `layer_grob()`
+  + `atan2()` binning), **not** the 340° complement.
+- **T-i2b** seam-adjacent non-straddling: `[350, 360]` and `[0, 10]` (touch the
+  pole without straddling; exercise `ssm_arc_span()`'s `max==360`/`min==0` edge).
+- **T-i2c** full-circle rejection relocated: `span >= 360` still errors with the
+  same message from the new `setup_data()` home (`plot.circumplex_cpm`'s
+  `drawable` pre-filter, `R/cpm_oop.R:335`, assumes it exists).
+- **T-i3** pole: `d ∈ {0, 360}` (both float labels) draw at the identical angle,
+  asserted at **grob level with tolerance** (`≤ 1e-12` npc, not `identical()`);
+  bonus: out-of-branch `-10`/`370` wrap correctly.
+- **T-arc0** zero-width wedge: `xmin == xmax` **drops**, does not draw a
+  degenerate radial line, and `plot.circumplex_cpm`'s legend-order coupling
+  (`R/cpm_oop.R:350-354`) still holds.
+- **T-r1** amplitude `= amax` on the outer ring / `= center` at center, no
+  per-layer `amax`. **T-r2** non-zero `center` relabels rings + remaps
+  consistently (guards the R3 mislabel).
+- Snapshot strategy: data-level + grob-level assertions (M13/M27 lesson) for the
+  boundary cases; wholesale snapshot regeneration + one human-eyeball pass at
+  review (no V4 byte continuity — RR08 gap 11). Don't re-add `circle_base()`'s
+  manual 25%/10% axis expansions (`clip="off"` + margins replace them — B4).
+
+**ggforce (RR08 R-8, Q5).** Likely **fully removable** (4 call sites, all
+eliminated by A) but only after M31 verifies: all three plot families off
+`StatArcBar`/`geom_circle`; the zero-width-wedge behavior re-owned (T-arc0);
+`grep -r ggforce` clean over `R/`,`tests/`,`vignettes/`,`NAMESPACE`; `check()` +
+suite pass with it dropped. Removal is its **own D-entry superseding the V6 KEEP
+holding** (DESIGN.md) — never a silent M31 side effect. Until then, keep the pin.
+
+**Docs (M31/M34).** Under `theta = "x"`, a user's `+ scale_x_continuous()` now
+replaces the spoke breaks (was only the hidden scales) — mostly good
+(`scale_x_circumplex()` becomes useful on the circle); update its docs
+(`R/scale_circumplex.R:29-36`) and note the behavior at M34.

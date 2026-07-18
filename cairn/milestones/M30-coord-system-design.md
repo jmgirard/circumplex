@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M30: Circumplex coordinate-system design
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** — (works under the CLAUDE.md angle invariants: [0,360), LM=360; IP/GP formalization deferred to /design-interview)
@@ -75,9 +75,10 @@ wrappers.
       ownership, configurable center, theme path, back-compat contract, and the
       invariant-preservation argument with the M31 boundary-test list.
       *(RB tripwire: irreversible-api, ip-touching)*
-- [ ] **T2** — Escalate the spec to Fable via `/milestone-brief` (RB); ingest
+- [x] **T2** — Escalate the spec to Fable via `/milestone-brief` (RB); ingest
       the RR; revise the spec (or accept rejections with rationale).
-      *(RB08 drafted 2026-07-17; awaiting review.)*
+      *(RB08 → RR08 GO Option A; spec revised, §11 punch-list added; pair
+      archived.)*
 - [ ] **T3** — Record the GO/NO-GO + ratified design as a D-entry; on GO, M31
       builds it; on NO-GO, M31 is retired and the trade-offs stay DESIGN.md
       known-limitations.
@@ -92,7 +93,34 @@ wrappers.
   A-vs-B / whether coord_radial's guide API expresses the circumplex labels.
   Option A re-pins ggplot2 >= 3.5.0 (contingent floor gate + D-entry at T3).
 - 2026-07-17 (T2): blocked on RB08 — coord-system design escalated to Fable.
+- 2026-07-17 (T2): ingested RR08 (GO Option A). Spec revised: floor corrected to
+  ggplot2 >= 4.0.0, §11 authoritative punch-list added, RB08/RR08 archived.
+  Unblocked → in-progress. T3 (GO + floor-bump D-entry) is the remaining step.
 
 ## Decisions
+
+### RR08 (Fable, 2026-07-17) — coord-system design review, ingested
+Verdict **GO (Option A)**: `coord_circumplex()` subclasses `CoordRadial`.
+Load-bearing holdings applied to the spec (§11) and inherited by M31:
+- **Floor is ggplot2 >= 4.0.0**, not 3.5.0 — `thetalim`/`rlim`/`reverse` /
+  numeric `r.axis.inside` are 4.0.0-only (verified vs v3.5.2 source). Dependency
+  gate + D-entry = **D-019** (cross-cutting; below).
+- **Seam (I2)** unwrap by *extension* (`xmax = xmin + span`, may exceed 360) in
+  the arc geom's `setup_data()`; one `GeomRect`, coord wraps periodically. Not
+  pre-split (stroked seam borders), not in `transform()` (munching precedes it).
+- **Pole (I3)** identical only if the coord hard-pins `expand = FALSE` +
+  `thetalim = c(0,360)` (default `expand = TRUE` = 33° gap); range coord-side,
+  never scale-limits (censor).
+- **Center** = `rlim = c(center, amax)` alone; `inner.radius` defaults 0
+  (decoupled — RR08 gap 10).
+- **`amax`/`n`** unconditional soft-deprecation, sentinel default, note-once;
+  never error (breaks documented examples).
+- **Scope M31 missed:** the `repel` branch redesign; two hidden consumers
+  `plot.circumplex_cpm` + `plot.circumplex_fit_structure` join R4's keep-working
+  set; +5 boundary tests; ggforce likely fully removable after a checklist, its
+  own D-entry superseding V6 (not a silent side effect).
+Triage: R-1…R-7 **apply** (in §11); R-8/R-9 **consider** (M31-gated: ggforce
+removal, ring-label styling); R-10…R-12 **reject** (per Fable's rationale:
+erroring on `amax`, pre-splitting the seam, dual 3.5/4.0 support).
 
 ## Review
