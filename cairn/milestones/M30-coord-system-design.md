@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M30: Circumplex coordinate-system design
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** — (works under the CLAUDE.md angle invariants: [0,360), LM=360; IP/GP formalization deferred to /design-interview)
@@ -77,6 +77,7 @@ wrappers.
       *(RB tripwire: irreversible-api, ip-touching)*
 - [ ] **T2** — Escalate the spec to Fable via `/milestone-brief` (RB); ingest
       the RR; revise the spec (or accept rejections with rationale).
+      *(RB08 drafted 2026-07-17; awaiting review.)*
 - [ ] **T3** — Record the GO/NO-GO + ratified design as a D-entry; on GO, M31
       builds it; on NO-GO, M31 is retired and the trade-offs stay DESIGN.md
       known-limitations.
@@ -90,6 +91,7 @@ wrappers.
   (bespoke base-`Coord`, no floor bump) as fallback. Central Fable question:
   A-vs-B / whether coord_radial's guide API expresses the circumplex labels.
   Option A re-pins ggplot2 >= 3.5.0 (contingent floor gate + D-entry at T3).
+- 2026-07-17 (T2): blocked on RB08 — coord-system design escalated to Fable.
 
 ## Decisions
 
