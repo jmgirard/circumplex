@@ -106,7 +106,7 @@ now-unused `ggforce` dependency.
 
 ## Tasks
 
-- [ ] **T1** — Implement `CoordCircumplex` (⊂ `CoordRadial`): hidden pins,
+- [x] **T1** — Implement `CoordCircumplex` (⊂ `CoordRadial`): hidden pins,
       `rlim = c(center, amax)` center, decoupled `inner.radius = 0`, themed
       `render_bg()` furniture, `setup_panel_params()`/`transform()` pinning
       LM=360 + CCW-from-right. Re-pin `DESCRIPTION` `ggplot2 (>= 4.0.0)`.
@@ -140,6 +140,12 @@ now-unused `ggforce` dependency.
   (spec §11 punch-list + D-019); superseded the generic pre-M30 plan. Gate:
   coord-aware repel kept working in M31 (enhanced ergonomics → M32); ggforce
   removed in M31 as a gated capstone + D-entry; full data+grob boundary battery.
+- 2026-07-17: T1 — `coord_circumplex()` (⊂ `CoordRadial`) in `R/coord_circumplex.R`,
+  exported; hard-pins `thetalim=c(0,360)`/`expand=FALSE`/`start=pi/2`/`reverse="theta"`,
+  center+amax via `rlim`, `inner.radius=0`. Live-verified the stock transform already
+  carries LM=360/CCW, the identical-pole (I3), and periodic seam-wrap (350↔370); 22
+  coord-unit tests (incl. T-i1b panel-range pin). `DESCRIPTION` ggplot2 `>= 4.0.0`
+  (D-019); pkgdown row added. Full suite green (2248 pass).
 
 ## Decisions
 
