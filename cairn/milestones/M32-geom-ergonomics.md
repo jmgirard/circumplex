@@ -6,7 +6,7 @@
 - **Priority:** normal
 - **Depends on:** M31
 - **Principles touched:** —
-- **Branch/PR:** m32-geom-ergonomics
+- **Branch/PR:** m32-geom-ergonomics · [PR #56](https://github.com/jmgirard/circumplex/pull/56)
 
 ## Goal
 
@@ -48,23 +48,26 @@ users need to compose custom figures.
 
 ## Acceptance criteria
 
-- [ ] `GeomSsmPoint`, `GeomSsmArc`, and `CoordCircumplex` are exported (NAMESPACE +
+- [x] `GeomSsmPoint`, `GeomSsmArc`, and `CoordCircumplex` are exported (NAMESPACE +
       `@format NULL` docs); a test defines a trivial subclass of each and renders
       it, proving the generators are usable downstream. The stale
       `StatSsmArc ⊂ ggforce::StatArcBar` phrase is gone from DESIGN.md.
-- [ ] With `na.rm = FALSE`, each geom (`GeomSsmPoint`, `GeomSsmArc`) given a
+- [x] With `na.rm = FALSE`, each geom (`GeomSsmPoint`, `GeomSsmArc`) given a
       degenerate (missing amplitude/displacement or incomplete-CI) row **warns**
       with the dropped-row count before dropping; with `na.rm = TRUE` (the default)
       it stays silent — all four cases asserted by a test.
-- [ ] The default canvas no longer overlaps the `0.5` amplitude-ring label with
-      the due-East angle label — asserted at grob level (positions/extents do not
-      intersect) and by a regenerated vdiffr baseline; unrelated plot baselines
-      (curve/diagnostic) regenerate byte-identically.
-- [ ] Each new styling/repel aesthetic has a default that reproduces current
+- [x] The default canvas draws its amplitude (radial) axis off every displacement
+      spoke — the built coord's `r_axis_inside` sits at the widest-gap midpoint
+      (22.5° for octants) and coincides with no spoke, so the `0.5` amplitude
+      label no longer collides with the due-East `0.5`/`LM` label — asserted at
+      the built-coord + helper level, plus a regenerated vdiffr baseline;
+      unrelated plot baselines (curve/contrast/diagnostic) regenerate
+      byte-identically. <!-- amended 2026-07-18 at review gate; see work log -->
+- [x] Each new styling/repel aesthetic has a default that reproduces current
       rendering (existing vdiffr/snapshot baselines unchanged where no new option
       is set) and a test exercising the non-default path; `repel = TRUE` yields
       non-overlapping labels.
-- [ ] `devtools::test()` and `devtools::check()` clean (0 errors / 0 warnings /
+- [x] `devtools::test()` and `devtools::check()` clean (0 errors / 0 warnings /
       0 notes).
 
 ## Coverage
@@ -130,7 +133,45 @@ users need to compose custom figures.
 - 2026-07-18: T6 — NEWS entry for the user-visible viz-ergonomics changes;
   `document()` no-diff; full `devtools::check()` clean (0/0/0, 5m25s, suite
   passes, examples + vignettes rebuilt). Status → review.
+- 2026-07-18: review (amend-via-gate) — AC3 amended: the radial-axis label grobs
+  have no stable handles (nested unnamed gTrees; positions in viewports), so a
+  literal grob position/extent-intersection assertion would couple to ggplot2
+  internal grob-naming (M31 lesson #3 fragility). Reworded to fence the robust
+  built-coord property — radial axis drawn off every spoke (`r_axis_inside` =
+  widest-gap midpoint), which deterministically guarantees non-overlap — plus the
+  vdiffr baseline. User-approved at the review gate.
 
 ## Decisions
 
 ## Review
+
+**Acceptance criteria — fresh evidence (2026-07-18):**
+
+- **AC1 (exports + subclass + StatSsmArc swept):** `NAMESPACE` exports
+  `GeomSsmPoint`, `GeomSsmArc`, `CoordCircumplex`; `man/circumplex-ggproto.Rd`
+  aliases all three (`@format NULL` → no `\format` block, by design).
+  `test-ggproto-classes.R` (4 tests) asserts the exports via
+  `getNamespaceExports()` and renders a trivial subclass of each. `grep StatSsmArc
+  cairn/DESIGN.md` → 0 hits. PASS.
+- **AC2 (na.rm parity):** `test-geom_ssm.R` T2 block — point `na.rm=FALSE` warns
+  "Removed 1 row", point `TRUE` silent, arc `FALSE` warns "Removed 2 rows", arc
+  `TRUE` silent, plus a no-degenerate-no-warn case. PASS.
+- **AC3 (amplitude axis off spoke; amended):** `ssm_r_axis_angle()` unit tests
+  (octants→22.5, poles→45, 12-pt→15, off every spoke; degenerate fallbacks) and
+  the built-coord test (`r_axis_inside` = 22.5, not in `octants() %% 360`;
+  `r_axis_angle=` override honored). 14 canvas vdiffr baselines regenerated; every
+  cartesian curve/contrast/ladder baseline byte-identical vs `origin/master`
+  (`git diff --name-only` → none). PASS (criterion amended at this gate — see work
+  log).
+- **AC4 (styling defaults + non-default paths):** `theme_circumplex()` default
+  equals the canvas theme (baselines unchanged) and a larger `base_size` differs;
+  `r_axis_angle` default auto + override tested; `repel=TRUE` adds a coord-aware
+  `GeomLabelRepel` layer (maps to amplitude/displacement) and errors by name when
+  `ggrepel` is mocked absent. PASS.
+- **AC5 (test + check clean):** `devtools::check(args="--no-manual")` →
+  **0 errors / 0 warnings / 0 notes** (5m25s; full testthat suite [207s], examples
+  `--run-donttest`, and vignette rebuild all OK). `devtools::document()` no-diff.
+  PASS.
+
+Combined targeted re-run of the four viz test files at review: 46 tests / 129
+assertions, 0 fail / 0 error / 0 skip.
