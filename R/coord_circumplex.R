@@ -52,9 +52,6 @@
 #'   coord_circumplex(amax = 0.5) +
 #'   geom_ssm_point(ggplot2::aes(amplitude = a_est, displacement = d_est))
 coord_circumplex <- function(amax = NULL, center = 0, r_axis_angle = NULL, ...) {
-  # Validate `center` before it is used in the `amax`/`center` comparison, so a
-  # bad `center` is named as the culprit (not `amax`); guard NA on both so the
-  # comparison never returns NA and throws a cryptic base error.
   # Every numeric argument here is guarded with !is.finite() rather than
   # is.na(): is.na(Inf) is FALSE, so an infinite limit slips past an is.na()
   # guard and surfaces only as a cryptic error deep in the render, never naming
