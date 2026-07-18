@@ -10,7 +10,6 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 set.seed(12345)
-library(ggforce)
 library(kableExtra)
 library(ggplot2)
 library(knitr)
@@ -67,7 +66,10 @@ ggplot2::ggplot() +
     vjust = "center"
   ) +
   # Draw the circle
-  ggforce::geom_circle(ggplot2::aes(x0 = 0, y0 = 0, r = 5),
+  ggplot2::annotate(
+    "path",
+    x = 5 * cos(seq(0, 2 * pi, length.out = 200)),
+    y = 5 * sin(seq(0, 2 * pi, length.out = 200)),
     color = "gray50", linewidth = 1.5
   ) +
   # Draw outer labels for octant abbreviations
@@ -315,9 +317,11 @@ ggplot2::ggplot() +
     vjust = "center"
   ) +
   # Draw the circle
-  ggforce::geom_circle(
-    ggplot2::aes(x0 = 0, y0 = 0, r = 5),
-    color = "gray50", 
+  ggplot2::annotate(
+    "path",
+    x = 5 * cos(seq(0, 2 * pi, length.out = 200)),
+    y = 5 * sin(seq(0, 2 * pi, length.out = 200)),
+    color = "gray50",
     linewidth = 1.5
   ) +
   # Draw outer labels for the octant names

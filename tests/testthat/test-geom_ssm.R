@@ -1,219 +1,191 @@
-# The polar-native geoms must reproduce, layer for layer, the coordinates that
-# ssm_plot_circle() computes inline. We compare the built (post-transform) x/y
-# of the arc and point layers rather than rendering, so the equivalence is
-# exact and device-independent. circle_base()/ggcircumplex() contribute the
-# same five canvas layers in both plots, so the arc is layer 6 and the points
-# are layer 7 in each.
+# Boundary/regression battery for the circumplex geoms under coord_circumplex()
+# (M31 AC4 / spec devel/m30-coord-spec.md §6, §11). The geoms hand amplitude and
+# displacement to the coord, which owns the polar transform; these tests fence
+# the angle invariants (CLAUDE.md; ip-touching) at the data level (post
+# setup_data / ggplot_build) AND the grob level (post-coord render), because
+# devtools::check() runs clean on a visually wrong figure (M13/M27 lesson).
 
-# Rebuild the plotting data frame the way ssm_plot_circle() does, so the
-# extension plot receives identical inputs.
-ext_plot <- function(res, amax) {
-  df <- res$results
-  if (res$details$contrast) df <- df[1:2, ]
-  ggcircumplex(
-    angles = as.integer(round(res$details$angles)),
-    amax = amax
-  ) +
+# --- helpers ------------------------------------------------------------------
+
+# Built data for the layer drawn by a given geom class (locate by geom, never by
+# a hardcoded index -- ggcircumplex()'s geom_blank shifts the numbering).
+layer_data_for <- function(p, geom_class) {
+  b <- ggplot2::ggplot_build(p)
+  idx <- which(vapply(p$layers, function(l) inherits(l$geom, geom_class),
+                      logical(1)))
+  b$data[[idx[[1]]]]
+}
+arc_layer_index <- function(p) {
+  which(vapply(p$layers, function(l) inherits(l$geom, "GeomSsmArc"),
+               logical(1)))[[1]]
+}
+
+# Angular coverage (degrees, [0, 360)) of a drawn arc grob's polygon vertices,
+# measured about the panel center (0.5, 0.5) in npc space -- the post-coord
+# rendered wedge, not the pre-transform rectangle.
+arc_grob_angles <- function(p) {
+  gr <- ggplot2::layer_grob(p, arc_layer_index(p))[[1]]
+  xs <- as.numeric(gr$x); ys <- as.numeric(gr$y)
+  ok <- is.finite(xs) & is.finite(ys)
+  (atan2(ys[ok] - 0.5, xs[ok] - 0.5) * 180 / pi) %% 360
+}
+point_grob_xy <- function(p) {
+  gr <- ggplot2::layer_grob(p, which(vapply(
+    p$layers, function(l) inherits(l$geom, "GeomSsmPoint"), logical(1)
+  ))[[1]])[[1]]
+  list(x = as.numeric(gr$x), y = as.numeric(gr$y))
+}
+
+arc_plot <- function(df, amax = 0.5, angles = octants()) {
+  ggcircumplex(angles, amax = amax) +
     geom_ssm_arc(
       data = df,
-      mapping = ggplot2::aes(
-        amplitude_min = .data$a_lci,
-        amplitude_max = .data$a_uci,
-        displacement_min = .data$d_lci,
-        displacement_max = .data$d_uci,
-        group = .data$Label
-      ),
-      amax = amax
-    ) +
-    geom_ssm_point(
-      data = df,
-      mapping = ggplot2::aes(
-        amplitude = .data$a_est,
-        displacement = .data$d_est,
-        group = .data$Label
-      ),
-      amax = amax
-    )
-}
-
-arc_xy <- function(p) {
-  d <- ggplot2::ggplot_build(p)$data[[6]]
-  d[order(d$x, d$y), c("x", "y")]
-}
-point_xy <- function(p) {
-  d <- ggplot2::ggplot_build(p)$data[[7]]
-  d[order(d$x, d$y), c("x", "y")]
-}
-
-test_that("geom_ssm_arc/point reproduce ssm_plot_circle geometry", {
-  data("jz2017")
-  set.seed(12345)
-  res <- ssm_analyze(jz2017, scales = 2:9, measures = "PARPD")
-  amax <- pretty_max(res$results$a_uci)
-
-  p_ssm <- ssm_plot_circle(res)
-  p_ext <- ext_plot(res, amax)
-
-  expect_equal(arc_xy(p_ext), arc_xy(p_ssm), ignore_attr = TRUE)
-  expect_equal(point_xy(p_ext), point_xy(p_ssm), ignore_attr = TRUE)
-})
-
-test_that("geom_ssm_* reproduce geometry with multiple profiles", {
-  data("jz2017")
-  set.seed(12345)
-  res <- ssm_analyze(jz2017, scales = 2:9, measures = 10:13)
-  amax <- pretty_max(res$results$a_uci)
-
-  p_ssm <- ssm_plot_circle(res)
-  p_ext <- ext_plot(res, amax)
-
-  expect_equal(arc_xy(p_ext), arc_xy(p_ssm), ignore_attr = TRUE)
-  expect_equal(point_xy(p_ext), point_xy(p_ssm), ignore_attr = TRUE)
-})
-
-test_that("an arc straddling the 0/360 seam renders as one contiguous arc", {
-  data("jz2017")
-  set.seed(12345)
-  dat <- jz2017[sample(seq_len(nrow(jz2017)), size = 100), ]
-  res <- ssm_analyze(dat, 2:9, measures = 19)
-  amax <- pretty_max(res$results$a_uci)
-
-  # Must match ssm_plot_circle's cross-zero handling exactly
-  expect_equal(arc_xy(ext_plot(res, amax)), arc_xy(ssm_plot_circle(res)),
-               ignore_attr = TRUE)
-
-  # A synthetic interval that crosses the seam (350 -> 10 deg, a 20 deg span)
-  # must render the short way, producing an arc of the same angular width as an
-  # equivalent non-crossing interval (170 -> 190 deg). arcPaths() emits points
-  # proportional to angular span, so a mishandled wrap (spanning 340 deg the
-  # long way) would produce far more vertices; equal counts prove containment.
-  one_arc <- function(dlo, dhi) {
-    p <- ggcircumplex(octants(), amax = 0.5) +
-      geom_ssm_arc(
-        data = data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = dlo, d_uci = dhi),
-        mapping = ggplot2::aes(
-          amplitude_min = a_lci, amplitude_max = a_uci,
-          displacement_min = d_lci, displacement_max = d_uci
-        ),
-        amax = 0.5
-      )
-    nrow(ggplot2::ggplot_build(p)$data[[6]])
-  }
-  # Equal up to arcPaths() discretization rounding; a long-way (340 deg) wrap
-  # would differ by hundreds of vertices, not a couple.
-  expect_lt(abs(one_arc(350, 10) - one_arc(170, 190)), 5)
-})
-
-test_that("geoms drop NA-displacement (degenerate) rows without error", {
-  # A flat profile has NA displacement and fit
-  dat <- as.data.frame(matrix(1, nrow = 20, ncol = 8))
-  colnames(dat) <- PANO()
-  res <- suppressWarnings(ssm_analyze(dat, scales = 1:8, boots = 20))
-
-  p <- ggcircumplex(octants(), amax = 0.5) +
-    geom_ssm_arc(
-      data = res$results,
       mapping = ggplot2::aes(
         amplitude_min = .data$a_lci, amplitude_max = .data$a_uci,
         displacement_min = .data$d_lci, displacement_max = .data$d_uci
-      ),
-      amax = 0.5
-    ) +
+      )
+    )
+}
+point_plot <- function(df, amax = 0.5) {
+  ggcircumplex(octants(), amax = amax) +
     geom_ssm_point(
-      data = res$results,
-      mapping = ggplot2::aes(
-        amplitude = .data$a_est, displacement = .data$d_est
-      ),
-      amax = 0.5
+      data = df,
+      mapping = ggplot2::aes(amplitude = .data$a_est, displacement = .data$d_est)
     )
+}
 
-  expect_no_error(ggplot2::ggplot_build(p))
-  # The degenerate row contributes no point vertices
-  expect_equal(nrow(ggplot2::ggplot_build(p)$data[[7]]), 0)
+# --- T-i1b: theta range hard-pinned regardless of the data --------------------
+
+test_that("theta range stays [0, 360] however narrow the data's displacement (T-i1b)", {
+  p <- point_plot(data.frame(a_est = c(0.2, 0.3), d_est = c(80, 100)))
+  pp <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]
+  expect_equal(pp$theta.range, c(0, 360))
 })
 
-test_that("StatSsmArc returns a parent-structured frame when all rows drop", {
-  # ROADMAP viz-robustness: when every arc row is dropped as degenerate, the
-  # stat used to short-circuit and return the raw (filtered) input frame --
-  # lacking the arc geometry columns the parent emits -- a structurally wrong
-  # 0-row frame. It must instead route the empty frame through the parent, so
-  # its structure matches the populated path (the parent's x/y), not the input
-  # aesthetics.
-  cols <- c("amplitude_min", "amplitude_max",
-            "displacement_min", "displacement_max")
-  all_na <- data.frame(
-    amplitude_min = NA_real_, amplitude_max = NA_real_,
-    displacement_min = NA_real_, displacement_max = NA_real_,
-    PANEL = factor(1L), group = 1L
-  )
-  empty <- StatSsmArc$compute_panel(all_na, scales = NULL, n = 360, amax = 0.5)
-  expect_equal(nrow(empty), 0)
-  # Parent (StatArcBar) output has x/y; the raw input columns must not survive
-  # as the whole frame.
-  expect_true(all(c("x", "y") %in% names(empty)))
-  expect_false(all(cols %in% names(empty)))
+# --- R1: the coord owns amax; there is no per-layer amax ----------------------
+
+test_that("amplitude radius is owned by the coord, not the layer (R1)", {
+  df <- data.frame(a_est = 0.25, d_est = 0)
+  r_of <- function(amax) {
+    xy <- point_grob_xy(point_plot(df, amax = amax))
+    sqrt((xy$x - 0.5)^2 + (xy$y - 0.5)^2)
+  }
+  # a = 0.25 is half the radius at amax = 0.5 but a quarter at amax = 1.0: the
+  # single coord scales it, so the same amplitude lands farther out at amax=0.5.
+  expect_gt(r_of(0.5), r_of(1.0))
+  # A point at the center amplitude sits at the panel center.
+  xy0 <- point_grob_xy(point_plot(data.frame(a_est = 0, d_est = 0), amax = 0.5))
+  expect_equal(xy0$x[[1]], 0.5, tolerance = 1e-9)
+  expect_equal(xy0$y[[1]], 0.5, tolerance = 1e-9)
 })
 
-test_that("geom_ssm_arc rejects a displacement interval that is not a sub-circle", {
-  # A span >= 360 deg (here from bounds outside [0, 360)) no longer names a
-  # unique arc; the stat must reject it rather than silently draw a wrong wedge.
-  bad <- data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = -100, d_uci = 300)
-  p <- ggcircumplex(octants(), amax = 0.5) +
-    geom_ssm_arc(
-      data = bad,
-      mapping = ggplot2::aes(
-        amplitude_min = a_lci, amplitude_max = a_uci,
-        displacement_min = d_lci, displacement_max = d_uci
-      ),
-      amax = 0.5
-    )
-  expect_error(ggplot2::ggplot_build(p), "full circle")
+# --- T-i2: seam-straddle unwrap by extension, short way across the pole --------
 
+test_that("a seam-straddling arc unwraps by extension and draws the short way (T-i2)", {
+  p <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 350, d_uci = 10))
+  # Data level: xmax extended past 360 (350 + 20-degree span).
+  ad <- layer_data_for(p, "GeomSsmArc")
+  expect_equal(ad$xmin, 350)
+  expect_equal(ad$xmax, 370)
+  # Grob level: covers (330, 360] and (0, 30] but NOT the 340-degree complement.
+  ang <- arc_grob_angles(p)
+  expect_true(any(ang > 330 & ang <= 360))
+  expect_true(any(ang > 0 & ang <= 30))
+  expect_false(any(ang > 30 & ang < 330))
+})
+
+test_that("a seam-adjacent non-straddling arc touches the pole without wrapping (T-i2b)", {
+  # [350, 360] and [0, 10] each span 10 degrees and touch the pole from one side.
+  below <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 350, d_uci = 360))
+  above <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 0, d_uci = 10))
+  expect_equal(layer_data_for(below, "GeomSsmArc")$xmax, 360)
+  expect_equal(layer_data_for(above, "GeomSsmArc")$xmax, 10)
+  # Neither spans more than its 10 degrees.
+  expect_false(any(arc_grob_angles(below) > 20 & arc_grob_angles(below) < 340))
+  expect_false(any(arc_grob_angles(above) > 20 & arc_grob_angles(above) < 340))
+})
+
+test_that("an interval spanning a full circle is rejected from setup_data (T-i2c)", {
+  bad <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = -100, d_uci = 300))
+  expect_error(ggplot2::ggplot_build(bad), "full circle")
   # A genuine seam-crossing interval (min > max, short way) is still accepted.
-  ok <- data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 350, d_uci = 10)
-  p_ok <- ggcircumplex(octants(), amax = 0.5) +
-    geom_ssm_arc(
-      data = ok,
-      mapping = ggplot2::aes(
-        amplitude_min = a_lci, amplitude_max = a_uci,
-        displacement_min = d_lci, displacement_max = d_uci
-      ),
-      amax = 0.5
-    )
-  expect_no_error(ggplot2::ggplot_build(p_ok))
+  ok <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 350, d_uci = 10))
+  expect_no_error(ggplot2::ggplot_build(ok))
 })
 
-test_that("a defined estimate with an undefined CI renders as a point, no wedge", {
-  # The shared predicates split location (point) from region (wedge): a row with
-  # a defined amplitude/displacement but NA CI bounds draws its point and drops
-  # only its wedge. plot.circumplex_cpm() is the layer that then names it.
+# --- T-i3: the 0/360 pole draws at one place for either float label -----------
+
+test_that("points at displacement 0 and 360 draw at the identical position (T-i3)", {
+  p <- point_plot(data.frame(a_est = c(0.3, 0.3), d_est = c(0, 360)))
+  xy <- point_grob_xy(p)
+  expect_equal(xy$x[[1]], xy$x[[2]], tolerance = 1e-12)
+  expect_equal(xy$y[[1]], xy$y[[2]], tolerance = 1e-12)
+})
+
+# --- T-arc0: zero-width wedge drops ------------------------------------------
+
+test_that("a zero-width interval draws no wedge, not a degenerate line (T-arc0)", {
+  # displacement_min == displacement_max -> span 0 -> dropped in setup_data.
+  p <- arc_plot(data.frame(a_lci = 0.2, a_uci = 0.3, d_lci = 90, d_uci = 90))
+  expect_equal(nrow(layer_data_for(p, "GeomSsmArc")), 0)
+})
+
+# --- I4: flat / undefined rows are dropped ------------------------------------
+
+test_that("a flat profile (NA displacement) is dropped, not mis-drawn (I4)", {
+  df <- data.frame(a_est = c(0.3, NA), d_est = c(90, NA))
+  p <- point_plot(df)
+  expect_no_error(ggplot2::ggplot_build(p))
+  expect_equal(nrow(layer_data_for(p, "GeomSsmPoint")), 1)
+})
+
+test_that("a defined estimate with an undefined CI draws a point but no wedge", {
   df <- data.frame(
     a_est = 0.3, d_est = 90,
     a_lci = NA_real_, a_uci = NA_real_, d_lci = NA_real_, d_uci = NA_real_
   )
   p <- ggcircumplex(octants(), amax = 0.5) +
-    geom_ssm_arc(
-      data = df,
-      mapping = ggplot2::aes(
-        amplitude_min = a_lci, amplitude_max = a_uci,
-        displacement_min = d_lci, displacement_max = d_uci
-      ),
-      amax = 0.5
-    ) +
-    geom_ssm_point(
-      data = df,
-      mapping = ggplot2::aes(amplitude = a_est, displacement = d_est),
-      amax = 0.5
-    )
-  b <- ggplot2::ggplot_build(p)
-  expect_equal(nrow(b$data[[6]]), 0)  # no wedge
-  expect_equal(nrow(b$data[[7]]), 1)  # one point
+    geom_ssm_arc(data = df, mapping = ggplot2::aes(
+      amplitude_min = a_lci, amplitude_max = a_uci,
+      displacement_min = d_lci, displacement_max = d_uci)) +
+    geom_ssm_point(data = df, mapping = ggplot2::aes(
+      amplitude = a_est, displacement = d_est))
+  expect_equal(nrow(layer_data_for(p, "GeomSsmArc")), 0)   # no wedge
+  expect_equal(nrow(layer_data_for(p, "GeomSsmPoint")), 1) # one point
 })
 
+# --- amax / n soft-deprecation (unconditional note, never an error) -----------
+
+test_that("supplying the retired amax/n geom arguments notes once and never errors", {
+  rlang::reset_message_verbosity("circumplex_geom_geom_ssm_point_amax")
+  rlang::reset_message_verbosity("circumplex_geom_geom_ssm_arc_n")
+  expect_message(geom_ssm_point(amax = 0.5), "deprecated")
+  expect_message(geom_ssm_arc(n = 100), "deprecated")
+  # Not supplying them is silent.
+  expect_no_message(geom_ssm_point())
+  expect_no_message(geom_ssm_arc())
+  # And a plot that passes a stray amax still renders correctly (self-heals).
+  p <- suppressMessages(
+    ggcircumplex(octants(), amax = 0.5) +
+      geom_ssm_point(data = data.frame(a_est = 0.3, d_est = 45),
+                     mapping = ggplot2::aes(amplitude = a_est, displacement = d_est),
+                     amax = 0.9)
+  )
+  expect_no_error(ggplot2::ggplot_build(p))
+})
+
+# --- visual regression --------------------------------------------------------
+
 test_that("a canvas-plus-geoms plot renders (visual regression)", {
+  skip_on_ci() # bootstrap CI positions are BLAS-sensitive (legacy lesson)
   data("jz2017")
   set.seed(12345)
   res <- ssm_analyze(jz2017, scales = 2:9, measures = "PARPD")
-  amax <- pretty_max(res$results$a_uci)
-  vdiffr::expect_doppelganger("ggcircumplex with ssm geoms", ext_plot(res, amax))
+  p <- ggcircumplex(octants(), amax = 0.5) +
+    geom_ssm_arc(data = res$results, mapping = ggplot2::aes(
+      amplitude_min = a_lci, amplitude_max = a_uci,
+      displacement_min = d_lci, displacement_max = d_uci, group = Label)) +
+    geom_ssm_point(data = res$results, mapping = ggplot2::aes(
+      amplitude = a_est, displacement = d_est, group = Label))
+  vdiffr::expect_doppelganger("ggcircumplex with ssm geoms", p)
 })

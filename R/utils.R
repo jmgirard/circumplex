@@ -68,12 +68,6 @@ angle_dist <- function(x, y) {
   d
 }
 
-# Convert degrees to ggplot's radian format ------------------------------------
-ggrad <- function(v) {
-  v <- as.numeric(v)
-  (v - 90) * (-pi / 180)
-}
-
 # Convert percent number to a formatted string ---------------------------------
 str_percent <- function(x, digits = 2) {
   paste0(floor(x * 10^(digits + 2)) / (10^digits), "%")

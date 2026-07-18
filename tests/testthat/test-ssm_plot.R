@@ -143,9 +143,31 @@ test_that("ggcircumplex() no longer exposes amin, and rings are 0-centered (R3)"
   # scale is fixed at 0 (center) to amax (outer ring), matching the geoms.
   expect_error(ggcircumplex(octants(), amin = 0.25), "unused argument")
 
-  # Ring labels (layer 4) reflect a 0..amax scale: seq(0, amax, 6)[c(3, 5)]
-  b <- ggplot2::ggplot_build(ggcircumplex(amax = 0.5))
-  expect_equal(b$data[[4]]$label, sprintf("%.2f", c(0.20, 0.40)))
+  # The amplitude (r) axis runs from 0 at the center to amax at the outer ring,
+  # owned by coord_circumplex() -- rings are 0-centered, matching the geoms.
+  pp <- ggplot2::ggplot_build(ggcircumplex(amax = 0.5))$layout$panel_params[[1]]
+  expect_equal(pp$r.range, c(0, 0.5))
+})
+
+test_that("the canvas furniture responds to theme elements (R3, AC3)", {
+  # The rings/spokes are the coord's themed panel grid, not frozen drawn geoms:
+  # a theme() change must reach them (the old theme_void() canvas could not be
+  # restyled). Assert at the grob level that panel.grid recolouring lands.
+  collect_col <- function(gr) {
+    out <- if (is.null(gr$gp$col)) character(0) else gr$gp$col
+    if (!is.null(gr$children)) {
+      out <- c(out, unlist(lapply(gr$children, collect_col)))
+    }
+    out
+  }
+  p <- ggcircumplex(octants(), amax = 0.5) +
+    ggplot2::theme(
+      panel.grid.major = ggplot2::element_line(colour = "red", linewidth = 2)
+    )
+  g <- ggplot2::ggplotGrob(p)
+  panel <- g$grobs[[which(g$layout$name == "panel")]]
+  cols <- collect_col(panel)
+  expect_true(any(grepl("red|FF0000", cols, ignore.case = TRUE)))
 })
 
 test_that("plot functions warn about unrecognized arguments", {

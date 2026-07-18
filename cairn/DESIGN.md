@@ -294,67 +294,44 @@ composable pieces: `ggcircumplex()` (canvas), `geom_ssm_point()` /
 axis). `ssm_plot_circle()`/`_curve()` are built on them; `ssm_plot_contrast()`
 is a Cartesian difference plot and stays independent.
 
-**Architecture.**
+**Architecture (M31 rewrite; D-019 coord + D-020 ggforce removal).**
 
-- **Canvas** (`ggcircumplex()` → internal `circle_base()`): the rings, spokes,
-  and labels are *drawn geometry* (`ggforce::geom_circle`, `geom_segment`,
-  `geom_label`) on a `theme_void()` base with hidden continuous x/y scales in a
-  radius space of roughly `[-5, 5]`. It is a plot constructor, not a coord.
-- **Point geom** (`GeomSsmPoint` ⊂ `GeomPoint`): the amplitude/displacement →
-  Cartesian transform runs in `setup_data()`, which executes *before* position
-  scale training, so the computed `x`/`y` train the panel range correctly.
-- **Arc stat** (`StatSsmArc` ⊂ `ggforce::StatArcBar`): `compute_panel()` injects
-  `x0/y0/r0/r/start/end` from the SSM bounds (with the 0/360 unwrap) and then
-  delegates to the parent via `ggproto_parent()` for the polygon tessellation.
-  This is the idiomatic split (a Stat computes positions; the Geom draws).
+- **Coordinate system** (`coord_circumplex()` ⊂ `ggplot2::CoordRadial`): the
+  single owner of `amax` (the amplitude→radius scaling) and the
+  displacement→angle polar transform. It hard-pins the circumplex convention
+  internally — `thetalim = c(0, 360)`, `expand = FALSE`, `start = pi/2`,
+  `reverse = "theta"` — so LM=360, the identical 0/360 pole (I3), and the
+  seam-straddle short-way wrap (I2) survive the transform; `amax` and the
+  configurable amplitude center are the radial limits (`rlim = c(center, amax)`),
+  trained once. Rings/spokes/labels are the coord's themed panel grid, so
+  `+ theme_*()` restyles them.
+- **Canvas** (`ggcircumplex()`): a thin constructor returning
+  `ggplot() + coord_circumplex() + <breaks/labels + theme>` (a `geom_blank`
+  establishes the extent). It no longer draws geometry — the former
+  `circle_base()` is gone.
+- **Point geom** (`GeomSsmPoint` ⊂ `GeomPoint`): `setup_data()` drops rows with
+  no location and maps amplitude/displacement to the coord's `y`/`x` (no
+  cartesian math; the coord owns the transform).
+- **Arc geom** (`GeomSsmArc` ⊂ `GeomRect`): `setup_data()` drops incomplete and
+  zero-width regions, unwraps a seam-straddling interval by extension
+  (`xmax = xmin + span`, may exceed 360) and validates the span; the polar coord
+  bends the rectangle into an annular wedge. Replaces the former
+  `StatSsmArc ⊂ ggforce::StatArcBar`.
 - **Label resolution**: a shared `resolve_circumplex_labels()` backs both the
-  canvas and the axis scale, so identical `angles`/`labels`/`instrument` inputs
-  label both contexts consistently.
+  canvas theta axis and `scale_x_circumplex()`, so identical
+  `angles`/`labels`/`instrument` inputs label both contexts consistently.
 
-**Best-practices review (V6 verdict, 2026-07).**
-
-- **`after_stat()`/`after_scale()`**: not used, and correctly so. The arc's Stat
-  feeds `GeomArcBar`'s required aesthetics directly (as ggforce itself does),
-  and no aesthetic needs post-scale remapping. Their absence is right, not a
-  gap.
-- **`ggforce` dependency: KEEP** (the acceptance's "keep iff it simplifies
-  arcs"). It supplies (a) the annular-sector polygon tessellation
-  (`StatArcBar`/`arcPaths`), which `StatSsmArc` reuses by inheritance rather
-  than reimplementing — hand-rolling a wrap-aware annular-wedge tessellator is
-  exactly the fiddly geometry worth *not* owning — and (b) `geom_circle` for the
-  canvas rings. It is already a mature hard dependency (Imports, ≥ 0.3.0);
-  dropping it would add risk for no benefit. See also Dependency policy above.
-
-**Known limitations / accepted trade-offs (deliberate for M3, candidates for a
-later milestone; do not "fix" casually — each risks the V4 snapshot stability
-that byte-identical output depended on).**
-
-- **`amax` is a per-layer parameter, not shared state.** The amplitude→radius
-  scale factor lives on both `ggcircumplex()` and each geom, and the caller must
-  keep them equal; a mismatch silently misaligns points from the rings. ggplot2
-  has no first-class way for a geom to read a plot-level constant. The idiomatic
-  fix is a `CoordCircumplex` (or a carrier scale) that owns `amax` and the polar
-  transform — a substantial rewrite of the drawn-geometry canvas, deferred.
-  A configurable amplitude *center* belongs in that same future scale/coord (as
-  its `limits`), not on the constructor: an early exported `ggcircumplex(amin=)`
-  relabelled the rings on an `amin..amax` scale while the geoms mapped amplitude
-  as `a*5/amax` (center = 0), silently mislabelling the axis. `amin` was removed
-  from the public constructor (2026-07-03, R3); `circle_base()` keeps an internal
-  `amin = 0` default only.
-- **The canvas does not respond to themes.** Because rings/spokes/labels are
-  drawn geoms under `theme_void()`, `+ theme_bw()` etc. do not restyle them.
-  Themed panel furniture would again require the coord/scale approach above. The
-  data layers themselves theme and scale normally.
-- **`na.rm` is effectively always TRUE.** The geoms silently drop rows with a
-  missing amplitude/displacement (degenerate profiles have no location),
-  regardless of the flag — a minor deviation from the ggplot2 convention where
-  `na.rm = FALSE` warns. As of R2 (2026-07-03) the higher-level
-  `ssm_plot_circle()` compensates by detecting undefined-displacement profiles
-  itself and warning by name before the geoms drop them; the raw geoms remain
-  silent (they have no profile labels to name).
-- **The `GeomSsmPoint`/`StatSsmArc` ggproto generators are not exported** (only
-  the layer constructors are). Fine for use; exporting them (with
-  `@format NULL`) would let others subclass — a cheap future addition.
+The three former known limitations — `amax` as un-shared per-layer state, no
+configurable center, a theme-frozen canvas — are **resolved** by this rewrite:
+each is structurally impossible to reintroduce once the coord owns the transform
+(M30 design; D-019). `ggforce` is no longer a dependency (D-020) — the arc is a
+coord-bent `GeomRect` and the rings are the coord's r-gridlines; the dead
+cartesian helpers `ggrad()`/`ssm_to_cartesian()`/`ssm_radius()` went with it.
+Two behaviors are unchanged: `na.rm` is effectively always TRUE (the geoms drop
+rows with a missing amplitude/displacement, and `ssm_plot_circle()` names such
+profiles before dropping them), and the `GeomSsmPoint`/`GeomSsmArc`/coord
+ggproto generators stay unexported (only the layer/coord constructors are) —
+exporting them for subclassing is deferred to M32.
 
 ## Key references
 
@@ -368,7 +345,8 @@ that byte-identical output depended on).**
 
 ## Dependency policy
 
-Imports kept minimal (boot, ggplot2, ggforce, htmlTable, Rcpp, rlang, stats).
+Imports kept minimal (boot, ggplot2, htmlTable, Rcpp, rlang, stats; `ggforce`
+removed in M31/D-020 once `coord_circumplex()` re-owned the arc/canvas geometry).
 Heavier or optional functionality goes to Suggests with graceful degradation
 (ggrepel, kableExtra). OpenMx is in Suggests as a **test oracle only**
 (cross-implementation checks in test-cpm_oracles.R, skipped when not

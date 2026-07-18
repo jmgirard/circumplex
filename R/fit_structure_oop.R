@@ -301,7 +301,6 @@ plot.circumplex_structure <- function(x, amax = 1, legend = TRUE, ...) {
         displacement = .data$angle,
         fill = .data$Scale
       ),
-      amax = amax,
       shape = 21,
       size = 3,
       color = "black"

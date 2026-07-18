@@ -70,6 +70,7 @@ reference:
   desc: Composable ggplot2 components for building circumplex figures
   contents:
   - ggcircumplex
+  - coord_circumplex
   - geom_ssm_point
   - geom_ssm_arc
   - scale_x_circumplex

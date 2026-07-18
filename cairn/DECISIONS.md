@@ -550,3 +550,30 @@ stands. D-006/D-014 minimal-deps satisfied (re-pin, not a new dep). D-018
 (wrappers retained) reinforced. Source: RR08 (Fable, 2026-07-17); Jeff, M30 T3
 gate.
 
+### D-020 (2026-07-17): ggforce dropped from Imports — the V6 KEEP holding is superseded (M31)
+
+**Context:** DESIGN.md's V6 review held `ggforce: KEEP` — its
+`StatArcBar`/`GeomArcBar` powered the CI-wedge geom and `geom_circle` drew the
+canvas rings. M30/D-019 (RR08 R-8) flagged ggforce as "likely fully removable"
+once the `coord_circumplex()` rewrite eliminated its call sites, but required a
+verification checklist and its own D-entry — never a silent side effect.
+**Decision:** Remove `ggforce` from `DESCRIPTION` Imports. M31 made the arc a
+coord-bent `GeomRect` and the rings the coord's themed r-gridlines, so the
+checklist (spec §11) is satisfied: (1) all three plot families
+(`ssm_plot_circle`, `plot.circumplex_cpm`, `plot.circumplex_fit_structure`)
+render off the coord with no `StatArcBar`/`geom_circle`; (2) the zero-width
+wedge is re-owned by `GeomSsmArc$setup_data()` (T-arc0 regression); (3)
+`grep -r ggforce` clean over `R/`, `tests/`, `vignettes/`, `NAMESPACE` (two
+vignette `geom_circle` illustrations replaced with `annotate("path")`); (4)
+`devtools::check()` clean (0 errors / 0 warnings; 1 transient top-level NOTE)
+and the full suite passes with it dropped. The dead cartesian helpers
+`ggrad()`/`ssm_to_cartesian()`/`ssm_radius()` are removed with it — the polar
+transform now lives in exactly one place (the coord).
+**Supersedes:** DESIGN.md V6's `ggforce: KEEP` (discharged, not a standing
+rejection — KEEP was conditional on ggforce *simplifying* the geoms, which
+Option A reversed). D-006/D-014 minimal-deps reinforced (one fewer Import).
+**Consequences:** no user-facing behavior change (internal dependency); NEWS
+notes the smaller dependency footprint at v2.0.0/M7. `ggplot2 (>= 4.0.0)`
+(D-019) is the only remaining plotting Import. Source: M31 T7; RR08 R-8; Jeff,
+M31 plan gate (Q2 "remove in M31").
+
