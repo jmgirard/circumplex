@@ -10,7 +10,6 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ggplot2)
-library(ggforce)
 library(kableExtra)
 set.seed(12345)
 ```

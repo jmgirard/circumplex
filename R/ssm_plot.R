@@ -70,9 +70,10 @@ ssm_plot_circle <- function(ssm_object,
     df <- df[1:2, ]
   }
 
-  # The amplitude/displacement-to-canvas transform (rescaling amplitudes and
-  # converting displacement to the ggforce arc convention, with wrap-around at
-  # the 0/360 boundary) is handled by geom_ssm_arc()/geom_ssm_point() below.
+  # The amplitude/displacement-to-canvas transform (amplitude scaling and the
+  # 0/360 polar mapping, with the seam wrap-around) is owned by
+  # coord_circumplex(); geom_ssm_arc()/geom_ssm_point() just supply the SSM
+  # aesthetics below.
   df_plot <- df
 
   # Profiles with an undefined location (flat or zero-amplitude scores:

@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M31: Circumplex coordinate-system build
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M30
 - **Principles touched:** — (implements under the CLAUDE.md angle invariants:
@@ -127,36 +127,19 @@ now-unused `ggforce` dependency.
 - [x] **T6** — AC4 boundary battery (T-i1b/T-i2/T-i2b/T-i2c/T-i3/T-arc0/T-r1/
       T-r2) at data + grob level; drive real values through the transform, not
       re-typed expressions (M13 teeth lesson).
-- [ ] **T7** — `ggforce` removal capstone: verification checklist, drop the
+- [x] **T7** — `ggforce` removal capstone: verification checklist, drop the
       Import, dead-code sweep (`ggrad`, `ssm_to_cartesian`), D-entry superseding
       DESIGN.md V6.
-- [ ] **T8** — vdiffr wholesale regen; `skip_on_ci()` BLAS-sensitive ones; full
+- [x] **T8** — vdiffr wholesale regen; `skip_on_ci()` BLAS-sensitive ones; full
       `test()` + `check()` clean; human-eyeball pass.
 
 ## Work log
 
-- 2026-07-17: created by /milestone-plan (viz expansion, area A build half).
-- 2026-07-17: plan deepened by /milestone-plan against M30's completed outputs
-  (spec §11 punch-list + D-019); superseded the generic pre-M30 plan. Gate:
-  coord-aware repel kept working in M31 (enhanced ergonomics → M32); ggforce
-  removed in M31 as a gated capstone + D-entry; full data+grob boundary battery.
-- 2026-07-17: T1 — `coord_circumplex()` (⊂ `CoordRadial`) in `R/coord_circumplex.R`,
-  exported; hard-pins `thetalim=c(0,360)`/`expand=FALSE`/`start=pi/2`/`reverse="theta"`,
-  center+amax via `rlim`, `inner.radius=0`. Live-verified the stock transform already
-  carries LM=360/CCW, the identical-pole (I3), and periodic seam-wrap (350↔370); 22
-  coord-unit tests (incl. T-i1b panel-range pin). `DESCRIPTION` ggplot2 `>= 4.0.0`
-  (D-019); pkgdown row added. Full suite green (2248 pass).
-- 2026-07-17: T2–T6 — geoms refactored onto the coord (`geom_ssm_point` → `x/y`;
-  `geom_ssm_arc` → coord-bent `GeomRect` with extension-unwrap + validation in
-  `setup_data`, `StatSsmArc`/ggforce arc path dropped); `amax`/`n` soft-deprecated
-  (one-time `inform`, never errors). `ggcircumplex()` rebuilt on the coord (themed
-  furniture; `circle_base()` removed); `ssm_plot_circle()` amax args dropped;
-  `repel=TRUE` redesigned coord-aware (ggrepel works under the coord). Two hidden
-  consumers ported. AC4 boundary battery (data+grob) in a rewritten test-geom_ssm.R;
-  structural plot tests rewritten to locate layers by geom; circumplex vdiffr
-  baselines regenerated (curve/ci-accuracy unchanged). Full suite green
-  (2709 pass, 0 fail, vdiffr included). Live-eyeballed canvas/circle/repel/wedges/
-  seam/cpm/fit_structure renders.
+- 2026-07-17: created by /milestone-plan; plan deepened same day against M30's
+  outputs (spec §11 + D-019), superseding the generic pre-M30 plan.
+- 2026-07-17: T1 — exported `coord_circumplex()` (⊂ `CoordRadial`, `R/coord_circumplex.R`) hard-pinning the LM=360/CCW convention; live-verified identical-pole (I3) + periodic seam-wrap (350↔370); 22 coord tests; DESCRIPTION ggplot2 `>= 4.0.0` (D-019); pkgdown row.
+- 2026-07-17: T2–T6 — geoms onto the coord (`GeomSsmPoint`→x/y; `GeomSsmArc`⊂`GeomRect`, extension-unwrap+validation in `setup_data`, `StatSsmArc` dropped); `amax`/`n` soft-deprecated (one-time inform); `ggcircumplex()` rebuilt (themed, `circle_base()` gone); coord-aware `repel`; two consumers ported; AC4 data+grob battery + structural tests by-geom; vdiffr regenerated. Suite green (2709). Renders live-eyeballed.
+- 2026-07-17: T7–T8 — `ggforce` removed (D-020, supersedes V6 KEEP); checklist verified (grep-clean incl. vignettes → `annotate`; T-arc0). Dead `ggrad`/`ssm_to_cartesian`/`ssm_radius` swept. DESIGN.md viz rewritten; NEWS added. `check()` 0/0/0 (a transient Rplots.pdf note, deleted). Status → review.
 
 ## Decisions
 

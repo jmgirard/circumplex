@@ -1,5 +1,18 @@
 # circumplex (development version)
 
+* Circumplex figures are now built on a real ggplot2 coordinate system. The new
+  `coord_circumplex()` owns the amplitude-to-radius scaling and the
+  displacement-to-angle transform in one place, so a canvas and its data layers
+  can no longer disagree about the outer-ring amplitude. It adds a configurable
+  amplitude *center* (the rings relabel and the amplitudes remap together) and a
+  theme-responsive canvas: the rings, spokes, and labels drawn by
+  `ggcircumplex()` now restyle through `+ theme_*()`. `ggcircumplex()`,
+  `geom_ssm_point()`, `geom_ssm_arc()`, and `ssm_plot_circle()` keep their
+  signatures and correct output. The per-layer `amax` argument (and
+  `geom_ssm_arc()`'s `n`) are no longer needed and are ignored with a one-time
+  note. This requires ggplot2 (>= 4.0.0), and `ggforce` is no longer a
+  dependency.
+
 * `ssm_ci_accuracy()` now assesses repeated-measures occasions analyses
   instead of stopping with an error. Its plug-in population is a multivariate
   normal with the observed stacked cross-occasion covariance, so the
