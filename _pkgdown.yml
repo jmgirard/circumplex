@@ -37,10 +37,6 @@ reference:
   - ssm_analyze
   - ssm_analyze_long
   - ssm_table
-  - ssm_plot_circle
-  - ssm_plot_contrast
-  - ssm_plot_curve
-  - ssm_plot_trajectory
   - ssm_parameters
   - ssm_parameters_id
   - summary.circumplex_ssm_id
@@ -67,8 +63,15 @@ reference:
   - ssm_ci_accuracy
   - summary.circumplex_ci_accuracy
   - plot.circumplex_ci_accuracy
-- title: Visualization Layer
-  desc: Composable ggplot2 components for building circumplex figures
+- title: Visualization - Complete Plots
+  desc: Ready-made circumplex figures for a set of SSM results
+  contents:
+  - ssm_plot_circle
+  - ssm_plot_curve
+  - ssm_plot_contrast
+  - ssm_plot_trajectory
+- title: Visualization - Building Blocks
+  desc: Composable ggplot2 components for building custom circumplex figures
   contents:
   - ggcircumplex
   - coord_circumplex

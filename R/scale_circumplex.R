@@ -47,7 +47,7 @@ circumplex_degree_labels <- function(angles) {
 #' @param ... Additional arguments passed to
 #'   [ggplot2::scale_x_continuous()], such as `name` or `limits`.
 #' @return A \pkg{ggplot2} scale object that can be added to a plot with `+`.
-#' @seealso [ggcircumplex()]
+#' @family circumplex layers
 #' @export
 #' @examples
 #' # Degree-labeled angle axis

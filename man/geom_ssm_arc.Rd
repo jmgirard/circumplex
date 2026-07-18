@@ -71,5 +71,11 @@ ggcircumplex(octants(), amax = 0.5) +
   )
 }
 \seealso{
-\code{\link[=coord_circumplex]{coord_circumplex()}}, \code{\link[=ggcircumplex]{ggcircumplex()}}, \code{\link[=geom_ssm_point]{geom_ssm_point()}}
+Other circumplex layers:
+\code{\link[=coord_circumplex]{coord_circumplex()}},
+\code{\link[=geom_ssm_point]{geom_ssm_point()}},
+\code{\link[=ggcircumplex]{ggcircumplex()}},
+\code{\link[=scale_x_circumplex]{scale_x_circumplex()}},
+\code{\link[=theme_circumplex]{theme_circumplex()}}
 }
+\concept{circumplex layers}

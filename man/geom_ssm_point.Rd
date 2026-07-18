@@ -49,5 +49,11 @@ ggcircumplex(octants(), amax = 0.5) +
   )
 }
 \seealso{
-\code{\link[=coord_circumplex]{coord_circumplex()}}, \code{\link[=ggcircumplex]{ggcircumplex()}}, \code{\link[=geom_ssm_arc]{geom_ssm_arc()}}
+Other circumplex layers:
+\code{\link[=coord_circumplex]{coord_circumplex()}},
+\code{\link[=geom_ssm_arc]{geom_ssm_arc()}},
+\code{\link[=ggcircumplex]{ggcircumplex()}},
+\code{\link[=scale_x_circumplex]{scale_x_circumplex()}},
+\code{\link[=theme_circumplex]{theme_circumplex()}}
 }
+\concept{circumplex layers}

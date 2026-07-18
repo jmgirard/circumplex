@@ -43,7 +43,7 @@
 #' @param ... Reserved for future extensions; currently unused.
 #' @return A \pkg{ggplot2} coordinate system that can be added to a plot with
 #'   `+`.
-#' @seealso [ggcircumplex()], [geom_ssm_point()], [geom_ssm_arc()]
+#' @family circumplex layers
 #' @export
 #' @examples
 #' data("jz2017")

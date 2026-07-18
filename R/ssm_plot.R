@@ -43,6 +43,7 @@ has_ggrepel <- function() {
 #'   of profiles is five or less. (default = FALSE)
 #' @param ... Not used. Supplying an unrecognized argument produces a warning.
 #' @return A ggplot variable containing a completed circular plot.
+#' @family visualization functions
 #' @export
 #' @examples
 #' \donttest{
@@ -257,6 +258,7 @@ ssm_plot_circle <- function(ssm_object,
 #'   low fit (<.70) or include them with dashed lines (default = FALSE).
 #' @param ... Not used. Supplying an unrecognized argument produces a warning.
 #' @return A ggplot object depicting the SSM curve(s) of each profile.
+#' @family visualization functions
 #' @export
 #' @examples
 #' \donttest{
@@ -396,6 +398,7 @@ ssm_plot_curve <- function(ssm_object,
 #' @param ... Not used. Supplying an unrecognized argument produces a warning.
 #' @return A ggplot variable containing difference point-ranges faceted by SSM
 #'   parameter. An interval that does not contain the value of zero has p<.05.
+#' @family visualization functions
 #' @export
 #' @examples
 #' \donttest{
@@ -539,6 +542,7 @@ ssm_plot_contrast <- function(ssm_object, drop_xy = FALSE,
 #'   `labels` is given) the scale abbreviations are taken from the instrument
 #'   (default = `NULL`).
 #' @return A \pkg{ggplot2} object containing the empty circumplex canvas.
+#' @family circumplex layers
 #' @seealso [coord_circumplex()], which owns the transform this canvas is built
 #'   on; [ssm_plot_circle()], which draws SSM results on this canvas.
 #' @export
@@ -596,7 +600,7 @@ ggcircumplex <- function(angles = octants(), labels = NULL,
 #' @param base_size A single positive number giving the base font size (in pt)
 #'   for the theme (default = 12).
 #' @return A \pkg{ggplot2} theme object, to be added to a plot with `+`.
-#' @seealso [ggcircumplex()], [coord_circumplex()]
+#' @family circumplex layers
 #' @export
 #' @examples
 #' # Restyle the canvas with a larger base font
