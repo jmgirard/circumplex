@@ -58,8 +58,12 @@ coord_circumplex <- function(amax = NULL, center = 0, r_axis_angle = NULL, ...) 
   stopifnot(is_num(center, n = 1), !is.na(center))
   stopifnot(is_null_or_num(amax, n = 1))
   stopifnot(is_null_or_num(r_axis_angle, n = 1))
-  if (!is.null(r_axis_angle) && is.na(r_axis_angle)) {
-    stop("`r_axis_angle` must be a single number (or NULL).", call. = FALSE)
+  if (!is.null(r_axis_angle) && !is.finite(r_axis_angle)) {
+    # !is.finite() catches NA, NaN, and +/-Inf: an Inf angle would slip past an
+    # is.na() guard and only surface as a cryptic NaN error deep in the coord's
+    # render (r_axis_angle %% 360 -> NaN), never naming this argument.
+    stop("`r_axis_angle` must be a single finite number (or NULL).",
+         call. = FALSE)
   }
   if (!is.null(amax) && (is.na(amax) || amax <= center)) {
     stop("`amax` must be a single number greater than `center`.", call. = FALSE)

@@ -175,3 +175,30 @@ users need to compose custom figures.
 
 Combined targeted re-run of the four viz test files at review: 46 tests / 129
 assertions, 0 fail / 0 error / 0 skip.
+
+**Consistency gate (2026-07-18):** `cairn_validate` all-pass (incl.
+coverage-complete, mirror agreement, weight caps); no DESIGN principle changed →
+`cairn_impact` skipped. Toolchain: `document()` no-diff, `pkgdown::check_pkgdown()`
+"No problems found", README in sync (untouched), NEWS entry present, `check()`
+0/0/0.
+
+**Independent three-lens review (2026-07-18):**
+- [O] diff-bug (Opus): 1 finding (below) — else clean (auto-placement logic,
+  `r_axis_inside` re-entrancy, na.rm parity, exports/roxygen all verified sound;
+  LM=360/pole/seam untouched).
+- [S] blame-history (Sonnet): no regressions — D-018/D-019/D-020 and M31's pinned
+  invariants intact; no double-warn in the three wrapper plots; repel/theme-rename
+  clean.
+- [S] prior-PR-comments (Sonnet): no prior-PR evidence (merged PRs carry zero
+  inline review comments; this repo reviews via cairn docs).
+
+**Finding (scored 78 — sub-threshold, but actioned):** `r_axis_angle` validation
+guarded `NA` but not `±Inf` (`coord_circumplex(r_axis_angle = Inf)` → `Inf %% 360`
+= `NaN` → cryptic render-time error never naming the argument). Scorer put it at
+78 (verified/real but low-severity edge case). Elected to **fix now** rather than
+log-only: it is a one-line correctness guard in code M32 itself introduced —
+switched the guard to `!is.finite()` (catches NA/NaN/±Inf), added `Inf`/`NA`
+regression tests. The sibling `amax`/`center` guards have the identical **pre-
+existing** gap (out of M32 scope) → spawned a background task
+(`task_010f992f`) to guard them via `/hotfix` or the next coord-touching
+milestone.

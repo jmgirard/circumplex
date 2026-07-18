@@ -120,6 +120,7 @@ test_that("r_axis_angle overrides the automatic placement (T3)", {
     ggplot2::scale_x_continuous(breaks = octants())
   co <- ggplot2::ggplot_build(p)$layout$coord
   expect_equal(co$r_axis_inside, 200)
-  expect_error(coord_circumplex(r_axis_angle = NA_real_), "r_axis_angle")
+  expect_error(coord_circumplex(r_axis_angle = NA_real_), "finite")
+  expect_error(coord_circumplex(r_axis_angle = Inf), "finite")
   expect_error(coord_circumplex(r_axis_angle = c(1, 2)), "r_axis_angle")
 })
