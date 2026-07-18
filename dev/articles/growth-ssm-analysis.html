@@ -288,34 +288,26 @@ intervals with correct wrapping at the boundary).</p>
 <span><span class="co">#&gt; 5    4  0.62  0.59  0.66  14.53  11.21  17.97      TRUE</span></span></code></pre></div>
 <p>The displacement estimates hug the 0°/360° boundary by design —
 values near 350° at early waves and near 10° at late waves — and the
-intervals wrap correctly rather than spanning “the long way around.” For
-plotting or reading the trend, unwrap the estimated trajectory onto a
-continuous branch with <code><a href="../reference/angle_unwrap.html">angle_unwrap()</a></code>:</p>
+intervals wrap correctly rather than spanning “the long way around.” A
+table in this shape — one row per time point, with
+<code>a_est</code>/<code>a_lci</code>/<code>a_uci</code>,
+<code>d_est</code>/<code>d_lci</code>/<code>d_uci</code>, and optionally
+<code>certified</code> — is what <code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code>
+plots directly:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d_branch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/angle_unwrap.html">angle_unwrap</a></span><span class="op">(</span><span class="va">trajectory</span><span class="op">$</span><span class="va">d_est</span><span class="op">)</span></span>
-<span><span class="co"># Each credible bound is reported independently wrapped into [0, 360), so an</span></span>
-<span><span class="co"># interval straddling the 0/360 seam has d_lci &gt; d_uci. Move each bound onto</span></span>
-<span><span class="co"># the estimate's unwrapped branch by its *signed* distance from the estimate</span></span>
-<span><span class="co"># (not by the estimate's branch offset, which would throw a straddling bound</span></span>
-<span><span class="co"># a full turn off).</span></span>
-<span><span class="va">rel</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span><span class="op">)</span> <span class="op">(</span><span class="op">(</span><span class="va">a</span> <span class="op">-</span> <span class="va">trajectory</span><span class="op">$</span><span class="va">d_est</span> <span class="op">+</span> <span class="fl">180</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">360</span><span class="op">)</span> <span class="op">-</span> <span class="fl">180</span></span>
-<span><span class="va">plot_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  wave <span class="op">=</span> <span class="va">waves</span>,</span>
-<span>  d <span class="op">=</span> <span class="va">d_branch</span>,</span>
-<span>  lci <span class="op">=</span> <span class="va">d_branch</span> <span class="op">+</span> <span class="fu">rel</span><span class="op">(</span><span class="va">trajectory</span><span class="op">$</span><span class="va">d_lci</span><span class="op">)</span>,</span>
-<span>  uci <span class="op">=</span> <span class="va">d_branch</span> <span class="op">+</span> <span class="fu">rel</span><span class="op">(</span><span class="va">trajectory</span><span class="op">$</span><span class="va">d_uci</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">plot_dat</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">wave</span>, y <span class="op">=</span> <span class="va">d</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_ribbon</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">lci</span>, ymax <span class="op">=</span> <span class="va">uci</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Wave"</span>, y <span class="op">=</span> <span class="st">"Displacement (degrees, unwrapped)"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="growth-ssm-analysis_files/figure-html/plot-1.png" class="r-plt" alt="" width="480"></p>
-<p>(Each interval endpoint is placed on the same branch as its estimate
-by its signed circular distance from it; near the boundary the endpoints
-may legitimately fall outside
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mi>°</mi><mo>,</mo><mn>360</mn><mi>°</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">[0°, 360°)</annotation></semantics></math>.)</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="growth-ssm-analysis_files/figure-html/plot-1.png" class="r-plt" alt="" width="624"></p>
+<p>The displacement panel is drawn on an <em>unwrapped</em> branch, so
+the trajectory crosses the boundary as one continuous path instead of
+jumping a full turn, and values there may legitimately fall outside
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mi>°</mi><mo>,</mo><mn>360</mn><mi>°</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">[0°, 360°)</annotation></semantics></math>.
+Each interval is placed on its estimate’s branch and keeps the width it
+was reported with — including an interval that straddles the seam, which
+is stored with <code>d_lci &gt; d_uci</code>. Doing this by hand is easy
+to get subtly wrong: the natural “shift each bound by its signed
+distance from the estimate” recipe silently cannot represent an interval
+wider than a half-turn, which is exactly the near-origin case Section 5
+is about. The function handles both.</p>
 </div>
 <div class="section level2">
 <h2 id="certification-when-dt-intervals-are-not-interpretable">5. Certification: when
@@ -389,6 +381,40 @@ amplitude interval sits too close to zero, and the displacement interval
 direction. In our validation simulations of this regime, the caution
 fires at the degraded wave in essentially every replicate while the
 origin-distal waves remain certified and nominally covered.</p>
+<p>Assembling this fit’s full trajectory the same way, and carrying the
+<code>certified</code> verdict into the table, lets the plot mark the
+verdict itself:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">per_wave2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">waves</span>, <span class="kw">function</span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/ssm_draws.html">ssm_draws</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
+<span>    e <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve"</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dve:wave"</span><span class="op">]</span>,</span>
+<span>    x <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx"</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvx:wave"</span><span class="op">]</span>,</span>
+<span>    y <span class="op">=</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvy"</span><span class="op">]</span> <span class="op">+</span> <span class="va">t</span> <span class="op">*</span> <span class="va">B2</span><span class="op">[</span>, <span class="st">"dvy:wave"</span><span class="op">]</span></span>
+<span>  <span class="op">)</span>, type <span class="op">=</span> <span class="st">"parameters"</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">trajectory2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  wave <span class="op">=</span> <span class="va">waves</span>,</span>
+<span>  a_est <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_est</span><span class="op">)</span>,</span>
+<span>  a_lci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_lci</span><span class="op">)</span>,</span>
+<span>  a_uci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_uci</span><span class="op">)</span>,</span>
+<span>  d_est <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_est</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  d_lci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_lci</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  d_uci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">d_uci</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  certified <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">per_wave2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="va">s</span><span class="op">$</span><span class="va">details</span><span class="op">$</span><span class="va">certified</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">trajectory2</span>, time <span class="op">=</span> <span class="st">"wave"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="growth-ssm-analysis_files/figure-html/lowamp-plot-1.png" class="r-plt" alt="" width="624"></p>
+<p>Uncertified waves are drawn as <strong>hollow</strong> points on the
+displacement panel. Read them as gaps in the argument, not as estimates
+with wide intervals: the amplitude panel shows why, with the interval
+collapsing toward zero as the group passes the origin. The displacement
+interval at such a wave can cover most of the circle, and the panel
+draws it at that full width rather than flattening it into something
+that looks precise.</p>
+<p>The <code>certified</code> column is optional. A table without it
+plots the same way, minus the hollow marking and its legend — the figure
+then makes no claim about interpretability either way, which is the
+honest default when the verdict was never computed.</p>
 </div>
 <div class="section level2">
 <h2 id="a-caution-about-reml-intervals-at-small-samples">6. A caution about REML intervals at small samples<a class="anchor" aria-label="anchor" href="#a-caution-about-reml-intervals-at-small-samples"></a>
@@ -412,7 +438,7 @@ normal-approximation draws.</p>
 displacement at each wave, <strong>unwrap</strong> each person’s
 sequence onto a continuous branch, and fit an ordinary univariate growth
 model to the unwrapped angles.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># One person's displacement over five waves, drifting across the boundary</span></span>
 <span><span class="va">d_person</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">350</span>, <span class="fl">355</span>, <span class="fl">2</span>, <span class="fl">8</span>, <span class="fl">12</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/angle_unwrap.html">angle_unwrap</a></span><span class="op">(</span><span class="va">d_person</span><span class="op">)</span></span>

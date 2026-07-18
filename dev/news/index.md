@@ -17,6 +17,24 @@
   interpretable is marked with a hollow point, and a profile with no
   defined displacement leaves a gap rather than a spurious segment.
 
+- [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+  also accepts a **trajectory table**: a data frame with one row per
+  time point, a numeric time column named by the new `time` argument,
+  and `a_est`/`a_lci`/`a_uci` and `d_est`/`d_lci`/`d_uci` columns
+  (optionally the `e_*`, `x_*`, and `y_*` triples and a logical
+  `certified` column). This is the shape a model-based workflow
+  assembles by evaluating a fitted growth model at each time point and
+  passing the draws through
+  [`ssm_draws()`](http://circumplex.jmgirard.com/dev/reference/ssm_draws.md),
+  and it is plotted on a continuous time axis, so unequally spaced time
+  points are drawn at their actual spacing. Only the panels the table
+  can fill are drawn. The displacement unwrap, the interval placement,
+  and the hollow marking of uninterpretable time points are shared with
+  the occasions path; when no `certified` column is supplied, the figure
+  makes no interpretability claim rather than asserting one. The “Growth
+  modeling” vignette now uses this instead of assembling the figure by
+  hand.
+
 - Circumplex figures are now built on a real ggplot2 coordinate system.
   The new
   [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
