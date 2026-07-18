@@ -41,8 +41,9 @@ geom_ssm_point(
 
 - na.rm:
 
-  Ignored; profiles with a missing displacement or amplitude (degenerate
-  profiles) are always dropped, since they have no location.
+  If `FALSE`, warn (with the dropped-row count) before removing profiles
+  with a missing displacement or amplitude, since they have no location
+  on the circle; if `TRUE` (the default) remove them silently.
 
 ## Value
 

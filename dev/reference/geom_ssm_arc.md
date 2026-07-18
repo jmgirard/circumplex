@@ -49,8 +49,9 @@ geom_ssm_arc(
 
 - na.rm:
 
-  Ignored; profiles with a missing displacement or amplitude bound
-  (degenerate profiles) are always dropped.
+  If `FALSE`, warn (with the dropped-row count) before removing profiles
+  with an incomplete confidence region (a missing amplitude or
+  displacement bound); if `TRUE` (the default) remove them silently.
 
 ## Value
 

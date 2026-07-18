@@ -14,7 +14,7 @@ disagree.
 ## Usage
 
 ``` r
-coord_circumplex(amax = NULL, center = 0, ...)
+coord_circumplex(amax = NULL, center = 0, r_axis_angle = NULL, ...)
 ```
 
 ## Arguments
@@ -31,6 +31,14 @@ coord_circumplex(amax = NULL, center = 0, ...)
   Optional. A single number giving the amplitude at the center of the
   circle (default = 0). Ring labels and the amplitude-to-radius mapping
   are guaranteed to agree.
+
+- r_axis_angle:
+
+  Optional. A single number giving the displacement (in degrees) along
+  which the amplitude (radial) axis and its labels are drawn. `NULL`
+  (the default) places it automatically in the widest gap between the
+  displacement spokes, so the amplitude labels never collide with a
+  spoke label.
 
 - ...:
 

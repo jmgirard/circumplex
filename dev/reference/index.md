@@ -112,6 +112,8 @@ Composable ggplot2 components for building circumplex figures
   : Draw SSM confidence-region arcs in circumplex space
 - [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
   : Angle-labeled x-axis scale for circumplex plots
+- [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md)
+  : Circumplex canvas theme
 
 ## Secondary SSM Functions
 

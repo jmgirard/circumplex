@@ -81,7 +81,7 @@ no longer take an <code>amax</code>, and the canvas and data layers can never di
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">coord_circumplex</span><span class="op">(</span>amax <span class="op">=</span> <span class="cn">NULL</span>, center <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">coord_circumplex</span><span class="op">(</span>amax <span class="op">=</span> <span class="cn">NULL</span>, center <span class="op">=</span> <span class="fl">0</span>, r_axis_angle <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -98,6 +98,14 @@ represented by the outer ring. <code>NULL</code> (the default) trains it from th
 <dd><p>Optional. A single number giving the amplitude at the center of
 the circle (default = 0). Ring labels and the amplitude-to-radius mapping
 are guaranteed to agree.</p></dd>
+
+
+<dt id="arg-r-axis-angle">r_axis_angle<a class="anchor" aria-label="anchor" href="#arg-r-axis-angle"></a></dt>
+<dd><p>Optional. A single number giving the displacement (in
+degrees) along which the amplitude (radial) axis and its labels are drawn.
+<code>NULL</code> (the default) places it automatically in the widest gap between the
+displacement spokes, so the amplitude labels never collide with a spoke
+label.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

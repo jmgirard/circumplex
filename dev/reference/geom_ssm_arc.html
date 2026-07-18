@@ -118,8 +118,9 @@ here is ignored with a one-time note.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
-<dd><p>Ignored; profiles with a missing displacement or amplitude
-bound (degenerate profiles) are always dropped.</p></dd>
+<dd><p>If <code>FALSE</code>, warn (with the dropped-row count) before removing
+profiles with an incomplete confidence region (a missing amplitude or
+displacement bound); if <code>TRUE</code> (the default) remove them silently.</p></dd>
 
 </dl></div>
     <div class="section level2">

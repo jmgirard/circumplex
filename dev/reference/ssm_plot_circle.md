@@ -51,7 +51,12 @@ ssm_plot_circle(
 
 - repel:
 
-  An experimental argument for plotting text labels instead of colors.
+  A logical determining whether each profile is labelled with a repelled
+  text label (placed on the circumplex canvas by
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
+  so labels avoid overlapping each other and the points) instead of
+  distinguished by colour and a legend (default = FALSE). Requires the
+  ggrepel package.
 
 - angle_labels:
 

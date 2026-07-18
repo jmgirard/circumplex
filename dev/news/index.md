@@ -24,6 +24,25 @@
   `n`) are no longer needed and are ignored with a one-time note. This
   requires ggplot2 (\>= 4.0.0), and `ggforce` is no longer a dependency.
 
+- The circumplex ggplot2 layers are now more extensible and ergonomic.
+  The `GeomSsmPoint`, `GeomSsmArc`, and `CoordCircumplex` ggproto
+  generators are exported so downstream packages can subclass them. The
+  amplitude (radial) axis and its labels are now drawn in the widest gap
+  between the displacement spokes, so they no longer overlap a spoke
+  label;
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+  gains an `r_axis_angle` argument to place it manually. The canvas
+  theme is exported as
+  [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md).
+  [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
+  and
+  [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
+  follow the ggplot2 `na.rm` convention: with `na.rm = FALSE` they warn
+  (with the count) before dropping profiles that cannot be placed, while
+  the default `na.rm = TRUE` drops them silently.
+  `ssm_plot_circle(repel = TRUE)` now gives a clear error when the
+  suggested `ggrepel` package is not installed.
+
 - [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/ssm_ci_accuracy.md)
   now assesses repeated-measures occasions analyses instead of stopping
   with an error. Its plug-in population is a multivariate normal with
