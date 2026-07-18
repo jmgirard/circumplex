@@ -83,7 +83,7 @@ users need to compose custom figures.
 - [x] **T2** — Implement `na.rm = FALSE` warn-by-count in `GeomSsmPoint$setup_data`
       and `GeomSsmArc$setup_data` (default TRUE stays silent); test all four
       geom×flag cases.
-- [ ] **T3** — Fix the due-East `0.5`/`LM` label overlap in `coord_circumplex()` /
+- [x] **T3** — Fix the due-East `0.5`/`LM` label overlap in `coord_circumplex()` /
       `ggcircumplex()` furniture; regenerate the affected vdiffr baseline; assert
       label separation at grob level.
 - [ ] **T4** — Firm up the `ssm_plot_circle(repel=)` path (non-overlapping
@@ -111,6 +111,14 @@ users need to compose custom figures.
   silent, FALSE warns by count on NA-drops; zero-width arc stays a silent
   geometry rule). Updated both `@param na.rm` docs + DESIGN.md. 4 geom×flag test
   cases; no double-warn in `ssm_plot_circle`/`plot.circumplex_cpm`.
+- 2026-07-18: T3 — fixed the due-East `0.5`/`LM` overlap: coord auto-places the
+  amplitude (radial) axis in the widest spoke gap (new `ssm_r_axis_angle()`
+  helper: octants→22.5°, poles→45°, 12-pt→15°; off every spoke) via
+  `setup_panel_params`, with a new `r_axis_angle=` override on
+  `coord_circumplex()`. Fenced at helper + built-coord level (`r_axis_inside`
+  moved off theta 0, not on any spoke). Regenerated 14 canvas vdiffr baselines;
+  all cartesian curve/contrast/ladder baselines byte-identical (env-fidelity
+  signal, M31 lesson).
 
 ## Decisions
 

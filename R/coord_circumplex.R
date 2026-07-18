@@ -35,6 +35,11 @@
 #' @param center Optional. A single number giving the amplitude at the center of
 #'   the circle (default = 0). Ring labels and the amplitude-to-radius mapping
 #'   are guaranteed to agree.
+#' @param r_axis_angle Optional. A single number giving the displacement (in
+#'   degrees) along which the amplitude (radial) axis and its labels are drawn.
+#'   `NULL` (the default) places it automatically in the widest gap between the
+#'   displacement spokes, so the amplitude labels never collide with a spoke
+#'   label.
 #' @param ... Reserved for future extensions; currently unused.
 #' @return A \pkg{ggplot2} coordinate system that can be added to a plot with
 #'   `+`.
@@ -46,12 +51,16 @@
 #' ggplot2::ggplot(res$results) +
 #'   coord_circumplex(amax = 0.5) +
 #'   geom_ssm_point(ggplot2::aes(amplitude = a_est, displacement = d_est))
-coord_circumplex <- function(amax = NULL, center = 0, ...) {
+coord_circumplex <- function(amax = NULL, center = 0, r_axis_angle = NULL, ...) {
   # Validate `center` before it is used in the `amax`/`center` comparison, so a
   # bad `center` is named as the culprit (not `amax`); guard NA on both so the
   # comparison never returns NA and throws a cryptic base error.
   stopifnot(is_num(center, n = 1), !is.na(center))
   stopifnot(is_null_or_num(amax, n = 1))
+  stopifnot(is_null_or_num(r_axis_angle, n = 1))
+  if (!is.null(r_axis_angle) && is.na(r_axis_angle)) {
+    stop("`r_axis_angle` must be a single number (or NULL).", call. = FALSE)
+  }
   if (!is.null(amax) && (is.na(amax) || amax <= center)) {
     stop("`amax` must be a single number greater than `center`.", call. = FALSE)
   }
@@ -77,8 +86,23 @@ coord_circumplex <- function(amax = NULL, center = 0, ...) {
     r_axis_inside = base$r_axis_inside, rotate_angle = base$rotate_angle,
     inner_radius = base$inner_radius, clip = base$clip,
     # Circumplex-specific state.
-    amax = amax, center = center
+    amax = amax, center = center, r_axis_angle = r_axis_angle
   )
+}
+
+# Displacement (degrees) at which to draw the amplitude (radial) axis: the
+# midpoint of the widest angular gap between consecutive displacement spokes, so
+# the amplitude tick labels never collide with a spoke label (the due-East
+# `0.5`/`LM` overlap resolved in M32). Equally spaced spokes tie, so the tie
+# breaks to the smallest such midpoint for a deterministic placement. Degenerate
+# break sets fall back to a sensible fixed angle.
+ssm_r_axis_angle <- function(breaks) {
+  b <- sort(unique(breaks[is.finite(breaks)] %% 360))
+  if (length(b) < 1L) return(90)                 # no spokes: straight up
+  if (length(b) < 2L) return((b + 180) %% 360)   # one spoke: opposite it
+  gaps <- diff(c(b, b[[1]] + 360))               # includes the wrap gap
+  mids <- (b + gaps / 2) %% 360
+  min(mids[gaps > max(gaps) - 1e-9])             # widest gap, smallest midpoint
 }
 
 #' @rdname circumplex-ggproto
@@ -100,6 +124,16 @@ CoordCircumplex <- ggplot2::ggproto(
         data_max <- self$center + 1
       }
       self$limits$r <- c(self$center, data_max)
+    }
+    # Place the amplitude (radial) axis in the widest spoke gap unless the caller
+    # pinned an angle, so its labels clear the spoke labels. The theta scale's
+    # breaks are the spokes; set r_axis_inside before delegating so the parent
+    # positions the radial axis guide there.
+    theta_scale <- if (self$theta == "x") scale_x else scale_y
+    self$r_axis_inside <- if (is.null(self$r_axis_angle)) {
+      ssm_r_axis_angle(theta_scale$get_breaks())
+    } else {
+      self$r_axis_angle %% 360
     }
     ggplot2::ggproto_parent(ggplot2::CoordRadial, self)$setup_panel_params(
       scale_x, scale_y, params
