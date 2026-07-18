@@ -99,7 +99,7 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
       `devel/m29-*-results.rds`, seeded, cell-indexed by level, smoke-first;
       interior + boundary cells; pre-registered acceptance in the script
       header; asserting test with a provenance comment.
-- [ ] **T4** — Discrimination oracle (§2.3.2 + RR07): the zeroed-cross-blocks
+- [x] **T4** — Discrimination oracle (§2.3.2 + RR07): the zeroed-cross-blocks
       occasions run ≡ the two-group independent diagnostic on coverage +
       `Median_width` (SE band); plus the dependent-vs-zeroed contrast
       `Median_width` ratio vs the closed-form Δe width target and a
@@ -125,9 +125,11 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
   `ssm_mc_replicates(occ_k=)` MC; flat/rank/structure/legacy refusals;
   occasions-aware `summary()` + R12). AC1/AC4 tests; `test()` clean.
 - 2026-07-17: T3 done — AC2 simulation-coverage oracle (`m29-*-oracle.{R,md}` +
-  committed `-results.rds`; R1=1000/R2=800/boots=300): diagnostic reported vs
-  direct empirical coverage of the real `ssm_analyze` procedure at the plug-in
-  (interior + pole × engines × contrast); 27/27 within the 4-SE band.
+  committed rds): diagnostic-reported vs direct empirical coverage of the real
+  `ssm_analyze` procedure at the plug-in; 27/27 within the 4-SE band.
+- 2026-07-17: T4 done — AC3 discrimination oracle (`m29-*-discrimination.{R,md}`
+  + committed rds): invariant (zeroed-occasions ≡ two-group ref) + closed-form Δe
+  width √(w′Σw/w′Σ₀w) <1% + Δd reversal sign; ≥2 oracle types met.
 
 ## Decisions
 

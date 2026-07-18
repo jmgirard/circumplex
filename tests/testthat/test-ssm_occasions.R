@@ -828,3 +828,42 @@ test_that("committed AC2 simulation-coverage oracle satisfies the registered ban
     }
   }
 })
+
+test_that("committed AC3 discrimination oracle satisfies the registered gates", {
+  # Pins devel/m29-ci-accuracy-occasions-discrimination.R. Coverage alone is
+  # blind to dependence-dropping; interval WIDTH discriminates. (A) the zeroed-
+  # cross-blocks occasions run reproduces the two-group independent diagnostic
+  # (invariant); (B) the dependent/zeroed elevation-contrast width ratio matches
+  # the closed-form sqrt(w'Sigma w / w'Sigma0 w) target; (C) the displacement
+  # ratio reverses sign across |Delta d| = 90. Skipped where devel/ is absent.
+  rds <- testthat::test_path("..", "..", "devel",
+                             "m29-ci-accuracy-occasions-discrimination-results.rds")
+  skip_if_not(file.exists(rds), "devel oracle results not present")
+  x <- readRDS(rds)
+  skip_if(isTRUE(x$smoke), "smoke-run rds carries no evidence")
+  base <- x$results$base
+  rev <- x$results$reversal
+
+  # (B) closed-form elevation width target, both cells (+/- 8%)
+  for (cell in list(base, rev)) {
+    obs <- cell$widthA[["e"]] / cell$widthB[["e"]]
+    expect_lt(abs(obs / cell$target_e - 1), 0.08)
+  }
+
+  # (C) displacement reversal: paired narrower at dd = 40, wider at dd = 135
+  expect_lt(base$widthA[["d"]] / base$widthB[["d"]], 1)
+  expect_gt(rev$widthA[["d"]] / rev$widthB[["d"]], 1)
+
+  # (A) invariant: zeroed occasions run (B) reproduces the two-group reference
+  # (C) on the contrast row -- coverage within the 4-SE band, Median_width
+  # within [0.90, 1.11] -- for the base cell.
+  for (pm in c("e", "a", "d")) {
+    cb <- base$covB[[pm]]; cc <- base$covC[[pm]]
+    band <- 4 * sqrt(cb * (1 - cb) / base$n_repsB +
+                       cc * (1 - cc) / base$n_repsC) + 0.010
+    expect_lte(abs(cb - cc), band)
+    wr <- base$widthB[[pm]] / base$widthC[[pm]]
+    expect_gt(wr, 0.90)
+    expect_lt(wr, 1.11)
+  }
+})
