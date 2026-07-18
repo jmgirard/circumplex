@@ -44,6 +44,8 @@ Functions for implementing the Structural Summary Method
   : Create a Difference Plot of SSM Contrast Results
 - [`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md)
   : Create a Curve Plot of SSM Results
+- [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+  : Create a Trajectory Plot of SSM Results Across Occasions
 - [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md)
   : Calculate Structural Summary Method parameters for a set of scores
 - [`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md)
