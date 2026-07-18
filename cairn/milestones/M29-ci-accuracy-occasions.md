@@ -90,7 +90,7 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
       grounded in [[D-017]] (RR07: construction (a), per-group observed stacked
       covariance, no CPM; `occ_k`-tagged storage; rank-deficiency
       warn-not-refuse; `(r−1) %/% k + 1` row↔group mapping).
-- [ ] **T2** — Implement the occasions path in `R/ssm_ci_accuracy.R`: remove
+- [x] **T2** — Implement the occasions path in `R/ssm_ci_accuracy.R`: remove
       the guard (:197), wire the stacked-MC population + wide-row simulation +
       per-occasion/contrast accuracy rows. Test-first (regression fixture
       asserting the correct population structure + boundary behavior).
@@ -110,22 +110,20 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
 
 ## Work log
 
-- 2026-07-17: created by /milestone-plan (longitudinal deferral §1.4). Sibling
-  M28 planned in the same run (§1.1 sugar).
-- 2026-07-17: /milestone-implement — status → in-progress; branch
-  m29-ci-accuracy-occasions cut from master.
-- 2026-07-17: question gate — storage settled (store stacked per-group stats at
-  analysis time); population structure (T1 ip-touching tripwire) escalated to a
-  fresh Fable RB.
-- 2026-07-17: blocked on RB07 (occasions plug-in population design; 6 questions).
+- 2026-07-17: created by /milestone-plan (deferral §1.4; sibling M28 §1.1).
+  /milestone-implement → in-progress; branch cut from master.
+- 2026-07-17: gate — storage settled (stacked per-group stats at analysis
+  time); population structure (T1 ip-touching) → RB07; blocked on RB07.
 - 2026-07-17: ingested RR07 (Fable) → M29-D1 + [[D-017]]; RB07/RR07 archived;
-  status → in-progress. No standing D-entry contradicted.
-- 2026-07-17: amendment gate (user-approved) — AC2 boundary/contrast, AC3 →
-  width + closed-form arms, AC4 → flat-occasion refusal; Scope oracle-battery
-  line + T1/T4 synced. Coverage map unchanged.
-- 2026-07-17: T1 done — `devel/m29-design.md` implementation blueprint
-  (population + loop, storage shape, the `(r−1) %/% k + 1` row↔group refactor,
-  structure-refusal, boundary/ladder/contrast unchanged, oracle plan).
+  in-progress. Amendment gate (user-approved): AC2 boundary/contrast, AC3 →
+  width + closed-form arms, AC4 → flat-refusal; Scope + T1/T4 synced.
+- 2026-07-17: T1 done — `devel/m29-design.md` blueprint (population/loop,
+  storage, `(r−1) %/% k + 1` row↔group refactor, oracle plan); per [[D-017]].
+- 2026-07-17: implement gate → M29-D2 (R12 add; shared-W bootstrap replay).
+- 2026-07-17: T2 done — occasions branch in `ssm_ci_accuracy.R` (stored stacked
+  per-group `(n,μ,Σ)`; guard removed; `MVN(μ,Σ̂_g)` via `mvn_root`; shared-W
+  bootstrap + `ssm_mc_replicates(occ_k=)` MC; flat/rank/structure/legacy
+  refusals; occasions-aware `summary()` + R12). AC1/AC4 tests; `test()` clean.
 
 ## Decisions
 
@@ -139,5 +137,13 @@ entry): R13 occasions `data=` fallback (refuse legacy `suff_stats = NULL` with a
 re-run message instead); R14 CPM-diagonal + observed-cross (98% non-PSD at
 n=25); R15 shrinkage (attenuates the dependence under test); R16 pooling across
 groups (replay is per-group).
+
+### M29-D2 (2026-07-17): R12 breadcrumb added; occasions bootstrap replay reuses the weight machinery
+
+Settled at the implement gate. **R12 (add):** `summary()` notes when a paired
+contrast's c=1 joint-certification rate (`cert[T1]&&cert[T2]`) is below `1−α` —
+the §2.2 caveat made legible; gates nothing. **Bootstrap replay:** reuse the
+weight path with one shared person-resample `W` across all k occasion blocks
+(same law as the person-row bootstrap); MC reuses `ssm_mc_replicates(occ_k=)`.
 
 ## Review

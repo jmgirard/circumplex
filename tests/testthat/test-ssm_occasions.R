@@ -563,13 +563,132 @@ test_that("ssm_plot_contrast plots an occasion contrast", {
   expect_error(ssm_plot_contrast(res2), "two occasions")
 })
 
-test_that("ssm_ci_accuracy errors informatively on occasions objects", {
+# ssm_ci_accuracy() occasions path (M29; D-017) -------------------------------
+
+test_that("occasions ci_accuracy population is the stacked cross-occasion covariance (AC1)", {
+  # A dependent fixture (rho = 0.7) and an independent one (rho = 0), same
+  # marginals: the stored stacked covariance must carry the within-person
+  # cross-occasion dependence in its off-diagonal p x p blocks, not zero them.
+  dep <- make_occ_data(n = 90, k = 2, rho = 0.7, seed = 101)
+  ind <- make_occ_data(n = 90, k = 2, rho = 0, seed = 101)
+  occ <- list(T1 = occ_names(1), T2 = occ_names(2))
+  p <- 8L
+  set.seed(201)
+  res_dep <- ssm_analyze(dep, occasions = occ, boots = 50)
+  set.seed(202)
+  res_ind <- ssm_analyze(ind, occasions = occ, boots = 50)
+
+  ss <- res_dep$details$suff_stats
+  expect_equal(ss$occ_k, 2L)
+  cov_dep <- ss$groups[["All"]]$cov
+  expect_equal(dim(cov_dep), c(2L * p, 2L * p))
+  cross_dep <- cov_dep[seq_len(p), p + seq_len(p)]
+  cross_ind <- res_ind$details$suff_stats$groups[["All"]]$cov[seq_len(p), p + seq_len(p)]
+  # dependent: the same-scale cross-occasion covariances (the block diagonal)
+  # track rho ~ 0.7; independent: they collapse toward zero
+  expect_gt(mean(diag(cross_dep)), 0.3)
+  expect_lt(mean(diag(cross_ind)), 0.15)
+
+  # the diagnostic consumes exactly that stacked covariance (its draw root is
+  # mvn_root of the stored cov), runs, and records the observed structure
+  set.seed(1)
+  acc <- ssm_ci_accuracy(res_dep, reps = 12, amplitude_factors = c(1))
+  expect_s3_class(acc, "circumplex_ci_accuracy")
+  expect_identical(acc$details$structure, "observed")
+  expect_equal(acc$details$occ_k, 2L)
+  expect_null(acc$cpm)
+  expect_true(all(c("T1", "T2") %in% acc$coverage$Profile))
+})
+
+test_that("occasions ci_accuracy runs both engines and reports a paired-contrast row", {
+  data <- make_contrast_data(n = 120, seed = 40)
+  occ <- list(T1 = occ_names(1), T2 = occ_names(2))
+  for (method in c("bootstrap", "montecarlo")) {
+    set.seed(40)
+    res <- ssm_analyze(data, occasions = occ, contrast = TRUE,
+                       boots = 150, method = method)
+    set.seed(41)
+    acc <- ssm_ci_accuracy(res, reps = 30, amplitude_factors = c(1, 0.25))
+    expect_s3_class(acc, "circumplex_ci_accuracy")
+    # the paired contrast row is present and its displacement verdict is
+    # unconditional (Parameter "d", not "d_conditional") -- M15-D1
+    con_lab <- "T2 - T1"
+    expect_true(con_lab %in% acc$coverage$Profile)
+    vd <- acc$verdict[acc$verdict$Profile == con_lab, ]
+    expect_true("d" %in% vd$Parameter)
+    expect_false("d_conditional" %in% vd$Parameter)
+    # coverage near nominal for the elevation contrast (loose, small reps)
+    ce <- acc$coverage[acc$coverage$Profile == con_lab &
+                         acc$coverage$Parameter == "e" &
+                         acc$coverage$Condition == 1, "Coverage"]
+    expect_gt(ce, 0.7)
+  }
+})
+
+test_that("occasions ci_accuracy refuses an explicit structure/cpm and a legacy object", {
   data <- make_contrast_data(n = 100, seed = 40)
-  set.seed(41)
   res <- ssm_analyze(data,
-    occasions = list(T1 = occ_names(1), T2 = occ_names(2)), boots = 50
+    occasions = list(T1 = occ_names(1), T2 = occ_names(2)), boots = 30
   )
-  expect_error(ssm_ci_accuracy(res), "occasion by occasion")
+  expect_error(ssm_ci_accuracy(res, structure = "cpm"),
+               "does not accept an explicit")
+  expect_error(ssm_ci_accuracy(res, structure = "observed"),
+               "does not accept an explicit")
+  expect_error(ssm_ci_accuracy(res, cpm = structure(list(), class = "circumplex_cpm")),
+               "does not accept an explicit")
+  # a pre-M29 occasions object (no stored stacked statistics) refuses
+  legacy <- res
+  legacy$details$suff_stats <- NULL
+  expect_error(ssm_ci_accuracy(legacy), "re-run ssm_analyze")
+})
+
+test_that("occasions ci_accuracy refuses a flat occasion by name (AC4)", {
+  data <- make_contrast_data(n = 60, seed = 12)
+  data[occ_names(2)] <- 3.0 # occasion 2 constant -> flat profile
+  res <- suppressWarnings(
+    ssm_analyze(data, occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+                boots = 20)
+  )
+  err <- expect_error(ssm_ci_accuracy(res, reps = 5))
+  expect_match(conditionMessage(err), "[Ff]lat")
+  expect_match(conditionMessage(err), "T2")
+})
+
+test_that("occasions ci_accuracy warns (not refuses) on a rank-deficient stacked covariance (AC4)", {
+  # n <= k*p = 16: the stacked covariance is singular but a proper degenerate
+  # normal; the run proceeds with a fit-statistic caveat rather than erroring
+  data <- make_contrast_data(n = 14, seed = 5)
+  set.seed(5)
+  res <- suppressWarnings(
+    ssm_analyze(data, occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+                boots = 20)
+  )
+  set.seed(6)
+  expect_warning(
+    acc <- ssm_ci_accuracy(res, reps = 6, amplitude_factors = c(1)),
+    "[Rr]ank-deficient"
+  )
+  expect_s3_class(acc, "circumplex_ci_accuracy")
+  expect_true(isTRUE(acc$details$rank_deficiency[["All"]]$deficient))
+})
+
+test_that("occasions ci_accuracy handles a pole-straddling occasion without error (AC4)", {
+  # occasion 1 peaks on the 0/360 pole; the diagnostic's angular coverage
+  # (mod-360 arc membership) must run and report a finite displacement row
+  data <- make_contrast_data(n = 80, d1 = 0, dd = 90, seed = 7)
+  for (method in c("bootstrap", "montecarlo")) {
+    set.seed(8)
+    res <- ssm_analyze(data,
+      occasions = list(T1 = occ_names(1), T2 = occ_names(2)),
+      boots = 150, method = method
+    )
+    set.seed(9)
+    acc <- ssm_ci_accuracy(res, reps = 15, amplitude_factors = c(1))
+    dcov <- acc$coverage[acc$coverage$Profile == "T1" &
+                           acc$coverage$Parameter == "d" &
+                           acc$coverage$Condition == 1, "Coverage"]
+    expect_true(is.finite(dcov))
+  }
 })
 
 # Boundary battery (CLAUDE.md; spec sec. 2.3 item 4) --------------------------
