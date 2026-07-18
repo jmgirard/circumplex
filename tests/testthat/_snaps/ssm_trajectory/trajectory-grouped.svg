@@ -228,6 +228,7 @@
 <rect x='446.17' y='534.40' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <circle cx='454.81' cy='543.04' r='2.49' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
 <rect x='498.37' y='534.40' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='507.01' cy='543.04' r='2.49' style='stroke-width: 0.71;' />
 <text x='468.93' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='23.96px' lengthAdjust='spacingAndGlyphs'>TRUE</text>
 <text x='521.13' y='546.07' style='font-size: 8.80px; font-family: sans;' textLength='27.88px' lengthAdjust='spacingAndGlyphs'>FALSE</text>
 <text x='22.64' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='106.41px' lengthAdjust='spacingAndGlyphs'>trajectory grouped</text>

@@ -1,5 +1,14 @@
 # circumplex (development version)
 
+* `ssm_plot_trajectory()`'s "Displacement interpretable" legend now draws both
+  of its keys. Previously, when no occasion was flagged as uninterpretable, the
+  `FALSE` key appeared as a label with no symbol beside it, so the legend named
+  an encoding it never showed.
+
+* `coord_circumplex()` now rejects a non-finite `amax` or `center` with a
+  message naming the argument, instead of accepting an infinite value and
+  failing later inside the rendering with an unrelated error.
+
 * The "Advanced Circumplex Visualization" vignette has been rewritten over the
   new plotting API. It now teaches `coord_circumplex()` as the owner of the
   amplitude-to-radius mapping (replacing the old advice to keep a per-layer

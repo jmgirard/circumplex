@@ -617,7 +617,16 @@ ssm_trajectory_ggplot <- function(df, time_col, xlab, base_size, na.rm) {
         data = d_rows,
         mapping = ggplot2::aes(shape = .data$Certified),
         size = 2,
-        na.rm = TRUE
+        na.rm = TRUE,
+        # Under the default (NA), ggplot2 drops a key's GLYPH for any break the
+        # layer's own data does not contain: a trajectory with nothing
+        # uncertified rendered the FALSE key as a label with no symbol beside
+        # it -- a legend naming an encoding it never showed. show.legend = TRUE
+        # makes the layer claim every break the scale defines, so the hollow
+        # key is drawn whether or not an uncertified occasion happens to exist.
+        # Keeping the break alive with drop = FALSE is necessary but not
+        # sufficient, and an `override.aes` shape vector does not reach the key.
+        show.legend = TRUE
       ) +
       ggplot2::scale_shape_manual(
         name = "Displacement interpretable",

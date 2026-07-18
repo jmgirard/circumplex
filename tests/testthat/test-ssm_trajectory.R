@@ -357,6 +357,25 @@ test_that("uncertified occasions render hollow and certified ones filled", {
   expect_equal(sum(pts$shape == 1), 1) # exactly the uncensored occasion
 })
 
+test_that("the certification legend draws both keys when nothing is uncertified", {
+  res <- traj_fit()
+  df <- ssm_trajectory_frame(res)
+  expect_true(all(df$Certified)) # the regime the defect hides in
+
+  # ggplot2 draws a key's glyph only for values present in layer data, so the
+  # FALSE break kept alive by drop = FALSE used to render as a label with a
+  # zeroGrob where its hollow symbol belongs -- a legend that names an encoding
+  # it does not show. Read the rendered keys, not the scale.
+  keys <- legend_key_glyphs(ssm_plot_trajectory(res), "Displacement interpretable")
+
+  expect_length(keys, 2)
+  expect_false(any(vapply(keys, function(k) all(is.na(k)), logical(1))))
+  # Exactly one glyph per key: two layers both claiming the legend would
+  # overdraw identical symbols on the keys they can fill.
+  expect_equal(unname(lengths(keys)), c(1L, 1L))
+  expect_equal(sort(unname(unlist(keys))), c(1, 16))
+})
+
 test_that("na.rm = FALSE names the dropped occasion count", {
   res <- traj_fit()
   res$results$a_est[[2]] <- NA_real_

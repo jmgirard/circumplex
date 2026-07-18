@@ -33,9 +33,17 @@ test_that("coord_circumplex() validates amax and center", {
   # A bad `center` is named even when `amax` is also supplied (validation order:
   # the comparison must not fire its message before `center` is type-checked).
   expect_error(coord_circumplex(amax = 1, center = "x"), "center")
-  # NA amax/center yield a clean message, not a cryptic "missing value" error.
-  expect_error(coord_circumplex(amax = NA_real_), "greater than")
-  expect_error(coord_circumplex(center = NA_real_), "is.na")
+  # Non-finite amax/center yield a clean message naming the argument, not a
+  # cryptic "missing value" error and not a render-time NaN. is.na(Inf) is
+  # FALSE, so an is.na() guard passes +/-Inf straight through to the transform
+  # (LESSONS 2026-07-18, M32); these must all be caught at call time.
+  for (bad in list(NA_real_, NaN, Inf, -Inf)) {
+    expect_error(coord_circumplex(amax = bad), "`amax`.*finite")
+    expect_error(coord_circumplex(center = bad), "`center`.*finite")
+  }
+  # A finite amax below a finite center still reports the comparison, not
+  # finiteness -- the two guards stay distinguishable.
+  expect_error(coord_circumplex(amax = 0.2, center = 0.5), "greater than")
 })
 
 test_that("amax and center are the radial limits, trained in one place", {
