@@ -10,13 +10,14 @@ library(circumplex)
 The
 [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md),
 [`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md),
+[`ssm_plot_contrast()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.md),
 and
-[`ssm_plot_contrast()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.md)
+[`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
 functions cover the most common circumplex figures, but they each
 produce a finished plot with a fixed set of layers. Sometimes you want
 more control: to overlay individual respondents on a group profile, to
-annotate a specific region of the circle, to restyle the points, or to
-place several circumplex panels side by side.
+zoom in on a band of amplitudes, to restyle the points, or to place
+several circumplex panels side by side.
 
 To make that possible, `circumplex` exposes the building blocks that the
 built-in plots are themselves made of. These are ordinary
@@ -24,15 +25,23 @@ built-in plots are themselves made of. These are ordinary
 them with `+` and combine them freely with any other `ggplot2` layers,
 scales, and themes:
 
+- [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+  is the **coordinate system**. It maps the `displacement` aesthetic
+  (degrees) onto the angle and the `amplitude` aesthetic onto the
+  radius, and it owns the amplitude-to-radius scaling for the whole
+  plot.
 - [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
-  draws the empty circular **canvas** (amplitude rings, displacement
-  spokes, and scale labels).
+  assembles the empty circular **canvas** — the coordinate system plus
+  the amplitude rings, displacement spokes, and scale labels.
 - [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
   and
   [`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md)
-  are polar-native **layers** that place profile points and their
-  confidence regions in the circle, taking amplitude and displacement
-  directly as aesthetics.
+  are the **layers** that place profile points and their confidence
+  regions in the circle, taking amplitude and displacement directly as
+  aesthetics.
+- [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md)
+  is the **theme** the canvas is drawn with, and the rings and spokes
+  are ordinary themed panel furniture that respond to further theming.
 - [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
   is a **scale** for the angle axis of linear circumplex plots (such as
   the score-by-angle curve).
@@ -74,16 +83,17 @@ ggcircumplex(instrument = csip)
 
 ![](advanced-visualization_files/figure-html/canvas-instrument-1.png)
 
-The `amax` argument sets the amplitude represented by the outer ring; it
-also determines the amplitude gridline labels. It matters because it is
-the shared reference that the data layers below must agree with, as we
-will see next.
+Throughout, displacement runs counterclockwise from the right, and the
+0/360 degree position is labeled 360.
 
-## Placing SSM results in the circle
+## The coordinate system
 
-Let’s estimate a Structural Summary Method (SSM) profile for two
-measures and draw it on the canvas ourselves, rather than calling
-[`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md).
+[`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+is a convenience wrapper. Underneath it, the piece that makes a
+circumplex plot circular is
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
+and you can add that to a bare `ggplot()` yourself when you want to
+build a figure from scratch:
 
 ``` r
 
@@ -96,7 +106,88 @@ results$results[, c("Label", "a_est", "d_est", "a_lci", "a_uci")]
 #>   Label    a_est    d_est     a_lci     a_uci
 #> 1 NARPD 0.189244 108.9667 0.1537900 0.2271848
 #> 2  ASPD 0.226159 115.9267 0.1905403 0.2640428
+
+ggplot(results$results) +
+  coord_circumplex(amax = 0.3) +
+  geom_ssm_point(aes(amplitude = a_est, displacement = d_est, fill = Label)) +
+  theme_circumplex()
 ```
+
+![](advanced-visualization_files/figure-html/coord-bare-1.png)
+
+That is the minimum: a coordinate system and a layer. The spokes fall on
+`ggplot2`’s default axis breaks rather than on the circumplex scale
+angles, because a bare coordinate system has not been told what the
+scales are — supplying those breaks and labels, along with the theme, is
+exactly what
+[`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+adds on top.
+
+Because the coordinate system owns the amplitude-to-radius mapping,
+`amax` is set exactly once per plot and the canvas and the data layers
+cannot disagree about what a given radius means. (Earlier versions of
+the package took an `amax` argument on each layer; those arguments are
+now deprecated and ignored, with a one-time note.) Leaving `amax = NULL`
+trains it from the data, as
+[`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+does.
+
+### Moving the center
+
+By default the center of the circle is amplitude 0, so radial distance
+is proportional to amplitude and the origin means “no differentiation
+among the scales.” The `center` argument moves that inner limit, which
+is useful when every profile sits in a narrow band of amplitudes and the
+interesting variation is squeezed against the rim:
+
+``` r
+
+ggplot(results$results) +
+  coord_circumplex(amax = 0.28, center = 0.15) +
+  scale_x_continuous(breaks = octants(), labels = PANO()) +
+  geom_ssm_point(aes(amplitude = a_est, displacement = d_est, fill = Label)) +
+  theme_circumplex()
+```
+
+![](advanced-visualization_files/figure-html/coord-center-1.png)
+
+This is a zoom, and it changes how the figure should be read. With a
+nonzero center, radial distance is no longer proportional to amplitude
+and the origin no longer represents zero amplitude, so differences in
+radius are exaggerated relative to the default view. The amplitude ring
+labels still report the true amplitudes, and they are what the reader
+should be directed to. Use a nonzero center to resolve closely spaced
+profiles, and say so in the caption.
+
+### Moving the amplitude axis
+
+The amplitude (radial) axis and its tick labels are placed automatically
+in the widest gap between the displacement spokes, so they never collide
+with a spoke label. You can override that with `r_axis_angle`, given as
+a displacement in degrees:
+
+``` r
+
+ggplot(results$results) +
+  coord_circumplex(amax = 0.3, r_axis_angle = 67.5) +
+  scale_x_continuous(breaks = octants(), labels = PANO()) +
+  geom_ssm_point(aes(amplitude = a_est, displacement = d_est, fill = Label)) +
+  theme_circumplex()
+```
+
+![](advanced-visualization_files/figure-html/coord-r-axis-1.png)
+
+Note that these examples build the canvas from its parts — the
+coordinate system, an x-scale carrying the spoke breaks and labels, and
+the theme — rather than adding a second coordinate system on top of
+[`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
+which `ggplot2` would replace with a message.
+
+## Placing SSM results in the circle
+
+Let’s draw the two-measure profile from above on a labeled canvas
+ourselves, rather than calling
+[`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md).
 
 [`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
 places a point for each profile at its amplitude (`a_est`) and
@@ -108,15 +199,9 @@ the SSM parameters directly as aesthetics and handle the conversion into
 circular coordinates internally, including wrap-around when a
 displacement interval crosses the 0/360 degree boundary.
 
-The one rule to remember is that **`amax` must be the same** for the
-canvas and for every data layer, so that amplitudes map onto the same
-radius. Here we set it once and reuse it:
-
 ``` r
 
-amax <- 1
-
-ggcircumplex(octants(), labels = PANO(), amax = amax) +
+ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
   geom_ssm_arc(
     data = results$results,
     mapping = aes(
@@ -124,18 +209,12 @@ ggcircumplex(octants(), labels = PANO(), amax = amax) +
       displacement_min = d_lci, displacement_max = d_uci,
       fill = Label
     ),
-    amax = amax, alpha = 0.4, color = NA
+    alpha = 0.4, color = NA
   ) +
   geom_ssm_point(
     data = results$results,
-    mapping = aes(amplitude = a_est, displacement = d_est, fill = Label),
-    amax = amax
+    mapping = aes(amplitude = a_est, displacement = d_est, fill = Label)
   )
-#> ! The `amax` argument of `geom_ssm_arc()` is deprecated and ignored.
-#> ℹ Amplitude scaling is now owned by `coord_circumplex()`; set `amax` there (or via `ggcircumplex(amax = )`).
-#> ! The `amax` argument of `geom_ssm_point()` is deprecated and ignored.
-#> ℹ Amplitude scaling is now owned by `coord_circumplex()`; set `amax` there (or via `ggcircumplex(amax = )`).
-#> This message is displayed once per session.
 ```
 
 ![](advanced-visualization_files/figure-html/results-plot-1.png)
@@ -153,6 +232,74 @@ interpreting at all when the amplitude interval is clearly above zero
 and the model fits reasonably well (see the “Introduction to SSM
 Analysis” vignette and
 [`?ssm_analyze`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)).
+
+## Restyling the canvas
+
+[`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md)
+is the theme
+[`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+applies. Because the rings, spokes, and labels are themed panel
+furniture rather than drawn geometry, any further theming reaches them.
+Adjust the base font size through the theme, and restyle the gridlines
+with an ordinary `theme()` call:
+
+``` r
+
+ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
+  geom_ssm_point(
+    data = results$results,
+    mapping = aes(amplitude = a_est, displacement = d_est, fill = Label)
+  ) +
+  theme_circumplex(base_size = 14) +
+  theme(
+    panel.grid.major = element_line(color = "steelblue", linetype = "dotted"),
+    legend.position = "bottom"
+  )
+```
+
+![](advanced-visualization_files/figure-html/theming-1.png)
+
+## Extending the layers
+
+The `ggplot2` objects behind the layers and the coordinate system —
+`GeomSsmPoint`, `GeomSsmArc`, and `CoordCircumplex` — are exported, so
+you can subclass them the same way you would subclass any `ggplot2`
+geom. This is the route to a reusable layer with your own defaults,
+rather than repeating the same arguments at every call site.
+
+``` r
+
+GeomSsmStar <- ggproto("GeomSsmStar", GeomSsmPoint,
+  default_aes = modifyList(
+    GeomSsmPoint$default_aes,
+    list(shape = 23, size = 5, fill = "#D55E00", colour = "black")
+  )
+)
+
+geom_ssm_star <- function(mapping = NULL, data = NULL, ...) {
+  layer(
+    geom = GeomSsmStar, mapping = mapping, data = data,
+    stat = "identity", position = "identity",
+    inherit.aes = FALSE, params = list(...)
+  )
+}
+
+ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
+  geom_ssm_star(
+    data = results$results,
+    mapping = aes(amplitude = a_est, displacement = d_est)
+  )
+```
+
+![](advanced-visualization_files/figure-html/subclass-1.png)
+
+Everything the parent geom does — mapping amplitude and displacement
+onto the positional aesthetics, and dropping profiles with no defined
+location — is inherited; only the defaults change. The polar transform
+itself is not part of the geom: as above,
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+owns it, which is why the subclass needs no circular arithmetic of its
+own.
 
 ## Composing custom layers
 
@@ -178,27 +325,133 @@ people <- people[!is.na(people$Disp), ]
 # Group-level profile for the same subset
 group <- ssm_analyze(jz2017[1:100, ], scales = PANO())
 
-amax <- 3
+# The group amplitude is shorter than a typical individual amplitude
+c(group = group$results$a_est, median_individual = median(people$Ampl))
+#>             group median_individual 
+#>         0.3651863         0.5189425
 
-ggcircumplex(octants(), labels = PANO(), amax = amax) +
+ggcircumplex(octants(), labels = PANO(), amax = 1.75) +
   geom_ssm_point(
     data = people,
     mapping = aes(amplitude = Ampl, displacement = Disp),
-    amax = amax, fill = "grey70", size = 1.5, alpha = 0.6
+    fill = "grey70", size = 1.5, alpha = 0.6
   ) +
   geom_ssm_point(
     data = group$results,
     mapping = aes(amplitude = a_est, displacement = d_est),
-    amax = amax, fill = "#0072B2", size = 4
+    fill = "#0072B2", size = 4
   )
 ```
 
 ![](advanced-visualization_files/figure-html/individuals-1.png)
 
-The individual points spread around the circle while the group summary
-sits near their center of mass, a picture that none of the built-in
-functions produce directly. Any other `ggplot2` layer — text
-annotations, additional geoms, faceting — can be added the same way.
+The individual points spread widely around the circle while the group
+summary sits close to the origin, a picture that none of the built-in
+functions produce directly. That contrast is not an artifact: the group
+profile is the SSM of the *mean* scale scores, so its position is the
+average of the individual positions in (x, y) — and averaging vectors
+that point in different directions yields a resultant shorter than the
+typical individual vector, as the two amplitudes printed above show. A
+group amplitude smaller than a typical person’s therefore indicates
+disagreement about *direction* among the respondents, not that each
+person’s profile is flat. Any other `ggplot2` layer — text annotations,
+additional geoms, faceting — can be added the same way.
+
+## Trajectories across occasions
+
+When the same people are measured on the same scales at two or more
+occasions,
+[`ssm_analyze_long()`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze_long.md)
+(for long data) or `ssm_analyze(occasions = )` (for wide data) estimates
+one SSM profile per occasion, resampling persons so that within-person
+dependence across occasions is respected.
+[`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+then draws each SSM parameter against time.
+
+Here is a small simulated three-wave data set whose group profile
+rotates counterclockwise across the 0/360 degree boundary, which is the
+case worth seeing drawn:
+
+``` r
+
+angles <- octants()
+n <- 200
+waves <- c(T1 = 330, T2 = 355, T3 = 20) # true displacement at each wave
+elevation <- rnorm(n) * 0.5 # per-person offset, stable across waves
+
+long <- do.call(rbind, lapply(names(waves), function(w) {
+  # Group signal at this wave, plus the stable person offset and fresh noise
+  signal <- 0.6 * cos((angles - waves[[w]]) * pi / 180)
+  scores <- matrix(signal, nrow = n, ncol = length(angles), byrow = TRUE) +
+    elevation +
+    matrix(rnorm(n * length(angles), sd = 0.5), nrow = n)
+  out <- as.data.frame(scores)
+  names(out) <- PANO()
+  out$id <- seq_len(n)
+  out$wave <- w
+  out
+}))
+
+results_long <- ssm_analyze_long(
+  long,
+  scales = PANO(),
+  id = "id",
+  occasion = "wave"
+)
+results_long$results[, c("Occasion", "a_est", "d_est", "d_lci", "d_uci")]
+#>   Occasion     a_est     d_est     d_lci     d_uci
+#> 1       T1 0.6133765 332.44652 329.70848 335.43024
+#> 2       T2 0.5879017 355.92454 352.64902 359.30751
+#> 3       T3 0.5907495  17.84307  14.57562  21.11586
+```
+
+``` r
+
+ssm_plot_trajectory(results_long, drop_xy = TRUE)
+```
+
+![](advanced-visualization_files/figure-html/occasions-plot-1.png)
+
+Two things about the displacement panel are worth reading carefully.
+First, it is drawn on an *unwrapped* branch: the profile crosses the
+0/360 boundary between the second and third wave, and rather than
+jumping a full turn the panel continues past 360, so values outside \[0,
+360) are expected there. Second, the occasion order comes from the data
+rather than from the plot: for a character occasion column it is
+first-appearance order, and for a factor it is the factor’s level order.
+Note that [`factor()`](https://rdrr.io/r/base/factor.html) sorts its
+levels alphabetically by default, which would place `T10` before `T2` —
+so if your occasion column is a factor, set its levels in temporal
+order.
+
+The unwrap carries an assumption that no data can check: that the
+profile rotates less than a half-turn between consecutive occasions.
+Waves that are far apart in time, or a series with a gap, could rotate
+further than that and would be drawn as the shorter rotation regardless,
+so read widely spaced occasions with that in mind.
+
+A time point whose amplitude interval is too close to zero for its
+displacement to be interpretable is drawn as a hollow point — a marker
+of an interpretability precondition, not a significance test.
+`drop_xy = TRUE` above omits the X-value and Y-value panels, leaving
+elevation, amplitude, and displacement.
+
+The bands are the per-occasion confidence intervals, one per time point.
+They are not a simultaneous confidence band for the trajectory as a
+whole, and overlap (or its absence) between two occasions’ bands is not
+a test of change between them; for that, estimate the contrast directly
+(see
+[`?ssm_analyze`](http://circumplex.jmgirard.com/dev/reference/ssm_analyze.md)
+and
+[`ssm_plot_contrast()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.md)).
+
+[`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+also accepts a trajectory table — a data frame of
+`a_est`/`a_lci`/`a_uci` and `d_est`/`d_lci`/`d_uci` triples at numeric
+time points — which is how you plot a *model-based* trajectory evaluated
+from a fitted growth model rather than one estimated separately at each
+wave. That workflow is the subject of the “Growth Models on SSM
+Parameters” vignette.
 
 ## The angle axis for linear plots
 

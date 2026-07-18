@@ -89,6 +89,14 @@ ssm_plot_circle(
 
 A ggplot variable containing a completed circular plot.
 
+## See also
+
+Other visualization functions:
+[`plot.circumplex_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_ci_accuracy.md),
+[`ssm_plot_contrast()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.md),
+[`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md),
+[`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+
 ## Examples
 
 ``` r

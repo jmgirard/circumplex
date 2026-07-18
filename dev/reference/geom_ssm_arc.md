@@ -72,9 +72,12 @@ since they do not name a unique arc.
 
 ## See also
 
+Other circumplex layers:
 [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
+[`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
 [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
-[`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md)
+[`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md),
+[`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md)
 
 ## Examples
 

@@ -38,14 +38,6 @@ Functions for implementing the Structural Summary Method
   : Perform SSM analyses on long-format repeated-measures data
 - [`ssm_table()`](http://circumplex.jmgirard.com/dev/reference/ssm_table.md)
   : Create HTML table from SSM results or contrasts
-- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
-  : Create a Circular Plot of SSM Results
-- [`ssm_plot_contrast()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.md)
-  : Create a Difference Plot of SSM Contrast Results
-- [`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md)
-  : Create a Curve Plot of SSM Results
-- [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
-  : Create a Trajectory Plot of SSM Results Over Time
 - [`ssm_parameters()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters.md)
   : Calculate Structural Summary Method parameters for a set of scores
 - [`ssm_parameters_id()`](http://circumplex.jmgirard.com/dev/reference/ssm_parameters_id.md)
@@ -100,9 +92,22 @@ Functions for evaluating circumplex structure and CI trustworthiness
 - [`plot(`*`<circumplex_ci_accuracy>`*`)`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_ci_accuracy.md)
   : Plot SSM CI accuracy across the amplitude ladder
 
-## Visualization Layer
+## Visualization - Complete Plots
 
-Composable ggplot2 components for building circumplex figures
+Ready-made circumplex figures for a set of SSM results
+
+- [`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md)
+  : Create a Circular Plot of SSM Results
+- [`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md)
+  : Create a Curve Plot of SSM Results
+- [`ssm_plot_contrast()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.md)
+  : Create a Difference Plot of SSM Contrast Results
+- [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+  : Create a Trajectory Plot of SSM Results Over Time
+
+## Visualization - Building Blocks
+
+Composable ggplot2 components for building custom circumplex figures
 
 - [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
   : Create a circumplex plotting canvas

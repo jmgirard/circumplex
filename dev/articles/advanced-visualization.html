@@ -101,12 +101,12 @@
 <h2 id="beyond-the-built-in-plots">Beyond the built-in plots<a class="anchor" aria-label="anchor" href="#beyond-the-built-in-plots"></a>
 </h2>
 <p>The <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>, <code><a href="../reference/ssm_plot_curve.html">ssm_plot_curve()</a></code>,
-and <code><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code> functions cover the most common
-circumplex figures, but they each produce a finished plot with a fixed
-set of layers. Sometimes you want more control: to overlay individual
-respondents on a group profile, to annotate a specific region of the
-circle, to restyle the points, or to place several circumplex panels
-side by side.</p>
+<code><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code>, and <code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code>
+functions cover the most common circumplex figures, but they each
+produce a finished plot with a fixed set of layers. Sometimes you want
+more control: to overlay individual respondents on a group profile, to
+zoom in on a band of amplitudes, to restyle the points, or to place
+several circumplex panels side by side.</p>
 <p>To make that possible, <code>circumplex</code> exposes the building
 blocks that the built-in plots are themselves made of. These are
 ordinary <a href="https://ggplot2.tidyverse.org/" class="external-link"><code>ggplot2</code></a>
@@ -115,14 +115,24 @@ freely with any other <code>ggplot2</code> layers, scales, and
 themes:</p>
 <ul>
 <li>
-<code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> draws the empty circular
-<strong>canvas</strong> (amplitude rings, displacement spokes, and scale
-labels).</li>
+<code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code> is the <strong>coordinate
+system</strong>. It maps the <code>displacement</code> aesthetic
+(degrees) onto the angle and the <code>amplitude</code> aesthetic onto
+the radius, and it owns the amplitude-to-radius scaling for the whole
+plot.</li>
+<li>
+<code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> assembles the empty circular
+<strong>canvas</strong> — the coordinate system plus the amplitude
+rings, displacement spokes, and scale labels.</li>
 <li>
 <code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code> and <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> are
-polar-native <strong>layers</strong> that place profile points and their
+the <strong>layers</strong> that place profile points and their
 confidence regions in the circle, taking amplitude and displacement
 directly as aesthetics.</li>
+<li>
+<code><a href="../reference/theme_circumplex.html">theme_circumplex()</a></code> is the <strong>theme</strong> the
+canvas is drawn with, and the rings and spokes are ordinary themed panel
+furniture that respond to further theming.</li>
 <li>
 <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> is a <strong>scale</strong> for
 the angle axis of linear circumplex plots (such as the score-by-angle
@@ -151,17 +161,17 @@ are taken from the instrument:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span>instrument <span class="op">=</span> <span class="va">csip</span><span class="op">)</span></span></code></pre></div>
 <p><img src="advanced-visualization_files/figure-html/canvas-instrument-1.png" class="r-plt" alt="" width="100%"></p>
-<p>The <code>amax</code> argument sets the amplitude represented by the
-outer ring; it also determines the amplitude gridline labels. It matters
-because it is the shared reference that the data layers below must agree
-with, as we will see next.</p>
+<p>Throughout, displacement runs counterclockwise from the right, and
+the 0/360 degree position is labeled 360.</p>
 </div>
 <div class="section level2">
-<h2 id="placing-ssm-results-in-the-circle">Placing SSM results in the circle<a class="anchor" aria-label="anchor" href="#placing-ssm-results-in-the-circle"></a>
+<h2 id="the-coordinate-system">The coordinate system<a class="anchor" aria-label="anchor" href="#the-coordinate-system"></a>
 </h2>
-<p>Let’s estimate a Structural Summary Method (SSM) profile for two
-measures and draw it on the canvas ourselves, rather than calling
-<code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>.</p>
+<p><code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> is a convenience wrapper. Underneath it,
+the piece that makes a circumplex plot circular is
+<code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code>, and you can add that to a bare
+<code>ggplot()</code> yourself when you want to build a figure from
+scratch:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span></span>
 <span>  <span class="va">jz2017</span>,</span>
@@ -171,7 +181,75 @@ measures and draw it on the canvas ourselves, rather than calling
 <span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Label"</span>, <span class="st">"a_est"</span>, <span class="st">"d_est"</span>, <span class="st">"a_lci"</span>, <span class="st">"a_uci"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   Label    a_est    d_est     a_lci     a_uci</span></span>
 <span><span class="co">#&gt; 1 NARPD 0.189244 108.9667 0.1537900 0.2271848</span></span>
-<span><span class="co">#&gt; 2  ASPD 0.226159 115.9267 0.1905403 0.2640428</span></span></code></pre></div>
+<span><span class="co">#&gt; 2  ASPD 0.226159 115.9267 0.1905403 0.2640428</span></span>
+<span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="advanced-visualization_files/figure-html/coord-bare-1.png" class="r-plt" alt="" width="100%"></p>
+<p>That is the minimum: a coordinate system and a layer. The spokes fall
+on <code>ggplot2</code>’s default axis breaks rather than on the
+circumplex scale angles, because a bare coordinate system has not been
+told what the scales are — supplying those breaks and labels, along with
+the theme, is exactly what <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> adds on top.</p>
+<p>Because the coordinate system owns the amplitude-to-radius mapping,
+<code>amax</code> is set exactly once per plot and the canvas and the
+data layers cannot disagree about what a given radius means. (Earlier
+versions of the package took an <code>amax</code> argument on each
+layer; those arguments are now deprecated and ignored, with a one-time
+note.) Leaving <code>amax = NULL</code> trains it from the data, as
+<code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code> does.</p>
+<div class="section level3">
+<h3 id="moving-the-center">Moving the center<a class="anchor" aria-label="anchor" href="#moving-the-center"></a>
+</h3>
+<p>By default the center of the circle is amplitude 0, so radial
+distance is proportional to amplitude and the origin means “no
+differentiation among the scales.” The <code>center</code> argument
+moves that inner limit, which is useful when every profile sits in a
+narrow band of amplitudes and the interesting variation is squeezed
+against the rim:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.28</span>, center <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="advanced-visualization_files/figure-html/coord-center-1.png" class="r-plt" alt="" width="100%"></p>
+<p>This is a zoom, and it changes how the figure should be read. With a
+nonzero center, radial distance is no longer proportional to amplitude
+and the origin no longer represents zero amplitude, so differences in
+radius are exaggerated relative to the default view. The amplitude ring
+labels still report the true amplitudes, and they are what the reader
+should be directed to. Use a nonzero center to resolve closely spaced
+profiles, and say so in the caption.</p>
+</div>
+<div class="section level3">
+<h3 id="moving-the-amplitude-axis">Moving the amplitude axis<a class="anchor" aria-label="anchor" href="#moving-the-amplitude-axis"></a>
+</h3>
+<p>The amplitude (radial) axis and its tick labels are placed
+automatically in the widest gap between the displacement spokes, so they
+never collide with a spoke label. You can override that with
+<code>r_axis_angle</code>, given as a displacement in degrees:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/coord_circumplex.html">coord_circumplex</a></span><span class="op">(</span>amax <span class="op">=</span> <span class="fl">0.3</span>, r_axis_angle <span class="op">=</span> <span class="fl">67.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="advanced-visualization_files/figure-html/coord-r-axis-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Note that these examples build the canvas from its parts — the
+coordinate system, an x-scale carrying the spoke breaks and labels, and
+the theme — rather than adding a second coordinate system on top of
+<code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code>, which <code>ggplot2</code> would replace
+with a message.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="placing-ssm-results-in-the-circle">Placing SSM results in the circle<a class="anchor" aria-label="anchor" href="#placing-ssm-results-in-the-circle"></a>
+</h2>
+<p>Let’s draw the two-measure profile from above on a labeled canvas
+ourselves, rather than calling <code><a href="../reference/ssm_plot_circle.html">ssm_plot_circle()</a></code>.</p>
 <p><code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code> places a point for each profile at its
 amplitude (<code>a_est</code>) and displacement (<code>d_est</code>),
 and <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> draws the wedge spanning each profile’s
@@ -180,14 +258,8 @@ interval angularly. Both take the SSM parameters directly as aesthetics
 and handle the conversion into circular coordinates internally,
 including wrap-around when a displacement interval crosses the 0/360
 degree boundary.</p>
-<p>The one rule to remember is that <strong><code>amax</code> must be
-the same</strong> for the canvas and for every data layer, so that
-amplitudes map onto the same radius. Here we set it once and reuse
-it:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">amax</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="va">amax</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_arc.html">geom_ssm_arc</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">results</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span></span>
@@ -195,18 +267,12 @@ it:</p>
 <span>      displacement_min <span class="op">=</span> <span class="va">d_lci</span>, displacement_max <span class="op">=</span> <span class="va">d_uci</span>,</span>
 <span>      fill <span class="op">=</span> <span class="va">Label</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    amax <span class="op">=</span> <span class="va">amax</span>, alpha <span class="op">=</span> <span class="fl">0.4</span>, color <span class="op">=</span> <span class="cn">NA</span></span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.4</span>, color <span class="op">=</span> <span class="cn">NA</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">results</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span>,</span>
-<span>    amax <span class="op">=</span> <span class="va">amax</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> The `amax` argument of `geom_ssm_arc()` is deprecated and ignored.</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Amplitude scaling is now owned by `coord_circumplex()`; set `amax` there (or via `ggcircumplex(amax = )`).</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> The `amax` argument of `geom_ssm_point()` is deprecated and ignored.</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Amplitude scaling is now owned by `coord_circumplex()`; set `amax` there (or via `ggcircumplex(amax = )`).</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This message is displayed once per session.</span></span></span></code></pre></div>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="advanced-visualization_files/figure-html/results-plot-1.png" class="r-plt" alt="" width="100%"></p>
 <p>Each arc displays two separate confidence intervals for one profile
 at once: its radial extent is the amplitude interval and its angular
@@ -222,6 +288,66 @@ zero and the model fits reasonably well (see the “Introduction to SSM
 Analysis” vignette and <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code>).</p>
 </div>
 <div class="section level2">
+<h2 id="restyling-the-canvas">Restyling the canvas<a class="anchor" aria-label="anchor" href="#restyling-the-canvas"></a>
+</h2>
+<p><code><a href="../reference/theme_circumplex.html">theme_circumplex()</a></code> is the theme
+<code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> applies. Because the rings, spokes, and
+labels are themed panel furniture rather than drawn geometry, any
+further theming reaches them. Adjust the base font size through the
+theme, and restyle the gridlines with an ordinary <code>theme()</code>
+call:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">results</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span>, fill <span class="op">=</span> <span class="va">Label</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_circumplex.html">theme_circumplex</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">14</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span></span>
+<span>    panel.grid.major <span class="op">=</span> <span class="fu">element_line</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"steelblue"</span>, linetype <span class="op">=</span> <span class="st">"dotted"</span><span class="op">)</span>,</span>
+<span>    legend.position <span class="op">=</span> <span class="st">"bottom"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="advanced-visualization_files/figure-html/theming-1.png" class="r-plt" alt="" width="100%"></p>
+</div>
+<div class="section level2">
+<h2 id="extending-the-layers">Extending the layers<a class="anchor" aria-label="anchor" href="#extending-the-layers"></a>
+</h2>
+<p>The <code>ggplot2</code> objects behind the layers and the coordinate
+system — <code>GeomSsmPoint</code>, <code>GeomSsmArc</code>, and
+<code>CoordCircumplex</code> — are exported, so you can subclass them
+the same way you would subclass any <code>ggplot2</code> geom. This is
+the route to a reusable layer with your own defaults, rather than
+repeating the same arguments at every call site.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">GeomSsmStar</span> <span class="op">&lt;-</span> <span class="fu">ggproto</span><span class="op">(</span><span class="st">"GeomSsmStar"</span>, <span class="va">GeomSsmPoint</span>,</span>
+<span>  default_aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/modifyList.html" class="external-link">modifyList</a></span><span class="op">(</span></span>
+<span>    <span class="va">GeomSsmPoint</span><span class="op">$</span><span class="va">default_aes</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">23</span>, size <span class="op">=</span> <span class="fl">5</span>, fill <span class="op">=</span> <span class="st">"#D55E00"</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">geom_ssm_star</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mapping</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">data</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">layer</span><span class="op">(</span></span>
+<span>    geom <span class="op">=</span> <span class="va">GeomSsmStar</span>, mapping <span class="op">=</span> <span class="va">mapping</span>, data <span class="op">=</span> <span class="va">data</span>,</span>
+<span>    stat <span class="op">=</span> <span class="st">"identity"</span>, position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>, params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_ssm_star</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">results</span><span class="op">$</span><span class="va">results</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="advanced-visualization_files/figure-html/subclass-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Everything the parent geom does — mapping amplitude and displacement
+onto the positional aesthetics, and dropping profiles with no defined
+location — is inherited; only the defaults change. The polar transform
+itself is not part of the geom: as above,
+<code><a href="../reference/coord_circumplex.html">coord_circumplex()</a></code> owns it, which is why the subclass needs
+no circular arithmetic of its own.</p>
+</div>
+<div class="section level2">
 <h2 id="composing-custom-layers">Composing custom layers<a class="anchor" aria-label="anchor" href="#composing-custom-layers"></a>
 </h2>
 <p>Because the canvas and geoms are ordinary <code>ggplot2</code>
@@ -230,7 +356,7 @@ where individual respondents fall relative to a summary. We can compute
 each person’s own amplitude and displacement with
 <code><a href="../reference/ssm_score.html">ssm_score()</a></code> and draw them as a faint cloud behind a
 group-level point.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Per-person SSM parameters for a subset of the sample. A respondent whose</span></span>
 <span><span class="co"># scores are flat has no displacement and is returned as NA (with a warning),</span></span>
 <span><span class="co"># so we keep only the well-defined profiles.</span></span>
@@ -244,25 +370,116 @@ group-level point.</p>
 <span><span class="co"># Group-level profile for the same subset</span></span>
 <span><span class="va">group</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze.html">ssm_analyze</a></span><span class="op">(</span><span class="va">jz2017</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span>, <span class="op">]</span>, scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">amax</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
+<span><span class="co"># The group amplitude is shorter than a typical individual amplitude</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>group <span class="op">=</span> <span class="va">group</span><span class="op">$</span><span class="va">results</span><span class="op">$</span><span class="va">a_est</span>, median_individual <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">people</span><span class="op">$</span><span class="va">Ampl</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;             group median_individual </span></span>
+<span><span class="co">#&gt;         0.3651863         0.5189425</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="va">amax</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="../reference/ggcircumplex.html">ggcircumplex</a></span><span class="op">(</span><span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span>, labels <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>, amax <span class="op">=</span> <span class="fl">1.75</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">people</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">Ampl</span>, displacement <span class="op">=</span> <span class="va">Disp</span><span class="op">)</span>,</span>
-<span>    amax <span class="op">=</span> <span class="va">amax</span>, fill <span class="op">=</span> <span class="st">"grey70"</span>, size <span class="op">=</span> <span class="fl">1.5</span>, alpha <span class="op">=</span> <span class="fl">0.6</span></span>
+<span>    fill <span class="op">=</span> <span class="st">"grey70"</span>, size <span class="op">=</span> <span class="fl">1.5</span>, alpha <span class="op">=</span> <span class="fl">0.6</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="../reference/geom_ssm_point.html">geom_ssm_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">group</span><span class="op">$</span><span class="va">results</span>,</span>
 <span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>amplitude <span class="op">=</span> <span class="va">a_est</span>, displacement <span class="op">=</span> <span class="va">d_est</span><span class="op">)</span>,</span>
-<span>    amax <span class="op">=</span> <span class="va">amax</span>, fill <span class="op">=</span> <span class="st">"#0072B2"</span>, size <span class="op">=</span> <span class="fl">4</span></span>
+<span>    fill <span class="op">=</span> <span class="st">"#0072B2"</span>, size <span class="op">=</span> <span class="fl">4</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="advanced-visualization_files/figure-html/individuals-1.png" class="r-plt" alt="" width="100%"></p>
-<p>The individual points spread around the circle while the group
-summary sits near their center of mass, a picture that none of the
-built-in functions produce directly. Any other <code>ggplot2</code>
+<p>The individual points spread widely around the circle while the group
+summary sits close to the origin, a picture that none of the built-in
+functions produce directly. That contrast is not an artifact: the group
+profile is the SSM of the <em>mean</em> scale scores, so its position is
+the average of the individual positions in (x, y) — and averaging
+vectors that point in different directions yields a resultant shorter
+than the typical individual vector, as the two amplitudes printed above
+show. A group amplitude smaller than a typical person’s therefore
+indicates disagreement about <em>direction</em> among the respondents,
+not that each person’s profile is flat. Any other <code>ggplot2</code>
 layer — text annotations, additional geoms, faceting — can be added the
 same way.</p>
+</div>
+<div class="section level2">
+<h2 id="trajectories-across-occasions">Trajectories across occasions<a class="anchor" aria-label="anchor" href="#trajectories-across-occasions"></a>
+</h2>
+<p>When the same people are measured on the same scales at two or more
+occasions, <code><a href="../reference/ssm_analyze_long.html">ssm_analyze_long()</a></code> (for long data) or
+<code>ssm_analyze(occasions = )</code> (for wide data) estimates one SSM
+profile per occasion, resampling persons so that within-person
+dependence across occasions is respected.
+<code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> then draws each SSM parameter against
+time.</p>
+<p>Here is a small simulated three-wave data set whose group profile
+rotates counterclockwise across the 0/360 degree boundary, which is the
+case worth seeing drawn:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">angles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
+<span><span class="va">waves</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>T1 <span class="op">=</span> <span class="fl">330</span>, T2 <span class="op">=</span> <span class="fl">355</span>, T3 <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="co"># true displacement at each wave</span></span>
+<span><span class="va">elevation</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="co"># per-person offset, stable across waves</span></span>
+<span></span>
+<span><span class="va">long</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">waves</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">w</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Group signal at this wave, plus the stable person offset and fresh noise</span></span>
+<span>  <span class="va">signal</span> <span class="op">&lt;-</span> <span class="fl">0.6</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="op">(</span><span class="va">angles</span> <span class="op">-</span> <span class="va">waves</span><span class="op">[[</span><span class="va">w</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">*</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">180</span><span class="op">)</span></span>
+<span>  <span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">signal</span>, nrow <span class="op">=</span> <span class="va">n</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">angles</span><span class="op">)</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="va">elevation</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">angles</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">scores</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
+<span>  <span class="va">out</span><span class="op">$</span><span class="va">wave</span> <span class="op">&lt;-</span> <span class="va">w</span></span>
+<span>  <span class="va">out</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">results_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_analyze_long.html">ssm_analyze_long</a></span><span class="op">(</span></span>
+<span>  <span class="va">long</span>,</span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="../reference/PANO.html">PANO</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  id <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span>  occasion <span class="op">=</span> <span class="st">"wave"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">results_long</span><span class="op">$</span><span class="va">results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Occasion"</span>, <span class="st">"a_est"</span>, <span class="st">"d_est"</span>, <span class="st">"d_lci"</span>, <span class="st">"d_uci"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   Occasion     a_est     d_est     d_lci     d_uci</span></span>
+<span><span class="co">#&gt; 1       T1 0.6133765 332.44652 329.70848 335.43024</span></span>
+<span><span class="co">#&gt; 2       T2 0.5879017 355.92454 352.64902 359.30751</span></span>
+<span><span class="co">#&gt; 3       T3 0.5907495  17.84307  14.57562  21.11586</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory</a></span><span class="op">(</span><span class="va">results_long</span>, drop_xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="advanced-visualization_files/figure-html/occasions-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Two things about the displacement panel are worth reading carefully.
+First, it is drawn on an <em>unwrapped</em> branch: the profile crosses
+the 0/360 boundary between the second and third wave, and rather than
+jumping a full turn the panel continues past 360, so values outside [0,
+360) are expected there. Second, the occasion order comes from the data
+rather than from the plot: for a character occasion column it is
+first-appearance order, and for a factor it is the factor’s level order.
+Note that <code><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor()</a></code> sorts its levels alphabetically by
+default, which would place <code>T10</code> before <code>T2</code> — so
+if your occasion column is a factor, set its levels in temporal
+order.</p>
+<p>The unwrap carries an assumption that no data can check: that the
+profile rotates less than a half-turn between consecutive occasions.
+Waves that are far apart in time, or a series with a gap, could rotate
+further than that and would be drawn as the shorter rotation regardless,
+so read widely spaced occasions with that in mind.</p>
+<p>A time point whose amplitude interval is too close to zero for its
+displacement to be interpretable is drawn as a hollow point — a marker
+of an interpretability precondition, not a significance test.
+<code>drop_xy = TRUE</code> above omits the X-value and Y-value panels,
+leaving elevation, amplitude, and displacement.</p>
+<p>The bands are the per-occasion confidence intervals, one per time
+point. They are not a simultaneous confidence band for the trajectory as
+a whole, and overlap (or its absence) between two occasions’ bands is
+not a test of change between them; for that, estimate the contrast
+directly (see <code><a href="../reference/ssm_analyze.html">?ssm_analyze</a></code> and
+<code><a href="../reference/ssm_plot_contrast.html">ssm_plot_contrast()</a></code>).</p>
+<p><code><a href="../reference/ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code> also accepts a trajectory table —
+a data frame of <code>a_est</code>/<code>a_lci</code>/<code>a_uci</code>
+and <code>d_est</code>/<code>d_lci</code>/<code>d_uci</code> triples at
+numeric time points — which is how you plot a <em>model-based</em>
+trajectory evaluated from a fitted growth model rather than one
+estimated separately at each wave. That workflow is the subject of the
+“Growth Models on SSM Parameters” vignette.</p>
 </div>
 <div class="section level2">
 <h2 id="the-angle-axis-for-linear-plots">The angle axis for linear plots<a class="anchor" aria-label="anchor" href="#the-angle-axis-for-linear-plots"></a>
@@ -273,7 +490,7 @@ runs through the scale angles. <code><a href="../reference/scale_x_circumplex.ht
 that axis consistently with the circular canvas: by default with the
 angle in degrees, or with custom labels or an instrument’s
 abbreviations.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">angles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/octants.html">octants</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">curve</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  angle <span class="op">=</span> <span class="va">angles</span>,</span>

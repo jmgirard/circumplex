@@ -51,6 +51,9 @@ Other ssm functions:
 [`summary.circumplex_ssm_id()`](http://circumplex.jmgirard.com/dev/reference/summary.circumplex_ssm_id.md)
 
 Other visualization functions:
+[`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md),
+[`ssm_plot_contrast()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_contrast.md),
+[`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md),
 [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
 
 ## Examples
@@ -66,7 +69,7 @@ res <- ssm_analyze(
 )
 set.seed(23456)
 acc <- ssm_ci_accuracy(res, reps = 25)
-#> Warning: CPM Hessian is ill-conditioned (condition number 6.69e+17): angles may be clustered or parameters weakly determined.
+#> Warning: CPM Hessian is ill-conditioned (condition number 3.53e+17): angles may be clustered or parameters weakly determined.
 plot(acc)
 
 # }

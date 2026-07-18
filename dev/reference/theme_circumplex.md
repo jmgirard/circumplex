@@ -29,8 +29,12 @@ A ggplot2 theme object, to be added to a plot with `+`.
 
 ## See also
 
+Other circumplex layers:
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
+[`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md),
+[`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
 [`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
-[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+[`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md)
 
 ## Examples
 

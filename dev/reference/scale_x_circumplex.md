@@ -51,7 +51,12 @@ A ggplot2 scale object that can be added to a plot with `+`.
 
 ## See also
 
-[`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md)
+Other circumplex layers:
+[`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
+[`geom_ssm_arc()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_arc.md),
+[`geom_ssm_point()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_point.md),
+[`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
+[`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md)
 
 ## Examples
 

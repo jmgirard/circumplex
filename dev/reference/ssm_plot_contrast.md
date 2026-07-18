@@ -60,6 +60,14 @@ A ggplot variable containing difference point-ranges faceted by SSM
 parameter. An interval that does not contain the value of zero has
 p\<.05.
 
+## See also
+
+Other visualization functions:
+[`plot.circumplex_ci_accuracy()`](http://circumplex.jmgirard.com/dev/reference/plot.circumplex_ci_accuracy.md),
+[`ssm_plot_circle()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_circle.md),
+[`ssm_plot_curve()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_curve.md),
+[`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+
 ## Examples
 
 ``` r

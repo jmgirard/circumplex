@@ -2,6 +2,30 @@
 
 ## circumplex (development version)
 
+- The “Advanced Circumplex Visualization” vignette has been rewritten
+  over the new plotting API. It now teaches
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+  as the owner of the amplitude-to-radius mapping (replacing the old
+  advice to keep a per-layer `amax` in sync), the configurable circle
+  center and amplitude-axis placement, restyling the canvas through
+  [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md)
+  and ordinary `theme()` calls, subclassing the exported
+  `GeomSsmPoint`/`GeomSsmArc` objects to build reusable layers, and
+  plotting a trajectory across occasions.
+
+- The reference index now groups the plotting API into “Complete Plots”
+  and “Building Blocks”. The `ssm_plot_*` functions now cross-link to
+  each other, so
+  [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
+  is reachable from its siblings’ help pages, and the composable layers
+  ([`ggcircumplex()`](http://circumplex.jmgirard.com/dev/reference/ggcircumplex.md),
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md),
+  the `geom_ssm_*()` layers,
+  [`scale_x_circumplex()`](http://circumplex.jmgirard.com/dev/reference/scale_x_circumplex.md),
+  and
+  [`theme_circumplex()`](http://circumplex.jmgirard.com/dev/reference/theme_circumplex.md))
+  likewise cross-link to each other.
+
 - The new
   [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)
   plots how each SSM parameter changes across occasions, one panel per
