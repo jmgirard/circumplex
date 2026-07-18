@@ -170,6 +170,53 @@ test_that("the canvas furniture responds to theme elements (R3, AC3)", {
   expect_true(any(grepl("red|FF0000", cols, ignore.case = TRUE)))
 })
 
+# --- T4: repel label ergonomics -----------------------------------------------
+
+test_that("ssm_plot_circle(repel = TRUE) adds a coord-aware repel layer (T4)", {
+  skip_if_not_installed("ggrepel")
+  data("jz2017")
+  set.seed(12345)
+  res <- ssm_analyze(jz2017, scales = 2:9, measures = c("NARPD", "ASPD"))
+  p <- ssm_plot_circle(res, repel = TRUE)
+  # A repel label layer is present and maps to amplitude/displacement, so the
+  # coord (not hand-computed cartesian) places the labels.
+  repel_idx <- which(vapply(
+    p$layers, function(l) inherits(l$geom, "GeomLabelRepel"), logical(1)
+  ))
+  expect_length(repel_idx, 1L)
+  mp <- p$layers[[repel_idx]]$mapping
+  expect_true(all(c("x", "y", "label") %in% names(mp)))
+  expect_no_error(ggplot2::ggplot_build(p))
+  # repel replaces the colour legend.
+  expect_equal(p$theme$legend.position, "none")
+})
+
+test_that("ssm_plot_circle(repel = TRUE) errors clearly when ggrepel is absent (T4)", {
+  testthat::local_mocked_bindings(has_ggrepel = function() FALSE)
+  data("aw2009")
+  set.seed(1)
+  res <- ssm_analyze(aw2009, scales = 1:8, boots = 50)
+  expect_error(ssm_plot_circle(res, repel = TRUE), "ggrepel")
+})
+
+# --- T5: exported circumplex canvas theme -------------------------------------
+
+test_that("theme_circumplex() is exported and validates base_size (T5)", {
+  expect_true("theme_circumplex" %in% getNamespaceExports("circumplex"))
+  expect_s3_class(theme_circumplex(), "theme")
+  expect_error(theme_circumplex(base_size = -1), "base_size")
+  expect_error(theme_circumplex(base_size = c(1, 2)), "base_size")
+})
+
+test_that("theme_circumplex() default reproduces the canvas theme; base_size varies it (T5)", {
+  # Default path is output-preserving: ggcircumplex() uses theme_circumplex()
+  # internally, so the default theme equals the canvas theme (baselines unchanged).
+  base <- ggcircumplex(octants(), font_size = 12)$theme
+  expect_equal(theme_circumplex(12)$text$size, base$text$size)
+  # Non-default path: a larger base_size changes the theme's base text size.
+  expect_gt(theme_circumplex(20)$text$size, theme_circumplex(12)$text$size)
+})
+
 test_that("plot functions warn about unrecognized arguments", {
   data("aw2009")
   set.seed(1)

@@ -1,4 +1,12 @@
 
+# Graceful-degradation gate for the optional label-repelling feature. ggrepel is
+# in Suggests (DESIGN.md dependency policy); only ssm_plot_circle(repel = TRUE)
+# needs it, so the rest of the plotting family runs without it. Wrapped so the
+# runtime gate can be exercised in tests via mocked bindings.
+has_ggrepel <- function() {
+  requireNamespace("ggrepel", quietly = TRUE)
+}
+
 #' Create a Circular Plot of SSM Results
 #'
 #' Take in the results of a Structural Summary Method analysis and plot the
@@ -16,8 +24,11 @@
 #'   12).
 #' @param drop_lowfit A logical determining whether profiles with low model fit
 #'   (<.70) should be omitted or plotted with dashed borders (default = FALSE).
-#' @param repel An experimental argument for plotting text labels instead of
-#'   colors.
+#' @param repel A logical determining whether each profile is labelled with a
+#'   repelled text label (placed on the circumplex canvas by
+#'   [coord_circumplex()], so labels avoid overlapping each other and the
+#'   points) instead of distinguished by colour and a legend (default = FALSE).
+#'   Requires the \pkg{ggrepel} package.
 #' @param angle_labels A character vector specifying text labels to plot around
 #'   the circle for each scale. Can also specify NULL to default to numerical
 #'   angle labels or a vector of empty strings ("") to hide the labels. If not
@@ -202,7 +213,13 @@ ssm_plot_circle <- function(ssm_object,
   }
 
   if (repel) {
-    requireNamespace("ggrepel")
+    if (!has_ggrepel()) {
+      stop(
+        "`repel = TRUE` requires the 'ggrepel' package, which is not ",
+        "installed. Install it with install.packages(\"ggrepel\").",
+        call. = FALSE
+      )
+    }
     # Coord-aware label repelling (M31): map the labels to the same
     # amplitude/displacement aesthetics as the points and let coord_circumplex()
     # place them, so ggrepel repels in the rendered panel space. (The old branch
@@ -564,14 +581,28 @@ ggcircumplex <- function(angles = octants(), labels = NULL,
     ) +
     ggplot2::scale_x_continuous(breaks = ang, labels = lab) +
     ggplot2::scale_y_continuous(name = NULL) +
-    circumplex_theme(base_size = font_size)
+    theme_circumplex(base_size = font_size)
 }
 
-# Themed furniture for the circumplex canvas. Kept internal (M31); the exported
-# styling surface is deferred to M32. Built on theme_minimal so the polar grid
-# (rings + spokes) and axis labels respond to further theme() calls, replacing
-# the old theme_void() + drawn-geometry furniture that could not be restyled.
-circumplex_theme <- function(base_size = 12) {
+#' Circumplex canvas theme
+#'
+#' The \pkg{ggplot2} theme applied to the circumplex canvas built by
+#' [ggcircumplex()]. It is built on [ggplot2::theme_minimal()] so that the
+#' amplitude rings, displacement spokes, and labels drawn by [coord_circumplex()]
+#' are themed panel furniture that respond to further theming. Apply it to a
+#' custom circumplex plot, and add `+ theme_*()` or `+ theme()` on top to
+#' restyle the canvas.
+#'
+#' @param base_size A single positive number giving the base font size (in pt)
+#'   for the theme (default = 12).
+#' @return A \pkg{ggplot2} theme object, to be added to a plot with `+`.
+#' @seealso [ggcircumplex()], [coord_circumplex()]
+#' @export
+#' @examples
+#' # Restyle the canvas with a larger base font
+#' ggcircumplex(octants()) + theme_circumplex(base_size = 16)
+theme_circumplex <- function(base_size = 12) {
+  stopifnot(is_num(base_size, n = 1) && base_size > 0)
   ggplot2::theme_minimal(base_size = base_size) +
     ggplot2::theme(
       axis.title = ggplot2::element_blank(),

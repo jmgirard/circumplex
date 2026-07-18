@@ -86,9 +86,9 @@ users need to compose custom figures.
 - [x] **T3** — Fix the due-East `0.5`/`LM` label overlap in `coord_circumplex()` /
       `ggcircumplex()` furniture; regenerate the affected vdiffr baseline; assert
       label separation at grob level.
-- [ ] **T4** — Firm up the `ssm_plot_circle(repel=)` path (non-overlapping
+- [x] **T4** — Firm up the `ssm_plot_circle(repel=)` path (non-overlapping
       labels); test.
-- [ ] **T5** — Add the styling/aesthetic options with output-preserving defaults;
+- [x] **T5** — Add the styling/aesthetic options with output-preserving defaults;
       test the non-default path.
 - [ ] **T6** — `document()`; full `test()` + `check()`.
 
@@ -119,6 +119,14 @@ users need to compose custom figures.
   moved off theta 0, not on any spoke). Regenerated 14 canvas vdiffr baselines;
   all cartesian curve/contrast/ladder baselines byte-identical (env-fidelity
   signal, M31 lesson).
+- 2026-07-18: T4 — firmed up `repel`: gated on new `has_ggrepel()` with a clear
+  install-hint error (Suggests idiom), rewrote the stale "experimental" doc.
+  Tests: coord-aware repel layer present + maps to amplitude/displacement;
+  mocked-absent ggrepel errors by name.
+- 2026-07-18: T5 — exported the canvas theme as `theme_circumplex(base_size)`
+  (was internal `circumplex_theme`; DESIGN.md deferral discharged), added
+  `_pkgdown.yml` row. Default path output-preserving (`ggcircumplex()` uses it;
+  baselines unchanged); non-default `base_size` path tested.
 
 ## Decisions
 
