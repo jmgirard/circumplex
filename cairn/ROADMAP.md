@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27, M31, M32, M33, M34 | high | milestones/M7-v2-release-prep.md |
 | M28 | Occasions long-format sugar (`ssm_analyze_long()`) | done | M25 | normal | milestones/archive/M28-occasions-long-format-sugar.md |
 | M29 | `ssm_ci_accuracy()` occasions extension | done | M25 | normal | milestones/archive/M29-ci-accuracy-occasions.md |
-| M30 | Circumplex coordinate-system design (Fable-reviewed) | planned | — | high | milestones/M30-coord-system-design.md |
+| M30 | Circumplex coordinate-system design (Fable-reviewed) | review | — | high | milestones/M30-coord-system-design.md |
 | M31 | Circumplex coordinate-system build | planned | M30 | high | milestones/M31-coord-system-build.md |
 | M32 | Circumplex geom & layer ergonomics | planned | M31 | normal | milestones/M32-geom-ergonomics.md |
 | M33 | Longitudinal trajectory visualization | planned | — | high | milestones/M33-trajectory-visualization.md |
