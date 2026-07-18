@@ -499,3 +499,54 @@ M31 is retired and only M32/M33/M34 remain (M7's dependency on M31 is then
 dropped). D-001/D-008/D-012 lineage extended; D-006/D-014 (minimal-deps) untouched
 — ggforce is already an Import (DESIGN.md V6). Source: Jeff, plan gate, 2026-07-17.
 
+### D-019 (2026-07-17): GO on the `CoordRadial`-based coordinate system (M30); ggplot2 floor re-pinned to >= 4.0.0
+
+**Context:** M30 turned the three DESIGN.md visualization known-limitations (no
+owner for `amax`/the polar transform → silent point/ring misalignment; no
+configurable center; theme-frozen canvas) into a build-ready design spec
+(`devel/m30-coord-spec.md`) and escalated it to independent Fable review
+(RB08 → RR08, 2026-07-17; archived under `cairn/reviews/archive/`). Tagged
+`irreversible-api` (new exported coordinate system) + `ip-touching` (re-owns the
+0/360 polar transform carrying the angle invariants). Verdict: **GO (Option A)**,
+one blocking factual correction (the floor).
+**Decision: GO.** Build `coord_circumplex()` in M31 as a `CoordRadial` subclass
+per the spec's §11 authoritative punch-list. **Re-pin `DESCRIPTION` `ggplot2
+(>= 3.3.0)` → `(>= 4.0.0)`** — the design's parameters (`thetalim`, `rlim`,
+`reverse`, numeric `r.axis.inside`) are 4.0.0-only, verified by Fable against the
+ggplot2 v3.5.2 source; the spec's original 3.5.0 claim was wrong. Fable-attested
+load-bearing holdings M31 inherits: (1) the coord **hard-pins** `thetalim =
+c(0,360)`, `expand = FALSE`, `start = pi/2`, `reverse = "theta"` internally
+(range coord-side, never scale-limits which censor); (2) seam-straddling arcs
+unwrap by **extension** (`xmax = xmin + span`, may exceed 360) in the arc geom's
+`setup_data()` — one `GeomRect`, coord wraps periodically (I2); (3) the pole
+(I3) draws identically for `d ∈ {0,360}` only under the `expand = FALSE` guard
+(default `expand = TRUE` opens a 33° gap); (4) configurable center = `rlim =
+c(center, amax)` alone, `inner.radius` decoupled and defaulting 0; (5) `amax`
+and `geom_ssm_arc(n=)` become inert — unconditional soft-deprecation with a
+sentinel default and a one-time note, **never** an error (that breaks the
+package's own documented examples); (6) two hidden consumers the spec missed,
+`plot.circumplex_cpm` and `plot.circumplex_fit_structure`, join the R4
+keep-working set; the `repel = TRUE` branch needs a redesign (it hand-computes
+canvas coordinates); (7) `ggforce` is likely fully removable but only via its
+**own M31 D-entry superseding the DESIGN.md V6 KEEP holding**, after a
+verification checklist — never a silent side effect.
+**Dependency-gate record:** re-pinning ggplot2 up is a dependency change
+(tracking-rules gate + D-entry); **user-approved 2026-07-17** (M30 T3 gate). It
+adds **no new Import** (ggplot2 is already an Import); the effective install
+floor is already R >= 4.1 (via ggplot2/htmlTable) → current ggplot2, so the
+honestly-named excluded cohort is only environments *pinned* to pre-4.0 ggplot2
+(e.g. an renv lock avoiding the S7 transition). The `DESCRIPTION` edit ships in
+M31 with the code that needs it, not in docs-only M30.
+**Rejected:** Option B (bespoke base-`Coord`, no floor bump) — higher total risk,
+owns two churned coord/guide generations of internal API and re-derives the
+annular tessellation (RR08 R-12); NO-GO (keep the drawn canvas) — the three
+defects are structural and worth fixing. Supporting ggplot2 3.5.x *and* 4.0.x in
+one subclass rejected (cross-version render drift in the invariant-carrying
+layer).
+**Re-trigger:** M31 may amend the spec only through its own gate with a work-log
+line; challenges to the RR08 holdings need a new RB.
+**Consequences:** M31 stays `planned` (not retired); D-018's M7→M31 dependency
+stands. D-006/D-014 minimal-deps satisfied (re-pin, not a new dep). D-018
+(wrappers retained) reinforced. Source: RR08 (Fable, 2026-07-17); Jeff, M30 T3
+gate.
+

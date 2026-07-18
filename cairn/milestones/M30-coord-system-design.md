@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M30: Circumplex coordinate-system design
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** — (works under the CLAUDE.md angle invariants: [0,360), LM=360; IP/GP formalization deferred to /design-interview)
@@ -79,9 +79,9 @@ wrappers.
       the RR; revise the spec (or accept rejections with rationale).
       *(RB08 → RR08 GO Option A; spec revised, §11 punch-list added; pair
       archived.)*
-- [ ] **T3** — Record the GO/NO-GO + ratified design as a D-entry; on GO, M31
+- [x] **T3** — Record the GO/NO-GO + ratified design as a D-entry; on GO, M31
       builds it; on NO-GO, M31 is retired and the trade-offs stay DESIGN.md
-      known-limitations.
+      known-limitations. *(GO — D-019; ggplot2 floor >= 4.0.0, user-approved.)*
 
 ## Work log
 
@@ -96,6 +96,8 @@ wrappers.
 - 2026-07-17 (T2): ingested RR08 (GO Option A). Spec revised: floor corrected to
   ggplot2 >= 4.0.0, §11 authoritative punch-list added, RB08/RR08 archived.
   Unblocked → in-progress. T3 (GO + floor-bump D-entry) is the remaining step.
+- 2026-07-17 (T3): GO ratified (Jeff, T3 gate) — D-019 records GO Option A +
+  ggplot2 floor >= 4.0.0. All tasks done, all ACs met → review.
 
 ## Decisions
 
