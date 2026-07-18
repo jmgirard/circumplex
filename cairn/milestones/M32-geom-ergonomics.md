@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M32: Circumplex geom & layer ergonomics
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M31
 - **Principles touched:** —
@@ -90,7 +90,7 @@ users need to compose custom figures.
       labels); test.
 - [x] **T5** — Add the styling/aesthetic options with output-preserving defaults;
       test the non-default path.
-- [ ] **T6** — `document()`; full `test()` + `check()`.
+- [x] **T6** — `document()`; full `test()` + `check()`.
 
 ## Work log
 
@@ -127,6 +127,9 @@ users need to compose custom figures.
   (was internal `circumplex_theme`; DESIGN.md deferral discharged), added
   `_pkgdown.yml` row. Default path output-preserving (`ggcircumplex()` uses it;
   baselines unchanged); non-default `base_size` path tested.
+- 2026-07-18: T6 — NEWS entry for the user-visible viz-ergonomics changes;
+  `document()` no-diff; full `devtools::check()` clean (0/0/0, 5m25s, suite
+  passes, examples + vignettes rebuilt). Status → review.
 
 ## Decisions
 
