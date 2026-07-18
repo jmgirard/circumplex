@@ -2,6 +2,17 @@
 
 ## circumplex (development version)
 
+- [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/dev/reference/ssm_plot_trajectory.md)’s
+  “Displacement interpretable” legend now draws both of its keys.
+  Previously, when no occasion was flagged as uninterpretable, the
+  `FALSE` key appeared as a label with no symbol beside it, so the
+  legend named an encoding it never showed.
+
+- [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+  now rejects a non-finite `amax` or `center` with a message naming the
+  argument, instead of accepting an infinite value and failing later
+  inside the rendering with an unrelated error.
+
 - The “Advanced Circumplex Visualization” vignette has been rewritten
   over the new plotting API. It now teaches
   [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
