@@ -828,11 +828,37 @@ ssm_analyze_occasions <- function(data, occ_idx, occ_cols, occ_labels, angles,
 
   results <- cbind(labels, bs_output)
 
+  # Per-group stacked sufficient statistics for the CI-accuracy diagnostic
+  # (M29 / D-017): the occasions plug-in population is
+  # MVN(stacked occasion means, observed stacked k*p covariance), so the
+  # within-person cross-occasion dependence lives in the off-diagonal p x p
+  # blocks. Stored per group as (n, mean, cov) on the listwise-complete person
+  # rows -- sufficient, and keeps participant data out of the returned object.
+  # `occ_k` tags the shape so a classic p x p consumer (ssm_ci_accuracy()'s
+  # non-occasions path) refuses it rather than silently pooling a k*p matrix.
+  stacked_cols <- colnames(bs_input)[seq_len(k * p)]
+  occ_groups <- stats::setNames(vector("list", n_groups), group_levels)
+  for (g in seq_len(n_groups)) {
+    block <- mat[grp == g, , drop = FALSE]
+    occ_groups[[g]] <- list(
+      n = nrow(block),
+      mean = colMeans(block),
+      cov = stats::cov(block)
+    )
+  }
+  suff_stats <- list(
+    occ_k = k,
+    occ_labels = occ_labels,
+    scale_names = stems,
+    stacked_cols = stacked_cols,
+    groups = occ_groups
+  )
+
   # Collect analysis details. `occasions` is the conditional occasions
-  # metadata (labels; k = its length) read by the print method. suff_stats
-  # stays NULL: an occasions object's flattened k*p columns would describe
-  # the wrong dependence structure for the CI-accuracy diagnostic, which
-  # errors informatively on occasions objects instead (spec sec. 1.4).
+  # metadata (labels; k = its length) read by the print method. `suff_stats`
+  # carries the stacked per-group statistics the CI-accuracy diagnostic
+  # replays from (M29 / D-017); an occasions object is refused by the classic
+  # p x p path via the `occ_k` shape tag.
   details <- list(
     boots = boots,
     interval = interval,
@@ -842,7 +868,7 @@ ssm_analyze_occasions <- function(data, occ_idx, occ_cols, occ_labels, angles,
     score_type = "Mean",
     method = method,
     occasions = occ_labels,
-    suff_stats = NULL
+    suff_stats = suff_stats
   )
 
   new_ssm(

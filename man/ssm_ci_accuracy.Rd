@@ -32,7 +32,8 @@ the verdict is keyed to. Applied to every profile row jointly.}
 model's model-implied scale correlations; \code{"observed"} bypasses the model
 and uses the pooled within-group correlation matrix directly (a
 sensitivity switch: if the two verdicts differ, structure uncertainty is
-itself material).}
+itself material). Not accepted for occasions analyses, whose population is
+always the observed stacked cross-occasion covariance (no model is fit).}
 
 \item{m}{Optional. The number of harmonics passed to \code{\link[=cpm_fit]{cpm_fit()}} (default
 \code{NULL} uses \code{min(3, floor((p - 1) / 2))}).}
@@ -42,7 +43,7 @@ population structure instead of refitting (its scales must match the ssm
 object's). Must be a unit-scaling fit (the default \code{cpm_fit()} scaling);
 a free-scaling fit models a covariance structure and is not a valid
 population correlation structure for this diagnostic. Ignored when
-\code{structure = "observed"}.}
+\code{structure = "observed"}; not accepted for occasions analyses.}
 
 \item{data}{Optional. The original data set, required only for ssm objects
 created before sufficient statistics were stored at analysis time; the
@@ -170,6 +171,21 @@ assesses the complete-data procedure (missing data are not simulated),
 and groups are assumed to share one circumplex structure. When the
 Browne model fits poorly, the simulated population may misrepresent the
 data; the embedded fit and its diagnostics are returned for inspection.
+
+For an occasions (repeated-measures) analysis the population is instead a
+multivariate normal with the \emph{observed} stacked cross-occasion covariance
+(no circular-model idealization): the within-person dependence across
+occasions is carried directly, and no \code{structure}/\code{cpm} alternative is
+offered. When the stacked covariance is rank-deficient (per-group sample
+size at or below the number of occasions times scales) the simulated
+population is a proper degenerate normal, so the reported coverage and
+width remain valid but the fit-statistic pass rate is descriptive only.
+For a paired contrast, the joint-certification rate (both occasions
+certified) is reported as a descriptive caveat on the contrast's
+interpretability. Assessing the occasions object per occasion via
+\verb{scales =} one occasion's columns instead uses the default \code{"cpm"}
+structure and can give slightly different per-occasion verdicts -- a
+structure-sensitivity fact, not a bug.
 }
 
 \examples{

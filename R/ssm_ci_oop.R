@@ -294,6 +294,28 @@ ssm_ci_verdict_text <- function(cls, guard_fired, guard_rate,
 # instead of pretending to have run it.
 ssm_ci_structure_note <- function(object) {
   d <- object$details
+  if (!is.null(d$occ_k)) {
+    # Occasions path (D-017): the population is MVN with the observed stacked
+    # cross-occasion covariance -- the within-person dependence is carried, not
+    # idealized, so there is no CPM sensitivity companion to compare against.
+    ssm_ci_cat_para(paste0(
+      "Structure note: population simulated from a multivariate normal with ",
+      "the observed per-group stacked cross-occasion covariance (the ",
+      "within-person dependence across occasions is carried directly; no ",
+      "circular process model is fit)."
+    ), indent = 0)
+    def <- Filter(function(rd) isTRUE(rd$deficient), d$rank_deficiency)
+    if (length(def) > 0) {
+      ssm_ci_cat_para(paste0(
+        "CAUTION: the stacked covariance is rank-deficient in group(s) ",
+        paste(names(def), collapse = ", "), " (n <= k*p); the reported ",
+        "coverage and width remain valid (a singular covariance is a proper ",
+        "degenerate normal), but the fit-statistic pass rate is descriptive ",
+        "only."
+      ), indent = 2)
+    }
+    return(invisible(object))
+  }
   if (identical(d$structure, "observed")) {
     ssm_ci_cat_para(paste0(
       "Structure note: population built from the observed pooled ",
@@ -410,7 +432,8 @@ summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
     # enumerates the Condition values in the tables below
     "\nAmplitude Ladder:\t", round(d$conditions, 3),
     "\nPopulation Structure:\t",
-    if (identical(d$structure, "cpm")) "Browne circular model (CPM)"
+    if (!is.null(d$occ_k)) "observed stacked cross-occasion covariance"
+    else if (identical(d$structure, "cpm")) "Browne circular model (CPM)"
     else "observed correlations",
     "\nGroup Sizes:\t\t", paste0(names(d$n), " = ", d$n, collapse = ", "),
     "\nCertification Rule:\t",
@@ -469,6 +492,28 @@ summary.circumplex_ci_accuracy <- function(object, digits = 3, ...) {
   cat("\nGuardrail operating characteristics:\n")
   gr <- round_numeric(object$guardrail)
   print(gr, row.names = FALSE)
+
+  # R12 breadcrumb (M29-D2): for an occasions paired contrast, the c = 1
+  # joint-certification rate (both occasions certified in the same simulated
+  # dataset) quantifies the sec. 2.2 both-occasions-nonzero caveat. When it
+  # sits well below the confidence level, the paired displacement contrast
+  # rests on at least one occasion that is not reliably certifiable -- surface
+  # that, since print.circumplex_ssm() gates nothing on it.
+  if (!is.null(d$occ_k) && isTRUE(d$contrast)) {
+    con_lab <- names(d$row_n)[length(d$row_n)]
+    grc <- object$guardrail
+    jrow <- grc[grc$Profile == con_lab & grc$Condition == 1, , drop = FALSE]
+    if (nrow(jrow) == 1 && is.finite(jrow$Cert_rate) &&
+        jrow$Cert_rate < d$interval) {
+      ssm_ci_cat_para(paste0(
+        "Paired-contrast caveat: both occasions were jointly certified in only ",
+        ssm_ci_pct(jrow$Cert_rate), " of simulated datasets (at c = 1). A ",
+        "paired displacement contrast is interpretable only when both ",
+        "occasions' amplitudes are reliably interpretable; read [", con_lab,
+        "] with that in mind."
+      ), indent = 0)
+    }
+  }
   invisible(object)
 }
 

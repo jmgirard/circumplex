@@ -77,7 +77,8 @@
 #'   model's model-implied scale correlations; `"observed"` bypasses the model
 #'   and uses the pooled within-group correlation matrix directly (a
 #'   sensitivity switch: if the two verdicts differ, structure uncertainty is
-#'   itself material).
+#'   itself material). Not accepted for occasions analyses, whose population is
+#'   always the observed stacked cross-occasion covariance (no model is fit).
 #' @param m Optional. The number of harmonics passed to [cpm_fit()] (default
 #'   `NULL` uses `min(3, floor((p - 1) / 2))`).
 #' @param cpm Optional. A pre-fitted `circumplex_cpm` object to reuse for the
@@ -85,7 +86,7 @@
 #'   object's). Must be a unit-scaling fit (the default `cpm_fit()` scaling);
 #'   a free-scaling fit models a covariance structure and is not a valid
 #'   population correlation structure for this diagnostic. Ignored when
-#'   `structure = "observed"`.
+#'   `structure = "observed"`; not accepted for occasions analyses.
 #' @param data Optional. The original data set, required only for ssm objects
 #'   created before sufficient statistics were stored at analysis time; the
 #'   statistics are then recomputed and checked against the stored profile
@@ -146,6 +147,21 @@
 #'   and groups are assumed to share one circumplex structure. When the
 #'   Browne model fits poorly, the simulated population may misrepresent the
 #'   data; the embedded fit and its diagnostics are returned for inspection.
+#'
+#'   For an occasions (repeated-measures) analysis the population is instead a
+#'   multivariate normal with the *observed* stacked cross-occasion covariance
+#'   (no circular-model idealization): the within-person dependence across
+#'   occasions is carried directly, and no `structure`/`cpm` alternative is
+#'   offered. When the stacked covariance is rank-deficient (per-group sample
+#'   size at or below the number of occasions times scales) the simulated
+#'   population is a proper degenerate normal, so the reported coverage and
+#'   width remain valid but the fit-statistic pass rate is descriptive only.
+#'   For a paired contrast, the joint-certification rate (both occasions
+#'   certified) is reported as a descriptive caveat on the contrast's
+#'   interpretability. Assessing the occasions object per occasion via
+#'   `scales =` one occasion's columns instead uses the default `"cpm"`
+#'   structure and can give slightly different per-occasion verdicts -- a
+#'   structure-sensitivity fact, not a bug.
 #' @references Zimmermann, J., & Wright, A. G. C. (2017). Beyond description
 #'   in interpersonal construct validation: Methodological advances in the
 #'   circumplex Structural Summary Approach. \emph{Assessment, 24}(1), 3-23.
@@ -181,6 +197,11 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
 
   call <- match.call()
   t_start <- proc.time()[["elapsed"]]
+  # Captured before match.arg() collapses the default: the occasions path
+  # accepts neither an explicit `structure` nor a `cpm` (no CPM is fit on the
+  # occasions path -- D-017), so an explicit supply must be refused, not
+  # silently ignored.
+  structure_supplied <- !missing(structure)
 
   # ---- validate arguments ----
   stopifnot(inherits(ssm_object, "circumplex_ssm"))
@@ -194,16 +215,30 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
       call. = FALSE
     )
   }
-  if (!is.null(ssm_object$details$occasions)) {
-    stop(
-      "ssm_ci_accuracy() does not yet support occasions analyses: its ",
-      "plug-in population is built from per-group sufficient statistics ",
-      "that ignore the within-person cross-occasion dependence, so it ",
-      "would silently simulate from the wrong population. Assess the ",
-      "profile CIs occasion by occasion instead (re-run ssm_analyze() ",
-      "with scales = one occasion's columns).",
-      call. = FALSE
-    )
+  # Occasions objects simulate from the observed stacked cross-occasion
+  # covariance (D-017); no CPM is fit, so an explicit structure/cpm supply is
+  # refused (refuse-don't-coerce, M18 lesson), and a pre-M29 occasions object
+  # (no stored stacked statistics) is refused with a re-run message rather
+  # than silently recomputing the wrong p x p object.
+  is_occ <- !is.null(ssm_object$details$occasions)
+  if (is_occ) {
+    if (structure_supplied || !is.null(cpm)) {
+      stop(
+        "ssm_ci_accuracy() does not accept an explicit `structure` or `cpm` ",
+        "for an occasions analysis: the occasions plug-in population is the ",
+        "observed stacked cross-occasion covariance and no circular process ",
+        "model is fit on the occasions path. Omit both (the default runs).",
+        call. = FALSE
+      )
+    }
+    if (is.null(ssm_object$details$suff_stats)) {
+      stop(
+        "This occasions ssm object predates cross-occasion sufficient-",
+        "statistics storage; re-run ssm_analyze() under this package version ",
+        "so the stacked per-group covariance is stored, then reassess.",
+        call. = FALSE
+      )
+    }
   }
   stopifnot(is_scalar_count(reps))
   stopifnot(is.numeric(amplitude_factors), length(amplitude_factors) >= 1,
@@ -215,6 +250,8 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
          "that the verdict is keyed to).", call. = FALSE)
   }
   structure <- match.arg(structure)
+  # The occasions path has one population: the observed stacked covariance.
+  if (is_occ) structure <- "observed"
   stopifnot(is.null(m) || is_scalar_count(m))
   stopifnot(is.null(cpm) || inherits(cpm, "circumplex_cpm"))
   # This diagnostic characterizes the population *correlation* structure and
@@ -275,11 +312,26 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
   # ssm_analyze() call arguments (scales/measures/grouping) that were passed as
   # variables in the user's scope, not this function's frame.
   stats_ss <- ssm_suff_stats(ssm_object, data = data, envir = parent.frame())
-  n_g <- stats_ss$n
+  if (is_occ) {
+    # Stacked per-group statistics (D-017): one entry per person-group, each
+    # carrying n_g, the stacked k*p mean, and the stacked k*p covariance whose
+    # off-diagonal p x p blocks are the within-person cross-occasion dependence.
+    occ_k <- stats_ss$occ_k
+    stacked_cols <- stats_ss$stacked_cols
+    n_g <- stats::setNames(
+      vapply(stats_ss$groups, function(gg) as.integer(gg$n), integer(1)),
+      names(stats_ss$groups)
+    )
+  } else {
+    occ_k <- NULL
+    n_g <- stats_ss$n
+  }
   G <- length(n_g)
 
   scores <- ssm_object$scores
-  scale_names <- setdiff(colnames(scores), c("Label", "Group", "Measure"))
+  # Label columns to strip; "Occasion" is present only on occasions objects.
+  scale_names <- setdiff(colnames(scores),
+                         c("Label", "Group", "Measure", "Occasion"))
   stopifnot(length(scale_names) == p)
   # scores holds one row per profile plus, when contrasting, one contrast row
   n_rows <- nrow(scores)
@@ -303,6 +355,7 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
   } else {
     measure_names <- NULL
     q <- 0L
+    if (is_occ) stopifnot(n_prof == G * occ_k)
   }
 
   # ---- population truths at c = 1; refuse flat profiles ----
@@ -312,46 +365,83 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     numeric(6)
   ))
   if (any(is.na(truth1[, fit_col]))) {
+    if (is_occ) {
+      # AC4 / D-017: name the flat occasion(s) rather than the generic refusal
+      bad <- row_labels[seq_len(n_prof)][is.na(truth1[, fit_col])]
+      stop("Flat (zero-variance) occasion profile(s): ",
+           paste(bad, collapse = ", "),
+           "; a flat occasion has no CI behavior to assess.", call. = FALSE)
+    }
     stop("One or more profile vectors are flat (zero variance); a flat ",
          "population has no CI behavior to assess.", call. = FALSE)
   }
 
-  # ---- pooled within-group scale correlations (spec sec. 3.2, step 1) ----
-  Rw <- matrix(0, p, p, dimnames = list(scale_names, scale_names))
-  wsum <- 0
-  for (g in seq_len(G)) {
-    Rw <- Rw + (n_g[[g]] - 1) *
-      stats_ss$cormats[[g]][scale_names, scale_names]
-    wsum <- wsum + (n_g[[g]] - 1)
-  }
-  Rw <- Rw / wsum
-
+  # ---- population scale structure (spec sec. 3.2, step 1) ----
+  # The occasions path has no single p x p circumplex to smooth: its plug-in
+  # population is the stored per-group stacked k*p covariance, assembled below
+  # (D-017). Skip the pooled-Rw / CPM construction entirely; P and cpm_obj stay
+  # unused on that path. `occ_rank_def` records per-group rank deficiency (a
+  # singular stacked covariance is a proper degenerate MVN whose projected
+  # dependence rides through -- warn, never refuse; RR07 R4).
   cpm_obj <- NULL
-  if (structure == "cpm") {
-    if (!is.null(cpm)) {
-      if (!identical(cpm$details$scales, scale_names)) {
-        stop("The supplied `cpm` was fitted to different scales than this ",
-             "ssm object.", call. = FALSE)
-      }
-      cpm_obj <- cpm
-    } else {
-      m_eff <- if (is.null(m)) min(3, floor((p - 1) / 2)) else m
-      # The n device yields the pooled-within Wishart df sum(n_g - 1):
-      # cpm_fit()'s internal multiplier is n - 1 (spec sec. 3.2)
-      if (sum(n_g) - G + 1 <= p) {
-        stop("Too few observations to characterize the population structure: ",
-             "the pooled within-group sample size (", sum(n_g) - G + 1,
-             ") must exceed the number of scales (", p, ").", call. = FALSE)
-      }
-      cpm_obj <- cpm_fit(
-        cormat = Rw, n = sum(n_g) - G + 1, scales = scale_names,
-        angles = angles_deg, m = m_eff, model = "quasi-circumplex",
-        ci_method = "analytic"
+  P <- NULL
+  occ_rank_def <- NULL
+  if (is_occ) {
+    kp <- occ_k * p
+    occ_rank_def <- lapply(seq_len(G), function(g) {
+      Sg <- stats_ss$groups[[g]]$cov
+      ev <- eigen(Sg, symmetric = TRUE, only.values = TRUE)$values
+      list(n = n_g[[g]], kp = kp,
+           min_eig_ratio = min(ev) / max(ev),
+           deficient = n_g[[g]] <= kp)
+    })
+    names(occ_rank_def) <- names(n_g)
+    def <- vapply(occ_rank_def, `[[`, logical(1), "deficient")
+    if (any(def)) {
+      warning(
+        "Rank-deficient stacked covariance in group(s) ",
+        paste(names(n_g)[def], collapse = ", "), " (n <= k*p = ", kp,
+        "): the plug-in population is a proper degenerate multivariate normal ",
+        "and the reported coverage/width are valid, but the fit-statistic ",
+        "pass rate is descriptive only.", call. = FALSE
       )
     }
-    P <- cpm_obj$matrices$Phat[scale_names, scale_names]
   } else {
-    P <- Rw
+    Rw <- matrix(0, p, p, dimnames = list(scale_names, scale_names))
+    wsum <- 0
+    for (g in seq_len(G)) {
+      Rw <- Rw + (n_g[[g]] - 1) *
+        stats_ss$cormats[[g]][scale_names, scale_names]
+      wsum <- wsum + (n_g[[g]] - 1)
+    }
+    Rw <- Rw / wsum
+
+    if (structure == "cpm") {
+      if (!is.null(cpm)) {
+        if (!identical(cpm$details$scales, scale_names)) {
+          stop("The supplied `cpm` was fitted to different scales than this ",
+               "ssm object.", call. = FALSE)
+        }
+        cpm_obj <- cpm
+      } else {
+        m_eff <- if (is.null(m)) min(3, floor((p - 1) / 2)) else m
+        # The n device yields the pooled-within Wishart df sum(n_g - 1):
+        # cpm_fit()'s internal multiplier is n - 1 (spec sec. 3.2)
+        if (sum(n_g) - G + 1 <= p) {
+          stop("Too few observations to characterize the population structure: ",
+               "the pooled within-group sample size (", sum(n_g) - G + 1,
+               ") must exceed the number of scales (", p, ").", call. = FALSE)
+        }
+        cpm_obj <- cpm_fit(
+          cormat = Rw, n = sum(n_g) - G + 1, scales = scale_names,
+          angles = angles_deg, m = m_eff, model = "quasi-circumplex",
+          ci_method = "analytic"
+        )
+      }
+      P <- cpm_obj$matrices$Phat[scale_names, scale_names]
+    } else {
+      P <- Rw
+    }
   }
 
   # ---- degenerate-ladder check (spec sec. 4.1): the margin rung ----
@@ -458,8 +548,17 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     })
   }
 
+  # ---- occasions-path simulation ingredients ----
+  # Per group, the draw-invariant root of the stored stacked k*p covariance
+  # (held fixed across ladder conditions -- only the mean moves; D-017 / design
+  # note sec. 5). mvn_root() is the shared draw root, so the population the
+  # diagnostic simulates cannot drift from the object's Monte Carlo engine.
+  if (is_occ) {
+    occ_roots <- lapply(seq_len(G), function(g) mvn_root(stats_ss$groups[[g]]$cov))
+  }
+
   # ---- mean-path simulation ingredients ----
-  if (!corr_based) {
+  if (!is_occ && !corr_based) {
     sds <- lapply(seq_len(G), function(g) {
       as.numeric(stats_ss$sds[[g]][scale_names])
     })
@@ -488,7 +587,18 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
         # 1. Simulate every group at its exact n (spec sec. 3.2, step 2)
         sims <- vector("list", G)
         for (g in seq_len(G)) {
-          if (!corr_based) {
+          if (is_occ) {
+            # Draw n_g persons from MVN(ladder-adjusted stacked mean, Sigma_g).
+            # The stacked mean is occasion-major: the group's k occasion-profile
+            # rows (rows (g-1)*occ_k + 1..occ_k of pc$profiles) laid end to end,
+            # matching the stacked_cols column order.
+            g_rows <- (g - 1) * occ_k + seq_len(occ_k)
+            mu_g <- as.numeric(t(pc$profiles[g_rows, , drop = FALSE]))
+            Z <- matrix(stats::rnorm(n_g[[g]] * occ_k * p), n_g[[g]],
+                        occ_k * p) %*% occ_roots[[g]]
+            sims[[g]] <- sweep(Z, 2, mu_g, "+")
+            colnames(sims[[g]]) <- stacked_cols
+          } else if (!corr_based) {
             Z <- sim_scales(n_g[[g]])
             sims[[g]] <- sweep(
               sweep(Z, 2, sds[[g]], "*"), 2, pc$profiles[g, ], "+"
@@ -504,15 +614,24 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
 
         # 2. Point estimates on the simulated data (the replicate's t0)
         t0_prof <- matrix(NA_real_, n_prof, p)
-        for (g in seq_len(G)) {
-          if (!corr_based) {
-            t0_prof[g, ] <- colMeans(sims[[g]])
-          } else {
-            r_hat <- stats::cor(
-              sims[[g]][, measure_names, drop = FALSE],
-              sims[[g]][, scale_names, drop = FALSE]
-            )
-            t0_prof[(g - 1) * q + seq_len(q), ] <- r_hat
+        if (is_occ) {
+          # Re-run the object's own occasion scoring: stack the simulated
+          # person rows, then occ_scores() -> one group-major/occasion-minor
+          # profile row per (group, occasion), matching prof_mat's row order.
+          all_sims <- do.call(rbind, sims)
+          grp_all <- rep(seq_len(G), times = as.integer(n_g))
+          t0_prof <- occ_scores(all_sims, grp_all, occ_k, p, listwise = TRUE)
+        } else {
+          for (g in seq_len(G)) {
+            if (!corr_based) {
+              t0_prof[g, ] <- colMeans(sims[[g]])
+            } else {
+              r_hat <- stats::cor(
+                sims[[g]][, measure_names, drop = FALSE],
+                sims[[g]][, scale_names, drop = FALSE]
+              )
+              t0_prof[(g - 1) * q + seq_len(q), ] <- r_hat
+            }
           }
         }
         t0_par <- matrix(group_parameters(t0_prof, theta), ncol = 6,
@@ -524,7 +643,37 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
         }
 
         # 3. Replay the object's own interval procedure (spec sec. 3.4)
-        if (method == "montecarlo") {
+        if (is_occ && method == "montecarlo") {
+          # The stacked k*p draws carry the cross-occasion dependence; the MC
+          # engine's occ_k path draws the joint group-mean vector and splits it
+          # back into per-occasion blocks (spec sec. 2.2). t0_prof is unused on
+          # the mean path (scores is consumed only when measures are present).
+          cs <- do.call(rbind, sims)
+          t_mat <- ssm_mc_replicates(cs, NULL, grp_vec, t0_prof, boots, theta,
+                                     contrast, occ_k = occ_k)
+        } else if (is_occ) {
+          # Bootstrap replay: ONE person-resample per group shared across all k
+          # occasion blocks (M29-D2), so within-person cross-occasion dependence
+          # rides through exactly as the object's person-row case bootstrap.
+          # Weighted occasion-block means have the same law as resampling the
+          # person rows and re-scoring (ssm_ci_wboot_means, pinned equal to the
+          # object's bs_function on the classic mean path).
+          rep_mats <- vector("list", n_prof)
+          for (g in seq_len(G)) {
+            W <- ssm_ci_boot_weights(n_g[[g]], boots)
+            for (j in seq_len(occ_k)) {
+              block_cols <- (j - 1) * p + seq_len(p)
+              means_j <- ssm_ci_wboot_means(sims[[g]][, block_cols, drop = FALSE], W)
+              rep_mats[[(g - 1) * occ_k + j]] <- matrix(
+                group_parameters(means_j, theta), ncol = 6, byrow = TRUE
+              )
+            }
+          }
+          t_mat <- do.call(cbind, rep_mats)
+          if (contrast) {
+            t_mat <- cbind(t_mat, param_diff(rep_mats[[2]], rep_mats[[1]]))
+          }
+        } else if (method == "montecarlo") {
           cs <- do.call(rbind, lapply(sims, function(S) {
             S[, scale_names, drop = FALSE]
           }))
@@ -787,7 +936,8 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
       out
     }
     deltas <- if (r <= n_prof) {
-      g <- if (corr_based) (r - 1) %/% q + 1 else r
+      g <- if (corr_based) (r - 1) %/% q + 1
+        else if (is_occ) (r - 1) %/% occ_k + 1 else r
       stats::setNames(
         vapply(seq_len(n_cond), function(k) pop_cond[[k]]$deltas[[g]],
                numeric(1)),
@@ -803,7 +953,8 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
   # inputs are the two profile rows' samples)
   row_n <- vapply(seq_len(n_rows), function(r) {
     if (r > n_prof) return(NA_real_)
-    g <- if (corr_based) (r - 1) %/% q + 1 else r
+    g <- if (corr_based) (r - 1) %/% q + 1
+      else if (is_occ) (r - 1) %/% occ_k + 1 else r
     as.numeric(n_g[[g]])
   }, numeric(1))
   names(row_n) <- row_labels
@@ -838,6 +989,12 @@ ssm_ci_accuracy <- function(ssm_object, reps = 1000,
     },
     failed_reps = failed_reps,
     degenerate_replicates = degen_reps,
+    # Occasions-path metadata (NULL on the classic path): occ_k tags the run
+    # for the occasions-aware summary()/structure-note wording, and
+    # rank_deficiency records the per-group stacked-covariance conditioning
+    # behind the fit-statistic caveat (D-017 / RR07 R4).
+    occ_k = occ_k,
+    rank_deficiency = occ_rank_def,
     parallel = parallel,
     ncpus = ncpus,
     elapsed = proc.time()[["elapsed"]] - t_start
