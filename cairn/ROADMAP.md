@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-18 (M32 done + archived, PR #56 — geom/layer ergonomics: exported ggproto generators, off-spoke amplitude axis, `theme_circumplex()`, na.rm opt-in parity. M27 terminal row pruned per retention. Terminal-row retention keeps the 5 most recent: M28–M32)_
+_Last hygiene check: 2026-07-18 (M33 done + archived, PR #57 — `ssm_plot_trajectory()`: faceted SSM trajectories across occasions, span-anchored displacement intervals, D-007 hollow marking. M28 terminal row pruned per retention. Terminal-row retention keeps the 5 most recent: M29–M33)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27, M31, M32, M33, M34, M35 | high | milestones/M7-v2-release-prep.md |
-| M28 | Occasions long-format sugar (`ssm_analyze_long()`) | done | M25 | normal | milestones/archive/M28-occasions-long-format-sugar.md |
 | M29 | `ssm_ci_accuracy()` occasions extension | done | M25 | normal | milestones/archive/M29-ci-accuracy-occasions.md |
 | M30 | Circumplex coordinate-system design (Fable-reviewed) | done | — | high | milestones/archive/M30-coord-system-design.md |
 | M31 | Circumplex coordinate-system build | done | M30 | high | milestones/archive/M31-coord-system-build.md |
 | M32 | Circumplex geom & layer ergonomics | done | M31 | normal | milestones/archive/M32-geom-ergonomics.md |
-| M33 | Longitudinal trajectory visualization (occasions objects) | review | — | high | milestones/M33-trajectory-visualization.md |
+| M33 | Longitudinal trajectory visualization (occasions objects) | done | — | high | milestones/archive/M33-trajectory-visualization.md |
 | M34 | Plotting vignette + pkgdown reference | planned | M31, M32, M33 | normal | milestones/M34-plotting-vignette-pkgdown.md |
 | M35 | Model-based trajectory plotting (`ssm_draws()` tables) | planned | M33 | normal | milestones/M35-model-based-trajectory.md |
 
