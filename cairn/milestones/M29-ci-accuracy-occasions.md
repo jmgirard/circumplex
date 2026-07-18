@@ -94,7 +94,7 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
       the guard (:197), wire the stacked-MC population + wide-row simulation +
       per-occasion/contrast accuracy rows. Test-first (regression fixture
       asserting the correct population structure + boundary behavior).
-- [ ] **T3** — Simulation-coverage oracle:
+- [x] **T3** — Simulation-coverage oracle:
       `devel/m29-ci-accuracy-occasions-oracle.R` + committed
       `devel/m29-*-results.rds`, seeded, cell-indexed by level, smoke-first;
       interior + boundary cells; pre-registered acceptance in the script
@@ -121,22 +121,22 @@ dependence (stacked Monte Carlo population, spec §2.2), validated by a full
   storage, `(r−1) %/% k + 1` row↔group refactor, oracle plan); per [[D-017]].
 - 2026-07-17: implement gate → M29-D2 (R12 add; shared-W bootstrap replay).
 - 2026-07-17: T2 done — occasions branch in `ssm_ci_accuracy.R` (stored stacked
-  per-group `(n,μ,Σ)`; guard removed; `MVN(μ,Σ̂_g)` via `mvn_root`; shared-W
-  bootstrap + `ssm_mc_replicates(occ_k=)` MC; flat/rank/structure/legacy
-  refusals; occasions-aware `summary()` + R12). AC1/AC4 tests; `test()` clean.
+  `(n,μ,Σ)`; guard removed; `MVN(μ,Σ̂_g)` via `mvn_root`; shared-W bootstrap +
+  `ssm_mc_replicates(occ_k=)` MC; flat/rank/structure/legacy refusals;
+  occasions-aware `summary()` + R12). AC1/AC4 tests; `test()` clean.
+- 2026-07-17: T3 done — AC2 simulation-coverage oracle (`m29-*-oracle.{R,md}` +
+  committed `-results.rds`; R1=1000/R2=800/boots=300): diagnostic reported vs
+  direct empirical coverage of the real `ssm_analyze` procedure at the plug-in
+  (interior + pole × engines × contrast); 27/27 within the 4-SE band.
 
 ## Decisions
 
 ### M29-D1 (2026-07-17): RR07 ingested — occasions population design settled
 
-Design promoted to [[D-017]] (apply R1–R11, now encoded in the amended
-AC2/AC3/AC4 + T1/T4; the AC amendments landed at the 2026-07-17 amendment gate).
-**consider** R12 (`summary()` breadcrumb when the c=1 joint-cert rate ≪ 1−α —
-decide T2/T5). Standing **rejects** (do not revisit without a superseding
-entry): R13 occasions `data=` fallback (refuse legacy `suff_stats = NULL` with a
-re-run message instead); R14 CPM-diagonal + observed-cross (98% non-PSD at
-n=25); R15 shrinkage (attenuates the dependence under test); R16 pooling across
-groups (replay is per-group).
+Design promoted to [[D-017]] (R1–R11 encoded in the amended AC2/AC3/AC4 + T1/T4
+at the 2026-07-17 amendment gate; standing rejects R13 `data=` fallback, R14
+CPM-diagonal+observed-cross, R15 shrinkage, R16 cross-group pooling all recorded
+there). R12 (`summary()` joint-cert breadcrumb) resolved in M29-D2 below.
 
 ### M29-D2 (2026-07-17): R12 breadcrumb added; occasions bootstrap replay reuses the weight machinery
 

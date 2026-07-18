@@ -794,3 +794,37 @@ test_that("occasion contrast runs through both engines consistently", {
     expect_true(res$results$d_lci[[3]] < 45 && res$results$d_uci[[3]] > 45)
   }
 })
+
+# ssm_ci_accuracy() occasions oracle (M29 T3/AC2) -----------------------------
+
+test_that("committed AC2 simulation-coverage oracle satisfies the registered band", {
+  # Pins devel/m29-ci-accuracy-occasions-oracle.R (R1 = 1000 diagnostic reps,
+  # R2 = 800 empirical reps, boots = 300): the diagnostic's REPORTED coverage
+  # must track the direct EMPIRICAL coverage of the object's own procedure at
+  # the same plug-in population, per occasion and for the paired contrast, on
+  # both engines. Regeneration that drifts out of the pre-registered band fails
+  # here. Skipped where devel/ is absent (built tarball).
+  rds <- testthat::test_path("..", "..", "devel",
+                             "m29-ci-accuracy-occasions-oracle-results.rds")
+  skip_if_not(file.exists(rds), "devel oracle results not present")
+  x <- readRDS(rds)
+  skip_if(isTRUE(x$smoke), "smoke-run rds carries no evidence")
+  # every (cell x engine) must have exercised the paired-contrast row
+  expect_true(all(c("interior.bootstrap", "interior.montecarlo",
+                    "pole.bootstrap") %in% names(x$results)))
+  for (key in names(x$results)) {
+    r <- x$results[[key]]
+    # the paired-contrast row is present (3rd column of the 3x3 matrices)
+    expect_equal(dim(r$reported), c(3L, 3L))
+    expect_equal(dim(r$empirical), c(3L, 3L))
+    for (ri in 1:3) {
+      for (pm_i in 1:3) {
+        rep_c <- r$reported[pm_i, ri]
+        emp_c <- r$empirical[pm_i, ri]
+        band <- 4 * sqrt(rep_c * (1 - rep_c) / r$n_reported +
+                           emp_c * (1 - emp_c) / r$n_empirical) + 0.010
+        expect_lte(abs(rep_c - emp_c), band)
+      }
+    }
+  }
+})
