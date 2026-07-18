@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37 | high | milestones/M7-v2-release-prep.md |
-| M36 | Visualization polish — certification legend key + non-finite guards | in-progress | — | normal | milestones/M36-viz-polish-legend-guards.md |
+| M36 | Visualization polish — certification legend key + non-finite guards | review | — | normal | milestones/M36-viz-polish-legend-guards.md |
 | M37 | On-circle movement paths across occasions | planned | M31, M32, M33 | normal | milestones/M37-on-circle-movement-paths.md |
 | M31 | Circumplex coordinate-system build | done | M30 | high | milestones/archive/M31-coord-system-build.md |
 | M32 | Circumplex geom & layer ergonomics | done | M31 | normal | milestones/archive/M32-geom-ergonomics.md |

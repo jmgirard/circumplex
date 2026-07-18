@@ -1,6 +1,6 @@
 # M36: Visualization polish — certification legend key + non-finite guards
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
@@ -71,7 +71,7 @@ certification legend's missing `FALSE` key glyph, and `coord_circumplex()`'s
       `R/coord_circumplex.R`, with error-branch tests for `Inf`/`-Inf`/`NA`/`NaN`.
 - [x] T4: Regenerate the affected vdiffr baseline(s) and confirm unaffected
       plots regenerate byte-identically.
-- [ ] T5: `devtools::document()`, full `devtools::test()`, `devtools::check()`;
+- [x] T5: `devtools::document()`, full `devtools::test()`, `devtools::check()`;
       NEWS.md entries for both fixes.
 
 ## Work log
@@ -96,6 +96,10 @@ certification legend's missing `FALSE` key glyph, and `coord_circumplex()`'s
   message text (`amax = NA` → "greater than"; `center = NA` → "is.na"). Both now
   assert the argument name plus "finite", which is the contract; the amax-below-
   center comparison keeps its own distinct message and its own assertion.
+- 2026-07-18: T5 done; status → review. `document()` no diff; full suite 2903
+  passing / 0 failed / 0 errors / 0 skipped (the 4 CPM Hessian warnings are
+  pre-existing); `check()` 0 errors / 0 warnings / 0 notes. NEWS entries added
+  for both fixes.
 
 ## Decisions
 
