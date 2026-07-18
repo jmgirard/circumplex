@@ -2,7 +2,7 @@
 
 - **Status:** planned
 - **Priority:** high
-- **Depends on:** M25, M26, M27, M31, M32, M33, M34
+- **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35
 - **Branch/PR:** —
 
 ## Goal
@@ -11,7 +11,8 @@ Ship the accumulated M2–M5 work (inference, visualization, Browne model + CI
 trustworthiness, structure tests, SEM) plus the CIRCUM free-scaling family
 (M17/M18, per D-008) and the longitudinal SSM builds (M25–M27, per D-012 +
 the 2026-07-16 plan gate) plus the visualization expansion (M30 design → M31
-build, M32 ergonomics, M33 trajectory viz, M34 docs, per D-018) to CRAN as one
+build, M32 ergonomics, M33 trajectory viz, M34 docs, M35 model-based
+trajectories, per D-018) to CRAN as one
 v2.0.0 release. **No target date** — the release ships when its bundle is
 complete and validated (D-008).
 
@@ -117,6 +118,10 @@ complete and validated (D-008).
   rationale + D-012). Goal/Out wording updated to match; the stale "M6
   longitudinal → its own ~v2.1.0" Out clause is superseded. No release-prep
   task change.
+- 2026-07-18: AMENDED (gated, /milestone-plan) — dependency gains M35, split out
+  of M33 at that milestone's re-plan gate (the growth vignette's trajectory
+  figure is model-based, not an occasions object). Extends the D-018 viz
+  expansion to M30–M35. No release-prep task change.
 
 ## Decisions
 
