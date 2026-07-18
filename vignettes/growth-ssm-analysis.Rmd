@@ -187,35 +187,24 @@ round_df
 
 The displacement estimates hug the 0°/360° boundary by design — values
 near 350° at early waves and near 10° at late waves — and the intervals
-wrap correctly rather than spanning "the long way around." For plotting or
-reading the trend, unwrap the estimated trajectory onto a continuous
-branch with `angle_unwrap()`:
+wrap correctly rather than spanning "the long way around." A table in this
+shape — one row per time point, with `a_est`/`a_lci`/`a_uci`,
+`d_est`/`d_lci`/`d_uci`, and optionally `certified` — is what
+`ssm_plot_trajectory()` plots directly:
 
-```{r plot, eval = has_glmmTMB, fig.width = 5, fig.height = 3.5}
-d_branch <- angle_unwrap(trajectory$d_est)
-# Each credible bound is reported independently wrapped into [0, 360), so an
-# interval straddling the 0/360 seam has d_lci > d_uci. Move each bound onto
-# the estimate's unwrapped branch by its *signed* distance from the estimate
-# (not by the estimate's branch offset, which would throw a straddling bound
-# a full turn off).
-rel <- function(a) ((a - trajectory$d_est + 180) %% 360) - 180
-plot_dat <- data.frame(
-  wave = waves,
-  d = d_branch,
-  lci = d_branch + rel(trajectory$d_lci),
-  uci = d_branch + rel(trajectory$d_uci)
-)
-ggplot(plot_dat, aes(x = wave, y = d)) +
-  geom_ribbon(aes(ymin = lci, ymax = uci), alpha = 0.25) +
-  geom_line() +
-  geom_point() +
-  labs(x = "Wave", y = "Displacement (degrees, unwrapped)") +
-  theme_minimal()
+```{r plot, eval = has_glmmTMB, fig.width = 6.5, fig.height = 3.5}
+ssm_plot_trajectory(trajectory, time = "wave")
 ```
 
-(Each interval endpoint is placed on the same branch as its estimate by its
-signed circular distance from it; near the boundary the endpoints may
-legitimately fall outside $[0°, 360°)$.)
+The displacement panel is drawn on an *unwrapped* branch, so the trajectory
+crosses the boundary as one continuous path instead of jumping a full turn,
+and values there may legitimately fall outside $[0°, 360°)$. Each interval
+is placed on its estimate's branch and keeps the width it was reported with
+— including an interval that straddles the seam, which is stored with
+`d_lci > d_uci`. Doing this by hand is easy to get subtly wrong: the natural
+"shift each bound by its signed distance from the estimate" recipe silently
+cannot represent an interval wider than a half-turn, which is exactly the
+near-origin case Section 5 is about. The function handles both.
 
 ## 5. Certification: when $d(t)$ intervals are not interpretable
 
@@ -270,6 +259,42 @@ here spanning more than half the circle — is not a statement about
 direction. In our validation simulations of this regime, the caution fires
 at the degraded wave in essentially every replicate while the origin-distal
 waves remain certified and nominally covered.
+
+Assembling this fit's full trajectory the same way, and carrying the
+`certified` verdict into the table, lets the plot mark the verdict itself:
+
+```{r lowamp-plot, eval = has_glmmTMB, fig.width = 6.5, fig.height = 3.5}
+per_wave2 <- lapply(waves, function(t) {
+  ssm_draws(cbind(
+    e = B2[, "dve"] + t * B2[, "dve:wave"],
+    x = B2[, "dvx"] + t * B2[, "dvx:wave"],
+    y = B2[, "dvy"] + t * B2[, "dvy:wave"]
+  ), type = "parameters")
+})
+trajectory2 <- data.frame(
+  wave = waves,
+  a_est = sapply(per_wave2, function(s) s$results$a_est),
+  a_lci = sapply(per_wave2, function(s) s$results$a_lci),
+  a_uci = sapply(per_wave2, function(s) s$results$a_uci),
+  d_est = sapply(per_wave2, function(s) as.numeric(s$results$d_est)),
+  d_lci = sapply(per_wave2, function(s) as.numeric(s$results$d_lci)),
+  d_uci = sapply(per_wave2, function(s) as.numeric(s$results$d_uci)),
+  certified = sapply(per_wave2, function(s) s$details$certified)
+)
+ssm_plot_trajectory(trajectory2, time = "wave")
+```
+
+Uncertified waves are drawn as **hollow** points on the displacement panel.
+Read them as gaps in the argument, not as estimates with wide intervals: the
+amplitude panel shows why, with the interval collapsing toward zero as the
+group passes the origin. The displacement interval at such a wave can cover
+most of the circle, and the panel draws it at that full width rather than
+flattening it into something that looks precise.
+
+The `certified` column is optional. A table without it plots the same way,
+minus the hollow marking and its legend — the figure then makes no claim
+about interpretability either way, which is the honest default when the
+verdict was never computed.
 
 ## 6. A caution about REML intervals at small samples
 

@@ -2,10 +2,20 @@
 % Please edit documentation in R/ssm_trajectory.R
 \name{ssm_plot_trajectory}
 \alias{ssm_plot_trajectory}
-\title{Create a Trajectory Plot of SSM Results Across Occasions}
+\alias{ssm_plot_trajectory.default}
+\alias{ssm_plot_trajectory.circumplex_ssm}
+\alias{ssm_plot_trajectory.data.frame}
+\title{Create a Trajectory Plot of SSM Results Over Time}
 \usage{
-ssm_plot_trajectory(
-  ssm_object,
+ssm_plot_trajectory(x, ...)
+
+\method{ssm_plot_trajectory}{default}(x, ...)
+
+\method{ssm_plot_trajectory}{circumplex_ssm}(x, drop_xy = FALSE, base_size = 11, na.rm = TRUE, ...)
+
+\method{ssm_plot_trajectory}{data.frame}(
+  x,
+  time,
   drop_xy = FALSE,
   base_size = 11,
   na.rm = TRUE,
@@ -13,8 +23,11 @@ ssm_plot_trajectory(
 )
 }
 \arguments{
-\item{ssm_object}{An SSM results object produced by \code{\link[=ssm_analyze]{ssm_analyze()}} with the
-\code{occasions} argument, or by \code{\link[=ssm_analyze_long]{ssm_analyze_long()}}.}
+\item{x}{An SSM results object produced by \code{\link[=ssm_analyze]{ssm_analyze()}} with the
+\code{occasions} argument or by \code{\link[=ssm_analyze_long]{ssm_analyze_long()}}, or a trajectory table
+(a data frame) as described above.}
+
+\item{...}{Not used. Supplying an unrecognized argument produces a warning.}
 
 \item{drop_xy}{A logical determining whether the X-value and Y-value panels
 should be omitted (default = \code{FALSE}), leaving elevation, amplitude, and
@@ -23,42 +36,64 @@ displacement.}
 \item{base_size}{A positive number determining the base font size of the plot
 (default = 11).}
 
-\item{na.rm}{A logical determining whether occasions that cannot be plotted
+\item{na.rm}{A logical determining whether time points that cannot be plotted
 (no defined displacement) are dropped silently (default = \code{TRUE}) or with a
 warning naming how many were removed (\code{FALSE}).}
 
-\item{...}{Not used. Supplying an unrecognized argument produces a warning.}
+\item{time}{A string naming the numeric time column of a trajectory table.
+Required for the data frame method; unused for SSM objects.}
 }
 \value{
-A ggplot object depicting each SSM parameter's trajectory across
-occasions, with confidence bands.
+A ggplot object depicting each SSM parameter's trajectory over time,
+with confidence bands.
 }
 \description{
-Plot each Structural Summary Method parameter against occasion, one facet per
+Plot each Structural Summary Method parameter against time, one facet per
 parameter, with its confidence interval as a band. This is a Cartesian
 diagnostic plot, not a circumplex figure: the horizontal axis is time, not
 angle.
 }
 \details{
+Two kinds of input are accepted, and they differ only in their time axis:
+\itemize{
+\item An \strong{SSM results object} with occasions, from \code{\link[=ssm_analyze]{ssm_analyze()}} with the
+\code{occasions} argument or from \code{\link[=ssm_analyze_long]{ssm_analyze_long()}}. Occasions are discrete
+and ordered, so the axis is discrete.
+\item A \strong{trajectory table}: a data frame with one row per time point, a numeric
+time column named by \code{time}, and the columns \code{a_est}, \code{a_lci}, \code{a_uci},
+\code{d_est}, \code{d_lci}, and \code{d_uci} (optionally the \verb{e_*}, \verb{x_*}, and \verb{y_*}
+triples, and a logical \code{certified} column). This is the shape a
+model-based workflow assembles by evaluating a fitted growth model at each
+time point and passing the draws through \code{\link[=ssm_draws]{ssm_draws()}}; see
+\code{vignette("growth-ssm-analysis")}. The axis is continuous, so unequally
+spaced time points are drawn at their actual spacing.
+}
+
+Both paths share one implementation of the displacement unwrap and the
+certification marking described below.
+
 The displacement panel is drawn on an \emph{unwrapped} branch, so a profile whose
 displacement crosses the 0/360 boundary renders as one continuous path rather
 than jumping a full turn. Values on that panel may therefore fall outside
 [0, 360); each confidence bound is placed at its signed angular distance
 from its own estimate. Unwrapping assumes the profile rotates less than a
-half-turn between consecutive occasions at which its displacement is defined
--- no data can verify this, so occasions that are far apart in time, or a
+half-turn between consecutive time points at which its displacement is
+defined -- no data can verify this, so time points that are far apart, or a
 series with a gap, should be read with that in mind.
 
 Occasions appear in the order they were supplied to \code{\link[=ssm_analyze]{ssm_analyze()}} (or in
 the occasion factor's level order for \code{\link[=ssm_analyze_long]{ssm_analyze_long()}}), never in
 alphabetical order.
 
-On the displacement panel, an occasion whose amplitude confidence interval is
-too close to zero for its displacement to be interpretable is drawn as a
-hollow point; see \code{\link[=ssm_analyze]{ssm_analyze()}} for the certification rule. A profile with
-no defined displacement at all (a flat profile) leaves a gap in that panel.
+On the displacement panel, a time point whose amplitude confidence interval
+is too close to zero for its displacement to be interpretable is drawn as a
+hollow point; see \code{\link[=ssm_analyze]{ssm_analyze()}} for the certification rule. For an SSM
+object the verdict is computed from the amplitude interval; for a trajectory
+table it is read from the optional \code{certified} column, and when that column
+is absent no interpretability claim is made or shown. A profile with no
+defined displacement at all (a flat profile) leaves a gap in that panel.
 
-A contrast row is never plotted as an occasion -- it is a difference, not a
+A contrast row is never plotted as a time point -- it is a difference, not a
 time point. Use \code{\link[=ssm_plot_contrast]{ssm_plot_contrast()}} for it.
 }
 \examples{
@@ -76,6 +111,19 @@ res <- ssm_analyze_long(rbind(t1, t2),
 ssm_plot_trajectory(res)
 ssm_plot_trajectory(res, drop_xy = TRUE)
 }
+
+# A model-based trajectory table, plotted on a continuous time axis
+trajectory <- data.frame(
+  wave = 0:4,
+  a_est = c(0.60, 0.55, 0.52, 0.58, 0.63),
+  a_lci = c(0.48, 0.43, 0.40, 0.46, 0.51),
+  a_uci = c(0.72, 0.67, 0.64, 0.70, 0.75),
+  d_est = c(350, 355, 2, 8, 12),
+  d_lci = c(340, 345, 352, 358, 2),
+  d_uci = c(0, 5, 12, 18, 22),
+  certified = c(TRUE, TRUE, FALSE, TRUE, TRUE)
+)
+ssm_plot_trajectory(trajectory, time = "wave")
 }
 \seealso{
 Other visualization functions:
