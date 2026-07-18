@@ -47,11 +47,14 @@
 #'   coord_circumplex(amax = 0.5) +
 #'   geom_ssm_point(ggplot2::aes(amplitude = a_est, displacement = d_est))
 coord_circumplex <- function(amax = NULL, center = 0, ...) {
+  # Validate `center` before it is used in the `amax`/`center` comparison, so a
+  # bad `center` is named as the culprit (not `amax`); guard NA on both so the
+  # comparison never returns NA and throws a cryptic base error.
+  stopifnot(is_num(center, n = 1), !is.na(center))
   stopifnot(is_null_or_num(amax, n = 1))
-  if (!is.null(amax) && !(amax > center)) {
-    stop("`amax` must be greater than `center`.", call. = FALSE)
+  if (!is.null(amax) && (is.na(amax) || amax <= center)) {
+    stop("`amax` must be a single number greater than `center`.", call. = FALSE)
   }
-  stopifnot(is_num(center, n = 1))
 
   # Build a stock CoordRadial with the pinned circumplex convention, then adopt
   # its computed fields under the CoordCircumplex parent so our overrides

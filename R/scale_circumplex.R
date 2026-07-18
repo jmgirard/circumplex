@@ -17,9 +17,9 @@ resolve_circumplex_labels <- function(angles, labels, instrument) {
 }
 
 # Default degree labels for a set of scale angles, shared by the circular canvas
-# (ggcircumplex()/circle_base()) and the linear axis (scale_x_circumplex()) so
-# both render fractional angles identically (e.g. 22.5 -> "22.5 deg") instead
-# of rounding to whole degrees. Integer angles print without a decimal.
+# (ggcircumplex()) and the linear axis (scale_x_circumplex()) so both render
+# fractional angles identically (e.g. 22.5 -> "22.5 deg") instead of rounding to
+# whole degrees. Integer angles print without a decimal.
 circumplex_degree_labels <- function(angles) {
   paste0(angles, "\u00B0")
 }

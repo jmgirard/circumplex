@@ -30,6 +30,12 @@ test_that("coord_circumplex() validates amax and center", {
   expect_error(coord_circumplex(amax = 0.5, center = 0.5), "greater than")
   expect_error(coord_circumplex(amax = 0.2, center = 0.5), "greater than")
   expect_error(coord_circumplex(center = "x"), "center")
+  # A bad `center` is named even when `amax` is also supplied (validation order:
+  # the comparison must not fire its message before `center` is type-checked).
+  expect_error(coord_circumplex(amax = 1, center = "x"), "center")
+  # NA amax/center yield a clean message, not a cryptic "missing value" error.
+  expect_error(coord_circumplex(amax = NA_real_), "greater than")
+  expect_error(coord_circumplex(center = NA_real_), "is.na")
 })
 
 test_that("amax and center are the radial limits, trained in one place", {
