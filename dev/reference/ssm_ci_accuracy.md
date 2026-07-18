@@ -58,7 +58,9 @@ ssm_ci_accuracy(
   model-implied scale correlations; `"observed"` bypasses the model and
   uses the pooled within-group correlation matrix directly (a
   sensitivity switch: if the two verdicts differ, structure uncertainty
-  is itself material).
+  is itself material). Not accepted for occasions analyses, whose
+  population is always the observed stacked cross-occasion covariance
+  (no model is fit).
 
 - m:
 
@@ -74,7 +76,7 @@ ssm_ci_accuracy(
   [`cpm_fit()`](http://circumplex.jmgirard.com/dev/reference/cpm_fit.md)
   scaling); a free-scaling fit models a covariance structure and is not
   a valid population correlation structure for this diagnostic. Ignored
-  when `structure = "observed"`.
+  when `structure = "observed"`; not accepted for occasions analyses.
 
 - data:
 
@@ -198,6 +200,22 @@ assesses the complete-data procedure (missing data are not simulated),
 and groups are assumed to share one circumplex structure. When the
 Browne model fits poorly, the simulated population may misrepresent the
 data; the embedded fit and its diagnostics are returned for inspection.
+
+For an occasions (repeated-measures) analysis the population is instead
+a multivariate normal with the *observed* stacked cross-occasion
+covariance (no circular-model idealization): the within-person
+dependence across occasions is carried directly, and no
+`structure`/`cpm` alternative is offered. When the stacked covariance is
+rank-deficient (per-group sample size at or below the number of
+occasions times scales) the simulated population is a proper degenerate
+normal, so the reported coverage and width remain valid but the
+fit-statistic pass rate is descriptive only. For a paired contrast, the
+joint-certification rate (both occasions certified) is reported as a
+descriptive caveat on the contrast's interpretability. Assessing the
+occasions object per occasion via `scales =` one occasion's columns
+instead uses the default `"cpm"` structure and can give slightly
+different per-occasion verdicts – a structure-sensitivity fact, not a
+bug.
 
 ## References
 
