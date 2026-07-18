@@ -2,7 +2,7 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M33: Longitudinal trajectory visualization (occasions objects)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** — (works under the CLAUDE.md angle invariants: LM=360,
@@ -123,7 +123,7 @@ unwrapping, and D-007 certification marking on the displacement panel.
       teeth by breaking the guarded line); T2/T10 ordering; certification shapes;
       flat-occasion gap + `na.rm` parity; contrast-row drop; every error branch;
       both object constructors and a grouped object.
-- [ ] **T5** — `devtools::document()`, NEWS entry, vdiffr baseline (delete stale
+- [x] **T5** — `devtools::document()`, NEWS entry, vdiffr baseline (delete stale
       snaps, run under `NOT_CRAN=true` or the comparison auto-skips — LESSONS
       M31), full `test()` + `check()`.
 
@@ -162,6 +162,11 @@ unwrapping, and D-007 certification marking on the displacement panel.
   was invisible (now pinned black via override.aes). `na.rm = FALSE` count
   corrected to one per profile; it had reported a flat occasion once per
   affected panel.
+- 2026-07-18: T5 done; status -> review. NEWS entry added; two vdiffr baselines
+  recorded under `skip_on_ci()` (secondary to the data-level fences — bootstrap
+  CI positions are BLAS-sensitive). `devtools::document()` produces no diff.
+  Full `devtools::test()` and `devtools::check()` clean: 0 errors / 0 warnings /
+  0 notes.
 
 ## Decisions
 

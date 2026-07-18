@@ -361,3 +361,18 @@ test_that("non-finite and non-scalar arguments are refused by name", {
 test_that("an unrecognized argument warns rather than passing silently", {
   expect_warning(ssm_plot_trajectory(traj_fit(), colour = "red"), "disregarded")
 })
+
+# Rendered appearance ---------------------------------------------------------
+
+test_that("the trajectory plot renders as expected", {
+  # Secondary to the data-level assertions above: bootstrap CI positions are
+  # BLAS-sensitive, so the baseline is a rendering guard, not the fence for any
+  # acceptance criterion.
+  skip_on_ci()
+  res <- traj_fit()
+  vdiffr::expect_doppelganger("trajectory ungrouped", ssm_plot_trajectory(res))
+  vdiffr::expect_doppelganger(
+    "trajectory grouped",
+    ssm_plot_trajectory(traj_fit(grouping = "Gender"), drop_xy = TRUE)
+  )
+})
