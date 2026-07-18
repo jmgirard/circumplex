@@ -2,13 +2,13 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M33: Longitudinal trajectory visualization (occasions objects)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Principles touched:** — (works under the CLAUDE.md angle invariants: LM=360,
   displacement seam unwrap, occasion order = list order, never alphabetical)
 
-- **Branch/PR:** —
+- **Branch/PR:** `m33-trajectory-viz`
 
 ## Goal
 
@@ -136,6 +136,10 @@ unwrapping, and D-007 certification marking on the displacement panel.
   scope and its criterion moved to M35 (plan gate: split). Gate also settled
   certification marking (in), contrast row (dropped), and left the parked
   `coord_circumplex()` non-finite guard candidate untouched.
+- 2026-07-18: in-progress on `m33-trajectory-viz`. No implementation question
+  gate — the plan was written this session against a fresh investigation and
+  left nothing open; conventions settled by precedent (`drop_xy = FALSE` per
+  `ssm_plot_contrast()`, `scales = "free_y"`, legend hidden when ungrouped).
 
 ## Decisions
 
