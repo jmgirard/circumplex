@@ -14,6 +14,7 @@ ssm_plot_circle(
   angle_labels = NULL,
   palette = "Set2",
   vary_shapes = FALSE,
+  path = FALSE,
   ...
 )
 }
@@ -54,6 +55,16 @@ coverage of a high number of variables).}
 \item{vary_shapes}{A logical determining whether profiles should each get
 their own shape or vary only by fill color. This only works when the number
 of profiles is five or less. (default = FALSE)}
+
+\item{path}{A logical determining whether each series' movement across
+occasions is drawn as an arrowed path on the circle (default = \code{FALSE}).
+Requires an SSM object with occasions, from \code{\link[=ssm_analyze]{ssm_analyze()}} with the
+\code{occasions} argument or from \code{\link[=ssm_analyze_long]{ssm_analyze_long()}}; supplying \code{TRUE} for any
+other object is an error. Occasions are connected in the order they were
+supplied, never alphabetically, and the path is drawn the short way across
+the 0/360 boundary. An occasion whose displacement is undefined (a flat or
+zero-amplitude profile) breaks the path rather than being interpolated
+through. See \code{\link[=geom_ssm_path]{geom_ssm_path()}} for the underlying layer.}
 
 \item{...}{Not used. Supplying an unrecognized argument produces a warning.}
 }

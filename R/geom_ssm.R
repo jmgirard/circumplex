@@ -7,7 +7,10 @@
 # in (displacement, amplitude) space per profile, which the polar coord bends
 # into an annular wedge -- a displacement interval that straddles the 0/360 seam
 # is unwrapped by extension (xmax = xmin + span, possibly > 360) so the coord's
-# periodic transform carries it the short way across the pole.
+# periodic transform carries it the short way across the pole. geom_ssm_path()
+# connects one profile's successive occasions, unwrapping the whole series onto
+# a continuous branch for the same reason; the coord's non-linear munching is
+# what curves each segment along the polar geodesic.
 
 # Plottability predicates for the circular canvas (ROADMAP viz-robustness
 # track). A profile has a *location* -- a point can be drawn -- iff its
@@ -128,13 +131,15 @@ geom_ssm_point <- function(mapping = NULL, data = NULL, stat = "identity",
 #'
 #' These are the \pkg{ggplot2} [ggplot2::ggproto()] classes that back the
 #' circumplex layers and coordinate system: `GeomSsmPoint` (the profile-point
-#' geom), `GeomSsmArc` (the confidence-region arc geom), and `CoordCircumplex`
-#' (the coordinate system). They are exported so that downstream packages can
-#' subclass them to build custom circumplex layers; most users should use the
-#' [geom_ssm_point()], [geom_ssm_arc()], and [coord_circumplex()] constructors
+#' geom), `GeomSsmArc` (the confidence-region arc geom), `GeomSsmPath` (the
+#' movement-path geom), and `CoordCircumplex` (the coordinate system). They are
+#' exported so that downstream packages can subclass them to build custom
+#' circumplex layers; most users should use the [geom_ssm_point()],
+#' [geom_ssm_arc()], [geom_ssm_path()], and [coord_circumplex()] constructors
 #' instead.
 #'
-#' @seealso [geom_ssm_point()], [geom_ssm_arc()], [coord_circumplex()]
+#' @seealso [geom_ssm_point()], [geom_ssm_arc()], [geom_ssm_path()],
+#'   [coord_circumplex()]
 #' @name circumplex-ggproto
 #' @keywords internal
 NULL
@@ -159,6 +164,127 @@ GeomSsmPoint <- ggplot2::ggproto(
       "a missing amplitude or displacement"
     )
     data <- data[keep, ]
+    data$x <- data$displacement
+    data$y <- data$amplitude
+    data
+  }
+)
+
+#' Draw a profile's movement across occasions in circumplex space
+#'
+#' A \pkg{ggplot2} layer that connects a profile's successive positions on a
+#' circumplex canvas built with [coord_circumplex()] (for example the canvas
+#' from [ggcircumplex()]), so change in amplitude and displacement reads as
+#' movement through circumplex space. Each segment is curved along the polar
+#' geodesic by the coordinate system, which owns the transform; the layer owns
+#' the ordering, the 0/360 seam handling, and the optional arrowheads.
+#'
+#' Points are connected in the order the rows appear in the data, exactly as
+#' [ggplot2::geom_path()] does, and the `group` aesthetic separates one series
+#' from another. Supplying the optional `order` aesthetic sorts the rows within
+#' each group before drawing, which is the safer choice when the data are
+#' assembled by hand: an occasion label sorted as text puts `T10` before `T2`
+#' and silently reverses time.
+#'
+#' Consecutive occasions are joined the **short** way around the circle. The
+#' displacements of each group are unwrapped onto a continuous branch before the
+#' coordinate system sees them, so a step from `350` to `10` degrees is drawn as
+#' the 20 degree arc across the pole rather than a 340 degree sweep the long way
+#' round. Unwrapped values may therefore fall outside `[0, 360)`. This assumes
+#' the profile rotates less than a half-turn between consecutive occasions at
+#' which its displacement is defined; no data can verify that, so widely spaced
+#' occasions should be read with it in mind.
+#'
+#' An occasion with no defined location -- a flat or zero-amplitude profile,
+#' whose displacement is undefined -- **breaks** the path rather than being
+#' interpolated through, and the segment after the gap is still drawn on the
+#' correct branch. Non-finite amplitudes and displacements are treated the same
+#' way, since an infinite angle names no position on the circle.
+#'
+#' @param mapping,data,stat,position,show.legend,inherit.aes,... Standard
+#'   \pkg{ggplot2} layer arguments. `mapping` must supply the `amplitude` and
+#'   `displacement` aesthetics, and may supply `order`.
+#' @param arrow An arrow specification produced by [ggplot2::arrow()], or `NULL`
+#'   (the default) for a path drawn without arrowheads. Arrowheads mark the
+#'   direction of time along the path.
+#' @param na.rm If `FALSE`, warn when occasions with no location are removed
+#'   from the ends of a path; if `TRUE` (the default) remove them silently.
+#'   Occasions with no location in the *middle* of a path break it either way.
+#' @return A \pkg{ggplot2} layer.
+#' @family circumplex layers
+#' @export
+#' @examples
+#' data("jz2017")
+#' scales <- c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO")
+#' t1 <- jz2017[, scales]
+#' t1$id <- seq_len(nrow(t1))
+#' t1$occasion <- "T1"
+#' t2 <- t1
+#' t2$occasion <- "T2"
+#' res <- ssm_analyze_long(rbind(t1, t2),
+#'   scales = scales, id = "id", occasion = "occasion"
+#' )
+#' ggcircumplex(octants(), amax = 0.5) +
+#'   geom_ssm_path(
+#'     data = res$results,
+#'     mapping = ggplot2::aes(amplitude = a_est, displacement = d_est),
+#'     arrow = ggplot2::arrow(length = ggplot2::unit(0.1, "inches"))
+#'   )
+geom_ssm_path <- function(mapping = NULL, data = NULL, stat = "identity",
+                          position = "identity", ..., arrow = NULL,
+                          na.rm = TRUE, show.legend = NA,
+                          inherit.aes = TRUE) {
+  ggplot2::layer(
+    geom = GeomSsmPath, mapping = mapping, data = data, stat = stat,
+    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    params = list(arrow = arrow, na.rm = na.rm, ...)
+  )
+}
+
+#' @rdname circumplex-ggproto
+#' @format NULL
+#' @usage NULL
+#' @export
+GeomSsmPath <- ggplot2::ggproto(
+  "GeomSsmPath", ggplot2::GeomPath,
+  required_aes = c("amplitude", "displacement"),
+  optional_aes = "order",
+  setup_data = function(data, params) {
+    # Non-finite guard, BEFORE the unwrap. ssm_has_location() is an is.na()
+    # test, and is.na(Inf) is FALSE -- an infinite displacement would sail
+    # through it into angle_unwrap()'s cumsum() and NaN out every later
+    # occasion in the series, blanking the path from that point on with no
+    # error (the recurring M32/M35 trap). An infinite amplitude or displacement
+    # names no position on the circle, so it is demoted to NA here and then
+    # handled by exactly the same gap machinery as a flat profile.
+    unplottable <- !is.finite(data$amplitude) | !is.finite(data$displacement)
+    data$amplitude[unplottable] <- NA_real_
+    data$displacement[unplottable] <- NA_real_
+
+    if (is.null(data$group)) data$group <- -1L
+
+    # The `order` aesthetic, when supplied, sorts within each series. order()
+    # is stable, so rows tied on `order` keep their data order, and sorting by
+    # group first keeps each series contiguous (GeomPath sorts by group again
+    # at draw time, also stably, so within-series order survives).
+    if (!is.null(data$order)) {
+      data <- data[order(data$group, data$order), , drop = FALSE]
+    }
+
+    # Unwrap each series onto a continuous branch, in row order, so the coord's
+    # periodic transform carries each step the short way across the 0/360 seam.
+    # ssm_unwrap_gapped() (R/ssm_trajectory.R) bridges an undefined occasion
+    # instead of propagating NA onward: the gap stays a gap, and the occasions
+    # after it are unwrapped relative to the last defined one rather than
+    # being blanked. Per group via split(seq_len()) so row order is untouched.
+    for (i in split(seq_len(nrow(data)), data$group)) {
+      data$displacement[i] <- ssm_unwrap_gapped(data$displacement[i])
+    }
+
+    # Hand amplitude/displacement to the coord as y/x. The NA rows are left in
+    # place: GeomPath$handle_na() trims them from the ends of each series and
+    # keeps the interior ones, which is what breaks the line at a gap. That is
+    # also where `na.rm` speaks, so this geom does not warn a second time.
     data$x <- data$displacement
     data$y <- data$amplitude
     data

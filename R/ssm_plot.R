@@ -41,6 +41,15 @@ has_ggrepel <- function() {
 #' @param vary_shapes A logical determining whether profiles should each get
 #'   their own shape or vary only by fill color. This only works when the number
 #'   of profiles is five or less. (default = FALSE)
+#' @param path A logical determining whether each series' movement across
+#'   occasions is drawn as an arrowed path on the circle (default = `FALSE`).
+#'   Requires an SSM object with occasions, from [ssm_analyze()] with the
+#'   `occasions` argument or from [ssm_analyze_long()]; supplying `TRUE` for any
+#'   other object is an error. Occasions are connected in the order they were
+#'   supplied, never alphabetically, and the path is drawn the short way across
+#'   the 0/360 boundary. An occasion whose displacement is undefined (a flat or
+#'   zero-amplitude profile) breaks the path rather than being interpolated
+#'   through. See [geom_ssm_path()] for the underlying layer.
 #' @param ... Not used. Supplying an unrecognized argument produces a warning.
 #' @return A ggplot variable containing a completed circular plot.
 #' @family visualization functions
@@ -64,6 +73,7 @@ ssm_plot_circle <- function(ssm_object,
                             angle_labels = NULL,
                             palette = "Set2",
                             vary_shapes = FALSE,
+                            path = FALSE,
                             ...) {
 
   chkDots(...)
@@ -73,13 +83,48 @@ ssm_plot_circle <- function(ssm_object,
 
   stopifnot(is_null_or_num(amax, n = 1))
   stopifnot(is_null_or_char(angle_labels, n = length(angles)))
+  stopifnot(is_flag(path))
+
+  # A movement path needs occasions to move between. Refuse early and name the
+  # way to produce one, rather than drawing a pathless circle that silently
+  # ignores the argument.
+  if (path && is.null(ssm_object$details$occasions)) {
+    stop(
+      "`path = TRUE` needs an SSM object with occasions to draw a movement ",
+      "path across; produce one with `ssm_analyze(occasions = )` or ",
+      "`ssm_analyze_long()`.",
+      call. = FALSE
+    )
+  }
   
   if (is.null(amax)) {
     amax <- pretty_max(ssm_object$results$a_uci)
   }
   
   if (ssm_object$details$contrast) {
-    df <- df[1:2, ]
+    # A contrast row is a difference, not a position on the circle, so it never
+    # gets drawn. The historical [1:2, ] slice is fine for the two-profile case
+    # it was written for but truncates an occasions object to its first two
+    # occasions; when a path is requested, drop only the contrast row (the last
+    # one -- the same positional detector ssm_trajectory_frame() uses).
+    df <- if (path) df[-nrow(df), , drop = FALSE] else df[1:2, ]
+  }
+
+  # Movement path across occasions. Built from `df` rather than the filtered
+  # `df_plot` below on purpose: an occasion with an undefined displacement must
+  # stay in the frame as NA so geom_ssm_path() BREAKS the path there. Dropping
+  # the row instead would silently connect the occasions on either side of the
+  # gap, drawing a movement that never happened.
+  df_path <- NULL
+  if (path) {
+    # Occasions in details$occasions order -- the order they were supplied in,
+    # never alphabetical, which puts T10 before T2 and reverses time.
+    df_path <- df
+    df_path[["Occasion"]] <-
+      factor(df_path[["Occasion"]], levels = ssm_object$details$occasions)
+    # One path per series: everything that is not the occasion identifies it.
+    df_path[["Series"]] <- paste(df_path[["Group"]], df_path[["Measure"]])
+    df_path <- df_path[order(df_path[["Series"]], df_path[["Occasion"]]), ]
   }
 
   # The amplitude/displacement-to-canvas transform (amplitude scaling and the
@@ -156,6 +201,24 @@ ssm_plot_circle <- function(ssm_object,
       legend.text = ggplot2::element_text(size = legend_font_size)
     )
   
+  ## Add the movement path first, so the arcs and points draw on top of it
+  if (path) {
+    p <- p +
+      geom_ssm_path(
+        data = df_path,
+        mapping = ggplot2::aes(
+          amplitude = .data$a_est,
+          displacement = .data$d_est,
+          group = .data$Series
+        ),
+        colour = "grey30",
+        linewidth = 0.6,
+        arrow = ggplot2::arrow(
+          length = ggplot2::unit(0.08, "inches"), type = "closed"
+        )
+      )
+  }
+
   ## Add arc bars
   p <- p +
     geom_ssm_arc(

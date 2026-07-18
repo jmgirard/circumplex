@@ -62,6 +62,7 @@ on; \code{\link[=ssm_plot_circle]{ssm_plot_circle()}}, which draws SSM results o
 Other circumplex layers:
 \code{\link[=coord_circumplex]{coord_circumplex()}},
 \code{\link[=geom_ssm_arc]{geom_ssm_arc()}},
+\code{\link[=geom_ssm_path]{geom_ssm_path()}},
 \code{\link[=geom_ssm_point]{geom_ssm_point()}},
 \code{\link[=scale_x_circumplex]{scale_x_circumplex()}},
 \code{\link[=theme_circumplex]{theme_circumplex()}}

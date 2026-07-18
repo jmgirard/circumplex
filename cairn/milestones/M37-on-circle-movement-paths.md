@@ -83,15 +83,15 @@ circumplex space rather than only as parallel Cartesian panels.
 
 ## Tasks
 
-- [ ] T1: Write the failing seam test first (path `350 -> 10` spans 20 degrees,
+- [x] T1: Write the failing seam test first (path `350 -> 10` spans 20 degrees,
       not 340), against the intended layer API.
-- [ ] T2: Implement `GeomSsmPath` / `geom_ssm_path()` in `R/geom_ssm.R`,
+- [x] T2: Implement `GeomSsmPath` / `geom_ssm_path()` in `R/geom_ssm.R`,
       emitting `amplitude`/`displacement` as `y`/`x` and letting the coord munch;
       follow the `GeomSsmPoint` `setup_data()` pattern (`R/geom_ssm.R:146-166`).
-- [ ] T3: Wire ordering + seam unwrapping through `ssm_unwrap_gapped()`, the
+- [x] T3: Wire ordering + seam unwrapping through `ssm_unwrap_gapped()`, the
       gap-breaking behavior, and the `!is.finite()` guard; tests for each.
-- [ ] T4: Add the arrow parameter and its grob-level test.
-- [ ] T5: Settle the convenience-surface shape at the implement gate
+- [x] T4: Add the arrow parameter and its grob-level test.
+- [x] T5: Settle the convenience-surface shape at the implement gate
       (new `ssm_plot_*()` vs an `ssm_plot_circle()` argument), then build it with
       occasion ordering taken from `details$occasions`.
       **(RB tripwire: irreversible-api)**
@@ -106,7 +106,41 @@ circumplex space rather than only as parallel Cartesian panels.
   ROADMAP visualization candidate row; both of its stated revisit conditions
   (trajectory viz shipped, M31 coord API settled) now hold. Animation excluded
   at the plan gate.
+- 2026-07-18: T1-T5 done. `geom_ssm_path()`/`GeomSsmPath` added to `R/geom_ssm.R`
+  (seam unwrap per group via `ssm_unwrap_gapped()`, `!is.finite()` guard before
+  the unwrap, optional `order` aes, `arrow` param); `ssm_plot_circle(path = )`
+  added. 31 tests in `tests/testthat/test-geom_ssm_path.R`; the AC5 ordering
+  guard mutation-checked (alphabetical ordering makes it fail). Question gate
+  settled the API shapes — see M37-D1. No new dependency: `ggplot2` re-exports
+  `arrow()`/`unit()`.
 
 ## Decisions
+
+### M37-D1 (2026-07-18): the movement-path convenience surface is `ssm_plot_circle(path = )`
+
+Settled at the implement question gate — the plan's `irreversible-api` tripwire
+on T5. `ssm_plot_circle()` is the door M34's vignette teaches for circle figures
+and already tolerates the conditional `Occasion` column; a separate
+`ssm_plot_path()` would have duplicated ~150 lines of canvas/palette/arc/point
+assembly and added a second permanent exported name for the same figure. Cost
+accepted: `path = TRUE` is meaningful only for an `ssm_analyze(occasions = )`
+object, and errors for anything else, naming the two ways to produce one.
+
+Two consequences inside the wrapper, both deliberate:
+
+- The path is built from the pre-filter results frame, not the `df_plot` the
+  points and arcs use, so an occasion with an undefined displacement stays in
+  the frame as `NA` and **breaks** the path. Reusing `df_plot` would drop the
+  row and silently connect the occasions on either side of the gap, drawing a
+  movement that never happened.
+- With a contrast, the historical `df[1:2, ]` slice truncates an occasions
+  object to its first two occasions; the path branch drops only the contrast
+  row (`-nrow(df)`, the positional detector `ssm_trajectory_frame()` uses).
+
+Layer-level shapes settled at the same gate: connection follows `geom_path()`
+(data row order, `group` separates series) with an optional `order` aesthetic
+sorting within group; `arrow` takes a `ggplot2::arrow()` object and is `NULL` by
+default. `ggplot2` re-exports both `arrow()` and `unit()`, so neither the layer
+nor its examples add a dependency on `grid`.
 
 ## Review
