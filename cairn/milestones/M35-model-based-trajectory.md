@@ -82,7 +82,7 @@ in the growth vignette.
 - [x] **T2** — Decide and build the entry point (generic + `data.frame` method, or
       `ssm_trajectory()` constructor); validation, roxygen, NAMESPACE.
       *(RB tripwire: irreversible-api — settle at the pre-implementation gate.)*
-- [ ] **T3** — Tests: continuous-axis happy path, partial-column table,
+- [x] **T3** — Tests: continuous-axis happy path, partial-column table,
       seam continuity, certification shapes, every error branch.
 - [ ] **T4** — Rewrite the growth vignette figure chunk; NEWS entry;
       `devtools::document()`; vdiffr baseline if the figure warrants one
@@ -107,6 +107,13 @@ in the growth vignette.
   validator; see M35-D1/M35-D2. Code landed before its tests (T3) — the
   validation surface was settled against a working prototype; all nine error
   branches exercised by hand before commit, then pinned in T3.
+- 2026-07-18: T3 — 63 tests in `test-ssm_trajectory_table.R`; full suite
+  0 failures / 2875 passes. Teeth proven by mutation: swapping
+  `ssm_interval_on_branch()` for the naive M27 per-bound expression turns the
+  new suite red (4 failures) and M33's red (3) — both fence the one shared
+  implementation. The first wide-arc fixture had NO teeth (its estimate sat at
+  the arc's centre, where the clamping expression agrees by symmetry); moved
+  the estimate off-centre, which is the real diffuse-draws case.
 
 ## Decisions
 
