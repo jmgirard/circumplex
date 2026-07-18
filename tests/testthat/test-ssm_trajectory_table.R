@@ -185,6 +185,26 @@ test_that("the certified column drives hollow marking on the displacement panel"
   expect_equal(unique(as.character(shape_layers[[1]]$data$Parameter)), "d")
 })
 
+test_that("the certification legend draws both keys on the table path too", {
+  # Same defect, second entry point: an all-TRUE certified column is exactly
+  # the case a model-based ssm_draws() workflow produces most often.
+  all_true <- legend_key_glyphs(
+    ssm_plot_trajectory(traj_table(certified = rep(TRUE, 5)), time = "wave"),
+    "Displacement interpretable"
+  )
+  expect_length(all_true, 2)
+  expect_equal(unname(lengths(all_true)), c(1L, 1L)) # one glyph per key, never overdrawn
+  expect_equal(sort(unname(unlist(all_true))), c(1, 16))
+
+  # The mixed case already drew both keys; assert it is left alone.
+  mixed <- legend_key_glyphs(
+    ssm_plot_trajectory(traj_table(), time = "wave"),
+    "Displacement interpretable"
+  )
+  expect_equal(unname(lengths(mixed)), c(1L, 1L))
+  expect_equal(sort(unname(unlist(mixed))), c(1, 16))
+})
+
 test_that("a table with no certified column makes no interpretability claim", {
   p <- ssm_plot_trajectory(traj_table(certified = NULL), time = "wave")
 

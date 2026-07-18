@@ -55,17 +55,26 @@ coord_circumplex <- function(amax = NULL, center = 0, r_axis_angle = NULL, ...) 
   # Validate `center` before it is used in the `amax`/`center` comparison, so a
   # bad `center` is named as the culprit (not `amax`); guard NA on both so the
   # comparison never returns NA and throws a cryptic base error.
-  stopifnot(is_num(center, n = 1), !is.na(center))
+  # Every numeric argument here is guarded with !is.finite() rather than
+  # is.na(): is.na(Inf) is FALSE, so an infinite limit slips past an is.na()
+  # guard and surfaces only as a cryptic error deep in the render, never naming
+  # the argument that caused it. `center` is validated before it is used in the
+  # `amax`/`center` comparison, so a bad `center` is named as the culprit (not
+  # `amax`) and the comparison never returns NA.
+  stopifnot(is_num(center, n = 1))
+  if (!is.finite(center)) {
+    stop("`center` must be a single finite number.", call. = FALSE)
+  }
   stopifnot(is_null_or_num(amax, n = 1))
   stopifnot(is_null_or_num(r_axis_angle, n = 1))
   if (!is.null(r_axis_angle) && !is.finite(r_axis_angle)) {
-    # !is.finite() catches NA, NaN, and +/-Inf: an Inf angle would slip past an
-    # is.na() guard and only surface as a cryptic NaN error deep in the coord's
-    # render (r_axis_angle %% 360 -> NaN), never naming this argument.
     stop("`r_axis_angle` must be a single finite number (or NULL).",
          call. = FALSE)
   }
-  if (!is.null(amax) && (is.na(amax) || amax <= center)) {
+  if (!is.null(amax) && !is.finite(amax)) {
+    stop("`amax` must be a single finite number (or NULL).", call. = FALSE)
+  }
+  if (!is.null(amax) && amax <= center) {
     stop("`amax` must be a single number greater than `center`.", call. = FALSE)
   }
 

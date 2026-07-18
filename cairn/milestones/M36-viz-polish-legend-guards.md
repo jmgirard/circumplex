@@ -1,10 +1,10 @@
 # M36: Visualization polish — certification legend key + non-finite guards
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m36-viz-polish`
 
 ## Goal
 
@@ -57,7 +57,7 @@ certification legend's missing `FALSE` key glyph, and `coord_circumplex()`'s
 
 ## Tasks
 
-- [ ] T1: Write the failing grob-level legend test (extract `pch` from the
+- [x] T1: Write the failing grob-level legend test (extract `pch` from the
       `guide-box-bottom` grob tree for an all-certified fixture); confirm red
       against current `R/ssm_trajectory.R`. Note for implement: neither
       `override.aes$shape` nor a 2-level `factor(Certified)` with `drop = FALSE`
@@ -65,11 +65,11 @@ certification legend's missing `FALSE` key glyph, and `coord_circumplex()`'s
       glyphs only for values present in layer data, so the fix must make the
       absent value present (e.g. a zero-size / `alpha = 0` presence layer keyed
       to the missing break) or build the key manually.
-- [ ] T2: Implement the fix at `R/ssm_trajectory.R:610-635`; extend the test to
+- [x] T2: Implement the fix at `R/ssm_trajectory.R:610-635`; extend the test to
       the table path and re-assert the mixed-data case is unchanged.
-- [ ] T3: Add `!is.finite()` guards for `amax` and `center` in
+- [x] T3: Add `!is.finite()` guards for `amax` and `center` in
       `R/coord_circumplex.R`, with error-branch tests for `Inf`/`-Inf`/`NA`/`NaN`.
-- [ ] T4: Regenerate the affected vdiffr baseline(s) and confirm unaffected
+- [x] T4: Regenerate the affected vdiffr baseline(s) and confirm unaffected
       plots regenerate byte-identically.
 - [ ] T5: `devtools::document()`, full `devtools::test()`, `devtools::check()`;
       NEWS.md entries for both fixes.
@@ -80,6 +80,22 @@ certification legend's missing `FALSE` key glyph, and `coord_circumplex()`'s
   "continuous / infrastructure refactors" candidate row (legend glyph, M35-found,
   M33-inherited; `amax`/`center` guard, M32 review). Legend behavior chosen at
   the plan gate: both keys always drawn.
+- 2026-07-18: T1–T4 done on `m36-viz-polish`. The legend defect reads at grob
+  level as a key gTree holding a `zeroGrob` where its glyph belongs; test red
+  pre-fix (one glyph, `16`), green post-fix (`16`, `1`), mixed-data case
+  unchanged throughout. Four fix techniques probed: `override.aes` shape vector
+  (fails, confirming the M35 finding), `alpha = 0` presence layer (works, but
+  adds invisible geometry), zero-row presence layer (works, draws nothing —
+  adopted), `geom_blank()` (wrong glyph). Tightened mid-task after the baseline
+  diff showed the fix made BOTH layers claim the legend, overdrawing the TRUE
+  key: the real layer now takes `show.legend = FALSE` and the helper counts
+  every glyph per key so overdraw cannot pass. Render-and-inspect done (legend
+  reads "● TRUE ○ FALSE"); baseline diff is confined to two legend circles, no
+  panel movement.
+- 2026-07-18: T3 changed two pre-existing coord assertions that pinned incidental
+  message text (`amax = NA` → "greater than"; `center = NA` → "is.na"). Both now
+  assert the argument name plus "finite", which is the contract; the amax-below-
+  center comparison keeps its own distinct message and its own assertion.
 
 ## Decisions
 

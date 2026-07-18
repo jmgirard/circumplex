@@ -608,6 +608,18 @@ ssm_trajectory_ggplot <- function(df, time_col, xlab, base_size, na.rm) {
     )
 
   if (show_cert) {
+    # A zero-row layer carrying both certification levels. ggplot2 draws a
+    # legend key's GLYPH only for values present in some layer's data, so a
+    # trajectory with nothing uncertified used to render the FALSE key as a
+    # label with no symbol -- a legend naming an encoding it never showed.
+    # Keeping the break alive with drop = FALSE is not enough, and neither an
+    # `override.aes` shape vector nor factoring `Certified` reaches the key.
+    # Zero rows make the value present to the guide while drawing nothing and
+    # training no scale (an alpha = 0 point would also work, but puts invisible
+    # geometry in the panel).
+    key_rows <- d_rows[0, , drop = FALSE]
+    key_rows$Certified <- factor(c("TRUE", "FALSE"), levels = c("TRUE", "FALSE"))[0]
+
     # Points are split by panel so certification -- a displacement-only
     # guardrail -- marks only where it applies, instead of implying every
     # parameter carries an interpretability verdict.
@@ -617,7 +629,19 @@ ssm_trajectory_ggplot <- function(df, time_col, xlab, base_size, na.rm) {
         data = d_rows,
         mapping = ggplot2::aes(shape = .data$Certified),
         size = 2,
-        na.rm = TRUE
+        na.rm = TRUE,
+        # The zero-row layer below owns the legend outright; letting this layer
+        # contribute too would draw a second, identical glyph over each key it
+        # can fill -- invisible by eye and in a baseline, but a legend assembled
+        # twice.
+        show.legend = FALSE
+      ) +
+      ggplot2::geom_point(
+        data = key_rows,
+        mapping = ggplot2::aes(shape = .data$Certified),
+        size = 2,
+        na.rm = TRUE,
+        show.legend = TRUE
       ) +
       ggplot2::scale_shape_manual(
         name = "Displacement interpretable",
