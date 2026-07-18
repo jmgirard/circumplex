@@ -70,7 +70,7 @@ wrappers.
 
 ## Tasks
 
-- [ ] **T1** — Draft `devel/m30-coord-spec.md`: survey ggplot2 `Coord`/scale
+- [x] **T1** — Draft `devel/m30-coord-spec.md`: survey ggplot2 `Coord`/scale
       extension mechanics for a fixed-aspect polar canvas; specify `amax`
       ownership, configurable center, theme path, back-compat contract, and the
       invariant-preservation argument with the M31 boundary-test list.
@@ -84,6 +84,12 @@ wrappers.
 ## Work log
 
 - 2026-07-17: created by /milestone-plan (viz expansion, area A design half).
+- 2026-07-17 (T1): drafted `devel/m30-coord-spec.md`. Recommends Option A —
+  subclass `CoordRadial` as `coord_circumplex()` so `amax`/center become r-scale
+  limits (R1/R2 structural) and the arc becomes a coord-bent `GeomRect`; Option B
+  (bespoke base-`Coord`, no floor bump) as fallback. Central Fable question:
+  A-vs-B / whether coord_radial's guide API expresses the circumplex labels.
+  Option A re-pins ggplot2 >= 3.5.0 (contingent floor gate + D-entry at T3).
 
 ## Decisions
 
