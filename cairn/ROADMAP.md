@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-17 (M30–M34 planned — viz expansion folded into v2.0.0 per D-018; M7 now depends on the viz builds. Terminal-row retention keeps the 5 most recent: M25–M29)_
+_Last hygiene check: 2026-07-17 (M30 done + archived, PR #54 — coord-system design GO Option A / D-019; M25 terminal row pruned per retention. Terminal-row retention keeps the 5 most recent: M26–M30)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,13 +9,12 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M25 | Longitudinal Build A — occasions API + paired contrasts | done | — | high | milestones/archive/M25-occasions-core.md |
 | M26 | Longitudinal Build B — per-person layer + draws adapter + Bayesian vignette | done | — | high | milestones/archive/M26-perperson-draws-adapter.md |
 | M27 | Longitudinal Build C — growth-model support on displacement | done | M25, M26 | high | milestones/archive/M27-growth-model-support.md |
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27, M31, M32, M33, M34 | high | milestones/M7-v2-release-prep.md |
 | M28 | Occasions long-format sugar (`ssm_analyze_long()`) | done | M25 | normal | milestones/archive/M28-occasions-long-format-sugar.md |
 | M29 | `ssm_ci_accuracy()` occasions extension | done | M25 | normal | milestones/archive/M29-ci-accuracy-occasions.md |
-| M30 | Circumplex coordinate-system design (Fable-reviewed) | review | — | high | milestones/M30-coord-system-design.md |
+| M30 | Circumplex coordinate-system design (Fable-reviewed) | done | — | high | milestones/archive/M30-coord-system-design.md |
 | M31 | Circumplex coordinate-system build | planned | M30 | high | milestones/M31-coord-system-build.md |
 | M32 | Circumplex geom & layer ergonomics | planned | M31 | normal | milestones/M32-geom-ergonomics.md |
 | M33 | Longitudinal trajectory visualization | planned | — | high | milestones/M33-trajectory-visualization.md |
