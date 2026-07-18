@@ -76,3 +76,11 @@ res <- ssm_analyze(
 ssm_plot_circle(res)
 }
 }
+\seealso{
+Other visualization functions:
+\code{\link[=plot.circumplex_ci_accuracy]{plot.circumplex_ci_accuracy()}},
+\code{\link[=ssm_plot_contrast]{ssm_plot_contrast()}},
+\code{\link[=ssm_plot_curve]{ssm_plot_curve()}},
+\code{\link[=ssm_plot_trajectory]{ssm_plot_trajectory()}}
+}
+\concept{visualization functions}

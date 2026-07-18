@@ -1,5 +1,20 @@
 # circumplex (development version)
 
+* The "Advanced Circumplex Visualization" vignette has been rewritten over the
+  new plotting API. It now teaches `coord_circumplex()` as the owner of the
+  amplitude-to-radius mapping (replacing the old advice to keep a per-layer
+  `amax` in sync), the configurable circle center and amplitude-axis placement,
+  restyling the canvas through `theme_circumplex()` and ordinary `theme()`
+  calls, subclassing the exported `GeomSsmPoint`/`GeomSsmArc` objects to build
+  reusable layers, and plotting a trajectory across occasions.
+
+* The reference index now groups the plotting API into "Complete Plots" and
+  "Building Blocks". The `ssm_plot_*` functions now cross-link to each other, so
+  `ssm_plot_trajectory()` is reachable from its siblings' help pages, and the
+  composable layers (`ggcircumplex()`, `coord_circumplex()`, the `geom_ssm_*()`
+  layers, `scale_x_circumplex()`, and `theme_circumplex()`) likewise cross-link
+  to each other.
+
 * The new `ssm_plot_trajectory()` plots how each SSM parameter changes across
   occasions, one panel per parameter with its confidence interval as a band, for
   results from `ssm_analyze(occasions = )` and `ssm_analyze_long()`. The

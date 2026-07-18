@@ -102,7 +102,7 @@ ssm_deprecate_geom_arg <- function(value, arg, fn) {
 #'   profiles with a missing displacement or amplitude, since they have no
 #'   location on the circle; if `TRUE` (the default) remove them silently.
 #' @return A \pkg{ggplot2} layer.
-#' @seealso [coord_circumplex()], [ggcircumplex()], [geom_ssm_arc()]
+#' @family circumplex layers
 #' @export
 #' @examples
 #' data("jz2017")
@@ -198,7 +198,7 @@ GeomSsmPoint <- ggplot2::ggproto(
 #'   profiles with an incomplete confidence region (a missing amplitude or
 #'   displacement bound); if `TRUE` (the default) remove them silently.
 #' @return A \pkg{ggplot2} layer.
-#' @seealso [coord_circumplex()], [ggcircumplex()], [geom_ssm_point()]
+#' @family circumplex layers
 #' @export
 #' @examples
 #' data("jz2017")

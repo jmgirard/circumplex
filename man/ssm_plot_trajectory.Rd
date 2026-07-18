@@ -127,6 +127,9 @@ ssm_plot_trajectory(trajectory, time = "wave")
 }
 \seealso{
 Other visualization functions:
-\code{\link[=plot.circumplex_ci_accuracy]{plot.circumplex_ci_accuracy()}}
+\code{\link[=plot.circumplex_ci_accuracy]{plot.circumplex_ci_accuracy()}},
+\code{\link[=ssm_plot_circle]{ssm_plot_circle()}},
+\code{\link[=ssm_plot_contrast]{ssm_plot_contrast()}},
+\code{\link[=ssm_plot_curve]{ssm_plot_curve()}}
 }
 \concept{visualization functions}

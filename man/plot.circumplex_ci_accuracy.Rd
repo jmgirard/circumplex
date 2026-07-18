@@ -54,6 +54,9 @@ Other ssm functions:
 \code{\link[=summary.circumplex_ssm_id]{summary.circumplex_ssm_id()}}
 
 Other visualization functions:
+\code{\link[=ssm_plot_circle]{ssm_plot_circle()}},
+\code{\link[=ssm_plot_contrast]{ssm_plot_contrast()}},
+\code{\link[=ssm_plot_curve]{ssm_plot_curve()}},
 \code{\link[=ssm_plot_trajectory]{ssm_plot_trajectory()}}
 }
 \concept{ssm functions}

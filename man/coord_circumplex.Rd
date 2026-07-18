@@ -50,5 +50,11 @@ ggplot2::ggplot(res$results) +
   geom_ssm_point(ggplot2::aes(amplitude = a_est, displacement = d_est))
 }
 \seealso{
-\code{\link[=ggcircumplex]{ggcircumplex()}}, \code{\link[=geom_ssm_point]{geom_ssm_point()}}, \code{\link[=geom_ssm_arc]{geom_ssm_arc()}}
+Other circumplex layers:
+\code{\link[=geom_ssm_arc]{geom_ssm_arc()}},
+\code{\link[=geom_ssm_point]{geom_ssm_point()}},
+\code{\link[=ggcircumplex]{ggcircumplex()}},
+\code{\link[=scale_x_circumplex]{scale_x_circumplex()}},
+\code{\link[=theme_circumplex]{theme_circumplex()}}
 }
+\concept{circumplex layers}

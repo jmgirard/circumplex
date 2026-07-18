@@ -58,4 +58,12 @@ ggcircumplex(instrument = csip)
 \seealso{
 \code{\link[=coord_circumplex]{coord_circumplex()}}, which owns the transform this canvas is built
 on; \code{\link[=ssm_plot_circle]{ssm_plot_circle()}}, which draws SSM results on this canvas.
+
+Other circumplex layers:
+\code{\link[=coord_circumplex]{coord_circumplex()}},
+\code{\link[=geom_ssm_arc]{geom_ssm_arc()}},
+\code{\link[=geom_ssm_point]{geom_ssm_point()}},
+\code{\link[=scale_x_circumplex]{scale_x_circumplex()}},
+\code{\link[=theme_circumplex]{theme_circumplex()}}
 }
+\concept{circumplex layers}
