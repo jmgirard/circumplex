@@ -447,6 +447,9 @@ ssm_trajectory_table_frame <- function(x, time, drop_xy = FALSE) {
 #' @return A ggplot object depicting each SSM parameter's trajectory over time,
 #'   with confidence bands.
 #' @family visualization functions
+#' @seealso [geom_ssm_path()] and `ssm_plot_circle(path = TRUE)`, which draw the
+#'   same change across occasions as movement on the circumplex canvas rather
+#'   than as parameter-by-time panels.
 #' @export
 #' @examples
 #' \donttest{

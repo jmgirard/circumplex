@@ -201,24 +201,6 @@ ssm_plot_circle <- function(ssm_object,
       legend.text = ggplot2::element_text(size = legend_font_size)
     )
   
-  ## Add the movement path first, so the arcs and points draw on top of it
-  if (path) {
-    p <- p +
-      geom_ssm_path(
-        data = df_path,
-        mapping = ggplot2::aes(
-          amplitude = .data$a_est,
-          displacement = .data$d_est,
-          group = .data$Series
-        ),
-        colour = "grey30",
-        linewidth = 0.6,
-        arrow = ggplot2::arrow(
-          length = ggplot2::unit(0.08, "inches"), type = "closed"
-        )
-      )
-  }
-
   ## Add arc bars
   p <- p +
     geom_ssm_arc(
@@ -273,6 +255,30 @@ ssm_plot_circle <- function(ssm_object,
       ggplot2::guides(
         color = ggplot2::guide_legend("Profile"),
         fill = ggplot2::guide_legend("Profile")
+      )
+  }
+
+  ## Add the movement path LAST, so its arrowhead draws on top of the occasion
+  ## markers. Underneath, the terminal arrowhead lands exactly where the final
+  ## occasion's point sits and is covered by it completely -- the direction of
+  ## time, which is the whole reason the path is drawn, becomes unreadable.
+  ## Caught by the render-and-inspect pass, M37; the data-level tests and a
+  ## vdiffr baseline both pass the version with the arrowhead hidden. The arrow
+  ## is sized to clear a size-3 point marker for the same reason.
+  if (path) {
+    p <- p +
+      geom_ssm_path(
+        data = df_path,
+        mapping = ggplot2::aes(
+          amplitude = .data$a_est,
+          displacement = .data$d_est,
+          group = .data$Series
+        ),
+        colour = "grey30",
+        linewidth = 0.6,
+        arrow = ggplot2::arrow(
+          length = ggplot2::unit(0.15, "inches"), type = "closed"
+        )
       )
   }
 

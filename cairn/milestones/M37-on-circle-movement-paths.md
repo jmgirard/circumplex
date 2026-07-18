@@ -1,6 +1,6 @@
 # M37: On-circle movement paths across occasions
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M31, M32, M33
 - **Principles touched:** —
@@ -95,9 +95,9 @@ circumplex space rather than only as parallel Cartesian panels.
       (new `ssm_plot_*()` vs an `ssm_plot_circle()` argument), then build it with
       occasion ordering taken from `details$occasions`.
       **(RB tripwire: irreversible-api)**
-- [ ] T6: Vignette figure + pkgdown reference placement + `@family` cross-links,
+- [x] T6: Vignette figure + pkgdown reference placement + `@family` cross-links,
       matching M34's grouping; render-and-inspect pass recorded.
-- [ ] T7: `devtools::document()`, full `devtools::test()`, `devtools::check()`,
+- [x] T7: `devtools::document()`, full `devtools::test()`, `devtools::check()`,
       `check_pkgdown()`; NEWS.md entry.
 
 ## Work log
@@ -113,6 +113,15 @@ circumplex space rather than only as parallel Cartesian panels.
   guard mutation-checked (alphabetical ordering makes it fail). Question gate
   settled the API shapes — see M37-D1. No new dependency: `ggplot2` re-exports
   `arrow()`/`unit()`.
+- 2026-07-18: T6-T7 done. Vignette section added to `advanced-visualization.Rmd`
+  (layer form + wrapper form, on the existing seam-crossing three-wave fixture);
+  pkgdown Building Blocks row; `ssm_plot_trajectory()` `@seealso` cross-link;
+  NEWS entries; 2 vdiffr baselines. The render-and-inspect pass caught a defect
+  no data-level fence or baseline can — the terminal arrowhead drawn underneath
+  the final occasion's point marker, hiding the direction of time. Fixed by
+  drawing the wrapper's path last and sizing the arrow to clear a size-3 marker.
+  Status -> review. `devtools::test()` 2936 pass / 0 fail;
+  `devtools::check()` 0 errors / 0 warnings / 0 notes; `check_pkgdown()` clean.
 
 ## Decisions
 

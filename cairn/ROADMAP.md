@@ -11,7 +11,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37 | high | milestones/M7-v2-release-prep.md |
 | M36 | Visualization polish — certification legend key + non-finite guards | done | — | normal | milestones/archive/M36-viz-polish-legend-guards.md |
-| M37 | On-circle movement paths across occasions | in-progress | M31, M32, M33 | normal | milestones/M37-on-circle-movement-paths.md |
+| M37 | On-circle movement paths across occasions | review | M31, M32, M33 | normal | milestones/M37-on-circle-movement-paths.md |
 | M32 | Circumplex geom & layer ergonomics | done | M31 | normal | milestones/archive/M32-geom-ergonomics.md |
 | M33 | Longitudinal trajectory visualization (occasions objects) | done | — | high | milestones/archive/M33-trajectory-visualization.md |
 | M34 | Plotting vignette + pkgdown reference | done | M31, M32, M33 | normal | milestones/archive/M34-plotting-vignette-pkgdown.md |

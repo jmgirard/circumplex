@@ -268,3 +268,46 @@ test_that("path = FALSE adds no path layer (AC5)", {
     p$layers, function(l) inherits(l$geom, "GeomSsmPath"), logical(1)
   )))
 })
+
+# --- AC6: rendered appearance -------------------------------------------------
+
+test_that("the movement path renders as expected", {
+  # Secondary to the data-level assertions above: this is a rendering guard, not
+  # the fence for any acceptance criterion. The M37 render-and-inspect pass is
+  # what caught the defect a baseline cannot -- an arrowhead drawn underneath
+  # the terminal occasion's marker, which hides the direction of time while
+  # every data-level fence and the baseline itself still pass.
+  skip_on_ci()
+  df <- data.frame(
+    a_est = c(0.35, 0.45, 0.40),
+    d_est = c(330, 355, 20)
+  )
+  vdiffr::expect_doppelganger(
+    "ssm path across the seam",
+    ggcircumplex(octants(), amax = 0.6) +
+      geom_ssm_point(
+        data = df,
+        mapping = ggplot2::aes(amplitude = .data$a_est, displacement = .data$d_est),
+        size = 2
+      ) +
+      geom_ssm_path(
+        data = df,
+        mapping = ggplot2::aes(amplitude = .data$a_est, displacement = .data$d_est),
+        arrow = ggplot2::arrow(
+          length = ggplot2::unit(0.18, "inches"), type = "closed"
+        ),
+        linewidth = 0.7
+      )
+  )
+  vdiffr::expect_doppelganger(
+    "ssm path with a gap",
+    ggcircumplex(octants(), amax = 0.6) +
+      geom_ssm_path(
+        data = data.frame(
+          a_est = c(0.35, 0, 0.40, 0.45),
+          d_est = c(330, NA, 20, 60)
+        ),
+        mapping = ggplot2::aes(amplitude = .data$a_est, displacement = .data$d_est)
+      )
+  )
+})
