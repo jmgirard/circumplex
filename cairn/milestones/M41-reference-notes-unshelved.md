@@ -1,10 +1,10 @@
 # M41: Source notes for the fit-index benchmark pair
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M40
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m41-reference-notes-benchmarks`
 
 ## Goal
 
