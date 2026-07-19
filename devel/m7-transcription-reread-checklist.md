@@ -37,12 +37,17 @@ already has. It tells you **where to look**, never what you should find.
 > them; the Discussion's 100/200 is displacement's numbers applied to both
 > parameters), and the accuracy table header now reads *bootstrap* CI.
 >
+> **B1's [FINDING] rows also confirmed** (2026-07-19). That leaves **every
+> lookup in both sections done** — 33 section-A rows and all of B1–B5 — and
+> **no transcribed value in either source was found wrong**. The whole yield
+> of the re-read was corrections to records *about* the values: a page anchor,
+> a column label, a comment's wording, two worksheet rows that dressed
+> computed numbers as published ones, and a table header that under-scoped its
+> own claim.
+>
 > **Still open — AC3 is not met until these are:**
-> - **B0** — the five fidelity judgments. Not lookups; they ask whether our
->   paraphrases overclaim.
-> - **B1** — the six [FINDING] threshold rows. The Figure 5 work established
->   what the numbers should be, but the rows themselves are unticked; say so
->   explicitly if reading that section settled them.
+> - **B0** — the five fidelity judgments below. The only remaining rows, and
+>   the only ones no page can settle.
 > - **Jeff's attestation** in the M7 work log, then the `pending (Jeff)`
 >   markers in `test-cpm_oracles.R:10-11`, `helper-cpm-oracles.R:6-7`, and
 >   `m4-zw-transcription.md`.
@@ -243,12 +248,12 @@ sentences appear in this order.
 > preamble, and the whole column is a claim about bootstrap coverage — not
 > about the point estimates and not about CIs in general.
 
-- [ ] Elevation / affiliation / dominance accurate at **n ≥ 50** — end of the elevation paragraph, p. 10
-- [ ] Amplitude accurate at **n ≥ 75** (general factor) and **n ≥ 150** (no general factor) — end of the amplitude paragraph, p. 10
-- [ ] Displacement accurate at **n ≥ 100** (general factor) and **> 200** (no general factor) — end of the displacement paragraph, p. 10. Note the asymmetry is theirs: "at least 100" but "greater than 200", which is why the vignette prints `n ≥ 100` and `n > 200`. Confirm we kept that distinction rather than tidying it.
-- [ ] Fit: inaccurate at population R² ≥ .9, coverage 0 at R² = 1 — p. 10, last paragraph, continuing onto p. 11
-- [ ] The band is Bradley's (1978) liberal band, 92.5%–97.5% (p. 10; vignette `:187-188`)
-- [ ] The amplitude ≥ .10 precondition — Study 2 Discussion, p. 10. The vignette attaches it to the amplitude and displacement rows only; confirm that is where they scope it.
+- [x] Elevation / affiliation / dominance accurate at **n ≥ 50** — end of the elevation paragraph, p. 10
+- [x] Amplitude accurate at **n ≥ 75** (general factor) and **n ≥ 150** (no general factor) — end of the amplitude paragraph, p. 10
+- [x] Displacement accurate at **n ≥ 100** (general factor) and **> 200** (no general factor) — end of the displacement paragraph, p. 10. Note the asymmetry is theirs: "at least 100" but "greater than 200", which is why the vignette prints `n ≥ 100` and `n > 200`. Confirm we kept that distinction rather than tidying it.
+- [x] Fit: inaccurate at population R² ≥ .9, coverage 0 at R² = 1 — p. 10, last paragraph, continuing onto p. 11
+- [x] The band is Bradley's (1978) liberal band, 92.5%–97.5% (p. 10; vignette `:187-188`)
+- [x] The amplitude ≥ .10 precondition — Study 2 Discussion, p. 10. The vignette attaches it to the amplitude and displacement rows only; confirm that is where they scope it.
 
 > ⚠ **The paper states these thresholds twice, and the two statements do not
 > agree.** The Study 2 **Results** (p. 10) gives amplitude 75/150 and
