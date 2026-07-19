@@ -2,6 +2,13 @@
 
 ## circumplex (development version)
 
+- Fixed a bug where
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/dev/reference/coord_circumplex.md)
+  could omit the outer amplitude ring, so a plot’s circle was left open
+  at the rim and points could be drawn beyond the outermost visible
+  ring. This happened whenever an amplitude gridline fell exactly on
+  `amax` (for instance `amax = 0.3` or `0.6`).
+
 - The new
   [`geom_ssm_path()`](http://circumplex.jmgirard.com/dev/reference/geom_ssm_path.md)
   layer draws a profile’s movement across occasions as a path on the
