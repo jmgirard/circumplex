@@ -14,9 +14,24 @@ against channel 1 on every load-bearing numeral (same date). One
 discrepancy found and resolved: the text layer renders Eq. A7's radicand as
 `2(ρ1−ρ3)+(1−ρ4)` where the page image shows `√2(ρ1−ρ3)+(1−ρ4)`; the √2
 form is confirmed correct because only it reproduces all five published
-scaling factors (see cross-validation below). **Second independent human
-re-read: pending (Jeff)** — same status convention as the B6
-Grassi-et-al. transcription.
+scaling factors (see cross-validation below). **That resolution is no longer
+inferential — Jeff confirmed Eq. A7 on the page 2026-07-19, both the √2
+radicand and the leading ½** (the ½ had never been checked by any pass).
+
+**Second independent human re-read: in progress (Jeff), started
+2026-07-19.** Confirmed so far: Eq. A7 (above); the two Note 3 population
+matrices; the Table 4 rows; the Figure 1A octant angles. Still open: the
+vignette's characterizations of Studies 1–2 (a fidelity judgment, not a
+lookup), the Study 2 threshold-source question below, and the remaining
+Eq. A6 / Eq. 3 / p. 9 / p. 14 value rows. Worksheet:
+`devel/m7-transcription-reread-checklist.md` section B.
+
+**⚠ Open question raised by the re-read (not a transcription error).** The
+paper states the amplitude and displacement thresholds twice with different
+numbers: Study 2 *Results* (p. 10) gives amplitude n ≥ 75 / n ≥ 150 and
+displacement n ≥ 100 / n > 200, while the Study 2 *Discussion* on the same
+page summarizes both together as 100/200. This record and the vignette follow
+the Results. Pending Jeff's decision on what the vignette should tell users.
 
 **Internal cross-validation (transcription self-checks, all reproduced):**
 
@@ -125,7 +140,11 @@ statistics with 95% CIs for PD scales at N = 1,166 —
   δ = 128.9° [116.7°, 141.6°], R² = .802, Prob = 1;
 - Obsessive–compulsive: e = .228 [.193, .261], aff = .011 [−.021, .041],
   dom = −.005 [−.038, .032], a = .012, δ = 337.4°, R² = .117, Prob = .130
-  (no CI brackets printed for its a and δ in the table).
+  (no CI brackets printed for its a and δ in the table — **confirmed
+  2026-07-19 to be a deliberate omission by the authors, not a transcription
+  gap**: with R² = .117 the amplitude and displacement are not interpretable,
+  so no interval is reported. Same logic the vignette leans on when it picks
+  OCPD as its near-flat cautionary case).
 *Cross-check:* `ssm_analyze(jz2017, PANO(), measures = c("PARPD","OCPD"))`
 on the bundled data (the same sample) reproduces every point estimate of
 both rows to the table's printed rounding (e/x/y/a/δ/R²; verified
@@ -204,6 +223,15 @@ in `devel/m4-zw-bridge.R` (seeded, committed with results).
   text-layer artifact resolved by cross-validation (Eq. A7 √2). F8 grid
   characterization confirmed. No-supplement finding recorded; O5 bridge
   re-scoped per the F7 mechanism. Jeff's independent re-read pending.
+- 2026-07-19 — Second independent human re-read begun (Jeff, M7 T3).
+  Eq. A7 confirmed on the page including its leading ½, closing the one
+  channel discrepancy that had been settled by reasoning; Note 3 matrices,
+  Table 4 rows, and Figure 1A angles confirmed; OCPD's absent a/δ CIs
+  confirmed as the authors' deliberate omission (R² = .117), a reason this
+  record did not previously carry. The twice-occurring 15.5% re-confirmed on
+  its two pages (6 and 13). New open question logged in Protocol above: the
+  Study 2 Results and Discussion state the amplitude/displacement thresholds
+  with different numbers. Re-read not yet complete.
 - 2026-07-07 — Review fix (W1 /code-review): Table 4 PARPD/OCPD rows added
   with provenance (the vignette cites OCPD's a = .012, which was previously
   not traceable to this record) plus the jz2017 reproduction cross-check;

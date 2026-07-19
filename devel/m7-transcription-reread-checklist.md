@@ -28,8 +28,14 @@ already has. It tells you **where to look**, never what you should find.
 > **Every transcribed value confirmed — no fixture changed.** Three
 > corrections, all to records *about* the values (a page anchor, a column
 > label, a comment's wording), applied the same day; see the A2–A6 notes.
-> Section B (Zimmermann & Wright) is still outstanding — AC3 is not met
-> until it is done.
+> **Section B started 2026-07-19, partly complete.** Confirmed: B2, B3's
+> Eq. A7 (including the leading ½ — closing the record's one inferential
+> resolution), B4, B5. Two worksheet defects found and fixed in B1a and B3,
+> both the same one: presenting *our computed* values as though printed
+> (hence the new **[DERIVED]** tag). **Still open — AC3 is not met until
+> these are:** B0's fidelity judgments, the remaining B1a/B3 value rows,
+> and two decisions for Jeff — the Study 2 threshold-source conflict (B1)
+> and whether the vignette's table header should say *bootstrap* CI.
 
 ## A. Grassi, Luccio & Di Blas (2010)
 
@@ -167,6 +173,7 @@ below is now tagged with which one it is.
 |---|---|---|
 | **[VALUE]** | A number or formula printed in the paper | Read it off the named table/equation. Same as section A. |
 | **[FINDING]** | A threshold the authors *assert in a sentence* | Find the sentence — page and section given below — and check the vignette says the same thing. Not in any table. |
+| **[DERIVED]** | A number *we* computed; the paper prints a rounder one, or none | Don't hunt for it on the page. Check the arithmetic and check that we didn't present it as published. Added 2026-07-19 after two rows did exactly that. |
 | **[FIDELITY]** | *Our* paraphrase of what they found | **No page settles this.** The paper never says "essentially unbiased"; we do. The question is whether our wording is faithful and doesn't overclaim — a judgment, not a lookup. Collected separately in **B0**, with the published numbers beside each. |
 
 If a row felt unverifiable, it was almost certainly a [FIDELITY] row sitting in
@@ -210,6 +217,21 @@ block in section B. **All four thresholds live in the Study 2 Results section,
 p. 10** — not in a table. Read that section top to bottom once; the four
 sentences appear in this order.
 
+> **Scope, per Jeff 2026-07-19 — say this on every row below.** These
+> thresholds are about **the empirical coverage accuracy of 95% percentile
+> bootstrap CIs**, and nothing else. They are not statements about the point
+> estimates, not about CIs in general, and not about statistical power or
+> significance. "Accurate at n ≥ 50" means: at that n, the bootstrap
+> interval's coverage lands inside the Bradley band. A reader who takes these
+> as "the estimate is trustworthy at n ≥ 50" has been misled, and the whole
+> column is one paraphrase away from reading that way — which is why B0
+> exists.
+>
+> Check on the vignette side: the prose at `:184-188` does say "95% percentile
+> bootstrap intervals", but the table header itself reads only
+> `95% CI accurate when…`. Decide whether the header should say **bootstrap
+> CI**, since tables get read without their preamble.
+
 - [ ] Elevation / affiliation / dominance accurate at **n ≥ 50** — end of the elevation paragraph, p. 10
 - [ ] Amplitude accurate at **n ≥ 75** (general factor) and **n ≥ 150** (no general factor) — end of the amplitude paragraph, p. 10
 - [ ] Displacement accurate at **n ≥ 100** (general factor) and **> 200** (no general factor) — end of the displacement paragraph, p. 10. Note the asymmetry is theirs: "at least 100" but "greater than 200", which is why the vignette prints `n ≥ 100` and `n > 200`. Confirm we kept that distinction rather than tidying it.
@@ -240,8 +262,13 @@ in the locator pass.
 - [ ] Relative amplitude bias averaged `15.5%`, reached `135.8%` — **p. 6** (the record said pp. 6–7; both numbers are on p. 6)
 - [ ] At n = 50, no general factor, population amplitude 0: expected sample amplitude `.153` — **p. 6**. The vignette rounds this to "about .15" (`:205`); confirm you're comfortable with the rounding, since .15 is also the "marked amplitude" figure the same bullet argues against.
 - [ ] SE of displacement ≈ `50°` at n = 100 for a weakly differentiated profile — **p. 8**
-- [ ] Eq. 3 constants `2.95` and `n^(−0.587)`, and the f_a values as the vignette **rounds** them: `.55` IIP-C, `.63` IIP-SC, `.85` IAS (unrounded .545/.625/.845 — those are B3's rows; the rounding is the vignette's own)
-- [ ] At n = 100 with an IIP-C-like instrument the frontier is ≈ `.11` — **p. 12**
+- [ ] Eq. 3 constants `2.95` and `n^(−0.587)` — **p. 12**
+- [ ] The vignette's f_a list (`:219`) — `.55` IIP-C, `.63` IIP-SC, `.85` IAS — **no single page prints all three**, which is why this row previously read as unverifiable. They are: IIP-C `.545` on **p. 9** (and again on p. 12), IAS `.845` on **p. 9**, IIP-SC `.625` on **p. 14**. The two-decimal forms are the vignette's own rounding; the paper prints three decimals in all three places.
+- [ ] At n = 100 with an IIP-C-like instrument the frontier is `.11`, and at n = 1,000 it is `.03` — **p. 12**, printed to two decimals in the text
+
+> **Corrected 2026-07-19** (Jeff, on the page): the earlier version of the
+> f_a row implied the unrounded values were findable near Eq. 3. They are
+> not — p. 12 prints only `f_a = .545`. Each value now carries its own page.
 
 > ⚠ **`15.5%` occurs twice in the paper for two different quantities** —
 > Study 1's average relative amplitude bias (**p. 6**) and Study 4's mean
@@ -260,21 +287,31 @@ in the locator pass.
 `devel/m4-zw-transcription.md`. These define the simulation conditions the
 diagnostic was validated against.
 
-- [ ] Without a substantial general factor (IAS, 2,988 students; Gurtman & Pincus, 2000; Wiggins, 1995): ρ1 `.430`, ρ2 `.030`, ρ3 `−.360`, ρ4 `−.740`
-- [ ] With a substantial general factor (IIP-C, 1,981 students; Gurtman & Balakrishnan, 1998): ρ1 `.683`, ρ2 `.500`, ρ3 `.345`, ρ4 `.288`
+> **✅ Confirmed 2026-07-19 by Jeff.** Both matrices correct as transcribed.
+
+- [x] Without a substantial general factor (IAS, 2,988 students; Gurtman & Pincus, 2000; Wiggins, 1995): ρ1 `.430`, ρ2 `.030`, ρ3 `−.360`, ρ4 `−.740`
+- [x] With a substantial general factor (IIP-C, 1,981 students; Gurtman & Balakrishnan, 1998): ρ1 `.683`, ρ2 `.500`, ρ3 `.345`, ρ4 `.288`
 
 ### B3. [VALUE] Scaling-factor formulas — Eq. A6, A7 (p. 18) and Eq. 3 (p. 12)
 
-The record flags **one resolved channel discrepancy** here. Please confirm the
-resolution against the page image, since it was settled by reasoning rather
-than by a clean second read:
+> **✅ Confirmed 2026-07-19 by Jeff against the page: Eq. A7 carries both the
+> leading ½ and the √2 radicand.** This closes the record's one open channel
+> discrepancy — previously settled by reasoning (only the √2 form reproduces
+> the published scaling factors) rather than by a clean second read — and
+> checks the ½, which no pass had ever verified. `m4-zw-transcription.md`
+> updated.
 
-- [ ] Eq. A7 in full: `f_a = ½·√( √2(ρ1−ρ3) + (1−ρ4) )` — radicand `√2(ρ1−ρ3)+(1−ρ4)`, **not** `2(ρ1−ρ3)+(1−ρ4)`. The text layer rendered it without the √; the page image shows it with. **Confirm the leading ½ as well** — the first cut listed only the radicand, so the ½ has never been checked against the page.
+- [x] Eq. A7 in full: `f_a = ½·√( √2(ρ1−ρ3) + (1−ρ4) )` — radicand `√2(ρ1−ρ3)+(1−ρ4)`, **not** `2(ρ1−ρ3)+(1−ρ4)`. Confirmed on the page, ½ included.
 - [ ] Eq. A6: `f_e = √((2ρ1+2ρ2+2ρ3+ρ4+1)/8)`
 - [ ] Eq. 3 (p. 12): `|AFF_min| = 2.95 · f_a · n^(−0.587)` — confirm both constants
-- [ ] Derived values quoted on p. 9: f_e → IIP-C `.737`, IAS `.240`; f_a → IIP-C `.545`, IAS `.845`
-- [ ] p. 14: IIP-SC f_a `.625`; `|.029|` at N = 1166
-- [ ] p. 12 worked values: f_a = .545 → n = 100 gives `.108` ("as large as .11"); n = 1000 gives `.028` (".03")
+- [ ] Values printed on **p. 9**: f_e → IIP-C `.737`, IAS `.240`; f_a → IIP-C `.545`, IAS `.845`
+- [ ] **p. 14**: IIP-SC f_a `.625`; `|.029|` at N = 1,166
+- [ ] **[DERIVED]** p. 12's worked values: the page prints **`.11`** (n = 100) and **`.03`** (n = 1,000), to two decimals. `.108` and `.028` are *our* recomputation from Eq. 3, not published figures — check the arithmetic, don't look for them on the page.
+
+> **Corrected 2026-07-19** (Jeff): this last row previously listed `.108`/`.028`
+> as though they were on p. 12, with the published `.11`/`.03` in parentheses —
+> exactly backwards. The page prints two decimals. Same defect as B1a's f_a
+> row, and the reason the **[DERIVED]** tag now exists.
 
 > **Numeric self-check, re-run 2026-07-19.** Feeding the B2 matrices through
 > the formulas as transcribed reproduces all eight published constants:
@@ -302,14 +339,21 @@ conflated two different Table 4 values** — OCPD's *amplitude* and PARPD's
 - [ ] Table 4, **paranoid** PD: elevation `.250`, the value the ipsatizing section says the raw-score analysis matches (`:572-573`)
 - [ ] N = 1,166 undergraduates, IIP-SC octants + PDQ-4+ target measures (`:41-42`)
 
-> Both Table 4 rows are transcribed in full in `devel/m4-zw-transcription.md`
-> (Paranoid and Obsessive–compulsive, with CIs); that record also notes OCPD's
-> a and δ print without CI brackets in the table. Worth confirming, since an
-> absent bracket is easy to read as a transcription omission.
+> **✅ Confirmed 2026-07-19 by Jeff.** All four rows correct, **and the absent
+> OCPD brackets are real** — the table genuinely prints no CI for that scale's
+> amplitude and displacement, because its goodness of fit is too low
+> (R² = .117) for those parameters to be interpretable. So it is a deliberate
+> omission by the authors, not a transcription gap. That reason was not in the
+> record before and is worth keeping: it is the same logic the vignette relies
+> on when it picks OCPD as its near-flat cautionary case.
+>
+> Both Table 4 rows are transcribed in full in `devel/m4-zw-transcription.md`.
 
 ### B5. [VALUE] Octant angles — Figure 1A (p. 3)
 
-- [ ] LM 0°, NO 45°, PA 90°, BC 135°, DE 180°, FG 225°, HI 270°, JK 315°
+> **✅ Confirmed 2026-07-19 by Jeff.**
+
+- [x] LM 0°, NO 45°, PA 90°, BC 135°, DE 180°, FG 225°, HI 270°, JK 315°
 
 > Note the package's own convention reports LM as **360**, not 0. That is a
 > deliberate package convention (D-003), not a transcription discrepancy —
