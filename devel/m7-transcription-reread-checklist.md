@@ -28,14 +28,24 @@ already has. It tells you **where to look**, never what you should find.
 > **Every transcribed value confirmed — no fixture changed.** Three
 > corrections, all to records *about* the values (a page anchor, a column
 > label, a comment's wording), applied the same day; see the A2–A6 notes.
-> **Section B started 2026-07-19, partly complete.** Confirmed: B2, B3's
-> Eq. A7 (including the leading ½ — closing the record's one inferential
-> resolution), B4, B5. Two worksheet defects found and fixed in B1a and B3,
-> both the same one: presenting *our computed* values as though printed
-> (hence the new **[DERIVED]** tag). **Still open — AC3 is not met until
-> these are:** B0's fidelity judgments, the remaining B1a/B3 value rows,
-> and two decisions for Jeff — the Study 2 threshold-source conflict (B1)
-> and whether the vignette's table header should say *bootstrap* CI.
+> **Section B, 2026-07-19 — every [VALUE] row confirmed.** B1a, B2, B3
+> (including Eq. A7's leading ½, closing the record's one inferential
+> resolution), B4, B5. Two worksheet defects found and fixed along the way,
+> both the same one — presenting *our computed* values as though printed —
+> which is why the **[DERIVED]** tag now exists. Both user-facing decisions
+> taken: the amplitude thresholds stay at 75/150 (Figure 5 Panel B supports
+> them; the Discussion's 100/200 is displacement's numbers applied to both
+> parameters), and the accuracy table header now reads *bootstrap* CI.
+>
+> **Still open — AC3 is not met until these are:**
+> - **B0** — the five fidelity judgments. Not lookups; they ask whether our
+>   paraphrases overclaim.
+> - **B1** — the six [FINDING] threshold rows. The Figure 5 work established
+>   what the numbers should be, but the rows themselves are unticked; say so
+>   explicitly if reading that section settled them.
+> - **Jeff's attestation** in the M7 work log, then the `pending (Jeff)`
+>   markers in `test-cpm_oracles.R:10-11`, `helper-cpm-oracles.R:6-7`, and
+>   `m4-zw-transcription.md`.
 
 ## A. Grassi, Luccio & Di Blas (2010)
 
@@ -51,14 +61,14 @@ Repo locations: `tests/testthat/helper-cpm-oracles.R` (fixtures),
 Science, Technology, Trades, BusinessOperations, BusinessContact, Social).
 Lower triangle, read row-wise:
 
-- [ ] Row 2 (Science): `.654`
-- [ ] Row 3 (Technology): `.453 .644`
-- [ ] Row 4 (Trades): `.251 .440 .757`
-- [ ] Row 5 (BusinessOperations): `.122 .158 .551 .493`
-- [ ] Row 6 (BusinessContact): `.218 .210 .570 .463 .754`
-- [ ] Row 7 (Social): `.496 .264 .366 .202 .471 .650`
-- [ ] N = 175
-- [ ] Scale names and their **order** match Table 1
+- [x] Row 2 (Science): `.654`
+- [x] Row 3 (Technology): `.453 .644`
+- [x] Row 4 (Trades): `.251 .440 .757`
+- [x] Row 5 (BusinessOperations): `.122 .158 .551 .493`
+- [x] Row 6 (BusinessContact): `.218 .210 .570 .463 .754`
+- [x] Row 7 (Social): `.496 .264 .366 .202 .471 .650`
+- [x] N = 175
+- [x] Scale names and their **order** match Table 1
 
 > Cross-check available: the paper states this reanalyzes Browne (1992)
 > Table 2. The matrix is also printed in the paper's Listing 1.
@@ -68,17 +78,17 @@ Lower triangle, read row-wise:
 `helper-cpm-oracles.R:33-55`. These are the frozen published-program values
 the free-scaling oracle asserts against.
 
-- [ ] Angles θ (deg): `0, 305.35328, 247.82980, 237.38218, 168.30615, 149.83787, 91.25973`
-- [ ] Angle SEs: `0, 9.01111, 7.35838, 9.44904, 9.08050, 7.95016, 8.72929`
-- [ ] v (communality parameter): `0.15438, 0.51654, 0.03945, 0.63153, 0.54550, 0.13449, 0.44771`
-- [ ] v SEs: `0.13759, 0.12755, 0.04238, 0.13854, 0.12125, 0.05959, 0.13865`
-- [ ] ζ: `0.91358, 0.81222, 1.00102, 0.79058, 0.79269, 0.92497, 0.84376`
-- [ ] Communality indices: `.93, .81, .98, .78, .80, .94, .83`
-- [ ] Communality 95% CIs: `(.73,.99) (.74,.87) (.87,1) (.71,.84) (.74,.86) (.87,.97) (.74,.90)`
-- [ ] Variance ratios (reproduced/input): `0.963, 1.000, 1.042, 1.020, 0.971, 0.971, 1.031`
-- [ ] β (correlation-function weights): `0.6378, 0.3622`
-- [ ] MCSC ρ(180°): `0.276`
-- [ ] F̂ (iteration trace, "final value"): `0.089815`
+- [x] Angles θ (deg): `0, 305.35328, 247.82980, 237.38218, 168.30615, 149.83787, 91.25973`
+- [x] Angle SEs: `0, 9.01111, 7.35838, 9.44904, 9.08050, 7.95016, 8.72929`
+- [x] v (communality parameter): `0.15438, 0.51654, 0.03945, 0.63153, 0.54550, 0.13449, 0.44771`
+- [x] v SEs: `0.13759, 0.12755, 0.04238, 0.13854, 0.12125, 0.05959, 0.13865`
+- [x] ζ: `0.91358, 0.81222, 1.00102, 0.79058, 0.79269, 0.92497, 0.84376`
+- [x] Communality indices: `.93, .81, .98, .78, .80, .94, .83`
+- [x] Communality 95% CIs: `(.73,.99) (.74,.87) (.87,1) (.71,.84) (.74,.86) (.87,.97) (.74,.90)`
+- [x] Variance ratios (reproduced/input): `0.963, 1.000, 1.042, 1.020, 0.971, 0.971, 1.031`
+- [x] β (correlation-function weights): `0.6378, 0.3622`
+- [x] MCSC ρ(180°): `0.276`
+- [x] F̂ (iteration trace, "final value"): `0.089815`
 
 > **Re-read result (2026-07-19).** All values confirmed. **Order correction:**
 > Appendix A prints these blocks in its own variable order — Health, Social,
@@ -102,11 +112,11 @@ the free-scaling oracle asserts against.
 
 `helper-cpm-oracles.R:44-48`.
 
-- [ ] T (χ²): `15.63`, df `7`, p `0.029`
-- [ ] F₀: `0.049`, 90% CI `(0.005, 0.139)`
-- [ ] RMSEA: `0.084`, 90% CI `(0.026, 0.141)`
-- [ ] Null χ²: `747.663`, null df `21`
-- [ ] TLI: `0.964` · CFI: `0.988` · SRMR: `0.04`
+- [x] T (χ²): `15.63`, df `7`, p `0.029`
+- [x] F₀: `0.049`, 90% CI `(0.005, 0.139)`
+- [x] RMSEA: `0.084`, 90% CI `(0.026, 0.141)`
+- [x] Null χ²: `747.663`, null df `21`
+- [x] TLI: `0.964` · CFI: `0.988` · SRMR: `0.04`
 
 ### A4. Constrained-model rows — Table 2 / Table 3 (p. 60)
 
@@ -118,16 +128,16 @@ Asserted inline in `test-cpm_oracles.R`.
 > comments said "zeta" and now say so. Applied to the m = 2 rows on the same
 > reading.
 
-- [ ] Model 2b (equal communality): β `(.628, .372)`, ρ̂₁ `.87`, F̂ `.299`, ρ(180) `.26` — `test-cpm_oracles.R:196-201`
-- [ ] Model 1a m = 2: β `(.608, .355, .038)`; F̂ `.067` (Table 3) — `test-cpm_oracles.R:229-239`
-- [ ] The m = 3 statement that β₃ attains "the lower bound of zero" (p. 59) — `test-cpm_oracles.R:251`
-- [ ] Model 3c (equal spacing, free scaling) — `test-cpm_oracles.R:347, 564-565`
+- [x] Model 2b (equal communality): β `(.628, .372)`, ρ̂₁ `.87`, F̂ `.299`, ρ(180) `.26` — `test-cpm_oracles.R:196-201`
+- [x] Model 1a m = 2: β `(.608, .355, .038)`; F̂ `.067` (Table 3) — `test-cpm_oracles.R:229-239`
+- [x] The m = 3 statement that β₃ attains "the lower bound of zero" (p. 59) — `test-cpm_oracles.R:251`
+- [x] Model 3c (equal spacing, free scaling) — `test-cpm_oracles.R:347, 564-565`
 
 ### A5. Quoted textual claims
 
-- [ ] p. 59: CircE's m = 1..3 results "coincide precisely with the ones obtained by CIRCUM" — this is what makes the fixtures transitively cover Browne's own program (`test-cpm_oracles.R:18-20`)
-- [ ] p. 57, **as published**: "The nonsymmetric confidence intervals for the communality index estimates, ρ(x_i, c_i) (Browne, 1992, Eq. 4), are obtained from symmetric confidence intervals on ln v_ii (Browne, 1982, pp. 95–96)." The checklist's earlier paraphrase ("communality CIs are symmetric Wald intervals on ln(v)") put the symmetry on the wrong quantity; the comment at `test-cpm_oracles.R:122-127` has been reworded to the published statement. The decoding arithmetic was already correct.
-- [ ] Appendix A prints variance ratios spanning `.963–1.042` (the free-scaling model difference)
+- [x] p. 59: CircE's m = 1..3 results "coincide precisely with the ones obtained by CIRCUM" — this is what makes the fixtures transitively cover Browne's own program (`test-cpm_oracles.R:18-20`)
+- [x] p. 57, **as published**: "The nonsymmetric confidence intervals for the communality index estimates, ρ(x_i, c_i) (Browne, 1992, Eq. 4), are obtained from symmetric confidence intervals on ln v_ii (Browne, 1982, pp. 95–96)." The checklist's earlier paraphrase ("communality CIs are symmetric Wald intervals on ln(v)") put the symmetry on the wrong quantity; the comment at `test-cpm_oracles.R:122-127` has been reworded to the published statement. The decoding arithmetic was already correct.
+- [x] Appendix A prints variance ratios spanning `.963–1.042` (the free-scaling model difference)
 
 ### A6. Secondary fixture — Listing 7–8 (pp. 67–68)
 
@@ -141,8 +151,8 @@ here cannot move a numeric result — verify last, or skip.
 > the source reads **ForeignLiterature**, which is what the fixture has
 > always said. No change was kept; corrected 2026-07-19.)*
 
-- [ ] Six scale names — Spelling, Punctuation, Grammar, Vocabulary, Literature, ForeignLiterature — and lower triangle: `.621 / .564 .742 / .476 .503 .577 / .394 .461 .472 .688 / .389 .411 .429 .548 .639`
-- [ ] N = 1046
+- [x] Six scale names — Spelling, Punctuation, Grammar, Vocabulary, Literature, ForeignLiterature — and lower triangle: `.621 / .564 .742 / .476 .503 .577 / .394 .461 .472 .688 / .389 .411 .429 .548 .639`
+- [x] N = 1046
 
 ---
 
@@ -207,7 +217,7 @@ on it be misled?** The published basis is given so the judgment is informed.
 - [ ] "**biased upward**, strongly so when population amplitude is small" (amplitude) — their basis: bias .0002–.136, average .021; relative bias average 15.5%, range 0–135.8%; direction consistently positive (p. 6)
 - [ ] "unbiased but imprecise at low amplitude" (displacement) — their basis: bias average −.03°, range −2.38° to 3.03° (p. 6); SE grows as amplitude shrinks (p. 8)
 - [ ] "biased downward … unsuited near 1" (fit) — their basis: average −.081, range −.382 to .027 (p. 6); coverage exactly 0 at population R² = 1, inaccurate at R² ≥ .9 (p. 10). Note "unsuited" is *their* word about the method for R² CIs (p. 11); "near 1" is ours.
-- [ ] Table header "95% CI accurate when…" — accuracy always means the Bradley band, never statistical significance. Confirm no cell reads as a significance claim.
+- [ ] Table header, now `95% bootstrap CI accurate when…` (changed 2026-07-19) — accuracy always means Bradley-band coverage, never statistical significance. Confirm no cell reads as a significance claim.
 
 ### B1. [FINDING] The sample-size thresholds the vignette's table prints
 
@@ -288,12 +298,14 @@ Prose, not a table, so it escaped the first cut — but every number in it is
 transcribed and shipped. All are printed values; each page below was confirmed
 in the locator pass.
 
-- [ ] Relative amplitude bias averaged `15.5%`, reached `135.8%` — **p. 6** (the record said pp. 6–7; both numbers are on p. 6)
-- [ ] At n = 50, no general factor, population amplitude 0: expected sample amplitude `.153` — **p. 6**. The vignette rounds this to "about .15" (`:205`); confirm you're comfortable with the rounding, since .15 is also the "marked amplitude" figure the same bullet argues against.
-- [ ] SE of displacement ≈ `50°` at n = 100 for a weakly differentiated profile — **p. 8**
-- [ ] Eq. 3 constants `2.95` and `n^(−0.587)` — **p. 12**
-- [ ] The vignette's f_a list (`:219`) — `.55` IIP-C, `.63` IIP-SC, `.85` IAS — **no single page prints all three**, which is why this row previously read as unverifiable. They are: IIP-C `.545` on **p. 9** (and again on p. 12), IAS `.845` on **p. 9**, IIP-SC `.625` on **p. 14**. The two-decimal forms are the vignette's own rounding; the paper prints three decimals in all three places.
-- [ ] At n = 100 with an IIP-C-like instrument the frontier is `.11`, and at n = 1,000 it is `.03` — **p. 12**, printed to two decimals in the text
+> **✅ All rows confirmed 2026-07-19 by Jeff**, against the pages.
+
+- [x] Relative amplitude bias averaged `15.5%`, reached `135.8%` — **p. 6** (the record said pp. 6–7; both numbers are on p. 6)
+- [x] At n = 50, no general factor, population amplitude 0: expected sample amplitude `.153` — **p. 6**. The vignette rounds this to "about .15" (`:205`); confirm you're comfortable with the rounding, since .15 is also the "marked amplitude" figure the same bullet argues against.
+- [x] SE of displacement ≈ `50°` at n = 100 for a weakly differentiated profile — **p. 8**
+- [x] Eq. 3 constants `2.95` and `n^(−0.587)` — **p. 12**
+- [x] The vignette's f_a list (`:219`) — `.55` IIP-C, `.63` IIP-SC, `.85` IAS — **no single page prints all three**, which is why this row previously read as unverifiable. They are: IIP-C `.545` on **p. 9** (and again on p. 12), IAS `.845` on **p. 9**, IIP-SC `.625` on **p. 14**. The two-decimal forms are the vignette's own rounding; the paper prints three decimals in all three places.
+- [x] At n = 100 with an IIP-C-like instrument the frontier is `.11`, and at n = 1,000 it is `.03` — **p. 12**, printed to two decimals in the text
 
 > **Corrected 2026-07-19** (Jeff, on the page): the earlier version of the
 > f_a row implied the unrounded values were findable near Eq. 3. They are
@@ -323,7 +335,9 @@ diagnostic was validated against.
 
 ### B3. [VALUE] Scaling-factor formulas — Eq. A6, A7 (p. 18) and Eq. 3 (p. 12)
 
-> **✅ Confirmed 2026-07-19 by Jeff against the page: Eq. A7 carries both the
+> **✅ Every row in this block confirmed 2026-07-19 by Jeff.** Including:
+>
+> **Eq. A7 carries both the
 > leading ½ and the √2 radicand.** This closes the record's one open channel
 > discrepancy — previously settled by reasoning (only the √2 form reproduces
 > the published scaling factors) rather than by a clean second read — and
@@ -331,11 +345,11 @@ diagnostic was validated against.
 > updated.
 
 - [x] Eq. A7 in full: `f_a = ½·√( √2(ρ1−ρ3) + (1−ρ4) )` — radicand `√2(ρ1−ρ3)+(1−ρ4)`, **not** `2(ρ1−ρ3)+(1−ρ4)`. Confirmed on the page, ½ included.
-- [ ] Eq. A6: `f_e = √((2ρ1+2ρ2+2ρ3+ρ4+1)/8)`
-- [ ] Eq. 3 (p. 12): `|AFF_min| = 2.95 · f_a · n^(−0.587)` — confirm both constants
-- [ ] Values printed on **p. 9**: f_e → IIP-C `.737`, IAS `.240`; f_a → IIP-C `.545`, IAS `.845`
-- [ ] **p. 14**: IIP-SC f_a `.625`; `|.029|` at N = 1,166
-- [ ] **[DERIVED]** p. 12's worked values: the page prints **`.11`** (n = 100) and **`.03`** (n = 1,000), to two decimals. `.108` and `.028` are *our* recomputation from Eq. 3, not published figures — check the arithmetic, don't look for them on the page.
+- [x] Eq. A6: `f_e = √((2ρ1+2ρ2+2ρ3+ρ4+1)/8)`
+- [x] Eq. 3 (p. 12): `|AFF_min| = 2.95 · f_a · n^(−0.587)` — confirm both constants
+- [x] Values printed on **p. 9**: f_e → IIP-C `.737`, IAS `.240`; f_a → IIP-C `.545`, IAS `.845`
+- [x] **p. 14**: IIP-SC f_a `.625`; `|.029|` at N = 1,166
+- [x] **[DERIVED]** p. 12's worked values: the page prints **`.11`** (n = 100) and **`.03`** (n = 1,000), to two decimals. `.108` and `.028` are *our* recomputation from Eq. 3, not published figures — check the arithmetic, don't look for them on the page.
 
 > **Corrected 2026-07-19** (Jeff): this last row previously listed `.108`/`.028`
 > as though they were on p. 12, with the published `.11`/`.03` in parentheses —
@@ -363,10 +377,10 @@ prose and its own computed output. **The first cut's single row here
 conflated two different Table 4 values** — OCPD's *amplitude* and PARPD's
 *elevation* — and cited a stale line for each; split and re-anchored below.
 
-- [ ] The Study 5 CircE fit pattern the vignette narrates (`:151-157`), including the printed indices: equal spacing + equal communality CFI `.824`, TLI `.795`, RMSEA `.169`; unequal spacing CFI `.958`, TLI `.931`, RMSEA `.098` (p. 14)
-- [ ] Table 4, **obsessive–compulsive** PD: amplitude `.012` at full sample size — the vignette's stated reason for picking this scale as the near-flat case (`:237-238`)
-- [ ] Table 4, **paranoid** PD: elevation `.250`, the value the ipsatizing section says the raw-score analysis matches (`:572-573`)
-- [ ] N = 1,166 undergraduates, IIP-SC octants + PDQ-4+ target measures (`:41-42`)
+- [x] The Study 5 CircE fit pattern the vignette narrates (`:151-157`), including the printed indices: equal spacing + equal communality CFI `.824`, TLI `.795`, RMSEA `.169`; unequal spacing CFI `.958`, TLI `.931`, RMSEA `.098` (p. 14)
+- [x] Table 4, **obsessive–compulsive** PD: amplitude `.012` at full sample size — the vignette's stated reason for picking this scale as the near-flat case (`:237-238`)
+- [x] Table 4, **paranoid** PD: elevation `.250`, the value the ipsatizing section says the raw-score analysis matches (`:572-573`)
+- [x] N = 1,166 undergraduates, IIP-SC octants + PDQ-4+ target measures (`:41-42`)
 
 > **✅ Confirmed 2026-07-19 by Jeff.** All four rows correct, **and the absent
 > OCPD brackets are real** — a deliberate omission by the authors, not a
