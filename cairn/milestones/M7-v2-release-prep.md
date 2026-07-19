@@ -3,7 +3,7 @@
 - **Status:** review
 - **Priority:** high
 - **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38
-- **Branch/PR:** `m7-v2-release-prep`
+- **Branch/PR:** `m7-v2-release-prep` / [PR #64](https://github.com/jmgirard/circumplex/pull/64)
 
 ## Goal
 
@@ -35,10 +35,10 @@ complete and validated (D-008).
 
 ## Acceptance criteria
 
-- [ ] DESCRIPTION at 2.0.0; NEWS.md heading renamed; `cran-comments.md` accurate.
-- [ ] `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
+- [x] DESCRIPTION at 2.0.0; NEWS.md heading renamed; `cran-comments.md` accurate.
+- [x] `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
       win-builder / R-devel green across platforms.
-- [ ] Second independent human re-read of the Grassi et al. (2010) CircE and
+- [x] Second independent human re-read of the Grassi et al. (2010) CircE and
       Zimmermann & Wright (2017) norm/structure transcriptions against their
       primary sources completed before submission, with any discrepancies
       resolved (Jeff-attested in the work log).
@@ -158,3 +158,109 @@ complete and validated (D-008).
 ## Decisions
 
 ## Review
+
+Reviewed 2026-07-19. PR [#64](https://github.com/jmgirard/circumplex/pull/64).
+
+### Acceptance-criterion evidence
+
+- **AC1 — DESCRIPTION 2.0.0, NEWS heading, cran-comments accurate.** `DESCRIPTION`
+  reads `Version: 2.0.0` and `Depends: R (>= 4.1)`; `NEWS.md` opens
+  `# circumplex 2.0.0`. `cran-comments.md` verified claim by claim against the
+  repo rather than read: R 4.6.1 matches `R.version.string`; the CI matrix line
+  matches `.github/workflows/R-CMD-check.yaml` exactly (5 configs); "five new
+  vignettes" matches 8 present minus 3 at `v1.2.0`; the Imports-count claim
+  checked against `git show v1.2.0:DESCRIPTION` (7 then, 7 now — true as
+  written). No milestone numbers leak into user-facing text (grep over NEWS,
+  README, cran-comments, vignettes).
+- **AC2 — check clean + win-builder green.** `devtools::check(manual = TRUE)`
+  **Status OK, 0/0/0** (7m16s) on the reviewed tip, with
+  `checking PDF version of manual ... OK` and
+  `checking re-building of vignette outputs ... OK` verified present by name
+  rather than inferred from the summary line. win-builder R-devel returned OK.
+  PR #64 CI: **9/9 green** across macOS/Windows/Ubuntu (release, devel,
+  oldrel-1), pkgdown, and both codecov gates.
+- **AC3 — transcription re-read attested.** Jeff's attestation is in the work
+  log (2026-07-19) with the full discrepancy/resolution table in
+  `devel/m7-transcription-reread-checklist.md`. Every row of both sections is
+  ticked; no transcribed value was wrong in either source; the three
+  `pending (Jeff)` markers are cleared.
+- **AC4 — release handed off.** **Not verified — deliberately deferred.** T4
+  cannot execute before merge (see the 2026-07-19 status entry). Left unticked.
+
+### Consistency gate
+
+`cairn_validate` exit 0, all 15 checks PASS. 47 advisory `work-log format`
+warnings, every one on a hard-wrapped pre-implement entry — history, which IP4
+forbids editing, and advisory by design; not touched. Toolchain slot:
+`document()` no diff; `NAMESPACE`/`man/` clean; README in sync;
+`pkgdown::check_pkgdown()` no problems; no new top-level files; full check clean.
+
+### Independent review — three lenses
+
+- **[O] diff-bug (Opus):** 4 findings.
+- **[S] blame-history (Sonnet):** no silent undoing found. Confirmed the A6
+  fixture revert is byte-exact against master, all 47 NEWS bullets accounted
+  for (the one dropped bullet documents a fix to code that never shipped, per
+  the T1 gate decision), and every numeric literal and tolerance in
+  `test-cpm_oracles.R` identical to master.
+- **[S] prior-PR-comments (Sonnet):** no prior-PR evidence — all 41 merged PRs
+  queried, zero inline review comments and zero non-empty review bodies exist
+  in this repo's history. Clean no-op, zero findings.
+
+### Findings actioned (score >= 80)
+
+**F1 (92) — `tests/testthat/test-rd-latex-safe.R`: the regression guard never
+ran in any gate that ships the release.** `test_path("..","..","man")` resolves
+to a non-existent directory under the `.Rcheck` layout (an installed package
+has `help/`, not `man/`), so `skip_if_not()` fired. Confirmed empirically: a
+stripped `R CMD check` listed
+`man/ not available (installed package) (1): 'test-rd-latex-safe.R:18:3'` among
+its skips, and PR #64's 9 green CI checks all ran with it skipped. The guard
+added to stop the CRAN-blocking LaTeX bug recurring was live only under a bare
+`devtools::test()` — the milestone's own "green because it never looked" lesson,
+repeating inside the fix for it.
+**Fixed:** the guard now prefers `man/` when present and otherwise reads the
+installed Rd database via `tools::Rd_db()`, which IS available at check time;
+it also fails loudly instead of passing vacuously if no Rd is found at all.
+Verified: `SKIP` 78 -> 77 and `PASS` +2 under `R CMD check`, with
+`rd-latex-safe` no longer appearing in the skip list.
+
+**F2 (55) — the hostile character class leaked.** Below the 80 bar, so not on
+the actioned list on its own; **fixed anyway as part of F1**, because F1's fix
+rewrites how the guard sources Rd content and leaving a known-leaky enumeration
+inside a guard under active repair made no sense. The enumerated ranges (Greek,
+math operators, super/subscripts) let arrows, primes, letterlike symbols,
+vulgar fractions, daggers and Greek Extended through; `->` is plausible in this
+package's occasions/trajectory prose. Replaced with **deny-by-default**: every
+non-ASCII character is flagged except a six-character allowlist of punctuation
+already shipping in `man/` and already proven to survive win-builder. Rationale:
+we know what win-builder's LaTeX rejected, not its full hostile set, so
+enumeration will always lag; a false positive costs one line, a false negative
+costs a rejected submission.
+**Verified by mutation, not by eye:** a planted `->` (U+2192, uncaught by the
+old class) in `man/octants.Rd`, run through a full `R CMD check`, failed the
+guard with `octants.Rd:1: ->`.
+
+### Findings logged, not actioned (score < 80)
+
+- **F4 (78) — `NEWS.md:6-8` undercounts.** "Alongside it come three other new
+  analysis families" omits `fit_structure()`, which the same file documents at
+  `:119` and which `cran-comments.md:40-41` lists as a top-level highlight.
+  Real editorial inconsistency in the first paragraph a user reads; one-line
+  fix; non-blocking. Surfaced to Jeff at the approval gate.
+- **F5 (50) — `cran-comments.md:85-86` is true but reads as a non sequitur.**
+  "ggforce is dropped ... so the Imports count is unchanged" never mentions
+  that `parallel` was added, which is what keeps the count level. Surfaced to
+  Jeff at the gate.
+- **F3 (5) — rejected, factually wrong.** The reviewer claimed the Imports
+  claim was false on a baseline of 8 Imports at 1.2.0 including `parallel`.
+  `git show v1.2.0:DESCRIPTION` shows 7, without `parallel`; HEAD shows 7. The
+  claim is true as written. Intermediate dev commits did carry both ggforce and
+  parallel (8), the likely source of the error. Independently confirmed by the
+  scorer.
+
+### Not merged as `done`
+
+Per the 2026-07-19 status entry, this review verifies AC1–AC3 and merges, but
+does **not** tick AC4, set status `done`, or archive. M7 returns to
+`in-progress` for T4 and reaches `done` only after the release handoff.
