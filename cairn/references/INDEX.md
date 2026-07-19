@@ -1,8 +1,20 @@
 # References index
 
-_One line per source summary: `citekey — title — traces to`._
+_One line per committed page: `citekey — title — traces to`._
 
-<!-- Pre-migration references (published-oracle papers, transcriptions, design
-     briefs) live under devel/ and are cited from cairn/DESIGN.md and the
-     entombed cairn/legacy/. Add cairn-era source summaries here as they are
-     ingested (see tracking-rules "Source ingestion"). -->
+- [grassi2010.md](grassi2010.md) — Grassi, Luccio & Di Blas (2010), *CircE: An R implementation of Browne's circular stochastic process model* — the published CPM oracle; traces to `tests/testthat/helper-cpm-oracles.R` and `tests/testthat/test-cpm_oracles.R`.
+- [zimmermann2017.md](zimmermann2017.md) — Zimmermann & Wright (2017), *Beyond description in interpersonal construct validation* — SSM estimator accuracy and sample-size guidance; traces to `vignettes/evaluating-circumplex-structure.Rmd` and the `jz2017` sample.
+
+<!-- Entry format note: cairn_validate's _INDEX_LINE regex matches the first
+     [\w./-]+\.md token after the bullet, so the link TEXT must be the
+     filename ("[grassi2010.md](grassi2010.md)"). A bare citekey as link text
+     ("[grassi2010](grassi2010.md)") is silently not counted as a catalog
+     entry and the page reads as unindexed. Caught by mutation at M40 T5.
+
+     Sources the repo relies on that have no page yet are tracked as M41
+     tasks, not recorded here as absences: Browne (1992), Acton & Revelle
+     (2004), Cheung & Rensvold (2002), Browne & Cudeck, Wendt et al. (2019),
+     Hu & Bentler (1999), Browne (1982). The gitignored shelf `sources/` holds
+     the PDFs. `sources/acton2002.pdf` is shelved but owes no page — the repo
+     cites Acton & Revelle (2002) only as other authors' citation of prior
+     work, which the "consulted in passing owes nothing" rule excludes. -->
