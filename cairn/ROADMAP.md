@@ -11,7 +11,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
 | M40 | Source notes for the two shelved primary sources | done | — | normal | milestones/archive/M40-reference-notes-shelved.md |
-| M41 | Source notes for the fit-index benchmark pair | in-progress | M40 | normal | milestones/M41-reference-notes-unshelved.md |
+| M41 | Source notes for the fit-index benchmark pair | review | M40 | normal | milestones/M41-reference-notes-unshelved.md |
 | M42 | Source notes for the CPM model and its communality CIs | planned | M40 | normal | milestones/M42-reference-notes-cpm.md |
 | M43 | Source notes for the structure criteria and the validity source | planned | M40 | normal | milestones/M43-reference-notes-structure.md |
 | M39 | Legible radial axis labels over data layers | done | — | normal | milestones/archive/M39-radial-label-legibility.md |

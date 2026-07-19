@@ -1,6 +1,6 @@
 # M41: Source notes for the fit-index benchmark pair
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M40
 - **Principles touched:** —
@@ -114,6 +114,7 @@ Cudeck (1993). Editing the `devel/` transcriptions → after M7 archives
 
 ## Work log
 
+- 2026-07-19: all tasks done, status → review. The profile's `verify` slot did not fire: it is conditional on roxygen changes (`document()`) or code changes (`devtools::test()`), and the branch diff is `cairn/` markdown only — 0 files outside `cairn/`, matching M40's docs-only precedent.
 - 2026-07-19: **T1-T5 done; both pages authored and validated.** T1 re-verified the shelf: `browne1992a.pdf` and `hu1999.pdf` both present, identified by first-page read rather than filename, with printed-page locations established from running heads (Browne & Cudeck printed 239 = PDF p. 10; Hu & Bentler PDF page n = printed page n) — observed 2026-07-19. T2/T3 authored both pages against M41-D1's two channels. T4 verified every `Traces to` anchor against the files, correcting one asserted line range (`R/ssm_ci_accuracy.R` comment starts at 1014, not 1015). T5: `INDEX.md` gained both entries plus a corrected owes-no-page ledger now covering acton2002, cudeck1983 and cheung2002; `cairn_validate` reports `references index<->disk` PASS and `references staleness` OK; `git diff --stat devel/` empty, nothing modified outside `cairn/`, and both pages' tail bytes checked clean (M34).
 - 2026-07-19: **substantive amendment to AC2, at the implementation question gate.** The plan described "both RMSEA cutoff sentences" as the .05 and .08 sentences. Reading p. 239 shows one continuous passage carrying **three** thresholds, and the two the package actually ships are **.08 and 0.1** (`ssm_ci_rmsea_reasonable`, `ssm_ci_rmsea_poor`) — the .05 is the one with the verified 1993 chapter anchor but is used nowhere. AC2 now covers all three verbatim and additionally requires the page to record two departures the repo's own wording makes: the source prints `0.1` not `.10`, and states a preference ("would not want to employ") where the package says "fits poorly". Jeff chose this amendment at the gate over leaving AC2 as planned.
 - 2026-07-19: two between-channel discrepancies found and recorded on `browne1992a.md`, both text-layer defects resolved in favour of the rendered page: `pdftotext` emits "RMSEAgreater" as one word, and drops the italics the print carries on "close fit". No numeral differed between channels on either page. Also recorded on `hu1999.md`: Hu & Bentler's own RMSEA cutoff is **.06**, not the .08/.10 the package ships from Browne & Cudeck — the repo's attribution is correct, but the two pages are cited in the same sentences and the confusion is one page-read away.
