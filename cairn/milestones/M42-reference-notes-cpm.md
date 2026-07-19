@@ -94,9 +94,9 @@ page (M41 work log, 2026-07-19).
 - [x] T1. Re-verify `browne1992.pdf` and `browne1982_pp95-96.pdf` on the shelf
       and stamp the observation — the shelf is live and moved twice during
       M40, so confirm rather than trust this plan's inventory.
-- [ ] T2. Author `browne1992.md` — the full CPM model specification, two
+- [x] T2. Author `browne1992.md` — the full CPM model specification, two
       channels. Expect this to fill a working session on its own.
-- [ ] T3. Build the parameter map: each quantity `R/cpm_fit.R` estimates
+- [x] T3. Build the parameter map: each quantity `R/cpm_fit.R` estimates
       against its published counterpart, walked against the code rather than
       asserted. A departure is recorded and escalated, never reconciled here.
 - [ ] T4. Author `browne1982.md` from pp. 95–96, two channels.
@@ -118,6 +118,8 @@ page (M41 work log, 2026-07-19).
 - 2026-07-19: T1 done — both sources confirmed on the shelf and identified from their own pages, not from filenames: `browne1992.pdf` is 29 pages, p. 1 printing "PSYCHOMETRIKA-VOL. 57, NO. 4, 469-497 / DECEMBER 1992" and "CIRCUMPLEX MODELS FOR CORRELATION MATRICES / MICHAEL W. BROWNE"; `browne1982_pp95-96.pdf` is 2 pages carrying printed page numbers 95 and 96 — observed 2026-07-19. Both are Acrobat "Paper Capture" OCR scans, which is what M42-D1 responds to.
 - 2026-07-19: question gate — three answers, all the recommended option. (1) **Substantive amendment to AC3**, user-approved: the criterion presumed Browne (1982) pp. 95–96 state a communality-CI derivation; the pages state the general transformation-based CI method (eqs. 1.6.29–1.6.41) with the log-variance instance (1.6.38–1.6.40) and mention neither communality nor the circumplex, so the criterion now asks for what is there plus an explicit statement that the communality application is Grassi's assembly. (2) OCR channel standing → M42-D1. (3) `browne1992.md` carries the implemented model only (§2, §3, §5.2 Requirements, §6), with §4 simplex and §5 Anderson under "Not extracted" — `grep -rn Anderson R/` returns nothing.
 - 2026-07-19: minor amendment — **T7 added** (discovered sub-task) for two dated observations this milestone falsifies on already-committed files: `browne1992a.md:6-8` asserts `browne1992.md` "does not exist yet", and `INDEX.md`'s comment block lists Browne 1992/1982 as still owing pages. Coverage AC6 → T6, T7.
+
+- 2026-07-19: T2+T3 done — `cairn/references/browne1992.md` authored, carrying the implemented model in full (eqs. 1–8, the six §5.2 Requirements, eqs. 30–48) plus a parameter map walked against `R/cpm_fit.R`. Two results worth naming. (a) **No numeric departure**: the engine's `zeta` is Browne's ζ*ᵢᵢ = ρ(xᵢ,cᵢ) of eqs. (3b*)/(4), verified by substituting into eq. (3) rather than asserted, and both scaling families' df reduce to eq. (6) under equivalent moment counts (the cancellation D-011 measured empirically). (b) **Three departures in kind, recorded not reconciled** per Scope: Browne's §6.7 IFA start-value recipe is not implemented (the engine uses its own starts), `cpm_spec()` imposes an m cap the paper does not print, and variant C (equal communality, free angles) appears nowhere in the paper. Also banked: five paper-internal errata, of which the p. 485 "[m/2] … less than m/2" definition is load-bearing — read literally it drops the top even harmonic from eq. (33).
 
 ## Decisions
 
