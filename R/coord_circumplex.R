@@ -114,6 +114,48 @@ rim_limit <- function(center, amax) {
   amax + (amax - center) * 64 * .Machine$double.eps
 }
 
+# Guarantee a ring at the rim. The break algorithm places one at `amax` only by
+# coincidence -- over [0, 1.75] it proposes 2, genuinely outside the panel and
+# correctly censored -- so the outermost ring sat below the rim and the circle
+# was drawn open, with data able to plot beyond the last visible ring. Append
+# the rim to the radial view scale's breaks; `guide_grid()` draws the rings from
+# `r$mapped_breaks()`, so the ring and the axis guide both follow from the one
+# patched break set.
+#
+# The appended break carries a blank label (M38-D1). Crowding near the rim is
+# governed by rendered label width rather than break spacing, so labelling every
+# rim collides with its neighbour, and suppressing that neighbour to make room
+# deletes a ring the break algorithm chose. Where `amax` is already a generated
+# break there is nothing to append and it keeps its own label.
+rim_view_scale <- function(view, rim) {
+  breaks <- view$get_breaks()
+  tol <- abs(rim) * 1e-9
+  if (any(abs(breaks - rim) <= tol, na.rm = TRUE)) {
+    return(view)
+  }
+  ggplot2::ggproto(
+    NULL, view,
+    breaks = c(breaks, rim),
+    get_labels = function(self, breaks = self$get_breaks()) {
+      # Label the breaks the scale knows about, then blank the appended rim.
+      # The rim is asked for separately rather than blanked afterwards because
+      # a scale carrying explicit `labels` pairs them positionally with its own
+      # breaks and aborts on a length mismatch -- handing it the appended break
+      # would error out of the build. NULL labels (a caller suppressing the
+      # amplitude labels) stay NULL: assigning into NULL by index would
+      # fabricate a vector of literal NA labels.
+      is_rim <- !is.na(breaks) & abs(breaks - rim) <= tol
+      labels <- self$scale$get_labels(breaks[!is_rim])
+      if (is.null(labels)) {
+        return(labels)
+      }
+      out <- rep(if (is.list(labels)) list("") else "", length(breaks))
+      out[!is_rim] <- labels
+      out
+    }
+  )
+}
+
 # Displacement (degrees) at which to draw the amplitude (radial) axis: the
 # midpoint of the widest angular gap between consecutive displacement spokes, so
 # the amplitude tick labels never collide with a spoke label (the due-East
@@ -163,8 +205,13 @@ CoordCircumplex <- ggplot2::ggproto(
     } else {
       self$r_axis_angle %% 360
     }
-    ggplot2::ggproto_parent(ggplot2::CoordRadial, self)$setup_panel_params(
-      scale_x, scale_y, params
-    )
+    params <- ggplot2::ggproto_parent(
+      ggplot2::CoordRadial, self
+    )$setup_panel_params(scale_x, scale_y, params)
+    # Add the rim ring after the parent has built the view scales, then keep the
+    # precomputed major positions consistent with the break set they came from.
+    params$r <- rim_view_scale(params$r, r_max)
+    params$r.major <- params$r$map(params$r$get_breaks())
+    params
   }
 )

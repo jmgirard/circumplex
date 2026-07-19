@@ -304,7 +304,13 @@ is a Cartesian difference plot and stays independent.
   seam-straddle short-way wrap (I2) survive the transform; `amax` and the
   configurable amplitude center are the radial limits (`rlim = c(center, amax)`),
   trained once. Rings/spokes/labels are the coord's themed panel grid, so
-  `+ theme_*()` restyles them.
+  `+ theme_*()` restyles them. The coord also owns the **rim ring**: the break
+  algorithm places a break at `amax` only by coincidence, so the coord appends
+  the rim to the radial breaks itself (M38) and every canvas closes. That
+  appended ring carries a blank label — crowding near the rim is governed by
+  rendered label width rather than break spacing, and suppressing the crowded
+  neighbour would delete a ring the break algorithm chose (M38-D1). Where `amax`
+  is already a generated break it keeps its own label and nothing is appended.
 - **Canvas** (`ggcircumplex()`): a thin constructor returning
   `ggplot() + coord_circumplex() + <breaks/labels + theme>` (a `geom_blank`
   establishes the extent). It no longer draws geometry — the former
