@@ -1,9 +1,9 @@
 # M7: v2.0.0 CRAN release preparation
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38
-- **Branch/PR:** —
+- **Branch/PR:** `m7-v2-release-prep`
 
 ## Goal
 
@@ -127,6 +127,8 @@ complete and validated (D-008).
   M31–M35 viz-track remainders. Jeff's plan-gate decision: both ship in v2.0.0
   under D-018's fold-in. No release-prep task change.
 - 2026-07-18: gated amendment — `Depends on:` gains M38 (guaranteed rim ring for the circumplex canvas), spun out of the PR #62 hotfix. Jeff's plan-gate decision: the rim is visible in every figure the CRAN debut ships, so it goes in the bundle. No release-prep task change.
+
+- 2026-07-18: started (/milestone-implement). Branch `m7-v2-release-prep` cut from master at 3d2d9a76; all 11 dependencies verified done. Status planned→in-progress.
 
 ## Decisions
 
