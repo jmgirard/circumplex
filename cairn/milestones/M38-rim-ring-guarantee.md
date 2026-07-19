@@ -75,13 +75,13 @@ that vignette.
       render candidate outcomes across gap/spacing ratios and compare a labeled
       rim with neighbour suppression against an unlabeled rim. Record the
       outcome as M38-D1.
-- [ ] T2. Test-first in `tests/testthat/test-coord_circumplex.R`: the case table
+- [x] T2. Test-first in `tests/testthat/test-coord_circumplex.R`: the case table
       as contract tests, asserting the ring is present at the rim
       (`panel_params$r$get_breaks()`) and that its label is blank exactly when
       `amax` is not itself a generated break
       (`panel_params$r$get_labels()`), plus the trained-`amax` and
       nonzero-`center` cases. Confirm they fail before T3.
-- [ ] T3. Implement in `R/coord_circumplex.R` — a helper beside `rim_limit()`
+- [x] T3. Implement in `R/coord_circumplex.R` — a helper beside `rim_limit()`
       (added by PR #62) that wraps the radial `ViewScale` returned by the
       parent's `setup_panel_params()`, appending the rim to its breaks and
       blanking that entry's label. The grid reads `r$mapped_breaks()`, so the
@@ -107,6 +107,7 @@ that vignette.
 - 2026-07-18: created by /milestone-plan; absorbs two candidate rows added the same day (guaranteed rim ring; bare-coord vignette figure), both spun out of the PR #62 hotfix. Plan gate: labeled break + collision rule over an unlabeled rim or a custom grob; vignette figure paired rather than silently fixed; inspection sweep scoped to this one vignette; added to M7's v2.0.0 bundle.
 - 2026-07-18: T1 done; substantive amendment at the implement gate (Jeff approved) — Scope In, AC1 and AC2 replaced, the labeled-rim-with-suppression mechanism moved to Out, T1/T2/T3 rewritten. Rationale in M38-D1: render evidence, not arithmetic, settled it.
 - 2026-07-18: FLAG for the user — the Goal still says the rim ring is "labeled", which M38-D1 contradicts. The Goal is create-only (never edited in place), and the milestone's substance (the canvas closes at its rim) is unchanged, so it is left as written and surfaced here rather than quietly corrected. Decide at review whether to strike the word or re-cut.
+- 2026-07-18: T2+T3 done in one commit (a test-first commit would land a red suite). `rim_view_scale()` wraps the parent's radial ViewScale, appending the rim with a blank label; `r.major` recomputed to stay consistent. Rendered and inspected amax=1.75 and center=0.15/amax=0.28: circle closed, ladder unchanged, no label collision. Suite 2980 passing under NOT_CRAN=true.
 
 ## Decisions
 

@@ -77,15 +77,68 @@ test_that("a break landing on the rim survives the radial censor", {
   breaks <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]$r$get_breaks()
   expect_false(anyNA(breaks))
   expect_equal(max(breaks), 0.3)
-  # A rim that no break was ever generated for is left alone: the outermost ring
-  # stays below amax rather than being snapped onto it, which would label a ring
-  # with an amplitude it is not drawn at. Guaranteeing a rim ring in this case
-  # needs its own label-collision rule and is not this fix.
-  p <- ggplot2::ggplot(data.frame(x = 45, y = 1.2)) +
+})
+
+# Radial breaks and their labels as the panel actually renders them.
+rim_furniture <- function(amax, center = 0, data_at = 0.7) {
+  y <- if (is.null(amax)) center + 1 else center + (amax - center) * data_at
+  p <- ggplot2::ggplot(data.frame(x = 45, y = y)) +
     ggplot2::geom_point(ggplot2::aes(x, y)) +
-    coord_circumplex(amax = 1.75)
-  breaks <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]$r$get_breaks()
-  expect_equal(max(breaks, na.rm = TRUE), 1.5)
+    coord_circumplex(amax = amax, center = center)
+  pp <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]
+  breaks <- pp$r$get_breaks()
+  keep <- is.finite(breaks)
+  list(breaks = breaks[keep], labels = as.character(pp$r$get_labels())[keep])
+}
+
+test_that("the canvas always draws a ring at the rim", {
+  # The break algorithm often proposes no break at `amax` at all -- over
+  # [0, 1.75] it proposes 2, which is genuinely outside the panel and correctly
+  # censored -- so the outermost ring sat below the rim and the circle was drawn
+  # open. The coord appends the rim itself (M38).
+  for (case in list(
+    list(amax = 0.7, center = 0),
+    list(amax = 1.1, center = 0),
+    list(amax = 1.75, center = 0),
+    list(amax = 2.4, center = 0),
+    list(amax = 0.28, center = 0.15)
+  )) {
+    f <- rim_furniture(case$amax, case$center)
+    expect_equal(max(f$breaks), case$amax)
+    expect_equal(min(f$breaks), case$center)
+  }
+  # A trained (amax = NULL) canvas gets the same guarantee off its trained rim.
+  f <- rim_furniture(NULL, center = 0)
+  expect_equal(max(f$breaks), 1)
+})
+
+test_that("the rim ring is labeled only when amax is itself a generated break", {
+  # M38-D1: the rim adds a ring and nothing else. Crowding is governed by
+  # rendered label width, not break spacing, so labelling every rim collides
+  # (amax = 1.1 printed 1.00/1.10 as "1.0010") and suppressing the neighbour to
+  # make room deletes a ring the break algorithm chose. The generated ladder is
+  # therefore left exactly as it is and the appended rim carries a blank label.
+  f <- rim_furniture(1.75)
+  expect_equal(f$breaks, c(0, 0.5, 1.0, 1.5, 1.75))
+  expect_equal(f$labels, c("0.00", "0.50", "1.00", "1.50", ""))
+  # The crowded case that motivated the abandoned suppression rule: 0.275 keeps
+  # its label and its ring, and the rim is silent rather than printing over it.
+  f <- rim_furniture(0.28, center = 0.15)
+  expect_equal(max(f$breaks), 0.28)
+  expect_true(0.275 %in% f$breaks)
+  expect_equal(f$labels[[length(f$labels)]], "")
+  # Where amax is already a generated break there is nothing to append, so it
+  # keeps the label the break algorithm gave it.
+  for (amax in c(0.3, 0.5, 0.8, 1.2)) {
+    f <- rim_furniture(amax)
+    expect_equal(max(f$breaks), amax)
+    expect_false(f$labels[[length(f$labels)]] == "")
+    # Exactly one ring at the rim -- the generated break is not duplicated by an
+    # appended one. Compared with tolerance: the generated break drifts a few
+    # ULPs wide of amax (0.30000000000000004), which is what the radial range's
+    # headroom exists to accommodate.
+    expect_equal(sum(abs(f$breaks - amax) <= abs(amax) * 1e-9), 1L)
+  }
 })
 
 test_that("amax = NULL trains the outer limit from the data, inner pinned to center", {
