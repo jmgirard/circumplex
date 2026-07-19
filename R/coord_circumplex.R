@@ -171,6 +171,119 @@ ssm_r_axis_angle <- function(breaks) {
   min(mids[gaps > max(gaps) - 1e-9])             # widest gap, smallest midpoint
 }
 
+# Semi-opaque plates drawn behind the amplitude tick labels (M39).
+#
+# The radial axis is a FOREGROUND guide: `CoordRadial$render_fg` emits it after
+# the geom layers, so its labels are already painted on top of the data. The
+# defect this fixes is therefore contrast, not draw order -- grey label text over
+# a dark arrowhead or a dense scatter stays on top and still cannot be read. The
+# plate is deliberately semi-transparent rather than opaque so it restores
+# contrast without erasing the data it covers.
+#
+# It is built FROM the label text grob rather than from computed positions.
+# `CoordRadial` places the radial axis through an unexported `rotate_r_axis()`,
+# so reproducing the placement would mean either reaching into ggplot2 internals
+# or re-deriving arithmetic that drifts silently and leaves the plate beside the
+# label instead of behind it. Sizing with `stringWidth()`/`stringHeight()` at the
+# text's own x/y/just hands the geometry to grid at draw time, making the plate
+# exact by construction (M39-D1).
+label_backdrop <- function(txt, pad = 1) {
+  labels <- as.character(txt$label)
+  # A blank label (M38 appends the rim break with one) would otherwise get a
+  # stray floating plate with nothing on it.
+  keep <- !is.na(labels) & labels != ""
+  if (!any(keep)) {
+    return(NULL)
+  }
+  n <- length(labels)
+  # x/just may arrive scalar for a vector of labels; recycle before subsetting
+  # so every plate is anchored exactly like the label it sits behind.
+  recycle <- function(u) if (length(u) == 1L && n > 1L) rep(u, n) else u
+  labels <- labels[keep]
+  x <- recycle(txt$x)[keep]
+  y <- recycle(txt$y)[keep]
+  # `%||%` is not used here: it only reached base R in 4.4 and this package
+  # declares R (>= 4.1), so it is not guaranteed available (D-021).
+  or_else <- function(value, default) if (is.null(value)) default else value
+  hj <- rep_len(or_else(txt$hjust, 0.5), n)[keep]
+  vj <- rep_len(or_else(txt$vjust, 0.5), n)[keep]
+  # The labels are ROTATED -- the radial axis sits at an angle, and each label
+  # is turned about its own anchor to stay readable. `rectGrob()` has no
+  # rotation, so a plate sharing the text's x/y is still drawn axis-aligned and
+  # slides off the label it is meant to back (caught by rendering, not by any
+  # structural check -- see the M39 work log). Each plate therefore gets its own
+  # viewport centred on that label's anchor: a viewport rotates about its own
+  # centre, so centring it on the anchor reproduces exactly the rotate-about-
+  # the-justification-point behaviour `textGrob()` applies to the label.
+  rot <- rep_len(or_else(txt$rot, 0), n)[keep]
+  # Inherit the label's font so stringWidth/stringHeight measure the text as it
+  # will actually be drawn rather than at the device default.
+  font <- list(
+    fontsize = txt$gp$fontsize, fontfamily = txt$gp$fontfamily,
+    fontface = txt$gp$font, cex = txt$gp$cex,
+    # White at 75% alpha, written as a literal rather than built with
+    # grDevices::adjustcolor() so the package gains no second dependency for a
+    # constant (the minimal-deps doctrine, D-006/D-014). BF = round(0.75 * 255).
+    fill = "#FFFFFFBF", col = NA
+  )
+  gp <- do.call(grid::gpar, font[!vapply(font, is.null, logical(1))])
+  plates <- lapply(seq_along(labels), function(i) {
+    # Padding widens the plate symmetrically, which would move it off the label
+    # unless the justification is centred: a plate `2 * pad` wider but pinned at
+    # the same edge sits off to one side. Shifting by `pad * (2 * just - 1)`
+    # re-centres it for any justification.
+    grid::rectGrob(
+      x = grid::unit(0.5, "npc") + grid::unit(pad * (2 * hj[[i]] - 1), "pt"),
+      y = grid::unit(0.5, "npc") + grid::unit(pad * (2 * vj[[i]] - 1), "pt"),
+      width = grid::stringWidth(labels[[i]]) + grid::unit(2 * pad, "pt"),
+      height = grid::stringHeight(labels[[i]]) + grid::unit(2 * pad, "pt"),
+      hjust = hj[[i]], vjust = vj[[i]],
+      gp = gp,
+      vp = grid::viewport(x = x[i], y = y[i], angle = rot[[i]])
+    )
+  })
+  do.call(grid::grobTree, c(plates, list(name = "circumplex-label-backdrop")))
+}
+
+# Walk a rendered foreground tree and put a backdrop behind the amplitude labels.
+#
+# The amplitude label grob is identified by its LABELS matching the radial view
+# scale's, not by position: M32 found these grobs nested in unnamed gTrees, so an
+# index path into them is not stable across ggplot2 versions, and the theta
+# (spoke) labels -- which M39 deliberately leaves alone -- sit in a sibling
+# subtree. A match failure therefore draws no plate at all, which is visible and
+# fenced, rather than silently styling the wrong text.
+add_label_backdrop <- function(grob, labels) {
+  # The view scale can carry a break the guide never draws -- an amax past the
+  # last generated break leaves an out-of-range break whose label is NA, dropped
+  # on the way to a grob -- so compare against the labels that can actually be
+  # rendered, not the raw break set.
+  labels <- as.character(labels)
+  labels <- labels[!is.na(labels)]
+  if (inherits(grob, "text")) {
+    if (identical(as.character(grob$label), labels)) {
+      backdrop <- label_backdrop(grob)
+      if (!is.null(backdrop)) {
+        # Keep the wrapper's name so the parent's childrenOrder still resolves.
+        return(grid::grobTree(backdrop, grob, name = grob$name))
+      }
+    }
+    return(grob)
+  }
+  # gtables hold their children in `grobs`, gTrees in `children`; assign back by
+  # index in both cases so the existing names (and childrenOrder) survive.
+  if (inherits(grob, "gtable")) {
+    for (i in seq_along(grob$grobs)) {
+      grob$grobs[[i]] <- add_label_backdrop(grob$grobs[[i]], labels)
+    }
+    return(grob)
+  }
+  for (i in seq_along(grob$children)) {
+    grob$children[[i]] <- add_label_backdrop(grob$children[[i]], labels)
+  }
+  grob
+}
+
 #' @rdname circumplex-ggproto
 #' @format NULL
 #' @usage NULL
@@ -213,5 +326,15 @@ CoordCircumplex <- ggplot2::ggproto(
     params$r <- rim_view_scale(params$r, r_max)
     params$r.major <- params$r$map(params$r$get_breaks())
     params
+  },
+
+  # Let the parent draw the foreground exactly as it does -- the radial axis is
+  # already painted above the geom layers there -- then slip a backdrop behind
+  # the amplitude labels so data underneath cannot swallow them (M39).
+  render_fg = function(self, panel_params, theme) {
+    fg <- ggplot2::ggproto_parent(
+      ggplot2::CoordRadial, self
+    )$render_fg(panel_params, theme)
+    add_label_backdrop(fg, panel_params$r$get_labels())
   }
 )
