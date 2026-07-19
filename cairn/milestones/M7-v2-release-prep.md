@@ -244,14 +244,18 @@ guard with `octants.Rd:1: ->`.
 ### Findings logged, not actioned (score < 80)
 
 - **F4 (78) — `NEWS.md:6-8` undercounts.** "Alongside it come three other new
-  analysis families" omits `fit_structure()`, which the same file documents at
+  analysis families" omitted `fit_structure()`, which the same file documents at
   `:119` and which `cran-comments.md:40-41` lists as a top-level highlight.
-  Real editorial inconsistency in the first paragraph a user reads; one-line
-  fix; non-blocking. Surfaced to Jeff at the approval gate.
-- **F5 (50) — `cran-comments.md:85-86` is true but reads as a non sequitur.**
-  "ggforce is dropped ... so the Imports count is unchanged" never mentions
-  that `parallel` was added, which is what keeps the count level. Surfaced to
-  Jeff at the gate.
+  **Fixed at Jeff's instruction at the approval gate** (below the actioned bar,
+  fixed on his call): now "four other new analysis families", with
+  `fit_structure()` named.
+- **F5 (50) — `cran-comments.md:85-86` was true but read as a non sequitur.**
+  "ggforce is dropped ... so the Imports count is unchanged" never mentioned
+  that `parallel` was added, which is what keeps the count level — the
+  omission that led the F3 reviewer to a wrong conclusion. **Fixed at Jeff's
+  instruction at the approval gate:** the sentence now names the `parallel`
+  addition, says the count is unchanged **at seven**, and states that no new
+  third-party dependency is introduced (`parallel` is base R).
 - **F3 (5) — rejected, factually wrong.** The reviewer claimed the Imports
   claim was false on a baseline of 8 Imports at 1.2.0 including `parallel`.
   `git show v1.2.0:DESCRIPTION` shows 7, without `parallel`; HEAD shows 7. The

@@ -83,7 +83,9 @@ documented in NEWS.md:
 The `ggplot2` requirement moves from `>= 3.3.0` to `>= 4.0.0`: the new
 coordinate system is a `CoordRadial` subclass and uses parameters introduced in
 ggplot2 4.0.0. `ggforce` is dropped from Imports (the new coordinate system
-subsumes what it was used for), so the Imports count is unchanged.
+subsumes what it was used for) and base R's `parallel` is added (for the new
+`parallel`/`ncpus` bootstrapping arguments), so the Imports count is unchanged
+at seven and no new third-party dependency is introduced.
 
 The declared `Depends: R` moves from `>= 3.4` to `>= 4.1`. This corrects an
 understated declaration rather than adding a restriction: ggplot2 (>= 4.0.0)

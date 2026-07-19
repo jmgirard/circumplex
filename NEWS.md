@@ -3,9 +3,10 @@
 This is a major release. Its flagship addition is `cpm_fit()`, a native
 reimplementation of Browne's (1992) circular stochastic process model for the
 correlational structure of circumplex scales — filling the gap left by the
-archived CircE package, the previous R implementation. Alongside it come three
+archived CircE package, the previous R implementation. Alongside it come four
 other new analysis families: latent-variable SSM analysis with `ssm_sem()`,
-repeated-measures (longitudinal) SSM analysis, and `ssm_ci_accuracy()`, a
+repeated-measures (longitudinal) SSM analysis, `fit_structure()` for
+exploratory circumplex-structure tests, and `ssm_ci_accuracy()`, a
 diagnostic for whether an `ssm_analyze()` result's confidence intervals can be
 trusted at your sample size and profile (Zimmermann & Wright, 2017). The
 plotting layer has been rebuilt on a real ggplot2 coordinate system.
