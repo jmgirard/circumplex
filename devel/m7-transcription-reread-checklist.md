@@ -8,10 +8,16 @@ against each other). Both records mark the remaining step as
 step's worksheet. It gates the v2.0.0 submission (M7 AC3).
 
 **How to use it.** Open the primary source at the anchor named in each row and
-read the published value off the page, *then* compare it to the Value column.
-Read source-first — comparing in the other direction invites confirmation of
-what is already written. Tick the box when the two agree; note any discrepancy
-in the Notes column and resolve it before T4.
+read the published value off the page, *then* compare it to the row. Read
+source-first — comparing in the other direction invites confirmation of what is
+already written. Tick the box when the two agree; note any discrepancy inline
+and resolve it before T4.
+
+That recipe fits section A, where nearly every row is a printed number. **It
+does not fit all of section B**, whose rows come in three kinds — printed
+values, asserted findings, and our own paraphrases, the last of which no page
+can settle. Section B rows are tagged accordingly; read
+*"How to check section B"* before starting that half.
 
 This checklist was assembled from the repo, so it inherits any error the repo
 already has. It tells you **where to look**, never what you should find.
@@ -150,47 +156,106 @@ through it directly. The rows below are the subset that reaches **shipped,
 user-facing output**, and so are the ones where an error would do the most
 damage.
 
-> **Worksheet refreshed 2026-07-19** after section A completed. Changes: line
-> anchors re-derived against the current vignette (all of them had drifted);
-> a new **B1a** covering six shipped numbers the first cut missed because they
-> sit in prose rather than in the table; **B4** split — its single row had
-> conflated OCPD's amplitude with PARPD's elevation — and given the Study 5
-> fit indices it also ships; **B3** given Eq. A7's leading ½, which had never
-> been listed; **B2** given the IIP-C ρ values instead of "per the record";
-> and the transcription record's own flagged 15.5% coincidence surfaced here
-> (B1a), where this pass will actually meet it.
->
+## How to check section B (read this first)
+
+Section A was uniform: nearly every row was "read this number off this table."
+Section B is not, and that is why it reads as harder to verify. Its rows are
+**three different kinds of claim**, and each needs a different move. Every row
+below is now tagged with which one it is.
+
+| Tag | What it is | What settles it |
+|---|---|---|
+| **[VALUE]** | A number or formula printed in the paper | Read it off the named table/equation. Same as section A. |
+| **[FINDING]** | A threshold the authors *assert in a sentence* | Find the sentence — page and section given below — and check the vignette says the same thing. Not in any table. |
+| **[FIDELITY]** | *Our* paraphrase of what they found | **No page settles this.** The paper never says "essentially unbiased"; we do. The question is whether our wording is faithful and doesn't overclaim — a judgment, not a lookup. Collected separately in **B0**, with the published numbers beside each. |
+
+If a row felt unverifiable, it was almost certainly a [FIDELITY] row sitting in
+a checklist of [VALUE] rows. Those are now pulled out into B0, where the
+question asked matches the work.
+
+> **Locator pass, 2026-07-19.** Each [FINDING] and [VALUE] row below now names
+> the printed page its claim actually sits on, confirmed page-by-page against
+> the shelf copy (`cairn/references/sources/zimmermann2017Description.pdf`;
+> PDF page numbering and printed page numbering coincide, so a page anchor is
+> unambiguous). **This confirms the anchors, not the values.** It used the same
+> extraction family as the original channel 2, so it is not an independent
+> read of any number — it only means that when a row says p. 10, p. 10 is
+> where you should be looking.
+
 > **What section A suggests to watch for.** Every one of its findings was an
 > error in a *record about* a value — a page anchor, a column label, a
 > variable order, a comment's wording — and **not one transcribed number was
-> wrong**. Section B's analogue is that same label/anchor layer: which study a
-> threshold comes from, which scale a Table 4 figure belongs to, whether a
-> vignette number is the published value or a rounding of it.
+> wrong**. Section B's analogue is that same label/anchor layer, and B1 below
+> now carries a live instance of it.
 
-### B1. The accuracy table the vignette prints (Studies 1–2, pp. 6–11)
+### B0. [FIDELITY] The vignette's characterizations — judgment, not lookup
 
-`vignettes/evaluating-circumplex-structure.Rmd:190-199`. This table is read
-by users as guidance about their own sample sizes.
+These are the accuracy table's "Point estimate" column
+(`vignettes/evaluating-circumplex-structure.Rmd:190-199`). Each is our
+compression of a paragraph of theirs. Don't hunt for a matching sentence;
+there isn't one. Ask instead: **does this overclaim, and would a user acting
+on it be misled?** The published basis is given so the judgment is informed.
 
-- [ ] Elevation, X, Y: essentially unbiased; CI accurate at n ≥ 50
-- [ ] Amplitude: biased **upward** (strongly at small population amplitude); accurate at n ≥ 75 (general-factor instrument) / n ≥ 150 (no general factor), given population amplitude ≥ .10
-- [ ] Displacement: unbiased but imprecise at low amplitude; accurate at n ≥ 100 (general factor) / n > 200 (no general factor), given population amplitude ≥ .10
-- [ ] Fit (R²): biased **downward**; population R² < .9 only, unsuited near 1
-- [ ] The band being applied is Bradley's (1978) liberal band, 92.5%–97.5% (`:187-188`)
+- [ ] "essentially unbiased" (elevation, X, Y) — their basis: average bias −.0007, most extreme −.013 (p. 6)
+- [ ] "**biased upward**, strongly so when population amplitude is small" (amplitude) — their basis: bias .0002–.136, average .021; relative bias average 15.5%, range 0–135.8%; direction consistently positive (p. 6)
+- [ ] "unbiased but imprecise at low amplitude" (displacement) — their basis: bias average −.03°, range −2.38° to 3.03° (p. 6); SE grows as amplitude shrinks (p. 8)
+- [ ] "biased downward … unsuited near 1" (fit) — their basis: average −.081, range −.382 to .027 (p. 6); coverage exactly 0 at population R² = 1, inaccurate at R² ≥ .9 (p. 10). Note "unsuited" is *their* word about the method for R² CIs (p. 11); "near 1" is ours.
+- [ ] Table header "95% CI accurate when…" — accuracy always means the Bradley band, never statistical significance. Confirm no cell reads as a significance claim.
 
-### B1a. The three "implications" bullets the vignette prints (`:203-222`)
+### B1. [FINDING] The sample-size thresholds the vignette's table prints
+
+`vignettes/evaluating-circumplex-structure.Rmd:190-199`. This column is read
+by users as guidance about their own sample sizes, so it is the highest-stakes
+block in section B. **All four thresholds live in the Study 2 Results section,
+p. 10** — not in a table. Read that section top to bottom once; the four
+sentences appear in this order.
+
+- [ ] Elevation / affiliation / dominance accurate at **n ≥ 50** — end of the elevation paragraph, p. 10
+- [ ] Amplitude accurate at **n ≥ 75** (general factor) and **n ≥ 150** (no general factor) — end of the amplitude paragraph, p. 10
+- [ ] Displacement accurate at **n ≥ 100** (general factor) and **> 200** (no general factor) — end of the displacement paragraph, p. 10. Note the asymmetry is theirs: "at least 100" but "greater than 200", which is why the vignette prints `n ≥ 100` and `n > 200`. Confirm we kept that distinction rather than tidying it.
+- [ ] Fit: inaccurate at population R² ≥ .9, coverage 0 at R² = 1 — p. 10, last paragraph, continuing onto p. 11
+- [ ] The band is Bradley's (1978) liberal band, 92.5%–97.5% (p. 10; vignette `:187-188`)
+- [ ] The amplitude ≥ .10 precondition — Study 2 Discussion, p. 10. The vignette attaches it to the amplitude and displacement rows only; confirm that is where they scope it.
+
+> ⚠ **The paper states these thresholds twice, and the two statements do not
+> agree.** The Study 2 **Results** (p. 10) gives amplitude 75/150 and
+> displacement 100/200, as above. The Study 2 **Discussion** on the same page
+> summarizes amplitude *and* displacement together as 100/200 — a rounder,
+> more conservative claim that does not reproduce the 75/150 figures.
+>
+> The vignette follows the **Results**. That is the more precise source and is
+> defensible, but it is a choice, not a transcription, and it means our
+> amplitude row (75/150) is looser than the authors' own summary sentence
+> (100/200). Decide deliberately whether to keep it, and if so whether the
+> vignette should note that the authors' discussion states a stricter figure.
+> This is the section-A error class — a value taken from the right paper but
+> the wrong section — caught live rather than after the fact.
+
+### B1a. [VALUE] The three "implications" bullets the vignette prints (`:203-222`)
 
 Prose, not a table, so it escaped the first cut — but every number in it is
-transcribed and shipped.
+transcribed and shipped. All are printed values; each page below was confirmed
+in the locator pass.
 
-- [ ] Relative amplitude bias averaged `15.5%`, reached `135.8%` (pp. 6–7)
-- [ ] ⚠ **`15.5%` occurs twice in the paper for two different quantities** — Study 1's average relative amplitude bias (p. 6) and Study 4's mean deviance when AFF₂ = 0 (p. 13). Both channels confirmed both occurrences independently; the record flags it so a reader does not "fix" one into the other. The vignette means the Study 1 sense. Please confirm on the page.
-- [ ] At n = 50, no general factor, population amplitude exactly 0: expected sample amplitude ≈ `.15` (pp. 6–7)
-- [ ] SE of displacement ≈ `50°` at n = 100 for a weakly differentiated profile (p. 8)
-- [ ] Eq. 3 constants `2.95` and `n^(−0.587)`, and the f_a values as the vignette **rounds** them: `.55` IIP-C, `.63` IIP-SC, `.85` IAS (record: .545, .625, .845 — confirm the unrounded values in B3, the rounding here is the vignette's)
-- [ ] At n = 100 with an IIP-C-like instrument the frontier is ≈ `.11`
+- [ ] Relative amplitude bias averaged `15.5%`, reached `135.8%` — **p. 6** (the record said pp. 6–7; both numbers are on p. 6)
+- [ ] At n = 50, no general factor, population amplitude 0: expected sample amplitude `.153` — **p. 6**. The vignette rounds this to "about .15" (`:205`); confirm you're comfortable with the rounding, since .15 is also the "marked amplitude" figure the same bullet argues against.
+- [ ] SE of displacement ≈ `50°` at n = 100 for a weakly differentiated profile — **p. 8**
+- [ ] Eq. 3 constants `2.95` and `n^(−0.587)`, and the f_a values as the vignette **rounds** them: `.55` IIP-C, `.63` IIP-SC, `.85` IAS (unrounded .545/.625/.845 — those are B3's rows; the rounding is the vignette's own)
+- [ ] At n = 100 with an IIP-C-like instrument the frontier is ≈ `.11` — **p. 12**
 
-### B2. Population octant matrices — Note 3 (p. 18)
+> ⚠ **`15.5%` occurs twice in the paper for two different quantities** —
+> Study 1's average relative amplitude bias (**p. 6**) and Study 4's mean
+> deviance when the second profile's affiliation is 0 (**p. 13**). Both
+> occurrences were confirmed independently in the original two channels, and
+> the locator pass re-confirmed both pages. It is a genuine coincidence, not a
+> paste error: do not "fix" one into the other. The vignette means the p. 6
+> sense.
+>
+> A third near-miss to be aware of while reading: `.153` appears on **p. 6** as
+> the expected sample amplitude above, and again on **p. 15** as a Table 4 CI
+> bound for an unrelated scale. Different quantities, same digits.
+
+### B2. [VALUE] Population octant matrices — Note 3 (p. 18)
 
 `devel/m4-zw-transcription.md`. These define the simulation conditions the
 diagnostic was validated against.
@@ -198,7 +263,7 @@ diagnostic was validated against.
 - [ ] Without a substantial general factor (IAS, 2,988 students; Gurtman & Pincus, 2000; Wiggins, 1995): ρ1 `.430`, ρ2 `.030`, ρ3 `−.360`, ρ4 `−.740`
 - [ ] With a substantial general factor (IIP-C, 1,981 students; Gurtman & Balakrishnan, 1998): ρ1 `.683`, ρ2 `.500`, ρ3 `.345`, ρ4 `.288`
 
-### B3. Scaling-factor formulas — Eq. A6, A7 (p. 18) and Eq. 3 (p. 12)
+### B3. [VALUE] Scaling-factor formulas — Eq. A6, A7 (p. 18) and Eq. 3 (p. 12)
 
 The record flags **one resolved channel discrepancy** here. Please confirm the
 resolution against the page image, since it was settled by reasoning rather
@@ -224,7 +289,7 @@ than by a clean second read:
 > error in any one of them alone would break the identity. Read the pages
 > anyway; this only tells you the set is internally coherent.
 
-### B4. Study 5 reproduction (pp. 13–16) and Table 4 (p. 15)
+### B4. [VALUE] Study 5 reproduction (pp. 13–16) and Table 4 (p. 15)
 
 The vignette reproduces these analyses live on the bundled `jz2017` data, so a
 transcription error here would surface as a mismatch between the vignette's
@@ -242,7 +307,7 @@ conflated two different Table 4 values** — OCPD's *amplitude* and PARPD's
 > a and δ print without CI brackets in the table. Worth confirming, since an
 > absent bracket is easy to read as a transcription omission.
 
-### B5. Octant angles — Figure 1A (p. 3)
+### B5. [VALUE] Octant angles — Figure 1A (p. 3)
 
 - [ ] LM 0°, NO 45°, PA 90°, BC 135°, DE 180°, FG 225°, HI 270°, JK 315°
 
