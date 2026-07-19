@@ -49,6 +49,14 @@ ssm_plot_curve(
 
 A ggplot object depicting the SSM curve(s) of each profile.
 
+## See also
+
+Other visualization functions:
+[`plot.circumplex_ci_accuracy()`](http://circumplex.jmgirard.com/reference/plot.circumplex_ci_accuracy.md),
+[`ssm_plot_circle()`](http://circumplex.jmgirard.com/reference/ssm_plot_circle.md),
+[`ssm_plot_contrast()`](http://circumplex.jmgirard.com/reference/ssm_plot_contrast.md),
+[`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
+
 ## Examples
 
 ``` r

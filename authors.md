@@ -15,16 +15,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/jmgirard/circumplex/blob/v1.2.0/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/jmgirard/circumplex/blob/master/DESCRIPTION)
 
 Girard J, Zimmermann J, Wright A (2026). *circumplex: Analysis and
-Visualization of Circular Data*. R package version 1.2.0,
+Visualization of Circular Data*. R package version 2.0.0,
 <https://github.com/jmgirard/circumplex>.
 
     @Manual{,
       title = {circumplex: Analysis and Visualization of Circular Data},
       author = {Jeffrey Girard and Johannes Zimmermann and Aidan Wright},
       year = {2026},
-      note = {R package version 1.2.0},
+      note = {R package version 2.0.0},
       url = {https://github.com/jmgirard/circumplex},
     }

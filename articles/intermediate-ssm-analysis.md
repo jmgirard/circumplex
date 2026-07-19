@@ -268,6 +268,7 @@ summary(results3)
 #> Displacement    142.345     68.178    218.702
 #> Model Fit         0.424                      
 #>   Note: model fit is inadequate (R² < .70); interpret only the elevation parameter.
+#>   Note: the amplitude CI lower bound is under 0.35 CI-widths above zero; the displacement is not interpretable.
 ```
 
 ``` r
@@ -550,6 +551,7 @@ summary(results6)
 #> Displacement     77.367     12.983    133.991
 #> Model Fit         0.500                      
 #>   Note: model fit is inadequate (R² < .70); interpret only the elevation parameter.
+#>   Note: the amplitude CI lower bound is under 0.35 CI-widths above zero; the displacement is not interpretable.
 #> 
 #> 
 #> # Contrast [BORPD: Male - Female]:
@@ -670,9 +672,16 @@ In this vignette, we learned how to generalize the SSM analyses to
 multiple groups and measures, how to conduct contrast analyses, how to
 make basic customizations to tables and figures, and how to export
 tables and figures to external files. In the next vignette, “Advanced
-Circumplex Visualization,” we will learn more advanced customization
-options for the SSM figures and other circumplex visualizations. (Note
-that the next vignette is still in progress.)
+Circumplex Visualization,” we learn how to build circumplex figures from
+scratch by composing the
+[`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
+canvas, the
+[`geom_ssm_point()`](http://circumplex.jmgirard.com/reference/geom_ssm_point.md)
+and
+[`geom_ssm_arc()`](http://circumplex.jmgirard.com/reference/geom_ssm_arc.md)
+layers, and the
+[`scale_x_circumplex()`](http://circumplex.jmgirard.com/reference/scale_x_circumplex.md)
+axis scale with any other `ggplot2` components.
 
 ## References
 

@@ -17,6 +17,7 @@ ssm_plot_circle(
   angle_labels = NULL,
   palette = "Set2",
   vary_shapes = FALSE,
+  path = FALSE,
   ...
 )
 ```
@@ -51,7 +52,12 @@ ssm_plot_circle(
 
 - repel:
 
-  An experimental argument for plotting text labels instead of colors.
+  A logical determining whether each profile is labelled with a repelled
+  text label (placed on the circumplex canvas by
+  [`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md),
+  so labels avoid overlapping each other and the points) instead of
+  distinguished by colour and a legend (default = FALSE). Requires the
+  ggrepel package.
 
 - angle_labels:
 
@@ -76,6 +82,22 @@ ssm_plot_circle(
   or vary only by fill color. This only works when the number of
   profiles is five or less. (default = FALSE)
 
+- path:
+
+  A logical determining whether each series' movement across occasions
+  is drawn as an arrowed path on the circle (default = `FALSE`).
+  Requires an SSM object with occasions, from
+  [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
+  with the `occasions` argument or from
+  [`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md);
+  supplying `TRUE` for any other object is an error. Occasions are
+  connected in the order they were supplied, never alphabetically, and
+  the path is drawn the short way across the 0/360 boundary. An occasion
+  whose displacement is undefined (a flat or zero-amplitude profile)
+  breaks the path rather than being interpolated through. See
+  [`geom_ssm_path()`](http://circumplex.jmgirard.com/reference/geom_ssm_path.md)
+  for the underlying layer.
+
 - ...:
 
   Not used. Supplying an unrecognized argument produces a warning.
@@ -83,6 +105,14 @@ ssm_plot_circle(
 ## Value
 
 A ggplot variable containing a completed circular plot.
+
+## See also
+
+Other visualization functions:
+[`plot.circumplex_ci_accuracy()`](http://circumplex.jmgirard.com/reference/plot.circumplex_ci_accuracy.md),
+[`ssm_plot_contrast()`](http://circumplex.jmgirard.com/reference/ssm_plot_contrast.md),
+[`ssm_plot_curve()`](http://circumplex.jmgirard.com/reference/ssm_plot_curve.md),
+[`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
 
 ## Examples
 

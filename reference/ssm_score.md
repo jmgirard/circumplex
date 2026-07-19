@@ -26,7 +26,14 @@ ssm_score(data, scales, angles = octants(), append = TRUE, ...)
 - angles:
 
   Required. A numeric vector containing the angular displacement of each
-  circumplex scale included in `scales` (in degrees).
+  circumplex scale included in `scales` (in degrees). The closed-form
+  SSM estimator used here equals the ordinary-least-squares cosine fit
+  for equally spaced `angles` (e.g., octants at 45-degree intervals) –
+  more generally, for any angle set satisfying first- and
+  second-harmonic balance. For angle sets violating that balance
+  (generic unequally spaced sets), it is the conventional Gurtman
+  estimator, not a least-squares fit, and the reported fit is then no
+  longer a bounded R-squared in `[0, 1]` (it can fall below 0).
 
 - append:
 
@@ -35,9 +42,10 @@ ssm_score(data, scales, angles = octants(), append = TRUE, ...)
 
 - ...:
 
-  Optional. Additional parameters to pass to
+  Optional. Additional **named** arguments passed to
   [`ssm_parameters()`](http://circumplex.jmgirard.com/reference/ssm_parameters.md),
-  such as `prefix` and `suffix`.
+  such as `prefix` and `suffix`; each must be a single string. Unnamed
+  or non-scalar arguments raise an error.
 
 ## Value
 
@@ -47,13 +55,30 @@ the SSM parameters (calculated rowwise).
 ## See also
 
 Other ssm functions:
+[`plot.circumplex_ci_accuracy()`](http://circumplex.jmgirard.com/reference/plot.circumplex_ci_accuracy.md),
 [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md),
+[`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md),
+[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md),
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md),
 [`ssm_parameters()`](http://circumplex.jmgirard.com/reference/ssm_parameters.md),
-[`ssm_table()`](http://circumplex.jmgirard.com/reference/ssm_table.md)
+[`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md),
+[`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md),
+[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/reference/ssm_sem_parameters.md),
+[`ssm_table()`](http://circumplex.jmgirard.com/reference/ssm_table.md),
+[`summary.circumplex_ssm_id()`](http://circumplex.jmgirard.com/reference/summary.circumplex_ssm_id.md)
 
 Other analysis functions:
+[`cpm_fit()`](http://circumplex.jmgirard.com/reference/cpm_fit.md),
+[`cpm_simulate()`](http://circumplex.jmgirard.com/reference/cpm_simulate.md),
 [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md),
-[`ssm_parameters()`](http://circumplex.jmgirard.com/reference/ssm_parameters.md)
+[`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md),
+[`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md),
+[`ssm_draws()`](http://circumplex.jmgirard.com/reference/ssm_draws.md),
+[`ssm_parameters()`](http://circumplex.jmgirard.com/reference/ssm_parameters.md),
+[`ssm_parameters_id()`](http://circumplex.jmgirard.com/reference/ssm_parameters_id.md),
+[`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md),
+[`ssm_sem_parameters()`](http://circumplex.jmgirard.com/reference/ssm_sem_parameters.md),
+[`summary.circumplex_ssm_id()`](http://circumplex.jmgirard.com/reference/summary.circumplex_ssm_id.md)
 
 ## Examples
 

@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +62,11 @@
 <li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
@@ -83,7 +88,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Intermediate SSM Analysis</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/v1.2.0/vignettes/intermediate-ssm-analysis.Rmd" class="external-link"><code>vignettes/intermediate-ssm-analysis.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/vignettes/intermediate-ssm-analysis.Rmd" class="external-link"><code>vignettes/intermediate-ssm-analysis.Rmd</code></a></small>
       <div class="d-none name"><code>intermediate-ssm-analysis.Rmd</code></div>
     </div>
 
@@ -461,7 +466,8 @@ below.</p>
 <span><span class="co">#&gt; Amplitude         0.047      0.013      0.101</span></span>
 <span><span class="co">#&gt; Displacement    142.345     68.178    218.702</span></span>
 <span><span class="co">#&gt; Model Fit         0.424                      </span></span>
-<span><span class="co">#&gt;   Note: model fit is inadequate (R² &lt; .70); interpret only the elevation parameter.</span></span></code></pre></div>
+<span><span class="co">#&gt;   Note: model fit is inadequate (R² &lt; .70); interpret only the elevation parameter.</span></span>
+<span><span class="co">#&gt;   Note: the amplitude CI lower bound is under 0.35 CI-widths above zero; the displacement is not interpretable.</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ssm_table.html">ssm_table</a></span><span class="op">(</span><span class="va">results3</span><span class="op">)</span></span></code></pre></div>
 <table class="table table" style="font-size: 12px; margin-left: auto; margin-right: auto;">
@@ -1042,6 +1048,7 @@ Group1”.</p>
 <span><span class="co">#&gt; Displacement     77.367     12.983    133.991</span></span>
 <span><span class="co">#&gt; Model Fit         0.500                      </span></span>
 <span><span class="co">#&gt;   Note: model fit is inadequate (R² &lt; .70); interpret only the elevation parameter.</span></span>
+<span><span class="co">#&gt;   Note: the amplitude CI lower bound is under 0.35 CI-widths above zero; the displacement is not interpretable.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; # Contrast [BORPD: Male - Female]:</span></span>
@@ -1372,9 +1379,11 @@ quality and used in manuscripts, presentations, or posters.</p>
 multiple groups and measures, how to conduct contrast analyses, how to
 make basic customizations to tables and figures, and how to export
 tables and figures to external files. In the next vignette, “Advanced
-Circumplex Visualization,” we will learn more advanced customization
-options for the SSM figures and other circumplex visualizations. (Note
-that the next vignette is still in progress.)</p>
+Circumplex Visualization,” we learn how to build circumplex figures from
+scratch by composing the <code><a href="../reference/ggcircumplex.html">ggcircumplex()</a></code> canvas, the
+<code><a href="../reference/geom_ssm_point.html">geom_ssm_point()</a></code> and <code><a href="../reference/geom_ssm_arc.html">geom_ssm_arc()</a></code> layers,
+and the <code><a href="../reference/scale_x_circumplex.html">scale_x_circumplex()</a></code> axis scale with any other
+<code>ggplot2</code> components.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -1410,7 +1419,7 @@ circumplex Structural Summary Approach. <em>Assessment, 24</em>(1),
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

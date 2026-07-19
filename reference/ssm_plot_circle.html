@@ -11,7 +11,7 @@ circular space quantified by displacement and amplitude."><meta property="og:ima
 
     <a class="navbar-brand me-2" href="../index.html">circumplex</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,11 @@ circular space quantified by displacement and amplitude."><meta property="og:ima
   <ul class="dropdown-menu" aria-labelledby="dropdown-vignettes"><li><a class="dropdown-item" href="../articles/using-instruments.html">Using Circumplex Instruments</a></li>
     <li><a class="dropdown-item" href="../articles/introduction-to-ssm-analysis.html">Introduction to SSM Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/intermediate-ssm-analysis.html">Intermediate SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/advanced-visualization.html">Advanced Circumplex Visualization</a></li>
+    <li><a class="dropdown-item" href="../articles/evaluating-circumplex-structure.html">Evaluating Circumplex Structure</a></li>
+    <li><a class="dropdown-item" href="../articles/sem-based-ssm-analysis.html">SEM-Based SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/bayesian-ssm-analysis.html">Bayesian SSM Analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/growth-ssm-analysis.html">Growth Models on SSM Parameters</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/jmgirard/circumplex"><span class="fa fa-github fa-lg"></span></a></li>
@@ -55,7 +60,7 @@ circular space quantified by displacement and amplitude."><meta property="og:ima
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Create a Circular Plot of SSM Results</h1>
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/v1.2.0/R/ssm_plot.R" class="external-link"><code>R/ssm_plot.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/circumplex/blob/master/R/ssm_plot.R" class="external-link"><code>R/ssm_plot.R</code></a></small>
       <div class="d-none name"><code>ssm_plot_circle.Rd</code></div>
     </div>
 
@@ -77,6 +82,7 @@ circular space quantified by displacement and amplitude.</p>
 <span>  angle_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  palette <span class="op">=</span> <span class="st">"Set2"</span>,</span>
 <span>  vary_shapes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  path <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -112,8 +118,11 @@ pt) of the text labels for the amplitude and displacement scales (default =
 
 
 <dt id="arg-repel">repel<a class="anchor" aria-label="anchor" href="#arg-repel"></a></dt>
-<dd><p>An experimental argument for plotting text labels instead of
-colors.</p></dd>
+<dd><p>A logical determining whether each profile is labelled with a
+repelled text label (placed on the circumplex canvas by
+<code><a href="coord_circumplex.html">coord_circumplex()</a></code>, so labels avoid overlapping each other and the
+points) instead of distinguished by colour and a legend (default = FALSE).
+Requires the <span class="pkg">ggrepel</span> package.</p></dd>
 
 
 <dt id="arg-angle-labels">angle_labels<a class="anchor" aria-label="anchor" href="#arg-angle-labels"></a></dt>
@@ -137,6 +146,18 @@ their own shape or vary only by fill color. This only works when the number
 of profiles is five or less. (default = FALSE)</p></dd>
 
 
+<dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
+<dd><p>A logical determining whether each series' movement across
+occasions is drawn as an arrowed path on the circle (default = <code>FALSE</code>).
+Requires an SSM object with occasions, from <code><a href="ssm_analyze.html">ssm_analyze()</a></code> with the
+<code>occasions</code> argument or from <code><a href="ssm_analyze_long.html">ssm_analyze_long()</a></code>; supplying <code>TRUE</code> for any
+other object is an error. Occasions are connected in the order they were
+supplied, never alphabetically, and the path is drawn the short way across
+the 0/360 boundary. An occasion whose displacement is undefined (a flat or
+zero-amplitude profile) breaks the path rather than being interpolated
+through. See <code><a href="geom_ssm_path.html">geom_ssm_path()</a></code> for the underlying layer.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Not used. Supplying an unrecognized argument produces a warning.</p></dd>
 
@@ -144,6 +165,14 @@ of profiles is five or less. (default = FALSE)</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A ggplot variable containing a completed circular plot.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other visualization functions:
+<code><a href="plot.circumplex_ci_accuracy.html">plot.circumplex_ci_accuracy()</a></code>,
+<code><a href="ssm_plot_contrast.html">ssm_plot_contrast()</a></code>,
+<code><a href="ssm_plot_curve.html">ssm_plot_curve()</a></code>,
+<code><a href="ssm_plot_trajectory.html">ssm_plot_trajectory()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -169,7 +198,7 @@ of profiles is five or less. (default = FALSE)</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

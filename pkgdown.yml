@@ -1,11 +1,16 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
+  advanced-visualization: advanced-visualization.html
+  bayesian-ssm-analysis: bayesian-ssm-analysis.html
+  evaluating-circumplex-structure: evaluating-circumplex-structure.html
+  growth-ssm-analysis: growth-ssm-analysis.html
   intermediate-ssm-analysis: intermediate-ssm-analysis.html
   introduction-to-ssm-analysis: introduction-to-ssm-analysis.html
+  sem-based-ssm-analysis: sem-based-ssm-analysis.html
   using-instruments: using-instruments.html
-last_built: 2026-07-04T01:43Z
+last_built: 2026-07-19T17:45Z
 urls:
   reference: http://circumplex.jmgirard.com/reference
   article: http://circumplex.jmgirard.com/articles
