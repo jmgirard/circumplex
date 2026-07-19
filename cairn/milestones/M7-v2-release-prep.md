@@ -53,7 +53,7 @@ complete and validated (D-008).
 
 ## Tasks
 
-- [ ] **T1** — Version bump + NEWS heading + refresh `cran-comments.md`
+- [x] **T1** — Version bump + NEWS heading + refresh `cran-comments.md`
       (groundwork staged 2026-07-08; the accurate summary + urlchecker DOI note
       already written per legacy MILESTONES.md R2).
 - [ ] **T2** — Full `check()` + win-builder / R-devel.
@@ -129,6 +129,7 @@ complete and validated (D-008).
 - 2026-07-18: gated amendment — `Depends on:` gains M38 (guaranteed rim ring for the circumplex canvas), spun out of the PR #62 hotfix. Jeff's plan-gate decision: the rim is visible in every figure the CRAN debut ships, so it goes in the bundle. No release-prep task change.
 
 - 2026-07-18: started (/milestone-implement). Branch `m7-v2-release-prep` cut from master at 3d2d9a76; all 11 dependencies verified done. Status planned→in-progress.
+- 2026-07-18: T1 done. DESCRIPTION 1.3.0.9002→2.0.0; NEWS dev section retitled to 2.0.0 and consolidated from 47 flat bullets into 8 thematic `##` groups (matching the 1.1.0/1.0.0 heading style) per the profile's release-walk slot — Jeff's gate choice "consolidate and group". Fixes to code that never shipped (the rim-ring omission, the trajectory legend key, the non-finite amax/center guard — all against features new in 2.0.0) were folded into their feature descriptions rather than listed as fixes; the two Advanced Visualization vignette bullets (added then rewritten in-cycle) merged into one. `cran-comments.md` refreshed: added the longitudinal and viz families, corrected "four"→five new vignettes, added brms/glmmTMB to the new-Suggests list, added a dependency note for the ggplot2 3.3.0→4.0.0 floor and the ggforce drop, and replaced the stale "one user-visible API tightening" claim with the three actual behavior changes (certification rule, pole labeling, argument validation). `devtools::test()`: 0 failures, 2986 passing, 0 skipped under NOT_CRAN=true; 4 pre-existing warnings in test-ci_accuracy.R (the diagnostic's own cautions, no code touched by T1).
 
 ## Decisions
 
