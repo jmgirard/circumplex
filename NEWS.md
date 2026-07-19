@@ -448,6 +448,14 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   estimable (scales with an inestimable interval are drawn as a point only and
   named).
 
+* The amplitude axis labels are now drawn over a translucent backdrop, so they
+  stay readable where a data layer falls behind them. The amplitude axis is
+  drawn on top of the plotted data, which kept the labels visible but not
+  legible: a label crossing a dark marker, an arrowhead, or a dense scatter had
+  too little contrast against it to read. The backdrop is deliberately
+  translucent rather than opaque, so it restores contrast without hiding the
+  data it covers.
+
 ## Documentation
 
 * New vignette, "Evaluating Circumplex Structure": how to test whether an

@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M39 | Legible radial axis labels over data layers | in-progress | — | normal | milestones/M39-radial-label-legibility.md |
+| M39 | Legible radial axis labels over data layers | review | — | normal | milestones/M39-radial-label-legibility.md |
 | M38 | Guaranteed rim ring for the circumplex canvas | done | — | normal | milestones/archive/M38-rim-ring-guarantee.md |
 | M36 | Visualization polish — certification legend key + non-finite guards | done | — | normal | milestones/archive/M36-viz-polish-legend-guards.md |
 | M37 | On-circle movement paths across occasions | done | M31, M32, M33 | normal | milestones/archive/M37-on-circle-movement-paths.md |

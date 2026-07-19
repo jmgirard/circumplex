@@ -1,6 +1,6 @@
 # M39: Legible radial axis labels over data layers
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
@@ -34,10 +34,13 @@ they stay readable where they fall over dark or dense geom layers.
 - Any change to break generation, the rim ring, or `ssm_r_axis_angle()`'s
   placement rule — M38 and M32 own those and their fences must stay green.
 
-**Merge gate:** M7 is at T4 with a v2.0.0 CRAN submission pending. This
-milestone may be *built* on its branch at any time, but must not merge to
-master until that submission is handed off, so the submitted tarball and
-master do not diverge mid-review. Review confirms before merging.
+**Merge gate (amended 2026-07-19 — the original clause is inverted):** M39's
+change is documented in **v2.0.0's** NEWS at Jeff's gate choice, which claims it
+as part of that release. So M39 must merge **before** `submit_cran()` runs, not
+after, or the submitted tarball would omit the code its own NEWS describes. The
+tarball is not yet submitted and M7 stays `blocked` in the meantime, so there is
+no conflict to resolve — the ordering is simply M39 merges, then M7 unblocks and
+ships. Review confirms M39 is merged ahead of the release handoff.
 
 ## Acceptance criteria
 
@@ -99,7 +102,7 @@ master do not diverge mid-review. Review confirms before merging.
 - [x] **T5** — Re-render `occasions-path`, `occasions-path-wrapper`, and
       `individuals`; inspect each and record the result. Regenerate any canvas
       baselines that legitimately moved, and state which and why.
-- [ ] **T6** — `document()`, `test()`, `check(manual = TRUE)`; NEWS entry;
+- [x] **T6** — `document()`, `test()`, `check(manual = TRUE)`; NEWS entry;
       `_pkgdown.yml` row if anything was exported.
 
 ## Work log
@@ -116,6 +119,10 @@ master do not diverge mid-review. Review confirms before merging.
 
 - 2026-07-19: T4 done. New baseline `amplitude-labels-over-dark-marks` puts heavy dark markers and a large arrowhead exactly where the amplitude labels fall, which no existing canvas baseline did — every one of them draws its labels over empty panel, so none could have seen a contrast defect (the M38 lesson, applied rather than rediscovered). **Teeth proven by mutation, not assumed:** with `label_backdrop()` stubbed to `NULL` the baseline fails; the artifact that mutated run wrote was deleted rather than accepted.
 - 2026-07-19: T5 done. **17 canvas baselines legitimately moved and were accepted; 12 did not, and the split is exactly the canvas/non-canvas boundary** — everything unmoved is a curve plot, a contrast panel plot, a trajectory plot, or the ladder plot, none of which draw a radial axis (verified by reading each test's plotting call, e.g. `single group mean ssm with labels` is `ssm_plot_curve()` and `group-constrast correlation ssm` is `ssm_plot_contrast()`, not circle plots as their names suggest). All three reported vignette figures re-rendered and inspected: `0.6` now reads over the arrowhead in `occasions-path`, `0.50` over the marker in `occasions-path-wrapper` (sampled `srgb(210,210,210)` behind the final glyph — exactly 75% white over the dark arrow, so the plate is compositing as designed), and `0.0`/`0.5` over the scatter in `individuals`. Full `devtools::test()` clean afterwards: 0 failures, the only warnings the 4 pre-existing `test-ci_accuracy.R` Hessian diagnostics. Stray PNGs the render scripts had dropped in the repo root were removed and the scripts repointed at the scratchpad (the M31 `Rplots.pdf` failure class).
+
+- 2026-07-19: T6 done. `devtools::check(manual = TRUE)`: **Status OK, 0 errors / 0 warnings / 0 notes** (5m13s), with both steps this repo has learned to verify by name rather than infer from the summary line confirmed present in the log — `checking PDF version of manual ... OK` (the class win-builder caught in M7, invisible under `--no-manual`) and `checking re-building of vignette outputs ... OK` (38s, exercising the knit that `devtools::test()` never touches). `document()` no diff; `pkgdown::check_pkgdown()` no problems; no `_pkgdown.yml` row needed since nothing new is exported (both new functions are internal). NEWS entry added to the **v2.0.0 Visualization section** at Jeff's gate choice, which carries a consequence recorded rather than absorbed silently: documenting the change in that release means the submitted tarball must contain it, so M39's merge gate is **inverted** — M39 merges before `submit_cran()`, not after. Jeff confirmed the tarball is unsubmitted and M7 stays `blocked` meanwhile, so the sequence is simply M39 merges, then M7 unblocks and ships; the ordering is cross-referenced in M7's work log so a session reading it alone still sees the predecessor.
+
+- 2026-07-19: status in-progress→review (/milestone-implement). All six tasks done; branch is 2 commits over 22 files. `check(manual = TRUE)` 0/0/0 on the tip. Acceptance-criterion boxes deliberately left unticked for `/milestone-review` to tick against fresh evidence (AC fencing). **One thing review should weigh rather than take on trust:** the T2 fence as first written passed an implementation that rendered visibly wrong (plates unrotated, sliding off their labels), so the structural assertions alone were not sufficient evidence — the rotation, per-label anchor, and font-inheritance assertions were added afterwards specifically to close that gap, and the render-and-inspect evidence in T5 is doing real work here, not decorating it.
 
 ## Decisions
 

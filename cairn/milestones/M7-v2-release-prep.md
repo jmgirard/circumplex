@@ -159,6 +159,8 @@ complete and validated (D-008).
 
 - 2026-07-19: status in-progress→**blocked** (/milestone-implement M39, at Jeff's gate choice). Blocker: T4/AC4 is the `submit_cran()` handoff, an action only Jeff can take, so M7 waits on something outside any session. Parking it is a status correction, not a deprioritization — it frees cairn's single `in-progress` slot for M39 and keeps `at most one in-progress` green. **Nothing about the release changed:** T1–T3 stay done, AC4 stays unticked, the milestone stays unarchived, and M7 returns to `in-progress` the moment T4 is picked up. M39 additionally carries a merge gate forbidding it to reach master until this submission is handed off.
 
+- 2026-07-19: **ordering constraint added by M39, no status change — M7 stays `blocked`.** M39 (amplitude-label backdrop) documents its change in *this* release's NEWS at Jeff's gate choice, so the v2.0.0 tarball must contain it: **M39 merges before T4 runs `submit_cran()`**, or the submission would omit code its own NEWS describes. Jeff confirmed the tarball is not yet submitted and that M7 should stay parked meanwhile, so nothing is in conflict — the sequence is M39 merges, then M7 unblocks and ships. Recorded here because a later session reading M7 alone would otherwise not know T4 has a predecessor.
+
 ## Decisions
 
 ## Review
