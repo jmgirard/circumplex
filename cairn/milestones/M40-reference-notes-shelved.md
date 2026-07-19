@@ -33,23 +33,23 @@ slot is not applicable and AC7 fences that claim instead.
 
 ## Acceptance criteria
 
-- [ ] `cairn/references/grassi2010.md` exists, carries every section the
+- [x] `cairn/references/grassi2010.md` exists, carries every section the
       source-note template defines, and every extracted value carries a page
       or table anchor.
-- [ ] `cairn/references/zimmermann2017.md` likewise.
-- [ ] Both Provenance blocks carry an `Extraction:` status on a **single
+- [x] `cairn/references/zimmermann2017.md` likewise.
+- [x] Both Provenance blocks carry an `Extraction:` status on a **single
       physical line** (a wrapped status silently loses its `— observed` stamp
       to the staleness guard), recording verification against the primary
       source and traceable to M7's AC3 attestation.
-- [ ] `cairn/references/INDEX.md` carries exactly one line per committed page
+- [x] `cairn/references/INDEX.md` carries exactly one line per committed page
       and no longer claims references live under `devel/`.
-- [ ] `cairn_validate` reports `references index<->disk` PASS and no
+- [x] `cairn_validate` reports `references index<->disk` PASS and no
       `references staleness` WARN for either page — **and the check is proved
       to have teeth by mutation**: delete one INDEX line, observe FAIL,
       restore, observe PASS.
-- [ ] The three `devel/` transcription files are byte-identical to their
+- [x] The three `devel/` transcription files are byte-identical to their
       pre-milestone state: `git diff --stat devel/` empty.
-- [ ] No file outside `cairn/` is modified, and each written page's tail bytes
+- [x] No file outside `cairn/` is modified, and each written page's tail bytes
       are checked for leaked tool-call scaffolding (`tail -6 f | od -c`, M34).
 
 ## Coverage
@@ -100,3 +100,106 @@ slot is not applicable and AC7 fences that claim instead.
 - **M40-D3 (2026-07-19): the Browne & Cudeck edition mismatch folds into M41's scope, not a candidate row.** `sources/browne1992a.pdf` is the 1992 *Sociological Methods & Research* 21(2), 230–258 article, while `R/ssm_ci_oop.R:415` cites the 1993 Bollen & Long chapter; resolving it edits package code, which M40 excludes. Noted here because Grassi p. 58 cites the **1992** version too, which is evidence toward correcting the shipped citation rather than hunting the chapter.
 
 ## Review
+
+Reviewed 2026-07-19. PR #66. Branch `m40-reference-notes-shelved`, 4 commits,
+diffstat 5 files / +337 −18, all under `cairn/`.
+
+### Acceptance criteria — fresh evidence
+
+- **AC1 (grassi2010.md).** File present; all seven template sections found by
+  grep (heading, Provenance, Citation, Role, Extracted values, Traces to, Open
+  questions); 46 page/table anchor tokens. The [O] diff-bug reviewer
+  independently cross-checked every value against
+  `tests/testthat/helper-cpm-oracles.R` — all seven θ and θ_SE, v and v_SE, z,
+  betas, MCSC, F̂, T/df/p, F₀ and RMSEA with CIs, null χ²/df, TLI/CFI/SRMR, the
+  seven variance ratios, and all seven communality indices and CI pairs
+  re-mapped into Table-1 order — with no disagreement.
+- **AC2 (zimmermann2017.md).** Same seven sections; 48 anchor tokens. Values
+  cross-checked against `devel/m4-zw-transcription.md` by the [O] reviewer with
+  no disagreement, and Eq. A6/A7/Eq. 3 independently recomputed: all eight
+  published constants reproduce; the no-√2 variant misses all three f_a values.
+- **AC3 (Extraction status).** Both statuses are single physical lines — 717
+  and 657 chars, re-measured after the review fixes. Both name a verification
+  and carry `— observed 2026-07-19`; `references staleness` reads them without
+  a WARN.
+- **AC4 (INDEX.md).** Parsed with `cairn_validate`'s own `_INDEX_LINE` regex:
+  entries `['grassi2010.md', 'zimmermann2017.md']` are a bijection with the
+  committed pages on disk. No claim that references live under `devel/`.
+- **AC5 (mutation-proved checks).** Re-run at review, after the fixes: baseline
+  PASS/OK → drop an INDEX entry FAIL → strip a Provenance block FAIL → blank an
+  `Extraction:` status fires the staleness WARN → restored PASS/OK, exit 0. The
+  checks have teeth and the tree restores clean.
+- **AC6 (devel/ untouched).** `git diff origin/master...HEAD -- devel/` empty;
+  `git status --porcelain devel/` clean.
+- **AC7 (scope + tail bytes).** Five changed files, all `cairn/`-prefixed; no
+  leaked tool-call scaffolding in any. Independently reinforced: `R CMD build`
+  produces a 243-entry tarball containing **zero** `cairn/` entries, so the
+  package surface provably cannot see this diff.
+
+### Consistency gate
+
+- `cairn_validate` exit 0, 15/15 PASS. The 47 `work-log format` WARNs are M7's
+  pre-existing hard-wrapped history, unchanged from baseline and unfixable
+  under IP4.
+- `cairn_impact` skipped — `Principles touched: —`, no IP/GP changed.
+- Toolchain half (`r-package` `consistency-gate` slot): **provably vacuous, not
+  assumed.** The diff touches zero files under `R/ src/ man/ NAMESPACE
+  DESCRIPTION data/ data-raw/ tests/ vignettes/ README NEWS.md _pkgdown.yml
+  inst/`, and the built tarball excludes `cairn/` entirely, so
+  `document()`/`check_pkgdown()`/`check()` have nothing to observe.
+
+### Independent review — three lenses + scorer
+
+[O] diff-bug (Opus), [S] blame-history (Sonnet), [S] prior-PR-comments
+(Sonnet), scored by a fresh [S] Sonnet scorer.
+
+- **[S] prior-PR-comments: no findings.** Confirmed clean no-op — every sampled
+  merged PR carries zero review comments; this repo reviews through cairn.
+- **[S] blame-history: no findings.** Independently verified all seven M7
+  findings carry faithfully (A2 block order, A3 page anchor, A4 ρ̂ label, A5
+  ln v_ii symmetry, A6 retraction not reintroduced, the OCPD Prob-not-R²
+  correction, the 75/150 threshold decision), that every `Traces to` line range
+  resolves, that no D-entry is contradicted, and that the old INDEX.md stub
+  lost nothing load-bearing.
+- **[O] diff-bug: 4 findings**, scored 90/88/80/58. Three actioned, one logged
+  below threshold.
+
+**F1 (90) — fixed.** `grassi2010.md` Open questions asserted "Browne (1982) is
+not on the shelf" — false when written: `browne1982_p95a/b.png` and
+`p96a/b.png` landed 16:08:31–16:09:42, and the commit carrying the sentence was
+16:09:40. Rewritten to say the two cited pages are shelved as images, the rest
+of the source is not, and the check is now possible but undone; the correction
+is marked in place. Logged to M41's work log too, since its T5 was scoped
+without knowing the images exist.
+
+**F2 (88) — fixed.** `grassi2010.md`'s status claimed verification "twice and
+independently", but the human channel (M7 AC3) attested the *fixtures*, and
+eight values on the page were never fixtures: a₀ and its SE, the close-fit p,
+NFI, GFI, AGFI, the sample discrepancy, and the 90%-vs-95% CI-level
+distinction. Those rested on the machine channel alone and the page did not say
+so — the exact defect class `zimmermann2017.md` fenced correctly, and a
+violation of M40-D2. Status rewritten to scope the double-verification to
+fixture-shared values; the eight are marked `**[1-channel]**` inline where they
+appear.
+
+**F3 (80) — fixed.** `INDEX.md`'s trailing comment made undated claims about
+the repo's own state while asserting it was "not recording absences". Rewritten:
+the owing-a-page ledger is named as M41's, the list is stamped
+`— observed 2026-07-19` and explicitly labelled a snapshot, and the fact that
+the shelf changed twice mid-milestone (Browne 1982 images, `cudeck1983.pdf`) is
+recorded as the reason not to trust it.
+
+**F4 (58) — below threshold, logged not actioned.** The `grassi2010.md`
+CIRCUM/CircE Open-questions bullet lacks an `— observed` stamp. Real but
+marginal: it is a "discussed elsewhere" pointer, not an availability claim that
+misdirects effort, and the scorer judged it does not carry the staleness risk
+the rule targets.
+
+### Residual concerns carried forward, not blocking
+
+- Eq. A7's √2 radicand and leading ½ still rest on a single human read; the
+  page's Open questions record this and name what would close it.
+- `cudeck1983.pdf` arrived on the shelf unrequested and unassessed — M41 T1
+  decides whether the repo relies on it before it earns a page.
+- The Browne & Cudeck 1992-vs-1993 edition mismatch against
+  `R/ssm_ci_oop.R:415` is M40-D3, folded into M41.

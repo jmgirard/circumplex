@@ -94,6 +94,7 @@ rather than assuming it.
 
 ## Work log
 
+- 2026-07-19: shelf state moved after this file was written, logged here rather than amending plan-owned Scope/Tasks (that is `/milestone-plan`'s to change at T1's re-scope gate). Two arrivals M41's Scope does not know about: **Browne (1982) pp. 95–96 are now on the shelf as four page images** (`browne1982_p95a/b`, `p96a/b.png`) — not the whole source, but exactly the pages T5's communality-CI derivation needs, so T5 may be partly workable already; and **`cudeck1983.pdf`** appeared, unrequested and unassessed — T1 must decide whether the repo relies on it at all before it earns a page. Found at M40's review by the diff-bug lens, which caught M40 asserting Browne 1982 was absent minutes after three of the four images had landed.
 - 2026-07-19: created by /milestone-plan alongside M40, which carries the two sources already on the shelf. Not workable until M40 is done and the seven PDFs are shelved; T1 gates on their actual presence rather than assuming it, and expects to re-scope at its own plan gate once the real citekeys are known.
 
 ## Decisions

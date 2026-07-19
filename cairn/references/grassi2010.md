@@ -4,7 +4,7 @@
 `cairn/references/sources/grassi2010.pdf` (gitignored).
 Pagination: journal pages 55–73; the shelf PDF is 19 pages, so PDF page *n* is
 printed page *n* + 54.
-Extraction: verified 2026-07-19 twice and independently — Jeff's second human re-read against the primary source (M7 AC3 attestation, which confirmed every transcribed value and changed no fixture), and an independent `pdftotext -layout` re-check during M40 that reproduced every value recorded on this page, including the reordered Appendix A communality block and the seventh variance ratio — observed 2026-07-19.
+Extraction: verified 2026-07-19 twice and independently for every value that also appears in the test fixtures — Jeff's second human re-read against the primary source (M7 AC3 attestation, which confirmed every transcribed value and changed no fixture), and an independent `pdftotext -layout` re-check during M40 that reproduced all of them, including the reordered Appendix A communality block and the seventh variance ratio; eight values on this page were never in the fixtures and so rest on the M40 machine channel alone, marked **[1-channel]** where they appear — a₀ and its SE, the close-fit p value, NFI, GFI, AGFI, the sample discrepancy, and the 90%-vs-95% CI-level distinction — observed 2026-07-19.
 
 **Citation.** Grassi, M., Luccio, R., & Di Blas, L. (2010). CircE: An R
 implementation of Browne's circular stochastic process model. *Behavior
@@ -20,7 +20,9 @@ Two confidence levels appear in this source and must not be conflated: the
 **fit-measure** intervals (F₀, RMSEA) are **90%**, printed as
 `Confidence Interval 90 %` in the Appendix A output; the **communality-index**
 intervals are "approximate **95%** one at time confidence intervals" (Appendix
-A header, p. 71).
+A header, p. 71). **[1-channel]** — the fixtures record neither CI level, so
+this distinction was first noted at M40 from the machine channel alone and no
+human read has confirmed it.
 
 ## Extracted values
 
@@ -52,12 +54,13 @@ overlapping subset — F, F₀ and its CI, RMSEA and its CI — but only Appendi
 carries the test statistic, df, p values, null χ², TLI, CFI, and SRMR.
 
 - F̂ = 0.089815 — iteration trace, "final value", p. 70.
-- Sample discrepancy 0.09; F₀ = 0.049, 90% CI (0.005 ; 0.139).
+- Sample discrepancy 0.09 **[1-channel]**; F₀ = 0.049, 90% CI (0.005 ; 0.139).
 - RMSEA = 0.084, 90% CI (0.026 ; 0.141).
 - Test statistic = 15.63; df = 7; p (H₀ perfect fit) = 0.029; p (H₀ close fit,
-  RMSEA = 0.050) = 0.137.
-- Null model χ² = 747.663, df = 21; NFI 0.979; TLI (Tucker–Lewis NNFI) 0.964;
-  CFI 0.988; SRMR 0.04; GFI 0.986; AGFI 0.944.
+  RMSEA = 0.050) = 0.137 **[1-channel]**.
+- Null model χ² = 747.663, df = 21; TLI (Tucker–Lewis NNFI) 0.964; CFI 0.988;
+  SRMR 0.04. Also printed, but fixture-absent: NFI 0.979 **[1-channel]**,
+  GFI 0.986 **[1-channel]**, AGFI 0.944 **[1-channel]**.
 
 ### Full-precision estimates — Appendix A, pp. 71–72
 
@@ -70,7 +73,7 @@ Errors" block:
 - v: 0.15438, 0.51654, 0.03945, 0.63153, 0.54550, 0.13449, 0.44771; SEs
   0.13759, 0.12755, 0.04238, 0.13854, 0.12125, 0.05959, 0.13865.
 - z: 0.91358, 0.81222, 1.00102, 0.79058, 0.79269, 0.92497, 0.84376.
-- a₀ = 1.76119 (SE 0.26287); betas b₀ = 0.6378, b₁ = 0.3622.
+- a₀ = 1.76119 (SE 0.26287) **[1-channel]**; betas b₀ = 0.6378, b₁ = 0.3622.
 - MCSC, correlation at 180 degrees = 0.276.
 - Ratios of reproduced to input variances: 0.963, 1.000, 1.042, 1.020, 0.971,
   0.971, 1.031. These are not 1, which is the CIRCUM/CircE free-scaling
@@ -128,10 +131,14 @@ Used for input-refusal behavior only; no numeric result depends on it.
 
 ## Open questions
 
-- Browne (1982) is not on the shelf, so the communality-CI derivation cited at
-  pp. 95–96 above is recorded here as this paper reports it and is not
-  independently checked against Browne — observed 2026-07-19. M41 T5 carries
-  that source.
+- The communality-CI derivation attributed to Browne (1982, pp. 95–96) is
+  recorded here as *this* paper reports it, and has not been checked against
+  Browne himself. Those two pages are on the shelf as images
+  (`sources/browne1982_p95a.png`, `p95b`, `p96a`, `p96b`), added mid-session
+  on 2026-07-19; the rest of Browne (1982) is not — so the check is now
+  possible but has not been done. M41 T5 carries it — observed 2026-07-19,
+  re-checked at merge (an earlier form of this bullet said the pages were
+  absent, which was already false when written).
 - The CIRCUM/CircE free-scaling model difference (why our F̂ exceeds their
   published 0.089815 at finite N) is analysed in
   `tests/testthat/test-cpm_oracles.R:30-47` and `devel/m4-browne-design.md`

@@ -11,10 +11,16 @@ _One line per committed page: `citekey — title — traces to`._
      ("[grassi2010](grassi2010.md)") is silently not counted as a catalog
      entry and the page reads as unindexed. Caught by mutation at M40 T5.
 
-     Sources the repo relies on that have no page yet are tracked as M41
-     tasks, not recorded here as absences: Browne (1992), Acton & Revelle
-     (2004), Cheung & Rensvold (2002), Browne & Cudeck, Wendt et al. (2019),
-     Hu & Bentler (1999), Browne (1982). The gitignored shelf `sources/` holds
-     the PDFs. `sources/acton2002.pdf` is shelved but owes no page — the repo
-     cites Acton & Revelle (2002) only as other authors' citation of prior
-     work, which the "consulted in passing owes nothing" rule excludes. -->
+     Which sources still owe a page is M41's ledger, not this file's: see
+     cairn/milestones/M41-reference-notes-unshelved.md, whose T1 re-inventories
+     the shelf precisely because it is a live directory. As of the M40 merge
+     the sources owing a page were Browne (1992), Acton & Revelle (2004),
+     Cheung & Rensvold (2002), Browne & Cudeck, Wendt et al. (2019),
+     Hu & Bentler (1999) and Browne (1982) — observed 2026-07-19; the shelf
+     changed twice during M40 alone (the Browne 1982 page images and
+     cudeck1983.pdf both arrived mid-session), so treat any list here as a
+     snapshot and re-inventory rather than trusting it.
+     `sources/acton2002.pdf` is shelved but owes no page — the repo cites
+     Acton & Revelle (2002) only as other authors' citation of prior work,
+     which the "consulted in passing owes nothing" rule excludes — observed
+     2026-07-19. -->
