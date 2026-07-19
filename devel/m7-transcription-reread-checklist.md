@@ -227,10 +227,11 @@ sentences appear in this order.
 > column is one paraphrase away from reading that way — which is why B0
 > exists.
 >
-> Check on the vignette side: the prose at `:184-188` does say "95% percentile
-> bootstrap intervals", but the table header itself reads only
-> `95% CI accurate when…`. Decide whether the header should say **bootstrap
-> CI**, since tables get read without their preamble.
+> **✅ Applied 2026-07-19 (Jeff's decision).** The table header now reads
+> `95% bootstrap CI accurate when…` (`:190`). The prose at `:184-188` already
+> said "95% percentile bootstrap intervals", but tables get read without their
+> preamble, and the whole column is a claim about bootstrap coverage — not
+> about the point estimates and not about CIs in general.
 
 - [ ] Elevation / affiliation / dominance accurate at **n ≥ 50** — end of the elevation paragraph, p. 10
 - [ ] Amplitude accurate at **n ≥ 75** (general factor) and **n ≥ 150** (no general factor) — end of the amplitude paragraph, p. 10
@@ -269,9 +270,10 @@ sentences appear in this order.
 > sentence hedges with "close to or dropped below" (with GF at n = 100 the
 > curve is sitting on the line, not under it).
 >
-> **Recommendation: keep 75/150.** The vignette is reporting the
-> parameter-specific finding the figure supports, and switching to 100/200
-> would import the Discussion's collapse of two parameters into one number.
+> **✅ Decided 2026-07-19 (Jeff): keep 75/150 as-is, no vignette change.** The
+> vignette reports the parameter-specific finding the figure supports;
+> switching to 100/200 would import the Discussion's collapse of two
+> parameters into one number and overstate what amplitude actually requires.
 >
 > ⚠ **Precision caveat.** These are values read off a rendered figure, not
 > published numbers — the per-condition deviances were never published (the

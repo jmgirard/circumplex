@@ -187,7 +187,7 @@ the same interval type `ssm_analyze()` reports — judging an interval
 accurate when its empirical coverage stayed within Bradley's (1978)
 liberal band of 92.5% to 97.5%. Their headline results:
 
-| Parameter | Point estimate | 95% CI accurate when... |
+| Parameter | Point estimate | 95% bootstrap CI accurate when... |
 |---|---|---|
 | Elevation ($e$) | essentially unbiased | $n \ge 50$ |
 | X value / affiliation | essentially unbiased | $n \ge 50$ |
