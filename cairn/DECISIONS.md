@@ -577,3 +577,26 @@ notes the smaller dependency footprint at v2.0.0/M7. `ggplot2 (>= 4.0.0)`
 (D-019) is the only remaining plotting Import. Source: M31 T7; RR08 R-8; Jeff,
 M31 plan gate (Q2 "remove in M31").
 
+### D-021 (2026-07-18): DESCRIPTION declares the true R floor, R (>= 4.1) (M7)
+
+**Context:** `DESCRIPTION` has carried `Depends: R (>= 3.4)` since well before
+the v2.0.0 bundle. Two later facts outran it. (1) D-015 added the precomputed
+brms vignette's committed fixture `vignettes/bayesian_ssm_draws.rds`, a
+version-3 serialized object; `R CMD build` therefore warns that the package
+"now depends on R (>= 3.5.0)" and silently writes that floor into the built
+tarball. (2) D-019 re-pinned `ggplot2 (>= 4.0.0)` and recorded in passing that
+"the effective install floor is already R >= 4.1 (via ggplot2/htmlTable)" --
+verified again at M7 T2: ggplot2 4.0.3 and htmlTable both declare
+`Depends: R (>= 4.1)`. Neither fact was ever written back into `DESCRIPTION`,
+so the declared floor understated the real one by two minor versions.
+**Decision:** Declare `Depends: R (>= 4.1)`.
+**Consequences:** No user who can install circumplex today is excluded -- the
+4.1 floor is already enforced transitively by ggplot2 (>= 4.0.0), so this
+records a constraint rather than adding one. The `R CMD build` serialization
+warning is resolved as a side effect (4.1 > 3.5.0). The repo's declaration now
+matches the analysis D-014 and D-019 already relied on. Shipped in v2.0.0 and
+NEWS-documented alongside the ggplot2 re-pin; `cran-comments.md`'s dependency
+note names it for the CRAN reviewer. Re-pinning an R floor is a dependency
+change under the tracking-rules gate -- **user-approved 2026-07-18** at the M7
+T2 gate. D-014/D-019 reinforced, neither superseded.
+

@@ -84,6 +84,12 @@ coordinate system is a `CoordRadial` subclass and uses parameters introduced in
 ggplot2 4.0.0. `ggforce` is dropped from Imports (the new coordinate system
 subsumes what it was used for), so the Imports count is unchanged.
 
+The declared `Depends: R` moves from `>= 3.4` to `>= 4.1`. This corrects an
+understated declaration rather than adding a restriction: ggplot2 (>= 4.0.0)
+and htmlTable both declare `Depends: R (>= 4.1)`, so 4.1 has been the effective
+install floor since the ggplot2 re-pin. It also subsumes the R (>= 3.5.0)
+requirement that `R CMD build` derives from the serialized vignette fixture.
+
 New Suggests are `lavaan`, `OpenMx`, `psych`, `brms`, and `glmmTMB`. They are
 used in tests, as test oracles, and optionally at runtime by the SEM feature
 family and by two vignettes; the package loads and all other functionality runs
