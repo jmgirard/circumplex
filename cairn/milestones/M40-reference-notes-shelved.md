@@ -1,10 +1,10 @@
 # M40: Source notes for the two shelved primary sources
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m40-reference-notes-shelved`
 
 ## Goal
 
@@ -64,7 +64,7 @@ slot is not applicable and AC7 fences that claim instead.
 
 ## Tasks
 
-- [ ] T1. Author `grassi2010CircE.md`: extract values from the provenance
+- [x] T1. Author `grassi2010.md` (citekey per M40-D1): extract values from the provenance
       headers in `tests/testthat/helper-cpm-oracles.R` and
       `tests/testthat/test-cpm_oracles.R` against the shelf PDF, preserving
       the M7 A3/A4/A5 corrections (unconstrained m = 1 fit measures come from
@@ -88,8 +88,13 @@ slot is not applicable and AC7 fences that claim instead.
 
 ## Work log
 
+- 2026-07-19: T1 done — `cairn/references/grassi2010.md`. The shelf changed mid-session: Jeff added seven PDFs and renamed the two originals to `author+year`, so `browne1992a.pdf` was identified as Browne & Cudeck (1992) SMR 21(2) 230–258 (not a second Browne solo paper) and `acton2002.pdf` as a bonus needing no page — the repo cites Acton & Revelle (2002) only as *others'* citation of prior work, which "consulted in passing owes nothing" excludes. Browne (1982) is still absent. Independent `pdftotext -layout` re-check reproduced EVERY fixture value: all 21 Table 1 correlations + N, the Table 2 model 1a row, the Table 3 fit row, all Appendix A full-precision estimates/SEs/fit measures, all seven communality indices and CIs after re-mapping the reordered block, all seven variance ratios, and the Listing 7 matrix + N. Three records confirmed on the page: A2's reordering note is printed verbatim ("variable names have been reordered to yield increasing polar angles"), A4's column really is ρ̂, and A6's retraction was right — p. 68 prints "Foreign Literature". New fact the fixtures never recorded: Appendix A's fit CIs are **90%** while its communality CIs are **95%**.
 - 2026-07-19: created by /milestone-plan. Scope split at the plan gate — the nine owed source notes are three different jobs (shelved+verified / transcribed-but-unshelved / cold reads), and only this group is workable today; M41 carries the other seven. Jeff's plan-gate decisions: leave the `devel/` transcriptions byte-untouched while M7's open work log cites them, and give Browne 1992 a full model specification in M41 rather than a reliance-scoped extract.
 
 ## Decisions
+
+- **M40-D1 (2026-07-19): citekeys follow the shelf's `author+year` filenames.** The pages are `grassi2010.md` and `zimmermann2017.md`, superseding the plan's `grassi2010CircE`/`zimmermann2017Description` — Jeff replaced the shelf mid-session with a consistently named nine-file set, and a citekey that disagrees with the file it points at is a permanent trap. Binds M41's seven pages too.
+- **M40-D2 (2026-07-19): an `Extraction:` status claims only what actually ran.** These two pages record verification because *both* channels exist — Jeff's M7 AC3 human re-read against the primary source, and an independent M40 `pdftotext -layout` re-check of every recorded value. A page with only one channel says so; a page with neither is `unverified`. Authoring a source note is itself a fresh transcription step, so inheriting an attestation of the *old* record without re-checking would have overclaimed.
+- **M40-D3 (2026-07-19): the Browne & Cudeck edition mismatch folds into M41's scope, not a candidate row.** `sources/browne1992a.pdf` is the 1992 *Sociological Methods & Research* 21(2), 230–258 article, while `R/ssm_ci_oop.R:415` cites the 1993 Bollen & Long chapter; resolving it edits package code, which M40 excludes. Noted here because Grassi p. 58 cites the **1992** version too, which is evidence toward correcting the shipped citation rather than hunting the chapter.
 
 ## Review

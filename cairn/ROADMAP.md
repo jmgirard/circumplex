@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M40 | Source notes for the two shelved primary sources | planned | — | normal | milestones/M40-reference-notes-shelved.md |
+| M40 | Source notes for the two shelved primary sources | in-progress | — | normal | milestones/M40-reference-notes-shelved.md |
 | M41 | Source notes for the seven unshelved relied-on sources | planned | M40 | normal | milestones/M41-reference-notes-unshelved.md |
 | M39 | Legible radial axis labels over data layers | done | — | normal | milestones/archive/M39-radial-label-legibility.md |
 | M38 | Guaranteed rim ring for the circumplex canvas | done | — | normal | milestones/archive/M38-rim-ring-guarantee.md |
