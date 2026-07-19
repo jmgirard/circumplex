@@ -245,13 +245,40 @@ sentences appear in this order.
 > summarizes amplitude *and* displacement together as 100/200 — a rounder,
 > more conservative claim that does not reproduce the 75/150 figures.
 >
-> The vignette follows the **Results**. That is the more precise source and is
-> defensible, but it is a choice, not a transcription, and it means our
-> amplitude row (75/150) is looser than the authors' own summary sentence
-> (100/200). Decide deliberately whether to keep it, and if so whether the
-> vignette should note that the authors' discussion states a stricter figure.
-> This is the section-A error class — a value taken from the right paper but
-> the wrong section — caught live rather than after the fact.
+> The vignette follows the **Results**.
+>
+> **✅ Figure 5 resolves this in the Results' favour (checked 2026-07-19).**
+> Read each panel as "the smallest n at which *every* amplitude curve,
+> including the worst case A = .10, sits below the 2.5% dotted line" — the
+> operative reading, and the one that matches the A ≥ .10 precondition:
+>
+> | Panel | without GF | with GF |
+> |---|---|---|
+> | **B — amplitude** | A = .10 curve ≈ 4.2% at n = 100, ≈ 2.45% at n = 150 → first below the line at **150** | ≈ 3.5% at n = 50, ≈ 2.1% at n = 75 → first below at **75** |
+> | **C — displacement** | ≈ 4.1% at n = 150 and **still ≈ 2.65% at n = 200** → needs **more than 200** | ≈ 4.0% at n = 75, ≈ 2.55% at n = 100 — essentially *on* the line |
+>
+> Two things follow. **(1) The 75/150 amplitude thresholds are what the figure
+> shows**; they are not a loose reading of the Results. **(2) The Discussion's
+> 100/200 is Panel C's displacement thresholds applied to both parameters** —
+> a conservative simplification that takes the worse of the two, not an
+> independent measurement that contradicts Panel B.
+>
+> The figure also explains two bits of the authors' careful wording: why
+> displacement without GF is "greater than 200" rather than "at least 200"
+> (at n = 200 the A = .10 curve has not yet crossed), and why the displacement
+> sentence hedges with "close to or dropped below" (with GF at n = 100 the
+> curve is sitting on the line, not under it).
+>
+> **Recommendation: keep 75/150.** The vignette is reporting the
+> parameter-specific finding the figure supports, and switching to 100/200
+> would import the Discussion's collapse of two parameters into one number.
+>
+> ⚠ **Precision caveat.** These are values read off a rendered figure, not
+> published numbers — the per-condition deviances were never published (the
+> record's no-supplement finding), so Figure 5 is the finest evidence that
+> exists. The clear calls (amplitude 150 without GF, 75 with GF; displacement
+> still above at 200) are well clear of eyeball error; the with-GF displacement
+> point at n = 100 is genuinely on the line and should not be read as precise.
 
 ### B1a. [VALUE] The three "implications" bullets the vignette prints (`:203-222`)
 

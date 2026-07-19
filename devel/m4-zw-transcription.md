@@ -26,12 +26,22 @@ lookup), the Study 2 threshold-source question below, and the remaining
 Eq. A6 / Eq. 3 / p. 9 / p. 14 value rows. Worksheet:
 `devel/m7-transcription-reread-checklist.md` section B.
 
-**⚠ Open question raised by the re-read (not a transcription error).** The
-paper states the amplitude and displacement thresholds twice with different
-numbers: Study 2 *Results* (p. 10) gives amplitude n ≥ 75 / n ≥ 150 and
-displacement n ≥ 100 / n > 200, while the Study 2 *Discussion* on the same
-page summarizes both together as 100/200. This record and the vignette follow
-the Results. Pending Jeff's decision on what the vignette should tell users.
+**Threshold double-statement, resolved by Figure 5 (2026-07-19).** The paper
+states the amplitude and displacement thresholds twice with different numbers:
+Study 2 *Results* (p. 10) gives amplitude n ≥ 75 / n ≥ 150 and displacement
+n ≥ 100 / n > 200, while the Study 2 *Discussion* on the same page summarizes
+both together as 100/200. **Figure 5 (p. 12) supports the Results.** Reading
+each panel for the smallest n at which the worst-case A = .10 curve falls
+below the 2.5% band: Panel B (amplitude) crosses at 150 without GF and 75 with
+GF; Panel C (displacement) is still above the line at n = 200 without GF, and
+sits on it at n = 100 with GF. So the Discussion's 100/200 is **Panel C's
+displacement thresholds applied to both parameters** — a conservative
+simplification, not a competing measurement. The figure also accounts for the
+authors' "greater than 200" and their "close to or dropped below" hedge.
+This record and the vignette follow the Results; keeping that is the
+recommendation. Values read off the rendered figure, not published (no
+per-condition deviances exist — see the no-supplement finding below), so the
+near-threshold with-GF displacement point at n = 100 is not precise.
 
 **Internal cross-validation (transcription self-checks, all reproduced):**
 
