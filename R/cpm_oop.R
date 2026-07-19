@@ -273,7 +273,8 @@ summary.circumplex_cpm <- function(object, digits = 3, ...) {
 #'
 #' Draw the estimated item configuration of a [cpm_fit()] object on the circular
 #' canvas from [ggcircumplex()]. Each scale is placed at its *estimated* angle
-#' (`θ`), at a radius given by its communality (`ζ²`, the share of
+#' (\eqn{\theta}{theta}), at a radius given by its communality
+#' (\eqn{\zeta^2}{zeta^2}, the share of
 #' its variance explained by the common circumplex factors), so items that the
 #' model explains well sit near the outer ring and items it explains poorly sit
 #' near the centre. The canvas spokes mark the *theoretical* angles supplied to

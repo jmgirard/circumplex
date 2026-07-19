@@ -14,9 +14,35 @@ against channel 1 on every load-bearing numeral (same date). One
 discrepancy found and resolved: the text layer renders Eq. A7's radicand as
 `2(ρ1−ρ3)+(1−ρ4)` where the page image shows `√2(ρ1−ρ3)+(1−ρ4)`; the √2
 form is confirmed correct because only it reproduces all five published
-scaling factors (see cross-validation below). **Second independent human
-re-read: pending (Jeff)** — same status convention as the B6
-Grassi-et-al. transcription.
+scaling factors (see cross-validation below). **That resolution is no longer
+inferential — Jeff confirmed Eq. A7 on the page 2026-07-19, both the √2
+radicand and the leading ½** (the ½ had never been checked by any pass).
+
+**Second independent human re-read: COMPLETE (Jeff), 2026-07-19.** Every
+value in this record was checked against the primary source, and **none was
+found wrong.** Also confirmed: Eq. A7 including its leading ½ (above), and
+the vignette's characterizations of Studies 1–2 as faithful rather than
+overclaiming. Two things changed as a result, neither a transcribed value:
+the Study 2 threshold-source question below was resolved from Figure 5, and
+the vignette's accuracy-table header was rescoped to say *bootstrap* CI.
+Worksheet: `devel/m7-transcription-reread-checklist.md` section B.
+
+**Threshold double-statement, resolved by Figure 5 (2026-07-19).** The paper
+states the amplitude and displacement thresholds twice with different numbers:
+Study 2 *Results* (p. 10) gives amplitude n ≥ 75 / n ≥ 150 and displacement
+n ≥ 100 / n > 200, while the Study 2 *Discussion* on the same page summarizes
+both together as 100/200. **Figure 5 (p. 12) supports the Results.** Reading
+each panel for the smallest n at which the worst-case A = .10 curve falls
+below the 2.5% band: Panel B (amplitude) crosses at 150 without GF and 75 with
+GF; Panel C (displacement) is still above the line at n = 200 without GF, and
+sits on it at n = 100 with GF. So the Discussion's 100/200 is **Panel C's
+displacement thresholds applied to both parameters** — a conservative
+simplification, not a competing measurement. The figure also accounts for the
+authors' "greater than 200" and their "close to or dropped below" hedge.
+This record and the vignette follow the Results; keeping that is the
+recommendation. Values read off the rendered figure, not published (no
+per-condition deviances exist — see the no-supplement finding below), so the
+near-threshold with-GF displacement point at n = 100 is not precise.
 
 **Internal cross-validation (transcription self-checks, all reproduced):**
 
@@ -125,7 +151,14 @@ statistics with 95% CIs for PD scales at N = 1,166 —
   δ = 128.9° [116.7°, 141.6°], R² = .802, Prob = 1;
 - Obsessive–compulsive: e = .228 [.193, .261], aff = .011 [−.021, .041],
   dom = −.005 [−.038, .032], a = .012, δ = 337.4°, R² = .117, Prob = .130
-  (no CI brackets printed for its a and δ in the table).
+  (no CI brackets printed for its a and δ in the table — **confirmed
+  2026-07-19 to be a deliberate omission by the authors, not a transcription
+  gap**: the trigger is its low **Prob = .130**, not its low R². Table 4's own
+  note defines Prob as "probability of accurate confidence intervals for
+  amplitude and angular displacement" — precisely the two parameters whose
+  CIs are withheld — and the authors' own rule is not to interpret a/δ CIs
+  when the probability estimate is < .50 (pp. 12–13, 16). R² = .117 is a
+  separate quantity and does not govern which intervals are printed).
 *Cross-check:* `ssm_analyze(jz2017, PANO(), measures = c("PARPD","OCPD"))`
 on the bundled data (the same sample) reproduces every point estimate of
 both rows to the table's printed rounding (e/x/y/a/δ/R²; verified
@@ -204,6 +237,21 @@ in `devel/m4-zw-bridge.R` (seeded, committed with results).
   text-layer artifact resolved by cross-validation (Eq. A7 √2). F8 grid
   characterization confirmed. No-supplement finding recorded; O5 bridge
   re-scoped per the F7 mechanism. Jeff's independent re-read pending.
+- 2026-07-19 — Correction to the entry below, same day: the OCPD a/δ CI
+  omission is triggered by its low **Prob (.130)**, **not** by its low R²
+  (.117), which that entry wrongly gave. Table 4's note defines Prob as the
+  probability of accurate CIs for amplitude and angular displacement — the
+  two parameters actually withheld — and the authors' < .50 rule (pp. 12–13,
+  16) is what applies. Corrected in the Table 4 block above.
+- 2026-07-19 — Second independent human re-read begun (Jeff, M7 T3).
+  Eq. A7 confirmed on the page including its leading ½, closing the one
+  channel discrepancy that had been settled by reasoning; Note 3 matrices,
+  Table 4 rows, and Figure 1A angles confirmed; OCPD's absent a/δ CIs
+  confirmed as the authors' deliberate omission (R² = .117), a reason this
+  record did not previously carry. The twice-occurring 15.5% re-confirmed on
+  its two pages (6 and 13). New open question logged in Protocol above: the
+  Study 2 Results and Discussion state the amplitude/displacement thresholds
+  with different numbers. Re-read not yet complete.
 - 2026-07-07 — Review fix (W1 /code-review): Table 4 PARPD/OCPD rows added
   with provenance (the vignette cites OCPD's a = .012, which was previously
   not traceable to this record) plus the jz2017 reproduction cross-check;
