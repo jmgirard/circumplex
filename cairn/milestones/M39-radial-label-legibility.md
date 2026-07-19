@@ -4,7 +4,7 @@
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** `m39-radial-label-legibility` / —
+- **Branch/PR:** `m39-radial-label-legibility` / [PR #65](https://github.com/jmgirard/circumplex/pull/65)
 
 ## Goal
 
@@ -44,28 +44,28 @@ ships. Review confirms M39 is merged ahead of the release handoff.
 
 ## Acceptance criteria
 
-- [ ] The radial axis tick labels render with a backdrop grob behind them,
+- [x] The radial axis tick labels render with a backdrop grob behind them,
       asserted structurally (the property — that a backdrop is emitted, one per
       labelled break, positioned with the labels), not by eyeballing a render.
       M32 established that label overlap itself cannot be fenced at grob level
       because the label grobs are nested unnamed gTrees; fence what is
       constructible instead.
-- [ ] A new vdiffr baseline covers a radial label falling over a dark mark —
+- [x] A new vdiffr baseline covers a radial label falling over a dark mark —
       a case the existing 14 canvas baselines do not contain. Verified to have
       teeth: it must differ from what the pre-change code renders.
-- [ ] Existing radial-axis fences still pass unchanged:
+- [x] Existing radial-axis fences still pass unchanged:
       `test-coord_circumplex.R`'s `ssm_r_axis_angle()` unit tests and the two
       `r_axis_inside` placement tests (`:218-253`), and the
       `test-ggproto-classes.R:53` field-copy fence.
-- [ ] The three reported figures re-rendered and read legibly; any baseline
+- [x] The three reported figures re-rendered and read legibly; any baseline
       that moved is accounted for as intended (M38: a clean vdiffr run is
       evidence only after checking the baselines exercise the changed path).
-- [ ] `devtools::document()` no diff; `devtools::test()` clean;
+- [x] `devtools::document()` no diff; `devtools::test()` clean;
       `devtools::check(manual = TRUE)` 0 errors / 0 warnings / 0 notes, with
       `checking PDF version of manual ... OK` and
       `checking re-building of vignette outputs ... OK` confirmed present in
       the log by name (M7: never read `Status: OK` as coverage).
-- [ ] `NEWS.md` carries a user-visible entry; if anything new is exported, a
+- [x] `NEWS.md` carries a user-visible entry; if anything new is exported, a
       `_pkgdown.yml` row in the same commit.
 
 ## Coverage
@@ -152,4 +152,45 @@ does not fire. Appearance is white at 75% alpha with 1pt padding — legible
 without erasing the data beneath. Jeff approved mechanism, API shape, and
 appearance at the T3 gate.
 
+- 2026-07-19: review — four findings from three lenses, all scored >= 80, all fixed on the branch and re-verified fresh (not by trusting the reviewers' own reproductions). **F1** (grid without a D-entry): D-022 written. **F2** (spoke labels plated when they read like amplitudes): plating now requires the grob be inside the guide's own `axis` gtable AND match the labels — reproduction went 2 backdrop groups -> 1. **F3** (plotmath sized to deparsed source): measured with `grobWidth`/`grobHeight` on the label grob — plotmath widths now glyph-scale (7.57/18.53/9.07/6.36/5.88pt vs the scorer's 54.5pt-for-7.1pt), byte-identical for plain labels so all 17 baselines still match. **F4** (fence missed plate extent/offset, caught only by skip_on_ci vdiffr): three structural regression tests added — fixed-size plate now fails 15, dropped re-centring fails 10, previously zero each. Post-fix: full `devtools::test()` clean (0 failures, 4 pre-existing Hessian warnings), `document()` no diff, `check(manual = TRUE)` 0/0/0 with both named steps present, `cairn_validate` 15/15, PR #65 CI 9/9 green. AC1-AC6 boxes ticked against this evidence.
+
 ## Review
+
+Reviewed 2026-07-19. PR [#65](https://github.com/jmgirard/circumplex/pull/65).
+
+### Acceptance-criterion evidence
+
+- **AC1 — backdrop rendered, asserted structurally.** `test-coord_circumplex.R`'s four M39 T2 tests pass with 51 assertions: a backdrop gTree exists carrying one `rect` per non-blank label, each plate rotated to the label's own `rot`, anchored at its own label rather than all at one point, inheriting the label font, and filled `#FFFFFF` at less than full opacity with `col = NA`. Fenced by mutation rather than inspection — suppressing the backdrop fails 6, dropping the rotation fails 10.
+- **AC2 — collision baseline with teeth.** New vdiffr baseline `amplitude-labels-over-dark-marks` puts heavy dark markers and an arrowhead where the labels fall; no pre-existing canvas baseline drew labels over anything. Teeth re-proven **fresh at review**, not inherited: stubbing `label_backdrop()` to `NULL` fails it, and dropping the plate rotation fails it.
+- **AC3 — pre-existing fences unchanged.** All fences the criterion names by path pass untouched: `ssm_r_axis_angle()` unit tests (9 assertions), both `r_axis_inside` placement tests (2 and 4), and `test-ggproto-classes.R`'s field-copy fence (7). Whole file: 0 failed, 0 error.
+- **AC4 — figures legible, baselines accounted for.** All three reported figures re-rendered and read: `0.6` over the arrowhead, `0.50` over the marker (pixel behind the final glyph sampled `srgb(210,210,210)` — exactly 75% white over the dark arrow, so the plate composites as designed), `0.0`/`0.5` over the scatter. 17 canvas baselines moved, 12 did not, and the split is exactly the canvas/non-canvas boundary — every unmoved one is a curve, contrast-panel, trajectory, or ladder plot with no radial axis, verified by reading each test's plotting call rather than inferring from its name. The history lens independently diffed all 17 line-by-line: **pure additions of `<rect>` elements, zero removed lines**, nothing else moved.
+- **AC5 — checks clean.** `devtools::check(manual = TRUE)`: **Status OK, 0/0/0** (5m30s), with `checking PDF version of manual ... OK` and `checking re-building of vignette outputs ... OK` confirmed present by name, never inferred from the summary line (M7's lesson). `document()` no diff. Full suite clean.
+- **AC6 — NEWS + pkgdown.** NEWS entry present in the v2.0.0 Visualization section; `check_pkgdown()` no problems; no `_pkgdown.yml` row needed since nothing is exported. No milestone numbers leak into user-facing text (grep over NEWS, README, cran-comments).
+
+### Consistency gate
+
+`cairn_validate` exit 0, all 15 checks PASS. 47 advisory `work-log format` warnings, every one on a hard-wrapped pre-M39 entry in M7's log — history, advisory by design, untouched. No principle changed (`Principles touched: —`), so the impact report is a clean skip. Toolchain slot: `document()` no diff; `NAMESPACE`/`man/` clean; `check_pkgdown()` passes; one added file, a snapshot under `tests/`, needing no `.Rbuildignore` entry; full check clean. PR #65 CI: **9/9 green** across macOS/Windows/Ubuntu (release, devel, oldrel-1), pkgdown, and both codecov gates.
+
+### Independent review — three lenses
+
+- **[O] diff-bug (Opus):** 3 findings plus one unnumbered note. Verified the shift formula, traversal safety, and matching robustness empirically (32 `center`x`amax` combinations; zero label ink off-plate across nine `r_axis_angle` values) before reporting.
+- **[S] blame-history (Sonnet):** 1 finding. No silent undoing: `render_fg` is purely additive (zero `-` lines in `R/coord_circumplex.R`), M38-D1's blank rim label is respected and fenced, and M32's "match by content, not index" lesson is honoured.
+- **[S] prior-PR-comments (Sonnet):** no prior-PR evidence — all merged PRs touching these files carry zero inline review comments. Clean no-op, zero findings, as LESSONS records is permanent for this repo.
+
+### Findings actioned (all four scored >= 80)
+
+**F1 (90) — `grid` added to Imports with no D-entry.** `DESCRIPTION` gained `grid`, but `cairn/DECISIONS.md` was untouched by the branch and its only `grid` string is inside the word "r-gridlines". The tracking rules require dependency changes to take a question gate **and** a D-entry; the gate was held at T3 but the entry was never written, and a work-log narration is not the required artifact. Every prior dependency change has one, including D-021, which was argued into an entry despite the constraint already being transitively true.
+**Fixed:** D-022 written, recording `grid` as base R, already transitively loaded via ggplot2, adding no install burden and unable to raise the R floor — and noting that `grDevices` was deliberately NOT taken for a colour constant.
+
+**F2 (85) — spoke labels could be plated, which Scope puts explicitly Out.** `add_label_backdrop()` matched on label-vector equality alone and did not stop at the first hit, so any foreground text grob whose labels equalled the radial labels got plates. Reproduced by both the reviewer and the scorer: `scale_x_continuous(labels = c("0.0", ..., "0.8"))` produced **two** backdrop groups, one behind the spoke labels. The code comment claimed the design fails visibly "rather than silently styling the wrong text" — here it silently styled the wrong text.
+**Fixed:** plating now requires **both** that the grob sits inside the guide's own `axis` gtable **and** that its labels match. Short-circuiting on first match would have been wrong — the theta guide is traversed first, so it would have selected the wrong grob. **Verified against the reproduction: 2 backdrop groups -> 1.**
+
+**F3 (88) — plotmath labels got plates sized to deparsed source text.** `as.character(txt$label)` deparses an expression, so `stringWidth()` measured the string `"gamma^2"` rather than the single rendered glyph. Reviewer measured ~4x oversize; the scorer independently measured **54.5pt of plate for a 7.1pt glyph**, and the base glyph of `gamma^2` fell outside its own plate vertically. Introduced by this diff — before it there was no plate.
+**Fixed:** the label is kept in its original form and measured with `grobWidth()`/`grobHeight()` on a text grob built from the label itself, which measures what the device draws for plain strings and expressions alike. **Verified: plate widths for the plotmath reproduction are now 7.57 / 18.53 / 9.07 / 6.36 / 5.88 pt** — glyph-scale, with the subscript and superscript cases correctly wider. Byte-identical for plain labels (all 17 baselines still match).
+
+**F4 (88) — the fence constrained rotation and anchor but not plate extent or padding offset.** Review mutation-verified that a plate hardcoded to 30x30pt, and one with the `pad * (2 * just - 1)` re-centring dropped, both **passed every structural test** and failed only the two vdiffr baselines — which both carry `skip_on_ci()`, so on CI those regressions went green. The same gap as the milestone's own headline lesson, one level down.
+**Fixed:** three regression tests added asserting the size units derive from a grob measurement (a constant-size plate cannot satisfy them) and that the anchors carry the padding term. **Mutation-verified: fixed-size plate now fails 15 structural assertions, dropped re-centring fails 10** — previously zero each.
+
+### Findings logged, not actioned
+
+- **Unnumbered minor (diff lens, below the bar and not scored) — helper inconsistency.** `label_backdrop()` recycles `x`/`y` with a hand-rolled `recycle()` handling only length-1 and length-n, while `hjust`/`vjust`/`rot` use `rep_len()`. A text grob with, say, 3 x-values for 6 labels is legal under grid recycling and would be subset by a length-6 logical. The reviewer could construct no path reaching it and flagged it only because two helpers in one function disagree. Left as-is: no reachable defect, and the ggplot2 axis guide always emits either a scalar or a full-length vector.

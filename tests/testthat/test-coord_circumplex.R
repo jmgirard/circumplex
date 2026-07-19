@@ -396,3 +396,84 @@ test_that("an amplitude label over a dark mark stays legible (M39 T4)", {
       )
   )
 })
+
+test_that("plate extent and padding offset are fenced structurally (M39 F4)", {
+  # Review found the structural fence covered rotation and anchor but NOT size
+  # or offset: a plate hardcoded to 30x30pt, or one with the padding re-centring
+  # dropped, passed everything here and failed only the two vdiffr baselines --
+  # both `skip_on_ci()`, so on CI those regressions went green. Fence the extent
+  # and the offset directly so the guard does not depend on a skipped snapshot.
+  parts <- axis_label_parts(ggcircumplex(octants(), amax = 0.8))
+  for (plate in parts$backdrop$children) {
+    # Size derives from the measured label, not a constant: the unit is a sum
+    # carrying a grob-measurement term, so a fixed-size plate cannot satisfy it.
+    for (dim in list(plate$width, plate$height)) {
+      expect_true(inherits(dim, "unit"))
+      expect_match(
+        paste(as.character(dim), collapse = " "), "grobwidth|grobheight",
+        ignore.case = TRUE
+      )
+    }
+    # The anchor carries the padding correction that re-centres the wider plate
+    # on its label. hjust/vjust are 0/1 here, so the offsets are -1pt and +1pt;
+    # dropping the correction leaves a bare 0.5npc with no "pt" term.
+    expect_match(paste(as.character(plate$x), collapse = " "), "pt|points")
+    expect_match(paste(as.character(plate$y), collapse = " "), "pt|points")
+  }
+})
+
+test_that("spoke labels are never plated, even when they read like amplitudes (M39 F2)", {
+  # Review reproduction: the walk matched on label text alone, so a caller whose
+  # THETA labels happen to equal the amplitude labels got plates behind both --
+  # and the theta guide is traversed first. The spoke labels are explicitly Out
+  # of this milestone's scope, so this must plate the amplitude axis only.
+  p <- ggplot2::ggplot() +
+    coord_circumplex(amax = 0.8) +
+    ggplot2::geom_blank(
+      data = data.frame(.x = c(0, 360), .y = c(0, 0.8)),
+      mapping = ggplot2::aes(x = .data$.x, y = .data$.y), inherit.aes = FALSE
+    ) +
+    ggplot2::scale_x_continuous(
+      breaks = c(72, 144, 216, 288, 360),
+      labels = c("0.0", "0.2", "0.4", "0.6", "0.8")
+    )
+  panel <- ggplot2::ggplotGrob(p)
+  panel <- panel$grobs[[which(panel$layout$name == "panel")]]
+  n <- 0L
+  walk <- function(g) {
+    if (identical(g$name, "circumplex-label-backdrop")) n <<- n + 1L
+    kids <- if (inherits(g, "gtable")) g$grobs else g$children
+    for (k in kids) walk(k)
+  }
+  walk(panel)
+  # Exactly one backdrop group: the amplitude axis. Two would mean the spoke
+  # labels were plated too.
+  expect_equal(n, 1L)
+})
+
+test_that("a plotmath label is measured as drawn, not as its source text (M39 F3)", {
+  # Review found `as.character()` deparsed an expression, so the plate was sized
+  # to the string "gamma^2" rather than to the single rendered glyph -- several
+  # times too wide, and vertically offset by the superscript. The plate must be
+  # measured from the label itself.
+  p <- ggplot2::ggplot() +
+    coord_circumplex(amax = 0.8) +
+    ggplot2::geom_blank(
+      data = data.frame(.x = c(0, 360), .y = c(0, 0.8)),
+      mapping = ggplot2::aes(x = .data$.x, y = .data$.y), inherit.aes = FALSE
+    ) +
+    ggplot2::scale_x_continuous(breaks = octants()) +
+    ggplot2::scale_y_continuous(
+      breaks = c(0, 0.2, 0.4, 0.6, 0.8),
+      labels = parse(text = c("alpha", "beta[max]", "gamma^2", "delta", "epsilon"))
+    )
+  parts <- axis_label_parts(p)
+  expect_false(is.null(parts$backdrop))
+  # Measurement is grob-based, so plotmath is measured rendered rather than
+  # deparsed; a stringWidth() implementation would carry "strwidth" instead.
+  for (plate in parts$backdrop$children) {
+    w <- paste(as.character(plate$width), collapse = " ")
+    expect_match(w, "grobwidth", ignore.case = TRUE)
+    expect_false(grepl("strwidth", w, ignore.case = TRUE))
+  }
+})

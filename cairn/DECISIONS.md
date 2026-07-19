@@ -600,3 +600,27 @@ note names it for the CRAN reviewer. Re-pinning an R floor is a dependency
 change under the tracking-rules gate -- **user-approved 2026-07-18** at the M7
 T2 gate. D-014/D-019 reinforced, neither superseded.
 
+
+### D-022 (2026-07-19): `grid` joins Imports for grob-level label backdrops (M39)
+
+**Context:** M39 draws a translucent plate behind each amplitude axis label so
+the label stays readable where a data layer falls behind it. There is no theme
+route to this: `element_text()` in ggplot2 4.0.3 has no `fill`, and ggplot2
+ships no text-with-background element (checked at the M39 T1 gate). The plate
+must therefore be a grob, which needs `unit()`, `gpar()`, `rectGrob()`,
+`textGrob()`, `grobWidth()`/`grobHeight()`, `viewport()`, and `grobTree()` --
+all in `grid`, which the package used nowhere before.
+**Decision:** declare `grid` in `Imports` and call it as `grid::`.
+**Consequences:** no user is affected and no install burden is added. `grid` is
+a base R package shipping with every R installation, it cannot raise the R
+floor, and ggplot2 -- already an Import -- depends on it, so it was loaded in
+every session that used this package's plotting layer already. This records an
+existing reality rather than adding a constraint, exactly as D-021 did for the
+R floor. **No second dependency was taken for convenience:** the plate's fill is
+written as the literal `#FFFFFFBF` rather than built with
+`grDevices::adjustcolor()`, keeping `grDevices` out of `Imports` for what is
+only a constant (D-006/D-014 minimal deps reinforced, neither superseded).
+Adding a dependency is a question-gate item under the tracking rules --
+**user-approved 2026-07-19** at the M39 T3 gate. This entry was written at
+review: the gate was held but the D-entry was missed at the time, and review's
+history lens caught the omission (M39 finding F1).
