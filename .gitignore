@@ -37,7 +37,7 @@ devel/m4-coverage-oracle-smoke-ana.rds
 devel/m4-coverage-oracle-partial.rds
 
 # cairn tracking
-cairn/references/pdf/
+cairn/references/sources/
 cairn/.merge-approved
 cairn/.merge-approved.pending
 Rplots.pdf
