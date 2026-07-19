@@ -9,10 +9,10 @@
 # extraction channels were diffed (rendered-page visual read and the PDF text
 # layer via pdftotext); the second fully independent human re-read per the
 # sec. 6.1 protocol was completed 2026-07-19 (Jeff), against the primary
-# source. It confirmed the transcribed values and corrected three records
-# ABOUT them -- the m = 1 fit-measure page anchor, the Table 2/3 column
-# label (p-hat, not zeta), and the sixth verbal-ability scale name
-# (ForeignLanguage, not ForeignLiterature). Sources by fixture:
+# source. It confirmed every transcribed value -- no fixture changed -- and
+# corrected three records ABOUT them: the m = 1 fit-measure page anchor, the
+# Table 2/3 column label (rho-hat, not zeta), and the communality-CI
+# comment. Sources by fixture:
 #   * correlation matrix, N:  Table 1 (p. 58), cross-checked against Listing 1
 #   * model estimates:        Table 2 (p. 60)
 #   * constrained-model F:    Table 3 (p. 60)

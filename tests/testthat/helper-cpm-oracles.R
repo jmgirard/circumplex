@@ -65,7 +65,7 @@ cpm_oracle_voc_appendix <- function() {
 # 1992, p. 470), N = 1046 (Listing 8). Used for input-refusal behavior only.
 cpm_oracle_verbal <- function() {
   nm <- c("Spelling", "Punctuation", "Grammar", "Vocabulary", "Literature",
-          "ForeignLanguage")
+          "ForeignLiterature")
   R <- matrix(0, 6, 6, dimnames = list(nm, nm))
   R[lower.tri(R)] <- c(
     .621, .564, .476, .394, .389,

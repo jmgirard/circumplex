@@ -18,10 +18,12 @@ already has. It tells you **where to look**, never what you should find.
 
 ---
 
-> **Section A completed 2026-07-19 by Jeff**, against the primary source. All
-> transcribed *values* confirmed. Four corrections, all to records *about* the
-> values, applied to the repo the same day (A2–A6 notes below). Section B
-> (Zimmermann & Wright) is still outstanding — AC3 is not met until it is done.
+> **Section A completed 2026-07-19 by Jeff**, against the primary source.
+> **Every transcribed value confirmed — no fixture changed.** Three
+> corrections, all to records *about* the values (a page anchor, a column
+> label, a comment's wording), applied the same day; see the A2–A6 notes.
+> Section B (Zimmermann & Wright) is still outstanding — AC3 is not met
+> until it is done.
 
 ## A. Grassi, Luccio & Di Blas (2010)
 
@@ -121,12 +123,13 @@ Asserted inline in `test-cpm_oracles.R`.
 also Browne, 1992, p. 470), used for input-refusal behavior only, so an error
 here cannot move a numeric result — verify last, or skip.
 
-> **Re-read result (2026-07-19).** Correlations and N confirmed. **One scale
-> name was wrong:** the sixth is *ForeignLanguage*, not *ForeignLiterature*.
-> Fixed at `helper-cpm-oracles.R:61`. As anticipated, this fixture feeds
-> input-refusal behavior only, so no numeric result moved.
+> **Re-read result (2026-07-19).** Correlations, N, and all six scale names
+> confirmed. *(An earlier note here reported the sixth scale as
+> "ForeignLanguage"; Jeff retracted that the same day as his own slip —
+> the source reads **ForeignLiterature**, which is what the fixture has
+> always said. No change was kept; corrected 2026-07-19.)*
 
-- [ ] Six scale names — Spelling, Punctuation, Grammar, Vocabulary, Literature, **ForeignLanguage** — and lower triangle: `.621 / .564 .742 / .476 .503 .577 / .394 .461 .472 .688 / .389 .411 .429 .548 .639`
+- [ ] Six scale names — Spelling, Punctuation, Grammar, Vocabulary, Literature, ForeignLiterature — and lower triangle: `.621 / .564 .742 / .476 .503 .577 / .394 .461 .472 .688 / .389 .411 .429 .548 .639`
 - [ ] N = 1046
 
 ---
@@ -157,12 +160,12 @@ damage.
 > and the transcription record's own flagged 15.5% coincidence surfaced here
 > (B1a), where this pass will actually meet it.
 >
-> **What section A suggests to watch for.** Every one of its four findings was
-> an error in a *record about* a value — a page anchor, a column label, a
-> variable order, a scale name — and none was a wrong number. Section B's
-> analogue is the label/anchor layer: which study a threshold comes from,
-> which scale a Table 4 figure belongs to, whether a vignette number is the
-> published value or a rounding of it.
+> **What section A suggests to watch for.** Every one of its findings was an
+> error in a *record about* a value — a page anchor, a column label, a
+> variable order, a comment's wording — and **not one transcribed number was
+> wrong**. Section B's analogue is that same label/anchor layer: which study a
+> threshold comes from, which scale a Table 4 figure belongs to, whether a
+> vignette number is the published value or a rounding of it.
 
 ### B1. The accuracy table the vignette prints (Studies 1–2, pp. 6–11)
 
