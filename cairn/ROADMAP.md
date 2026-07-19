@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-18 (M37 done + archived, PR #61 — `geom_ssm_path()` draws movement across occasions on the circumplex canvas, with a `ssm_plot_circle(path = )` wrapper; the seam is crossed the short way and an undefined occasion breaks the path. Review removed the `order` aesthetic, which ggplot2's `add_group()` fragmented into a zeroGrob (M37-D2), and fixed a `drop_lowfit` bypass. M32 terminal row pruned per retention (keeps M33–M37). Earlier: M36 done + archived, PR #60 — certification legend draws both keys, `coord_circumplex()` rejects non-finite `amax`/`center`. Earlier: M34 done + archived, PR #59 — plotting vignette rewritten over the M31–M33 API. Terminal-row retention keeps the 5 most recent: M33–M37)_
+_Last hygiene check: 2026-07-18 (M38 done + archived, PR #63 — `coord_circumplex()` now always draws a ring at `amax`, so every canvas closes at its rim; the ring is unlabeled unless `amax` is itself a generated break (M38-D1), and no generated break is removed. Review caught two regressions M38 introduced: appending the rim desynchronized the break set from a scale's explicit `labels` (hard build error) and blanking by index into `NULL` labels gave literal `NA` labels. The vignette's `coord-bare` figure is now paired with a corrected counterpart. Earlier the same day: PR #62 hotfixed the floating-point censor that dropped a break landing *on* the rim. M33 terminal row pruned per retention (keeps M34–M38))_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,10 +10,9 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | planned | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M38 | Guaranteed rim ring for the circumplex canvas | review | — | normal | milestones/M38-rim-ring-guarantee.md |
+| M38 | Guaranteed rim ring for the circumplex canvas | done | — | normal | milestones/archive/M38-rim-ring-guarantee.md |
 | M36 | Visualization polish — certification legend key + non-finite guards | done | — | normal | milestones/archive/M36-viz-polish-legend-guards.md |
 | M37 | On-circle movement paths across occasions | done | M31, M32, M33 | normal | milestones/archive/M37-on-circle-movement-paths.md |
-| M33 | Longitudinal trajectory visualization (occasions objects) | done | — | high | milestones/archive/M33-trajectory-visualization.md |
 | M34 | Plotting vignette + pkgdown reference | done | M31, M32, M33 | normal | milestones/archive/M34-plotting-vignette-pkgdown.md |
 | M35 | Model-based trajectory plotting (`ssm_draws()` tables) | done | M33 | normal | milestones/archive/M35-model-based-trajectory.md |
 
