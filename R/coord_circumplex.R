@@ -100,6 +100,20 @@ coord_circumplex <- function(amax = NULL, center = 0, r_axis_angle = NULL, ...) 
   )
 }
 
+# Upper bound to hand ggplot2 for the radial range, a few ULPs above `amax`.
+# ggplot2 censors the r breaks against that range with an exact comparison,
+# while the break generator overshoots: seq(0, 0.3, by = 0.1) ends at
+# 0.30000000000000004. Without the headroom a break sitting *on* the rim is
+# censored to NA, the outer ring vanishes, and data plots outside the outermost
+# visible ring even though `amax` is documented as the amplitude that ring
+# represents (amax = 0.5 and 0.8 escaped only because their top break is exact).
+# The headroom is relative to the radial span and scaled well above the
+# generator's accumulated drift (a few ULPs) while staying far below anything
+# that could shift a ring by a visible amount.
+rim_limit <- function(center, amax) {
+  amax + (amax - center) * 64 * .Machine$double.eps
+}
+
 # Displacement (degrees) at which to draw the amplitude (radial) axis: the
 # midpoint of the widest angular gap between consecutive displacement spokes, so
 # the amplitude tick labels never collide with a spoke label (the due-East
@@ -127,14 +141,18 @@ CoordCircumplex <- ggplot2::ggproto(
   # hard-pinned to [0, 360] by the `limits$theta` field, independent of the
   # data's displacement range (the guard the seam and pole mechanisms hang on).
   setup_panel_params = function(self, scale_x, scale_y, params = list()) {
-    if (is.null(self$amax)) {
+    r_max <- self$amax
+    if (is.null(r_max)) {
       r_scale <- if (self$theta == "x") scale_y else scale_x
       data_max <- suppressWarnings(max(r_scale$get_limits(), na.rm = TRUE))
       if (!is.finite(data_max) || data_max <= self$center) {
         data_max <- self$center + 1
       }
-      self$limits$r <- c(self$center, data_max)
+      r_max <- data_max
     }
+    # Recomputed from `amax`/`center` on every call rather than nudged in place,
+    # so repeated builds of the same coord stay idempotent.
+    self$limits$r <- c(self$center, rim_limit(self$center, r_max))
     # Place the amplitude (radial) axis in the widest spoke gap unless the caller
     # pinned an angle, so its labels clear the spoke labels. The theta scale's
     # breaks are the spokes; set r_axis_inside before delegating so the parent
