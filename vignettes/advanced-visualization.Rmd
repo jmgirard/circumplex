@@ -115,10 +115,11 @@ ggplot(results$results) +
   theme_circumplex()
 ```
 
-The difference between those two figures is exactly what `ggcircumplex()` adds
-on top of the coordinate system: the spoke breaks, their scale labels, and the
-theme. Build from the parts when you want to vary one of them; reach for
-`ggcircumplex()` when you do not.
+The only difference between those two figures is that second line: the spoke
+breaks and their scale labels. Supplying them, along with the theme, is what
+`ggcircumplex()` does on top of the coordinate system. Build from the parts when
+you want to vary one of those pieces; reach for `ggcircumplex()` when you do
+not.
 
 Because the coordinate system owns the amplitude-to-radius mapping, `amax` is
 set exactly once per plot and the canvas and the data layers cannot disagree

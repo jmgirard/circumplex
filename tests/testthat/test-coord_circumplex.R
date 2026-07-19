@@ -80,8 +80,8 @@ test_that("a break landing on the rim survives the radial censor", {
 })
 
 # Radial breaks and their labels as the panel actually renders them.
-rim_furniture <- function(amax, center = 0, data_at = 0.7) {
-  y <- if (is.null(amax)) center + 1 else center + (amax - center) * data_at
+rim_furniture <- function(amax, center = 0, data_at = 0.7, trained_max = 1) {
+  y <- if (is.null(amax)) trained_max else center + (amax - center) * data_at
   p <- ggplot2::ggplot(data.frame(x = 45, y = y)) +
     ggplot2::geom_point(ggplot2::aes(x, y)) +
     coord_circumplex(amax = amax, center = center)
@@ -108,8 +108,12 @@ test_that("the canvas always draws a ring at the rim", {
     expect_equal(min(f$breaks), case$center)
   }
   # A trained (amax = NULL) canvas gets the same guarantee off its trained rim.
-  f <- rim_furniture(NULL, center = 0)
-  expect_equal(max(f$breaks), 1)
+  # The datum is deliberately not a round number: at a trained rim of exactly 1
+  # the break generator already emits one there, so the assertion would pass
+  # with the rim append removed entirely and prove nothing.
+  f <- rim_furniture(NULL, center = 0, trained_max = 0.73)
+  expect_equal(max(f$breaks), 0.73)
+  expect_equal(f$labels[[length(f$labels)]], "")
 })
 
 test_that("the rim ring is labeled only when amax is itself a generated break", {
@@ -120,7 +124,10 @@ test_that("the rim ring is labeled only when amax is itself a generated break", 
   # therefore left exactly as it is and the appended rim carries a blank label.
   f <- rim_furniture(1.75)
   expect_equal(f$breaks, c(0, 0.5, 1.0, 1.5, 1.75))
-  expect_equal(f$labels, c("0.00", "0.50", "1.00", "1.50", ""))
+  # The generated breaks are labeled exactly as the scale labels them on its own
+  # -- the rim is not handed to the labeller, so it cannot drag extra decimal
+  # places onto the visible labels either.
+  expect_equal(f$labels, c("0.0", "0.5", "1.0", "1.5", ""))
   # The crowded case that motivated the abandoned suppression rule: 0.275 keeps
   # its label and its ring, and the rim is silent rather than printing over it.
   f <- rim_furniture(0.28, center = 0.15)
@@ -139,6 +146,32 @@ test_that("the rim ring is labeled only when amax is itself a generated break", 
     # headroom exists to accommodate.
     expect_equal(sum(abs(f$breaks - amax) <= abs(amax) * 1e-9), 1L)
   }
+})
+
+test_that("appending the rim respects what the amplitude scale says about labels", {
+  # A scale carrying explicit `labels` pairs them positionally with its own
+  # breaks and aborts on a length mismatch, so the appended rim must never be
+  # handed to it: doing so errored out of the build entirely.
+  p <- ggplot2::ggplot(data.frame(x = 45, y = 1.2)) +
+    ggplot2::geom_point(ggplot2::aes(x, y)) +
+    coord_circumplex(amax = 1.75) +
+    ggplot2::scale_y_continuous(
+      breaks = c(0, 0.5, 1, 1.5), labels = c("a", "b", "c", "d")
+    )
+  pp <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]
+  expect_equal(max(pp$r$get_breaks()), 1.75)
+  expect_equal(as.character(pp$r$get_labels()), c("a", "b", "c", "d", ""))
+  # A caller suppressing the amplitude labels keeps no labels at all -- blanking
+  # the rim by index into NULL would fabricate a vector of literal NA labels.
+  p <- ggplot2::ggplot(data.frame(x = 45, y = 1.2)) +
+    ggplot2::geom_point(ggplot2::aes(x, y)) +
+    coord_circumplex(amax = 1.75) +
+    ggplot2::scale_y_continuous(labels = NULL)
+  pp <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]
+  # na.rm: the generated set carries a censored NA break (the algorithm's
+  # out-of-range proposal), which is what made the rim missing in the first place.
+  expect_equal(max(pp$r$get_breaks(), na.rm = TRUE), 1.75)
+  expect_null(pp$r$get_labels())
 })
 
 test_that("amax = NULL trains the outer limit from the data, inner pinned to center", {

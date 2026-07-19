@@ -137,9 +137,21 @@ rim_view_scale <- function(view, rim) {
     NULL, view,
     breaks = c(breaks, rim),
     get_labels = function(self, breaks = self$get_breaks()) {
-      labels <- self$scale$get_labels(breaks)
-      labels[!is.na(breaks) & abs(breaks - rim) <= tol] <- ""
-      labels
+      # Label the breaks the scale knows about, then blank the appended rim.
+      # The rim is asked for separately rather than blanked afterwards because
+      # a scale carrying explicit `labels` pairs them positionally with its own
+      # breaks and aborts on a length mismatch -- handing it the appended break
+      # would error out of the build. NULL labels (a caller suppressing the
+      # amplitude labels) stay NULL: assigning into NULL by index would
+      # fabricate a vector of literal NA labels.
+      is_rim <- !is.na(breaks) & abs(breaks - rim) <= tol
+      labels <- self$scale$get_labels(breaks[!is_rim])
+      if (is.null(labels)) {
+        return(labels)
+      }
+      out <- rep(if (is.list(labels)) list("") else "", length(breaks))
+      out[!is_rim] <- labels
+      out
     }
   )
 }
