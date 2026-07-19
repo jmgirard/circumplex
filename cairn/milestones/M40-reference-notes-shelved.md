@@ -72,12 +72,12 @@ slot is not applicable and AC7 fences that claim instead.
       communality index, not ζ; the symmetry belongs on ln v_ii). Record
       Appendix A's own variable order explicitly — flat row order invited a
       false mismatch at M7 T3.
-- [ ] T2. Author `zimmermann2017Description.md` from
+- [x] T2. Author `zimmermann2017.md` (citekey per M40-D1) from
       `devel/m4-zw-transcription.md` against the shelf PDF, carrying the Eq.
       A7 confirmation (√2 radicand **and** leading ½, both confirmed on the
       page 2026-07-19) and the Table 4 note that OCPD's withheld a/δ CIs
       track its low Prob (.130), not its R².
-- [ ] T3. Write both Provenance blocks; verify each `Extraction:` status is
+- [x] T3. Write both Provenance blocks; verify each `Extraction:` status is
       one physical line.
 - [ ] T4. Rewrite `INDEX.md` — drop the deferral comment, add one line per
       committed page.
@@ -88,6 +88,7 @@ slot is not applicable and AC7 fences that claim instead.
 
 ## Work log
 
+- 2026-07-19: T2+T3 done — `cairn/references/zimmermann2017.md`, both Provenance blocks written and each `Extraction:` status confirmed a single physical line (420 and 657 chars). Machine re-check reproduced the Note 3 matrices, both Table 4 rows, Table 4's note, the Study 2 thresholds, the Study 5 CircE indices and IIP-SC parameters, and all eight constants Eq. A6/A7/Eq. 3 derive (no-√2 variant misses all three f_a values). **Table 4's printed note independently confirms M7's Prob-not-R² correction.** Three items are outside a text layer and rest on Jeff's read alone, recorded as such rather than claimed: Figure 1A's octant angles, Figure 5's panel readings, and Eq. A7's √2 radicand + leading ½, which `pdftotext` silently drops — the M40 channel reproduced that artifact rather than resolving it, so the page logs Eq. A7 as still lacking two genuinely independent channels.
 - 2026-07-19: T1 done — `cairn/references/grassi2010.md`. The shelf changed mid-session: Jeff added seven PDFs and renamed the two originals to `author+year`, so `browne1992a.pdf` was identified as Browne & Cudeck (1992) SMR 21(2) 230–258 (not a second Browne solo paper) and `acton2002.pdf` as a bonus needing no page — the repo cites Acton & Revelle (2002) only as *others'* citation of prior work, which "consulted in passing owes nothing" excludes. Browne (1982) is still absent. Independent `pdftotext -layout` re-check reproduced EVERY fixture value: all 21 Table 1 correlations + N, the Table 2 model 1a row, the Table 3 fit row, all Appendix A full-precision estimates/SEs/fit measures, all seven communality indices and CIs after re-mapping the reordered block, all seven variance ratios, and the Listing 7 matrix + N. Three records confirmed on the page: A2's reordering note is printed verbatim ("variable names have been reordered to yield increasing polar angles"), A4's column really is ρ̂, and A6's retraction was right — p. 68 prints "Foreign Literature". New fact the fixtures never recorded: Appendix A's fit CIs are **90%** while its communality CIs are **95%**.
 - 2026-07-19: created by /milestone-plan. Scope split at the plan gate — the nine owed source notes are three different jobs (shelved+verified / transcribed-but-unshelved / cold reads), and only this group is workable today; M41 carries the other seven. Jeff's plan-gate decisions: leave the `devel/` transcriptions byte-untouched while M7's open work log cites them, and give Browne 1992 a full model specification in M41 rather than a reliance-scoped extract.
 
