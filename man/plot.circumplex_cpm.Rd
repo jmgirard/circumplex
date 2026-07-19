@@ -27,7 +27,8 @@ A \pkg{ggplot2} object.
 \description{
 Draw the estimated item configuration of a \code{\link[=cpm_fit]{cpm_fit()}} object on the circular
 canvas from \code{\link[=ggcircumplex]{ggcircumplex()}}. Each scale is placed at its \emph{estimated} angle
-(\code{θ}), at a radius given by its communality (\verb{ζ²}, the share of
+(\eqn{\theta}{theta}), at a radius given by its communality
+(\eqn{\zeta^2}{zeta^2}, the share of
 its variance explained by the common circumplex factors), so items that the
 model explains well sit near the outer ring and items it explains poorly sit
 near the centre. The canvas spokes mark the \emph{theoretical} angles supplied to
