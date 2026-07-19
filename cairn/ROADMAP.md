@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-18 (M38 done + archived, PR #63 — `coord_circumplex()` now always draws a ring at `amax`, so every canvas closes at its rim; the ring is unlabeled unless `amax` is itself a generated break (M38-D1), and no generated break is removed. Review caught two regressions M38 introduced: appending the rim desynchronized the break set from a scale's explicit `labels` (hard build error) and blanking by index into `NULL` labels gave literal `NA` labels. The vignette's `coord-bare` figure is now paired with a corrected counterpart. Earlier the same day: PR #62 hotfixed the floating-point censor that dropped a break landing *on* the rim. M33 terminal row pruned per retention (keeps M34–M38))_
+_Last hygiene check: 2026-07-19 (M7 v2.0.0 release prep merged, PR #64 — DESCRIPTION at 2.0.0, R floor declared >= 4.1 (D-021), NEWS consolidated, cran-comments refreshed and verified claim-by-claim. Two blind-gate defects fixed: literal Greek in roxygen broke the PDF manual on win-builder after two 0/0/0 local checks that pass `--no-manual`, and review found the regression guard added for it was itself skipped under `R CMD check` — now reads the installed Rd database and denies non-ASCII by default, verified by mutation. The Grassi/Zimmermann-Wright transcription re-read found no wrong value in either source. **M7 deliberately stays `in-progress`, not `done`:** T4 (hand `submit_cran()` to Jeff) cannot run before merge, so the milestone is not archived until the release is handed over)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,7 +9,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M7 | v2.0.0 CRAN release preparation | review | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
+| M7 | v2.0.0 CRAN release preparation | in-progress | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
 | M38 | Guaranteed rim ring for the circumplex canvas | done | — | normal | milestones/archive/M38-rim-ring-guarantee.md |
 | M36 | Visualization polish — certification legend key + non-finite guards | done | — | normal | milestones/archive/M36-viz-polish-legend-guards.md |
 | M37 | On-circle movement paths across occasions | done | M31, M32, M33 | normal | milestones/archive/M37-on-circle-movement-paths.md |

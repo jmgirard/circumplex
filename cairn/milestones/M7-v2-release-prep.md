@@ -1,6 +1,6 @@
 # M7: v2.0.0 CRAN release preparation
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38
 - **Branch/PR:** `m7-v2-release-prep` / [PR #64](https://github.com/jmgirard/circumplex/pull/64)
@@ -154,6 +154,8 @@ complete and validated (D-008).
 - 2026-07-19: T3 section B — **all [VALUE] rows now confirmed** (Jeff: "i checked all the B1a/B3 values"), joining B2/B4/B5 and Eq. A7. Worksheet checkboxes ticked to match, including all 33 section-A rows, which had been confirmed in prose since the morning but never actually ticked — the boxes were lagging the attestation. Remaining for AC3: B0's five fidelity judgments (whether our paraphrases overclaim — not lookups), B1's six [FINDING] threshold rows (the Figure 5 work established the numbers, but Jeff has not said the rows themselves are settled), Jeff's work-log attestation, and then the three `pending (Jeff)` markers. T2 stays open until they are read — AC2 needs win-builder green on the *fixed* tarball, and the run that flagged the LaTeX ERROR tested the pre-fix one.
 
 - 2026-07-19: status in-progress→review (/milestone-implement). T1–T3 done; the branch is 22 commits over 14 files and `check(manual = TRUE)` is 0/0/0 on the tip. **Deliberate, user-approved deviation from the standard flow, logged rather than smoothed over:** T4/AC4 (hand `submit_cran()` to Jeff) cannot be executed before merge — building the submission tarball from an unmerged branch would submit code that is not on the default branch — so M7 enters `review` with T4 open. Jeff's gate choice was "keep M7 open until submitted", meaning **`/milestone-review` should verify AC1–AC3, merge on his approval, and then STOP: it must not tick AC4, must not set status `done`, and must not archive the milestone.** M7 returns to `in-progress` after merge for T4, and reaches `done` only once the release is actually handed over. This bends cairn's normal "review merges, marks done, archives" sequence; it is recorded here so a later session reads it as the exception it is, not as a precedent or as review having failed to finish its job.
+
+- 2026-07-19: **PR #64 squash-merged to master (`39a97013`) at Jeff's approval.** AC1–AC3 verified with fresh evidence (Review section); CI 9/9 green; `check(manual = TRUE)` 0/0/0. Review's one actioned finding (F1, score 92) was that the Rd-LaTeX regression guard skipped under `R CMD check` and therefore ran in no gate that ships a release — fixed and verified by mutation. F2 (55) fixed alongside it; F4 (78) and F5 (50) fixed at Jeff's instruction at the gate; F3 (5) rejected as factually wrong. **Status review→in-progress, NOT done**, per the deferred-T4 decision: T4/AC4 (hand `submit_cran()` to Jeff) runs post-merge, and M7 is not archived until the release is handed over. Lesson captured in LESSONS.md.
 
 ## Decisions
 
