@@ -25,8 +25,12 @@ path relies on.
 - `browne1982.md` — Browne (1982), scoped to **pp. 95–96 only**; the shelf
   holds exactly those two pages as `sources/browne1982_pp95-96.pdf` and the
   rest of the source is neither available nor required. The page records the
-  communality-CI derivation as Browne states it: nonsymmetric CIs on
-  ρ(xᵢ, cᵢ) obtained from **symmetric** CIs on ln vᵢᵢ.
+  **general transformation-based CI method** those pages state — a symmetric
+  interval on θ = h(γᵢ) inverted through h⁻¹, and the logarithmic instance
+  for a variance or standard deviation. The communality-specific chain
+  (nonsymmetric CIs on ρ(xᵢ, cᵢ) from symmetric CIs on ln vᵢᵢ) is *Grassi's*
+  assembly of that method with `browne1992.md` eq. 4; Browne does not state
+  it on these pages (amended 2026-07-19, T4 gate).
 
 **Correction owed to a committed page.** `cairn/references/grassi2010.md:134-140`
 carries an open question pointing at four page images
@@ -36,10 +40,11 @@ claim proven false, so it is corrected **in place** and marked, per the
 tracking rule; the same bullet's open question ("has not been checked against
 Browne himself") is what `browne1982.md` resolves.
 
-The repo's two-channel transcription protocol applies to both pages: a visual
-page read and an independent `pdftotext -layout` extraction, diffed on every
-load-bearing numeral, with between-channel discrepancies recorded rather than
-silently resolved.
+The repo's two-channel transcription protocol applies to both pages, in the
+form M42-D1 fixes for an OCR-scanned source: a read of the rendered page
+images, authoritative, cross-checked against `pdftotext -layout`, diffed on
+every load-bearing numeral, with between-channel discrepancies recorded
+rather than silently resolved.
 
 **Out:** The fit-index benchmark pair → M41. Acton & Revelle (2004) and Wendt
 et al. (2019) → M43. **Package code changes of any kind** — this is a
@@ -99,7 +104,7 @@ page (M41 work log, 2026-07-19).
 - [x] T3. Build the parameter map: each quantity `R/cpm_fit.R` estimates
       against its published counterpart, walked against the code rather than
       asserted. A departure is recorded and escalated, never reconciled here.
-- [ ] T4. Author `browne1982.md` from pp. 95–96, two channels.
+- [x] T4. Author `browne1982.md` from pp. 95–96, two channels.
 - [ ] T5. Correct `grassi2010.md:134-140` in place — PNG pointer → shelved
       PDF, open question resolved, correction marked.
 - [ ] T6. `Traces to` sections written against the actual citing lines;
@@ -120,6 +125,9 @@ page (M41 work log, 2026-07-19).
 - 2026-07-19: minor amendment — **T7 added** (discovered sub-task) for two dated observations this milestone falsifies on already-committed files: `browne1992a.md:6-8` asserts `browne1992.md` "does not exist yet", and `INDEX.md`'s comment block lists Browne 1992/1982 as still owing pages. Coverage AC6 → T6, T7.
 
 - 2026-07-19: T2+T3 done — `cairn/references/browne1992.md` authored, carrying the implemented model in full (eqs. 1–8, the six §5.2 Requirements, eqs. 30–48) plus a parameter map walked against `R/cpm_fit.R`. Two results worth naming. (a) **No numeric departure**: the engine's `zeta` is Browne's ζ*ᵢᵢ = ρ(xᵢ,cᵢ) of eqs. (3b*)/(4), verified by substituting into eq. (3) rather than asserted, and both scaling families' df reduce to eq. (6) under equivalent moment counts (the cancellation D-011 measured empirically). (b) **Three departures in kind, recorded not reconciled** per Scope: Browne's §6.7 IFA start-value recipe is not implemented (the engine uses its own starts), `cpm_spec()` imposes an m cap the paper does not print, and variant C (equal communality, free angles) appears nowhere in the paper. Also banked: five paper-internal errata, of which the p. 485 "[m/2] … less than m/2" definition is load-bearing — read literally it drops the top even harmonic from eq. (33).
+
+- 2026-07-19: T4 done — `cairn/references/browne1982.md` authored. It opens with a scope warning because the pages do not say what the citing chain implies: eqs. (1.6.29)–(1.6.41) are a general transform-and-invert CI method (symmetric interval on θ = h(γᵢ), inverted through h⁻¹ so the result cannot include inadmissible values), and the log instance (1.6.38)–(1.6.40) composes in closed form to γ̂·exp(±c_α σ̂/γ̂) — `tests/testthat/test-cpm_oracles.R:136` term for term. The communality chain has three links and only the first is Browne (1982); links 2 and 3 are `browne1992.md` eq. 4 and Grassi's reporting choice. Attribution corrected, arithmetic unaffected. Full citation transcribed verbatim from `grassi2010.pdf`'s reference list and flagged as unverified against the source (the shelf has two interior pages, no title page). Three open questions banked: the unverified citation, the twice-printed "(1.6.9)" that reads as though it means (1.6.29) and is undecidable from two pages, and the p. 97 continuation of (1.6.41).
+- 2026-07-19: amendment (same approval as the AC3 gate) — the **Scope** block carried the same false premise AC3 did and named the pre-M42-D1 channel protocol; both sentences replaced, text previewed in chat before this commit.
 
 ## Decisions
 
