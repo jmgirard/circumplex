@@ -142,9 +142,12 @@ statistics with 95% CIs for PD scales at N = 1,166 —
   dom = −.005 [−.038, .032], a = .012, δ = 337.4°, R² = .117, Prob = .130
   (no CI brackets printed for its a and δ in the table — **confirmed
   2026-07-19 to be a deliberate omission by the authors, not a transcription
-  gap**: with R² = .117 the amplitude and displacement are not interpretable,
-  so no interval is reported. Same logic the vignette leans on when it picks
-  OCPD as its near-flat cautionary case).
+  gap**: the trigger is its low **Prob = .130**, not its low R². Table 4's own
+  note defines Prob as "probability of accurate confidence intervals for
+  amplitude and angular displacement" — precisely the two parameters whose
+  CIs are withheld — and the authors' own rule is not to interpret a/δ CIs
+  when the probability estimate is < .50 (pp. 12–13, 16). R² = .117 is a
+  separate quantity and does not govern which intervals are printed).
 *Cross-check:* `ssm_analyze(jz2017, PANO(), measures = c("PARPD","OCPD"))`
 on the bundled data (the same sample) reproduces every point estimate of
 both rows to the table's printed rounding (e/x/y/a/δ/R²; verified
@@ -223,6 +226,12 @@ in `devel/m4-zw-bridge.R` (seeded, committed with results).
   text-layer artifact resolved by cross-validation (Eq. A7 √2). F8 grid
   characterization confirmed. No-supplement finding recorded; O5 bridge
   re-scoped per the F7 mechanism. Jeff's independent re-read pending.
+- 2026-07-19 — Correction to the entry below, same day: the OCPD a/δ CI
+  omission is triggered by its low **Prob (.130)**, **not** by its low R²
+  (.117), which that entry wrongly gave. Table 4's note defines Prob as the
+  probability of accurate CIs for amplitude and angular displacement — the
+  two parameters actually withheld — and the authors' < .50 rule (pp. 12–13,
+  16) is what applies. Corrected in the Table 4 block above.
 - 2026-07-19 — Second independent human re-read begun (Jeff, M7 T3).
   Eq. A7 confirmed on the page including its leading ½, closing the one
   channel discrepancy that had been settled by reasoning; Note 3 matrices,

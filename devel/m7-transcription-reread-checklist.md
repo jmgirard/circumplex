@@ -340,12 +340,19 @@ conflated two different Table 4 values** — OCPD's *amplitude* and PARPD's
 - [ ] N = 1,166 undergraduates, IIP-SC octants + PDQ-4+ target measures (`:41-42`)
 
 > **✅ Confirmed 2026-07-19 by Jeff.** All four rows correct, **and the absent
-> OCPD brackets are real** — the table genuinely prints no CI for that scale's
-> amplitude and displacement, because its goodness of fit is too low
-> (R² = .117) for those parameters to be interpretable. So it is a deliberate
-> omission by the authors, not a transcription gap. That reason was not in the
-> record before and is worth keeping: it is the same logic the vignette relies
-> on when it picks OCPD as its near-flat cautionary case.
+> OCPD brackets are real** — a deliberate omission by the authors, not a
+> transcription gap. **The trigger is its low `Prob` (.130), not its low R²**
+> (.117). Table 4's own note defines Prob as "probability of accurate
+> confidence intervals for amplitude and angular displacement" — exactly the
+> two parameters withheld — and the authors' rule is not to interpret a/δ CIs
+> when that estimate is < .50 (pp. 12–13, 16). R² is a separate quantity and
+> does not govern which intervals print.
+>
+> *(An earlier version of this note gave R² as the reason; corrected the same
+> day. The distinction matters here more than most: Prob is a statement about
+> whether the interval is trustworthy, R² about how well the model fits, and
+> conflating them is precisely the error the vignette's own guidance warns
+> against.)*
 >
 > Both Table 4 rows are transcribed in full in `devel/m4-zw-transcription.md`.
 
