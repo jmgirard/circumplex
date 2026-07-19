@@ -147,6 +147,23 @@ through it directly. The rows below are the subset that reaches **shipped,
 user-facing output**, and so are the ones where an error would do the most
 damage.
 
+> **Worksheet refreshed 2026-07-19** after section A completed. Changes: line
+> anchors re-derived against the current vignette (all of them had drifted);
+> a new **B1a** covering six shipped numbers the first cut missed because they
+> sit in prose rather than in the table; **B4** split — its single row had
+> conflated OCPD's amplitude with PARPD's elevation — and given the Study 5
+> fit indices it also ships; **B3** given Eq. A7's leading ½, which had never
+> been listed; **B2** given the IIP-C ρ values instead of "per the record";
+> and the transcription record's own flagged 15.5% coincidence surfaced here
+> (B1a), where this pass will actually meet it.
+>
+> **What section A suggests to watch for.** Every one of its four findings was
+> an error in a *record about* a value — a page anchor, a column label, a
+> variable order, a scale name — and none was a wrong number. Section B's
+> analogue is the label/anchor layer: which study a threshold comes from,
+> which scale a Table 4 figure belongs to, whether a vignette number is the
+> published value or a rounding of it.
+
 ### B1. The accuracy table the vignette prints (Studies 1–2, pp. 6–11)
 
 `vignettes/evaluating-circumplex-structure.Rmd:190-199`. This table is read
@@ -156,7 +173,19 @@ by users as guidance about their own sample sizes.
 - [ ] Amplitude: biased **upward** (strongly at small population amplitude); accurate at n ≥ 75 (general-factor instrument) / n ≥ 150 (no general factor), given population amplitude ≥ .10
 - [ ] Displacement: unbiased but imprecise at low amplitude; accurate at n ≥ 100 (general factor) / n > 200 (no general factor), given population amplitude ≥ .10
 - [ ] Fit (R²): biased **downward**; population R² < .9 only, unsuited near 1
-- [ ] The band being applied is Bradley's (1978) liberal band, 92.5%–97.5%
+- [ ] The band being applied is Bradley's (1978) liberal band, 92.5%–97.5% (`:187-188`)
+
+### B1a. The three "implications" bullets the vignette prints (`:203-222`)
+
+Prose, not a table, so it escaped the first cut — but every number in it is
+transcribed and shipped.
+
+- [ ] Relative amplitude bias averaged `15.5%`, reached `135.8%` (pp. 6–7)
+- [ ] ⚠ **`15.5%` occurs twice in the paper for two different quantities** — Study 1's average relative amplitude bias (p. 6) and Study 4's mean deviance when AFF₂ = 0 (p. 13). Both channels confirmed both occurrences independently; the record flags it so a reader does not "fix" one into the other. The vignette means the Study 1 sense. Please confirm on the page.
+- [ ] At n = 50, no general factor, population amplitude exactly 0: expected sample amplitude ≈ `.15` (pp. 6–7)
+- [ ] SE of displacement ≈ `50°` at n = 100 for a weakly differentiated profile (p. 8)
+- [ ] Eq. 3 constants `2.95` and `n^(−0.587)`, and the f_a values as the vignette **rounds** them: `.55` IIP-C, `.63` IIP-SC, `.85` IAS (record: .545, .625, .845 — confirm the unrounded values in B3, the rounding here is the vignette's)
+- [ ] At n = 100 with an IIP-C-like instrument the frontier is ≈ `.11`
 
 ### B2. Population octant matrices — Note 3 (p. 18)
 
@@ -164,7 +193,7 @@ by users as guidance about their own sample sizes.
 diagnostic was validated against.
 
 - [ ] Without a substantial general factor (IAS, 2,988 students; Gurtman & Pincus, 2000; Wiggins, 1995): ρ1 `.430`, ρ2 `.030`, ρ3 `−.360`, ρ4 `−.740`
-- [ ] With a general factor (IIP-C) — values per the record; confirm all four ρ
+- [ ] With a substantial general factor (IIP-C, 1,981 students; Gurtman & Balakrishnan, 1998): ρ1 `.683`, ρ2 `.500`, ρ3 `.345`, ρ4 `.288`
 
 ### B3. Scaling-factor formulas — Eq. A6, A7 (p. 18) and Eq. 3 (p. 12)
 
@@ -172,22 +201,43 @@ The record flags **one resolved channel discrepancy** here. Please confirm the
 resolution against the page image, since it was settled by reasoning rather
 than by a clean second read:
 
-- [ ] Eq. A7 radicand is `√2(ρ1−ρ3)+(1−ρ4)` — **not** `2(ρ1−ρ3)+(1−ρ4)`. The text layer rendered it without the √; the page image shows it with. (Only the √2 form reproduces all five published scaling factors.)
+- [ ] Eq. A7 in full: `f_a = ½·√( √2(ρ1−ρ3) + (1−ρ4) )` — radicand `√2(ρ1−ρ3)+(1−ρ4)`, **not** `2(ρ1−ρ3)+(1−ρ4)`. The text layer rendered it without the √; the page image shows it with. **Confirm the leading ½ as well** — the first cut listed only the radicand, so the ½ has never been checked against the page.
 - [ ] Eq. A6: `f_e = √((2ρ1+2ρ2+2ρ3+ρ4+1)/8)`
 - [ ] Eq. 3 (p. 12): `|AFF_min| = 2.95 · f_a · n^(−0.587)` — confirm both constants
 - [ ] Derived values quoted on p. 9: f_e → IIP-C `.737`, IAS `.240`; f_a → IIP-C `.545`, IAS `.845`
 - [ ] p. 14: IIP-SC f_a `.625`; `|.029|` at N = 1166
 - [ ] p. 12 worked values: f_a = .545 → n = 100 gives `.108` ("as large as .11"); n = 1000 gives `.028` (".03")
 
-### B4. Study 5 reproduction (p. 14) and Table 4
+> **Numeric self-check, re-run 2026-07-19.** Feeding the B2 matrices through
+> the formulas as transcribed reproduces all eight published constants:
+> f_e → .7369 / .2398 (pub .737 / .240); f_a → .5454 / .8452 / .6246
+> (pub .545 / .845 / .625); Eq. 3 → .1077, .0279, .0292 (pub .11, .03, .029).
+> The no-√2 variant gives .589 / .911 / .675 and misses every one.
+>
+> **What this does and does not settle.** It is a *consistency* check, not an
+> independent oracle: B2's ρ values and these formulas were transcribed by the
+> same pass, so a compensating pair of errors would still close. It does mean
+> the √2 reading, the ½, and the four IIP-C ρ values are mutually pinned — an
+> error in any one of them alone would break the identity. Read the pages
+> anyway; this only tells you the set is internally coherent.
+
+### B4. Study 5 reproduction (pp. 13–16) and Table 4 (p. 15)
 
 The vignette reproduces these analyses live on the bundled `jz2017` data, so a
 transcription error here would surface as a mismatch between the vignette's
-prose and its own computed output.
+prose and its own computed output. **The first cut's single row here
+conflated two different Table 4 values** — OCPD's *amplitude* and PARPD's
+*elevation* — and cited a stale line for each; split and re-anchored below.
 
-- [ ] The Study 5 pattern the vignette says it reproduces (`evaluating-circumplex-structure.Rmd:151`)
-- [ ] The Table 4 elevation value for the obsessive–compulsive PD profile that the ipsatizing section compares against (`evaluating-circumplex-structure.Rmd:237, 572`)
-- [ ] N = 1166 for Study 5
+- [ ] The Study 5 CircE fit pattern the vignette narrates (`:151-157`), including the printed indices: equal spacing + equal communality CFI `.824`, TLI `.795`, RMSEA `.169`; unequal spacing CFI `.958`, TLI `.931`, RMSEA `.098` (p. 14)
+- [ ] Table 4, **obsessive–compulsive** PD: amplitude `.012` at full sample size — the vignette's stated reason for picking this scale as the near-flat case (`:237-238`)
+- [ ] Table 4, **paranoid** PD: elevation `.250`, the value the ipsatizing section says the raw-score analysis matches (`:572-573`)
+- [ ] N = 1,166 undergraduates, IIP-SC octants + PDQ-4+ target measures (`:41-42`)
+
+> Both Table 4 rows are transcribed in full in `devel/m4-zw-transcription.md`
+> (Paranoid and Obsessive–compulsive, with CIs); that record also notes OCPD's
+> a and δ print without CI brackets in the table. Worth confirming, since an
+> absent bracket is easy to read as a transcription omission.
 
 ### B5. Octant angles — Figure 1A (p. 3)
 
