@@ -218,3 +218,16 @@ test_that("r_axis_angle overrides the automatic placement (T3)", {
   expect_error(coord_circumplex(r_axis_angle = Inf), "finite")
   expect_error(coord_circumplex(r_axis_angle = c(1, 2)), "r_axis_angle")
 })
+
+test_that("the rim ring renders on an unround amax", {
+  # The rim ring is purely visual, so it gets the one plot guard the repo's
+  # test doctrine allows (vdiffr where the plot is the product). No existing
+  # baseline covers it: every vdiffr canvas in the suite uses amax 0.5, 0.6 or
+  # 1.0, all of which the break algorithm already places a break at, so none of
+  # them moved when the rim ring landed.
+  skip_on_ci()
+  vdiffr::expect_doppelganger(
+    "rim ring at an unround amax",
+    ggcircumplex(octants(), labels = PANO(), amax = 1.75)
+  )
+})

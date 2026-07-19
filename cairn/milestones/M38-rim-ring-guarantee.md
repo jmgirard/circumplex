@@ -87,7 +87,7 @@ that vignette.
       blanking that entry's label. The grid reads `r$mapped_breaks()`, so the
       ring and the guide both follow from the one patched break set. Keep the
       ULP headroom: it still carries the already-a-break cases.
-- [ ] T4. Regenerate the vdiffr baselines per the M31 procedure — delete the
+- [x] T4. Regenerate the vdiffr baselines per the M31 procedure — delete the
       stale `_snaps/<file>/*.svg`, re-run under `NOT_CRAN=true` (a bare
       `Rscript` run silently skips the comparison), and diff each moved SVG to
       confirm only the rim ring and its label were added.
@@ -108,6 +108,7 @@ that vignette.
 - 2026-07-18: T1 done; substantive amendment at the implement gate (Jeff approved) — Scope In, AC1 and AC2 replaced, the labeled-rim-with-suppression mechanism moved to Out, T1/T2/T3 rewritten. Rationale in M38-D1: render evidence, not arithmetic, settled it.
 - 2026-07-18: FLAG for the user — the Goal still says the rim ring is "labeled", which M38-D1 contradicts. The Goal is create-only (never edited in place), and the milestone's substance (the canvas closes at its rim) is unchanged, so it is left as written and surfaced here rather than quietly corrected. Decide at review whether to strike the word or re-cut.
 - 2026-07-18: T2+T3 done in one commit (a test-first commit would land a red suite). `rim_view_scale()` wraps the parent's radial ViewScale, appending the rim with a blank label; `r.major` recomputed to stay consistent. Rendered and inspected amax=1.75 and center=0.15/amax=0.28: circle closed, ladder unchanged, no label collision. Suite 2980 passing under NOT_CRAN=true.
+- 2026-07-18: T4 done — NO existing vdiffr baseline moved, and the reason is not a silent skip: every vdiffr canvas in the suite uses amax 0.5, 0.6 or 1.0, all already-a-break cases the change does not touch (the same run under NOT_CRAN=true did flag the two geom_ssm_path baselines for PR #62, so comparison is live). That left the new behavior with no visual guard, so one baseline was ADDED at amax = 1.75: 14 polylines, labels 0.00/0.50/1.00/1.50 and no 1.75 — five rings, four labels, exactly M38-D1.
 
 ## Decisions
 
