@@ -3,9 +3,16 @@
 **Purpose.** The Grassi et al. (2010) and Zimmermann & Wright (2017)
 transcriptions were each extracted through two *mechanical* channels (a
 rendered-page visual read and a `pdftotext` text-layer extraction, diffed
-against each other). Both records mark the remaining step as
+against each other). Both records marked the remaining step as
 `second independent human re-read: pending (Jeff)`. This checklist is that
-step's worksheet. It gates the v2.0.0 submission (M7 AC3).
+step's worksheet. It gated the v2.0.0 submission (M7 AC3).
+
+> ## ✅ COMPLETE — 2026-07-19, Jeff, against both primary sources
+>
+> **No transcribed value in either source was found wrong.** Every row in
+> both sections is ticked. The re-read's entire yield was corrections to
+> records *about* the values, listed in the section notes below; exactly one
+> reached shipped output (the accuracy-table header).
 
 **How to use it.** Open the primary source at the anchor named in each row and
 read the published value off the page, *then* compare it to the row. Read
@@ -45,12 +52,11 @@ already has. It tells you **where to look**, never what you should find.
 > computed numbers as published ones, and a table header that under-scoped its
 > own claim.
 >
-> **Still open — AC3 is not met until these are:**
-> - **B0** — the five fidelity judgments below. The only remaining rows, and
->   the only ones no page can settle.
-> - **Jeff's attestation** in the M7 work log, then the `pending (Jeff)`
->   markers in `test-cpm_oracles.R:10-11`, `helper-cpm-oracles.R:6-7`, and
->   `m4-zw-transcription.md`.
+> **B0 approved 2026-07-19 (Jeff):** the vignette's five characterizations of
+> Studies 1–2 are faithful and do not overclaim. That was the last open row.
+> Attestation recorded in the M7 work log; all three `pending (Jeff)` markers
+> cleared (`test-cpm_oracles.R`, `helper-cpm-oracles.R`,
+> `m4-zw-transcription.md`).
 
 ## A. Grassi, Luccio & Di Blas (2010)
 
@@ -218,11 +224,11 @@ compression of a paragraph of theirs. Don't hunt for a matching sentence;
 there isn't one. Ask instead: **does this overclaim, and would a user acting
 on it be misled?** The published basis is given so the judgment is informed.
 
-- [ ] "essentially unbiased" (elevation, X, Y) — their basis: average bias −.0007, most extreme −.013 (p. 6)
-- [ ] "**biased upward**, strongly so when population amplitude is small" (amplitude) — their basis: bias .0002–.136, average .021; relative bias average 15.5%, range 0–135.8%; direction consistently positive (p. 6)
-- [ ] "unbiased but imprecise at low amplitude" (displacement) — their basis: bias average −.03°, range −2.38° to 3.03° (p. 6); SE grows as amplitude shrinks (p. 8)
-- [ ] "biased downward … unsuited near 1" (fit) — their basis: average −.081, range −.382 to .027 (p. 6); coverage exactly 0 at population R² = 1, inaccurate at R² ≥ .9 (p. 10). Note "unsuited" is *their* word about the method for R² CIs (p. 11); "near 1" is ours.
-- [ ] Table header, now `95% bootstrap CI accurate when…` (changed 2026-07-19) — accuracy always means Bradley-band coverage, never statistical significance. Confirm no cell reads as a significance claim.
+- [x] "essentially unbiased" (elevation, X, Y) — their basis: average bias −.0007, most extreme −.013 (p. 6)
+- [x] "**biased upward**, strongly so when population amplitude is small" (amplitude) — their basis: bias .0002–.136, average .021; relative bias average 15.5%, range 0–135.8%; direction consistently positive (p. 6)
+- [x] "unbiased but imprecise at low amplitude" (displacement) — their basis: bias average −.03°, range −2.38° to 3.03° (p. 6); SE grows as amplitude shrinks (p. 8)
+- [x] "biased downward … unsuited near 1" (fit) — their basis: average −.081, range −.382 to .027 (p. 6); coverage exactly 0 at population R² = 1, inaccurate at R² ≥ .9 (p. 10). Note "unsuited" is *their* word about the method for R² CIs (p. 11); "near 1" is ours.
+- [x] Table header, now `95% bootstrap CI accurate when…` (changed 2026-07-19) — accuracy always means Bradley-band coverage, never statistical significance. Confirm no cell reads as a significance claim.
 
 ### B1. [FINDING] The sample-size thresholds the vignette's table prints
 
@@ -416,12 +422,25 @@ conflated two different Table 4 values** — OCPD's *amplitude* and PARPD's
 
 ---
 
-## Attestation
+## Attestation — ✅ recorded 2026-07-19
 
-When complete, record the outcome in the M7 work log: the date, that the
-re-read was done against the primary sources, and either "no discrepancies"
-or each discrepancy and its resolution. Then the two `pending (Jeff)` markers
-in `tests/testthat/test-cpm_oracles.R:10-11`,
-`tests/testthat/helper-cpm-oracles.R:6-7`, and
-`devel/m4-zw-transcription.md` should be updated to record the completed
-re-read and its date.
+**Jeff, 2026-07-19:** the second independent human re-read was performed
+against the primary sources — Grassi, Luccio & Di Blas (2010) and
+Zimmermann & Wright (2017) — covering every row of both sections.
+**No transcribed value was found wrong in either source.**
+
+Discrepancies found and their resolutions, all in records *about* the values
+rather than in the values themselves:
+
+| # | Discrepancy | Resolution |
+|---|---|---|
+| A3 | m = 1 fit measures anchored to Table 3 (p. 60) | Re-anchored to Appendix A (pp. 70–71); provenance header now splits unconstrained fit measures from constrained F |
+| A4 | Table 2/3 column called ζ | It is ρ̂ (communality index, Browne 1992 Eq. 4); three code comments corrected. Assertions were already right — that column *is* our `Zeta` |
+| A5 | Comment put the CI symmetry on the communality index | Reworded to the published statement: nonsymmetric CIs on ρ(x_i, c_i) from symmetric CIs on ln v_ii (Browne, 1982, pp. 95–96). Arithmetic was already correct |
+| A6 | Reported as ForeignLanguage | Retracted same day; source reads ForeignLiterature, as the fixture always had. No change kept |
+| B1a, B3 | Two worksheet rows presented *computed* values as published | Rewritten with per-value page anchors; **[DERIVED]** tag added so the distinction is structural |
+| B1 | Study 2 Results and Discussion state the thresholds differently (75/150 vs 100/200) | Figure 5 supports the Results; the Discussion's figures are displacement's applied to both parameters. Vignette keeps 75/150 |
+| B1 → vignette | Accuracy-table header under-scoped its claim | Header now reads `95% bootstrap CI accurate when…` — **the only finding that reached shipped output** |
+
+Markers cleared: `tests/testthat/test-cpm_oracles.R`,
+`tests/testthat/helper-cpm-oracles.R`, `devel/m4-zw-transcription.md`.

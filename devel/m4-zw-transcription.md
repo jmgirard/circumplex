@@ -18,13 +18,14 @@ scaling factors (see cross-validation below). **That resolution is no longer
 inferential — Jeff confirmed Eq. A7 on the page 2026-07-19, both the √2
 radicand and the leading ½** (the ½ had never been checked by any pass).
 
-**Second independent human re-read: in progress (Jeff), started
-2026-07-19.** Confirmed so far: Eq. A7 (above); the two Note 3 population
-matrices; the Table 4 rows; the Figure 1A octant angles. Still open: the
-vignette's characterizations of Studies 1–2 (a fidelity judgment, not a
-lookup), the Study 2 threshold-source question below, and the remaining
-Eq. A6 / Eq. 3 / p. 9 / p. 14 value rows. Worksheet:
-`devel/m7-transcription-reread-checklist.md` section B.
+**Second independent human re-read: COMPLETE (Jeff), 2026-07-19.** Every
+value in this record was checked against the primary source, and **none was
+found wrong.** Also confirmed: Eq. A7 including its leading ½ (above), and
+the vignette's characterizations of Studies 1–2 as faithful rather than
+overclaiming. Two things changed as a result, neither a transcribed value:
+the Study 2 threshold-source question below was resolved from Figure 5, and
+the vignette's accuracy-table header was rescoped to say *bootstrap* CI.
+Worksheet: `devel/m7-transcription-reread-checklist.md` section B.
 
 **Threshold double-statement, resolved by Figure 5 (2026-07-19).** The paper
 states the amplitude and displacement thresholds twice with different numbers:
