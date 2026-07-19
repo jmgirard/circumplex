@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-19 (audit clean — `cairn_validate` 15/15 PASS, no open issues or PRs, no un-ingested RRs; M39 planned the same day. M7 v2.0.0 release prep merged, PR #64 — DESCRIPTION at 2.0.0, R floor declared >= 4.1 (D-021), NEWS consolidated, cran-comments refreshed and verified claim-by-claim. Two blind-gate defects fixed: literal Greek in roxygen broke the PDF manual on win-builder after two 0/0/0 local checks that pass `--no-manual`, and review found the regression guard added for it was itself skipped under `R CMD check` — now reads the installed Rd database and denies non-ASCII by default, verified by mutation. The Grassi/Zimmermann-Wright transcription re-read found no wrong value in either source. **M7 deliberately stays `in-progress`, not `done`:** T4 (hand `submit_cran()` to Jeff) cannot run before merge, so the milestone is not archived until the release is handed over)_
+_Last hygiene check: 2026-07-19 (M39 shipped — amplitude axis labels now carry a translucent backdrop so they stay legible over data layers, PR #65 squash `f10b483a`, 9/9 CI, four review findings fixed incl. D-022 recording `grid` in Imports; M39's NEWS entry is in the v2.0.0 section, so it landed ahead of the release and M7 stays `blocked` on its `submit_cran()` handoff. Earlier: audit clean — `cairn_validate` 15/15 PASS. M7 v2.0.0 release prep merged, PR #64 — DESCRIPTION at 2.0.0, R floor declared >= 4.1 (D-021), NEWS consolidated, cran-comments refreshed and verified claim-by-claim. Two blind-gate defects fixed: literal Greek in roxygen broke the PDF manual on win-builder after two 0/0/0 local checks that pass `--no-manual`, and review found the regression guard added for it was itself skipped under `R CMD check` — now reads the installed Rd database and denies non-ASCII by default, verified by mutation. The Grassi/Zimmermann-Wright transcription re-read found no wrong value in either source. **M7 deliberately stays `in-progress`, not `done`:** T4 (hand `submit_cran()` to Jeff) cannot run before merge, so the milestone is not archived until the release is handed over)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,11 +10,10 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M39 | Legible radial axis labels over data layers | review | — | normal | milestones/M39-radial-label-legibility.md |
+| M39 | Legible radial axis labels over data layers | done | — | normal | milestones/archive/M39-radial-label-legibility.md |
 | M38 | Guaranteed rim ring for the circumplex canvas | done | — | normal | milestones/archive/M38-rim-ring-guarantee.md |
 | M36 | Visualization polish — certification legend key + non-finite guards | done | — | normal | milestones/archive/M36-viz-polish-legend-guards.md |
 | M37 | On-circle movement paths across occasions | done | M31, M32, M33 | normal | milestones/archive/M37-on-circle-movement-paths.md |
-| M34 | Plotting vignette + pkgdown reference | done | M31, M32, M33 | normal | milestones/archive/M34-plotting-vignette-pkgdown.md |
 | M35 | Model-based trajectory plotting (`ssm_draws()` tables) | done | M33 | normal | milestones/archive/M35-model-based-trajectory.md |
 
 ## Candidates
