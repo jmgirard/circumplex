@@ -538,7 +538,7 @@ without changing results for a given seed.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">34567</span><span class="op">)</span></span>
 <span><span class="va">acc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ssm_ci_accuracy.html">ssm_ci_accuracy</a></span><span class="op">(</span><span class="va">res</span>, reps <span class="op">=</span> <span class="fl">200</span>, amplitude_factors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: CPM Hessian is ill-conditioned (condition number 1.29e+17): angles may</span></span>
+<span><span class="co">#&gt; Warning: CPM Hessian is ill-conditioned (condition number 9.17e+16): angles may</span></span>
 <span><span class="co">#&gt; be clustered or parameters weakly determined.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">acc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -550,7 +550,7 @@ without changing results for a given seed.</p>
 <span><span class="co">#&gt; Population Structure:     Browne circular model (CPM) </span></span>
 <span><span class="co">#&gt; Group Sizes:      All = 250 </span></span>
 <span><span class="co">#&gt; Certification Rule:   a_lci / (a_uci - a_lci) &gt;= 0.35 (scale-free, print-independent) </span></span>
-<span><span class="co">#&gt; Elapsed:      10.7 s</span></span>
+<span><span class="co">#&gt; Elapsed:      14.1 s</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Structure note: population simulated from a Browne circular model fit (m = 3,</span></span>
 <span><span class="co">#&gt; RMSEA = 0.064, SRMR = 0.038).</span></span>
