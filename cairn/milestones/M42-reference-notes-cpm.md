@@ -1,10 +1,10 @@
 # M42: Source notes for the CPM model and its communality CIs
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M40
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m42-reference-notes-cpm`
 
 ## Goal
 
@@ -58,9 +58,13 @@ page (M41 work log, 2026-07-19).
       parameter `R/cpm_fit.R` estimates to its published counterpart **from
       the page alone**, without opening the paper.
 - [ ] `cairn/references/browne1982.md` exists carrying every template section,
-      scoped to pp. 95–96, recording the communality-CI derivation with the
-      log-scale symmetry stated as Browne states it and anchored to the
-      printed equation numbers.
+      scoped to pp. 95–96, recording the **general transformation-based CI
+      method** these pages actually state — the symmetric interval on
+      θ = h(γᵢ) inverted through h⁻¹, and the logarithmic instance for a
+      variance or standard deviation — anchored to the printed equation
+      numbers, and stating explicitly that the communality-specific
+      application is Grassi's assembly of that method with `browne1992.md`
+      eq. 4, not something Browne states on these pages.
 - [ ] `grassi2010.md`'s Browne-1982 bullet is corrected in place and marked:
       the stale PNG pointer names the shelved PDF, and the open question it
       records is resolved by reference to `browne1982.md`.
@@ -83,11 +87,11 @@ page (M41 work log, 2026-07-19).
 - AC3 → T1, T4
 - AC4 → T5
 - AC5 → T2, T4, T6
-- AC6 → T6
+- AC6 → T6, T7
 
 ## Tasks
 
-- [ ] T1. Re-verify `browne1992.pdf` and `browne1982_pp95-96.pdf` on the shelf
+- [x] T1. Re-verify `browne1992.pdf` and `browne1982_pp95-96.pdf` on the shelf
       and stamp the observation — the shelf is live and moved twice during
       M40, so confirm rather than trust this plan's inventory.
 - [ ] T2. Author `browne1992.md` — the full CPM model specification, two
@@ -101,11 +105,40 @@ page (M41 work log, 2026-07-19).
 - [ ] T6. `Traces to` sections written against the actual citing lines;
       `INDEX.md` entries; `cairn_validate` clean; tail-byte and untouched-tree
       checks.
+- [ ] T7. Discharge the two dated observations this milestone falsifies on
+      already-committed files: `browne1992a.md`'s citekey-trap paragraph
+      (which says `browne1992.md` "does not exist yet" and names M42 as owing
+      the reciprocal warning) and `INDEX.md`'s comment-block ledger of which
+      sources still owe a page. Both are corrected in place and marked.
 
 ## Work log
 
 - 2026-07-19: created by /milestone-plan, splitting M41 at the re-size gate its own `Out:` clause called for. Carries the two Browne sources: the 1992 CPM paper (the split-out M41 predicted — "a spec document in a source note's clothes") and the 1982 pp. 95–96 communality-CI derivation, which belongs here rather than with the fit benchmarks because it serves the same CPM oracle path (`tests/testthat/test-cpm_oracles.R:133`, `grassi2010.md`). Both sources verified present on the shelf at plan time — `browne1992.pdf` confirmed by first-page read as *Psychometrika* 57(4) 469–497, distinct from `browne1992a.pdf` (Browne & Cudeck, M41) — observed 2026-07-19. T5 exists because that plan-time inventory found `grassi2010.md` still naming four page images the consolidated PDF replaced.
 
+- 2026-07-19: T1 done — both sources confirmed on the shelf and identified from their own pages, not from filenames: `browne1992.pdf` is 29 pages, p. 1 printing "PSYCHOMETRIKA-VOL. 57, NO. 4, 469-497 / DECEMBER 1992" and "CIRCUMPLEX MODELS FOR CORRELATION MATRICES / MICHAEL W. BROWNE"; `browne1982_pp95-96.pdf` is 2 pages carrying printed page numbers 95 and 96 — observed 2026-07-19. Both are Acrobat "Paper Capture" OCR scans, which is what M42-D1 responds to.
+- 2026-07-19: question gate — three answers, all the recommended option. (1) **Substantive amendment to AC3**, user-approved: the criterion presumed Browne (1982) pp. 95–96 state a communality-CI derivation; the pages state the general transformation-based CI method (eqs. 1.6.29–1.6.41) with the log-variance instance (1.6.38–1.6.40) and mention neither communality nor the circumplex, so the criterion now asks for what is there plus an explicit statement that the communality application is Grassi's assembly. (2) OCR channel standing → M42-D1. (3) `browne1992.md` carries the implemented model only (§2, §3, §5.2 Requirements, §6), with §4 simplex and §5 Anderson under "Not extracted" — `grep -rn Anderson R/` returns nothing.
+- 2026-07-19: minor amendment — **T7 added** (discovered sub-task) for two dated observations this milestone falsifies on already-committed files: `browne1992a.md:6-8` asserts `browne1992.md` "does not exist yet", and `INDEX.md`'s comment block lists Browne 1992/1982 as still owing pages. Coverage AC6 → T6, T7.
+
 ## Decisions
+
+### M42-D1 (2026-07-19): on an OCR-scanned source the page image is the authoritative channel and `pdftotext` is not an independent witness
+
+**Context:** M41-D1 recorded that the repo's two-channel transcription protocol
+runs two *machine* channels — `pdftotext -layout` and the implementing session's
+read of the `pdftoppm` page image — and that neither is a human attestation.
+Both M42 sources go further: `browne1992.pdf` and `browne1982_pp95-96.pdf` are
+Acrobat "Paper Capture" OCR of scanned typescript (`pdfinfo` Producer line), so
+the text layer is *derived from the same page image* rather than from a
+born-digital text stream. On `browne1982_pp95-96.pdf` the text layer drops every
+display equation, preserving only the equation numbers.
+**Decision:** Both channels still run and every load-bearing numeral is still
+diffed, but on an OCR-scanned source the rendered page image is the
+**authoritative** channel and `pdftotext` is a cross-check for reading slips
+only — never an independent witness to a value. Each page's `Extraction:` status
+says so on its own line, and says plainly that a defect in the scan itself is
+uncatchable by either channel.
+**Consequences:** refines M41-D1 for the scanned-source case; supersedes nothing.
+Every value on both M42 pages rests on one authoritative channel, which the
+status states rather than implies.
 
 ## Review
