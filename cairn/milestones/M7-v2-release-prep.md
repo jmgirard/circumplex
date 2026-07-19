@@ -1,6 +1,6 @@
 # M7: v2.0.0 CRAN release preparation
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** high
 - **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38
 - **Branch/PR:** `m7-v2-release-prep` / [PR #64](https://github.com/jmgirard/circumplex/pull/64)
@@ -156,6 +156,8 @@ complete and validated (D-008).
 - 2026-07-19: status in-progress→review (/milestone-implement). T1–T3 done; the branch is 22 commits over 14 files and `check(manual = TRUE)` is 0/0/0 on the tip. **Deliberate, user-approved deviation from the standard flow, logged rather than smoothed over:** T4/AC4 (hand `submit_cran()` to Jeff) cannot be executed before merge — building the submission tarball from an unmerged branch would submit code that is not on the default branch — so M7 enters `review` with T4 open. Jeff's gate choice was "keep M7 open until submitted", meaning **`/milestone-review` should verify AC1–AC3, merge on his approval, and then STOP: it must not tick AC4, must not set status `done`, and must not archive the milestone.** M7 returns to `in-progress` after merge for T4, and reaches `done` only once the release is actually handed over. This bends cairn's normal "review merges, marks done, archives" sequence; it is recorded here so a later session reads it as the exception it is, not as a precedent or as review having failed to finish its job.
 
 - 2026-07-19: **PR #64 squash-merged to master (`39a97013`) at Jeff's approval.** AC1–AC3 verified with fresh evidence (Review section); CI 9/9 green; `check(manual = TRUE)` 0/0/0. Review's one actioned finding (F1, score 92) was that the Rd-LaTeX regression guard skipped under `R CMD check` and therefore ran in no gate that ships a release — fixed and verified by mutation. F2 (55) fixed alongside it; F4 (78) and F5 (50) fixed at Jeff's instruction at the gate; F3 (5) rejected as factually wrong. **Status review→in-progress, NOT done**, per the deferred-T4 decision: T4/AC4 (hand `submit_cran()` to Jeff) runs post-merge, and M7 is not archived until the release is handed over. Lesson captured in LESSONS.md.
+
+- 2026-07-19: status in-progress→**blocked** (/milestone-implement M39, at Jeff's gate choice). Blocker: T4/AC4 is the `submit_cran()` handoff, an action only Jeff can take, so M7 waits on something outside any session. Parking it is a status correction, not a deprioritization — it frees cairn's single `in-progress` slot for M39 and keeps `at most one in-progress` green. **Nothing about the release changed:** T1–T3 stay done, AC4 stays unticked, the milestone stays unarchived, and M7 returns to `in-progress` the moment T4 is picked up. M39 additionally carries a merge gate forbidding it to reach master until this submission is handed off.
 
 ## Decisions
 
