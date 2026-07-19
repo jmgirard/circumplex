@@ -105,12 +105,12 @@ page (M41 work log, 2026-07-19).
       against its published counterpart, walked against the code rather than
       asserted. A departure is recorded and escalated, never reconciled here.
 - [x] T4. Author `browne1982.md` from pp. 95–96, two channels.
-- [ ] T5. Correct `grassi2010.md:134-140` in place — PNG pointer → shelved
+- [x] T5. Correct `grassi2010.md:134-140` in place — PNG pointer → shelved
       PDF, open question resolved, correction marked.
-- [ ] T6. `Traces to` sections written against the actual citing lines;
+- [x] T6. `Traces to` sections written against the actual citing lines;
       `INDEX.md` entries; `cairn_validate` clean; tail-byte and untouched-tree
       checks.
-- [ ] T7. Discharge the two dated observations this milestone falsifies on
+- [x] T7. Discharge the two dated observations this milestone falsifies on
       already-committed files: `browne1992a.md`'s citekey-trap paragraph
       (which says `browne1992.md` "does not exist yet" and names M42 as owing
       the reciprocal warning) and `INDEX.md`'s comment-block ledger of which
@@ -128,6 +128,10 @@ page (M41 work log, 2026-07-19).
 
 - 2026-07-19: T4 done — `cairn/references/browne1982.md` authored. It opens with a scope warning because the pages do not say what the citing chain implies: eqs. (1.6.29)–(1.6.41) are a general transform-and-invert CI method (symmetric interval on θ = h(γᵢ), inverted through h⁻¹ so the result cannot include inadmissible values), and the log instance (1.6.38)–(1.6.40) composes in closed form to γ̂·exp(±c_α σ̂/γ̂) — `tests/testthat/test-cpm_oracles.R:136` term for term. The communality chain has three links and only the first is Browne (1982); links 2 and 3 are `browne1992.md` eq. 4 and Grassi's reporting choice. Attribution corrected, arithmetic unaffected. Full citation transcribed verbatim from `grassi2010.pdf`'s reference list and flagged as unverified against the source (the shelf has two interior pages, no title page). Three open questions banked: the unverified citation, the twice-printed "(1.6.9)" that reads as though it means (1.6.29) and is undecidable from two pages, and the p. 97 continuation of (1.6.41).
 - 2026-07-19: amendment (same approval as the AC3 gate) — the **Scope** block carried the same false premise AC3 did and named the pre-M42-D1 channel protocol; both sentences replaced, text previewed in chat before this commit.
+
+- 2026-07-19: T5 done — `grassi2010.md`'s Browne-1982 bullet corrected in place and marked. The stale four-PNG pointer now names `sources/browne1982_pp95-96.pdf`, and the open question is resolved by reference to `browne1982.md` — with the substantive correction that Browne pp. 95–96 never mention communalities. The paper-report sentence at `grassi2010.md:104-106` is accurate as a report of Grassi and is left standing, with a cross-reference added so a reader meets the caveat where the claim sits.
+- 2026-07-19: T7 done — `browne1992a.md`'s citekey-trap paragraph no longer says `browne1992.md` "does not exist yet", and `INDEX.md`'s comment-block ledger no longer lists the two Browne sources as owing pages; both corrected in place and marked, per the correcting-current-knowledge rule.
+- 2026-07-19: T6 done — both pages' `Traces to` written against actual citing lines, each verified by reading the line (three cited anchors were wrong on first write and fixed: `cpm_rho_deriv` is at `R/cpm_fit.R:46` not :53, and the oracle block is `test-cpm_oracles.R:131-137` with the comment at 132-135). `INDEX.md` carries one line per new page with the filename as link text. `cairn_validate`: **all checks passed** — `weight caps` PASS, `references index<->disk` PASS, `references staleness` OK (no WARN), `record density` OK; the 47 `work-log format` advisories are all pre-existing M7 hard-wraps, none from M42. `git diff --stat devel/` empty; no file outside `cairn/` modified. Tail bytes of both new pages checked by `od -c` — clean, single trailing newline, no leaked scaffolding. `devtools::test()` 0 failures / 3082 passing (the milestone touches no package file; run to confirm the tree is green).
 
 ## Decisions
 

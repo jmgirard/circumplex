@@ -103,7 +103,10 @@ Re-mapped into Table-1 order, with their approximate 95% one-at-a-time CIs:
 
 The nonsymmetric CIs on ρ(xᵢ, cᵢ) are obtained from **symmetric** CIs on
 ln vᵢᵢ (Browne, 1982, pp. 95–96) — the symmetry belongs to the log-v scale,
-not to the communality CIs themselves (M7 T3 finding A5).
+not to the communality CIs themselves (M7 T3 finding A5). That is *this
+paper's* sentence (p. 57); the "(Browne, 1982)" in it points at a general CI
+method, not at a communality derivation — see `browne1982.md` and the Open
+questions below (M42, 2026-07-19).
 
 ### Verbal ability tests — Listing 7, p. 68
 
@@ -131,14 +134,21 @@ Used for input-refusal behavior only; no numeric result depends on it.
 
 ## Open questions
 
-- The communality-CI derivation attributed to Browne (1982, pp. 95–96) is
-  recorded here as *this* paper reports it, and has not been checked against
-  Browne himself. Those two pages are on the shelf as images
-  (`sources/browne1982_p95a.png`, `p95b`, `p96a`, `p96b`), added mid-session
-  on 2026-07-19; the rest of Browne (1982) is not — so the check is now
-  possible but has not been done. M41 T5 carries it — observed 2026-07-19,
-  re-checked at merge (an earlier form of this bullet said the pages were
-  absent, which was already false when written).
+- **Resolved (M42, 2026-07-19).** This bullet previously recorded the
+  communality-CI derivation as unchecked against Browne himself, and pointed
+  at four page images (`sources/browne1982_p95a.png`, `p95b`, `p96a`, `p96b`)
+  that the consolidated `sources/browne1982_pp95-96.pdf` has since replaced.
+  Both pointers are corrected here in place. The check has now been done and
+  is banked at `cairn/references/browne1982.md`, with one substantive
+  correction to what this page said: **Browne (1982) pp. 95–96 state a
+  *general* transform-and-invert CI method and never mention communalities,
+  vᵢᵢ, or the circumplex.** The sentence above — "the nonsymmetric CIs on
+  ρ(xᵢ, cᵢ) are obtained from symmetric CIs on ln vᵢᵢ (Browne, 1982,
+  pp. 95–96)" — is accurate as a report of what *this* paper (Grassi) says at
+  p. 57, and it is left standing as such; what it must not be read as is a
+  claim that Browne derives the communality CI. The composition is Grassi's,
+  assembled from Browne (1982) eqs. (1.6.38)–(1.6.40) and `browne1992.md`
+  eq. (4) — observed 2026-07-19.
 - The CIRCUM/CircE free-scaling model difference (why our F̂ exceeds their
   published 0.089815 at finite N) is analysed in
   `tests/testthat/test-cpm_oracles.R:30-47` and `devel/m4-browne-design.md`
