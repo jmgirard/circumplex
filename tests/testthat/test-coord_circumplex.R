@@ -55,6 +55,39 @@ test_that("amax and center are the radial limits, trained in one place", {
   expect_equal(pp$r.range, c(0.2, 1))
 })
 
+test_that("a break landing on the rim survives the radial censor", {
+  # `amax` is documented as the amplitude the outer ring represents, but ggplot2
+  # censors the radial breaks against the panel range with an exact comparison
+  # and the break generator drifts a few ULPs wide of it: seq(0, 0.3, by = 0.1)
+  # ends at 0.30000000000000004. The rim break was dropped to NA and the circle
+  # rendered with no outer ring, leaving the data outside the outermost visible
+  # ring; amax = 0.5 and 0.8 escaped only because their top break is exact.
+  for (amax in c(0.3, 0.6, 1.2)) {
+    p <- ggplot2::ggplot(data.frame(x = 45, y = amax * 0.7)) +
+      ggplot2::geom_point(ggplot2::aes(x, y)) +
+      coord_circumplex(amax = amax)
+    breaks <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]$r$get_breaks()
+    expect_false(anyNA(breaks))
+    expect_equal(max(breaks), amax)
+  }
+  # Same at a nonzero center, where the rim break is generated off that origin.
+  p <- ggplot2::ggplot(data.frame(x = 45, y = 0.25)) +
+    ggplot2::geom_point(ggplot2::aes(x, y)) +
+    coord_circumplex(amax = 0.3, center = 0.1)
+  breaks <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]$r$get_breaks()
+  expect_false(anyNA(breaks))
+  expect_equal(max(breaks), 0.3)
+  # A rim that no break was ever generated for is left alone: the outermost ring
+  # stays below amax rather than being snapped onto it, which would label a ring
+  # with an amplitude it is not drawn at. Guaranteeing a rim ring in this case
+  # needs its own label-collision rule and is not this fix.
+  p <- ggplot2::ggplot(data.frame(x = 45, y = 1.2)) +
+    ggplot2::geom_point(ggplot2::aes(x, y)) +
+    coord_circumplex(amax = 1.75)
+  breaks <- ggplot2::ggplot_build(p)$layout$panel_params[[1]]$r$get_breaks()
+  expect_equal(max(breaks, na.rm = TRUE), 1.5)
+})
+
 test_that("amax = NULL trains the outer limit from the data, inner pinned to center", {
   p <- ggplot2::ggplot(data.frame(x = c(10, 200), y = c(0.1, 0.42))) +
     ggplot2::geom_point(ggplot2::aes(x, y)) +
