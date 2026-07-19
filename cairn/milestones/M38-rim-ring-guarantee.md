@@ -10,9 +10,8 @@
 
 ## Goal
 
-Guarantee that `coord_circumplex()` draws a labeled amplitude ring at `amax`, so
-every circumplex canvas closes at its rim instead of trailing off into an open
-panel.
+Guarantee that `coord_circumplex()` draws an amplitude ring at `amax`, so every
+circumplex canvas closes at its rim instead of trailing off into an open panel.
 
 ## Scope
 
@@ -112,6 +111,7 @@ that vignette.
 - 2026-07-18: T5+T6 done. `coord-bare` now pairs the bare figure with a `coord-bare-scaled` counterpart carrying the octant breaks; the prose makes the difference between them the lesson. All 15 figures in the vignette knitted (under `load_all()`, dev version 1.3.0.9002 printed — the M21/M34 installed-vs-dev trap) and inspected one by one: every circumplex canvas closes at its rim, the Cartesian figures (occasions-plot, curve-axis) are unaffected. One out-of-scope defect found and routed to a candidate row rather than absorbed: radial axis labels are drawn beneath the geom layers and get obscured by markers/arrowheads.
 - 2026-07-18: T7 done — DESIGN.md's coord bullet now records that the coord owns the rim ring and why the appended ring is unlabeled; NEWS entry added above the PR #62 hotfix line. `devtools::document()` no diff; `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes; suite 2981 passing. Status → review.
 - 2026-07-18: review — 5 findings from the diff-bug lens, all scored >=80, all actioned; two were user-facing regressions this milestone introduced (a hard build error on scales carrying explicit `labels`, and literal NA labels under `labels = NULL`). Fixed on the branch with regression tests; M38-D2 appended to correct M38-D1's overstated rationale. All 5 AC verified with fresh evidence; consistency gate clean.
+- 2026-07-18: user override at the merge gate — the word "labeled" struck from the create-only Goal rather than re-cutting the milestone, since M38-D1 changed only the labelling rule and not the goal's substance. Logged per the user-overrides rule, not treated as precedent for editing a Goal generally.
 
 ## Decisions
 
