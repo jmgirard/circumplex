@@ -1,5 +1,12 @@
 # circumplex (development version)
 
+* `coord_circumplex()` now always draws an amplitude ring at `amax`, so every
+  circumplex canvas closes at its rim. Previously the outermost ring was
+  wherever the axis break algorithm happened to place one, which for many
+  values of `amax` left the circle open and let points be drawn past the last
+  visible ring. The rim ring is unlabeled unless `amax` is itself one of the
+  axis breaks; the labeled rings are otherwise unchanged.
+
 * Fixed a bug where `coord_circumplex()` could omit the outer amplitude ring, so
   a plot's circle was left open at the rim and points could be drawn beyond the
   outermost visible ring. This happened whenever an amplitude gridline fell
