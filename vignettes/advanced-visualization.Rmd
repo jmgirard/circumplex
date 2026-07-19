@@ -101,11 +101,24 @@ ggplot(results$results) +
   theme_circumplex()
 ```
 
-That is the minimum: a coordinate system and a layer. The spokes fall on
-`ggplot2`'s default axis breaks rather than on the circumplex scale angles,
-because a bare coordinate system has not been told what the scales are ---
-supplying those breaks and labels, along with the theme, is exactly what
-`ggcircumplex()` adds on top.
+That is the minimum: a coordinate system and a layer. It is also visibly
+unfinished --- the spokes fall on `ggplot2`'s default axis breaks (0, 100, 200,
+300) rather than on the circumplex scale angles, because a bare coordinate
+system has not been told what the scales are. Supplying those breaks and labels
+is the missing piece:
+
+```{r coord-bare-scaled}
+ggplot(results$results) +
+  coord_circumplex(amax = 0.3) +
+  scale_x_continuous(breaks = octants(), labels = PANO()) +
+  geom_ssm_point(aes(amplitude = a_est, displacement = d_est, fill = Label)) +
+  theme_circumplex()
+```
+
+The difference between those two figures is exactly what `ggcircumplex()` adds
+on top of the coordinate system: the spoke breaks, their scale labels, and the
+theme. Build from the parts when you want to vary one of them; reach for
+`ggcircumplex()` when you do not.
 
 Because the coordinate system owns the amplitude-to-radius mapping, `amax` is
 set exactly once per plot and the canvas and the data layers cannot disagree

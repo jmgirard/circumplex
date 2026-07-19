@@ -91,10 +91,10 @@ that vignette.
       stale `_snaps/<file>/*.svg`, re-run under `NOT_CRAN=true` (a bare
       `Rscript` run silently skips the comparison), and diff each moved SVG to
       confirm only the rim ring and its label were added.
-- [ ] T5. Rework the `coord-bare` chunk at `vignettes/advanced-visualization.Rmd`
+- [x] T5. Rework the `coord-bare` chunk at `vignettes/advanced-visualization.Rmd`
       :90-108 into the bare figure plus its corrected counterpart, and rewrite
       the prose at :104-108 around that contrast.
-- [ ] T6. Render every figure in `advanced-visualization.Rmd` and look at each
+- [x] T6. Render every figure in `advanced-visualization.Rmd` and look at each
       one (M33/M36/M37 lesson: data-level fences and vdiffr baselines both pass
       a figure that reads wrong). Record what was inspected; route anything
       found beyond this scope to a candidate row rather than absorbing it.
@@ -109,6 +109,7 @@ that vignette.
 - 2026-07-18: FLAG for the user — the Goal still says the rim ring is "labeled", which M38-D1 contradicts. The Goal is create-only (never edited in place), and the milestone's substance (the canvas closes at its rim) is unchanged, so it is left as written and surfaced here rather than quietly corrected. Decide at review whether to strike the word or re-cut.
 - 2026-07-18: T2+T3 done in one commit (a test-first commit would land a red suite). `rim_view_scale()` wraps the parent's radial ViewScale, appending the rim with a blank label; `r.major` recomputed to stay consistent. Rendered and inspected amax=1.75 and center=0.15/amax=0.28: circle closed, ladder unchanged, no label collision. Suite 2980 passing under NOT_CRAN=true.
 - 2026-07-18: T4 done — NO existing vdiffr baseline moved, and the reason is not a silent skip: every vdiffr canvas in the suite uses amax 0.5, 0.6 or 1.0, all already-a-break cases the change does not touch (the same run under NOT_CRAN=true did flag the two geom_ssm_path baselines for PR #62, so comparison is live). That left the new behavior with no visual guard, so one baseline was ADDED at amax = 1.75: 14 polylines, labels 0.00/0.50/1.00/1.50 and no 1.75 — five rings, four labels, exactly M38-D1.
+- 2026-07-18: T5+T6 done. `coord-bare` now pairs the bare figure with a `coord-bare-scaled` counterpart carrying the octant breaks; the prose makes the difference between them the lesson. All 15 figures in the vignette knitted (under `load_all()`, dev version 1.3.0.9002 printed — the M21/M34 installed-vs-dev trap) and inspected one by one: every circumplex canvas closes at its rim, the Cartesian figures (occasions-plot, curve-axis) are unaffected. One out-of-scope defect found and routed to a candidate row rather than absorbed: radial axis labels are drawn beneath the geom layers and get obscured by markers/arrowheads.
 
 ## Decisions
 
