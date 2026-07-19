@@ -7,13 +7,21 @@
 # process model", Behavior Research Methods 42(1), 55-73
 # (doi:10.3758/BRM.42.1.55) -- oracle O2 of the design sec. 6.2 set. Two
 # extraction channels were diffed (rendered-page visual read and the PDF text
-# layer via pdftotext); a second fully independent human re-read per the
-# sec. 6.1 protocol is still pending (Jeff). Sources by fixture:
+# layer via pdftotext); the second fully independent human re-read per the
+# sec. 6.1 protocol was completed 2026-07-19 (Jeff), against the primary
+# source. It confirmed the transcribed values and corrected three records
+# ABOUT them -- the m = 1 fit-measure page anchor, the Table 2/3 column
+# label (p-hat, not zeta), and the sixth verbal-ability scale name
+# (ForeignLanguage, not ForeignLiterature). Sources by fixture:
 #   * correlation matrix, N:  Table 1 (p. 58), cross-checked against Listing 1
 #   * model estimates:        Table 2 (p. 60)
-#   * fit measures:           Table 3 (p. 60)
+#   * constrained-model F:    Table 3 (p. 60)
+#   * unconstrained m = 1 fit measures (T, df, p, F0, RMSEA, null chi-sq,
+#     TLI, CFI, SRMR):        Appendix A (pp. 70-71), NOT Table 3
 #   * full-precision m = 1 output (angles, SEs, CIs, v, z, betas, fit):
 #                             Appendix A (pp. 70-72)
+# Appendix A prints its blocks in its own variable order, not Table 1's; the
+# fixtures store everything in Table-1 order (see helper-cpm-oracles.R).
 # The paper states this example reanalyzes the data Browne (1992) used
 # (their Table 2) and that CircE's m = 1..3 results "coincide precisely with
 # the ones obtained by CIRCUM" (p. 59), so these fixtures transitively cover
@@ -117,11 +125,13 @@ test_that("published oracle: our discrepancy reproduces CircE's F-hat at their s
   # free-scaling model difference, nailed to the published record.
   expect_equal(diag(Sig), app$var_ratios, tolerance = 5e-4,
                ignore_attr = TRUE)
-  # Their communality index is our zeta (index, NOT zeta^2; design sec. 6.5):
-  # rho(x, c) = 1/sqrt(1 + v) reproduces their comm. ind. column.
+  # Their communality index rho(x_i, c_i) (Browne, 1992, Eq. 4) is our zeta
+  # (the index, NOT zeta^2; design sec. 6.5): rho(x, c) = 1/sqrt(1 + v)
+  # reproduces their comm. ind. column.
   expect_equal(round(1 / sqrt(1 + app$v), 2), app$comm)
-  # Their communality CIs decode as symmetric Wald intervals on ln(v)
-  # (Browne, 1982; stated on p. 57) -- a different CI shape from our
+  # Their CIs on that index are NONsymmetric; what is symmetric is the
+  # underlying interval on ln v_ii (Browne, 1982, pp. 95-96; stated on
+  # p. 57), which the transform below inverts. A different CI shape from our
   # symmetric-natural zeta CIs, recorded per the sec. 6.3 checklist item 7.
   v_ci <- app$v[1] * exp(c(1, -1) * 1.96 * app$v_se[1] / app$v[1])
   expect_equal(round(1 / sqrt(1 + v_ci), 2), app$comm_ci[1, ])
@@ -198,7 +208,9 @@ test_that("published oracle: equal-communality rows (Table 2 model 2b)", {
   f1 <- cpm_fit(cormat = voc$R, scales = voc$names,
                 angles = c(0, 48, 111, 121, 190, 208, 272), n = voc$N, m = 1,
                 model = "equal-communality")
-  # Published: beta (.628, .372), zeta .87, F .299 (Table 3), rho180 .26.
+  # Published: beta (.628, .372), F .299 (Table 3), rho180 .26, and the
+  # common communality index -- which Table 2 labels rho-hat_1, NOT zeta --
+  # at .87. That column is our Zeta (design sec. 6.5), hence the comparison.
   expect_equal(f1$betas$Beta, c(.628, .372), tolerance = 0.005,
                ignore_attr = TRUE)
   expect_equal(f1$results$Zeta[1], .87, tolerance = 0.005)
@@ -212,7 +224,8 @@ test_that("published oracle: equal-communality rows (Table 2 model 2b)", {
                                  angles = c(0, 50, 111, 122, 190, 209, 272),
                                  n = voc$N, m = 2,
                                  model = "equal-communality"))
-  # Published: beta (.619, .370, .011), zeta .88, F .292.
+  # Published: beta (.619, .370, .011), communality index rho-hat_1 .88
+  # (Table 2's column, not zeta), F .292.
   expect_equal(f2$betas$Beta, c(.619, .370, .011), tolerance = 0.005,
                ignore_attr = TRUE)
   expect_equal(f2$results$Zeta[1], .88, tolerance = 0.005)
@@ -226,8 +239,9 @@ test_that("published oracle: m = 2 reproduces CIRCUM's two Heywood cases", {
   voc <- cpm_oracle_voc()
   fit <- suppressWarnings(cpm_fit(cormat = voc$R, scales = voc$names,
                                   angles = voc$th_start, n = voc$N, m = 2))
-  # Table 2 model 1a m = 2: beta (.608, .355, .038), zeta
-  # (.96, .83, 1, .77, .82, .94, 1) -- Technology and Social at the bound
+  # Table 2 model 1a m = 2: beta (.608, .355, .038), communality index
+  # rho-hat (.96, .83, 1, .77, .82, .94, 1) -- the same Table 2 column as
+  # above, our Zeta -- with Technology and Social at the bound
   # (the paper: "the FS correlation function with m = 2 gave two Heywood
   # cases", p. 59, crediting Browne, 1992, p. 494 for the same finding).
   expect_equal(fit$betas$Beta, c(.608, .355, .038), tolerance = 0.005,

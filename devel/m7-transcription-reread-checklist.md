@@ -18,6 +18,11 @@ already has. It tells you **where to look**, never what you should find.
 
 ---
 
+> **Section A completed 2026-07-19 by Jeff**, against the primary source. All
+> transcribed *values* confirmed. Four corrections, all to records *about* the
+> values, applied to the repo the same day (A2–A6 notes below). Section B
+> (Zimmermann & Wright) is still outstanding — AC3 is not met until it is done.
+
 ## A. Grassi, Luccio & Di Blas (2010)
 
 *CircE: An R implementation of Browne's circular stochastic process model.*
@@ -61,13 +66,25 @@ the free-scaling oracle asserts against.
 - [ ] MCSC ρ(180°): `0.276`
 - [ ] F̂ (iteration trace, "final value"): `0.089815`
 
+> **Re-read result (2026-07-19).** All values confirmed. **Order correction:**
+> Appendix A prints these blocks in its own variable order — Health, Social,
+> BusinessContact, BusinessOperations, Trades, Technology, Science (ascending in
+> its mirrored angle) — not Table 1's. The rows above (and the fixtures) are in
+> **Table-1 order**; re-map by scale before comparing. Mapped that way the
+> communality indices and all seven CIs agree exactly.
+>
 > **Direction caution.** The angle vector is the Appendix A direction, which is
 > the *mirror* of the Table 2 model-1a start values (`th_start = 0, 55, 112,
 > 123, 192, 210, 269` at `helper-cpm-oracles.R:29`). The paper prints both and
 > labels one "360 − ang. pos." Confirm you are reading the Appendix A column,
 > not Table 2, for this block — and confirm the start values separately.
 
-### A3. Fit measures — Table 3 (p. 60) / Appendix A
+### A3. Fit measures — Appendix A (pp. 70–71)
+
+> **Re-read result (2026-07-19).** Values confirmed, **anchor corrected**: these
+> unconstrained m = 1 fit measures come from Appendix A (pp. 70–71), not Table 3
+> (p. 60). Table 3 is the anchor for the *constrained*-model F values (A4).
+> The provenance header in `test-cpm_oracles.R` now splits the two.
 
 `helper-cpm-oracles.R:44-48`.
 
@@ -81,7 +98,13 @@ the free-scaling oracle asserts against.
 
 Asserted inline in `test-cpm_oracles.R`.
 
-- [ ] Model 2b (equal communality): β `(.628, .372)`, ζ `.87`, F̂ `.299`, ρ(180) `.26` — `test-cpm_oracles.R:196-201`
+> **Re-read result (2026-07-19).** Values confirmed, **label corrected**: the
+> table lists `.87` as ρ̂₁ (the communality index), not ζ. The assertion is
+> still right — that column *is* our `Zeta` per design sec. 6.5 — but the code
+> comments said "zeta" and now say so. Applied to the m = 2 rows on the same
+> reading.
+
+- [ ] Model 2b (equal communality): β `(.628, .372)`, ρ̂₁ `.87`, F̂ `.299`, ρ(180) `.26` — `test-cpm_oracles.R:196-201`
 - [ ] Model 1a m = 2: β `(.608, .355, .038)`; F̂ `.067` (Table 3) — `test-cpm_oracles.R:229-239`
 - [ ] The m = 3 statement that β₃ attains "the lower bound of zero" (p. 59) — `test-cpm_oracles.R:251`
 - [ ] Model 3c (equal spacing, free scaling) — `test-cpm_oracles.R:347, 564-565`
@@ -89,7 +112,7 @@ Asserted inline in `test-cpm_oracles.R`.
 ### A5. Quoted textual claims
 
 - [ ] p. 59: CircE's m = 1..3 results "coincide precisely with the ones obtained by CIRCUM" — this is what makes the fixtures transitively cover Browne's own program (`test-cpm_oracles.R:18-20`)
-- [ ] p. 57: communality CIs are symmetric Wald intervals on `ln(v)` (Browne, 1982) — decoded at `test-cpm_oracles.R:122-127`
+- [ ] p. 57, **as published**: "The nonsymmetric confidence intervals for the communality index estimates, ρ(x_i, c_i) (Browne, 1992, Eq. 4), are obtained from symmetric confidence intervals on ln v_ii (Browne, 1982, pp. 95–96)." The checklist's earlier paraphrase ("communality CIs are symmetric Wald intervals on ln(v)") put the symmetry on the wrong quantity; the comment at `test-cpm_oracles.R:122-127` has been reworded to the published statement. The decoding arithmetic was already correct.
 - [ ] Appendix A prints variance ratios spanning `.963–1.042` (the free-scaling model difference)
 
 ### A6. Secondary fixture — Listing 7–8 (pp. 67–68)
@@ -98,7 +121,12 @@ Asserted inline in `test-cpm_oracles.R`.
 also Browne, 1992, p. 470), used for input-refusal behavior only, so an error
 here cannot move a numeric result — verify last, or skip.
 
-- [ ] Six scale names and lower triangle: `.621 / .564 .742 / .476 .503 .577 / .394 .461 .472 .688 / .389 .411 .429 .548 .639`
+> **Re-read result (2026-07-19).** Correlations and N confirmed. **One scale
+> name was wrong:** the sixth is *ForeignLanguage*, not *ForeignLiterature*.
+> Fixed at `helper-cpm-oracles.R:61`. As anticipated, this fixture feeds
+> input-refusal behavior only, so no numeric result moved.
+
+- [ ] Six scale names — Spelling, Punctuation, Grammar, Vocabulary, Literature, **ForeignLanguage** — and lower triangle: `.621 / .564 .742 / .476 .503 .577 / .394 .461 .472 .688 / .389 .411 .429 .548 .639`
 - [ ] N = 1046
 
 ---

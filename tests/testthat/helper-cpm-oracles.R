@@ -4,7 +4,8 @@
 #
 # Published-value provenance: see the header of test-cpm_oracles.R (all
 # values transcribed 2026-07-06 from Grassi, Luccio & Di Blas, 2010, BRM
-# 42(1), 55-73; second independent human re-read pending: Jeff).
+# 42(1), 55-73; second independent human re-read of the Grassi values
+# completed 2026-07-19 by Jeff -- see that header for what it corrected).
 
 # ---- fixtures ----------------------------------------------------------------
 
@@ -29,7 +30,12 @@ cpm_oracle_voc <- function() {
        th_start = c(0, 55, 112, 123, 192, 210, 269))
 }
 
-# Appendix A (pp. 71-72), unconstrained m = 1: full-precision estimates.
+# Appendix A (pp. 70-72), unconstrained m = 1: full-precision estimates.
+# Every vector below is stored in Table-1 variable order. The Appendix prints
+# these blocks in its OWN order -- Health, Social, BusinessContact,
+# BusinessOperations, Trades, Technology, Science, i.e. ascending in its
+# mirrored angle -- so a value read off the page must be re-mapped by scale
+# before it is compared here (2026-07-19 re-read).
 cpm_oracle_voc_appendix <- function() {
   list(
     theta = c(0, 305.35328, 247.82980, 237.38218, 168.30615, 149.83787,
@@ -47,7 +53,8 @@ cpm_oracle_voc_appendix <- function() {
     null_chisq = 747.663, null_df = 21,
     tli = 0.964, cfi = 0.988, srmr = 0.04,
     var_ratios = c(0.963, 1.000, 1.042, 1.020, 0.971, 0.971, 1.031),
-    # communality indices with their 95% CIs, in Table-1 variable order
+    # communality indices rho-hat(x_i, c_i) (Browne, 1992, Eq. 4) with their
+    # 95% CIs, in Table-1 variable order
     comm = c(.93, .81, .98, .78, .80, .94, .83),
     comm_ci = rbind(c(.73, .99), c(.74, .87), c(.87, 1), c(.71, .84),
                     c(.74, .86), c(.87, .97), c(.74, .90))
@@ -58,7 +65,7 @@ cpm_oracle_voc_appendix <- function() {
 # 1992, p. 470), N = 1046 (Listing 8). Used for input-refusal behavior only.
 cpm_oracle_verbal <- function() {
   nm <- c("Spelling", "Punctuation", "Grammar", "Vocabulary", "Literature",
-          "ForeignLiterature")
+          "ForeignLanguage")
   R <- matrix(0, 6, 6, dimnames = list(nm, nm))
   R[lower.tri(R)] <- c(
     .621, .564, .476, .394, .389,
