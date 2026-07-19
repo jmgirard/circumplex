@@ -1,10 +1,11 @@
 # browne1992a — the RMSEA cutoffs the structure note reports against
 
-**Citekey trap.** This page is Browne **& Cudeck**. The neighbouring
-`browne1992.md` is Browne **alone** (the CPM paper, *Psychometrika* 57(4)).
-The `a` suffix in this citekey marks a **different author set**, not a second
-work by the same author — the usual reading of an alphabetical suffix. Both
-pages say so, in both directions.
+**Citekey trap.** This page is Browne **& Cudeck**. The citekey `browne1992`
+— no suffix — belongs to Browne **alone** (the CPM paper, *Psychometrika*
+57(4) 469–497). The `a` suffix here marks a **different author set**, not a
+second work by the same author, which is how an alphabetical suffix normally
+reads. `browne1992.md` does **not exist yet**: it is owed by M42, which is
+responsible for carrying the reciprocal warning on it — observed 2026-07-19.
 
 **Provenance.** Ingested 2026-07-19 by M41 from
 `cairn/references/sources/browne1992a.pdf` (gitignored).
@@ -24,10 +25,17 @@ edition the package's `@references` cite. It is named here **neutrally**, never
 as "reprinted in": see Open questions, where the relationship is recorded as
 established in structure but unestablished in text.
 
-**Role.** The source of the two RMSEA thresholds the package hard-codes for
-the structure-note wording of `summary.circumplex_ci_accuracy()`. Those
-constants gate **wording only, never estimation**
-(`R/ssm_ci_accuracy.R:1014-1023`).
+**Role.** This source reaches the package on **two** paths, and they differ in
+kind — conflating them is easy and was the substantive defect M41's review
+caught.
+
+1. **Wording.** The two RMSEA thresholds hard-coded for the structure-note
+   wording of `summary.circumplex_ci_accuracy()`. These gate **wording only,
+   never estimation** (`R/ssm_ci_accuracy.R:1014-1023`).
+2. **Estimation.** `cpm_fit()` computes the RMSEA point estimate and its 90%
+   interval **natively**, by this paper's eqs. 13 and 14 — see "The RMSEA
+   estimator" below. This is a live numeric dependency on the source, not a
+   citation, and the code carries no attribution to it.
 
 ## Extracted values
 
@@ -82,16 +90,53 @@ page; no numeral differed between channels.
 - `pdftotext` loses the **italics on "close fit"**, which the print carries.
   The italics matter: they mark it as the term being defined.
 
+### The RMSEA estimator — eq. 13 (p. 239) and eq. 14 (p. 240)
+
+`cpm_fit()` implements both of these directly. They are banked here verbatim
+so a future change to that code has a published form to check against.
+
+- **Eq. 13, p. 239** — the point estimate:
+
+  ε̂ₐ = √(F̂₀ / d) = √( Max{ (F̂/d − 1/n), 0 } )
+
+  Implemented at `R/cpm_fit.R:1049` as
+  `rmsea <- sqrt(max(Fhat / df - 1 / n, 0))`. The `Max{·, 0}` truncation and
+  the `− 1/n` correction are both the equation's, not the implementation's.
+
+- **Eq. 14, p. 240** — the 90% confidence interval:
+
+  (ε̂ₐL ; ε̂ₐU) = ( √( λ̂L / (n d) ) ; √( λ̂U / (n d) ) )
+
+  where λ̂L and λ̂U are the noncentrality parameters obtained by inverting the
+  noncentral chi-square. Implemented at `R/cpm_fit.R:1011-1028`
+  (`cpm_rmsea_ci()`), whose closing line
+  `c(sqrt(lambda_l / (n * df)), sqrt(lambda_u / (n * df)))` is eq. 14 term for
+  term, with λ̂ found by `uniroot` on `pchisq(Tstat, df, ncp = λ)`.
+
+**A documented property of eq. 14 the code relies on**, p. 240: "If the lower
+limit of the confidence interval is zero, the test, based on n × F̂, of the
+null hypothesis of exact fit in equation 4 would *not reject* the null
+hypothesis at the 5% level." `cpm_rmsea_ci()`'s `if (lower_fun(0) < 0) 0`
+branch is what produces that zero lower limit.
+
 ### Not extracted
 
-The paper's substantive contribution — the RMSEA point estimate (eq. 13,
-p. 239), its 90% confidence interval (eq. 14), and the test of close fit
-(eq. 15, pp. 240–241) — is **not** transcribed here, because nothing in the
-repo computes them: RMSEA reaches the package through `lavaan` and `CircE`,
-and only the cutoffs above are ours. A milestone that ever computes an RMSEA
-interval directly must extend this page rather than assume it is complete.
+The **test of close fit** (eq. 15, pp. 240–241) and its exceedance probability
+are not transcribed here: nothing in the repo computes a close-fit test —
+verified by grep over `R/` for a close-fit statistic or p-value, which returns
+nothing — observed 2026-07-19. A milestone that adds one must extend this page
+rather than assume it is complete.
 
 ## Traces to
+
+**Estimation path** (eqs. 13–14; no attribution in the code — a corrector
+changing any of these lines is changing an implementation of this paper):
+
+- `R/cpm_fit.R:1049` — eq. 13, the RMSEA point estimate.
+- `R/cpm_fit.R:1011-1028` — eq. 14, `cpm_rmsea_ci()`, the 90% interval.
+- `R/cpm_oop.R:40-42,183-185` — where that estimate and interval are printed.
+
+**Wording path** (the cutoffs):
 
 - `R/ssm_ci_accuracy.R:1014-1023` — the comment attributing these cutoffs, and
   the constants `ssm_ci_rmsea_reasonable <- 0.08` and
