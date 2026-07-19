@@ -1,6 +1,6 @@
 # M42: Source notes for the CPM model and its communality CIs
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M40
 - **Principles touched:** —
