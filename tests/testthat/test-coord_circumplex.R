@@ -264,3 +264,216 @@ test_that("the rim ring renders on an unround amax", {
     ggcircumplex(octants(), labels = PANO(), amax = 1.75)
   )
 })
+
+# --- M39: the amplitude labels carry a backdrop so data cannot swallow them ---
+
+# Pull the panel's foreground grob (the last panel child; the radial axis is a
+# FOREGROUND guide, which is why the labels were already on top of the data and
+# the defect was contrast rather than draw order) and return the amplitude-axis
+# text grob alongside the backdrop drawn behind it. Located by name and by
+# label-set rather than by index: M32 established that these grobs are nested in
+# unnamed gTrees, so a positional path into them is not stable, and the theta
+# (spoke) labels sit in a sibling subtree that M39 deliberately leaves alone.
+axis_label_parts <- function(p) {
+  panel <- ggplot2::ggplotGrob(p)
+  panel <- panel$grobs[[which(panel$layout$name == "panel")]]
+  found <- list(text = NULL, backdrop = NULL)
+  walk <- function(g) {
+    if (inherits(g, "text") && !any(grepl("°", as.character(g$label)))) {
+      found$text <<- g
+    }
+    if (identical(g$name, "circumplex-label-backdrop")) found$backdrop <<- g
+    kids <- if (inherits(g, "gtable")) g$grobs else g$children
+    for (k in kids) walk(k)
+  }
+  walk(panel)
+  found
+}
+
+test_that("the amplitude labels are drawn over a backdrop (M39 T2)", {
+  parts <- axis_label_parts(ggcircumplex(octants(), amax = 0.8))
+
+  # The labels themselves are unchanged: still one vectorized text grob.
+  expect_false(is.null(parts$text))
+  expect_equal(as.character(parts$text$label), c("0.0", "0.2", "0.4", "0.6", "0.8"))
+
+  # A backdrop exists, carrying one plate per label rather than one for all.
+  expect_false(is.null(parts$backdrop))
+  expect_length(parts$backdrop$children, length(parts$text$label))
+  for (plate in parts$backdrop$children) expect_s3_class(plate, "rect")
+
+  # Semi-transparent fill and no border, so the data underneath stays visible.
+  for (plate in parts$backdrop$children) {
+    expect_identical(plate$gp$col, NA)
+    expect_match(plate$gp$fill, "^#FFFFFF", ignore.case = TRUE)
+    expect_false(identical(toupper(plate$gp$fill), "#FFFFFFFF")) # not opaque
+  }
+})
+
+test_that("each plate is rotated onto its own label (M39 T2)", {
+  # The regression this exists for: the radial axis sits at an angle and every
+  # label is turned about its own anchor to stay readable, but rectGrob has no
+  # rotation. A first implementation shared the labels' x/y and still drew the
+  # plates axis-aligned, so they slid off the text -- and every structural
+  # assertion above still passed. Only rendering exposed it. Fence the rotation
+  # and the per-label anchor directly so it cannot come back silently.
+  parts <- axis_label_parts(ggcircumplex(octants(), amax = 0.8))
+  rot <- parts$text$rot
+  expect_true(rot != 0) # precondition: the labels really are rotated here
+
+  anchors_x <- character(0)
+  for (plate in parts$backdrop$children) {
+    expect_false(is.null(plate$vp))
+    expect_equal(plate$vp$angle, rot)
+    anchors_x <- c(anchors_x, format(plate$vp$y))
+  }
+  # Each plate is anchored at its own label's position, not all at one point.
+  expect_equal(length(unique(anchors_x)), length(parts$text$label))
+
+  # The plates inherit the label font, so their size measures the text as drawn
+  # rather than at the device default.
+  for (plate in parts$backdrop$children) {
+    expect_equal(plate$gp$fontsize, parts$text$gp$fontsize)
+  }
+})
+
+test_that("the backdrop tracks a relocated axis (M39 T2)", {
+  # r_axis_angle (M32) moves the axis, which changes the label rotation; the
+  # plates must follow it rather than keep the default placement's angle.
+  p <- ggplot2::ggplot() +
+    coord_circumplex(amax = 0.8, r_axis_angle = 200) +
+    ggplot2::geom_blank(
+      data = data.frame(.x = c(0, 360), .y = c(0, 0.8)),
+      mapping = ggplot2::aes(x = .data$.x, y = .data$.y), inherit.aes = FALSE
+    ) +
+    ggplot2::scale_x_continuous(breaks = octants())
+  moved <- axis_label_parts(p)
+  expect_false(is.null(moved$backdrop))
+  expect_length(moved$backdrop$children, length(moved$text$label))
+  for (plate in moved$backdrop$children) {
+    expect_equal(plate$vp$angle, moved$text$rot)
+  }
+  # And that really is a different angle from the default placement.
+  default_rot <- axis_label_parts(ggcircumplex(octants(), amax = 0.8))$text$rot
+  expect_false(isTRUE(all.equal(moved$text$rot, default_rot)))
+})
+
+test_that("the rim's blank label gets no plate (M39 T2)", {
+  # M38 appends the rim break with a blank label. A plate behind an empty string
+  # would be a stray floating rectangle, so the count follows the non-empty
+  # labels, not the break count.
+  parts <- axis_label_parts(ggcircumplex(octants(), amax = 1.75))
+  labels <- as.character(parts$text$label)
+  # amax 1.75 is not a generated break, so M38 appends the rim with a blank
+  # label -- the precondition this test depends on, asserted rather than assumed.
+  expect_true(any(labels == ""))
+  expect_length(parts$backdrop$children, sum(labels != ""))
+})
+
+test_that("an amplitude label over a dark mark stays legible (M39 T4)", {
+  # The defect M39 fixes is a CONTRAST failure, and no existing canvas baseline
+  # could see it: every one of them draws the labels over empty panel. This
+  # baseline puts a large dark marker and a heavy arrowhead exactly where the
+  # amplitude labels fall -- the `advanced-visualization.Rmd` situation reduced
+  # to a fixture -- so the plates are the only thing keeping the labels
+  # readable, and removing them moves this image.
+  skip_on_ci()
+  # amax 0.8 puts labels at 0.2/0.4/0.6; the path runs straight through them.
+  marks <- data.frame(a = c(0.2, 0.4, 0.6, 0.8), d = rep(22.5, 4))
+  vdiffr::expect_doppelganger(
+    "amplitude labels over dark marks",
+    ggcircumplex(octants(), amax = 0.8) +
+      geom_ssm_point(
+        data = marks,
+        mapping = ggplot2::aes(amplitude = .data$a, displacement = .data$d),
+        fill = "grey10", size = 9
+      ) +
+      geom_ssm_path(
+        data = marks,
+        mapping = ggplot2::aes(amplitude = .data$a, displacement = .data$d),
+        arrow = grid::arrow(length = grid::unit(0.3, "inches"), type = "closed"),
+        linewidth = 1.4
+      )
+  )
+})
+
+test_that("plate extent and padding offset are fenced structurally (M39 F4)", {
+  # Review found the structural fence covered rotation and anchor but NOT size
+  # or offset: a plate hardcoded to 30x30pt, or one with the padding re-centring
+  # dropped, passed everything here and failed only the two vdiffr baselines --
+  # both `skip_on_ci()`, so on CI those regressions went green. Fence the extent
+  # and the offset directly so the guard does not depend on a skipped snapshot.
+  parts <- axis_label_parts(ggcircumplex(octants(), amax = 0.8))
+  for (plate in parts$backdrop$children) {
+    # Size derives from the measured label, not a constant: the unit is a sum
+    # carrying a grob-measurement term, so a fixed-size plate cannot satisfy it.
+    for (dim in list(plate$width, plate$height)) {
+      expect_true(inherits(dim, "unit"))
+      expect_match(
+        paste(as.character(dim), collapse = " "), "grobwidth|grobheight",
+        ignore.case = TRUE
+      )
+    }
+    # The anchor carries the padding correction that re-centres the wider plate
+    # on its label. hjust/vjust are 0/1 here, so the offsets are -1pt and +1pt;
+    # dropping the correction leaves a bare 0.5npc with no "pt" term.
+    expect_match(paste(as.character(plate$x), collapse = " "), "pt|points")
+    expect_match(paste(as.character(plate$y), collapse = " "), "pt|points")
+  }
+})
+
+test_that("spoke labels are never plated, even when they read like amplitudes (M39 F2)", {
+  # Review reproduction: the walk matched on label text alone, so a caller whose
+  # THETA labels happen to equal the amplitude labels got plates behind both --
+  # and the theta guide is traversed first. The spoke labels are explicitly Out
+  # of this milestone's scope, so this must plate the amplitude axis only.
+  p <- ggplot2::ggplot() +
+    coord_circumplex(amax = 0.8) +
+    ggplot2::geom_blank(
+      data = data.frame(.x = c(0, 360), .y = c(0, 0.8)),
+      mapping = ggplot2::aes(x = .data$.x, y = .data$.y), inherit.aes = FALSE
+    ) +
+    ggplot2::scale_x_continuous(
+      breaks = c(72, 144, 216, 288, 360),
+      labels = c("0.0", "0.2", "0.4", "0.6", "0.8")
+    )
+  panel <- ggplot2::ggplotGrob(p)
+  panel <- panel$grobs[[which(panel$layout$name == "panel")]]
+  n <- 0L
+  walk <- function(g) {
+    if (identical(g$name, "circumplex-label-backdrop")) n <<- n + 1L
+    kids <- if (inherits(g, "gtable")) g$grobs else g$children
+    for (k in kids) walk(k)
+  }
+  walk(panel)
+  # Exactly one backdrop group: the amplitude axis. Two would mean the spoke
+  # labels were plated too.
+  expect_equal(n, 1L)
+})
+
+test_that("a plotmath label is measured as drawn, not as its source text (M39 F3)", {
+  # Review found `as.character()` deparsed an expression, so the plate was sized
+  # to the string "gamma^2" rather than to the single rendered glyph -- several
+  # times too wide, and vertically offset by the superscript. The plate must be
+  # measured from the label itself.
+  p <- ggplot2::ggplot() +
+    coord_circumplex(amax = 0.8) +
+    ggplot2::geom_blank(
+      data = data.frame(.x = c(0, 360), .y = c(0, 0.8)),
+      mapping = ggplot2::aes(x = .data$.x, y = .data$.y), inherit.aes = FALSE
+    ) +
+    ggplot2::scale_x_continuous(breaks = octants()) +
+    ggplot2::scale_y_continuous(
+      breaks = c(0, 0.2, 0.4, 0.6, 0.8),
+      labels = parse(text = c("alpha", "beta[max]", "gamma^2", "delta", "epsilon"))
+    )
+  parts <- axis_label_parts(p)
+  expect_false(is.null(parts$backdrop))
+  # Measurement is grob-based, so plotmath is measured rendered rather than
+  # deparsed; a stringWidth() implementation would carry "strwidth" instead.
+  for (plate in parts$backdrop$children) {
+    w <- paste(as.character(plate$width), collapse = " ")
+    expect_match(w, "grobwidth", ignore.case = TRUE)
+    expect_false(grepl("strwidth", w, ignore.case = TRUE))
+  }
+})

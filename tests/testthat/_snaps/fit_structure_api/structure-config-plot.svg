@@ -57,6 +57,11 @@
 <text x='397.11' y='517.45' text-anchor='middle' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='14.41px' lengthAdjust='spacingAndGlyphs'>NO</text>
 <text x='538.29' y='379.65' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='12.81px' lengthAdjust='spacingAndGlyphs'>PA</text>
 <text x='552.66' y='301.31' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>BC</text>
+<rect x='330.26' y='288.59' width='20.68' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
+<rect x='301.77' y='242.10' width='20.68' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
+<rect x='273.29' y='195.62' width='20.68' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
+<rect x='244.80' y='149.14' width='20.68' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
+<rect x='216.32' y='102.65' width='20.68' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
 <text x='331.25' y='296.19' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.00</text>
 <text x='302.77' y='249.71' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.25</text>
 <text x='274.28' y='203.22' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>0.50</text>

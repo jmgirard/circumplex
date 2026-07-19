@@ -52,6 +52,12 @@
 <text x='515.09' y='461.08' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='19.86px' lengthAdjust='spacingAndGlyphs'>315°</text>
 <text x='583.45' y='300.74' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='19.86px' lengthAdjust='spacingAndGlyphs'>360°</text>
 <text x='515.87' y='140.41' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='14.52px' lengthAdjust='spacingAndGlyphs'>45°</text>
+<rect x='359.92' y='298.65' width='15.34' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
+<rect x='400.21' y='281.96' width='15.34' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
+<rect x='440.51' y='265.27' width='15.34' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
+<rect x='480.80' y='248.58' width='15.34' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
+<rect x='521.09' y='231.89' width='15.34' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
+<rect x='561.39' y='215.20' width='15.34' height='8.60' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF; fill-opacity: 0.75;' />
 <text x='360.92' y='306.25' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>0.0</text>
 <text x='401.21' y='289.56' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>0.1</text>
 <text x='441.50' y='272.87' style='font-size: 9.60px; fill: #4D4D4D; font-family: sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>0.2</text>
