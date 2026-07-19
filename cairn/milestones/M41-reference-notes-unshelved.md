@@ -1,10 +1,10 @@
 # M41: Source notes for the fit-index benchmark pair
 
-- **Status:** planned
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M40
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m41-reference-notes-benchmarks` · https://github.com/jmgirard/circumplex/pull/67
 
 ## Goal
 
@@ -58,27 +58,34 @@ Cudeck (1993). Editing the `devel/` transcriptions → after M7 archives
 
 ## Acceptance criteria
 
-- [ ] `cairn/references/browne1992a.md` exists carrying every template
+- [x] `cairn/references/browne1992a.md` exists carrying every template
       section, with each extracted value page- or table-anchored; the 1992 SMR
       article is its anchor edition and the 1993 chapter is named neutrally
       ("also appears as ch. 6, pp. 136–162"), never as a reprint.
-- [ ] Both RMSEA cutoff sentences are quoted verbatim anchored at 1992 p. 239.
-      The .05 sentence's chapter anchor is recorded as p. 144 with its Google
-      Books provenance; the .08 sentence's chapter page is recorded as
+- [x] The p. 239 passage is quoted verbatim carrying all three of its
+      thresholds (0.05 close fit, 0.08 reasonable error of approximation,
+      and "greater than 0.1" would-not-employ), anchored by the printed
+      running head rather than inferred from the 238/240 markers. The .05
+      sentence's chapter anchor is recorded as p. 144 with its Google Books
+      provenance; the .08/0.1 sentence's chapter page is recorded as
       **unverified and not derived**, with the −94 offset trap stated (the
-      arithmetic predicts chapter p. 145; the real page is 144).
-- [ ] `cairn/references/hu1999.md` exists carrying every template section,
+      arithmetic predicts chapter p. 145; the real page is 144). The page
+      also records two things the repo's own wording smooths over: the
+      source prints **0.1**, not `.10`, and it states a preference ("would
+      not want to employ") rather than the "fits poorly" verdict at
+      `R/ssm_ci_oop.R:340` and `vignettes/evaluating-circumplex-structure.Rmd:93`.
+- [x] `cairn/references/hu1999.md` exists carrying every template section,
       with every cutoff the repo cites (SRMR, CFI, TLI) quoted verbatim and
       page-anchored.
-- [ ] Each page's `Extraction:` status is one physical line stating its real
+- [x] Each page's `Extraction:` status is one physical line stating its real
       per-channel standing — never a verification a channel did not perform
       (M40) — and each page's `Traces to` names the specific citing lines
       listed in Scope, verified against the files.
-- [ ] `INDEX.md` carries one line per new page with the **filename** as link
+- [x] `INDEX.md` carries one line per new page with the **filename** as link
       text (M40), plus a dated note recording that `sources/cheung2002.pdf` is
       shelved and owes no page; `cairn_validate` reports
       `references index<->disk` PASS with no `references staleness` WARN.
-- [ ] `git diff --stat devel/` is empty, no file outside `cairn/` is modified,
+- [x] `git diff --stat devel/` is empty, no file outside `cairn/` is modified,
       and each written page's tail bytes are checked for leaked tool-call
       scaffolding (M34).
 
@@ -93,20 +100,24 @@ Cudeck (1993). Editing the `devel/` transcriptions → after M7 archives
 
 ## Tasks
 
-- [ ] T1. Re-verify `browne1992a.pdf` and `hu1999.pdf` on the shelf and stamp
+- [x] T1. Re-verify `browne1992a.pdf` and `hu1999.pdf` on the shelf and stamp
       the observation — the shelf is live and moved twice during M40, so
       confirm rather than trust this plan's inventory.
-- [ ] T2. Author `browne1992a.md`: two-channel read of p. 239, the
+- [x] T2. Author `browne1992a.md`: two-channel read of p. 239, the
       edition-relationship record carried over from the work log, and the
       offset trap.
-- [ ] T3. Author `hu1999.md`: two-channel read of the cutoffs the repo cites.
-- [ ] T4. Write both pages' `Traces to` sections against the actual citing
+- [x] T3. Author `hu1999.md`: two-channel read of the cutoffs the repo cites.
+- [x] T4. Write both pages' `Traces to` sections against the actual citing
       lines, not this plan's list.
-- [ ] T5. `INDEX.md` entries + the dated `cheung2002.pdf` no-page-owed note;
+- [x] T5. `INDEX.md` entries + the dated `cheung2002.pdf` no-page-owed note;
       `cairn_validate` clean; tail-byte and untouched-tree checks.
 
 ## Work log
 
+- 2026-07-19: all tasks done, status → review. The profile's `verify` slot did not fire: it is conditional on roxygen changes (`document()`) or code changes (`devtools::test()`), and the branch diff is `cairn/` markdown only — 0 files outside `cairn/`, matching M40's docs-only precedent.
+- 2026-07-19: **T1-T5 done; both pages authored and validated.** T1 re-verified the shelf: `browne1992a.pdf` and `hu1999.pdf` both present, identified by first-page read rather than filename, with printed-page locations established from running heads (Browne & Cudeck printed 239 = PDF p. 10; Hu & Bentler PDF page n = printed page n) — observed 2026-07-19. T2/T3 authored both pages against M41-D1's two channels. T4 verified every `Traces to` anchor against the files, correcting one asserted line range (`R/ssm_ci_accuracy.R` comment starts at 1014, not 1015). T5: `INDEX.md` gained both entries plus a corrected owes-no-page ledger now covering acton2002, cudeck1983 and cheung2002; `cairn_validate` reports `references index<->disk` PASS and `references staleness` OK; `git diff --stat devel/` empty, nothing modified outside `cairn/`, and both pages' tail bytes checked clean (M34).
+- 2026-07-19: **substantive amendment to AC2, at the implementation question gate.** The plan described "both RMSEA cutoff sentences" as the .05 and .08 sentences. Reading p. 239 shows one continuous passage carrying **three** thresholds, and the two the package actually ships are **.08 and 0.1** (`ssm_ci_rmsea_reasonable`, `ssm_ci_rmsea_poor`) — the .05 is the one with the verified 1993 chapter anchor but is used nowhere. AC2 now covers all three verbatim and additionally requires the page to record two departures the repo's own wording makes: the source prints `0.1` not `.10`, and states a preference ("would not want to employ") where the package says "fits poorly". Jeff chose this amendment at the gate over leaving AC2 as planned.
+- 2026-07-19: two between-channel discrepancies found and recorded on `browne1992a.md`, both text-layer defects resolved in favour of the rendered page: `pdftotext` emits "RMSEAgreater" as one word, and drops the italics the print carries on "close fit". No numeral differed between channels on either page. Also recorded on `hu1999.md`: Hu & Bentler's own RMSEA cutoff is **.06**, not the .08/.10 the package ships from Browne & Cudeck — the repo's attribution is correct, but the two pages are cited in the same sentences and the confusion is one page-read away.
 - 2026-07-19: **re-sized at the plan gate its own `Out:` clause called for.** The shelf inventory M41's T1 was to perform is done here — all seven sources are present, identified by first-page read, and recorded in the M42/M43 plans alongside this one. Seven notes plus a full CPM specification is three milestones' work against M40's demonstrated throughput of two notes, so M41 narrows to the fit-benchmark pair and keeps its ID because this work log is entirely about the Browne & Cudeck edition question; Browne (1992) + Browne (1982) → M42, Acton & Revelle + Wendt → M43. Two Scope corrections: **Cheung & Rensvold has no shipped reliance** (zero hits across `R/`, `vignettes/`, `tests/`; the ΔCFI offer at `devel/m5-sem-design.md:751-759` was never taken up, and its own caveats exclude the robust estimators `ssm_sem()` defaults to), so it owes no page and the ΔCFI feature question becomes a candidate row; and `browne1982_pp95-96.pdf` has replaced the four page images, which `grassi2010.md:137` still names — M42 corrects that in place.
 - 2026-07-19: **Browne & Cudeck edition question CLOSED for T3 — do not reopen without the physical book.** Established by web research: SMR **21(2), Nov 1992** was a special issue edited by Bollen & Long (their own "Tests for Structural Equation Models" is article 1, DOI 10.1177/0049124192021002001), and the 1993 Sage volume is its book version — same editors, same papers, contiguous journal pagination (Bollen & Stine 205-229 immediately precedes Browne & Cudeck 230-258), and a matching TOC order with "Alternative Ways of Assessing Model Fit" sixth. **Whether the chapters are VERBATIM reprints is unresolved and stays unasserted**: the only claim found either way is an anonymous Amazon customer review ("the text is not identical") reaching us through a search-engine paraphrase, which contradicts Jeff's Google Books spot-check that the visible pages look identical; the book's preface, which would state the relationship outright, is omitted from the Google Books preview — observed 2026-07-19. **T3 therefore cites Browne & Cudeck (1992), SMR 21(2) 230-258, anchored p. 239** (both cutoff sentences, bracketed by the printed 238/240 markers, verified by pdftotext + Jeff's read) — the original publication, on the shelf, and re-readable. The chapter is named on the page NEUTRALLY ("also appears as ch. 6, pp. 136-162"), never as "Reprinted in", because verbatim-ness is exactly what we could not establish. Chapter anchor for the .05 sentence is p. 144 (Jeff, Google Books); the .08 sentence's chapter page was never verified and is not derived — the -94 offset predicts 145 against an actual 144.
 - 2026-07-19: **supersedes the previous entry's T3 recommendation.** Jeff located the cutoff sentence in the 1993 chapter via Google Books: **chapter p. 144** carries "a value of the RMSEA of about 0.05 or less would indicate a close fit…". That removes the only reason to change the shipped citation — the 1993 now has a verified page anchor of its own — so **T3 keeps `R/ssm_ci_oop.R:415` citing Browne & Cudeck (1993)** and no package code changes. The 1992 article remains the shelved, re-readable companion: its p. 239 carries **both** cutoff sentences, now bracketed by the printed 238 and 240 page markers rather than inferred from one side. Two things the source note must record: the **.08 sentence's chapter page is still unverified** (~5 lines after the .05 sentence in the article, so probably also 144 — not banked), and the derived-offset trap is now demonstrated rather than hypothetical: article p. 239 − 94 predicts chapter p. 145, but the real page is **144**, so the arithmetic would have shipped a wrong number that read like a checked one.
@@ -116,4 +127,108 @@ Cudeck (1993). Editing the `devel/` transcriptions → after M7 archives
 
 ## Decisions
 
+- **M41-D1 (2026-07-19): channel 2 is Claude reading rendered page images, not a human attestation.**
+  M40's two channels were `pdftotext -layout` plus Jeff's own read. Here the
+  second channel is a visual read of `pdftoppm`-rendered page images by the
+  implementing session. It is genuinely independent of the text layer — the
+  OCR artifact "RMSEAgreater" in the pdftotext output is exactly the class of
+  error it catches — but it is **not** a human attestation, and no
+  `Extraction:` status on either page may imply one. M40's lesson stands: a
+  status is scoped to what each channel actually saw.
+
 ## Review
+
+Reviewed 2026-07-19. PR #67.
+
+### Acceptance-criteria evidence
+
+- **AC1** — `cairn/references/browne1992a.md` exists; all template sections
+  present (`Provenance`/`Citation`/`Role` blocks + `## Extracted values`,
+  `## Traces to`, `## Open questions`), checked by grep. The 1992 SMR article
+  is the anchor edition; the 1993 chapter appears as "also appears as chapter
+  6, pp. 136–162", never as a reprint. The diff-bug reviewer independently
+  confirmed the masthead ("Vol. 21, No. 2, November 1992 230-258") and that
+  pp. 136–162 is corroborated by Hu & Bentler's own reference list.
+- **AC2** — the p. 239 passage is quoted verbatim and machine-verified: a
+  normalized substring comparison against `pdftotext -f 10 -l 10` output
+  MATCHED, with the only normalizations being the two artifacts the page
+  itself documents. All three thresholds present (0.05 / 0.08 / greater than
+  0.1). Running-head anchor confirmed (`Browne, Cudeck / ALTERNATIVES IN
+  ASSESSMENT 239`). Chapter p. 144 recorded with its Google Books provenance;
+  the .08/0.1 chapter page recorded as unverified and not derived; the −94
+  offset trap stated (predicts 145, real 144 — arithmetic independently
+  re-checked: 230−136 = 94). Both wording departures recorded (`0.1` vs `.10`;
+  "would not want to employ" vs "fits poorly").
+- **AC3** — `cairn/references/hu1999.md` exists with all template sections.
+  All three abstract quotes machine-verified MATCH against `pdftotext -f 1
+  -l 1`. Every cutoff the repo cites is quoted verbatim and anchored to p. 1;
+  pagination basis confirmed at PDF p. 28 (running head reads 28).
+- **AC4** — `Extraction:` is one physical line on both pages (lines 15 and 8;
+  the following line is empty in each), carries a verification verb, a date,
+  and an explicit disclaimer that channel 2 is not a human attestation
+  (M41-D1). Every `Traces to` anchor was opened and checked; three were
+  corrected during review (see findings).
+- **AC5** — `INDEX.md` carries one line per page with the filename as link
+  text (all four entries checked). The dated `cheung2002.pdf` no-page-owed
+  note is present with its reason. `cairn_validate` exit 0: 15/15 PASS
+  including `references index<->disk`; `references staleness` OK, no WARN.
+- **AC6** — `git diff --stat master..HEAD -- devel/` empty; 0 files outside
+  `cairn/` in the branch diff (5 files, all under `cairn/`); tail bytes of
+  both pages end `— observed 2026-07-19.` with no leaked scaffolding (M34).
+
+### Consistency gate
+
+- Universal: `cairn_validate` exit 0, 15/15 PASS (re-run after fixes). Two
+  advisory WARNs, both pre-existing and untouched by this milestone —
+  `record density` on LESSONS.md and 47 `work-log format` wraps, all in M7.
+- `cairn_impact`: skipped, no principle changed (`Principles touched: —`).
+- Toolchain (`consistency-gate` slot): `devtools::check(args="--no-manual")`
+  → **Status: OK**, 0 errors / 0 warnings / 0 notes. No roxygen and no R file
+  changed, so `document()` no-diff and the generated-file rules are trivially
+  satisfied and the PDF-manual surface is untouched. No NEWS entry: the
+  milestone has no user-visible change. `cairn/` is already in
+  `.Rbuildignore` (`^cairn$`), so the new files add no check NOTE.
+
+### Independent review — three lenses + scorer
+
+- **[O] diff-bug (Opus):** 4 findings. Independently verified both pages'
+  quotes character-exact, re-rendered p. 239 to confirm both between-channel
+  discrepancy claims are real, and confirmed the offset arithmetic.
+- **[S] blame-history (Sonnet):** no findings. Confirmed none of M40's three
+  review defects recurred, and that the `INDEX.md` rewrite dropped no M40
+  caveat in substance.
+- **[S] prior-PR-comments (Sonnet):** no prior-PR evidence — scanned all 44
+  merged PRs; only #13 and #18 ever carried comments, neither touching any
+  file in this diff. Confirms the standing LESSONS calibration (M33) rather
+  than assuming it.
+
+**Actioned (scored ≥ 80):**
+
+- **F1 (95) — FIXED.** `browne1992a.md` claimed eqs. 13/14/15 were not
+  transcribed "because nothing in the repo computes them: RMSEA reaches the
+  package through `lavaan` and `CircE`". False: `R/cpm_fit.R:1049` computes
+  eq. 13 (`sqrt(max(Fhat/df - 1/n, 0))`) and `R/cpm_fit.R:1011-1028`
+  computes eq. 14 by noncentral chi-square inversion, neither carrying any
+  attribution. Fixed by banking eqs. 13 and 14 verbatim (eq. 14 read from
+  p. 240, running head confirmed), splitting `Role` into a wording path and
+  an estimation path, adding the estimation anchors to `Traces to`, and
+  narrowing "Not extracted" to eq. 15 only — which grep confirms is genuinely
+  not computed.
+- **F2 (85) — FIXED.** The citekey-trap block asserted "Both pages say so, in
+  both directions" when `browne1992.md` does not exist. Rewritten to state
+  that it is owed by M42, which carries the reciprocal warning, with an
+  `— observed` stamp.
+
+**Logged, below the 80 threshold, not actioned as such (IP3):**
+
+- **F3 (78)** — `hu1999.md` anchored `R/cpm_oop.R:44` as printing CFI and TLI;
+  line 44 prints CFI only. **Fixed anyway**: the scorer's own justification
+  calls it "a real, verifiable citation inaccuracy", confirmed here by
+  command, and the correction is one line. Recorded as a deliberate departure
+  from the threshold rather than a silent one.
+- **F4 (63)** — undated repo-state claims in body prose (as distinct from the
+  correctly dated Open questions). Not actioned as a class; the scorer noted
+  the sibling M40 pages do not uniformly date body prose either, so applying
+  it here alone would create an inconsistency. The one instance that was
+  materially false is F1 and is fixed and dated. Left for a future
+  convention-wide pass if the repo wants one.
