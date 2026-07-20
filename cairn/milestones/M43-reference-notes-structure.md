@@ -4,7 +4,7 @@
 - **Priority:** normal
 - **Depends on:** M40
 - **Principles touched:** —
-- **Branch/PR:** `m43-reference-notes-structure`
+- **Branch/PR:** `m43-reference-notes-structure` · https://github.com/jmgirard/circumplex/pull/69
 
 ## Goal
 
@@ -52,26 +52,26 @@ prior work (`INDEX.md`, 2026-07-19).
 
 ## Acceptance criteria
 
-- [ ] `cairn/references/acton2004.md` exists carrying every template section,
+- [x] `cairn/references/acton2004.md` exists carrying every template section,
       with each implemented criterion's formula and cutoff page-, equation-,
       or table-anchored.
-- [ ] The page records the Eq. 6 discrepancy **as the paper prints it** and
+- [x] The page records the Eq. 6 discrepancy **as the paper prints it** and
       records the repo's resolution at `R/fit_structure.R:332-333` separately,
       such that a reader can tell the printed form from the shipped form from
       the page alone.
-- [ ] The page records the cutoff calibration basis — Acton & Revelle
+- [x] The page records the cutoff calibration basis — Acton & Revelle
       calibrated at nv = 64/128 variables (`R/fit_structure.R:233`) — with its
       own anchor, so a reader can see what the shipped cutoffs were
       calibrated at and at what scale count the repo applies them.
-- [ ] `cairn/references/wendt2019.md` exists carrying every template section,
+- [x] `cairn/references/wendt2019.md` exists carrying every template section,
       with each of the four vignette-cited claims quoted or table-anchored,
       and the reconciliation against `devel/m5-wendt-discrepancies.md`
       recorded — any disagreement stated, never silently resolved.
-- [ ] Each page's `Extraction:` status is one physical line stating its real
+- [x] Each page's `Extraction:` status is one physical line stating its real
       per-channel standing — never a verification a channel did not perform
       (M40) — and each page's `Traces to` names the specific citing lines
       listed in Scope, verified against the files.
-- [ ] `INDEX.md` carries one line per new page with the **filename** as link
+- [x] `INDEX.md` carries one line per new page with the **filename** as link
       text (M40); `cairn_validate` reports `references index<->disk` PASS with
       no `references staleness` WARN; `git diff --stat devel/` is empty, no
       file outside `cairn/` is modified, and each written page's tail bytes
@@ -122,3 +122,21 @@ prior work (`INDEX.md`, 2026-07-19).
 ## Decisions
 
 ## Review
+
+**Reviewed 2026-07-19.** PR #69. Branch cut from and compared against `origin/master`, which had not moved (0 commits behind). Diff: 5 files, +608/−15, every file under `cairn/`.
+
+### Acceptance-criteria evidence (fresh, by command)
+
+- **AC1 — `acton2004.md` template-complete, criteria anchored.** All seven template sections present, exactly one each (grep for `# `, `**Provenance.**`, `**Citation.**`, `**Role.**`, `## Extracted values`, `## Traces to`, `## Open questions`). All four implemented criteria carry an equation *and* page anchor in the "four implemented criteria, as printed" table — Gap Eq. (2) p. 5, Fisher Eq. (6) p. 6, VT2 Eq. (8) p. 7, RT Eq. (9) p. 7 — and every published cutoff carries a page anchor (pp. 17, 19, 20) in the cutoff table.
+- **AC2 — Eq. 6 recorded both ways, separately.** The page carries a dedicated section quoting the printed equation (`X_v = Σ_f φ_fv²`, the communality) and the p. 6 prose (vector lengths `√h²`) as separate blocks, then records the repo's shipped resolution separately again. **Amended at review:** the page originally cited only `R/fit_structure.R:95-103` for the repo's resolution, while AC2 names `:332-333`; rather than read the criterion charitably, the page now cites *both* code locations and states that the explanation is duplicated in two places a corrector must keep in sync. `sed -n '332,333p'` confirms those lines carry the printed-vs-prose split verbatim.
+- **AC3 — calibration basis anchored.** `sed -n '233p' R/fit_structure.R` returns "Acton & Revelle's published cutoffs were calibrated at nv = 64/128 variables", matching the page's own p. 8 design anchor (the 2 × 2 × 2 × 2 × 3 × 2 × **2 (64 vs 128 variables)** factorial). The page additionally establishes *why* no published nv = 8 value exists — A&R announce the 8/16/32 follow-up at pp. 10 and 18 and never report its results — and carries a published-vs-shipped comparison table. **All 24 shipped constants independently re-verified at review** by reading `circumplex:::structure_cutoffs[["8"]]` from the loaded package (not the source text); every value matches the page's table.
+- **AC4 — `wendt2019.md` template-complete, four claims anchored, reconciliation recorded.** All seven template sections present, one each. Each of the four vignette claims is quoted verbatim with a page anchor (RMSEA and fit indices p. 830; g–agency and g–communion correlations p. 831) and summarized in a claims-checked table with a verdict per claim. The reconciliation against `devel/m5-wendt-discrepancies.md` records agreement and **one disagreement stated rather than settled**: its §1 gives the g–communion range as "−.034 to +.142" where p. 831 prints Sample 4 `r = −.115`.
+- **AC5 — `Extraction:` status and `Traces to` verified.** `awk` confirms exactly one `Extraction:` line per page, each a single physical line (acton2004.md line 8, 501 chars; wendt2019.md line 8, 448 chars), each carrying a verification verb and an `— observed` date, and each naming what the channels did *not* cover. All 20 distinct `path:LINE` citations across both pages checked in-range by script; the Scope-named anchors spot-verified by content (`R/fit_structure.R:722` = the p. 9 deviation-scoring citation; vignette `:44`, `:114`, `:368`, `:394` = the four Wendt claims).
+- **AC6 — index, validation, untouched tree.** Both `INDEX.md` entries use the **filename** as link text (M40's mutation-caught trap). `cairn_validate`: 15/15 checks PASS including `references index<->disk` and `coverage complete`; `references staleness` OK with **no WARN**. `git diff --stat origin/master..HEAD -- devel/` empty. No file outside `cairn/` modified, in the diff or the working tree. Whole-file scaffolding scan of both pages plus `INDEX.md` clean (M34).
+
+### Consistency gate
+
+- `cairn_validate` exit 0; 15/15 PASS. Two advisory WARNs, both pre-existing and neither M43's: the ROADMAP hygiene stamp at 2,568 chars (line 4 — replaced, not appended, in this pass, which clears it) and 47 wrapped work-log lines in M7.
+- No `DESIGN.md` principle changed (`Principles touched: —`), so `cairn_impact` is skipped by rule.
+- Profile `r-package` `consistency-gate`: `devtools::document()` produces no diff (`git status` on `man/`, `NAMESPACE`, `R/` clean). No generated file hand-edited; no `README.Rmd`, export, or top-level file touched. **No `NEWS.md` entry** — correct, not an omission: M43 changes no package file and has no user-visible surface, and the profile scopes the NEWS requirement to user-visible changes.
+- `devtools::test()` (NOT_CRAN=true): 3082 PASS / 0 FAIL / 0 SKIP / 4 pre-existing WARN — the exact M42 baseline, as an empty package diff predicts.

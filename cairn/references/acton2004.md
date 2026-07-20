@@ -106,8 +106,11 @@ not editorial: reproducing A&R's own design yields the published .10/.15
 cutoffs on the vector-length scale and roughly doubled values on the
 communality scale, so whatever their CIRC_STRUC program computed, it evidently
 computed vector lengths (as does `psych::circ.tests`). The reasoning is
-recorded at `R/fit_structure.R:95-103` and in
-`devel/ar2004-transcription.md`. The departure is deliberate and is a
+recorded **twice** in the code, and a corrector changing one copy must change
+the other: at `R/fit_structure.R:95-103` (the `structure_fisher()` header
+comment) and again at `R/fit_structure.R:332-338` (the exported wrapper's
+roxygen, which states the same printed-vs-prose split and the same
+resolution), plus `devel/ar2004-transcription.md`. The departure is deliberate and is a
 departure *in kind* from the printed equation — this page does not resolve it
 in the paper's favour or the repo's, it records that they differ.
 
