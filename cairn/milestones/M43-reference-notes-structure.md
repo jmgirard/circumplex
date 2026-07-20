@@ -91,9 +91,9 @@ prior work (`INDEX.md`, 2026-07-19).
 - [x] T1. Re-verify `acton2004.pdf` and `wendt2019.pdf` on the shelf and stamp
       the observation — the shelf is live and moved twice during M40, so
       confirm rather than trust this plan's inventory.
-- [ ] T2. Author `acton2004.md` — the four implemented criteria, their
+- [x] T2. Author `acton2004.md` — the four implemented criteria, their
       formulas and cutoffs, two channels.
-- [ ] T3. Record the Eq. 6 printed-vs-prose discrepancy and the nv = 64/128
+- [x] T3. Record the Eq. 6 printed-vs-prose discrepancy and the nv = 64/128
       calibration basis, cross-checked against `R/fit_structure.R:96,233,332-333`.
 - [ ] T4. Author `wendt2019.md` — the four vignette-cited claims, two
       channels.
@@ -109,6 +109,9 @@ prior work (`INDEX.md`, 2026-07-19).
 
 - 2026-07-19: T1 — both shelf PDFs re-verified independently of the plan's inventory. `acton2004.pdf` = *MPR Online* 9(1), 27 pp., pagination 1:1 (running heads on PDF pp. 3/5/9/13 read 3/5/9/13); `wendt2019.pdf` = *J Abnorm Psychol* 128(8) 823–839, 17 pp., PDF p. n = printed p. 822+n. Neither is an OCR scan (`pdfinfo` Producer: Acrobat Distiller from Word, and Adobe LiveCycle/XPP), so the M42-D1 trap — text layer derived from the page image, corroborating nothing — does not apply and the two channels are genuinely independent here — observed 2026-07-19.
 - 2026-07-19: implementation question gate held; all three recommendations taken. (1) `acton2004.md` records A&R's published nv = 64/128 cutoffs alongside the shipped re-derived nv = 8 constants, so the re-derivation's sanity gate stays checkable from the page. (2) RANDALL's sources (Hubert & Arabie 1987; Tracey 1997) back shipped code, are unshelved, and have no page — recorded on the page as a non-attribution and raised as a ROADMAP candidate at review rather than expanding M43. (3) `acton2004.md` reconciles against `devel/ar2004-transcription.md` read-only, symmetric with T5's treatment of Wendt.
+
+- 2026-07-19: T2/T3 — `acton2004.md` authored. Two-channel coverage on every equation (pp. 5–7, 10), every published cutoff (pp. 17, 19), and Table 2 (p. 15); prose anchors rest on the text channel, stated as such. **The text channel returns an empty line for every display equation** (Eq. 6 extracts as nothing), so the equations rest on the image channel — a silent-dropout mode, not a disagreement. Eq. 6 recorded both ways per AC2: printed `X_v = Σ_f φ_fv²` (communality) vs. the p. 6 prose describing vector lengths √h², with the repo's `sd(h)/mean(h)` resolution recorded separately. Gap/VT2/RT verified as implemented exactly as printed — RT's `sum((rl2[,1]-rl2[,2])^2/2)` **is** Eq. 9 at nf = 2. AC3 satisfied and sharpened: the published cutoffs are nv = 64/128 (p. 8 design), and **A&R announce an nv = 8/16/32 follow-up twice (pp. 10, 18) but never report its results**, which is why the repo re-derived; a side-by-side published-vs-shipped table is on the page, with the raw Gap "almost certainly" cutoff moving .01 → .35.
+- 2026-07-19: T2/T3 reconciliation against `devel/ar2004-transcription.md` (read-only, no `devel/` file touched): agreement on every point compared, including all nine published-cutoff rows. Its two recorded paper-internal errata independently confirmed (VT2 24.6 in Table 2 vs 24.5 in p. 18 prose; p. 20's MT paragraph saying "an RT value less than .06"). **A third erratum found that the prior record missed:** p. 20 gives MT's deviation-scoring effect as F(1,192) = 1,265.5, η² = .11, but Table 2 gives MT's IS × Dev cell as 1,262.5 (.11) — η² agrees, so the table is coherent and the prose digit is corrupt, plausibly contaminated by RT's genuine 1,265.6 one row up. Immaterial to the package; recorded for completeness.
 
 ## Decisions
 
