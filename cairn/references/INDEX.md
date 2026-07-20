@@ -7,6 +7,8 @@ _One line per committed page: `citekey — title — traces to`._
 - [browne1992a.md](browne1992a.md) — Browne & Cudeck (1992), *Alternative ways of assessing model fit* — the RMSEA cutoffs (0.08 reasonable, greater than 0.1 would-not-employ) AND eqs. 13/14, which `cpm_fit()` implements natively; traces to `R/cpm_fit.R:1011-1028,1049`, `R/ssm_ci_accuracy.R:1014-1023`, `R/ssm_ci_oop.R` and `vignettes/evaluating-circumplex-structure.Rmd`.
 - [browne1992.md](browne1992.md) — Browne (1992), *Circumplex models for correlation matrices* — the full specification of the CPM `cpm_fit()` estimates (eqs. 1–8, 30–48), plus a parameter map, five printed errata, and three departures the code takes from the paper; traces to `R/cpm_fit.R`, `R/cpm_oop.R:123,162`, `R/ssm_ci_accuracy.R:169-170`, `tests/testthat/helper-cpm-oracles.R` and both vignettes.
 - [browne1982.md](browne1982.md) — Browne (1982), *Covariance structures*, pp. 95–96 only — the general transform-and-invert CI method (eqs. 1.6.29–1.6.41), whose log instance the communality-CI oracle reconstructs; traces to `tests/testthat/test-cpm_oracles.R:131-137` and `cairn/references/grassi2010.md`. No `R/` estimator uses the method (the page dates and scopes that claim).
+- [acton2004.md](acton2004.md) — Acton & Revelle (2004), *Evaluation of ten psychometric criteria for circumplex structure* — the four criteria `fit_structure()` implements (Fisher eq. 6, Gap eq. 2, VT2 eq. 8, RT eq. 9), the Eq. 6 printed-vs-prose split, and the published nv = 64/128 cutoffs the shipped nv = 8 constants are **not** taken from; traces to `R/fit_structure.R`, `R/fit_structure_oop.R`, `data-raw/structure-test-cutoffs.R` and `vignettes/evaluating-circumplex-structure.Rmd`.
+- [wendt2019.md](wendt2019.md) — Wendt et al. (2019), *The latent structure of interpersonal problems* — the real-data benchmark for the fixed-angle circumplex CFA (RMSEA .075–.111, g–agency ≈ −.29 across four samples); traces to `vignettes/sem-based-ssm-analysis.Rmd:44,114,368,394-400,428`. Context for the strict tier, never an oracle.
 - [hu1999.md](hu1999.md) — Hu & Bentler (1999), *Cutoff criteria for fit indexes in covariance structure analysis* — the SRMR .08 and CFI/TLI .95 cutoffs; traces to `R/ssm_ci_accuracy.R:1023`, `R/ssm_ci_oop.R`, `R/cpm_oop.R:187-188` and `vignettes/evaluating-circumplex-structure.Rmd`.
 
 <!-- Entry format note: cairn_validate's _INDEX_LINE regex matches the first
@@ -22,12 +24,18 @@ _One line per committed page: `citekey — title — traces to`._
      2026-07-19.)
 
      Which sources still owe a page is the milestone files' ledger, not this
-     file's. As of the M42 merge the remaining sources owing a page are
-     Acton & Revelle (2004) and Wendt et al. (2019), both M43 — observed
-     2026-07-19; the Browne (1992) and Browne (1982) entries this note
-     carried after M41 are discharged. The shelf is a live directory that
-     changed twice during M40 alone, so treat any list here as a snapshot
-     and re-inventory rather than trusting it.
+     file's. As of the M43 merge every source on the shelf that the repo
+     relies on has a page — the Acton & Revelle (2004) and Wendt et al.
+     (2019) entries this note carried after M42 are discharged, as the
+     Browne (1992) and Browne (1982) ones were before them — observed
+     2026-07-19. Two sources the repo DOES rely on are not on the shelf and
+     so have no page: Hubert & Arabie (1987) and Tracey (1997), which back
+     RANDALL (`structure_randall()`, `structure_randall_test()`, cited at
+     R/fit_structure.R:714,773-778). Surfaced by M43 and carried as a
+     ROADMAP candidate; both PDFs must be shelved before a milestone can
+     take it up. The shelf is a live directory that changed twice during
+     M40 alone, so treat any list here as a snapshot and re-inventory
+     rather than trusting it.
 
      Shelved sources that owe NO page, each with its reason — all observed
      2026-07-19:
