@@ -97,7 +97,7 @@ without losing a live lesson.
       the named test, record the observed failure, revert. Confirm
       `git status` clean afterward. An enforcement claim that does not
       reproduce a failure is struck from the shortlist and the lesson stays.
-- [ ] **T4** — Consolidate the "green because it never looked" family
+- [x] **T4** — Consolidate the "green because it never looked" family
       (`:29`, `:39`, `:43`, `:44`, `:45`) into one multi-case line, preserving
       each case's distinguishing mechanism — the cases differ in *why* the run
       never looked, which is the transferable part.
@@ -154,6 +154,8 @@ without losing a live lesson.
 
 - 2026-07-19: T2 done. **Retirement yields one line, not a haul** — and the finding that produced it is D-051's own carve-out: "a guard in the same area is not enforcement when the lesson teaches the judgment that guard does not make." `:30` `:31` `:38` `:47` all have live tests in their area, and all teach a judgment a future author must make about NEW code, so a test failing when today's guard is deleted enforces nothing; `:41` states outright that neither path is reachable through the package API; `:36` has no guard at all. Only `:44` (M7) clears the bar, and only its Greek-reaches-Rd half — the "a guard that skips under `R CMD check` is not a guard" half is unenforced and is T4 family material. `:13`/`:15` could retire on OWNERSHIP into `PROFILE.md`'s `test-doctrine` slot (D-051 permits moving content there), but that expands scope and trades this file's budget for a 120-line-capped one; left as a follow-up candidate. Consequence for the target: consolidation plus the header trim must carry it, and the arithmetic closes at 41 lines (49 - 3 T4 - 2 T5 + 1 split - 4 header).
 - 2026-07-19: T3 done. Mutation evidence for the single enforcement retirement: planted U+03B8 in `man/octants.Rd` (generated file, probe only), ran `test-rd-latex-safe.R` under `NOT_CRAN=true`, guard **FAILED** with `octants.Rd:5: θ` against a clean-tree baseline of 0 failed / 2 passed; `git checkout -- man/octants.Rd` reverted and `git status man/` is clean. The failure names the exact mistake the lesson warns about, so the enforcement claim holds rather than merely plausibly holding. No package file is committed by this task.
+
+- 2026-07-19: T4 done. Five family sources (`:29` `:39` `:43` `:44` `:45`) → two lines: one merged lesson carrying five labelled cases — skipped by FLAG, skipped by PATH, AUTO-skipped comparison, baselines that never exercised the change, probe that couldn't attribute — plus M39's structural-fence shape, and one surviving line for M39's `rot` viewport technique, which is a grid mechanism rather than family material and would have been destroyed by a naive 5→1 merge. `:39` (M36 ablation) was folded IN rather than kept out: "it works is not it is the mechanism" is the same failure — a green signal that never discriminated — applied to attribution. One clause retired on **ownership**, not dropped: `:29`'s `Rplots.pdf`→`.Rbuildignore` housekeeping is owned by `PROFILE.md`'s consistency-gate slot ("New top-level files have `.Rbuildignore` entries"), and `^Rplots\.pdf$` is present. 49→46 lines, 20,972→20,554 chars.
 
 ## Decisions
 
