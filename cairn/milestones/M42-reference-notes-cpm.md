@@ -4,7 +4,7 @@
 - **Priority:** normal
 - **Depends on:** M40
 - **Principles touched:** —
-- **Branch/PR:** `m42-reference-notes-cpm`
+- **Branch/PR:** `m42-reference-notes-cpm` / https://github.com/jmgirard/circumplex/pull/68
 
 ## Goal
 
@@ -57,12 +57,12 @@ page (M41 work log, 2026-07-19).
 
 ## Acceptance criteria
 
-- [ ] `cairn/references/browne1992.md` exists carrying every template section,
+- [x] `cairn/references/browne1992.md` exists carrying every template section,
       with each extracted value page-, equation-, or table-anchored.
-- [ ] The page carries the full CPM model specification: a reader can map each
+- [x] The page carries the full CPM model specification: a reader can map each
       parameter `R/cpm_fit.R` estimates to its published counterpart **from
       the page alone**, without opening the paper.
-- [ ] `cairn/references/browne1982.md` exists carrying every template section,
+- [x] `cairn/references/browne1982.md` exists carrying every template section,
       scoped to pp. 95–96, recording the **general transformation-based CI
       method** these pages actually state — the symmetric interval on
       θ = h(γᵢ) inverted through h⁻¹, and the logarithmic instance for a
@@ -70,16 +70,16 @@ page (M41 work log, 2026-07-19).
       numbers, and stating explicitly that the communality-specific
       application is Grassi's assembly of that method with `browne1992.md`
       eq. 4, not something Browne states on these pages.
-- [ ] `grassi2010.md`'s Browne-1982 bullet is corrected in place and marked:
+- [x] `grassi2010.md`'s Browne-1982 bullet is corrected in place and marked:
       the stale PNG pointer names the shelved PDF, and the open question it
       records is resolved by reference to `browne1982.md`.
-- [ ] Each page's `Extraction:` status is one physical line stating its real
+- [x] Each page's `Extraction:` status is one physical line stating its real
       per-channel standing — never a verification a channel did not perform
       (M40) — and each page's `Traces to` names specific citing lines
       (`R/cpm_fit.R`, `R/ssm_ci_accuracy.R:169`,
       `tests/testthat/test-cpm_oracles.R:133`, `cairn/references/grassi2010.md`),
       verified against the files.
-- [ ] `INDEX.md` carries one line per new page with the **filename** as link
+- [x] `INDEX.md` carries one line per new page with the **filename** as link
       text (M40); `cairn_validate` reports `references index<->disk` PASS with
       no `references staleness` WARN; `git diff --stat devel/` is empty, no
       file outside `cairn/` is modified, and each written page's tail bytes
@@ -156,3 +156,131 @@ Every value on both M42 pages rests on one authoritative channel, which the
 status states rather than implies.
 
 ## Review
+
+Reviewed 2026-07-19. PR https://github.com/jmgirard/circumplex/pull/68.
+
+### Acceptance-criteria evidence
+
+- **AC1 — both pages carry every template section, values anchored.** Checked by
+  script against the eight template sections; both pages carry all eight.
+  `browne1992.md` 409 lines, `browne1982.md` 207. Every value in `Extracted
+  values` carries a page or equation anchor in the source's own numbering
+  (Browne's `(n)`, the 1982 chapter's `(1.6.n)`).
+- **AC2 — a reader can map each estimated parameter from the page alone.** The
+  parameter map's two load-bearing claims were re-derived independently at
+  review, not read: (a) the ζ identity — `cpm_implied_cor(theta, zeta, beta)`
+  vs Browne eq. (3) `D*(P_c + D_v)D*` with ζ* = (1+v)^(−1/2), built from the
+  Grassi Appendix A v vector, agree to **max abs diff 2.22e-16** with the eq. (3)
+  form's diagonal exactly 1; (b) the df bookkeeping — for all 10 legal (p, m)
+  combinations at p ∈ {6, 8, 12}, the free family's q equals Browne's
+  q = 3p + m − 1 exactly, both families' df equal Browne's d = ½p(p+1) − q
+  exactly, and unit df == free df. The "no numeric departure" claim is
+  verified, not asserted. The independent Opus reviewer reached the same
+  conclusion and additionally established the cancellation is unconditional
+  across variants, not only variant A.
+- **AC3 — `browne1982.md` records the general method, scoped.** Present, scoped
+  to pp. 95–96, eqs. (1.6.29)–(1.6.41) anchored to the printed numbers, opening
+  with an explicit scope warning that the pages state a general method and the
+  communality application is Grassi's assembly. The closed-form composition
+  γ̂·exp(±c_α σ̂/γ̂) was checked term-for-term against
+  `tests/testthat/test-cpm_oracles.R:136`.
+- **AC4 — `grassi2010.md` corrected in place and marked.** The stale four-PNG
+  pointer now names `sources/browne1982_pp95-96.pdf` (the PNG names survive only
+  inside the correction, naming what was replaced); the open question is marked
+  `**Resolved (M42, 2026-07-19).**` and resolved by reference to
+  `browne1982.md`. The M7 T3 finding A5 sentence at `:104-106` is left verbatim
+  and gains a cross-reference. The blame-history reviewer independently
+  confirmed findings A2/A3/A4/A6 are untouched.
+- **AC5 — Extraction statuses honest, Traces to verified.** Each page's
+  `Extraction:` is one physical line (512 and 594 chars). Both state the M42-D1
+  standing: the page image is authoritative, `pdftotext` is a cross-check only,
+  no value read by a human. All Traces-to anchors were opened and read at
+  review — 38 on `browne1992.md`, 7 on `browne1982.md`, all in range and all
+  landing on content matching the page's description (one anchor was wrong on
+  first write and is fixed, F4 below).
+- **AC6 — INDEX, validate, diff scope, tail bytes.** All 6 INDEX entries use the
+  filename as link text (the M40 regex trap). `cairn_validate`: **all checks
+  passed**, 15 PASS including `references index<->disk` and `coverage complete`,
+  `references staleness` OK with no WARN, `record density` OK. `git diff
+  --stat devel/` empty; `git diff --name-only master..HEAD` lists only `cairn/`
+  paths. Tail bytes of both pages checked with `od -c` — single trailing
+  newline, no leaked scaffolding.
+
+### Consistency gate
+
+Universal: `cairn_validate` exit 0, all checks passed (47 `work-log format`
+advisories, all pre-existing M7 hard-wraps, none from M42). No DESIGN.md
+principle changed → `cairn_impact` skipped.
+
+Toolchain (`r-package` profile `consistency-gate` slot): `devtools::document()`
+produces no diff in `NAMESPACE` or `man/`; `pkgdown::check_pkgdown()` "No
+problems found"; README.Rmd/README.md untouched by this diff; no NEWS entry
+owed (no user-visible change — the diff touches no package file); `.Rbuildignore`
+already carries `^cairn$` and no top-level file was added.
+**`devtools::check(args = "--no-manual")`: 0 errors / 0 warnings / 0 notes**
+(5m 8s). `--no-manual` is justified here because no roxygen changed — the M7
+lesson that `--no-manual` masks PDF-manual breakage applies to roxygen edits,
+and this diff has none. `devtools::test()`: 0 failures / 3082 passing.
+CI on PR #68: **7/7 green** (ubuntu devel/release/oldrel-1, macos, windows,
+pkgdown, test-coverage).
+
+### Independent review — three lenses + scorer
+
+- **[O] diff-bug (Opus):** 6 findings.
+- **[S] blame-history (Sonnet):** 0 findings. Traced each in-place edit to its
+  origin commit and found all three discharge debts prior milestones explicitly
+  left (`60fc20b2` M40, `0dc74f32` M41); confirmed M42-D1 narrows M41-D1 for the
+  scanned-source case without touching the protocol governing `browne1992a.md`
+  or `hu1999.md`, whose Extraction lines are unmodified.
+- **[S] prior-PR-comments (Sonnet):** 0 findings. Checked the diff against every
+  M40 and M41 review lesson (INDEX link text, Extraction overclaim, undated
+  absence claims, the M41 F1 "nothing implements X" trap) and found none
+  regressed.
+
+**Actioned (score ≥ 80):**
+
+- **F1 (95) — fixed.** `browne1982.md` claimed "the package's own ζ intervals
+  are symmetric on the natural scale", false for the default path: `ci_method`
+  defaults to `"bootstrap"` (`R/cpm_fit.R:1527`), whose ζ intervals are
+  **percentile** intervals via `stats::quantile()` (`:1316-1323`) and are
+  asymmetric; only the analytic Wald branch (`:1644-1645`) is symmetric. Found
+  independently by the implementing session at review before the reviewer
+  reported it. The page now names both routes and explains that neither
+  transforms first — the load-bearing claim (neither is Browne's route) was
+  always true; the characterization was not.
+- **F4 (90) — fixed.** `browne1992.md` anchored the eq. (4) conversion at
+  `test-cpm_oracles.R:129-130`, which are comment lines; the assertion is at
+  `:131`. Anchor corrected, with the comment cited separately.
+
+**Below threshold, logged (4):**
+
+- **F2 (40) — rejected.** Claimed `browne1982.md`'s Extraction status overclaims
+  because the citation was not read off the source. Rejected on the scorer's
+  reasoning, which is right: tracking-rules keeps the Citation block outside the
+  Provenance block's scope, the status names the equations channel explicitly,
+  and the page's first Open question already flags the citation as unverified.
+- **F3 (75) — fixed anyway.** The absence claim in the Role paragraph carried no
+  `— observed` stamp though the same claim is dated in Traces to. One-line fix,
+  and it is precisely the failure mode this milestone series exists to prevent,
+  so it was not worth banking.
+- **F5 (70) — fixed anyway.** Departure 1 said eqs. (41)–(48) have "no repo line
+  depending on them" while the parameter map cites §6.7's θ_r = 0 convention as
+  the warrant for the `reference` pin. Departure 1 now scopes itself to the
+  *recipe* and states that the reference convention is live, warning against
+  reading it as licence to drop the §6.7 transcription.
+- **F6 (28) — superseded by a stronger finding of the reviewer's own.** The
+  scorer was right that the provenance claim ("no repo value is read from §8")
+  is accurate. But checking it against the source turned up something no agent
+  found: **Browne's Table 11, p. 494 (§8.2) prints β₀ = .638, β₁ = .362,
+  ρ₁₈₀° = .28 and angles 0, 55, 112, 123, 192, 210, 269 — digit for digit the
+  values `grassi2010.md` records from Grassi's Table 2 (p. 60).** So §8
+  independently corroborates the m = 1 oracle, and Grassi's "coincide precisely
+  with CIRCUM" claim is checkable against Browne's own printed output. The
+  "Not extracted" section now records this, so a future milestone wanting a
+  second published anchor knows where it is instead of reading §8 as empty.
+
+### Outcome
+
+All six acceptance criteria verified against fresh evidence. Six findings
+raised, two actioned, three more fixed voluntarily, one rejected with reason.
+No criterion was reinterpreted and no plan-owned text was edited at review.

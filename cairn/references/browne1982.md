@@ -32,8 +32,9 @@ printed page numbers 95 and 96.
 `tests/testthat/test-cpm_oracles.R:136`, which reproduces CircE's published
 communality-index intervals from its published vᵢᵢ and their standard errors.
 Nothing in `R/` implements this method — the package's own ζ intervals are
-symmetric on the natural scale — so this source backs a **test's
-reconstruction of another program's output**, not a shipped estimator.
+formed on the natural scale, by either route it offers (see "Traces to") — so
+this source backs a **test's reconstruction of another program's output**, not
+a shipped estimator — observed 2026-07-19.
 
 ## Extracted values
 
@@ -172,8 +173,14 @@ correct; the correction is to the attribution, not to the arithmetic.
 
 **Nothing in `R/` traces here**, stated precisely: no shipped function forms a
 confidence interval by this source's route — transform to an unbounded scale,
-take the symmetric normal interval there, invert. The package's own ζ intervals
-are symmetric on the natural scale. Two `R/` sites do apply a transformation
+take the symmetric normal interval there, invert. The package offers two ζ
+interval routes and neither is that one: a bootstrap **percentile** interval
+(`R/cpm_fit.R:1316-1323`), which is asymmetric about ζ̂ but gets its asymmetry
+from the replicate distribution rather than from a transformation, and an
+analytic **Wald** interval ζ̂ ± z·σ̂(ζ̂) (`R/cpm_fit.R:1644-1645`), which is
+symmetric on the natural scale and is exactly the form eq. (1.6.29) describes
+and eqs. (1.6.30)–(1.6.34) exist to improve on. Neither transforms first.
+Two `R/` sites do apply a transformation
 and are **not** instances of this method: `R/ssm_montecarlo.R:158` wraps
 Monte Carlo *draws* in `atanh`/`tanh` (variance stabilization for simulation,
 not an interval), and `R/cpm_fit.R:244` exponentiates the log-scale

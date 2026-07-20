@@ -268,8 +268,9 @@ walked against the code.
 off-diagonal), and on the diagonal ζ*ᵢᵢ²(1 + vᵢᵢ) = 1. That is exactly the
 code's `P <- (zeta %o% zeta) * C; diag(P) <- 1`
 (`R/cpm_fit.R:66-72`). The engine therefore estimates Browne's communality
-index directly, which is why `tests/testthat/test-cpm_oracles.R:129-130`
-converts CircE's published vᵢᵢ by 1/√(1 + v) before comparing.
+index directly, which is why `tests/testthat/test-cpm_oracles.R:131`
+converts CircE's published vᵢᵢ by 1/√(1 + v) before comparing (the reasoning
+is in the comment at `:128-130`).
 
 **The df bookkeeping, checked in both families.** Browne's eq. (6) counts
 ½p(p + 1) covariance moments against q = 3p + m − 1 (variant A, §6.4). The
@@ -293,8 +294,13 @@ something the paper does not state.
    and does not derive angles from eq. (48). It takes the user's theoretical
    angles as the angle start, sets ζ from a max-|rᵢⱼ| rule clipped to
    [0.3, 0.95], and fits β by least squares of the off-diagonal rᵢⱼ on
-   {cos(k·Δᵢⱼ)} (`R/cpm_fit.R:409-439`). Eqs. (41)–(48) are therefore banked
-   above as published context with **no repo line depending on them**.
+   {cos(k·Δᵢⱼ)} (`R/cpm_fit.R:409-439`). The *recipe* — eqs. (41)–(47) and
+   eq. (48)'s arc-cos angle formula — is therefore banked above as published
+   context that no repo line computes. **One piece of §6.7 is not idle:** its
+   θ_r = 0 reference-variable convention (p. 488) is the published warrant for
+   the engine's `reference` pin (`R/cpm_fit.R:127`), as the parameter map's
+   `theta` row records. Do not read this departure as licence to drop the
+   §6.7 transcription.
 2. **The engine imposes an identification cap on m that the paper does not
    print.** `cpm_spec()` caps m at floor((p−1)/2) for variants A/C and
    floor(p/2) for B/D (`R/cpm_fit.R:135-145`). Browne states no cap: §6.4's
@@ -348,10 +354,24 @@ carries the model the package implements, not the whole paper.
 - **§6.1 (Cudeck's circular weighted sum) and §6.2 (the Wiggins–Steiger–Gaelick
   symmetric circulant, eq. 29)** beyond the §6.5 relationship recorded above.
 - **§8, the worked applications** — Revelle's mood questionnaire (Table 6,
-  N = 472) and the vocational-interest example. The repo's oracle for the
-  latter is `grassi2010.md`, which reanalyzes the same data and prints
-  full-precision estimates this paper does not; nothing in the repo reads a
-  numeric value out of §8 — observed 2026-07-19.
+  N = 472) and the vocational-interest example (§8.2). The repo's oracle for
+  the latter is `grassi2010.md`, which reanalyzes the same data and prints
+  full-precision estimates this paper does not. No repo value is read *from*
+  §8: `tests/testthat/helper-cpm-oracles.R` transcribes Grassi throughout, and
+  its own header records that provenance — observed 2026-07-19.
+
+  **But §8 independently corroborates the oracle, which is worth knowing
+  before anyone treats this as dead weight.** Table 11, p. 494 ("Vocational
+  Interest Scales: Estimates") prints, on its `FS m=1` row, β₀ = .638,
+  β₁ = .362, ρ₁₈₀° = .28 and polar angles 0, 55, 112, 123, 192, 210, 269 —
+  digit for digit the values `grassi2010.md` records from Grassi's Table 2
+  (p. 60). Grassi's claim that CircE "coincide[s] precisely with … CIRCUM" is
+  therefore checkable against Browne's own printed output at m = 1, not only
+  against CircE's. A milestone wanting a second published anchor for the
+  m = 1 oracle should extend this page to Table 11 rather than assume §8 holds
+  nothing — observed 2026-07-19. Also unextracted from §8: the input
+  correlation matrix is **Table 2, p. 470** (the introduction, not §8), which
+  is the table `helper-cpm-oracles.R:12` names.
 - **§9, Concluding Comments.**
 
 ## Traces to
