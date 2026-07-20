@@ -1,6 +1,6 @@
 # M43: Source notes for the structure criteria and the validity source
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M40
 - **Principles touched:** —
@@ -99,7 +99,7 @@ prior work (`INDEX.md`, 2026-07-19).
       channels.
 - [x] T5. Reconcile against `devel/m5-wendt-discrepancies.md` (read-only) and
       record what disagrees.
-- [ ] T6. `Traces to` sections written against the actual citing lines;
+- [x] T6. `Traces to` sections written against the actual citing lines;
       `INDEX.md` entries; `cairn_validate` clean; tail-byte and untouched-tree
       checks.
 
@@ -115,6 +115,9 @@ prior work (`INDEX.md`, 2026-07-19).
 
 - 2026-07-19: T4/T5 — `wendt2019.md` authored; all four vignette claims verified against the source and all four hold. RMSEA .075–.111 quoted verbatim from p. 830 and correctly scoped to CFA-PC (the fixed-spacing, fixed-communality model); the four g–agency correlations (−.283/−.292/−.267/−.324, mean −.2915) quoted verbatim from p. 831. The `:394` claim is accurate and if anything **conservative** — "competitive with categorical and hybrid alternatives" understates p. 832's "superior validity … No evidence … for the incremental validity of categorical or hybrid approaches". One qualifier recorded: the "unit-cosine" specificity rests on the online supplement (R Code S25), which is **not on the shelf**, so it is second-hand on this page. The image channel was load-bearing here — `pdftotext` mis-renders this PDF's operators through the font encoding (`=`→`⫽`, `−`→`⫺`, `<`→`⬍`), so every numeral was confirmed against the rendered page.
 - 2026-07-19: T5 reconciliation against `devel/m5-wendt-discrepancies.md` (read-only): agreement on everything load-bearing, including its §7 correction, which is confirmed verbatim — the "relaxing the restrictions improves fit without sacrificing validity" claim is Wendt et al.'s **citation of prior work** (p. 829, crediting Acton & Revelle 2002 and Gurtman & Pincus 2000), while their own p. 832 finding is the opposite. **One disagreement recorded rather than settled:** its §1 gives the g–communion range as "−.034 to +.142", but p. 831 prints Sample 4 r = −.115, so the true range is −.115 to +.142 — the record's lower bound is Sample 1's value, not the minimum. Immaterial (nothing uses the communion correlation; §1's argument rests on the agency values, which are right) and not corrected, since `devel/` is out of scope.
+
+- 2026-07-19: T6 — both `INDEX.md` entries added with the **filename** as link text (M40); its owed-a-page ledger note updated to discharge M43's two sources and to record that RANDALL's two sources are relied on but unshelved. ROADMAP candidate row added for those two per the gate decision (search-first sweep found no overlap in candidates, DECISIONS, or the archive). `cairn_validate`: all 15 checks PASS including `references index<->disk` and `coverage complete`, `references staleness` OK with no WARN. Two advisory WARNs both pre-existing and not M43's — the ROADMAP hygiene stamp at 2,568 chars (line 4; replaced rather than appended at review, which clears it) and 47 wrapped work-log lines in M7. `git diff --stat master..HEAD -- devel/` empty; every file touched on the branch is under `cairn/`; tail bytes and a whole-file scan of all three written pages show no leaked tool-call scaffolding (M34).
+- 2026-07-19: all tasks complete; status → review. `devtools::test()` under NOT_CRAN=true: 3082 PASS, 0 FAIL, 0 SKIP, 4 pre-existing WARN — the exact M42 baseline, as an empty package diff predicts. No package file, test, or vignette was changed, so the profile's `verify` slot has no code surface to exercise — the milestone is documentation-only by its own `Out:` clause, and `cairn_validate` plus the untouched-tree checks are the applicable gate.
 
 ## Decisions
 
