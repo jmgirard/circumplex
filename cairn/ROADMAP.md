@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-19 (**M43 shipped**, PR #69 `920b76fd`, closing the M40–M43 reference-note series — every shelved source the repo relies on now has a page. `acton2004.md` records departures, not a transcription. Review caught a false provenance claim in M43's own work; fixed, graduated to LESSONS. M38 pruned. M7 stays un-archived at `blocked`.)_
+_Last hygiene check: 2026-07-19 (audit clean — 15/15 checks, tree clean, no open issues or PRs. Nothing in flight: M39–M43 all merged. M7's one ordering constraint is now cleared (M39 shipped), so it waits only on Jeff's `submit_cran()` window. Open advisory: `LESSONS.md` at 49/50 items and ~300 chars over density — its consolidation pass is a candidate.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
