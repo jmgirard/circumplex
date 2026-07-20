@@ -5,7 +5,7 @@
 Pagination: the journal's own, *MPR Online* 9(1) 1–27; the shelf PDF's page *n*
 is printed page *n* (confirmed against the running heads on pp. 3, 5, 9, 13),
 so every anchor below is a printed page.
-Extraction: verified 2026-07-19 against the source by two independent channels — `pdftotext -layout` and a visual read of `pdftoppm`-rendered page images — covering every equation (pp. 5–7, 10), every published cutoff (pp. 17, 19), and Table 2 (p. 15); the surrounding prose anchors (pp. 8, 9, 13, 18, 20, 22, 23) rest on the text channel alone, which carries prose faithfully but silently drops this paper's display equations, and no value here has been read by a human — observed 2026-07-19.
+Extraction: verified 2026-07-19 against the source by two independent channels — `pdftotext -layout` and a visual read of `pdftoppm`-rendered page images — covering every equation (pp. 5–7, 10), every published cutoff (pp. 17, 19), and Table 2 (p. 15); the surrounding prose anchors (pp. 8, 9, 13, 18, 20, 22, 23) rest on the text channel alone, and no value here has been read by a human — observed 2026-07-19.
 
 The two channels are genuinely independent for this source, which is not
 something to assume. `pdfinfo` reports Producer `Acrobat Distiller 5.0
@@ -200,8 +200,10 @@ The mechanism is stated on p. 22: "Deviation scoring works because it removes a
 general factor if there is one and has little effect if there is not."
 
 The recommendation is not unconditional. Deviation scoring is "recommended"
-for the Fisher Test (p. 17) and "strongly recommended in every case" for VT2
-(p. 19), but the Discussion calls it "a mixed blessing: Used with the correct
+for the Fisher Test (p. 17) and, for VT2, "In every case, deviation scoring is
+strongly recommended" (p. 19) — the same sentence recurs for MT in the reversed
+word order, "Deviation scoring is strongly recommended in every case" (p. 21),
+so quote whichever page you cite — but the Discussion calls it "a mixed blessing: Used with the correct
 interpretation, it can enhance the power of a test; used with an incorrect
 interpretation, it can render fallacious results" (p. 23), and for the Gap Test
 specifically "deviation scoring in some cases actually causes it to register
@@ -279,6 +281,8 @@ here **read-only**; M43 changes no `devel/` file. Its own status line records
 "Second independent human re-read: pending (Jeff)", so it carries no human
 attestation this page could inherit even if inheriting one were legitimate —
 which, per M40, it is not: authoring this page is itself a fresh extraction.
+(The pending status is a claim about that file's current state, not a standing
+fact — observed 2026-07-19.)
 
 **Agreement.** My independent two-channel extraction matches it on every point
 compared: the four equations including the wrap-around gap in Eq. 2; the
@@ -298,7 +302,7 @@ here:**
 
 **A third it does not record, found here.** The same p. 20 MT paragraph gives
 the deviation-scoring effect as `F(1, 192) = 1,265.5, η² = .11`, but Table 2
-(p. 15) gives MT's IS × Dev cell as **`1,262.5** (.11)`**. The η² agrees at
+(p. 15) gives MT's IS × Dev cell as `1,262.5` with η² `(.11)`. The η² agrees at
 .11, so the table's `1,262.5` is the coherent value and the prose's `1,265.5`
 looks like a digit corruption — possibly contaminated by RT's genuine
 `1,265.6` one row above it in the same table. Immaterial to the package
@@ -306,17 +310,28 @@ looks like a digit corruption — possibly contaminated by RT's genuine
 than because anything depends on it.
 
 **No between-channel discrepancies** were found in this extraction. One
-artifact worth naming so it is not mistaken for one later: the text channel
-returns an *empty line* where each display equation sits (Eq. 6 extracts as
-nothing at all), so the equations on this page rest on the image channel. That
-is a silent-dropout failure mode, not a disagreement — the text channel does
-not render a wrong equation, it renders none.
+artifact worth naming so it is not mistaken for one later: `pdftotext -layout`
+does extract the display equations, but it **scatters each one across several
+physical output lines** — the fraction's numerator and denominator, the
+summation's index and limit, and the superscripts all land on separate lines,
+with the `(6)` equation marker on a line of its own. So a grep pinned to the
+line carrying the equation number returns a bare line and *looks* like the
+equation is missing when it is not. (This page said exactly that in its first
+draft; corrected at the M43 review, 2026-07-19, after the claim was tested by
+re-running the command.) The practical consequence for a corrector: read the
+surrounding lines, not the marker line, and reassemble — or use the image,
+which is why both channels genuinely cover the equations here rather than the
+image alone.
 
 ## Traces to
 
 - `R/fit_structure.R:104-114` — `structure_fisher()`, the Eq. 6 prose reading.
 - `R/fit_structure.R:95-103` — the comment recording the Eq. 6 discrepancy and
   its empirical resolution.
+- `R/fit_structure.R:332-338` — the **second copy** of that same
+  printed-vs-prose account, in the exported wrapper's roxygen. A correction to
+  the Eq. 6 record must change this and `:95-103` together; updating only one
+  leaves the user-facing documentation stating the old resolution.
 - `R/fit_structure.R:123-134` — `structure_gap()`, Eq. 2 including the
   wrap-around gap.
 - `R/fit_structure.R:151-168` — `structure_vt()`, Eq. 8.

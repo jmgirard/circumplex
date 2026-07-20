@@ -121,6 +121,8 @@ prior work (`INDEX.md`, 2026-07-19).
 
 ## Decisions
 
+- 2026-07-19: **correction, superseding the T2/T3 entry above.** That entry states in bold that "the text channel returns an empty line for every display equation (Eq. 6 extracts as nothing)". That is **false** and is not edited here because work logs are history (IP4/D-045). `pdftotext -layout` does extract every display equation; it scatters each across several physical output lines, leaving the line that carries the `(6)` marker bare. The implementing probe grepped only that marker line and inferred absence — the same "green because it never looked" failure LESSONS records for M31/M7/M39. Caught by the review's diff-bug lens, reproduced before acting. Consequence is favourable, not adverse: both channels genuinely cover the equations, so the two-channel claim is stronger than the page first said, not weaker. `acton2004.md` corrected in place (it is current knowledge, not history).
+
 ## Review
 
 **Reviewed 2026-07-19.** PR #69. Branch cut from and compared against `origin/master`, which had not moved (0 commits behind). Diff: 5 files, +608/−15, every file under `cairn/`.
@@ -140,3 +142,21 @@ prior work (`INDEX.md`, 2026-07-19).
 - No `DESIGN.md` principle changed (`Principles touched: —`), so `cairn_impact` is skipped by rule.
 - Profile `r-package` `consistency-gate`: `devtools::document()` produces no diff (`git status` on `man/`, `NAMESPACE`, `R/` clean). No generated file hand-edited; no `README.Rmd`, export, or top-level file touched. **No `NEWS.md` entry** — correct, not an omission: M43 changes no package file and has no user-visible surface, and the profile scopes the NEWS requirement to user-visible changes.
 - `devtools::test()` (NOT_CRAN=true): 3082 PASS / 0 FAIL / 0 SKIP / 4 pre-existing WARN — the exact M42 baseline, as an empty package diff predicts.
+- `devtools::check(args = "--no-manual")`: **0 errors, 0 warnings, 0 notes**, 5m 6s.
+
+### Independent review fan-out
+
+Three fresh-context lenses plus a separate scorer. The `[S]` blame-history lens returned **zero findings** — it independently confirmed nothing was lost in the `INDEX.md` ledger rewrite (byte-diffed against master), that both pages' absence claims survive a *formula* grep rather than a citation grep (the M41 lesson), and that the page's account of the cutoff re-derivation matches `data-raw/structure-test-cutoffs.R` and its commit. The `[S]` prior-PR lens returned **zero findings** and is the known clean no-op here (PRs #66/#67/#68 carry zero review comments; LESSONS records this lens has no evidential weight in this repo). The `[O]` diff-bug lens returned five findings, all independently reproduced by the reviewing session before acting.
+
+**Actioned (scored ≥ 80):**
+
+- **F1 (95) — fixed. A false statement about the page's own evidence.** The page asserted three times that `pdftotext -layout` "silently drops this paper's display equations" and that "Eq. 6 extracts as nothing at all". **This is false.** The command extracts every display equation; `-layout` scatters each across several physical output lines, leaving the line carrying the `(6)` marker bare. The implementing probe grepped only that marker line and inferred absence — the same "green because it never looked" failure LESSONS already records for M31, M7, and M39. Reproduced at review before acting. The correction *strengthens* the provenance: both channels genuinely cover the equations, so the equations are two-channel, not image-only. Page corrected in place (current knowledge); the work-log entry that repeated the claim is superseded by an appended correction, never edited (IP4/D-045).
+- **F3 (85) — fixed.** `acton2004.md` carried an undated absence claim about another repo file's state ("Second independent human re-read: pending (Jeff)… carries no human attestation"), which the "Standing facts vs. dated observations" rule requires be stamped. `wendt2019.md` handled the identical situation correctly, so the two pages disagreed on one rule. Now stamped `— observed 2026-07-19`.
+- **F5 (88) — fixed.** Interleaved code-span and bold delimiters (`` **`1,262.5** (.11)`** ``) garbled the very numeral the third erratum turns on. Rewritten as `` `1,262.5` with η² `(.11)` ``.
+- **F4 (80) — fixed.** The page quoted "strongly recommended in every case" and anchored it to p. 19. That word order is p. 21's (the MT section); p. 19 (VT2) reads "In every case, deviation scoring is strongly recommended." Substance was right, the verbatim string was mis-anchored. Both wordings and both pages now recorded.
+
+**Logged, below threshold:**
+
+- **F2 (68) — fixed anyway, recorded as a deviation.** The `Traces to` list omitted `R/fit_structure.R:332-338` after the review-time AC2 amendment cited it in the prose. The scorer put it at 68 because Scope's literal citing-line list for this page names only `:722`, leaving room to read AC5 as already satisfied. Fixed regardless — the gap was *introduced by this review's own amendment*, the fix is one entry, and leaving the prose insisting two copies be kept in sync while the corrector's map named only one would be self-defeating. Actioning a sub-threshold finding is a deviation from the ≥ 80 rule and is logged here rather than passed off as routine.
+
+No finding required a code change; the milestone remains documentation-only.
