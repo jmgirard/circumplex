@@ -5,6 +5,8 @@ _One line per committed page: `citekey — title — traces to`._
 - [grassi2010.md](grassi2010.md) — Grassi, Luccio & Di Blas (2010), *CircE: An R implementation of Browne's circular stochastic process model* — the published CPM oracle; traces to `tests/testthat/helper-cpm-oracles.R` and `tests/testthat/test-cpm_oracles.R`.
 - [zimmermann2017.md](zimmermann2017.md) — Zimmermann & Wright (2017), *Beyond description in interpersonal construct validation* — SSM estimator accuracy and sample-size guidance; traces to `vignettes/evaluating-circumplex-structure.Rmd` and the `jz2017` sample.
 - [browne1992a.md](browne1992a.md) — Browne & Cudeck (1992), *Alternative ways of assessing model fit* — the RMSEA cutoffs (0.08 reasonable, greater than 0.1 would-not-employ) AND eqs. 13/14, which `cpm_fit()` implements natively; traces to `R/cpm_fit.R:1011-1028,1049`, `R/ssm_ci_accuracy.R:1014-1023`, `R/ssm_ci_oop.R` and `vignettes/evaluating-circumplex-structure.Rmd`.
+- [browne1992.md](browne1992.md) — Browne (1992), *Circumplex models for correlation matrices* — the full specification of the CPM `cpm_fit()` estimates (eqs. 1–8, 30–48), plus a parameter map, five printed errata, and three departures the code takes from the paper; traces to `R/cpm_fit.R`, `R/cpm_oop.R:123,162`, `R/ssm_ci_accuracy.R:169-170`, `tests/testthat/helper-cpm-oracles.R` and both vignettes.
+- [browne1982.md](browne1982.md) — Browne (1982), *Covariance structures*, pp. 95–96 only — the general transform-and-invert CI method (eqs. 1.6.29–1.6.41), whose log instance the communality-CI oracle reconstructs; traces to `tests/testthat/test-cpm_oracles.R:131-137` and `cairn/references/grassi2010.md`. No `R/` estimator uses the method (the page dates and scopes that claim).
 - [hu1999.md](hu1999.md) — Hu & Bentler (1999), *Cutoff criteria for fit indexes in covariance structure analysis* — the SRMR .08 and CFI/TLI .95 cutoffs; traces to `R/ssm_ci_accuracy.R:1023`, `R/ssm_ci_oop.R`, `R/cpm_oop.R:187-188` and `vignettes/evaluating-circumplex-structure.Rmd`.
 
 <!-- Entry format note: cairn_validate's _INDEX_LINE regex matches the first
@@ -14,15 +16,18 @@ _One line per committed page: `citekey — title — traces to`._
      entry and the page reads as unindexed. Caught by mutation at M40 T5.
 
      Citekey trap: browne1992a.md is Browne & CUDECK (1992); browne1992.md
-     (owed, M42) is Browne ALONE. The `a` suffix marks a different author set,
-     not a second work by one author. Both pages state this.
+     is Browne ALONE. The `a` suffix marks a different author set, not a
+     second work by one author. Both pages state this. (This note read
+     "browne1992.md (owed, M42)" until M42 authored it; corrected in place
+     2026-07-19.)
 
      Which sources still owe a page is the milestone files' ledger, not this
-     file's. As of the M41 merge the remaining sources owing a page are
-     Browne (1992) and Browne (1982), both M42; and Acton & Revelle (2004)
-     and Wendt et al. (2019), both M43 — observed 2026-07-19. The shelf is a
-     live directory that changed twice during M40 alone, so treat any list
-     here as a snapshot and re-inventory rather than trusting it.
+     file's. As of the M42 merge the remaining sources owing a page are
+     Acton & Revelle (2004) and Wendt et al. (2019), both M43 — observed
+     2026-07-19; the Browne (1992) and Browne (1982) entries this note
+     carried after M41 are discharged. The shelf is a live directory that
+     changed twice during M40 alone, so treat any list here as a snapshot
+     and re-inventory rather than trusting it.
 
      Shelved sources that owe NO page, each with its reason — all observed
      2026-07-19:

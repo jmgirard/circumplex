@@ -4,8 +4,9 @@
 — no suffix — belongs to Browne **alone** (the CPM paper, *Psychometrika*
 57(4) 469–497). The `a` suffix here marks a **different author set**, not a
 second work by the same author, which is how an alphabetical suffix normally
-reads. `browne1992.md` does **not exist yet**: it is owed by M42, which is
-responsible for carrying the reciprocal warning on it — observed 2026-07-19.
+reads. `browne1992.md` now **exists** and carries the reciprocal warning,
+authored by M42 (this sentence read "does not exist yet: it is owed by M42";
+corrected in place 2026-07-19) — observed 2026-07-19.
 
 **Provenance.** Ingested 2026-07-19 by M41 from
 `cairn/references/sources/browne1992a.pdf` (gitignored).
