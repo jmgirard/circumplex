@@ -3,11 +3,11 @@
      Per-section owners are tagged below. -->
 # M44: LESSONS.md consolidation and retirement pass
 
-- **Status:** review
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Principles touched:** —
-- **Branch/PR:** `m44-lessons-consolidation`
+- **Branch/PR:** `m44-lessons-consolidation` / [PR #70](https://github.com/jmgirard/circumplex/pull/70)
 
 ## Goal
 
@@ -152,6 +152,59 @@ without losing a live lesson.
 
 - 2026-07-19: status in-progress→review. All 7 tasks done. `devtools::test()` on the final tree: 0 failed, 0 errors, **3082 passing**, 0 skipped. `cairn_validate` all checks pass — `weight caps` PASS (the M44 file itself hit the 150-line plan-owned cap twice during the pass; Scope and then the ledger were each compressed in a single rewrite rather than nibbled). Branch touches **no package file**: `git diff master...HEAD --name-only` under `R/ src/ tests/ man/ vignettes/` is empty, so T3's mutation probe left no residue.
 
+- 2026-07-19: **review SENT BACK — AC1 fails as written.** The three-lens review (see Review section) found real content losses in the merges; fixing F1/F2/F3 (plus F4/F5/F6 material) restored ~220 chars of identifiers and mechanisms, putting the file at **19,211 chars against AC1's ≤19,000**. Lines are fine (41 ≤ 42) and every other criterion passes. The two consolidated lines — AC1's own designated compression source — have now been compressed twice; a third pass would re-cut exactly what the review said to restore. Per the never-reinterpret rule this is the criterion being wrong, not the work, so it goes back for a gated AC1 amendment rather than a charitable read. Nothing else is outstanding.
+
+- 2026-07-19: status in-progress→**blocked**, at Jeff's gate choice. Blocker: he is revising **cairn's own sizing rules** upstream, and AC1's open question — whether the char target is ≤19,000 or ≤19,500 — is downstream of that work, so amending it now would just be re-amended after. Nothing about the milestone is in doubt: all seven tasks are done, every criterion except AC1's char clause passes with fresh evidence, the three actioned review findings are fixed on the branch, and PR #70 stays a draft with 8/9 CI green. Resuming means one gated AC1 amendment against the new sizing rules, then re-review — no rework. Branch `m44-lessons-consolidation` holds everything; master is untouched.
+
 ## Decisions
 
 ## Review
+
+Reviewed 2026-07-19. PR [#70](https://github.com/jmgirard/circumplex/pull/70).
+
+### Acceptance-criterion evidence
+
+- **AC1 — caps green, ≤42 lines, ≤19,000 chars.** Fresh count on the reviewed
+  tip: **41 lines / 34 lessons / 18,994 chars**. `cairn_validate`: `weight
+  caps` PASS, `record density` OK, exit 0. Both targets met with margin (1
+  line, 6 chars) and both axes clear their thresholds (line cap 50, char
+  threshold 20,500).
+- **AC2 — retirements justified, mutation-proven, no package residue.** Three
+  retirements, each naming its D-051 criterion in the ledger. The one
+  *enforcement* retirement carries mutation evidence in the work log: planted
+  U+03B8 in `man/octants.Rd`, `test-rd-latex-safe.R` failed with
+  `octants.Rd:5: θ` against a clean baseline of 0 failed / 2 passed, reverted,
+  `git status man/` clean. Residue check on the reviewed tip:
+  `git diff master...HEAD --name-only` returns exactly three paths, all under
+  `cairn/` — **no `R/`, `src/`, `tests/`, `man/`, or `vignettes/` file is
+  touched by this branch.** `devtools::test()`: 0 failed, 0 errors, 3082
+  passing, 0 skipped.
+- **AC3 — protected formula lines byte-identical.** Verified programmatically
+  against the pre-pass snapshot (`git show 56577d32:cairn/LESSONS.md`), by
+  exact string membership rather than by eye: `:16` M20 ulp window (578
+  chars), `:22` M26 `%%`-vs-`modu` (433), `:28` M31/M32 coord-side pinning
+  (869), `:32` M27/M33 unwrap (940) — all four present unchanged.
+- **AC4 — header names the checks, restates no threshold.** The new header
+  reads "Both weight axes are enforced by `cairn_validate` (`weight caps`,
+  `record density`); don't restate thresholds here." Grepped: no numeric
+  threshold remains in the header, and the stale `<17,000 chars` claim is
+  gone.
+- **AC5 — conservation ledger complete.** Re-verified at review, not trusted
+  from T1: all **38** pre-pass lesson indices appear in the ledger, none
+  missing, none extra.
+- **AC6 — graduated list drafted.** The ledger's "Retired — graduated (AC6)"
+  bullet names all three with their criteria, ready for the archive summary.
+
+### Consistency gate
+
+Universal: `cairn_validate` exit 0, all checks PASS (`coverage complete` PASS
+included). 47 advisory `work-log format` warnings, every one on M7's
+hard-wrapped pre-implement history — IP4 forbids editing it, advisory by
+design, not touched. No `DESIGN.md` principle changed, so `cairn_impact` was
+skipped per the slot.
+
+Toolchain (`r-package` profile): `document()` produces no diff;
+`NAMESPACE`/`man/` clean; README.md newer than README.Rmd (in sync);
+`pkgdown::check_pkgdown()` — no problems found; no new top-level files; no
+NEWS entry owed (zero package files changed, so no user-visible change).
+
