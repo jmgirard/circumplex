@@ -1,10 +1,10 @@
 # M43: Source notes for the structure criteria and the validity source
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M40
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m43-reference-notes-structure`
 
 ## Goal
 
@@ -88,7 +88,7 @@ prior work (`INDEX.md`, 2026-07-19).
 
 ## Tasks
 
-- [ ] T1. Re-verify `acton2004.pdf` and `wendt2019.pdf` on the shelf and stamp
+- [x] T1. Re-verify `acton2004.pdf` and `wendt2019.pdf` on the shelf and stamp
       the observation — the shelf is live and moved twice during M40, so
       confirm rather than trust this plan's inventory.
 - [ ] T2. Author `acton2004.md` — the four implemented criteria, their
@@ -106,6 +106,9 @@ prior work (`INDEX.md`, 2026-07-19).
 ## Work log
 
 - 2026-07-19: created by /milestone-plan, splitting M41 at the re-size gate its own `Out:` clause called for. Carries the two remaining relied-on sources. Both verified present on the shelf at plan time by first-page read — `acton2004.pdf` = *MPR Online* 9(1), `wendt2019.pdf` = *J Abnorm Psychol* 128(8) 823–839 — observed 2026-07-19. Acton & Revelle is the heavier of the two: `R/fit_structure.R` implements four of its criteria and already records one printed-vs-prose discrepancy in its own comments, which AC2 makes the page carry rather than launder. Wendt is lighter — four vignette claims — but comes with an existing read-only design record of paper-internal inconsistencies that T5 must reconcile against.
+
+- 2026-07-19: T1 — both shelf PDFs re-verified independently of the plan's inventory. `acton2004.pdf` = *MPR Online* 9(1), 27 pp., pagination 1:1 (running heads on PDF pp. 3/5/9/13 read 3/5/9/13); `wendt2019.pdf` = *J Abnorm Psychol* 128(8) 823–839, 17 pp., PDF p. n = printed p. 822+n. Neither is an OCR scan (`pdfinfo` Producer: Acrobat Distiller from Word, and Adobe LiveCycle/XPP), so the M42-D1 trap — text layer derived from the page image, corroborating nothing — does not apply and the two channels are genuinely independent here — observed 2026-07-19.
+- 2026-07-19: implementation question gate held; all three recommendations taken. (1) `acton2004.md` records A&R's published nv = 64/128 cutoffs alongside the shipped re-derived nv = 8 constants, so the re-derivation's sanity gate stays checkable from the page. (2) RANDALL's sources (Hubert & Arabie 1987; Tracey 1997) back shipped code, are unshelved, and have no page — recorded on the page as a non-attribution and raised as a ROADMAP candidate at review rather than expanding M43. (3) `acton2004.md` reconciles against `devel/ar2004-transcription.md` read-only, symmetric with T5's treatment of Wendt.
 
 ## Decisions
 
