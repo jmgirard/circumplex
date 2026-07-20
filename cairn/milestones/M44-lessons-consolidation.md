@@ -89,11 +89,11 @@ without losing a live lesson.
 - [x] **T1** — Inventory: build the conservation-ledger skeleton in this file,
       all 38 lessons of `cairn/LESSONS.md` with a one-phrase topic tag. No
       edit to `LESSONS.md` yet.
-- [ ] **T2** — Retirement audit: apply D-051's two criteria to each item. For
+- [x] **T2** — Retirement audit: apply D-051's two criteria to each item. For
       every enforcement claim, name the specific test that would have to fail.
       Produce the shortlist; mark partly-covered lessons and what their
       uncovered remainder is.
-- [ ] **T3** — Mutation-verify the T2 shortlist: break each guarded line, run
+- [x] **T3** — Mutation-verify the T2 shortlist: break each guarded line, run
       the named test, record the observed failure, revert. Confirm
       `git status` clean afterward. An enforcement claim that does not
       reproduce a failure is struck from the shortlist and the lesson stays.
@@ -128,17 +128,32 @@ without losing a live lesson.
   under marker · `:42` M38 label width vs break spacing.
 - **Split → T6:** `:33` M33 = occasions ordering + the prior-PR-lens no-op
   (two unrelated lessons on one line).
-- **Retirement audit → T2/T3:** `:13` `:15` `:29` `:30` `:31` `:36` `:38`
-  `:41` `:44` `:47` — the candidates with a plausible enforcing test or an
-  owning slot elsewhere. Overlap with T4/T5 is deliberate: a line can be both
-  consolidated and trimmed.
-- **Kept as-is unless T2 finds otherwise:** `:12` `:14` `:17` `:18` `:19`
-  `:20` `:21` `:23` `:24` `:25` `:26` `:27` `:35` `:37` `:46` `:48` `:49`.
+- **Retired (T2/T3) — one, and only in half:** `:44` M7, **enforcement**,
+  mutation-proven at T3 (`test-rd-latex-safe.R` failed `octants.Rd:5: θ` on a
+  planted theta, reverted). Only the Greek-reaches-Rd half is enforced; the
+  "a guard that skips under `R CMD check` is not a guard" half is unenforced
+  and merges into T4's family line. Trimmed to remainder, not deleted.
+- **Audited, NOT retired (T2):** `:30` `:31` `:38` `:41` `:47` — guards and
+  tests exist in the area, but each teaches a judgment a *future* author must
+  make about *new* code, and D-051 excludes exactly that ("a guard in the
+  same area is not enforcement when the lesson teaches the judgment that
+  guard does not make"); `:41` says outright that the suite is blind to it.
+  `:36` — no such guard exists at all.
+- **Ownership retirement possible, out of scope:** `:13` `:15` — toolchain
+  meta-knowledge (`NOT_CRAN`, `load_all()` vs the installed package) that
+  `PROFILE.md`'s `test-doctrine` slot could own. D-051 permits *moving* it
+  there, but that expands scope and trades this file's budget for a capped
+  one (`PROFILE.md` < 120). Follow-up candidate; both stay for now.
+- **Kept as-is:** `:12` `:14` `:17` `:18` `:19` `:20` `:21` `:23` `:24` `:25`
+  `:26` `:27` `:35` `:37` `:46` `:48` `:49`.
 
 ## Work log
 
 - 2026-07-19: created by /milestone-plan, promoted from the ROADMAP candidate added at M43's post-merge hygiene. Gate choices (Jeff): deliberate headroom (≤42 items) over minimum-viable; consolidation-first with retirement only where D-051 genuinely holds; header points at the validator rather than duplicating a threshold that moves; enforcement retirements **mutation-proven**, not inspected — D-051's discriminating word is *fails*, and `LESSONS.md:12` is itself the lesson that says prove by mutation, never by eye.
 - 2026-07-19: T1 done. Ledger indexes the pre-pass file at `56577d32`; all 38 lessons assigned, verified programmatically (38 distinct indices, no gap, no extra). **AMENDED (gated) at Jeff's mini-gate:** the `weight caps` check measures whole-file LINES (`LINE_CAPS` in `cairn_scripts.py:44`, FAIL at >=50), not lesson items — the file is 49 lines = 11 header + 38 lessons, and the plan had carried the WARN's "49" in as "49 items". AC1 retargeted to **<=42 total lines** and AC5 to **38 starting lesson items**; Scope notes the 11-line header is budget too. Jeff chose "<=42 lines, header counts", preserving the plan gate's headroom intent.
+
+- 2026-07-19: T2 done. **Retirement yields one line, not a haul** — and the finding that produced it is D-051's own carve-out: "a guard in the same area is not enforcement when the lesson teaches the judgment that guard does not make." `:30` `:31` `:38` `:47` all have live tests in their area, and all teach a judgment a future author must make about NEW code, so a test failing when today's guard is deleted enforces nothing; `:41` states outright that neither path is reachable through the package API; `:36` has no guard at all. Only `:44` (M7) clears the bar, and only its Greek-reaches-Rd half — the "a guard that skips under `R CMD check` is not a guard" half is unenforced and is T4 family material. `:13`/`:15` could retire on OWNERSHIP into `PROFILE.md`'s `test-doctrine` slot (D-051 permits moving content there), but that expands scope and trades this file's budget for a 120-line-capped one; left as a follow-up candidate. Consequence for the target: consolidation plus the header trim must carry it, and the arithmetic closes at 41 lines (49 - 3 T4 - 2 T5 + 1 split - 4 header).
+- 2026-07-19: T3 done. Mutation evidence for the single enforcement retirement: planted U+03B8 in `man/octants.Rd` (generated file, probe only), ran `test-rd-latex-safe.R` under `NOT_CRAN=true`, guard **FAILED** with `octants.Rd:5: θ` against a clean-tree baseline of 0 failed / 2 passed; `git checkout -- man/octants.Rd` reverted and `git status man/` is clean. The failure names the exact mistake the lesson warns about, so the enforcement claim holds rather than merely plausibly holding. No package file is committed by this task.
 
 ## Decisions
 
