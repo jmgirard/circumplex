@@ -95,9 +95,9 @@ prior work (`INDEX.md`, 2026-07-19).
       formulas and cutoffs, two channels.
 - [x] T3. Record the Eq. 6 printed-vs-prose discrepancy and the nv = 64/128
       calibration basis, cross-checked against `R/fit_structure.R:96,233,332-333`.
-- [ ] T4. Author `wendt2019.md` — the four vignette-cited claims, two
+- [x] T4. Author `wendt2019.md` — the four vignette-cited claims, two
       channels.
-- [ ] T5. Reconcile against `devel/m5-wendt-discrepancies.md` (read-only) and
+- [x] T5. Reconcile against `devel/m5-wendt-discrepancies.md` (read-only) and
       record what disagrees.
 - [ ] T6. `Traces to` sections written against the actual citing lines;
       `INDEX.md` entries; `cairn_validate` clean; tail-byte and untouched-tree
@@ -112,6 +112,9 @@ prior work (`INDEX.md`, 2026-07-19).
 
 - 2026-07-19: T2/T3 — `acton2004.md` authored. Two-channel coverage on every equation (pp. 5–7, 10), every published cutoff (pp. 17, 19), and Table 2 (p. 15); prose anchors rest on the text channel, stated as such. **The text channel returns an empty line for every display equation** (Eq. 6 extracts as nothing), so the equations rest on the image channel — a silent-dropout mode, not a disagreement. Eq. 6 recorded both ways per AC2: printed `X_v = Σ_f φ_fv²` (communality) vs. the p. 6 prose describing vector lengths √h², with the repo's `sd(h)/mean(h)` resolution recorded separately. Gap/VT2/RT verified as implemented exactly as printed — RT's `sum((rl2[,1]-rl2[,2])^2/2)` **is** Eq. 9 at nf = 2. AC3 satisfied and sharpened: the published cutoffs are nv = 64/128 (p. 8 design), and **A&R announce an nv = 8/16/32 follow-up twice (pp. 10, 18) but never report its results**, which is why the repo re-derived; a side-by-side published-vs-shipped table is on the page, with the raw Gap "almost certainly" cutoff moving .01 → .35.
 - 2026-07-19: T2/T3 reconciliation against `devel/ar2004-transcription.md` (read-only, no `devel/` file touched): agreement on every point compared, including all nine published-cutoff rows. Its two recorded paper-internal errata independently confirmed (VT2 24.6 in Table 2 vs 24.5 in p. 18 prose; p. 20's MT paragraph saying "an RT value less than .06"). **A third erratum found that the prior record missed:** p. 20 gives MT's deviation-scoring effect as F(1,192) = 1,265.5, η² = .11, but Table 2 gives MT's IS × Dev cell as 1,262.5 (.11) — η² agrees, so the table is coherent and the prose digit is corrupt, plausibly contaminated by RT's genuine 1,265.6 one row up. Immaterial to the package; recorded for completeness.
+
+- 2026-07-19: T4/T5 — `wendt2019.md` authored; all four vignette claims verified against the source and all four hold. RMSEA .075–.111 quoted verbatim from p. 830 and correctly scoped to CFA-PC (the fixed-spacing, fixed-communality model); the four g–agency correlations (−.283/−.292/−.267/−.324, mean −.2915) quoted verbatim from p. 831. The `:394` claim is accurate and if anything **conservative** — "competitive with categorical and hybrid alternatives" understates p. 832's "superior validity … No evidence … for the incremental validity of categorical or hybrid approaches". One qualifier recorded: the "unit-cosine" specificity rests on the online supplement (R Code S25), which is **not on the shelf**, so it is second-hand on this page. The image channel was load-bearing here — `pdftotext` mis-renders this PDF's operators through the font encoding (`=`→`⫽`, `−`→`⫺`, `<`→`⬍`), so every numeral was confirmed against the rendered page.
+- 2026-07-19: T5 reconciliation against `devel/m5-wendt-discrepancies.md` (read-only): agreement on everything load-bearing, including its §7 correction, which is confirmed verbatim — the "relaxing the restrictions improves fit without sacrificing validity" claim is Wendt et al.'s **citation of prior work** (p. 829, crediting Acton & Revelle 2002 and Gurtman & Pincus 2000), while their own p. 832 finding is the opposite. **One disagreement recorded rather than settled:** its §1 gives the g–communion range as "−.034 to +.142", but p. 831 prints Sample 4 r = −.115, so the true range is −.115 to +.142 — the record's lower bound is Sample 1's value, not the minimum. Immaterial (nothing uses the communion correlation; §1's argument rests on the agency values, which are right) and not corrected, since `devel/` is out of scope.
 
 ## Decisions
 
