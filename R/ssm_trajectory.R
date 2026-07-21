@@ -607,7 +607,12 @@ ssm_trajectory_ggplot <- function(df, time_col, xlab, base_size, na.rm) {
     ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(
       legend.position = "bottom",
-      panel.grid.minor = ggplot2::element_blank()
+      panel.grid.minor = ggplot2::element_blank(),
+      # scales = "free_y" gives each panel its own interior y-axis, so the
+      # Amplitude and Displacement panels' tick labels sit in the gutter to
+      # their left and crowd the neighbouring panel at vignette width. Widen
+      # the horizontal panel gap so the labels clear it (M50).
+      panel.spacing.x = grid::unit(1.2, "lines")
     )
 
   if (show_cert) {

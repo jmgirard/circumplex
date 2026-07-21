@@ -78,7 +78,7 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
 
 ## Tasks
 
-- [ ] T1 — Add horizontal panel spacing to `ssm_trajectory_ggplot()`'s theme
+- [x] T1 — Add horizontal panel spacing to `ssm_trajectory_ggplot()`'s theme
       (`R/ssm_trajectory.R:607-611`); render-and-inspect the grouped,
       ungrouped, and table figures (M33/M38: data-level tests and a stale
       baseline both pass a figure that reads wrong); regenerate the 5
@@ -103,6 +103,7 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
 ## Work log
 
 - 2026-07-21: created by /milestone-plan.
+- 2026-07-21: T1 — added `panel.spacing.x = grid::unit(1.2, "lines")` to `ssm_trajectory_ggplot()`; render-inspected 3- and 5-panel layouts (labels clear); regenerated 5 vdiffr baselines (env parity confirmed via coord_circumplex byte-identical); trajectory tests 145 pass / 0 fail.
 
 ## Decisions
 
