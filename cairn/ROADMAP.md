@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-21 (candidate triage: 20→12 rows — pruned 5 rows (4 promoted → archived milestones + the LESSONS.md row, now enforced by the `weight caps` CHECK + D-051/D-055), trimmed 2 to their live riders, consolidated the four E1–E4 prospects → one `forward-source-prospects.md` pointer. Validate green; 47 advisories M7's; M7 blocked.)_
+_Last hygiene check: 2026-07-21 (M49 done+archived → the fit-index-caveats candidate absorbed; pruned M44 for terminal-row retention (5 kept: M45–M49); LESSONS 38→39. Validate green; 47 advisories M7's; M7 blocked.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M49 | Fit-index guidance — the two source-backed caveats | review | — | normal | milestones/M49-fitindex-source-caveats.md |
+| M49 | Fit-index guidance — the two source-backed caveats | done | — | normal | milestones/archive/M49-fitindex-source-caveats.md |
 | M47 | SSM estimator source notes (Wright 2009 + defining Gurtman) | done | — | normal | milestones/archive/M47-estimator-source-notes.md |
 | M48 | Fit-index and uncited shelf sources (browne1993 twin + strack2013) | done | — | normal | milestones/archive/M48-fitindex-uncited-sources.md |
 | M45 | Source notes for the RANDALL structure test pair | done | M40 | normal | milestones/archive/M45-reference-notes-randall.md |
 | M46 | Prospect notes for the four forward-looking shelf sources | done | — | normal | milestones/archive/M46-prospect-notes-forward-sources.md |
-| M44 | LESSONS.md consolidation and retirement pass | dropped | — | normal | milestones/archive/M44-lessons-consolidation.md |
 
 ## Candidates
 
