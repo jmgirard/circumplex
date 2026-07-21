@@ -1,11 +1,11 @@
 # M49: Fit-index guidance — the two source-backed caveats
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m49-fitindex-source-caveats
 
 ## Goal
 
