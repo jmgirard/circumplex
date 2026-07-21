@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-20 (M44 dropped at Jeff's request — `LESSONS.md` passes `weight caps` at 49/50 lines and `record density` OK. Header's retired `<17,000 chars` cap corrected; M39 pruned per terminal-row retention. M7 still blocked on Jeff's CRAN window.)_
+_Last hygiene check: 2026-07-20 (/milestone: reconciled M39's merge into M7 — M7 now blocked solely on the T4 `submit_cran()` handoff, the M39 predecessor cleared. Flagged for triage: PR #70 (dropped M44) still open on GitHub. Validate green; the 47 `work-log format` advisories are all M7's IP4-protected pre-implement history.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
