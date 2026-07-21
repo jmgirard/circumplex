@@ -84,15 +84,15 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
       baseline both pass a figure that reads wrong); regenerate the 5
       trajectory vdiffr baselines under `NOT_CRAN=true` (M31: bare `Rscript`
       auto-skips vdiffr) and confirm no unrelated baseline moved.
-- [ ] T2 — Rework the instrument/label example (`advanced-visualization.Rmd`
+- [x] T2 — Rework the instrument/label example (`advanced-visualization.Rmd`
       ~L66–82): descriptive full-scale-name spokes; one sentence that an
       instrument object can be passed; correct the surrounding prose.
-- [ ] T3 — Cut the broken `coord-bare` figure and its "unfinished" prose
+- [x] T3 — Cut the broken `coord-bare` figure and its "unfinished" prose
       (~L84–122); lead with the correctly-scaled construction, explaining the
       scale line in prose. Verify no remaining figure shows default breaks.
-- [ ] T4 — Remove the "Extending the layers" section (~L236–270) and any
+- [x] T4 — Remove the "Extending the layers" section (~L236–270) and any
       cross-reference to it.
-- [ ] T5 — Simplify advanced base-R in the visible chunks (the `[, c(...)]`
+- [x] T5 — Simplify advanced base-R in the visible chunks (the `[, c(...)]`
       selections, the `do.call(rbind, lapply())` + `matrix()` occasions build,
       `people[!is.na(...), ]`) into simpler idioms, or move unavoidable
       construction into a non-echoed setup chunk; keep every figure equivalent.
@@ -104,6 +104,10 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
 
 - 2026-07-21: created by /milestone-plan.
 - 2026-07-21: T1 — added `panel.spacing.x = grid::unit(1.2, "lines")` to `ssm_trajectory_ggplot()`; render-inspected 3- and 5-panel layouts (labels clear); regenerated 5 vdiffr baselines (env parity confirmed via coord_circumplex byte-identical); trajectory tests 145 pass / 0 fail.
+- 2026-07-21: T2 — replaced the `instrument = csip` figure (identical PA–NO abbrevs) with descriptive full scale-name spokes (`labels = csip$Scales$Label`); kept a one-sentence note that an instrument can be passed. Render-inspected: all 8 names fit at fig.width=7.
+- 2026-07-21: T3 — cut the deliberately-broken `coord-bare` figure (spokes on default 0/100/200/300) and its "unfinished" prose; lead with the correctly-scaled `coord-built` figure and explain the scale line in prose.
+- 2026-07-21: T4 — removed the "Extending the layers" section (`GeomSsmStar` ggproto subclass); no dangling cross-references remain.
+- 2026-07-21: T5 — `[, c()]` displays → `subset(select=)`; `people[!is.na(),]` → `subset()`; moved the `do.call(rbind, lapply())`+`matrix()` occasions simulation into a non-echoed `echo = FALSE` chunk. Echoed chunks now carry no flagged base-R; full vignette knits under load_all (KNIT OK, 13 figures).
 
 ## Decisions
 
