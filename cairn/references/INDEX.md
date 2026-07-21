@@ -10,6 +10,8 @@ _One line per committed page: `citekey — title — traces to`._
 - [acton2004.md](acton2004.md) — Acton & Revelle (2004), *Evaluation of ten psychometric criteria for circumplex structure* — the four criteria `fit_structure()` implements (Fisher eq. 6, Gap eq. 2, VT2 eq. 8, RT eq. 9), the Eq. 6 printed-vs-prose split, and the published nv = 64/128 cutoffs the shipped nv = 8 constants are **not** taken from; traces to `R/fit_structure.R`, `R/fit_structure_oop.R`, `data-raw/structure-test-cutoffs.R` and `vignettes/evaluating-circumplex-structure.Rmd`.
 - [wendt2019.md](wendt2019.md) — Wendt et al. (2019), *The latent structure of interpersonal problems* — the real-data benchmark for the fixed-angle circumplex CFA (RMSEA .075–.111, g–agency ≈ −.29 across four samples); traces to `vignettes/sem-based-ssm-analysis.Rmd:44,114,368,394-400,428`. Context for the strict tier, never an oracle.
 - [hu1999.md](hu1999.md) — Hu & Bentler (1999), *Cutoff criteria for fit indexes in covariance structure analysis* — the SRMR .08 and CFI/TLI .95 cutoffs; traces to `R/ssm_ci_accuracy.R:1023`, `R/ssm_ci_oop.R`, `R/cpm_oop.R:187-188` and `vignettes/evaluating-circumplex-structure.Rmd`.
+- [hubert1987.md](hubert1987.md) — Hubert & Arabie (1987), *Evaluating order hypotheses within proximity matrices* — the randomization order test behind `fit_structure()`'s RANDALL: the normalized agreement index (A−D)/(A+D+T) and its exact / (M+1)/(N+1) randomization p-value; traces to `R/fit_structure.R` (`structure_randall()`, `structure_randall_test()`), `tests/testthat/test-fit_structure.R` and `vignettes/evaluating-circumplex-structure.Rmd`.
+- [tracey1997.md](tracey1997.md) — Tracey (1997), *RANDALL: A Microsoft FORTRAN program…* — the program operationalizing Hubert & Arabie (1987), naming the Correspondence Index; traces to the same RANDALL implementation and `man/fit_structure.Rd` (`@references`). Companion to `hubert1987.md`; its Table 1 pins the tie case where the code's index (.92) departs from RANDALL's CI (.93).
 
 <!-- Entry format note: cairn_validate's _INDEX_LINE regex matches the first
      [\w./-]+\.md token after the bullet, so the link TEXT must be the
@@ -24,18 +26,20 @@ _One line per committed page: `citekey — title — traces to`._
      2026-07-19.)
 
      Which sources still owe a page is the milestone files' ledger, not this
-     file's. As of the M43 merge every source on the shelf that the repo
-     relies on has a page — the Acton & Revelle (2004) and Wendt et al.
-     (2019) entries this note carried after M42 are discharged, as the
-     Browne (1992) and Browne (1982) ones were before them — observed
-     2026-07-19. Two sources the repo DOES rely on are not on the shelf and
-     so have no page: Hubert & Arabie (1987) and Tracey (1997), which back
-     RANDALL (`structure_randall()`, `structure_randall_test()`, cited at
-     R/fit_structure.R:714,773-778). Surfaced by M43 and carried as a
-     ROADMAP candidate; both PDFs must be shelved before a milestone can
-     take it up. The shelf is a live directory that changed twice during
-     M40 alone, so treat any list here as a snapshot and re-inventory
-     rather than trusting it.
+     file's. As of the M45 merge every source on the shelf that the repo
+     relies on has a page — the Hubert & Arabie (1987) and Tracey (1997)
+     RANDALL pair this note recorded as owed after M43 are discharged by M45
+     (both PDFs were shelved 2026-07-20, clearing the "not on the shelf" gate),
+     as the Acton & Revelle (2004) / Wendt (2019) and Browne (1992) / Browne
+     (1982) entries were before them — observed 2026-07-20. The shelf is a
+     live directory that changed twice during M40 alone, so treat any list
+     here as a snapshot and re-inventory rather than trusting it.
+
+     Forward-looking shelf sources (nagy2019, weide2021, rogoza2021,
+     tracey2000) were added on purpose as future research material, not
+     because anything cites them; per D-023 they are captured as prospects
+     by M46, NOT dismissed as "owes no page," and do not belong on this
+     committed-page list until a milestone comes to rely on one.
 
      Shelved sources that owe NO page, each with its reason — all observed
      2026-07-19:
