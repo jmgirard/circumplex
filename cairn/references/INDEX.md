@@ -12,6 +12,7 @@ _One line per committed page: `citekey — title — traces to`._
 - [hu1999.md](hu1999.md) — Hu & Bentler (1999), *Cutoff criteria for fit indexes in covariance structure analysis* — the SRMR .08 and CFI/TLI .95 cutoffs; traces to `R/ssm_ci_accuracy.R:1023`, `R/ssm_ci_oop.R`, `R/cpm_oop.R:187-188` and `vignettes/evaluating-circumplex-structure.Rmd`.
 - [hubert1987.md](hubert1987.md) — Hubert & Arabie (1987), *Evaluating order hypotheses within proximity matrices* — the randomization order test behind `fit_structure()`'s RANDALL: the normalized agreement index (A−D)/(A+D+T) and its exact / (M+1)/(N+1) randomization p-value; traces to `R/fit_structure.R` (`structure_randall()`, `structure_randall_test()`), `tests/testthat/test-fit_structure.R` and `vignettes/evaluating-circumplex-structure.Rmd`.
 - [tracey1997.md](tracey1997.md) — Tracey (1997), *RANDALL: A Microsoft FORTRAN program…* — the program operationalizing Hubert & Arabie (1987), naming the Correspondence Index; traces to the same RANDALL implementation and `man/fit_structure.Rd` (`@references`). Companion to `hubert1987.md`; its Table 1 pins the tie case where the code's index (.92) departs from RANDALL's CI (.93).
+- [forward-source-prospects.md](forward-source-prospects.md) — Forward-looking source prospects (M46) — a supply-push survey synthesis note triaging four shelved sources (nagy2019, weide2021, rogoza2021, tracey2000), each mapped to a `candidate` ROADMAP row; traces to nothing yet — per-source pages owed only on graduation (D-024).
 
 <!-- Entry format note: cairn_validate's _INDEX_LINE regex matches the first
      [\w./-]+\.md token after the bullet, so the link TEXT must be the
@@ -37,9 +38,13 @@ _One line per committed page: `citekey — title — traces to`._
 
      Forward-looking shelf sources (nagy2019, weide2021, rogoza2021,
      tracey2000) were added on purpose as future research material, not
-     because anything cites them; per D-023 they are captured as prospects
-     by M46, NOT dismissed as "owes no page," and do not belong on this
-     committed-page list until a milestone comes to rely on one.
+     because anything cites them; per D-023 (mechanism superseded by D-024)
+     they are captured as prospects by M46, NOT dismissed as "owes no page."
+     M46 triaged all four into the ONE committed survey synthesis note listed
+     above (forward-source-prospects.md) plus four candidate ROADMAP rows; a
+     per-source <citekey>.md page is still owed only once a milestone comes to
+     rely on one (D-024). So the survey note carries its INDEX line here; the
+     four sources individually do not, until they graduate.
 
      Shelved sources that owe NO page, each with its reason — all observed
      2026-07-19:
