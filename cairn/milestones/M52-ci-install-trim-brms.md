@@ -67,13 +67,13 @@ the Bayesian vignette's `brm()` chunk is `eval = FALSE` and ships a committed
 
 ## Tasks
 
-- [ ] T1 — In `.github/workflows/R-CMD-check.yaml`, replace the `needs: check`
+- [x] T1 — In `.github/workflows/R-CMD-check.yaml`, replace the `needs: check`
       resolution with `dependencies: '"hard"'` + an `extra-packages` allowlist of
       every DESCRIPTION Suggest except brms (plus `any::rcmdcheck`); add
       `_R_CHECK_FORCE_SUGGESTS_: false` to the job env if the check ERRORs on the
       absent brms. Add an inline comment: brms is excluded because it is never
       loaded (D-015), and the allowlist must mirror DESCRIPTION Suggests minus brms.
-- [ ] T2 — Apply the same allowlist trim to `.github/workflows/test-coverage.yaml`
+- [x] T2 — Apply the same allowlist trim to `.github/workflows/test-coverage.yaml`
       (`extra-packages: any::covr, any::xml2` + the same Suggests-minus-brms list).
 - [ ] T3 — Push the branch, open the PR, and verify: R-CMD-check + coverage green;
       capture the "install dependencies" step durations before/after and confirm
@@ -86,6 +86,14 @@ the Bayesian vignette's `brm()` chunk is `eval = FALSE` and ships a committed
   cost` candidate (M51 scope note, 2026-07-21); Jeff chose brms-only trim + a
   measured-delta merge bar at the plan gate. Load-bearing evidence: D-015 (brms
   inert — precomputed vignette), D-016 (glmmTMB eval-guarded, kept).
+- 2026-07-21: T1+T2 done — both workflows switched from `needs: check` /
+  `needs: coverage` (whole-Suggests resolution) to `dependencies: '"hard"'` + an
+  explicit 14-pkg allowlist = DESCRIPTION Suggests minus brms (check job adds
+  rcmdcheck; coverage job adds xml2). `_R_CHECK_FORCE_SUGGESTS_: false` on the
+  check job so the absent brms is skippable, not a check WARNING under --as-cran.
+  Both files YAML-validated; brms confirmed absent from both installs. Only
+  `.github/workflows/` touched, so the profile verify slot holds trivially
+  (no package-file diff). T3 (CI-green + measured delta) needs the PR's runs.
 
 ## Decisions
 

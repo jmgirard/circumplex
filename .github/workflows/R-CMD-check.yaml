@@ -36,6 +36,10 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      # brms is a declared Suggest but is never installed on CI (see the
+      # setup-r-dependencies step below), so R CMD check must treat it as
+      # skippable rather than erroring on "suggested but not available".
+      _R_CHECK_FORCE_SUGGESTS_: false
 
     steps:
       - uses: actions/checkout@v4
@@ -50,8 +54,30 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
-          needs: check
+          # brms is deliberately excluded from the CI install. It is never
+          # loaded by package code, tests, or vignette build — the Bayesian
+          # vignette's brm() chunk is eval = FALSE and ships a committed .rds
+          # fixture (cairn D-015) — yet it pulls in the whole Stan toolchain
+          # (rstan/StanHeaders/RcppParallel/BH), the heaviest compile in the
+          # tree. So instead of `needs: check` (which resolves ALL Suggests),
+          # we install hard deps + an explicit allowlist that MUST stay a
+          # mirror of DESCRIPTION Suggests minus brms. See cairn milestone M52.
+          dependencies: '"hard"'
+          extra-packages: |
+            any::rcmdcheck
+            any::covr
+            any::ggrepel
+            any::glmmTMB
+            any::kableExtra
+            any::knitr
+            any::lavaan
+            any::OpenMx
+            any::psych
+            any::RColorBrewer
+            any::rmarkdown
+            any::roxygen2
+            any::testthat
+            any::vdiffr
 
       - uses: r-lib/actions/check-r-package@v2
         with:
