@@ -624,3 +624,27 @@ Adding a dependency is a question-gate item under the tracking rules --
 **user-approved 2026-07-19** at the M39 T3 gate. This entry was written at
 review: the gate was held but the D-entry was missed at the time, and review's
 history lens caught the omission (M39 finding F1).
+
+### D-023 (2026-07-20): a deliberately-shelved source is captured as a research prospect, not dismissed as "owes no page"
+
+**Context:** The M41/M43 source-note sweeps dispositioned shelved PDFs the repo
+does not cite as "owes no page" (the "consulted in passing owes nothing" rule;
+`INDEX.md` ledger). At the M45/M46 plan gate Jeff added nagy2019, weide2021,
+rogoza2021, and tracey2000 to the shelf **on purpose** — as candidate
+references, oracles, or research material for future milestones — and rejected
+the owes-no-page disposition as shortsighted: absence of a current citation is
+not evidence a source is inert.
+**Decision:** A shelf source no shipped code cites is dispositioned by *intent*,
+not by citation count. One deliberately added as future research material is
+captured as a **prospect** — a forward-looking brief (what it contains, what it
+could seed, what a taking-up milestone must verify) plus a `candidate` ROADMAP
+row — kept separate from the relied-upon reference pages and out of `INDEX.md`'s
+committed-page list (it has no `Traces to`). The "owes no page" ledger is
+retained only for sources genuinely consulted in passing (e.g. cited only as
+other authors' citation of prior work), which stay listed with their reason.
+**Consequences:** M46 authors the four prospect briefs and rows. Future source
+sweeps must ask *why a PDF is on the shelf* before dispositioning it, never
+dismiss on "nothing cites it." The full extraction + code-cross-reference bar
+(the M45 relied-upon bar) is owed only when a milestone comes to rely on a
+source. Refines the M41/M43 owes-no-page practice; no D-entry superseded.
+Source: Jeff, M45/M46 plan gate.
