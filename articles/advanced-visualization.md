@@ -72,16 +72,20 @@ ggcircumplex(octants(), labels = PANO())
 
 ![](advanced-visualization_files/figure-html/canvas-labels-1.png)
 
-If you are working with one of the instruments bundled with the package,
-you can pass it directly and the scale angles and abbreviations are
-taken from the instrument:
+The labels need not be abbreviations. The octant scales also have full
+interpersonal names, which you can put on the spokes instead:
 
 ``` r
 
-ggcircumplex(instrument = csip)
+ggcircumplex(octants(), labels = csip$Scales$Label)
 ```
 
-![](advanced-visualization_files/figure-html/canvas-instrument-1.png)
+![](advanced-visualization_files/figure-html/canvas-descriptive-1.png)
+
+If you are working with one of the instruments bundled with the package,
+you can pass it directly with `ggcircumplex(instrument = csip)`, and its
+scale angles and abbreviations are taken from the instrument rather than
+typed by hand.
 
 Throughout, displacement runs counterclockwise from the right, and the
 0/360 degree position is labeled 360.
@@ -93,7 +97,9 @@ is a convenience wrapper. Underneath it, the piece that makes a
 circumplex plot circular is
 [`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md),
 and you can add that to a bare `ggplot()` yourself when you want to
-build a figure from scratch:
+build a figure from scratch. On top of the coordinate system you supply
+three things: an x-scale carrying the spoke breaks and labels, a data
+layer, and the theme.
 
 ``` r
 
@@ -102,26 +108,10 @@ results <- ssm_analyze(
   scales = PANO(),
   measures = c("NARPD", "ASPD")
 )
-results$results[, c("Label", "a_est", "d_est", "a_lci", "a_uci")]
+subset(results$results, select = c(Label, a_est, d_est, a_lci, a_uci))
 #>   Label    a_est    d_est     a_lci     a_uci
 #> 1 NARPD 0.189244 108.9667 0.1537900 0.2271848
 #> 2  ASPD 0.226159 115.9267 0.1905403 0.2640428
-
-ggplot(results$results) +
-  coord_circumplex(amax = 0.3) +
-  geom_ssm_point(aes(amplitude = a_est, displacement = d_est, fill = Label)) +
-  theme_circumplex()
-```
-
-![](advanced-visualization_files/figure-html/coord-bare-1.png)
-
-That is the minimum: a coordinate system and a layer. It is also visibly
-unfinished — the spokes fall on `ggplot2`’s default axis breaks (0, 100,
-200, 300) rather than on the circumplex scale angles, because a bare
-coordinate system has not been told what the scales are. Supplying those
-breaks and labels is the missing piece:
-
-``` r
 
 ggplot(results$results) +
   coord_circumplex(amax = 0.3) +
@@ -130,11 +120,12 @@ ggplot(results$results) +
   theme_circumplex()
 ```
 
-![](advanced-visualization_files/figure-html/coord-bare-scaled-1.png)
+![](advanced-visualization_files/figure-html/coord-built-1.png)
 
-The only difference between those two figures is that second line: the
-spoke breaks and their scale labels. Supplying them, along with the
-theme, is what
+The `scale_x_continuous()` line is the one that tells the coordinate
+system where the scale angles are; without it the spokes would fall on
+`ggplot2`’s default breaks rather than on the octants. Supplying those
+breaks and labels, along with the theme, is what
 [`ggcircumplex()`](http://circumplex.jmgirard.com/reference/ggcircumplex.md)
 does on top of the coordinate system. Build from the parts when you want
 to vary one of those pieces; reach for
@@ -277,48 +268,6 @@ ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
 
 ![](advanced-visualization_files/figure-html/theming-1.png)
 
-## Extending the layers
-
-The `ggplot2` objects behind the layers and the coordinate system —
-`GeomSsmPoint`, `GeomSsmArc`, and `CoordCircumplex` — are exported, so
-you can subclass them the same way you would subclass any `ggplot2`
-geom. This is the route to a reusable layer with your own defaults,
-rather than repeating the same arguments at every call site.
-
-``` r
-
-GeomSsmStar <- ggproto("GeomSsmStar", GeomSsmPoint,
-  default_aes = modifyList(
-    GeomSsmPoint$default_aes,
-    list(shape = 23, size = 5, fill = "#D55E00", colour = "black")
-  )
-)
-
-geom_ssm_star <- function(mapping = NULL, data = NULL, ...) {
-  layer(
-    geom = GeomSsmStar, mapping = mapping, data = data,
-    stat = "identity", position = "identity",
-    inherit.aes = FALSE, params = list(...)
-  )
-}
-
-ggcircumplex(octants(), labels = PANO(), amax = 0.3) +
-  geom_ssm_star(
-    data = results$results,
-    mapping = aes(amplitude = a_est, displacement = d_est)
-  )
-```
-
-![](advanced-visualization_files/figure-html/subclass-1.png)
-
-Everything the parent geom does — mapping amplitude and displacement
-onto the positional aesthetics, and dropping profiles with no defined
-location — is inherited; only the defaults change. The polar transform
-itself is not part of the geom: as above,
-[`coord_circumplex()`](http://circumplex.jmgirard.com/reference/coord_circumplex.md)
-owns it, which is why the subclass needs no circular arithmetic of its
-own.
-
 ## Composing custom layers
 
 Because the canvas and geoms are ordinary `ggplot2` objects, you can add
@@ -338,7 +287,7 @@ people <- ssm_score(
   scales = PANO(),
   append = FALSE
 )
-people <- people[!is.na(people$Disp), ]
+people <- subset(people, !is.na(Disp))
 
 # Group-level profile for the same subset
 group <- ssm_analyze(jz2017[1:100, ], scales = PANO())
@@ -386,29 +335,16 @@ dependence across occasions is respected.
 [`ssm_plot_trajectory()`](http://circumplex.jmgirard.com/reference/ssm_plot_trajectory.md)
 then draws each SSM parameter against time.
 
-Here is a small simulated three-wave data set whose group profile
-rotates counterclockwise across the 0/360 degree boundary, which is the
-case worth seeing drawn:
+Here is a small simulated three-wave data set, `long`, whose group
+profile rotates counterclockwise across the 0/360 degree boundary — the
+case worth seeing drawn. (The code that simulates it is omitted; it is
+not the point here. The data frame has one row per person per wave, the
+eight [`PANO()`](http://circumplex.jmgirard.com/reference/PANO.md) scale
+columns, an `id`, and a `wave` label.) We estimate one profile per wave
+with
+[`ssm_analyze_long()`](http://circumplex.jmgirard.com/reference/ssm_analyze_long.md):
 
 ``` r
-
-angles <- octants()
-n <- 200
-waves <- c(T1 = 330, T2 = 355, T3 = 20) # true displacement at each wave
-elevation <- rnorm(n) * 0.5 # per-person offset, stable across waves
-
-long <- do.call(rbind, lapply(names(waves), function(w) {
-  # Group signal at this wave, plus the stable person offset and fresh noise
-  signal <- 0.6 * cos((angles - waves[[w]]) * pi / 180)
-  scores <- matrix(signal, nrow = n, ncol = length(angles), byrow = TRUE) +
-    elevation +
-    matrix(rnorm(n * length(angles), sd = 0.5), nrow = n)
-  out <- as.data.frame(scores)
-  names(out) <- PANO()
-  out$id <- seq_len(n)
-  out$wave <- w
-  out
-}))
 
 results_long <- ssm_analyze_long(
   long,
@@ -416,7 +352,7 @@ results_long <- ssm_analyze_long(
   id = "id",
   occasion = "wave"
 )
-results_long$results[, c("Occasion", "a_est", "d_est", "d_lci", "d_uci")]
+subset(results_long$results, select = c(Occasion, a_est, d_est, d_lci, d_uci))
 #>   Occasion     a_est     d_est     d_lci     d_uci
 #> 1       T1 0.6133765 332.44652 329.70848 335.43024
 #> 2       T2 0.5879017 355.92454 352.64902 359.30751
@@ -483,7 +419,7 @@ draws the same series as a path on the circular canvas, so a change in
 
 ``` r
 
-ggcircumplex(angles, amax = 0.8) +
+ggcircumplex(octants(), amax = 0.8) +
   geom_ssm_point(
     data = results_long$results,
     mapping = aes(amplitude = a_est, displacement = d_est),
