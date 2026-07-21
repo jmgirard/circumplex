@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-20 (/milestone-review M45: merged PR #71, archived M45 → done, RANDALL candidate discharged. Validate green; the 47 `work-log format` advisories are all M7's IP4-protected pre-implement history. Still flagged for triage: PR #70 (dropped M44) open on GitHub. M46 (forward-source prospects) remains planned.)_
+_Last hygiene check: 2026-07-21 (/milestone-review M46: merged PR #72, archived M46 → done — re-planned to the supply-push doctrine (D-024 supersedes D-023); shipped one survey note + four candidate rows. New candidate: triage 8 unaccounted shelf sources (wright2009/gurtman* owe pages). Validate green; 47 work-log advisories remain M7's; PR #70 still open.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -11,9 +11,8 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
 | M45 | Source notes for the RANDALL structure test pair | done | M40 | normal | milestones/archive/M45-reference-notes-randall.md |
-| M46 | Prospect notes for the four forward-looking shelf sources | review | — | normal | milestones/M46-prospect-notes-forward-sources.md |
+| M46 | Prospect notes for the four forward-looking shelf sources | done | — | normal | milestones/archive/M46-prospect-notes-forward-sources.md |
 | M44 | LESSONS.md consolidation and retirement pass | dropped | — | normal | milestones/archive/M44-lessons-consolidation.md |
-| M41 | Source notes for the fit-index benchmark pair | done | M40 | normal | milestones/archive/M41-reference-notes-benchmarks.md |
 | M42 | Source notes for the CPM model and its communality CIs | done | M40 | normal | milestones/archive/M42-reference-notes-cpm.md |
 | M43 | Source notes for the structure criteria and the validity source | done | M40 | normal | milestones/archive/M43-reference-notes-structure.md |
 
