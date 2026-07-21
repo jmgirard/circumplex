@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m47-estimator-source-notes
+- **Branch/PR:** m47-estimator-source-notes · https://github.com/jmgirard/circumplex/pull/73
 
 ## Goal
 
@@ -33,7 +33,7 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
 
 ## Acceptance criteria
 
-- [ ] `wright2009.md` exists at the M45 bar: full citation; the `aw2009`
+- [x] `wright2009.md` exists at the M45 bar: full citation; the `aw2009`
       dataset provenance cross-referenced to `R/example_data.R:4` +
       `man/aw2009.Rd`; the closed-form SSM parameter formulas it publishes
       banked verbatim with page/table anchors; a `**Provenance.**` block whose
@@ -41,28 +41,28 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
       the shelf PDF is an OCR scan the page image is the single authoritative
       channel (M42-D1), not two independent ones. (Amended 2026-07-20: wright2009
       is a Paper-Capture scan.)
-- [ ] `gurtman1998.md` (Gurtman & Balakrishnan 1998, *Circular Measurement
+- [x] `gurtman1998.md` (Gurtman & Balakrishnan 1998, *Circular Measurement
       Redux*) — identified as the source defining the "conventional Gurtman
       estimator" with cited evidence matching `R/ssm_analysis.R:1183` and the
       weights at `test-ssm_sem_syntax.R:6` — banks its elevation / amplitude /
       angular-displacement / R² formulas verbatim with page anchors and a
       `**Provenance.**` block.
-- [ ] `gurtman2003.md` (Gurtman & Pincus 2003, Handbook ch. 16) banks the
+- [x] `gurtman2003.md` (Gurtman & Pincus 2003, Handbook ch. 16) banks the
       structural-summary model (Eq 16.7) and its R² goodness-of-fit definition
       with page anchors and a `**Provenance.**` block; `Traces to` the two SSM
       vignettes that cite it (`introduction-`, `intermediate-ssm-analysis.Rmd`).
       (Added 2026-07-20 at the T3 gate: 2003 is relied-upon, not owes-no-page.
       Corrected same day: gurtman2003 does NOT print the .80/.70 R² cutoffs
       Wright 2009 attributes to it — that's recorded as a dated observation.)
-- [ ] Each new page's `Traces to` names the code lines the source backs (the
+- [x] Each new page's `Traces to` names the code lines the source backs (the
       `R/ssm_analysis.R` closed-form path; `test-ssm_sem_syntax.R:6`; the
       vignettes), and the banked estimator formulas reconcile with the shipped
       estimator (weights / means / R² match).
-- [ ] Every remaining shelf Gurtman PDF (1991 / 1993 / 1994) is dispositioned —
+- [x] Every remaining shelf Gurtman PDF (1991 / 1993 / 1994) is dispositioned —
       an owes-no-page `INDEX.md` comment with its reason, or a prospect
       `candidate` ROADMAP row where deliberately shelved — leaving none
       unaccounted.
-- [ ] `INDEX.md` carries a line for each new committed page; `cairn_validate`
+- [x] `INDEX.md` carries a line for each new committed page; `cairn_validate`
       (references check + full run) is green.
 
 ## Coverage
@@ -139,3 +139,35 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
   and declined by Jeff.
 
 ## Review
+
+**AC evidence (fresh, 2026-07-20; PR #73):**
+
+- AC1 ✓ — `wright2009.md`: citation (JPA 91(4) 311–322, DOI 10.1080/00223890902935696);
+  `aw2009` provenance → Table A re-confirmed identical fresh (`aw2009` 5×8,
+  PA[1] = −1.09, LM[5] = 1.49 = Table A P1/P5); Eqs. 7–13 banked with p.315
+  anchors; Provenance states the OCR-scan single authoritative channel (image),
+  dated observed 2026-07-20.
+- AC2 ✓ — `gurtman1998.md`: identified as definer; Eqs. 1–2 banked from p.349
+  (the SS_Total page Wright cites) matching `test-ssm_sem_syntax.R:6`
+  ("e = mean, x = (2/p)*cos") and `R/ssm_analysis.R:1183` ("conventional Gurtman
+  estimator"); Provenance present.
+- AC3 ✓ — `gurtman2003.md`: Eq. 16.7 + R² goodness-of-fit definition banked with
+  p.417 anchor; born-digital text-layer Provenance; `Traces to` the two SSM
+  vignettes; the .80/.70-not-in-2003 correction re-verified fresh (0
+  cutoff-language hits in the source).
+- AC4 ✓ — each page's `Traces to` names specific code lines; the banked estimator
+  reconciles with the shipped one (e = mean; X/Y weighted sums, c = 2/p;
+  a = √(X²+Y²); δ from Y/X; R² = 1 − SS_resid/SS_Total).
+- AC5 ✓ — gurtman 1991/1993/1994 each carry an owes-no-page `INDEX.md` ledger
+  entry with reason (3 lines).
+- AC6 ✓ — `INDEX.md` has a catalog line for each of the 3 new pages;
+  `cairn_validate` exits 0, all CHECKs PASS.
+
+**Consistency gate:** `cairn_validate` exit 0 (all CHECKs PASS). Toolchain
+r-package gate: no package files touched (`git diff --name-only master..HEAD` =
+`cairn/` only), so `document()` no-diff and `check()` are clean no-ops.
+Advisories (non-blocking): `record density (1)` on `ROADMAP.md:4` (the planning
+hygiene stamp, 402/400 chars — shortened when the stamp is replaced at post-merge
+hygiene); `work-log format (47)` all pre-existing M7 lines.
+
+**Independent fresh-context review:** _(pending — three lenses + scorer)_
