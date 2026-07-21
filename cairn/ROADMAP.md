@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-20 (/milestone-plan: promoted the 8-source triage → M47 (estimator sources: wright2009 + the defining Gurtman work, RB no-oracle) + M48 (browne1993 twin cross-ref + strack2013 prospect); corrected the row's browne1993=uncited error — it is cited as "Browne & Cudeck, 1993" in the vignette + snapshot. Validate green; 47 work-log advisories remain M7's; PR #70 still open.)_
+_Last hygiene check: 2026-07-21 (/milestone-review M47: merged PR #73, archived → done. Shipped 3 estimator source notes — wright2009 + gurtman1998 (the definer) + gurtman2003 — and owes-no-page for gurtman 1991/1993/1994; review F1/F2 fixed. Validate green; M48 still planned; PR #70 still open; 47 advisories remain M7's. Pruned M42 terminal row per retention.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M47 | SSM estimator source notes (Wright 2009 + defining Gurtman) | review | — | normal | milestones/M47-estimator-source-notes.md |
+| M47 | SSM estimator source notes (Wright 2009 + defining Gurtman) | done | — | normal | milestones/archive/M47-estimator-source-notes.md |
 | M48 | Fit-index and uncited shelf sources (browne1993 twin + strack2013) | planned | — | normal | milestones/M48-fitindex-uncited-sources.md |
 | M45 | Source notes for the RANDALL structure test pair | done | M40 | normal | milestones/archive/M45-reference-notes-randall.md |
 | M46 | Prospect notes for the four forward-looking shelf sources | done | — | normal | milestones/archive/M46-prospect-notes-forward-sources.md |
 | M44 | LESSONS.md consolidation and retirement pass | dropped | — | normal | milestones/archive/M44-lessons-consolidation.md |
-| M42 | Source notes for the CPM model and its communality CIs | done | M40 | normal | milestones/archive/M42-reference-notes-cpm.md |
 | M43 | Source notes for the structure criteria and the validity source | done | M40 | normal | milestones/archive/M43-reference-notes-structure.md |
 
 ## Candidates
