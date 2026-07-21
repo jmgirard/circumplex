@@ -5,7 +5,7 @@
 - **Depends on:** M40
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m45-reference-notes-randall
+- **Branch/PR:** m45-reference-notes-randall · https://github.com/jmgirard/circumplex/pull/71
 
 ## Goal
 
@@ -110,3 +110,47 @@ open question.
   (.92 → .93).
 
 ## Review
+
+**PR #71** (draft). Reviewed 2026-07-20. Docs-only apart from a 3-line test
+comment; branch diff = 6 files (2 new source notes, INDEX, milestone, ROADMAP,
+one test comment).
+
+### Acceptance criteria — fresh evidence
+
+- [x] AC1 — `hubert1987.md` (117 lines): banks the Eq. 3/5 normalized index,
+  the exact p-value (p. 175), and the (M+1)/(N+1) MC form (p. 177), each
+  page-anchored; `Extraction:` status records the OCR-scan single-witness
+  honestly (verified 2026-07-20 against `pdftoppm` images of pp. 176–177, no
+  human read — M40-D2); `## Traces to` present.
+- [x] AC2 — `tracey1997.md` (89 lines): banks CI = (A−D)/(A+D+T), exact-only
+  enumeration, the 4/6/8-var program scope, page-anchored pp. 165–167; honest
+  `Extraction:` status; `## Traces to` present.
+- [x] AC3 — both notes carry a `## Reconciliation with the shipped code`
+  section; cross-checked fresh under `load_all()` on Tracey Table 1:
+  `randall_predictions(6)` = **72** predictions, code reproduces
+  **A=69/D=2/T=1**, index **.9167** vs Tracey CI **.9306**. The strict-`>` tie
+  departure and the faithful (M+1)/(N+1) match are recorded verbatim; disposition
+  in **M45-D1**.
+- [x] AC4 — `INDEX.md` gains both entries with filename link text (confirmed by
+  `cairn_validate` `references index<->disk` PASS); the RANDALL owes-a-page
+  ledger note is retired (the sole surviving "not on the shelf" mention is in the
+  retired-note prose describing what was cleared).
+- [x] AC5 — `test-fit_structure_api.R:2` corrected ("five Acton & Revelle" →
+  four A&R criteria + RANDALL); `test-fit_structure.R` and
+  `test-fit_structure_api.R` pass under `NOT_CRAN=true`.
+- [x] AC6 — `cairn_validate` all checks pass (exit 0; 48 advisories, all
+  pre-existing M7 work-log history, non-gating); both pages parse
+  `('ok', 2026-07-20)`.
+
+### Consistency gate
+
+- `cairn_validate`: all checks passed (exit 0). Coverage completeness: pass.
+- Profile (`r-package`) consistency-gate: `devtools::document()` no diff; no
+  `man/`/`NAMESPACE`/`R/` generated-file drift; no new top-level files; README
+  and pkgdown unaffected (no export surface change). `devtools::check(--no-manual)`:
+  _pending — recorded below._
+- `cairn_impact`: N/A (Principles touched: —; no DESIGN.md principle changed).
+
+### Independent review (three lenses + scorer)
+
+_pending._
