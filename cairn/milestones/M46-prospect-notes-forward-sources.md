@@ -71,9 +71,7 @@ applied here). Adding these to `INDEX.md`'s committed-page list (they have no
 
 ## Work log
 
-- 2026-07-20: created by /milestone-plan (Jeff split the forward-looking
-  sources out of M45 into their own scope; they were added to the shelf on
-  purpose as future references / oracles / research material).
+- 2026-07-20: created by /milestone-plan (Jeff split the forward-looking sources out of M45 into their own scope — shelved on purpose as future references / oracles / research material; see D-023).
 
 ## Decisions
 
