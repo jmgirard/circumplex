@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m52-ci-install-trim-brms
+- **Branch/PR:** m52-ci-install-trim-brms · https://github.com/jmgirard/circumplex/pull/78
 
 ## Goal
 
@@ -94,6 +94,11 @@ the Bayesian vignette's `brm()` chunk is `eval = FALSE` and ships a committed
   Both files YAML-validated; brms confirmed absent from both installs. Only
   `.github/workflows/` touched, so the profile verify slot holds trivially
   (no package-file diff). T3 (CI-green + measured delta) needs the PR's runs.
+- 2026-07-21: T3 in progress — PR #78 opened against master; R-CMD-check
+  (ubuntu-release PR job), test-coverage, and pkgdown running. Baseline for the
+  AC4 delta: the untrimmed workflow on the identical plan commit `6d45597b`
+  (master run 29845320357), whose ubuntu-release job is the before-counterpart.
+  Awaiting CI settle to capture install-step timings and confirm brms/Stan absent.
 
 ## Decisions
 
