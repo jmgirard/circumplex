@@ -138,4 +138,28 @@ location; see D-024).
 
 ### Independent review (three lenses + scorer)
 
-_Pending reviewer return._
+Three fresh-context lenses, distinct evidence bases, ref-based git only:
+
+- **[O] diff-bug (Opus)** — no findings. Verified template completeness, the
+  one-physical-line unbolded Extraction status, all dated observations, E1–E4
+  Disposition↔candidate-row agreement, the INDEX link-text format, and
+  independently confirmed the tracey2000-uncited correction against
+  `R/instrument_data.R:5` and a Tracey grep.
+- **[S] blame-history (Sonnet)** — one finding (D-042 citation, below). Verified
+  the INDEX comment's D-023→D-024 supersession leaves the M40 regex note and
+  owes-no-page ledger untouched, the four candidate rows' factual claims against
+  the source files, the "8 unaccounted" reconciliation, and that no ceremony was
+  skipped (`d16eab4f` start commit present).
+- **[S] prior-review (Sonnet)** — no findings. Diff complies with every archived
+  M40–M45 review rule checked (M40 T5 link-text, M40-D2 Extraction honesty,
+  M41-D1/M42-D1 OCR single-channel, M45 F1/F2 coverage-claim). GitHub PR-comment
+  probe returned `[]` (review happens through cairn, as expected).
+
+**Actioned findings (score ≥ 80): none.**
+
+**Logged below threshold (score < 80), surfaced not dropped (IP3):**
+- D-042 citation in `forward-source-prospects.md` ("search-first, D-042") —
+  **score 20.** D-042 is a *cairn-framework* decision (in the plugin's
+  `tracking-rules.md`), not a repo D-entry; this repo already bare-cites
+  framework D-numbers (D-045, D-051, D-055, D-058) as an established convention,
+  so the citation is consistent, not a phantom. No fix.
