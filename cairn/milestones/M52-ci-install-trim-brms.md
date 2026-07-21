@@ -1,11 +1,11 @@
 # M52: Trim brms/Stan from CI dependency installs
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m52-ci-install-trim-brms
 
 ## Goal
 
