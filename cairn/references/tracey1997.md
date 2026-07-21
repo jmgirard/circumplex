@@ -10,7 +10,7 @@ Plug-in`), so its `pdftotext` text layer is **OCR output of the page image, not
 an independent witness** (garbled: "1ERENCE", "Im", "wasp= .0167"). The
 load-bearing passages — the Correspondence Index definition and the worked
 RIASEC example (69 confirmed / 2 not / 1 tie / CI .93 / p = .0167) — were
-**verified 2026-07-20 against the `pdftoppm`-rendered image of p. 165**; the OCR
+verified 2026-07-20 against the `pdftoppm`-rendered image of p. 165; the OCR
 text layer served only to locate passages and read the reference list. Per
 M41-D1 the rendered-image read is independent of the text layer but is **not** a
 human attestation, and both derive from the same scan. No value here has been
