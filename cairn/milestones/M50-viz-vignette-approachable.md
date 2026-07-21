@@ -63,7 +63,7 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
       trajectory vdiffr baselines are regenerated (only the intended ones
       move), and a render-and-inspect confirms no interior-label collision.
       Evidence: `R/ssm_trajectory.R` diff; `_snaps/ssm_trajectory*`; the figure.
-- [ ] `devtools::test()` (NOT_CRAN=true) green and
+- [x] `devtools::test()` (NOT_CRAN=true) green and
       `devtools::check(args = "--no-manual")` clean with every vignette figure
       knitting. Evidence: check/test logs (the `verify` slot).
 
@@ -124,6 +124,7 @@ _Reviewed 2026-07-21. PR #76. Driving RR: none (no projection-vs-outcome)._
 - AC3 — grep for `extending the layers` / `ggproto` / `GeomSsmStar` / `geom_ssm_star` = 0 occurrences.
 - AC4 — the only flagged construct remaining is `matrix(` at Rmd L302–303, inside the `echo = FALSE` `occasions-data-sim` chunk (L293); no `do.call(`/`lapply(`/`[, c(`/`[!is.na(` anywhere. Full vignette knits under `load_all()` (KNIT OK, 13 figures); reworked figures equivalent.
 - AC5 — `R/ssm_trajectory.R:615` adds `panel.spacing.x = grid::unit(1.2, "lines")`; 5 vdiffr baselines regenerated (`_snaps/ssm_trajectory{,_table}`), env parity confirmed (coord_circumplex byte-identical), diff is pure panel geometry; 3- and 5-panel layouts render-inspected, labels clear.
+- AC6 — review-time `devtools::check(args = "--no-manual")` = 0 errors / 0 warnings / 0 notes (tests, incl. the 5 regenerated snapshots, run within it); post-fix vignette re-knit KNIT OK (13 figures). PR CI runs the full matrix on the final commit.
 
 **Consistency gate:**
 
