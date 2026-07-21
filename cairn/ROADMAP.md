@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-21 (/milestone-review M47: merged PR #73, archived → done. Shipped 3 estimator source notes — wright2009 + gurtman1998 (the definer) + gurtman2003 — and owes-no-page for gurtman 1991/1993/1994; review F1/F2 fixed. Validate green; M48 still planned; PR #70 still open; 47 advisories remain M7's. Pruned M42 terminal row per retention.)_
+_Last hygiene check: 2026-07-21 (/milestone-review M48: merged PR #74, archived → done. browne1993 chapter-twin resolved by a cross-reference on browne1992a.md (cutoffs p.144, worked-example table p.152; F1 fixed the conflated anchor). strack2013 → prospect candidate row. Validate green; 47 advisories remain M7's; M7 blocked; PR #70 open. Pruned M43 terminal row.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -11,11 +11,10 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
 | M47 | SSM estimator source notes (Wright 2009 + defining Gurtman) | done | — | normal | milestones/archive/M47-estimator-source-notes.md |
-| M48 | Fit-index and uncited shelf sources (browne1993 twin + strack2013) | review | — | normal | milestones/M48-fitindex-uncited-sources.md |
+| M48 | Fit-index and uncited shelf sources (browne1993 twin + strack2013) | done | — | normal | milestones/archive/M48-fitindex-uncited-sources.md |
 | M45 | Source notes for the RANDALL structure test pair | done | M40 | normal | milestones/archive/M45-reference-notes-randall.md |
 | M46 | Prospect notes for the four forward-looking shelf sources | done | — | normal | milestones/archive/M46-prospect-notes-forward-sources.md |
 | M44 | LESSONS.md consolidation and retirement pass | dropped | — | normal | milestones/archive/M44-lessons-consolidation.md |
-| M43 | Source notes for the structure criteria and the validity source | done | M40 | normal | milestones/archive/M43-reference-notes-structure.md |
 
 ## Candidates
 
