@@ -1,11 +1,11 @@
 # M46: Prospect notes for the four forward-looking shelf sources
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m46-forward-source-prospects
 
 ## Goal
 
