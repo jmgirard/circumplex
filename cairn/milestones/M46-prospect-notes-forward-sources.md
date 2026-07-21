@@ -79,7 +79,7 @@ location; see D-024).
       "what these four are" section, the E1–E4 ledger, and a Disposition mapping
       each row to its candidate row. Derived/first-hand `Extraction:` status on
       one physical line.
-- [ ] T3 — Add the note's `INDEX.md` line (filename as link text); correct the
+- [x] T3 — Add the note's `INDEX.md` line (filename as link text); correct the
       stale `INDEX.md` prospects comment to point at the survey note; confirm no
       per-source page was created.
 - [ ] T4 — Register four `candidate` ROADMAP rows, one per source, each pointing
@@ -92,6 +92,7 @@ location; see D-024).
 - 2026-07-20: re-planned by /milestone-plan — this milestone predated the official supply-push exploration doctrine (tracking-rules "Exploring prospective sources", shipped by cairn M103). Superseded D-023's per-source-prospect-brief mechanism with that doctrine's output: dropped the invented `cairn/references/prospects/` home, replaced the four per-source briefs with one committed survey synthesis note + four candidate rows, recorded D-024. Content unchanged in substance (still capture-by-intent); only the mechanism conforms. See D-024.
 - 2026-07-20: T1 — read the four shelf PDFs at survey altitude; pinned citations/DOIs. Corrected the plan's tracey2000 note: it is uncited (CAIS `@source` is Sodano & Tracey 2006, `R/instrument_data.R:5`), a false repo-state claim caught by the M40/M41 re-check lesson.
 - 2026-07-20: T2 — authored `cairn/references/forward-source-prospects.md` (survey synthesis note): provenance/scope/evidence-snapshot, neutral per-source characterization, E1–E4 prospect ledger (kind: oracle/method/reference/feature), Disposition → four candidate rows, dated open questions. No verbatim values banked; one-physical-line derived Extraction status.
+- 2026-07-20: T3 — added the survey note's `INDEX.md` committed-page line (filename link text); corrected the stale INDEX comment (D-023 mechanism superseded by D-024) to point at the one survey note; confirmed no per-source `<citekey>.md` page was created.
 
 ## Decisions
 
