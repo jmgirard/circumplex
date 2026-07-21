@@ -1,11 +1,11 @@
 # M45: Source notes for the RANDALL structure test pair
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M40
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m45-reference-notes-randall
 
 ## Goal
 
