@@ -33,13 +33,14 @@ Add the two caveats its own cited sources state to the fit-index guidance in `vi
 
 ## Tasks
 
-- [ ] T1 — Insert the Hu & Bentler small-*n* overrejection caveat into `### Reading the fit indices` (at/after the benchmark paragraph, lines 91–97): scoped to TLI and RMSEA, explicitly excluding CFI, attributed to Hu & Bentler (1999), tied to the modest-*n* circumplex context. Verify wording against `hu1999.md`'s abstract quote.
-- [ ] T2 — Insert Browne & Cudeck's "subjective judgment / not infallible" characterization, attributed to Browne & Cudeck (1993), as a source-literature caveat distinct from the package-simulation cautions list. Verify against `browne1992a.md`'s p. 239 quote.
+- [x] T1 — Insert the Hu & Bentler small-*n* overrejection caveat into `### Reading the fit indices` (at/after the benchmark paragraph, lines 91–97): scoped to TLI and RMSEA, explicitly excluding CFI, attributed to Hu & Bentler (1999), tied to the modest-*n* circumplex context. Verify wording against `hu1999.md`'s abstract quote.
+- [x] T2 — Insert Browne & Cudeck's "subjective judgment / not infallible" characterization, attributed to Browne & Cudeck (1993), as a source-literature caveat distinct from the package-simulation cautions list. Verify against `browne1992a.md`'s p. 239 quote.
 - [ ] T3 — Build via `devtools::check(args = "--no-manual")` (authoritative build, not a standalone `render()` — M21/M34); confirm no new NOTE/WARNING and an unchanged References list; check the edited region's bytes for leaked scaffolding (M34).
 
 ## Work log
 
 - 2026-07-21: created by /milestone-plan. Absorbs the "fit-index guidance omits two caveats" candidate row (ROADMAP); lineage: `hu1999.md` open question deferred this from M41. Gate decisions: overrejection caveat scoped to TLI+RMSEA only (CFI excluded, per source); both caveats added.
+- 2026-07-21: T1+T2 — inserted both source-literature caveats as one prose paragraph after the benchmark paragraph, kept distinct from the package-simulation cautions list (relabeled "Two further cautions are circumplex-specific"). Quotes verified verbatim against `browne1992a.md` (p. 239) and `hu1999.md` (abstract); CFI excluded from the overrejection claim.
 
 ## Decisions
 

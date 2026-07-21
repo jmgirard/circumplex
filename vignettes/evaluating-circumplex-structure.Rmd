@@ -96,8 +96,20 @@ at or below about .08 suggests acceptable average residuals (Hu & Bentler,
 Bentler, 1999). Treat these as conventions from the broader
 covariance-structure literature, not circumplex-specific laws.
 
-Two circumplex-specific cautions, both from this package's own validation
-simulations:
+Two caveats come from the benchmark sources themselves. Browne and Cudeck
+call their own RMSEA thresholds "based on subjective judgment," cautioning
+that such a figure "cannot be regarded as infallible or correct" (Browne &
+Cudeck, 1993) — read the cutoffs as conventions, not decision rules. And the
+comparative-fit benchmark is least dependable at small samples: Hu and
+Bentler (1999) found that the ML-based TLI and RMSEA tend to *overreject*
+true-population models when the sample is small (CFI is not among the indices
+they flag), and circumplex analyses are often run at modest sample sizes —
+the SSM accuracy thresholds in Section 3 span roughly $n = 50$ to $200$. At
+small $n$, then, a TLI or RMSEA that falls short of its benchmark can reflect
+the index's small-sample behavior as much as the model's fit.
+
+Two further cautions are circumplex-specific, both from this package's own
+validation simulations:
 
 - **Boundary solutions are common at realistic sample sizes.** When octant
   scales share a strong general factor (as interpersonal problem scales
