@@ -68,7 +68,11 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
 - [ ] T1 — Read `sources/wright2009.pdf`; extract the `aw2009` dataset
       provenance and the closed-form SSM parameter formulas with page/table
       anchors; two-channel verify (`pdftotext -layout` + a `pdftoppm`-rendered
-      page-image read).
+      page-image read). **Jeff's warning (plan gate, 2026-07-20): the printed
+      paper carries typos he had to correct for the oracle** — treat any banked
+      value as suspect until the two channels agree, and record the printed
+      errata verbatim beside the corrected value in a `wright2009.md` errata
+      section (as `browne1992.md` does its five), never silently fix.
 - [ ] T2 — Author `wright2009.md` from `templates/source-note.md`: citation,
       provenance block, banked formulas, `Traces to` `R/example_data.R:4` /
       `man/aw2009.Rd` and the estimator code.
