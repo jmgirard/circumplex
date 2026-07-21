@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M50 | Advanced Visualization vignette — rework for a less-advanced audience | planned | — | normal | milestones/M50-viz-vignette-approachable.md |
+| M50 | Advanced Visualization vignette — rework for a less-advanced audience | in-progress | — | normal | milestones/M50-viz-vignette-approachable.md |
 | M49 | Fit-index guidance — the two source-backed caveats | done | — | normal | milestones/archive/M49-fitindex-source-caveats.md |
 | M47 | SSM estimator source notes (Wright 2009 + defining Gurtman) | done | — | normal | milestones/archive/M47-estimator-source-notes.md |
 | M48 | Fit-index and uncited shelf sources (browne1993 twin + strack2013) | done | — | normal | milestones/archive/M48-fitindex-uncited-sources.md |

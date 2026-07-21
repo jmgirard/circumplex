@@ -1,11 +1,11 @@
 # M50: Advanced Visualization vignette — rework for a less-advanced audience
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m50-viz-vignette-approachable
 
 ## Goal
 
