@@ -12,6 +12,9 @@ _One line per committed page: `citekey — title — traces to`._
 - [hu1999.md](hu1999.md) — Hu & Bentler (1999), *Cutoff criteria for fit indexes in covariance structure analysis* — the SRMR .08 and CFI/TLI .95 cutoffs; traces to `R/ssm_ci_accuracy.R:1023`, `R/ssm_ci_oop.R`, `R/cpm_oop.R:187-188` and `vignettes/evaluating-circumplex-structure.Rmd`.
 - [hubert1987.md](hubert1987.md) — Hubert & Arabie (1987), *Evaluating order hypotheses within proximity matrices* — the randomization order test behind `fit_structure()`'s RANDALL: the normalized agreement index (A−D)/(A+D+T) and its exact / (M+1)/(N+1) randomization p-value; traces to `R/fit_structure.R` (`structure_randall()`, `structure_randall_test()`), `tests/testthat/test-fit_structure.R` and `vignettes/evaluating-circumplex-structure.Rmd`.
 - [tracey1997.md](tracey1997.md) — Tracey (1997), *RANDALL: A Microsoft FORTRAN program…* — the program operationalizing Hubert & Arabie (1987), naming the Correspondence Index; traces to the same RANDALL implementation and `man/fit_structure.Rd` (`@references`). Companion to `hubert1987.md`; its Table 1 pins the tie case where the code's index (.92) departs from RANDALL's CI (.93).
+- [wright2009.md](wright2009.md) — Wright, Pincus, Conroy & Hilsenroth (2009), *Integrating methods to optimize circumplex description and comparison of groups* — the published closed-form SSM estimator (Eqs. 7–13) and the source of the `aw2009` example data (its Table A); traces to `R/ssm_analysis.R:1183`, `R/example_data.R:4`, `man/aw2009.Rd`, `tests/testthat/test-ssm_sem_syntax.R:6` and the three SSM vignettes.
+- [gurtman1998.md](gurtman1998.md) — Gurtman & Balakrishnan (1998), *Circular measurement redux* — the originating definition of the "conventional Gurtman estimator": the structural-summary decomposition (Eq. 1) and `R² = 1 − Σd²/SS_Total` (Eq. 2, p. 349, the page Wright 2009 cites); traces to `R/ssm_analysis.R:1183`, `tests/testthat/test-ssm_sem_syntax.R:6` and `cairn/references/wright2009.md`.
+- [gurtman2003.md](gurtman2003.md) — Gurtman & Pincus (2003), *The circumplex model: Methods and research applications* — the vignette-cited SSM methods reference restating the structural-summary model (Eq. 16.7); traces to `vignettes/introduction-to-ssm-analysis.Rmd:443`, `vignettes/intermediate-ssm-analysis.Rmd:280` and `R/ssm_analysis.R:1183`. Does NOT carry the .80/.70 R² cutoffs Wright attributes to it.
 - [forward-source-prospects.md](forward-source-prospects.md) — Forward-looking source prospects (M46) — a supply-push survey synthesis note triaging four shelved sources (nagy2019, weide2021, rogoza2021, tracey2000), each mapped to a `candidate` ROADMAP row; traces to nothing yet — per-source pages owed only on graduation (D-024).
 
 <!-- Entry format note: cairn_validate's _INDEX_LINE regex matches the first
@@ -62,4 +65,18 @@ _One line per committed page: `citekey — title — traces to`._
        literature constant, and the delta-CFI option was left as an
        unexercised offer (devel/m5-sem-design.md:751-759, section 12.2
        item 2). Assessed at M41; a ROADMAP candidate row carries the feature
-       question, and the milestone that ever takes it up authors the page. -->
+       question, and the milestone that ever takes it up authors the page.
+
+     Gurtman corpus — dispositioned at M47 while identifying the estimator's
+     defining source (gurtman1998); each uncited by shipped code, none a
+     standalone seedable prospect — all observed 2026-07-20:
+     - sources/gurtman1991.pdf — Gurtman (1991), Evaluating the
+       interpersonalness of personality scales; a scale-evaluation method the
+       repo does not cite or implement. Consulted in passing.
+     - sources/gurtman1993.pdf — Gurtman (1993), Constructing personality tests
+       to meet a structural criterion; test-construction methodology, uncited.
+     - sources/gurtman1994.pdf — Gurtman (1994), The circumplex as a tool…: a
+       methodological primer. Its one relevant contribution — the "slight
+       scaling correction" behind the vector-averaging estimator — is captured
+       transitively by gurtman1998.md's citation of "Gurtman, 1994"; the repo
+       cites 1994 nowhere directly. Consulted as another source's citation. -->
