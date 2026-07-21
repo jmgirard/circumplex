@@ -2,12 +2,12 @@
      section ownership". A phase skill never rewrites another phase's section. -->
 # M51: Speed up CI — concurrency cancel, paths-ignore, slimmed PR matrix
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m51-ci-speedup
+- **Branch/PR:** m51-ci-speedup · https://github.com/jmgirard/circumplex/pull/77
 
 ## Goal
 
@@ -66,7 +66,7 @@ No package code, no dependency add/remove/re-pin.
       expression (PR → 1 config; else the current 5).
 - [x] T2 `test-coverage.yaml`: add the same `paths-ignore` to its
       `pull_request` trigger and the same top-level `concurrency` block.
-- [ ] T3 Validate: `yaml::read_yaml()` each of the four workflow files clean;
+- [x] T3 Validate: `yaml::read_yaml()` each of the four workflow files clean;
       confirm `git diff` is scoped to the intended lines only; open the PR.
 
 ## Work log
@@ -74,6 +74,7 @@ No package code, no dependency add/remove/re-pin.
 - 2026-07-21: created by /milestone-plan.
 - 2026-07-21: T1 — R-CMD-check.yaml gets concurrency (cancel-in-progress:true), paths-ignore [cairn/**,man/**,README.md] on pull_request, and github.event_name-conditional matrix (PR=1 ubuntu/release; else full 5). yaml::read_yaml() parses clean; folded matrix scalar verified.
 - 2026-07-21: T2 — test-coverage.yaml gets the same concurrency block and paths-ignore; push trigger and job body unchanged. yaml::read_yaml() clean.
+- 2026-07-21: T3 — all four workflows parse; diff scoped to concurrency/paths-ignore/matrix only (pkgdown/pr-commands untouched). Branch pushed; PR #77 opened. Status → review.
 
 ## Decisions
 
