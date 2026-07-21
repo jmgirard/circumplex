@@ -82,7 +82,7 @@ location; see D-024).
 - [x] T3 — Add the note's `INDEX.md` line (filename as link text); correct the
       stale `INDEX.md` prospects comment to point at the survey note; confirm no
       per-source page was created.
-- [ ] T4 — Register four `candidate` ROADMAP rows, one per source, each pointing
+- [x] T4 — Register four `candidate` ROADMAP rows, one per source, each pointing
       at the synthesis note.
 - [ ] T5 — Run `cairn_validate`; confirm clean; commit.
 
@@ -93,6 +93,7 @@ location; see D-024).
 - 2026-07-20: T1 — read the four shelf PDFs at survey altitude; pinned citations/DOIs. Corrected the plan's tracey2000 note: it is uncited (CAIS `@source` is Sodano & Tracey 2006, `R/instrument_data.R:5`), a false repo-state claim caught by the M40/M41 re-check lesson.
 - 2026-07-20: T2 — authored `cairn/references/forward-source-prospects.md` (survey synthesis note): provenance/scope/evidence-snapshot, neutral per-source characterization, E1–E4 prospect ledger (kind: oracle/method/reference/feature), Disposition → four candidate rows, dated open questions. No verbatim values banked; one-physical-line derived Extraction status.
 - 2026-07-20: T3 — added the survey note's `INDEX.md` committed-page line (filename link text); corrected the stale INDEX comment (D-023 mechanism superseded by D-024) to point at the one survey note; confirmed no per-source `<citekey>.md` page was created.
+- 2026-07-20: T4 — registered four `candidate` ROADMAP rows (nagy2019 E1, weide2021 E2, rogoza2021 E3, tracey2000 E4), each naming its seedable oracle/method/reference/feature and pointing at `forward-source-prospects.md`; each notes no page owed until relied upon (D-024).
 
 ## Decisions
 
