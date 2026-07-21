@@ -4,8 +4,8 @@ Durable repo lessons — build quirks, testing tricks, gotchas worth
 remembering next time — captured at milestone end, surfaced at plan time.
 Not status, not decisions.
 
-One line per lesson: `- YYYY-MM-DD (M<NN>): <lesson>`. Two caps: <50 items
-(prune) and <17,000 chars (compress in place). Git history keeps the record.
+One line per lesson: `- YYYY-MM-DD (M<NN>): <lesson>`. Two axes via `cairn_validate`:
+line count (`weight caps`, prune/retire) and per-line length (`record density`, compress). Git history keeps the record.
 
 <!-- lessons appended below by /milestone-review post-merge hygiene -->
 
