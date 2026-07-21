@@ -76,9 +76,9 @@ open question.
       order-agreement statistic and randomization p-value via the independent
       channels that exist; author `hubert1987.md` (banked definitions, page
       anchors, `Traces to`, `Extraction:` status).
-- [ ] T2 — Same for `tracey1997.pdf`; author `tracey1997.md` (RANDALL
+- [x] T2 — Same for `tracey1997.pdf`; author `tracey1997.md` (RANDALL
       operationalization: exact vs. random relabeling, circumplex use).
-- [ ] T3 — Reconcile both notes against `R/fit_structure.R`
+- [x] T3 — Reconcile both notes against `R/fit_structure.R`
       (`randall_predictions()` / `structure_randall()` ~585–591 /
       `structure_randall_test()` ~647–701); record any departure verbatim
       (probe display equations so the probe sees what it checks — M43 lesson).
@@ -93,7 +93,20 @@ open question.
 - 2026-07-20: created by /milestone-plan (promotes the RANDALL ROADMAP
   candidate; both PDFs now shelved).
 - 2026-07-20: T1 — authored `hubert1987.md`. Both PDFs are OCR scans (ABBYY / Acrobat Paper Capture), so text layer ≠ independent witness; verified Eqs. 3/5, the exact and (M+1)/(N+1) p-values, and worked values against `pdftoppm` images of pp. 176–177. Code faithfully implements Eq. 3 at T=0 and the paper's own (M+1)/(N+1); departures banked: strict-`>` scores ties as disagreements (immaterial for continuous r), exact-enum cutoff nv≤9 vs paper's n≤8.
+- 2026-07-20: T2/T3 — authored `tracey1997.md` (CI = (A−D)/(A+D+T); exact-only, no MC; 4/6/8-var program). Reconciled both notes against the code and cross-checked on Tracey's Table 1 matrix under `load_all()`: `randall_predictions(6)` gives exactly 72 predictions; the code reproduces A=69/D=2/T=1 and returns .9167 vs Tracey's CI .93 — the banked tie departure, empirically confirmed. See M45-D1.
 
 ## Decisions
+
+- **M45-D1 (2026-07-20): `structure_randall()`'s tie handling differs from
+  Tracey's CI; left unchanged (out of scope, immaterial for continuous r).**
+  Verified empirically on Tracey (1997) Table 1 under `load_all()`: the code
+  returns .9167 where Tracey's RANDALL reports CI .93 — A=69, D=2, T=1, N=72 —
+  because the strict `>` scores the one tie as a disagreement, so
+  code = `(A−D−T)/N` vs Tracey/H&A Eq. 3 = `(A−D)/N`. Banked in `hubert1987.md`
+  and `tracey1997.md`. Not changed here: a statistical-output change is outside
+  M45's docs scope, and exact correlation ties are measure-zero, so no real
+  `fit_structure()` input triggers it. If ever aligned, it needs its own
+  regression test and the note that it would move a published example's value
+  (.92 → .93).
 
 ## Review
