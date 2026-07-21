@@ -54,10 +54,10 @@ disposition — a bare candidate row suffices); the estimator sources → M47.
 
 ## Tasks
 
-- [ ] T1 — Read `sources/browne1993.pdf`; locate the RMSEA .05 / .08 / .10 cutoff
+- [x] T1 — Read `sources/browne1993.pdf`; locate the RMSEA .05 / .08 / .10 cutoff
       passage; record the chapter page numbers; two-channel verify against
       `browne1992a.md`'s banked 1992 values (confirm same content).
-- [ ] T2 — Amend `browne1992a.md` (current knowledge, corrected in place) with
+- [x] T2 — Amend `browne1992a.md` (current knowledge, corrected in place) with
       the twin cross-reference: the 1993-chapter citation, its vignette/snapshot
       cite sites, and the chapter page anchors; update the extraction status.
 - [ ] T3 — Add the strack2013 prospect `candidate` ROADMAP row (search-first
@@ -68,6 +68,8 @@ disposition — a bare candidate row suffices); the estimator sources → M47.
 
 - 2026-07-20: created by /milestone-plan (split from the 8-source triage; sibling M47).
 - 2026-07-21: /milestone-implement → in-progress; branch m48-fitindex-uncited-sources cut from synced master. No question gate (plan decisions locked; no tripwires).
+- 2026-07-21: T1 — verified `sources/browne1993.pdf` chapter p. 144 (PDF p. 9, bracketed by the 143/145 running heads) carries the .05/.08/.10 cutoff passage and the m=2 worked-example row, matching `browne1992a.md`'s banked 1992 values word/digit-for-digit; two channels (pdftotext -layout + rendered page image), no divergence.
+- 2026-07-21: T2 — amended `browne1992a.md`: affirmative twin cross-reference in Citation (user-facing cite sites incl. `_snaps/ci_accuracy.md:38`, chapter p. 144 anchor), added the snapshot to Traces>Wording, added a dated 2026-07-21 chapter re-check to the extraction status. cairn_validate green (references index<->disk PASS).
 
 ## Decisions
 
