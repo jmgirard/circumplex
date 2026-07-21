@@ -23,8 +23,10 @@ edited by Bollen & Long.
 The same paper **also appears as** chapter 6, pp. 136–162, of K. A. Bollen &
 J. S. Long (Eds.), *Testing Structural Equation Models* (Sage, 1993) — the
 edition the package's `@references` cite. It is named here **neutrally**, never
-as "reprinted in": see Open questions, where the relationship is recorded as
-established in structure but unestablished in text.
+as "reprinted in": the two editions were compared 2026-07-20 (see the resolved
+items under Open questions) — the chapter is a reset, lightly copy-edited
+typesetting, not a photographic reprint, but every value this page extracts is
+identical between them.
 
 **Role.** This source reaches the package on **two** paths, and they differ in
 kind — conflating them is easy and was the substantive defect M41's review
@@ -153,23 +155,34 @@ changing any of these lines is changing an implementation of this paper):
 
 ## Open questions
 
-- **Whether the 1993 chapter is a verbatim reprint of this article is
-  unresolved, and this page asserts nothing either way.** What is established:
-  same editors, same papers, contiguous journal pagination (Bollen & Stine
-  205–229 immediately precedes this article's 230–258), matching table of
-  contents order. What is not: the book's preface, which would state the
-  relationship outright, is omitted from the Google Books preview, and the
-  only direct claim found — an anonymous customer review asserting the text is
-  not identical — reaches us through a search-engine paraphrase and contradicts
-  a Google Books spot-check that the visible pages look identical
-  (M41 work log) — observed 2026-07-19.
-- **The 0.08/0.1 sentence has no verified page anchor in the 1993 chapter.**
-  The 0.05 sentence does: chapter **p. 144**, located by Jeff via Google Books.
-  The 0.08/0.1 sentence follows it by about five lines in the article, so it is
-  probably also p. 144 — **not banked, and deliberately not derived.** The
-  offset trap here is demonstrated, not hypothetical: article p. 239 minus the
-  94-page offset predicts chapter p. 145, and the real page is 144. A derived
-  anchor would have read exactly like a checked one — observed 2026-07-19.
+- **Resolved 2026-07-20 — the 1993 chapter is not a verbatim reprint, but
+  every value this page extracts is identical between the two editions.** Jeff
+  added the chapter to the shelf (`browne1993.pdf`) and it was compared against
+  `browne1992a.pdf`. The chapter is a **fully reset, lightly copy-edited
+  typesetting**: different pagination (136–162 vs 230–258), different line
+  breaks throughout, and copy-edits such as "The authors thank" → "We would
+  like to thank", "can only be judged" → "can be judged only", "but is more
+  reasonable" → "but it is more reasonable", "scale invariant" →
+  "scale-invariant". So the anonymous customer review's "text is not identical"
+  is literally true and immaterial. **Identical between editions:** the three
+  RMSEA thresholds (0.05/0.08/0.1) and their descriptors word-for-word; eqs.
+  13/14 numbering with the surrounding eq-9/eq-12 derivation and the "lower
+  limit is zero" property; eq. 15's presence; and the worked-example fit tables
+  digit-for-digit (e.g. 4.915, 0.098, (0.083; 0.113), 7.282, (6.612; 8.086),
+  417.81). The M41 extraction — read from the article but cited to the chapter
+  — therefore holds for the cited edition. Channel: `pdftotext -layout` on both
+  PDFs plus a read of that text layer, a machine channel; the equations render
+  as images in both and were checked by their numbering and surrounding prose,
+  not their typeset form, and no page was read by a human — observed
+  2026-07-20.
+- **Resolved 2026-07-20 — all three thresholds sit on chapter p. 144.** The
+  direct read confirms it: the running head `144 Alternative Ways of Assessing
+  Model Fit` tops the page, and `MICHAEL W. BROWNE and ROBERT CUDECK 145` does
+  not appear until after the "…would not want to employ a model with a RMSEA
+  greater than 0.1" sentence. Jeff's Google Books find (0.05 → p. 144) is
+  confirmed and now extends to the 0.08/0.1 sentence. The +94 offset prediction
+  of p. 145 was wrong, exactly as this page warned — a derived anchor would
+  have read like a checked one — observed 2026-07-20.
 - No value on this page has been read by a human. Both channels are machine
   channels operating on the same PDF (M41-D1), so a defect in the scan itself
   — as opposed to the text layer — would not have been caught. A human read of
