@@ -99,8 +99,8 @@ covariance-structure literature, not circumplex-specific laws.
 Two caveats come from the benchmark sources themselves. Browne and Cudeck
 call their own RMSEA thresholds "based on subjective judgment," cautioning
 that such a figure "cannot be regarded as infallible or correct" (Browne &
-Cudeck, 1993) — read the cutoffs as conventions, not decision rules. And the
-comparative-fit benchmark is least dependable at small samples: Hu and
+Cudeck, 1993) — read the cutoffs as conventions, not decision rules. And these
+benchmarks are least dependable at small samples: Hu and
 Bentler (1999) found that the ML-based TLI and RMSEA tend to *overreject*
 true-population models when the sample is small (CFI is not among the indices
 they flag), and circumplex analyses are often run at modest sample sizes —
