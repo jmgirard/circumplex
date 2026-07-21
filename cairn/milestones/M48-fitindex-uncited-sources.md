@@ -1,11 +1,11 @@
 # M48: Fit-index and uncited shelf sources (browne1993 twin + strack2013 prospect)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m48-fitindex-uncited-sources
 
 ## Goal
 
@@ -67,6 +67,7 @@ disposition — a bare candidate row suffices); the estimator sources → M47.
 ## Work log
 
 - 2026-07-20: created by /milestone-plan (split from the 8-source triage; sibling M47).
+- 2026-07-21: /milestone-implement → in-progress; branch m48-fitindex-uncited-sources cut from synced master. No question gate (plan decisions locked; no tripwires).
 
 ## Decisions
 
