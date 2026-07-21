@@ -11,7 +11,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
 | M45 | Source notes for the RANDALL structure test pair | done | M40 | normal | milestones/archive/M45-reference-notes-randall.md |
-| M46 | Prospect notes for the four forward-looking shelf sources | in-progress | — | normal | milestones/M46-prospect-notes-forward-sources.md |
+| M46 | Prospect notes for the four forward-looking shelf sources | review | — | normal | milestones/M46-prospect-notes-forward-sources.md |
 | M44 | LESSONS.md consolidation and retirement pass | dropped | — | normal | milestones/archive/M44-lessons-consolidation.md |
 | M41 | Source notes for the fit-index benchmark pair | done | M40 | normal | milestones/archive/M41-reference-notes-benchmarks.md |
 | M42 | Source notes for the CPM model and its communality CIs | done | M40 | normal | milestones/archive/M42-reference-notes-cpm.md |

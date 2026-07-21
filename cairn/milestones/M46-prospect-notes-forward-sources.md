@@ -1,6 +1,6 @@
 # M46: Prospect notes for the four forward-looking shelf sources
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -84,7 +84,7 @@ location; see D-024).
       per-source page was created.
 - [x] T4 — Register four `candidate` ROADMAP rows, one per source, each pointing
       at the synthesis note.
-- [ ] T5 — Run `cairn_validate`; confirm clean; commit.
+- [x] T5 — Run `cairn_validate`; confirm clean; commit.
 
 ## Work log
 
@@ -94,6 +94,7 @@ location; see D-024).
 - 2026-07-20: T2 — authored `cairn/references/forward-source-prospects.md` (survey synthesis note): provenance/scope/evidence-snapshot, neutral per-source characterization, E1–E4 prospect ledger (kind: oracle/method/reference/feature), Disposition → four candidate rows, dated open questions. No verbatim values banked; one-physical-line derived Extraction status.
 - 2026-07-20: T3 — added the survey note's `INDEX.md` committed-page line (filename link text); corrected the stale INDEX comment (D-023 mechanism superseded by D-024) to point at the one survey note; confirmed no per-source `<citekey>.md` page was created.
 - 2026-07-20: T4 — registered four `candidate` ROADMAP rows (nagy2019 E1, weide2021 E2, rogoza2021 E3, tracey2000 E4), each naming its seedable oracle/method/reference/feature and pointing at `forward-source-prospects.md`; each notes no page owed until relied upon (D-024).
+- 2026-07-20: T5 — `cairn_validate` all checks pass (references index<->disk, references staleness, coverage complete all clean; the 47 work-log advisories are all M7's pre-existing IP4-protected history, none from M46). All tasks done; status in-progress→review.
 
 ## Decisions
 
