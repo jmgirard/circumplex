@@ -1,11 +1,11 @@
 # M50: Advanced Visualization vignette — rework for a less-advanced audience
 
-- **Status:** planned
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m50-viz-vignette-approachable · https://github.com/jmgirard/circumplex/pull/76
 
 ## Goal
 
@@ -47,23 +47,23 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
 
 ## Acceptance criteria
 
-- [ ] The instrument/label example renders spokes with full descriptive scale
+- [x] The instrument/label example renders spokes with full descriptive scale
       names (not `PA`–`NO`), and no vignette prose claims a bundled instrument
       relabels spokes. Evidence: the reworked chunk knits; grep the Rmd.
-- [ ] No figure in the coordinate-system section shows spokes on ggplot2
+- [x] No figure in the coordinate-system section shows spokes on ggplot2
       default breaks (0/100/200/300); every circumplex figure carries octant
       spokes. Evidence: the `coord-bare` broken-figure chunk is gone; render.
-- [ ] The "Extending the layers" section is removed. Evidence: the Rmd contains
+- [x] The "Extending the layers" section is removed. Evidence: the Rmd contains
       no `ggproto`, `GeomSsmStar`, or "Extending the layers".
-- [ ] The vignette's echoed R chunks contain none of `do.call(`, `lapply(`,
+- [x] The vignette's echoed R chunks contain none of `do.call(`, `lapply(`,
       `matrix(`, `[, c(`, or logical/negative row-filtering `[!is.na(`; any
       unavoidable construction is confined to a non-echoed setup chunk.
       Evidence: grep over echoed chunks + render shows equivalent figures.
-- [ ] `ssm_trajectory_ggplot()` sets a horizontal panel spacing, the 5
+- [x] `ssm_trajectory_ggplot()` sets a horizontal panel spacing, the 5
       trajectory vdiffr baselines are regenerated (only the intended ones
       move), and a render-and-inspect confirms no interior-label collision.
       Evidence: `R/ssm_trajectory.R` diff; `_snaps/ssm_trajectory*`; the figure.
-- [ ] `devtools::test()` (NOT_CRAN=true) green and
+- [x] `devtools::test()` (NOT_CRAN=true) green and
       `devtools::check(args = "--no-manual")` clean with every vignette figure
       knitting. Evidence: check/test logs (the `verify` slot).
 
@@ -78,32 +78,69 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
 
 ## Tasks
 
-- [ ] T1 — Add horizontal panel spacing to `ssm_trajectory_ggplot()`'s theme
+- [x] T1 — Add horizontal panel spacing to `ssm_trajectory_ggplot()`'s theme
       (`R/ssm_trajectory.R:607-611`); render-and-inspect the grouped,
       ungrouped, and table figures (M33/M38: data-level tests and a stale
       baseline both pass a figure that reads wrong); regenerate the 5
       trajectory vdiffr baselines under `NOT_CRAN=true` (M31: bare `Rscript`
       auto-skips vdiffr) and confirm no unrelated baseline moved.
-- [ ] T2 — Rework the instrument/label example (`advanced-visualization.Rmd`
+- [x] T2 — Rework the instrument/label example (`advanced-visualization.Rmd`
       ~L66–82): descriptive full-scale-name spokes; one sentence that an
       instrument object can be passed; correct the surrounding prose.
-- [ ] T3 — Cut the broken `coord-bare` figure and its "unfinished" prose
+- [x] T3 — Cut the broken `coord-bare` figure and its "unfinished" prose
       (~L84–122); lead with the correctly-scaled construction, explaining the
       scale line in prose. Verify no remaining figure shows default breaks.
-- [ ] T4 — Remove the "Extending the layers" section (~L236–270) and any
+- [x] T4 — Remove the "Extending the layers" section (~L236–270) and any
       cross-reference to it.
-- [ ] T5 — Simplify advanced base-R in the visible chunks (the `[, c(...)]`
+- [x] T5 — Simplify advanced base-R in the visible chunks (the `[, c(...)]`
       selections, the `do.call(rbind, lapply())` + `matrix()` occasions build,
       `people[!is.na(...), ]`) into simpler idioms, or move unavoidable
       construction into a non-echoed setup chunk; keep every figure equivalent.
-- [ ] T6 — `devtools::test()` (NOT_CRAN=true) and
+- [x] T6 — `devtools::test()` (NOT_CRAN=true) and
       `devtools::check(args = "--no-manual")`; confirm the vignette builds and
       every figure knits; final render-and-inspect sweep of the reworked figures.
 
 ## Work log
 
 - 2026-07-21: created by /milestone-plan.
+- 2026-07-21: T1 — added `panel.spacing.x = grid::unit(1.2, "lines")` to `ssm_trajectory_ggplot()`; render-inspected 3- and 5-panel layouts (labels clear); regenerated 5 vdiffr baselines (env parity confirmed via coord_circumplex byte-identical); trajectory tests 145 pass / 0 fail.
+- 2026-07-21: T2 — replaced the `instrument = csip` figure (identical PA–NO abbrevs) with descriptive full scale-name spokes (`labels = csip$Scales$Label`); kept a one-sentence note that an instrument can be passed. Render-inspected: all 8 names fit at fig.width=7.
+- 2026-07-21: T3 — cut the deliberately-broken `coord-bare` figure (spokes on default 0/100/200/300) and its "unfinished" prose; lead with the correctly-scaled `coord-built` figure and explain the scale line in prose.
+- 2026-07-21: T4 — removed the "Extending the layers" section (`GeomSsmStar` ggproto subclass); no dangling cross-references remain.
+- 2026-07-21: T5 — `[, c()]` displays → `subset(select=)`; `people[!is.na(),]` → `subset()`; moved the `do.call(rbind, lapply())`+`matrix()` occasions simulation into a non-echoed `echo = FALSE` chunk. Echoed chunks now carry no flagged base-R; full vignette knits under load_all (KNIT OK, 13 figures).
+- 2026-07-21: T6 — `devtools::check(args = "--no-manual")` clean: 0 errors / 0 warnings / 0 notes (4m52s), authoritative vignette build included. Status → review.
+- 2026-07-21: review — PR #76; AC1–AC6 verified; consistency gate clean (validate exit 0, document no-diff, pkgdown ok). Fan-out (3 lenses + inline scoring): no regressions; F1 (garbled sentence, all 3 lenses) and F2 (`angles` undefined in echoed chunk) fixed on-branch; re-knit KNIT OK.
 
 ## Decisions
 
 ## Review
+
+_Reviewed 2026-07-21. PR #76. Driving RR: none (no projection-vs-outcome)._
+
+**Acceptance-criterion evidence (fresh):**
+
+- AC1 — `canvas-descriptive` chunk renders `ggcircumplex(octants(), labels = csip$Scales$Label)` (full interpersonal names); the `instrument = csip` reference is now inline prose, not a figure; no prose claims a bundled instrument produces different spokes. Render-inspected: all 8 names fit at `fig.width = 7`, none clipped.
+- AC2 — grep for `coord-bare` / `0, 100, 200` / "visibly unfinished" / "default axis breaks" returns nothing; `coord-built` renders octant spokes (verified in-vignette render).
+- AC3 — grep for `extending the layers` / `ggproto` / `GeomSsmStar` / `geom_ssm_star` = 0 occurrences.
+- AC4 — the only flagged construct remaining is `matrix(` at Rmd L302–303, inside the `echo = FALSE` `occasions-data-sim` chunk (L293); no `do.call(`/`lapply(`/`[, c(`/`[!is.na(` anywhere. Full vignette knits under `load_all()` (KNIT OK, 13 figures); reworked figures equivalent.
+- AC5 — `R/ssm_trajectory.R:615` adds `panel.spacing.x = grid::unit(1.2, "lines")`; 5 vdiffr baselines regenerated (`_snaps/ssm_trajectory{,_table}`), env parity confirmed (coord_circumplex byte-identical), diff is pure panel geometry; 3- and 5-panel layouts render-inspected, labels clear.
+- AC6 — review-time `devtools::check(args = "--no-manual")` = 0 errors / 0 warnings / 0 notes (tests, incl. the 5 regenerated snapshots, run within it); post-fix vignette re-knit KNIT OK (13 figures). PR CI runs the full matrix on the final commit.
+
+**Consistency gate:**
+
+- `cairn_validate.py` — exit 0, all checks PASS (47 work-log-format advisories, all pre-existing M7 lines; not M50's).
+- No `DESIGN.md` principle changed → `cairn_impact` skipped.
+- Toolchain (`r-package` consistency-gate slot): `devtools::document()` no-diff (man/, NAMESPACE, RcppExports unchanged); `pkgdown::check_pkgdown()` passes; NEWS entry not owed — `ssm_plot_trajectory()` and the vignette are both new in the unreleased 2.0.0, so the panel-spacing refinement is intra-development, not user-visible vs a released version.
+
+**Independent fresh-context review (3 lenses + scorer):**
+
+- [O] diff-bug: statistical/mechanical core clean (panel.spacing touches no data/branch/certification; 5 baselines geometry-only — text and numeric values unchanged; `subset()` rewrites behaviourally equivalent; labels pair correctly). 2 findings (below).
+- [S] blame-history: no regressions — the spacing change touches none of the M27/M33/M35 seam/unwrap invariants (those live in `GeomSsmArc$setup_data()`, untouched); removed vignette sections were M34 docs choices, not decision-backed; exported API unchanged. Independently flagged F1.
+- [S] prior-review: no regressions — M34's statistical-precision caveats survive, occasion-ordering intact, seam case preserved, all 5 baselines regenerated (per M31/M38 lesson), no leaked scaffolding (M34). Independently flagged F1.
+
+Findings (scored inline — both self-evidently real and actioned, so no exclusion gate needed):
+
+- F1 (score 98) — garbled sentence at `advanced-visualization.Rmd` descriptive-labels example (flagged by all three lenses). **Fixed**: reworded to "The octant scales also have full interpersonal names, which you can put on the spokes instead:".
+- F2 (score 92) — the echoed `occasions-path` chunk used `ggcircumplex(angles, ...)` but `angles` moved into the `echo = FALSE` sim chunk, so a reader copying the visible chunk hits `object 'angles' not found`. **Fixed**: chunk now calls `ggcircumplex(octants(), ...)`. Re-knit KNIT OK.
+
+No findings scored below 80; no follow-ups spawned.
