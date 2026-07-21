@@ -1,5 +1,6 @@
 # User-facing fit_structure() API (M4.5/T7): the single entry point over the
-# five Acton & Revelle (2004) structure tests, plus its print/summary/plot
+# four Acton & Revelle (2004) criteria plus RANDALL (Hubert & Arabie, 1987;
+# Tracey, 1997) structure tests, plus its print/summary/plot
 # methods. The criterion statistics and their interpretation/inference are
 # validated in test-fit_structure.R; here we test the wrapper's orchestration,
 # scoring behavior, object contract, and rendering.

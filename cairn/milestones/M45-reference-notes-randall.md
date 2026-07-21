@@ -1,6 +1,6 @@
 # M45: Source notes for the RANDALL structure test pair
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M40
 - **Driving RR:** —
@@ -84,14 +84,13 @@ open question.
       (probe display equations so the probe sees what it checks — M43 lesson).
 - [x] T4 — Add both `INDEX.md` entries (filename link text); retire the RANDALL
       owes-a-page ledger note.
-- [ ] T5 — Fix the miscount comment at `test-fit_structure_api.R:2`; run the
+- [x] T5 — Fix the miscount comment at `test-fit_structure_api.R:2`; run the
       `fit_structure` test files under `NOT_CRAN=true` to confirm green.
-- [ ] T6 — Run `cairn_budget` + `cairn_validate`; commit.
+- [x] T6 — Run `cairn_budget` + `cairn_validate`; commit.
 
 ## Work log
 
-- 2026-07-20: created by /milestone-plan (promotes the RANDALL ROADMAP
-  candidate; both PDFs now shelved).
+- 2026-07-20: created by /milestone-plan (promotes the RANDALL ROADMAP candidate; both PDFs now shelved).
 - 2026-07-20: T1 — authored `hubert1987.md`. Both PDFs are OCR scans (ABBYY / Acrobat Paper Capture), so text layer ≠ independent witness; verified Eqs. 3/5, the exact and (M+1)/(N+1) p-values, and worked values against `pdftoppm` images of pp. 176–177. Code faithfully implements Eq. 3 at T=0 and the paper's own (M+1)/(N+1); departures banked: strict-`>` scores ties as disagreements (immaterial for continuous r), exact-enum cutoff nv≤9 vs paper's n≤8.
 - 2026-07-20: T2/T3 — authored `tracey1997.md` (CI = (A−D)/(A+D+T); exact-only, no MC; 4/6/8-var program). Reconciled both notes against the code and cross-checked on Tracey's Table 1 matrix under `load_all()`: `randall_predictions(6)` gives exactly 72 predictions; the code reproduces A=69/D=2/T=1 and returns .9167 vs Tracey's CI .93 — the banked tie departure, empirically confirmed. See M45-D1.
 - 2026-07-20: T4 — INDEX.md gains both entries (filename link text) and the RANDALL owes-a-page ledger note is retired; added D-023 forward-looking-sources note. Parser fix (M40 family): `cairn_validate`'s staleness check reads the Extraction block only to the next line STARTING with `**`, so a `**verified <date>**` at a physical line-start truncated tracey's status → "unrecognized"; un-bolded the verified-date phrase in BOTH notes so a reflow can't re-break it. Both now parse `('ok', 2026-07-20)`.
