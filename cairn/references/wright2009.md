@@ -9,9 +9,7 @@ The shelf PDF is an Acrobat Paper-Capture OCR scan (Producer "Adobe Acrobat 10.0
 Paper Capture Plug-in"), so its text layer is a single OCR channel, **not**
 independent of the page image (M42-D1); the OCR badly mangles the display
 formulae.
-Extraction: verified 2026-07-20 against the source by a first-hand visual read
-of the `pdftoppm`-rendered page images — the authoritative channel for a scan;
-the OCR text served only to locate passages — observed 2026-07-20.
+Extraction: verified 2026-07-20 against the source by the implementing session's own visual read of the `pdftoppm`-rendered page images — the authoritative channel for a scan, independent of the OCR text layer (used only to locate passages) but, per M41-D1, not a human attestation; no value on this page has been read by a human — observed 2026-07-20.
 
 **Citation.** Wright, A. G. C., Pincus, A. L., Conroy, D. E., & Hilsenroth,
 M. J. (2009). Integrating methods to optimize circumplex description and

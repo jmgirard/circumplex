@@ -9,9 +9,7 @@ The shelf PDF is an Acrobat Paper-Capture OCR scan (Producer "Adobe Acrobat 10.0
 Paper Capture Plug-in"), so its text layer is a single OCR channel, **not**
 independent of the page image (M42-D1), and the OCR mangles the display
 formulae.
-Extraction: verified 2026-07-20 against the source by a first-hand visual read
-of the `pdftoppm`-rendered image of p. 349 — the authoritative channel for a
-scan; the OCR text located passages only — observed 2026-07-20.
+Extraction: verified 2026-07-20 against the source by the implementing session's own visual read of the `pdftoppm`-rendered image of p. 349 — the authoritative channel for a scan, independent of the OCR text layer (used only to locate passages) but, per M41-D1, not a human attestation; no value on this page has been read by a human — observed 2026-07-20.
 
 **Citation.** Gurtman, M. B., & Balakrishnan, J. D. (1998). Circular measurement
 redux: The analysis and interpretation of interpersonal circle profiles.

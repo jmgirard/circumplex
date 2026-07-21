@@ -126,12 +126,15 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
 - 2026-07-20: T3 gate + amendment (M47-D1) — both Gurtman pages, no Fable. Amended AC1 (wright2009 is an OCR scan → single authoritative channel, not two), AC2 (→gurtman1998), added AC3 (gurtman2003); AC5 remaining = 1991/1993/1994. Corrected an AC3 over-claim: gurtman2003 does not print the .80/.70 cutoffs.
 - 2026-07-20: T4/T4b — authored `gurtman1998.md` (Eqs. 1–2 from the p.349 image; the SS_Total page Wright cites; estimator = vector-averaging closed form w/ 2/p scaling) and `gurtman2003.md` (Eq. 16.7 from the born-digital text layer; recorded the .80/.70-not-in-2003 finding). Two INDEX lines added.
 - 2026-07-20: T5–T6 — dispositioned gurtman 1991/1993/1994 as owes-no-page (uncited; 1994's scaling correction captured transitively). Validate green (weight caps / references / coverage all PASS); budget 132/149. All tasks done → status review.
+- 2026-07-21: review fan-out (3 lenses + scorer). F1 (92) fixed — added the M41-D1 not-a-human-attestation caveat to all three pages, each Extraction status now one physical line. F2 (78) fixed — corrected the M47-D1 .80/.70 self-contradiction. F3/F4 (45/45) logged, not actioned. Validate green.
 
 ## Decisions
 
 - M47-D1 (T3 gate, 2026-07-20): both `gurtman1998` (the estimator definer) and
-  `gurtman2003` (vignette-cited SSM methods reference + R² .80/.70 cutoffs) get
+  `gurtman2003` (vignette-cited SSM methods reference) get
   full source notes — 2003 is relied-upon by the vignettes, not owes-no-page
+  (its role is the structural-summary exposition, NOT the R² .80/.70 cutoffs,
+  which it does not print — see `gurtman2003.md`; corrected 2026-07-21 per review F2)
   (amends AC2 → AC2+AC3; remaining to disposition = 1991/1993/1994). The
   estimator-identity attribution proceeds on the triangulated Opus finding
   (Wright's explicit "Gurtman & Balakrishnan, 1998, p. 349" + code match +
@@ -170,4 +173,33 @@ Advisories (non-blocking): `record density (1)` on `ROADMAP.md:4` (the planning
 hygiene stamp, 402/400 chars — shortened when the stamp is replaced at post-merge
 hygiene); `work-log format (47)` all pre-existing M7 lines.
 
-**Independent fresh-context review:** _(pending — three lenses + scorer)_
+**Independent fresh-context review (3 lenses + scorer, 2026-07-21):** [O] diff-bug,
+[S] blame-history, [S] prior-review, [S] scorer. Four findings; scores F1 92 /
+F2 78 / F3 45 / F4 45.
+
+- **F1 (92, actioned — FIXED):** all three pages omitted the M41-D1 caveat that
+  the session's page-image read is *not a human attestation* and "no value has
+  been read by a human" — carried by all 10 predecessor pages — and phrased the
+  read as "first-hand visual read." Fix: each Extraction status rewritten as one
+  physical line disclosing it is the implementing session's own read, not a human
+  attestation, with the no-human caveat (also removes a wrapped-Extraction-line
+  risk).
+- **F2 (78, below threshold — FIXED anyway):** M47-D1 restated the debunked
+  ".80/.70 cutoffs" attribution to gurtman2003 as fact, contradicting the
+  milestone's own correction. Fix: M47-D1 parenthetical corrected (a durable
+  Decisions-record self-contradiction is worth the one-phrase fix even sub-80).
+- **F3 (45, logged, not actioned):** AC2's "amplitude/angular-displacement
+  formulas verbatim" overstates what gurtman1998 banks (Eq. 1 + Eq. 2 +
+  vector-averaging prose; the source prints no explicit closed-form a/δ formula).
+  The INDEX line and the page itself are accurate; only the plan-owned AC wording
+  is loose (gate-amend-only) — not patched review-side.
+- **F4 (45, logged, not actioned):** the gurtman1991/1993 owes-no-page rationale
+  leans on citation-count language D-023 disfavors, but the disposition is a
+  defensible substantive call (content plausibly out of SSM scope; per-source
+  content reasons given). No candidate row added.
+
+Lens confirmations (clean): all code anchors resolve; banked formulas reconcile
+with `src/parameters.cpp` (elev=mean, (2/n)·Σ, √(x²+y²), atan2,
+gfit=1−SS_resid/(var·(n−1))); `aw2009` = Table A all 40 cells; INDEX
+link-text / staleness-parser / OCR-single-channel / page-range all clean; the
+browne1993 correction (pre-existing on master) verified accurate.

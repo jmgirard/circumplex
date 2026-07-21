@@ -8,9 +8,7 @@ PDF p. 11).
 The shelf PDF is a born-digital typeset PDF (font-encoded text with `ﬁ`/`ﬂ`
 ligatures and `θ`/`δ` glyphs — not an OCR scan), so its text layer is a reliable
 digital channel.
-Extraction: verified 2026-07-20 against the source by reading the text layer —
-the authoritative channel for a born-digital source — with the rendered p. 417
-image spot-checked; observed 2026-07-20.
+Extraction: verified 2026-07-20 against the source by the implementing session's own read of the born-digital text layer — the authoritative channel for a born-digital source — with the rendered p. 417 image spot-checked; per M41-D1 this is the session's own read, not a human attestation, and no value on this page has been read by a human — observed 2026-07-20.
 
 **Citation.** Gurtman, M. B., & Pincus, A. L. (2003). The circumplex model:
 Methods and research applications. In J. A. Schinka & W. F. Velicer (Eds.),
