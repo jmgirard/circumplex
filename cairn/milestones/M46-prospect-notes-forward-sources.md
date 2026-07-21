@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m46-forward-source-prospects
+- **Branch/PR:** m46-forward-source-prospects · PR #72
 
 ## Goal
 
@@ -37,7 +37,7 @@ location; see D-024).
 
 ## Acceptance criteria
 
-- [ ] A survey synthesis note exists at
+- [x] A survey synthesis note exists at
       `cairn/references/forward-source-prospects.md`, authored from
       `synthesis-note.md`, with one stable-ID ledger row per source (nagy2019,
       weide2021, rogoza2021, tracey2000) stating a content characterization, the
@@ -46,14 +46,14 @@ location; see D-024).
       claim citing a specific value/page is page-anchored. Its `Extraction:`
       status is a derived/first-hand form on one physical line with an unbolded
       verb, and every repo-state claim carries `— observed <date>`.
-- [ ] The note carries its `INDEX.md` line (filename as link text, per the
+- [x] The note carries its `INDEX.md` line (filename as link text, per the
       references check); the stale `INDEX.md` comment saying the four prospects
       stay off the committed-page list is corrected to point at the survey note;
       no per-source `<citekey>.md` page is created for the four sources.
-- [ ] Four `candidate` ROADMAP rows are registered, one per source, each naming
+- [x] Four `candidate` ROADMAP rows are registered, one per source, each naming
       the seedable oracle/method/reference and pointing at the synthesis note;
       the note's Disposition maps every ledger row to its candidate row.
-- [ ] `cairn_validate` is clean — the new note raises no unindexed-page,
+- [x] `cairn_validate` is clean — the new note raises no unindexed-page,
       `references staleness`, or dated-observation advisory.
 
 ## Coverage
@@ -99,3 +99,43 @@ location; see D-024).
 ## Decisions
 
 ## Review
+
+**Reviewed** 2026-07-20 · branch `m46-forward-source-prospects` · PR #72 · diff
+`origin/master..HEAD` (docs-only: 4 `cairn/` files, no package surface).
+
+### Acceptance-criteria evidence
+
+- **AC1 — survey synthesis note.** `cairn/references/forward-source-prospects.md`
+  exists, authored from `synthesis-note.md` (all template blocks present:
+  Provenance/Scope/Evidence-snapshot/characterization/ledger/Disposition/Open
+  questions). Four stable-ID ledger rows E1–E4, each with content + seedable
+  kind + "must verify". No verbatim values banked; the one specific figure
+  (weide2021 N = 822) is descriptive from the abstract, not a banked value.
+  `Extraction:` is one physical line, unbolded verb — `references staleness`
+  parses it OK. Every repo-state claim carries `— observed 2026-07-20`.
+- **AC2 — INDEX line + comment + no per-source page.** `INDEX.md` carries
+  `[forward-source-prospects.md](forward-source-prospects.md) — …` (filename
+  link text, per the M40 regex note); the stale prospects comment now points at
+  the survey note and cites D-024; `ls cairn/references/` shows no per-source
+  `.md` for the four. `references index<->disk` PASS.
+- **AC3 — four candidate rows + Disposition.** ROADMAP carries four
+  `M46 prospect E1–E4` rows, each naming its seedable kind and pointing at
+  `forward-source-prospects.md`; the note's Disposition maps E1–E4 to them (4/4).
+- **AC4 — cairn_validate clean.** Exit 0, all checks pass; `references
+  index<->disk` PASS, `references staleness` OK, `coverage complete` PASS. No
+  unindexed-page or dated-observation advisory from the new note.
+
+### Consistency gate
+
+- **cairn_validate** — exit 0, all checks pass. The 47 `work-log format`
+  advisories are all M7's pre-existing IP4-protected history, unchanged by M46.
+- **cairn_impact** — N/A; `Principles touched: —` (no DESIGN principle changed).
+- **r-package toolchain consistency-gate** — N/A: the diff touches only `cairn/`
+  (in `.Rbuildignore`); no `R/`, `man/`, `NAMESPACE`, `data/`, `NEWS.md`,
+  `README`, vignettes, `_pkgdown.yml`, or `DESCRIPTION`, so `document()`-no-diff,
+  generated-files, README-sync, pkgdown, NEWS-entry, and `check()` have no
+  surface to act on.
+
+### Independent review (three lenses + scorer)
+
+_Pending reviewer return._
