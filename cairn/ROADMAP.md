@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M47 | SSM estimator source notes (Wright 2009 + defining Gurtman) | planned | — | normal | milestones/M47-estimator-source-notes.md |
+| M47 | SSM estimator source notes (Wright 2009 + defining Gurtman) | in-progress | — | normal | milestones/M47-estimator-source-notes.md |
 | M48 | Fit-index and uncited shelf sources (browne1993 twin + strack2013) | planned | — | normal | milestones/M48-fitindex-uncited-sources.md |
 | M45 | Source notes for the RANDALL structure test pair | done | M40 | normal | milestones/archive/M45-reference-notes-randall.md |
 | M46 | Prospect notes for the four forward-looking shelf sources | done | — | normal | milestones/archive/M46-prospect-notes-forward-sources.md |

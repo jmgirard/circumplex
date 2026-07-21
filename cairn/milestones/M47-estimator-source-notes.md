@@ -1,11 +1,11 @@
 # M47: SSM estimator source notes (Wright 2009 + the defining Gurtman work)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m47-estimator-source-notes
 
 ## Goal
 
