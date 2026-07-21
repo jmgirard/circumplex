@@ -65,13 +65,15 @@ location; see D-024).
 
 ## Tasks
 
-- [ ] T1 — Read the four shelf PDFs
+- [x] T1 — Read the four shelf PDFs
       (`cairn/references/sources/{nagy2019,weide2021,rogoza2021,tracey2000}.pdf`)
       at survey altitude; draft one ledger row per source (content, seedable
-      oracle/method/reference, what a taking-up milestone must verify). Note
-      tracey2000 currently appears only as CAIS data provenance in
-      `R/instrument_data.R` / `data-raw/cais.R`.
-- [ ] T2 — Author `cairn/references/forward-source-prospects.md` from
+      oracle/method/reference, what a taking-up milestone must verify).
+      tracey2000 (the 2000 handbook chapter) is **uncited** by shipped code —
+      the CAIS `@source` is Sodano & Tracey (2006) at `R/instrument_data.R:5`,
+      a different work; the plan's "appears only as CAIS provenance" note was
+      wrong and is corrected here (M40/M41 re-check-the-claim lesson).
+- [x] T2 — Author `cairn/references/forward-source-prospects.md` from
       `synthesis-note.md`: Provenance (derived, ingested date, M46), Scope +
       tracking disclaimer, Evidence snapshot (each `— observed`), a neutral
       "what these four are" section, the E1–E4 ledger, and a Disposition mapping
@@ -88,6 +90,8 @@ location; see D-024).
 
 - 2026-07-20: created by /milestone-plan (Jeff split the forward-looking sources out of M45 into their own scope — shelved on purpose as future references / oracles / research material; see D-023).
 - 2026-07-20: re-planned by /milestone-plan — this milestone predated the official supply-push exploration doctrine (tracking-rules "Exploring prospective sources", shipped by cairn M103). Superseded D-023's per-source-prospect-brief mechanism with that doctrine's output: dropped the invented `cairn/references/prospects/` home, replaced the four per-source briefs with one committed survey synthesis note + four candidate rows, recorded D-024. Content unchanged in substance (still capture-by-intent); only the mechanism conforms. See D-024.
+- 2026-07-20: T1 — read the four shelf PDFs at survey altitude; pinned citations/DOIs. Corrected the plan's tracey2000 note: it is uncited (CAIS `@source` is Sodano & Tracey 2006, `R/instrument_data.R:5`), a false repo-state claim caught by the M40/M41 re-check lesson.
+- 2026-07-20: T2 — authored `cairn/references/forward-source-prospects.md` (survey synthesis note): provenance/scope/evidence-snapshot, neutral per-source characterization, E1–E4 prospect ledger (kind: oracle/method/reference/feature), Disposition → four candidate rows, dated open questions. No verbatim values banked; one-physical-line derived Extraction status.
 
 ## Decisions
 
