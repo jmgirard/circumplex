@@ -1,6 +1,6 @@
 # M50: Advanced Visualization vignette — rework for a less-advanced audience
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -96,7 +96,7 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
       selections, the `do.call(rbind, lapply())` + `matrix()` occasions build,
       `people[!is.na(...), ]`) into simpler idioms, or move unavoidable
       construction into a non-echoed setup chunk; keep every figure equivalent.
-- [ ] T6 — `devtools::test()` (NOT_CRAN=true) and
+- [x] T6 — `devtools::test()` (NOT_CRAN=true) and
       `devtools::check(args = "--no-manual")`; confirm the vignette builds and
       every figure knits; final render-and-inspect sweep of the reworked figures.
 
@@ -108,6 +108,7 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
 - 2026-07-21: T3 — cut the deliberately-broken `coord-bare` figure (spokes on default 0/100/200/300) and its "unfinished" prose; lead with the correctly-scaled `coord-built` figure and explain the scale line in prose.
 - 2026-07-21: T4 — removed the "Extending the layers" section (`GeomSsmStar` ggproto subclass); no dangling cross-references remain.
 - 2026-07-21: T5 — `[, c()]` displays → `subset(select=)`; `people[!is.na(),]` → `subset()`; moved the `do.call(rbind, lapply())`+`matrix()` occasions simulation into a non-echoed `echo = FALSE` chunk. Echoed chunks now carry no flagged base-R; full vignette knits under load_all (KNIT OK, 13 figures).
+- 2026-07-21: T6 — `devtools::check(args = "--no-manual")` clean: 0 errors / 0 warnings / 0 notes (4m52s), authoritative vignette build included. Status → review.
 
 ## Decisions
 
