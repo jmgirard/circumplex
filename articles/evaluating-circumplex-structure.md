@@ -396,7 +396,7 @@ summary(acc)
 #> Population Structure:     Browne circular model (CPM) 
 #> Group Sizes:      All = 250 
 #> Certification Rule:   a_lci / (a_uci - a_lci) >= 0.35 (scale-free, print-independent) 
-#> Elapsed:      14.1 s
+#> Elapsed:      13.6 s
 #> 
 #> Structure note: population simulated from a Browne circular model fit (m = 3,
 #> RMSEA = 0.064, SRMR = 0.038).
