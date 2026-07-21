@@ -14,6 +14,7 @@ Pagination: the journal's own, *SMR* 21(2) 230–258; the shelf PDF is 29 pages
 and PDF page *n* is printed page *n* + 229, so printed p. 239 is PDF p. 10,
 confirmed by its running head rather than by arithmetic.
 Extraction: verified 2026-07-19 against the source by two independent channels — `pdftotext -layout` and a visual read of the `pdftoppm`-rendered page image — covering every value on this page, all of which come from the single p. 239 passage; per M41-D1 the second channel is the implementing session's own read of the page image, which is independent of the text layer but is **not** a human attestation, and no value here has been read by a human — observed 2026-07-19.
+Chapter-twin re-check: re-verified 2026-07-21 by M48 against `sources/browne1993.pdf` by the same two machine channels — `pdftotext -layout` and a read of the `pdftoppm`-rendered page image. The three cutoffs sit in one passage on **chapter p. 144** (PDF p. 9); the m = 2 worked-example row (4.915, 0.098, (0.083; 0.113), 7.282, (6.612; 8.086), 417.81) sits in **Table 6.1 on chapter p. 152** (PDF p. 17) — a *different* chapter page from the cutoffs, confirmed by the p. 151 / p. 153 running heads on the flanking PDF pages. Both match the 1992 values banked here word-for-word and digit-for-digit; still no page read by a human — observed 2026-07-21.
 
 **Citation.** Browne, M. W., & Cudeck, R. (1992). Alternative ways of
 assessing model fit. *Sociological Methods & Research, 21*(2), 230–258. The
@@ -21,12 +22,21 @@ article carries no printed DOI. It appeared in a November 1992 special issue
 edited by Bollen & Long.
 
 The same paper **also appears as** chapter 6, pp. 136–162, of K. A. Bollen &
-J. S. Long (Eds.), *Testing Structural Equation Models* (Sage, 1993) — the
-edition the package's `@references` cite. It is named here **neutrally**, never
-as "reprinted in": the two editions were compared 2026-07-20 (see the resolved
-items under Open questions) — the chapter is a reset, lightly copy-edited
-typesetting, not a photographic reprint, but every value this page extracts is
-identical between them.
+J. S. Long (Eds.), *Testing Structural Equation Models* (Sage, 1993) — **the
+edition the package cites in user-facing text**, always as "Browne & Cudeck
+(1993)": the vignette benchmark prose and its reference-list entry
+(`vignettes/evaluating-circumplex-structure.Rmd:93` and `:613`) and the
+CI-accuracy structure-note snapshot (`tests/testthat/_snaps/ci_accuracy.md:38`),
+which is the frozen render of the `R/ssm_ci_oop.R` sites under "Traces to". The
+chapter carries **the same three RMSEA cutoffs this page extracts** from the 1992
+article, in one continuous passage on **chapter p. 144** (`sources/browne1993.pdf`
+PDF p. 9; running head `144 Alternative Ways of Assessing Model Fit`, the passage
+closing before the p. 145 head) — so the M41 extraction, read from the 1992
+article but cited to the 1993 chapter, holds for the cited edition. The chapter
+is named here **neutrally**, never as "reprinted in": the two editions were
+compared (see the resolved items under Open questions) — the chapter is a reset,
+lightly copy-edited typesetting, not a photographic reprint, but every value this
+page extracts is identical between them.
 
 **Role.** This source reaches the package on **two** paths, and they differ in
 kind — conflating them is easy and was the substantive defect M41's review
@@ -152,6 +162,9 @@ changing any of these lines is changing an implementation of this paper):
   its `@references` entry, which cite the 1993 chapter.
 - `vignettes/evaluating-circumplex-structure.Rmd:92-93,613` — the benchmark
   prose and the reference-list entry.
+- `tests/testthat/_snaps/ci_accuracy.md:38` — the frozen structure-note snapshot
+  carrying the "Browne & Cudeck, 1993" adequate-fit citation, the rendered output
+  of the `R/ssm_ci_oop.R:349-352` branch.
 
 ## Open questions
 
