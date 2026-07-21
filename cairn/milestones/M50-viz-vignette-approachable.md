@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m50-viz-vignette-approachable
+- **Branch/PR:** m50-viz-vignette-approachable · https://github.com/jmgirard/circumplex/pull/76
 
 ## Goal
 
@@ -47,19 +47,19 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
 
 ## Acceptance criteria
 
-- [ ] The instrument/label example renders spokes with full descriptive scale
+- [x] The instrument/label example renders spokes with full descriptive scale
       names (not `PA`–`NO`), and no vignette prose claims a bundled instrument
       relabels spokes. Evidence: the reworked chunk knits; grep the Rmd.
-- [ ] No figure in the coordinate-system section shows spokes on ggplot2
+- [x] No figure in the coordinate-system section shows spokes on ggplot2
       default breaks (0/100/200/300); every circumplex figure carries octant
       spokes. Evidence: the `coord-bare` broken-figure chunk is gone; render.
-- [ ] The "Extending the layers" section is removed. Evidence: the Rmd contains
+- [x] The "Extending the layers" section is removed. Evidence: the Rmd contains
       no `ggproto`, `GeomSsmStar`, or "Extending the layers".
-- [ ] The vignette's echoed R chunks contain none of `do.call(`, `lapply(`,
+- [x] The vignette's echoed R chunks contain none of `do.call(`, `lapply(`,
       `matrix(`, `[, c(`, or logical/negative row-filtering `[!is.na(`; any
       unavoidable construction is confined to a non-echoed setup chunk.
       Evidence: grep over echoed chunks + render shows equivalent figures.
-- [ ] `ssm_trajectory_ggplot()` sets a horizontal panel spacing, the 5
+- [x] `ssm_trajectory_ggplot()` sets a horizontal panel spacing, the 5
       trajectory vdiffr baselines are regenerated (only the intended ones
       move), and a render-and-inspect confirms no interior-label collision.
       Evidence: `R/ssm_trajectory.R` diff; `_snaps/ssm_trajectory*`; the figure.
@@ -113,3 +113,19 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
 ## Decisions
 
 ## Review
+
+_Reviewed 2026-07-21. PR #76. Driving RR: none (no projection-vs-outcome)._
+
+**Acceptance-criterion evidence (fresh):**
+
+- AC1 — `canvas-descriptive` chunk renders `ggcircumplex(octants(), labels = csip$Scales$Label)` (full interpersonal names); the `instrument = csip` reference is now inline prose, not a figure; no prose claims a bundled instrument produces different spokes. Render-inspected: all 8 names fit at `fig.width = 7`, none clipped.
+- AC2 — grep for `coord-bare` / `0, 100, 200` / "visibly unfinished" / "default axis breaks" returns nothing; `coord-built` renders octant spokes (verified in-vignette render).
+- AC3 — grep for `extending the layers` / `ggproto` / `GeomSsmStar` / `geom_ssm_star` = 0 occurrences.
+- AC4 — the only flagged construct remaining is `matrix(` at Rmd L302–303, inside the `echo = FALSE` `occasions-data-sim` chunk (L293); no `do.call(`/`lapply(`/`[, c(`/`[!is.na(` anywhere. Full vignette knits under `load_all()` (KNIT OK, 13 figures); reworked figures equivalent.
+- AC5 — `R/ssm_trajectory.R:615` adds `panel.spacing.x = grid::unit(1.2, "lines")`; 5 vdiffr baselines regenerated (`_snaps/ssm_trajectory{,_table}`), env parity confirmed (coord_circumplex byte-identical), diff is pure panel geometry; 3- and 5-panel layouts render-inspected, labels clear.
+
+**Consistency gate:**
+
+- `cairn_validate.py` — exit 0, all checks PASS (47 work-log-format advisories, all pre-existing M7 lines; not M50's).
+- No `DESIGN.md` principle changed → `cairn_impact` skipped.
+- Toolchain (`r-package` consistency-gate slot): `devtools::document()` no-diff (man/, NAMESPACE, RcppExports unchanged); `pkgdown::check_pkgdown()` passes; NEWS entry not owed — `ssm_plot_trajectory()` and the vignette are both new in the unreleased 2.0.0, so the panel-spacing refinement is intra-development, not user-visible vs a released version.
