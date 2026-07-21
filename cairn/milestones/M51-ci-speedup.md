@@ -60,7 +60,7 @@ No package code, no dependency add/remove/re-pin.
 
 ## Tasks
 
-- [ ] T1 `R-CMD-check.yaml`: add `paths-ignore` to the `pull_request` trigger,
+- [x] T1 `R-CMD-check.yaml`: add `paths-ignore` to the `pull_request` trigger,
       add the top-level `concurrency` block, and replace the static
       `matrix.config` with the `github.event_name`-conditional `fromJSON`
       expression (PR → 1 config; else the current 5).
@@ -72,6 +72,7 @@ No package code, no dependency add/remove/re-pin.
 ## Work log
 
 - 2026-07-21: created by /milestone-plan.
+- 2026-07-21: T1 — R-CMD-check.yaml gets concurrency (cancel-in-progress:true), paths-ignore [cairn/**,man/**,README.md] on pull_request, and github.event_name-conditional matrix (PR=1 ubuntu/release; else full 5). yaml::read_yaml() parses clean; folded matrix scalar verified.
 
 ## Decisions
 
