@@ -65,7 +65,7 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
 
 ## Tasks
 
-- [ ] T1 — Read `sources/wright2009.pdf`; extract the `aw2009` dataset
+- [x] T1 — Read `sources/wright2009.pdf`; extract the `aw2009` dataset
       provenance and the closed-form SSM parameter formulas with page/table
       anchors; two-channel verify (`pdftotext -layout` + a `pdftoppm`-rendered
       page-image read). **Jeff's warning (plan gate, 2026-07-20): the printed
@@ -73,7 +73,10 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
       value as suspect until the two channels agree, and record the printed
       errata verbatim beside the corrected value in a `wright2009.md` errata
       section (as `browne1992.md` does its five), never silently fix.
-- [ ] T2 — Author `wright2009.md` from `templates/source-note.md`: citation,
+      [PDF is an OCR scan → page image is the sole authoritative channel; OCR
+      text located only. aw2009 = Table A exactly; SS_Total missing-square typo
+      + unreconciled scalars recorded.]
+- [x] T2 — Author `wright2009.md` from `templates/source-note.md`: citation,
       provenance block, banked formulas, `Traces to` `R/example_data.R:4` /
       `man/aw2009.Rd` and the estimator code.
 - [ ] T3 — Identify the estimator-defining Gurtman paper: read `gurtman1998`
@@ -97,6 +100,7 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
 ## Work log
 
 - 2026-07-20: created by /milestone-plan (split from the 8-source triage; sibling M48).
+- 2026-07-20: T1–T2 — authored `wright2009.md`. Banked estimator Eqs. 7–13 from the p.315 page image (OCR scan; image is sole authoritative channel). `aw2009` confirmed identical to Wright Table A (all 40 cells). Recorded the Appendix printed typo (SS_Total final term missing its square) + the unreconciled hand-computed scalars per Jeff's warning; no shipped test transcribes them. INDEX line added.
 
 ## Decisions
 
