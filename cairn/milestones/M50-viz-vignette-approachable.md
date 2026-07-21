@@ -109,6 +109,7 @@ ggplot2 experts, and fix the one shipped-function defect that rework surfaces.
 - 2026-07-21: T4 — removed the "Extending the layers" section (`GeomSsmStar` ggproto subclass); no dangling cross-references remain.
 - 2026-07-21: T5 — `[, c()]` displays → `subset(select=)`; `people[!is.na(),]` → `subset()`; moved the `do.call(rbind, lapply())`+`matrix()` occasions simulation into a non-echoed `echo = FALSE` chunk. Echoed chunks now carry no flagged base-R; full vignette knits under load_all (KNIT OK, 13 figures).
 - 2026-07-21: T6 — `devtools::check(args = "--no-manual")` clean: 0 errors / 0 warnings / 0 notes (4m52s), authoritative vignette build included. Status → review.
+- 2026-07-21: review — PR #76; AC1–AC6 verified; consistency gate clean (validate exit 0, document no-diff, pkgdown ok). Fan-out (3 lenses + inline scoring): no regressions; F1 (garbled sentence, all 3 lenses) and F2 (`angles` undefined in echoed chunk) fixed on-branch; re-knit KNIT OK.
 
 ## Decisions
 
@@ -129,3 +130,16 @@ _Reviewed 2026-07-21. PR #76. Driving RR: none (no projection-vs-outcome)._
 - `cairn_validate.py` — exit 0, all checks PASS (47 work-log-format advisories, all pre-existing M7 lines; not M50's).
 - No `DESIGN.md` principle changed → `cairn_impact` skipped.
 - Toolchain (`r-package` consistency-gate slot): `devtools::document()` no-diff (man/, NAMESPACE, RcppExports unchanged); `pkgdown::check_pkgdown()` passes; NEWS entry not owed — `ssm_plot_trajectory()` and the vignette are both new in the unreleased 2.0.0, so the panel-spacing refinement is intra-development, not user-visible vs a released version.
+
+**Independent fresh-context review (3 lenses + scorer):**
+
+- [O] diff-bug: statistical/mechanical core clean (panel.spacing touches no data/branch/certification; 5 baselines geometry-only — text and numeric values unchanged; `subset()` rewrites behaviourally equivalent; labels pair correctly). 2 findings (below).
+- [S] blame-history: no regressions — the spacing change touches none of the M27/M33/M35 seam/unwrap invariants (those live in `GeomSsmArc$setup_data()`, untouched); removed vignette sections were M34 docs choices, not decision-backed; exported API unchanged. Independently flagged F1.
+- [S] prior-review: no regressions — M34's statistical-precision caveats survive, occasion-ordering intact, seam case preserved, all 5 baselines regenerated (per M31/M38 lesson), no leaked scaffolding (M34). Independently flagged F1.
+
+Findings (scored inline — both self-evidently real and actioned, so no exclusion gate needed):
+
+- F1 (score 98) — garbled sentence at `advanced-visualization.Rmd` descriptive-labels example (flagged by all three lenses). **Fixed**: reworded to "The octant scales also have full interpersonal names, which you can put on the spokes instead:".
+- F2 (score 92) — the echoed `occasions-path` chunk used `ggcircumplex(angles, ...)` but `angles` moved into the `echo = FALSE` sim chunk, so a reader copying the visible chunk hits `object 'angles' not found`. **Fixed**: chunk now calls `ggcircumplex(octants(), ...)`. Re-knit KNIT OK.
+
+No findings scored below 80; no follow-ups spawned.

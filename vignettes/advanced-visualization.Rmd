@@ -70,8 +70,8 @@ spokes in the order of the angles:
 ggcircumplex(octants(), labels = PANO())
 ```
 
-The labels need not be abbreviations. The octant scales have full interpersonal
-names, and passing those labels the spokes with them instead:
+The labels need not be abbreviations. The octant scales also have full
+interpersonal names, which you can put on the spokes instead:
 
 ```{r canvas-descriptive}
 ggcircumplex(octants(), labels = csip$Scales$Label)
@@ -367,7 +367,7 @@ amplitude and displacement of a single occasion are split across two panels.
 change in (amplitude, displacement) reads as movement through circumplex space.
 
 ```{r occasions-path}
-ggcircumplex(angles, amax = 0.8) +
+ggcircumplex(octants(), amax = 0.8) +
   geom_ssm_point(
     data = results_long$results,
     mapping = aes(amplitude = a_est, displacement = d_est),
