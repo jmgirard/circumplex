@@ -247,8 +247,25 @@ residuals (Hu &amp; Bentler, 1999); CFI and TLI near .95 or above
 suggest good comparative fit (Hu &amp; Bentler, 1999). Treat these as
 conventions from the broader covariance-structure literature, not
 circumplex-specific laws.</p>
-<p>Two circumplex-specific cautions, both from this package’s own
-validation simulations:</p>
+<p>Two caveats come from the benchmark sources themselves. Browne and
+Cudeck call their own RMSEA thresholds “based on subjective judgment,”
+cautioning that such a figure “cannot be regarded as infallible or
+correct” (Browne &amp; Cudeck, 1993) — read the cutoffs as conventions,
+not decision rules. And these benchmarks are least dependable at small
+samples: Hu and Bentler (1999) found that the ML-based TLI and RMSEA
+tend to <em>overreject</em> true-population models when the sample is
+small (CFI is not among the indices they flag), and circumplex analyses
+are often run at modest sample sizes — the SSM accuracy thresholds in
+Section 3 span roughly
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">n = 50</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>200</mn><annotation encoding="application/x-tex">200</annotation></semantics></math>.
+At small
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
+then, a TLI or RMSEA that falls short of its benchmark can reflect the
+index’s small-sample behavior as much as the model’s fit.</p>
+<p>Two further cautions are circumplex-specific, both from this
+package’s own validation simulations:</p>
 <ul>
 <li>
 <strong>Boundary solutions are common at realistic sample
