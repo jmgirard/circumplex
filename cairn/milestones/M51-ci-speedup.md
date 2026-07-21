@@ -64,7 +64,7 @@ No package code, no dependency add/remove/re-pin.
       add the top-level `concurrency` block, and replace the static
       `matrix.config` with the `github.event_name`-conditional `fromJSON`
       expression (PR → 1 config; else the current 5).
-- [ ] T2 `test-coverage.yaml`: add the same `paths-ignore` to its
+- [x] T2 `test-coverage.yaml`: add the same `paths-ignore` to its
       `pull_request` trigger and the same top-level `concurrency` block.
 - [ ] T3 Validate: `yaml::read_yaml()` each of the four workflow files clean;
       confirm `git diff` is scoped to the intended lines only; open the PR.
@@ -73,6 +73,7 @@ No package code, no dependency add/remove/re-pin.
 
 - 2026-07-21: created by /milestone-plan.
 - 2026-07-21: T1 — R-CMD-check.yaml gets concurrency (cancel-in-progress:true), paths-ignore [cairn/**,man/**,README.md] on pull_request, and github.event_name-conditional matrix (PR=1 ubuntu/release; else full 5). yaml::read_yaml() parses clean; folded matrix scalar verified.
+- 2026-07-21: T2 — test-coverage.yaml gets the same concurrency block and paths-ignore; push trigger and job body unchanged. yaml::read_yaml() clean.
 
 ## Decisions
 
