@@ -33,8 +33,28 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr, any::xml2
-          needs: coverage
+          # brms is deliberately excluded (see R-CMD-check.yaml for the full
+          # rationale — never loaded, cairn D-015, drags in the Stan stack).
+          # covr runs the suite with NOT_CRAN set, so the skip_on_cran oracles
+          # DO run here and need OpenMx/glmmTMB/lavaan — hence the allowlist is
+          # the same DESCRIPTION-Suggests-minus-brms mirror as the check job,
+          # plus covr + xml2. Keep the two allowlists in sync. cairn M52.
+          dependencies: '"hard"'
+          extra-packages: |
+            any::covr
+            any::xml2
+            any::ggrepel
+            any::glmmTMB
+            any::kableExtra
+            any::knitr
+            any::lavaan
+            any::OpenMx
+            any::psych
+            any::RColorBrewer
+            any::rmarkdown
+            any::roxygen2
+            any::testthat
+            any::vdiffr
 
       - name: Test coverage
         run: |
