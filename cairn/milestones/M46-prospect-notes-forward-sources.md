@@ -9,69 +9,85 @@
 
 ## Goal
 
-Characterize the four sources deliberately shelved as future research material
-so a later planner starts warm — what each contains, why it could become a
-reference, oracle, or feature, and what a taking-up milestone would verify.
+Triage the four deliberately-shelved forward-looking sources into one committed
+survey synthesis note plus four `candidate` ROADMAP rows — per the supply-push
+exploration doctrine — so a later planner starts warm without owing any
+per-source reference page.
 
 ## Scope
 
-**In:** a forward-looking prospect brief per source — nagy2019 (covariate
-extension of Browne's CPM), weide2021 (Bayesian + ML circumplex IIP modeling),
-rogoza2021 (three-step circumplex procedure), tracey2000 (analysis-of-circumplex
-chapter) — each summarizing content, naming the milestone it could seed, and
-stating what that milestone must verify. A `candidate` ROADMAP row per source
-pointing at its brief. These are **prospect** material, honestly flagged as not
-yet relied upon (no shipped code cites them), kept separate from the
-relied-upon reference pages.
+**In:** one committed **survey synthesis note**
+(`cairn/references/forward-source-prospects.md`, authored from
+`synthesis-note.md`) triaging nagy2019 (covariate extension of Browne's CPM),
+weide2021 (Bayesian + ML circumplex IIP modeling), rogoza2021 (three-step
+circumplex procedure), tracey2000 (analysis-of-circumplex chapter) — one
+stable-ID ledger row per source giving a content characterization, the
+oracle/method/reference it could seed, and what a taking-up milestone must
+verify; its `INDEX.md` line; and a Disposition mapping each row to a `candidate`
+ROADMAP row. Four `candidate` rows, one per source. Correcting the stale
+`INDEX.md` comment that says prospects stay off the committed-page list.
 
-**Out:** building the features/oracles they could seed (each is its own future
-milestone). Full formula extraction and code-cross-reference validation (owed
-only if and when a milestone relies on a source — the M45 bar, deliberately not
-applied here). Adding these to `INDEX.md`'s committed-page list (they have no
-`Traces to`). The relied-upon RANDALL pair → M45.
+**Out:** per-source `<citekey>.md` pages (demand-pull — owed only when a
+milestone comes to rely on a source → future milestones). Full formula
+extraction, verbatim value banking, and code-cross-reference validation (the
+M45 relied-upon bar; owed only on graduation). Building the oracles/methods/
+features these could seed (each its own future milestone). The invented
+`cairn/references/prospects/` home (dropped — the doctrine adds no new write
+location; see D-024).
 
 ## Acceptance criteria
 
-- [ ] A prospect brief exists for each of the four sources (nagy2019, weide2021,
-      rogoza2021, tracey2000), each stating: a content summary, the
-      reference/oracle/feature it could seed, and what a taking-up milestone
-      would have to verify. Claims that cite a specific value or page are
-      page-anchored; each brief is flagged "not yet relied upon (no `Traces
-      to`)."
+- [ ] A survey synthesis note exists at
+      `cairn/references/forward-source-prospects.md`, authored from
+      `synthesis-note.md`, with one stable-ID ledger row per source (nagy2019,
+      weide2021, rogoza2021, tracey2000) stating a content characterization, the
+      oracle/method/reference it could seed, and what a taking-up milestone must
+      verify. No source's verbatim values are banked (supply-push altitude); any
+      claim citing a specific value/page is page-anchored. Its `Extraction:`
+      status is a derived/first-hand form on one physical line with an unbolded
+      verb, and every repo-state claim carries `— observed <date>`.
+- [ ] The note carries its `INDEX.md` line (filename as link text, per the
+      references check); the stale `INDEX.md` comment saying the four prospects
+      stay off the committed-page list is corrected to point at the survey note;
+      no per-source `<citekey>.md` page is created for the four sources.
 - [ ] Four `candidate` ROADMAP rows are registered, one per source, each naming
-      the seedable milestone and marked "on shelf, forward-looking, no reference
-      page owed until relied upon."
-- [ ] The prospect material is stored separately from the relied-upon reference
-      pages and is **not** added to `INDEX.md`'s committed-page list; its home is
-      stated in the milestone.
-- [ ] `cairn_validate` is clean (no unindexed-page advisory raised by the new
-      prospect files).
+      the seedable oracle/method/reference and pointing at the synthesis note;
+      the note's Disposition maps every ledger row to its candidate row.
+- [ ] `cairn_validate` is clean — the new note raises no unindexed-page,
+      `references staleness`, or dated-observation advisory.
 
 ## Coverage
 
-- AC1 → T1, T2, T3, T4
-- AC2 → T5
-- AC3 → T1, T6
-- AC4 → T6
+- AC1 → T1, T2
+- AC2 → T3
+- AC3 → T4
+- AC4 → T5
 
 ## Tasks
 
-- [ ] T1 — Establish the prospect home (default: `cairn/references/prospects/`,
-      out of `INDEX.md` and the tarball like all of `cairn/`); author the
-      nagy2019 brief.
-- [ ] T2 — Author the weide2021 brief (flag as a potential
-      Bayesian/ML inference-comparison oracle or benchmark).
-- [ ] T3 — Author the rogoza2021 brief (potential method / vignette material).
-- [ ] T4 — Author the tracey2000 brief (potential reference; note it currently
-      appears only as CAIS data provenance in `R/instrument_data.R` /
-      `data-raw/cais.R`).
-- [ ] T5 — Register four `candidate` ROADMAP rows, one per source, each
-      pointing at its brief.
-- [ ] T6 — Run `cairn_validate`; commit.
+- [ ] T1 — Read the four shelf PDFs
+      (`cairn/references/sources/{nagy2019,weide2021,rogoza2021,tracey2000}.pdf`)
+      at survey altitude; draft one ledger row per source (content, seedable
+      oracle/method/reference, what a taking-up milestone must verify). Note
+      tracey2000 currently appears only as CAIS data provenance in
+      `R/instrument_data.R` / `data-raw/cais.R`.
+- [ ] T2 — Author `cairn/references/forward-source-prospects.md` from
+      `synthesis-note.md`: Provenance (derived, ingested date, M46), Scope +
+      tracking disclaimer, Evidence snapshot (each `— observed`), a neutral
+      "what these four are" section, the E1–E4 ledger, and a Disposition mapping
+      each row to its candidate row. Derived/first-hand `Extraction:` status on
+      one physical line.
+- [ ] T3 — Add the note's `INDEX.md` line (filename as link text); correct the
+      stale `INDEX.md` prospects comment to point at the survey note; confirm no
+      per-source page was created.
+- [ ] T4 — Register four `candidate` ROADMAP rows, one per source, each pointing
+      at the synthesis note.
+- [ ] T5 — Run `cairn_validate`; confirm clean; commit.
 
 ## Work log
 
 - 2026-07-20: created by /milestone-plan (Jeff split the forward-looking sources out of M45 into their own scope — shelved on purpose as future references / oracles / research material; see D-023).
+- 2026-07-20: re-planned by /milestone-plan — this milestone predated the official supply-push exploration doctrine (tracking-rules "Exploring prospective sources", shipped by cairn M103). Superseded D-023's per-source-prospect-brief mechanism with that doctrine's output: dropped the invented `cairn/references/prospects/` home, replaced the four per-source briefs with one committed survey synthesis note + four candidate rows, recorded D-024. Content unchanged in substance (still capture-by-intent); only the mechanism conforms. See D-024.
 
 ## Decisions
 

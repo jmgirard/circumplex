@@ -648,3 +648,34 @@ dismiss on "nothing cites it." The full extraction + code-cross-reference bar
 (the M45 relied-upon bar) is owed only when a milestone comes to rely on a
 source. Refines the M41/M43 owes-no-page practice; no D-entry superseded.
 Source: Jeff, M45/M46 plan gate.
+_Mechanism superseded by D-024 (2026-07-20): the principle here stands, but the
+per-source-brief-in-`prospects/` output is replaced by the supply-push doctrine's
+survey synthesis note + candidate rows._
+
+### D-024 (2026-07-20): forward-looking shelf sources are triaged into one survey synthesis note + candidate rows, not per-source prospect briefs (supersedes D-023's mechanism)
+
+**Context:** D-023 (same M45/M46 plan gate) captured the four deliberately-shelved
+sources (nagy2019, weide2021, rogoza2021, tracey2000) as prospects via a
+per-source forward-looking *brief* in a new `cairn/references/prospects/` home,
+held out of `INDEX.md`. The cairn supply-push exploration doctrine
+(`tracking-rules.md` "Exploring prospective sources", shipped by cairn M103,
+*after* D-023) governs exactly this activity and prescribes a different
+mechanism: exploration adds no new write location, withholds per-source
+`<citekey>.md` pages (they stay demand-pull), always emits `candidate` ROADMAP
+rows, and commits at most one **survey synthesis note** when the triage outlives
+the milestone.
+**Decision:** D-023's *principle* stands — a deliberately-shelved source is
+dispositioned by intent, not citation count, and captured rather than dismissed
+as "owes no page." Its *mechanism* is replaced by the official supply-push
+output: M46 authors one committed survey synthesis note
+(`cairn/references/forward-source-prospects.md`, from `synthesis-note.md`,
+INDEX-listed) triaging the four sources, plus four `candidate` rows. No
+`prospects/` home; no per-source pages. A per-source `<citekey>.md` page is owed
+only when a milestone comes to rely on a source (the M45 bar).
+**Consequences:** The four sources gain one survey note and four candidate rows,
+not four briefs; the note carries an `INDEX.md` line (reversing D-023's
+out-of-INDEX instruction — correct for a synthesis note), and the stale
+`INDEX.md` prospects comment is corrected. Supersedes D-023's mechanism; D-023
+retained as historical record and cross-referenced. The owes-no-page ledger is
+untouched (still valid for genuinely-in-passing sources).
+Source: Jeff, M46 re-plan gate.
