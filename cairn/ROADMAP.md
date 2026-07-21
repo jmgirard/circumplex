@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-20 (/milestone: reconciled M39's merge into M7 — M7 now blocked solely on the T4 `submit_cran()` handoff, the M39 predecessor cleared. Flagged for triage: PR #70 (dropped M44) still open on GitHub. Validate green; the 47 `work-log format` advisories are all M7's IP4-protected pre-implement history.)_
+_Last hygiene check: 2026-07-20 (/milestone-review M45: merged PR #71, archived M45 → done, RANDALL candidate discharged. Validate green; the 47 `work-log format` advisories are all M7's IP4-protected pre-implement history. Still flagged for triage: PR #70 (dropped M44) open on GitHub. M46 (forward-source prospects) remains planned.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,10 +10,9 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M45 | Source notes for the RANDALL structure test pair | review | M40 | normal | milestones/M45-reference-notes-randall.md |
+| M45 | Source notes for the RANDALL structure test pair | done | M40 | normal | milestones/archive/M45-reference-notes-randall.md |
 | M46 | Prospect notes for the four forward-looking shelf sources | planned | — | normal | milestones/M46-prospect-notes-forward-sources.md |
 | M44 | LESSONS.md consolidation and retirement pass | dropped | — | normal | milestones/archive/M44-lessons-consolidation.md |
-| M40 | Source notes for the two shelved primary sources | done | — | normal | milestones/archive/M40-reference-notes-shelved.md |
 | M41 | Source notes for the fit-index benchmark pair | done | M40 | normal | milestones/archive/M41-reference-notes-benchmarks.md |
 | M42 | Source notes for the CPM model and its communality CIs | done | M40 | normal | milestones/archive/M42-reference-notes-cpm.md |
 | M43 | Source notes for the structure criteria and the validity source | done | M40 | normal | milestones/archive/M43-reference-notes-structure.md |
