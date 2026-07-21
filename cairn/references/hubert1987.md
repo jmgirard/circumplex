@@ -11,8 +11,10 @@ an independent witness** — and it is visibly garbled ("Wakeneld", "denned",
 "m^ima"). Every load-bearing formula and numeral below (Eqs. 3 and 5, the
 exact- and Monte-Carlo p-value definitions, the worked values .75 and
 .88 − .13) was therefore verified 2026-07-20 against the `pdftoppm`-rendered
-images of pp. 176–177; the OCR text layer served only to locate passages and
-cross-check running prose. Per M41-D1 the rendered-image read is independent of
+images of pp. 175–177 — the pages carrying every anchor this note cites (the
+exact p-value and the reference-set symmetry on p. 175, Eqs. 3/5 and the worked
+values on p. 176, the Monte-Carlo form on p. 177); the OCR text layer served
+only to locate passages and cross-check running prose. Per M41-D1 the rendered-image read is independent of
 the text layer but is **not** a human attestation, and both channels derive
 from the same scan image — a defect in the scan itself would escape both. No
 value here has been read by a human.

@@ -9,9 +9,10 @@ Extraction: the PDF is an OCR scan (`Producer: Adobe Acrobat … Paper Capture
 Plug-in`), so its `pdftotext` text layer is **OCR output of the page image, not
 an independent witness** (garbled: "1ERENCE", "Im", "wasp= .0167"). The
 load-bearing passages — the Correspondence Index definition and the worked
-RIASEC example (69 confirmed / 2 not / 1 tie / CI .93 / p = .0167) — were
-verified 2026-07-20 against the `pdftoppm`-rendered image of p. 165; the OCR
-text layer served only to locate passages and read the reference list. Per
+RIASEC example (69 confirmed / 2 not / 1 tie / CI .93 on p. 165, p = .0167 on
+p. 166) — were verified 2026-07-20 against the `pdftoppm`-rendered images of
+pp. 165–166; the OCR text layer served only to locate passages and read the
+reference list. Per
 M41-D1 the rendered-image read is independent of the text layer but is **not** a
 human attestation, and both derive from the same scan. No value here has been
 read by a human.
@@ -55,7 +56,13 @@ For the Table 1 correlation matrix (ACT/UNIACT, 358 males), a circular order
 model yields **72 unique order predictions**; "69 of the 72 order predictions
 were confirmed, two were not confirmed, and there was one tie. The
 correspondence index was .93" (p. 165) — i.e. (69 − 2)/72 = .9306. The exact
-p-value was **p = .0167 (= 1/60**, the 12/720 tie for the maximum; p. 166).
+p-value is printed as "p = .0167 (1/720)" (p. 166) — a **printed slip**: .0167
+is 1/60, not 1/720 (= .0014). The .0167 is the correct value: 12 of the 720
+relabelings tie the maximum (the 6 cyclic rotations × 2 reversals of the
+circular structure), so 12/720 = 1/60 = .0167, exactly Hubert & Arabie's Table 2
+result for the same RIASEC structure (`hubert1987.md`, p. 175). Tracey's
+companion phrase "no other comparisons … fit … as well or better" is the same
+imprecision — the 11 symmetric images also tie it.
 
 ### Program scope — p. 167
 
@@ -85,8 +92,11 @@ Points specific to this source:
   to Hubert & Arabie (1987, p. 177), **not** to Tracey, whose program enumerates
   exhaustively and offers no sampled option.
 - **Scope generalized.** RANDALL is fixed to 4/6/8 variables; the package
-  accepts `length(scales) >= 4`, enumerates exactly for `nv <= 9`, and switches
-  to the sampled p-value beyond — a superset of RANDALL's fixed sizes.
+  accepts `length(scales) >= 4` and enumerates exactly by default for
+  `nv <= 9`. It does **not** auto-switch beyond that: for `nv > 9` it errors
+  unless the caller supplies `n_perm`, and the sampled `(M+1)/(N+1)` path runs
+  whenever `n_perm` is given (at any `nv`). Still a superset of RANDALL's fixed
+  sizes.
 
 ## What this source does and does not license
 
