@@ -1,6 +1,6 @@
 # M47: SSM estimator source notes (Wright 2009 + the defining Gurtman work)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -110,10 +110,12 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
       anchors, a provenance block, and `Traces to` the two SSM vignettes.
       [Born-digital text layer. Recorded that 2003 does NOT print the .80/.70
       cutoffs Wright attributes to it.]
-- [ ] T5 — Disposition the remaining shelf Gurtman PDFs (1991 / 1993 / 1994):
+- [x] T5 — Disposition the remaining shelf Gurtman PDFs (1991 / 1993 / 1994):
       owes-no-page `INDEX.md` comment with reason, or a prospect `candidate` row
       (search-first, D-042) where deliberately shelved.
-- [ ] T6 — Add `INDEX.md` lines for the new pages; run `cairn_validate` +
+      [All three uncited, none a standalone prospect → owes-no-page ledger
+      entries. gurtman1994's scaling correction captured transitively.]
+- [x] T6 — Add `INDEX.md` lines for the new pages; run `cairn_validate` +
       references check; guard the known parser traps (unbolded `verified <date>`
       off line-start; filename as INDEX link text — M40).
 
@@ -123,6 +125,7 @@ only). Gurtman 1992 and Gurtman & Pincus 2000 are cited in vignettes but are
 - 2026-07-20: T1–T2 — authored `wright2009.md`. Banked estimator Eqs. 7–13 from the p.315 page image (OCR scan; image is sole authoritative channel). `aw2009` confirmed identical to Wright Table A (all 40 cells). Recorded the Appendix printed typo (SS_Total final term missing its square) + the unreconciled hand-computed scalars per Jeff's warning; no shipped test transcribes them. INDEX line added.
 - 2026-07-20: T3 gate + amendment (M47-D1) — both Gurtman pages, no Fable. Amended AC1 (wright2009 is an OCR scan → single authoritative channel, not two), AC2 (→gurtman1998), added AC3 (gurtman2003); AC5 remaining = 1991/1993/1994. Corrected an AC3 over-claim: gurtman2003 does not print the .80/.70 cutoffs.
 - 2026-07-20: T4/T4b — authored `gurtman1998.md` (Eqs. 1–2 from the p.349 image; the SS_Total page Wright cites; estimator = vector-averaging closed form w/ 2/p scaling) and `gurtman2003.md` (Eq. 16.7 from the born-digital text layer; recorded the .80/.70-not-in-2003 finding). Two INDEX lines added.
+- 2026-07-20: T5–T6 — dispositioned gurtman 1991/1993/1994 as owes-no-page (uncited; 1994's scaling correction captured transitively). Validate green (weight caps / references / coverage all PASS); budget 132/149. All tasks done → status review.
 
 ## Decisions
 

@@ -65,4 +65,18 @@ _One line per committed page: `citekey — title — traces to`._
        literature constant, and the delta-CFI option was left as an
        unexercised offer (devel/m5-sem-design.md:751-759, section 12.2
        item 2). Assessed at M41; a ROADMAP candidate row carries the feature
-       question, and the milestone that ever takes it up authors the page. -->
+       question, and the milestone that ever takes it up authors the page.
+
+     Gurtman corpus — dispositioned at M47 while identifying the estimator's
+     defining source (gurtman1998); each uncited by shipped code, none a
+     standalone seedable prospect — all observed 2026-07-20:
+     - sources/gurtman1991.pdf — Gurtman (1991), Evaluating the
+       interpersonalness of personality scales; a scale-evaluation method the
+       repo does not cite or implement. Consulted in passing.
+     - sources/gurtman1993.pdf — Gurtman (1993), Constructing personality tests
+       to meet a structural criterion; test-construction methodology, uncited.
+     - sources/gurtman1994.pdf — Gurtman (1994), The circumplex as a tool…: a
+       methodological primer. Its one relevant contribution — the "slight
+       scaling correction" behind the vector-averaging estimator — is captured
+       transitively by gurtman1998.md's citation of "Gurtman, 1994"; the repo
+       cites 1994 nowhere directly. Consulted as another source's citation. -->
