@@ -132,6 +132,12 @@ axes_fit <- function(dat, items, angles_deg, estimator = "ML",
   )
 }
 
+# Whether a fitted lavaan model converged. A thin seam so the convergence guard
+# in axes_reliability() (RR09 BC12) is testable via local_mocked_bindings().
+axes_converged <- function(fit) {
+  isTRUE(lavaan::lavInspect(fit, "converged"))
+}
+
 # --- Population model and simulation (oracle + bundled-data generator) ---------
 
 # The exact population item-correlation matrix implied by the five orthogonal
@@ -190,4 +196,334 @@ cronbach_alpha <- function(x) {
 # honest by isolating xi1.
 axis_reliability_nb <- function(w, rel_scale, var_axis) {
   1 - sum(w^2 * (1 - rel_scale)) / var_axis
+}
+
+# --- Input resolution (instrument map or explicit map) ------------------------
+
+# Resolve column selectors (character names or numeric indices) against `data`
+# to character column names; an out-of-range numeric index becomes NA (caught as
+# a missing item by the caller).
+axes_colnames <- function(sel, data) {
+  if (is.numeric(sel)) colnames(data)[sel] else as.character(sel)
+}
+
+# Normalize the two input forms to one internal map: a list of per-scale item
+# column-name vectors, the matching per-scale angles (degrees), and scale labels.
+# Instrument form (parallel to score()): `items` is ALL item columns in
+# item-number order and the instrument's Scales$Items are 1-based indices into
+# it. Explicit form: `items` is a list of per-scale item-column vectors and
+# `angles` the per-scale angles.
+axes_resolve_map <- function(data, items, angles, instrument) {
+  if (!is.null(instrument)) {
+    stopifnot(inherits(instrument, "circumplex_instrument"))
+    stopifnot(is_var(items))
+    if (!is.null(angles)) {
+      stop("Supply either `instrument` or `angles`, not both.", call. = FALSE)
+    }
+    all_cols <- axes_colnames(items, data)
+    key <- instrument$Scales
+    item_list <- lapply(seq_len(nrow(key)), function(i) {
+      nums <- as.integer(strsplit(key$Items[[i]], ",")[[1]])
+      if (max(nums) > length(all_cols)) {
+        stop(
+          "The instrument's scale ", key$Abbrev[[i]], " indexes item ",
+          max(nums), " but only ", length(all_cols), " items were supplied.",
+          call. = FALSE
+        )
+      }
+      all_cols[nums]
+    })
+    list(
+      items = item_list,
+      angles = as.numeric(key$Angle),
+      labels = as.character(key$Abbrev)
+    )
+  } else {
+    if (!is.list(items)) {
+      stop(
+        "Without an `instrument`, `items` must be a list of per-scale item ",
+        "column vectors (and `angles` their angles).",
+        call. = FALSE
+      )
+    }
+    stopifnot(is.numeric(angles), length(angles) == length(items))
+    labels <- names(items)
+    if (is.null(labels)) labels <- sprintf("Scale%d", seq_along(items))
+    list(
+      items = lapply(items, axes_colnames, data = data),
+      angles = as.numeric(angles),
+      labels = labels
+    )
+  }
+}
+
+# --- The estimator ------------------------------------------------------------
+
+#' Reliability of the circumplex axes (Strack, Jacobs & Grosse Holtforth, 2013)
+#'
+#' Estimate the reliability (and standard error of measurement) of the two
+#' circumplex axes of an octant instrument with the item-level restricted
+#' tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The model
+#' decomposes each item's variance into orthogonal components -- a general
+#' factor, the two circumplex axes, scale specificity, and item specificity --
+#' and reads the axes' reliability off the isolated axes-variance component with
+#' the Spearman-Brown formula. It is a confirmatory, item-level complement to
+#' [fit_structure()]'s exploratory scale-level criteria.
+#'
+#' @details
+#' The model is fit to the item **correlation** matrix (the items are
+#' z-standardized) as a flat fixed-links CFA: every item loads on the two axes
+#' with fixed cosine weights, on a general factor with weight one, and on its
+#' scale's specificity factor with weight one; the two axis variances are held
+#' equal (the circumplex "no preferred rotation" axiom) and every
+#' scale-specificity variance shares one value, while item errors stay free
+#' (tau-equivalent). Only the axes-variance component feeds reliability.
+#'
+#' The Nunnally-Bernstein axis reliability (`nb_reliability`) is reported
+#' alongside for comparison: it **overestimates** axis reliability when scale
+#' specificity is large, because it charges scale-specificity variance to the
+#' axis rather than isolating it (Strack et al. 2013, Figure 3).
+#'
+#' Missing data are handled by **listwise deletion only** (a message reports the
+#' complete-case count); pairwise correlation input is never used. A boundary
+#' fit (a non-positive estimated axes variance, or any negative estimated
+#' variance) returns `NA` reliability and SEm with a warning and a boundary flag
+#' rather than a clipped or negative value.
+#'
+#' @param data A data frame (or matrix) containing the circumplex items.
+#' @param items Item selection. With `instrument`, a character vector of column
+#'   names (or numeric indices) giving **all** items in item-number order, as in
+#'   [score()]. Without `instrument`, a list with one element per scale, each a
+#'   character vector (or numeric indices) of that scale's item columns.
+#' @param angles A numeric vector of the scales' angles in degrees (one per
+#'   scale), required for the explicit map and forbidden with `instrument`
+#'   (which supplies its own). Use [octants()].
+#' @param instrument Optional. A `circumplex_instrument` object supplying the
+#'   scale angles and item membership (`Scales$Angle`, `Scales$Items`).
+#' @param sd The scale for the standard error of measurement: `"std"` (the
+#'   default) reports the z-standardized SEm `sqrt(1 - reliability)`; `"raw"`
+#'   uses each axis composite's observed raw SD; or a numeric vector (length 1,
+#'   recycled, or length 2 for the X and Y axes) of axis SDs.
+#' @return An object of class `circumplex_axes_reliability` with `print()` and
+#'   [summary()] methods: `results` (one row per axis: the axes variance, item_n,
+#'   reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
+#'   `components` (the estimated variance components with SEs), `fit` (global fit
+#'   indices), and `details`.
+#' @references Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The
+#'   reliability of circumplex axes. \emph{SAGE Open}, 3(2).
+#'   \doi{10.1177/2158244013486115}
+#' @seealso [fit_structure()] for exploratory circumplex-structure criteria.
+#' @export
+axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
+                             sd = "std") {
+  call <- match.call()
+  stopifnot(is.data.frame(data) || is.matrix(data))
+  if (is.matrix(data)) data <- as.data.frame(data)
+  if (!requireNamespace("lavaan", quietly = TRUE)) {
+    stop("`axes_reliability()` requires the lavaan package.", call. = FALSE)
+  }
+
+  map <- axes_resolve_map(data, items, angles, instrument)
+  item_cols <- map$items
+  angles_deg <- map$angles
+  n_scales <- length(item_cols)
+
+  # --- Refuse contract (RR09 BC12) --------------------------------------------
+  if (n_scales != 8L) {
+    stop(
+      "`axes_reliability()` supports octant (8-scale) instruments; ",
+      n_scales, " scales were supplied.",
+      call. = FALSE
+    )
+  }
+  if (anyNA(angles_deg)) {
+    stop("`angles` contains a missing value.", call. = FALSE)
+  }
+  # The angle multiset must equal octants() modulo 360 (equal octant spacing);
+  # this rejects unequal spacing and duplicate angles alike.
+  if (!identical(
+    sort(as.numeric(angles_deg) %% 360),
+    sort(as.numeric(octants()) %% 360)
+  )) {
+    stop(
+      "`angles` must be the eight octant angles (see octants()); an unequal ",
+      "spacing or a duplicated angle is not a type-a octant circumplex.",
+      call. = FALSE
+    )
+  }
+  n_items_scale <- lengths(item_cols)
+  if (any(n_items_scale < 2L)) {
+    stop("Every scale must have at least 2 items.", call. = FALSE)
+  }
+  all_cols <- unlist(item_cols)
+  missing_cols <- setdiff(all_cols, colnames(data))
+  if (length(missing_cols) > 0 || anyNA(all_cols)) {
+    stop(
+      "Item column(s) not found in `data`: ",
+      paste(stats::na.omit(union(missing_cols, all_cols[is.na(all_cols)])),
+            collapse = ", "),
+      ".",
+      call. = FALSE
+    )
+  }
+
+  mat <- as.matrix(data[, all_cols, drop = FALSE])
+  if (!is.numeric(mat)) {
+    stop("`items` must select numeric columns.", call. = FALSE)
+  }
+  if (any(is.infinite(mat) | is.nan(mat))) {
+    stop("`data` contains non-finite (Inf/NaN) values.", call. = FALSE)
+  }
+
+  # --- Listwise deletion (RR09 BC13) ------------------------------------------
+  n_total <- nrow(mat)
+  mat <- mat[stats::complete.cases(mat), , drop = FALSE]
+  n <- nrow(mat)
+  p <- ncol(mat)
+  message(
+    "axes_reliability(): ", n, " complete case(s) used",
+    if (n < n_total) paste0(" (", n_total - n, " removed by listwise deletion)"),
+    "."
+  )
+  if (n <= p) {
+    stop(
+      "Complete-case N (", n, ") must exceed the number of items (", p, ").",
+      call. = FALSE
+    )
+  }
+
+  item_var <- apply(mat, 2, stats::var)
+  if (any(item_var <= 0)) {
+    stop(
+      "Zero-variance item(s): ",
+      paste(all_cols[item_var <= 0], collapse = ", "), ".",
+      call. = FALSE
+    )
+  }
+  R <- stats::cor(mat)
+  # A small positive tolerance so a near-singular matrix (e.g. duplicated or
+  # collinear items, whose smallest eigenvalue is float noise ~1e-15) is refused
+  # here rather than choking lavaan with a cryptic message downstream.
+  if (min(eigen(R, symmetric = TRUE, only.values = TRUE)$values) <= 1e-8) {
+    stop(
+      "The item correlation matrix is not positive definite; the model ",
+      "cannot be fit.",
+      call. = FALSE
+    )
+  }
+
+  # --- Fit the flat fixed-links CFA on the standardized items -----------------
+  zdf <- as.data.frame(scale(mat))
+  colnames(zdf) <- all_cols
+  # Convergence, boundary, and singularity are all guarded explicitly below, so
+  # lavaan's own fit-time warnings (e.g. "some estimated lv variances are
+  # negative" on a boundary fit) are redundant noise; suppress them in favor of
+  # this function's own clean diagnostics.
+  fit <- suppressWarnings(axes_fit(zdf, item_cols, angles_deg))
+  if (!axes_converged(fit)) {
+    stop(
+      "The lavaan model did not converge; the axes reliability cannot be ",
+      "estimated.",
+      call. = FALSE
+    )
+  }
+
+  # --- Extract components and per-axis reliability ----------------------------
+  pe <- lavaan::parameterEstimates(fit)
+  comp_var <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat]
+  comp_se <- function(lat) pe$se[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat]
+  xi1 <- comp_var("AX")[[1]]
+  xi2 <- comp_var("GEN")[[1]]
+  zeta1 <- comp_var("SS1")[[1]]
+  eps <- pe$est[pe$op == "~~" & pe$lhs == pe$rhs & pe$lhs %in% all_cols]
+
+  # Boundary: a non-positive axes variance, or any negative estimated variance,
+  # is not a usable solution (RR09 BC11). NA the reliability/SEm -- never clip,
+  # zero, or return a negative -- and flag it.
+  boundary <- xi1 <= 0 || xi2 < 0 || zeta1 < 0 || any(eps < 0)
+  if (boundary) {
+    warning(
+      "A boundary solution (non-positive axes variance or a negative ",
+      "estimated variance) was reached; reliability and SEm are NA.",
+      call. = FALSE
+    )
+  }
+
+  item_n <- axis_item_n(angles_deg, n_items_scale)
+  weights <- axis_weights(angles_deg)
+
+  rel <- if (boundary) c(x = NA_real_, y = NA_real_) else {
+    c(x = axis_reliability_sb(xi1, item_n[["x"]]),
+      y = axis_reliability_sb(xi1, item_n[["y"]]))
+  }
+
+  # SEm scale: "std" (SD = 1), "raw" (observed axis-composite SD), or numeric.
+  scale_scores <- vapply(
+    item_cols, function(cols) rowMeans(mat[, cols, drop = FALSE]),
+    numeric(n)
+  )
+  axis_sd <- if (identical(sd, "std")) {
+    c(x = 1, y = 1)
+  } else if (identical(sd, "raw")) {
+    c(
+      x = stats::sd(as.numeric(scale_scores %*% weights[, "w_x"])),
+      y = stats::sd(as.numeric(scale_scores %*% weights[, "w_y"]))
+    )
+  } else {
+    stopifnot(is.numeric(sd), length(sd) %in% c(1L, 2L))
+    if (length(sd) == 1L) c(x = sd, y = sd) else c(x = sd[[1]], y = sd[[2]])
+  }
+  sem <- if (boundary) c(x = NA_real_, y = NA_real_) else {
+    c(x = axis_sem(rel[["x"]], axis_sd[["x"]]),
+      y = axis_sem(rel[["y"]], axis_sd[["y"]]))
+  }
+
+  # Nunnally-Bernstein axis reliability (independent of the CFA fit): per-scale
+  # alpha and the z-standardized weighted scale composite.
+  rel_scale <- vapply(
+    item_cols, function(cols) cronbach_alpha(mat[, cols, drop = FALSE]),
+    numeric(1)
+  )
+  zscore <- scale(scale_scores)
+  nb <- c(
+    x = axis_reliability_nb(
+      weights[, "w_x"], rel_scale,
+      stats::var(as.numeric(zscore %*% weights[, "w_x"]))
+    ),
+    y = axis_reliability_nb(
+      weights[, "w_y"], rel_scale,
+      stats::var(as.numeric(zscore %*% weights[, "w_y"]))
+    )
+  )
+
+  results <- data.frame(
+    Axis = c("X", "Y"),
+    xi1 = c(xi1, xi1),
+    item_n = c(item_n[["x"]], item_n[["y"]]),
+    reliability = c(rel[["x"]], rel[["y"]]),
+    sem = c(sem[["x"]], sem[["y"]]),
+    nb_reliability = c(nb[["x"]], nb[["y"]]),
+    boundary = c(boundary, boundary),
+    stringsAsFactors = FALSE
+  )
+  components <- data.frame(
+    Component = c("general", "axes", "scale_specificity", "item"),
+    Symbol = c("xi2", "xi1", "zeta1", "epsilon"),
+    Estimate = c(xi2, xi1, zeta1, mean(eps)),
+    SE = c(comp_se("GEN")[[1]], comp_se("AX")[[1]], comp_se("SS1")[[1]], NA_real_),
+    stringsAsFactors = FALSE
+  )
+  fm <- lavaan::fitMeasures(fit, c("chisq", "df", "pvalue", "rmsea", "cfi",
+                                   "srmr"))
+  new_axes_reliability(
+    results = results,
+    components = components,
+    fit = as.list(fm),
+    details = list(
+      n = n, n_total = n_total, n_items = p, n_scales = n_scales,
+      angles = angles_deg, labels = map$labels, sd = sd,
+      converged = TRUE, boundary = boundary
+    ),
+    call = call
+  )
 }

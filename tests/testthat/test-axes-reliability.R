@@ -379,3 +379,158 @@ test_that("BC9: N-B overestimates vs CFA at high scale-specificity (Figure 3)", 
 
   expect_gt(nb_rel - cfa_rel, .05) # pre-registered margin; observed ~.21
 })
+
+# Refuse / boundary / listwise contract (T8). BC11 boundary, BC12 refusals,
+# BC13 listwise policy on the exported axes_reliability().
+
+# A valid octant item dataset + its explicit item map, for perturbing.
+axes_valid_fixture <- function(n = 1500L, k = 4L, xi1 = .20, seed = 42L) {
+  oct <- octants()
+  set.seed(seed)
+  dat <- axes_simulate(n, oct, k, xi1, .05, .08)
+  inames <- sprintf("i%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  list(
+    data = dat, oct = oct,
+    items = split(inames, rep(seq_along(oct), each = k)),
+    names = inames
+  )
+}
+
+test_that("BC11: small positive xi1 gives a small reliability, not a boundary", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  set.seed(2)
+  dat <- axes_simulate(4000L, oct, 2L, xi1 = .028, xi2 = .04, zeta1 = .05)
+  inames <- sprintf("j%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  items <- split(inames, rep(seq_along(oct), each = 2L))
+  res <- suppressMessages(axes_reliability(dat, items = items, angles = oct))
+  expect_false(res$details$boundary)
+  # COC-style small-but-real reliability -- never NA, negative, or zero.
+  expect_gt(res$results$reliability[[1]], 0)
+  expect_lt(res$results$reliability[[1]], .40)
+})
+
+test_that("BC11: a boundary fit (xi1 <= 0) returns NA + warning + flag", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  # xi1 = 0 population, small N: seed 5 yields a negative xi1-hat (a boundary).
+  set.seed(5)
+  dat <- axes_simulate(400L, oct, 4L, xi1 = 0, xi2 = .05, zeta1 = .40)
+  inames <- sprintf("i%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  items <- split(inames, rep(seq_along(oct), each = 4L))
+  expect_warning(
+    res <- suppressMessages(axes_reliability(dat, items = items, angles = oct)),
+    "boundary"
+  )
+  expect_true(res$details$boundary)
+  expect_true(all(is.na(res$results$reliability)))
+  expect_true(all(is.na(res$results$sem)))
+  expect_lt(res$results$xi1[[1]], 0) # recorded, never clipped to 0
+})
+
+test_that("BC12: each malformed input errors informatively", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_valid_fixture()
+  ok <- function() suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$oct)
+  )
+  expect_no_error(ok()) # the fixture itself is valid
+
+  # scale count != 8
+  expect_error(
+    suppressMessages(axes_reliability(
+      fx$data, items = fx$items[1:7], angles = fx$oct[1:7]
+    )),
+    "8-scale"
+  )
+  # unequal spacing
+  bad_ang <- fx$oct
+  bad_ang[[1]] <- bad_ang[[1]] + 5
+  expect_error(
+    suppressMessages(axes_reliability(fx$data, items = fx$items, angles = bad_ang)),
+    "octant"
+  )
+  # duplicate angle
+  dup_ang <- fx$oct
+  dup_ang[[2]] <- dup_ang[[1]]
+  expect_error(
+    suppressMessages(axes_reliability(fx$data, items = fx$items, angles = dup_ang)),
+    "octant"
+  )
+  # NA angle
+  na_ang <- fx$oct
+  na_ang[[3]] <- NA_real_
+  expect_error(
+    suppressMessages(axes_reliability(fx$data, items = fx$items, angles = na_ang)),
+    "missing"
+  )
+  # a scale with < 2 items
+  one_item <- fx$items
+  one_item[[1]] <- one_item[[1]][1]
+  expect_error(
+    suppressMessages(axes_reliability(fx$data, items = one_item, angles = fx$oct)),
+    "at least 2 items"
+  )
+  # item absent from data
+  absent <- fx$items
+  absent[[1]][[1]] <- "not_a_column"
+  expect_error(
+    suppressMessages(axes_reliability(fx$data, items = absent, angles = fx$oct)),
+    "not found"
+  )
+  # non-finite value
+  inf_data <- fx$data
+  inf_data[[1, fx$names[[1]]]] <- Inf
+  expect_error(
+    suppressMessages(axes_reliability(inf_data, items = fx$items, angles = fx$oct)),
+    "non-finite"
+  )
+  # zero-variance item
+  zv_data <- fx$data
+  zv_data[[fx$names[[1]]]] <- 1
+  expect_error(
+    suppressMessages(axes_reliability(zv_data, items = fx$items, angles = fx$oct)),
+    "Zero-variance"
+  )
+  # complete-case N <= p
+  small <- axes_valid_fixture(n = 20L)
+  expect_error(
+    suppressMessages(axes_reliability(small$data, items = small$items, angles = small$oct)),
+    "Complete-case N"
+  )
+  # non-positive-definite correlation matrix (a duplicated item column)
+  pd_data <- fx$data
+  pd_data[[fx$names[[2]]]] <- pd_data[[fx$names[[1]]]]
+  expect_error(
+    suppressMessages(axes_reliability(pd_data, items = fx$items, angles = fx$oct)),
+    "positive definite"
+  )
+  # lavaan non-convergence (via the mockable seam)
+  testthat::local_mocked_bindings(axes_converged = function(fit) FALSE)
+  expect_error(
+    suppressMessages(axes_reliability(fx$data, items = fx$items, angles = fx$oct)),
+    "did not converge"
+  )
+})
+
+test_that("BC13: listwise deletion reports N and refuses when N <= p", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_valid_fixture(n = 1500L)
+  # Missingness is removed listwise, and the complete-case N is reported.
+  miss <- fx$data
+  miss[1:100, fx$names[[1]]] <- NA
+  expect_message(
+    axes_reliability(miss, items = fx$items, angles = fx$oct),
+    "1400 complete case"
+  )
+  # Enough rows overall, but too few complete cases -> refuse.
+  fewcc <- fx$data
+  fewcc[26:1500, fx$names[[1]]] <- NA # only 25 complete cases, p = 32
+  expect_error(
+    suppressMessages(axes_reliability(fewcc, items = fx$items, angles = fx$oct)),
+    "Complete-case N"
+  )
+})
