@@ -84,7 +84,7 @@ GO/NO-GO itself may retire the whole feature (no build).
       (high scale-specificity), stating no published-data oracle exists.
 - [x] T4 — Spec section: the proposed exported API (name, signature, inputs,
       outputs, refuse-don't-coerce contract).
-- [ ] T5 — Author `cairn/references/strack2013.md` from the source-note
+- [x] T5 — Author `cairn/references/strack2013.md` from the source-note
       template; extract the reliability/SEm/N–B formulas + Table 3 anchors;
       write the provenance block with a dated extraction status; add the INDEX
       line.
@@ -97,6 +97,7 @@ GO/NO-GO itself may retire the whole feature (no build).
 
 - 2026-07-23: created by /milestone-plan. Design-first into v2.0.0 (D-025); strack2013 candidate (M48) promoted; build stays a candidate pending GO/NO-GO.
 - 2026-07-23 (T1–T4): drafted `devel/m53-axes-reliability-spec.md` — model (§2, 4 Fable points), reliability/SEm/N–B (§3), two-layer oracle (§4, Layer A = published Table-3 formula oracle, Layer B = synthetic+cross-engine ξ1), API (§5). Plan-gate directions: standalone fn, octant MVP, item+instrument input.
+- 2026-07-23 (T5): authored `cairn/references/strack2013.md` (born-digital extraction, verified; Table-3 formula-oracle rows + all formulas anchored) + INDEX line; validate green (references index<->disk PASS, staleness OK).
 
 ## Decisions
 
