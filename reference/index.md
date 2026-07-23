@@ -85,6 +85,13 @@ Functions for evaluating circumplex structure and CI trustworthiness
   : Summarize circumplex-structure test results
 - [`plot(`*`<circumplex_structure>`*`)`](http://circumplex.jmgirard.com/reference/plot.circumplex_structure.md)
   : Plot a circumplex-structure configuration
+- [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  : Reliability of the circumplex axes (Strack, Jacobs & Grosse
+  Holtforth, 2013)
+- [`print(`*`<circumplex_axes_reliability>`*`)`](http://circumplex.jmgirard.com/reference/print.circumplex_axes_reliability.md)
+  : Print circumplex axes-reliability results
+- [`summary(`*`<circumplex_axes_reliability>`*`)`](http://circumplex.jmgirard.com/reference/summary.circumplex_axes_reliability.md)
+  : Summarize circumplex axes-reliability results
 - [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md)
   : Assess the accuracy of SSM confidence intervals by simulation
 - [`summary(`*`<circumplex_ci_accuracy>`*`)`](http://circumplex.jmgirard.com/reference/summary.circumplex_ci_accuracy.md)
@@ -154,3 +161,5 @@ Functions that make your life easier
   octant scores on real circumplex scales with covariates
 - [`raw_iipsc`](http://circumplex.jmgirard.com/reference/raw_iipsc.md) :
   Raw item responses on real circumplex scales
+- [`simulated_items`](http://circumplex.jmgirard.com/reference/simulated_items.md)
+  : Simulated item responses on octant circumplex scales

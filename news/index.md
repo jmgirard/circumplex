@@ -12,7 +12,9 @@ analysis with
 [`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md),
 repeated-measures (longitudinal) SSM analysis,
 [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
-for exploratory circumplex-structure tests, and
+for exploratory circumplex-structure tests,
+[`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+for the reliability of the circumplex axes (Strack et al., 2013), and
 [`ssm_ci_accuracy()`](http://circumplex.jmgirard.com/reference/ssm_ci_accuracy.md),
 a diagnostic for whether an
 [`ssm_analyze()`](http://circumplex.jmgirard.com/reference/ssm_analyze.md)
@@ -185,6 +187,27 @@ on a real ggplot2 coordinate system.
   [`plot()`](https://rdrr.io/r/graphics/plot.default.html) methods;
   interpretations are presented as the heuristic likelihood
   classifications they are, never as significance tests.
+
+- New
+  [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  function estimates the reliability (and standard error of measurement)
+  of the two circumplex axes with the item-level restricted
+  tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The
+  model decomposes each item’s variance into a general factor, the two
+  circumplex axes, scale specificity, and item specificity, and reads
+  the axes’ reliability off the isolated axes-variance component with
+  the Spearman-Brown formula — a confirmatory, item-level complement to
+  [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)’s
+  exploratory scale-level criteria. The Nunnally-Bernstein axis
+  reliability is reported alongside for comparison (it overestimates
+  when scale specificity is large). Items are supplied through a
+  `circumplex_instrument` or an explicit angle-and-item map; missing
+  data are handled by listwise deletion; a boundary fit returns `NA`
+  reliability rather than a clipped value; and the returned
+  `circumplex_axes_reliability` object has
+  [`print()`](https://rdrr.io/r/base/print.html) and
+  [`summary()`](https://rdrr.io/r/base/summary.html) methods. A bundled
+  simulated dataset, `simulated_items`, is included for the examples.
 
 - New
   [`cpm_simulate()`](http://circumplex.jmgirard.com/reference/cpm_simulate.md)
