@@ -84,3 +84,78 @@ test_that("BC2: SEm formula reproduces Table 3 col 13 (Layer A)", {
     axis_sem(bc2$rel, sd = sqrt(bc2$var)) - bc2$sem
   ) <= .02))
 })
+
+# The lavaan constraint set (T3). Build the exact population correlation matrix
+# of an octant type-a instrument from known (xi1, xi2, zeta1) components, fit the
+# flat fixed-links model through the sem_fit_cfa() chokepoint, and assert its
+# structure on the fitted lavaan object (RR09 BC4). (Exact recovery of the
+# components -- and the (N-1)/N rescaling -- is the population-matrix oracle in
+# T4/BC5; here the population matrix only guarantees a well-conditioned fit.)
+
+# Exact population correlation matrix from the five orthogonal components: item i
+# on scale s (angle theta_s) and item j on scale t share
+# xi2 (general) + xi1*cos(theta_s - theta_t) (axes) + zeta1*[s == t] (scale
+# specificity); the item residual fills the unit diagonal (spec section 2).
+axes_population_cor <- function(oct, k, xi1, xi2, zeta1) {
+  ang <- rep(oct, each = k)
+  scl <- rep(seq_along(oct), each = k)
+  th <- ang * pi / 180
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(scl, scl, `==`)
+  diag(sig) <- 1
+  list(sigma = sig, scale = scl)
+}
+
+test_that("BC4: fitted lavaan object has the intended constraint set", {
+  skip_if_not_installed("lavaan")
+  set.seed(486115)
+  oct <- octants()
+  k <- 4L # 32-item instrument -> item_n 16
+  pop <- axes_population_cor(oct, k, xi1 = .26, xi2 = .05, zeta1 = .07)
+  p <- nrow(pop$sigma)
+  inames <- sprintf("i%02d", seq_len(p))
+  items <- split(inames, pop$scale)
+
+  dat <- as.data.frame(mvn_draws(3000L, rep(0, p), pop$sigma))
+  dat <- as.data.frame(scale(dat)) # z-standardize: fit the correlation matrix
+  colnames(dat) <- inames
+
+  fit <- axes_fit(dat, items, oct)
+  expect_true(lavaan::lavInspect(fit, "converged"))
+
+  pt <- lavaan::parTable(fit)
+  latents <- c("AX", "AY", "GEN", sprintf("SS%d", seq_along(oct)))
+
+  # All loadings fixed (zero free loadings).
+  expect_true(all(pt$free[pt$op == "=~"] == 0))
+
+  # AX/AY variances equality-constrained (one shared, non-empty label).
+  axl <- pt$label[pt$op == "~~" & pt$lhs == "AX" & pt$rhs == "AX"]
+  ayl <- pt$label[pt$op == "~~" & pt$lhs == "AY" & pt$rhs == "AY"]
+  expect_identical(axl, ayl)
+  expect_true(nzchar(axl))
+
+  # Every scale-specificity variance shares one label.
+  ss <- pt$op == "~~" & pt$lhs == pt$rhs & grepl("^SS[0-9]+$", pt$lhs)
+  expect_length(unique(pt$label[ss]), 1L)
+  expect_true(nzchar(unique(pt$label[ss])))
+
+  # Every latent covariance fixed at 0.
+  lcov <- pt$op == "~~" & pt$lhs != pt$rhs &
+    pt$lhs %in% latents & pt$rhs %in% latents
+  expect_true(any(lcov))
+  expect_true(all(pt$free[lcov] == 0))
+  expect_true(all(pt$ustart[lcov] == 0))
+
+  # Item errors free.
+  ierr <- pt$op == "~~" & pt$lhs == pt$rhs & pt$lhs %in% inames
+  expect_length(which(ierr), p)
+  expect_true(all(pt$free[ierr] > 0))
+
+  # df = p(p+1)/2 - p - 3 for the non-blocked model (3 latent variances +
+  # p free errors; all loadings and latent covariances fixed).
+  expect_equal(
+    unname(lavaan::fitMeasures(fit, "df")),
+    p * (p + 1) / 2 - p - 3
+  )
+})
