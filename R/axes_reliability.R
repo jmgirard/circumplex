@@ -353,7 +353,7 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' structure models. \emph{Psychological Bulletin}, 105(2), 317-327.
 #' @seealso [fit_structure()] for exploratory circumplex-structure criteria.
 #' @export
-#' @examples
+#' @examplesIf requireNamespace("lavaan", quietly = TRUE)
 #' # A simulated 32-item octant dataset (four items per octant scale).
 #' data("simulated_items")
 #'

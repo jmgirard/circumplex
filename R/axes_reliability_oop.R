@@ -83,6 +83,17 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
       "\n  reliability and SEm are NA rather than a clipped value.\n",
       sep = ""
     )
+  } else if (isTRUE(all.equal(
+    x$results$reliability[[1]], x$results$reliability[[2]]
+  ))) {
+    # The two axes share one (equal-constrained) axes-variance estimate, so a
+    # balanced instrument's rows match by construction (RR09) -- flag it so a
+    # user does not read the identical rows as a bug.
+    cat(
+      "\n  Note: the two axes share one axes-variance estimate and, with equal",
+      "\n  items per axis, carry the same reliability -- expected, not an error.\n",
+      sep = ""
+    )
   }
   cat("\n", axes_se_caveat, "\n", sep = "")
   invisible(x)

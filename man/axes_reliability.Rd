@@ -71,6 +71,7 @@ variance) returns \code{NA} reliability and SEm with a warning and a boundary fl
 rather than a clipped or negative value.
 }
 \examples{
+\dontshow{if (requireNamespace("lavaan", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 # A simulated 32-item octant dataset (four items per octant scale).
 data("simulated_items")
 
@@ -80,6 +81,7 @@ items <- split(names(simulated_items), rep(1:8, each = 4))
 res <- axes_reliability(simulated_items, items = items, angles = octants())
 res
 summary(res)
+\dontshow{\}) # examplesIf}
 }
 \references{
 Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The reliability of
