@@ -157,3 +157,24 @@ consistency-gate (r-package): no package surface changed → `document()` no-dif
 NEWS (no user-visible change in a design milestone; the feature ships at the
 build), pkgdown, and full `check()` are N/A locally; CI on PR #79 runs the
 matrix against the unchanged package (green required at merge).
+
+**Independent fresh-context review** (three lenses + inline scoring). Diff-bug
+[O] verified all source-note values against the PDF and D-026/spec against RR09
+— all faithful. Blame-history [S]: no findings (D-026 supersedes nothing
+silently; M48 candidate correctly promoted; design→build pattern mirrors
+D-008/D-009, D-018/D-019). Prior-review [S]: GH PR-comment probe `[]` (M33
+empty-threads confirmed). Two findings, both scored inline (both surfaced and
+actioned, none dropped, so no separate scorer spawned):
+
+- **F1 (88, prior-review) — FIXED.** `cairn/references/strack2013.md` Extraction
+  status was wrapped across three physical lines, regressing the M47
+  one-physical-line rule (the `references staleness` parser reads the line it
+  starts on; template mandates it). Joined to one physical line.
+- **F2 (82, diff-bug) — NOTE ONLY (history, IP4).** `RR09` §8's narrative
+  pointer miscites "BC3/BC9" for orthogonality/snap_trig, which are actually
+  **BC4/BC10** (BC3 = item_n, BC9 = N–B cell). Confined to the archived Fable
+  report — not edited (IP4). Nothing downstream inherited it: D-026 holding 3
+  and spec §7 use the correct BC4/BC10, and the build ingests the authoritative
+  BC1–BC13 list (RR09 lines 397–450, correct) verbatim, never §8's prose. The
+  build's plan must read the BC list, not §8's narrative — noted here for that
+  plan.
