@@ -1,6 +1,6 @@
 # M54: Axes-reliability (Strack 2013) — build `axes_reliability()`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR09
@@ -157,6 +157,7 @@ FIML.
 - 2026-07-23: T9 done — `axes_ols_shadow()` (B-1): OLS of the off-diagonal r's on (1, cosΔ, same-scale) recovers (ξ2,ξ1,ζ1) exactly on the population matrix (1e-8) and cross-checks the CFA ξ̂1 to <1e-2 on finite data — a third SEM-independent route beside lavaan/OpenMx. Wired as lavaan `start()` seeds (floored positive; start-invariant estimates verified) and stored in `details$ols_shadow`. Full `devtools::test()` clean (0 fail, 3159 pass).
 - 2026-07-23: T10 done (AC14) — `print`/`summary.circumplex_axes_reliability` (per-axis table, components, global fit, Cudeck 1989 SE caveat); full roxygen + non-`\dontrun` `@examples`; `simulated_items` bundled dataset (seed 486115 generator `data-raw/simulated_items.R`, 500×32 1–7 Likert, ξ1=.18/ξ2=.06/ζ1=.10, rel≈.78; roxygen in `R/example_data.R`); `_pkgdown.yml` rows (fn + dataset); NEWS entry + intro-family line. Instrument-path test reproduces explicit-map. Full `devtools::test()` clean (0 fail, 3170 pass).
 - 2026-07-23: T11 done → dropped (rotten). One retrieval attempt for the SAGE LISREL syntax supplement: `journals.sagepub.com` returns HTTP 403 (bot-blocked) and the paper's cited supplement host `www.sgo.sagepub.com` is a dead legacy path. Nothing banked; the two-layer oracle battery (T4–T9) is self-sufficient without it.
+- 2026-07-23: all tasks checked; `devtools::check(--no-manual)` → Status OK (0 errors / 0 warnings / 0 notes) = AC16; full suite 0 fail / 3170 pass = AC15. Status → review.
 
 ## Decisions
 

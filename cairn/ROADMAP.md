@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-23 (M54 axes-reliability build PLANNED via /milestone-plan — the cairn `_BC_HEAD` fix landed, so the parked design is now a file: one milestone, all BC1–BC13 ingested verbatim as AC1–AC13, z-std SEm default, bundled simulated item dataset, OLS-shadow + supplement retrieval folded in; M7 now depends on M54. Validate green; M7 blocked on CRAN handoff.)_
+_Last hygiene check: 2026-07-23 (M54 axes-reliability build → REVIEW: all 11 tasks done, `axes_reliability()` exported with the full BC1–BC13 oracle battery + refuse/boundary/listwise contract + `simulated_items` dataset; T11 supplement dropped (SAGE 403). `devtools::check` Status OK, suite 3170 pass. M7 still blocked on CRAN handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54 | high | milestones/M7-v2-release-prep.md |
-| M54 | Axes-reliability (Strack 2013) build — `axes_reliability()` | in-progress | — | normal | milestones/M54-axes-reliability-build.md |
+| M54 | Axes-reliability (Strack 2013) build — `axes_reliability()` | review | — | normal | milestones/M54-axes-reliability-build.md |
 | M53 | Axes-reliability (Strack 2013) — design spec + GO/NO-GO | done | — | normal | milestones/archive/M53-axes-reliability-design.md |
 | M52 | Trim brms/Stan from CI dependency installs | done | — | normal | milestones/archive/M52-ci-install-trim-brms.md |
 | M51 | Speed up CI — concurrency, paths-ignore, slimmed PR matrix | done | — | normal | milestones/archive/M51-ci-speedup.md |
