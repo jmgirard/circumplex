@@ -163,3 +163,31 @@ axes_simulate <- function(n, angles_deg, n_items, xi1, xi2, zeta1,
   colnames(x) <- sprintf("%s_%02d", prefix, seq_len(p))
   as.data.frame(x)
 }
+
+# --- Nunnally-Bernstein axis reliability (the comparison estimator) -----------
+
+# Cronbach's alpha of a scale from its item scores `x` (n rows x m items):
+# alpha = m/(m-1) * (1 - sum(item variances) / variance of the item sum). The
+# per-scale reliability Rel_scale_i the Nunnally-Bernstein axis formula needs.
+cronbach_alpha <- function(x) {
+  m <- ncol(x)
+  cv <- stats::cov(x)
+  (m / (m - 1)) * (1 - sum(diag(cv)) / sum(cv))
+}
+
+# Nunnally-Bernstein reliability of a circumplex axis (Strack et al. 2013, p. 3;
+# Nunnally & Bernstein 1994, p. 271, Eqs. 7-17), the comparison to the CFA/SB
+# reliability:
+#   Rel_axis(NB) = 1 - (Sum wi^2 - Sum wi^2 * Rel_scale_i) / Var_axis
+# on z-standardized scale scores, where `w` are the per-SCALE cosine axis weights
+# (scale-level: Sum wi^2 = 4.0 for octant type-a, NOT the item-level item_n),
+# `rel_scale` each scale's reliability (cronbach_alpha()), and `var_axis` the
+# observed variance of the weighted axis composite Sum(wi * scale_i). Numerator =
+# Sum wi^2 (1 - rel_i) = the composite's error variance (errors uncorrelated,
+# z-standardized). The paper's headline (Figure 3): N-B OVERESTIMATES axis
+# reliability when scale-specificity is large, because scale-specificity inflates
+# Var_axis without being charged as axis error -- the CFA reliability stays
+# honest by isolating xi1.
+axis_reliability_nb <- function(w, rel_scale, var_axis) {
+  1 - sum(w^2 * (1 - rel_scale)) / var_axis
+}

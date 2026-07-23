@@ -308,3 +308,74 @@ test_that("BC7: lavaan and OpenMx agree on the component variances (Layer B)", {
     expect_lt(max(abs(lav - mx)), 1e-3) # observed ~6e-5
   }
 })
+
+# Nunnally-Bernstein comparison (T7). BC8: a code-independent worked-example
+# oracle for the N-B formula -- NOT Table 3 col 14, which is not recomputable
+# from printed values (RR09 Q6). BC9: a synthetic high-scale-specificity cell
+# reproducing the paper's Figure 3 headline (N-B overestimates axis reliability).
+
+test_that("BC8: N-B formula matches a hand-worked example (independent route)", {
+  # A worked X-axis octant weight pattern (0, +/-sqrt(.5), +/-1); scale-level
+  # Sum wi^2 = 4.0 (Strack 2013 p. 3), decoupled from octants() ordering so the
+  # pairing with rel_scale is explicit.
+  w <- c(1, sqrt(.5), 0, -sqrt(.5), -1, -sqrt(.5), 0, sqrt(.5))
+  rel_scale <- c(.82, .78, .80, .76, .84, .79, .81, .77)
+  var_axis <- 3.9
+  expect_equal(sum(w^2), 4.0)
+
+  # Hand-worked oracle: Sum wi^2 (1 - rel_i) with wi^2 = {1, .5, 0, .5, ...}:
+  #   1(.18) + .5(.22) + .5(.24) + 1(.16) + .5(.21) + .5(.23) = .79
+  #   NB = 1 - .79 / 3.9 = 0.7974358974358974
+  expect_equal(
+    axis_reliability_nb(w, rel_scale, var_axis),
+    0.7974358974358974,
+    tolerance = 1e-6
+  )
+
+  # Independent route: an explicit scalar accumulation over scales.
+  err <- 0
+  for (s in seq_along(w)) err <- err + w[s]^2 * (1 - rel_scale[s])
+  expect_equal(axis_reliability_nb(w, rel_scale, var_axis), 1 - err / var_axis,
+    tolerance = 1e-12)
+})
+
+# Compute the X-axis N-B reliability from raw item data (the full N-B path):
+# per-scale Cronbach alpha, the z-standardized weighted scale composite, its
+# variance, then the N-B formula.
+axes_nb_from_data <- function(dat, items, angles_deg) {
+  w <- axis_weights(angles_deg)[, "w_x"]
+  rel_scale <- vapply(
+    items, function(nm) cronbach_alpha(dat[, nm, drop = FALSE]), numeric(1)
+  )
+  sscore <- scale(vapply(
+    items, function(nm) rowMeans(dat[, nm, drop = FALSE]), numeric(nrow(dat))
+  ))
+  var_axis <- stats::var(as.numeric(sscore %*% w))
+  axis_reliability_nb(w, rel_scale, var_axis)
+}
+
+test_that("BC9: N-B overestimates vs CFA at high scale-specificity (Figure 3)", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  k <- 4L
+  # High scale-specificity cell: zeta1 = .45 (>= .40 of item variance),
+  # xi1 = .12 (<= .15 axes). The paper's MEIL/CV-LI regime (p. 8).
+  set.seed(913)
+  dat <- axes_simulate(5000L, oct, k, xi1 = .12, xi2 = .03, zeta1 = .45)
+  p <- ncol(dat)
+  inames <- sprintf("i%02d", seq_len(p))
+  colnames(dat) <- inames
+  items <- split(inames, rep(seq_along(oct), each = k))
+
+  # CFA/SB reliability (X axis).
+  zdat <- as.data.frame(scale(dat))
+  colnames(zdat) <- inames
+  pe <- lavaan::parameterEstimates(axes_fit(zdat, items, oct))
+  xi1hat <- pe$est[pe$op == "~~" & pe$lhs == "AX" & pe$rhs == "AX"][[1]]
+  cfa_rel <- axis_reliability_sb(xi1hat, axis_item_n(oct, k)[["x"]])
+
+  # N-B reliability (X axis) from the raw scale scores.
+  nb_rel <- axes_nb_from_data(dat, items, oct)
+
+  expect_gt(nb_rel - cfa_rel, .05) # pre-registered margin; observed ~.21
+})

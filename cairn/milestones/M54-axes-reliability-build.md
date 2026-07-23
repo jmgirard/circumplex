@@ -121,7 +121,7 @@ FIML.
 - [x] T4. Population-matrix oracle, (N−1)/N handled (wishart). Tests: BC5.
 - [x] T5. Finite-sample MC recovery (generator shared with T10). Tests: BC6.
 - [x] T6. Cross-engine lavaan/OpenMx, `skip` if absent, no new Imports. BC7.
-- [ ] T7. N–B implementation + code-independent worked-example oracle +
+- [x] T7. N–B implementation + code-independent worked-example oracle +
       high-scale-specificity direction cell. Tests: BC8, BC9.
 - [ ] T8. Refuse/boundary/listwise contract: `paf2()` NA precedent
       (`R/fit_structure.R:16`), `!is.finite` guards, modular `octants()` check.
@@ -149,6 +149,7 @@ FIML.
 - 2026-07-23: T4 done — BC5 population-matrix oracle: fit the exact Σ built from known (ξ1,ξ2,ζ1) for a 32-item octant via `lavaan::cfa(sample.cov=, likelihood="wishart", orthogonal=TRUE)`; recovers every component exactly (ξ̂1=.15, ξ̂2=.08, ζ̂1=.12, all ε̂=.65 equal <1e-6) at χ²<1e-6. (N−1)/N trap mutation-proven by probe: default likelihood gives ξ̂1=.1497, misses the 1e-4 bar; only wishart passes. Full `devtools::test()` clean (0 fail, 3124 pass).
 - 2026-07-23: T5 done — factored the single authoritative population model + simulator into `R/axes_reliability.R` (`axes_population_cor()`, `axes_simulate()`; BC5 test now uses the package `axes_population_cor()`), the generator shared with T10's bundled dataset. BC6 MC recovery: mean ξ̂1 within 2 MC-SEs of truth at two distinct ξ1 cells (.10, .20; N=2000, reps=150, seeds 11/22); realized |bias|/MCSE ~1 (1.11, 0.78) — genuine near-unbiasedness, not seed-tuned. Full `devtools::test()` clean (0 fail, 3126 pass).
 - 2026-07-23: T6 done — BC7 cross-engine: the identical flat model fit in OpenMx (closed form Σ = ξ1·C + ξ2·J + ζ1·B + diag(ε), independently coded via mxAlgebra) and lavaan on the identical sample covariance agree on ξ1/ξ2/ζ1 to ~6e-5 (≪ the 1e-3 bar) on 2 datasets; skips (not passes) without OpenMx; OpenMx already Suggests (no new Imports). Full `devtools::test()` clean (0 fail, 3128 pass).
+- 2026-07-23: T7 done — `axis_reliability_nb()` (N–B formula, scale-level Σwᵢ²=4.0) + `cronbach_alpha()` in `R/axes_reliability.R`. BC8: hand-worked oracle (explicit w²∈{1,.5,0}, literal expected .7974358974, +independent scalar-accumulation route) — NOT Table 3 col 14 (not recomputable, RR09 Q6). BC9: high-scale-specificity cell (ζ1=.45, ξ1=.12; N=5000) reproduces Figure 3 — NB−CFA=+0.21 ≫ the .05 pre-registered margin. Full `devtools::test()` clean (0 fail, 3132 pass).
 
 ## Decisions
 
