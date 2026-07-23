@@ -31,67 +31,67 @@ FIML.
 
 ## Acceptance criteria
 
-- [ ] AC1 (BC1, revised by RR10; RR09's original in Deviations below): SB(col 6
+- [x] AC1 (BC1, revised by RR10; RR09's original in Deviations below): SB(col 6
       /100, col 10) reproduces col 11 within ±.005 for the 4 anchors (IAL S1,
       IPI-A S9, OCAI S15, COC S16 — all Self) and ±.01 for the 11 self-consistent
       non-blocked type-a rows (all but IIP S6 Self, the erratum: assert sum
       101.0±0.1, |SB(.130,32)−.81|>.01, |SB(.120,32)−.81|≤.005); sum guard: the
       12 banked rows each sum to their banked total ±0.1.
-- [ ] AC2 (BC2): `sqrt(col 12) · sqrt(1 − col 11)` must reproduce col 13 within
+- [x] AC2 (BC2): `sqrt(col 12) · sqrt(1 − col 11)` must reproduce col 13 within
       ±.02 for at least the IAL, OCAI, and COC anchor rows.
-- [ ] AC3 (BC3): item_n computed from instrument structure as the per-axis Σwᵢ²
+- [x] AC3 (BC3): item_n computed from instrument structure as the per-axis Σwᵢ²
       must be **exact** (after snapping): 64-item octant → 32; 32-item → 16;
       16-item → 8; and equal across the two axes for every balanced octant
       instrument.
-- [ ] AC4 (BC4): A test must assert, on the fitted lavaan object: all loadings
+- [x] AC4 (BC4): A test must assert, on the fitted lavaan object: all loadings
       fixed (zero free loadings); AX/AY variances equality-
       constrained; all scale-specificity variances share one label; **every**
       latent covariance fixed at 0; item errors free; and `df = p(p+1)/2 − p − 3`
       for the non-blocked MVP model.
-- [ ] AC5 (BC5): Fitting the exact population matrix built from known (ξ1, ξ2,
+- [x] AC5 (BC5): Fitting the exact population matrix built from known (ξ1, ξ2,
       ζ1, ε) for an octant instrument must recover every component within 1e−4
       and give χ² < 1e−6, with the lavaan (N−1)/N likelihood rescaling
       explicitly handled (wishart likelihood or corrected expectation); all ε̂_i
       must be equal within 1e−6.
-- [ ] AC6 (BC6): ≥2 Monte-Carlo cells (distinct ξ1 levels) where the mean ξ̂1
+- [x] AC6 (BC6): ≥2 Monte-Carlo cells (distinct ξ1 levels) where the mean ξ̂1
       across replicates is within 2 Monte-Carlo SEs of truth.
-- [ ] AC7 (BC7): lavaan and OpenMx fits of the identical model on identical
+- [x] AC7 (BC7): lavaan and OpenMx fits of the identical model on identical
       input must agree on all free component variances within 1e−3 (expected
       agreement ~1e−5) on ≥2 datasets; the test skips (not passes) when OpenMx
       is unavailable; no new Imports (D-006/D-014).
-- [ ] AC8 (BC8): The Nunnally–Bernstein implementation must pass an oracle that
+- [x] AC8 (BC8): The Nunnally–Bernstein implementation must pass an oracle that
       does not share its code path: a worked example whose Rel_scaleᵢ, Σwᵢ², and
       Var_axis are computed independently (by hand or by an independent route in
       the test), agreeing within 1e−6; Table 3 col 14 must **not** be cited as
       its oracle.
-- [ ] AC9 (BC9): A synthetic high-scale-specificity cell (scale-specificity ≥
+- [x] AC9 (BC9): A synthetic high-scale-specificity cell (scale-specificity ≥
       .40 of item variance, axes ≤ .15) where the test asserts `NB_reliability −
       CFA_reliability > 0` with a pre-registered margin (≥ .05), reproducing the
       paper's Figure 3 headline.
-- [ ] AC10 (BC10): Tests must assert: θ = 360 → weights exactly (+1, 0); θ = 90
+- [x] AC10 (BC10): Tests must assert: θ = 360 → weights exactly (+1, 0); θ = 90
       → exactly (0, +1); θ = 0 and θ = 360 yield identical weights; weights pass
       through the snapping helper (no 1e−16 residue in emitted syntax).
-- [ ] AC11 (BC11): ξ̂1 ≤ 0, or any negative estimated variance, must yield
+- [x] AC11 (BC11): ξ̂1 ≤ 0, or any negative estimated variance, must yield
       reliability/SEm = NA plus a warning and a boundary flag in the output —
       never a negative, clipped, or silently-zeroed reliability; a small
       positive ξ̂1 (e.g. .03) must flow through to a small reliability (COC-style
       .19), not be treated as degenerate.
-- [ ] AC12 (BC12): Each of the following must error informatively: scale count
+- [x] AC12 (BC12): Each of the following must error informatively: scale count
       ≠ 8; angle multiset ≠ octants() mod 360 (including an unequal-spacing case
       and a duplicate-angle case); NA angle; any scale with < 2 items; item in
       the instrument map absent from the data; non-finite values in the data;
       zero-variance item; complete-case N ≤ p or non-PD correlation matrix;
       lavaan non-convergence.
-- [ ] AC13 (BC13): The chosen policy (recommended: listwise with an informative
+- [x] AC13 (BC13): The chosen policy (recommended: listwise with an informative
       message reporting the complete-case N) must be documented and tested,
       including the refusal when complete-case N ≤ p; pairwise correlation input
       must not occur.
-- [ ] AC14: A bundled simulated item-level example dataset (seed-pinned
+- [x] AC14: A bundled simulated item-level example dataset (seed-pinned
       `data-raw/` generator with provenance; roxygen in `R/example_data.R`;
       `_pkgdown.yml` row) exists and `axes_reliability()` runs on it in a
       non-`\dontrun` help example.
-- [ ] AC15: `Rscript -e 'devtools::test()'` clean (verify slot).
-- [ ] AC16: `Rscript -e 'devtools::check()'` clean — 0 errors, 0 warnings, NOTEs
+- [x] AC15: `Rscript -e 'devtools::test()'` clean (verify slot).
+- [x] AC16: `Rscript -e 'devtools::check()'` clean — 0 errors, 0 warnings, NOTEs
       justified (consistency-gate).
 
 **Deviations from RR09**
@@ -156,6 +156,7 @@ FIML.
 - 2026-07-23: T10 done (AC14) — `print`/`summary.circumplex_axes_reliability` (per-axis table, components, global fit, Cudeck 1989 SE caveat); full roxygen + non-`\dontrun` `@examples`; `simulated_items` bundled dataset (seed 486115 generator `data-raw/simulated_items.R`, 500×32 1–7 Likert, ξ1=.18/ξ2=.06/ζ1=.10, rel≈.78; roxygen in `R/example_data.R`); `_pkgdown.yml` rows (fn + dataset); NEWS entry + intro-family line. Instrument-path test reproduces explicit-map. Full `devtools::test()` clean (0 fail, 3170 pass).
 - 2026-07-23: T11 done → dropped (rotten). One retrieval attempt for the SAGE LISREL syntax supplement: `journals.sagepub.com` returns HTTP 403 (bot-blocked) and the paper's cited supplement host `www.sgo.sagepub.com` is a dead legacy path. Nothing banked; the two-layer oracle battery (T4–T9) is self-sufficient without it.
 - 2026-07-23: all tasks checked; `devtools::check(--no-manual)` → Status OK (0 errors / 0 warnings / 0 notes) = AC16; full suite 0 fail / 3170 pass = AC15. Status → review.
+- 2026-07-23: review — PR #80; all 16 ACs verified with fresh evidence; cairn_validate green (weight-cap fixed). Reviewer fan-out: F1 (unguarded lavaan example, 92) + F2 (print note for identical axes rows, 85) actioned & fixed; F3 (blockwise ζ2 doc note, 60) sub-threshold → logged to the deferred-extensions candidate. Blame-history clean.
 
 ## Decisions
 
@@ -171,3 +172,62 @@ FIML.
   RR09's BC1 in the Deviations-from-RR09 table.
 
 ## Review
+
+_2026-07-23 · PR #80 · fresh evidence gathered by command._
+
+**Per-criterion evidence** (test-file run: 88 assertions, 0 fail, 0 skip —
+lavaan + OpenMx present locally; the lavaan/OpenMx tests `skip` when absent):
+
+- AC1 ✓ `BC1` test (P6): SB reproduces col 11 — 4 anchors ±.005, 11-row sweep
+  ±.01, IIP S6 Self erratum pinned (printed-pair inconsistent, corrected-pair
+  reproduces), 12-row sum guard.
+- AC2 ✓ `BC2` test (P1): √(col12)·√(1−col11) reproduces col 13 ±.02.
+- AC3 ✓ `BC3` test (P11): item_n 64→32 / 32→16 / 16→8, equal across axes.
+- AC4 ✓ `BC4` test (P12): loadings all fixed, AX/AY equal-labeled, shared ζ1,
+  every latent covariance 0, errors free, df = p(p+1)/2 − p − 3.
+- AC5 ✓ `BC5` test (P8): exact population recovery, wishart, χ² < 1e-6, ε equal.
+- AC6 ✓ `BC6` test (P2): mean ξ̂1 within 2 MC-SEs at ξ1 = .10 and .20.
+- AC7 ✓ `BC7` test (P2): lavaan vs OpenMx agree ~6e-5 (< 1e-3) on 2 datasets.
+- AC8 ✓ `BC8` test (P3): N–B vs hand-worked value + independent route (not col 14).
+- AC9 ✓ `BC9` test (P1): N–B − CFA ≈ .21 (> .05 margin), Figure-3 direction.
+- AC10 ✓ `BC10` test (P4): θ=360→(1,0), θ=90→(0,1), 0≡360, no snap residue.
+- AC11 ✓ `BC11` tests (P3+P5): small ξ̂1 → small reliability; ξ̂1≤0 → NA + warning
+  + flag, ξ̂1 recorded negative (never clipped).
+- AC12 ✓ `BC12` test (P12): all refuse branches fire (incl. mocked non-convergence).
+- AC13 ✓ `BC13` test (P2): listwise message + N≤p refusal; no pairwise.
+- AC14 ✓ `AC14`/instrument-path tests (P8+P3): runs on bundled `simulated_items`;
+  print/summary dispatch; instrument path reproduces the explicit-map result.
+- AC15 ✓ full `devtools::test()`: 0 fail, 3170 pass.
+- AC16 ✓ `devtools::check(--no-manual)`: Status OK (0 errors / 0 warnings / 0 notes).
+
+**Projection vs. outcome (Driving RR09):** BC5 measured exact (<1e-8) against
+projected ≤1e-4; BC7 measured ~6e-5 against projected ~1e-5 (both inside the
+1e-3 criterion — the ~1e-5 was an expectation, the 1e-3 the bar, met); BC9
+measured ~.21 against projected ≥.05; BC6 measured |bias|/MCSE ~1 against the
+2-SE bar. No shortfall past any stated tolerance.
+
+**Consistency gate:** `cairn_validate` all checks PASS (weight-caps fixed by
+trimming two redundant task annotations to a 149-line plan-owned body; the 49
+advisories are pre-existing M7 work-log formatting, non-gating). r-package
+slot: `document()` no-diff, `pkgdown::check_pkgdown()` clean, `check()` OK,
+NEWS entry present.
+
+**Independent fresh-context review (3 lenses + scorer):**
+- [O] diff-bug: 1 finding (F1); all 9 statistical scrutiny points verified correct.
+- [S] blame-history: no findings — purely additive; sem_fit_cfa/snap_trig/fmt/
+  mvn_draws unchanged; DESCRIPTION unchanged (no new Import); D-006/D-014/D-025/
+  D-026 honored; deferred items (non-octant, correlation input, blockwise ζ2) not shipped.
+- [S] prior-review: 2 findings (F2, F3); GitHub PR-comment probe empty (skipped).
+- [S] scorer: F1 = 92, F2 = 85, F3 = 60.
+
+Triage:
+- **F1 (92, actioned/fixed):** the help example used a plain `@examples` for a
+  lavaan-dependent call, which would ERROR under CRAN `_R_CHECK_DEPENDS_ONLY_`;
+  switched to `@examplesIf requireNamespace("lavaan", ...)` (ssm_sem idiom).
+- **F2 (85, actioned/fixed):** `print()` now notes the two axes share one
+  axes-variance estimate and carry equal reliability for a balanced instrument,
+  so identical X/Y rows don't read as a bug (RR09 §7 amendment 1).
+- **F3 (60, sub-threshold, logged):** roxygen lacks RR09 amendment 8's note that
+  a blockwise instrument analyzed without ζ2 folds block variance elsewhere.
+  Blockwise ζ2 is a deferred extension with no bundled block-structured
+  instrument; the note lands with that feature (existing ROADMAP candidate).
