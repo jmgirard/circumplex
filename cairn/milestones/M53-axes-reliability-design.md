@@ -1,6 +1,6 @@
 # M53: Axes-reliability (Strack 2013) — design spec + GO/NO-GO
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -98,6 +98,7 @@ GO/NO-GO itself may retire the whole feature (no build).
 - 2026-07-23: created by /milestone-plan. Design-first into v2.0.0 (D-025); strack2013 candidate (M48) promoted; build stays a candidate pending GO/NO-GO.
 - 2026-07-23 (T1–T4): drafted `devel/m53-axes-reliability-spec.md` — model (§2, 4 Fable points), reliability/SEm/N–B (§3), two-layer oracle (§4, Layer A = published Table-3 formula oracle, Layer B = synthetic+cross-engine ξ1), API (§5). Plan-gate directions: standalone fn, octant MVP, item+instrument input.
 - 2026-07-23 (T5): authored `cairn/references/strack2013.md` (born-digital extraction, verified; Table-3 formula-oracle rows + all formulas anchored) + INDEX line; validate green (references index<->disk PASS, staleness OK).
+- 2026-07-23 (T6): drafted RB09 (8 questions: model faithfulness, F-1…F-4, oracle sufficiency, API, GO/NO-GO); blocked on RB09 pending Fable review.
 
 ## Decisions
 
