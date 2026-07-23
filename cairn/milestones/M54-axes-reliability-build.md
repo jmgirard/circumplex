@@ -1,11 +1,11 @@
 # M54: Axes-reliability (Strack 2013) — build `axes_reliability()`
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR09
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m54-axes-reliability`
 
 ## Goal
 
