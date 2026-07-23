@@ -71,18 +71,18 @@ GO/NO-GO itself may retire the whole feature (no build).
 
 ## Tasks
 
-- [ ] T1 — Draft `devel/m53-axes-reliability-spec.md`: the restricted
+- [x] T1 — Draft `devel/m53-axes-reliability-spec.md`: the restricted
       tau-equivalent CFA (fixed cosine-weight loadings from scale `Angle`; five
       variance components; lavaan engine per the `R/ssm_sem.R:736` chokepoint),
       each element anchored to `strack2013`. Decide + document the supported
       circumplex type(s) — type a / 8-octant primary, others deferred-in-spec.
-- [ ] T2 — Spec section: reliability (Spearman–Brown from ξ1), SEm, and the
+- [x] T2 — Spec section: reliability (Spearman–Brown from ξ1), SEm, and the
       Nunnally–Bernstein comparison, formulas verbatim-anchored to `strack2013`
       (pp. 3–4).
-- [ ] T3 — Spec section: the validation/oracle strategy — synthetic ξ1
+- [x] T3 — Spec section: the validation/oracle strategy — synthetic ξ1
       recovery + cross-engine lavaan/OpenMx check + a failure-expecting cell
       (high scale-specificity), stating no published-data oracle exists.
-- [ ] T4 — Spec section: the proposed exported API (name, signature, inputs,
+- [x] T4 — Spec section: the proposed exported API (name, signature, inputs,
       outputs, refuse-don't-coerce contract).
 - [ ] T5 — Author `cairn/references/strack2013.md` from the source-note
       template; extract the reliability/SEm/N–B formulas + Table 3 anchors;
@@ -96,6 +96,7 @@ GO/NO-GO itself may retire the whole feature (no build).
 ## Work log
 
 - 2026-07-23: created by /milestone-plan. Design-first into v2.0.0 (D-025); strack2013 candidate (M48) promoted; build stays a candidate pending GO/NO-GO.
+- 2026-07-23 (T1–T4): drafted `devel/m53-axes-reliability-spec.md` — model (§2, 4 Fable points), reliability/SEm/N–B (§3), two-layer oracle (§4, Layer A = published Table-3 formula oracle, Layer B = synthetic+cross-engine ξ1), API (§5). Plan-gate directions: standalone fn, octant MVP, item+instrument input.
 
 ## Decisions
 
