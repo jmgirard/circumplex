@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** RR09
 - **Principles touched:** —
-- **Branch/PR:** `m54-axes-reliability`
+- **Branch/PR:** `m54-axes-reliability` · PR #80
 
 ## Goal
 
@@ -125,16 +125,14 @@ FIML.
       high-scale-specificity direction cell. Tests: BC8, BC9.
 - [x] T8. Refuse/boundary/listwise contract: `paf2()` NA precedent
       (`R/fit_structure.R:16`), `!is.finite` guards, modular `octants()` check.
-      Tests: BC11, BC12, BC13. (API gate: both instrument + explicit map; `sd =
-      "std"|"raw"|numeric` — 2026-07-23.)
+      Tests: BC11, BC12, BC13.
 - [x] T9. OLS-shadow estimator (B-1) — regress off-diag r's on
       `(cos Δ, 1, same-scale)`; SEM-independent cross-check + start values.
 - [x] T10. S3 object + print/summary + roxygen (SE caveat, per-axis rows);
       `_pkgdown.yml` + NEWS; bundle the simulated dataset (`data-raw/` +
       `data/*.rda` + `R/example_data.R`) used in the help example. (AC14)
 - [x] T11. Supplement retrieval (B-2) — one attempt at the SAGE LISREL syntax;
-      bank if found, drop if rotten. → dropped (rotten): SAGE 403, legacy
-      sgo.sagepub.com supplement path dead.
+      bank if found, drop if rotten. → dropped (rotten; SAGE 403, see work log).
 
 ## Work log
 

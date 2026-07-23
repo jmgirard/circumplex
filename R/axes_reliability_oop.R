@@ -46,6 +46,16 @@ axes_se_caveat <- paste0(
 
 # ---- methods ----------------------------------------------------------------
 
+#' Print circumplex axes-reliability results
+#'
+#' Compact display of an [axes_reliability()] object: the per-axis reliability,
+#' SEm, and Nunnally-Bernstein comparison, with the correlation-as-covariance
+#' standard-error caveat.
+#'
+#' @param x A `circumplex_axes_reliability` object.
+#' @param digits The number of decimal places to display (default = 3).
+#' @param ... Not used.
+#' @return `x`, invisibly.
 #' @method print circumplex_axes_reliability
 #' @export
 print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
@@ -78,6 +88,16 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   invisible(x)
 }
 
+#' Summarize circumplex axes-reliability results
+#'
+#' Fuller display of an [axes_reliability()] object: everything [print()] shows
+#' plus the estimated variance components (with standard errors) and the global
+#' fit indices.
+#'
+#' @param object A `circumplex_axes_reliability` object.
+#' @param digits The number of decimal places to display (default = 3).
+#' @param ... Not used.
+#' @return `object`, invisibly.
 #' @method summary circumplex_axes_reliability
 #' @export
 summary.circumplex_axes_reliability <- function(object, digits = 3, ...) {
