@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-21 (M52 done+archived (brms/Stan CI-install trim, PR #78); pruned M47 for terminal-row retention (5 kept: M48–M52); +1 LESSONS (allowlist drift), pruned stalest (M16) for the <50 cap. Validate green; M7 blocked on CRAN handoff.)_
+_Last hygiene check: 2026-07-23 (M53 done+archived (axes-reliability Strack-2013 design + Fable GO, PR #79); pruned M48 for terminal-row retention (5 kept: M49–M53). Axes-reliability build now a GO'd candidate (Driving RR: RR09, BC1–BC13). No new/retired LESSONS. Validate green; M7 blocked on CRAN handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38 | high | milestones/M7-v2-release-prep.md |
-| M53 | Axes-reliability (Strack 2013) — design spec + GO/NO-GO | review | — | normal | milestones/M53-axes-reliability-design.md |
+| M53 | Axes-reliability (Strack 2013) — design spec + GO/NO-GO | done | — | normal | milestones/archive/M53-axes-reliability-design.md |
 | M52 | Trim brms/Stan from CI dependency installs | done | — | normal | milestones/archive/M52-ci-install-trim-brms.md |
 | M51 | Speed up CI — concurrency, paths-ignore, slimmed PR matrix | done | — | normal | milestones/archive/M51-ci-speedup.md |
 | M50 | Advanced Visualization vignette — rework for a less-advanced audience | done | — | normal | milestones/archive/M50-viz-vignette-approachable.md |
 | M49 | Fit-index guidance — the two source-backed caveats | done | — | normal | milestones/archive/M49-fitindex-source-caveats.md |
-| M48 | Fit-index and uncited shelf sources (browne1993 twin + strack2013) | done | — | normal | milestones/archive/M48-fitindex-uncited-sources.md |
 
 ## Candidates
 
