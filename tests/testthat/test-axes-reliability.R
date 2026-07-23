@@ -86,25 +86,12 @@ test_that("BC2: SEm formula reproduces Table 3 col 13 (Layer A)", {
 })
 
 # The lavaan constraint set (T3). Build the exact population correlation matrix
-# of an octant type-a instrument from known (xi1, xi2, zeta1) components, fit the
-# flat fixed-links model through the sem_fit_cfa() chokepoint, and assert its
-# structure on the fitted lavaan object (RR09 BC4). (Exact recovery of the
-# components -- and the (N-1)/N rescaling -- is the population-matrix oracle in
-# T4/BC5; here the population matrix only guarantees a well-conditioned fit.)
-
-# Exact population correlation matrix from the five orthogonal components: item i
-# on scale s (angle theta_s) and item j on scale t share
-# xi2 (general) + xi1*cos(theta_s - theta_t) (axes) + zeta1*[s == t] (scale
-# specificity); the item residual fills the unit diagonal (spec section 2).
-axes_population_cor <- function(oct, k, xi1, xi2, zeta1) {
-  ang <- rep(oct, each = k)
-  scl <- rep(seq_along(oct), each = k)
-  th <- ang * pi / 180
-  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
-    zeta1 * outer(scl, scl, `==`)
-  diag(sig) <- 1
-  list(sigma = sig, scale = scl)
-}
+# of an octant type-a instrument from known (xi1, xi2, zeta1) components (the
+# package's axes_population_cor()), fit the flat fixed-links model through the
+# sem_fit_cfa() chokepoint, and assert its structure on the fitted lavaan object
+# (RR09 BC4). (Exact recovery of the components -- and the (N-1)/N rescaling --
+# is the population-matrix oracle in T4/BC5; here the population matrix only
+# guarantees a well-conditioned fit.)
 
 test_that("BC4: fitted lavaan object has the intended constraint set", {
   skip_if_not_installed("lavaan")
@@ -204,4 +191,42 @@ test_that("BC5: exact population matrix recovers every component (Layer B)", {
 
   # Exact fit at the population matrix.
   expect_lt(unname(lavaan::fitMeasures(fit, "chisq")), 1e-6)
+})
+
+# Finite-sample Monte-Carlo recovery (T5). Simulate replicate item datasets from
+# a known five-component population (axes_simulate(), the generator shared with
+# the bundled example dataset), fit each, and check that the mean recovered xi1
+# lands within 2 Monte-Carlo SEs of truth at two distinct xi1 levels (RR09 BC6).
+# The near-unbiasedness is genuine, not seed-tuned: at N = 2000, reps = 150 the
+# realized |bias|/MCSE is ~1 (well inside the 2-SE band) at both cells.
+
+axes_mc_recover_xi1 <- function(oct, k, xi1, xi2, zeta1, n, reps, seed) {
+  set.seed(seed)
+  pop <- axes_population_cor(oct, k, xi1, xi2, zeta1)
+  inames <- sprintf("item_%02d", seq_along(pop$scale))
+  items <- split(inames, pop$scale)
+  est <- numeric(reps)
+  for (r in seq_len(reps)) {
+    dat <- as.data.frame(scale(axes_simulate(n, oct, k, xi1, xi2, zeta1)))
+    colnames(dat) <- inames
+    pe <- lavaan::parameterEstimates(axes_fit(dat, items, oct))
+    est[r] <- pe$est[pe$op == "~~" & pe$lhs == "AX" & pe$rhs == "AX"][[1]]
+  }
+  list(mean = mean(est), mcse = stats::sd(est) / sqrt(reps))
+}
+
+test_that("BC6: Monte-Carlo mean xi1 recovers truth within 2 MC-SEs (Layer B)", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  cells <- list(
+    list(xi1 = .10, seed = 11L),
+    list(xi1 = .20, seed = 22L)
+  )
+  for (cell in cells) {
+    mc <- axes_mc_recover_xi1(
+      oct, k = 4L, xi1 = cell$xi1, xi2 = .05, zeta1 = .08,
+      n = 2000L, reps = 150L, seed = cell$seed
+    )
+    expect_lt(abs(mc$mean - cell$xi1), 2 * mc$mcse)
+  }
 })

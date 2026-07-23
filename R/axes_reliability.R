@@ -131,3 +131,35 @@ axes_fit <- function(dat, items, angles_deg, estimator = "ML",
     orthogonal = TRUE
   )
 }
+
+# --- Population model and simulation (oracle + bundled-data generator) ---------
+
+# The exact population item-correlation matrix implied by the five orthogonal
+# components (spec section 2). Item i on the scale at `angles_deg[s]` and item j
+# on the scale at `angles_deg[t]` share xi2 (general) + xi1*cos(theta_s -
+# theta_t) (axes) + zeta1*[s == t] (scale specificity); the item residual fills
+# the unit diagonal. Every scale carries `n_items` items. The single
+# authoritative construction shared by the population-matrix oracle (BC5), the
+# finite-sample Monte-Carlo recovery (BC6), and axes_simulate().
+axes_population_cor <- function(angles_deg, n_items, xi1, xi2, zeta1) {
+  scale <- rep(seq_along(angles_deg), each = n_items)
+  th <- rep(as.numeric(angles_deg), each = n_items) * pi / 180
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(scale, scale, `==`)
+  diag(sig) <- 1
+  list(sigma = sig, scale = scale)
+}
+
+# Simulate `n` respondents' item scores from the five-component population
+# (axes_population_cor()) via the shared mvn_root() draw convention. Items are
+# unit-variance by construction (the population is a correlation matrix), so the
+# draws feed axes_fit() directly. Used by the BC6 Monte-Carlo recovery oracle
+# and, seed-pinned, by the bundled example-dataset generator (data-raw/).
+axes_simulate <- function(n, angles_deg, n_items, xi1, xi2, zeta1,
+                          prefix = "item") {
+  pop <- axes_population_cor(angles_deg, n_items, xi1, xi2, zeta1)
+  p <- nrow(pop$sigma)
+  x <- mvn_draws(n, rep(0, p), pop$sigma)
+  colnames(x) <- sprintf("%s_%02d", prefix, seq_len(p))
+  as.data.frame(x)
+}
