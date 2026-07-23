@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** m53-axes-reliability-design
+- **Branch/PR:** m53-axes-reliability-design · PR #79
 
 ## Goal
 
@@ -33,29 +33,29 @@ GO/NO-GO itself may retire the whole feature (no build).
 
 ## Acceptance criteria
 
-- [ ] AC1 — the spec fully specifies the restricted CFA model (fixed
+- [x] AC1 — the spec fully specifies the restricted CFA model (fixed
       cosine-weight loadings derived from scale `Angle`; the five variance
       components; the lavaan engine, reusing the `R/ssm_sem.R` `lavaan::cfa`
       chokepoint pattern) AND the reliability = Spearman–Brown
       `(item_n·ξ1)/(1+(item_n−1)·ξ1)` with `item_n = Σwᵢ²`, SEm = `SD·√(1−Rel)`,
       and the Nunnally–Bernstein comparison — each element anchored to
       `strack2013` (fig/eq/p). `(RB tripwire: ip-touching)`
-- [ ] AC2 — the spec specifies a validation strategy meeting the ≥2
+- [x] AC2 — the spec specifies a validation strategy meeting the ≥2
       independent-oracle-types bar despite no published-data oracle: synthetic
       recovery of a known ξ1 + a cross-engine lavaan/OpenMx check, including a
       failure-expecting cell (high scale-specificity → N–B overestimates, the
       paper's headline + the M23 lesson). `(RB tripwire: no-oracle)`
-- [ ] AC3 — the spec specifies the exported API: function name, signature,
+- [x] AC3 — the spec specifies the exported API: function name, signature,
       accepted inputs (item data + instrument/angles, or an item correlation
       matrix + weights), outputs (per-axis reliability, SEm, variance
       components with SEs), and the refuse-don't-coerce contract for
       unsupported inputs (non-circumplex, unequal spacing, missing item→scale
       map) per the M18 lesson. `(RB tripwire: irreversible-api)`
-- [ ] AC4 — `cairn/references/strack2013.md` is authored from
+- [x] AC4 — `cairn/references/strack2013.md` is authored from
       `templates/source-note.md`, INDEX-listed, with the reliability/SEm/N–B
       formulas and Table 3 anchors extracted and a provenance block whose
       extraction status carries its own dated re-check.
-- [ ] AC5 — a Fable-reviewed (RB09→RR09) GO/NO-GO on building the feature in
+- [x] AC5 — a Fable-reviewed (RB09→RR09) GO/NO-GO on building the feature in
       v2.0.0 is recorded as a D-entry enumerating the load-bearing findings; on
       GO the build candidate is promoted and M7 gains the dependency, on NO-GO
       the feature is dropped/deferred with rationale.
@@ -117,3 +117,43 @@ GO/NO-GO itself may retire the whole feature (no build).
   corrected; RB09/RR09 archived.
 
 ## Review
+
+Docs-only design milestone (spec + source note + GO/NO-GO). Diff touches only
+`devel/` + `cairn/` — zero package files (`git diff --name-only master..HEAD`:
+no `R/`, `src/`, `tests/`, `man/`, `DESCRIPTION`, `NAMESPACE`, `data/`,
+`vignettes/`, `README`, `NEWS`). Driving RR: — (M53 produces RR09, is not
+driven by one) → projection-vs-outcome no-ops.
+
+**Acceptance-criterion evidence (fresh):**
+
+- **AC1** ✓ — `devel/m53-axes-reliability-spec.md` §2 specifies the restricted
+  tau-equivalent CFA (five components, fixed cosine-weight loadings from scale
+  `Angle`, lavaan engine, flat-form≡Figure-2 note) and §3 the Spearman–Brown
+  reliability / SEm / N–B, each anchored to `strack2013` (Figure 2, pp. 2–4).
+  RR09 §1 verdict: "Faithful, with one structural note the build must carry."
+- **AC2** ✓ — spec §4 gives Layer A (Table 3 published-value oracle; four
+  anchors reproduced) + Layer B (synthetic recovery + cross-engine lavaan/OpenMx
+  + BC5 population-matrix) + the high-scale-specificity failure-expecting cell
+  (BC9). RR09 §6 verdict: "Adequate for GO" (meets the ≥2-oracle-types bar).
+- **AC3** ✓ — spec §5 specifies standalone `axes_reliability()`: signature,
+  item-data + instrument input, outputs (per-axis reliability, SEm, five
+  components + SEs, item_n, fit indices, N–B), and the refuse-don't-coerce
+  contract. RR09 §7 verdict: "The standalone shape is right; endorse with
+  amendments" (folded into BC11–BC13).
+- **AC4** ✓ — `cairn/references/strack2013.md` exists, INDEX-listed
+  (`cairn_validate` `references index<->disk` PASS), provenance block with a
+  dated verified extraction status (`references staleness` OK). Born-digital
+  extraction; Table-3 formula-oracle rows + all formulas anchored.
+- **AC5** ✓ — GO/NO-GO recorded as **D-026** (`cairn/DECISIONS.md`), verdict
+  **GO** with six load-bearing holdings; RR09 archived at
+  `cairn/reviews/archive/RR09-axes-reliability-strack.md`. BC1–BC13 bind the
+  build (its `Driving RR: RR09`), not M53.
+
+**Consistency gate:** `cairn_validate` exit 0 — all 22 checks PASS/OK incl.
+`coverage complete`, `references index<->disk`, `binding criteria`, `weight
+caps` (47 advisories: pre-existing work-log wrap WARNs, none this milestone's).
+No `DESIGN.md` principle changed → `cairn_impact` skipped. Toolchain
+consistency-gate (r-package): no package surface changed → `document()` no-diff,
+NEWS (no user-visible change in a design milestone; the feature ships at the
+build), pkgdown, and full `check()` are N/A locally; CI on PR #79 runs the
+matrix against the unchanged package (green required at merge).
