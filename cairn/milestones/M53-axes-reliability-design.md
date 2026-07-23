@@ -1,6 +1,6 @@
 # M53: Axes-reliability (Strack 2013) — design spec + GO/NO-GO
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -99,7 +99,20 @@ GO/NO-GO itself may retire the whole feature (no build).
 - 2026-07-23 (T1–T4): drafted `devel/m53-axes-reliability-spec.md` — model (§2, 4 Fable points), reliability/SEm/N–B (§3), two-layer oracle (§4, Layer A = published Table-3 formula oracle, Layer B = synthetic+cross-engine ξ1), API (§5). Plan-gate directions: standalone fn, octant MVP, item+instrument input.
 - 2026-07-23 (T5): authored `cairn/references/strack2013.md` (born-digital extraction, verified; Table-3 formula-oracle rows + all formulas anchored) + INDEX line; validate green (references index<->disk PASS, staleness OK).
 - 2026-07-23 (T6): drafted RB09 (8 questions: model faithfulness, F-1…F-4, oracle sufficiency, API, GO/NO-GO); blocked on RB09 pending Fable review.
+- 2026-07-23 (T6): ingested RR09 — verdict GO, BC1–BC13 (promoted D-026). Applied spec §2/§4 corrections; updated the build candidate (GO'd, Driving RR: RR09); archived RB09/RR09. Back to in-progress.
 
 ## Decisions
+
+- 2026-07-23 (T6, RR09 ingested): Fable **GO** on building `axes_reliability()`
+  in v2.0.0, conditional on BC1–BC13 (promoted to D-026). Design holdings:
+  model faithful (the flat implemented form ≡ Figure 2's hierarchical drawing,
+  all intermediate paths fixed); identified (moment structure linear in the
+  components → parameter-free rank condition, rank 3 with ≥2 items/scale,
+  df = p(p+1)/2 − p − 3, verified by exact population recovery); Layer-A
+  Table-3 oracle genuine (four anchors reproduced independently); Layer-B needs
+  a population-matrix cell (BC5) + `(N−1)/N` handling; the N–B col-14 is NOT a
+  printed oracle → own code-independent oracle (BC8). **BC1–BC13 bind the
+  BUILD** (its `Driving RR: RR09`), not this design milestone. Spec §2/§4
+  corrected; RB09/RR09 archived.
 
 ## Review

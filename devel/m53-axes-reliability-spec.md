@@ -65,6 +65,16 @@ Estimated free parameters: the latent variances present among {ξ1, ξ2, ζ1, ζ
 `lavaan::cfa` chokepoint pattern (fiml/std handling); OpenMx as the independent
 cross-engine oracle (§4). The paper used LISREL 8.8 ML (p. 5).
 
+**Model form — flat vs. hierarchical (RR09 Q1).** Figure 2 is drawn
+*hierarchically* (items → scale latents → axes/general via fixed paths); this
+spec and the build implement the covariance-equivalent **flat** form (items
+load directly on axes/general/scale-specificity latents). The two are identical
+in fit because every intermediate path is fixed (+1 or the cosine), so the
+product of fixed paths equals the flat fixed loading and the disturbance becomes
+the specificity latent. The build's syntax generator must state this equivalence
+in a comment so a reader comparing against Figure 2 does not think the models
+differ. RR09 confirmed §2 is otherwise a faithful rendering.
+
 **Model-structure points flagged for Fable (RB09):**
 
 - **F-1. Error freedom vs the sum-to-100% identity.** Fitting to a correlation
@@ -121,8 +131,13 @@ and `item_n` (col 10) must reproduce its printed `Reliability` (col 11) within
 rounding. Verified by hand across four types while drafting: IAL .26→.92; IPI-A
 .134→.71; COC .028→.19; OCAI .117→.51 (all match col 11). This is a genuine
 **published-value oracle** for the formula layer — Table 3 is the oracle, no raw
-data needed. SEm (col 13) and the N–B column (col 14) give two further printed
-cross-checks.
+data needed. SEm (col 13) gives a further printed cross-check. **Correction
+(RR09 Q6): the N–B column (col 14) is NOT a usable printed cross-check** — the
+Nunnally–Bernstein formula needs each scale's alpha (Rel_scaleᵢ) and the axis
+variance, neither printed in Table 3, so col 14 is not recomputable from printed
+values. The N–B layer therefore needs its **own code-independent oracle** — a
+worked example whose Rel_scaleᵢ, Σwᵢ², and Var_axis are computed by an
+independent route (RR09 BC8) — never Table 3 col 14.
 
 **Layer B — the CFA fit that produces ξ1 → synthetic recovery + cross-engine.**
 Because the raw matrices are unavailable, the *estimation* is validated by:
@@ -130,10 +145,14 @@ Because the raw matrices are unavailable, the *estimation* is validated by:
 structure (chosen ξ1, ξ2, ζ1, ε), fit, and recover ξ1 within Monte-Carlo error;
 (2) **cross-engine** — the same fixed-links model in lavaan and OpenMx must agree
 on ξ1 to tight tolerance (the ≥2-independent-oracle-types bar, per the
-validation doctrine). **Failure-expecting cell (M23 lesson):** a synthetic cell
-with *high scale-specificity* must reproduce the paper's headline — N–B
-overestimates while the CFA reliability stays honest — so the oracle asserts the
-gap, not just agreement.
+validation doctrine); (3) **deterministic population-matrix recovery (RR09 BC5)**
+— fit the exact Σ built from known components; recovery must be exact to
+numerical tolerance (χ² ≈ 0), and the lavaan `(N−1)/N` likelihood rescaling must
+be handled (wishart likelihood or corrected expectation), the trap RR09 verified
+(.14985 recovered for a true .15). **Failure-expecting cell (M23 lesson):** a
+synthetic cell with *high scale-specificity* must reproduce the paper's headline
+— N–B overestimates while the CFA reliability stays honest — so the oracle
+asserts the gap direction and size (RR09 BC9), not mere agreement.
 
 Global-fit context (not an oracle): mean RMSEA .088 (SD .014), AGFI .691, PGFI
 .651 across the paper's 29 models (p. 5).
@@ -169,3 +188,22 @@ refuse contract right; and does anything here touch the angle invariants in a wa
 that needs a boundary test the build must carry. A NO-GO (e.g., identification
 or oracle insufficiency) drops/defers the feature from v2.0.0 with rationale
 (D-025 anticipates this).
+
+## 7. RR09 outcome — GO (2026-07-23)
+
+Fable review RB09→RR09 returned **GO**, conditional on **BC1–BC13** (archived
+`cairn/reviews/archive/RR09-axes-reliability-strack.md`; promoted D-026). The
+model is a faithful, identified rendering; identification is a parameter-free
+rank condition (rank 3 with ≥2 items/scale, df = p(p+1)/2 − p − 3, verified by
+an exact population fit); the Layer-A oracle is genuine (all four anchors
+reproduced independently). RR09's BC1–BC13 are the **build's** binding criteria
+(the build sets `Driving RR: RR09` and ingests them verbatim as ACs). Applied
+spec corrections: §2 flat-vs-hierarchical equivalence note; §4 struck the phantom
+N–B col-14 oracle claim and added the BC5 population-matrix cell + `(N−1)/N`
+handling. Load-bearing build holdings from RR09: `orthogonal = TRUE` is mandatory
+(lavaan frees latent covariances by default, BC4); item errors stay **free**
+(constraining them equal is rejected — changes df/fit class, RR09 rec 8);
+weights route through `snap_trig` with pole tests (BC10); boundary fits
+(ξ̂1 ≤ 0) return NA reliability + warning, never clipped (BC11); refuse contract
+uses a modular-angle check and ≥2 items/scale (BC12); listwise missing-data with
+N > p (BC13).

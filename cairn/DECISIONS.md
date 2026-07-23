@@ -710,3 +710,41 @@ verdict is a separate later D-entry (M53 T6, Fable-reviewed RB09→RR09), as
 D-009/D-019 were for M18/M31 after D-008/D-018 admitted them. The `strack2013`
 candidate row is promoted (M48 lineage). D-001/D-008/D-012/D-018 lineage
 extended; none other superseded. Source: Jeff, M53 plan gate.
+
+### D-026 (2026-07-23): GO on building the circumplex axes-reliability estimator (Strack 2013) in v2.0.0 (M53)
+
+**Context:** D-025 admitted the axes-reliability feature to v2.0.0 as a
+design→build path, M53 free to NO-GO. M53 designed the estimator
+(`devel/m53-axes-reliability-spec.md`) and escalated to independent Fable review
+(RB09→RR09, archived under `cairn/reviews/archive/`).
+**Decision: GO.** Build `axes_reliability()` — an item-level restricted
+tau-equivalent CFA reading circumplex axes reliability off the axes variance ξ1
+(Spearman–Brown) — with the Layer-A (Table 3) + Layer-B (synthetic recovery +
+cross-engine lavaan/OpenMx + deterministic population-matrix) oracles, per the
+spec. Fable-attested load-bearing holdings: (1) **faithful** — the flat
+implemented form is covariance-equivalent to Figure 2's hierarchical drawing
+(every intermediate path fixed at +1 or the cosine); (2) **identified** — the
+moment structure is linear in the components, a parameter-free rank condition
+(rank 3 with ≥2 items/scale, collapsing to 2 at single-item scales;
+`df = p(p+1)/2 − p − 3`), verified by exact population recovery; (3)
+**`orthogonal = TRUE` is mandatory** (`lavaan::cfa` frees latent covariances by
+default), and item errors stay **free** (constraining them equal changes df/fit
+class — rejected); (4) the Layer-A Table-3 reliability/SEm oracle is a genuine
+published-value oracle (four anchors reproduced independently), but the N–B
+column (col 14) is **not** recomputable from printed values and needs its own
+code-independent oracle; (5) analyzing a correlation matrix as covariance gives
+correct point estimates but approximate SEs/χ² (Cudeck 1989; the paper's own
+practice) — documented, with the lavaan `(N−1)/N` likelihood rescaling handled
+in oracles; (6) weights route through `snap_trig` with pole tests (LM=360),
+boundary fits (ξ̂1 ≤ 0) return NA reliability + warning (never clipped), and the
+refuse contract uses a modular-angle check, ≥2 items/scale, N > p, and listwise
+missing data.
+**Binding:** RR09's **BC1–BC13** bind the **build** milestone verbatim (its
+`Driving RR: RR09`), not the design milestone M53.
+**Consequences:** the axes-reliability build candidate is cleared to plan; when
+planned it sets `Driving RR: RR09`, ingests BC1–BC13 as acceptance criteria, and
+M7 (v2.0.0) gains `Depends on:` it (D-025). Non-octant types (b–f),
+quasi-circumplex weights, the secondary correlation-matrix input, and blockwise
+ζ2 are deferred (build/candidate scope). D-025's design→build path is discharged
+on its GO branch; D-006/D-014 minimal-deps reinforced (lavaan/OpenMx stay
+`Suggests`, no new Import). Source: RR09 (Fable, 2026-07-23); M53 T6.
