@@ -1,6 +1,6 @@
 # M53: Axes-reliability (Strack 2013) — design spec + GO/NO-GO
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -88,7 +88,7 @@ GO/NO-GO itself may retire the whole feature (no build).
       template; extract the reliability/SEm/N–B formulas + Table 3 anchors;
       write the provenance block with a dated extraction status; add the INDEX
       line.
-- [ ] T6 — Escalate to Fable: write RB09 (self-contained: the model, the
+- [x] T6 — Escalate to Fable: write RB09 (self-contained: the model, the
       oracle-absence, the API, the angle-invariant touch), ingest RR09, record
       the GO/NO-GO D-entry with load-bearing findings; on GO promote the build
       candidate and note the M7 dependency add.
@@ -100,6 +100,7 @@ GO/NO-GO itself may retire the whole feature (no build).
 - 2026-07-23 (T5): authored `cairn/references/strack2013.md` (born-digital extraction, verified; Table-3 formula-oracle rows + all formulas anchored) + INDEX line; validate green (references index<->disk PASS, staleness OK).
 - 2026-07-23 (T6): drafted RB09 (8 questions: model faithfulness, F-1…F-4, oracle sufficiency, API, GO/NO-GO); blocked on RB09 pending Fable review.
 - 2026-07-23 (T6): ingested RR09 — verdict GO, BC1–BC13 (promoted D-026). Applied spec §2/§4 corrections; updated the build candidate (GO'd, Driving RR: RR09); archived RB09/RR09. Back to in-progress.
+- 2026-07-23: all tasks done (docs-only design milestone: spec + source note + GO/NO-GO); cairn_validate green → status review.
 
 ## Decisions
 
