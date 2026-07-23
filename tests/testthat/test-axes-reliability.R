@@ -230,3 +230,81 @@ test_that("BC6: Monte-Carlo mean xi1 recovers truth within 2 MC-SEs (Layer B)", 
     expect_lt(abs(mc$mean - cell$xi1), 2 * mc$mcse)
   }
 })
+
+# Cross-engine oracle (T6). The identical flat fixed-links model, fit in OpenMx
+# and in lavaan on the identical sample covariance, must agree on every free
+# component variance (RR09 BC7). The axes structure has the closed form
+#   Sigma = xi1*C + xi2*J + zeta1*B + diag(eps),
+# where C_ij = cos(theta_i - theta_j) = AX AX' + AY AY' with the equal axis
+# variance factored out, J is all-ones (the +1 general loadings), and B marks
+# same-scale item pairs (the shared scale-specificity) -- exactly the lavaan
+# constraint set. OpenMx is Suggests already (no new Imports; D-006/D-014).
+
+axes_mx_components <- function(S, n, angles_deg, n_items) {
+  p <- nrow(S)
+  nm <- rownames(S)
+  scale <- rep(seq_along(angles_deg), each = n_items)
+  th <- rep(as.numeric(angles_deg), each = n_items) * pi / 180
+  model <- OpenMx::mxModel(
+    "axes",
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .15, lbound = 0,
+                     name = "xi1"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .05, lbound = 0,
+                     name = "xi2"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .10, lbound = 0,
+                     name = "zeta1"),
+    OpenMx::mxMatrix("Full", p, 1, free = TRUE, values = .5, lbound = 0,
+                     name = "eps"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(th, th, function(a, b) cos(a - b)),
+                     name = "C"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE, values = 1, name = "J"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(scale, scale, `==`) * 1, name = "B"),
+    OpenMx::mxAlgebra(
+      xi1[1, 1] * C + xi2[1, 1] * J + zeta1[1, 1] * B + vec2diag(eps),
+      name = "Sigma", dimnames = list(nm, nm)
+    ),
+    OpenMx::mxData(observed = S, type = "cov", numObs = n),
+    OpenMx::mxExpectationNormal(covariance = "Sigma"),
+    OpenMx::mxFitFunctionML()
+  )
+  fit <- suppressWarnings(suppressMessages(
+    OpenMx::mxRun(model, silent = TRUE, suppressWarnings = TRUE)
+  ))
+  c(
+    xi1 = OpenMx::mxEval(xi1, fit)[1, 1],
+    xi2 = OpenMx::mxEval(xi2, fit)[1, 1],
+    zeta1 = OpenMx::mxEval(zeta1, fit)[1, 1]
+  )
+}
+
+axes_lav_components <- function(S, n, items, angles_deg) {
+  fit <- lavaan::cfa(
+    axes_syntax(items, angles_deg),
+    sample.cov = S, sample.nobs = n, orthogonal = TRUE, likelihood = "wishart"
+  )
+  pe <- lavaan::parameterEstimates(fit)
+  vv <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+  c(xi1 = vv("AX"), xi2 = vv("GEN"), zeta1 = vv("SS1"))
+}
+
+test_that("BC7: lavaan and OpenMx agree on the component variances (Layer B)", {
+  skip_if_not_installed("lavaan")
+  skip_if_not_installed("OpenMx")
+  oct <- octants()
+  k <- 4L
+  for (seed in c(7L, 8L)) {
+    set.seed(seed)
+    dat <- as.data.frame(scale(axes_simulate(2000L, oct, k, .15, .05, .10)))
+    p <- ncol(dat)
+    inames <- sprintf("i%02d", seq_len(p))
+    colnames(dat) <- inames
+    items <- split(inames, rep(seq_along(oct), each = k))
+    S <- stats::cov(dat)
+
+    lav <- axes_lav_components(S, 2000L, items, oct)
+    mx <- axes_mx_components(S, 2000L, oct, k)
+    expect_lt(max(abs(lav - mx)), 1e-3) # observed ~6e-5
+  }
+})

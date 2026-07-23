@@ -120,7 +120,7 @@ FIML.
       (`R/ssm_sem.R:736`); equivalence comment. Tests: BC4.
 - [x] T4. Population-matrix oracle, (N−1)/N handled (wishart). Tests: BC5.
 - [x] T5. Finite-sample MC recovery (generator shared with T10). Tests: BC6.
-- [ ] T6. Cross-engine lavaan/OpenMx, `skip` if absent, no new Imports. BC7.
+- [x] T6. Cross-engine lavaan/OpenMx, `skip` if absent, no new Imports. BC7.
 - [ ] T7. N–B implementation + code-independent worked-example oracle +
       high-scale-specificity direction cell. Tests: BC8, BC9.
 - [ ] T8. Refuse/boundary/listwise contract: `paf2()` NA precedent
@@ -148,6 +148,7 @@ FIML.
 - 2026-07-23: T3 done — `axes_syntax()` (flat fixed-links, hierarchical-equivalence comment) + `axes_fit()` (reuses `sem_fit_cfa()`, `orthogonal = TRUE`) in `R/axes_reliability.R`; BC4 asserts on the fitted lavaan object (loadings all fixed, AX/AY equal-labeled, shared-ζ1 label, all latent covs fixed 0, errors free, df = p(p+1)/2−p−3), mutation-proven (drop-orthogonal → latcov/df fail; per-scale ζ + unequal axis labels → axeq/ss/df fail). Full `devtools::test()` clean (0 fail, 3116 pass).
 - 2026-07-23: T4 done — BC5 population-matrix oracle: fit the exact Σ built from known (ξ1,ξ2,ζ1) for a 32-item octant via `lavaan::cfa(sample.cov=, likelihood="wishart", orthogonal=TRUE)`; recovers every component exactly (ξ̂1=.15, ξ̂2=.08, ζ̂1=.12, all ε̂=.65 equal <1e-6) at χ²<1e-6. (N−1)/N trap mutation-proven by probe: default likelihood gives ξ̂1=.1497, misses the 1e-4 bar; only wishart passes. Full `devtools::test()` clean (0 fail, 3124 pass).
 - 2026-07-23: T5 done — factored the single authoritative population model + simulator into `R/axes_reliability.R` (`axes_population_cor()`, `axes_simulate()`; BC5 test now uses the package `axes_population_cor()`), the generator shared with T10's bundled dataset. BC6 MC recovery: mean ξ̂1 within 2 MC-SEs of truth at two distinct ξ1 cells (.10, .20; N=2000, reps=150, seeds 11/22); realized |bias|/MCSE ~1 (1.11, 0.78) — genuine near-unbiasedness, not seed-tuned. Full `devtools::test()` clean (0 fail, 3126 pass).
+- 2026-07-23: T6 done — BC7 cross-engine: the identical flat model fit in OpenMx (closed form Σ = ξ1·C + ξ2·J + ζ1·B + diag(ε), independently coded via mxAlgebra) and lavaan on the identical sample covariance agree on ξ1/ξ2/ζ1 to ~6e-5 (≪ the 1e-3 bar) on 2 datasets; skips (not passes) without OpenMx; OpenMx already Suggests (no new Imports). Full `devtools::test()` clean (0 fail, 3128 pass).
 
 ## Decisions
 
