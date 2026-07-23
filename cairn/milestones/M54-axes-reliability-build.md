@@ -150,6 +150,8 @@ candidate; the secondary correlation-matrix-only input → candidate (N–B is
 - 2026-07-23: created by /milestone-plan; blocker cleared (cairn `_BC_HEAD` fix landed, parser reads all 13 RR09 BCs); Driving RR09, BC1–BC13 ingested verbatim as AC1–AC13; example = bundled simulated dataset; OLS-shadow (B-1) + supplement retrieval (B-2) folded in.
 - 2026-07-23: T1 done — `axis_weights()` + `axis_item_n()` in `R/axes_reliability.R`; BC3 (item_n 64→32/32→16/16→8, equal axes) + BC10 (pole snap, 0≡360) pass, mutation-proven; full `devtools::test()` clean (0 fail, 3097 pass).
 - 2026-07-23: minor amend — T2 gains a source-extraction sub-task: `strack2013.md` banks only the 4 anchors (cols 6/10/11); BC1 needs all non-blocked type-a rows and BC2 needs cols 12/13, so the Layer-A oracle must first extend the banked Table 3 (two-channel protocol).
+- 2026-07-23: extended `strack2013.md` Table 3 banking (all 12 non-blocked type-a rows + cols 12/13 for BC2 anchors), two-channel-verified.
+- 2026-07-23: BC1 anomaly found — SB reproduces 11/12 non-blocked type-a rows within ±.01; IIP S6 Self fails (.017) and is a provable paper erratum (components sum to 101.0%, unique in the table; corrected %axes 12.0 restores 100.0% and reproduces printed .81). BC1 (Fable-authored) not literally satisfiable for that row — PENDING a handling decision (escalate vs documented erratum).
 
 ## Decisions
 

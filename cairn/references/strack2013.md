@@ -78,6 +78,51 @@ printed `%axes` (col 6) and `item_n` (col 10) reproduces col 11:
 - OCAI, Sample 15 Self: %axes 11.7, item_n 8 → Rel .51 (col 11 = .51).
 - COC, Sample 16 Self: %axes 2.8, item_n 8 → Rel .19 (col 11 = .19).
 
+**Non-blocked type-a rows — col 6 (%axes), col 10 (item_n), col 11
+(Reliability), banked for the M54 Layer-A oracle (BC1, the ±.01 sweep over
+every non-blocked type-a row).** The `(SE)` under the col-number header is the
+parenthetical SE of col 6 %axes, not a separately numbered column, so col 10 =
+item_n, col 11 = Reliability, col 12 = Raw variance, col 13 = SEm (as the note
+above uses). Blocked type-a instruments carry block-specificity (col 9) and are
+excluded from the sweep: CSIV (S7 Self, 2.8%), TRC-g (S10 Self, 3.7%), TRC-t
+(S11 Self, 6.7%).
+
+| Instrument | Sample | Perspective | %axes | item_n | Reliability |
+|---|---|---|---|---|---|
+| IAL   | 1 | Self  | 26.0 | 32 | .92 |
+| IAL   | 1 | Other | 26.1 | 32 | .92 |
+| IAL   | 2 | Self  | 23.0 | 32 | .90 |
+| IAS-R | 3 | Self  | 22.9 | 32 | .90 |
+| IAS-R | 3 | Other | 21.5 | 32 | .90 |
+| IIP   | 4 | Self  | 11.8 | 32 | .81 |
+| IIP   | 5 | −t1   | 13.2 | 32 | .83 |
+| IIP   | 5 | −t2   | 11.8 | 32 | .81 |
+| IIP   | 6 | Self  | 13.0 | 32 | .81 |
+| IMI   | 6 | Other | 27.9 | 32 | .92 |
+| SAS-C | 8 | Self  | 17.8 | 32 | .87 |
+| IPI-A | 9 | Self  | 13.4 | 16 | .71 |
+
+**SEm cross-check inputs (col 12 Raw variance, col 13 SEm), banked for BC2:**
+IAL S1 Self 0.98 → 0.28; OCAI S15 Self 15.95 → 2.78; COC S16 Self 6.70 → 2.33.
+Check: `sqrt(col 12)·sqrt(1 − col 11)` gives IAL .2800 (→.28), COC 2.330 (→2.33)
+exactly, OCAI 2.796 (printed 2.78, within input-rounding — the BC2 ±.02 slack).
+
+Extraction of this Table 3 block: two channels on p. 7, agreeing on every value
+above — the born-digital `pdftotext -layout` text layer, and an AI read of the
+page-image rendering (not a human attestation; no value read by a human eye);
+verified 2026-07-23 (M54 T2).
+
+**Erratum (IIP Sample 6 Self).** This row is internally inconsistent in the
+printed table: its variance components sum to **101.0%** (17.7 + 13.0 + 2.4 +
+67.9), the only row in Table 3 that does not sum to 100.0%. Spearman–Brown on
+the printed %axes 13.0 / item_n 32 gives .827, missing the printed Reliability
+.81 by .017 — while all 11 other non-blocked type-a rows reproduce col 11 within
+±.01. A single-digit correction of %axes 13.0 → **12.0** restores the 100.0% sum
+*and* reproduces the printed .81 (SB(.12, 32) = .8136), so the printed "13.0" is
+almost certainly a typo for 12.0 (true ξ1 ≈ .12). Both extraction channels read
+"13.0", so this is a defect in the source, not the transcription. Flagged to
+Fable (M54 RB) for the BC1 oracle's handling.
+
 ### Global fit and the RANDALL relation (pp. 5, 8)
 
 Mean fit across the 29 models: `RMSEA = .088 (SD .014)`, `AGFI = .691
