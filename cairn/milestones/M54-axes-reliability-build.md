@@ -1,6 +1,6 @@
 # M54: Axes-reliability (Strack 2013) — build `axes_reliability()`
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR09
@@ -16,26 +16,27 @@ off the axes variance ξ1 — with its two-layer validation battery, per RR09 GO
 ## Scope
 
 **In:** a standalone exported `axes_reliability()` (parallel to
-`fit_structure()`) for octant type-a instruments: the flat-form fixed-links
-lavaan model (weights via `snap_trig`, `orthogonal = TRUE`, equal-axis and
-shared-ζ1 labels, free errors), reusing the `sem_fit_cfa()` chokepoint
-(`R/ssm_sem.R:736-757`); Spearman–Brown reliability + SEm (**z-standardized SD
-default**, exposed as an argument); the Nunnally–Bernstein comparison; a
-list-classed S3 object with print/summary + roxygen; the Layer-A (Table 3) and
-Layer-B (population-matrix + finite-sample + cross-engine) oracles; the
-refuse/boundary/listwise contract; a **bundled simulated item-level example
-dataset** (seed-pinned `data-raw/` generator) for the help page.
+`fit_structure()`) for octant type-a instruments: the flat fixed-links lavaan
+model (`snap_trig` weights, `orthogonal = TRUE`, equal-axis + shared-ζ1 labels,
+free errors) via the `sem_fit_cfa()` chokepoint (`R/ssm_sem.R:736`);
+Spearman–Brown reliability + SEm (**z-std SD default**, argument-exposed); the
+N–B comparison; a list-classed S3 object (print/summary + roxygen); the Layer-A
+(Table 3) and Layer-B (population-matrix + finite-sample + cross-engine)
+oracles; the refuse/boundary/listwise contract; and a **bundled simulated
+item-level dataset** (seed-pinned `data-raw/` generator) for the help page.
 
-**Out:** non-octant types b–f and quasi-circumplex weights → deferred-in-spec
-candidate; the secondary correlation-matrix-only input → candidate (N–B is
-`NA`-with-reason there); blockwise ζ2 → candidate; FIML on items → candidate.
+**Out (→ candidate):** non-octant types b–f + quasi-circumplex weights; the
+correlation-matrix-only input (N–B `NA`-with-reason there); blockwise ζ2; item
+FIML.
 
 ## Acceptance criteria
 
-- [ ] AC1 (BC1): Spearman–Brown on Table 3's printed col 6 (/100) and col 10
-      must reproduce col 11 for the four anchor rows (IAL S1 Self; IPI-A S9
-      Self; OCAI S15 Self; COC S16 Self) within ±.005, and for every
-      non-blocked type-a row of Table 3 within ±.01.
+- [ ] AC1 (BC1, revised by RR10; RR09's original in Deviations below): SB(col 6
+      /100, col 10) reproduces col 11 within ±.005 for the 4 anchors (IAL S1,
+      IPI-A S9, OCAI S15, COC S16 — all Self) and ±.01 for the 11 self-consistent
+      non-blocked type-a rows (all but IIP S6 Self, the erratum: assert sum
+      101.0±0.1, |SB(.130,32)−.81|>.01, |SB(.120,32)−.81|≤.005); sum guard: the
+      12 banked rows each sum to their banked total ±0.1.
 - [ ] AC2 (BC2): `sqrt(col 12) · sqrt(1 − col 11)` must reproduce col 13 within
       ±.02 for at least the IAL, OCAI, and COC anchor rows.
 - [ ] AC3 (BC3): item_n computed from instrument structure as the per-axis Σwᵢ²
@@ -93,57 +94,45 @@ candidate; the secondary correlation-matrix-only input → candidate (N–B is
 - [ ] AC16: `Rscript -e 'devtools::check()'` clean — 0 errors, 0 warnings, NOTEs
       justified (consistency-gate).
 
+**Deviations from RR09**
+
+| BC | Disposition |
+|---|---|
+| BC1 | Superseded in full by RR10 (2026-07-23, Fable) to handle the IIP S6 Self source erratum; RR10's revised BC1 is ingested as AC1 above. BC2–BC13 stand. |
+
 ## Coverage
 
-- AC1, AC2 → T2
-- AC3, AC10 → T1
-- AC4 → T3
-- AC5 → T4
-- AC6 → T5
-- AC7 → T6
-- AC8, AC9 → T7
-- AC11, AC12, AC13 → T8
-- AC14 → T10
-- AC15 → T1–T11
-- AC16 → T9, T10
+- AC1, AC2 → T2 · AC3, AC10 → T1 · AC4 → T3 · AC5 → T4 · AC6 → T5
+- AC7 → T6 · AC8, AC9 → T7 · AC11, AC12, AC13 → T8 · AC14 → T10
+- AC15 → T1–T11 · AC16 → T9, T10
 
 ## Tasks
 
-- [x] T1. Weights + item_n: route scale weights through `snap_trig`
-      (`R/ssm_sem_syntax.R:160-165`) with axes at 0°/90°; per-axis item_n =
-      Σwᵢ². Tests first: BC10 pole weights, BC3 exact item_n.
-- [ ] T2. Spearman–Brown reliability + SEm (z-standardized SD default arg).
-      Layer-A published-value oracle from Table 3 (`references/strack2013.md`).
-      Tests first: BC1, BC2. **Sub-task (discovered T1→T2):** the note banks
-      only the 4 anchor rows (cols 6/10/11); first extend it with every
-      non-blocked type-a row (BC1) and cols 12/13 SD²/SEm for IAL/OCAI/COC
-      (BC2), via the two-channel extraction protocol (M40–M47).
-- [ ] T3. lavaan constraint-set builder — flat fixed-links form,
-      `orthogonal = TRUE`, equal-axis + shared-ζ1 labels, free errors; reuse
-      `sem_fit_cfa()` (`R/ssm_sem.R:736-757`); flat-vs-hierarchical equivalence
-      comment. Tests first: BC4 (constraints + df).
-- [ ] T4. Population-matrix recovery oracle with (N−1)/N rescaling handled
-      (wishart likelihood). Tests first: BC5.
-- [ ] T5. Finite-sample Monte-Carlo recovery oracle (shared generator with the
-      T10 dataset). Tests first: BC6.
-- [ ] T6. Cross-engine lavaan/OpenMx oracle, `skip` when OpenMx absent, no new
-      Imports. Tests first: BC7.
-- [ ] T7. Nunnally–Bernstein implementation + code-independent worked-example
-      oracle + high-scale-specificity direction cell. Tests first: BC8, BC9.
-- [ ] T8. Refuse contract + boundary policy + listwise missing-data: reuse the
-      `paf2()` NA precedent (`R/fit_structure.R:16-28`), `!is.finite` guards
-      (M32/M35), modular-angle check via `octants()`
-      (`R/convenience_functions.R:33-35`). Tests first: BC11, BC12, BC13.
-- [ ] T9. OLS-shadow internal estimator (RR09 B-1) — regress off-diagonal r's
-      on `(cos Δ, 1, same-scale)`; SEM-independent cross-check + start values;
-      assert close agreement with ML on synthetic data.
-- [ ] T10. S3 list object + print/summary + roxygen (corr-as-cov SE caveat,
-      identical-per-axis rows explained); `_pkgdown.yml` row; NEWS.md entry;
-      bundle the simulated dataset (`data-raw/` generator, `data/*.rda`,
-      `R/example_data.R` doc) and use it in the help example. (AC14)
-- [ ] T11. Supplement retrieval (RR09 B-2) — one attempt at the 2013 SAGE
-      LISREL-syntax supplement; bank in `cairn/references/` if found, drop if
-      link-rotten.
+- [x] T1. Weights + item_n via `snap_trig` (`R/ssm_sem_syntax.R:160`), axes at
+      0°/90°, per-axis Σwᵢ². Tests: BC10, BC3.
+- [x] T2a. Extend `strack2013.md` Table 3 banking (12 non-blocked type-a rows,
+      cols 5–13) two-channel; done alongside the RR10 erratum ingest.
+- [ ] T2. Spearman–Brown reliability + SEm (z-std SD default arg); Layer-A
+      oracle per revised BC1 (11-row ±.01 sweep, 4 anchors ±.005, IIP S6 Self
+      3 assertions, component-sum guard). Tests: BC1, BC2.
+- [ ] T3. lavaan constraint set — flat fixed-links, `orthogonal = TRUE`,
+      equal-axis + shared-ζ1 labels, free errors; reuse `sem_fit_cfa()`
+      (`R/ssm_sem.R:736`); equivalence comment. Tests: BC4.
+- [ ] T4. Population-matrix oracle, (N−1)/N handled (wishart). Tests: BC5.
+- [ ] T5. Finite-sample MC recovery (generator shared with T10). Tests: BC6.
+- [ ] T6. Cross-engine lavaan/OpenMx, `skip` if absent, no new Imports. BC7.
+- [ ] T7. N–B implementation + code-independent worked-example oracle +
+      high-scale-specificity direction cell. Tests: BC8, BC9.
+- [ ] T8. Refuse/boundary/listwise contract: `paf2()` NA precedent
+      (`R/fit_structure.R:16`), `!is.finite` guards, modular `octants()` check.
+      Tests: BC11, BC12, BC13.
+- [ ] T9. OLS-shadow estimator (B-1) — regress off-diag r's on
+      `(cos Δ, 1, same-scale)`; SEM-independent cross-check + start values.
+- [ ] T10. S3 object + print/summary + roxygen (SE caveat, per-axis rows);
+      `_pkgdown.yml` + NEWS; bundle the simulated dataset (`data-raw/` +
+      `data/*.rda` + `R/example_data.R`) used in the help example. (AC14)
+- [ ] T11. Supplement retrieval (B-2) — one attempt at the SAGE LISREL syntax;
+      bank if found, drop if rotten.
 
 ## Work log
 
@@ -153,7 +142,19 @@ candidate; the secondary correlation-matrix-only input → candidate (N–B is
 - 2026-07-23: extended `strack2013.md` Table 3 banking (all 12 non-blocked type-a rows + cols 12/13 for BC2 anchors), two-channel-verified.
 - 2026-07-23: BC1 anomaly found — SB reproduces 11/12 non-blocked type-a rows within ±.01; IIP S6 Self fails (.017) and is a provable paper erratum (components sum to 101.0%, unique in the table; corrected %axes 12.0 restores 100.0% and reproduces printed .81). BC1 (Fable-authored) not literally satisfiable for that row — PENDING a handling decision (escalate vs documented erratum).
 - 2026-07-23: blocked on RB10 — Fable escalation on BC1's handling of the IIP S6 Self erratum (drafted `cairn/reviews/RB10-axes-reliability-bc1-erratum.md`).
+- 2026-07-23: ingested RR10 — erratum confirmed, oracle = option (a) + sum guard; BC1 revised (AC1 + Deviations table); banked Table 3 cols 5–9 for the 12 rows + fixed the source-note overclaim/SEm nuance; RB10/RR10 archived; resumed T2.
 
 ## Decisions
+
+- 2026-07-23 (RR10, ingested; full reasoning in `reviews/archive/RR10-…`):
+  IIP S6 Self of Strack Table 3 is a source erratum — a single-digit %axes typo
+  (13.0 for 12.0; ξ1 ≈ .12), over-determined by the 100.0% sum identity and the
+  printed reliability; a printed-SEm nuance does not overturn it. Layer-A oracle
+  = option (a): sweep the 11 self-consistent rows (±.01; anchors ±.005), pin
+  IIP S6 Self with printed-pair-inconsistent + corrected-pair-reproduces
+  assertions, plus a component-sum guard over the 12 banked rows (scoped).
+- 2026-07-23: BC1 revised by RR10 (verbatim there, faithfully in AC1);
+  `Driving RR:` stays RR09 so `cairn_validate` keeps enforcing BC2–BC13, with
+  RR09's BC1 in the Deviations-from-RR09 table.
 
 ## Review

@@ -87,20 +87,25 @@ above uses). Blocked type-a instruments carry block-specificity (col 9) and are
 excluded from the sweep: CSIV (S7 Self, 2.8%), TRC-g (S10 Self, 3.7%), TRC-t
 (S11 Self, 6.7%).
 
-| Instrument | Sample | Perspective | %axes | item_n | Reliability |
-|---|---|---|---|---|---|
-| IAL   | 1 | Self  | 26.0 | 32 | .92 |
-| IAL   | 1 | Other | 26.1 | 32 | .92 |
-| IAL   | 2 | Self  | 23.0 | 32 | .90 |
-| IAS-R | 3 | Self  | 22.9 | 32 | .90 |
-| IAS-R | 3 | Other | 21.5 | 32 | .90 |
-| IIP   | 4 | Self  | 11.8 | 32 | .81 |
-| IIP   | 5 | −t1   | 13.2 | 32 | .83 |
-| IIP   | 5 | −t2   | 11.8 | 32 | .81 |
-| IIP   | 6 | Self  | 13.0 | 32 | .81 |
-| IMI   | 6 | Other | 27.9 | 32 | .92 |
-| SAS-C | 8 | Self  | 17.8 | 32 | .87 |
-| IPI-A | 9 | Self  | 13.4 | 16 | .71 |
+Variance components banked too (cols 5–9): %general (col 5), %axes (col 6),
+%scale-specificity (col 7), %item-specificity (col 9); %block-specificity
+(col 8) is `—` for all twelve (non-blocked), so the row sum is
+%gen + %axes + %scale + %item (RR10 Q4 sum guard).
+
+| Instrument | Sample | Persp. | %gen | %axes | %scale | %item | item_n | Rel | sum |
+|---|---|---|---|---|---|---|---|---|---|
+| IAL   | 1 | Self  |  2.1 | 26.0 | 6.5 | 65.4 | 32 | .92 | 100.0 |
+| IAL   | 1 | Other |  2.0 | 26.1 | 5.7 | 66.2 | 32 | .92 | 100.0 |
+| IAL   | 2 | Self  |  2.9 | 23.0 | 5.3 | 68.8 | 32 | .90 | 100.0 |
+| IAS-R | 3 | Self  |  1.1 | 22.9 | 9.1 | 66.9 | 32 | .90 | 100.0 |
+| IAS-R | 3 | Other |  1.4 | 21.5 | 8.7 | 68.4 | 32 | .90 | 100.0 |
+| IIP   | 4 | Self  | 13.9 | 11.8 | 1.5 | 72.8 | 32 | .81 | 100.0 |
+| IIP   | 5 | −t1   | 16.6 | 13.2 | 1.5 | 68.7 | 32 | .83 | 100.0 |
+| IIP   | 5 | −t2   | 20.5 | 11.8 | 2.0 | 65.7 | 32 | .81 | 100.0 |
+| IIP   | 6 | Self  | 17.7 | 13.0 | 2.4 | 67.9 | 32 | .81 | **101.0** |
+| IMI   | 6 | Other |  1.7 | 27.9 | 5.9 | 64.5 | 32 | .92 | 100.0 |
+| SAS-C | 8 | Self  |  4.8 | 17.8 | 6.2 | 71.2 | 32 | .87 | 100.0 |
+| IPI-A | 9 | Self  | 19.2 | 13.4 | 2.8 | 64.6 | 16 | .71 | 100.0 |
 
 **SEm cross-check inputs (col 12 Raw variance, col 13 SEm), banked for BC2:**
 IAL S1 Self 0.98 → 0.28; OCAI S15 Self 15.95 → 2.78; COC S16 Self 6.70 → 2.33.
@@ -110,18 +115,26 @@ exactly, OCAI 2.796 (printed 2.78, within input-rounding — the BC2 ±.02 slack
 Extraction of this Table 3 block: two channels on p. 7, agreeing on every value
 above — the born-digital `pdftotext -layout` text layer, and an AI read of the
 page-image rendering (not a human attestation; no value read by a human eye);
-verified 2026-07-23 (M54 T2).
+verified 2026-07-23 (M54 T2), components cross-read against the `pdftotext -raw`
+mode in RR10.
 
 **Erratum (IIP Sample 6 Self).** This row is internally inconsistent in the
 printed table: its variance components sum to **101.0%** (17.7 + 13.0 + 2.4 +
-67.9), the only row in Table 3 that does not sum to 100.0%. Spearman–Brown on
-the printed %axes 13.0 / item_n 32 gives .827, missing the printed Reliability
-.81 by .017 — while all 11 other non-blocked type-a rows reproduce col 11 within
+67.9). Among the twelve **non-blocked type-a** rows above it is the only one not
+summing to 100.0% (RR10 narrowed an earlier "only row in Table 3" claim:
+table-wide, CSIV S7 Self sums to 102.9 and OCAI S15 Meta to 100.6, and the MEIL
+S14 Self text layer reads 74.4 — none is in the BC1 sweep population). SB on the
+printed %axes 13.0 / item_n 32 gives .827, missing the printed Reliability .81
+by .017 — while all 11 other non-blocked type-a rows reproduce col 11 within
 ±.01. A single-digit correction of %axes 13.0 → **12.0** restores the 100.0% sum
 *and* reproduces the printed .81 (SB(.12, 32) = .8136), so the printed "13.0" is
-almost certainly a typo for 12.0 (true ξ1 ≈ .12). Both extraction channels read
-"13.0", so this is a defect in the source, not the transcription. Flagged to
-Fable (M54 RB) for the BC1 oracle's handling.
+almost certainly a typo for 12.0 (true ξ1 ≈ .12). One nuance (RR10 Q1/B-2): the
+printed SEm .23 (raw variance .30) fits a reliability-typo reading slightly
+better, but that would need two independent print errors and cannot explain the
+101.0% sum, so parsimony favors the single %axes typo. Both extraction channels
+read "13.0", so this is a source defect, not the transcription. Handling ruled
+by RR10: sweep the 11 self-consistent rows, pin this row with the printed-pair
+inconsistency + corrected-pair assertions (revised BC1).
 
 ### Global fit and the RANDALL relation (pp. 5, 8)
 
