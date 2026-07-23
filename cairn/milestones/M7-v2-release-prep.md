@@ -2,7 +2,7 @@
 
 - **Status:** blocked
 - **Priority:** high
-- **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38
+- **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54
 - **Branch/PR:** `m7-v2-release-prep` / [PR #64](https://github.com/jmgirard/circumplex/pull/64)
 
 ## Goal
