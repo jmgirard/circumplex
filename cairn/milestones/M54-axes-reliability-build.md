@@ -1,6 +1,6 @@
 # M54: Axes-reliability (Strack 2013) — build `axes_reliability()`
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR09
@@ -152,6 +152,7 @@ candidate; the secondary correlation-matrix-only input → candidate (N–B is
 - 2026-07-23: minor amend — T2 gains a source-extraction sub-task: `strack2013.md` banks only the 4 anchors (cols 6/10/11); BC1 needs all non-blocked type-a rows and BC2 needs cols 12/13, so the Layer-A oracle must first extend the banked Table 3 (two-channel protocol).
 - 2026-07-23: extended `strack2013.md` Table 3 banking (all 12 non-blocked type-a rows + cols 12/13 for BC2 anchors), two-channel-verified.
 - 2026-07-23: BC1 anomaly found — SB reproduces 11/12 non-blocked type-a rows within ±.01; IIP S6 Self fails (.017) and is a provable paper erratum (components sum to 101.0%, unique in the table; corrected %axes 12.0 restores 100.0% and reproduces printed .81). BC1 (Fable-authored) not literally satisfiable for that row — PENDING a handling decision (escalate vs documented erratum).
+- 2026-07-23: blocked on RB10 — Fable escalation on BC1's handling of the IIP S6 Self erratum (drafted `cairn/reviews/RB10-axes-reliability-bc1-erratum.md`).
 
 ## Decisions
 
