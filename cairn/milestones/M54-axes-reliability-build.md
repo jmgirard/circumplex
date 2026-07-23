@@ -112,10 +112,9 @@ FIML.
       0°/90°, per-axis Σwᵢ². Tests: BC10, BC3.
 - [x] T2a. Extend `strack2013.md` Table 3 banking (12 non-blocked type-a rows,
       cols 5–13) two-channel; done alongside the RR10 erratum ingest.
-- [ ] T2. Spearman–Brown reliability + SEm (z-std SD default arg); Layer-A
+- [x] T2. Spearman–Brown reliability + SEm (z-std SD default arg); Layer-A
       oracle per revised BC1 (11-row ±.01 sweep, 4 anchors ±.005, IIP S6 Self
-      3 assertions, component-sum guard). Tests: BC1, BC2. (code + oracle
-      written; targeted tests + mutations pass; full-suite verify pending)
+      3 assertions, component-sum guard). Tests: BC1, BC2.
 - [ ] T3. lavaan constraint set — flat fixed-links, `orthogonal = TRUE`,
       equal-axis + shared-ζ1 labels, free errors; reuse `sem_fit_cfa()`
       (`R/ssm_sem.R:736`); equivalence comment. Tests: BC4.
@@ -145,6 +144,7 @@ FIML.
 - 2026-07-23: blocked on RB10 — Fable escalation on BC1's handling of the IIP S6 Self erratum (drafted `cairn/reviews/RB10-axes-reliability-bc1-erratum.md`).
 - 2026-07-23: ingested RR10 — erratum confirmed, oracle = option (a) + sum guard; BC1 revised (AC1 + Deviations table); banked Table 3 cols 5–9 for the 12 rows + fixed the source-note overclaim/SEm nuance; RB10/RR10 archived; resumed T2.
 - 2026-07-23: T2 checkpoint (NOT yet checked off) — `axis_reliability_sb()` + `axis_sem()` written; Layer-A oracle (BC1 revised: 4 anchors ±.005, 11-row ±.01 sweep, IIP S6 Self erratum assertions, 12-row sum guard; BC2 SEm ±.02) passes targeted + mutation-proven; full `devtools::test()` running — T2 checks off only when it is clean.
+- 2026-07-23: T2 verify clean (full `devtools::test()`: 0 fail, 3104 pass) — T2 checked off. Next: T3 lavaan constraint set (BC4).
 
 ## Decisions
 
