@@ -60,6 +60,9 @@ reference:
   - print.circumplex_structure
   - summary.circumplex_structure
   - plot.circumplex_structure
+  - axes_reliability
+  - print.circumplex_axes_reliability
+  - summary.circumplex_axes_reliability
   - ssm_ci_accuracy
   - summary.circumplex_ci_accuracy
   - plot.circumplex_ci_accuracy
@@ -96,6 +99,7 @@ reference:
   - aw2009
   - jz2017
   - raw_iipsc
+  - simulated_items
 navbar:
   title: circumplex
   left:

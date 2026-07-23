@@ -6,9 +6,11 @@ correlational structure of circumplex scales — filling the gap left by the
 archived CircE package, the previous R implementation. Alongside it come four
 other new analysis families: latent-variable SSM analysis with `ssm_sem()`,
 repeated-measures (longitudinal) SSM analysis, `fit_structure()` for
-exploratory circumplex-structure tests, and `ssm_ci_accuracy()`, a
-diagnostic for whether an `ssm_analyze()` result's confidence intervals can be
-trusted at your sample size and profile (Zimmermann & Wright, 2017). The
+exploratory circumplex-structure tests, `axes_reliability()` for the
+reliability of the circumplex axes (Strack et al., 2013), and
+`ssm_ci_accuracy()`, a diagnostic for whether an `ssm_analyze()` result's
+confidence intervals can be trusted at your sample size and profile
+(Zimmermann & Wright, 2017). The
 plotting layer has been rebuilt on a real ggplot2 coordinate system.
 
 ## Breaking changes and changed behavior
@@ -137,6 +139,21 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   `circumplex_structure` object has `print()`, `summary()`, and `plot()`
   methods; interpretations are presented as the heuristic likelihood
   classifications they are, never as significance tests.
+
+* New `axes_reliability()` function estimates the reliability (and standard
+  error of measurement) of the two circumplex axes with the item-level
+  restricted tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013).
+  The model decomposes each item's variance into a general factor, the two
+  circumplex axes, scale specificity, and item specificity, and reads the axes'
+  reliability off the isolated axes-variance component with the Spearman-Brown
+  formula — a confirmatory, item-level complement to `fit_structure()`'s
+  exploratory scale-level criteria. The Nunnally-Bernstein axis reliability is
+  reported alongside for comparison (it overestimates when scale specificity is
+  large). Items are supplied through a `circumplex_instrument` or an explicit
+  angle-and-item map; missing data are handled by listwise deletion; a boundary
+  fit returns `NA` reliability rather than a clipped value; and the returned
+  `circumplex_axes_reliability` object has `print()` and `summary()` methods. A
+  bundled simulated dataset, `simulated_items`, is included for the examples.
 
 * New `cpm_simulate()` function draws standardized observations from a fitted
   `cpm_fit()` model's implied correlation matrix, using the model's exact

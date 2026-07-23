@@ -584,3 +584,61 @@ test_that("BC13: listwise deletion reports N and refuses when N <= p", {
     "Complete-case N"
   )
 })
+
+# S3 object, methods, and the bundled example dataset (T10, AC14).
+
+test_that("AC14: axes_reliability() runs on the bundled simulated_items data", {
+  skip_if_not_installed("lavaan")
+  data("simulated_items", package = "circumplex", envir = environment())
+  expect_equal(dim(simulated_items), c(500L, 32L))
+
+  # The exact call from the (non-\dontrun) help example.
+  items <- split(names(simulated_items), rep(1:8, each = 4))
+  res <- suppressMessages(
+    axes_reliability(simulated_items, items = items, angles = octants())
+  )
+  expect_s3_class(res, "circumplex_axes_reliability")
+  expect_false(res$details$boundary)
+  # A sensible, non-degenerate reliability from the .18 axes-variance design.
+  expect_gt(res$results$reliability[[1]], .6)
+  expect_lt(res$results$reliability[[1]], .9)
+
+  # print()/summary() dispatch and return the object invisibly.
+  expect_output(print(res), "Circumplex Axes Reliability")
+  expect_output(summary(res), "Variance components")
+  expect_identical(suppressMessages(print(res)), res)
+})
+
+test_that("axes_reliability() works via the instrument path", {
+  skip_if_not_installed("lavaan")
+  # A simulated 32-item dataset matching iipsc's item->scale->angle mapping.
+  data("iipsc", package = "circumplex", envir = environment())
+  key <- iipsc$Scales
+  item_scale <- integer(32)
+  item_angle <- numeric(32)
+  for (s in seq_len(nrow(key))) {
+    nums <- as.integer(strsplit(key$Items[[s]], ",")[[1]])
+    item_scale[nums] <- s
+    item_angle[nums] <- key$Angle[[s]]
+  }
+  th <- item_angle * pi / 180
+  sigma <- .06 + .18 * outer(th, th, function(a, b) cos(a - b)) +
+    .10 * outer(item_scale, item_scale, `==`)
+  diag(sigma) <- 1
+  set.seed(99)
+  dat <- as.data.frame(mvn_draws(800L, rep(0, 32), sigma))
+  colnames(dat) <- sprintf("item%02d", seq_len(32))
+
+  res <- suppressMessages(
+    axes_reliability(dat, items = seq_len(32), instrument = iipsc)
+  )
+  expect_s3_class(res, "circumplex_axes_reliability")
+  expect_false(res$details$boundary)
+  # The instrument path must reproduce the explicit-map result on the same data
+  # (split() orders the groups 1..8, matching key$Angle's row order).
+  emap <- split(colnames(dat), item_scale)
+  res2 <- suppressMessages(
+    axes_reliability(dat, items = emap, angles = as.numeric(key$Angle))
+  )
+  expect_equal(res$results$xi1[[1]], res2$results$xi1[[1]], tolerance = 1e-6)
+})

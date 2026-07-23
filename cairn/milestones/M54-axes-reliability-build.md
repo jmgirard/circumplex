@@ -129,11 +129,12 @@ FIML.
       "std"|"raw"|numeric` — 2026-07-23.)
 - [x] T9. OLS-shadow estimator (B-1) — regress off-diag r's on
       `(cos Δ, 1, same-scale)`; SEM-independent cross-check + start values.
-- [ ] T10. S3 object + print/summary + roxygen (SE caveat, per-axis rows);
+- [x] T10. S3 object + print/summary + roxygen (SE caveat, per-axis rows);
       `_pkgdown.yml` + NEWS; bundle the simulated dataset (`data-raw/` +
       `data/*.rda` + `R/example_data.R`) used in the help example. (AC14)
-- [ ] T11. Supplement retrieval (B-2) — one attempt at the SAGE LISREL syntax;
-      bank if found, drop if rotten.
+- [x] T11. Supplement retrieval (B-2) — one attempt at the SAGE LISREL syntax;
+      bank if found, drop if rotten. → dropped (rotten): SAGE 403, legacy
+      sgo.sagepub.com supplement path dead.
 
 ## Work log
 
@@ -154,6 +155,8 @@ FIML.
 - 2026-07-23: API question gate (pre-T8) — exported `axes_reliability()`: (Q1) support BOTH an `instrument` and an explicit `angles` + per-scale item-list map; (Q2) `sd = "std"` (default z-std √(1−rel)) | `"raw"` (observed axis-composite SD) | numeric.
 - 2026-07-23: T8 done — exported `axes_reliability(data, items, angles, instrument, sd)` + `new_axes_reliability()` S3 (`R/axes_reliability_oop.R`; print/summary deferred to T10) + `axes_resolve_map()` (both input forms) + `axes_converged()` seam. Refuse contract (BC12): ≠8 scales, non-octant/unequal/duplicate/NA angles, <2 items/scale, missing column, non-finite, zero-variance, N≤p, non-PD (1e-8 tol), non-convergence (mocked). Boundary (BC11): ξ̂1≤0 or any negative variance → NA rel/SEm + warning + flag (seed-5 ξ1=0 cell, ξ̂1<0 deterministic); small ξ̂1 (.028) → small rel ~.18. Listwise only (BC13): complete-case message + N≤p refusal, no pairwise. lavaan fit warnings suppressed (own guards). Full `devtools::test()` clean (0 fail, 3154 pass).
 - 2026-07-23: T9 done — `axes_ols_shadow()` (B-1): OLS of the off-diagonal r's on (1, cosΔ, same-scale) recovers (ξ2,ξ1,ζ1) exactly on the population matrix (1e-8) and cross-checks the CFA ξ̂1 to <1e-2 on finite data — a third SEM-independent route beside lavaan/OpenMx. Wired as lavaan `start()` seeds (floored positive; start-invariant estimates verified) and stored in `details$ols_shadow`. Full `devtools::test()` clean (0 fail, 3159 pass).
+- 2026-07-23: T10 done (AC14) — `print`/`summary.circumplex_axes_reliability` (per-axis table, components, global fit, Cudeck 1989 SE caveat); full roxygen + non-`\dontrun` `@examples`; `simulated_items` bundled dataset (seed 486115 generator `data-raw/simulated_items.R`, 500×32 1–7 Likert, ξ1=.18/ξ2=.06/ζ1=.10, rel≈.78; roxygen in `R/example_data.R`); `_pkgdown.yml` rows (fn + dataset); NEWS entry + intro-family line. Instrument-path test reproduces explicit-map. Full `devtools::test()` clean (0 fail, 3170 pass).
+- 2026-07-23: T11 done → dropped (rotten). One retrieval attempt for the SAGE LISREL syntax supplement: `journals.sagepub.com` returns HTTP 403 (bot-blocked) and the paper's cited supplement host `www.sgo.sagepub.com` is a dead legacy path. Nothing banked; the two-layer oracle battery (T4–T9) is self-sufficient without it.
 
 ## Decisions
 

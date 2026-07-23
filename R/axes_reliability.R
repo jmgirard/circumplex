@@ -313,6 +313,13 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' specificity is large, because it charges scale-specificity variance to the
 #' axis rather than isolating it (Strack et al. 2013, Figure 3).
 #'
+#' Because the model is fit to the item **correlation** matrix as if it were a
+#' covariance matrix (the paper's own practice), the component point estimates
+#' and the reliabilities are correct, but the component standard errors and the
+#' global chi-square are **approximate** (Cudeck, 1989). Results are reported
+#' **per axis** (X and Y): for a balanced octant instrument the two axes carry
+#' the same axes-variance estimate and differ only through `item_n`.
+#'
 #' Missing data are handled by **listwise deletion only** (a message reports the
 #' complete-case count); pairwise correlation input is never used. A boundary
 #' fit (a non-positive estimated axes variance, or any negative estimated
@@ -338,11 +345,24 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #'   reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
 #'   `components` (the estimated variance components with SEs), `fit` (global fit
 #'   indices), and `details`.
-#' @references Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The
-#'   reliability of circumplex axes. \emph{SAGE Open}, 3(2).
-#'   \doi{10.1177/2158244013486115}
+#' @references
+#' Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The reliability of
+#' circumplex axes. \emph{SAGE Open}, 3(2). \doi{10.1177/2158244013486115}
+#'
+#' Cudeck, R. (1989). Analysis of correlation matrices using covariance
+#' structure models. \emph{Psychological Bulletin}, 105(2), 317-327.
 #' @seealso [fit_structure()] for exploratory circumplex-structure criteria.
 #' @export
+#' @examples
+#' # A simulated 32-item octant dataset (four items per octant scale).
+#' data("simulated_items")
+#'
+#' # Map the item columns to their eight scales (four items each), in the
+#' # octants() angle order, then estimate the axes reliability.
+#' items <- split(names(simulated_items), rep(1:8, each = 4))
+#' res <- axes_reliability(simulated_items, items = items, angles = octants())
+#' res
+#' summary(res)
 axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
                              sd = "std") {
   call <- match.call()
