@@ -679,3 +679,34 @@ out-of-INDEX instruction — correct for a synthesis note), and the stale
 retained as historical record and cross-referenced. The owes-no-page ledger is
 untouched (still valid for genuinely-in-passing sources).
 Source: Jeff, M46 re-plan gate.
+
+### D-025 (2026-07-23): the circumplex axes-reliability feature (Strack 2013) enters v2.0.0 scope as a design→build path
+
+**Context:** The `strack2013` ROADMAP candidate (M48 supply-push capture) —
+Strack, Jacobs & Grosse Holtforth (2013), *Reliability of Circumplex Axes* — is
+a tau-equivalent CFA variance-decomposition model estimating circumplex **axes
+reliability** (and SEm) from the axes variance component ξ1, contrasting with
+`fit_structure()`'s RANDALL (sensitive to the axes/scale-specificity ratio;
+Strack isolates both). At the M53 plan gate Jeff chose to (a) plan it
+design-first, and (b) fold it into v2.0.0 rather than ride ~v2.1.0.
+**Decision:** Supersede D-001's new-features-excluded clause **insofar as it
+bars the axes-reliability feature** — narrowly, exactly as D-008 did for CIRCUM
+and D-018 for the viz expansion. The feature enters v2.0.0 scope as **M53**
+(design spec + Fable-reviewed GO/NO-GO, docs-only) → an axes-reliability
+**build** (ROADMAP candidate, planned only post-GO). M53 may decide **NO-GO**,
+in which case nothing axes-reliability ships in v2.0.0 and the build is
+dropped/deferred. This extends D-008/D-012/D-018's doctrine — scope is the
+variable, the date yields to the statistics; there is no release-date pressure,
+v2.0.0 grows and ships when its bundle is complete and validated.
+**Scope of the supersession:** narrow — promotes **only** the axes-reliability
+feature; all other D-001 consequences and exclusions stand.
+**Consequences:** M7 (v2.0.0) will gain `Depends on:` the build **at
+build-planning time, on a GO** — not now, because the build has no ID until GO
+(design-first). The build inherits M7's release linkage; M53 itself is
+docs-only and does not gate M7. No new dependency: lavaan and OpenMx are already
+`Suggests` (used by `ssm_sem` and its oracle), so the model reuses the existing
+`lavaan::cfa` chokepoint — D-006/D-014 minimal-deps reinforced. The GO/NO-GO
+verdict is a separate later D-entry (M53 T6, Fable-reviewed RB09→RR09), as
+D-009/D-019 were for M18/M31 after D-008/D-018 admitted them. The `strack2013`
+candidate row is promoted (M48 lineage). D-001/D-008/D-012/D-018 lineage
+extended; none other superseded. Source: Jeff, M53 plan gate.
