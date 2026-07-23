@@ -516,6 +516,56 @@ test_that("BC12: each malformed input errors informatively", {
   )
 })
 
+# OLS-shadow estimator (T9, B-1). A SEM-independent least-squares recovery of
+# the component variances from the off-diagonal correlations -- a third
+# independent route beside lavaan and OpenMx, and the fit's start values.
+
+test_that("OLS-shadow recovers the components exactly on the population matrix", {
+  oct <- octants()
+  k <- 4L
+  truth <- c(xi2 = .08, xi1 = .15, zeta1 = .12)
+  pop <- axes_population_cor(oct, k, truth[["xi1"]], truth[["xi2"]], truth[["zeta1"]])
+  item_angle <- rep(oct, each = k)
+  ols <- axes_ols_shadow(pop$sigma, item_angle, pop$scale)
+  expect_equal(ols[["xi2"]], truth[["xi2"]], tolerance = 1e-8)
+  expect_equal(ols[["xi1"]], truth[["xi1"]], tolerance = 1e-8)
+  expect_equal(ols[["zeta1"]], truth[["zeta1"]], tolerance = 1e-8)
+})
+
+test_that("OLS-shadow cross-checks the CFA estimate on finite data", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  k <- 4L
+  set.seed(3)
+  dat <- axes_simulate(2000L, oct, k, xi1 = .15, xi2 = .08, zeta1 = .12)
+  inames <- sprintf("i%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  items <- split(inames, rep(seq_along(oct), each = k))
+  res <- suppressMessages(axes_reliability(dat, items = items, angles = oct))
+  # The stored SEM-independent OLS-shadow agrees with the CFA axes variance.
+  expect_lt(abs(res$details$ols_shadow[["xi1"]] - res$results$xi1[[1]]), 1e-2)
+})
+
+test_that("start values do not change the converged CFA estimates", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  k <- 4L
+  set.seed(4)
+  dat <- as.data.frame(scale(axes_simulate(2000L, oct, k, .15, .08, .12)))
+  inames <- sprintf("i%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  items <- split(inames, rep(seq_along(oct), each = k))
+  xi1_no <- lavaan::parameterEstimates(
+    suppressWarnings(axes_fit(dat, items, oct))
+  )
+  xi1_no <- xi1_no$est[xi1_no$lhs == "AX" & xi1_no$op == "~~"][1]
+  xi1_st <- lavaan::parameterEstimates(
+    suppressWarnings(axes_fit(dat, items, oct, start = c(xi1 = .15, xi2 = .08, zeta1 = .12)))
+  )
+  xi1_st <- xi1_st$est[xi1_st$lhs == "AX" & xi1_st$op == "~~"][1]
+  expect_equal(xi1_no, xi1_st, tolerance = 1e-6)
+})
+
 test_that("BC13: listwise deletion reports N and refuses when N <= p", {
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture(n = 1500L)

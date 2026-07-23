@@ -127,7 +127,7 @@ FIML.
       (`R/fit_structure.R:16`), `!is.finite` guards, modular `octants()` check.
       Tests: BC11, BC12, BC13. (API gate: both instrument + explicit map; `sd =
       "std"|"raw"|numeric` — 2026-07-23.)
-- [ ] T9. OLS-shadow estimator (B-1) — regress off-diag r's on
+- [x] T9. OLS-shadow estimator (B-1) — regress off-diag r's on
       `(cos Δ, 1, same-scale)`; SEM-independent cross-check + start values.
 - [ ] T10. S3 object + print/summary + roxygen (SE caveat, per-axis rows);
       `_pkgdown.yml` + NEWS; bundle the simulated dataset (`data-raw/` +
@@ -153,6 +153,7 @@ FIML.
 - 2026-07-23: T7 done — `axis_reliability_nb()` (N–B formula, scale-level Σwᵢ²=4.0) + `cronbach_alpha()` in `R/axes_reliability.R`. BC8: hand-worked oracle (explicit w²∈{1,.5,0}, literal expected .7974358974, +independent scalar-accumulation route) — NOT Table 3 col 14 (not recomputable, RR09 Q6). BC9: high-scale-specificity cell (ζ1=.45, ξ1=.12; N=5000) reproduces Figure 3 — NB−CFA=+0.21 ≫ the .05 pre-registered margin. Full `devtools::test()` clean (0 fail, 3132 pass).
 - 2026-07-23: API question gate (pre-T8) — exported `axes_reliability()`: (Q1) support BOTH an `instrument` and an explicit `angles` + per-scale item-list map; (Q2) `sd = "std"` (default z-std √(1−rel)) | `"raw"` (observed axis-composite SD) | numeric.
 - 2026-07-23: T8 done — exported `axes_reliability(data, items, angles, instrument, sd)` + `new_axes_reliability()` S3 (`R/axes_reliability_oop.R`; print/summary deferred to T10) + `axes_resolve_map()` (both input forms) + `axes_converged()` seam. Refuse contract (BC12): ≠8 scales, non-octant/unequal/duplicate/NA angles, <2 items/scale, missing column, non-finite, zero-variance, N≤p, non-PD (1e-8 tol), non-convergence (mocked). Boundary (BC11): ξ̂1≤0 or any negative variance → NA rel/SEm + warning + flag (seed-5 ξ1=0 cell, ξ̂1<0 deterministic); small ξ̂1 (.028) → small rel ~.18. Listwise only (BC13): complete-case message + N≤p refusal, no pairwise. lavaan fit warnings suppressed (own guards). Full `devtools::test()` clean (0 fail, 3154 pass).
+- 2026-07-23: T9 done — `axes_ols_shadow()` (B-1): OLS of the off-diagonal r's on (1, cosΔ, same-scale) recovers (ξ2,ξ1,ζ1) exactly on the population matrix (1e-8) and cross-checks the CFA ξ̂1 to <1e-2 on finite data — a third SEM-independent route beside lavaan/OpenMx. Wired as lavaan `start()` seeds (floored positive; start-invariant estimates verified) and stored in `details$ols_shadow`. Full `devtools::test()` clean (0 fail, 3159 pass).
 
 ## Decisions
 
