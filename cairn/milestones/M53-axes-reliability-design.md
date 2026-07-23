@@ -1,11 +1,11 @@
 # M53: Axes-reliability (Strack 2013) — design spec + GO/NO-GO
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m53-axes-reliability-design
 
 ## Goal
 
