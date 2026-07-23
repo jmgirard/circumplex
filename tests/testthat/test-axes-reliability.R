@@ -21,3 +21,66 @@ test_that("BC10: pole weights snap exactly and theta 0 == 360", {
   resid <- w[!(w %in% c(0, 1, -1))]
   expect_true(all(abs(abs(resid) - cospi(0.25)) < 1e-12))
 })
+
+# Layer-A published-value oracle. Fixtures are Strack et al. (2013) Table 3
+# (p. 7), banked in cairn/references/strack2013.md (two-channel verified:
+# pdftotext text layer + page-image render). IIP S6 Self is a documented source
+# erratum (components sum to 101.0%); BC1 handling ruled by RR10.
+
+test_that("BC1: Spearman-Brown reproduces Table 3 reliability (Layer A)", {
+  # Four anchor rows (col 6 %axes / 100, col 10 item_n, col 11 Rel), +/-.005.
+  anchors <- data.frame(
+    xi1    = c(.260, .134, .117, .028), # IAL S1, IPI-A S9, OCAI S15, COC S16
+    item_n = c(32,   16,   8,    8),
+    rel    = c(.92,  .71,  .51,  .19)
+  )
+  expect_true(all(abs(
+    axis_reliability_sb(anchors$xi1, anchors$item_n) - anchors$rel
+  ) <= .005))
+
+  # The twelve banked non-blocked type-a rows: components (%gen, %axes, %scale,
+  # %item; %block = 0 for all), item_n, Rel. strack2013.md Table 3.
+  typea <- data.frame(
+    row   = c("IAL1S", "IAL1O", "IAL2S", "IASR3S", "IASR3O", "IIP4S",
+              "IIP5t1", "IIP5t2", "IIP6S", "IMI6O", "SASC8S", "IPIA9S"),
+    gen   = c(2.1, 2.0, 2.9, 1.1, 1.4, 13.9, 16.6, 20.5, 17.7, 1.7, 4.8, 19.2),
+    axes  = c(26.0, 26.1, 23.0, 22.9, 21.5, 11.8, 13.2, 11.8, 13.0, 27.9,
+              17.8, 13.4),
+    scale = c(6.5, 5.7, 5.3, 9.1, 8.7, 1.5, 1.5, 2.0, 2.4, 5.9, 6.2, 2.8),
+    item  = c(65.4, 66.2, 68.8, 66.9, 68.4, 72.8, 68.7, 65.7, 67.9, 64.5,
+              71.2, 64.6),
+    item_n = c(32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 16),
+    rel   = c(.92, .92, .90, .90, .90, .81, .83, .81, .81, .92, .87, .71)
+  )
+  typea$sum <- typea$gen + typea$axes + typea$scale + typea$item
+
+  # Component-sum guard (RR10 Q4): each banked row sums to its banked total
+  # +/-0.1; exactly one row (IIP S6 Self) is inconsistent, at 101.0.
+  self_consistent <- abs(typea$sum - 100.0) <= 0.1
+  expect_identical(typea$row[!self_consistent], "IIP6S")
+  expect_true(abs(typea$sum[typea$row == "IIP6S"] - 101.0) <= 0.1)
+
+  # Sweep the eleven self-consistent rows at +/-.01.
+  sc <- typea[self_consistent, ]
+  expect_true(all(abs(
+    axis_reliability_sb(sc$axes / 100, sc$item_n) - sc$rel
+  ) <= .01))
+
+  # IIP S6 Self erratum (RR10 option a): the printed pair is inconsistent, and
+  # the sum-restoring single-digit correction (%axes 13.0 -> 12.0) reproduces.
+  expect_true(abs(axis_reliability_sb(.130, 32) - .81) > .01)   # printed pair
+  expect_true(abs(axis_reliability_sb(.120, 32) - .81) <= .005) # corrected pair
+})
+
+test_that("BC2: SEm formula reproduces Table 3 col 13 (Layer A)", {
+  # sqrt(col 12 raw variance) * sqrt(1 - col 11 rel) reproduces col 13 SEm
+  # within +/-.02 for the IAL, OCAI, COC anchor rows. strack2013.md Table 3.
+  bc2 <- data.frame(
+    var = c(0.98, 15.95, 6.70), # IAL S1, OCAI S15, COC S16 (Self)
+    rel = c(.92,  .51,   .19),
+    sem = c(0.28, 2.78,  2.33)
+  )
+  expect_true(all(abs(
+    axis_sem(bc2$rel, sd = sqrt(bc2$var)) - bc2$sem
+  ) <= .02))
+})

@@ -32,3 +32,24 @@ axis_item_n <- function(angles_deg, n_items) {
   w <- axis_weights(angles_deg)
   c(x = sum(n_items * w[, "w_x"]^2), y = sum(n_items * w[, "w_y"]^2))
 }
+
+# --- Reliability and SEm ------------------------------------------------------
+
+# Spearman-Brown "list-length" reliability of a circumplex axis from its axes
+# variance component xi1 (the mean inter-item correlation an axis induces) and
+# effective test length item_n (Strack et al. 2013, p. 4):
+# Rel = (item_n * xi1) / (1 + (item_n - 1) * xi1). item_n comes from
+# axis_item_n(). Only xi1 (not the general/scale-specificity components) feeds
+# reliability (p. 4).
+axis_reliability_sb <- function(xi1, item_n) {
+  (item_n * xi1) / (1 + (item_n - 1) * xi1)
+}
+
+# Standard error of measurement (Strack et al. 2013, p. 3): SEm = SD * sqrt(1 -
+# Rel), feeding the +/-1.65*SEm single-profile location CI (p. 6). SD is the
+# axis-score scale and is a researcher choice: the z-standardized default
+# (sd = 1) gives SEm = sqrt(1 - rel); passing the raw axis SD (e.g. sqrt() of
+# Table 3's raw-variance column) reproduces the paper's raw-scale SEm.
+axis_sem <- function(rel, sd = 1) {
+  sd * sqrt(1 - rel)
+}
