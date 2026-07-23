@@ -159,3 +159,49 @@ test_that("BC4: fitted lavaan object has the intended constraint set", {
     p * (p + 1) / 2 - p - 3
   )
 })
+
+test_that("BC5: exact population matrix recovers every component (Layer B)", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  k <- 4L
+  xi1 <- .15
+  xi2 <- .08
+  zeta1 <- .12
+  eps <- 1 - xi1 - xi2 - zeta1
+  pop <- axes_population_cor(oct, k, xi1, xi2, zeta1)
+  sigma <- pop$sigma
+  p <- nrow(sigma)
+  inames <- sprintf("i%02d", seq_len(p))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, pop$scale)
+
+  # Fit the EXACT population matrix. lavaan's default ML rescales by the biased
+  # (N-1)/N likelihood divisor (RR09's verified trap: .1497 for a true .15 at
+  # N = 500); likelihood = "wishart" uses the N-1 divisor, recovering every
+  # component to numerical precision at chisq = 0. This oracle path fits a
+  # covariance matrix directly, so it does not route through sem_fit_cfa() (the
+  # fiml/listwise raw-data chokepoint); the constraint set is axes_syntax()'s.
+  fit <- lavaan::cfa(
+    axes_syntax(items, oct),
+    sample.cov = sigma, sample.nobs = 500L,
+    orthogonal = TRUE, likelihood = "wishart"
+  )
+  expect_true(lavaan::lavInspect(fit, "converged"))
+
+  pe <- lavaan::parameterEstimates(fit)
+  vhat <- function(lat) {
+    pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+  }
+  expect_lt(abs(vhat("AX") - xi1), 1e-4)
+  expect_lt(abs(vhat("AY") - xi1), 1e-4)
+  expect_lt(abs(vhat("GEN") - xi2), 1e-4)
+  expect_lt(abs(vhat("SS1") - zeta1), 1e-4)
+
+  # All item residual variances equal within 1e-6 (and recover the true eps).
+  ehat <- pe$est[pe$op == "~~" & pe$lhs == pe$rhs & pe$lhs %in% inames]
+  expect_lt(max(ehat) - min(ehat), 1e-6)
+  expect_lt(abs(mean(ehat) - eps), 1e-4)
+
+  # Exact fit at the population matrix.
+  expect_lt(unname(lavaan::fitMeasures(fit, "chisq")), 1e-6)
+})

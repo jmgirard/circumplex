@@ -118,7 +118,7 @@ FIML.
 - [x] T3. lavaan constraint set — flat fixed-links, `orthogonal = TRUE`,
       equal-axis + shared-ζ1 labels, free errors; reuse `sem_fit_cfa()`
       (`R/ssm_sem.R:736`); equivalence comment. Tests: BC4.
-- [ ] T4. Population-matrix oracle, (N−1)/N handled (wishart). Tests: BC5.
+- [x] T4. Population-matrix oracle, (N−1)/N handled (wishart). Tests: BC5.
 - [ ] T5. Finite-sample MC recovery (generator shared with T10). Tests: BC6.
 - [ ] T6. Cross-engine lavaan/OpenMx, `skip` if absent, no new Imports. BC7.
 - [ ] T7. N–B implementation + code-independent worked-example oracle +
@@ -146,6 +146,7 @@ FIML.
 - 2026-07-23: T2 checkpoint (NOT yet checked off) — `axis_reliability_sb()` + `axis_sem()` written; Layer-A oracle (BC1 revised: 4 anchors ±.005, 11-row ±.01 sweep, IIP S6 Self erratum assertions, 12-row sum guard; BC2 SEm ±.02) passes targeted + mutation-proven; full `devtools::test()` running — T2 checks off only when it is clean.
 - 2026-07-23: T2 verify clean (full `devtools::test()`: 0 fail, 3104 pass) — T2 checked off. Next: T3 lavaan constraint set (BC4).
 - 2026-07-23: T3 done — `axes_syntax()` (flat fixed-links, hierarchical-equivalence comment) + `axes_fit()` (reuses `sem_fit_cfa()`, `orthogonal = TRUE`) in `R/axes_reliability.R`; BC4 asserts on the fitted lavaan object (loadings all fixed, AX/AY equal-labeled, shared-ζ1 label, all latent covs fixed 0, errors free, df = p(p+1)/2−p−3), mutation-proven (drop-orthogonal → latcov/df fail; per-scale ζ + unequal axis labels → axeq/ss/df fail). Full `devtools::test()` clean (0 fail, 3116 pass).
+- 2026-07-23: T4 done — BC5 population-matrix oracle: fit the exact Σ built from known (ξ1,ξ2,ζ1) for a 32-item octant via `lavaan::cfa(sample.cov=, likelihood="wishart", orthogonal=TRUE)`; recovers every component exactly (ξ̂1=.15, ξ̂2=.08, ζ̂1=.12, all ε̂=.65 equal <1e-6) at χ²<1e-6. `test-local` helper `axes_population_cor()`. (N−1)/N trap mutation-proven by probe: default likelihood gives ξ̂1=.1497, misses the 1e-4 bar; only wishart passes. Full `devtools::test()` clean (0 fail, 3124 pass).
 
 ## Decisions
 
