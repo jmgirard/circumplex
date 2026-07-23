@@ -109,7 +109,7 @@ candidate; the secondary correlation-matrix-only input → candidate (N–B is
 
 ## Tasks
 
-- [ ] T1. Weights + item_n: route scale weights through `snap_trig`
+- [x] T1. Weights + item_n: route scale weights through `snap_trig`
       (`R/ssm_sem_syntax.R:160-165`) with axes at 0°/90°; per-axis item_n =
       Σwᵢ². Tests first: BC10 pole weights, BC3 exact item_n.
 - [ ] T2. Spearman–Brown reliability + SEm (z-standardized SD default arg).
@@ -145,6 +145,7 @@ candidate; the secondary correlation-matrix-only input → candidate (N–B is
 ## Work log
 
 - 2026-07-23: created by /milestone-plan; blocker cleared (cairn `_BC_HEAD` fix landed, parser reads all 13 RR09 BCs); Driving RR09, BC1–BC13 ingested verbatim as AC1–AC13; example = bundled simulated dataset; OLS-shadow (B-1) + supplement retrieval (B-2) folded in.
+- 2026-07-23: T1 done — `axis_weights()` + `axis_item_n()` in `R/axes_reliability.R`; BC3 (item_n 64→32/32→16/16→8, equal axes) + BC10 (pole snap, 0≡360) pass, mutation-proven; full `devtools::test()` clean (0 fail, 3097 pass).
 
 ## Decisions
 
