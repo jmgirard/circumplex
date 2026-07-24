@@ -34,24 +34,24 @@ cross-references them.
 
 ## Acceptance criteria
 
-- [ ] `vignettes/axes-reliability.Rmd` exists with a `%\VignetteIndexEntry{}`,
+- [x] `vignettes/axes-reliability.Rmd` exists with a `%\VignetteIndexEntry{}`,
       the `knitr::rmarkdown` engine, and UTF-8 encoding, and knits without error
       when lavaan is installed.
-- [ ] The vignette builds when lavaan is **not** installed — model-fitting
+- [x] The vignette builds when lavaan is **not** installed — model-fitting
       chunks are gated on `requireNamespace("lavaan")` and a fallback note is
       shown, mirroring `sem-based-ssm-analysis.Rmd:10-25`.
-- [ ] The vignette runs the primary workflow on `simulated_items`: it maps the
+- [x] The vignette runs the primary workflow on `simulated_items`: it maps the
       32 item columns to their 8 octant scales, calls `axes_reliability(...,
       angles = octants())`, and displays both `print()` and `summary()` output,
       naming the per-axis columns (reliability, SEm, `nb_reliability`).
-- [ ] The vignette states, in prose citing its source, each of the three caveats
+- [x] The vignette states, in prose citing its source, each of the three caveats
       the function documents: (a) `nb_reliability` **overestimates** when scale
       specificity is large (Strack et al. 2013, Fig. 3); (b) fitting the item
       **correlation** matrix as covariance makes component SEs and χ²
       **approximate** but point estimates and reliabilities correct (Cudeck,
       1989); (c) missing data are **listwise-only** and a boundary fit returns
       `NA` reliability/SEm, not a clipped value.
-- [ ] `R CMD build` / `tools::buildVignettes()` produces the vignette cleanly,
+- [x] `R CMD build` / `tools::buildVignettes()` produces the vignette cleanly,
       and `devtools::check(args = "--no-manual")` reports no new
       WARNING/NOTE attributable to it.
 
@@ -80,3 +80,22 @@ cross-references them.
 ## Decisions
 
 ## Review
+
+Reviewed 2026-07-23 on branch `m55-axes-reliability-vignette`, PR #81, base
+`master` (unmoved since cut; no merge needed).
+
+**Acceptance-criteria evidence (fresh):**
+- AC1 — `vignettes/axes-reliability.Rmd:1-8` carries `%\VignetteIndexEntry{Axes Reliability}`, `knitr::rmarkdown` engine, UTF-8. Rendered clean with lavaan present (23 KB HTML).
+- AC2 — gating at `axes-reliability.Rmd:15-16,23` (`requireNamespace`, `opts_chunk$set(eval = has_lavaan)`, note chunk `eval = !has_lavaan`). Rendered a copy with `has_lavaan` forced `FALSE`: builds, fallback note shown, no fit output leaked.
+- AC3 — workflow at `axes-reliability.Rmd:68-99`: `data("simulated_items")`, `split(names(...), rep(1:8, each = 4))`, `axes_reliability(..., angles = octants())`, `res`, `summary(res)`; per-axis columns named in prose (`item_n`, Reliability, SEm, `NB_Reliability`).
+- AC4 — three caveats with sources: NB overestimation (`:105-108`, Strack 2013 Fig. 3), correlation-as-covariance → approximate SEs/χ² (`:118-120`, Cudeck 1989), listwise-only + boundary→`NA` (`:123-131`). SEm framed as measurement imprecision, explicitly not a significance test (`:140-141`).
+- AC5 — `devtools::check(args = "--no-manual")` fresh: 0 errors, 0 warnings, 0 notes (6m26s). PR #81 CI: pkgdown pass; test-coverage + ubuntu-latest pending at review time (require green before merge).
+
+**Consistency gate:** `cairn_validate` exit 0, all checks pass (47 advisories are pre-existing wrapped work-log lines in M7, not M55). No DESIGN principle changed → `cairn_impact` skipped. `pkgdown::check_pkgdown()`: no problems found. Vignette's sole URL (Strack DOI) is byte-identical to the `\doi{}` in `R/axes_reliability.R` already validated in M54.
+
+**Independent review — three lenses, all zero findings:**
+- [O] diff-bug (Opus): ran the example live; every numeric claim matches (Reliability 0.773, NB 0.822/0.823, axes 0.175, SEm 0.476 = √(1−0.773)); all caveats reproduce the roxygen; angle convention and lavaan gating correct.
+- [S] blame-history (Sonnet): vignette faithfully restates D-025/D-026/M53/M54 decisions; `instrument=` claim does not overstate (all shipped instruments are octant); does not undo or contradict any recorded decision.
+- [S] prior-review (Sonnet): no prior-review evidence reintroduced/contradicted; M54 F2 print-note requirement (why the two axes rows match) is satisfied at `:86-88`; GitHub inline-comment probe empty.
+
+No findings surfaced → scorer/triage no-op. No follow-ups spawned.
