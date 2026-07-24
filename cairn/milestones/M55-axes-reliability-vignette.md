@@ -1,6 +1,6 @@
 # M55: Axes-Reliability vignette — teaching `axes_reliability()`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M54
 - **Driving RR:** —
@@ -69,12 +69,13 @@ cross-references them.
 - [x] T2: Worked-example section — `data("simulated_items")`, build the items list (`split(names(simulated_items), rep(1:8, each = 4))`), call `axes_reliability(..., angles = octants())`, show `res`; cross-reference the `instrument =` convenience path without running it (no 500-row registered instrument in the package).
 - [x] T3: Interpretation section — `summary(res)` (variance components + global fit), reading the per-axis reliability, SEm, and `nb_reliability` table; why X and Y match for a balanced octant instrument (differ only via `item_n`).
 - [x] T4: Caveats section — the three doc-level caveats (AC4) in precise prose, each naming its source (Strack et al. 2013; Cudeck 1989); no significance-test language for any CI (CLAUDE.md style; DECISIONS.md D-entry on vignette wording).
-- [ ] T5: Build + register — knit locally, confirm lavaan-absent build path, `tools::buildVignettes()` + `devtools::check(args = "--no-manual")` clean; confirm pkgdown auto-discovers the article (no `_pkgdown.yml` articles list to edit).
+- [x] T5: Build + register — knit locally, confirm lavaan-absent build path, `tools::buildVignettes()` + `devtools::check(args = "--no-manual")` clean; confirm pkgdown auto-discovers the article (no `_pkgdown.yml` articles list to edit).
 
 ## Work log
 
 - 2026-07-23: created by /milestone-plan (focused scope: teach `axes_reliability()`; lineage D-025 → D-026 → M53 design → M54 build → M55 docs).
 - 2026-07-23: T1–T4 — wrote `vignettes/axes-reliability.Rmd` (motivation, worked example on `simulated_items`, component/NB interpretation, three caveats). Knits clean with lavaan present (23 KB) and with lavaan forced absent (note shown, no fit output leaked).
+- 2026-07-23: T5 — `devtools::check(args = "--no-manual")` clean (0 errors, 0 warnings, 0 notes; 6m28s); vignette builds under R CMD check and is auto-registered (no `_pkgdown.yml` edit needed). All tasks done → status `review`.
 
 ## Decisions
 
