@@ -82,7 +82,7 @@ stay recorded, not decided — their source-note Open-Question status is unchang
       eq. 8 note — one comment naming both arrangements.
 - [x] T4 — Add the honest non-attribution comments at variant C (`:112`) and
       the m-cap (`:135-145`) per AC3.
-- [ ] T5 — Add the Browne (1992) Table 11 (p. 494) co-anchor to the m = 1
+- [x] T5 — Add the Browne (1992) Table 11 (p. 494) co-anchor to the m = 1
       oracle provenance in `test-cpm_oracles.R` (~`:140-142`), alongside the
       existing Grassi Table 2 citation.
 - [ ] T6 — Re-sync the "Traces to" line anchors in `browne1992.md` and
@@ -98,6 +98,10 @@ stay recorded, not decided — their source-note Open-Question status is unchang
   inline comments in R/cpm_fit.R — finer task split than the natural commit
   unit). Non-ASCII `§` in three comments replaced with ASCII `sec.` (M7
   deny-by-default). devtools::test() clean: FAIL 0 | PASS 3170.
+- 2026-07-23: T5 — Browne (1992) Table 11 (p. 494) co-anchor added to the m=1
+  oracle provenance header; verified the fixture (beta .6378/.3622, mcsc .276,
+  th_start 0/55/112/123/192/210/269) matches Table 11's printed .638/.362/.28
+  to Browne's precision. test-cpm_oracles.R: FAIL 0 | PASS 66 (9 CRAN-skip).
 
 ## Decisions
 
