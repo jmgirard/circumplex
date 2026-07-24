@@ -28,6 +28,10 @@
 #'
 #' @noRd
 cpm_rho <- function(delta, beta) {
+  # FS correlation function: Browne (1992) eq. 34 (p. 486), the angle-difference
+  # form rho(c_i,c_j) = sum_{k=1..m} beta_k cos(k(theta_j-theta_i)) + beta_0 --
+  # the same function as eq. 30 (p. 485) written on theta_d, with beta
+  # constrained by eqs. 31-32 (sum to 1; non-negative). browne1992.md.
   k <- seq_along(beta) - 1L
   d <- as.vector(delta)
   # outer over k: rows = delta entries, cols = harmonics
@@ -44,6 +48,8 @@ cpm_rho <- function(delta, beta) {
 #'
 #' @noRd
 cpm_rho_deriv <- function(delta, beta) {
+  # Derivative of the FS correlation function, Browne (1992) eq. 34 (p. 486);
+  # feeds the analytic gradient (design sec. 3.4). browne1992.md.
   k <- seq_along(beta) - 1L
   d <- as.vector(delta)
   out <- -(sin(outer(d, k)) %*% (k * beta))
@@ -64,6 +70,10 @@ cpm_rho_deriv <- function(delta, beta) {
 #' @param beta length-(m+1) numeric, non-negative, summing to 1.
 #' @noRd
 cpm_implied_cor <- function(theta, zeta, beta) {
+  # Model-implied correlation P: Browne (1992) eq. 3 (p. 471) under the
+  # communality-index identity zeta*_ii = rho(x_i,c_i) of eqs. (3b*)/4 (p. 472)
+  # -- so zeta IS Browne's communality index, not the unique variance v_ii.
+  # browne1992.md.
   p <- length(theta)
   Delta <- outer(theta, theta, `-`)
   C <- cpm_rho(Delta, beta)                 # p x p, C_ii = 1
@@ -82,6 +92,8 @@ cpm_implied_cor <- function(theta, zeta, beta) {
 #'
 #' @noRd
 cpm_implied_cov <- function(theta, zeta, beta, sigma) {
+  # Free-scaling covariance structure Sigma = D_sigma P D_sigma: Browne (1992)
+  # eq. 2 (p. 471), Sigma_x = D_zeta(P_c + D_v)D_zeta. browne1992.md.
   P <- cpm_implied_cor(theta, zeta, beta)
   (sigma %o% sigma) * P
 }
@@ -94,6 +106,9 @@ cpm_implied_cov <- function(theta, zeta, beta, sigma) {
 #'
 #' @noRd
 cpm_discrepancy <- function(R, P, ldR = NULL) {
+  # Normal-theory ML discrepancy F: Browne (1992) eq. 5 (p. 472),
+  # F = ln|Sigma| - ln|S| + tr(S Sigma^-1) - p, evaluated at R rather than S
+  # (licensed by the p. 473 scale-invariance sentence). browne1992.md.
   p <- nrow(R)
   ldP <- as.numeric(determinant(P, logarithm = TRUE)$modulus)
   if (is.null(ldR)) {
@@ -133,6 +148,9 @@ cpm_spec <- function(p, m, variant = c("A", "B", "C", "D"), reference = 1,
   stopifnot(is_scalar_count(reference), reference <= p)
 
   # m-cap (design sec. 1.4): default floor((p-1)/2) for A/C; floor(p/2) for B/D.
+  # Browne (1992) prints NO such cap -- its only guidance is the advisory
+  # "substantially less than p/2" (sec. 6.4, p. 486). This bound is the package's
+  # own (browne1992.md Departures 2), stricter than the paper on the A/C branch.
   cap <- if (variant %in% c("B", "D")) floor(p / 2) else floor((p - 1) / 2)
   if (m > cap) {
     stop(
@@ -144,6 +162,10 @@ cpm_spec <- function(p, m, variant = c("A", "B", "C", "D"), reference = 1,
     )
   }
 
+  # Variant provenance (browne1992.md Departures 3): variant D (fixed equally
+  # spaced angles, one shared zeta) is Browne (1992)'s sec. 6.5 circulant case
+  # (eq. 35, p. 487); variant C (equal communality, free angles) is the
+  # package's OWN constraint and appears nowhere in Browne.
   free_angles <- if (variant %in% c("A", "C")) (p - 1L) else 0L
   n_zeta <- if (variant %in% c("A", "B")) p else 1L
   # Free scaling adds p log-variance parameters, all free, no identification pin
@@ -152,6 +174,9 @@ cpm_spec <- function(p, m, variant = c("A", "B", "C", "D"), reference = 1,
   n_sigma <- if (scaling == "free") p else 0L
   n_beta_free <- m
 
+  # Free-parameter count q: Browne (1992) sec. 6.4 (p. 486), q = 3p+m-1 for the free
+  # covariance family (p scales + p-1 angles + p zeta + m beta); the unit family
+  # drops the p scales for q = 2p+m-1 (browne1992.md parameter map).
   q <- free_angles + n_zeta + n_sigma + n_beta_free
   # df is UNCHANGED by free scaling (spec sec. 4): the free family fits the full
   # p(p+1)/2 covariance moments with q_corr + p parameters, so
@@ -159,6 +184,9 @@ cpm_spec <- function(p, m, variant = c("A", "B", "C", "D"), reference = 1,
   # explicitly and take df = n_moments - q so both families share one formula
   # (and cpm_spec_reduce cannot drift from it).
   n_moments <- if (scaling == "free") p * (p + 1L) / 2L else p * (p - 1L) / 2L
+  # Degrees of freedom: Browne (1992) eq. 6 (p. 473), d = p(p+1)/2 - q on the
+  # covariance moments; the unit family fits p(p-1)/2 correlation moments and
+  # gives the same d (browne1992.md parameter map).
   df <- n_moments - q
 
   # index blocks within gamma* ([angle][u][s][v]); i_sigma is empty under unit.
@@ -1024,6 +1052,10 @@ cpm_rmsea_ci <- function(Tstat, df, n, level = 0.90) {
 
   lambda_l <- if (lower_fun(0) < 0) 0 else find_ncp(lower_fun)
   lambda_u <- if (upper_fun(0) < 0) 0 else find_ncp(upper_fun)
+  # RMSEA 90% CI: Browne & Cudeck (1992) eq. 14 (p. 240),
+  # (sqrt(lambda_L/(n d)); sqrt(lambda_U/(n d))) term for term, with
+  # lambda_L/lambda_U the noncentrality parameters found by inverting the
+  # noncentral chi-square above. browne1992a.md.
   c(sqrt(lambda_l / (n * df)), sqrt(lambda_u / (n * df)))
 }
 
@@ -1046,6 +1078,10 @@ cpm_fit_indices <- function(Fhat, df, p, N, R, Phat, q) {
 
   has_df <- df >= 1
   pvalue <- if (has_df) stats::pchisq(Tstat, df, lower.tail = FALSE) else NA_real_
+  # RMSEA point estimate: Browne & Cudeck (1992) eq. 13 (p. 239),
+  # sqrt(Max{F/d - 1/n, 0}) -- the arrangement implemented here -- which is
+  # algebraically Browne (1992) eq. 8 (p. 473), {Max((nF-d)/(nd),0)}^(1/2).
+  # browne1992a.md / browne1992.md.
   rmsea <- if (has_df) sqrt(max(Fhat / df - 1 / n, 0)) else NA_real_
   rmsea_ci <- if (has_df) cpm_rmsea_ci(Tstat, df, n) else c(NA_real_, NA_real_)
 
@@ -1381,6 +1417,8 @@ cpm_boundary_markers <- function(object) {
   d <- object$details
   b <- object$betas$Beta
   as.character(c(
+    # Heywood case: Browne (1992) p. 472 -- a communality index rho(x_i,c_i)
+    # estimated at one (browne1992.md).
     if (isTRUE(d$heywood)) "Heywood communality",
     if (length(d$removed_harmonics) > 0) "boundary harmonic removed",
     if (length(b) > 0 && isTRUE(min(b) < 0.10)) {

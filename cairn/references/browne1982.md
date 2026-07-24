@@ -175,15 +175,15 @@ correct; the correction is to the attribution, not to the arithmetic.
 confidence interval by this source's route — transform to an unbounded scale,
 take the symmetric normal interval there, invert. The package offers two ζ
 interval routes and neither is that one: a bootstrap **percentile** interval
-(`R/cpm_fit.R:1316-1323`), which is asymmetric about ζ̂ but gets its asymmetry
+(`R/cpm_fit.R:1346-1359`), which is asymmetric about ζ̂ but gets its asymmetry
 from the replicate distribution rather than from a transformation, and an
-analytic **Wald** interval ζ̂ ± z·σ̂(ζ̂) (`R/cpm_fit.R:1644-1645`), which is
+analytic **Wald** interval ζ̂ ± z·σ̂(ζ̂) (`R/cpm_fit.R:1682-1683`), which is
 symmetric on the natural scale and is exactly the form eq. (1.6.29) describes
 and eqs. (1.6.30)–(1.6.34) exist to improve on. Neither transforms first.
 Two `R/` sites do apply a transformation
 and are **not** instances of this method: `R/ssm_montecarlo.R:158` wraps
 Monte Carlo *draws* in `atanh`/`tanh` (variance stabilization for simulation,
-not an interval), and `R/cpm_fit.R:244` exponentiates the log-scale
+not an interval), and `R/cpm_fit.R:272` exponentiates the log-scale
 optimization parameter (the unconstrained parameterization, not an interval).
 `structure_fisher()` in `R/fit_structure.R` is Fisher's equal-axes test and
 unrelated to Fisher's z. Checked by grep over `R/` for `exp(`/`log(`/`atanh`

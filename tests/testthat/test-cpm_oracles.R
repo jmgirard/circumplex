@@ -25,7 +25,13 @@
 # The paper states this example reanalyzes the data Browne (1992) used
 # (their Table 2) and that CircE's m = 1..3 results "coincide precisely with
 # the ones obtained by CIRCUM" (p. 59), so these fixtures transitively cover
-# oracle O1 (Browne's own program) as well.
+# oracle O1 (Browne's own program) as well. That O1 coverage is also DIRECT,
+# not only transitive via CircE's claim: Browne (1992) Table 11 (p. 494,
+# "Vocational Interest Scales: Estimates") prints, on its FS m = 1 row,
+# beta_0 = .638, beta_1 = .362, rho_180 = .28 and polar angles
+# 0, 55, 112, 123, 192, 210, 269 -- matching this m = 1 fixture's
+# beta = c(.6378, .3622), mcsc = .276, and th_start angles to Browne's own
+# printed 2-3 digit precision (see cairn/references/browne1992.md sec. 8).
 #
 # ---- The CIRCUM/CircE model difference (triaged per design sec. 6.3) ---------
 # CIRCUM and CircE fit Browne's *covariance* structure
