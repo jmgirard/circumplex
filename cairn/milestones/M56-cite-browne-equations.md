@@ -70,17 +70,17 @@ stay recorded, not decided — their source-note Open-Question status is unchang
 
 ## Tasks
 
-- [ ] T1 — Build the equation→line checklist from both source notes' "Traces
+- [x] T1 — Build the equation→line checklist from both source notes' "Traces
       to" tables and `browne1992.md`'s "Departures" section; verify each cited
       equation against the note's banked verbatim form AND confirm each line
       still implements what the table claims (guard against M41-style drift —
       line numbers or code may have moved). No code change.
-- [ ] T2 — Add the inline provenance comments for the `browne1992.md`
+- [x] T2 — Add the inline provenance comments for the `browne1992.md`
       estimation lines enumerated in AC1.
-- [ ] T3 — Add the inline comments for `browne1992a.md`: `:1049` (eq. 13,
+- [x] T3 — Add the inline comments for `browne1992a.md`: `:1049` (eq. 13,
       p. 239) and `cpm_rmsea_ci` (eq. 14, p. 240). Coordinate `:1049` with T2's
       eq. 8 note — one comment naming both arrangements.
-- [ ] T4 — Add the honest non-attribution comments at variant C (`:112`) and
+- [x] T4 — Add the honest non-attribution comments at variant C (`:112`) and
       the m-cap (`:135-145`) per AC3.
 - [ ] T5 — Add the Browne (1992) Table 11 (p. 494) co-anchor to the m = 1
       oracle provenance in `test-cpm_oracles.R` (~`:140-142`), alongside the
@@ -93,6 +93,11 @@ stay recorded, not decided — their source-note Open-Question status is unchang
 ## Work log
 
 - 2026-07-23: created by /milestone-plan.
+- 2026-07-23: T1 checklist verified (all 11 anchors match banked forms; line
+  numbers current, no code drift). T2–T4 folded into one checkpoint (all
+  inline comments in R/cpm_fit.R — finer task split than the natural commit
+  unit). Non-ASCII `§` in three comments replaced with ASCII `sec.` (M7
+  deny-by-default). devtools::test() clean: FAIL 0 | PASS 3170.
 
 ## Decisions
 
