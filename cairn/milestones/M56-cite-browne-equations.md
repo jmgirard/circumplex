@@ -1,6 +1,6 @@
 # M56: Cite the published Browne equations `R/cpm_fit.R` implements
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -89,7 +89,7 @@ stay recorded, not decided — their source-note Open-Question status is unchang
       `browne1992a.md` to the post-edit line numbers. (Amended: the insertions
       also shifted cpm_fit.R cites in `browne1982.md`, `hu1999.md`, and
       `INDEX.md` — all re-synced, each new target content-verified.)
-- [ ] T7 — `Rscript -e 'devtools::test()'` clean; confirm the m = 1 oracle test
+- [x] T7 — `Rscript -e 'devtools::test()'` clean; confirm the m = 1 oracle test
       passes.
 
 ## Work log
@@ -98,6 +98,7 @@ stay recorded, not decided — their source-note Open-Question status is unchang
 - 2026-07-23: T1–T4 — verified all 11 anchors vs banked forms (lines current, no drift); added inline eq comments to R/cpm_fit.R (T2–T4 folded into one checkpoint, finer split than the natural commit unit); non-ASCII `§`→`sec.` (M7 deny-by-default); devtools::test() clean FAIL 0 | PASS 3170.
 - 2026-07-23: T5 — Browne (1992) Table 11 (p. 494) co-anchor added to the m=1 oracle header; fixture (beta .6378/.3622, mcsc .276, angles 0/55/112/123/192/210/269) matches Table 11's .638/.362/.28 to Browne's precision; test-cpm_oracles.R FAIL 0 | PASS 66 (9 CRAN-skip).
 - 2026-07-23: T6 — amended to re-sync ALL source-note cpm_fit.R line anchors (browne1982/browne1992/browne1992a/hu1999/INDEX, not just the two planned — my insertions shifted them); each new target content-verified; cairn_validate references-staleness OK.
+- 2026-07-23: T7 — full devtools::test() clean FAIL 0 | PASS 3170; status → review.
 
 ## Decisions
 
