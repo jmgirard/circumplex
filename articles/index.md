@@ -4,6 +4,8 @@
 
 - [Advanced Circumplex
   Visualization](http://circumplex.jmgirard.com/articles/advanced-visualization.md):
+- [Axes
+  Reliability](http://circumplex.jmgirard.com/articles/axes-reliability.md):
 - [Bayesian SSM
   Analysis](http://circumplex.jmgirard.com/articles/bayesian-ssm-analysis.md):
 - [Evaluating Circumplex
