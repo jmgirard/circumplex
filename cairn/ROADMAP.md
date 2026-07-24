@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-24 (M56 → DONE, merged PR #82: inline Browne equation-provenance comments in `R/cpm_fit.R` — eqs. 2/3/5/6/8/34/13/14 + Heywood cited at their implementing lines from the `browne1992`/`browne1992a` source notes; honest non-attribution at variant C + the m-cap; Browne Table 11 m=1 oracle co-anchor; `cpm_fit.R` line anchors re-synced across 5 notes. Three-lens review caught + fixed 3 stale "no citation" passages the new comments falsified; check 0/0/0, test PASS 3170. Archived. M7 still blocked on CRAN handoff.)_
+_Last hygiene check: 2026-07-23 (audit: 16/16 gate checks PASS; both GitHub inboxes empty; git reconciled; no work in flight. Two advisories: over-length hygiene line now shed; M7's 47 legacy multi-line work-log entries left as historical record. M7 stays blocked on the CRAN cadence window.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
