@@ -1,11 +1,11 @@
 # M56: Cite the published Browne equations `R/cpm_fit.R` implements
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** m56-cite-browne-equations
 
 ## Goal
 
