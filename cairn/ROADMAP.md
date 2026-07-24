@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M55 | Axes-Reliability vignette — teaching `axes_reliability()` | planned | M54 | normal | milestones/M55-axes-reliability-vignette.md |
+| M55 | Axes-Reliability vignette — teaching `axes_reliability()` | in-progress | M54 | normal | milestones/M55-axes-reliability-vignette.md |
 | M54 | Axes-reliability (Strack 2013) build — `axes_reliability()` | done | — | normal | milestones/archive/M54-axes-reliability-build.md |
 | M53 | Axes-reliability (Strack 2013) — design spec + GO/NO-GO | done | — | normal | milestones/archive/M53-axes-reliability-design.md |
 | M52 | Trim brms/Stan from CI dependency installs | done | — | normal | milestones/archive/M52-ci-install-trim-brms.md |
