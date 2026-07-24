@@ -420,10 +420,11 @@ carries the model the package implements, not the whole paper.
   machine channels over the same OCR scan (M42-D1), so a defect in the scan
   itself would not have been caught. A human read of pp. 471–473 and 485–490
   would close this — observed 2026-07-19.
-- **The code carries no citation for the equations it implements.** This
-  repeats the finding M41's review made about `browne1992a.md`'s eqs. 13/14:
-  `R/cpm_fit.R` names Browne (1992) in its header and `@references`, but no
-  line of the engine points at an equation number, so a corrector has nothing
-  local telling them which published form they are changing. Whether to
-  annotate the code is a package change and therefore outside M42's scope —
-  observed 2026-07-19.
+- **Resolved 2026-07-23 by M56 — the code now cites the equations it
+  implements.** As observed 2026-07-19 (and repeating M41's finding about
+  `browne1992a.md`'s eqs. 13/14): `R/cpm_fit.R` named Browne (1992) in its
+  header and `@references`, but no line of the engine pointed at an equation
+  number, so a corrector had nothing local telling them which published form
+  they were changing. M56 added inline equation-number comments at the
+  implementing lines (eqs. 2/3/5/6/8/34 and the Heywood definition; see the
+  "Traces to" table), which is the package change M42's scope excluded.

@@ -48,7 +48,8 @@ caught.
 2. **Estimation.** `cpm_fit()` computes the RMSEA point estimate and its 90%
    interval **natively**, by this paper's eqs. 13 and 14 — see "The RMSEA
    estimator" below. This is a live numeric dependency on the source, not a
-   citation, and the code carries no attribution to it.
+   citation. M56 (2026-07-23) added inline equation-number comments at the
+   implementing lines, so the code now carries local attribution to eqs. 13/14.
 
 ## Extracted values
 
@@ -142,8 +143,9 @@ rather than assume it is complete.
 
 ## Traces to
 
-**Estimation path** (eqs. 13–14; no attribution in the code — a corrector
-changing any of these lines is changing an implementation of this paper):
+**Estimation path** (eqs. 13–14; M56 added inline equation-number comments at
+these lines — a corrector changing any of them is changing an implementation of
+this paper, and the code now says so locally):
 
 - `R/cpm_fit.R:1085` — eq. 13, the RMSEA point estimate.
 - `R/cpm_fit.R:1039-1060` — eq. 14, `cpm_rmsea_ci()`, the 90% interval.

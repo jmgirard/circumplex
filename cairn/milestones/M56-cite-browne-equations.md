@@ -99,6 +99,7 @@ stay recorded, not decided — their source-note Open-Question status is unchang
 - 2026-07-23: T5 — Browne (1992) Table 11 (p. 494) co-anchor added to the m=1 oracle header; fixture (beta .6378/.3622, mcsc .276, angles 0/55/112/123/192/210/269) matches Table 11's .638/.362/.28 to Browne's precision; test-cpm_oracles.R FAIL 0 | PASS 66 (9 CRAN-skip).
 - 2026-07-23: T6 — amended to re-sync ALL source-note cpm_fit.R line anchors (browne1982/browne1992/browne1992a/hu1999/INDEX, not just the two planned — my insertions shifted them); each new target content-verified; cairn_validate references-staleness OK.
 - 2026-07-23: T7 — full devtools::test() clean FAIL 0 | PASS 3170; status → review.
+- 2026-07-23: review — three-lens + scorer; two lenses converged on stale "no citation" prose in browne1992a.md (:51,:145, score 85) and browne1992.md (:423-429, score 72) that M56's own comments falsified; fixed all three (past-tense/resolved framing); cairn_validate + check 0/0/0 still clean.
 
 ## Decisions
 
@@ -132,3 +133,31 @@ coverage complete, references staleness, dangling ids — 48 advisory work-log
 warnings, all pre-existing M7 wrapping). Toolchain: `devtools::check(--no-manual)`
 0 errors | 0 warnings | 0 notes; `pkgdown::check_pkgdown()` no problems. No new
 top-level files; no `DESIGN.md` principle changed (`cairn_impact` skipped).
+
+**Independent three-lens review + scorer:**
+
+- [O] diff-bug (Opus): 0 findings — all citations, non-attribution comments,
+  re-synced anchors, and the Table 11 co-anchor verified correct.
+- [S] blame-history (Sonnet) and [S] prior-review-record (Sonnet) converged
+  independently on ONE defect: three passages in the source notes still assert
+  the engine code carries no equation citation — `browne1992a.md:51`,
+  `browne1992a.md:145`, `browne1992.md:423-429` — which M56's own added
+  comments falsify. The T6 re-sync updated only the numeric anchors, not this
+  prose. (Prior-review lens confirmed GitHub PR-comment surface empty; this
+  regresses nothing — it *completes* M41's finding but left the doc side open.)
+- [S] scorer: 82 overall; sub-split loci 1–2 (`browne1992a.md`) = 85, locus 3
+  (`browne1992.md` Open-questions bullet) = 72.
+
+**Triage:**
+
+- **Fixed now (loci 1–2, score 85 — actioned):** rewrote both `browne1992a.md`
+  passages to state M56 added inline eq. 13/14 attribution (past tense + M56
+  note), so the note no longer contradicts the code it describes.
+- **Fixed now (locus 3, score 72 — below the 80 action threshold, logged and
+  fixed anyway):** the same falsified claim in `browne1992.md`'s Open-questions
+  bullet; marked "Resolved 2026-07-23 by M56" (historical framing preserved).
+  Fixed despite the sub-threshold score because it is the identical defect in a
+  file already being edited — leaving it would keep `browne1992.md` internally
+  contradictory. `grep` confirms no "no attribution"/"no citation" claim
+  remains; `cairn_validate` references-staleness still OK after the edits.
+- No follow-ups spawned; nothing rejected.
