@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-23 (M56 planned: cite the published Browne equations `R/cpm_fit.R` implements — inline provenance comments from the `browne1992.md`/`browne1992a.md` Traces-to tables + Browne Table 11 m=1 oracle co-anchor; promoted from the ROADMAP candidate, which is now removed. Comment-only + one test citation; not an M7 dependency. Prior hygiene: M55 axes-reliability vignette → DONE, PR #81; M7 still blocked on CRAN handoff.)_
+_Last hygiene check: 2026-07-24 (M56 → DONE, merged PR #82: inline Browne equation-provenance comments in `R/cpm_fit.R` — eqs. 2/3/5/6/8/34/13/14 + Heywood cited at their implementing lines from the `browne1992`/`browne1992a` source notes; honest non-attribution at variant C + the m-cap; Browne Table 11 m=1 oracle co-anchor; `cpm_fit.R` line anchors re-synced across 5 notes. Three-lens review caught + fixed 3 stale "no citation" passages the new comments falsified; check 0/0/0, test PASS 3170. Archived. M7 still blocked on CRAN handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M56 | Cite the published Browne equations `R/cpm_fit.R` implements | review | — | normal | milestones/M56-cite-browne-equations.md |
+| M56 | Cite the published Browne equations `R/cpm_fit.R` implements | done | — | normal | milestones/archive/M56-cite-browne-equations.md |
 | M55 | Axes-Reliability vignette — teaching `axes_reliability()` | done | M54 | normal | milestones/archive/M55-axes-reliability-vignette.md |
 | M54 | Axes-reliability (Strack 2013) build — `axes_reliability()` | done | — | normal | milestones/archive/M54-axes-reliability-build.md |
 | M53 | Axes-reliability (Strack 2013) — design spec + GO/NO-GO | done | — | normal | milestones/archive/M53-axes-reliability-design.md |
 | M52 | Trim brms/Stan from CI dependency installs | done | — | normal | milestones/archive/M52-ci-install-trim-brms.md |
-| M51 | Speed up CI — concurrency, paths-ignore, slimmed PR matrix | done | — | normal | milestones/archive/M51-ci-speedup.md |
 
 ## Candidates
 
