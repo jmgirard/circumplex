@@ -112,7 +112,7 @@ so a future change to that code has a published form to check against.
 
   ε̂ₐ = √(F̂₀ / d) = √( Max{ (F̂/d − 1/n), 0 } )
 
-  Implemented at `R/cpm_fit.R:1049` as
+  Implemented at `R/cpm_fit.R:1085` as
   `rmsea <- sqrt(max(Fhat / df - 1 / n, 0))`. The `Max{·, 0}` truncation and
   the `− 1/n` correction are both the equation's, not the implementation's.
 
@@ -121,7 +121,7 @@ so a future change to that code has a published form to check against.
   (ε̂ₐL ; ε̂ₐU) = ( √( λ̂L / (n d) ) ; √( λ̂U / (n d) ) )
 
   where λ̂L and λ̂U are the noncentrality parameters obtained by inverting the
-  noncentral chi-square. Implemented at `R/cpm_fit.R:1011-1028`
+  noncentral chi-square. Implemented at `R/cpm_fit.R:1039-1060`
   (`cpm_rmsea_ci()`), whose closing line
   `c(sqrt(lambda_l / (n * df)), sqrt(lambda_u / (n * df)))` is eq. 14 term for
   term, with λ̂ found by `uniroot` on `pchisq(Tstat, df, ncp = λ)`.
@@ -145,8 +145,8 @@ rather than assume it is complete.
 **Estimation path** (eqs. 13–14; no attribution in the code — a corrector
 changing any of these lines is changing an implementation of this paper):
 
-- `R/cpm_fit.R:1049` — eq. 13, the RMSEA point estimate.
-- `R/cpm_fit.R:1011-1028` — eq. 14, `cpm_rmsea_ci()`, the 90% interval.
+- `R/cpm_fit.R:1085` — eq. 13, the RMSEA point estimate.
+- `R/cpm_fit.R:1039-1060` — eq. 14, `cpm_rmsea_ci()`, the 90% interval.
 - `R/cpm_oop.R:40-42,183-185` — where that estimate and interval are printed.
 
 **Wording path** (the cutoffs):

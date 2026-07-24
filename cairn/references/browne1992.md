@@ -99,7 +99,7 @@ Equation numbers below are the paper's own. Sections are the paper's own.
   **This is algebraically the same estimator as `browne1992a.md`'s eq. 13**,
   which prints it as √(Max{F̂/d − 1/n, 0}) — the two arrangements are equal
   term for term, since (nF̂ − d)/(nd) = F̂/d − 1/n. The package implements the
-  `browne1992a` arrangement (`R/cpm_fit.R:1049`). n = N − 1 here (p. 473).
+  `browne1992a` arrangement (`R/cpm_fit.R:1085`). n = N − 1 here (p. 473).
 
 - **Scale invariance, p. 473, verbatim**: "Since all models under
   consideration will be special cases of model (2), and this is invariant
@@ -252,14 +252,14 @@ walked against the code.
 |---|---|---|
 | `beta` (length m+1, indexed from k = 0, non-negative, sums to 1) | β₀…β_m of the FS correlation function | eqs. (30)–(32); `R/cpm_fit.R:30` (`cpm_rho`) |
 | `cpm_rho(delta, beta)` | ρ(θ_d) evaluated on the angle difference | eq. (34); `R/cpm_fit.R:30` |
-| `theta` (radians internally, degrees at the API) | the polar angles θᵢ, one held fixed at a reference | eq. (34) and §6.7's θ_r = 0 convention; `R/cpm_fit.R:127` (`reference`) |
-| `zeta` (length p, in (0, 1]) | **ζ\*ᵢᵢ = ρ(xᵢ, cᵢ), the communality index** — *not* the unique variance vᵢᵢ and *not* its square | eqs. (3b\*) and (4); `R/cpm_fit.R:66` |
-| `P = D_zeta C D_zeta + (I − D_zeta²)` | P_x of eq. (3) | verified below; `R/cpm_fit.R:66` (`cpm_implied_cor`) |
-| `sigma` (free scaling, M18/D-009) | the scale-dependent ζᵢᵢ of D_ζ in the covariance structure | eq. (2); `R/cpm_fit.R:84` (`cpm_implied_cov`) |
-| `cpm_discrepancy` | F(S, Σ), evaluated at R rather than S | eq. (5) + the p. 473 scale-invariance sentence; `R/cpm_fit.R:96` |
-| `q` | the free-parameter count | eq. (6)'s q; §6.6's 2p + m − 1 (unit) / §6.4's 3p + m − 1 (free); `R/cpm_fit.R:155` |
-| `df` | d | eq. (6); `R/cpm_fit.R:161-162` |
-| `heywood` diagnostic | "a Heywood case occurs if an estimate of a communality index … is equal to one" | p. 472; `R/cpm_fit.R:1384` |
+| `theta` (radians internally, degrees at the API) | the polar angles θᵢ, one held fixed at a reference | eq. (34) and §6.7's θ_r = 0 convention; `R/cpm_fit.R:142` (`reference`) |
+| `zeta` (length p, in (0, 1]) | **ζ\*ᵢᵢ = ρ(xᵢ, cᵢ), the communality index** — *not* the unique variance vᵢᵢ and *not* its square | eqs. (3b\*) and (4); `R/cpm_fit.R:72` |
+| `P = D_zeta C D_zeta + (I − D_zeta²)` | P_x of eq. (3) | verified below; `R/cpm_fit.R:72` (`cpm_implied_cor`) |
+| `sigma` (free scaling, M18/D-009) | the scale-dependent ζᵢᵢ of D_ζ in the covariance structure | eq. (2); `R/cpm_fit.R:94` (`cpm_implied_cov`) |
+| `cpm_discrepancy` | F(S, Σ), evaluated at R rather than S | eq. (5) + the p. 473 scale-invariance sentence; `R/cpm_fit.R:108` |
+| `q` | the free-parameter count | eq. (6)'s q; §6.6's 2p + m − 1 (unit) / §6.4's 3p + m − 1 (free); `R/cpm_fit.R:180` |
+| `df` | d | eq. (6); `R/cpm_fit.R:186-190` |
+| `heywood` diagnostic | "a Heywood case occurs if an estimate of a communality index … is equal to one" | p. 472; `R/cpm_fit.R:1422` |
 | reflection canonicalization | the p. 477 arbitrariness of rotation direction | Requirement 5, p. 477 |
 
 **The `zeta` identity, verified rather than asserted.** Substituting
@@ -267,7 +267,7 @@ walked against the code.
 (P_x)ᵢⱼ = ζ*ᵢ ζ*ⱼ (P_c)ᵢⱼ (D_v is diagonal, so it contributes nothing
 off-diagonal), and on the diagonal ζ*ᵢᵢ²(1 + vᵢᵢ) = 1. That is exactly the
 code's `P <- (zeta %o% zeta) * C; diag(P) <- 1`
-(`R/cpm_fit.R:66-72`). The engine therefore estimates Browne's communality
+(`R/cpm_fit.R:72-82`). The engine therefore estimates Browne's communality
 index directly, which is why `tests/testthat/test-cpm_oracles.R:131`
 converts CircE's published vᵢᵢ by 1/√(1 + v) before comparing (the reasoning
 is in the comment at `:128-130`).
@@ -294,16 +294,16 @@ something the paper does not state.
    and does not derive angles from eq. (48). It takes the user's theoretical
    angles as the angle start, sets ζ from a max-|rᵢⱼ| rule clipped to
    [0.3, 0.95], and fits β by least squares of the off-diagonal rᵢⱼ on
-   {cos(k·Δᵢⱼ)} (`R/cpm_fit.R:409-439`). The *recipe* — eqs. (41)–(47) and
+   {cos(k·Δᵢⱼ)} (`R/cpm_fit.R:437-467`). The *recipe* — eqs. (41)–(47) and
    eq. (48)'s arc-cos angle formula — is therefore banked above as published
    context that no repo line computes. **One piece of §6.7 is not idle:** its
    θ_r = 0 reference-variable convention (p. 488) is the published warrant for
-   the engine's `reference` pin (`R/cpm_fit.R:127`), as the parameter map's
+   the engine's `reference` pin (`R/cpm_fit.R:142`), as the parameter map's
    `theta` row records. Do not read this departure as licence to drop the
    §6.7 transcription.
 2. **The engine imposes an identification cap on m that the paper does not
    print.** `cpm_spec()` caps m at floor((p−1)/2) for variants A/C and
-   floor(p/2) for B/D (`R/cpm_fit.R:135-145`). Browne states no cap: §6.4's
+   floor(p/2) for B/D (`R/cpm_fit.R:150-162`). Browne states no cap: §6.4's
    guidance is the advisory "substantially less than p/2" for Requirement 2,
    and §6.5 uses m = [p/2] for the circulant case. The cap is the package's,
    and it is stricter than the paper's advice on the A/C branch.
@@ -311,7 +311,7 @@ something the paper does not state.
    equally spaced angles, one shared ζ) is the §6.5 circulant case; variant B
    (fixed angles, free ζ) is a partial one. **Variant C, equal communality
    with free angles, appears nowhere in this paper** — it is the design's own
-   constraint (`R/cpm_fit.R:112`).
+   constraint (`R/cpm_fit.R:127`).
 
 ## Errata — the paper's own internal inconsistencies
 
@@ -377,18 +377,18 @@ carries the model the package implements, not the whole paper.
 ## Traces to
 
 - `R/cpm_fit.R:2` — the engine header naming this paper as the model.
-- `R/cpm_fit.R:30,46` — `cpm_rho()` / `cpm_rho_deriv()`: eq. (34) and its
+- `R/cpm_fit.R:30,50` — `cpm_rho()` / `cpm_rho_deriv()`: eq. (34) and its
   derivative.
-- `R/cpm_fit.R:66-72` — `cpm_implied_cor()`: eq. (3) under the (3b\*) identity.
-- `R/cpm_fit.R:84-87` — `cpm_implied_cov()`: eq. (2)'s scaling.
-- `R/cpm_fit.R:96-105` — `cpm_discrepancy()`: eq. (5).
-- `R/cpm_fit.R:112` — the variant table, whose variant C has no counterpart here.
-- `R/cpm_fit.R:135-145` — the m cap, which the paper does not print.
-- `R/cpm_fit.R:155,161-162` — q and d: eq. (6).
-- `R/cpm_fit.R:1049` — the RMSEA point estimate: eq. (8) here, printed as
+- `R/cpm_fit.R:72-82` — `cpm_implied_cor()`: eq. (3) under the (3b\*) identity.
+- `R/cpm_fit.R:94-98` — `cpm_implied_cov()`: eq. (2)'s scaling.
+- `R/cpm_fit.R:108-117` — `cpm_discrepancy()`: eq. (5).
+- `R/cpm_fit.R:127` — the variant table, whose variant C has no counterpart here.
+- `R/cpm_fit.R:150-162` — the m cap, which the paper does not print.
+- `R/cpm_fit.R:180,186-190` — q and d: eq. (6).
+- `R/cpm_fit.R:1085` — the RMSEA point estimate: eq. (8) here, printed as
   `browne1992a.md`'s eq. 13, which is the arrangement the code follows.
-- `R/cpm_fit.R:1384` — the Heywood marker: p. 472.
-- `R/cpm_fit.R:1504`, `R/cpm_fit.R:1781` — the `@references` entries.
+- `R/cpm_fit.R:1422` — the Heywood marker: p. 472.
+- `R/cpm_fit.R:1542`, `R/cpm_fit.R:1819` — the `@references` entries.
 - `R/cpm_oop.R:123,162` — the "Circular Process Model (Browne, 1992)" print
   headers.
 - `R/ssm_ci_accuracy.R:169-170` — the `@references` entry for the CPM

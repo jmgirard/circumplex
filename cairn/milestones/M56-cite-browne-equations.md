@@ -85,23 +85,19 @@ stay recorded, not decided — their source-note Open-Question status is unchang
 - [x] T5 — Add the Browne (1992) Table 11 (p. 494) co-anchor to the m = 1
       oracle provenance in `test-cpm_oracles.R` (~`:140-142`), alongside the
       existing Grassi Table 2 citation.
-- [ ] T6 — Re-sync the "Traces to" line anchors in `browne1992.md` and
-      `browne1992a.md` to the post-edit line numbers.
+- [x] T6 — Re-sync the "Traces to" line anchors in `browne1992.md` and
+      `browne1992a.md` to the post-edit line numbers. (Amended: the insertions
+      also shifted cpm_fit.R cites in `browne1982.md`, `hu1999.md`, and
+      `INDEX.md` — all re-synced, each new target content-verified.)
 - [ ] T7 — `Rscript -e 'devtools::test()'` clean; confirm the m = 1 oracle test
       passes.
 
 ## Work log
 
 - 2026-07-23: created by /milestone-plan.
-- 2026-07-23: T1 checklist verified (all 11 anchors match banked forms; line
-  numbers current, no code drift). T2–T4 folded into one checkpoint (all
-  inline comments in R/cpm_fit.R — finer task split than the natural commit
-  unit). Non-ASCII `§` in three comments replaced with ASCII `sec.` (M7
-  deny-by-default). devtools::test() clean: FAIL 0 | PASS 3170.
-- 2026-07-23: T5 — Browne (1992) Table 11 (p. 494) co-anchor added to the m=1
-  oracle provenance header; verified the fixture (beta .6378/.3622, mcsc .276,
-  th_start 0/55/112/123/192/210/269) matches Table 11's printed .638/.362/.28
-  to Browne's precision. test-cpm_oracles.R: FAIL 0 | PASS 66 (9 CRAN-skip).
+- 2026-07-23: T1–T4 — verified all 11 anchors vs banked forms (lines current, no drift); added inline eq comments to R/cpm_fit.R (T2–T4 folded into one checkpoint, finer split than the natural commit unit); non-ASCII `§`→`sec.` (M7 deny-by-default); devtools::test() clean FAIL 0 | PASS 3170.
+- 2026-07-23: T5 — Browne (1992) Table 11 (p. 494) co-anchor added to the m=1 oracle header; fixture (beta .6378/.3622, mcsc .276, angles 0/55/112/123/192/210/269) matches Table 11's .638/.362/.28 to Browne's precision; test-cpm_oracles.R FAIL 0 | PASS 66 (9 CRAN-skip).
+- 2026-07-23: T6 — amended to re-sync ALL source-note cpm_fit.R line anchors (browne1982/browne1992/browne1992a/hu1999/INDEX, not just the two planned — my insertions shifted them); each new target content-verified; cairn_validate references-staleness OK.
 
 ## Decisions
 
