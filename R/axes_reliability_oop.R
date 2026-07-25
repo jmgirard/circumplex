@@ -60,10 +60,14 @@ axes_se_caveat <- paste0(
 #' @export
 print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   d <- x$details
+  from_cormat <- identical(d$input, "cormat")
   cat(
     "\nCircumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)",
+    "\nInput:        ", if (from_cormat) "correlation matrix" else "item data",
     "\nItems:        ", d$n_items, " (", d$n_scales, " scales)",
-    "\nComplete N:   ", d$n,
+    # "Complete N" names the listwise complete-case count, which only the raw
+    # path has; a supplied correlation matrix carries a stated sample size.
+    if (from_cormat) "\nSample N:     " else "\nComplete N:   ", d$n,
     "\nSEm scale:    ", if (is.character(d$sd)) d$sd else "custom",
     "\n\n# Per-axis reliability\n\n",
     sep = ""
@@ -92,6 +96,15 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
     cat(
       "\n  Note: the two axes share one axes-variance estimate and, with equal",
       "\n  items per axis, carry the same reliability -- expected, not an error.\n",
+      sep = ""
+    )
+  }
+  if (from_cormat) {
+    # RR09 sec. 7.4: NA-with-reason, never silently dropped.
+    cat(
+      "\n  Note: the Nunnally-Bernstein comparison needs the raw item scores",
+      "\n  (scale alphas and the axis-composite variance), so it is NA on the",
+      "\n  correlation-matrix path.\n",
       sep = ""
     )
   }

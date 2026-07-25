@@ -82,15 +82,15 @@ no dependency and D-001 is not superseded (M59 plan gate).
       `cormat`/`n` arguments and watch it fail. Prove each new guard by
       mutation, not by eye, and scope every probe to the surface it claims to
       check (M57).
-- [ ] T2. Add `cormat`/`n` and the AC5 refuse contract in `axes_reliability()`
+- [x] T2. Add `cormat`/`n` and the AC5 refuse contract in `axes_reliability()`
       (`R/axes_reliability.R:366`), mirroring `cpm_fit()`'s validation block
       (`R/cpm_fit.R:1583`), reusing the existing PD/eigenvalue guard at `:456`
       and bypassing the listwise block at `:427`.
-- [ ] T3. Route the fit to `sample.cov`/`sample.nobs`. `sem_fit_cfa()`
+- [x] T3. Route the fit to `sample.cov`/`sample.nobs`. `sem_fit_cfa()`
       (`R/ssm_sem.R:745`) is the single `lavaan::cfa` chokepoint and takes
       `data`; extend it or add a sibling seam without disturbing its SEM
       callers. `axes_ols_shadow()` (`:137`) already takes `R` directly.
-- [ ] T4. N–B → `NA` with a stated reason; refuse `sd = "raw"`; update
+- [x] T4. N–B → `NA` with a stated reason; refuse `sd = "raw"`; update
       `print`/`summary`. Grep every consumer of `nb_reliability` and the
       `details` list before changing their contract (M18).
 - [ ] T5. AC3(a) population-matrix oracle through the public `cormat` path.
@@ -109,6 +109,7 @@ no dependency and D-001 is not superseded (M59 plan gate).
 - 2026-07-25: created by /milestone-plan.
 - 2026-07-25: start — status in-progress, branch `m59-axes-reliability-corr-input` cut from master.
 - 2026-07-25: T1 — AC2 round-trip test written first; fails with `unused arguments (cormat, n)`, the intended pre-implementation failure.
+- 2026-07-25: T2–T4 — `cormat`/`n` path, refuse contract, `axes_fit_cormat()` seam, N–B `NA`-with-reason, `sd="raw"` refusal, print/summary. Round-trip agrees to 1e-15 (not merely inside the 1e-6 bar); the wishart/normal ratio measured exactly 499/500, confirming the `(N−1)/N` mechanism is matched rather than tolerated. Suite FAIL 0 / PASS 3263 (baseline 3247 + the 16 new).
 - 2026-07-25: amended AC1/AC2/AC3a/AC4/AC5 + Scope + T1/T2/T8 at the implement gate — the planned `nobs`-switches-`data` surface is replaced by `cormat` + `n`, matching `cpm_fit()`'s existing correlation-matrix path (`R/cpm_fit.R:1559`), a house precedent the plan's collision sweep missed. Jeff's call at the gate.
 
 ## Decisions
