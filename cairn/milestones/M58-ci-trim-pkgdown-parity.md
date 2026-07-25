@@ -18,8 +18,10 @@ mechanical allowlist/DESCRIPTION sync check.
 **In:**
 - `pkgdown.yaml`: `dependencies: '"hard"'` + explicit allowlist (DESCRIPTION
   `Suggests` minus brms, plus `any::pkgdown`, `local::.`), replacing
-  `needs: website` — its lockfile currently carries brms 2.23.0 + the Stan
-  stack M52 removed from the other two jobs.
+  `needs: website` — its lockfile currently carries brms 2.23.0 and rstan,
+  which the site never uses. (M52's "brms + its Stan stack
+  rstan/StanHeaders/RcppParallel/BH" framing misattributed three of those:
+  BH/RcppParallel/StanHeaders are OpenMx's, not brms's.)
 - `pkgdown.yaml`: M51-shape concurrency (`cancel-in-progress: true`, stable
   per-ref group) — today's PR group key is `github.run_id`, unique per run, so
   superseded runs never cancel.
@@ -42,9 +44,14 @@ mechanical allowlist/DESCRIPTION sync check.
 
 ## Acceptance criteria
 
-- [ ] AC1 — The pkgdown job resolves and installs none of brms, rstan,
-      StanHeaders, RcppParallel, BH: its live job log's resolution output
-      contains no match for them, and the site build is green.
+- [ ] AC1 — The pkgdown job no longer resolves or installs brms or rstan:
+      `any::brms` appears zero times in the job's `.github/pkg.lock`, and
+      neither package appears in its install plan. BH, RcppParallel and
+      StanHeaders are deliberately NOT part of this criterion — they are
+      OpenMx `LinkingTo`/`Imports` dependencies, and D-029 keeps OpenMx, so
+      they are installed by design. A session-info listing is not evidence
+      either way: it reports the restored cache's library, not this run's
+      install plan.
 - [ ] AC2 — pkgdown's allowlist equals DESCRIPTION `Suggests` minus brms, and
       the built site's growth, SEM, and axes-reliability articles show their
       fitted results (glmmTMB/lavaan chunks evaluated, not the not-installed
@@ -96,6 +103,7 @@ mechanical allowlist/DESCRIPTION sync check.
 - 2026-07-25: status planned->in-progress; branch `m58-ci-trim-pkgdown-parity` cut from master@425fd294.
 - 2026-07-25: T1 done — `tools/check-ci-deps.R` (base R, handles block + inline `extra-packages` forms); `^tools$` added to .Rbuildignore. Local teeth check: flags pkgdown's real drift, and an injected `tibble` Suggest is named per-file; exit 1 both, clean revert.
 - 2026-07-25: T2-T5 done — pkgdown gets the hard-deps+allowlist install (brms/Stan out, glmmTMB/lavaan kept), workflow-level `cancel-in-progress`, and paths-ignore; push triggers on all three workflows gain paths-ignore; guard wired into R-CMD-check after setup-r. Guard now exits 0; all three YAMLs parse; `devtools::test()` 0 FAIL / 3247 PASS / 0 SKIP.
+- 2026-07-25: AMENDMENT (substantive, user-gated) — AC1 and the pkgdown Scope bullet narrowed from five packages to brms+rstan. BH/RcppParallel/StanHeaders are OpenMx LinkingTo/Imports deps (PR #84 pkgdown log, `"ref": "any::OpenMx"` block), not brms's, so D-029 guarantees their presence and the original AC1 was unsatisfiable. Misattribution inherited from M52's framing; M52's archive left untouched (history, IP4) and its R-CMD-check comment left alone at the user's choice.
 
 ## Decisions
 

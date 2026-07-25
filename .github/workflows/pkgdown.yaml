@@ -53,11 +53,13 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           # Same allowlist discipline as R-CMD-check.yaml / test-coverage.yaml:
-          # `needs: website` resolved ALL Suggests, which put brms and the whole
-          # Stan stack (rstan/rstanarm/StanHeaders/RcppParallel/BH) into this
-          # job's lockfile even though the site never needs them — the Bayesian
-          # vignette's brm() chunk is eval = FALSE against a committed .rds
-          # fixture (cairn D-015). glmmTMB/lavaan ARE needed: they evaluate the
+          # `needs: website` resolved ALL Suggests, which put brms and rstan
+          # into this job's lockfile even though the site never needs them —
+          # the Bayesian vignette's brm() chunk is eval = FALSE against a
+          # committed .rds fixture (cairn D-015). Note that BH, RcppParallel
+          # and StanHeaders are NOT brms's and do not go away: they are OpenMx
+          # LinkingTo/Imports deps, and OpenMx stays (cairn D-029).
+          # glmmTMB/lavaan ARE needed: they evaluate the
           # growth, SEM and axes-reliability articles' fitting chunks, which
           # would otherwise publish as "package not installed" notes.
           # This list MUST stay a mirror of DESCRIPTION Suggests minus brms;
