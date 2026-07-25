@@ -1,10 +1,25 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+# paths-ignore on BOTH triggers (cairn M58): a cairn-only commit cannot change
+# the site, and on push this workflow also deploys to gh-pages, so it was
+# rebuilding and redeploying for nothing.
+# This list is deliberately SHORTER than the other two workflows' — it is
+# `cairn/**` only. `man/**` and `README.md` are ignorable for R CMD check and
+# coverage but are direct INPUTS here: `_pkgdown.yml` declares a `reference:`
+# section, so pkgdown renders every man/*.Rd into the published reference
+# pages, and the site home page is built from README.md. Ignoring either would
+# let a roxygen regeneration or a README edit leave the live site stale until
+# some unrelated commit happened along (M58 review, F3).
+# `**/*.Rmd` is likewise not ignored: vignette sources are articles.
 on:
   push:
     branches: [main, master]
+    paths-ignore:
+      - 'cairn/**'
   pull_request:
     branches: [main, master]
+    paths-ignore:
+      - 'cairn/**'
   release:
     types: [published]
   workflow_dispatch:
@@ -13,12 +28,23 @@ name: pkgdown.yaml
 
 permissions: read-all
 
+# Two regimes, because unlike the other two workflows this one DEPLOYS.
+# PRs: keyed per ref and cancelled on supersession — the M51 behaviour, and
+# what the old job-level block failed to do (it keyed PRs on github.run_id,
+# unique per run, so nothing ever cancelled).
+# Deploying events (push / release / workflow_dispatch): ONE shared key and no
+# cancellation, so they queue instead of racing each other onto gh-pages. The
+# old block collapsed all non-PR events to the literal `true`, which serialized
+# them by accident; keying on github.ref alone would have split a release
+# (refs/tags/<tag>) from a master push (refs/heads/master) and let two
+# concurrent deploys collide — `clean: false` makes a mixed tree possible.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
-    # Only restrict concurrency for non-PR jobs
-    concurrency:
-      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
@@ -34,8 +60,35 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
-          needs: website
+          # Same allowlist discipline as R-CMD-check.yaml / test-coverage.yaml:
+          # `needs: website` resolved ALL Suggests, which put brms and rstan
+          # into this job's lockfile even though the site never needs them —
+          # the Bayesian vignette's brm() chunk is eval = FALSE against a
+          # committed .rds fixture (cairn D-015). Note that BH, RcppParallel
+          # and StanHeaders are NOT brms's and do not go away: they are OpenMx
+          # LinkingTo/Imports deps, and OpenMx stays (cairn D-029).
+          # glmmTMB/lavaan ARE needed: they evaluate the
+          # growth, SEM and axes-reliability articles' fitting chunks, which
+          # would otherwise publish as "package not installed" notes.
+          # This list MUST stay a mirror of DESCRIPTION Suggests minus brms;
+          # tools/check-ci-deps.R enforces that. See cairn milestone M58.
+          dependencies: '"hard"'
+          extra-packages: |
+            any::pkgdown
+            any::covr
+            any::ggrepel
+            any::glmmTMB
+            any::kableExtra
+            any::knitr
+            any::lavaan
+            any::OpenMx
+            any::psych
+            any::RColorBrewer
+            any::rmarkdown
+            any::roxygen2
+            any::testthat
+            any::vdiffr
+            local::.
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)

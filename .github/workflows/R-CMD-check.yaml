@@ -3,6 +3,10 @@
 on:
   push:
     branches: [main, master]
+    paths-ignore:
+      - 'cairn/**'
+      - 'man/**'
+      - 'README.md'
   pull_request:
     branches: [main, master]
     paths-ignore:
@@ -51,6 +55,13 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+
+      # Runs BEFORE the dependency install, so a drifted allowlist fails the
+      # job instead of silently skipping the package it forgot
+      # (_R_CHECK_FORCE_SUGGESTS_ is false below — cairn M52/M58). Base R only,
+      # so it needs nothing installed beyond the R set up above.
+      - name: Check CI dependency allowlists match DESCRIPTION
+        run: Rscript tools/check-ci-deps.R
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
