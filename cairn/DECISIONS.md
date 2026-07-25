@@ -748,3 +748,44 @@ quasi-circumplex weights, the secondary correlation-matrix input, and blockwise
 ζ2 are deferred (build/candidate scope). D-025's design→build path is discharged
 on its GO branch; D-006/D-014 minimal-deps reinforced (lavaan/OpenMx stay
 `Suggests`, no new Import). Source: RR09 (Fable, 2026-07-23); M53 T6.
+
+### D-027 (2026-07-24): ΔCFI enters `ssm_sem()` as a reported-only criterion, scope-gated to the envelope its source simulated (M57)
+
+**Context:** the M5 SEM design left an open decision (§12.2 item 2): Δχ² was
+the invariance verdict statistic, and alternative-index cutoffs would be
+"offered only once transcribed". The Cheung & Rensvold (2002) transcription
+landed 2026-07-07 but M5 T4 shipped without wiring it, leaving a candidate
+row. M57 takes it up. Two things make the choice non-obvious: the article
+states the direction of its own rule backwards, and the package's default
+estimator (MLR) is outside the scope the article's simulation covers.
+**Decision, three parts.** (1) **Reported, never gating.** The ladder table
+carries `dcfi` = CFI(rung) − CFI(previous *fitted* rung); `comparable`, the
+verdict string, and the fit the estimation layer consumes read the nested Δχ²
+test and nothing else. Gating on ΔCFI was rejected: the two criteria answer
+different questions and can legitimately disagree, and a package that gates on
+whichever criterion is handier has no stable contract. (2) **The direction
+comes from the simulation, not the printed sentence.** The p. 251 sentence says
+ΔCFI ≤ −.01 means invariance "should not be rejected"; Table 5 (p. 248) shows
+its critical values are the 1% *lower* tails of the simulated null
+distributions (ΔCFI 1% entries −.0085 … −.0039, null means ≈ 0), so a value at
+or below the cutoff is the 1%-level evidence *against* invariance. The repo
+implements ΔCFI < −.01 → reject, with ≥ −.01 retaining, and cites
+`cairn/references/cheung2002.md` for it rather than the sentence.
+(3) **Scope-gated, and the gate keys on the statistic.** The retain/reject
+label prints only for exactly two groups AND a plain normal-theory CFI (no
+`cfi.robust`/`cfi.scaled` in `fitMeasures()`); elsewhere the value prints with
+an explicit not-validated note and no verdict. Keying on the differenced
+statistic rather than on `estimator == "ML"` ties the label to the quantity it
+judges, so a robust index can never be labeled against a normal-theory cutoff.
+**Rejected alternative:** extrapolating the cutoff to robust CFI or >2 groups.
+Cheung & Rensvold simulated neither (p. 251: two groups, ML, multivariate
+normal, Type I error only; robust variants postdate the study), so a cutoff
+there would be invented, not extended. The package declines to flag rather
+than fabricate a threshold — which is why the flag is OFF under `ssm_sem()`'s
+own MLR default, an intended consequence and not a defect.
+**Consequences:** an exported `print()` surface change inside unreleased
+v2.0.0 (NEWS bullet, no deprecation cycle owed — the function is new in this
+release). ΔGamma hat (−.001) and ΔMcDonald's NCI (−.02) stay transcribed in
+`cheung2002.md` and unwired; a candidate row carries them. Any future
+robust-CFI or multi-group flag needs new simulation evidence and a superseding
+entry here.

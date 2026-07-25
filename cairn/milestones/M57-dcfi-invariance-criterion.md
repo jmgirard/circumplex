@@ -1,6 +1,6 @@
 # M57: ΔCFI secondary invariance criterion for `ssm_sem()`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -41,7 +41,7 @@ Add the Cheung–Rensvold (2002) ΔCFI as a labeled, reported-only secondary inv
 - [x] T2: implement `dcfi` in `sem_fit_ladder` ([R/ssm_sem.R:776](R/ssm_sem.R:776)) and the scope-gated flag; wire into the table print ([R/ssm_sem.R:1604](R/ssm_sem.R:1604)). No touch to `comparable`/verdict/`fit_est` selection.
 - [x] T3: author `cairn/references/cheung2002.md`; add the inline `# Cheung & Rensvold (2002)` citation at the implementing lines; update `INDEX.md`; correct the stale INDEX + `devel/m5-sem-design.md` §12.2 prose.
 - [x] T4: roxygen on `ssm_sem()` + NEWS.md entry + SEM-vignette paragraph.
-- [ ] T5: D-entry (D-027) recording the decision; `devtools::document()`; `devtools::test()`; `devtools::check(args = "--no-manual")`.
+- [x] T5: D-entry (D-027) recording the decision; `devtools::document()`; `devtools::test()`; `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
@@ -51,6 +51,9 @@ Add the Cheung–Rensvold (2002) ΔCFI as a labeled, reported-only secondary inv
 - 2026-07-24: T3 — `cairn/references/cheung2002.md` authored. Not carried over from the 2026-07-07 transcription: every anchored page (233, 248–251) was re-read against the born-digital PDF text layer this session (M40 lesson — authoring a page is a fresh extraction). The two channels agree on every value; two typographic diffs recorded (the article prints "–0.01", and the general-criterion sentence spans pp. 250–251). Table 5's ΔCFI 1% column (−.0085 … −.0039, all negative, means ≈ 0) is the decisive internal evidence that the p. 251 sentence has the direction backwards — a stronger direction oracle than the transcription's reasoning alone. No DOI is printed anywhere in the 23-page PDF, so none is asserted.
 - 2026-07-24: T3 stale-prose sweep (M56 lesson) grepped the OLD assertion's keywords, not just the touched lines: corrected in place the INDEX "owes no page / unexercised offer" block, `devel/m5-sem-design.md` §6.2's TBT paragraph and §12.2 item 2, and — found by the sweep, beyond AC4's named two — `cairn/references/wendt2019.md`'s "sources are not on the shelf" claim, which was already wrong for cheung2002 and gurtman2003 when written. `cairn/milestones/archive/M41-*.md` carries the same falsified claim and is left byte-untouched (history, IP4); `devel/cr2002-transcription.md` likewise (ROADMAP's byte-untouched-until-M7 constraint). `cairn_validate`: all checks pass, `references index<->disk` PASS.
 - 2026-07-24: T4 — `@param invariance` + `@return` + a new `@references` entry; a NEWS bullet in the Latent-variable (SEM) section (v2.0.0 is unreleased and `ssm_sem()` is new in it, so this is a feature note, not a changed-behavior entry); vignette §7 gains two paragraphs, §8's caveat list a clause, and the reference list the citation. All three surfaces state cutoff + alpha, reported-only (with why the two criteria can disagree: ΔCFI is sample-size-insensitive, Δχ² is not), and the full scope. `document()` run; roxygen and the generated Rd are ASCII-only (M7's literal-Greek PDF-manual lesson). Tests 0 failures / 3220 pass.
+- 2026-07-24: T5 — D-027 appended (reported-only; direction from Table 5's 1% tails, not the p. 251 sentence; scope gate keyed on the differenced statistic; extrapolation to robust CFI / >2 groups rejected as fabrication). `devtools::document()` produces no diff; `devtools::test()` 0 failures / 3220 pass; `devtools::check(args = "--no-manual")` **0 errors / 0 warnings / 0 notes** (8m 51s; tests, examples with --run-donttest, and vignette re-build all OK). Not read as coverage per the M7 lesson: the --no-manual gap is the PDF manual, and `R/ssm_sem.R` + `man/ssm_sem.Rd` were grepped ASCII-only.
+- 2026-07-24: verified what the vignette's own reader sees — the `jz2017` Gender ladder prints `dcfi = -0.011` under the MLR default with the not-validated note and no verdict, while Δχ² rejects metric. A value that would cross the cutoff, correctly left unlabeled: exactly the case the scope gate exists for.
+- 2026-07-24: all tasks done, local checks clean → status `review`.
 - 2026-07-23: created by /milestone-plan. Promotes the "ΔCFI secondary invariance criterion" candidate (M41 surface; `devel/m5-sem-design.md` §12.2 item 2; transcription `devel/cr2002-transcription.md` landed 2026-07-07; T4 shipped without it). Q1 (robust-CFI scope) resolved to the scope-gated hybrid; Q2 → docs reach roxygen+NEWS+vignette; Q3 → rides v2.0.0, no M7 gate. No RB tripwire (numeric part is a subtraction; transcription is the value/direction oracle). No scope-supersession D-entry owed — completes M5's already-bundled `ssm_sem`, not a new feature family.
 
 ## Decisions
