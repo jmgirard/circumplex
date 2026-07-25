@@ -109,6 +109,7 @@ supersession the plan wrongly thought unnecessary.
 
 ## Work log
 
+- 2026-07-25: review — all 7 ACs verified on final code; 3 of 4 diff-bug findings actioned and fixed (F1/F3/F4), 3 sub-threshold logged. One blocking `gh pr checks --watch` timed out at 10m; fresh state at that point: pkgdown pass, ubuntu-latest (release) + test-coverage pending. Nothing left watching.
 - 2026-07-25: created by /milestone-plan.
 - 2026-07-25: start — status in-progress, branch `m59-axes-reliability-corr-input` cut from master.
 - 2026-07-25: T1 — AC2 round-trip test written first; fails with `unused arguments (cormat, n)`, the intended pre-implementation failure.
