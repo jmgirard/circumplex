@@ -44,7 +44,7 @@ mechanical allowlist/DESCRIPTION sync check.
 
 ## Acceptance criteria
 
-- [ ] AC1 — The pkgdown job no longer resolves or installs brms or rstan:
+- [x] AC1 — The pkgdown job no longer resolves or installs brms or rstan:
       `any::brms` appears zero times in the job's `.github/pkg.lock`, and
       neither package appears in its install plan. BH, RcppParallel and
       StanHeaders are deliberately NOT part of this criterion — they are
@@ -52,20 +52,20 @@ mechanical allowlist/DESCRIPTION sync check.
       they are installed by design. A session-info listing is not evidence
       either way: it reports the restored cache's library, not this run's
       install plan.
-- [ ] AC2 — pkgdown's allowlist equals DESCRIPTION `Suggests` minus brms, and
+- [x] AC2 — pkgdown's allowlist equals DESCRIPTION `Suggests` minus brms, and
       the built site's growth, SEM, and axes-reliability articles show their
       fitted results (glmmTMB/lavaan chunks evaluated, not the not-installed
       note).
-- [ ] AC3 — Two pushes to the branch in quick succession leave exactly one
+- [x] AC3 — Two pushes to the branch in quick succession leave exactly one
       pkgdown run uncancelled; the superseded run's conclusion is `cancelled`.
 - [ ] AC4 — A `cairn/**`-only push to `master` (the review's own post-merge
       hygiene commit) triggers zero runs of all three workflows, per
       `gh run list` taken after it.
-- [ ] AC5 — `tools/check-ci-deps.R` is proven by mutation, not by eye: a
+- [x] AC5 — `tools/check-ci-deps.R` is proven by mutation, not by eye: a
       `Suggests` entry injected without an allowlist update turns the
       R-CMD-check job red with a message naming the package and the file, and
       the revert turns it green. Both run URLs in the work log.
-- [ ] AC6 — `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
+- [x] AC6 — `devtools::check()` clean (0 errors / 0 warnings / 0 notes) and
       the full CI matrix green on `master` after merge.
 
 ## Coverage
@@ -119,3 +119,94 @@ mechanical allowlist/DESCRIPTION sync check.
 ## Decisions
 
 ## Review
+
+Reviewed 2026-07-25 on branch `m58-ci-trim-pkgdown-parity`, PR #84. Master in
+sync (0/0 vs origin), branch 0 behind — no merge needed, evidence not stale.
+
+**AC1 — pkgdown no longer resolves/installs brms or rstan. VERIFIED.**
+Latest pkgdown job (run 30166582895, conclusion success): `"ref": "any::brms"`
+0 occurrences, `"ref": "any::rstan"` 0. The 12 direct `any::` refs pak was
+asked for are OpenMx, covr, ggrepel, glmmTMB, kableExtra, lavaan, pkgdown,
+psych, roxygen2, sessioninfo, testthat, vdiffr — neither package among them.
+Post cache-purge both are absent from the built library too (stronger than the
+criterion asks). RcppParallel remains, correctly: OpenMx `Imports`, kept by D-029.
+
+**AC2 — allowlist mirrors Suggests; articles keep their fits. VERIFIED.**
+Allowlist-vs-DESCRIPTION compared by an independent parser, NOT by
+`tools/check-ci-deps.R` (the artifact under test): allowlist minus its declared
+extras (`pkgdown`, `local::.`) == Suggests minus brms, exact set equality.
+Same run wrote 10 article pages with 0 degradation notes — grepped for the exact
+strings the vignettes emit when a package is missing
+(`vignettes/growth-ssm-analysis.Rmd:51`, `axes-reliability.Rmd:25`) — and
+glmmTMB, lavaan and OpenMx are all present in the library.
+
+**AC3 — superseded runs cancel. VERIFIED.**
+Push 07e25550 then 9af8d3f8 in quick succession: all three of the former's runs
+have conclusion `cancelled` (pkgdown 30165483647); the latter's pkgdown run
+30165483368/30165493368 ran to success. Exactly one uncancelled pkgdown run
+across the pair.
+
+**AC5 — guard proven by mutation. VERIFIED, step-level.**
+RED run 30165493362 with `tibble` injected into Suggests: job `failure`, step 5
+"Check CI dependency allowlists match DESCRIPTION" `failure`, steps 6 and 7
+`skipped` — it fired BEFORE the dependency install, as designed. Message named
+tibble against all three workflow paths. GREEN run 30165840887 after revert
+a2d2dd2b: step 5 `success`, steps 6-7 `success`, job `success`. DESCRIPTION is
+byte-identical to master (empty diff) — the mutation pair cancels out.
+
+**AC6 — full check clean. VERIFIED (local half).**
+Fresh `devtools::check(args="--no-manual")` on the review branch: `Status: OK`,
+`0 errors | 0 warnings | 0 notes`, 6m24s, zero N/W lines. The "full CI matrix
+green on master after merge" clause is inherently post-merge and is completed
+at step 9.
+
+**AC4 — NOT YET VERIFIABLE (by its own wording).**
+The criterion names "the review's own post-merge hygiene commit" as its
+evidence, so it cannot be executed before the merge. Ticked at step 9 against
+`gh run list` taken after that commit. Baseline for contrast: the pre-change
+plan commit 425fd294 was a `cairn/**`-only push to master and triggered all
+three workflows.
+
+**Consistency gate — all clean.**
+`cairn_validate`: 15 PASS (incl. `coverage complete`, `weight caps`), 0 FAIL;
+47 advisories, all pre-existing M7 work-log wrapping (history, IP4). Profile
+`r-package` slot: `devtools::document()` no diff; `pkgdown::check_pkgdown()`
+"No problems found"; README.md in sync and untouched; `^tools$` .Rbuildignore
+entry verified by tarball probe (0 `circumplex/tools` entries against 32
+`circumplex/R/`); `devtools::check()` clean. NEWS: no entry owed — every
+non-tracking file changed (`.github/`, `tools/`) is Rbuildignored, so nothing
+reaches users.
+
+**Independent review — three lenses + scorer.**
+[S] prior-PR-comments: zero findings; PR-comment probe returned `[]`, so the
+GitHub surface was correctly not walked. [S] blame-history: zero findings; it
+established that pkgdown's old job-level concurrency block was inherited
+r-lib scaffold (2024, pre-cairn), never a circumplex decision, so replacing it
+reverses nothing deliberate. [O] diff-bug: six findings, scored below.
+
+- **F1 (80, ACTIONED — fixed on branch).** pkgdown concurrency keyed on
+  `github.ref` split a release deploy (`refs/tags/<tag>`) from a master-push
+  deploy (`refs/heads/master`), letting two gh-pages deploys race where the old
+  catch-all key serialized them; `workflow_dispatch` additionally gained
+  cancel-in-progress against an in-flight deploy. Fixed: PRs keyed per ref with
+  cancellation (AC3 preserved), all deploying events on one shared key with
+  cancellation off, so they queue.
+- **F2 (55, logged).** The guard reads only `extra-packages:`, never
+  `dependencies:`/`needs:`. Reproduced in a sandbox: restoring
+  `dependencies: '"all"'` + `needs: website` returns brms and the Stan stack
+  while the guard prints "in sync" and exits 0.
+- **F3 (78, logged).** `man/**` and `README.md` are pkgdown site inputs
+  (`_pkgdown.yml:18` `reference:` over 74 Rd files; README.md is the home
+  page), so ignoring them on pkgdown lets an Rd- or README-only push leave the
+  published site stale.
+- **F4 (68, logged).** `man/**` on R-CMD-check's push trigger means an Rd-only
+  commit to master runs zero jobs; Rd is real check input. Scorer noted zero
+  `man/**`-only commits in repo history.
+- **F5 (25, logged).** The guard's policy list is a hardcoded three-path
+  whitelist; a future fourth workflow would be unguarded silently.
+- **F6 (40, logged).** Token normalization does not strip pak's `@ref` pin
+  suffix, so `any::glmmTMB@1.1.9` fails spuriously (loudly, self-correcting).
+
+Verification gap noted, not a defect: the guard step has only ever executed on
+ubuntu (the PR matrix is a single ubuntu/release leg). Its first windows/macos
+run happens on the merge push, covered by AC6's post-merge clause.

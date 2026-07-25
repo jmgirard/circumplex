@@ -26,13 +26,19 @@ name: pkgdown.yaml
 
 permissions: read-all
 
-# Matches R-CMD-check.yaml / test-coverage.yaml (cairn M51). The previous
-# job-level block keyed PRs on github.run_id — unique per run, so superseded
-# PR runs never cancelled — and set no cancel-in-progress at all, so pushes
-# merely queued behind each other.
+# Two regimes, because unlike the other two workflows this one DEPLOYS.
+# PRs: keyed per ref and cancelled on supersession — the M51 behaviour, and
+# what the old job-level block failed to do (it keyed PRs on github.run_id,
+# unique per run, so nothing ever cancelled).
+# Deploying events (push / release / workflow_dispatch): ONE shared key and no
+# cancellation, so they queue instead of racing each other onto gh-pages. The
+# old block collapsed all non-PR events to the literal `true`, which serialized
+# them by accident; keying on github.ref alone would have split a release
+# (refs/tags/<tag>) from a master push (refs/heads/master) and let two
+# concurrent deploys collide — `clean: false` makes a mixed tree possible.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   pkgdown:
