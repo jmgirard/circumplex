@@ -115,6 +115,31 @@ ssm_sem(
   contrast is rendered by any method). Under the strict tier the metric
   rung is vacuous (all loadings fixed) and is reported as such.
 
+  The ladder table also reports `dcfi`, the change in CFI from the
+  previous fitted rung (`NA` for configural and for the strict tier's
+  vacuous metric rung), as a labeled **secondary** criterion: Cheung and
+  Rensvold's (2002) general rule rejects an invariance step when CFI
+  drops by more than .01 (their alpha = .01). It is reported and never
+  gates: `comparable`, the verdict, and the fit the estimation layer
+  consumes are decided by the nested test alone, and the two criteria
+  can legitimately disagree (a change in CFI is insensitive to sample
+  size where the nested test is not). The retain/reject label prints
+  **only inside the envelope that simulation covers**: exactly two
+  groups, ML estimation, and a plain (non-robust) CFI. Three separate
+  things put a fit outside it, and the printed note names which one
+  applies. A robust estimator – the default `"MLR"`, or `"MLM"` – makes
+  lavaan report a robust CFI; so does `missing = "fiml"`, even under
+  `estimator = "ML"`, so plain ML is necessary for the label but not
+  sufficient. `"GLS"`, `"WLS"`, `"ULS"` and `"DWLS"` are not ML
+  estimation at all, though their CFI is plain-named. And more than two
+  groups is outside the simulation whatever the estimator. In each case
+  the `dcfi` value still prints, marked as not validated for that
+  configuration and with no verdict attached.
+
+  Cheung and Rensvold simulated two groups, ML estimation, multivariate
+  normal data, and Type I error only; robust CFI variants were not in
+  their study, so no cutoff here was validated for one.
+
 - invariance_alpha:
 
   Optional. The alpha level for the invariance gating decision (default
@@ -196,10 +221,13 @@ and the `ssm_plot_*` functions work on it), containing `results`
 (estimates and intervals), `scores` (the latent profile vectors),
 `details`, `call`, plus `sem` (the fitted lavaan model: the gate rung's
 fit for grouped analyses, or the configural fit when the gate was
-rejected), `invariance` (for grouped analyses: the ladder table, the
-`comparable` flag, the verdict text, the gate rung, and the alpha used;
-`NULL` for single-group analyses), and `model` (tier, generated syntax
-for single-group fits, and the OLS projection weights).
+rejected), `invariance` (for grouped analyses: the ladder table –
+including the `dcfi` column and its `cr` retain/reject label, `NA`
+outside the criterion's validated scope – the `comparable` flag, the
+verdict text, the gate and required rungs, the alpha used, and
+`dcfi_scope` recording that scope; `NULL` for single-group analyses),
+and `model` (tier, generated syntax for single-group fits, and the OLS
+projection weights).
 
 Inadmissible parameter draws (a nonpositive common-part or measure
 variance, or a disattenuated correlation at or beyond 1) are dropped
@@ -281,6 +309,15 @@ settings (`"mvn"` through the package's own draws; `"boot"` through a
 seed handed to lavaan's bootstrap). Call
 [`set.seed()`](https://rdrr.io/r/base/Random.html) immediately before
 `ssm_sem()` for reproducible confidence intervals.
+
+## References
+
+Cheung, G. W., & Rensvold, R. B. (2002). Evaluating goodness-of-fit
+indexes for testing measurement invariance. *Structural Equation
+Modeling*, 9(2), 233-255. (The `dcfi` secondary criterion. Their p. 251
+sentence states the direction of the -.01 rule backwards relative to
+their own Table 5, whose critical values are the 1% lower tails of the
+simulated null distributions; this package follows the simulation.)
 
 ## See also
 

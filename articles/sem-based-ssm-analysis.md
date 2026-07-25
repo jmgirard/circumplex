@@ -411,9 +411,14 @@ by_gender
 #>          CFI = 0.938, RMSEA = 0.123, SRMR = 0.06
 #> 
 #> Invariance ladder (gate: metric, alpha = 0.05):
-#>        rung   chisq df   cfi rmsea dchisq ddf       p
-#>  configural 287.272 34 0.938 0.123     NA  NA        
-#>      metric 337.356 48 0.927 0.112 54.781  14 < 0.001
+#>        rung   chisq df   cfi rmsea dchisq ddf       p   dcfi
+#>  configural 287.272 34 0.938 0.123     NA  NA             NA
+#>      metric 337.356 48 0.927 0.112 54.781  14 < 0.001 -0.011
+#> ΔCFI: Cheung & Rensvold (2002) criterion, alpha = .01, two-group ML
+#>   simulation scope. The cutoff is NOT validated for this configuration
+#>   (robust CFI), so the value is descriptive only, with no binary
+#>   verdict. Secondary and reported only -- the verdict below gates on
+#>   the nested chi-square difference test alone.
 #> Verdict: metric invariance rejected (Δχ²(14) = 54.78, p < 0.0001, alpha = 0.05): these groups cannot be compared on this instrument's latent metric.
 #> The requested latent contrast was therefore not computed; the rows below are each group's separate (configural) latent profile. The observed-score contrast (ssm_analyze()) answers its own, different question and remains available.
 #> 
@@ -448,6 +453,42 @@ fit it yourself and pass it to
 [`ssm_sem_parameters()`](http://circumplex.jmgirard.com/reference/ssm_sem_parameters.md),
 which computes the contrast from whatever multi-group fit you supply and
 leaves the comparability claim to you.
+
+The ladder table also carries `dcfi`, the change in CFI from the
+previous fitted rung. This is Cheung and Rensvold’s (2002) secondary
+criterion, whose general rule rejects an invariance step when CFI falls
+by more than .01. It is **reported, never gating**: comparability, the
+verdict, and the model the estimates are taken from are decided by the
+nested test alone. The two criteria can disagree, and neither is a
+tiebreaker for the other — a change in CFI is insensitive to sample
+size, which the nested test is not, so in a large sample the nested test
+can reject a step whose CFI barely moves.
+
+That direction is worth stating carefully, because the article gives it
+two ways. Its Table 5 reports critical values that are the 1% *lower*
+tails of the simulated null distributions, so a ΔCFI at or below one of
+them is the 1%-level evidence *against* invariance — the sense used
+here. The sentence stating the general rule on the article’s p. 251
+reads the opposite way relative to that same table. This package follows
+the simulation.
+
+Read the retain/reject label narrowly on the occasions it appears.
+Cheung and Rensvold simulated two groups, ML estimation, and
+multivariate normal data, and examined Type I error only — not power —
+and robust CFI variants were not part of their study.
+[`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)
+therefore prints the label only for a two-group fit estimated by ML
+whose CFI is the plain, non-robust one. Note that `estimator = "ML"` is
+necessary but not sufficient: `missing = "fiml"` also makes lavaan
+report a robust CFI, so a fit can be ML and still fall outside the
+envelope. Because the default estimator is `"MLR"`, the ladder above
+prints its `dcfi` value marked as outside that scope, with no verdict
+attached and the note naming which condition applies. The same
+withholding covers a non-ML estimator such as `"GLS"`, whose CFI is
+plain-named but whose fit function is not the one the criterion was
+simulated under. That is a deliberate refusal rather than a gap:
+extending the cutoff to a robust index, another estimator, or three or
+more groups would take simulation work nobody has done.
 
 When invariance is not the obstacle — for example, contrasting **two
 measures** within one group, where no cross-group invariance is at stake
@@ -553,7 +594,10 @@ assumptions. The documentation states them; the vignette should too.
   misspecification and are refused rather than summarized.
 - **Invariance gating is a modeling decision** with a default test, not
   an oracle. The observed contrast remains available and answers its own
-  question.
+  question. The secondary `dcfi` criterion printed beside it gates
+  nothing, and its .01 cutoff is validated only for two-group, ML,
+  multivariate-normal fits, for Type I error only — the package
+  withholds the verdict everywhere else rather than extrapolating it.
 
 ## 9. Relation to the literature
 
@@ -592,6 +636,10 @@ boundary; to cross to freely estimated angles, use
 
 - Browne, M. W. (1992). Circumplex models for correlation matrices.
   *Psychometrika, 57*(4), 469–497.
+
+- Cheung, G. W., & Rensvold, R. B. (2002). Evaluating goodness-of-fit
+  indexes for testing measurement invariance. *Structural Equation
+  Modeling, 9*(2), 233–255.
 
 - Moss, J. (2026). Inference for disattenuated correlations. *Applied
   Psychological Measurement*. Advance online publication.

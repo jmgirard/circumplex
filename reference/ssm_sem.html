@@ -192,7 +192,29 @@ Rungs fitted ABOVE the required one are reported but never gate the
 contrast. On rejection, the returned object states the non-comparison
 and reports each group's separate configural profile instead (no
 contrast is rendered by any method). Under the strict tier the metric
-rung is vacuous (all loadings fixed) and is reported as such.</p></dd>
+rung is vacuous (all loadings fixed) and is reported as such.</p>
+<p>The ladder table also reports <code>dcfi</code>, the change in CFI from the previous
+fitted rung (<code>NA</code> for configural and for the strict tier's vacuous metric
+rung), as a labeled <strong>secondary</strong> criterion: Cheung and Rensvold's (2002)
+general rule rejects an invariance step when CFI drops by more than .01
+(their alpha = .01). It is reported and never gates: <code>comparable</code>, the
+verdict, and the fit the estimation layer consumes are decided by the
+nested test alone, and the two criteria can legitimately disagree (a
+change in CFI is insensitive to sample size where the nested test is not).
+The retain/reject label prints <strong>only inside the envelope that simulation
+covers</strong>: exactly two groups, ML estimation, and a plain (non-robust) CFI.
+Three separate things put a fit outside it, and the printed note names
+which one applies. A robust estimator – the default <code>"MLR"</code>, or <code>"MLM"</code>
+– makes lavaan report a robust CFI; so does <code>missing = "fiml"</code>, even
+under <code>estimator = "ML"</code>, so plain ML is necessary for the label but not
+sufficient. <code>"GLS"</code>, <code>"WLS"</code>, <code>"ULS"</code> and <code>"DWLS"</code> are not ML estimation
+at all, though their CFI is plain-named. And more than two groups is
+outside the simulation whatever the estimator. In each case the <code>dcfi</code>
+value still prints, marked as not validated for that configuration and
+with no verdict attached.</p>
+<p>Cheung and Rensvold simulated two groups, ML estimation, multivariate
+normal data, and Type I error only; robust CFI variants were not in their
+study, so no cutoff here was validated for one.</p></dd>
 
 
 <dt id="arg-invariance-alpha">invariance_alpha<a class="anchor" aria-label="anchor" href="#arg-invariance-alpha"></a></dt>
@@ -273,8 +295,11 @@ the <code>"mvn"</code> engine.</p></dd>
 vectors), <code>details</code>, <code>call</code>, plus <code>sem</code> (the fitted lavaan model: the
 gate rung's fit for grouped analyses, or the configural fit when the
 gate was rejected), <code>invariance</code> (for grouped analyses: the ladder
-table, the <code>comparable</code> flag, the verdict text, the gate rung, and the
-alpha used; <code>NULL</code> for single-group analyses), and <code>model</code> (tier,
+table – including the <code>dcfi</code> column and its <code>cr</code> retain/reject label,
+<code>NA</code> outside the criterion's validated scope – the <code>comparable</code> flag,
+the verdict text, the gate and required rungs, the alpha used, and
+<code>dcfi_scope</code> recording that scope; <code>NULL</code> for single-group analyses),
+and <code>model</code> (tier,
 generated syntax for single-group fits, and the OLS projection
 weights).</p>
 <p>Inadmissible parameter draws (a nonpositive common-part or measure
@@ -345,6 +370,16 @@ vacuous (all loadings fixed) and is reported as such.</p>
 settings (<code>"mvn"</code> through the package's own draws; <code>"boot"</code> through a
 seed handed to lavaan's bootstrap). Call <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> immediately before
 <code>ssm_sem()</code> for reproducible confidence intervals.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Cheung, G. W., &amp; Rensvold, R. B. (2002). Evaluating
+goodness-of-fit indexes for testing measurement invariance.
+<em>Structural Equation Modeling</em>, 9(2), 233-255. (The <code>dcfi</code> secondary
+criterion. Their p. 251 sentence states the direction of the -.01 rule
+backwards relative to their own Table 5, whose critical values are the 1%
+lower tails of the simulated null distributions; this package follows the
+simulation.)</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
