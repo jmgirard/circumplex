@@ -1,11 +1,11 @@
 # M59: Correlation-matrix input path for `axes_reliability()`
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M54
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m59-axes-reliability-corr-input`
 
 ## Goal
 
@@ -104,6 +104,7 @@ no dependency and D-001 is not superseded (M59 plan gate).
 ## Work log
 
 - 2026-07-25: created by /milestone-plan.
+- 2026-07-25: start — status in-progress, branch `m59-axes-reliability-corr-input` cut from master.
 
 ## Decisions
 
