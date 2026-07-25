@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-23 (audit: 16/16 gate checks PASS; both GitHub inboxes empty; git reconciled; no work in flight. Two advisories: over-length hygiene line now shed; M7's 47 legacy multi-line work-log entries left as historical record. M7 stays blocked on the CRAN cadence window.)_
+_Last hygiene check: 2026-07-25 (M57 merged as PR #83 and archived; ROADMAP row done, M52's terminal row pruned to hold retention at 5. Two LESSONS lines sharpened in place rather than duplicated — M7's gains the `devtools::check(manual = FALSE)` gap, the guard-teeth line a sixth probe-failure mode. D-027 and D-028 appended. M7 stays blocked on the CRAN cadence window.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -10,12 +10,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M57 | ΔCFI secondary invariance criterion for `ssm_sem()` | review | — | normal | milestones/M57-dcfi-invariance-criterion.md |
+| M57 | ΔCFI secondary invariance criterion for `ssm_sem()` | done | — | normal | milestones/archive/M57-dcfi-invariance-criterion.md |
 | M56 | Cite the published Browne equations `R/cpm_fit.R` implements | done | — | normal | milestones/archive/M56-cite-browne-equations.md |
 | M55 | Axes-Reliability vignette — teaching `axes_reliability()` | done | M54 | normal | milestones/archive/M55-axes-reliability-vignette.md |
 | M54 | Axes-reliability (Strack 2013) build — `axes_reliability()` | done | — | normal | milestones/archive/M54-axes-reliability-build.md |
 | M53 | Axes-reliability (Strack 2013) — design spec + GO/NO-GO | done | — | normal | milestones/archive/M53-axes-reliability-design.md |
-| M52 | Trim brms/Stan from CI dependency installs | done | — | normal | milestones/archive/M52-ci-install-trim-brms.md |
 
 ## Candidates
 
