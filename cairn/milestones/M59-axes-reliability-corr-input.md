@@ -5,7 +5,7 @@
 - **Depends on:** M54
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m59-axes-reliability-corr-input`
+- **Branch/PR:** `m59-axes-reliability-corr-input` / https://github.com/jmgirard/circumplex/pull/85
 
 ## Goal
 
@@ -34,32 +34,32 @@ supersession the plan wrongly thought unnecessary.
 
 ## Acceptance criteria
 
-- [ ] AC1 (surface). `axes_reliability()` gains `cormat = NULL` and `n = NULL`,
+- [x] AC1 (surface). `axes_reliability()` gains `cormat = NULL` and `n = NULL`,
       following `cpm_fit()`'s house pattern (`R/cpm_fit.R:1559`): exactly one of
       `data` or `cormat`; `n` is required with `cormat` and refused with `data`.
       `devtools::document()` produces no diff. *(RB tripwire: irreversible-api)*
-- [ ] AC2 (round-trip oracle). On ≥2 datasets, `axes_reliability(cormat =
+- [x] AC2 (round-trip oracle). On ≥2 datasets, `axes_reliability(cormat =
       cor(x), n = nrow(x), …)` equals `axes_reliability(x, …)` on ξ1/ξ2/ζ1, both
       reliabilities, SEm at `sd = "std"`, `df` and χ² within 1e-6 — with
       lavaan's `(N−1)/N` likelihood rescaling explicitly handled, not absorbed
       into tolerance (RR09 BC5's trap).
-- [ ] AC3 (two independent oracle types on the corr path). **(a)
+- [x] AC3 (two independent oracle types on the corr path). **(a)
       Deterministic population matrix** — the exact `axes_population_cor()`
       matrix fed through the public `cormat` path recovers (ξ1, ξ2, ζ1) within
       1e-4 with χ² < 1e-6. **(b) Cross-engine** — lavaan and OpenMx fits of the
       identical model on the identical correlation matrix agree on every free
       component within 1e-3; that test **skips**, never passes, when OpenMx is
       absent; no new Imports (D-006/D-014). Both halves need their own evidence.
-- [ ] AC4 (N–B and SEm). `nb_reliability` is `NA` on the `cormat` path and
+- [x] AC4 (N–B and SEm). `nb_reliability` is `NA` on the `cormat` path and
       `print`/`summary` state why — RR09 §7.4: "N–B must be `NA`-with-reason
       there, not dropped silently". `sd = "raw"` errors informatively (no raw
       scores exist); `"std"` and numeric `sd` work.
-- [ ] AC5 (refuse contract). Each errors informatively, with a regression test:
+- [x] AC5 (refuse contract). Each errors informatively, with a regression test:
       `data` and `cormat` both supplied, or neither; `cormat` non-square,
       asymmetric, non-unit-diagonal, non-finite, or non-PD; `cormat` dimnames
       absent or mismatched with `items`; `n` absent with `cormat`, supplied
       with `data`, non-numeric, non-finite, or ≤ number of items.
-- [ ] AC6 (docs). Roxygen and `vignettes/axes-reliability.Rmd` document the
+- [x] AC6 (docs). Roxygen and `vignettes/axes-reliability.Rmd` document the
       corr path (including the Cudeck SE approximation already stated for the
       raw path) and carry the RR09 §7.8 note that a blockwise-administered
       instrument analyzed without ζ2 folds block variance into the general and
@@ -123,3 +123,63 @@ supersession the plan wrongly thought unnecessary.
 ## Decisions
 
 ## Review
+
+Reviewed 2026-07-25 on `m59-axes-reliability-corr-input` @ PR #85. Evidence is
+fresh (re-run at review, never recalled from implementation).
+
+### Acceptance-criteria evidence
+
+- **AC1 (surface).** `args(axes_reliability)` prints
+  `function (data = NULL, items, angles = NULL, instrument = NULL, cormat = NULL, n = NULL, sd = "std")`.
+  The exactly-one and `n`-with-`data` refusals are fenced in the AC5 block. A
+  fresh `devtools::document()` left `git status` clean over `man/`, `NAMESPACE`,
+  and `R/` — no diff.
+- **AC2 (round-trip oracle).** Test block `AC2: the cormat path reproduces the
+  raw path exactly` — 16 assertions, 0 fail, 0 skip, across two datasets (the
+  bundled 32-item `simulated_items`; a 16-item draw at ξ1 = .22). Measured
+  max |diff|: components 1.44e-15, SEs 2.69e-17, reliability 1.11e-16,
+  χ² 3.58e-12, `df` identical (493) — three to nine orders inside the 1e-6 bar.
+  The `(N−1)/N` convention is *matched*, not tolerated: the wishart/normal ξ1
+  ratio measured 0.9979999 against 499/500 = 0.998 exactly.
+- **AC3 (two independent oracle types).** (a) 17 assertions: recovery equals
+  truth × (n−1)/n to 1e-8 relative at n = 500 / 5000 / 50000, χ² < 1e-6 at each;
+  at n = 50000 outright recovery within 1e-4 (measured error 3e-6); a permuted
+  `cormat` reproduces the unpermuted answer to 1e-10. (b) 2 assertions (seeds
+  7, 8): OpenMx vs the public path max |diff| ≈ 1.95e-5 against the 1e-3 bar.
+  Skips-never-passes proven mechanically: a probe applying
+  `skip_if_not_installed()` to an absent package reports `Skip`, and the
+  `expect_true(FALSE)` following it never executed. No new Imports —
+  `DESCRIPTION` is not in the diff; OpenMx stays `Suggests` (D-006/D-014).
+- **AC4 (N–B and SEm).** 9 assertions: the `nb_reliability` column is present
+  and wholly `NA`; `print()` and `summary()` both emit "Nunnally-Bernstein
+  comparison needs the raw item"; the header reads `Input: correlation matrix`
+  and `Sample N:`; numeric `sd` yields sem = sd·sqrt(1 − rel) to 1e-10;
+  `sd = "raw"` errors with "needs the raw scale scores".
+- **AC5 (refuse contract).** 18 assertions, one per listed condition: both or
+  neither of `data`/`cormat`; `n` with `data`; non-square; absent dimnames;
+  asymmetric; non-unit diagonal; NA/non-finite; singular (non-PD); an item
+  absent from the matrix; `n` missing, character, length-2, fractional, NA, Inf,
+  = p, and < p. The Inf case is load-bearing rather than decorative: removing
+  `!is.finite(n)` turns the suite red (mutation run at T5–T7).
+- **AC6 (docs).** `man/axes_reliability.Rd` carries `cormat` (8 occurrences) and
+  the "Blockwise instruments" section, whose 6.7% figure roxygen correctly
+  escaped to `6.7\%` (an unescaped `%` is an Rd comment character; the manual
+  builds clean). `vignettes/axes-reliability.Rmd` adds §4 "Starting from a
+  published correlation matrix" plus a fourth caveat carrying the same note;
+  Cudeck (1989) is cited on both surfaces. NEWS is folded into the existing
+  unreleased `axes_reliability()` bullet. No milestone numbers appear in any
+  user-facing text (grep clean over NEWS, Rd, vignette).
+
+### Consistency gate
+
+- `cairn_validate` exit 0 — 16 checks PASS (including `coverage complete` and
+  `binding criteria`); `record density`, `sizing`, `dangling id tokens`,
+  `references staleness`, `release window` all OK. The 47 `work-log format`
+  advisories are M7's pre-existing wrapped entries — history, never edited
+  (IP4); none belong to M59.
+- `cairn_impact` correctly skipped: `Principles touched: —`, no IP/GP changed.
+- Profile (`r-package`) `consistency-gate` slot: `document()` no diff ✓;
+  `NAMESPACE`, `data/`, `README` untouched by the diff ✓; `man/` limited to the
+  one regenerated Rd ✓; `pkgdown::check_pkgdown()` → "No problems found" ✓;
+  NEWS entry present with no milestone numbers ✓; no new top-level files, so no
+  `.Rbuildignore` addition owed ✓.
