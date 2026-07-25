@@ -1,11 +1,11 @@
 # M58: Finish the post-M52 CI trim — pkgdown parity + an allowlist drift guard
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m58-ci-trim-pkgdown-parity`
 
 ## Goal
 
@@ -93,6 +93,7 @@ mechanical allowlist/DESCRIPTION sync check.
 ## Work log
 
 - 2026-07-25: created by /milestone-plan.
+- 2026-07-25: status planned->in-progress; branch `m58-ci-trim-pkgdown-parity` cut from master@425fd294.
 
 ## Decisions
 
