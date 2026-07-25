@@ -72,7 +72,7 @@ mechanical allowlist/DESCRIPTION sync check.
 
 ## Tasks
 
-- [ ] **T1** — Write `tools/check-ci-deps.R`: `read.dcf` for `Suggests`, parse
+- [x] **T1** — Write `tools/check-ci-deps.R`: `read.dcf` for `Suggests`, parse
       each workflow's `extra-packages:` block by indentation, compare against
       per-file documented exclusions, `stop()` naming package + file on drift.
       Add `^tools$` to `.Rbuildignore`. Run locally: true state passes,
@@ -94,6 +94,7 @@ mechanical allowlist/DESCRIPTION sync check.
 
 - 2026-07-25: created by /milestone-plan.
 - 2026-07-25: status planned->in-progress; branch `m58-ci-trim-pkgdown-parity` cut from master@425fd294.
+- 2026-07-25: T1 done — `tools/check-ci-deps.R` (base R, handles block + inline `extra-packages` forms); `^tools$` added to .Rbuildignore. Local teeth check: flags pkgdown's real drift, and an injected `tibble` Suggest is named per-file; exit 1 both, clean revert.
 
 ## Decisions
 

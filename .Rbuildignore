@@ -24,3 +24,4 @@
 ^cairn$
 ^\.DS_Store$
 ^Rplots\.pdf$
+^tools$
