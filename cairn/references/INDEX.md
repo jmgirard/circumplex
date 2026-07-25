@@ -16,6 +16,7 @@ _One line per committed page: `citekey — title — traces to`._
 - [gurtman1998.md](gurtman1998.md) — Gurtman & Balakrishnan (1998), *Circular measurement redux* — the originating definition of the "conventional Gurtman estimator": the structural-summary decomposition (Eq. 1) and `R² = 1 − Σd²/SS_Total` (Eq. 2, p. 349, the page Wright 2009 cites); traces to `R/ssm_analysis.R:1183`, `tests/testthat/test-ssm_sem_syntax.R:6` and `cairn/references/wright2009.md`.
 - [gurtman2003.md](gurtman2003.md) — Gurtman & Pincus (2003), *The circumplex model: Methods and research applications* — the vignette-cited SSM methods reference restating the structural-summary model (Eq. 16.7); traces to `vignettes/introduction-to-ssm-analysis.Rmd:443`, `vignettes/intermediate-ssm-analysis.Rmd:280` and `R/ssm_analysis.R:1183`. Does NOT carry the .80/.70 R² cutoffs Wright attributes to it.
 - [strack2013.md](strack2013.md) — Strack, Jacobs & Grosse Holtforth (2013), *Reliability of Circumplex Axes* — the tau-equivalent CFA variance-decomposition model, the Spearman–Brown axes-reliability / SEm / Nunnally–Bernstein formulas, and Table 3 as a published-value oracle for the formula layer; traces to `devel/m53-axes-reliability-spec.md` (code traces land on a build GO).
+- [cheung2002.md](cheung2002.md) — Cheung & Rensvold (2002), *Evaluating goodness-of-fit indexes for testing measurement invariance* — the ΔCFI −.01 cutoff with its published alpha (.01), the ΔGamma-hat/ΔMcDonald's-NCI cutoffs, Table 5's per-hypothesis 1% tails, and the binding simulation scope (two groups, ML, multivariate normal, Type I only); traces to `R/ssm_sem.R:759-771,773-790,794-816,921-932`, `tests/testthat/test-ssm_sem_groups.R`, `man/ssm_sem.Rd` and `vignettes/sem-based-ssm-analysis.Rmd`. Settles the direction the article's own p. 251 sentence states backwards.
 - [forward-source-prospects.md](forward-source-prospects.md) — Forward-looking source prospects (M46) — a supply-push survey synthesis note triaging four shelved sources (nagy2019, weide2021, rogoza2021, tracey2000), each mapped to a `candidate` ROADMAP row; traces to nothing yet — per-source pages owed only on graduation (D-024).
 
 <!-- Entry format note: cairn_validate's _INDEX_LINE regex matches the first
@@ -60,13 +61,11 @@ _One line per committed page: `citekey — title — traces to`._
        "Alternative ways of assessing model fit", with the author order
        reversed. The repo neither computes nor asserts a cross-validation
        index (Grassi's Appendix A merely prints an ECVI). Assessed at M41.
-     - sources/cheung2002.pdf — Cheung & Rensvold (2002); no shipped code,
-       vignette, or test cites it. The ssm_sem() invariance gate ships the
-       chi-square difference test only, a computed quantity needing no
-       literature constant, and the delta-CFI option was left as an
-       unexercised offer (devel/m5-sem-design.md:751-759, section 12.2
-       item 2). Assessed at M41; a ROADMAP candidate row carries the feature
-       question, and the milestone that ever takes it up authors the page.
+     (This block listed sources/cheung2002.pdf as owing no page — "no shipped
+     code, vignette, or test cites it", the delta-CFI option "an unexercised
+     offer" — from M41 until M57 exercised it. Corrected in place 2026-07-24:
+     cheung2002 graduated to a committed page, listed above, and its entry is
+     removed from this list rather than left readable.)
 
      Gurtman corpus — dispositioned at M47 while identifying the estimator's
      defining source (gurtman1998); each uncited by shipped code, none a

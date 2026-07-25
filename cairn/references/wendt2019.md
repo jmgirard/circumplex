@@ -167,10 +167,15 @@ stated range is wrong as printed and is not corrected here, because `devel/`
 is out of M43's scope (the ROADMAP carries the post-M7 disposition of these
 files).
 
-**Two claims in that file this page cannot check**, both because the sources
-are not on the shelf: its §8 verification of the equal-`L1` general loading
-from supplement R Code S25, and its readings of Gurtman & Pincus (2003),
-Moss (2026), and Cheung & Rensvold (2002) — observed 2026-07-19.
+**Two claims in that file this page cannot check**: its §8 verification of the
+equal-`L1` general loading from supplement R Code S25, and its readings of
+Gurtman & Pincus (2003), Moss (2026), and Cheung & Rensvold (2002) — observed
+2026-07-19. *Corrected in place 2026-07-24 (M57): the stated reason — "because
+the sources are not on the shelf" — held only for the supplement and Moss
+(2026). `gurtman2003.pdf` and `cheung2002.pdf` were both on the shelf on
+2026-07-19 and each now has a committed page (`gurtman2003.md`,
+`cheung2002.md`), so availability is no longer the obstacle for those two. The
+checks themselves remain unperformed by this page — observed 2026-07-24.*
 
 ## Traces to
 

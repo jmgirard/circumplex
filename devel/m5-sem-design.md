@@ -756,7 +756,12 @@ citation; review F6). Still a computed quantity, no literature constant
 needed. Alternative-index cutoffs (ΔCFI etc.) are offered only
 once transcribed (**TBT**, candidate source Cheung & Rensvold 2002), and
 until then the summary prints the indices without a verdict attached to
-them. Surfaced as open decision §12.2.
+them. Surfaced as open decision §12.2. **Corrected in place 2026-07-24
+(M57):** the TBT is discharged and the ΔCFI cutoff IS now offered — as a
+labeled, reported-only secondary criterion scope-gated to two groups plus a
+plain normal-theory CFI, cited to `cairn/references/cheung2002.md`. Δχ²
+remains the sole gating verdict statistic, exactly as this paragraph's
+first half says. See §12.2 item 2 for the resolution.
 
 ### 6.3 The non-comparison path (acceptance-critical)
 
@@ -1106,6 +1111,17 @@ the machinery pins pass — it consumes the working estimator.
    plain ML, normality, never validated for robust indices). Offering the
    ΔCFI flag as a labeled secondary criterion is now unblocked; whether to
    offer it remains Jeff's call at T4. Δχ² stays the default either way.
+   **RESOLVED 2026-07-24 (M57): offered.** `ssm_sem()`'s ladder table now
+   carries a `dcfi` column and, inside the criterion's validated envelope
+   (two groups AND a plain normal-theory CFI), a `cr` retain/reject column
+   against −.01; outside that envelope the value prints with an explicit
+   "cutoff not validated for this configuration" note and no verdict. It is
+   reported-only — `comparable`, the verdict string, and the estimation-fit
+   selection never read it, and Δχ² remains the sole gate. The citable
+   record is now `cairn/references/cheung2002.md` (which re-verified every
+   value against the PDF); the transcription file remains the
+   first-channel protocol artifact. ΔGamma hat and ΔMcDonald's NCI stay
+   transcribed but unwired.
 3. **g–plane covariances free by default** (§3.1): proposed yes, pending
    T2's identification check; flip recorded here if it fails.
    **RESOLVED 2026-07-07 (T3): the check failed — flipped to 0-fixed, no

@@ -756,20 +756,28 @@ sem_fit_cfa <- function(syn, dat, grouping = NULL, estimator, se, missing,
   do.call(lavaan::cfa, args)
 }
 
-# The Cheung & Rensvold (2002) general Delta-GFI critical value for CFI: a
+# Cheung & Rensvold (2002), general Delta-GFI criterion, pp. 250-251: a CFI
 # drop of more than .01 across an adjacent pair of ladder rungs rejects that
-# invariance step (alpha = .01, two-group ML simulation). Value AND DIRECTION
-# per cairn/references/cheung2002.md -- the article's own p. 251 sentence
-# states the direction backwards, contradicting the Table 5 simulation its
-# critical values are the 1% tails of.
+# invariance step (alpha = .01, two-group ML simulation; their Table 5, p. 248,
+# holds the per-hypothesis 1% tails this rounds).
+#
+# The DIRECTION is taken from cairn/references/cheung2002.md, not from the
+# article's own p. 251 sentence, which states it backwards: it reads
+# "smaller than or equal to -0.01 indicates that the null hypothesis of
+# invariance should not be rejected", contradicting the Table 5 construction
+# its critical values come from (they are the 1% LOWER tails of the simulated
+# null-hypothesis Delta-GFI distributions, so a value at or below one is the
+# 1%-level evidence AGAINST invariance).
 sem_dcfi_cutoff <- -0.01
 
 # Apply the criterion. `in_scope` is the two-group/plain-ML envelope Cheung &
-# Rensvold actually simulated; outside it the difference is still reported but
-# NO verdict is attached (they simulated neither >2 groups nor robust indices,
-# and inventing a cutoff there would be fabrication, not extrapolation).
-# Boundary: a value exactly AT the cutoff RETAINS ("Delta-CFI >= -.01 -> the
-# step is retained by this criterion").
+# Rensvold actually simulated (their "Limitations of the Simulation", p. 251:
+# two groups, ML estimation, multivariate normal data, Type I error only);
+# outside it the difference is still reported but NO verdict is attached --
+# they simulated neither >2 groups nor robust indices (which did not exist in
+# their study), and inventing a cutoff there would be fabrication, not
+# extrapolation. Boundary: a value exactly AT the cutoff RETAINS
+# ("Delta-CFI >= -.01 -> the step is retained by this criterion").
 sem_dcfi_flag <- function(dcfi, in_scope) {
   out <- rep(NA_character_, length(dcfi))
   if (!isTRUE(in_scope)) {
