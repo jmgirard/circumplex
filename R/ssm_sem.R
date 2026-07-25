@@ -770,9 +770,10 @@ sem_fit_cfa <- function(syn, dat, grouping = NULL, estimator, se, missing,
 # 1%-level evidence AGAINST invariance).
 sem_dcfi_cutoff <- -0.01
 
-# Apply the criterion. `in_scope` is the two-group/plain-ML envelope Cheung &
-# Rensvold actually simulated (their "Limitations of the Simulation", p. 251:
-# two groups, ML estimation, multivariate normal data, Type I error only);
+# Apply the criterion. `in_scope` is the envelope Cheung & Rensvold actually
+# simulated (their "Limitations of the Simulation", p. 251: two groups, ML
+# estimation, multivariate normal data, Type I error only) -- see
+# `sem_fit_ladder` for the three-part test that computes it;
 # outside it the difference is still reported but NO verdict is attached --
 # they simulated neither >2 groups nor robust indices (which did not exist in
 # their study), and inventing a cutoff there would be fabrication, not
@@ -791,32 +792,35 @@ sem_dcfi_flag <- function(dcfi, in_scope) {
 # The attribution + scope block printed beneath the ladder table. The
 # attribution and the published scope label accompany the value ALWAYS; out of
 # scope the block additionally names why no verdict is given.
-sem_dcfi_note <- function(scope) {
+sem_dcfi_note <- function(scope, width = 72) {
   dcfi <- "\u0394CFI"
-  head <- paste0(
-    dcfi, ": Cheung & Rensvold (2002) criterion, alpha = .01, two-group ML\n",
-    "  simulation scope"
-  )
-  tail <- paste0(
-    "Secondary and reported only -- the verdict below gates on the nested\n",
-    "  chi-square difference test alone.\n"
-  )
-  if (isTRUE(scope$in_scope)) {
+  scope_part <- if (isTRUE(scope$in_scope)) {
     paste0(
-      head, "; ", dcfi, " < ", format(sem_dcfi_cutoff),
-      " rejects that invariance step.\n  ", tail
+      "; ", dcfi, " < ", format(sem_dcfi_cutoff),
+      " rejects that invariance step."
     )
   } else {
+    # The reason list is variable-length (up to three), which is why the block
+    # is wrapped programmatically rather than by hand -- a hand-wrapped layout
+    # silently overflows once a second reason appears.
     why <- c(
+      if (!isTRUE(scope$ml)) paste("non-ML estimator:", scope$estimator),
       if (!isTRUE(scope$cfi_plain)) "robust CFI",
       if (!identical(scope$n_groups, 2L)) paste(scope$n_groups, "groups")
     )
     paste0(
-      head, ". The cutoff is NOT validated for this configuration\n  (",
-      paste(why, collapse = "; "), "): the value is descriptive only, with ",
-      "no binary verdict.\n  ", tail
+      ". The cutoff is NOT validated for this configuration (",
+      paste(why, collapse = "; "),
+      "), so the value is descriptive only, with no binary verdict."
     )
   }
+  body <- paste0(
+    dcfi, ": Cheung & Rensvold (2002) criterion, alpha = .01, two-group ML ",
+    "simulation scope", scope_part,
+    " Secondary and reported only -- the verdict below gates on the nested ",
+    "chi-square difference test alone."
+  )
+  paste0(paste(strwrap(body, width = width, exdent = 2), collapse = "\n"), "\n")
 }
 
 # Fit the rung sequence up to `gate`, run lavaan's own nested-model test
@@ -854,6 +858,7 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   prev_fit <- NULL
   prev_cfi <- NA_real_
   cfi_plain <- logical(0)
+  est_used <- character(0)
   for (r in rungs) {
     if (sem_strict_metric_vacuous(model, r)) {
       rows[[r]] <- data.frame(
@@ -901,6 +906,11 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
     cfi_plain <- c(
       cfi_plain, !any(c("cfi.robust", "cfi.scaled") %in% names(fm))
     )
+    # lavaan reports the FIT FUNCTION here, so MLR and MLM both read "ML"
+    # (they are ML estimation with a robust test / robust SEs) while GLS, WLS,
+    # ULS and DWLS read their own names. Paired with the plain-CFI test above
+    # this separates "ML with a robust index" from "not ML at all".
+    est_used <- c(est_used, lavaan::lavInspect(fit, "options")$estimator)
     rows[[r]] <- data.frame(
       rung = r,
       chisq = sem_fm_pick(fm, "chisq.scaled", "chisq"),
@@ -918,17 +928,25 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   table <- do.call(rbind, rows)
   rownames(table) <- NULL
 
-  # The Cheung & Rensvold envelope: two groups AND the plain (normal-theory)
-  # CFI. Gating on the STATISTIC rather than on `estimator` keeps the label
-  # tied to the quantity actually differenced, so a robust index can never be
-  # flagged against a cutoff simulated for a normal-theory one.
+  # The Cheung & Rensvold envelope (p. 251): two groups, ML estimation, AND the
+  # plain (normal-theory) CFI. Both estimator tests are needed and neither
+  # implies the other. The plain-CFI test keeps the label tied to the quantity
+  # actually differenced, so a robust index can never be flagged against a
+  # cutoff simulated for a normal-theory one. The ML test excludes GLS, WLS,
+  # ULS and continuous DWLS, which yield a plain-NAMED CFI while not being the
+  # estimator the criterion was simulated under. Keying on the fit function
+  # rather than on the user's `estimator` argument still admits
+  # estimator = "ML" with sandwich standard errors, where the CFI is
+  # normal-theory (CFI does not read the standard errors).
   dcfi_scope <- list(
     n_groups = as.integer(n_groups),
+    estimator = if (length(est_used)) est_used[[1]] else NA_character_,
+    ml = length(est_used) > 0 && all(est_used == "ML"),
     cfi_plain = length(cfi_plain) > 0 && all(cfi_plain),
     in_scope = FALSE
   )
   dcfi_scope$in_scope <- identical(dcfi_scope$n_groups, 2L) &&
-    dcfi_scope$cfi_plain
+    dcfi_scope$ml && dcfi_scope$cfi_plain
   table$cr <- sem_dcfi_flag(table$dcfi, dcfi_scope$in_scope)
 
   # Comparability: EVERY tested rung up through `required` must be retained.
@@ -1157,11 +1175,12 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   nested test alone, and the two criteria can legitimately disagree (a
 #'   change in CFI is insensitive to sample size where the nested test is not).
 #'   The retain/reject label prints **only inside the envelope that simulation
-#'   covers** -- exactly two groups and the plain normal-theory CFI (that is,
-#'   `estimator = "ML"`; the default `"MLR"` yields a robust CFI). Under a
-#'   robust CFI or more than two groups the `dcfi` value still prints, with a
-#'   note that the cutoff is not validated for that configuration and no
-#'   verdict attached. Cheung and Rensvold simulated two groups, ML estimation,
+#'   covers** -- exactly two groups, ML estimation, and the plain normal-theory
+#'   CFI (that is, `estimator = "ML"`; the default `"MLR"` yields a robust CFI,
+#'   and `"GLS"`/`"WLS"`/`"ULS"`/`"DWLS"` are not ML at all even though their
+#'   CFI is plain-named). Under a robust CFI, a non-ML estimator, or more than
+#'   two groups the `dcfi` value still prints, with a note naming why the
+#'   cutoff is not validated for that configuration and no verdict attached. Cheung and Rensvold simulated two groups, ML estimation,
 #'   multivariate normal data, and Type I error only; robust CFI variants were
 #'   not in their study, so no cutoff here was validated for one.
 #' @param invariance_alpha Optional. The alpha level for the invariance
@@ -1729,7 +1748,12 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
       dchisq = round(tab$dchisq, digits),
       ddf = tab$ddf,
       p = sem_fmt_p(tab$p, digits),
-      dcfi = round(tab$dcfi, digits)
+      # At least 4 decimals, whatever `digits` is: the label is decided on the
+      # unrounded value against a 2-decimal cutoff, so printing at `digits = 3`
+      # would render -0.0096 (retain) and -0.0104 (reject) identically as
+      # "-0.01" -- one number shown under two opposite verdicts, directly
+      # beneath a rule stated in terms of that number.
+      dcfi = round(tab$dcfi, max(digits, 4))
     )
     # The retain/reject column appears ONLY inside the criterion's validated
     # scope; outside it the value stands alone and the note below says why.

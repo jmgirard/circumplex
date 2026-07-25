@@ -122,12 +122,16 @@ From "Limitations of the Simulation" (p. 251) and the Discussion (p. 250):
 
 - `R/ssm_sem.R:759-771` (`sem_dcfi_cutoff`) — the −.01 cutoff and the
   direction, with this page named as the authority over the p. 251 sentence.
-- `R/ssm_sem.R:773-790` (`sem_dcfi_flag`) — the ≥ −.01 retain boundary and the
-  two-group/plain-ML scope restriction, from the Limitations section.
-- `R/ssm_sem.R:794-816` (`sem_dcfi_note`) — the user-facing attribution and
-  published scope label printed beneath the invariance ladder.
-- `R/ssm_sem.R:921-932` (`sem_fit_ladder`) — the scope test itself (two groups
-  AND a plain normal-theory CFI).
+- `R/ssm_sem.R:773-789` (`sem_dcfi_flag`) — the ≥ −.01 retain boundary and the
+  scope restriction, from the Limitations section.
+- `R/ssm_sem.R:791-823` (`sem_dcfi_note`) — the user-facing attribution and
+  published scope label printed beneath the invariance ladder, plus the reason
+  named when the verdict is withheld.
+- `R/ssm_sem.R:930-949` (`sem_fit_ladder`) — the scope test itself: two groups
+  AND ML estimation AND a plain normal-theory CFI. All three are required and
+  no two imply the third; the ML clause was added at the M57 review, which
+  found that `GLS`/`WLS`/`ULS`/`DWLS` yield a plain-NAMED CFI while not being
+  the estimator this source simulated (D-028).
 - `tests/testthat/test-ssm_sem_groups.R` — the ΔCFI section: the deterministic
   pin of the ≥ −.01 boundary, both flag directions, and the robust-CFI and
   three-group scope gates.

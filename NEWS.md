@@ -202,16 +202,24 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
 * The invariance ladder `print()` reports additionally carries `dcfi`, the
   change in CFI from the previous fitted rung, as a labeled *secondary*
   criterion: Cheung and Rensvold's (2002) general rule rejects an invariance
-  step when CFI falls by more than .01. It is reported and never gates — the
+  step when CFI falls by more than .01. (That direction is taken from the
+  article's own Table 5, whose critical values are the 1% *lower* tails of the
+  simulated null distributions; the sentence stating the rule on its p. 251
+  reads backwards relative to that table, and the package follows the
+  simulation.) It is reported and never gates — the
   nested test alone decides comparability, the verdict, and which fit the
   estimates come from — and the two criteria can legitimately disagree, since a
   change in CFI is insensitive to sample size where the nested test is not. The
-  retain/reject label prints only inside the envelope their simulation covers:
-  exactly two groups and the plain normal-theory CFI, meaning
-  `estimator = "ML"`. Under a robust CFI (including the `"MLR"` default) or
-  more than two groups, the `dcfi` value still prints, marked as not validated
-  for that configuration and carrying no verdict — extending the cutoff there
-  would require simulation that has not been done.
+  retain/reject label prints only inside the envelope their simulation covers,
+  which is narrow: they simulated **two groups, ML estimation, and
+  multivariate normal data, and examined Type I error only** — not power — and
+  robust CFI variants were not part of their study. So the label appears only
+  for a two-group fit whose CFI is the plain normal-theory one, meaning
+  `estimator = "ML"`. Under a robust CFI (including the `"MLR"` default), a
+  non-ML estimator such as `"GLS"`, or more than two groups, the `dcfi` value
+  still prints, marked as not validated for that configuration and carrying no
+  verdict — extending the cutoff there would require simulation that has not
+  been done.
 
 ## Repeated-measures and longitudinal analysis
 

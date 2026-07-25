@@ -566,6 +566,14 @@ dcfi_header <- function(res) {
   grep("rung", out, value = TRUE)[[1]]
 }
 
+# Printed output with all whitespace collapsed. The attribution block is
+# wrapped programmatically (its reason list is variable-length), so an
+# assertion keyed to where a line happens to break would fence the wrapper
+# rather than the wording.
+dcfi_printed <- function(res) {
+  gsub("\\s+", " ", paste(utils::capture.output(print(res)), collapse = " "))
+}
+
 test_that("dcfi is the CFI difference between adjacent fitted rungs, NA where there is no predecessor (cheung2002)", {
   skip_if_not_installed("lavaan")
   pop <- dcfi_pop_2g(0)
@@ -669,7 +677,7 @@ test_that("in scope (two groups, plain-ML CFI) the Cheung-Rensvold flag retains 
   expect_lt(tab_bad$dcfi[tab_bad$rung == "metric"], -0.01)
   expect_identical(tab_bad$cr[tab_bad$rung == "metric"], "reject")
   # Printed: the value, the flag, and the attribution WITH its scope label
-  out <- paste(utils::capture.output(print(bad)), collapse = "\n")
+  out <- dcfi_printed(bad)
   expect_match(out, "Cheung & Rensvold \\(2002\\)")
   expect_match(out, "alpha = .01", fixed = TRUE)
   expect_match(out, "two-group", fixed = TRUE)
@@ -705,7 +713,7 @@ test_that("outside the validated scope (robust CFI, or more than two groups) dcf
   expect_false(isTRUE(inv$dcfi_scope$cfi_plain))
   expect_false(is.na(inv$table$dcfi[inv$table$rung == "metric"])) # value kept
   expect_true(all(is.na(inv$table$cr))) # verdict withheld
-  out <- paste(utils::capture.output(print(mlr)), collapse = "\n")
+  out <- dcfi_printed(mlr)
   expect_match(out, "Cheung & Rensvold \\(2002\\)")
   expect_match(out, "not validated", ignore.case = TRUE)
   expect_match(out, "robust CFI", fixed = TRUE)
@@ -729,7 +737,7 @@ test_that("outside the validated scope (robust CFI, or more than two groups) dcf
   expect_false(isTRUE(inv3$dcfi_scope$in_scope))
   expect_false(is.na(inv3$table$dcfi[inv3$table$rung == "metric"]))
   expect_true(all(is.na(inv3$table$cr)))
-  out3 <- paste(utils::capture.output(print(g3)), collapse = "\n")
+  out3 <- dcfi_printed(g3)
   expect_match(out3, "not validated", ignore.case = TRUE)
   expect_match(out3, "3 groups", fixed = TRUE)
   expect_no_match(dcfi_header(g3), "cr\\s*$")
@@ -774,4 +782,131 @@ test_that("Delta-CFI is REPORTED ONLY: it never moves the gate, the verdict, or 
     lavaan::fitMeasures(res$sem)[["df"]],
     tab$df[tab$rung == "configural"]
   )
+})
+
+# A low-saturation two-group population: a small baseline chi-square makes CFI
+# move fast per unit of misfit while Delta-chi-square stays modest at small n.
+# This is what makes the COMPLEMENT of the disagreement fixture reachable --
+# Delta-CFI rejecting while the nested test retains (see the AND-leak test).
+dcfi_pop_lowsat <- function(eps) {
+  a <- rep(0.35, 8)
+  cc_a <- rep(0.40, 8)
+  d1 <- 40 * pi / 180
+  d2 <- 110 * pi / 180
+  gA <- sem_pop(
+    a, cc_a, rep(0.6, 8), oct,
+    cbind(c(0.15, 0.3 * cos(d1), 0.3 * sin(d1))), v_m = 1
+  )
+  gB <- sem_pop(
+    a, cc_a * (1 + eps * cos(2 * oct * pi / 180)), rep(0.6, 8), oct,
+    cbind(c(0.18, 0.28 * cos(d2), 0.28 * sin(d2))), v_m = 1
+  )
+  list(sigma = list(A = gA$sigma, B = gB$sigma), scales = gA$scales)
+}
+
+test_that("a non-ML estimator that still yields a plain CFI is OUT of scope (Cheung & Rensvold simulated ML only)", {
+  skip_if_not_installed("lavaan")
+  # GLS, WLS, ULS and continuous DWLS all produce plain-named fit measures, so
+  # "no cfi.robust/cfi.scaled" does NOT imply "normal-theory ML CFI". Cheung &
+  # Rensvold's Limitations section (p. 251) restricts the criterion to ML, so a
+  # non-ML fit must get the value and NO verdict -- flagging it would assert a
+  # cutoff the source never simulated. Caught at the M57 review (F1).
+  pop <- dcfi_pop_2g(0)
+  dat <- sim_groups(pop$sigma, n_per = 300, seed = 11)
+  set.seed(41)
+  gls <- suppressWarnings(ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    estimator = "GLS", se = "standard", boots = 20
+  ))
+  sc <- gls$invariance$dcfi_scope
+  expect_identical(sc$estimator, "GLS")
+  expect_true(isTRUE(sc$cfi_plain)) # the trap: the CFI *is* plain-named
+  expect_false(isTRUE(sc$ml)) # but the estimator is not ML
+  expect_false(isTRUE(sc$in_scope))
+  expect_false(is.na(gls$invariance$table$dcfi[2])) # value still reported
+  expect_true(all(is.na(gls$invariance$table$cr))) # verdict withheld
+  expect_no_match(dcfi_header(gls), "cr\\s*$")
+  out <- dcfi_printed(gls)
+  expect_match(out, "not validated", ignore.case = TRUE)
+  expect_match(out, "non-ML estimator: GLS", fixed = TRUE)
+  # And the ML family stays IN scope: MLR/MLM are ML estimation, excluded only
+  # by their robust CFI, so the plain-CFI test must remain the operative one
+  set.seed(42)
+  ml <- ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    estimator = "ML", boots = 20
+  )
+  expect_identical(ml$invariance$dcfi_scope$estimator, "ML")
+  expect_true(isTRUE(ml$invariance$dcfi_scope$in_scope))
+})
+
+test_that("printed dcfi resolves against the cutoff: values either side of -.01 never render alike (M57 review F2)", {
+  skip_if_not_installed("lavaan")
+  # round(dcfi, 3) would print both -0.0096 (retain) and -0.0104 (reject) as
+  # "-0.01", showing one number under two opposite labels directly beneath a
+  # rule stated in terms of that number.
+  pop <- dcfi_pop_2g(0)
+  dat <- sim_groups(pop$sigma, n_per = 400, seed = 11)
+  set.seed(43)
+  res <- ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    estimator = "ML", boots = 20
+  )
+  spliced <- res
+  spliced$invariance$table$dcfi[2] <- -0.0096
+  spliced$invariance$table$cr <- sem_dcfi_flag(
+    spliced$invariance$table$dcfi, TRUE
+  )
+  # Assert on the metric RUNG's own printed row, not the whole output -- the
+  # attribution note legitimately contains the literal "-0.01" (it states the
+  # rule), so a whole-output negative match would fence nothing.
+  metric_row <- function(x) {
+    grep("^ *metric ", utils::capture.output(print(x)), value = TRUE)[[1]]
+  }
+  row_hi <- metric_row(spliced)
+  spliced$invariance$table$dcfi[2] <- -0.0104
+  spliced$invariance$table$cr <- sem_dcfi_flag(
+    spliced$invariance$table$dcfi, TRUE
+  )
+  row_lo <- metric_row(spliced)
+  # The two labels really are opposite at these values
+  expect_match(row_hi, "retain")
+  expect_match(row_lo, "reject")
+  # ... and the printed VALUE distinguishes them
+  expect_match(row_hi, "-0.0096", fixed = TRUE)
+  expect_match(row_lo, "-0.0104", fixed = TRUE)
+  # Neither collapses onto the bare cutoff the label is decided against
+  expect_no_match(row_hi, "-0.01 ", fixed = TRUE)
+  expect_no_match(row_lo, "-0.01 ", fixed = TRUE)
+})
+
+test_that("the gate follows Delta-chi-square when Delta-CFI REJECTS and the nested test retains (AND-leak guard)", {
+  skip_if_not_installed("lavaan")
+  # Complement of the disagreement fixture above. There, ΔCFI retained while
+  # Δχ² rejected, and the truth was comparable = FALSE -- so a leak of the form
+  # "comparable requires BOTH criteria to retain" would also have produced
+  # FALSE and passed. Here ΔCFI REJECTS while Δχ² retains and the truth is
+  # comparable = TRUE, which such a leak cannot produce. The two fixtures
+  # together fence both directions (M57 review F3).
+  pop <- dcfi_pop_lowsat(0.30)
+  dat <- sim_groups(pop$sigma, n_per = 150, seed = 64)
+  set.seed(44)
+  res <- ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    contrast = TRUE, estimator = "ML", boots = 200
+  )
+  inv <- res$invariance
+  met <- inv$table$rung == "metric"
+  expect_true(isTRUE(inv$dcfi_scope$in_scope)) # the flag is live here
+  expect_lt(inv$table$dcfi[met], -0.01) # Cheung-Rensvold rejects
+  expect_identical(inv$table$cr[met], "reject")
+  expect_gte(inv$table$p[met], inv$alpha) # the nested test retains
+  # The gate follows the nested test alone: comparable, and the contrast IS
+  # computed despite the secondary criterion rejecting the same rung
+  expect_true(isTRUE(inv$comparable))
+  expect_true(isTRUE(res$details$contrast))
+  expect_equal(nrow(res$results), 3)
+  expect_match(res$results$Label[3], "B - A")
+  expect_match(inv$verdict, "metric invariance retained")
+  expect_no_match(inv$verdict, "CFI", ignore.case = TRUE)
 })

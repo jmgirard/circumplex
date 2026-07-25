@@ -89,11 +89,12 @@ verdict, and the fit the estimation layer consumes are decided by the
 nested test alone, and the two criteria can legitimately disagree (a
 change in CFI is insensitive to sample size where the nested test is not).
 The retain/reject label prints \strong{only inside the envelope that simulation
-covers} -- exactly two groups and the plain normal-theory CFI (that is,
-\code{estimator = "ML"}; the default \code{"MLR"} yields a robust CFI). Under a
-robust CFI or more than two groups the \code{dcfi} value still prints, with a
-note that the cutoff is not validated for that configuration and no
-verdict attached. Cheung and Rensvold simulated two groups, ML estimation,
+covers} -- exactly two groups, ML estimation, and the plain normal-theory
+CFI (that is, \code{estimator = "ML"}; the default \code{"MLR"} yields a robust CFI,
+and \code{"GLS"}/\code{"WLS"}/\code{"ULS"}/\code{"DWLS"} are not ML at all even though their
+CFI is plain-named). Under a robust CFI, a non-ML estimator, or more than
+two groups the \code{dcfi} value still prints, with a note naming why the
+cutoff is not validated for that configuration and no verdict attached. Cheung and Rensvold simulated two groups, ML estimation,
 multivariate normal data, and Type I error only; robust CFI variants were
 not in their study, so no cutoff here was validated for one.}
 
