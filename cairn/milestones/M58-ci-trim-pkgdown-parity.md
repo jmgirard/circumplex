@@ -77,14 +77,14 @@ mechanical allowlist/DESCRIPTION sync check.
       per-file documented exclusions, `stop()` naming package + file on drift.
       Add `^tools$` to `.Rbuildignore`. Run locally: true state passes,
       injected drift fails.
-- [ ] **T2** — Rewrite `pkgdown.yaml`'s `setup-r-dependencies` step (drop
+- [x] **T2** — Rewrite `pkgdown.yaml`'s `setup-r-dependencies` step (drop
       `needs: website`; `dependencies: '"hard"'` + allowlist), carrying an
       M52-style comment naming the brms exclusion and pointing at T1's guard.
-- [ ] **T3** — `pkgdown.yaml` concurrency → `group: ${{ github.workflow }}-${{
+- [x] **T3** — `pkgdown.yaml` concurrency → `group: ${{ github.workflow }}-${{
       github.ref }}`, `cancel-in-progress: true`.
-- [ ] **T4** — Add `paths-ignore` to the `push` trigger of all three
+- [x] **T4** — Add `paths-ignore` to the `push` trigger of all three
       workflows and to `pkgdown.yaml`'s `pull_request` trigger.
-- [ ] **T5** — Wire `Rscript tools/check-ci-deps.R` into `R-CMD-check.yaml`
+- [x] **T5** — Wire `Rscript tools/check-ci-deps.R` into `R-CMD-check.yaml`
       as a step after `setup-r`, before `setup-r-dependencies`.
 - [ ] **T6** — Prove the guard by mutation on the branch: inject a `Suggests`
       entry, push, observe red naming it, revert, observe green; record both
@@ -95,6 +95,7 @@ mechanical allowlist/DESCRIPTION sync check.
 - 2026-07-25: created by /milestone-plan.
 - 2026-07-25: status planned->in-progress; branch `m58-ci-trim-pkgdown-parity` cut from master@425fd294.
 - 2026-07-25: T1 done — `tools/check-ci-deps.R` (base R, handles block + inline `extra-packages` forms); `^tools$` added to .Rbuildignore. Local teeth check: flags pkgdown's real drift, and an injected `tibble` Suggest is named per-file; exit 1 both, clean revert.
+- 2026-07-25: T2-T5 done — pkgdown gets the hard-deps+allowlist install (brms/Stan out, glmmTMB/lavaan kept), workflow-level `cancel-in-progress`, and paths-ignore; push triggers on all three workflows gain paths-ignore; guard wired into R-CMD-check after setup-r. Guard now exits 0; all three YAMLs parse; `devtools::test()` 0 FAIL / 3247 PASS / 0 SKIP.
 
 ## Decisions
 
