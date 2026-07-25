@@ -183,3 +183,26 @@ fresh (re-run at review, never recalled from implementation).
   one regenerated Rd ✓; `pkgdown::check_pkgdown()` → "No problems found" ✓;
   NEWS entry present with no milestone numbers ✓; no new top-level files, so no
   `.Rbuildignore` addition owed ✓.
+
+### Independent review — three lenses
+
+- **[S] prior-PR-comments lens: no findings.** GitHub inline-comment probe
+  returned `[]` (consistent with M33's recorded finding that this repo reviews
+  through cairn, not PR threads), so archived `## Review` sections were the
+  evidence base. It confirmed the diff *discharges* rather than regresses each
+  targeted obligation: M54 F3's blockwise note present in both roxygen and
+  vignette with RR09 §7.8's own 6.7% figure; RR09 §7.4's NA-with-reason honored
+  in `print()` and `summary()` independently; BC5's rescaling trap handled by
+  matching the convention, not widening tolerance; BC4's mandatory
+  `orthogonal = TRUE` set on the new fit path. No `references/` page touched, so
+  the M40/M47 provenance-status family does not apply.
+- **[S] blame-history lens: no findings.** The raw path's listwise block and its
+  `n <= p` refusal are byte-identical to `master` (moved inside `if (has_data)`,
+  logic unchanged); the PD/eigenvalue guard and its 1e-8 tolerance remain
+  unconditional on both paths; the boundary (BC11) block is path-agnostic and
+  untouched; `suppressWarnings` scope is functionally unchanged; `sem_fit_cfa()`
+  has an empty diff, so the SEM chokepoint was bypassed rather than disturbed
+  (as T3 intended); `details` only gained `input`. It separately judged the
+  zero-variance refusal's unreachability on the `cormat` path legitimate — a
+  unit diagonal encodes non-zero variance by definition, and a zero-variance
+  item yields `NA` correlations that the finiteness check catches.
