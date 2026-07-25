@@ -64,7 +64,7 @@ supersession the plan wrongly thought unnecessary.
       raw path) and carry the RR09 §7.8 note that a blockwise-administered
       instrument analyzed without ζ2 folds block variance into the general and
       scale components; NEWS entry added.
-- [ ] AC7 (profile verify). `devtools::test()` clean and
+- [x] AC7 (profile verify). `devtools::test()` clean and
       `devtools::check()` OK — with the PDF-manual step confirmed to have
       **run** by grepping the log for `checking PDF version of manual`, since
       this milestone touches roxygen (M7/M57 lesson).
@@ -169,6 +169,16 @@ fresh (re-run at review, never recalled from implementation).
   Cudeck (1989) is cited on both surfaces. NEWS is folded into the existing
   unreleased `axes_reliability()` bullet. No milestone numbers appear in any
   user-facing text (grep clean over NEWS, Rd, vignette).
+
+- **AC7 (profile verify).** Re-run on the FINAL post-fix code:
+  `devtools::test()` → FAIL 0 / WARN 4 / SKIP 0 / PASS 3318 (the 4 warnings are
+  pre-existing, confirmed against a stashed tree at implementation time; the
+  axes file alone is 159 pass / 0 fail / 0 skip). `devtools::check(manual = TRUE)`
+  → `Status: OK`, zero ERROR/WARNING/NOTE lines, with
+  `checking PDF version of manual ... OK` at log line 119 — the step
+  `devtools::check()` skips by default and which the M7/M57 lesson names as the
+  repeat offender, confirmed to have actually run rather than inferred from
+  `Status: OK`.
 
 ### Consistency gate
 
