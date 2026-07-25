@@ -41,7 +41,6 @@ Imports:
     stats
 Suggests:
     brms,
-    tibble,
     covr (>= 3.5.0),
     ggrepel,
     glmmTMB,
