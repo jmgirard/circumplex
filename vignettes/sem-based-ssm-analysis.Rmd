@@ -331,17 +331,19 @@ fit you supply and leaves the comparability claim to you.
 
 The ladder table also carries `dcfi`, the change in CFI from the previous
 fitted rung. This is Cheung and Rensvold's (2002) secondary criterion, whose
-general rule rejects an invariance step when CFI falls by more than .01. That
-direction comes from the article's own Table 5, whose critical values are the
-1% *lower* tails of the simulated null distributions, so a ΔCFI at or below one
-is evidence *against* invariance; the sentence stating the rule on the article's
-p. 251 reads backwards relative to its own table, and this package follows the
-simulation. It is
+general rule rejects an invariance step when CFI falls by more than .01. It is
 **reported, never gating**: comparability, the verdict, and the model the
 estimates are taken from are decided by the nested test alone. The two criteria
 can disagree, and neither is a tiebreaker for the other — a change in CFI is
 insensitive to sample size, which the nested test is not, so in a large sample
 the nested test can reject a step whose CFI barely moves.
+
+That direction is worth stating carefully, because the article gives it two
+ways. Its Table 5 reports critical values that are the 1% *lower* tails of the
+simulated null distributions, so a ΔCFI at or below one of them is the
+1%-level evidence *against* invariance — the sense used here. The sentence
+stating the general rule on the article's p. 251 reads the opposite way
+relative to that same table. This package follows the simulation.
 
 Read the retain/reject label narrowly on the occasions it appears. Cheung and
 Rensvold simulated two groups, ML estimation, and multivariate normal data, and
