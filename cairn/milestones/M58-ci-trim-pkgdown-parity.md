@@ -191,11 +191,11 @@ reverses nothing deliberate. [O] diff-bug: six findings, scored below.
   cancel-in-progress against an in-flight deploy. Fixed: PRs keyed per ref with
   cancellation (AC3 preserved), all deploying events on one shared key with
   cancellation off, so they queue.
-- **F2 (55, logged).** The guard reads only `extra-packages:`, never
+- **F2 (55, ACTIONED at user direction — fixed on branch).** The guard reads only `extra-packages:`, never
   `dependencies:`/`needs:`. Reproduced in a sandbox: restoring
   `dependencies: '"all"'` + `needs: website` returns brms and the Stan stack
   while the guard prints "in sync" and exits 0.
-- **F3 (78, logged).** `man/**` and `README.md` are pkgdown site inputs
+- **F3 (78, ACTIONED at user direction — fixed on branch).** `man/**` and `README.md` are pkgdown site inputs
   (`_pkgdown.yml:18` `reference:` over 74 Rd files; README.md is the home
   page), so ignoring them on pkgdown lets an Rd- or README-only push leave the
   published site stale.
@@ -210,3 +210,20 @@ reverses nothing deliberate. [O] diff-bug: six findings, scored below.
 Verification gap noted, not a defect: the guard step has only ever executed on
 ubuntu (the PR matrix is a single ubuntu/release leg). Its first windows/macos
 run happens on the merge push, covered by AC6's post-merge clause.
+
+**Post-review fixes (F2, F3) — user directed the two sub-threshold findings fixed.**
+F2: the guard now also asserts, per policy file, that the setup-r-dependencies
+step carries `dependencies: '"hard"'` and carries NO `needs:` key, scoped to
+that key's own `with:` mapping. Proven three ways — true state exits 0; the
+sandbox sabotage (`dependencies: '"all"'` + `needs: website`) now exits 1 with
+both messages, where before the fix it exited 0 reporting "in sync"; and a
+job-level `jobs.<id>.needs` at a different indentation does NOT false-positive
+(exits 0), confirming the block scoping.
+F3: pkgdown's paths-ignore reduced to `cairn/**` alone, dropping `man/**` and
+`README.md` because both are site inputs. The other two workflows keep the full
+three-entry list, which is correct for them. AC4 is unaffected — a `cairn/**`
+-only push still matches pkgdown's filter.
+AC6 not re-run: the only files changed after its evidence was gathered are
+`.github/workflows/pkgdown.yaml` and `tools/check-ci-deps.R`, both matched by
+`.Rbuildignore` (`^\.github$`, `^tools$`), so the built package is unchanged.
+F4, F5 and F6 remain logged and unactioned at the user's direction.

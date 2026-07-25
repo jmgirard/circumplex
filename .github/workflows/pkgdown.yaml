@@ -1,23 +1,25 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-# paths-ignore on BOTH triggers (cairn M58): a commit touching only tracking
-# files, generated Rd, or the rendered README cannot change the site, and on
-# push this workflow also deploys to gh-pages — so a cairn-only commit was
-# rebuilding and redeploying the whole site for nothing. `**/*.Rmd` is
-# deliberately NOT ignored: vignette sources are articles.
+# paths-ignore on BOTH triggers (cairn M58): a cairn-only commit cannot change
+# the site, and on push this workflow also deploys to gh-pages, so it was
+# rebuilding and redeploying for nothing.
+# This list is deliberately SHORTER than the other two workflows' — it is
+# `cairn/**` only. `man/**` and `README.md` are ignorable for R CMD check and
+# coverage but are direct INPUTS here: `_pkgdown.yml` declares a `reference:`
+# section, so pkgdown renders every man/*.Rd into the published reference
+# pages, and the site home page is built from README.md. Ignoring either would
+# let a roxygen regeneration or a README edit leave the live site stale until
+# some unrelated commit happened along (M58 review, F3).
+# `**/*.Rmd` is likewise not ignored: vignette sources are articles.
 on:
   push:
     branches: [main, master]
     paths-ignore:
       - 'cairn/**'
-      - 'man/**'
-      - 'README.md'
   pull_request:
     branches: [main, master]
     paths-ignore:
       - 'cairn/**'
-      - 'man/**'
-      - 'README.md'
   release:
     types: [published]
   workflow_dispatch:

@@ -18,6 +18,15 @@
 # When a workflow legitimately needs a package that is NOT a Suggest, add it to
 # that file's `extra` below. When a workflow legitimately omits a Suggest, add
 # it to `exclude` below with a comment saying why.
+#
+# The allowlist is only authoritative while the step also says
+# `dependencies: '"hard"'` and does NOT say `needs:` — either of those two keys
+# reverts the job to whole-Suggests resolution, which drags brms and the Stan
+# toolchain back in while leaving the allowlist text untouched and this script
+# green. So both keys are asserted too, scoped to the same `with:` block (a
+# job-level `jobs.<id>.needs` is a different key and must not be confused with
+# it). Found in the M58 review; without it the guard could report "in sync"
+# over a job that had silently reverted M52 and M58 both.
 
 # ---- policy ---------------------------------------------------------------
 
@@ -102,6 +111,38 @@ read_allowlist <- function(path) {
   sort(unique(pkgs[pkgs != "."]))
 }
 
+# The sibling keys of `extra-packages:` within its own `with:` mapping. Walks
+# out from that key in both directions, keeping only lines at exactly its
+# indentation and stopping at the first line indented less (which ends the
+# mapping). Block-scalar content is indented deeper and is skipped, so the
+# allowlist entries themselves are never mistaken for keys.
+read_with_block_keys <- function(path) {
+  lines <- readLines(path, warn = FALSE)
+  key <- grep("^\\s*extra-packages\\s*:", lines)
+  if (length(key) != 1L) {
+    return(character(0L))
+  }
+  indent_of <- function(l) nchar(sub("^(\\s*).*", "\\1", l))
+  key_indent <- indent_of(lines[[key]])
+
+  collect <- function(idxs) {
+    out <- character(0L)
+    for (i in idxs) {
+      line <- lines[[i]]
+      if (!nzchar(trimws(line))) next
+      ind <- indent_of(line)
+      if (ind < key_indent) break
+      if (ind > key_indent) next
+      if (startsWith(trimws(line), "#")) next
+      out <- c(out, line)
+    }
+    out
+  }
+  block <- c(collect(rev(seq_len(key - 1L))), lines[[key]],
+             collect(seq.int(key + 1L, length(lines))))
+  trimws(block)
+}
+
 # ---- check ----------------------------------------------------------------
 
 suggests <- read_suggests()
@@ -118,6 +159,23 @@ for (path in names(policy)) {
     next
   }
   rule <- policy[[path]]
+
+  # The two keys that decide whether the allowlist governs at all.
+  with_keys <- read_with_block_keys(path)
+  dep_line <- grep("^dependencies\\s*:", with_keys, value = TRUE)
+  if (length(dep_line) != 1L || !grepl("\"hard\"", dep_line, fixed = TRUE)) {
+    problems <- c(problems, sprintf(
+      "%s: the setup-r-dependencies step must carry `dependencies: '\"hard\"'` for its allowlist to govern; found %s. Anything else resolves ALL Suggests and reinstates brms.",
+      path,
+      if (length(dep_line) == 0L) "no `dependencies:` key" else paste0("`", dep_line, "`")
+    ))
+  }
+  if (any(grepl("^needs\\s*:", with_keys))) {
+    problems <- c(problems, sprintf(
+      "%s: the setup-r-dependencies step must NOT carry a `needs:` key — it resolves dependency roles wholesale (e.g. `needs: website` pulls every Suggest, brms included) and silently overrides the allowlist.",
+      path
+    ))
+  }
 
   unknown_exclude <- setdiff(rule$exclude, suggests)
   if (length(unknown_exclude)) {
