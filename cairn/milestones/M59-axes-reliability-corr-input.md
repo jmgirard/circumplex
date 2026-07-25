@@ -206,3 +206,59 @@ fresh (re-run at review, never recalled from implementation).
   zero-variance refusal's unreachability on the `cormat` path legitimate — a
   unit diagonal encodes non-zero variance by definition, and a zero-variance
   item yields `NA` correlations that the finiteness check catches.
+- **[O] diff-bug lens: four findings, three actioned.** It independently
+  confirmed the core statistics — round-trip xi1 diff 5.6e-17, the `(N−1)/N`
+  claim true (traced to `sample.cov.rescale`, so attributing it to `likelihood`
+  is loose wording not an error), guards firing on the new path (it forced a
+  ξ1 = 0 population through `cormat` and got the correct warning + NA), and no
+  NULL dereference of `mat`/`scale_scores`.
+
+**Scored by a fresh [S] scorer** (did not generate the findings). Actioned
+(≥ 80), all three fixed on the branch and each proven by mutation:
+
+- **F1 (95) — `R/axes_reliability.R`: dimnames guard checked one dimension, the
+  subset indexes two.** A matrix with colnames and NULL rownames passed
+  validation, then failed on `cormat[all_cols, all_cols]` with a bare
+  `subscript out of bounds` rather than the refusal AC5 promises for absent
+  dimnames. That shape is the *default* result of `as.matrix(read.csv(...))` —
+  the transcribe-a-published-matrix workflow this path exists to serve.
+  Reproduced verbatim. Fixed: the guard requires dimnames present and identical
+  on both dimensions, in the same order; three cases added (rownames-NULL,
+  colnames-NULL, scrambled order). Mutation: reverting to colnames-only → red.
+- **F3 (85) — the permuted-cormat test could not fence what it claimed.** Its
+  comment said the permutation proves loadings are matched by name; the
+  assertion read `components$Estimate`, which lavaan makes invariant by matching
+  `sample.cov` on dimnames itself. Measured with the reorder removed:
+  max |diff| exactly **0**. The reorder actually determines
+  `details$ols_shadow` (built positionally), which collapses from .15 to
+  ~2.6e-4 without it — and that was asserted only on the raw path. Fixed:
+  `ols_shadow` now asserted on the `cormat` path. Mutation: dropping the
+  reorder now fails *on the `ols_shadow` assertion* rather than incidentally
+  through ~1e-8 optimizer jitter.
+- **F4 (85) — the cross-engine oracle's comment misattributed its residual, and
+  a systematic offset sat inside the bar.** The comment blamed the engines'
+  likelihood normalization; correcting for `(N−1)/N` measurably *worsens*
+  agreement, and pairing OpenMx with a wishart lavaan fit is looser still
+  (5.5e-5 / 6.5e-5 vs 1.9e-5 across seeds 7, 8) — so OpenMx's `type="cov"`
+  convention sits nearer lavaan's `"normal"`, the shipped pairing is the
+  tightest available, and the residual is plain optimizer disagreement. Fixed:
+  comment states what is true; bar tightened 1e-3 → 2e-4, plus an assertion
+  that the disagreement is below the `(N−1)/N` offset (xi1/n = 7.5e-5), which
+  *falsifies* the old explanation instead of leaving it untested. This was the
+  same "absorbed into tolerance" practice AC2 forbids, one screen away.
+
+Sub-threshold (< 80) — logged, not actioned (IP3: surfaced, never dropped):
+
+- **F2 (65)** — the `cormat` path validates finiteness/symmetry/unit-diagonal on
+  the whole supplied matrix before subsetting, while the raw path subsets first
+  and validates only selected columns. So a superset matrix carrying the items
+  plus unrelated variables is refused if anything *outside* the item block is
+  NA, though the raw-data analogue is accepted and a clean superset works.
+  Reproduced. Arguable design gap, no criterion promises block-only validation.
+- **F5 (65)** — `sample(nrow(sigma))` had no preceding `set.seed()`. Fixed
+  incidentally (`set.seed(59)`) because F3's fix rewrote those exact lines;
+  recorded here rather than claimed as an actioned finding.
+- **F6 (50)** — the `sd = "raw"` refusal sits after the lavaan fit, so that
+  combination pays a full fit before erroring, and on a boundary matrix emits
+  the boundary warning before the `sd` error. Cost/ordering nit; AC5's
+  informative error is still delivered.
