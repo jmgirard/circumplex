@@ -18,6 +18,11 @@ step keeps `"hard"` with no `needs:` key.
 **Decisions:** D-029 — OpenMx/glmmTMB stay installed (BC7 carries no
 `skip_on_cran`; dep install is under 7% of a job). No milestone-local entries.
 
+**Post-merge:** AC4 confirmed live — hygiene commit 77887f25 (`cairn/**` only)
+triggered zero runs, against plan commit 425fd294 which triggered all three
+pre-change. AC6 confirmed — full 5-config matrix green on master, the guard
+step passing on windows and macos for the first time.
+
 **Review:** prior-PR-comments and blame-history zero findings; diff-bug six,
 scored 80/78/68/55/40/25. F1 actioned; F2+F3 actioned at maintainer direction
 past the scorer threshold; F4/F5/F6 logged. Retired M52's allowlist-drift
