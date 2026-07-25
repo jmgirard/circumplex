@@ -89,14 +89,20 @@ verdict, and the fit the estimation layer consumes are decided by the
 nested test alone, and the two criteria can legitimately disagree (a
 change in CFI is insensitive to sample size where the nested test is not).
 The retain/reject label prints \strong{only inside the envelope that simulation
-covers} -- exactly two groups, ML estimation, and the plain normal-theory
-CFI (that is, \code{estimator = "ML"}; the default \code{"MLR"} yields a robust CFI,
-and \code{"GLS"}/\code{"WLS"}/\code{"ULS"}/\code{"DWLS"} are not ML at all even though their
-CFI is plain-named). Under a robust CFI, a non-ML estimator, or more than
-two groups the \code{dcfi} value still prints, with a note naming why the
-cutoff is not validated for that configuration and no verdict attached. Cheung and Rensvold simulated two groups, ML estimation,
-multivariate normal data, and Type I error only; robust CFI variants were
-not in their study, so no cutoff here was validated for one.}
+covers}: exactly two groups, ML estimation, and a plain (non-robust) CFI.
+Three separate things put a fit outside it, and the printed note names
+which one applies. A robust estimator -- the default \code{"MLR"}, or \code{"MLM"}
+-- makes lavaan report a robust CFI; so does \code{missing = "fiml"}, even
+under \code{estimator = "ML"}, so plain ML is necessary for the label but not
+sufficient. \code{"GLS"}, \code{"WLS"}, \code{"ULS"} and \code{"DWLS"} are not ML estimation
+at all, though their CFI is plain-named. And more than two groups is
+outside the simulation whatever the estimator. In each case the \code{dcfi}
+value still prints, marked as not validated for that configuration and
+with no verdict attached.
+
+Cheung and Rensvold simulated two groups, ML estimation, multivariate
+normal data, and Type I error only; robust CFI variants were not in their
+study, so no cutoff here was validated for one.}
 
 \item{invariance_alpha}{Optional. The alpha level for the invariance
 gating decision (default = 0.05). The gate is a modeling decision with

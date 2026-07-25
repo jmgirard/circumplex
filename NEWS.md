@@ -199,7 +199,7 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   observed-score group contrast in `ssm_analyze()` remains the right tool when
   invariance cannot be assumed; it answers its own, different question.
 
-* The invariance ladder `print()` reports additionally carries `dcfi`, the
+* The invariance ladder that `print()` reports now also carries `dcfi`, the
   change in CFI from the previous fitted rung, as a labeled *secondary*
   criterion: Cheung and Rensvold's (2002) general rule rejects an invariance
   step when CFI falls by more than .01. (That direction is taken from the
@@ -214,12 +214,14 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   which is narrow: they simulated **two groups, ML estimation, and
   multivariate normal data, and examined Type I error only** — not power — and
   robust CFI variants were not part of their study. So the label appears only
-  for a two-group fit whose CFI is the plain normal-theory one, meaning
-  `estimator = "ML"`. Under a robust CFI (including the `"MLR"` default), a
-  non-ML estimator such as `"GLS"`, or more than two groups, the `dcfi` value
-  still prints, marked as not validated for that configuration and carrying no
-  verdict — extending the cutoff there would require simulation that has not
-  been done.
+  for a two-group fit estimated by ML whose CFI is the plain, non-robust one.
+  `estimator = "ML"` is necessary but not sufficient: `missing = "fiml"` also
+  makes lavaan report a robust CFI, as do the `"MLR"` default and `"MLM"`.
+  Under a robust CFI from any of those routes, a non-ML estimator such as
+  `"GLS"`, or more than two groups, the `dcfi` value still prints, marked as
+  not validated for that configuration, with a note naming which condition
+  applies and carrying no verdict — extending the cutoff there would require
+  simulation that has not been done.
 
 ## Repeated-measures and longitudinal analysis
 

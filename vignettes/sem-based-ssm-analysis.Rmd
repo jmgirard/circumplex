@@ -349,13 +349,15 @@ Read the retain/reject label narrowly on the occasions it appears. Cheung and
 Rensvold simulated two groups, ML estimation, and multivariate normal data, and
 examined Type I error only — not power — and robust CFI variants were not part
 of their study. `ssm_sem()` therefore prints the label only for a two-group fit
-estimated by ML whose CFI is the plain normal-theory one — `estimator = "ML"`.
-Because the default estimator is `"MLR"`, the ladder above prints its `dcfi`
-value marked as outside that validated scope, with no verdict attached, and the
-note names the reason. The same withholding applies to a non-ML estimator such
-as `"GLS"`, whose CFI is plain-named but whose fit function is not the one the
-criterion was simulated under. That is a deliberate refusal rather than a gap:
-extending the cutoff to a robust index, another estimator, or three or more
+estimated by ML whose CFI is the plain, non-robust one. Note that
+`estimator = "ML"` is necessary but not sufficient: `missing = "fiml"` also
+makes lavaan report a robust CFI, so a fit can be ML and still fall outside the
+envelope. Because the default estimator is `"MLR"`, the ladder above prints its
+`dcfi` value marked as outside that scope, with no verdict attached and the note
+naming which condition applies. The same withholding covers a non-ML estimator
+such as `"GLS"`, whose CFI is plain-named but whose fit function is not the one
+the criterion was simulated under. That is a deliberate refusal rather than a
+gap: extending the cutoff to a robust index, another estimator, or three or more
 groups would take simulation work nobody has done.
 
 When invariance is not the obstacle — for example, contrasting **two measures**
