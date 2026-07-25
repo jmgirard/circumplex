@@ -642,3 +642,58 @@ test_that("axes_reliability() works via the instrument path", {
   )
   expect_equal(res$results$xi1[[1]], res2$results$xi1[[1]], tolerance = 1e-6)
 })
+
+# --- M59: the cormat input path -----------------------------------------------
+
+# AC2 round-trip oracle. This is an EXACT oracle, not an approximate one, and the
+# reason is worth stating because the tolerance below would otherwise look
+# suspiciously tight. The raw path z-standardizes the complete cases (scale(),
+# N-1 divisor) and hands lavaan the frame; lavaan's default ML likelihood then
+# rescales the N-1 covariance of those z-scores -- which is exactly cor(mat) --
+# by (N-1)/N. Passing sample.cov = cor(mat) with sample.nobs = N under the SAME
+# default likelihood applies the same (N-1)/N rescaling, so both paths hand the
+# optimizer bit-identical moments. RR09 BC5's trap is thereby handled by matching
+# it, not by widening tolerance: likelihood = "wishart" (which the BC5 population
+# oracle above uses, for the different purpose of recovering an exact truth)
+# would BREAK this equivalence by precisely (N-1)/N.
+
+axes_rt_compare <- function(raw, cm, tol = 1e-6) {
+  expect_equal(cm$results$xi1, raw$results$xi1, tolerance = tol)
+  expect_equal(cm$results$item_n, raw$results$item_n, tolerance = tol)
+  expect_equal(cm$results$reliability, raw$results$reliability, tolerance = tol)
+  expect_equal(cm$results$sem, raw$results$sem, tolerance = tol)
+  expect_equal(cm$components$Estimate, raw$components$Estimate, tolerance = tol)
+  expect_equal(cm$components$SE, raw$components$SE, tolerance = tol)
+  expect_equal(cm$fit$df, raw$fit$df)
+  expect_equal(cm$fit$chisq, raw$fit$chisq, tolerance = tol)
+}
+
+test_that("AC2: the cormat path reproduces the raw path exactly", {
+  skip_if_not_installed("lavaan")
+
+  # Dataset 1: the bundled 32-item example.
+  data("simulated_items", package = "circumplex", envir = environment())
+  items1 <- split(names(simulated_items), rep(1:8, each = 4))
+  raw1 <- suppressMessages(
+    axes_reliability(simulated_items, items = items1, angles = octants())
+  )
+  cm1 <- suppressMessages(axes_reliability(
+    cormat = stats::cor(simulated_items), items = items1,
+    angles = octants(), n = nrow(simulated_items)
+  ))
+  axes_rt_compare(raw1, cm1)
+
+  # Dataset 2: a 16-item draw at a different component design, so the
+  # equivalence is not an artifact of one instrument size or one xi1 level.
+  oct <- octants()
+  set.seed(2059)
+  dat2 <- axes_simulate(700L, oct, 2L, xi1 = .22, xi2 = .05, zeta1 = .14)
+  items2 <- split(names(dat2), rep(1:8, each = 2))
+  raw2 <- suppressMessages(
+    axes_reliability(dat2, items = items2, angles = oct)
+  )
+  cm2 <- suppressMessages(axes_reliability(
+    cormat = stats::cor(dat2), items = items2, angles = oct, n = nrow(dat2)
+  ))
+  axes_rt_compare(raw2, cm2)
+})

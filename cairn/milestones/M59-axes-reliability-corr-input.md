@@ -78,7 +78,7 @@ no dependency and D-001 is not superseded (M59 plan gate).
 
 ## Tasks
 
-- [ ] T1. Test-first: write the AC2 round-trip test against the not-yet-added
+- [x] T1. Test-first: write the AC2 round-trip test against the not-yet-added
       `cormat`/`n` arguments and watch it fail. Prove each new guard by
       mutation, not by eye, and scope every probe to the surface it claims to
       check (M57).
@@ -108,6 +108,7 @@ no dependency and D-001 is not superseded (M59 plan gate).
 
 - 2026-07-25: created by /milestone-plan.
 - 2026-07-25: start — status in-progress, branch `m59-axes-reliability-corr-input` cut from master.
+- 2026-07-25: T1 — AC2 round-trip test written first; fails with `unused arguments (cormat, n)`, the intended pre-implementation failure.
 - 2026-07-25: amended AC1/AC2/AC3a/AC4/AC5 + Scope + T1/T2/T8 at the implement gate — the planned `nobs`-switches-`data` surface is replaced by `cormat` + `n`, matching `cpm_fit()`'s existing correlation-matrix path (`R/cpm_fit.R:1559`), a house precedent the plan's collision sweep missed. Jeff's call at the gate.
 
 ## Decisions
