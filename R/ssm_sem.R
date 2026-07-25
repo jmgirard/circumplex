@@ -1147,6 +1147,23 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   and reports each group's separate configural profile instead (no
 #'   contrast is rendered by any method). Under the strict tier the metric
 #'   rung is vacuous (all loadings fixed) and is reported as such.
+#'
+#'   The ladder table also reports `dcfi`, the change in CFI from the previous
+#'   fitted rung (`NA` for configural and for the strict tier's vacuous metric
+#'   rung), as a labeled **secondary** criterion: Cheung and Rensvold's (2002)
+#'   general rule rejects an invariance step when CFI drops by more than .01
+#'   (their alpha = .01). It is reported and never gates: `comparable`, the
+#'   verdict, and the fit the estimation layer consumes are decided by the
+#'   nested test alone, and the two criteria can legitimately disagree (a
+#'   change in CFI is insensitive to sample size where the nested test is not).
+#'   The retain/reject label prints **only inside the envelope that simulation
+#'   covers** -- exactly two groups and the plain normal-theory CFI (that is,
+#'   `estimator = "ML"`; the default `"MLR"` yields a robust CFI). Under a
+#'   robust CFI or more than two groups the `dcfi` value still prints, with a
+#'   note that the cutoff is not validated for that configuration and no
+#'   verdict attached. Cheung and Rensvold simulated two groups, ML estimation,
+#'   multivariate normal data, and Type I error only; robust CFI variants were
+#'   not in their study, so no cutoff here was validated for one.
 #' @param invariance_alpha Optional. The alpha level for the invariance
 #'   gating decision (default = 0.05). The gate is a modeling decision with
 #'   a default test, not an oracle; the invariance table is always returned
@@ -1206,8 +1223,11 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   vectors), `details`, `call`, plus `sem` (the fitted lavaan model: the
 #'   gate rung's fit for grouped analyses, or the configural fit when the
 #'   gate was rejected), `invariance` (for grouped analyses: the ladder
-#'   table, the `comparable` flag, the verdict text, the gate rung, and the
-#'   alpha used; `NULL` for single-group analyses), and `model` (tier,
+#'   table -- including the `dcfi` column and its `cr` retain/reject label,
+#'   `NA` outside the criterion's validated scope -- the `comparable` flag,
+#'   the verdict text, the gate and required rungs, the alpha used, and
+#'   `dcfi_scope` recording that scope; `NULL` for single-group analyses),
+#'   and `model` (tier,
 #'   generated syntax for single-group fits, and the OLS projection
 #'   weights).
 #'
@@ -1222,6 +1242,13 @@ new_ssm_sem <- function(results, scores, details, call, sem, invariance,
 #'   settings (`"mvn"` through the package's own draws; `"boot"` through a
 #'   seed handed to lavaan's bootstrap). Call `set.seed()` immediately before
 #'   `ssm_sem()` for reproducible confidence intervals.
+#' @references Cheung, G. W., & Rensvold, R. B. (2002). Evaluating
+#'   goodness-of-fit indexes for testing measurement invariance.
+#'   \emph{Structural Equation Modeling}, 9(2), 233-255. (The `dcfi` secondary
+#'   criterion. Their p. 251 sentence states the direction of the -.01 rule
+#'   backwards relative to their own Table 5, whose critical values are the 1%
+#'   lower tails of the simulated null distributions; this package follows the
+#'   simulation.)
 #' @family ssm functions
 #' @family analysis functions
 #' @seealso [ssm_analyze()] for the observed-score SSM, [ssm_sem_syntax()] for

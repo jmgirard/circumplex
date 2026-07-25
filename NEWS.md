@@ -199,6 +199,20 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   observed-score group contrast in `ssm_analyze()` remains the right tool when
   invariance cannot be assumed; it answers its own, different question.
 
+* The invariance ladder `print()` reports additionally carries `dcfi`, the
+  change in CFI from the previous fitted rung, as a labeled *secondary*
+  criterion: Cheung and Rensvold's (2002) general rule rejects an invariance
+  step when CFI falls by more than .01. It is reported and never gates — the
+  nested test alone decides comparability, the verdict, and which fit the
+  estimates come from — and the two criteria can legitimately disagree, since a
+  change in CFI is insensitive to sample size where the nested test is not. The
+  retain/reject label prints only inside the envelope their simulation covers:
+  exactly two groups and the plain normal-theory CFI, meaning
+  `estimator = "ML"`. Under a robust CFI (including the `"MLR"` default) or
+  more than two groups, the `dcfi` value still prints, marked as not validated
+  for that configuration and carrying no verdict — extending the cutoff there
+  would require simulation that has not been done.
+
 ## Repeated-measures and longitudinal analysis
 
 * New repeated-measures (longitudinal) SSM analyses: `ssm_analyze()` gains an
