@@ -697,3 +697,190 @@ test_that("AC2: the cormat path reproduces the raw path exactly", {
   ))
   axes_rt_compare(raw2, cm2)
 })
+
+# AC3(a): the deterministic population-matrix oracle, driven through the PUBLIC
+# cormat path (BC5 above fits lavaan directly, so it does not exercise the
+# argument handling, subsetting, or reordering this milestone adds).
+#
+# The public path deliberately keeps lavaan's default likelihood = "normal" so
+# it agrees with the raw path exactly (see the AC2 note), and that convention
+# rescales sample.cov by (N-1)/N. Rather than hide that behind a loose
+# tolerance, the second block below PINS it: the recovered component is truth *
+# (n-1)/n to numerical precision, at three sample sizes. Recovery within 1e-4
+# then follows from choosing an n where that exact offset is below the bar.
+
+test_that("AC3(a): the population matrix recovers every component (cormat path)", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  k <- 4L
+  xi1 <- .15
+  xi2 <- .08
+  zeta1 <- .12
+  pop <- axes_population_cor(oct, k, xi1, xi2, zeta1)
+  sigma <- pop$sigma
+  inames <- sprintf("i%02d", seq_len(nrow(sigma)))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, pop$scale)
+
+  # The offset is exactly (n-1)/n -- measured identical at n = 500, 5e3, 5e4.
+  for (n in c(500L, 5000L, 50000L)) {
+    res <- suppressMessages(
+      axes_reliability(cormat = sigma, items = items, angles = oct, n = n)
+    )
+    est <- res$components$Estimate
+    expect_equal(est[[2]], xi1 * (n - 1) / n, tolerance = 1e-8)   # axes
+    expect_equal(est[[1]], xi2 * (n - 1) / n, tolerance = 1e-8)   # general
+    expect_equal(est[[3]], zeta1 * (n - 1) / n, tolerance = 1e-8) # scale
+    expect_lt(res$fit$chisq, 1e-6)
+  }
+
+  # AC3(a) proper: at an n where that exact offset (xi1/n = 3e-6) is below the
+  # 1e-4 bar, the public path recovers the truth outright.
+  res <- suppressMessages(
+    axes_reliability(cormat = sigma, items = items, angles = oct, n = 50000L)
+  )
+  est <- res$components$Estimate
+  expect_lt(abs(est[[2]] - xi1), 1e-4)
+  expect_lt(abs(est[[1]] - xi2), 1e-4)
+  expect_lt(abs(est[[3]] - zeta1), 1e-4)
+  expect_lt(res$fit$chisq, 1e-6)
+
+  # The matrix may arrive in any column order: a permuted cormat must give the
+  # identical answer, since the fixed cosine loadings are matched to items by
+  # name, not by position.
+  perm <- sample(nrow(sigma))
+  res_p <- suppressMessages(axes_reliability(
+    cormat = sigma[perm, perm], items = items, angles = oct, n = 50000L
+  ))
+  expect_equal(res_p$components$Estimate, est, tolerance = 1e-10)
+})
+
+# AC3(b): cross-engine. OpenMx and the public cormat path fit the identical
+# model to the identical correlation matrix. The residual disagreement is the
+# two engines' differing likelihood normalization, measured at ~2e-5 -- two
+# orders inside the 1e-3 bar (the raw-data BC7 pairing above observes ~6e-5).
+# OpenMx is already Suggests; no new Imports (D-006/D-014).
+
+test_that("AC3(b): lavaan and OpenMx agree on the cormat path (Layer B)", {
+  skip_if_not_installed("lavaan")
+  skip_if_not_installed("OpenMx")
+  oct <- octants()
+  k <- 4L
+  n <- 2000L
+  for (seed in c(7L, 8L)) {
+    set.seed(seed)
+    dat <- as.data.frame(scale(axes_simulate(n, oct, k, .15, .05, .10)))
+    inames <- sprintf("i%02d", seq_len(ncol(dat)))
+    colnames(dat) <- inames
+    items <- split(inames, rep(seq_along(oct), each = k))
+    R <- stats::cor(dat)
+
+    res <- suppressMessages(
+      axes_reliability(cormat = R, items = items, angles = oct, n = n)
+    )
+    lav <- c(
+      xi1 = res$components$Estimate[[2]],
+      xi2 = res$components$Estimate[[1]],
+      zeta1 = res$components$Estimate[[3]]
+    )
+    mx <- axes_mx_components(R, n, oct, k)
+    expect_lt(max(abs(lav - mx)), 1e-3) # observed ~2e-5
+  }
+})
+
+# AC4 + AC5: what the cormat path reports NA for, refuses, and errors on.
+
+test_that("AC4: N-B is NA with a stated reason and sd = 'raw' is refused", {
+  skip_if_not_installed("lavaan")
+  data("simulated_items", package = "circumplex", envir = environment())
+  items <- split(names(simulated_items), rep(1:8, each = 4))
+  R <- stats::cor(simulated_items)
+
+  res <- suppressMessages(
+    axes_reliability(cormat = R, items = items, angles = octants(), n = 500L)
+  )
+  # NA-with-reason (RR09 sec. 7.4): the column stays, carrying NA, and both
+  # print() and summary() say why -- never silently dropped.
+  expect_true("nb_reliability" %in% names(res$results))
+  expect_true(all(is.na(res$results$nb_reliability)))
+  expect_output(print(res), "Nunnally-Bernstein comparison needs the raw item")
+  expect_output(summary(res), "Nunnally-Bernstein comparison needs the raw item")
+  expect_output(print(res), "Input:\\s+correlation matrix")
+  expect_output(print(res), "Sample N:")
+
+  # "std" and numeric sd work; "raw" is refused with the reason.
+  expect_false(is.na(res$results$sem[[1]]))
+  res_num <- suppressMessages(axes_reliability(
+    cormat = R, items = items, angles = octants(), n = 500L, sd = c(2, 3)
+  ))
+  expect_equal(
+    res_num$results$sem,
+    c(2, 3) * sqrt(1 - res$results$reliability),
+    tolerance = 1e-10
+  )
+  expect_error(
+    axes_reliability(cormat = R, items = items, angles = octants(), n = 500L,
+                     sd = "raw"),
+    "needs the raw scale scores"
+  )
+})
+
+test_that("AC5: each malformed cormat/n input errors informatively", {
+  skip_if_not_installed("lavaan")
+  data("simulated_items", package = "circumplex", envir = environment())
+  items <- split(names(simulated_items), rep(1:8, each = 4))
+  oct <- octants()
+  R <- stats::cor(simulated_items)
+  p <- ncol(R)
+  ok <- function(...) axes_reliability(items = items, angles = oct, ...)
+
+  # Exactly one of data / cormat.
+  expect_error(
+    axes_reliability(simulated_items, items = items, angles = oct, cormat = R,
+                     n = 500L),
+    "exactly one of `data` or `cormat`"
+  )
+  expect_error(axes_reliability(items = items, angles = oct),
+               "exactly one of `data` or `cormat`")
+  # `n` belongs to the cormat path only.
+  expect_error(
+    axes_reliability(simulated_items, items = items, angles = oct, n = 500L),
+    "applies only to the `cormat` path"
+  )
+
+  # Shape and content of the matrix.
+  expect_error(ok(cormat = R[1:4, ], n = 500L), "must be a square matrix")
+  expect_error(ok(cormat = unname(R), n = 500L), "must have dimnames")
+  asym <- R
+  asym[1, 2] <- asym[1, 2] + .1
+  expect_error(ok(cormat = asym, n = 500L), "must be symmetric")
+  nonunit <- R
+  diag(nonunit)[1] <- 1.5
+  expect_error(ok(cormat = nonunit, n = 500L), "must have a unit diagonal")
+  nafill <- R
+  nafill[1, 2] <- nafill[2, 1] <- NA_real_
+  expect_error(ok(cormat = nafill, n = 500L), "missing or non-finite")
+  # Singular: two items made perfectly collinear (still symmetric, unit diag).
+  sing <- R
+  sing[1, 2] <- sing[2, 1] <- 1
+  expect_error(ok(cormat = sing, n = 500L), "not positive definite")
+  # An item the matrix does not carry.
+  bad_items <- items
+  bad_items[[1]][[1]] <- "not_an_item"
+  expect_error(
+    axes_reliability(cormat = R, items = bad_items, angles = oct, n = 500L),
+    "not found in `cormat`"
+  )
+
+  # The sample size.
+  expect_error(ok(cormat = R), "`n` \\(the sample size\\) is required")
+  expect_error(ok(cormat = R, n = "500"), "single whole number")
+  expect_error(ok(cormat = R, n = c(100L, 200L)), "single whole number")
+  expect_error(ok(cormat = R, n = 500.5), "single whole number")
+  expect_error(ok(cormat = R, n = NA_integer_), "single whole number")
+  # Inf slips is_scalar_count() (ceiling(Inf) == floor(Inf)) AND the n <= p
+  # comparison, so it needs the explicit is.finite() guard.
+  expect_error(ok(cormat = R, n = Inf), "single whole number")
+  expect_error(ok(cormat = R, n = p), "greater than the number of items")
+  expect_error(ok(cormat = R, n = p - 1L), "greater than the number of items")
+})
