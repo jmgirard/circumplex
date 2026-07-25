@@ -26,8 +26,11 @@ docs, vignette, NEWS. Plus the outstanding RR09 §7.8 blockwise-ζ2 doc note
 estimation, FIML on items → they stay on the ROADMAP candidate row
 "Axes-reliability deferred-in-spec extensions", each still gated on a concrete
 use case (D-026). Covariance-matrix (non-unit-diagonal) input → not planned;
-the model assumes unit-variance items. v2.0.0 scope → **not** entered: M7 gains
-no dependency and D-001 is not superseded (M59 plan gate).
+the model assumes unit-variance items. Gating the release → out: M7 gains **no**
+`Depends on: M59` and never waits for it (M59 plan gate). Amended at the
+implement gate: the milestone *does* enter v2.0.0's contents, because master
+ships as v2.0.0 and M59 merges first, so D-030 records the narrow D-001
+supersession the plan wrongly thought unnecessary.
 
 ## Acceptance criteria
 
@@ -99,7 +102,7 @@ no dependency and D-001 is not superseded (M59 plan gate).
 - [x] T7. AC5 refuse-contract regression tests.
 - [x] T8. Roxygen: `@param cormat`, `@param n`, the corr-path `@details`
       paragraph, the blockwise-ζ2 note; `devtools::document()`.
-- [ ] T9. Vignette section + NEWS. Check the tail bytes of any wholesale-written
+- [x] T9. Vignette section + NEWS. Check the tail bytes of any wholesale-written
       file (M34) and confirm no echoed chunk depends on a hidden one (M50).
 - [ ] T10. Full `devtools::test()` + `devtools::check()`; verify the PDF-manual
       step actually ran (AC7); fix fallout.
@@ -109,6 +112,8 @@ no dependency and D-001 is not superseded (M59 plan gate).
 - 2026-07-25: created by /milestone-plan.
 - 2026-07-25: start — status in-progress, branch `m59-axes-reliability-corr-input` cut from master.
 - 2026-07-25: T1 — AC2 round-trip test written first; fails with `unused arguments (cormat, n)`, the intended pre-implementation failure.
+- 2026-07-25: T9 — vignette section 4 ("Starting from a published correlation matrix") + a fourth caveat carrying the RR09 §7.8 blockwise note; NEWS folded into the existing unreleased `axes_reliability()` bullet. Vignette knits; no echoed chunk depends on a hidden one (M50 check clear).
+- 2026-07-25: amended Scope at the implement gate — the plan's "v2.0.0 not entered" was wrong on mechanics (master ships as v2.0.0; `DESCRIPTION` already reads 2.0.0), so D-030 records the narrow D-001 supersession. M7 still gains no dependency. Jeff's call at the gate.
 - 2026-07-25: T8 — roxygen: `@param cormat`/`@param n`, a "Supplying a correlation matrix" section, a "Blockwise instruments" section discharging RR09 §7.8 (M54 F3), and a cormat example. `document()` idempotent; only `man/axes_reliability.Rd` changed. The `cpm_gradient` link warning is pre-existing (present on the unmodified tree).
 - 2026-07-25: T5–T7 — AC3(a) population oracle pins the convention exactly (recovered = truth × (n−1)/n to 1e-8 relative at n = 500/5e3/5e4, and a permuted cormat gives an identical answer); AC3(b) cross-engine OpenMx agrees to ~2e-5 against a 1e-3 bar; AC4/AC5 regressions. Both novel guards proven by mutation: dropping `is.finite(n)` and dropping the cormat reordering each turn the suite red. Suite FAIL 0 / PASS 3309.
 - 2026-07-25: T2–T4 — `cormat`/`n` path, refuse contract, `axes_fit_cormat()` seam, N–B `NA`-with-reason, `sd="raw"` refusal, print/summary. Round-trip agrees to 1e-15 (not merely inside the 1e-6 bar); the wishart/normal ratio measured exactly 499/500, confirming the `(N−1)/N` mechanism is matched rather than tolerated. Suite FAIL 0 / PASS 3263 (baseline 3247 + the 16 new).

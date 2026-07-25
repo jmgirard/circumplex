@@ -861,3 +861,36 @@ Reopening needs a superseding entry and a materially different measurement —
 a cold-cache regime, or a check job where the install is a real share of
 runtime. The remaining install cost that *is* worth taking is pkgdown's
 un-trimmed brms/Stan lockfile, which M58 addresses instead.
+
+### D-030 (2026-07-25): the axes-reliability correlation-matrix input enters v2.0.0 — a narrow D-001 supersession that does not gate M7 (M59)
+
+**Context:** M59 adds the `cormat` + `n` input path to `axes_reliability()`. At
+its plan gate the milestone was scoped as post-v2.0.0, on the reading that this
+needed no D-001 supersession. That reading was wrong about the mechanics: D-001
+has work accumulate on master until the release train leaves, master is what
+ships as v2.0.0 (`DESCRIPTION` already reads `Version: 2.0.0`, and `NEWS.md`'s
+open section is `# circumplex 2.0.0`), and M59 merges to master well before the
+release window M7 is blocked on. The feature therefore ships in v2.0.0 whether
+or not a plan says otherwise; the honest choices were to record that or to hold
+the finished branch unmerged until after the release.
+**Decision:** Supersede D-001's new-features-excluded clause **insofar as it
+bars the axes-reliability correlation-matrix input** — narrowly, exactly as
+D-008 did for CIRCUM, D-018 for the visualization expansion, and D-025 for the
+axes-reliability feature itself. The `cormat`/`n` path ships in v2.0.0 and its
+NEWS text sits under the 2.0.0 heading, folded into the existing
+`axes_reliability()` bullet rather than announced as a change to an unreleased
+function.
+**Scope of the supersession:** narrow — promotes **only** M59's
+correlation-matrix input path. All other D-001 consequences and exclusions
+stand, and the four extensions still parked on the ROADMAP's
+"Axes-reliability deferred-in-spec extensions" candidate row (non-octant types
+b–f, quasi-circumplex weights, blockwise ζ2 estimation, FIML on items) are
+untouched — D-026's deferral of each, pending a concrete use case, is unchanged.
+**Consequences:** M7 does **not** gain `Depends on: M59`. That is the part of
+the plan-gate answer that stands unamended: the release never waits for M59, it
+merely contains it if M59 lands first. Should the release window open before M59
+merges, M59 ships in the following version and this entry is spent without
+effect — it licenses inclusion, it does not require it. No new dependency
+(lavaan is already `Suggests`; D-006/D-014 minimal-deps reinforced). M59's Scope
+`Out:` clause is amended to match, with a work-log line. D-001/D-008/D-018/D-025
+lineage extended; none other superseded. Source: Jeff, M59 implement gate.
