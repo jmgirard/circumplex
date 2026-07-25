@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-25 (M59 planned then implemented → `review`; the axes-reliability correlation-matrix input promoted off the deferred-extensions candidate row, which keeps types b–f, quasi-circumplex, blockwise ζ2, and FIML. D-030 appended at M59's implement gate: the plan's "stays out of v2.0.0, so D-001 needs no supersession" was wrong on mechanics — master ships as v2.0.0 — and is corrected here (M59, corrected at the implement gate); M7 still gains no dependency. Terminal rows at 5. M7 stays blocked on the CRAN cadence window.)_
+_Last hygiene check: 2026-07-25 (M59 → `review`: axes-reliability correlation-matrix input, promoted off the deferred-extensions row (types b–f, quasi-circumplex, blockwise ζ2, FIML remain). D-030 at M59's implement gate corrects this stamp's earlier "M59 stays out of v2.0.0" — master ships as v2.0.0; M7 still gains no dependency. Terminal rows 5; M7 blocked on the CRAN window.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
