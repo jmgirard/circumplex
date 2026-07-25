@@ -825,3 +825,39 @@ state the ML clause. `dcfi_scope` gains `estimator` and `ml` fields alongside
 condition needs the condition's own test beside it — "the index is plain-named"
 proxies for "the estimator is ML" and silently fails on the estimators nobody
 thought to try.
+
+### D-029 (2026-07-25): OpenMx and glmmTMB stay installed on the CI check job — the post-M52 install trim is declined on measured grounds (M58 plan gate)
+
+**Context:** M51's scope note (2026-07-21) left a ROADMAP candidate holding the
+remainder of the CI dependency-install trim after M52 took brms: dropping
+OpenMx and/or glmmTMB from the `R-CMD-check` job. Its stated premise was that
+"their `skip_on_cran` oracles never run under `R CMD check`, so excluding
+OpenMx loses nothing there". Jeff declined it at the M52 plan gate; it was
+recorded as deferred, not rejected. Re-investigated at the M58 plan gate.
+**Decision:** both stay installed on both CI jobs. Declined outright, not
+deferred again — the candidate row is closed.
+**Why the premise no longer holds.** M54 landed
+`tests/testthat/test-axes-reliability.R` on 2026-07-23, two days after the note
+was written. That file contains **zero** `skip_on_cran()` calls, so its BC7
+cross-engine oracle (line 292, "lavaan and OpenMx agree on the component
+variances") is gated only by `skip_if_not_installed("OpenMx")` and does run
+under `R CMD check` today. Removing OpenMx would convert it to a silent skip on
+the check job — the exact "a step that doesn't run reports success" family
+LESSONS records against M7, M31 and M38. The premise still holds for glmmTMB's
+test (`test-growth_invariants.R:48` carries `skip_on_cran()`), but
+`vignettes/growth-ssm-analysis.Rmd:113` gates its fitting chunks on
+`has_glmmTMB`, so the check job would build that vignette with its model fits
+unevaluated.
+**Why the payoff does not justify it.** Per-step timings from the 2026-07-25
+push runs (30162856789 / 30162856756 / 30162856759, all cache hits):
+`setup-r-dependencies` is 0.9 min of a 14.5-min check job, 0.7 min of a
+13.0-min coverage job, 0.9 min of a 4.3-min pkgdown job — under 7% of a run
+before any trim. Removing two packages from an already-cached ~1-minute install
+buys seconds. This is consistent with M52's own measurement (60s → 41s,
+recorded there as "modest").
+**Consequences:** the two workflow allowlists keep `any::OpenMx` and
+`any::glmmTMB`; DESCRIPTION `Suggests` is untouched, so D-015 and D-016 stand.
+Reopening needs a superseding entry and a materially different measurement —
+a cold-cache regime, or a check job where the install is a real share of
+runtime. The remaining install cost that *is* worth taking is pkgdown's
+un-trimmed brms/Stan lockfile, which M58 addresses instead.
