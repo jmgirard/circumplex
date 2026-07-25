@@ -1,6 +1,6 @@
 # M59: Correlation-matrix input path for `axes_reliability()`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M54
 - **Driving RR:** —
@@ -104,7 +104,7 @@ supersession the plan wrongly thought unnecessary.
       paragraph, the blockwise-ζ2 note; `devtools::document()`.
 - [x] T9. Vignette section + NEWS. Check the tail bytes of any wholesale-written
       file (M34) and confirm no echoed chunk depends on a hidden one (M50).
-- [ ] T10. Full `devtools::test()` + `devtools::check()`; verify the PDF-manual
+- [x] T10. Full `devtools::test()` + `devtools::check()`; verify the PDF-manual
       step actually ran (AC7); fix fallout.
 
 ## Work log
@@ -112,6 +112,7 @@ supersession the plan wrongly thought unnecessary.
 - 2026-07-25: created by /milestone-plan.
 - 2026-07-25: start — status in-progress, branch `m59-axes-reliability-corr-input` cut from master.
 - 2026-07-25: T1 — AC2 round-trip test written first; fails with `unused arguments (cormat, n)`, the intended pre-implementation failure.
+- 2026-07-25: T10 — `devtools::check(manual = TRUE)` → `Status: OK` (0 errors/warnings/notes); `checking PDF version of manual ... OK` present at log line 119, so the step the M7/M57 lesson names as silently skipped genuinely ran. Suite inside check OK (197s). Status → review.
 - 2026-07-25: T9 — vignette section 4 ("Starting from a published correlation matrix") + a fourth caveat carrying the RR09 §7.8 blockwise note; NEWS folded into the existing unreleased `axes_reliability()` bullet. Vignette knits; no echoed chunk depends on a hidden one (M50 check clear).
 - 2026-07-25: amended Scope at the implement gate — the plan's "v2.0.0 not entered" was wrong on mechanics (master ships as v2.0.0; `DESCRIPTION` already reads 2.0.0), so D-030 records the narrow D-001 supersession. M7 still gains no dependency. Jeff's call at the gate.
 - 2026-07-25: T8 — roxygen: `@param cormat`/`@param n`, a "Supplying a correlation matrix" section, a "Blockwise instruments" section discharging RR09 §7.8 (M54 F3), and a cormat example. `document()` idempotent; only `man/axes_reliability.Rd` changed. The `cpm_gradient` link warning is pre-existing (present on the unmodified tree).
