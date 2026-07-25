@@ -748,3 +748,80 @@ quasi-circumplex weights, the secondary correlation-matrix input, and blockwise
 ζ2 are deferred (build/candidate scope). D-025's design→build path is discharged
 on its GO branch; D-006/D-014 minimal-deps reinforced (lavaan/OpenMx stay
 `Suggests`, no new Import). Source: RR09 (Fable, 2026-07-23); M53 T6.
+
+### D-027 (2026-07-24): ΔCFI enters `ssm_sem()` as a reported-only criterion, scope-gated to the envelope its source simulated (M57)
+
+**Context:** the M5 SEM design left an open decision (§12.2 item 2): Δχ² was
+the invariance verdict statistic, and alternative-index cutoffs would be
+"offered only once transcribed". The Cheung & Rensvold (2002) transcription
+landed 2026-07-07 but M5 T4 shipped without wiring it, leaving a candidate
+row. M57 takes it up. Two things make the choice non-obvious: the article
+states the direction of its own rule backwards, and the package's default
+estimator (MLR) is outside the scope the article's simulation covers.
+**Decision, three parts.** (1) **Reported, never gating.** The ladder table
+carries `dcfi` = CFI(rung) − CFI(previous *fitted* rung); `comparable`, the
+verdict string, and the fit the estimation layer consumes read the nested Δχ²
+test and nothing else. Gating on ΔCFI was rejected: the two criteria answer
+different questions and can legitimately disagree, and a package that gates on
+whichever criterion is handier has no stable contract. (2) **The direction
+comes from the simulation, not the printed sentence.** The p. 251 sentence says
+ΔCFI ≤ −.01 means invariance "should not be rejected"; Table 5 (p. 248) shows
+its critical values are the 1% *lower* tails of the simulated null
+distributions (ΔCFI 1% entries −.0085 … −.0039, null means ≈ 0), so a value at
+or below the cutoff is the 1%-level evidence *against* invariance. The repo
+implements ΔCFI < −.01 → reject, with ≥ −.01 retaining, and cites
+`cairn/references/cheung2002.md` for it rather than the sentence.
+(3) **Scope-gated, and the gate keys on the statistic.** The retain/reject
+label prints only for exactly two groups AND a plain normal-theory CFI (no
+`cfi.robust`/`cfi.scaled` in `fitMeasures()`); elsewhere the value prints with
+an explicit not-validated note and no verdict. Keying on the differenced
+statistic rather than on `estimator == "ML"` ties the label to the quantity it
+judges, so a robust index can never be labeled against a normal-theory cutoff.
+**Rejected alternative:** extrapolating the cutoff to robust CFI or >2 groups.
+Cheung & Rensvold simulated neither (p. 251: two groups, ML, multivariate
+normal, Type I error only; robust variants postdate the study), so a cutoff
+there would be invented, not extended. The package declines to flag rather
+than fabricate a threshold — which is why the flag is OFF under `ssm_sem()`'s
+own MLR default, an intended consequence and not a defect.
+**Consequences:** an exported `print()` surface change inside unreleased
+v2.0.0 (NEWS bullet, no deprecation cycle owed — the function is new in this
+release). ΔGamma hat (−.001) and ΔMcDonald's NCI (−.02) stay transcribed in
+`cheung2002.md` and unwired; a candidate row carries them. Any future
+robust-CFI or multi-group flag needs new simulation evidence and a superseding
+entry here.
+
+### D-028 (2026-07-25): the ΔCFI scope gate requires ML estimation as well as a plain CFI — narrows D-027 part (3) (M57 review)
+
+**Context:** D-027 part (3) set the ΔCFI scope gate to "exactly two groups AND
+no `cfi.robust`/`cfi.scaled` in `fitMeasures()`", keying on the statistic
+differenced rather than on the user's `estimator` argument. Its stated
+rationale — "a robust index can never be labeled against a normal-theory
+cutoff" — is sound but was **incomplete**: `GLS`, `WLS`, `ULS` and continuous
+`DWLS` also return plain-named fit measures, so they passed the gate. The M57
+review reproduced it end-to-end: a two-group `estimator = "GLS"` fit printed a
+"retain" label with no not-validated caveat, contradicting AC2, the roxygen and
+NEWS text, and `cairn/references/cheung2002.md`'s own binding scope block
+("**ML estimation only**").
+**Decision:** the gate is a **three-part conjunction** — exactly two groups AND
+ML estimation AND a plain (non-robust) CFI. ML estimation is tested as
+`identical(lavaan::lavInspect(fit, "options")$estimator, "ML")`, which reads the
+**fit function**, not the argument: it returns `"ML"` for `ML`, `MLR` and `MLM`
+(all ML estimation, differing in the test statistic and standard errors) and
+`"GLS"`/`"ULS"`/`"DWLS"`/`"WLS"` otherwise. Verified against lavaan directly.
+The two estimator clauses are both needed and neither implies the other: the
+plain-CFI clause excludes MLR/MLM (ML fit, robust index), the ML clause excludes
+GLS/WLS/ULS/DWLS (plain index, wrong fit function). D-027's admission of
+`estimator = "ML", se = "robust.huber.white"` is **retained** — the fit function
+is ML and the CFI is normal-theory, since CFI does not read the standard errors.
+**What is superseded:** only D-027 part (3)'s two-part formulation. Parts (1)
+reported-only and (2) direction-from-Table-5 stand unchanged, as does the whole
+of D-027's refusal to invent a cutoff outside the simulated envelope — this
+entry *strengthens* that refusal rather than qualifying it.
+**Consequences:** `print()` now names the reason the verdict is withheld
+("non-ML estimator: GLS", "robust CFI", "N groups", or a combination), so the
+note is informative rather than merely negative. Roxygen, NEWS and the vignette
+state the ML clause. `dcfi_scope` gains `estimator` and `ml` fields alongside
+`cfi_plain`. Generalizable lesson: a scope gate keyed on a *proxy* for a
+condition needs the condition's own test beside it — "the index is plain-named"
+proxies for "the estimator is ML" and silently fails on the estimators nobody
+thought to try.

@@ -507,3 +507,406 @@ test_that("single-group syntax fitted with group= is refused (measure blocks equ
     "equality-constrained across groups"
   )
 })
+
+# The Delta-CFI secondary criterion (M57) ----------------------------------------
+#
+# Cheung & Rensvold (2002) proposed a general Delta-GFI criterion for the
+# invariance ladder; the CFI member is implemented here as a labeled,
+# REPORTED-ONLY secondary criterion. Value and direction come from
+# cairn/references/cheung2002.md (the paper's own p. 251 sentence states the
+# direction backwards -- it contradicts the Table 5 simulation the critical
+# values come from). Scope is two groups and plain-ML CFI; the package's
+# default estimator is MLR, so the binary flag is OFF by default BY DESIGN.
+
+# Group A is metric-invariant with group B up to per-group factor dispersion
+# and its own measure block; `eps` then perturbs group B's circumplex
+# saturations by (1 + eps*cos(2*theta)) -- a SECOND-HARMONIC pattern violation
+# the scaled tier's per-group isotropic plane scale cannot absorb. eps and
+# n_per tune the two criteria independently: the population CFI drop is set by
+# eps alone while Delta-chi-square grows with n, which is what makes a
+# Delta-CFI/Delta-chi-square DISAGREEMENT constructible (see the reported-only
+# test below). eps = 0 is exactly metric-invariant.
+dcfi_pop_2g <- function(eps) {
+  a <- seq(0.5, 0.7, length.out = 8)
+  cc_a <- seq(0.65, 0.55, length.out = 8)
+  d1 <- 40 * pi / 180
+  d2 <- 110 * pi / 180
+  gA <- sem_pop(
+    a, cc_a, seq(0.3, 0.6, length.out = 8), oct,
+    cbind(c(0.2, 0.4 * cos(d1), 0.4 * sin(d1))),
+    v_m = 1
+  )
+  gB <- sem_pop(
+    a, cc_a * (1 + eps * cos(2 * oct * pi / 180)),
+    seq(0.4, 0.7, length.out = 8), oct,
+    cbind(c(0.25, 0.35 * cos(d2), 0.35 * sin(d2))),
+    v_m = 1
+  )
+  list(
+    sigma = list(A = gA$sigma, B = gB$sigma),
+    scales = gA$scales, measures = gA$measures
+  )
+}
+
+# Simulate raw data for an arbitrary number of groups (sim_2g() is two-group)
+sim_groups <- function(sigmas, n_per, seed) {
+  set.seed(seed)
+  do.call(rbind, lapply(names(sigmas), function(g) {
+    sig <- sigmas[[g]]
+    x <- as.data.frame(matrix(rnorm(n_per * ncol(sig)), n_per) %*% chol(sig))
+    colnames(x) <- colnames(sig)
+    x$grp <- g
+    x
+  }))
+}
+
+# The printed ladder's header line, for asserting which columns are shown
+dcfi_header <- function(res) {
+  out <- utils::capture.output(print(res))
+  grep("rung", out, value = TRUE)[[1]]
+}
+
+# Printed output with all whitespace collapsed. The attribution block is
+# wrapped programmatically (its reason list is variable-length), so an
+# assertion keyed to where a line happens to break would fence the wrapper
+# rather than the wording.
+dcfi_printed <- function(res) {
+  gsub("\\s+", " ", paste(utils::capture.output(print(res)), collapse = " "))
+}
+
+test_that("dcfi is the CFI difference between adjacent fitted rungs, NA where there is no predecessor (cheung2002)", {
+  skip_if_not_installed("lavaan")
+  pop <- dcfi_pop_2g(0)
+  dat <- sim_groups(pop$sigma, n_per = 400, seed = 11)
+  set.seed(31)
+  res <- ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    estimator = "ML", boots = 20
+  )
+  tab <- res$invariance$table
+  expect_true("dcfi" %in% names(tab))
+  # configural has no predecessor
+  expect_true(is.na(tab$dcfi[tab$rung == "configural"]))
+  # Oracle 1 (invariant): the column IS the difference of the CFI the same
+  # table displays -- the two internal routes must agree exactly
+  expect_equal(tab$dcfi[-1], diff(tab$cfi), tolerance = 0)
+  # Oracle 2 (live, independent): refit both rungs outside the ladder and
+  # difference lavaan's own plain CFI. Independent of sem_fit_ladder's
+  # bookkeeping, so it catches an off-by-one pairing the invariant cannot.
+  dat$grp <- factor(dat$grp)
+  cfi_refit <- vapply(c("configural", "metric"), function(rung) {
+    fit <- lavaan::cfa(
+      ssm_sem_syntax(
+        scales = pop$scales, angles = oct, measures = "m1",
+        n_groups = 2, invariance = rung
+      ),
+      data = dat, group = "grp", group.label = levels(dat$grp),
+      estimator = "ML", se = "robust.huber.white", missing = "listwise"
+    )
+    unname(lavaan::fitMeasures(fit)[["cfi"]])
+  }, numeric(1))
+  expect_equal(
+    tab$dcfi[tab$rung == "metric"],
+    cfi_refit[["metric"]] - cfi_refit[["configural"]],
+    tolerance = 1e-8
+  )
+})
+
+test_that("the strict tier's VACUOUS metric rung carries no dcfi, and the next rung differences against configural", {
+  skip_if_not_installed("lavaan")
+  p <- 8
+  th <- oct * pi / 180
+  lambda <- cbind(1, cos(th), sin(th))
+  phi <- diag(c(0.8, 0.5, 0.5))
+  sig <- lambda %*% phi %*% t(lambda) + diag(seq(0.3, 0.6, length.out = p))
+  nm <- paste0("s", 1:p)
+  dimnames(sig) <- list(nm, nm)
+  nu <- seq(1, 1.6, length.out = p)
+  mu2 <- nu + as.numeric(lambda %*% c(0.3, 0.25, -0.15))
+  set.seed(32)
+  mk <- function(mu, grp, n = 600) {
+    x <- as.data.frame(sweep(matrix(rnorm(n * p), n) %*% chol(sig), 2, mu, "+"))
+    colnames(x) <- nm
+    x$grp <- grp
+    x
+  }
+  dat <- rbind(mk(nu, "A"), mk(mu2, "B"))
+  set.seed(33)
+  res <- ssm_sem(dat,
+    scales = nm, grouping = "grp", contrast = TRUE, model = "strict",
+    estimator = "ML", boots = 20
+  )
+  tab <- res$invariance$table
+  vac <- tab$rung == "metric"
+  expect_true(nzchar(tab$note[vac])) # really the vacuous row
+  expect_true(is.na(tab$dcfi[vac]))
+  expect_true(is.na(tab$cr[vac]))
+  # scalar differences against the last FITTED rung (configural), exactly as
+  # its Delta-chi-square does -- the vacuous rung imposes nothing to difference
+  expect_equal(
+    tab$dcfi[tab$rung == "scalar"],
+    tab$cfi[tab$rung == "scalar"] - tab$cfi[tab$rung == "configural"],
+    tolerance = 0
+  )
+})
+
+test_that("in scope (two groups, plain-ML CFI) the Cheung-Rensvold flag retains above the -.01 cutoff and rejects below it", {
+  skip_if_not_installed("lavaan")
+  # Retained: metric-invariant population, CFI does not drop
+  pop_ok <- dcfi_pop_2g(0)
+  dat_ok <- sim_groups(pop_ok$sigma, n_per = 400, seed = 11)
+  set.seed(34)
+  ok <- ssm_sem(dat_ok,
+    scales = pop_ok$scales, measures = "m1", grouping = "grp",
+    estimator = "ML", boots = 20
+  )
+  tab_ok <- ok$invariance$table
+  expect_true(isTRUE(ok$invariance$dcfi_scope$in_scope))
+  expect_gt(tab_ok$dcfi[tab_ok$rung == "metric"], -0.01)
+  expect_identical(tab_ok$cr[tab_ok$rung == "metric"], "retain")
+  expect_true(is.na(tab_ok$cr[tab_ok$rung == "configural"]))
+  # Rejected: a strong second-harmonic pattern violation drops CFI by > .01
+  pop_bad <- dcfi_pop_2g(0.35)
+  dat_bad <- sim_groups(pop_bad$sigma, n_per = 700, seed = 61)
+  set.seed(35)
+  bad <- suppressWarnings(ssm_sem(dat_bad,
+    scales = pop_bad$scales, measures = "m1", grouping = "grp",
+    estimator = "ML", boots = 20
+  ))
+  tab_bad <- bad$invariance$table
+  expect_lt(tab_bad$dcfi[tab_bad$rung == "metric"], -0.01)
+  expect_identical(tab_bad$cr[tab_bad$rung == "metric"], "reject")
+  # Printed: the value, the flag, and the attribution WITH its scope label
+  out <- dcfi_printed(bad)
+  expect_match(out, "Cheung & Rensvold \\(2002\\)")
+  expect_match(out, "alpha = .01", fixed = TRUE)
+  expect_match(out, "two-group", fixed = TRUE)
+  expect_match(dcfi_header(bad), "dcfi")
+  expect_match(dcfi_header(bad), "cr\\s*$")
+})
+
+test_that("the -.01 cutoff is a >= boundary and never fires outside its validated scope (cheung2002 operational rule)", {
+  # Deterministic unit pin of the criterion itself: the transcription's rule is
+  # "Delta-CFI < -.01 -> reject; Delta-CFI >= -.01 -> retained", so a value
+  # exactly AT the cutoff retains. No fit lands exactly on -.01, hence the
+  # direct helper test (cairn/references/cheung2002.md).
+  expect_identical(
+    sem_dcfi_flag(c(NA, 0.004, 0, -0.005, -0.01, -0.0100001, -0.03), TRUE),
+    c(NA, "retain", "retain", "retain", "retain", "reject", "reject")
+  )
+  # Out of scope: values are still differenced, but no verdict is attached
+  expect_true(all(is.na(sem_dcfi_flag(c(0.004, -0.03), FALSE))))
+  expect_true(all(is.na(sem_dcfi_flag(c(0.004, -0.03), NA))))
+})
+
+test_that("outside the validated scope (robust CFI, or more than two groups) dcfi prints with a not-validated note and NO binary flag", {
+  skip_if_not_installed("lavaan")
+  # (a) robust CFI: the package's DEFAULT estimator (MLR), two groups
+  pop <- dcfi_pop_2g(0.02)
+  dat2 <- sim_groups(pop$sigma, n_per = 400, seed = 51)
+  set.seed(36)
+  mlr <- ssm_sem(dat2,
+    scales = pop$scales, measures = "m1", grouping = "grp", boots = 20
+  )
+  inv <- mlr$invariance
+  expect_false(isTRUE(inv$dcfi_scope$in_scope))
+  expect_false(isTRUE(inv$dcfi_scope$cfi_plain))
+  expect_false(is.na(inv$table$dcfi[inv$table$rung == "metric"])) # value kept
+  expect_true(all(is.na(inv$table$cr))) # verdict withheld
+  out <- dcfi_printed(mlr)
+  expect_match(out, "Cheung & Rensvold \\(2002\\)")
+  expect_match(out, "not validated", ignore.case = TRUE)
+  expect_match(out, "robust CFI", fixed = TRUE)
+  expect_match(out, "descriptive only", fixed = TRUE)
+  expect_no_match(dcfi_header(mlr), "cr\\s*$") # no flag column at all
+  # (b) three groups under plain ML
+  pop3 <- list(
+    A = dcfi_pop_2g(0)$sigma$A,
+    B = dcfi_pop_2g(0.02)$sigma$B,
+    C = dcfi_pop_2g(-0.02)$sigma$B
+  )
+  dat3 <- sim_groups(pop3, n_per = 400, seed = 41)
+  set.seed(37)
+  g3 <- suppressWarnings(ssm_sem(dat3,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    estimator = "ML", boots = 20
+  ))
+  inv3 <- g3$invariance
+  expect_identical(inv3$dcfi_scope$n_groups, 3L)
+  expect_true(isTRUE(inv3$dcfi_scope$cfi_plain)) # plain CFI, but 3 groups
+  expect_false(isTRUE(inv3$dcfi_scope$in_scope))
+  expect_false(is.na(inv3$table$dcfi[inv3$table$rung == "metric"]))
+  expect_true(all(is.na(inv3$table$cr)))
+  out3 <- dcfi_printed(g3)
+  expect_match(out3, "not validated", ignore.case = TRUE)
+  expect_match(out3, "3 groups", fixed = TRUE)
+  expect_no_match(dcfi_header(g3), "cr\\s*$")
+})
+
+test_that("Delta-CFI is REPORTED ONLY: it never moves the gate, the verdict, or the estimation fit, even when it disagrees with Delta-chi-square", {
+  skip_if_not_installed("lavaan")
+  # A deliberate DISAGREEMENT: a small pattern violation at large n. The
+  # Cheung-Rensvold flag retains (CFI drops only ~.002) while the nested
+  # Delta-chi-square rejects (p ~ .0004). Only the latter may gate.
+  pop <- dcfi_pop_2g(0.12)
+  dat <- sim_groups(pop$sigma, n_per = 2000, seed = 31)
+  set.seed(38)
+  res <- suppressWarnings(ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    contrast = TRUE, estimator = "ML", boots = 20
+  ))
+  inv <- res$invariance
+  tab <- inv$table
+  met <- tab$rung == "metric"
+  # The two criteria really do disagree on this fixture
+  expect_gt(tab$dcfi[met], -0.01)
+  expect_identical(tab$cr[met], "retain")
+  expect_lt(tab$p[met], inv$alpha)
+  # The gate follows Delta-chi-square ALONE. Recomputed here from the table's
+  # own p column and alpha -- a Delta-CFI-blind determination.
+  gated <- tab[!nzchar(tab$note) & tab$rung != "configural", ]
+  expect_identical(
+    inv$comparable,
+    !any(is.na(gated$p)) && !any(gated$p < inv$alpha, na.rm = TRUE)
+  )
+  expect_false(isTRUE(inv$comparable))
+  # The verdict text is the Delta-chi-square verdict, with no CFI in it
+  expect_match(inv$verdict, "metric invariance rejected")
+  expect_no_match(inv$verdict, "CFI", ignore.case = TRUE)
+  expect_no_match(inv$verdict, "retain")
+  # The estimation fit is still the configural one (the non-comparison path),
+  # and no contrast row was produced
+  expect_false(isTRUE(res$details$contrast))
+  expect_equal(nrow(res$results), 2)
+  expect_identical(
+    lavaan::fitMeasures(res$sem)[["df"]],
+    tab$df[tab$rung == "configural"]
+  )
+})
+
+# A low-saturation two-group population: a small baseline chi-square makes CFI
+# move fast per unit of misfit while Delta-chi-square stays modest at small n.
+# This is what makes the COMPLEMENT of the disagreement fixture reachable --
+# Delta-CFI rejecting while the nested test retains (see the AND-leak test).
+dcfi_pop_lowsat <- function(eps) {
+  a <- rep(0.35, 8)
+  cc_a <- rep(0.40, 8)
+  d1 <- 40 * pi / 180
+  d2 <- 110 * pi / 180
+  gA <- sem_pop(
+    a, cc_a, rep(0.6, 8), oct,
+    cbind(c(0.15, 0.3 * cos(d1), 0.3 * sin(d1))), v_m = 1
+  )
+  gB <- sem_pop(
+    a, cc_a * (1 + eps * cos(2 * oct * pi / 180)), rep(0.6, 8), oct,
+    cbind(c(0.18, 0.28 * cos(d2), 0.28 * sin(d2))), v_m = 1
+  )
+  list(sigma = list(A = gA$sigma, B = gB$sigma), scales = gA$scales)
+}
+
+test_that("a non-ML estimator that still yields a plain CFI is OUT of scope (Cheung & Rensvold simulated ML only)", {
+  skip_if_not_installed("lavaan")
+  # GLS, WLS, ULS and continuous DWLS all produce plain-named fit measures, so
+  # "no cfi.robust/cfi.scaled" does NOT imply "normal-theory ML CFI". Cheung &
+  # Rensvold's Limitations section (p. 251) restricts the criterion to ML, so a
+  # non-ML fit must get the value and NO verdict -- flagging it would assert a
+  # cutoff the source never simulated. Caught at the M57 review (F1).
+  pop <- dcfi_pop_2g(0)
+  dat <- sim_groups(pop$sigma, n_per = 300, seed = 11)
+  set.seed(41)
+  gls <- suppressWarnings(ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    estimator = "GLS", se = "standard", boots = 20
+  ))
+  sc <- gls$invariance$dcfi_scope
+  expect_identical(sc$estimator, "GLS")
+  expect_true(isTRUE(sc$cfi_plain)) # the trap: the CFI *is* plain-named
+  expect_false(isTRUE(sc$ml)) # but the estimator is not ML
+  expect_false(isTRUE(sc$in_scope))
+  expect_false(is.na(gls$invariance$table$dcfi[2])) # value still reported
+  expect_true(all(is.na(gls$invariance$table$cr))) # verdict withheld
+  expect_no_match(dcfi_header(gls), "cr\\s*$")
+  out <- dcfi_printed(gls)
+  expect_match(out, "not validated", ignore.case = TRUE)
+  expect_match(out, "non-ML estimator: GLS", fixed = TRUE)
+  # And the ML family stays IN scope: MLR/MLM are ML estimation, excluded only
+  # by their robust CFI, so the plain-CFI test must remain the operative one
+  set.seed(42)
+  ml <- ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    estimator = "ML", boots = 20
+  )
+  expect_identical(ml$invariance$dcfi_scope$estimator, "ML")
+  expect_true(isTRUE(ml$invariance$dcfi_scope$in_scope))
+})
+
+test_that("printed dcfi resolves against the cutoff: values either side of -.01 never render alike (M57 review F2)", {
+  skip_if_not_installed("lavaan")
+  # round(dcfi, 3) would print both -0.0096 (retain) and -0.0104 (reject) as
+  # "-0.01", showing one number under two opposite labels directly beneath a
+  # rule stated in terms of that number.
+  pop <- dcfi_pop_2g(0)
+  dat <- sim_groups(pop$sigma, n_per = 400, seed = 11)
+  set.seed(43)
+  res <- ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    estimator = "ML", boots = 20
+  )
+  spliced <- res
+  spliced$invariance$table$dcfi[2] <- -0.0096
+  spliced$invariance$table$cr <- sem_dcfi_flag(
+    spliced$invariance$table$dcfi, TRUE
+  )
+  # Assert on the metric RUNG's own printed row, not the whole output -- the
+  # attribution note legitimately contains the literal "-0.01" (it states the
+  # rule), so a whole-output negative match would fence nothing.
+  metric_row <- function(x) {
+    grep("^ *metric ", utils::capture.output(print(x)), value = TRUE)[[1]]
+  }
+  row_hi <- metric_row(spliced)
+  spliced$invariance$table$dcfi[2] <- -0.0104
+  spliced$invariance$table$cr <- sem_dcfi_flag(
+    spliced$invariance$table$dcfi, TRUE
+  )
+  row_lo <- metric_row(spliced)
+  # The two labels really are opposite at these values
+  expect_match(row_hi, "retain")
+  expect_match(row_lo, "reject")
+  # ... and the printed VALUE distinguishes them
+  expect_match(row_hi, "-0.0096", fixed = TRUE)
+  expect_match(row_lo, "-0.0104", fixed = TRUE)
+  # Neither collapses onto the bare cutoff the label is decided against
+  expect_no_match(row_hi, "-0.01 ", fixed = TRUE)
+  expect_no_match(row_lo, "-0.01 ", fixed = TRUE)
+})
+
+test_that("the gate follows Delta-chi-square when Delta-CFI REJECTS and the nested test retains (AND-leak guard)", {
+  skip_if_not_installed("lavaan")
+  # Complement of the disagreement fixture above. There, ΔCFI retained while
+  # Δχ² rejected, and the truth was comparable = FALSE -- so a leak of the form
+  # "comparable requires BOTH criteria to retain" would also have produced
+  # FALSE and passed. Here ΔCFI REJECTS while Δχ² retains and the truth is
+  # comparable = TRUE, which such a leak cannot produce. The two fixtures
+  # together fence both directions (M57 review F3).
+  pop <- dcfi_pop_lowsat(0.30)
+  dat <- sim_groups(pop$sigma, n_per = 150, seed = 64)
+  set.seed(44)
+  res <- ssm_sem(dat,
+    scales = pop$scales, measures = "m1", grouping = "grp",
+    contrast = TRUE, estimator = "ML", boots = 200
+  )
+  inv <- res$invariance
+  met <- inv$table$rung == "metric"
+  expect_true(isTRUE(inv$dcfi_scope$in_scope)) # the flag is live here
+  expect_lt(inv$table$dcfi[met], -0.01) # Cheung-Rensvold rejects
+  expect_identical(inv$table$cr[met], "reject")
+  expect_gte(inv$table$p[met], inv$alpha) # the nested test retains
+  # The gate follows the nested test alone: comparable, and the contrast IS
+  # computed despite the secondary criterion rejecting the same rung
+  expect_true(isTRUE(inv$comparable))
+  expect_true(isTRUE(res$details$contrast))
+  expect_equal(nrow(res$results), 3)
+  expect_match(res$results$Label[3], "B - A")
+  expect_match(inv$verdict, "metric invariance retained")
+  expect_no_match(inv$verdict, "CFI", ignore.case = TRUE)
+})

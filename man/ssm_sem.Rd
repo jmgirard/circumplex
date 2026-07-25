@@ -78,7 +78,31 @@ Rungs fitted ABOVE the required one are reported but never gate the
 contrast. On rejection, the returned object states the non-comparison
 and reports each group's separate configural profile instead (no
 contrast is rendered by any method). Under the strict tier the metric
-rung is vacuous (all loadings fixed) and is reported as such.}
+rung is vacuous (all loadings fixed) and is reported as such.
+
+The ladder table also reports \code{dcfi}, the change in CFI from the previous
+fitted rung (\code{NA} for configural and for the strict tier's vacuous metric
+rung), as a labeled \strong{secondary} criterion: Cheung and Rensvold's (2002)
+general rule rejects an invariance step when CFI drops by more than .01
+(their alpha = .01). It is reported and never gates: \code{comparable}, the
+verdict, and the fit the estimation layer consumes are decided by the
+nested test alone, and the two criteria can legitimately disagree (a
+change in CFI is insensitive to sample size where the nested test is not).
+The retain/reject label prints \strong{only inside the envelope that simulation
+covers}: exactly two groups, ML estimation, and a plain (non-robust) CFI.
+Three separate things put a fit outside it, and the printed note names
+which one applies. A robust estimator -- the default \code{"MLR"}, or \code{"MLM"}
+-- makes lavaan report a robust CFI; so does \code{missing = "fiml"}, even
+under \code{estimator = "ML"}, so plain ML is necessary for the label but not
+sufficient. \code{"GLS"}, \code{"WLS"}, \code{"ULS"} and \code{"DWLS"} are not ML estimation
+at all, though their CFI is plain-named. And more than two groups is
+outside the simulation whatever the estimator. In each case the \code{dcfi}
+value still prints, marked as not validated for that configuration and
+with no verdict attached.
+
+Cheung and Rensvold simulated two groups, ML estimation, multivariate
+normal data, and Type I error only; robust CFI variants were not in their
+study, so no cutoff here was validated for one.}
 
 \item{invariance_alpha}{Optional. The alpha level for the invariance
 gating decision (default = 0.05). The gate is a modeling decision with
@@ -139,8 +163,11 @@ A \code{circumplex_ssm_sem} object (a subclass of \code{circumplex_ssm}, so
 vectors), \code{details}, \code{call}, plus \code{sem} (the fitted lavaan model: the
 gate rung's fit for grouped analyses, or the configural fit when the
 gate was rejected), \code{invariance} (for grouped analyses: the ladder
-table, the \code{comparable} flag, the verdict text, the gate rung, and the
-alpha used; \code{NULL} for single-group analyses), and \code{model} (tier,
+table -- including the \code{dcfi} column and its \code{cr} retain/reject label,
+\code{NA} outside the criterion's validated scope -- the \code{comparable} flag,
+the verdict text, the gate and required rungs, the alpha used, and
+\code{dcfi_scope} recording that scope; \code{NULL} for single-group analyses),
+and \code{model} (tier,
 generated syntax for single-group fits, and the OLS projection
 weights).
 
@@ -243,6 +270,15 @@ res
 summary(res)
 }
 \dontshow{\}) # examplesIf}
+}
+\references{
+Cheung, G. W., & Rensvold, R. B. (2002). Evaluating
+goodness-of-fit indexes for testing measurement invariance.
+\emph{Structural Equation Modeling}, 9(2), 233-255. (The \code{dcfi} secondary
+criterion. Their p. 251 sentence states the direction of the -.01 rule
+backwards relative to their own Table 5, whose critical values are the 1\%
+lower tails of the simulated null distributions; this package follows the
+simulation.)
 }
 \seealso{
 \code{\link[=ssm_analyze]{ssm_analyze()}} for the observed-score SSM, \code{\link[=ssm_sem_syntax]{ssm_sem_syntax()}} for
