@@ -42,6 +42,9 @@ Add the Cheung–Rensvold (2002) ΔCFI as a labeled, reported-only secondary inv
 - [x] T3: author `cairn/references/cheung2002.md`; add the inline `# Cheung & Rensvold (2002)` citation at the implementing lines; update `INDEX.md`; correct the stale INDEX + `devel/m5-sem-design.md` §12.2 prose.
 - [x] T4: roxygen on `ssm_sem()` + NEWS.md entry + SEM-vignette paragraph.
 - [x] T5: D-entry (D-027) recording the decision; `devtools::document()`; `devtools::test()`; `devtools::check(args = "--no-manual")`.
+- [ ] T6 (from review, F1 — AC2): require ML estimation as well as a plain CFI in the scope gate — AND `identical(lavaan::lavInspect(fit, "options")$estimator, "ML")` into `cfi_plain`'s conjunction (it reads `"ML"` for ML/MLR/MLM, `"GLS"`/`"ULS"`/`"DWLS"` otherwise, so `estimator = "ML", se = "robust.huber.white"` stays admitted per the T2 gate decision); add the third `why` reason to `sem_dcfi_note()`; regression test at a two-group `GLS` fit asserting no `cr` column and a caveat naming the non-ML estimator. Amend D-027 part (3) to state the conjunction. Re-verify AC2 and AC6.
+- [ ] T7 (from review, F2): print `dcfi` at `max(digits, 4)` so the displayed value always resolves against the 2-decimal cutoff; test that −0.0096 and −0.0104 render distinguishably under their opposite labels.
+- [ ] T8 (from review, AC5): add the Type-I-error-only caveat (and normality as the simulation's data assumption, not just "normal-theory CFI") to the NEWS bullet; then take the AC5 attribution clause through the substantive-amendment gate — its "the transcription note" target was superseded by T3's own `cairn/references/cheung2002.md`, and user-facing docs must not cite a `devel/` file. Re-sync `cheung2002.md`'s `Traces to` line anchors after T6/T7 move them (M56 lesson).
 
 ## Work log
 
