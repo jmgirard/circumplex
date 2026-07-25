@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M58 | Finish the post-M52 CI trim — pkgdown parity + an allowlist drift guard | in-progress | — | normal | milestones/M58-ci-trim-pkgdown-parity.md |
+| M58 | Finish the post-M52 CI trim — pkgdown parity + an allowlist drift guard | review | — | normal | milestones/M58-ci-trim-pkgdown-parity.md |
 | M57 | ΔCFI secondary invariance criterion for `ssm_sem()` | done | — | normal | milestones/archive/M57-dcfi-invariance-criterion.md |
 | M56 | Cite the published Browne equations `R/cpm_fit.R` implements | done | — | normal | milestones/archive/M56-cite-browne-equations.md |
 | M55 | Axes-Reliability vignette — teaching `axes_reliability()` | done | M54 | normal | milestones/archive/M55-axes-reliability-vignette.md |

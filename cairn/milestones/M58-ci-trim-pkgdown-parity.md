@@ -1,11 +1,11 @@
 # M58: Finish the post-M52 CI trim — pkgdown parity + an allowlist drift guard
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m58-ci-trim-pkgdown-parity`
+- **Branch/PR:** `m58-ci-trim-pkgdown-parity` / [PR #84](https://github.com/jmgirard/circumplex/pull/84)
 
 ## Goal
 
@@ -93,7 +93,7 @@ mechanical allowlist/DESCRIPTION sync check.
       workflows and to `pkgdown.yaml`'s `pull_request` trigger.
 - [x] **T5** — Wire `Rscript tools/check-ci-deps.R` into `R-CMD-check.yaml`
       as a step after `setup-r`, before `setup-r-dependencies`.
-- [ ] **T6** — Prove the guard by mutation on the branch: inject a `Suggests`
+- [x] **T6** — Prove the guard by mutation on the branch: inject a `Suggests`
       entry, push, observe red naming it, revert, observe green; record both
       run URLs.
 
@@ -104,6 +104,12 @@ mechanical allowlist/DESCRIPTION sync check.
 - 2026-07-25: T1 done — `tools/check-ci-deps.R` (base R, handles block + inline `extra-packages` forms); `^tools$` added to .Rbuildignore. Local teeth check: flags pkgdown's real drift, and an injected `tibble` Suggest is named per-file; exit 1 both, clean revert.
 - 2026-07-25: T2-T5 done — pkgdown gets the hard-deps+allowlist install (brms/Stan out, glmmTMB/lavaan kept), workflow-level `cancel-in-progress`, and paths-ignore; push triggers on all three workflows gain paths-ignore; guard wired into R-CMD-check after setup-r. Guard now exits 0; all three YAMLs parse; `devtools::test()` 0 FAIL / 3247 PASS / 0 SKIP.
 - 2026-07-25: AMENDMENT (substantive, user-gated) — AC1 and the pkgdown Scope bullet narrowed from five packages to brms+rstan. BH/RcppParallel/StanHeaders are OpenMx LinkingTo/Imports deps (PR #84 pkgdown log, `"ref": "any::OpenMx"` block), not brms's, so D-029 guarantees their presence and the original AC1 was unsatisfiable. Misattribution inherited from M52's framing; M52's archive left untouched (history, IP4) and its R-CMD-check comment left alone at the user's choice.
+- 2026-07-25: T6 done — guard proven by mutation on CI. RED: injecting `tibble` into Suggests failed run 30165493362 AT the guard step (step 5 failure, steps 6-7 SKIPPED, so it fired before the install), message naming tibble and all three workflow paths. GREEN: revert a2d2dd2b, run 30165840887 pass. Baseline green run 30165014607.
+- 2026-07-25: AC3 evidence came free from the T6 push pair — push A (07e25550) had all three runs `cancelled` (pkgdown 30165483647) when push B (9af8d3f8) superseded it; exactly one pkgdown run uncancelled per sha.
+- 2026-07-25: AC1 evidence (final run 30165840898): `"ref": "any::brms"` count 0; install plan 21 pkgs, 13 named, no brms/rstan; pak's direct-ref set is 12 entries, none of them brms/rstan. knitr/rmarkdown/RColorBrewer verified PRESENT in the final library (not silently dropped) despite not appearing as direct refs.
+- 2026-07-25: CAVEAT recorded honestly — brms/rstan are still PRESENT in the restored library cache (session info lists them as RSPM) because the cache archives the whole library and was seeded from the pre-change cache. The lockfile no longer requests them, so a cold cache or the next key rotation drops them, but the wall-clock install saving is not realized today (dep step 54s -> 69s across the change; the 69s run reinstalled 13 pkgs after the lockfile key changed). The durable win is correctness; the speed wins in this milestone are paths-ignore and cancel-in-progress.
+- 2026-07-25: `devtools::check(args="--no-manual")` 0 errors / 0 warnings / 0 notes. `^tools$` confirmed effective: a built tarball contains 0 `circumplex/tools` entries (probe sanity: 32 `circumplex/R/` entries). PDF-manual step did not run (--no-manual) — no roxygen was touched this milestone, so the M7/M57 manual gap does not apply.
+- 2026-07-25: all tasks done; status in-progress->review.
 
 ## Decisions
 
