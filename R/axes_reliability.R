@@ -457,10 +457,17 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     if (nrow(cormat) != ncol(cormat)) {
       stop("`cormat` must be a square matrix.", call. = FALSE)
     }
-    if (is.null(colnames(cormat))) {
+    # Both dimensions are indexed by name below (`cormat[all_cols, all_cols]`),
+    # so both must carry the same names in the same order. Checking only
+    # colnames() lets the commonest transcription shape through -- reading a
+    # published matrix back with as.matrix(read.csv(...)) yields colnames and
+    # NULL rownames -- and it then fails on the subset with a bare "subscript
+    # out of bounds" instead of this refusal.
+    if (is.null(colnames(cormat)) || is.null(rownames(cormat)) ||
+        !identical(rownames(cormat), colnames(cormat))) {
       stop(
-        "`cormat` must have dimnames naming its items, so `items` can select ",
-        "them.",
+        "`cormat` must have dimnames naming its items, identical on both ",
+        "dimensions and in the same order, so `items` can select them.",
         call. = FALSE
       )
     }

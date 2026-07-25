@@ -745,20 +745,44 @@ test_that("AC3(a): the population matrix recovers every component (cormat path)"
   expect_lt(abs(est[[3]] - zeta1), 1e-4)
   expect_lt(res$fit$chisq, 1e-6)
 
-  # The matrix may arrive in any column order: a permuted cormat must give the
-  # identical answer, since the fixed cosine loadings are matched to items by
-  # name, not by position.
+  # The matrix may arrive in any column order, and a permuted cormat must give
+  # the identical answer. Note carefully WHICH quantity fences the reordering
+  # step: lavaan matches `sample.cov` by dimnames itself, so
+  # components$Estimate is invariant to a permuted input whether or not the
+  # package reorders (measured: max |diff| exactly 0 with the reorder removed).
+  # The quantity the reorder actually determines is the OLS shadow, which is
+  # built POSITIONALLY from R against item_angle/item_scale -- without the
+  # reorder its xi1 collapses from .15 to ~2.6e-4. So assert the shadow here,
+  # mirroring the raw path's OLS-shadow check, or the reorder ships unfenced.
+  set.seed(59)
   perm <- sample(nrow(sigma))
   res_p <- suppressMessages(axes_reliability(
     cormat = sigma[perm, perm], items = items, angles = oct, n = 50000L
   ))
   expect_equal(res_p$components$Estimate, est, tolerance = 1e-10)
+  expect_equal(res$details$ols_shadow[["xi1"]], xi1, tolerance = 1e-8)
+  expect_equal(res$details$ols_shadow[["xi2"]], xi2, tolerance = 1e-8)
+  expect_equal(res$details$ols_shadow[["zeta1"]], zeta1, tolerance = 1e-8)
+  expect_equal(res_p$details$ols_shadow, res$details$ols_shadow, tolerance = 1e-8)
 })
 
 # AC3(b): cross-engine. OpenMx and the public cormat path fit the identical
-# model to the identical correlation matrix. The residual disagreement is the
-# two engines' differing likelihood normalization, measured at ~2e-5 -- two
-# orders inside the 1e-3 bar (the raw-data BC7 pairing above observes ~6e-5).
+# model to the identical correlation matrix, agreeing to ~1.9e-5 on both seeds.
+#
+# What that residual is NOT: the two engines' likelihood normalization. That
+# was the obvious explanation and it is measurably false -- correcting the
+# lavaan side for (N-1)/N makes agreement WORSE, and pairing OpenMx against a
+# wishart-likelihood lavaan fit (the convention the raw-data BC7 companion
+# above uses) is looser still at 5.5e-5 to 6.5e-5. Empirically OpenMx's
+# type="cov"/numObs convention sits closer to lavaan's default "normal" than to
+# "wishart", so the public path is the tighter pairing, and what remains is
+# ordinary disagreement between two different optimizers on one matrix.
+#
+# The assertions encode both facts rather than absorbing them into a loose
+# bar: a 2e-4 bar (10x the observed disagreement, and 5x tighter than AC3(b)'s
+# 1e-3, which a tighter test still satisfies), plus a direct check that the
+# disagreement is SMALLER than the (N-1)/N offset would be -- which is what
+# falsifies the normalization explanation instead of merely not testing it.
 # OpenMx is already Suggests; no new Imports (D-006/D-014).
 
 test_that("AC3(b): lavaan and OpenMx agree on the cormat path (Layer B)", {
@@ -784,7 +808,11 @@ test_that("AC3(b): lavaan and OpenMx agree on the cormat path (Layer B)", {
       zeta1 = res$components$Estimate[[3]]
     )
     mx <- axes_mx_components(R, n, oct, k)
-    expect_lt(max(abs(lav - mx)), 1e-3) # observed ~2e-5
+    disagreement <- max(abs(lav - mx))
+    expect_lt(disagreement, 2e-4) # observed 1.95e-5 (seed 7), 1.92e-5 (seed 8)
+    # The (N-1)/N offset on xi1 would be xi1/n = 7.5e-5 at these values. The
+    # measured disagreement sits below it, so normalization cannot be its cause.
+    expect_lt(disagreement, .15 / n)
   }
 })
 
@@ -851,6 +879,21 @@ test_that("AC5: each malformed cormat/n input errors informatively", {
   # Shape and content of the matrix.
   expect_error(ok(cormat = R[1:4, ], n = 500L), "must be a square matrix")
   expect_error(ok(cormat = unname(R), n = 500L), "must have dimnames")
+  # Half-named is the shape as.matrix(read.csv(...)) produces -- colnames kept,
+  # rownames dropped -- i.e. the default outcome of transcribing a published
+  # matrix, which is the workflow this path exists for. It must reach the
+  # informative refusal, not a bare "subscript out of bounds" from the subset.
+  half <- R
+  rownames(half) <- NULL
+  expect_error(ok(cormat = half, n = 500L), "must have dimnames")
+  colonly <- R
+  colnames(colonly) <- NULL
+  expect_error(ok(cormat = colonly, n = 500L), "must have dimnames")
+  # Names present on both dimensions but in different orders would silently
+  # mis-subset (rows read in one order, columns in another).
+  scrambled <- R
+  rownames(scrambled) <- rev(colnames(R))
+  expect_error(ok(cormat = scrambled, n = 500L), "must have dimnames")
   asym <- R
   asym[1, 2] <- asym[1, 2] + .1
   expect_error(ok(cormat = asym, n = 500L), "must be symmetric")
