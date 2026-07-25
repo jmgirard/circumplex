@@ -1,11 +1,11 @@
 # M57: ΔCFI secondary invariance criterion for `ssm_sem()`
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m57-dcfi-invariance-criterion`
 
 ## Goal
 
@@ -37,16 +37,21 @@ Add the Cheung–Rensvold (2002) ΔCFI as a labeled, reported-only secondary inv
 
 ## Tasks
 
-- [ ] T1: tests first (`tests/testthat/test-ssm_sem.R`) — (a) `dcfi` = hand-computed CFI difference + NA rows; (b) two-group ML: ΔCFI ∈ (−.01, 0] retains, < −.01 rejects; (c) scope-gate: MLR fit and a 3-group fit print value + note, no binary flag; (d) reported-only: gate/verdict/fit identical with ΔCFI present vs absent on a disagreement fixture.
-- [ ] T2: implement `dcfi` in `sem_fit_ladder` ([R/ssm_sem.R:776](R/ssm_sem.R:776)) and the scope-gated flag; wire into the table print ([R/ssm_sem.R:1604](R/ssm_sem.R:1604)). No touch to `comparable`/verdict/`fit_est` selection.
+- [x] T1: tests first (`tests/testthat/test-ssm_sem.R`) — (a) `dcfi` = hand-computed CFI difference + NA rows; (b) two-group ML: ΔCFI ∈ (−.01, 0] retains, < −.01 rejects; (c) scope-gate: MLR fit and a 3-group fit print value + note, no binary flag; (d) reported-only: gate/verdict/fit identical with ΔCFI present vs absent on a disagreement fixture.
+- [x] T2: implement `dcfi` in `sem_fit_ladder` ([R/ssm_sem.R:776](R/ssm_sem.R:776)) and the scope-gated flag; wire into the table print ([R/ssm_sem.R:1604](R/ssm_sem.R:1604)). No touch to `comparable`/verdict/`fit_est` selection.
 - [ ] T3: author `cairn/references/cheung2002.md`; add the inline `# Cheung & Rensvold (2002)` citation at the implementing lines; update `INDEX.md`; correct the stale INDEX + `devel/m5-sem-design.md` §12.2 prose.
 - [ ] T4: roxygen on `ssm_sem()` + NEWS.md entry + SEM-vignette paragraph.
 - [ ] T5: D-entry (D-027) recording the decision; `devtools::document()`; `devtools::test()`; `devtools::check(args = "--no-manual")`.
 
 ## Work log
 
+- 2026-07-24: T1+T2 done, committed together — a tests-first pair cannot be green apart, so both tick at one checkpoint. Minor amendment: the ΔCFI tests live in `tests/testthat/test-ssm_sem_groups.R` (where every ladder test lives), not `test-ssm_sem.R` as T1 wrote — the criterion is a multi-group ladder feature.
+- 2026-07-24: T1 fixtures — a second-harmonic-perturbed two-group population whose `eps` sets the population CFI drop while n sets Δχ², so the two criteria can be made to DISAGREE (eps = 0.12, n = 2000/group: ΔCFI −.0022 → "retain", Δχ² p = .0004 → reject). Oracles: invariant (dcfi == diff of the table's own cfi) + live (both rungs refitted outside the ladder, lavaan's own CFI differenced, agreeing to 1e-8) + a deterministic helper pin of the ≥ −.01 boundary.
+- 2026-07-24: T2 — `sem_dcfi_cutoff`/`sem_dcfi_flag`/`sem_dcfi_note` added; `sem_fit_ladder` gains `dcfi`/`cr` columns and a `dcfi_scope` record carried into the returned `invariance` list; `print.circumplex_ssm_sem` gains the two columns and the attribution block. Full suite 0 failures / 3220 pass (4 pre-existing CPM-Hessian warnings in test-ci_accuracy.R). Print output rendered and read in all four configurations (in-scope retain, in-scope reject, MLR, 3-group).
 - 2026-07-23: created by /milestone-plan. Promotes the "ΔCFI secondary invariance criterion" candidate (M41 surface; `devel/m5-sem-design.md` §12.2 item 2; transcription `devel/cr2002-transcription.md` landed 2026-07-07; T4 shipped without it). Q1 (robust-CFI scope) resolved to the scope-gated hybrid; Q2 → docs reach roxygen+NEWS+vignette; Q3 → rides v2.0.0, no M7 gate. No RB tripwire (numeric part is a subtraction; transcription is the value/direction oracle). No scope-supersession D-entry owed — completes M5's already-bundled `ssm_sem`, not a new feature family.
 
 ## Decisions
+
+- 2026-07-24 (implement question gate): the ΔCFI surface. (a) The printed ladder gains a `dcfi` column plus, in scope, a `cr` retain/reject column, with one attribution + scope block beneath the table. (b) `invariance$table` stores `cr` as well as `dcfi`, so a programmatic caller gets the criterion applied rather than re-deriving the −.01 cutoff and the scope rule. (c) The scope gate keys on **the statistic actually differenced** — two groups AND no `cfi.robust`/`cfi.scaled` in `fitMeasures()` — not on `estimator == "ML"`. Keying on the statistic means a robust index can never be labeled against a normal-theory cutoff, and it correctly admits `estimator = "ML", se = "robust.huber.white"`, where the CFI is normal-theory (CFI does not read the standard errors).
 
 ## Review

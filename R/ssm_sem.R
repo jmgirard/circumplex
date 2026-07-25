@@ -756,6 +756,61 @@ sem_fit_cfa <- function(syn, dat, grouping = NULL, estimator, se, missing,
   do.call(lavaan::cfa, args)
 }
 
+# The Cheung & Rensvold (2002) general Delta-GFI critical value for CFI: a
+# drop of more than .01 across an adjacent pair of ladder rungs rejects that
+# invariance step (alpha = .01, two-group ML simulation). Value AND DIRECTION
+# per cairn/references/cheung2002.md -- the article's own p. 251 sentence
+# states the direction backwards, contradicting the Table 5 simulation its
+# critical values are the 1% tails of.
+sem_dcfi_cutoff <- -0.01
+
+# Apply the criterion. `in_scope` is the two-group/plain-ML envelope Cheung &
+# Rensvold actually simulated; outside it the difference is still reported but
+# NO verdict is attached (they simulated neither >2 groups nor robust indices,
+# and inventing a cutoff there would be fabrication, not extrapolation).
+# Boundary: a value exactly AT the cutoff RETAINS ("Delta-CFI >= -.01 -> the
+# step is retained by this criterion").
+sem_dcfi_flag <- function(dcfi, in_scope) {
+  out <- rep(NA_character_, length(dcfi))
+  if (!isTRUE(in_scope)) {
+    return(out)
+  }
+  ok <- !is.na(dcfi)
+  out[ok] <- ifelse(dcfi[ok] < sem_dcfi_cutoff, "reject", "retain")
+  out
+}
+
+# The attribution + scope block printed beneath the ladder table. The
+# attribution and the published scope label accompany the value ALWAYS; out of
+# scope the block additionally names why no verdict is given.
+sem_dcfi_note <- function(scope) {
+  dcfi <- "\u0394CFI"
+  head <- paste0(
+    dcfi, ": Cheung & Rensvold (2002) criterion, alpha = .01, two-group ML\n",
+    "  simulation scope"
+  )
+  tail <- paste0(
+    "Secondary and reported only -- the verdict below gates on the nested\n",
+    "  chi-square difference test alone.\n"
+  )
+  if (isTRUE(scope$in_scope)) {
+    paste0(
+      head, "; ", dcfi, " < ", format(sem_dcfi_cutoff),
+      " rejects that invariance step.\n  ", tail
+    )
+  } else {
+    why <- c(
+      if (!isTRUE(scope$cfi_plain)) "robust CFI",
+      if (!identical(scope$n_groups, 2L)) paste(scope$n_groups, "groups")
+    )
+    paste0(
+      head, ". The cutoff is NOT validated for this configuration\n  (",
+      paste(why, collapse = "; "), "): the value is descriptive only, with ",
+      "no binary verdict.\n  ", tail
+    )
+  }
+}
+
 # Fit the rung sequence up to `gate`, run lavaan's own nested-model test
 # between adjacent rungs (the scaled difference test under robust estimators,
 # via lavTestLRT), and return the table, the verdict, and the fit the
@@ -789,11 +844,14 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
   syns <- list()
   rows <- list()
   prev_fit <- NULL
+  prev_cfi <- NA_real_
+  cfi_plain <- logical(0)
   for (r in rungs) {
     if (sem_strict_metric_vacuous(model, r)) {
       rows[[r]] <- data.frame(
         rung = r, chisq = NA_real_, df = NA_real_, cfi = NA_real_,
         rmsea = NA_real_, dchisq = NA_real_, ddf = NA_real_, p = NA_real_,
+        dcfi = NA_real_, cr = NA_character_,
         note = "vacuous (all loadings fixed under the strict tier)"
       )
       next
@@ -827,19 +885,43 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
       ddf <- lrt[2, "Df diff"]
       pval <- lrt[2, "Pr(>Chisq)"]
     }
+    # Delta-CFI (Cheung & Rensvold 2002) differences exactly the CFI the table
+    # DISPLAYS -- plain cfi under ML, cfi.robust under MLR -- against the last
+    # FITTED rung, the same pairing the nested test above uses. Whether that
+    # CFI is the plain normal-theory one decides the criterion's scope below.
+    cfi <- sem_fm_pick(fm, "cfi.robust", "cfi.scaled", "cfi")
+    cfi_plain <- c(
+      cfi_plain, !any(c("cfi.robust", "cfi.scaled") %in% names(fm))
+    )
     rows[[r]] <- data.frame(
       rung = r,
       chisq = sem_fm_pick(fm, "chisq.scaled", "chisq"),
       df = sem_fm_pick(fm, "df.scaled", "df"),
-      cfi = sem_fm_pick(fm, "cfi.robust", "cfi.scaled", "cfi"),
+      cfi = cfi,
       rmsea = sem_fm_pick(fm, "rmsea.robust", "rmsea.scaled", "rmsea"),
       dchisq = dchisq, ddf = ddf, p = pval,
+      dcfi = if (is.null(prev_fit)) NA_real_ else cfi - prev_cfi,
+      cr = NA_character_,
       note = ""
     )
     prev_fit <- fit
+    prev_cfi <- cfi
   }
   table <- do.call(rbind, rows)
   rownames(table) <- NULL
+
+  # The Cheung & Rensvold envelope: two groups AND the plain (normal-theory)
+  # CFI. Gating on the STATISTIC rather than on `estimator` keeps the label
+  # tied to the quantity actually differenced, so a robust index can never be
+  # flagged against a cutoff simulated for a normal-theory one.
+  dcfi_scope <- list(
+    n_groups = as.integer(n_groups),
+    cfi_plain = length(cfi_plain) > 0 && all(cfi_plain),
+    in_scope = FALSE
+  )
+  dcfi_scope$in_scope <- identical(dcfi_scope$n_groups, 2L) &&
+    dcfi_scope$cfi_plain
+  table$cr <- sem_dcfi_flag(table$dcfi, dcfi_scope$in_scope)
 
   # Comparability: EVERY tested rung up through `required` must be retained.
   # Configural has no test; the strict tier's vacuous metric rung holds by
@@ -928,8 +1010,8 @@ sem_fit_ladder <- function(dat, scales, angles_deg, measures, grouping,
 
   list(
     table = table, comparable = comparable, verdict = verdict,
-    gate = gate, required = required, alpha = alpha, fit = fit_est,
-    syntax = syn_est
+    gate = gate, required = required, alpha = alpha,
+    dcfi_scope = dcfi_scope, fit = fit_est, syntax = syn_est
   )
 }
 
@@ -1334,7 +1416,8 @@ ssm_sem <- function(data, scales, angles = octants(), measures = NULL,
     sem = fit,
     invariance = if (is.null(ladder)) NULL else c(
       ladder[c(
-        "table", "comparable", "verdict", "gate", "required", "alpha"
+        "table", "comparable", "verdict", "gate", "required", "alpha",
+        "dcfi_scope"
       )],
       list(contrast_requested = contrast)
     ),
@@ -1610,13 +1693,22 @@ print.circumplex_ssm_sem <- function(x, digits = 3, ...) {
       rmsea = round(tab$rmsea, digits),
       dchisq = round(tab$dchisq, digits),
       ddf = tab$ddf,
-      p = sem_fmt_p(tab$p, digits)
+      p = sem_fmt_p(tab$p, digits),
+      dcfi = round(tab$dcfi, digits)
     )
+    # The retain/reject column appears ONLY inside the criterion's validated
+    # scope; outside it the value stands alone and the note below says why.
+    if (any(!is.na(tab$cr))) {
+      show$cr <- tab$cr
+    }
     print(show, row.names = FALSE, na.print = "")
     if (any(nzchar(tab$note))) {
       for (i in which(nzchar(tab$note))) {
         cat("  note [", tab$rung[i], "]: ", tab$note[i], "\n", sep = "")
       }
+    }
+    if (any(!is.na(tab$dcfi))) {
+      cat(sem_dcfi_note(inv$dcfi_scope))
     }
     if (isTRUE(inv$comparable)) {
       cat("Verdict: ", inv$verdict, "\n", sep = "")
