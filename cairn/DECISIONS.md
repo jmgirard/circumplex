@@ -933,3 +933,54 @@ entry is spent without effect. No new dependency (lavaan and OpenMx are already
 "Axes-reliability deferred-in-spec extensions" candidate row is narrowed to its
 two survivors. D-001/D-008/D-018/D-025/D-026/D-030 lineage extended; none other
 superseded. Source: Jeff, M60/M61 plan gate.
+
+### D-032 (2026-07-26): blockwise ζ2 enters v2.0.0 and takes up D-026's last-but-one deferral — a narrow D-001 supersession that does not gate M7 (M63)
+
+**Context:** D-026 deferred four axes-reliability extensions pending a concrete
+use case; D-030 and D-031 took up three of them (M59, M60, M61), leaving
+blockwise ζ2 and FIML on items parked. At the M63 plan gate Jeff took up
+blockwise ζ2. The use case is the caveat the package already ships: roxygen at
+`R/axes_reliability.R:533-543` tells callers that a blockwise instrument folds
+its block variance into the general and scale-specificity components, inflating
+them and deflating the share attributed to the axes, and that Strack et al.
+report block-specificity as high as 6.7% — so `axes_reliability()` currently
+returns a knowably biased ξ1 for an entire class of instruments and says so.
+Estimating ζ2 removes the caveat rather than documenting around it.
+Investigation also corrected the candidate row's oracle premise: the row held
+that the three blocked Table 3 rows plus the OCAI type-d rows "would be its
+published oracle if memberships can be recovered", but recoverable memberships
+were never the constraint — Strack et al. publish variance components, item_n
+and reliability for those rows and no correlation matrix, so they cannot drive
+an end-to-end fit at all (the conclusion `strack2013.md:160-170` already reached
+for the type-f SYMLOG rows). Reliability is SB(ξ1, item_n) and never touches ζ2,
+so those rows anchor the formula layer, which M63 does not change.
+**Decision:** Supersede D-001's new-features-excluded clause **insofar as it
+bars blockwise ζ2 estimation** — narrowly, exactly as D-008 did for CIRCUM,
+D-018 for the visualization expansion, D-025 for the axes-reliability feature,
+D-030 for its correlation-matrix input, and D-031 for the non-octant and
+single-item extensions. M63 ships in v2.0.0, its NEWS text folded into the
+existing `axes_reliability()` bullet under the 2.0.0 heading. Three gate answers
+fix the design: block membership reaches the estimator through a **`blocks =`
+argument only** (no bundled instrument records block structure, so an
+`Instrument` field would ship empty on every one of them with nothing to
+populate it from); an **unidentified ζ2 is dropped and flagged**, not refused,
+mirroring the `axes_fits_zeta1()` contract M61 established so the emitted syntax
+and the reported component set can never disagree; and the **acceptance bar is
+synthetic** — known-ζ2 recovery, a demonstration that omitting ζ2 biases ξ1, and
+lavaan/OpenMx/OLS-shadow agreement — with the blocked Table 3 rows added as
+formula-layer Spearman–Brown and five-component sum anchors only.
+**Scope of the supersession:** narrow — promotes **only** M63. All other D-001
+consequences and exclusions stand. **FIML on items is untouched**, and D-026's
+deferral of it, pending a concrete use case, is unchanged — it is now the last
+survivor of the four. RR09 §4's holding that refusing unequal spacing is
+"scope-correct, not merely cautious" is likewise untouched: blocks are a
+grouping of items, not a respacing of scales, and M63 goes nowhere near the
+quasi-circumplex refusal.
+**Consequences:** M7 does **not** gain `Depends on: M63` — on D-030's reading
+the release never waits for it, it merely contains it if it lands first; should
+the window open first, M63 ships in the following version and this entry is
+spent without effect. No new dependency (lavaan and OpenMx are already
+`Suggests`; D-006/D-014 minimal-deps reinforced). Carrying blocks on the
+`circumplex_instrument` class is deferred to the ROADMAP candidate row, not
+rejected. D-001/D-008/D-018/D-025/D-026/D-030/D-031 lineage extended; none other
+superseded. Source: Jeff, M63 plan gate.
