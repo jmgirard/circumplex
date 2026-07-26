@@ -213,16 +213,23 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
 # Used as a cross-check on the CFA estimate (a third independent route beside
 # lavaan and OpenMx) and as start values for the fit. Exact on the population
 # matrix; a method-of-moments approximation in finite samples.
+#
+# With one item at every scale position the same-scale indicator is identically
+# zero off the diagonal, so that third column is a zero column: the design drops
+# to rank 2 and qr.solve() fails outright. Drop it and regress on (1, cos-diff)
+# alone, returning a two-component seed. The seed then matches the model's
+# parameter set exactly, because axes_fits_zeta1() drops zeta1 on the same
+# condition -- both read the item map, so they cannot disagree (M61 T3).
 axes_ols_shadow <- function(R, item_angle_deg, item_scale) {
   ut <- upper.tri(R)
   th <- as.numeric(item_angle_deg) * pi / 180
-  X <- cbind(
-    1,
-    outer(th, th, function(a, b) cos(a - b))[ut],
-    as.numeric(outer(item_scale, item_scale, `==`)[ut])
-  )
+  same <- as.numeric(outer(item_scale, item_scale, `==`)[ut])
+  X <- cbind(1, outer(th, th, function(a, b) cos(a - b))[ut])
+  if (any(same != 0)) X <- cbind(X, same)
   b <- qr.solve(X, R[ut])
-  c(xi2 = b[[1]], xi1 = b[[2]], zeta1 = b[[3]])
+  out <- c(xi2 = b[[1]], xi1 = b[[2]])
+  if (ncol(X) == 3L) out[["zeta1"]] <- b[[3]]
+  out
 }
 
 # Fit the axes-reliability model on item data through the single lavaan::cfa

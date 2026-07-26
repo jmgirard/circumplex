@@ -1381,3 +1381,52 @@ test_that("M61 T2: a seed without zeta1 emits no modifier rather than erroring",
                       start = c(xi2 = .05, xi1 = .20, zeta1 = .08))
   expect_match(syn3, "SS1 ~~ start\\(0\\.08[0-9]*\\)\\*zeta1\\*SS1")
 })
+
+test_that("M61 T3: the OLS shadow drops to two columns when no same-scale pair exists", {
+  # Single item at every position: the same-scale indicator is identically zero
+  # off the diagonal, so the three-column design has a zero column. Before M61
+  # this was a hard qr.solve() failure, not a graceful degradation.
+  ang <- (seq_len(8L) - 1L) * 45
+  xi1 <- .18
+  xi2 <- .07
+  # zeta1 is irrelevant at n_items = 1 -- its block lands entirely on the
+  # diagonal, which axes_population_cor() overwrites with 1 -- so the generating
+  # population genuinely has no scale-specificity term, whatever is passed here.
+  pop <- axes_population_cor(ang, 1L, xi1, xi2, zeta1 = 0)
+  item_scale <- pop$scale
+  item_angle <- rep(ang, each = 1L)
+
+  seed <- expect_no_error(axes_ols_shadow(pop$sigma, item_angle, item_scale))
+  expect_identical(names(seed), c("xi2", "xi1"))
+  # Exact on the population matrix: r_ij = xi2 + xi1*cos(theta_i - theta_j) is
+  # linear in the two remaining columns, so least squares is not an
+  # approximation here (the same claim the three-column shadow makes).
+  expect_lt(abs(seed[["xi1"]] - xi1), 1e-10)
+  expect_lt(abs(seed[["xi2"]] - xi2), 1e-10)
+
+  # zeta1 really is unrecoverable, not merely omitted: any zeta1 gives the same
+  # population matrix at one item per position, so nothing could recover it.
+  pop_b <- axes_population_cor(ang, 1L, xi1, xi2, zeta1 = .40)
+  expect_identical(pop_b$sigma, pop$sigma)
+})
+
+test_that("M61 T3: a mixed map keeps the three-column shadow", {
+  ang <- (seq_len(4L) - 1L) * 90
+  # Scale 1 carries a pair; scales 2-4 carry one item each. One pair is enough
+  # to identify zeta1, so the third column survives.
+  item_scale <- c(1L, 1L, 2L, 3L, 4L)
+  item_angle <- ang[item_scale]
+  xi1 <- .15
+  xi2 <- .06
+  zeta1 <- .10
+  th <- item_angle * pi / 180
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(item_scale, item_scale, `==`)
+  diag(sig) <- 1
+
+  seed <- axes_ols_shadow(sig, item_angle, item_scale)
+  expect_identical(names(seed), c("xi2", "xi1", "zeta1"))
+  expect_lt(abs(seed[["xi1"]] - xi1), 1e-10)
+  expect_lt(abs(seed[["xi2"]] - xi2), 1e-10)
+  expect_lt(abs(seed[["zeta1"]] - zeta1), 1e-10)
+})
