@@ -85,7 +85,7 @@ any rotation, instead of only the canonical octant set.
 
 ## Tasks
 
-- [ ] T1: tests first — a rotated type-b set and k = 6 / k = 12 sets currently
+- [x] T1: tests first — a rotated type-b set and k = 6 / k = 12 sets currently
       error at `R/axes_reliability.R:495-506`; pin that as the failing fence,
       and pin every refusal that must survive
       (`tests/testthat/test-axes-reliability.R:442-476`).
@@ -112,6 +112,7 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: in-progress on `m60-axes-reliability-equal-spacing`.
 - 2026-07-25: amended Scope + AC2 at the implement gate — scale-count floor 3 → 4, measured: the moment design (cos Δ, 1, same-scale) is rank 2 at k = 3 for any items/scale, rank 3 from k = 4. Jeff accepted.
 - 2026-07-25: implement gate — spacing tolerance is float-representation only, never near-equal spacing (Jeff; keeps RR09 §4's quasi-circumplex refusal intact).
+- 2026-07-25: T1 fence added (4 test blocks, rotated/k!=8/refusals/pole); red for the right reason — the octant-only refusals at :485-506, not an incidental error. Suite stays red by design until T3.
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 
 ## Decisions

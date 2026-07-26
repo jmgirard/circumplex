@@ -945,3 +945,119 @@ test_that("AC5: each malformed cormat/n input errors informatively", {
   expect_error(ok(cormat = R, n = p), "greater than the number of items")
   expect_error(ok(cormat = R, n = p - 1L), "greater than the number of items")
 })
+
+# M60 axes_reliability(): any equally spaced angle set, any rotation ----------
+
+# A fixture at an arbitrary equally spaced angle set. Unlike
+# axes_valid_fixture(), the scale count is a parameter, so the split() group
+# levels are pinned explicitly -- a bare numeric group vector is coerced to a
+# factor whose levels sort as CHARACTER ("1", "10", "11", "12", "2", ...), which
+# would silently pair scale 10's items with angle 2 at k >= 10 (the M34/M33
+# alphabetical-ordering family).
+axes_spaced_fixture <- function(angles, n = 1500L, k = 4L, xi1 = .20,
+                                seed = 42L) {
+  set.seed(seed)
+  dat <- axes_simulate(n, angles, k, xi1, .05, .08)
+  inames <- sprintf("i%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  grp <- factor(rep(seq_along(angles), each = k), levels = seq_along(angles))
+  list(data = dat, angles = angles, items = split(inames, grp), names = inames)
+}
+
+test_that("M60: a rotated equally spaced set estimates (Strack type b)", {
+  skip_if_not_installed("lavaan")
+  # Type b: eight scales at 45 deg spacing, rotated 22.5 deg off the axes
+  # (strack2013 p. 2 -- weights +/-.38268 and +/-.92388).
+  ang <- seq(22.5, 337.5, by = 45)
+  fx <- axes_spaced_fixture(ang)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  expect_s3_class(res, "circumplex_axes_reliability")
+  expect_true(all(is.finite(res$results$reliability)))
+  expect_true(all(res$results$reliability > 0 & res$results$reliability < 1))
+  # The equal-axis-variance restriction makes both axes agree at any rotation.
+  expect_equal(res$results$reliability[[1]], res$results$reliability[[2]],
+               tolerance = 1e-6)
+  # The type-b magnitudes actually reached the model.
+  w <- abs(axis_weights(ang))
+  expect_equal(sort(unique(round(w, 5))), c(0.38268, 0.92388))
+})
+
+test_that("M60: equally spaced sets with k != 8 estimate", {
+  skip_if_not_installed("lavaan")
+  for (k in c(6L, 12L)) {
+    ang <- (seq_len(k) - 1L) * (360 / k)
+    fx <- axes_spaced_fixture(ang, n = 2000L)
+    res <- suppressMessages(
+      axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+    )
+    expect_true(all(is.finite(res$results$reliability)), label = paste("k =", k))
+    expect_equal(res$results$reliability[[1]], res$results$reliability[[2]],
+                 tolerance = 1e-6)
+    expect_identical(res$details$n_scales, k)
+  }
+})
+
+test_that("M60: the refusal contract survives the relaxation", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_spaced_fixture(octants())
+  bad <- function(angles = fx$angles, items = fx$items) {
+    suppressMessages(axes_reliability(fx$data, items = items, angles = angles))
+  }
+
+  # Unequal spacing stays refused -- a quasi-circumplex is out of scope, and the
+  # tolerance admits float representation error only (RR09 section 4).
+  ang <- fx$angles
+  ang[[1]] <- ang[[1]] + 5
+  expect_error(bad(ang), "equally spaced")
+  # A departure far too small to be a real design, but far larger than float
+  # noise, is still refused.
+  ang2 <- fx$angles
+  ang2[[1]] <- ang2[[1]] + 1e-4
+  expect_error(bad(ang2), "equally spaced")
+
+  # Duplicates, NAs.
+  dup <- fx$angles
+  dup[[2]] <- dup[[1]]
+  expect_error(bad(dup), "duplicat")
+  na_ang <- fx$angles
+  na_ang[[3]] <- NA_real_
+  expect_error(bad(na_ang), "missing")
+
+  # Fewer than 4 scales: at k = 3 every cross-scale pair carries the same
+  # cos(delta) = -0.5, so the moment design (cos delta, 1, same-scale) drops to
+  # rank 2 and the three components are not separately identified.
+  expect_error(bad(c(0, 120, 240), fx$items[1:3]), "identif")
+  expect_error(bad(c(0, 180), fx$items[1:2]), "at least 4")
+
+  # Fewer than 2 items on a scale (M61 territory, still refused here).
+  one <- fx$items
+  one[[1]] <- one[[1]][1]
+  expect_error(bad(items = one), "at least 2 items")
+})
+
+test_that("M60: the spacing test is modular at the pole", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_spaced_fixture(octants())
+  # octants() carries LM = 360; the same set written with 0 must behave
+  # identically, not read as unequally spaced.
+  zero_form <- as.numeric(fx$angles)
+  zero_form[zero_form == 360] <- 0
+  a <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  b <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = zero_form)
+  )
+  expect_equal(a$results$reliability, b$results$reliability)
+  # But 0 and 360 in the SAME set are one position twice -- a duplicate.
+  both <- as.numeric(fx$angles)
+  both[both == 45] <- 0 # now carries both 0 and 360
+  expect_error(
+    suppressMessages(
+      axes_reliability(fx$data, items = fx$items, angles = both)
+    ),
+    "duplicat"
+  )
+})
