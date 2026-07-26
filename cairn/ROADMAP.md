@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-25 (M59 → `review`: axes-reliability correlation-matrix input, promoted off the deferred-extensions row (types b–f, quasi-circumplex, blockwise ζ2, FIML remain). D-030 at M59's implement gate corrects this stamp's earlier "M59 stays out of v2.0.0" — master ships as v2.0.0; M7 still gains no dependency. Terminal rows 5; M7 blocked on the CRAN window.)_
+_Last hygiene check: 2026-07-26 (M59 merged as PR #85 and archived; row done, M54's terminal row pruned to hold retention at 5. D-030 admits it to v2.0.0 narrowly; M7 gains no dependency, still blocked on the CRAN window. One M59 lesson added, one folded into the guard-teeth family as (g); none retired.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,13 +9,12 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M59 | Correlation-matrix input path for `axes_reliability()` | review | M54 | normal | milestones/M59-axes-reliability-corr-input.md |
+| M59 | Correlation-matrix input path for `axes_reliability()` | done | M54 | normal | milestones/archive/M59-axes-reliability-corr-input.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M58 | Finish the post-M52 CI trim — pkgdown parity + an allowlist drift guard | done | — | normal | milestones/archive/M58-ci-trim-pkgdown-parity.md |
 | M57 | ΔCFI secondary invariance criterion for `ssm_sem()` | done | — | normal | milestones/archive/M57-dcfi-invariance-criterion.md |
 | M56 | Cite the published Browne equations `R/cpm_fit.R` implements | done | — | normal | milestones/archive/M56-cite-browne-equations.md |
 | M55 | Axes-Reliability vignette — teaching `axes_reliability()` | done | M54 | normal | milestones/archive/M55-axes-reliability-vignette.md |
-| M54 | Axes-reliability (Strack 2013) build — `axes_reliability()` | done | — | normal | milestones/archive/M54-axes-reliability-build.md |
 
 ## Candidates
 
