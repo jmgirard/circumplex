@@ -60,10 +60,13 @@ carried into the reported SEm.}
 An object of class \code{circumplex_axes_reliability} with \code{print()} and
 \code{\link[=summary]{summary()}} methods: \code{results} (one row per axis: the axes variance, item_n,
 reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
-\code{components} (the estimated variance components with SEs -- four rows, or
-three when scale specificity was dropped), \code{fit} (global fit indices), and
-\code{details} (including \code{zeta1_fitted}, whether scale specificity was in the
-model, and \code{nb_reason}, why the Nunnally-Bernstein comparison is \code{NA}).
+\code{components} (the estimated variance components with SEs -- four rows by
+default, three when scale specificity was dropped, five when block
+specificity was fitted), \code{fit} (global fit indices), and \code{details}
+(including \code{zeta1_fitted} and \code{zeta2_fitted}, whether scale and block
+specificity were in the model, \code{blocks}, the block labels when a block map
+was supplied, and \code{nb_reason}, why the Nunnally-Bernstein comparison is
+\code{NA}).
 }
 \description{
 Estimate the reliability (and standard error of measurement) of the two
@@ -158,15 +161,34 @@ on a raw scale.
 }
 
 \section{Blockwise instruments}{
-Some circumplex instruments are administered in \strong{blocks} (items grouped by
-something other than their scale), which contributes a block-specificity
-variance component of its own. This model has no such component, and the
-package's instrument objects carry no block structure, so a blockwise
-instrument analyzed here folds its block variance into the general and
-scale-specificity components -- inflating them and, in turn, deflating the
-share attributed to the axes. Strack et al. (2013, Table 3) report
-block-specificity as high as 6.7\%, so treat axes reliability from a blockwise
-instrument as approximate.
+Some circumplex instruments are administered in \strong{blocks} -- items grouped
+by something other than their scale -- which carries a block-specificity
+variance of its own (Strack et al. 2013 report it as high as 6.7\%). Supply
+\code{blocks} to estimate it as a fifth component: the \code{components} table then
+carries a \code{zeta2} row and \code{details$zeta2_fitted} is \code{TRUE}. The package's
+instrument objects record no block structure, so the map comes from you.
+
+Block specificity is estimable only when the blocks are not a relabelling of
+something the model already has. If every block coincides with a scale, or
+all items share one block, or every item sits in its own block, the
+component explains nothing the others do not; it is dropped from the model,
+\code{details$zeta2_fitted} is \code{FALSE}, and the component table keeps its four
+rows. That decision is read off the data's own moment structure rather than
+a rule of thumb, so a map that looks informative but is not -- blocks pairing
+diametrically opposite scales, say -- is caught as well.
+
+\strong{What omitting \code{blocks} costs depends on the block geometry}, and it is not
+a uniform penalty. The general factor absorbs block variance in every
+configuration, so \code{xi2} is inflated whenever blocks exist and are ignored.
+The axes variance -- the one reliability is read from -- moves only when
+blocks are \strong{angularly clustered}, meaning the items sharing a block sit
+near one another on the circle. When each block instead draws about evenly
+from around the circle, block membership is orthogonal to the axes' cosine
+term, and \code{xi1}, the reliability, and the SEm are unaffected. Between those
+extremes the bias grows with how strongly block membership tracks angular
+proximity, and it can run in either direction. So a blockwise instrument
+analyzed without \code{blocks} gives a trustworthy reliability when its blocks
+sample the circle evenly, and an unreliable one when they do not.
 }
 
 \examples{

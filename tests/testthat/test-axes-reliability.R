@@ -2717,3 +2717,54 @@ test_that("M63 T8 (AC5): the blocked Table 3 rows reproduce Rel and SEm (Layer A
   # zeta2 population and not a slice of the non-blocked sweep.
   expect_true(all(tbl$block > 0))
 })
+
+test_that("M63 T9 (AC7): every documented surface names the block component", {
+  # man/ in the dev tree, Rd_db() once installed -- the dual-source pattern
+  # test-rd-latex-safe.R already uses, because a man/-only guard silently
+  # SKIPS under R CMD check (installed packages carry help/, not man/) and a
+  # Rd_db()-only guard errors under load_all(). The M7 lesson is that a guard
+  # reachable on only one of those paths runs in neither gate that ships.
+  rd_file <- test_path("..", "..", "man", "axes_reliability.Rd")
+  rd <- if (file.exists(rd_file)) {
+    paste(readLines(rd_file, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  } else {
+    db <- tools::Rd_db("circumplex")
+    paste(as.character(db[["axes_reliability.Rd"]]), collapse = "")
+  }
+  # Fail loudly rather than pass vacuously if neither source yielded anything.
+  expect_gt(nchar(rd), 1000L)
+
+  # Each assertion pins a structure that exists ONLY if the documentation does.
+  # A bare expect_match(rd, "blocks") is FALSE COVERAGE and was measured to be:
+  # the prose section says "administered in blocks", so deleting @param blocks
+  # left the guard green (the M39/M40 trap). \item{blocks}{ is emitted only by
+  # the \arguments entry, so it cannot be satisfied by prose.
+  expect_match(rd, "\\item{blocks}{", fixed = TRUE)
+  # Likewise for the flag: pin the \value phrasing, not the bare token, which
+  # also appears in the Blockwise prose two sections away.
+  expect_match(rd, "zeta1_fitted} and \\code{zeta2_fitted}", fixed = TRUE)
+  # The @return enumerates the component-row counts, and five is now reachable.
+  expect_match(rd, "five when block", fixed = TRUE)
+  # The corrected conditional replaced the unconditional caveat: the claim that
+  # block variance deflates the axes share unconditionally is FALSE for an
+  # angle-balanced layout (M63-D2) and must not have survived anywhere.
+  expect_false(grepl("treat axes reliability from a blockwise", rd,
+                     fixed = TRUE))
+  expect_match(rd, "angularly clustered", fixed = TRUE)
+
+  # print()/summary() render the components table generically, so the new row
+  # must reach the console without either method enumerating components itself.
+  skip_if_not_installed("lavaan")
+  ang <- octants()
+  blk_idx <- axes_crossed_blocks(length(ang), 2L)
+  set.seed(77L)
+  dat <- axes_simulate(1200L, ang, 2L, .20, .05, .08, zeta2 = .06,
+                       item_block = blk_idx)
+  inames <- colnames(dat)
+  res <- suppressMessages(axes_reliability(
+    dat, items = split(inames, rep(seq_along(ang), each = 2L)),
+    angles = ang, blocks = split(inames, blk_idx)
+  ))
+  out <- paste(utils::capture.output(summary(res)), collapse = "\n")
+  expect_match(out, "block_specificity", fixed = TRUE)
+})

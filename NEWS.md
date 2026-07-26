@@ -163,7 +163,19 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   multi-item scale still estimates it. Because coefficient alpha is undefined
   for a one-item scale, the Nunnally-Bernstein comparison is reported as `NA`
   with a stated reason whenever any scale has fewer than two items — as Strack
-  et al. themselves do, leaving it blank for such instruments. Estimation works either from raw item data or, through
+  et al. themselves do, leaving it blank for such instruments. Blockwise
+  instruments — those administering items in blocks cutting across the scales —
+  are supported through a `blocks` argument taking a list of item columns, one
+  element per block, which adds Strack's block-specificity component to the
+  model and a `zeta2` row to the components table. Blocks that carry no
+  information the model lacks (blocks that coincide with the scales, one block
+  for everything, or one block per item) leave the component unidentified, and
+  it is dropped with `details$zeta2_fitted` recording that, as scale
+  specificity is on a single-item instrument. Whether ignoring real blocks
+  matters depends on their geometry: the general factor absorbs block variance
+  in every configuration, but the axes variance — and so the reliability —
+  moves only when the items sharing a block sit near one another on the circle,
+  and is unaffected when each block samples the circle evenly. Estimation works either from raw item data or, through
   `cormat` and `n`, from a published item correlation matrix alone, for
   reanalyzing a matrix whose raw data is not available; on that path the
   Nunnally-Bernstein comparison is reported as `NA` and `sd = "raw"` is refused,

@@ -161,14 +161,32 @@ and a boundary flag, rather than a clipped, negative, or missing number. An `NA`
 here is a signal that the model did not identify a usable axes-variance
 component in your data — not a defect to be worked around.
 
-**A blockwise instrument's block variance has nowhere to go.** Some circumplex
+**A blockwise instrument needs its blocks declared.** Some circumplex
 instruments are administered in blocks — items grouped by something other than
-their scale — which contributes a block-specificity component of its own. This
-model has no such component, and the package's instrument objects carry no block
-structure, so that variance is folded into the general and scale-specificity
-components instead, inflating them and deflating the share credited to the axes.
-Strack et al. (2013, Table 3) report block-specificity as high as 6.7%, so read
-axes reliability from a blockwise instrument as approximate.
+their scale — which carries a block-specificity component of its own, reported
+as high as 6.7% by Strack et al. (2013, Table 3). Pass `blocks` (a list of item
+columns, one element per block, exactly as `items` is a list per scale) and that
+component is estimated too: the component table gains a `zeta2` row and
+`details$zeta2_fitted` is `TRUE`. Nothing in the bundled instrument objects
+records block membership, so the map has to come from you.
+
+The component is only estimable when the blocks say something the model does not
+already know. Blocks that coincide with the scales, a single block holding every
+item, or one block per item all leave `zeta2` unidentified, and it is dropped
+with `details$zeta2_fitted` set to `FALSE` — the same treatment scale
+specificity gets on a single-item instrument.
+
+What it costs to *ignore* real blocks depends on their geometry, and the answer
+is less alarming than it sounds. The general factor soaks up block variance
+whichever way the blocks fall, so `xi2` is inflated whenever blocks exist and go
+undeclared. The axes variance — the quantity reliability is actually read from —
+only moves when blocks are *angularly clustered*, that is, when the items
+sharing a block sit near one another on the circle. A block that draws about
+evenly from around the circle is orthogonal to the axes' cosine term, and leaves
+`xi1`, the reliability, and the SEm untouched. So a blockwise instrument whose
+blocks sample the circle evenly gives a trustworthy reliability even without
+`blocks`; one whose blocks cover contiguous arcs does not, and there the bias
+can run in either direction.
 
 Finally, a note on the `SEm`. The standard error of measurement supports a
 location interval for a single profile (Strack et al., 2013, use ±1.65·SEm). By
