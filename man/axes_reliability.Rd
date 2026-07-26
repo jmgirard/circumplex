@@ -128,9 +128,9 @@ fit returns \code{NA} reliability and SEm with a warning and a boundary flag
 rather than a clipped, negative, or missing value. A fit counts as a boundary
 when the estimated axes variance falls outside \verb{(0, 1)} -- at or below zero
 the axes carry no variance to be reliable, and at or above one they carry all
-of it, which drives the Spearman-Brown reliability to one or beyond and
-leaves the standard error of measurement undefined -- or when any estimated
-variance is negative.
+of it, which drives the Spearman-Brown reliability to one or beyond, leaving
+the standard error of measurement at zero or undefined -- or when any
+estimated variance is negative.
 }
 
 \section{Supplying a correlation matrix instead of raw data}{

@@ -289,13 +289,21 @@ axes_converged <- function(fit) {
 #   xi1 >= 1  the axes carry ALL of it. Spearman-Brown gives rel > 1 for
 #             xi1 > 1 and exactly 1 at xi1 == 1 (rel > 1 iff xi1 > 1, since
 #             item_n*xi1 > 1 + (item_n - 1)*xi1 reduces to xi1 > 1), and
-#             axis_sem()'s sqrt(1 - rel) then returns NaN or a bare zero.
-#             Included at the closed bound for symmetry with xi1 <= 0: rel == 1
-#             requires zero item-error variance, which is degenerate rather
-#             than perfect. On the correlation metric this needs a grossly
-#             misspecified fit and is not reachable through axes_reliability()
-#             (M62; see the test file's never-NaN block), but the doctrine is
-#             never to emit a NaN, so it is guarded rather than argued away.
+#             axis_sem()'s sqrt(1 - rel) then returns NaN. Included at the
+#             closed bound for symmetry with xi1 <= 0: rel == 1 requires zero
+#             item-error variance, which is degenerate rather than perfect. On
+#             the correlation metric this needs a grossly misspecified fit and
+#             is not reachable through axes_reliability() (M62; see the test
+#             file's never-NaN block), but the doctrine is never to emit a NaN,
+#             so it is guarded rather than argued away.
+#             What this bound does NOT claim: because it tests xi1 rather than
+#             the derived rel, an xi1 within ~1e-15 of 1 is admitted while the
+#             SB ratio rounds to exactly 1, giving SEm exactly 0 (M62 review,
+#             finding scored 74 and recorded rather than actioned). That is
+#             finite and non-negative -- a degenerate estimate, not a NaN -- so
+#             it is outside what this guard is for. Moving the test onto rel
+#             would close the float gap, at the cost of a per-axis predicate;
+#             the sweep test pins the current behavior either way.
 #
 # The remaining two catch any negative estimated variance. zeta1 is NULL on the
 # zeta1-dropped path (M61), and NULL-ness is the same source of truth
@@ -502,9 +510,9 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' rather than a clipped, negative, or missing value. A fit counts as a boundary
 #' when the estimated axes variance falls outside `(0, 1)` -- at or below zero
 #' the axes carry no variance to be reliable, and at or above one they carry all
-#' of it, which drives the Spearman-Brown reliability to one or beyond and
-#' leaves the standard error of measurement undefined -- or when any estimated
-#' variance is negative.
+#' of it, which drives the Spearman-Brown reliability to one or beyond, leaving
+#' the standard error of measurement at zero or undefined -- or when any
+#' estimated variance is negative.
 #'
 #' # Supplying a correlation matrix instead of raw data
 #'

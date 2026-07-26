@@ -83,8 +83,13 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   print(disp, row.names = FALSE, right = FALSE)
   if (isTRUE(d$boundary)) {
     cat(
-      "\n  Note: a boundary solution (non-positive axes variance) was reached;",
-      "\n  reliability and SEm are NA rather than a clipped value.\n",
+      # Names the CLASS of solution, not one disjunct: the flag is raised by an
+      # axes variance outside (0, 1) OR any negative variance component, and
+      # naming only the first told a user the wrong cause for the others
+      # (M62 review, F2). The components table below already shows which.
+      "\n  Note: a boundary solution was reached (an axes variance outside",
+      "\n  (0, 1), or a negative variance component); reliability and SEm are",
+      "\n  NA rather than a clipped value. See the components table above.\n",
       sep = ""
     )
   } else if (isTRUE(all.equal(

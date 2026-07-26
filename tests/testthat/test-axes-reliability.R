@@ -483,10 +483,18 @@ test_that("M62: no xi1 the boundary guard admits can yield a NaN or negative SEm
   # The property AC1 actually claims, swept rather than spot-checked: across
   # every item_n this package can produce -- 2 is the k = 4 single-item floor,
   # 2.5 an odd-k half-integer, 26/3 the SYMLOG-shaped fractional value, 16 and
-  # 32 the octant cases -- every admitted xi1 gives a reliability in (0, 1) and
-  # a finite positive SEm.
+  # 32 the octant cases -- every admitted xi1 gives a finite, non-negative SEm.
+  #
+  # `sem >= 0`, deliberately not `> 0`, and the grid runs right up to the bound
+  # to keep that honest. The guard tests xi1, not the derived reliability, so
+  # within about 1e-15 of 1 the SB ratio ROUNDS to exactly 1 and SEm is exactly
+  # 0 for an xi1 the predicate admits (measured: item_n 26/3 and 32 at
+  # xi1 = 1 - 1e-15). A bare zero is finite, non-negative and non-NaN, which is
+  # the whole of what this milestone promises -- but a grid stopping short of
+  # that regime while asserting `> 0` would be a test proving its property on a
+  # hand-picked interior and claiming it universally.
   grid <- expand.grid(
-    xi1 = c(1e-8, .001, .05, .5, .95, .999, 1 - 1e-9),
+    xi1 = c(1e-8, .001, .05, .5, .95, .999, 1 - 1e-9, 1 - 1e-14, 1 - 1e-15),
     item_n = c(2, 2.5, 26 / 3, 16, 32)
   )
   rel <- axis_reliability_sb(grid$xi1, grid$item_n)
@@ -497,17 +505,59 @@ test_that("M62: no xi1 the boundary guard admits can yield a NaN or negative SEm
                      xi2 = .1, zeta1 = .1, eps = .3)
   expect_false(any(admitted))
   expect_true(all(is.finite(rel)))
-  expect_true(all(rel > 0 & rel < 1))
+  expect_true(all(rel > 0 & rel <= 1))
   expect_true(all(is.finite(sem)))
-  expect_true(all(sem > 0))
+  expect_true(all(!is.nan(sem) & sem >= 0))
 })
 
-test_that("M62: a boundary fit reports NA SEm and raises no bare NaN warning", {
+test_that("M62: no accepted input lets a bare `NaNs produced` warning escape", {
+  skip_if_not_installed("lavaan")
+  # AC1's second clause, asserted on UNMOCKED calls. The sibling test below
+  # forces the boundary through a mock, which routes straight to a literal
+  # NA_real_ and so never runs the arithmetic that could raise this warning --
+  # it cannot probe this claim, and must not be read as doing so.
+  warn_texts <- function(expr) {
+    w <- character(0)
+    withCallingHandlers(
+      suppressMessages(expr),
+      warning = function(c) {
+        w <<- c(w, conditionMessage(c))
+        invokeRestart("muffleWarning")
+      }
+    )
+    w
+  }
+
+  # An ordinary fit: no warnings of any kind, so certainly no NaN one.
+  fx <- axes_valid_fixture()
+  expect_false(any(grepl(
+    "NaN", warn_texts(axes_reliability(fx$data, items = fx$items,
+                                       angles = fx$oct))
+  )))
+
+  # A real boundary fit, where the NA path is actually taken (the BC11 seed):
+  # the boundary warning is raised and it is the ONLY one -- R's bare
+  # "NaNs produced" from sqrt() of a negative never reaches the user, which is
+  # what the guard exists to prevent.
+  oct <- octants()
+  set.seed(5)
+  bd <- axes_simulate(400L, oct, 4L, xi1 = 0, xi2 = .05, zeta1 = .40)
+  inames <- sprintf("i%02d", seq_len(ncol(bd)))
+  colnames(bd) <- inames
+  w <- warn_texts(axes_reliability(
+    bd, items = split(inames, rep(seq_along(oct), each = 4L)), angles = oct
+  ))
+  expect_true(any(grepl("boundary", w)))
+  expect_false(any(grepl("NaN", w)))
+})
+
+test_that("M62: the boundary branch reports NA rather than NaN, end to end", {
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture()
-  # Force the boundary through the same seam the convergence guard uses, so the
-  # NA-not-NaN path is exercised end to end without needing a fixture that can
-  # reach xi1 >= 1 (it cannot -- see the block comment above).
+  # Forces the boundary through the same seam the convergence guard uses. This
+  # proves the boundary -> NA wiring and that NA is not NaN; it does NOT probe
+  # the guard's condition (the mock replaces it) -- the predicate test above is
+  # what reddens when the xi1 >= 1 disjunct is deleted.
   testthat::local_mocked_bindings(axes_is_boundary = function(...) TRUE)
   expect_warning(
     res <- suppressMessages(
