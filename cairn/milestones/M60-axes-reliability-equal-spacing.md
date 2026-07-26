@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m60-axes-reliability-equal-spacing`
+- **Branch/PR:** `m60-axes-reliability-equal-spacing` / [PR #86](https://github.com/jmgirard/circumplex/pull/86)
 
 ## Goal
 
@@ -47,29 +47,29 @@ any rotation, instead of only the canonical octant set.
 
 ## Acceptance criteria
 
-- [ ] AC1: `axes_reliability()` estimates a rotated equally spaced set (the
+- [x] AC1: `axes_reliability()` estimates a rotated equally spaced set (the
       type-b interstitial angles 22.5…337.5) and a k ≠ 8 set (k = 6 and k = 12),
       returning finite equal per-axis reliability; the octant-only error no
       longer fires.
-- [ ] AC2: each refusal still fires with a message naming the offender —
+- [x] AC2: each refusal still fires with a message naming the offender —
       unequal spacing, duplicate angle, NA angle, k < 4 (naming identification
       as the reason at k = 3), and < 2 items on any scale.
-- [ ] AC3: the spacing test is modular — a set expressed with LM = 360 is
+- [x] AC3: the spacing test is modular — a set expressed with LM = 360 is
       accepted identically to the same set using 0, and a set carrying both 0
       and 360 is refused as a duplicate.
-- [ ] AC4: per-axis item_n equals `n_items × k/2` for every accepted
+- [x] AC4: per-axis item_n equals `n_items × k/2` for every accepted
       configuration at any rotation, at a tolerance set from the discrimination
       required rather than from one machine's printed value (M59, M20).
-- [ ] AC5: Layer A — all four CV-LI type-b rows of Strack (2013) Table 3
+- [x] AC5: Layer A — all four CV-LI type-b rows of Strack (2013) Table 3
       (%axes 3.5 / 2.7 / 1.9 / 7.6 at item_n 16 → .37 / .31 / .24 / .57;
       `strack2013` p. 7) reproduce within ±.01.
-- [ ] AC6: Layer B at a rotated-octant and a non-octant configuration —
+- [x] AC6: Layer B at a rotated-octant and a non-octant configuration —
       population-matrix recovery exact to numerical tolerance, synthetic
       recovery, and cross-engine lavaan/OpenMx agreement.
-- [ ] AC7: no doc still claims octant-only — roxygen, regenerated `man/`,
+- [x] AC7: no doc still claims octant-only — roxygen, regenerated `man/`,
       vignette and NEWS updated, and the type-b oracle rows banked in
       `cairn/references/strack2013.md` with a provenance re-verification mark.
-- [ ] AC8: `devtools::check()` clean and the PDF manual actually built
+- [x] AC8: `devtools::check()` clean and the PDF manual actually built
       (`R CMD Rd2pdf`; `check()` skips it by default — M7/M57).
 
 ## Coverage
@@ -122,6 +122,7 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: T8 `devtools::check()` OK (0/0/0, 9m30s) and the PDF manual built directly (`R CMD Rd2pdf`, 76pp) — the check log has zero occurrences of "checking PDF version of manual", confirming `--no-manual` skipped it, which is how M7 and M57 each shipped a CRAN-blocking failure. New Rd section verified present in the rendered PDF. No new D-entry owed: D-031 already admits M60 to v2.0.0.
 - 2026-07-25: all tasks done; status -> review.
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
+- 2026-07-25: review checkpoint — PR #86 opened (draft); all 8 ACs verified with fresh evidence and ticked; consistency gate clean. Review fan-out: prior-review lens clean, blame lens 1 finding (strack2013.md provenance overclaim), diff-bug lens still running. CI pending. Not yet triaged or merged.
 
 ## Decisions
 
@@ -134,3 +135,60 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25 (T2): the wrap-around gap in `angles_spacing_status()` is kept for symmetry with the modular reading but is NOT load-bearing — all gaps sum to 360, so k-1 interior gaps of 360/k force it. Mutation-verified: removing the term changes no test. The comment says so rather than claiming a mechanism it does not have (M36).
 
 ## Review
+
+Verified 2026-07-25 on `m60-axes-reliability-equal-spacing` @ df0c62db, PR #86.
+Evidence is fresh (commands re-run at review), never recalled.
+
+**AC1** — `M60: a rotated equally spaced set estimates (Strack type b)` 5/5 and
+`M60: equally spaced sets with k != 8 estimate` 6/6. The type-b set (22.5…337.5)
+and k = 6 / k = 12 all return finite per-axis reliability in (0, 1), equal across
+axes to 1e-6, with `details$n_scales` recording k. The block also asserts the
+type-b weight magnitudes reaching the model are .38268 / .92388, matching p. 2.
+
+**AC2** — `M60: the refusal contract survives the relaxation` 7/7: unequal
+spacing at +5° and at +1e-4, duplicate position, NA angle, k = 3 (message names
+identification), k = 2 (names the 4-scale floor), and < 2 items per scale. The
+pre-existing BC12 refusal block also still passes with its three re-pointed
+message strings.
+
+**AC3** — `M60: the spacing test is modular at the pole` 2/2 (LM = 360 form and
+0 form give identical reliability; 0-and-360 together refused as a duplicate),
+plus `angles_spacing_status()` 56/56 covering k = 4:24 at two rotations,
+near-misses at 1e-4, and out-of-range angles.
+
+**AC4** — `M60: per-axis item_n is n * k/2 at any rotation` 315/315 over
+k = 4:16 × 4 rotations × 3 item counts, at an absolute tolerance of 1e-8 chosen
+from the discrimination required (one item = 1.0, so it fences at 1e8×) rather
+than from a printed value. BC3's exact octant `expect_identical()` retained
+unweakened; an unbalanced set gives legitimately unequal per-axis values.
+
+**AC5** — `M60: Spearman-Brown reproduces the non-octant Table 3 rows` 5/5. All
+four CV-LI type-b rows reproduce within ±.01 (.367/.308/.237/.568 against
+printed .37/.31/.24/.57) and all four sum to 100.0. Includes a discrimination
+assertion that the same sweep read at the octant item_n of 32 fails.
+
+**AC6** — `M60: exact population recovery holds at rotated and non-octant sets`
+24/24 across four geometries (type-b rotated octants, k = 6, k = 12, k = 5 at a
+13.7° rotation): every component recovered to < 1e-4 with chisq < 1e-6.
+Monte-Carlo recovery 1/1 within 2 MC-SEs at the rotated set; lavaan/OpenMx
+agreement 2/2 at < 1e-3.
+
+**AC7** — roxygen gained a "Which instruments this accepts" section; `man/`
+regenerated and `devtools::document()` produces no diff; vignette §6 and the
+NEWS `axes_reliability()` bullet updated. A fresh grep for "octant" across
+`man/`, the vignette and NEWS finds no surviving octant-only claim — every hit
+either describes the (genuinely octant) example dataset or frames octants as one
+option among many. Six CV-LI references banked in `references/strack2013.md`
+with the `Type`-column finding and an inline provenance re-verification mark.
+
+**AC8** — `devtools::check()` OK, 0 errors / 0 warnings / 0 notes, 9m30s. PDF
+manual built directly via `R CMD Rd2pdf` (76pp); the check log contains zero
+occurrences of "checking PDF version of manual", confirming the step was skipped
+by `check()` itself, and the new Rd section was verified present in the render.
+
+**Consistency gate.** `cairn_validate` exit 0, all 16 checks PASS (2 advisories:
+sizing at 8 ACs — the 8th is the template-mandated check criterion, judged not a
+split; work-log format, 47 pre-existing M7 lines). No DESIGN principle changed,
+so `cairn_impact` does not apply. Toolchain slot: `document()` no-diff ✔,
+`pkgdown::check_pkgdown()` "No problems found" ✔, NEWS entry present ✔, README
+untouched ✔, no new top-level files ✔, full check clean ✔.
