@@ -208,8 +208,8 @@ evidence gathered by command in this session, never recalled. M61 test blocks:
   `cairn/references/strack2013.md` with its `INDEX.md` line intact. No milestone
   numbers in user-facing text.
 - **AC8** — `devtools::check(args = "--no-manual")` re-run at review: **Status OK,
-  0 errors / 0 warnings / 0 notes**, and re-run again after the F1 fix: **OK,
-  0/0/0** (6m 28s). PDF manual built by
+  0 errors / 0 warnings / 0 notes**, re-run after the F1 fix: **OK, 0/0/0**
+  (6m 28s); and re-run again after the F3/F4 fixes: **OK, 0/0/0** (5m 52s). PDF manual built by
   `R CMD Rd2pdf` (exit 0, 346 KB); its pdfTeX `dest` warnings are pre-existing
   cross-package link references (ggplot2, lavaan, boot).
 - **AC9 (BC1)** — machine-diffed: M61's AC4 and AC14 are RR11 Q6's two criteria
