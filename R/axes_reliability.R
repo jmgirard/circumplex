@@ -394,9 +394,9 @@ axes_converged <- function(fit) {
 # would let the two disagree.
 #
 # Scalar by design: `||` errors on a length > 1 argument in R >= 4.3.
-axes_is_boundary <- function(xi1, xi2, zeta1, eps) {
+axes_is_boundary <- function(xi1, xi2, zeta1, eps, zeta2 = NULL) {
   xi1 <= 0 || xi1 >= 1 || xi2 < 0 || (!is.null(zeta1) && zeta1 < 0) ||
-    any(eps < 0)
+    (!is.null(zeta2) && zeta2 < 0) || any(eps < 0)
 }
 
 # --- Population model and simulation (oracle + bundled-data generator) ---------
@@ -408,13 +408,29 @@ axes_is_boundary <- function(xi1, xi2, zeta1, eps) {
 # the unit diagonal. Every scale carries `n_items` items. The single
 # authoritative construction shared by the population-matrix oracle (BC5), the
 # finite-sample Monte-Carlo recovery (BC6), and axes_simulate().
-axes_population_cor <- function(angles_deg, n_items, xi1, xi2, zeta1) {
+axes_population_cor <- function(angles_deg, n_items, xi1, xi2, zeta1,
+                                zeta2 = 0, item_block = NULL) {
   scale <- rep(seq_along(angles_deg), each = n_items)
   th <- rep(as.numeric(angles_deg), each = n_items) * pi / 180
   sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
     zeta1 * outer(scale, scale, `==`)
+  # The fifth component (M63). Absent by default, so every pre-M63 caller
+  # generates exactly the four-component population it did before.
+  if (!is.null(item_block)) {
+    sig <- sig + zeta2 * outer(item_block, item_block, `==`)
+  }
   diag(sig) <- 1
-  list(sigma = sig, scale = scale)
+  list(sigma = sig, scale = scale, block = item_block)
+}
+
+# The canonical blockwise layout: item j of every scale goes to block j, so a
+# k-scale instrument with n items each has n blocks of k items, one per scale
+# position. This is the crossed design that identifies zeta2 -- same-block and
+# same-scale share no off-diagonal pair -- and it is the layout a blockwise
+# instrument actually has, items being administered one block at a time with
+# each block sampling the whole circle (Strack et al. 2013, type d).
+axes_crossed_blocks <- function(n_scales, n_items) {
+  rep(seq_len(n_items), times = n_scales)
 }
 
 # Simulate `n` respondents' item scores from the five-component population
@@ -423,8 +439,9 @@ axes_population_cor <- function(angles_deg, n_items, xi1, xi2, zeta1) {
 # draws feed axes_fit() directly. Used by the BC6 Monte-Carlo recovery oracle
 # and, seed-pinned, by the bundled example-dataset generator (data-raw/).
 axes_simulate <- function(n, angles_deg, n_items, xi1, xi2, zeta1,
-                          prefix = "item") {
-  pop <- axes_population_cor(angles_deg, n_items, xi1, xi2, zeta1)
+                          zeta2 = 0, item_block = NULL, prefix = "item") {
+  pop <- axes_population_cor(angles_deg, n_items, xi1, xi2, zeta1,
+                             zeta2 = zeta2, item_block = item_block)
   p <- nrow(pop$sigma)
   x <- mvn_draws(n, rep(0, p), pop$sigma)
   colnames(x) <- sprintf("%s_%02d", prefix, seq_len(p))
@@ -715,6 +732,12 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   0 and 360 name the same position.
 #' @param instrument Optional. A `circumplex_instrument` object supplying the
 #'   scale angles and item membership (`Scales$Angle`, `Scales$Items`).
+#' @param blocks Optional. For a **blockwise** instrument, a list with one
+#'   element per administration block, each a character vector (or numeric
+#'   indices) of that block's item columns -- the same shape `items` takes for
+#'   scales. The blocks must partition the items: every item in exactly one
+#'   block. Supplying them adds the block-specificity component to the model;
+#'   see "Blockwise instruments" below.
 #' @param sd The scale for the standard error of measurement: `"std"` (the
 #'   default) reports the z-standardized SEm `sqrt(1 - reliability)`; `"raw"`
 #'   uses each axis composite's observed raw SD; or a numeric vector (length 1,
@@ -755,7 +778,7 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' )
 axes_reliability <- function(data = NULL, items, angles = NULL,
                              instrument = NULL, cormat = NULL, n = NULL,
-                             sd = "std") {
+                             blocks = NULL, sd = "std") {
   call <- match.call()
   if (!requireNamespace("lavaan", quietly = TRUE)) {
     stop("`axes_reliability()` requires the lavaan package.", call. = FALSE)
@@ -995,7 +1018,11 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # for the fit and stored as a cross-check on the CFA estimate.
   item_angle <- rep(angles_deg, times = n_items_scale)
   item_scale <- rep(seq_len(n_scales), times = n_items_scale)
-  ols <- axes_ols_shadow(R, item_angle, item_scale)
+  # Blocks are resolved against the same column source and aligned to the same
+  # `all_cols` order the design matrices use (M63); NULL when none were given.
+  blk <- axes_resolve_blocks(blocks, if (has_data) data else cormat, all_cols)
+  item_block <- blk$index
+  ols <- axes_ols_shadow(R, item_angle, item_scale, item_block)
 
   # Convergence, boundary, and singularity are all guarded explicitly below, so
   # lavaan's own fit-time warnings (e.g. "some estimated lv variances are
@@ -1004,9 +1031,10 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   fit <- suppressWarnings(if (has_data) {
     zdf <- as.data.frame(scale(mat))
     colnames(zdf) <- all_cols
-    axes_fit(zdf, item_cols, angles_deg, start = ols)
+    axes_fit(zdf, item_cols, angles_deg, item_block = item_block, start = ols)
   } else {
-    axes_fit_cormat(R, item_cols, angles_deg, n, start = ols)
+    axes_fit_cormat(R, item_cols, angles_deg, n, item_block = item_block,
+                    start = ols)
   })
   if (!axes_converged(fit)) {
     stop(
@@ -1027,6 +1055,19 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # in the parameter table -- one source of truth for the component set.
   fit_zeta1 <- axes_fits_zeta1(item_cols)
   zeta1 <- if (fit_zeta1) comp_var("SS1")[[1]] else NULL
+  # Same discipline for zeta2 (M63): read the presence of the component off the
+  # design predicate the syntax emitter used, never off whether "BS1" happens to
+  # appear in the parameter table.
+  #
+  # Substituting the table lookup here is a NULL mutation -- no test reddens --
+  # and that is correct rather than a coverage hole (the M60 lesson): BS1 is in
+  # the table exactly when the emitter wrote it, and the emitter consults this
+  # same predicate, so the two expressions are equal by construction today. The
+  # predicate is used anyway because it stays correct if the emitter changes,
+  # which is the drift no single-point mutation can exhibit. Recorded so a later
+  # session does not re-chase the green.
+  fit_zeta2 <- axes_fits_zeta2(item_angle, item_scale, item_block)
+  zeta2 <- if (fit_zeta2) comp_var("BS1")[[1]] else NULL
   eps <- pe$est[pe$op == "~~" & pe$lhs == pe$rhs & pe$lhs %in% all_cols]
 
   # Boundary: an axes variance outside (0, 1), or any negative estimated
@@ -1034,7 +1075,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # NA the reliability/SEm -- never clip, zero, or return a negative or a NaN --
   # and flag it. The predicate is a named seam so the unreachable-in-practice
   # upper bound is still testable; see axes_is_boundary() for each disjunct.
-  boundary <- axes_is_boundary(xi1, xi2, zeta1, eps)
+  boundary <- axes_is_boundary(xi1, xi2, zeta1, eps, zeta2)
   if (boundary) {
     warning(
       "A boundary solution (an axes variance outside (0, 1), or a negative ",
@@ -1163,13 +1204,16 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     c(Component = "general", Symbol = "xi2"),
     c(Component = "axes", Symbol = "xi1"),
     if (fit_zeta1) c(Component = "scale_specificity", Symbol = "zeta1"),
+    if (fit_zeta2) c(Component = "block_specificity", Symbol = "zeta2"),
     c(Component = "item", Symbol = "epsilon")
   )
   comp_rows <- Filter(Negate(is.null), comp_rows)
-  comp_est <- c(xi2, xi1, if (fit_zeta1) zeta1, mean(eps))
+  comp_est <- c(xi2, xi1, if (fit_zeta1) zeta1, if (fit_zeta2) zeta2,
+                mean(eps))
   comp_ses <- c(
     comp_se("GEN")[[1]], comp_se("AX")[[1]],
     if (fit_zeta1) comp_se("SS1")[[1]],
+    if (fit_zeta2) comp_se("BS1")[[1]],
     NA_real_
   )
   components <- data.frame(
@@ -1194,6 +1238,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # (M61): FALSE means one item per scale position, so zeta1 was
       # unidentified and dropped rather than estimated.
       zeta1_fitted = fit_zeta1,
+      # Whether block specificity was in the fitted model (M63). FALSE with
+      # `blocks` supplied means the map did not identify zeta2 -- the blocks
+      # added no rank to the moment-structure design -- so it was dropped
+      # rather than fitted to a moment it shares with another component.
+      zeta2_fitted = fit_zeta2,
+      blocks = if (is.null(blk)) NULL else blk$labels,
       # Why the Nunnally-Bernstein comparison is NA, or NULL when it is
       # available: "cormat" (no raw scores) or "single_item" (alpha undefined).
       nb_reason = nb_reason,

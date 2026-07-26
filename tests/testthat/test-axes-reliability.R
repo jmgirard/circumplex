@@ -2308,3 +2308,142 @@ test_that("M63 T3: zeta2 takes a start modifier only when the seed carries it", 
   )
   expect_true(grepl("BS1 ~~ zeta2*BS1", syn3, fixed = TRUE))
 })
+
+test_that("M63 T4: the shadow drops BOTH specificity columns when neither is identified", {
+  # One item per scale (no zeta1) AND blocks that are the scales (no zeta2):
+  # the design falls back to the two-column form M61 introduced. Neither drop
+  # may take the other's column with it.
+  ang <- c(0, 90, 180, 270)
+  scale_of <- 1:4
+  sig <- 0.05 + 0.20 * outer(ang * pi / 180, ang * pi / 180,
+                             function(a, b) cos(a - b))
+  diag(sig) <- 1
+
+  both <- axes_ols_shadow(sig, ang, scale_of, scale_of)
+  expect_identical(names(both), c("xi2", "xi1"))
+  expect_lt(abs(both[["xi1"]] - .20), 1e-10)
+
+  # One item per scale but blocks that DO cut across: zeta2 survives alone,
+  # with no zeta1 beside it (Strack's type e administered in blocks).
+  crossed <- c(1L, 1L, 2L, 2L)
+  sig2 <- sig + 0.06 * outer(crossed, crossed, `==`)
+  diag(sig2) <- 1
+  only2 <- axes_ols_shadow(sig2, ang, scale_of, crossed)
+  expect_identical(names(only2), c("xi2", "xi1", "zeta2"))
+  expect_lt(abs(only2[["zeta2"]] - .06), 1e-10)
+})
+
+test_that("M63 T5: axes_population_cor() carries zeta2 into the population", {
+  ang <- c(0, 90, 180, 270)
+  k <- 2L
+  blk <- axes_crossed_blocks(length(ang), k)
+  expect_identical(blk, c(1L, 2L, 1L, 2L, 1L, 2L, 1L, 2L))
+
+  pop <- axes_population_cor(ang, k, xi1 = .20, xi2 = .05, zeta1 = .08,
+                             zeta2 = .06, item_block = blk)
+  # A same-block, different-scale pair carries xi2 + xi1*cos(dtheta) + zeta2 --
+  # and NOT zeta1, which is what makes the two components separable.
+  # Items 1 and 3: scales 1 and 2 (0 and 90 deg), both block 1.
+  expect_lt(abs(pop$sigma[1, 3] - (.05 + .20 * cos(pi / 2) + .06)), 1e-12)
+  # Items 1 and 2: same scale (0 deg), different blocks -> zeta1, not zeta2.
+  expect_lt(abs(pop$sigma[1, 2] - (.05 + .20 * 1 + .08)), 1e-12)
+  # Items 1 and 4: different scale, different block -> neither specificity.
+  expect_lt(abs(pop$sigma[1, 4] - (.05 + .20 * cos(pi / 2))), 1e-12)
+  expect_true(all(diag(pop$sigma) == 1))
+
+  # Omitting the block map reproduces the pre-M63 population EXACTLY, so no
+  # existing oracle silently moves under this change.
+  expect_identical(
+    axes_population_cor(ang, k, .20, .05, .08)$sigma,
+    axes_population_cor(ang, k, .20, .05, .08, zeta2 = .06)$sigma
+  )
+
+  # The population must stay a valid correlation matrix at these settings.
+  expect_gt(min(eigen(pop$sigma, symmetric = TRUE, only.values = TRUE)$values), 0)
+})
+
+test_that("M63 T5: the shadow recovers all four components off a simulated draw", {
+  ang <- c(0, 45, 90, 135, 180, 225, 270, 315)
+  k <- 2L
+  blk <- axes_crossed_blocks(length(ang), k)
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+
+  set.seed(4242L)
+  dat <- axes_simulate(6000L, ang, k, truth[["xi1"]], truth[["xi2"]],
+                       truth[["zeta1"]], zeta2 = truth[["zeta2"]],
+                       item_block = blk)
+  expect_identical(ncol(dat), length(ang) * k)
+
+  got <- axes_ols_shadow(stats::cor(as.matrix(dat)),
+                         rep(ang, each = k), rep(seq_along(ang), each = k), blk)
+  # Finite-sample, so an absolute bound wide enough for sampling noise at
+  # n = 6000 but far narrower than the .06 signal being detected (M59/M61: set
+  # the bar from the discrimination required, and state it absolutely).
+  for (nm in names(truth)) expect_lt(abs(got[[nm]] - truth[[nm]]), .02)
+})
+
+test_that("M63 T6: axes_is_boundary() catches a negative zeta2", {
+  # The new disjunct, tested on the UNMOCKED predicate: a negative block
+  # variance is not a usable solution, exactly as a negative zeta1 is not.
+  # (M62 lesson (i): mock the seam and the arithmetic under test never runs.)
+  expect_true(axes_is_boundary(.2, .05, .08, c(.5, .5), zeta2 = -.01))
+  expect_false(axes_is_boundary(.2, .05, .08, c(.5, .5), zeta2 = .01))
+  # zeta2 = NULL is the no-blocks path and must not read as a boundary.
+  expect_false(axes_is_boundary(.2, .05, .08, c(.5, .5), zeta2 = NULL))
+  # A negative zeta2 must not be masked by, or mask, the other disjuncts.
+  expect_true(axes_is_boundary(.2, .05, NULL, c(.5, .5), zeta2 = -.01))
+  expect_true(axes_is_boundary(0, .05, .08, c(.5, .5), zeta2 = .01))
+  # Default NULL keeps every pre-M63 call site's behaviour byte-identical.
+  expect_false(axes_is_boundary(.2, .05, .08, c(.5, .5)))
+})
+
+test_that("M63 T6: axes_reliability() fits and reports zeta2 end to end", {
+  skip_if_not_installed("lavaan")
+  ang <- c(0, 45, 90, 135, 180, 225, 270, 315)
+  k <- 2L
+  blk_idx <- axes_crossed_blocks(length(ang), k)
+  set.seed(909L)
+  dat <- axes_simulate(3000L, ang, k, xi1 = .20, xi2 = .05, zeta1 = .08,
+                       zeta2 = .06, item_block = blk_idx)
+  inames <- colnames(dat)
+  items <- split(inames, rep(seq_along(ang), each = k))
+  blocks <- split(inames, blk_idx)
+
+  res <- suppressMessages(
+    axes_reliability(dat, items = items, angles = ang, blocks = blocks)
+  )
+  expect_s3_class(res, "circumplex_axes_reliability")
+  expect_true(res$details$zeta2_fitted)
+  expect_identical(res$details$blocks, c("1", "2"))
+  # Five component rows now: general, axes, scale, block, item.
+  expect_identical(res$components$Symbol,
+                   c("xi2", "xi1", "zeta1", "zeta2", "epsilon"))
+  z2 <- res$components$Estimate[res$components$Symbol == "zeta2"]
+  expect_lt(abs(z2 - .06), .02)
+  expect_true(is.finite(res$components$SE[res$components$Symbol == "zeta2"]))
+  # And the estimate the whole milestone exists for: xi1 recovered, not
+  # deflated by block variance leaking into the other components.
+  expect_lt(abs(res$components$Estimate[res$components$Symbol == "xi1"] - .20),
+            .02)
+  expect_false(res$results$boundary[[1]])
+  expect_true(all(is.finite(res$results$reliability)))
+  expect_true(all(is.finite(res$results$sem)))
+
+  # Blocks that are the scales: accepted, but reported as not fitted, with the
+  # four-row component set and no NA/NaN anywhere.
+  res_u <- suppressMessages(
+    axes_reliability(dat, items = items, angles = ang, blocks = items)
+  )
+  expect_false(res_u$details$zeta2_fitted)
+  expect_identical(res_u$components$Symbol, c("xi2", "xi1", "zeta1", "epsilon"))
+  expect_true(all(is.finite(res_u$results$reliability)))
+
+  # No blocks at all reproduces the pre-M63 result EXACTLY on the same data.
+  res_n <- suppressMessages(
+    axes_reliability(dat, items = items, angles = ang)
+  )
+  expect_false(res_n$details$zeta2_fitted)
+  expect_null(res_n$details$blocks)
+  expect_equal(res_u$results$reliability, res_n$results$reliability,
+               tolerance = 1e-10)
+})

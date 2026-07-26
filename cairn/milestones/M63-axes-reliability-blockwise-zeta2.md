@@ -87,11 +87,11 @@ type-f rows).
       with the cosine column. Settle it against a numeric identifiability probe.
 - [x] T3 `axes_syntax()` emits `BS<m>` latents with a shared `zeta2` label and
       `start()` seeding (`:146`), dropped whole when T2's predicate is false.
-- [ ] T4 `axes_ols_shadow()` fourth same-block design column (`:228`), with the
+- [x] T4 `axes_ols_shadow()` fourth same-block design column (`:228`), with the
       rank-drop path that already handles the ζ1-dropped case extended.
-- [ ] T5 `axes_population_cor()` + `axes_simulate()` carry ζ2 and a block map
+- [x] T5 `axes_population_cor()` + `axes_simulate()` carry ζ2 and a block map
       (`:328`, `:342`). Build the fixture from ONE population (M61 lesson (h)).
-- [ ] T6 `axes_is_boundary()` negative-ζ2 disjunct (`:314`) + the never-NaN
+- [x] T6 `axes_is_boundary()` negative-ζ2 disjunct (`:314`) + the never-NaN
       block; assert the condition on the unmocked path (M62 lesson (i)).
 - [ ] T7 Oracle: known-ζ2 recovery, the omitted-ζ2 bias demonstration, and
       lavaan/OpenMx/OLS-shadow agreement. Prove each new guard by mutation, and
@@ -105,6 +105,7 @@ type-f rows).
 
 ## Work log
 
+- 2026-07-26: T4/T5/T6 done, and the estimator is now end-to-end — `axes_reliability()` takes `blocks =`, fits ζ2 when the map identifies it, and reports it as a fifth component row with `details$zeta2_fitted`. Correcting my own record: T1's tick covered the resolver and its validation only; the `axes_reliability()` signature and wiring it names landed here, and T4's shadow column had already landed inside T2. On a 3000-row blockwise draw ξ1 and ζ2 both recover within .02 of truth, and an unblocked call on the same data reproduces the pre-M63 result to 1e-10. Mutations: negative-ζ2 boundary disjunct, the population's ζ2 term, and crossed-vs-scale-aligned blocks all redden (2, 6, 7+2 respectively). One NULL mutation recorded rather than chased (M60 lesson): reading ζ2 off lavaan's parameter table instead of the design predicate cannot redden, because `BS1` is in the table exactly when the emitter wrote it and the emitter reads the same predicate — they are equal by construction, and only a two-point mutation could separate them. `devtools::test()` 0 failures / 4011 passes.
 - 2026-07-26: T3 done — `axes_syntax()` emits one `BS<m>` latent per block sharing a single `zeta2` label, dropped whole when the design says unidentified; `item_block` threaded through `axes_fit()`/`axes_fit_cormat()` (minor task refinement: the fit-seam plumbing landed here so the emitter is reachable, rather than waiting for T6). Two defects caught by the tests before commit: the drop comment named the `zeta2` token, which would have silently defeated a "no such component anywhere" assertion the way M61's comment deliberately avoids (reworded, with the reason recorded in the code); and a test regex pinned digits `fmt()` never prints, since .06 expands to 0.0599999… — reseeded on a dyadic value. Three mutations red, including block latents loading scale items instead of block items. `devtools::test()` 0 failures / 3973 passes.
 - 2026-07-26: T2 done — the component set now lives in one place, `axes_design()`, which the OLS shadow and `axes_fits_zeta2()` both read; ζ2 joins only when the same-block column raises the design's rank. Task refined during work (minor): the shadow's move onto the shared design landed here rather than in T4, since the predicate needed it first; T4 keeps the shadow's zeta2 return. The gate's rank-check answer is now evidenced, not just asserted — a block map pairing OPPOSITE scales spans two scales each (so the rejected structural rule calls it identified) yet same-block equals -cos exactly and adds no rank; substituting the structural rule into the code turns 4 tests red. M61's shadow tests pass untouched as the refactor's fence. `devtools::test()` 0 failures / 3956 passes.
 - 2026-07-26: T1 done — `axes_resolve_blocks()` maps a list of per-block item vectors onto the `unlist(item_cols)` order, or NULL for the pre-M63 path. Implement gate settled two open choices: `blocks` is a list of item vectors mirroring `items` (a flat label vector was refused as a silent-misalignment channel, M25 family), and identification will be a rank check on the OLS design rather than a structural rule. M63-D1 records the partition contract. Four guards proven by mutation (orphan, duplicate, index alignment, empty block); `devtools::test()` 0 failures / 3936 passes.

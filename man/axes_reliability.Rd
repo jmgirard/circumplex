@@ -11,6 +11,7 @@ axes_reliability(
   instrument = NULL,
   cormat = NULL,
   n = NULL,
+  blocks = NULL,
   sd = "std"
 )
 }
@@ -40,6 +41,13 @@ Supply exactly one of \code{data} or \code{cormat}.}
 \item{n}{For the \code{cormat} path, the sample size (number of observations) the
 correlation matrix was computed from. Required with \code{cormat}, and not
 accepted with \code{data} (which carries its own).}
+
+\item{blocks}{Optional. For a \strong{blockwise} instrument, a list with one
+element per administration block, each a character vector (or numeric
+indices) of that block's item columns -- the same shape \code{items} takes for
+scales. The blocks must partition the items: every item in exactly one
+block. Supplying them adds the block-specificity component to the model;
+see "Blockwise instruments" below.}
 
 \item{sd}{The scale for the standard error of measurement: \code{"std"} (the
 default) reports the z-standardized SEm \code{sqrt(1 - reliability)}; \code{"raw"}
