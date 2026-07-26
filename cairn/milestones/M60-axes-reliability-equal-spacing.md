@@ -100,7 +100,7 @@ any rotation, instead of only the canonical octant set.
       an octant accident (16 scales at 22.5° measured `y = 31.999999999999996`).
 - [x] T5: bank the four CV-LI type-b Table 3 rows in
       `cairn/references/strack2013.md` and add the ±.01 sweep test.
-- [ ] T6: re-run the population-matrix, synthetic-recovery and cross-engine
+- [x] T6: re-run the population-matrix, synthetic-recovery and cross-engine
       OpenMx cells at a rotated-octant and a k ≠ 8 configuration.
 - [ ] T7: roxygen (`R/axes_reliability.R:316-317,343,395`), `man/` regeneration,
       vignette and NEWS.
@@ -117,9 +117,12 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: mutation-tested the 5 guards. 4 had teeth (floor→3: 1 fail; tol 1e-8→0.5: 3; skip duplicate: 6; accept any spacing: 7). The `%% 360` reduction did NOT redden — for in-range sets the wrap term compensates; it bites only on angles outside [0, 360), now asserted (`c(10, 100, 190, 640)`), and the mutation reddens. Full suite 3394 pass / 0 fail; the 4 warnings are pre-existing in test-ci_accuracy.R.
 - 2026-07-25: T4 item_n = n*k/2 pinned over k = 4:16 x 4 rotations x 3 item counts, plus an unbalanced set giving legitimately unequal per-axis values; stale octant-only comment on axis_item_n() corrected.
 - 2026-07-25: T5 banked Table 3's `Type` column + the four type-b (CV-LI) and one type-c (MEIL) rows in `references/strack2013.md`, re-verified in two channels (text layer + 200-dpi page image) agreeing on every value; provenance status re-marked inline. Sweep test added, incl. a discrimination check that the wrong item_n fails it. MEIL's components sum to 74.4 (a second source defect, RR10-corroborated) so it anchors reliability only, never a sum guard.
+- 2026-07-25: T6 Layer-B at 4 new geometries (type-b rotated octants, k=6, k=12, k=5 at a 13.7° rotation): exact population recovery + chisq<1e-6, MC recovery within 2 MCSE at the rotated set, lavaan/OpenMx agreement <1e-3. Also hardened two test helpers whose `split()` on a numeric group vector would misorder scales at k>=10 — a no-op at k=8, and the production path (`axes_resolve_map()`) was already positional and safe.
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 
 ## Decisions
+
+- 2026-07-25 (T6): a GLOBAL rotation of the syntax weights is undetectable by any oracle here, and correctly so — Σ depends only on cos(θi−θj), which is invariant to adding a constant to every angle, which is the model's own "no preferred rotation" axiom (p. 4). Weight mutations must break RELATIVE geometry to be valid; perturbing one scale's angle reddens 19 tests, perturbing all of them reddens none. Recorded so a later session does not read the null result as missing coverage.
 
 - 2026-07-25 (T5): `cairn_validate`'s sizing advisory flags M60 and M61 at 8 acceptance criteria (>7 tripwire). Not split: the 8th in each is the template-mandated "profile verify/check clean" criterion every code milestone carries, so the substantive count is 7. Splitting on a hygiene criterion would cut a coherent unit for a counting artifact.
 

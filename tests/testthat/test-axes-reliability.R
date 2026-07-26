@@ -204,7 +204,10 @@ axes_mc_recover_xi1 <- function(oct, k, xi1, xi2, zeta1, n, reps, seed) {
   set.seed(seed)
   pop <- axes_population_cor(oct, k, xi1, xi2, zeta1)
   inames <- sprintf("item_%02d", seq_along(pop$scale))
-  items <- split(inames, pop$scale)
+  # Pin the split() levels: a bare numeric group vector becomes a factor whose
+  # levels sort as CHARACTER, so at k >= 10 scale 10 would pair with angle 2.
+  # A no-op at k = 8; required now that M60 makes k >= 10 reachable.
+  items <- split(inames, factor(pop$scale, levels = seq_along(oct)))
   est <- numeric(reps)
   for (r in seq_len(reps)) {
     dat <- as.data.frame(scale(axes_simulate(n, oct, k, xi1, xi2, zeta1)))
@@ -300,7 +303,8 @@ test_that("BC7: lavaan and OpenMx agree on the component variances (Layer B)", {
     p <- ncol(dat)
     inames <- sprintf("i%02d", seq_len(p))
     colnames(dat) <- inames
-    items <- split(inames, rep(seq_along(oct), each = k))
+    items <- split(inames, factor(rep(seq_along(oct), each = k),
+                                  levels = seq_along(oct))) # see M60 note above
     S <- stats::cov(dat)
 
     lav <- axes_lav_components(S, 2000L, items, oct)
@@ -1183,4 +1187,81 @@ test_that("M60: Spearman-Brown reproduces the non-octant Table 3 rows (Layer A)"
   expect_false(all(abs(
     axis_reliability_sb(typeb$axes / 100, 32) - typeb$rel
   ) <= .01))
+})
+
+# M60 Layer-B: the BC5/BC6/BC7 oracles re-run at the configurations M60 unlocks
+# -- a rotated octant set (Strack type b, no weight lands on 0) and non-octant
+# counts (k = 6, k = 12, where scales DO sit on the poles). The estimator's
+# geometry-specific risk lives in the weights and the moment design, which the
+# exact population cell exercises completely.
+
+axes_pop_recovers <- function(angles, k, xi1, xi2, zeta1) {
+  pop <- axes_population_cor(angles, k, xi1, xi2, zeta1)
+  sigma <- pop$sigma
+  p <- nrow(sigma)
+  inames <- sprintf("i%02d", seq_len(p))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, factor(pop$scale, levels = seq_along(angles)))
+  fit <- lavaan::cfa(
+    axes_syntax(items, angles),
+    sample.cov = sigma, sample.nobs = 500L,
+    orthogonal = TRUE, likelihood = "wishart"
+  )
+  pe <- lavaan::parameterEstimates(fit)
+  vv <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+  list(
+    converged = lavaan::lavInspect(fit, "converged"),
+    est = c(xi1 = vv("AX"), xi1b = vv("AY"), xi2 = vv("GEN"),
+            zeta1 = vv("SS1")),
+    chisq = unname(lavaan::fitMeasures(fit, "chisq"))
+  )
+}
+
+test_that("M60: exact population recovery holds at rotated and non-octant sets", {
+  skip_if_not_installed("lavaan")
+  xi1 <- .15; xi2 <- .08; zeta1 <- .12
+  cells <- list(
+    `type-b rotated octants` = seq(22.5, 337.5, by = 45),
+    `k = 6` = (seq_len(6L) - 1L) * 60,
+    `k = 12` = (seq_len(12L) - 1L) * 30,
+    `k = 5 at an odd rotation` = (seq_len(5L) - 1L) * 72 + 13.7
+  )
+  for (nm in names(cells)) {
+    got <- axes_pop_recovers(cells[[nm]], k = 3L, xi1, xi2, zeta1)
+    expect_true(got$converged, label = nm)
+    # Exact at the population matrix -- no Monte-Carlo slack.
+    expect_lt(abs(got$est[["xi1"]] - xi1), 1e-4)
+    expect_lt(abs(got$est[["xi1b"]] - xi1), 1e-4)
+    expect_lt(abs(got$est[["xi2"]] - xi2), 1e-4)
+    expect_lt(abs(got$est[["zeta1"]] - zeta1), 1e-4)
+    expect_lt(got$chisq, 1e-6)
+  }
+})
+
+test_that("M60: Monte-Carlo recovery holds at a rotated octant set (Layer B)", {
+  skip_if_not_installed("lavaan")
+  mc <- axes_mc_recover_xi1(
+    seq(22.5, 337.5, by = 45), k = 4L, xi1 = .15, xi2 = .05, zeta1 = .08,
+    n = 1500L, reps = 100L, seed = 60L
+  )
+  expect_lt(abs(mc$mean - .15), 2 * mc$mcse)
+})
+
+test_that("M60: lavaan and OpenMx agree at a non-octant set (Layer B)", {
+  skip_if_not_installed("lavaan")
+  skip_if_not_installed("OpenMx")
+  for (ang in list(seq(22.5, 337.5, by = 45), (seq_len(6L) - 1L) * 60)) {
+    k <- 4L
+    set.seed(60L)
+    dat <- as.data.frame(scale(axes_simulate(2000L, ang, k, .15, .05, .10)))
+    p <- ncol(dat)
+    inames <- sprintf("i%02d", seq_len(p))
+    colnames(dat) <- inames
+    items <- split(inames, factor(rep(seq_along(ang), each = k),
+                                  levels = seq_along(ang)))
+    S <- stats::cov(dat)
+    lav <- axes_lav_components(S, 2000L, items, ang)
+    mx <- axes_mx_components(S, 2000L, ang, k)
+    expect_lt(max(abs(lav - mx)), 1e-3)
+  }
 })
