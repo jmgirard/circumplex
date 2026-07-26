@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-26 (M59 merged as PR #85 and archived; row done, M54's terminal row pruned to hold retention at 5. D-030 admits it to v2.0.0 narrowly; M7 gains no dependency, still blocked on the CRAN window. One M59 lesson added, one folded into the guard-teeth family as (g); none retired.)_
+_Last hygiene check: 2026-07-25 (nothing shipped since M59; tree clean and level with origin, all checks PASS, no open issues/PRs/RBs, M7 still parked on the submit_cran handoff. Prior stamp's future date corrected. Gap reported to the plugin, not fixed here: the SessionStart injection is 65% M7 work log and truncates its newest entries.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
