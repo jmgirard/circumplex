@@ -71,8 +71,13 @@ angles_spacing_status <- function(angles_deg, tol = 1e-8) {
 # because the +/-.7071 weights' float error cancels, while 16 scales at 22.5 deg
 # measure (32.000000000000000, 31.999999999999996). Compare non-octant item_n
 # with a tolerance, never expect_identical(). Computed per axis so an unbalanced
-# set degrades gracefully (Table 3 col. 10 is per axis, and fractional for
-# SYMLOG at 8.67).
+# set degrades gracefully -- Table 3 col. 10 is per axis, and an unbalanced or
+# odd-k set gives a fractional value (five single-item positions give 2.5).
+#
+# Table 3's own fractional entry, SYMLOG's 8.67, is NOT such a set and is not
+# reachable here: Strack fits SYMLOG as a sphere (three orthogonal axes), so its
+# 26 items split 26/3 = 8.67 per axis. Under this two-axis contract a
+# single-item set always gives k/2, a half-integer (M61; cairn RR11).
 axis_item_n <- function(angles_deg, n_items) {
   w <- axis_weights(angles_deg)
   c(x = sum(n_items * w[, "w_x"]^2), y = sum(n_items * w[, "w_y"]^2))

@@ -1168,9 +1168,11 @@ test_that("M60: per-axis item_n is n * k/2 at any rotation", {
   # and that must not be weakened just because rotated sets need a tolerance.
   expect_identical(axis_item_n(octants(), 4L), c(x = 16, y = 16))
 
-  # An unbalanced set legitimately gives different item_n per axis, and a
-  # fractional value (the SYMLOG shape, Table 3 col. 10 = 8.67). Nothing here
-  # rounds or forces the two axes to agree.
+  # An unbalanced set legitimately gives different item_n per axis. Nothing here
+  # rounds or forces the two axes to agree. (Table 3's fractional entry, SYMLOG's
+  # 8.67, is NOT this shape -- it is a three-axis sphere model's 26/3, out of
+  # scope for a two-axis contract; see M61 / cairn RR11. The reachable fractional
+  # cases are an odd-k or unbalanced set, tested at M61 T7.)
   unb <- axis_item_n(c(0, 90, 180, 270), c(3L, 1L, 3L, 1L))
   expect_equal(unb[["x"]], 6, tolerance = tol)
   expect_equal(unb[["y"]], 2, tolerance = tol)
