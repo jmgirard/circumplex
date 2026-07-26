@@ -109,7 +109,20 @@ by dropping the scale-specificity component ζ1, as Strack's types e and f do.
 ## Work log
 
 - 2026-07-25: created by /milestone-plan.
+- 2026-07-26: implementation question gate. Drop switch is *inferred* from the item map by one shared predicate, not threaded as an argument through `axes_syntax()`/`axes_fit()`/`axes_fit_cormat()` — the model and the results table then cannot disagree about whether ζ1 was fitted. N–B `NA` breadth → M61-D1. AC4's fractional-item_n question escalated to a Review Brief (Jeff's call at the gate).
+- 2026-07-26: read Strack Table 3 p. 7 in the shelf PDF for the six single-item rows. Types e/f print `—` for BOTH scale- and block-specificity (the paper drops ζ1 itself), col 14 is blank for all six, and all six component rows sum to exactly 100.0 — so they carry a sum guard the type-c row could not. AC4's `8.67` is unreachable end to end: at equal spacing with one item per position per-axis item_n is exactly k/2, so 8.67 needs k = 17.34; Table 1 lists SYMLOG with 26 items and no scales, and 26/3 = 8.667 (SYMLOG is a three-axis system). COC checks out: 16 items → item_n 8.
 
 ## Decisions
+
+- **M61-D1 (2026-07-26): the Nunnally–Bernstein `NA` rule is "any scale with
+  fewer than 2 items", a superset of AC3's "ζ1-dropped path".** AC3 forbids
+  `NaN`, and `cronbach_alpha()` divides by `m - 1`, so a *mixed* configuration
+  (at least one multi-item scale, so ζ1 is still fitted, plus at least one
+  single-item scale) would return `NaN` under AC3's literal reading — exactly
+  the branch AC2 requires be tested. The broader rule satisfies AC3 strictly and
+  closes that hole. Strack corroborates the wider reading: Table 3 col 14 is
+  blank for every single-item row, and p. 5 states the formula "was not applied
+  for analyzing instruments with a single item per spatial position". Decided at
+  the M61 implementation question gate (Jeff).
 
 ## Review
