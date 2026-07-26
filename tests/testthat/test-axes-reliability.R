@@ -2447,3 +2447,228 @@ test_that("M63 T6: axes_reliability() fits and reports zeta2 end to end", {
   expect_equal(res_u$results$reliability, res_n$results$reliability,
                tolerance = 1e-10)
 })
+
+# --- M63 T7: the Layer-B oracle for zeta2 -------------------------------------
+#
+# Three claims, each on the EXACT population matrix so no sampling noise stands
+# between the model and its truth: the fit recovers zeta2 (AC3), the bias from
+# omitting it is conditional on block geometry (AC4, per M63-D2), and three
+# independent engines agree (AC5).
+
+# Fit the exact population with likelihood = "wishart" (the N-1 divisor), the
+# BC5 convention: lavaan's default ML rescales by (N-1)/N and would miss truth
+# by ~.0003 at N = 500 for reasons that have nothing to do with zeta2.
+axes_pop_fit_components <- function(sigma, items, angles_deg, item_block) {
+  fit <- lavaan::cfa(
+    axes_syntax(items, angles_deg, item_block = item_block),
+    sample.cov = sigma, sample.nobs = 500L,
+    orthogonal = TRUE, likelihood = "wishart"
+  )
+  pe <- lavaan::parameterEstimates(fit)
+  v <- function(l) pe$est[pe$op == "~~" & pe$lhs == l & pe$rhs == l][[1]]
+  out <- c(xi1 = v("AX"), xi2 = v("GEN"), zeta1 = v("SS1"))
+  if (!is.null(item_block) &&
+      axes_fits_zeta2(rep(angles_deg, times = lengths(items)),
+                      rep(seq_along(items), times = lengths(items)),
+                      item_block)) {
+    out[["zeta2"]] <- v("BS1")
+  }
+  out
+}
+
+axes_zeta2_pop <- function(angles, k, truth, item_block) {
+  pop <- axes_population_cor(angles, k, truth[["xi1"]], truth[["xi2"]],
+                             truth[["zeta1"]], zeta2 = truth[["zeta2"]],
+                             item_block = item_block)
+  inames <- sprintf("i%02d", seq_along(pop$scale))
+  dimnames(pop$sigma) <- list(inames, inames)
+  list(sigma = pop$sigma, scale = pop$scale, names = inames,
+       items = split(inames, factor(pop$scale, levels = seq_along(angles))))
+}
+
+test_that("M63 T7 (AC3): the fit recovers zeta2 on the exact population", {
+  skip_if_not_installed("lavaan")
+  ang <- octants()
+  k <- 4L
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+  blk <- axes_crossed_blocks(length(ang), k)
+  px <- axes_zeta2_pop(ang, k, truth, blk)
+
+  got <- axes_pop_fit_components(px$sigma, px$items, ang, blk)
+  expect_identical(names(got), c("xi1", "xi2", "zeta1", "zeta2"))
+  # Absolute bounds, stated absolutely (M61's relative-tolerance trap). 1e-4 is
+  # four orders below the .06 signal, so it fences the estimate without pinning
+  # optimizer noise (M59: set the bar from the discrimination required).
+  for (nm in names(truth)) expect_lt(abs(got[[nm]] - truth[[nm]]), 1e-4)
+
+  # The population must be a genuine correlation matrix at these settings, or
+  # "recovery" would be recovery of something unreachable.
+  expect_gt(min(eigen(px$sigma, symmetric = TRUE, only.values = TRUE)$values), 0)
+  expect_true(all(diag(px$sigma) == 1))
+})
+
+test_that("M63 T7 (AC4): the omitted-zeta2 bias in xi1 is conditional on geometry", {
+  skip_if_not_installed("lavaan")
+  ang <- octants()
+  k <- 4L
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+  item_scale <- rep(seq_along(ang), each = k)
+
+  # Angle-BALANCED: each block draws one item from every scale.
+  balanced <- axes_crossed_blocks(length(ang), k)
+  # Angle-CLUSTERED: each block spans a contiguous half of the circle.
+  clustered <- ifelse(item_scale <= 4, 1L, 2L)
+  # Both must be identified, or the comparison is about identifiability rather
+  # than about geometry.
+  expect_true(axes_fits_zeta2(rep(ang, each = k), item_scale, balanced))
+  expect_true(axes_fits_zeta2(rep(ang, each = k), item_scale, clustered))
+
+  for (case in list(list(blk = balanced, bal = TRUE),
+                    list(blk = clustered, bal = FALSE))) {
+    px <- axes_zeta2_pop(ang, k, truth, case$blk)
+    # Fit the SAME population with zeta2 omitted from the model.
+    naive <- axes_pop_fit_components(px$sigma, px$items, ang, item_block = NULL)
+    expect_false("zeta2" %in% names(naive))
+    bias_xi1 <- naive[["xi1"]] - truth[["xi1"]]
+
+    if (case$bal) {
+      # Provably zero: within-block pairs are all cross-scale and span every
+      # scale pair uniformly, so same-block is orthogonal to cos(theta_i -
+      # theta_j) and omitting it cannot move the cosine coefficient (M63-D2).
+      #
+      # The bound is set from the DISCRIMINATION required, not from what this
+      # machine printed (M59): the alternative hypothesis is the clustered
+      # branch below at +.024, so 1e-4 still separates the two by 240x while
+      # sitting ~3400x above the observed 2.9e-8. The exact-arithmetic route
+      # (the OLS shadow) gives -7.5e-16; the gap is the ML optimizer's own
+      # convergence tolerance, which is platform-variable, so a bound near
+      # machine epsilon would fence the optimizer rather than the claim.
+      expect_lt(abs(bias_xi1), 1e-4)
+    } else {
+      # Angle-clustered blocks correlate with the cosine column, and there the
+      # component genuinely protects xi1: >= 10% of truth.
+      expect_gt(abs(bias_xi1), .10 * truth[["xi1"]])
+    }
+    # The one unconditional claim: the general factor absorbs block variance
+    # under BOTH geometries.
+    expect_gt(naive[["xi2"]] - truth[["xi2"]], .005)
+  }
+})
+
+test_that("M63 T7 (AC4): closed-form omitted-variable bias predicts the fitted bias", {
+  skip_if_not_installed("lavaan")
+  # An independent route to the same number, so the conditional above rests on
+  # a derivation and not only on a fitted value: for y = X*beta + gamma*z, the
+  # bias in beta from dropping z is gamma * (X'X)^-1 X'z. The cosine element of
+  # that auxiliary solve IS the xi1 bias per unit zeta2.
+  ang <- octants()
+  k <- 4L
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+  item_scale <- rep(seq_along(ang), each = k)
+  item_angle <- rep(ang, each = k)
+  X <- axes_design(item_angle, item_scale)
+  ut <- upper.tri(matrix(0, length(item_scale), length(item_scale)))
+
+  for (blk in list(axes_crossed_blocks(length(ang), k),
+                   ifelse(item_scale <= 4, 1L, 2L))) {
+    z <- as.numeric(outer(blk, blk, `==`)[ut])
+    predicted <- truth[["zeta2"]] * qr.solve(X, z)[[2]]
+    px <- axes_zeta2_pop(ang, k, truth, blk)
+    observed <- axes_pop_fit_components(px$sigma, px$items, ang,
+                                        item_block = NULL)[["xi1"]] -
+      truth[["xi1"]]
+    # Two routes, one number. The bound discriminates against "the algebra is
+    # wrong", which would put predicted and observed a whole bias apart (~.024),
+    # so 1e-3 separates them by ~24x while leaving ~96x over the observed
+    # 1.04e-5 residual -- the ML optimizer's convergence tolerance again, not a
+    # disagreement between the two routes (M59).
+    expect_lt(abs(predicted - observed), 1e-3)
+  }
+})
+
+# OpenMx route for the five-component model: the same Sigma built from matrix
+# algebra rather than lavaan syntax, so agreement is between two independent
+# implementations of the model and not two calls into one. Mirrors BC7's helper
+# with the block matrix added.
+axes_mx_components_zeta2 <- function(S, n, angles_deg, n_items, item_block) {
+  p <- nrow(S)
+  nm <- rownames(S)
+  scale <- rep(seq_along(angles_deg), each = n_items)
+  th <- rep(as.numeric(angles_deg), each = n_items) * pi / 180
+  model <- OpenMx::mxModel(
+    "axes2",
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .15, lbound = 0,
+                     name = "xi1"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .05, lbound = 0,
+                     name = "xi2"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .10, lbound = 0,
+                     name = "zeta1"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .05, lbound = 0,
+                     name = "zeta2"),
+    OpenMx::mxMatrix("Full", p, 1, free = TRUE, values = .5, lbound = 0,
+                     name = "eps"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(th, th, function(a, b) cos(a - b)),
+                     name = "C"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE, values = 1, name = "J"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(scale, scale, `==`) * 1, name = "B"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(item_block, item_block, `==`) * 1,
+                     name = "K"),
+    OpenMx::mxAlgebra(
+      xi1[1, 1] * C + xi2[1, 1] * J + zeta1[1, 1] * B + zeta2[1, 1] * K +
+        vec2diag(eps),
+      name = "Sigma", dimnames = list(nm, nm)
+    ),
+    OpenMx::mxData(observed = S, type = "cov", numObs = n),
+    OpenMx::mxExpectationNormal(covariance = "Sigma"),
+    OpenMx::mxFitFunctionML()
+  )
+  fit <- suppressWarnings(suppressMessages(
+    OpenMx::mxRun(model, silent = TRUE, suppressWarnings = TRUE)
+  ))
+  c(
+    xi1 = OpenMx::mxEval(xi1, fit)[1, 1],
+    xi2 = OpenMx::mxEval(xi2, fit)[1, 1],
+    zeta1 = OpenMx::mxEval(zeta1, fit)[1, 1],
+    zeta2 = OpenMx::mxEval(zeta2, fit)[1, 1]
+  )
+}
+
+test_that("M63 T7 (AC5): lavaan, OpenMx and the OLS shadow agree on zeta2", {
+  skip_if_not_installed("lavaan")
+  skip_if_not_installed("OpenMx")
+  ang <- octants()
+  k <- 2L
+  blk <- axes_crossed_blocks(length(ang), k)
+  item_scale <- rep(seq_along(ang), each = k)
+  item_angle <- rep(ang, each = k)
+
+  for (seed in c(11L, 12L)) {
+    set.seed(seed)
+    dat <- as.data.frame(scale(
+      axes_simulate(2500L, ang, k, .20, .05, .08, zeta2 = .06,
+                    item_block = blk)
+    ))
+    inames <- sprintf("i%02d", seq_len(ncol(dat)))
+    colnames(dat) <- inames
+    items <- split(inames, factor(item_scale, levels = seq_along(ang)))
+    S <- stats::cov(dat)
+
+    lav <- axes_pop_fit_components(S, items, ang, blk)[c("xi1", "xi2",
+                                                         "zeta1", "zeta2")]
+    mx <- axes_mx_components_zeta2(S, 2500L, ang, k, blk)
+    ols <- axes_ols_shadow(stats::cor(as.matrix(dat)), item_angle, item_scale,
+                           blk)[c("xi1", "xi2", "zeta1", "zeta2")]
+
+    # Two SEM engines on the same sample should agree to optimizer precision;
+    # 1e-3 leaves room for their different parameterizations (BC7 observes
+    # ~6e-5 on the four-component model).
+    expect_lt(max(abs(lav - mx)), 1e-3)
+    # The OLS shadow is a method-of-moments estimator, not ML, so it agrees to
+    # sampling order rather than to optimizer precision -- .02 fences it well
+    # inside the .06 signal it must resolve.
+    expect_lt(max(abs(lav - ols)), .02)
+  }
+})

@@ -47,9 +47,16 @@ type-f rows).
       ζ2 within a stated **absolute** bound (stated absolutely, per the M61
       relative-tolerance trap), set from the discrimination required rather than
       from one machine's printed value (M59).
-- [ ] AC4 Fitting that same population **without** ζ2 biases ξ1 by a margin the
-      test asserts — the component demonstrably earns its place, and the
-      caveat at `R/axes_reliability.R:533-543` is shown to describe a real error.
+- [ ] AC4 The omitted-ζ2 bias in ξ1 is characterized as a **conditional on block
+      geometry**, not a blanket claim, with both branches asserted against the
+      exact population matrix and agreeing with a closed-form omitted-variable-bias
+      prediction: under an **angle-balanced** layout (each block drawing one item
+      per scale) ξ1 is unbiased — asserted at < 1e-4, a bound set from the 240×
+      separation against the clustered branch rather than from one machine's
+      printed value (M59), with the orthogonality derivation recorded — while
+      under an **angle-clustered** layout (blocks
+      spanning contiguous arcs) ξ1 carries ≥ 10% relative bias. ξ2 is inflated
+      under every layout tested, which is the claim that does hold unconditionally.
 - [ ] AC5 lavaan, OpenMx, and the OLS shadow agree on ξ1/ξ2/ζ1/ζ2 within stated
       bounds on the population matrix, and the blocked type-a rows (CSIV S7,
       TRC-g S10, TRC-t S11) plus the OCAI type-d rows reproduce their printed
@@ -93,7 +100,7 @@ type-f rows).
       (`:328`, `:342`). Build the fixture from ONE population (M61 lesson (h)).
 - [x] T6 `axes_is_boundary()` negative-ζ2 disjunct (`:314`) + the never-NaN
       block; assert the condition on the unmocked path (M62 lesson (i)).
-- [ ] T7 Oracle: known-ζ2 recovery, the omitted-ζ2 bias demonstration, and
+- [x] T7 Oracle: known-ζ2 recovery, the omitted-ζ2 bias demonstration, and
       lavaan/OpenMx/OLS-shadow agreement. Prove each new guard by mutation, and
       record any null mutation with why the model is invariant (M60 lesson).
 - [ ] T8 Bank the blocked type-a rows (CSIV S7, TRC-g S10, TRC-t S11) and the
@@ -105,6 +112,7 @@ type-f rows).
 
 ## Work log
 
+- 2026-07-26: T7 done, and it changed a plan claim. AC4 as planned asserted that omitting ζ2 biases ξ1; measurement showed that is FALSE for the canonical crossed layout — ξ1 is provably unbiased there because same-block is orthogonal to cos(θi−θj), confirmed three ways (OLS shadow at -7.5e-16, closed-form omitted-variable bias at 9.9e-17, lavaan CFA at 2.9e-8). It is true for angle-clustered layouts (+.024 on a truth of .20, +12%). Jeff approved amending AC4 to the conditional at a mini gate; M63-D2 records the finding and the shipped roxygen caveat is now known to be wrong in two of three parts, which T9 must rewrite. Minor follow-on amendment: AC4's stated bound moved 1e-8 → 1e-4 after both drafted tolerances failed on the machine that wrote them — recalibrated from the 240x separation against the clustered branch rather than from a printed value (M59). AC3 recovery within 1e-4 on the exact population; AC5 lavaan/OpenMx agree to 1e-3 and the OLS shadow to .02, OpenMx actually running (0 skips). Mutation: BS latents loading 0.9 instead of 1 reddens 5 tests. `devtools::test()` 0 failures / 4032 passes.
 - 2026-07-26: T4/T5/T6 done, and the estimator is now end-to-end — `axes_reliability()` takes `blocks =`, fits ζ2 when the map identifies it, and reports it as a fifth component row with `details$zeta2_fitted`. Correcting my own record: T1's tick covered the resolver and its validation only; the `axes_reliability()` signature and wiring it names landed here, and T4's shadow column had already landed inside T2. On a 3000-row blockwise draw ξ1 and ζ2 both recover within .02 of truth, and an unblocked call on the same data reproduces the pre-M63 result to 1e-10. Mutations: negative-ζ2 boundary disjunct, the population's ζ2 term, and crossed-vs-scale-aligned blocks all redden (2, 6, 7+2 respectively). One NULL mutation recorded rather than chased (M60 lesson): reading ζ2 off lavaan's parameter table instead of the design predicate cannot redden, because `BS1` is in the table exactly when the emitter wrote it and the emitter reads the same predicate — they are equal by construction, and only a two-point mutation could separate them. `devtools::test()` 0 failures / 4011 passes.
 - 2026-07-26: T3 done — `axes_syntax()` emits one `BS<m>` latent per block sharing a single `zeta2` label, dropped whole when the design says unidentified; `item_block` threaded through `axes_fit()`/`axes_fit_cormat()` (minor task refinement: the fit-seam plumbing landed here so the emitter is reachable, rather than waiting for T6). Two defects caught by the tests before commit: the drop comment named the `zeta2` token, which would have silently defeated a "no such component anywhere" assertion the way M61's comment deliberately avoids (reworded, with the reason recorded in the code); and a test regex pinned digits `fmt()` never prints, since .06 expands to 0.0599999… — reseeded on a dyadic value. Three mutations red, including block latents loading scale items instead of block items. `devtools::test()` 0 failures / 3973 passes.
 - 2026-07-26: T2 done — the component set now lives in one place, `axes_design()`, which the OLS shadow and `axes_fits_zeta2()` both read; ζ2 joins only when the same-block column raises the design's rank. Task refined during work (minor): the shadow's move onto the shared design landed here rather than in T4, since the predicate needed it first; T4 keeps the shadow's zeta2 return. The gate's rank-check answer is now evidenced, not just asserted — a block map pairing OPPOSITE scales spans two scales each (so the rejected structural rule calls it identified) yet same-block equals -cos exactly and adds no rank; substituting the structural rule into the code turns 4 tests red. M61's shadow tests pass untouched as the refactor's fence. `devtools::test()` 0 failures / 3956 passes.
@@ -123,5 +131,23 @@ type-f rows).
   partitions the items into scales the same way. Ruled at implement, not plan:
   the plan settled the argument's *shape* (list of item vectors, M63 gate) and
   left its *completeness* open.
+
+- **M63-D2 (2026-07-26): the omitted-ζ2 bias in ξ1 is conditional on block
+  geometry, and the shipped caveat overstates it.** Measured three independent
+  ways on the exact population — the OLS shadow, a closed-form omitted-variable-bias
+  computation, and the lavaan CFA, agreeing to five decimals — omitting ζ2 leaves
+  ξ1 EXACTLY unbiased when each block draws one item per scale, because the
+  same-block indicator is then orthogonal to cos(θi − θj): within-block pairs are
+  all cross-scale and span every scale pair uniformly, so the auxiliary regression
+  of same-block on the design has a zero cosine coefficient (measured 9.9e-17).
+  Under angle-clustered blocks that coefficient is 0.398 and ξ1 carries +.024 on a
+  truth of .20 (+12%). ξ2 is inflated under every geometry tested; ζ1's bias
+  changes sign with geometry. The roxygen caveat at `R/axes_reliability.R:533-543`
+  therefore ships an unconditional claim — block variance inflating general and
+  scale-specificity "and, in turn, deflating the share attributed to the axes" —
+  that is wrong in two of three parts for the canonical crossed layout. T9
+  rewrites it as the conditional; AC4 is amended to assert both branches rather
+  than a single direction. Same family as M23: write a bias claim as a conditional
+  with the condition derived.
 
 ## Review
