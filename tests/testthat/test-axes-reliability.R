@@ -1468,23 +1468,37 @@ test_that("M61 T4/T6: the zeta1-dropped path returns a three-row component set (
   expect_true(all(res$results$reliability > 0 & res$results$reliability < 1))
 })
 
+# The population implied by an UNBALANCED item map: scale s contributes
+# `counts[s]` items at `angles[s]`. Same construction as axes_population_cor(),
+# which assumes a constant item count per scale and so cannot express a mixed
+# map. One coherent Sigma -- never two independent draws glued together, which
+# would carry zero true cross-block correlation and correspond to no population
+# at all (caught at the M61 review gate, finding F1).
+axes_unbalanced_population <- function(angles, counts, xi1, xi2, zeta1) {
+  item_scale <- rep(seq_along(angles), times = counts)
+  th <- angles[item_scale] * pi / 180
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(item_scale, item_scale, `==`)
+  diag(sig) <- 1
+  list(sigma = sig, scale = item_scale)
+}
+
 test_that("M61 T4/T6: a mixed map still fits zeta1 and keeps four rows (AC2)", {
   skip_if_not_installed("lavaan")
   # Eight equally spaced positions; scale 1 carries a pair, the rest one item
   # each. One pair is all the drop rule requires.
   ang <- (seq_len(8L) - 1L) * 45
+  cnt <- c(2L, rep(1L, 7L))
+  pop <- axes_unbalanced_population(ang, cnt, .20, .05, .08)
   set.seed(614L)
-  dat <- axes_simulate(1500L, ang, 1L, .20, .05, .08)
-  inames <- sprintf("i%02d", seq_len(ncol(dat)))
-  colnames(dat) <- inames
-  # Duplicate-free extra item on scale 1: simulate it as its own position's
-  # second item by drawing a fresh column correlated through the same model.
-  dat2 <- axes_simulate(1500L, ang, 2L, .20, .05, .08)
-  colnames(dat2) <- sprintf("j%02d", seq_len(ncol(dat2)))
-  mixed_dat <- cbind(dat2[, 1:2], dat[, -1, drop = FALSE])
-  items <- c(list(colnames(dat2)[1:2]), as.list(inames[-1]))
+  x <- mvn_draws(1500L, rep(0, nrow(pop$sigma)), pop$sigma)
+  inames <- sprintf("i%02d", seq_len(ncol(x)))
+  mixed_dat <- as.data.frame(x)
+  colnames(mixed_dat) <- inames
+  items <- split(inames, factor(pop$scale, levels = seq_along(ang)))
 
   expect_true(axes_fits_zeta1(items))
+  expect_identical(unname(lengths(items)), cnt)
   res <- suppressMessages(
     axes_reliability(mixed_dat, items = items, angles = ang)
   )
@@ -1493,6 +1507,54 @@ test_that("M61 T4/T6: a mixed map still fits zeta1 and keeps four rows (AC2)", {
   expect_true(res$details$zeta1_fitted)
   # The seed carried zeta1 too, since the OLS shadow kept its third column.
   expect_identical(names(res$details$ols_shadow), c("xi2", "xi1", "zeta1"))
+  # The fixture is a real population, so the estimates must land in the right
+  # neighbourhood -- structural assertions alone would pass over a fit that had
+  # gone to a boundary solution. These bounds are ABSOLUTE and deliberately
+  # loose: this is one finite sample, and zeta1 rests on the single item pair
+  # scale 1 contributes, so its sampling variance is large (measured .058 for a
+  # truth of .08 at n = 1500). Exact recovery is the population oracle's job,
+  # asserted at 1e-4 in the mixed Layer-B test below; what this fences is a
+  # boundary or grossly wrong fit reaching the results frame.
+  est <- stats::setNames(res$components$Estimate, res$components$Symbol)
+  expect_lt(abs(est[["xi1"]] - .20), .05)
+  expect_lt(abs(est[["xi2"]] - .05), .05)
+  expect_lt(abs(est[["zeta1"]] - .08), .05)
+  expect_false(res$results$boundary[[1]])
+})
+
+# Exact-population oracle for the MIXED map -- the configuration M61 newly
+# accepts and which no Layer-B cell otherwise covers (M61 review finding F2).
+# The second cell puts the multi-item scale somewhere other than first, which is
+# what confirms comp_var("SS1") reads the SHARED zeta1 label rather than
+# happening to read a latent that owns a pair.
+test_that("M61: exact population recovery at mixed item counts (Layer B)", {
+  skip_if_not_installed("lavaan")
+  ang <- (seq_len(8L) - 1L) * 45
+  xi1 <- .20; xi2 <- .05; zeta1 <- .08
+  cells <- list(
+    `pair on scale 1` = c(2L, rep(1L, 7L)),
+    `pair on scale 3` = c(1L, 1L, 2L, rep(1L, 5L)),
+    `two pairs` = c(2L, 1L, 1L, 2L, 1L, 1L, 1L, 1L)
+  )
+  for (nm in names(cells)) {
+    pop <- axes_unbalanced_population(ang, cells[[nm]], xi1, xi2, zeta1)
+    sigma <- pop$sigma
+    inames <- sprintf("u%02d", seq_len(nrow(sigma)))
+    dimnames(sigma) <- list(inames, inames)
+    items <- split(inames, factor(pop$scale, levels = seq_along(ang)))
+    fit <- lavaan::cfa(
+      axes_syntax(items, ang), sample.cov = sigma, sample.nobs = 500L,
+      orthogonal = TRUE, likelihood = "wishart"
+    )
+    expect_true(lavaan::lavInspect(fit, "converged"), label = nm)
+    pe <- lavaan::parameterEstimates(fit)
+    vv <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+    expect_lt(abs(vv("AX") - xi1), 1e-4)
+    expect_lt(abs(vv("AY") - xi1), 1e-4)
+    expect_lt(abs(vv("GEN") - xi2), 1e-4)
+    expect_lt(abs(vv("SS1") - zeta1), 1e-4)
+    expect_lt(unname(lavaan::fitMeasures(fit, "chisq")), 1e-6)
+  }
 })
 
 test_that("M61 T5: N-B is NA-with-reason on the single-item path, never NaN (AC3)", {
