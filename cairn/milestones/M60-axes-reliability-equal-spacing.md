@@ -114,6 +114,7 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: implement gate — spacing tolerance is float-representation only, never near-equal spacing (Jeff; keeps RR09 §4's quasi-circumplex refusal intact).
 - 2026-07-25: T1 fence added (4 test blocks, rotated/k!=8/refusals/pole); red for the right reason — the octant-only refusals at :485-506, not an incidental error. Suite stays red by design until T3.
 - 2026-07-25: T2 `angles_spacing_status()` (modular, tol = 1e-8 = float noise only) + 15 unit assertions incl. k = 4:24 at two rotations; T3 wired it into the refuse contract and re-pointed the three stale BC12 message expectations. Suite green (232).
+- 2026-07-25: mutation-tested the 5 guards. 4 had teeth (floor→3: 1 fail; tol 1e-8→0.5: 3; skip duplicate: 6; accept any spacing: 7). The `%% 360` reduction did NOT redden — for in-range sets the wrap term compensates; it bites only on angles outside [0, 360), now asserted (`c(10, 100, 190, 640)`), and the mutation reddens. Full suite 3394 pass / 0 fail; the 4 warnings are pre-existing in test-ci_accuracy.R.
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 
 ## Decisions

@@ -24,8 +24,13 @@ axis_weights <- function(angles_deg) {
 # Classify an angle set as an equally spaced circumplex, one status string:
 # "missing", "duplicate", "unequal", or "ok". Modular by construction --
 # positions reduce mod 360 first, so the package's LM = 360 and 0 are ONE
-# position (a naive sorted-diff treating them as distinct is the classic pole
-# bug; RR09 section 4). Every gap between successive positions must equal
+# position (RR09 section 4). Where that reduction actually bites is an angle
+# supplied OUTSIDE [0, 360): c(10, 100, 190, 640) is equally spaced modulo 360,
+# but a naive sorted-diff reads its wrap gap as negative and calls it a
+# duplicate. A set carrying both 0 and 360 is caught either way (the wrap gap
+# goes to 0), so that case does not pin this line -- the out-of-range one does,
+# and is what the mutation test asserts.
+# Every gap between successive positions must equal
 # 360/k. The wrap-around gap from the last position back to the first is
 # carried for symmetry with the modular reading, NOT because it catches a case
 # the interior gaps miss: all gaps sum to 360 by construction, so k-1 interior

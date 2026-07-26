@@ -1101,6 +1101,14 @@ test_that("M60: angles_spacing_status() classifies at the pole and near-misses",
   # NA is classified, never silently dropped by sort().
   expect_identical(angles_spacing_status(c(0, 90, NA, 270)), "missing")
 
+  # Angles supplied outside [0, 360) reduce onto their circumplex positions.
+  # This is the ONLY case that pins the `%% 360` reduction: with it removed,
+  # the octant sets and the 0-and-360 duplicate below still classify correctly
+  # (the wrap gap compensates), but this set is misread as a duplicate.
+  expect_identical(angles_spacing_status(c(10, 100, 190, 640)), "ok")
+  expect_identical(angles_spacing_status(c(-90, 0, 90, 180)), "ok")
+  expect_identical(angles_spacing_status(c(0, 90, 180, 270, 450)), "duplicate")
+
   # The tolerance is loose enough for an exactly-constructed odd set, whose
   # gaps carry real float error (360/7 is not representable).
   expect_identical(angles_spacing_status((0:6) * (360 / 7)), "ok")
