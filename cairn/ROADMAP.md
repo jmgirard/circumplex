@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-26 (M61 shipped — `axes_reliability()` now accepts one item per scale position, dropping ζ1 where it is unidentified; tree clean and level with origin, all checks PASS, no open issues/PRs/RBs. M56 row pruned under terminal-row retention. M7 still parked on the submit_cran handoff.)_
+_Last hygiene check: 2026-07-26 (second pass same day, post-M61: nothing changed since — no commits, tree clean and level with origin, all 16 checks PASS, no open issues/PRs/RBs, no candidate movement. M7 still parked on the submit_cran handoff, which only Jeff can perform.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
