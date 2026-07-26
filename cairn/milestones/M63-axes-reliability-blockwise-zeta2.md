@@ -55,12 +55,16 @@ type-f rows).
       separation against the clustered branch rather than from one machine's
       printed value (M59), with the orthogonality derivation recorded — while
       under an **angle-clustered** layout (blocks
-      spanning contiguous arcs) ξ1 carries ≥ 10% relative bias. ξ2 is inflated
-      under every layout tested, which is the claim that does hold unconditionally.
+      spanning contiguous arcs) ξ1 carries ≥ 10% relative bias. ξ2 is never
+      deflated — inflated under most layouts, exactly unchanged under a few.
 - [x] AC5 lavaan, OpenMx, and the OLS shadow agree on ξ1/ξ2/ζ1/ζ2 within stated
-      bounds on the population matrix, and the blocked type-a rows (CSIV S7,
-      TRC-g S10, TRC-t S11) plus the OCAI type-d rows reproduce their printed
-      reliability by Spearman–Brown and sum to 100% across five components.
+      bounds on the population matrix, and all six banked blocked/type-d Table 3
+      rows (CSIV S7, TRC-g S10, TRC-t S11, OCAI S15 Self/Other/Meta) reproduce
+      their printed reliability by Spearman–Brown within ±.01 and their printed
+      SEm within ±.02. The five-component sum guard binds only the four rows the
+      source prints self-consistently; CSIV (102.9) and OCAI S15 Meta (100.6) are
+      pre-existing source defects, pinned with their printed sums rather than
+      swept, per RR10's ruling for the IIP S6 erratum.
 - [x] AC6 No NaN, negative, or infinite SEm on any ζ2 path: a negative ζ2 trips
       the boundary flag, and the never-NaN block covers the new component.
 - [x] AC7 Every surface that enumerates the component set names ζ2 — roxygen
@@ -112,6 +116,7 @@ type-f rows).
 
 ## Work log
 
+- 2026-07-26: gated AC amendment at the merge gate, at Jeff's direction — status review→in-progress→review. AC5's "sum to 100% across five components" was false for two of the six banked rows, so it now binds the sum guard to the four self-consistent rows and requires CSIV (102.9) and OCAI S15 Meta (100.6) pinned with their printed sums — the text now describes what the test asserts, rather than the test being read charitably against it. AC4's closing clause was amended in the same pass because review finding F3 falsified it: it claimed ξ2 inflation "does hold unconditionally", now "never deflated — inflated under most layouts, exactly unchanged under a few". Both re-verified against fresh evidence before re-ticking; suite 903 passed / 0 failed.
 - 2026-07-26: status in-progress→review. All 9 tasks done. Full `devtools::check(manual = TRUE)` is 0/0/0 with BOTH steps that habitually skip actually running — `checking tests ... OK` (431s, not SKIPPED) and `checking PDF version of manual ... OK` — which is the M7/M57 lesson's requirement, since this milestone changed roxygen. `devtools::test()` 4032+ passes, 0 failures. Branch is 8 commits over 8 files.
 - 2026-07-26: T9 done — the caveat this milestone existed to remove is gone from every surface, replaced by M63-D2's conditional in the roxygen, the vignette, and NEWS; `@return` now names the five-row case and `zeta2_fitted`; `example_data.R` says explicitly that the bundled dataset's fifth component is zero, since it claimed a "five-component population" while enumerating four. The enumeration sweep grepped for the OLD assertion's keywords rather than the changed lines (M56/M62): "as approximate", "deflating the share", "no such component" now appear on no surface. The AC7 doc guard was FALSE COVERAGE on first writing and measured to be so — `expect_match(rd, "blocks")` passed with `@param blocks` deleted, because the prose says "administered in blocks" (the M39/M40 trap); re-pinned to `\item{blocks}{`, which only the \arguments entry emits, and both it and the reverted-caveat mutation now redden. The guard also reads man/ in the dev tree and Rd_db() once installed, the dual-source pattern test-rd-latex-safe.R uses, because a man/-only guard skips under R CMD check and an Rd_db()-only guard errors under load_all().
 - 2026-07-26: T8 done — the six Table 3 rows carrying a col-8 value (CSIV S7, TRC-g S10, TRC-t S11, OCAI S15 Self/Other/Meta) banked in `strack2013.md`, two channels on p. 7 (text layer + 300-dpi page image) agreeing on every value, including the source's own `(1.2))` misprint. All six reproduce printed Rel by Spearman–Brown within .01 and printed SEm within .02. Deviation from AC5 as written, following existing repo precedent rather than a new gate: AC5 says the rows "sum to 100%% across five components", but two do not — CSIV 102.9 and OCAI Meta 100.6, both defects this page already recorded — so the test sweeps the four self-consistent rows and PINS the two with their printed sums, which is RR10's standing ruling for the IIP S6 erratum. Also recorded on the page: these rows can never be an end-to-end fixture, since no correlation matrix is published and reliability never touches ζ2.
@@ -182,11 +187,15 @@ type-f rows).
   OpenMx ran, 0 skips) and `M63 T8 (AC5): the blocked Table 3 rows reproduce Rel
   and SEm (Layer A)` (6). Two SEM engines within 1e-3; OLS shadow within .02.
   All six banked rows reproduce printed Rel within .01 and SEm within .02.
-  **Deviation, recorded not reinterpreted:** AC5 says the rows "sum to 100%
-  across five components"; two do not (CSIV 102.9, OCAI Meta 100.6, both
-  pre-existing source defects this page already recorded). The test sweeps the
-  four self-consistent rows and pins the two with their printed sums, per RR10's
-  standing ruling for the IIP S6 erratum. Flagged to the user at the merge gate.
+  **AC5 was amended at the merge gate** (Jeff's call) to say what the evidence
+  supports: its earlier "sum to 100% across five components" was false for two
+  of the six rows. The amended text binds the sum guard to the four
+  self-consistent rows and requires the other two pinned with their printed
+  sums; that is exactly what the test does, so the amendment describes the
+  evidence rather than the evidence chasing the text. **AC4's closing clause was
+  amended in the same pass** — it claimed ξ2 inflation "does hold
+  unconditionally", which review finding F3 disproved; now "never deflated —
+  inflated under most layouts, exactly unchanged under a few".
 - AC6 — `M63 T6: axes_is_boundary() catches a negative zeta2` (6) on the
   unmocked predicate, and `M63 T6: axes_reliability() fits and reports zeta2 end
   to end` (16). No NaN, negative, or infinite SEm on any ζ2 path.
