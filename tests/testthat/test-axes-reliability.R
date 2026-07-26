@@ -2093,3 +2093,70 @@ test_that("M61 review F4: nb_reason carries every reason that applies", {
   )
   expect_identical(r2$details$nb_reason, "cormat")
 })
+
+# --- M63: blockwise instruments and the zeta2 component -----------------------
+#
+# Blocks group items by something OTHER than their scale (Strack's type d), so
+# the canonical blockwise design takes one item from each scale into each block:
+# `same-block` and `same-scale` are then genuinely different indicators, which
+# is exactly the condition that identifies zeta2.
+
+# Four scales, k items each, with `nb` blocks laid across the scales: item j of
+# every scale goes to block j. Requires k == nb, the balanced case.
+axes_block_fixture <- function(angles = c(0, 90, 180, 270), k = 2L) {
+  inames <- sprintf("i%02d", seq_len(length(angles) * k))
+  scale_of <- rep(seq_along(angles), each = k)
+  block_of <- rep(seq_len(k), times = length(angles))
+  list(
+    names = inames,
+    items = split(inames, factor(scale_of, levels = seq_along(angles))),
+    blocks = split(inames, factor(block_of, levels = seq_len(k))),
+    angles = angles,
+    scale_of = scale_of,
+    block_of = block_of
+  )
+}
+
+test_that("M63 T1: axes_resolve_blocks() maps blocks onto the item order", {
+  fx <- axes_block_fixture()
+  src <- as.data.frame(matrix(0, nrow = 2, ncol = length(fx$names),
+                              dimnames = list(NULL, fx$names)))
+  all_cols <- unlist(fx$items, use.names = FALSE)
+
+  # NULL blocks stay NULL -- the no-zeta2 path, unchanged from M61.
+  expect_null(axes_resolve_blocks(NULL, src, all_cols))
+
+  got <- axes_resolve_blocks(fx$blocks, src, all_cols)
+  # The returned index is aligned with `all_cols`, not with the block list's
+  # own order: item j of every scale carries block j.
+  expect_identical(got$index, fx$block_of)
+  expect_identical(got$labels, c("1", "2"))
+
+  # Numeric indices resolve exactly as names do (axes_colnames()).
+  by_num <- axes_resolve_blocks(list(c(1L, 3L, 5L, 7L), c(2L, 4L, 6L, 8L)),
+                                src, all_cols)
+  expect_identical(by_num$index, got$index)
+  expect_identical(by_num$labels, c("Block1", "Block2"))
+})
+
+test_that("M63 T1: `blocks` must partition the items, and says which item broke it", {
+  fx <- axes_block_fixture()
+  src <- as.data.frame(matrix(0, nrow = 2, ncol = length(fx$names),
+                              dimnames = list(NULL, fx$names)))
+  all_cols <- unlist(fx$items, use.names = FALSE)
+  r <- function(b) axes_resolve_blocks(b, src, all_cols)
+
+  # Not a list at all -- the settled API shape is a list of item vectors, so a
+  # flat label vector is refused rather than silently reinterpreted.
+  expect_error(r(c("A", "A", "B", "B", "A", "A", "B", "B")),
+               "must be a list of per-block item")
+  expect_error(r(list()), "at least one block")
+  # An empty block contributes no items and would silently stop counting.
+  expect_error(r(list(character(0), fx$names)), "no items")
+  # An item named in a block but absent from the data.
+  expect_error(r(list(c("i01", "nope"), fx$names[-1])), "not found.*nope")
+  # An item in two blocks at once: the partition is broken by duplication.
+  expect_error(r(list(fx$names[1:5], fx$names[5:8])), "more than one block.*i05")
+  # An item in no block: the partition is broken by omission.
+  expect_error(r(list(fx$names[1:4], fx$names[5:7])), "no block.*i08")
+})

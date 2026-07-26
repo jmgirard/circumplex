@@ -435,6 +435,76 @@ axes_resolve_map <- function(data, items, angles, instrument) {
   }
 }
 
+# Normalize the `blocks` argument to a per-item integer block index aligned with
+# `all_cols` -- the unlist(item_cols) order every design matrix here is built in
+# -- or NULL when no blocks were supplied (the pre-M63 model).
+#
+# `blocks` is a list of per-block item vectors, mirroring the explicit `items`
+# form exactly: same shape, same axes_colnames() name-or-index resolution, same
+# optional names. That shape was chosen over a flat per-item label vector at the
+# M63 implement gate because a flat vector's correctness rests on matching
+# unlist(items) order silently, and a misaligned one yields a wrong answer
+# rather than an error (the M25 positional-subsetting family).
+#
+# The blocks must PARTITION the items -- every item in exactly one block. A
+# blockwise instrument administers every item in some block, so an item in no
+# block is a map the model has no reading for, and an item in two is a
+# contradiction; both are refused naming the offending item rather than
+# resolved by a rule the caller never asked for (M63-D1).
+axes_resolve_blocks <- function(blocks, src, all_cols) {
+  if (is.null(blocks)) return(NULL)
+  if (!is.list(blocks)) {
+    stop(
+      "`blocks` must be a list of per-block item column vectors (one element ",
+      "per block), as `items` is a list of per-scale item column vectors.",
+      call. = FALSE
+    )
+  }
+  if (length(blocks) < 1L) {
+    stop("`blocks` must name at least one block.", call. = FALSE)
+  }
+  cols <- lapply(blocks, axes_colnames, data = src)
+  empty <- which(lengths(cols) < 1L)
+  if (length(empty) > 0) {
+    stop(
+      "Every block must have at least 1 item; block(s) ",
+      paste(empty, collapse = ", "), " have no items.",
+      call. = FALSE
+    )
+  }
+  flat <- unlist(cols, use.names = FALSE)
+  unknown <- setdiff(flat, all_cols)
+  if (length(unknown) > 0 || anyNA(flat)) {
+    stop(
+      "Block item(s) not found among the `items` columns: ",
+      paste(stats::na.omit(union(unknown, flat[is.na(flat)])), collapse = ", "),
+      ".",
+      call. = FALSE
+    )
+  }
+  dup <- unique(flat[duplicated(flat)])
+  if (length(dup) > 0) {
+    stop(
+      "Item(s) in more than one block: ", paste(dup, collapse = ", "),
+      ". `blocks` must partition the items.",
+      call. = FALSE
+    )
+  }
+  orphan <- setdiff(all_cols, flat)
+  if (length(orphan) > 0) {
+    stop(
+      "Item(s) in no block: ", paste(orphan, collapse = ", "),
+      ". `blocks` must partition the items.",
+      call. = FALSE
+    )
+  }
+  labels <- names(blocks)
+  if (is.null(labels)) labels <- sprintf("Block%d", seq_along(blocks))
+  index <- integer(length(all_cols))
+  for (b in seq_along(cols)) index[match(cols[[b]], all_cols)] <- b
+  list(index = index, labels = as.character(labels))
+}
+
 # --- The estimator ------------------------------------------------------------
 
 #' Reliability of the circumplex axes (Strack, Jacobs & Grosse Holtforth, 2013)

@@ -77,7 +77,7 @@ type-f rows).
 
 ## Tasks
 
-- [ ] T1 `blocks =` argument on `axes_reliability()` (`R/axes_reliability.R:603`)
+- [x] T1 `blocks =` argument on `axes_reliability()` (`R/axes_reliability.R:603`)
       + resolution to a per-item block index beside `axes_resolve_map()`
       (`:394`); validation and error tests first.
 - [ ] T2 `axes_fits_zeta2()` identification predicate mirroring
@@ -105,8 +105,20 @@ type-f rows).
 
 ## Work log
 
+- 2026-07-26: T1 done — `axes_resolve_blocks()` maps a list of per-block item vectors onto the `unlist(item_cols)` order, or NULL for the pre-M63 path. Implement gate settled two open choices: `blocks` is a list of item vectors mirroring `items` (a flat label vector was refused as a silent-misalignment channel, M25 family), and identification will be a rank check on the OLS design rather than a structural rule. M63-D1 records the partition contract. Four guards proven by mutation (orphan, duplicate, index alignment, empty block); `devtools::test()` 0 failures / 3936 passes.
 - 2026-07-26: created by /milestone-plan. Four gate answers from Jeff: into v2.0.0 as a narrow D-001 supersession (D-032); `blocks =` argument only, no Instrument field; unidentified ζ2 drops and flags per the M61 precedent; oracle bar is synthetic recovery + omitted-ζ2 bias + cross-engine. Investigation corrected the candidate row's premise — Table 3's blocked rows can never be an end-to-end fixture (no published correlation matrix), so they anchor the formula layer only and the estimator's real oracle is synthetic.
 
 ## Decisions
+
+- **M63-D1 (2026-07-26): `blocks` must partition the items.** Every item belongs
+  to exactly one block; an item in no block and an item in two are both refused,
+  naming the offending item. A blockwise instrument administers every item in
+  some block, so a partial map is one the model has no reading for — the
+  alternatives were to invent a catch-all block for the remainder or to fit
+  block latents over part of the item set, and both answer a question the caller
+  never asked. Refusing keeps `blocks` the exact shape-mate of `items`, which
+  partitions the items into scales the same way. Ruled at implement, not plan:
+  the plan settled the argument's *shape* (list of item vectors, M63 gate) and
+  left its *completeness* open.
 
 ## Review
