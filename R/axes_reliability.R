@@ -863,7 +863,24 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # needs the item scores and the composite variance needs the respondents -- so
   # the cormat path reports NA with the reason (RR09 sec. 7.4: NA-with-reason,
   # never silently dropped), rather than an approximation the user cannot audit.
-  nb <- if (has_data) {
+  #
+  # A second unavailability arrives with M61 (M61-D1): Cronbach's alpha is
+  # undefined for a one-item scale -- cronbach_alpha() divides by m - 1, so it
+  # returns NaN -- and the N-B formula has no rel_scale to consume. The test is
+  # "ANY scale carries fewer than two items", NOT "zeta1 was dropped": a MIXED
+  # map still fits zeta1 yet has an undefined alpha on its single-item scales,
+  # and would otherwise propagate NaN into the results frame. Strack et al.
+  # corroborate: Table 3 col 14 is blank for every single-item row, and p. 5
+  # states the formula "was not applied for analyzing instruments with a single
+  # item per spatial position".
+  nb_reason <- if (!has_data) {
+    "cormat"
+  } else if (any(n_items_scale < 2L)) {
+    "single_item"
+  } else {
+    NULL
+  }
+  nb <- if (is.null(nb_reason)) {
     rel_scale <- vapply(
       item_cols, function(cols) cronbach_alpha(mat[, cols, drop = FALSE]),
       numeric(1)
@@ -932,6 +949,9 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # (M61): FALSE means one item per scale position, so zeta1 was
       # unidentified and dropped rather than estimated.
       zeta1_fitted = fit_zeta1,
+      # Why the Nunnally-Bernstein comparison is NA, or NULL when it is
+      # available: "cormat" (no raw scores) or "single_item" (alpha undefined).
+      nb_reason = nb_reason,
       ols_shadow = ols
     ),
     call = call

@@ -1492,3 +1492,59 @@ test_that("M61 T4/T6: a mixed map still fits zeta1 and keeps four rows (AC2)", {
   # The seed carried zeta1 too, since the OLS shadow kept its third column.
   expect_identical(names(res$details$ols_shadow), c("xi2", "xi1", "zeta1"))
 })
+
+test_that("M61 T5: N-B is NA-with-reason on the single-item path, never NaN (AC3)", {
+  skip_if_not_installed("lavaan")
+  ang <- (seq_len(8L) - 1L) * 45
+  fx <- axes_spaced_fixture(ang, n = 1000L, k = 1L)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+
+  # NA, and specifically NOT NaN: is.na() is TRUE for both, so the NaN check has
+  # to be made separately or the criterion's "never NaN" clause goes untested.
+  expect_true(all(is.na(res$results$nb_reliability)))
+  expect_false(any(is.nan(res$results$nb_reliability)))
+  expect_identical(res$details$nb_reason, "single_item")
+
+  # The reason reaches the user, on the same house pattern the cormat path uses.
+  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  expect_match(out, "Nunnally-Bernstein comparison needs each scale's alpha")
+  expect_match(out, "undefined for a scale carrying only one item")
+  # ... and the display shows a dash rather than a number for it.
+  expect_match(out, "NB_Reliability")
+})
+
+test_that("M61 T5: a MIXED map also reports N-B as NA -- the M61-D1 hole", {
+  skip_if_not_installed("lavaan")
+  # This is the branch AC3's literal wording would have missed: zeta1 IS fitted
+  # here, so a "zeta1-dropped path" rule would let alpha's NaN through.
+  ang <- (seq_len(8L) - 1L) * 45
+  set.seed(615L)
+  dat2 <- axes_simulate(1200L, ang, 2L, .20, .05, .08)
+  colnames(dat2) <- sprintf("j%02d", seq_len(ncol(dat2)))
+  # Scale 1 keeps both its items; every other scale keeps only its first.
+  keep <- c(1L, 2L, seq(3L, ncol(dat2), by = 2L))
+  mixed <- dat2[, keep, drop = FALSE]
+  items <- c(list(colnames(dat2)[1:2]), as.list(colnames(dat2)[seq(3L, ncol(dat2), by = 2L)]))
+
+  expect_true(axes_fits_zeta1(items))         # zeta1 IS fitted
+  res <- suppressMessages(axes_reliability(mixed, items = items, angles = ang))
+  expect_true(res$details$zeta1_fitted)
+  expect_identical(res$details$nb_reason, "single_item")
+  expect_true(all(is.na(res$results$nb_reliability)))
+  expect_false(any(is.nan(res$results$nb_reliability)))
+})
+
+test_that("M61 T5: N-B stays available and unannotated when every scale has a pair", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_spaced_fixture(octants(), n = 800L, k = 4L)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  expect_null(res$details$nb_reason)
+  expect_true(all(is.finite(res$results$nb_reliability)))
+  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  expect_false(grepl("undefined for a scale", out, fixed = TRUE))
+  expect_false(grepl("correlation-matrix path", out, fixed = TRUE))
+})
