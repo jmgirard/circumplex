@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m63-axes-reliability-blockwise-zeta2`
+- **Branch/PR:** `m63-axes-reliability-blockwise-zeta2` · https://github.com/jmgirard/circumplex/pull/89
 
 ## Goal
 
@@ -35,19 +35,19 @@ type-f rows).
 
 ## Acceptance criteria
 
-- [ ] AC1 `blocks =` accepts a per-item block map on the raw-data and `cormat`
+- [x] AC1 `blocks =` accepts a per-item block map on the raw-data and `cormat`
       paths, is validated with the house `stopifnot()`/`is_*()` idiom, and is
       refused with a named error on a length mismatch, an unmappable item, or a
       non-finite/missing block label.
-- [ ] AC2 ζ2 is fitted and reported when identified; when every block coincides
+- [x] AC2 ζ2 is fitted and reported when identified; when every block coincides
       with a scale it is dropped from the emitted syntax and flagged in
       `details$zeta2_fitted`, with the emitted model and the reported component
       set never disagreeing (the `axes_fits_zeta1()` contract, extended).
-- [ ] AC3 On a synthetic population with known ζ2 > 0, the fit recovers ξ1 and
+- [x] AC3 On a synthetic population with known ζ2 > 0, the fit recovers ξ1 and
       ζ2 within a stated **absolute** bound (stated absolutely, per the M61
       relative-tolerance trap), set from the discrimination required rather than
       from one machine's printed value (M59).
-- [ ] AC4 The omitted-ζ2 bias in ξ1 is characterized as a **conditional on block
+- [x] AC4 The omitted-ζ2 bias in ξ1 is characterized as a **conditional on block
       geometry**, not a blanket claim, with both branches asserted against the
       exact population matrix and agreeing with a closed-form omitted-variable-bias
       prediction: under an **angle-balanced** layout (each block drawing one item
@@ -57,17 +57,17 @@ type-f rows).
       under an **angle-clustered** layout (blocks
       spanning contiguous arcs) ξ1 carries ≥ 10% relative bias. ξ2 is inflated
       under every layout tested, which is the claim that does hold unconditionally.
-- [ ] AC5 lavaan, OpenMx, and the OLS shadow agree on ξ1/ξ2/ζ1/ζ2 within stated
+- [x] AC5 lavaan, OpenMx, and the OLS shadow agree on ξ1/ξ2/ζ1/ζ2 within stated
       bounds on the population matrix, and the blocked type-a rows (CSIV S7,
       TRC-g S10, TRC-t S11) plus the OCAI type-d rows reproduce their printed
       reliability by Spearman–Brown and sum to 100% across five components.
-- [ ] AC6 No NaN, negative, or infinite SEm on any ζ2 path: a negative ζ2 trips
+- [x] AC6 No NaN, negative, or infinite SEm on any ζ2 path: a negative ζ2 trips
       the boundary flag, and the never-NaN block covers the new component.
-- [ ] AC7 Every surface that enumerates the component set names ζ2 — roxygen
+- [x] AC7 Every surface that enumerates the component set names ζ2 — roxygen
       (including the replaced `# Blockwise instruments` section), `print()`,
       `summary()`, the `@return` component-row count, the vignette, and NEWS —
       verified by grepping for the enumeration, not the changed lines (M56/M62).
-- [ ] AC8 `devtools::test()` clean and `devtools::check()` 0/0/0, with the PDF
+- [x] AC8 `devtools::test()` clean and `devtools::check()` 0/0/0, with the PDF
       manual actually built (`checking PDF version of manual` present in the
       log, per the M7/M57 lesson) since roxygen changes here.
 
@@ -154,3 +154,100 @@ type-f rows).
   with the condition derived.
 
 ## Review
+
+2026-07-26, PR #89. All evidence re-run fresh at review, never recalled.
+
+**Criterion evidence** (20 M63 tests, 120 assertions, 0 failed / 0 errored /
+0 skipped; whole file 886 assertions green):
+
+- AC1 — `M63 T1: axes_resolve_blocks() maps blocks onto the item order` (5) and
+  `M63 T1: blocks must partition the items, and says which item broke it` (6).
+  Six refusals each name the offending item: non-list, empty list, empty block,
+  unknown name, item in two blocks, item in no block. Four guards proven red by
+  mutation at implement (orphan, duplicate, index alignment, empty block).
+- AC2 — `M63 T2: axes_fits_zeta2() keeps zeta2 only where it is identified` (5),
+  `M63 T3: axes_syntax() emits BS latents sharing one zeta2 label` (7),
+  `M63 T3: an unidentified block map emits no BS latents at all` (6). Emitted
+  syntax and reported component set are one decision (`axes_design()`), so they
+  cannot disagree; `details$zeta2_fitted` verified both ways end to end.
+- AC3 — `M63 T7 (AC3): the fit recovers zeta2 on the exact population` (7). All
+  four components within 1e-4 of truth on the exact population matrix; bound
+  stated absolutely and set four orders below the .06 signal.
+- AC4 — `M63 T7 (AC4): the omitted-zeta2 bias in xi1 is conditional on
+  geometry` (8) and `... closed-form omitted-variable bias predicts the fitted
+  bias` (2). Angle-balanced: |bias| < 1e-4 (observed 2.9e-8). Angle-clustered:
+  |bias| > 10% of truth (observed +12%). ξ2 inflated under both. The OVB algebra
+  and the CFA agree within 1e-3 (observed 1.04e-5).
+- AC5 — `M63 T7 (AC5): lavaan, OpenMx and the OLS shadow agree on zeta2` (4;
+  OpenMx ran, 0 skips) and `M63 T8 (AC5): the blocked Table 3 rows reproduce Rel
+  and SEm (Layer A)` (6). Two SEM engines within 1e-3; OLS shadow within .02.
+  All six banked rows reproduce printed Rel within .01 and SEm within .02.
+  **Deviation, recorded not reinterpreted:** AC5 says the rows "sum to 100%
+  across five components"; two do not (CSIV 102.9, OCAI Meta 100.6, both
+  pre-existing source defects this page already recorded). The test sweeps the
+  four self-consistent rows and pins the two with their printed sums, per RR10's
+  standing ruling for the IIP S6 erratum. Flagged to the user at the merge gate.
+- AC6 — `M63 T6: axes_is_boundary() catches a negative zeta2` (6) on the
+  unmocked predicate, and `M63 T6: axes_reliability() fits and reports zeta2 end
+  to end` (16). No NaN, negative, or infinite SEm on any ζ2 path.
+- AC7 — **failed on first review evidence; fixed on the branch and re-verified.**
+  The implement-time sweep grepped the OLD claim's keywords ("as approximate",
+  "deflating the share", "no such component" — absent from every surface) and
+  was blind in the other direction: it never swept for positive enumerations
+  needing EXTENDING. The prior-review lens caught it, and a positive sweep then
+  found five stranded lists, not the three it reported — `@description`'s
+  component enumeration, `@details`'s loading structure, and three vignette
+  passages (the four-pieces sentence, the population description, the
+  components-are-isolated list). All five fixed. The guard was strengthened from
+  presence to COMPLETENESS: it now slices the description's own enumeration and
+  requires the block member inside it, and deleting that member reddens the
+  suite (verified by mutation). `M63 T9 (AC7)` now 8 assertions.
+  Fourth recurrence of the M56/M62 lesson; the LESSONS line is updated to name
+  the asymmetry rather than repeat the general warning.
+- AC8 — `devtools::check(manual = TRUE)`: 0 errors, 0 warnings, 0 notes, with
+  `checking tests ... OK` (431s, not SKIPPED) and `checking PDF version of
+  manual ... OK` both confirmed present in the log.
+
+**Independent review — three lenses + scorer.** Five findings; three actioned
+(scored 92/90/90), two below the 80 threshold and logged.
+
+- **F1 (92) — the corrected conditional's *condition* was itself wrong. FIXED.**
+  The shipped rule said ξ1 is unaffected "when each block draws about evenly
+  from around the circle". Disproved: blocks pairing diametrically opposite
+  scales are maximally dispersed — every block's angles average to the circle's
+  centre, mean resultant length 0 — yet at eight scales ξ1 comes back 9% BELOW
+  truth. Even spread is not the test; carrying information about angular
+  distance is. Rewritten in roxygen, vignette and NEWS around the case that is
+  actually safe and checkable (each block draws one item from every scale), with
+  the counterexample stated. M63-D2's derivation was right; the plain-language
+  gloss put on it was not.
+- **F2 (90) — a worked example true only at k = 4. FIXED.** The docs offered
+  opposite-scale blocks as a map the rank check refuses. That holds at four
+  scales; at six, eight and twelve it is identified — and eight is this
+  package's canonical layout, so the example was wrong exactly where most users
+  are. Example removed; the behaviour is pinned by test instead.
+- **F3 (90) — "ξ2 is inflated in every configuration" overstated. FIXED.** A
+  layout exists whose ξ2 bias is exactly zero (auxiliary intercept coefficient
+  0 to float precision) while ξ1 carries −0.25·ζ2. Now "inflated under most
+  layouts, never deflated".
+- **F4 (58, below threshold — fixed anyway).** `axes_is_boundary()`'s header
+  still read "Four disjuncts … the remaining two" after M63 added a fifth.
+  Actioned despite the score because it is a factual error in a comment on code
+  this milestone changed and the fix is one line.
+- **F5 (52, below threshold — not actioned).** Supplying blocks that don't
+  identify ζ2 is invisible on `print()`/`summary()`. The scorer's own check
+  weakened it: `zeta1_fitted` behaves identically and has since M61, so the
+  silent drop is the established precedent the plan asked for, not a deviation.
+
+Three tests were added to fence the **condition** rather than instances of it —
+the earlier AC4 test exercised only crossed and contiguous layouts, so restating
+the rule wrongly reddened nothing. Reinstating either false claim now reddens
+the suite (verified by mutation). Test count 20 → 23, assertions 120 → 137.
+
+**Consistency gate.** `cairn_validate` exit 0, all 16 checks PASS (two
+advisories, neither a gate failure: M63's 8 criteria over the 7 tripwire, and
+M7's 47 legacy hard-wrapped work-log lines). No principle change, so
+`cairn_impact` does not apply. Profile `consistency-gate` slot: `document()`
+produces no diff; generated files consistent; README current; NEWS carries the
+user-visible entry with no milestone numbers; no new top-level files;
+`pkgdown::check_pkgdown()` reports no problems.

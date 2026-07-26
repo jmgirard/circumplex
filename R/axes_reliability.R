@@ -365,7 +365,7 @@ axes_converged <- function(fit) {
 
 # Whether a fit landed on a boundary -- not a usable solution, so the caller
 # NAs the reliability and SEm rather than reporting a clipped, negative, or
-# imaginary value (RR09 BC11). Four disjuncts, and the first two bracket the
+# imaginary value (RR09 BC11). Five disjuncts, and the first two bracket the
 # axes variance on both sides:
 #
 #   xi1 <= 0  the axes carry no variance, so there is nothing to be reliable.
@@ -388,7 +388,8 @@ axes_converged <- function(fit) {
 #             would close the float gap, at the cost of a per-axis predicate;
 #             the sweep test pins the current behavior either way.
 #
-# The remaining two catch any negative estimated variance. zeta1 is NULL on the
+# The remaining three catch any negative estimated variance -- zeta1, zeta2, and
+# the item errors. zeta1 is NULL on the
 # zeta1-dropped path (M61), and NULL-ness is the same source of truth
 # axes_fits_zeta1() gives the caller -- passing a separate flag alongside it
 # would let the two disagree.
@@ -613,18 +614,21 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' circumplex axes of an instrument with the item-level restricted
 #' tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The model
 #' decomposes each item's variance into orthogonal components -- a general
-#' factor, the two circumplex axes, scale specificity, and item specificity --
-#' and reads the axes' reliability off the isolated axes-variance component with
+#' factor, the two circumplex axes, scale specificity, block specificity for a
+#' blockwise instrument, and item specificity -- and reads the axes'
+#' reliability off the isolated axes-variance component with
 #' the Spearman-Brown formula. It is a confirmatory, item-level complement to
 #' [fit_structure()]'s exploratory scale-level criteria.
 #'
 #' @details
 #' The model is fit to the item **correlation** matrix (the items are
 #' z-standardized) as a flat fixed-links CFA: every item loads on the two axes
-#' with fixed cosine weights, on a general factor with weight one, and on its
-#' scale's specificity factor with weight one; the two axis variances are held
-#' equal (the circumplex "no preferred rotation" axiom) and every
-#' scale-specificity variance shares one value, while item errors stay free
+#' with fixed cosine weights, on a general factor with weight one, on its
+#' scale's specificity factor with weight one, and -- when `blocks` are supplied
+#' and identified -- on its block's specificity factor with weight one; the two
+#' axis variances are held equal (the circumplex "no preferred rotation" axiom),
+#' every scale-specificity variance shares one value and every
+#' block-specificity variance shares one value, while item errors stay free
 #' (tau-equivalent). Only the axes-variance component feeds reliability.
 #'
 #' The Nunnally-Bernstein axis reliability (`nb_reliability`) is reported
@@ -715,21 +719,33 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' component explains nothing the others do not; it is dropped from the model,
 #' `details$zeta2_fitted` is `FALSE`, and the component table keeps its four
 #' rows. That decision is read off the data's own moment structure rather than
-#' a rule of thumb, so a map that looks informative but is not -- blocks pairing
-#' diametrically opposite scales, say -- is caught as well.
+#' from a rule of thumb about how the blocks look, so it also catches maps
+#' whose redundancy is not obvious by eye.
 #'
 #' **What omitting `blocks` costs depends on the block geometry**, and it is not
-#' a uniform penalty. The general factor absorbs block variance in every
-#' configuration, so `xi2` is inflated whenever blocks exist and are ignored.
-#' The axes variance -- the one reliability is read from -- moves only when
-#' blocks are **angularly clustered**, meaning the items sharing a block sit
-#' near one another on the circle. When each block instead draws about evenly
-#' from around the circle, block membership is orthogonal to the axes' cosine
-#' term, and `xi1`, the reliability, and the SEm are unaffected. Between those
-#' extremes the bias grows with how strongly block membership tracks angular
-#' proximity, and it can run in either direction. So a blockwise instrument
-#' analyzed without `blocks` gives a trustworthy reliability when its blocks
-#' sample the circle evenly, and an unreliable one when they do not.
+#' a uniform penalty. The general factor never gives block variance back, so
+#' `xi2` is inflated under most layouts and unchanged under a few; it is never
+#' deflated. The axes variance -- the one reliability is read from -- moves only
+#' when block membership carries information about the angular distance between
+#' items, over and above what sharing a scale already says.
+#'
+#' The clean case is worth stating exactly, because it is both common and
+#' checkable: **when each block draws exactly one item from every scale**, every
+#' within-block pair is a different-scale pair and the blocks span every pair of
+#' scale positions equally often. Block membership then says nothing about
+#' angular distance, and `xi1`, the reliability, and the SEm are unaffected --
+#' the component is worth estimating for its own sake, but ignoring it costs the
+#' reliability nothing.
+#'
+#' Away from that case the bias runs in either direction and **"the blocks are
+#' spread evenly around the circle" is not the test.** Blocks that pair
+#' diametrically opposite scales are as dispersed as a block can be -- their
+#' angles average to the centre of the circle -- and at eight scales they still
+#' pull `xi1` about 9% below truth, because every within-block pair sits half a
+#' turn apart and that is emphatically information about angular distance.
+#' Blocks covering contiguous arcs pull it the other way, about 12% above. When
+#' the blocks are neither one item per scale nor obviously arbitrary, estimate
+#' the component rather than reasoning about the geometry.
 #'
 #' @param data A data frame (or matrix) containing the circumplex items. Supply
 #'   exactly one of `data` or `cormat`.

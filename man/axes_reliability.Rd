@@ -73,18 +73,21 @@ Estimate the reliability (and standard error of measurement) of the two
 circumplex axes of an instrument with the item-level restricted
 tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The model
 decomposes each item's variance into orthogonal components -- a general
-factor, the two circumplex axes, scale specificity, and item specificity --
-and reads the axes' reliability off the isolated axes-variance component with
+factor, the two circumplex axes, scale specificity, block specificity for a
+blockwise instrument, and item specificity -- and reads the axes'
+reliability off the isolated axes-variance component with
 the Spearman-Brown formula. It is a confirmatory, item-level complement to
 \code{\link[=fit_structure]{fit_structure()}}'s exploratory scale-level criteria.
 }
 \details{
 The model is fit to the item \strong{correlation} matrix (the items are
 z-standardized) as a flat fixed-links CFA: every item loads on the two axes
-with fixed cosine weights, on a general factor with weight one, and on its
-scale's specificity factor with weight one; the two axis variances are held
-equal (the circumplex "no preferred rotation" axiom) and every
-scale-specificity variance shares one value, while item errors stay free
+with fixed cosine weights, on a general factor with weight one, on its
+scale's specificity factor with weight one, and -- when \code{blocks} are supplied
+and identified -- on its block's specificity factor with weight one; the two
+axis variances are held equal (the circumplex "no preferred rotation" axiom),
+every scale-specificity variance shares one value and every
+block-specificity variance shares one value, while item errors stay free
 (tau-equivalent). Only the axes-variance component feeds reliability.
 
 The Nunnally-Bernstein axis reliability (\code{nb_reliability}) is reported
@@ -174,21 +177,33 @@ all items share one block, or every item sits in its own block, the
 component explains nothing the others do not; it is dropped from the model,
 \code{details$zeta2_fitted} is \code{FALSE}, and the component table keeps its four
 rows. That decision is read off the data's own moment structure rather than
-a rule of thumb, so a map that looks informative but is not -- blocks pairing
-diametrically opposite scales, say -- is caught as well.
+from a rule of thumb about how the blocks look, so it also catches maps
+whose redundancy is not obvious by eye.
 
 \strong{What omitting \code{blocks} costs depends on the block geometry}, and it is not
-a uniform penalty. The general factor absorbs block variance in every
-configuration, so \code{xi2} is inflated whenever blocks exist and are ignored.
-The axes variance -- the one reliability is read from -- moves only when
-blocks are \strong{angularly clustered}, meaning the items sharing a block sit
-near one another on the circle. When each block instead draws about evenly
-from around the circle, block membership is orthogonal to the axes' cosine
-term, and \code{xi1}, the reliability, and the SEm are unaffected. Between those
-extremes the bias grows with how strongly block membership tracks angular
-proximity, and it can run in either direction. So a blockwise instrument
-analyzed without \code{blocks} gives a trustworthy reliability when its blocks
-sample the circle evenly, and an unreliable one when they do not.
+a uniform penalty. The general factor never gives block variance back, so
+\code{xi2} is inflated under most layouts and unchanged under a few; it is never
+deflated. The axes variance -- the one reliability is read from -- moves only
+when block membership carries information about the angular distance between
+items, over and above what sharing a scale already says.
+
+The clean case is worth stating exactly, because it is both common and
+checkable: \strong{when each block draws exactly one item from every scale}, every
+within-block pair is a different-scale pair and the blocks span every pair of
+scale positions equally often. Block membership then says nothing about
+angular distance, and \code{xi1}, the reliability, and the SEm are unaffected --
+the component is worth estimating for its own sake, but ignoring it costs the
+reliability nothing.
+
+Away from that case the bias runs in either direction and \strong{"the blocks are
+spread evenly around the circle" is not the test.} Blocks that pair
+diametrically opposite scales are as dispersed as a block can be -- their
+angles average to the centre of the circle -- and at eight scales they still
+pull \code{xi1} about 9\% below truth, because every within-block pair sits half a
+turn apart and that is emphatically information about angular distance.
+Blocks covering contiguous arcs pull it the other way, about 12\% above. When
+the blocks are neither one item per scale nor obviously arbitrary, estimate
+the component rather than reasoning about the geometry.
 }
 
 \examples{

@@ -172,10 +172,13 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   for everything, or one block per item) leave the component unidentified, and
   it is dropped with `details$zeta2_fitted` recording that, as scale
   specificity is on a single-item instrument. Whether ignoring real blocks
-  matters depends on their geometry: the general factor absorbs block variance
-  in every configuration, but the axes variance — and so the reliability —
-  moves only when the items sharing a block sit near one another on the circle,
-  and is unaffected when each block samples the circle evenly. Estimation works either from raw item data or, through
+  matters depends on their geometry: the general factor is inflated under most
+  layouts and never deflated, while the axes variance — and so the reliability
+  — moves only when block membership carries information about the angular
+  distance between items. When each block draws exactly one item from every
+  scale it carries none, and the reliability is unaffected; other layouts bias
+  it in either direction, and being evenly spread around the circle is not
+  sufficient for safety. Estimation works either from raw item data or, through
   `cormat` and `n`, from a published item correlation matrix alone, for
   reanalyzing a matrix whose raw data is not available; on that path the
   Nunnally-Bernstein comparison is reported as `NA` and `sd = "raw"` is refused,

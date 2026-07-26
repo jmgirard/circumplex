@@ -2555,6 +2555,92 @@ test_that("M63 T7 (AC4): the omitted-zeta2 bias in xi1 is conditional on geometr
   }
 })
 
+test_that("M63 review: even angular spread does NOT make omitting zeta2 safe", {
+  skip_if_not_installed("lavaan")
+  # The review counterexample to the FIRST wording of this milestone's own
+  # conditional. That wording said xi1 was unaffected when "each block draws
+  # about evenly from around the circle", which is false: blocks pairing
+  # diametrically opposite scales are maximally dispersed -- every block's
+  # angles average to the centre of the circle, mean resultant length 0 -- and
+  # still bias xi1, because every within-block pair sits half a turn apart and
+  # that IS information about angular distance.
+  #
+  # This test fences the CONDITION, not two instances of it: the earlier AC4
+  # test exercises only crossed and contiguous layouts, so restating the rule
+  # wrongly reddened nothing. Here an even-spread layout is asserted to be
+  # UNSAFE, which is exactly what the false rule denied.
+  ang <- octants()
+  k <- 2L
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+  item_scale <- rep(seq_along(ang), each = k)
+  item_angle <- rep(ang, each = k)
+  antipodal <- ((item_scale - 1L) %% 4L) + 1L   # pairs each scale with its opposite
+
+  # Every block is maximally dispersed: its angles average to the circle centre.
+  for (b in unique(antipodal)) {
+    th <- item_angle[antipodal == b] * pi / 180
+    mrl <- Mod(mean(complex(real = cos(th), imaginary = sin(th))))
+    expect_lt(mrl, 1e-12)
+  }
+  # ...and it is identified, so this is a real fit and not a dropped component.
+  expect_true(axes_fits_zeta2(item_angle, item_scale, antipodal))
+
+  px <- axes_zeta2_pop(ang, k, truth, antipodal)
+  naive <- axes_pop_fit_components(px$sigma, px$items, ang, item_block = NULL)
+  bias <- naive[["xi1"]] - truth[["xi1"]]
+  # Biased DOWNWARD by ~9% of truth -- opposite in sign to the contiguous case,
+  # which is why "it can go either way" is the honest statement.
+  expect_lt(bias, -.05 * truth[["xi1"]])
+  # And the component recovers truth when it IS fitted, so the bias is the
+  # omission's doing rather than a misspecified population.
+  full <- axes_pop_fit_components(px$sigma, px$items, ang, antipodal)
+  expect_lt(abs(full[["xi1"]] - truth[["xi1"]]), 1e-4)
+
+  # The one layout the docs DO promise is safe: one item per scale per block.
+  safe <- axes_crossed_blocks(length(ang), k)
+  px_s <- axes_zeta2_pop(ang, k, truth, safe)
+  naive_s <- axes_pop_fit_components(px_s$sigma, px_s$items, ang,
+                                     item_block = NULL)
+  expect_lt(abs(naive_s[["xi1"]] - truth[["xi1"]]), 1e-4)
+})
+
+test_that("M63 review: opposite-scale blocks are identified except at k = 4", {
+  # The docs originally offered opposite-scale blocks as an example of a map
+  # the rank check REFUSES. That holds only at four scales, where same-block
+  # equals -cos exactly; at six, eight and twelve the pairing is identified.
+  # Eight is this package's canonical layout, so the example was wrong exactly
+  # where most users live. Pinned so the claim cannot be reinstated.
+  for (kk in c(6L, 8L, 12L)) {
+    a <- seq(0, 360 - 360 / kk, length.out = kk)
+    s <- rep(seq_len(kk), each = 2L)
+    expect_true(axes_fits_zeta2(rep(a, each = 2L), s,
+                                ((s - 1L) %% (kk / 2L)) + 1L))
+  }
+  # k = 4 remains the genuine collinear case (the T2 test above covers why).
+  expect_false(axes_fits_zeta2(rep(c(0, 90, 180, 270), each = 2L),
+                               rep(1:4, each = 2L),
+                               ((rep(1:4, each = 2L) - 1L) %% 2L) + 1L))
+})
+
+test_that("M63 review: xi2 inflation is not unconditional", {
+  # The shipped prose said the general factor absorbs block variance "in every
+  # configuration". It does not: this layout leaves xi2 exactly untouched while
+  # xi1 carries -0.25 * zeta2. Corrected to "inflated under most layouts,
+  # never deflated" -- and pinned here so the stronger claim cannot return.
+  ang <- c(0, 90, 180, 270)
+  k <- 2L
+  item_scale <- rep(seq_along(ang), each = k)
+  item_angle <- rep(ang, each = k)
+  blk <- c(1L, 2L, 4L, 4L, 2L, 1L, 3L, 3L)
+  X <- axes_design(item_angle, item_scale)
+  ut <- upper.tri(matrix(0, length(item_scale), length(item_scale)))
+  aux <- qr.solve(X, as.numeric(outer(blk, blk, `==`)[ut]))
+  # Intercept coefficient exactly zero -> zero xi2 bias at any zeta2.
+  expect_lt(abs(aux[[1]]), 1e-10)
+  # while the cosine coefficient is emphatically not zero.
+  expect_gt(abs(aux[[2]]), .2)
+})
+
 test_that("M63 T7 (AC4): closed-form omitted-variable bias predicts the fitted bias", {
   skip_if_not_installed("lavaan")
   # An independent route to the same number, so the conditional above rests on
@@ -2745,12 +2831,34 @@ test_that("M63 T9 (AC7): every documented surface names the block component", {
   expect_match(rd, "zeta1_fitted} and \\code{zeta2_fitted}", fixed = TRUE)
   # The @return enumerates the component-row counts, and five is now reachable.
   expect_match(rd, "five when block", fixed = TRUE)
+
+  # COMPLETENESS, not just presence. The first version of this guard asserted
+  # only that the new text existed, and review caught two enumerations of the
+  # component set that still listed four members -- the M56/M62 "widening a
+  # definition strands its other descriptions" lesson, fourth recurrence. The
+  # asymmetry is the trap: a sweep for the OLD claim's keywords finds stale
+  # negative claims to delete, and is blind to positive lists that need
+  # EXTENDING. So pin the description's own enumeration: it runs from the
+  # general factor to item specificity, and block specificity must sit inside
+  # it. Deleting the member from that sentence reddens this.
+  desc <- sub(".*decomposes each item's variance into orthogonal components",
+              "", rd)
+  desc <- sub("and reads the axes.*", "", desc)
+  expect_match(desc, "block specificity", fixed = TRUE)
   # The corrected conditional replaced the unconditional caveat: the claim that
   # block variance deflates the axes share unconditionally is FALSE for an
   # angle-balanced layout (M63-D2) and must not have survived anywhere.
   expect_false(grepl("treat axes reliability from a blockwise", rd,
                      fixed = TRUE))
-  expect_match(rd, "angularly clustered", fixed = TRUE)
+  # The corrected condition (review F1). The docs must state the safe case as
+  # one-item-per-scale, NOT as "spread evenly around the circle", which review
+  # disproved with a maximally-dispersed counterexample that still biases xi1.
+  expect_match(rd, "one item from every scale", fixed = TRUE)
+  # And the disproved framing must not come back in either of its two forms:
+  # the "angularly clustered" safety rule, or the k=4-only worked example that
+  # claimed opposite-scale blocks are refused.
+  expect_false(grepl("angularly clustered", rd, fixed = TRUE))
+  expect_false(grepl("diametrically opposite scales, say", rd, fixed = TRUE))
 
   # print()/summary() render the components table generically, so the new row
   # must reach the console without either method enumerating components itself.
