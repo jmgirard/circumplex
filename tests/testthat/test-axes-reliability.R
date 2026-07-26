@@ -1325,3 +1325,59 @@ test_that("M61 T1: the >= 2-items refusal is the only gate refusing a single-ite
   expect_identical(length(fx$items), 16L)
   expect_true(all(lengths(fx$items) == 1L))
 })
+
+test_that("M61 T2: axes_fits_zeta1() reads the drop rule off the item map", {
+  # The rule is "at least one scale carries a PAIR", not "every scale does" --
+  # a mixed map still fits zeta1 because one multi-item scale supplies the
+  # off-diagonal moment and the shared label carries it to the rest.
+  expect_true(axes_fits_zeta1(list(c("a", "b"), c("c", "d"))))
+  expect_true(axes_fits_zeta1(list(c("a", "b"), "c", "d", "e")))  # mixed
+  expect_false(axes_fits_zeta1(list("a", "b", "c", "d")))         # all single
+  # A zero-item scale is not a pair either; it must not be read as one.
+  expect_false(axes_fits_zeta1(list(character(0), "b", "c", "d")))
+})
+
+test_that("M61 T2: axes_syntax() drops the SS latents exactly on the single-item map", {
+  ang4 <- c(0, 90, 180, 270)
+  single <- list("i1", "i2", "i3", "i4")
+  mixed <- list(c("i1", "i2"), "i3", "i4", "i5")
+
+  syn_s <- axes_syntax(single, ang4)
+  # No scale-specificity anywhere: no SS latent definitions, no zeta1 label.
+  expect_false(grepl("SS1", syn_s, fixed = TRUE))
+  expect_false(grepl("zeta1", syn_s, fixed = TRUE))
+  expect_true(grepl("no scale-specificity component", syn_s, fixed = TRUE))
+  # The rest of the model is untouched: both axes, the general factor, and the
+  # shared xi1 label all survive the drop.
+  expect_true(grepl("AX ~~ xi1*AX", syn_s, fixed = TRUE))
+  expect_true(grepl("AY ~~ xi1*AY", syn_s, fixed = TRUE))
+  expect_true(grepl("GEN ~~ xi2*GEN", syn_s, fixed = TRUE))
+
+  # The mixed map keeps zeta1 -- and keeps an SS latent for the SINGLE-item
+  # scales too, since the shared-label restriction is what identifies them.
+  syn_m <- axes_syntax(mixed, ang4)
+  expect_true(grepl("SS1 =~ 1*i1 + 1*i2", syn_m, fixed = TRUE))
+  expect_true(grepl("SS2 =~ 1*i3", syn_m, fixed = TRUE))
+  expect_true(grepl("SS4 ~~ zeta1*SS4", syn_m, fixed = TRUE))
+})
+
+test_that("M61 T2: a seed without zeta1 emits no modifier rather than erroring", {
+  ang4 <- c(0, 90, 180, 270)
+  # The two-column OLS shadow (T3) returns a seed with no `zeta1` element.
+  # `start[["zeta1"]]` on that vector is a subscript error, not a NULL, so the
+  # lookup must test for the name -- this is the fence on that.
+  seed2 <- c(xi2 = .05, xi1 = .20)
+  syn <- expect_no_error(axes_syntax(list("i1", "i2", "i3", "i4"), ang4,
+                                     start = seed2))
+  # fmt() prints a double at full precision, so match the value's leading
+  # digits rather than pinning its digit count -- the assertion is about WHICH
+  # parameters get a modifier, not about how fmt() formats.
+  expect_match(syn, "AX ~~ start\\(0\\.2[0-9]*\\)\\*xi1\\*AX")
+  expect_match(syn, "GEN ~~ start\\(0\\.05[0-9]*\\)\\*xi2\\*GEN")
+  expect_false(grepl("zeta1", syn, fixed = TRUE))
+
+  # A full three-element seed still seeds all three on the zeta1-fitted path.
+  syn3 <- axes_syntax(list(c("i1", "i2"), "i3", "i4", "i5"), ang4,
+                      start = c(xi2 = .05, xi1 = .20, zeta1 = .08))
+  expect_match(syn3, "SS1 ~~ start\\(0\\.08[0-9]*\\)\\*zeta1\\*SS1")
+})

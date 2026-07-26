@@ -110,7 +110,7 @@ refused; the equal-spacing relaxation itself → M60.
 Line refs are post-M60: `R/axes_reliability.R`, or `test-` = `tests/testthat/test-axes-reliability.R`.
 
 - [x] T1: tests first — a single-item configuration currently errors at the ≥ 2-items refusal (`:609`); pin that fence and `cronbach_alpha()`'s `NaN` at `m = 1`.
-- [ ] T2: the drop predicate + `axes_syntax()` (`:125-172`) — latent names, measurement and variance blocks, and the `st()` start lookup, which must emit no modifier rather than a `NULL` start.
+- [x] T2: the drop predicate + `axes_syntax()` (`:125-172`) — latent names, measurement and variance blocks, and the `st()` start lookup, which must emit no modifier rather than a `NULL` start.
 - [ ] T3: two-column OLS shadow (`:182-192`) when no same-scale pair exists; the seed drops `zeta1` (consumed `:718`, stored `:856`).
 - [ ] T4: generalize the `SS1` extractions (`:745`, `:842`), the boundary test (`:751`) and the four-row components frame (`:838-844`) to a variable-length component set.
 - [ ] T5: N–B `NA`-with-reason (`:802-826`) plus the print/summary message (`R/axes_reliability_oop.R:102-110`).
@@ -130,6 +130,8 @@ Line refs are post-M60: `R/axes_reliability.R`, or `test-` = `tests/testthat/tes
 - 2026-07-26: RB11/RR11 archived; AC block compressed in one pass to fit the ingested criteria — Scope condensed and Tasks re-pointed to post-M60 line numbers (the plan's refs were pre-M60 and stale). Plan-owned body 149/149.
 
 - 2026-07-26: T1 done — two characterization tests pin `cronbach_alpha()`'s `NaN` at `m = 1` (the arithmetic M61-D1 rests on) and pin that the ≥ 2-items line is the *only* gate refusing a 16-position single-item COC-shaped set, so T6's relaxation shows up in the diff. `devtools::test()` clean.
+
+- 2026-07-26: T2 done — `axes_fits_zeta1()` (any scale with ≥ 2 items) is the single source of the drop decision; `axes_syntax()` omits the SS latents and the `zeta1` label on the all-single-item map and keeps them for a mixed one, including the single-item scales' own SS latents, which the shared label identifies. The `st()` start lookup now tests the key by name — a two-element seed emits no modifier rather than a subscript error. Full `devtools::test()` clean (3772 pass, 0 fail).
 
 ## Decisions
 

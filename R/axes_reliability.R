@@ -101,6 +101,22 @@ axis_sem <- function(rel, sd = 1) {
 
 # --- The restricted tau-equivalent CFA (the lavaan constraint set) ------------
 
+# Whether the scale-specificity component zeta1 is identified for this item map:
+# exactly when at least one scale carries two items. A same-scale item PAIR is
+# the only place zeta1 appears in a moment the model fits -- r_ij carries
+# zeta1*[scale_i == scale_j], and i == j is the unit diagonal, not a fitted
+# off-diagonal -- so with one item at every position zeta1 is perfectly
+# confounded with the item residuals and the OLS shadow's same-scale design
+# column is all zeros. Strack et al. (2013) drop it on exactly this condition:
+# Table 3 (p. 7) prints "--" for scale-specificity on the single-item types e
+# and f. A MIXED map still fits it: one multi-item scale supplies the pair, and
+# the shared-label restriction carries the estimate to the single-item scales.
+#
+# Inferred from the item map rather than threaded as an argument (M61 gate,
+# 2026-07-26), so the emitted syntax and the reported component set can never
+# disagree about whether zeta1 was fitted.
+axes_fits_zeta1 <- function(items) any(lengths(items) >= 2L)
+
 # Emit lavaan syntax for the flat fixed-links item-level model (Strack et al.
 # 2013, Figure 2; spec devel/m53-axes-reliability-spec.md section 2).
 #
@@ -126,7 +142,11 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
   th <- as.numeric(angles_deg) * pi / 180
   wx <- snap_trig(cos(th))
   wy <- snap_trig(sin(th))
-  ss <- sprintf("SS%d", seq_along(items))
+  # Scale-specificity is emitted only where it is identified (M61); with one
+  # item at every position the SS latents and their shared zeta1 label are
+  # dropped from the model entirely rather than fitted to the diagonal.
+  fit_zeta1 <- axes_fits_zeta1(items)
+  ss <- if (fit_zeta1) sprintf("SS%d", seq_along(items)) else character(0)
 
   # One fixed loading term "w*item" per item; scales whose weight snaps to 0
   # (a pole scale on the orthogonal axis) contribute no term to that axis.
@@ -141,9 +161,13 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
   # Optional start values (the OLS-shadow seed): a `start(v)*` modifier on each
   # variance, floored positive so the optimizer starts inside the parameter
   # space (start values seed, never constrain -- a boundary estimate can still
-  # go non-positive). No modifier when `start` is NULL (lavaan's own defaults).
+  # go non-positive). No modifier when `start` is NULL (lavaan's own defaults),
+  # and none when the seed simply lacks the key: the two-column OLS shadow of
+  # the zeta1-dropped path returns no `zeta1` element, and `start[["zeta1"]]` on
+  # a vector without that name is an error, not a NULL (M61 T2).
   st <- function(key) {
-    if (is.null(start)) "" else sprintf("start(%s)*", fmt(max(start[[key]], 0.01)))
+    if (is.null(start) || !key %in% names(start)) return("")
+    sprintf("start(%s)*", fmt(max(start[[key]], 0.01)))
   }
 
   lines <- c(
@@ -153,20 +177,30 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
     paste("AX =~", paste(load_terms(wx), collapse = " + ")),
     paste("AY =~", paste(load_terms(wy), collapse = " + ")),
     paste("GEN =~", paste(unit_terms(unlist(items)), collapse = " + ")),
-    vapply(
-      seq_along(items),
-      function(s) paste(ss[[s]], "=~", paste(unit_terms(items[[s]]), collapse = " + ")),
-      character(1)
-    ),
+    if (fit_zeta1) {
+      vapply(
+        seq_along(items),
+        function(s) paste(ss[[s]], "=~", paste(unit_terms(items[[s]]), collapse = " + ")),
+        character(1)
+      )
+    },
     "",
     "# equal axis variances (xi1), free general variance (xi2)",
     paste0("AX ~~ ", st("xi1"), "xi1*AX"),
     paste0("AY ~~ ", st("xi1"), "xi1*AY"),
     paste0("GEN ~~ ", st("xi2"), "xi2*GEN"),
     "",
-    "# shared scale-specificity variance (zeta1); errors free (tau-equivalent)",
-    vapply(ss, function(s) paste0(s, " ~~ ", st("zeta1"), "zeta1*", s),
-           character(1))
+    if (fit_zeta1) {
+      c(
+        "# shared scale-specificity variance (zeta1); errors free (tau-equivalent)",
+        vapply(ss, function(s) paste0(s, " ~~ ", st("zeta1"), "zeta1*", s),
+               character(1))
+      )
+    } else {
+      # One item per scale position: zeta1 is unidentified and is dropped from
+      # the model rather than fitted (Strack's types e and f). Errors stay free.
+      "# no scale-specificity component (one item per position); errors free"
+    }
   )
   paste(lines, collapse = "\n")
 }
