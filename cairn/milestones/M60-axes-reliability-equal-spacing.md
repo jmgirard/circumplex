@@ -94,7 +94,7 @@ any rotation, instead of only the canonical octant set.
       at the pole and against near-miss spacings.
 - [x] T3: replace the refusal block with count / spacing / duplicate checks and
       informative messages; keep the ≥ 2-items-per-scale gate.
-- [ ] T4: rotation-invariance tests for `axis_item_n()`
+- [x] T4: rotation-invariance tests for `axis_item_n()`
       (`R/axes_reliability.R:31-34`) — `n × k/2`; keep the exact-equality octant
       assertion at `test-axes-reliability.R:5` exact, since exactness there is
       an octant accident (16 scales at 22.5° measured `y = 31.999999999999996`).
@@ -115,9 +115,12 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: T1 fence added (4 test blocks, rotated/k!=8/refusals/pole); red for the right reason — the octant-only refusals at :485-506, not an incidental error. Suite stays red by design until T3.
 - 2026-07-25: T2 `angles_spacing_status()` (modular, tol = 1e-8 = float noise only) + 15 unit assertions incl. k = 4:24 at two rotations; T3 wired it into the refuse contract and re-pointed the three stale BC12 message expectations. Suite green (232).
 - 2026-07-25: mutation-tested the 5 guards. 4 had teeth (floor→3: 1 fail; tol 1e-8→0.5: 3; skip duplicate: 6; accept any spacing: 7). The `%% 360` reduction did NOT redden — for in-range sets the wrap term compensates; it bites only on angles outside [0, 360), now asserted (`c(10, 100, 190, 640)`), and the mutation reddens. Full suite 3394 pass / 0 fail; the 4 warnings are pre-existing in test-ci_accuracy.R.
+- 2026-07-25: T4 item_n = n*k/2 pinned over k = 4:16 x 4 rotations x 3 item counts, plus an unbalanced set giving legitimately unequal per-axis values; stale octant-only comment on axis_item_n() corrected.
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 
 ## Decisions
+
+- 2026-07-25 (T4): non-octant item_n is compared with a tolerance set from discrimination (1e-8 absolute; one item = 1.0, so it fences at 1e8x and sits ~6 orders above the ~1e-14 float noise). The octant `expect_identical()` in BC3 stays exact — exactness there is a real property of that set, not an artifact to weaken.
 
 - 2026-07-25 (T2): the wrap-around gap in `angles_spacing_status()` is kept for symmetry with the modular reading but is NOT load-bearing — all gaps sum to 360, so k-1 interior gaps of 360/k force it. Mutation-verified: removing the term changes no test. The comment says so rather than claiming a mechanism it does not have (M36).
 

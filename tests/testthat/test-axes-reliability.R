@@ -1114,3 +1114,34 @@ test_that("M60: angles_spacing_status() classifies at the pole and near-misses",
   expect_identical(angles_spacing_status((0:6) * (360 / 7)), "ok")
   expect_identical(angles_spacing_status((0:8) * (360 / 9) + 123.456), "ok")
 })
+
+test_that("M60: per-axis item_n is n * k/2 at any rotation", {
+  # The tolerance is set from the DISCRIMINATION required, not from what this
+  # machine prints (M59): the smallest error that could matter is one item, so
+  # item_n = 1.0, and 1e-8 fences that at 1e8x while sitting ~6 orders above
+  # the ~1e-14 float noise these sums actually carry.
+  tol <- 1e-8
+  for (k in 4:16) {
+    for (rot in c(0, 22.5, 17.3, 180)) {
+      ang <- (seq_len(k) - 1L) * (360 / k) + rot
+      for (n in c(1L, 2L, 5L)) {
+        inn <- axis_item_n(ang, n)
+        expect_equal(inn[["x"]], n * k / 2, tolerance = tol,
+                     label = sprintf("k=%d rot=%s n=%d x", k, rot, n))
+        expect_equal(inn[["y"]], n * k / 2, tolerance = tol,
+                     label = sprintf("k=%d rot=%s n=%d y", k, rot, n))
+      }
+    }
+  }
+
+  # The octant set stays EXACT -- BC3 above asserts expect_identical() on it,
+  # and that must not be weakened just because rotated sets need a tolerance.
+  expect_identical(axis_item_n(octants(), 4L), c(x = 16, y = 16))
+
+  # An unbalanced set legitimately gives different item_n per axis, and a
+  # fractional value (the SYMLOG shape, Table 3 col. 10 = 8.67). Nothing here
+  # rounds or forces the two axes to agree.
+  unb <- axis_item_n(c(0, 90, 180, 270), c(3L, 1L, 3L, 1L))
+  expect_equal(unb[["x"]], 6, tolerance = tol)
+  expect_equal(unb[["y"]], 2, tolerance = tol)
+})

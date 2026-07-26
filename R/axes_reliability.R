@@ -55,11 +55,20 @@ angles_spacing_status <- function(angles_deg, tol = 1e-8) {
 
 # Per-axis effective test length item_n = sum of squared item weights
 # (Strack et al. 2013, Table 3 col. 10; the Spearman-Brown composite length).
-# Balanced octant instruments give exact integers after snapping -- 64-item ->
-# 32, 32 -> 16, 16 -> 8 -- equal across axes, because the +/-.7071 weights'
-# float error cancels over a full octant set. Computed per axis so unbalanced
-# and deferred non-octant types degrade gracefully (Table 3 col. 10 is per axis
-# and fractional for SYMLOG).
+#
+# For a balanced set of k equally spaced scales carrying n items each, both axes
+# get item_n = n * k/2 at ANY rotation, because sum(cos^2) over k equally spaced
+# angles is k/2 independently of where the set starts (k >= 3). That identity is
+# what keeps the model's equal-axis-variance restriction -- the circumplex
+# "no preferred rotation" axiom, p. 4 -- as substantively innocuous for a
+# rotated or non-octant set as it is for the canonical octants (M60).
+#
+# Exactness, however, is an octant accident: octant sets give exact integers
+# because the +/-.7071 weights' float error cancels, while 16 scales at 22.5 deg
+# measure (32.000000000000000, 31.999999999999996). Compare non-octant item_n
+# with a tolerance, never expect_identical(). Computed per axis so an unbalanced
+# set degrades gracefully (Table 3 col. 10 is per axis, and fractional for
+# SYMLOG at 8.67).
 axis_item_n <- function(angles_deg, n_items) {
   w <- axis_weights(angles_deg)
   c(x = sum(n_items * w[, "w_x"]^2), y = sum(n_items * w[, "w_y"]^2))
