@@ -1,11 +1,11 @@
 # M63: Blockwise instruments for `axes_reliability()` — the ζ2 component
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m63-axes-reliability-blockwise-zeta2`
 
 ## Goal
 
