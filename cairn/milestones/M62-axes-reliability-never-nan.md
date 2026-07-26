@@ -1,6 +1,6 @@
 # M62: Close `axes_reliability()`'s two never-NaN gaps — ξ1 ≥ 1 and an unvalidated `sd`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -96,7 +96,7 @@ standard error of measurement, by closing the two paths that still can.
       `is.na()`.
 - [x] **T3** — Roxygen for `@param sd` and the `@details` boundary sentence;
       `document()`; confirm `man/` regenerated, never hand-edited.
-- [ ] **T4** — Run the mutation checks for AC3, then the profile's verify slot
+- [x] **T4** — Run the mutation checks for AC3, then the profile's verify slot
       and the full `check(manual = TRUE)`, grepping the log for the PDF-manual
       line by name rather than trusting `Status: OK`.
 
@@ -109,6 +109,8 @@ standard error of measurement, by closing the two paths that still can.
 - 2026-07-26: T1 done. Boundary expression extracted to `axes_is_boundary(xi1, xi2, zeta1, eps)` with the `xi1 >= 1` disjunct added; the caller now reads the seam and its warning names "an axes variance outside (0, 1)". `zeta1`'s NULL-ness replaces the separate `fit_zeta1` flag — one source of truth for whether the component was fitted, and behaviorally identical on both paths (enumerated in the test rather than assumed, per the M60 lesson on generalizing a gate). Three tests added: the predicate across the new and every shipped case incl. both ζ1-dropped branches; a swept property test that no admitted ξ1 yields a non-finite or non-positive SEm across item_n ∈ {2, 2.5, 26/3, 16, 32}; and an end-to-end NA-not-NaN test via `local_mocked_bindings(axes_is_boundary=)`, the seam pattern `axes_converged` already uses. **AC3 first half: mutation-verified** — deleting the `xi1 >= 1` disjunct reddens `test-axes-reliability.R:463` and `:464`; code restored and re-run green. Two defects in my own tests caught before the fix landed, both in the wrapper rather than the claim: a `...`-forwarding helper collided on `xi1` ("matched by multiple actual arguments"), and the sweep called the predicate on a length-7 vector, which `||` rejects in R >= 4.3. `devtools::test()`: 0 failures, 3910 passing, 0 skipped; the 4 warnings are the pre-existing test-ci_accuracy.R diagnostics.
 - 2026-07-26: T2 done. Numeric `sd` now refuses non-finite and non-positive values with a message naming the received value; `"std"`, `"raw"`, a positive scalar and a positive length-2 vector are untouched and asserted to return exactly what they returned before. Guarded with `is.finite()`, never `is.na()` — the fourth recurrence of the M32/M35 lesson, and the two `Inf` cases are what pin that choice. Plain logical `NA` was already refused by the existing `stopifnot(is.numeric(sd))`, so the new guard covers `NA_real_`/`NaN`. **AC3 second half: mutation-verified** — deleting the guard block reddens 8 assertions in `test-axes-reliability.R`; restored and re-run green. `devtools::test()`: 0 failures, 3922 passing, 0 skipped, same 4 pre-existing warnings.
 - 2026-07-26: T3 done. `@param sd` states the finite-and-positive requirement; the `@details` boundary sentence now names both sides of the axes-variance bracket and says why each is unusable, in the vignette-prose register rather than by naming ξ1. `document()` regenerated `man/axes_reliability.Rd` only, never hand-edited. Its three `cpm_gradient` link warnings were checked against a stashed clean tree and occur there identically — pre-existing, not introduced here. `test-rd-latex-safe.R` passes on the regenerated Rd (the guard M7 repaired), so the new prose introduces no LaTeX-hostile character. `devtools::test()`: 0 failures, 3922 passing, 0 skipped.
+- 2026-07-26: T4 done; status in-progress→review. Both mutation checks were run at their own tasks and are recorded there (T1: 2 assertions redden; T2: 8), so T4 carried only the full check. `devtools::check(manual = TRUE)`: **Status OK, 0 errors / 0 warnings / 0 notes**, 8m25s. The two steps this repo has learned to verify by name rather than trusting `Status: OK` are both present in the log: `checking PDF version of manual ... OK` and `checking re-building of vignette outputs ... [45s/49s] OK`. Branch is 4 commits over 3 files; PR not opened here — the PR URL is review's slot per the section-ownership table.
+- 2026-07-26: deviation logged — the `r-package` profile's test-doctrine slot says new user-facing conditions use `cli::cli_abort()`, but `cli` is not in Imports and `R/` contains zero `cli_abort()` calls; adopting it would be a unilateral dependency change, which the tracking rules forbid. The new `sd` refusal matches the file's own `stop(..., call. = FALSE)` idiom instead.
 
 ## Decisions
 
