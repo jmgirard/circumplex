@@ -102,7 +102,7 @@ any rotation, instead of only the canonical octant set.
       `cairn/references/strack2013.md` and add the ±.01 sweep test.
 - [x] T6: re-run the population-matrix, synthetic-recovery and cross-engine
       OpenMx cells at a rotated-octant and a k ≠ 8 configuration.
-- [ ] T7: roxygen (`R/axes_reliability.R:316-317,343,395`), `man/` regeneration,
+- [x] T7: roxygen (`R/axes_reliability.R:316-317,343,395`), `man/` regeneration,
       vignette and NEWS.
 - [ ] T8: D-entry for the v2.0.0 admission; full check plus the PDF manual.
 
@@ -118,6 +118,7 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: T4 item_n = n*k/2 pinned over k = 4:16 x 4 rotations x 3 item counts, plus an unbalanced set giving legitimately unequal per-axis values; stale octant-only comment on axis_item_n() corrected.
 - 2026-07-25: T5 banked Table 3's `Type` column + the four type-b (CV-LI) and one type-c (MEIL) rows in `references/strack2013.md`, re-verified in two channels (text layer + 200-dpi page image) agreeing on every value; provenance status re-marked inline. Sweep test added, incl. a discrimination check that the wrong item_n fails it. MEIL's components sum to 74.4 (a second source defect, RR10-corroborated) so it anchors reliability only, never a sum guard.
 - 2026-07-25: T6 Layer-B at 4 new geometries (type-b rotated octants, k=6, k=12, k=5 at a 13.7° rotation): exact population recovery + chisq<1e-6, MC recovery within 2 MCSE at the rotated set, lavaan/OpenMx agreement <1e-3. Also hardened two test helpers whose `split()` on a numeric group vector would misorder scales at k>=10 — a no-op at k=8, and the production path (`axes_resolve_map()`) was already positional and safe.
+- 2026-07-25: T7 docs — new roxygen section "Which instruments this accepts" (equal spacing at any rotation, the k>=4 identification floor, quasi-circumplex refused not approximated), `angles` param doc, man/ regenerated, vignette §6 paragraph, NEWS folded into the existing axes_reliability() bullet per D-031. NAMESPACE unchanged (the helper is internal, so no _pkgdown.yml row is owed). Vignette tail bytes checked clean (M34).
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 
 ## Decisions
