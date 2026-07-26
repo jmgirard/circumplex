@@ -280,6 +280,34 @@ axes_converged <- function(fit) {
   isTRUE(lavaan::lavInspect(fit, "converged"))
 }
 
+# Whether a fit landed on a boundary -- not a usable solution, so the caller
+# NAs the reliability and SEm rather than reporting a clipped, negative, or
+# imaginary value (RR09 BC11). Four disjuncts, and the first two bracket the
+# axes variance on both sides:
+#
+#   xi1 <= 0  the axes carry no variance, so there is nothing to be reliable.
+#   xi1 >= 1  the axes carry ALL of it. Spearman-Brown gives rel > 1 for
+#             xi1 > 1 and exactly 1 at xi1 == 1 (rel > 1 iff xi1 > 1, since
+#             item_n*xi1 > 1 + (item_n - 1)*xi1 reduces to xi1 > 1), and
+#             axis_sem()'s sqrt(1 - rel) then returns NaN or a bare zero.
+#             Included at the closed bound for symmetry with xi1 <= 0: rel == 1
+#             requires zero item-error variance, which is degenerate rather
+#             than perfect. On the correlation metric this needs a grossly
+#             misspecified fit and is not reachable through axes_reliability()
+#             (M62; see the test file's never-NaN block), but the doctrine is
+#             never to emit a NaN, so it is guarded rather than argued away.
+#
+# The remaining two catch any negative estimated variance. zeta1 is NULL on the
+# zeta1-dropped path (M61), and NULL-ness is the same source of truth
+# axes_fits_zeta1() gives the caller -- passing a separate flag alongside it
+# would let the two disagree.
+#
+# Scalar by design: `||` errors on a length > 1 argument in R >= 4.3.
+axes_is_boundary <- function(xi1, xi2, zeta1, eps) {
+  xi1 <= 0 || xi1 >= 1 || xi2 < 0 || (!is.null(zeta1) && zeta1 < 0) ||
+    any(eps < 0)
+}
+
 # --- Population model and simulation (oracle + bundled-data generator) ---------
 
 # The exact population item-correlation matrix implied by the five orthogonal
@@ -834,16 +862,15 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   zeta1 <- if (fit_zeta1) comp_var("SS1")[[1]] else NULL
   eps <- pe$est[pe$op == "~~" & pe$lhs == pe$rhs & pe$lhs %in% all_cols]
 
-  # Boundary: a non-positive axes variance, or any negative estimated variance,
-  # is not a usable solution (RR09 BC11). NA the reliability/SEm -- never clip,
-  # zero, or return a negative -- and flag it. On the zeta1-dropped path there
-  # is no scale-specificity variance to test; `zeta1 < 0` on a NULL would be
-  # logical(0), which `||` rejects in R >= 4.3, so the term is dropped rather
-  # than defaulted.
-  boundary <- xi1 <= 0 || xi2 < 0 || (fit_zeta1 && zeta1 < 0) || any(eps < 0)
+  # Boundary: an axes variance outside (0, 1), or any negative estimated
+  # variance, is not a usable solution (RR09 BC11; M62 added the upper bound).
+  # NA the reliability/SEm -- never clip, zero, or return a negative or a NaN --
+  # and flag it. The predicate is a named seam so the unreachable-in-practice
+  # upper bound is still testable; see axes_is_boundary() for each disjunct.
+  boundary <- axes_is_boundary(xi1, xi2, zeta1, eps)
   if (boundary) {
     warning(
-      "A boundary solution (non-positive axes variance or a negative ",
+      "A boundary solution (an axes variance outside (0, 1), or a negative ",
       "estimated variance) was reached; reliability and SEm are NA.",
       call. = FALSE
     )

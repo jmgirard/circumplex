@@ -1,11 +1,11 @@
 # M62: Close `axes_reliability()`'s two never-NaN gaps — ξ1 ≥ 1 and an unvalidated `sd`
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m62-axes-reliability-never-nan`
 
 ## Goal
 
@@ -80,7 +80,7 @@ standard error of measurement, by closing the two paths that still can.
 
 ## Tasks
 
-- [ ] **T1** — Test first: assert the extracted boundary helper is `TRUE` at
+- [x] **T1** — Test first: assert the extracted boundary helper is `TRUE` at
       `xi1 = 1` and `xi1 = 1.001` and unchanged across the shipped cases, and
       that `axes_reliability()` emits no `NaNs produced` warning. Then extract
       the boundary expression from `R/axes_reliability.R:843` into a helper,
@@ -105,6 +105,8 @@ standard error of measurement, by closing the two paths that still can.
 - 2026-07-26: created by /milestone-plan. Promoted from the ROADMAP's continuous-refactors candidate row, which absorbed RR11 Beyond 2 on 2026-07-26.
 - 2026-07-26: plan-gate investigation, three probes run in R against the dev tree. (1) `sd` accepts `-1`/`Inf`/`NA`/`NaN` and reports SEm `-0.4764406`/`Inf`/`NA`/`NaN` — a second never-NaN gap the candidate row did not name, folded in at Jeff's gate choice. (2) ξ1 > 1 looks unreachable through the public API: an engineered cormat implying ξ1 = 1.15, ξ2 = .20 has min eigenvalue exactly −0.35 (= its implied negative eps) and is refused by the existing positive-definite gate — evidence, not proof, since the finite-sample fit is approximate, so the guard is still owed and its test needs a seam. (3) The NaN threshold is exactly ξ1 > 1 (rel 0.999937 → 1.000000 → 1.000062, SEm 0.0079 → 0 → NaN), and R's bare `NaNs produced` warning escapes today because `suppressWarnings()` wraps only the fit.
 - 2026-07-26: plan gate — four decisions (Jeff). Both gaps in one milestone; ξ1 ≥ 1 folded into `boundary` rather than made a hard error or silently floored; `sd` refuses non-finite AND non-positive; no D-entry, since D-001 bars new features and this hardens an unreleased function (D-030/D-031 not extended).
+- 2026-07-26: started (/milestone-implement). Branch `m62-axes-reliability-never-nan` cut from master at 57f5c009; no dependencies to verify. Status planned→in-progress.
+- 2026-07-26: T1 done. Boundary expression extracted to `axes_is_boundary(xi1, xi2, zeta1, eps)` with the `xi1 >= 1` disjunct added; the caller now reads the seam and its warning names "an axes variance outside (0, 1)". `zeta1`'s NULL-ness replaces the separate `fit_zeta1` flag — one source of truth for whether the component was fitted, and behaviorally identical on both paths (enumerated in the test rather than assumed, per the M60 lesson on generalizing a gate). Three tests added: the predicate across the new and every shipped case incl. both ζ1-dropped branches; a swept property test that no admitted ξ1 yields a non-finite or non-positive SEm across item_n ∈ {2, 2.5, 26/3, 16, 32}; and an end-to-end NA-not-NaN test via `local_mocked_bindings(axes_is_boundary=)`, the seam pattern `axes_converged` already uses. **AC3 first half: mutation-verified** — deleting the `xi1 >= 1` disjunct reddens `test-axes-reliability.R:463` and `:464`; code restored and re-run green. Two defects in my own tests caught before the fix landed, both in the wrapper rather than the claim: a `...`-forwarding helper collided on `xi1` ("matched by multiple actual arguments"), and the sweep called the predicate on a length-7 vector, which `||` rejects in R >= 4.3. `devtools::test()`: 0 failures, 3910 passing, 0 skipped; the 4 warnings are the pre-existing test-ci_accuracy.R diagnostics.
 
 ## Decisions
 
