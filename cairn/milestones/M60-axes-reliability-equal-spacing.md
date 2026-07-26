@@ -1,11 +1,11 @@
 # M60: Any equally spaced angle set for `axes_reliability()`
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m60-axes-reliability-equal-spacing`
 
 ## Goal
 
@@ -16,13 +16,20 @@ any rotation, instead of only the canonical octant set.
 
 **In:**
 - Replace the `octants()` set-identity refusal (`R/axes_reliability.R:485-506`)
-  with a genuine modular equal-spacing predicate: k ≥ 3 scales, constant
+  with a genuine modular equal-spacing predicate: k ≥ 4 scales, constant
   successive gap of 360/k including the wrap-around gap, tolerance-based,
   pole-aware (LM = 360 ≡ 0). Unequal spacing, duplicate angles and NA angles
-  stay refused with a message naming the offender.
+  stay refused with a message naming the offender. k = 3 is refused as
+  *unidentified*, not merely unsupported: three equally spaced scales give every
+  cross-scale pair the same cos Δ = −0.5, collapsing the moment-structure design
+  (cos Δ, 1, same-scale) from rank 3 to rank 2 at any number of items per scale
+  (measured 2026-07-25; D-026 holding 2). The spacing tolerance admits
+  floating-point representation error only, never a near-equal (quasi-circumplex)
+  set — RR09 §4.
 - The ≥ 2-items-per-scale refusal (`:507-510`) stays, so ζ1 remains identified.
 - Pin the rotation-invariance that keeps the equal-axis-variance restriction
-  substantively innocuous: for k ≥ 3, per-axis Σw² = k/2 at any rotation.
+  substantively innocuous: per-axis Σw² = k/2 at any rotation, for every
+  accepted k.
 - Oracles: the four CV-LI type-b rows of Strack Table 3 (Layer A), plus the
   existing population-matrix / synthetic-recovery / cross-engine cells re-run at
   a rotated and a non-octant configuration (Layer B).
@@ -45,8 +52,8 @@ any rotation, instead of only the canonical octant set.
       returning finite equal per-axis reliability; the octant-only error no
       longer fires.
 - [ ] AC2: each refusal still fires with a message naming the offender —
-      unequal spacing, duplicate angle, NA angle, k < 3, and < 2 items on any
-      scale.
+      unequal spacing, duplicate angle, NA angle, k < 4 (naming identification
+      as the reason at k = 3), and < 2 items on any scale.
 - [ ] AC3: the spacing test is modular — a set expressed with LM = 360 is
       accepted identically to the same set using 0, and a set carrying both 0
       and 360 is refused as a duplicate.
@@ -102,6 +109,10 @@ any rotation, instead of only the canonical octant set.
 ## Work log
 
 - 2026-07-25: created by /milestone-plan.
+- 2026-07-25: in-progress on `m60-axes-reliability-equal-spacing`.
+- 2026-07-25: amended Scope + AC2 at the implement gate — scale-count floor 3 → 4, measured: the moment design (cos Δ, 1, same-scale) is rank 2 at k = 3 for any items/scale, rank 3 from k = 4. Jeff accepted.
+- 2026-07-25: implement gate — spacing tolerance is float-representation only, never near-equal spacing (Jeff; keeps RR09 §4's quasi-circumplex refusal intact).
+- 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 
 ## Decisions
 
