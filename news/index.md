@@ -197,15 +197,19 @@ on a real ggplot2 coordinate system.
   circumplex axes, scale specificity, and item specificity, and reads
   the axes’ reliability off the isolated axes-variance component with
   the Spearman-Brown formula — a confirmatory, item-level complement to
-  [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)’s
+  [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)‘s
   exploratory scale-level criteria. The Nunnally-Bernstein axis
   reliability is reported alongside for comparison (it overestimates
   when scale specificity is large). Items are supplied through a
-  `circumplex_instrument` or an explicit angle-and-item map; missing
-  data are handled by listwise deletion; a boundary fit returns `NA`
-  reliability rather than a clipped value; and the returned
-  `circumplex_axes_reliability` object has
-  [`print()`](https://rdrr.io/r/base/print.html) and
+  `circumplex_instrument` or an explicit angle-and-item map. Estimation
+  works either from raw item data or, through `cormat` and `n`, from a
+  published item correlation matrix alone, for reanalyzing a matrix
+  whose raw data is not available; on that path the Nunnally-Bernstein
+  comparison is reported as `NA` and `sd = "raw"` is refused, since both
+  need the respondents’ own item scores. Missing data are handled by
+  listwise deletion; a boundary fit returns `NA` reliability rather than
+  a clipped value; and the returned `circumplex_axes_reliability` object
+  has [`print()`](https://rdrr.io/r/base/print.html) and
   [`summary()`](https://rdrr.io/r/base/summary.html) methods. A bundled
   simulated dataset, `simulated_items`, is included for the examples.
 

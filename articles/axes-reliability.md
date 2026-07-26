@@ -64,6 +64,7 @@ res <- axes_reliability(simulated_items, items = items, angles = octants())
 res
 #> 
 #> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
+#> Input:        item data
 #> Items:        32 (8 scales)
 #> Complete N:   500
 #> SEm scale:    std
@@ -111,6 +112,7 @@ variance components and the model’s global fit:
 summary(res)
 #> 
 #> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
+#> Input:        item data
 #> Items:        32 (8 scales)
 #> Complete N:   500
 #> SEm scale:    std
@@ -152,9 +154,63 @@ non-trivial (Strack et al., 2013, Figure 3). The gap between the two
 numbers is a direct read-out of how much scale-specific variance the
 simpler formula would have miscredited to the axes.
 
-## 4. Caveats to keep in mind
+## 4. Starting from a published correlation matrix
 
-Three properties of the method shape how its output should be read.
+You do not always have the raw data. A paper may print an item
+correlation matrix and nothing else, and that matrix is enough: pass it
+as `cormat` together with the sample size it was computed from, in place
+of `data`.
+
+``` r
+
+R <- cor(simulated_items)
+axes_reliability(
+  cormat = R, items = items, angles = octants(), n = nrow(simulated_items)
+)
+#> 
+#> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
+#> Input:        correlation matrix
+#> Items:        32 (8 scales)
+#> Sample N:     500
+#> SEm scale:    std
+#> 
+#> # Per-axis reliability
+#> 
+#>  Axis item_n Reliability SEm   NB_Reliability
+#>  X    16     0.773       0.476 --            
+#>  Y    16     0.773       0.476 --            
+#> 
+#>   Note: the two axes share one axes-variance estimate and, with equal
+#>   items per axis, carry the same reliability -- expected, not an error.
+#> 
+#>   Note: the Nunnally-Bernstein comparison needs the raw item scores
+#>   (scale alphas and the axis-composite variance), so it is NA on the
+#>   correlation-matrix path.
+#> 
+#>   Note: the model is fit to the item correlation matrix, so the point
+#>   estimates are exact but the standard errors and global fit are
+#>   approximate (Cudeck, 1989).
+```
+
+The estimates are identical to the raw-data run above — the raw-data
+path builds exactly this matrix internally and fits it the same way.
+`items` selects and orders the matrix’s rows by name, so its own column
+ordering does not matter, and it must be symmetric, positive definite,
+and have a unit diagonal (the model assumes unit-variance items).
+
+Two things are unavailable here, and both for the same reason: they are
+properties of the respondents, not of their correlations. The
+Nunnally–Bernstein comparison is reported as `NA` — it needs each
+scale’s alpha and the axis composite’s variance, neither of which a
+correlation matrix carries. And `sd = "raw"` is refused, because there
+are no scale scores to take an observed SD from; supply the axis SDs
+numerically if you want SEm on a raw scale. Both are reported rather
+than silently omitted, so a matrix-based result cannot be mistaken for a
+raw-data one.
+
+## 5. Caveats to keep in mind
+
+Four properties of the method shape how its output should be read.
 
 **The standard errors and global fit are approximate.** Following the
 paper’s own practice, the model is fit to the item **correlation**
@@ -176,6 +232,16 @@ and a boundary flag, rather than a clipped or negative number. An `NA`
 here is a signal that the model did not identify a usable axes-variance
 component in your data — not a defect to be worked around.
 
+**A blockwise instrument’s block variance has nowhere to go.** Some
+circumplex instruments are administered in blocks — items grouped by
+something other than their scale — which contributes a block-specificity
+component of its own. This model has no such component, and the
+package’s instrument objects carry no block structure, so that variance
+is folded into the general and scale-specificity components instead,
+inflating them and deflating the share credited to the axes. Strack et
+al. (2013, Table 3) report block-specificity as high as 6.7%, so read
+axes reliability from a blockwise instrument as approximate.
+
 Finally, a note on the `SEm`. The standard error of measurement supports
 a location interval for a single profile (Strack et al., 2013, use
 ±1.65·SEm). By default
@@ -186,7 +252,7 @@ scale. Such an interval describes the measurement imprecision of one
 profile’s axis position; it is not a significance test of that position
 against any particular value.
 
-## 5. Wrap-up
+## 6. Wrap-up
 
 [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
 gives a compact, per-axis answer to “how reliably does this instrument

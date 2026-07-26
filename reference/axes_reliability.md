@@ -14,14 +14,23 @@ exploratory scale-level criteria.
 ## Usage
 
 ``` r
-axes_reliability(data, items, angles = NULL, instrument = NULL, sd = "std")
+axes_reliability(
+  data = NULL,
+  items,
+  angles = NULL,
+  instrument = NULL,
+  cormat = NULL,
+  n = NULL,
+  sd = "std"
+)
 ```
 
 ## Arguments
 
 - data:
 
-  A data frame (or matrix) containing the circumplex items.
+  A data frame (or matrix) containing the circumplex items. Supply
+  exactly one of `data` or `cormat`.
 
 - items:
 
@@ -42,6 +51,18 @@ axes_reliability(data, items, angles = NULL, instrument = NULL, sd = "std")
 
   Optional. A `circumplex_instrument` object supplying the scale angles
   and item membership (`Scales$Angle`, `Scales$Items`).
+
+- cormat:
+
+  An item correlation matrix (the matrix-input path), symmetric with a
+  unit diagonal and positive definite, with dimnames naming the items.
+  Supply exactly one of `data` or `cormat`.
+
+- n:
+
+  For the `cormat` path, the sample size (number of observations) the
+  correlation matrix was computed from. Required with `cormat`, and not
+  accepted with `data` (which carries its own).
 
 - sd:
 
@@ -91,6 +112,35 @@ used. A boundary fit (a non-positive estimated axes variance, or any
 negative estimated variance) returns `NA` reliability and SEm with a
 warning and a boundary flag rather than a clipped or negative value.
 
+## Supplying a correlation matrix instead of raw data
+
+Give `cormat` and `n` in place of `data` to estimate from an item
+correlation matrix that someone else published, with no raw data in
+hand. The matrix must be symmetric, positive definite, and carry a unit
+diagonal (the model assumes unit-variance items); `items` selects and
+orders its rows by name, so the matrix's own column order does not
+matter. Estimates are identical to those the raw-data path would give
+for the same matrix.
+
+Two results are unavailable on this path, because both need the
+respondents' own item scores rather than their correlations: the
+Nunnally-Bernstein comparison is reported as `NA` (it needs each scale's
+alpha and the axis composite's variance), and `sd = "raw"` is refused
+(there are no scale scores to take an observed SD from). Supply the axis
+SDs numerically if you want SEm on a raw scale.
+
+## Blockwise instruments
+
+Some circumplex instruments are administered in **blocks** (items
+grouped by something other than their scale), which contributes a
+block-specificity variance component of its own. This model has no such
+component, and the package's instrument objects carry no block
+structure, so a blockwise instrument analyzed here folds its block
+variance into the general and scale-specificity components – inflating
+them and, in turn, deflating the share attributed to the axes. Strack et
+al. (2013, Table 3) report block-specificity as high as 6.7%, so treat
+axes reliability from a blockwise instrument as approximate.
+
 ## References
 
 Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The
@@ -119,6 +169,7 @@ res <- axes_reliability(simulated_items, items = items, angles = octants())
 res
 #> 
 #> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
+#> Input:        item data
 #> Items:        32 (8 scales)
 #> Complete N:   500
 #> SEm scale:    std
@@ -138,6 +189,7 @@ res
 summary(res)
 #> 
 #> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
+#> Input:        item data
 #> Items:        32 (8 scales)
 #> Complete N:   500
 #> SEm scale:    std
@@ -166,4 +218,34 @@ summary(res)
 #> # Global fit
 #> 
 #>   chi-square(493) = 479.19,  RMSEA = 0.000,  CFI = 1.000
+
+# The same estimates from the item correlation matrix alone, as when
+# reanalyzing a matrix published without its raw data.
+axes_reliability(
+  cormat = cor(simulated_items), items = items, angles = octants(),
+  n = nrow(simulated_items)
+)
+#> 
+#> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
+#> Input:        correlation matrix
+#> Items:        32 (8 scales)
+#> Sample N:     500
+#> SEm scale:    std
+#> 
+#> # Per-axis reliability
+#> 
+#>  Axis item_n Reliability SEm   NB_Reliability
+#>  X    16     0.773       0.476 --            
+#>  Y    16     0.773       0.476 --            
+#> 
+#>   Note: the two axes share one axes-variance estimate and, with equal
+#>   items per axis, carry the same reliability -- expected, not an error.
+#> 
+#>   Note: the Nunnally-Bernstein comparison needs the raw item scores
+#>   (scale alphas and the axis-composite variance), so it is NA on the
+#>   correlation-matrix path.
+#> 
+#>   Note: the model is fit to the item correlation matrix, so the point
+#>   estimates are exact but the standard errors and global fit are
+#>   approximate (Cudeck, 1989).
 ```
