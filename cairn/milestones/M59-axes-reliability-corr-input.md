@@ -110,6 +110,7 @@ supersession the plan wrongly thought unnecessary.
 ## Work log
 
 - 2026-07-25: review — all 7 ACs verified on final code; 3 of 4 diff-bug findings actioned and fixed (F1/F3/F4), 3 sub-threshold logged. One blocking `gh pr checks --watch` timed out at 10m; fresh state at that point: pkgdown pass, ubuntu-latest (release) + test-coverage pending. Nothing left watching.
+- 2026-07-25: CI red on `test-coverage` (4 failures; ubuntu check + pkgdown passed) — my AC3(a) tolerance was calibrated on macOS and is not portable (M20 family). Three tolerances relaxed to portable values, re-verified locally (159/0/0; suite 3318; both mutations still red). **UNCOMMITTED CHECKPOINT:** the tolerance fix in `tests/testthat/test-axes-reliability.R` and this Review section's "CI red, and the fix" block are on disk but NOT committed — the harness permission classifier was unavailable and every `git commit` was refused. NOT merged; PR #85 open; CI has not run against the fixed code. `cairn/.merge-approved` (M59 / PR #85) exists from the merge gate but is deliberately unused: approval was conditional on green CI, CI went red, and the fix changed oracle tolerances, so re-approval is owed before any merge. Resume: commit + push these changes, let CI run, re-present the merge gate.
 - 2026-07-25: created by /milestone-plan.
 - 2026-07-25: start — status in-progress, branch `m59-axes-reliability-corr-input` cut from master.
 - 2026-07-25: T1 — AC2 round-trip test written first; fails with `unused arguments (cormat, n)`, the intended pre-implementation failure.
@@ -273,3 +274,36 @@ Sub-threshold (< 80) — logged, not actioned (IP3: surfaced, never dropped):
   combination pays a full fit before erroring, and on a boundary matrix emits
   the boundary warning before the `sd` error. Cost/ordering nit; AC5's
   informative error is still delivered.
+
+### CI red, and the fix
+
+The first full CI run came back with `test-coverage` **failing** (4 failures)
+while `ubuntu-latest (release)` and `pkgdown` passed. The cause was my own
+tolerances, not the implementation. The AC3(a) `(n−1)/n` pinning asserted
+`tolerance = 1e-8` — calibrated on macOS, where it holds at ~3e-11 relative —
+and the covr-instrumented Linux run landed at 1.3e-8 (`0.149969998` against
+`0.149970000`). Optimizer precision is platform- and BLAS-dependent: the M20
+lesson family, cited in this milestone's own plan and then walked into anyway.
+
+Three tolerances relaxed to portable values, each with its reasoning recorded
+at the assertion:
+
+- The `(n−1)/n` pinning: 1e-8 → **1e-6**. Discrimination is preserved, because
+  the alternative it rules out (no rescaling at all) is off by relative
+  1/n = 2e-3 / 2e-4 / 2e-5 at the three cells — still 20× the tolerance at the
+  tightest, and 77× above the observed cross-platform noise.
+- The permuted-components check: 1e-10 → **1e-8**; belt-and-braces now that
+  `ols_shadow` fences the reorder.
+- The AC3(b) normalization-falsification assertion: the absolute
+  `disagreement < xi1/n` bound sat only 3.8× from its threshold — one BLAS
+  difference from a false failure. Replaced by the **comparative** form: were
+  the residual the convention gap, pairing OpenMx against a wishart-likelihood
+  lavaan fit (matching OpenMx's own convention) would agree *better*; it agrees
+  worse (6.5e-5 / 5.5e-5 against 1.9e-5). A ratio absorbs platform noise on
+  both sides where an absolute bound cannot. Outer bar 2e-4 → 5e-4, still 2×
+  tighter than AC3(b)'s 1e-3.
+
+Re-verified after the change: axes file 159 pass / 0 fail / 0 skip; suite
+FAIL 0 / WARN 4 / PASS 3318; both mutations still red — dropping the cormat
+reorder still fails on the `ols_shadow` assertion, and reverting the dimnames
+guard to colnames-only still fails. The relaxations cost no fencing power.

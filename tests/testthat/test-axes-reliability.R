@@ -728,9 +728,16 @@ test_that("AC3(a): the population matrix recovers every component (cormat path)"
       axes_reliability(cormat = sigma, items = items, angles = oct, n = n)
     )
     est <- res$components$Estimate
-    expect_equal(est[[2]], xi1 * (n - 1) / n, tolerance = 1e-8)   # axes
-    expect_equal(est[[1]], xi2 * (n - 1) / n, tolerance = 1e-8)   # general
-    expect_equal(est[[3]], zeta1 * (n - 1) / n, tolerance = 1e-8) # scale
+    # 1e-6, not the 1e-8 first written here: that passed at ~3e-11 relative on
+    # macOS and failed on CI at 1.3e-8 (optimizer precision is platform- and
+    # BLAS-dependent -- the M20 family). 1e-6 keeps the discrimination that
+    # matters, since the alternative hypothesis this pins down (no (n-1)/n
+    # rescaling at all) is off by relative 1/n = 2e-3 / 2e-4 / 2e-5 at the three
+    # cells -- still 20x the tolerance at the tightest one, and 77x above the
+    # observed cross-platform noise.
+    expect_equal(est[[2]], xi1 * (n - 1) / n, tolerance = 1e-6)   # axes
+    expect_equal(est[[1]], xi2 * (n - 1) / n, tolerance = 1e-6)   # general
+    expect_equal(est[[3]], zeta1 * (n - 1) / n, tolerance = 1e-6) # scale
     expect_lt(res$fit$chisq, 1e-6)
   }
 
@@ -759,7 +766,11 @@ test_that("AC3(a): the population matrix recovers every component (cormat path)"
   res_p <- suppressMessages(axes_reliability(
     cormat = sigma[perm, perm], items = items, angles = oct, n = 50000L
   ))
-  expect_equal(res_p$components$Estimate, est, tolerance = 1e-10)
+  # 1e-8 rather than 1e-10 for the same portability reason as above; the
+  # reorder is fenced by the ols_shadow assertions below, not by this one.
+  expect_equal(res_p$components$Estimate, est, tolerance = 1e-8)
+  # ols_shadow comes from a closed-form qr.solve() on a fixed design matrix,
+  # not an optimizer, so it is stable across platforms at this tolerance.
   expect_equal(res$details$ols_shadow[["xi1"]], xi1, tolerance = 1e-8)
   expect_equal(res$details$ols_shadow[["xi2"]], xi2, tolerance = 1e-8)
   expect_equal(res$details$ols_shadow[["zeta1"]], zeta1, tolerance = 1e-8)
@@ -809,10 +820,17 @@ test_that("AC3(b): lavaan and OpenMx agree on the cormat path (Layer B)", {
     )
     mx <- axes_mx_components(R, n, oct, k)
     disagreement <- max(abs(lav - mx))
-    expect_lt(disagreement, 2e-4) # observed 1.95e-5 (seed 7), 1.92e-5 (seed 8)
-    # The (N-1)/N offset on xi1 would be xi1/n = 7.5e-5 at these values. The
-    # measured disagreement sits below it, so normalization cannot be its cause.
-    expect_lt(disagreement, .15 / n)
+    expect_lt(disagreement, 5e-4) # observed 1.95e-5 (seed 7), 1.92e-5 (seed 8)
+    # Falsify the normalization explanation COMPARATIVELY, not against an
+    # absolute threshold. If the residual were the (N-1)/N convention gap, then
+    # pairing OpenMx against a wishart-likelihood lavaan fit -- which matches
+    # OpenMx's own convention -- would agree BETTER. It agrees worse (measured
+    # 6.5e-5 seed 7, 5.5e-5 seed 8, against 1.9e-5 for the shipped pairing).
+    # A ratio is the portable form of the claim: both sides absorb platform
+    # optimizer noise together, where a bound sitting 4x from the offset would
+    # be one BLAS difference away from a false failure.
+    wishart <- axes_lav_components(R, n, items, oct)
+    expect_lt(disagreement, max(abs(wishart - mx)))
   }
 })
 
