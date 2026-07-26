@@ -1,6 +1,6 @@
 # M61: Single-item scale positions for `axes_reliability()` — dropping ζ1
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** M60
 - **Driving RR:** —
@@ -111,6 +111,7 @@ by dropping the scale-specificity component ζ1, as Strack's types e and f do.
 - 2026-07-25: created by /milestone-plan.
 - 2026-07-26: implementation question gate. Drop switch is *inferred* from the item map by one shared predicate, not threaded as an argument through `axes_syntax()`/`axes_fit()`/`axes_fit_cormat()` — the model and the results table then cannot disagree about whether ζ1 was fitted. N–B `NA` breadth → M61-D1. AC4's fractional-item_n question escalated to a Review Brief (Jeff's call at the gate).
 - 2026-07-26: read Strack Table 3 p. 7 in the shelf PDF for the six single-item rows. Types e/f print `—` for BOTH scale- and block-specificity (the paper drops ζ1 itself), col 14 is blank for all six, and all six component rows sum to exactly 100.0 — so they carry a sum guard the type-c row could not. AC4's `8.67` is unreachable end to end: at equal spacing with one item per position per-axis item_n is exactly k/2, so 8.67 needs k = 17.34; Table 1 lists SYMLOG with 26 items and no scales, and 26/3 = 8.667 (SYMLOG is a three-axis system). COC checks out: 16 items → item_n 8.
+- 2026-07-26: blocked on RB11 (`cairn/reviews/RB11-axes-reliability-fractional-item-n.md`) — whether AC4's `8.67` is reachable at all, whether the three SYMLOG Table 3 rows are a legitimate Layer-A oracle, and the replacement wording for AC4.
 
 ## Decisions
 
