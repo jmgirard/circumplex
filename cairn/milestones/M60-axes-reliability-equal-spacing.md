@@ -89,10 +89,10 @@ any rotation, instead of only the canonical octant set.
       error at `R/axes_reliability.R:495-506`; pin that as the failing fence,
       and pin every refusal that must survive
       (`tests/testthat/test-axes-reliability.R:442-476`).
-- [ ] T2: extract a modular equal-spacing predicate (pole-aware, wrap-around
+- [x] T2: extract a modular equal-spacing predicate (pole-aware, wrap-around
       gap, tolerance-based); no such helper exists anywhere in `R/`. Unit-test
       at the pole and against near-miss spacings.
-- [ ] T3: replace the refusal block with count / spacing / duplicate checks and
+- [x] T3: replace the refusal block with count / spacing / duplicate checks and
       informative messages; keep the ≥ 2-items-per-scale gate.
 - [ ] T4: rotation-invariance tests for `axis_item_n()`
       (`R/axes_reliability.R:31-34`) — `n × k/2`; keep the exact-equality octant
@@ -113,8 +113,11 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: amended Scope + AC2 at the implement gate — scale-count floor 3 → 4, measured: the moment design (cos Δ, 1, same-scale) is rank 2 at k = 3 for any items/scale, rank 3 from k = 4. Jeff accepted.
 - 2026-07-25: implement gate — spacing tolerance is float-representation only, never near-equal spacing (Jeff; keeps RR09 §4's quasi-circumplex refusal intact).
 - 2026-07-25: T1 fence added (4 test blocks, rotated/k!=8/refusals/pole); red for the right reason — the octant-only refusals at :485-506, not an incidental error. Suite stays red by design until T3.
+- 2026-07-25: T2 `angles_spacing_status()` (modular, tol = 1e-8 = float noise only) + 15 unit assertions incl. k = 4:24 at two rotations; T3 wired it into the refuse contract and re-pointed the three stale BC12 message expectations. Suite green (232).
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 
 ## Decisions
+
+- 2026-07-25 (T2): the wrap-around gap in `angles_spacing_status()` is kept for symmetry with the modular reading but is NOT load-bearing — all gaps sum to 360, so k-1 interior gaps of 360/k force it. Mutation-verified: removing the term changes no test. The comment says so rather than claiming a mechanism it does not have (M36).
 
 ## Review

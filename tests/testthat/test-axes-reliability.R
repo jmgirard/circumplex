@@ -439,26 +439,28 @@ test_that("BC12: each malformed input errors informatively", {
   )
   expect_no_error(ok()) # the fixture itself is valid
 
-  # scale count != 8
+  # A 7-scale subset of the octants is no longer refused for its COUNT (M60
+  # accepts any k >= 4) but for its spacing -- dropping one octant leaves a
+  # 90-degree gap among 45-degree ones.
   expect_error(
     suppressMessages(axes_reliability(
       fx$data, items = fx$items[1:7], angles = fx$oct[1:7]
     )),
-    "8-scale"
+    "equally spaced"
   )
   # unequal spacing
   bad_ang <- fx$oct
   bad_ang[[1]] <- bad_ang[[1]] + 5
   expect_error(
     suppressMessages(axes_reliability(fx$data, items = fx$items, angles = bad_ang)),
-    "octant"
+    "equally spaced"
   )
   # duplicate angle
   dup_ang <- fx$oct
   dup_ang[[2]] <- dup_ang[[1]]
   expect_error(
     suppressMessages(axes_reliability(fx$data, items = fx$items, angles = dup_ang)),
-    "octant"
+    "duplicat"
   )
   # NA angle
   na_ang <- fx$oct
@@ -980,7 +982,9 @@ test_that("M60: a rotated equally spaced set estimates (Strack type b)", {
   expect_equal(res$results$reliability[[1]], res$results$reliability[[2]],
                tolerance = 1e-6)
   # The type-b magnitudes actually reached the model.
-  w <- abs(axis_weights(ang))
+  # as.vector(): unique() on a matrix works ROWWISE, so it would return rows
+  # rather than the distinct weight magnitudes.
+  w <- as.vector(abs(axis_weights(ang)))
   expect_equal(sort(unique(round(w, 5))), c(0.38268, 0.92388))
 })
 
@@ -1060,4 +1064,45 @@ test_that("M60: the spacing test is modular at the pole", {
     ),
     "duplicat"
   )
+})
+
+test_that("M60: angles_spacing_status() classifies at the pole and near-misses", {
+  # The package's own octant set, LM = 360.
+  expect_identical(angles_spacing_status(octants()), "ok")
+  # The same eight positions written with 0 instead of 360 -- one position, so
+  # the modular reduction must call both "ok" (the classic pole bug is to read
+  # 0 and 360 as distinct and report unequal spacing).
+  expect_identical(angles_spacing_status(c(0, 45, 90, 135, 180, 225, 270, 315)),
+                   "ok")
+  # 0 AND 360 in one set is that position twice.
+  expect_identical(angles_spacing_status(c(0, 45, 90, 135, 180, 225, 270, 360)),
+                   "duplicate")
+  expect_identical(angles_spacing_status(c(45, 45, 135, 225)), "duplicate")
+
+  # Rotations and other counts.
+  expect_identical(angles_spacing_status(seq(22.5, 337.5, by = 45)), "ok")
+  for (k in 4:24) {
+    expect_identical(angles_spacing_status((seq_len(k) - 1L) * (360 / k)), "ok")
+    # ... and at an arbitrary rotation of the same set.
+    expect_identical(
+      angles_spacing_status((seq_len(k) - 1L) * (360 / k) + 17.3), "ok"
+    )
+  }
+
+  # Near-misses are refused: the tolerance is float noise, not a design margin.
+  expect_identical(angles_spacing_status(c(0, 90, 180, 270.0001)), "unequal")
+  expect_identical(angles_spacing_status(c(0, 90, 180, 270 + 1e-4)), "unequal")
+  # A set bunched into one arc: its interior gaps are constant but are not
+  # 360/k, which is what refuses it. (The wrap-around gap cannot be the thing
+  # that catches this, or anything else -- all gaps sum to 360, so constant
+  # interior gaps of 360/k force the wrap gap to match. Verified by mutation.)
+  expect_identical(angles_spacing_status(c(0, 10, 20, 30)), "unequal")
+
+  # NA is classified, never silently dropped by sort().
+  expect_identical(angles_spacing_status(c(0, 90, NA, 270)), "missing")
+
+  # The tolerance is loose enough for an exactly-constructed odd set, whose
+  # gaps carry real float error (360/7 is not representable).
+  expect_identical(angles_spacing_status((0:6) * (360 / 7)), "ok")
+  expect_identical(angles_spacing_status((0:8) * (360 / 9) + 123.456), "ok")
 })

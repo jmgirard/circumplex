@@ -21,6 +21,33 @@ axis_weights <- function(angles_deg) {
   cbind(w_x = snap_trig(cos(th)), w_y = snap_trig(sin(th)))
 }
 
+# Classify an angle set as an equally spaced circumplex, one status string:
+# "missing", "duplicate", "unequal", or "ok". Modular by construction --
+# positions reduce mod 360 first, so the package's LM = 360 and 0 are ONE
+# position (a naive sorted-diff treating them as distinct is the classic pole
+# bug; RR09 section 4). Every gap between successive positions must equal
+# 360/k. The wrap-around gap from the last position back to the first is
+# carried for symmetry with the modular reading, NOT because it catches a case
+# the interior gaps miss: all gaps sum to 360 by construction, so k-1 interior
+# gaps of 360/k force the wrap gap to 360/k too (verified by mutation -- with
+# the wrap term removed, no test changes).
+#
+# `tol` admits floating-point representation error only -- the gaps of an
+# exactly-constructed set carry ~1e-14 degrees of error at worst -- and never a
+# near-equal (quasi-circumplex) set, which Strack et al. excluded (p. 5) and
+# RR09 section 4 holds is scope-correct to refuse rather than merely cautious.
+# A departure of 1e-4 degrees is already 4 orders of magnitude above the noise
+# floor and is refused, so no real design slips through on tolerance.
+angles_spacing_status <- function(angles_deg, tol = 1e-8) {
+  if (anyNA(angles_deg)) return("missing")
+  a <- sort(as.numeric(angles_deg) %% 360)
+  k <- length(a)
+  gaps <- c(diff(a), 360 - (a[[k]] - a[[1]]))
+  if (any(gaps <= tol)) return("duplicate")
+  if (any(abs(gaps - 360 / k) > tol)) return("unequal")
+  "ok"
+}
+
 # Per-axis effective test length item_n = sum of squared item weights
 # (Strack et al. 2013, Table 3 col. 10; the Spearman-Brown composite length).
 # Balanced octant instruments give exact integers after snapping -- 64-item ->
@@ -481,29 +508,44 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   angles_deg <- map$angles
   n_scales <- length(item_cols)
 
-  # --- Refuse contract (RR09 BC12) --------------------------------------------
-  if (n_scales != 8L) {
-    stop(
-      "`axes_reliability()` supports octant (8-scale) instruments; ",
-      n_scales, " scales were supplied.",
-      call. = FALSE
-    )
-  }
+  # --- Refuse contract (RR09 BC12; M60 generalized it past the octant set) ----
   if (anyNA(angles_deg)) {
     stop("`angles` contains a missing value.", call. = FALSE)
   }
-  # The angle multiset must equal octants() modulo 360 (equal octant spacing);
-  # this rejects unequal spacing and duplicate angles alike.
-  if (!identical(
-    sort(as.numeric(angles_deg) %% 360),
-    sort(as.numeric(octants()) %% 360)
-  )) {
+  # Four scales is the identification floor, not a convention: at three equally
+  # spaced scales every cross-scale pair carries the same cos(delta) = -0.5, so
+  # the moment-structure design (cos delta, 1, same-scale) drops from rank 3 to
+  # rank 2 and the three variance components are not separately estimable
+  # (measured over k = 3:9 and 2-3 items/scale; RR09/D-026 holding 2).
+  if (n_scales < 4L) {
     stop(
-      "`angles` must be the eight octant angles (see octants()); an unequal ",
-      "spacing or a duplicated angle is not a type-a octant circumplex.",
+      "`axes_reliability()` needs at least 4 equally spaced scales; ",
+      n_scales, if (n_scales == 1L) " was" else " were", " supplied.",
+      if (n_scales == 3L) {
+        paste0(
+          " At 3 equally spaced scales every pair of scales sits the same ",
+          "angular distance apart, so the general, axes, and scale-specificity ",
+          "variances are not separately identified."
+        )
+      } else "",
       call. = FALSE
     )
   }
+  shown <- paste(format(sort(as.numeric(angles_deg) %% 360)), collapse = ", ")
+  switch(angles_spacing_status(angles_deg),
+    duplicate = stop(
+      "`angles` duplicates a circumplex position (0 and 360 degrees are one ",
+      "position): ", shown, ".",
+      call. = FALSE
+    ),
+    unequal = stop(
+      "`angles` must be equally spaced around the circle: ", n_scales,
+      " scales require a constant ", format(360 / n_scales),
+      "-degree spacing, but were supplied as ", shown,
+      ". A quasi-circumplex (near-equal spacing) is out of scope.",
+      call. = FALSE
+    )
+  )
   n_items_scale <- lengths(item_cols)
   if (any(n_items_scale < 2L)) {
     stop("Every scale must have at least 2 items.", call. = FALSE)
