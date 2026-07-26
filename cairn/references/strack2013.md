@@ -7,7 +7,7 @@ Pagination: the article's own page numbers. The PDF is **born-digital**
 (`Creator: Adobe InDesign CS5.5`, `Producer: Adobe PDF Library 9.9`) — not an
 OCR scan — so its `pdftotext` text layer is the typeset text itself, a faithful
 witness (unlike the `hubert1987`/`tracey1997` OCR scans).
-Extraction: verified 2026-07-23 against the born-digital `pdftotext -layout` text layer, with Table 3 and every formula below additionally cross-read against the layout-preserved rendering; no value read by a second human channel — observed 2026-07-23.
+Extraction: verified 2026-07-23 against the born-digital `pdftotext -layout` text layer, with Table 3 and every formula below additionally cross-read against the layout-preserved rendering; re-verified 2026-07-25 (M60) on p. 7, where the `Type` column and the type-b and type-c rows banked below were read in both channels — the text layer and a 200-dpi page-image render — agreeing on every value (the type-e and type-f rows on that page are NOT banked here and carry no verification claim; they are M61's to bank); no value read by a second human channel — observed 2026-07-25.
 
 **Citation.** Strack, M., Jacobs, I., & Grosse Holtforth, M. (2013). Reliability
 of Circumplex Axes. *SAGE Open*, 3(2), 1–12. DOI 10.1177/2158244013486115.
@@ -106,6 +106,33 @@ Variance components banked too (cols 5–9): %general (col 5), %axes (col 6),
 | IMI   | 6 | Other |  1.7 | 27.9 | 5.9 | 64.5 | 32 | .92 | 100.0 |
 | SAS-C | 8 | Self  |  4.8 | 17.8 | 6.2 | 71.2 | 32 | .87 | 100.0 |
 | IPI-A | 9 | Self  | 19.2 | 13.4 | 2.8 | 64.6 | 16 | .71 | 100.0 |
+
+**Column (1) is `Type`** — Table 3 labels every row with its Figure 1 circumplex
+type (a–f), so the paper publishes reliability anchors for the non-octant types,
+not only for type a. Banked below for M60 (types b, c) and M61 (the single-item
+types e, f); type d (OCAI) carries block-specificity and waits on ζ2.
+
+**Type-b rows (CV-LI, equal 45° spacing rotated 22.5° off the axes; p. 2).**
+All four sum to 100.0, and all four reproduce col 11 by Spearman–Brown on
+col 6 / col 10 within ±.01 (.367, .308, .237, .568 against .37, .31, .24, .57):
+
+| Instrument | Sample | Persp. | %gen | %axes | %scale | %item | item_n | Rel | sum |
+|---|---|---|---|---|---|---|---|---|---|
+| CV-LI | 12 | Self  | 22.6 | 3.5 | 19.6 | 54.3 | 16 | .37 | 100.0 |
+| CV-LI | 12 | Other | 42.9 | 2.7 | 15.0 | 39.4 | 16 | .31 | 100.0 |
+| CV-LI | 12 | Meta  | 35.4 | 1.9 | 19.6 | 43.1 | 16 | .24 | 100.0 |
+| CV-LI | 13 | Self  | 19.6 | 7.6 | 19.7 | 53.1 | 16 | .57 | 100.0 |
+
+**Type-c row (MEIL, Sample 14 Self): %gen 4.3, %axes 5.5, %scale 27.9, %item
+36.7, item_n 30, Rel .63 — components sum to 74.4, not 100.0.** A second source
+defect, independent of the IIP S6 erratum below and already noted by RR10 from
+the text layer; the page image agrees, so it is the source, not the
+transcription. The 25.6 points are unaccounted for and col 8 is `—`. The
+reliability column is nonetheless self-consistent: SB(.055, 30) = .6358
+reproduces the printed .63 within ±.01, so the row is usable as a Layer-A
+reliability anchor while its component row is not usable as a sum guard.
+The instrument's scale count is not printed, so k cannot be derived from the
+table — observed 2026-07-25.
 
 **SEm cross-check inputs (col 12 Raw variance, col 13 SEm), banked for BC2:**
 IAL S1 Self 0.98 → 0.28; OCAI S15 Self 15.95 → 2.78; COC S16 Self 6.70 → 2.33.

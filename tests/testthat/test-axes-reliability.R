@@ -204,7 +204,11 @@ axes_mc_recover_xi1 <- function(oct, k, xi1, xi2, zeta1, n, reps, seed) {
   set.seed(seed)
   pop <- axes_population_cor(oct, k, xi1, xi2, zeta1)
   inames <- sprintf("item_%02d", seq_along(pop$scale))
-  items <- split(inames, pop$scale)
+  # Levels pinned explicitly so the scale->angle pairing is stated rather than
+  # inferred. (split() on a NUMERIC group vector already orders levels
+  # numerically, so this is equivalent, not a fix -- only a CHARACTER group
+  # vector would sort "10" before "2".)
+  items <- split(inames, factor(pop$scale, levels = seq_along(oct)))
   est <- numeric(reps)
   for (r in seq_len(reps)) {
     dat <- as.data.frame(scale(axes_simulate(n, oct, k, xi1, xi2, zeta1)))
@@ -300,7 +304,8 @@ test_that("BC7: lavaan and OpenMx agree on the component variances (Layer B)", {
     p <- ncol(dat)
     inames <- sprintf("i%02d", seq_len(p))
     colnames(dat) <- inames
-    items <- split(inames, rep(seq_along(oct), each = k))
+    items <- split(inames, factor(rep(seq_along(oct), each = k),
+                                  levels = seq_along(oct))) # levels stated, see above
     S <- stats::cov(dat)
 
     lav <- axes_lav_components(S, 2000L, items, oct)
@@ -439,26 +444,28 @@ test_that("BC12: each malformed input errors informatively", {
   )
   expect_no_error(ok()) # the fixture itself is valid
 
-  # scale count != 8
+  # A 7-scale subset of the octants is no longer refused for its COUNT (M60
+  # accepts any k >= 4) but for its spacing -- dropping one octant leaves a
+  # 90-degree gap among 45-degree ones.
   expect_error(
     suppressMessages(axes_reliability(
       fx$data, items = fx$items[1:7], angles = fx$oct[1:7]
     )),
-    "8-scale"
+    "equally spaced"
   )
   # unequal spacing
   bad_ang <- fx$oct
   bad_ang[[1]] <- bad_ang[[1]] + 5
   expect_error(
     suppressMessages(axes_reliability(fx$data, items = fx$items, angles = bad_ang)),
-    "octant"
+    "equally spaced"
   )
   # duplicate angle
   dup_ang <- fx$oct
   dup_ang[[2]] <- dup_ang[[1]]
   expect_error(
     suppressMessages(axes_reliability(fx$data, items = fx$items, angles = dup_ang)),
-    "octant"
+    "duplicat"
   )
   # NA angle
   na_ang <- fx$oct
@@ -944,4 +951,338 @@ test_that("AC5: each malformed cormat/n input errors informatively", {
   expect_error(ok(cormat = R, n = Inf), "single whole number")
   expect_error(ok(cormat = R, n = p), "greater than the number of items")
   expect_error(ok(cormat = R, n = p - 1L), "greater than the number of items")
+})
+
+# M60 axes_reliability(): any equally spaced angle set, any rotation ----------
+
+# A fixture at an arbitrary equally spaced angle set. Unlike
+# axes_valid_fixture(), the scale count is a parameter, so the split() group
+# levels are pinned explicitly, stating the scale->angle pairing rather than
+# leaving it to coercion. This is equivalence, not a repair: split() coerces a
+# NUMERIC group vector with factor(), whose levels sort numerically, so 1:12
+# already pairs correctly. Only a CHARACTER group vector would sort "10" before
+# "2" -- the hazard the M33/M34 ordering lessons describe.
+axes_spaced_fixture <- function(angles, n = 1500L, k = 4L, xi1 = .20,
+                                seed = 42L) {
+  set.seed(seed)
+  dat <- axes_simulate(n, angles, k, xi1, .05, .08)
+  inames <- sprintf("i%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  grp <- factor(rep(seq_along(angles), each = k), levels = seq_along(angles))
+  list(data = dat, angles = angles, items = split(inames, grp), names = inames)
+}
+
+test_that("M60: a rotated equally spaced set estimates (Strack type b)", {
+  skip_if_not_installed("lavaan")
+  # Type b: eight scales at 45 deg spacing, rotated 22.5 deg off the axes
+  # (strack2013 p. 2 -- weights +/-.38268 and +/-.92388).
+  ang <- seq(22.5, 337.5, by = 45)
+  fx <- axes_spaced_fixture(ang)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  expect_s3_class(res, "circumplex_axes_reliability")
+  expect_true(all(is.finite(res$results$reliability)))
+  expect_true(all(res$results$reliability > 0 & res$results$reliability < 1))
+  # The equal-axis-variance restriction makes both axes agree at any rotation.
+  expect_equal(res$results$reliability[[1]], res$results$reliability[[2]],
+               tolerance = 1e-6)
+  # The type-b magnitudes actually reached the model.
+  # as.vector(): unique() on a matrix works ROWWISE, so it would return rows
+  # rather than the distinct weight magnitudes.
+  w <- as.vector(abs(axis_weights(ang)))
+  expect_equal(sort(unique(round(w, 5))), c(0.38268, 0.92388))
+})
+
+test_that("M60: equally spaced sets with k != 8 estimate", {
+  skip_if_not_installed("lavaan")
+  for (k in c(6L, 12L)) {
+    ang <- (seq_len(k) - 1L) * (360 / k)
+    fx <- axes_spaced_fixture(ang, n = 2000L)
+    res <- suppressMessages(
+      axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+    )
+    expect_true(all(is.finite(res$results$reliability)), label = paste("k =", k))
+    expect_equal(res$results$reliability[[1]], res$results$reliability[[2]],
+                 tolerance = 1e-6)
+    expect_identical(res$details$n_scales, k)
+  }
+})
+
+test_that("M60: the refusal contract survives the relaxation", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_spaced_fixture(octants())
+  bad <- function(angles = fx$angles, items = fx$items) {
+    suppressMessages(axes_reliability(fx$data, items = items, angles = angles))
+  }
+
+  # Unequal spacing stays refused -- a quasi-circumplex is out of scope, and the
+  # tolerance admits float representation error only (RR09 section 4).
+  ang <- fx$angles
+  ang[[1]] <- ang[[1]] + 5
+  expect_error(bad(ang), "equally spaced")
+  # A departure far too small to be a real design, but far larger than float
+  # noise, is still refused.
+  ang2 <- fx$angles
+  ang2[[1]] <- ang2[[1]] + 1e-4
+  expect_error(bad(ang2), "equally spaced")
+
+  # Duplicates, NAs.
+  dup <- fx$angles
+  dup[[2]] <- dup[[1]]
+  expect_error(bad(dup), "duplicat")
+  na_ang <- fx$angles
+  na_ang[[3]] <- NA_real_
+  expect_error(bad(na_ang), "missing")
+
+  # Fewer than 4 scales: at k = 3 every cross-scale pair carries the same
+  # cos(delta) = -0.5, so the moment design (cos delta, 1, same-scale) drops to
+  # rank 2 and the three components are not separately identified.
+  expect_error(bad(c(0, 120, 240), fx$items[1:3]), "identif")
+  expect_error(bad(c(0, 180), fx$items[1:2]), "at least 4")
+
+  # Fewer than 2 items on a scale (M61 territory, still refused here).
+  one <- fx$items
+  one[[1]] <- one[[1]][1]
+  expect_error(bad(items = one), "at least 2 items")
+
+  # A non-finite angle must be REFUSED BY NAME, not carried into the fit.
+  # anyNA() does not reject Inf, and `Inf %% 360` is NaN which sort() drops, so
+  # without an is.finite() gate the spacing test reads the SURVIVING angles as
+  # equally spaced and the run dies later in qr.solve() naming nothing.
+  inf_ang <- fx$angles
+  inf_ang[[2]] <- Inf
+  expect_error(bad(inf_ang), "must be finite")
+  expect_error(bad(inf_ang), "scale\\(s\\) 2")
+  neg_inf <- fx$angles
+  neg_inf[[5]] <- -Inf
+  expect_error(bad(neg_inf), "must be finite")
+})
+
+test_that("M60: the spacing test is modular at the pole", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_spaced_fixture(octants())
+  # octants() carries LM = 360; the same set written with 0 must behave
+  # identically, not read as unequally spaced.
+  zero_form <- as.numeric(fx$angles)
+  zero_form[zero_form == 360] <- 0
+  a <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  b <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = zero_form)
+  )
+  expect_equal(a$results$reliability, b$results$reliability)
+  # But 0 and 360 in the SAME set are one position twice -- a duplicate.
+  both <- as.numeric(fx$angles)
+  both[both == 45] <- 0 # now carries both 0 and 360
+  expect_error(
+    suppressMessages(
+      axes_reliability(fx$data, items = fx$items, angles = both)
+    ),
+    "duplicat"
+  )
+})
+
+test_that("M60: angles_spacing_status() classifies at the pole and near-misses", {
+  # The package's own octant set, LM = 360.
+  expect_identical(angles_spacing_status(octants()), "ok")
+  # The same eight positions written with 0 instead of 360 -- one position, so
+  # the modular reduction must call both "ok" (the classic pole bug is to read
+  # 0 and 360 as distinct and report unequal spacing).
+  expect_identical(angles_spacing_status(c(0, 45, 90, 135, 180, 225, 270, 315)),
+                   "ok")
+  # 0 AND 360 in one set is that position twice.
+  expect_identical(angles_spacing_status(c(0, 45, 90, 135, 180, 225, 270, 360)),
+                   "duplicate")
+  expect_identical(angles_spacing_status(c(45, 45, 135, 225)), "duplicate")
+
+  # Rotations and other counts.
+  expect_identical(angles_spacing_status(seq(22.5, 337.5, by = 45)), "ok")
+  for (k in 4:24) {
+    expect_identical(angles_spacing_status((seq_len(k) - 1L) * (360 / k)), "ok")
+    # ... and at an arbitrary rotation of the same set.
+    expect_identical(
+      angles_spacing_status((seq_len(k) - 1L) * (360 / k) + 17.3), "ok"
+    )
+  }
+
+  # Near-misses are refused: the tolerance is float noise, not a design margin.
+  expect_identical(angles_spacing_status(c(0, 90, 180, 270.0001)), "unequal")
+  expect_identical(angles_spacing_status(c(0, 90, 180, 270 + 1e-4)), "unequal")
+  # A set bunched into one arc: its interior gaps are constant but are not
+  # 360/k, which is what refuses it. (The wrap-around gap cannot be the thing
+  # that catches this, or anything else -- all gaps sum to 360, so constant
+  # interior gaps of 360/k force the wrap gap to match. Verified by mutation.)
+  expect_identical(angles_spacing_status(c(0, 10, 20, 30)), "unequal")
+
+  # Non-finite angles are classified, never silently dropped by sort(). Inf is
+  # the dangerous one: anyNA() does not reject it, `Inf %% 360` is NaN, and
+  # sort() drops NaN -- so without this branch the surviving angles could
+  # satisfy 360/k and the set would read as "ok".
+  expect_identical(angles_spacing_status(c(0, 90, NA, 270)), "nonfinite")
+  expect_identical(angles_spacing_status(c(0, 90, NaN, 270)), "nonfinite")
+  expect_identical(angles_spacing_status(c(0, 120, 240, Inf)), "nonfinite")
+  expect_identical(angles_spacing_status(c(octants(), Inf)), "nonfinite")
+  expect_identical(angles_spacing_status(c(0, 90, 180, -Inf)), "nonfinite")
+
+  # Angles supplied outside [0, 360) reduce onto their circumplex positions.
+  # This is the ONLY case that pins the `%% 360` reduction: with it removed,
+  # the octant sets and the 0-and-360 duplicate below still classify correctly
+  # (the wrap gap compensates), but this set is misread as a duplicate.
+  expect_identical(angles_spacing_status(c(10, 100, 190, 640)), "ok")
+  expect_identical(angles_spacing_status(c(-90, 0, 90, 180)), "ok")
+  expect_identical(angles_spacing_status(c(0, 90, 180, 270, 450)), "duplicate")
+
+  # The tolerance is loose enough for an exactly-constructed odd set, whose
+  # gaps carry real float error (360/7 is not representable).
+  expect_identical(angles_spacing_status((0:6) * (360 / 7)), "ok")
+  expect_identical(angles_spacing_status((0:8) * (360 / 9) + 123.456), "ok")
+})
+
+test_that("M60: per-axis item_n is n * k/2 at any rotation", {
+  # The tolerance is set from the DISCRIMINATION required, not from what this
+  # machine prints (M59): the smallest error that could matter is one item, so
+  # item_n = 1.0, and 1e-8 fences that at 1e8x while sitting ~6 orders above
+  # the ~1e-14 float noise these sums actually carry.
+  tol <- 1e-8
+  for (k in 4:16) {
+    for (rot in c(0, 22.5, 17.3, 180)) {
+      ang <- (seq_len(k) - 1L) * (360 / k) + rot
+      for (n in c(1L, 2L, 5L)) {
+        inn <- axis_item_n(ang, n)
+        expect_equal(inn[["x"]], n * k / 2, tolerance = tol,
+                     label = sprintf("k=%d rot=%s n=%d x", k, rot, n))
+        expect_equal(inn[["y"]], n * k / 2, tolerance = tol,
+                     label = sprintf("k=%d rot=%s n=%d y", k, rot, n))
+      }
+    }
+  }
+
+  # The octant set stays EXACT -- BC3 above asserts expect_identical() on it,
+  # and that must not be weakened just because rotated sets need a tolerance.
+  expect_identical(axis_item_n(octants(), 4L), c(x = 16, y = 16))
+
+  # An unbalanced set legitimately gives different item_n per axis, and a
+  # fractional value (the SYMLOG shape, Table 3 col. 10 = 8.67). Nothing here
+  # rounds or forces the two axes to agree.
+  unb <- axis_item_n(c(0, 90, 180, 270), c(3L, 1L, 3L, 1L))
+  expect_equal(unb[["x"]], 6, tolerance = tol)
+  expect_equal(unb[["y"]], 2, tolerance = tol)
+})
+
+test_that("M60: Spearman-Brown reproduces the non-octant Table 3 rows (Layer A)", {
+  # Strack et al. (2013) Table 3 col 1 is the circumplex TYPE, so the paper
+  # publishes anchors beyond type a. Banked in cairn/references/strack2013.md
+  # (two channels on p. 7: pdftotext text layer + page-image render).
+
+  # Type b -- CV-LI, eight scales at 45 deg rotated 22.5 deg off the axes
+  # (p. 2). This is exactly the configuration M60 unlocks.
+  typeb <- data.frame(
+    row    = c("CVLI12S", "CVLI12O", "CVLI12M", "CVLI13S"),
+    gen    = c(22.6, 42.9, 35.4, 19.6),
+    axes   = c(3.5, 2.7, 1.9, 7.6),
+    scale  = c(19.6, 15.0, 19.6, 19.7),
+    item   = c(54.3, 39.4, 43.1, 53.1),
+    item_n = c(16, 16, 16, 16),
+    rel    = c(.37, .31, .24, .57)
+  )
+  # Every type-b row is internally consistent -- unlike the IIP S6 erratum, no
+  # exception carve-out is needed here.
+  expect_true(all(abs(
+    typeb$gen + typeb$axes + typeb$scale + typeb$item - 100.0
+  ) <= 0.1))
+  expect_true(all(abs(
+    axis_reliability_sb(typeb$axes / 100, typeb$item_n) - typeb$rel
+  ) <= .01))
+
+  # Type c -- MEIL S14 Self. Its COMPONENTS are a second source defect (they sum
+  # to 74.4, not 100.0; both extraction channels agree, and RR10 saw it in the
+  # text layer), so this row is asserted as a reliability anchor only, never as
+  # a component-sum guard.
+  expect_true(abs(4.3 + 5.5 + 27.9 + 36.7 - 74.4) <= 0.1) # the defect, pinned
+  expect_true(abs(axis_reliability_sb(.055, 30) - .63) <= .01)
+
+  # The sweep discriminates: it is not satisfied by any item_n. Reading the
+  # type-b rows at the octant item_n of 32 would miss every printed value.
+  expect_false(all(abs(
+    axis_reliability_sb(typeb$axes / 100, 32) - typeb$rel
+  ) <= .01))
+})
+
+# M60 Layer-B: the BC5/BC6/BC7 oracles re-run at the configurations M60 unlocks
+# -- a rotated octant set (Strack type b, no weight lands on 0) and non-octant
+# counts (k = 6, k = 12, where scales DO sit on the poles). The estimator's
+# geometry-specific risk lives in the weights and the moment design, which the
+# exact population cell exercises completely.
+
+axes_pop_recovers <- function(angles, k, xi1, xi2, zeta1) {
+  pop <- axes_population_cor(angles, k, xi1, xi2, zeta1)
+  sigma <- pop$sigma
+  p <- nrow(sigma)
+  inames <- sprintf("i%02d", seq_len(p))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, factor(pop$scale, levels = seq_along(angles)))
+  fit <- lavaan::cfa(
+    axes_syntax(items, angles),
+    sample.cov = sigma, sample.nobs = 500L,
+    orthogonal = TRUE, likelihood = "wishart"
+  )
+  pe <- lavaan::parameterEstimates(fit)
+  vv <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+  list(
+    converged = lavaan::lavInspect(fit, "converged"),
+    est = c(xi1 = vv("AX"), xi1b = vv("AY"), xi2 = vv("GEN"),
+            zeta1 = vv("SS1")),
+    chisq = unname(lavaan::fitMeasures(fit, "chisq"))
+  )
+}
+
+test_that("M60: exact population recovery holds at rotated and non-octant sets", {
+  skip_if_not_installed("lavaan")
+  xi1 <- .15; xi2 <- .08; zeta1 <- .12
+  cells <- list(
+    `type-b rotated octants` = seq(22.5, 337.5, by = 45),
+    `k = 6` = (seq_len(6L) - 1L) * 60,
+    `k = 12` = (seq_len(12L) - 1L) * 30,
+    `k = 5 at an odd rotation` = (seq_len(5L) - 1L) * 72 + 13.7
+  )
+  for (nm in names(cells)) {
+    got <- axes_pop_recovers(cells[[nm]], k = 3L, xi1, xi2, zeta1)
+    expect_true(got$converged, label = nm)
+    # Exact at the population matrix -- no Monte-Carlo slack.
+    expect_lt(abs(got$est[["xi1"]] - xi1), 1e-4)
+    expect_lt(abs(got$est[["xi1b"]] - xi1), 1e-4)
+    expect_lt(abs(got$est[["xi2"]] - xi2), 1e-4)
+    expect_lt(abs(got$est[["zeta1"]] - zeta1), 1e-4)
+    expect_lt(got$chisq, 1e-6)
+  }
+})
+
+test_that("M60: Monte-Carlo recovery holds at a rotated octant set (Layer B)", {
+  skip_if_not_installed("lavaan")
+  mc <- axes_mc_recover_xi1(
+    seq(22.5, 337.5, by = 45), k = 4L, xi1 = .15, xi2 = .05, zeta1 = .08,
+    n = 1500L, reps = 100L, seed = 60L
+  )
+  expect_lt(abs(mc$mean - .15), 2 * mc$mcse)
+})
+
+test_that("M60: lavaan and OpenMx agree at a non-octant set (Layer B)", {
+  skip_if_not_installed("lavaan")
+  skip_if_not_installed("OpenMx")
+  for (ang in list(seq(22.5, 337.5, by = 45), (seq_len(6L) - 1L) * 60)) {
+    k <- 4L
+    set.seed(60L)
+    dat <- as.data.frame(scale(axes_simulate(2000L, ang, k, .15, .05, .10)))
+    p <- ncol(dat)
+    inames <- sprintf("i%02d", seq_len(p))
+    colnames(dat) <- inames
+    items <- split(inames, factor(rep(seq_along(ang), each = k),
+                                  levels = seq_along(ang)))
+    S <- stats::cov(dat)
+    lav <- axes_lav_components(S, 2000L, items, ang)
+    mx <- axes_mx_components(S, 2000L, ang, k)
+    expect_lt(max(abs(lav - mx)), 1e-3)
+  }
 })
