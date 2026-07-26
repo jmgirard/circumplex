@@ -1,6 +1,6 @@
 # M60: Any equally spaced angle set for `axes_reliability()`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -104,7 +104,7 @@ any rotation, instead of only the canonical octant set.
       OpenMx cells at a rotated-octant and a k ≠ 8 configuration.
 - [x] T7: roxygen (`R/axes_reliability.R:316-317,343,395`), `man/` regeneration,
       vignette and NEWS.
-- [ ] T8: D-entry for the v2.0.0 admission; full check plus the PDF manual.
+- [x] T8: D-entry for the v2.0.0 admission; full check plus the PDF manual.
 
 ## Work log
 
@@ -119,6 +119,8 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: T5 banked Table 3's `Type` column + the four type-b (CV-LI) and one type-c (MEIL) rows in `references/strack2013.md`, re-verified in two channels (text layer + 200-dpi page image) agreeing on every value; provenance status re-marked inline. Sweep test added, incl. a discrimination check that the wrong item_n fails it. MEIL's components sum to 74.4 (a second source defect, RR10-corroborated) so it anchors reliability only, never a sum guard.
 - 2026-07-25: T6 Layer-B at 4 new geometries (type-b rotated octants, k=6, k=12, k=5 at a 13.7° rotation): exact population recovery + chisq<1e-6, MC recovery within 2 MCSE at the rotated set, lavaan/OpenMx agreement <1e-3. Also hardened two test helpers whose `split()` on a numeric group vector would misorder scales at k>=10 — a no-op at k=8, and the production path (`axes_resolve_map()`) was already positional and safe.
 - 2026-07-25: T7 docs — new roxygen section "Which instruments this accepts" (equal spacing at any rotation, the k>=4 identification floor, quasi-circumplex refused not approximated), `angles` param doc, man/ regenerated, vignette §6 paragraph, NEWS folded into the existing axes_reliability() bullet per D-031. NAMESPACE unchanged (the helper is internal, so no _pkgdown.yml row is owed). Vignette tail bytes checked clean (M34).
+- 2026-07-25: T8 `devtools::check()` OK (0/0/0, 9m30s) and the PDF manual built directly (`R CMD Rd2pdf`, 76pp) — the check log has zero occurrences of "checking PDF version of manual", confirming `--no-manual` skipped it, which is how M7 and M57 each shipped a CRAN-blocking failure. New Rd section verified present in the rendered PDF. No new D-entry owed: D-031 already admits M60 to v2.0.0.
+- 2026-07-25: all tasks done; status -> review.
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 
 ## Decisions
