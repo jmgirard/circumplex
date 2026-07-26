@@ -436,6 +436,173 @@ test_that("BC11: a boundary fit (xi1 <= 0) returns NA + warning + flag", {
   expect_lt(res$results$xi1[[1]], 0) # recorded, never clipped to 0
 })
 
+# --- The never-NaN contract (M62) --------------------------------------------
+# Two ways axes_reliability() could report a NaN, negative, or infinite SEm.
+# The first is a xi1 >= 1 fit, where Spearman-Brown returns a reliability at or
+# above 1 and axis_sem()'s sqrt(1 - rel) goes imaginary. That state is not
+# reachable through the exported function -- on a unit-diagonal correlation
+# matrix the model reproduces, eps_i = 1 - xi1 - xi2 - zeta1, so xi1 > 1 with
+# the other components non-negative drives the matrix indefinite and the
+# positive-definite gate refuses it first (measured at the M62 plan gate: an
+# engineered cormat implying xi1 = 1.15, xi2 = .20 has min eigenvalue exactly
+# -0.35, its own implied eps). Evidence, not proof -- a finite-sample fit is
+# approximate -- so the guard is owed, and the predicate is tested directly
+# because no end-to-end fixture can reach it. The two halves compose: these
+# tests prove xi1 >= 1 sets the boundary flag, and the BC11 test above proves
+# the flag yields NA + warning rather than a computed value.
+
+test_that("M62: axes_is_boundary() catches xi1 >= 1 as well as xi1 <= 0", {
+  ok <- function(xi1 = .5, xi2 = .1, zeta1 = .1, eps = c(.3, .3)) {
+    axes_is_boundary(xi1, xi2, zeta1, eps)
+  }
+  expect_false(ok()) # the interior case is not a boundary
+
+  # The new half. >= 1 is deliberate and symmetric with the shipped <= 0: at
+  # exactly 1 the SB reliability is exactly 1 and SEm exactly 0, which requires
+  # zero item-error variance -- degenerate, not usable.
+  expect_true(ok(xi1 = 1))
+  expect_true(ok(xi1 = 1.001))
+  expect_false(ok(xi1 = .999)) # fences the threshold from below
+
+  # The shipped half, unchanged. Enumerated rather than assumed: M62 adds a
+  # disjunct to this expression, and generalizing a gate is where incidental
+  # refusals get dropped (the M60 lesson).
+  expect_true(ok(xi1 = 0))
+  expect_true(ok(xi1 = -.01))
+  expect_true(ok(xi2 = -.01))
+  expect_true(ok(zeta1 = -.01))
+  expect_true(ok(eps = c(.3, -.01)))
+
+  # The zeta1-dropped path (M61): zeta1 is NULL, and NULL must not itself read
+  # as a boundary, nor error the way `logical(0)` would inside `||`.
+  expect_false(ok(zeta1 = NULL))
+  expect_true(ok(zeta1 = NULL, eps = c(.3, -.01)))
+})
+
+test_that("M62: no xi1 the boundary guard admits can yield a NaN or negative SEm", {
+  # The property AC1 actually claims, swept rather than spot-checked: across
+  # every item_n this package can produce -- 2 is the k = 4 single-item floor,
+  # 2.5 an odd-k half-integer, 26/3 the SYMLOG-shaped fractional value, 16 and
+  # 32 the octant cases -- every admitted xi1 gives a finite, non-negative SEm.
+  #
+  # `sem >= 0`, deliberately not `> 0`, and the grid runs right up to the bound
+  # to keep that honest. The guard tests xi1, not the derived reliability, so
+  # within about 1e-15 of 1 the SB ratio ROUNDS to exactly 1 and SEm is exactly
+  # 0 for an xi1 the predicate admits (measured: item_n 26/3 and 32 at
+  # xi1 = 1 - 1e-15). A bare zero is finite, non-negative and non-NaN, which is
+  # the whole of what this milestone promises -- but a grid stopping short of
+  # that regime while asserting `> 0` would be a test proving its property on a
+  # hand-picked interior and claiming it universally.
+  grid <- expand.grid(
+    xi1 = c(1e-8, .001, .05, .5, .95, .999, 1 - 1e-9, 1 - 1e-14, 1 - 1e-15),
+    item_n = c(2, 2.5, 26 / 3, 16, 32)
+  )
+  rel <- axis_reliability_sb(grid$xi1, grid$item_n)
+  sem <- axis_sem(rel)
+  # Mapped, not vectorized: the predicate uses `||`, which errors on a
+  # length > 1 argument in R >= 4.3 -- it is a scalar decision by design.
+  admitted <- vapply(grid$xi1, axes_is_boundary, logical(1),
+                     xi2 = .1, zeta1 = .1, eps = .3)
+  expect_false(any(admitted))
+  expect_true(all(is.finite(rel)))
+  expect_true(all(rel > 0 & rel <= 1))
+  expect_true(all(is.finite(sem)))
+  expect_true(all(!is.nan(sem) & sem >= 0))
+})
+
+test_that("M62: no accepted input lets a bare `NaNs produced` warning escape", {
+  skip_if_not_installed("lavaan")
+  # AC1's second clause, asserted on UNMOCKED calls. The sibling test below
+  # forces the boundary through a mock, which routes straight to a literal
+  # NA_real_ and so never runs the arithmetic that could raise this warning --
+  # it cannot probe this claim, and must not be read as doing so.
+  warn_texts <- function(expr) {
+    w <- character(0)
+    withCallingHandlers(
+      suppressMessages(expr),
+      warning = function(c) {
+        w <<- c(w, conditionMessage(c))
+        invokeRestart("muffleWarning")
+      }
+    )
+    w
+  }
+
+  # An ordinary fit: no warnings of any kind, so certainly no NaN one.
+  fx <- axes_valid_fixture()
+  expect_false(any(grepl(
+    "NaN", warn_texts(axes_reliability(fx$data, items = fx$items,
+                                       angles = fx$oct))
+  )))
+
+  # A real boundary fit, where the NA path is actually taken (the BC11 seed):
+  # the boundary warning is raised and it is the ONLY one -- R's bare
+  # "NaNs produced" from sqrt() of a negative never reaches the user, which is
+  # what the guard exists to prevent.
+  oct <- octants()
+  set.seed(5)
+  bd <- axes_simulate(400L, oct, 4L, xi1 = 0, xi2 = .05, zeta1 = .40)
+  inames <- sprintf("i%02d", seq_len(ncol(bd)))
+  colnames(bd) <- inames
+  w <- warn_texts(axes_reliability(
+    bd, items = split(inames, rep(seq_along(oct), each = 4L)), angles = oct
+  ))
+  expect_true(any(grepl("boundary", w)))
+  expect_false(any(grepl("NaN", w)))
+})
+
+test_that("M62: the boundary branch reports NA rather than NaN, end to end", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_valid_fixture()
+  # Forces the boundary through the same seam the convergence guard uses. This
+  # proves the boundary -> NA wiring and that NA is not NaN; it does NOT probe
+  # the guard's condition (the mock replaces it) -- the predicate test above is
+  # what reddens when the xi1 >= 1 disjunct is deleted.
+  testthat::local_mocked_bindings(axes_is_boundary = function(...) TRUE)
+  expect_warning(
+    res <- suppressMessages(
+      axes_reliability(fx$data, items = fx$items, angles = fx$oct)
+    ),
+    "boundary"
+  )
+  expect_true(all(is.na(res$results$sem)))
+  expect_false(any(is.nan(res$results$sem))) # NA, never NaN
+  expect_true(res$details$boundary)
+})
+
+test_that("M62: a numeric `sd` must be finite and positive", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_valid_fixture()
+  run <- function(s) suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$oct, sd = s)
+  )
+
+  # The second never-NaN path, and the only one reachable from the exported
+  # API: `sd` scales SEm = sd * sqrt(1 - rel), so each of these reached the
+  # results frame unchallenged before M62 -- measured at the plan gate as
+  # sem = -0.4764406, Inf, NA, and NaN respectively.
+  for (bad in list(-1, 0, Inf, -Inf, NA_real_, NaN)) {
+    expect_error(run(bad), "must be finite and positive")
+  }
+  # Length-2 (per-axis SDs): one bad element is enough, and it is caught
+  # whichever axis carries it.
+  expect_error(run(c(2, -1)), "must be finite and positive")
+  expect_error(run(c(NaN, 2)), "must be finite and positive")
+  # is.finite() rather than is.na(): is.na() admits +/-Inf, which is why the
+  # Inf cases above are the ones that pin this line (the M32/M35 lesson).
+
+  # Everything already legal stays legal, and returns what it returned before.
+  ref <- run("std")
+  expect_true(all(is.finite(ref$results$sem)))
+  expect_equal(
+    run(3)$results$sem, 3 * ref$results$sem, tolerance = 1e-10
+  )
+  expect_equal(
+    run(c(2, 3))$results$sem, c(2, 3) * ref$results$sem, tolerance = 1e-10
+  )
+  expect_true(all(is.finite(run("raw")$results$sem)))
+})
+
 test_that("BC12: each malformed input errors informatively", {
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture()

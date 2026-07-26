@@ -280,6 +280,42 @@ axes_converged <- function(fit) {
   isTRUE(lavaan::lavInspect(fit, "converged"))
 }
 
+# Whether a fit landed on a boundary -- not a usable solution, so the caller
+# NAs the reliability and SEm rather than reporting a clipped, negative, or
+# imaginary value (RR09 BC11). Four disjuncts, and the first two bracket the
+# axes variance on both sides:
+#
+#   xi1 <= 0  the axes carry no variance, so there is nothing to be reliable.
+#   xi1 >= 1  the axes carry ALL of it. Spearman-Brown gives rel > 1 for
+#             xi1 > 1 and exactly 1 at xi1 == 1 (rel > 1 iff xi1 > 1, since
+#             item_n*xi1 > 1 + (item_n - 1)*xi1 reduces to xi1 > 1), and
+#             axis_sem()'s sqrt(1 - rel) then returns NaN. Included at the
+#             closed bound for symmetry with xi1 <= 0: rel == 1 requires zero
+#             item-error variance, which is degenerate rather than perfect. On
+#             the correlation metric this needs a grossly misspecified fit and
+#             is not reachable through axes_reliability() (M62; see the test
+#             file's never-NaN block), but the doctrine is never to emit a NaN,
+#             so it is guarded rather than argued away.
+#             What this bound does NOT claim: because it tests xi1 rather than
+#             the derived rel, an xi1 within ~1e-15 of 1 is admitted while the
+#             SB ratio rounds to exactly 1, giving SEm exactly 0 (M62 review,
+#             finding scored 74 and recorded rather than actioned). That is
+#             finite and non-negative -- a degenerate estimate, not a NaN -- so
+#             it is outside what this guard is for. Moving the test onto rel
+#             would close the float gap, at the cost of a per-axis predicate;
+#             the sweep test pins the current behavior either way.
+#
+# The remaining two catch any negative estimated variance. zeta1 is NULL on the
+# zeta1-dropped path (M61), and NULL-ness is the same source of truth
+# axes_fits_zeta1() gives the caller -- passing a separate flag alongside it
+# would let the two disagree.
+#
+# Scalar by design: `||` errors on a length > 1 argument in R >= 4.3.
+axes_is_boundary <- function(xi1, xi2, zeta1, eps) {
+  xi1 <= 0 || xi1 >= 1 || xi2 < 0 || (!is.null(zeta1) && zeta1 < 0) ||
+    any(eps < 0)
+}
+
 # --- Population model and simulation (oracle + bundled-data generator) ---------
 
 # The exact population item-correlation matrix implied by the five orthogonal
@@ -470,9 +506,13 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #'
 #' Missing data are handled by **listwise deletion only** (a message reports the
 #' complete-case count); pairwise correlation input is never used. A boundary
-#' fit (a non-positive estimated axes variance, or any negative estimated
-#' variance) returns `NA` reliability and SEm with a warning and a boundary flag
-#' rather than a clipped or negative value.
+#' fit returns `NA` reliability and SEm with a warning and a boundary flag
+#' rather than a clipped, negative, or missing value. A fit counts as a boundary
+#' when the estimated axes variance falls outside `(0, 1)` -- at or below zero
+#' the axes carry no variance to be reliable, and at or above one they carry all
+#' of it, which drives the Spearman-Brown reliability to one or beyond, leaving
+#' the standard error of measurement at zero or undefined -- or when any
+#' estimated variance is negative.
 #'
 #' # Supplying a correlation matrix instead of raw data
 #'
@@ -525,7 +565,9 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' @param sd The scale for the standard error of measurement: `"std"` (the
 #'   default) reports the z-standardized SEm `sqrt(1 - reliability)`; `"raw"`
 #'   uses each axis composite's observed raw SD; or a numeric vector (length 1,
-#'   recycled, or length 2 for the X and Y axes) of axis SDs.
+#'   recycled, or length 2 for the X and Y axes) of axis SDs. A supplied numeric
+#'   SD must be finite and positive; anything else is refused rather than
+#'   carried into the reported SEm.
 #' @return An object of class `circumplex_axes_reliability` with `print()` and
 #'   [summary()] methods: `results` (one row per axis: the axes variance, item_n,
 #'   reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
@@ -834,16 +876,15 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   zeta1 <- if (fit_zeta1) comp_var("SS1")[[1]] else NULL
   eps <- pe$est[pe$op == "~~" & pe$lhs == pe$rhs & pe$lhs %in% all_cols]
 
-  # Boundary: a non-positive axes variance, or any negative estimated variance,
-  # is not a usable solution (RR09 BC11). NA the reliability/SEm -- never clip,
-  # zero, or return a negative -- and flag it. On the zeta1-dropped path there
-  # is no scale-specificity variance to test; `zeta1 < 0` on a NULL would be
-  # logical(0), which `||` rejects in R >= 4.3, so the term is dropped rather
-  # than defaulted.
-  boundary <- xi1 <= 0 || xi2 < 0 || (fit_zeta1 && zeta1 < 0) || any(eps < 0)
+  # Boundary: an axes variance outside (0, 1), or any negative estimated
+  # variance, is not a usable solution (RR09 BC11; M62 added the upper bound).
+  # NA the reliability/SEm -- never clip, zero, or return a negative or a NaN --
+  # and flag it. The predicate is a named seam so the unreachable-in-practice
+  # upper bound is still testable; see axes_is_boundary() for each disjunct.
+  boundary <- axes_is_boundary(xi1, xi2, zeta1, eps)
   if (boundary) {
     warning(
-      "A boundary solution (non-positive axes variance or a negative ",
+      "A boundary solution (an axes variance outside (0, 1), or a negative ",
       "estimated variance) was reached; reliability and SEm are NA.",
       call. = FALSE
     )
@@ -884,6 +925,20 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     )
   } else {
     stopifnot(is.numeric(sd), length(sd) %in% c(1L, 2L))
+    # An axis SD scales SEm = sd * sqrt(1 - rel), so an unusable value here
+    # lands straight in the results frame: -1 gave a negative SEm, Inf an
+    # infinite one, and NA/NaN a missing one with nothing to say why (all
+    # measured at the M62 plan gate). is.finite() rather than is.na(), which
+    # admits +/-Inf -- the M32/M35 lesson, fourth recurrence. Zero is refused
+    # with the negatives: it reports SEm = 0 on every axis, indistinguishable
+    # from perfect measurement.
+    if (!all(is.finite(sd)) || any(sd <= 0)) {
+      stop(
+        "`sd` must be finite and positive; received ",
+        paste(format(sd), collapse = ", "), ".",
+        call. = FALSE
+      )
+    }
     if (length(sd) == 1L) c(x = sd, y = sd) else c(x = sd[[1]], y = sd[[2]])
   }
   sem <- if (boundary) c(x = NA_real_, y = NA_real_) else {
