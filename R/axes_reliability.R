@@ -424,7 +424,11 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' The Nunnally-Bernstein axis reliability (`nb_reliability`) is reported
 #' alongside for comparison: it **overestimates** axis reliability when scale
 #' specificity is large, because it charges scale-specificity variance to the
-#' axis rather than isolating it (Strack et al. 2013, Figure 3).
+#' axis rather than isolating it (Strack et al. 2013, Figure 3). It needs each
+#' scale's coefficient alpha, which is undefined for a scale carrying a single
+#' item, so it is reported as `NA` with a stated reason whenever any scale has
+#' fewer than two items -- as Strack et al. themselves do, leaving it blank for
+#' such instruments.
 #'
 #' Because the model is fit to the item **correlation** matrix as if it were a
 #' covariance matrix (the paper's own practice), the component point estimates
@@ -443,12 +447,26 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' which is what keeps the equal-axis-variance restriction as innocuous as it
 #' is for octants.
 #'
+#' Scales may carry **one item each**, as Strack et al.'s types e and f do. With
+#' a single item at every position no two items share a scale, so the
+#' scale-specificity component is not identified and is dropped from the model
+#' rather than estimated: the components table then has three rows instead of
+#' four, and `details$zeta1_fitted` is `FALSE`. A *mixed* instrument still
+#' estimates it -- one multi-item scale supplies the information, and the
+#' shared-value restriction carries it to the rest.
+#'
 #' Two limits. At least **four** scales are required: with three, every pair of
 #' scales sits the same angular distance apart, and the general, axes, and
 #' scale-specificity variances are then not separately identified. And spacing
 #' must be equal, not merely close -- a quasi-circumplex is refused rather than
 #' approximated, since Strack et al. (2013) excluded such instruments from the
-#' model's validation. Every scale still needs at least two items.
+#' model's validation. Every scale needs at least one item.
+#'
+#' The model is two-dimensional. Instruments whose items span three dimensions
+#' -- spherical designs such as SYMLOG (Strack et al.'s type f) -- are out of
+#' scope, even though Strack et al. (2013) analyze one; their Table 3 SYMLOG
+#' rows arise from a three-axis sphere model, not from any configuration this
+#' function accepts.
 #'
 #' Missing data are handled by **listwise deletion only** (a message reports the
 #' complete-case count); pairwise correlation input is never used. A boundary
@@ -511,8 +529,10 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' @return An object of class `circumplex_axes_reliability` with `print()` and
 #'   [summary()] methods: `results` (one row per axis: the axes variance, item_n,
 #'   reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
-#'   `components` (the estimated variance components with SEs), `fit` (global fit
-#'   indices), and `details`.
+#'   `components` (the estimated variance components with SEs -- four rows, or
+#'   three when scale specificity was dropped), `fit` (global fit indices), and
+#'   `details` (including `zeta1_fitted`, whether scale specificity was in the
+#'   model, and `nb_reason`, why the Nunnally-Bernstein comparison is `NA`).
 #' @references
 #' Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The reliability of
 #' circumplex axes. \emph{SAGE Open}, 3(2). \doi{10.1177/2158244013486115}
