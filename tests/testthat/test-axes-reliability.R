@@ -1145,3 +1145,42 @@ test_that("M60: per-axis item_n is n * k/2 at any rotation", {
   expect_equal(unb[["x"]], 6, tolerance = tol)
   expect_equal(unb[["y"]], 2, tolerance = tol)
 })
+
+test_that("M60: Spearman-Brown reproduces the non-octant Table 3 rows (Layer A)", {
+  # Strack et al. (2013) Table 3 col 1 is the circumplex TYPE, so the paper
+  # publishes anchors beyond type a. Banked in cairn/references/strack2013.md
+  # (two channels on p. 7: pdftotext text layer + page-image render).
+
+  # Type b -- CV-LI, eight scales at 45 deg rotated 22.5 deg off the axes
+  # (p. 2). This is exactly the configuration M60 unlocks.
+  typeb <- data.frame(
+    row    = c("CVLI12S", "CVLI12O", "CVLI12M", "CVLI13S"),
+    gen    = c(22.6, 42.9, 35.4, 19.6),
+    axes   = c(3.5, 2.7, 1.9, 7.6),
+    scale  = c(19.6, 15.0, 19.6, 19.7),
+    item   = c(54.3, 39.4, 43.1, 53.1),
+    item_n = c(16, 16, 16, 16),
+    rel    = c(.37, .31, .24, .57)
+  )
+  # Every type-b row is internally consistent -- unlike the IIP S6 erratum, no
+  # exception carve-out is needed here.
+  expect_true(all(abs(
+    typeb$gen + typeb$axes + typeb$scale + typeb$item - 100.0
+  ) <= 0.1))
+  expect_true(all(abs(
+    axis_reliability_sb(typeb$axes / 100, typeb$item_n) - typeb$rel
+  ) <= .01))
+
+  # Type c -- MEIL S14 Self. Its COMPONENTS are a second source defect (they sum
+  # to 74.4, not 100.0; both extraction channels agree, and RR10 saw it in the
+  # text layer), so this row is asserted as a reliability anchor only, never as
+  # a component-sum guard.
+  expect_true(abs(4.3 + 5.5 + 27.9 + 36.7 - 74.4) <= 0.1) # the defect, pinned
+  expect_true(abs(axis_reliability_sb(.055, 30) - .63) <= .01)
+
+  # The sweep discriminates: it is not satisfied by any item_n. Reading the
+  # type-b rows at the octant item_n of 32 would miss every printed value.
+  expect_false(all(abs(
+    axis_reliability_sb(typeb$axes / 100, 32) - typeb$rel
+  ) <= .01))
+})

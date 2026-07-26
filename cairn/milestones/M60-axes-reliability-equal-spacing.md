@@ -98,7 +98,7 @@ any rotation, instead of only the canonical octant set.
       (`R/axes_reliability.R:31-34`) — `n × k/2`; keep the exact-equality octant
       assertion at `test-axes-reliability.R:5` exact, since exactness there is
       an octant accident (16 scales at 22.5° measured `y = 31.999999999999996`).
-- [ ] T5: bank the four CV-LI type-b Table 3 rows in
+- [x] T5: bank the four CV-LI type-b Table 3 rows in
       `cairn/references/strack2013.md` and add the ±.01 sweep test.
 - [ ] T6: re-run the population-matrix, synthetic-recovery and cross-engine
       OpenMx cells at a rotated-octant and a k ≠ 8 configuration.
@@ -116,9 +116,12 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: T2 `angles_spacing_status()` (modular, tol = 1e-8 = float noise only) + 15 unit assertions incl. k = 4:24 at two rotations; T3 wired it into the refuse contract and re-pointed the three stale BC12 message expectations. Suite green (232).
 - 2026-07-25: mutation-tested the 5 guards. 4 had teeth (floor→3: 1 fail; tol 1e-8→0.5: 3; skip duplicate: 6; accept any spacing: 7). The `%% 360` reduction did NOT redden — for in-range sets the wrap term compensates; it bites only on angles outside [0, 360), now asserted (`c(10, 100, 190, 640)`), and the mutation reddens. Full suite 3394 pass / 0 fail; the 4 warnings are pre-existing in test-ci_accuracy.R.
 - 2026-07-25: T4 item_n = n*k/2 pinned over k = 4:16 x 4 rotations x 3 item counts, plus an unbalanced set giving legitimately unequal per-axis values; stale octant-only comment on axis_item_n() corrected.
+- 2026-07-25: T5 banked Table 3's `Type` column + the four type-b (CV-LI) and one type-c (MEIL) rows in `references/strack2013.md`, re-verified in two channels (text layer + 200-dpi page image) agreeing on every value; provenance status re-marked inline. Sweep test added, incl. a discrimination check that the wrong item_n fails it. MEIL's components sum to 74.4 (a second source defect, RR10-corroborated) so it anchors reliability only, never a sum guard.
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 
 ## Decisions
+
+- 2026-07-25 (T5): `cairn_validate`'s sizing advisory flags M60 and M61 at 8 acceptance criteria (>7 tripwire). Not split: the 8th in each is the template-mandated "profile verify/check clean" criterion every code milestone carries, so the substantive count is 7. Splitting on a hygiene criterion would cut a coherent unit for a counting artifact.
 
 - 2026-07-25 (T4): non-octant item_n is compared with a tolerance set from discrimination (1e-8 absolute; one item = 1.0, so it fences at 1e8x and sits ~6 orders above the ~1e-14 float noise). The octant `expect_identical()` in BC3 stays exact — exactness there is a real property of that set, not an artifact to weaken.
 
