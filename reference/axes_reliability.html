@@ -144,7 +144,9 @@ accepted with <code>data</code> (which carries its own).</p></dd>
 <dd><p>The scale for the standard error of measurement: <code>"std"</code> (the
 default) reports the z-standardized SEm <code>sqrt(1 - reliability)</code>; <code>"raw"</code>
 uses each axis composite's observed raw SD; or a numeric vector (length 1,
-recycled, or length 2 for the X and Y axes) of axis SDs.</p></dd>
+recycled, or length 2 for the X and Y axes) of axis SDs. A supplied numeric
+SD must be finite and positive; anything else is refused rather than
+carried into the reported SEm.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -210,9 +212,13 @@ rows arise from a three-axis sphere model, not from any configuration this
 function accepts.</p>
 <p>Missing data are handled by <strong>listwise deletion only</strong> (a message reports the
 complete-case count); pairwise correlation input is never used. A boundary
-fit (a non-positive estimated axes variance, or any negative estimated
-variance) returns <code>NA</code> reliability and SEm with a warning and a boundary flag
-rather than a clipped or negative value.</p>
+fit returns <code>NA</code> reliability and SEm with a warning and a boundary flag
+rather than a clipped, negative, or missing value. A fit counts as a boundary
+when the estimated axes variance falls outside <code>(0, 1)</code> – at or below zero
+the axes carry no variance to be reliable, and at or above one they carry all
+of it, which drives the Spearman-Brown reliability to one or beyond, leaving
+the standard error of measurement at zero or undefined – or when any
+estimated variance is negative.</p>
     </div>
     <div class="section level2">
     <h2 id="supplying-a-correlation-matrix-instead-of-raw-data">Supplying a correlation matrix instead of raw data<a class="anchor" aria-label="anchor" href="#supplying-a-correlation-matrix-instead-of-raw-data"></a></h2>

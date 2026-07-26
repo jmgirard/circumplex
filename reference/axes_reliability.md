@@ -72,7 +72,9 @@ axes_reliability(
   The scale for the standard error of measurement: `"std"` (the default)
   reports the z-standardized SEm `sqrt(1 - reliability)`; `"raw"` uses
   each axis composite's observed raw SD; or a numeric vector (length 1,
-  recycled, or length 2 for the X and Y axes) of axis SDs.
+  recycled, or length 2 for the X and Y axes) of axis SDs. A supplied
+  numeric SD must be finite and positive; anything else is refused
+  rather than carried into the reported SEm.
 
 ## Value
 
@@ -148,9 +150,14 @@ configuration this function accepts.
 
 Missing data are handled by **listwise deletion only** (a message
 reports the complete-case count); pairwise correlation input is never
-used. A boundary fit (a non-positive estimated axes variance, or any
-negative estimated variance) returns `NA` reliability and SEm with a
-warning and a boundary flag rather than a clipped or negative value.
+used. A boundary fit returns `NA` reliability and SEm with a warning and
+a boundary flag rather than a clipped, negative, or missing value. A fit
+counts as a boundary when the estimated axes variance falls outside
+`(0, 1)` – at or below zero the axes carry no variance to be reliable,
+and at or above one they carry all of it, which drives the
+Spearman-Brown reliability to one or beyond, leaving the standard error
+of measurement at zero or undefined – or when any estimated variance is
+negative.
 
 ## Supplying a correlation matrix instead of raw data
 
