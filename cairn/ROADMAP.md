@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-25 (nothing shipped since M59; tree clean and level with origin, all checks PASS, no open issues/PRs/RBs, M7 still parked on the submit_cran handoff. Prior stamp's future date corrected. Gap reported to the plugin, not fixed here: the SessionStart injection is 65% M7 work log and truncates its newest entries.)_
+_Last hygiene check: 2026-07-26 (M60 shipped — `axes_reliability()` now takes any equally spaced angle set; tree clean and level with origin, all checks PASS, no open issues/PRs/RBs. M55 row pruned under terminal-row retention. M7 still parked on the submit_cran handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,14 +9,13 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M60 | Any equally spaced angle set for `axes_reliability()` | review | — | normal | milestones/M60-axes-reliability-equal-spacing.md |
+| M60 | Any equally spaced angle set for `axes_reliability()` | done | — | normal | milestones/archive/M60-axes-reliability-equal-spacing.md |
 | M61 | Single-item scale positions for `axes_reliability()` — dropping ζ1 | planned | M60 | normal | milestones/M61-axes-reliability-single-item.md |
 | M59 | Correlation-matrix input path for `axes_reliability()` | done | M54 | normal | milestones/archive/M59-axes-reliability-corr-input.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M58 | Finish the post-M52 CI trim — pkgdown parity + an allowlist drift guard | done | — | normal | milestones/archive/M58-ci-trim-pkgdown-parity.md |
 | M57 | ΔCFI secondary invariance criterion for `ssm_sem()` | done | — | normal | milestones/archive/M57-dcfi-invariance-criterion.md |
 | M56 | Cite the published Browne equations `R/cpm_fit.R` implements | done | — | normal | milestones/archive/M56-cite-browne-equations.md |
-| M55 | Axes-Reliability vignette — teaching `axes_reliability()` | done | M54 | normal | milestones/archive/M55-axes-reliability-vignette.md |
 
 ## Candidates
 
