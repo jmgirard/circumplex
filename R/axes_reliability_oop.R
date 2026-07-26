@@ -102,16 +102,19 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   # RR09 sec. 7.4 and M61-D1: NA-with-reason, never silently dropped. `d$nb_reason`
   # is NULL when the comparison is available. The `from_cormat` fallback keeps the
   # note on objects built before M61 added the field.
+  # `nb_reason` carries EVERY reason that applies, so both notes print when a
+  # correlation matrix also has single-item scales -- membership, not identity.
   nb_reason <- d$nb_reason
   if (is.null(nb_reason) && from_cormat) nb_reason <- "cormat"
-  if (identical(nb_reason, "cormat")) {
+  if ("cormat" %in% nb_reason) {
     cat(
       "\n  Note: the Nunnally-Bernstein comparison needs the raw item scores",
       "\n  (scale alphas and the axis-composite variance), so it is NA on the",
       "\n  correlation-matrix path.\n",
       sep = ""
     )
-  } else if (identical(nb_reason, "single_item")) {
+  }
+  if ("single_item" %in% nb_reason) {
     cat(
       "\n  Note: the Nunnally-Bernstein comparison needs each scale's alpha,",
       "\n  which is undefined for a scale carrying only one item, so it is NA",

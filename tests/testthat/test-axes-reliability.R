@@ -1861,3 +1861,68 @@ test_that("M61 T8: lavaan and OpenMx agree at a single-item set (Layer B)", {
     expect_lt(max(abs(lav - mx)), 1e-3)
   }
 })
+
+test_that("M61 review F3: the k < 4 message names only components the map would fit", {
+  skip_if_not_installed("lavaan")
+  ang3 <- c(0, 120, 240)
+  set.seed(63L)
+  d <- as.data.frame(matrix(stats::rnorm(200 * 6), ncol = 6))
+  colnames(d) <- sprintf("v%d", 1:6)
+
+  # Multi-item map: zeta1 WOULD be fitted, so scale specificity is named.
+  multi <- list(c("v1", "v2"), c("v3", "v4"), c("v5", "v6"))
+  expect_error(
+    suppressMessages(axes_reliability(d, items = multi, angles = ang3)),
+    "general, axes, and scale-specificity variances"
+  )
+  # Single-item map: zeta1 would be DROPPED, so naming it would misdirect the
+  # user toward a component that was never in the model.
+  single <- list("v1", "v2", "v3")
+  expect_error(
+    suppressMessages(axes_reliability(d, items = single, angles = ang3)),
+    "general and axes variances are not separately identified"
+  )
+  err <- tryCatch(
+    suppressMessages(axes_reliability(d, items = single, angles = ang3)),
+    error = function(e) conditionMessage(e)
+  )
+  expect_false(grepl("scale-specificity", err, fixed = TRUE))
+  # Both still refuse, and for the same underlying reason.
+  expect_match(err, "at least 4 equally spaced scales")
+})
+
+test_that("M61 review F4: nb_reason carries every reason that applies", {
+  skip_if_not_installed("lavaan")
+  ang <- (seq_len(8L) - 1L) * 45
+  pop <- axes_population_cor(ang, 1L, .20, .05, zeta1 = 0)
+  R <- pop$sigma
+  inames <- sprintf("c%02d", seq_len(nrow(R)))
+  dimnames(R) <- list(inames, inames)
+  items <- split(inames, factor(pop$scale, levels = seq_along(ang)))
+
+  # A correlation matrix whose scales each carry one item: BOTH unavailabilities
+  # hold at once. Reporting only "cormat" would hide the alpha-undefined fact
+  # and make it unrecoverable from `details`.
+  res <- suppressMessages(
+    axes_reliability(cormat = R, items = items, angles = ang, n = 500L)
+  )
+  expect_setequal(res$details$nb_reason, c("cormat", "single_item"))
+  expect_true(all(is.na(res$results$nb_reliability)))
+  expect_false(any(is.nan(res$results$nb_reliability)))
+  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  expect_match(out, "correlation-matrix path")
+  expect_match(out, "undefined for a scale carrying only one item")
+
+  # Each reason still stands alone where only one applies.
+  fx <- axes_spaced_fixture(ang, n = 900L, k = 1L)
+  r1 <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  expect_identical(r1$details$nb_reason, "single_item")
+  fx2 <- axes_spaced_fixture(ang, n = 900L, k = 3L)
+  r2 <- suppressMessages(
+    axes_reliability(cormat = stats::cor(as.matrix(fx2$data)),
+                     items = fx2$items, angles = fx2$angles, n = 900L)
+  )
+  expect_identical(r2$details$nb_reason, "cormat")
+})

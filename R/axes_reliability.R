@@ -641,10 +641,19 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       "`axes_reliability()` needs at least 4 equally spaced scales; ",
       n_scales, if (n_scales == 1L) " was" else " were", " supplied.",
       if (n_scales == 3L) {
+        # Name only the components this map's model would actually fit: on an
+        # all-single-item map zeta1 is dropped anyway (axes_fits_zeta1()), so
+        # citing scale specificity as the casualty would misdirect the user
+        # toward a component that was never in the model (M61 review, F3).
         paste0(
           " At 3 equally spaced scales every pair of scales sits the same ",
-          "angular distance apart, so the general, axes, and scale-specificity ",
-          "variances are not separately identified."
+          "angular distance apart, so the ",
+          if (axes_fits_zeta1(item_cols)) {
+            "general, axes, and scale-specificity variances "
+          } else {
+            "general and axes variances "
+          },
+          "are not separately identified."
         )
       } else "",
       call. = FALSE
@@ -898,13 +907,16 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # corroborate: Table 3 col 14 is blank for every single-item row, and p. 5
   # states the formula "was not applied for analyzing instruments with a single
   # item per spatial position".
-  nb_reason <- if (!has_data) {
-    "cormat"
-  } else if (any(n_items_scale < 2L)) {
-    "single_item"
-  } else {
-    NULL
-  }
+  # The two unavailabilities are independent and can both hold at once -- a
+  # correlation matrix whose scales each carry one item has no raw scores AND no
+  # defined alpha. `nb_reason` therefore carries every reason that applies, not
+  # the first one matched, so `details` stays a faithful record and print()
+  # states both (M61 review, F4). `c()` drops the NULLs, so it is NULL when the
+  # comparison is available.
+  nb_reason <- c(
+    if (!has_data) "cormat",
+    if (any(n_items_scale < 2L)) "single_item"
+  )
   nb <- if (is.null(nb_reason)) {
     rel_scale <- vapply(
       item_cols, function(cols) cronbach_alpha(mat[, cols, drop = FALSE]),

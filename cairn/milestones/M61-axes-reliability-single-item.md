@@ -147,6 +147,7 @@ Line refs are post-M60: `R/axes_reliability.R`, or `test-` = `tests/testthat/tes
 - 2026-07-26: AC8 evidence — `devtools::check(args = "--no-manual")` **Status: OK, 0 errors / 0 warnings / 0 notes** (6m 21s, tests 256s), and the PDF manual actually built via `R CMD Rd2pdf` (exit 0, 346 KB); its pdfTeX `dest` warnings are pre-existing cross-package link references (ggplot2, lavaan, boot), not M61's. Status → review.
 - 2026-07-26: correction to the T4/T6 work-log line above — it says "three pre-existing tests" pinned the old `>= 2 items` contract; there were **two** (`git show master:tests/…` finds exactly two occurrences, at lines 482 and 1047). The third was M61's own T1 characterization test, written earlier in this milestone and rewritten at T6, so not pre-existing. Caught by the blame-history reviewer at the M61 review gate and verified against `master`.
 - 2026-07-26: review fan-out complete. Two lenses 0 findings; the diff-bug lens found 4, scored 82/77/66/32. F1 (incoherent AC2 mixed fixture) fixed on the branch; its fix also closed F2's oracle gap by adding a mixed exact-population Layer-B cell. F3/F4 logged unactioned with reasons. Axes test file 720 expectations, 0 failed (M61 blocks 130).
+- 2026-07-26: user override at the merge gate — Jeff directed F3 (66) and F4 (32) be fixed rather than left logged, despite both scoring below the 80 actioning threshold. Both fixed on the branch with their own regression tests: the k < 4 message now names "general and axes variances" on a map whose ζ1 would be dropped, and `nb_reason` is a character vector so a single-item cormat input reports both `"cormat"` and `"single_item"` and prints both notes. Axes test file 731 expectations, 0 failed.
 
 ## Decisions
 
@@ -275,14 +276,15 @@ that did not generate the findings.
   xi1/xi2/zeta1 to 1e-4 at chisq < 1e-6. The scale-3 cell confirms
   `comp_var("SS1")` reads the shared zeta1 label rather than a latent that
   happens to own a pair.
-- **F3 (66)** — the k < 4 refusal message names scale specificity, which is not
-  in the model for an all-single-item 3-scale map. The refusal is still correct;
-  only the stated reason is stale, and the line is unmodified by the diff.
-  Cosmetic; left for the milestone that next touches that message.
-- **F4 (32)** — `nb_reason` is a single string, so a cormat input whose scales
-  each carry one item reports only `"cormat"`. Rejected: a correlation matrix
-  can never supply raw item scores whatever the item counts, so `"cormat"` is
-  the more fundamental and sufficient reason; AC3 is met either way.
+- **F3 (66)** — the k < 4 refusal message named scale specificity, which is not
+  in the model for an all-single-item 3-scale map. **Jeff overrode the
+  sub-threshold triage at the merge gate and directed both be fixed** (logged
+  per the user-override rule). The explanation now names only the components
+  that map's model would fit.
+- **F4 (32)** — `nb_reason` was a single string, so a cormat input whose scales
+  each carry one item reported only `"cormat"`. **Fixed on the same override:**
+  it is now a character vector carrying every reason that applies, and print()
+  states each. The two unavailabilities are independent and can hold at once.
 
 ### Consistency gate
 
