@@ -44,7 +44,11 @@ axis_weights <- function(angles_deg) {
 # A departure of 1e-4 degrees is already 4 orders of magnitude above the noise
 # floor and is refused, so no real design slips through on tolerance.
 angles_spacing_status <- function(angles_deg, tol = 1e-8) {
-  if (anyNA(angles_deg)) return("missing")
+  # is.finite() rather than anyNA(): anyNA() does NOT reject +/-Inf (the M32/M35
+  # lesson), and an infinite angle is worse than useless here -- `Inf %% 360` is
+  # NaN and sort() SILENTLY DROPS it, so `k` below would be computed after the
+  # drop and the surviving angles could satisfy 360/k and return "ok".
+  if (!all(is.finite(as.numeric(angles_deg)))) return("nonfinite")
   a <- sort(as.numeric(angles_deg) %% 360)
   k <- length(a)
   gaps <- c(diff(a), 360 - (a[[k]] - a[[1]]))
@@ -546,6 +550,21 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   if (anyNA(angles_deg)) {
     stop("`angles` contains a missing value.", call. = FALSE)
   }
+  # anyNA() above does not reject +/-Inf (the M32/M35 lesson), and an infinite
+  # angle would otherwise reach the fit: `Inf %% 360` is NaN, sort() drops it,
+  # and the surviving angles can satisfy the spacing test -- so the fit dies in
+  # qr.solve() naming nothing. Refuse it here, naming the offending scale.
+  nonfinite <- which(!is.finite(as.numeric(angles_deg)))
+  if (length(nonfinite) > 0) {
+    stop(
+      "`angles` must be finite; scale(s) ",
+      paste(nonfinite, collapse = ", "), " carry ",
+      paste(unique(as.character(as.numeric(angles_deg)[nonfinite])),
+            collapse = ", "),
+      ".",
+      call. = FALSE
+    )
+  }
   # Four scales is the identification floor, not a convention: at three equally
   # spaced scales every cross-scale pair carries the same cos(delta) = -0.5, so
   # the moment-structure design (cos delta, 1, same-scale) drops from rank 3 to
@@ -566,7 +585,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     )
   }
   shown <- paste(format(sort(as.numeric(angles_deg) %% 360)), collapse = ", ")
+  # The final unnamed branch is switch()'s default: an unhandled status must
+  # abort, never fall through to the fit. Unreachable today (the gates above
+  # exclude "nonfinite"), but this helper is shared and switch() returns NULL
+  # invisibly on no match, which would silently accept a malformed set.
   switch(angles_spacing_status(angles_deg),
+    ok = NULL,
     duplicate = stop(
       "`angles` duplicates a circumplex position (0 and 360 degrees are one ",
       "position): ", shown, ".",
@@ -578,7 +602,8 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       "-degree spacing, but were supplied as ", shown,
       ". A quasi-circumplex (near-equal spacing) is out of scope.",
       call. = FALSE
-    )
+    ),
+    stop("`angles` were not usable: ", shown, ".", call. = FALSE)
   )
   n_items_scale <- lengths(item_cols)
   if (any(n_items_scale < 2L)) {

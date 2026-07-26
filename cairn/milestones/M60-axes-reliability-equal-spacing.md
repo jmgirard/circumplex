@@ -123,6 +123,7 @@ any rotation, instead of only the canonical octant set.
 - 2026-07-25: all tasks done; status -> review.
 - 2026-07-25: refusals use `stop(call. = FALSE)` matching all 26 in the file; the profile's cli_abort slot would need cli as a new dependency (gate + D-entry) for no gain.
 - 2026-07-25: review checkpoint — PR #86 opened (draft); all 8 ACs verified with fresh evidence and ticked; consistency gate clean. Review fan-out: prior-review lens clean, blame lens 1 finding (strack2013.md provenance overclaim), diff-bug lens still running. CI pending. Not yet triaged or merged.
+- 2026-07-25: review fan-out triaged — F1 (96) non-finite angle escaping the refuse contract, F2 (83) false split() comments, F5 (82) provenance overclaim all fixed; F3 (62) and F4 (45) logged below threshold. Suite 3748 pass.
 
 ## Decisions
 
@@ -192,3 +193,60 @@ split; work-log format, 47 pre-existing M7 lines). No DESIGN principle changed,
 so `cairn_impact` does not apply. Toolchain slot: `document()` no-diff ✔,
 `pkgdown::check_pkgdown()` "No problems found" ✔, NEWS entry present ✔, README
 untouched ✔, no new top-level files ✔, full check clean ✔.
+
+**Independent review — three lenses + scorer.** Diff-bug [O] 4 findings,
+blame-history [S] 1, prior-PR-comments [S] 0 (GitHub comment surface probed
+empty; archived `## Review` sections were the evidence base). All five scored by
+a fresh [S] scorer that did not generate them.
+
+*Actioned (score ≥ 80), all three fixed on the branch:*
+
+- **F1 (96) — a non-finite angle escaped the whole refuse contract.**
+  `anyNA()` does not reject `Inf`; `Inf %% 360` is `NaN`; `sort()` silently
+  drops it, so the helper's `k` was computed after the drop and the surviving
+  angles satisfied `360/k`, returning `"ok"`. Verified:
+  `angles_spacing_status(c(octants(), Inf))` gave `"ok"` and a full call died in
+  `qr.solve()` with `NA/NaN/Inf in foreign function call` naming nothing. A
+  regression the diff introduced — master refused it via the set-identity length
+  mismatch — and a walk into the recorded M32/M35 lesson. Fixed with an
+  `is.finite()` gate naming the offending scale and value, an `is.finite()`
+  predicate in the helper (status `"nonfinite"`), and a `switch()` default so an
+  unhandled status aborts instead of falling through. Both mutations redden
+  (removing the caller gate: 1 failure; reverting the helper to `anyNA()`: 3).
+- **F2 (83) — three code comments and a work-log line asserted a hazard that
+  does not exist.** They claimed `split()` on a numeric group vector sorts
+  levels as CHARACTER, misordering scales at k ≥ 10. False: `split()` coerces
+  with `factor()`, whose levels sort numerically; only a character group vector
+  sorts lexically, and all five edits were behavioral no-ops. Comments corrected
+  to say the level pinning states the pairing rather than repairing it.
+- **F5 (82) — the provenance line overclaimed.** It named "type-e and type-f
+  rows ... agreeing on every banked value" when no type-e/f rows are banked in
+  this file at all; those are M61's. Repeat of the M40/M45/M47 lesson that an
+  Extraction status may claim only what each channel actually saw. Scoped to the
+  type-b and type-c rows actually banked, and states explicitly that type-e/f
+  carry no verification claim.
+
+*Logged below threshold, not actioned (surfaced, never silently dropped):*
+
+- **F3 (62)** — the MEIL component-sum assertion re-sums the four literals on
+  its own line against a derived 74.4, so it offers weaker regression protection
+  than its "the defect, pinned" comment implies. The scorer noted it is not
+  strictly tautological (editing one literal would fail it).
+- **F4 (45)** — the type-b Layer-A block calls only `axis_reliability_sb()` with
+  `item_n` hard-banked at 16, so it passes verbatim on master and validates the
+  paper's arithmetic rather than the generalization. Scored low because AC4's
+  `item_n = n·k/2` sweep already covers the geometry derivation separately, by
+  design. Its minor sibling — `expect_false(all(...))` where the comment implies
+  `expect_true(all(... > .01))` — passes for the right reason today.
+
+**Verified sound by the diff-bug lens, independently of the author:** the
+k ≥ 4 identification floor (rank recomputed over k = 3:9 × 4 rotations ×
+balanced and unbalanced item counts — rank 2 at k = 3 in every cell, rank 3 from
+k = 4); the Σw² = k/2 identity derived analytically; the check ordering; and
+every downstream path (print/summary, OLS shadow, start values, N–B, `sd =
+"raw"`, the `cormat` path) exercised at k = 4/5/6/8-rotated/12.
+
+**Post-fix.** Full suite 3748 pass / 0 fail (4 warnings pre-existing in
+`test-ci_accuracy.R`); axes file 589 pass. CI green on the pre-fix commit
+including `test-coverage` — the `covr` job that failed in M59 — and re-run on
+the fix commit.

@@ -7,7 +7,7 @@ Pagination: the article's own page numbers. The PDF is **born-digital**
 (`Creator: Adobe InDesign CS5.5`, `Producer: Adobe PDF Library 9.9`) — not an
 OCR scan — so its `pdftotext` text layer is the typeset text itself, a faithful
 witness (unlike the `hubert1987`/`tracey1997` OCR scans).
-Extraction: verified 2026-07-23 against the born-digital `pdftotext -layout` text layer, with Table 3 and every formula below additionally cross-read against the layout-preserved rendering; re-verified 2026-07-25 (M60) on p. 7, where the `Type` column and the type-b, type-c, type-e and type-f rows were read in both channels — the text layer and a 200-dpi page-image render — agreeing on every banked value; no value read by a second human channel — observed 2026-07-25.
+Extraction: verified 2026-07-23 against the born-digital `pdftotext -layout` text layer, with Table 3 and every formula below additionally cross-read against the layout-preserved rendering; re-verified 2026-07-25 (M60) on p. 7, where the `Type` column and the type-b and type-c rows banked below were read in both channels — the text layer and a 200-dpi page-image render — agreeing on every value (the type-e and type-f rows on that page are NOT banked here and carry no verification claim; they are M61's to bank); no value read by a second human channel — observed 2026-07-25.
 
 **Citation.** Strack, M., Jacobs, I., & Grosse Holtforth, M. (2013). Reliability
 of Circumplex Axes. *SAGE Open*, 3(2), 1–12. DOI 10.1177/2158244013486115.

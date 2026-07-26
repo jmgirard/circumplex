@@ -204,9 +204,10 @@ axes_mc_recover_xi1 <- function(oct, k, xi1, xi2, zeta1, n, reps, seed) {
   set.seed(seed)
   pop <- axes_population_cor(oct, k, xi1, xi2, zeta1)
   inames <- sprintf("item_%02d", seq_along(pop$scale))
-  # Pin the split() levels: a bare numeric group vector becomes a factor whose
-  # levels sort as CHARACTER, so at k >= 10 scale 10 would pair with angle 2.
-  # A no-op at k = 8; required now that M60 makes k >= 10 reachable.
+  # Levels pinned explicitly so the scale->angle pairing is stated rather than
+  # inferred. (split() on a NUMERIC group vector already orders levels
+  # numerically, so this is equivalent, not a fix -- only a CHARACTER group
+  # vector would sort "10" before "2".)
   items <- split(inames, factor(pop$scale, levels = seq_along(oct)))
   est <- numeric(reps)
   for (r in seq_len(reps)) {
@@ -304,7 +305,7 @@ test_that("BC7: lavaan and OpenMx agree on the component variances (Layer B)", {
     inames <- sprintf("i%02d", seq_len(p))
     colnames(dat) <- inames
     items <- split(inames, factor(rep(seq_along(oct), each = k),
-                                  levels = seq_along(oct))) # see M60 note above
+                                  levels = seq_along(oct))) # levels stated, see above
     S <- stats::cov(dat)
 
     lav <- axes_lav_components(S, 2000L, items, oct)
@@ -956,10 +957,11 @@ test_that("AC5: each malformed cormat/n input errors informatively", {
 
 # A fixture at an arbitrary equally spaced angle set. Unlike
 # axes_valid_fixture(), the scale count is a parameter, so the split() group
-# levels are pinned explicitly -- a bare numeric group vector is coerced to a
-# factor whose levels sort as CHARACTER ("1", "10", "11", "12", "2", ...), which
-# would silently pair scale 10's items with angle 2 at k >= 10 (the M34/M33
-# alphabetical-ordering family).
+# levels are pinned explicitly, stating the scale->angle pairing rather than
+# leaving it to coercion. This is equivalence, not a repair: split() coerces a
+# NUMERIC group vector with factor(), whose levels sort numerically, so 1:12
+# already pairs correctly. Only a CHARACTER group vector would sort "10" before
+# "2" -- the hazard the M33/M34 ordering lessons describe.
 axes_spaced_fixture <- function(angles, n = 1500L, k = 4L, xi1 = .20,
                                 seed = 42L) {
   set.seed(seed)
@@ -1043,6 +1045,18 @@ test_that("M60: the refusal contract survives the relaxation", {
   one <- fx$items
   one[[1]] <- one[[1]][1]
   expect_error(bad(items = one), "at least 2 items")
+
+  # A non-finite angle must be REFUSED BY NAME, not carried into the fit.
+  # anyNA() does not reject Inf, and `Inf %% 360` is NaN which sort() drops, so
+  # without an is.finite() gate the spacing test reads the SURVIVING angles as
+  # equally spaced and the run dies later in qr.solve() naming nothing.
+  inf_ang <- fx$angles
+  inf_ang[[2]] <- Inf
+  expect_error(bad(inf_ang), "must be finite")
+  expect_error(bad(inf_ang), "scale\\(s\\) 2")
+  neg_inf <- fx$angles
+  neg_inf[[5]] <- -Inf
+  expect_error(bad(neg_inf), "must be finite")
 })
 
 test_that("M60: the spacing test is modular at the pole", {
@@ -1102,8 +1116,15 @@ test_that("M60: angles_spacing_status() classifies at the pole and near-misses",
   # interior gaps of 360/k force the wrap gap to match. Verified by mutation.)
   expect_identical(angles_spacing_status(c(0, 10, 20, 30)), "unequal")
 
-  # NA is classified, never silently dropped by sort().
-  expect_identical(angles_spacing_status(c(0, 90, NA, 270)), "missing")
+  # Non-finite angles are classified, never silently dropped by sort(). Inf is
+  # the dangerous one: anyNA() does not reject it, `Inf %% 360` is NaN, and
+  # sort() drops NaN -- so without this branch the surviving angles could
+  # satisfy 360/k and the set would read as "ok".
+  expect_identical(angles_spacing_status(c(0, 90, NA, 270)), "nonfinite")
+  expect_identical(angles_spacing_status(c(0, 90, NaN, 270)), "nonfinite")
+  expect_identical(angles_spacing_status(c(0, 120, 240, Inf)), "nonfinite")
+  expect_identical(angles_spacing_status(c(octants(), Inf)), "nonfinite")
+  expect_identical(angles_spacing_status(c(0, 90, 180, -Inf)), "nonfinite")
 
   # Angles supplied outside [0, 360) reduce onto their circumplex positions.
   # This is the ONLY case that pins the `%% 360` reduction: with it removed,
