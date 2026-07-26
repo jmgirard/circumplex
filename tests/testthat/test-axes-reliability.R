@@ -1679,3 +1679,123 @@ test_that("M61 T7: fractional AND unequal item_n survives on the zeta1-fitted pa
     res$results$reliability[[1]], res$results$reliability[[2]]
   )))
 })
+
+# M61 Layer B (T8). The BC5/BC6/BC7 oracles re-run at single-item
+# configurations, where the model has no zeta1 at all. The generating population
+# genuinely carries no scale-specificity: at one item per position the zeta1
+# block of axes_population_cor() lands entirely on the diagonal, which is
+# overwritten with 1, so passing zeta1 = 0 is exact rather than an
+# approximation (pinned in the T3 test above).
+
+axes_pop_recovers_single <- function(angles, xi1, xi2) {
+  pop <- axes_population_cor(angles, 1L, xi1, xi2, zeta1 = 0)
+  sigma <- pop$sigma
+  p <- nrow(sigma)
+  inames <- sprintf("s%02d", seq_len(p))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, factor(pop$scale, levels = seq_along(angles)))
+  fit <- lavaan::cfa(
+    axes_syntax(items, angles),
+    sample.cov = sigma, sample.nobs = 500L,
+    orthogonal = TRUE, likelihood = "wishart"
+  )
+  pe <- lavaan::parameterEstimates(fit)
+  vv <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+  list(
+    converged = lavaan::lavInspect(fit, "converged"),
+    est = c(xi1 = vv("AX"), xi1b = vv("AY"), xi2 = vv("GEN")),
+    # No SS latent exists to read -- assert that, rather than reading a value.
+    has_ss = any(pe$op == "~~" & grepl("^SS", pe$lhs)),
+    chisq = unname(lavaan::fitMeasures(fit, "chisq"))
+  )
+}
+
+test_that("M61 T8: exact population recovery at single-item configurations (AC6)", {
+  skip_if_not_installed("lavaan")
+  xi1 <- .16
+  xi2 <- .09
+  cells <- list(
+    `k = 5 (fractional item_n 2.5)` = (seq_len(5L) - 1L) * 72,
+    `k = 8 octants` = octants(),
+    `k = 16 (the COC shape, item_n 8)` = (seq_len(16L) - 1L) * 22.5,
+    `k = 6 at an odd rotation` = (seq_len(6L) - 1L) * 60 + 11.3
+  )
+  for (nm in names(cells)) {
+    got <- axes_pop_recovers_single(cells[[nm]], xi1, xi2)
+    expect_true(got$converged, label = nm)
+    # Exact at the population matrix -- no Monte-Carlo slack.
+    expect_lt(abs(got$est[["xi1"]] - xi1), 1e-4)
+    expect_lt(abs(got$est[["xi1b"]] - xi1), 1e-4)
+    expect_lt(abs(got$est[["xi2"]] - xi2), 1e-4)
+    # Neither the generating Sigma nor the fitted model carries a zeta1 term.
+    expect_false(got$has_ss, label = nm)
+    expect_lt(got$chisq, 1e-6)
+  }
+})
+
+test_that("M61 T8: Monte-Carlo recovery holds at a single-item set (Layer B)", {
+  skip_if_not_installed("lavaan")
+  # axes_mc_recover_xi1() reads AX only, so it carries over to the zeta1-dropped
+  # path unchanged; k = 1 item per position is the whole difference.
+  mc <- axes_mc_recover_xi1(
+    (seq_len(12L) - 1L) * 30, k = 1L, xi1 = .18, xi2 = .06, zeta1 = 0,
+    n = 2000L, reps = 100L, seed = 618L
+  )
+  expect_lt(abs(mc$mean - .18), 2 * mc$mcse)
+})
+
+# The OpenMx cross-check without the zeta1*B term. At one item per position B is
+# the identity, so zeta1 would be perfectly confounded with the item residuals:
+# dropping it is what makes the model identified, not a simplification.
+axes_mx_components_single <- function(S, n, angles_deg) {
+  p <- nrow(S)
+  nm <- rownames(S)
+  th <- as.numeric(angles_deg) * pi / 180
+  model <- OpenMx::mxModel(
+    "axes_single",
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .15, lbound = 0,
+                     name = "xi1"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .05, lbound = 0,
+                     name = "xi2"),
+    OpenMx::mxMatrix("Full", p, 1, free = TRUE, values = .5, lbound = 0,
+                     name = "eps"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(th, th, function(a, b) cos(a - b)),
+                     name = "C"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE, values = 1, name = "J"),
+    OpenMx::mxAlgebra(
+      xi1[1, 1] * C + xi2[1, 1] * J + vec2diag(eps),
+      name = "Sigma", dimnames = list(nm, nm)
+    ),
+    OpenMx::mxData(observed = S, type = "cov", numObs = n),
+    OpenMx::mxExpectationNormal(covariance = "Sigma"),
+    OpenMx::mxFitFunctionML()
+  )
+  fit <- suppressWarnings(suppressMessages(
+    OpenMx::mxRun(model, silent = TRUE, suppressWarnings = TRUE)
+  ))
+  c(xi1 = OpenMx::mxEval(xi1, fit)[1, 1], xi2 = OpenMx::mxEval(xi2, fit)[1, 1])
+}
+
+test_that("M61 T8: lavaan and OpenMx agree at a single-item set (Layer B)", {
+  skip_if_not_installed("lavaan")
+  skip_if_not_installed("OpenMx")
+  for (ang in list((seq_len(12L) - 1L) * 30, (seq_len(5L) - 1L) * 72)) {
+    set.seed(619L)
+    dat <- as.data.frame(scale(axes_simulate(2000L, ang, 1L, .16, .06, 0)))
+    inames <- sprintf("s%02d", seq_len(ncol(dat)))
+    colnames(dat) <- inames
+    items <- split(inames, factor(seq_along(ang), levels = seq_along(ang)))
+    S <- stats::cov(dat)
+
+    fit <- lavaan::cfa(
+      axes_syntax(items, ang), sample.cov = S, sample.nobs = 2000L,
+      orthogonal = TRUE, likelihood = "wishart"
+    )
+    pe <- lavaan::parameterEstimates(fit)
+    vv <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+    lav <- c(xi1 = vv("AX"), xi2 = vv("GEN"))
+    mx <- axes_mx_components_single(S, 2000L, ang)
+    expect_lt(max(abs(lav - mx)), 1e-3)
+  }
+})
