@@ -911,6 +911,20 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     )
   } else {
     stopifnot(is.numeric(sd), length(sd) %in% c(1L, 2L))
+    # An axis SD scales SEm = sd * sqrt(1 - rel), so an unusable value here
+    # lands straight in the results frame: -1 gave a negative SEm, Inf an
+    # infinite one, and NA/NaN a missing one with nothing to say why (all
+    # measured at the M62 plan gate). is.finite() rather than is.na(), which
+    # admits +/-Inf -- the M32/M35 lesson, fourth recurrence. Zero is refused
+    # with the negatives: it reports SEm = 0 on every axis, indistinguishable
+    # from perfect measurement.
+    if (!all(is.finite(sd)) || any(sd <= 0)) {
+      stop(
+        "`sd` must be finite and positive; received ",
+        paste(format(sd), collapse = ", "), ".",
+        call. = FALSE
+      )
+    }
     if (length(sd) == 1L) c(x = sd, y = sd) else c(x = sd[[1]], y = sd[[2]])
   }
   sem <- if (boundary) c(x = NA_real_, y = NA_real_) else {

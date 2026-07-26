@@ -520,6 +520,39 @@ test_that("M62: a boundary fit reports NA SEm and raises no bare NaN warning", {
   expect_true(res$details$boundary)
 })
 
+test_that("M62: a numeric `sd` must be finite and positive", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_valid_fixture()
+  run <- function(s) suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$oct, sd = s)
+  )
+
+  # The second never-NaN path, and the only one reachable from the exported
+  # API: `sd` scales SEm = sd * sqrt(1 - rel), so each of these reached the
+  # results frame unchallenged before M62 -- measured at the plan gate as
+  # sem = -0.4764406, Inf, NA, and NaN respectively.
+  for (bad in list(-1, 0, Inf, -Inf, NA_real_, NaN)) {
+    expect_error(run(bad), "must be finite and positive")
+  }
+  # Length-2 (per-axis SDs): one bad element is enough, and it is caught
+  # whichever axis carries it.
+  expect_error(run(c(2, -1)), "must be finite and positive")
+  expect_error(run(c(NaN, 2)), "must be finite and positive")
+  # is.finite() rather than is.na(): is.na() admits +/-Inf, which is why the
+  # Inf cases above are the ones that pin this line (the M32/M35 lesson).
+
+  # Everything already legal stays legal, and returns what it returned before.
+  ref <- run("std")
+  expect_true(all(is.finite(ref$results$sem)))
+  expect_equal(
+    run(3)$results$sem, 3 * ref$results$sem, tolerance = 1e-10
+  )
+  expect_equal(
+    run(c(2, 3))$results$sem, c(2, 3) * ref$results$sem, tolerance = 1e-10
+  )
+  expect_true(all(is.finite(run("raw")$results$sem)))
+})
+
 test_that("BC12: each malformed input errors informatively", {
   skip_if_not_installed("lavaan")
   fx <- axes_valid_fixture()

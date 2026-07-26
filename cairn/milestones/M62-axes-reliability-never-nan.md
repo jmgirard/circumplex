@@ -89,7 +89,7 @@ standard error of measurement, by closing the two paths that still can.
       shipped `xi1 <= 0`: at exactly 1 the Spearman-Brown reliability is
       exactly 1 and SEm exactly 0, which requires zero item-error variance —
       a degenerate solution, not a usable one.
-- [ ] **T2** — Test first: each refused `sd` value from AC2 errors, each
+- [x] **T2** — Test first: each refused `sd` value from AC2 errors, each
       accepted one is unchanged. Then add the validation at
       `R/axes_reliability.R:886`. This is the fourth recurrence of the
       M32/M35 `!is.finite()` lesson, so guard with `is.finite()`, never
@@ -107,6 +107,7 @@ standard error of measurement, by closing the two paths that still can.
 - 2026-07-26: plan gate — four decisions (Jeff). Both gaps in one milestone; ξ1 ≥ 1 folded into `boundary` rather than made a hard error or silently floored; `sd` refuses non-finite AND non-positive; no D-entry, since D-001 bars new features and this hardens an unreleased function (D-030/D-031 not extended).
 - 2026-07-26: started (/milestone-implement). Branch `m62-axes-reliability-never-nan` cut from master at 57f5c009; no dependencies to verify. Status planned→in-progress.
 - 2026-07-26: T1 done. Boundary expression extracted to `axes_is_boundary(xi1, xi2, zeta1, eps)` with the `xi1 >= 1` disjunct added; the caller now reads the seam and its warning names "an axes variance outside (0, 1)". `zeta1`'s NULL-ness replaces the separate `fit_zeta1` flag — one source of truth for whether the component was fitted, and behaviorally identical on both paths (enumerated in the test rather than assumed, per the M60 lesson on generalizing a gate). Three tests added: the predicate across the new and every shipped case incl. both ζ1-dropped branches; a swept property test that no admitted ξ1 yields a non-finite or non-positive SEm across item_n ∈ {2, 2.5, 26/3, 16, 32}; and an end-to-end NA-not-NaN test via `local_mocked_bindings(axes_is_boundary=)`, the seam pattern `axes_converged` already uses. **AC3 first half: mutation-verified** — deleting the `xi1 >= 1` disjunct reddens `test-axes-reliability.R:463` and `:464`; code restored and re-run green. Two defects in my own tests caught before the fix landed, both in the wrapper rather than the claim: a `...`-forwarding helper collided on `xi1` ("matched by multiple actual arguments"), and the sweep called the predicate on a length-7 vector, which `||` rejects in R >= 4.3. `devtools::test()`: 0 failures, 3910 passing, 0 skipped; the 4 warnings are the pre-existing test-ci_accuracy.R diagnostics.
+- 2026-07-26: T2 done. Numeric `sd` now refuses non-finite and non-positive values with a message naming the received value; `"std"`, `"raw"`, a positive scalar and a positive length-2 vector are untouched and asserted to return exactly what they returned before. Guarded with `is.finite()`, never `is.na()` — the fourth recurrence of the M32/M35 lesson, and the two `Inf` cases are what pin that choice. Plain logical `NA` was already refused by the existing `stopifnot(is.numeric(sd))`, so the new guard covers `NA_real_`/`NaN`. **AC3 second half: mutation-verified** — deleting the guard block reddens 8 assertions in `test-axes-reliability.R`; restored and re-run green. `devtools::test()`: 0 failures, 3922 passing, 0 skipped, same 4 pre-existing warnings.
 
 ## Decisions
 
