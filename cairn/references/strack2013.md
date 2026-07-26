@@ -214,10 +214,16 @@ p. 8) — RANDALL confounds the two components the CFA isolates.
 
 - `devel/m53-axes-reliability-spec.md` — the M53 design spec; every model,
   formula, and oracle claim here anchors to this page.
-- On a GO/NO-GO **GO**, the axes-reliability build's estimator and its
+- ~~On a GO/NO-GO **GO**, the axes-reliability build's estimator and its
   Layer-A (Table 3) / Layer-B (synthetic + cross-engine) oracles will trace
   here — no `R/` or `tests/` code traces yet (design-only milestone) —
-  observed 2026-07-23.
+  observed 2026-07-23.~~ **Corrected 2026-07-26 (M61):** the GO was taken and
+  the code now traces here. `R/axes_reliability.R` implements the model, the
+  Spearman–Brown / SEm / Nunnally–Bernstein formulas, and the drop rule for the
+  single-item types; `tests/testthat/test-axes-reliability.R` carries the
+  Layer-A sweeps over this page's banked Table 3 rows (type a, the type-b/c
+  rows, and the type-e/f rows above) and the Layer-B population, Monte-Carlo
+  and lavaan/OpenMx cells — observed 2026-07-26.
 
 ## Open questions
 

@@ -5,7 +5,7 @@
 - **Depends on:** M60
 - **Driving RR:** RR11
 - **Principles touched:** —
-- **Branch/PR:** `m61-axes-reliability-single-item`
+- **Branch/PR:** `m61-axes-reliability-single-item` / https://github.com/jmgirard/circumplex/pull/87
 
 ## Goal
 
@@ -30,15 +30,15 @@ refused; the equal-spacing relaxation itself → M60.
 
 ## Acceptance criteria
 
-- [ ] AC1: `axes_reliability()` estimates a configuration with exactly one item per scale
+- [x] AC1: `axes_reliability()` estimates a configuration with exactly one item per scale
       position — no error, finite per-axis reliability, a three-row components frame with no
       scale-specificity row, and `details` recording that ζ1 was not fitted.
-- [ ] AC2: the drop rule is "no same-scale item pair exists"; a mixed configuration carrying
+- [x] AC2: the drop rule is "no same-scale item pair exists"; a mixed configuration carrying
       at least one multi-item scale still fits ζ1. Both branches tested.
-- [ ] AC3: Nunnally–Bernstein is `NA` with a stated reason on the ζ1-dropped path — never
+- [x] AC3: Nunnally–Bernstein is `NA` with a stated reason on the ζ1-dropped path — never
       `NaN`, never a number — surfaced in print/summary on the house pattern the cormat path
       already uses (`:824-826`).
-- [ ] AC4: fractional item_n works end to end on both reachable shapes: (i) an odd
+- [x] AC4: fractional item_n works end to end on both reachable shapes: (i) an odd
       all-single-item configuration (k = 5 → item_n 2.5/2.5) on the ζ1-dropped path, and
       (ii) a mixed unequal-count configuration at a non-octant rotation (e.g. angles
       22.5/112.5/202.5/292.5, counts 2/3/2/2 → item_n 4.14645/4.85355) on the ζ1-fitted
@@ -46,40 +46,40 @@ refused; the equal-spacing relaxation itself → M60.
       per-axis Σ nᵢwᵢ² within 1e-8 and is stored as double, and in (ii) the two axes differ.
       SYMLOG's printed 8.67 = 26/3 is a three-axis (sphere-model) value unreachable under
       the input contract and is asserted only at the formula layer (AC5).
-- [ ] AC5: Layer A is a formula-layer sweep of the six single-item Table 3 rows, never an
+- [x] AC5: Layer A is a formula-layer sweep of the six single-item Table 3 rows, never an
       end-to-end path; its numbers, sum guard and discrimination check are AC11 (BC3).
-- [ ] AC6: Layer B at a single-item configuration — population-matrix recovery
+- [x] AC6: Layer B at a single-item configuration — population-matrix recovery
       exact to numerical tolerance with no ζ1 term in either the generating Σ or
       the model, synthetic recovery, and cross-engine lavaan/OpenMx agreement.
-- [ ] AC7: roxygen, regenerated `man/`, vignette and NEWS state the drop rule
+- [x] AC7: roxygen, regenerated `man/`, vignette and NEWS state the drop rule
       and the N–B unavailability; the six oracle rows are banked in
       `cairn/references/strack2013.md`.
-- [ ] AC8: `devtools::check()` clean and the PDF manual actually built
+- [x] AC8: `devtools::check()` clean and the PDF manual actually built
       (`R CMD Rd2pdf`; `check()` skips it by default — M7/M57).
-- [ ] AC9 (BC1): M61's AC4 is replaced verbatim by the two criteria in RR11 Q6 (AC4a,
+- [x] AC9 (BC1): M61's AC4 is replaced verbatim by the two criteria in RR11 Q6 (AC4a,
       AC4b), and the Coverage map reads `AC4a → T7; AC4b → T3`.
-- [ ] AC10 (BC2): no test anywhere in M61 calls `axes_reliability()` (either input path)
+- [x] AC10 (BC2): no test anywhere in M61 calls `axes_reliability()` (either input path)
       with a configuration presented as SYMLOG or asserted to yield per-axis item_n 8.67;
       the three SYMLOG Table 3 rows enter the suite only through direct
       `axis_reliability_sb()` calls.
-- [ ] AC11 (BC3): the Layer-A sweep asserts, each within ±.01: SB(.028, 8) → .19,
+- [x] AC11 (BC3): the Layer-A sweep asserts, each within ±.01: SB(.028, 8) → .19,
       SB(.032, 8) → .21, SB(.019, 8) → .13, SB(.272, 8.67) → .76, SB(.303, 8.67) → .79,
       SB(.281, 8.67) → .77; asserts each of the six rows' printed components sum to 100.0
       within ±.05; and asserts the three SYMLOG rows each miss their printed reliability by
       MORE than .01 at item_n 32.
-- [ ] AC12 (BC4): the end-to-end fixtures of AC4a compare the results-frame `item_n`
+- [x] AC12 (BC4): the end-to-end fixtures of AC4a compare the results-frame `item_n`
       against an analytic per-axis sum coded independently in the test (not via
       `axis_item_n()`), with `expect_equal(tolerance = 1e-8)`, assert `is.double()` on the
       frame column, and on the mixed fixture assert the two axes' item_n differ; no new
       `expect_identical()` on any non-octant item_n, and the existing octant-exactness
       assertions are not weakened.
-- [ ] AC13 (BC5): `cairn/references/strack2013.md` banks the six type-e/f rows carrying
+- [x] AC13 (BC5): `cairn/references/strack2013.md` banks the six type-e/f rows carrying
       (i) the sphere standing fact quoting pp. 2, 5, and 9, (ii) the `8.67 = 26/3`
       identity, and (iii) a dated (`— observed YYYY-MM-DD`) observation that the
       configuration is unreachable under the accepted input contract (citing D-031); the
       sweep test carries the never-promote comment; the `axes_reliability()` roxygen states
       the two-dimensional scope naming spherical designs (SYMLOG) as out of scope.
-- [ ] AC14: the OLS shadow returns a two-component seed instead of erroring when the
+- [x] AC14: the OLS shadow returns a two-component seed instead of erroring when the
       same-scale design column is empty.
 
 **Deviations from RR11**
@@ -167,3 +167,92 @@ Line refs are post-M60: `R/axes_reliability.R`, or `test-` = `tests/testthat/tes
   `cairn/reviews/archive/RR11-axes-reliability-fractional-item-n.md`.
 
 ## Review
+
+Verified 2026-07-26 on branch `m61-axes-reliability-single-item` at PR #87. All
+evidence gathered by command in this session, never recalled. M61 test blocks:
+**107 expectations, 0 failed, 0 skipped**; whole axes file 697/0.
+
+- **AC1** — a 16-position single-item set (the COC shape) estimates: components
+  frame has **3 rows** (`general`/`axes`/`item`, symbols `xi2`/`xi1`/`epsilon`),
+  no `scale_specificity` row present, `details$zeta1_fitted` `FALSE`, both
+  reliabilities finite, `item_n` 8/8. Run directly, plus test blocks
+  "M61 T1/T6" and "M61 T4/T6 ... three-row component set (AC1)".
+- **AC2** — both branches exercised. Drop rule `axes_fits_zeta1()` truth table
+  tested (pair / mixed / all-single / zero-item). A mixed map (lengths
+  2,1,1,1,1,1,1,1) gives `zeta1_fitted TRUE`, a **4-row** components frame and a
+  3-element OLS seed; the all-single map gives FALSE, 3 rows, 2-element seed.
+- **AC3** — single-item path returns `nb_reliability` `NA NA` with
+  `is.na TRUE` / **`is.nan FALSE`** (asserted separately, since `is.na(NaN)` is
+  TRUE) and `details$nb_reason == "single_item"`; `print()` output carries
+  "needs each scale's alpha" / "undefined for a scale carrying only one item",
+  on the same house pattern as the cormat note.
+- **AC4** — both reachable shapes run end to end. (i) k = 5 single-item →
+  `item_n` 2.5/2.5 on the zeta1-dropped path; (ii) angles 22.5/112.5/202.5/292.5
+  with counts 2/3/2/2 → 4.1464466/4.8535534 on the zeta1-fitted path, axes
+  differ. Both compared against an analytic per-axis sum coded independently of
+  `axis_item_n()` at `tolerance = 1e-8`, with `is.double()` asserted.
+- **AC5** — the Layer-A block calls only `axis_reliability_sb()`; its two
+  `axes_reliability()` occurrences are inside the never-promote comment
+  (verified by reading the block, lines 1566-1608). Numbers live in AC11.
+- **AC6** — exact population recovery at four single-item cells (k = 5, 8, 16,
+  and 6 at an odd rotation): every component within 1e-4, chisq < 1e-6, and each
+  cell also asserts **no `SS` latent exists** rather than reading a value from
+  one. Monte-Carlo recovery within 2 MC-SEs at k = 12. lavaan/OpenMx agree to
+  < 1e-3 at k = 12 and k = 5 with the `zeta1*B` term removed.
+- **AC7** — roxygen, regenerated `man/axes_reliability.Rd`, the vignette's
+  closing section and the NEWS 2.0.0 bullet all state the drop rule, the mixed
+  case and the N-B unavailability; the six rows are banked in
+  `cairn/references/strack2013.md` with its `INDEX.md` line intact. No milestone
+  numbers in user-facing text.
+- **AC8** — `devtools::check(args = "--no-manual")` re-run at review:
+  **Status OK, 0 errors / 0 warnings / 0 notes**. PDF manual built by
+  `R CMD Rd2pdf` (exit 0, 346 KB); its pdfTeX `dest` warnings are pre-existing
+  cross-package link references (ggplot2, lavaan, boot).
+- **AC9 (BC1)** — machine-diffed: M61's AC4 and AC14 are RR11 Q6's two criteria
+  **verbatim** (whitespace-normalized equality, both `True`). Coverage reads
+  `AC4 -> T7` and `AC14 -> T3`. The label departure (`AC4`/`AC14` rather than
+  `AC4a`/`AC4b`) is the recorded Deviations-from-RR11 row.
+- **AC10 (BC2)** — every `8.67` and `SYMLOG` occurrence in the test file
+  enumerated: all are comments except the `typef` data frame consumed by
+  `axis_reliability_sb()`. No `axes_reliability()` call anywhere is presented as
+  SYMLOG or asserted to yield `item_n` 8.67.
+- **AC11 (BC3)** — the sweep asserts all six SB values within +/-.01, the six
+  component sums to 100.0 within +/-.05, and that the three SYMLOG rows each
+  miss their printed reliability by more than .01 at `item_n` 32.
+- **AC12 (BC4)** — analytic-sum comparison at 1e-8, `is.double()`, and
+  axes-differ on the mixed fixture, all present. Grep confirms the only
+  `expect_identical` on `item_n` are the four pre-existing **octant** ones
+  (lines 5-7, 1169); no new one on any non-octant value.
+- **AC13 (BC5)** — `strack2013.md` banks all six type-e/f rows, quotes the
+  sphere fact at pp. 2, 5 and 9, carries the `8.67 = 26/3` identity and the
+  dated unreachability observation citing D-031; the sweep test carries the
+  never-promote comment; the roxygen states the two-dimensional scope naming
+  SYMLOG. Second channel actually run: a 200-dpi `pdftoppm` page render of p. 7
+  read against the text layer, agreeing on all six rows digit-for-digit.
+- **AC14** — the single-item path's `details$ols_shadow` is a 2-element
+  `(xi2, xi1)` seed; `qr.solve()` no longer sees a zero column. Population
+  recovery through the two-column shadow is exact to 1e-10.
+
+### Consistency gate
+
+`cairn_validate` exit 0 — all checks PASS. Two advisories, neither a gate
+failure: `sizing (split tripwires)` flags M61's 14 criteria (five are ingested
+RR11 binding criteria, not new work), and `work-log format` (47) is entirely
+pre-existing M7 content. Toolchain slot: `document()` produces no diff,
+`pkgdown::check_pkgdown()` reports no problems, NEWS carries the user-visible
+entry folded into the existing bullet per D-031, no new top-level files.
+
+### Projection vs outcome (Driving RR: RR11)
+
+RR11's numeric projections, each measured this session and recorded beside it:
+
+| RR11 projected | Measured |
+|---|---|
+| k = 5 single-item item_n 2.5/2.5 | 2.5/2.5 (and 2.4999999999999996 at rotation 13.7 deg, as RR11 predicted) |
+| mixed 2/3/2/2 at 22.5 deg -> 4.14645/4.85355 | 4.1464466/4.8535534 |
+| all six type-e/f rows reproduce within +/-.005 | max miss .004114 (SYMLOG), .004157 (COC) |
+| SYMLOG rows miss by > .01 at item_n 32 | .1628/.1429/.1560 |
+| SB(xi1, 8.5) vs SB(xi1, 26/3) differ by ~.0032-.0036 | .00352/.00324/.00344 |
+| Bales 26-vector per-axis sum = 26/3 | 2*1 + 8*(1/2) + 8*(1/3) = 8.6667 exactly |
+
+No shortfall against any projection.
