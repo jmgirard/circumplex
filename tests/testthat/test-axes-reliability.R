@@ -2672,3 +2672,48 @@ test_that("M63 T7 (AC5): lavaan, OpenMx and the OLS shadow agree on zeta2", {
     expect_lt(max(abs(lav - ols)), .02)
   }
 })
+
+test_that("M63 T8 (AC5): the blocked Table 3 rows reproduce Rel and SEm (Layer A)", {
+  # The six rows in Table 3 (p. 7) printing a col-8 block-specificity value:
+  # the three blocked type-a rows excluded from the BC1 sweep, and the three
+  # type-d (OCAI) rows. Banked in cairn/references/strack2013.md (M63 T8), two
+  # channels. These anchor the FORMULA layer only -- the paper prints no
+  # correlation matrix, and reliability never touches zeta2 -- so they fence
+  # Spearman-Brown and the SEm identity, never the zeta2 estimator.
+  tbl <- data.frame(
+    inst   = c("CSIV", "TRC-g", "TRC-t", "OCAI", "OCAI", "OCAI"),
+    persp  = c("Self", "Self", "Self", "Self", "Other", "Meta"),
+    gen    = c(13.5, 11.6, 13.6, 31.6, 42.6, 48.2),
+    axes   = c(14.8,  8.0,  5.5, 11.7,  7.8,  7.3),
+    scale  = c( 4.2,  4.9,  6.5,  3.8,  0.6,  3.4),
+    block  = c( 2.8,  3.7,  6.7,  2.6,  4.9,  5.2),
+    item   = c(67.6, 71.8, 67.7, 50.2, 44.1, 36.5),
+    item_n = c(  32,   20,   20,    8,    8,    8),
+    rel    = c( .84,  .63,  .54,  .51,  .40,  .38),
+    rawvar = c(0.60, 1.89, 1.23, 15.95, 9.98, 9.64),
+    sem    = c(0.31, 0.83, 0.75,  2.78, 2.44, 2.43),
+    stringsAsFactors = FALSE
+  )
+
+  # Spearman-Brown on printed col 6 / col 10 reproduces printed col 11, every
+  # row, at the paper's own print precision.
+  sb <- axis_reliability_sb(tbl$axes / 100, tbl$item_n)
+  expect_true(all(abs(sb - tbl$rel) < .01))
+  # SEm = sqrt(raw variance) * sqrt(1 - Rel) reproduces printed col 13. The
+  # .02 slack is the BC2 convention: the inputs are printed pre-rounded.
+  expect_true(all(abs(axis_sem(tbl$rel, sqrt(tbl$rawvar)) - tbl$sem) < .02))
+
+  # The five-component sum. Four rows are self-consistent; two are the source's
+  # own pre-existing defects, PINNED with their printed sums rather than
+  # averaged away or silently excluded (RR10's ruling for the IIP S6 erratum).
+  sums <- tbl$gen + tbl$axes + tbl$scale + tbl$block + tbl$item
+  ok <- !(tbl$inst == "CSIV" | (tbl$inst == "OCAI" & tbl$persp == "Meta"))
+  expect_true(all(abs(sums[ok] - 100) < .15))     # 100.0, 100.0, 99.9, 100.0
+  expect_equal(sums[tbl$inst == "CSIV"], 102.9, tolerance = 1e-8)
+  expect_equal(sums[tbl$inst == "OCAI" & tbl$persp == "Meta"], 100.6,
+               tolerance = 1e-8)
+
+  # Every row carries a nonzero block-specificity: that is what makes these the
+  # zeta2 population and not a slice of the non-blocked sweep.
+  expect_true(all(tbl$block > 0))
+})
