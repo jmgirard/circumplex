@@ -1548,3 +1548,132 @@ test_that("M61 T5: N-B stays available and unannotated when every scale has a pa
   expect_false(grepl("undefined for a scale", out, fixed = TRUE))
   expect_false(grepl("correlation-matrix path", out, fixed = TRUE))
 })
+
+# M61 Layer A (T7). The six single-item Table 3 rows, banked in
+# cairn/references/strack2013.md (two channels on p. 7: the born-digital
+# pdftotext text layer and a 200-dpi page-image render). Like the M60 sweep,
+# this is a FORMULA-LAYER oracle: it calls axis_reliability_sb() directly with
+# the paper's printed (%axes, item_n) pairs. It is not, and must not become, a
+# path through axes_reliability().
+
+test_that("M61 T7: Spearman-Brown reproduces the six single-item Table 3 rows (Layer A)", {
+  # Type e -- COC, sixteen single-item positions (Table 1: 16 items, no
+  # scales). This IS a configuration the package accepts: 16 positions give
+  # item_n = 16/2 = 8, exactly the printed value.
+  typee <- data.frame(
+    row    = c("COC16S", "COC16O", "COC16M"),
+    gen    = c(34.1, 46.7, 43.1),
+    axes   = c(2.8, 3.2, 1.9),
+    item   = c(63.1, 50.1, 55.0),
+    item_n = c(8, 8, 8),
+    rel    = c(.19, .21, .13)
+  )
+  # Type f -- SYMLOG. NOT a package-supported configuration: Strack fits SYMLOG
+  # as a SPHERE (three orthogonal axes; "spheres (e.g., Bales & Cohen, 1979)"
+  # p. 2, "realizes a sphere" p. 5, "the SYMLOG for a sphere model" p. 9), and
+  # its item_n 8.67 = 26/3 is unreachable in any two-axis equally spaced set,
+  # where single-item sets give k/2 -- a half-integer. These rows are the
+  # paper's only published fractional-item_n triples, so they anchor the scalar
+  # identity axis_reliability_sb() -- and only that. Never promote them to an
+  # end-to-end axes_reliability() fixture.
+  typef <- data.frame(
+    row    = c("SYM17S", "SYM17O", "SYM17M"),
+    gen    = c(14.4, 11.8, 15.2),
+    axes   = c(27.2, 30.3, 28.1),
+    item   = c(58.4, 57.9, 56.7),
+    item_n = c(8.67, 8.67, 8.67),
+    rel    = c(.76, .79, .77)
+  )
+  six <- rbind(typee, typef)
+
+  # Scale-specificity is "--" on all six (the paper drops zeta1 too), so the
+  # component sum is %gen + %axes + %item alone. All six are internally
+  # consistent -- unlike the type-c row, these carry a real sum guard.
+  expect_true(all(abs(six$gen + six$axes + six$item - 100.0) <= .05))
+
+  # The sweep itself.
+  expect_true(all(abs(
+    axis_reliability_sb(six$axes / 100, six$item_n) - six$rel
+  ) <= .01))
+
+  # The sweep discriminates -- but only against a DISTANT item_n. At SYMLOG's
+  # xi1 the printed 8.67 and its nearest reachable neighbour 8.5 differ by only
+  # ~.0035 in reliability, far inside the +/-.01 window, so this check would be
+  # worthless at a near miss and nobody may read it as "verified 8.67".
+  expect_true(all(abs(
+    axis_reliability_sb(typef$axes / 100, 32) - typef$rel
+  ) > .01))
+})
+
+# A per-axis item_n coded INDEPENDENTLY of axis_item_n(): plain cos/sin, no
+# snap_trig(), no axis_weights(). Comparing the results frame against the
+# function that produced it would assert nothing (BC4).
+axes_analytic_item_n <- function(angles_deg, counts) {
+  th <- angles_deg * pi / 180
+  c(x = sum(counts * cos(th)^2), y = sum(counts * sin(th)^2))
+}
+
+test_that("M61 T7: fractional item_n survives end to end on the zeta1-dropped path", {
+  skip_if_not_installed("lavaan")
+  # Five single-item positions -- an ODD count, which is the only single-item
+  # shape giving a fractional item_n (k/2 = 2.5). This is the reachable
+  # fractional case; SYMLOG's 8.67 is a sphere-model value and is asserted at
+  # the formula layer only.
+  ang <- (seq_len(5L) - 1L) * 72
+  fx <- axes_spaced_fixture(ang, n = 1200L, k = 1L)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+
+  want <- axes_analytic_item_n(ang, rep(1L, 5L))
+  expect_equal(res$results$item_n, unname(want[c("x", "y")]), tolerance = 1e-8)
+  expect_equal(res$results$item_n, c(2.5, 2.5), tolerance = 1e-8)
+  # Stored as a double, not silently coerced to integer -- a rounding-tolerant
+  # comparison at a half-integer would not catch that on its own.
+  expect_true(is.double(res$results$item_n))
+  # No expect_identical() here: the half-integer is NOT float-exact at every
+  # rotation (k = 5 at 13.7 degrees measures 2.4999999999999996), so pinning
+  # identity would be a platform trap, not a stronger assertion.
+
+  expect_false(res$details$zeta1_fitted)
+  expect_true(all(is.finite(res$results$reliability)))
+})
+
+test_that("M61 T7: fractional AND unequal item_n survives on the zeta1-fitted path", {
+  skip_if_not_installed("lavaan")
+  # Four positions rotated 22.5 degrees off the axes, carrying 2/3/2/2 items.
+  # This is the only shape whose per-axis item_n are fractional *and differ*,
+  # so it alone catches an x/y conflation -- a single-item set always gives
+  # equal axes and is structurally blind to that defect.
+  ang <- c(22.5, 112.5, 202.5, 292.5)
+  cnt <- c(2L, 3L, 2L, 2L)
+  item_scale <- rep(seq_along(ang), times = cnt)
+  th <- ang[item_scale] * pi / 180
+  xi1 <- .20; xi2 <- .05; zeta1 <- .08
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(item_scale, item_scale, `==`)
+  diag(sig) <- 1
+
+  set.seed(617L)
+  x <- mvn_draws(1500L, rep(0, nrow(sig)), sig)
+  inames <- sprintf("m%02d", seq_len(ncol(x)))
+  dat <- as.data.frame(x)
+  colnames(dat) <- inames
+  items <- split(inames, factor(item_scale, levels = seq_along(ang)))
+
+  expect_true(axes_fits_zeta1(items))
+  res <- suppressMessages(axes_reliability(dat, items = items, angles = ang))
+
+  want <- axes_analytic_item_n(ang, cnt)
+  expect_equal(res$results$item_n, unname(want[c("x", "y")]), tolerance = 1e-8)
+  expect_equal(res$results$item_n, c(4.1464466, 4.8535534), tolerance = 1e-6)
+  expect_true(is.double(res$results$item_n))
+  # The two axes genuinely differ -- nothing recycled one into both rows.
+  expect_false(isTRUE(all.equal(res$results$item_n[[1]], res$results$item_n[[2]])))
+  expect_true(res$details$zeta1_fitted)
+  # ... and the reliabilities differ with them, since they share one xi1 and
+  # differ only through item_n.
+  expect_false(isTRUE(all.equal(
+    res$results$reliability[[1]], res$results$reliability[[2]]
+  )))
+})
