@@ -1286,3 +1286,42 @@ test_that("M60: lavaan and OpenMx agree at a non-octant set (Layer B)", {
     expect_lt(max(abs(lav - mx)), 1e-3)
   }
 })
+
+# --- M61: single-item scale positions (the zeta1-dropped path) ----------------
+# T1 pins the two pre-M61 facts the rest of the milestone turns on, BEFORE
+# anything changes: the arithmetic that forces M61-D1, and the single line that
+# refuses a single-item instrument today. T6 relaxes that line; this test is
+# what makes the relaxation visible in the diff rather than silent.
+
+test_that("M61 T1: cronbach_alpha() is NaN at one item -- the reason N-B cannot report", {
+  set.seed(61L)
+  one <- matrix(stats::rnorm(50), ncol = 1)
+  # m/(m-1) is 1/0 = Inf and (1 - sum(diag(cv))/sum(cv)) is exactly 0, so the
+  # product is NaN -- not Inf, and not a number. This is the arithmetic behind
+  # M61-D1: alpha is undefined for a one-item scale, so the Nunnally-Bernstein
+  # axis formula has no rel_scale to consume and must report NA with a stated
+  # reason rather than propagate NaN into a results frame.
+  expect_true(is.nan(cronbach_alpha(one)))
+  # Two items is where it becomes defined -- the boundary M61-D1 draws.
+  expect_true(is.finite(cronbach_alpha(matrix(stats::rnorm(100), ncol = 2))))
+})
+
+test_that("M61 T1: the >= 2-items refusal is the only gate refusing a single-item set", {
+  skip_if_not_installed("lavaan")
+  # The COC shape (Strack type e; Table 3 p. 7: 16 items, no scales, item_n 8):
+  # sixteen equally spaced positions carrying one item each.
+  ang <- (seq_len(16L) - 1L) * 22.5
+  fx <- axes_spaced_fixture(ang, n = 800L, k = 1L)
+  expect_error(
+    suppressMessages(
+      axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+    ),
+    "at least 2 items"
+  )
+  # ... and every OTHER gate in the refuse contract passes on this input, so the
+  # item-count line really is the only thing in the way. Without this, a later
+  # reader could think spacing or scale count were also implicated.
+  expect_identical(angles_spacing_status(ang), "ok")
+  expect_identical(length(fx$items), 16L)
+  expect_true(all(lengths(fx$items) == 1L))
+})

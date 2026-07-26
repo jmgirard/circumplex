@@ -109,7 +109,7 @@ refused; the equal-spacing relaxation itself → M60.
 
 Line refs are post-M60: `R/axes_reliability.R`, or `test-` = `tests/testthat/test-axes-reliability.R`.
 
-- [ ] T1: tests first — a single-item configuration currently errors at the ≥ 2-items refusal (`:609`); pin that fence and `cronbach_alpha()`'s `NaN` at `m = 1`.
+- [x] T1: tests first — a single-item configuration currently errors at the ≥ 2-items refusal (`:609`); pin that fence and `cronbach_alpha()`'s `NaN` at `m = 1`.
 - [ ] T2: the drop predicate + `axes_syntax()` (`:125-172`) — latent names, measurement and variance blocks, and the `st()` start lookup, which must emit no modifier rather than a `NULL` start.
 - [ ] T3: two-column OLS shadow (`:182-192`) when no same-scale pair exists; the seed drops `zeta1` (consumed `:718`, stored `:856`).
 - [ ] T4: generalize the `SS1` extractions (`:745`, `:842`), the boundary test (`:751`) and the four-row components frame (`:838-844`) to a variable-length component set.
@@ -128,6 +128,8 @@ Line refs are post-M60: `R/axes_reliability.R`, or `test-` = `tests/testthat/tes
 
 - 2026-07-26: ingested RR11 (→ M61-D2). Applied recs 1–5 (AC4 → AC4a/AC4b, AC5 re-scoped to the formula layer, Scope and T7 reworded, BC1–BC5 ingested verbatim as AC9–AC13 with Coverage lines, `Driving RR: RR11`) and both "consider" recs (rec 6 → a k = 5 population cell in T8; rec 7 → the two SYMLOG-shape comment mislabels folded into T9). Rejected as advised: rec 8 (SYMLOG SEm cross-checks — the Self row misses by ~.04) and rec 9 (an 8.67-tuned end-to-end fixture). RR11 Beyond 2 (ξ1 ≥ 1 → NaN SEm) absorbed into the existing ROADMAP infrastructure-refactor candidate row rather than M61's scope, per RR11; Beyond 3 (item_n print width) and Beyond 4 (the paper's 28-vs-29 subsample quirk) rejected as cosmetic / not this repo's. Re-verified RR11's arithmetic independently in R before ingesting: k = 5 item_n measures 2.4999999999999996, the mixed fixture 4.1464466/4.8535534, `2·1 + 8·½ + 8·⅓ = 26/3` exactly, all six SB rows within ±.005, and the three sphere quotes are on pp. 2, 5, 9. No RR11 finding contradicts a standing D-entry (D-031 width and RR09 §4 both stand), so nothing is superseded.
 - 2026-07-26: RB11/RR11 archived; AC block compressed in one pass to fit the ingested criteria — Scope condensed and Tasks re-pointed to post-M60 line numbers (the plan's refs were pre-M60 and stale). Plan-owned body 149/149.
+
+- 2026-07-26: T1 done — two characterization tests pin `cronbach_alpha()`'s `NaN` at `m = 1` (the arithmetic M61-D1 rests on) and pin that the ≥ 2-items line is the *only* gate refusing a 16-position single-item COC-shaped set, so T6's relaxation shows up in the diff. `devtools::test()` clean.
 
 ## Decisions
 
