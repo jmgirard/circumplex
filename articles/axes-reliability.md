@@ -94,7 +94,7 @@ The header confirms how many complete cases were used, and the per-axis
 table reports, for each axis, the effective test length (`item_n`), the
 Strack axis `Reliability`, its standard error of measurement (`SEm`),
 and the Nunnally–Bernstein reliability (`NB_Reliability`) for
-comparison. For a balanced octant instrument the two axes share one
+comparison. For a balanced instrument the two axes share one
 axes-variance estimate and carry equal `item_n`, so they report the same
 reliability — expected, not an error.
 
@@ -258,10 +258,21 @@ against any particular value.
 gives a compact, per-axis answer to “how reliably does this instrument
 measure communion and agency?”, isolating the axes variance from the
 general and scale-specific components that a simpler reliability formula
-would conflate. Use it to characterize an octant circumplex instrument
-before leaning on its axis scores, and read its output with the
+would conflate. Use it to characterize a circumplex instrument before
+leaning on its axis scores, and read its output with the
 correlation-as-covariance, listwise-deletion, and boundary caveats in
 mind.
+
+The examples above all use the canonical eight octant scales, but
+nothing in the model requires them: any **equally spaced** set of angles
+works, at any rotation and at any count from four scales upward. Equal
+spacing is what matters, and it is required rather than merely preferred
+— a quasi-circumplex, whose scales sit at slightly unequal intervals, is
+refused rather than approximated, because Strack et al. (2013) excluded
+such instruments when validating the model. Three scales are refused for
+a different reason: at that count every pair of scales sits the same
+angular distance apart, so the general, axes, and scale-specificity
+variances can no longer be told apart.
 
 ## References
 

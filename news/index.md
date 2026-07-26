@@ -201,14 +201,20 @@ on a real ggplot2 coordinate system.
   exploratory scale-level criteria. The Nunnally-Bernstein axis
   reliability is reported alongside for comparison (it overestimates
   when scale specificity is large). Items are supplied through a
-  `circumplex_instrument` or an explicit angle-and-item map. Estimation
-  works either from raw item data or, through `cormat` and `n`, from a
-  published item correlation matrix alone, for reanalyzing a matrix
-  whose raw data is not available; on that path the Nunnally-Bernstein
-  comparison is reported as `NA` and `sd = "raw"` is refused, since both
-  need the respondents’ own item scores. Missing data are handled by
-  listwise deletion; a boundary fit returns `NA` reliability rather than
-  a clipped value; and the returned `circumplex_axes_reliability` object
+  `circumplex_instrument` or an explicit angle-and-item map. Any equally
+  spaced set of scale angles is accepted, at any rotation and any count
+  from four scales up — the canonical octants, an interstitial set
+  rotated off the axes, or a six- or twelve-scale circumplex. Unequally
+  spaced (quasi-circumplex) angles are refused rather than approximated,
+  and three scales are refused because the variance components are not
+  separately identified at that count. Estimation works either from raw
+  item data or, through `cormat` and `n`, from a published item
+  correlation matrix alone, for reanalyzing a matrix whose raw data is
+  not available; on that path the Nunnally-Bernstein comparison is
+  reported as `NA` and `sd = "raw"` is refused, since both need the
+  respondents’ own item scores. Missing data are handled by listwise
+  deletion; a boundary fit returns `NA` reliability rather than a
+  clipped value; and the returned `circumplex_axes_reliability` object
   has [`print()`](https://rdrr.io/r/base/print.html) and
   [`summary()`](https://rdrr.io/r/base/summary.html) methods. A bundled
   simulated dataset, `simulated_items`, is included for the examples.

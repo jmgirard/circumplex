@@ -1,7 +1,7 @@
 # Reliability of the circumplex axes (Strack, Jacobs & Grosse Holtforth, 2013)
 
 Estimate the reliability (and standard error of measurement) of the two
-circumplex axes of an octant instrument with the item-level restricted
+circumplex axes of an instrument with the item-level restricted
 tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The
 model decomposes each item's variance into orthogonal components – a
 general factor, the two circumplex axes, scale specificity, and item
@@ -44,8 +44,11 @@ axes_reliability(
 
   A numeric vector of the scales' angles in degrees (one per scale),
   required for the explicit map and forbidden with `instrument` (which
-  supplies its own). Use
-  [`octants()`](http://circumplex.jmgirard.com/reference/octants.md).
+  supplies its own). Must be equally spaced around the circle, at any
+  rotation, with at least four scales;
+  [`octants()`](http://circumplex.jmgirard.com/reference/octants.md)
+  gives the canonical eight. Angles outside `[0, 360)` are reduced onto
+  their circumplex positions, so 0 and 360 name the same position.
 
 - instrument:
 
@@ -102,9 +105,27 @@ Because the model is fit to the item **correlation** matrix as if it
 were a covariance matrix (the paper's own practice), the component point
 estimates and the reliabilities are correct, but the component standard
 errors and the global chi-square are **approximate** (Cudeck, 1989).
-Results are reported **per axis** (X and Y): for a balanced octant
-instrument the two axes carry the same axes-variance estimate and differ
-only through `item_n`.
+Results are reported **per axis** (X and Y): for a balanced instrument
+the two axes carry the same axes-variance estimate and differ only
+through `item_n`.
+
+## Which instruments this accepts
+
+Any set of **equally spaced** scale angles, at any rotation: the
+canonical octants, an interstitial set rotated 22.5 degrees off the
+axes, or a non-octant count such as six or twelve scales. What matters
+is equal spacing, not the count or the starting angle – for any equally
+spaced set of `k` scales, each axis draws the same effective test length
+(`k / 2` per item), which is what keeps the equal-axis-variance
+restriction as innocuous as it is for octants.
+
+Two limits. At least **four** scales are required: with three, every
+pair of scales sits the same angular distance apart, and the general,
+axes, and scale-specificity variances are then not separately
+identified. And spacing must be equal, not merely close – a
+quasi-circumplex is refused rather than approximated, since Strack et
+al. (2013) excluded such instruments from the model's validation. Every
+scale still needs at least two items.
 
 Missing data are handled by **listwise deletion only** (a message
 reports the complete-case count); pairwise correlation input is never
