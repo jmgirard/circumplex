@@ -1,11 +1,11 @@
 # M61: Single-item scale positions for `axes_reliability()` — dropping ζ1
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M60
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m61-axes-reliability-single-item`
 
 ## Goal
 

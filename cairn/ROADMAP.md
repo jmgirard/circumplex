@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M60 | Any equally spaced angle set for `axes_reliability()` | done | — | normal | milestones/archive/M60-axes-reliability-equal-spacing.md |
-| M61 | Single-item scale positions for `axes_reliability()` — dropping ζ1 | planned | M60 | normal | milestones/M61-axes-reliability-single-item.md |
+| M61 | Single-item scale positions for `axes_reliability()` — dropping ζ1 | in-progress | M60 | normal | milestones/M61-axes-reliability-single-item.md |
 | M59 | Correlation-matrix input path for `axes_reliability()` | done | M54 | normal | milestones/archive/M59-axes-reliability-corr-input.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M58 | Finish the post-M52 CI trim — pkgdown parity + an allowlist drift guard | done | — | normal | milestones/archive/M58-ci-trim-pkgdown-parity.md |
