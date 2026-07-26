@@ -4,10 +4,19 @@
 \alias{axes_reliability}
 \title{Reliability of the circumplex axes (Strack, Jacobs & Grosse Holtforth, 2013)}
 \usage{
-axes_reliability(data, items, angles = NULL, instrument = NULL, sd = "std")
+axes_reliability(
+  data = NULL,
+  items,
+  angles = NULL,
+  instrument = NULL,
+  cormat = NULL,
+  n = NULL,
+  sd = "std"
+)
 }
 \arguments{
-\item{data}{A data frame (or matrix) containing the circumplex items.}
+\item{data}{A data frame (or matrix) containing the circumplex items. Supply
+exactly one of \code{data} or \code{cormat}.}
 
 \item{items}{Item selection. With \code{instrument}, a character vector of column
 names (or numeric indices) giving \strong{all} items in item-number order, as in
@@ -20,6 +29,14 @@ scale), required for the explicit map and forbidden with \code{instrument}
 
 \item{instrument}{Optional. A \code{circumplex_instrument} object supplying the
 scale angles and item membership (\code{Scales$Angle}, \code{Scales$Items}).}
+
+\item{cormat}{An item correlation matrix (the matrix-input path), symmetric
+with a unit diagonal and positive definite, with dimnames naming the items.
+Supply exactly one of \code{data} or \code{cormat}.}
+
+\item{n}{For the \code{cormat} path, the sample size (number of observations) the
+correlation matrix was computed from. Required with \code{cormat}, and not
+accepted with \code{data} (which carries its own).}
 
 \item{sd}{The scale for the standard error of measurement: \code{"std"} (the
 default) reports the z-standardized SEm \code{sqrt(1 - reliability)}; \code{"raw"}
@@ -70,6 +87,34 @@ fit (a non-positive estimated axes variance, or any negative estimated
 variance) returns \code{NA} reliability and SEm with a warning and a boundary flag
 rather than a clipped or negative value.
 }
+\section{Supplying a correlation matrix instead of raw data}{
+Give \code{cormat} and \code{n} in place of \code{data} to estimate from an item correlation
+matrix that someone else published, with no raw data in hand. The matrix must
+be symmetric, positive definite, and carry a unit diagonal (the model assumes
+unit-variance items); \code{items} selects and orders its rows by name, so the
+matrix's own column order does not matter. Estimates are identical to those
+the raw-data path would give for the same matrix.
+
+Two results are unavailable on this path, because both need the respondents'
+own item scores rather than their correlations: the Nunnally-Bernstein
+comparison is reported as \code{NA} (it needs each scale's alpha and the axis
+composite's variance), and \code{sd = "raw"} is refused (there are no scale scores
+to take an observed SD from). Supply the axis SDs numerically if you want SEm
+on a raw scale.
+}
+
+\section{Blockwise instruments}{
+Some circumplex instruments are administered in \strong{blocks} (items grouped by
+something other than their scale), which contributes a block-specificity
+variance component of its own. This model has no such component, and the
+package's instrument objects carry no block structure, so a blockwise
+instrument analyzed here folds its block variance into the general and
+scale-specificity components -- inflating them and, in turn, deflating the
+share attributed to the axes. Strack et al. (2013, Table 3) report
+block-specificity as high as 6.7\%, so treat axes reliability from a blockwise
+instrument as approximate.
+}
+
 \examples{
 \dontshow{if (requireNamespace("lavaan", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 # A simulated 32-item octant dataset (four items per octant scale).
@@ -81,6 +126,13 @@ items <- split(names(simulated_items), rep(1:8, each = 4))
 res <- axes_reliability(simulated_items, items = items, angles = octants())
 res
 summary(res)
+
+# The same estimates from the item correlation matrix alone, as when
+# reanalyzing a matrix published without its raw data.
+axes_reliability(
+  cormat = cor(simulated_items), items = items, angles = octants(),
+  n = nrow(simulated_items)
+)
 \dontshow{\}) # examplesIf}
 }
 \references{

@@ -161,6 +161,28 @@ axes_fit <- function(dat, items, angles_deg, estimator = "ML",
   )
 }
 
+# The cormat sibling of axes_fit(): the same syntax and the same mandatory
+# `orthogonal = TRUE`, fit to a moment matrix instead of raw rows. It does NOT
+# route through sem_fit_cfa(), and deliberately so -- that chokepoint exists to
+# own the fiml/listwise `missing` translation and the multi-group group.label
+# ordering, and neither concept applies to a fit with no rows (the BC5
+# population oracle bypasses it for the same reason).
+#
+# `likelihood` is left at lavaan's default "normal", which rescales sample.cov
+# by (N-1)/N. That is not an oversight to correct but the very thing that makes
+# this path agree with the raw path exactly: lavaan applies the same (N-1)/N
+# rescaling to the N-1 covariance it computes from raw z-scores, and that
+# covariance IS cor(mat). Switching to likelihood = "wishart" here would put the
+# two paths (N-1)/N apart -- see the AC2 round-trip test.
+axes_fit_cormat <- function(R, items, angles_deg, n, estimator = "ML",
+                            se = "standard", start = NULL) {
+  lavaan::cfa(
+    axes_syntax(items, angles_deg, start = start),
+    sample.cov = R, sample.nobs = as.integer(n),
+    estimator = estimator, se = se, orthogonal = TRUE
+  )
+}
+
 # Whether a fitted lavaan model converged. A thin seam so the convergence guard
 # in axes_reliability() (RR09 BC12) is testable via local_mocked_bindings().
 axes_converged <- function(fit) {
@@ -326,7 +348,42 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' variance) returns `NA` reliability and SEm with a warning and a boundary flag
 #' rather than a clipped or negative value.
 #'
-#' @param data A data frame (or matrix) containing the circumplex items.
+#' # Supplying a correlation matrix instead of raw data
+#'
+#' Give `cormat` and `n` in place of `data` to estimate from an item correlation
+#' matrix that someone else published, with no raw data in hand. The matrix must
+#' be symmetric, positive definite, and carry a unit diagonal (the model assumes
+#' unit-variance items); `items` selects and orders its rows by name, so the
+#' matrix's own column order does not matter. Estimates are identical to those
+#' the raw-data path would give for the same matrix.
+#'
+#' Two results are unavailable on this path, because both need the respondents'
+#' own item scores rather than their correlations: the Nunnally-Bernstein
+#' comparison is reported as `NA` (it needs each scale's alpha and the axis
+#' composite's variance), and `sd = "raw"` is refused (there are no scale scores
+#' to take an observed SD from). Supply the axis SDs numerically if you want SEm
+#' on a raw scale.
+#'
+#' # Blockwise instruments
+#'
+#' Some circumplex instruments are administered in **blocks** (items grouped by
+#' something other than their scale), which contributes a block-specificity
+#' variance component of its own. This model has no such component, and the
+#' package's instrument objects carry no block structure, so a blockwise
+#' instrument analyzed here folds its block variance into the general and
+#' scale-specificity components -- inflating them and, in turn, deflating the
+#' share attributed to the axes. Strack et al. (2013, Table 3) report
+#' block-specificity as high as 6.7%, so treat axes reliability from a blockwise
+#' instrument as approximate.
+#'
+#' @param data A data frame (or matrix) containing the circumplex items. Supply
+#'   exactly one of `data` or `cormat`.
+#' @param cormat An item correlation matrix (the matrix-input path), symmetric
+#'   with a unit diagonal and positive definite, with dimnames naming the items.
+#'   Supply exactly one of `data` or `cormat`.
+#' @param n For the `cormat` path, the sample size (number of observations) the
+#'   correlation matrix was computed from. Required with `cormat`, and not
+#'   accepted with `data` (which carries its own).
 #' @param items Item selection. With `instrument`, a character vector of column
 #'   names (or numeric indices) giving **all** items in item-number order, as in
 #'   [score()]. Without `instrument`, a list with one element per scale, each a
@@ -363,16 +420,63 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' res <- axes_reliability(simulated_items, items = items, angles = octants())
 #' res
 #' summary(res)
-axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
+#'
+#' # The same estimates from the item correlation matrix alone, as when
+#' # reanalyzing a matrix published without its raw data.
+#' axes_reliability(
+#'   cormat = cor(simulated_items), items = items, angles = octants(),
+#'   n = nrow(simulated_items)
+#' )
+axes_reliability <- function(data = NULL, items, angles = NULL,
+                             instrument = NULL, cormat = NULL, n = NULL,
                              sd = "std") {
   call <- match.call()
-  stopifnot(is.data.frame(data) || is.matrix(data))
-  if (is.matrix(data)) data <- as.data.frame(data)
   if (!requireNamespace("lavaan", quietly = TRUE)) {
     stop("`axes_reliability()` requires the lavaan package.", call. = FALSE)
   }
 
-  map <- axes_resolve_map(data, items, angles, instrument)
+  # Exactly one of data / cormat, and `n` only with cormat -- the house pattern
+  # cpm_fit() already uses for its CircE-style matrix path (R/cpm_fit.R:1583).
+  has_data <- !is.null(data)
+  has_cormat <- !is.null(cormat)
+  if (has_data == has_cormat) {
+    stop("Supply exactly one of `data` or `cormat`.", call. = FALSE)
+  }
+  if (has_data && !is.null(n)) {
+    stop(
+      "`n` applies only to the `cormat` path; the raw-data path takes its ",
+      "sample size from `data`.",
+      call. = FALSE
+    )
+  }
+  if (has_data) {
+    stopifnot(is.data.frame(data) || is.matrix(data))
+    if (is.matrix(data)) data <- as.data.frame(data)
+  } else {
+    cormat <- as.matrix(cormat)
+    if (nrow(cormat) != ncol(cormat)) {
+      stop("`cormat` must be a square matrix.", call. = FALSE)
+    }
+    # Both dimensions are indexed by name below (`cormat[all_cols, all_cols]`),
+    # so both must carry the same names in the same order. Checking only
+    # colnames() lets the commonest transcription shape through -- reading a
+    # published matrix back with as.matrix(read.csv(...)) yields colnames and
+    # NULL rownames -- and it then fails on the subset with a bare "subscript
+    # out of bounds" instead of this refusal.
+    if (is.null(colnames(cormat)) || is.null(rownames(cormat)) ||
+        !identical(rownames(cormat), colnames(cormat))) {
+      stop(
+        "`cormat` must have dimnames naming its items, identical on both ",
+        "dimensions and in the same order, so `items` can select them.",
+        call. = FALSE
+      )
+    }
+  }
+
+  # axes_resolve_map() reads only colnames(), so the correlation matrix serves
+  # as the column source on the cormat path exactly as the data frame does.
+  map <- axes_resolve_map(if (has_data) data else cormat, items, angles,
+                          instrument)
   item_cols <- map$items
   angles_deg <- map$angles
   n_scales <- length(item_cols)
@@ -405,10 +509,12 @@ axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
     stop("Every scale must have at least 2 items.", call. = FALSE)
   }
   all_cols <- unlist(item_cols)
-  missing_cols <- setdiff(all_cols, colnames(data))
+  src_cols <- if (has_data) colnames(data) else colnames(cormat)
+  missing_cols <- setdiff(all_cols, src_cols)
   if (length(missing_cols) > 0 || anyNA(all_cols)) {
     stop(
-      "Item column(s) not found in `data`: ",
+      "Item column(s) not found in `", if (has_data) "data" else "cormat",
+      "`: ",
       paste(stats::na.omit(union(missing_cols, all_cols[is.na(all_cols)])),
             collapse = ", "),
       ".",
@@ -416,40 +522,81 @@ axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
     )
   }
 
-  mat <- as.matrix(data[, all_cols, drop = FALSE])
-  if (!is.numeric(mat)) {
-    stop("`items` must select numeric columns.", call. = FALSE)
-  }
-  if (any(is.infinite(mat) | is.nan(mat))) {
-    stop("`data` contains non-finite (Inf/NaN) values.", call. = FALSE)
-  }
+  if (has_data) {
+    mat <- as.matrix(data[, all_cols, drop = FALSE])
+    if (!is.numeric(mat)) {
+      stop("`items` must select numeric columns.", call. = FALSE)
+    }
+    if (any(is.infinite(mat) | is.nan(mat))) {
+      stop("`data` contains non-finite (Inf/NaN) values.", call. = FALSE)
+    }
 
-  # --- Listwise deletion (RR09 BC13) ------------------------------------------
-  n_total <- nrow(mat)
-  mat <- mat[stats::complete.cases(mat), , drop = FALSE]
-  n <- nrow(mat)
-  p <- ncol(mat)
-  message(
-    "axes_reliability(): ", n, " complete case(s) used",
-    if (n < n_total) paste0(" (", n_total - n, " removed by listwise deletion)"),
-    "."
-  )
-  if (n <= p) {
-    stop(
-      "Complete-case N (", n, ") must exceed the number of items (", p, ").",
-      call. = FALSE
+    # --- Listwise deletion (RR09 BC13) ----------------------------------------
+    n_total <- nrow(mat)
+    mat <- mat[stats::complete.cases(mat), , drop = FALSE]
+    n <- nrow(mat)
+    p <- ncol(mat)
+    message(
+      "axes_reliability(): ", n, " complete case(s) used",
+      if (n < n_total) {
+        paste0(" (", n_total - n, " removed by listwise deletion)")
+      },
+      "."
     )
-  }
+    if (n <= p) {
+      stop(
+        "Complete-case N (", n, ") must exceed the number of items (", p, ").",
+        call. = FALSE
+      )
+    }
 
-  item_var <- apply(mat, 2, stats::var)
-  if (any(item_var <= 0)) {
-    stop(
-      "Zero-variance item(s): ",
-      paste(all_cols[item_var <= 0], collapse = ", "), ".",
-      call. = FALSE
-    )
+    item_var <- apply(mat, 2, stats::var)
+    if (any(item_var <= 0)) {
+      stop(
+        "Zero-variance item(s): ",
+        paste(all_cols[item_var <= 0], collapse = ", "), ".",
+        call. = FALSE
+      )
+    }
+    R <- stats::cor(mat)
+  } else {
+    # --- The correlation-matrix path --------------------------------------------
+    if (!is.numeric(cormat)) {
+      stop("`cormat` must be a numeric matrix.", call. = FALSE)
+    }
+    if (!all(is.finite(cormat))) {
+      stop("`cormat` contains missing or non-finite values.", call. = FALSE)
+    }
+    if (!isSymmetric(unname(cormat), tol = 1e-8)) {
+      stop("`cormat` must be symmetric.", call. = FALSE)
+    }
+    if (max(abs(diag(cormat) - 1)) > 1e-8) {
+      stop(
+        "`cormat` must have a unit diagonal (a correlation matrix); this model ",
+        "assumes unit-variance items.",
+        call. = FALSE
+      )
+    }
+    # Subset AND reorder to the item map's order, so the fixed cosine loadings
+    # line up with the items regardless of the matrix's own column order.
+    R <- cormat[all_cols, all_cols, drop = FALSE]
+    mat <- NULL
+    p <- ncol(R)
+    if (is.null(n)) {
+      stop("`n` (the sample size) is required with `cormat`.", call. = FALSE)
+    }
+    # is_scalar_count() admits Inf (ceiling(Inf) == floor(Inf)), and Inf then
+    # passes `n <= p` too -- the M32/M35 !is.finite() family. Guard it directly.
+    if (!is_scalar_count(n) || !is.finite(n) || n <= p) {
+      stop(
+        "`n` must be a single whole number greater than the number of items (",
+        p, ").",
+        call. = FALSE
+      )
+    }
+    n <- as.integer(n)
+    n_total <- n
   }
-  R <- stats::cor(mat)
   # A small positive tolerance so a near-singular matrix (e.g. duplicated or
   # collinear items, whose smallest eigenvalue is float noise ~1e-15) is refused
   # here rather than choking lavaan with a cryptic message downstream.
@@ -462,8 +609,6 @@ axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
   }
 
   # --- Fit the flat fixed-links CFA on the standardized items -----------------
-  zdf <- as.data.frame(scale(mat))
-  colnames(zdf) <- all_cols
   # SEM-independent OLS-shadow (B-1): a least-squares estimate of the three
   # component variances from the off-diagonal correlations, used as start values
   # for the fit and stored as a cross-check on the CFA estimate.
@@ -475,7 +620,13 @@ axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
   # lavaan's own fit-time warnings (e.g. "some estimated lv variances are
   # negative" on a boundary fit) are redundant noise; suppress them in favor of
   # this function's own clean diagnostics.
-  fit <- suppressWarnings(axes_fit(zdf, item_cols, angles_deg, start = ols))
+  fit <- suppressWarnings(if (has_data) {
+    zdf <- as.data.frame(scale(mat))
+    colnames(zdf) <- all_cols
+    axes_fit(zdf, item_cols, angles_deg, start = ols)
+  } else {
+    axes_fit_cormat(R, item_cols, angles_deg, n, start = ols)
+  })
   if (!axes_converged(fit)) {
     stop(
       "The lavaan model did not converge; the axes reliability cannot be ",
@@ -514,10 +665,23 @@ axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
   }
 
   # SEm scale: "std" (SD = 1), "raw" (observed axis-composite SD), or numeric.
-  scale_scores <- vapply(
-    item_cols, function(cols) rowMeans(mat[, cols, drop = FALSE]),
-    numeric(n)
-  )
+  # "raw" needs the respondents' own scale scores, so it is unavailable from a
+  # correlation matrix -- refused with the reason, never silently downgraded.
+  scale_scores <- if (has_data) {
+    vapply(
+      item_cols, function(cols) rowMeans(mat[, cols, drop = FALSE]),
+      numeric(n)
+    )
+  } else {
+    NULL
+  }
+  if (identical(sd, "raw") && !has_data) {
+    stop(
+      "`sd = \"raw\"` needs the raw scale scores, which the `cormat` path does ",
+      "not have; use \"std\" or supply the axis SDs numerically.",
+      call. = FALSE
+    )
+  }
   axis_sd <- if (identical(sd, "std")) {
     c(x = 1, y = 1)
   } else if (identical(sd, "raw")) {
@@ -535,22 +699,30 @@ axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
   }
 
   # Nunnally-Bernstein axis reliability (independent of the CFA fit): per-scale
-  # alpha and the z-standardized weighted scale composite.
-  rel_scale <- vapply(
-    item_cols, function(cols) cronbach_alpha(mat[, cols, drop = FALSE]),
-    numeric(1)
-  )
-  zscore <- scale(scale_scores)
-  nb <- c(
-    x = axis_reliability_nb(
-      weights[, "w_x"], rel_scale,
-      stats::var(as.numeric(zscore %*% weights[, "w_x"]))
-    ),
-    y = axis_reliability_nb(
-      weights[, "w_y"], rel_scale,
-      stats::var(as.numeric(zscore %*% weights[, "w_y"]))
+  # alpha and the z-standardized weighted scale composite. Both inputs are
+  # item-level quantities a correlation matrix cannot supply -- Cronbach's alpha
+  # needs the item scores and the composite variance needs the respondents -- so
+  # the cormat path reports NA with the reason (RR09 sec. 7.4: NA-with-reason,
+  # never silently dropped), rather than an approximation the user cannot audit.
+  nb <- if (has_data) {
+    rel_scale <- vapply(
+      item_cols, function(cols) cronbach_alpha(mat[, cols, drop = FALSE]),
+      numeric(1)
     )
-  )
+    zscore <- scale(scale_scores)
+    c(
+      x = axis_reliability_nb(
+        weights[, "w_x"], rel_scale,
+        stats::var(as.numeric(zscore %*% weights[, "w_x"]))
+      ),
+      y = axis_reliability_nb(
+        weights[, "w_y"], rel_scale,
+        stats::var(as.numeric(zscore %*% weights[, "w_y"]))
+      )
+    )
+  } else {
+    c(x = NA_real_, y = NA_real_)
+  }
 
   results <- data.frame(
     Axis = c("X", "Y"),
@@ -578,6 +750,7 @@ axes_reliability <- function(data, items, angles = NULL, instrument = NULL,
     details = list(
       n = n, n_total = n_total, n_items = p, n_scales = n_scales,
       angles = angles_deg, labels = map$labels, sd = sd,
+      input = if (has_data) "data" else "cormat",
       converged = TRUE, boundary = boundary,
       ols_shadow = ols
     ),
