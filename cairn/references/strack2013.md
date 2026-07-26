@@ -7,7 +7,7 @@ Pagination: the article's own page numbers. The PDF is **born-digital**
 (`Creator: Adobe InDesign CS5.5`, `Producer: Adobe PDF Library 9.9`) — not an
 OCR scan — so its `pdftotext` text layer is the typeset text itself, a faithful
 witness (unlike the `hubert1987`/`tracey1997` OCR scans).
-Extraction: verified 2026-07-23 against the born-digital `pdftotext -layout` text layer, with Table 3 and every formula below additionally cross-read against the layout-preserved rendering; re-verified 2026-07-25 (M60) on p. 7, where the `Type` column and the type-b and type-c rows banked below were read in both channels — the text layer and a 200-dpi page-image render — agreeing on every value (the type-e and type-f rows on that page are NOT banked here and carry no verification claim; they are M61's to bank); no value read by a second human channel — observed 2026-07-25.
+Extraction: verified 2026-07-23 against the born-digital `pdftotext -layout` text layer, with Table 3 and every formula below additionally cross-read against the layout-preserved rendering; re-verified 2026-07-25 (M60) on p. 7, where the `Type` column and the type-b and type-c rows banked below were read in both channels — the text layer and a 200-dpi page-image render — agreeing on every value (~~the type-e and type-f rows on that page are NOT banked here and carry no verification claim; they are M61's to bank~~ — superseded 2026-07-26: M61 banked them, see the type-e/f block below); re-verified again 2026-07-26 (M61) on p. 7 for the six type-e/f rows, both channels agreeing; no value read by a second human channel — observed 2026-07-26.
 
 **Citation.** Strack, M., Jacobs, I., & Grosse Holtforth, M. (2013). Reliability
 of Circumplex Axes. *SAGE Open*, 3(2), 1–12. DOI 10.1177/2158244013486115.
@@ -134,6 +134,46 @@ reliability anchor while its component row is not usable as a sum guard.
 The instrument's scale count is not printed, so k cannot be derived from the
 table — observed 2026-07-25.
 
+**Type-e and type-f rows (one item per scale position, ζ1 absent).** Strack et
+al. print `—` for BOTH scale-specificity (col 7) and block-specificity (col 8)
+on all six rows: with one item per position no same-scale item pair exists, so
+ζ1 is unidentified and the paper drops it. Col 14 (Nunnally–Bernstein) is blank
+for all six as well, and p. 5 says why: "The Nunnally–Bernstein formula was not
+applied for analyzing instruments with a single item per spatial position (i.e.,
+the COC and SYMLOG instrument)." All six rows sum to exactly 100.0
+(%gen + %axes + %item), so unlike the type-c row they carry a sum guard, and all
+six reproduce col 11 by Spearman–Brown on col 6 / col 10 within ±.005.
+
+| Instrument | Sample | Persp. | %gen | %axes | %item | item_n | Rel | sum |
+|---|---|---|---|---|---|---|---|---|
+| COC    | 16 | Self  | 34.1 |  2.8 | 63.1 | 8    | .19 | 100.0 |
+| COC    | 16 | Other | 46.7 |  3.2 | 50.1 | 8    | .21 | 100.0 |
+| COC    | 16 | Meta  | 43.1 |  1.9 | 55.0 | 8    | .13 | 100.0 |
+| SYMLOG | 17 | Self  | 14.4 | 27.2 | 58.4 | 8.67 | .76 | 100.0 |
+| SYMLOG | 17 | Other | 11.8 | 30.3 | 57.9 | 8.67 | .79 | 100.0 |
+| SYMLOG | 17 | Meta  | 15.2 | 28.1 | 56.7 | 8.67 | .77 | 100.0 |
+
+Type e (COC) is a two-axis configuration: Table 1 lists 16 items and no scales,
+and 16 equally spaced single-item positions give item_n = 16/2 = 8, exactly as
+printed.
+
+**Type-f rows (SYMLOG) are sphere-model values, not a two-axis configuration.**
+Strack et al. fit SYMLOG as a *sphere* — a three-dimensional extension of the
+circumplex: Figure 1's 3-D types are "spheres (e.g., Bales & Cohen, 1979)"
+(p. 2), the instrument "realizes a sphere" (p. 5), and the fitted model is named
+"the SYMLOG for a sphere model" (p. 9). Table 1 lists 26 items and no scales;
+each item's squared direction cosines sum to 1 over *three* orthogonal axes, so
+per-axis item_n = 26/3 = 8.667, printed 8.67 (Table 3 col 10). In any two-axis
+equally spaced single-item set item_n = k/2, a half-integer, so 8.67 is
+unreachable under `axes_reliability()`'s accepted input (D-031 width; RR09 §4) —
+the three rows are formula-layer Spearman–Brown anchors only, never an
+end-to-end fixture — observed 2026-07-26.
+
+Extraction of this type-e/f block: two channels on p. 7 agreeing on every value
+— the born-digital `pdftotext -layout` text layer and a page-image render;
+verified 2026-07-26 (M61 T7). The three sphere sentences on pp. 2, 5, and 9 were
+read in the text layer only.
+
 **SEm cross-check inputs (col 12 Raw variance, col 13 SEm), banked for BC2:**
 IAL S1 Self 0.98 → 0.28; OCAI S15 Self 15.95 → 2.78; COC S16 Self 6.70 → 2.33.
 Check: `sqrt(col 12)·sqrt(1 − col 11)` gives IAL .2800 (→.28), COC 2.330 (→2.33)
@@ -174,10 +214,16 @@ p. 8) — RANDALL confounds the two components the CFA isolates.
 
 - `devel/m53-axes-reliability-spec.md` — the M53 design spec; every model,
   formula, and oracle claim here anchors to this page.
-- On a GO/NO-GO **GO**, the axes-reliability build's estimator and its
+- ~~On a GO/NO-GO **GO**, the axes-reliability build's estimator and its
   Layer-A (Table 3) / Layer-B (synthetic + cross-engine) oracles will trace
   here — no `R/` or `tests/` code traces yet (design-only milestone) —
-  observed 2026-07-23.
+  observed 2026-07-23.~~ **Corrected 2026-07-26 (M61):** the GO was taken and
+  the code now traces here. `R/axes_reliability.R` implements the model, the
+  Spearman–Brown / SEm / Nunnally–Bernstein formulas, and the drop rule for the
+  single-item types; `tests/testthat/test-axes-reliability.R` carries the
+  Layer-A sweeps over this page's banked Table 3 rows (type a, the type-b/c
+  rows, and the type-e/f rows above) and the Layer-B population, Monte-Carlo
+  and lavaan/OpenMx cells — observed 2026-07-26.
 
 ## Open questions
 

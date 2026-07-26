@@ -474,12 +474,14 @@ test_that("BC12: each malformed input errors informatively", {
     suppressMessages(axes_reliability(fx$data, items = fx$items, angles = na_ang)),
     "missing"
   )
-  # a scale with < 2 items
-  one_item <- fx$items
-  one_item[[1]] <- one_item[[1]][1]
+  # a scale with no items at all (M61 relaxed this gate from "< 2 items" to
+  # "< 1 item": one item per position is Strack's types e and f, and is now
+  # estimated with the scale-specificity component dropped)
+  no_item <- fx$items
+  no_item[[1]] <- character(0)
   expect_error(
-    suppressMessages(axes_reliability(fx$data, items = one_item, angles = fx$oct)),
-    "at least 2 items"
+    suppressMessages(axes_reliability(fx$data, items = no_item, angles = fx$oct)),
+    "at least 1 item"
   )
   # item absent from data
   absent <- fx$items
@@ -1041,10 +1043,13 @@ test_that("M60: the refusal contract survives the relaxation", {
   expect_error(bad(c(0, 120, 240), fx$items[1:3]), "identif")
   expect_error(bad(c(0, 180), fx$items[1:2]), "at least 4")
 
-  # Fewer than 2 items on a scale (M61 territory, still refused here).
-  one <- fx$items
-  one[[1]] <- one[[1]][1]
-  expect_error(bad(items = one), "at least 2 items")
+  # A scale with NO items stays refused, and names itself. (Fewer than 2 items
+  # was refused here until M61 relaxed it to the zeta1 drop rule; a mixed map
+  # with one single-item scale is now estimated, not an error.)
+  none <- fx$items
+  none[[1]] <- character(0)
+  expect_error(bad(items = none), "at least 1 item")
+  expect_error(bad(items = none), "scale\\(s\\) 1")
 
   # A non-finite angle must be REFUSED BY NAME, not carried into the fit.
   # anyNA() does not reject Inf, and `Inf %% 360` is NaN which sort() drops, so
@@ -1163,9 +1168,11 @@ test_that("M60: per-axis item_n is n * k/2 at any rotation", {
   # and that must not be weakened just because rotated sets need a tolerance.
   expect_identical(axis_item_n(octants(), 4L), c(x = 16, y = 16))
 
-  # An unbalanced set legitimately gives different item_n per axis, and a
-  # fractional value (the SYMLOG shape, Table 3 col. 10 = 8.67). Nothing here
-  # rounds or forces the two axes to agree.
+  # An unbalanced set legitimately gives different item_n per axis. Nothing here
+  # rounds or forces the two axes to agree. (Table 3's fractional entry, SYMLOG's
+  # 8.67, is NOT this shape -- it is a three-axis sphere model's 26/3, out of
+  # scope for a two-axis contract; see M61 / cairn RR11. The reachable fractional
+  # cases are an odd-k or unbalanced set, tested at M61 T7.)
   unb <- axis_item_n(c(0, 90, 180, 270), c(3L, 1L, 3L, 1L))
   expect_equal(unb[["x"]], 6, tolerance = tol)
   expect_equal(unb[["y"]], 2, tolerance = tol)
@@ -1285,4 +1292,637 @@ test_that("M60: lavaan and OpenMx agree at a non-octant set (Layer B)", {
     mx <- axes_mx_components(S, 2000L, ang, k)
     expect_lt(max(abs(lav - mx)), 1e-3)
   }
+})
+
+# --- M61: single-item scale positions (the zeta1-dropped path) ----------------
+# T1 pins the two pre-M61 facts the rest of the milestone turns on, BEFORE
+# anything changes: the arithmetic that forces M61-D1, and the single line that
+# refuses a single-item instrument today. T6 relaxes that line; this test is
+# what makes the relaxation visible in the diff rather than silent.
+
+test_that("M61 T1: cronbach_alpha() is NaN at one item -- the reason N-B cannot report", {
+  set.seed(61L)
+  one <- matrix(stats::rnorm(50), ncol = 1)
+  # m/(m-1) is 1/0 = Inf and (1 - sum(diag(cv))/sum(cv)) is exactly 0, so the
+  # product is NaN -- not Inf, and not a number. This is the arithmetic behind
+  # M61-D1: alpha is undefined for a one-item scale, so the Nunnally-Bernstein
+  # axis formula has no rel_scale to consume and must report NA with a stated
+  # reason rather than propagate NaN into a results frame.
+  expect_true(is.nan(cronbach_alpha(one)))
+  # Two items is where it becomes defined -- the boundary M61-D1 draws.
+  expect_true(is.finite(cronbach_alpha(matrix(stats::rnorm(100), ncol = 2))))
+})
+
+test_that("M61 T1/T6: the single-item set passes every gate, and now estimates", {
+  skip_if_not_installed("lavaan")
+  # The COC shape (Strack type e; Table 3 p. 7: 16 items, no scales, item_n 8):
+  # sixteen equally spaced positions carrying one item each. Until M61 the
+  # >= 2-items line refused exactly this; T1 pinned that every OTHER gate in the
+  # refuse contract passed on it, so the item-count line really was the only
+  # thing in the way -- no spacing or scale-count problem was hiding behind it.
+  ang <- (seq_len(16L) - 1L) * 22.5
+  fx <- axes_spaced_fixture(ang, n = 800L, k = 1L)
+  expect_identical(angles_spacing_status(ang), "ok")
+  expect_identical(length(fx$items), 16L)
+  expect_true(all(lengths(fx$items) == 1L))
+  expect_false(axes_fits_zeta1(fx$items))
+
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  expect_s3_class(res, "circumplex_axes_reliability")
+  expect_true(all(is.finite(res$results$reliability)))
+  # item_n = k/2 = 8, the COC value Strack prints.
+  expect_equal(res$results$item_n, c(8, 8), tolerance = 1e-8)
+})
+
+test_that("M61 T2: axes_fits_zeta1() reads the drop rule off the item map", {
+  # The rule is "at least one scale carries a PAIR", not "every scale does" --
+  # a mixed map still fits zeta1 because one multi-item scale supplies the
+  # off-diagonal moment and the shared label carries it to the rest.
+  expect_true(axes_fits_zeta1(list(c("a", "b"), c("c", "d"))))
+  expect_true(axes_fits_zeta1(list(c("a", "b"), "c", "d", "e")))  # mixed
+  expect_false(axes_fits_zeta1(list("a", "b", "c", "d")))         # all single
+  # A zero-item scale is not a pair either; it must not be read as one.
+  expect_false(axes_fits_zeta1(list(character(0), "b", "c", "d")))
+})
+
+test_that("M61 T2: axes_syntax() drops the SS latents exactly on the single-item map", {
+  ang4 <- c(0, 90, 180, 270)
+  single <- list("i1", "i2", "i3", "i4")
+  mixed <- list(c("i1", "i2"), "i3", "i4", "i5")
+
+  syn_s <- axes_syntax(single, ang4)
+  # No scale-specificity anywhere: no SS latent definitions, no zeta1 label.
+  expect_false(grepl("SS1", syn_s, fixed = TRUE))
+  expect_false(grepl("zeta1", syn_s, fixed = TRUE))
+  expect_true(grepl("no scale-specificity component", syn_s, fixed = TRUE))
+  # The rest of the model is untouched: both axes, the general factor, and the
+  # shared xi1 label all survive the drop.
+  expect_true(grepl("AX ~~ xi1*AX", syn_s, fixed = TRUE))
+  expect_true(grepl("AY ~~ xi1*AY", syn_s, fixed = TRUE))
+  expect_true(grepl("GEN ~~ xi2*GEN", syn_s, fixed = TRUE))
+
+  # The mixed map keeps zeta1 -- and keeps an SS latent for the SINGLE-item
+  # scales too, since the shared-label restriction is what identifies them.
+  syn_m <- axes_syntax(mixed, ang4)
+  expect_true(grepl("SS1 =~ 1*i1 + 1*i2", syn_m, fixed = TRUE))
+  expect_true(grepl("SS2 =~ 1*i3", syn_m, fixed = TRUE))
+  expect_true(grepl("SS4 ~~ zeta1*SS4", syn_m, fixed = TRUE))
+})
+
+test_that("M61 T2: a seed without zeta1 emits no modifier rather than erroring", {
+  ang4 <- c(0, 90, 180, 270)
+  # The two-column OLS shadow (T3) returns a seed with no `zeta1` element.
+  # `start[["zeta1"]]` on that vector is a subscript error, not a NULL, so the
+  # lookup must test for the name -- this is the fence on that.
+  seed2 <- c(xi2 = .05, xi1 = .20)
+  syn <- expect_no_error(axes_syntax(list("i1", "i2", "i3", "i4"), ang4,
+                                     start = seed2))
+  # fmt() prints a double at full precision, so match the value's leading
+  # digits rather than pinning its digit count -- the assertion is about WHICH
+  # parameters get a modifier, not about how fmt() formats.
+  expect_match(syn, "AX ~~ start\\(0\\.2[0-9]*\\)\\*xi1\\*AX")
+  expect_match(syn, "GEN ~~ start\\(0\\.05[0-9]*\\)\\*xi2\\*GEN")
+  expect_false(grepl("zeta1", syn, fixed = TRUE))
+
+  # A full three-element seed still seeds all three on the zeta1-fitted path.
+  syn3 <- axes_syntax(list(c("i1", "i2"), "i3", "i4", "i5"), ang4,
+                      start = c(xi2 = .05, xi1 = .20, zeta1 = .08))
+  expect_match(syn3, "SS1 ~~ start\\(0\\.08[0-9]*\\)\\*zeta1\\*SS1")
+})
+
+test_that("M61 T3: the OLS shadow drops to two columns when no same-scale pair exists", {
+  # Single item at every position: the same-scale indicator is identically zero
+  # off the diagonal, so the three-column design has a zero column. Before M61
+  # this was a hard qr.solve() failure, not a graceful degradation.
+  ang <- (seq_len(8L) - 1L) * 45
+  xi1 <- .18
+  xi2 <- .07
+  # zeta1 is irrelevant at n_items = 1 -- its block lands entirely on the
+  # diagonal, which axes_population_cor() overwrites with 1 -- so the generating
+  # population genuinely has no scale-specificity term, whatever is passed here.
+  pop <- axes_population_cor(ang, 1L, xi1, xi2, zeta1 = 0)
+  item_scale <- pop$scale
+  item_angle <- rep(ang, each = 1L)
+
+  seed <- expect_no_error(axes_ols_shadow(pop$sigma, item_angle, item_scale))
+  expect_identical(names(seed), c("xi2", "xi1"))
+  # Exact on the population matrix: r_ij = xi2 + xi1*cos(theta_i - theta_j) is
+  # linear in the two remaining columns, so least squares is not an
+  # approximation here (the same claim the three-column shadow makes).
+  expect_lt(abs(seed[["xi1"]] - xi1), 1e-10)
+  expect_lt(abs(seed[["xi2"]] - xi2), 1e-10)
+
+  # zeta1 really is unrecoverable, not merely omitted: any zeta1 gives the same
+  # population matrix at one item per position, so nothing could recover it.
+  pop_b <- axes_population_cor(ang, 1L, xi1, xi2, zeta1 = .40)
+  expect_identical(pop_b$sigma, pop$sigma)
+})
+
+test_that("M61 T3: a mixed map keeps the three-column shadow", {
+  ang <- (seq_len(4L) - 1L) * 90
+  # Scale 1 carries a pair; scales 2-4 carry one item each. One pair is enough
+  # to identify zeta1, so the third column survives.
+  item_scale <- c(1L, 1L, 2L, 3L, 4L)
+  item_angle <- ang[item_scale]
+  xi1 <- .15
+  xi2 <- .06
+  zeta1 <- .10
+  th <- item_angle * pi / 180
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(item_scale, item_scale, `==`)
+  diag(sig) <- 1
+
+  seed <- axes_ols_shadow(sig, item_angle, item_scale)
+  expect_identical(names(seed), c("xi2", "xi1", "zeta1"))
+  expect_lt(abs(seed[["xi1"]] - xi1), 1e-10)
+  expect_lt(abs(seed[["xi2"]] - xi2), 1e-10)
+  expect_lt(abs(seed[["zeta1"]] - zeta1), 1e-10)
+})
+
+test_that("M61 T4/T6: the zeta1-dropped path returns a three-row component set (AC1)", {
+  skip_if_not_installed("lavaan")
+  ang <- (seq_len(12L) - 1L) * 30
+  fx <- axes_spaced_fixture(ang, n = 1200L, k = 1L)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+
+  # Three rows, and the scale-specificity row is ABSENT rather than NA -- an NA
+  # row would read as "estimated but unavailable" instead of "not in this
+  # model", which is the distinction M61 exists to make.
+  expect_identical(nrow(res$components), 3L)
+  expect_identical(res$components$Component, c("general", "axes", "item"))
+  expect_identical(res$components$Symbol, c("xi2", "xi1", "epsilon"))
+  expect_false("scale_specificity" %in% res$components$Component)
+  # The two fitted components still carry standard errors; only the item row's
+  # SE is NA (it is a mean of free residuals, as on the zeta1-fitted path).
+  expect_true(all(is.finite(res$components$SE[1:2])))
+  expect_true(is.na(res$components$SE[[3]]))
+
+  # details records the drop, so a caller can tell the two models apart without
+  # inspecting the component table.
+  expect_false(res$details$zeta1_fitted)
+  expect_true(all(is.finite(res$results$reliability)))
+  expect_true(all(res$results$reliability > 0 & res$results$reliability < 1))
+})
+
+# The population implied by an UNBALANCED item map: scale s contributes
+# `counts[s]` items at `angles[s]`. Same construction as axes_population_cor(),
+# which assumes a constant item count per scale and so cannot express a mixed
+# map. One coherent Sigma -- never two independent draws glued together, which
+# would carry zero true cross-block correlation and correspond to no population
+# at all (caught at the M61 review gate, finding F1).
+axes_unbalanced_population <- function(angles, counts, xi1, xi2, zeta1) {
+  item_scale <- rep(seq_along(angles), times = counts)
+  th <- angles[item_scale] * pi / 180
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(item_scale, item_scale, `==`)
+  diag(sig) <- 1
+  list(sigma = sig, scale = item_scale)
+}
+
+test_that("M61 T4/T6: a mixed map still fits zeta1 and keeps four rows (AC2)", {
+  skip_if_not_installed("lavaan")
+  # Eight equally spaced positions; scale 1 carries a pair, the rest one item
+  # each. One pair is all the drop rule requires.
+  ang <- (seq_len(8L) - 1L) * 45
+  cnt <- c(2L, rep(1L, 7L))
+  pop <- axes_unbalanced_population(ang, cnt, .20, .05, .08)
+  set.seed(614L)
+  x <- mvn_draws(1500L, rep(0, nrow(pop$sigma)), pop$sigma)
+  inames <- sprintf("i%02d", seq_len(ncol(x)))
+  mixed_dat <- as.data.frame(x)
+  colnames(mixed_dat) <- inames
+  items <- split(inames, factor(pop$scale, levels = seq_along(ang)))
+
+  expect_true(axes_fits_zeta1(items))
+  expect_identical(unname(lengths(items)), cnt)
+  res <- suppressMessages(
+    axes_reliability(mixed_dat, items = items, angles = ang)
+  )
+  expect_identical(nrow(res$components), 4L)
+  expect_true("scale_specificity" %in% res$components$Component)
+  expect_true(res$details$zeta1_fitted)
+  # The seed carried zeta1 too, since the OLS shadow kept its third column.
+  expect_identical(names(res$details$ols_shadow), c("xi2", "xi1", "zeta1"))
+  # The fixture is a real population, so the estimates must land in the right
+  # neighbourhood -- structural assertions alone would pass over a fit that had
+  # gone to a boundary solution. These bounds are ABSOLUTE and deliberately
+  # loose: this is one finite sample, and zeta1 rests on the single item pair
+  # scale 1 contributes, so its sampling variance is large (measured .058 for a
+  # truth of .08 at n = 1500). Exact recovery is the population oracle's job,
+  # asserted at 1e-4 in the mixed Layer-B test below; what this fences is a
+  # boundary or grossly wrong fit reaching the results frame.
+  est <- stats::setNames(res$components$Estimate, res$components$Symbol)
+  expect_lt(abs(est[["xi1"]] - .20), .05)
+  expect_lt(abs(est[["xi2"]] - .05), .05)
+  expect_lt(abs(est[["zeta1"]] - .08), .05)
+  expect_false(res$results$boundary[[1]])
+})
+
+# Exact-population oracle for the MIXED map -- the configuration M61 newly
+# accepts and which no Layer-B cell otherwise covers (M61 review finding F2).
+# The second cell puts the multi-item scale somewhere other than first, which is
+# what confirms comp_var("SS1") reads the SHARED zeta1 label rather than
+# happening to read a latent that owns a pair.
+test_that("M61: exact population recovery at mixed item counts (Layer B)", {
+  skip_if_not_installed("lavaan")
+  ang <- (seq_len(8L) - 1L) * 45
+  xi1 <- .20; xi2 <- .05; zeta1 <- .08
+  cells <- list(
+    `pair on scale 1` = c(2L, rep(1L, 7L)),
+    `pair on scale 3` = c(1L, 1L, 2L, rep(1L, 5L)),
+    `two pairs` = c(2L, 1L, 1L, 2L, 1L, 1L, 1L, 1L)
+  )
+  for (nm in names(cells)) {
+    pop <- axes_unbalanced_population(ang, cells[[nm]], xi1, xi2, zeta1)
+    sigma <- pop$sigma
+    inames <- sprintf("u%02d", seq_len(nrow(sigma)))
+    dimnames(sigma) <- list(inames, inames)
+    items <- split(inames, factor(pop$scale, levels = seq_along(ang)))
+    fit <- lavaan::cfa(
+      axes_syntax(items, ang), sample.cov = sigma, sample.nobs = 500L,
+      orthogonal = TRUE, likelihood = "wishart"
+    )
+    expect_true(lavaan::lavInspect(fit, "converged"), label = nm)
+    pe <- lavaan::parameterEstimates(fit)
+    vv <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+    expect_lt(abs(vv("AX") - xi1), 1e-4)
+    expect_lt(abs(vv("AY") - xi1), 1e-4)
+    expect_lt(abs(vv("GEN") - xi2), 1e-4)
+    expect_lt(abs(vv("SS1") - zeta1), 1e-4)
+    expect_lt(unname(lavaan::fitMeasures(fit, "chisq")), 1e-6)
+  }
+})
+
+test_that("M61 T5: N-B is NA-with-reason on the single-item path, never NaN (AC3)", {
+  skip_if_not_installed("lavaan")
+  ang <- (seq_len(8L) - 1L) * 45
+  fx <- axes_spaced_fixture(ang, n = 1000L, k = 1L)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+
+  # NA, and specifically NOT NaN: is.na() is TRUE for both, so the NaN check has
+  # to be made separately or the criterion's "never NaN" clause goes untested.
+  expect_true(all(is.na(res$results$nb_reliability)))
+  expect_false(any(is.nan(res$results$nb_reliability)))
+  expect_identical(res$details$nb_reason, "single_item")
+
+  # The reason reaches the user, on the same house pattern the cormat path uses.
+  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  expect_match(out, "Nunnally-Bernstein comparison needs each scale's alpha")
+  expect_match(out, "undefined for a scale carrying only one item")
+  # ... and the display shows a dash rather than a number for it.
+  expect_match(out, "NB_Reliability")
+})
+
+test_that("M61 T5: a MIXED map also reports N-B as NA -- the M61-D1 hole", {
+  skip_if_not_installed("lavaan")
+  # This is the branch AC3's literal wording would have missed: zeta1 IS fitted
+  # here, so a "zeta1-dropped path" rule would let alpha's NaN through.
+  ang <- (seq_len(8L) - 1L) * 45
+  set.seed(615L)
+  dat2 <- axes_simulate(1200L, ang, 2L, .20, .05, .08)
+  colnames(dat2) <- sprintf("j%02d", seq_len(ncol(dat2)))
+  # Scale 1 keeps both its items; every other scale keeps only its first.
+  keep <- c(1L, 2L, seq(3L, ncol(dat2), by = 2L))
+  mixed <- dat2[, keep, drop = FALSE]
+  items <- c(list(colnames(dat2)[1:2]), as.list(colnames(dat2)[seq(3L, ncol(dat2), by = 2L)]))
+
+  expect_true(axes_fits_zeta1(items))         # zeta1 IS fitted
+  res <- suppressMessages(axes_reliability(mixed, items = items, angles = ang))
+  expect_true(res$details$zeta1_fitted)
+  expect_identical(res$details$nb_reason, "single_item")
+  expect_true(all(is.na(res$results$nb_reliability)))
+  expect_false(any(is.nan(res$results$nb_reliability)))
+})
+
+test_that("M61 T5: N-B stays available and unannotated when every scale has a pair", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_spaced_fixture(octants(), n = 800L, k = 4L)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  expect_null(res$details$nb_reason)
+  expect_true(all(is.finite(res$results$nb_reliability)))
+  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  expect_false(grepl("undefined for a scale", out, fixed = TRUE))
+  expect_false(grepl("correlation-matrix path", out, fixed = TRUE))
+})
+
+# M61 Layer A (T7). The six single-item Table 3 rows, banked in
+# cairn/references/strack2013.md (two channels on p. 7: the born-digital
+# pdftotext text layer and a 200-dpi page-image render). Like the M60 sweep,
+# this is a FORMULA-LAYER oracle: it calls axis_reliability_sb() directly with
+# the paper's printed (%axes, item_n) pairs. It is not, and must not become, a
+# path through axes_reliability().
+
+test_that("M61 T7: Spearman-Brown reproduces the six single-item Table 3 rows (Layer A)", {
+  # Type e -- COC, sixteen single-item positions (Table 1: 16 items, no
+  # scales). This IS a configuration the package accepts: 16 positions give
+  # item_n = 16/2 = 8, exactly the printed value.
+  typee <- data.frame(
+    row    = c("COC16S", "COC16O", "COC16M"),
+    gen    = c(34.1, 46.7, 43.1),
+    axes   = c(2.8, 3.2, 1.9),
+    item   = c(63.1, 50.1, 55.0),
+    item_n = c(8, 8, 8),
+    rel    = c(.19, .21, .13)
+  )
+  # Type f -- SYMLOG. NOT a package-supported configuration: Strack fits SYMLOG
+  # as a SPHERE (three orthogonal axes; "spheres (e.g., Bales & Cohen, 1979)"
+  # p. 2, "realizes a sphere" p. 5, "the SYMLOG for a sphere model" p. 9), and
+  # its item_n 8.67 = 26/3 is unreachable in any two-axis equally spaced set,
+  # where single-item sets give k/2 -- a half-integer. These rows are the
+  # paper's only published fractional-item_n triples, so they anchor the scalar
+  # identity axis_reliability_sb() -- and only that. Never promote them to an
+  # end-to-end axes_reliability() fixture.
+  typef <- data.frame(
+    row    = c("SYM17S", "SYM17O", "SYM17M"),
+    gen    = c(14.4, 11.8, 15.2),
+    axes   = c(27.2, 30.3, 28.1),
+    item   = c(58.4, 57.9, 56.7),
+    item_n = c(8.67, 8.67, 8.67),
+    rel    = c(.76, .79, .77)
+  )
+  six <- rbind(typee, typef)
+
+  # Scale-specificity is "--" on all six (the paper drops zeta1 too), so the
+  # component sum is %gen + %axes + %item alone. All six are internally
+  # consistent -- unlike the type-c row, these carry a real sum guard.
+  expect_true(all(abs(six$gen + six$axes + six$item - 100.0) <= .05))
+
+  # The sweep itself.
+  expect_true(all(abs(
+    axis_reliability_sb(six$axes / 100, six$item_n) - six$rel
+  ) <= .01))
+
+  # The sweep discriminates -- but only against a DISTANT item_n. At SYMLOG's
+  # xi1 the printed 8.67 and its nearest reachable neighbour 8.5 differ by only
+  # ~.0035 in reliability, far inside the +/-.01 window, so this check would be
+  # worthless at a near miss and nobody may read it as "verified 8.67".
+  expect_true(all(abs(
+    axis_reliability_sb(typef$axes / 100, 32) - typef$rel
+  ) > .01))
+})
+
+# A per-axis item_n coded INDEPENDENTLY of axis_item_n(): plain cos/sin, no
+# snap_trig(), no axis_weights(). Comparing the results frame against the
+# function that produced it would assert nothing (BC4).
+axes_analytic_item_n <- function(angles_deg, counts) {
+  th <- angles_deg * pi / 180
+  c(x = sum(counts * cos(th)^2), y = sum(counts * sin(th)^2))
+}
+
+test_that("M61 T7: fractional item_n survives end to end on the zeta1-dropped path", {
+  skip_if_not_installed("lavaan")
+  # Five single-item positions -- an ODD count, which is the only single-item
+  # shape giving a fractional item_n (k/2 = 2.5). This is the reachable
+  # fractional case; SYMLOG's 8.67 is a sphere-model value and is asserted at
+  # the formula layer only.
+  ang <- (seq_len(5L) - 1L) * 72
+  fx <- axes_spaced_fixture(ang, n = 1200L, k = 1L)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+
+  want <- axes_analytic_item_n(ang, rep(1L, 5L))
+  expect_equal(res$results$item_n, unname(want[c("x", "y")]), tolerance = 1e-8)
+  expect_equal(res$results$item_n, c(2.5, 2.5), tolerance = 1e-8)
+  # Stored as a double, not silently coerced to integer -- a rounding-tolerant
+  # comparison at a half-integer would not catch that on its own.
+  expect_true(is.double(res$results$item_n))
+  # No expect_identical() here: the half-integer is NOT float-exact at every
+  # rotation (k = 5 at 13.7 degrees measures 2.4999999999999996), so pinning
+  # identity would be a platform trap, not a stronger assertion.
+
+  expect_false(res$details$zeta1_fitted)
+  expect_true(all(is.finite(res$results$reliability)))
+})
+
+test_that("M61 T7: fractional AND unequal item_n survives on the zeta1-fitted path", {
+  skip_if_not_installed("lavaan")
+  # Four positions rotated 22.5 degrees off the axes, carrying 2/3/2/2 items.
+  # This is the only shape whose per-axis item_n are fractional *and differ*,
+  # so it alone catches an x/y conflation -- a single-item set always gives
+  # equal axes and is structurally blind to that defect.
+  ang <- c(22.5, 112.5, 202.5, 292.5)
+  cnt <- c(2L, 3L, 2L, 2L)
+  item_scale <- rep(seq_along(ang), times = cnt)
+  th <- ang[item_scale] * pi / 180
+  xi1 <- .20; xi2 <- .05; zeta1 <- .08
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(item_scale, item_scale, `==`)
+  diag(sig) <- 1
+
+  set.seed(617L)
+  x <- mvn_draws(1500L, rep(0, nrow(sig)), sig)
+  inames <- sprintf("m%02d", seq_len(ncol(x)))
+  dat <- as.data.frame(x)
+  colnames(dat) <- inames
+  items <- split(inames, factor(item_scale, levels = seq_along(ang)))
+
+  expect_true(axes_fits_zeta1(items))
+  res <- suppressMessages(axes_reliability(dat, items = items, angles = ang))
+
+  want <- axes_analytic_item_n(ang, cnt)
+  expect_equal(res$results$item_n, unname(want[c("x", "y")]), tolerance = 1e-8)
+  expect_equal(res$results$item_n, c(4.1464466, 4.8535534), tolerance = 1e-6)
+  expect_true(is.double(res$results$item_n))
+  # The two axes genuinely differ -- nothing recycled one into both rows.
+  expect_false(isTRUE(all.equal(res$results$item_n[[1]], res$results$item_n[[2]])))
+  expect_true(res$details$zeta1_fitted)
+  # ... and the reliabilities differ with them, since they share one xi1 and
+  # differ only through item_n.
+  expect_false(isTRUE(all.equal(
+    res$results$reliability[[1]], res$results$reliability[[2]]
+  )))
+})
+
+# M61 Layer B (T8). The BC5/BC6/BC7 oracles re-run at single-item
+# configurations, where the model has no zeta1 at all. The generating population
+# genuinely carries no scale-specificity: at one item per position the zeta1
+# block of axes_population_cor() lands entirely on the diagonal, which is
+# overwritten with 1, so passing zeta1 = 0 is exact rather than an
+# approximation (pinned in the T3 test above).
+
+axes_pop_recovers_single <- function(angles, xi1, xi2) {
+  pop <- axes_population_cor(angles, 1L, xi1, xi2, zeta1 = 0)
+  sigma <- pop$sigma
+  p <- nrow(sigma)
+  inames <- sprintf("s%02d", seq_len(p))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, factor(pop$scale, levels = seq_along(angles)))
+  fit <- lavaan::cfa(
+    axes_syntax(items, angles),
+    sample.cov = sigma, sample.nobs = 500L,
+    orthogonal = TRUE, likelihood = "wishart"
+  )
+  pe <- lavaan::parameterEstimates(fit)
+  vv <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+  list(
+    converged = lavaan::lavInspect(fit, "converged"),
+    est = c(xi1 = vv("AX"), xi1b = vv("AY"), xi2 = vv("GEN")),
+    # No SS latent exists to read -- assert that, rather than reading a value.
+    has_ss = any(pe$op == "~~" & grepl("^SS", pe$lhs)),
+    chisq = unname(lavaan::fitMeasures(fit, "chisq"))
+  )
+}
+
+test_that("M61 T8: exact population recovery at single-item configurations (AC6)", {
+  skip_if_not_installed("lavaan")
+  xi1 <- .16
+  xi2 <- .09
+  cells <- list(
+    `k = 5 (fractional item_n 2.5)` = (seq_len(5L) - 1L) * 72,
+    `k = 8 octants` = octants(),
+    `k = 16 (the COC shape, item_n 8)` = (seq_len(16L) - 1L) * 22.5,
+    `k = 6 at an odd rotation` = (seq_len(6L) - 1L) * 60 + 11.3
+  )
+  for (nm in names(cells)) {
+    got <- axes_pop_recovers_single(cells[[nm]], xi1, xi2)
+    expect_true(got$converged, label = nm)
+    # Exact at the population matrix -- no Monte-Carlo slack.
+    expect_lt(abs(got$est[["xi1"]] - xi1), 1e-4)
+    expect_lt(abs(got$est[["xi1b"]] - xi1), 1e-4)
+    expect_lt(abs(got$est[["xi2"]] - xi2), 1e-4)
+    # Neither the generating Sigma nor the fitted model carries a zeta1 term.
+    expect_false(got$has_ss, label = nm)
+    expect_lt(got$chisq, 1e-6)
+  }
+})
+
+test_that("M61 T8: Monte-Carlo recovery holds at a single-item set (Layer B)", {
+  skip_if_not_installed("lavaan")
+  # axes_mc_recover_xi1() reads AX only, so it carries over to the zeta1-dropped
+  # path unchanged; k = 1 item per position is the whole difference.
+  mc <- axes_mc_recover_xi1(
+    (seq_len(12L) - 1L) * 30, k = 1L, xi1 = .18, xi2 = .06, zeta1 = 0,
+    n = 2000L, reps = 100L, seed = 618L
+  )
+  expect_lt(abs(mc$mean - .18), 2 * mc$mcse)
+})
+
+# The OpenMx cross-check without the zeta1*B term. At one item per position B is
+# the identity, so zeta1 would be perfectly confounded with the item residuals:
+# dropping it is what makes the model identified, not a simplification.
+axes_mx_components_single <- function(S, n, angles_deg) {
+  p <- nrow(S)
+  nm <- rownames(S)
+  th <- as.numeric(angles_deg) * pi / 180
+  model <- OpenMx::mxModel(
+    "axes_single",
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .15, lbound = 0,
+                     name = "xi1"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .05, lbound = 0,
+                     name = "xi2"),
+    OpenMx::mxMatrix("Full", p, 1, free = TRUE, values = .5, lbound = 0,
+                     name = "eps"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(th, th, function(a, b) cos(a - b)),
+                     name = "C"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE, values = 1, name = "J"),
+    OpenMx::mxAlgebra(
+      xi1[1, 1] * C + xi2[1, 1] * J + vec2diag(eps),
+      name = "Sigma", dimnames = list(nm, nm)
+    ),
+    OpenMx::mxData(observed = S, type = "cov", numObs = n),
+    OpenMx::mxExpectationNormal(covariance = "Sigma"),
+    OpenMx::mxFitFunctionML()
+  )
+  fit <- suppressWarnings(suppressMessages(
+    OpenMx::mxRun(model, silent = TRUE, suppressWarnings = TRUE)
+  ))
+  c(xi1 = OpenMx::mxEval(xi1, fit)[1, 1], xi2 = OpenMx::mxEval(xi2, fit)[1, 1])
+}
+
+test_that("M61 T8: lavaan and OpenMx agree at a single-item set (Layer B)", {
+  skip_if_not_installed("lavaan")
+  skip_if_not_installed("OpenMx")
+  for (ang in list((seq_len(12L) - 1L) * 30, (seq_len(5L) - 1L) * 72)) {
+    set.seed(619L)
+    dat <- as.data.frame(scale(axes_simulate(2000L, ang, 1L, .16, .06, 0)))
+    inames <- sprintf("s%02d", seq_len(ncol(dat)))
+    colnames(dat) <- inames
+    items <- split(inames, factor(seq_along(ang), levels = seq_along(ang)))
+    S <- stats::cov(dat)
+
+    fit <- lavaan::cfa(
+      axes_syntax(items, ang), sample.cov = S, sample.nobs = 2000L,
+      orthogonal = TRUE, likelihood = "wishart"
+    )
+    pe <- lavaan::parameterEstimates(fit)
+    vv <- function(lat) pe$est[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat][[1]]
+    lav <- c(xi1 = vv("AX"), xi2 = vv("GEN"))
+    mx <- axes_mx_components_single(S, 2000L, ang)
+    expect_lt(max(abs(lav - mx)), 1e-3)
+  }
+})
+
+test_that("M61 review F3: the k < 4 message names only components the map would fit", {
+  skip_if_not_installed("lavaan")
+  ang3 <- c(0, 120, 240)
+  set.seed(63L)
+  d <- as.data.frame(matrix(stats::rnorm(200 * 6), ncol = 6))
+  colnames(d) <- sprintf("v%d", 1:6)
+
+  # Multi-item map: zeta1 WOULD be fitted, so scale specificity is named.
+  multi <- list(c("v1", "v2"), c("v3", "v4"), c("v5", "v6"))
+  expect_error(
+    suppressMessages(axes_reliability(d, items = multi, angles = ang3)),
+    "general, axes, and scale-specificity variances"
+  )
+  # Single-item map: zeta1 would be DROPPED, so naming it would misdirect the
+  # user toward a component that was never in the model.
+  single <- list("v1", "v2", "v3")
+  expect_error(
+    suppressMessages(axes_reliability(d, items = single, angles = ang3)),
+    "general and axes variances are not separately identified"
+  )
+  err <- tryCatch(
+    suppressMessages(axes_reliability(d, items = single, angles = ang3)),
+    error = function(e) conditionMessage(e)
+  )
+  expect_false(grepl("scale-specificity", err, fixed = TRUE))
+  # Both still refuse, and for the same underlying reason.
+  expect_match(err, "at least 4 equally spaced scales")
+})
+
+test_that("M61 review F4: nb_reason carries every reason that applies", {
+  skip_if_not_installed("lavaan")
+  ang <- (seq_len(8L) - 1L) * 45
+  pop <- axes_population_cor(ang, 1L, .20, .05, zeta1 = 0)
+  R <- pop$sigma
+  inames <- sprintf("c%02d", seq_len(nrow(R)))
+  dimnames(R) <- list(inames, inames)
+  items <- split(inames, factor(pop$scale, levels = seq_along(ang)))
+
+  # A correlation matrix whose scales each carry one item: BOTH unavailabilities
+  # hold at once. Reporting only "cormat" would hide the alpha-undefined fact
+  # and make it unrecoverable from `details`.
+  res <- suppressMessages(
+    axes_reliability(cormat = R, items = items, angles = ang, n = 500L)
+  )
+  expect_setequal(res$details$nb_reason, c("cormat", "single_item"))
+  expect_true(all(is.na(res$results$nb_reliability)))
+  expect_false(any(is.nan(res$results$nb_reliability)))
+  out <- paste(utils::capture.output(print(res)), collapse = "\n")
+  expect_match(out, "correlation-matrix path")
+  expect_match(out, "undefined for a scale carrying only one item")
+
+  # Each reason still stands alone where only one applies.
+  fx <- axes_spaced_fixture(ang, n = 900L, k = 1L)
+  r1 <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  expect_identical(r1$details$nb_reason, "single_item")
+  fx2 <- axes_spaced_fixture(ang, n = 900L, k = 3L)
+  r2 <- suppressMessages(
+    axes_reliability(cormat = stats::cor(as.matrix(fx2$data)),
+                     items = fx2$items, angles = fx2$angles, n = 900L)
+  )
+  expect_identical(r2$details$nb_reason, "cormat")
 })

@@ -71,8 +71,13 @@ angles_spacing_status <- function(angles_deg, tol = 1e-8) {
 # because the +/-.7071 weights' float error cancels, while 16 scales at 22.5 deg
 # measure (32.000000000000000, 31.999999999999996). Compare non-octant item_n
 # with a tolerance, never expect_identical(). Computed per axis so an unbalanced
-# set degrades gracefully (Table 3 col. 10 is per axis, and fractional for
-# SYMLOG at 8.67).
+# set degrades gracefully -- Table 3 col. 10 is per axis, and an unbalanced or
+# odd-k set gives a fractional value (five single-item positions give 2.5).
+#
+# Table 3's own fractional entry, SYMLOG's 8.67, is NOT such a set and is not
+# reachable here: Strack fits SYMLOG as a sphere (three orthogonal axes), so its
+# 26 items split 26/3 = 8.67 per axis. Under this two-axis contract a
+# single-item set always gives k/2, a half-integer (M61; cairn RR11).
 axis_item_n <- function(angles_deg, n_items) {
   w <- axis_weights(angles_deg)
   c(x = sum(n_items * w[, "w_x"]^2), y = sum(n_items * w[, "w_y"]^2))
@@ -101,6 +106,22 @@ axis_sem <- function(rel, sd = 1) {
 
 # --- The restricted tau-equivalent CFA (the lavaan constraint set) ------------
 
+# Whether the scale-specificity component zeta1 is identified for this item map:
+# exactly when at least one scale carries two items. A same-scale item PAIR is
+# the only place zeta1 appears in a moment the model fits -- r_ij carries
+# zeta1*[scale_i == scale_j], and i == j is the unit diagonal, not a fitted
+# off-diagonal -- so with one item at every position zeta1 is perfectly
+# confounded with the item residuals and the OLS shadow's same-scale design
+# column is all zeros. Strack et al. (2013) drop it on exactly this condition:
+# Table 3 (p. 7) prints "--" for scale-specificity on the single-item types e
+# and f. A MIXED map still fits it: one multi-item scale supplies the pair, and
+# the shared-label restriction carries the estimate to the single-item scales.
+#
+# Inferred from the item map rather than threaded as an argument (M61 gate,
+# 2026-07-26), so the emitted syntax and the reported component set can never
+# disagree about whether zeta1 was fitted.
+axes_fits_zeta1 <- function(items) any(lengths(items) >= 2L)
+
 # Emit lavaan syntax for the flat fixed-links item-level model (Strack et al.
 # 2013, Figure 2; spec devel/m53-axes-reliability-spec.md section 2).
 #
@@ -126,7 +147,11 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
   th <- as.numeric(angles_deg) * pi / 180
   wx <- snap_trig(cos(th))
   wy <- snap_trig(sin(th))
-  ss <- sprintf("SS%d", seq_along(items))
+  # Scale-specificity is emitted only where it is identified (M61); with one
+  # item at every position the SS latents and their shared zeta1 label are
+  # dropped from the model entirely rather than fitted to the diagonal.
+  fit_zeta1 <- axes_fits_zeta1(items)
+  ss <- if (fit_zeta1) sprintf("SS%d", seq_along(items)) else character(0)
 
   # One fixed loading term "w*item" per item; scales whose weight snaps to 0
   # (a pole scale on the orthogonal axis) contribute no term to that axis.
@@ -141,9 +166,13 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
   # Optional start values (the OLS-shadow seed): a `start(v)*` modifier on each
   # variance, floored positive so the optimizer starts inside the parameter
   # space (start values seed, never constrain -- a boundary estimate can still
-  # go non-positive). No modifier when `start` is NULL (lavaan's own defaults).
+  # go non-positive). No modifier when `start` is NULL (lavaan's own defaults),
+  # and none when the seed simply lacks the key: the two-column OLS shadow of
+  # the zeta1-dropped path returns no `zeta1` element, and `start[["zeta1"]]` on
+  # a vector without that name is an error, not a NULL (M61 T2).
   st <- function(key) {
-    if (is.null(start)) "" else sprintf("start(%s)*", fmt(max(start[[key]], 0.01)))
+    if (is.null(start) || !key %in% names(start)) return("")
+    sprintf("start(%s)*", fmt(max(start[[key]], 0.01)))
   }
 
   lines <- c(
@@ -153,20 +182,30 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
     paste("AX =~", paste(load_terms(wx), collapse = " + ")),
     paste("AY =~", paste(load_terms(wy), collapse = " + ")),
     paste("GEN =~", paste(unit_terms(unlist(items)), collapse = " + ")),
-    vapply(
-      seq_along(items),
-      function(s) paste(ss[[s]], "=~", paste(unit_terms(items[[s]]), collapse = " + ")),
-      character(1)
-    ),
+    if (fit_zeta1) {
+      vapply(
+        seq_along(items),
+        function(s) paste(ss[[s]], "=~", paste(unit_terms(items[[s]]), collapse = " + ")),
+        character(1)
+      )
+    },
     "",
     "# equal axis variances (xi1), free general variance (xi2)",
     paste0("AX ~~ ", st("xi1"), "xi1*AX"),
     paste0("AY ~~ ", st("xi1"), "xi1*AY"),
     paste0("GEN ~~ ", st("xi2"), "xi2*GEN"),
     "",
-    "# shared scale-specificity variance (zeta1); errors free (tau-equivalent)",
-    vapply(ss, function(s) paste0(s, " ~~ ", st("zeta1"), "zeta1*", s),
-           character(1))
+    if (fit_zeta1) {
+      c(
+        "# shared scale-specificity variance (zeta1); errors free (tau-equivalent)",
+        vapply(ss, function(s) paste0(s, " ~~ ", st("zeta1"), "zeta1*", s),
+               character(1))
+      )
+    } else {
+      # One item per scale position: zeta1 is unidentified and is dropped from
+      # the model rather than fitted (Strack's types e and f). Errors stay free.
+      "# no scale-specificity component (one item per position); errors free"
+    }
   )
   paste(lines, collapse = "\n")
 }
@@ -179,16 +218,23 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
 # Used as a cross-check on the CFA estimate (a third independent route beside
 # lavaan and OpenMx) and as start values for the fit. Exact on the population
 # matrix; a method-of-moments approximation in finite samples.
+#
+# With one item at every scale position the same-scale indicator is identically
+# zero off the diagonal, so that third column is a zero column: the design drops
+# to rank 2 and qr.solve() fails outright. Drop it and regress on (1, cos-diff)
+# alone, returning a two-component seed. The seed then matches the model's
+# parameter set exactly, because axes_fits_zeta1() drops zeta1 on the same
+# condition -- both read the item map, so they cannot disagree (M61 T3).
 axes_ols_shadow <- function(R, item_angle_deg, item_scale) {
   ut <- upper.tri(R)
   th <- as.numeric(item_angle_deg) * pi / 180
-  X <- cbind(
-    1,
-    outer(th, th, function(a, b) cos(a - b))[ut],
-    as.numeric(outer(item_scale, item_scale, `==`)[ut])
-  )
+  same <- as.numeric(outer(item_scale, item_scale, `==`)[ut])
+  X <- cbind(1, outer(th, th, function(a, b) cos(a - b))[ut])
+  if (any(same != 0)) X <- cbind(X, same)
   b <- qr.solve(X, R[ut])
-  c(xi2 = b[[1]], xi1 = b[[2]], zeta1 = b[[3]])
+  out <- c(xi2 = b[[1]], xi1 = b[[2]])
+  if (ncol(X) == 3L) out[["zeta1"]] <- b[[3]]
+  out
 }
 
 # Fit the axes-reliability model on item data through the single lavaan::cfa
@@ -378,7 +424,11 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' The Nunnally-Bernstein axis reliability (`nb_reliability`) is reported
 #' alongside for comparison: it **overestimates** axis reliability when scale
 #' specificity is large, because it charges scale-specificity variance to the
-#' axis rather than isolating it (Strack et al. 2013, Figure 3).
+#' axis rather than isolating it (Strack et al. 2013, Figure 3). It needs each
+#' scale's coefficient alpha, which is undefined for a scale carrying a single
+#' item, so it is reported as `NA` with a stated reason whenever any scale has
+#' fewer than two items -- as Strack et al. themselves do, leaving it blank for
+#' such instruments.
 #'
 #' Because the model is fit to the item **correlation** matrix as if it were a
 #' covariance matrix (the paper's own practice), the component point estimates
@@ -397,12 +447,26 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' which is what keeps the equal-axis-variance restriction as innocuous as it
 #' is for octants.
 #'
+#' Scales may carry **one item each**, as Strack et al.'s types e and f do. With
+#' a single item at every position no two items share a scale, so the
+#' scale-specificity component is not identified and is dropped from the model
+#' rather than estimated: the components table then has three rows instead of
+#' four, and `details$zeta1_fitted` is `FALSE`. A *mixed* instrument still
+#' estimates it -- one multi-item scale supplies the information, and the
+#' shared-value restriction carries it to the rest.
+#'
 #' Two limits. At least **four** scales are required: with three, every pair of
 #' scales sits the same angular distance apart, and the general, axes, and
 #' scale-specificity variances are then not separately identified. And spacing
 #' must be equal, not merely close -- a quasi-circumplex is refused rather than
 #' approximated, since Strack et al. (2013) excluded such instruments from the
-#' model's validation. Every scale still needs at least two items.
+#' model's validation. Every scale needs at least one item.
+#'
+#' The model is two-dimensional. Instruments whose items span three dimensions
+#' -- spherical designs such as SYMLOG (Strack et al.'s type f) -- are out of
+#' scope, even though Strack et al. (2013) analyze one; their Table 3 SYMLOG
+#' rows arise from a three-axis sphere model, not from any configuration this
+#' function accepts.
 #'
 #' Missing data are handled by **listwise deletion only** (a message reports the
 #' complete-case count); pairwise correlation input is never used. A boundary
@@ -465,8 +529,10 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' @return An object of class `circumplex_axes_reliability` with `print()` and
 #'   [summary()] methods: `results` (one row per axis: the axes variance, item_n,
 #'   reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
-#'   `components` (the estimated variance components with SEs), `fit` (global fit
-#'   indices), and `details`.
+#'   `components` (the estimated variance components with SEs -- four rows, or
+#'   three when scale specificity was dropped), `fit` (global fit indices), and
+#'   `details` (including `zeta1_fitted`, whether scale specificity was in the
+#'   model, and `nb_reason`, why the Nunnally-Bernstein comparison is `NA`).
 #' @references
 #' Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The reliability of
 #' circumplex axes. \emph{SAGE Open}, 3(2). \doi{10.1177/2158244013486115}
@@ -575,10 +641,19 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       "`axes_reliability()` needs at least 4 equally spaced scales; ",
       n_scales, if (n_scales == 1L) " was" else " were", " supplied.",
       if (n_scales == 3L) {
+        # Name only the components this map's model would actually fit: on an
+        # all-single-item map zeta1 is dropped anyway (axes_fits_zeta1()), so
+        # citing scale specificity as the casualty would misdirect the user
+        # toward a component that was never in the model (M61 review, F3).
         paste0(
           " At 3 equally spaced scales every pair of scales sits the same ",
-          "angular distance apart, so the general, axes, and scale-specificity ",
-          "variances are not separately identified."
+          "angular distance apart, so the ",
+          if (axes_fits_zeta1(item_cols)) {
+            "general, axes, and scale-specificity variances "
+          } else {
+            "general and axes variances "
+          },
+          "are not separately identified."
         )
       } else "",
       call. = FALSE
@@ -605,9 +680,19 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     ),
     stop("`angles` were not usable: ", shown, ".", call. = FALSE)
   )
+  # Every scale needs an item; two are no longer required (M61). One item per
+  # position is Strack's types e and f, and the model handles it by dropping the
+  # scale-specificity component, which is unidentified there -- see
+  # axes_fits_zeta1(). A scale with NO items is still refused: it contributes
+  # nothing to either axis and its angle would silently stop counting.
   n_items_scale <- lengths(item_cols)
-  if (any(n_items_scale < 2L)) {
-    stop("Every scale must have at least 2 items.", call. = FALSE)
+  empty <- which(n_items_scale < 1L)
+  if (length(empty) > 0) {
+    stop(
+      "Every scale must have at least 1 item; scale(s) ",
+      paste(empty, collapse = ", "), " have none.",
+      call. = FALSE
+    )
   }
   all_cols <- unlist(item_cols)
   src_cols <- if (has_data) colnames(data) else colnames(cormat)
@@ -742,13 +827,20 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   comp_se <- function(lat) pe$se[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat]
   xi1 <- comp_var("AX")[[1]]
   xi2 <- comp_var("GEN")[[1]]
-  zeta1 <- comp_var("SS1")[[1]]
+  # zeta1 exists only where the model fitted it (M61). Read it off the same
+  # predicate the syntax emitter used, never off whether "SS1" happens to appear
+  # in the parameter table -- one source of truth for the component set.
+  fit_zeta1 <- axes_fits_zeta1(item_cols)
+  zeta1 <- if (fit_zeta1) comp_var("SS1")[[1]] else NULL
   eps <- pe$est[pe$op == "~~" & pe$lhs == pe$rhs & pe$lhs %in% all_cols]
 
   # Boundary: a non-positive axes variance, or any negative estimated variance,
   # is not a usable solution (RR09 BC11). NA the reliability/SEm -- never clip,
-  # zero, or return a negative -- and flag it.
-  boundary <- xi1 <= 0 || xi2 < 0 || zeta1 < 0 || any(eps < 0)
+  # zero, or return a negative -- and flag it. On the zeta1-dropped path there
+  # is no scale-specificity variance to test; `zeta1 < 0` on a NULL would be
+  # logical(0), which `||` rejects in R >= 4.3, so the term is dropped rather
+  # than defaulted.
+  boundary <- xi1 <= 0 || xi2 < 0 || (fit_zeta1 && zeta1 < 0) || any(eps < 0)
   if (boundary) {
     warning(
       "A boundary solution (non-positive axes variance or a negative ",
@@ -805,7 +897,27 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # needs the item scores and the composite variance needs the respondents -- so
   # the cormat path reports NA with the reason (RR09 sec. 7.4: NA-with-reason,
   # never silently dropped), rather than an approximation the user cannot audit.
-  nb <- if (has_data) {
+  #
+  # A second unavailability arrives with M61 (M61-D1): Cronbach's alpha is
+  # undefined for a one-item scale -- cronbach_alpha() divides by m - 1, so it
+  # returns NaN -- and the N-B formula has no rel_scale to consume. The test is
+  # "ANY scale carries fewer than two items", NOT "zeta1 was dropped": a MIXED
+  # map still fits zeta1 yet has an undefined alpha on its single-item scales,
+  # and would otherwise propagate NaN into the results frame. Strack et al.
+  # corroborate: Table 3 col 14 is blank for every single-item row, and p. 5
+  # states the formula "was not applied for analyzing instruments with a single
+  # item per spatial position".
+  # The two unavailabilities are independent and can both hold at once -- a
+  # correlation matrix whose scales each carry one item has no raw scores AND no
+  # defined alpha. `nb_reason` therefore carries every reason that applies, not
+  # the first one matched, so `details` stays a faithful record and print()
+  # states both (M61 review, F4). `c()` drops the NULLs, so it is NULL when the
+  # comparison is available.
+  nb_reason <- c(
+    if (!has_data) "cormat",
+    if (any(n_items_scale < 2L)) "single_item"
+  )
+  nb <- if (is.null(nb_reason)) {
     rel_scale <- vapply(
       item_cols, function(cols) cronbach_alpha(mat[, cols, drop = FALSE]),
       numeric(1)
@@ -835,11 +947,28 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     boundary = c(boundary, boundary),
     stringsAsFactors = FALSE
   )
+  # The component set is variable-length (M61): the scale-specificity row is
+  # present only where the model fitted zeta1. Rows are assembled from a list so
+  # a dropped component leaves no row at all -- never an NA row, which would
+  # read as "estimated, unavailable" rather than "not in this model".
+  comp_rows <- list(
+    c(Component = "general", Symbol = "xi2"),
+    c(Component = "axes", Symbol = "xi1"),
+    if (fit_zeta1) c(Component = "scale_specificity", Symbol = "zeta1"),
+    c(Component = "item", Symbol = "epsilon")
+  )
+  comp_rows <- Filter(Negate(is.null), comp_rows)
+  comp_est <- c(xi2, xi1, if (fit_zeta1) zeta1, mean(eps))
+  comp_ses <- c(
+    comp_se("GEN")[[1]], comp_se("AX")[[1]],
+    if (fit_zeta1) comp_se("SS1")[[1]],
+    NA_real_
+  )
   components <- data.frame(
-    Component = c("general", "axes", "scale_specificity", "item"),
-    Symbol = c("xi2", "xi1", "zeta1", "epsilon"),
-    Estimate = c(xi2, xi1, zeta1, mean(eps)),
-    SE = c(comp_se("GEN")[[1]], comp_se("AX")[[1]], comp_se("SS1")[[1]], NA_real_),
+    Component = vapply(comp_rows, `[[`, character(1), "Component"),
+    Symbol = vapply(comp_rows, `[[`, character(1), "Symbol"),
+    Estimate = comp_est,
+    SE = comp_ses,
     stringsAsFactors = FALSE
   )
   fm <- lavaan::fitMeasures(fit, c("chisq", "df", "pvalue", "rmsea", "cfi",
@@ -853,6 +982,13 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       angles = angles_deg, labels = map$labels, sd = sd,
       input = if (has_data) "data" else "cormat",
       converged = TRUE, boundary = boundary,
+      # Whether the scale-specificity component was in the fitted model at all
+      # (M61): FALSE means one item per scale position, so zeta1 was
+      # unidentified and dropped rather than estimated.
+      zeta1_fitted = fit_zeta1,
+      # Why the Nunnally-Bernstein comparison is NA, or NULL when it is
+      # available: "cormat" (no raw scores) or "single_item" (alpha undefined).
+      nb_reason = nb_reason,
       ols_shadow = ols
     ),
     call = call
