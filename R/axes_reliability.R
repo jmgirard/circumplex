@@ -646,9 +646,19 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     ),
     stop("`angles` were not usable: ", shown, ".", call. = FALSE)
   )
+  # Every scale needs an item; two are no longer required (M61). One item per
+  # position is Strack's types e and f, and the model handles it by dropping the
+  # scale-specificity component, which is unidentified there -- see
+  # axes_fits_zeta1(). A scale with NO items is still refused: it contributes
+  # nothing to either axis and its angle would silently stop counting.
   n_items_scale <- lengths(item_cols)
-  if (any(n_items_scale < 2L)) {
-    stop("Every scale must have at least 2 items.", call. = FALSE)
+  empty <- which(n_items_scale < 1L)
+  if (length(empty) > 0) {
+    stop(
+      "Every scale must have at least 1 item; scale(s) ",
+      paste(empty, collapse = ", "), " have none.",
+      call. = FALSE
+    )
   }
   all_cols <- unlist(item_cols)
   src_cols <- if (has_data) colnames(data) else colnames(cormat)
@@ -783,13 +793,20 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   comp_se <- function(lat) pe$se[pe$op == "~~" & pe$lhs == lat & pe$rhs == lat]
   xi1 <- comp_var("AX")[[1]]
   xi2 <- comp_var("GEN")[[1]]
-  zeta1 <- comp_var("SS1")[[1]]
+  # zeta1 exists only where the model fitted it (M61). Read it off the same
+  # predicate the syntax emitter used, never off whether "SS1" happens to appear
+  # in the parameter table -- one source of truth for the component set.
+  fit_zeta1 <- axes_fits_zeta1(item_cols)
+  zeta1 <- if (fit_zeta1) comp_var("SS1")[[1]] else NULL
   eps <- pe$est[pe$op == "~~" & pe$lhs == pe$rhs & pe$lhs %in% all_cols]
 
   # Boundary: a non-positive axes variance, or any negative estimated variance,
   # is not a usable solution (RR09 BC11). NA the reliability/SEm -- never clip,
-  # zero, or return a negative -- and flag it.
-  boundary <- xi1 <= 0 || xi2 < 0 || zeta1 < 0 || any(eps < 0)
+  # zero, or return a negative -- and flag it. On the zeta1-dropped path there
+  # is no scale-specificity variance to test; `zeta1 < 0` on a NULL would be
+  # logical(0), which `||` rejects in R >= 4.3, so the term is dropped rather
+  # than defaulted.
+  boundary <- xi1 <= 0 || xi2 < 0 || (fit_zeta1 && zeta1 < 0) || any(eps < 0)
   if (boundary) {
     warning(
       "A boundary solution (non-positive axes variance or a negative ",
@@ -876,11 +893,28 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     boundary = c(boundary, boundary),
     stringsAsFactors = FALSE
   )
+  # The component set is variable-length (M61): the scale-specificity row is
+  # present only where the model fitted zeta1. Rows are assembled from a list so
+  # a dropped component leaves no row at all -- never an NA row, which would
+  # read as "estimated, unavailable" rather than "not in this model".
+  comp_rows <- list(
+    c(Component = "general", Symbol = "xi2"),
+    c(Component = "axes", Symbol = "xi1"),
+    if (fit_zeta1) c(Component = "scale_specificity", Symbol = "zeta1"),
+    c(Component = "item", Symbol = "epsilon")
+  )
+  comp_rows <- Filter(Negate(is.null), comp_rows)
+  comp_est <- c(xi2, xi1, if (fit_zeta1) zeta1, mean(eps))
+  comp_ses <- c(
+    comp_se("GEN")[[1]], comp_se("AX")[[1]],
+    if (fit_zeta1) comp_se("SS1")[[1]],
+    NA_real_
+  )
   components <- data.frame(
-    Component = c("general", "axes", "scale_specificity", "item"),
-    Symbol = c("xi2", "xi1", "zeta1", "epsilon"),
-    Estimate = c(xi2, xi1, zeta1, mean(eps)),
-    SE = c(comp_se("GEN")[[1]], comp_se("AX")[[1]], comp_se("SS1")[[1]], NA_real_),
+    Component = vapply(comp_rows, `[[`, character(1), "Component"),
+    Symbol = vapply(comp_rows, `[[`, character(1), "Symbol"),
+    Estimate = comp_est,
+    SE = comp_ses,
     stringsAsFactors = FALSE
   )
   fm <- lavaan::fitMeasures(fit, c("chisq", "df", "pvalue", "rmsea", "cfi",
@@ -894,6 +928,10 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       angles = angles_deg, labels = map$labels, sd = sd,
       input = if (has_data) "data" else "cormat",
       converged = TRUE, boundary = boundary,
+      # Whether the scale-specificity component was in the fitted model at all
+      # (M61): FALSE means one item per scale position, so zeta1 was
+      # unidentified and dropped rather than estimated.
+      zeta1_fitted = fit_zeta1,
       ols_shadow = ols
     ),
     call = call

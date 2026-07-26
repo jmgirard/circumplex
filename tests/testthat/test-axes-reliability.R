@@ -474,12 +474,14 @@ test_that("BC12: each malformed input errors informatively", {
     suppressMessages(axes_reliability(fx$data, items = fx$items, angles = na_ang)),
     "missing"
   )
-  # a scale with < 2 items
-  one_item <- fx$items
-  one_item[[1]] <- one_item[[1]][1]
+  # a scale with no items at all (M61 relaxed this gate from "< 2 items" to
+  # "< 1 item": one item per position is Strack's types e and f, and is now
+  # estimated with the scale-specificity component dropped)
+  no_item <- fx$items
+  no_item[[1]] <- character(0)
   expect_error(
-    suppressMessages(axes_reliability(fx$data, items = one_item, angles = fx$oct)),
-    "at least 2 items"
+    suppressMessages(axes_reliability(fx$data, items = no_item, angles = fx$oct)),
+    "at least 1 item"
   )
   # item absent from data
   absent <- fx$items
@@ -1041,10 +1043,13 @@ test_that("M60: the refusal contract survives the relaxation", {
   expect_error(bad(c(0, 120, 240), fx$items[1:3]), "identif")
   expect_error(bad(c(0, 180), fx$items[1:2]), "at least 4")
 
-  # Fewer than 2 items on a scale (M61 territory, still refused here).
-  one <- fx$items
-  one[[1]] <- one[[1]][1]
-  expect_error(bad(items = one), "at least 2 items")
+  # A scale with NO items stays refused, and names itself. (Fewer than 2 items
+  # was refused here until M61 relaxed it to the zeta1 drop rule; a mixed map
+  # with one single-item scale is now estimated, not an error.)
+  none <- fx$items
+  none[[1]] <- character(0)
+  expect_error(bad(items = none), "at least 1 item")
+  expect_error(bad(items = none), "scale\\(s\\) 1")
 
   # A non-finite angle must be REFUSED BY NAME, not carried into the fit.
   # anyNA() does not reject Inf, and `Inf %% 360` is NaN which sort() drops, so
@@ -1306,24 +1311,27 @@ test_that("M61 T1: cronbach_alpha() is NaN at one item -- the reason N-B cannot 
   expect_true(is.finite(cronbach_alpha(matrix(stats::rnorm(100), ncol = 2))))
 })
 
-test_that("M61 T1: the >= 2-items refusal is the only gate refusing a single-item set", {
+test_that("M61 T1/T6: the single-item set passes every gate, and now estimates", {
   skip_if_not_installed("lavaan")
   # The COC shape (Strack type e; Table 3 p. 7: 16 items, no scales, item_n 8):
-  # sixteen equally spaced positions carrying one item each.
+  # sixteen equally spaced positions carrying one item each. Until M61 the
+  # >= 2-items line refused exactly this; T1 pinned that every OTHER gate in the
+  # refuse contract passed on it, so the item-count line really was the only
+  # thing in the way -- no spacing or scale-count problem was hiding behind it.
   ang <- (seq_len(16L) - 1L) * 22.5
   fx <- axes_spaced_fixture(ang, n = 800L, k = 1L)
-  expect_error(
-    suppressMessages(
-      axes_reliability(fx$data, items = fx$items, angles = fx$angles)
-    ),
-    "at least 2 items"
-  )
-  # ... and every OTHER gate in the refuse contract passes on this input, so the
-  # item-count line really is the only thing in the way. Without this, a later
-  # reader could think spacing or scale count were also implicated.
   expect_identical(angles_spacing_status(ang), "ok")
   expect_identical(length(fx$items), 16L)
   expect_true(all(lengths(fx$items) == 1L))
+  expect_false(axes_fits_zeta1(fx$items))
+
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+  expect_s3_class(res, "circumplex_axes_reliability")
+  expect_true(all(is.finite(res$results$reliability)))
+  # item_n = k/2 = 8, the COC value Strack prints.
+  expect_equal(res$results$item_n, c(8, 8), tolerance = 1e-8)
 })
 
 test_that("M61 T2: axes_fits_zeta1() reads the drop rule off the item map", {
@@ -1429,4 +1437,58 @@ test_that("M61 T3: a mixed map keeps the three-column shadow", {
   expect_lt(abs(seed[["xi1"]] - xi1), 1e-10)
   expect_lt(abs(seed[["xi2"]] - xi2), 1e-10)
   expect_lt(abs(seed[["zeta1"]] - zeta1), 1e-10)
+})
+
+test_that("M61 T4/T6: the zeta1-dropped path returns a three-row component set (AC1)", {
+  skip_if_not_installed("lavaan")
+  ang <- (seq_len(12L) - 1L) * 30
+  fx <- axes_spaced_fixture(ang, n = 1200L, k = 1L)
+  res <- suppressMessages(
+    axes_reliability(fx$data, items = fx$items, angles = fx$angles)
+  )
+
+  # Three rows, and the scale-specificity row is ABSENT rather than NA -- an NA
+  # row would read as "estimated but unavailable" instead of "not in this
+  # model", which is the distinction M61 exists to make.
+  expect_identical(nrow(res$components), 3L)
+  expect_identical(res$components$Component, c("general", "axes", "item"))
+  expect_identical(res$components$Symbol, c("xi2", "xi1", "epsilon"))
+  expect_false("scale_specificity" %in% res$components$Component)
+  # The two fitted components still carry standard errors; only the item row's
+  # SE is NA (it is a mean of free residuals, as on the zeta1-fitted path).
+  expect_true(all(is.finite(res$components$SE[1:2])))
+  expect_true(is.na(res$components$SE[[3]]))
+
+  # details records the drop, so a caller can tell the two models apart without
+  # inspecting the component table.
+  expect_false(res$details$zeta1_fitted)
+  expect_true(all(is.finite(res$results$reliability)))
+  expect_true(all(res$results$reliability > 0 & res$results$reliability < 1))
+})
+
+test_that("M61 T4/T6: a mixed map still fits zeta1 and keeps four rows (AC2)", {
+  skip_if_not_installed("lavaan")
+  # Eight equally spaced positions; scale 1 carries a pair, the rest one item
+  # each. One pair is all the drop rule requires.
+  ang <- (seq_len(8L) - 1L) * 45
+  set.seed(614L)
+  dat <- axes_simulate(1500L, ang, 1L, .20, .05, .08)
+  inames <- sprintf("i%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  # Duplicate-free extra item on scale 1: simulate it as its own position's
+  # second item by drawing a fresh column correlated through the same model.
+  dat2 <- axes_simulate(1500L, ang, 2L, .20, .05, .08)
+  colnames(dat2) <- sprintf("j%02d", seq_len(ncol(dat2)))
+  mixed_dat <- cbind(dat2[, 1:2], dat[, -1, drop = FALSE])
+  items <- c(list(colnames(dat2)[1:2]), as.list(inames[-1]))
+
+  expect_true(axes_fits_zeta1(items))
+  res <- suppressMessages(
+    axes_reliability(mixed_dat, items = items, angles = ang)
+  )
+  expect_identical(nrow(res$components), 4L)
+  expect_true("scale_specificity" %in% res$components$Component)
+  expect_true(res$details$zeta1_fitted)
+  # The seed carried zeta1 too, since the OLS shadow kept its third column.
+  expect_identical(names(res$details$ols_shadow), c("xi2", "xi1", "zeta1"))
 })
