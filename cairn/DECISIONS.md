@@ -894,3 +894,42 @@ effect — it licenses inclusion, it does not require it. No new dependency
 (lavaan is already `Suggests`; D-006/D-014 minimal-deps reinforced). M59's Scope
 `Out:` clause is amended to match, with a work-log line. D-001/D-008/D-018/D-025
 lineage extended; none other superseded. Source: Jeff, M59 implement gate.
+
+### D-031 (2026-07-25): the axes-reliability non-octant and single-item extensions enter v2.0.0 — a narrow D-001 supersession that does not gate M7 (M60, M61)
+
+**Context:** D-026 deferred four axes-reliability extensions ("Non-octant types
+(b–f), quasi-circumplex weights, the secondary correlation-matrix input, and
+blockwise ζ2 are deferred"), and D-030 left three of them parked, "pending a
+concrete use case". At the M60/M61 plan gate Jeff took up two of the four. The
+investigation found them much narrower than the deferral implied: Strack's type
+b is eight equally spaced scales rotated 22.5° off the axes (p. 2), so the only
+thing refusing it is the *phase* pinned by the `octants()` set-identity check at
+`R/axes_reliability.R:495-506` — the weight and item_n math is already general.
+Table 3 carries a **Type** column with printed %axes / item_n / reliability for
+every type a–f, so each extension has a published-value oracle; all four type-b
+rows and all six single-item rows reproduce by Spearman–Brown.
+**Decision:** Supersede D-001's new-features-excluded clause **insofar as it
+bars these two extensions** — narrowly, exactly as D-008 did for CIRCUM, D-018
+for the visualization expansion, D-025 for the axes-reliability feature, and
+D-030 for its correlation-matrix input. M60 (any equally spaced angle set, any
+rotation, ≥ 2 items per scale) and M61 (single-item scale positions, ζ1 dropped)
+ship in v2.0.0, their NEWS text folded into the existing `axes_reliability()`
+bullet under the 2.0.0 heading. The accepted-input width is the plan-gate
+answer: **any equally spaced set at any rotation**, because per-axis Σw² = k/2
+holds at every rotation for k ≥ 3, so the equal-axis-variance restriction stays
+as innocuous as it is for octants and pinning the phase would be arbitrary.
+**Scope of the supersession:** narrow — promotes **only** M60 and M61. All other
+D-001 consequences and exclusions stand. The two remaining parked extensions —
+blockwise ζ2 estimation and FIML on items — are untouched, and D-026's deferral
+of each, pending a concrete use case, is unchanged. RR09 §4's holding that
+"Refusing unequal spacing in the MVP is therefore scope-correct, not merely
+cautious" is likewise untouched: types b, c, e and f are all equally spaced, and
+neither milestone goes near the quasi-circumplex refusal.
+**Consequences:** M7 does **not** gain `Depends on: M60` or `M61` — on D-030's
+reading, the release never waits for them, it merely contains them if they land
+first; should the window open first, they ship in the following version and this
+entry is spent without effect. No new dependency (lavaan and OpenMx are already
+`Suggests`; D-006/D-014 minimal-deps reinforced). The ROADMAP's
+"Axes-reliability deferred-in-spec extensions" candidate row is narrowed to its
+two survivors. D-001/D-008/D-018/D-025/D-026/D-030 lineage extended; none other
+superseded. Source: Jeff, M60/M61 plan gate.

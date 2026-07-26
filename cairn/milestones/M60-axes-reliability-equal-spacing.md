@@ -1,0 +1,108 @@
+# M60: Any equally spaced angle set for `axes_reliability()`
+
+- **Status:** planned
+- **Priority:** normal
+- **Depends on:** —
+- **Driving RR:** —
+- **Principles touched:** —
+- **Branch/PR:** —
+
+## Goal
+
+Let `axes_reliability()` estimate from any equally spaced set of scale angles at
+any rotation, instead of only the canonical octant set.
+
+## Scope
+
+**In:**
+- Replace the `octants()` set-identity refusal (`R/axes_reliability.R:485-506`)
+  with a genuine modular equal-spacing predicate: k ≥ 3 scales, constant
+  successive gap of 360/k including the wrap-around gap, tolerance-based,
+  pole-aware (LM = 360 ≡ 0). Unequal spacing, duplicate angles and NA angles
+  stay refused with a message naming the offender.
+- The ≥ 2-items-per-scale refusal (`:507-510`) stays, so ζ1 remains identified.
+- Pin the rotation-invariance that keeps the equal-axis-variance restriction
+  substantively innocuous: for k ≥ 3, per-axis Σw² = k/2 at any rotation.
+- Oracles: the four CV-LI type-b rows of Strack Table 3 (Layer A), plus the
+  existing population-matrix / synthetic-recovery / cross-engine cells re-run at
+  a rotated and a non-octant configuration (Layer B).
+- D-entry admitting this to v2.0.0 (narrow D-001 supersession, D-030 pattern);
+  roxygen, `man/`, vignette, NEWS.
+
+**Out:**
+- One-item-per-scale positions (Strack types e/f, ζ1 dropped) → M61.
+- Blockwise ζ2 (Strack type d) → ROADMAP candidate row; blocked on a data-model
+  decision, since no bundled instrument records block membership
+  (`R/instrument_oop.R:1-11`).
+- FIML on items → ROADMAP candidate row.
+- Unequal spacing / quasi-circumplex — stays refused; RR09 §4 holds the refusal
+  is scope-correct, and nothing here touches it.
+
+## Acceptance criteria
+
+- [ ] AC1: `axes_reliability()` estimates a rotated equally spaced set (the
+      type-b interstitial angles 22.5…337.5) and a k ≠ 8 set (k = 6 and k = 12),
+      returning finite equal per-axis reliability; the octant-only error no
+      longer fires.
+- [ ] AC2: each refusal still fires with a message naming the offender —
+      unequal spacing, duplicate angle, NA angle, k < 3, and < 2 items on any
+      scale.
+- [ ] AC3: the spacing test is modular — a set expressed with LM = 360 is
+      accepted identically to the same set using 0, and a set carrying both 0
+      and 360 is refused as a duplicate.
+- [ ] AC4: per-axis item_n equals `n_items × k/2` for every accepted
+      configuration at any rotation, at a tolerance set from the discrimination
+      required rather than from one machine's printed value (M59, M20).
+- [ ] AC5: Layer A — all four CV-LI type-b rows of Strack (2013) Table 3
+      (%axes 3.5 / 2.7 / 1.9 / 7.6 at item_n 16 → .37 / .31 / .24 / .57;
+      `strack2013` p. 7) reproduce within ±.01.
+- [ ] AC6: Layer B at a rotated-octant and a non-octant configuration —
+      population-matrix recovery exact to numerical tolerance, synthetic
+      recovery, and cross-engine lavaan/OpenMx agreement.
+- [ ] AC7: no doc still claims octant-only — roxygen, regenerated `man/`,
+      vignette and NEWS updated, and the type-b oracle rows banked in
+      `cairn/references/strack2013.md` with a provenance re-verification mark.
+- [ ] AC8: `devtools::check()` clean and the PDF manual actually built
+      (`R CMD Rd2pdf`; `check()` skips it by default — M7/M57).
+
+## Coverage
+
+- AC1 → T1, T3
+- AC2 → T1, T3
+- AC3 → T2, T3
+- AC4 → T4
+- AC5 → T5
+- AC6 → T6
+- AC7 → T5, T7
+- AC8 → T8
+
+## Tasks
+
+- [ ] T1: tests first — a rotated type-b set and k = 6 / k = 12 sets currently
+      error at `R/axes_reliability.R:495-506`; pin that as the failing fence,
+      and pin every refusal that must survive
+      (`tests/testthat/test-axes-reliability.R:442-476`).
+- [ ] T2: extract a modular equal-spacing predicate (pole-aware, wrap-around
+      gap, tolerance-based); no such helper exists anywhere in `R/`. Unit-test
+      at the pole and against near-miss spacings.
+- [ ] T3: replace the refusal block with count / spacing / duplicate checks and
+      informative messages; keep the ≥ 2-items-per-scale gate.
+- [ ] T4: rotation-invariance tests for `axis_item_n()`
+      (`R/axes_reliability.R:31-34`) — `n × k/2`; keep the exact-equality octant
+      assertion at `test-axes-reliability.R:5` exact, since exactness there is
+      an octant accident (16 scales at 22.5° measured `y = 31.999999999999996`).
+- [ ] T5: bank the four CV-LI type-b Table 3 rows in
+      `cairn/references/strack2013.md` and add the ±.01 sweep test.
+- [ ] T6: re-run the population-matrix, synthetic-recovery and cross-engine
+      OpenMx cells at a rotated-octant and a k ≠ 8 configuration.
+- [ ] T7: roxygen (`R/axes_reliability.R:316-317,343,395`), `man/` regeneration,
+      vignette and NEWS.
+- [ ] T8: D-entry for the v2.0.0 admission; full check plus the PDF manual.
+
+## Work log
+
+- 2026-07-25: created by /milestone-plan.
+
+## Decisions
+
+## Review
