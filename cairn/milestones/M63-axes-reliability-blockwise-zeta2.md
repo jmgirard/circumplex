@@ -80,7 +80,7 @@ type-f rows).
 - [x] T1 `blocks =` argument on `axes_reliability()` (`R/axes_reliability.R:603`)
       + resolution to a per-item block index beside `axes_resolve_map()`
       (`:394`); validation and error tests first.
-- [ ] T2 `axes_fits_zeta2()` identification predicate mirroring
+- [x] T2 `axes_fits_zeta2()` identification predicate mirroring
       `axes_fits_zeta1()` (`:123`). Open design question for implement: whether
       the predicate is structural ("some block spans ≥2 scales") or a rank check
       on the OLS design — the structural form can miss a block map collinear
@@ -105,6 +105,7 @@ type-f rows).
 
 ## Work log
 
+- 2026-07-26: T2 done — the component set now lives in one place, `axes_design()`, which the OLS shadow and `axes_fits_zeta2()` both read; ζ2 joins only when the same-block column raises the design's rank. Task refined during work (minor): the shadow's move onto the shared design landed here rather than in T4, since the predicate needed it first; T4 keeps the shadow's zeta2 return. The gate's rank-check answer is now evidenced, not just asserted — a block map pairing OPPOSITE scales spans two scales each (so the rejected structural rule calls it identified) yet same-block equals -cos exactly and adds no rank; substituting the structural rule into the code turns 4 tests red. M61's shadow tests pass untouched as the refactor's fence. `devtools::test()` 0 failures / 3956 passes.
 - 2026-07-26: T1 done — `axes_resolve_blocks()` maps a list of per-block item vectors onto the `unlist(item_cols)` order, or NULL for the pre-M63 path. Implement gate settled two open choices: `blocks` is a list of item vectors mirroring `items` (a flat label vector was refused as a silent-misalignment channel, M25 family), and identification will be a rank check on the OLS design rather than a structural rule. M63-D1 records the partition contract. Four guards proven by mutation (orphan, duplicate, index alignment, empty block); `devtools::test()` 0 failures / 3936 passes.
 - 2026-07-26: created by /milestone-plan. Four gate answers from Jeff: into v2.0.0 as a narrow D-001 supersession (D-032); `blocks =` argument only, no Instrument field; unidentified ζ2 drops and flags per the M61 precedent; oracle bar is synthetic recovery + omitted-ζ2 bias + cross-engine. Investigation corrected the candidate row's premise — Table 3's blocked rows can never be an end-to-end fixture (no published correlation matrix), so they anchor the formula layer only and the estimator's real oracle is synthetic.
 

@@ -225,16 +225,55 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
 # alone, returning a two-component seed. The seed then matches the model's
 # parameter set exactly, because axes_fits_zeta1() drops zeta1 on the same
 # condition -- both read the item map, so they cannot disagree (M61 T3).
-axes_ols_shadow <- function(R, item_angle_deg, item_scale) {
-  ut <- upper.tri(R)
+axes_ols_shadow <- function(R, item_angle_deg, item_scale, item_block = NULL) {
+  X <- axes_design(item_angle_deg, item_scale, item_block)
+  stats::setNames(qr.solve(X, R[upper.tri(R)]), colnames(X))
+}
+
+# The moment-structure design shared by the OLS shadow and the identification
+# predicates: one row per off-diagonal item pair, one column per component the
+# model can actually fit. The whole component set is decided here, in one place,
+# so the syntax emitter, the shadow, and the reported components cannot disagree
+# about which parameters exist (the M61 doctrine, extended to zeta2 at M63).
+#
+# Columns are added only where they carry information:
+#
+#   xi2, xi1   always -- the intercept and cos(theta_i - theta_j).
+#   zeta1      when some same-scale pair exists off the diagonal; with one item
+#              at every position the column is all zeros (M61).
+#   zeta2      when adding same-block RAISES THE RANK of the design.
+#
+# The zeta2 test is a rank check rather than a structural rule ("some block
+# spans two or more scales"), decided at the M63 implement gate, because the
+# structural rule is not sufficient. Blocks pairing OPPOSITE scales span two
+# scales each and are still unidentified: every same-block pair sits 180 degrees
+# apart and every cross-block pair 90, so same-block is exactly -cos and adds no
+# rank. The rank check catches that, the confounded-with-zeta1 case (blocks that
+# are the scales), the all-one-block case (same-block is the intercept), and the
+# all-singleton case (same-block is the zero column), with one test instead of
+# four hand-written ones -- and catches whatever else a caller's map does that
+# nobody enumerated.
+axes_design <- function(item_angle_deg, item_scale, item_block = NULL) {
+  p <- length(item_scale)
+  ut <- upper.tri(matrix(0, p, p))
   th <- as.numeric(item_angle_deg) * pi / 180
-  same <- as.numeric(outer(item_scale, item_scale, `==`)[ut])
   X <- cbind(1, outer(th, th, function(a, b) cos(a - b))[ut])
-  if (any(same != 0)) X <- cbind(X, same)
-  b <- qr.solve(X, R[ut])
-  out <- c(xi2 = b[[1]], xi1 = b[[2]])
-  if (ncol(X) == 3L) out[["zeta1"]] <- b[[3]]
-  out
+  colnames(X) <- c("xi2", "xi1")
+  same <- as.numeric(outer(item_scale, item_scale, `==`)[ut])
+  if (any(same != 0)) X <- cbind(X, zeta1 = same)
+  if (!is.null(item_block)) {
+    cand <- cbind(X, zeta2 = as.numeric(outer(item_block, item_block, `==`)[ut]))
+    if (qr(cand)$rank > qr(X)$rank) X <- cand
+  }
+  X
+}
+
+# Whether the block-specificity component zeta2 is identified for this item and
+# block map -- read off the design above, never from a separate rule, so the
+# emitted syntax and the reported component set stay one decision (M61/M63).
+axes_fits_zeta2 <- function(item_angle_deg, item_scale, item_block) {
+  if (is.null(item_block)) return(FALSE)
+  "zeta2" %in% colnames(axes_design(item_angle_deg, item_scale, item_block))
 }
 
 # Fit the axes-reliability model on item data through the single lavaan::cfa

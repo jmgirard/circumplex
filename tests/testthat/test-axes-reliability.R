@@ -2160,3 +2160,95 @@ test_that("M63 T1: `blocks` must partition the items, and says which item broke 
   # An item in no block: the partition is broken by omission.
   expect_error(r(list(fx$names[1:4], fx$names[5:7])), "no block.*i08")
 })
+
+test_that("M63 T2: axes_design() names the columns the model will fit", {
+  fx <- axes_block_fixture()
+  ang <- rep(fx$angles, each = 2L)
+
+  # No blocks: the pre-M63 three-column design, unchanged.
+  X0 <- axes_design(ang, fx$scale_of)
+  expect_identical(colnames(X0), c("xi2", "xi1", "zeta1"))
+  # Blocks laid across the scales: zeta2 joins as a fourth column.
+  X1 <- axes_design(ang, fx$scale_of, fx$block_of)
+  expect_identical(colnames(X1), c("xi2", "xi1", "zeta1", "zeta2"))
+  # The design is the upper triangle of the item-by-item matrix.
+  p <- length(ang)
+  expect_identical(nrow(X1), as.integer(p * (p - 1L) / 2L))
+})
+
+test_that("M63 T2: axes_fits_zeta2() keeps zeta2 only where it is identified", {
+  fx <- axes_block_fixture()
+  ang <- rep(fx$angles, each = 2L)
+  fits <- function(blk) axes_fits_zeta2(ang, fx$scale_of, blk)
+
+  # Identified: blocks cut across the scales, so same-block is a genuinely
+  # different indicator from same-scale.
+  expect_true(fits(fx$block_of))
+  # Blocks that ARE the scales: same-block == same-scale, perfectly confounded
+  # with zeta1. This is the case the M63 gate named.
+  expect_false(fits(fx$scale_of))
+  # One block holding everything: same-block is all ones off the diagonal, so
+  # it is the intercept column and carries no information of its own.
+  expect_false(fits(rep(1L, length(ang))))
+  # Every item its own block: same-block is all zeros off the diagonal -- the
+  # zero-column case that killed qr.solve() before M61 handled its zeta1 twin.
+  expect_false(fits(seq_along(ang)))
+  # No blocks supplied at all.
+  expect_false(axes_fits_zeta2(ang, fx$scale_of, NULL))
+})
+
+test_that("M63 T2: a block map spanning two scales can still be unidentified", {
+  # THE case that decided the M63 gate for a rank check over a structural rule.
+  # Four scales, one item each, at 0/90/180/270; blocks pair OPPOSITE scales.
+  # Every same-block pair is 180 deg apart (cos = -1) and every cross-block pair
+  # is 90 deg apart (cos = 0), so same-block == -cos exactly: the block column
+  # is a scalar multiple of the axes column and adds no rank.
+  ang <- c(0, 90, 180, 270)
+  scale_of <- 1:4
+  paired <- c(1L, 2L, 1L, 2L)   # {0,180} and {90,270}
+
+  # A structural rule -- "some block spans >= 2 scales" -- would say identified.
+  expect_true(any(tapply(scale_of, paired, function(s) length(unique(s))) >= 2))
+  # The rank check says otherwise, and the rank check is right.
+  expect_false(axes_fits_zeta2(ang, scale_of, paired))
+  expect_identical(colnames(axes_design(ang, scale_of, paired)), c("xi2", "xi1"))
+
+  # Rotating the same pairing off the axes does not rescue it: the collinearity
+  # is in the pairing, not the phase.
+  expect_false(axes_fits_zeta2(ang + 22.5, scale_of, paired))
+
+  # But blocking ADJACENT scales instead is identified at the same angles --
+  # so the refusal above is about this pairing, not about k = 4 or single items.
+  adjacent <- c(1L, 1L, 2L, 2L)  # {0,90} and {180,270}
+  expect_true(axes_fits_zeta2(ang, scale_of, adjacent))
+})
+
+test_that("M63 T2: the OLS shadow recovers zeta2 exactly on the population", {
+  fx <- axes_block_fixture(k = 2L)
+  ang <- rep(fx$angles, each = 2L)
+  xi1 <- .20; xi2 <- .05; zeta1 <- .08; zeta2 <- .06
+
+  # Build the population correlation matrix by hand from the five-component
+  # decomposition, so the shadow is checked against arithmetic it never saw.
+  p <- length(ang)
+  th <- ang * pi / 180
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(fx$scale_of, fx$scale_of, `==`) +
+    zeta2 * outer(fx$block_of, fx$block_of, `==`)
+  diag(sig) <- 1
+
+  got <- axes_ols_shadow(sig, ang, fx$scale_of, fx$block_of)
+  expect_identical(names(got), c("xi2", "xi1", "zeta1", "zeta2"))
+  expect_lt(abs(got[["xi1"]] - xi1), 1e-10)
+  expect_lt(abs(got[["xi2"]] - xi2), 1e-10)
+  expect_lt(abs(got[["zeta1"]] - zeta1), 1e-10)
+  expect_lt(abs(got[["zeta2"]] - zeta2), 1e-10)
+
+  # Omitting the block map from the SAME matrix biases the other components --
+  # the block variance has to go somewhere. This is the OLS-side preview of the
+  # AC4 claim the CFA makes end to end.
+  naive <- axes_ols_shadow(sig, ang, fx$scale_of)
+  expect_false("zeta2" %in% names(naive))
+  expect_gt(abs(naive[["xi1"]] - xi1) + abs(naive[["xi2"]] - xi2) +
+              abs(naive[["zeta1"]] - zeta1), 1e-3)
+})
