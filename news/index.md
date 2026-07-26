@@ -207,14 +207,23 @@ on a real ggplot2 coordinate system.
   rotated off the axes, or a six- or twelve-scale circumplex. Unequally
   spaced (quasi-circumplex) angles are refused rather than approximated,
   and three scales are refused because the variance components are not
-  separately identified at that count. Estimation works either from raw
-  item data or, through `cormat` and `n`, from a published item
-  correlation matrix alone, for reanalyzing a matrix whose raw data is
-  not available; on that path the Nunnally-Bernstein comparison is
-  reported as `NA` and `sd = "raw"` is refused, since both need the
-  respondents’ own item scores. Missing data are handled by listwise
-  deletion; a boundary fit returns `NA` reliability rather than a
-  clipped value; and the returned `circumplex_axes_reliability` object
+  separately identified at that count. Scales may carry a single item
+  each, as Strack’s single-item circumplex types do: with one item at
+  every position no two items share a scale, so the scale-specificity
+  component is not identified and is dropped from the model rather than
+  estimated, leaving a three-row components table. A mixed instrument
+  carrying at least one multi-item scale still estimates it. Because
+  coefficient alpha is undefined for a one-item scale, the
+  Nunnally-Bernstein comparison is reported as `NA` with a stated reason
+  whenever any scale has fewer than two items — as Strack et
+  al. themselves do, leaving it blank for such instruments. Estimation
+  works either from raw item data or, through `cormat` and `n`, from a
+  published item correlation matrix alone, for reanalyzing a matrix
+  whose raw data is not available; on that path the Nunnally-Bernstein
+  comparison is reported as `NA` and `sd = "raw"` is refused, since both
+  need the respondents’ own item scores. Missing data are handled by
+  listwise deletion; a boundary fit returns `NA` reliability rather than
+  a clipped value; and the returned `circumplex_axes_reliability` object
   has [`print()`](https://rdrr.io/r/base/print.html) and
   [`summary()`](https://rdrr.io/r/base/summary.html) methods. A bundled
   simulated dataset, `simulated_items`, is included for the examples.

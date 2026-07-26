@@ -347,6 +347,30 @@ et al. (2013) excluded such instruments when validating the model. Three
 scales are refused for a different reason: at that count every pair of
 scales sits the same angular distance apart, so the general, axes, and
 scale-specificity variances can no longer be told apart.</p>
+<p>Scales may also carry a <strong>single item</strong> each, as Strack
+et al.’s single-item circumplex types do. With one item at every
+position no two items ever share a scale, so nothing in the data
+distinguishes scale specificity from item specificity: the
+scale-specificity component is not identified, and
+<code><a href="../reference/axes_reliability.html">axes_reliability()</a></code> drops it from the model rather than
+estimating a quantity the data cannot support. The components table then
+carries three rows instead of four, and
+<code>details$zeta1_fitted</code> records the drop. An instrument that
+<em>mixes</em> single-item and multi-item scales still estimates the
+component — one multi-item scale supplies the information, and the
+shared-value restriction carries it to the remaining scales. One
+consequence follows for the comparison figure: coefficient alpha is
+undefined for a one-item scale, so the Nunnally–Bernstein reliability is
+reported as <code>NA</code> with its reason whenever any scale has fewer
+than two items, exactly as Strack et al. leave that column blank for
+such instruments.</p>
+<p>One further boundary is worth stating plainly, because the paper
+crosses it and this function does not: the model implemented here is
+<strong>two</strong>-dimensional. Strack et al. also analyze a
+<em>spherical</em> instrument, SYMLOG, whose items span three orthogonal
+dimensions; the figures they publish for it come from that three-axis
+model, and no configuration <code><a href="../reference/axes_reliability.html">axes_reliability()</a></code> accepts will
+reproduce them.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
