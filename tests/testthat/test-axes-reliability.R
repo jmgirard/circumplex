@@ -2252,3 +2252,59 @@ test_that("M63 T2: the OLS shadow recovers zeta2 exactly on the population", {
   expect_gt(abs(naive[["xi1"]] - xi1) + abs(naive[["xi2"]] - xi2) +
               abs(naive[["zeta1"]] - zeta1), 1e-3)
 })
+
+test_that("M63 T3: axes_syntax() emits BS latents sharing one zeta2 label", {
+  fx <- axes_block_fixture()
+  syn <- axes_syntax(fx$items, fx$angles, item_block = fx$block_of)
+
+  # One block latent per block, loading +1 on that block's items -- and the
+  # items are the ACROSS-scale ones, not a scale's worth.
+  expect_true(grepl("BS1 =~ 1*i01 + 1*i03 + 1*i05 + 1*i07", syn, fixed = TRUE))
+  expect_true(grepl("BS2 =~ 1*i02 + 1*i04 + 1*i06 + 1*i08", syn, fixed = TRUE))
+  # Every block variance shares the one zeta2 label (the model's restriction).
+  expect_true(grepl("BS1 ~~ zeta2*BS1", syn, fixed = TRUE))
+  expect_true(grepl("BS2 ~~ zeta2*BS2", syn, fixed = TRUE))
+  # The rest of the model is untouched by the addition.
+  expect_true(grepl("AX ~~ xi1*AX", syn, fixed = TRUE))
+  expect_true(grepl("GEN ~~ xi2*GEN", syn, fixed = TRUE))
+  expect_true(grepl("SS1 ~~ zeta1*SS1", syn, fixed = TRUE))
+})
+
+test_that("M63 T3: an unidentified block map emits no BS latents at all", {
+  fx <- axes_block_fixture()
+  # Blocks that ARE the scales: axes_fits_zeta2() is FALSE, so the component is
+  # dropped from the model rather than fitted to a confounded moment -- exactly
+  # how M61 drops zeta1, and read off the same design.
+  syn <- axes_syntax(fx$items, fx$angles, item_block = fx$scale_of)
+  expect_false(grepl("BS1", syn, fixed = TRUE))
+  expect_false(grepl("zeta2", syn, fixed = TRUE))
+  expect_true(grepl("no block-specificity component", syn, fixed = TRUE))
+  # zeta1 is still there -- dropping zeta2 must not take its neighbour with it.
+  expect_true(grepl("SS1 ~~ zeta1*SS1", syn, fixed = TRUE))
+
+  # No blocks supplied: byte-identical to the pre-M63 emission.
+  expect_identical(axes_syntax(fx$items, fx$angles),
+                   axes_syntax(fx$items, fx$angles, item_block = NULL))
+  expect_false(grepl("zeta2", axes_syntax(fx$items, fx$angles), fixed = TRUE))
+})
+
+test_that("M63 T3: zeta2 takes a start modifier only when the seed carries it", {
+  fx <- axes_block_fixture()
+  # A dyadic seed (1/16) so fmt()'s full-precision printing is exact: .06 would
+  # print as 0.059999999999999998 and a regex pinned to "0.06" would never
+  # match. The M61 comment warns about the digit COUNT; the value's own decimal
+  # expansion is the other half of the same trap.
+  seed <- c(xi2 = .05, xi1 = .20, zeta1 = .08, zeta2 = .0625)
+  syn <- axes_syntax(fx$items, fx$angles, item_block = fx$block_of, start = seed)
+  expect_match(syn, "BS1 ~~ start\\(0\\.0625[0-9]*\\)\\*zeta2\\*BS1")
+  expect_match(syn, "BS2 ~~ start\\(0\\.0625[0-9]*\\)\\*zeta2\\*BS2")
+
+  # A seed WITHOUT zeta2 (the shadow returns none when zeta2 is unidentified)
+  # must emit no modifier rather than erroring on the missing name -- the same
+  # trap M61 hit with zeta1.
+  seed3 <- c(xi2 = .05, xi1 = .20, zeta1 = .08)
+  syn3 <- expect_no_error(
+    axes_syntax(fx$items, fx$angles, item_block = fx$block_of, start = seed3)
+  )
+  expect_true(grepl("BS1 ~~ zeta2*BS1", syn3, fixed = TRUE))
+})

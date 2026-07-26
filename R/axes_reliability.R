@@ -143,7 +143,7 @@ axes_fits_zeta1 <- function(items) any(lengths(items) >= 2L)
 # covariance-equivalent: every intermediate path is fixed (+1 or the cosine), so
 # the product of fixed paths equals the flat fixed loading and each scale's
 # disturbance becomes its specificity latent. The two are identical in fit.
-axes_syntax <- function(items, angles_deg, start = NULL) {
+axes_syntax <- function(items, angles_deg, item_block = NULL, start = NULL) {
   th <- as.numeric(angles_deg) * pi / 180
   wx <- snap_trig(cos(th))
   wy <- snap_trig(sin(th))
@@ -152,6 +152,20 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
   # dropped from the model entirely rather than fitted to the diagonal.
   fit_zeta1 <- axes_fits_zeta1(items)
   ss <- if (fit_zeta1) sprintf("SS%d", seq_along(items)) else character(0)
+
+  # Block-specificity is emitted on the same terms (M63): only where the design
+  # says it is identified, read off axes_design() so the emitted model and the
+  # reported component set are one decision, never two that can drift apart.
+  all_items <- unlist(items, use.names = FALSE)
+  item_angle <- rep(as.numeric(angles_deg), times = lengths(items))
+  item_scale <- rep(seq_along(items), times = lengths(items))
+  fit_zeta2 <- axes_fits_zeta2(item_angle, item_scale, item_block)
+  block_items <- if (fit_zeta2) {
+    split(all_items, factor(item_block, levels = sort(unique(item_block))))
+  } else {
+    list()
+  }
+  bs <- if (fit_zeta2) sprintf("BS%d", seq_along(block_items)) else character(0)
 
   # One fixed loading term "w*item" per item; scales whose weight snaps to 0
   # (a pole scale on the orthogonal axis) contribute no term to that axis.
@@ -189,6 +203,16 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
         character(1)
       )
     },
+    if (fit_zeta2) {
+      vapply(
+        seq_along(block_items),
+        function(b) {
+          paste(bs[[b]], "=~",
+                paste(unit_terms(block_items[[b]]), collapse = " + "))
+        },
+        character(1)
+      )
+    },
     "",
     "# equal axis variances (xi1), free general variance (xi2)",
     paste0("AX ~~ ", st("xi1"), "xi1*AX"),
@@ -205,6 +229,24 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
       # One item per scale position: zeta1 is unidentified and is dropped from
       # the model rather than fitted (Strack's types e and f). Errors stay free.
       "# no scale-specificity component (one item per position); errors free"
+    },
+    if (fit_zeta2) {
+      c(
+        "",
+        "# shared block-specificity variance (zeta2), blockwise instruments only",
+        vapply(bs, function(b) paste0(b, " ~~ ", st("zeta2"), "zeta2*", b),
+               character(1))
+      )
+    } else if (!is.null(item_block)) {
+      # Blocks were supplied but add no rank to the design -- the component is
+      # not estimable from this map, so it is dropped rather than fitted to a
+      # moment it shares with another component (M63; see axes_design()).
+      # The comment deliberately does NOT name the parameter token, so that a
+      # "no such component anywhere in this syntax" assertion stays meaningful
+      # -- the same reason M61's dropped-scale-specificity comment does not say
+      # zeta1 (its test asserts the token is absent from the whole string).
+      c("", "# no block-specificity component (the supplied block map adds no",
+        "# rank to the moment-structure design, so it is not estimable here)")
     }
   )
   paste(lines, collapse = "\n")
@@ -281,9 +323,10 @@ axes_fits_zeta2 <- function(item_angle_deg, item_scale, item_block) {
 # fixes every latent covariance at 0; RR09 BC4). The model assumes unit-variance
 # items (the five components sum to 1, p. 4), so callers standardize the items
 # before fitting -- the paper fits the item *correlation* matrix (spec section 2).
-axes_fit <- function(dat, items, angles_deg, estimator = "ML",
+axes_fit <- function(dat, items, angles_deg, item_block = NULL,
+                     estimator = "ML",
                      se = "standard", missing = "listwise", start = NULL) {
-  syn <- axes_syntax(items, angles_deg, start = start)
+  syn <- axes_syntax(items, angles_deg, item_block = item_block, start = start)
   sem_fit_cfa(
     syn, dat,
     estimator = estimator, se = se, missing = missing,
@@ -304,10 +347,11 @@ axes_fit <- function(dat, items, angles_deg, estimator = "ML",
 # rescaling to the N-1 covariance it computes from raw z-scores, and that
 # covariance IS cor(mat). Switching to likelihood = "wishart" here would put the
 # two paths (N-1)/N apart -- see the AC2 round-trip test.
-axes_fit_cormat <- function(R, items, angles_deg, n, estimator = "ML",
+axes_fit_cormat <- function(R, items, angles_deg, n, item_block = NULL,
+                            estimator = "ML",
                             se = "standard", start = NULL) {
   lavaan::cfa(
-    axes_syntax(items, angles_deg, start = start),
+    axes_syntax(items, angles_deg, item_block = item_block, start = start),
     sample.cov = R, sample.nobs = as.integer(n),
     estimator = estimator, se = se, orthogonal = TRUE
   )
