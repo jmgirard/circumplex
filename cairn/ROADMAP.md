@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-26 (M62 shipped — `axes_reliability()` can no longer report a NaN, negative, or infinite SEm: a numeric `sd` must be finite and positive, and `xi1 >= 1` now trips the boundary flag. Tree clean and level with origin, all 16 checks PASS, no open issues/PRs/RBs. M57 row pruned under terminal-row retention.)_
+_Last hygiene check: 2026-07-26 (third pass, no drift — nothing changed since the post-M62 pass: tree clean and level with origin, all 16 checks PASS, no open issues/PRs/RBs, nothing in flight. M7 stays parked on Jeff's CRAN handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
