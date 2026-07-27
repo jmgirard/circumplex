@@ -212,6 +212,92 @@ test_that("BC1: the block-specificity component is corrected too (the K matrix)"
 })
 
 
+# The population metric ratio at the probe population, derived in RR13's
+# reproduction appendix (sqrt(naive/actual) = 1.441229). Used ONLY as the proxy
+# in the fixture arm below, never by the shipped code, which evaluates the ratio
+# at each fit's own Sigma-hat.
+M66_POP_RATIO <- 1.4412
+
+
+test_that("BC4: the corrected FIML SE calibrates over the committed fixture", {
+  fx <- readRDS(test_path("fixtures", "m65-heavy-cells.rds"))
+  expect_gte(fx$provenance$reps, 200L)
+
+  # The fixture stores fiml.se (uncorrected) and fiml.xi1 per replicate, and no
+  # Sigma-hat -- the per-replicate ratio is not reconstructible from it. So this
+  # arm divides by the POPULATION constant, which is exactly how RR13 produced
+  # the 1.001/1.008/1.018 it cites. The live arm below is what establishes that
+  # the constant is a sound stand-in for what the code actually does.
+  for (rate in names(fx$mcar)) {
+    cell <- fx$mcar[[rate]]
+    calib <- mean(cell[, "fiml.se"] / M66_POP_RATIO, na.rm = TRUE) /
+      stats::sd(cell[, "fiml.xi1"], na.rm = TRUE)
+    expect_gt(calib, 0.90)
+    expect_lt(calib, 1.10)
+  }
+
+  # RR13 B-4: the listwise-under-deletion columns are a free N-invariance
+  # asset, carrying the same check across an order of magnitude of effective N
+  # (complete cases run ~370 at 2% MCAR down to ~48 at 10%) at no simulation
+  # cost. na.rm is load-bearing rather than defensive: at 10% MCAR one of the
+  # 200 replicates leaves 32 complete cases for 24 items and does not fit.
+  for (rate in names(fx$mcar)) {
+    cell <- fx$mcar[[rate]]
+    ok <- !is.na(cell[, "lw_se"]) & !is.na(cell[, "lw_xi1"])
+    expect_gte(sum(ok), 195L)
+    calib <- mean(cell[ok, "lw_se"] / M66_POP_RATIO) /
+      stats::sd(cell[ok, "lw_xi1"])
+    expect_gt(calib, 0.90)
+    expect_lt(calib, 1.10)
+  }
+})
+
+
+test_that("BC4: the shipped composition evaluates the ratio at Sigma-hat", {
+  skip_if_not_installed("lavaan")
+  fx <- readRDS(test_path("fixtures", "m65-heavy-cells.rds"))
+  oct <- octants()
+  seeds <- fx$provenance$seeds$mcar
+
+  live <- function(rate, r) {
+    set.seed(seeds[[r]])
+    mat <- axes_mcar(as.matrix(axes_simulate(600L, oct, 3L, .35, .10, .08)), rate)
+    res <- suppressMessages(suppressWarnings(
+      axes_reliability(as.data.frame(mat),
+                       items = split(colnames(mat), rep(1:8, each = 3)),
+                       angles = oct, missing = "fiml")
+    ))
+    naive <- res$details$se_uncorrected[["xi1"]]
+    c(naive = naive,
+      per_sigma = res$components$SE[res$components$Symbol == "xi1"],
+      ratio = naive / res$components$SE[res$components$Symbol == "xi1"])
+  }
+
+  got <- vapply(c(0.02, 0.05, 0.10),
+                function(rate) live(rate, 1L), numeric(3))
+
+  # BC4 requires the ratio be evaluated AT Sigma-hat, not taken as a constant.
+  # A per-fit ratio varies across fits; a hardcoded constant would not. The
+  # three cells differ in missingness rate, so their Sigma-hats differ and so
+  # must their ratios -- this reddens if the code is ever changed to divide by
+  # a literal.
+  expect_false(isTRUE(all.equal(got["ratio", 1], got["ratio", 3])))
+
+  # And the per-Sigma-hat ratio does NOT equal the population constant. It runs
+  # systematically ABOVE it -- measured 1.4499/1.4501/1.4507 against 1.4412
+  # over 20 replicates per rate at M66 T4, consistent in sign and size across
+  # all three rates, so it is a finite-sample offset and not scatter. The
+  # fixture arm above therefore uses a proxy that is ~2% CONSERVATIVE in the
+  # corrected SE: the shipped composition reports a slightly SMALLER SE and so
+  # calibrates slightly nearer 1 than the numbers that test asserts. The offset
+  # is well inside the ~3.6% MC SE of an empirical SD over 200 replicates, so
+  # it cannot change AC4's verdict at this replicate count -- which is what
+  # makes the constant a sound stand-in, NOT that the two agree exactly.
+  expect_gt(mean(got["ratio", ]), M66_POP_RATIO)
+  expect_lt(mean(got["ratio", ]) / M66_POP_RATIO - 1, 0.05)
+})
+
+
 test_that("BC1: a non-invertible Sigma-hat gives NA SEs with a reason, never a number", {
   pp <- probe_pop()
   # A singular matrix: duplicate one item's row/column exactly.
