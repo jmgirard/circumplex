@@ -52,7 +52,7 @@ grounds.
       0.9 / 3.6 / 2.8%), which is the discriminating bound since materially
       disagreeing routes would sit about one SE apart — and the deletion-cost
       shares (p = 64 → 0.53 / 0.27 / 0.038 complete cases at 1 / 2 / 5%).
-- [ ] **AC2** `cairn/reviews/archive/RB12-*.md` is self-contained: it states the
+- [x] **AC2** `cairn/reviews/archive/RB12-*.md` is self-contained: it states the
       question, all four AC1 findings with the command producing each, and the
       three verdict questions — the metric, what the reported components mean
       under FIML, and whether the FIML-consistent correlation matrix is the
@@ -126,6 +126,8 @@ grounds.
 - 2026-07-26: **AC2 AMENDED (gated)** — the criterion required RB12 to state all three design positions fixed at this gate and RB12 states two, which failed review (F2). Amended at Jeff's gate choice (option A of three) to describe the artifact accurately: two positions stated as the milestone's, the one-stage/two-stage question left deliberately open, and the reason that framing is a property rather than a gap — RR12 §4's one-stage answer is independent evidence, not an echo of ours. RB12 is archived history so the artifact was never a candidate for editing. Second gated amendment in this milestone (AC1 at T1, AC2 here); both were criteria written more tightly than the evidence supported.
 - 2026-07-26: status in-progress→review (/milestone-implement), second pass. All eight review findings dispositioned: F1 fixed in the probe, F3/F4/F5 by D-034 + M64-D9 + the in-place ROADMAP correction, F6/F7 by appended work-log corrections, F2 by this AC2 amendment, F8 left standing under IP4 and recorded. Still no package surface touched.
 
+- 2026-07-26: second review pass. AC2 verified against its amended text; AC1 re-verified after the probe gained its F5 section (four figures unchanged, two runs byte-identical); all corrections confirmed on disk. Gate clean — `cairn_validate` exit 0, and the package tree is unchanged since the Status OK 0/0/0 `check(manual = TRUE)` at `6266b729`, so that evidence still holds for this tip. **No fresh three-lens fan-out ran** at the maintainer's gate choice, since the new commits are corrections the first-pass lenses prescribed; the Review section says so rather than implying a second independent pass. All five criteria ticked; awaiting the merge gate.
+
 ## Decisions
 
 - **M64-D1 (2026-07-26, RR12 §1) — the metric is FIML, not available-case.** RR12 confirms one-stage FIML and **overturns the standardization** the plan submitted with it: available-case `scale()` is MCAR-honest but MAR-dishonest, because the standardized columns carry `k_i·k_j·ρ_ij` and the model has no free off-diagonal per-item parameter to absorb it. Measured under mechanism M2: +0.0167 above the FIML-metric estimate (paired SE 0.0006), ≈1 SE at N = 600, while the two metric-correct routes agree to +0.0008. The build standardizes by saturated-FIML (EM) moments with a `sqrt(N_used/(N_used − 1))` convention that reproduces `scale()` exactly on complete data.
@@ -142,8 +144,9 @@ grounds.
 ## Review
 
 Reviewed 2026-07-26. PR [#90](https://github.com/jmgirard/circumplex/pull/90).
-**Outcome: RETURNED to `in-progress` — AC2 fails as written.** First return for
-this milestone (thrash count 1 of 3).
+**First pass outcome: RETURNED to `in-progress` — AC2 failed as written** (thrash
+count 1 of 3). **Second pass 2026-07-26: all five criteria verified** — see the
+second-pass section below, which also states what that pass did and did not do.
 
 ### Acceptance-criterion evidence
 
@@ -293,6 +296,54 @@ precedent for fixing below the bar rather than logging and leaving a trap.
   bar rather than overturning it). A future session auditing which of M64's
   positions survived review gets exactly the wrong answer. Corrected by the
   appended entry.
+
+### Second pass (2026-07-26) — after the findings were applied
+
+**Scope of this pass, stated so nothing is implied that did not happen: no
+fresh three-lens fan-out ran.** The new commits are the corrections the
+first-pass lenses themselves prescribed, and the maintainer chose at the gate
+to re-verify rather than re-fan-out. So the independent-review evidence below
+the first-pass headings is the *only* independent review this milestone had;
+this pass re-executed the criteria and the gate.
+
+- **[x] AC2 — verified against the amended text.** Fresh literal greps on the
+  archived RB12: Q6 states position 2 as the milestone's ("The milestone's
+  position is to report both as unavailable-with-reason"), Q8 states position 3
+  ("The milestone's synthetic bar is…"), and Q4 asks the third openly ("which
+  route is the defensible default?") with `one-stage` occurring only three
+  times — the pasted probe table, its legend, and a hypothetical clause — so no
+  position is stated for it. All three verdict questions located: Q1 (the
+  metric), Q2 (what the reported components mean), Q5 (R̂ as the input for the
+  shadow and the PD refusal). The criterion was amended through the
+  `/milestone-implement` step-6 gate, not reinterpreted here.
+- **[x] AC1 — re-verified after the probe gained its F5 section.** All four
+  named figures still print unchanged (`npar 27→51 / df 273 / 24 intercepts`;
+  `max |v - 1| = 0.0456`; 0.9 / 3.6 / 2.8%; `p = 64 items 0.526 0.274 0.038`),
+  and two consecutive runs are byte-identical.
+- **Corrections confirmed on disk:** D-034 appended (annotating D-033,
+  changing no decision); M64-D9 appended locally; the ROADMAP build row now
+  carries BC9's hard-error contract for `sd = "raw"` distinct from
+  `nb_reliability`'s NA; both work-log corrections (six files, 20×/28×)
+  present.
+- **New finding from applying F1, recorded not hidden.** Adding the
+  available-case `scale()` check shows RB12's quoted `|mean| ≤ 6e-17` is
+  itself seed-specific and does **not** reproduce — the committed script
+  measures 7.76e-17 / 7.62e-17 / 7.9e-17 at 2/5/10% per-item MCAR (its SD
+  bound does reproduce, 6.66e-16 to 8.88e-16). Both are machine precision and
+  the claim RB12 rests on the figure holds, so nothing substantive moves;
+  D-034 records it. This is the M59/M61 one-run-tolerance lesson recurring for
+  the **second** time inside this milestone, AC1's own bound having been the
+  first — the pattern worth carrying forward, not the individual number.
+- **Gate, second pass.** `cairn_validate` exit 0, all 15 PASS (47 advisory
+  work-log warnings, all M7's pre-existing wrapped history). Toolchain: the
+  package tree is **unchanged since the clean `check(manual = TRUE)`** —
+  `git diff --name-only 6266b729..HEAD` returns only `cairn/DECISIONS.md`,
+  `cairn/ROADMAP.md`, this file, and `devel/m64-fiml-probe.R`, with `devel/`
+  `.Rbuildignore`d — so that Status OK 0/0/0, with both step lines verified by
+  name, still holds for this tip. `document()` no diff and
+  `pkgdown::check_pkgdown()` clean were verified on the same unchanged tree.
+- **Thrash count: 1 return, of the 3 that would trigger a re-plan.** Neither
+  thrash trigger fires: one return, and no criterion failed twice.
 
 ### Findings logged, not actioned (score < 80)
 
