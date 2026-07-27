@@ -408,57 +408,83 @@ test_that("M66: stored cells reproduce live, so the fixture is not stale", {
 
 
 test_that("BC6: a pipeline bootstrap independently reproduces the corrected SE", {
+  # The independent oracle. The correction is analytic; this resamples
+  # respondents and re-runs the WHOLE pipeline per resample -- crucially
+  # re-computing the correlation matrix, which is where the in-sample
+  # standardization lives. lavaan's own se = "bootstrap" would NOT
+  # re-standardize (it resamples the z-columns and so reproduces the
+  # covariance-metric variability the correction removes), which is why BC6
+  # forbids it and why devel/m66-bootstrap-oracle.R writes this by hand.
+  #
+  # Stored rather than run here because the comparison is only as sharp as the
+  # bootstrap's OWN Monte-Carlo noise: the SD of a bootstrap SD over B
+  # resamples is ~1/sqrt(2B), about 5% at B = 200. Measured at M66 on seed
+  # 1001, B = 200 gave 0.013625 against a converged 0.012967 -- noise alone
+  # moved a real 9.5% gap to 15.06% and tipped it over BC6's 15% bar. The
+  # fixture uses B = 1000 (noise ~2.2%; the running SD is stable from B = 400
+  # on). The bar is BC6's and is not relaxed; what changed is the precision of
+  # the instrument reading it.
+  fx <- readRDS(test_path("fixtures", "m66-bootstrap-oracle.rds"))
+  expect_gte(fx$provenance$b, 200L)
+  expect_gte(nrow(fx$draws), 2L)
+
+  for (i in seq_len(nrow(fx$draws))) {
+    d <- fx$draws[i, ]
+    where <- paste0("draw ", rownames(fx$draws)[i])
+    expect_gte(d[["kept"]], fx$provenance$b * 0.95)
+    expect_lt(abs(d[["boot"]] - d[["analytic"]]) / d[["analytic"]], 0.15,
+              label = paste0("bootstrap vs corrected SE, ", where))
+    # Direction, against the thing actually being ruled out: the bootstrap must
+    # sit far closer to the CORRECTED SE than to the uncorrected one, which is
+    # ~44% larger. Without this a bootstrap landing between them could satisfy
+    # the 15% bar while agreeing with neither.
+    expect_lt(abs(d[["boot"]] - d[["analytic"]]),
+              abs(d[["boot"]] - d[["naive"]]),
+              label = paste0("bootstrap nearer corrected than naive, ", where))
+  }
+})
+
+
+test_that("BC6: the stored bootstrap reproduces live, so the oracle is not stale", {
   skip_if_not_installed("lavaan")
   skip_on_cran()
-  # The independent oracle. The delta-method correction is analytic; this
-  # resamples respondents and re-runs the WHOLE pipeline per resample --
-  # crucially including re-computing the correlation matrix, which is where the
-  # in-sample standardization lives. lavaan's own se = "bootstrap" would NOT
-  # re-standardize: it resamples the z-columns and so reproduces the
-  # covariance-metric variability the correction exists to remove, which is why
-  # RR13 BC6 forbids it and why this is written by hand.
+  fx <- readRDS(test_path("fixtures", "m66-bootstrap-oracle.rds"))
+  seed <- fx$provenance$seeds[[1]]
   oct <- octants()
-  items_of <- function(mat) split(colnames(mat), rep(1:8, each = 3))
-  n <- 600L
-  n_boot <- 200L
 
-  boot_se <- function(seed) {
-    set.seed(seed)
-    dat <- as.matrix(axes_simulate(n, oct, 3L, .35, .10, .08))
-    items <- items_of(dat)
-    fit0 <- axes_reliability(as.data.frame(dat), items = items, angles = oct)
-    analytic <- fit0$components$SE[fit0$components$Symbol == "xi1"]
+  set.seed(seed)
+  dat <- as.matrix(axes_simulate(fx$provenance$n, oct, 3L, .35, .10, .08))
+  items <- split(colnames(dat), rep(1:8, each = 3))
+  res <- suppressMessages(
+    axes_reliability(as.data.frame(dat), items = items, angles = oct)
+  )
 
-    est <- vapply(seq_len(n_boot), function(b) {
-      idx <- sample.int(n, n, replace = TRUE)
-      r <- stats::cor(dat[idx, , drop = FALSE])
-      f <- tryCatch(
-        suppressWarnings(axes_fit_cormat(r, items, oct, n = n)),
-        error = function(e) NULL
-      )
-      if (is.null(f)) return(NA_real_)
-      pe <- lavaan::parameterEstimates(f)
-      pe$est[pe$op == "~~" & pe$lhs == "AX" & pe$rhs == "AX"][[1]]
-    }, numeric(1))
+  # The ANALYTIC side is cheap and exact, so it is re-derived in full: if the
+  # correction ever drifts, this reddens even though the expensive bootstrap
+  # half stays stored. That is the half a stale fixture would otherwise hide.
+  expect_equal(res$components$SE[res$components$Symbol == "xi1"],
+               unname(fx$draws[1L, "analytic"]), tolerance = 1e-4)
+  expect_equal(unname(res$details$se_uncorrected[["xi1"]]),
+               unname(fx$draws[1L, "naive"]), tolerance = 1e-4)
 
-    c(analytic = analytic, boot = stats::sd(est, na.rm = TRUE),
-      kept = sum(!is.na(est)))
-  }
-
-  for (seed in c(1001L, 1002L)) {
-    got <- boot_se(seed)
-    expect_gte(got[["kept"]], 190)
-    rel <- abs(got[["boot"]] - got[["analytic"]]) / got[["analytic"]]
-    expect_lt(rel, 0.15,
-              label = paste0("bootstrap vs corrected SE, seed ", seed))
-    # Direction check against the thing being ruled out: the bootstrap must sit
-    # far closer to the CORRECTED SE than to the uncorrected one, which is 44%
-    # larger. Without this, a bootstrap that happened to land between them
-    # could satisfy the 15% bar while agreeing with neither.
-    naive <- got[["analytic"]] * 1.4412
-    expect_lt(abs(got[["boot"]] - got[["analytic"]]),
-              abs(got[["boot"]] - naive))
-  }
+  # A short live bootstrap: 60 resamples, enough to prove the resampling path
+  # still runs and lands in the right neighbourhood, not enough to sharpen
+  # BC6's bar -- so it is asserted loosely and says so. Its own MC noise at
+  # B = 60 is ~9%, which is why 0.35 and not 0.15.
+  est <- vapply(seq_len(60L), function(b) {
+    set.seed(seed * 1000L + b)
+    idx <- sample.int(nrow(dat), nrow(dat), replace = TRUE)
+    f <- tryCatch(
+      suppressWarnings(axes_fit_cormat(stats::cor(dat[idx, , drop = FALSE]),
+                                       items, oct, n = nrow(dat))),
+      error = function(e) NULL
+    )
+    if (is.null(f)) return(NA_real_)
+    pe <- lavaan::parameterEstimates(f)
+    pe$est[pe$op == "~~" & pe$lhs == "AX" & pe$rhs == "AX"][[1]]
+  }, numeric(1))
+  live_sd <- stats::sd(est, na.rm = TRUE)
+  expect_lt(abs(live_sd - fx$draws[1L, "boot"]) / fx$draws[1L, "boot"], 0.35)
 })
 
 
