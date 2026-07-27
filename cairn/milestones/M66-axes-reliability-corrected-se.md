@@ -112,20 +112,22 @@ doc/NEWS surfaces the correction falsifies.
   `item_04` at the plan gate) and the misaligned computation returns 0.0046
   where 0.01677 is right, with no error. Pin that with a test that would redden
   if the realignment were dropped.
-- [ ] **T2 — wire into the components table.** Replace the `comp_ses` vector at
-  `R/axes_reliability.R:1542-1547` on the raw-data and `cormat` paths. Same
-  code both paths (AC1).
+- [ ] **T2 — wire into the components table, all three paths.** Replace the
+  `comp_ses` vector at `R/axes_reliability.R:1542-1547`: raw and `cormat` take
+  the corrected SE directly, FIML takes the multiplicative composition
+  (observed-information SE × corrected/naive at Σ̂). Amended from "raw and
+  cormat only" at implement — see the work log; the paths cannot be migrated
+  separately.
 - [ ] **T3 — the ζ2 anchor.** Derive the block-component (`K`) row and pin a
   deterministic anchor on the crossed-blocks layout (`axes_crossed_blocks()`,
   `R/axes_reliability.R:453`), the way T1 pins ξ1/ξ2/ζ1. RR13's reproduction
   code never exercises `K`, so this is the one piece of AC1 with no worked
   value behind it.
-- [ ] **T4 — FIML composition + bridge probe.** Corrected FIML SE = the
-  observed-information SE ÷ the per-parameter ratio at that fit's own Σ̂.
-  Bridge probe: re-fit ~20 of the fixture's stored seeds, show the per-Σ̂ and
-  population-constant (1.4412) corrections agree within Monte-Carlo noise, then
-  discharge AC4's [0.90, 1.10] check over all 600 stored replicates via the
-  constant.
+- [ ] **T4 — FIML calibration evidence (AC4).** The composition itself moved to
+  T2. Bridge probe: re-fit ~20 of the fixture's stored seeds, show the per-Σ̂
+  and population-constant (1.4412) corrections agree within Monte-Carlo noise,
+  then discharge AC4's [0.90, 1.10] check over all 600 stored replicates via
+  the constant.
 - [ ] **T5 — heavy cells: generator script + committed fixture.** Following
   M65's pattern (`devel/m65-fiml-heavy-cells.R` → committed `.rds` → live-smoke
   harness). Three new cells the existing fixture does not carry: 200 complete-
@@ -153,6 +155,10 @@ doc/NEWS surfaces the correction falsifies.
 - 2026-07-27: started (/milestone-implement). Branch `m66-axes-reliability-corrected-se` cut from master at 704adba3; no dependencies to verify, no other milestone in-progress. Status planned→in-progress.
 - 2026-07-27: implement gate settled three open API choices — `details$se_uncorrected` retains lavaan's reported SEs (auditability without a supported opt-out); a Σ̂ the correction cannot invert gives NA SEs with a warning and a named reason, never a silent fallback to the uncorrected number; and no `se =` argument, since an opt-out would make a value the package documents as miscalibrated into a permanent exported surface (D-035 already rules the change a fix, not an interface change).
 - 2026-07-27: T1 done. `R/axes_corrected_se.R` (new): `axes_se_derivs()` builds {C, J, B, K, E_11..E_pp}; `axes_corrected_se()` returns naive + corrected SEs per component and a `reason`. Anchors: naive SE(ξ1) 0.0167459, corrected 0.0116264, ratios 1.4403/1.0673/0.9969 — all inside BC2, and the naive branch matches lavaan's own reported SE to <1e-7, which fences the derivative structure independently. `devtools::test()` 0 failures, 4263 passing; the 4 warnings are the pre-existing test-ci_accuracy.R diagnostic cautions (0 warnings across both axes test files).
+- 2026-07-27: **checkpoint, T2+T3 code complete but NOT yet verified — boxes deliberately unticked.** `test-axes-corrected-se.R` passes 35 assertions and `test-axes-reliability.R` its 903, but the full `test-axes-fiml.R` re-run was still in flight when the turn ended, so the profile's `verify` slot has not been seen clean on this diff. Next session: re-run `test-axes-fiml.R`, then `devtools::test()`, then tick T2/T3 if clean.
+- 2026-07-27: minor plan amendment — T2 now wires **all three** paths and T4 keeps only the FIML calibration *evidence*. The split shipped an inconsistent intermediate state: `test-axes-fiml.R`'s live-smoke harness compares the listwise SE against a stored fixture value and asserts `fiml_se < lw_se` ACROSS paths, so correcting one path and not the other fails tests that are right to fail. Criteria and Coverage unchanged.
+- 2026-07-27: T2 kept M65's fixture rather than regenerating it. Its `lw_se`/`fiml.se` columns hold pre-correction SEs, which is exactly what `details$se_uncorrected` still carries, so the live-smoke harness now reads that field and goes on catching drift in lavaan's own observed-information SEs. Regenerating to corrected values would have left that check comparing this package's output against itself. M65's `expect_lt(fiml_se, lw_se)` is now asserted on BOTH metrics, because the two paths divide by ratios evaluated at their own Σ̂ and the ordering is not preserved by construction.
+- 2026-07-27: T3 ζ2 anchor derived on the crossed-blocks layout (8 scales × 3 items, ξ1=.35, ξ2=.10, ζ1=.08, ζ2=.05, n=600): naive SE(ζ2) 0.0042551 — equal to lavaan's own `BS1` SE to 7 decimals, which is the independent fence on the `K` derivative matrix RR13's appendix never exercises — corrected 0.0042646, ratio 0.9978. All four naive SEs match lavaan at this population. Swapping `K` for the same-scale indicator reddens 6 assertions. The corrected ζ2 literal is recorded in-test as a regression pin, not an oracle, since it comes from this implementation.
 - 2026-07-27: T1 mutation record. Reddening: dropping the Σ̂ realignment fails 8 assertions, cos(2Δ) for cos(Δ) fails 8, dropping the W_c diagonal fails 3. NOT reddening, and correctly so: stripping C's diagonal leaves both SEs bit-identical to 15 decimals, because the diagonal direction is spanned by the free {E_ii} and the change is a unit-triangular reparameterization of nuisance parameters. The code comment claiming that diagonal was load-bearing was false and is corrected in place (the M36/M60 lesson family); the null is recorded there so a later session does not re-chase it.
 
 ## Decisions

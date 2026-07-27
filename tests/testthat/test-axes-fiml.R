@@ -1096,13 +1096,23 @@ test_that("M65-D3: stored seeds reproduce live, so the fixture is not stale", {
   # lavaan bump could shift the observed-information SEs, and BC13 would stay
   # green. The listwise SE is re-run for the same reason: BC13's ratio clauses
   # are a comparison, so pinning one side of it is pinning half a claim.
+  # M66: the fixture's `lw_se` / `fiml.se` columns were generated before the
+  # correlation-structure correction, so they hold the UNCORRECTED SEs -- which
+  # is exactly what `details$se_uncorrected` still carries, unchanged, on every
+  # path. The fixture comparison therefore reads that field rather than
+  # `components$SE`, and keeps doing the job it was written for: catching a
+  # drift in lavaan's own observed-information SEs or in this package's
+  # extraction of them. Regenerating the fixture to hold corrected values would
+  # have destroyed that check, since the corrected number is computed by this
+  # package and would then be compared only against itself.
   est_of <- function(mat, ...) {
     res <- suppressMessages(suppressWarnings(
       axes_reliability(as.data.frame(mat), items = items(mat), angles = oct,
                        ...)
     ))
     c(xi1 = res$results$xi1[[1]],
-      se = res$components$SE[res$components$Symbol == "xi1"])
+      se = res$components$SE[res$components$Symbol == "xi1"],
+      se_naive = res$details$se_uncorrected[["xi1"]])
   }
   # Tolerance covers cross-platform BLAS noise AND the lavaan version: the
   # fixture was generated on 0.6.21, whose h1 EM iterates plainly, while 0.7
@@ -1129,15 +1139,21 @@ test_that("M65-D3: stored seeds reproduce live, so the fixture is not stale", {
       expect_equal(unname(live[["xi1"]]),
                    unname(fx$mcar[[i]][r, "fiml.xi1"]), tolerance = tol,
                    label = paste0("live xi1, ", where))
-      expect_equal(unname(live[["se"]]),
+      expect_equal(unname(live[["se_naive"]]),
                    unname(fx$mcar[[i]][r, "fiml.se"]), tolerance = tol,
                    label = paste0("live FIML SE, ", where))
       lw <- est_of(mat, missing = "listwise")
-      expect_equal(unname(lw[["se"]]),
+      expect_equal(unname(lw[["se_naive"]]),
                    unname(fx$mcar[[i]][r, "lw_se"]), tolerance = tol,
                    label = paste0("live listwise SE, ", where))
       # BC13's direction, asserted on numbers produced in THIS run rather than
       # read out of the file: the FIML SE beats listwise replicate by replicate.
+      # Asserted on BOTH metrics (M66). The uncorrected pair is what M65
+      # measured; the corrected pair is what users now read, and the claim has
+      # to survive the correction rather than be inherited through it -- the two
+      # paths divide by DIFFERENT ratios (each evaluated at its own Sigma-hat),
+      # so the ordering is not preserved by construction and has to be checked.
+      expect_lt(live[["se_naive"]], lw[["se_naive"]])
       expect_lt(live[["se"]], lw[["se"]])
     }
   }

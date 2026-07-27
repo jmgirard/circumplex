@@ -872,8 +872,12 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   specificity were in the model, `blocks`, the block labels when a block map
 #'   was supplied, `nb_reason`, why the Nunnally-Bernstein comparison is `NA`,
 #'   `missing`, which missing-data treatment lavaan actually used,
-#'   `n_complete`, the complete-case count, and `min_coverage`, the fewest
-#'   respondents behind any item pair). `n_complete` and `min_coverage` are
+#'   `n_complete`, the complete-case count, `min_coverage`, the fewest
+#'   respondents behind any item pair, `se_uncorrected`, the component standard
+#'   errors as normal-theory maximum likelihood reports them before the
+#'   correlation-structure correction, and `se_correction_failed`, `NULL` when
+#'   that correction succeeded or a string naming why the reported SEs are
+#'   `NA`). `n_complete` and `min_coverage` are
 #'   present on every path so that a caller can read them unconditionally, and
 #'   are `NA` where they carry no information: `min_coverage` outside
 #'   `missing = "fiml"`, and both of them when a correlation matrix was supplied
@@ -1539,10 +1543,45 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   comp_rows <- Filter(Negate(is.null), comp_rows)
   comp_est <- c(xi2, xi1, if (fit_zeta1) zeta1, if (fit_zeta2) zeta2,
                 mean(eps))
+  # What lavaan reported: normal-theory SEs priced for a sample COVARIANCE
+  # input, while this estimator consumes a sample CORRELATION matrix. Retained
+  # in `details` after the correction below replaces them, so the correction
+  # stays auditable without a supported opt-out argument (M66 implement gate).
+  se_uncorrected <- c(
+    xi2 = comp_se("GEN")[[1]], xi1 = comp_se("AX")[[1]],
+    if (fit_zeta1) c(zeta1 = comp_se("SS1")[[1]]),
+    if (fit_zeta2) c(zeta2 = comp_se("BS1")[[1]])
+  )
+
+  # --- The corrected component standard errors (M66; RR13 BC1, D-035) --------
+  #
+  # `fitted(fit)$cov` is NOT in item-map order -- lavaan orders by first
+  # appearance in the syntax -- so `all_cols` is passed alongside it and
+  # axes_corrected_se() realigns off the dimnames. See that function; consuming
+  # the matrix positionally returns a plausible number 3.6x off.
+  #
+  # `n` is the sample size the SEs are priced at on each path: complete cases
+  # for listwise, the supplied `n` for cormat.
+  corrected <- axes_corrected_se(
+    lavaan::fitted(fit)$cov, all_cols, item_angle, item_scale, item_block,
+    n = n, fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2
+  )
+  se_reported <- if (missing == "fiml") {
+    # The FIML path composes MULTIPLICATIVELY rather than by replacement
+    # (RR13 BC4). Its observed-information SEs price the MISSING information
+    # correctly -- they rise with the missingness rate, which is the job RR12
+    # section 3 required of them -- and the complete-data formula above does
+    # not price it at all. Dividing by the metric ratio at Sigma-hat removes
+    # the correlation-as-covariance error while KEEPING that pricing; replacing
+    # the SE outright would silently discard it.
+    se_uncorrected * (corrected$corrected / corrected$naive)[names(se_uncorrected)]
+  } else {
+    corrected$corrected[names(se_uncorrected)]
+  }
   comp_ses <- c(
-    comp_se("GEN")[[1]], comp_se("AX")[[1]],
-    if (fit_zeta1) comp_se("SS1")[[1]],
-    if (fit_zeta2) comp_se("BS1")[[1]],
+    se_reported[["xi2"]], se_reported[["xi1"]],
+    if (fit_zeta1) se_reported[["zeta1"]],
+    if (fit_zeta2) se_reported[["zeta2"]],
     NA_real_
   )
   components <- data.frame(
@@ -1616,6 +1655,14 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # Why the Nunnally-Bernstein comparison is NA, or NULL when it is
       # available: "cormat" (no raw scores) or "single_item" (alpha undefined).
       nb_reason = nb_reason,
+      # What lavaan reported before the correlation-structure correction (M66).
+      # Kept so a user can see the size of the correction on their own data,
+      # and so a pre-M66 analysis can be reproduced, without the package
+      # offering a supported way to ASK for the uncorrected number.
+      se_uncorrected = se_uncorrected,
+      # NULL when the correction succeeded; otherwise why every corrected SE
+      # is NA ("singular", "unidentified").
+      se_correction_failed = corrected$reason,
       ols_shadow = ols
     ),
     call = call
