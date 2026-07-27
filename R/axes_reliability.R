@@ -779,6 +779,11 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   recycled, or length 2 for the X and Y axes) of axis SDs. A supplied numeric
 #'   SD must be finite and positive; anything else is refused rather than
 #'   carried into the reported SEm.
+#' @param missing How item-level missing data are handled on the `data` path:
+#'   `"listwise"` (the default; complete cases only) or `"fiml"`
+#'   (full-information maximum likelihood, via lavaan's `missing = "ml"`),
+#'   which uses every respondent who answered at least one item. Not available
+#'   with `cormat`, which carries no missing cells.
 #' @return An object of class `circumplex_axes_reliability` with `print()` and
 #'   [summary()] methods: `results` (one row per axis: the axes variance, item_n,
 #'   reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
@@ -816,11 +821,16 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' )
 axes_reliability <- function(data = NULL, items, angles = NULL,
                              instrument = NULL, cormat = NULL, n = NULL,
-                             blocks = NULL, sd = "std") {
+                             blocks = NULL, sd = "std",
+                             missing = c("listwise", "fiml")) {
   call <- match.call()
   if (!requireNamespace("lavaan", quietly = TRUE)) {
     stop("`axes_reliability()` requires the lavaan package.", call. = FALSE)
   }
+  # Same spelling and same two values as ssm_sem() (R/ssm_sem.R), so the two
+  # entry points to lavaan in this package name the estimator the same way; the
+  # "fiml" -> "ml" translation is owned once, by sem_fit_cfa().
+  missing <- match.arg(missing)
 
   # Exactly one of data / cormat, and `n` only with cormat -- the house pattern
   # cpm_fit() already uses for its CircE-style matrix path (R/cpm_fit.R:1583).
@@ -833,6 +843,19 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     stop(
       "`n` applies only to the `cormat` path; the raw-data path takes its ",
       "sample size from `data`.",
+      call. = FALSE
+    )
+  }
+  # Not one of BC7's six refusal clauses, and it is not an oversight that it is
+  # not: those clauses all describe a missingness pattern FIML cannot estimate
+  # from, whereas this one is a path with no respondents at all. A published
+  # correlation matrix carries no missing cells and no rows for the saturated
+  # EM stage, so there is nothing for the argument to name.
+  if (has_cormat && missing == "fiml") {
+    stop(
+      "`missing = \"fiml\"` needs the respondents' item scores, which the ",
+      "`cormat` path does not have; supply `data`, or use the default ",
+      "`missing = \"listwise\"`.",
       call. = FALSE
     )
   }
@@ -973,34 +996,53 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       stop("`data` contains non-finite (Inf/NaN) values.", call. = FALSE)
     }
 
-    # --- Listwise deletion (RR09 BC13) ----------------------------------------
     n_total <- nrow(mat)
-    mat <- mat[stats::complete.cases(mat), , drop = FALSE]
-    n <- nrow(mat)
     p <- ncol(mat)
-    message(
-      "axes_reliability(): ", n, " complete case(s) used",
-      if (n < n_total) {
-        paste0(" (", n_total - n, " removed by listwise deletion)")
-      },
-      "."
-    )
-    if (n <= p) {
-      stop(
-        "Complete-case N (", n, ") must exceed the number of items (", p, ").",
-        call. = FALSE
-      )
-    }
 
-    item_var <- apply(mat, 2, stats::var)
-    if (any(item_var <= 0)) {
-      stop(
-        "Zero-variance item(s): ",
-        paste(all_cols[item_var <= 0], collapse = ", "), ".",
-        call. = FALSE
+    if (missing == "listwise") {
+      # --- Listwise deletion (RR09 BC13) --------------------------------------
+      mat <- mat[stats::complete.cases(mat), , drop = FALSE]
+      n <- nrow(mat)
+      message(
+        "axes_reliability(): ", n, " complete case(s) used",
+        if (n < n_total) {
+          paste0(" (", n_total - n, " removed by listwise deletion)")
+        },
+        "."
       )
+      if (n <= p) {
+        stop(
+          "Complete-case N (", n, ") must exceed the number of items (", p,
+          ").",
+          call. = FALSE
+        )
+      }
+
+      item_var <- apply(mat, 2, stats::var)
+      if (any(item_var <= 0)) {
+        stop(
+          "Zero-variance item(s): ",
+          paste(all_cols[item_var <= 0], collapse = ", "), ".",
+          call. = FALSE
+        )
+      }
+      R <- stats::cor(mat)
+      zmat <- scale(mat)
+    } else {
+      # --- FIML on the items (M65) --------------------------------------------
+      # Two stages, one body of information. The saturated (EM) stage supplies
+      # the standardizing moments and R-hat; the structured stage is ONE
+      # lavaan::cfa(missing = "ml") on the columns those moments standardized.
+      # Nothing here recomputes a moment from the standardized columns -- see
+      # axes_fiml_moments() on why that would silently be an available-case
+      # correlation wearing the FIML metric's clothes.
+      cvg <- axes_fiml_coverage(mat)
+      mat <- mat[cvg$keep, , drop = FALSE]
+      n <- cvg$n_used
+      mom <- axes_fiml_moments(mat)
+      R <- mom$R
+      zmat <- mom$z
     }
-    R <- stats::cor(mat)
   } else {
     # --- The correlation-matrix path --------------------------------------------
     if (!is.numeric(cormat)) {
@@ -1067,9 +1109,10 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # negative" on a boundary fit) are redundant noise; suppress them in favor of
   # this function's own clean diagnostics.
   fit <- suppressWarnings(if (has_data) {
-    zdf <- as.data.frame(scale(mat))
+    zdf <- as.data.frame(zmat)
     colnames(zdf) <- all_cols
-    axes_fit(zdf, item_cols, angles_deg, item_block = item_block, start = ols)
+    axes_fit(zdf, item_cols, angles_deg, item_block = item_block, start = ols,
+             missing = missing)
   } else {
     axes_fit_cormat(R, item_cols, angles_deg, n, item_block = item_block,
                     start = ols)

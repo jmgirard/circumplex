@@ -12,7 +12,8 @@ axes_reliability(
   cormat = NULL,
   n = NULL,
   blocks = NULL,
-  sd = "std"
+  sd = "std",
+  missing = c("listwise", "fiml")
 )
 }
 \arguments{
@@ -55,6 +56,12 @@ uses each axis composite's observed raw SD; or a numeric vector (length 1,
 recycled, or length 2 for the X and Y axes) of axis SDs. A supplied numeric
 SD must be finite and positive; anything else is refused rather than
 carried into the reported SEm.}
+
+\item{missing}{How item-level missing data are handled on the \code{data} path:
+\code{"listwise"} (the default; complete cases only) or \code{"fiml"}
+(full-information maximum likelihood, via lavaan's \code{missing = "ml"}),
+which uses every respondent who answered at least one item. Not available
+with \code{cormat}, which carries no missing cells.}
 }
 \value{
 An object of class \code{circumplex_axes_reliability} with \code{print()} and

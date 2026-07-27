@@ -92,8 +92,8 @@ are standing and not revisited here.
 
 ## Coverage
 
-- AC2, AC3, AC6 → T1
-- AC1, AC4, AC5 → T2
+- AC2, AC6 → T1
+- AC1, AC3, AC4, AC5 → T2
 - AC7 → T3
 - AC8, AC9 → T4
 - AC11, AC12, AC14, AC15 → T5
@@ -105,7 +105,7 @@ are standing and not revisited here.
 
 - [x] **T1** — Metric layer: saturated-FIML (EM) means/SDs with the `sqrt(N_used/(N_used − 1))` rescaling and R̂
       built from them (route per M65-D1); complete-data equality tests vs `scale(mat)`/`cor(mat)` at 1e-12.
-- [ ] **T2** — API + one-stage wiring: `missing =` on `axes_reliability()` (`R/axes_reliability.R:819`) through the
+- [x] **T2** — API + one-stage wiring: `missing =` on `axes_reliability()` (`R/axes_reliability.R:819`) through the
       existing `axes_fit(missing =)` → `sem_fit_cfa()` translation (`R/ssm_sem.R:749`); observed-information
       assertion; a test that no two-stage SE or χ² reaches `results`/`components`/`fit`/print.
 - [ ] **T3** — Six-clause refusal contract, all-missing-row drop, soft thin-coverage warning (M65-D2). Per the M62
@@ -130,6 +130,9 @@ are standing and not revisited here.
 - 2026-07-26: minor amendment (wording only, no scope change) — Tasks compressed from 25 lines to 18 by cutting duplicated lesson prose to pointers, after the M65-D1..D3 block left the plan-owned body at 148/149 with eight tasks still to run. No task added, removed, reordered, or rescoped.
 - 2026-07-26: T1 done. `R/axes_fiml.R` adds `axes_fiml_h1()` (the EM seam) and `axes_fiml_moments()`; `tests/testthat/test-axes-fiml.R` adds 14 assertions. BC2 measures 2.2e-15 and BC6 1.1e-15 against the 1e-12 bar. Two findings, both from ablating rather than asserting: (a) `lavInspect(fit, "converged")` reports FALSE on a HEALTHY saturated fit — it describes the structured optimizer, which this stage never runs — so `axes_converged()` would have refused every dataset; the seam now listens for lavaan's EM iteration-cap warning and checks moment finiteness instead. (b) The `ordered = character(0)` pin is a measured no-op (0 difference on a 5-point integer Likert fixture; non-numeric input is refused upstream) — comment corrected to claim a pin, not a fix, per the M36 lesson. The N-1 rescaling is mutation-verified: removing it reddens BC2 at 1.8e-3, nine orders above the bar. Full suite 0 failures / 4076 passing / 4 pre-existing warnings, count unchanged.
 - 2026-07-26: session paused at the T1 commit (user's gate choice). M65 stays `in-progress`; branch `m65-axes-reliability-fiml-build` is pushed at 1568a52f with T1 done and T2-T8 open. Resume at T2, which is entangled with T3 — both rewrite the same data-preparation region of `axes_reliability()` (`R/axes_reliability.R:967-1051`), since BC7's N_used ≤ p refusal replaces the complete-case one — so they are best taken together in one sitting.
+
+- 2026-07-26: gated Coverage amendment — AC3 moves from T1 to T2 (`AC2, AC6 → T1`; `AC1, AC3, AC4, AC5 → T2`). AC3 compares the two `missing =` paths, and the argument does not exist until T2, so T1 could not have produced its evidence. No criterion text, task, or scope changed. User approved at the T2 implement gate.
+- 2026-07-26: T2 done. `missing = c("listwise", "fiml")` on `axes_reliability()`, `match.arg`'d to `ssm_sem()`'s spelling; the FIML branch standardizes by `axes_fiml_moments()` and fits one `axes_fit(missing = "fiml")` through `sem_fit_cfa()`. `axes_fiml_coverage()` split out of `axes_fiml_moments()` because order is load-bearing — T3's pattern-readable refusals must fire before the EM stage, since lavaan fabricates an unidentified moment rather than failing (V-F). `missing = "fiml"` with `cormat` is refused (a seventh refusal, outside BC7's six: no rows to run EM over). AC3 measures agreement well inside 1e-8 on components, reliability, and SEm, four-component and five-component (zeta2) cells alike. AC4 asserts observed information on the object the function actually fitted, captured through the `axes_converged()` seam rather than on a parallel fit; the listwise branch is fired through the same capture and required to read back `"listwise"`, so the assertion cannot pass vacuously. AC5 pins the ban two ways: `axes_fit_cormat()` mocked to abort is never reached, and unmocked the reported chi-square and xi1 SE both differ from the banned two-stage refit of R-hat at total N. Full suite 0 failures / 4096 passing / 4 pre-existing warnings, count unchanged.
 
 ## Decisions
 

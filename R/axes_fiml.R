@@ -68,26 +68,50 @@ axes_fiml_h1 <- function(dat) {
 }
 
 
-# Saturated-FIML moments, the standardized item matrix, and the coverage
-# diagnostics BC8 reports. `mat` is the numeric item matrix in item-map order,
-# missing cells as NA. Rows with NO observed item are dropped here (BC7): they
-# carry no information for any moment, and leaving them in would inflate every
-# denominator that N_used feeds.
-axes_fiml_moments <- function(mat) {
+# The observed-data geometry, EM-free: which rows survive, how many respondents
+# stand behind each item and each item PAIR, and the counts BC8 reports. `mat`
+# is the numeric item matrix in item-map order, missing cells as NA.
+#
+# Split from axes_fiml_moments() because ORDER is load-bearing: every BC7
+# refusal that can be read off the missingness pattern alone -- N_used <= p, a
+# barely-observed or constant item, a never-jointly-observed pair -- must fire
+# BEFORE the EM stage, not after. Handing a degenerate item to EM does not
+# produce an informative failure; lavaan fabricates the unidentified moment and
+# returns something that looks like an estimate (evidence V-F). So the caller
+# screens on this, then estimates.
+#
+# Rows with NO observed item are dropped here (BC7): they carry no information
+# for any moment, and leaving them in would inflate every denominator N_used
+# feeds. `keep` is returned rather than the filtered matrix so the caller drops
+# once, on its own copy, and every later quantity agrees about which rows exist.
+axes_fiml_coverage <- function(mat) {
   obs <- !is.na(mat)
   keep <- rowSums(obs) > 0L
-  n_dropped <- sum(!keep)
-  mat <- mat[keep, , drop = FALSE]
   obs <- obs[keep, , drop = FALSE]
-  n_used <- nrow(mat)
+  p <- ncol(mat)
 
   # Pairwise joint coverage: how many respondents answered BOTH items of a
   # pair. crossprod() on the observed-indicator matrix gives every pair at once;
   # the diagonal is per-ITEM coverage, which is a different quantity, so the
   # minimum is taken over the off-diagonal only.
   co <- crossprod(obs)
-  min_coverage <- if (ncol(co) > 1L) min(co[upper.tri(co)]) else NA_real_
+  list(
+    keep = keep,
+    n_used = sum(keep),
+    n_dropped = sum(!keep),
+    n_complete = sum(rowSums(obs) == p),
+    item_n = diag(co),
+    pair_n = co,
+    min_coverage = if (p > 1L) min(co[upper.tri(co)]) else NA_real_
+  )
+}
 
+
+# Saturated-FIML moments and the standardized item matrix. `mat` is the item
+# matrix with its all-missing rows ALREADY dropped (axes_fiml_coverage()), so
+# nrow(mat) is N_used and the two stages cannot disagree about the denominator.
+axes_fiml_moments <- function(mat) {
+  n_used <- nrow(mat)
   h1 <- axes_fiml_h1(as.data.frame(mat))
   if (!isTRUE(h1$converged)) {
     stop(
@@ -109,14 +133,5 @@ axes_fiml_moments <- function(mat) {
   # correlation of the standardized columns would be an available-case
   # correlation wearing the FIML metric's clothes -- exactly the quantity RR09
   # BC13 bans and D-033 was careful to say R-hat is not.
-  list(
-    z = z,
-    mean = mu,
-    sd = sdv,
-    R = stats::cov2cor(h1$cov),
-    n_used = n_used,
-    n_dropped = n_dropped,
-    n_complete = sum(stats::complete.cases(mat)),
-    min_coverage = min_coverage
-  )
+  list(z = z, mean = mu, sd = sdv, R = stats::cov2cor(h1$cov))
 }
