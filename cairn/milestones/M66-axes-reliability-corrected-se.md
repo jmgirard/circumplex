@@ -1,11 +1,11 @@
 # M66: Corrected component standard errors for `axes_reliability()`
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** RR13
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m66-axes-reliability-corrected-se`
 
 ## Goal
 
@@ -150,6 +150,7 @@ doc/NEWS surfaces the correction falsifies.
 - 2026-07-27: plan gate chose the ~20-seed bridge probe for AC4 over full 600-replicate regeneration and over the population constant alone, because the fixture stores no Σ̂ and the probe buys the per-Σ̂ claim for minutes rather than ~45 min of refitting; falsified by the probe measuring per-Σ̂ and constant corrections disagreeing by more than Monte-Carlo noise, which would force the regeneration.
 - 2026-07-27: plan gate chose to add a ζ2 deterministic anchor (T3) over shipping the blockwise branch on its existing structural unit tests, because AC1 binds ζ2 while RR13's worked code omits `K` entirely; falsified by nothing — the rejected alternative was strictly weaker evidence.
 - 2026-07-27: plan gate chose to spin the AC5 exact-route escalation out as its own milestone over taking it inside M66, because its size is conditional on a measurement not yet taken; falsified by an AC5 cell missing [0.85, 1.15], which triggers that plan.
+- 2026-07-27: started (/milestone-implement). Branch `m66-axes-reliability-corrected-se` cut from master at 704adba3; no dependencies to verify, no other milestone in-progress. Status planned→in-progress.
 
 ## Decisions
 
