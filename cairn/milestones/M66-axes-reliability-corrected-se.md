@@ -81,7 +81,7 @@ doc/NEWS surfaces the correction falsifies.
   reliabilities and SEm are unchanged, and that Strack et al.'s printed LISREL
   SEs carry the uncorrected approximation. Verified against rendered `print()`
   output and the built Rd, never the source strings alone.
-- [ ] **AC8 (gate clean).** `devtools::test()` and
+- [x] **AC8 (gate clean).** `devtools::test()` and
   `devtools::check(args = "--no-manual")` clean, plus a built PDF manual
   (`R CMD Rd2pdf --no-preview --force`), since AC7 changes roxygen.
 
@@ -230,6 +230,20 @@ Gathered fresh at the review gate 2026-07-27, by command, on branch
   under Breaking changes, with no milestone numbers in user-facing text.
   Guards mutation-verified: reverting the caveat reddens 4 assertions, deleting
   the FIML correction sentence reddens the positive assert added for it.
+
+- **AC8 — met.** On the final commit `dd9bb3b8`: `devtools::test()` 0 failures
+  / **4377 passing** / 0 skips (4 warnings, all the pre-existing
+  test-ci_accuracy.R CPM-conditioning cautions); `devtools::check()` full run
+  **Status OK, 0 errors / 0 warnings / 0 notes** (14m 55s); PDF manual built
+  directly with `R CMD Rd2pdf --no-preview --force`, **78 pages**, exit 0.
+  The manual is built separately because `check()` skips that step — grepping
+  the check log for `checking PDF version of manual` returns 0 hits, which is
+  how the M7/M57 lesson is applied here as a measurement rather than recalled.
+  CI on PR #92 green on the same commit: ubuntu-latest (release), test-coverage,
+  pkgdown, codecov/patch, codecov/project. The test-coverage pass is load-bearing
+  rather than a formality — M59 recorded a tolerance that passed locally and
+  failed only under covr instrumentation, so a green local check is not evidence
+  for it, and M66 added several numeric tolerances.
 
 ### Independent review — three lenses, then a scorer
 
