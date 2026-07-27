@@ -323,14 +323,21 @@ axes_fits_zeta2 <- function(item_angle_deg, item_scale, item_block) {
 # fixes every latent covariance at 0; RR09 BC4). The model assumes unit-variance
 # items (the five components sum to 1, p. 4), so callers standardize the items
 # before fitting -- the paper fits the item *correlation* matrix (spec section 2).
+#
+# `...` forwards further lavaan arguments through the chokepoint. It exists for
+# one caller and one purpose (M65-D5): a `missing = "ml"` fit runs its OWN
+# unrestricted-moments EM, for the saturated loglikelihood the fit indices are
+# referenced against, and that EM needs the same raised iteration cap the
+# saturated stage gets -- without a way in, the cap reached only one of the two
+# EM sites and the chi-square could be computed against a stalled baseline.
 axes_fit <- function(dat, items, angles_deg, item_block = NULL,
                      estimator = "ML",
-                     se = "standard", missing = "listwise", start = NULL) {
+                     se = "standard", missing = "listwise", start = NULL, ...) {
   syn <- axes_syntax(items, angles_deg, item_block = item_block, start = start)
   sem_fit_cfa(
     syn, dat,
     estimator = estimator, se = se, missing = missing,
-    orthogonal = TRUE
+    orthogonal = TRUE, ...
   )
 }
 
@@ -361,6 +368,19 @@ axes_fit_cormat <- function(R, items, angles_deg, n, item_block = NULL,
 # in axes_reliability() (RR09 BC12) is testable via local_mocked_bindings().
 axes_converged <- function(fit) {
   isTRUE(lavaan::lavInspect(fit, "converged"))
+}
+
+# Which missing-data treatment lavaan actually used, in this package's spelling.
+# lavaan reports "ml" (or "ml.x" when fixed.x is in play) for FIML; anything
+# else -- including the cormat path, which has no rows and so no treatment --
+# is the complete-case one. Mirrors sem_details()'s read-back in R/ssm_sem.R so
+# the two entry points report the estimator identically.
+axes_lav_missing <- function(fit) {
+  lav <- tryCatch(
+    lavaan::lavInspect(fit, "options")$missing,
+    error = function(e) NULL
+  )
+  if (identical(lav, "ml") || identical(lav, "ml.x")) "fiml" else "listwise"
 }
 
 # Whether a fit landed on a boundary -- not a usable solution, so the caller
@@ -647,6 +667,27 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' **per axis** (X and Y): for a balanced instrument the two axes carry the
 #' same axes-variance estimate and differ only through `item_n`.
 #'
+#' How approximate is worth stating, because it is neither small nor uniform.
+#' The reported standard errors are the ones normal-theory maximum likelihood
+#' would report for a sample **covariance** input, while the estimator consumes
+#' a sample **correlation** matrix, whose diagonal cannot vary. For an
+#' instrument whose axes carry a lot of variance the component standard errors
+#' therefore **overstate** sampling variability substantially -- by about 40% at
+#' an axes variance of .35 -- so a confidence interval built from them is
+#' conservative. For weak-axes, strong-general instruments the ratio drifts the
+#' other way and they are slightly **understated**. Treat the component SEs as
+#' order-of-magnitude guidance rather than as calibrated uncertainty; the point
+#' estimates, reliabilities, and SEm are unaffected. The global chi-square
+#' carries the same approximation in the other direction, flattering fit by
+#' roughly 4%.
+#'
+#' A related detail, in case you check: the fitted model does **not** reproduce
+#' the correlation matrix's unit diagonal exactly, and that is expected rather
+#' than a defect. With the loadings fixed, the stationarity condition available
+#' for a free item error is the *weighted* diagonal, not the raw one, so
+#' off-diagonal sampling misfit leaks into the implied diagonal at roughly the
+#' sampling standard error of a correlation.
+#'
 #' # Which instruments this accepts
 #'
 #' Any set of **equally spaced** scale angles, at any rotation: the canonical
@@ -678,15 +719,52 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' rows arise from a three-axis sphere model, not from any configuration this
 #' function accepts.
 #'
-#' Missing data are handled by **listwise deletion only** (a message reports the
-#' complete-case count); pairwise correlation input is never used. A boundary
-#' fit returns `NA` reliability and SEm with a warning and a boundary flag
-#' rather than a clipped, negative, or missing value. A fit counts as a boundary
-#' when the estimated axes variance falls outside `(0, 1)` -- at or below zero
-#' the axes carry no variance to be reliable, and at or above one they carry all
-#' of it, which drives the Spearman-Brown reliability to one or beyond, leaving
-#' the standard error of measurement at zero or undefined -- or when any
-#' estimated variance is negative.
+#' # Missing data
+#'
+#' `missing = "listwise"` is the default: only complete cases are used, and a
+#' message reports how many there were. Pairwise-deletion correlations are
+#' never used on either setting.
+#'
+#' `missing = "fiml"` instead estimates from every respondent who answered at
+#' least one item, by full-information maximum likelihood. Two assumptions come
+#' with it, and both are stronger than listwise deletion's: the data must be
+#' **missing at random** (missingness may depend on values you observed, but
+#' not on the unobserved values themselves) **and multivariate normal**. Under
+#' MCAR — the special case where missingness is unrelated to anything —
+#' listwise deletion is *consistent*, merely inefficient, so FIML buys
+#' precision there and not correctness. Under MAR listwise deletion is
+#' genuinely biased and FIML is not, which is when the switch is worth its
+#' assumptions.
+#'
+#' The items are standardized by the saturated model's own FIML means and SDs,
+#' never by the means and SDs of whichever cells happen to be observed, and
+#' those standardized columns feed a single FIML fit. The reported standard
+#' errors are observed-information standard errors on that standardized metric,
+#' conditional on the standardization constants (they do not propagate the
+#' uncertainty in the constants themselves), and they remain approximate for
+#' the same correlation-as-covariance reason as the default path.
+#'
+#' Two results are unavailable under `missing = "fiml"`, both because they need
+#' items observed by every respondent: the Nunnally-Bernstein comparison is
+#' `NA` with a stated reason, and `sd = "raw"` is refused — supply the axis SDs
+#' numerically instead.
+#'
+#' A note on provenance: Strack et al. (2013) report no missing-data analyses,
+#' so nothing about the FIML path rests on their results. It is certified
+#' against this package's own synthetic oracle, where the true variance
+#' components are known by construction.
+#'
+#' # Boundary solutions
+#'
+#' This contract governs every input path -- raw items on either `missing`
+#' setting, and a supplied correlation matrix alike. A boundary fit returns `NA`
+#' reliability and SEm with a warning and a boundary flag rather than a clipped,
+#' negative, or missing value. A fit counts as a boundary when the estimated
+#' axes variance falls outside `(0, 1)` -- at or below zero the axes carry no
+#' variance to be reliable, and at or above one they carry all of it, which
+#' drives the Spearman-Brown reliability to one or beyond, leaving the standard
+#' error of measurement at zero or undefined -- or when any estimated variance
+#' is negative.
 #'
 #' # Supplying a correlation matrix instead of raw data
 #'
@@ -779,6 +857,11 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   recycled, or length 2 for the X and Y axes) of axis SDs. A supplied numeric
 #'   SD must be finite and positive; anything else is refused rather than
 #'   carried into the reported SEm.
+#' @param missing How item-level missing data are handled on the `data` path:
+#'   `"listwise"` (the default; complete cases only) or `"fiml"`
+#'   (full-information maximum likelihood, via lavaan's `missing = "ml"`),
+#'   which uses every respondent who answered at least one item. Not available
+#'   with `cormat`, which carries no missing cells.
 #' @return An object of class `circumplex_axes_reliability` with `print()` and
 #'   [summary()] methods: `results` (one row per axis: the axes variance, item_n,
 #'   reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
@@ -787,8 +870,14 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   specificity was fitted), `fit` (global fit indices), and `details`
 #'   (including `zeta1_fitted` and `zeta2_fitted`, whether scale and block
 #'   specificity were in the model, `blocks`, the block labels when a block map
-#'   was supplied, and `nb_reason`, why the Nunnally-Bernstein comparison is
-#'   `NA`).
+#'   was supplied, `nb_reason`, why the Nunnally-Bernstein comparison is `NA`,
+#'   `missing`, which missing-data treatment lavaan actually used,
+#'   `n_complete`, the complete-case count, and `min_coverage`, the fewest
+#'   respondents behind any item pair). `n_complete` and `min_coverage` are
+#'   present on every path so that a caller can read them unconditionally, and
+#'   are `NA` where they carry no information: `min_coverage` outside
+#'   `missing = "fiml"`, and both of them when a correlation matrix was supplied
+#'   in place of raw data.
 #' @references
 #' Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The reliability of
 #' circumplex axes. \emph{SAGE Open}, 3(2). \doi{10.1177/2158244013486115}
@@ -816,11 +905,16 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' )
 axes_reliability <- function(data = NULL, items, angles = NULL,
                              instrument = NULL, cormat = NULL, n = NULL,
-                             blocks = NULL, sd = "std") {
+                             blocks = NULL, sd = "std",
+                             missing = c("listwise", "fiml")) {
   call <- match.call()
   if (!requireNamespace("lavaan", quietly = TRUE)) {
     stop("`axes_reliability()` requires the lavaan package.", call. = FALSE)
   }
+  # Same spelling and same two values as ssm_sem() (R/ssm_sem.R), so the two
+  # entry points to lavaan in this package name the estimator the same way; the
+  # "fiml" -> "ml" translation is owned once, by sem_fit_cfa().
+  missing <- match.arg(missing)
 
   # Exactly one of data / cormat, and `n` only with cormat -- the house pattern
   # cpm_fit() already uses for its CircE-style matrix path (R/cpm_fit.R:1583).
@@ -833,6 +927,19 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     stop(
       "`n` applies only to the `cormat` path; the raw-data path takes its ",
       "sample size from `data`.",
+      call. = FALSE
+    )
+  }
+  # Not one of BC7's six refusal clauses, and it is not an oversight that it is
+  # not: those clauses all describe a missingness pattern FIML cannot estimate
+  # from, whereas this one is a path with no respondents at all. A published
+  # correlation matrix carries no missing cells and no rows for the saturated
+  # EM stage, so there is nothing for the argument to name.
+  if (has_cormat && missing == "fiml") {
+    stop(
+      "`missing = \"fiml\"` needs the respondents' item scores, which the ",
+      "`cormat` path does not have; supply `data`, or use the default ",
+      "`missing = \"listwise\"`.",
       call. = FALSE
     )
   }
@@ -964,6 +1071,14 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     )
   }
 
+  # Reported in `details` on every path so a caller can read the fields
+  # unconditionally; set below wherever they mean something. The pairwise
+  # minimum is a FIML diagnostic and stays NA elsewhere: on the listwise path
+  # every retained row answered every item, so reporting N there would look
+  # like a measurement rather than a tautology.
+  n_complete <- NA_integer_
+  min_coverage <- NA_real_
+
   if (has_data) {
     mat <- as.matrix(data[, all_cols, drop = FALSE])
     if (!is.numeric(mat)) {
@@ -973,34 +1088,148 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       stop("`data` contains non-finite (Inf/NaN) values.", call. = FALSE)
     }
 
-    # --- Listwise deletion (RR09 BC13) ----------------------------------------
     n_total <- nrow(mat)
-    mat <- mat[stats::complete.cases(mat), , drop = FALSE]
-    n <- nrow(mat)
     p <- ncol(mat)
-    message(
-      "axes_reliability(): ", n, " complete case(s) used",
-      if (n < n_total) {
-        paste0(" (", n_total - n, " removed by listwise deletion)")
-      },
-      "."
-    )
-    if (n <= p) {
-      stop(
-        "Complete-case N (", n, ") must exceed the number of items (", p, ").",
-        call. = FALSE
-      )
-    }
 
-    item_var <- apply(mat, 2, stats::var)
-    if (any(item_var <= 0)) {
-      stop(
-        "Zero-variance item(s): ",
-        paste(all_cols[item_var <= 0], collapse = ", "), ".",
-        call. = FALSE
+    if (missing == "listwise") {
+      # --- Listwise deletion (RR09 BC13) --------------------------------------
+      mat <- mat[stats::complete.cases(mat), , drop = FALSE]
+      n <- nrow(mat)
+      message(
+        "axes_reliability(): ", n, " complete case(s) used",
+        if (n < n_total) {
+          paste0(" (", n_total - n, " removed by listwise deletion)")
+        },
+        "."
       )
+      if (n <= p) {
+        stop(
+          "Complete-case N (", n, ") must exceed the number of items (", p,
+          ").",
+          call. = FALSE
+        )
+      }
+
+      item_var <- apply(mat, 2, stats::var)
+      if (any(item_var <= 0)) {
+        stop(
+          "Zero-variance item(s): ",
+          paste(all_cols[item_var <= 0], collapse = ", "), ".",
+          call. = FALSE
+        )
+      }
+      R <- stats::cor(mat)
+      zmat <- scale(mat)
+      n_complete <- n
+    } else {
+      # --- FIML on the items (M65) --------------------------------------------
+      # Two stages, one body of information. The saturated (EM) stage supplies
+      # the standardizing moments and R-hat; the structured stage is ONE
+      # lavaan::cfa(missing = "ml") on the columns those moments standardized.
+      # Nothing here recomputes a moment from the standardized columns -- see
+      # axes_fiml_moments() on why that would silently be an available-case
+      # correlation wearing the FIML metric's clothes.
+      cvg <- axes_fiml_coverage(mat)
+      mat <- mat[cvg$keep, , drop = FALSE]
+      n <- cvg$n_used
+      n_complete <- cvg$n_complete
+      min_coverage <- cvg$min_coverage
+      message(
+        "axes_reliability(): FIML on ", n,
+        " respondent(s) with at least one observed item (", cvg$n_complete,
+        " complete case(s))",
+        if (cvg$n_dropped > 0L) {
+          paste0("; ", cvg$n_dropped, " row(s) with no observed item dropped")
+        },
+        "; minimum pairwise coverage ", cvg$min_coverage, "."
+      )
+
+      # --- The refusal contract (BC7) ----------------------------------------
+      # Clauses (i)-(iii) are readable off the missingness pattern alone and
+      # fire BEFORE the EM stage. That order is the point: lavaan does not
+      # refuse a moment it cannot identify, it fabricates one and returns a fit
+      # that looks converged (evidence V-F), so a degenerate item or an
+      # unobserved pair must be caught here or it is never caught at all.
+      #
+      # (i) The sample-size floor, on N_used rather than on the complete-case
+      # count. This is the same floor the listwise path enforces, moved to the
+      # quantity the FIML fit actually consumes -- and it is why a dataset the
+      # listwise path refuses can be estimable here (BC14).
+      if (n <= p) {
+        stop(
+          "N with at least one observed item (", n, ") must exceed the number ",
+          "of items (", p, ").",
+          call. = FALSE
+        )
+      }
+      # (ii) Per-item: too few observed values to have a variance at all, then
+      # a variance of zero among the values that are observed. Split in two
+      # because var() on a single value returns NA rather than 0, so a
+      # variance test alone would let a one-response item through as NA.
+      thin_item <- which(cvg$item_n < 2L)
+      if (length(thin_item) > 0) {
+        stop(
+          "Item(s) with fewer than 2 observed values, so no variance can be ",
+          "estimated: ", paste(all_cols[thin_item], collapse = ", "), ".",
+          call. = FALSE
+        )
+      }
+      item_var <- apply(mat, 2, stats::var, na.rm = TRUE)
+      if (any(item_var <= 0)) {
+        stop(
+          "Zero-variance item(s) among the observed values: ",
+          paste(all_cols[item_var <= 0], collapse = ", "), ".",
+          call. = FALSE
+        )
+      }
+      # (iii) Per-pair: a pair no respondent answered both of. Named
+      # explicitly, because this is the failure a user is least likely to
+      # anticipate and the one lavaan hides most completely.
+      zero_pair <- which(cvg$pair_n == 0 & upper.tri(cvg$pair_n),
+                         arr.ind = TRUE)
+      if (nrow(zero_pair) > 0) {
+        shown_pairs <- seq_len(min(3L, nrow(zero_pair)))
+        stop(
+          "Item pair(s) never jointly observed, so their correlation is not ",
+          "estimable: ",
+          paste(
+            all_cols[zero_pair[shown_pairs, 1L]], "and",
+            all_cols[zero_pair[shown_pairs, 2L]],
+            collapse = "; "
+          ),
+          if (nrow(zero_pair) > length(shown_pairs)) {
+            paste0(" (and ", nrow(zero_pair) - length(shown_pairs),
+                   " further pair(s))")
+          },
+          ".",
+          call. = FALSE
+        )
+      }
+      # Thin, but not empty: a warning rather than a refusal (M65-D2). The
+      # number is named so the user can judge it, and it is a convention with
+      # no inferential meaning -- see axes_fiml_min_overlap.
+      if (cvg$min_coverage < axes_fiml_min_overlap) {
+        warning(
+          "Some item pair(s) were jointly observed by as few as ",
+          cvg$min_coverage, " respondent(s); the estimated correlation ",
+          "between them rests on very little data. (",
+          axes_fiml_min_overlap,
+          " is a conventional small-sample floor, not a threshold with ",
+          "inferential meaning.)",
+          call. = FALSE
+        )
+      }
+
+      # (iv) Saturated-stage non-convergence is refused inside
+      # axes_fiml_moments(), at the axes_fiml_h1() seam it owns.
+      mom <- axes_fiml_moments(mat)
+      R <- mom$R
+      zmat <- mom$z
+      # (v) Non-PD R-hat and (vi) structured-fit non-convergence are the
+      # shared guards below -- the same eigenvalue floor and the same
+      # axes_converged() seam the listwise path uses, now consuming R-hat and
+      # the one-stage FIML fit.
     }
-    R <- stats::cor(mat)
   } else {
     # --- The correlation-matrix path --------------------------------------------
     if (!is.numeric(cormat)) {
@@ -1066,18 +1295,55 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # lavaan's own fit-time warnings (e.g. "some estimated lv variances are
   # negative" on a boundary fit) are redundant noise; suppress them in favor of
   # this function's own clean diagnostics.
-  fit <- suppressWarnings(if (has_data) {
-    zdf <- as.data.frame(scale(mat))
-    colnames(zdf) <- all_cols
-    axes_fit(zdf, item_cols, angles_deg, item_block = item_block, start = ols)
-  } else {
-    axes_fit_cormat(R, item_cols, angles_deg, n, item_block = item_block,
-                    start = ols)
-  })
+  #
+  # ONE warning is not noise, and is why this is withCallingHandlers() and not
+  # suppressWarnings() (M65-D5): a `missing = "ml"` fit runs a SECOND
+  # unrestricted-moments EM of its own, for the saturated loglikelihood that
+  # chi-square, CFI and RMSEA are referenced against. It is not the saturated
+  # stage above, axes_converged() cannot see it -- that predicate inspects the
+  # STRUCTURED optimizer, which converges fine -- and lavaan reports its stall
+  # by warning and then returning the stalled iterate anyway. Muffled, the
+  # estimates and their SEs stayed correct while the global fit indices were
+  # silently computed against the wrong baseline.
+  em_stalled <- FALSE
+  fiml_args <- if (has_data && missing == "fiml") axes_fiml_em_args() else list()
+  fit <- withCallingHandlers(
+    if (has_data) {
+      zdf <- as.data.frame(zmat)
+      colnames(zdf) <- all_cols
+      do.call(axes_fit, c(
+        list(zdf, item_cols, angles_deg, item_block = item_block, start = ols,
+             missing = missing),
+        fiml_args
+      ))
+    } else {
+      axes_fit_cormat(R, item_cols, angles_deg, n, item_block = item_block,
+                      start = ols)
+    },
+    warning = function(w) {
+      if (axes_fiml_em_stalled(w)) {
+        em_stalled <<- TRUE
+      }
+      invokeRestart("muffleWarning")
+    }
+  )
+  # Order matters: a non-converged OPTIMIZER is BC7 clause (vi) and keeps its own
+  # message, so it is tested first. The EM check below is the residual case --
+  # the raised cap reaches both EM sites now, so this fires only if the
+  # structured stage's EM needs more room than the saturated stage did on the
+  # same data, which no measured dataset has.
   if (!axes_converged(fit)) {
     stop(
       "The lavaan model did not converge; the axes reliability cannot be ",
       "estimated.",
+      call. = FALSE
+    )
+  }
+  if (em_stalled) {
+    stop(
+      "The unrestricted (EM) stage of the FIML fit did not converge, so the ",
+      "model fit statistics would be computed against a saturated model that ",
+      "was never reached.",
       call. = FALSE
     )
   }
@@ -1133,7 +1399,11 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # SEm scale: "std" (SD = 1), "raw" (observed axis-composite SD), or numeric.
   # "raw" needs the respondents' own scale scores, so it is unavailable from a
   # correlation matrix -- refused with the reason, never silently downgraded.
-  scale_scores <- if (has_data) {
+  # Not computed under FIML: a row with any missing item has no scale score,
+  # and rowMeans() would quietly hand back NA for it. Every consumer below is
+  # unavailable on that path anyway (both are refused or NA'd just after), so
+  # the composites are skipped rather than computed and discarded.
+  scale_scores <- if (has_data && missing != "fiml") {
     vapply(
       item_cols, function(cols) rowMeans(mat[, cols, drop = FALSE]),
       numeric(n)
@@ -1145,6 +1415,20 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     stop(
       "`sd = \"raw\"` needs the raw scale scores, which the `cormat` path does ",
       "not have; use \"std\" or supply the axis SDs numerically.",
+      call. = FALSE
+    )
+  }
+  # A hard error, not an NA (D-034 correction 2). The available-case SD of the
+  # axis composite is computable here and looks perfectly reasonable, which is
+  # the problem: it is the available-case quantity this path exists to avoid,
+  # and it would land in the reported SEm with nothing marking it. Refusing
+  # sends the user to an SD they chose knowingly.
+  if (identical(sd, "raw") && missing == "fiml") {
+    stop(
+      "`sd = \"raw\"` needs each respondent's complete axis composite, which ",
+      "the FIML path does not have; an available-case SD would reintroduce ",
+      "exactly the bias this path avoids. Use \"std\" or supply the axis SDs ",
+      "numerically.",
       call. = FALSE
     )
   }
@@ -1200,8 +1484,15 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # the first one matched, so `details` stays a faithful record and print()
   # states both (M61 review, F4). `c()` drops the NULLs, so it is NULL when the
   # comparison is available.
+  # A third unavailability arrives with M65: both N-B inputs are available-case
+  # quantities under FIML. Cronbach's alpha over the observed cells and the
+  # variance of a composite only complete respondents have are exactly the
+  # metric RR12 ruled against, so the comparison is NA'd rather than computed
+  # from whatever happened to be answered -- and, like the two before it, this
+  # reason accumulates rather than replacing them.
   nb_reason <- c(
     if (!has_data) "cormat",
+    if (missing == "fiml") "fiml",
     if (any(n_items_scale < 2L)) "single_item"
   )
   nb <- if (is.null(nb_reason)) {
@@ -1261,8 +1552,42 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     SE = comp_ses,
     stringsAsFactors = FALSE
   )
-  fm <- lavaan::fitMeasures(fit, c("chisq", "df", "pvalue", "rmsea", "cfi",
-                                   "srmr"))
+  # SRMR is requested by its COVARIANCE-ONLY name, not the bare "srmr" alias.
+  # The alias is path-dependent: on a `missing = "ml"` fit lavaan resolves it to
+  # the mean-inclusive Bentler SRMR, while the listwise and cormat fits get the
+  # covariance-only one -- so `$fit$srmr` silently measured two different things
+  # depending on an argument, and did so on data with no missing cells at all.
+  #
+  # The mean-inclusive variant is not merely different here, it is wrong for this
+  # model: lavaan frees every item intercept, so the mean structure is saturated,
+  # the mean residuals are structurally zero, and the extra terms only dilute the
+  # denominator from p(p+1)/2 to p(p+1)/2 + p. Measured: the reported value came
+  # out deflated by exactly sqrt((p+1)/(p+3)) -- 0.96225 = sqrt(25/27) at p = 24,
+  # 0.94591 = sqrt(17/19) at p = 16 -- always in the flattering direction, on a
+  # documented return field readers compare against Hu & Bentler's .08.
+  #
+  # Named unconditionally rather than branched on `missing`, because on the
+  # listwise and cormat fits the two names return bit-identical values (measured
+  # on lavaan 0.6.21 AND 0.7-2, both paths), so this cannot disturb AC1's
+  # bit-identity to the shipped numbers. The returned element keeps the name
+  # "srmr": the contract is the quantity, not lavaan's spelling of it.
+  want <- c("chisq", "df", "pvalue", "rmsea", "cfi", "srmr_bentler_nomean")
+  fm <- lavaan::fitMeasures(fit, want)
+  # lavaan DROPS a measure name it does not recognize -- silently, no warning,
+  # just a shorter vector (measured: two names, one bogus, returns one element).
+  # `srmr_bentler_nomean` is an internal variant rather than a documented alias
+  # and lavaan is a Suggests with no version floor, so a future rename would
+  # otherwise delete `$fit$srmr` -- a documented @return field -- and leave the
+  # object looking well formed. Refuse instead of shipping a hole.
+  if (!identical(names(fm), want)) {
+    stop(
+      "The installed lavaan did not return the expected fit measures (missing: ",
+      paste(setdiff(want, names(fm)), collapse = ", "),
+      "). This is a lavaan version incompatibility; please report it.",
+      call. = FALSE
+    )
+  }
+  names(fm)[names(fm) == "srmr_bentler_nomean"] <- "srmr"
   new_axes_reliability(
     results = results,
     components = components,
@@ -1271,6 +1596,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       n = n, n_total = n_total, n_items = p, n_scales = n_scales,
       angles = angles_deg, labels = map$labels, sd = sd,
       input = if (has_data) "data" else "cormat",
+      # Read off the FITTED object rather than echoed from the argument, the
+      # same discipline sem_details() uses (R/ssm_sem.R). An echo would keep
+      # saying "fiml" if the argument ever stopped reaching lavaan, which is
+      # the one failure this field exists to make visible.
+      missing = axes_lav_missing(fit),
+      n_complete = n_complete, min_coverage = min_coverage,
       converged = TRUE, boundary = boundary,
       # Whether the scale-specificity component was in the fitted model at all
       # (M61): FALSE means one item per scale position, so zeta1 was

@@ -183,7 +183,22 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   reanalyzing a matrix whose raw data is not available; on that path the
   Nunnally-Bernstein comparison is reported as `NA` and `sd = "raw"` is refused,
   since both need the respondents' own item scores. Missing data are handled by
-  listwise deletion; a boundary
+  listwise deletion by default, and a `missing = "fiml"` setting estimates from
+  every respondent who answered at least one item by full-information maximum
+  likelihood instead. FIML assumes the data are missing at random and
+  multivariate normal, both stronger assumptions than listwise deletion needs:
+  under MCAR listwise deletion is already consistent and merely inefficient, so
+  the gain there is precision rather than correctness, while under MAR listwise
+  deletion is biased and FIML is not. The items are standardized by the
+  saturated model's own FIML moments rather than by whichever cells happen to be
+  observed, and those columns feed a single FIML fit; the reported standard
+  errors are observed-information standard errors on that standardized metric,
+  conditional on the standardization constants. Under `missing = "fiml"` the
+  Nunnally-Bernstein comparison is `NA` and `sd = "raw"` is refused, both
+  needing items observed by every respondent. Pairwise-deletion correlations are
+  never used on either setting. Strack et al. report no missing-data analyses,
+  so the FIML variant is certified against the package's own synthetic oracle
+  rather than against their results. A boundary
   fit returns `NA` reliability rather than a clipped value; and the returned
   `circumplex_axes_reliability` object has `print()` and `summary()` methods. A
   bundled simulated dataset, `simulated_items`, is included for the examples.

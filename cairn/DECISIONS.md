@@ -1093,3 +1093,48 @@ standardizes exactly for the available cases, holds. It is the M59/M61 lesson
 second time inside this milestone, the first being AC1's own amended bound.
 RB12's pasted transcript also omits one `message()` line the script emits
 (F8). IP4 leaves both in place. Source: M64 review, findings F1/F3/F4/F5/F8.
+
+### D-035 (2026-07-27): `axes_reliability()`'s component SEs will be corrected, not caveated — supersedes D-026 holding (5) and RR09 §2 (M65, RR13)
+
+**Context:** D-026 holding (5), on RR09 §2's authority, ruled the
+correlation-as-covariance issue **"document, don't fix"**: "analyzing a
+correlation matrix as covariance gives correct point estimates but approximate
+SEs/χ² (Cudeck 1989; the paper's own practice) — documented". RR09's grounds
+were faithfulness to the source paper's own LISREL practice, and the SEs being
+"approximate". **Neither RR09 nor D-026 ever measured the magnitude or the
+direction of that approximation.** M65 measured it: the mean reported SE(ξ1) is
+1.452× the estimator's empirical sampling SD over 200 replicates — on the new
+FIML path and the shipped listwise path alike, to three decimals. Escalated as
+RB13→RR13 (Fable, 2026-07-27).
+**Decision: correct the SEs.** RR13 derived the ratio analytically rather than
+simulating it — Σ is linear in the components, so the delta method gives both
+sides in closed form — predicting 1.4412 against the measured 1.452 (0.2 MC
+SEs), with the naive quantity reproducing lavaan's information-matrix value to
+6 decimals. So the number is the exact textbook consequence for this design and
+**not a defect** in the model, the extraction, or lavaan. What overturns
+"document, don't fix" is not error but **size and sign**: across the accepted
+input space the ratio runs [0.81, 1.97], and at Strack's own Table 3
+configurations it spans 0.989 (weak-axes/strong-general instruments, reported
+SEs slightly too *small*) to 1.300 (strong-axes instruments). An approximation
+that is sign-unstable cannot be stated honestly by any static caveat — which is
+the ground RR09 could not have weighed, because the sweep did not exist.
+**Route:** the Browne/Cudeck corrected asymptotic covariance specialized to
+this linear structure, ~40 lines of base R, no new dependency, identical code
+on the raw, `cormat`, and FIML paths; validated at 1.005 (complete data) and
+1.001/1.008/1.018 (FIML at 2/5/10% MCAR) against M65's committed fixture.
+Measured rejections: lavaan `correlation = TRUE` (a different model class —
+npar 3, determined errors, moves ξ̂1 by ≈5 empirical SDs, refuses missing data),
+robust/sandwich SEs (measured no fix — blind to the in-sample standardization),
+and unit-variance refitting (RR12 §9 stands).
+**Consequences:** the correction takes **its own milestone**, bound by RR13
+BC1–BC6, not M65 — it changes the shipped listwise and `cormat` paths, which is
+strictly larger than M65's FIML scope, and M65's FIML path adds none of the
+miscalibration. **M65 ships first** under RR13 BC7, recording the departure from
+RR12 BC13 in its Deviations table with both printed caveats strengthened to
+quantify. No deprecation cycle: the SEs were always documented as approximate,
+point estimates/reliability/SEm/df are unchanged, and the maintainer's pre-1.0
+waiver covers the formality. The global χ²/fit indices carry the same
+approximation in the other direction (E[T] = 261.1 against df = 273, flattered
+~4%) and keep their caveat. `ssm_sem()` is not implicated — it lives on the
+covariance metric. Source: RR13 (Fable, 2026-07-27); derivation independently
+re-run at ingestion and reproduced exactly.
