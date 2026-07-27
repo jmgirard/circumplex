@@ -984,3 +984,112 @@ spent without effect. No new dependency (lavaan and OpenMx are already
 `circumplex_instrument` class is deferred to the ROADMAP candidate row, not
 rejected. D-001/D-008/D-018/D-025/D-026/D-030/D-031 lineage extended; none other
 superseded. Source: Jeff, M63 plan gate.
+
+### D-033 (2026-07-26): GO on FIML item-level missing data for `axes_reliability()`, on the FIML correlation metric — takes up D-026's last deferral, a narrow D-001 supersession that does not gate M7 (M64)
+
+**Context:** D-026 deferred four axes-reliability extensions pending a concrete
+use case; D-030, D-031 and D-032 took up three, leaving FIML on items as the
+last survivor, whose deferral D-032 reaffirmed verbatim. The use case is
+measured rather than asserted. Listwise deletion at **item** level retains a
+respondent with probability (1 − rate)^p, so a realistic 64-item instrument
+keeps 53% of respondents at 1% per-item MCAR and 3.8% at 5%; and at 15% on 24
+items the shipped function does not degrade but **refuses** — "Complete-case N
+(12) must exceed the number of items (24)" on 600 respondents
+(`devel/m64-fiml-probe.R`, findings F1/F1b). The vignette currently advises
+around this: "address the missingness before interpreting the estimate"
+(`vignettes/axes-reliability.Rmd:156`). At the M64 plan gate Jeff chose
+escalation over a direct build, so the design went to independent Fable review
+as RB12 → RR12.
+**Decision: GO.** Supersede D-001's new-features-excluded clause **insofar as it
+bars FIML item-level missing data** — narrowly, exactly as D-008 did for CIRCUM,
+D-018 for the visualization expansion, D-025 for the axes-reliability feature,
+D-030 for its correlation-matrix input, D-031 for the non-octant and single-item
+extensions, and D-032 for blockwise ζ2. `axes_reliability()` gains
+`missing = c("listwise", "fiml")`, matching the sibling exported `ssm_sem()`
+spelling, with `"listwise"` the default and its numbers bit-identical to shipped.
+**The metric holding is load-bearing, and it overturns the position M64 put to
+review.** Available-case `scale()` standardization is MCAR-honest but
+**MAR-dishonest**: the standardized columns carry k_i·k_j·ρ_ij and the model has
+no free per-item parameter *off* the diagonal to absorb an item-specific
+multiplicative distortion, so it lands in the components. Measured **+0.0167**
+above the FIML-metric estimate under a harsh same-scale-anchor MAR mechanism
+(paired SE 0.0006 — about one full SE at N = 600), while the two metric-correct
+routes agree to +0.0008. So the build standardizes by **saturated-FIML (EM)
+moments** with a `sqrt(N_used/(N_used − 1))` convention that reproduces
+`scale()` exactly on complete data, feeds a single **one-stage** structured FIML
+fit, and retargets the OLS shadow and the positive-definiteness refusal to the
+FIML correlation matrix R̂. Two-stage SEs and χ² never surface (`sample.nobs =
+N_total` overstates information and no scalar effective N repairs it). Rejected
+with reasons: the per-item unit-total-variance constraint (raises df and leaves
+the paper's free-errors class — D-026's equal-errors rejection generalizes),
+post-hoc component rescaling (does not touch the off-diagonal distortion), and
+any scalar effective-N repair. A mandatory refusal is added for an item pair
+never jointly observed: lavaan fabricates that moment (r = 0 against a
+population 0.3475) and `axes_reliability()` fits inside `suppressWarnings()`, so
+it is silent in this function.
+**Binding:** RR12's **BC1–BC16** bind the **build** milestone verbatim (its
+`Driving RR: RR12`), not M64, which ships no code. RR09 **BC13 is upheld, not
+superseded** — R̂ is a saturated ML estimate, not a pairwise-deletion matrix.
+RR09 §4's quasi-circumplex refusal is untouched.
+**Scope of the supersession:** narrow — promotes **only** FIML item-level
+missing data. All other D-001 consequences and exclusions stand. D-026's
+deferral list is now empty; the one remaining axes-reliability candidate (block
+membership on the `circumplex_instrument` class) was never part of it.
+**Consequences:** the build is cleared to plan and sets `Driving RR: RR12`. M7
+does **not** gain `Depends on:` it — on D-030's reading the release never waits
+for it and merely contains it if it lands first. No new dependency (lavaan and
+OpenMx are already `Suggests`; D-006/D-014 minimal-deps reinforced). Two
+follow-ons are ROADMAP candidates rather than scope: planned-missingness designs
+(three-form and similar), which the zero-joint-coverage refusal excludes even
+though the structured model stays identified there, and lavaan's
+`missing = "two.stage"` as a future SE-corrected alternative. The complete-data
+implied-diagonal departure RB12 flagged is closed as expected restricted-ML
+behavior rather than a defect, verified at the stationarity condition (M64-D3) —
+no correction milestone. D-001/D-008/D-018/D-025/D-026/D-030/D-031/D-032 lineage
+extended; none other superseded. Source: RR12 (Fable, 2026-07-26); M64 T4.
+
+### D-034 (2026-07-26): three corrections to D-033's record of the FIML GO — annotates D-033, changes no decision (M64 review)
+
+**Context:** M64's own review found three factual defects inside D-033.
+`DECISIONS.md` is append-only history (IP4), so the entry is annotated here
+rather than edited. **No decision changes:** D-033's GO, its narrow D-001
+supersession, its takeup of D-026's FIML deferral, and BC1–BC16 binding the
+build all stand exactly as recorded.
+**Correction 1 — the reversal that did not happen (review F3).** D-033 says the
+metric holding "overturns the position M64 put to review", and M64-D1 says it
+overturns "the standardization the plan submitted with it". Neither is right.
+M64's Scope names available-case z-standardization as "the one question this
+session cannot settle" — an open question, not a position — and RB12's Q1 asks
+it neutrally. The three positions M64 **did** fix were each **confirmed**:
+one-stage FIML through `sem_fit_cfa` (RR12 §4), N–B and `sd = "raw"` reported
+unavailable (§6), and a synthetic bar carrying a non-MCAR cell (§8, which
+augmented the bar rather than overturning it). The accurate statement is that
+RR12 **answered M64's open question** and, in answering it, ruled out the
+mechanism the shipped code path happens to use. Identical consequence for the
+build; a materially different answer to "how much of M64's own judgment survived
+review", which is what a later session would come here to ask.
+**Correction 2 — `sd = "raw"` is a hard error, not an NA (review F4).** D-033's
+summary and the first ROADMAP build row lumped `sd = "raw"` together with
+`nb_reliability` as "unavailable-with-reason". RR12 §6's Ruling and **BC9** set
+two *different* contracts: `nb_reliability` becomes NA with `nb_reason` gaining
+`"fiml"`, while `sd = "raw"` must be **refused with an informative error**
+naming `"std"` and numeric SDs as the alternatives. BC9's verbatim text governs
+the build; the ROADMAP row is corrected in place (current knowledge).
+**Correction 3 — line anchor (review F5).** The vignette sentence "address the
+missingness before interpreting the estimate" is at
+`vignettes/axes-reliability.Rmd:157`; D-033 cites `:156`, which ends
+"…discards a large share of". BC16 requires rewriting that paragraph, so the
+anchor is load-bearing. The M43/M57 off-by-one anchor family, recurring.
+**Also recorded, not a correction to D-033 (review F1, F8).** RB12 asserts the
+committed probe "reproduces every figure quoted in this brief" and quotes
+"|mean| ≤ 6e-17, |SD − 1| ≤ 9e-16" for available-case `scale()`. The check was
+missing from the script and has been added (its new F5 section), but the quoted
+**mean** bound is seed-specific and does not reproduce: the committed script
+measures 7.76e-17 / 7.62e-17 / 7.9e-17 at 2/5/10% per-item MCAR. The SD bound
+does reproduce (6.66e-16 to 8.88e-16). Both are machine precision and nothing
+substantive turns on it — the claim RB12 rests on that figure, that `scale()`
+standardizes exactly for the available cases, holds. It is the M59/M61 lesson
+("a tolerance calibrated on one run is not a tolerance") recurring for the
+second time inside this milestone, the first being AC1's own amended bound.
+RB12's pasted transcript also omits one `message()` line the script emits
+(F8). IP4 leaves both in place. Source: M64 review, findings F1/F3/F4/F5/F8.
