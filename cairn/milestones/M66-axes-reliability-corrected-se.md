@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** RR13
 - **Principles touched:** —
-- **Branch/PR:** `m66-axes-reliability-corrected-se`
+- **Branch/PR:** `m66-axes-reliability-corrected-se` / [PR #92](https://github.com/jmgirard/circumplex/pull/92)
 
 ## Goal
 
