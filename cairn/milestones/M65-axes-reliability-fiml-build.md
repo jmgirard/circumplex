@@ -1,11 +1,11 @@
 # M65: FIML item-level missing data for `axes_reliability()` — the build
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR12
 - **Principles touched:** —
-- **Branch/PR:** `m65-axes-reliability-fiml-build` / —
+- **Branch/PR:** `m65-axes-reliability-fiml-build` / https://github.com/jmgirard/circumplex/pull/91
 
 ## Goal
 
@@ -150,6 +150,8 @@ instead of forcing listwise deletion.
 - 2026-07-27: RR13 ingested. Verdict verified rather than taken on trust — the report's appendix is standalone base R and was re-run at ingestion, reproducing ratio 1.441229 and predicted SEs 0.01677/0.01164 exactly, plus the multiplicative FIML repair at 1.001/1.008/1.018. D-035 records the supersession of D-026 holding (5); the correction itself is a ROADMAP candidate bound by RR13 BC1–BC6, NOT folded into M65. Applied here: the Deviations from RR12 table (BC13's band replaced by BC7's [1.31, 1.57], quoted verbatim), the replacement band in the test plus a new assertion that dividing out the single analytic ratio calibrates every FIML cell to within 2%, and both printed caveats quantified in `print()`, roxygen and the vignette instead of saying "approximate". Scope compressed by 5 lines to fit the table under the 150-line cap; Scope's Out clause gains the SE correction. Status blocked→in-progress.
 - 2026-07-27: T8 done. `devtools::check(manual = TRUE)` clean — 0 errors / 0 warnings / 0 notes in 12m25s — and the log carries `checking PDF version of manual ... OK` at line 113 by name (the M7/M57 lesson; a first attempt that also passed `args = "--no-manual"` was killed and re-run, since those two arguments together suppress exactly the step AC17 names). `document()` produces no diff. Full suite 0 failures / 4197 passing / 4 pre-existing warnings. Status → review.
 
+- 2026-07-27: **returned by /milestone-review (first return).** Gate failure: CI `ubuntu-latest (release)` on PR #91 failed with 26 errors, all `unknown argument: 'em.h1.iter.max'` from `axes_fiml_h1()` — CI runs **lavaan 0.7-2** where that option does not exist, local runs 0.6.21 where it does, which is why a clean local `check(manual = TRUE)` missed it. Plus two actioned findings from the fan-out: F1 (88) the raised EM cap reaches only the saturated stage, not the structured fit's own h1 EM, whose stall `suppressWarnings()` hides and `axes_converged()` cannot see — global fit indices silently wrong on thinly-covered data (χ² 388.61 reported against 458.80 converged); F3 (83) BC13 has no live coverage at all, the live half runs 5 fits rather than the ~10 M65-D3 and T6 promise, and never reads `components$SE`. Two findings logged below threshold (F2 76 thin-overlap warning fires on small-N complete data; F4 58 dormant descending-range bug in `axes_mar_*` at `n_items == 1`). Blame-history and prior-review lenses both returned no findings. Acceptance criteria unticked: the fix changes the code their evidence came from.
+
 ## Decisions
 
 - **M65-D1 (2026-07-26): saturated moments come from lavaan's `h1` EM estimate, not an explicit saturated fit.**
@@ -176,3 +178,106 @@ instead of forcing listwise deletion.
   3.93 from the converged answer on unit-variance items. Cost: a genuinely stuck dataset now waits ~11 s to be refused instead of 0.15 s.
 
 ## Review
+
+> **RETURNED to `in-progress` on 2026-07-27 (first return).** CI failed and two
+> findings scored at or above the actioning threshold. The per-criterion evidence
+> below was fresh and correct on the reviewing machine (lavaan 0.6.21), but it is
+> **superseded** — the fix changes the code it was gathered from, so every
+> criterion box is unticked and the next review re-gathers. Kept as the record of
+> what this attempt verified.
+
+### Gate failure — CI (blocking)
+
+`ubuntu-latest (release)` on PR #91: **26 errors**, every one
+`lavaan->lav_step02_options(): unknown argument: 'em.h1.iter.max'`, raised from
+`axes_fiml_h1()`. **CI runs lavaan 0.7-2; local development runs 0.6.21**, and
+the option M65-D4 depends on does not exist in 0.7. The FIML path is therefore
+broken outright for anyone on current lavaan — the whole of `test-axes-fiml.R`
+errors. `pkgdown` passed; `test-coverage` had not finished. Local
+`devtools::check(manual = TRUE)` was clean precisely because it used 0.6.21,
+which is why nothing before CI caught this. The fix must make the cap
+version-safe (feature-detect the option, or find its 0.7 equivalent) rather than
+pin the package to an old lavaan; a DESCRIPTION floor is a decision, not a
+default.
+
+### Independent review — three lenses, then a scorer
+
+Fan-out over `master..HEAD`. The **[S] blame-history** lens reported **no
+findings**: every guard traced from M53–M63 (the non-finite input check, the
+complete-case N ≤ p floor, the zero-variance check, the PD eigenvalue floor, the
+boundary predicate, the `sd` validation, the `nb_reason` accumulation) is
+preserved, and the one substantive change to prior intent — superseding D-026
+holding (5) — is a recorded decision superseding a recorded decision. The **[S]
+prior-review** lens reported **no regressions**, noting the diff cites the M62,
+M36, M32/M35 and M61-F4 lessons by name and re-applies each; its GitHub
+PR-comment probe returned empty, so that surface was skipped and the archived
+review records plus RR09–RR13 were the evidence. The **[O] diff-bug** lens
+returned four findings, scored by a fresh **[S]** scorer that did not generate
+them:
+
+**Actioned (≥ 80):**
+
+- **F1 (88) — the raised EM cap reaches only one of the two EM sites, so global
+  fit indices can be silently wrong.** `axes_fiml_em_iter_max` is passed to
+  `lavCor()` in `axes_fiml_h1()`, but the structured `cfa(missing = "ml")` runs
+  its *own* unrestricted h1 EM for `logl.unrestricted` at lavaan's default cap.
+  It warns when it stalls; `axes_reliability()` wraps the fit in
+  `suppressWarnings()`, and `axes_converged()` inspects the *structured*
+  optimizer, which converges — so nothing sees it. Scorer reproduced it to four
+  decimals on the thin-coverage cell M65-D4 exists for (reported χ² 388.61 /
+  CFI 0.9596 / RMSEA 0.0376 against converged 458.80 / 0.9366 / 0.0476), and
+  confirmed ξ1 and its SE are bit-identical between the two — only `$fit` is
+  wrong. `axes_fit()` has no `...`, so the cap cannot currently reach that call.
+- **F3 (83) — BC13 has no live coverage, and the live half is smaller than
+  M65-D3 and T6 promise.** Both say "~10 replicates" live for BC10/BC13; the
+  implemented live test runs 5 fits total and extracts only
+  `results$xi1[[1]]`, never `components$SE`. Every quantity BC13 asserts — the
+  reported SEs, the [1.31, 1.57] band, the 1.4412 repair check — comes solely
+  from the stored fixture. Changing `se = "standard"`, or a lavaan bump that
+  shifts observed-information SEs, would leave all of BC13 green. The reduction
+  was never recorded as an amendment, and the test's own "what this does NOT
+  re-run" comment omits the SE column, so the gap is invisible to a later
+  reader. This lands on the one criterion the milestone had to escalate.
+
+**Below threshold — logged, not actioned (IP3):**
+
+- **F2 (76)** — the M65-D2 thin-overlap warning tests `min_coverage < 30`, and
+  on complete data `min_coverage == n_used`, so any FIML call with N < 30 warns
+  about missingness when nothing is missing, and says "some item pair(s)" when
+  it holds for all of them. Reproduced (4 scales × 2 items, N = 25, zero NAs);
+  a messaging defect, not a statistical one.
+- **F4 (58)** — `axes_mar_m2()`'s `seq.int(n_items*s + 2L, n_items*s + n_items)`
+  descends to `c(2, 1)` at `n_items == 1L` rather than being empty;
+  `axes_mar_m1()` has the same shape. Scorer partly confirmed: the bug is real
+  but in reachable multi-scale cases it errors with `subscript out of bounds`
+  rather than silently corrupting, and no current call site passes anything but
+  `n_items = 3L`. Dormant; worth a defensive guard when that code is next
+  touched.
+
+
+_Reviewed 2026-07-27. PR https://github.com/jmgirard/circumplex/pull/91._
+
+### Acceptance-criteria evidence (fresh, by command)
+
+- **AC1** — `missing = c("listwise", "fiml")` present with `"listwise"` first; `match.arg`'d, so a typo errors naming the options. The default call and an explicit `missing = "listwise"` call return `identical()` objects (call slot aside). The `"fiml"` → `"ml"` translation is asserted on the fitted object's `lavInspect(fit, "options")$missing`, which only `sem_fit_cfa()` sets. Bit-identity to shipped is carried by the pre-M65 tests in `test-axes-reliability.R`, which hold the shipped numbers and pass unchanged: full suite 0 failures / 4197 passing / 4 pre-existing warnings.
+- **AC2** — max |z − `scale(mat)`| = **2.66e-15** against the 1e-12 bar (three orders of headroom). Mutation-verified: removing the `sqrt(N/(N−1))` rescaling reddens it at 1.8e-3.
+- **AC3** — on complete data, fiml vs listwise: max |component difference| **1.11e-16**, reliability and SEm differences exactly **0**, against the 1e-8 bar. Measured 1.11e-16 against RR12's projected 5.6e-17 — same order, both ~8 orders inside the bar. Verified again with `blocks` supplied so the ζ2 clause has evidence.
+- **AC4** — `lavInspect(fit, "options")$information[1] == "observed"` asserted on the object `axes_reliability()` actually fitted, captured through the `axes_converged()` seam rather than on a parallel fit. The listwise branch is fired through the same capture and required to read back `"listwise"`, so the assertion cannot pass vacuously.
+- **AC5** — `axes_fit_cormat()` mocked to abort is never reached on the FIML path. Unmocked, the reported χ² and the ξ1 SE both differ from the banned two-stage refit of R̂ at total N, while the point estimates agree to < 0.01 — so the difference is an information claim, not two estimators of different things.
+- **AC6** — max |R̂ − `cor(mat)`| = **8.33e-16** against the 1e-12 bar; measured 8.33e-16 against RR12's projected **8.9e-16**. R̂ is read off the saturated fit, never recomputed from the standardized columns. The OLS shadow and the PD guard both consume it.
+- **AC7** — a test per clause. (i) N_used floor refuses with its own wording, not the listwise one; (ii) `< 2` observed values and zero-variance-among-observed refuse separately, each naming the item; (iii) a never-jointly-observed pair refuses naming the pair; (iv) the EM seam refuses when mocked, with the unmocked predicate asserted TRUE on real data (the T1 finding: `lavInspect(fit, "converged")` reports FALSE on a healthy saturated fit); (v) the PD guard refuses R̂ at the seam — **not reachable end to end** under FIML, recorded with its measurement (an exactly duplicated item pair lands at eigenvalue 1.12e-08, just above the retained 1e-8 floor, because R̂ is a `cov2cor` of an EM ML covariance and so PSD by construction; such data is still refused, by clause (vi)); (vi) structured non-convergence refuses. All-missing rows are dropped, reported, and excluded from N_used.
+- **AC8** — startup message carries all four counts (N_used, complete cases, dropped rows, minimum pairwise coverage). `print()` shows `Total N: <n> (<k> complete)` under FIML while listwise keeps `Complete N:` and cormat keeps `Sample N:`. `details$missing` is read off the fitted object via `axes_lav_missing()`, never echoed from the argument; `n_complete` and `min_coverage` present.
+- **AC9** — `nb_reliability` is NA with `"fiml"` in `nb_reason`, asserted accumulating with `"single_item"` on a single-item FIML instrument (both notes print). `sd = "raw"` is a hard error naming `"std"` and numeric SDs; a numeric `sd` still works, and `"raw"` still works on the listwise path.
+- **AC10** — from the committed 200-replicate fixture: |bias|/MCSE = **1.24 / 1.17 / 1.36** at 2/5/10% MCAR, all inside the 2-MC-SE band; max |OLS shadow − CFA| = **0.0018 / 0.0021 / 0.0025**, all inside .05, required in every replicate rather than on average.
+- **AC11** — FIML mean ξ̂1 **0.3477** (bias −0.0023) at MC SE **0.0023**, i.e. 1.01 MC SEs from truth (bar: 3). Listwise mean **0.3205** (bias −0.0295) at MC SE **0.0067**, 4.38 MC SEs from truth (bar: > 3). Measured −0.0023 at MC SE 0.0023 against RR12's projected **−0.0021 at MC SE 0.0023**; measured −0.0295 at 0.0067 against projected **−0.0295 at 0.0067**.
+- **AC12** — mean[available-case − shipped] = **+0.0169**, paired SE 0.0006, against the ≥ +0.010 bar; measured +0.0169 (SE 0.0006) against RR12's projected **+0.0167 (SE 0.0006)**. mean|shipped − two-stage| = **0.0017**, paired SE 0.0008, against the ≤ 0.005 bar; measured 0.0017 against projected **0.0008 (SE 0.0012)** — larger than projected but less than half the bar, and inside the projection's own stated MC error.
+- **AC13** — three of four clauses pass: mean FIML SE < mean listwise SE at both rates, and the ratio decreases **0.542 → 0.282** from 5% to 10%. **The calibration clause fails as written** (measured **1.452** against the required [0.85, 1.15]) and is dispositioned by the Deviations from RR12 table above, not by a reinterpretation: RR13 derived the truthful value of this ratio for the shipped estimator as 1.4412 in closed form, RR12 set its band without measuring the shipped path (which measures the identical 1.452 on complete data), and BC7 replaces the band with [1.31, 1.57] — met at 1.452. The band was not widened; D-035 routes the correction to its own milestone.
+- **AC14** — the F1b fixture leaves **13 complete cases** against 24 items, so listwise refuses on N ≤ p while FIML fits all 600: ξ̂1 **0.3715**, SE **0.0179**, converged, non-boundary, |ξ̂1 − .35| = 0.0215 inside the .05 bar. Measured 0.3715 (SE 0.0179) against RR12's projected **0.3573 (SE 0.0174)** — the point estimates differ because RR12's exact draw construction is unspecified (it reports 12 complete cases to this fixture's 13), the SEs agree closely, and the criterion's own tolerance is met with better than half its budget to spare.
+- **AC15** — all four components within 3 reported SEs of truth: ξ̂1 **0.3000** (SE .0080, 0.00 SEs from .30), ξ̂2 **0.1039** (.0048, 0.81), ζ̂1 **0.0557** (.0036, 1.19), ζ̂2 **0.0485** (.0026, 0.56). Measured against RR12's projected **.2979/.1019/.0639/.0490 with SEs .0080/.0048/.0037/.0026** — every reported SE reproduces the projection to the printed digit; the point estimates differ within sampling error on a different draw, and all four sit inside the criterion.
+- **AC16** — the roxygen gains a `# Missing data` section and the vignette a rewritten caveat, both carrying all five required claims (listwise default; MAR **and** multivariate normality; listwise consistent-not-biased under MCAR; observed-information SEs on the standardized metric conditional on the standardization constants and approximate for the correlation-as-covariance reason; certified by this package's synthetic oracle, not by Strack et al., who report no missing-data analyses). NEWS carries the same five. The FIML SE caveat is asserted to print under `"fiml"` and **not** under `"listwise"`. Both caveats additionally quantify per RR13 Recommendation 2.
+- **AC17** — `devtools::document()` produces no diff; `devtools::test()` 0 failures / 4197 passing; `devtools::check(manual = TRUE)` **0 errors, 0 warnings, 0 notes** in 12m25s, with `checking PDF version of manual ... OK` present by name at line 113 of the log. A first attempt that also passed `args = "--no-manual"` was killed and re-run — those two together suppress exactly the step this criterion exists to require (M7/M57 lesson).
+
+### Consistency gate
+
+`cairn_validate` exit 0 — `weight caps`, `coverage complete`, `roadmap<->disk orphans`, and **`binding criteria`** all PASS; the last confirms the AC block still string-matches RR12 verbatim, i.e. AC13's text was dispositioned by the Deviations table rather than softened. Two advisories, both pre-existing or deliberate: `work-log format` (47, all M7's hard-wrapped pre-implement lines, history under IP4) and `sizing (split tripwires)` (M65's 17 criteria, the plan-gate choice recorded in the work log — the binding-criteria check binds all 16 of RR12's to one file; M54 precedent). No DESIGN.md principle changed, so `cairn_impact` is not run. Toolchain gate: `document()` no diff, NAMESPACE unchanged (no new exports, so no `_pkgdown.yml` rows owed), no new top-level files (so no `.Rbuildignore` entries owed), README.Rmd untouched, `pkgdown::check_pkgdown()` clean, NEWS entry present, full `check()` clean.
+
