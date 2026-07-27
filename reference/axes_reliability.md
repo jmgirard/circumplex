@@ -109,12 +109,16 @@ fitted), `fit` (global fit indices), and `details` (including
 were in the model, `blocks`, the block labels when a block map was
 supplied, `nb_reason`, why the Nunnally-Bernstein comparison is `NA`,
 `missing`, which missing-data treatment lavaan actually used,
-`n_complete`, the complete-case count, and `min_coverage`, the fewest
-respondents behind any item pair). `n_complete` and `min_coverage` are
-present on every path so that a caller can read them unconditionally,
-and are `NA` where they carry no information: `min_coverage` outside
-`missing = "fiml"`, and both of them when a correlation matrix was
-supplied in place of raw data.
+`n_complete`, the complete-case count, `min_coverage`, the fewest
+respondents behind any item pair, `se_uncorrected`, the component
+standard errors as normal-theory maximum likelihood reports them before
+the correlation-structure correction, and `se_correction_failed`, `NULL`
+when that correction succeeded or a string naming why the reported SEs
+are `NA`). `n_complete` and `min_coverage` are present on every path so
+that a caller can read them unconditionally, and are `NA` where they
+carry no information: `min_coverage` outside `missing = "fiml"`, and
+both of them when a correlation matrix was supplied in place of raw
+data.
 
 ## Details
 
@@ -140,25 +144,34 @@ al. themselves do, leaving it blank for such instruments.
 
 Because the model is fit to the item **correlation** matrix as if it
 were a covariance matrix (the paper's own practice), the component point
-estimates and the reliabilities are correct, but the component standard
-errors and the global chi-square are **approximate** (Cudeck, 1989).
-Results are reported **per axis** (X and Y): for a balanced instrument
-the two axes carry the same axes-variance estimate and differ only
-through `item_n`.
+estimates and the reliabilities are correct, and the component standard
+errors are **corrected** for that metric, but the global chi-square
+remains **approximate** (Cudeck, 1989). Results are reported **per
+axis** (X and Y): for a balanced instrument the two axes carry the same
+axes-variance estimate and differ only through `item_n`.
 
-How approximate is worth stating, because it is neither small nor
-uniform. The reported standard errors are the ones normal-theory maximum
-likelihood would report for a sample **covariance** input, while the
-estimator consumes a sample **correlation** matrix, whose diagonal
-cannot vary. For an instrument whose axes carry a lot of variance the
-component standard errors therefore **overstate** sampling variability
-substantially – by about 40% at an axes variance of .35 – so a
-confidence interval built from them is conservative. For weak-axes,
-strong-general instruments the ratio drifts the other way and they are
-slightly **understated**. Treat the component SEs as order-of-magnitude
-guidance rather than as calibrated uncertainty; the point estimates,
-reliabilities, and SEm are unaffected. The global chi-square carries the
-same approximation in the other direction, flattering fit by roughly 4%.
+What the correction does. Normal-theory maximum likelihood prices its
+standard errors for a sample **covariance** input, while this estimator
+consumes a sample **correlation** matrix, whose diagonal cannot vary at
+all and whose off-diagonal cells are less variable than the
+corresponding covariances. Left uncorrected, that mismatch
+**overstates** sampling variability by about 40% for an instrument whose
+axes carry a lot of variance (an axes variance of .35), and
+**understates** it slightly for weak-axes, strong-general instruments –
+so it could not be stated honestly by any fixed caveat, because it
+changes sign across the range of instruments this function accepts. The
+reported SEs are therefore adjusted to the correlation metric and are
+calibrated uncertainty, not order-of-magnitude guidance. They are
+typically **smaller** than the standard errors printed in Strack et al.
+(2013), whose LISREL values carry the uncorrected approximation. Point
+estimates, reliabilities, and SEm are unchanged by the correction. What
+lavaan reported before it is kept in `details$se_uncorrected`.
+
+The global chi-square carries the same approximation in the other
+direction and is **not** corrected: at the reference population its
+expected value is 261.1 against 273 degrees of freedom, so the test is
+mildly conservative toward fit and RMSEA and p-values are flattered by
+roughly 4%.
 
 A related detail, in case you check: the fitted model does **not**
 reproduce the correlation matrix's unit diagonal exactly, and that is
@@ -221,9 +234,26 @@ SDs, never by the means and SDs of whichever cells happen to be
 observed, and those standardized columns feed a single FIML fit. The
 reported standard errors are observed-information standard errors on
 that standardized metric, conditional on the standardization constants
-(they do not propagate the uncertainty in the constants themselves), and
-they remain approximate for the same correlation-as-covariance reason as
-the default path.
+(they do not propagate the uncertainty in the constants themselves).
+They carry the same correlation-metric correction as every other path,
+applied multiplicatively so that the observed information's own pricing
+of the missing data survives it. What the correction does not reach is
+the uncertainty in the standardization constants above. At mild rates
+that residual is too small to pin down: at 2%, 5%, and 10% cellwise
+missingness it measures 0.1%, 0.8%, and 1.8%, all well inside the
+Monte-Carlo error of the comparison itself (about 3.6% over 200
+replicates), so its size is bounded but its direction at those rates is
+not established.
+
+It becomes measurable, and **anti-conservative**, as missingness grows.
+Over 201 replicates at 15% cellwise MCAR the reported standard errors
+average about 7% **below** the estimator's actual sampling variability,
+so at that rate a confidence interval built from them is slightly too
+narrow. Note the direction reverses: the mild-rate figures above, such
+as they are, sit on the conservative side. Treat heavy missingness as
+the regime where these standard errors are least trustworthy, and prefer
+a resampling interval there if the uncertainty matters to your
+conclusion.
 
 Two results are unavailable under `missing = "fiml"`, both because they
 need items observed by every respondent: the Nunnally-Bernstein
@@ -353,13 +383,12 @@ res
 #>   Note: the two axes share one axes-variance estimate and, with equal
 #>   items per axis, carry the same reliability -- expected, not an error.
 #> 
-#>   Note: the model is fit to the item correlation matrix, so the point
-#>   estimates are exact but the standard errors and global fit are
-#>   approximate (Cudeck, 1989). How approximate depends on the instrument:
-#>   where the axes carry a lot of variance the component SEs overstate
-#>   sampling variability substantially (about 40% at an axes variance of
-#>   .35), while for weak-axes, strong-general instruments they are slightly
-#>   understated. Global fit is flattered by roughly 4%.
+#>   Note: the model is fit to the item correlation matrix as if it were a
+#>   covariance matrix, so the global fit statistics are approximate
+#>   (Cudeck, 1989). Global fit is flattered by roughly 4%. The component
+#>   standard errors are corrected for this and are calibrated; they are
+#>   typically smaller than the values printed by Strack et al. (2013),
+#>   whose LISREL standard errors carry the uncorrected approximation.
 summary(res)
 #> 
 #> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
@@ -377,19 +406,18 @@ summary(res)
 #>   Note: the two axes share one axes-variance estimate and, with equal
 #>   items per axis, carry the same reliability -- expected, not an error.
 #> 
-#>   Note: the model is fit to the item correlation matrix, so the point
-#>   estimates are exact but the standard errors and global fit are
-#>   approximate (Cudeck, 1989). How approximate depends on the instrument:
-#>   where the axes carry a lot of variance the component SEs overstate
-#>   sampling variability substantially (about 40% at an axes variance of
-#>   .35), while for weak-axes, strong-general instruments they are slightly
-#>   understated. Global fit is flattered by roughly 4%.
+#>   Note: the model is fit to the item correlation matrix as if it were a
+#>   covariance matrix, so the global fit statistics are approximate
+#>   (Cudeck, 1989). Global fit is flattered by roughly 4%. The component
+#>   standard errors are corrected for this and are calibrated; they are
+#>   typically smaller than the values printed by Strack et al. (2013),
+#>   whose LISREL standard errors carry the uncorrected approximation.
 #> 
 #> # Variance components
 #> 
 #>  Component         Estimate SE   
 #>  general           0.051    0.005
-#>  axes              0.175    0.011
+#>  axes              0.175    0.009
 #>  scale_specificity 0.093    0.008
 #>  item              0.680    --   
 #> 
@@ -423,11 +451,10 @@ axes_reliability(
 #>   (scale alphas and the axis-composite variance), so it is NA on the
 #>   correlation-matrix path.
 #> 
-#>   Note: the model is fit to the item correlation matrix, so the point
-#>   estimates are exact but the standard errors and global fit are
-#>   approximate (Cudeck, 1989). How approximate depends on the instrument:
-#>   where the axes carry a lot of variance the component SEs overstate
-#>   sampling variability substantially (about 40% at an axes variance of
-#>   .35), while for weak-axes, strong-general instruments they are slightly
-#>   understated. Global fit is flattered by roughly 4%.
+#>   Note: the model is fit to the item correlation matrix as if it were a
+#>   covariance matrix, so the global fit statistics are approximate
+#>   (Cudeck, 1989). Global fit is flattered by roughly 4%. The component
+#>   standard errors are corrected for this and are calibrated; they are
+#>   typically smaller than the values printed by Strack et al. (2013),
+#>   whose LISREL standard errors carry the uncorrected approximation.
 ```

@@ -183,8 +183,12 @@ specificity was fitted), <code>fit</code> (global fit indices), and <code>detail
 specificity were in the model, <code>blocks</code>, the block labels when a block map
 was supplied, <code>nb_reason</code>, why the Nunnally-Bernstein comparison is <code>NA</code>,
 <code>missing</code>, which missing-data treatment lavaan actually used,
-<code>n_complete</code>, the complete-case count, and <code>min_coverage</code>, the fewest
-respondents behind any item pair). <code>n_complete</code> and <code>min_coverage</code> are
+<code>n_complete</code>, the complete-case count, <code>min_coverage</code>, the fewest
+respondents behind any item pair, <code>se_uncorrected</code>, the component standard
+errors as normal-theory maximum likelihood reports them before the
+correlation-structure correction, and <code>se_correction_failed</code>, <code>NULL</code> when
+that correction succeeded or a string naming why the reported SEs are
+<code>NA</code>). <code>n_complete</code> and <code>min_coverage</code> are
 present on every path so that a caller can read them unconditionally, and
 are <code>NA</code> where they carry no information: <code>min_coverage</code> outside
 <code>missing = "fiml"</code>, and both of them when a correlation matrix was supplied
@@ -211,23 +215,31 @@ fewer than two items – as Strack et al. themselves do, leaving it blank for
 such instruments.</p>
 <p>Because the model is fit to the item <strong>correlation</strong> matrix as if it were a
 covariance matrix (the paper's own practice), the component point estimates
-and the reliabilities are correct, but the component standard errors and the
-global chi-square are <strong>approximate</strong> (Cudeck, 1989). Results are reported
+and the reliabilities are correct, and the component standard errors are
+<strong>corrected</strong> for that metric, but the global chi-square remains
+<strong>approximate</strong> (Cudeck, 1989). Results are reported
 <strong>per axis</strong> (X and Y): for a balanced instrument the two axes carry the
 same axes-variance estimate and differ only through <code>item_n</code>.</p>
-<p>How approximate is worth stating, because it is neither small nor uniform.
-The reported standard errors are the ones normal-theory maximum likelihood
-would report for a sample <strong>covariance</strong> input, while the estimator consumes
-a sample <strong>correlation</strong> matrix, whose diagonal cannot vary. For an
-instrument whose axes carry a lot of variance the component standard errors
-therefore <strong>overstate</strong> sampling variability substantially – by about 40% at
-an axes variance of .35 – so a confidence interval built from them is
-conservative. For weak-axes, strong-general instruments the ratio drifts the
-other way and they are slightly <strong>understated</strong>. Treat the component SEs as
-order-of-magnitude guidance rather than as calibrated uncertainty; the point
-estimates, reliabilities, and SEm are unaffected. The global chi-square
-carries the same approximation in the other direction, flattering fit by
-roughly 4%.</p>
+<p>What the correction does. Normal-theory maximum likelihood prices its
+standard errors for a sample <strong>covariance</strong> input, while this estimator
+consumes a sample <strong>correlation</strong> matrix, whose diagonal cannot vary at all
+and whose off-diagonal cells are less variable than the corresponding
+covariances. Left uncorrected, that mismatch <strong>overstates</strong> sampling
+variability by about 40% for an instrument whose axes carry a lot of
+variance (an axes variance of .35), and <strong>understates</strong> it slightly for
+weak-axes, strong-general instruments – so it could not be stated honestly
+by any fixed caveat, because it changes sign across the range of instruments
+this function accepts. The reported SEs are therefore adjusted to the
+correlation metric and are calibrated uncertainty, not order-of-magnitude
+guidance. They are typically <strong>smaller</strong> than the standard errors printed in
+Strack et al. (2013), whose LISREL values carry the uncorrected
+approximation. Point estimates, reliabilities, and SEm are unchanged by the
+correction. What lavaan reported before it is kept in
+<code>details$se_uncorrected</code>.</p>
+<p>The global chi-square carries the same approximation in the other direction
+and is <strong>not</strong> corrected: at the reference population its expected value is
+261.1 against 273 degrees of freedom, so the test is mildly conservative
+toward fit and RMSEA and p-values are flattered by roughly 4%.</p>
 <p>A related detail, in case you check: the fitted model does <strong>not</strong> reproduce
 the correlation matrix's unit diagonal exactly, and that is expected rather
 than a defect. With the loadings fixed, the stationarity condition available
@@ -283,8 +295,23 @@ never by the means and SDs of whichever cells happen to be observed, and
 those standardized columns feed a single FIML fit. The reported standard
 errors are observed-information standard errors on that standardized metric,
 conditional on the standardization constants (they do not propagate the
-uncertainty in the constants themselves), and they remain approximate for
-the same correlation-as-covariance reason as the default path.</p>
+uncertainty in the constants themselves). They carry the same
+correlation-metric correction as every other path, applied multiplicatively
+so that the observed information's own pricing of the missing data survives
+it. What the correction does not reach is the uncertainty in the
+standardization constants above. At mild rates that residual is too small to
+pin down: at 2%, 5%, and 10% cellwise missingness it measures 0.1%, 0.8%,
+and 1.8%, all well inside the Monte-Carlo error of the comparison itself
+(about 3.6% over 200 replicates), so its size is bounded but its direction
+at those rates is not established.</p>
+<p>It becomes measurable, and <strong>anti-conservative</strong>, as missingness grows.
+Over 201 replicates at 15% cellwise MCAR the reported standard errors
+average about 7% <strong>below</strong> the estimator's actual sampling variability, so
+at that rate a confidence interval built from them is slightly too narrow.
+Note the direction reverses: the mild-rate figures above, such as they are,
+sit on the conservative side. Treat heavy missingness as the regime where
+these standard errors are least trustworthy, and prefer a resampling
+interval there if the uncertainty matters to your conclusion.</p>
 <p>Two results are unavailable under <code>missing = "fiml"</code>, both because they need
 items observed by every respondent: the Nunnally-Bernstein comparison is
 <code>NA</code> with a stated reason, and <code>sd = "raw"</code> is refused — supply the axis SDs
@@ -399,13 +426,12 @@ structure models. <em>Psychological Bulletin</em>, 105(2), 317-327.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Note: the two axes share one axes-variance estimate and, with equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   items per axis, carry the same reliability -- expected, not an error.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Note: the model is fit to the item correlation matrix, so the point</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   estimates are exact but the standard errors and global fit are</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   approximate (Cudeck, 1989). How approximate depends on the instrument:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   where the axes carry a lot of variance the component SEs overstate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   sampling variability substantially (about 40% at an axes variance of</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .35), while for weak-axes, strong-general instruments they are slightly</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   understated. Global fit is flattered by roughly 4%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Note: the model is fit to the item correlation matrix as if it were a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   covariance matrix, so the global fit statistics are approximate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (Cudeck, 1989). Global fit is flattered by roughly 4%. The component</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   standard errors are corrected for this and are calibrated; they are</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   typically smaller than the values printed by Strack et al. (2013),</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   whose LISREL standard errors carry the uncorrected approximation.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Circumplex Axes Reliability (Strack, Jacobs &amp; Grosse Holtforth, 2013)</span>
@@ -423,19 +449,18 @@ structure models. <em>Psychological Bulletin</em>, 105(2), 317-327.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Note: the two axes share one axes-variance estimate and, with equal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   items per axis, carry the same reliability -- expected, not an error.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Note: the model is fit to the item correlation matrix, so the point</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   estimates are exact but the standard errors and global fit are</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   approximate (Cudeck, 1989). How approximate depends on the instrument:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   where the axes carry a lot of variance the component SEs overstate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   sampling variability substantially (about 40% at an axes variance of</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .35), while for weak-axes, strong-general instruments they are slightly</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   understated. Global fit is flattered by roughly 4%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Note: the model is fit to the item correlation matrix as if it were a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   covariance matrix, so the global fit statistics are approximate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (Cudeck, 1989). Global fit is flattered by roughly 4%. The component</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   standard errors are corrected for this and are calibrated; they are</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   typically smaller than the values printed by Strack et al. (2013),</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   whose LISREL standard errors carry the uncorrected approximation.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # Variance components</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Component         Estimate SE   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  general           0.051    0.005</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  axes              0.175    0.011</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  axes              0.175    0.009</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  scale_specificity 0.093    0.008</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  item              0.680    --   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -469,13 +494,12 @@ structure models. <em>Psychological Bulletin</em>, 105(2), 317-327.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   (scale alphas and the axis-composite variance), so it is NA on the</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   correlation-matrix path.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Note: the model is fit to the item correlation matrix, so the point</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   estimates are exact but the standard errors and global fit are</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   approximate (Cudeck, 1989). How approximate depends on the instrument:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   where the axes carry a lot of variance the component SEs overstate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   sampling variability substantially (about 40% at an axes variance of</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .35), while for weak-axes, strong-general instruments they are slightly</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   understated. Global fit is flattered by roughly 4%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Note: the model is fit to the item correlation matrix as if it were a</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   covariance matrix, so the global fit statistics are approximate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (Cudeck, 1989). Global fit is flattered by roughly 4%. The component</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   standard errors are corrected for this and are calibrated; they are</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   typically smaller than the values printed by Strack et al. (2013),</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   whose LISREL standard errors carry the uncorrected approximation.</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
