@@ -1,6 +1,6 @@
 # M65: FIML item-level missing data for `axes_reliability()` — the build
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR12
@@ -148,6 +148,8 @@ are standing and not revisited here.
 
 - 2026-07-27: T6 harness re-run clean (200 reps, 50.1 min, 7 workers) and committed as `tests/testthat/fixtures/m65-heavy-cells.rds`. BC10 passes in all three cells (|bias|/MCSE 1.24/1.17/1.36, max |OLS − CFA| 0.0018/0.0021/0.0025); BC11 passes (FIML −1.01, listwise −4.38 bias/MCSE); BC12 passes (drift +0.0169, agreement 0.0017); BC13's three SE-comparison clauses pass (ratio 0.542 → 0.282, decreasing). The live re-run of stored seeds reproduces the fixture, so the mechanism move into the package and the estimator are confirmed consistent with it.
 - 2026-07-27: **AC13's calibration clause fails and is escalated.** Measured mean reported FIML SE ÷ empirical SD of ξ̂1 = 1.452 at 5% MCAR over 200 reps, against RR12's required [0.85, 1.15]. Diagnostic: the shipped listwise path measures 1.452 on COMPLETE data over the same 200 seeds, so the ~45% conservatism is the documented correlation-as-covariance approximation (Cudeck, 1989) inherited whole — FIML adds none of its own, and RR12 set the band without measuring the shipped path, so neither path could ever have met it. The band is NOT widened (AC13 forbids it). At the T6 gate the user declined both the record-and-caveat remedy and an in-milestone SE fix, and chose escalation: whether a CRAN-shipped estimator's 45%-conservative SEs should be corrected rather than caveated is going to a Fable review brief. The suite therefore carries ONE known failure (test-axes-fiml.R BC13 calibration upper bound) — deliberate, not overlooked; it is the criterion recording its own unmet state until the RB rules. T8's `check(manual = TRUE)` is not run for the same reason.
+
+- 2026-07-27: blocked on RB13 (`cairn/reviews/RB13-axes-reliability-se-calibration.md`) — whether `axes_reliability()`'s ~45%-conservative standard errors should be corrected rather than caveated, which would supersede D-026 holding (5) and RR09 §2's "document, don't fix". T8's `check(manual = TRUE)` and the AC13 disposition both wait on the RR. Deviation from `/milestone-brief` step 2, logged rather than silent: the RB and this status change are committed on the milestone branch, not the default branch, because M65's milestone file has diverged there and a status change on master would conflict at merge.
 
 ## Decisions
 
