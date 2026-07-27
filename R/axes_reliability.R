@@ -754,14 +754,17 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' against this package's own synthetic oracle, where the true variance
 #' components are known by construction.
 #'
-#' A boundary
-#' fit returns `NA` reliability and SEm with a warning and a boundary flag
-#' rather than a clipped, negative, or missing value. A fit counts as a boundary
-#' when the estimated axes variance falls outside `(0, 1)` -- at or below zero
-#' the axes carry no variance to be reliable, and at or above one they carry all
-#' of it, which drives the Spearman-Brown reliability to one or beyond, leaving
-#' the standard error of measurement at zero or undefined -- or when any
-#' estimated variance is negative.
+#' # Boundary solutions
+#'
+#' This contract governs every input path -- raw items on either `missing`
+#' setting, and a supplied correlation matrix alike. A boundary fit returns `NA`
+#' reliability and SEm with a warning and a boundary flag rather than a clipped,
+#' negative, or missing value. A fit counts as a boundary when the estimated
+#' axes variance falls outside `(0, 1)` -- at or below zero the axes carry no
+#' variance to be reliable, and at or above one they carry all of it, which
+#' drives the Spearman-Brown reliability to one or beyond, leaving the standard
+#' error of measurement at zero or undefined -- or when any estimated variance
+#' is negative.
 #'
 #' # Supplying a correlation matrix instead of raw data
 #'
@@ -1545,8 +1548,28 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     SE = comp_ses,
     stringsAsFactors = FALSE
   )
+  # SRMR is requested by its COVARIANCE-ONLY name, not the bare "srmr" alias.
+  # The alias is path-dependent: on a `missing = "ml"` fit lavaan resolves it to
+  # the mean-inclusive Bentler SRMR, while the listwise and cormat fits get the
+  # covariance-only one -- so `$fit$srmr` silently measured two different things
+  # depending on an argument, and did so on data with no missing cells at all.
+  #
+  # The mean-inclusive variant is not merely different here, it is wrong for this
+  # model: lavaan frees every item intercept, so the mean structure is saturated,
+  # the mean residuals are structurally zero, and the extra terms only dilute the
+  # denominator from p(p+1)/2 to p(p+1)/2 + p. Measured: the reported value came
+  # out deflated by exactly sqrt((p+1)/(p+3)) -- 0.96225 = sqrt(25/27) at p = 24,
+  # 0.94591 = sqrt(17/19) at p = 16 -- always in the flattering direction, on a
+  # documented return field readers compare against Hu & Bentler's .08.
+  #
+  # Named unconditionally rather than branched on `missing`, because on the
+  # listwise and cormat fits the two names return bit-identical values (measured
+  # on lavaan 0.6.21 AND 0.7-2, both paths), so this cannot disturb AC1's
+  # bit-identity to the shipped numbers. The returned element keeps the name
+  # "srmr": the contract is the quantity, not lavaan's spelling of it.
   fm <- lavaan::fitMeasures(fit, c("chisq", "df", "pvalue", "rmsea", "cfi",
-                                   "srmr"))
+                                   "srmr_bentler_nomean"))
+  names(fm)[names(fm) == "srmr_bentler_nomean"] <- "srmr"
   new_axes_reliability(
     results = results,
     components = components,

@@ -97,9 +97,17 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
     # Three different N's, three different labels, because they are three
     # different quantities and a shared label would hide that. "Complete N"
     # names the listwise complete-case count; "Sample N" the size a supplied
-    # correlation matrix was computed from; "Total N" every respondent the FIML
-    # fit used, with the complete-case count beside it so the reader can see how
+    # correlation matrix was computed from; "Total N" every respondent in the
+    # data, with the complete-case count beside it so the reader can see how
     # much of it listwise would have discarded (M65).
+    #
+    # "Total N" prints d$n_total, NOT d$n. The two differ whenever a row with no
+    # observed item at all was dropped, and printing N_used under a label
+    # reading "Total" named a number that was not the total -- caught at review
+    # against AC8, which requires the total N. Where they differ the used count
+    # is shown beside it rather than replaced by it, because N_used is what the
+    # fit consumed and the reader needs both; where they agree it is left out,
+    # so the common case gains no noise.
     if (from_cormat) {
       "\nSample N:     "
     } else if (is_fiml) {
@@ -107,8 +115,14 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
     } else {
       "\nComplete N:   "
     },
-    d$n,
-    if (is_fiml) paste0(" (", d$n_complete, " complete)"),
+    if (is_fiml) d$n_total else d$n,
+    if (is_fiml) {
+      paste0(
+        " (",
+        if (!identical(d$n_total, d$n)) paste0(d$n, " used, "),
+        d$n_complete, " complete)"
+      )
+    },
     "\nSEm scale:    ", if (is.character(d$sd)) d$sd else "custom",
     "\n\n# Per-axis reliability\n\n",
     sep = ""

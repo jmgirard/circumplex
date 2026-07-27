@@ -200,15 +200,18 @@ A note on provenance: Strack et al. (2013) report no missing-data analyses,
 so nothing about the FIML path rests on their results. It is certified
 against this package's own synthetic oracle, where the true variance
 components are known by construction.
+}
 
-A boundary
-fit returns \code{NA} reliability and SEm with a warning and a boundary flag
-rather than a clipped, negative, or missing value. A fit counts as a boundary
-when the estimated axes variance falls outside \verb{(0, 1)} -- at or below zero
-the axes carry no variance to be reliable, and at or above one they carry all
-of it, which drives the Spearman-Brown reliability to one or beyond, leaving
-the standard error of measurement at zero or undefined -- or when any
-estimated variance is negative.
+\section{Boundary solutions}{
+This contract governs every input path -- raw items on either \code{missing}
+setting, and a supplied correlation matrix alike. A boundary fit returns \code{NA}
+reliability and SEm with a warning and a boundary flag rather than a clipped,
+negative, or missing value. A fit counts as a boundary when the estimated
+axes variance falls outside \verb{(0, 1)} -- at or below zero the axes carry no
+variance to be reliable, and at or above one they carry all of it, which
+drives the Spearman-Brown reliability to one or beyond, leaving the standard
+error of measurement at zero or undefined -- or when any estimated variance
+is negative.
 }
 
 \section{Supplying a correlation matrix instead of raw data}{

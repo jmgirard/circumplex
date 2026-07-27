@@ -210,6 +210,40 @@ test_that("AC3: complete-data agreement holds with a fifth component too", {
                tolerance = 1e-8)
 })
 
+test_that("on complete data EVERY reported fit measure agrees between paths", {
+  skip_if_not_installed("lavaan")
+  # The gap that let a wrong number ship: AC3 pins the components, reliability
+  # and SEm, and nothing pinned `$fit`. lavaan hands a `missing = "ml"` fit the
+  # MEAN-INCLUSIVE Bentler SRMR while the listwise and cormat paths get the
+  # covariance-only one, so `$fit$srmr` silently measured a different quantity
+  # on the FIML path -- deflated by exactly sqrt((p + 1)/(p + 3)), which is 4%
+  # at p = 24 and 9% at p = 8, always in the flattering direction, on data with
+  # no missing cells at all. The mean structure is saturated (lavaan frees every
+  # item intercept), so the mean residuals are structurally zero and the extra
+  # terms only dilute the denominator; the covariance-only value is the
+  # comparable quantity, and `$fit$srmr` is a documented return field readers
+  # compare against Hu & Bentler's .08.
+  #
+  # Asserted over the WHOLE list rather than srmr alone: the defect was that one
+  # element of a six-element contract quietly meant something else, and naming
+  # only the element that broke would leave the other five just as unguarded.
+  mat <- fiml_fixture()
+  dat <- as.data.frame(mat)
+  items <- fiml_items(mat)
+  lw <- suppressMessages(
+    axes_reliability(dat, items = items, angles = octants(),
+                     missing = "listwise")
+  )
+  fi <- suppressMessages(
+    axes_reliability(dat, items = items, angles = octants(), missing = "fiml")
+  )
+  expect_identical(names(fi$fit), names(lw$fit))
+  expect_equal(fi$fit, lw$fit, tolerance = 1e-8)
+  # And the failing element specifically, so a regression names itself rather
+  # than reporting "the list differs somewhere".
+  expect_equal(fi$fit$srmr, lw$fit$srmr, tolerance = 1e-8)
+})
+
 test_that("AC4: the FIML fit uses observed information", {
   skip_if_not_installed("lavaan")
   # Asserted on the object axes_reliability() ACTUALLY fitted, captured through
@@ -707,15 +741,45 @@ test_that("BC8: print() shows the total N beside the complete-case count", {
   fx <- fiml_refuse_fixture()
   mat <- fiml_holes(fx$mat)
   res <- fiml_call(mat, fx$items)
+  # No row is dropped here, so N_used IS the total and the line carries two
+  # numbers. This is the case the test used to assert alone -- and because the
+  # two quantities coincide in it, it could not tell them apart; see the next
+  # test for the case that can.
+  expect_identical(res$details$n, res$details$n_total)
   out <- paste(capture.output(print(res)), collapse = "\n")
-  expect_match(out, paste0("Total N:\\s+", res$details$n))
+  expect_match(out, paste0("Total N:\\s+", res$details$n_total))
   expect_match(out, paste0("\\(", res$details$n_complete, " complete\\)"))
+  expect_no_match(out, "used")
   # The listwise path keeps its own label, unchanged.
   lw <- suppressMessages(
     axes_reliability(as.data.frame(fx$mat), items = fx$items,
                      angles = octants(), missing = "listwise")
   )
   expect_match(paste(capture.output(print(lw)), collapse = "\n"), "Complete N:")
+})
+
+test_that("BC8: with rows dropped, `Total N` is the TOTAL, not the used count", {
+  skip_if_not_installed("lavaan")
+  # The case AC8's own drop clause contemplates and the fixture above cannot
+  # reach. A row with no observed item at all is dropped from N_used, so the two
+  # counts separate -- and printing N_used under a label reading "Total" named a
+  # number that was not the total (caught at the second review).
+  fx <- fiml_refuse_fixture()
+  mat <- fiml_holes(fx$mat)
+  mat[295:300, ] <- NA_real_
+  res <- fiml_call(mat, fx$items)
+  expect_identical(res$details$n_total, 300L)
+  expect_identical(res$details$n, 294L)
+
+  out <- paste(capture.output(print(res)), collapse = "\n")
+  # The total is what the label promises...
+  expect_match(out, "Total N:\\s+300")
+  # ... and the count the fit actually consumed is still shown, because a reader
+  # given only the total would over-read how much data the estimate rests on.
+  expect_match(out, "\\(294 used, 24 complete\\)")
+  # Guard against the regression this test exists for: the printed total must
+  # not silently revert to N_used.
+  expect_no_match(out, "Total N:\\s+294")
 })
 
 test_that("BC9: the N-B comparison is NA under FIML, with the reason", {
