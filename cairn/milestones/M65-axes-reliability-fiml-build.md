@@ -103,7 +103,7 @@ are standing and not revisited here.
 
 ## Tasks
 
-- [ ] **T1** — Metric layer: saturated-FIML (EM) means/SDs with the `sqrt(N_used/(N_used − 1))` rescaling and R̂
+- [x] **T1** — Metric layer: saturated-FIML (EM) means/SDs with the `sqrt(N_used/(N_used − 1))` rescaling and R̂
       built from them (route per M65-D1); complete-data equality tests vs `scale(mat)`/`cor(mat)` at 1e-12.
 - [ ] **T2** — API + one-stage wiring: `missing =` on `axes_reliability()` (`R/axes_reliability.R:819`) through the
       existing `axes_fit(missing =)` → `sem_fit_cfa()` translation (`R/ssm_sem.R:749`); observed-information
@@ -128,6 +128,7 @@ are standing and not revisited here.
 
 - 2026-07-26: started (/milestone-implement). Branch `m65-axes-reliability-fiml-build` cut from master at 1552b031; no dependencies to verify. Status planned→in-progress. Implement-gate choices recorded as M65-D1 (saturated moments via lavaan `h1` EM — an explicit saturated fit misses BC2/BC6 by five orders, measured), M65-D2 (soft overlap warning at 30), M65-D3 (~10-replicate live smoke, never skipped).
 - 2026-07-26: minor amendment (wording only, no scope change) — Tasks compressed from 25 lines to 18 by cutting duplicated lesson prose to pointers, after the M65-D1..D3 block left the plan-owned body at 148/149 with eight tasks still to run. No task added, removed, reordered, or rescoped.
+- 2026-07-26: T1 done. `R/axes_fiml.R` adds `axes_fiml_h1()` (the EM seam) and `axes_fiml_moments()`; `tests/testthat/test-axes-fiml.R` adds 14 assertions. BC2 measures 2.2e-15 and BC6 1.1e-15 against the 1e-12 bar. Two findings, both from ablating rather than asserting: (a) `lavInspect(fit, "converged")` reports FALSE on a HEALTHY saturated fit — it describes the structured optimizer, which this stage never runs — so `axes_converged()` would have refused every dataset; the seam now listens for lavaan's EM iteration-cap warning and checks moment finiteness instead. (b) The `ordered = character(0)` pin is a measured no-op (0 difference on a 5-point integer Likert fixture; non-numeric input is refused upstream) — comment corrected to claim a pin, not a fix, per the M36 lesson. The N-1 rescaling is mutation-verified: removing it reddens BC2 at 1.8e-3, nine orders above the bar. Full suite 0 failures / 4076 passing / 4 pre-existing warnings, count unchanged.
 
 ## Decisions
 
