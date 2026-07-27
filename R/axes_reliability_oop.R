@@ -38,31 +38,38 @@ axes_fmt <- function(x, digits = 3) {
 # model is fit to the item correlation matrix as if it were a covariance matrix
 # (the paper's own practice), so the point estimates are correct but the
 # standard errors and the global chi-square are approximate (Cudeck, 1989).
-# Quantified rather than merely labelled "approximate" (D-035): the size of the
-# approximation was measured for the first time at M65, and it is large enough
-# and direction-unstable enough that the bare word misleads. RR13 derived it in
-# closed form -- the reported SE is priced for a covariance input while the
-# estimator consumes a correlation matrix -- giving x1.44 at axes variance .35,
-# and a ratio running [0.81, 1.97] over the accepted input space, dipping below
-# 1 for weak-axes/strong-general instruments. The correction is its own
-# milestone; until it lands this text must not imply the error is safely
-# one-directional.
+# The SE half of this caveat is GONE as of M66: the component standard errors
+# are now corrected for the correlation-as-covariance metric (RR13 BC1, D-035),
+# so the text no longer warns about them. What survives is the global-fit half,
+# which the correction does not touch -- the chi-square carries the same
+# approximation in the OTHER direction and keeps its sentence verbatim.
+#
+# Why the SE warning could not simply have been sharpened instead: the ratio it
+# described runs [0.81, 1.97] across the accepted input space and dips below 1
+# for weak-axes/strong-general instruments, so it is sign-unstable and no static
+# sentence states it honestly (RR13 section 2). That is what overturned
+# "document, don't fix".
 axes_se_caveat <- paste0(
-  "  Note: the model is fit to the item correlation matrix, so the point\n",
-  "  estimates are exact but the standard errors and global fit are\n",
-  "  approximate (Cudeck, 1989). How approximate depends on the instrument:\n",
-  "  where the axes carry a lot of variance the component SEs overstate\n",
-  "  sampling variability substantially (about 40% at an axes variance of\n",
-  "  .35), while for weak-axes, strong-general instruments they are slightly\n",
-  "  understated. Global fit is flattered by roughly 4%."
+  "  Note: the model is fit to the item correlation matrix as if it were a\n",
+  "  covariance matrix, so the global fit statistics are approximate\n",
+  "  (Cudeck, 1989). Global fit is flattered by roughly 4%. The component\n",
+  "  standard errors are corrected for this and are calibrated; they are\n",
+  "  typically smaller than the values printed by Strack et al. (2013),\n",
+  "  whose LISREL standard errors carry the uncorrected approximation."
 )
 
 # The extra sentence the FIML path owes on top of the caveat above. Its SEs
-# carry a SECOND approximation the default path does not: they are computed on
+# carry an approximation the correction does NOT remove: they are computed on
 # the standardized metric holding the standardization constants fixed, so they
 # do not propagate the uncertainty in the FIML means and SDs that produced that
-# metric. Stated where the SEs are shown, not only in the help page, because
-# that is where a reader is about to use them.
+# metric. M66 corrected the correlation-as-covariance metric error on this path
+# as on every other -- composed multiplicatively, so the observed-information
+# pricing of the missing information survives -- and RR13 section 4 measured
+# what is left over afterwards at 0.1 / 0.8 / 1.8% at 2 / 5 / 10% MCAR, an
+# order of magnitude below the effect that was corrected. Unchanged at M66
+# (its wording never mentioned the metric error), and stated where the SEs are
+# shown rather than only in the help page, because that is where a reader is
+# about to use them.
 axes_fiml_se_caveat <- paste0(
   "  Note: under missing = \"fiml\" the standard errors are\n",
   "  observed-information SEs on the standardized metric, conditional on the\n",
@@ -192,8 +199,33 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
       sep = ""
     )
   }
-  cat("\n", axes_se_caveat, "\n", sep = "")
-  if (is_fiml) cat("\n", axes_fiml_se_caveat, "\n", sep = "")
+  # The correction-failure state gets its own note, like every other
+  # NA-with-reason state above it (boundary, cormat, fiml, single_item) --
+  # RR09 sec. 7.4's NA-with-reason doctrine, which the new state was otherwise
+  # the only one to skip. Without it the SE column reads as all-NA with the
+  # explanation reachable only from `details`, and the call-time warning() is
+  # routinely muffled (this package's own harnesses wrap the call in
+  # suppressWarnings()).
+  #
+  # It also SUPPRESSES the caveat below rather than printing it beside the
+  # gap: that text asserts the standard errors "are corrected ... and are
+  # calibrated" and compares them to Strack et al.'s, which is a claim about
+  # numbers that are not there. The global-fit half is reprinted on its own so
+  # nothing true is lost with it (M66 review, F3).
+  se_failed <- x$details$se_correction_failed
+  if (!is.null(se_failed)) {
+    cat(
+      "\n  Note: the component standard errors could not be computed (",
+      se_failed, ") and are\n  NA. The point estimates, reliability, and SEm ",
+      "are unaffected. The model\n  is fit to the item correlation matrix, so ",
+      "the global fit statistics are\n  approximate (Cudeck, 1989) and ",
+      "flattered by roughly 4%.\n",
+      sep = ""
+    )
+  } else {
+    cat("\n", axes_se_caveat, "\n", sep = "")
+    if (is_fiml) cat("\n", axes_fiml_se_caveat, "\n", sep = "")
+  }
   invisible(x)
 }
 

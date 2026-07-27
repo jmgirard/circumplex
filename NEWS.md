@@ -15,6 +15,21 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
 
 ## Breaking changes and changed behavior
 
+* The component standard errors reported by `axes_reliability()` are now
+  calibrated. Previously they were computed as if the item correlation matrix
+  were a covariance matrix — the source paper's own practice, documented as
+  approximate — which for strong-axes instruments overstated the standard
+  error of the axes variance by 25–45%, and for weak-axes, strong-general
+  instruments could understate it slightly. Because the error changed sign
+  across the range of instruments the function accepts, no fixed caveat could
+  state it honestly. Point estimates, reliabilities, SEm, degrees of freedom,
+  and the fit statistics are all unchanged. Corrected standard errors are
+  typically *smaller* than those printed in Strack et al. (2013), whose LISREL
+  values carry the same uncorrected approximation. The uncorrected values
+  remain available in `details$se_uncorrected`. The global chi-square carries
+  the approximation in the opposite direction and is not corrected; it stays
+  documented as flattering fit by roughly 4%.
+
 * The displacement-interpretability guardrail in `print()` and `summary()`
   now uses a scale-free rule: a profile's displacement is certified as
   interpretable only when the amplitude confidence interval's lower bound sits
