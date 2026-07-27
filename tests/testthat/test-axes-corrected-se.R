@@ -518,10 +518,23 @@ test_that("AC7: the printed caveat drops the SE warning and keeps the fit one", 
 
 
 test_that("AC7: the Rd states the correction and no longer claims otherwise", {
-  rd <- paste(readLines(test_path("..", "..", "man", "axes_reliability.Rd")),
-              collapse = " ")
+  # man/ in the dev tree, Rd_db() once installed -- the dual-source pattern
+  # test-rd-latex-safe.R and test-axes-reliability.R already use. A man/-only
+  # guard cannot even OPEN the file under R CMD check (installed packages carry
+  # help/, not man/), which is how this test errored the whole check on its
+  # first run; a Rd_db()-only guard errors under load_all(). The M7 lesson is
+  # that a guard reachable on only one of those paths runs in neither gate that
+  # ships.
+  rd_file <- test_path("..", "..", "man", "axes_reliability.Rd")
+  rd <- if (file.exists(rd_file)) {
+    paste(readLines(rd_file, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  } else {
+    db <- tools::Rd_db("circumplex")
+    paste(as.character(db[["axes_reliability.Rd"]]), collapse = "")
+  }
+  # Fail loudly rather than pass vacuously if neither source yielded anything.
+  expect_gt(nchar(rd), 1000L)
   rd <- gsub("\\s+", " ", rd)
-  skip_if(!nzchar(rd))
 
   # The FIML sentence the correction falsified (R/axes_reliability.R, the
   # "# Missing data" section). It said the FIML SEs "remain approximate for the
