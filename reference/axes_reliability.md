@@ -22,7 +22,8 @@ axes_reliability(
   cormat = NULL,
   n = NULL,
   blocks = NULL,
-  sd = "std"
+  sd = "std",
+  missing = c("listwise", "fiml")
 )
 ```
 
@@ -86,6 +87,14 @@ axes_reliability(
   numeric SD must be finite and positive; anything else is refused
   rather than carried into the reported SEm.
 
+- missing:
+
+  How item-level missing data are handled on the `data` path:
+  `"listwise"` (the default; complete cases only) or `"fiml"`
+  (full-information maximum likelihood, via lavaan's `missing = "ml"`),
+  which uses every respondent who answered at least one item. Not
+  available with `cormat`, which carries no missing cells.
+
 ## Value
 
 An object of class `circumplex_axes_reliability` with
@@ -98,8 +107,14 @@ when scale specificity was dropped, five when block specificity was
 fitted), `fit` (global fit indices), and `details` (including
 `zeta1_fitted` and `zeta2_fitted`, whether scale and block specificity
 were in the model, `blocks`, the block labels when a block map was
-supplied, and `nb_reason`, why the Nunnally-Bernstein comparison is
-`NA`).
+supplied, `nb_reason`, why the Nunnally-Bernstein comparison is `NA`,
+`missing`, which missing-data treatment lavaan actually used,
+`n_complete`, the complete-case count, and `min_coverage`, the fewest
+respondents behind any item pair). `n_complete` and `min_coverage` are
+present on every path so that a caller can read them unconditionally,
+and are `NA` where they carry no information: `min_coverage` outside
+`missing = "fiml"`, and both of them when a correlation matrix was
+supplied in place of raw data.
 
 ## Details
 
@@ -130,6 +145,27 @@ errors and the global chi-square are **approximate** (Cudeck, 1989).
 Results are reported **per axis** (X and Y): for a balanced instrument
 the two axes carry the same axes-variance estimate and differ only
 through `item_n`.
+
+How approximate is worth stating, because it is neither small nor
+uniform. The reported standard errors are the ones normal-theory maximum
+likelihood would report for a sample **covariance** input, while the
+estimator consumes a sample **correlation** matrix, whose diagonal
+cannot vary. For an instrument whose axes carry a lot of variance the
+component standard errors therefore **overstate** sampling variability
+substantially – by about 40% at an axes variance of .35 – so a
+confidence interval built from them is conservative. For weak-axes,
+strong-general instruments the ratio drifts the other way and they are
+slightly **understated**. Treat the component SEs as order-of-magnitude
+guidance rather than as calibrated uncertainty; the point estimates,
+reliabilities, and SEm are unaffected. The global chi-square carries the
+same approximation in the other direction, flattering fit by roughly 4%.
+
+A related detail, in case you check: the fitted model does **not**
+reproduce the correlation matrix's unit diagonal exactly, and that is
+expected rather than a defect. With the loadings fixed, the stationarity
+condition available for a free item error is the *weighted* diagonal,
+not the raw one, so off-diagonal sampling misfit leaks into the implied
+diagonal at roughly the sampling standard error of a correlation.
 
 ## Which instruments this accepts
 
@@ -163,16 +199,53 @@ are out of scope, even though Strack et al. (2013) analyze one; their
 Table 3 SYMLOG rows arise from a three-axis sphere model, not from any
 configuration this function accepts.
 
-Missing data are handled by **listwise deletion only** (a message
-reports the complete-case count); pairwise correlation input is never
-used. A boundary fit returns `NA` reliability and SEm with a warning and
-a boundary flag rather than a clipped, negative, or missing value. A fit
-counts as a boundary when the estimated axes variance falls outside
-`(0, 1)` – at or below zero the axes carry no variance to be reliable,
-and at or above one they carry all of it, which drives the
-Spearman-Brown reliability to one or beyond, leaving the standard error
-of measurement at zero or undefined – or when any estimated variance is
-negative.
+## Missing data
+
+`missing = "listwise"` is the default: only complete cases are used, and
+a message reports how many there were. Pairwise-deletion correlations
+are never used on either setting.
+
+`missing = "fiml"` instead estimates from every respondent who answered
+at least one item, by full-information maximum likelihood. Two
+assumptions come with it, and both are stronger than listwise
+deletion's: the data must be **missing at random** (missingness may
+depend on values you observed, but not on the unobserved values
+themselves) **and multivariate normal**. Under MCAR — the special case
+where missingness is unrelated to anything — listwise deletion is
+*consistent*, merely inefficient, so FIML buys precision there and not
+correctness. Under MAR listwise deletion is genuinely biased and FIML is
+not, which is when the switch is worth its assumptions.
+
+The items are standardized by the saturated model's own FIML means and
+SDs, never by the means and SDs of whichever cells happen to be
+observed, and those standardized columns feed a single FIML fit. The
+reported standard errors are observed-information standard errors on
+that standardized metric, conditional on the standardization constants
+(they do not propagate the uncertainty in the constants themselves), and
+they remain approximate for the same correlation-as-covariance reason as
+the default path.
+
+Two results are unavailable under `missing = "fiml"`, both because they
+need items observed by every respondent: the Nunnally-Bernstein
+comparison is `NA` with a stated reason, and `sd = "raw"` is refused —
+supply the axis SDs numerically instead.
+
+A note on provenance: Strack et al. (2013) report no missing-data
+analyses, so nothing about the FIML path rests on their results. It is
+certified against this package's own synthetic oracle, where the true
+variance components are known by construction.
+
+## Boundary solutions
+
+This contract governs every input path – raw items on either `missing`
+setting, and a supplied correlation matrix alike. A boundary fit returns
+`NA` reliability and SEm with a warning and a boundary flag rather than
+a clipped, negative, or missing value. A fit counts as a boundary when
+the estimated axes variance falls outside `(0, 1)` – at or below zero
+the axes carry no variance to be reliable, and at or above one they
+carry all of it, which drives the Spearman-Brown reliability to one or
+beyond, leaving the standard error of measurement at zero or undefined –
+or when any estimated variance is negative.
 
 ## Supplying a correlation matrix instead of raw data
 
@@ -282,7 +355,11 @@ res
 #> 
 #>   Note: the model is fit to the item correlation matrix, so the point
 #>   estimates are exact but the standard errors and global fit are
-#>   approximate (Cudeck, 1989).
+#>   approximate (Cudeck, 1989). How approximate depends on the instrument:
+#>   where the axes carry a lot of variance the component SEs overstate
+#>   sampling variability substantially (about 40% at an axes variance of
+#>   .35), while for weak-axes, strong-general instruments they are slightly
+#>   understated. Global fit is flattered by roughly 4%.
 summary(res)
 #> 
 #> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
@@ -302,7 +379,11 @@ summary(res)
 #> 
 #>   Note: the model is fit to the item correlation matrix, so the point
 #>   estimates are exact but the standard errors and global fit are
-#>   approximate (Cudeck, 1989).
+#>   approximate (Cudeck, 1989). How approximate depends on the instrument:
+#>   where the axes carry a lot of variance the component SEs overstate
+#>   sampling variability substantially (about 40% at an axes variance of
+#>   .35), while for weak-axes, strong-general instruments they are slightly
+#>   understated. Global fit is flattered by roughly 4%.
 #> 
 #> # Variance components
 #> 
@@ -344,5 +425,9 @@ axes_reliability(
 #> 
 #>   Note: the model is fit to the item correlation matrix, so the point
 #>   estimates are exact but the standard errors and global fit are
-#>   approximate (Cudeck, 1989).
+#>   approximate (Cudeck, 1989). How approximate depends on the instrument:
+#>   where the axes carry a lot of variance the component SEs overstate
+#>   sampling variability substantially (about 40% at an axes variance of
+#>   .35), while for weak-axes, strong-general instruments they are slightly
+#>   understated. Global fit is flattered by roughly 4%.
 ```

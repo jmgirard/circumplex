@@ -82,7 +82,11 @@ res
 #> 
 #>   Note: the model is fit to the item correlation matrix, so the point
 #>   estimates are exact but the standard errors and global fit are
-#>   approximate (Cudeck, 1989).
+#>   approximate (Cudeck, 1989). How approximate depends on the instrument:
+#>   where the axes carry a lot of variance the component SEs overstate
+#>   sampling variability substantially (about 40% at an axes variance of
+#>   .35), while for weak-axes, strong-general instruments they are slightly
+#>   understated. Global fit is flattered by roughly 4%.
 ```
 
 If your items belong to one of the package’s built-in instruments, you
@@ -130,7 +134,11 @@ summary(res)
 #> 
 #>   Note: the model is fit to the item correlation matrix, so the point
 #>   estimates are exact but the standard errors and global fit are
-#>   approximate (Cudeck, 1989).
+#>   approximate (Cudeck, 1989). How approximate depends on the instrument:
+#>   where the axes carry a lot of variance the component SEs overstate
+#>   sampling variability substantially (about 40% at an axes variance of
+#>   .35), while for weak-axes, strong-general instruments they are slightly
+#>   understated. Global fit is flattered by roughly 4%.
 #> 
 #> # Variance components
 #> 
@@ -192,7 +200,11 @@ axes_reliability(
 #> 
 #>   Note: the model is fit to the item correlation matrix, so the point
 #>   estimates are exact but the standard errors and global fit are
-#>   approximate (Cudeck, 1989).
+#>   approximate (Cudeck, 1989). How approximate depends on the instrument:
+#>   where the axes carry a lot of variance the component SEs overstate
+#>   sampling variability substantially (about 40% at an axes variance of
+#>   .35), while for weak-axes, strong-general instruments they are slightly
+#>   understated. Global fit is flattered by roughly 4%.
 ```
 
 The estimates are identical to the raw-data run above — the raw-data
@@ -220,13 +232,55 @@ paper’s own practice, the model is fit to the item **correlation**
 matrix as though it were a covariance matrix. The component point
 estimates and the reliabilities are correct, but the component standard
 errors and the global chi-square are only approximate (Cudeck, 1989).
-Read the fit indices as a rough guide, not as an exact test.
 
-**Missing data are handled by listwise deletion only.** The header
-reports the complete-case count so you can see how many rows
-contributed; pairwise correlation input is never used. If listwise
-deletion discards a large share of your sample, address the missingness
-before interpreting the estimate.
+How approximate is worth knowing, because it is neither small nor
+uniform. The reported standard errors are the ones normal-theory maximum
+likelihood would report for a sample **covariance** input, while the
+estimator actually consumes a sample **correlation** matrix, whose
+diagonal cannot vary. For an instrument whose axes carry a lot of
+variance the component standard errors therefore **overstate** sampling
+variability substantially — by about 40% at an axes variance of .35 — so
+an interval built from them errs on the cautious side. For weak-axes,
+strong-general instruments the ratio drifts the other way and they are
+slightly **understated**. Read the component SEs as order-of-magnitude
+guidance rather than calibrated uncertainty; the point estimates,
+reliabilities, and SEm are unaffected either way. Read the fit indices
+as a rough guide, not an exact test — they are flattered by roughly 4%
+for the same reason.
+
+If you check the implied matrix, you will also find that it does not
+reproduce the unit diagonal exactly. That too is expected: with the
+loadings fixed, the condition a free item error satisfies is the
+*weighted* diagonal rather than the raw one, so off-diagonal sampling
+misfit leaks into the implied diagonal at roughly the sampling standard
+error of a correlation.
+
+**Missing data: listwise by default, FIML on request.** The default,
+`missing = "listwise"`, uses complete cases only and reports how many
+there were. `missing = "fiml"` instead estimates from every respondent
+who answered at least one item, and reports the total N with the
+complete-case count beside it. Pairwise-deletion correlations are never
+used on either setting.
+
+The choice is a trade of assumptions, not a free upgrade. FIML requires
+the data to be **missing at random** — missingness may depend on values
+you observed, but not on the unobserved values themselves — **and
+multivariate normal**. Under MCAR, where missingness is unrelated to
+anything, listwise deletion is already consistent and merely wasteful,
+so FIML buys precision rather than correctness; under MAR, listwise
+deletion is genuinely biased and FIML is not. Under FIML the standard
+errors are observed-information standard errors on the standardized
+metric, conditional on the standardization constants, and are
+approximate for the same correlation-as-covariance reason as above. Two
+results become unavailable, both needing items observed by every
+respondent: the Nunnally-Bernstein comparison is `NA` with a stated
+reason, and `sd = "raw"` is refused in favour of numeric axis SDs.
+
+Note the provenance, because it differs from the rest of this vignette:
+Strack et al. (2013) report no missing-data analyses at all, so nothing
+about the FIML path rests on their results. It is certified against this
+package’s own synthetic oracle, where the true variance components are
+known by construction.
 
 **A boundary fit returns `NA`, not a clipped value.** If the model
 estimates an axes variance outside the interval (0, 1) — at or below
@@ -296,8 +350,7 @@ measure communion and agency?”, isolating the axes variance from the
 general and scale-specific components that a simpler reliability formula
 would conflate. Use it to characterize a circumplex instrument before
 leaning on its axis scores, and read its output with the
-correlation-as-covariance, listwise-deletion, and boundary caveats in
-mind.
+correlation-as-covariance, missing-data, and boundary caveats in mind.
 
 The examples above all use the canonical eight octant scales, but
 nothing in the model requires them: any **equally spaced** set of angles
