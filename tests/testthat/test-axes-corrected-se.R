@@ -298,6 +298,64 @@ test_that("BC4: the shipped composition evaluates the ratio at Sigma-hat", {
 })
 
 
+test_that("AC7: the printed caveat drops the SE warning and keeps the fit one", {
+  skip_if_not_installed("lavaan")
+  pp <- probe_pop()
+  res <- axes_reliability(cormat = pp$sigma, items = pp$items,
+                          angles = pp$angles, n = 600)
+  out <- paste(capture.output(print(res)), collapse = " ")
+  out <- gsub("\\s+", " ", out)
+
+  # What must still be there: the citation and the global-fit sentence, which
+  # the correction does not touch.
+  expect_match(out, "Cudeck, 1989", fixed = TRUE)
+  expect_match(out, "Global fit is flattered by roughly 4%", fixed = TRUE)
+  # ... and the new positive claim.
+  expect_match(out, "standard errors are corrected for this and are calibrated",
+               fixed = TRUE)
+
+  # What must be GONE. This is the directional half the M56/M63 lesson says the
+  # stale-claim sweep keeps missing: hunting the old wording finds negative
+  # assertions to delete, so each falsified phrase is pinned as an ABSENCE
+  # here. Any of them coming back means the caveat is warning about an error
+  # the package no longer has.
+  expect_no_match(out, "component SEs overstate", fixed = TRUE)
+  expect_no_match(out, "order-of-magnitude guidance", fixed = TRUE)
+  expect_no_match(out, "they are slightly understated", fixed = TRUE)
+  expect_no_match(out, "the standard errors and global fit are approximate",
+                  fixed = TRUE)
+})
+
+
+test_that("AC7: the Rd states the correction and no longer claims otherwise", {
+  rd <- paste(readLines(test_path("..", "..", "man", "axes_reliability.Rd")),
+              collapse = " ")
+  rd <- gsub("\\s+", " ", rd)
+  skip_if(!nzchar(rd))
+
+  # The FIML sentence the correction falsified (R/axes_reliability.R, the
+  # "# Missing data" section). It said the FIML SEs "remain approximate for the
+  # same correlation-as-covariance reason as the default path"; both halves of
+  # that are now false, since the default path is corrected and so is this one.
+  expect_false(grepl("remain approximate for the same", rd, fixed = TRUE))
+  # The residual the correction genuinely does NOT reach is stated instead.
+  expect_match(rd, "uncertainty in the standardization constants", fixed = TRUE)
+
+  # The @details block: corrected SEs, and the chi-square explicitly NOT
+  # corrected, with RR13 B-1's figures so a reader can check the direction.
+  expect_match(rd, "are calibrated uncertainty, not order-of-magnitude",
+               fixed = TRUE)
+  expect_match(rd, "261.1 against 273 degrees of freedom", fixed = TRUE)
+  # `fixed = TRUE` takes the string literally, so it must NOT carry regex
+  # escapes -- "details\\$se_uncorrected" would look for a literal backslash
+  # and fail against a page that says exactly the right thing (the M57 lesson,
+  # caught here by the assertion failing rather than by review).
+  expect_match(rd, "\\code{details$se_uncorrected}", fixed = TRUE)
+  # The old unconditional claim must not survive anywhere in the page.
+  expect_false(grepl("Treat the component SEs as", rd, fixed = TRUE))
+})
+
+
 test_that("BC1: a non-invertible Sigma-hat gives NA SEs with a reason, never a number", {
   pp <- probe_pop()
   # A singular matrix: duplicate one item's row/column exactly.

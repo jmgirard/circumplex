@@ -74,8 +74,12 @@ specificity was fitted), \code{fit} (global fit indices), and \code{details}
 specificity were in the model, \code{blocks}, the block labels when a block map
 was supplied, \code{nb_reason}, why the Nunnally-Bernstein comparison is \code{NA},
 \code{missing}, which missing-data treatment lavaan actually used,
-\code{n_complete}, the complete-case count, and \code{min_coverage}, the fewest
-respondents behind any item pair). \code{n_complete} and \code{min_coverage} are
+\code{n_complete}, the complete-case count, \code{min_coverage}, the fewest
+respondents behind any item pair, \code{se_uncorrected}, the component standard
+errors as normal-theory maximum likelihood reports them before the
+correlation-structure correction, and \code{se_correction_failed}, \code{NULL} when
+that correction succeeded or a string naming why the reported SEs are
+\code{NA}). \code{n_complete} and \code{min_coverage} are
 present on every path so that a caller can read them unconditionally, and
 are \code{NA} where they carry no information: \code{min_coverage} outside
 \code{missing = "fiml"}, and both of them when a correlation matrix was supplied
@@ -114,24 +118,33 @@ such instruments.
 
 Because the model is fit to the item \strong{correlation} matrix as if it were a
 covariance matrix (the paper's own practice), the component point estimates
-and the reliabilities are correct, but the component standard errors and the
-global chi-square are \strong{approximate} (Cudeck, 1989). Results are reported
+and the reliabilities are correct, and the component standard errors are
+\strong{corrected} for that metric, but the global chi-square remains
+\strong{approximate} (Cudeck, 1989). Results are reported
 \strong{per axis} (X and Y): for a balanced instrument the two axes carry the
 same axes-variance estimate and differ only through \code{item_n}.
 
-How approximate is worth stating, because it is neither small nor uniform.
-The reported standard errors are the ones normal-theory maximum likelihood
-would report for a sample \strong{covariance} input, while the estimator consumes
-a sample \strong{correlation} matrix, whose diagonal cannot vary. For an
-instrument whose axes carry a lot of variance the component standard errors
-therefore \strong{overstate} sampling variability substantially -- by about 40\% at
-an axes variance of .35 -- so a confidence interval built from them is
-conservative. For weak-axes, strong-general instruments the ratio drifts the
-other way and they are slightly \strong{understated}. Treat the component SEs as
-order-of-magnitude guidance rather than as calibrated uncertainty; the point
-estimates, reliabilities, and SEm are unaffected. The global chi-square
-carries the same approximation in the other direction, flattering fit by
-roughly 4\%.
+What the correction does. Normal-theory maximum likelihood prices its
+standard errors for a sample \strong{covariance} input, while this estimator
+consumes a sample \strong{correlation} matrix, whose diagonal cannot vary at all
+and whose off-diagonal cells are less variable than the corresponding
+covariances. Left uncorrected, that mismatch \strong{overstates} sampling
+variability by about 40\% for an instrument whose axes carry a lot of
+variance (an axes variance of .35), and \strong{understates} it slightly for
+weak-axes, strong-general instruments -- so it could not be stated honestly
+by any fixed caveat, because it changes sign across the range of instruments
+this function accepts. The reported SEs are therefore adjusted to the
+correlation metric and are calibrated uncertainty, not order-of-magnitude
+guidance. They are typically \strong{smaller} than the standard errors printed in
+Strack et al. (2013), whose LISREL values carry the uncorrected
+approximation. Point estimates, reliabilities, and SEm are unchanged by the
+correction. What lavaan reported before it is kept in
+\code{details$se_uncorrected}.
+
+The global chi-square carries the same approximation in the other direction
+and is \strong{not} corrected: at the reference population its expected value is
+261.1 against 273 degrees of freedom, so the test is mildly conservative
+toward fit and RMSEA and p-values are flattered by roughly 4\%.
 
 A related detail, in case you check: the fitted model does \strong{not} reproduce
 the correlation matrix's unit diagonal exactly, and that is expected rather
@@ -192,8 +205,13 @@ never by the means and SDs of whichever cells happen to be observed, and
 those standardized columns feed a single FIML fit. The reported standard
 errors are observed-information standard errors on that standardized metric,
 conditional on the standardization constants (they do not propagate the
-uncertainty in the constants themselves), and they remain approximate for
-the same correlation-as-covariance reason as the default path.
+uncertainty in the constants themselves). They carry the same
+correlation-metric correction as every other path, applied multiplicatively
+so that the observed information's own pricing of the missing data survives
+it. What the correction does not reach is the uncertainty in the
+standardization constants above; at 2\%, 5\%, and 10\% cellwise missingness
+that residual measures 0.1\%, 0.8\%, and 1.8\% respectively -- an order of
+magnitude below the metric error that is corrected.
 
 Two results are unavailable under \code{missing = "fiml"}, both because they need
 items observed by every respondent: the Nunnally-Bernstein comparison is
