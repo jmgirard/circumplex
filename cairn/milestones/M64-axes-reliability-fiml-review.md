@@ -1,6 +1,6 @@
 # M64: FIML on items for `axes_reliability()` — the estimator-metric question
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -102,6 +102,8 @@ grounds.
 - 2026-07-26: started (/milestone-implement). Branch `m64-axes-reliability-fiml-review` cut from master at `ec420791`; no dependencies to check. Status planned→in-progress. No pre-implementation question gate: the plan fixed the three design positions as RB12 inputs, and the Fable spawn is gated per-instance inside /milestone-brief at T2.
 - 2026-07-26: T1 done. `devel/m64-fiml-probe.R` reproduces all four findings seed-pinned — F1 deletion shares, F1b the shipped refusal, F2 the saturated mean structure, F3 the implied-diagonal departure, F4 route agreement. Fixed the scratchpad probe's dead `pe$free` filter by counting `coef()` names instead: `parameterEstimates()` has no `free` column, so the intercept count printed 0 where the true count is 24 (LESSONS (f), the probe's own syntax lying). The committed script prints 12 complete cases at 15% MCAR where the scratchpad printed 16 — a different missingness seed, and no criterion quotes that figure.
 - 2026-07-26: AC1 AMENDED (gated) — its one-vs-two-stage agreement bound read 5e-4 and the committed script measures 6.2e-4, so the criterion would have failed review as written. Replaced with a comparative bound at Jeff's gate choice: the routes' ξ1 differ by under 5% of ξ1's own SE (measured 0.9 / 3.6 / 2.8%), ~14× headroom to the one-SE disagreement it must rule out. The M59/M61 tolerance lesson recurring inside a plan that had cited it.
+
+- 2026-07-26: status in-progress→**blocked** on RB12 (`cairn/reviews/RB12-axes-reliability-fiml-metric.md`), nine questions: the metric under FIML, the complete-data implied-diagonal departure, the saturated mean structure's effect on ξ1's SE, one-stage vs two-stage, the OLS-shadow/PD-refusal input, N–B and `sd = "raw"`, the FIML refusal set and the `"Complete N:"` label, the evidence bar, GO/NO-GO. Committed on the milestone branch rather than master: M64's whole deliverable is this RB/RR pair, so splitting it off would fragment the branch T1 already sits on.
 
 ## Decisions
 
