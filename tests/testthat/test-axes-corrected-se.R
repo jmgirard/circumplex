@@ -596,6 +596,41 @@ test_that("AC7: the Rd states the correction and no longer claims otherwise", {
 })
 
 
+test_that("AC7: the vignette's caveats match the corrected contract", {
+  # The teaching vignette is the FOURTH surface carrying the SE claim, and the
+  # one M66's own doc sweep missed: AC7 enumerated the printed caveat, two
+  # roxygen passages and NEWS, so nothing pointed at vignettes/. Caught by the
+  # review gate's prior-review lens, which recognised it as the M56/M62/M63
+  # stale-prose family recurring on this very file. CLAUDE.md holds vignettes
+  # to statistically precise prose, and until this was fixed the vignette told
+  # readers the SEs were order-of-magnitude guidance while print(), the Rd and
+  # NEWS all said they were calibrated.
+  #
+  # Guarded at SOURCE rather than in the rendered article: the .Rmd is what an
+  # author edits, it is present in the dev tree and in the built package's
+  # vignette sources, and a rendered-HTML guard would need the site built.
+  vig <- test_path("..", "..", "vignettes", "axes-reliability.Rmd")
+  skip_if_not(file.exists(vig), "vignette source not available")
+  txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))
+  expect_gt(nchar(txt), 1000L)
+
+  # The falsified claims, pinned as absences.
+  expect_no_match(txt, "order-of-magnitude", fixed = TRUE)
+  expect_no_match(txt, "The standard errors and global fit are approximate",
+                  fixed = TRUE)
+  expect_no_match(txt, "approximate for the same correlation-as-covariance",
+                  fixed = TRUE)
+  # Paired positives, so the section cannot satisfy the absences by DELETION --
+  # the trap the guard review caught in the Rd guard for exactly this reason.
+  expect_match(txt, "The component standard errors are **corrected** for it",
+               fixed = TRUE)
+  expect_match(txt, "carry the same correlation-metric correction as every other",
+               fixed = TRUE)
+  # The fit statistics are still approximate, and must keep saying so.
+  expect_match(txt, "fit indices are not corrected", fixed = TRUE)
+})
+
+
 test_that("BC1: a non-invertible Sigma-hat gives NA SEs with a reason, never a number", {
   pp <- probe_pop()
   # A singular matrix: duplicate one item's row/column exactly.
