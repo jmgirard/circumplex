@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-26 (fourth pass — no drift found. All 16 checks PASS; tree clean; 0 open issues/PRs; no open RBs. Sole advisory is M7's 47 hard-wrapped pre-implement work-log lines, history under IP4. Reported gap: the always-read frame's worked table omits `CLAUDE.md`.)_
+_Last hygiene check: 2026-07-27 (M65 post-merge. All 16 checks PASS; M65 archived and its live file deleted; 6 terminal rows pruned to 5 by dropping M60. LESSONS gained M65's cross-version-dependency lesson and a (j) clause on comparisons that cannot fail, and shed two: the M38 vdiffr-blindness line retired by ownership into 7(c), and a generic Rscript hazard that failed the inflow test.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,12 +9,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M60 | Any equally spaced angle set for `axes_reliability()` | done | — | normal | milestones/archive/M60-axes-reliability-equal-spacing.md |
 | M61 | Single-item scale positions for `axes_reliability()` — dropping ζ1 | done | M60 | normal | milestones/archive/M61-axes-reliability-single-item.md |
 | M62 | Close `axes_reliability()`'s two never-NaN gaps — ξ1 ≥ 1 and an unvalidated `sd` | done | — | normal | milestones/archive/M62-axes-reliability-never-nan.md |
 | M63 | Blockwise instruments for `axes_reliability()` — the ζ2 component | done | — | normal | milestones/archive/M63-axes-reliability-blockwise-zeta2.md |
 | M64 | FIML on items for `axes_reliability()` — the estimator-metric question | done | — | normal | milestones/archive/M64-axes-reliability-fiml-review.md |
-| M65 | FIML item-level missing data for `axes_reliability()` — the build | review | — | normal | milestones/M65-axes-reliability-fiml-build.md |
+| M65 | FIML item-level missing data for `axes_reliability()` — the build | done | — | normal | milestones/archive/M65-axes-reliability-fiml-build.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
