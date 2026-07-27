@@ -323,14 +323,21 @@ axes_fits_zeta2 <- function(item_angle_deg, item_scale, item_block) {
 # fixes every latent covariance at 0; RR09 BC4). The model assumes unit-variance
 # items (the five components sum to 1, p. 4), so callers standardize the items
 # before fitting -- the paper fits the item *correlation* matrix (spec section 2).
+#
+# `...` forwards further lavaan arguments through the chokepoint. It exists for
+# one caller and one purpose (M65-D5): a `missing = "ml"` fit runs its OWN
+# unrestricted-moments EM, for the saturated loglikelihood the fit indices are
+# referenced against, and that EM needs the same raised iteration cap the
+# saturated stage gets -- without a way in, the cap reached only one of the two
+# EM sites and the chi-square could be computed against a stalled baseline.
 axes_fit <- function(dat, items, angles_deg, item_block = NULL,
                      estimator = "ML",
-                     se = "standard", missing = "listwise", start = NULL) {
+                     se = "standard", missing = "listwise", start = NULL, ...) {
   syn <- axes_syntax(items, angles_deg, item_block = item_block, start = start)
   sem_fit_cfa(
     syn, dat,
     estimator = estimator, se = se, missing = missing,
-    orthogonal = TRUE
+    orthogonal = TRUE, ...
   )
 }
 
@@ -1281,19 +1288,55 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # lavaan's own fit-time warnings (e.g. "some estimated lv variances are
   # negative" on a boundary fit) are redundant noise; suppress them in favor of
   # this function's own clean diagnostics.
-  fit <- suppressWarnings(if (has_data) {
-    zdf <- as.data.frame(zmat)
-    colnames(zdf) <- all_cols
-    axes_fit(zdf, item_cols, angles_deg, item_block = item_block, start = ols,
-             missing = missing)
-  } else {
-    axes_fit_cormat(R, item_cols, angles_deg, n, item_block = item_block,
-                    start = ols)
-  })
+  #
+  # ONE warning is not noise, and is why this is withCallingHandlers() and not
+  # suppressWarnings() (M65-D5): a `missing = "ml"` fit runs a SECOND
+  # unrestricted-moments EM of its own, for the saturated loglikelihood that
+  # chi-square, CFI and RMSEA are referenced against. It is not the saturated
+  # stage above, axes_converged() cannot see it -- that predicate inspects the
+  # STRUCTURED optimizer, which converges fine -- and lavaan reports its stall
+  # by warning and then returning the stalled iterate anyway. Muffled, the
+  # estimates and their SEs stayed correct while the global fit indices were
+  # silently computed against the wrong baseline.
+  em_stalled <- FALSE
+  fiml_args <- if (has_data && missing == "fiml") axes_fiml_em_args() else list()
+  fit <- withCallingHandlers(
+    if (has_data) {
+      zdf <- as.data.frame(zmat)
+      colnames(zdf) <- all_cols
+      do.call(axes_fit, c(
+        list(zdf, item_cols, angles_deg, item_block = item_block, start = ols,
+             missing = missing),
+        fiml_args
+      ))
+    } else {
+      axes_fit_cormat(R, item_cols, angles_deg, n, item_block = item_block,
+                      start = ols)
+    },
+    warning = function(w) {
+      if (axes_fiml_em_stalled(w)) {
+        em_stalled <<- TRUE
+      }
+      invokeRestart("muffleWarning")
+    }
+  )
+  # Order matters: a non-converged OPTIMIZER is BC7 clause (vi) and keeps its own
+  # message, so it is tested first. The EM check below is the residual case --
+  # the raised cap reaches both EM sites now, so this fires only if the
+  # structured stage's EM needs more room than the saturated stage did on the
+  # same data, which no measured dataset has.
   if (!axes_converged(fit)) {
     stop(
       "The lavaan model did not converge; the axes reliability cannot be ",
       "estimated.",
+      call. = FALSE
+    )
+  }
+  if (em_stalled) {
+    stop(
+      "The unrestricted (EM) stage of the FIML fit did not converge, so the ",
+      "model fit statistics would be computed against a saturated model that ",
+      "was never reached.",
       call. = FALSE
     )
   }

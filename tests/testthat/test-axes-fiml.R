@@ -521,7 +521,19 @@ test_that("M60 re-assertion: the listwise refusals still fire on their own terms
   # trusting that a shared guard stayed shared.
   fx <- fiml_refuse_fixture()
   mat <- fx$mat
-  mat[25:nrow(mat), fx$cols[[1]]] <- NA_real_ # 24 complete cases, p = 24
+  # Rows 25+ each lose exactly ONE item, cycling through the 24 items: that
+  # leaves 24 complete cases against p = 24, while every item keeps ~288 of its
+  # 300 responses and every pair stays richly covered.
+  #
+  # Starving a SINGLE item down to 24 responses reaches the same complete-case
+  # count in one line, and was how this read until it was run against lavaan
+  # 0.7-2: that construction lands in the near-singular region where 0.7's
+  # accelerated EM does not converge even at the raised cap, so FIML refused it
+  # too and the contrast this test exists for vanished. The re-assertion is
+  # about WHICH N each path floors on; thin items are BC7 clause (ii)'s subject,
+  # and mixing the two made this test hostage to an EM corner.
+  rows <- 25:nrow(mat)
+  mat[cbind(rows, (seq_along(rows) - 1L) %% ncol(mat) + 1L)] <- NA_real_
   # FIML estimates it (N_used = 300); listwise sees 24 complete cases, which
   # does not exceed the 24 items.
   expect_error(
@@ -537,30 +549,107 @@ test_that("M60 re-assertion: the listwise refusals still fire on their own terms
 
 test_that("M65-D4: the EM cap is a backstop, not a routine limit", {
   skip_if_not_installed("lavaan")
-  # lavaan's default em.h1.iter.max = 500 makes clause (iv) fire on data FIML
-  # can estimate: one item at 20/300 coverage stalls at 500 and converges in a
-  # third of a second with room. Without the raised cap this whole cell would
-  # refuse -- so the assertion is that it does NOT.
+  # lavaan's single-level default of 500 EM iterations makes clause (iv) fire on
+  # data FIML can estimate: one item at 20/300 coverage stalls at 500 and
+  # converges in a third of a second with room. Without the raised cap this
+  # whole cell would refuse -- so the assertion is that it does NOT.
   fx <- fiml_refuse_fixture()
   mat <- fx$mat
   mat[21:nrow(mat), fx$cols[[1]]] <- NA_real_
   expect_true(axes_fiml_h1(as.data.frame(mat))$converged)
-  # ... and the default really is the thing that would have refused it, so the
-  # constant is load-bearing rather than decorative.
+  # ... and the constant is load-bearing rather than decorative -- but WHERE it
+  # is load-bearing turns out to depend on the lavaan installed, so the probe
+  # below asserts a different thing on each and never nothing on either.
   expect_gt(axes_fiml_em_iter_max, 500L)
   stalled <- FALSE
   withCallingHandlers(
-    lavaan::lavCor(as.data.frame(mat), ordered = character(0), missing = "ml",
-                   output = "fit", meanstructure = TRUE,
-                   em.h1.iter.max = 500L),
+    do.call(lavaan::lavCor, c(
+      list(as.data.frame(mat), ordered = character(0), missing = "ml",
+           output = "fit", meanstructure = TRUE),
+      axes_fiml_em_args(500L)
+    )),
     warning = function(w) {
-      if (grepl("Maximum number of iterations", conditionMessage(w))) {
-        stalled <<- TRUE
-      }
+      if (axes_fiml_em_stalled(w)) stalled <<- TRUE
       invokeRestart("muffleWarning")
     }
   )
-  expect_true(stalled)
+  # lavaan 0.7 accelerates the h1 EM (SQUAREM by default); 0.6 iterates plainly.
+  # On 0.6 the default cap of 500 refuses this estimable cell, which is the
+  # measurement M65-D4 rests on. On 0.7 the acceleration reaches tolerance well
+  # inside 500 and the cap is doing nothing here -- so assert that, rather than
+  # asserting a 0.6 fact on a 0.7 machine or quietly skipping. The cap is
+  # retained on both: it costs nothing when the EM exits on tolerance, and 0.7's
+  # acceleration is not uniformly faster (it fails to converge at all on the
+  # near-singular cell the M60 re-assertion used to build).
+  accelerated <- "acceleration" %in% names(lavaan::lavOptions()$em.h1.args)
+  expect_identical(stalled, !accelerated)
+})
+
+test_that("M65-D5: the EM cap is spelled for the lavaan actually installed", {
+  skip_if_not_installed("lavaan")
+  # Regression test for the failure CI caught and a local check could not:
+  # lavaan renamed this option at 0.7-1, from a top-level `em.h1.iter.max` to
+  # the `max_iter` element of a nested `em.h1.args` list, and 0.7 ABORTS with
+  # "unknown argument" rather than ignoring the old name. Hardcoding one
+  # spelling broke every FIML call on lavaan 0.7 while development on 0.6.21
+  # stayed green.
+  #
+  # Asserted as a ROUND TRIP rather than by comparing names, because the failure
+  # has two halves: lavaan must accept the argument, and must carry the cap into
+  # the fit. A spelling lavaan silently ignored would pass a name check.
+  args <- axes_fiml_em_args(1234L)
+  expect_length(args, 1L)
+  expect_true(names(args) %in% names(lavaan::lavOptions()))
+
+  fx <- fiml_refuse_fixture()
+  fit <- do.call(lavaan::lavCor, c(
+    list(as.data.frame(fiml_holes(fx$mat)), ordered = character(0),
+         missing = "ml", output = "fit", meanstructure = TRUE),
+    args
+  ))
+  opts <- lavaan::lavInspect(fit, "options")
+  read_back <- if (is.list(opts$em.h1.args)) {
+    opts$em.h1.args$max_iter
+  } else {
+    opts$em.h1.iter.max
+  }
+  expect_identical(as.integer(read_back), 1234L)
+})
+
+test_that("M65-D5: a stalled structured-stage EM is refused, not muffled", {
+  skip_if_not_installed("lavaan")
+  # The second EM site (F1). A `missing = "ml"` cfa() runs its own unrestricted
+  # -moments EM for the saturated loglikelihood that chi-square, CFI and RMSEA
+  # are referenced against. It is NOT the saturated stage, axes_converged()
+  # cannot see it (that predicate inspects the structured optimizer, which
+  # converges), and axes_reliability() muffles lavaan's fit-time warnings -- so
+  # a stall there used to leave the components and their SEs correct while the
+  # global fit indices were silently computed against a baseline never reached.
+  #
+  # Driven by squeezing the cap rather than by mocking, so what is asserted is
+  # the real lavaan condition and the real detection path. The same fixture at
+  # the shipped cap must estimate cleanly, or this would be asserting that thin
+  # data fails rather than that a stalled EM is caught.
+  fx <- fiml_refuse_fixture()
+  mat <- fx$mat
+  mat[21:nrow(mat), fx$cols[[1]]] <- NA_real_
+  expect_s3_class(suppressWarnings(fiml_call(mat, fx$items)),
+                  "circumplex_axes_reliability")
+
+  # The squeeze is applied at axes_fit() and NOT by mocking axes_fiml_em_args(),
+  # which both stages read: starving the saturated stage would refuse at clause
+  # (iv) first and this test would pass without ever exercising the second site.
+  real_fit <- axes_fit
+  local_mocked_bindings(axes_fit = function(dat, items, angles_deg, ...) {
+    args <- list(...)
+    args[names(axes_fiml_em_args())] <- NULL
+    do.call(real_fit, c(list(dat, items, angles_deg), args,
+                        axes_fiml_em_args(10L)))
+  })
+  # suppressWarnings covers the thin-overlap warning this fixture also earns
+  # (item 1 sits at 20/300); the refusal under test is an error, not a warning.
+  expect_error(suppressWarnings(fiml_call(mat, fx$items)),
+               "unrestricted \\(EM\\) stage")
 })
 
 
@@ -924,39 +1013,76 @@ test_that("M65-D3: stored seeds reproduce live, so the fixture is not stale", {
     set.seed(seed)
     as.matrix(axes_simulate(n, oct, 3L, .35, .10, .08))
   }
-  xi1_of <- function(mat, ...) {
-    suppressMessages(suppressWarnings(
+  # BOTH quantities the stored cells are read for, never the point estimate
+  # alone: BC13 asserts entirely on the reported SEs, so re-running xi1 while
+  # leaving components$SE unread would leave every SE claim resting on the
+  # fixture with nothing live behind it -- `se = "standard"` could change, or a
+  # lavaan bump could shift the observed-information SEs, and BC13 would stay
+  # green. The listwise SE is re-run for the same reason: BC13's ratio clauses
+  # are a comparison, so pinning one side of it is pinning half a claim.
+  est_of <- function(mat, ...) {
+    res <- suppressMessages(suppressWarnings(
       axes_reliability(as.data.frame(mat), items = items(mat), angles = oct,
                        ...)
-    ))$results$xi1[[1]]
+    ))
+    c(xi1 = res$results$xi1[[1]],
+      se = res$components$SE[res$components$Symbol == "xi1"])
   }
-  # Tolerance covers cross-platform BLAS noise in lavaan's optimizer only; on
-  # the generating machine these are exact. A drifted estimator or a drifted
-  # mechanism moves them by orders more than this.
-  tol <- 1e-6
+  # Tolerance covers cross-platform BLAS noise AND the lavaan version: the
+  # fixture was generated on 0.6.21, whose h1 EM iterates plainly, while 0.7
+  # accelerates it (SQUAREM) and so stops at a slightly different point inside
+  # the same 1e-5 convergence tolerance -- measured at 1.2e-6 relative on the M2
+  # replicate, which is why 1e-6 was too tight. On one machine and one lavaan
+  # these are exact.
+  #
+  # 1e-4 still discriminates by two orders or more: BC12's own bars are 0.005
+  # and 0.010, BC10's OLS-CFA bar is 0.05, and a drifted estimator or drifted
+  # mechanism moves these values by far more than a stopping-point difference.
+  tol <- 1e-4
 
-  # One MCAR replicate per rate -- three fits, ~15 s.
+  # Three MCAR replicates per rate -- nine FIML fits and nine listwise ones,
+  # which is the "~10 replicates" M65-D3 commits to (the earlier one-per-rate
+  # version ran three, and was found short at review).
   for (i in seq_along(fx$mcar)) {
     rate <- as.numeric(names(fx$mcar)[[i]])
-    seed <- fx$provenance$seeds$mcar[[1]]
-    live <- xi1_of(axes_mcar(draw(600L, seed), rate), missing = "fiml")
-    expect_equal(live, unname(fx$mcar[[i]][1, "fiml.xi1"]), tolerance = tol,
-                 label = paste0("live xi1 at ", rate, " MCAR"))
+    for (r in 1:3) {
+      seed <- fx$provenance$seeds$mcar[[r]]
+      mat <- axes_mcar(draw(600L, seed), rate)
+      where <- paste0("rep ", r, " at ", rate, " MCAR")
+      live <- est_of(mat, missing = "fiml")
+      expect_equal(unname(live[["xi1"]]),
+                   unname(fx$mcar[[i]][r, "fiml.xi1"]), tolerance = tol,
+                   label = paste0("live xi1, ", where))
+      expect_equal(unname(live[["se"]]),
+                   unname(fx$mcar[[i]][r, "fiml.se"]), tolerance = tol,
+                   label = paste0("live FIML SE, ", where))
+      lw <- est_of(mat, missing = "listwise")
+      expect_equal(unname(lw[["se"]]),
+                   unname(fx$mcar[[i]][r, "lw_se"]), tolerance = tol,
+                   label = paste0("live listwise SE, ", where))
+      # BC13's direction, asserted on numbers produced in THIS run rather than
+      # read out of the file: the FIML SE beats listwise replicate by replicate.
+      expect_lt(live[["se"]], lw[["se"]])
+    }
   }
 
   # One M1 replicate at full N -- the MAR mechanism's own reproduction.
   seed_m1 <- fx$provenance$seeds$m1[[1]]
-  live_m1 <- xi1_of(axes_mar_m1(draw(2400L, seed_m1), 3L), missing = "fiml")
-  expect_equal(live_m1, unname(fx$m1[1, "fiml"]), tolerance = tol)
+  live_m1 <- est_of(axes_mar_m1(draw(2400L, seed_m1), 3L), missing = "fiml")
+  expect_equal(unname(live_m1[["xi1"]]), unname(fx$m1[1, "fiml"]),
+               tolerance = tol)
 
   # One M2 replicate, shipped leg only. What this does NOT re-run, stated so
   # the coverage is never overestimated: (a) the available-case leg of BC12,
   # which is a test-side construction the package deliberately does not offer,
-  # (b) the two-stage leg, (c) the other 199 MCAR replicates per cell and the
+  # (b) the two-stage leg, (c) the other 197 MCAR replicates per cell and the
   # other 4 M1 / 3 M2 replicates, and so (d) every MEAN and SD the four
-  # criteria above are computed from. Those come from the stored file; what is
-  # re-derived here is that the code still produces the numbers in it.
+  # criteria above are computed from -- including BC13's calibration ratio,
+  # whose empirical SD needs all 200 replicates and cannot be re-derived from
+  # three. Those come from the stored file; what is re-derived here is that the
+  # code still produces the per-replicate xi1 AND SE values in it.
   seed_m2 <- fx$provenance$seeds$m2[[1]]
-  live_m2 <- xi1_of(axes_mar_m2(draw(2000L, seed_m2), 3L), missing = "fiml")
-  expect_equal(live_m2, unname(fx$m2[1, "shipped"]), tolerance = tol)
+  live_m2 <- est_of(axes_mar_m2(draw(2000L, seed_m2), 3L), missing = "fiml")
+  expect_equal(unname(live_m2[["xi1"]]), unname(fx$m2[1, "shipped"]),
+               tolerance = tol)
 })

@@ -100,22 +100,19 @@ instead of forcing listwise deletion.
 ## Tasks
 
 - [x] **T1** — Metric layer: saturated-FIML (EM) means/SDs with the `sqrt(N_used/(N_used − 1))` rescaling and R̂
-      built from them (route per M65-D1); complete-data equality tests vs `scale(mat)`/`cor(mat)` at 1e-12.
-- [x] **T2** — API + one-stage wiring: `missing =` on `axes_reliability()` (`R/axes_reliability.R:819`) through the
-      existing `axes_fit(missing =)` → `sem_fit_cfa()` translation (`R/ssm_sem.R:749`); observed-information
-      assertion; a test that no two-stage SE or χ² reaches `results`/`components`/`fit`/print.
-- [x] **T3** — Six-clause refusal contract, all-missing-row drop, soft thin-coverage warning (M65-D2). Per the M62
-      lesson, clause (iv)'s mock proves wiring only — assert each condition unmocked. Per M60, re-assert what the
-      complete-case N ≤ p and PD checks refused *incidentally* before they move to N_used and R̂.
+      built from them (M65-D1); complete-data equality vs `scale(mat)`/`cor(mat)` at 1e-12.
+- [x] **T2** — API + one-stage wiring: `missing =` on `axes_reliability()` through the existing `axes_fit()` →
+      `sem_fit_cfa()` translation; observed-information assertion; no two-stage SE or χ² in the reported output.
+- [x] **T3** — Six-clause refusal contract, all-missing-row drop, soft thin-coverage warning (M65-D2); M62's
+      assert-each-condition-unmocked rule and M60's re-assertion of the incidental listwise refusals.
 - [x] **T4** — Reporting and derived quantities: startup message, `print()`, `details` read-back via `lavInspect()`,
-      `nb_reliability`/`nb_reason`, and the `sd = "raw"` hard error (D-034 correction 2 — an error, not an NA).
+      `nb_reliability`/`nb_reason`, `sd = "raw"` a hard error (D-034 correction 2 — an error, not an NA).
 - [x] **T5** — In-suite evidence cells, both fully live (~42 s measured): BC14 headline (F1b) and BC15 ζ2.
-- [x] **T6** — Heavy-cell harness (M65-D3, extended to BC11/BC12 at the T5 gate): one seed-pinned `devel/` script runs
-      BC10, BC13, BC11, BC12 and commits an `.rds` summary; a fast test asserts it **and** re-runs live (~10 reps for
-      BC10/BC13, one per MAR cell). Comment what the live half misses. Driver: FIML fits measure 18-68 s, not 3.1 s.
-- [x] **T7** — Docs: roxygen missing-data paragraph (`R/axes_reliability.R:681-682`), vignette caveat
-      (`vignettes/axes-reliability.Rmd:154-157`), extended SE caveat, diagonal-departure sentence, NEWS entry. Run
-      the M63 **two-way** enumeration sweep — grep the old claim to delete *and* every enumeration to extend.
+- [x] **T6** — Heavy-cell harness (M65-D3, extended to BC11/BC12 at the T5 gate): one seed-pinned `devel/` script
+      runs BC10–BC13 and commits an `.rds` summary; a fast test asserts it **and** re-runs ~10 reps live, ξ1 and
+      the reported SEs both, commenting what the live half misses.
+- [x] **T7** — Docs: roxygen missing-data paragraph, vignette caveat, extended SE caveat, diagonal-departure
+      sentence, NEWS entry; the M63 **two-way** enumeration sweep (claims to delete *and* enumerations to extend).
 - [x] **T8** — Fold reviewer probes into `devel/m64-fiml-probe.R`; full `check(manual = TRUE)`; post-merge hygiene.
 
 ## Work log
@@ -152,6 +149,8 @@ instead of forcing listwise deletion.
 
 - 2026-07-27: **returned by /milestone-review (first return).** Gate failure: CI `ubuntu-latest (release)` on PR #91 failed with 26 errors, all `unknown argument: 'em.h1.iter.max'` from `axes_fiml_h1()` — CI runs **lavaan 0.7-2** where that option does not exist, local runs 0.6.21 where it does, which is why a clean local `check(manual = TRUE)` missed it. Plus two actioned findings from the fan-out: F1 (88) the raised EM cap reaches only the saturated stage, not the structured fit's own h1 EM, whose stall `suppressWarnings()` hides and `axes_converged()` cannot see — global fit indices silently wrong on thinly-covered data (χ² 388.61 reported against 458.80 converged); F3 (83) BC13 has no live coverage at all, the live half runs 5 fits rather than the ~10 M65-D3 and T6 promise, and never reads `components$SE`. Two findings logged below threshold (F2 76 thin-overlap warning fires on small-N complete data; F4 58 dormant descending-range bug in `axes_mar_*` at `n_items == 1`). Blame-history and prior-review lenses both returned no findings. Acceptance criteria unticked: the fix changes the code their evidence came from.
 
+- 2026-07-27: **return fixed** — the CI blocker plus F1 and F3. (1) CI: `axes_fiml_em_args()` now reads the cap's spelling off `lavOptions()` at call time, serving `em.h1.iter.max` (lavaan ≤ 0.6) and `em.h1.args$max_iter` (0.7+) alike, with no DESCRIPTION floor and so no dependency change (M65-D5). Verified the only way it could be: lavaan 0.7-2 installed into a scratch library and the FULL suite run under both versions — 0 failures on each. A local check on 0.6.21 was clean while CI had 26 errors, so running one version is what let this ship. (2) F1: `axes_fit()` gains `...` so the cap reaches the structured fit's own unrestricted-moments EM, and a stall there is detected through `withCallingHandlers()` and refused rather than muffled. Measured on the thin cell the scorer used: reported chi-square/CFI/RMSEA move from the stalled 388.61/0.9596/0.0376 to 458.80/0.9366/0.0476, matching the scorer's converged reference to four decimals. (3) F3: the live half of the T6 harness now runs 3 replicates per MCAR rate — 9 FIML and 9 listwise fits, the "~10 replicates" M65-D3 and T6 promise, against the 5 that shipped — and re-runs the reported SEs on both paths rather than xi1 alone, with a per-replicate assertion that the FIML SE beats listwise; the "what this does NOT re-run" comment now names the calibration ratio as fixture-only. Three cross-version differences surfaced by the 0.7-2 run and fixed on their merits: the M60 re-assertion fixture spreads one hole per row instead of starving a single item to 24 responses (that cell is near-singular, and 0.7's accelerated EM does not converge on it at any cap, so FIML refused it too and the contrast the test exists for vanished); M65-D4's "the default cap would have refused this" probe now asserts stalled on plain-EM lavaan and converged on accelerating lavaan (0.7 defaults to SQUAREM), rather than asserting a 0.6 fact on a 0.7 machine or skipping; and the fixture-reproduction tolerance moves 1e-6 to 1e-4, because 0.7's acceleration stops at a different point inside the same 1e-5 EM tolerance (measured 1.2e-6 relative), still two orders inside BC12's own 0.005 bar. Minor amendment (wording only, no scope change): Tasks compressed by 3 lines to fit M65-D5 under the 150-line cap; T6's line now states that the live half re-runs the SEs. F2 and F4 remain below threshold and unactioned (IP3). Noted and dismissed: on lavaan 0.7 `test-ssm_sem.R:708` draws a new marker-switching warning, but only from a deliberately degenerate 4-variable noise fixture built to be refused — no `ssm_sem()` assertion moves.
+
 ## Decisions
 
 - **M65-D1 (2026-07-26): saturated moments come from lavaan's `h1` EM estimate, not an explicit saturated fit.**
@@ -176,6 +175,12 @@ instead of forcing listwise deletion.
   and converges in 0.23 s at 2000; at 20/300, 0.35 s at 50000; at 25/300, ~50000 and 10.6 s. Healthy 10%-MCAR data is unaffected either way —
   EM exits on tolerance, not the cap. The refusal is retained and matters more, not less: at 25/300 the cap-10000 iterate's covariance sits
   3.93 from the converged answer on unit-variance items. Cost: a genuinely stuck dataset now waits ~11 s to be refused instead of 0.15 s.
+- **M65-D5 (2026-07-27): the EM cap is spelled at run time, reaches BOTH EM sites, and a stall refuses.**
+  lavaan renamed it at 0.7-1 (`em.h1.iter.max` → `em.h1.args$max_iter`) and 0.7 aborts on the old spelling, so
+  `axes_fiml_em_args()` reads `lavOptions()` per call — no lavaan version floor, and so no dependency change. The
+  structured `cfa(missing = "ml")` runs a SECOND unrestricted-moments EM for the saturated loglikelihood; `axes_fit()`
+  gains `...` so the cap reaches it, and a stall there is now detected and REFUSED rather than muffled — estimates and
+  SEs stayed right while χ²/CFI/RMSEA were referenced to a baseline never reached, which is not the smaller error.
 
 ## Review
 

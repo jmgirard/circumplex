@@ -49,6 +49,44 @@
 axes_fiml_em_iter_max <- 50000L
 
 
+# The cap's SPELLING is version-dependent, and getting it wrong is a hard error
+# rather than a silently ignored argument: lavaan renamed this option at 0.7-1,
+# from a top-level `em.h1.iter.max` to a `max_iter` element of a nested
+# `em.h1.args` list, and 0.7 aborts with "unknown argument" on the old name.
+# (The nested spelling did not exist before 0.7, so the mapping is one-to-one in
+# both directions -- lavOptions() carries exactly one of the two names.)
+#
+# Detected at RUN time off lavOptions(), never at build time: lavaan is a
+# Suggests, and a user upgrades it without reinstalling this package, so a
+# choice baked in at install time would be wrong on exactly the machines this
+# guard exists for. If a future lavaan carries NEITHER name, no cap is passed
+# and lavaan's own default applies -- the EM then stalls sooner on thin data and
+# the refusals below fire, which is a conservative failure rather than a wrong
+# number.
+axes_fiml_em_args <- function(cap = axes_fiml_em_iter_max) {
+  opts <- names(lavaan::lavOptions())
+  if ("em.h1.args" %in% opts) {
+    list(em.h1.args = list(max_iter = cap))
+  } else if ("em.h1.iter.max" %in% opts) {
+    list(em.h1.iter.max = cap)
+  } else {
+    list()
+  }
+}
+
+
+# Did this warning report the unrestricted-moments EM hitting its cap? Both
+# lavaan generations word the message differently but both contain the literal
+# "moments using EM" and both name an `em.h1*` option in the remedy, so either
+# substring identifies it. Deliberately NARROW: the structured-fit call site
+# below muffles lavaan's boundary and optimizer warnings too, and matching one
+# of those would turn a converged-but-boundary fit into an EM refusal.
+axes_fiml_em_stalled <- function(w) {
+  msg <- conditionMessage(w)
+  grepl("moments using EM", msg, fixed = TRUE) || grepl("em\\.h1", msg)
+}
+
+
 axes_fiml_h1 <- function(dat) {
   stalled <- FALSE
   # `ordered = character(0)` pins every column as continuous. Ablated rather
@@ -61,16 +99,18 @@ axes_fiml_h1 <- function(dat) {
   # default changes should be a test failure somewhere, not a silent estimand
   # swap here. Stated so a later reader does not credit it with current work.
   fit <- withCallingHandlers(
-    lavaan::lavCor(
-      dat,
-      ordered = character(0),
-      missing = "ml",
-      output = "fit",
-      meanstructure = TRUE,
-      em.h1.iter.max = axes_fiml_em_iter_max
-    ),
+    do.call(lavaan::lavCor, c(
+      list(
+        dat,
+        ordered = character(0),
+        missing = "ml",
+        output = "fit",
+        meanstructure = TRUE
+      ),
+      axes_fiml_em_args()
+    )),
     warning = function(w) {
-      if (grepl("iteration|converg", conditionMessage(w), ignore.case = TRUE)) {
+      if (axes_fiml_em_stalled(w)) {
         stalled <<- TRUE
       }
       invokeRestart("muffleWarning")
