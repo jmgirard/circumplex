@@ -509,11 +509,28 @@ test_that("AC7: the printed caveat drops the SE warning and keeps the fit one", 
   # assertions to delete, so each falsified phrase is pinned as an ABSENCE
   # here. Any of them coming back means the caveat is warning about an error
   # the package no longer has.
+  #
+  # The four below pin the OLD text verbatim, so they catch a revert. They do
+  # NOT catch a REWORDING: the old caveat said "component SEs overstate" while
+  # the new one says "standard errors", so the same false claim written in the
+  # current text's vocabulary would slip past all four (found by the M66
+  # fresh-context guard review, which the author's own mutation testing missed
+  # because a mutation only ever tests the revert). The two verb-stem asserts
+  # after them close that: no wording of "the SEs overstate/understate your
+  # uncertainty" survives either, and neither stem appears anywhere in any
+  # printed note today.
   expect_no_match(out, "component SEs overstate", fixed = TRUE)
-  expect_no_match(out, "order-of-magnitude guidance", fixed = TRUE)
   expect_no_match(out, "they are slightly understated", fixed = TRUE)
   expect_no_match(out, "the standard errors and global fit are approximate",
                   fixed = TRUE)
+  expect_no_match(out, "How approximate depends on the instrument", fixed = TRUE)
+  expect_no_match(out, "overstat", fixed = TRUE)
+  expect_no_match(out, "understat", fixed = TRUE)
+  # Forward-looking rather than a revert guard: "order-of-magnitude guidance"
+  # was never in the PRINTED caveat (it lived only in the roxygen), so this
+  # cannot fail on any reversion of this string. Kept deliberately, and labelled
+  # so, to catch that Rd vocabulary migrating into print.
+  expect_no_match(out, "order-of-magnitude guidance", fixed = TRUE)
 })
 
 
@@ -541,14 +558,34 @@ test_that("AC7: the Rd states the correction and no longer claims otherwise", {
   # same correlation-as-covariance reason as the default path"; both halves of
   # that are now false, since the default path is corrected and so is this one.
   expect_false(grepl("remain approximate for the same", rd, fixed = TRUE))
-  # The residual the correction genuinely does NOT reach is stated instead.
-  expect_match(rd, "uncertainty in the standardization constants", fixed = TRUE)
+  # Every absence assert above needs a POSITIVE partner, or the rule can be
+  # reverted-by-deletion with the guard green. Without the next assert, deleting
+  # the sentence that says the FIML path IS corrected leaves the section silent
+  # on the question, satisfies the absence assert by deletion, and keeps the
+  # following sentence (which the residual assert pins) intact -- an Rd that
+  # claims nothing, with the suite green. Found by the M66 fresh-context guard
+  # review; it was the one true unpaired negative in either guard.
+  expect_match(rd, "carry the same correlation-metric correction as every other path",
+               fixed = TRUE)
+  # The residual the correction genuinely does NOT reach. Pinned with its
+  # PREDICATE, not just the noun phrase: "uncertainty in the standardization
+  # constants" alone stays green if the sentence is inverted to say the
+  # correction now removes it.
+  expect_match(rd,
+               "What the correction does not reach is the uncertainty in the standardization constants",
+               fixed = TRUE)
 
   # The @details block: corrected SEs, and the chi-square explicitly NOT
   # corrected, with RR13 B-1's figures so a reader can check the direction.
   expect_match(rd, "are calibrated uncertainty, not order-of-magnitude",
                fixed = TRUE)
+  # The figures AND the predicate they belong to. The figures alone would stay
+  # green under a rewrite saying the chi-square IS corrected -- the numbers are
+  # the same either way, so they cannot carry the claim by themselves.
   expect_match(rd, "261.1 against 273 degrees of freedom", fixed = TRUE)
+  expect_match(rd,
+               "global chi-square carries the same approximation in the other direction and is \\strong{not} corrected",
+               fixed = TRUE)
   # `fixed = TRUE` takes the string literally, so it must NOT carry regex
   # escapes -- "details\\$se_uncorrected" would look for a literal backslash
   # and fail against a page that says exactly the right thing (the M57 lesson,
