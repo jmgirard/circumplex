@@ -1,6 +1,6 @@
 # M64: FIML on items for `axes_reliability()` — the estimator-metric question
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -52,13 +52,13 @@ grounds.
       0.9 / 3.6 / 2.8%), which is the discriminating bound since materially
       disagreeing routes would sit about one SE apart — and the deletion-cost
       shares (p = 64 → 0.53 / 0.27 / 0.038 complete cases at 1 / 2 / 5%).
-- [ ] **AC2** `cairn/reviews/RB12-*.md` is self-contained: it states the
+- [ ] **AC2** `cairn/reviews/archive/RB12-*.md` is self-contained: it states the
       question, all four AC1 findings with the command producing each, the
       three design positions fixed at this gate, and what a verdict must decide
       — the metric, what the reported components mean under FIML, and whether
       the FIML-consistent correlation matrix is the right input for the OLS
       cross-check (`axes_ols_shadow()`) and the positive-definiteness refusal.
-- [ ] **AC3** `cairn/reviews/RR12-*.md` is committed and ingested per
+- [ ] **AC3** `cairn/reviews/archive/RR12-*.md` is committed and ingested per
       `/milestone-brief`'s protocol, with every recommendation carrying a
       disposition (apply / consider / reject) and a reason in this file's
       Decisions section.
@@ -86,12 +86,12 @@ grounds.
       printing the figure AC1 quotes. Fix probe 1's dead `pe$free` filter
       (`parameterEstimates()` has no `free` column, so the intercept count read
       0 — the LESSONS (f) family) by counting `coef()` names.
-- [ ] **T2** — Author RB12 via `/milestone-brief` from T1's output, carrying the
+- [x] **T2** — Author RB12 via `/milestone-brief` from T1's output, carrying the
       four findings, the three fixed positions, and the verdict questions in
       AC2. Note for the brief: `ssm_sem()` already exports
       `missing = c("listwise", "fiml")` (`R/ssm_sem.R:1303`), so the argument
       spelling is precedent, not a proposal.
-- [ ] **T3** — Ingest RR12: disposition every recommendation, and record the
+- [x] **T3** — Ingest RR12: disposition every recommendation, and record the
       binding criteria verbatim for the build to ingest.
 - [ ] **T4** — Author the GO/NO-GO D-entry; update the ROADMAP per AC5 and
       graduate FIML off the axes-reliability extensions row.
@@ -105,6 +105,19 @@ grounds.
 
 - 2026-07-26: status in-progress→**blocked** on RB12 (`cairn/reviews/RB12-axes-reliability-fiml-metric.md`), nine questions: the metric under FIML, the complete-data implied-diagonal departure, the saturated mean structure's effect on ξ1's SE, one-stage vs two-stage, the OLS-shadow/PD-refusal input, N–B and `sd = "raw"`, the FIML refusal set and the `"Complete N:"` label, the evidence bar, GO/NO-GO. Committed on the milestone branch rather than master: M64's whole deliverable is this RB/RR pair, so splitting it off would fragment the branch T1 already sits on.
 
+- 2026-07-26: T2+T3 done. RB12 spawned to Fable at Jeff's gate; RR12 returned **GO under BC1–BC16** and is ingested — eight decisions recorded above, every recommendation triaged, pair archived. The review overturned the plan's standardization (available-case `scale()` is MAR-dishonest, measured ≈1 SE) while confirming one-stage FIML, closed question 2 without a spin-out, and strengthened the N–B ruling. One RR12 evidence note corrected against an independent re-run (M64-D6). Status blocked→in-progress.
+
+- 2026-07-26: minor amendment — AC2/AC3 now name `cairn/reviews/archive/`, since the brief protocol archives the RB/RR pair at ingestion and the plan-time paths would have pointed review at files that no longer sit there. No change to what either criterion verifies.
+
 ## Decisions
+
+- **M64-D1 (2026-07-26, RR12 §1) — the metric is FIML, not available-case.** RR12 confirms one-stage FIML and **overturns the standardization** the plan submitted with it: available-case `scale()` is MCAR-honest but MAR-dishonest, because the standardized columns carry `k_i·k_j·ρ_ij` and the model has no free off-diagonal per-item parameter to absorb it. Measured under mechanism M2: +0.0167 above the FIML-metric estimate (paired SE 0.0006), ≈1 SE at N = 600, while the two metric-correct routes agree to +0.0008. The build standardizes by saturated-FIML (EM) moments with a `sqrt(N_used/(N_used − 1))` convention that reproduces `scale()` exactly on complete data.
+- **M64-D2 (2026-07-26, RR12 §4) — one-stage only.** Two-stage R̂ is internal machinery; its SEs and χ² never surface. `sample.nobs = N_total` overstates information, and no scalar effective N repairs it (the loss is parameter- and pattern-specific). F4's near-equal SEs are an artifact of mild missingness and must not be cited as validating the convention (RR12 B-2).
+- **M64-D3 (2026-07-26, RR12 §2) — the complete-data diagonal departure is not a defect.** Expected restricted-ML behavior, verified at the stationarity condition (weighted diagonal 8.0e-07 against a raw 0.0448) and vanishing on the population (2.95e-13, ξ1 recovered exactly). No correction milestone; M64's question 2 is closed rather than spun out.
+- **M64-D4 (2026-07-26, RR12 §6) — N–B and `sd = "raw"` stay unavailable-with-reason,** and the brief's premise is corrected in the strengthening direction: `cronbach_alpha()` runs on **raw** scores, so an R̂ reconstruction would silently swap covariance alpha for standardized alpha under the same column name — the swap RR09 rec. 4 exists to prevent.
+- **M64-D5 (2026-07-26) — BC1–BC16 bind the BUILD, not M64.** M64 ships no code, so its header keeps `Driving RR: —`; the archived RR12 `## Binding criteria` section is the single authority, and the build sets `Driving RR: RR12` and ingests all sixteen verbatim. T3's "record for the build to ingest" is discharged by that pointer, not by copying the criteria here — a second copy is a drift vector, and `cairn_validate`'s string-compare exists to keep one.
+- **M64-D6 (2026-07-26) — correction to RR12's V-F evidence note, verified independently.** RR12 says lavaan fabricates a never-jointly-observed moment "silently … no error and no warning". It does fabricate it (independently reproduced: r(1,4) = 0 against a population 0.3475), but lavaan 0.6.21 **does** warn ("some pairwise combinations have zero coverage … use `lavInspect(fit, \"coverage\")`"). The finding stands and BC7(iii) is unchanged, because `axes_reliability()` fits inside `suppressWarnings()` (`R/axes_reliability.R:1069`), making it silent *in this function*. Two consequences for the build: use `lavInspect(fit, "coverage")` as the coverage source for BC7(iii)/BC8 rather than hand-rolling one, and do not restate RR12's "no warning" wording. RR12 itself is history and stays unedited (IP4).
+- **M64-D7 (2026-07-26) — recommendation triage.** Apply: recs 1–7 (all sixteen BCs, via the build). Consider, each routed: fold the M1/M2 reviewer probes into a committed probe → the build, whose BC11/BC12 tests must implement them anyway (a devel/ duplicate would be a second record; RR12 states both mechanisms with seeds inline, so its evidence is already reproducible); a soft minimum-coverage warning threshold → build's discretion, BC8 already binds *reporting* it; one doc sentence on the finite-sample diagonal departure → build's discretion; planned-missingness support (B-4) and lavaan `missing = "two.stage"` → one candidate row at T4. Reject: all four of rec. 9's rejections stand as RR12 states them, and none contradicts a standing entry — D-026's equal-errors rejection generalizes to the determined-errors constraint, and RR09 BC13 is upheld (R̂ is a saturated FIML estimate, not a pairwise matrix).
+- **M64-D8 (2026-07-26) — cost flagged for the build, not a deviation.** BC10 and BC13 ask ≥ 200 replicates per cell, i.e. several hundred FIML fits on 24 items. That will not fit an ordinary `devtools::test()` run; the build must solve it (a `devel/` oracle run with committed results, or `skip_on_cran`), and raise a "Deviations from RR12" row only if it cannot meet the replicate count at all.
 
 ## Review
