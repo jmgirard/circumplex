@@ -2,7 +2,7 @@
 
 - **Status:** blocked
 - **Priority:** high
-- **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54
+- **Depends on:** M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55
 - **Branch/PR:** `m7-v2-release-prep` / [PR #64](https://github.com/jmgirard/circumplex/pull/64)
 
 ## Goal
@@ -161,6 +161,7 @@ complete and validated (D-008).
 
 - 2026-07-19: **ordering constraint added by M39, no status change — M7 stays `blocked`.** M39 (amplitude-label backdrop) documents its change in *this* release's NEWS at Jeff's gate choice, so the v2.0.0 tarball must contain it: **M39 merges before T4 runs `submit_cran()`**, or the submission would omit code its own NEWS describes. Jeff confirmed the tarball is not yet submitted and that M7 should stay parked meanwhile, so nothing is in conflict — the sequence is M39 merges, then M7 unblocks and ships. Recorded here because a later session reading M7 alone would otherwise not know T4 has a predecessor.
 - 2026-07-20: reconciliation (/milestone) — M39 is merged to master (PR #65, `d55d9252`; done and pruned from the ROADMAP table), so the ordering constraint the 2026-07-19 entry recorded is now satisfied. M7 is blocked **solely** on T4/AC4, the `submit_cran()` handoff only Jeff can perform. No status change (stays `blocked`); no task change.
+- 2026-07-27: mirror catch-up (/milestone audit) — this header's `Depends on:` gains **M55** (axes-reliability vignette), which the ROADMAP row has carried since `a90c7eec plan M55` while the header was never synced. ROADMAP wins mirror conflicts, so the header takes it; M55 is `done`, so the dependency set resolves exactly as before. Bookkeeping only: no status change, no task change, no release-prep change, and the 14-day work clock is untouched.
 
 ## Decisions
 

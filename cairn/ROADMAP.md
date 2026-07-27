@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-27 (M65 post-merge. All 16 checks PASS; M65 archived and its live file deleted; 6 terminal rows pruned to 5 by dropping M60. LESSONS gained M65's cross-version-dependency lesson and a (j) clause on comparisons that cannot fail, and shed two: the M38 vdiffr-blindness line retired by ownership into 7(c), and a generic Rscript hazard that failed the inflow test.)_
+_Last hygiene check: 2026-07-27 (audit pass, post-M65. All 16 checks PASS; both GitHub inboxes empty. One drift fixed: M7's header `Depends on:` gained M55, which this table has carried since M55 was planned while the header went unsynced.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
