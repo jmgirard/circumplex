@@ -1047,3 +1047,49 @@ implied-diagonal departure RB12 flagged is closed as expected restricted-ML
 behavior rather than a defect, verified at the stationarity condition (M64-D3) —
 no correction milestone. D-001/D-008/D-018/D-025/D-026/D-030/D-031/D-032 lineage
 extended; none other superseded. Source: RR12 (Fable, 2026-07-26); M64 T4.
+
+### D-034 (2026-07-26): three corrections to D-033's record of the FIML GO — annotates D-033, changes no decision (M64 review)
+
+**Context:** M64's own review found three factual defects inside D-033.
+`DECISIONS.md` is append-only history (IP4), so the entry is annotated here
+rather than edited. **No decision changes:** D-033's GO, its narrow D-001
+supersession, its takeup of D-026's FIML deferral, and BC1–BC16 binding the
+build all stand exactly as recorded.
+**Correction 1 — the reversal that did not happen (review F3).** D-033 says the
+metric holding "overturns the position M64 put to review", and M64-D1 says it
+overturns "the standardization the plan submitted with it". Neither is right.
+M64's Scope names available-case z-standardization as "the one question this
+session cannot settle" — an open question, not a position — and RB12's Q1 asks
+it neutrally. The three positions M64 **did** fix were each **confirmed**:
+one-stage FIML through `sem_fit_cfa` (RR12 §4), N–B and `sd = "raw"` reported
+unavailable (§6), and a synthetic bar carrying a non-MCAR cell (§8, which
+augmented the bar rather than overturning it). The accurate statement is that
+RR12 **answered M64's open question** and, in answering it, ruled out the
+mechanism the shipped code path happens to use. Identical consequence for the
+build; a materially different answer to "how much of M64's own judgment survived
+review", which is what a later session would come here to ask.
+**Correction 2 — `sd = "raw"` is a hard error, not an NA (review F4).** D-033's
+summary and the first ROADMAP build row lumped `sd = "raw"` together with
+`nb_reliability` as "unavailable-with-reason". RR12 §6's Ruling and **BC9** set
+two *different* contracts: `nb_reliability` becomes NA with `nb_reason` gaining
+`"fiml"`, while `sd = "raw"` must be **refused with an informative error**
+naming `"std"` and numeric SDs as the alternatives. BC9's verbatim text governs
+the build; the ROADMAP row is corrected in place (current knowledge).
+**Correction 3 — line anchor (review F5).** The vignette sentence "address the
+missingness before interpreting the estimate" is at
+`vignettes/axes-reliability.Rmd:157`; D-033 cites `:156`, which ends
+"…discards a large share of". BC16 requires rewriting that paragraph, so the
+anchor is load-bearing. The M43/M57 off-by-one anchor family, recurring.
+**Also recorded, not a correction to D-033 (review F1, F8).** RB12 asserts the
+committed probe "reproduces every figure quoted in this brief" and quotes
+"|mean| ≤ 6e-17, |SD − 1| ≤ 9e-16" for available-case `scale()`. The check was
+missing from the script and has been added (its new F5 section), but the quoted
+**mean** bound is seed-specific and does not reproduce: the committed script
+measures 7.76e-17 / 7.62e-17 / 7.9e-17 at 2/5/10% per-item MCAR. The SD bound
+does reproduce (6.66e-16 to 8.88e-16). Both are machine precision and nothing
+substantive turns on it — the claim RB12 rests on that figure, that `scale()`
+standardizes exactly for the available cases, holds. It is the M59/M61 lesson
+("a tolerance calibrated on one run is not a tolerance") recurring for the
+second time inside this milestone, the first being AC1's own amended bound.
+RB12's pasted transcript also omits one `message()` line the script emits
+(F8). IP4 leaves both in place. Source: M64 review, findings F1/F3/F4/F5/F8.

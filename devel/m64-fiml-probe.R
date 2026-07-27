@@ -184,3 +184,32 @@ for (r in c(0.02, 0.05, 0.10)) {
 cat("\nEstimates are printed as est (SE). Listwise SE inflates as deletion\n",
     "bites while both FIML SEs hold; the two FIML routes track each other to\n",
     "a small fraction of one SE.\n", sep = "")
+
+# ==============================================================================
+# FINDING 5 — what base::scale() does to an NA-containing matrix
+# ==============================================================================
+# Added 2026-07-26 at the M64 review (finding F1). RB12 quotes a figure for this
+# ("|mean| <= 6e-17, |SD - 1| <= 9e-16") and asserts this script reproduces
+# every figure it quotes, but the check lived only in a plan-gate scratchpad
+# probe and did not survive consolidation. RB12 is archived history and cannot
+# be edited, so the check is added here instead, which makes the archived claim
+# true rather than restating it.
+#
+# The point: scale() centers and scales COLUMN-WISE with na.rm, so on incomplete
+# data each column's AVAILABLE-CASE mean is 0 and SD is 1 to machine precision.
+# That is exactly why the construction looks harmless and exactly why RR12 sec. 1
+# rejects it -- available-case moments are consistent only under MCAR, and the
+# machine-precision agreement below says nothing about which population those
+# moments estimate.
+rule("F5: scale() on an NA matrix = available-case standardization")
+for (r in c(0.02, 0.05, 0.10)) {
+  z <- scale(mcar(mat, r, seed = 100 + r * 100))
+  cat(sprintf(
+    "%3.0f%% per-item MCAR: max |column mean| = %.3g, max |column SD - 1| = %.3g\n",
+    r * 100, max(abs(colMeans(z, na.rm = TRUE))),
+    max(abs(apply(z, 2, stats::sd, na.rm = TRUE) - 1))
+  ))
+}
+cat("Machine precision on both, at every rate -- the standardization is exact\n",
+    "for the available cases and silent about whether those are the right\n",
+    "moments (RR12 sec. 1).\n", sep = "")

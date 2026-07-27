@@ -1,6 +1,6 @@
 # M64: FIML on items for `axes_reliability()` — the estimator-metric question
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -53,11 +53,16 @@ grounds.
       disagreeing routes would sit about one SE apart — and the deletion-cost
       shares (p = 64 → 0.53 / 0.27 / 0.038 complete cases at 1 / 2 / 5%).
 - [ ] **AC2** `cairn/reviews/archive/RB12-*.md` is self-contained: it states the
-      question, all four AC1 findings with the command producing each, the
-      three design positions fixed at this gate, and what a verdict must decide
-      — the metric, what the reported components mean under FIML, and whether
-      the FIML-consistent correlation matrix is the right input for the OLS
-      cross-check (`axes_ols_shadow()`) and the positive-definiteness refusal.
+      question, all four AC1 findings with the command producing each, and the
+      three verdict questions — the metric, what the reported components mean
+      under FIML, and whether the FIML-consistent correlation matrix is the
+      right input for the OLS cross-check (`axes_ols_shadow()`) and the
+      positive-definiteness refusal. Of the three design positions fixed at
+      this gate it states **two** as the milestone's (N–B and `sd = "raw"`
+      unavailable-with-reason; the synthetic bar's non-MCAR cell) and puts the
+      third — one-stage versus two-stage — as an **open** question, left
+      deliberately unanchored, which is why RR12 §4's one-stage answer is
+      independent evidence rather than an echo.
 - [x] **AC3** `cairn/reviews/archive/RR12-*.md` is committed and ingested per
       `/milestone-brief`'s protocol, with every recommendation carrying a
       disposition (apply / consider / reject) and a reason in this file's
@@ -115,6 +120,12 @@ grounds.
 
 - 2026-07-26: status review→**in-progress** (/milestone-review). **AC2 fails as written**: RB12 states two of the three design positions the Scope fixed — Q6 and Q8 name theirs as the milestone's, but one-stage FIML appears nowhere as a fixed position, Q4 having asked the route openly. RB12 is archived history (IP4), so the criterion cannot be satisfied by editing it and is not reinterpreted; it needs a gated amendment. AC1/AC3/AC4/AC5 verified and ticked. Gate otherwise clean: `cairn_validate` exit 0 (15 PASS), `check(manual = TRUE)` Status OK 0/0/0 with both step lines verified by name, `document()` no diff, pkgdown clean. Four findings actioned (F6 87, F7 85, F2 82, F1 80), three fixed anyway below the bar (F4 63, F5 78, F3 68), one logged (F8 65). First return; thrash count 1 of 3.
 
+- 2026-07-26: review findings applied. F1: the available-case `scale()` check is added to `devel/m64-fiml-probe.R` as a new F5 section, which makes RB12's claim auditable — though the measurement shows RB12's quoted `|mean| <= 6e-17` is itself seed-specific and does not reproduce (7.76e-17 / 7.62e-17 / 7.9e-17 at 2/5/10%; its SD bound does reproduce), the M59/M61 lesson recurring for the second time in this milestone. F3/F4/F5 corrected by appended **D-034** (annotates D-033, changes no decision) and locally by M64-D9; the ROADMAP build row's `sd = "raw"` contract corrected in place. F8 left standing under IP4, recorded in D-034.
+- 2026-07-26: corrections to two earlier work-log lines in this file, appended rather than edited (D-045/IP4 — work logs are history). **Review F6:** the 2026-07-26 status→review line says "four commits over five files"; the branch was **six** files at that point (`DECISIONS.md`, `ROADMAP.md`, this file, RB12, RR12, `devel/m64-fiml-probe.R`) — the same commit that wrote the line is what added the sixth. **Review F7:** the AC1 amendment line says "~14× headroom"; the correct figures are **20×** for the 5%-of-an-SE bound and **~28×** for the largest measurement (3.6%), against the one-SE disagreement the bound rules out. No arithmetic on the stated numbers yields 14×, and the amendment's justification is stronger than it claimed, not weaker.
+
+- 2026-07-26: **AC2 AMENDED (gated)** — the criterion required RB12 to state all three design positions fixed at this gate and RB12 states two, which failed review (F2). Amended at Jeff's gate choice (option A of three) to describe the artifact accurately: two positions stated as the milestone's, the one-stage/two-stage question left deliberately open, and the reason that framing is a property rather than a gap — RR12 §4's one-stage answer is independent evidence, not an echo of ours. RB12 is archived history so the artifact was never a candidate for editing. Second gated amendment in this milestone (AC1 at T1, AC2 here); both were criteria written more tightly than the evidence supported.
+- 2026-07-26: status in-progress→review (/milestone-implement), second pass. All eight review findings dispositioned: F1 fixed in the probe, F3/F4/F5 by D-034 + M64-D9 + the in-place ROADMAP correction, F6/F7 by appended work-log corrections, F2 by this AC2 amendment, F8 left standing under IP4 and recorded. Still no package surface touched.
+
 ## Decisions
 
 - **M64-D1 (2026-07-26, RR12 §1) — the metric is FIML, not available-case.** RR12 confirms one-stage FIML and **overturns the standardization** the plan submitted with it: available-case `scale()` is MCAR-honest but MAR-dishonest, because the standardized columns carry `k_i·k_j·ρ_ij` and the model has no free off-diagonal per-item parameter to absorb it. Measured under mechanism M2: +0.0167 above the FIML-metric estimate (paired SE 0.0006), ≈1 SE at N = 600, while the two metric-correct routes agree to +0.0008. The build standardizes by saturated-FIML (EM) moments with a `sqrt(N_used/(N_used − 1))` convention that reproduces `scale()` exactly on complete data.
@@ -125,6 +136,8 @@ grounds.
 - **M64-D6 (2026-07-26) — correction to RR12's V-F evidence note, verified independently.** RR12 says lavaan fabricates a never-jointly-observed moment "silently … no error and no warning". It does fabricate it (independently reproduced: r(1,4) = 0 against a population 0.3475), but lavaan 0.6.21 **does** warn ("some pairwise combinations have zero coverage … use `lavInspect(fit, \"coverage\")`"). The finding stands and BC7(iii) is unchanged, because `axes_reliability()` fits inside `suppressWarnings()` (`R/axes_reliability.R:1069`), making it silent *in this function*. Two consequences for the build: use `lavInspect(fit, "coverage")` as the coverage source for BC7(iii)/BC8 rather than hand-rolling one, and do not restate RR12's "no warning" wording. RR12 itself is history and stays unedited (IP4).
 - **M64-D7 (2026-07-26) — recommendation triage.** Apply: recs 1–7 (all sixteen BCs, via the build). Consider, each routed: fold the M1/M2 reviewer probes into a committed probe → the build, whose BC11/BC12 tests must implement them anyway (a devel/ duplicate would be a second record; RR12 states both mechanisms with seeds inline, so its evidence is already reproducible); a soft minimum-coverage warning threshold → build's discretion, BC8 already binds *reporting* it; one doc sentence on the finite-sample diagonal departure → build's discretion; planned-missingness support (B-4) and lavaan `missing = "two.stage"` → one candidate row at T4. Reject: all four of rec. 9's rejections stand as RR12 states them, and none contradicts a standing entry — D-026's equal-errors rejection generalizes to the determined-errors constraint, and RR09 BC13 is upheld (R̂ is a saturated FIML estimate, not a pairwise matrix).
 - **M64-D8 (2026-07-26) — cost flagged for the build, not a deviation.** BC10 and BC13 ask ≥ 200 replicates per cell, i.e. several hundred FIML fits on 24 items. That will not fit an ordinary `devtools::test()` run; the build must solve it (a `devel/` oracle run with committed results, or `skip_on_cran`), and raise a "Deviations from RR12" row only if it cannot meet the replicate count at all.
+
+- **M64-D9 (2026-07-26, M64 review) — corrections to M64-D1 and M64-D4; see D-034.** M64-D1's "overturns the standardization the plan submitted with it" is wrong (review F3): the Scope named that standardization as the OPEN question, and all three positions this milestone actually fixed were confirmed by RR12 §4/§6/§8. Read M64-D1 as "RR12 answered M64's open question and thereby ruled out the mechanism the shipped path uses". M64-D4's "unavailable-with-reason" wrongly covers both withheld quantities (review F4): BC9 makes `nb_reliability` an NA-with-reason and `sd = "raw"` a hard informative error. Both entries stay as written — the Decisions section is append-only — and D-034 carries the full corrections plus the two items IP4 leaves standing in RB12 (its non-reproducible mean bound, its non-verbatim transcript).
 
 ## Review
 
