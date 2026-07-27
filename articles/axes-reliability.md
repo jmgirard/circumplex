@@ -18,12 +18,13 @@ the instrument measures each axis.
 [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
 answers that question with the estimator of Strack, Jacobs, and Grosse
 Holtforth (2013). It fits an item-level measurement model that
-decomposes each item’s variance into four pieces — a general factor
-common to all items, the two circumplex **axes**, a scale-specificity
-component, and item error — and reads axis reliability off the **axes**
-component alone. Reliability is then the Spearman–Brown “list-length”
-reliability of a composite of that length built from items that share
-only their axes variance.
+decomposes each item’s variance into orthogonal pieces — a general
+factor common to all items, the two circumplex **axes**, a
+scale-specificity component, item error, and, for an instrument
+administered in blocks, a block-specificity component — and reads axis
+reliability off the **axes** component alone. Reliability is then the
+Spearman–Brown “list-length” reliability of a composite of that length
+built from items that share only their axes variance.
 
 This is a different question from the other reliability-adjacent tools
 in the package.
@@ -44,8 +45,9 @@ eight octant scales, in the order that
 [`octants()`](http://circumplex.jmgirard.com/reference/octants.md)
 returns. The items were drawn from a five-component population (a
 general factor, two equal axes with axes variance .18, a shared
-scale-specificity component of .10, and free item error) that implies an
-axis reliability of about .78.
+scale-specificity component of .10, no block specificity — the
+instrument is not blockwise, so that component is zero here — and free
+item error) that implies an axis reliability of about .78.
 
 [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
 needs three things: the data, a map from items to scales, and the
@@ -145,14 +147,15 @@ summary(res)
 
 The **variance components** show the decomposition the reliability rests
 on: the `axes` component is the only one that feeds reliability, while
-`general`, `scale_specificity`, and item error are isolated from it.
-This is precisely why the Nunnally–Bernstein figure printed alongside
-runs **higher** than the Strack reliability: N–B charges
-scale-specificity variance to the axis rather than isolating it, so it
-**overestimates** axis reliability whenever scale specificity is
-non-trivial (Strack et al., 2013, Figure 3). The gap between the two
-numbers is a direct read-out of how much scale-specific variance the
-simpler formula would have miscredited to the axes.
+`general`, `scale_specificity`, `block_specificity` (when blocks were
+supplied), and item error are isolated from it. This is precisely why
+the Nunnally–Bernstein figure printed alongside runs **higher** than the
+Strack reliability: N–B charges scale-specificity variance to the axis
+rather than isolating it, so it **overestimates** axis reliability
+whenever scale specificity is non-trivial (Strack et al., 2013, Figure
+3). The gap between the two numbers is a direct read-out of how much
+scale-specific variance the simpler formula would have miscredited to
+the axes.
 
 ## 4. Starting from a published correlation matrix
 
@@ -234,15 +237,46 @@ than a clipped, negative, or missing number. An `NA` here is a signal
 that the model did not identify a usable axes-variance component in your
 data — not a defect to be worked around.
 
-**A blockwise instrument’s block variance has nowhere to go.** Some
-circumplex instruments are administered in blocks — items grouped by
-something other than their scale — which contributes a block-specificity
-component of its own. This model has no such component, and the
-package’s instrument objects carry no block structure, so that variance
-is folded into the general and scale-specificity components instead,
-inflating them and deflating the share credited to the axes. Strack et
-al. (2013, Table 3) report block-specificity as high as 6.7%, so read
-axes reliability from a blockwise instrument as approximate.
+**A blockwise instrument needs its blocks declared.** Some circumplex
+instruments are administered in blocks — items grouped by something
+other than their scale — which carries a block-specificity component of
+its own, reported as high as 6.7% by Strack et al. (2013, Table 3). Pass
+`blocks` (a list of item columns, one element per block, exactly as
+`items` is a list per scale) and that component is estimated too: the
+component table gains a `zeta2` row and `details$zeta2_fitted` is
+`TRUE`. Nothing in the bundled instrument objects records block
+membership, so the map has to come from you.
+
+The component is only estimable when the blocks say something the model
+does not already know. Blocks that coincide with the scales, a single
+block holding every item, or one block per item all leave `zeta2`
+unidentified, and it is dropped with `details$zeta2_fitted` set to
+`FALSE` — the same treatment scale specificity gets on a single-item
+instrument.
+
+What it costs to *ignore* real blocks depends on their geometry. The
+general factor never hands block variance back, so `xi2` is inflated
+under most layouts and unchanged under a few — never deflated. The axes
+variance, the quantity reliability is actually read from, moves only
+when block membership carries information about the *angular distance*
+between items, beyond what sharing a scale already tells you.
+
+One case is clean enough to rely on: when **each block draws exactly one
+item from every scale**, every within-block pair is a different-scale
+pair and the blocks cover every pair of scale positions equally often.
+Membership then says nothing about angular distance, and `xi1`, the
+reliability, and the SEm are untouched — worth estimating for its own
+sake, but costless to omit.
+
+Elsewhere, be careful: *“the blocks are spread evenly around the circle”
+is not the test.* Blocks pairing diametrically opposite scales are as
+evenly spread as blocks get — their angles average to the centre of the
+circle — and at eight scales they still pull `xi1` about 9% *below*
+truth, because every within-block pair sits exactly half a turn apart,
+which is very much information about angular distance. Blocks covering
+contiguous arcs pull about 12% the other way. Unless each block takes
+one item per scale, estimate the component rather than reasoning about
+the picture.
 
 Finally, a note on the `SEm`. The standard error of measurement supports
 a location interval for a single profile (Strack et al., 2013, use

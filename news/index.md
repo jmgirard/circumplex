@@ -216,15 +216,32 @@ on a real ggplot2 coordinate system.
   coefficient alpha is undefined for a one-item scale, the
   Nunnally-Bernstein comparison is reported as `NA` with a stated reason
   whenever any scale has fewer than two items — as Strack et
-  al. themselves do, leaving it blank for such instruments. Estimation
-  works either from raw item data or, through `cormat` and `n`, from a
-  published item correlation matrix alone, for reanalyzing a matrix
-  whose raw data is not available; on that path the Nunnally-Bernstein
-  comparison is reported as `NA` and `sd = "raw"` is refused, since both
-  need the respondents’ own item scores. Missing data are handled by
-  listwise deletion; a boundary fit returns `NA` reliability rather than
-  a clipped value; and the returned `circumplex_axes_reliability` object
-  has [`print()`](https://rdrr.io/r/base/print.html) and
+  al. themselves do, leaving it blank for such instruments. Blockwise
+  instruments — those administering items in blocks cutting across the
+  scales — are supported through a `blocks` argument taking a list of
+  item columns, one element per block, which adds Strack’s
+  block-specificity component to the model and a `zeta2` row to the
+  components table. Blocks that carry no information the model lacks
+  (blocks that coincide with the scales, one block for everything, or
+  one block per item) leave the component unidentified, and it is
+  dropped with `details$zeta2_fitted` recording that, as scale
+  specificity is on a single-item instrument. Whether ignoring real
+  blocks matters depends on their geometry: the general factor is
+  inflated under most layouts and never deflated, while the axes
+  variance — and so the reliability — moves only when block membership
+  carries information about the angular distance between items. When
+  each block draws exactly one item from every scale it carries none,
+  and the reliability is unaffected; other layouts bias it in either
+  direction, and being evenly spread around the circle is not sufficient
+  for safety. Estimation works either from raw item data or, through
+  `cormat` and `n`, from a published item correlation matrix alone, for
+  reanalyzing a matrix whose raw data is not available; on that path the
+  Nunnally-Bernstein comparison is reported as `NA` and `sd = "raw"` is
+  refused, since both need the respondents’ own item scores. Missing
+  data are handled by listwise deletion; a boundary fit returns `NA`
+  reliability rather than a clipped value; and the returned
+  `circumplex_axes_reliability` object has
+  [`print()`](https://rdrr.io/r/base/print.html) and
   [`summary()`](https://rdrr.io/r/base/summary.html) methods. A bundled
   simulated dataset, `simulated_items`, is included for the examples.
 

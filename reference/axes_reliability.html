@@ -3,15 +3,17 @@
 circumplex axes of an instrument with the item-level restricted
 tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The model
 decomposes each item's variance into orthogonal components – a general
-factor, the two circumplex axes, scale specificity, and item specificity –
-and reads the axes' reliability off the isolated axes-variance component with
+factor, the two circumplex axes, scale specificity, block specificity for a
+blockwise instrument, and item specificity – and reads the axes'
+reliability off the isolated axes-variance component with
 the Spearman-Brown formula. It is a confirmatory, item-level complement to
 fit_structure()'s exploratory scale-level criteria."><meta property="og:description" content="Estimate the reliability (and standard error of measurement) of the two
 circumplex axes of an instrument with the item-level restricted
 tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The model
 decomposes each item's variance into orthogonal components – a general
-factor, the two circumplex axes, scale specificity, and item specificity –
-and reads the axes' reliability off the isolated axes-variance component with
+factor, the two circumplex axes, scale specificity, block specificity for a
+blockwise instrument, and item specificity – and reads the axes'
+reliability off the isolated axes-variance component with
 the Spearman-Brown formula. It is a confirmatory, item-level complement to
 fit_structure()'s exploratory scale-level criteria."><meta property="og:image" content="http://circumplex.jmgirard.com/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -79,8 +81,9 @@ fit_structure()'s exploratory scale-level criteria."><meta property="og:image" c
 circumplex axes of an instrument with the item-level restricted
 tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The model
 decomposes each item's variance into orthogonal components – a general
-factor, the two circumplex axes, scale specificity, and item specificity –
-and reads the axes' reliability off the isolated axes-variance component with
+factor, the two circumplex axes, scale specificity, block specificity for a
+blockwise instrument, and item specificity – and reads the axes'
+reliability off the isolated axes-variance component with
 the Spearman-Brown formula. It is a confirmatory, item-level complement to
 <code><a href="fit_structure.html">fit_structure()</a></code>'s exploratory scale-level criteria.</p>
     </div>
@@ -94,6 +97,7 @@ the Spearman-Brown formula. It is a confirmatory, item-level complement to
 <span>  instrument <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cormat <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  blocks <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sd <span class="op">=</span> <span class="st">"std"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -140,6 +144,15 @@ correlation matrix was computed from. Required with <code>cormat</code>, and not
 accepted with <code>data</code> (which carries its own).</p></dd>
 
 
+<dt id="arg-blocks">blocks<a class="anchor" aria-label="anchor" href="#arg-blocks"></a></dt>
+<dd><p>Optional. For a <strong>blockwise</strong> instrument, a list with one
+element per administration block, each a character vector (or numeric
+indices) of that block's item columns – the same shape <code>items</code> takes for
+scales. The blocks must partition the items: every item in exactly one
+block. Supplying them adds the block-specificity component to the model;
+see "Blockwise instruments" below.</p></dd>
+
+
 <dt id="arg-sd">sd<a class="anchor" aria-label="anchor" href="#arg-sd"></a></dt>
 <dd><p>The scale for the standard error of measurement: <code>"std"</code> (the
 default) reports the z-standardized SEm <code>sqrt(1 - reliability)</code>; <code>"raw"</code>
@@ -154,19 +167,24 @@ carried into the reported SEm.</p></dd>
     <p>An object of class <code>circumplex_axes_reliability</code> with <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> and
 <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> methods: <code>results</code> (one row per axis: the axes variance, item_n,
 reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
-<code>components</code> (the estimated variance components with SEs – four rows, or
-three when scale specificity was dropped), <code>fit</code> (global fit indices), and
-<code>details</code> (including <code>zeta1_fitted</code>, whether scale specificity was in the
-model, and <code>nb_reason</code>, why the Nunnally-Bernstein comparison is <code>NA</code>).</p>
+<code>components</code> (the estimated variance components with SEs – four rows by
+default, three when scale specificity was dropped, five when block
+specificity was fitted), <code>fit</code> (global fit indices), and <code>details</code>
+(including <code>zeta1_fitted</code> and <code>zeta2_fitted</code>, whether scale and block
+specificity were in the model, <code>blocks</code>, the block labels when a block map
+was supplied, and <code>nb_reason</code>, why the Nunnally-Bernstein comparison is
+<code>NA</code>).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The model is fit to the item <strong>correlation</strong> matrix (the items are
 z-standardized) as a flat fixed-links CFA: every item loads on the two axes
-with fixed cosine weights, on a general factor with weight one, and on its
-scale's specificity factor with weight one; the two axis variances are held
-equal (the circumplex "no preferred rotation" axiom) and every
-scale-specificity variance shares one value, while item errors stay free
+with fixed cosine weights, on a general factor with weight one, on its
+scale's specificity factor with weight one, and – when <code>blocks</code> are supplied
+and identified – on its block's specificity factor with weight one; the two
+axis variances are held equal (the circumplex "no preferred rotation" axiom),
+every scale-specificity variance shares one value and every
+block-specificity variance shares one value, while item errors stay free
 (tau-equivalent). Only the axes-variance component feeds reliability.</p>
 <p>The Nunnally-Bernstein axis reliability (<code>nb_reliability</code>) is reported
 alongside for comparison: it <strong>overestimates</strong> axis reliability when scale
@@ -237,15 +255,42 @@ on a raw scale.</p>
     </div>
     <div class="section level2">
     <h2 id="blockwise-instruments">Blockwise instruments<a class="anchor" aria-label="anchor" href="#blockwise-instruments"></a></h2>
-    <p>Some circumplex instruments are administered in <strong>blocks</strong> (items grouped by
-something other than their scale), which contributes a block-specificity
-variance component of its own. This model has no such component, and the
-package's instrument objects carry no block structure, so a blockwise
-instrument analyzed here folds its block variance into the general and
-scale-specificity components – inflating them and, in turn, deflating the
-share attributed to the axes. Strack et al. (2013, Table 3) report
-block-specificity as high as 6.7%, so treat axes reliability from a blockwise
-instrument as approximate.</p>
+    <p>Some circumplex instruments are administered in <strong>blocks</strong> – items grouped
+by something other than their scale – which carries a block-specificity
+variance of its own (Strack et al. 2013 report it as high as 6.7%). Supply
+<code>blocks</code> to estimate it as a fifth component: the <code>components</code> table then
+carries a <code>zeta2</code> row and <code>details$zeta2_fitted</code> is <code>TRUE</code>. The package's
+instrument objects record no block structure, so the map comes from you.</p>
+<p>Block specificity is estimable only when the blocks are not a relabelling of
+something the model already has. If every block coincides with a scale, or
+all items share one block, or every item sits in its own block, the
+component explains nothing the others do not; it is dropped from the model,
+<code>details$zeta2_fitted</code> is <code>FALSE</code>, and the component table keeps its four
+rows. That decision is read off the data's own moment structure rather than
+from a rule of thumb about how the blocks look, so it also catches maps
+whose redundancy is not obvious by eye.</p>
+<p><strong>What omitting <code>blocks</code> costs depends on the block geometry</strong>, and it is not
+a uniform penalty. The general factor never gives block variance back, so
+<code>xi2</code> is inflated under most layouts and unchanged under a few; it is never
+deflated. The axes variance – the one reliability is read from – moves only
+when block membership carries information about the angular distance between
+items, over and above what sharing a scale already says.</p>
+<p>The clean case is worth stating exactly, because it is both common and
+checkable: <strong>when each block draws exactly one item from every scale</strong>, every
+within-block pair is a different-scale pair and the blocks span every pair of
+scale positions equally often. Block membership then says nothing about
+angular distance, and <code>xi1</code>, the reliability, and the SEm are unaffected –
+the component is worth estimating for its own sake, but ignoring it costs the
+reliability nothing.</p>
+<p>Away from that case the bias runs in either direction and <strong>"the blocks are
+spread evenly around the circle" is not the test.</strong> Blocks that pair
+diametrically opposite scales are as dispersed as a block can be – their
+angles average to the centre of the circle – and at eight scales they still
+pull <code>xi1</code> about 9% below truth, because every within-block pair sits half a
+turn apart and that is emphatically information about angular distance.
+Blocks covering contiguous arcs pull it the other way, about 12% above. When
+the blocks are neither one item per scale nor obviously arbitrary, estimate
+the component rather than reasoning about the geometry.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
