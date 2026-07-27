@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-26 (M64 shipped — a Fable review (RR12) settled the FIML-on-items question with a GO under BC1–BC16 and ruled out available-case standardization as MAR-dishonest; the build is a candidate row carrying `Driving RR: RR12`. All 16 checks PASS; M59 row pruned under terminal-row retention.)_
+_Last hygiene check: 2026-07-26 (fourth pass — no drift found. All 16 checks PASS; tree clean; 0 open issues/PRs; no open RBs. Sole advisory is M7's 47 hard-wrapped pre-implement work-log lines, history under IP4. Reported gap: the always-read frame's worked table omits `CLAUDE.md`.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
