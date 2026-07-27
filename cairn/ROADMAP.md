@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-26 (third pass, no drift — nothing changed since the post-M62 pass: tree clean and level with origin, all 16 checks PASS, no open issues/PRs/RBs, nothing in flight. M7 stays parked on Jeff's CRAN handoff.)_
+_Last hygiene check: 2026-07-26 (M63 shipped — `axes_reliability()` estimates block specificity via a new `blocks` argument, and review corrected the caveat it replaces: omitting the component is harmless when each block draws one item per scale, not merely when blocks look evenly spread. All 16 checks PASS; M58 row pruned.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -13,9 +13,8 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M61 | Single-item scale positions for `axes_reliability()` — dropping ζ1 | done | M60 | normal | milestones/archive/M61-axes-reliability-single-item.md |
 | M59 | Correlation-matrix input path for `axes_reliability()` | done | M54 | normal | milestones/archive/M59-axes-reliability-corr-input.md |
 | M62 | Close `axes_reliability()`'s two never-NaN gaps — ξ1 ≥ 1 and an unvalidated `sd` | done | — | normal | milestones/archive/M62-axes-reliability-never-nan.md |
-| M63 | Blockwise instruments for `axes_reliability()` — the ζ2 component | review | — | normal | milestones/M63-axes-reliability-blockwise-zeta2.md |
+| M63 | Blockwise instruments for `axes_reliability()` — the ζ2 component | done | — | normal | milestones/archive/M63-axes-reliability-blockwise-zeta2.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M58 | Finish the post-M52 CI trim — pkgdown parity + an allowlist drift guard | done | — | normal | milestones/archive/M58-ci-trim-pkgdown-parity.md |
 
 ## Candidates
 
