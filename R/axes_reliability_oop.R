@@ -38,10 +38,23 @@ axes_fmt <- function(x, digits = 3) {
 # model is fit to the item correlation matrix as if it were a covariance matrix
 # (the paper's own practice), so the point estimates are correct but the
 # standard errors and the global chi-square are approximate (Cudeck, 1989).
+# Quantified rather than merely labelled "approximate" (D-035): the size of the
+# approximation was measured for the first time at M65, and it is large enough
+# and direction-unstable enough that the bare word misleads. RR13 derived it in
+# closed form -- the reported SE is priced for a covariance input while the
+# estimator consumes a correlation matrix -- giving x1.44 at axes variance .35,
+# and a ratio running [0.81, 1.97] over the accepted input space, dipping below
+# 1 for weak-axes/strong-general instruments. The correction is its own
+# milestone; until it lands this text must not imply the error is safely
+# one-directional.
 axes_se_caveat <- paste0(
   "  Note: the model is fit to the item correlation matrix, so the point\n",
   "  estimates are exact but the standard errors and global fit are\n",
-  "  approximate (Cudeck, 1989)."
+  "  approximate (Cudeck, 1989). How approximate depends on the instrument:\n",
+  "  where the axes carry a lot of variance the component SEs overstate\n",
+  "  sampling variability substantially (about 40% at an axes variance of\n",
+  "  .35), while for weak-axes, strong-general instruments they are slightly\n",
+  "  understated. Global fit is flattered by roughly 4%."
 )
 
 # The extra sentence the FIML path owes on top of the caveat above. Its SEs

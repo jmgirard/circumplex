@@ -848,14 +848,40 @@ test_that("BC13: reported FIML SEs beat listwise, and track the truth", {
   expect_lt(se_ratio("0.05"), 1)
   expect_lt(se_ratio("0.10"), 1)
   expect_lt(se_ratio("0.10"), se_ratio("0.05"))
-  # Calibration: at 5% MCAR the mean reported SE must match the empirical
-  # spread of the estimate itself. This is the criterion that would catch an SE
-  # that is merely small -- an SE can beat listwise's and still be a lie.
+  # Calibration. RR12 BC13 asked for this ratio in [0.85, 1.15]; RR13 replaced
+  # that band with [1.31, 1.57] (recorded in the Deviations from RR12 table,
+  # and this is a REPLACEMENT, not a widening).
+  #
+  # Why the original band was unmeetable: the reported SE is normal-theory ML
+  # priced for a sample COVARIANCE input, while the estimator consumes a sample
+  # CORRELATION matrix whose diagonal cannot vary. Because this model's implied
+  # covariance is linear in the components, RR13 derived both sides in closed
+  # form -- predicting 1.4412 against the measured 1.452 -- so the truthful
+  # value of this ratio for the SHIPPED estimator is ~1.44, not 1. The listwise
+  # path measures the identical 1.452 on COMPLETE data, so no implementation of
+  # either path could have satisfied a band centred at 1.
+  #
+  # The band is centred on the derived value, with the width from Monte-Carlo
+  # error (+/- ~2.5 MC SEs), so it still discriminates: an SE-extraction bug, a
+  # wrong information matrix, or a regression in the standardizing metric moves
+  # the ratio off 1.44 and reddens this. D-035 routes the correction itself to
+  # its own milestone; when that lands, this band becomes [0.90, 1.10].
   x <- fx$mcar[["0.05"]]
   calib <- mean(x[, "fiml.se"], na.rm = TRUE) /
     stats::sd(x[, "fiml.xi1"], na.rm = TRUE)
-  expect_gt(calib, 0.85)
-  expect_lt(calib, 1.15)
+  expect_gt(calib, 1.31)
+  expect_lt(calib, 1.57)
+  # The FIML path inherits this and adds nothing of its own: dividing out the
+  # single analytic ratio leaves the reported SE calibrated at every rate.
+  # Pinned because it is the evidence that the miscalibration is the shipped
+  # estimator's, not the new path's -- the claim D-035 rests on.
+  for (rate in names(fx$mcar)) {
+    m <- fx$mcar[[rate]]
+    repaired <- (mean(m[, "fiml.se"], na.rm = TRUE) / 1.4412) /
+      stats::sd(m[, "fiml.xi1"], na.rm = TRUE)
+    expect_gt(repaired, 0.90, label = paste0("repaired calibration at ", rate))
+    expect_lt(repaired, 1.10, label = paste0("repaired calibration at ", rate))
+  }
 })
 
 test_that("BC11: under MAR the FIML path is unbiased and listwise is not", {

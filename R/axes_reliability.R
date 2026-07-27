@@ -660,6 +660,20 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' **per axis** (X and Y): for a balanced instrument the two axes carry the
 #' same axes-variance estimate and differ only through `item_n`.
 #'
+#' How approximate is worth stating, because it is neither small nor uniform.
+#' The reported standard errors are the ones normal-theory maximum likelihood
+#' would report for a sample **covariance** input, while the estimator consumes
+#' a sample **correlation** matrix, whose diagonal cannot vary. For an
+#' instrument whose axes carry a lot of variance the component standard errors
+#' therefore **overstate** sampling variability substantially -- by about 40% at
+#' an axes variance of .35 -- so a confidence interval built from them is
+#' conservative. For weak-axes, strong-general instruments the ratio drifts the
+#' other way and they are slightly **understated**. Treat the component SEs as
+#' order-of-magnitude guidance rather than as calibrated uncertainty; the point
+#' estimates, reliabilities, and SEm are unaffected. The global chi-square
+#' carries the same approximation in the other direction, flattering fit by
+#' roughly 4%.
+#'
 #' A related detail, in case you check: the fitted model does **not** reproduce
 #' the correlation matrix's unit diagonal exactly, and that is expected rather
 #' than a defect. With the loadings fixed, the stationarity condition available

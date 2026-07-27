@@ -1,6 +1,6 @@
 # M65: FIML item-level missing data for `axes_reliability()` — the build
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR12
@@ -15,19 +15,9 @@ instead of forcing listwise deletion.
 
 ## Scope
 
-**In:** `missing = c("listwise", "fiml")` on `axes_reliability()`, `"listwise"` default and bit-identical to
-shipped; standardization by saturated-FIML (EM) moments on the `sqrt(N_used/(N_used − 1))` convention feeding one
-structured one-stage fit through `sem_fit_cfa()`; OLS shadow and PD refusal retargeted to R̂; the six-clause refusal
-contract; reporting and derived-quantity contracts; the nine-cell evidence bar; the roxygen and vignette rewrites.
-Three RR12 §8 "Consider" items taken up at the plan gate: a soft warning on thin minimum pairwise joint coverage,
-folding the reviewer probes into `devel/m64-fiml-probe.R`, and one doc sentence on the finite-sample diagonal
-departure (M64-D3: expected restricted-ML behavior, not a defect).
+**In:** `missing = c("listwise", "fiml")` on `axes_reliability()`, `"listwise"` default and bit-identical to shipped; standardization by saturated-FIML (EM) moments on the `sqrt(N_used/(N_used − 1))` convention feeding one structured one-stage fit through `sem_fit_cfa()`; OLS shadow and PD refusal retargeted to R̂; the six-clause refusal contract; reporting and derived-quantity contracts; the nine-cell evidence bar; the roxygen and vignette rewrites. Three RR12 §8 "Consider" items taken up at the plan gate: a soft warning on thin minimum pairwise joint coverage, folding the reviewer probes into `devel/m64-fiml-probe.R`, and one doc sentence on the finite-sample diagonal departure (M64-D3: expected restricted-ML behavior, not a defect).
 
-**Out:** planned-missingness designs and lavaan's `missing = "two.stage"` → both stay ROADMAP candidate rows,
-promoted on a concrete use case. Block membership on `circumplex_instrument` → its own candidate row.
-Pairwise-deletion correlations stay banned (RR09 BC13, upheld by D-033). RR12 §9's four rejections (per-item
-unit-total-variance constraint, post-hoc component rescaling, any scalar effective-N repair, pairwise correlations)
-are standing and not revisited here.
+**Out:** planned-missingness designs and lavaan's `missing = "two.stage"` → both stay ROADMAP candidate rows, promoted on a concrete use case. Block membership on `circumplex_instrument` → its own candidate row. Pairwise-deletion correlations stay banned (RR09 BC13, upheld by D-033). RR12 §9's four rejections (per-item unit-total-variance constraint, post-hoc component rescaling, any scalar effective-N repair, pairwise correlations) are standing and not revisited here. **Correcting the SEs is out** — D-035 routes it to its own milestone under RR13 BC1–BC6.
 
 ## Acceptance criteria
 
@@ -89,6 +79,12 @@ are standing and not revisited here.
 - [ ] AC17: the profile's `verify` slot clean (`devtools::test()`, `document()` no diff) and, because this milestone
       edits roxygen, a full `devtools::check(manual = TRUE)` whose log carries `checking PDF version of manual ... OK`
       by name (M7/M57 lesson: a bare `check()` defaults to `manual = FALSE` and skips that step).
+
+## Deviations from RR12
+
+| Criterion | Departure | Authority |
+|---|---|---|
+| AC13 (BC13) | The `[0.85, 1.15]` calibration band is **replaced, not widened**, by RR13 BC7 verbatim: "**BC7 (M65's replacement criterion).** If M65 ships before the corrective milestone: RR12 BC13's [0.85, 1.15] band is replaced by — at the 5% MCAR fixture cell, mean reported SE(ξ1) / empirical SD(ξ̂1) ∈ **[1.31, 1.57]** (analytic prediction 1.441 ± ≈2.5 MC SEs); the deviation is recorded in M65's "Deviations from RR12" table citing this report; and both printed caveats state magnitude and direction-dependence per Recommendation 2. The band is not a widening of BC13: it is centered on the derived truthful value of the shipped estimator's ratio, not on the measurement." AC13's other three clauses are unchanged and pass. | RR13 (Fable, 2026-07-27) and D-035. RR12 set BC13's band without measuring the shipped path, which sits at the identical 1.452, so no implementation of either path could ever have met it. Measured 1.452 ∈ [1.31, 1.57]. |
 
 ## Coverage
 

@@ -148,8 +148,23 @@ Four properties of the method shape how its output should be read.
 own practice, the model is fit to the item **correlation** matrix as though it
 were a covariance matrix. The component point estimates and the reliabilities
 are correct, but the component standard errors and the global chi-square are
-only approximate (Cudeck, 1989). Read the fit indices as a rough guide, not as
-an exact test. If you check the implied matrix, you will also find that it does
+only approximate (Cudeck, 1989).
+
+How approximate is worth knowing, because it is neither small nor uniform. The
+reported standard errors are the ones normal-theory maximum likelihood would
+report for a sample **covariance** input, while the estimator actually consumes
+a sample **correlation** matrix, whose diagonal cannot vary. For an instrument
+whose axes carry a lot of variance the component standard errors therefore
+**overstate** sampling variability substantially — by about 40% at an axes
+variance of .35 — so an interval built from them errs on the cautious side. For
+weak-axes, strong-general instruments the ratio drifts the other way and they
+are slightly **understated**. Read the component SEs as order-of-magnitude
+guidance rather than calibrated uncertainty; the point estimates,
+reliabilities, and SEm are unaffected either way. Read the fit indices as a
+rough guide, not an exact test — they are flattered by roughly 4% for the same
+reason.
+
+If you check the implied matrix, you will also find that it does
 not reproduce the unit diagonal exactly. That too is expected: with the loadings
 fixed, the condition a free item error satisfies is the *weighted* diagonal
 rather than the raw one, so off-diagonal sampling misfit leaks into the implied
