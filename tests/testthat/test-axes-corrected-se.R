@@ -298,6 +298,170 @@ test_that("BC4: the shipped composition evaluates the ratio at Sigma-hat", {
 })
 
 
+m66_cells <- function() {
+  readRDS(test_path("fixtures", "m66-corrected-se-cells.rds"))
+}
+
+# calibration = mean corrected SE / empirical SD of the estimator. The whole
+# point of the correction: a calibrated SE is one whose average equals the
+# estimator's actual sampling variability.
+m66_calib <- function(cell) {
+  ok <- !is.na(cell[, "se"]) & !is.na(cell[, "xi1"])
+  list(calib = mean(cell[ok, "se"]) / stats::sd(cell[ok, "xi1"]),
+       r = sum(ok),
+       mc_se = 1 / sqrt(2 * (sum(ok) - 1)))
+}
+
+
+test_that("BC3: the correction calibrates on complete data over 201 replicates", {
+  fx <- m66_cells()
+  expect_gte(fx$provenance$reps, 200L)
+  got <- m66_calib(fx$complete)
+  expect_gte(got$r, 200L)
+  expect_gt(got$calib, 0.90)
+  expect_lt(got$calib, 1.10)
+
+  # The corrected SE must also equal the CLOSED-FORM value, not merely land in
+  # the band: the band is a Monte-Carlo comparison and would tolerate a
+  # systematically wrong SE paired with a coincidentally matching SD. The
+  # analytic value at this population is 0.011639 (T1's anchor).
+  ok <- !is.na(fx$complete[, "se"])
+  expect_lt(abs(mean(fx$complete[ok, "se"]) - 0.011639), 5e-4)
+
+  # ... and xi1 itself is unbiased, so the SD in the denominator is the
+  # estimator's own variability and not a drifted one.
+  expect_lt(abs(mean(fx$complete[ok, "xi1"]) - 0.35), 3 * 0.0121 / sqrt(got$r))
+})
+
+
+test_that("BC5: the correction holds past mild missingness, at 15% MCAR and M1 MAR", {
+  fx <- m66_cells()
+
+  for (nm in c("mcar15", "m1")) {
+    got <- m66_calib(fx[[nm]])
+    # BC5's replicate floor is stated as a precision requirement -- "enough
+    # replicates that the MC SE of the SD is <= 5%" -- so it is asserted as
+    # one rather than as a count, which is what the requirement actually says.
+    expect_lte(got$mc_se, 0.05, label = paste0("MC SE of the SD, ", nm))
+    expect_gt(got$calib, 0.85, label = paste0("calibration, ", nm))
+    expect_lt(got$calib, 1.15, label = paste0("calibration, ", nm))
+  }
+
+  # Direction, recorded because it is a real limitation rather than noise: at
+  # 15% cellwise MCAR the correction runs ANTI-CONSERVATIVE -- measured 0.9255,
+  # i.e. the reported SE understates the estimator's true variability by ~7.5%,
+  # which is 2.1 MC SEs below 1 and cannot be read as sampling noise. It is
+  # inside BC5's band, which RR13 deliberately set wider ([0.85, 1.15]) for
+  # exactly this regime, and it is what the roxygen's beyond-mild-missingness
+  # sentence reports. Pinned so a future change that worsens it is caught
+  # rather than absorbed by the band's width.
+  expect_lt(m66_calib(fx$mcar15)$calib, 1.0)
+  expect_gt(m66_calib(fx$mcar15)$calib, 0.88)
+  # The MAR cell, by contrast, calibrates essentially exactly (1.0152).
+  expect_lt(abs(m66_calib(fx$m1)$calib - 1), 0.06)
+})
+
+
+test_that("M66: stored cells reproduce live, so the fixture is not stale", {
+  skip_if_not_installed("lavaan")
+  fx <- m66_cells()
+  oct <- octants()
+  items_of <- function(mat) split(colnames(mat), rep(1:8, each = 3))
+  draw <- function(n, seed) {
+    set.seed(seed)
+    as.matrix(axes_simulate(n, oct, 3L, .35, .10, .08))
+  }
+  live <- function(mat, ...) {
+    res <- suppressMessages(suppressWarnings(
+      axes_reliability(as.data.frame(mat), items = items_of(mat),
+                       angles = oct, ...)
+    ))
+    c(xi1 = res$results$xi1[[1]],
+      se = res$components$SE[res$components$Symbol == "xi1"])
+  }
+  # 1e-4 for the same reason M65's harness uses it: lavaan 0.7 accelerates the
+  # h1 EM and stops at a slightly different point inside the same convergence
+  # tolerance, measured at ~1e-6 relative. Two orders of headroom to that, and
+  # far tighter than any drift in the estimator would produce.
+  tol <- 1e-4
+
+  # BOTH stored columns are re-derived, never the point estimate alone: BC3 and
+  # BC5 assert entirely on the SEs, so leaving `se` unread would leave every
+  # calibration claim resting on the file with nothing live behind it.
+  s <- fx$provenance$seeds$complete[[1]]
+  lv <- live(draw(600L, s))
+  expect_equal(unname(lv[["xi1"]]), unname(fx$complete[1, "xi1"]), tolerance = tol)
+  expect_equal(unname(lv[["se"]]), unname(fx$complete[1, "se"]), tolerance = tol)
+
+  s <- fx$provenance$seeds$mcar15[[1]]
+  lv <- live(axes_mcar(draw(600L, s), 0.15), missing = "fiml")
+  expect_equal(unname(lv[["xi1"]]), unname(fx$mcar15[1, "xi1"]), tolerance = tol)
+  expect_equal(unname(lv[["se"]]), unname(fx$mcar15[1, "se"]), tolerance = tol)
+
+  # What this does NOT re-run, stated so coverage is never overestimated: the
+  # other 200 replicates of each cell, the entire M1 MAR cell (one fit runs
+  # 18-68 s), and therefore every MEAN and SD the two criteria above are
+  # computed from. Those come from the stored file; what is re-derived here is
+  # that the code still produces the per-replicate values in it.
+  expect_identical(nrow(fx$m1), nrow(fx$complete))
+})
+
+
+test_that("BC6: a pipeline bootstrap independently reproduces the corrected SE", {
+  skip_if_not_installed("lavaan")
+  skip_on_cran()
+  # The independent oracle. The delta-method correction is analytic; this
+  # resamples respondents and re-runs the WHOLE pipeline per resample --
+  # crucially including re-computing the correlation matrix, which is where the
+  # in-sample standardization lives. lavaan's own se = "bootstrap" would NOT
+  # re-standardize: it resamples the z-columns and so reproduces the
+  # covariance-metric variability the correction exists to remove, which is why
+  # RR13 BC6 forbids it and why this is written by hand.
+  oct <- octants()
+  items_of <- function(mat) split(colnames(mat), rep(1:8, each = 3))
+  n <- 600L
+  n_boot <- 200L
+
+  boot_se <- function(seed) {
+    set.seed(seed)
+    dat <- as.matrix(axes_simulate(n, oct, 3L, .35, .10, .08))
+    items <- items_of(dat)
+    fit0 <- axes_reliability(as.data.frame(dat), items = items, angles = oct)
+    analytic <- fit0$components$SE[fit0$components$Symbol == "xi1"]
+
+    est <- vapply(seq_len(n_boot), function(b) {
+      idx <- sample.int(n, n, replace = TRUE)
+      r <- stats::cor(dat[idx, , drop = FALSE])
+      f <- tryCatch(
+        suppressWarnings(axes_fit_cormat(r, items, oct, n = n)),
+        error = function(e) NULL
+      )
+      if (is.null(f)) return(NA_real_)
+      pe <- lavaan::parameterEstimates(f)
+      pe$est[pe$op == "~~" & pe$lhs == "AX" & pe$rhs == "AX"][[1]]
+    }, numeric(1))
+
+    c(analytic = analytic, boot = stats::sd(est, na.rm = TRUE),
+      kept = sum(!is.na(est)))
+  }
+
+  for (seed in c(1001L, 1002L)) {
+    got <- boot_se(seed)
+    expect_gte(got[["kept"]], 190)
+    rel <- abs(got[["boot"]] - got[["analytic"]]) / got[["analytic"]]
+    expect_lt(rel, 0.15,
+              label = paste0("bootstrap vs corrected SE, seed ", seed))
+    # Direction check against the thing being ruled out: the bootstrap must sit
+    # far closer to the CORRECTED SE than to the uncorrected one, which is 44%
+    # larger. Without this, a bootstrap that happened to land between them
+    # could satisfy the 15% bar while agreeing with neither.
+    naive <- got[["analytic"]] * 1.4412
+    expect_lt(abs(got[["boot"]] - got[["analytic"]]),
+              abs(got[["boot"]] - naive))
+  }
+})
+
+
 test_that("AC7: the printed caveat drops the SE warning and keeps the fit one", {
   skip_if_not_installed("lavaan")
   pp <- probe_pop()

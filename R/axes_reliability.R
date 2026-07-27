@@ -758,6 +758,14 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' that residual measures 0.1%, 0.8%, and 1.8% respectively -- an order of
 #' magnitude below the metric error that is corrected.
 #'
+#' That residual grows with the missingness rate, and it grows in the
+#' **anti-conservative** direction. Over 201 replicates at 15% cellwise MCAR
+#' the reported standard errors average about 7% **below** the estimator's
+#' actual sampling variability, so at that rate and beyond a confidence
+#' interval built from them is slightly too narrow. Treat heavy missingness as
+#' the regime where these standard errors are least trustworthy, and prefer a
+#' resampling interval there if the uncertainty matters to your conclusion.
+#'
 #' Two results are unavailable under `missing = "fiml"`, both because they need
 #' items observed by every respondent: the Nunnally-Bernstein comparison is
 #' `NA` with a stated reason, and `sd = "raw"` is refused — supply the axis SDs
