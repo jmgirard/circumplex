@@ -1,6 +1,6 @@
 # M66: Corrected component standard errors for `axes_reliability()`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** RR13
@@ -139,7 +139,7 @@ doc/NEWS surfaces the correction falsifies.
   resamples each, re-computing the correlation matrix per resample; assert
   agreement within 15% relative. Must not use lavaan's `se = "bootstrap"`,
   which does not re-standardize (AC6).
-- [ ] **T7 — docs, caveats, NEWS, gate.** AC7's four surfaces, then AC8's
+- [x] **T7 — docs, caveats, NEWS, gate.** AC7's four surfaces, then AC8's
   checks including the PDF manual.
 
 ## Work log
@@ -174,6 +174,7 @@ doc/NEWS surfaces the correction falsifies.
 - 2026-07-27: T7 — **fresh-context [O] guard review found five real weaknesses my own mutation testing could not**, which is the point of the rule that an author never certifies their own guard. A mutation only ever tests the REVERT; it says nothing about a reworded reintroduction or a revert-by-deletion. Findings, all applied: (F1) the absence asserts pinned the OLD vocabulary — old text said "component SEs overstate", new text says "standard errors", so the same false claim rewritten in current words passed all four; now pinned at the verb stems `overstat`/`understat`, absent from every printed note. (F2) `"order-of-magnitude guidance"` was never in the PRINTED caveat (only the roxygen), so it could not fail on any reversion of the string it guards, while the comment above it claimed every falsified phrase was pinned; kept for forward value, now labelled honestly, and a phrase the old caveat did carry added beside it. (F3, F5) two asserts pinned noun phrases without their predicates and stayed green under a rewrite that INVERTED the claim — 261.1 and 273 are the same numbers whether the χ² is corrected or not. (F4) **the one true hole:** the FIML section's positive claim was unpinned, so deleting it satisfied the absence assert BY DELETION while the next sentence kept the residual assert green — an Rd silent on whether the FIML path is corrected, suite green. Verified closed by mutation: deleting that sentence now reddens.
 - 2026-07-27: T7 — coverage NOT claimed for two AC7 clauses, per the same review: `axes_fiml_se_caveat`'s unchanged-ness is covered by the pre-existing `test-axes-fiml.R:941`, not by these guards, and the `NEWS.md` clause has no assert anywhere — it is read at the review gate, matching AC7's own "verified against rendered print() output and the built Rd" scoping.
 - 2026-07-27: T7 — a failed mutation reported the unmutated suite's result (`107 PASS`) because its anchor string never matched; only an explicit `assert` in the mutation script exposed it. Second instance this milestone of a probe whose own validity had to be established before its output meant anything (after the `skip_on_cran` silent skip at T6).
+- 2026-07-27: all tasks done; status in-progress→review. Final gates: `devtools::test()` 0 failures / 4362 passing / 0 skips (4 warnings, all the pre-existing test-ci_accuracy.R cautions); `R CMD check` Status OK, 0/0/0; PDF manual 78 pages. Acceptance-criteria boxes deliberately left UNTICKED — they are review's to tick against fresh evidence recorded in the Review section (AC fencing).
 - 2026-07-27: T7 doc content done (box unticked — AC8's `check()` + PDF manual run at the end). `axes_se_caveat` drops its SE clause and keeps the global-fit sentence verbatim; `axes_fiml_se_caveat` unchanged as AC7 requires; both falsified roxygen passages rewritten, including the `# Missing data` sentence claiming the FIML SEs "remain approximate for the same correlation-as-covariance reason", which is now false in both halves. RR13 B-1's E[T] = 261.1 against df = 273 stated in roxygen. NEWS entry under Breaking changes. Verified against rendered `print()` output and the built Rd, not source strings — and each falsified phrase is pinned as an ABSENCE assertion, the directional half the M56/M63 stale-claim lesson says the sweep keeps missing. The `cpm_gradient` link warning from `document()` is pre-existing (R/cpm_fit.R is byte-untouched by this branch).
 - 2026-07-27: T1 mutation record. Reddening: dropping the Σ̂ realignment fails 8 assertions, cos(2Δ) for cos(Δ) fails 8, dropping the W_c diagonal fails 3. NOT reddening, and correctly so: stripping C's diagonal leaves both SEs bit-identical to 15 decimals, because the diagonal direction is spanned by the free {E_ii} and the change is a unit-triangular reparameterization of nuisance parameters. The code comment claiming that diagonal was load-bearing was false and is corrected in place (the M36/M60 lesson family); the null is recorded there so a later session does not re-chase it.
 
