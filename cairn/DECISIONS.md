@@ -984,3 +984,66 @@ spent without effect. No new dependency (lavaan and OpenMx are already
 `circumplex_instrument` class is deferred to the ROADMAP candidate row, not
 rejected. D-001/D-008/D-018/D-025/D-026/D-030/D-031 lineage extended; none other
 superseded. Source: Jeff, M63 plan gate.
+
+### D-033 (2026-07-26): GO on FIML item-level missing data for `axes_reliability()`, on the FIML correlation metric — takes up D-026's last deferral, a narrow D-001 supersession that does not gate M7 (M64)
+
+**Context:** D-026 deferred four axes-reliability extensions pending a concrete
+use case; D-030, D-031 and D-032 took up three, leaving FIML on items as the
+last survivor, whose deferral D-032 reaffirmed verbatim. The use case is
+measured rather than asserted. Listwise deletion at **item** level retains a
+respondent with probability (1 − rate)^p, so a realistic 64-item instrument
+keeps 53% of respondents at 1% per-item MCAR and 3.8% at 5%; and at 15% on 24
+items the shipped function does not degrade but **refuses** — "Complete-case N
+(12) must exceed the number of items (24)" on 600 respondents
+(`devel/m64-fiml-probe.R`, findings F1/F1b). The vignette currently advises
+around this: "address the missingness before interpreting the estimate"
+(`vignettes/axes-reliability.Rmd:156`). At the M64 plan gate Jeff chose
+escalation over a direct build, so the design went to independent Fable review
+as RB12 → RR12.
+**Decision: GO.** Supersede D-001's new-features-excluded clause **insofar as it
+bars FIML item-level missing data** — narrowly, exactly as D-008 did for CIRCUM,
+D-018 for the visualization expansion, D-025 for the axes-reliability feature,
+D-030 for its correlation-matrix input, D-031 for the non-octant and single-item
+extensions, and D-032 for blockwise ζ2. `axes_reliability()` gains
+`missing = c("listwise", "fiml")`, matching the sibling exported `ssm_sem()`
+spelling, with `"listwise"` the default and its numbers bit-identical to shipped.
+**The metric holding is load-bearing, and it overturns the position M64 put to
+review.** Available-case `scale()` standardization is MCAR-honest but
+**MAR-dishonest**: the standardized columns carry k_i·k_j·ρ_ij and the model has
+no free per-item parameter *off* the diagonal to absorb an item-specific
+multiplicative distortion, so it lands in the components. Measured **+0.0167**
+above the FIML-metric estimate under a harsh same-scale-anchor MAR mechanism
+(paired SE 0.0006 — about one full SE at N = 600), while the two metric-correct
+routes agree to +0.0008. So the build standardizes by **saturated-FIML (EM)
+moments** with a `sqrt(N_used/(N_used − 1))` convention that reproduces
+`scale()` exactly on complete data, feeds a single **one-stage** structured FIML
+fit, and retargets the OLS shadow and the positive-definiteness refusal to the
+FIML correlation matrix R̂. Two-stage SEs and χ² never surface (`sample.nobs =
+N_total` overstates information and no scalar effective N repairs it). Rejected
+with reasons: the per-item unit-total-variance constraint (raises df and leaves
+the paper's free-errors class — D-026's equal-errors rejection generalizes),
+post-hoc component rescaling (does not touch the off-diagonal distortion), and
+any scalar effective-N repair. A mandatory refusal is added for an item pair
+never jointly observed: lavaan fabricates that moment (r = 0 against a
+population 0.3475) and `axes_reliability()` fits inside `suppressWarnings()`, so
+it is silent in this function.
+**Binding:** RR12's **BC1–BC16** bind the **build** milestone verbatim (its
+`Driving RR: RR12`), not M64, which ships no code. RR09 **BC13 is upheld, not
+superseded** — R̂ is a saturated ML estimate, not a pairwise-deletion matrix.
+RR09 §4's quasi-circumplex refusal is untouched.
+**Scope of the supersession:** narrow — promotes **only** FIML item-level
+missing data. All other D-001 consequences and exclusions stand. D-026's
+deferral list is now empty; the one remaining axes-reliability candidate (block
+membership on the `circumplex_instrument` class) was never part of it.
+**Consequences:** the build is cleared to plan and sets `Driving RR: RR12`. M7
+does **not** gain `Depends on:` it — on D-030's reading the release never waits
+for it and merely contains it if it lands first. No new dependency (lavaan and
+OpenMx are already `Suggests`; D-006/D-014 minimal-deps reinforced). Two
+follow-ons are ROADMAP candidates rather than scope: planned-missingness designs
+(three-form and similar), which the zero-joint-coverage refusal excludes even
+though the structured model stays identified there, and lavaan's
+`missing = "two.stage"` as a future SE-corrected alternative. The complete-data
+implied-diagonal departure RB12 flagged is closed as expected restricted-ML
+behavior rather than a defect, verified at the stationarity condition (M64-D3) —
+no correction milestone. D-001/D-008/D-018/D-025/D-026/D-030/D-031/D-032 lineage
+extended; none other superseded. Source: RR12 (Fable, 2026-07-26); M64 T4.

@@ -1,6 +1,6 @@
 # M64: FIML on items for `axes_reliability()` — the estimator-metric question
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -93,7 +93,7 @@ grounds.
       spelling is precedent, not a proposal.
 - [x] **T3** — Ingest RR12: disposition every recommendation, and record the
       binding criteria verbatim for the build to ingest.
-- [ ] **T4** — Author the GO/NO-GO D-entry; update the ROADMAP per AC5 and
+- [x] **T4** — Author the GO/NO-GO D-entry; update the ROADMAP per AC5 and
       graduate FIML off the axes-reliability extensions row.
 
 ## Work log
@@ -108,6 +108,10 @@ grounds.
 - 2026-07-26: T2+T3 done. RB12 spawned to Fable at Jeff's gate; RR12 returned **GO under BC1–BC16** and is ingested — eight decisions recorded above, every recommendation triaged, pair archived. The review overturned the plan's standardization (available-case `scale()` is MAR-dishonest, measured ≈1 SE) while confirming one-stage FIML, closed question 2 without a spin-out, and strengthened the N–B ruling. One RR12 evidence note corrected against an independent re-run (M64-D6). Status blocked→in-progress.
 
 - 2026-07-26: minor amendment — AC2/AC3 now name `cairn/reviews/archive/`, since the brief protocol archives the RB/RR pair at ingestion and the plan-time paths would have pointed review at files that no longer sit there. No change to what either criterion verifies.
+
+- 2026-07-26: T4 done. **D-033 = GO** appended to `cairn/DECISIONS.md`: narrow D-001 supersession, takes up D-026's last deferral citing the measured deletion cost, carries the metric holding (saturated-FIML standardization, never available-case `scale()`), and fixes BC1–BC16 as binding on the build. ROADMAP gains the build candidate row (`Driving RR: RR12`, with M64-D8's replicate-cost note) and a post-build follow-ons row (planned-missingness designs; lavaan `missing = "two.stage"`); the extensions row's FIML lineage now records the GO and that D-026's deferral list is empty. M7 deliberately does not gain a dependency, on D-030's reading.
+
+- 2026-07-26: status in-progress→review (/milestone-implement). T1–T4 done; the branch is four commits over five files and touches **no package surface** (`R/`, `tests/`, `man/`, `vignettes/`, `NAMESPACE`, `DESCRIPTION` and `NEWS.md` all untouched), so the profile's verify slot has nothing to run and there is no NEWS entry to owe — M64 is docs-only by design and the user-visible change ships with the build.
 
 ## Decisions
 
