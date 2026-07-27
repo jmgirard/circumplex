@@ -1,11 +1,11 @@
 # M64: FIML on items for `axes_reliability()` — the estimator-metric question
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m64-axes-reliability-fiml-review` / —
+- **Branch/PR:** `m64-axes-reliability-fiml-review` / [PR #90](https://github.com/jmgirard/circumplex/pull/90)
 
 ## Goal
 
@@ -43,7 +43,7 @@ grounds.
 
 ## Acceptance criteria
 
-- [ ] **AC1** `devel/m64-fiml-probe.R` reproduces all four plan-gate findings
+- [x] **AC1** `devel/m64-fiml-probe.R` reproduces all four plan-gate findings
       from a clean `Rscript` session, seed-pinned, printing each figure RB12
       quotes: the saturated mean structure (24 free intercepts, df unchanged at
       273), the complete-data implied-diagonal departure (max |v − 1| = 0.046),
@@ -58,15 +58,15 @@ grounds.
       — the metric, what the reported components mean under FIML, and whether
       the FIML-consistent correlation matrix is the right input for the OLS
       cross-check (`axes_ols_shadow()`) and the positive-definiteness refusal.
-- [ ] **AC3** `cairn/reviews/archive/RR12-*.md` is committed and ingested per
+- [x] **AC3** `cairn/reviews/archive/RR12-*.md` is committed and ingested per
       `/milestone-brief`'s protocol, with every recommendation carrying a
       disposition (apply / consider / reject) and a reason in this file's
       Decisions section.
-- [ ] **AC4** A `cairn/DECISIONS.md` entry records GO or NO-GO. On GO it names
+- [x] **AC4** A `cairn/DECISIONS.md` entry records GO or NO-GO. On GO it names
       the binding criteria the build ingests verbatim, supersedes D-001 narrowly
       for this feature, and takes up D-026's FIML deferral citing the measured
       use case. On NO-GO it records the refusal and its rationale.
-- [ ] **AC5** `cairn/ROADMAP.md` reflects the verdict: on GO a build candidate
+- [x] **AC5** `cairn/ROADMAP.md` reflects the verdict: on GO a build candidate
       row naming `Driving RR: RR12`; on NO-GO the FIML item retired with a
       pointer to AC4's entry. Either way FIML leaves the axes-reliability
       extensions row with its lineage noted.
@@ -113,6 +113,8 @@ grounds.
 
 - 2026-07-26: status in-progress→review (/milestone-implement). T1–T4 done; the branch is four commits over five files and touches **no package surface** (`R/`, `tests/`, `man/`, `vignettes/`, `NAMESPACE`, `DESCRIPTION` and `NEWS.md` all untouched), so the profile's verify slot has nothing to run and there is no NEWS entry to owe — M64 is docs-only by design and the user-visible change ships with the build.
 
+- 2026-07-26: status review→**in-progress** (/milestone-review). **AC2 fails as written**: RB12 states two of the three design positions the Scope fixed — Q6 and Q8 name theirs as the milestone's, but one-stage FIML appears nowhere as a fixed position, Q4 having asked the route openly. RB12 is archived history (IP4), so the criterion cannot be satisfied by editing it and is not reinterpreted; it needs a gated amendment. AC1/AC3/AC4/AC5 verified and ticked. Gate otherwise clean: `cairn_validate` exit 0 (15 PASS), `check(manual = TRUE)` Status OK 0/0/0 with both step lines verified by name, `document()` no diff, pkgdown clean. Four findings actioned (F6 87, F7 85, F2 82, F1 80), three fixed anyway below the bar (F4 63, F5 78, F3 68), one logged (F8 65). First return; thrash count 1 of 3.
+
 ## Decisions
 
 - **M64-D1 (2026-07-26, RR12 §1) — the metric is FIML, not available-case.** RR12 confirms one-stage FIML and **overturns the standardization** the plan submitted with it: available-case `scale()` is MCAR-honest but MAR-dishonest, because the standardized columns carry `k_i·k_j·ρ_ij` and the model has no free off-diagonal per-item parameter to absorb it. Measured under mechanism M2: +0.0167 above the FIML-metric estimate (paired SE 0.0006), ≈1 SE at N = 600, while the two metric-correct routes agree to +0.0008. The build standardizes by saturated-FIML (EM) moments with a `sqrt(N_used/(N_used − 1))` convention that reproduces `scale()` exactly on complete data.
@@ -125,3 +127,165 @@ grounds.
 - **M64-D8 (2026-07-26) — cost flagged for the build, not a deviation.** BC10 and BC13 ask ≥ 200 replicates per cell, i.e. several hundred FIML fits on 24 items. That will not fit an ordinary `devtools::test()` run; the build must solve it (a `devel/` oracle run with committed results, or `skip_on_cran`), and raise a "Deviations from RR12" row only if it cannot meet the replicate count at all.
 
 ## Review
+
+Reviewed 2026-07-26. PR [#90](https://github.com/jmgirard/circumplex/pull/90).
+**Outcome: RETURNED to `in-progress` — AC2 fails as written.** First return for
+this milestone (thrash count 1 of 3).
+
+### Acceptance-criterion evidence
+
+- **[x] AC1 — the probe reproduces all four named figures.** Fresh
+  `Rscript devel/m64-fiml-probe.R` from a clean session: F2 prints
+  `npar 27 df 273 free intercepts 0` (listwise) against
+  `npar 51 df 273 free intercepts 24` (FIML) — the saturated mean structure;
+  F3 prints `max |v - 1| = 0.0456` on complete data → the criterion's 0.046;
+  F4 prints route agreement 0.9% / 3.6% / 2.8% of ξ1's SE at 2/5/10% MCAR, all
+  under the amended 5% bound; F1 prints `p = 64 items 0.526 0.274 0.038` at
+  1/2/5%. Deterministic — the [O] lens ran it twice byte-identical, and the
+  seeds are exact integers. **Scoped correctly:** AC1's colon enumerates
+  exactly these four, so RB12's separate `|mean| ≤ 6e-17` figure — which the
+  script does *not* compute (finding F1) — is outside this criterion. The
+  scorer flagged the diff lens's wider reading and is right.
+- **[ ] AC2 — FAILS. RB12 states two of the three fixed design positions.**
+  Verified by literal grep: RB12 states position 2 as the milestone's ("The
+  milestone's position is to report both as unavailable-with-reason", Q6) and
+  position 3 ("The milestone's synthetic bar is…", Q8), but nowhere states
+  position 1 (one-stage FIML through `sem_fit_cfa`) as a fixed position — its
+  Q4 asks "which route is the defensible default?" openly, and `one-stage`
+  occurs in RB12 only in the pasted probe table, its legend, and a
+  hypothetical clause. Found independently by this review and by the [O] lens
+  (F2, scored 82). The criterion's other clauses hold: RB12 states the
+  question, pastes all four AC1 findings with `Rscript devel/m64-fiml-probe.R`
+  as the producing command, and its Q1/Q2/Q5/Q9 carry all three
+  verdict-must-decide items. **Not reinterpreted and not patchable
+  review-side:** RB12 now sits in `cairn/reviews/archive/`, which IP4 forbids
+  editing, so the criterion must be amended through
+  `/milestone-implement` step 6 and re-reviewed.
+- **[x] AC3 — RR12 committed and ingested.** `git ls-files` confirms
+  `cairn/reviews/archive/RR12-axes-reliability-fiml-metric.md` tracked; 9
+  numbered recommendations, dispositioned 7 Apply / 1 Consider / 1 Reject in
+  RR12 and each routed in M64-D7 (recs 1–7 apply via the build; all five of
+  rec. 8's items individually routed; all four of rec. 9's rejections
+  recorded). 8 milestone-local Decisions entries; 16 BCs located.
+- **[x] AC4 — D-033 records GO with all four required elements.** Present by
+  literal grep: `Decision: GO`; the narrow supersession clause ("insofar as
+  it"); `BC1–BC16` named as binding with `Driving RR: RR12`; D-026's deferral
+  taken up citing the measured use case (the verbatim refusal string
+  `(12) must exceed the number of items (24)`); and `BC13 is upheld, not
+  superseded`. Ticked against the elements the criterion names. **Three
+  factual defects inside the same entry are actioned separately** (F3, F4, F5)
+  and require an appended correcting entry, since D-033 is append-only
+  history.
+- **[x] AC5 — ROADMAP reflects the verdict.** Build candidate row present
+  naming `Driving RR: RR12`; the post-build follow-ons row present; the
+  extensions row's FIML lineage records `M64` and `D-033 = GO`; M64's status
+  row reads `review`. File at 35 lines against a <60 cap.
+
+### Consistency gate
+
+**Universal:** `cairn_validate` exit 0 — all 15 PASS checks green, including
+`coverage complete`, `binding criteria`, `roadmap<->disk orphans` and
+`weight caps`. 47 advisory `work-log format` warnings, every one on M7's
+pre-existing hard-wrapped history, which IP4 forbids editing. No `DESIGN.md`
+principle touched (this repo carries no IP/GP block), so `cairn_impact` is a
+clean skip.
+
+**Toolchain (`r-package` profile):** `devtools::check(manual = TRUE)`
+**Status OK, 0 errors / 0 warnings / 0 notes**, with
+`checking PDF version of manual ... OK` and
+`checking re-building of vignette outputs ... OK` both verified present **by
+name** rather than inferred from the summary line (the M7/M57 lesson).
+`devtools::document()` produces no diff — `man/`, `NAMESPACE` and both
+`RcppExports` files clean. `pkgdown::check_pkgdown()`: no problems found.
+README untouched and in sync. No new top-level files. **No NEWS entry is
+owed:** the branch modifies no package surface at all —
+`git diff --name-only origin/master..HEAD` matches nothing under `R/`,
+`tests/`, `man/`, `src/`, `data/`, `vignettes/`, `NAMESPACE`, `DESCRIPTION` or
+`NEWS.md` — so the profile's `verify` slot had nothing to run and the
+user-visible change ships with the build.
+
+### Independent review — three lenses
+
+- **[O] diff-bug (Opus):** 8 findings, listed below. Also independently
+  re-derived RR12's V-B identities (ξ1 diff 5.55e-17 against RR12's 5.6e-17;
+  `lavCor` vs `cor` 8.88e-16 against 8.9e-16), confirmed every D-033 and
+  ROADMAP figure against its source, and confirmed the probe measures what
+  each comment claims with no lying filter, pattern, or range.
+- **[S] blame-history (Sonnet):** no silent undoing, no unacknowledged
+  contradiction. Verified D-033's supersession is genuinely narrow on the
+  D-008/D-018/D-025/D-030/D-031/D-032 template, that RR09 BC13 is upheld
+  rather than superseded, and that the rewritten candidate row dropped
+  nothing — every element of the old row survives or was deliberately
+  graduated.
+- **[S] prior-PR-comments (Sonnet):** **no prior-review evidence.** Read every
+  `## Review` record in M53, M54, M59–M63 and all of `LESSONS.md`; the gated
+  GitHub probe returned `[]`, so the PR-thread walk was correctly skipped.
+  Found no regression of any prior finding, and noted the diff explicitly
+  applies three recorded lessons (the M57/M59 probe-syntax family at T1, the
+  M59/M61 tolerance family at AC1's amendment, the M53/M63 pointer-not-copy
+  discipline at M64-D5).
+
+### Findings actioned (score ≥ 80)
+
+- **F6 (87) — the closing work-log line undercounts the branch.** It reads
+  "four commits over five files"; `git diff --stat origin/master..HEAD` shows
+  six (`DECISIONS.md`, `ROADMAP.md`, the milestone file, RB12, RR12, the probe
+  script). The line was written in the T4 commit, which is itself what added
+  the sixth. Fix by appending a correcting work-log line — work logs are
+  history.
+- **F7 (85) — the gated amendment's justification misstates its own margin.**
+  "~14× headroom" follows from neither figure in the sentence: a 5%-of-an-SE
+  bound is 20× headroom to the one-SE disagreement it rules out, and the
+  largest measurement (3.6%) is ~28×. A later audit of why AC1 was relaxed
+  cannot reconstruct 14×. Fix by appended correction.
+- **F2 (82) — AC2 fails as written.** See the AC2 evidence line. Fix by a
+  gated AC2 amendment at `/milestone-implement` step 6; RB12 is archived
+  history and cannot be edited to satisfy it.
+- **F1 (80) — RB12 asserts the probe reproduces a figure the probe never
+  computes.** RB12 claims it "reproduces every figure quoted in this brief"
+  and quotes "|mean| ≤ 6e-17, |SD − 1| ≤ 9e-16" for available-case `scale()`;
+  that check was in a plan-gate scratchpad probe and did not survive
+  consolidation into the committed script. Does **not** fail AC1 (see above).
+  Fix by adding the check to `devel/m64-fiml-probe.R`, which makes the
+  archived claim true rather than editing history.
+
+### Findings fixed anyway below the actioned bar, with reason
+
+Three findings scored under 80 but sit in durable records a future build
+session reads first, and each costs one sentence to correct — the M62
+precedent for fixing below the bar rather than logging and leaving a trap.
+
+- **F4 (63) — `sd = "raw"` is softened from a hard error to
+  "unavailable-with-reason".** RR12's §6 Ruling and BC9 set two *different*
+  contracts: `nb_reliability` becomes NA with an accumulated reason, while
+  `sd = "raw"` must be "refused with an informative error". M64-D4 and the
+  ROADMAP build row lump them. A planner reading the ROADMAP row rather than
+  BC9 implements a silent NA, which BC9's verbatim diff then flags as a
+  deviation. The ROADMAP is current knowledge and is corrected in place; the
+  milestone-local entry takes an appended correction. (RR12's own §6 bold
+  summary uses the loose phrase, so the drift is inherited — but the ruling,
+  not the summary, is what binds.)
+- **F5 (78) — wrong line cited for the vignette quote.** D-033 attributes
+  "address the missingness before interpreting the estimate" to
+  `vignettes/axes-reliability.Rmd:156`; the text is on 157. It points a build
+  session at the wrong line of the very paragraph BC16 requires rewriting.
+  The M43/M57 off-by-one anchor family, recurring.
+- **F3 (68) — the durable record claims a reversal that did not happen.**
+  D-033 says the metric holding "overturns the position M64 put to review" and
+  M64-D1 says it "overturns the standardization the plan submitted with it".
+  But M64's own Scope names available-case standardization as "the one
+  question this session cannot settle" — an open question, not a position —
+  and RR12 §1 answers it rather than reversing anything. Meanwhile all three
+  positions M64 *did* fix were confirmed (RR12 §4, §6, §8; §8 augmented the
+  bar rather than overturning it). A future session auditing which of M64's
+  positions survived review gets exactly the wrong answer. Corrected by the
+  appended entry.
+
+### Findings logged, not actioned (score < 80)
+
+- **F8 (65) — RB12's pasted probe transcript is not verbatim.** It omits the
+  `axes_reliability(): 600 complete case(s) used.` message the script emits
+  inside F3, while including the analogous F1b message. Not actioned: RB12 is
+  archived history and IP4 forbids editing it, no cited figure is affected,
+  and the appended correction records the discrepancy for anyone diffing the
+  block against a fresh run.
