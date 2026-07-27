@@ -307,7 +307,7 @@ attempts verified and what they caught.
 - **AC3** — complete data, fiml vs listwise: max |component difference| **1.52e-13**, reliability **3.2e-14**, SEm **4.34e-14**, all against the 1e-8 bar; measured against RR12's projected **5.6e-17**, both far inside. With `blocks` supplied so the ζ2 clause has its own evidence: **1.11e-16** across all five components.
 - **AC4** — `information[1] == "observed"` asserted on the object actually fitted, through the `axes_converged()` seam (3 assertions); the listwise branch is fired through the same capture and must read back `"listwise"` (1 assertion), so it cannot pass vacuously.
 - **AC5** — the ban holds (4 assertions: `axes_fit_cormat()` mocked to abort is never reached; unmocked, the reported χ² and ξ1 SE both differ from the banned two-stage refit while point estimates agree to < 0.01). **Strengthened this pass**: `$fit` is now pinned as a whole across paths, after the second review found `srmr` silently switching definition. On complete data all six measures agree — χ² 4.21e-12, df 0, pvalue 6.46e-14, rmsea 0, cfi 0, **srmr 1.14e-15** — and `cormat`'s srmr matches listwise bit-identically.
-- **AC6** — max |R̂ − `cor(mat)`| = **8.33e-16** against the 1e-12 bar; measured against RR12's projected **8.9e-16**. R̂ is read off the saturated fit, never recomputed from the standardized columns.
+- **AC6** — max |R̂ − `cor(mat)`| = **8.33e-16** against the 1e-12 bar; measured against RR12's projected **8.9e-16**. R̂ is read off the saturated fit, never recomputed from the standardized columns. The criterion binds **two** consumers of R̂, so both are measured, and the OLS-shadow half discriminatively — under the M2 MAR mechanism at N = 2000, where the two candidate matrices genuinely separate: the reported `details$ols_shadow[["xi1"]]` is **0.336302**, equal to the shadow recomputed from R̂ to **0.00e+00**, against **0.274541** from a pairwise available-case correlation (a gap of **6.18e-02**). The PD half is pinned by the clause (v) seam test. Noted from the third-pass fan-out: this discriminative check is a review-side measurement, not a suite assertion — no `ols_shadow` assertion exists in `test-axes-fiml.R`, and BC10's stored MCAR column cannot separate the two (0.3562 against 0.3563).
 - **AC7** — a test per clause, all pass: (i) the N_used floor with its own wording plus all-missing rows dropped and excluded; (ii) `< 2` observed values and zero-variance-among-observed refuse separately, each naming the item; (iii) a never-jointly-observed pair refuses naming the pair; (iv) the EM seam refuses when mocked, with the unmocked predicate asserted TRUE on real data; (v) the PD guard refuses R̂ at the seam — **not reachable end to end** under FIML, recorded with its measurement (a duplicated pair lands at eigenvalue 1.12e-08, just above the retained 1e-8 floor, because R̂ is a `cov2cor` of an EM ML covariance; such data is still refused, by clause (vi)); (vi) structured non-convergence refuses.
 - **AC8** — **now met, and the clause that failed the second pass is directly measured.** `print()` reports the **total** N: on a 300-row frame with 6 all-missing rows and 5% MCAR it prints `Total N: 300 (294 used, 92 complete)` against `details$n_total` **300**, `n` **294**, `n_complete` **92**; with nothing dropped it collapses to `Total N: 300 (71 complete)`. Listwise keeps `Complete N:` and cormat `Sample N:`. The startup message carries all four counts (4 assertions); `details$missing` reads back `"fiml"` off the fitted object via `axes_lav_missing()`, never echoed, with `n_complete` and `min_coverage` present (5 assertions). Two print tests now fence it: the no-drop case asserts N_used and the total coincide *and* that no "used" clause appears (5 assertions), and a new separated case asserts the total is 300, that the used count is shown, and that the line does **not** revert to 294 (5 assertions) — the coverage gap that let the label ship wrong.
 - **AC9** — `nb_reliability` NA with `"fiml"` in `nb_reason`, asserted accumulating with `"single_item"` on a single-item FIML instrument (4 + 3 assertions); `sd = "raw"` is a hard error naming `"std"` and numeric SDs, a numeric `sd` still works, and `"raw"` still works listwise (5 assertions).
@@ -319,6 +319,59 @@ attempts verified and what they caught.
 - **AC15** — all four components within 3 reported SEs: ξ̂1 **0.3000** (SE .0080, **0.00** SEs), ξ̂2 **0.1039** (.0048, **0.81**), ζ̂1 **0.0557** (.0036, **1.19**), ζ̂2 **0.0485** (.0026, **0.56**). Against RR12's projected **.2979/.1019/.0639/.0490 with SEs .0080/.0048/.0037/.0026** — every reported SE reproduces the projection to the printed digit.
 - **AC16** — read at review in all three surfaces. Roxygen `# Missing data`, the vignette caveat (lines 173–195) and NEWS each carry all five claims: listwise default; MAR **and** multivariate normality; listwise consistent-not-biased under MCAR; observed-information SEs on the standardized metric, conditional on the standardization constants, approximate for the correlation-as-covariance reason; certified by this package's synthetic oracle because Strack et al. report no missing-data analyses. The FIML-only SE caveat prints under `"fiml"` and not under `"listwise"`. Both printed caveats are quantified per RR13 Recommendation 2 — magnitude and direction-dependence: "about 40% at an axes variance of .35", "for weak-axes, strong-general instruments they are slightly understated", "global fit is flattered by roughly 4%". The roxygen edit this pass moved the boundary contract *out* of this section into its own; the five claims are unaffected and re-read in place.
 - **AC17** — `devtools::document()` no diff (re-run after the roxygen section split); `devtools::test()` 765 tests / **4245 passing** / 0 failures; `devtools::check(manual = TRUE)` **0 errors, 0 warnings, 0 notes** in 16m24s with `checking PDF version of manual ... OK` present by name (M7/M57 lesson).
+
+### Independent review — three lenses, then a scorer (third pass)
+
+Fan-out over `master..HEAD`. The **[S] blame-history** lens reported **no
+findings**, tracing each of the second return's three fixes to the intent of the
+code it changed: the `srmr_bentler_nomean` switch measured bit-identical on the
+listwise/`cormat` fits so AC1's shipped numbers are preserved; the `print()`
+change strictly more informative than what it replaced; the boundary section
+better placed than either the pre-M65 or first-draft state. It re-verified every
+guard from M53–M63 intact. The **[S] prior-review** lens reported **no
+regressions**, confirming the second return's three items fixed as claimed and
+that the fix commit never touches `R/axes_fiml.R` or the T6 harness, so the
+*first* return's remedies are not at risk (its GitHub PR-comment probe returned
+empty). The **[O] diff-bug** lens returned four findings, scored by a fresh
+**[S]** scorer that did not generate them.
+
+**Actioned (≥ 80): none.** All four scored below the threshold.
+
+**Below threshold — logged, not actioned (IP3):**
+
+- **F1 (62) — `fitMeasures()` drops an unknown name silently, and the new `$fit`
+  test cannot detect the hole.** Verified at review: requesting two measures with
+  one bogus name returns one element, no warning; the rename line then no-ops and
+  `$fit$srmr` — a documented `@return` field — is absent, while
+  `expect_identical(names(fi$fit), names(lw$fit))` compares two vectors built by
+  the same line of code, `expect_equal(fi$fit, lw$fit)` compares two equally
+  truncated lists, and `expect_equal(fi$fit$srmr, lw$fit$srmr)` reduces to
+  `expect_equal(NULL, NULL)`, which passes. Scored down as forward-looking: the
+  name is present on both 0.6.21 and 0.7-2, which this milestone cross-tested, so
+  nothing is wrong today. The fix is to pin the six literal names in the test
+  and/or assert `length(fm) == 6L` at the call. **This is a hole in a guard added
+  by this milestone's own second-return fix**, which is why it is cross-referenced
+  onto the ROADMAP row for the milestone that next touches this code rather than
+  only logged here.
+- **F2 (45)** — nothing pins `$fit`'s absolute values on any path, so a
+  common-mode change of the requested SRMR variant would move both paths together
+  undetected. Scored down as requiring an unmotivated edit a code review would
+  catch, unlike F1's "lavaan changes under us" mechanism.
+- **F3 (52)** — AC6's OLS-shadow clause has no *suite* assertion under FIML, and
+  BC10's stored MCAR column cannot discriminate R̂ from an available-case
+  substitute (0.3562 against 0.3563). Scored down because `R <- mom$R` is a single
+  shared assignment feeding both consumers, so the criterion holds by
+  construction — and the AC6 evidence line above now measures it discriminatively
+  under M2 MAR, where the two candidates separate by 6.18e-02.
+- **F4 (72)** — the `@return` text implies `n_complete` is FIML-only; it is set on
+  the listwise path too and asserted there, and the in-code comment states the
+  opposite of the roxygen. A clean documentation inconsistency in a CRAN
+  `@return` field, cheap to fix, but doc-precision rather than a wrong number.
+
+Also re-derived a third time and still unactioned at the user's standing gate
+choice: the thin-overlap warning fires on complete data whenever N < 30. It has
+now been found by three independent lenses and scored 76, 78 and (this pass, as a
+minor note) not scored. Cross-referenced with F1 and F4 onto the follow-on row.
 
 ### Consistency gate (third pass)
 
