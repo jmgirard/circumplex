@@ -1,11 +1,11 @@
 # M65: FIML item-level missing data for `axes_reliability()` — the build
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR12
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m65-axes-reliability-fiml-build` / —
 
 ## Goal
 
@@ -103,33 +103,50 @@ are standing and not revisited here.
 
 ## Tasks
 
-- [ ] **T1** — The metric layer: saturated-FIML (EM) means/SDs with the `sqrt(N_used/(N_used − 1))` rescaling, and R̂
-      built from them; complete-data equality tests against `scale(mat)` and `cor(mat)` at 1e-12.
+- [ ] **T1** — Metric layer: saturated-FIML (EM) means/SDs with the `sqrt(N_used/(N_used − 1))` rescaling and R̂
+      built from them (route per M65-D1); complete-data equality tests vs `scale(mat)`/`cor(mat)` at 1e-12.
 - [ ] **T2** — API + one-stage wiring: `missing =` on `axes_reliability()` (`R/axes_reliability.R:819`) through the
       existing `axes_fit(missing =)` → `sem_fit_cfa()` translation (`R/ssm_sem.R:749`); observed-information
       assertion; a test that no two-stage SE or χ² reaches `results`/`components`/`fit`/print.
-- [ ] **T3** — The six-clause refusal contract, the all-missing-row drop, and the soft thin-coverage warning. Per M62,
-      the mockable saturated-stage seam (clause iv) proves branch wiring only — assert each condition against the
-      unmocked path. Per M60, re-assert what the complete-case N ≤ p and PD checks refused *incidentally* before they
-      move to N_used and R̂.
+- [ ] **T3** — Six-clause refusal contract, all-missing-row drop, soft thin-coverage warning (M65-D2). Per the M62
+      lesson, clause (iv)'s mock proves wiring only — assert each condition unmocked. Per M60, re-assert what the
+      complete-case N ≤ p and PD checks refused *incidentally* before they move to N_used and R̂.
 - [ ] **T4** — Reporting and derived quantities: startup message, `print()`, `details` read-back via `lavInspect()`,
       `nb_reliability`/`nb_reason`, and the `sd = "raw"` hard error (D-034 correction 2 — an error, not an NA).
 - [ ] **T5** — In-suite evidence cells: BC11 MAR reversal, BC12 metric falsification, BC14 headline, BC15 ζ2.
-- [ ] **T6** — Heavy-cell harness (plan-gate choice): a seed-pinned `devel/` script runs BC10's three cells and BC13's
-      ≥200 replicates once (~45 min measured at 1.4–6.2 s per FIML fit, N = 600, 24 items), its summary committed as
-      an `.rds`; a fast test asserts that stored summary against BC10/BC13's thresholds **and** re-runs a few
-      replicates live so CI exercises the real path. Log what the live half does not cover.
-- [ ] **T7** — Docs: the roxygen missing-data paragraph (`R/axes_reliability.R:681-682`), the vignette caveat
-      paragraph (`vignettes/axes-reliability.Rmd:154-157`), the extended SE caveat, the diagonal-departure sentence,
-      and the NEWS entry. Run the M63 **two-way** enumeration sweep: grep the old "listwise deletion only" claim to
-      delete, and grep every surface that *enumerates* the missing-data policy to extend — assert completeness, not
-      presence.
-- [ ] **T8** — Fold the reviewer probes into `devel/m64-fiml-probe.R`; full `check(manual = TRUE)`; post-merge hygiene.
+- [ ] **T6** — Heavy-cell harness (M65-D3): seed-pinned `devel/` script runs BC10's three cells and BC13's ≥200
+      replicates once (~45 min measured), summary committed as `.rds`; a fast test asserts the stored summary against
+      BC10/BC13 **and** re-runs ~10 replicates live. Comment what the live half does not cover.
+- [ ] **T7** — Docs: roxygen missing-data paragraph (`R/axes_reliability.R:681-682`), vignette caveat
+      (`vignettes/axes-reliability.Rmd:154-157`), extended SE caveat, diagonal-departure sentence, NEWS entry. Run
+      the M63 **two-way** enumeration sweep — grep the old claim to delete *and* every enumeration to extend.
+- [ ] **T8** — Fold reviewer probes into `devel/m64-fiml-probe.R`; full `check(manual = TRUE)`; post-merge hygiene.
 
 ## Work log
 
 - 2026-07-26: created by /milestone-plan. Promotes the ROADMAP candidate GO'd by D-033 (corrected by D-034); ingests RR12 BC1–BC16 verbatim as AC1–AC16. Gate choices: one oversized milestone over a build/evidence split (the binding-criteria check binds all 16 to one file; M54 precedent); heavy BC10/BC13 cells as script + stored `.rds` + live smoke; all three RR12 §8 "Consider" items in scope.
 
+- 2026-07-26: started (/milestone-implement). Branch `m65-axes-reliability-fiml-build` cut from master at 1552b031; no dependencies to verify. Status planned→in-progress. Implement-gate choices recorded as M65-D1 (saturated moments via lavaan `h1` EM — an explicit saturated fit misses BC2/BC6 by five orders, measured), M65-D2 (soft overlap warning at 30), M65-D3 (~10-replicate live smoke, never skipped).
+- 2026-07-26: minor amendment (wording only, no scope change) — Tasks compressed from 25 lines to 18 by cutting duplicated lesson prose to pointers, after the M65-D1..D3 block left the plan-owned body at 148/149 with eight tasks still to run. No task added, removed, reordered, or rescoped.
+
 ## Decisions
+
+- **M65-D1 (2026-07-26): saturated moments come from lavaan's `h1` EM estimate, not an explicit saturated fit.**
+  BC2/BC6 demand 1e-12 agreement with `scale(mat)`/`cor(mat)` on complete data. Measured on the BC10 fixture
+  (24 items, N = 600): an explicit saturated `lavaan::sem()` reaches only 1.3e-07 and costs 9.3 s — the general
+  optimizer's convergence tolerance, five orders short, and no model tuning fixes that. `lavCor(dat, missing =
+  "ml", output = "fit", meanstructure = TRUE)` → `lavInspect(f, "h1")` returns `$mean` and `$cov` from lavaan's
+  EM in 0.11 s at 2.2e-15 / 1.1e-15, reproducing RR12's measured 8.9e-16, and is exported API (no `:::`). BC7
+  clause (iv)'s mockable seam attaches to this call.
+- **M65-D2 (2026-07-26): soft overlap warning at 30 jointly-observed respondents.** RR12 §7 binds no floor and
+  says any positive constant is arbitrary, so 30 is taken as the *conventional* small-sample floor for a
+  correlation, not a quantity derived here — the message names the number and the docs call it a convention with
+  no inferential meaning. The hard zero-coverage refusal (BC7 iii) is untouched.
+- **M65-D3 (2026-07-26): the BC10/BC13 live smoke runs ~10 replicates and is never skipped.** The ≥200-replicate
+  statistics come from a seed-pinned `devel/` script with a committed summary; the in-suite half re-runs ~10
+  replicates (~30 s at the measured 3.1 s/fit) with no `skip_on_cran()` — a skip flag here would repeat the
+  failure this repo has hit four times (M7 `--no-manual`, M16 `skip_on_cran()`, M31 vdiffr, M39 CI baseline):
+  green because it never ran. The test comments what the live half does *not* cover, so the stored summary is
+  never mistaken for something CI re-derives.
 
 ## Review
