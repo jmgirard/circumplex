@@ -96,8 +96,8 @@ are standing and not revisited here.
 - AC1, AC3, AC4, AC5 → T2
 - AC7 → T3
 - AC8, AC9 → T4
-- AC11, AC12, AC14, AC15 → T5
-- AC10, AC13 → T6
+- AC14, AC15 → T5
+- AC10, AC11, AC12, AC13 → T6
 - AC16 → T7
 - AC17 → T8
 
@@ -113,10 +113,10 @@ are standing and not revisited here.
       complete-case N ≤ p and PD checks refused *incidentally* before they move to N_used and R̂.
 - [x] **T4** — Reporting and derived quantities: startup message, `print()`, `details` read-back via `lavInspect()`,
       `nb_reliability`/`nb_reason`, and the `sd = "raw"` hard error (D-034 correction 2 — an error, not an NA).
-- [ ] **T5** — In-suite evidence cells: BC11 MAR reversal, BC12 metric falsification, BC14 headline, BC15 ζ2.
-- [ ] **T6** — Heavy-cell harness (M65-D3): seed-pinned `devel/` script runs BC10's three cells and BC13's ≥200
-      replicates once (~45 min measured), summary committed as `.rds`; a fast test asserts the stored summary against
-      BC10/BC13 **and** re-runs ~10 replicates live. Comment what the live half does not cover.
+- [x] **T5** — In-suite evidence cells, both fully live (~42 s measured): BC14 headline (F1b) and BC15 ζ2.
+- [ ] **T6** — Heavy-cell harness (M65-D3, extended to BC11/BC12 at the T5 gate): one seed-pinned `devel/` script runs
+      BC10, BC13, BC11, BC12 and commits an `.rds` summary; a fast test asserts it **and** re-runs live (~10 reps for
+      BC10/BC13, one per MAR cell). Comment what the live half misses. Driver: FIML fits measure 18-68 s, not 3.1 s.
 - [ ] **T7** — Docs: roxygen missing-data paragraph (`R/axes_reliability.R:681-682`), vignette caveat
       (`vignettes/axes-reliability.Rmd:154-157`), extended SE caveat, diagonal-departure sentence, NEWS entry. Run
       the M63 **two-way** enumeration sweep — grep the old claim to delete *and* every enumeration to extend.
@@ -137,6 +137,9 @@ are standing and not revisited here.
 - 2026-07-26: T3 done. All six BC7 clauses refuse, plus the all-missing-row drop and M65-D2's soft warning at 30. Clauses (i)-(iii) fire before the EM stage, which is the load-bearing order: lavaan fabricates an unidentified moment rather than failing (V-F). Two findings, both from firing the clauses on real data rather than assuming. (a) M65-D4: lavaan's default `em.h1.iter.max = 500` made clause (iv) refuse estimable data — an item at 40/300 coverage stalled at the default and converges in 0.23 s with room; the cap is now 50000 and healthy data is unaffected because EM exits on tolerance. (b) Clause (v) is NOT reachable end to end under FIML: R-hat is a cov2cor of an EM ML covariance, hence PSD by construction, and the EM's 1e-5 tolerance leaves ~1e-8 of residual noise, so an exactly duplicated item pair gives R-hat[1,2] = 1 with minimum eigenvalue 1.12e-08 — just above the retained 1e-8 floor (3.9e-16 for the same data listwise). Such data is still refused, by clause (vi). Tested at the seam on the M62 precedent, with a second test recording the end-to-end landing so the mock is never read as an end-to-end guarantee; the floor stays 1e-8 per AC6, since a FIML-specific floor would be a calibration RR12 did not do. Also re-asserted (M60): the listwise path still refuses on its own complete-case N and its own `cor()`. Full suite 0 failures / 4126 passing / 4 pre-existing warnings, count unchanged.
 
 - 2026-07-26: T4 done. Reporting: the BC8 startup message (landed with T3's row drop) reports N_used, complete cases, dropped rows, and minimum pairwise coverage; `print()` labels the FIML N `Total N:` with the complete-case count beside it, while listwise keeps `Complete N:` and cormat keeps `Sample N:` — three quantities, three labels. `details` gains `missing` (read off the fitted object via `axes_lav_missing()`, mirroring `sem_details()`, never echoed from the argument), `n_complete`, and `min_coverage`; the latter two are NA on the paths where they carry no information rather than absent, so a caller can read them unconditionally. Derived quantities: `nb_reason` gains `"fiml"` and accumulates with `cormat`/`single_item` (asserted on a single-item FIML instrument carrying two reasons at once), and `sd = "raw"` is a hard error naming both alternatives (D-034 correction 2) — the available-case composite SD is computable and plausible-looking, which is exactly why it must not be silently reported. Scale composites are no longer computed at all under FIML. Full suite 0 failures / 4150 passing / 4 pre-existing warnings, count unchanged.
+
+- 2026-07-26: gated amendment at the T5 gate — BC11 and BC12 move from T5's in-suite cells to T6's harness; T5 keeps BC14 and BC15 fully live (~42 s). Driver, measured: the structured `cfa(missing = "ml")` runs 18-68 s per fit under realistic MAR missingness (the saturated EM is 0.5 s), 6-20x the plan's 3.1 s/fit assumption, so BC11+BC12 as planned would add ~14 min to every suite run. Neither criterion says where its replicates run, so no criterion text changed; Tasks T5/T6 and the Coverage rows for AC11/AC12 did. User approved.
+- 2026-07-26: T5 done. BC14: at RR12's pinned seed 115 the F1b fixture leaves 13 complete cases against 24 items, so listwise refuses on N ≤ p while FIML fits all 600 and lands at |ξ̂1 − .35| well inside .05 with a finite reported SE — converged, non-boundary, and near truth asserted as three separate claims, since a boundary fit also "converges". BC15: the crossed-blocks cell recovers all four components within 3 REPORTED SEs of truth (.30/.10/.06/.05), which tests the SEs as well as the estimates — a collapsed SE fails it even with a perfect point estimate. The M1/M2 mechanisms were reconstructed from RR12's header and check out against its own numbers: M1 seed 501 gives FIML ξ̂1 = .3466 vs listwise .3167, and seed 115 reproduces RR12's reported complete-case count exactly. Full suite 0 failures / 4162 passing / 4 pre-existing warnings, 6m25s wall.
 
 ## Decisions
 

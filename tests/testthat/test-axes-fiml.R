@@ -687,3 +687,79 @@ test_that("BC9: `sd = \"raw\"` is a hard error under FIML, not an NA", {
     "circumplex_axes_reliability"
   )
 })
+
+
+# --- T5: the two live evidence cells (BC14, BC15) -----------------------------
+#
+# BC11's MAR reversal and BC12's metric falsification moved to the T6 harness at
+# the T5 gate (2026-07-26): the structured FIML fit measures 18-68 s per fit
+# under realistic MAR missingness, so their replicate counts cost ~14 minutes
+# per suite run. These two cells are each a single fit and stay fully live --
+# nothing about them is read from a stored summary.
+
+test_that("BC14: FIML estimates a dataset listwise cannot touch", {
+  skip_if_not_installed("lavaan")
+  # The headline. 15% per-item MCAR over 24 items leaves almost no complete
+  # respondents -- listwise is not merely inefficient here, it has nothing left
+  # to fit -- while FIML uses all 600. Seed 115 is RR12's pinned probe seed;
+  # its 13 complete cases are what makes the two paths' fates so different.
+  oct <- octants()
+  set.seed(115)
+  mat <- as.matrix(axes_simulate(600L, oct, 3L, .35, .10, .08))
+  mat[runif(length(mat)) < 0.15] <- NA
+  items <- fiml_items(mat)
+  dat <- as.data.frame(mat)
+
+  expect_lt(sum(stats::complete.cases(mat)), ncol(mat))
+  expect_error(
+    suppressMessages(
+      axes_reliability(dat, items = items, angles = oct, missing = "listwise")
+    ),
+    "Complete-case N"
+  )
+
+  res <- suppressMessages(
+    axes_reliability(dat, items = items, angles = oct, missing = "fiml")
+  )
+  expect_identical(res$details$n, 600L)
+  expect_true(res$details$converged)
+  expect_false(res$results$boundary[[1]])
+  # Converged AND non-boundary AND near truth. The three are separate claims:
+  # a boundary fit would also "converge", and a converged non-boundary fit can
+  # still be far from .35, which is what the tolerance is for.
+  expect_lt(abs(res$results$xi1[[1]] - 0.35), 0.05)
+  # A reported SE, not an NA -- the fit has to have produced usable information
+  # for the estimate to be worth anything.
+  expect_true(is.finite(res$components$SE[res$components$Symbol == "xi1"]))
+})
+
+test_that("BC15: the five-component model is recovered under missingness", {
+  skip_if_not_installed("lavaan")
+  # The zeta2 cell. A crossed block design (item j of every scale in block j) is
+  # the layout that identifies block specificity, and this asks whether all four
+  # estimated components survive 5% MCAR -- not just xi1, which the other cells
+  # already cover. Truth .30/.10/.06/.05.
+  oct <- octants()
+  blk <- axes_crossed_blocks(8L, 3L)
+  set.seed(915)
+  mat <- as.matrix(
+    axes_simulate(2000L, oct, 3L, .30, .10, .06, zeta2 = .05, item_block = blk)
+  )
+  mat[runif(length(mat)) < 0.05] <- NA
+  res <- suppressMessages(
+    axes_reliability(as.data.frame(mat), items = fiml_items(mat), angles = oct,
+                     blocks = split(colnames(mat), blk), missing = "fiml")
+  )
+  expect_true(res$details$zeta2_fitted)
+  truth <- c(xi1 = .30, xi2 = .10, zeta1 = .06, zeta2 = .05)
+  for (sym in names(truth)) {
+    est <- res$components$Estimate[res$components$Symbol == sym]
+    se <- res$components$SE[res$components$Symbol == sym]
+    # Within 3 REPORTED SEs, so the criterion tests the SEs as well as the
+    # point estimates: an SE collapsed to near zero would fail this even with a
+    # perfect estimate, and an inflated one cannot rescue a bad estimate by
+    # much. Labelled so a failure names the component.
+    expect_lt(abs(est - truth[[sym]]) / se, 3,
+              label = paste0("|", sym, " - truth| / SE"))
+  }
+})
