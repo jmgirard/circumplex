@@ -1,6 +1,6 @@
 # M65: FIML item-level missing data for `axes_reliability()` — the build
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR12
@@ -154,6 +154,8 @@ instead of forcing listwise deletion.
 - 2026-07-27: gates re-run after the fix, status in-progress→review. CI on PR #91 is green on every job: `ubuntu-latest (release)` passes in 20m24s (it had 26 errors), `test-coverage` passes in 19m56s (it had not finished last time), `pkgdown` and both codecov contexts pass. Local `devtools::check(manual = TRUE)` 0 errors / 0 warnings / 0 notes with `checking PDF version of manual ... OK` by name (AC17); `document()` no diff; `cairn_validate` exit 0 with the same 48 advisories as before (47 M7 work-log lines, 1 M65 sizing). Full suite clean under lavaan 0.6.21 AND 0.7-2, 4 pre-existing warnings on each.
 
 - 2026-07-27: **review second pass, checkpoint (in flight).** 16 of 17 criteria verified with fresh evidence and ticked; full suite 763 tests / 4235 passing / 0 failures / 4 pre-existing warnings; `cairn_validate` exit 0 with all 16 checks PASS; `pkgdown::check_pkgdown()` clean. **AC8 fails as written and is unticked**: `print()`'s FIML branch shows `details$n` (N_used) labelled `Total N:` while `details$n_total` is populated and never printed — measured 294 against a true 300 on a frame with 6 all-missing rows. Blame-history and prior-review lenses both returned no findings, the latter confirming F1 and F3 are genuinely fixed and that the 1e-6→1e-4 tolerance is not a disguised widening of BC13's band. The diff-bug lens returned five findings; the confidence scorer is still running, so the disposition is not yet recorded. Independently re-derived while waiting: SRMR silently changes definition under `missing = "fiml"` (mean-inclusive Bentler), measured on COMPLETE data at ratio 0.96225 = sqrt(25/27) exactly against listwise, with chi-square and CFI agreeing to the digit; the roxygen `# Missing data` heading swallowed the boundary-fit contract in the rendered `.Rd`; and M65-D2's documentation half is unmet.
+
+- 2026-07-27: **returned by /milestone-review (second return).** Status review→in-progress. Three sufficient reasons. (1) **AC8 fails as written**: `print()`'s FIML branch shows `details$n` (N_used) labelled `Total N:` while `details$n_total` is populated and never printed — measured 294 against a true 300 on a 300-row frame with 6 all-missing rows. The remedy is either printing `n_total` or a gated amendment to AC8's wording; review does not choose, and does not read the criterion charitably. (2) **F1 (87)**: under `missing = "fiml"` the reported SRMR silently becomes lavaan's mean-inclusive Bentler variant, deflated by exactly `sqrt((p+1)/(p+3))` — reproduced on COMPLETE data at ratio 0.96225 = sqrt(25/27) (p = 24) and 0.94591 = sqrt(17/19) (p = 16), with χ² and CFI agreeing to the digit and `srmr_bentler_nomean` on the FIML object returning the listwise value bit-identically. (3) **F4 (88)**: the roxygen `# Missing data` heading swallowed the boundary-fit contract, which now renders inside that section at `man/axes_reliability.Rd:204-211` with an orphaned `A boundary` line break. Logged below threshold: F2 (38, the AC8 label scored as a finding), F3 (38, M65-D2's doc half), F5 (78, the thin-overlap warning firing on complete data at N < 30 — the first return's F2 at 76, re-derived by a different lens and scored by a different scorer, twice just under the bar). Everything else verified: 16 of 17 criteria fresh, full suite 763 tests / 4235 passing / 0 failures, CI green on every job, `cairn_validate` exit 0 all 16 PASS, `pkgdown::check_pkgdown()` clean, `check(manual = TRUE)` 0/0/0. Blame-history and prior-review lenses returned no findings. Second return of three before the re-plan threshold; no criterion has failed twice.
 
 ## Decisions
 
@@ -333,6 +335,78 @@ reports no problems; README.Rmd untouched; no new top-level files, and
 present; full `devtools::check(manual = TRUE)` clean. The committed fixture
 carries its provenance in-file (source, generator script, truth, per-cell seeds,
 replicate count, R and lavaan versions), per the profile's fixture rule.
+
+### Independent review — three lenses, then a scorer (second pass)
+
+Fan-out over `master..HEAD`. The **[S] blame-history** lens reported **no
+findings**: every guard traced from M53–M63 is intact, and it judged both of the
+return fix's test changes (the M60 re-assertion fixture rebuild, the 1e-6→1e-4
+tolerance) as fixes on the merits rather than weakenings. The **[S] prior-review**
+lens reported **no regressions**, confirming F1 and F3 of the first return are
+genuinely fixed and that the loosened tolerance is not a disguised widening of
+BC13's band (its GitHub PR-comment probe returned empty, so archived `## Review`
+sections plus RB13/RR13 were the evidence). The **[O] diff-bug** lens returned
+five findings, scored by a fresh **[S]** scorer that did not generate them.
+
+**Actioned (≥ 80):**
+
+- **F1 (87) — under `missing = "fiml"` the reported SRMR silently switches
+  definition and is systematically optimistic.** `fitMeasures(fit, "srmr")` on a
+  `missing = "ml"` fit returns lavaan's *mean-inclusive* Bentler SRMR, while the
+  listwise and `cormat` paths get the covariance-only one. Because lavaan frees
+  every item intercept the mean structure is saturated and the mean residuals are
+  structurally zero, so the extra terms only dilute the denominator from
+  `p(p+1)/2` to `p(p+1)/2 + p` — deflating the reported value by exactly
+  `sqrt((p+1)/(p+3))`. Reproduced three times independently on **complete** data
+  (no missing cells at all): at p = 24 listwise 0.043740 against fiml 0.042089,
+  ratio **0.96225** = `sqrt(25/27)` to five decimals, while χ² and CFI agree to
+  the printed digit; at p = 16 the ratio is 0.94591 = `sqrt(17/19)`; and
+  `fitMeasures(fit, "srmr_bentler_nomean")` on the FIML object returns the
+  listwise value bit-identically. `$fit$srmr` is a documented `@return` field
+  readers compare against Hu & Bentler's .08, and nothing in `details` marks that
+  it changed meaning. No test compares `$fit` across the two paths — AC3 covers
+  only components, reliability and SEm.
+- **F4 (88) — the roxygen `# Missing data` section swallowed the boundary-fit
+  contract.** The new heading was opened where T7 deleted the old "listwise
+  deletion only" sentence, so the entire boundary-solution contract (NA
+  reliability and SEm, the `(0, 1)` rule, negative variances) — which governs all
+  three input paths — now renders inside `\section{Missing data}` at
+  `man/axes_reliability.Rd:204-211`, and the paragraph opens with an orphaned
+  `A boundary` on its own line. Valid Rd, so `R CMD check` passes over it; wrong
+  content placement in a CRAN-shipped help page.
+
+**Below threshold — logged, not actioned (IP3):**
+
+- **F2 (38)** — the same fact as the AC8 gate failure above, scored as a
+  *finding* rather than as a criterion. The scorer judged the label a considered
+  design choice, citing the print method's own comment ("every respondent the FIML
+  fit used") and the startup message's separate report of the dropped rows. Its
+  justification also cites both review passes as having signed the format off,
+  which is not correct for this pass — AC8 is unticked above. The finding's score
+  and the criterion's failure are separate questions: a low score does not license
+  reinterpreting a criterion, so the gate failure stands regardless.
+- **F3 (38)** — M65-D2's documentation half: no user-facing surface calls the
+  30-respondent floor a convention, though the runtime warning itself does, in the
+  decision's own words, at the point of contact. No AC binds it.
+- **F5 (78)** — the thin-overlap warning fires on complete data whenever N < 30,
+  because `min_coverage == n_used` with nothing missing, and says "some item
+  pair(s)" when it holds for all of them. Reproduced at N = 25 with zero NAs. This
+  is the first return's F2 (scored 76) re-derived independently by a different
+  lens and scored 78 by a different scorer — two passes, both just under the bar.
+
+### Disposition — RETURNED to `in-progress` (second return)
+
+Three separate reasons, any one of which is sufficient: AC8 fails as written; F1
+and F4 both score at or above the actioning threshold. Per the never-reinterpret
+rule, AC8 is not read charitably here — the remedy is either to print
+`details$n_total` or to amend AC8's wording through `/milestone-implement`'s
+gate, and that choice belongs to implement with the user at its question gate,
+not to review.
+
+Thrash count: **second return of this milestone** (first was 2026-07-27, CI on
+lavaan 0.7-2 plus F1/F3). The third-return re-plan threshold has not been
+reached, and no criterion has failed twice — AC8's is a first failure — so
+neither thrash trigger fires.
 
 ### Cross-version verification (new this pass)
 
