@@ -1,6 +1,6 @@
 # M65: FIML item-level missing data for `axes_reliability()` — the build
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR12
@@ -116,7 +116,7 @@ instead of forcing listwise deletion.
 - [x] **T7** — Docs: roxygen missing-data paragraph (`R/axes_reliability.R:681-682`), vignette caveat
       (`vignettes/axes-reliability.Rmd:154-157`), extended SE caveat, diagonal-departure sentence, NEWS entry. Run
       the M63 **two-way** enumeration sweep — grep the old claim to delete *and* every enumeration to extend.
-- [ ] **T8** — Fold reviewer probes into `devel/m64-fiml-probe.R`; full `check(manual = TRUE)`; post-merge hygiene.
+- [x] **T8** — Fold reviewer probes into `devel/m64-fiml-probe.R`; full `check(manual = TRUE)`; post-merge hygiene.
 
 ## Work log
 
@@ -146,6 +146,9 @@ instead of forcing listwise deletion.
 - 2026-07-27: **AC13's calibration clause fails and is escalated.** Measured mean reported FIML SE ÷ empirical SD of ξ̂1 = 1.452 at 5% MCAR over 200 reps, against RR12's required [0.85, 1.15]. Diagnostic: the shipped listwise path measures 1.452 on COMPLETE data over the same 200 seeds, so the ~45% conservatism is the documented correlation-as-covariance approximation (Cudeck, 1989) inherited whole — FIML adds none of its own, and RR12 set the band without measuring the shipped path, so neither path could ever have met it. The band is NOT widened (AC13 forbids it). At the T6 gate the user declined both the record-and-caveat remedy and an in-milestone SE fix, and chose escalation: whether a CRAN-shipped estimator's 45%-conservative SEs should be corrected rather than caveated is going to a Fable review brief. The suite therefore carries ONE known failure (test-axes-fiml.R BC13 calibration upper bound) — deliberate, not overlooked; it is the criterion recording its own unmet state until the RB rules. T8's `check(manual = TRUE)` is not run for the same reason.
 
 - 2026-07-27: blocked on RB13 (`cairn/reviews/RB13-axes-reliability-se-calibration.md`) — whether `axes_reliability()`'s ~45%-conservative standard errors should be corrected rather than caveated, which would supersede D-026 holding (5) and RR09 §2's "document, don't fix". T8's `check(manual = TRUE)` and the AC13 disposition both wait on the RR. Deviation from `/milestone-brief` step 2, logged rather than silent: the RB and this status change are committed on the milestone branch, not the default branch, because M65's milestone file has diverged there and a status change on master would conflict at merge.
+
+- 2026-07-27: RR13 ingested. Verdict verified rather than taken on trust — the report's appendix is standalone base R and was re-run at ingestion, reproducing ratio 1.441229 and predicted SEs 0.01677/0.01164 exactly, plus the multiplicative FIML repair at 1.001/1.008/1.018. D-035 records the supersession of D-026 holding (5); the correction itself is a ROADMAP candidate bound by RR13 BC1–BC6, NOT folded into M65. Applied here: the Deviations from RR12 table (BC13's band replaced by BC7's [1.31, 1.57], quoted verbatim), the replacement band in the test plus a new assertion that dividing out the single analytic ratio calibrates every FIML cell to within 2%, and both printed caveats quantified in `print()`, roxygen and the vignette instead of saying "approximate". Scope compressed by 5 lines to fit the table under the 150-line cap; Scope's Out clause gains the SE correction. Status blocked→in-progress.
+- 2026-07-27: T8 done. `devtools::check(manual = TRUE)` clean — 0 errors / 0 warnings / 0 notes in 12m25s — and the log carries `checking PDF version of manual ... OK` at line 113 by name (the M7/M57 lesson; a first attempt that also passed `args = "--no-manual"` was killed and re-run, since those two arguments together suppress exactly the step AC17 names). `document()` produces no diff. Full suite 0 failures / 4197 passing / 4 pre-existing warnings. Status → review.
 
 ## Decisions
 
