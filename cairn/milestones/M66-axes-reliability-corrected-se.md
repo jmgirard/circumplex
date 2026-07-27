@@ -37,7 +37,7 @@ doc/NEWS surfaces the correction falsifies.
 
 ## Acceptance criteria
 
-- [ ] **AC1 (BC1, the correction).** Corrected component SEs are computed as
+- [x] **AC1 (BC1, the correction).** Corrected component SEs are computed as
   SE_corr = √(2·tr(W_c Σ̂ W_c Σ̂)/n), where W = ½ Σ̂⁻¹(Σ_s c_s M_s)Σ̂⁻¹ with
   {M_s} the model's derivative matrices {C, J, B (, K), E_11…E_pp}, c the
   target parameter's row of (Δ′VΔ)⁻¹, and W_c equal to W off the diagonal
@@ -45,31 +45,31 @@ doc/NEWS surfaces the correction falsifies.
   dependency; lavaan/OpenMx stay Suggests), evaluated at the fitted Σ̂,
   identical code on the data and cormat paths, and applied to every SE the
   `components` table reports (ξ1, ξ2, ζ1 and ζ2 when fitted).
-- [ ] **AC2 (BC2, deterministic anchors).** Fitting the exact probe population
+- [x] **AC2 (BC2, deterministic anchors).** Fitting the exact probe population
   matrix (8 scales × 3 items, ξ1=.35, ξ2=.10, ζ1=.08) at n = 600: the
   uncorrected SE(ξ1) must equal 0.01677 within 2e-4 and the corrected SE(ξ1)
   must equal 0.01164 within 2e-4; the corrected/uncorrected ratio for
   (ξ1, ξ2, ζ1) must equal (1/1.441, 1/1.067, 1/0.997) within 0.01 each.
-- [ ] **AC3 (BC3, empirical calibration, complete data).** Over ≥200
+- [x] **AC3 (BC3, empirical calibration, complete data).** Over ≥200
   complete-data replicates at the probe population (the fixture seeds may be
   reused), mean corrected SE(ξ1) / empirical SD(ξ̂1) ∈ [0.90, 1.10] (band
   ≈ ±2.8 MC SEs; measured 1.005 over 50 replicates in this review).
-- [ ] **AC4 (BC4, FIML composition).** The FIML path's corrected SE is the
+- [x] **AC4 (BC4, FIML composition).** The FIML path's corrected SE is the
   observed-information SE divided by the same per-parameter ratio evaluated
   at Σ̂. Against the committed 200-replicate fixture at 2, 5, and 10% MCAR,
   mean corrected FIML SE(ξ1) / empirical SD ∈ [0.90, 1.10] in every cell
   (measured 1.001/1.008/1.018).
-- [ ] **AC5 (BC5, beyond-mild-missingness check).** One cell each at 15% MCAR
+- [x] **AC5 (BC5, beyond-mild-missingness check).** One cell each at 15% MCAR
   (the BC14 headline fixture population) and mechanism M1 MAR with enough
   replicates that the MC SE of the SD is ≤ 5%: corrected SE / empirical SD
   ∈ [0.85, 1.15]. If either cell fails, escalate to the exact route
   (Γ_R from the saturated fit's observed-information acov, delta-transformed)
   or the pipeline bootstrap — the band must not be widened.
-- [ ] **AC6 (BC6, independent oracle).** On ≥2 complete-data draws, a pipeline
+- [x] **AC6 (BC6, independent oracle).** On ≥2 complete-data draws, a pipeline
   bootstrap (≥200 resamples, re-computing the correlation matrix per
   resample) must agree with the corrected SE(ξ1) within 15% relative; the
   test must not use lavaan's `se = "bootstrap"`.
-- [ ] **AC7 (docs state the corrected contract).** The printed
+- [x] **AC7 (docs state the corrected contract).** The printed
   `axes_se_caveat` drops its standard-error clause and keeps its global-fit
   sentence unchanged; `axes_fiml_se_caveat` is unchanged; the roxygen passages
   the correction falsifies are rewritten — both the `@details`
@@ -181,3 +181,62 @@ doc/NEWS surfaces the correction falsifies.
 ## Decisions
 
 ## Review
+
+### Evidence per criterion
+
+Gathered fresh at the review gate 2026-07-27, by command, on branch
+`m66-axes-reliability-corrected-se` at parity with `origin/master`.
+
+- **AC1 — met.** `DESCRIPTION` is byte-unchanged against master (no new
+  dependency; lavaan/OpenMx stay Suggests). `R/axes_corrected_se.R` calls
+  nothing outside base R and `stats::`. Every reported component SE routes
+  through `se_reported` (`R/axes_reliability.R:1591-1608`): xi2, xi1, and
+  zeta1/zeta2 where fitted; the item row keeps its structural `NA`. The
+  correction is evaluated at the fitted Sigma-hat and the same code serves the
+  data and cormat paths.
+- **AC2 — met.** naive SE(xi1) **0.016746** against projected **0.01677**
+  (gap 2.41e-05, tol 2e-4); corrected **0.011626** against projected
+  **0.01164** (gap 1.36e-05, tol 2e-4). Corrected/uncorrected ratios measured
+  **0.69428 / 0.93696 / 1.00313** against projected **0.69396 / 0.93721 /
+  1.00301** (gaps 3e-4 / 2e-4 / 1e-4, tol 0.01 each). Independently, the naive
+  branch reproduces lavaan's own information-matrix SE to <1e-7 on all four
+  components including the blockwise K.
+- **AC3 — met.** 201 complete-data replicates: calibration **0.9584**, band
+  [0.90, 1.10]. RR13 projected 1.005 over 50 replicates; the difference is in
+  the denominator, not the correction (mean corrected SE 0.011620 against the
+  closed-form 0.011639, agreement 0.2%; empirical SD 0.012124 against RR13's
+  0.01158, 1.3 MC SEs apart on two independent ~200-replicate experiments).
+- **AC4 — met.** Corrected FIML SE / empirical SD over the committed
+  200-replicate fixture: **1.0013 / 1.0075 / 1.0182** at 2/5/10% MCAR against
+  projected **1.001 / 1.008 / 1.018**, band [0.90, 1.10]. Reproduces RR13 to
+  the digit in every cell.
+- **AC5 — met.** 15% MCAR **0.9255**; M1 MAR at N=2400 **1.0152**; band
+  [0.85, 1.15], both inside, so RR13's exact-route escalation is not
+  triggered. R=201 per cell puts the MC SE of the SD at **exactly 0.0500**
+  against BC5's "<= 5%" — met at the boundary by construction, since 201 is
+  the smallest R satisfying it. 201/201 replicates usable in every cell with
+  xi1 unbiased, so no selection effect stands behind any figure.
+- **AC6 — met.** Pipeline bootstrap, 3 draws x B=1000, re-computing the
+  correlation matrix per resample and not using lavaan's `se = "bootstrap"`:
+  agreement with the corrected SE **2.02% / 2.21% / 2.52%** against the 15%
+  bar, and **32.40% / 29.99% / 26.66%** from the uncorrected value — the
+  oracle discriminates the two rather than merely clearing the bar.
+- **AC7 — met.** Rendered `print()` carries the global-fit sentence verbatim
+  and the new calibrated-SE claim, and none of the four falsified phrases;
+  the built Rd states the correction, the FIML path's inclusion in it, the
+  residual it does not reach, and the chi-square explicitly NOT corrected with
+  RR13 B-1's 261.1/273. `axes_fiml_se_caveat`'s printed string is byte-identical
+  to master (independently verified by the blame lens). NEWS carries the entry
+  under Breaking changes, with no milestone numbers in user-facing text.
+  Guards mutation-verified: reverting the caveat reddens 4 assertions, deleting
+  the FIML correction sentence reddens the positive assert added for it.
+
+### Consistency gate
+
+- `cairn_validate` — all checks pass, exit 0 (48 advisories, none a failure;
+  47 are M7's pre-existing wrapped work-log lines).
+- `devtools::document()` — no diff in `man/` or `NAMESPACE`.
+- `pkgdown::check_pkgdown()` — "No problems found", exit 0.
+- `.Rbuildignore` covers `^devel$` and `^cairn$`; no new top-level file is
+  unignored. README.Rmd/README.md untouched by this branch.
+- NEWS entry present, no milestone numbers.
