@@ -237,10 +237,22 @@ test_that("on complete data EVERY reported fit measure agrees between paths", {
   fi <- suppressMessages(
     axes_reliability(dat, items = items, angles = octants(), missing = "fiml")
   )
-  expect_identical(names(fi$fit), names(lw$fit))
+  # The names are pinned to LITERALS, not to each other. `fitMeasures()` drops a
+  # name it does not recognize -- silently, no warning, a shorter vector -- and
+  # the FIML path asks for `srmr_bentler_nomean`, which is one of lavaan's six
+  # internal SRMR variants rather than a documented alias, in a package that is
+  # Suggests with no version floor. Compared to each other these two lists come
+  # from ONE line of code, so a dropped name shortens both alike: the comparison
+  # passes, `$fit$srmr` is absent from a documented @return field, and
+  # `expect_equal(NULL, NULL)` passes too. Measured at review, not reasoned
+  # about: requesting two measures with one bogus name returns one element.
+  expected <- c("chisq", "df", "pvalue", "rmsea", "cfi", "srmr")
+  expect_identical(names(lw$fit), expected)
+  expect_identical(names(fi$fit), expected)
   expect_equal(fi$fit, lw$fit, tolerance = 1e-8)
-  # And the failing element specifically, so a regression names itself rather
-  # than reporting "the list differs somewhere".
+  # And the element that actually broke, named so a regression reports itself
+  # rather than "the list differs somewhere". Guarded against the NULL == NULL
+  # degenerate case by the name pins above.
   expect_equal(fi$fit$srmr, lw$fit$srmr, tolerance = 1e-8)
 })
 

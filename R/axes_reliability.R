@@ -871,9 +871,13 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   (including `zeta1_fitted` and `zeta2_fitted`, whether scale and block
 #'   specificity were in the model, `blocks`, the block labels when a block map
 #'   was supplied, `nb_reason`, why the Nunnally-Bernstein comparison is `NA`,
-#'   `missing`, which missing-data treatment lavaan actually used, and --
-#'   under `missing = "fiml"` -- `n_complete`, the complete-case count, and
-#'   `min_coverage`, the fewest respondents behind any item pair).
+#'   `missing`, which missing-data treatment lavaan actually used,
+#'   `n_complete`, the complete-case count, and `min_coverage`, the fewest
+#'   respondents behind any item pair). `n_complete` and `min_coverage` are
+#'   present on every path so that a caller can read them unconditionally, and
+#'   are `NA` where they carry no information: `min_coverage` outside
+#'   `missing = "fiml"`, and both of them when a correlation matrix was supplied
+#'   in place of raw data.
 #' @references
 #' Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The reliability of
 #' circumplex axes. \emph{SAGE Open}, 3(2). \doi{10.1177/2158244013486115}
@@ -1567,8 +1571,22 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # on lavaan 0.6.21 AND 0.7-2, both paths), so this cannot disturb AC1's
   # bit-identity to the shipped numbers. The returned element keeps the name
   # "srmr": the contract is the quantity, not lavaan's spelling of it.
-  fm <- lavaan::fitMeasures(fit, c("chisq", "df", "pvalue", "rmsea", "cfi",
-                                   "srmr_bentler_nomean"))
+  want <- c("chisq", "df", "pvalue", "rmsea", "cfi", "srmr_bentler_nomean")
+  fm <- lavaan::fitMeasures(fit, want)
+  # lavaan DROPS a measure name it does not recognize -- silently, no warning,
+  # just a shorter vector (measured: two names, one bogus, returns one element).
+  # `srmr_bentler_nomean` is an internal variant rather than a documented alias
+  # and lavaan is a Suggests with no version floor, so a future rename would
+  # otherwise delete `$fit$srmr` -- a documented @return field -- and leave the
+  # object looking well formed. Refuse instead of shipping a hole.
+  if (!identical(names(fm), want)) {
+    stop(
+      "The installed lavaan did not return the expected fit measures (missing: ",
+      paste(setdiff(want, names(fm)), collapse = ", "),
+      "). This is a lavaan version incompatibility; please report it.",
+      call. = FALSE
+    )
+  }
   names(fm)[names(fm) == "srmr_bentler_nomean"] <- "srmr"
   new_axes_reliability(
     results = results,

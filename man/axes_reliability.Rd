@@ -73,9 +73,13 @@ specificity was fitted), \code{fit} (global fit indices), and \code{details}
 (including \code{zeta1_fitted} and \code{zeta2_fitted}, whether scale and block
 specificity were in the model, \code{blocks}, the block labels when a block map
 was supplied, \code{nb_reason}, why the Nunnally-Bernstein comparison is \code{NA},
-\code{missing}, which missing-data treatment lavaan actually used, and --
-under \code{missing = "fiml"} -- \code{n_complete}, the complete-case count, and
-\code{min_coverage}, the fewest respondents behind any item pair).
+\code{missing}, which missing-data treatment lavaan actually used,
+\code{n_complete}, the complete-case count, and \code{min_coverage}, the fewest
+respondents behind any item pair). \code{n_complete} and \code{min_coverage} are
+present on every path so that a caller can read them unconditionally, and
+are \code{NA} where they carry no information: \code{min_coverage} outside
+\code{missing = "fiml"}, and both of them when a correlation matrix was supplied
+in place of raw data.
 }
 \description{
 Estimate the reliability (and standard error of measurement) of the two

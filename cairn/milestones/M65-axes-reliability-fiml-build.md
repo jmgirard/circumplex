@@ -1,6 +1,6 @@
 # M65: FIML item-level missing data for `axes_reliability()` — the build
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR12
@@ -21,62 +21,62 @@ instead of forcing listwise deletion.
 
 ## Acceptance criteria
 
-- [x] AC1 (BC1): `axes_reliability()` gains `missing = c("listwise", "fiml")` with `"listwise"` the default, matching `ssm_sem()`'s
+- [ ] AC1 (BC1): `axes_reliability()` gains `missing = c("listwise", "fiml")` with `"listwise"` the default, matching `ssm_sem()`'s
       spelling; the `"fiml"` → lavaan `"ml"` translation goes through `sem_fit_cfa()`. Every pre-M64 test passes unchanged, and the
       listwise path's numbers are bit-identical to shipped.
-- [x] AC2 (BC2): Under `missing = "fiml"` the items are standardized by the saturated-model FIML (EM) means and by the FIML SDs
+- [ ] AC2 (BC2): Under `missing = "fiml"` the items are standardized by the saturated-model FIML (EM) means and by the FIML SDs
       rescaled by `sqrt(N_used/(N_used − 1))` — never by available-case `scale()` moments — and the reported fit is a single
       structured `lavaan::cfa(missing = "ml", orthogonal = TRUE)` on those columns. On complete data the standardized matrix must
       equal `scale(mat)` within 1e-12 elementwise.
-- [x] AC3 (BC3): On data with no missing cells, `missing = "fiml"` must reproduce `missing = "listwise"`'s ξ1, ξ2, ζ1 (and ζ2 when
+- [ ] AC3 (BC3): On data with no missing cells, `missing = "fiml"` must reproduce `missing = "listwise"`'s ξ1, ξ2, ζ1 (and ζ2 when
       fitted), reliability, and SEm within 1e-8 each (measured: 5.6e-17 on ξ1 for the probe fixture).
-- [x] AC4 (BC4): A test must assert on the fitted FIML lavaan object that `lavInspect(fit, "options")$information[1] == "observed"`.
-- [x] AC5 (BC5): The reported component SEs and fit measures must come from the one-stage FIML fit; no SE or χ² computed from a
+- [ ] AC4 (BC4): A test must assert on the fitted FIML lavaan object that `lavInspect(fit, "options")$information[1] == "observed"`.
+- [ ] AC5 (BC5): The reported component SEs and fit measures must come from the one-stage FIML fit; no SE or χ² computed from a
       correlation matrix with `sample.nobs` set to the total N may appear in `results`, `components`, `fit`, or any print/summary
       output.
-- [x] AC6 (BC6): Under `missing = "fiml"`, the OLS shadow (start values and stored cross-check) and the positive-definiteness
+- [ ] AC6 (BC6): Under `missing = "fiml"`, the OLS shadow (start values and stored cross-check) and the positive-definiteness
       refusal (min eigenvalue ≤ 1e-8, retained) must consume the saturated FIML correlation matrix R̂. On complete data R̂ must
       equal `cor(mat)` within 1e-12 elementwise (measured: 8.9e-16).
-- [x] AC7 (BC7): Each of the following must refuse informatively under `missing = "fiml"`, with a test per clause: (i) N_used ≤ p,
+- [ ] AC7 (BC7): Each of the following must refuse informatively under `missing = "fiml"`, with a test per clause: (i) N_used ≤ p,
       where N_used counts rows with ≥1 observed item; (ii) an item with < 2 observed values, or zero variance among observed values;
       (iii) an item pair never jointly observed, naming at least one such pair (evidence V-F: lavaan silently fabricates the moment
       otherwise); (iv) saturated-stage non-convergence (mockable seam); (v) non-PD R̂; (vi) structured-fit non-convergence. Rows
       with no observed items are dropped with a message reporting the count and excluded from N_used.
-- [x] AC8 (BC8): Under `missing = "fiml"`: the startup message reports N_used, the complete-case count, any all-missing rows
+- [ ] AC8 (BC8): Under `missing = "fiml"`: the startup message reports N_used, the complete-case count, any all-missing rows
       dropped, and the minimum pairwise joint coverage; `print()` reports the total N with the complete-case count alongside (the
       listwise path keeps `"Complete N:"`); `details` gains `missing` (read back from the fitted lavaan object via `lavInspect(fit,
       "options")$missing`, not echoed from the argument), `n_complete`, and the minimum pairwise coverage.
-- [x] AC9 (BC9): Under `missing = "fiml"`, `nb_reliability` is NA with `nb_reason` including `"fiml"` (accumulating with any other
+- [ ] AC9 (BC9): Under `missing = "fiml"`, `nb_reliability` is NA with `nb_reason` including `"fiml"` (accumulating with any other
       applicable reason), and `sd = "raw"` is refused with an informative error naming `"std"` and numeric SDs as the alternatives;
       `print()`/`summary()` state the reason.
-- [x] AC10 (BC10): On the probe population (8 octant scales × 3 items, ξ1 = .35, ξ2 = .10, ζ1 = .08, N = 600) at 2%, 5%, and 10%
+- [ ] AC10 (BC10): On the probe population (8 octant scales × 3 items, ξ1 = .35, ξ2 = .10, ζ1 = .08, N = 600) at 2%, 5%, and 10%
       per-item MCAR, the mean ξ̂1 over ≥ 200 replicates must lie within 2 MC SEs of .35 in every cell, and the stored OLS shadow's
       ξ1 must agree with the CFA ξ̂1 within .05 in every replicate.
-- [x] AC11 (BC11): Under mechanism M1 (defined in this report's header: always-observed scale-1 anchors, P(miss) =
+- [ ] AC11 (BC11): Under mechanism M1 (defined in this report's header: always-observed scale-1 anchors, P(miss) =
       plogis(qlogis(.12) + 1.5·x_anchor)), with ≥ 5 replicates at N = 2400 (or an MC-equivalent budget): the FIML-path mean ξ̂1 must
       lie within 3 MC SEs of .35, and the listwise mean ξ̂1 must differ from .35 by more than 3 MC SEs (measured: FIML-metric
       −0.0021 at MC SE 0.0023; listwise −0.0295 at MC SE 0.0067).
-- [x] AC12 (BC12): Under mechanism M2 (same-scale anchors, P(miss) = plogis(qlogis(.30) + 2.5·x_anchor_s)), paired over identical
+- [ ] AC12 (BC12): Under mechanism M2 (same-scale anchors, P(miss) = plogis(qlogis(.30) + 2.5·x_anchor_s)), paired over identical
       draws (≥ 4 replicates at N = 2000): mean[ξ̂1(available-case-standardized one-stage) − ξ̂1(shipped FIML path)] must be ≥ +0.010
       (measured +0.0167, paired SE 0.0006), and mean|ξ̂1(shipped FIML path) − ξ̂1(two-stage fit of the FIML correlation matrix)|
       must be ≤ 0.005 (measured 0.0008, paired SE 0.0012).
-- [x] AC13 (BC13): At 5% and 10% per-item MCAR on the probe population, the mean reported FIML SE of ξ1 must be smaller than the
+- [ ] AC13 (BC13): At 5% and 10% per-item MCAR on the probe population, the mean reported FIML SE of ξ1 must be smaller than the
       mean reported listwise SE, with the FIML/listwise ratio decreasing from 5% to 10%; and at 5% MCAR over ≥ 200 replicates, the
       ratio of the mean reported FIML SE to the empirical SD of ξ̂1 must lie in [0.85, 1.15]. If the ratio falls outside the band,
       the milestone must surface it in the "Deviations from RR12" table with a strengthened documented SE caveat — never widen the
       band silently.
-- [x] AC14 (BC14): On the F1b fixture (probe population, N = 600, 15% per-item MCAR, the pinned probe seed): `missing = "listwise"`
+- [ ] AC14 (BC14): On the F1b fixture (probe population, N = 600, 15% per-item MCAR, the pinned probe seed): `missing = "listwise"`
       refuses with the N ≤ p error; `missing = "fiml"` returns a converged, non-boundary estimate with |ξ̂1 − .35| ≤ .05 (measured
       ξ̂1 = 0.3573, SE 0.0174).
-- [x] AC15 (BC15): One pinned crossed-blocks cell (8 scales × 3 items, `axes_crossed_blocks()`, truth ξ1 = .30, ξ2 = .10, ζ1 = .06,
+- [ ] AC15 (BC15): One pinned crossed-blocks cell (8 scales × 3 items, `axes_crossed_blocks()`, truth ξ1 = .30, ξ2 = .10, ζ1 = .06,
       ζ2 = .05, N = 2000, 5% per-item MCAR): the FIML path fits the five-component model with each of ξ̂1, ξ̂2, ζ̂1, ζ̂2 within 3
       reported SEs of its truth (measured: .2979/.1019/.0639/.0490 with SEs .0080/.0048/.0037/.0026).
-- [x] AC16 (BC16): The roxygen missing-data paragraph and the vignette caveat paragraph are rewritten to state: listwise remains the
+- [ ] AC16 (BC16): The roxygen missing-data paragraph and the vignette caveat paragraph are rewritten to state: listwise remains the
       default; `missing = "fiml"` assumes MAR **and** multivariate normality; under MCAR listwise is consistent (inefficient, not
       biased); the FIML SEs are observed-information SEs on the standardized metric, conditional on the standardization constants,
       and approximate for the same correlation-as-covariance reason as the shipped path; and the FIML variant is certified by the
       package's synthetic oracle, not by Strack et al. (2013), who report no missing-data analyses.
-- [x] AC17: the profile's `verify` slot clean (`devtools::test()`, `document()` no diff) and, because this milestone
+- [ ] AC17: the profile's `verify` slot clean (`devtools::test()`, `document()` no diff) and, because this milestone
       edits roxygen, a full `devtools::check(manual = TRUE)` whose log carries `checking PDF version of manual ... OK`
       by name (M7/M57 lesson: a bare `check()` defaults to `manual = FALSE` and skips that step).
 
@@ -114,7 +114,7 @@ instead of forcing listwise deletion.
 - [x] **T7** — Docs: roxygen missing-data paragraph, vignette caveat, extended SE caveat, diagonal-departure
       sentence, NEWS entry; the M63 **two-way** enumeration sweep (claims to delete *and* enumerations to extend).
 - [x] **T8** — Fold reviewer probes into `devel/m64-fiml-probe.R`; full `check(manual = TRUE)`; post-merge hygiene.
-- [ ] **T9** — Merge-gate hardening (user request): pin the six literal `$fit` names against a silently dropped `fitMeasures()` name (F1); correct `@return`'s FIML-only claim about `n_complete` (F4).
+- [x] **T9** — Merge-gate hardening (user request): pin the six literal `$fit` names against a silently dropped `fitMeasures()` name (F1); correct `@return`'s FIML-only claim about `n_complete` (F4).
 
 ## Work log
 
@@ -163,6 +163,8 @@ instead of forcing listwise deletion.
 - 2026-07-27: gates re-run after the second-return fix, status in-progress→review. CI on PR #91 green on every job: `ubuntu-latest (release)` 24m22s, `test-coverage` 26m12s, `pkgdown` 4m17s, both codecov contexts. Local `devtools::check(manual = TRUE)` 0 errors / 0 warnings / 0 notes in 16m24s with `checking PDF version of manual ... OK` by name (AC17); `document()` no diff after the roxygen section split; `cairn_validate` exit 0. Full suite clean under lavaan 0.6.21 and 0.7-2 alike: 765 tests / 4245 passing / 0 failures (4 pre-existing warnings on 0.6.21, 5 on 0.7-2 — the extra is lavaan 0.7's marker-switch notice on a deliberately degenerate `test-ssm_sem.R` noise fixture built to be refused, not an M65 surface). All 17 criteria remain unticked for the next review to re-gather.
 
 - 2026-07-27: **merge approval withheld at the third-pass gate; changes requested.** Status review→in-progress. All 17 criteria passed with fresh evidence and no finding reached the actioning threshold, but the user declined to merge until two of the logged findings are fixed: F1 (62), the hole in this milestone's own `$fit` guard — `fitMeasures()` drops an unknown name silently, so a future lavaan retiring `srmr_bentler_nomean` would make `$fit$srmr` vanish with all three assertions still passing — and F4 (72), the `@return` line implying `n_complete` is FIML-only when it is set on every path. Added as T9 (minor amendment: a discovered sub-task, no scope or criterion change). F2 (45) and F3 (52) stay logged and cross-referenced onto the follow-on ROADMAP row, as does the thin-overlap warning. Not counted as a review return: no criterion failed and no finding was actioned — this is a maintainer's call at the gate, recorded per the user-override rule.
+
+- 2026-07-27: T9 done, status in-progress→review. **F1**: the `$fit` names are pinned to LITERALS on both paths rather than to each other — compared to each other the two lists come from one line of code, so a dropped name shortens both alike and `expect_equal(NULL, NULL)` passes. A guard at the `fitMeasures()` call now refuses outright when the returned names are not the six requested, since lavaan drops an unrecognized name silently (measured: two names, one bogus, returns one element). Mutation-verified rather than assumed: swapping the requested name to a bogus one makes `axes_reliability()` refuse with `missing: srmr_bogus_name`, where before it would have shipped an object with no `$fit$srmr` at all. **F4**: the `@return` text no longer claims `n_complete` is FIML-only. The first replacement wording was itself wrong — it said both fields are present everywhere and only `min_coverage` is NA outside FIML — and checking the three paths found `n_complete` is NA on the `cormat` path too (listwise 200/NA, fiml 200/200, cormat NA/NA); corrected before commit, since trading one imprecise `@return` claim for another is the defect F4 named. Gates: full suite 765 tests / **4246 passing** / 0 failures under lavaan 0.6.21 AND 0.7-2; `check(manual = TRUE)` 0 errors / 0 warnings / 0 notes in 17m06s; `document()` no diff. All 17 criteria stay unticked — T9 changed `R/axes_reliability.R` and its roxygen, so the third pass's evidence is stale and the next review re-gathers.
 
 ## Decisions
 
