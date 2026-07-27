@@ -299,3 +299,266 @@ test_that("AC5: no two-stage refit of R-hat reaches the reported results", {
   ts_est <- pe$est[pe$op == "~~" & pe$lhs == "AX" & pe$rhs == "AX"][[1]]
   expect_lt(abs(res$results$xi1[[1]] - ts_est), 0.01)
 })
+
+
+# --- T3: the six-clause refusal contract (BC7) --------------------------------
+#
+# The clauses are not interchangeable, and the order they fire in is part of the
+# contract. Clauses (i)-(iii) are readable off the missingness pattern alone and
+# MUST fire before the EM stage: evidence V-F is that lavaan does not refuse a
+# moment it cannot identify -- it fabricates one and hands back a fit that looks
+# converged. A test suite that only checked "an error is raised" would pass
+# against an implementation that screened after estimating, which is the version
+# that silently returns a number.
+#
+# Every clause but (iv) is fired on real data. Clause (iv)'s mock proves wiring
+# only (the M62 lesson), so the unmocked predicate is asserted separately.
+
+# A FIML-estimable fixture to degrade: enough rows that N_used is comfortable
+# and every pair is well covered, so a refusal below can only come from the
+# damage the test itself inflicts.
+fiml_refuse_fixture <- function(n = 300L) {
+  mat <- fiml_fixture(n = n)
+  list(mat = mat, items = fiml_items(mat), cols = colnames(mat))
+}
+
+fiml_call <- function(mat, items, ...) {
+  suppressMessages(
+    axes_reliability(as.data.frame(mat), items = items, angles = octants(),
+                     missing = "fiml", ...)
+  )
+}
+
+test_that("BC7 (i): N_used counts rows with any observed item, and floors at p", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture(n = 20L) # 20 rows, 24 items
+  expect_error(fiml_call(fx$mat, fx$items), "at least one observed item")
+  # The floor is on N_used, NOT on the complete-case count -- so the message
+  # must be the FIML one. Getting the listwise wording here would mean the
+  # branch had refused on the wrong quantity, which is exactly what BC14 turns
+  # on: a dataset listwise refuses can be estimable under FIML.
+  expect_error(fiml_call(fx$mat, fx$items), "^(?!.*Complete-case)", perl = TRUE)
+})
+
+test_that("BC7 (i): all-missing rows are dropped and excluded from N_used", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  mat <- fx$mat
+  mat[1:5, ] <- NA_real_
+  expect_message(
+    axes_reliability(as.data.frame(mat), items = fx$items, angles = octants(),
+                     missing = "fiml"),
+    "5 row\\(s\\) with no observed item dropped"
+  )
+  res <- fiml_call(mat, fx$items)
+  # Counted out of N_used, not merely reported: an all-missing row carries no
+  # information for any moment, so leaving it in would inflate every
+  # denominator N_used feeds.
+  expect_identical(res$details$n, nrow(mat) - 5L)
+  expect_identical(res$details$n_total, nrow(mat))
+})
+
+test_that("BC7 (ii): an item with fewer than 2 observed values is refused", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  mat <- fx$mat
+  mat[-1, fx$cols[[3]]] <- NA_real_ # one surviving response
+  expect_error(fiml_call(mat, fx$items), "fewer than 2 observed values")
+  expect_error(fiml_call(mat, fx$items), fx$cols[[3]])
+  # Separated from the variance clause because var() of a single value is NA,
+  # not 0 -- a variance test alone would let this through as a missing value.
+  expect_true(is.na(stats::var(mat[, fx$cols[[3]]], na.rm = TRUE)))
+})
+
+test_that("BC7 (ii): an item constant among its observed values is refused", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  mat <- fx$mat
+  mat[, fx$cols[[4]]] <- 3
+  mat[1:50, fx$cols[[4]]] <- NA_real_ # constant AND partly missing
+  expect_error(fiml_call(mat, fx$items), "Zero-variance item")
+  expect_error(fiml_call(mat, fx$items), fx$cols[[4]])
+})
+
+test_that("BC7 (iii): a never-jointly-observed pair is refused, and named", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  mat <- fx$mat
+  # Two items on complementary halves of the sample: each is well observed, the
+  # pair never is. This is the clause lavaan hides most completely -- without
+  # it the run returns a fabricated moment inside a converged-looking fit.
+  half <- seq_len(nrow(mat) / 2)
+  mat[half, fx$cols[[1]]] <- NA_real_
+  mat[-half, fx$cols[[2]]] <- NA_real_
+  expect_error(fiml_call(mat, fx$items), "never jointly observed")
+  expect_error(fiml_call(mat, fx$items),
+               paste0(fx$cols[[1]], " and ", fx$cols[[2]]))
+  # The pattern is genuinely estimable per ITEM -- both items keep half the
+  # sample -- so the refusal is about the pair, not about thin items.
+  expect_identical(sum(!is.na(mat[, fx$cols[[1]]])), length(half))
+})
+
+test_that("BC7 (iv): saturated-stage non-convergence is refused", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture(n = 100L)
+  local_mocked_bindings(
+    axes_fiml_h1 = function(dat) {
+      list(mean = colMeans(dat), cov = stats::cov(dat), converged = FALSE)
+    }
+  )
+  expect_error(fiml_call(fx$mat, fx$items), "saturated \\(EM\\) stage")
+})
+
+test_that("BC7 (iv): the unmocked convergence predicate reports TRUE", {
+  skip_if_not_installed("lavaan")
+  # The half the mock cannot prove, and the one that actually bit at T1:
+  # lavInspect(fit, "converged") reports FALSE on a healthy saturated fit
+  # (it describes the structured optimizer, which this stage never runs), so a
+  # predicate built on it would have refused every dataset while the mocked
+  # test above still passed. Assert the real thing on real data.
+  mat <- fiml_holes(fiml_fixture())
+  h1 <- axes_fiml_h1(as.data.frame(mat))
+  expect_true(h1$converged)
+  expect_true(all(is.finite(h1$cov)))
+})
+
+test_that("BC7 (v): the PD guard consumes R-hat and refuses on it", {
+  skip_if_not_installed("lavaan")
+  # Tested at the seam rather than end to end, on the M62 precedent, because
+  # the end-to-end route does not reach this clause under FIML -- see the next
+  # test for the measurement. The guard is still owed: it is the same
+  # eigenvalue floor the listwise and cormat paths use (AC6 retains 1e-8), and
+  # what this pins is that the FIML branch feeds R-hat to it rather than some
+  # other matrix.
+  fx <- fiml_refuse_fixture(n = 100L)
+  singular <- stats::cor(fx$mat)
+  singular[2, ] <- singular[1, ]
+  singular[, 2] <- singular[, 1]
+  local_mocked_bindings(
+    axes_fiml_moments = function(mat) {
+      list(z = scale(mat), mean = colMeans(mat), sd = apply(mat, 2, stats::sd),
+           R = singular)
+    }
+  )
+  expect_error(fiml_call(fiml_holes(fx$mat), fx$items), "not positive definite")
+})
+
+test_that("BC7 (v): duplicated items are refused, but by clause (vi)", {
+  skip_if_not_installed("lavaan")
+  # The honest record of where the end-to-end route actually lands, so a later
+  # session does not read the mocked test above as an end-to-end guarantee.
+  #
+  # R-hat cannot be indefinite: it is a cov2cor() of an EM maximum-likelihood
+  # covariance, which is positive SEMI-definite by construction. So tripping a
+  # floor at 1e-8 needs near-exact singularity, and the EM's own tolerance
+  # (lavaan's default em.h1.tol = 1e-5) leaves about 1e-8 of residual noise in
+  # the estimated moments. Measured on this fixture with item 2 an exact copy
+  # of item 1: R-hat[1, 2] = 1 to machine precision, yet the minimum eigenvalue
+  # is 1.12e-08 -- just ABOVE the floor -- against 3.9e-16 for the same data
+  # listwise. The structured fit then fails to converge, which is where the
+  # refusal comes from.
+  #
+  # What the user is owed is a refusal, and gets one; what they lose is the
+  # sharper of two messages. Recorded rather than repaired: AC6 retains the
+  # 1e-8 floor, and a FIML-specific floor would be a calibration RR12 did not
+  # do.
+  fx <- fiml_refuse_fixture()
+  mat <- fiml_holes(fx$mat, rate = 0.05, seed = 3L)
+  mat[, fx$cols[[2]]] <- mat[, fx$cols[[1]]]
+  cvg <- axes_fiml_coverage(mat)
+  rhat <- axes_fiml_moments(mat[cvg$keep, , drop = FALSE])$R
+  expect_equal(rhat[1, 2], 1, tolerance = 1e-7)
+  expect_gt(min(eigen(rhat, symmetric = TRUE, only.values = TRUE)$values), 1e-8)
+  expect_error(fiml_call(mat, fx$items), "did not converge")
+})
+
+test_that("BC7 (vi): structured-fit non-convergence is refused", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  local_mocked_bindings(axes_converged = function(fit) FALSE)
+  expect_error(fiml_call(fiml_holes(fx$mat), fx$items), "did not converge")
+})
+
+test_that("M65-D2: thin pairwise overlap warns rather than refusing", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  mat <- fx$mat
+  # Drive ONE pair down to a positive but small joint count, leaving every
+  # other pair intact. 20 < the conventional floor of 30, and > 0, so this is
+  # the band between BC7 (iii)'s refusal and no complaint at all.
+  keep_both <- seq_len(20L)
+  mat[setdiff(seq_len(nrow(mat)), keep_both), fx$cols[[1]]] <- NA_real_
+  expect_warning(
+    suppressMessages(
+      axes_reliability(as.data.frame(mat), items = fx$items,
+                       angles = octants(), missing = "fiml")
+    ),
+    "as few as 20"
+  )
+  # A warning, not a refusal: the estimate is still produced.
+  res <- suppressWarnings(fiml_call(mat, fx$items))
+  expect_false(res$results$boundary[[1]])
+  # And the floor is named as a convention, so no reader takes 30 for a test.
+  expect_identical(axes_fiml_min_overlap, 30L)
+})
+
+test_that("M65-D2: healthy overlap draws no warning", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  expect_no_warning(
+    suppressMessages(
+      axes_reliability(as.data.frame(fiml_holes(fx$mat)), items = fx$items,
+                       angles = octants(), missing = "fiml")
+    )
+  )
+})
+
+test_that("M60 re-assertion: the listwise refusals still fire on their own terms", {
+  skip_if_not_installed("lavaan")
+  # The FIML branch moved the sample-size floor to N_used and the PD gate to
+  # R-hat. Both checks refused things INCIDENTALLY on the listwise path before
+  # M65 -- so re-assert them there, on the original quantities, rather than
+  # trusting that a shared guard stayed shared.
+  fx <- fiml_refuse_fixture()
+  mat <- fx$mat
+  mat[25:nrow(mat), fx$cols[[1]]] <- NA_real_ # 24 complete cases, p = 24
+  # FIML estimates it (N_used = 300); listwise sees 24 complete cases, which
+  # does not exceed the 24 items.
+  expect_error(
+    suppressMessages(
+      axes_reliability(as.data.frame(mat), items = fx$items,
+                       angles = octants(), missing = "listwise")
+    ),
+    "Complete-case N \\(24\\)"
+  )
+  expect_s3_class(suppressWarnings(fiml_call(mat, fx$items)),
+                  "circumplex_axes_reliability")
+})
+
+test_that("M65-D4: the EM cap is a backstop, not a routine limit", {
+  skip_if_not_installed("lavaan")
+  # lavaan's default em.h1.iter.max = 500 makes clause (iv) fire on data FIML
+  # can estimate: one item at 20/300 coverage stalls at 500 and converges in a
+  # third of a second with room. Without the raised cap this whole cell would
+  # refuse -- so the assertion is that it does NOT.
+  fx <- fiml_refuse_fixture()
+  mat <- fx$mat
+  mat[21:nrow(mat), fx$cols[[1]]] <- NA_real_
+  expect_true(axes_fiml_h1(as.data.frame(mat))$converged)
+  # ... and the default really is the thing that would have refused it, so the
+  # constant is load-bearing rather than decorative.
+  expect_gt(axes_fiml_em_iter_max, 500L)
+  stalled <- FALSE
+  withCallingHandlers(
+    lavaan::lavCor(as.data.frame(mat), ordered = character(0), missing = "ml",
+                   output = "fit", meanstructure = TRUE,
+                   em.h1.iter.max = 500L),
+    warning = function(w) {
+      if (grepl("Maximum number of iterations", conditionMessage(w))) {
+        stalled <<- TRUE
+      }
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_true(stalled)
+})

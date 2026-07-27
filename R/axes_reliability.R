@@ -1039,9 +1039,101 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       cvg <- axes_fiml_coverage(mat)
       mat <- mat[cvg$keep, , drop = FALSE]
       n <- cvg$n_used
+      message(
+        "axes_reliability(): FIML on ", n,
+        " respondent(s) with at least one observed item (", cvg$n_complete,
+        " complete case(s))",
+        if (cvg$n_dropped > 0L) {
+          paste0("; ", cvg$n_dropped, " row(s) with no observed item dropped")
+        },
+        "; minimum pairwise coverage ", cvg$min_coverage, "."
+      )
+
+      # --- The refusal contract (BC7) ----------------------------------------
+      # Clauses (i)-(iii) are readable off the missingness pattern alone and
+      # fire BEFORE the EM stage. That order is the point: lavaan does not
+      # refuse a moment it cannot identify, it fabricates one and returns a fit
+      # that looks converged (evidence V-F), so a degenerate item or an
+      # unobserved pair must be caught here or it is never caught at all.
+      #
+      # (i) The sample-size floor, on N_used rather than on the complete-case
+      # count. This is the same floor the listwise path enforces, moved to the
+      # quantity the FIML fit actually consumes -- and it is why a dataset the
+      # listwise path refuses can be estimable here (BC14).
+      if (n <= p) {
+        stop(
+          "N with at least one observed item (", n, ") must exceed the number ",
+          "of items (", p, ").",
+          call. = FALSE
+        )
+      }
+      # (ii) Per-item: too few observed values to have a variance at all, then
+      # a variance of zero among the values that are observed. Split in two
+      # because var() on a single value returns NA rather than 0, so a
+      # variance test alone would let a one-response item through as NA.
+      thin_item <- which(cvg$item_n < 2L)
+      if (length(thin_item) > 0) {
+        stop(
+          "Item(s) with fewer than 2 observed values, so no variance can be ",
+          "estimated: ", paste(all_cols[thin_item], collapse = ", "), ".",
+          call. = FALSE
+        )
+      }
+      item_var <- apply(mat, 2, stats::var, na.rm = TRUE)
+      if (any(item_var <= 0)) {
+        stop(
+          "Zero-variance item(s) among the observed values: ",
+          paste(all_cols[item_var <= 0], collapse = ", "), ".",
+          call. = FALSE
+        )
+      }
+      # (iii) Per-pair: a pair no respondent answered both of. Named
+      # explicitly, because this is the failure a user is least likely to
+      # anticipate and the one lavaan hides most completely.
+      zero_pair <- which(cvg$pair_n == 0 & upper.tri(cvg$pair_n),
+                         arr.ind = TRUE)
+      if (nrow(zero_pair) > 0) {
+        shown_pairs <- seq_len(min(3L, nrow(zero_pair)))
+        stop(
+          "Item pair(s) never jointly observed, so their correlation is not ",
+          "estimable: ",
+          paste(
+            all_cols[zero_pair[shown_pairs, 1L]], "and",
+            all_cols[zero_pair[shown_pairs, 2L]],
+            collapse = "; "
+          ),
+          if (nrow(zero_pair) > length(shown_pairs)) {
+            paste0(" (and ", nrow(zero_pair) - length(shown_pairs),
+                   " further pair(s))")
+          },
+          ".",
+          call. = FALSE
+        )
+      }
+      # Thin, but not empty: a warning rather than a refusal (M65-D2). The
+      # number is named so the user can judge it, and it is a convention with
+      # no inferential meaning -- see axes_fiml_min_overlap.
+      if (cvg$min_coverage < axes_fiml_min_overlap) {
+        warning(
+          "Some item pair(s) were jointly observed by as few as ",
+          cvg$min_coverage, " respondent(s); the estimated correlation ",
+          "between them rests on very little data. (",
+          axes_fiml_min_overlap,
+          " is a conventional small-sample floor, not a threshold with ",
+          "inferential meaning.)",
+          call. = FALSE
+        )
+      }
+
+      # (iv) Saturated-stage non-convergence is refused inside
+      # axes_fiml_moments(), at the axes_fiml_h1() seam it owns.
       mom <- axes_fiml_moments(mat)
       R <- mom$R
       zmat <- mom$z
+      # (v) Non-PD R-hat and (vi) structured-fit non-convergence are the
+      # shared guards below -- the same eigenvalue floor and the same
+      # axes_converged() seam the listwise path uses, now consuming R-hat and
+      # the one-stage FIML fit.
     }
   } else {
     # --- The correlation-matrix path --------------------------------------------

@@ -108,7 +108,7 @@ are standing and not revisited here.
 - [x] **T2** — API + one-stage wiring: `missing =` on `axes_reliability()` (`R/axes_reliability.R:819`) through the
       existing `axes_fit(missing =)` → `sem_fit_cfa()` translation (`R/ssm_sem.R:749`); observed-information
       assertion; a test that no two-stage SE or χ² reaches `results`/`components`/`fit`/print.
-- [ ] **T3** — Six-clause refusal contract, all-missing-row drop, soft thin-coverage warning (M65-D2). Per the M62
+- [x] **T3** — Six-clause refusal contract, all-missing-row drop, soft thin-coverage warning (M65-D2). Per the M62
       lesson, clause (iv)'s mock proves wiring only — assert each condition unmocked. Per M60, re-assert what the
       complete-case N ≤ p and PD checks refused *incidentally* before they move to N_used and R̂.
 - [ ] **T4** — Reporting and derived quantities: startup message, `print()`, `details` read-back via `lavInspect()`,
@@ -134,6 +134,8 @@ are standing and not revisited here.
 - 2026-07-26: gated Coverage amendment — AC3 moves from T1 to T2 (`AC2, AC6 → T1`; `AC1, AC3, AC4, AC5 → T2`). AC3 compares the two `missing =` paths, and the argument does not exist until T2, so T1 could not have produced its evidence. No criterion text, task, or scope changed. User approved at the T2 implement gate.
 - 2026-07-26: T2 done. `missing = c("listwise", "fiml")` on `axes_reliability()`, `match.arg`'d to `ssm_sem()`'s spelling; the FIML branch standardizes by `axes_fiml_moments()` and fits one `axes_fit(missing = "fiml")` through `sem_fit_cfa()`. `axes_fiml_coverage()` split out of `axes_fiml_moments()` because order is load-bearing — T3's pattern-readable refusals must fire before the EM stage, since lavaan fabricates an unidentified moment rather than failing (V-F). `missing = "fiml"` with `cormat` is refused (a seventh refusal, outside BC7's six: no rows to run EM over). AC3 measures agreement well inside 1e-8 on components, reliability, and SEm, four-component and five-component (zeta2) cells alike. AC4 asserts observed information on the object the function actually fitted, captured through the `axes_converged()` seam rather than on a parallel fit; the listwise branch is fired through the same capture and required to read back `"listwise"`, so the assertion cannot pass vacuously. AC5 pins the ban two ways: `axes_fit_cormat()` mocked to abort is never reached, and unmocked the reported chi-square and xi1 SE both differ from the banned two-stage refit of R-hat at total N. Full suite 0 failures / 4096 passing / 4 pre-existing warnings, count unchanged.
 
+- 2026-07-26: T3 done. All six BC7 clauses refuse, plus the all-missing-row drop and M65-D2's soft warning at 30. Clauses (i)-(iii) fire before the EM stage, which is the load-bearing order: lavaan fabricates an unidentified moment rather than failing (V-F). Two findings, both from firing the clauses on real data rather than assuming. (a) M65-D4: lavaan's default `em.h1.iter.max = 500` made clause (iv) refuse estimable data — an item at 40/300 coverage stalled at the default and converges in 0.23 s with room; the cap is now 50000 and healthy data is unaffected because EM exits on tolerance. (b) Clause (v) is NOT reachable end to end under FIML: R-hat is a cov2cor of an EM ML covariance, hence PSD by construction, and the EM's 1e-5 tolerance leaves ~1e-8 of residual noise, so an exactly duplicated item pair gives R-hat[1,2] = 1 with minimum eigenvalue 1.12e-08 — just above the retained 1e-8 floor (3.9e-16 for the same data listwise). Such data is still refused, by clause (vi). Tested at the seam on the M62 precedent, with a second test recording the end-to-end landing so the mock is never read as an end-to-end guarantee; the floor stays 1e-8 per AC6, since a FIML-specific floor would be a calibration RR12 did not do. Also re-asserted (M60): the listwise path still refuses on its own complete-case N and its own `cor()`. Full suite 0 failures / 4126 passing / 4 pre-existing warnings, count unchanged.
+
 ## Decisions
 
 - **M65-D1 (2026-07-26): saturated moments come from lavaan's `h1` EM estimate, not an explicit saturated fit.**
@@ -153,5 +155,10 @@ are standing and not revisited here.
   failure this repo has hit four times (M7 `--no-manual`, M16 `skip_on_cran()`, M31 vdiffr, M39 CI baseline):
   green because it never ran. The test comments what the live half does *not* cover, so the stored summary is
   never mistaken for something CI re-derives.
+- **M65-D4 (2026-07-26): the saturated EM runs to a 50000-iteration cap, not lavaan's default 500.**
+  At the default, clause (iv) refused estimable data: on the 24-item probe population (N = 300), one item at 40/300 coverage stalls at 500
+  and converges in 0.23 s at 2000; at 20/300, 0.35 s at 50000; at 25/300, ~50000 and 10.6 s. Healthy 10%-MCAR data is unaffected either way —
+  EM exits on tolerance, not the cap. The refusal is retained and matters more, not less: at 25/300 the cap-10000 iterate's covariance sits
+  3.93 from the converged answer on unit-variance items. Cost: a genuinely stuck dataset now waits ~11 s to be refused instead of 0.15 s.
 
 ## Review

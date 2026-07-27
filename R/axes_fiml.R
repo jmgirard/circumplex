@@ -30,6 +30,25 @@
 # EM loop hitting its iteration cap, which lavaan reports as a warning and then
 # returns its last iterate anyway -- silently usable-looking, so it is caught by
 # listening for the warning rather than by inspecting the returned object.
+
+# The EM iteration cap, raised far above lavaan's default of 500 (M65-D4). At
+# the default, a healthy dataset converges on TOLERANCE and never sees the cap,
+# but a thinly-covered item hits it and returns its last iterate -- so clause
+# (iv) refused datasets FIML can estimate. Measured on the 24-item probe
+# population (N = 300, one item's coverage varied): 40/300 stalls at 500 and
+# converges in 0.23 s at 2000; 20/300 stalls at 500 and converges in 0.35 s at
+# 50000; 25/300 needs ~50000 and 10.6 s. Healthy 10%-MCAR data takes the same
+# 0.1-0.3 s at either cap, because the cap is not what stops it.
+#
+# The refusal is retained, and matters more with the cap raised, not less: a
+# stalled iterate is not a slightly-worse estimate but an unusable one -- at
+# 25/300 the cap-10000 iterate's covariance differs from the converged answer
+# by 3.93 (measured), on unit-variance items. What changes is that reaching the
+# cap now means the EM really is not converging, rather than that it was not
+# given room to.
+axes_fiml_em_iter_max <- 50000L
+
+
 axes_fiml_h1 <- function(dat) {
   stalled <- FALSE
   # `ordered = character(0)` pins every column as continuous. Ablated rather
@@ -47,7 +66,8 @@ axes_fiml_h1 <- function(dat) {
       ordered = character(0),
       missing = "ml",
       output = "fit",
-      meanstructure = TRUE
+      meanstructure = TRUE,
+      em.h1.iter.max = axes_fiml_em_iter_max
     ),
     warning = function(w) {
       if (grepl("iteration|converg", conditionMessage(w), ignore.case = TRUE)) {
@@ -66,6 +86,15 @@ axes_fiml_h1 <- function(dat) {
     converged = !stalled && all(is.finite(h1$mean)) && all(is.finite(h1$cov))
   )
 }
+
+
+# The jointly-observed count below which the pairwise overlap is reported as
+# thin. It is a WARNING and never a refusal (M65-D2): RR12 section 7 binds no
+# floor and says outright that any positive constant is arbitrary, so 30 is
+# taken as the conventional small-sample floor for a correlation -- a
+# convention, not a quantity derived here, and with no inferential meaning. The
+# hard refusal is at zero overlap, where the moment is not estimable at all.
+axes_fiml_min_overlap <- 30L
 
 
 # The observed-data geometry, EM-free: which rows survive, how many respondents
