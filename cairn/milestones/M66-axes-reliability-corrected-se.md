@@ -104,7 +104,7 @@ doc/NEWS surfaces the correction falsifies.
 
 ## Tasks
 
-- [ ] **T1 — the corrected-covariance helper, tests-first.** New base-R helper
+- [x] **T1 — the corrected-covariance helper, tests-first.** New base-R helper
   building {C, J, B, K, E_ii}, the information matrix, W and W_c per AC1,
   returning corrected SEs for every fitted component. Write the AC2 anchor test
   first. **The helper must realign Σ̂ to the item-map order before use** —
@@ -151,6 +151,9 @@ doc/NEWS surfaces the correction falsifies.
 - 2026-07-27: plan gate chose to add a ζ2 deterministic anchor (T3) over shipping the blockwise branch on its existing structural unit tests, because AC1 binds ζ2 while RR13's worked code omits `K` entirely; falsified by nothing — the rejected alternative was strictly weaker evidence.
 - 2026-07-27: plan gate chose to spin the AC5 exact-route escalation out as its own milestone over taking it inside M66, because its size is conditional on a measurement not yet taken; falsified by an AC5 cell missing [0.85, 1.15], which triggers that plan.
 - 2026-07-27: started (/milestone-implement). Branch `m66-axes-reliability-corrected-se` cut from master at 704adba3; no dependencies to verify, no other milestone in-progress. Status planned→in-progress.
+- 2026-07-27: implement gate settled three open API choices — `details$se_uncorrected` retains lavaan's reported SEs (auditability without a supported opt-out); a Σ̂ the correction cannot invert gives NA SEs with a warning and a named reason, never a silent fallback to the uncorrected number; and no `se =` argument, since an opt-out would make a value the package documents as miscalibrated into a permanent exported surface (D-035 already rules the change a fix, not an interface change).
+- 2026-07-27: T1 done. `R/axes_corrected_se.R` (new): `axes_se_derivs()` builds {C, J, B, K, E_11..E_pp}; `axes_corrected_se()` returns naive + corrected SEs per component and a `reason`. Anchors: naive SE(ξ1) 0.0167459, corrected 0.0116264, ratios 1.4403/1.0673/0.9969 — all inside BC2, and the naive branch matches lavaan's own reported SE to <1e-7, which fences the derivative structure independently. `devtools::test()` 0 failures, 4263 passing; the 4 warnings are the pre-existing test-ci_accuracy.R diagnostic cautions (0 warnings across both axes test files).
+- 2026-07-27: T1 mutation record. Reddening: dropping the Σ̂ realignment fails 8 assertions, cos(2Δ) for cos(Δ) fails 8, dropping the W_c diagonal fails 3. NOT reddening, and correctly so: stripping C's diagonal leaves both SEs bit-identical to 15 decimals, because the diagonal direction is spanned by the free {E_ii} and the change is a unit-triangular reparameterization of nuisance parameters. The code comment claiming that diagonal was load-bearing was false and is corrected in place (the M36/M60 lesson family); the null is recorded there so a later session does not re-chase it.
 
 ## Decisions
 
