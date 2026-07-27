@@ -1,6 +1,6 @@
 # M65: FIML item-level missing data for `axes_reliability()` — the build
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR12
@@ -114,6 +114,7 @@ instead of forcing listwise deletion.
 - [x] **T7** — Docs: roxygen missing-data paragraph, vignette caveat, extended SE caveat, diagonal-departure
       sentence, NEWS entry; the M63 **two-way** enumeration sweep (claims to delete *and* enumerations to extend).
 - [x] **T8** — Fold reviewer probes into `devel/m64-fiml-probe.R`; full `check(manual = TRUE)`; post-merge hygiene.
+- [ ] **T9** — Merge-gate hardening (user request): pin the six literal `$fit` names against a silently dropped `fitMeasures()` name (F1); correct `@return`'s FIML-only claim about `n_complete` (F4).
 
 ## Work log
 
@@ -160,6 +161,8 @@ instead of forcing listwise deletion.
 - 2026-07-27: second return fixed — AC8, F1 and F4, both gate choices taken as recommended. (1) **F1, test-first**: a new test asserts the WHOLE `$fit` list agrees between paths on complete data — not `srmr` alone, since the defect was one element of a six-element contract quietly meaning something else — and it reddened at 0.0450 against 0.0467 before the fix. `fitMeasures()` now requests `srmr_bentler_nomean` and returns it under the name `srmr`. Named unconditionally rather than branched on `missing`, because the two lavaan names are bit-identical on the listwise and cormat fits — measured on 0.6.21 and 0.7-2, both paths — so AC1's bit-identity to the shipped numbers cannot be disturbed; only the FIML path moves, from the mean-inclusive Bentler SRMR to the covariance-only one that the other two paths already reported. (2) **AC8**: `print()`'s FIML line now shows `details$n_total` under `Total N:`, with the used count beside it only where a dropped row makes the two differ — `Total N: 300 (294 used, 92 complete)` against `Total N: 293 (24 complete)` when nothing is dropped. The old BC8 print test could not have caught this: its fixture drops no row, so N_used and the total coincided; it now asserts that coincidence explicitly and a second test covers the separated case, asserting both the total and that it does not revert to N_used. (3) **F4**: the boundary-fit contract gets its own `# Boundary solutions` roxygen section stating that it governs every input path, so it no longer renders inside `\section{Missing data}`, and the orphaned `A boundary` line break is gone. Pre-M65 it sat in the tail of the instruments section, so this is better than restoring the prior state rather than a revert. F5 (78) stays unactioned at the user's gate choice. Every acceptance criterion is unticked: the fix changes the code the second pass's evidence came from, and the roxygen change also stales AC16 and AC17. Full suite under lavaan 0.6.21: 765 tests / 4245 passing / 0 failures / 4 pre-existing warnings.
 
 - 2026-07-27: gates re-run after the second-return fix, status in-progress→review. CI on PR #91 green on every job: `ubuntu-latest (release)` 24m22s, `test-coverage` 26m12s, `pkgdown` 4m17s, both codecov contexts. Local `devtools::check(manual = TRUE)` 0 errors / 0 warnings / 0 notes in 16m24s with `checking PDF version of manual ... OK` by name (AC17); `document()` no diff after the roxygen section split; `cairn_validate` exit 0. Full suite clean under lavaan 0.6.21 and 0.7-2 alike: 765 tests / 4245 passing / 0 failures (4 pre-existing warnings on 0.6.21, 5 on 0.7-2 — the extra is lavaan 0.7's marker-switch notice on a deliberately degenerate `test-ssm_sem.R` noise fixture built to be refused, not an M65 surface). All 17 criteria remain unticked for the next review to re-gather.
+
+- 2026-07-27: **merge approval withheld at the third-pass gate; changes requested.** Status review→in-progress. All 17 criteria passed with fresh evidence and no finding reached the actioning threshold, but the user declined to merge until two of the logged findings are fixed: F1 (62), the hole in this milestone's own `$fit` guard — `fitMeasures()` drops an unknown name silently, so a future lavaan retiring `srmr_bentler_nomean` would make `$fit$srmr` vanish with all three assertions still passing — and F4 (72), the `@return` line implying `n_complete` is FIML-only when it is set on every path. Added as T9 (minor amendment: a discovered sub-task, no scope or criterion change). F2 (45) and F3 (52) stay logged and cross-referenced onto the follow-on ROADMAP row, as does the thin-overlap warning. Not counted as a review return: no criterion failed and no finding was actioned — this is a maintainer's call at the gate, recorded per the user-override rule.
 
 ## Decisions
 
