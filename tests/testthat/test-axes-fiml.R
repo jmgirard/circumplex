@@ -562,3 +562,128 @@ test_that("M65-D4: the EM cap is a backstop, not a routine limit", {
   )
   expect_true(stalled)
 })
+
+
+# --- T4: reporting and derived quantities (BC8, BC9) --------------------------
+#
+# What the FIML path tells the user about itself, and what it declines to tell
+# them. The declining half is the substantive one: two derived quantities --
+# the Nunnally-Bernstein comparison and the raw-metric SEm -- need each
+# respondent's complete item scores, and computing them from whatever happens
+# to be observed would be exactly the available-case quantity this whole path
+# exists to avoid.
+
+test_that("BC8: the startup message reports the four counts", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  mat <- fiml_holes(fx$mat)
+  mat[1:3, ] <- NA_real_
+  cvg <- axes_fiml_coverage(mat)
+  msg <- capture_messages(
+    axes_reliability(as.data.frame(mat), items = fx$items, angles = octants(),
+                     missing = "fiml")
+  )
+  msg <- paste(msg, collapse = "")
+  expect_match(msg, paste0("FIML on ", cvg$n_used, " respondent"))
+  expect_match(msg, paste0(cvg$n_complete, " complete case"))
+  expect_match(msg, "3 row\\(s\\) with no observed item dropped")
+  expect_match(msg, paste0("minimum pairwise coverage ", cvg$min_coverage))
+})
+
+test_that("BC8: details records the estimator, read back off the fit", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  mat <- fiml_holes(fx$mat)
+  res <- fiml_call(mat, fx$items)
+  # Read back from lavInspect(fit, "options")$missing rather than echoed from
+  # the argument, so `details$missing` reports what lavaan ACTUALLY did. An
+  # echo would keep saying "fiml" even if the argument stopped reaching the
+  # fit -- the one failure this field exists to make visible.
+  expect_identical(res$details$missing, "fiml")
+  cvg <- axes_fiml_coverage(mat)
+  expect_identical(res$details$n_complete, cvg$n_complete)
+  expect_identical(res$details$min_coverage, cvg$min_coverage)
+  # The listwise path reports itself as such, and its complete-case count is
+  # its N by construction.
+  lw <- suppressMessages(
+    axes_reliability(as.data.frame(fx$mat), items = fx$items,
+                     angles = octants(), missing = "listwise")
+  )
+  expect_identical(lw$details$missing, "listwise")
+  expect_identical(lw$details$n_complete, lw$details$n)
+})
+
+test_that("BC8: print() shows the total N beside the complete-case count", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  mat <- fiml_holes(fx$mat)
+  res <- fiml_call(mat, fx$items)
+  out <- paste(capture.output(print(res)), collapse = "\n")
+  expect_match(out, paste0("Total N:\\s+", res$details$n))
+  expect_match(out, paste0("\\(", res$details$n_complete, " complete\\)"))
+  # The listwise path keeps its own label, unchanged.
+  lw <- suppressMessages(
+    axes_reliability(as.data.frame(fx$mat), items = fx$items,
+                     angles = octants(), missing = "listwise")
+  )
+  expect_match(paste(capture.output(print(lw)), collapse = "\n"), "Complete N:")
+})
+
+test_that("BC9: the N-B comparison is NA under FIML, with the reason", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  res <- fiml_call(fiml_holes(fx$mat), fx$items)
+  expect_true(all(is.na(res$results$nb_reliability)))
+  expect_true("fiml" %in% res$details$nb_reason)
+  out <- paste(capture.output(print(res)), collapse = "\n")
+  expect_match(out, "Nunnally-Bernstein")
+  expect_match(paste(capture.output(summary(res)), collapse = "\n"),
+               "Nunnally-Bernstein")
+})
+
+test_that("BC9: the FIML reason accumulates with the others", {
+  skip_if_not_installed("lavaan")
+  # `nb_reason` carries EVERY reason that applies, not the first matched (the
+  # M61 review's F4 holding). A single-item instrument estimated under FIML has
+  # two independent unavailabilities, and both must be stated.
+  oct <- octants()
+  set.seed(21)
+  mat <- as.matrix(axes_simulate(400L, oct, 1L, .35, .10, 0))
+  colnames(mat) <- sprintf("s%02d", seq_len(ncol(mat)))
+  items <- split(colnames(mat), seq_len(8))
+  mat <- fiml_holes(mat, rate = 0.05, seed = 44L)
+  res <- suppressMessages(
+    axes_reliability(as.data.frame(mat), items = items, angles = oct,
+                     missing = "fiml")
+  )
+  expect_setequal(res$details$nb_reason, c("fiml", "single_item"))
+  out <- paste(capture.output(print(res)), collapse = "\n")
+  expect_match(out, "only one item")
+  expect_match(out, "every respondent")
+})
+
+test_that("BC9: `sd = \"raw\"` is a hard error under FIML, not an NA", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  mat <- fiml_holes(fx$mat)
+  # An error rather than a silent NA (D-034 correction 2): a raw-metric SEm
+  # taken from available-case composites is a number the user cannot audit and
+  # would read as the honest one.
+  err <- expect_error(fiml_call(mat, fx$items, sd = "raw"), "sd")
+  # The message must name both usable alternatives, or the user is refused with
+  # nowhere to go.
+  expect_match(conditionMessage(err), "std")
+  expect_match(conditionMessage(err), "numerical|numeric")
+  # A supplied numeric SD still works: the refusal is about deriving the SD
+  # from incomplete composites, not about the raw metric itself.
+  expect_s3_class(fiml_call(mat, fx$items, sd = c(1.4, 1.6)),
+                  "circumplex_axes_reliability")
+  # ... and "raw" is still available on the listwise path.
+  expect_s3_class(
+    suppressMessages(
+      axes_reliability(as.data.frame(fx$mat), items = fx$items,
+                       angles = octants(), sd = "raw")
+    ),
+    "circumplex_axes_reliability"
+  )
+})

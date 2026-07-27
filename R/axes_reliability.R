@@ -363,6 +363,19 @@ axes_converged <- function(fit) {
   isTRUE(lavaan::lavInspect(fit, "converged"))
 }
 
+# Which missing-data treatment lavaan actually used, in this package's spelling.
+# lavaan reports "ml" (or "ml.x" when fixed.x is in play) for FIML; anything
+# else -- including the cormat path, which has no rows and so no treatment --
+# is the complete-case one. Mirrors sem_details()'s read-back in R/ssm_sem.R so
+# the two entry points report the estimator identically.
+axes_lav_missing <- function(fit) {
+  lav <- tryCatch(
+    lavaan::lavInspect(fit, "options")$missing,
+    error = function(e) NULL
+  )
+  if (identical(lav, "ml") || identical(lav, "ml.x")) "fiml" else "listwise"
+}
+
 # Whether a fit landed on a boundary -- not a usable solution, so the caller
 # NAs the reliability and SEm rather than reporting a clipped, negative, or
 # imaginary value (RR09 BC11). Five disjuncts, and the first two bracket the
@@ -987,6 +1000,14 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     )
   }
 
+  # Reported in `details` on every path so a caller can read the fields
+  # unconditionally; set below wherever they mean something. The pairwise
+  # minimum is a FIML diagnostic and stays NA elsewhere: on the listwise path
+  # every retained row answered every item, so reporting N there would look
+  # like a measurement rather than a tautology.
+  n_complete <- NA_integer_
+  min_coverage <- NA_real_
+
   if (has_data) {
     mat <- as.matrix(data[, all_cols, drop = FALSE])
     if (!is.numeric(mat)) {
@@ -1028,6 +1049,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       }
       R <- stats::cor(mat)
       zmat <- scale(mat)
+      n_complete <- n
     } else {
       # --- FIML on the items (M65) --------------------------------------------
       # Two stages, one body of information. The saturated (EM) stage supplies
@@ -1039,6 +1061,8 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       cvg <- axes_fiml_coverage(mat)
       mat <- mat[cvg$keep, , drop = FALSE]
       n <- cvg$n_used
+      n_complete <- cvg$n_complete
+      min_coverage <- cvg$min_coverage
       message(
         "axes_reliability(): FIML on ", n,
         " respondent(s) with at least one observed item (", cvg$n_complete,
@@ -1268,7 +1292,11 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # SEm scale: "std" (SD = 1), "raw" (observed axis-composite SD), or numeric.
   # "raw" needs the respondents' own scale scores, so it is unavailable from a
   # correlation matrix -- refused with the reason, never silently downgraded.
-  scale_scores <- if (has_data) {
+  # Not computed under FIML: a row with any missing item has no scale score,
+  # and rowMeans() would quietly hand back NA for it. Every consumer below is
+  # unavailable on that path anyway (both are refused or NA'd just after), so
+  # the composites are skipped rather than computed and discarded.
+  scale_scores <- if (has_data && missing != "fiml") {
     vapply(
       item_cols, function(cols) rowMeans(mat[, cols, drop = FALSE]),
       numeric(n)
@@ -1280,6 +1308,20 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     stop(
       "`sd = \"raw\"` needs the raw scale scores, which the `cormat` path does ",
       "not have; use \"std\" or supply the axis SDs numerically.",
+      call. = FALSE
+    )
+  }
+  # A hard error, not an NA (D-034 correction 2). The available-case SD of the
+  # axis composite is computable here and looks perfectly reasonable, which is
+  # the problem: it is the available-case quantity this path exists to avoid,
+  # and it would land in the reported SEm with nothing marking it. Refusing
+  # sends the user to an SD they chose knowingly.
+  if (identical(sd, "raw") && missing == "fiml") {
+    stop(
+      "`sd = \"raw\"` needs each respondent's complete axis composite, which ",
+      "the FIML path does not have; an available-case SD would reintroduce ",
+      "exactly the bias this path avoids. Use \"std\" or supply the axis SDs ",
+      "numerically.",
       call. = FALSE
     )
   }
@@ -1335,8 +1377,15 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # the first one matched, so `details` stays a faithful record and print()
   # states both (M61 review, F4). `c()` drops the NULLs, so it is NULL when the
   # comparison is available.
+  # A third unavailability arrives with M65: both N-B inputs are available-case
+  # quantities under FIML. Cronbach's alpha over the observed cells and the
+  # variance of a composite only complete respondents have are exactly the
+  # metric RR12 ruled against, so the comparison is NA'd rather than computed
+  # from whatever happened to be answered -- and, like the two before it, this
+  # reason accumulates rather than replacing them.
   nb_reason <- c(
     if (!has_data) "cormat",
+    if (missing == "fiml") "fiml",
     if (any(n_items_scale < 2L)) "single_item"
   )
   nb <- if (is.null(nb_reason)) {
@@ -1406,6 +1455,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       n = n, n_total = n_total, n_items = p, n_scales = n_scales,
       angles = angles_deg, labels = map$labels, sd = sd,
       input = if (has_data) "data" else "cormat",
+      # Read off the FITTED object rather than echoed from the argument, the
+      # same discipline sem_details() uses (R/ssm_sem.R). An echo would keep
+      # saying "fiml" if the argument ever stopped reaching lavaan, which is
+      # the one failure this field exists to make visible.
+      missing = axes_lav_missing(fit),
+      n_complete = n_complete, min_coverage = min_coverage,
       converged = TRUE, boundary = boundary,
       # Whether the scale-specificity component was in the fitted model at all
       # (M61): FALSE means one item per scale position, so zeta1 was

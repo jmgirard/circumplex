@@ -61,13 +61,28 @@ axes_se_caveat <- paste0(
 print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   d <- x$details
   from_cormat <- identical(d$input, "cormat")
+  # identical() on the read-back field, so an object built before M65 (no
+  # `missing` field at all) reads as FALSE rather than erroring.
+  is_fiml <- identical(d$missing, "fiml")
   cat(
     "\nCircumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)",
     "\nInput:        ", if (from_cormat) "correlation matrix" else "item data",
     "\nItems:        ", d$n_items, " (", d$n_scales, " scales)",
-    # "Complete N" names the listwise complete-case count, which only the raw
-    # path has; a supplied correlation matrix carries a stated sample size.
-    if (from_cormat) "\nSample N:     " else "\nComplete N:   ", d$n,
+    # Three different N's, three different labels, because they are three
+    # different quantities and a shared label would hide that. "Complete N"
+    # names the listwise complete-case count; "Sample N" the size a supplied
+    # correlation matrix was computed from; "Total N" every respondent the FIML
+    # fit used, with the complete-case count beside it so the reader can see how
+    # much of it listwise would have discarded (M65).
+    if (from_cormat) {
+      "\nSample N:     "
+    } else if (is_fiml) {
+      "\nTotal N:      "
+    } else {
+      "\nComplete N:   "
+    },
+    d$n,
+    if (is_fiml) paste0(" (", d$n_complete, " complete)"),
     "\nSEm scale:    ", if (is.character(d$sd)) d$sd else "custom",
     "\n\n# Per-axis reliability\n\n",
     sep = ""
@@ -116,6 +131,15 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
       "\n  Note: the Nunnally-Bernstein comparison needs the raw item scores",
       "\n  (scale alphas and the axis-composite variance), so it is NA on the",
       "\n  correlation-matrix path.\n",
+      sep = ""
+    )
+  }
+  if ("fiml" %in% nb_reason) {
+    cat(
+      "\n  Note: the Nunnally-Bernstein comparison needs each scale's alpha and",
+      "\n  the axis-composite variance, both of which need items observed by",
+      "\n  every respondent, so it is NA under missing = \"fiml\" rather than",
+      "\n  computed from whatever cells happened to be answered.\n",
       sep = ""
     )
   }
