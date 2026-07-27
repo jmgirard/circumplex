@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-26 (M63 shipped — `axes_reliability()` estimates block specificity via a new `blocks` argument, and review corrected the caveat it replaces: omitting the component is harmless when each block draws one item per scale, not merely when blocks look evenly spread. All 16 checks PASS; M58 row pruned.)_
+_Last hygiene check: 2026-07-26 (M64 shipped — a Fable review (RR12) settled the FIML-on-items question with a GO under BC1–BC16 and ruled out available-case standardization as MAR-dishonest; the build is a candidate row carrying `Driving RR: RR12`. All 16 checks PASS; M59 row pruned under terminal-row retention.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -11,10 +11,9 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M60 | Any equally spaced angle set for `axes_reliability()` | done | — | normal | milestones/archive/M60-axes-reliability-equal-spacing.md |
 | M61 | Single-item scale positions for `axes_reliability()` — dropping ζ1 | done | M60 | normal | milestones/archive/M61-axes-reliability-single-item.md |
-| M59 | Correlation-matrix input path for `axes_reliability()` | done | M54 | normal | milestones/archive/M59-axes-reliability-corr-input.md |
 | M62 | Close `axes_reliability()`'s two never-NaN gaps — ξ1 ≥ 1 and an unvalidated `sd` | done | — | normal | milestones/archive/M62-axes-reliability-never-nan.md |
 | M63 | Blockwise instruments for `axes_reliability()` — the ζ2 component | done | — | normal | milestones/archive/M63-axes-reliability-blockwise-zeta2.md |
-| M64 | FIML on items for `axes_reliability()` — the estimator-metric question | review | — | normal | milestones/M64-axes-reliability-fiml-review.md |
+| M64 | FIML on items for `axes_reliability()` — the estimator-metric question | done | — | normal | milestones/archive/M64-axes-reliability-fiml-review.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
