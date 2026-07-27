@@ -2093,3 +2093,786 @@ test_that("M61 review F4: nb_reason carries every reason that applies", {
   )
   expect_identical(r2$details$nb_reason, "cormat")
 })
+
+# --- M63: blockwise instruments and the zeta2 component -----------------------
+#
+# Blocks group items by something OTHER than their scale (Strack's type d), so
+# the canonical blockwise design takes one item from each scale into each block:
+# `same-block` and `same-scale` are then genuinely different indicators, which
+# is exactly the condition that identifies zeta2.
+
+# Four scales, k items each, with `nb` blocks laid across the scales: item j of
+# every scale goes to block j. Requires k == nb, the balanced case.
+axes_block_fixture <- function(angles = c(0, 90, 180, 270), k = 2L) {
+  inames <- sprintf("i%02d", seq_len(length(angles) * k))
+  scale_of <- rep(seq_along(angles), each = k)
+  block_of <- rep(seq_len(k), times = length(angles))
+  list(
+    names = inames,
+    items = split(inames, factor(scale_of, levels = seq_along(angles))),
+    blocks = split(inames, factor(block_of, levels = seq_len(k))),
+    angles = angles,
+    scale_of = scale_of,
+    block_of = block_of
+  )
+}
+
+test_that("M63 T1: axes_resolve_blocks() maps blocks onto the item order", {
+  fx <- axes_block_fixture()
+  src <- as.data.frame(matrix(0, nrow = 2, ncol = length(fx$names),
+                              dimnames = list(NULL, fx$names)))
+  all_cols <- unlist(fx$items, use.names = FALSE)
+
+  # NULL blocks stay NULL -- the no-zeta2 path, unchanged from M61.
+  expect_null(axes_resolve_blocks(NULL, src, all_cols))
+
+  got <- axes_resolve_blocks(fx$blocks, src, all_cols)
+  # The returned index is aligned with `all_cols`, not with the block list's
+  # own order: item j of every scale carries block j.
+  expect_identical(got$index, fx$block_of)
+  expect_identical(got$labels, c("1", "2"))
+
+  # Numeric indices resolve exactly as names do (axes_colnames()).
+  by_num <- axes_resolve_blocks(list(c(1L, 3L, 5L, 7L), c(2L, 4L, 6L, 8L)),
+                                src, all_cols)
+  expect_identical(by_num$index, got$index)
+  expect_identical(by_num$labels, c("Block1", "Block2"))
+})
+
+test_that("M63 T1: `blocks` must partition the items, and says which item broke it", {
+  fx <- axes_block_fixture()
+  src <- as.data.frame(matrix(0, nrow = 2, ncol = length(fx$names),
+                              dimnames = list(NULL, fx$names)))
+  all_cols <- unlist(fx$items, use.names = FALSE)
+  r <- function(b) axes_resolve_blocks(b, src, all_cols)
+
+  # Not a list at all -- the settled API shape is a list of item vectors, so a
+  # flat label vector is refused rather than silently reinterpreted.
+  expect_error(r(c("A", "A", "B", "B", "A", "A", "B", "B")),
+               "must be a list of per-block item")
+  expect_error(r(list()), "at least one block")
+  # An empty block contributes no items and would silently stop counting.
+  expect_error(r(list(character(0), fx$names)), "no items")
+  # An item named in a block but absent from the data.
+  expect_error(r(list(c("i01", "nope"), fx$names[-1])), "not found.*nope")
+  # An item in two blocks at once: the partition is broken by duplication.
+  expect_error(r(list(fx$names[1:5], fx$names[5:8])), "more than one block.*i05")
+  # An item in no block: the partition is broken by omission.
+  expect_error(r(list(fx$names[1:4], fx$names[5:7])), "no block.*i08")
+})
+
+test_that("M63 T2: axes_design() names the columns the model will fit", {
+  fx <- axes_block_fixture()
+  ang <- rep(fx$angles, each = 2L)
+
+  # No blocks: the pre-M63 three-column design, unchanged.
+  X0 <- axes_design(ang, fx$scale_of)
+  expect_identical(colnames(X0), c("xi2", "xi1", "zeta1"))
+  # Blocks laid across the scales: zeta2 joins as a fourth column.
+  X1 <- axes_design(ang, fx$scale_of, fx$block_of)
+  expect_identical(colnames(X1), c("xi2", "xi1", "zeta1", "zeta2"))
+  # The design is the upper triangle of the item-by-item matrix.
+  p <- length(ang)
+  expect_identical(nrow(X1), as.integer(p * (p - 1L) / 2L))
+})
+
+test_that("M63 T2: axes_fits_zeta2() keeps zeta2 only where it is identified", {
+  fx <- axes_block_fixture()
+  ang <- rep(fx$angles, each = 2L)
+  fits <- function(blk) axes_fits_zeta2(ang, fx$scale_of, blk)
+
+  # Identified: blocks cut across the scales, so same-block is a genuinely
+  # different indicator from same-scale.
+  expect_true(fits(fx$block_of))
+  # Blocks that ARE the scales: same-block == same-scale, perfectly confounded
+  # with zeta1. This is the case the M63 gate named.
+  expect_false(fits(fx$scale_of))
+  # One block holding everything: same-block is all ones off the diagonal, so
+  # it is the intercept column and carries no information of its own.
+  expect_false(fits(rep(1L, length(ang))))
+  # Every item its own block: same-block is all zeros off the diagonal -- the
+  # zero-column case that killed qr.solve() before M61 handled its zeta1 twin.
+  expect_false(fits(seq_along(ang)))
+  # No blocks supplied at all.
+  expect_false(axes_fits_zeta2(ang, fx$scale_of, NULL))
+})
+
+test_that("M63 T2: a block map spanning two scales can still be unidentified", {
+  # THE case that decided the M63 gate for a rank check over a structural rule.
+  # Four scales, one item each, at 0/90/180/270; blocks pair OPPOSITE scales.
+  # Every same-block pair is 180 deg apart (cos = -1) and every cross-block pair
+  # is 90 deg apart (cos = 0), so same-block == -cos exactly: the block column
+  # is a scalar multiple of the axes column and adds no rank.
+  ang <- c(0, 90, 180, 270)
+  scale_of <- 1:4
+  paired <- c(1L, 2L, 1L, 2L)   # {0,180} and {90,270}
+
+  # A structural rule -- "some block spans >= 2 scales" -- would say identified.
+  expect_true(any(tapply(scale_of, paired, function(s) length(unique(s))) >= 2))
+  # The rank check says otherwise, and the rank check is right.
+  expect_false(axes_fits_zeta2(ang, scale_of, paired))
+  expect_identical(colnames(axes_design(ang, scale_of, paired)), c("xi2", "xi1"))
+
+  # Rotating the same pairing off the axes does not rescue it: the collinearity
+  # is in the pairing, not the phase.
+  expect_false(axes_fits_zeta2(ang + 22.5, scale_of, paired))
+
+  # But blocking ADJACENT scales instead is identified at the same angles --
+  # so the refusal above is about this pairing, not about k = 4 or single items.
+  adjacent <- c(1L, 1L, 2L, 2L)  # {0,90} and {180,270}
+  expect_true(axes_fits_zeta2(ang, scale_of, adjacent))
+})
+
+test_that("M63 T2: the OLS shadow recovers zeta2 exactly on the population", {
+  fx <- axes_block_fixture(k = 2L)
+  ang <- rep(fx$angles, each = 2L)
+  xi1 <- .20; xi2 <- .05; zeta1 <- .08; zeta2 <- .06
+
+  # Build the population correlation matrix by hand from the five-component
+  # decomposition, so the shadow is checked against arithmetic it never saw.
+  p <- length(ang)
+  th <- ang * pi / 180
+  sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
+    zeta1 * outer(fx$scale_of, fx$scale_of, `==`) +
+    zeta2 * outer(fx$block_of, fx$block_of, `==`)
+  diag(sig) <- 1
+
+  got <- axes_ols_shadow(sig, ang, fx$scale_of, fx$block_of)
+  expect_identical(names(got), c("xi2", "xi1", "zeta1", "zeta2"))
+  expect_lt(abs(got[["xi1"]] - xi1), 1e-10)
+  expect_lt(abs(got[["xi2"]] - xi2), 1e-10)
+  expect_lt(abs(got[["zeta1"]] - zeta1), 1e-10)
+  expect_lt(abs(got[["zeta2"]] - zeta2), 1e-10)
+
+  # Omitting the block map from the SAME matrix biases the other components --
+  # the block variance has to go somewhere. This is the OLS-side preview of the
+  # AC4 claim the CFA makes end to end.
+  naive <- axes_ols_shadow(sig, ang, fx$scale_of)
+  expect_false("zeta2" %in% names(naive))
+  expect_gt(abs(naive[["xi1"]] - xi1) + abs(naive[["xi2"]] - xi2) +
+              abs(naive[["zeta1"]] - zeta1), 1e-3)
+})
+
+test_that("M63 T3: axes_syntax() emits BS latents sharing one zeta2 label", {
+  fx <- axes_block_fixture()
+  syn <- axes_syntax(fx$items, fx$angles, item_block = fx$block_of)
+
+  # One block latent per block, loading +1 on that block's items -- and the
+  # items are the ACROSS-scale ones, not a scale's worth.
+  expect_true(grepl("BS1 =~ 1*i01 + 1*i03 + 1*i05 + 1*i07", syn, fixed = TRUE))
+  expect_true(grepl("BS2 =~ 1*i02 + 1*i04 + 1*i06 + 1*i08", syn, fixed = TRUE))
+  # Every block variance shares the one zeta2 label (the model's restriction).
+  expect_true(grepl("BS1 ~~ zeta2*BS1", syn, fixed = TRUE))
+  expect_true(grepl("BS2 ~~ zeta2*BS2", syn, fixed = TRUE))
+  # The rest of the model is untouched by the addition.
+  expect_true(grepl("AX ~~ xi1*AX", syn, fixed = TRUE))
+  expect_true(grepl("GEN ~~ xi2*GEN", syn, fixed = TRUE))
+  expect_true(grepl("SS1 ~~ zeta1*SS1", syn, fixed = TRUE))
+})
+
+test_that("M63 T3: an unidentified block map emits no BS latents at all", {
+  fx <- axes_block_fixture()
+  # Blocks that ARE the scales: axes_fits_zeta2() is FALSE, so the component is
+  # dropped from the model rather than fitted to a confounded moment -- exactly
+  # how M61 drops zeta1, and read off the same design.
+  syn <- axes_syntax(fx$items, fx$angles, item_block = fx$scale_of)
+  expect_false(grepl("BS1", syn, fixed = TRUE))
+  expect_false(grepl("zeta2", syn, fixed = TRUE))
+  expect_true(grepl("no block-specificity component", syn, fixed = TRUE))
+  # zeta1 is still there -- dropping zeta2 must not take its neighbour with it.
+  expect_true(grepl("SS1 ~~ zeta1*SS1", syn, fixed = TRUE))
+
+  # No blocks supplied: byte-identical to the pre-M63 emission.
+  expect_identical(axes_syntax(fx$items, fx$angles),
+                   axes_syntax(fx$items, fx$angles, item_block = NULL))
+  expect_false(grepl("zeta2", axes_syntax(fx$items, fx$angles), fixed = TRUE))
+})
+
+test_that("M63 T3: zeta2 takes a start modifier only when the seed carries it", {
+  fx <- axes_block_fixture()
+  # A dyadic seed (1/16) so fmt()'s full-precision printing is exact: .06 would
+  # print as 0.059999999999999998 and a regex pinned to "0.06" would never
+  # match. The M61 comment warns about the digit COUNT; the value's own decimal
+  # expansion is the other half of the same trap.
+  seed <- c(xi2 = .05, xi1 = .20, zeta1 = .08, zeta2 = .0625)
+  syn <- axes_syntax(fx$items, fx$angles, item_block = fx$block_of, start = seed)
+  expect_match(syn, "BS1 ~~ start\\(0\\.0625[0-9]*\\)\\*zeta2\\*BS1")
+  expect_match(syn, "BS2 ~~ start\\(0\\.0625[0-9]*\\)\\*zeta2\\*BS2")
+
+  # A seed WITHOUT zeta2 (the shadow returns none when zeta2 is unidentified)
+  # must emit no modifier rather than erroring on the missing name -- the same
+  # trap M61 hit with zeta1.
+  seed3 <- c(xi2 = .05, xi1 = .20, zeta1 = .08)
+  syn3 <- expect_no_error(
+    axes_syntax(fx$items, fx$angles, item_block = fx$block_of, start = seed3)
+  )
+  expect_true(grepl("BS1 ~~ zeta2*BS1", syn3, fixed = TRUE))
+})
+
+test_that("M63 T4: the shadow drops BOTH specificity columns when neither is identified", {
+  # One item per scale (no zeta1) AND blocks that are the scales (no zeta2):
+  # the design falls back to the two-column form M61 introduced. Neither drop
+  # may take the other's column with it.
+  ang <- c(0, 90, 180, 270)
+  scale_of <- 1:4
+  sig <- 0.05 + 0.20 * outer(ang * pi / 180, ang * pi / 180,
+                             function(a, b) cos(a - b))
+  diag(sig) <- 1
+
+  both <- axes_ols_shadow(sig, ang, scale_of, scale_of)
+  expect_identical(names(both), c("xi2", "xi1"))
+  expect_lt(abs(both[["xi1"]] - .20), 1e-10)
+
+  # One item per scale but blocks that DO cut across: zeta2 survives alone,
+  # with no zeta1 beside it (Strack's type e administered in blocks).
+  crossed <- c(1L, 1L, 2L, 2L)
+  sig2 <- sig + 0.06 * outer(crossed, crossed, `==`)
+  diag(sig2) <- 1
+  only2 <- axes_ols_shadow(sig2, ang, scale_of, crossed)
+  expect_identical(names(only2), c("xi2", "xi1", "zeta2"))
+  expect_lt(abs(only2[["zeta2"]] - .06), 1e-10)
+})
+
+test_that("M63 T5: axes_population_cor() carries zeta2 into the population", {
+  ang <- c(0, 90, 180, 270)
+  k <- 2L
+  blk <- axes_crossed_blocks(length(ang), k)
+  expect_identical(blk, c(1L, 2L, 1L, 2L, 1L, 2L, 1L, 2L))
+
+  pop <- axes_population_cor(ang, k, xi1 = .20, xi2 = .05, zeta1 = .08,
+                             zeta2 = .06, item_block = blk)
+  # A same-block, different-scale pair carries xi2 + xi1*cos(dtheta) + zeta2 --
+  # and NOT zeta1, which is what makes the two components separable.
+  # Items 1 and 3: scales 1 and 2 (0 and 90 deg), both block 1.
+  expect_lt(abs(pop$sigma[1, 3] - (.05 + .20 * cos(pi / 2) + .06)), 1e-12)
+  # Items 1 and 2: same scale (0 deg), different blocks -> zeta1, not zeta2.
+  expect_lt(abs(pop$sigma[1, 2] - (.05 + .20 * 1 + .08)), 1e-12)
+  # Items 1 and 4: different scale, different block -> neither specificity.
+  expect_lt(abs(pop$sigma[1, 4] - (.05 + .20 * cos(pi / 2))), 1e-12)
+  expect_true(all(diag(pop$sigma) == 1))
+
+  # Omitting the block map reproduces the pre-M63 population EXACTLY, so no
+  # existing oracle silently moves under this change.
+  expect_identical(
+    axes_population_cor(ang, k, .20, .05, .08)$sigma,
+    axes_population_cor(ang, k, .20, .05, .08, zeta2 = .06)$sigma
+  )
+
+  # The population must stay a valid correlation matrix at these settings.
+  expect_gt(min(eigen(pop$sigma, symmetric = TRUE, only.values = TRUE)$values), 0)
+})
+
+test_that("M63 T5: the shadow recovers all four components off a simulated draw", {
+  ang <- c(0, 45, 90, 135, 180, 225, 270, 315)
+  k <- 2L
+  blk <- axes_crossed_blocks(length(ang), k)
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+
+  set.seed(4242L)
+  dat <- axes_simulate(6000L, ang, k, truth[["xi1"]], truth[["xi2"]],
+                       truth[["zeta1"]], zeta2 = truth[["zeta2"]],
+                       item_block = blk)
+  expect_identical(ncol(dat), length(ang) * k)
+
+  got <- axes_ols_shadow(stats::cor(as.matrix(dat)),
+                         rep(ang, each = k), rep(seq_along(ang), each = k), blk)
+  # Finite-sample, so an absolute bound wide enough for sampling noise at
+  # n = 6000 but far narrower than the .06 signal being detected (M59/M61: set
+  # the bar from the discrimination required, and state it absolutely).
+  for (nm in names(truth)) expect_lt(abs(got[[nm]] - truth[[nm]]), .02)
+})
+
+test_that("M63 T6: axes_is_boundary() catches a negative zeta2", {
+  # The new disjunct, tested on the UNMOCKED predicate: a negative block
+  # variance is not a usable solution, exactly as a negative zeta1 is not.
+  # (M62 lesson (i): mock the seam and the arithmetic under test never runs.)
+  expect_true(axes_is_boundary(.2, .05, .08, c(.5, .5), zeta2 = -.01))
+  expect_false(axes_is_boundary(.2, .05, .08, c(.5, .5), zeta2 = .01))
+  # zeta2 = NULL is the no-blocks path and must not read as a boundary.
+  expect_false(axes_is_boundary(.2, .05, .08, c(.5, .5), zeta2 = NULL))
+  # A negative zeta2 must not be masked by, or mask, the other disjuncts.
+  expect_true(axes_is_boundary(.2, .05, NULL, c(.5, .5), zeta2 = -.01))
+  expect_true(axes_is_boundary(0, .05, .08, c(.5, .5), zeta2 = .01))
+  # Default NULL keeps every pre-M63 call site's behaviour byte-identical.
+  expect_false(axes_is_boundary(.2, .05, .08, c(.5, .5)))
+})
+
+test_that("M63 T6: axes_reliability() fits and reports zeta2 end to end", {
+  skip_if_not_installed("lavaan")
+  ang <- c(0, 45, 90, 135, 180, 225, 270, 315)
+  k <- 2L
+  blk_idx <- axes_crossed_blocks(length(ang), k)
+  set.seed(909L)
+  dat <- axes_simulate(3000L, ang, k, xi1 = .20, xi2 = .05, zeta1 = .08,
+                       zeta2 = .06, item_block = blk_idx)
+  inames <- colnames(dat)
+  items <- split(inames, rep(seq_along(ang), each = k))
+  blocks <- split(inames, blk_idx)
+
+  res <- suppressMessages(
+    axes_reliability(dat, items = items, angles = ang, blocks = blocks)
+  )
+  expect_s3_class(res, "circumplex_axes_reliability")
+  expect_true(res$details$zeta2_fitted)
+  expect_identical(res$details$blocks, c("1", "2"))
+  # Five component rows now: general, axes, scale, block, item.
+  expect_identical(res$components$Symbol,
+                   c("xi2", "xi1", "zeta1", "zeta2", "epsilon"))
+  z2 <- res$components$Estimate[res$components$Symbol == "zeta2"]
+  expect_lt(abs(z2 - .06), .02)
+  expect_true(is.finite(res$components$SE[res$components$Symbol == "zeta2"]))
+  # And the estimate the whole milestone exists for: xi1 recovered, not
+  # deflated by block variance leaking into the other components.
+  expect_lt(abs(res$components$Estimate[res$components$Symbol == "xi1"] - .20),
+            .02)
+  expect_false(res$results$boundary[[1]])
+  expect_true(all(is.finite(res$results$reliability)))
+  expect_true(all(is.finite(res$results$sem)))
+
+  # Blocks that are the scales: accepted, but reported as not fitted, with the
+  # four-row component set and no NA/NaN anywhere.
+  res_u <- suppressMessages(
+    axes_reliability(dat, items = items, angles = ang, blocks = items)
+  )
+  expect_false(res_u$details$zeta2_fitted)
+  expect_identical(res_u$components$Symbol, c("xi2", "xi1", "zeta1", "epsilon"))
+  expect_true(all(is.finite(res_u$results$reliability)))
+
+  # No blocks at all reproduces the pre-M63 result EXACTLY on the same data.
+  res_n <- suppressMessages(
+    axes_reliability(dat, items = items, angles = ang)
+  )
+  expect_false(res_n$details$zeta2_fitted)
+  expect_null(res_n$details$blocks)
+  expect_equal(res_u$results$reliability, res_n$results$reliability,
+               tolerance = 1e-10)
+})
+
+# --- M63 T7: the Layer-B oracle for zeta2 -------------------------------------
+#
+# Three claims, each on the EXACT population matrix so no sampling noise stands
+# between the model and its truth: the fit recovers zeta2 (AC3), the bias from
+# omitting it is conditional on block geometry (AC4, per M63-D2), and three
+# independent engines agree (AC5).
+
+# Fit the exact population with likelihood = "wishart" (the N-1 divisor), the
+# BC5 convention: lavaan's default ML rescales by (N-1)/N and would miss truth
+# by ~.0003 at N = 500 for reasons that have nothing to do with zeta2.
+axes_pop_fit_components <- function(sigma, items, angles_deg, item_block) {
+  fit <- lavaan::cfa(
+    axes_syntax(items, angles_deg, item_block = item_block),
+    sample.cov = sigma, sample.nobs = 500L,
+    orthogonal = TRUE, likelihood = "wishart"
+  )
+  pe <- lavaan::parameterEstimates(fit)
+  v <- function(l) pe$est[pe$op == "~~" & pe$lhs == l & pe$rhs == l][[1]]
+  out <- c(xi1 = v("AX"), xi2 = v("GEN"), zeta1 = v("SS1"))
+  if (!is.null(item_block) &&
+      axes_fits_zeta2(rep(angles_deg, times = lengths(items)),
+                      rep(seq_along(items), times = lengths(items)),
+                      item_block)) {
+    out[["zeta2"]] <- v("BS1")
+  }
+  out
+}
+
+axes_zeta2_pop <- function(angles, k, truth, item_block) {
+  pop <- axes_population_cor(angles, k, truth[["xi1"]], truth[["xi2"]],
+                             truth[["zeta1"]], zeta2 = truth[["zeta2"]],
+                             item_block = item_block)
+  inames <- sprintf("i%02d", seq_along(pop$scale))
+  dimnames(pop$sigma) <- list(inames, inames)
+  list(sigma = pop$sigma, scale = pop$scale, names = inames,
+       items = split(inames, factor(pop$scale, levels = seq_along(angles))))
+}
+
+test_that("M63 T7 (AC3): the fit recovers zeta2 on the exact population", {
+  skip_if_not_installed("lavaan")
+  ang <- octants()
+  k <- 4L
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+  blk <- axes_crossed_blocks(length(ang), k)
+  px <- axes_zeta2_pop(ang, k, truth, blk)
+
+  got <- axes_pop_fit_components(px$sigma, px$items, ang, blk)
+  expect_identical(names(got), c("xi1", "xi2", "zeta1", "zeta2"))
+  # Absolute bounds, stated absolutely (M61's relative-tolerance trap). 1e-4 is
+  # four orders below the .06 signal, so it fences the estimate without pinning
+  # optimizer noise (M59: set the bar from the discrimination required).
+  for (nm in names(truth)) expect_lt(abs(got[[nm]] - truth[[nm]]), 1e-4)
+
+  # The population must be a genuine correlation matrix at these settings, or
+  # "recovery" would be recovery of something unreachable.
+  expect_gt(min(eigen(px$sigma, symmetric = TRUE, only.values = TRUE)$values), 0)
+  expect_true(all(diag(px$sigma) == 1))
+})
+
+test_that("M63 T7 (AC4): the omitted-zeta2 bias in xi1 is conditional on geometry", {
+  skip_if_not_installed("lavaan")
+  ang <- octants()
+  k <- 4L
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+  item_scale <- rep(seq_along(ang), each = k)
+
+  # Angle-BALANCED: each block draws one item from every scale.
+  balanced <- axes_crossed_blocks(length(ang), k)
+  # Angle-CLUSTERED: each block spans a contiguous half of the circle.
+  clustered <- ifelse(item_scale <= 4, 1L, 2L)
+  # Both must be identified, or the comparison is about identifiability rather
+  # than about geometry.
+  expect_true(axes_fits_zeta2(rep(ang, each = k), item_scale, balanced))
+  expect_true(axes_fits_zeta2(rep(ang, each = k), item_scale, clustered))
+
+  for (case in list(list(blk = balanced, bal = TRUE),
+                    list(blk = clustered, bal = FALSE))) {
+    px <- axes_zeta2_pop(ang, k, truth, case$blk)
+    # Fit the SAME population with zeta2 omitted from the model.
+    naive <- axes_pop_fit_components(px$sigma, px$items, ang, item_block = NULL)
+    expect_false("zeta2" %in% names(naive))
+    bias_xi1 <- naive[["xi1"]] - truth[["xi1"]]
+
+    if (case$bal) {
+      # Provably zero: within-block pairs are all cross-scale and span every
+      # scale pair uniformly, so same-block is orthogonal to cos(theta_i -
+      # theta_j) and omitting it cannot move the cosine coefficient (M63-D2).
+      #
+      # The bound is set from the DISCRIMINATION required, not from what this
+      # machine printed (M59): the alternative hypothesis is the clustered
+      # branch below at +.024, so 1e-4 still separates the two by 240x while
+      # sitting ~3400x above the observed 2.9e-8. The exact-arithmetic route
+      # (the OLS shadow) gives -7.5e-16; the gap is the ML optimizer's own
+      # convergence tolerance, which is platform-variable, so a bound near
+      # machine epsilon would fence the optimizer rather than the claim.
+      expect_lt(abs(bias_xi1), 1e-4)
+    } else {
+      # Angle-clustered blocks correlate with the cosine column, and there the
+      # component genuinely protects xi1: >= 10% of truth.
+      expect_gt(abs(bias_xi1), .10 * truth[["xi1"]])
+    }
+    # The one unconditional claim: the general factor absorbs block variance
+    # under BOTH geometries.
+    expect_gt(naive[["xi2"]] - truth[["xi2"]], .005)
+  }
+})
+
+test_that("M63 review: even angular spread does NOT make omitting zeta2 safe", {
+  skip_if_not_installed("lavaan")
+  # The review counterexample to the FIRST wording of this milestone's own
+  # conditional. That wording said xi1 was unaffected when "each block draws
+  # about evenly from around the circle", which is false: blocks pairing
+  # diametrically opposite scales are maximally dispersed -- every block's
+  # angles average to the centre of the circle, mean resultant length 0 -- and
+  # still bias xi1, because every within-block pair sits half a turn apart and
+  # that IS information about angular distance.
+  #
+  # This test fences the CONDITION, not two instances of it: the earlier AC4
+  # test exercises only crossed and contiguous layouts, so restating the rule
+  # wrongly reddened nothing. Here an even-spread layout is asserted to be
+  # UNSAFE, which is exactly what the false rule denied.
+  ang <- octants()
+  k <- 2L
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+  item_scale <- rep(seq_along(ang), each = k)
+  item_angle <- rep(ang, each = k)
+  antipodal <- ((item_scale - 1L) %% 4L) + 1L   # pairs each scale with its opposite
+
+  # Every block is maximally dispersed: its angles average to the circle centre.
+  for (b in unique(antipodal)) {
+    th <- item_angle[antipodal == b] * pi / 180
+    mrl <- Mod(mean(complex(real = cos(th), imaginary = sin(th))))
+    expect_lt(mrl, 1e-12)
+  }
+  # ...and it is identified, so this is a real fit and not a dropped component.
+  expect_true(axes_fits_zeta2(item_angle, item_scale, antipodal))
+
+  px <- axes_zeta2_pop(ang, k, truth, antipodal)
+  naive <- axes_pop_fit_components(px$sigma, px$items, ang, item_block = NULL)
+  bias <- naive[["xi1"]] - truth[["xi1"]]
+  # Biased DOWNWARD by ~9% of truth -- opposite in sign to the contiguous case,
+  # which is why "it can go either way" is the honest statement.
+  expect_lt(bias, -.05 * truth[["xi1"]])
+  # And the component recovers truth when it IS fitted, so the bias is the
+  # omission's doing rather than a misspecified population.
+  full <- axes_pop_fit_components(px$sigma, px$items, ang, antipodal)
+  expect_lt(abs(full[["xi1"]] - truth[["xi1"]]), 1e-4)
+
+  # The one layout the docs DO promise is safe: one item per scale per block.
+  safe <- axes_crossed_blocks(length(ang), k)
+  px_s <- axes_zeta2_pop(ang, k, truth, safe)
+  naive_s <- axes_pop_fit_components(px_s$sigma, px_s$items, ang,
+                                     item_block = NULL)
+  expect_lt(abs(naive_s[["xi1"]] - truth[["xi1"]]), 1e-4)
+})
+
+test_that("M63 review: opposite-scale blocks are identified except at k = 4", {
+  # The docs originally offered opposite-scale blocks as an example of a map
+  # the rank check REFUSES. That holds only at four scales, where same-block
+  # equals -cos exactly; at six, eight and twelve the pairing is identified.
+  # Eight is this package's canonical layout, so the example was wrong exactly
+  # where most users live. Pinned so the claim cannot be reinstated.
+  for (kk in c(6L, 8L, 12L)) {
+    a <- seq(0, 360 - 360 / kk, length.out = kk)
+    s <- rep(seq_len(kk), each = 2L)
+    expect_true(axes_fits_zeta2(rep(a, each = 2L), s,
+                                ((s - 1L) %% (kk / 2L)) + 1L))
+  }
+  # k = 4 remains the genuine collinear case (the T2 test above covers why).
+  expect_false(axes_fits_zeta2(rep(c(0, 90, 180, 270), each = 2L),
+                               rep(1:4, each = 2L),
+                               ((rep(1:4, each = 2L) - 1L) %% 2L) + 1L))
+})
+
+test_that("M63 review: xi2 inflation is not unconditional", {
+  # The shipped prose said the general factor absorbs block variance "in every
+  # configuration". It does not: this layout leaves xi2 exactly untouched while
+  # xi1 carries -0.25 * zeta2. Corrected to "inflated under most layouts,
+  # never deflated" -- and pinned here so the stronger claim cannot return.
+  ang <- c(0, 90, 180, 270)
+  k <- 2L
+  item_scale <- rep(seq_along(ang), each = k)
+  item_angle <- rep(ang, each = k)
+  blk <- c(1L, 2L, 4L, 4L, 2L, 1L, 3L, 3L)
+  X <- axes_design(item_angle, item_scale)
+  ut <- upper.tri(matrix(0, length(item_scale), length(item_scale)))
+  aux <- qr.solve(X, as.numeric(outer(blk, blk, `==`)[ut]))
+  # Intercept coefficient exactly zero -> zero xi2 bias at any zeta2.
+  expect_lt(abs(aux[[1]]), 1e-10)
+  # while the cosine coefficient is emphatically not zero.
+  expect_gt(abs(aux[[2]]), .2)
+})
+
+test_that("M63 T7 (AC4): closed-form omitted-variable bias predicts the fitted bias", {
+  skip_if_not_installed("lavaan")
+  # An independent route to the same number, so the conditional above rests on
+  # a derivation and not only on a fitted value: for y = X*beta + gamma*z, the
+  # bias in beta from dropping z is gamma * (X'X)^-1 X'z. The cosine element of
+  # that auxiliary solve IS the xi1 bias per unit zeta2.
+  ang <- octants()
+  k <- 4L
+  truth <- c(xi1 = .20, xi2 = .05, zeta1 = .08, zeta2 = .06)
+  item_scale <- rep(seq_along(ang), each = k)
+  item_angle <- rep(ang, each = k)
+  X <- axes_design(item_angle, item_scale)
+  ut <- upper.tri(matrix(0, length(item_scale), length(item_scale)))
+
+  for (blk in list(axes_crossed_blocks(length(ang), k),
+                   ifelse(item_scale <= 4, 1L, 2L))) {
+    z <- as.numeric(outer(blk, blk, `==`)[ut])
+    predicted <- truth[["zeta2"]] * qr.solve(X, z)[[2]]
+    px <- axes_zeta2_pop(ang, k, truth, blk)
+    observed <- axes_pop_fit_components(px$sigma, px$items, ang,
+                                        item_block = NULL)[["xi1"]] -
+      truth[["xi1"]]
+    # Two routes, one number. The bound discriminates against "the algebra is
+    # wrong", which would put predicted and observed a whole bias apart (~.024),
+    # so 1e-3 separates them by ~24x while leaving ~96x over the observed
+    # 1.04e-5 residual -- the ML optimizer's convergence tolerance again, not a
+    # disagreement between the two routes (M59).
+    expect_lt(abs(predicted - observed), 1e-3)
+  }
+})
+
+# OpenMx route for the five-component model: the same Sigma built from matrix
+# algebra rather than lavaan syntax, so agreement is between two independent
+# implementations of the model and not two calls into one. Mirrors BC7's helper
+# with the block matrix added.
+axes_mx_components_zeta2 <- function(S, n, angles_deg, n_items, item_block) {
+  p <- nrow(S)
+  nm <- rownames(S)
+  scale <- rep(seq_along(angles_deg), each = n_items)
+  th <- rep(as.numeric(angles_deg), each = n_items) * pi / 180
+  model <- OpenMx::mxModel(
+    "axes2",
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .15, lbound = 0,
+                     name = "xi1"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .05, lbound = 0,
+                     name = "xi2"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .10, lbound = 0,
+                     name = "zeta1"),
+    OpenMx::mxMatrix("Full", 1, 1, free = TRUE, values = .05, lbound = 0,
+                     name = "zeta2"),
+    OpenMx::mxMatrix("Full", p, 1, free = TRUE, values = .5, lbound = 0,
+                     name = "eps"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(th, th, function(a, b) cos(a - b)),
+                     name = "C"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE, values = 1, name = "J"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(scale, scale, `==`) * 1, name = "B"),
+    OpenMx::mxMatrix("Full", p, p, free = FALSE,
+                     values = outer(item_block, item_block, `==`) * 1,
+                     name = "K"),
+    OpenMx::mxAlgebra(
+      xi1[1, 1] * C + xi2[1, 1] * J + zeta1[1, 1] * B + zeta2[1, 1] * K +
+        vec2diag(eps),
+      name = "Sigma", dimnames = list(nm, nm)
+    ),
+    OpenMx::mxData(observed = S, type = "cov", numObs = n),
+    OpenMx::mxExpectationNormal(covariance = "Sigma"),
+    OpenMx::mxFitFunctionML()
+  )
+  fit <- suppressWarnings(suppressMessages(
+    OpenMx::mxRun(model, silent = TRUE, suppressWarnings = TRUE)
+  ))
+  c(
+    xi1 = OpenMx::mxEval(xi1, fit)[1, 1],
+    xi2 = OpenMx::mxEval(xi2, fit)[1, 1],
+    zeta1 = OpenMx::mxEval(zeta1, fit)[1, 1],
+    zeta2 = OpenMx::mxEval(zeta2, fit)[1, 1]
+  )
+}
+
+test_that("M63 T7 (AC5): lavaan, OpenMx and the OLS shadow agree on zeta2", {
+  skip_if_not_installed("lavaan")
+  skip_if_not_installed("OpenMx")
+  ang <- octants()
+  k <- 2L
+  blk <- axes_crossed_blocks(length(ang), k)
+  item_scale <- rep(seq_along(ang), each = k)
+  item_angle <- rep(ang, each = k)
+
+  for (seed in c(11L, 12L)) {
+    set.seed(seed)
+    dat <- as.data.frame(scale(
+      axes_simulate(2500L, ang, k, .20, .05, .08, zeta2 = .06,
+                    item_block = blk)
+    ))
+    inames <- sprintf("i%02d", seq_len(ncol(dat)))
+    colnames(dat) <- inames
+    items <- split(inames, factor(item_scale, levels = seq_along(ang)))
+    S <- stats::cov(dat)
+
+    lav <- axes_pop_fit_components(S, items, ang, blk)[c("xi1", "xi2",
+                                                         "zeta1", "zeta2")]
+    mx <- axes_mx_components_zeta2(S, 2500L, ang, k, blk)
+    ols <- axes_ols_shadow(stats::cor(as.matrix(dat)), item_angle, item_scale,
+                           blk)[c("xi1", "xi2", "zeta1", "zeta2")]
+
+    # Two SEM engines on the same sample should agree to optimizer precision;
+    # 1e-3 leaves room for their different parameterizations (BC7 observes
+    # ~6e-5 on the four-component model).
+    expect_lt(max(abs(lav - mx)), 1e-3)
+    # The OLS shadow is a method-of-moments estimator, not ML, so it agrees to
+    # sampling order rather than to optimizer precision -- .02 fences it well
+    # inside the .06 signal it must resolve.
+    expect_lt(max(abs(lav - ols)), .02)
+  }
+})
+
+test_that("M63 T8 (AC5): the blocked Table 3 rows reproduce Rel and SEm (Layer A)", {
+  # The six rows in Table 3 (p. 7) printing a col-8 block-specificity value:
+  # the three blocked type-a rows excluded from the BC1 sweep, and the three
+  # type-d (OCAI) rows. Banked in cairn/references/strack2013.md (M63 T8), two
+  # channels. These anchor the FORMULA layer only -- the paper prints no
+  # correlation matrix, and reliability never touches zeta2 -- so they fence
+  # Spearman-Brown and the SEm identity, never the zeta2 estimator.
+  tbl <- data.frame(
+    inst   = c("CSIV", "TRC-g", "TRC-t", "OCAI", "OCAI", "OCAI"),
+    persp  = c("Self", "Self", "Self", "Self", "Other", "Meta"),
+    gen    = c(13.5, 11.6, 13.6, 31.6, 42.6, 48.2),
+    axes   = c(14.8,  8.0,  5.5, 11.7,  7.8,  7.3),
+    scale  = c( 4.2,  4.9,  6.5,  3.8,  0.6,  3.4),
+    block  = c( 2.8,  3.7,  6.7,  2.6,  4.9,  5.2),
+    item   = c(67.6, 71.8, 67.7, 50.2, 44.1, 36.5),
+    item_n = c(  32,   20,   20,    8,    8,    8),
+    rel    = c( .84,  .63,  .54,  .51,  .40,  .38),
+    rawvar = c(0.60, 1.89, 1.23, 15.95, 9.98, 9.64),
+    sem    = c(0.31, 0.83, 0.75,  2.78, 2.44, 2.43),
+    stringsAsFactors = FALSE
+  )
+
+  # Spearman-Brown on printed col 6 / col 10 reproduces printed col 11, every
+  # row, at the paper's own print precision.
+  sb <- axis_reliability_sb(tbl$axes / 100, tbl$item_n)
+  expect_true(all(abs(sb - tbl$rel) < .01))
+  # SEm = sqrt(raw variance) * sqrt(1 - Rel) reproduces printed col 13. The
+  # .02 slack is the BC2 convention: the inputs are printed pre-rounded.
+  expect_true(all(abs(axis_sem(tbl$rel, sqrt(tbl$rawvar)) - tbl$sem) < .02))
+
+  # The five-component sum. Four rows are self-consistent; two are the source's
+  # own pre-existing defects, PINNED with their printed sums rather than
+  # averaged away or silently excluded (RR10's ruling for the IIP S6 erratum).
+  sums <- tbl$gen + tbl$axes + tbl$scale + tbl$block + tbl$item
+  ok <- !(tbl$inst == "CSIV" | (tbl$inst == "OCAI" & tbl$persp == "Meta"))
+  expect_true(all(abs(sums[ok] - 100) < .15))     # 100.0, 100.0, 99.9, 100.0
+  expect_equal(sums[tbl$inst == "CSIV"], 102.9, tolerance = 1e-8)
+  expect_equal(sums[tbl$inst == "OCAI" & tbl$persp == "Meta"], 100.6,
+               tolerance = 1e-8)
+
+  # Every row carries a nonzero block-specificity: that is what makes these the
+  # zeta2 population and not a slice of the non-blocked sweep.
+  expect_true(all(tbl$block > 0))
+})
+
+test_that("M63 T9 (AC7): every documented surface names the block component", {
+  # man/ in the dev tree, Rd_db() once installed -- the dual-source pattern
+  # test-rd-latex-safe.R already uses, because a man/-only guard silently
+  # SKIPS under R CMD check (installed packages carry help/, not man/) and a
+  # Rd_db()-only guard errors under load_all(). The M7 lesson is that a guard
+  # reachable on only one of those paths runs in neither gate that ships.
+  rd_file <- test_path("..", "..", "man", "axes_reliability.Rd")
+  rd <- if (file.exists(rd_file)) {
+    paste(readLines(rd_file, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  } else {
+    db <- tools::Rd_db("circumplex")
+    paste(as.character(db[["axes_reliability.Rd"]]), collapse = "")
+  }
+  # Fail loudly rather than pass vacuously if neither source yielded anything.
+  expect_gt(nchar(rd), 1000L)
+
+  # Each assertion pins a structure that exists ONLY if the documentation does.
+  # A bare expect_match(rd, "blocks") is FALSE COVERAGE and was measured to be:
+  # the prose section says "administered in blocks", so deleting @param blocks
+  # left the guard green (the M39/M40 trap). \item{blocks}{ is emitted only by
+  # the \arguments entry, so it cannot be satisfied by prose.
+  expect_match(rd, "\\item{blocks}{", fixed = TRUE)
+  # Likewise for the flag: pin the \value phrasing, not the bare token, which
+  # also appears in the Blockwise prose two sections away.
+  expect_match(rd, "zeta1_fitted} and \\code{zeta2_fitted}", fixed = TRUE)
+  # The @return enumerates the component-row counts, and five is now reachable.
+  expect_match(rd, "five when block", fixed = TRUE)
+
+  # COMPLETENESS, not just presence. The first version of this guard asserted
+  # only that the new text existed, and review caught two enumerations of the
+  # component set that still listed four members -- the M56/M62 "widening a
+  # definition strands its other descriptions" lesson, fourth recurrence. The
+  # asymmetry is the trap: a sweep for the OLD claim's keywords finds stale
+  # negative claims to delete, and is blind to positive lists that need
+  # EXTENDING. So pin the description's own enumeration: it runs from the
+  # general factor to item specificity, and block specificity must sit inside
+  # it. Deleting the member from that sentence reddens this.
+  desc <- sub(".*decomposes each item's variance into orthogonal components",
+              "", rd)
+  desc <- sub("and reads the axes.*", "", desc)
+  expect_match(desc, "block specificity", fixed = TRUE)
+  # The corrected conditional replaced the unconditional caveat: the claim that
+  # block variance deflates the axes share unconditionally is FALSE for an
+  # angle-balanced layout (M63-D2) and must not have survived anywhere.
+  expect_false(grepl("treat axes reliability from a blockwise", rd,
+                     fixed = TRUE))
+  # The corrected condition (review F1). The docs must state the safe case as
+  # one-item-per-scale, NOT as "spread evenly around the circle", which review
+  # disproved with a maximally-dispersed counterexample that still biases xi1.
+  expect_match(rd, "one item from every scale", fixed = TRUE)
+  # And the disproved framing must not come back in either of its two forms:
+  # the "angularly clustered" safety rule, or the k=4-only worked example that
+  # claimed opposite-scale blocks are refused.
+  expect_false(grepl("angularly clustered", rd, fixed = TRUE))
+  expect_false(grepl("diametrically opposite scales, say", rd, fixed = TRUE))
+
+  # print()/summary() render the components table generically, so the new row
+  # must reach the console without either method enumerating components itself.
+  skip_if_not_installed("lavaan")
+  ang <- octants()
+  blk_idx <- axes_crossed_blocks(length(ang), 2L)
+  set.seed(77L)
+  dat <- axes_simulate(1200L, ang, 2L, .20, .05, .08, zeta2 = .06,
+                       item_block = blk_idx)
+  inames <- colnames(dat)
+  res <- suppressMessages(axes_reliability(
+    dat, items = split(inames, rep(seq_along(ang), each = 2L)),
+    angles = ang, blocks = split(inames, blk_idx)
+  ))
+  out <- paste(utils::capture.output(summary(res)), collapse = "\n")
+  expect_match(out, "block_specificity", fixed = TRUE)
+})

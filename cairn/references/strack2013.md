@@ -7,7 +7,7 @@ Pagination: the article's own page numbers. The PDF is **born-digital**
 (`Creator: Adobe InDesign CS5.5`, `Producer: Adobe PDF Library 9.9`) — not an
 OCR scan — so its `pdftotext` text layer is the typeset text itself, a faithful
 witness (unlike the `hubert1987`/`tracey1997` OCR scans).
-Extraction: verified 2026-07-23 against the born-digital `pdftotext -layout` text layer, with Table 3 and every formula below additionally cross-read against the layout-preserved rendering; re-verified 2026-07-25 (M60) on p. 7, where the `Type` column and the type-b and type-c rows banked below were read in both channels — the text layer and a 200-dpi page-image render — agreeing on every value (~~the type-e and type-f rows on that page are NOT banked here and carry no verification claim; they are M61's to bank~~ — superseded 2026-07-26: M61 banked them, see the type-e/f block below); re-verified again 2026-07-26 (M61) on p. 7 for the six type-e/f rows, both channels agreeing; no value read by a second human channel — observed 2026-07-26.
+Extraction: verified 2026-07-23 against the born-digital `pdftotext -layout` text layer, with Table 3 and every formula below additionally cross-read against the layout-preserved rendering; re-verified 2026-07-25 (M60) on p. 7, where the `Type` column and the type-b and type-c rows banked below were read in both channels — the text layer and a 200-dpi page-image render — agreeing on every value (~~the type-e and type-f rows on that page are NOT banked here and carry no verification claim; they are M61's to bank~~ — superseded 2026-07-26: M61 banked them, see the type-e/f block below); re-verified again 2026-07-26 (M61) on p. 7 for the six type-e/f rows, both channels agreeing; re-verified again 2026-07-26 (M63) on p. 7 for the six blocked rows carrying a col-8 value (CSIV S7, TRC-g S10, TRC-t S11 and the three OCAI S15 rows), read column by column in both channels — the text layer and a 300-dpi page-image render — agreeing on every value including the source's own `(1.2))` misprint; no value read by a second human channel — observed 2026-07-26.
 
 **Citation.** Strack, M., Jacobs, I., & Grosse Holtforth, M. (2013). Reliability
 of Circumplex Axes. *SAGE Open*, 3(2), 1–12. DOI 10.1177/2158244013486115.
@@ -173,6 +173,51 @@ Extraction of this type-e/f block: two channels on p. 7 agreeing on every value
 — the born-digital `pdftotext -layout` text layer and a page-image render;
 verified 2026-07-26 (M61 T7). The three sphere sentences on pp. 2, 5, and 9 were
 read in the text layer only.
+
+**Blocked rows — the block-specificity (col 8) population, banked for M63.**
+The three **blocked type-a** rows excluded from the BC1 sweep above, plus the
+three **type-d** (OCAI) rows, are the only rows in Table 3 printing a col-8
+value. They are the published anchors for the ζ2 component; all six carry the
+full five-component decomposition, so `%gen + %axes + %scale + %block + %item`
+is their row sum rather than the four-term sum the non-blocked rows take.
+
+| Type | Instrument | Sample | Persp. | %gen | %axes | (SE) | %scale | %block | %item | item_n | Rel | Raw var | SEm | N–B | sum |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| a | CSIV  |  7 | Self  | 13.5 | 14.8 | (1.2)  | 4.2 | 2.8 | 67.6 | 32 | .84 |  0.60 | 0.31 | .85 | **102.9** |
+| a | TRC-g | 10 | Self  | 11.6 |  8.0 | (0.7)  | 4.9 | 3.7 | 71.8 | 20 | .63 |  1.89 | 0.83 | .64 | 100.0 |
+| a | TRC-t | 11 | Self  | 13.6 |  5.5 | (0.9)  | 6.5 | 6.7 | 67.7 | 20 | .54 |  1.23 | 0.75 | .62 | 100.0 |
+| d | OCAI  | 15 | Self  | 31.6 | 11.7 | (1.2)) | 3.8 | 2.6 | 50.2 |  8 | .51 | 15.95 | 2.78 | .63 | 99.9 |
+| d | OCAI  | 15 | Other | 42.6 |  7.8 | (1.0)  | 0.6 | 4.9 | 44.1 |  8 | .40 |  9.98 | 2.44 | .52 | 100.0 |
+| d | OCAI  | 15 | Meta  | 48.2 |  7.3 | (1.0)  | 3.4 | 5.2 | 36.5 |  8 | .38 |  9.64 | 2.43 | .57 | **100.6** |
+
+All six reproduce col 11 by Spearman–Brown on col 6 / col 10 within ±.01
+(.8475, .6349, .5379, .5146, .4036, .3865 against .84, .63, .54, .51, .40, .38;
+max deviation .0075 at CSIV), and all six reproduce col 13 by
+`sqrt(col 12)·sqrt(1 − col 11)` within ±.02 (max .016 at OCAI Self). **The
+five-component sum guard is usable on four of the six only.** CSIV S7 (102.9)
+and OCAI S15 Meta (100.6) are the two pre-existing source inconsistencies this
+page already records above; OCAI S15 Self sums to 99.9, a rounding artifact at
+one decimal. Handling follows RR10's ruling for the IIP S6 erratum — sweep the
+self-consistent rows, pin the inconsistent ones with their printed sums — so
+the defect is asserted rather than averaged away.
+
+Two printing quirks, both read identically in both channels and therefore the
+source's own rather than the transcription's: OCAI S15 Self prints its SE as
+`(1.2))` with a doubled closing parenthesis, and CSIV S7's components sum to
+102.9. Neither affects the banked values.
+
+What these rows can and cannot anchor: they are **formula-layer anchors only**,
+never an end-to-end fixture, because Strack et al. print components and
+reliability but no item correlation matrix — the same limit this page records
+for the type-f rows above. Since reliability is `SB(ξ1, item_n)` and never
+touches ζ2, no published row in Table 3 exercises the ζ2 *estimator*; M63's
+estimator oracle is synthetic (known-ζ2 recovery, the omitted-ζ2 bias
+conditional, and lavaan/OpenMx/OLS-shadow agreement) — observed 2026-07-26.
+
+Extraction of this blocked-row block: two channels on p. 7 agreeing on every
+value above — the born-digital `pdftotext -layout` text layer and a 300-dpi
+page-image render read column by column; verified 2026-07-26 (M63 T8). No value
+read by a second human channel — observed 2026-07-26.
 
 **SEm cross-check inputs (col 12 Raw variance, col 13 SEm), banked for BC2:**
 IAL S1 Self 0.98 → 0.28; OCAI S15 Self 15.95 → 2.78; COC S16 Self 6.70 → 2.33.

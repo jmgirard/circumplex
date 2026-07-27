@@ -143,7 +143,7 @@ axes_fits_zeta1 <- function(items) any(lengths(items) >= 2L)
 # covariance-equivalent: every intermediate path is fixed (+1 or the cosine), so
 # the product of fixed paths equals the flat fixed loading and each scale's
 # disturbance becomes its specificity latent. The two are identical in fit.
-axes_syntax <- function(items, angles_deg, start = NULL) {
+axes_syntax <- function(items, angles_deg, item_block = NULL, start = NULL) {
   th <- as.numeric(angles_deg) * pi / 180
   wx <- snap_trig(cos(th))
   wy <- snap_trig(sin(th))
@@ -152,6 +152,20 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
   # dropped from the model entirely rather than fitted to the diagonal.
   fit_zeta1 <- axes_fits_zeta1(items)
   ss <- if (fit_zeta1) sprintf("SS%d", seq_along(items)) else character(0)
+
+  # Block-specificity is emitted on the same terms (M63): only where the design
+  # says it is identified, read off axes_design() so the emitted model and the
+  # reported component set are one decision, never two that can drift apart.
+  all_items <- unlist(items, use.names = FALSE)
+  item_angle <- rep(as.numeric(angles_deg), times = lengths(items))
+  item_scale <- rep(seq_along(items), times = lengths(items))
+  fit_zeta2 <- axes_fits_zeta2(item_angle, item_scale, item_block)
+  block_items <- if (fit_zeta2) {
+    split(all_items, factor(item_block, levels = sort(unique(item_block))))
+  } else {
+    list()
+  }
+  bs <- if (fit_zeta2) sprintf("BS%d", seq_along(block_items)) else character(0)
 
   # One fixed loading term "w*item" per item; scales whose weight snaps to 0
   # (a pole scale on the orthogonal axis) contribute no term to that axis.
@@ -189,6 +203,16 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
         character(1)
       )
     },
+    if (fit_zeta2) {
+      vapply(
+        seq_along(block_items),
+        function(b) {
+          paste(bs[[b]], "=~",
+                paste(unit_terms(block_items[[b]]), collapse = " + "))
+        },
+        character(1)
+      )
+    },
     "",
     "# equal axis variances (xi1), free general variance (xi2)",
     paste0("AX ~~ ", st("xi1"), "xi1*AX"),
@@ -205,6 +229,24 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
       # One item per scale position: zeta1 is unidentified and is dropped from
       # the model rather than fitted (Strack's types e and f). Errors stay free.
       "# no scale-specificity component (one item per position); errors free"
+    },
+    if (fit_zeta2) {
+      c(
+        "",
+        "# shared block-specificity variance (zeta2), blockwise instruments only",
+        vapply(bs, function(b) paste0(b, " ~~ ", st("zeta2"), "zeta2*", b),
+               character(1))
+      )
+    } else if (!is.null(item_block)) {
+      # Blocks were supplied but add no rank to the design -- the component is
+      # not estimable from this map, so it is dropped rather than fitted to a
+      # moment it shares with another component (M63; see axes_design()).
+      # The comment deliberately does NOT name the parameter token, so that a
+      # "no such component anywhere in this syntax" assertion stays meaningful
+      # -- the same reason M61's dropped-scale-specificity comment does not say
+      # zeta1 (its test asserts the token is absent from the whole string).
+      c("", "# no block-specificity component (the supplied block map adds no",
+        "# rank to the moment-structure design, so it is not estimable here)")
     }
   )
   paste(lines, collapse = "\n")
@@ -225,16 +267,55 @@ axes_syntax <- function(items, angles_deg, start = NULL) {
 # alone, returning a two-component seed. The seed then matches the model's
 # parameter set exactly, because axes_fits_zeta1() drops zeta1 on the same
 # condition -- both read the item map, so they cannot disagree (M61 T3).
-axes_ols_shadow <- function(R, item_angle_deg, item_scale) {
-  ut <- upper.tri(R)
+axes_ols_shadow <- function(R, item_angle_deg, item_scale, item_block = NULL) {
+  X <- axes_design(item_angle_deg, item_scale, item_block)
+  stats::setNames(qr.solve(X, R[upper.tri(R)]), colnames(X))
+}
+
+# The moment-structure design shared by the OLS shadow and the identification
+# predicates: one row per off-diagonal item pair, one column per component the
+# model can actually fit. The whole component set is decided here, in one place,
+# so the syntax emitter, the shadow, and the reported components cannot disagree
+# about which parameters exist (the M61 doctrine, extended to zeta2 at M63).
+#
+# Columns are added only where they carry information:
+#
+#   xi2, xi1   always -- the intercept and cos(theta_i - theta_j).
+#   zeta1      when some same-scale pair exists off the diagonal; with one item
+#              at every position the column is all zeros (M61).
+#   zeta2      when adding same-block RAISES THE RANK of the design.
+#
+# The zeta2 test is a rank check rather than a structural rule ("some block
+# spans two or more scales"), decided at the M63 implement gate, because the
+# structural rule is not sufficient. Blocks pairing OPPOSITE scales span two
+# scales each and are still unidentified: every same-block pair sits 180 degrees
+# apart and every cross-block pair 90, so same-block is exactly -cos and adds no
+# rank. The rank check catches that, the confounded-with-zeta1 case (blocks that
+# are the scales), the all-one-block case (same-block is the intercept), and the
+# all-singleton case (same-block is the zero column), with one test instead of
+# four hand-written ones -- and catches whatever else a caller's map does that
+# nobody enumerated.
+axes_design <- function(item_angle_deg, item_scale, item_block = NULL) {
+  p <- length(item_scale)
+  ut <- upper.tri(matrix(0, p, p))
   th <- as.numeric(item_angle_deg) * pi / 180
-  same <- as.numeric(outer(item_scale, item_scale, `==`)[ut])
   X <- cbind(1, outer(th, th, function(a, b) cos(a - b))[ut])
-  if (any(same != 0)) X <- cbind(X, same)
-  b <- qr.solve(X, R[ut])
-  out <- c(xi2 = b[[1]], xi1 = b[[2]])
-  if (ncol(X) == 3L) out[["zeta1"]] <- b[[3]]
-  out
+  colnames(X) <- c("xi2", "xi1")
+  same <- as.numeric(outer(item_scale, item_scale, `==`)[ut])
+  if (any(same != 0)) X <- cbind(X, zeta1 = same)
+  if (!is.null(item_block)) {
+    cand <- cbind(X, zeta2 = as.numeric(outer(item_block, item_block, `==`)[ut]))
+    if (qr(cand)$rank > qr(X)$rank) X <- cand
+  }
+  X
+}
+
+# Whether the block-specificity component zeta2 is identified for this item and
+# block map -- read off the design above, never from a separate rule, so the
+# emitted syntax and the reported component set stay one decision (M61/M63).
+axes_fits_zeta2 <- function(item_angle_deg, item_scale, item_block) {
+  if (is.null(item_block)) return(FALSE)
+  "zeta2" %in% colnames(axes_design(item_angle_deg, item_scale, item_block))
 }
 
 # Fit the axes-reliability model on item data through the single lavaan::cfa
@@ -242,9 +323,10 @@ axes_ols_shadow <- function(R, item_angle_deg, item_scale) {
 # fixes every latent covariance at 0; RR09 BC4). The model assumes unit-variance
 # items (the five components sum to 1, p. 4), so callers standardize the items
 # before fitting -- the paper fits the item *correlation* matrix (spec section 2).
-axes_fit <- function(dat, items, angles_deg, estimator = "ML",
+axes_fit <- function(dat, items, angles_deg, item_block = NULL,
+                     estimator = "ML",
                      se = "standard", missing = "listwise", start = NULL) {
-  syn <- axes_syntax(items, angles_deg, start = start)
+  syn <- axes_syntax(items, angles_deg, item_block = item_block, start = start)
   sem_fit_cfa(
     syn, dat,
     estimator = estimator, se = se, missing = missing,
@@ -265,10 +347,11 @@ axes_fit <- function(dat, items, angles_deg, estimator = "ML",
 # rescaling to the N-1 covariance it computes from raw z-scores, and that
 # covariance IS cor(mat). Switching to likelihood = "wishart" here would put the
 # two paths (N-1)/N apart -- see the AC2 round-trip test.
-axes_fit_cormat <- function(R, items, angles_deg, n, estimator = "ML",
+axes_fit_cormat <- function(R, items, angles_deg, n, item_block = NULL,
+                            estimator = "ML",
                             se = "standard", start = NULL) {
   lavaan::cfa(
-    axes_syntax(items, angles_deg, start = start),
+    axes_syntax(items, angles_deg, item_block = item_block, start = start),
     sample.cov = R, sample.nobs = as.integer(n),
     estimator = estimator, se = se, orthogonal = TRUE
   )
@@ -282,7 +365,7 @@ axes_converged <- function(fit) {
 
 # Whether a fit landed on a boundary -- not a usable solution, so the caller
 # NAs the reliability and SEm rather than reporting a clipped, negative, or
-# imaginary value (RR09 BC11). Four disjuncts, and the first two bracket the
+# imaginary value (RR09 BC11). Five disjuncts, and the first two bracket the
 # axes variance on both sides:
 #
 #   xi1 <= 0  the axes carry no variance, so there is nothing to be reliable.
@@ -305,15 +388,16 @@ axes_converged <- function(fit) {
 #             would close the float gap, at the cost of a per-axis predicate;
 #             the sweep test pins the current behavior either way.
 #
-# The remaining two catch any negative estimated variance. zeta1 is NULL on the
+# The remaining three catch any negative estimated variance -- zeta1, zeta2, and
+# the item errors. zeta1 is NULL on the
 # zeta1-dropped path (M61), and NULL-ness is the same source of truth
 # axes_fits_zeta1() gives the caller -- passing a separate flag alongside it
 # would let the two disagree.
 #
 # Scalar by design: `||` errors on a length > 1 argument in R >= 4.3.
-axes_is_boundary <- function(xi1, xi2, zeta1, eps) {
+axes_is_boundary <- function(xi1, xi2, zeta1, eps, zeta2 = NULL) {
   xi1 <= 0 || xi1 >= 1 || xi2 < 0 || (!is.null(zeta1) && zeta1 < 0) ||
-    any(eps < 0)
+    (!is.null(zeta2) && zeta2 < 0) || any(eps < 0)
 }
 
 # --- Population model and simulation (oracle + bundled-data generator) ---------
@@ -325,13 +409,29 @@ axes_is_boundary <- function(xi1, xi2, zeta1, eps) {
 # the unit diagonal. Every scale carries `n_items` items. The single
 # authoritative construction shared by the population-matrix oracle (BC5), the
 # finite-sample Monte-Carlo recovery (BC6), and axes_simulate().
-axes_population_cor <- function(angles_deg, n_items, xi1, xi2, zeta1) {
+axes_population_cor <- function(angles_deg, n_items, xi1, xi2, zeta1,
+                                zeta2 = 0, item_block = NULL) {
   scale <- rep(seq_along(angles_deg), each = n_items)
   th <- rep(as.numeric(angles_deg), each = n_items) * pi / 180
   sig <- xi2 + xi1 * outer(th, th, function(a, b) cos(a - b)) +
     zeta1 * outer(scale, scale, `==`)
+  # The fifth component (M63). Absent by default, so every pre-M63 caller
+  # generates exactly the four-component population it did before.
+  if (!is.null(item_block)) {
+    sig <- sig + zeta2 * outer(item_block, item_block, `==`)
+  }
   diag(sig) <- 1
-  list(sigma = sig, scale = scale)
+  list(sigma = sig, scale = scale, block = item_block)
+}
+
+# The canonical blockwise layout: item j of every scale goes to block j, so a
+# k-scale instrument with n items each has n blocks of k items, one per scale
+# position. This is the crossed design that identifies zeta2 -- same-block and
+# same-scale share no off-diagonal pair -- and it is the layout a blockwise
+# instrument actually has, items being administered one block at a time with
+# each block sampling the whole circle (Strack et al. 2013, type d).
+axes_crossed_blocks <- function(n_scales, n_items) {
+  rep(seq_len(n_items), times = n_scales)
 }
 
 # Simulate `n` respondents' item scores from the five-component population
@@ -340,8 +440,9 @@ axes_population_cor <- function(angles_deg, n_items, xi1, xi2, zeta1) {
 # draws feed axes_fit() directly. Used by the BC6 Monte-Carlo recovery oracle
 # and, seed-pinned, by the bundled example-dataset generator (data-raw/).
 axes_simulate <- function(n, angles_deg, n_items, xi1, xi2, zeta1,
-                          prefix = "item") {
-  pop <- axes_population_cor(angles_deg, n_items, xi1, xi2, zeta1)
+                          zeta2 = 0, item_block = NULL, prefix = "item") {
+  pop <- axes_population_cor(angles_deg, n_items, xi1, xi2, zeta1,
+                             zeta2 = zeta2, item_block = item_block)
   p <- nrow(pop$sigma)
   x <- mvn_draws(n, rep(0, p), pop$sigma)
   colnames(x) <- sprintf("%s_%02d", prefix, seq_len(p))
@@ -435,6 +536,76 @@ axes_resolve_map <- function(data, items, angles, instrument) {
   }
 }
 
+# Normalize the `blocks` argument to a per-item integer block index aligned with
+# `all_cols` -- the unlist(item_cols) order every design matrix here is built in
+# -- or NULL when no blocks were supplied (the pre-M63 model).
+#
+# `blocks` is a list of per-block item vectors, mirroring the explicit `items`
+# form exactly: same shape, same axes_colnames() name-or-index resolution, same
+# optional names. That shape was chosen over a flat per-item label vector at the
+# M63 implement gate because a flat vector's correctness rests on matching
+# unlist(items) order silently, and a misaligned one yields a wrong answer
+# rather than an error (the M25 positional-subsetting family).
+#
+# The blocks must PARTITION the items -- every item in exactly one block. A
+# blockwise instrument administers every item in some block, so an item in no
+# block is a map the model has no reading for, and an item in two is a
+# contradiction; both are refused naming the offending item rather than
+# resolved by a rule the caller never asked for (M63-D1).
+axes_resolve_blocks <- function(blocks, src, all_cols) {
+  if (is.null(blocks)) return(NULL)
+  if (!is.list(blocks)) {
+    stop(
+      "`blocks` must be a list of per-block item column vectors (one element ",
+      "per block), as `items` is a list of per-scale item column vectors.",
+      call. = FALSE
+    )
+  }
+  if (length(blocks) < 1L) {
+    stop("`blocks` must name at least one block.", call. = FALSE)
+  }
+  cols <- lapply(blocks, axes_colnames, data = src)
+  empty <- which(lengths(cols) < 1L)
+  if (length(empty) > 0) {
+    stop(
+      "Every block must have at least 1 item; block(s) ",
+      paste(empty, collapse = ", "), " have no items.",
+      call. = FALSE
+    )
+  }
+  flat <- unlist(cols, use.names = FALSE)
+  unknown <- setdiff(flat, all_cols)
+  if (length(unknown) > 0 || anyNA(flat)) {
+    stop(
+      "Block item(s) not found among the `items` columns: ",
+      paste(stats::na.omit(union(unknown, flat[is.na(flat)])), collapse = ", "),
+      ".",
+      call. = FALSE
+    )
+  }
+  dup <- unique(flat[duplicated(flat)])
+  if (length(dup) > 0) {
+    stop(
+      "Item(s) in more than one block: ", paste(dup, collapse = ", "),
+      ". `blocks` must partition the items.",
+      call. = FALSE
+    )
+  }
+  orphan <- setdiff(all_cols, flat)
+  if (length(orphan) > 0) {
+    stop(
+      "Item(s) in no block: ", paste(orphan, collapse = ", "),
+      ". `blocks` must partition the items.",
+      call. = FALSE
+    )
+  }
+  labels <- names(blocks)
+  if (is.null(labels)) labels <- sprintf("Block%d", seq_along(blocks))
+  index <- integer(length(all_cols))
+  for (b in seq_along(cols)) index[match(cols[[b]], all_cols)] <- b
+  list(index = index, labels = as.character(labels))
+}
+
 # --- The estimator ------------------------------------------------------------
 
 #' Reliability of the circumplex axes (Strack, Jacobs & Grosse Holtforth, 2013)
@@ -443,18 +614,21 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' circumplex axes of an instrument with the item-level restricted
 #' tau-equivalent CFA of Strack, Jacobs, and Grosse Holtforth (2013). The model
 #' decomposes each item's variance into orthogonal components -- a general
-#' factor, the two circumplex axes, scale specificity, and item specificity --
-#' and reads the axes' reliability off the isolated axes-variance component with
+#' factor, the two circumplex axes, scale specificity, block specificity for a
+#' blockwise instrument, and item specificity -- and reads the axes'
+#' reliability off the isolated axes-variance component with
 #' the Spearman-Brown formula. It is a confirmatory, item-level complement to
 #' [fit_structure()]'s exploratory scale-level criteria.
 #'
 #' @details
 #' The model is fit to the item **correlation** matrix (the items are
 #' z-standardized) as a flat fixed-links CFA: every item loads on the two axes
-#' with fixed cosine weights, on a general factor with weight one, and on its
-#' scale's specificity factor with weight one; the two axis variances are held
-#' equal (the circumplex "no preferred rotation" axiom) and every
-#' scale-specificity variance shares one value, while item errors stay free
+#' with fixed cosine weights, on a general factor with weight one, on its
+#' scale's specificity factor with weight one, and -- when `blocks` are supplied
+#' and identified -- on its block's specificity factor with weight one; the two
+#' axis variances are held equal (the circumplex "no preferred rotation" axiom),
+#' every scale-specificity variance shares one value and every
+#' block-specificity variance shares one value, while item errors stay free
 #' (tau-equivalent). Only the axes-variance component feeds reliability.
 #'
 #' The Nunnally-Bernstein axis reliability (`nb_reliability`) is reported
@@ -532,15 +706,46 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #'
 #' # Blockwise instruments
 #'
-#' Some circumplex instruments are administered in **blocks** (items grouped by
-#' something other than their scale), which contributes a block-specificity
-#' variance component of its own. This model has no such component, and the
-#' package's instrument objects carry no block structure, so a blockwise
-#' instrument analyzed here folds its block variance into the general and
-#' scale-specificity components -- inflating them and, in turn, deflating the
-#' share attributed to the axes. Strack et al. (2013, Table 3) report
-#' block-specificity as high as 6.7%, so treat axes reliability from a blockwise
-#' instrument as approximate.
+#' Some circumplex instruments are administered in **blocks** -- items grouped
+#' by something other than their scale -- which carries a block-specificity
+#' variance of its own (Strack et al. 2013 report it as high as 6.7%). Supply
+#' `blocks` to estimate it as a fifth component: the `components` table then
+#' carries a `zeta2` row and `details$zeta2_fitted` is `TRUE`. The package's
+#' instrument objects record no block structure, so the map comes from you.
+#'
+#' Block specificity is estimable only when the blocks are not a relabelling of
+#' something the model already has. If every block coincides with a scale, or
+#' all items share one block, or every item sits in its own block, the
+#' component explains nothing the others do not; it is dropped from the model,
+#' `details$zeta2_fitted` is `FALSE`, and the component table keeps its four
+#' rows. That decision is read off the data's own moment structure rather than
+#' from a rule of thumb about how the blocks look, so it also catches maps
+#' whose redundancy is not obvious by eye.
+#'
+#' **What omitting `blocks` costs depends on the block geometry**, and it is not
+#' a uniform penalty. The general factor never gives block variance back, so
+#' `xi2` is inflated under most layouts and unchanged under a few; it is never
+#' deflated. The axes variance -- the one reliability is read from -- moves only
+#' when block membership carries information about the angular distance between
+#' items, over and above what sharing a scale already says.
+#'
+#' The clean case is worth stating exactly, because it is both common and
+#' checkable: **when each block draws exactly one item from every scale**, every
+#' within-block pair is a different-scale pair and the blocks span every pair of
+#' scale positions equally often. Block membership then says nothing about
+#' angular distance, and `xi1`, the reliability, and the SEm are unaffected --
+#' the component is worth estimating for its own sake, but ignoring it costs the
+#' reliability nothing.
+#'
+#' Away from that case the bias runs in either direction and **"the blocks are
+#' spread evenly around the circle" is not the test.** Blocks that pair
+#' diametrically opposite scales are as dispersed as a block can be -- their
+#' angles average to the centre of the circle -- and at eight scales they still
+#' pull `xi1` about 9% below truth, because every within-block pair sits half a
+#' turn apart and that is emphatically information about angular distance.
+#' Blocks covering contiguous arcs pull it the other way, about 12% above. When
+#' the blocks are neither one item per scale nor obviously arbitrary, estimate
+#' the component rather than reasoning about the geometry.
 #'
 #' @param data A data frame (or matrix) containing the circumplex items. Supply
 #'   exactly one of `data` or `cormat`.
@@ -562,6 +767,12 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #'   0 and 360 name the same position.
 #' @param instrument Optional. A `circumplex_instrument` object supplying the
 #'   scale angles and item membership (`Scales$Angle`, `Scales$Items`).
+#' @param blocks Optional. For a **blockwise** instrument, a list with one
+#'   element per administration block, each a character vector (or numeric
+#'   indices) of that block's item columns -- the same shape `items` takes for
+#'   scales. The blocks must partition the items: every item in exactly one
+#'   block. Supplying them adds the block-specificity component to the model;
+#'   see "Blockwise instruments" below.
 #' @param sd The scale for the standard error of measurement: `"std"` (the
 #'   default) reports the z-standardized SEm `sqrt(1 - reliability)`; `"raw"`
 #'   uses each axis composite's observed raw SD; or a numeric vector (length 1,
@@ -571,10 +782,13 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' @return An object of class `circumplex_axes_reliability` with `print()` and
 #'   [summary()] methods: `results` (one row per axis: the axes variance, item_n,
 #'   reliability, SEm, Nunnally-Bernstein reliability, and boundary flag),
-#'   `components` (the estimated variance components with SEs -- four rows, or
-#'   three when scale specificity was dropped), `fit` (global fit indices), and
-#'   `details` (including `zeta1_fitted`, whether scale specificity was in the
-#'   model, and `nb_reason`, why the Nunnally-Bernstein comparison is `NA`).
+#'   `components` (the estimated variance components with SEs -- four rows by
+#'   default, three when scale specificity was dropped, five when block
+#'   specificity was fitted), `fit` (global fit indices), and `details`
+#'   (including `zeta1_fitted` and `zeta2_fitted`, whether scale and block
+#'   specificity were in the model, `blocks`, the block labels when a block map
+#'   was supplied, and `nb_reason`, why the Nunnally-Bernstein comparison is
+#'   `NA`).
 #' @references
 #' Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The reliability of
 #' circumplex axes. \emph{SAGE Open}, 3(2). \doi{10.1177/2158244013486115}
@@ -602,7 +816,7 @@ axes_resolve_map <- function(data, items, angles, instrument) {
 #' )
 axes_reliability <- function(data = NULL, items, angles = NULL,
                              instrument = NULL, cormat = NULL, n = NULL,
-                             sd = "std") {
+                             blocks = NULL, sd = "std") {
   call <- match.call()
   if (!requireNamespace("lavaan", quietly = TRUE)) {
     stop("`axes_reliability()` requires the lavaan package.", call. = FALSE)
@@ -842,7 +1056,11 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # for the fit and stored as a cross-check on the CFA estimate.
   item_angle <- rep(angles_deg, times = n_items_scale)
   item_scale <- rep(seq_len(n_scales), times = n_items_scale)
-  ols <- axes_ols_shadow(R, item_angle, item_scale)
+  # Blocks are resolved against the same column source and aligned to the same
+  # `all_cols` order the design matrices use (M63); NULL when none were given.
+  blk <- axes_resolve_blocks(blocks, if (has_data) data else cormat, all_cols)
+  item_block <- blk$index
+  ols <- axes_ols_shadow(R, item_angle, item_scale, item_block)
 
   # Convergence, boundary, and singularity are all guarded explicitly below, so
   # lavaan's own fit-time warnings (e.g. "some estimated lv variances are
@@ -851,9 +1069,10 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   fit <- suppressWarnings(if (has_data) {
     zdf <- as.data.frame(scale(mat))
     colnames(zdf) <- all_cols
-    axes_fit(zdf, item_cols, angles_deg, start = ols)
+    axes_fit(zdf, item_cols, angles_deg, item_block = item_block, start = ols)
   } else {
-    axes_fit_cormat(R, item_cols, angles_deg, n, start = ols)
+    axes_fit_cormat(R, item_cols, angles_deg, n, item_block = item_block,
+                    start = ols)
   })
   if (!axes_converged(fit)) {
     stop(
@@ -874,6 +1093,19 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # in the parameter table -- one source of truth for the component set.
   fit_zeta1 <- axes_fits_zeta1(item_cols)
   zeta1 <- if (fit_zeta1) comp_var("SS1")[[1]] else NULL
+  # Same discipline for zeta2 (M63): read the presence of the component off the
+  # design predicate the syntax emitter used, never off whether "BS1" happens to
+  # appear in the parameter table.
+  #
+  # Substituting the table lookup here is a NULL mutation -- no test reddens --
+  # and that is correct rather than a coverage hole (the M60 lesson): BS1 is in
+  # the table exactly when the emitter wrote it, and the emitter consults this
+  # same predicate, so the two expressions are equal by construction today. The
+  # predicate is used anyway because it stays correct if the emitter changes,
+  # which is the drift no single-point mutation can exhibit. Recorded so a later
+  # session does not re-chase the green.
+  fit_zeta2 <- axes_fits_zeta2(item_angle, item_scale, item_block)
+  zeta2 <- if (fit_zeta2) comp_var("BS1")[[1]] else NULL
   eps <- pe$est[pe$op == "~~" & pe$lhs == pe$rhs & pe$lhs %in% all_cols]
 
   # Boundary: an axes variance outside (0, 1), or any negative estimated
@@ -881,7 +1113,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # NA the reliability/SEm -- never clip, zero, or return a negative or a NaN --
   # and flag it. The predicate is a named seam so the unreachable-in-practice
   # upper bound is still testable; see axes_is_boundary() for each disjunct.
-  boundary <- axes_is_boundary(xi1, xi2, zeta1, eps)
+  boundary <- axes_is_boundary(xi1, xi2, zeta1, eps, zeta2)
   if (boundary) {
     warning(
       "A boundary solution (an axes variance outside (0, 1), or a negative ",
@@ -1010,13 +1242,16 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     c(Component = "general", Symbol = "xi2"),
     c(Component = "axes", Symbol = "xi1"),
     if (fit_zeta1) c(Component = "scale_specificity", Symbol = "zeta1"),
+    if (fit_zeta2) c(Component = "block_specificity", Symbol = "zeta2"),
     c(Component = "item", Symbol = "epsilon")
   )
   comp_rows <- Filter(Negate(is.null), comp_rows)
-  comp_est <- c(xi2, xi1, if (fit_zeta1) zeta1, mean(eps))
+  comp_est <- c(xi2, xi1, if (fit_zeta1) zeta1, if (fit_zeta2) zeta2,
+                mean(eps))
   comp_ses <- c(
     comp_se("GEN")[[1]], comp_se("AX")[[1]],
     if (fit_zeta1) comp_se("SS1")[[1]],
+    if (fit_zeta2) comp_se("BS1")[[1]],
     NA_real_
   )
   components <- data.frame(
@@ -1041,6 +1276,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # (M61): FALSE means one item per scale position, so zeta1 was
       # unidentified and dropped rather than estimated.
       zeta1_fitted = fit_zeta1,
+      # Whether block specificity was in the fitted model (M63). FALSE with
+      # `blocks` supplied means the map did not identify zeta2 -- the blocks
+      # added no rank to the moment-structure design -- so it was dropped
+      # rather than fitted to a moment it shares with another component.
+      zeta2_fitted = fit_zeta2,
+      blocks = if (is.null(blk)) NULL else blk$labels,
       # Why the Nunnally-Bernstein comparison is NA, or NULL when it is
       # available: "cormat" (no raw scores) or "single_item" (alpha undefined).
       nb_reason = nb_reason,
