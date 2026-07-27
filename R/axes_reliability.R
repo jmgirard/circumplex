@@ -660,6 +660,13 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' **per axis** (X and Y): for a balanced instrument the two axes carry the
 #' same axes-variance estimate and differ only through `item_n`.
 #'
+#' A related detail, in case you check: the fitted model does **not** reproduce
+#' the correlation matrix's unit diagonal exactly, and that is expected rather
+#' than a defect. With the loadings fixed, the stationarity condition available
+#' for a free item error is the *weighted* diagonal, not the raw one, so
+#' off-diagonal sampling misfit leaks into the implied diagonal at roughly the
+#' sampling standard error of a correlation.
+#'
 #' # Which instruments this accepts
 #'
 #' Any set of **equally spaced** scale angles, at any rotation: the canonical
@@ -691,8 +698,42 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' rows arise from a three-axis sphere model, not from any configuration this
 #' function accepts.
 #'
-#' Missing data are handled by **listwise deletion only** (a message reports the
-#' complete-case count); pairwise correlation input is never used. A boundary
+#' # Missing data
+#'
+#' `missing = "listwise"` is the default: only complete cases are used, and a
+#' message reports how many there were. Pairwise-deletion correlations are
+#' never used on either setting.
+#'
+#' `missing = "fiml"` instead estimates from every respondent who answered at
+#' least one item, by full-information maximum likelihood. Two assumptions come
+#' with it, and both are stronger than listwise deletion's: the data must be
+#' **missing at random** (missingness may depend on values you observed, but
+#' not on the unobserved values themselves) **and multivariate normal**. Under
+#' MCAR — the special case where missingness is unrelated to anything —
+#' listwise deletion is *consistent*, merely inefficient, so FIML buys
+#' precision there and not correctness. Under MAR listwise deletion is
+#' genuinely biased and FIML is not, which is when the switch is worth its
+#' assumptions.
+#'
+#' The items are standardized by the saturated model's own FIML means and SDs,
+#' never by the means and SDs of whichever cells happen to be observed, and
+#' those standardized columns feed a single FIML fit. The reported standard
+#' errors are observed-information standard errors on that standardized metric,
+#' conditional on the standardization constants (they do not propagate the
+#' uncertainty in the constants themselves), and they remain approximate for
+#' the same correlation-as-covariance reason as the default path.
+#'
+#' Two results are unavailable under `missing = "fiml"`, both because they need
+#' items observed by every respondent: the Nunnally-Bernstein comparison is
+#' `NA` with a stated reason, and `sd = "raw"` is refused — supply the axis SDs
+#' numerically instead.
+#'
+#' A note on provenance: Strack et al. (2013) report no missing-data analyses,
+#' so nothing about the FIML path rests on their results. It is certified
+#' against this package's own synthetic oracle, where the true variance
+#' components are known by construction.
+#'
+#' A boundary
 #' fit returns `NA` reliability and SEm with a warning and a boundary flag
 #' rather than a clipped, negative, or missing value. A fit counts as a boundary
 #' when the estimated axes variance falls outside `(0, 1)` -- at or below zero
@@ -805,8 +846,10 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   specificity was fitted), `fit` (global fit indices), and `details`
 #'   (including `zeta1_fitted` and `zeta2_fitted`, whether scale and block
 #'   specificity were in the model, `blocks`, the block labels when a block map
-#'   was supplied, and `nb_reason`, why the Nunnally-Bernstein comparison is
-#'   `NA`).
+#'   was supplied, `nb_reason`, why the Nunnally-Bernstein comparison is `NA`,
+#'   `missing`, which missing-data treatment lavaan actually used, and --
+#'   under `missing = "fiml"` -- `n_complete`, the complete-case count, and
+#'   `min_coverage`, the fewest respondents behind any item pair).
 #' @references
 #' Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The reliability of
 #' circumplex axes. \emph{SAGE Open}, 3(2). \doi{10.1177/2158244013486115}

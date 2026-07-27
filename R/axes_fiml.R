@@ -88,6 +88,56 @@ axes_fiml_h1 <- function(dat) {
 }
 
 
+# --- The MAR mechanisms the evidence cells are generated under ----------------
+#
+# Package-internal rather than test-local, for the same reason axes_simulate()
+# is: the seed-pinned harness (devel/m65-fiml-heavy-cells.R) and the suite's
+# live re-run must generate the SAME missingness from the same seed, or the
+# suite would be re-deriving a different quantity than the stored summary
+# records and neither would notice. One definition, two callers.
+#
+# Both are MAR by construction, which is the property the cells turn on:
+# missingness depends only on always-observed values, never on the value that
+# goes missing. Verbatim from RR12's header, including the constants.
+#
+# M1 (moderate, cross-scale anchor): the first scale's items are always
+# observed; every other item's cells go missing independently with
+# P = plogis(qlogis(.12) + 1.5 * x_anchor), where x_anchor is the respondent's
+# first item on scale 1.
+axes_mar_m1 <- function(mat, n_items) {
+  p <- stats::plogis(stats::qlogis(.12) + 1.5 * mat[, 1])
+  for (j in seq.int(n_items + 1L, ncol(mat))) {
+    mat[stats::runif(nrow(mat)) < p, j] <- NA
+  }
+  mat
+}
+
+# M2 (harsh, same-scale anchor): the first item of every scale is always
+# observed; that scale's remaining items go missing with
+# P = plogis(qlogis(.30) + 2.5 * x_first-item-of-that-scale). Selecting on an
+# r ~ .53 same-scale correlate is what maximizes the available-case variance
+# distortion -- this mechanism exists to make the wrong metric fail loudly,
+# not to be realistic.
+axes_mar_m2 <- function(mat, n_items) {
+  for (s in seq_len(ncol(mat) / n_items) - 1L) {
+    anchor <- mat[, n_items * s + 1L]
+    p <- stats::plogis(stats::qlogis(.30) + 2.5 * anchor)
+    for (j in seq.int(n_items * s + 2L, n_items * s + n_items)) {
+      mat[stats::runif(nrow(mat)) < p, j] <- NA
+    }
+  }
+  mat
+}
+
+# Per-cell MCAR, the BC10/BC13 mechanism. Trivial, but kept beside its two
+# siblings so a reader comparing the three cells reads one file, and so the
+# harness and the suite share this draw as well.
+axes_mcar <- function(mat, rate) {
+  mat[stats::runif(length(mat)) < rate] <- NA
+  mat
+}
+
+
 # The jointly-observed count below which the pairwise overlap is reported as
 # thin. It is a WARNING and never a refusal (M65-D2): RR12 section 7 binds no
 # floor and says outright that any positive constant is arbitrary, so 30 is

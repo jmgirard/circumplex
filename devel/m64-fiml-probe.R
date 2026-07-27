@@ -213,3 +213,108 @@ for (r in c(0.02, 0.05, 0.10)) {
 cat("Machine precision on both, at every rate -- the standardization is exact\n",
     "for the available cases and silent about whether those are the right\n",
     "moments (RR12 sec. 1).\n", sep = "")
+
+# ==============================================================================
+# RR12 REVIEWER PROBES (V-C, V-D, V-F)
+# ==============================================================================
+# Added 2026-07-26 at M65 T8, discharging RR12 recommendation B-6: the reviewer
+# probes should be reproducible by the same one-command route the brief used.
+#
+# Six of the nine reviewer probes are already reproducible without this file,
+# because M65 turned them into assertions the suite runs on every check --
+# V-A (observed information) and V-B (complete-data identities) in the AC4 and
+# BC2/BC6/AC3 tests, V-E and V-G in devel/m65-fiml-heavy-cells.R's stored cells,
+# V-H in the BC14 test, V-I in the BC15 test. Three are left, and they are left
+# for a reason: each one measures something the SHIPPED code deliberately never
+# does, so no test of shipped behaviour can carry them.
+
+rule("V-C: stationarity is the WEIGHTED diagonal")
+# Why this is not a defect. The classical "ML reproduces the diagonal exactly"
+# result of exploratory factor analysis needs the free-loadings stationarity
+# equations, and this model's loadings are FIXED. What a free item error e_i
+# actually satisfies is dF/de_i ~ [Sinv (S - Sigma) Sinv]_ii = 0 -- the
+# weighted diagonal. So off-diagonal sampling misfit has nowhere to go but the
+# raw diagonal, and lands there at roughly the sampling SE of a correlation.
+{
+  z <- scale(mat)
+  fit <- suppressWarnings(lavaan::cfa(syn, data = as.data.frame(z),
+                                      estimator = "ML", se = "standard",
+                                      orthogonal = TRUE))
+  S <- lavaan::lavInspect(fit, "sampstat")$cov
+  Sig <- lavaan::lavInspect(fit, "implied")$cov
+  Sinv <- solve(Sig)
+  cat(sprintf("  max |diag(S - Sigma)|                 = %.4f\n",
+              max(abs(diag(S - Sig)))))
+  cat(sprintf("  max |diag(Sinv (S - Sigma) Sinv)|     = %.2e\n",
+              max(abs(diag(Sinv %*% (S - Sig) %*% Sinv)))))
+  cat(sprintf("  sampling SE of a correlation at N=%d  = %.4f\n",
+              nrow(mat), 1 / sqrt(nrow(mat))))
+  cat("  The weighted diagonal is zero to optimizer precision while the raw\n",
+      "  one departs at the order of 1/sqrt(N). Expected restricted-ML\n",
+      "  behaviour (M64-D3), documented in the roxygen and the vignette.\n",
+      sep = "")
+}
+
+rule("V-D: the departure shrinks like sampling error")
+# The discriminating check. A sampling artefact must shrink like sampling
+# error; a misspecification would not. If this row ever stops shrinking, the
+# reassuring story above is wrong and the sentence in the docs must go.
+for (n in c(600L, 2400L, 9600L)) {
+  set.seed(7)
+  d <- as.matrix(axes_simulate(n, ang, n_items, xi1 = truth[["xi1"]],
+                               xi2 = truth[["xi2"]], zeta1 = truth[["zeta1"]]))
+  f <- suppressWarnings(lavaan::cfa(syn, data = as.data.frame(scale(d)),
+                                    estimator = "ML", se = "standard",
+                                    orthogonal = TRUE))
+  cat(sprintf("  N = %5d: max |diag(S - Sigma)| = %.4f   (1/sqrt(N) = %.4f)\n",
+              n, max(abs(diag(lavaan::lavInspect(f, "sampstat")$cov -
+                                lavaan::lavInspect(f, "implied")$cov))),
+              1 / sqrt(n)))
+}
+{
+  pop <- circumplex:::axes_population_cor(ang, n_items, truth[["xi1"]],
+                                          truth[["xi2"]], truth[["zeta1"]])$sigma
+  dimnames(pop) <- list(colnames(mat), colnames(mat))
+  # sample.nobs large enough that lavaan's default (N-1)/N rescaling of
+  # sample.cov is itself below the departure being measured -- at N = 10000 it
+  # alone would put a 1e-4 floor under this row and hide the answer.
+  f <- suppressWarnings(lavaan::cfa(syn, sample.cov = pop, sample.nobs = 1e7,
+                                    estimator = "ML", se = "standard",
+                                    orthogonal = TRUE))
+  # Reordered by name: lavaan returns the implied matrix in its own variable
+  # order, which is not the item-map order `pop` is built in.
+  imp <- lavaan::lavInspect(f, "implied")$cov[rownames(pop), colnames(pop)]
+  cat(sprintf("  population matrix: max |diag(S - Sigma)| = %.3g, xi1 = %.6f\n",
+              max(abs(diag(pop - imp))), xi1_of(f)[["est"]]))
+  cat("  No sampling error, no departure, and xi1 recovered exactly: the\n",
+      "  departure above is sampling misfit leaking through the fixed\n",
+      "  loadings, not a wrong model.\n", sep = "")
+}
+
+rule("V-F: lavaan fabricates an unobserved moment")
+# The justification for BC7 clause (iii), and the reason that clause refuses
+# rather than warns. The saturated likelihood is flat in a moment no respondent
+# contributed to, so EM returns its start value -- zero -- and reports nothing.
+# The shipped code refuses this input, so only a probe can show what it would
+# otherwise have returned.
+{
+  m <- mat
+  half <- seq_len(nrow(m) / 2)
+  m[half, 1] <- NA
+  m[-half, 4] <- NA
+  pop <- circumplex:::axes_population_cor(ang, n_items, truth[["xi1"]],
+                                          truth[["xi2"]], truth[["zeta1"]])$sigma
+  f <- suppressWarnings(lavaan::lavCor(as.data.frame(m), ordered = character(0),
+                                       missing = "ml", output = "fit",
+                                       meanstructure = TRUE))
+  rhat <- stats::cov2cor(lavaan::lavInspect(f, "h1")$cov)
+  cat(sprintf("  respondents observing BOTH item 1 and item 4 : %d\n",
+              sum(!is.na(m[, 1]) & !is.na(m[, 4]))))
+  cat(sprintf("  lavaan's r(1,4)                              : %.4f\n",
+              rhat[1, 4]))
+  cat(sprintf("  population r(1,4)                            : %.4f\n",
+              pop[1, 4]))
+  cat("  No warning, no error, no NA -- a fabricated moment inside an\n",
+      "  otherwise ordinary correlation matrix. axes_reliability() refuses\n",
+      "  this input before the EM stage (BC7 clause iii).\n", sep = "")
+}

@@ -44,6 +44,19 @@ axes_se_caveat <- paste0(
   "  approximate (Cudeck, 1989)."
 )
 
+# The extra sentence the FIML path owes on top of the caveat above. Its SEs
+# carry a SECOND approximation the default path does not: they are computed on
+# the standardized metric holding the standardization constants fixed, so they
+# do not propagate the uncertainty in the FIML means and SDs that produced that
+# metric. Stated where the SEs are shown, not only in the help page, because
+# that is where a reader is about to use them.
+axes_fiml_se_caveat <- paste0(
+  "  Note: under missing = \"fiml\" the standard errors are\n",
+  "  observed-information SEs on the standardized metric, conditional on the\n",
+  "  FIML standardization constants; FIML assumes the data are missing at\n",
+  "  random and multivariate normal."
+)
+
 # ---- methods ----------------------------------------------------------------
 
 #' Print circumplex axes-reliability results
@@ -153,6 +166,7 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
     )
   }
   cat("\n", axes_se_caveat, "\n", sep = "")
+  if (is_fiml) cat("\n", axes_fiml_se_caveat, "\n", sep = "")
   invisible(x)
 }
 

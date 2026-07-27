@@ -72,8 +72,10 @@ default, three when scale specificity was dropped, five when block
 specificity was fitted), \code{fit} (global fit indices), and \code{details}
 (including \code{zeta1_fitted} and \code{zeta2_fitted}, whether scale and block
 specificity were in the model, \code{blocks}, the block labels when a block map
-was supplied, and \code{nb_reason}, why the Nunnally-Bernstein comparison is
-\code{NA}).
+was supplied, \code{nb_reason}, why the Nunnally-Bernstein comparison is \code{NA},
+\code{missing}, which missing-data treatment lavaan actually used, and --
+under \code{missing = "fiml"} -- \code{n_complete}, the complete-case count, and
+\code{min_coverage}, the fewest respondents behind any item pair).
 }
 \description{
 Estimate the reliability (and standard error of measurement) of the two
@@ -112,6 +114,13 @@ and the reliabilities are correct, but the component standard errors and the
 global chi-square are \strong{approximate} (Cudeck, 1989). Results are reported
 \strong{per axis} (X and Y): for a balanced instrument the two axes carry the
 same axes-variance estimate and differ only through \code{item_n}.
+
+A related detail, in case you check: the fitted model does \strong{not} reproduce
+the correlation matrix's unit diagonal exactly, and that is expected rather
+than a defect. With the loadings fixed, the stationarity condition available
+for a free item error is the \emph{weighted} diagonal, not the raw one, so
+off-diagonal sampling misfit leaks into the implied diagonal at roughly the
+sampling standard error of a correlation.
 }
 \section{Which instruments this accepts}{
 Any set of \strong{equally spaced} scale angles, at any rotation: the canonical
@@ -142,9 +151,43 @@ The model is two-dimensional. Instruments whose items span three dimensions
 scope, even though Strack et al. (2013) analyze one; their Table 3 SYMLOG
 rows arise from a three-axis sphere model, not from any configuration this
 function accepts.
+}
 
-Missing data are handled by \strong{listwise deletion only} (a message reports the
-complete-case count); pairwise correlation input is never used. A boundary
+\section{Missing data}{
+\code{missing = "listwise"} is the default: only complete cases are used, and a
+message reports how many there were. Pairwise-deletion correlations are
+never used on either setting.
+
+\code{missing = "fiml"} instead estimates from every respondent who answered at
+least one item, by full-information maximum likelihood. Two assumptions come
+with it, and both are stronger than listwise deletion's: the data must be
+\strong{missing at random} (missingness may depend on values you observed, but
+not on the unobserved values themselves) \strong{and multivariate normal}. Under
+MCAR — the special case where missingness is unrelated to anything —
+listwise deletion is \emph{consistent}, merely inefficient, so FIML buys
+precision there and not correctness. Under MAR listwise deletion is
+genuinely biased and FIML is not, which is when the switch is worth its
+assumptions.
+
+The items are standardized by the saturated model's own FIML means and SDs,
+never by the means and SDs of whichever cells happen to be observed, and
+those standardized columns feed a single FIML fit. The reported standard
+errors are observed-information standard errors on that standardized metric,
+conditional on the standardization constants (they do not propagate the
+uncertainty in the constants themselves), and they remain approximate for
+the same correlation-as-covariance reason as the default path.
+
+Two results are unavailable under \code{missing = "fiml"}, both because they need
+items observed by every respondent: the Nunnally-Bernstein comparison is
+\code{NA} with a stated reason, and \code{sd = "raw"} is refused — supply the axis SDs
+numerically instead.
+
+A note on provenance: Strack et al. (2013) report no missing-data analyses,
+so nothing about the FIML path rests on their results. It is certified
+against this package's own synthetic oracle, where the true variance
+components are known by construction.
+
+A boundary
 fit returns \code{NA} reliability and SEm with a warning and a boundary flag
 rather than a clipped, negative, or missing value. A fit counts as a boundary
 when the estimated axes variance falls outside \verb{(0, 1)} -- at or below zero

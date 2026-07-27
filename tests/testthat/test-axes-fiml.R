@@ -763,3 +763,174 @@ test_that("BC15: the five-component model is recovered under missingness", {
               label = paste0("|", sym, " - truth| / SE"))
   }
 })
+
+
+# --- T7: the documented claims that live in code ------------------------------
+#
+# AC16's rewrites are prose (roxygen, vignette, NEWS) and are read at review.
+# One of its claims is emitted at runtime, though, so it gets a test: the FIML
+# standard errors carry a SECOND approximation beyond the shipped path's
+# correlation-as-covariance one, and a user reading the SEs should be told so
+# where the SEs are, not only in the help page.
+
+test_that("AC16: the FIML SE caveat prints beside the SEs, and only there", {
+  skip_if_not_installed("lavaan")
+  fx <- fiml_refuse_fixture()
+  fi <- fiml_call(fiml_holes(fx$mat), fx$items)
+  out <- paste(capture.output(print(fi)), collapse = " ")
+  expect_match(out, "observed-information SEs on the standardized metric")
+  expect_match(out, "conditional on the")
+  expect_match(out, "missing at\\s+random and multivariate normal")
+  # The shipped caveat is still there too -- the FIML sentence adds to it
+  # rather than replacing it, because both approximations apply at once.
+  expect_match(out, "Cudeck, 1989")
+  # ... and the listwise path does NOT gain a caveat about an estimator it did
+  # not use, which is the failure a single unconditional cat() would produce.
+  lw <- suppressMessages(
+    axes_reliability(as.data.frame(fx$mat), items = fx$items,
+                     angles = octants(), missing = "listwise")
+  )
+  lw_out <- paste(capture.output(print(lw)), collapse = " ")
+  expect_no_match(lw_out, "observed-information")
+  expect_match(lw_out, "Cudeck, 1989")
+})
+
+
+# --- T6: the heavy evidence cells (BC10, BC11, BC12, BC13) --------------------
+#
+# These four criteria need 200 replicates at N = 600 and a handful at N = 2400
+# under MAR, which is well over an hour of FIML fitting. devel/m65-fiml-heavy-
+# cells.R runs them once, seed-pinned, and commits the per-replicate results;
+# the tests below read that file (M65-D3, extended to BC11/BC12 at the T5 gate).
+#
+# A stored number is evidence only if something still checks that the code
+# produces it. The last test here re-runs stored seeds live and requires them
+# to reproduce their stored values -- which is a far stronger check than a
+# statistical smoke, because it catches drift in the estimator AND in the
+# missingness mechanism at once. It carries no skip flag: this repo has four
+# times shipped a check that was green because it never ran (M7 --no-manual,
+# M16 skip_on_cran(), M31 vdiffr, M39 CI baseline).
+
+heavy <- function() readRDS(test_path("fixtures", "m65-heavy-cells.rds"))
+
+mc_se <- function(x) stats::sd(x, na.rm = TRUE) / sqrt(sum(!is.na(x)))
+
+test_that("BC10: every MCAR cell recovers xi1 within 2 MC SEs of truth", {
+  fx <- heavy()
+  expect_gte(fx$provenance$reps, 200L)
+  for (rate in names(fx$mcar)) {
+    x <- fx$mcar[[rate]]
+    est <- x[, "fiml.xi1"]
+    # Within 2 MC SEs of .35. The band is a Monte-Carlo band, so it tightens as
+    # replicates accumulate -- 200 replicates is what makes it a real test and
+    # not a formality, which is why the reps floor is asserted above.
+    expect_lt(abs(mean(est, na.rm = TRUE) - 0.35) / mc_se(est), 2,
+              label = paste0("|bias|/MCSE at ", rate, " MCAR"))
+    # The OLS shadow is an estimator-independent least-squares route to the
+    # same quantity, so its agreement with the CFA is a cross-check no lavaan
+    # bug could fake. Required in EVERY replicate, not on average: an average
+    # would let a handful of wild disagreements hide.
+    expect_lt(max(abs(x[, "fiml.ols"] - x[, "fiml.xi1"]), na.rm = TRUE), 0.05,
+              label = paste0("max |OLS - CFA| at ", rate, " MCAR"))
+  }
+})
+
+test_that("BC13: reported FIML SEs beat listwise, and track the truth", {
+  fx <- heavy()
+  se_ratio <- function(rate) {
+    x <- fx$mcar[[rate]]
+    mean(x[, "fiml.se"], na.rm = TRUE) / mean(x[, "lw_se"], na.rm = TRUE)
+  }
+  # Smaller than listwise at both rates, and the gap WIDENS as missingness
+  # grows: that direction is the substantive claim, since a FIML SE that beat
+  # listwise by a constant factor would suggest a scaling difference rather
+  # than the information gain the criterion is about.
+  expect_lt(se_ratio("0.05"), 1)
+  expect_lt(se_ratio("0.10"), 1)
+  expect_lt(se_ratio("0.10"), se_ratio("0.05"))
+  # Calibration: at 5% MCAR the mean reported SE must match the empirical
+  # spread of the estimate itself. This is the criterion that would catch an SE
+  # that is merely small -- an SE can beat listwise's and still be a lie.
+  x <- fx$mcar[["0.05"]]
+  calib <- mean(x[, "fiml.se"], na.rm = TRUE) /
+    stats::sd(x[, "fiml.xi1"], na.rm = TRUE)
+  expect_gt(calib, 0.85)
+  expect_lt(calib, 1.15)
+})
+
+test_that("BC11: under MAR the FIML path is unbiased and listwise is not", {
+  fx <- heavy()
+  # The reversal, and the reason the argument exists. Both halves are needed:
+  # FIML being close to truth says nothing on its own unless listwise, on the
+  # SAME draws, is demonstrably not.
+  fi <- fx$m1[, "fiml"]
+  lw <- fx$m1[, "listwise"]
+  expect_lt(abs(mean(fi, na.rm = TRUE) - 0.35) / mc_se(fi), 3)
+  expect_gt(abs(mean(lw, na.rm = TRUE) - 0.35) / mc_se(lw), 3)
+  # Directional, so a failure cannot be read as noise: listwise's bias is
+  # downward under this mechanism, not merely large.
+  expect_lt(mean(lw, na.rm = TRUE), mean(fi, na.rm = TRUE))
+})
+
+test_that("BC12: the metric, not the estimator, is what moves xi1", {
+  fx <- heavy()
+  m2 <- fx$m2
+  # Paired on identical draws, so the contrast isolates the standardizing
+  # moments: all three routes see the same data and the same model.
+  drift <- m2[, "available_case"] - m2[, "shipped"]
+  expect_gte(mean(drift, na.rm = TRUE), 0.010)
+  # ... and the metric-correct alternative agrees with the shipped path, which
+  # is what makes the drift above a property of the METRIC rather than of
+  # one-stage-vs-two-stage estimation.
+  agree <- abs(m2[, "shipped"] - m2[, "two_stage"])
+  expect_lte(mean(agree, na.rm = TRUE), 0.005)
+  # The two comparisons must not be confusable: the wrong-metric drift is an
+  # order of magnitude larger than the right-metric disagreement.
+  expect_gt(mean(drift, na.rm = TRUE), 3 * mean(agree, na.rm = TRUE))
+})
+
+test_that("M65-D3: stored seeds reproduce live, so the fixture is not stale", {
+  skip_if_not_installed("lavaan")
+  fx <- heavy()
+  oct <- octants()
+  items <- function(mat) split(colnames(mat), rep(1:8, each = 3))
+  draw <- function(n, seed) {
+    set.seed(seed)
+    as.matrix(axes_simulate(n, oct, 3L, .35, .10, .08))
+  }
+  xi1_of <- function(mat, ...) {
+    suppressMessages(suppressWarnings(
+      axes_reliability(as.data.frame(mat), items = items(mat), angles = oct,
+                       ...)
+    ))$results$xi1[[1]]
+  }
+  # Tolerance covers cross-platform BLAS noise in lavaan's optimizer only; on
+  # the generating machine these are exact. A drifted estimator or a drifted
+  # mechanism moves them by orders more than this.
+  tol <- 1e-6
+
+  # One MCAR replicate per rate -- three fits, ~15 s.
+  for (i in seq_along(fx$mcar)) {
+    rate <- as.numeric(names(fx$mcar)[[i]])
+    seed <- fx$provenance$seeds$mcar[[1]]
+    live <- xi1_of(axes_mcar(draw(600L, seed), rate), missing = "fiml")
+    expect_equal(live, unname(fx$mcar[[i]][1, "fiml.xi1"]), tolerance = tol,
+                 label = paste0("live xi1 at ", rate, " MCAR"))
+  }
+
+  # One M1 replicate at full N -- the MAR mechanism's own reproduction.
+  seed_m1 <- fx$provenance$seeds$m1[[1]]
+  live_m1 <- xi1_of(axes_mar_m1(draw(2400L, seed_m1), 3L), missing = "fiml")
+  expect_equal(live_m1, unname(fx$m1[1, "fiml"]), tolerance = tol)
+
+  # One M2 replicate, shipped leg only. What this does NOT re-run, stated so
+  # the coverage is never overestimated: (a) the available-case leg of BC12,
+  # which is a test-side construction the package deliberately does not offer,
+  # (b) the two-stage leg, (c) the other 199 MCAR replicates per cell and the
+  # other 4 M1 / 3 M2 replicates, and so (d) every MEAN and SD the four
+  # criteria above are computed from. Those come from the stored file; what is
+  # re-derived here is that the code still produces the numbers in it.
+  seed_m2 <- fx$provenance$seeds$m2[[1]]
+  live_m2 <- xi1_of(axes_mar_m2(draw(2000L, seed_m2), 3L), missing = "fiml")
+  expect_equal(live_m2, unname(fx$m2[1, "shipped"]), tolerance = tol)
+})
