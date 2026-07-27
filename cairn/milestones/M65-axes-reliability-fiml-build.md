@@ -1,0 +1,135 @@
+# M65: FIML item-level missing data for `axes_reliability()` — the build
+
+- **Status:** planned
+- **Priority:** normal
+- **Depends on:** —
+- **Driving RR:** RR12
+- **Principles touched:** —
+- **Branch/PR:** —
+
+## Goal
+
+Give `axes_reliability()` a `missing = "fiml"` path built on the FIML
+correlation metric, so item-level missingness is handled honestly under MAR
+instead of forcing listwise deletion.
+
+## Scope
+
+**In:** `missing = c("listwise", "fiml")` on `axes_reliability()`, `"listwise"` default and bit-identical to
+shipped; standardization by saturated-FIML (EM) moments on the `sqrt(N_used/(N_used − 1))` convention feeding one
+structured one-stage fit through `sem_fit_cfa()`; OLS shadow and PD refusal retargeted to R̂; the six-clause refusal
+contract; reporting and derived-quantity contracts; the nine-cell evidence bar; the roxygen and vignette rewrites.
+Three RR12 §8 "Consider" items taken up at the plan gate: a soft warning on thin minimum pairwise joint coverage,
+folding the reviewer probes into `devel/m64-fiml-probe.R`, and one doc sentence on the finite-sample diagonal
+departure (M64-D3: expected restricted-ML behavior, not a defect).
+
+**Out:** planned-missingness designs and lavaan's `missing = "two.stage"` → both stay ROADMAP candidate rows,
+promoted on a concrete use case. Block membership on `circumplex_instrument` → its own candidate row.
+Pairwise-deletion correlations stay banned (RR09 BC13, upheld by D-033). RR12 §9's four rejections (per-item
+unit-total-variance constraint, post-hoc component rescaling, any scalar effective-N repair, pairwise correlations)
+are standing and not revisited here.
+
+## Acceptance criteria
+
+- [ ] AC1 (BC1): `axes_reliability()` gains `missing = c("listwise", "fiml")` with `"listwise"` the default, matching `ssm_sem()`'s
+      spelling; the `"fiml"` → lavaan `"ml"` translation goes through `sem_fit_cfa()`. Every pre-M64 test passes unchanged, and the
+      listwise path's numbers are bit-identical to shipped.
+- [ ] AC2 (BC2): Under `missing = "fiml"` the items are standardized by the saturated-model FIML (EM) means and by the FIML SDs
+      rescaled by `sqrt(N_used/(N_used − 1))` — never by available-case `scale()` moments — and the reported fit is a single
+      structured `lavaan::cfa(missing = "ml", orthogonal = TRUE)` on those columns. On complete data the standardized matrix must
+      equal `scale(mat)` within 1e-12 elementwise.
+- [ ] AC3 (BC3): On data with no missing cells, `missing = "fiml"` must reproduce `missing = "listwise"`'s ξ1, ξ2, ζ1 (and ζ2 when
+      fitted), reliability, and SEm within 1e-8 each (measured: 5.6e-17 on ξ1 for the probe fixture).
+- [ ] AC4 (BC4): A test must assert on the fitted FIML lavaan object that `lavInspect(fit, "options")$information[1] == "observed"`.
+- [ ] AC5 (BC5): The reported component SEs and fit measures must come from the one-stage FIML fit; no SE or χ² computed from a
+      correlation matrix with `sample.nobs` set to the total N may appear in `results`, `components`, `fit`, or any print/summary
+      output.
+- [ ] AC6 (BC6): Under `missing = "fiml"`, the OLS shadow (start values and stored cross-check) and the positive-definiteness
+      refusal (min eigenvalue ≤ 1e-8, retained) must consume the saturated FIML correlation matrix R̂. On complete data R̂ must
+      equal `cor(mat)` within 1e-12 elementwise (measured: 8.9e-16).
+- [ ] AC7 (BC7): Each of the following must refuse informatively under `missing = "fiml"`, with a test per clause: (i) N_used ≤ p,
+      where N_used counts rows with ≥1 observed item; (ii) an item with < 2 observed values, or zero variance among observed values;
+      (iii) an item pair never jointly observed, naming at least one such pair (evidence V-F: lavaan silently fabricates the moment
+      otherwise); (iv) saturated-stage non-convergence (mockable seam); (v) non-PD R̂; (vi) structured-fit non-convergence. Rows
+      with no observed items are dropped with a message reporting the count and excluded from N_used.
+- [ ] AC8 (BC8): Under `missing = "fiml"`: the startup message reports N_used, the complete-case count, any all-missing rows
+      dropped, and the minimum pairwise joint coverage; `print()` reports the total N with the complete-case count alongside (the
+      listwise path keeps `"Complete N:"`); `details` gains `missing` (read back from the fitted lavaan object via `lavInspect(fit,
+      "options")$missing`, not echoed from the argument), `n_complete`, and the minimum pairwise coverage.
+- [ ] AC9 (BC9): Under `missing = "fiml"`, `nb_reliability` is NA with `nb_reason` including `"fiml"` (accumulating with any other
+      applicable reason), and `sd = "raw"` is refused with an informative error naming `"std"` and numeric SDs as the alternatives;
+      `print()`/`summary()` state the reason.
+- [ ] AC10 (BC10): On the probe population (8 octant scales × 3 items, ξ1 = .35, ξ2 = .10, ζ1 = .08, N = 600) at 2%, 5%, and 10%
+      per-item MCAR, the mean ξ̂1 over ≥ 200 replicates must lie within 2 MC SEs of .35 in every cell, and the stored OLS shadow's
+      ξ1 must agree with the CFA ξ̂1 within .05 in every replicate.
+- [ ] AC11 (BC11): Under mechanism M1 (defined in this report's header: always-observed scale-1 anchors, P(miss) =
+      plogis(qlogis(.12) + 1.5·x_anchor)), with ≥ 5 replicates at N = 2400 (or an MC-equivalent budget): the FIML-path mean ξ̂1 must
+      lie within 3 MC SEs of .35, and the listwise mean ξ̂1 must differ from .35 by more than 3 MC SEs (measured: FIML-metric
+      −0.0021 at MC SE 0.0023; listwise −0.0295 at MC SE 0.0067).
+- [ ] AC12 (BC12): Under mechanism M2 (same-scale anchors, P(miss) = plogis(qlogis(.30) + 2.5·x_anchor_s)), paired over identical
+      draws (≥ 4 replicates at N = 2000): mean[ξ̂1(available-case-standardized one-stage) − ξ̂1(shipped FIML path)] must be ≥ +0.010
+      (measured +0.0167, paired SE 0.0006), and mean|ξ̂1(shipped FIML path) − ξ̂1(two-stage fit of the FIML correlation matrix)|
+      must be ≤ 0.005 (measured 0.0008, paired SE 0.0012).
+- [ ] AC13 (BC13): At 5% and 10% per-item MCAR on the probe population, the mean reported FIML SE of ξ1 must be smaller than the
+      mean reported listwise SE, with the FIML/listwise ratio decreasing from 5% to 10%; and at 5% MCAR over ≥ 200 replicates, the
+      ratio of the mean reported FIML SE to the empirical SD of ξ̂1 must lie in [0.85, 1.15]. If the ratio falls outside the band,
+      the milestone must surface it in the "Deviations from RR12" table with a strengthened documented SE caveat — never widen the
+      band silently.
+- [ ] AC14 (BC14): On the F1b fixture (probe population, N = 600, 15% per-item MCAR, the pinned probe seed): `missing = "listwise"`
+      refuses with the N ≤ p error; `missing = "fiml"` returns a converged, non-boundary estimate with |ξ̂1 − .35| ≤ .05 (measured
+      ξ̂1 = 0.3573, SE 0.0174).
+- [ ] AC15 (BC15): One pinned crossed-blocks cell (8 scales × 3 items, `axes_crossed_blocks()`, truth ξ1 = .30, ξ2 = .10, ζ1 = .06,
+      ζ2 = .05, N = 2000, 5% per-item MCAR): the FIML path fits the five-component model with each of ξ̂1, ξ̂2, ζ̂1, ζ̂2 within 3
+      reported SEs of its truth (measured: .2979/.1019/.0639/.0490 with SEs .0080/.0048/.0037/.0026).
+- [ ] AC16 (BC16): The roxygen missing-data paragraph and the vignette caveat paragraph are rewritten to state: listwise remains the
+      default; `missing = "fiml"` assumes MAR **and** multivariate normality; under MCAR listwise is consistent (inefficient, not
+      biased); the FIML SEs are observed-information SEs on the standardized metric, conditional on the standardization constants,
+      and approximate for the same correlation-as-covariance reason as the shipped path; and the FIML variant is certified by the
+      package's synthetic oracle, not by Strack et al. (2013), who report no missing-data analyses.
+- [ ] AC17: the profile's `verify` slot clean (`devtools::test()`, `document()` no diff) and, because this milestone
+      edits roxygen, a full `devtools::check(manual = TRUE)` whose log carries `checking PDF version of manual ... OK`
+      by name (M7/M57 lesson: a bare `check()` defaults to `manual = FALSE` and skips that step).
+
+## Coverage
+
+- AC2, AC3, AC6 → T1
+- AC1, AC4, AC5 → T2
+- AC7 → T3
+- AC8, AC9 → T4
+- AC11, AC12, AC14, AC15 → T5
+- AC10, AC13 → T6
+- AC16 → T7
+- AC17 → T8
+
+## Tasks
+
+- [ ] **T1** — The metric layer: saturated-FIML (EM) means/SDs with the `sqrt(N_used/(N_used − 1))` rescaling, and R̂
+      built from them; complete-data equality tests against `scale(mat)` and `cor(mat)` at 1e-12.
+- [ ] **T2** — API + one-stage wiring: `missing =` on `axes_reliability()` (`R/axes_reliability.R:819`) through the
+      existing `axes_fit(missing =)` → `sem_fit_cfa()` translation (`R/ssm_sem.R:749`); observed-information
+      assertion; a test that no two-stage SE or χ² reaches `results`/`components`/`fit`/print.
+- [ ] **T3** — The six-clause refusal contract, the all-missing-row drop, and the soft thin-coverage warning. Per M62,
+      the mockable saturated-stage seam (clause iv) proves branch wiring only — assert each condition against the
+      unmocked path. Per M60, re-assert what the complete-case N ≤ p and PD checks refused *incidentally* before they
+      move to N_used and R̂.
+- [ ] **T4** — Reporting and derived quantities: startup message, `print()`, `details` read-back via `lavInspect()`,
+      `nb_reliability`/`nb_reason`, and the `sd = "raw"` hard error (D-034 correction 2 — an error, not an NA).
+- [ ] **T5** — In-suite evidence cells: BC11 MAR reversal, BC12 metric falsification, BC14 headline, BC15 ζ2.
+- [ ] **T6** — Heavy-cell harness (plan-gate choice): a seed-pinned `devel/` script runs BC10's three cells and BC13's
+      ≥200 replicates once (~45 min measured at 1.4–6.2 s per FIML fit, N = 600, 24 items), its summary committed as
+      an `.rds`; a fast test asserts that stored summary against BC10/BC13's thresholds **and** re-runs a few
+      replicates live so CI exercises the real path. Log what the live half does not cover.
+- [ ] **T7** — Docs: the roxygen missing-data paragraph (`R/axes_reliability.R:681-682`), the vignette caveat
+      paragraph (`vignettes/axes-reliability.Rmd:154-157`), the extended SE caveat, the diagonal-departure sentence,
+      and the NEWS entry. Run the M63 **two-way** enumeration sweep: grep the old "listwise deletion only" claim to
+      delete, and grep every surface that *enumerates* the missing-data policy to extend — assert completeness, not
+      presence.
+- [ ] **T8** — Fold the reviewer probes into `devel/m64-fiml-probe.R`; full `check(manual = TRUE)`; post-merge hygiene.
+
+## Work log
+
+- 2026-07-26: created by /milestone-plan. Promotes the ROADMAP candidate GO'd by D-033 (corrected by D-034); ingests RR12 BC1–BC16 verbatim as AC1–AC16. Gate choices: one oversized milestone over a build/evidence split (the binding-criteria check binds all 16 to one file; M54 precedent); heavy BC10/BC13 cells as script + stored `.rds` + live smoke; all three RR12 §8 "Consider" items in scope.
+
+## Decisions
+
+## Review
