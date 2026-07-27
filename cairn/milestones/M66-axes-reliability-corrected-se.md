@@ -231,6 +231,69 @@ Gathered fresh at the review gate 2026-07-27, by command, on branch
   Guards mutation-verified: reverting the caveat reddens 4 assertions, deleting
   the FIML correction sentence reddens the positive assert added for it.
 
+### Independent review — three lenses, then a scorer
+
+Three fresh-context reviewers with distinct evidence bases, then a separate
+[S] scorer that generated none of the findings.
+
+- **[S] blame-history — no findings.** Independently verified that
+  `axes_fiml_se_caveat`'s printed string is byte-identical to master (AC7's
+  "unchanged" clause), that M65's live-smoke fence is preserved rather than
+  weakened by re-pointing it at `details$se_uncorrected`, and that M62's
+  boundary guard runs BEFORE the correction so a correction failure can only
+  NA `components$SE`, never SEm or reliability.
+- **[S] prior-review — one finding, actioned.** GitHub inline-comment probe
+  returned nothing human, so the PR-thread walk was skipped; archived
+  `## Review` sections were the evidence.
+- **[O] diff-bug — three findings.** It also re-derived the whole formula
+  against RR13 independently and confirmed the parameter ordering, the Σ̂
+  realignment, the FIML arithmetic, and the pole / single-item / crossed-block
+  edge cases.
+
+**Actioned (score ≥ 80):**
+
+- **F-A (prior-review, fixed).** `vignettes/axes-reliability.Rmd` §5 still
+  asserted the falsified claims verbatim — "Read the component SEs as
+  order-of-magnitude guidance rather than calibrated uncertainty", "**The
+  standard errors and global fit are approximate**", and the FIML sentence
+  "are approximate for the same correlation-as-covariance reason as above" —
+  while `print()`, the Rd and NEWS all said the opposite for the same
+  function. AC7 enumerated four surfaces and none of them was the vignette,
+  which CLAUDE.md holds to statistically precise prose. The M56/M62/M63
+  stale-prose family, recurring on this very file. Fixed in `62516ac4` and
+  guarded at source with PAIRED absence/positive assertions.
+- **F1 (88, fixed).** The `# Missing data` roxygen cited the FIML residual as
+  0.1/0.8/1.8% at 2/5/10% MCAR — figures that are |calib − 1| for calibrations
+  ABOVE 1, i.e. conservative — and then claimed the residual "grows in the
+  **anti-conservative** direction". The 15% result is a sign REVERSAL, which
+  this milestone's own work log says outright, so the sentence contradicted
+  its own cited evidence and disagreed with the vignette. Rewritten: at mild
+  rates the residual is bounded but inside the ~3.6% Monte-Carlo error of the
+  comparison so its direction there is not established; it becomes measurable
+  and anti-conservative at 15%, and the reversal is stated.
+- **F3 (85, fixed).** The correction-failure state was the only NA-with-reason
+  state in the object with no printed note (boundary, cormat, fiml and
+  single_item all have one), and the caveat printed beside an all-NA SE column
+  asserted the SEs "are corrected ... and are calibrated" — a claim about
+  numbers that are not there. `print()` now emits a note naming the reason and
+  SUPPRESSES that caveat, reprinting its global-fit half so nothing true is
+  lost. Tested at the seam only, and the test says so: the state is
+  UNREACHABLE end-to-end today (the positive-definiteness gate refuses
+  singular input before any fit), so the test proves branch wiring and
+  explicitly not the condition (M62 lesson).
+
+**Logged, below the actioned bar (1 finding):**
+
+- **F2 (68).** An indefinite-but-nonsingular Σ̂ could in principle yield a
+  partially-NaN SE vector with `reason` still NULL, contradicting the helper's
+  own stated contract. Hardened anyway with a one-line `is.finite()` gate,
+  because a header stating a contract the code does not enforce is worse than
+  no contract — but the record is that **the reported measurement did not
+  reproduce**: the finding cited 96 NaN cases in 300 indefinite draws, and
+  re-running it over 3822 indefinite matrices at this layout produced zero,
+  with the new guard never firing. No end-to-end call reaches the helper with
+  such input in any case.
+
 ### Consistency gate
 
 - `cairn_validate` — all checks pass, exit 0 (48 advisories, none a failure;

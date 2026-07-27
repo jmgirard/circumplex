@@ -596,6 +596,47 @@ test_that("AC7: the Rd states the correction and no longer claims otherwise", {
 })
 
 
+test_that("M66 review F3: print() WIRING for the correction-failure note", {
+  skip_if_not_installed("lavaan")
+  # Title says WIRING deliberately (the M62 lesson): this constructs the
+  # failure state on the object rather than provoking it, so it proves the
+  # print branch is connected and says nothing about the CONDITION selecting
+  # it. That distinction is load-bearing here, because the state is currently
+  # UNREACHABLE end-to-end -- axes_reliability()'s positive-definiteness gate
+  # refuses a singular correlation matrix before any fit happens ("The item
+  # correlation matrix is not positive definite; the model cannot be fit"),
+  # which is why no integration test exists and why this one must not pretend
+  # to be one.
+  pp <- probe_pop()
+  res <- axes_reliability(cormat = pp$sigma, items = pp$items,
+                          angles = pp$angles, n = 600)
+  res$details$se_correction_failed <- "singular"
+  res$components$SE <- NA_real_
+  out <- gsub("\\s+", " ", paste(capture.output(print(res)), collapse = " "))
+
+  # The failure is stated, with its reason.
+  expect_match(out, "component standard errors could not be computed (singular)",
+               fixed = TRUE)
+  expect_match(out, "point estimates, reliability, and SEm are unaffected",
+               fixed = TRUE)
+  # The calibrated-SE claim is SUPPRESSED -- printing it beside an all-NA SE
+  # column would assert a property of numbers that are not there.
+  expect_no_match(out, "are corrected for this and are calibrated", fixed = TRUE)
+  expect_no_match(out, "typically smaller than the values printed by",
+                  fixed = TRUE)
+  # ... but nothing true is lost with it: the global-fit caveat still prints.
+  expect_match(out, "Cudeck, 1989", fixed = TRUE)
+  expect_match(out, "flattered by roughly 4%", fixed = TRUE)
+
+  # And the normal path is unchanged by the branch.
+  ok <- gsub("\\s+", " ", paste(capture.output(print(
+    axes_reliability(cormat = pp$sigma, items = pp$items,
+                     angles = pp$angles, n = 600))), collapse = " "))
+  expect_match(ok, "are corrected for this and are calibrated", fixed = TRUE)
+  expect_no_match(ok, "could not be computed", fixed = TRUE)
+})
+
+
 test_that("AC7: the vignette's caveats match the corrected contract", {
   # The teaching vignette is the FOURTH surface carrying the SE claim, and the
   # one M66's own doc sweep missed: AC7 enumerated the printed caveat, two

@@ -199,8 +199,33 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
       sep = ""
     )
   }
-  cat("\n", axes_se_caveat, "\n", sep = "")
-  if (is_fiml) cat("\n", axes_fiml_se_caveat, "\n", sep = "")
+  # The correction-failure state gets its own note, like every other
+  # NA-with-reason state above it (boundary, cormat, fiml, single_item) --
+  # RR09 sec. 7.4's NA-with-reason doctrine, which the new state was otherwise
+  # the only one to skip. Without it the SE column reads as all-NA with the
+  # explanation reachable only from `details`, and the call-time warning() is
+  # routinely muffled (this package's own harnesses wrap the call in
+  # suppressWarnings()).
+  #
+  # It also SUPPRESSES the caveat below rather than printing it beside the
+  # gap: that text asserts the standard errors "are corrected ... and are
+  # calibrated" and compares them to Strack et al.'s, which is a claim about
+  # numbers that are not there. The global-fit half is reprinted on its own so
+  # nothing true is lost with it (M66 review, F3).
+  se_failed <- x$details$se_correction_failed
+  if (!is.null(se_failed)) {
+    cat(
+      "\n  Note: the component standard errors could not be computed (",
+      se_failed, ") and are\n  NA. The point estimates, reliability, and SEm ",
+      "are unaffected. The model\n  is fit to the item correlation matrix, so ",
+      "the global fit statistics are\n  approximate (Cudeck, 1989) and ",
+      "flattered by roughly 4%.\n",
+      sep = ""
+    )
+  } else {
+    cat("\n", axes_se_caveat, "\n", sep = "")
+    if (is_fiml) cat("\n", axes_fiml_se_caveat, "\n", sep = "")
+  }
   invisible(x)
 }
 

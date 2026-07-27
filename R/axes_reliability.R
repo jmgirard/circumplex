@@ -754,17 +754,20 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' correlation-metric correction as every other path, applied multiplicatively
 #' so that the observed information's own pricing of the missing data survives
 #' it. What the correction does not reach is the uncertainty in the
-#' standardization constants above; at 2%, 5%, and 10% cellwise missingness
-#' that residual measures 0.1%, 0.8%, and 1.8% respectively -- an order of
-#' magnitude below the metric error that is corrected.
+#' standardization constants above. At mild rates that residual is too small to
+#' pin down: at 2%, 5%, and 10% cellwise missingness it measures 0.1%, 0.8%,
+#' and 1.8%, all well inside the Monte-Carlo error of the comparison itself
+#' (about 3.6% over 200 replicates), so its size is bounded but its direction
+#' at those rates is not established.
 #'
-#' That residual grows with the missingness rate, and it grows in the
-#' **anti-conservative** direction. Over 201 replicates at 15% cellwise MCAR
-#' the reported standard errors average about 7% **below** the estimator's
-#' actual sampling variability, so at that rate and beyond a confidence
-#' interval built from them is slightly too narrow. Treat heavy missingness as
-#' the regime where these standard errors are least trustworthy, and prefer a
-#' resampling interval there if the uncertainty matters to your conclusion.
+#' It becomes measurable, and **anti-conservative**, as missingness grows.
+#' Over 201 replicates at 15% cellwise MCAR the reported standard errors
+#' average about 7% **below** the estimator's actual sampling variability, so
+#' at that rate a confidence interval built from them is slightly too narrow.
+#' Note the direction reverses: the mild-rate figures above, such as they are,
+#' sit on the conservative side. Treat heavy missingness as the regime where
+#' these standard errors are least trustworthy, and prefer a resampling
+#' interval there if the uncertainty matters to your conclusion.
 #'
 #' Two results are unavailable under `missing = "fiml"`, both because they need
 #' items observed by every respondent: the Nunnally-Bernstein comparison is

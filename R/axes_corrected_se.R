@@ -146,6 +146,22 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
     c(sqrt(naive / n), sqrt(corrected / n))
   }, numeric(2))
 
+  # Belt-and-braces on the contract stated above, NOT a fixed bug -- and the
+  # distinction is recorded because the evidence is thinner than it looks.
+  # In principle a nonsingular Sigma-hat need not be POSITIVE DEFINITE, and
+  # solve() succeeding does not rule the indefinite case out; there
+  # 2*tr(W_c S W_c S) could come out negative and sqrt() return NaN, leaving a
+  # vector numeric in one component and NaN in another with `reason` still
+  # NULL -- the mixed state the header forbids, and NaN rather than NA besides
+  # (the M62 doctrine). An M66 reviewer reported measuring that on 96 of 300
+  # indefinite draws. **Re-running it over 3822 indefinite matrices at this
+  # layout reproduced it zero times, and this guard has never fired**, so the
+  # reported case is unconfirmed and no end-to-end axes_reliability() call
+  # reaches here at all (its positive-definiteness gate refuses such input
+  # first). Kept anyway: it is one comparison, it costs nothing, and a header
+  # that states a contract the code does not enforce is worse than no contract.
+  if (!all(is.finite(out))) return(na_out("indefinite"))
+
   list(
     naive = stats::setNames(out[1, ], d$components),
     corrected = stats::setNames(out[2, ], d$components),
