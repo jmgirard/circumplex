@@ -327,6 +327,54 @@ re-derived, plus the two quantities T9 touched.
 - **AC16** — all five claims present in roxygen, vignette (lines 173–195) and NEWS; the FIML-only SE caveat prints under `"fiml"` and not `"listwise"`; both printed caveats quantified per RR13 Recommendation 2 ("about 40% at an axes variance of .35", "slightly understated" for weak-axes instruments, "flattered by roughly 4%"). T9's `@return` correction is outside AC16's five claims and does not disturb them.
 - **AC17** — `document()` no diff after T9's roxygen edit; `devtools::test()` 765 tests / **4246 passing** / 0 failures; `devtools::check(manual = TRUE)` **0 errors, 0 warnings, 0 notes** in 17m06s with `checking PDF version of manual ... OK` by name.
 
+### Independent review — scoped to the T9 delta (fourth pass)
+
+The third pass ran the full three-lens fan-out over `master..HEAD` and returned
+nothing at threshold; T9's delta is a guard, a test assertion and a doc sentence,
+so this pass scoped the fan-out to `5f5c086a..HEAD` with the whole diff available
+as context. Recorded as a deliberate deviation, not an omission. An **[S]** lens
+covering both prior intent and prior-review regression reported **no findings**,
+verifying independently that the `@return` wording is now accurate on all three
+paths, that the guard is stronger than the finding's suggested minimum, and that
+nothing the two earlier returns fixed is touched. The **[O]** diff-bug lens
+returned three findings, scored by a fresh **[S]** scorer.
+
+**Actioned (≥ 80): none.** All three scored below the threshold.
+
+**Below threshold — logged, not actioned (IP3):**
+
+- **F1 (58) — `axes_fiml_em_stalled()`'s first disjunct has never fired.** lavaan
+  wraps its warning through `getOption("width")`, so at the default 80 the text
+  reads `"...the sample moments \n   using EM;..."` and the `fixed = TRUE`
+  literal `"moments using EM"` is split across the newline. Reproduced at review
+  on **both** generations: `clause1 FALSE / ws-tolerant TRUE / clause2 TRUE` on
+  0.6.21 and on 0.7.2 alike, and clause 1 flips to TRUE at `width = 300`, which
+  identifies the wrap as the cause. **The comment at `R/axes_fiml.R` claiming
+  both generations "contain the literal `moments using EM` … so either substring
+  identifies it" is therefore false** — a measured-fact claim that was not
+  measured, against the M36 lesson. Detection survives only on
+  `grepl("em\\.h1", msg)`, which matches the remedy sentence naming a lavaan
+  option; that option has already been renamed once, and it was that rename which
+  caused this milestone's first CI failure. A further rename dropping the
+  `em.h1` stem would silence BC7 clause (iv) and the structured-stage stall guard
+  together, which is the silent-wrong-fit-indices failure the second return was
+  about. Fix measured to work on both versions:
+  `grepl("moments[[:space:]]+using EM", msg)`. Scored down as out of scope for
+  the T9 diff (the predicate came in at the first return's fix and has since
+  cleared two gates), currently working via the fallback, and guarding a second
+  rename more speculative than the first.
+- **F2 (46)** — the new fit-measure guard's message degenerates to `"(missing: )"`
+  for a mismatch that is not a dropped name, because `identical()` also fails on
+  order and length while `setdiff()` reports only set difference. Not reachable
+  under observed lavaan behaviour (order and length are preserved on both
+  versions, checked under a deliberately reversed request), and the guard still
+  fails safe — only the message misleads. `all(want %in% names(fm))` then
+  `fm <- fm[want]` would fix it and drop the order coupling.
+- **F3 (36)** — the rationale comment's "silently, no warning" is false on 0.7.2,
+  which emits `unknown fit measure` before returning the shortened vector; 0.6.21
+  is silent. The drop the guard defends against is real on both, so the guard
+  stands; the stated measured fact does not, and it appears twice.
+
 ### Cross-version verification
 
 Full suite run locally against both lavaan generations at this commit: 765 tests
