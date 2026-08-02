@@ -1,6 +1,6 @@
 # M67: M65 review fold-ins for the `axes_reliability()` FIML path
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M66
 - **Driving RR:** —
@@ -100,7 +100,7 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
   post-drop `n_used`; third regression case on the row-drop path.
 - [x] **T9 — F13 (review return): AC5 recomputation mirrors the package's row
   filter.**
-- [ ] **T10 — re-gate.** Tests, check, PDF manual.
+- [x] **T10 — re-gate.** Tests, check, PDF manual.
 
 ## Work log
 
@@ -123,6 +123,7 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
 - 2026-08-02: T9 done (F13, below threshold, actioned at the user's gate choice). The AC5 shadow is now recomputed from `mat_m2[axes_fiml_coverage(mat_m2)$keep, ]`, mirroring the package's own call. This is robustness, not a bug fix, and does not redden under mutation: `axes_mar_m2()` leaves no all-missing row, so both forms agree on this fixture — which is exactly the accident the fix removes, and the same row-filter accounting that made F4 real.
 
 - 2026-08-02: checkpoint. T7-T9 verified on the one test file they touch (`test-axes-fiml.R`, 0 failures) plus the two mutation reversions; the full `devtools::test()` and the T10 re-gate (check, PDF manual) have NOT yet reported at this commit.
+- 2026-08-02: T10 done, status in-progress→review (second time). Full suite 0 failures / 4421 passing / 4 pre-existing warnings — 28 more assertions than the first pass's 4393, which is the 24-position gap sweep plus the third thin-overlap case. `devtools::document()` no diff (this pass changed no roxygen at all; the AC1 amendment is tracking-only). `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes in 13m22s. PDF manual 78 pages, unchanged from the first pass, with no warning outside the pre-existing `Rfn.*` external-link class. NEWS still owes no entry, on the first pass's reasoning: the feature is unreleased, and F1/F4 correct guards that never shipped.
 
 ## Decisions
 
