@@ -30,14 +30,19 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
 
 ## Acceptance criteria
 
-- [ ] **AC1 (EM-stall predicate fires on both lavaan generations).** A test
-  feeds `axes_fiml_em_stalled()` the real wrapped warning text from lavaan
-  0.6.21 and 0.7.2 (captured with `dput(conditionMessage(w))`, not retyped) and
-  asserts the *first* disjunct matches on both. The `fixed = TRUE` literal
-  `"moments using EM"` never fires — lavaan wraps at `getOption("width")`, so
-  the phrase straddles a newline — leaving detection resting solely on
+- [ ] **AC1 (EM-stall predicate fires on both lavaan generations, at every wrap
+  position).** A test feeds `axes_fiml_em_stalled()` the real wrapped warning
+  text from lavaan 0.6.21 and 0.7.2 (captured with `dput(conditionMessage(w))`,
+  not retyped) and asserts the *first* disjunct matches on both. Because lavaan
+  re-wraps at `getOption("width")` on emission, the test does not rest on the
+  captured width-80 break: it sweeps the break across every inter-word gap of
+  each diagnosis sentence — the full domain `lav_msg()` can break in — and
+  asserts the disjunct matches at all of them. The `fixed = TRUE` literal
+  `"moments using EM"` fails at exactly the two gaps separating its three
+  words, which includes the break lavaan takes at the default width 80 on both
+  generations, leaving detection there resting solely on
   `grepl("em\\.h1", msg)`, whose stem lavaan has already renamed once. Its
-  comment claiming the literal matches is corrected, not merely reworded.
+  comment is corrected to that measured behavior, not merely reworded.
 - [ ] **AC2 (fit-measure guard is honest on every mismatch).** The guard at
   `R/axes_reliability.R:1574-1590` names the actual problem for a non-drop
   mismatch (today `identical(names(fm), want)` with a `setdiff()` message
@@ -65,12 +70,12 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
 
 ## Coverage
 
-- AC1 → T1
+- AC1 → T1, T7
 - AC2 → T2
-- AC3 → T3
+- AC3 → T3, T8
 - AC4 → T4
-- AC5 → T5
-- AC6 → T6
+- AC5 → T5, T9
+- AC6 → T6, T10
 
 ## Tasks
 
@@ -86,6 +91,16 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
 - [x] **T4 — `@return` text for `n_complete`.**
 - [x] **T5 — OLS-shadow R̂ assertion**, on an M2-style MAR fixture.
 - [x] **T6 — gate.** Tests, check, PDF manual.
+- [x] **T7 — F1/F2/F3 (review return): wrap-position-proof EM-stall
+  predicate.** Both inter-word gaps whitespace-tolerant; the comment corrected
+  to the measured behavior; the AC1 test sweeps every gap instead of pinning
+  one width.
+- [x] **T8 — F4/F5 (review return): thin-overlap warning under unit
+  nonresponse.** Compare against the supplied respondent total, not the
+  post-drop `n_used`; third regression case on the row-drop path.
+- [x] **T9 — F13 (review return): AC5 recomputation mirrors the package's row
+  filter.**
+- [ ] **T10 — re-gate.** Tests, check, PDF manual.
 
 ## Work log
 
@@ -101,6 +116,13 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
 - 2026-08-02: T2–T5 share one gate run: full suite 0 failures / 4393 passing / 4 pre-existing warnings.
 - 2026-08-02: T6 done, status in-progress→review. `devtools::document()` no diff (no roxygen changed this milestone — T4 was verification only). Full suite 0 failures / 4393 passing / 4 pre-existing warnings. `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes in 13m35s. PDF manual builds, 78 pages, with only the pre-existing `Rfn.summary` pdftex cross-reference warning. No NEWS entry is owed: `axes_reliability()` and its FIML path are both unreleased (2.0.0 is the dev version), the existing NEWS text never promised the small-N warning this milestone stops, and every change here is to a guard message, a comment, or a warning's firing condition inside a feature NEWS already describes generically.
 - 2026-08-02: **returned by /milestone-review (first return).** Status review→in-progress. Every gate clean — `cairn_validate` 16/16 PASS, `check(args = "--no-manual")` 0/0/0, `document()` no diff, pkgdown clean, PDF manual 78 pages — and the blame-history and prior-review lenses both returned no findings. Three diff-bug findings clear the return floor: F1 (95) the EM-stall regex made only ONE of two inter-word gaps whitespace-tolerant, so it still fails at nine widths in 20–250 while the fully-tolerant pattern fails at none, leaving detection back on the `em.h1` stem AC1 exists to remove; F4 (92) the thin-overlap warning's new `min_coverage < n_used` clause suppresses the warning under heavy unit nonresponse, because `n_used` is counted after all-missing rows are dropped — reproduced at 120 respondents with 95 all-NA, where master warns and this branch is silent; F2 (90) the replacement comment claims the old literal "never fires", re-measured as firing at 209 of 231 widths. F3 (80) actioned with them: the AC1 test pins two width-80 strings and so could not catch either. No criterion ticked — the fixes change the code their evidence would come from.
+
+- 2026-08-02: substantive amendment to AC1, gated and accepted. Two clauses were false or too weak to hold their own fix: "The `fixed = TRUE` literal ... never fires" (F2's finding, inherited into the criterion), and a test bar of "asserts the first disjunct matches on both", which F3 showed is met by a test pinning one width. Amended to state the measured behavior — the literal fails at exactly the two gaps separating its three words, one of which is the width-80 break on both generations — and to require a sweep over every inter-word gap. Shown verbatim in chat before commit.
+- 2026-08-02: T7 done (F1, F2, F3). Break position, not width, is the thing the predicate is sensitive to: `lav_msg()` splits the message on whitespace and prefixes the chunk after a break with a newline and three spaces, so the break can land in any inter-word gap and only two of them can break this match. Measured exhaustively over all 12 gaps of each generation's diagnosis sentence: the old literal fails at 2 (gaps 11 and 12), the shipped one-gap pattern at 1 (gap 12, `using`/`EM`) — F1 — and `moments[[:space:]]+using[[:space:]]+EM` at none. That makes the test a 12-position sweep rather than a width sweep: finite, exhaustive over the domain `lav_msg` can break in, and independent of the installed lavaan's wrapping arithmetic. Mutation-verified — reverting to the one-gap pattern reddens the sweep with exactly two failures, one per generation. The comment's "never fires ... flips to TRUE only at width = 300" is replaced by that measurement, not reworded.
+- 2026-08-02: T8 done (F4, F5). The second clause now compares `min_coverage` against `n_used + n_dropped`, the respondent count the caller supplied, because `n_used` is counted after `axes_fiml_coverage()` drops all-missing rows: under heavy unit nonresponse every surviving row is complete, so `min_coverage == n_used` and the warning was suppressed where it was true. Reproduced at 120 respondents with 95 all-NA (`n_used` 25, `n_dropped` 95, `min_coverage` 25). The corrected form states the real invariant — equality holds if and only if the input frame had no missing cell at all — and discriminates all four cases: complete N=25 silent, complete N=200 silent, thin overlap at N=200 fires naming 20, unit nonresponse fires naming 25. Two candidates measured wrong and rejected: `nrow(mat)` (mat is row-filtered at R/axes_reliability.R:1162, so it equals `n_used` there) and `anyNA(mat)` (same reason). A third regression case on the row-drop path retires F5, which flagged that path as unexercised; mutation-verified, reverting to `n_used` reddens exactly that case.
+- 2026-08-02: T9 done (F13, below threshold, actioned at the user's gate choice). The AC5 shadow is now recomputed from `mat_m2[axes_fiml_coverage(mat_m2)$keep, ]`, mirroring the package's own call. This is robustness, not a bug fix, and does not redden under mutation: `axes_mar_m2()` leaves no all-missing row, so both forms agree on this fixture — which is exactly the accident the fix removes, and the same row-filter accounting that made F4 real.
+
+- 2026-08-02: checkpoint. T7-T9 verified on the one test file they touch (`test-axes-fiml.R`, 0 failures) plus the two mutation reversions; the full `devtools::test()` and the T10 re-gate (check, PDF manual) have NOT yet reported at this commit.
 
 ## Decisions
 

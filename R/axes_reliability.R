@@ -1239,15 +1239,21 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # no inferential meaning -- see axes_fiml_min_overlap.
       #
       # Both clauses are load-bearing. The second says the thinnest pair is
-      # thinner than the sample actually used, which is precisely "missingness
-      # thinned this pair": `min_coverage == n_used` holds if and only if every
-      # used row is complete. Without it the warning fired on any complete
-      # sample under 30, reporting missing-data thinness on a frame with no
-      # missing cell -- the sentence was then true of N and false of itself.
-      # Small N alone is not this function's business to remark on, and the
-      # listwise path does not remark on it either.
+      # thinner than the sample the CALLER SUPPLIED, which is precisely
+      # "missingness thinned this pair": equality holds if and only if the
+      # input frame had no missing cell at all. Without it the warning fired on
+      # any complete sample under 30, reporting missing-data thinness on a
+      # frame with no missing cell -- the sentence was then true of N and false
+      # of itself. Small N alone is not this function's business to remark on,
+      # and the listwise path does not remark on it either.
+      #
+      # The comparison is against `n_used + n_dropped` and NOT `n_used`, which
+      # is counted after axes_fiml_coverage() drops all-missing rows: under
+      # heavy unit nonresponse -- respondents who answered everything or
+      # nothing -- every surviving row is complete, so `n_used` alone equals
+      # min_coverage and silently suppressed a warning that was true.
       if (cvg$min_coverage < axes_fiml_min_overlap &&
-            cvg$min_coverage < cvg$n_used) {
+            cvg$min_coverage < cvg$n_used + cvg$n_dropped) {
         warning(
           "Some item pair(s) were jointly observed by as few as ",
           cvg$min_coverage, " respondent(s); the estimated correlation ",
