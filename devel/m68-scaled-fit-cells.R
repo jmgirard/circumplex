@@ -161,6 +161,15 @@ pop_diagnostic <- function(p) {
   )
 }
 
+# The sample-size sweep. This is the cell that separates the two candidate
+# explanations for a rejection rate above nominal at N = 600: an error in the
+# scaling factor, or the ML chi-square's own finite-sample upward bias. The
+# factor is a function of the population matrix and does not move with N, so if
+# the residual shrinks as N grows the factor is not what is producing it.
+# Run at the strong-axes population, whose c is pinned independently by AC2's
+# closed-form oracle.
+NSWEEP <- c(600L, 1200L, 2400L, 4800L)
+
 # ---- run --------------------------------------------------------------------
 
 t0 <- Sys.time()
@@ -175,6 +184,16 @@ for (nm in names(POPS)) {
     seeds, function(s) one_rep(p, s), mc.cores = CORES
   ))
   diags[[nm]] <- pop_diagnostic(p)
+}
+
+sweep <- list()
+for (nn in NSWEEP) {
+  message("sample-size sweep at N = ", nn, ": ", REPS, " replicates")
+  p <- POPS$strong
+  p$n <- nn
+  sweep[[as.character(nn)]] <- do.call(rbind, parallel::mclapply(
+    40000L + nn + seq_len(REPS), function(s) one_rep(p, s), mc.cores = CORES
+  ))
 }
 elapsed <- as.numeric(difftime(Sys.time(), t0, units = "mins"))
 
@@ -195,6 +214,9 @@ out <- list(
     lavaan_version = as.character(utils::packageVersion("lavaan"))
   ),
   cells = cells,
+  sweep = sweep,
+  sweep_n = NSWEEP,
+  sweep_population = "strong",
   population_diagnostics = diags
 )
 
@@ -218,6 +240,20 @@ report <- function(nm) {
   ))
 }
 for (nm in names(POPS)) report(nm)
+
+for (nn in names(sweep)) {
+  x <- sweep[[nn]]
+  ok <- stats::complete.cases(x)
+  df <- x[which(ok)[1], "df"]
+  rej <- mean(x[ok, "p"] < .05)
+  message(sprintf(
+    paste0("sweep N=%5s n_ok=%4d | mean(T)/df=%.4f mean(Ts)/df=%.4f | ",
+           "sd(Ts)/sqrt(2df)=%.4f | rej: unscaled=%.4f scaled=%.4f (+-%.4f)"),
+    nn, sum(ok), mean(x[ok, "chisq"]) / df, mean(x[ok, "chisq_scaled"]) / df,
+    stats::sd(x[ok, "chisq_scaled"]) / sqrt(2 * df),
+    mean(x[ok, "p_unscaled"] < .05), rej, sqrt(rej * (1 - rej) / sum(ok))
+  ))
+}
 message(sprintf("elapsed: %.1f min", elapsed))
 
 saveRDS(out, OUT)
