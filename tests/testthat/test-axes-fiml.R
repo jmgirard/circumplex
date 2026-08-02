@@ -808,10 +808,14 @@ test_that("the EM-stall predicate fires on both lavaan generations", {
     # disjunct was a `fixed = TRUE` literal "moments using EM". It fails at the
     # two gaps separating its three words, and the width-80 break lavaan
     # actually takes lands in one of them on BOTH generations, leaving
-    # detection there resting solely on the `em.h1` stem in the remedy sentence
-    # -- an option lavaan has already renamed once, and that rename is what
-    # broke this path on CI during M65. Strip the remedy sentence and the
-    # predicate must still fire on the diagnosis alone.
+    # detection there resting solely on the `em.h1` stem in the remedy
+    # sentence. lavaan renamed that option once already, at 0.7-1
+    # (`em.h1.iter.max` -> `em.h1.args$max_iter`) -- which did NOT break
+    # detection, both spellings containing `em.h1`; what it broke was
+    # axes_fiml_em_args(), a different seam, and that is the M65 CI failure.
+    # A FURTHER rename dropping the stem would silence detection outright,
+    # which is why the diagnosis half has to carry it alone. Strip the remedy
+    # sentence and the predicate must still fire on the diagnosis alone.
     stripped <- paste0(strsplit(msg, "EM;", fixed = TRUE)[[1]][[1]], "EM.")
     expect_false(grepl("em\\.h1", stripped))
     expect_true(axes_fiml_em_stalled(simpleWarning(stripped)))

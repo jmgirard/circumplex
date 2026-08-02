@@ -30,7 +30,7 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
 
 ## Acceptance criteria
 
-- [ ] **AC1 (EM-stall predicate fires on both lavaan generations, at every wrap
+- [x] **AC1 (EM-stall predicate fires on both lavaan generations, at every wrap
   position).** A test feeds `axes_fiml_em_stalled()` the real wrapped warning
   text from lavaan 0.6.21 and 0.7.2 (captured with `dput(conditionMessage(w))`,
   not retyped) and asserts the *first* disjunct matches on both. Because lavaan
@@ -43,7 +43,7 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
   generations, leaving detection there resting solely on
   `grepl("em\\.h1", msg)`, whose stem lavaan has already renamed once. Its
   comment is corrected to that measured behavior, not merely reworded.
-- [ ] **AC2 (fit-measure guard is honest on every mismatch).** The guard at
+- [x] **AC2 (fit-measure guard is honest on every mismatch).** The guard at
   `R/axes_reliability.R:1574-1590` names the actual problem for a non-drop
   mismatch (today `identical(names(fm), want)` with a `setdiff()` message
   degenerates to "(missing: )" when only the *order* differs); the six `$fit`
@@ -51,20 +51,20 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
   lavaan drop cannot leave a hole the current assertions pass over; and the
   "silently, no warning" comment is corrected — lavaan 0.7.2 emits
   `unknown fit measure`.
-- [ ] **AC3 (thin-overlap warning distinguishes thin from small).** On complete
+- [x] **AC3 (thin-overlap warning distinguishes thin from small).** On complete
   data with N < 30 the warning either does not fire or says what is actually
   true — today it reports "Some item pair(s) were jointly observed by as few as
   N respondent(s)" on data with no missing cells at all, because
   `min_coverage` equals N. A regression test covers complete data at N < 30 and
   genuinely thin overlap at N ≥ 30 separately.
-- [ ] **AC4 (`n_complete` documented as it behaves).** The `@return` text no
+- [x] **AC4 (`n_complete` documented as it behaves).** The `@return` text no
   longer implies `n_complete` is FIML-only; it is set on every path. Verified
   against the built Rd.
-- [ ] **AC5 (the FIML OLS shadow consumes R̂).** A suite assertion discriminates
+- [x] **AC5 (the FIML OLS shadow consumes R̂).** A suite assertion discriminates
   the FIML correlation matrix from an available-case correlation — discriminative
   only under an M2-style MAR mechanism, where the two differ; a complete-data or
   MCAR fixture cannot tell them apart and must not be used as the fence.
-- [ ] **AC6 (gate clean).** `devtools::test()` and
+- [x] **AC6 (gate clean).** `devtools::test()` and
   `devtools::check(args = "--no-manual")` clean, plus a built PDF manual since
   AC4 changes roxygen.
 
@@ -124,6 +124,7 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
 
 - 2026-08-02: checkpoint. T7-T9 verified on the one test file they touch (`test-axes-fiml.R`, 0 failures) plus the two mutation reversions; the full `devtools::test()` and the T10 re-gate (check, PDF manual) have NOT yet reported at this commit.
 - 2026-08-02: T10 done, status in-progress→review (second time). Full suite 0 failures / 4421 passing / 4 pre-existing warnings — 28 more assertions than the first pass's 4393, which is the 24-position gap sweep plus the third thin-overlap case. `devtools::document()` no diff (this pass changed no roxygen at all; the AC1 amendment is tracking-only). `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes in 13m22s. PDF manual 78 pages, unchanged from the first pass, with no warning outside the pre-existing `Rfn.*` external-link class. NEWS still owes no entry, on the first pass's reasoning: the feature is unreleased, and F1/F4 correct guards that never shipped.
+- 2026-08-02: review second pass. All six criteria verified with fresh evidence and ticked; gates clean (cairn_validate 16/16, test 0/4421, check 0/0/0 in 18m08s, document() no diff, pkgdown clean, PDF 78pp). Fan-out returned 17 candidates from the diff-bug lens, one at or above 80: F18 (90), a false causal claim in the AC1 test comment about which lavaan rename broke CI, fixed in place at review. Not a return - a test comment is not a defect in what the package does for users, and AC1 own comment clause covers the source comment, which was already right. 16 findings logged below threshold, including F19 (42), the padded-frame asymmetry, which re-litigates the first pass F4 (92) holding rather than falsifying AC3 as written.
 
 ## Decisions
 
@@ -203,3 +204,139 @@ pre-existing; F15 (8) the reviewer's clean-bill note.
 does for its users, and F2 additionally falsifies AC1's own "its comment ... is
 corrected, not merely reworded" clause. First defect return for this milestone.
 
+
+### Second pass — 2026-08-02 (PR #93)
+
+**Outcome: all six criteria verified, one finding fixed in place, no return.**
+Every gate fresh by command. The independent fan-out returned 17 candidates
+from one lens; a fresh scorer put exactly one at or above 80.
+
+**Gates (all clean, all fresh).** `cairn_validate` exit 0, 16 of 16 CHECKs PASS
+— including `coverage complete` against the amended Coverage map and
+`binding criteria`; the 47 `work-log format` advisories are all pre-existing M7
+lines, none from this milestone. No DESIGN principle changed
+(`Principles touched: —`), so `cairn_impact` is skipped. Toolchain
+`consistency-gate`: `document()` no diff; `man/`, `NAMESPACE`, `src/` and
+`data/` untouched by the diff; README.Rmd/README.md untouched; no new
+top-level files, so no `.Rbuildignore` entry is owed; `pkgdown::check_pkgdown()`
+clean; `devtools::test()` 0 failures / 4421 passing / 4 pre-existing warnings;
+`devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings /
+0 notes in 18m08s. NEWS carries no entry and none is owed, verified rather than
+inherited: CRAN holds 1.2.0, so 2.0.0 and the whole `axes_reliability()` FIML
+path are unreleased.
+
+**AC1 — verified.** The predicate is
+`grepl("moments[[:space:]]+using[[:space:]]+EM", msg) || grepl("em\\.h1", msg)`
+(`R/axes_fiml.R:97`): both inter-word gaps whitespace-tolerant. The test sweeps
+every inter-word gap of each generation's diagnosis sentence
+(`tests/testthat/test-axes-fiml.R:824`) rather than pinning a captured width.
+Measured at review over all 12 gaps per generation: the old `fixed = TRUE`
+literal fails at 2 (gaps 11 and 12), the first pass's one-gap pattern at 1
+(gap 12), the shipped pattern at none — and the diff-bug lens independently
+drove the sentence through lavaan's own `lav_msg()` at every width 20-250 and
+found 0 failures. The source comment states that measured behavior.
+
+**AC2 — verified.** The guard keys on membership, `if (!all(want %in% names(fm)))`,
+then imposes the order itself with `fm <- fm[want]`, so the degenerate
+"(missing: )" message is unreachable for a non-drop mismatch. The six `$fit`
+names are pinned literally at `tests/testthat/test-axes-fiml.R:251`
+(`chisq`, `df`, `pvalue`, `rmsea`, `cfi`, `srmr`) and asserted on both the
+listwise and FIML objects. The former "silently, no warning" comment now
+records the measured version split — the drop is common to 0.6.21 and 0.7.2,
+only the silence is version-specific.
+
+**AC3 — verified.** The clause is
+`cvg$min_coverage < axes_fiml_min_overlap && cvg$min_coverage < cvg$n_used + cvg$n_dropped`
+(`R/axes_reliability.R:1255-1256`). Measured at review on four frames: complete
+N = 25 silent, complete N = 200 silent, thin overlap at N = 200 with one item
+held to 20 fires and names 20, and 120 respondents of whom 95 answered nothing
+fires and names 25. The regression test carries complete data at N < 30 and
+genuinely thin overlap at N >= 30 as separate assertions, plus a third case on
+the row-drop path. The diff-bug lens confirmed
+`n_used + n_dropped == nrow(mat)` is a guaranteed identity —
+`axes_fiml_coverage()` sets `keep <- rowSums(!is.na(mat)) > 0L` with
+`length(keep) == nrow(mat)` and no NA path — and that the clause can never
+suppress a genuinely thin pair.
+
+**AC4 — verified against the built Rd.** `man/axes_reliability.Rd:82-86` states
+that `n_complete` and `min_coverage` "are present on every path so that a
+caller can read them unconditionally", naming the NA cases explicitly. Measured
+at review on all three paths at this commit: listwise `n_complete = 200`,
+`min_coverage = NA`; fiml `89` / `89`; cormat `NA` / `NA`. The Rd says what the
+code does, and nothing in it implies `n_complete` is FIML-only.
+
+**AC5 — verified.** `tests/testthat/test-axes-fiml.R:1339-1349` recomputes the
+shadow from `axes_fiml_moments(mat_m2[keep_m2, ])$R` — mirroring the package's
+own row filter — and asserts it equals the shipped `details$ols_shadow`, with
+an `expect_gt` separation check against the available-case candidate so the
+equality cannot pass vacuously. The fence is discriminative by construction and
+by measurement: the two candidates separate by 6.18e-02 on xi1 under M2's MAR
+mechanism, where under MCAR they agree to ~1e-4, so no complete-data or MCAR
+fixture could carry the claim.
+
+**AC6 — verified.** `devtools::test()` 0 failures / 4421 passing / 4
+pre-existing warnings. `devtools::check(args = "--no-manual")` Status OK,
+0 errors / 0 warnings / 0 notes in 18m08s. PDF manual builds at 78 pages, with
+no warning outside the pre-existing `Rfn.*` external-link class.
+
+### Independent review — three lenses, then a scorer
+
+The **[S] blame-history** lens returned no regressions, re-deriving each check
+rather than trusting the work log: every touched line traces to `d2c48b446`
+(M65), M65-D2's warn-never-refuse holding survives (the site still only
+`warning()`s), BC7 clause (iii)'s hard zero-coverage refusal sits outside every
+diff hunk, and no test assertion was dropped without a replacement of equal or
+greater strength. The **[S] prior-review** lens returned no findings: F1, F2 and
+F4 are genuinely closed rather than restated in new form, the below-threshold
+F5-F16 code is untouched, and the GitHub inline-comment probe came back empty
+again, so archived `## Review` sections were the evidence base. The **[O]
+diff-bug** lens returned 17 findings, scored by a fresh **[S]** scorer that did
+not generate them and that held the diff and this plan.
+
+**Actioned (>= 80): one.**
+
+- **F18 (90) — a false causal claim in the AC1 test comment.** It read "an
+  option lavaan has already renamed once, and that rename is what broke this
+  path on CI during M65". Verified false against `cairn/LESSONS.md`: the 0.7-1
+  rename was `em.h1.iter.max` -> `em.h1.args$max_iter`, and BOTH spellings
+  contain `em.h1`, so that rename never touched detection; what it broke was
+  `axes_fiml_em_args()`, a different seam. Exactly the class this milestone's
+  Goal exists to close, and the same class as the first pass's F2 (90). Fixed
+  in place at review: the comment now names the rename, states that detection
+  survived it, names the seam that did break, and keeps the point that stands —
+  a FURTHER rename dropping the stem would silence detection outright. The
+  source comment at `R/axes_fiml.R:88-90` already had this right and is
+  unchanged. Comment-only, in a test file; `test-axes-fiml.R` re-run clean.
+
+**Not a return.** F18 is the sole actioned finding and clears neither branch of
+the return floor: a comment in a test file is not a defect in what the package
+does for its users, and AC1's "its comment is corrected" clause refers to the
+predicate's own comment, which the lens confirms is correct. Triage was
+therefore fix-now with no status change. The first pass's defect return remains
+the only one.
+
+**Below threshold — logged, not actioned (IP3): 16.** F19 (42) the new clause
+warns on a frame padded with all-NA rows where every used row is complete, so
+the warning tracks whether blank rows were left in rather than what the
+estimator sees — reproduced at review (29 complete + 6 all-NA warns; the same
+29 rows alone are silent), but this is the unit-nonresponse case the first
+pass's F4 (92) decided must warn, and AC3's clause is scoped to complete data;
+F20 (65) the mocked order-only test asserts names but not that values travelled
+with them, so `names(fm) <- want` would pass it (F11 restated); F21 (65) the AC5
+separation check still computes the available-case candidate on the unfiltered
+matrix while the FIML candidate is now filtered (F13 half-retired); F22 (60) the
+`em.h1` disjunct's remaining exposure is a false positive on any lavaan warning
+merely mentioning `em.h1.args`; F23 (55) the clause reconstructs `n_total`,
+already in scope at `R/axes_reliability.R:1120`; F24 (55) the "missing: )"
+assertion is tautological given the `expect_match` above it (F10); F25 (45)
+thin-overlap case (a) pins neither `min_coverage` nor the threshold constant
+(F12); F26 (45) the AC5 comment mixes a relative tolerance with an absolute bar
+(F14); F27 (42) the sweep's comment claims a finite-domain proof over break
+SETS that a single-break sweep does not deliver, harmless because the two
+clauses are independent; F28 (38) `axes_fiml_min_overlap`'s doc comment is stale
+on an unmodified line (F6); F29 (35) the "small N alone is not this function's
+business" comment reads oddly when `n_dropped > 0`; F30 (35) case (c) encodes
+F19's behavior as intended; F31 (35) `expect_gt(n_gap, 0L)` is near-vacuous;
+F32 (30) and F33 (30) the guard accepts a duplicate-named or over-long `fm`
+where `identical()` refused (F8/F16); F34 (15) the `p == 1` NA-propagation path
+is unreachable given `p >= n_scales >= 3`.
