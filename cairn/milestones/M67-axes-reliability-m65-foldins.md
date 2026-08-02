@@ -1,6 +1,6 @@
 # M67: M65 review fold-ins for the `axes_reliability()` FIML path
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M66
 - **Driving RR:** —
@@ -85,7 +85,7 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
   at `R/axes_reliability.R:1211-1221`, with the two-case regression test.
 - [x] **T4 — `@return` text for `n_complete`.**
 - [x] **T5 — OLS-shadow R̂ assertion**, on an M2-style MAR fixture.
-- [ ] **T6 — gate.** Tests, check, PDF manual.
+- [x] **T6 — gate.** Tests, check, PDF manual.
 
 ## Work log
 
@@ -99,6 +99,7 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
 - 2026-08-02: T4 done — verification only, no edit. M65's own T9 already corrected this text, and the shipped `man/axes_reliability.Rd:82-86` states both fields are present on every path with `min_coverage` NA outside FIML and both NA on `cormat`. Measured on all three paths at this commit: listwise 200/NA, fiml 144/189, cormat NA/NA. The Rd says what the code does.
 - 2026-08-02: T5 done. The live M2 replicate now makes one `axes_reliability()` call and asserts `details$ols_shadow` equals the shadow recomputed from `axes_fiml_moments(mat)$R` at 1e-8, against the available-case shadow measured 6.176e-02 away on ξ1 (0.3363 vs 0.2745) — reproducing RR12's 6.18e-02 and leaving the fence six orders inside the separation. Discriminative by construction: under MCAR the two candidates agree to ~1e-4, so no complete-data or MCAR fixture could carry this claim. Mutation-verified rather than assumed — substituting `stats::cor(mat, use = "pairwise.complete.obs")` for `mom$R` in the FIML branch reddens it (0.2745 against the expected 0.3363), then restored.
 - 2026-08-02: T2–T5 share one gate run: full suite 0 failures / 4393 passing / 4 pre-existing warnings.
+- 2026-08-02: T6 done, status in-progress→review. `devtools::document()` no diff (no roxygen changed this milestone — T4 was verification only). Full suite 0 failures / 4393 passing / 4 pre-existing warnings. `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes in 13m35s. PDF manual builds, 78 pages, with only the pre-existing `Rfn.summary` pdftex cross-reference warning. No NEWS entry is owed: `axes_reliability()` and its FIML path are both unreleased (2.0.0 is the dev version), the existing NEWS text never promised the small-N warning this milestone stops, and every change here is to a guard message, a comment, or a warning's firing condition inside a feature NEWS already describes generically.
 
 ## Decisions
 
