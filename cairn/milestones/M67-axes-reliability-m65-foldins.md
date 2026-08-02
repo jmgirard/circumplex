@@ -1,11 +1,11 @@
 # M67: M65 review fold-ins for the `axes_reliability()` FIML path
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M66
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m67-axes-m65-foldins`
+- **Branch/PR:** `m67-axes-m65-foldins` / https://github.com/jmgirard/circumplex/pull/93
 
 ## Goal
 
@@ -100,7 +100,83 @@ and a discriminative suite assertion that the FIML OLS shadow consumes R̂.
 - 2026-08-02: T5 done. The live M2 replicate now makes one `axes_reliability()` call and asserts `details$ols_shadow` equals the shadow recomputed from `axes_fiml_moments(mat)$R` at 1e-8, against the available-case shadow measured 6.176e-02 away on ξ1 (0.3363 vs 0.2745) — reproducing RR12's 6.18e-02 and leaving the fence six orders inside the separation. Discriminative by construction: under MCAR the two candidates agree to ~1e-4, so no complete-data or MCAR fixture could carry this claim. Mutation-verified rather than assumed — substituting `stats::cor(mat, use = "pairwise.complete.obs")` for `mom$R` in the FIML branch reddens it (0.2745 against the expected 0.3363), then restored.
 - 2026-08-02: T2–T5 share one gate run: full suite 0 failures / 4393 passing / 4 pre-existing warnings.
 - 2026-08-02: T6 done, status in-progress→review. `devtools::document()` no diff (no roxygen changed this milestone — T4 was verification only). Full suite 0 failures / 4393 passing / 4 pre-existing warnings. `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes in 13m35s. PDF manual builds, 78 pages, with only the pre-existing `Rfn.summary` pdftex cross-reference warning. No NEWS entry is owed: `axes_reliability()` and its FIML path are both unreleased (2.0.0 is the dev version), the existing NEWS text never promised the small-N warning this milestone stops, and every change here is to a guard message, a comment, or a warning's firing condition inside a feature NEWS already describes generically.
+- 2026-08-02: **returned by /milestone-review (first return).** Status review→in-progress. Every gate clean — `cairn_validate` 16/16 PASS, `check(args = "--no-manual")` 0/0/0, `document()` no diff, pkgdown clean, PDF manual 78 pages — and the blame-history and prior-review lenses both returned no findings. Three diff-bug findings clear the return floor: F1 (95) the EM-stall regex made only ONE of two inter-word gaps whitespace-tolerant, so it still fails at nine widths in 20–250 while the fully-tolerant pattern fails at none, leaving detection back on the `em.h1` stem AC1 exists to remove; F4 (92) the thin-overlap warning's new `min_coverage < n_used` clause suppresses the warning under heavy unit nonresponse, because `n_used` is counted after all-missing rows are dropped — reproduced at 120 respondents with 95 all-NA, where master warns and this branch is silent; F2 (90) the replacement comment claims the old literal "never fires", re-measured as firing at 209 of 231 widths. F3 (80) actioned with them: the AC1 test pins two width-80 strings and so could not catch either. No criterion ticked — the fixes change the code their evidence would come from.
 
 ## Decisions
 
 ## Review
+
+### First pass — 2026-08-02 (PR #93)
+
+**Outcome: returned to `in-progress`.** Every mechanical gate is clean, but three
+findings clear the return floor. No acceptance criterion is ticked: the fixes
+change the code each criterion's evidence would come from.
+
+**Gates (all clean, all fresh by command).** `cairn_validate` exit 0, 16 of 16
+CHECKs PASS (the 47 `work-log format` advisories are all pre-existing M7 lines,
+none from this milestone). No DESIGN principle changed, so `cairn_impact` is
+skipped. Toolchain `consistency-gate`: `document()` no diff; `man/`, `NAMESPACE`
+and `src/` untouched by the diff; README.Rmd/README.md untouched and unaffected;
+`pkgdown::check_pkgdown()` clean; `devtools::check(args = "--no-manual")`
+0 errors / 0 warnings / 0 notes in 18m06s; PDF manual builds at 78 pages. NEWS
+carries no entry, and none is owed — the whole feature is unreleased and NEWS
+never promised the behavior this milestone changes.
+
+### Independent review — three lenses, then a scorer
+
+The **[S] blame-history** lens returned no regressions: each change traces to a
+specific M65 finding logged as deferred to the milestone that next touches this
+code, M65-D2's warn-never-refuse holding survives, BC7 clause (iii)'s hard
+zero-coverage refusal is untouched, and the M65-D3 test lost no assertion when
+`est_of()` gave way to a direct call. The **[S] prior-review** lens returned no
+findings; the GitHub inline-comment probe came back empty, so archived
+`## Review` sections were the evidence base. The **[O] diff-bug** lens returned
+15 findings, scored by a fresh **[S]** scorer that did not generate them.
+
+**Actioned (>= 80): four.**
+
+- **F1 (95) — the EM-stall regex is still width-fragile, so AC1's whole point is
+  unmet.** Only one of the two inter-word gaps was made whitespace-tolerant:
+  `"moments[[:space:]]+using EM"` leaves `using EM` a literal space, and lavaan
+  re-wraps at `getOption("width")` at emission time, so the break lands in
+  either gap depending on width. Re-verified at review across widths 20-250: the
+  shipped pattern fails at nine of them while
+  `"moments[[:space:]]+using[[:space:]]+EM"` fails at none. An unmatched warning
+  is muffled and `converged` stays `TRUE`, so detection falls back to the
+  `em.h1` stem — the single point of failure AC1 exists to remove.
+- **F4 (92) — the new second clause suppresses the warning on heavy unit
+  nonresponse.** `n_used` is counted AFTER `axes_fiml_coverage()` drops
+  all-missing rows, so a frame whose respondents either answered everything or
+  answered nothing has every used row complete and `min_coverage == n_used`.
+  Reproduced at review: 120 respondents, 95 of them all-NA, 16 items -- `n_used`
+  25, `min_coverage` 25, and NO warning fires where master warns. The suppressed
+  sentence is true there.
+- **F2 (90) — the replacement comment states a measured fact that is false**, in
+  a milestone whose Goal is closing comments that say what the code does not do.
+  It claims the old literal "never fires ... flips to TRUE only at width = 300";
+  re-measured at review, the literal fires at 209 of 231 widths and fails at the
+  default 80, which is all the evidence supports. Repeated in the test comment
+  ("matched NEITHER generation") and inherited from AC1's own wording.
+- **F3 (80) — the AC1 test cannot catch F1 or F2.** It pins two frozen width-80
+  strings and calls the predicate directly, so it characterizes one width rather
+  than the wrap-sensitivity its own comment names as the subject.
+
+**Below threshold — logged, not actioned (IP3):** F5 (75) the AC3 test never
+exercises the row-drop path F4 lives in; F11 (68) the mocked order-only test
+asserts names but not that values travelled with them; F13 (62) the AC5
+recomputation calls `axes_fiml_moments()` on the unfiltered matrix while the
+package calls it on `mat[cvg$keep, ]`, safe only because `axes_mar_m2()` leaves
+no all-NA row; F10 (55) the `"missing: )"` assertion is tautological given the
+`expect_match` above it; F12 (45) thin-overlap case (a) has no error containment
+at N = 25 with p = 16; F14 (45) the AC5 comment mixes a relative tolerance with
+an absolute bar; F6 (35) `axes_fiml_min_overlap`'s doc comment is stale but sits
+on an unmodified line; F7 (30) AC2 is satisfied by dissolving the non-drop
+mismatch rather than naming it, which is the design T2 specified; F8 (30) and
+F16 (30) the guard now accepts an over-long or duplicate-named `fm` where
+`identical()` refused; F9 (20) the guard checks names but not finiteness,
+pre-existing; F15 (8) the reviewer's clean-bill note.
+
+**Return floor.** F1, F4 and F2 each score >= 90 on defects in what the package
+does for its users, and F2 additionally falsifies AC1's own "its comment ... is
+corrected, not merely reworded" clause. First defect return for this milestone.
+
