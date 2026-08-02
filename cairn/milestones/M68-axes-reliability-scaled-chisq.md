@@ -1,9 +1,9 @@
 # M68: Scaled global test statistic for `axes_reliability()`
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
-- **Driving RR:** —
+- **Driving RR:** RR14
 - **Principles touched:** —
 - **Branch/PR:** `m68-axes-reliability-scaled-chisq`
 
@@ -16,125 +16,187 @@ machinery M66 built for the component standard errors.
 
 ## Scope
 
-**In:**
-- A new `R/axes_scaled_fit.R` computing the scaling factor
-  `c = tr(U Γ_R) / df` at the fitted Σ̂, and the independence model's own
-  factor `c_b`, where `Γ_R` is the asymptotic covariance of the sample
-  correlation matrix and `U = W − W Δ (Δ' W Δ)^-1 Δ' W`.
-- `$fit$chisq`, `$pvalue`, `$rmsea` and `$cfi` become the scaled values on all
-  three input paths (raw-listwise, `cormat`, `missing = "fiml"`); `$fit$df` and
-  `$fit$srmr` are untouched. lavaan's unscaled six land in
-  `details$fit_uncorrected`, the factors in `details$scaling_factor`.
-- Source notes for the two papers the shipped formula code relies on:
-  `satorra1994.md` (the scaling correction) and `cudeck1989.md` (the
-  correlation-as-covariance analysis M66 already cites at
-  `R/axes_corrected_se.R:22` without a page).
-- Rewriting every caveat surface that currently tells the user the fit
-  statistics are uncorrected.
+**In:** `R/axes_scaled_fit.R` computing `c = tr(U Γ_R)/df` at the fitted Σ̂ and
+the independence model's own `c_b`; `$fit$chisq`, `$pvalue`, `$rmsea` and
+`$cfi` become the scaled values on all three input paths (raw-listwise,
+`cormat`, `missing = "fiml"`), with lavaan's unscaled six in
+`details$fit_uncorrected` and the factors in `details$scaling_factor`; source
+notes for `satorra1994` and `cudeck1989`; every caveat surface rewritten. The
+full scope statement is D-036 and is not restated here.
 
-**Out:**
-- A scaled *difference* test for nested model comparison — no such comparison
-  exists in this API; becomes a candidate row.
-- SRMR, which is a residual summary rather than a test statistic and carries
-  no scaling factor; its own metric question stays where M65 left it.
-- Correcting `ssm_sem()`, which lives on the covariance metric and is not
-  implicated (D-035).
+**Out:** a scaled *difference* test — no such comparison exists in this API
+(candidate row); SRMR and `$fit$df`, neither a test statistic with a reference
+distribution to recalibrate; `ssm_sem()`, which lives on the covariance metric
+and is unimplicated (D-035); a Swain/Bartlett-type small-sample mean correction
+to `T`, which RR14 shows would close the residual small-N gap but which is
+future work, not M68 (candidate row).
 
 ## Acceptance criteria
 
-- [ ] **AC1** — On raw-listwise, `cormat` and `missing = "fiml"` alike,
-      `$fit$chisq`, `$pvalue`, `$rmsea` and `$cfi` are computed from
-      `T_s = T / c` (with `$cfi` also using `c_b`); `$fit$df` and `$fit$srmr`
-      are bit-identical to the values the current code returns; and
-      `details$fit_uncorrected` and `details$scaling_factor` are present on
-      every path. No path returns a scaled statistic beside an unscaled one
-      *among the four χ²-derived statistics*, verified by a test that reads all
-      four from each of the three paths.
-- [ ] **AC2** — The factor is backed by two independent oracle types.
-      *Closed-form:* an explicit vech-space routine forming `Γ_R`, `W`, `Δ` and
-      `U` as literal matrices, agreeing with the shipped trace-identity
-      implementation to ≤ 1e-8 relative on the canonical octant probe, a
-      6-scale map and a one-item-per-scale map, citing `satorra1994 (p. N)`.
-      *Simulation-coverage:* AC3. RR13's `E[T] = 261.1` against `df = 273` at
-      its probe population (8 scales × 3 items, ξ1 = .35, ξ2 = .10, ζ1 = .08,
-      N = 600; RR13 W-A) is **corroborating** to ≤ 0.5, not a gate — RR13 ships
-      no reproduction code for it, so a miss escalates rather than fails.
-- [ ] **AC3** — Over 2000 replicates at each of three complete-data
-      populations — strong-axes (ξ1 ≈ .35), the Strack Table 3 COC-Other
-      weak-axes/strong-general row, and the anti-conservative corner
-      (ξ1 ≤ .05, ξ2 ≈ .6, large `p`) — `mean(T_s) / df` ∈ [0.97, 1.03] and the
-      empirical rejection rate of `$fit$pvalue` at α = .05 ∈ [.036, .064]
-      (±2.8 MC SE, the RR13 Q5 band), with the unscaled rate recorded
-      alongside. Harness follows M65's: seed-pinned `devel/` generator,
-      committed `.rds` summary, fast live smoke cell in the suite.
-- [ ] **AC4** — On the FIML path, regenerating from the stored seeds of the
-      M65 fixture's 2 / 5 / 10 % MCAR cells and the M66 fixture's 201-replicate
-      M1 MAR cell, `mean(T_s) / df` ∈ [0.95, 1.05] in every cell; and the
-      `em_stalled` refusal still fires before any scaled statistic is computed
-      (test drives a stalled EM and asserts the refusal message, not a value).
-- [ ] **AC5** — No user-facing surface still states the global fit statistics
-      are uncorrected. The enumerating procedure is `grep -rn` over `R/`,
-      `man/`, `vignettes/`, `NEWS.md` and `tests/testthat/` for `flattered`,
-      `not corrected`, `261.1` and `approximate`; each hit is dispositioned in
-      the work log as (a) updated to the corrected contract, (b) a historical
-      reference inside a NEWS entry for an already-released version, or (c) an
-      unrelated use of the term, listed and left untouched.
-- [ ] **AC6** — `cairn/references/satorra1994.md` and
-      `cairn/references/cudeck1989.md` exist, authored from
-      `templates/source-note.md` with provenance blocks and page/equation
-      anchors for the scaling formula and the correlation-metric result; both
-      carry `INDEX.md` lines; `R/axes_scaled_fit.R` and `R/axes_corrected_se.R`
-      cite them as `citekey (p. N)`.
-- [ ] **AC7** — `devtools::document()` produces no diff; `devtools::test()` and
+AC1-AC6 are plan-owned; AC7-AC14 are RR14's binding criteria BC1-BC8, ingested
+verbatim and mechanically diffed against `cairn/reviews/RR14-*.md`, with no
+departures and so no "Deviations from RR14" table. The plan's original AC3
+(a rejection-rate band at N = 600) is **superseded** by AC7-AC9 and AC14 —
+RR14 Q2/Q5 showed it demanded what no scaling factor can deliver — and the
+remaining plan-owned criteria are renumbered contiguously, so AC4-AC7 of the
+original plan are AC3-AC6 here.
+
+- [ ] **AC1** — All three input paths compute `$fit$chisq`, `$pvalue`, `$rmsea`
+      and `$cfi` from `T_s = T / c` (`$cfi` also using `c_b`); `$fit$df` and
+      `$fit$srmr` stay bit-identical; `details$fit_uncorrected` and
+      `details$scaling_factor` present on every path; no path returns a scaled
+      statistic beside an unscaled one among the four, verified by a test
+      reading all four from each path.
+- [ ] **AC2** — Two independent oracle types. *Closed-form:* an explicit
+      vech-space routine forming `Γ_R`, `W`, `Δ` and `U` as literal matrices,
+      agreeing with the shipped trace-identity implementation to ≤ 1e-8 relative
+      on the octant probe, a 6-scale map and a one-item-per-scale map, citing
+      `satorra1994 (p. N)`, and carrying AC13's entrywise `Γ_R` check.
+      *Simulation-coverage:* AC7-AC9. RR13's `E[T] = 261.1` against `df = 273`
+      corroborates to ≤ 0.5 but does not gate — RR13 ships no reproduction code,
+      so a miss escalates.
+- [ ] **AC3** — On the FIML path, regenerating from the M65 fixture's 2/5/10 %
+      MCAR seeds and the M66 fixture's 201-replicate M1 MAR cell,
+      `mean(T_s)/df` ∈ [0.95, 1.05] in every cell; and the `em_stalled` refusal
+      still fires before any scaled statistic is computed.
+- [ ] **AC4** — No user-facing surface still says the global fit statistics are
+      uncorrected: `grep -rn` over `R/`, `man/`, `vignettes/`, `NEWS.md` and
+      `tests/testthat/` for `flattered`, `not corrected`, `261.1`, `approximate`,
+      every hit dispositioned in the work log as (a) updated, (b) historical
+      inside a released-version NEWS entry, or (c) unrelated and listed. Re-run
+      after AC11's edits.
+- [ ] **AC5** — `satorra1994.md` and `cudeck1989.md` exist with provenance
+      blocks and page anchors, both carry `INDEX.md` lines, and
+      `R/axes_scaled_fit.R` / `R/axes_corrected_se.R` cite them as
+      `citekey (p. N)`.
+- [ ] **AC6** — `devtools::document()` no diff; `devtools::test()` and
       `devtools::check()` clean (0 errors, 0 warnings; NOTEs justified).
+- [ ] **AC7** (BC1): At each of the three AC3 populations (strong-axes, Strack COC S16
+      Other weak-axes, anti-conservative corner), N = 600, ≥ 2000 replicates
+      produced by the seed-pinned generator `devel/m68-scaled-fit-cells.R` with
+      its per-replicate summary committed at
+      `tests/testthat/fixtures/m68-scaled-fit-cells.rds`:
+      `mean(T_s)/df ∈ [0.97, 1.03]`. (Measured: 1.0204 / 1.0139 / 1.0227.)
+- [ ] **AC8** (BC2): At the strong-axes population, N = 4800, ≥ 2000 replicates from
+      the same seed-pinned generator, stored in the same committed fixture:
+      empirical rejection rate of `$fit$pvalue` at α = .05 within `[.036, .064]`
+      (nominal ± 2.8 MC SE at 2000 replicates). (Measured: .0540 ± .0051;
+      independent 3000-replicate run .0500 ± .0040.)
+- [ ] **AC9** (BC3): At each of the three populations, N = 600, the scaled and
+      unscaled rejection rates at α = .05 — computed from the committed fixture's
+      per-replicate `p` and `p_unscaled` columns, not stored as separate scalars
+      — are reported in the milestone (committed scaled: .0790 / .0630 / .1070;
+      committed unscaled: .0270 / .0200 / .0215). A same-environment rerun of the
+      generator (same seeds, same R and lavaan versions) must reproduce each rate
+      exactly (agreement to ≤ 1e-12); for a regeneration under a changed
+      environment (R or lavaan version drift) or with new seeds, each rate must
+      lie within ±.021 (≈ 3 MC SE at 2000 replicates) of its committed value.
+      These are regression fences, not calibration claims; a breach escalates
+      rather than being re-fenced, and an escalation that accepts new values must
+      update BC5's documented numbers in the same change.
+- [ ] **AC10** (BC4): From the committed fixture's per-replicate `chisq` and `cfactor`
+      columns, at each N = 600 cell: |rej(T/ĉ) − rej(T/c_pop)| ≤ .005 at
+      α = .05, recording that the tail excess is not factor-estimation noise.
+      `c_pop` for each population is the fixture's own
+      `population_diagnostics$*$cfactor`. (Measured: ≤ .0005 in every cell;
+      relative sd(ĉ) ≤ .0024.)
+- [ ] **AC11** (BC5): Three user-facing surfaces carry the small-sample behaviour, at
+      two depths. The `axes_reliability()` roxygen Details and the vignette's
+      scaled-fit section each state, with these numbers: (i) the scaled statistic
+      is calibrated in mean and its test is asymptotically exact, approaching the
+      nominal rate as p\*/N falls — measured at the strong-axes population as
+      .092 / .079 / .062 / .054 at p\*/N = 0.50 / 0.25 / 0.12 / 0.06, reaching
+      the nominal band by p\*/N ≈ 0.06 (a single-population sweep; not stated as
+      a universal threshold); (ii) at N = 600 the scaled χ² test over-rejects at
+      α = .05 — measured .06–.11 at three populations chosen to bracket the
+      accepted input space — while the uncorrected statistic under-rejects
+      (.02–.03) and moves further from nominal as N grows; (iii) the
+      over-rejection at fixed N grows with instrument size (df) and shrinks with
+      N, so p-values near a chosen threshold at moderate N should be read
+      cautiously, with the error direction being over-flagging rather than
+      flattering; (iv) the rejection-rate evidence is complete-data — the FIML
+      path's scaled statistic is calibrated in mean (AC4) but its tail behaviour
+      is unmeasured, and the prose must not extend the rejection-rate claims to
+      it. All documented rates are the committed fixture's values (rounded) and
+      move only with it (BC3). Third surface: the printed note
+      `axes_fit_scaled_note` (`R/axes_reliability_oop.R`), which `summary()`
+      prints beside the χ²/RMSEA/CFI line, gains one sentence giving the
+      direction of the small-sample error (the test can modestly over-reject at
+      typical sample sizes) and pointing to `?axes_reliability` — direction and
+      pointer only, no rates, so the printed note cannot drift from the fixture.
+      No runtime warning is added for this.
+- [ ] **AC12** (BC6): No user-facing surface describes the scaling as a robustness
+      correction for non-normal data, established by an AC5-shaped sweep:
+      `grep -rin` over `R/`, `man/`, `vignettes/`, `NEWS.md` and
+      `tests/testthat/` for `robust`, `non-normal`, `nonnormal`,
+      `distribution-free`, `kurtosis` and `ADF`, with every hit dispositioned in
+      the work log as (a) updated, (b) a historical reference inside a NEWS entry
+      for an already-released version, or (c) an unrelated use (e.g.
+      `ssm_sem()`'s robust estimators), listed and left untouched. Additionally,
+      the `axes_reliability()` roxygen Details block carries at least one
+      sentence stating the factor is normal-theory and corrects the
+      correlation-versus-covariance metric only, whose presence the sweep log
+      records.
+- [ ] **AC13** (BC7): The AC2 vech oracle gains an independent off-diagonal check on
+      `Γ_R`: at least one probe map's `Γ_R` is compared entrywise (all cells,
+      not the diagonal only) against the closed normal-theory formula for
+      `n·cov(r_ij, r_kl)`, written out in the test itself:
+      `½ρ_ij ρ_kl (ρ_ik² + ρ_il² + ρ_jk² + ρ_jl²) + ρ_ik ρ_jl + ρ_il ρ_jk −
+      ρ_ij(ρ_ik ρ_il + ρ_jk ρ_jl) − ρ_kl(ρ_ik ρ_jk + ρ_il ρ_jl)`, agreeing to
+      ≤ 1e-12 absolute. This is an internal test-side recomputation, not shipped
+      formula code, so AC6's source-note requirement does not attach: the shipped
+      statistic nowhere relies on this identity, the formula is fully specified
+      above rather than by citation, and its own correctness is established by
+      the required agreement with the repo's independent delta-method route
+      (measured 3.3e-16 in this review) — a disagreement fails the suite rather
+      than shipping a wrong number. (Attribution to Olkin–Siotani may appear in a
+      comment; no PDF shelving gates this criterion.)
+- [ ] **AC14** (BC8): The regression evidence stands in the suite, not only in the work
+      log: a test file reads the committed fixture and asserts, from its stored
+      per-replicate columns, BC1's three means, BC2's rejection rate, BC3's six
+      rates against their fences, and BC4's ≤ .005 bound; and a fast live smoke
+      cell (following M65's harness pattern, ≤ ~20 replicates at one population)
+      runs the generator's replicate function end-to-end so a regression in the
+      wiring is caught without the 5-minute full run. Checkable:
+      `grep -rn m68-scaled-fit-cells tests/` is non-empty and the named
+      assertions are present.
 
 ## Coverage
 
-- AC1 → T3, T4
-- AC2 → T2
-- AC3 → T6
-- AC4 → T4, T7
-- AC5 → T5
-- AC6 → T1
-- AC7 → T8
+- AC1 → T3, T4 · AC2 → T2, T9 · AC3 → T4, T7 · AC4 → T5, T12 · AC5 → T1
+- AC6 → T8 · AC7 → T6 · AC8 → T6 · AC9 → T6, T10 · AC10 → T10
+- AC11 → T11 · AC12 → T12 · AC13 → T9 · AC14 → T10
 
 ## Tasks
 
-- [x] **T1** — Author `cairn/references/satorra1994.md` and `cudeck1989.md`
-      from the source-note template, with provenance blocks and page anchors;
-      add both `INDEX.md` lines. **Gated on the maintainer shelving
-      `satorra1994.pdf` and `cudeck1989.pdf` in `cairn/references/sources/`**
-      (primary-sources hard stop). Do first — T2 cites its page numbers.
-- [x] **T2** — Test-first `R/axes_scaled_fit.R`: `axes_scaling_factor()`
-      returning `c` and `c_b` at Σ̂, reusing `axes_se_derivs()`
-      (`R/axes_corrected_se.R:50`) for Δ and the same dimnames-realignment
-      discipline (`:93-101`), with AC2's explicit vech-space oracle alongside.
-      Mirror M66's failure contract: named `reason` + NA, never a fallback to
-      the unscaled factor.
-- [x] **T3** — Wire listwise + `cormat` into `R/axes_reliability.R:1654-1681`:
-      scale after `fitMeasures()`, move the unscaled six into
-      `details$fit_uncorrected`, add `details$scaling_factor`, and extend the
-      fit-measure membership guard (`:1670-1677`) to the new fields.
-- [x] **T4** — FIML path. Decide and record which `Γ_R` the factor uses there —
-      the complete-data form at Σ̂, or RR13 §4's saturated observed-information
-      acov delta-transformed — then wire it, keeping the `em_stalled` refusal
-      (`:1387-1393`) strictly ahead of any scaling.
-      *(RB tripwire: no-oracle — no complete-data reference value covers this;
-      AC4's simulation is the only oracle.)*
-- [x] **T5** — Rewrite the caveat surfaces: `R/axes_reliability_oop.R:52-59`
-      and `:216-224`, roxygen `R/axes_reliability.R:663-669` and `:688-691`,
-      `vignettes/axes-reliability.Rmd:147-152, 167-169`, `NEWS.md:26-31`, and
-      the tests pinning the old strings
-      (`tests/testthat/test-axes-corrected-se.R:502, 585, 629, 671`). Run AC5's
-      sweep and record every disposition.
-- [ ] **T6** — Complete-data simulation: seed-pinned generator under `devel/`,
-      three populations × 2000 replicates, committed `.rds` summary with its
-      regeneration recipe, plus a fast live smoke cell in the suite.
+Completed tasks are compressed to one line each; the work log carries their
+detail.
+
+- [x] **T1** — Source notes `satorra1994.md` and `cudeck1989.md` + `INDEX.md` lines.
+- [x] **T2** — `R/axes_scaled_fit.R`: `axes_scaling_factor()` and
+      `axes_scale_fit_measures()`, test-first, with AC2's vech-space oracle.
+- [x] **T3** — Wire listwise + `cormat`; unscaled six to `details$fit_uncorrected`;
+      fit-measure membership guard extended.
+- [x] **T4** — FIML path, on the same complete-data factor (M68-D1), with the
+      `em_stalled` refusal kept strictly ahead of any scaling.
+- [x] **T5** — Caveat surfaces rewritten; AC5's sweep run and dispositioned.
+- [x] **T6** — Complete-data simulation: seed-pinned `devel/` generator, three
+      populations plus the N-sweep, committed `.rds` summary.
 - [ ] **T7** — FIML simulation cells: regenerate from the M65 fixture's
       2/5/10 % MCAR seeds and the M66 fixture's M1 MAR seeds, store the T_s
-      summaries beside AC3's.
-- [ ] **T8** — `document()`, `test()`, `check()`; NEWS entry for the changed
-      fit statistics.
+      summaries beside AC7's.
+- [ ] **T9** — AC13: extend the vech oracle's `Γ_R` check from the diagonal to
+      every cell, against the closed normal-theory covariance formula written
+      out in the test.
+- [ ] **T10** — AC10/AC14: a suite test reading the committed fixture and
+      asserting AC7's means, AC8's rate, AC9's six rates and AC10's bound,
+      plus the fast live smoke cell (M65 pattern).
+- [ ] **T11** — AC11: the small-sample behaviour on three surfaces — roxygen
+      Details, the vignette's scaled-fit section, and one direction-and-pointer
+      sentence in `axes_fit_scaled_note`.
+- [ ] **T12** — AC12: the six-token robustness sweep with AC5's three-way
+      disposition, plus the normal-theory fencing sentence in the roxygen.
+- [ ] **T8** — `document()`, `test()`, `check()`; NEWS entry.
 
 ## Work log
 
@@ -152,6 +214,11 @@ machinery M66 built for the component standard errors.
 - 2026-08-02: AC3 finding — the mean criterion passes at all three populations (`mean(T_s)/df` = 1.0204 / 1.0139 / 1.0227, band [0.97, 1.03]); the rejection-rate criterion does not (.0790 / .0630 / .1070, band [.036, .064]). The Satterthwaite-adjusted statistic does not fix it either (.0740 / .0590 / .1030), so eigenvalue dispersion is not the cause. The sample-size sweep at the strong-axes population isolates it: as N runs 600 → 1200 → 2400 → 4800, `mean(T)/df` falls monotonically to `c_pop` = 0.9563 (0.9755, 0.9695, 0.9623, 0.9579), `mean(T_s)/df` → 1.0016, the sd ratio → 0.9974, and the scaled rejection rate → .0540 (inside the band) — while the factor itself is a function of the population matrix and does not move with N. So the residual is the ML chi-square's own finite-sample upward bias, not an error in the factor, which AC2's closed-form oracle pins to 1e-15 independently. The asymmetry that matters for the ship decision: the UNSCALED rate moves AWAY from nominal as N grows (.0260 → .0145) while the scaled one moves toward it.
 - 2026-08-02: escalation — the implementation gate offered (a) amend AC3 to gate the rejection rate only where `p*/N` is small and record the small-N rates, (b) a Fable-level second opinion, or (c) park the milestone. The maintainer chose (b). No criterion was amended; AC3 stands as written and the milestone stays `in-progress` pending the review. Routing to `/milestone-brief`.
 - 2026-08-02: blocked on RB14 — AC3's rejection-rate criterion escalated for independent review; the brief asks five questions, three of them attacks on the implementing session's own reading (the derivation, the finite-sample-bias attribution, and the population-matrix shortcut in the adjusted-statistic comparison).
+- 2026-08-02: RR14 returned and its binding criteria were audited before ingestion ([O], fresh context, per the ingest-audit rule). The substance passed — Q1 confirmed the derivation through a fully independent Olkin-Siotani route at 1e-15, Q2 established the finite-sample-bias attribution by direct decomposition (replacing per-fit c-hat with c_pop moves the rejection rate by <= .0005, ruling out factor noise; oracle mean-recentering alone restores .048-.058 in every cell), and BC1-BC7 are jointly satisfiable and violate no frozen scope or standing decision. The criteria as WRITTEN did not pass: the audit found AC3's `fast live smoke cell in the suite` clause dropped with nothing replacing it (no test reads the fixture today, so BC1-BC4 could be satisfied in narrative alone), BC5 mandating two overclaims into user-facing prose and omitting the `summary()` printed note where the harm actually occurs, BC6 making a universal claim over a domain its `grep -rin robust` does not enumerate, BC3 ambiguous on `recorded in the committed fixture` and fencing a seed-pinned regeneration with a Monte-Carlo tolerance, and BC7 mandating a published formula with no shelved source against the primary-sources hard stop. Sent back to the reviewer for revision at the maintainer's direction rather than ingested verbatim with a Deviations table.
+- 2026-08-02: RR14 revised at the maintainer's direction rather than ingested with a Deviations table — the reviewer closed all ten audit findings in place and added BC8, restoring the `fast live smoke cell in the suite` clause the criteria had dropped. Ingested verbatim as AC7-AC14; `cairn_validate`'s `binding criteria` string-compare PASSES, so there are no departures and no Deviations table.
+- 2026-08-02: amendment return: AC3 — superseded outright by AC7-AC9 and AC14; the plan's remaining criteria renumbered contiguously (original AC4-AC7 are now AC3-AC6) because `coverage complete` counts AC checkboxes positionally and a gap reds the check.
+- 2026-08-02: RB14/RR14 format note — the RR's binding-criteria bullets were rewritten from `- **BCn** — ` to `- BCn: ` (text byte-identical) because `cairn_validate`'s `binding criteria` check parses only the latter and otherwise reported it would `silently bind nothing`.
+- 2026-08-02: weight-cap overrun accepted at the maintainer's direction (200 plan-owned lines against a <150 cap, and both sizing tripwires tripped at 14 criteria / 12 tasks). A compression pass ran first — Scope cross-referenced to D-036, completed tasks reduced to one line each, the six plan-owned criteria rewritten in a single pass — taking the body from 221 to 200; the remaining 51 lines are RR14's verbatim criteria, which may not be edited. The alternative on offer was splitting the milestone, which either ships the scaled statistic without its small-sample documentation or without its regression harness; the maintainer chose the logged overrun over shipping a half-validated correction. `weight caps` will FAIL again at the review gate and is expected to.
 - 2026-08-02: plan chose replacing `$fit`'s values and retaining the unscaled six in `details$fit_uncorrected` over adding parallel `*_scaled` fields, following M66's `details$se_uncorrected` precedent, so the default-read number is the calibrated one; falsified by a user needing both side by side in printed output.
 
 ## Decisions
@@ -208,5 +275,38 @@ lavaan's Σ̂, so the two are internally consistent there; the corrected branch
 carries an O(1/n) discrepancy this milestone does not touch. Out of M68's scope
 — changing it changes shipped standard errors — and filed as a ROADMAP candidate
 instead.
+
+**M68-D3 (2026-08-02): RR14 confirms the derivation and the ship decision; the
+small-N residual is documented, not corrected.** Ingests
+`cairn/reviews/RR14-axes-reliability-scaled-chisq-calibration.md`.
+
+*Q1 — derivation confirmed.* An independent route the repo does not use
+(Olkin–Siotani closed formula for `n·cov(r_ij, r_kl)`, verified against the
+delta-method construction at 3e-16 on a non-model matrix, against a Monte
+Carlo, and carried end-to-end) reproduced the shipped `c = 0.9563346` at
+relative 2e-15. The baseline collapse to `mean((1 − ρ²)²)` is exact and
+structural — `Δ_b′V_bΓ_R = 0` — and M68-D2's `cov2cor(Σ̂)` pricing is right.
+
+*Q2 — attribution established, not merely inferred.* Replacing the per-fit `ĉ`
+with `c_pop` in the committed fixture moves the rejection rate by ≤ .0005 in
+every cell (relative `sd(ĉ)` ≤ .0024), ruling out factor-estimation noise;
+oracle mean-recentering alone restores .048–.058 in every cell, proving the
+residual is a pure mean shift. Mechanism: tail excess ≈ Φ-shift of (relative
+bias)·√(df/2), which predicts why the large-`df` anti-conservative corner
+rejects worst.
+
+*Q3 — `$fit$df` stays an integer.* Eigenvalue dispersion measured at 2.5%; a
+mean shift is not something a multiplicative statistic can remove, so a per-fit
+Satterthwaite adjustment would mutate a documented field to buy ~.004.
+
+*Q4 — ship all four.* The unscaled test is asymptotically miscalibrated in the
+flattering direction and worsens with N; the scaled test's small-N error
+over-flags and shrinks with N. RMSEA/CFI effects are negligible (~0.006 RMSEA
+at N = 600).
+
+*Rejected by RR14, recorded so they are not re-litigated:* a per-fit adjusted
+statistic, a runtime small-sample warning (it would fire on essentially every
+realistic input, degrading the warning channel), and any retreat to the
+unscaled statistics or a user-facing switch (D-035/D-036 stand).
 
 ## Review
