@@ -698,6 +698,46 @@ test_that("M65-D5: a stalled structured-stage EM is refused, not muffled", {
                "unrestricted \\(EM\\) stage")
 })
 
+test_that("the EM-stall predicate fires on both lavaan generations", {
+  # Real wrapped warning text, captured with `dput(conditionMessage(w))` at the
+  # default getOption("width") = 80 by squeezing the h1 EM cap on each
+  # generation -- never retyped, because the WRAP POSITION is the thing under
+  # test. lavaan 0.6.21 and 0.7.2 differ in the emitting function's name and in
+  # the remedy option they name, and agree in wrapping between "moments" and
+  # "using EM".
+  msg_0621 <- paste0(
+    "lavaan->lav_mvnorm_missing_h1_estimate_moments():  \n   Maximum number ",
+    "of iterations reached when computing the sample moments \n   using EM; ",
+    "use the em.h1.iter.max= argument to increase the number of \n   iterations"
+  )
+  msg_072 <- paste0(
+    "lavaan->lav_mvn_mi_h1_est_moments():  \n   Maximum number of iterations ",
+    "reached when computing the sample moments \n   using EM; increase the ",
+    "max_iter element of the em.h1.args= argument to \n   increase the number ",
+    "of iterations"
+  )
+
+  for (msg in list(msg_0621, msg_072)) {
+    expect_true(axes_fiml_em_stalled(simpleWarning(msg)))
+    # The half that reddens, and the reason this test exists: the first
+    # disjunct was a `fixed = TRUE` literal "moments using EM", which matched
+    # NEITHER generation, leaving detection resting solely on the `em.h1` stem
+    # in the remedy sentence -- an option lavaan has already renamed once, and
+    # that rename is what broke this path on CI during M65. Strip the remedy
+    # sentence and the predicate must still fire on the diagnosis alone.
+    stripped <- paste0(strsplit(msg, "EM;", fixed = TRUE)[[1]][[1]], "EM.")
+    expect_false(grepl("em\\.h1", stripped))
+    expect_true(axes_fiml_em_stalled(simpleWarning(stripped)))
+  }
+
+  # Deliberately narrow, and asserted so: the call site muffles lavaan's
+  # boundary and optimizer warnings through this same predicate, and matching
+  # one of those would turn a converged-but-boundary fit into an EM refusal.
+  expect_false(axes_fiml_em_stalled(simpleWarning(
+    "lavaan->lav_object_post_check():  \n   some estimated ov variances are negative"
+  )))
+})
+
 
 # --- T4: reporting and derived quantities (BC8, BC9) --------------------------
 #
