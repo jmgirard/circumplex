@@ -105,23 +105,23 @@ machinery M66 built for the component standard errors.
       add both `INDEX.md` lines. **Gated on the maintainer shelving
       `satorra1994.pdf` and `cudeck1989.pdf` in `cairn/references/sources/`**
       (primary-sources hard stop). Do first — T2 cites its page numbers.
-- [ ] **T2** — Test-first `R/axes_scaled_fit.R`: `axes_scaling_factor()`
+- [x] **T2** — Test-first `R/axes_scaled_fit.R`: `axes_scaling_factor()`
       returning `c` and `c_b` at Σ̂, reusing `axes_se_derivs()`
       (`R/axes_corrected_se.R:50`) for Δ and the same dimnames-realignment
       discipline (`:93-101`), with AC2's explicit vech-space oracle alongside.
       Mirror M66's failure contract: named `reason` + NA, never a fallback to
       the unscaled factor.
-- [ ] **T3** — Wire listwise + `cormat` into `R/axes_reliability.R:1654-1681`:
+- [x] **T3** — Wire listwise + `cormat` into `R/axes_reliability.R:1654-1681`:
       scale after `fitMeasures()`, move the unscaled six into
       `details$fit_uncorrected`, add `details$scaling_factor`, and extend the
       fit-measure membership guard (`:1670-1677`) to the new fields.
-- [ ] **T4** — FIML path. Decide and record which `Γ_R` the factor uses there —
+- [x] **T4** — FIML path. Decide and record which `Γ_R` the factor uses there —
       the complete-data form at Σ̂, or RR13 §4's saturated observed-information
       acov delta-transformed — then wire it, keeping the `em_stalled` refusal
       (`:1387-1393`) strictly ahead of any scaling.
       *(RB tripwire: no-oracle — no complete-data reference value covers this;
       AC4's simulation is the only oracle.)*
-- [ ] **T5** — Rewrite the caveat surfaces: `R/axes_reliability_oop.R:52-59`
+- [x] **T5** — Rewrite the caveat surfaces: `R/axes_reliability_oop.R:52-59`
       and `:216-224`, roxygen `R/axes_reliability.R:663-669` and `:688-691`,
       `vignettes/axes-reliability.Rmd:147-152, 167-169`, `NEWS.md:26-31`, and
       the tests pinning the old strings
@@ -144,6 +144,10 @@ machinery M66 built for the component standard errors.
 - 2026-08-02: plan gate chose scaling CFI via the independence model's own `c_b` over leaving CFI uncorrected, because `summary()` prints χ², RMSEA and CFI on one line (`R/axes_reliability_oop.R:257-262`) and RR13 B-2 named mixed-calibration comparison as the harm on the SE side; falsified by `c_b` proving unidentified or unstable on any accepted input.
 - 2026-08-02: implementation question gate — both recommendations accepted; recorded as M68-D1 (FIML uses the complete-data `Γ_R` at Σ̂ on M66's multiplicative-composition precedent; a failed factor NAs the four statistics with a stored reason rather than falling back to unscaled). The T4 tripwire is settled here, not escalated.
 - 2026-08-02: T1 done — `satorra1994.md` and `cudeck1989.md` authored from the source-note template with INDEX lines. Both PDFs are Paper Capture OCR scans; satorra1994's text layer drops eqs. 16.21/16.22 entirely (the M42-D1 trap), so both were read from rendered page images. Anchors banked: U (eq. 16.18, p. 406), T̄ = c⁻¹T and c = trace{UΓ/r} (eqs. 16.21/16.22, p. 407), the any-moments licensing sentence (p. 401), Cudeck's scale-invariance definition (p. 319) and Table 4's 48% SE discrepancy (p. 323). Two claims the notes fence rather than assert: the axes model's non-scale-invariance is derived in-repo (Cudeck never treats a circumplex), and Cudeck's Error (b) is a different error from the one M68 corrects.
+- 2026-08-02: T2 done — `R/axes_scaled_fit.R` ships `axes_scaling_factor()` (satorra1994 eqs. 16.18/16.21/16.22) and `axes_scale_fit_measures()`. The trace is evaluated through p x p identities, never a p* x p* matrix: `tr(V Gamma_R) = sum_{k<l}[1 - (Sigma^-1)_kl rho_kl (1 - rho_kl^2)]`, derived twice (two derivations reconcile iff `tr(Sigma^-1 Sigma) = p`), and the baseline factor collapses to `mean((1 - rho^2)^2)` because the independence model's free parameters are the variances, whose sample correlations do not vary. AC2's literal vech-space oracle agrees to 1e-15 on all three maps; 1/c = 1.0457 against RR13's measured 273/261.1 = 1.0456. Recorded as M68-D2: pricing at `cov2cor(Sigma-hat)` rather than lavaan's raw Sigma-hat, plus a ROADMAP candidate for the same assumption in `axes_corrected_se()`. 463 assertions.
+- 2026-08-02: T3+T4 done in one edit — M68-D1 makes the FIML path use the same complete-data factor, so the three input paths share one wiring at `R/axes_reliability.R:1674-1723`. `want` gains `baseline.chisq`/`baseline.df`/`ntotal` (fed to the scaler, never reported) and they pass the same membership guard as the reported six. `details` gains `fit_uncorrected`, `scaling_factor` and `fit_scaling_failed`. The `em_stalled` refusal already sat far above the scaling; T4's ordering test makes that falsifiable by stubbing `axes_scaling_factor()` to `stop()` and asserting the EM message wins, so it discriminates ORDER rather than re-asserting that the refusal fires.
+- 2026-08-02: T5 done — AC5's sweep (`grep -rn` for `flattered`, `not corrected`, `261.1`, `approximate` over R/, man/, vignettes/, NEWS.md, tests/testthat/) dispositioned in full. (a) UPDATED: roxygen `R/axes_reliability.R` (the corrected-contract paragraph, the `@return` fields, the FIML section's new factor-choice paragraph, a Satorra-Bentler `@references` entry); `R/axes_reliability_oop.R`'s printed note, split into three pieces because the two corrections can now fail independently and a note asserting a correction that did not happen is worse than none; `vignettes/axes-reliability.Rmd` section 5 + References; `NEWS.md` (the M66 entry's trailing not-corrected clause removed, a new entry added); and the five guard blocks in `tests/testthat/test-axes-corrected-se.R`, each falsified claim moved to an absence with a paired positive so it cannot be satisfied by deletion. (b) HISTORICAL-IN-NEWS: none — every NEWS hit sits inside the unreleased 2.0.0 section, so no released version ever carried the caveat, which is what D-036 shipping alongside M66 was for. (c) UNRELATED, listed and untouched: `R/fit_structure.R:345,721`, `R/ssm_analysis.R:111`, `R/ssm_oop.R:121`, `R/axes_corrected_se.R:17`, the quasi-circumplex "refused rather than approximated" trio (`R/axes_reliability.R:736`, `man/axes_reliability.Rd:198`, `vignettes/axes-reliability.Rmd:291`), `NEWS.md:190,262`, `vignettes/growth-ssm-analysis.Rmd:307`, `vignettes/evaluating-circumplex-structure.Rmd:93,126,184,229,449`, `tests/testthat/test-axes-reliability.R:506,881`, `man/fit_structure.Rd:71`, `man/ssm_analyze.Rd:140,155`.
+- 2026-08-02: suite after T5 — 0 failures, 4946 passing (baseline before M68 was 4421); the 4 pre-existing warnings are unchanged.
 - 2026-08-02: plan chose replacing `$fit`'s values and retaining the unscaled six in `details$fit_uncorrected` over adding parallel `*_scaled` fields, following M66's `details$se_uncorrected` precedent, so the default-read number is the calibrated one; falsified by a user needing both side by side in printed output.
 
 ## Decisions
@@ -176,5 +180,29 @@ still carries lavaan's six. `$fit$df` and `$fit$srmr` are unaffected — they
 never depended on the factor. Rejected: reporting lavaan's unscaled values with
 a warning, which is the one failure a user could not detect, and is the same
 call M66 made for the SEs (`R/axes_corrected_se.R:88-92`).
+
+**M68-D2 (2026-08-02): the factor is priced at `cov2cor(Σ̂)`, not at Σ̂ as
+lavaan returns it.** Discovered at T2 while building AC2's oracle, and
+load-bearing: pricing at the raw Σ̂ moved `c` by 0.3% and broke oracle agreement
+at the 1e-4 level.
+
+`lavaan::fitted(fit)$cov` carries lavaan's `sample.cov.rescale`, so the fitted
+diagonal comes back at `(N−1)/N` — 0.998333 at n = 600 — and `Γ_R`'s entries are
+functions of correlations, where `(1 − ρ²)²` is meaningless at ρ > 1. A single
+scalar does not undo it either: under misspecification the implied diagonal is
+not even constant (measured range 0.951–1.026 on a deliberately perturbed
+probe). Normalizing is exact rather than approximate — `T` is invariant to a
+scalar rescaling of both matrices, and pricing `U` and `Γ_R` at the same implied
+*correlation* matrix is the coherent reading of an estimand defined on the
+correlation metric. With it, the shipped trace identity and the literal
+vech-space oracle agree to 1e-15.
+
+Noted, not acted on: `axes_corrected_se()` prices at the raw Σ̂ with the same
+unit-diagonal assumption in its `wc` construction (`R/axes_corrected_se.R:141-143`).
+Its `naive` branch reproduces lavaan's own SEs to 1e-7 *because* it matches
+lavaan's Σ̂, so the two are internally consistent there; the corrected branch
+carries an O(1/n) discrepancy this milestone does not touch. Out of M68's scope
+— changing it changes shipped standard errors — and filed as a ROADMAP candidate
+instead.
 
 ## Review

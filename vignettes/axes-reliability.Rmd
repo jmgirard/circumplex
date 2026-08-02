@@ -144,7 +144,8 @@ cannot be mistaken for a raw-data one.
 
 Four properties of the method shape how its output should be read.
 
-**The global fit statistics are approximate; the standard errors are not.**
+**Both the standard errors and the global fit statistics are corrected for the
+correlation metric.**
 Following the paper's own practice, the model is fit to the item
 **correlation** matrix as though it were a covariance matrix. That metric
 mismatch leaves the component point estimates and the reliabilities correct,
@@ -164,9 +165,26 @@ correlation metric and are calibrated uncertainty. They are typically
 LISREL values carry the uncorrected approximation. What the estimator reported
 before the correction is kept in `details$se_uncorrected`.
 
-The **fit indices are not corrected** and still want reading as a rough guide
-rather than an exact test: they carry the same mismatch in the other direction
-and are flattered by roughly 4%.
+The **global fit statistics are corrected too**, for the same mismatch running
+the other way. Sample correlations vary *less* than the covariances the
+reference chi-square distribution is derived for, so an uncorrected test
+statistic comes out too small and fit is flattered. `chisq`, `pvalue`, `rmsea`
+and `cfi` are therefore reported as Satorra–Bentler-type **scaled** values —
+the chi-square divided by a factor computed at the fitted matrix, with `cfi`
+also scaling its own baseline model (Satorra & Bentler, 1994). The factor is
+recomputed for every fit rather than being a constant, which is the whole
+point: how much fit was flattered depends on the instrument. `df` and `srmr`
+are unchanged, being a count of restrictions and a residual summary rather
+than test statistics with a reference distribution. What the estimator reported
+before the scaling is kept in `details$fit_uncorrected`, and the factors
+themselves in `details$scaling_factor`.
+
+Read the scaled statistic for what it is. The correction makes the test
+statistic match its reference distribution *in expectation*; it is a
+calibration, not an exactness guarantee, and it will not rescue a model that is
+badly wrong. The usual cutoffs (Hu & Bentler, 1999) are no more or less
+appropriate than before — what has changed is that the number being compared to
+them is no longer systematically kind.
 
 If you check the implied matrix, you will also find that it does
 not reproduce the unit diagonal exactly. That too is expected: with the loadings
@@ -301,6 +319,10 @@ reproduce them.
 
 * Cudeck, R. (1989). Analysis of correlation matrices using covariance
   structure models. _Psychological Bulletin, 105_(2), 317–327.
+
+* Satorra, A., & Bentler, P. M. (1994). Corrections to test statistics and
+  standard errors in covariance structure analysis. In _Latent variables
+  analysis: Applications for developmental research_ (pp. 399–419).
 
 * Strack, S., Jacobs, K. A., & Grosse Holtforth, M. (2013). The reliability of
   circumplex axes. _SAGE Open, 3_(2). https://doi.org/10.1177/2158244013486115

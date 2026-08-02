@@ -23,12 +23,30 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   instruments could understate it slightly. Because the error changed sign
   across the range of instruments the function accepts, no fixed caveat could
   state it honestly. Point estimates, reliabilities, SEm, degrees of freedom,
-  and the fit statistics are all unchanged. Corrected standard errors are
+  and SRMR are all unchanged; the remaining fit statistics are corrected
+  separately, below. Corrected standard errors are
   typically *smaller* than those printed in Strack et al. (2013), whose LISREL
   values carry the same uncorrected approximation. The uncorrected values
-  remain available in `details$se_uncorrected`. The global chi-square carries
-  the approximation in the opposite direction and is not corrected; it stays
-  documented as flattering fit by roughly 4%.
+  remain available in `details$se_uncorrected`.
+
+* The global fit statistics reported by `axes_reliability()` are now
+  calibrated to the correlation metric. `chisq`, `pvalue`, `rmsea` and `cfi`
+  are Satorra-Bentler-type *scaled* values, computed by dividing the
+  chi-square by a factor evaluated at the fitted matrix (with `cfi` also
+  scaling its baseline model); `df` and `srmr` are unchanged. Previously these
+  carried the same correlation-as-covariance mismatch as the standard errors
+  did, running the other way: sample correlations vary less than covariances,
+  so the test statistic came out too small and fit was flattered — by roughly
+  4% at one reference population, which the documentation had reported as
+  though it were a constant. It is not a constant, and the scaling factor is
+  now recomputed for every fit. All three input paths scale, including
+  `missing = "fiml"`. Expect slightly larger chi-squares, smaller p-values,
+  slightly higher RMSEA, and slightly lower CFI than previous versions
+  reported on the same data. The unscaled values remain available in
+  `details$fit_uncorrected`, with the factors in `details$scaling_factor`. If
+  the factor cannot be computed, the four are `NA` with the reason in
+  `details$fit_scaling_failed` rather than falling back to the unscaled
+  values.
 
 * The displacement-interpretability guardrail in `print()` and `summary()`
   now uses a scale-free rule: a profile's displacement is certified as
