@@ -1138,3 +1138,33 @@ approximation in the other direction (E[T] = 261.1 against df = 273, flattered
 ~4%) and keep their caveat. `ssm_sem()` is not implicated — it lives on the
 covariance metric. Source: RR13 (Fable, 2026-07-27); derivation independently
 re-run at ingestion and reproduced exactly.
+
+### D-036 (2026-08-02): `axes_reliability()`'s global test statistic will be scaled, not caveated — supersedes D-035's fit-caveat holding (M68)
+
+**Context:** D-035 corrected the component SEs and explicitly held the other
+side: "The global χ²/fit indices carry the same approximation in the other
+direction (E[T] = 261.1 against df = 273, flattered ~4%) and keep their
+caveat." RR13 §3 set the same boundary — "a scaled test statistic from the same
+Γ machinery is possible later but is not part of this recommendation" — and
+B-1 filed it as a low-priority future milestone. Neither was a rejection; both
+were scope boundaries on M66, whose Γ machinery now exists
+(`R/axes_corrected_se.R`).
+**Decision: scale the statistic.** `$fit$chisq`, `$pvalue`, `$rmsea` and `$cfi`
+become Satorra–Bentler-type scaled values, `T_s = T / c` with
+`c = tr(U Γ_R)/df` at the fitted Σ̂ and CFI additionally using the independence
+model's factor `c_b`. What overturns "keep their caveat" is not new error but
+the same argument D-035 made for the SEs, applied to the statistic M66 left
+alone: a caveat that quantifies one number ("flattered by roughly 4%") is a
+population-specific figure presented as a constant, and the machinery that
+would replace it with the actual per-fit factor is now shipped and validated.
+**Scope:** all three input paths, because a path-dependent `$fit$chisq` is the
+failure the M65 SRMR fix cured (`R/axes_reliability.R:1635-1653`). `$fit$df`
+and `$fit$srmr` are unchanged — SRMR is a residual summary, not a test
+statistic. `ssm_sem()` remains unimplicated, on D-035's grounds.
+**Release:** enters v2.0.0, a narrow D-001 supersession that does not gate M7,
+following D-030/D-031/D-032/D-033. Shipping in the same release as M66 means no
+released version ever carries the 4% caveat.
+**Not decided here:** which `Γ_R` the FIML path uses — the complete-data form
+at Σ̂ or RR13 §4's saturated observed-information acov delta-transformed. M68 T4
+carries it as an (RB tripwire: no-oracle) open question, and AC4's simulation is
+its only oracle. Source: RR13 B-1 (Fable, 2026-07-27); M68 plan gate.
