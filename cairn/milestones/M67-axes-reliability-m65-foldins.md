@@ -1,11 +1,11 @@
 # M67: M65 review fold-ins for the `axes_reliability()` FIML path
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M66
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m67-axes-m65-foldins`
 
 ## Goal
 
