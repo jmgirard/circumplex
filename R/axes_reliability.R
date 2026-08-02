@@ -699,10 +699,47 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' before the scaling is kept in `details$fit_uncorrected`, and the two factors
 #' in `details$scaling_factor`.
 #'
+#' One thing the scaling is **not**: it is not a robustness correction for
+#' non-normal data. The factor is computed under normal theory throughout, and
+#' it corrects one thing only -- that the estimator consumes a sample
+#' correlation matrix where normal-theory maximum likelihood prices a sample
+#' covariance matrix. It does not license the model against skewed or
+#' heavy-tailed items, and it is unrelated to the Satorra-Bentler scaled
+#' statistics reported by `ssm_sem()`'s robust estimators, which correct for
+#' non-normality on the covariance metric.
+#'
 #' The scaled statistic matches its reference chi-square in **mean**; it is not
 #' exact, and it does not make a badly misspecified model fit. If the factor
 #' cannot be computed, all four are `NA` with the reason in
 #' `details$fit_scaling_failed` -- never the uncorrected value in their place.
+#'
+#' # How well calibrated is the test, and at what sample size
+#'
+#' The scaling fixes the metric error, and the χ² test built on it is
+#' asymptotically exact: its rejection rate approaches the nominal α as the
+#' number of distinct moments p\eqn{^*} = p(p+1)/2 falls relative to N. Measured
+#' by simulation at one population (8 octant scales, 3 items each, axes variance
+#' .35), the rejection rate at α = .05 runs .092, .079, .062, .054 at
+#' p\eqn{^*}/N = 0.50, 0.25, 0.12, 0.06 -- reaching the nominal band by
+#' p\eqn{^*}/N of about 0.06. That is a sweep at a single population, not a
+#' general threshold.
+#'
+#' At **N = 600** the test **over-rejects**: measured .06 to .11 at three
+#' populations chosen to bracket the range of instruments this function accepts.
+#' The uncorrected statistic under-rejects over the same range, at .02 to .03,
+#' and -- unlike the scaled one -- moves *further* from nominal as N grows,
+#' because its error is asymptotic while the scaled statistic's is a
+#' finite-sample one that shrinks away.
+#'
+#' The over-rejection at a fixed N grows with instrument size (larger `df`) and
+#' shrinks with N. So a p-value near whatever threshold you are using deserves
+#' caution at moderate N and a large item count -- but note the direction: the
+#' scaled test **over-flags** misfit rather than flattering it, which is the
+#' safer error and the opposite of what the uncorrected statistic did.
+#'
+#' All of that evidence is **complete-data**. Under `missing = "fiml"` the
+#' scaled statistic is calibrated in mean, but its rejection rate has not been
+#' measured, so none of the rates above should be read as applying to that path.
 #'
 #' A related detail, in case you check: the fitted model does **not** reproduce
 #' the correlation matrix's unit diagonal exactly, and that is expected rather

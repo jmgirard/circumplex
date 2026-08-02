@@ -751,3 +751,132 @@ test_that("AC14: the live smoke cell reproduces the committed harness", {
   # Scaling moves the statistic UP, on every single replicate, because c < 1.
   expect_true(all(got["ratio", ] > got["raw", ]))
 })
+
+
+# ---- AC11: the small-sample behaviour is documented, on three surfaces ------
+
+test_that("AC11: the Rd states the calibration sweep, the direction, and the FIML scope", {
+  rd <- if (file.exists(test_path("..", "..", "man", "axes_reliability.Rd"))) {
+    paste(readLines(test_path("..", "..", "man", "axes_reliability.Rd"),
+                    warn = FALSE), collapse = " ")
+  } else {
+    db <- tools::Rd_db("circumplex")
+    paste(as.character(db[["axes_reliability.Rd"]]), collapse = "")
+  }
+  expect_gt(nchar(rd), 1000L)
+  rd <- gsub("\\s+", " ", rd)
+
+  # (i) the sweep, with its numbers and its own scope disclaimer. The
+  # disclaimer is pinned because without it the page states a general
+  # threshold that one population's sweep does not support.
+  expect_match(rd, ".092, .079, .062, .054", fixed = TRUE)
+  expect_match(rd, "0.50, 0.25, 0.12, 0.06", fixed = TRUE)
+  expect_match(rd, "sweep at a single population, not a general threshold",
+               fixed = TRUE)
+  # (ii) the N = 600 behaviour, both directions.
+  expect_match(rd, ".06 to .11", fixed = TRUE)
+  expect_match(rd, ".02 to .03", fixed = TRUE)
+  expect_match(rd, "moves \\emph{further} from nominal as N grows",
+               fixed = TRUE)
+  # (iii) the direction of the error, which is the part a user acts on.
+  expect_match(rd, "over-flags", fixed = TRUE)
+  # (iv) the FIML scoping. Without it the rates above read as covering a path
+  # where no rejection rate has ever been measured.
+  expect_match(rd, "rejection rate has not been measured", fixed = TRUE)
+})
+
+
+test_that("AC11: the vignette carries the same four claims", {
+  vig <- test_path("..", "..", "vignettes", "axes-reliability.Rmd")
+  skip_if_not(file.exists(vig))
+  txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))
+  expect_gt(nchar(txt), 1000L)
+
+  expect_match(txt, "| .092 | .079 | .062 | .054 |", fixed = TRUE)
+  expect_match(txt, "sweep at a single population, not a general threshold",
+               fixed = TRUE)
+  expect_match(txt, "measured .06 to .11 at three populations chosen to bracket",
+               fixed = TRUE)
+  expect_match(txt, "**over-flags** misfit rather than flattering it",
+               fixed = TRUE)
+  expect_match(txt, "rejection rate has not been measured", fixed = TRUE)
+})
+
+
+test_that("AC11: the printed note gives direction and a pointer, and no rates", {
+  skip_if_not_installed("lavaan")
+  pp <- probe_octant()
+  res <- axes_reliability(cormat = pp$sigma, items = pp$items,
+                          angles = pp$angles, n = 600)
+  out <- gsub("\\s+", " ", paste(capture.output(print(res)), collapse = " "))
+
+  expect_match(out, "can modestly over-reject at typical sample sizes",
+               fixed = TRUE)
+  expect_match(out, "over-flags misfit rather than flattering it", fixed = TRUE)
+  expect_match(out, "?axes_reliability for the measured rates", fixed = TRUE)
+
+  # And deliberately NO rates here. A number printed on this surface would
+  # drift out of agreement with the Rd and the vignette the first time the
+  # fixture is regenerated, because nothing ties it to them (BC5).
+  for (bad in c(".06 to .11", ".092", ".054", "p*/N")) {
+    expect_no_match(out, bad, fixed = TRUE)
+  }
+})
+
+
+test_that("AC11: the documented rates are the fixture's rates", {
+  # BC5's tie: the published numbers are the committed fixture's, rounded, and
+  # move only with it. Without this the documentation and the evidence are two
+  # independent records of the same quantity, which is how they drift.
+  fx <- m68_cells()
+  rates <- vapply(M68_POPS, function(nm) {
+    cell <- m68_ok(fx$cells[[nm]])
+    mean(cell[, "p"] < .05)
+  }, numeric(1))
+  # The Rd and vignette say ".06 to .11" at these three populations.
+  expect_gte(min(rates), .06 - .005)
+  expect_lte(max(rates), .11 + .005)
+
+  unscaled <- vapply(M68_POPS, function(nm) {
+    cell <- m68_ok(fx$cells[[nm]])
+    mean(cell[, "p_unscaled"] < .05)
+  }, numeric(1))
+  # ... and ".02 to .03" for the uncorrected statistic.
+  expect_gte(min(unscaled), .02 - .005)
+  expect_lte(max(unscaled), .03 + .005)
+
+  # The sweep numbers the Rd prints, against the sweep cells they came from.
+  want <- c("600" = .092, "1200" = .079, "2400" = .062, "4800" = .054)
+  for (nn in names(want)) {
+    cell <- m68_ok(fx$sweep[[nn]])
+    expect_lt(abs(mean(cell[, "p"] < .05) - want[[nn]]), .006, label = nn)
+  }
+})
+
+
+test_that("AC12: the Rd fences the scaling against the robustness misreading", {
+  rd <- if (file.exists(test_path("..", "..", "man", "axes_reliability.Rd"))) {
+    paste(readLines(test_path("..", "..", "man", "axes_reliability.Rd"),
+                    warn = FALSE), collapse = " ")
+  } else {
+    db <- tools::Rd_db("circumplex")
+    paste(as.character(db[["axes_reliability.Rd"]]), collapse = "")
+  }
+  rd <- gsub("\\s+", " ", rd)
+
+  # A Satorra-Bentler scaled statistic is best known as the fix for
+  # NON-NORMALITY, which this one is not: the factor is normal-theory
+  # throughout and corrects the correlation-versus-covariance metric only. The
+  # same package reports genuine robust scaled statistics from ssm_sem(), so
+  # the two are one `?` away from each other and the confusion is live.
+  expect_match(rd, "not a robustness correction for non-normal data",
+               fixed = TRUE)
+  expect_match(rd, "computed under normal theory throughout", fixed = TRUE)
+  # The paired positive on the other half: it must also say what the factor
+  # DOES correct, or the fence could be satisfied by a bare denial.
+  expect_match(rd, "corrects one thing only", fixed = TRUE)
+  # And the cross-reference that keeps a reader from importing ssm_sem()'s
+  # meaning of the same author names.
+  expect_match(rd, "unrelated to the Satorra-Bentler scaled statistics reported by",
+               fixed = TRUE)
+})

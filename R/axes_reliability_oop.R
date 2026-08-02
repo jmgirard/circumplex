@@ -69,10 +69,20 @@ axes_se_corrected_note <- paste0(
   "  and are calibrated; they are typically smaller than the values printed\n",
   "  by Strack et al. (2013), whose LISREL output carries no correction."
 )
+# The third surface RR14 required (BC5). It carries the DIRECTION of the
+# small-sample error and a pointer, deliberately no rates: the measured numbers
+# live in the roxygen and the vignette, where they are tied to the committed
+# fixture and move with it, and a rate printed here would drift out of agreement
+# with them the first time the fixture is regenerated. This is where the harm
+# happens -- summary() prints the chi-square, RMSEA and CFI on the next line,
+# and a reader deciding on a p-value near a threshold sees this note and nothing
+# else.
 axes_fit_scaled_note <- paste0(
   "  The global fit statistics chisq, pvalue, rmsea and cfi are scaled to\n",
   "  that metric (Satorra & Bentler, 1994), which removes a distortion that\n",
-  "  flatters fit; df and srmr are unchanged."
+  "  flatters fit; df and srmr are unchanged. The scaled test can modestly\n",
+  "  over-reject at typical sample sizes -- it over-flags misfit rather than\n",
+  "  flattering it; see ?axes_reliability for the measured rates."
 )
 
 # The extra sentence the FIML path owes on top of the caveat above. Its SEs

@@ -186,6 +186,35 @@ badly wrong. The usual cutoffs (Hu & Bentler, 1999) are no more or less
 appropriate than before — what has changed is that the number being compared to
 them is no longer systematically kind.
 
+**How well calibrated is the test, and at what sample size?** The scaling fixes
+the metric error, and the χ² test built on it is asymptotically exact: its
+rejection rate approaches the nominal α as the number of distinct moments,
+p\* = p(p+1)/2, falls relative to N. Simulated at one population (eight octant
+scales, three items each, axes variance .35), the rejection rate at α = .05 runs
+
+| p\*/N | 0.50 | 0.25 | 0.12 | 0.06 |
+|---|---|---|---|---|
+| rejection rate | .092 | .079 | .062 | .054 |
+
+reaching the nominal band by a p\*/N of about 0.06. That is a sweep at a single
+population, not a general threshold.
+
+At **N = 600** the test **over-rejects** — measured .06 to .11 at three
+populations chosen to bracket the range of instruments the function accepts.
+The uncorrected statistic under-rejects over the same range, at .02 to .03, and
+moves *further* from nominal as N grows, because its error is asymptotic while
+the scaled statistic's is a finite-sample one that shrinks away. The
+over-rejection at a fixed N grows with instrument size (larger `df`) and shrinks
+with N.
+
+Two practical consequences. A p-value near whatever threshold you are using
+deserves caution at moderate N with many items — but note the direction: the
+scaled test **over-flags** misfit rather than flattering it, which is the safer
+error, and the opposite of what the uncorrected statistic did. And all of this
+evidence is **complete-data**: under `missing = "fiml"` the scaled statistic is
+calibrated in mean, but its rejection rate has not been measured, so none of
+these rates should be read as applying to that path.
+
 If you check the implied matrix, you will also find that it does
 not reproduce the unit diagonal exactly. That too is expected: with the loadings
 fixed, the condition a free item error satisfies is the *weighted* diagonal
