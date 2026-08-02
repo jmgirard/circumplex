@@ -1,6 +1,6 @@
 # M68: Scaled global test statistic for `axes_reliability()`
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -151,6 +151,7 @@ machinery M66 built for the component standard errors.
 - 2026-08-02: T6 harness written (`devel/m68-scaled-fit-cells.R`, seed-pinned, committed summary `tests/testthat/fixtures/m68-scaled-fit-cells.rds`, 2000 replicates per cell) and RUN, but T6 is NOT complete: AC3's rejection-rate clause is not satisfiable as written and is under escalation, so the suite's smoke assertions are held until the disposition is settled.
 - 2026-08-02: AC3 finding — the mean criterion passes at all three populations (`mean(T_s)/df` = 1.0204 / 1.0139 / 1.0227, band [0.97, 1.03]); the rejection-rate criterion does not (.0790 / .0630 / .1070, band [.036, .064]). The Satterthwaite-adjusted statistic does not fix it either (.0740 / .0590 / .1030), so eigenvalue dispersion is not the cause. The sample-size sweep at the strong-axes population isolates it: as N runs 600 → 1200 → 2400 → 4800, `mean(T)/df` falls monotonically to `c_pop` = 0.9563 (0.9755, 0.9695, 0.9623, 0.9579), `mean(T_s)/df` → 1.0016, the sd ratio → 0.9974, and the scaled rejection rate → .0540 (inside the band) — while the factor itself is a function of the population matrix and does not move with N. So the residual is the ML chi-square's own finite-sample upward bias, not an error in the factor, which AC2's closed-form oracle pins to 1e-15 independently. The asymmetry that matters for the ship decision: the UNSCALED rate moves AWAY from nominal as N grows (.0260 → .0145) while the scaled one moves toward it.
 - 2026-08-02: escalation — the implementation gate offered (a) amend AC3 to gate the rejection rate only where `p*/N` is small and record the small-N rates, (b) a Fable-level second opinion, or (c) park the milestone. The maintainer chose (b). No criterion was amended; AC3 stands as written and the milestone stays `in-progress` pending the review. Routing to `/milestone-brief`.
+- 2026-08-02: blocked on RB14 — AC3's rejection-rate criterion escalated for independent review; the brief asks five questions, three of them attacks on the implementing session's own reading (the derivation, the finite-sample-bias attribution, and the population-matrix shortcut in the adjusted-statistic comparison).
 - 2026-08-02: plan chose replacing `$fit`'s values and retaining the unscaled six in `details$fit_uncorrected` over adding parallel `*_scaled` fields, following M66's `details$se_uncorrected` precedent, so the default-read number is the calibrated one; falsified by a user needing both side by side in printed output.
 
 ## Decisions
