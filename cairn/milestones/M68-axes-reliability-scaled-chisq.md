@@ -185,10 +185,10 @@ detail.
 - [ ] **T7** — FIML simulation cells: regenerate from the M65 fixture's
       2/5/10 % MCAR seeds and the M66 fixture's M1 MAR seeds, store the T_s
       summaries beside AC7's.
-- [ ] **T9** — AC13: extend the vech oracle's `Γ_R` check from the diagonal to
+- [x] **T9** — AC13: extend the vech oracle's `Γ_R` check from the diagonal to
       every cell, against the closed normal-theory covariance formula written
       out in the test.
-- [ ] **T10** — AC10/AC14: a suite test reading the committed fixture and
+- [x] **T10** — AC10/AC14: a suite test reading the committed fixture and
       asserting AC7's means, AC8's rate, AC9's six rates and AC10's bound,
       plus the fast live smoke cell (M65 pattern).
 - [ ] **T11** — AC11: the small-sample behaviour on three surfaces — roxygen
@@ -219,6 +219,8 @@ detail.
 - 2026-08-02: amendment return: AC3 — superseded outright by AC7-AC9 and AC14; the plan's remaining criteria renumbered contiguously (original AC4-AC7 are now AC3-AC6) because `coverage complete` counts AC checkboxes positionally and a gap reds the check.
 - 2026-08-02: RB14/RR14 format note — the RR's binding-criteria bullets were rewritten from `- **BCn** — ` to `- BCn: ` (text byte-identical) because `cairn_validate`'s `binding criteria` check parses only the latter and otherwise reported it would `silently bind nothing`.
 - 2026-08-02: weight-cap overrun accepted at the maintainer's direction (200 plan-owned lines against a <150 cap, and both sizing tripwires tripped at 14 criteria / 12 tasks). A compression pass ran first — Scope cross-referenced to D-036, completed tasks reduced to one line each, the six plan-owned criteria rewritten in a single pass — taking the body from 221 to 200; the remaining 51 lines are RR14's verbatim criteria, which may not be edited. The alternative on offer was splitting the milestone, which either ships the scaled statistic without its small-sample documentation or without its regression harness; the maintainer chose the logged overrun over shipping a half-validated correction. `weight caps` will FAIL again at the review gate and is expected to.
+- 2026-08-02: T9 done — the vech oracle's `Γ_R` check extended from the diagonal to every cell against the closed normal-theory covariance formula written out in the test (RR14 finding 1: the off-diagonal cells carry most of `tr{U Γ_R}` and were pinned only by the two delta-method routes agreeing). Agreement 1e-12 on the octant probe and on a non-model random correlation matrix, with a perturbation check so the comparison is capable of failing.
+- 2026-08-02: T10 done — suite regression over the committed fixture: AC7's three means (each paired with the negative that the unscaled ratio is outside the same band), AC8's nominal rejection rate at N = 4800 (paired with the unscaled .0145 at the same N), AC9's six fenced rates, AC10's factor-noise decomposition, plus a 12-replicate live smoke cell asserting direction rather than calibration. `grep -rn m68-scaled-fit-cells tests/` is now non-empty. 540 assertions.
 - 2026-08-02: plan chose replacing `$fit`'s values and retaining the unscaled six in `details$fit_uncorrected` over adding parallel `*_scaled` fields, following M66's `details$se_uncorrected` precedent, so the default-read number is the calibrated one; falsified by a user needing both side by side in printed output.
 
 ## Decisions

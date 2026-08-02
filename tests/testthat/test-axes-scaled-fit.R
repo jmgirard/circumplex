@@ -67,7 +67,10 @@ vech_oracle_factor <- function(sigma, mats, df, baseline_df) {
   # Independent check on Gr itself: under normality the asymptotic variance of
   # sqrt(n) r_ij is (1 - rho_ij^2)^2, which J never sees -- it is the
   # Pearson-Filon value, and agreement says the delta method was assembled
-  # right rather than merely consistently.
+  # right rather than merely consistently. The DIAGONAL only; the entrywise
+  # check is vech_oracle_gamma_r_closed() below, and RR14 found that the
+  # diagonal alone left most of tr{U Gamma_R} validated by nothing but the two
+  # delta-method routes agreeing with each other.
   for (a in seq_len(pstar)) {
     i <- idx[a, 1]
     j <- idx[a, 2]
@@ -102,6 +105,74 @@ vech_oracle_factor <- function(sigma, mats, df, baseline_df) {
     scale = sum(diag(U %*% Gr)) / df,
     baseline = sum(diag(Ub %*% Gr)) / baseline_df
   )
+}
+
+
+# Gamma_R built a SECOND, wholly different way: entry by entry from the closed
+# normal-theory expression for the asymptotic covariance of two sample
+# correlations. The delta-method route above never sees this formula -- it
+# composes a Jacobian with Gamma_S -- so agreement is a genuine cross-check
+# rather than two spellings of one derivation.
+#
+# For i != j and k != l,
+#
+#   n*cov(r_ij, r_kl) =
+#     0.5*rho_ij*rho_kl*(rho_ik^2 + rho_il^2 + rho_jk^2 + rho_jl^2)
+#     + rho_ik*rho_jl + rho_il*rho_jk
+#     - rho_ij*(rho_ik*rho_il + rho_jk*rho_jl)
+#     - rho_kl*(rho_ik*rho_jk + rho_il*rho_jl)
+#
+# and any cell touching a variance (i == j or k == l) is zero, because a sample
+# correlation's diagonal does not vary. The identity is Olkin & Siotani's; it is
+# written out here rather than cited because nothing SHIPPED relies on it -- it
+# is a test-side recomputation whose own correctness is established by the
+# agreement this function is used to assert (RR14 BC7).
+vech_oracle_gamma_r_closed <- function(sigma) {
+  p <- nrow(sigma)
+  idx <- which(lower.tri(matrix(0, p, p), diag = TRUE), arr.ind = TRUE)
+  pstar <- nrow(idx)
+  out <- matrix(0, pstar, pstar)
+  r <- sigma
+  for (a in seq_len(pstar)) {
+    i <- idx[a, 1]
+    j <- idx[a, 2]
+    if (i == j) next
+    for (b in seq_len(pstar)) {
+      k <- idx[b, 1]
+      l <- idx[b, 2]
+      if (k == l) next
+      out[a, b] <-
+        0.5 * r[i, j] * r[k, l] *
+          (r[i, k]^2 + r[i, l]^2 + r[j, k]^2 + r[j, l]^2) +
+        r[i, k] * r[j, l] + r[i, l] * r[j, k] -
+        r[i, j] * (r[i, k] * r[i, l] + r[j, k] * r[j, l]) -
+        r[k, l] * (r[i, k] * r[j, k] + r[i, l] * r[j, l])
+    }
+  }
+  out
+}
+
+# The delta-method Gamma_R on its own, so the two routes can be compared without
+# running the whole factor.
+vech_oracle_gamma_r_delta <- function(sigma) {
+  p <- nrow(sigma)
+  D <- vech_oracle_dup(p)
+  Dp <- solve(t(D) %*% D) %*% t(D)
+  pstar <- p * (p + 1) / 2
+  Gs <- 2 * Dp %*% kronecker(sigma, sigma) %*% t(Dp)
+  idx <- which(lower.tri(matrix(0, p, p), diag = TRUE), arr.ind = TRUE)
+  J <- matrix(0, pstar, pstar)
+  for (a in seq_len(pstar)) {
+    i <- idx[a, 1]
+    j <- idx[a, 2]
+    if (i == j) next
+    J[a, a] <- 1
+    ai <- which(idx[, 1] == i & idx[, 2] == i)
+    aj <- which(idx[, 1] == j & idx[, 2] == j)
+    J[a, ai] <- J[a, ai] - 0.5 * sigma[i, j]
+    J[a, aj] <- J[a, aj] - 0.5 * sigma[i, j]
+  }
+  J %*% Gs %*% t(J)
 }
 
 
@@ -512,4 +583,171 @@ test_that("AC1: `$fit$df` and `$fit$srmr` are what lavaan itself reports", {
   # expect_scaled_contract() above. What this refit adds is that the reported
   # quantity is still lavaan's covariance-only SRMR at all.
   expect_lt(abs(res$fit$srmr - fm[["srmr_bentler_nomean"]]), 1e-8)
+})
+
+
+test_that("AC13: Gamma_R agrees entrywise with the closed normal-theory formula", {
+  skip_if_not_installed("lavaan")
+  # RR14's "Beyond the brief" finding 1: the oracle validated Gamma_R only on
+  # its DIAGONAL, while the off-diagonal cells carry most of tr{U Gamma_R} and
+  # were pinned by nothing but the two delta-method routes agreeing with each
+  # other. This closes it in the suite.
+  pp <- probe_octant()
+  ff <- probe_fit(pp)
+  sigma <- stats::cov2cor(ff$sigma[pp$names, pp$names])
+
+  got <- vech_oracle_gamma_r_delta(sigma)
+  want <- vech_oracle_gamma_r_closed(sigma)
+  expect_identical(dim(got), dim(want))
+  # ALL cells, not the diagonal only. Absolute rather than relative, because
+  # most cells are near zero and a relative bar there is meaningless.
+  expect_lt(max(abs(got - want)), 1e-12)
+
+  # The comparison must be capable of failing: perturbing one correlation moves
+  # the closed-form matrix well outside the bar, so agreement above is not two
+  # all-zero matrices matching. Guards the M60 green-for-the-wrong-reason trap.
+  bad <- sigma
+  bad[1, 2] <- bad[2, 1] <- bad[1, 2] + 0.05
+  expect_gt(max(abs(vech_oracle_gamma_r_closed(bad) - want)), 1e-6)
+
+  # And a non-model matrix, so the check is not resting on the fitted matrix's
+  # own structure (RR14 verified its route at 3.3e-16 this way).
+  set.seed(4)
+  z <- matrix(stats::rnorm(40 * 6), 40, 6)
+  free <- stats::cor(z)
+  expect_lt(
+    max(abs(vech_oracle_gamma_r_delta(free) - vech_oracle_gamma_r_closed(free))),
+    1e-12
+  )
+})
+
+
+# ---- AC7-AC10, AC14: the committed calibration evidence ---------------------
+#
+# RR14 BC8: the regression evidence stands in the SUITE, not only in the work
+# log. Without these, AC7-AC10 could be satisfied by a narrative and the package
+# would ship with no standing check on the calibration numbers at all -- the
+# gap the binding-criteria audit called the single most consequential omission.
+#
+# Regenerate the fixture with `Rscript devel/m68-scaled-fit-cells.R` (2000
+# replicates, ~5 min on 8 cores).
+
+m68_cells <- function() {
+  readRDS(test_path("fixtures", "m68-scaled-fit-cells.rds"))
+}
+
+# The three N = 600 populations and their committed rates (AC9's fences).
+M68_POPS <- c("strong", "weak", "antic")
+M68_RATE_SCALED <- c(strong = .0790, weak = .0630, antic = .1070)
+M68_RATE_UNSCALED <- c(strong = .0270, weak = .0200, antic = .0215)
+
+m68_ok <- function(cell) cell[stats::complete.cases(cell), , drop = FALSE]
+
+
+test_that("AC7: mean(T_s)/df is in [0.97, 1.03] at all three populations", {
+  fx <- m68_cells()
+  expect_gte(fx$provenance$reps, 2000L)
+  for (nm in M68_POPS) {
+    cell <- m68_ok(fx$cells[[nm]])
+    expect_gte(nrow(cell), 2000L, label = nm)
+    got <- mean(cell[, "chisq_scaled"]) / cell[1, "df"]
+    expect_gt(got, 0.97, label = paste("mean(T_s)/df", nm))
+    expect_lt(got, 1.03, label = paste("mean(T_s)/df", nm))
+  }
+
+  # The paired negative: the UNSCALED ratio must be outside the same band at
+  # every population, or the criterion above would be satisfied by a factor
+  # that did nothing. This is the whole claim of the milestone in one line.
+  for (nm in M68_POPS) {
+    cell <- m68_ok(fx$cells[[nm]])
+    expect_lt(mean(cell[, "chisq"]) / cell[1, "df"], 0.985, label = nm)
+  }
+})
+
+
+test_that("AC8: the rejection rate is nominal where the asymptotics hold", {
+  fx <- m68_cells()
+  cell <- m68_ok(fx$sweep[["4800"]])
+  expect_gte(nrow(cell), 2000L)
+  rej <- mean(cell[, "p"] < .05)
+  expect_gt(rej, .036)
+  expect_lt(rej, .064)
+
+  # ... and the unscaled test is NOT, in the flattering direction, at the same
+  # sample size. The pair is the argument for shipping: at the N where the
+  # reference distribution is trustworthy, the scaled test is right and the
+  # uncorrected one rejects at roughly a third of nominal.
+  expect_lt(mean(cell[, "p_unscaled"] < .05), .030)
+})
+
+
+test_that("AC9: the N = 600 rates hold their committed fences", {
+  fx <- m68_cells()
+  # Regression fences, NOT calibration claims -- the scaled rates here are
+  # deliberately outside the nominal band, and that is the documented
+  # small-sample behaviour (AC11), not a defect. A breach escalates rather
+  # than being re-fenced, and would have to move AC11's published numbers too.
+  for (nm in M68_POPS) {
+    cell <- m68_ok(fx$cells[[nm]])
+    expect_lt(abs(mean(cell[, "p"] < .05) - M68_RATE_SCALED[[nm]]), .021,
+              label = paste("scaled rate", nm))
+    expect_lt(abs(mean(cell[, "p_unscaled"] < .05) - M68_RATE_UNSCALED[[nm]]),
+              .021, label = paste("unscaled rate", nm))
+  }
+})
+
+
+test_that("AC10: the tail excess is not factor-estimation noise", {
+  fx <- m68_cells()
+  # RR14 Q2's decomposition, re-run from the stored columns: replacing each
+  # replicate's own c-hat with the population factor barely moves the rejection
+  # rate, so the excess is a mean shift in T and not noise the estimated factor
+  # introduced. This is the load-bearing evidence for documenting the residual
+  # (AC11) rather than treating it as a defect in the scaling.
+  for (nm in M68_POPS) {
+    cell <- m68_ok(fx$cells[[nm]])
+    df <- cell[1, "df"]
+    c_pop <- fx$population_diagnostics[[nm]]$cfactor
+    rej_hat <- mean(stats::pchisq(cell[, "chisq"] / cell[, "cfactor"], df,
+                                  lower.tail = FALSE) < .05)
+    rej_pop <- mean(stats::pchisq(cell[, "chisq"] / c_pop, df,
+                                  lower.tail = FALSE) < .05)
+    expect_lt(abs(rej_hat - rej_pop), .005, label = paste("rej gap", nm))
+    # The per-fit factor barely varies, which is why the two agree.
+    expect_lt(stats::sd(cell[, "cfactor"]) / mean(cell[, "cfactor"]), .01,
+              label = paste("rel sd(c-hat)", nm))
+  }
+})
+
+
+test_that("AC14: the live smoke cell reproduces the committed harness", {
+  skip_if_not_installed("lavaan")
+  # The stored numbers above are a pin; this runs the same path end-to-end at
+  # ~12 replicates so a regression in the WIRING is caught without the 5-minute
+  # full run. The M65 harness pattern: a stored fixture is never the only thing
+  # between a broken estimator and a green suite.
+  #
+  # It asserts the direction, not the calibration -- 12 replicates cannot
+  # resolve a rejection rate, and pretending otherwise would be the fixture's
+  # bar applied to a sample far too small for it.
+  oct <- octants()
+  got <- vapply(seq_len(12L), function(i) {
+    set.seed(6000L + i)
+    mat <- as.matrix(axes_simulate(600L, oct, 3L, .35, .10, .08))
+    items <- split(colnames(mat), rep(seq_len(8), each = 3L))
+    r <- suppressMessages(suppressWarnings(
+      axes_reliability(as.data.frame(mat), items = items, angles = oct)
+    ))
+    c(ratio = r$fit$chisq / r$fit$df,
+      cfac = unname(r$details$scaling_factor[["model"]]),
+      raw = r$details$fit_uncorrected$chisq / r$fit$df)
+  }, numeric(3))
+
+  # The factor is a population quantity and barely moves across replicates, so
+  # even 12 draws pin it tightly against the fixture's own c_pop.
+  fx <- m68_cells()
+  expect_lt(abs(mean(got["cfac", ]) -
+                  fx$population_diagnostics$strong$cfactor), .005)
+  # Scaling moves the statistic UP, on every single replicate, because c < 1.
+  expect_true(all(got["ratio", ] > got["raw", ]))
 })
