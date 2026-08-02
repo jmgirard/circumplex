@@ -1237,7 +1237,23 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # Thin, but not empty: a warning rather than a refusal (M65-D2). The
       # number is named so the user can judge it, and it is a convention with
       # no inferential meaning -- see axes_fiml_min_overlap.
-      if (cvg$min_coverage < axes_fiml_min_overlap) {
+      #
+      # Both clauses are load-bearing. The second says the thinnest pair is
+      # thinner than the sample the CALLER SUPPLIED, which is precisely
+      # "missingness thinned this pair": equality holds if and only if the
+      # input frame had no missing cell at all. Without it the warning fired on
+      # any complete sample under 30, reporting missing-data thinness on a
+      # frame with no missing cell -- the sentence was then true of N and false
+      # of itself. Small N alone is not this function's business to remark on,
+      # and the listwise path does not remark on it either.
+      #
+      # The comparison is against `n_used + n_dropped` and NOT `n_used`, which
+      # is counted after axes_fiml_coverage() drops all-missing rows: under
+      # heavy unit nonresponse -- respondents who answered everything or
+      # nothing -- every surviving row is complete, so `n_used` alone equals
+      # min_coverage and silently suppressed a warning that was true.
+      if (cvg$min_coverage < axes_fiml_min_overlap &&
+            cvg$min_coverage < cvg$n_used + cvg$n_dropped) {
         warning(
           "Some item pair(s) were jointly observed by as few as ",
           cvg$min_coverage, " respondent(s); the estimated correlation ",
@@ -1637,13 +1653,21 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # "srmr": the contract is the quantity, not lavaan's spelling of it.
   want <- c("chisq", "df", "pvalue", "rmsea", "cfi", "srmr_bentler_nomean")
   fm <- lavaan::fitMeasures(fit, want)
-  # lavaan DROPS a measure name it does not recognize -- silently, no warning,
-  # just a shorter vector (measured: two names, one bogus, returns one element).
+  # lavaan DROPS a measure name it does not recognize, returning a shorter
+  # vector rather than refusing (measured on BOTH generations: two names, one
+  # bogus, returns one element -- silently on 0.6.21, and on 0.7.2 with a
+  # `unknown fit measure: '<name>'` warning. The drop is what matters and is
+  # common to both; only the silence is version-specific).
   # `srmr_bentler_nomean` is an internal variant rather than a documented alias
   # and lavaan is a Suggests with no version floor, so a future rename would
   # otherwise delete `$fit$srmr` -- a documented @return field -- and leave the
   # object looking well formed. Refuse instead of shipping a hole.
-  if (!identical(names(fm), want)) {
+  #
+  # Keyed on MEMBERSHIP, then reordered here. `identical(names(fm), want)` also
+  # failed on order and on length, for which `setdiff()` reports nothing, so any
+  # mismatch that was not a dropped name refused with the degenerate message
+  # "(missing: )" -- a guard that fails safe while telling the user nothing.
+  if (!all(want %in% names(fm))) {
     stop(
       "The installed lavaan did not return the expected fit measures (missing: ",
       paste(setdiff(want, names(fm)), collapse = ", "),
@@ -1651,6 +1675,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       call. = FALSE
     )
   }
+  fm <- fm[want]
   names(fm)[names(fm) == "srmr_bentler_nomean"] <- "srmr"
   new_axes_reliability(
     results = results,

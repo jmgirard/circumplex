@@ -75,15 +75,26 @@ axes_fiml_em_args <- function(cap = axes_fiml_em_iter_max) {
 }
 
 
-# Did this warning report the unrestricted-moments EM hitting its cap? Both
-# lavaan generations word the message differently but both contain the literal
-# "moments using EM" and both name an `em.h1*` option in the remedy, so either
-# substring identifies it. Deliberately NARROW: the structured-fit call site
-# below muffles lavaan's boundary and optimizer warnings too, and matching one
-# of those would turn a converged-but-boundary fit into an EM refusal.
+# Did this warning report the unrestricted-moments EM hitting its cap? Two
+# independent substrings, because either alone is fragile. The DIAGNOSIS
+# sentence ("the sample moments using EM") is worded identically on both
+# generations, but lavaan hard-wraps its messages at getOption("width")
+# (lav_msg(): split on whitespace, then prefix the chunk after a break with a
+# newline and three spaces), so WHERE the break lands moves with the width in
+# force at emission time. A `fixed = TRUE` literal "moments using EM" therefore
+# fails at exactly the two gaps separating its three words -- and one of those
+# is the break lavaan actually takes at the default width 80, measured on
+# 0.6.21 and 0.7.2 alike. Hence a whitespace class at BOTH gaps: making only
+# the first tolerant still leaves the `using`/`EM` gap fatal.
+# The REMEDY sentence names an `em.h1*` option, which is version-specific:
+# lavaan renamed the option once already at 0.7-1, and a further rename of the
+# stem would silence this predicate if it were the only clause. Deliberately
+# NARROW: the structured-fit call site below muffles lavaan's boundary and
+# optimizer warnings too, and matching one of those would turn a
+# converged-but-boundary fit into an EM refusal.
 axes_fiml_em_stalled <- function(w) {
   msg <- conditionMessage(w)
-  grepl("moments using EM", msg, fixed = TRUE) || grepl("em\\.h1", msg)
+  grepl("moments[[:space:]]+using[[:space:]]+EM", msg) || grepl("em\\.h1", msg)
 }
 
 

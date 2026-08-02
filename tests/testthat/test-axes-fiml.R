@@ -238,8 +238,10 @@ test_that("on complete data EVERY reported fit measure agrees between paths", {
     axes_reliability(dat, items = items, angles = octants(), missing = "fiml")
   )
   # The names are pinned to LITERALS, not to each other. `fitMeasures()` drops a
-  # name it does not recognize -- silently, no warning, a shorter vector -- and
-  # the FIML path asks for `srmr_bentler_nomean`, which is one of lavaan's six
+  # name it does not recognize, returning a shorter vector rather than refusing
+  # (silently on lavaan 0.6.21; on 0.7.2 with an `unknown fit measure` warning,
+  # measured at M67 -- the drop is common to both generations, the silence is
+  # not). The FIML path asks for `srmr_bentler_nomean`, which is one of lavaan's six
   # internal SRMR variants rather than a documented alias, in a package that is
   # Suggests with no version floor. Compared to each other these two lists come
   # from ONE line of code, so a dropped name shortens both alike: the comparison
@@ -559,6 +561,75 @@ test_that("M65-D2: healthy overlap draws no warning", {
   )
 })
 
+test_that("the thin-overlap warning separates thin overlap from a small sample", {
+  skip_if_not_installed("lavaan")
+  # Two cases, deliberately split, because the pre-M67 predicate
+  # `min_coverage < 30` could not tell them apart: on complete data
+  # `min_coverage` EQUALS the sample size, so every small complete sample drew
+  # "Some item pair(s) were jointly observed by as few as 25 respondent(s)" --
+  # a true statement about N dressed as a statement about missing data, on a
+  # frame with no missing cell at all. Found by three independent review lenses
+  # at M65 (scored 76, 78, and once as an unscored note).
+  #
+  # The warning now also requires the thinnest pair to be thinner than the
+  # sample the CALLER SUPPLIED, which is exactly "some missingness thinned a
+  # pair": equality holds if and only if the input frame had no missing cell.
+  # Small N alone stays unremarked, as it already is on the listwise path.
+  # Case (c) fences the half of that comparison that is easy to get wrong --
+  # rows axes_fiml_coverage() drops before `n_used` is counted.
+  oct <- octants()
+  thin_msg <- "jointly observed by as few as"
+  warns_of <- function(dat, items) {
+    ws <- character(0)
+    withCallingHandlers(
+      suppressMessages(
+        axes_reliability(as.data.frame(dat), items = items, angles = oct,
+                         missing = "fiml")
+      ),
+      warning = function(w) {
+        ws <<- c(ws, conditionMessage(w))
+        invokeRestart("muffleWarning")
+      }
+    )
+    ws
+  }
+
+  # (a) Complete data, N = 25 < 30. Collected rather than `expect_no_warning()`
+  # so an unrelated boundary or optimizer warning cannot be mistaken for this
+  # one, or mask its absence.
+  set.seed(67)
+  small <- axes_simulate(25L, oct, 2L, xi1 = .15, xi2 = .05, zeta1 = .10)
+  inames <- sprintf("t%02d", seq_len(ncol(small)))
+  colnames(small) <- inames
+  items <- split(inames, rep(seq_along(oct), each = 2L))
+  expect_false(any(grepl(thin_msg, warns_of(small, items), fixed = TRUE)))
+
+  # (b) Genuinely thin overlap at N = 200: one item answered by 20 respondents,
+  # so every pair it belongs to rests on 20 while the sample is 200. The
+  # warning must still fire, and still name the count.
+  set.seed(68)
+  wide <- axes_simulate(200L, oct, 2L, xi1 = .15, xi2 = .05, zeta1 = .10)
+  colnames(wide) <- inames
+  wide[21:nrow(wide), 1L] <- NA_real_
+  ws <- warns_of(wide, items)
+  expect_true(any(grepl(thin_msg, ws, fixed = TRUE)))
+  expect_true(any(grepl("as few as 20 respondent", ws, fixed = TRUE)))
+
+  # (c) Heavy UNIT nonresponse: 120 respondents of whom 95 answered nothing.
+  # axes_fiml_coverage() drops those 95 before `n_used` is counted, so every
+  # surviving row is complete and `min_coverage` equals `n_used` -- which is
+  # why the comparison is against the supplied total and not `n_used`. The
+  # thinness is real (25 of 120 supplied respondents), so the warning must
+  # fire and must name 25. Comparing against `n_used` alone silences it.
+  set.seed(69)
+  unit <- axes_simulate(120L, oct, 2L, xi1 = .15, xi2 = .05, zeta1 = .10)
+  colnames(unit) <- inames
+  unit[26:120, ] <- NA_real_
+  ws_unit <- warns_of(unit, items)
+  expect_true(any(grepl(thin_msg, ws_unit, fixed = TRUE)))
+  expect_true(any(grepl("as few as 25 respondent", ws_unit, fixed = TRUE)))
+})
+
 test_that("M60 re-assertion: the listwise refusals still fire on their own terms", {
   skip_if_not_installed("lavaan")
   # The FIML branch moved the sample-size floor to N_used and the PD gate to
@@ -696,6 +767,78 @@ test_that("M65-D5: a stalled structured-stage EM is refused, not muffled", {
   # (item 1 sits at 20/300); the refusal under test is an error, not a warning.
   expect_error(suppressWarnings(fiml_call(mat, fx$items)),
                "unrestricted \\(EM\\) stage")
+})
+
+test_that("the EM-stall predicate fires on both lavaan generations", {
+  # Real wrapped warning text, captured with `dput(conditionMessage(w))` at the
+  # default getOption("width") = 80 by squeezing the h1 EM cap on each
+  # generation -- never retyped, because the WRAP POSITION is the thing under
+  # test. lavaan 0.6.21 and 0.7.2 differ in the emitting function's name and in
+  # the remedy option they name, and agree in wrapping between "moments" and
+  # "using EM".
+  msg_0621 <- paste0(
+    "lavaan->lav_mvnorm_missing_h1_estimate_moments():  \n   Maximum number ",
+    "of iterations reached when computing the sample moments \n   using EM; ",
+    "use the em.h1.iter.max= argument to increase the number of \n   iterations"
+  )
+  msg_072 <- paste0(
+    "lavaan->lav_mvn_mi_h1_est_moments():  \n   Maximum number of iterations ",
+    "reached when computing the sample moments \n   using EM; increase the ",
+    "max_iter element of the em.h1.args= argument to \n   increase the number ",
+    "of iterations"
+  )
+
+  # lavaan's wrapper (lav_msg) splits the message on whitespace and, at a
+  # break, prefixes the following chunk with a newline and three spaces. So the
+  # break position is a function of the width in force when the warning is
+  # EMITTED, not of the width these strings were captured at, and pinning the
+  # two captured width-80 strings characterizes one width rather than the
+  # wrap-sensitivity under test. Re-break at each inter-word gap instead: that
+  # enumerates every position lav_msg can break in, so "matches at all widths"
+  # is asserted over a finite domain rather than sampled.
+  rewrap_at <- function(txt, i) {
+    w <- strsplit(txt, "[[:space:]]+")[[1]]
+    w[i + 1L] <- paste0("\n   ", w[i + 1L])
+    paste(w, collapse = " ")
+  }
+
+  for (msg in list(msg_0621, msg_072)) {
+    expect_true(axes_fiml_em_stalled(simpleWarning(msg)))
+    # The half that reddens, and the reason this test exists: the first
+    # disjunct was a `fixed = TRUE` literal "moments using EM". It fails at the
+    # two gaps separating its three words, and the width-80 break lavaan
+    # actually takes lands in one of them on BOTH generations, leaving
+    # detection there resting solely on the `em.h1` stem in the remedy
+    # sentence. lavaan renamed that option once already, at 0.7-1
+    # (`em.h1.iter.max` -> `em.h1.args$max_iter`) -- which did NOT break
+    # detection, both spellings containing `em.h1`; what it broke was
+    # axes_fiml_em_args(), a different seam, and that is the M65 CI failure.
+    # A FURTHER rename dropping the stem would silence detection outright,
+    # which is why the diagnosis half has to carry it alone. Strip the remedy
+    # sentence and the predicate must still fire on the diagnosis alone.
+    stripped <- paste0(strsplit(msg, "EM;", fixed = TRUE)[[1]][[1]], "EM.")
+    expect_false(grepl("em\\.h1", stripped))
+    expect_true(axes_fiml_em_stalled(simpleWarning(stripped)))
+
+    # ... and must still fire wherever the break falls. A pattern tolerant at
+    # only one of the two gaps passes the width-80 case above and fails here.
+    diagnosis <- paste(strsplit(stripped, "[[:space:]]+")[[1]], collapse = " ")
+    n_gap <- length(strsplit(diagnosis, " ", fixed = TRUE)[[1]]) - 1L
+    expect_gt(n_gap, 0L)
+    for (i in seq_len(n_gap)) {
+      expect_true(
+        axes_fiml_em_stalled(simpleWarning(rewrap_at(diagnosis, i))),
+        info = paste("break after word", i, "of", diagnosis)
+      )
+    }
+  }
+
+  # Deliberately narrow, and asserted so: the call site muffles lavaan's
+  # boundary and optimizer warnings through this same predicate, and matching
+  # one of those would turn a converged-but-boundary fit into an EM refusal.
+  expect_false(axes_fiml_em_stalled(simpleWarning(
+    "lavaan->lav_object_post_check():  \n   some estimated ov variances are negative"
+  )))
 })
 
 
@@ -1174,7 +1317,38 @@ test_that("M65-D3: stored seeds reproduce live, so the fixture is not stale", {
   # three. Those come from the stored file; what is re-derived here is that the
   # code still produces the per-replicate xi1 AND SE values in it.
   seed_m2 <- fx$provenance$seeds$m2[[1]]
-  live_m2 <- est_of(axes_mar_m2(draw(2000L, seed_m2), 3L), missing = "fiml")
-  expect_equal(unname(live_m2[["xi1"]]), unname(fx$m2[1, "shipped"]),
+  mat_m2 <- axes_mar_m2(draw(2000L, seed_m2), 3L)
+  res_m2 <- suppressMessages(suppressWarnings(
+    axes_reliability(as.data.frame(mat_m2), items = items(mat_m2),
+                     angles = oct, missing = "fiml")
+  ))
+  expect_equal(unname(res_m2$results$xi1[[1]]), unname(fx$m2[1, "shipped"]),
                tolerance = tol)
+
+  # The OLS shadow consumes R-hat, not an available-case correlation. Fenced on
+  # THIS replicate because the fence has to be discriminative: under MCAR the
+  # two candidate matrices agree to about 1e-4 (0.3562 against 0.3563, measured
+  # at M65), so an MCAR or complete-data fixture cannot tell them apart and
+  # would pass whichever matrix the code used. M2 is MAR, where they separate.
+  #
+  # Asserted on the shipped `details$ols_shadow` against both candidates
+  # recomputed here, rather than on the single shared `R <- mom$R` assignment
+  # holding by construction -- construction is what a suite assertion is for.
+  item_angle <- rep(oct, each = 3L)
+  item_scale <- rep(seq_along(oct), each = 3L)
+  # Recomputed on the rows the package keeps, not on the raw matrix: the FIML
+  # path calls axes_fiml_moments() on mat[cvg$keep, ]. axes_mar_m2() happens to
+  # leave no all-missing row, so the two agree here -- which is precisely why
+  # the recomputation must not depend on that holding.
+  keep_m2 <- axes_fiml_coverage(mat_m2)$keep
+  shadow_fiml <- axes_ols_shadow(
+    axes_fiml_moments(mat_m2[keep_m2, , drop = FALSE])$R, item_angle, item_scale
+  )
+  shadow_avail <- axes_ols_shadow(
+    stats::cor(mat_m2, use = "pairwise.complete.obs"), item_angle, item_scale
+  )
+  expect_equal(res_m2$details$ols_shadow, shadow_fiml, tolerance = 1e-8)
+  # And the two candidates really are distinguishable here, so the assertion
+  # above is not vacuously satisfied by both.
+  expect_gt(abs(shadow_fiml[["xi1"]] - shadow_avail[["xi1"]]), 1e-3)
 })
