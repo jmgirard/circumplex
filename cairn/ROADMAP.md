@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-07-27 (M66 post-merge. All checks PASS; M66 archived and its live file deleted; 6 terminal rows pruned to 5 by dropping M61. LESSONS gained M66's lavaan variable-reordering lesson and extended two existing lines rather than adding rows.)_
+_Last hygiene check: 2026-08-02 (M67 post-merge. All checks PASS; M67 archived and its live file deleted; 6 terminal rows pruned to 5 by dropping M62. LESSONS extended two existing lines — lavaan's width-dependent message wrapping onto M65's, and the post-filter-count trap onto M60's — and added no row.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,12 +9,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M62 | Close `axes_reliability()`'s two never-NaN gaps — ξ1 ≥ 1 and an unvalidated `sd` | done | — | normal | milestones/archive/M62-axes-reliability-never-nan.md |
 | M63 | Blockwise instruments for `axes_reliability()` — the ζ2 component | done | — | normal | milestones/archive/M63-axes-reliability-blockwise-zeta2.md |
 | M64 | FIML on items for `axes_reliability()` — the estimator-metric question | done | — | normal | milestones/archive/M64-axes-reliability-fiml-review.md |
 | M65 | FIML item-level missing data for `axes_reliability()` — the build | done | — | normal | milestones/archive/M65-axes-reliability-fiml-build.md |
 | M66 | Corrected component standard errors for `axes_reliability()` | done | — | high | milestones/archive/M66-axes-reliability-corrected-se.md |
-| M67 | M65 review fold-ins for the `axes_reliability()` FIML path | review | M66 | normal | milestones/M67-axes-reliability-m65-foldins.md |
+| M67 | M65 review fold-ins for the `axes_reliability()` FIML path | done | M66 | normal | milestones/archive/M67-axes-reliability-m65-foldins.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
