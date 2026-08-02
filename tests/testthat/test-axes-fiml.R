@@ -238,8 +238,10 @@ test_that("on complete data EVERY reported fit measure agrees between paths", {
     axes_reliability(dat, items = items, angles = octants(), missing = "fiml")
   )
   # The names are pinned to LITERALS, not to each other. `fitMeasures()` drops a
-  # name it does not recognize -- silently, no warning, a shorter vector -- and
-  # the FIML path asks for `srmr_bentler_nomean`, which is one of lavaan's six
+  # name it does not recognize, returning a shorter vector rather than refusing
+  # (silently on lavaan 0.6.21; on 0.7.2 with an `unknown fit measure` warning,
+  # measured at M67 -- the drop is common to both generations, the silence is
+  # not). The FIML path asks for `srmr_bentler_nomean`, which is one of lavaan's six
   # internal SRMR variants rather than a documented alias, in a package that is
   # Suggests with no version floor. Compared to each other these two lists come
   # from ONE line of code, so a dropped name shortens both alike: the comparison
@@ -557,6 +559,59 @@ test_that("M65-D2: healthy overlap draws no warning", {
                        angles = octants(), missing = "fiml")
     )
   )
+})
+
+test_that("the thin-overlap warning separates thin overlap from a small sample", {
+  skip_if_not_installed("lavaan")
+  # Two cases, deliberately split, because the pre-M67 predicate
+  # `min_coverage < 30` could not tell them apart: on complete data
+  # `min_coverage` EQUALS the sample size, so every small complete sample drew
+  # "Some item pair(s) were jointly observed by as few as 25 respondent(s)" --
+  # a true statement about N dressed as a statement about missing data, on a
+  # frame with no missing cell at all. Found by three independent review lenses
+  # at M65 (scored 76, 78, and once as an unscored note).
+  #
+  # The warning now also requires the thinnest pair to be thinner than the
+  # sample actually used, which is exactly "some missingness thinned a pair":
+  # `min_coverage == n_used` holds if and only if every used row is complete.
+  # Small N alone stays unremarked, as it already is on the listwise path.
+  oct <- octants()
+  thin_msg <- "jointly observed by as few as"
+  warns_of <- function(dat, items) {
+    ws <- character(0)
+    withCallingHandlers(
+      suppressMessages(
+        axes_reliability(as.data.frame(dat), items = items, angles = oct,
+                         missing = "fiml")
+      ),
+      warning = function(w) {
+        ws <<- c(ws, conditionMessage(w))
+        invokeRestart("muffleWarning")
+      }
+    )
+    ws
+  }
+
+  # (a) Complete data, N = 25 < 30. Collected rather than `expect_no_warning()`
+  # so an unrelated boundary or optimizer warning cannot be mistaken for this
+  # one, or mask its absence.
+  set.seed(67)
+  small <- axes_simulate(25L, oct, 2L, xi1 = .15, xi2 = .05, zeta1 = .10)
+  inames <- sprintf("t%02d", seq_len(ncol(small)))
+  colnames(small) <- inames
+  items <- split(inames, rep(seq_along(oct), each = 2L))
+  expect_false(any(grepl(thin_msg, warns_of(small, items), fixed = TRUE)))
+
+  # (b) Genuinely thin overlap at N = 200: one item answered by 20 respondents,
+  # so every pair it belongs to rests on 20 while the sample is 200. The
+  # warning must still fire, and still name the count.
+  set.seed(68)
+  wide <- axes_simulate(200L, oct, 2L, xi1 = .15, xi2 = .05, zeta1 = .10)
+  colnames(wide) <- inames
+  wide[21:nrow(wide), 1L] <- NA_real_
+  ws <- warns_of(wide, items)
+  expect_true(any(grepl(thin_msg, ws, fixed = TRUE)))
+  expect_true(any(grepl("as few as 20 respondent", ws, fixed = TRUE)))
 })
 
 test_that("M60 re-assertion: the listwise refusals still fire on their own terms", {
@@ -1214,7 +1269,32 @@ test_that("M65-D3: stored seeds reproduce live, so the fixture is not stale", {
   # three. Those come from the stored file; what is re-derived here is that the
   # code still produces the per-replicate xi1 AND SE values in it.
   seed_m2 <- fx$provenance$seeds$m2[[1]]
-  live_m2 <- est_of(axes_mar_m2(draw(2000L, seed_m2), 3L), missing = "fiml")
-  expect_equal(unname(live_m2[["xi1"]]), unname(fx$m2[1, "shipped"]),
+  mat_m2 <- axes_mar_m2(draw(2000L, seed_m2), 3L)
+  res_m2 <- suppressMessages(suppressWarnings(
+    axes_reliability(as.data.frame(mat_m2), items = items(mat_m2),
+                     angles = oct, missing = "fiml")
+  ))
+  expect_equal(unname(res_m2$results$xi1[[1]]), unname(fx$m2[1, "shipped"]),
                tolerance = tol)
+
+  # The OLS shadow consumes R-hat, not an available-case correlation. Fenced on
+  # THIS replicate because the fence has to be discriminative: under MCAR the
+  # two candidate matrices agree to about 1e-4 (0.3562 against 0.3563, measured
+  # at M65), so an MCAR or complete-data fixture cannot tell them apart and
+  # would pass whichever matrix the code used. M2 is MAR, where they separate.
+  #
+  # Asserted on the shipped `details$ols_shadow` against both candidates
+  # recomputed here, rather than on the single shared `R <- mom$R` assignment
+  # holding by construction -- construction is what a suite assertion is for.
+  item_angle <- rep(oct, each = 3L)
+  item_scale <- rep(seq_along(oct), each = 3L)
+  shadow_fiml <- axes_ols_shadow(axes_fiml_moments(mat_m2)$R,
+                                 item_angle, item_scale)
+  shadow_avail <- axes_ols_shadow(
+    stats::cor(mat_m2, use = "pairwise.complete.obs"), item_angle, item_scale
+  )
+  expect_equal(res_m2$details$ols_shadow, shadow_fiml, tolerance = 1e-8)
+  # And the two candidates really are distinguishable here, so the assertion
+  # above is not vacuously satisfied by both.
+  expect_gt(abs(shadow_fiml[["xi1"]] - shadow_avail[["xi1"]]), 1e-3)
 })

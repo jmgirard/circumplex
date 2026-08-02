@@ -417,6 +417,63 @@ test_that("BC11: small positive xi1 gives a small reliability, not a boundary", 
   expect_lt(res$results$reliability[[1]], .40)
 })
 
+test_that("the fit-measure guard names the actual problem on every mismatch", {
+  skip_if_not_installed("lavaan")
+  # The guard exists because `fitMeasures()` DROPS a name it does not
+  # recognize and returns a shorter vector, so a future lavaan retiring
+  # `srmr_bentler_nomean` would delete `$fit$srmr` -- a documented @return
+  # field -- and leave the object looking well formed. Measured on both
+  # generations at M67, since the guard's own comment used to assert this
+  # wrongly: requesting one real and one bogus measure returns ONE element,
+  # silently on 0.6.21 and with a `unknown fit measure: 'srmr_bogus_name'`
+  # warning on 0.7.2. The drop is real on both; only the silence was
+  # version-specific.
+  #
+  # What is under test here is the guard's DIAGNOSIS. It used to test
+  # `identical(names(fm), want)`, which also fails on order and on length,
+  # while its message reported `setdiff(want, names(fm))` -- so any mismatch
+  # that was not a dropped name printed the degenerate "(missing: )" and told
+  # the user nothing.
+  oct <- octants()
+  set.seed(11)
+  dat <- axes_simulate(300L, oct, 2L, xi1 = .15, xi2 = .05, zeta1 = .10)
+  inames <- sprintf("g%02d", seq_len(ncol(dat)))
+  colnames(dat) <- inames
+  items <- split(inames, rep(seq_along(oct), each = 2L))
+  call_it <- function() {
+    suppressMessages(axes_reliability(dat, items = items, angles = oct))
+  }
+  real_fm <- lavaan::fitMeasures
+
+  # (1) An order-only difference is not a missing measure, and must not be
+  # reported as one. lavaan preserves the requested order on both generations
+  # today, so this is forward-looking: the guard must key on membership and
+  # then impose the order itself.
+  local_mocked_bindings(
+    fitMeasures = function(object, fit.measures, ...) {
+      rev(real_fm(object, fit.measures, ...))
+    },
+    .package = "lavaan"
+  )
+  res <- call_it()
+  expect_identical(
+    names(res$fit),
+    c("chisq", "df", "pvalue", "rmsea", "cfi", "srmr")
+  )
+
+  # (2) A genuine drop still refuses, and names the measure that went missing.
+  local_mocked_bindings(
+    fitMeasures = function(object, fit.measures, ...) {
+      fm <- real_fm(object, fit.measures, ...)
+      fm[names(fm) != "cfi"]
+    },
+    .package = "lavaan"
+  )
+  err <- expect_error(call_it(), "did not return the expected fit measures")
+  expect_match(conditionMessage(err), "missing: cfi", fixed = TRUE)
+  expect_false(grepl("missing: )", conditionMessage(err), fixed = TRUE))
+})
+
 test_that("BC11: a boundary fit (xi1 <= 0) returns NA + warning + flag", {
   skip_if_not_installed("lavaan")
   oct <- octants()
