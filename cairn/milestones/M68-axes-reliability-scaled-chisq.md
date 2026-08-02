@@ -100,7 +100,7 @@ machinery M66 built for the component standard errors.
 
 ## Tasks
 
-- [ ] **T1** — Author `cairn/references/satorra1994.md` and `cudeck1989.md`
+- [x] **T1** — Author `cairn/references/satorra1994.md` and `cudeck1989.md`
       from the source-note template, with provenance blocks and page anchors;
       add both `INDEX.md` lines. **Gated on the maintainer shelving
       `satorra1994.pdf` and `cudeck1989.pdf` in `cairn/references/sources/`**
@@ -142,8 +142,39 @@ machinery M66 built for the component standard errors.
 - 2026-08-02: criteria audit ([O], fresh context) returned 13 findings; 5 clear-fixes applied before the gate — AC1's srmr/df clause contradicted its own no-mixture clause; AC3's [.035,.065] band at 500 reps was ±1.55 MC SE (a calibrated statistic fails ~12% of the time), raised to 2000 reps and the RR13 Q5 ±2.8 MC SE band; AC4 conflated the M65 fixture (no χ² stored, 5-rep M1 cell) with M66's 201-rep M1 cell; AC5's grep over-caught unrelated uses (`evaluating-circumplex-structure.Rmd:93`, `ssm_analysis.R:111`), so a third disposition was added; AC2's 261.1 was demoted from gate to corroboration because RR13 ships no reproduction code for it. Four judgment findings went to the question gate.
 - 2026-08-02: plan gate chose scaling all three paths over shipping listwise+`cormat` first with FIML as a dependent milestone, because a path-dependent `$fit$chisq` is the exact trap the M65 SRMR fix cured (`R/axes_reliability.R:1635-1653`); falsified by the FIML calibration of AC4 missing its band under both candidate `Γ_R` constructions.
 - 2026-08-02: plan gate chose scaling CFI via the independence model's own `c_b` over leaving CFI uncorrected, because `summary()` prints χ², RMSEA and CFI on one line (`R/axes_reliability_oop.R:257-262`) and RR13 B-2 named mixed-calibration comparison as the harm on the SE side; falsified by `c_b` proving unidentified or unstable on any accepted input.
+- 2026-08-02: implementation question gate — both recommendations accepted; recorded as M68-D1 (FIML uses the complete-data `Γ_R` at Σ̂ on M66's multiplicative-composition precedent; a failed factor NAs the four statistics with a stored reason rather than falling back to unscaled). The T4 tripwire is settled here, not escalated.
+- 2026-08-02: T1 done — `satorra1994.md` and `cudeck1989.md` authored from the source-note template with INDEX lines. Both PDFs are Paper Capture OCR scans; satorra1994's text layer drops eqs. 16.21/16.22 entirely (the M42-D1 trap), so both were read from rendered page images. Anchors banked: U (eq. 16.18, p. 406), T̄ = c⁻¹T and c = trace{UΓ/r} (eqs. 16.21/16.22, p. 407), the any-moments licensing sentence (p. 401), Cudeck's scale-invariance definition (p. 319) and Table 4's 48% SE discrepancy (p. 323). Two claims the notes fence rather than assert: the axes model's non-scale-invariance is derived in-repo (Cudeck never treats a circumplex), and Cudeck's Error (b) is a different error from the one M68 corrects.
 - 2026-08-02: plan chose replacing `$fit`'s values and retaining the unscaled six in `details$fit_uncorrected` over adding parallel `*_scaled` fields, following M66's `details$se_uncorrected` precedent, so the default-read number is the calibrated one; falsified by a user needing both side by side in printed output.
 
 ## Decisions
+
+**M68-D1 (2026-08-02): the FIML path's scaling factor uses the complete-data
+`Γ_R` at Σ̂, and a failed factor NAs the four statistics rather than falling
+back.** Settles the T4 `(RB tripwire: no-oracle)` question D-036 left open, at
+the implementation question gate rather than by escalation.
+
+*The `Γ_R` choice.* The two candidates were the complete-data `Γ_R` evaluated at
+the fitted Σ̂, and RR13 §4's saturated observed-information acov
+delta-transformed to the correlation metric. Chosen: the complete-data form, on
+M66's precedent rather than on new theory. M66's FIML SEs compose
+**multiplicatively** — `se_uncorrected * (corrected/naive)`
+(`R/axes_reliability.R:1610-1620`) — precisely so lavaan's own missing-data
+pricing survives and only the metric error is removed. The test statistic sits
+in the same position: lavaan's FIML `T` is already referenced against the FIML
+saturated loglikelihood, so it already prices missingness, and the normal-theory
+reference for `c` is exactly 1, which makes `c` a metric-only ratio by
+construction. The saturated-information form would price missingness a second
+time, inside a factor applied to a statistic that has already priced it.
+*Falsified by:* AC4's cells missing [0.95, 1.05], which is the only oracle
+either construction has; a miss escalates via `/milestone-brief` rather than
+being patched.
+
+*The failure contract.* When `axes_scaling_factor()` returns a `reason` instead
+of a factor, `$fit$chisq`, `$pvalue`, `$rmsea` and `$cfi` are `NA` with the
+reason stored in `details$fit_scaling_failed`, and `details$fit_uncorrected`
+still carries lavaan's six. `$fit$df` and `$fit$srmr` are unaffected — they
+never depended on the factor. Rejected: reporting lavaan's unscaled values with
+a warning, which is the one failure a user could not detect, and is the same
+call M66 made for the SEs (`R/axes_corrected_se.R:88-92`).
 
 ## Review
