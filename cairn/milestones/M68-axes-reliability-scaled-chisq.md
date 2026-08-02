@@ -1,11 +1,11 @@
 # M68: Scaled global test statistic for `axes_reliability()`
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m68-axes-reliability-scaled-chisq`
 
 ## Goal
 
