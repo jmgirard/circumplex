@@ -112,13 +112,19 @@ supplied, `nb_reason`, why the Nunnally-Bernstein comparison is `NA`,
 `n_complete`, the complete-case count, `min_coverage`, the fewest
 respondents behind any item pair, `se_uncorrected`, the component
 standard errors as normal-theory maximum likelihood reports them before
-the correlation-structure correction, and `se_correction_failed`, `NULL`
+the correlation-structure correction, `se_correction_failed`, `NULL`
 when that correction succeeded or a string naming why the reported SEs
-are `NA`). `n_complete` and `min_coverage` are present on every path so
-that a caller can read them unconditionally, and are `NA` where they
-carry no information: `min_coverage` outside `missing = "fiml"`, and
-both of them when a correlation matrix was supplied in place of raw
-data.
+are `NA`, `fit_uncorrected`, the six fit statistics as lavaan reports
+them before the correlation-metric scaling, `scaling_factor`, the two
+Satorra-Bentler factors (`model` and `baseline`), and
+`fit_scaling_failed`, `NULL` when the scaling succeeded or a string
+naming why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`). `fit` carries
+`chisq`, `df`, `pvalue`, `rmsea`, `cfi` and `srmr`; the four
+chi-square-derived values are scaled and `df` and `srmr` are not.
+`n_complete` and `min_coverage` are present on every path so that a
+caller can read them unconditionally, and are `NA` where they carry no
+information: `min_coverage` outside `missing = "fiml"`, and both of them
+when a correlation matrix was supplied in place of raw data.
 
 ## Details
 
@@ -144,11 +150,11 @@ al. themselves do, leaving it blank for such instruments.
 
 Because the model is fit to the item **correlation** matrix as if it
 were a covariance matrix (the paper's own practice), the component point
-estimates and the reliabilities are correct, and the component standard
-errors are **corrected** for that metric, but the global chi-square
-remains **approximate** (Cudeck, 1989). Results are reported **per
-axis** (X and Y): for a balanced instrument the two axes carry the same
-axes-variance estimate and differ only through `item_n`.
+estimates and the reliabilities are correct, and both the component
+standard errors and the global test statistic are **corrected** for that
+metric (Cudeck, 1989; Satorra & Bentler, 1994). Results are reported
+**per axis** (X and Y): for a balanced instrument the two axes carry the
+same axes-variance estimate and differ only through `item_n`.
 
 What the correction does. Normal-theory maximum likelihood prices its
 standard errors for a sample **covariance** input, while this estimator
@@ -167,11 +173,67 @@ typically **smaller** than the standard errors printed in Strack et al.
 estimates, reliabilities, and SEm are unchanged by the correction. What
 lavaan reported before it is kept in `details$se_uncorrected`.
 
-The global chi-square carries the same approximation in the other
-direction and is **not** corrected: at the reference population its
-expected value is 261.1 against 273 degrees of freedom, so the test is
-mildly conservative toward fit and RMSEA and p-values are flattered by
-roughly 4%.
+The global test statistic carries the same mismatch in the other
+direction, and is corrected too. Left alone it is too **small** – fit is
+flattered, because the sample correlations the estimator consumes vary
+less than the covariances the reference chi-square is derived for.
+`chisq`, `pvalue`, `rmsea` and `cfi` are therefore reported as
+Satorra-Bentler-type **scaled** values, `chisq` divided by a factor
+computed at the fitted matrix (Satorra & Bentler, 1994), with `cfi`
+additionally scaling its own baseline model. The factor is not a
+constant: it is recomputed for every fit, which is the point – the size
+of the distortion depends on the instrument. `df` and `srmr` are
+**unchanged**, being a count of restrictions and a residual summary
+rather than test statistics with a reference distribution. What lavaan
+reported before the scaling is kept in `details$fit_uncorrected`, and
+the two factors in `details$scaling_factor`.
+
+One thing the scaling is **not**: it is not a robustness correction for
+non-normal data. The factor is computed under normal theory throughout,
+and it corrects one thing only – that the estimator consumes a sample
+correlation matrix where normal-theory maximum likelihood prices a
+sample covariance matrix. It does not license the model against skewed
+or heavy-tailed items, and it is unrelated to the Satorra-Bentler scaled
+statistics reported by
+[`ssm_sem()`](http://circumplex.jmgirard.com/reference/ssm_sem.md)'s
+robust estimators, which correct for non-normality on the covariance
+metric.
+
+The scaled statistic matches its reference chi-square in **mean**; it is
+not exact, and it does not make a badly misspecified model fit. If the
+factor cannot be computed, all four are `NA` with the reason in
+`details$fit_scaling_failed` – never the uncorrected value in their
+place.
+
+## How well calibrated is the test, and at what sample size
+
+The scaling fixes the metric error, and the \\\chi^2\\ test built on it
+is asymptotically exact: its rejection rate approaches the nominal
+\\\alpha\\ as the number of distinct moments p\\^\*\\ = p(p+1)/2 falls
+relative to N. Measured by simulation at one population (8 octant
+scales, 3 items each, axes variance .35), the rejection rate at
+\\\alpha\\ = .05 runs .092, .079, .062, .054 at p\\^\*\\/N = 0.50, 0.25,
+0.12, 0.06 – reaching the nominal band by p\\^\*\\/N of about 0.06. That
+is a sweep at a single population, not a general threshold.
+
+At **N = 600** the \\\chi^2\\ test **over-rejects**: measured .06 to .11
+at three populations chosen to bracket the range of instruments this
+function accepts. The uncorrected statistic under-rejects over the same
+range, at .02 to .03, and – unlike the scaled one – moves *further* from
+nominal as N grows, because its error is asymptotic while the scaled
+statistic's is a finite-sample one that shrinks away.
+
+The over-rejection at a fixed N grows with instrument size (larger `df`)
+and shrinks with N. So a p-value near whatever threshold you are using
+deserves caution at moderate N and a large item count – but note the
+direction: the scaled test **over-flags** misfit rather than flattering
+it, which is the safer error and the opposite of what the uncorrected
+statistic did.
+
+All of that evidence is **complete-data**. Under `missing = "fiml"` the
+scaled statistic is calibrated in mean, but its rejection rate has not
+been measured, so none of the rates above should be read as applying to
+that path.
 
 A related detail, in case you check: the fitted model does **not**
 reproduce the correlation matrix's unit diagonal exactly, and that is
@@ -254,6 +316,15 @@ as they are, sit on the conservative side. Treat heavy missingness as
 the regime where these standard errors are least trustworthy, and prefer
 a resampling interval there if the uncertainty matters to your
 conclusion.
+
+The global fit statistics are scaled on this path too, by the same
+factor the complete-data paths use rather than one rebuilt from the FIML
+fit's own saturated stage. That is deliberate and follows the standard
+errors above: lavaan's FIML chi-square is already referenced against the
+FIML saturated loglikelihood, so it already prices the missing
+information, while the scaling factor's normal-theory reference is
+exactly 1 – which makes the factor a metric-only ratio. A factor that
+priced missingness a second time would double-count it.
 
 Two results are unavailable under `missing = "fiml"`, both because they
 need items observed by every respondent: the Nunnally-Bernstein
@@ -350,6 +421,10 @@ reliability of circumplex axes. *SAGE Open*, 3(2).
 Cudeck, R. (1989). Analysis of correlation matrices using covariance
 structure models. *Psychological Bulletin*, 105(2), 317-327.
 
+Satorra, A., & Bentler, P. M. (1994). Corrections to test statistics and
+standard errors in covariance structure analysis. In *Latent variables
+analysis: Applications for developmental research* (pp. 399-419).
+
 ## See also
 
 [`fit_structure()`](http://circumplex.jmgirard.com/reference/fit_structure.md)
@@ -384,11 +459,12 @@ res
 #>   items per axis, carry the same reliability -- expected, not an error.
 #> 
 #>   Note: the model is fit to the item correlation matrix as if it were a
-#>   covariance matrix, so the global fit statistics are approximate
-#>   (Cudeck, 1989). Global fit is flattered by roughly 4%. The component
-#>   standard errors are corrected for this and are calibrated; they are
-#>   typically smaller than the values printed by Strack et al. (2013),
-#>   whose LISREL standard errors carry the uncorrected approximation.
+#>   covariance matrix (Cudeck, 1989), and both sides of that mismatch are
+#>   corrected -- so these numbers differ from LISREL's, and from lavaan's
+#>   own, by design.
+#>   The component standard errors are adjusted to the correlation metric
+#>   and are calibrated; they are typically smaller than the values printed
+#>   by Strack et al. (2013), whose LISREL output carries no correction.
 summary(res)
 #> 
 #> Circumplex Axes Reliability (Strack, Jacobs & Grosse Holtforth, 2013)
@@ -407,11 +483,12 @@ summary(res)
 #>   items per axis, carry the same reliability -- expected, not an error.
 #> 
 #>   Note: the model is fit to the item correlation matrix as if it were a
-#>   covariance matrix, so the global fit statistics are approximate
-#>   (Cudeck, 1989). Global fit is flattered by roughly 4%. The component
-#>   standard errors are corrected for this and are calibrated; they are
-#>   typically smaller than the values printed by Strack et al. (2013),
-#>   whose LISREL standard errors carry the uncorrected approximation.
+#>   covariance matrix (Cudeck, 1989), and both sides of that mismatch are
+#>   corrected -- so these numbers differ from LISREL's, and from lavaan's
+#>   own, by design.
+#>   The component standard errors are adjusted to the correlation metric
+#>   and are calibrated; they are typically smaller than the values printed
+#>   by Strack et al. (2013), whose LISREL output carries no correction.
 #> 
 #> # Variance components
 #> 
@@ -423,7 +500,13 @@ summary(res)
 #> 
 #> # Global fit
 #> 
-#>   chi-square(493) = 479.19,  RMSEA = 0.000,  CFI = 1.000
+#>   chi-square(493) = 488.27,  RMSEA = 0.000,  CFI = 1.000
+#> 
+#>   The global fit statistics chisq, pvalue, rmsea and cfi are scaled to
+#>   that metric (Satorra & Bentler, 1994), which removes a distortion that
+#>   flatters fit; df and srmr are unchanged. The scaled test can modestly
+#>   over-reject at typical sample sizes -- it over-flags misfit rather than
+#>   flattering it; see ?axes_reliability for the measured rates.
 
 # The same estimates from the item correlation matrix alone, as when
 # reanalyzing a matrix published without its raw data.
@@ -452,9 +535,10 @@ axes_reliability(
 #>   correlation-matrix path.
 #> 
 #>   Note: the model is fit to the item correlation matrix as if it were a
-#>   covariance matrix, so the global fit statistics are approximate
-#>   (Cudeck, 1989). Global fit is flattered by roughly 4%. The component
-#>   standard errors are corrected for this and are calibrated; they are
-#>   typically smaller than the values printed by Strack et al. (2013),
-#>   whose LISREL standard errors carry the uncorrected approximation.
+#>   covariance matrix (Cudeck, 1989), and both sides of that mismatch are
+#>   corrected -- so these numbers differ from LISREL's, and from lavaan's
+#>   own, by design.
+#>   The component standard errors are adjusted to the correlation metric
+#>   and are calibrated; they are typically smaller than the values printed
+#>   by Strack et al. (2013), whose LISREL output carries no correction.
 ```
