@@ -1,6 +1,6 @@
 # M68: Scaled global test statistic for `axes_reliability()`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR14
@@ -196,7 +196,7 @@ detail.
       sentence in `axes_fit_scaled_note`.
 - [x] **T12** — AC12: the six-token robustness sweep with AC5's three-way
       disposition, plus the normal-theory fencing sentence in the roxygen.
-- [ ] **T8** — `document()`, `test()`, `check()`; NEWS entry.
+- [x] **T8** — `document()`, `test()`, `check()`; NEWS entry.
 
 ## Work log
 
@@ -225,6 +225,9 @@ detail.
 - 2026-08-02: T12 done (AC12) — the six-token sweep (`robust`, `non-normal`, `nonnormal`, `distribution-free`, `kurtosis`, `ADF`) over R/, man/, vignettes/, NEWS.md and tests/testthat/ returned ~90 hits, every one dispositioned (c) unrelated: all are `ssm_sem()`'s genuine robust estimators and their scaled statistics, `ssm_ci_accuracy()`'s Bradley robustness band, CPM/plotting uses of the word, or test assertions about those. None describes M68's scaling. `R/axes_corrected_se.R:26` is the only hit on an axes surface and already fences the misreading from M66's side (robust/sandwich SEs `measured no fix`). Zero hits needed (a) or (b). Added the required fencing sentence to the roxygen Details — normal-theory throughout, corrects the correlation-versus-covariance metric only, explicitly unrelated to `ssm_sem()`'s robust scaled statistics — with a guard pinning both halves.
 - 2026-08-02: AC4 re-run after the T11/T12 edits — every surviving hit is either the corrected-contract text describing the distortion being removed or an unrelated use (the quasi-circumplex `refused rather than approximated` trio, `NEWS.md:190,262`). No surface reverted.
 - 2026-08-02: T7 done (AC3) — `devel/m68-fiml-scaled-cells.R` regenerates from the M65 fixture's MCAR seeds and the M66 fixture's M1 MAR seeds (read off those fixtures rather than restated, so the three sets of evidence are the SAME draws), 95 min for 801 FIML fits. `mean(T_s)/df` = 1.0187 / 1.0221 / 1.0267 / 1.0107 at 2/5/10 % MCAR and M1 MAR — all inside AC3's [0.95, 1.05], so **M68-D1 is not falsified**. The four track the complete-data N = 600 value (1.0204) closely, which is what a metric-only factor predicts, and the M1 cell at N = 2400 lands nearest to 1, the same finite-sample bias shrinking with N. A second test pins the D-1 consequence directly: the factor does not drift across a fivefold change in the missingness rate (a saturated-information factor would).
+- 2026-08-02: T8 done — NEWS entry extended with the small-sample direction and a pointer to `?axes_reliability`. `devtools::document()` produces no diff. `devtools::test()`: 0 failures, 5031 passing, 4 warnings (all pre-existing, unchanged from the 4421-pass pre-M68 baseline). `devtools::check(args = "--no-manual")`: **Status: OK** — 0 errors, 0 warnings, 0 notes.
+- 2026-08-02: caught at T8 by the repo's own `test-rd-latex-safe.R` guard, not by review — the new roxygen section used literal `chi-squared` and `alpha` glyphs, which the Rd must carry as `\eqn{}` math. Rewritten; the guard is the reason a non-ASCII Rd never reaches win-builder. Worth noting that the filtered test runs during T11 never exercised it, so only the full suite found it.
+- 2026-08-02: all tasks complete; status -> review.
 - 2026-08-02: plan chose replacing `$fit`'s values and retaining the unscaled six in `details$fit_uncorrected` over adding parallel `*_scaled` fields, following M66's `details$se_uncorrected` precedent, so the default-read number is the calibrated one; falsified by a user needing both side by side in printed output.
 
 ## Decisions

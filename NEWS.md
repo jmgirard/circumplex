@@ -46,7 +46,11 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   `details$fit_uncorrected`, with the factors in `details$scaling_factor`. If
   the factor cannot be computed, the four are `NA` with the reason in
   `details$fit_scaling_failed` rather than falling back to the unscaled
-  values.
+  values. The correction is calibrated in mean and its test is asymptotically
+  exact, but at small samples relative to the item count it over-rejects: see
+  `?axes_reliability` for the measured rates and the sample sizes they were
+  measured at. Note the direction — the scaled test over-flags misfit, where
+  the uncorrected one flattered it.
 
 * The displacement-interpretability guardrail in `print()` and `summary()`
   now uses a scale-free rule: a profile's displacement is certified as

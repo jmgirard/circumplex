@@ -715,16 +715,18 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'
 #' # How well calibrated is the test, and at what sample size
 #'
-#' The scaling fixes the metric error, and the χ² test built on it is
-#' asymptotically exact: its rejection rate approaches the nominal α as the
-#' number of distinct moments p\eqn{^*} = p(p+1)/2 falls relative to N. Measured
-#' by simulation at one population (8 octant scales, 3 items each, axes variance
-#' .35), the rejection rate at α = .05 runs .092, .079, .062, .054 at
-#' p\eqn{^*}/N = 0.50, 0.25, 0.12, 0.06 -- reaching the nominal band by
-#' p\eqn{^*}/N of about 0.06. That is a sweep at a single population, not a
+#' The scaling fixes the metric error, and the \eqn{\chi^2}{chi-squared} test
+#' built on it is asymptotically exact: its rejection rate approaches the
+#' nominal \eqn{\alpha}{alpha} as the number of distinct moments
+#' p\eqn{^*}{*} = p(p+1)/2 falls relative to N. Measured by simulation at one
+#' population (8 octant scales, 3 items each, axes variance .35), the rejection
+#' rate at \eqn{\alpha}{alpha} = .05 runs .092, .079, .062, .054 at
+#' p\eqn{^*}{*}/N = 0.50, 0.25, 0.12, 0.06 -- reaching the nominal band by
+#' p\eqn{^*}{*}/N of about 0.06. That is a sweep at a single population, not a
 #' general threshold.
 #'
-#' At **N = 600** the test **over-rejects**: measured .06 to .11 at three
+#' At **N = 600** the \eqn{\chi^2}{chi-squared} test **over-rejects**:
+#' measured .06 to .11 at three
 #' populations chosen to bracket the range of instruments this function accepts.
 #' The uncorrected statistic under-rejects over the same range, at .02 to .03,
 #' and -- unlike the scaled one -- moves *further* from nominal as N grows,
