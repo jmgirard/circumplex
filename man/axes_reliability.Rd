@@ -77,9 +77,16 @@ was supplied, \code{nb_reason}, why the Nunnally-Bernstein comparison is \code{N
 \code{n_complete}, the complete-case count, \code{min_coverage}, the fewest
 respondents behind any item pair, \code{se_uncorrected}, the component standard
 errors as normal-theory maximum likelihood reports them before the
-correlation-structure correction, and \code{se_correction_failed}, \code{NULL} when
+correlation-structure correction, \code{se_correction_failed}, \code{NULL} when
 that correction succeeded or a string naming why the reported SEs are
-\code{NA}). \code{n_complete} and \code{min_coverage} are
+\code{NA}, \code{fit_uncorrected}, the six fit statistics as lavaan reports them
+before the correlation-metric scaling, \code{scaling_factor}, the two
+Satorra-Bentler factors (\code{model} and \code{baseline}), and
+\code{fit_scaling_failed}, \code{NULL} when the scaling succeeded or a string naming
+why \code{chisq}, \code{pvalue}, \code{rmsea} and \code{cfi} are \code{NA}). \code{fit} carries \code{chisq},
+\code{df}, \code{pvalue}, \code{rmsea}, \code{cfi} and \code{srmr}; the four chi-square-derived
+values are scaled and \code{df} and \code{srmr} are not.
+\code{n_complete} and \code{min_coverage} are
 present on every path so that a caller can read them unconditionally, and
 are \code{NA} where they carry no information: \code{min_coverage} outside
 \code{missing = "fiml"}, and both of them when a correlation matrix was supplied
@@ -118,9 +125,9 @@ such instruments.
 
 Because the model is fit to the item \strong{correlation} matrix as if it were a
 covariance matrix (the paper's own practice), the component point estimates
-and the reliabilities are correct, and the component standard errors are
-\strong{corrected} for that metric, but the global chi-square remains
-\strong{approximate} (Cudeck, 1989). Results are reported
+and the reliabilities are correct, and both the component standard errors
+and the global test statistic are \strong{corrected} for that metric
+(Cudeck, 1989; Satorra & Bentler, 1994). Results are reported
 \strong{per axis} (X and Y): for a balanced instrument the two axes carry the
 same axes-variance estimate and differ only through \code{item_n}.
 
@@ -141,10 +148,62 @@ approximation. Point estimates, reliabilities, and SEm are unchanged by the
 correction. What lavaan reported before it is kept in
 \code{details$se_uncorrected}.
 
-The global chi-square carries the same approximation in the other direction
-and is \strong{not} corrected: at the reference population its expected value is
-261.1 against 273 degrees of freedom, so the test is mildly conservative
-toward fit and RMSEA and p-values are flattered by roughly 4\%.
+The global test statistic carries the same mismatch in the other direction,
+and is corrected too. Left alone it is too \strong{small} -- fit is flattered,
+because the sample correlations the estimator consumes vary less than the
+covariances the reference chi-square is derived for. \code{chisq}, \code{pvalue},
+\code{rmsea} and \code{cfi} are therefore reported as Satorra-Bentler-type \strong{scaled}
+values, \code{chisq} divided by a factor computed at the fitted matrix (Satorra &
+Bentler, 1994), with \code{cfi} additionally scaling its own baseline model. The
+factor is not a constant: it is recomputed for every fit, which is the point
+-- the size of the distortion depends on the instrument. \code{df} and \code{srmr} are
+\strong{unchanged}, being a count of restrictions and a residual summary rather
+than test statistics with a reference distribution. What lavaan reported
+before the scaling is kept in \code{details$fit_uncorrected}, and the two factors
+in \code{details$scaling_factor}.
+
+One thing the scaling is \strong{not}: it is not a robustness correction for
+non-normal data. The factor is computed under normal theory throughout, and
+it corrects one thing only -- that the estimator consumes a sample
+correlation matrix where normal-theory maximum likelihood prices a sample
+covariance matrix. It does not license the model against skewed or
+heavy-tailed items, and it is unrelated to the Satorra-Bentler scaled
+statistics reported by \code{ssm_sem()}'s robust estimators, which correct for
+non-normality on the covariance metric.
+
+The scaled statistic matches its reference chi-square in \strong{mean}; it is not
+exact, and it does not make a badly misspecified model fit. If the factor
+cannot be computed, all four are \code{NA} with the reason in
+\code{details$fit_scaling_failed} -- never the uncorrected value in their place.
+}
+\section{How well calibrated is the test, and at what sample size}{
+The scaling fixes the metric error, and the \eqn{\chi^2}{chi-squared} test
+built on it is asymptotically exact: its rejection rate approaches the
+nominal \eqn{\alpha}{alpha} as the number of distinct moments
+p\eqn{^*}{*} = p(p+1)/2 falls relative to N. Measured by simulation at one
+population (8 octant scales, 3 items each, axes variance .35), the rejection
+rate at \eqn{\alpha}{alpha} = .05 runs .092, .079, .062, .054 at
+p\eqn{^*}{*}/N = 0.50, 0.25, 0.12, 0.06 -- reaching the nominal band by
+p\eqn{^*}{*}/N of about 0.06. That is a sweep at a single population, not a
+general threshold.
+
+At \strong{N = 600} the \eqn{\chi^2}{chi-squared} test \strong{over-rejects}:
+measured .06 to .11 at three
+populations chosen to bracket the range of instruments this function accepts.
+The uncorrected statistic under-rejects over the same range, at .02 to .03,
+and -- unlike the scaled one -- moves \emph{further} from nominal as N grows,
+because its error is asymptotic while the scaled statistic's is a
+finite-sample one that shrinks away.
+
+The over-rejection at a fixed N grows with instrument size (larger \code{df}) and
+shrinks with N. So a p-value near whatever threshold you are using deserves
+caution at moderate N and a large item count -- but note the direction: the
+scaled test \strong{over-flags} misfit rather than flattering it, which is the
+safer error and the opposite of what the uncorrected statistic did.
+
+All of that evidence is \strong{complete-data}. Under \code{missing = "fiml"} the
+scaled statistic is calibrated in mean, but its rejection rate has not been
+measured, so none of the rates above should be read as applying to that path.
 
 A related detail, in case you check: the fitted model does \strong{not} reproduce
 the correlation matrix's unit diagonal exactly, and that is expected rather
@@ -153,6 +212,7 @@ for a free item error is the \emph{weighted} diagonal, not the raw one, so
 off-diagonal sampling misfit leaks into the implied diagonal at roughly the
 sampling standard error of a correlation.
 }
+
 \section{Which instruments this accepts}{
 Any set of \strong{equally spaced} scale angles, at any rotation: the canonical
 octants, an interstitial set rotated 22.5 degrees off the axes, or a
@@ -223,6 +283,15 @@ Note the direction reverses: the mild-rate figures above, such as they are,
 sit on the conservative side. Treat heavy missingness as the regime where
 these standard errors are least trustworthy, and prefer a resampling
 interval there if the uncertainty matters to your conclusion.
+
+The global fit statistics are scaled on this path too, by the same factor
+the complete-data paths use rather than one rebuilt from the FIML fit's own
+saturated stage. That is deliberate and follows the standard errors above:
+lavaan's FIML chi-square is already referenced against the FIML saturated
+loglikelihood, so it already prices the missing information, while the
+scaling factor's normal-theory reference is exactly 1 -- which makes the
+factor a metric-only ratio. A factor that priced missingness a second time
+would double-count it.
 
 Two results are unavailable under \code{missing = "fiml"}, both because they need
 items observed by every respondent: the Nunnally-Bernstein comparison is
@@ -332,6 +401,10 @@ circumplex axes. \emph{SAGE Open}, 3(2). \doi{10.1177/2158244013486115}
 
 Cudeck, R. (1989). Analysis of correlation matrices using covariance
 structure models. \emph{Psychological Bulletin}, 105(2), 317-327.
+
+Satorra, A., & Bentler, P. M. (1994). Corrections to test statistics and
+standard errors in covariance structure analysis. In \emph{Latent variables
+analysis: Applications for developmental research} (pp. 399-419).
 }
 \seealso{
 \code{\link[=fit_structure]{fit_structure()}} for exploratory circumplex-structure criteria.

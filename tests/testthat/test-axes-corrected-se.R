@@ -496,13 +496,22 @@ test_that("AC7: the printed caveat drops the SE warning and keeps the fit one", 
   out <- paste(capture.output(print(res)), collapse = " ")
   out <- gsub("\\s+", " ", out)
 
-  # What must still be there: the citation and the global-fit sentence, which
-  # the correction does not touch.
+  # What must still be there: the citation.
   expect_match(out, "Cudeck, 1989", fixed = TRUE)
-  expect_match(out, "Global fit is flattered by roughly 4%", fixed = TRUE)
-  # ... and the new positive claim.
-  expect_match(out, "standard errors are corrected for this and are calibrated",
+  # ... and the two positive claims, one per correction. M68 falsified the
+  # global-fit sentence this test used to pin ("Global fit is flattered by
+  # roughly 4%") -- that figure was one population's, printed as a constant --
+  # so it moves to the absence block below and the scaling claim takes its
+  # place. The two are pinned SEPARATELY because the two corrections can fail
+  # independently and the object emits them independently -- and on different
+  # surfaces as of the M68 review: the SE claim in print(), the scaling claim
+  # beside the fit line summary() prints (F16).
+  expect_match(out, "standard errors are adjusted to the correlation metric",
                fixed = TRUE)
+  sm <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
+  expect_match(sm, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
+  expect_match(sm, "Satorra & Bentler, 1994", fixed = TRUE)
+  expect_match(sm, "df and srmr are unchanged", fixed = TRUE)
 
   # What must be GONE. This is the directional half the M56/M63 lesson says the
   # stale-claim sweep keeps missing: hunting the old wording finds negative
@@ -531,6 +540,12 @@ test_that("AC7: the printed caveat drops the SE warning and keeps the fit one", 
   # cannot fail on any reversion of this string. Kept deliberately, and labelled
   # so, to catch that Rd vocabulary migrating into print.
   expect_no_match(out, "order-of-magnitude guidance", fixed = TRUE)
+  # M68's own falsified claims, pinned as absences beside the positives above.
+  # "roughly 4%" is the load-bearing one: it is a population-specific figure
+  # that read as a property of the method, and a revert would restore it while
+  # every other assertion here stayed green.
+  expect_no_match(out, "flattered by roughly 4%", fixed = TRUE)
+  expect_no_match(out, "global fit statistics are approximate", fixed = TRUE)
 })
 
 
@@ -579,12 +594,24 @@ test_that("AC7: the Rd states the correction and no longer claims otherwise", {
   # corrected, with RR13 B-1's figures so a reader can check the direction.
   expect_match(rd, "are calibrated uncertainty, not order-of-magnitude",
                fixed = TRUE)
-  # The figures AND the predicate they belong to. The figures alone would stay
-  # green under a rewrite saying the chi-square IS corrected -- the numbers are
-  # the same either way, so they cannot carry the claim by themselves.
-  expect_match(rd, "261.1 against 273 degrees of freedom", fixed = TRUE)
-  expect_match(rd,
-               "global chi-square carries the same approximation in the other direction and is \\strong{not} corrected",
+  # M68 falsified both of these, and they are now pinned as ABSENCES with
+  # paired positives. The figure matters more than the sentence: 261.1 was
+  # measured at one reference population and printed as though it described the
+  # method, which is the specific defect D-036 overturned. A revert would bring
+  # the number back verbatim.
+  expect_false(grepl("261.1 against 273 degrees of freedom", rd, fixed = TRUE))
+  expect_false(grepl("is \\strong{not} corrected", rd, fixed = TRUE))
+  # The paired positives, so the absences cannot be satisfied by deleting the
+  # paragraph and leaving the page silent on the question.
+  expect_match(rd, "reported as Satorra-Bentler-type \\strong{scaled} values",
+               fixed = TRUE)
+  expect_match(rd, "\\code{df} and \\code{srmr} are \\strong{unchanged}",
+               fixed = TRUE)
+  expect_match(rd, "\\code{details$fit_uncorrected}", fixed = TRUE)
+  # The honesty clause: the scaled statistic matches its reference in mean and
+  # is not exact. Deleting it would leave the page overclaiming, which no
+  # absence assertion above would notice.
+  expect_match(rd, "matches its reference chi-square in \\strong{mean}",
                fixed = TRUE)
   # `fixed = TRUE` takes the string literally, so it must NOT carry regex
   # escapes -- "details\\$se_uncorrected" would look for a literal backslash
@@ -624,16 +651,56 @@ test_that("M66 review F3: print() WIRING for the correction-failure note", {
   expect_no_match(out, "are corrected for this and are calibrated", fixed = TRUE)
   expect_no_match(out, "typically smaller than the values printed by",
                   fixed = TRUE)
-  # ... but nothing true is lost with it: the global-fit caveat still prints.
+  # ... but nothing true is lost with it. This object has a FAILED SE
+  # correction and a SUCCESSFUL scaling -- the two are independent as of M68 --
+  # so the surviving half must still print, and must not have been dragged down
+  # with the suppressed one.
   expect_match(out, "Cudeck, 1989", fixed = TRUE)
-  expect_match(out, "flattered by roughly 4%", fixed = TRUE)
+  expect_no_match(out, "flattered by roughly 4%", fixed = TRUE)
+  # The scaled-fit sentence lives beside the fit line summary() prints, not in
+  # print()'s block (M68 review, F16), so it is summary() that must carry it.
+  sm <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
+  expect_match(sm, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
+  expect_no_match(out, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
+  # M68 review F1: the opening's own summary clause is an assertion too. With
+  # the SE correction failed it must NOT claim both sides were corrected.
+  expect_no_match(out, "both sides of that mismatch", fixed = TRUE)
+  expect_match(out, "the global-fit side of that mismatch is corrected",
+               fixed = TRUE)
 
-  # And the normal path is unchanged by the branch.
-  ok <- gsub("\\s+", " ", paste(capture.output(print(
+  # The mirror image: a failed SCALING with working SEs. Injected the same way
+  # and for the same reason -- axes_reliability()'s positive-definiteness gate
+  # makes the state unreachable end-to-end, so this proves the branch is wired,
+  # not that anything selects it.
+  res2 <- axes_reliability(cormat = pp$sigma, items = pp$items,
+                           angles = pp$angles, n = 600)
+  res2$details$fit_scaling_failed <- "unidentified"
+  res2$fit[c("chisq", "pvalue", "rmsea", "cfi")] <- NA_real_
+  out2 <- gsub("\\s+", " ", paste(capture.output(summary(res2)), collapse = " "))
+  expect_match(out2, "could not be scaled to the correlation metric (unidentified)",
+               fixed = TRUE)
+  expect_match(out2, "details$fit_uncorrected", fixed = TRUE)
+  # The scaling claim is suppressed -- it would assert a property of four NAs.
+  expect_no_match(out2, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
+  # ... while the SE claim, which is still true here, survives.
+  expect_match(out2, "standard errors are adjusted to the correlation metric",
+               fixed = TRUE)
+  # F1 in the mirror direction: only the SE side may be claimed here.
+  expect_match(out2, "the standard-error side of that mismatch is corrected",
+               fixed = TRUE)
+  expect_no_match(out2, "both sides of that mismatch", fixed = TRUE)
+
+  # And the normal path is unchanged by either branch.
+  ok <- gsub("\\s+", " ", paste(capture.output(summary(
     axes_reliability(cormat = pp$sigma, items = pp$items,
                      angles = pp$angles, n = 600))), collapse = " "))
-  expect_match(ok, "are corrected for this and are calibrated", fixed = TRUE)
+  expect_match(ok, "standard errors are adjusted to the correlation metric",
+               fixed = TRUE)
+  expect_match(ok, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
+  # Both corrections live: the opening says so, and only here.
+  expect_match(ok, "both sides of that mismatch are corrected", fixed = TRUE)
   expect_no_match(ok, "could not be computed", fixed = TRUE)
+  expect_no_match(ok, "could not be scaled", fixed = TRUE)
 })
 
 
@@ -667,8 +734,16 @@ test_that("AC7: the vignette's caveats match the corrected contract", {
                fixed = TRUE)
   expect_match(txt, "carry the same correlation-metric correction as every other",
                fixed = TRUE)
-  # The fit statistics are still approximate, and must keep saying so.
-  expect_match(txt, "fit indices are not corrected", fixed = TRUE)
+  # M68 falsified the "not corrected" clause; absence plus paired positives.
+  expect_no_match(txt, "fit indices are not corrected", fixed = TRUE)
+  expect_no_match(txt, "flattered by roughly 4%", fixed = TRUE)
+  expect_match(txt, "**global fit statistics are corrected too**", fixed = TRUE)
+  expect_match(txt, "`details$fit_uncorrected`", fixed = TRUE)
+  # The section must keep telling the reader what the correction does NOT buy.
+  # Without this, the vignette could be rewritten into an overclaim and every
+  # assertion above would stay green.
+  expect_match(txt, "it is a calibration, not an exactness guarantee",
+               fixed = TRUE)
 })
 
 

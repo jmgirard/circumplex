@@ -1352,3 +1352,36 @@ test_that("M65-D3: stored seeds reproduce live, so the fixture is not stale", {
   # above is not vacuously satisfied by both.
   expect_gt(abs(shadow_fiml[["xi1"]] - shadow_avail[["xi1"]]), 1e-3)
 })
+
+test_that("M68: the EM-stall refusal fires before any statistic is scaled", {
+  skip_if_not_installed("lavaan")
+  # The companion to the stall test above, and the ordering half of M68 AC4.
+  # The refusal exists because a stalled saturated EM leaves chi-square, CFI and
+  # RMSEA referenced against a baseline that was never reached -- and M68 now
+  # RESCALES exactly those three plus the p-value. Scaling a statistic computed
+  # against the wrong baseline would produce a calibrated-looking number built
+  # on the fault the refusal exists to stop, so the ordering is load-bearing
+  # rather than incidental.
+  #
+  # Asserted by making the scaler itself fatal: if control ever reaches it the
+  # error message is this stub's, not the refusal's, so the test discriminates
+  # ORDER rather than merely re-asserting that the refusal fires.
+  fx <- fiml_refuse_fixture()
+  mat <- fx$mat
+  mat[21:nrow(mat), fx$cols[[1]]] <- NA_real_
+
+  real_fit <- axes_fit
+  local_mocked_bindings(
+    axes_fit = function(dat, items, angles_deg, ...) {
+      args <- list(...)
+      args[names(axes_fiml_em_args())] <- NULL
+      do.call(real_fit, c(list(dat, items, angles_deg), args,
+                          axes_fiml_em_args(10L)))
+    },
+    axes_scaling_factor = function(...) {
+      stop("the scaler ran before the EM-stall refusal", call. = FALSE)
+    }
+  )
+  expect_error(suppressWarnings(fiml_call(mat, fx$items)),
+               "unrestricted \\(EM\\) stage")
+})

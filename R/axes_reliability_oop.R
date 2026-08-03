@@ -34,28 +34,85 @@ axes_fmt <- function(x, digits = 3) {
   out
 }
 
-# The standard-error caveat shared by print()/summary() and the roxygen: the
-# model is fit to the item correlation matrix as if it were a covariance matrix
-# (the paper's own practice), so the point estimates are correct but the
-# standard errors and the global chi-square are approximate (Cudeck, 1989).
-# The SE half of this caveat is GONE as of M66: the component standard errors
-# are now corrected for the correlation-as-covariance metric (RR13 BC1, D-035),
-# so the text no longer warns about them. What survives is the global-fit half,
-# which the correction does not touch -- the chi-square carries the same
-# approximation in the OTHER direction and keeps its sentence verbatim.
+# The metric note shared by print()/summary() and the roxygen: the model is fit
+# to the item correlation matrix as if it were a covariance matrix (the paper's
+# own practice), so the point estimates are correct but normal-theory maximum
+# likelihood misprices everything downstream of the sampling variability
+# (cudeck1989, p. 323). The printed text below cites author-year rather than a
+# citekey because it is read by users, not by this repo.
 #
-# Why the SE warning could not simply have been sharpened instead: the ratio it
-# described runs [0.81, 1.97] across the accepted input space and dips below 1
-# for weak-axes/strong-general instruments, so it is sign-unstable and no static
-# sentence states it honestly (RR13 section 2). That is what overturned
-# "document, don't fix".
-axes_se_caveat <- paste0(
-  "  Note: the model is fit to the item correlation matrix as if it were a\n",
-  "  covariance matrix, so the global fit statistics are approximate\n",
-  "  (Cudeck, 1989). Global fit is flattered by roughly 4%. The component\n",
-  "  standard errors are corrected for this and are calibrated; they are\n",
-  "  typically smaller than the values printed by Strack et al. (2013),\n",
-  "  whose LISREL standard errors carry the uncorrected approximation."
+# This text used to WARN. Both halves of the warning are now gone, in two
+# milestones: M66 corrected the component standard errors (RR13 BC1, D-035),
+# and M68 scaled the global test statistic (satorra1994 (p. 407), D-036). What is
+# left is not a caveat but an orientation note -- it says what was corrected,
+# because the reported numbers differ from the ones a reader reproduces in
+# LISREL or by calling lavaan directly, and an unexplained difference reads as
+# a bug.
+#
+# Why neither warning could simply have been sharpened instead: the SE ratio
+# runs [0.81, 1.97] across the accepted input space and dips below 1 for
+# weak-axes/strong-general instruments (RR13 section 2), and the fit distortion
+# is likewise a per-fit quantity that the retired "roughly 4%" reported as a
+# constant. A caveat that quantifies one population is not a caveat that can be
+# stated honestly; that is what overturned "document, don't fix" on both sides.
+# Split into three pieces because the two corrections can fail INDEPENDENTLY,
+# and a note that asserts a correction which did not happen is worse than no
+# note. print() below prints the shared opening beside whichever halves are
+# live; a failed half gets its own NA-with-reason note instead.
+#
+# The opening is a FUNCTION of which halves are live rather than a constant,
+# because its own summary clause is an assertion too: "both sides of that
+# mismatch are corrected" is false on an object where one correction failed,
+# and it was printed unconditionally -- the exact failure the three-way split
+# exists to prevent, reintroduced one level up (M68 review, F1). The three
+# variants say only what is true of the object in hand; where neither half is
+# live, print() emits no opening at all.
+axes_metric_note <- function(se_live, fit_live) {
+  # Each variant carries its own line breaks: the clause lengths differ, and a
+  # shared tail wraps one of the three badly.
+  tail <- if (se_live && fit_live) {
+    paste0("both sides of that mismatch are\n",
+           "  corrected -- so these numbers differ from LISREL's, and from",
+           " lavaan's\n  own, by design.")
+  } else if (se_live) {
+    paste0("the standard-error side of that\n",
+           "  mismatch is corrected -- so those numbers differ from LISREL's,",
+           " and\n  from lavaan's own, by design.")
+  } else {
+    paste0("the global-fit side of that\n",
+           "  mismatch is corrected -- so those numbers differ from LISREL's,",
+           " and\n  from lavaan's own, by design.")
+  }
+  paste0(
+    "  Note: the model is fit to the item correlation matrix as if it were a\n",
+    "  covariance matrix (Cudeck, 1989), and ", tail
+  )
+}
+axes_se_corrected_note <- paste0(
+  "  The component standard errors are adjusted to the correlation metric\n",
+  "  and are calibrated; they are typically smaller than the values printed\n",
+  "  by Strack et al. (2013), whose LISREL output carries no correction."
+)
+# The third surface RR14 required (BC5). It carries the DIRECTION of the
+# small-sample error and a pointer, deliberately no rates: the measured numbers
+# live in the roxygen and the vignette, where they are tied to the committed
+# fixture and move with it, and a rate printed here would drift out of agreement
+# with them the first time the fixture is regenerated.
+#
+# It is printed by summary(), directly UNDER the chi-square/RMSEA/CFI line,
+# rather than by print() -- BC5 asks for it beside that line, and print() emits
+# its notes before summary() has printed the components table and the fit line,
+# which put two blocks between the claim and the numbers it qualifies (M68
+# review, F16). print() reports no fit statistic at all, so nothing is orphaned
+# by the move, and the sentence appears exactly once in a summary() call. The
+# scaling-failure note travels with it for the same reason: it explains four NAs
+# that only summary() displays.
+axes_fit_scaled_note <- paste0(
+  "  The global fit statistics chisq, pvalue, rmsea and cfi are scaled to\n",
+  "  that metric (Satorra & Bentler, 1994), which removes a distortion that\n",
+  "  flatters fit; df and srmr are unchanged. The scaled test can modestly\n",
+  "  over-reject at typical sample sizes -- it over-flags misfit rather than\n",
+  "  flattering it; see ?axes_reliability for the measured rates."
 )
 
 # The extra sentence the FIML path owes on top of the caveat above. Its SEs
@@ -207,26 +264,57 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   # routinely muffled (this package's own harnesses wrap the call in
   # suppressWarnings()).
   #
-  # It also SUPPRESSES the caveat below rather than printing it beside the
-  # gap: that text asserts the standard errors "are corrected ... and are
-  # calibrated" and compares them to Strack et al.'s, which is a claim about
-  # numbers that are not there. The global-fit half is reprinted on its own so
-  # nothing true is lost with it (M66 review, F3).
-  se_failed <- x$details$se_correction_failed
-  if (!is.null(se_failed)) {
+  # It also SUPPRESSES the corrected-SE half of the caveat rather than printing
+  # it beside the gap: that text asserts the standard errors "are corrected ...
+  # and are calibrated", which is a claim about numbers that are not there. The
+  # surviving half is still printed so nothing true is lost with it (M66 review,
+  # F3). The two failures usually arrive together (both routes solve the same
+  # sigma-hat) but need not, and neither note may speak for the other -- which
+  # is why the opening below is a function of both flags even though only the SE
+  # half is printed here; the fit half and its own failure note are emitted by
+  # summary(), beside the numbers they qualify (axes_cat_fit_note()).
+  se_live <- is.null(x$details$se_correction_failed)
+  fit_live <- is.null(x$details$fit_scaling_failed)
+  if (!se_live) {
     cat(
       "\n  Note: the component standard errors could not be computed (",
-      se_failed, ") and are\n  NA. The point estimates, reliability, and SEm ",
-      "are unaffected. The model\n  is fit to the item correlation matrix, so ",
-      "the global fit statistics are\n  approximate (Cudeck, 1989) and ",
-      "flattered by roughly 4%.\n",
+      x$details$se_correction_failed,
+      ") and are\n  NA. The point estimates, reliability, and SEm ",
+      "are unaffected.\n",
       sep = ""
     )
-  } else {
-    cat("\n", axes_se_caveat, "\n", sep = "")
-    if (is_fiml) cat("\n", axes_fiml_se_caveat, "\n", sep = "")
+  }
+  if (se_live || fit_live) {
+    cat("\n",
+        paste(c(axes_metric_note(se_live, fit_live),
+                if (se_live) axes_se_corrected_note),
+              collapse = "\n"),
+        "\n", sep = "")
+    if (se_live && is_fiml) {
+      cat("\n", axes_fiml_se_caveat, "\n", sep = "")
+    }
   }
   invisible(x)
+}
+
+
+# The scaled-fit note and its failure counterpart, printed by summary() under
+# the fit line rather than by print() -- see the axes_fit_scaled_note comment
+# above. Factored out so the two callers cannot drift apart.
+axes_cat_fit_note <- function(x) {
+  fit_failed <- x$details$fit_scaling_failed
+  if (is.null(fit_failed)) {
+    cat("\n", axes_fit_scaled_note, "\n", sep = "")
+  } else {
+    cat(
+      "\n  Note: the global fit statistics could not be scaled to the ",
+      "correlation\n  metric (", fit_failed, "), so chisq, pvalue, rmsea and ",
+      "cfi are NA. What\n  lavaan reported unscaled is in ",
+      "details$fit_uncorrected; df and srmr are\n  unaffected.\n",
+      sep = ""
+    )
+  }
+  invisible(NULL)
 }
 
 #' Summarize circumplex axes-reliability results
@@ -260,5 +348,8 @@ summary.circumplex_axes_reliability <- function(object, digits = 3, ...) {
     ",  CFI = ", axes_fmt(x$fit$cfi, 3),
     "\n", sep = ""
   )
+  # BC5's third surface, beside the line it qualifies rather than two blocks
+  # above it.
+  axes_cat_fit_note(x)
   invisible(x)
 }

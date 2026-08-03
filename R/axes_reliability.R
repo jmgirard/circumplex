@@ -662,9 +662,9 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'
 #' Because the model is fit to the item **correlation** matrix as if it were a
 #' covariance matrix (the paper's own practice), the component point estimates
-#' and the reliabilities are correct, and the component standard errors are
-#' **corrected** for that metric, but the global chi-square remains
-#' **approximate** (Cudeck, 1989). Results are reported
+#' and the reliabilities are correct, and both the component standard errors
+#' and the global test statistic are **corrected** for that metric
+#' (Cudeck, 1989; Satorra & Bentler, 1994). Results are reported
 #' **per axis** (X and Y): for a balanced instrument the two axes carry the
 #' same axes-variance estimate and differ only through `item_n`.
 #'
@@ -685,10 +685,63 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' correction. What lavaan reported before it is kept in
 #' `details$se_uncorrected`.
 #'
-#' The global chi-square carries the same approximation in the other direction
-#' and is **not** corrected: at the reference population its expected value is
-#' 261.1 against 273 degrees of freedom, so the test is mildly conservative
-#' toward fit and RMSEA and p-values are flattered by roughly 4%.
+#' The global test statistic carries the same mismatch in the other direction,
+#' and is corrected too. Left alone it is too **small** -- fit is flattered,
+#' because the sample correlations the estimator consumes vary less than the
+#' covariances the reference chi-square is derived for. `chisq`, `pvalue`,
+#' `rmsea` and `cfi` are therefore reported as Satorra-Bentler-type **scaled**
+#' values, `chisq` divided by a factor computed at the fitted matrix (Satorra &
+#' Bentler, 1994), with `cfi` additionally scaling its own baseline model. The
+#' factor is not a constant: it is recomputed for every fit, which is the point
+#' -- the size of the distortion depends on the instrument. `df` and `srmr` are
+#' **unchanged**, being a count of restrictions and a residual summary rather
+#' than test statistics with a reference distribution. What lavaan reported
+#' before the scaling is kept in `details$fit_uncorrected`, and the two factors
+#' in `details$scaling_factor`.
+#'
+#' One thing the scaling is **not**: it is not a robustness correction for
+#' non-normal data. The factor is computed under normal theory throughout, and
+#' it corrects one thing only -- that the estimator consumes a sample
+#' correlation matrix where normal-theory maximum likelihood prices a sample
+#' covariance matrix. It does not license the model against skewed or
+#' heavy-tailed items, and it is unrelated to the Satorra-Bentler scaled
+#' statistics reported by `ssm_sem()`'s robust estimators, which correct for
+#' non-normality on the covariance metric.
+#'
+#' The scaled statistic matches its reference chi-square in **mean**; it is not
+#' exact, and it does not make a badly misspecified model fit. If the factor
+#' cannot be computed, all four are `NA` with the reason in
+#' `details$fit_scaling_failed` -- never the uncorrected value in their place.
+#'
+#' # How well calibrated is the test, and at what sample size
+#'
+#' The scaling fixes the metric error, and the \eqn{\chi^2}{chi-squared} test
+#' built on it is asymptotically exact: its rejection rate approaches the
+#' nominal \eqn{\alpha}{alpha} as the number of distinct moments
+#' p\eqn{^*}{*} = p(p+1)/2 falls relative to N. Measured by simulation at one
+#' population (8 octant scales, 3 items each, axes variance .35), the rejection
+#' rate at \eqn{\alpha}{alpha} = .05 runs .092, .079, .062, .054 at
+#' p\eqn{^*}{*}/N = 0.50, 0.25, 0.12, 0.06 -- reaching the nominal band by
+#' p\eqn{^*}{*}/N of about 0.06. That is a sweep at a single population, not a
+#' general threshold.
+#'
+#' At **N = 600** the \eqn{\chi^2}{chi-squared} test **over-rejects**:
+#' measured .06 to .11 at three
+#' populations chosen to bracket the range of instruments this function accepts.
+#' The uncorrected statistic under-rejects over the same range, at .02 to .03,
+#' and -- unlike the scaled one -- moves *further* from nominal as N grows,
+#' because its error is asymptotic while the scaled statistic's is a
+#' finite-sample one that shrinks away.
+#'
+#' The over-rejection at a fixed N grows with instrument size (larger `df`) and
+#' shrinks with N. So a p-value near whatever threshold you are using deserves
+#' caution at moderate N and a large item count -- but note the direction: the
+#' scaled test **over-flags** misfit rather than flattering it, which is the
+#' safer error and the opposite of what the uncorrected statistic did.
+#'
+#' All of that evidence is **complete-data**. Under `missing = "fiml"` the
+#' scaled statistic is calibrated in mean, but its rejection rate has not been
+#' measured, so none of the rates above should be read as applying to that path.
 #'
 #' A related detail, in case you check: the fitted model does **not** reproduce
 #' the correlation matrix's unit diagonal exactly, and that is expected rather
@@ -768,6 +821,15 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' sit on the conservative side. Treat heavy missingness as the regime where
 #' these standard errors are least trustworthy, and prefer a resampling
 #' interval there if the uncertainty matters to your conclusion.
+#'
+#' The global fit statistics are scaled on this path too, by the same factor
+#' the complete-data paths use rather than one rebuilt from the FIML fit's own
+#' saturated stage. That is deliberate and follows the standard errors above:
+#' lavaan's FIML chi-square is already referenced against the FIML saturated
+#' loglikelihood, so it already prices the missing information, while the
+#' scaling factor's normal-theory reference is exactly 1 -- which makes the
+#' factor a metric-only ratio. A factor that priced missingness a second time
+#' would double-count it.
 #'
 #' Two results are unavailable under `missing = "fiml"`, both because they need
 #' items observed by every respondent: the Nunnally-Bernstein comparison is
@@ -900,9 +962,16 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   `n_complete`, the complete-case count, `min_coverage`, the fewest
 #'   respondents behind any item pair, `se_uncorrected`, the component standard
 #'   errors as normal-theory maximum likelihood reports them before the
-#'   correlation-structure correction, and `se_correction_failed`, `NULL` when
+#'   correlation-structure correction, `se_correction_failed`, `NULL` when
 #'   that correction succeeded or a string naming why the reported SEs are
-#'   `NA`). `n_complete` and `min_coverage` are
+#'   `NA`, `fit_uncorrected`, the six fit statistics as lavaan reports them
+#'   before the correlation-metric scaling, `scaling_factor`, the two
+#'   Satorra-Bentler factors (`model` and `baseline`), and
+#'   `fit_scaling_failed`, `NULL` when the scaling succeeded or a string naming
+#'   why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`). `fit` carries `chisq`,
+#'   `df`, `pvalue`, `rmsea`, `cfi` and `srmr`; the four chi-square-derived
+#'   values are scaled and `df` and `srmr` are not.
+#'   `n_complete` and `min_coverage` are
 #'   present on every path so that a caller can read them unconditionally, and
 #'   are `NA` where they carry no information: `min_coverage` outside
 #'   `missing = "fiml"`, and both of them when a correlation matrix was supplied
@@ -913,6 +982,10 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'
 #' Cudeck, R. (1989). Analysis of correlation matrices using covariance
 #' structure models. \emph{Psychological Bulletin}, 105(2), 317-327.
+#'
+#' Satorra, A., & Bentler, P. M. (1994). Corrections to test statistics and
+#' standard errors in covariance structure analysis. In \emph{Latent variables
+#' analysis: Applications for developmental research} (pp. 399-419).
 #' @seealso [fit_structure()] for exploratory circumplex-structure criteria.
 #' @export
 #' @examplesIf requireNamespace("lavaan", quietly = TRUE)
@@ -1651,7 +1724,14 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # on lavaan 0.6.21 AND 0.7-2, both paths), so this cannot disturb AC1's
   # bit-identity to the shipped numbers. The returned element keeps the name
   # "srmr": the contract is the quantity, not lavaan's spelling of it.
-  want <- c("chisq", "df", "pvalue", "rmsea", "cfi", "srmr_bentler_nomean")
+  #
+  # The last three are NOT reported. They are the inputs the scaled statistic is
+  # rebuilt from (M68): CFI needs the independence model's own chi-square and
+  # df, and RMSEA needs the sample size lavaan itself priced the index at. They
+  # go through the same membership guard as the reported six, because the scaled
+  # values are as version-dependent on them as `$fit$srmr` is on its own name.
+  want <- c("chisq", "df", "pvalue", "rmsea", "cfi", "srmr_bentler_nomean",
+            "baseline.chisq", "baseline.df", "ntotal")
   fm <- lavaan::fitMeasures(fit, want)
   # lavaan DROPS a measure name it does not recognize, returning a shorter
   # vector rather than refusing (measured on BOTH generations: two names, one
@@ -1677,10 +1757,38 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   }
   fm <- fm[want]
   names(fm)[names(fm) == "srmr_bentler_nomean"] <- "srmr"
+
+  # The global test statistic carries the correlation-as-covariance mismatch in
+  # the OTHER direction from the component SEs above -- lavaan refers T to a
+  # chi-square derived for a sample COVARIANCE matrix, so fit is flattered. The
+  # Satorra-Bentler scaling factor removes it; see R/axes_scaled_fit.R.
+  #
+  # `sigma` arrives in lavaan's variable order and is realigned there off its
+  # own dimnames, exactly as for the SEs.
+  #
+  # ALL THREE INPUT PATHS SCALE, and the FIML path uses this same complete-data
+  # factor rather than one built from its saturated stage (M68-D1). The reason
+  # is the composition argument the SEs make just above: lavaan's FIML T is
+  # already referenced against the FIML saturated loglikelihood, so it already
+  # prices the missing information, while c's normal-theory reference is exactly
+  # 1 -- which makes c a metric-only ratio. A factor that priced missingness
+  # again would price it twice. A path-dependent `$fit$chisq` is also the exact
+  # trap the M65 SRMR fix cured a few lines up.
+  #
+  # Order matters and is already right: the `em_stalled` refusal fires far above
+  # this point, so no scaled statistic is ever computed against a saturated
+  # model that was never reached.
+  scaling <- axes_scaling_factor(
+    lavaan::fitted(fit)$cov, all_cols, item_angle, item_scale, item_block,
+    fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2,
+    df = fm[["df"]], baseline_df = fm[["baseline.df"]]
+  )
+  scaled <- axes_scale_fit_measures(fm, scaling)
+
   new_axes_reliability(
     results = results,
     components = components,
-    fit = as.list(fm),
+    fit = scaled$fit,
     details = list(
       n = n, n_total = n_total, n_items = p, n_scales = n_scales,
       angles = angles_deg, labels = map$labels, sd = sd,
@@ -1713,6 +1821,19 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # NULL when the correction succeeded; otherwise why every corrected SE
       # is NA ("singular", "unidentified").
       se_correction_failed = corrected$reason,
+      # What lavaan reported before the correlation-metric scaling (M68), on the
+      # same footing as `se_uncorrected` above: visible for comparison and for
+      # reproducing a pre-M68 analysis, without the package offering a supported
+      # way to ASK for the uncorrected statistic.
+      fit_uncorrected = scaled$uncorrected,
+      # The two Satorra-Bentler factors: `model` divides the fitted model's
+      # chi-square, `baseline` the independence model's (which only CFI reads).
+      # Both are NA together when the scaling failed.
+      scaling_factor = c(model = scaling$scale, baseline = scaling$baseline),
+      # NULL when the scaling succeeded; otherwise why the four chi-square-
+      # derived statistics are NA ("singular", "unidentified", "df_mismatch",
+      # "baseline_df_mismatch", "indefinite").
+      fit_scaling_failed = scaling$reason,
       ols_shadow = ols
     ),
     call = call
