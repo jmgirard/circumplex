@@ -628,4 +628,6 @@ and an unexported function's argument names are not a contract.
 No return. All 14 criteria pass with fresh evidence; the three actioned findings
 were fixed in-round and re-verified, as was the CI-only defect above.
 Re-verified after the fixes: `devtools::check(args = "--no-manual")`
-**Status: OK** (0/0/0, 13m 21.7s), test phase clean.
+**Status: OK** (0/0/0, 13m 21.7s), test phase clean; and CI is fully green on
+the platform that exhibited the failure — `ubuntu-latest (release)` pass
+(26m54s), `test-coverage` pass, `pkgdown` pass, both codecov checks pass.
