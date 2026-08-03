@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** RR14
 - **Principles touched:** —
-- **Branch/PR:** `m68-axes-reliability-scaled-chisq`
+- **Branch/PR:** `m68-axes-reliability-scaled-chisq` / https://github.com/jmgirard/circumplex/pull/94
 
 ## Goal
 
