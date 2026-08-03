@@ -41,7 +41,7 @@ RR14 Q2/Q5 showed it demanded what no scaling factor can deliver — and the
 remaining plan-owned criteria are renumbered contiguously, so AC4-AC7 of the
 original plan are AC3-AC6 here.
 
-- [ ] **AC1** — All three input paths compute `$fit$chisq`, `$pvalue`, `$rmsea`
+- [x] **AC1** — All three input paths compute `$fit$chisq`, `$pvalue`, `$rmsea`
       and `$cfi` from `T_s = T / c` (`$cfi` also using `c_b`); `$fit$df` and
       `$fit$srmr` stay bit-identical; `details$fit_uncorrected` and
       `details$scaling_factor` present on every path; no path returns a scaled
@@ -65,7 +65,7 @@ original plan are AC3-AC6 here.
       every hit dispositioned in the work log as (a) updated, (b) historical
       inside a released-version NEWS entry, or (c) unrelated and listed. Re-run
       after AC11's edits.
-- [ ] **AC5** — `satorra1994.md` and `cudeck1989.md` exist with provenance
+- [x] **AC5** — `satorra1994.md` and `cudeck1989.md` exist with provenance
       blocks and page anchors, both carry `INDEX.md` lines, and
       `R/axes_scaled_fit.R` / `R/axes_corrected_se.R` cite them as
       `citekey (p. N)`.
@@ -82,7 +82,7 @@ original plan are AC3-AC6 here.
       empirical rejection rate of `$fit$pvalue` at α = .05 within `[.036, .064]`
       (nominal ± 2.8 MC SE at 2000 replicates). (Measured: .0540 ± .0051;
       independent 3000-replicate run .0500 ± .0040.)
-- [ ] **AC9** (BC3): At each of the three populations, N = 600, the scaled and
+- [x] **AC9** (BC3): At each of the three populations, N = 600, the scaled and
       unscaled rejection rates at α = .05 — computed from the committed fixture's
       per-replicate `p` and `p_unscaled` columns, not stored as separate scalars
       — are reported in the milestone (committed scaled: .0790 / .0630 / .1070;
@@ -100,7 +100,7 @@ original plan are AC3-AC6 here.
       `c_pop` for each population is the fixture's own
       `population_diagnostics$*$cfactor`. (Measured: ≤ .0005 in every cell;
       relative sd(ĉ) ≤ .0024.)
-- [ ] **AC11** (BC5): Three user-facing surfaces carry the small-sample behaviour, at
+- [x] **AC11** (BC5): Three user-facing surfaces carry the small-sample behaviour, at
       two depths. The `axes_reliability()` roxygen Details and the vignette's
       scaled-fit section each state, with these numbers: (i) the scaled statistic
       is calibrated in mean and its test is asymptotically exact, approaching the
@@ -151,7 +151,7 @@ original plan are AC3-AC6 here.
       (measured 3.3e-16 in this review) — a disagreement fails the suite rather
       than shipping a wrong number. (Attribution to Olkin–Siotani may appear in a
       comment; no PDF shelving gates this criterion.)
-- [ ] **AC14** (BC8): The regression evidence stands in the suite, not only in the work
+- [x] **AC14** (BC8): The regression evidence stands in the suite, not only in the work
       log: a test file reads the committed fixture and asserts, from its stored
       per-replicate columns, BC1's three means, BC2's rejection rate, BC3's six
       rates against their fences, and BC4's ≤ .005 bound; and a fast live smoke
@@ -428,3 +428,113 @@ was an amendment return and is counted separately). Five criterion failures
 (F4/AC1, F5/AC5, F6/AC9, F7/AC14, F16/AC11) plus F1 at 92 on user-facing
 behaviour take the return floor. F2 is actioned in the same pass.
 
+
+---
+
+**Round 2 (2026-08-03).** The five criteria that failed round 1 (AC1, AC5, AC9,
+AC11, AC14) re-verified with fresh evidence, and the nine that passed re-run
+rather than carried over — the code moved under all of them.
+
+### Criterion evidence (fresh, by command)
+
+- **AC1 — PASS.** All three paths scale all four statistics: listwise/cormat
+  `chisq` 296.128 -> 309.566, `p` .16073 -> .06323, `rmsea` .016804 -> .021130,
+  `cfi` .991775 -> .988847 at `c` = 0.956590; fiml 297.011 -> 310.480 at
+  0.956621. `df` = 273 and `srmr` bit-identical to the uncorrected copy on every
+  path (`identical()` TRUE). Round 1's F4 gap is closed: `expect_scaled_contract()`
+  now reads `$fit$cfi` on each path and recomputes it by inverting lavaan's own
+  uncorrected CFI for the baseline chi-square; verified outside the suite too,
+  agreeing at 0.0e+00 / 0.0e+00 / 1.1e-16, and the branch was confirmed to FIRE
+  on all three paths rather than being guarded away.
+- **AC2 — PASS.** Oracle tests green in a full run of the file. Corroboration
+  re-measured: `261.1 / c_pop` = 273.022 against `df` = 273, gap 0.022 <= 0.5.
+- **AC3 — PASS.** FIML `mean(T_s)/df` = 1.0187 / 1.0221 / 1.0267 / 1.0107 at
+  2/5/10 % MCAR and M1 MAR (200/200/200/201 replicates), all inside [0.95, 1.05].
+- **AC4 — PASS.** Four-token sweep re-run over five trees: 51 hits, every one
+  either corrected-contract text (the vignette's "fit is flattered" describing
+  the distortion being removed), an absence-guard pinning falsified wording, or
+  an unrelated use. No surface reverted.
+- **AC5 — PASS.** Both source notes exist with `Provenance` blocks and page
+  anchors, both carry `INDEX.md` lines, and both R files now cite with pages:
+  `R/axes_scaled_fit.R` at `satorra1994 (pp. 401/406/407)` and
+  `cudeck1989 (pp. 322-323)`; `R/axes_corrected_se.R` at `cudeck1989 (p. 323)`
+  twice and `satorra1994 (pp. 406-407)`. Round 1's F5 gap is closed.
+- **AC6 — PASS.** `document()` no diff; `test()` 0 failures / 5077 passing / 4
+  pre-existing warnings; `check(args = "--no-manual")` **Status: OK** (0/0/0,
+  13m 2.5s).
+- **AC7 — PASS.** `mean(T_s)/df` = 1.0204 / 1.0139 / 1.0227 over 2000
+  replicates each, inside [0.97, 1.03]; unscaled 0.9757 / 0.9423 / 0.9798.
+- **AC8 — PASS.** Rejection at N = 4800 = .0540 +- .0051 over 2000 replicates,
+  inside [.036, .064]; unscaled .0145 at the same N.
+- **AC9 — PASS.** Both arms now hold. The +-.021 drift fence: scaled
+  .0790 / .0630 / .1070, unscaled .0270 / .0200 / .0215. The exact-reproduction
+  arm, unimplemented at round 1 (F6), is implemented twice over: in the suite as
+  exact equality of all six rates to their committed constants at 1e-12 plus a
+  per-replicate replay from pinned seeds, environment-guarded and confirmed NOT
+  skipped (the file runs 0 skips); and at full scale by the generator's new
+  `verify` mode, which regenerated all seven cells over 14000 fits under the
+  fixture's own R 4.6.1 / lavaan 0.6.21 and reproduced every stored column at
+  **max|diff| = 0.000e+00**, with all seven rejection rates identical.
+- **AC10 — PASS.** |rej(T/c-hat) - rej(T/c_pop)| = .00100 / .00000 / .00050,
+  all <= .005; relative sd(c-hat) = .00089 / .00243 / .00067. See the
+  projection-vs-outcome note below on the .0005 figure BC4 records.
+- **AC11 — PASS.** All three surfaces carry the behaviour, and the third one now
+  sits where BC5 asks. `summary()` prints the note directly under the
+  chi-square/RMSEA/CFI line with nothing but blank lines between them — asserted
+  as a POSITION, by line index, not merely as presence — and `print()` no longer
+  carries it, so it appears exactly once. The Rd and vignette carry the sweep
+  (.092/.079/.062/.054 at p*/N 0.50/0.25/0.12/0.06, with its
+  single-population disclaimer), the N = 600 range, the direction, and the
+  complete-data scoping; the printed note still carries direction and pointer
+  only, with rates pinned absent. Round 1's F16 is closed.
+- **AC12 — PASS.** Six-token sweep re-run: 111 hits over five trees, one on an
+  axes surface (`R/axes_corrected_se.R:41`, `ssm_sem()`-adjacent rejected-routes
+  prose) plus the roxygen's own fencing paragraph. The fencing sentence is
+  present and guarded.
+- **AC13 — PASS.** Entrywise `Gamma_R` agreement to 1e-12 on the octant probe
+  and on a non-model random correlation matrix, with the perturbation check.
+- **AC14 — PASS.** `grep -rn m68-scaled-fit-cells tests/` non-empty; the suite
+  test asserts BC1's three means, BC2's rate, BC3's six rates and BC4's bound.
+  Round 1's F7 gap is closed: the populations, seed formula and replicate
+  function moved to `tests/testthat/helper-m68-cells.R`, which
+  `devel/m68-scaled-fit-cells.R` source()s and binds as its own `one_rep`, so
+  the smoke cell calls the generator's own function on the generator's own first
+  12 strong-axes seeds and requires the committed rows back at 1e-12. The
+  blame-history lens independently diffed the move and found the populations and
+  seed formulas content-identical.
+
+### Projection vs outcome (Driving RR: RR14)
+
+Measured against RR14's own recorded figures, both numbers verbatim:
+
+- `c` at the strong-axes population: measured 0.9563346 against projected
+  0.9563346 (RR14 Q1's independent Olkin-Siotani route, relative 2e-15).
+- BC1 mean ratios: measured 1.0204 / 1.0139 / 1.0227 against projected
+  1.0204 / 1.0139 / 1.0227.
+- BC2 rejection rate at N = 4800: measured .0540 +- .0051 against projected
+  .0540 +- .0051.
+- BC3 six rates: measured .0790/.0630/.1070 and .0270/.0200/.0215 against the
+  same six projected values.
+- BC5 sweep: measured .0920 / .0785 / .0615 / .0540 against projected
+  .092 / .079 / .062 / .054.
+- **BC4 factor-noise bound: measured <= .00100 against projected <= .0005.**
+  The discrepancy is in RR14's own parenthetical, not in the deliverable: BC4's
+  operative bar is <= .005 and the strong cell's .00100 sits well inside it, and
+  round 1 measured the same .00100 and ticked the criterion on the same
+  reading. Recorded rather than reconciled — no re-run of RR14's decomposition
+  is available to say which of the two figures its note described, and the
+  conclusion it supports (the tail excess is a mean shift, not factor noise) is
+  unchanged at either value. Relative sd(c-hat) matches exactly: measured
+  <= .00243 against projected <= .0024.
+
+### Consistency gate
+
+`cairn_validate` exits 1: **`weight caps` FAIL** (205 plan-owned lines against a
+<150 cap; heaviest Acceptance criteria 130, of which RR14's verbatim block may
+not be edited) plus `sizing` WARN (14 criteria, 15 tasks). Both are the
+maintainer's logged exception of 2026-08-02, now 5 lines larger than when it was
+taken — the three tasks the return added. All 15 other checks PASS, including
+`coverage complete` (the map was amended to name T13-T15) and `binding criteria`.
+The 47 `work-log format` warnings are all on M7 and pre-existing.
+Toolchain gate: `document()` no diff, `pkgdown::check_pkgdown()` no problems,
+README in sync, NEWS entry present, `check()` **OK**.
