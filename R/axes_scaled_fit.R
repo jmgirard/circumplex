@@ -31,13 +31,13 @@
 # Strength of the claim, stated exactly because it is easy to overstate: the
 # scaled statistic agrees with the reference chi-square in MEAN always, and is
 # exactly chi-square only when the eigenvalues of U Gamma are all equal
-# (satorra1994 p. 407, cases a and b). This model is in the chapter's case (c),
+# satorra1994 (p. 407), cases a and b. This model is in the chapter's case (c),
 # where a better approximation is a supported conjecture, not a theorem. AC3's
 # simulation is what establishes that it holds here.
 #
 # Rejected route: Satorra & Bentler's ADJUSTED (Satterthwaite-type) statistic,
 # which matches mean AND variance by moving to noninteger degrees of freedom
-# (satorra1994 p. 409). It would change `$fit$df`, a documented return field,
+# satorra1994 (p. 409). It would change `$fit$df`, a documented return field,
 # from an integer count of overidentifying restrictions into a fitted quantity.
 
 

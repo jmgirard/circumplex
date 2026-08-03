@@ -43,7 +43,7 @@ axes_fmt <- function(x, digits = 3) {
 #
 # This text used to WARN. Both halves of the warning are now gone, in two
 # milestones: M66 corrected the component standard errors (RR13 BC1, D-035),
-# and M68 scaled the global test statistic (satorra1994 p. 407, D-036). What is
+# and M68 scaled the global test statistic (satorra1994 (p. 407), D-036). What is
 # left is not a caveat but an orientation note -- it says what was corrected,
 # because the reported numbers differ from the ones a reader reproduces in
 # LISREL or by calling lavaan directly, and an unexplained difference reads as

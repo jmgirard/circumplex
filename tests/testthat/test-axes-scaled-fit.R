@@ -466,28 +466,35 @@ test_that("M68 review F2: CFI is 1, not NaN, when neither model nor baseline mis
   expect_false(is.nan(got$fit$cfi))
   expect_equal(got$fit$cfi, 1)
 
-  # Against lavaan's own function on the same two scaled statistics, so the
-  # agreement is with the reference implementation and not with our reading of
-  # it. Skipped rather than faked if the internal is ever renamed.
-  lav_cfi <- tryCatch(get("lav_fit_cfi", envir = asNamespace("lavaan")),
-                      error = function(e) NULL)
-  skip_if(is.null(lav_cfi), "lavaan::lav_fit_cfi is not available")
-  expect_equal(
-    got$fit$cfi,
-    lav_cfi(X2 = 200 / 0.95, df = 273, X2.null = 260 / 0.95, df.null = 276)
-  )
-
   # Only the 0/0 corner is special-cased: a misfitting model still gets the
-  # ratio, and still agrees with lavaan.
+  # ratio.
   fm2 <- fm
   fm2[["chisq"]] <- 400
   fm2[["baseline.chisq"]] <- 4000
   got2 <- axes_scale_fit_measures(fm2, cf)
   expect_lt(got2$fit$cfi, 1)
-  expect_equal(
-    got2$fit$cfi,
-    lav_cfi(X2 = 400 / 0.95, df = 273, X2.null = 4000 / 0.95, df.null = 276)
-  )
+  expect_equal(got2$fit$cfi, 1 - (400 / 0.95 - 273) /
+                 (4000 / 0.95 - 276))
+
+  # Against lavaan's own function on the same two scaled statistics, so the
+  # agreement is with the reference implementation and not with our reading of
+  # it. `lav_fit_cfi()` is UNEXPORTED, so neither its existence nor its argument
+  # names are a contract: an earlier lavaan takes them positionally under
+  # different names, and calling it by name errored the whole test on CI while
+  # passing locally (M68 review round 2 -- the existence probe checked that the
+  # symbol resolved, not that it accepted these arguments). The call itself is
+  # therefore what is probed, and any failure to reach it SKIPS: the assertions
+  # above already pin the behaviour without lavaan's help, and this is
+  # corroboration against the reference implementation, not the check itself.
+  ref <- tryCatch({
+    f <- get("lav_fit_cfi", envir = asNamespace("lavaan"))
+    c(f(X2 = 200 / 0.95, df = 273, X2.null = 260 / 0.95, df.null = 276),
+      f(X2 = 400 / 0.95, df = 273, X2.null = 4000 / 0.95, df.null = 276))
+  }, error = function(e) NULL, warning = function(w) NULL)
+  skip_if(is.null(ref) || length(ref) != 2L || anyNA(ref),
+          "lavaan::lav_fit_cfi is not callable with these arguments")
+  expect_equal(got$fit$cfi, ref[[1]])
+  expect_equal(got2$fit$cfi, ref[[2]])
 })
 
 
@@ -808,9 +815,21 @@ test_that("AC14: the live smoke cell reproduces the committed harness", {
   # Same seeds as the fixture's first 12 rows, so this is not merely the same
   # DISTRIBUTION -- it is the same draws, and the committed numbers must come
   # back. This is AC9's exact-reproduction arm applied where it is cheap.
+  #
+  # The BIT-EXACT half is gated on the environment (m68_env_matches), the same
+  # gate AC9's replay uses; without it this errors rather than skips on any
+  # platform whose BLAS/LAPACK or lavaan differs, which on CRAN is most of them
+  # (M68 review round 2, F1 -- the gate was on the sibling test only). What runs
+  # everywhere is the loose agreement below: it still catches a harness that has
+  # drifted from the package, which is what AC14 asks the cell for, without
+  # asserting last-bit determinism the platform does not owe.
   stored <- t(fx$cells$strong[seq_along(seeds), , drop = FALSE])
   expect_identical(rownames(got), rownames(stored))
-  expect_lt(max(abs(got - stored)), 1e-12)
+  expect_lt(max(abs(got["chisq", ] - stored["chisq", ])), 1e-4)
+  expect_lt(max(abs(got["cfactor", ] - stored["cfactor", ])), 1e-6)
+  if (m68_env_matches(fx)) {
+    expect_lt(max(abs(got - stored)), 1e-12)
+  }
 
   # Direction, not calibration: 12 replicates cannot resolve a rejection rate,
   # and applying the fixture's bar to a sample this small would be theatre. The
@@ -832,19 +851,17 @@ test_that("AC9: the committed rates reproduce exactly in the same environment", 
   # regeneration is a re-derivation rather than a fresh sample. It was
   # unimplemented (M68 review, F6).
   #
-  # Guarded on the environment, because the criterion is: R or lavaan drift
-  # moves the arm to the +/- .021 fence, which the test above already enforces.
-  skip_if_not(
-    identical(fx$provenance$r_version, R.version.string) &&
-      identical(fx$provenance$lavaan_version,
-                as.character(utils::packageVersion("lavaan"))),
-    "fixture was generated under a different R or lavaan version"
-  )
-
   # (1) The rates ARE the committed constants, to 1e-12 rather than to the
   # rounding the fence tolerates. A rate is a deterministic function of the
   # stored per-replicate column, so this is the arm's claim about the rates
   # exactly.
+  #
+  # This arm is UNGUARDED, deliberately: it is arithmetic over a frozen .rds and
+  # cannot be moved by an R or lavaan upgrade, so gating it on the environment
+  # would retire the tightest fence in the file the day either one ships a new
+  # version, leaving only the +/- .021 drift fence -- which tolerates a 2.5x
+  # move in the small rates (M68 review round 2, F2). Only the live replay below
+  # depends on the environment.
   for (nm in M68_POPS) {
     cell <- m68_ok(fx$cells[[nm]])
     expect_lt(abs(mean(cell[, "p"] < .05) - M68_RATE_SCALED[[nm]]), 1e-12,
@@ -857,6 +874,11 @@ test_that("AC9: the committed rates reproduce exactly in the same environment", 
   # (1) is a live property of the harness and not an arithmetic tautology over a
   # frozen file. Two replicates per population -- the whole 6000-fit
   # regeneration is the generator's `verify` mode, run by hand.
+  #
+  # THIS is what the environment gate belongs on: same seeds reproduce the same
+  # numbers only under the same R and the same lavaan.
+  skip_if_not(m68_env_matches(fx),
+              "fixture was generated under a different R or lavaan version")
   for (nm in M68_POPS) {
     idx <- c(1L, 2L)
     seeds <- m68_seeds(nm, max(idx))[idx]

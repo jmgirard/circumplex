@@ -63,6 +63,22 @@ m68_seeds <- function(what, reps) {
 # collide with each other or with the three population cells above.
 m68_sweep_seeds <- function(n, reps) 40000L + as.integer(n) + seq_len(reps)
 
+# Does this machine match the environment the fixture was generated under?
+#
+# Bit-exact replay of a stored replicate is a claim about THIS R and THIS
+# lavaan and nothing else. `axes_simulate()` -> `cor()` -> lavaan's optimizer
+# amplifies last-bit LAPACK/BLAS differences well past any useful bar (a 1e-15
+# relative perturbation of one correlation moves the scaled chi-square by
+# ~9e-12), so on a platform with a different numeric library the comparison
+# fails for a reason that says nothing about this package. Every exact-replay
+# assertion is gated on this; the assertions that survive a changed environment
+# are the drift fences and the direction checks, which are gated on nothing.
+m68_env_matches <- function(fx) {
+  identical(fx$provenance$r_version, R.version.string) &&
+    identical(fx$provenance$lavaan_version,
+              as.character(utils::packageVersion("lavaan")))
+}
+
 # One replicate, reduced to what the criteria consume. Both p-values are stored:
 # `p` is what the package now reports and `p_unscaled` is what lavaan reported
 # before the scaling, so the "with the unscaled rate recorded alongside" clause

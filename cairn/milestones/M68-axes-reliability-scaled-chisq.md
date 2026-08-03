@@ -538,3 +538,64 @@ taken — the three tasks the return added. All 15 other checks PASS, including
 The 47 `work-log format` warnings are all on M7 and pre-existing.
 Toolchain gate: `document()` no diff, `pkgdown::check_pkgdown()` no problems,
 README in sync, NEWS entry present, `check()` **OK**.
+
+### Independent review — three lenses, then a scorer (round 2)
+
+Blame-history lens: **zero findings** — it traced every round-2 edit to the
+round-1 finding that demanded it, and independently diffed the harness move,
+confirming the population parameters and seed formulas content-identical (one
+cosmetic note: a test title still says "print() WIRING" though it now also
+asserts `summary()` wiring). Prior-review lens: **no regression found**; the
+GitHub inline-comment probe returned empty, so no per-PR walk. It records one
+advisory: F1's defect shape — an unconditional positive claim printed beside a
+state that may have failed — is now the THIRD occurrence in this file (M62 F3,
+M66 F3, M68 F1), which is a lesson rather than a defect. Diff-bug lens: 12
+findings. Scored by a fresh agent holding the diff and the plan; 3 scored >= 80.
+
+**Actioned (>= 80), verbatim titles, all fixed in this round:**
+
+- F1 (92) — AC14's smoke cell asserts bit-level reproduction of the fixture with
+  no environment guard — a portability/CRAN failure waiting to happen.
+- F2 (85) — AC9's exact-rate arm is over-guarded and will silently vanish on the
+  next R release.
+- F11 (80) — Two `satorra1994` citations do not use AC5's literal
+  `citekey (p. N)` form.
+
+Fixes: the environment predicate moved into `helper-m68-cells.R` as
+`m68_env_matches()` and is now applied where each belongs — AC14's smoke cell
+gates only its bit-exact comparison on it and keeps always-on loose bars
+(1e-4 on `chisq`, 1e-6 on `cfactor`) that still catch harness/package drift,
+while AC9's frozen-fixture arithmetic arm was moved OUT from behind the gate
+(it cannot be moved by a version bump) and the gate now sits only on the live
+replay. Verified: the predicate returns FALSE on a doctored lavaan version, and
+the always-on bars are met at 0.000e+00. The two citations now read
+`satorra1994 (p. 407)` and `satorra1994 (p. 409)`.
+
+**Return floor.** None of the three takes it. F11 is a criterion-shaped miss but
+was fixed in this round rather than returned, so AC5 passes as written. F1
+scored >= 90 but is a defect in the verification harness's portability, not in
+what `axes_reliability()` does for its users — the floor's excluded class — and
+no criterion demanded bit-exactness of the smoke cell. Defect-return count for
+this milestone stays at 1 (round 1); the AC3 supersession remains on the
+separate amendment track.
+
+**Logged below threshold (9), not actioned:** F6 (66) the shipped `cfi`/`rmsea`
+are lavaan's *scaled* variants and no user-facing surface says which variant is
+reported, while the file header claims agreement with `lav_fit_cfi()`; F9 (65)
+the CFI recomputation sits inside a conditional with nothing asserting the
+conditional was entered; F8 (62) `seq(fit_at + 1L, note_at - 1L)` counts
+backwards if the note ever lands adjacent to the fit line; F12 (58) the scaled-fit
+note's "that metric" now has a distant antecedent; F7 (72) the AC11 no-rates test
+now scans output containing formatted fit numbers, so a collision is possible
+where it was structurally impossible; F10 (55) the test's CFI 0/0 corner uses
+`t2 == 0` where the shipped code uses `all.equal(t2, 0)`; F3 (45)
+`axes_metric_note(FALSE, FALSE)` would return a false claim, unreachable because
+the sole call site guards it; F5 (42) an object built before M68 has no
+`fit_scaling_failed` field and would read as a successful scaling, unreachable
+because 2.0.0 is unreleased; F4 (30) the both-failed `print()` state emits no
+metric note, which the surrounding comment states as the intended design.
+
+### Return
+
+No return. All 14 criteria pass with fresh evidence; the three actioned findings
+were fixed in-round and re-verified.
