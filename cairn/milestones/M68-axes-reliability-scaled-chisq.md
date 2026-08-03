@@ -1,6 +1,6 @@
 # M68: Scaled global test statistic for `axes_reliability()`
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR14
@@ -47,7 +47,7 @@ original plan are AC3-AC6 here.
       `details$scaling_factor` present on every path; no path returns a scaled
       statistic beside an unscaled one among the four, verified by a test
       reading all four from each path.
-- [ ] **AC2** — Two independent oracle types. *Closed-form:* an explicit
+- [x] **AC2** — Two independent oracle types. *Closed-form:* an explicit
       vech-space routine forming `Γ_R`, `W`, `Δ` and `U` as literal matrices,
       agreeing with the shipped trace-identity implementation to ≤ 1e-8 relative
       on the octant probe, a 6-scale map and a one-item-per-scale map, citing
@@ -55,11 +55,11 @@ original plan are AC3-AC6 here.
       *Simulation-coverage:* AC7-AC9. RR13's `E[T] = 261.1` against `df = 273`
       corroborates to ≤ 0.5 but does not gate — RR13 ships no reproduction code,
       so a miss escalates.
-- [ ] **AC3** — On the FIML path, regenerating from the M65 fixture's 2/5/10 %
+- [x] **AC3** — On the FIML path, regenerating from the M65 fixture's 2/5/10 %
       MCAR seeds and the M66 fixture's 201-replicate M1 MAR cell,
       `mean(T_s)/df` ∈ [0.95, 1.05] in every cell; and the `em_stalled` refusal
       still fires before any scaled statistic is computed.
-- [ ] **AC4** — No user-facing surface still says the global fit statistics are
+- [x] **AC4** — No user-facing surface still says the global fit statistics are
       uncorrected: `grep -rn` over `R/`, `man/`, `vignettes/`, `NEWS.md` and
       `tests/testthat/` for `flattered`, `not corrected`, `261.1`, `approximate`,
       every hit dispositioned in the work log as (a) updated, (b) historical
@@ -69,15 +69,15 @@ original plan are AC3-AC6 here.
       blocks and page anchors, both carry `INDEX.md` lines, and
       `R/axes_scaled_fit.R` / `R/axes_corrected_se.R` cite them as
       `citekey (p. N)`.
-- [ ] **AC6** — `devtools::document()` no diff; `devtools::test()` and
+- [x] **AC6** — `devtools::document()` no diff; `devtools::test()` and
       `devtools::check()` clean (0 errors, 0 warnings; NOTEs justified).
-- [ ] **AC7** (BC1): At each of the three AC3 populations (strong-axes, Strack COC S16
+- [x] **AC7** (BC1): At each of the three AC3 populations (strong-axes, Strack COC S16
       Other weak-axes, anti-conservative corner), N = 600, ≥ 2000 replicates
       produced by the seed-pinned generator `devel/m68-scaled-fit-cells.R` with
       its per-replicate summary committed at
       `tests/testthat/fixtures/m68-scaled-fit-cells.rds`:
       `mean(T_s)/df ∈ [0.97, 1.03]`. (Measured: 1.0204 / 1.0139 / 1.0227.)
-- [ ] **AC8** (BC2): At the strong-axes population, N = 4800, ≥ 2000 replicates from
+- [x] **AC8** (BC2): At the strong-axes population, N = 4800, ≥ 2000 replicates from
       the same seed-pinned generator, stored in the same committed fixture:
       empirical rejection rate of `$fit$pvalue` at α = .05 within `[.036, .064]`
       (nominal ± 2.8 MC SE at 2000 replicates). (Measured: .0540 ± .0051;
@@ -94,7 +94,7 @@ original plan are AC3-AC6 here.
       These are regression fences, not calibration claims; a breach escalates
       rather than being re-fenced, and an escalation that accepts new values must
       update BC5's documented numbers in the same change.
-- [ ] **AC10** (BC4): From the committed fixture's per-replicate `chisq` and `cfactor`
+- [x] **AC10** (BC4): From the committed fixture's per-replicate `chisq` and `cfactor`
       columns, at each N = 600 cell: |rej(T/ĉ) − rej(T/c_pop)| ≤ .005 at
       α = .05, recording that the tail excess is not factor-estimation noise.
       `c_pop` for each population is the fixture's own
@@ -125,7 +125,7 @@ original plan are AC3-AC6 here.
       typical sample sizes) and pointing to `?axes_reliability` — direction and
       pointer only, no rates, so the printed note cannot drift from the fixture.
       No runtime warning is added for this.
-- [ ] **AC12** (BC6): No user-facing surface describes the scaling as a robustness
+- [x] **AC12** (BC6): No user-facing surface describes the scaling as a robustness
       correction for non-normal data, established by an AC5-shaped sweep:
       `grep -rin` over `R/`, `man/`, `vignettes/`, `NEWS.md` and
       `tests/testthat/` for `robust`, `non-normal`, `nonnormal`,
@@ -137,7 +137,7 @@ original plan are AC3-AC6 here.
       sentence stating the factor is normal-theory and corrects the
       correlation-versus-covariance metric only, whose presence the sweep log
       records.
-- [ ] **AC13** (BC7): The AC2 vech oracle gains an independent off-diagonal check on
+- [x] **AC13** (BC7): The AC2 vech oracle gains an independent off-diagonal check on
       `Γ_R`: at least one probe map's `Γ_R` is compared entrywise (all cells,
       not the diagonal only) against the closed normal-theory formula for
       `n·cov(r_ij, r_kl)`, written out in the test itself:
@@ -228,6 +228,7 @@ detail.
 - 2026-08-02: T8 done — NEWS entry extended with the small-sample direction and a pointer to `?axes_reliability`. `devtools::document()` produces no diff. `devtools::test()`: 0 failures, 5031 passing, 4 warnings (all pre-existing, unchanged from the 4421-pass pre-M68 baseline). `devtools::check(args = "--no-manual")`: **Status: OK** — 0 errors, 0 warnings, 0 notes.
 - 2026-08-02: caught at T8 by the repo's own `test-rd-latex-safe.R` guard, not by review — the new roxygen section used literal `chi-squared` and `alpha` glyphs, which the Rd must carry as `\eqn{}` math. Rewritten; the guard is the reason a non-ASCII Rd never reaches win-builder. Worth noting that the filtered test runs during T11 never exercised it, so only the full suite found it.
 - 2026-08-02: all tasks complete; status -> review.
+- 2026-08-02: review round 1 RETURNED to in-progress. Failed: AC1 (no test reads `$fit$cfi` on any path, so a wiring regression assigning lavaan's unscaled cfi would pass the whole file), AC5 (`R/axes_corrected_se.R:22` still carries the unpaged `(Cudeck, 1989)` the criterion requires anchored), AC9 (the same-environment exact-reproduction arm is unimplemented; only the +-.021 drift fence runs), AC11 (the printed note sits two blocks above the fit line `summary()` prints, not beside it), AC14 (the smoke cell re-implements the replicate inline on different seeds instead of running the generator's own function). Also actioned: F1 at 92 (`print()` emits `both sides of that mismatch are corrected` even when one correction failed — the exact failure its own comment says the three-way split exists to prevent) and F2 at 82 (scaled CFI returns NaN where lavaan returns 1, when both the model and baseline chi-squares fall at or under their df). Passed with fresh evidence: AC2, AC3, AC4, AC6, AC7, AC8, AC10, AC12, AC13. Consistency gate clean apart from the logged weight-cap exception. Blame-history and prior-review lenses returned zero findings each.
 - 2026-08-02: plan chose replacing `$fit`'s values and retaining the unscaled six in `details$fit_uncorrected` over adding parallel `*_scaled` fields, following M66's `details$se_uncorrected` precedent, so the default-read number is the calibrated one; falsified by a user needing both side by side in printed output.
 
 ## Decisions
@@ -319,3 +320,100 @@ realistic input, degrading the warning channel), and any retreat to the
 unscaled statistics or a user-facing switch (D-035/D-036 stand).
 
 ## Review
+
+**Round 1 (2026-08-02) — RETURNED to `in-progress`.** Five acceptance criteria
+fail as literally written, plus two actioned defects that map to no criterion.
+Evidence below; criteria that passed are ticked in the AC block above, those
+that failed are not.
+
+### Criterion evidence (fresh, by command)
+
+- **AC1 — FAIL.** All three paths do scale (listwise/cormat `chisq` 296.128 ->
+  309.566 at `c` = 0.95659, fiml 297.011 -> 310.480 at 0.95662; `df` 273 and
+  `srmr` 0.049503 identical to the uncorrected copy on every path; `$fit`
+  carries exactly the six documented fields). But the criterion's own
+  verification clause is unmet — see F4.
+- **AC2 — PASS.** Vech-space oracle agrees with the shipped trace identities on
+  three probe maps; a third independent route (numerical differentiation of
+  `cov2cor`, by the diff reviewer) agrees to 9e-12 relative. Corroboration:
+  `261.1 / c_pop` = 273.022 against `df` = 273, gap 0.022 <= the 0.5 bar.
+- **AC3 — PASS.** FIML `mean(T_s)/df` = 1.0187 / 1.0221 / 1.0267 / 1.0107 at
+  2/5/10 % MCAR and M1 MAR (200/200/200/201 replicates), all inside
+  [0.95, 1.05]. The `em_stalled` ordering test asserts the refusal message with
+  the scaler stubbed to `stop()`.
+- **AC4 — PASS.** Sweep re-run post-documentation: every surviving hit is either
+  corrected-contract text or an unrelated use, dispositioned in the work log.
+- **AC5 — FAIL.** See F5.
+- **AC6 — PASS.** `document()` no diff; `test()` 0 failures / 5031 passing / 4
+  pre-existing warnings; `check(args = "--no-manual")` **Status: OK**.
+- **AC7 — PASS.** `mean(T_s)/df` = 1.0204 / 1.0139 / 1.0227 over 2000
+  replicates each, inside [0.97, 1.03]; unscaled 0.9757 / 0.9423 / 0.9798.
+- **AC8 — PASS.** Rejection at N = 4800 = .0540 +- .0051 over 2000 replicates,
+  inside [.036, .064]; unscaled .0145 at the same N.
+- **AC9 — FAIL.** The +-.021 drift fence holds (.0790/.0630/.1070 scaled,
+  .0270/.0200/.0215 unscaled), but the criterion's exact-reproduction arm is
+  unimplemented — see F6.
+- **AC10 — PASS.** |rej(T/c-hat) - rej(T/c_pop)| = .00100 / .00000 / .00050,
+  all <= .005; relative sd(c-hat) <= .00243.
+- **AC11 — FAIL.** See F16.
+- **AC12 — PASS.** Six-token sweep over five trees; no surface describes the
+  scaling as a robustness correction; the roxygen fencing sentence is present
+  and guarded.
+- **AC13 — PASS.** Entrywise `Gamma_R` agreement to 1e-12 on the octant probe
+  and on a non-model random correlation matrix, with a perturbation check.
+- **AC14 — FAIL.** See F7.
+
+### Consistency gate
+
+`cairn_validate` exits 1: **`weight caps` FAIL** (200 plan-owned lines against
+a <150 cap) plus `sizing` WARN (14 criteria, 12 tasks). Both are the
+maintainer's logged exception of 2026-08-02, taken over splitting the milestone;
+they are not new. All 15 other checks PASS, including `coverage complete` and
+`binding criteria` (the AC block string-compares clean against RR14).
+Toolchain gate: `document()` no diff, `pkgdown::check_pkgdown()` no problems,
+README in sync, NEWS entry present, `check()` OK.
+
+### Independent review — three lenses, then a scorer
+
+Blame-history lens: **zero findings** (every deletion traced to the D-entry
+authorizing it; the M65 SRMR fix comment verified untouched). Prior-review lens:
+**zero findings** (checked against M59-M67 archived `## Review` sections and
+`LESSONS.md`; the GitHub inline-comment probe returned empty, so no per-PR walk).
+Diff-bug lens: 19 findings. Scored by a fresh agent; 7 scored >= 80.
+
+**Actioned (>= 80), verbatim titles:**
+
+- F1 (92) — `print()` asserts both corrections happened when only one did.
+- F4 (85) — AC1's "verified by a test reading all four from each path" is not
+  met for `cfi`.
+- F6 (85) — AC9's exact-reproduction arm is unimplemented and unevidenced.
+- F7 (85) — AC14's smoke cell does not run "the generator's replicate function".
+- F16 (83) — BC5's "prints beside the chi-squared/RMSEA/CFI line" is only
+  loosely met.
+- F5 (82) — AC5 is not satisfied: `R/axes_corrected_se.R` carries no
+  `citekey (p. N)` citation.
+- F2 (82) — scaled CFI is `NaN` where lavaan returns 1.
+
+**Logged below threshold (12), not actioned:** F8 (68) the AC13 check validates
+a duplicate of the Jacobian rather than the oracle's own; F19 (68) the FIML
+cells tolerate ~5% silent scaling failures where the complete-data cells
+tolerate none; F17 (58) the vignette names Satorra-Bentler with no
+non-normality fence (AC12 requires it only in the roxygen); F11 (50) an item
+name absent from `sigma`'s dimnames raises a subscript error rather than the
+documented refusal; F10 (45) the printed-note test scans the whole transcript
+and could collide with a formatted value; F12 (45) `df_mismatch` warns where the
+sibling lavaan guard errors; F14 (45) the 536 KB fixture ships in the CRAN
+tarball; F3 (40) `axes_scale_fit_measures()` guards `cf$scale` but not
+`cf$baseline` or its sign, unreachable through the real pipeline; F15 (35) the
+information matrix is computed twice per call; F18 (35) AC7-AC10 read stored
+columns rather than re-running the estimator; F9 (30) no scaled-fit test
+exercises `item_block`/zeta2; F13 (30) `c_b` prices `Gamma_R` at the
+model-implied matrix (measured effect on CFI: 6e-5).
+
+### Return
+
+Return #1 for this milestone on the defect track (the earlier AC3 supersession
+was an amendment return and is counted separately). Five criterion failures
+(F4/AC1, F5/AC5, F6/AC9, F7/AC14, F16/AC11) plus F1 at 92 on user-facing
+behaviour take the return floor. F2 is actioned in the same pass.
+
