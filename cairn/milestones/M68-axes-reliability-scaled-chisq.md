@@ -595,7 +595,37 @@ the sole call site guards it; F5 (42) an object built before M68 has no
 because 2.0.0 is unreleased; F4 (30) the both-failed `print()` state emits no
 metric note, which the surrounding comment states as the intended design.
 
+### CI as a fourth lens
+
+The draft PR's first CI run **failed on `ubuntu-latest`**, and it is worth
+recording what that bought, because the local environment could not have found
+any of it. Two of the three failures were the diff-bug lens's own findings,
+confirmed empirically rather than by argument:
+
+- `test-axes-scaled-fit.R:813` — the AC14 bit-exact bar failed on a different
+  platform. That is F1's predicted failure, observed. The fixture was generated
+  on this machine, so the assertion passed here by construction and could never
+  have failed locally.
+- `test-axes-scaled-fit.R:837` — AC9 SKIPPED wholesale ("different R or lavaan
+  version"), taking the frozen-fixture arithmetic arm with it. That is F2's
+  predicted silent-vanishing, observed one release earlier than expected.
+- `test-axes-scaled-fit.R:475` — **a third defect neither lens nor the local
+  suite found**: the F2 regression test called the unexported
+  `lavaan:::lav_fit_cfi()` by argument name, and CI's lavaan takes them under
+  different names, erroring the test. The existence probe guarding it checked
+  that the symbol resolved, not that it accepted these arguments — the same
+  false-coverage shape as a prose-guard that asserts a phrase occurring
+  elsewhere. Fixed by removing the dependence from the load-bearing assertions
+  (the misfitting case is now recomputed in closed form) and probing the call
+  itself, skipping if it is not callable.
+
+Recorded as a lesson rather than a process change: a fixture generated on the
+authoring machine makes every exactness assertion over it locally unfalsifiable,
+and an unexported function's argument names are not a contract.
+
 ### Return
 
 No return. All 14 criteria pass with fresh evidence; the three actioned findings
-were fixed in-round and re-verified.
+were fixed in-round and re-verified, as was the CI-only defect above.
+Re-verified after the fixes: `devtools::check(args = "--no-manual")`
+**Status: OK** (0/0/0, 13m 21.7s), test phase clean.
