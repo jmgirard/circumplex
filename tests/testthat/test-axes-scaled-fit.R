@@ -880,3 +880,55 @@ test_that("AC12: the Rd fences the scaling against the robustness misreading", {
   expect_match(rd, "unrelated to the Satorra-Bentler scaled statistics reported by",
                fixed = TRUE)
 })
+
+
+# ---- AC3: the FIML path's mean calibration ----------------------------------
+#
+# This is the ONLY oracle behind M68-D1 -- the decision to scale the FIML path
+# with the complete-data Gamma_R at Sigma-hat rather than one rebuilt from the
+# FIML fit's own saturated stage. No complete-data reference value covers that
+# choice, so a miss here falsifies the decision rather than needing a fix.
+#
+# Regenerate with `Rscript devel/m68-fiml-scaled-cells.R` (~1 h; the M1 MAR
+# cell fits at N = 2400).
+
+test_that("AC3: mean(T_s)/df is in [0.95, 1.05] in every FIML cell", {
+  fx <- readRDS(test_path("fixtures", "m68-fiml-scaled-cells.rds"))
+  # The seeds are the M65 and M66 fixtures' own, so these are the SAME draws
+  # those two measured point estimates and standard errors on -- not a fresh
+  # sample that merely looks comparable. Assert the provenance, because that
+  # sharing is the reason the three sets of evidence can be read together.
+  m65 <- readRDS(test_path("fixtures", "m65-heavy-cells.rds"))
+  m66 <- readRDS(test_path("fixtures", "m66-corrected-se-cells.rds"))
+  expect_identical(fx$provenance$seeds$mcar, m65$provenance$seeds$mcar)
+  expect_identical(fx$provenance$seeds$m1, m66$provenance$seeds$m1)
+
+  for (nm in c("0.02", "0.05", "0.10", "m1")) {
+    cell <- fx$cells[[nm]]
+    ok <- stats::complete.cases(cell)
+    expect_gte(sum(ok), 190L, label = paste("survivors", nm))
+    got <- mean(cell[ok, "chisq_scaled"]) / cell[which(ok)[1], "df"]
+    expect_gt(got, 0.95, label = paste("mean(T_s)/df", nm))
+    expect_lt(got, 1.05, label = paste("mean(T_s)/df", nm))
+  }
+})
+
+
+test_that("AC3: the FIML factor is the complete-data one, per M68-D1", {
+  fx <- readRDS(test_path("fixtures", "m68-fiml-scaled-cells.rds"))
+  cells <- readRDS(test_path("fixtures", "m68-scaled-fit-cells.rds"))
+  c_pop <- cells$population_diagnostics$strong$cfactor
+
+  # M68-D1 chose the complete-data Gamma_R at Sigma-hat over a saturated-stage
+  # reconstruction, on the ground that lavaan's FIML chi-square already prices
+  # the missing information. The observable consequence: the factor is a
+  # property of the POPULATION matrix, so it must not drift with the
+  # missingness rate. A saturated-information factor would.
+  facs <- vapply(c("0.02", "0.05", "0.10"), function(nm) {
+    cell <- fx$cells[[nm]]
+    mean(cell[stats::complete.cases(cell), "cfactor"])
+  }, numeric(1))
+  expect_lt(max(abs(facs - c_pop)), .01)
+  # And no trend across a fivefold change in the missingness rate.
+  expect_lt(abs(facs[["0.10"]] - facs[["0.02"]]), .005)
+})
