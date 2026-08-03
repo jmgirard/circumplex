@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-03 (M68 post-merge. All checks PASS; M68 archived at 22 lines and its live file deleted, retiring the logged `weight caps` exception; 6 terminal rows pruned to 5 by dropping M63. LESSONS extended three existing lines — the authoring-machine fixture case onto M59's, unexported signatures onto M65's, split-claim summaries onto M56's — and added no row.)_
+_Last hygiene check: 2026-08-03 (audit pass, replacing the M68 post-merge stamp; nothing changed since it. All checks PASS, nothing fixed, both GitHub inboxes empty. M7 stays `blocked` on the maintainer's unopened release window; its 47 `work-log format` WARNs are migration-era hard wraps in history and stay as-is.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
