@@ -503,12 +503,15 @@ test_that("AC7: the printed caveat drops the SE warning and keeps the fit one", 
   # roughly 4%") -- that figure was one population's, printed as a constant --
   # so it moves to the absence block below and the scaling claim takes its
   # place. The two are pinned SEPARATELY because the two corrections can fail
-  # independently and print() now emits them independently.
+  # independently and the object emits them independently -- and on different
+  # surfaces as of the M68 review: the SE claim in print(), the scaling claim
+  # beside the fit line summary() prints (F16).
   expect_match(out, "standard errors are adjusted to the correlation metric",
                fixed = TRUE)
-  expect_match(out, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
-  expect_match(out, "Satorra & Bentler, 1994", fixed = TRUE)
-  expect_match(out, "df and srmr are unchanged", fixed = TRUE)
+  sm <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
+  expect_match(sm, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
+  expect_match(sm, "Satorra & Bentler, 1994", fixed = TRUE)
+  expect_match(sm, "df and srmr are unchanged", fixed = TRUE)
 
   # What must be GONE. This is the directional half the M56/M63 lesson says the
   # stale-claim sweep keeps missing: hunting the old wording finds negative
@@ -653,8 +656,17 @@ test_that("M66 review F3: print() WIRING for the correction-failure note", {
   # so the surviving half must still print, and must not have been dragged down
   # with the suppressed one.
   expect_match(out, "Cudeck, 1989", fixed = TRUE)
-  expect_match(out, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
   expect_no_match(out, "flattered by roughly 4%", fixed = TRUE)
+  # The scaled-fit sentence lives beside the fit line summary() prints, not in
+  # print()'s block (M68 review, F16), so it is summary() that must carry it.
+  sm <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
+  expect_match(sm, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
+  expect_no_match(out, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
+  # M68 review F1: the opening's own summary clause is an assertion too. With
+  # the SE correction failed it must NOT claim both sides were corrected.
+  expect_no_match(out, "both sides of that mismatch", fixed = TRUE)
+  expect_match(out, "the global-fit side of that mismatch is corrected",
+               fixed = TRUE)
 
   # The mirror image: a failed SCALING with working SEs. Injected the same way
   # and for the same reason -- axes_reliability()'s positive-definiteness gate
@@ -664,7 +676,7 @@ test_that("M66 review F3: print() WIRING for the correction-failure note", {
                            angles = pp$angles, n = 600)
   res2$details$fit_scaling_failed <- "unidentified"
   res2$fit[c("chisq", "pvalue", "rmsea", "cfi")] <- NA_real_
-  out2 <- gsub("\\s+", " ", paste(capture.output(print(res2)), collapse = " "))
+  out2 <- gsub("\\s+", " ", paste(capture.output(summary(res2)), collapse = " "))
   expect_match(out2, "could not be scaled to the correlation metric (unidentified)",
                fixed = TRUE)
   expect_match(out2, "details$fit_uncorrected", fixed = TRUE)
@@ -673,14 +685,20 @@ test_that("M66 review F3: print() WIRING for the correction-failure note", {
   # ... while the SE claim, which is still true here, survives.
   expect_match(out2, "standard errors are adjusted to the correlation metric",
                fixed = TRUE)
+  # F1 in the mirror direction: only the SE side may be claimed here.
+  expect_match(out2, "the standard-error side of that mismatch is corrected",
+               fixed = TRUE)
+  expect_no_match(out2, "both sides of that mismatch", fixed = TRUE)
 
   # And the normal path is unchanged by either branch.
-  ok <- gsub("\\s+", " ", paste(capture.output(print(
+  ok <- gsub("\\s+", " ", paste(capture.output(summary(
     axes_reliability(cormat = pp$sigma, items = pp$items,
                      angles = pp$angles, n = 600))), collapse = " "))
   expect_match(ok, "standard errors are adjusted to the correlation metric",
                fixed = TRUE)
   expect_match(ok, "chisq, pvalue, rmsea and cfi are scaled", fixed = TRUE)
+  # Both corrections live: the opening says so, and only here.
+  expect_match(ok, "both sides of that mismatch are corrected", fixed = TRUE)
   expect_no_match(ok, "could not be computed", fixed = TRUE)
   expect_no_match(ok, "could not be scaled", fixed = TRUE)
 })

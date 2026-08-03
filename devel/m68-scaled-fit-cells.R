@@ -25,74 +25,37 @@
 # Usage (from the package root):
 #   Rscript devel/m68-scaled-fit-cells.R            # full run, 2000 reps
 #   Rscript devel/m68-scaled-fit-cells.R 50 4       # 50 reps, 4 workers (smoke)
+#   Rscript devel/m68-scaled-fit-cells.R 2000 8 verify   # re-run, compare, DO
+#                                                        # NOT write
 #
 # Every replicate seeds itself from its own pinned seed, so the result does not
 # depend on the worker count or on scheduling order.
+#
+# `verify` is AC9's same-environment exact-reproduction arm at full scale: it
+# regenerates every cell and compares against the committed fixture instead of
+# overwriting it, reporting the maximum absolute discrepancy per stored column
+# and the six rejection rates. The suite carries the cheap standing version of
+# the same check (a handful of replicates re-run from their own seeds, in
+# test-axes-scaled-fit.R); this is the whole-fixture confirmation, run by hand
+# because it costs ~5 minutes of fitting.
+#
+# The populations, the seed formula and the replicate function live in
+# tests/testthat/helper-m68-cells.R so that the suite runs THIS generator's own
+# replicate function rather than a copy (M68 review, F6/F7).
 
 suppressMessages(devtools::load_all(quiet = TRUE))
+source("tests/testthat/helper-m68-cells.R")
 
 args <- commandArgs(trailingOnly = TRUE)
 REPS <- if (length(args) >= 1) as.integer(args[[1]]) else 2000L
 CORES <- if (length(args) >= 2) as.integer(args[[2]]) else 8L
+VERIFY <- length(args) >= 3 && identical(args[[3]], "verify")
 
 OUT <- "tests/testthat/fixtures/m68-scaled-fit-cells.rds"
 
-# The three populations AC3 names.
-#
-# `strong` is RR13's own probe population, where E[T] = 261.1 against df = 273
-# was measured. `weak` is Strack et al. (2013) Table 3's COC Sample 16 Other row
-# -- %gen 46.7, %axes 3.2, %item 50.1 over 16 single-item positions
-# (strack2013.md, p. 7) -- a real published instrument at the weak-axes,
-# strong-general corner, where the metric distortion is largest. `antic` is the
-# anti-conservative corner the plan names: weak axes, a dominating general
-# factor, and a large item count, so df is big and the eigenvalue dispersion
-# that drives the tail behaviour has the most room to show.
-POPS <- list(
-  strong = list(
-    label = "strong-axes (RR13 probe: 8 scales x 3 items)",
-    angles = octants(), k = 3L, xi1 = .35, xi2 = .10, zeta1 = .08, n = 600L
-  ),
-  weak = list(
-    label = "weak-axes/strong-general (Strack Table 3, COC S16 Other)",
-    angles = as_degree(seq(22.5, 360, by = 22.5)), k = 1L,
-    xi1 = .032, xi2 = .467, zeta1 = 0, n = 600L
-  ),
-  antic = list(
-    label = "anti-conservative corner (12 scales x 3 items, xi1 = .05)",
-    angles = as_degree(seq(30, 360, by = 30)), k = 3L,
-    xi1 = .05, xi2 = .60, zeta1 = .05, n = 600L
-  )
-)
-
-pop_items <- function(p, nm) split(nm, rep(seq_along(p$angles), each = p$k))
-
-# One replicate, reduced to what AC3 consumes. Both p-values are stored: `p` is
-# what the package now reports and `p_unscaled` is what lavaan reported before
-# the scaling, so the "with the unscaled rate recorded alongside" clause needs
-# no second run.
-one_rep <- function(p, seed) {
-  set.seed(seed)
-  mat <- as.matrix(axes_simulate(p$n, p$angles, p$k, p$xi1, p$xi2, p$zeta1))
-  res <- tryCatch(
-    suppressMessages(suppressWarnings(
-      axes_reliability(as.data.frame(mat), items = pop_items(p, colnames(mat)),
-                       angles = p$angles)
-    )),
-    error = function(e) NULL
-  )
-  if (is.null(res) || !is.null(res$details$fit_scaling_failed)) {
-    return(c(chisq = NA_real_, chisq_scaled = NA_real_, df = NA_real_,
-             p = NA_real_, p_unscaled = NA_real_, cfactor = NA_real_))
-  }
-  c(
-    chisq = res$details$fit_uncorrected$chisq,
-    chisq_scaled = res$fit$chisq,
-    df = res$fit$df,
-    p = res$fit$pvalue,
-    p_unscaled = res$details$fit_uncorrected$pvalue,
-    cfactor = unname(res$details$scaling_factor[["model"]])
-  )
-}
+POPS <- m68_pops
+pop_items <- m68_pop_items
+one_rep <- m68_one_rep
 
 # ---- the vech-space diagnostic, at the POPULATION matrix ---------------------
 #
@@ -178,8 +141,7 @@ diags <- list()
 for (nm in names(POPS)) {
   p <- POPS[[nm]]
   message("population `", nm, "`: ", REPS, " replicates -- ", p$label)
-  seeds <- switch(nm, strong = 10000L, weak = 20000L, antic = 30000L) +
-    seq_len(REPS)
+  seeds <- m68_seeds(nm, REPS)
   cells[[nm]] <- do.call(rbind, parallel::mclapply(
     seeds, function(s) one_rep(p, s), mc.cores = CORES
   ))
@@ -192,7 +154,7 @@ for (nn in NSWEEP) {
   p <- POPS$strong
   p$n <- nn
   sweep[[as.character(nn)]] <- do.call(rbind, parallel::mclapply(
-    40000L + nn + seq_len(REPS), function(s) one_rep(p, s), mc.cores = CORES
+    m68_sweep_seeds(nn, REPS), function(s) one_rep(p, s), mc.cores = CORES
   ))
 }
 elapsed <- as.numeric(difftime(Sys.time(), t0, units = "mins"))
@@ -205,9 +167,9 @@ out <- list(
     ),
     generator = "devel/m68-scaled-fit-cells.R",
     populations = POPS,
-    seeds = list(strong = 10000L + seq_len(REPS),
-                 weak = 20000L + seq_len(REPS),
-                 antic = 30000L + seq_len(REPS)),
+    seeds = list(strong = m68_seeds("strong", REPS),
+                 weak = m68_seeds("weak", REPS),
+                 antic = m68_seeds("antic", REPS)),
     reps = REPS,
     elapsed_min = elapsed,
     r_version = R.version.string,
@@ -256,5 +218,37 @@ for (nn in names(sweep)) {
 }
 message(sprintf("elapsed: %.1f min", elapsed))
 
-saveRDS(out, OUT)
-message("wrote ", OUT)
+if (VERIFY) {
+  # AC9's exact-reproduction arm, at full scale. Same seeds, same environment =>
+  # the stored numbers must come back bit-for-bit; anything above 1e-12 on a
+  # stored column means the harness and the fixture have parted company, which
+  # is a regression and not a tolerance question. The rejection rates are
+  # reported too, because they are what AC9 fences and a reader should not have
+  # to trust that they follow from the columns.
+  old <- readRDS(OUT)
+  message("verify against ", OUT,
+          " (fixture: ", old$provenance$r_version,
+          ", lavaan ", old$provenance$lavaan_version, ")")
+  worst <- 0
+  for (grp in c("cells", "sweep")) {
+    for (nm in names(out[[grp]])) {
+      a <- out[[grp]][[nm]]
+      b <- old[[grp]][[nm]]
+      if (!identical(dim(a), dim(b))) {
+        message(sprintf("  %-6s %-6s DIMENSIONS DIFFER", grp, nm))
+        next
+      }
+      d <- max(abs(a - b), na.rm = TRUE)
+      worst <- max(worst, d)
+      message(sprintf("  %-6s %-6s max|diff| = %.3e | rej new=%.4f old=%.4f",
+                      grp, nm, d,
+                      mean(a[, "p"] < .05, na.rm = TRUE),
+                      mean(b[, "p"] < .05, na.rm = TRUE)))
+    }
+  }
+  message(sprintf("worst discrepancy over every stored cell: %.3e", worst))
+  message("verify mode: ", OUT, " NOT rewritten")
+} else {
+  saveRDS(out, OUT)
+  message("wrote ", OUT)
+}

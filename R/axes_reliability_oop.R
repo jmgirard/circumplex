@@ -38,7 +38,8 @@ axes_fmt <- function(x, digits = 3) {
 # to the item correlation matrix as if it were a covariance matrix (the paper's
 # own practice), so the point estimates are correct but normal-theory maximum
 # likelihood misprices everything downstream of the sampling variability
-# (Cudeck, 1989).
+# (cudeck1989, p. 323). The printed text below cites author-year rather than a
+# citekey because it is read by users, not by this repo.
 #
 # This text used to WARN. Both halves of the warning are now gone, in two
 # milestones: M66 corrected the component standard errors (RR13 BC1, D-035),
@@ -58,12 +59,35 @@ axes_fmt <- function(x, digits = 3) {
 # and a note that asserts a correction which did not happen is worse than no
 # note. print() below prints the shared opening beside whichever halves are
 # live; a failed half gets its own NA-with-reason note instead.
-axes_metric_note <- paste0(
-  "  Note: the model is fit to the item correlation matrix as if it were a\n",
-  "  covariance matrix (Cudeck, 1989), and both sides of that mismatch are\n",
-  "  corrected -- so these numbers differ from LISREL's, and from lavaan's\n",
-  "  own, by design."
-)
+#
+# The opening is a FUNCTION of which halves are live rather than a constant,
+# because its own summary clause is an assertion too: "both sides of that
+# mismatch are corrected" is false on an object where one correction failed,
+# and it was printed unconditionally -- the exact failure the three-way split
+# exists to prevent, reintroduced one level up (M68 review, F1). The three
+# variants say only what is true of the object in hand; where neither half is
+# live, print() emits no opening at all.
+axes_metric_note <- function(se_live, fit_live) {
+  # Each variant carries its own line breaks: the clause lengths differ, and a
+  # shared tail wraps one of the three badly.
+  tail <- if (se_live && fit_live) {
+    paste0("both sides of that mismatch are\n",
+           "  corrected -- so these numbers differ from LISREL's, and from",
+           " lavaan's\n  own, by design.")
+  } else if (se_live) {
+    paste0("the standard-error side of that\n",
+           "  mismatch is corrected -- so those numbers differ from LISREL's,",
+           " and\n  from lavaan's own, by design.")
+  } else {
+    paste0("the global-fit side of that\n",
+           "  mismatch is corrected -- so those numbers differ from LISREL's,",
+           " and\n  from lavaan's own, by design.")
+  }
+  paste0(
+    "  Note: the model is fit to the item correlation matrix as if it were a\n",
+    "  covariance matrix (Cudeck, 1989), and ", tail
+  )
+}
 axes_se_corrected_note <- paste0(
   "  The component standard errors are adjusted to the correlation metric\n",
   "  and are calibrated; they are typically smaller than the values printed\n",
@@ -73,10 +97,16 @@ axes_se_corrected_note <- paste0(
 # small-sample error and a pointer, deliberately no rates: the measured numbers
 # live in the roxygen and the vignette, where they are tied to the committed
 # fixture and move with it, and a rate printed here would drift out of agreement
-# with them the first time the fixture is regenerated. This is where the harm
-# happens -- summary() prints the chi-square, RMSEA and CFI on the next line,
-# and a reader deciding on a p-value near a threshold sees this note and nothing
-# else.
+# with them the first time the fixture is regenerated.
+#
+# It is printed by summary(), directly UNDER the chi-square/RMSEA/CFI line,
+# rather than by print() -- BC5 asks for it beside that line, and print() emits
+# its notes before summary() has printed the components table and the fit line,
+# which put two blocks between the claim and the numbers it qualifies (M68
+# review, F16). print() reports no fit statistic at all, so nothing is orphaned
+# by the move, and the sentence appears exactly once in a summary() call. The
+# scaling-failure note travels with it for the same reason: it explains four NAs
+# that only summary() displays.
 axes_fit_scaled_note <- paste0(
   "  The global fit statistics chisq, pvalue, rmsea and cfi are scaled to\n",
   "  that metric (Satorra & Bentler, 1994), which removes a distortion that\n",
@@ -238,24 +268,44 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
   # it beside the gap: that text asserts the standard errors "are corrected ...
   # and are calibrated", which is a claim about numbers that are not there. The
   # surviving half is still printed so nothing true is lost with it (M66 review,
-  # F3) -- and M68 makes that half conditional in turn, because the scaling can
-  # fail on its own. The two failures usually arrive together (both routes solve
-  # the same sigma-hat) but need not, and neither note may speak for the other.
-  se_failed <- x$details$se_correction_failed
-  fit_failed <- x$details$fit_scaling_failed
-  live <- c(
-    if (is.null(se_failed)) axes_se_corrected_note,
-    if (is.null(fit_failed)) axes_fit_scaled_note
-  )
-  if (!is.null(se_failed)) {
+  # F3). The two failures usually arrive together (both routes solve the same
+  # sigma-hat) but need not, and neither note may speak for the other -- which
+  # is why the opening below is a function of both flags even though only the SE
+  # half is printed here; the fit half and its own failure note are emitted by
+  # summary(), beside the numbers they qualify (axes_cat_fit_note()).
+  se_live <- is.null(x$details$se_correction_failed)
+  fit_live <- is.null(x$details$fit_scaling_failed)
+  if (!se_live) {
     cat(
       "\n  Note: the component standard errors could not be computed (",
-      se_failed, ") and are\n  NA. The point estimates, reliability, and SEm ",
+      x$details$se_correction_failed,
+      ") and are\n  NA. The point estimates, reliability, and SEm ",
       "are unaffected.\n",
       sep = ""
     )
   }
-  if (!is.null(fit_failed)) {
+  if (se_live || fit_live) {
+    cat("\n",
+        paste(c(axes_metric_note(se_live, fit_live),
+                if (se_live) axes_se_corrected_note),
+              collapse = "\n"),
+        "\n", sep = "")
+    if (se_live && is_fiml) {
+      cat("\n", axes_fiml_se_caveat, "\n", sep = "")
+    }
+  }
+  invisible(x)
+}
+
+
+# The scaled-fit note and its failure counterpart, printed by summary() under
+# the fit line rather than by print() -- see the axes_fit_scaled_note comment
+# above. Factored out so the two callers cannot drift apart.
+axes_cat_fit_note <- function(x) {
+  fit_failed <- x$details$fit_scaling_failed
+  if (is.null(fit_failed)) {
+    cat("\n", axes_fit_scaled_note, "\n", sep = "")
+  } else {
     cat(
       "\n  Note: the global fit statistics could not be scaled to the ",
       "correlation\n  metric (", fit_failed, "), so chisq, pvalue, rmsea and ",
@@ -264,13 +314,7 @@ print.circumplex_axes_reliability <- function(x, digits = 3, ...) {
       sep = ""
     )
   }
-  if (length(live) > 0) {
-    cat("\n", paste(c(axes_metric_note, live), collapse = "\n"), "\n", sep = "")
-    if (is.null(se_failed) && is_fiml) {
-      cat("\n", axes_fiml_se_caveat, "\n", sep = "")
-    }
-  }
-  invisible(x)
+  invisible(NULL)
 }
 
 #' Summarize circumplex axes-reliability results
@@ -304,5 +348,8 @@ summary.circumplex_axes_reliability <- function(object, digits = 3, ...) {
     ",  CFI = ", axes_fmt(x$fit$cfi, 3),
     "\n", sep = ""
   )
+  # BC5's third surface, beside the line it qualifies rather than two blocks
+  # above it.
+  axes_cat_fit_note(x)
   invisible(x)
 }

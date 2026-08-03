@@ -207,12 +207,26 @@ axes_scale_fit_measures <- function(fm, cf) {
   if (is.null(cf$reason) && is.finite(cf$scale)) {
     ts <- fm[["chisq"]] / cf$scale
     tbs <- fm[["baseline.chisq"]] / cf$baseline
+    # CFI's 0/0 case, handled exactly as lavaan's own lav_fit_cfi() handles it:
+    # when the model and the baseline BOTH fit at or under their degrees of
+    # freedom, both excesses are zero and the ratio is undefined. lavaan returns
+    # 1 there; the published definition's limit is 1; and the arithmetic
+    # otherwise returns NaN, which reads as a computation failure rather than as
+    # perfect fit. The state is reachable -- an over-identified model on a
+    # near-independence correlation matrix hits it (M68 review, F2).
+    t1 <- max(ts - df, 0)
+    t2 <- max(ts - df, tbs - fm[["baseline.df"]], 0)
+    cfi <- if (isTRUE(all.equal(t1, 0)) && isTRUE(all.equal(t2, 0))) {
+      1
+    } else {
+      1 - t1 / t2
+    }
     scaled <- list(
       chisq = ts,
       df = df,
       pvalue = stats::pchisq(ts, df, lower.tail = FALSE),
       rmsea = sqrt(max(ts - df, 0) / (df * fm[["ntotal"]])),
-      cfi = 1 - max(ts - df, 0) / max(ts - df, tbs - fm[["baseline.df"]], 0),
+      cfi = cfi,
       srmr = fm[["srmr"]]
     )
   } else {

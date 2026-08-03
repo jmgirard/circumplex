@@ -163,9 +163,9 @@ original plan are AC3-AC6 here.
 
 ## Coverage
 
-- AC1 → T3, T4 · AC2 → T2, T9 · AC3 → T4, T7 · AC4 → T5, T12 · AC5 → T1
-- AC6 → T8 · AC7 → T6 · AC8 → T6 · AC9 → T6, T10 · AC10 → T10
-- AC11 → T11 · AC12 → T12 · AC13 → T9 · AC14 → T10
+- AC1 → T3, T4, T14 · AC2 → T2, T9 · AC3 → T4, T7 · AC4 → T5, T12
+- AC5 → T1, T15 · AC6 → T8 · AC7 → T6 · AC8 → T6 · AC9 → T6, T10, T14
+- AC10 → T10 · AC11 → T11, T13 · AC12 → T12 · AC13 → T9 · AC14 → T10, T14
 
 ## Tasks
 
@@ -197,6 +197,11 @@ detail.
 - [x] **T12** — AC12: the six-token robustness sweep with AC5's three-way
       disposition, plus the normal-theory fencing sentence in the roxygen.
 - [x] **T8** — `document()`, `test()`, `check()`; NEWS entry.
+- [x] **T13** — Review F1/F2/F16: the metric note claims only the corrections that
+      happened; the scaled-fit note moves beside `summary()`'s fit line; CFI is 1, not `NaN`, at 0/0.
+- [x] **T14** — Review F4/F6/F7: `$fit$cfi` recomputed on every path; the harness moves to
+      `tests/testthat/helper-m68-cells.R`; AC9's exact-reproduction arm in the suite + generator `verify` mode.
+- [x] **T15** — Review F5: `R/axes_corrected_se.R` anchors `cudeck1989 (p. 323)`.
 
 ## Work log
 
@@ -230,6 +235,11 @@ detail.
 - 2026-08-02: all tasks complete; status -> review.
 - 2026-08-02: review round 1 RETURNED to in-progress. Failed: AC1 (no test reads `$fit$cfi` on any path, so a wiring regression assigning lavaan's unscaled cfi would pass the whole file), AC5 (`R/axes_corrected_se.R:22` still carries the unpaged `(Cudeck, 1989)` the criterion requires anchored), AC9 (the same-environment exact-reproduction arm is unimplemented; only the +-.021 drift fence runs), AC11 (the printed note sits two blocks above the fit line `summary()` prints, not beside it), AC14 (the smoke cell re-implements the replicate inline on different seeds instead of running the generator's own function). Also actioned: F1 at 92 (`print()` emits `both sides of that mismatch are corrected` even when one correction failed — the exact failure its own comment says the three-way split exists to prevent) and F2 at 82 (scaled CFI returns NaN where lavaan returns 1, when both the model and baseline chi-squares fall at or under their df). Passed with fresh evidence: AC2, AC3, AC4, AC6, AC7, AC8, AC10, AC12, AC13. Consistency gate clean apart from the logged weight-cap exception. Blame-history and prior-review lenses returned zero findings each.
 - 2026-08-02: plan chose replacing `$fit`'s values and retaining the unscaled six in `details$fit_uncorrected` over adding parallel `*_scaled` fields, following M66's `details$se_uncorrected` precedent, so the default-read number is the calibrated one; falsified by a user needing both side by side in printed output.
+- 2026-08-02: round-2 question gate — both recommendations accepted: the scaled-fit note MOVES to `summary()`'s fit line (rather than printing in both places or amending RR14's criterion), and AC9's exact-reproduction arm is implemented as a per-replicate replay in the suite plus a full-scale `verify` mode on the generator run once by hand. Tasks T13-T15 added for the return (minor amendment) and the Coverage map extended to name them.
+- 2026-08-02: T13 done (F1/F2/F16) — `axes_metric_note` became a function of which corrections are live, because its own "both sides of that mismatch are corrected" clause was an unconditional assertion, the exact failure the three-way split existed to prevent, re-introduced one level up; three variants now say only what is true of the object. `axes_fit_scaled_note` and the scaling-failure note moved out of `print()` into `summary()`, directly under the chi-square/RMSEA/CFI line (BC5 asks for "beside"; `print()` reports no fit statistic, so nothing is orphaned and the sentence appears once). Scaled CFI now returns 1 rather than `NaN` when model and baseline both fall at or under their df, mirroring lavaan's own `lav_fit_cfi()` and checked against that function directly. The AC11 placement test asserts POSITION, not just presence: nothing but blank lines may sit between the fit line and the note.
+- 2026-08-02: T14 done (F4/F6/F7) — the harness's populations, seed formula and replicate function moved from `devel/m68-scaled-fit-cells.R` into `tests/testthat/helper-m68-cells.R` (the existing `helper-ssm-sem.R` / `devel/m5-coverage-oracle.R` pattern), so the generator source()s them and the suite calls the generator's OWN `m68_one_rep()`; the smoke cell now runs it on the fixture's own first 12 strong-axes seeds and requires the committed rows back to 1e-12, where before it re-implemented the replicate inline on unrelated seeds and could not see harness/package drift at all. AC9's exact-reproduction arm: the suite asserts the six rates equal their committed constants to 1e-12 (not the ±.021 fence) and replays two replicates per population from their seeds, guarded on the R and lavaan versions matching the fixture's. `$fit$cfi` is now read on every input path in `expect_scaled_contract()` and recomputed independently by inverting lavaan's own uncorrected CFI for the baseline chi-square `details` does not store — with a paired assertion that the scaled and unscaled values differ, so reporting lavaan's number cannot pass.
+- 2026-08-02: AC9 full-scale evidence — `Rscript devel/m68-scaled-fit-cells.R 2000 8 verify` (new mode: regenerates and compares instead of writing) reproduced all seven committed cells at max|diff| = 0.000e+00 over 14000 fits, same R 4.6.1 / lavaan 0.6.21, 4.8 min; all seven rejection rates identical to the committed values.
+- 2026-08-02: T15 done (F5) — `R/axes_corrected_se.R` anchors `cudeck1989 (p. 323)` twice, at the Error (c) scope sentence and at the attribution paragraph, which now fences what the article actually supplies: Cudeck states a correction is needed and points at Browne (1982, section 1.6), prints no formula, and the Browne pages he means are not on the shelf — so the shipped formula is derived in-repo and the citation licenses the premise, not the algebra. The `cudeck1989.md` note's own "cited without a page today" line corrected in place, since it had become false.
 
 ## Decisions
 

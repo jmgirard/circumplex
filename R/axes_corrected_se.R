@@ -6,7 +6,12 @@
 # of a sample COVARIANCE matrix while the estimator consumes a sample
 # CORRELATION matrix -- whose diagonal does not vary at all, and whose
 # off-diagonal cells are less variable than the corresponding covariances
-# (var(sqrt(n) r_ij) = (1 - rho^2)^2 against (1 + rho^2)).
+# (var(sqrt(n) r_ij) = (1 - rho^2)^2 against (1 + rho^2)). That is Cudeck's
+# Error (c), cudeck1989 (p. 323): "If a model that is not scale invariant is
+# applied to a correlation matrix with most computer programs, all of the
+# estimated standard errors will be wrong." This model is not scale invariant
+# (the derivation is in cairn/references/cudeck1989.md, not in the article --
+# Cudeck never treats a circumplex).
 #
 # The size of that mismatch was first measured at M65 and derived in closed form
 # at RR13: x1.44 at the probe population, and a ratio running [0.81, 1.97] over
@@ -18,8 +23,18 @@
 # implied covariance is LINEAR in the parameters: Sigma = xi1*C + xi2*J +
 # zeta1*B + zeta2*K + diag(eps). The ML estimator therefore linearizes exactly
 # as theta_hat - theta ~ tr(W(input - Sigma)), and both pricings of `input` are
-# available in closed form. This is the Browne/Cudeck corrected asymptotic
-# covariance specialized to that linear structure (Cudeck, 1989).
+# available in closed form.
+#
+# Attribution, stated exactly because it is easy to overstate: cudeck1989
+# (p. 323) says a correction is needed and points at Browne (1982, section 1.6)
+# for one -- "Formulas are available that give correct standard errors ... but
+# as of this writing, these corrections have not been included in most computer
+# programs." He prints no such formula in that article, and the Browne pages he
+# points at are not on this repo's shelf. So the formula below is DERIVED here
+# from the model's linear structure and validated by this repo's own oracles;
+# cudeck1989 licenses the premise, not the algebra. The companion page for the
+# test-statistic side of the same mismatch is satorra1994 (pp. 406-407), used in
+# R/axes_scaled_fit.R.
 #
 # Rejected routes, each MEASURED rather than argued (RR13 section 3): lavaan's
 # `correlation = TRUE` fits a different model class (npar 3, item errors

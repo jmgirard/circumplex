@@ -452,6 +452,45 @@ test_that("AC1: scaling the fit measures divides T and leaves df and srmr alone"
 })
 
 
+test_that("M68 review F2: CFI is 1, not NaN, when neither model nor baseline misfits", {
+  skip_if_not_installed("lavaan")
+  # Both excesses zero => 0/0. The shipped formula returned NaN, which a user
+  # reads as a broken computation rather than as perfect fit; lavaan's own
+  # lav_fit_cfi() returns 1 in the same state, and so does the definition's
+  # limit. Reachable whenever a well-fitting model sits on a near-independence
+  # correlation matrix: the baseline chi-square is then small too.
+  fm <- c(chisq = 200, df = 273, pvalue = 0.9, rmsea = 0, cfi = 1,
+          srmr = 0.02, baseline.chisq = 260, baseline.df = 276, ntotal = 600)
+  cf <- list(scale = 0.95, baseline = 0.95, reason = NULL)
+  got <- axes_scale_fit_measures(fm, cf)
+  expect_false(is.nan(got$fit$cfi))
+  expect_equal(got$fit$cfi, 1)
+
+  # Against lavaan's own function on the same two scaled statistics, so the
+  # agreement is with the reference implementation and not with our reading of
+  # it. Skipped rather than faked if the internal is ever renamed.
+  lav_cfi <- tryCatch(get("lav_fit_cfi", envir = asNamespace("lavaan")),
+                      error = function(e) NULL)
+  skip_if(is.null(lav_cfi), "lavaan::lav_fit_cfi is not available")
+  expect_equal(
+    got$fit$cfi,
+    lav_cfi(X2 = 200 / 0.95, df = 273, X2.null = 260 / 0.95, df.null = 276)
+  )
+
+  # Only the 0/0 corner is special-cased: a misfitting model still gets the
+  # ratio, and still agrees with lavaan.
+  fm2 <- fm
+  fm2[["chisq"]] <- 400
+  fm2[["baseline.chisq"]] <- 4000
+  got2 <- axes_scale_fit_measures(fm2, cf)
+  expect_lt(got2$fit$cfi, 1)
+  expect_equal(
+    got2$fit$cfi,
+    lav_cfi(X2 = 400 / 0.95, df = 273, X2.null = 4000 / 0.95, df.null = 276)
+  )
+})
+
+
 test_that("AC1: a scaled statistic is never reported beside an unscaled one", {
   skip_if_not_installed("lavaan")
   # c = 1 exactly is the identity case; every scaled statistic must then equal
@@ -511,12 +550,40 @@ expect_scaled_contract <- function(res, label) {
   expect_lt(abs(res$fit$chisq - ts), 1e-10 * max(1, abs(ts)))
   expect_lt(abs(res$fit$pvalue - stats::pchisq(ts, u$df, lower.tail = FALSE)),
             1e-12)
-  # RMSEA and CFI are checked for MOVEMENT rather than recomputed here: their
-  # arithmetic is pinned against lavaan's own above, and repeating it would
-  # only re-assert the implementation against itself.
   if (ts > u$df || u$chisq > u$df) {
     expect_false(isTRUE(all.equal(res$fit$rmsea, u$rmsea)), info = label)
   }
+
+  # CFI, read and recomputed on EVERY path (M68 review, F4: no test in this file
+  # read `$fit$cfi` at all, so a wiring regression that assigned lavaan's
+  # unscaled cfi to the reported field would have passed the whole suite -- the
+  # one of the four statistics with no standing check).
+  #
+  # `details` does not store the baseline chi-square, so it is recovered by
+  # inverting lavaan's OWN uncorrected cfi:
+  #     cfi = 1 - (T - df) / (T_b - df_b)      when T > df and T_b - df_b is the
+  #                                            larger of the two excesses
+  # with df_b = p(p-1)/2, the independence model's own count. The inversion is
+  # exact and uses only the uncorrected six plus the two factors, so it is
+  # independent of the value under test.
+  pn <- res$details$n_items
+  dfb <- pn * (pn - 1) / 2
+  if (u$chisq > u$df && u$cfi < 1 - 1e-8) {
+    tsb <- ((u$chisq - u$df) / (1 - u$cfi) + dfb) / cb
+    t1 <- max(ts - u$df, 0)
+    t2 <- max(ts - u$df, tsb - dfb, 0)
+    want_cfi <- if (t2 == 0) 1 else 1 - t1 / t2
+    # The check must be capable of failing: the scaled and unscaled CFIs differ
+    # here, so passing it by reporting lavaan's value is not available.
+    expect_gt(abs(want_cfi - u$cfi), 1e-4, label = paste("cfi moves", label))
+    expect_lt(abs(res$fit$cfi - want_cfi), 1e-8,
+              label = paste("cfi recomputation", label))
+    expect_false(isTRUE(all.equal(res$fit$cfi, u$cfi)), info = label)
+  }
+  # ... and whatever the fit, the reported CFI is a number in range and never
+  # NaN (M68 review, F2).
+  expect_false(is.nan(res$fit$cfi), info = label)
+  expect_true(res$fit$cfi >= 0 && res$fit$cfi <= 1, info = label)
 
   # df and srmr pass through untouched -- AC1's bit-identity clause.
   expect_identical(res$fit$df, u$df, info = label)
@@ -723,33 +790,81 @@ test_that("AC10: the tail excess is not factor-estimation noise", {
 test_that("AC14: the live smoke cell reproduces the committed harness", {
   skip_if_not_installed("lavaan")
   # The stored numbers above are a pin; this runs the same path end-to-end at
-  # ~12 replicates so a regression in the WIRING is caught without the 5-minute
+  # 12 replicates so a regression in the WIRING is caught without the 5-minute
   # full run. The M65 harness pattern: a stored fixture is never the only thing
   # between a broken estimator and a green suite.
   #
-  # It asserts the direction, not the calibration -- 12 replicates cannot
-  # resolve a rejection rate, and pretending otherwise would be the fixture's
-  # bar applied to a sample far too small for it.
-  oct <- octants()
-  got <- vapply(seq_len(12L), function(i) {
-    set.seed(6000L + i)
-    mat <- as.matrix(axes_simulate(600L, oct, 3L, .35, .10, .08))
-    items <- split(colnames(mat), rep(seq_len(8), each = 3L))
-    r <- suppressMessages(suppressWarnings(
-      axes_reliability(as.data.frame(mat), items = items, angles = oct)
-    ))
-    c(ratio = r$fit$chisq / r$fit$df,
-      cfac = unname(r$details$scaling_factor[["model"]]),
-      raw = r$details$fit_uncorrected$chisq / r$fit$df)
-  }, numeric(3))
-
-  # The factor is a population quantity and barely moves across replicates, so
-  # even 12 draws pin it tightly against the fixture's own c_pop.
+  # It runs the GENERATOR'S OWN replicate function -- m68_one_rep() in
+  # helper-m68-cells.R, which devel/m68-scaled-fit-cells.R source()s and calls
+  # for every row of the fixture -- on the generator's own population and its
+  # own first 12 seeds. The earlier version re-implemented the replicate inline
+  # on unrelated seeds, which cannot catch the drift between the harness and the
+  # package that is the only reason a smoke cell exists (M68 review, F7).
   fx <- m68_cells()
-  expect_lt(abs(mean(got["cfac", ]) -
+  seeds <- m68_seeds("strong", 12L)
+  got <- vapply(seeds, function(s) m68_one_rep(m68_pops$strong, s), numeric(6))
+  expect_false(anyNA(got))
+
+  # Same seeds as the fixture's first 12 rows, so this is not merely the same
+  # DISTRIBUTION -- it is the same draws, and the committed numbers must come
+  # back. This is AC9's exact-reproduction arm applied where it is cheap.
+  stored <- t(fx$cells$strong[seq_along(seeds), , drop = FALSE])
+  expect_identical(rownames(got), rownames(stored))
+  expect_lt(max(abs(got - stored)), 1e-12)
+
+  # Direction, not calibration: 12 replicates cannot resolve a rejection rate,
+  # and applying the fixture's bar to a sample this small would be theatre. The
+  # factor, by contrast, is a population quantity and barely moves, so 12 draws
+  # pin it tightly against the fixture's own c_pop.
+  expect_lt(abs(mean(got["cfactor", ]) -
                   fx$population_diagnostics$strong$cfactor), .005)
   # Scaling moves the statistic UP, on every single replicate, because c < 1.
-  expect_true(all(got["ratio", ] > got["raw", ]))
+  expect_true(all(got["chisq_scaled", ] > got["chisq", ]))
+})
+
+
+test_that("AC9: the committed rates reproduce exactly in the same environment", {
+  skip_if_not_installed("lavaan")
+  fx <- m68_cells()
+  # AC9 has two arms and the drift fence above is only the second one. The first
+  # is exact reproduction under an UNCHANGED environment, which is a different
+  # claim entirely: it says the pinned seeds still determine the numbers, so a
+  # regeneration is a re-derivation rather than a fresh sample. It was
+  # unimplemented (M68 review, F6).
+  #
+  # Guarded on the environment, because the criterion is: R or lavaan drift
+  # moves the arm to the +/- .021 fence, which the test above already enforces.
+  skip_if_not(
+    identical(fx$provenance$r_version, R.version.string) &&
+      identical(fx$provenance$lavaan_version,
+                as.character(utils::packageVersion("lavaan"))),
+    "fixture was generated under a different R or lavaan version"
+  )
+
+  # (1) The rates ARE the committed constants, to 1e-12 rather than to the
+  # rounding the fence tolerates. A rate is a deterministic function of the
+  # stored per-replicate column, so this is the arm's claim about the rates
+  # exactly.
+  for (nm in M68_POPS) {
+    cell <- m68_ok(fx$cells[[nm]])
+    expect_lt(abs(mean(cell[, "p"] < .05) - M68_RATE_SCALED[[nm]]), 1e-12,
+              label = paste("exact scaled rate", nm))
+    expect_lt(abs(mean(cell[, "p_unscaled"] < .05) - M68_RATE_UNSCALED[[nm]]),
+              1e-12, label = paste("exact unscaled rate", nm))
+  }
+
+  # (2) ... and the stored column itself is reproducible from its own seeds, so
+  # (1) is a live property of the harness and not an arithmetic tautology over a
+  # frozen file. Two replicates per population -- the whole 6000-fit
+  # regeneration is the generator's `verify` mode, run by hand.
+  for (nm in M68_POPS) {
+    idx <- c(1L, 2L)
+    seeds <- m68_seeds(nm, max(idx))[idx]
+    got <- vapply(seeds, function(s) m68_one_rep(m68_pops[[nm]], s), numeric(6))
+    stored <- t(fx$cells[[nm]][idx, , drop = FALSE])
+    expect_false(anyNA(got), label = nm)
+    expect_lt(max(abs(got - stored)), 1e-12, label = paste("replay", nm))
+  }
 })
 
 
@@ -808,7 +923,24 @@ test_that("AC11: the printed note gives direction and a pointer, and no rates", 
   pp <- probe_octant()
   res <- axes_reliability(cormat = pp$sigma, items = pp$items,
                           angles = pp$angles, n = 600)
-  out <- gsub("\\s+", " ", paste(capture.output(print(res)), collapse = " "))
+  out <- gsub("\\s+", " ", paste(capture.output(summary(res)), collapse = " "))
+
+  # BC5 asks for the note BESIDE the chi-square/RMSEA/CFI line, so its position
+  # is asserted and not just its presence: nothing may come between the fit line
+  # and the note (M68 review, F16 -- it used to sit two blocks above, printed by
+  # print() before summary() had emitted the components table or the fit line).
+  lines <- capture.output(summary(res))
+  fit_at <- grep("^  chi-square\\(", lines)
+  note_at <- grep("The global fit statistics chisq, pvalue, rmsea and cfi",
+                  lines, fixed = TRUE)
+  expect_length(fit_at, 1L)
+  expect_length(note_at, 1L)
+  expect_true(note_at > fit_at)
+  expect_true(all(!nzchar(trimws(lines[seq(fit_at + 1L, note_at - 1L)]))))
+  # ... and print() alone no longer carries it, so it appears exactly once.
+  pr <- gsub("\\s+", " ", paste(capture.output(print(res)), collapse = " "))
+  expect_no_match(pr, "The global fit statistics chisq, pvalue, rmsea and cfi",
+                  fixed = TRUE)
 
   expect_match(out, "can modestly over-reject at typical sample sizes",
                fixed = TRUE)

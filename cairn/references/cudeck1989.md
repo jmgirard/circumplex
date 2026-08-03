@@ -16,8 +16,9 @@ No DOI is printed on the article — observed 2026-08-02.
 **Role.** The published statement of the *problem* `axes_reliability()` has and
 both M66 and M68 correct. `axes_reliability()` fits a covariance structure to a
 matrix of sample correlations (Strack et al.'s own LISREL practice), and this
-article is the canonical account of what that costs. It is cited without a page
-at `R/axes_corrected_se.R` today; M68 supplies the anchors. It supplies the
+article is the canonical account of what that costs. It was cited without a page
+at `R/axes_corrected_se.R` until M68 supplied the anchors (M68, corrected at the
+M68 review round 1 — the anchoring landed then, not with the note). It supplies the
 diagnosis, **not** the fix — for the fix see `satorra1994.md`.
 
 ## Extracted values
@@ -175,9 +176,10 @@ subsection and carries no corrected acov (see `browne1982.md`). **The Browne
 
 ## Traces to
 
-- `R/axes_corrected_se.R:1-29` — the file header's diagnosis of the
-  correlation-as-covariance problem, and its `(Cudeck, 1989)` citation at
-  line 22, which M68 anchors to a page.
+- `R/axes_corrected_se.R` — the file header's diagnosis of the
+  correlation-as-covariance problem, carrying p. 323 twice: the Error (c) scope
+  sentence, and the attribution paragraph fencing what Cudeck does and does not
+  supply (he points at Browne 1982 §1.6 and prints no formula).
 - `R/axes_scaled_fit.R` — the same premise on the test-statistic side.
 - `cairn/references/satorra1994.md` — the companion page carrying the fix this
   page's problem statement calls for.
