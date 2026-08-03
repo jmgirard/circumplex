@@ -14,7 +14,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M65 | FIML item-level missing data for `axes_reliability()` — the build | done | — | normal | milestones/archive/M65-axes-reliability-fiml-build.md |
 | M66 | Corrected component standard errors for `axes_reliability()` | done | — | high | milestones/archive/M66-axes-reliability-corrected-se.md |
 | M67 | M65 review fold-ins for the `axes_reliability()` FIML path | done | M66 | normal | milestones/archive/M67-axes-reliability-m65-foldins.md |
-| M68 | Scaled global test statistic for `axes_reliability()` | in-progress | — | normal | milestones/M68-axes-reliability-scaled-chisq.md |
+| M68 | Scaled global test statistic for `axes_reliability()` | review | — | normal | milestones/M68-axes-reliability-scaled-chisq.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
