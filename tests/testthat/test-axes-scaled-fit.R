@@ -1145,13 +1145,15 @@ test_that("AC4: the reported cfi IS the cfi.scaled definition, not cfi.robust", 
   bad <- pp$sigma
   bad[1, 5] <- bad[5, 1] <- bad[1, 5] + 0.30
   bad[2, 9] <- bad[9, 2] <- bad[2, 9] - 0.25
-  skip_if(min(eigen(bad, symmetric = TRUE)$values) <= 0,
-          "perturbed probe matrix is not positive definite")
+  # Asserted, not skipped. Both are properties of a committed deterministic
+  # fixture rather than facts about the environment, so a skip here would let a
+  # future change to the probe silently delete this test's whole point instead
+  # of reddening. Only the lavaan-internal corroboration below earns a skip.
+  expect_gt(min(eigen(bad, symmetric = TRUE)$values), 0)
 
   res <- suppressMessages(axes_reliability(cormat = bad, items = pp$items,
                                            angles = pp$angles, n = 1500))
-  skip_if(!is.null(res$details$fit_scaling_failed),
-          "the scaling failed on this probe")
+  expect_null(res$details$fit_scaling_failed)
 
   # Every input is read off the object. That IS the claim under test: a reader
   # can settle which variant they are looking at without refitting anything.

@@ -5,7 +5,7 @@
 - **Depends on:** M69
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m70-axes-scaled-fit-self-describing`
+- **Branch/PR:** `m70-axes-scaled-fit-self-describing` / https://github.com/jmgirard/circumplex/pull/96
 
 ## Goal
 
@@ -40,7 +40,7 @@ first Out clause rules out.
 
 ## Acceptance criteria
 
-- [ ] **AC1** — `details` gains `n_moments`, the number of distinct analyzed
+- [x] **AC1** — `details` gains `n_moments`, the number of distinct analyzed
       moments `p * (p + 1) / 2`, so `p*/N` is readable without arithmetic over
       `n_items`; the N of that ratio is the existing `details$n`, which AC2's
       `@return` text names explicitly as the sample size the fit was priced at,
@@ -49,7 +49,7 @@ first Out clause rules out.
       and that `details$n` equals `lavaan::fitMeasures(fit, "ntotal")` on the
       cormat, listwise and FIML paths — each probed on data where those three
       N's differ, so the assertion cannot pass by coincidence.
-- [ ] **AC2** — The `@return` text for `details` names both new fields and says
+- [x] **AC2** — The `@return` text for `details` names both new fields and says
       what they are for, and the vignette's calibration passage tells the reader
       where to read `p*/N` off the object. Evidence: a doc guard reads
       `man/axes_reliability.Rd` and the vignette source and asserts both field
@@ -57,7 +57,7 @@ first Out clause rules out.
       assertion pins that the vignette's calibration table and the sentence
       pointing at the object are both present, so removing one without the
       other reddens.
-- [ ] **AC3** — Every user-facing surface reporting the scaled `cfi`/`rmsea` —
+- [x] **AC3** — Every user-facing surface reporting the scaled `cfi`/`rmsea` —
       the roxygen in `R/axes_reliability.R`, the printed output built in
       `R/axes_reliability_oop.R`, `vignettes/axes-reliability.Rmd`, and
       `NEWS.md` — names the lavaan variant the values correspond to
@@ -67,7 +67,7 @@ first Out clause rules out.
       and `man/` is regenerated from the roxygen and checked to carry the
       wording; the milestone commits the per-surface list with each classified
       as updated, or as not reporting these values with its reason.
-- [ ] **AC4** — AC3's correspondence claim is true of the shipped computation: a
+- [x] **AC4** — AC3's correspondence claim is true of the shipped computation: a
       test recomputes `$fit$cfi` from the scaled model chi-square, `df`, the
       scaled baseline chi-square and the baseline df using the `cfi.scaled`
       definition written out arithmetically in the test — no lavaan internal is
@@ -80,7 +80,7 @@ first Out clause rules out.
       vacuous. Where `details` does not expose the baseline chi-square and
       baseline df the recomputation needs, this milestone adds them rather than
       inverting lavaan's uncorrected `cfi` to recover them.
-- [ ] **AC5** — `axes_scaling_factor()`'s nonpositive-diagonal guard
+- [x] **AC5** — `axes_scaling_factor()`'s nonpositive-diagonal guard
       (`R/axes_scaled_fit.R:103`) returns its documented named-reason NA
       instead of erroring, on the three diagonal inputs the regression test
       below enumerates. Evidence: a regression test, confirmed red against the
@@ -93,7 +93,7 @@ first Out clause rules out.
       non-finite-diagonal warning, which the test expects rather than
       suppresses; the `0` case is the unchanged control showing the fix
       rejects nothing new.
-- [ ] **AC6** — The profile's `verify` slot is clean: `devtools::document()`
+- [x] **AC6** — The profile's `verify` slot is clean: `devtools::document()`
       after roxygen changes and `devtools::test()` passing, plus
       `devtools::check()` before review.
 
@@ -159,6 +159,109 @@ first Out clause rules out.
 
 - 2026-08-04: all five tasks done; `devtools::check(args = "--no-manual")` clean at 0 errors / 0 warnings / 0 notes, full suite FAIL 0 PASS 5777. Status → review.
 
+- 2026-08-04 (review): three-lens fan-out returned 19 findings, 6 actioned at >= 80 and all fixed on the branch; none met the return floor. The AC2 doc guard reddened on my own fix to the sentence it pins, which is the guard working. `devtools::check()` re-run after the fixes: 0/0/0.
+
 ## Decisions
 
 ## Review
+
+Reviewed 2026-08-04 on PR #96. Evidence gathered fresh by command; no criterion
+verified from recall.
+
+- **AC1** — `test-axes-reliability.R` "AC1: details reports p* and the N the fit
+  was priced at" passes 16 assertions, 0 skipped: `n_moments == 300` for the
+  p = 24 fixture on all three input paths, and `details$n` equals the captured
+  fit's `fitMeasures(fit, "ntotal")` on each. The probe's three N's are pairwise
+  distinct (listwise 398, FIML 488, `n_total` 500), so the equality is
+  discriminating. The paired test "AC1: details exposes the baseline chisq and
+  df as one pair" passes 3 assertions: names `c("chisq", "df")`, values equal to
+  lavaan's `baseline.chisq`/`baseline.df`, and `df == p(p-1)/2 == 276`.
+- **AC2** — "AC2: the Rd names both new fields and what they are for" passes 5
+  assertions against the regenerated `man/axes_reliability.Rd`, each field name
+  pinned together with a verb-carrying phrase of its meaning. "AC2: the
+  vignette's calibration table and its object pointer travel together" passes 3.
+  Both guards verified by mutation at implement time: deleting the Rd clause and
+  deleting the vignette pointer each reddened their own assertion.
+- **AC3** — per-surface ledger committed in the work log (T3 entry), all four
+  surfaces read in full rather than grepped. Four classified UPDATED (roxygen,
+  the `summary()` note, the vignette, `NEWS.md`); two further `NEWS.md` passages
+  classified as reporting other functions' fit indices (`cpm_fit()` at 115-126,
+  `ssm_sem()`'s `dcfi` at 300-319). `man/` regenerated from the roxygen and
+  verified to carry the wording.
+- **AC4** — "AC4: the reported cfi IS the cfi.scaled definition, not
+  cfi.robust" passes 6 assertions, 0 skipped, so lavaan's unexported
+  `lav_fit_cfi()` corroboration ran rather than skipping. On the perturbed
+  octant probe both excesses are strictly positive and the two scaling factors
+  differ (c = 0.9562, c_b = 0.8653); the reported `cfi` matches the
+  `cfi.scaled` definition to 1e-10 and `cfi.robust` on the same inputs differs
+  by 3.5e-3, against a required 1e-4.
+- **AC5** — "AC5: a non-finite fitted diagonal refuses cleanly instead of
+  erroring" passes 14 assertions, 0 skipped, and needs no lavaan fit. Confirmed
+  red before the fix with the exact error the candidate row reported, "missing
+  value where TRUE/FALSE needed". `NA_real_` and `NaN` diagonals each return
+  `reason == "singular"` with `scale`/`baseline` both `NA_real_`; the `0`
+  control is unchanged.
+- **AC6** — `devtools::document()` produces no diff (`man/`, `NAMESPACE` clean).
+  `pkgdown::check_pkgdown()`: no problems found. `devtools::check(args =
+  "--no-manual")` re-run AFTER the review fixes: **0 errors, 0 warnings, 0
+  notes** in 16m26s, its embedded suite included.
+
+Consistency gate: `cairn_validate` exit 0, all checks passed (47 advisories, 46
+of them the pre-existing `work-log format` warnings on M7's hard-wrapped log).
+Profile `consistency-gate` slot: `document()` no-diff PASS, pkgdown PASS,
+`NEWS.md` entries present for both user-visible changes, no new top-level files.
+
+### Independent review (three lenses + scorer)
+
+Fan-out on PR #96. **Blame-history [S]:** zero findings — traced the guard change
+to the gap M69's own round-2 review logged (A1, scored 48) and graduated
+deliberately. **Prior-review-record [S]:** zero regressions; the
+`gh api .../pulls/comments` probe returned `[]`, so no PR-thread walk was owed
+and the archived `## Review` sections were the whole evidence base.
+**Diff-bug [O]:** 19 candidate findings, all passed to a fresh [S] scorer.
+
+**Actioned (>= 80), all fixed on the branch — none met the return floor, since
+none scored >= 90 and none demonstrated a criterion failing inside its named
+procedure's domain:**
+
+- **F1 (88)** — the new `@return` said `baseline` plus `fit$chisq`/`fit$df`
+  reproduce `cfi`. False: the rebuild also needs `scaling_factor[["baseline"]]`.
+  Rewritten to state five inputs, and the AC2 doc guard extended to pin that
+  clause so the error cannot return silently.
+- **F2 (85)** — the same error as a code comment, with a wrong count ("two of
+  the three inputs"). Rewritten.
+- **F4 (82)** — the `cfi.robust` cross-check advice was misleading: on a plain
+  ML fit lavaan returns no `*.robust` or `*.scaled` measure at all, so the
+  request comes back empty rather than disagreeing. Corrected on all three
+  surfaces.
+- **F5 (82)** — the guard comment claimed a general "non-finite" guarantee the
+  code does not provide: `+Inf` fails `<= 0`, survives `cov2cor()` (which maps
+  it to a zeroed row and a unit diagonal), and `solve()`/`is.finite` accept the
+  result, so a factor is computed from a corrupted matrix. Pre-existing, not
+  introduced here — the comment was narrowed to NA/NaN and the hole spawned a
+  ROADMAP candidate row.
+- **F6 (80)** — the comment's causal account of the sibling's differing reason
+  string was wrong: the two agree ("singular") on the NA/NaN route and differ
+  only on the finite-nonpositive one, where they chose different literals.
+  Rewritten.
+- **F7 (82)** — the AC2 vignette guard was satisfied to skip ALWAYS under
+  `R CMD check`, which runs from `<pkg>.Rcheck/tests/testthat` where
+  `../../vignettes` does not exist; it had therefore never run on CI or CRAN.
+  Given an `inst/doc` fallback, mirroring the Rd guard beside it.
+
+**Logged, below the 80 threshold, not actioned (13).** F3 (76) NEWS repeated
+F1's error — fixed anyway while the surface was open, since shipping known-false
+prose is worse than the threshold is worth. F16 (72) AC1's "each probed on data
+where those three N's differ" cannot hold on the cormat path, where `n_total`
+is set equal to `n` and `n_complete` is NA — surfaced at the merge gate. F12
+(68) vignette's "count of rows" false for cormat — fixed. F14 (68) the bare-name
+list omitted `pvalue` — fixed. F15 (65) the printed surface has no automated
+guard. F9 (62) `details$baseline` overloads the name used by
+`scaling_factor[["baseline"]]` — flagged in the `@return` rather than renamed.
+F10 (62) grammar embedding the new fields in the `NA` clause — fixed. F11 (55)
+`n_moments` wording imprecise on the FIML mean structure. F8 (50) AC4's
+fixture-dependent skips — converted to assertions anyway. F18 (48) stale
+`:103` anchors after the fix moved the guard to `:116`. F17 (45) the baseline
+chisq check is a round-trip, not an oracle. F13 (35) the "three sample sizes"
+passage overstated. F19 (12) line length.
+

@@ -3037,7 +3037,12 @@ test_that("AC2: the Rd names both new fields and what they are for", {
   # is the only part a reader needs.
   expect_match(rd, "\\code{n_moments}, the number of distinct analyzed moments",
                fixed = TRUE)
-  expect_match(rd, "\\code{baseline}, the independence model's unscaled",
+  expect_match(rd,
+               "\\code{baseline}, the independence model's \\strong{unscaled}",
+               fixed = TRUE)
+  # The five-input rebuild, pinned because stating only two of them is the
+  # defect the M70 review found in this very sentence.
+  expect_match(rd, "five inputs, since the baseline chi-square must be scaled",
                fixed = TRUE)
   # `n` was already shipped; what M70 adds is the sentence saying WHICH of the
   # three sample sizes it is, without which naming it in the vignette is a
@@ -3048,8 +3053,18 @@ test_that("AC2: the Rd names both new fields and what they are for", {
 
 
 test_that("AC2: the vignette's calibration table and its object pointer travel together", {
+  # Under R CMD check the tests run from <pkg>.Rcheck/tests/testthat, where
+  # ../../vignettes does not exist -- so a bare skip_if_not(file.exists(...))
+  # here is satisfied to skip ALWAYS on the surface that matters most, and this
+  # guard would never have run on CRAN or CI. The installed copy under
+  # inst/doc is the fallback, exactly as the Rd guard above falls back to
+  # tools::Rd_db().
   vig <- test_path("..", "..", "vignettes", "axes-reliability.Rmd")
-  skip_if_not(file.exists(vig))
+  if (!file.exists(vig)) {
+    vig <- system.file("doc", "axes-reliability.Rmd", package = "circumplex")
+  }
+  skip_if(!nzchar(vig) || !file.exists(vig),
+          "the vignette source is not readable from either location")
   txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))
   expect_gt(nchar(txt), 1000L)
 

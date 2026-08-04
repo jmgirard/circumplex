@@ -723,9 +723,13 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' with plain maximum likelihood, the scaling being applied here rather than by
 #' lavaan, `fitMeasures()` on an equivalent fit reports the **uncorrected**
 #' values -- those in `details$fit_uncorrected` -- under the bare names `chisq`,
-#' `rmsea` and `cfi`. So a cross-check against either lavaan's bare `cfi` or its
-#' `cfi.robust` will disagree with `$fit$cfi`, and neither disagreement is a
-#' defect. `details$baseline` and `details$scaling_factor` carry what you need to
+#' `pvalue`, `rmsea` and `cfi`. It reports no `*.scaled` or `*.robust` measure
+#' at all on such a fit: lavaan supplies those only for a genuinely scaled
+#' estimator such as `"MLM"` or `"MLR"`, and silently returns a shorter vector
+#' when asked for one it does not have. So a cross-check against lavaan's bare
+#' `cfi` will disagree with `$fit$cfi`, a request for `cfi.robust` will come
+#' back empty rather than disagreeing, and neither outcome is a defect.
+#' `details$baseline` and `details$scaling_factor` carry what you need to
 #' rebuild the reported values yourself.
 #'
 #' # How well calibrated is the test, and at what sample size
@@ -983,10 +987,16 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   before the correlation-metric scaling, `scaling_factor`, the two
 #'   Satorra-Bentler factors (`model` and `baseline`), and
 #'   `fit_scaling_failed`, `NULL` when the scaling succeeded or a string naming
-#'   why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`, `n_moments`, the number
-#'   of distinct analyzed moments \eqn{p^* = p(p+1)/2}, and `baseline`, the
-#'   independence model's unscaled `chisq` and `df`, which together with
-#'   `fit$chisq` and `fit$df` reproduce the reported `cfi`). `fit` carries `chisq`,
+#'   why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`).
+#'   `details` also carries `n_moments`, the number of distinct analyzed
+#'   moments \eqn{p^* = p(p+1)/2}, and `baseline`, the independence model's
+#'   **unscaled** `chisq` and `df`. Those two, with `fit$chisq`, `fit$df` and
+#'   the `baseline` element of `scaling_factor` -- five inputs, since the
+#'   baseline chi-square must be scaled by its own factor before it is used --
+#'   reproduce the reported `cfi`. Note that `details$baseline` and the
+#'   `baseline` element of `details$scaling_factor` are different quantities
+#'   that share a name: the first is a chi-square and df pair, the second a
+#'   scaling factor. `fit` carries `chisq`,
 #'   `df`, `pvalue`, `rmsea`, `cfi` and `srmr`; the four chi-square-derived
 #'   values are scaled and `df` and `srmr` are not.
 #'   Three sample sizes sit beside each other in `details` and are not
@@ -1866,12 +1876,13 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # way to ASK for the uncorrected statistic.
       fit_uncorrected = scaled$uncorrected,
       # The independence model's chi-square and df (M70), in the grouped shape
-      # `scaling_factor` below uses. They are two of the three inputs `cfi` is
-      # rebuilt from -- the third is `fit$chisq` -- so exposing them lets a
-      # caller reproduce the reported CFI, and tell the variant it corresponds
-      # to, without inverting the uncorrected value to recover them. Both are
-      # lavaan's own, unscaled: `axes_scale_fit_measures()` applies the
-      # `baseline` scaling factor at the point of use.
+      # `scaling_factor` below uses. Rebuilding `cfi` takes five inputs -- these
+      # two, `fit$chisq`, `fit$df`, and `scaling_factor[["baseline"]]`, which
+      # scales the baseline chi-square before the excess is taken -- and these
+      # were the two a caller could not otherwise obtain without inverting the
+      # uncorrected value. Both are lavaan's own, UNSCALED:
+      # `axes_scale_fit_measures()` applies the `baseline` factor at the point
+      # of use, which is why the rebuild needs it separately.
       baseline = c(chisq = fm[["baseline.chisq"]], df = fm[["baseline.df"]]),
       # The two Satorra-Bentler factors: `model` divides the fitted model's
       # chi-square, `baseline` the independence model's (which only CFI reads).
