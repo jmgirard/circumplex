@@ -1,11 +1,11 @@
 # M70: Self-describing scaled fit output for `axes_reliability()`
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M69
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m70-axes-scaled-fit-self-describing`
 
 ## Goal
 
@@ -40,11 +40,14 @@ first Out clause rules out.
 ## Acceptance criteria
 
 - [ ] **AC1** — `details` gains `n_moments`, the number of distinct analyzed
-      moments `p * (p + 1) / 2`, and an explicitly named field for the N the fit
-      was priced at, so `p*/N` is readable without arithmetic over `n_items`.
-      Evidence: a test asserts `n_moments == p * (p + 1) / 2` for a fit of known
-      p = 24, and that the reported N equals `lavaan::fitMeasures(fit,
-      "ntotal")` on the cormat, listwise and FIML paths.
+      moments `p * (p + 1) / 2`, so `p*/N` is readable without arithmetic over
+      `n_items`; the N of that ratio is the existing `details$n`, which AC2's
+      `@return` text names explicitly as the sample size the fit was priced at,
+      distinguishing it from the `n_total` and `n_complete` beside it. Evidence:
+      a test asserts `n_moments == p * (p + 1) / 2` for a fit of known p = 24,
+      and that `details$n` equals `lavaan::fitMeasures(fit, "ntotal")` on the
+      cormat, listwise and FIML paths — each probed on data where those three
+      N's differ, so the assertion cannot pass by coincidence.
 - [ ] **AC2** — The `@return` text for `details` names both new fields and says
       what they are for, and the vignette's calibration passage tells the reader
       where to read `p*/N` off the object. Evidence: a doc guard reads
@@ -104,10 +107,12 @@ first Out clause rules out.
 
 ## Tasks
 
-- [ ] **T1** — Add `n_moments`, the named N field, and the baseline chi-square
-      and baseline df AC4 needs to the `details` list
-      (`R/axes_reliability.R:1792`); test each on the cormat, listwise and FIML
-      paths.
+- [ ] **T1** — Add `n_moments` and, as one grouped field
+      `baseline = c(chisq = ..., df = ...)` matching the existing
+      `scaling_factor` idiom, the baseline chi-square and df AC4 needs, to the
+      `details` list (`R/axes_reliability.R:1799`); test each on the cormat,
+      listwise and FIML paths, on data where `n`, `n_total` and `n_complete`
+      differ.
 - [ ] **T2** — Write the `@return` text for the new fields, add the vignette
       sentence pointing at them beside the calibration table
       (`vignettes/axes-reliability.Rmd:189-202`), and add the paired doc guard.
@@ -136,6 +141,10 @@ first Out clause rules out.
 - 2026-08-04: amended at a /milestone-plan gate (milestone still `planned`, not yet started) to absorb the NA-unsafe `axes_scaling_factor()` guard from its ROADMAP candidate row — new AC5 + T5, old AC5 renumbered AC6, Scope In/Out and Coverage updated. Trigger reading: the row said "whichever milestone next opens `R/axes_scaled_fit.R`" and M70 opens only the caller and the matching test file, so the user waived the strict trigger on adjacency grounds.
 - 2026-08-04: criteria audit ([O], fresh context, authored none of the drafts) returned eight findings on the drafted AC5/T5; seven fixed in the wording before this file was written — T5 would have reddened the citation-rot guard at `test-axes-scaled-fit.R:1108` by transcribing a numbered sibling citation; the sibling comment T5 asked to carry is false here (NA/NaN does reach `cov2cor()`); the NA/NaN cases raise a second warning from `cov2cor()` the evidence had not expected; the "carries NA or NaN" universal was unbounded against a two-case test; the test would have been silently lavaan-skipped like the rest of its file; the cited sibling range was off by a paragraph; and no principle conflict exists because `cairn/DESIGN.md` carries no IP/GP block at all.
 - 2026-08-04: gate chose leaving the two surfaces' reason codes divergent (`"singular"` vs `"nonpositive_diagonal"` on a zero/negative diagonal) over unifying them, because unification changes documented user-visible output that this milestone's first Out clause excludes; falsified by a user or reviewer reading the two codes as reporting different conditions.
+
+- 2026-08-04: status → in-progress; branch `m70-axes-scaled-fit-self-describing` cut from pushed master.
+- 2026-08-04: substantive amendment at the implement question gate — AC1's "gains an explicitly named field for the N" was measurably already shipped: `details$n` is the row count of exactly the matrix handed to lavaan on all three paths (probed: cormat 640/640, FIML 488/500 with 12 all-NA rows dropped, listwise 398/500), so it already equals `fitMeasures(fit, "ntotal")`. Gate chose documenting `n` over adding an `n_fit` alias, because two fields holding one number can later disagree; renaming `n` was rejected as needing a deprecation cycle this milestone did not scope. AC1 amended accordingly, and its evidence tightened to require probe data where `n`, `n_total` and `n_complete` differ — on the package's own example data all three are 500, which would have made the assertion vacuous.
+- 2026-08-04: gate chose one grouped `baseline = c(chisq, df)` field over flat `baseline_chisq`/`baseline_df`, matching the existing `scaling_factor = c(model, baseline)` idiom; T1 updated to name the shape (and its stale `:1792` anchor corrected to `:1799`).
 
 ## Decisions
 

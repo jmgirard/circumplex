@@ -14,7 +14,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M67 | M65 review fold-ins for the `axes_reliability()` FIML path | done | M66 | normal | milestones/archive/M67-axes-reliability-m65-foldins.md |
 | M68 | Scaled global test statistic for `axes_reliability()` | done | — | normal | milestones/archive/M68-axes-reliability-scaled-chisq.md |
 | M69 | Correlation-metric pricing for `axes_reliability()`'s corrected component SEs | done | — | normal | milestones/archive/M69-axes-corrected-se-unit-diagonal.md |
-| M70 | Self-describing scaled fit output for `axes_reliability()` | planned | M69 | normal | milestones/M70-axes-scaled-fit-self-describing.md |
+| M70 | Self-describing scaled fit output for `axes_reliability()` | in-progress | M69 | normal | milestones/M70-axes-scaled-fit-self-describing.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
