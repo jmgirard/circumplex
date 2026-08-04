@@ -42,29 +42,29 @@ helper's own contract boundary.
 
 ## Acceptance criteria
 
-- [ ] AC1 — At the octant probe with one `+Inf` diagonal entry,
+- [x] AC1 — At the octant probe with one `+Inf` diagonal entry,
       `axes_scaling_factor()` returns `scale` and `baseline` both `NA_real_`,
       `reason` identical to `"infinite_diagonal"`, and warns; the regression
       test asserting this is mutation-verified — the new guard line is reverted,
       the test observed red, and the line restored.
-- [ ] AC2 — The four pre-existing refusal routes on this surface are unchanged:
+- [x] AC2 — The four pre-existing refusal routes on this surface are unchanged:
       a `-Inf`, a `0`, an `NA` and a `NaN` diagonal entry each still yield
       `reason == "singular"`. Evidence: `tests/testthat/test-axes-scaled-fit.R`
       asserts all four explicitly (the `-Inf` cell is added by this milestone;
       the other three exist at `:1229-1254`) and the file runs green with no
       edit to any pre-existing reason-string expectation.
-- [ ] AC3 — The `fit_scaling_failed` and `se_correction_failed` comments in
+- [x] AC3 — The `fit_scaling_failed` and `se_correction_failed` comments in
       `R/axes_reliability.R` each name exactly the reason literals *contained
       in* their helper's source, enumerated by a grep over the `na_out(` call
       sites and the bare string returns of `R/axes_scaled_fit.R` and of
       `R/axes_corrected_se.R` (the latter including `axes_se_pricing()`, whose
       strings `axes_corrected_se()` forwards through `na_out(raw)`/`na_out(std)`
       rather than as literals).
-- [ ] AC4 — The header comment at `R/axes_scaled_fit.R:114-119` no longer
+- [x] AC4 — The header comment at `R/axes_scaled_fit.R:114-119` no longer
       describes the `+Inf` case as an open candidate: `grep -n "ROADMAP
       candidate" R/axes_scaled_fit.R` returns nothing, and the block instead
       states which entries the two guards refuse and which fall through.
-- [ ] AC5 — `devtools::test()` clean over the full suite, and
+- [x] AC5 — `devtools::test()` clean over the full suite, and
       `devtools::check(args = "--no-manual")` at 0 errors / 0 warnings / 0 notes.
 
 ## Coverage
@@ -110,7 +110,91 @@ helper's own contract boundary.
 - 2026-08-04: T4 done — AC3's grep run over both helpers gives `axes_scaled_fit.R` = {df_mismatch, baseline_df_mismatch, singular, unidentified, indefinite, infinite_diagonal} and `axes_corrected_se.R` = {nonpositive_diagonal} direct plus {singular, unidentified, indefinite} forwarded from `axes_se_pricing()`. Both `details` comments now match: `:1871` gained the two literals it had been missing since M69, `:1892` gained `"infinite_diagonal"`, and each says it enumerates what the source CONTAINS rather than what a user has been shown (`"indefinite"` has never fired). The enumeration guard at `test-axes-corrected-se.R:1181-1185` needed no change — M71 adds no literal to the file it pins.
 - 2026-08-04: full `devtools::test()` green — FAIL 0 | WARN 4 | SKIP 0 | PASS 5788. The four warnings are pre-existing and not from this branch: `test-axes-scaled-fit.R` alone reports WARN 0 over 671 passes, and both new inputs return before `cov2cor()`, so neither can raise an uncaught warning.
 - 2026-08-04: T5 done — `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes (14m 25s, circumplex 2.0.0). No roxygen change was needed: `man/axes_reliability.Rd:80` documents the field as "a string naming why" and never enumerates the literals, so the corrected enumerations are code comments only. All tasks done; status in-progress→review.
+- 2026-08-04: review — three fresh-context lenses run; the history and prior-review lenses returned no findings, the diff-bug lens returned 10, of which one scored >= 80. F4 (85, the sibling-behaviour comment naming the wrong mechanism) fixed in place; F3 (70) also fixed though below the actioned bar, after verifying its reachability claim live. No acceptance criterion failed, so no return under the floor.
 
 ## Decisions
 
 ## Review
+
+### Evidence per criterion (fresh, 2026-08-04)
+
+- **AC1** — `test-axes-scaled-fit.R:1261` "AC1: a +Inf fitted diagonal refuses
+  instead of scaling a corrupted matrix" passes: `reason` identical to
+  `"infinite_diagonal"`, `scale`/`baseline` both `NA_real_`, warning matched.
+  Mutation-verified at T3 and again independently by the diff-bug reviewer,
+  which reproduced the pre-fix return (`scale = 0.9579017`, `reason = NULL`)
+  by deleting the guard line and restored green afterwards.
+- **AC2** — all four pre-existing routes assert explicitly in that file and
+  pass: `NA`/`NaN` at `:1233-1242`, `0` at `:1250-1252`, `-Inf` at
+  `:1294-1296`, each `reason == "singular"`. No pre-existing reason-string
+  expectation was edited (the diff adds lines only below `:1255`).
+- **AC3** — AC3's own grep, re-run at review: `axes_scaled_fit.R` contains
+  {df_mismatch, baseline_df_mismatch, singular, unidentified, indefinite,
+  infinite_diagonal}, matching `R/axes_reliability.R:1897-1899` exactly;
+  `axes_corrected_se.R` contains `nonpositive_diagonal` directly plus
+  {singular, unidentified, indefinite} forwarded from `axes_se_pricing()`,
+  matching `:1870-1876` exactly.
+- **AC4** — `grep -c "ROADMAP candidate" R/axes_scaled_fit.R` returns 0, and
+  the block now states which entry each of the two guards refuses and which
+  falls through.
+- **AC5** — `devtools::test()` on the final tree: FAIL 0 | WARN 4 | SKIP 0 |
+  PASS 5788 (the four warnings are pre-existing; the touched file alone is
+  WARN 0 over 671 passes). `devtools::check(args = "--no-manual")`: Status OK,
+  0 errors / 0 warnings / 0 notes, 13m 22s.
+
+### Consistency gate
+
+Universal: `cairn_validate` exit 0, all checks PASS (the standing
+`work-log format` WARN is M7's legacy hard-wrapped entries, untouched here).
+No principle changed, so `cairn_impact` was skipped. Toolchain
+(`r-package` profile): `devtools::document()` produces no diff to `man/` or
+`NAMESPACE`; `pkgdown::check_pkgdown()` "No problems found"; no new exports,
+so no `_pkgdown.yml` row is owed; no `.Rbuildignore` entry needed. **No
+NEWS.md entry is owed**: `axes_reliability()` and the guard it fixes are both
+unreleased — the package is at 2.0.0 pre-submission, so no released version
+ever carried the defect.
+
+### Independent review
+
+Three fresh-context lenses. The **[S] blame-history** lens returned no
+findings, confirming the new guard composes with rather than undoes M70's
+`na.rm = TRUE` fix and contradicts no recorded decision. The **[S]
+prior-review** lens returned no findings; its GitHub probe found no real
+inline review threads, so the archived `## Review` sections were the whole
+evidence base. The **[O] diff-bug** lens returned 10 findings.
+
+**Actioned (>= 80):**
+
+- **F4 (85) — the sibling-behaviour comment describes the wrong mechanism**
+  (`R/axes_scaled_fit.R:139-141`). The comment said `axes_corrected_se()`
+  refuses `+Inf` because "it prices the raw sigma before normalizing, so the
+  zeroed row makes its information matrix rank-deficient" — but no zeroed row
+  exists on that path; the zeros appear in `solve(sigma)` (1/Inf), not in the
+  input, and `cov2cor()` is never applied there. The conclusion was right and
+  the causal sentence wrong. **Fixed now**: the comment names the inverse as
+  where the zeros appear and says the laundering is specific to this file.
+
+**Logged, not actioned (< 80), 9 findings:**
+
+- F1 (15) — the guard refuses `+Inf` but a huge-but-finite implied variance
+  (measured: 1e10 still returns a factor with `reason = NULL`) is unguarded,
+  while the sibling refuses it. Scored out of scope: the plan gate chose
+  `+Inf`-only deliberately. Reproduced live at review and carried to a
+  **candidate ROADMAP row** rather than left in this section alone.
+- F3 (70) — the new `fit_scaling_failed` comment borrowed the SE list's
+  never-fired caveat, but this surface's literals are reachable. **Fixed
+  anyway**, below the bar, after verifying live that `indefinite` fires at
+  1e-3, `unidentified` at 1e-8 and `singular` at 1e-300 on this surface.
+- F2 (30) — "corrupted matrix" is an overclaim; inherited wording.
+- F5 (20) — a stale intra-file line citation, pre-existing on master.
+- F6 (40) — no test pins the comment enumerations against their source; the
+  one-time grep is what AC3 chose.
+- F7 (20) — the M70 zero-diagonal control has no teeth against deleting the
+  `<= 0` guard; pre-existing, and M71's `-Inf` case now reddens on it.
+- F8 (25) — test naming/traceability and a copied setup block.
+- F9 (10) — no NEWS entry; the finding concedes this is correct.
+- F10 (15) — the graduated ROADMAP row still names the superseded fix shape;
+  unchanged by this diff.
+
+No finding demonstrated an acceptance criterion failing, and none scored >= 90
+on user-facing behavior, so the return floor was not reached.

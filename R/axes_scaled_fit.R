@@ -137,10 +137,13 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # says "singular"): the two guards simply chose different literals. On the
   # NA/NaN route the sibling also falls through and also refuses as
   # "singular", so the two agree there. On +Inf the sibling refuses too, as
-  # "unidentified": it prices the raw sigma before normalizing, so the zeroed
-  # row makes its information matrix rank-deficient. It computes no wrong
-  # number, which is why its label was left alone; the relabel is tracked
-  # separately rather than made here.
+  # "unidentified", by a different route than this one: it prices the RAW
+  # sigma, and solve() of an infinite variance zeroes that row/column of the
+  # INVERSE (1/Inf), which makes its information matrix rank-deficient. No
+  # cov2cor() is involved on that path -- the laundering described above is
+  # specific to this file, which normalizes before it inverts. So the sibling
+  # computes no wrong number, which is why its label was left alone; the
+  # relabel is tracked separately rather than made here.
   if (any(diag(sigma) <= 0, na.rm = TRUE)) return(na_out("singular"))
   if (any(is.infinite(diag(sigma)))) return(na_out("infinite_diagonal"))
   sigma <- stats::cov2cor(sigma)

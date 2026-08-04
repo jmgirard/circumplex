@@ -1895,8 +1895,10 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       scaling_factor = c(model = scaling$scale, baseline = scaling$baseline),
       # NULL when the scaling succeeded; otherwise why the four chi-square-
       # derived statistics are NA ("singular", "unidentified", "df_mismatch",
-      # "baseline_df_mismatch", "indefinite", "infinite_diagonal"), on the same
-      # contains-not-reaches basis as the SE list above.
+      # "baseline_df_mismatch", "indefinite", "infinite_diagonal"), enumerated
+      # from the source the same way as the SE list above -- but WITHOUT its
+      # never-fired caveat: this surface's guards are its own, and all six
+      # literals here are reachable at the helper's contract boundary.
       fit_scaling_failed = scaling$reason,
       ols_shadow = ols
     ),
