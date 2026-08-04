@@ -1,6 +1,6 @@
 # M69: Correlation-metric pricing for `axes_reliability()`'s corrected component SEs
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR15
@@ -144,6 +144,9 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
 - 2026-08-03: T5 done, T4 and T6 closed with it. `m66-corrected-se-cells.rds` regenerated at 201 replicates per cell, 7 workers, 93.4 min, provenance R 4.6.1 / lavaan 0.6.21. Calibration re-measured under the new pricing: complete 0.9584 -> 0.9598, 15% MCAR 0.9255 -> 0.9267, M1 MAR 1.0152 -> 1.0156, every cell inside its band ([0.90, 1.10] and [0.85, 1.15]). Two moved marginally toward 1 and one marginally away; all three deltas are ~0.1% against the comparison's own ~3.6% Monte-Carlo error, so this is NOT evidence that calibration improved — stated that way deliberately, because the tempting reading is unsupported at this replicate count.
 - 2026-08-03: T6's two pending figures resolved, both **unchanged, because the re-run rounds the same way** (AC3's own escape clause, earned rather than assumed). `R/axes_reliability.R:817` "average about 7% below" measures 7.33% against the previous 7.45%. `:811-813` "0.1%, 0.8%, and 1.8%" at 2/5/10% MCAR are computed as `mean(fiml.se / M66_POP_RATIO) / sd(fiml.xi1)` from the STORED uncorrected `fiml.se` and the population constant 1.4412 — neither of which M69 touches, and M69 restored `1/fiml_ratio` to exactly 1.441229, so that constant is now more exactly right than it was. The published 0.96 / 0.93 / 1.02 all still round from the re-measured values. No prose edit was required on any of the four surfaces; the ledger's "unchanged" entries are now measured rather than projected.
 - 2026-08-03: full `devtools::test()` green, no failures, with the regenerated fixture. All five breakages the ingest audit predicted are closed.
+
+- 2026-08-03: two source-reading guards written this milestone would have FAILED CRAN, both caught by `devtools::check()` rather than by the suite. `test_path("..", "..", "R", ...)` resolves to nothing in an installed package and `readLines()` errors there rather than skipping — the M7 "a step that doesn't run reports success" trap, in its louder form. Hit twice: the AC4 citation guard first, then the AC10 enumeration written minutes earlier, because fixing the first instance did not sweep for its siblings (the M56/M62/M63 directional-sweep failure, recurring). The sweep that should have come first — `grep -rn 'test_path("..", "..", "R"' tests/testthat/` — finds exactly three sites; all three are now `skip_if_not(file.exists(...))` guarded with the limitation stated in the test rather than left silent. AC10's runtime half was split out so it always runs, including on CRAN; only the source enumeration skips.
+- 2026-08-03: T5-T8 complete, all eight tasks done. `devtools::check(args = "--no-manual")` **Status: OK, 0 errors / 0 warnings / 0 notes**; full `devtools::test()` green. `--no-manual` skips nothing this branch could break: the diff changes zero roxygen (`#'`) lines and touches no `man/` file, checked rather than assumed (the M7/M57 lesson). Status in-progress -> review.
 
 ## Decisions
 
