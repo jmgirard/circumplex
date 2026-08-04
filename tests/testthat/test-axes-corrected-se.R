@@ -1021,6 +1021,11 @@ test_that("AC7: the same invariance holds on the zeta2 (blockwise) probe", {
   expect_lt(max(abs(scalar_rs$corrected / base$corrected - 1)), 1e-6)
   expect_lt(max(abs(scalar_rs$fiml_ratio / base$fiml_ratio - 1)), 1e-6)
   expect_lt(max(abs(scalar_rs$naive / base$naive - 2)), 1e-6)
+  # The anti-triviality companion, carried over from the octant test rather
+  # than left to it: without this, an edit that normalized `naive` too would
+  # leave every invariance above green on this probe while breaking the lavaan
+  # fence (M69 review round 2, A7).
+  expect_gt(max(abs(diag_rs$naive / base$naive - 1)), 1e-3)
 })
 
 
