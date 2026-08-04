@@ -968,10 +968,21 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   before the correlation-metric scaling, `scaling_factor`, the two
 #'   Satorra-Bentler factors (`model` and `baseline`), and
 #'   `fit_scaling_failed`, `NULL` when the scaling succeeded or a string naming
-#'   why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`). `fit` carries `chisq`,
+#'   why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`, `n_moments`, the number
+#'   of distinct analyzed moments \eqn{p^* = p(p+1)/2}, and `baseline`, the
+#'   independence model's unscaled `chisq` and `df`, which together with
+#'   `fit$chisq` and `fit$df` reproduce the reported `cfi`). `fit` carries `chisq`,
 #'   `df`, `pvalue`, `rmsea`, `cfi` and `srmr`; the four chi-square-derived
 #'   values are scaled and `df` and `srmr` are not.
-#'   `n_complete` and `min_coverage` are
+#'   Three sample sizes sit beside each other in `details` and are not
+#'   interchangeable. `n` is the one the fit was priced at -- the number of rows
+#'   the estimator was actually handed, after listwise deletion or after
+#'   dropping rows with no observed item, and the `n` you supplied on the
+#'   correlation-matrix path. It is the N to divide `n_moments` by when locating
+#'   a fit on the calibration table in
+#'   \code{vignette("axes-reliability")}. `n_total` is the number of rows
+#'   supplied before any of that, and `n_complete` the number answering every
+#'   item. `n_complete` and `min_coverage` are
 #'   present on every path so that a caller can read them unconditionally, and
 #'   are `NA` where they carry no information: `min_coverage` outside
 #'   `missing = "fiml"`, and both of them when a correlation matrix was supplied

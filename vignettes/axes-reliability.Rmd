@@ -199,6 +199,12 @@ scales, three items each, axes variance .35), the rejection rate at α = .05 run
 reaching the nominal band by a p\*/N of about 0.06. That is a sweep at a single
 population, not a general threshold.
 
+You do not have to work out where your own fit sits on that row. The object
+reports both halves of the ratio: `details$n_moments` is p\*, and `details$n`
+is the N the fit was priced at — the count of rows the estimator was actually
+handed, which is smaller than `details$n_total` wherever cases were dropped.
+Divide the first by the second and read across.
+
 At **N = 600** the test **over-rejects** — measured .06 to .11 at three
 populations chosen to bracket the range of instruments the function accepts.
 The uncorrected statistic under-rejects over the same range, at .02 to .03, and

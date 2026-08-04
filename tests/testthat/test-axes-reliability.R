@@ -3019,3 +3019,46 @@ test_that("AC1: details exposes the baseline chisq and df as one pair", {
   # The independence model frees p variances out of p*, leaving p(p-1)/2.
   expect_identical(unname(bl[["df"]]), 24 * 23 / 2)
 })
+
+
+test_that("AC2: the Rd names both new fields and what they are for", {
+  rd_file <- test_path("..", "..", "man", "axes_reliability.Rd")
+  rd <- if (file.exists(rd_file)) {
+    paste(readLines(rd_file, warn = FALSE), collapse = " ")
+  } else {
+    paste(as.character(tools::Rd_db("circumplex")[["axes_reliability.Rd"]]),
+          collapse = "")
+  }
+  expect_gt(nchar(rd), 1000L)
+  rd <- gsub("\\s+", " ", rd)
+
+  # Each field name is pinned WITH a verb-carrying phrase of what it is. A bare
+  # name match would survive deleting the clause that explains the field, which
+  # is the only part a reader needs.
+  expect_match(rd, "\\code{n_moments}, the number of distinct analyzed moments",
+               fixed = TRUE)
+  expect_match(rd, "\\code{baseline}, the independence model's unscaled",
+               fixed = TRUE)
+  # `n` was already shipped; what M70 adds is the sentence saying WHICH of the
+  # three sample sizes it is, without which naming it in the vignette is a
+  # pointer to an ambiguity.
+  expect_match(rd, "Three sample sizes sit beside each other", fixed = TRUE)
+  expect_match(rd, "\\code{n} is the one the fit was priced at", fixed = TRUE)
+})
+
+
+test_that("AC2: the vignette's calibration table and its object pointer travel together", {
+  vig <- test_path("..", "..", "vignettes", "axes-reliability.Rmd")
+  skip_if_not(file.exists(vig))
+  txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))
+  expect_gt(nchar(txt), 1000L)
+
+  has_table <- grepl("| p\\*/N | 0.50 | 0.25 | 0.12 | 0.06 |", txt, fixed = TRUE)
+  has_pointer <- grepl("`details$n_moments` is p\\*, and `details$n`", txt,
+                       fixed = TRUE)
+  # Paired on purpose. A calibration table with no way to locate your own fit
+  # on it is the state this milestone existed to end; a pointer to a table that
+  # has moved is worse. Removing either one alone reddens here.
+  expect_identical(has_table, has_pointer)
+  expect_true(has_table)
+})

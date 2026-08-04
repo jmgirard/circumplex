@@ -114,7 +114,7 @@ first Out clause rules out.
       `details` list (`R/axes_reliability.R:1799`); test each on the cormat,
       listwise and FIML paths, on data where `n`, `n_total` and `n_complete`
       differ.
-- [ ] **T2** — Write the `@return` text for the new fields, add the vignette
+- [x] **T2** — Write the `@return` text for the new fields, add the vignette
       sentence pointing at them beside the calibration table
       (`vignettes/axes-reliability.Rmd:189-202`), and add the paired doc guard.
 - [ ] **T3** — Read the four user-facing surfaces in full, add the lavaan
@@ -148,6 +148,8 @@ first Out clause rules out.
 - 2026-08-04: gate chose one grouped `baseline = c(chisq, df)` field over flat `baseline_chisq`/`baseline_df`, matching the existing `scaling_factor = c(model, baseline)` idiom; T1 updated to name the shape (and its stale `:1792` anchor corrected to `:1799`).
 
 - 2026-08-04 (T1): `details` gains `n_moments` and `baseline = c(chisq, df)`; tests capture THE fitted lavaan object through the `axes_converged()` seam rather than refitting, and probe on data where `n`/`n_total`/`n_complete` are pairwise distinct. Full suite FAIL 0, PASS 5749.
+
+- 2026-08-04 (T2): `@return` documents `n_moments`, `baseline`, and which of the three sample sizes `n` is; vignette gains the sentence pointing at both halves of `p*/N`. Doc guard verified by mutation — deleting the Rd clause and deleting the vignette pointer each reddened their own assertion (2 failures, restored).
 
 ## Decisions
 

@@ -83,10 +83,21 @@ that correction succeeded or a string naming why the reported SEs are
 before the correlation-metric scaling, \code{scaling_factor}, the two
 Satorra-Bentler factors (\code{model} and \code{baseline}), and
 \code{fit_scaling_failed}, \code{NULL} when the scaling succeeded or a string naming
-why \code{chisq}, \code{pvalue}, \code{rmsea} and \code{cfi} are \code{NA}). \code{fit} carries \code{chisq},
+why \code{chisq}, \code{pvalue}, \code{rmsea} and \code{cfi} are \code{NA}, \code{n_moments}, the number
+of distinct analyzed moments \eqn{p^* = p(p+1)/2}, and \code{baseline}, the
+independence model's unscaled \code{chisq} and \code{df}, which together with
+\code{fit$chisq} and \code{fit$df} reproduce the reported \code{cfi}). \code{fit} carries \code{chisq},
 \code{df}, \code{pvalue}, \code{rmsea}, \code{cfi} and \code{srmr}; the four chi-square-derived
 values are scaled and \code{df} and \code{srmr} are not.
-\code{n_complete} and \code{min_coverage} are
+Three sample sizes sit beside each other in \code{details} and are not
+interchangeable. \code{n} is the one the fit was priced at -- the number of rows
+the estimator was actually handed, after listwise deletion or after
+dropping rows with no observed item, and the \code{n} you supplied on the
+correlation-matrix path. It is the N to divide \code{n_moments} by when locating
+a fit on the calibration table in
+\code{vignette("axes-reliability")}. \code{n_total} is the number of rows
+supplied before any of that, and \code{n_complete} the number answering every
+item. \code{n_complete} and \code{min_coverage} are
 present on every path so that a caller can read them unconditionally, and
 are \code{NA} where they carry no information: \code{min_coverage} outside
 \code{missing = "fiml"}, and both of them when a correlation matrix was supplied
