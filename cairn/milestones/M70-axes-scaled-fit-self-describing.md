@@ -1,6 +1,6 @@
 # M70: Self-describing scaled fit output for `axes_reliability()`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M69
 - **Driving RR:** —
@@ -156,6 +156,8 @@ first Out clause rules out.
 - 2026-08-04 (T4): recomputation test rebuilds `$fit$cfi` from `details` alone on a perturbed octant probe (both excesses strictly positive, c = 0.9562 vs c_b = 0.8653). Reported value matches the `cfi.scaled` definition to 1e-10 and the `cfi.robust` definition applied to the same inputs differs by 3.5e-3 — four orders above the tolerance, so the test discriminates the two rather than merely tolerating both. lavaan's unexported `lav_fit_cfi()` corroborates via `get()` and was callable here. Full suite FAIL 0, PASS 5763.
 
 - 2026-08-04 (T5): guard made NA-safe. Test written first and confirmed red with the exact reported error, "missing value where TRUE/FALSE needed". Comment authored for this site rather than carried from the sibling (here the non-finite entry falls THROUGH to `cov2cor()` and is caught by the `solve()`/`is.finite` pair, the opposite of the sibling's route); no numbered sibling citation written, so the citation-rot guard at `test-axes-scaled-fit.R:1108` still counts exactly 1. Both warnings on the NA/NaN route are asserted rather than one left escaping as a test warning. Full suite FAIL 0, PASS 5777.
+
+- 2026-08-04: all five tasks done; `devtools::check(args = "--no-manual")` clean at 0 errors / 0 warnings / 0 notes, full suite FAIL 0 PASS 5777. Status → review.
 
 ## Decisions
 
