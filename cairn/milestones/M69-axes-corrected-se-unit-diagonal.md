@@ -1,6 +1,6 @@
 # M69: Correlation-metric pricing for `axes_reliability()`'s corrected component SEs
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR15
@@ -154,6 +154,8 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
 - 2026-08-04: all four fixes mutation-verified rather than eyeballed. Reverting `na.rm` reddens 1 assertion; stripping the naive-pricing sentence from the cited range reddens 3; the tightened F16 bar fails the mixed quotient at 0.00185 and passes `fiml_ratio` at 0.00029. Caveat recorded on F20: the stamp lives in the committed `.rds`, and a future re-run of `devel/m66-heavy-cells.R` will write the generator's own literal `source` again — whoever regenerates next stamps their own milestone.
 
 - 2026-08-04: the AC4 guard reddened on this milestone's own commit — adding F1's comment block pushed the Wc fold past the cited `:172-178`, and the guard caught it before review did. Citation re-pointed to `:171-179`. This is the guard demonstrating the exact rot it exists to prevent, on the first edit that could cause it.
+
+- 2026-08-04: AC5 re-verified after the round-1 fixes — `devtools::check(args = "--no-manual")` **Status: OK, 0 errors / 0 warnings / 0 notes**. Status in-progress -> review for round 2.
 
 ## Decisions
 
