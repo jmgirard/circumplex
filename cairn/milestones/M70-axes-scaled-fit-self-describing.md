@@ -15,9 +15,10 @@ recomputing anything.
 
 ## Scope
 
-**In:** two new `details` fields — the count of distinct analyzed moments
-`p* = p(p+1)/2` and an explicitly named field for the N the fit was priced at —
-so the `p*/N` the vignette's calibration table is indexed by is readable off the
+**In:** a new `details` field for the count of distinct analyzed moments
+`p* = p(p+1)/2`, and `@return` text naming the existing `details$n` as the N the
+fit was priced at (the amendment gate found that field already shipped), so the
+`p*/N` the vignette's calibration table is indexed by is readable off the
 object; whatever further `details` fields the AC4 recomputation needs; the
 `@return` documentation and the vignette passage that point at them; and naming
 the lavaan variant the scaled `cfi`/`rmsea` correspond to on every user-facing
@@ -107,7 +108,7 @@ first Out clause rules out.
 
 ## Tasks
 
-- [ ] **T1** — Add `n_moments` and, as one grouped field
+- [x] **T1** — Add `n_moments` and, as one grouped field
       `baseline = c(chisq = ..., df = ...)` matching the existing
       `scaling_factor` idiom, the baseline chi-square and df AC4 needs, to the
       `details` list (`R/axes_reliability.R:1799`); test each on the cormat,
@@ -145,6 +146,8 @@ first Out clause rules out.
 - 2026-08-04: status → in-progress; branch `m70-axes-scaled-fit-self-describing` cut from pushed master.
 - 2026-08-04: substantive amendment at the implement question gate — AC1's "gains an explicitly named field for the N" was measurably already shipped: `details$n` is the row count of exactly the matrix handed to lavaan on all three paths (probed: cormat 640/640, FIML 488/500 with 12 all-NA rows dropped, listwise 398/500), so it already equals `fitMeasures(fit, "ntotal")`. Gate chose documenting `n` over adding an `n_fit` alias, because two fields holding one number can later disagree; renaming `n` was rejected as needing a deprecation cycle this milestone did not scope. AC1 amended accordingly, and its evidence tightened to require probe data where `n`, `n_total` and `n_complete` differ — on the package's own example data all three are 500, which would have made the assertion vacuous.
 - 2026-08-04: gate chose one grouped `baseline = c(chisq, df)` field over flat `baseline_chisq`/`baseline_df`, matching the existing `scaling_factor = c(model, baseline)` idiom; T1 updated to name the shape (and its stale `:1792` anchor corrected to `:1799`).
+
+- 2026-08-04 (T1): `details` gains `n_moments` and `baseline = c(chisq, df)`; tests capture THE fitted lavaan object through the `axes_converged()` seam rather than refitting, and probe on data where `n`/`n_total`/`n_complete` are pairwise distinct. Full suite FAIL 0, PASS 5749.
 
 ## Decisions
 

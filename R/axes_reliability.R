@@ -1798,6 +1798,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     fit = scaled$fit,
     details = list(
       n = n, n_total = n_total, n_items = p, n_scales = n_scales,
+      # The count of distinct analyzed moments, p* = p(p+1)/2 (M70). Reported
+      # rather than left to the caller because `p*/N` -- with `n` above as the
+      # N, the one lavaan was actually handed -- is what the calibration table
+      # in vignette("axes-reliability") is indexed by, and recomputing it off
+      # `n_items` invites reading `n_total` or `n_complete` as the denominator.
+      n_moments = p * (p + 1) / 2,
       angles = angles_deg, labels = map$labels, sd = sd,
       input = if (has_data) "data" else "cormat",
       # Read off the FITTED object rather than echoed from the argument, the
@@ -1833,6 +1839,14 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # reproducing a pre-M68 analysis, without the package offering a supported
       # way to ASK for the uncorrected statistic.
       fit_uncorrected = scaled$uncorrected,
+      # The independence model's chi-square and df (M70), in the grouped shape
+      # `scaling_factor` below uses. They are two of the three inputs `cfi` is
+      # rebuilt from -- the third is `fit$chisq` -- so exposing them lets a
+      # caller reproduce the reported CFI, and tell the variant it corresponds
+      # to, without inverting the uncorrected value to recover them. Both are
+      # lavaan's own, unscaled: `axes_scale_fit_measures()` applies the
+      # `baseline` scaling factor at the point of use.
+      baseline = c(chisq = fm[["baseline.chisq"]], df = fm[["baseline.df"]]),
       # The two Satorra-Bentler factors: `model` divides the fitted model's
       # chi-square, `baseline` the independence model's (which only CFI reads).
       # Both are NA together when the scaling failed.
