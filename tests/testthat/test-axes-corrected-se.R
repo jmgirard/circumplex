@@ -968,9 +968,58 @@ test_that("AC7: corrected and fiml_ratio are invariant to diagonal rescaling", {
 })
 
 
-# NOT YET WRITTEN: deviation D1's wiring assertion, that the reported FIML SE
-# equals se_uncorrected * fiml_ratio component-wise. It needs the FIML fit's own
-# Sigma-hat, which `details` does not expose; reconstructing the fit test-side
-# would build both sides of the comparison from the same code and catch nothing
-# common-mode (the M65 (j) trap). Carried on T4. Recorded here rather than
-# stubbed, because a stub that skips or asserts TRUE reads as coverage.
+test_that("AC7: the reported FIML SE is se_uncorrected times fiml_ratio", {
+  skip_if_not_installed("lavaan")
+  # Deviation D1's wiring assertion. After D2 this is the PRIMARY evidence that
+  # the repricing reaches the FIML surface at all: the committed band fixture
+  # stores the uncorrected SE and no Sigma-hat, so it cannot respond to the
+  # change.
+  #
+  # The fit's own Sigma-hat is not exposed in `details`, and rebuilding the fit
+  # test-side would construct both sides of the comparison from the same code
+  # and catch nothing common-mode (the M65 (j) trap). So the real helper is
+  # CAPTURED rather than replaced: the mock calls through and records what the
+  # estimator actually received. That keeps this a wiring assertion and nothing
+  # more, which is exactly what it claims to be (the M62 lesson: a seam mock
+  # proves the branch wiring, never the condition selecting it).
+  captured <- NULL
+  real <- axes_corrected_se
+  testthat::local_mocked_bindings(
+    axes_corrected_se = function(...) {
+      out <- real(...)
+      captured <<- out
+      out
+    },
+    .package = "circumplex"
+  )
+
+  fx <- readRDS(test_path("fixtures", "m65-heavy-cells.rds"))
+  oct <- octants()
+  set.seed(fx$provenance$seeds$mcar[[1L]])
+  mat <- axes_mcar(as.matrix(axes_simulate(600L, oct, 3L, .35, .10, .08)), 0.05)
+  res <- suppressMessages(suppressWarnings(
+    axes_reliability(as.data.frame(mat),
+                     items = split(colnames(mat), rep(1:8, each = 3)),
+                     angles = oct, missing = "fiml")
+  ))
+
+  expect_false(is.null(captured))
+  expect_true("fiml_ratio" %in% names(captured))
+
+  sym <- res$components$Symbol
+  unc <- res$details$se_uncorrected
+  for (s in names(unc)) {
+    expect_equal(
+      res$components$SE[sym == s],
+      unname(unc[[s]] * captured$fiml_ratio[[s]]),
+      tolerance = 1e-10,
+      label = paste0("reported FIML SE == se_uncorrected * fiml_ratio, ", s)
+    )
+  }
+
+  # ... and the ratio applied is NOT the mixed-matrix quotient. The two differ
+  # by N/(N-1) = 1.00167 at n = 600, so this discriminates decisively and is
+  # what would redden if line 1691 ever went back to corrected/naive (D-037).
+  mixed <- captured$corrected / captured$naive
+  expect_gt(max(abs(mixed / captured$fiml_ratio - 1)), 1e-4)
+})

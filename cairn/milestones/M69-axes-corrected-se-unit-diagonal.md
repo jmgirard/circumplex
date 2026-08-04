@@ -102,7 +102,7 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
       header states each value's pricing. Keep the extracted helper's matrix
       parameter named `sigma`, or AC4's literal stops matching for a reason
       unrelated to what it guards.
-- [ ] **T3** — Pin the invariances (diagonal and scalar at 1e-6), the
+- [x] **T3** — Pin the invariances (diagonal and scalar at 1e-6), the
       raw-`naive` scaling companion, and D1's wiring assertion.
 - [ ] **T4** — Re-pin `:203`/`:204`, regenerate both fixtures with provenance
       per AC1, re-measure the live FIML arm at `:256-298` (D2's evidence arm).
@@ -110,7 +110,7 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
 - [ ] **T6** — Read the four prose surfaces in full, update every size,
       direction or sign statement, commit the ledger, then run AC11's direction
       sweep within D3's domain.
-- [ ] **T7** — Repair `R/axes_scaled_fit.R:135`; add AC4's parsed-range guard.
+- [x] **T7** — Repair `R/axes_scaled_fit.R:135`; add AC4's parsed-range guard.
 
 ## Work log
 
@@ -133,6 +133,9 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
 - 2026-08-03: full `devtools::test()` carries exactly three known failures, all fixture staleness, none a regression: `test-axes-corrected-se.R:401`/`:406` (the `m66-corrected-se-cells.rds` live-vs-stored arm, 0.01173 vs stored 0.01171 and 0.01184 vs 0.01182) and `:472` (the bootstrap fixture's `analytic` column, 0.01186 vs 0.01184; `NOT_CRAN` only). T4 regenerates the bootstrap fixture, T5 the cells fixture. The ingest audit predicted all five breakages and no others; all five occurred and nothing else did.
 
 - 2026-08-03: T3 partially done, deliberately left unticked. The invariance pins are in and green: `corrected` and `fiml_ratio` invariant to `D Sigma-hat D` for a seeded positive diagonal and to the scalar 2 at 1e-6, with the companion that `naive` scales by exactly 2 under the scalar (RR15's measured 2.000000) and visibly does NOT hold still under the diagonal — so the invariances cannot be the trivial consequence of normalizing everything, and the companion says from inside the same test which matrix `naive` sits on. Two self-inflicted bugs caught by running rather than by eye: the scalar companion was written against sqrt(2) where `D = sqrt(2)I` gives `2*Sigma-hat`, and the first blockwise oracle map used a contiguous block layout. **Still owed on T3: deviation D1's wiring assertion** (reported FIML SE equals `se_uncorrected * fiml_ratio` component-wise). It needs the FIML fit's own Sigma-hat, which `details` does not expose, and reconstructing the fit test-side would build both sides from the same code and catch nothing common-mode (the M65 (j) trap). Moved to T4; recorded in the test file as a named gap rather than stubbed, since a skipping stub reads as coverage.
+
+- 2026-08-03: T3 completed and T7 done. D1's wiring assertion landed after all, via a CAPTURING mock: the real `axes_corrected_se()` is called through and its return recorded, so the test proves the branch wiring without rebuilding either side from the estimator's own code (the M65 (j) trap it was deferred over). Mutation-verified — reverting `:1691` to `corrected/naive` reddens it three times, once per component, and nothing else. T7's citation now reads `R/axes_corrected_se.R:172-178` and is held by a parsing guard in `test-axes-scaled-fit.R`; mutation-verified twice, a stale range failing 2 assertions and an over-wide range failing the 15-line span check.
+- 2026-08-03: T4 bootstrap half done — `m66-bootstrap-oracle.rds` regenerated (0.6 min, B = 1000, three draws) with fresh provenance. **Unrequested independent evidence the repricing is right:** the pipeline bootstrap re-standardizes per resample and shares no arithmetic with the analytic formula, and the repriced SE is closer to it on all three draws — seed 1001 |old-boot| 0.000239 → |new-boot| 0.000221, 1002 0.000257 → 0.000240, 1003 0.000290 → 0.000276. The correction moved toward an empirical oracle, not merely toward internal consistency. T4's remaining piece is the `m66-corrected-se-cells.rds` regeneration, which is T5's compute.
 
 ## Decisions
 

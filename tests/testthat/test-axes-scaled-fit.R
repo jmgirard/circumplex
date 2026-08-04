@@ -1086,3 +1086,41 @@ test_that("AC3: the FIML factor is the complete-data one, per M68-D1", {
   # And no trend across a fivefold change in the missingness rate.
   expect_lt(abs(facs[["0.10"]] - facs[["0.02"]]), .005)
 })
+
+
+# ---- M69 / AC4: the cross-file citation cannot rot silently ------------------
+
+test_that("AC4: axes_scaled_fit's Wc citation still lands on the Wc fold", {
+  cite_src <- readLines(test_path("..", "..", "R", "axes_scaled_fit.R"))
+  target <- readLines(test_path("..", "..", "R", "axes_corrected_se.R"))
+  skip_if(length(cite_src) == 0L || length(target) == 0L, "sources not readable")
+
+  # The citation, parsed rather than assumed: "(R/axes_corrected_se.R:A-B)".
+  hits <- regmatches(
+    cite_src,
+    regexpr("R/axes_corrected_se\\.R:[0-9]+-[0-9]+", cite_src)
+  )
+  hits <- hits[nzchar(hits)]
+  expect_length(hits, 1L)
+
+  rng <- as.integer(strsplit(sub(".*:", "", hits[[1]]), "-", fixed = TRUE)[[1]])
+  expect_lt(rng[[2]] - rng[[1]], 15L)      # AC4: at most a 15-line span
+  expect_lte(rng[[2]], length(target))
+
+  # It must actually contain the fold it claims to point at. A bare "the file
+  # exists" check would pass over any range at all -- the loophole the M69
+  # criteria audit flagged in the first draft of this criterion.
+  cited <- target[rng[[1]]:rng[[2]]]
+  expect_true(any(grepl("diag(wc) <- -rowSums(wc * sigma)", cited, fixed = TRUE)))
+
+  # And the cited range states the matrix the fold is exact at, so the
+  # "exactly as it is there" claim above the citation is checkable rather than
+  # decorative. Asserted over `cited` itself: a range that pointed at the bare
+  # three assignment lines would satisfy the fold check above while saying
+  # nothing about pricing, which is the whole content of D-037.
+  expect_true(any(grepl("unit diagonal", cited, fixed = TRUE)))
+
+  # The citing side names cov2cor too, so neither surface can drift back to the
+  # raw matrix with this comment still reading as true.
+  expect_true(any(grepl("cov2cor(Sigma-hat)", cite_src, fixed = TRUE)))
+})
