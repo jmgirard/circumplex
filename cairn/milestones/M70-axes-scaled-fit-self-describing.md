@@ -117,7 +117,7 @@ first Out clause rules out.
 - [x] **T2** — Write the `@return` text for the new fields, add the vignette
       sentence pointing at them beside the calibration table
       (`vignettes/axes-reliability.Rmd:189-202`), and add the paired doc guard.
-- [ ] **T3** — Read the four user-facing surfaces in full, add the lavaan
+- [x] **T3** — Read the four user-facing surfaces in full, add the lavaan
       variant naming and the cross-check warning to each that reports the
       scaled values, and commit the per-surface classification ledger.
 - [ ] **T4** — Add the `cfi.scaled`-versus-`cfi.robust` recomputation test on a
@@ -150,6 +150,8 @@ first Out clause rules out.
 - 2026-08-04 (T1): `details` gains `n_moments` and `baseline = c(chisq, df)`; tests capture THE fitted lavaan object through the `axes_converged()` seam rather than refitting, and probe on data where `n`/`n_total`/`n_complete` are pairwise distinct. Full suite FAIL 0, PASS 5749.
 
 - 2026-08-04 (T2): `@return` documents `n_moments`, `baseline`, and which of the three sample sizes `n` is; vignette gains the sentence pointing at both halves of `p*/N`. Doc guard verified by mutation — deleting the Rd clause and deleting the vignette pointer each reddened their own assertion (2 failures, restored).
+
+- 2026-08-04 (T3) per-surface ledger, all four read in full rather than grepped: **roxygen** `R/axes_reliability.R` @details scaling block — UPDATED, new paragraph naming the `*.scaled` correspondence and both failing cross-checks; **printed output** `R/axes_reliability_oop.R` — UPDATED at `axes_fit_scaled_note`, which `axes_cat_fit_note()` is the sole caller of and `print()` emits no fit statistic at all, so the one edit covers the whole printed surface; **vignette** `vignettes/axes-reliability.Rmd` — UPDATED after the scaling passage; **NEWS.md** — UPDATED, scaled-fit bullet gains the variant naming plus a new bullet for `n_moments`/`baseline`/`n`. Checked and classified NOT REPORTING these values: `NEWS.md:115-126` (`cpm_fit()`, different function, unscaled indices) and `NEWS.md:300-319` (`ssm_sem()` `dcfi`, different function and estimator). `man/axes_reliability.Rd` regenerated and verified to carry the wording (`chisq.scaled`/`cfi.robust` present at Rd:190).
 
 ## Decisions
 

@@ -713,6 +713,21 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' cannot be computed, all four are `NA` with the reason in
 #' `details$fit_scaling_failed` -- never the uncorrected value in their place.
 #'
+#' If you cross-check against lavaan, match the variant. The scaled `chisq`,
+#' `pvalue`, `rmsea` and `cfi` here are built with the definitions lavaan calls
+#' `chisq.scaled`, `pvalue.scaled`, `rmsea.scaled` and `cfi.scaled` -- the
+#' mean-adjusted Satorra-Bentler forms, `cfi` scaling its baseline term as well
+#' as its model term. They are **not** the `*.robust` forms (`cfi.robust`,
+#' `rmsea.robust`), which apply the Brosseau-Liard/Savalei adjustment and give
+#' different numbers from the same inputs. And because the model is estimated
+#' with plain maximum likelihood, the scaling being applied here rather than by
+#' lavaan, `fitMeasures()` on an equivalent fit reports the **uncorrected**
+#' values -- those in `details$fit_uncorrected` -- under the bare names `chisq`,
+#' `rmsea` and `cfi`. So a cross-check against either lavaan's bare `cfi` or its
+#' `cfi.robust` will disagree with `$fit$cfi`, and neither disagreement is a
+#' defect. `details$baseline` and `details$scaling_factor` carry what you need to
+#' rebuild the reported values yourself.
+#'
 #' # How well calibrated is the test, and at what sample size
 #'
 #' The scaling fixes the metric error, and the \eqn{\chi^2}{chi-squared} test

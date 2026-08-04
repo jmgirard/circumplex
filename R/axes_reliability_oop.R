@@ -112,7 +112,12 @@ axes_fit_scaled_note <- paste0(
   "  that metric (Satorra & Bentler, 1994), which removes a distortion that\n",
   "  flatters fit; df and srmr are unchanged. The scaled test can modestly\n",
   "  over-reject at typical sample sizes -- it over-flags misfit rather than\n",
-  "  flattering it; see ?axes_reliability for the measured rates."
+  "  flattering it; see ?axes_reliability for the measured rates.\n",
+  # Named here and not only in the help page because the cross-check a reader
+  # runs is prompted by seeing these four numbers, and both of the obvious
+  # comparisons -- lavaan's bare cfi and its cfi.robust -- disagree with them.
+  "  They follow lavaan's *.scaled definitions, not its *.robust ones, and\n",
+  "  differ from what fitMeasures() reports for an equivalent ML fit."
 )
 
 # The extra sentence the FIML path owes on top of the caveat above. Its SEs

@@ -179,6 +179,18 @@ than test statistics with a reference distribution. What the estimator reported
 before the scaling is kept in `details$fit_uncorrected`, and the factors
 themselves in `details$scaling_factor`.
 
+If you go looking for these numbers in lavaan, match the variant. They are
+built with the definitions lavaan calls `chisq.scaled`, `pvalue.scaled`,
+`rmsea.scaled` and `cfi.scaled` — the mean-adjusted Satorra–Bentler forms — and
+**not** the `*.robust` ones (`cfi.robust`, `rmsea.robust`), which apply a
+different (Brosseau-Liard/Savalei) adjustment and give different numbers.
+Because the model is estimated with plain ML and the scaling is applied by this
+package rather than by lavaan, `fitMeasures()` on an equivalent fit hands back
+the *uncorrected* values under the bare names `chisq`, `rmsea` and `cfi`. So
+both obvious cross-checks — against lavaan's bare `cfi` and against its
+`cfi.robust` — will disagree with `$fit$cfi`, and neither disagreement is a
+defect.
+
 Read the scaled statistic for what it is. The correction makes the test
 statistic match its reference distribution *in expectation*; it is a
 calibration, not an exactness guarantee, and it will not rescue a model that is

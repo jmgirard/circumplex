@@ -186,6 +186,21 @@ The scaled statistic matches its reference chi-square in \strong{mean}; it is no
 exact, and it does not make a badly misspecified model fit. If the factor
 cannot be computed, all four are \code{NA} with the reason in
 \code{details$fit_scaling_failed} -- never the uncorrected value in their place.
+
+If you cross-check against lavaan, match the variant. The scaled \code{chisq},
+\code{pvalue}, \code{rmsea} and \code{cfi} here are built with the definitions lavaan calls
+\code{chisq.scaled}, \code{pvalue.scaled}, \code{rmsea.scaled} and \code{cfi.scaled} -- the
+mean-adjusted Satorra-Bentler forms, \code{cfi} scaling its baseline term as well
+as its model term. They are \strong{not} the \verb{*.robust} forms (\code{cfi.robust},
+\code{rmsea.robust}), which apply the Brosseau-Liard/Savalei adjustment and give
+different numbers from the same inputs. And because the model is estimated
+with plain maximum likelihood, the scaling being applied here rather than by
+lavaan, \code{fitMeasures()} on an equivalent fit reports the \strong{uncorrected}
+values -- those in \code{details$fit_uncorrected} -- under the bare names \code{chisq},
+\code{rmsea} and \code{cfi}. So a cross-check against either lavaan's bare \code{cfi} or its
+\code{cfi.robust} will disagree with \verb{$fit$cfi}, and neither disagreement is a
+defect. \code{details$baseline} and \code{details$scaling_factor} carry what you need to
+rebuild the reported values yourself.
 }
 \section{How well calibrated is the test, and at what sample size}{
 The scaling fixes the metric error, and the \eqn{\chi^2}{chi-squared} test

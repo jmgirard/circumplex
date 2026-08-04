@@ -50,7 +50,20 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   exact, but at small samples relative to the item count it over-rejects: see
   `?axes_reliability` for the measured rates and the sample sizes they were
   measured at. Note the direction — the scaled test over-flags misfit, where
-  the uncorrected one flattered it.
+  the uncorrected one flattered it. These follow the definitions lavaan calls
+  `chisq.scaled`, `pvalue.scaled`, `rmsea.scaled` and `cfi.scaled`, not its
+  `*.robust` forms; since the fit itself is estimated with plain ML,
+  `fitMeasures()` on an equivalent fit reports the unscaled values, so a
+  cross-check against either lavaan's bare `cfi` or its `cfi.robust` will
+  differ.
+
+* `axes_reliability()` objects now report `details$n_moments`, the number of
+  distinct analyzed moments p\* = p(p+1)/2, and `details$baseline`, the
+  independence model's unscaled chi-square and degrees of freedom. Together
+  with `details$n` — documented now as the sample size the fit was priced at,
+  as distinct from `n_total` and `n_complete` — these let you locate a fit on
+  the calibration table in `vignette("axes-reliability")` and reproduce the
+  reported `cfi` without recomputing anything.
 
 * The displacement-interpretability guardrail in `print()` and `summary()`
   now uses a scale-free rule: a profile's displacement is certified as
