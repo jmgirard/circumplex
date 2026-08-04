@@ -94,7 +94,7 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
       discharged)`
 - [x] **T1** — Test-first: vech-space oracle at `cov2cor(Sigma-hat)`, confirmed
       RED against the shipped raw pricing before T3.
-- [ ] **T2** — Reprice: one realignment, two pricings — `naive` raw,
+- [x] **T2** — Reprice: one realignment, two pricings — `naive` raw,
       `corrected` and `fiml_ratio` at `cov2cor(Sigma-hat)`
       (`R/axes_corrected_se.R:156-158`); add RR15 B2's nonpositive-diagonal
       refusal before `cov2cor()` with the NA-together contract extended to
@@ -127,6 +127,10 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
 - 2026-08-03: RR15 B3, new measurement worth carrying: on a shipped-path 5% MCAR FIML fit the fitted diagonal ranges **0.9433-1.0723, sd 0.0303** — nowhere near a constant (N-1)/N, and the fact that makes the mixed ratio un-pinnable on the only path that uses it. Alongside M68's misspecification range of 0.951-1.026.
 
 - 2026-08-03: T1 done. Vech-space oracle appended at the END of `test-axes-corrected-se.R` (deviation D4: nothing may be inserted above BC3's anchors at `:67-69`/`:191-194`). Deliberately RED, as test-first requires: octant map 1.718e-3, blockwise/crossed map 1.731e-3, against the 1e-6 bar. The octant figure independently reproduces RR15's measured 1.7209e-3 on zeta1 by a route sharing no arithmetic with either the shipped code or the review's probe. The oracle's own three self-checks pass — `V %*% Gamma_S = I`, the Pearson-Filon `(1-rho^2)^2` diagonal of Gamma_R, and the Gamma_S sandwich collapsing exactly to the bread — so it is internally validated before it disagrees with anything. First blockwise draft used a contiguous layout; corrected to `axes_crossed_blocks()` per the M63 lesson before running.
+
+- 2026-08-03: T2 done. `axes_se_pricing()` extracted (matrix parameter kept named `sigma` per AC4's coupling note) and called twice — raw for `naive`, `cov2cor()` for `corrected` and the new `fiml_ratio`; RR15 B2's `nonpositive_diagonal` refusal added before `cov2cor()` runs, with the NA-together contract extended to all three vectors; `R/axes_reliability.R:1691` now consumes `fiml_ratio` instead of forming `corrected/naive`. Both AC2 oracle tests go green. AC6/BC1's enumeration run: `grep -rn "axes_corrected_se" R/` gives one production call site (`:1679`), which consumes `fiml_ratio`; the only remaining quotient in `R/` is the helper's own same-matrix `std$corrected / std$naive`.
+- 2026-08-03: minor amendment — T4's two literal re-pins were done ahead of T3, because the suite cannot reach green without them and T2's check-off needs it. `:203` 0.0042646 → 0.0042719; `:204` re-pinned onto `fiml_ratio` at 1.0022604 rather than the old `naive/corrected` 0.9978, since after M69 that quotient straddles two matrices and is not a meaningful quantity to fence (D-037). Task order otherwise unchanged.
+- 2026-08-03: full `devtools::test()` carries exactly three known failures, all fixture staleness, none a regression: `test-axes-corrected-se.R:401`/`:406` (the `m66-corrected-se-cells.rds` live-vs-stored arm, 0.01173 vs stored 0.01171 and 0.01184 vs 0.01182) and `:472` (the bootstrap fixture's `analytic` column, 0.01186 vs 0.01184; `NOT_CRAN` only). T4 regenerates the bootstrap fixture, T5 the cells fixture. The ingest audit predicted all five breakages and no others; all five occurred and nothing else did.
 
 ## Decisions
 

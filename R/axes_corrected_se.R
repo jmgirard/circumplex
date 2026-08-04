@@ -100,35 +100,54 @@ axes_se_derivs <- function(item_angle_deg, item_scale, item_block,
 # dimnames cannot be realigned and is refused rather than consumed in whatever
 # order it arrived.
 #
-# Returns a list: `naive` (what normal-theory covariance ML reports),
-# `corrected` (the correlation-structure value), and `reason` -- NULL when the
-# computation succeeded, or a string naming why both vectors are NA. The two
-# vectors are NA together and never fall back to each other: relabelling the
+# Returns a list of three named vectors plus `reason`. EACH IS PRICED AT A
+# STATED MATRIX, and which one is not cosmetic (M69, RR15):
+#
+#   `naive`      normal-theory covariance ML, at the RAW realigned Sigma-hat.
+#                Raw because this is the value that reproduces lavaan's own
+#                reported SE to 1e-7, the only independent tie between this
+#                derivative set and lavaan's implementation.
+#   `corrected`  the correlation-structure value, at `cov2cor(Sigma-hat)`.
+#   `fiml_ratio` `corrected` divided by the normal-theory SE, BOTH at
+#                `cov2cor(Sigma-hat)` -- the metric-only conversion the FIML
+#                path multiplies lavaan's observed-information SE by.
+#
+# Why the corrected side is normalized: the W_c fold below compresses the
+# standardization differential using `Sigma_ij` in place of `rho_ij`, which is
+# the same number ONLY when the diagonal is exactly 1. lavaan's
+# `sample.cov.rescale` leaves the fitted diagonal at (N-1)/N, and under
+# misspecification it is not even constant (measured 0.943-1.072 on a FIML fit,
+# RR15 B3). Evaluated off the unit diagonal the fold is not the derived quantity
+# at any scale -- decisively, scaling Sigma-hat by 2 scales the corrected SEs by
+# 1.538/2.009/2.114 where a coherent variance-metric quantity gives exactly 2.
+# RR13's own reproduction appendix derives both branches at the unit-diagonal
+# population matrix, so this is fidelity to that derivation, not merely
+# consistency with R/axes_scaled_fit.R (D-037).
+#
+# Why `fiml_ratio` is returned rather than composed at the call site: with only
+# `naive` and `corrected` exposed, the mixed-matrix ratio
+# `corrected$corrected / corrected$naive` is one plausible-looking expression
+# away at every future call site, and it INFLATES the reported FIML SE by
+# N/(N-1) -- 0.17% at n = 600, 1% at n = 100. Returning the ratio makes the
+# same-matrix invariant a property of this function, testable once.
+#
+# `reason` is NULL on success, or a string naming why all three vectors are NA.
+# They are NA together and never fall back to each other: relabelling the
 # uncorrected number as corrected is the one failure a user could not detect.
-axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
-                              item_block = NULL, n, fit_zeta1, fit_zeta2) {
-  if (is.null(rownames(sigma)) || is.null(colnames(sigma))) {
-    stop(
-      "`sigma` must carry dimnames so it can be realigned to the item map.",
-      call. = FALSE
-    )
-  }
-  sigma <- sigma[item_names, item_names, drop = FALSE]
-
-  d <- axes_se_derivs(item_angle_deg, item_scale, item_block,
-                      fit_zeta1, fit_zeta2)
-  na_out <- function(reason) {
-    empty <- stats::setNames(rep(NA_real_, d$n_comp), d$components)
-    warning(
-      "The corrected component standard errors could not be computed (",
-      reason, "); they are reported as NA.",
-      call. = FALSE
-    )
-    list(naive = empty, corrected = empty, reason = reason)
-  }
-
+# One pricing of the whole sandwich at one matrix. Called twice by
+# axes_corrected_se() -- once at the raw Sigma-hat, once at cov2cor(Sigma-hat)
+# -- because the two returned quantities are defined at different matrices and
+# the duplicated linear algebra is 24x24 with q ~ 28, i.e. free.
+#
+# The parameter is named `sigma` deliberately: R/axes_scaled_fit.R's Wc comment
+# cites the W_c fold below by line range and a guard asserts the citation still
+# lands on it, so renaming this would redden that guard for a reason unrelated
+# to what it guards.
+#
+# Returns a list of the two SE vectors, or a single string naming the failure.
+axes_se_pricing <- function(sigma, d, n) {
   si <- tryCatch(solve(sigma), error = function(e) NULL)
-  if (is.null(si) || !all(is.finite(si))) return(na_out("singular"))
+  if (is.null(si) || !all(is.finite(si))) return("singular")
 
   sim <- lapply(d$mats, function(m) si %*% m)
   q <- length(sim)
@@ -141,7 +160,7 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
     }
   }
   acov <- tryCatch(solve(info), error = function(e) NULL)
-  if (is.null(acov) || !all(is.finite(acov))) return(na_out("unidentified"))
+  if (is.null(acov) || !all(is.finite(acov))) return("unidentified")
 
   out <- vapply(seq_len(d$n_comp), function(r) {
     # W for component r: the derivative structure weighted by that component's
@@ -152,7 +171,8 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
     # W_c is W with the covariance->correlation Jacobian folded in: the sample
     # correlation's diagonal has ZERO sampling variance, and its off-diagonal
     # carries dr_ij = ds_ij - 0.5*rho_ij*(ds_ii + ds_jj). Off the diagonal W is
-    # unchanged; the diagonal absorbs the standardization.
+    # unchanged; the diagonal absorbs the standardization. The substitution of
+    # `sigma` for rho is exact only at a unit diagonal -- see the header.
     wc <- w
     diag(wc) <- 0
     diag(wc) <- -rowSums(wc * sigma)
@@ -175,11 +195,50 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # reaches here at all (its positive-definiteness gate refuses such input
   # first). Kept anyway: it is one comparison, it costs nothing, and a header
   # that states a contract the code does not enforce is worse than no contract.
-  if (!all(is.finite(out))) return(na_out("indefinite"))
+  if (!all(is.finite(out))) return("indefinite")
+
+  list(naive = out[1, ], corrected = out[2, ])
+}
+
+
+axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
+                              item_block = NULL, n, fit_zeta1, fit_zeta2) {
+  if (is.null(rownames(sigma)) || is.null(colnames(sigma))) {
+    stop(
+      "`sigma` must carry dimnames so it can be realigned to the item map.",
+      call. = FALSE
+    )
+  }
+  sigma <- sigma[item_names, item_names, drop = FALSE]
+
+  d <- axes_se_derivs(item_angle_deg, item_scale, item_block,
+                      fit_zeta1, fit_zeta2)
+  na_out <- function(reason) {
+    empty <- stats::setNames(rep(NA_real_, d$n_comp), d$components)
+    warning(
+      "The corrected component standard errors could not be computed (",
+      reason, "); they are reported as NA.",
+      call. = FALSE
+    )
+    list(naive = empty, corrected = empty, fiml_ratio = empty, reason = reason)
+  }
+
+  # Refused BEFORE cov2cor() runs, which is what makes this reachable at all:
+  # cov2cor() of a nonpositive diagonal returns NaN rows rather than erroring,
+  # so without this the failure would surface as "indefinite" or as raw NaN
+  # instead of as an honest refusal. The sibling surface has carried the same
+  # guard since M68 (R/axes_scaled_fit.R); this one did not (RR15 B2).
+  if (any(diag(sigma) <= 0)) return(na_out("nonpositive_diagonal"))
+
+  raw <- axes_se_pricing(sigma, d, n)
+  if (is.character(raw)) return(na_out(raw))
+  std <- axes_se_pricing(stats::cov2cor(sigma), d, n)
+  if (is.character(std)) return(na_out(std))
 
   list(
-    naive = stats::setNames(out[1, ], d$components),
-    corrected = stats::setNames(out[2, ], d$components),
+    naive = stats::setNames(raw$naive, d$components),
+    corrected = stats::setNames(std$corrected, d$components),
+    fiml_ratio = stats::setNames(std$corrected / std$naive, d$components),
     reason = NULL
   )
 }

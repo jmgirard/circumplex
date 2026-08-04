@@ -1685,10 +1685,17 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     # (RR13 BC4). Its observed-information SEs price the MISSING information
     # correctly -- they rise with the missingness rate, which is the job RR12
     # section 3 required of them -- and the complete-data formula above does
-    # not price it at all. Dividing by the metric ratio at Sigma-hat removes
-    # the correlation-as-covariance error while KEEPING that pricing; replacing
-    # the SE outright would silently discard it.
-    se_uncorrected * (corrected$corrected / corrected$naive)[names(se_uncorrected)]
+    # not price it at all. Multiplying by the metric ratio removes the
+    # correlation-as-covariance error while KEEPING that pricing; replacing the
+    # SE outright would silently discard it.
+    #
+    # `fiml_ratio` is taken from the helper rather than built here as
+    # `corrected/naive`. Those two are priced at DIFFERENT matrices by design
+    # (raw and cov2cor respectively), so their quotient is not the metric-only
+    # conversion this line needs -- it inflates the reported SE by N/(N-1),
+    # 0.17% at n = 600 and 1% at n = 100. D-037 supersedes RR13 BC4's
+    # "evaluated at Sigma-hat" for exactly this reason.
+    se_uncorrected * corrected$fiml_ratio[names(se_uncorrected)]
   } else {
     corrected$corrected[names(se_uncorrected)]
   }

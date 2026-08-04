@@ -200,8 +200,15 @@ test_that("BC1: the block-specificity component is corrected too (the K matrix)"
   # 0.01164 in the BC2 anchor test, so what this pins is that the two compose
   # for the block component as they do for the other three. Recorded as a
   # regression pin, not as an oracle.
-  expect_lt(abs(got$corrected[["zeta2"]] - 0.0042646), 2e-6)
-  expect_lt(abs(got$naive[["zeta2"]] / got$corrected[["zeta2"]] - 0.9978), 1e-3)
+  # Re-pinned at M69: both literals moved when the corrected branch was repriced
+  # at cov2cor(Sigma-hat). 0.0042646 -> 0.0042719 (gap 7.3e-6 against the 2e-6
+  # window), and the ratio 0.9978 -> 0.9961 (gap 1.7e-3 against 1e-3).
+  expect_lt(abs(got$corrected[["zeta2"]] - 0.0042719), 2e-6)
+  # The ratio pin now reads `fiml_ratio`, NOT naive/corrected. Those two are
+  # priced at different matrices by design after M69, so their quotient is not a
+  # meaningful quantity to pin -- it carries an N/(N-1) artifact (D-037).
+  # `fiml_ratio` is the same-matrix conversion the FIML path actually applies.
+  expect_lt(abs(got$fiml_ratio[["zeta2"]] - 1.0022604), 1e-4)
 
   # zeta2 reaches the reported table through the estimator, not just the helper.
   res <- axes_reliability(cormat = pop$sigma, items = items, angles = oct,
