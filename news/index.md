@@ -65,7 +65,24 @@ on a real ggplot2 coordinate system.
   [`?axes_reliability`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
   for the measured rates and the sample sizes they were measured at.
   Note the direction — the scaled test over-flags misfit, where the
-  uncorrected one flattered it.
+  uncorrected one flattered it. These follow the definitions lavaan
+  calls `chisq.scaled`, `pvalue.scaled`, `rmsea.scaled` and
+  `cfi.scaled`, not its `*.robust` forms. Since the fit itself is
+  estimated with plain ML, `fitMeasures()` on an equivalent fit reports
+  the unscaled values under the bare names and no `*.scaled` or
+  `*.robust` measure at all, so a cross-check against lavaan’s bare
+  `cfi` will differ and a request for `cfi.robust` will come back empty.
+
+- [`axes_reliability()`](http://circumplex.jmgirard.com/reference/axes_reliability.md)
+  objects now report `details$n_moments`, the number of distinct
+  analyzed moments p\* = p(p+1)/2, and `details$baseline`, the
+  independence model’s unscaled chi-square and degrees of freedom.
+  `details$n` is documented now as the sample size the fit was priced
+  at, as distinct from `n_total` and `n_complete`. Together `n_moments`
+  and `n` let you locate a fit on the calibration table in
+  [`vignette("axes-reliability")`](http://circumplex.jmgirard.com/articles/axes-reliability.md);
+  `baseline`, with `fit$chisq`, `fit$df` and the `baseline` element of
+  `details$scaling_factor`, lets you reproduce the reported `cfi`.
 
 - The displacement-interpretability guardrail in
   [`print()`](https://rdrr.io/r/base/print.html) and

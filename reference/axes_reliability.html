@@ -192,10 +192,27 @@ that correction succeeded or a string naming why the reported SEs are
 before the correlation-metric scaling, <code>scaling_factor</code>, the two
 Satorra-Bentler factors (<code>model</code> and <code>baseline</code>), and
 <code>fit_scaling_failed</code>, <code>NULL</code> when the scaling succeeded or a string naming
-why <code>chisq</code>, <code>pvalue</code>, <code>rmsea</code> and <code>cfi</code> are <code>NA</code>). <code>fit</code> carries <code>chisq</code>,
+why <code>chisq</code>, <code>pvalue</code>, <code>rmsea</code> and <code>cfi</code> are <code>NA</code>).
+<code>details</code> also carries <code>n_moments</code>, the number of distinct analyzed
+moments \(p^* = p(p+1)/2\), and <code>baseline</code>, the independence model's
+<strong>unscaled</strong> <code>chisq</code> and <code>df</code>. Those two, with <code>fit$chisq</code>, <code>fit$df</code> and
+the <code>baseline</code> element of <code>scaling_factor</code> – five inputs, since the
+baseline chi-square must be scaled by its own factor before it is used –
+reproduce the reported <code>cfi</code>. Note that <code>details$baseline</code> and the
+<code>baseline</code> element of <code>details$scaling_factor</code> are different quantities
+that share a name: the first is a chi-square and df pair, the second a
+scaling factor. <code>fit</code> carries <code>chisq</code>,
 <code>df</code>, <code>pvalue</code>, <code>rmsea</code>, <code>cfi</code> and <code>srmr</code>; the four chi-square-derived
 values are scaled and <code>df</code> and <code>srmr</code> are not.
-<code>n_complete</code> and <code>min_coverage</code> are
+Three sample sizes sit beside each other in <code>details</code> and are not
+interchangeable. <code>n</code> is the one the fit was priced at – the number of rows
+the estimator was actually handed, after listwise deletion or after
+dropping rows with no observed item, and the <code>n</code> you supplied on the
+correlation-matrix path. It is the N to divide <code>n_moments</code> by when locating
+a fit on the calibration table in
+<code><a href="../articles/axes-reliability.html">vignette("axes-reliability")</a></code>. <code>n_total</code> is the number of rows
+supplied before any of that, and <code>n_complete</code> the number answering every
+item. <code>n_complete</code> and <code>min_coverage</code> are
 present on every path so that a caller can read them unconditionally, and
 are <code>NA</code> where they carry no information: <code>min_coverage</code> outside
 <code>missing = "fiml"</code>, and both of them when a correlation matrix was supplied
@@ -268,6 +285,24 @@ non-normality on the covariance metric.</p>
 exact, and it does not make a badly misspecified model fit. If the factor
 cannot be computed, all four are <code>NA</code> with the reason in
 <code>details$fit_scaling_failed</code> – never the uncorrected value in their place.</p>
+<p>If you cross-check against lavaan, match the variant. The scaled <code>chisq</code>,
+<code>pvalue</code>, <code>rmsea</code> and <code>cfi</code> here are built with the definitions lavaan calls
+<code>chisq.scaled</code>, <code>pvalue.scaled</code>, <code>rmsea.scaled</code> and <code>cfi.scaled</code> – the
+mean-adjusted Satorra-Bentler forms, <code>cfi</code> scaling its baseline term as well
+as its model term. They are <strong>not</strong> the <code>*.robust</code> forms (<code>cfi.robust</code>,
+<code>rmsea.robust</code>), which apply the Brosseau-Liard/Savalei adjustment and give
+different numbers from the same inputs. And because the model is estimated
+with plain maximum likelihood, the scaling being applied here rather than by
+lavaan, <code>fitMeasures()</code> on an equivalent fit reports the <strong>uncorrected</strong>
+values – those in <code>details$fit_uncorrected</code> – under the bare names <code>chisq</code>,
+<code>pvalue</code>, <code>rmsea</code> and <code>cfi</code>. It reports no <code>*.scaled</code> or <code>*.robust</code> measure
+at all on such a fit: lavaan supplies those only for a genuinely scaled
+estimator such as <code>"MLM"</code> or <code>"MLR"</code>, and silently returns a shorter vector
+when asked for one it does not have. So a cross-check against lavaan's bare
+<code>cfi</code> will disagree with <code>$fit$cfi</code>, a request for <code>cfi.robust</code> will come
+back empty rather than disagreeing, and neither outcome is a defect.
+<code>details$baseline</code> and <code>details$scaling_factor</code> carry what you need to
+rebuild the reported values yourself.</p>
     </div>
     <div class="section level2">
     <h2 id="how-well-calibrated-is-the-test-and-at-what-sample-size">How well calibrated is the test, and at what sample size<a class="anchor" aria-label="anchor" href="#how-well-calibrated-is-the-test-and-at-what-sample-size"></a></h2>
@@ -541,6 +576,8 @@ analysis: Applications for developmental research</em> (pp. 399-419).</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   flatters fit; df and srmr are unchanged. The scaled test can modestly</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   over-reject at typical sample sizes -- it over-flags misfit rather than</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   flattering it; see ?axes_reliability for the measured rates.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   They follow lavaan's *.scaled definitions, not its *.robust ones, and</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   differ from what fitMeasures() reports for an equivalent ML fit.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># The same estimates from the item correlation matrix alone, as when</span></span></span>
 <span class="r-in"><span><span class="co"># reanalyzing a matrix published without its raw data.</span></span></span>

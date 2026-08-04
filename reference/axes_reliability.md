@@ -118,13 +118,30 @@ are `NA`, `fit_uncorrected`, the six fit statistics as lavaan reports
 them before the correlation-metric scaling, `scaling_factor`, the two
 Satorra-Bentler factors (`model` and `baseline`), and
 `fit_scaling_failed`, `NULL` when the scaling succeeded or a string
-naming why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`). `fit` carries
-`chisq`, `df`, `pvalue`, `rmsea`, `cfi` and `srmr`; the four
-chi-square-derived values are scaled and `df` and `srmr` are not.
-`n_complete` and `min_coverage` are present on every path so that a
-caller can read them unconditionally, and are `NA` where they carry no
-information: `min_coverage` outside `missing = "fiml"`, and both of them
-when a correlation matrix was supplied in place of raw data.
+naming why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`). `details`
+also carries `n_moments`, the number of distinct analyzed moments \\p^\*
+= p(p+1)/2\\, and `baseline`, the independence model's **unscaled**
+`chisq` and `df`. Those two, with `fit$chisq`, `fit$df` and the
+`baseline` element of `scaling_factor` – five inputs, since the baseline
+chi-square must be scaled by its own factor before it is used –
+reproduce the reported `cfi`. Note that `details$baseline` and the
+`baseline` element of `details$scaling_factor` are different quantities
+that share a name: the first is a chi-square and df pair, the second a
+scaling factor. `fit` carries `chisq`, `df`, `pvalue`, `rmsea`, `cfi`
+and `srmr`; the four chi-square-derived values are scaled and `df` and
+`srmr` are not. Three sample sizes sit beside each other in `details`
+and are not interchangeable. `n` is the one the fit was priced at – the
+number of rows the estimator was actually handed, after listwise
+deletion or after dropping rows with no observed item, and the `n` you
+supplied on the correlation-matrix path. It is the N to divide
+`n_moments` by when locating a fit on the calibration table in
+[`vignette("axes-reliability")`](http://circumplex.jmgirard.com/articles/axes-reliability.md).
+`n_total` is the number of rows supplied before any of that, and
+`n_complete` the number answering every item. `n_complete` and
+`min_coverage` are present on every path so that a caller can read them
+unconditionally, and are `NA` where they carry no information:
+`min_coverage` outside `missing = "fiml"`, and both of them when a
+correlation matrix was supplied in place of raw data.
 
 ## Details
 
@@ -204,6 +221,26 @@ not exact, and it does not make a badly misspecified model fit. If the
 factor cannot be computed, all four are `NA` with the reason in
 `details$fit_scaling_failed` – never the uncorrected value in their
 place.
+
+If you cross-check against lavaan, match the variant. The scaled
+`chisq`, `pvalue`, `rmsea` and `cfi` here are built with the definitions
+lavaan calls `chisq.scaled`, `pvalue.scaled`, `rmsea.scaled` and
+`cfi.scaled` – the mean-adjusted Satorra-Bentler forms, `cfi` scaling
+its baseline term as well as its model term. They are **not** the
+`*.robust` forms (`cfi.robust`, `rmsea.robust`), which apply the
+Brosseau-Liard/Savalei adjustment and give different numbers from the
+same inputs. And because the model is estimated with plain maximum
+likelihood, the scaling being applied here rather than by lavaan,
+`fitMeasures()` on an equivalent fit reports the **uncorrected** values
+– those in `details$fit_uncorrected` – under the bare names `chisq`,
+`pvalue`, `rmsea` and `cfi`. It reports no `*.scaled` or `*.robust`
+measure at all on such a fit: lavaan supplies those only for a genuinely
+scaled estimator such as `"MLM"` or `"MLR"`, and silently returns a
+shorter vector when asked for one it does not have. So a cross-check
+against lavaan's bare `cfi` will disagree with `$fit$cfi`, a request for
+`cfi.robust` will come back empty rather than disagreeing, and neither
+outcome is a defect. `details$baseline` and `details$scaling_factor`
+carry what you need to rebuild the reported values yourself.
 
 ## How well calibrated is the test, and at what sample size
 
@@ -507,6 +544,8 @@ summary(res)
 #>   flatters fit; df and srmr are unchanged. The scaled test can modestly
 #>   over-reject at typical sample sizes -- it over-flags misfit rather than
 #>   flattering it; see ?axes_reliability for the measured rates.
+#>   They follow lavaan's *.scaled definitions, not its *.robust ones, and
+#>   differ from what fitMeasures() reports for an equivalent ML fit.
 
 # The same estimates from the item correlation matrix alone, as when
 # reanalyzing a matrix published without its raw data.

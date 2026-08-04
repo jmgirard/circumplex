@@ -237,7 +237,9 @@ model’s global fit:</p>
 <span><span class="co">#&gt;   that metric (Satorra &amp; Bentler, 1994), which removes a distortion that</span></span>
 <span><span class="co">#&gt;   flatters fit; df and srmr are unchanged. The scaled test can modestly</span></span>
 <span><span class="co">#&gt;   over-reject at typical sample sizes -- it over-flags misfit rather than</span></span>
-<span><span class="co">#&gt;   flattering it; see ?axes_reliability for the measured rates.</span></span></code></pre></div>
+<span><span class="co">#&gt;   flattering it; see ?axes_reliability for the measured rates.</span></span>
+<span><span class="co">#&gt;   They follow lavaan's *.scaled definitions, not its *.robust ones, and</span></span>
+<span><span class="co">#&gt;   differ from what fitMeasures() reports for an equivalent ML fit.</span></span></code></pre></div>
 <p>The <strong>variance components</strong> show the decomposition the
 reliability rests on: the <code>axes</code> component is the only one
 that feeds reliability, while <code>general</code>,
@@ -349,6 +351,26 @@ count of restrictions and a residual summary rather than test statistics
 with a reference distribution. What the estimator reported before the
 scaling is kept in <code>details$fit_uncorrected</code>, and the factors
 themselves in <code>details$scaling_factor</code>.</p>
+<p>If you go looking for these numbers in lavaan, match the variant.
+They are built with the definitions lavaan calls
+<code>chisq.scaled</code>, <code>pvalue.scaled</code>,
+<code>rmsea.scaled</code> and <code>cfi.scaled</code> — the
+mean-adjusted Satorra–Bentler forms — and <strong>not</strong> the
+<code>*.robust</code> ones (<code>cfi.robust</code>,
+<code>rmsea.robust</code>), which apply a different
+(Brosseau-Liard/Savalei) adjustment and give different numbers. Because
+the model is estimated with plain ML and the scaling is applied by this
+package rather than by lavaan, <code>fitMeasures()</code> on an
+equivalent fit hands back the <em>uncorrected</em> values under the bare
+names <code>chisq</code>, <code>pvalue</code>, <code>rmsea</code> and
+<code>cfi</code> — and reports no <code>*.scaled</code> or
+<code>*.robust</code> measure at all, since lavaan supplies those only
+for a genuinely scaled estimator such as <code>"MLM"</code> or
+<code>"MLR"</code>, and quietly returns a shorter vector when asked for
+one it does not have. So a cross-check against lavaan’s bare
+<code>cfi</code> will disagree with <code>$fit$cfi</code>, a request for
+<code>cfi.robust</code> will come back empty rather than disagreeing,
+and neither outcome is a defect.</p>
 <p>Read the scaled statistic for what it is. The correction makes the
 test statistic match its reference distribution <em>in expectation</em>;
 it is a calibration, not an exactness guarantee, and it will not rescue
@@ -379,6 +401,13 @@ variance .35), the rejection rate at α = .05 runs</p>
 </table>
 <p>reaching the nominal band by a p*/N of about 0.06. That is a sweep at
 a single population, not a general threshold.</p>
+<p>You do not have to work out where your own fit sits on that row. The
+object reports both halves of the ratio: <code>details$n_moments</code>
+is p*, and <code>details$n</code> is the N the fit was priced at — on
+the raw-data paths the count of rows the estimator was actually handed,
+smaller than <code>details$n_total</code> wherever cases were dropped;
+on the correlation-matrix path the <code>n</code> you supplied. Divide
+the first by the second and read across.</p>
 <p>At <strong>N = 600</strong> the test <strong>over-rejects</strong> —
 measured .06 to .11 at three populations chosen to bracket the range of
 instruments the function accepts. The uncorrected statistic

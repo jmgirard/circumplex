@@ -157,6 +157,8 @@ summary(res)
 #>   flatters fit; df and srmr are unchanged. The scaled test can modestly
 #>   over-reject at typical sample sizes -- it over-flags misfit rather than
 #>   flattering it; see ?axes_reliability for the measured rates.
+#>   They follow lavaan's *.scaled definitions, not its *.robust ones, and
+#>   differ from what fitMeasures() reports for an equivalent ML fit.
 ```
 
 The **variance components** show the decomposition the reliability rests
@@ -270,6 +272,22 @@ than test statistics with a reference distribution. What the estimator
 reported before the scaling is kept in `details$fit_uncorrected`, and
 the factors themselves in `details$scaling_factor`.
 
+If you go looking for these numbers in lavaan, match the variant. They
+are built with the definitions lavaan calls `chisq.scaled`,
+`pvalue.scaled`, `rmsea.scaled` and `cfi.scaled` — the mean-adjusted
+Satorra–Bentler forms — and **not** the `*.robust` ones (`cfi.robust`,
+`rmsea.robust`), which apply a different (Brosseau-Liard/Savalei)
+adjustment and give different numbers. Because the model is estimated
+with plain ML and the scaling is applied by this package rather than by
+lavaan, `fitMeasures()` on an equivalent fit hands back the
+*uncorrected* values under the bare names `chisq`, `pvalue`, `rmsea` and
+`cfi` — and reports no `*.scaled` or `*.robust` measure at all, since
+lavaan supplies those only for a genuinely scaled estimator such as
+`"MLM"` or `"MLR"`, and quietly returns a shorter vector when asked for
+one it does not have. So a cross-check against lavaan’s bare `cfi` will
+disagree with `$fit$cfi`, a request for `cfi.robust` will come back
+empty rather than disagreeing, and neither outcome is a defect.
+
 Read the scaled statistic for what it is. The correction makes the test
 statistic match its reference distribution *in expectation*; it is a
 calibration, not an exactness guarantee, and it will not rescue a model
@@ -290,6 +308,14 @@ variance .35), the rejection rate at α = .05 runs
 
 reaching the nominal band by a p\*/N of about 0.06. That is a sweep at a
 single population, not a general threshold.
+
+You do not have to work out where your own fit sits on that row. The
+object reports both halves of the ratio: `details$n_moments` is p\*, and
+`details$n` is the N the fit was priced at — on the raw-data paths the
+count of rows the estimator was actually handed, smaller than
+`details$n_total` wherever cases were dropped; on the correlation-matrix
+path the `n` you supplied. Divide the first by the second and read
+across.
 
 At **N = 600** the test **over-rejects** — measured .06 to .11 at three
 populations chosen to bracket the range of instruments the function
