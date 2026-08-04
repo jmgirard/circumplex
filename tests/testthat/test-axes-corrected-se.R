@@ -906,3 +906,71 @@ test_that("AC2: the corrected branch matches the vech oracle at cov2cor, blockwi
 
   expect_lt(max(abs(unname(got$corrected) / want$corrected - 1)), 1e-6)
 })
+
+
+# ---- M69 / AC7 (BC2): invariance of the correlation-metric quantities --------
+#
+# `corrected` and `fiml_ratio` are priced at cov2cor(Sigma-hat), which is an
+# exact retraction onto unit-diagonal matrices, so both are invariant to
+# Sigma-hat -> D Sigma-hat D for ANY positive diagonal D. `naive` is priced at
+# the raw matrix and is homogeneous of degree 1, so it scales.
+#
+# Diagonal invariance rather than mere scalar invariance is the point (RR15 Q5):
+# a scalar-only pin stays GREEN under a "divide by the mean diagonal" or "divide
+# by (N-1)/N" pseudo-fix, and the fitted diagonal is not constant under
+# misspecification (0.943-1.072 measured on a FIML fit, RR15 B3). Diagonal
+# invariance is the property only cov2cor delivers.
+#
+# Deviation D1: the rescaled matrix carries its dimnames re-attached.
+# `D %*% S %*% D` drops them, and axes_corrected_se() refuses a dimnames-free
+# matrix by design (pinned at :104), so the literal BC2 recipe would error.
+
+test_that("AC7: corrected and fiml_ratio are invariant to diagonal rescaling", {
+  skip_if_not_installed("lavaan")
+  pp <- probe_pop()
+  fit <- axes_fit_cormat(pp$sigma, pp$items, pp$angles, n = 600)
+  sigma_hat <- lavaan::fitted(fit)$cov
+
+  se_at <- function(m) axes_corrected_se(
+    m, pp$names, pp$item_angle, pp$scale,
+    n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE
+  )
+  base <- se_at(sigma_hat)
+
+  set.seed(69L)
+  dv <- exp(stats::runif(nrow(sigma_hat), -0.3, 0.3))
+  rescale <- function(m, d) {
+    out <- diag(d) %*% m %*% diag(d)
+    dimnames(out) <- dimnames(m)          # D1: the bare product drops these
+    out
+  }
+  diag_rs <- se_at(rescale(sigma_hat, dv))
+  scalar_rs <- se_at(rescale(sigma_hat, rep(sqrt(2), nrow(sigma_hat))))
+
+  # 1e-6, derived in BC2: the superseded raw/mixed pricing violates these
+  # identities by O(1) factors (1.538-2.114 at scalar 2), six orders above;
+  # measured floating-point drift of the cov2cor path is 4.4e-16. Never
+  # bit-identity.
+  expect_lt(max(abs(diag_rs$corrected / base$corrected - 1)), 1e-6)
+  expect_lt(max(abs(diag_rs$fiml_ratio / base$fiml_ratio - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$corrected / base$corrected - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$fiml_ratio / base$fiml_ratio - 1)), 1e-6)
+
+  # The companion that stops the above from being the trivial consequence of
+  # normalizing EVERYTHING: naive is still priced at the raw matrix, so it
+  # scales by exactly the scalar. If a later edit normalized naive too, these
+  # invariances would still pass while the lavaan fence at :67-69 broke -- this
+  # says which matrix naive is on, from inside the same test.
+  # D = sqrt(2)*I, so the rescaled matrix is 2*Sigma-hat and naive scales by
+  # exactly 2 -- homogeneous of degree 1, matching RR15's measured 2.000000.
+  expect_lt(max(abs(scalar_rs$naive / base$naive - 2)), 1e-6)
+  expect_gt(max(abs(diag_rs$naive / base$naive - 1)), 1e-3)
+})
+
+
+# NOT YET WRITTEN: deviation D1's wiring assertion, that the reported FIML SE
+# equals se_uncorrected * fiml_ratio component-wise. It needs the FIML fit's own
+# Sigma-hat, which `details` does not expose; reconstructing the fit test-side
+# would build both sides of the comparison from the same code and catch nothing
+# common-mode (the M65 (j) trap). Carried on T4. Recorded here rather than
+# stubbed, because a stub that skips or asserts TRUE reads as coverage.
