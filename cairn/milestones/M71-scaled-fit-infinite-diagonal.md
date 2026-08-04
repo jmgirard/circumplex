@@ -1,11 +1,11 @@
 # M71: Refuse an infinite fitted diagonal in `axes_scaling_factor()`
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m71-scaled-fit-infinite-diagonal`
 
 ## Goal
 
@@ -105,6 +105,7 @@ helper's own contract boundary.
 - 2026-08-04: plan gate chose refusing positive infinity only, after the `<= 0` guard, over a `!is.finite()` guard ahead of it, because the latter relabels the `-Inf`, `NA` and `NaN` routes that are correct today; falsified by evidence that a caller needs one reason for every non-finite entry.
 - 2026-08-04: plan gate chose `"infinite_diagonal"` over reusing `"singular"` and over `"nonfinite_diagonal"`, because an infinite variance is not a singular matrix and a non-finite label would be false for the `NA`/`NaN` entries that keep reporting `"singular"`; falsified by a user or a downstream consumer needing the two infinite and missing cases to share one code.
 - 2026-08-04: plan gate chose leaving `axes_corrected_se()`'s label alone over relabelling both surfaces, because it already refuses and warns so no user is misled about a *result*, and relabelling reopens the cross-surface parity question M70 declined; falsified by a user reporting the `"unidentified"` label, or by any need for the two surfaces to agree.
+- 2026-08-04: T1 tests written and confirmed red before the fix — the `+Inf` case fails 4 assertions (`reason` NULL, `scale`/`baseline` returned as numbers), the `-Inf` control passes, showing it already takes the `<= 0` guard. T1 stays unticked until T2 turns it green, so no task is checked off against a red suite.
 
 ## Decisions
 
