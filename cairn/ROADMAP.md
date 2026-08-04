@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-03 (audit pass, replacing the M68 post-merge stamp; nothing changed since it. All checks PASS, nothing fixed, both GitHub inboxes empty. M7 stays `blocked` on the maintainer's unopened release window; its 47 `work-log format` WARNs are migration-era hard wraps in history and stay as-is.)_
+_Last hygiene check: 2026-08-03 (post-plan pass. Since the prior stamp: M69 and M70 planned and pushed, two candidate rows graduated, and a stale anchor plus a stale 0.3% magnitude corrected in place on the refactors row. All checks PASS, nothing fixed, both GitHub inboxes empty; the 47 `work-log format` WARNs remain M7's migration-era hard wraps in history.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
