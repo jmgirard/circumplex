@@ -1062,21 +1062,8 @@ test_that("AC10: a nonpositive diagonal is refused before cov2cor() runs", {
 
 
 test_that("AC10: every non-success return NAs all three vectors together", {
-  # BC5's enumeration procedure, run as a test rather than by eye: the
-  # na_out() calls are the function's only non-success RETURNS. Deviation D5
-  # records the two error exits that are outside this contract because they
-  # raise conditions instead of returning -- asserted here so "three na_out
-  # calls" cannot quietly become four unnoticed.
-  src <- readLines(test_path("..", "..", "R", "axes_corrected_se.R"))
-  reasons <- regmatches(src, regexpr('return\\("[a-z_]+"\\)', src))
-  reasons <- sub('return\\("', "", sub('"\\)', "", reasons))
-  expect_setequal(reasons, c("singular", "unidentified", "indefinite"))
-  # Plus the guard's own reason, which routes through na_out() directly.
-  expect_true(any(grepl('na_out("nonpositive_diagonal")', src, fixed = TRUE)))
-
-  # D5's two error exits, which are NOT part of the NA-together contract.
-  expect_true(any(grepl("must carry dimnames", src, fixed = TRUE)))
-
+  # Runtime half -- always runs, including under R CMD check. This is the
+  # load-bearing assertion; the source enumeration below is a completeness aid.
   pp <- probe_pop()
   sing <- pp$sigma
   sing[2L, ] <- sing[1L, ]
@@ -1088,4 +1075,28 @@ test_that("AC10: every non-success return NAs all three vectors together", {
   # The pre-M69 singular path must NA fiml_ratio too, not just its two elders.
   expect_true(all(is.na(got$fiml_ratio)))
   expect_named(got, c("naive", "corrected", "fiml_ratio", "reason"))
+})
+
+
+test_that("AC10: the na_out() calls are the only non-success returns (BC5 enumeration)", {
+  # BC5's enumeration procedure, run mechanically rather than by eye, so
+  # "three na_out calls" cannot quietly become four unnoticed.
+  #
+  # SKIPPED under R CMD check: an installed package carries no R/ sources, and
+  # reading them there errors rather than skipping -- the M7 trap, hit twice in
+  # this milestone (the sibling guard in test-axes-scaled-fit.R first, then
+  # this one, because fixing the first did not sweep for the second). Said
+  # plainly instead of left silent: this half runs in development only. The
+  # runtime half of the contract is asserted in the test above and always runs.
+  src_path <- test_path("..", "..", "R", "axes_corrected_se.R")
+  skip_if_not(file.exists(src_path), "package R/ sources absent (installed)")
+  src <- readLines(src_path)
+
+  reasons <- regmatches(src, regexpr('return\\("[a-z_]+"\\)', src))
+  reasons <- sub('return\\("', "", sub('"\\)', "", reasons))
+  expect_setequal(reasons, c("singular", "unidentified", "indefinite"))
+  # Plus the guard's own reason, which routes through na_out() directly.
+  expect_true(any(grepl('na_out("nonpositive_diagonal")', src, fixed = TRUE)))
+  # D5's error exit, which is NOT part of the NA-together contract.
+  expect_true(any(grepl("must carry dimnames", src, fixed = TRUE)))
 })
