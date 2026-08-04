@@ -1,6 +1,6 @@
 # M71: Refuse an infinite fitted diagonal in `axes_scaling_factor()`
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -93,7 +93,7 @@ helper's own contract boundary.
       (`:1871` gains `"nonpositive_diagonal"` and `"indefinite"`; `:1892` gains
       `"infinite_diagonal"`), and update the enumeration guard at
       `tests/testthat/test-axes-corrected-se.R:1181-1185` if it pins the set.
-- [ ] T5 — Full `devtools::test()` and `devtools::check(args = "--no-manual")`;
+- [x] T5 — Full `devtools::test()` and `devtools::check(args = "--no-manual")`;
       no roxygen change is expected (`man/axes_reliability.Rd:80` documents the
       field as "a string naming why", not an enumeration) — re-document only if
       that proves wrong.
@@ -109,6 +109,7 @@ helper's own contract boundary.
 - 2026-08-04: T2/T3 done — the guard `if (any(is.infinite(diag(sigma)))) return(na_out("infinite_diagonal"))` sits immediately after the `<= 0` line at `R/axes_scaled_fit.R:145`, so `-Inf` keeps its `"singular"` route and `NA`/`NaN` keep falling through (`is.infinite()` is FALSE on both, no `na.rm` needed). `test-axes-scaled-fit.R` green; mutation-verified by deleting the guard line (the same 4 assertions redden), restoring, and re-running green. The `:103-125` comment block is rewritten as a three-door table naming which entry each guard refuses, and no longer calls the `+Inf` case an open candidate — the phrase AC4 greps for is gone from the file.
 - 2026-08-04: T4 done — AC3's grep run over both helpers gives `axes_scaled_fit.R` = {df_mismatch, baseline_df_mismatch, singular, unidentified, indefinite, infinite_diagonal} and `axes_corrected_se.R` = {nonpositive_diagonal} direct plus {singular, unidentified, indefinite} forwarded from `axes_se_pricing()`. Both `details` comments now match: `:1871` gained the two literals it had been missing since M69, `:1892` gained `"infinite_diagonal"`, and each says it enumerates what the source CONTAINS rather than what a user has been shown (`"indefinite"` has never fired). The enumeration guard at `test-axes-corrected-se.R:1181-1185` needed no change — M71 adds no literal to the file it pins.
 - 2026-08-04: full `devtools::test()` green — FAIL 0 | WARN 4 | SKIP 0 | PASS 5788. The four warnings are pre-existing and not from this branch: `test-axes-scaled-fit.R` alone reports WARN 0 over 671 passes, and both new inputs return before `cov2cor()`, so neither can raise an uncaught warning.
+- 2026-08-04: T5 done — `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes (14m 25s, circumplex 2.0.0). No roxygen change was needed: `man/axes_reliability.Rd:80` documents the field as "a string naming why" and never enumerates the literals, so the corrected enumerations are code comments only. All tasks done; status in-progress→review.
 
 ## Decisions
 
