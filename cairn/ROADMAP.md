@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-04 (M70 post-merge. All checks PASS; M70 archived at 25 lines, live file deleted; terminal rows pruned 6 to 5 by dropping M65. One candidate row added: the `+Inf` hole in the same guard M70 made NA-safe. One lesson added, none retired — M70 shipped no guard that enforces an existing line.)_
+_Last hygiene check: 2026-08-04 (status pass, same day as the M70 post-merge check. All checks PASS, nothing changed; both GitHub inboxes empty; M7 stays blocked on Jeff's `submit_cran()` handoff. Only open judgment: M7's `Depends on` never gained M66–M70, all done, so the set resolves unchanged.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
