@@ -83,10 +83,27 @@ that correction succeeded or a string naming why the reported SEs are
 before the correlation-metric scaling, \code{scaling_factor}, the two
 Satorra-Bentler factors (\code{model} and \code{baseline}), and
 \code{fit_scaling_failed}, \code{NULL} when the scaling succeeded or a string naming
-why \code{chisq}, \code{pvalue}, \code{rmsea} and \code{cfi} are \code{NA}). \code{fit} carries \code{chisq},
+why \code{chisq}, \code{pvalue}, \code{rmsea} and \code{cfi} are \code{NA}).
+\code{details} also carries \code{n_moments}, the number of distinct analyzed
+moments \eqn{p^* = p(p+1)/2}, and \code{baseline}, the independence model's
+\strong{unscaled} \code{chisq} and \code{df}. Those two, with \code{fit$chisq}, \code{fit$df} and
+the \code{baseline} element of \code{scaling_factor} -- five inputs, since the
+baseline chi-square must be scaled by its own factor before it is used --
+reproduce the reported \code{cfi}. Note that \code{details$baseline} and the
+\code{baseline} element of \code{details$scaling_factor} are different quantities
+that share a name: the first is a chi-square and df pair, the second a
+scaling factor. \code{fit} carries \code{chisq},
 \code{df}, \code{pvalue}, \code{rmsea}, \code{cfi} and \code{srmr}; the four chi-square-derived
 values are scaled and \code{df} and \code{srmr} are not.
-\code{n_complete} and \code{min_coverage} are
+Three sample sizes sit beside each other in \code{details} and are not
+interchangeable. \code{n} is the one the fit was priced at -- the number of rows
+the estimator was actually handed, after listwise deletion or after
+dropping rows with no observed item, and the \code{n} you supplied on the
+correlation-matrix path. It is the N to divide \code{n_moments} by when locating
+a fit on the calibration table in
+\code{vignette("axes-reliability")}. \code{n_total} is the number of rows
+supplied before any of that, and \code{n_complete} the number answering every
+item. \code{n_complete} and \code{min_coverage} are
 present on every path so that a caller can read them unconditionally, and
 are \code{NA} where they carry no information: \code{min_coverage} outside
 \code{missing = "fiml"}, and both of them when a correlation matrix was supplied
@@ -175,6 +192,25 @@ The scaled statistic matches its reference chi-square in \strong{mean}; it is no
 exact, and it does not make a badly misspecified model fit. If the factor
 cannot be computed, all four are \code{NA} with the reason in
 \code{details$fit_scaling_failed} -- never the uncorrected value in their place.
+
+If you cross-check against lavaan, match the variant. The scaled \code{chisq},
+\code{pvalue}, \code{rmsea} and \code{cfi} here are built with the definitions lavaan calls
+\code{chisq.scaled}, \code{pvalue.scaled}, \code{rmsea.scaled} and \code{cfi.scaled} -- the
+mean-adjusted Satorra-Bentler forms, \code{cfi} scaling its baseline term as well
+as its model term. They are \strong{not} the \verb{*.robust} forms (\code{cfi.robust},
+\code{rmsea.robust}), which apply the Brosseau-Liard/Savalei adjustment and give
+different numbers from the same inputs. And because the model is estimated
+with plain maximum likelihood, the scaling being applied here rather than by
+lavaan, \code{fitMeasures()} on an equivalent fit reports the \strong{uncorrected}
+values -- those in \code{details$fit_uncorrected} -- under the bare names \code{chisq},
+\code{pvalue}, \code{rmsea} and \code{cfi}. It reports no \verb{*.scaled} or \verb{*.robust} measure
+at all on such a fit: lavaan supplies those only for a genuinely scaled
+estimator such as \code{"MLM"} or \code{"MLR"}, and silently returns a shorter vector
+when asked for one it does not have. So a cross-check against lavaan's bare
+\code{cfi} will disagree with \verb{$fit$cfi}, a request for \code{cfi.robust} will come
+back empty rather than disagreeing, and neither outcome is a defect.
+\code{details$baseline} and \code{details$scaling_factor} carry what you need to
+rebuild the reported values yourself.
 }
 \section{How well calibrated is the test, and at what sample size}{
 The scaling fixes the metric error, and the \eqn{\chi^2}{chi-squared} test

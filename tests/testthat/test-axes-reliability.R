@@ -2933,3 +2933,147 @@ test_that("M63 T9 (AC7): every documented surface names the block component", {
   out <- paste(utils::capture.output(summary(res)), collapse = "\n")
   expect_match(out, "block_specificity", fixed = TRUE)
 })
+
+
+# --- M70: a self-describing object -------------------------------------------
+#
+# `p*/N` indexes the calibration table the vignette documents, so both halves
+# have to be readable off the object without the user recomputing either.
+
+# THE fitted lavaan object axes_reliability() built, caught on its way through
+# the axes_converged() seam. Refitting an equivalent model instead would test
+# the refit's own row selection -- which is the very thing under test here,
+# since `n` is meant to be the N lavaan was actually handed.
+axes_capture_fit <- function(thunk) {
+  captured <- NULL
+  res <- testthat::with_mocked_bindings(
+    thunk(),
+    axes_converged = function(fit) {
+      captured <<- fit
+      isTRUE(lavaan::lavInspect(fit, "converged"))
+    }
+  )
+  list(
+    res = res,
+    ntotal = unname(lavaan::fitMeasures(captured, "ntotal")),
+    baseline = unname(lavaan::fitMeasures(captured, c("baseline.chisq",
+                                                      "baseline.df")))
+  )
+}
+
+test_that("AC1: details reports p* and the N the fit was priced at", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_valid_fixture(n = 1200L, k = 3L, seed = 70L)
+  p <- length(fx$names)
+  expect_identical(p, 24L)               # AC1's known-p fixture
+  pstar <- p * (p + 1) / 2               # 300
+
+  # Thirty rows missing entirely plus scattered item-level gaps, so that `n`,
+  # `n_total` and `n_complete` are three DIFFERENT numbers on both raw paths.
+  # Measured on the package's own example data all three are 500, and every
+  # assertion below would pass while reading the wrong field.
+  set.seed(70)
+  holed <- fx$data
+  holed[1:30, ] <- NA_real_
+  for (j in 1:6) holed[sample(31:nrow(holed), 40L), j] <- NA_real_
+
+  lw <- axes_capture_fit(function() {
+    suppressMessages(axes_reliability(holed, items = fx$items, angles = fx$oct))
+  })
+  expect_identical(lw$res$details$n_moments, pstar)
+  expect_equal(as.numeric(lw$res$details$n), lw$ntotal)
+  expect_lt(lw$res$details$n, lw$res$details$n_total)
+
+  fm <- axes_capture_fit(function() {
+    suppressMessages(axes_reliability(holed, items = fx$items, angles = fx$oct,
+                                      missing = "fiml"))
+  })
+  expect_identical(fm$res$details$n_moments, pstar)
+  expect_equal(as.numeric(fm$res$details$n), fm$ntotal)
+  expect_lt(fm$res$details$n, fm$res$details$n_total)
+  expect_lt(fm$res$details$n_complete, fm$res$details$n)
+  # The three N's are pairwise distinct on this fixture, which is what makes
+  # the equality above discriminating rather than coincidental.
+  expect_false(fm$res$details$n == lw$res$details$n)
+
+  cm <- axes_capture_fit(function() {
+    suppressMessages(axes_reliability(cormat = stats::cor(fx$data),
+                                      items = fx$items, angles = fx$oct,
+                                      n = 640L))
+  })
+  expect_identical(cm$res$details$n_moments, pstar)
+  expect_equal(as.numeric(cm$res$details$n), cm$ntotal)
+  expect_identical(cm$res$details$n, 640L)
+})
+
+test_that("AC1: details exposes the baseline chisq and df as one pair", {
+  skip_if_not_installed("lavaan")
+  fx <- axes_valid_fixture(n = 900L, k = 3L, seed = 71L)
+  got <- axes_capture_fit(function() {
+    suppressMessages(axes_reliability(fx$data, items = fx$items,
+                                      angles = fx$oct))
+  })
+  bl <- got$res$details$baseline
+  expect_named(bl, c("chisq", "df"))
+  expect_equal(unname(bl), got$baseline)
+  # The independence model frees p variances out of p*, leaving p(p-1)/2.
+  expect_identical(unname(bl[["df"]]), 24 * 23 / 2)
+})
+
+
+test_that("AC2: the Rd names both new fields and what they are for", {
+  rd_file <- test_path("..", "..", "man", "axes_reliability.Rd")
+  rd <- if (file.exists(rd_file)) {
+    paste(readLines(rd_file, warn = FALSE), collapse = " ")
+  } else {
+    paste(as.character(tools::Rd_db("circumplex")[["axes_reliability.Rd"]]),
+          collapse = "")
+  }
+  expect_gt(nchar(rd), 1000L)
+  rd <- gsub("\\s+", " ", rd)
+
+  # Each field name is pinned WITH a verb-carrying phrase of what it is. A bare
+  # name match would survive deleting the clause that explains the field, which
+  # is the only part a reader needs.
+  expect_match(rd, "\\code{n_moments}, the number of distinct analyzed moments",
+               fixed = TRUE)
+  expect_match(rd,
+               "\\code{baseline}, the independence model's \\strong{unscaled}",
+               fixed = TRUE)
+  # The five-input rebuild, pinned because stating only two of them is the
+  # defect the M70 review found in this very sentence.
+  expect_match(rd, "five inputs, since the baseline chi-square must be scaled",
+               fixed = TRUE)
+  # `n` was already shipped; what M70 adds is the sentence saying WHICH of the
+  # three sample sizes it is, without which naming it in the vignette is a
+  # pointer to an ambiguity.
+  expect_match(rd, "Three sample sizes sit beside each other", fixed = TRUE)
+  expect_match(rd, "\\code{n} is the one the fit was priced at", fixed = TRUE)
+})
+
+
+test_that("AC2: the vignette's calibration table and its object pointer travel together", {
+  # Under R CMD check the tests run from <pkg>.Rcheck/tests/testthat, where
+  # ../../vignettes does not exist -- so a bare skip_if_not(file.exists(...))
+  # here is satisfied to skip ALWAYS on the surface that matters most, and this
+  # guard would never have run on CRAN or CI. The installed copy under
+  # inst/doc is the fallback, exactly as the Rd guard above falls back to
+  # tools::Rd_db().
+  vig <- test_path("..", "..", "vignettes", "axes-reliability.Rmd")
+  if (!file.exists(vig)) {
+    vig <- system.file("doc", "axes-reliability.Rmd", package = "circumplex")
+  }
+  skip_if(!nzchar(vig) || !file.exists(vig),
+          "the vignette source is not readable from either location")
+  txt <- gsub("\\s+", " ", paste(readLines(vig, warn = FALSE), collapse = " "))
+  expect_gt(nchar(txt), 1000L)
+
+  has_table <- grepl("| p\\*/N | 0.50 | 0.25 | 0.12 | 0.06 |", txt, fixed = TRUE)
+  has_pointer <- grepl("`details$n_moments` is p\\*, and `details$n`", txt,
+                       fixed = TRUE)
+  # Paired on purpose. A calibration table with no way to locate your own fit
+  # on it is the state this milestone existed to end; a pointer to a table that
+  # has moved is worse. Removing either one alone reddens here.
+  expect_identical(has_table, has_pointer)
+  expect_true(has_table)
+})

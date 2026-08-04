@@ -713,6 +713,25 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' cannot be computed, all four are `NA` with the reason in
 #' `details$fit_scaling_failed` -- never the uncorrected value in their place.
 #'
+#' If you cross-check against lavaan, match the variant. The scaled `chisq`,
+#' `pvalue`, `rmsea` and `cfi` here are built with the definitions lavaan calls
+#' `chisq.scaled`, `pvalue.scaled`, `rmsea.scaled` and `cfi.scaled` -- the
+#' mean-adjusted Satorra-Bentler forms, `cfi` scaling its baseline term as well
+#' as its model term. They are **not** the `*.robust` forms (`cfi.robust`,
+#' `rmsea.robust`), which apply the Brosseau-Liard/Savalei adjustment and give
+#' different numbers from the same inputs. And because the model is estimated
+#' with plain maximum likelihood, the scaling being applied here rather than by
+#' lavaan, `fitMeasures()` on an equivalent fit reports the **uncorrected**
+#' values -- those in `details$fit_uncorrected` -- under the bare names `chisq`,
+#' `pvalue`, `rmsea` and `cfi`. It reports no `*.scaled` or `*.robust` measure
+#' at all on such a fit: lavaan supplies those only for a genuinely scaled
+#' estimator such as `"MLM"` or `"MLR"`, and silently returns a shorter vector
+#' when asked for one it does not have. So a cross-check against lavaan's bare
+#' `cfi` will disagree with `$fit$cfi`, a request for `cfi.robust` will come
+#' back empty rather than disagreeing, and neither outcome is a defect.
+#' `details$baseline` and `details$scaling_factor` carry what you need to
+#' rebuild the reported values yourself.
+#'
 #' # How well calibrated is the test, and at what sample size
 #'
 #' The scaling fixes the metric error, and the \eqn{\chi^2}{chi-squared} test
@@ -968,10 +987,27 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   before the correlation-metric scaling, `scaling_factor`, the two
 #'   Satorra-Bentler factors (`model` and `baseline`), and
 #'   `fit_scaling_failed`, `NULL` when the scaling succeeded or a string naming
-#'   why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`). `fit` carries `chisq`,
+#'   why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`).
+#'   `details` also carries `n_moments`, the number of distinct analyzed
+#'   moments \eqn{p^* = p(p+1)/2}, and `baseline`, the independence model's
+#'   **unscaled** `chisq` and `df`. Those two, with `fit$chisq`, `fit$df` and
+#'   the `baseline` element of `scaling_factor` -- five inputs, since the
+#'   baseline chi-square must be scaled by its own factor before it is used --
+#'   reproduce the reported `cfi`. Note that `details$baseline` and the
+#'   `baseline` element of `details$scaling_factor` are different quantities
+#'   that share a name: the first is a chi-square and df pair, the second a
+#'   scaling factor. `fit` carries `chisq`,
 #'   `df`, `pvalue`, `rmsea`, `cfi` and `srmr`; the four chi-square-derived
 #'   values are scaled and `df` and `srmr` are not.
-#'   `n_complete` and `min_coverage` are
+#'   Three sample sizes sit beside each other in `details` and are not
+#'   interchangeable. `n` is the one the fit was priced at -- the number of rows
+#'   the estimator was actually handed, after listwise deletion or after
+#'   dropping rows with no observed item, and the `n` you supplied on the
+#'   correlation-matrix path. It is the N to divide `n_moments` by when locating
+#'   a fit on the calibration table in
+#'   \code{vignette("axes-reliability")}. `n_total` is the number of rows
+#'   supplied before any of that, and `n_complete` the number answering every
+#'   item. `n_complete` and `min_coverage` are
 #'   present on every path so that a caller can read them unconditionally, and
 #'   are `NA` where they carry no information: `min_coverage` outside
 #'   `missing = "fiml"`, and both of them when a correlation matrix was supplied
@@ -1798,6 +1834,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
     fit = scaled$fit,
     details = list(
       n = n, n_total = n_total, n_items = p, n_scales = n_scales,
+      # The count of distinct analyzed moments, p* = p(p+1)/2 (M70). Reported
+      # rather than left to the caller because `p*/N` -- with `n` above as the
+      # N, the one lavaan was actually handed -- is what the calibration table
+      # in vignette("axes-reliability") is indexed by, and recomputing it off
+      # `n_items` invites reading `n_total` or `n_complete` as the denominator.
+      n_moments = p * (p + 1) / 2,
       angles = angles_deg, labels = map$labels, sd = sd,
       input = if (has_data) "data" else "cormat",
       # Read off the FITTED object rather than echoed from the argument, the
@@ -1833,6 +1875,15 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # reproducing a pre-M68 analysis, without the package offering a supported
       # way to ASK for the uncorrected statistic.
       fit_uncorrected = scaled$uncorrected,
+      # The independence model's chi-square and df (M70), in the grouped shape
+      # `scaling_factor` below uses. Rebuilding `cfi` takes five inputs -- these
+      # two, `fit$chisq`, `fit$df`, and `scaling_factor[["baseline"]]`, which
+      # scales the baseline chi-square before the excess is taken -- and these
+      # were the two a caller could not otherwise obtain without inverting the
+      # uncorrected value. Both are lavaan's own, UNSCALED:
+      # `axes_scale_fit_measures()` applies the `baseline` factor at the point
+      # of use, which is why the rebuild needs it separately.
+      baseline = c(chisq = fm[["baseline.chisq"]], df = fm[["baseline.df"]]),
       # The two Satorra-Bentler factors: `model` divides the fitted model's
       # chi-square, `baseline` the independence model's (which only CFI reads).
       # Both are NA together when the scaling failed.

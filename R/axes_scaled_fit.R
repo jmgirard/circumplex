@@ -100,7 +100,30 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   if (!isTRUE(p * (p - 1) / 2 == baseline_df)) {
     return(na_out("baseline_df_mismatch"))
   }
-  if (any(diag(sigma) <= 0)) return(na_out("singular"))
+  # `na.rm = TRUE` is load-bearing, not defensive. Without it a single NA or
+  # NaN on the fitted diagonal makes the predicate NA and `if (NA)` ERRORS with
+  # "missing value where TRUE/FALSE needed" -- in place of the named-reason NA
+  # this function's header promises, and which every other refusal here honors.
+  # With na.rm an NA or NaN entry falls THROUGH this guard, reaches cov2cor()
+  # on the next line (which warns about it in its own words), and is caught by
+  # the solve()/tryCatch/is.finite pair below as "singular". That is the route
+  # it should take: this guard exists for a diagonal that is finite but not
+  # positive, which cov2cor() would silently turn into NaN correlations, and
+  # `<= 0` still catches every such entry with na.rm in place.
+  #
+  # NA and NaN, deliberately, and not "non-finite" in general: a +Inf entry
+  # takes NEITHER door. It fails `<= 0`, and cov2cor() maps it to a zeroed
+  # row/column with a unit diagonal, which solve() inverts happily and
+  # is.finite() accepts -- so a factor is computed from a corrupted matrix.
+  # That hole predates this guard's na.rm fix and is not introduced by it; it
+  # is a ROADMAP candidate rather than a claim this comment gets to make.
+  #
+  # The sibling guard in axes_corrected_se() differs in its REASON STRING on
+  # the finite-nonpositive route only ("nonpositive_diagonal" where this one
+  # says "singular"): the two guards simply chose different literals. On the
+  # NA/NaN route the sibling also falls through and also refuses as
+  # "singular", so the two agree there.
+  if (any(diag(sigma) <= 0, na.rm = TRUE)) return(na_out("singular"))
   sigma <- stats::cov2cor(sigma)
 
   si <- tryCatch(solve(sigma), error = function(e) NULL)
