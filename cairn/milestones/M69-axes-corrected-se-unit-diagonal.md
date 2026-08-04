@@ -104,10 +104,10 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
       unrelated to what it guards.
 - [x] **T3** — Pin the invariances (diagonal and scalar at 1e-6), the
       raw-`naive` scaling companion, and D1's wiring assertion.
-- [ ] **T4** — Re-pin `:203`/`:204`, regenerate both fixtures with provenance
+- [x] **T4** — Re-pin `:203`/`:204`, regenerate both fixtures with provenance
       per AC1, re-measure the live FIML arm at `:256-298` (D2's evidence arm).
-- [ ] **T5** — Re-run M66's calibration at all three cells; regenerate it.
-- [ ] **T6** — Read the four prose surfaces in full, update every size,
+- [x] **T5** — Re-run M66's calibration at all three cells; regenerate it.
+- [x] **T6** — Read the four prose surfaces in full, update every size,
       direction or sign statement, commit the ledger, then run AC11's direction
       sweep within D3's domain.
 - [x] **T7** — Repair `R/axes_scaled_fit.R:135`; add AC4's parsed-range guard.
@@ -140,6 +140,10 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
 - 2026-08-03: T6 prose ledger, read for meaning across all four surfaces (AC3). UNCHANGED, each re-measured rather than assumed: `R/axes_reliability.R:675` "overstates ... by about 40%" (measured 43.9% after repricing, was ~44.0%, rounds the same way); `:677` "understates it slightly for weak-axes, strong-general instruments" (sign claim re-verified on a weak-axes probe, naive/corrected = 0.982 < 1, still below 1); `:680` "calibrated uncertainty, not order-of-magnitude guidance" and `:682` "typically smaller than ... Strack et al." (direction claims, unmoved); `R/axes_reliability_oop.R:92` printed note (carries no figure); `vignettes/axes-reliability.Rmd:155-167` (same three claims as the roxygen, same grounds); `NEWS.md:18-30` "overstated ... by 25-45%" (43.9% sits inside the stated band, and v2.0.0 is unreleased so that entry describes the net shipped result — M69 earns no new bullet, it refines a correction whose user-visible statement does not move). PENDING T5's re-run: `R/axes_reliability.R:812` mild-rate "between 1.4% and 1.8%" and `:817` "average about 7% below" at 15% MCAR, both derived from the calibration cells.
 - 2026-08-03: AC11 direction sweep run within D3's domain and clean. Seven hits in the branch diff: four state the artifact as inflation by N/(N-1) (`axes_corrected_se.R` header, `axes_reliability.R:1691`, the re-pin comment, the wiring assertion) and three refer to lavaan's fitted diagonal being (N-1)/N, which is a fact about `sample.cov.rescale` and not a claim about the artifact's direction. No occurrence of "shrink" anywhere in the diff. A second read-for-meaning pass over direction words carrying no literal — smaller/larger/too narrow/conservative/overstate/understate/flatter — returned nothing in the code diff. In the milestone's forward-looking sections the only hit is AC11's own negated mention, excluded by D3 clause (iii).
 - 2026-08-03: **1/fiml_ratio at the octant probe measures 1.441229 against RR13's published 1.441229** — six-decimal agreement with the constant the shipped both-raw pricing missed at 1.44034. RR15 §4 predicted the restoration; this confirms it on the running code, and is the third independent line of evidence for the repricing after the vech oracle and the bootstrap.
+
+- 2026-08-03: T5 done, T4 and T6 closed with it. `m66-corrected-se-cells.rds` regenerated at 201 replicates per cell, 7 workers, 93.4 min, provenance R 4.6.1 / lavaan 0.6.21. Calibration re-measured under the new pricing: complete 0.9584 -> 0.9598, 15% MCAR 0.9255 -> 0.9267, M1 MAR 1.0152 -> 1.0156, every cell inside its band ([0.90, 1.10] and [0.85, 1.15]). Two moved marginally toward 1 and one marginally away; all three deltas are ~0.1% against the comparison's own ~3.6% Monte-Carlo error, so this is NOT evidence that calibration improved — stated that way deliberately, because the tempting reading is unsupported at this replicate count.
+- 2026-08-03: T6's two pending figures resolved, both **unchanged, because the re-run rounds the same way** (AC3's own escape clause, earned rather than assumed). `R/axes_reliability.R:817` "average about 7% below" measures 7.33% against the previous 7.45%. `:811-813` "0.1%, 0.8%, and 1.8%" at 2/5/10% MCAR are computed as `mean(fiml.se / M66_POP_RATIO) / sd(fiml.xi1)` from the STORED uncorrected `fiml.se` and the population constant 1.4412 — neither of which M69 touches, and M69 restored `1/fiml_ratio` to exactly 1.441229, so that constant is now more exactly right than it was. The published 0.96 / 0.93 / 1.02 all still round from the re-measured values. No prose edit was required on any of the four surfaces; the ledger's "unchanged" entries are now measured rather than projected.
+- 2026-08-03: full `devtools::test()` green, no failures, with the regenerated fixture. All five breakages the ingest audit predicted are closed.
 
 ## Decisions
 
