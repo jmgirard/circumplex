@@ -47,8 +47,12 @@ first Out clause rules out.
       distinguishing it from the `n_total` and `n_complete` beside it. Evidence:
       a test asserts `n_moments == p * (p + 1) / 2` for a fit of known p = 24,
       and that `details$n` equals `lavaan::fitMeasures(fit, "ntotal")` on the
-      cormat, listwise and FIML paths — each probed on data where those three
-      N's differ, so the assertion cannot pass by coincidence.
+      cormat, listwise and FIML paths. The listwise and FIML probes run on data
+      where `n`, `n_total` and `n_complete` all differ, so neither assertion can
+      pass by coincidence. The cormat path admits no such probe — `n_total` is
+      set equal to `n` and `n_complete` is `NA` by construction there — so its
+      assertion establishes only that the supplied `n` reaches lavaan
+      unchanged, which is all that path has to prove.
 - [x] **AC2** — The `@return` text for `details` names both new fields and says
       what they are for, and the vignette's calibration passage tells the reader
       where to read `p*/N` off the object. Evidence: a doc guard reads
@@ -161,6 +165,8 @@ first Out clause rules out.
 
 - 2026-08-04 (review): three-lens fan-out returned 19 findings, 6 actioned at >= 80 and all fixed on the branch; none met the return floor. The AC2 doc guard reddened on my own fix to the sentence it pins, which is the guard working. `devtools::check()` re-run after the fixes: 0/0/0.
 
+- 2026-08-04: amendment return: AC1 — "The listwise and FIML probes run on data where `n`, `n_total` and `n_complete` all differ, so neither assertion can pass by coincidence. The cormat path admits no such probe — `n_total` is set equal to `n` and `n_complete` is `NA` by construction there — so its assertion establishes only that the supplied `n` reaches lavaan unchanged, which is all that path has to prove." Raised as review finding F16 (scored 72); the prior wording required "each" of three paths to be probed on data where the three N's differ, which is unsatisfiable on cormat. First amendment return on this milestone.
+
 ## Decisions
 
 ## Review
@@ -172,8 +178,10 @@ verified from recall.
   was priced at" passes 16 assertions, 0 skipped: `n_moments == 300` for the
   p = 24 fixture on all three input paths, and `details$n` equals the captured
   fit's `fitMeasures(fit, "ntotal")` on each. The probe's three N's are pairwise
-  distinct (listwise 398, FIML 488, `n_total` 500), so the equality is
-  discriminating. The paired test "AC1: details exposes the baseline chisq and
+  distinct on the two raw-data probes (listwise n 398, FIML n 488, `n_total`
+  500), so those two equalities are discriminating; the cormat probe asserts
+  only that the supplied `n = 640` reaches lavaan unchanged, per AC1 as
+  amended at the review gate. The paired test "AC1: details exposes the baseline chisq and
   df as one pair" passes 3 assertions: names `c("chisq", "df")`, values equal to
   lavaan's `baseline.chisq`/`baseline.df`, and `df == p(p-1)/2 == 276`.
 - **AC2** — "AC2: the Rd names both new fields and what they are for" passes 5
