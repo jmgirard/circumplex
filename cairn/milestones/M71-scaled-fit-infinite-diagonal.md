@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m71-scaled-fit-infinite-diagonal`
+- **Branch/PR:** `m71-scaled-fit-infinite-diagonal` · https://github.com/jmgirard/circumplex/pull/97
 
 ## Goal
 
