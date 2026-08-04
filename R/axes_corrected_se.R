@@ -172,7 +172,8 @@ axes_se_pricing <- function(sigma, d, n) {
     # correlation's diagonal has ZERO sampling variance, and its off-diagonal
     # carries dr_ij = ds_ij - 0.5*rho_ij*(ds_ii + ds_jj). Off the diagonal W is
     # unchanged; the diagonal absorbs the standardization. The substitution of
-    # `sigma` for rho is exact only at a unit diagonal -- see the header.
+    # `sigma` for rho is exact only at a unit diagonal, so `corrected` and
+    # `fiml_ratio` are priced at cov2cor(Sigma-hat) while `naive` is priced raw.
     wc <- w
     diag(wc) <- 0
     diag(wc) <- -rowSums(wc * sigma)
@@ -228,7 +229,18 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # so without this the failure would surface as "indefinite" or as raw NaN
   # instead of as an honest refusal. The sibling surface has carried the same
   # guard since M68 (R/axes_scaled_fit.R); this one did not (RR15 B2).
-  if (any(diag(sigma) <= 0)) return(na_out("nonpositive_diagonal"))
+  #
+  # `na.rm = TRUE` is load-bearing, not defensive. Without it a single NA or
+  # NaN on the diagonal makes the predicate NA and `if (NA)` ERRORS, which
+  # breaks the NA-together contract on an input the pre-M69 code handled: it
+  # fell through to solve() -> tryCatch -> na_out("singular"). With na.rm the
+  # same input takes that same route again, and the NaN never reaches cov2cor()
+  # because this function returns before it. `<= 0` still catches every
+  # genuinely nonpositive variance. (M69 review round 1, F1 -- the `is.finite`
+  # family recurring: M32, M35, M60.)
+  if (any(diag(sigma) <= 0, na.rm = TRUE)) {
+    return(na_out("nonpositive_diagonal"))
+  }
 
   raw <- axes_se_pricing(sigma, d, n)
   if (is.character(raw)) return(na_out(raw))

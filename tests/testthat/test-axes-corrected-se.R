@@ -39,10 +39,24 @@ test_that("BC2: the corrected covariance reproduces RR13's deterministic anchors
   expect_lt(abs(got$corrected[["xi1"]] - 0.01164), 2e-4)
 
   # corrected/uncorrected per component, BC2's (1/1.441, 1/1.067, 1/0.997).
-  ratio <- got$corrected / got$naive
-  expect_lt(abs(ratio[["xi1"]] - 1 / 1.441), 0.01)
-  expect_lt(abs(ratio[["xi2"]] - 1 / 1.067), 0.01)
-  expect_lt(abs(ratio[["zeta1"]] - 1 / 0.997), 0.01)
+  #
+  # Read off `fiml_ratio`, NOT `corrected / naive`. RR13's published constants
+  # are UNIT-DIAGONAL quantities (its reproduction appendix derives both sides
+  # at the population matrix P with diag(P) = 1), so `fiml_ratio` -- both sides
+  # at cov2cor(Sigma-hat) -- is the quantity they describe. After M69
+  # `corrected` and `naive` are priced at different matrices, so their quotient
+  # carries the N/(N-1) artifact and is not what RR13 anchored (M69 review
+  # round 1, F16, found independently by two lenses).
+  #
+  # The tolerance tightens from 0.01 to 0.001 in the same move. At 0.01 this
+  # assertion could not tell the two quantities apart at all: the mixed
+  # quotient sits 0.00185 from RR13's constants and `fiml_ratio` sits 0.00029,
+  # both inside a 0.01 window. 0.001 fences the mixed alternative while keeping
+  # ~3x headroom on the value actually asserted.
+  ratio <- got$fiml_ratio
+  expect_lt(abs(ratio[["xi1"]] - 1 / 1.441), 0.001)
+  expect_lt(abs(ratio[["xi2"]] - 1 / 1.067), 0.001)
+  expect_lt(abs(ratio[["zeta1"]] - 1 / 0.997), 0.001)
 })
 
 
@@ -968,6 +982,48 @@ test_that("AC7: corrected and fiml_ratio are invariant to diagonal rescaling", {
 })
 
 
+test_that("AC7: the same invariance holds on the zeta2 (blockwise) probe", {
+  skip_if_not_installed("lavaan")
+  # Deviation D1 reads "the probe fits" as the octant probe PLUS the zeta2
+  # probe. The test above covers only the first, leaving the block-specificity
+  # component -- whose literals this milestone re-pinned -- unchecked for
+  # invariance (M69 review round 1, F13).
+  oct <- octants()
+  blk <- axes_crossed_blocks(8L, 3L)
+  pop <- axes_population_cor(oct, 3L, xi1 = .35, xi2 = .10, zeta1 = .08,
+                             zeta2 = .05, item_block = blk)
+  nm <- sprintf("item_%02d", seq_len(nrow(pop$sigma)))
+  dimnames(pop$sigma) <- list(nm, nm)
+  ia <- rep(as.numeric(oct), each = 3L)
+  fit <- axes_fit_cormat(pop$sigma, unname(split(nm, pop$scale)), oct,
+                         n = 600, item_block = blk)
+  sigma_hat <- lavaan::fitted(fit)$cov
+
+  se_at <- function(m) axes_corrected_se(
+    m, nm, ia, pop$scale, item_block = blk,
+    n = 600, fit_zeta1 = TRUE, fit_zeta2 = TRUE
+  )
+  base <- se_at(sigma_hat)
+
+  set.seed(70L)
+  dv <- exp(stats::runif(nrow(sigma_hat), -0.3, 0.3))
+  rescale <- function(m, d) {
+    out <- diag(d) %*% m %*% diag(d)
+    dimnames(out) <- dimnames(m)
+    out
+  }
+  diag_rs <- se_at(rescale(sigma_hat, dv))
+  scalar_rs <- se_at(rescale(sigma_hat, rep(sqrt(2), nrow(sigma_hat))))
+
+  expect_true("zeta2" %in% names(base$corrected))
+  expect_lt(max(abs(diag_rs$corrected / base$corrected - 1)), 1e-6)
+  expect_lt(max(abs(diag_rs$fiml_ratio / base$fiml_ratio - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$corrected / base$corrected - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$fiml_ratio / base$fiml_ratio - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$naive / base$naive - 2)), 1e-6)
+})
+
+
 test_that("AC7: the reported FIML SE is se_uncorrected times fiml_ratio", {
   skip_if_not_installed("lavaan")
   # Deviation D1's wiring assertion. After D2 this is the PRIMARY evidence that
@@ -1048,6 +1104,31 @@ test_that("AC10: a nonpositive diagonal is refused before cov2cor() runs", {
   # than as this honest refusal (RR15 B2, the M62 doctrine).
   expect_false(any(is.nan(got$fiml_ratio)))
   expect_false(any(is.nan(got$corrected)))
+
+  # A non-finite diagonal must NOT take this door, and must not error. The
+  # predicate is NA-safe precisely so this input keeps the route it had before
+  # M69: solve() -> tryCatch -> na_out("singular"). Written as a regression
+  # test because M69 shipped the erroring version to review (round 1, F1).
+  na_diag <- pp$sigma
+  na_diag[1L, 1L] <- NA_real_
+  expect_warning(
+    gna <- axes_corrected_se(na_diag, pp$names, pp$item_angle, pp$scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
+    "could not be computed"
+  )
+  expect_identical(gna$reason, "singular")
+  expect_true(all(is.na(gna$naive)))
+  expect_true(all(is.na(gna$corrected)))
+  expect_true(all(is.na(gna$fiml_ratio)))
+
+  nan_diag <- pp$sigma
+  nan_diag[2L, 2L] <- NaN
+  expect_warning(
+    gnan <- axes_corrected_se(nan_diag, pp$names, pp$item_angle, pp$scale,
+                              n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
+    "could not be computed"
+  )
+  expect_identical(gnan$reason, "singular")
 
   # A negative diagonal takes the same door.
   bad2 <- pp$sigma

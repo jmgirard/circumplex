@@ -1123,14 +1123,15 @@ test_that("AC4: axes_scaled_fit's Wc citation still lands on the Wc fold", {
   cited <- target[rng[[1]]:rng[[2]]]
   expect_true(any(grepl("diag(wc) <- -rowSums(wc * sigma)", cited, fixed = TRUE)))
 
-  # And the cited range states the matrix the fold is exact at, so the
-  # "exactly as it is there" claim above the citation is checkable rather than
-  # decorative. Asserted over `cited` itself: a range that pointed at the bare
-  # three assignment lines would satisfy the fold check above while saying
-  # nothing about pricing, which is the whole content of D-037.
-  expect_true(any(grepl("unit diagonal", cited, fixed = TRUE)))
-
-  # The citing side names cov2cor too, so neither surface can drift back to the
-  # raw matrix with this comment still reading as true.
-  expect_true(any(grepl("cov2cor(Sigma-hat)", cite_src, fixed = TRUE)))
+  # AC4 requires the cited range to state EACH SIDE's pricing. Both assertions
+  # are made over `cited` — the parsed range — and never over the citing file
+  # at large: an earlier draft checked "cov2cor(Sigma-hat)" anywhere in
+  # axes_scaled_fit.R, which its own prose satisfied, so the guard passed
+  # without the cited range saying anything about pricing at all (M69 review
+  # round 1, F21).
+  cited_txt <- paste(cited, collapse = " ")
+  expect_true(grepl("unit diagonal", cited_txt, fixed = TRUE))
+  expect_true(grepl("cov2cor(Sigma-hat)", cited_txt, fixed = TRUE))
+  expect_true(grepl("naive", cited_txt, fixed = TRUE) &&
+                grepl("raw", cited_txt, fixed = TRUE))
 })
