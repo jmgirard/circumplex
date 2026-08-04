@@ -1,6 +1,6 @@
 # M69: Correlation-metric pricing for `axes_reliability()`'s corrected component SEs
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR15
@@ -27,7 +27,7 @@ raw — the only independent tie of the derivative set to lavaan.
 
 ## Acceptance criteria
 
-- [x] **AC1** — Every assertion or fixture whose value moves is enumerated in
+- [ ] **AC1** — Every assertion or fixture whose value moves is enumerated in
       this file with old value, new value, and re-pinned-or-regenerated — at
       minimum `test-axes-corrected-se.R:203`, `:204` (RR15 §7: *will* redden),
       the live-vs-stored arm over `fixtures/m66-corrected-se-cells.rds`, and
@@ -48,14 +48,14 @@ raw — the only independent tie of the derivative set to lavaan.
       and bare sign claims), each listed with old and new wording or
       "unchanged, rounds the same way", and framed per RR15 B4 as a coherence
       fix rather than a material recalibration.
-- [x] **AC4** — `R/axes_scaled_fit.R`'s Wc comment cites a range of
+- [ ] **AC4** — `R/axes_scaled_fit.R`'s Wc comment cites a range of
       `R/axes_corrected_se.R` spanning at most 15 lines containing the
       diagonal-fold assignment, and states each side's pricing; a test parses
       the cited range and asserts both, so a later edit reddens.
 - [x] **AC5** — The profile's `verify` slot is clean: `document()`, `test()`,
       and `check()` before review.
 - [x] **AC6 (BC1)** — `axes_corrected_se()` returns `naive` priced at the raw realigned Sigma-hat, `corrected` priced at `stats::cov2cor()` of that matrix, and a per-component `fiml_ratio` equal to the corrected SE divided by the normal-theory SE **both evaluated at `cov2cor(Sigma-hat)`**; the FIML composition in `R/axes_reliability.R` consumes `fiml_ratio`, and no code in `R/` forms a ratio of `corrected` to `naive`. Enumeration procedure for that universal: `grep -rn "axes_corrected_se" R/` lists every call site (one at review time); each hit and its surrounding function is inspected for ratio formation.
-- [x] **AC7 (BC2)** — On the probe fits of `test-axes-corrected-se.R`, for a seeded random positive diagonal D (entries in [exp(-0.3), exp(0.3)]) and the scalar 2: `corrected` and `fiml_ratio` computed from `D %*% Sigma-hat %*% D` and from `2 * Sigma-hat` each equal their values at Sigma-hat within 1e-6, and `naive` at `2 * Sigma-hat` equals 2 times `naive` at Sigma-hat within 1e-6. Tolerance derivation: the superseded raw/mixed pricing violates these identities by O(1) factors (measured 1.538-2.114 at scalar 2), ≥6 orders above the tolerance; the measured floating-point drift of the cov2cor path is 4.4e-16 and the repository's worst observed instrumentation drift is 1.3e-8, ≥2 orders below. No bit-identity assertions.
+- [ ] **AC7 (BC2)** — On the probe fits of `test-axes-corrected-se.R`, for a seeded random positive diagonal D (entries in [exp(-0.3), exp(0.3)]) and the scalar 2: `corrected` and `fiml_ratio` computed from `D %*% Sigma-hat %*% D` and from `2 * Sigma-hat` each equal their values at Sigma-hat within 1e-6, and `naive` at `2 * Sigma-hat` equals 2 times `naive` at Sigma-hat within 1e-6. Tolerance derivation: the superseded raw/mixed pricing violates these identities by O(1) factors (measured 1.538-2.114 at scalar 2), ≥6 orders above the tolerance; the measured floating-point drift of the cov2cor path is 4.4e-16 and the repository's worst observed instrumentation drift is 1.3e-8, ≥2 orders below. No bit-identity assertions.
 - [x] **AC8 (BC3)** — `tests/testthat/test-axes-corrected-se.R` lines 67-69 and 191-194 pass with their assertion lines unedited: `naive` reproduces lavaan's own component SEs within 1e-7 absolute.
 - [x] **AC9 (BC4')** — The FIML path's corrected SE is the observed-information SE multiplied by the per-parameter ratio of correlation-metric SE to normal-theory SE, **both evaluated at the implied correlation matrix `cov2cor(Sigma-hat)` of that fit**. Against the committed 200-replicate fixture at 2, 5, and 10% MCAR, mean corrected FIML SE(xi1) / empirical SD ∈ [0.90, 1.10] in every cell, re-run under the new pricing. Numeric projection: the reported FIML SE moves by less than 1% relative to the shipped value in every cell (measured -0.062% on the cormat probe's xi1; the 1% bound allows the FIML diagonal profile, sd 0.030), so the band's verdict cannot flip — but the re-run, not the projection, is the evidence.
 - [x] **AC10 (BC5)** — With any nonpositive diagonal entry in the realigned Sigma-hat, `naive`, `corrected`, and `fiml_ratio` are all NA under one named `reason`, refused **before** `cov2cor()` executes; and in every failure return of the function the three vectors are NA together with no fallback. Enumeration procedure: the `na_out()` calls in `axes_corrected_se()` are the function's only non-success returns; list and check each.
@@ -148,6 +148,8 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
 - 2026-08-03: two source-reading guards written this milestone would have FAILED CRAN, both caught by `devtools::check()` rather than by the suite. `test_path("..", "..", "R", ...)` resolves to nothing in an installed package and `readLines()` errors there rather than skipping — the M7 "a step that doesn't run reports success" trap, in its louder form. Hit twice: the AC4 citation guard first, then the AC10 enumeration written minutes earlier, because fixing the first instance did not sweep for its siblings (the M56/M62/M63 directional-sweep failure, recurring). The sweep that should have come first — `grep -rn 'test_path("..", "..", "R"' tests/testthat/` — finds exactly three sites; all three are now `skip_if_not(file.exists(...))` guarded with the limitation stated in the test rather than left silent. AC10's runtime half was split out so it always runs, including on CRAN; only the source enumeration skips.
 - 2026-08-03: T5-T8 complete, all eight tasks done. `devtools::check(args = "--no-manual")` **Status: OK, 0 errors / 0 warnings / 0 notes**; full `devtools::test()` green. `--no-manual` skips nothing this branch could break: the diff changes zero roxygen (`#'`) lines and touches no `man/` file, checked rather than assumed (the M7/M57 lesson). Status in-progress -> review.
 
+- 2026-08-04: **review round 1 returned to in-progress.** Failed: AC1 (F16 — the `corrected/naive` pin at `test-axes-corrected-se.R:42-45` moved +0.105-0.172% and is absent from the ledger; F20 — regenerated fixtures carry no M69 provenance marker), AC4 (F21 — the guard checks the citing file rather than the parsed cited range, and the range never states `naive` is priced raw), AC7 (F13 — D1's zeta2 probe is never invariance-checked). Plus F1 at 92, a regression this branch introduced: an NA diagonal now errors where `origin/master` returned `reason = "singular"`. Defect-return count for M69: 1.
+
 ## Decisions
 
 - **2026-08-03 (RR15 Q1) — M69's premise is affirmed, on stronger ground than the plan had.** The Wc fold's compression `Sigma_ij = rho_ij` holds only at a unit diagonal, so the raw evaluation is not the derived formula at any scale — measured by non-homogeneity: scaling Sigma-hat by 2 scales the corrected SEs by 1.538/2.009/2.114 where any coherent variance-metric quantity gives exactly 2. RR13's own reproduction appendix derives both branches at the unit-diagonal population matrix, so the shipped raw pricing was plug-in drift from RR13's derivation, not a choice RR13 made. M68-D2 is affirmed on the same ground.
@@ -189,3 +191,19 @@ One review-side measurement error, recorded because it nearly became a finding: 
 ### Consistency gate
 
 `cairn_validate` all checks pass (48 advisories, none a failure; 47 are M7's migration-era work-log wraps). `document()` no diff; `pkgdown::check_pkgdown()` no problems; README.md in sync; no new top-level files. `NEWS.md` deliberately untouched: the existing entry describes the net shipped behaviour, its stated 25-45% band still contains the re-measured 43.9%, and no released version ever carried the superseded pricing. No DESIGN.md principle changed, so `cairn_impact` does not apply.
+
+### Review round 1 — RETURNED to in-progress (2026-08-04)
+
+Three lenses plus a Sonnet scorer. 23 candidate findings; **3 actioned (>= 80)**, 20 logged below threshold.
+
+**Actioned:**
+
+- **F16 (93) — a stale mixed-matrix ratio pin, found independently by two lenses.** `tests/testthat/test-axes-corrected-se.R:42-45` still forms `ratio <- got$corrected / got$naive` and pins it to RR13's constants, one screen above `:207-210` which states that exactly this quotient "is not a meaningful quantity to pin" after M69. Measured: the quantity moved +0.105% / +0.162% / +0.172% and survives only because its 0.01 tolerance is ~5x the shift. Against `fiml_ratio` — which is what RR13's unit-diagonal constants actually describe — the gap would be 0.00029 rather than 0.00185. **Fails AC1**, whose universal covers every assertion whose value moves.
+- **F1 (92) — a regression this branch introduced.** `R/axes_corrected_se.R:231`: `any(diag(sigma) <= 0)` is `NA` when a diagonal entry is `NA`, so `if (NA)` raises "missing value where TRUE/FALSE needed". Verified against both trees: this branch errors, `origin/master` returned `reason = "singular"`. The `!is.finite()` lesson recurring (M32/M35/M60). AC10's letter survives — deviation D5 put error exits outside the NA-together contract — so this returns on the >= 90 limb, not on a criterion failure.
+- **F21 (80) — the AC4 guard does not enforce AC4.** It checks `"cov2cor(Sigma-hat)"` against the whole citing file, satisfied by prose the same commit added, rather than against the parsed cited range; and the cited range `:172-178` never states that `naive` is priced raw. **Fails AC4.**
+
+**Below threshold but bearing on ticked criteria, so their criteria are unticked too:** F13 (78) — D1 reads "the probe fits" as the octant probe plus the zeta2 probe at `:180`, and the AC7 invariance test exercises only the first, so zeta2 is never invariance-checked (**AC7**). F20 (70) — both regenerated fixtures still record `source = "M66, RR13 BC3/BC5"` with no M69 marker or regeneration date (**AC1**).
+
+**Logged, not actioned** (18): F9 (70) the oracle's third self-check is tautological given the `V %*% Gs = I` assert, and its comment claims otherwise; F10 (68) "the two routes share no arithmetic" is false, both build Delta from `axes_se_derivs()`; F5 (68) `fiml_ratio` is an unguarded quotient; F17 (68) the D2 evidence arm sits 0.0461 against a 0.05 bound, unrecorded; F7 (65) the 60-line header now sits above the helper and `axes_corrected_se()` has none; F14 (62) the AC10 enumeration test does not enumerate `na_out(` calls its title promises; F11 (55) the artifact stated as exactly N/(N-1) on the FIML path where the diagonal is not constant; F4 (50) sibling surfaces give different reason strings for the same predicate; F8 (45) two return contracts in one comment block; F19 (42) T6's justification uses the cormat constant for FIML-path figures; F12 (35) `fiml_ratio` has no independent-oracle fence though the oracle computes both sides; F22 (32) the bootstrap corroboration is one deterministic direction, not three confirmations; F2 (30) `reason` no longer says which pricing failed; F15 (28) an underived tolerance at `:211`; F18 (25) a pre-existing stale comment; F6 (20) RR15 endorsed the non-model-implied pricing; F3 (12) pre-existing; F23 (10) the intentional rewire.
+
+**Clean per all three lenses:** no regression of prior milestones' intent; both fixtures kept every column and provenance field; `naive` arithmetically identical to the pre-split value; AC6's enumeration holds; no generated file touched; the AC11 direction sweep clean; `1/fiml_ratio` = 1.441229 confirmed independently.
