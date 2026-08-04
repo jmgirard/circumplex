@@ -1,6 +1,6 @@
 # M69: Correlation-metric pricing for `axes_reliability()`'s corrected component SEs
 
-- **Status:** planned
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -121,6 +121,7 @@ reproduce lavaan's number and is fenced against it.
 - 2026-08-03: created by /milestone-plan.
 - 2026-08-03: criteria audit ([O], fresh context, authored none of the drafts) returned findings on all six drafted criteria. Fixed in the wording before this file was written: an unreproducible "about 3e-3" discrimination figure (measured live at 1.05e-3 on the governing component); an AC1 whose "unedited" framing hid four assertions and fixtures that actually break; and a bounded-promise failure whose grep-for-literals procedure provably misses "about 40%", "about 7% below" and a bare sign claim on shipped surfaces. Not fixed here: the FIML ratio's mixed-matrix (N-1)/N artifact, escalated at the gate and now AC4/T1.
 - 2026-08-03: plan gate chose escalating the FIML ratio pricing to a Fable review over settling it in session as same-matrix pricing via a third return value, because it changes an exported number by a sample-size-dependent factor and is estimator math where a plausible-but-wrong answer survives ordinary review; falsified by an RR resting only on evidence this session already held.
+- 2026-08-03: blocked on RB15 (metric pricing of the corrected component SEs and the FIML ratio), which T1 escalates and AC4 is verified against.
 - 2026-08-03: plan gate chose re-running all three calibration cells over re-running the two fast cells and arguing the M1 MAR cell unchanged, because the figures are documented user-facing claims; falsified by a measured demonstration that the repricing is exactly scale-only in that cell.
 
 ## Decisions
