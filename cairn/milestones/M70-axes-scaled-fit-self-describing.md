@@ -123,7 +123,7 @@ first Out clause rules out.
 - [x] **T4** — Add the `cfi.scaled`-versus-`cfi.robust` recomputation test on a
       misfitting probe, with the arithmetic written out and any lavaan internal
       reached only via `get()`.
-- [ ] **T5** — Change the guard at `R/axes_scaled_fit.R:103` to
+- [x] **T5** — Change the guard at `R/axes_scaled_fit.R:103` to
       `any(diag(sigma) <= 0, na.rm = TRUE)` and write a load-bearing comment
       for *this* site rather than carrying the sibling's: here the NA/NaN
       matrix does reach `cov2cor()`, and is caught downstream by the
@@ -154,6 +154,8 @@ first Out clause rules out.
 - 2026-08-04 (T3) per-surface ledger, all four read in full rather than grepped: **roxygen** `R/axes_reliability.R` @details scaling block — UPDATED, new paragraph naming the `*.scaled` correspondence and both failing cross-checks; **printed output** `R/axes_reliability_oop.R` — UPDATED at `axes_fit_scaled_note`, which `axes_cat_fit_note()` is the sole caller of and `print()` emits no fit statistic at all, so the one edit covers the whole printed surface; **vignette** `vignettes/axes-reliability.Rmd` — UPDATED after the scaling passage; **NEWS.md** — UPDATED, scaled-fit bullet gains the variant naming plus a new bullet for `n_moments`/`baseline`/`n`. Checked and classified NOT REPORTING these values: `NEWS.md:115-126` (`cpm_fit()`, different function, unscaled indices) and `NEWS.md:300-319` (`ssm_sem()` `dcfi`, different function and estimator). `man/axes_reliability.Rd` regenerated and verified to carry the wording (`chisq.scaled`/`cfi.robust` present at Rd:190).
 
 - 2026-08-04 (T4): recomputation test rebuilds `$fit$cfi` from `details` alone on a perturbed octant probe (both excesses strictly positive, c = 0.9562 vs c_b = 0.8653). Reported value matches the `cfi.scaled` definition to 1e-10 and the `cfi.robust` definition applied to the same inputs differs by 3.5e-3 — four orders above the tolerance, so the test discriminates the two rather than merely tolerating both. lavaan's unexported `lav_fit_cfi()` corroborates via `get()` and was callable here. Full suite FAIL 0, PASS 5763.
+
+- 2026-08-04 (T5): guard made NA-safe. Test written first and confirmed red with the exact reported error, "missing value where TRUE/FALSE needed". Comment authored for this site rather than carried from the sibling (here the non-finite entry falls THROUGH to `cov2cor()` and is caught by the `solve()`/`is.finite` pair, the opposite of the sibling's route); no numbered sibling citation written, so the citation-rot guard at `test-axes-scaled-fit.R:1108` still counts exactly 1. Both warnings on the NA/NaN route are asserted rather than one left escaping as a test warning. Full suite FAIL 0, PASS 5777.
 
 ## Decisions
 

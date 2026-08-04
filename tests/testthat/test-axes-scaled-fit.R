@@ -1198,3 +1198,56 @@ test_that("AC4: the reported cfi IS the cfi.scaled definition, not cfi.robust", 
           "lavaan::lav_fit_cfi is not callable with these arguments")
   expect_equal(res$fit$cfi, unname(ref), tolerance = 1e-10)
 })
+
+
+# ---- M70 AC5: the nonpositive-diagonal guard is NA-safe ---------------------
+
+test_that("AC5: a non-finite fitted diagonal refuses cleanly instead of erroring", {
+  # Deliberately no skip_if_not_installed("lavaan"): unlike the rest of this
+  # file, nothing here fits a model. `df` and `baseline_df` are computed from
+  # the map so the guards above line 103 pass, and the diagonal check is
+  # reached with no estimator involved.
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  df <- p * (p + 1) / 2 - length(
+    axes_se_derivs(pp$item_angle, pp$scale, NULL, TRUE, FALSE)$mats
+  )
+  baseline_df <- p * (p - 1) / 2
+
+  call_it <- function(sigma) {
+    axes_scaling_factor(sigma, pp$names, pp$item_angle, pp$scale,
+                        fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+                        df = df, baseline_df = baseline_df)
+  }
+
+  # An NA and a NaN entry each used to error out of `if (NA)` with "missing
+  # value where TRUE/FALSE needed", instead of the named-reason NA this
+  # function's own header promises. With the predicate NA-safe they fall
+  # through to cov2cor() and are caught by the solve()/is.finite pair below it
+  # -- which is why the reason is "singular" and not "nonpositive_diagonal".
+  # Two warnings arrive on these paths, R's own cov2cor() non-finite-diagonal
+  # warning first and this function's refusal second; the refusal is the one
+  # asserted, and the first is expected rather than suppressed.
+  for (bad_value in list(NA_real_, NaN)) {
+    sig <- pp$sigma
+    sig[2L, 2L] <- bad_value
+    w <- testthat::capture_warnings(got <- call_it(sig))
+    # Both are asserted rather than one asserted and one left to escape as a
+    # test warning: cov2cor()'s arrival is a fact about the route this input
+    # takes, and the route is what the fix changed.
+    expect_true(any(grepl("could not be computed", w, fixed = TRUE)))
+    expect_true(any(grepl("diag", w, fixed = TRUE)))
+    expect_identical(got$reason, "singular")
+    expect_identical(got$scale, NA_real_)
+    expect_identical(got$baseline, NA_real_)
+  }
+
+  # The unchanged control: a zero variance still takes the guard's own door, so
+  # the fix rejects nothing it did not reject before.
+  sig0 <- pp$sigma
+  sig0[3L, 3L] <- 0
+  expect_warning(got0 <- call_it(sig0), "could not be computed")
+  expect_identical(got0$reason, "singular")
+  expect_identical(got0$scale, NA_real_)
+  expect_identical(got0$baseline, NA_real_)
+})
