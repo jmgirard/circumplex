@@ -1168,3 +1168,40 @@ released version ever carries the 4% caveat.
 at Σ̂ or RR13 §4's saturated observed-information acov delta-transformed. M68 T4
 carries it as an (RB tripwire: no-oracle) open question, and AC4's simulation is
 its only oracle. Source: RR13 B-1 (Fable, 2026-07-27); M68 plan gate.
+
+### D-037 (2026-08-03): `axes_reliability()`'s FIML metric ratio is evaluated at `cov2cor(Σ̂)` — supersedes RR13 BC4's "evaluated at Σ̂" (M69, RR15)
+
+**Context:** M66 shipped `axes_corrected_se()` pricing both its `naive` and
+`corrected` branches at lavaan's raw `fitted(fit)$cov`, whose diagonal is
+`(N−1)/N` rather than 1 (lavaan's `sample.cov.rescale`). M68-D2 had independently
+chosen `cov2cor(Σ̂)` for the sibling scaled-fit surface. RR15 established that the
+corrected branch's Jacobian fold compresses to `Σ_ij = ρ_ij` only at a unit
+diagonal, so the raw evaluation is not the derived formula at any scale —
+measured by non-homogeneity: scaling Σ̂ by 2 scales the corrected SEs by
+1.538/2.009/2.114 where a coherent variance-metric quantity gives exactly 2.
+RR13's own reproduction appendix derives both branches at the unit-diagonal
+population matrix, so the shipped raw pricing was plug-in drift from RR13's
+derivation, not a choice RR13 made.
+
+**Decision:** The FIML path's corrected SE is the observed-information SE
+multiplied by the per-parameter ratio of correlation-metric SE to normal-theory
+SE, **both evaluated at `cov2cor(Σ̂)`** — superseding RR13 BC4's operative phrase
+"the same per-parameter ratio evaluated at Σ̂", which no longer describes the
+computation. The ratio is returned by `axes_corrected_se()` as `fiml_ratio`
+rather than composed at the call site, so the same-matrix invariant is a property
+of the helper. `naive` stays priced at the raw Σ̂: it is the only independent tie
+of the derivative set to lavaan's own implementation, fenced at 1e-7.
+
+**Consequences:** Reported component SEs move by ~0.1–0.2% at n = 600, growing
+like 1/N — a coherence fix, not a material recalibration (RR15 B4). BC4's
+missing-information rationale survives untouched: that pricing lives entirely in
+the `se_uncorrected` factor. Same-matrix pricing *restores* agreement with RR13's
+published constant 1.441229 (1/0.6938522 = 1.44124, against the shipped both-raw
+1.44034). M68-D2 is affirmed on the same ground rather than merely left standing.
+A mixed-matrix ratio was rejected: it inflates the reported FIML SE by N/(N−1)
+(measured 1.0016694), is un-pinnable on the FIML path where the fitted diagonal
+ranges 0.943–1.072, and would regress against the shipped both-raw ratio's
+6.2e-4 fidelity. `sample.cov.rescale = FALSE` as a root-cause fix is refused
+here (RR15 rec 8): it changes every shipped point estimate and would not obviate
+`cov2cor()`, since the fitted diagonal departs from 1 under misspecification
+regardless. Source: RR15 (Fable, 2026-08-03); M69 ingest gate.
