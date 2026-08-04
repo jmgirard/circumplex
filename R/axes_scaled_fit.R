@@ -111,19 +111,38 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # positive, which cov2cor() would silently turn into NaN correlations, and
   # `<= 0` still catches every such entry with na.rm in place.
   #
-  # NA and NaN, deliberately, and not "non-finite" in general: a +Inf entry
-  # takes NEITHER door. It fails `<= 0`, and cov2cor() maps it to a zeroed
-  # row/column with a unit diagonal, which solve() inverts happily and
-  # is.finite() accepts -- so a factor is computed from a corrupted matrix.
-  # That hole predates this guard's na.rm fix and is not introduced by it; it
-  # is a ROADMAP candidate rather than a claim this comment gets to make.
+  # NA and NaN, deliberately, and not "non-finite" in general. The three
+  # non-finite entries take three different doors here, and the ORDER of the
+  # two guards below is what keeps them apart:
+  #
+  #   -Inf   caught by `<= 0`, which is true of it        -> "singular"
+  #   NA/NaN falls through both (na.rm above, and is.infinite() is FALSE on
+  #          both), reaches cov2cor(), and is caught by the solve()/is.finite
+  #          pair below                                   -> "singular"
+  #   +Inf   fails `<= 0`, so the second guard is the only thing that refuses
+  #          it                                           -> "infinite_diagonal"
+  #
+  # +Inf needs its own guard because it is the one entry cov2cor() launders
+  # rather than propagates: it maps that row/column to zeros with a unit
+  # diagonal, which solve() inverts happily and is.finite() accepts, so before
+  # M71 a factor was computed from a corrupted matrix and returned with reason
+  # NULL (measured 0.9579017 at the M70 review) -- an uncorrected-from-corrupted
+  # number in a field documented as corrected, the one failure a user could not
+  # detect. Testing `!is.finite()` here instead, or ahead of the `<= 0` guard,
+  # would refuse the same input but silently relabel the -Inf and NA/NaN routes
+  # above, which are correct as they stand; tests pin all three.
   #
   # The sibling guard in axes_corrected_se() differs in its REASON STRING on
   # the finite-nonpositive route only ("nonpositive_diagonal" where this one
   # says "singular"): the two guards simply chose different literals. On the
   # NA/NaN route the sibling also falls through and also refuses as
-  # "singular", so the two agree there.
+  # "singular", so the two agree there. On +Inf the sibling refuses too, as
+  # "unidentified": it prices the raw sigma before normalizing, so the zeroed
+  # row makes its information matrix rank-deficient. It computes no wrong
+  # number, which is why its label was left alone; the relabel is tracked
+  # separately rather than made here.
   if (any(diag(sigma) <= 0, na.rm = TRUE)) return(na_out("singular"))
+  if (any(is.infinite(diag(sigma)))) return(na_out("infinite_diagonal"))
   sigma <- stats::cov2cor(sigma)
 
   si <- tryCatch(solve(sigma), error = function(e) NULL)

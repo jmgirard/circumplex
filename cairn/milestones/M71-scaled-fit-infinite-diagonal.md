@@ -77,17 +77,17 @@ helper's own contract boundary.
 
 ## Tasks
 
-- [ ] T1 — Tests first, in `tests/testthat/test-axes-scaled-fit.R` beside the
+- [x] T1 — Tests first, in `tests/testthat/test-axes-scaled-fit.R` beside the
       existing diagonal cases at `:1229-1254`: a `+Inf` case expecting
       `"infinite_diagonal"` (fails against current code — it returns
       `reason = NULL`), and a `-Inf` case expecting `"singular"` (passes today;
       it is the route the fix must not disturb, and no test covers it).
-- [ ] T2 — Add the guard immediately *after* the `<= 0` line at
+- [x] T2 — Add the guard immediately *after* the `<= 0` line at
       `R/axes_scaled_fit.R:126`, testing positive infinity only, so `-Inf` keeps
       its existing route and `NA`/`NaN` keep falling through
       (`is.infinite()` is `FALSE` on both, so no `na.rm` is needed). Rewrite the
       `:103-125` comment block for the shipped behavior (AC4).
-- [ ] T3 — Mutation-verify T2's guard: revert the line, confirm T1's `+Inf`
+- [x] T3 — Mutation-verify T2's guard: revert the line, confirm T1's `+Inf`
       test goes red, restore, confirm green.
 - [ ] T4 — Correct the two enumeration comments in `R/axes_reliability.R`
       (`:1871` gains `"nonpositive_diagonal"` and `"indefinite"`; `:1892` gains
@@ -106,6 +106,7 @@ helper's own contract boundary.
 - 2026-08-04: plan gate chose `"infinite_diagonal"` over reusing `"singular"` and over `"nonfinite_diagonal"`, because an infinite variance is not a singular matrix and a non-finite label would be false for the `NA`/`NaN` entries that keep reporting `"singular"`; falsified by a user or a downstream consumer needing the two infinite and missing cases to share one code.
 - 2026-08-04: plan gate chose leaving `axes_corrected_se()`'s label alone over relabelling both surfaces, because it already refuses and warns so no user is misled about a *result*, and relabelling reopens the cross-surface parity question M70 declined; falsified by a user reporting the `"unidentified"` label, or by any need for the two surfaces to agree.
 - 2026-08-04: T1 tests written and confirmed red before the fix — the `+Inf` case fails 4 assertions (`reason` NULL, `scale`/`baseline` returned as numbers), the `-Inf` control passes, showing it already takes the `<= 0` guard. T1 stays unticked until T2 turns it green, so no task is checked off against a red suite.
+- 2026-08-04: T2/T3 done — the guard `if (any(is.infinite(diag(sigma)))) return(na_out("infinite_diagonal"))` sits immediately after the `<= 0` line at `R/axes_scaled_fit.R:145`, so `-Inf` keeps its `"singular"` route and `NA`/`NaN` keep falling through (`is.infinite()` is FALSE on both, no `na.rm` needed). `test-axes-scaled-fit.R` green; mutation-verified by deleting the guard line (the same 4 assertions redden), restoring, and re-running green. The `:103-125` comment block is rewritten as a three-door table naming which entry each guard refuses, and no longer calls the `+Inf` case an open candidate — the phrase AC4 greps for is gone from the file.
 
 ## Decisions
 
