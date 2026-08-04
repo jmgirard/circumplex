@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-03 (post-plan pass. Since the prior stamp: M69 and M70 planned and pushed, two candidate rows graduated, and a stale anchor plus a stale 0.3% magnitude corrected in place on the refactors row. All checks PASS, nothing fixed, both GitHub inboxes empty; the 47 `work-log format` WARNs remain M7's migration-era hard wraps in history.)_
+_Last hygiene check: 2026-08-04 (M69 post-merge. All checks PASS; M69 archived at 25 lines, live file deleted; terminal rows pruned 6 to 5 by dropping M64. One candidate row added: the sibling NA-unsafe guard at `axes_scaled_fit.R:103`. LESSONS extended three existing lines, no new row.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,12 +9,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M64 | FIML on items for `axes_reliability()` — the estimator-metric question | done | — | normal | milestones/archive/M64-axes-reliability-fiml-review.md |
 | M65 | FIML item-level missing data for `axes_reliability()` — the build | done | — | normal | milestones/archive/M65-axes-reliability-fiml-build.md |
 | M66 | Corrected component standard errors for `axes_reliability()` | done | — | high | milestones/archive/M66-axes-reliability-corrected-se.md |
 | M67 | M65 review fold-ins for the `axes_reliability()` FIML path | done | M66 | normal | milestones/archive/M67-axes-reliability-m65-foldins.md |
 | M68 | Scaled global test statistic for `axes_reliability()` | done | — | normal | milestones/archive/M68-axes-reliability-scaled-chisq.md |
-| M69 | Correlation-metric pricing for `axes_reliability()`'s corrected component SEs | review | — | normal | milestones/M69-axes-corrected-se-unit-diagonal.md |
+| M69 | Correlation-metric pricing for `axes_reliability()`'s corrected component SEs | done | — | normal | milestones/archive/M69-axes-corrected-se-unit-diagonal.md |
 | M70 | Self-describing scaled fit output for `axes_reliability()` | planned | M69 | normal | milestones/M70-axes-scaled-fit-self-describing.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
