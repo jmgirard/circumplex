@@ -1253,3 +1253,47 @@ test_that("AC5: a non-finite fitted diagonal refuses cleanly instead of erroring
   expect_identical(got0$scale, NA_real_)
   expect_identical(got0$baseline, NA_real_)
 })
+
+
+# ---- M71 AC1/AC2: an infinite fitted diagonal is refused, and only it -------
+
+test_that("AC1: a +Inf fitted diagonal refuses instead of scaling a corrupted matrix", {
+  # Same estimator-free setup as the M70 block above, for the same reason.
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  df <- p * (p + 1) / 2 - length(
+    axes_se_derivs(pp$item_angle, pp$scale, NULL, TRUE, FALSE)$mats
+  )
+  baseline_df <- p * (p - 1) / 2
+
+  call_it <- function(sigma) {
+    axes_scaling_factor(sigma, pp$names, pp$item_angle, pp$scale,
+                        fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+                        df = df, baseline_df = baseline_df)
+  }
+
+  # The defect this milestone fixes: +Inf fails `<= 0`, and cov2cor() maps its
+  # row/column to zeros with a unit diagonal rather than to NaN -- so solve()
+  # inverts it, is.finite() accepts, and a factor was COMPUTED and returned
+  # with reason NULL (measured at the M70 review: scale 0.9579017, baseline
+  # 0.8777185, no warning). Reporting an uncorrected-from-corrupted number in a
+  # field documented as corrected is the one failure a user cannot detect.
+  sig_inf <- pp$sigma
+  sig_inf[4L, 4L] <- Inf
+  expect_warning(got <- call_it(sig_inf), "could not be computed")
+  expect_identical(got$reason, "infinite_diagonal")
+  expect_identical(got$scale, NA_real_)
+  expect_identical(got$baseline, NA_real_)
+
+  # AC2's at-risk cell, and the reason the guard tests positive infinity rather
+  # than `!is.finite()`: -Inf is ALREADY refused by the `<= 0` guard above it,
+  # and a non-finite test placed ahead of that guard would silently relabel
+  # this route. No test covered it before M71, which is what made the relabel
+  # silent.
+  sig_ninf <- pp$sigma
+  sig_ninf[4L, 4L] <- -Inf
+  expect_warning(got_n <- call_it(sig_ninf), "could not be computed")
+  expect_identical(got_n$reason, "singular")
+  expect_identical(got_n$scale, NA_real_)
+  expect_identical(got_n$baseline, NA_real_)
+})
