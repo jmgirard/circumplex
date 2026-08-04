@@ -89,7 +89,7 @@ helper's own contract boundary.
       `:103-125` comment block for the shipped behavior (AC4).
 - [x] T3 — Mutation-verify T2's guard: revert the line, confirm T1's `+Inf`
       test goes red, restore, confirm green.
-- [ ] T4 — Correct the two enumeration comments in `R/axes_reliability.R`
+- [x] T4 — Correct the two enumeration comments in `R/axes_reliability.R`
       (`:1871` gains `"nonpositive_diagonal"` and `"indefinite"`; `:1892` gains
       `"infinite_diagonal"`), and update the enumeration guard at
       `tests/testthat/test-axes-corrected-se.R:1181-1185` if it pins the set.
@@ -107,6 +107,8 @@ helper's own contract boundary.
 - 2026-08-04: plan gate chose leaving `axes_corrected_se()`'s label alone over relabelling both surfaces, because it already refuses and warns so no user is misled about a *result*, and relabelling reopens the cross-surface parity question M70 declined; falsified by a user reporting the `"unidentified"` label, or by any need for the two surfaces to agree.
 - 2026-08-04: T1 tests written and confirmed red before the fix — the `+Inf` case fails 4 assertions (`reason` NULL, `scale`/`baseline` returned as numbers), the `-Inf` control passes, showing it already takes the `<= 0` guard. T1 stays unticked until T2 turns it green, so no task is checked off against a red suite.
 - 2026-08-04: T2/T3 done — the guard `if (any(is.infinite(diag(sigma)))) return(na_out("infinite_diagonal"))` sits immediately after the `<= 0` line at `R/axes_scaled_fit.R:145`, so `-Inf` keeps its `"singular"` route and `NA`/`NaN` keep falling through (`is.infinite()` is FALSE on both, no `na.rm` needed). `test-axes-scaled-fit.R` green; mutation-verified by deleting the guard line (the same 4 assertions redden), restoring, and re-running green. The `:103-125` comment block is rewritten as a three-door table naming which entry each guard refuses, and no longer calls the `+Inf` case an open candidate — the phrase AC4 greps for is gone from the file.
+- 2026-08-04: T4 done — AC3's grep run over both helpers gives `axes_scaled_fit.R` = {df_mismatch, baseline_df_mismatch, singular, unidentified, indefinite, infinite_diagonal} and `axes_corrected_se.R` = {nonpositive_diagonal} direct plus {singular, unidentified, indefinite} forwarded from `axes_se_pricing()`. Both `details` comments now match: `:1871` gained the two literals it had been missing since M69, `:1892` gained `"infinite_diagonal"`, and each says it enumerates what the source CONTAINS rather than what a user has been shown (`"indefinite"` has never fired). The enumeration guard at `test-axes-corrected-se.R:1181-1185` needed no change — M71 adds no literal to the file it pins.
+- 2026-08-04: full `devtools::test()` green — FAIL 0 | WARN 4 | SKIP 0 | PASS 5788. The four warnings are pre-existing and not from this branch: `test-axes-scaled-fit.R` alone reports WARN 0 over 671 passes, and both new inputs return before `cov2cor()`, so neither can raise an uncaught warning.
 
 ## Decisions
 

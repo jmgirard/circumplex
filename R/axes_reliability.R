@@ -1868,7 +1868,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # offering a supported way to ASK for the uncorrected number.
       se_uncorrected = se_uncorrected,
       # NULL when the correction succeeded; otherwise why every corrected SE
-      # is NA ("singular", "unidentified").
+      # is NA ("nonpositive_diagonal" from the guard's own door, and
+      # "singular", "unidentified", "indefinite" forwarded from
+      # axes_se_pricing()). The list named two of the four until M71 audited
+      # it against the source; "indefinite" in particular has never been
+      # observed to fire (R/axes_corrected_se.R:185-198), so this enumerates
+      # what the helper CONTAINS, not what a user has been shown.
       se_correction_failed = corrected$reason,
       # What lavaan reported before the correlation-metric scaling (M68), on the
       # same footing as `se_uncorrected` above: visible for comparison and for
@@ -1890,7 +1895,8 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       scaling_factor = c(model = scaling$scale, baseline = scaling$baseline),
       # NULL when the scaling succeeded; otherwise why the four chi-square-
       # derived statistics are NA ("singular", "unidentified", "df_mismatch",
-      # "baseline_df_mismatch", "indefinite").
+      # "baseline_df_mismatch", "indefinite", "infinite_diagonal"), on the same
+      # contains-not-reaches basis as the SE list above.
       fit_scaling_failed = scaling$reason,
       ols_shadow = ols
     ),
