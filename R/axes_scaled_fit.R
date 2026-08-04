@@ -129,12 +129,21 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # --- the projection term ----------------------------------------------------
   #
   # trace{V Delta (Delta'V Delta)^-1 Delta'V Gamma_R} = sum_st A_st B_st with
-  # A = (Delta'V Delta)^-1 -- the same information matrix axes_corrected_se()
+  # A = (Delta'V Delta)^-1 -- the same information matrix axes_se_pricing()
   # builds -- and B_st = 2 tr(Wc_s Sigma Wc_t Sigma), where Wc is W with the
   # covariance-to-correlation Jacobian folded in exactly as it is there
-  # (R/axes_corrected_se.R:137-143): off the diagonal W is unchanged, and the
+  # (R/axes_corrected_se.R:171-179): off the diagonal W is unchanged, and the
   # diagonal absorbs the standardization because a sample correlation's diagonal
   # does not vary at all.
+  #
+  # "Exactly as it is there" is now literally true on BOTH sides. Until M69 it
+  # was not: this file normalized with cov2cor() at line 104 while
+  # axes_corrected_se() folded at the raw Sigma-hat, so the two surfaces priced
+  # the same construction at different matrices. Both are at cov2cor(Sigma-hat)
+  # now (D-037). A guard in tests/testthat/test-axes-scaled-fit.R parses the
+  # line range out of this comment and asserts it still lands on the fold, so
+  # this citation reddens rather than rotting the next time the code moves --
+  # which is how it came to be stale in the first place.
   sim <- lapply(d$mats, function(m) si %*% m)
   info <- matrix(0, q, q)
   for (s in seq_len(q)) {

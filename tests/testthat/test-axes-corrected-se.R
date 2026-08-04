@@ -39,10 +39,24 @@ test_that("BC2: the corrected covariance reproduces RR13's deterministic anchors
   expect_lt(abs(got$corrected[["xi1"]] - 0.01164), 2e-4)
 
   # corrected/uncorrected per component, BC2's (1/1.441, 1/1.067, 1/0.997).
-  ratio <- got$corrected / got$naive
-  expect_lt(abs(ratio[["xi1"]] - 1 / 1.441), 0.01)
-  expect_lt(abs(ratio[["xi2"]] - 1 / 1.067), 0.01)
-  expect_lt(abs(ratio[["zeta1"]] - 1 / 0.997), 0.01)
+  #
+  # Read off `fiml_ratio`, NOT `corrected / naive`. RR13's published constants
+  # are UNIT-DIAGONAL quantities (its reproduction appendix derives both sides
+  # at the population matrix P with diag(P) = 1), so `fiml_ratio` -- both sides
+  # at cov2cor(Sigma-hat) -- is the quantity they describe. After M69
+  # `corrected` and `naive` are priced at different matrices, so their quotient
+  # carries the N/(N-1) artifact and is not what RR13 anchored (M69 review
+  # round 1, F16, found independently by two lenses).
+  #
+  # The tolerance tightens from 0.01 to 0.001 in the same move. At 0.01 this
+  # assertion could not tell the two quantities apart at all: the mixed
+  # quotient sits 0.00185 from RR13's constants and `fiml_ratio` sits 0.00029,
+  # both inside a 0.01 window. 0.001 fences the mixed alternative while keeping
+  # ~3x headroom on the value actually asserted.
+  ratio <- got$fiml_ratio
+  expect_lt(abs(ratio[["xi1"]] - 1 / 1.441), 0.001)
+  expect_lt(abs(ratio[["xi2"]] - 1 / 1.067), 0.001)
+  expect_lt(abs(ratio[["zeta1"]] - 1 / 0.997), 0.001)
 })
 
 
@@ -200,8 +214,15 @@ test_that("BC1: the block-specificity component is corrected too (the K matrix)"
   # 0.01164 in the BC2 anchor test, so what this pins is that the two compose
   # for the block component as they do for the other three. Recorded as a
   # regression pin, not as an oracle.
-  expect_lt(abs(got$corrected[["zeta2"]] - 0.0042646), 2e-6)
-  expect_lt(abs(got$naive[["zeta2"]] / got$corrected[["zeta2"]] - 0.9978), 1e-3)
+  # Re-pinned at M69: both literals moved when the corrected branch was repriced
+  # at cov2cor(Sigma-hat). 0.0042646 -> 0.0042719 (gap 7.3e-6 against the 2e-6
+  # window), and the ratio 0.9978 -> 0.9961 (gap 1.7e-3 against 1e-3).
+  expect_lt(abs(got$corrected[["zeta2"]] - 0.0042719), 2e-6)
+  # The ratio pin now reads `fiml_ratio`, NOT naive/corrected. Those two are
+  # priced at different matrices by design after M69, so their quotient is not a
+  # meaningful quantity to pin -- it carries an N/(N-1) artifact (D-037).
+  # `fiml_ratio` is the same-matrix conversion the FIML path actually applies.
+  expect_lt(abs(got$fiml_ratio[["zeta2"]] - 1.0022604), 1e-4)
 
   # zeta2 reaches the reported table through the estimator, not just the helper.
   res <- axes_reliability(cormat = pop$sigma, items = items, angles = oct,
@@ -764,4 +785,404 @@ test_that("BC1: a non-invertible Sigma-hat gives NA SEs with a reason, never a n
   # NA, never NaN, and never a fallback to the uncorrected value.
   expect_false(any(is.nan(got$corrected)))
   expect_identical(got$reason, "singular")
+})
+
+
+# ---- M69 / AC2: the vech-space oracle at cov2cor(Sigma-hat) ------------------
+#
+# The shipped corrected branch folds the covariance-to-correlation Jacobian into
+# a p x p sandwich. This rebuilds the same asymptotic variance the STUPID way --
+# literal p* x p* duplication matrix, V, Gamma_S and the standardization
+# Jacobian J -- so the two routes share no arithmetic.
+#
+# Priced at cov2cor(Sigma-hat) per RR15 Q1: the fold's compression Sigma_ij =
+# rho_ij holds only at a unit diagonal, and lavaan's sample.cov.rescale leaves
+# the fitted diagonal at (N-1)/N. Appended at the END of this file deliberately
+# -- BC3 anchors the lavaan fence at lines 67-69 and 191-194, so nothing may be
+# inserted above them (M69 deviation D4).
+
+m69_dup <- function(p) {
+  pstar <- p * (p + 1) / 2
+  D <- matrix(0, p * p, pstar)
+  k <- 0L
+  for (j in seq_len(p)) for (i in j:p) {
+    k <- k + 1L
+    D[(j - 1) * p + i, k] <- 1
+    D[(i - 1) * p + j, k] <- 1
+  }
+  D
+}
+
+m69_vech <- function(M) M[lower.tri(M, diag = TRUE)]
+
+# Component SEs from literal vech-space matrices. `sigma` must ALREADY be a
+# correlation matrix in the item map's own order. Returns the normal-theory
+# (`naive`) and correlation-metric (`corrected`) SEs at that matrix.
+m69_vech_se <- function(sigma, mats, n_comp, n) {
+  p <- nrow(sigma)
+  pstar <- p * (p + 1) / 2
+  D <- m69_dup(p)
+  Dp <- solve(t(D) %*% D) %*% t(D)
+  si <- solve(sigma)
+
+  # V, the normal-theory ML weight in vech coordinates, and Gamma_S, the acov of
+  # vech(S). They are inverses; the oracle asserts that rather than assuming it.
+  V <- 0.5 * t(D) %*% kronecker(si, si) %*% D
+  Gs <- 2 * Dp %*% kronecker(sigma, sigma) %*% t(Dp)
+  testthat::expect_lt(max(abs(V %*% Gs - diag(pstar))), 1e-9)
+
+  # Gamma_R = J Gamma_S J', J the row-by-row Jacobian of the
+  # covariance-to-correlation map at a unit diagonal:
+  #   dr_ij = ds_ij - 0.5 * rho_ij * (ds_ii + ds_jj)  (i != j),  dr_ii = 0.
+  idx <- which(lower.tri(matrix(0, p, p), diag = TRUE), arr.ind = TRUE)
+  J <- matrix(0, pstar, pstar)
+  for (a in seq_len(pstar)) {
+    i <- idx[a, 1]
+    j <- idx[a, 2]
+    if (i == j) next
+    J[a, a] <- 1
+    ai <- which(idx[, 1] == i & idx[, 2] == i)
+    aj <- which(idx[, 1] == j & idx[, 2] == j)
+    J[a, ai] <- J[a, ai] - 0.5 * sigma[i, j]
+    J[a, aj] <- J[a, aj] - 0.5 * sigma[i, j]
+  }
+  Gr <- J %*% Gs %*% t(J)
+  # Independent check on Gamma_R: under normality the asymptotic variance of
+  # sqrt(n) r_ij is the Pearson-Filon (1 - rho^2)^2, which J never sees.
+  for (a in seq_len(pstar)) {
+    i <- idx[a, 1]
+    j <- idx[a, 2]
+    want <- if (i == j) 0 else (1 - sigma[i, j]^2)^2
+    testthat::expect_lt(abs(Gr[a, a] - want), 1e-9)
+  }
+
+  Delta <- vapply(mats, m69_vech, numeric(pstar))
+  bread <- solve(t(Delta) %*% V %*% Delta)
+  meat <- t(Delta) %*% V %*% Gr %*% V %*% Delta
+  # Oracle self-check: priced with Gamma_S instead of Gamma_R the sandwich
+  # collapses to the bread exactly, because V and Gamma_S are inverses. A slip
+  # in D, V or Delta breaks this before it reaches any comparison.
+  meat_s <- t(Delta) %*% V %*% Gs %*% V %*% Delta
+  testthat::expect_lt(max(abs(bread %*% meat_s %*% bread - bread)), 1e-9)
+
+  r <- seq_len(n_comp)
+  list(
+    naive = sqrt(diag(bread)[r] / n),
+    corrected = sqrt(diag(bread %*% meat %*% bread)[r] / n)
+  )
+}
+
+
+test_that("AC2: the corrected branch matches the vech oracle at cov2cor, octant map", {
+  skip_if_not_installed("lavaan")
+  pp <- probe_pop()
+  fit <- axes_fit_cormat(pp$sigma, pp$items, pp$angles, n = 600)
+  sigma_hat <- lavaan::fitted(fit)$cov[pp$names, pp$names]
+
+  d <- axes_se_derivs(pp$item_angle, pp$scale, NULL, TRUE, FALSE)
+  want <- m69_vech_se(stats::cov2cor(sigma_hat), d$mats, d$n_comp, 600)
+
+  got <- axes_corrected_se(
+    lavaan::fitted(fit)$cov, pp$names, pp$item_angle, pp$scale,
+    n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE
+  )
+
+  # 1e-6 relative, derived in AC2 from the discrimination required: the
+  # superseded raw-Sigma-hat pricing differs by 1.05e-3 on its closest
+  # component, so this fences that alternative by 1000x.
+  expect_lt(max(abs(unname(got$corrected) / want$corrected - 1)), 1e-6)
+})
+
+
+test_that("AC2: the corrected branch matches the vech oracle at cov2cor, blockwise map", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  # The crossed layout, as the BC1 K-matrix test above uses: a contiguous one
+  # biases xi1 (the M63 lesson).
+  blk <- axes_crossed_blocks(8L, 3L)
+  pop <- axes_population_cor(oct, 3L, xi1 = .35, xi2 = .10, zeta1 = .08,
+                             zeta2 = .05, item_block = blk)
+  nm <- sprintf("item_%02d", seq_len(nrow(pop$sigma)))
+  dimnames(pop$sigma) <- list(nm, nm)
+  items <- unname(split(nm, pop$scale))
+  item_angle <- rep(as.numeric(oct), each = 3L)
+
+  fit <- axes_fit_cormat(pop$sigma, items, oct, n = 600, item_block = blk)
+  sigma_hat <- lavaan::fitted(fit)$cov[nm, nm]
+
+  d <- axes_se_derivs(item_angle, pop$scale, blk, TRUE, TRUE)
+  want <- m69_vech_se(stats::cov2cor(sigma_hat), d$mats, d$n_comp, 600)
+
+  got <- axes_corrected_se(
+    lavaan::fitted(fit)$cov, nm, item_angle, pop$scale, item_block = blk,
+    n = 600, fit_zeta1 = TRUE, fit_zeta2 = TRUE
+  )
+
+  expect_lt(max(abs(unname(got$corrected) / want$corrected - 1)), 1e-6)
+})
+
+
+# ---- M69 / AC7 (BC2): invariance of the correlation-metric quantities --------
+#
+# `corrected` and `fiml_ratio` are priced at cov2cor(Sigma-hat), which is an
+# exact retraction onto unit-diagonal matrices, so both are invariant to
+# Sigma-hat -> D Sigma-hat D for ANY positive diagonal D. `naive` is priced at
+# the raw matrix and is homogeneous of degree 1, so it scales.
+#
+# Diagonal invariance rather than mere scalar invariance is the point (RR15 Q5):
+# a scalar-only pin stays GREEN under a "divide by the mean diagonal" or "divide
+# by (N-1)/N" pseudo-fix, and the fitted diagonal is not constant under
+# misspecification (0.943-1.072 measured on a FIML fit, RR15 B3). Diagonal
+# invariance is the property only cov2cor delivers.
+#
+# Deviation D1: the rescaled matrix carries its dimnames re-attached.
+# `D %*% S %*% D` drops them, and axes_corrected_se() refuses a dimnames-free
+# matrix by design (pinned at :104), so the literal BC2 recipe would error.
+
+test_that("AC7: corrected and fiml_ratio are invariant to diagonal rescaling", {
+  skip_if_not_installed("lavaan")
+  pp <- probe_pop()
+  fit <- axes_fit_cormat(pp$sigma, pp$items, pp$angles, n = 600)
+  sigma_hat <- lavaan::fitted(fit)$cov
+
+  se_at <- function(m) axes_corrected_se(
+    m, pp$names, pp$item_angle, pp$scale,
+    n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE
+  )
+  base <- se_at(sigma_hat)
+
+  set.seed(69L)
+  dv <- exp(stats::runif(nrow(sigma_hat), -0.3, 0.3))
+  rescale <- function(m, d) {
+    out <- diag(d) %*% m %*% diag(d)
+    dimnames(out) <- dimnames(m)          # D1: the bare product drops these
+    out
+  }
+  diag_rs <- se_at(rescale(sigma_hat, dv))
+  scalar_rs <- se_at(rescale(sigma_hat, rep(sqrt(2), nrow(sigma_hat))))
+
+  # 1e-6, derived in BC2: the superseded raw/mixed pricing violates these
+  # identities by O(1) factors (1.538-2.114 at scalar 2), six orders above;
+  # measured floating-point drift of the cov2cor path is 4.4e-16. Never
+  # bit-identity.
+  expect_lt(max(abs(diag_rs$corrected / base$corrected - 1)), 1e-6)
+  expect_lt(max(abs(diag_rs$fiml_ratio / base$fiml_ratio - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$corrected / base$corrected - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$fiml_ratio / base$fiml_ratio - 1)), 1e-6)
+
+  # The companion that stops the above from being the trivial consequence of
+  # normalizing EVERYTHING: naive is still priced at the raw matrix, so it
+  # scales by exactly the scalar. If a later edit normalized naive too, these
+  # invariances would still pass while the lavaan fence at :67-69 broke -- this
+  # says which matrix naive is on, from inside the same test.
+  # D = sqrt(2)*I, so the rescaled matrix is 2*Sigma-hat and naive scales by
+  # exactly 2 -- homogeneous of degree 1, matching RR15's measured 2.000000.
+  expect_lt(max(abs(scalar_rs$naive / base$naive - 2)), 1e-6)
+  expect_gt(max(abs(diag_rs$naive / base$naive - 1)), 1e-3)
+})
+
+
+test_that("AC7: the same invariance holds on the zeta2 (blockwise) probe", {
+  skip_if_not_installed("lavaan")
+  # Deviation D1 reads "the probe fits" as the octant probe PLUS the zeta2
+  # probe. The test above covers only the first, leaving the block-specificity
+  # component -- whose literals this milestone re-pinned -- unchecked for
+  # invariance (M69 review round 1, F13).
+  oct <- octants()
+  blk <- axes_crossed_blocks(8L, 3L)
+  pop <- axes_population_cor(oct, 3L, xi1 = .35, xi2 = .10, zeta1 = .08,
+                             zeta2 = .05, item_block = blk)
+  nm <- sprintf("item_%02d", seq_len(nrow(pop$sigma)))
+  dimnames(pop$sigma) <- list(nm, nm)
+  ia <- rep(as.numeric(oct), each = 3L)
+  fit <- axes_fit_cormat(pop$sigma, unname(split(nm, pop$scale)), oct,
+                         n = 600, item_block = blk)
+  sigma_hat <- lavaan::fitted(fit)$cov
+
+  se_at <- function(m) axes_corrected_se(
+    m, nm, ia, pop$scale, item_block = blk,
+    n = 600, fit_zeta1 = TRUE, fit_zeta2 = TRUE
+  )
+  base <- se_at(sigma_hat)
+
+  set.seed(70L)
+  dv <- exp(stats::runif(nrow(sigma_hat), -0.3, 0.3))
+  rescale <- function(m, d) {
+    out <- diag(d) %*% m %*% diag(d)
+    dimnames(out) <- dimnames(m)
+    out
+  }
+  diag_rs <- se_at(rescale(sigma_hat, dv))
+  scalar_rs <- se_at(rescale(sigma_hat, rep(sqrt(2), nrow(sigma_hat))))
+
+  expect_true("zeta2" %in% names(base$corrected))
+  expect_lt(max(abs(diag_rs$corrected / base$corrected - 1)), 1e-6)
+  expect_lt(max(abs(diag_rs$fiml_ratio / base$fiml_ratio - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$corrected / base$corrected - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$fiml_ratio / base$fiml_ratio - 1)), 1e-6)
+  expect_lt(max(abs(scalar_rs$naive / base$naive - 2)), 1e-6)
+  # The anti-triviality companion, carried over from the octant test rather
+  # than left to it: without this, an edit that normalized `naive` too would
+  # leave every invariance above green on this probe while breaking the lavaan
+  # fence (M69 review round 2, A7).
+  expect_gt(max(abs(diag_rs$naive / base$naive - 1)), 1e-3)
+})
+
+
+test_that("AC7: the reported FIML SE is se_uncorrected times fiml_ratio", {
+  skip_if_not_installed("lavaan")
+  # Deviation D1's wiring assertion. After D2 this is the PRIMARY evidence that
+  # the repricing reaches the FIML surface at all: the committed band fixture
+  # stores the uncorrected SE and no Sigma-hat, so it cannot respond to the
+  # change.
+  #
+  # The fit's own Sigma-hat is not exposed in `details`, and rebuilding the fit
+  # test-side would construct both sides of the comparison from the same code
+  # and catch nothing common-mode (the M65 (j) trap). So the real helper is
+  # CAPTURED rather than replaced: the mock calls through and records what the
+  # estimator actually received. That keeps this a wiring assertion and nothing
+  # more, which is exactly what it claims to be (the M62 lesson: a seam mock
+  # proves the branch wiring, never the condition selecting it).
+  captured <- NULL
+  real <- axes_corrected_se
+  testthat::local_mocked_bindings(
+    axes_corrected_se = function(...) {
+      out <- real(...)
+      captured <<- out
+      out
+    },
+    .package = "circumplex"
+  )
+
+  fx <- readRDS(test_path("fixtures", "m65-heavy-cells.rds"))
+  oct <- octants()
+  set.seed(fx$provenance$seeds$mcar[[1L]])
+  mat <- axes_mcar(as.matrix(axes_simulate(600L, oct, 3L, .35, .10, .08)), 0.05)
+  res <- suppressMessages(suppressWarnings(
+    axes_reliability(as.data.frame(mat),
+                     items = split(colnames(mat), rep(1:8, each = 3)),
+                     angles = oct, missing = "fiml")
+  ))
+
+  expect_false(is.null(captured))
+  expect_true("fiml_ratio" %in% names(captured))
+
+  sym <- res$components$Symbol
+  unc <- res$details$se_uncorrected
+  for (s in names(unc)) {
+    expect_equal(
+      res$components$SE[sym == s],
+      unname(unc[[s]] * captured$fiml_ratio[[s]]),
+      tolerance = 1e-10,
+      label = paste0("reported FIML SE == se_uncorrected * fiml_ratio, ", s)
+    )
+  }
+
+  # ... and the ratio applied is NOT the mixed-matrix quotient. The two differ
+  # by N/(N-1) = 1.00167 at n = 600, so this discriminates decisively and is
+  # what would redden if line 1691 ever went back to corrected/naive (D-037).
+  mixed <- captured$corrected / captured$naive
+  expect_gt(max(abs(mixed / captured$fiml_ratio - 1)), 1e-4)
+})
+
+
+# ---- M69 / AC10 (BC5): the failure contract, extended to fiml_ratio ----------
+
+test_that("AC10: a nonpositive diagonal is refused before cov2cor() runs", {
+  pp <- probe_pop()
+  bad <- pp$sigma
+  bad[3L, 3L] <- 0                        # a zero variance; cov2cor gives NaN
+
+  expect_warning(
+    got <- axes_corrected_se(bad, pp$names, pp$item_angle, pp$scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
+    "could not be computed"
+  )
+  expect_identical(got$reason, "nonpositive_diagonal")
+
+  # All THREE vectors NA together -- the contract fiml_ratio joined at M69.
+  expect_true(all(is.na(got$naive)))
+  expect_true(all(is.na(got$corrected)))
+  expect_true(all(is.na(got$fiml_ratio)))
+  # NA, never NaN. Without the guard, cov2cor() of a zero diagonal produces NaN
+  # rows and the failure would surface as "indefinite" or as raw NaN rather
+  # than as this honest refusal (RR15 B2, the M62 doctrine).
+  expect_false(any(is.nan(got$fiml_ratio)))
+  expect_false(any(is.nan(got$corrected)))
+
+  # A non-finite diagonal must NOT take this door, and must not error. The
+  # predicate is NA-safe precisely so this input keeps the route it had before
+  # M69: solve() -> tryCatch -> na_out("singular"). Written as a regression
+  # test because M69 shipped the erroring version to review (round 1, F1).
+  na_diag <- pp$sigma
+  na_diag[1L, 1L] <- NA_real_
+  expect_warning(
+    gna <- axes_corrected_se(na_diag, pp$names, pp$item_angle, pp$scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
+    "could not be computed"
+  )
+  expect_identical(gna$reason, "singular")
+  expect_true(all(is.na(gna$naive)))
+  expect_true(all(is.na(gna$corrected)))
+  expect_true(all(is.na(gna$fiml_ratio)))
+
+  nan_diag <- pp$sigma
+  nan_diag[2L, 2L] <- NaN
+  expect_warning(
+    gnan <- axes_corrected_se(nan_diag, pp$names, pp$item_angle, pp$scale,
+                              n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
+    "could not be computed"
+  )
+  expect_identical(gnan$reason, "singular")
+
+  # A negative diagonal takes the same door.
+  bad2 <- pp$sigma
+  bad2[5L, 5L] <- -0.2
+  expect_warning(
+    got2 <- axes_corrected_se(bad2, pp$names, pp$item_angle, pp$scale,
+                              n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
+    "could not be computed"
+  )
+  expect_identical(got2$reason, "nonpositive_diagonal")
+})
+
+
+test_that("AC10: every non-success return NAs all three vectors together", {
+  # Runtime half -- always runs, including under R CMD check. This is the
+  # load-bearing assertion; the source enumeration below is a completeness aid.
+  pp <- probe_pop()
+  sing <- pp$sigma
+  sing[2L, ] <- sing[1L, ]
+  sing[, 2L] <- sing[, 1L]
+  got <- suppressWarnings(
+    axes_corrected_se(sing, pp$names, pp$item_angle, pp$scale,
+                      n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  # The pre-M69 singular path must NA fiml_ratio too, not just its two elders.
+  expect_true(all(is.na(got$fiml_ratio)))
+  expect_named(got, c("naive", "corrected", "fiml_ratio", "reason"))
+})
+
+
+test_that("AC10: the na_out() calls are the only non-success returns (BC5 enumeration)", {
+  # BC5's enumeration procedure, run mechanically rather than by eye, so
+  # "three na_out calls" cannot quietly become four unnoticed.
+  #
+  # SKIPPED under R CMD check: an installed package carries no R/ sources, and
+  # reading them there errors rather than skipping -- the M7 trap, hit twice in
+  # this milestone (the sibling guard in test-axes-scaled-fit.R first, then
+  # this one, because fixing the first did not sweep for the second). Said
+  # plainly instead of left silent: this half runs in development only. The
+  # runtime half of the contract is asserted in the test above and always runs.
+  src_path <- test_path("..", "..", "R", "axes_corrected_se.R")
+  skip_if_not(file.exists(src_path), "package R/ sources absent (installed)")
+  src <- readLines(src_path)
+
+  reasons <- regmatches(src, regexpr('return\\("[a-z_]+"\\)', src))
+  reasons <- sub('return\\("', "", sub('"\\)', "", reasons))
+  expect_setequal(reasons, c("singular", "unidentified", "indefinite"))
+  # Plus the guard's own reason, which routes through na_out() directly.
+  expect_true(any(grepl('na_out("nonpositive_diagonal")', src, fixed = TRUE)))
+  # D5's error exit, which is NOT part of the NA-together contract.
+  expect_true(any(grepl("must carry dimnames", src, fixed = TRUE)))
 })

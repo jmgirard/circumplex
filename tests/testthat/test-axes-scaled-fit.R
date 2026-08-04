@@ -1086,3 +1086,52 @@ test_that("AC3: the FIML factor is the complete-data one, per M68-D1", {
   # And no trend across a fivefold change in the missingness rate.
   expect_lt(abs(facs[["0.10"]] - facs[["0.02"]]), .005)
 })
+
+
+# ---- M69 / AC4: the cross-file citation cannot rot silently ------------------
+
+test_that("AC4: axes_scaled_fit's Wc citation still lands on the Wc fold", {
+  # An INSTALLED package carries no R/ sources, so under R CMD check these paths
+  # do not exist and readLines() errors outright. Guarded the way this file's
+  # other source-reading guards are. Stated plainly because a silent skip is
+  # false coverage (the M7 lesson): this guard runs under devtools::test() and
+  # is SKIPPED under R CMD check and on CRAN, so it fences the citation in
+  # development only -- which is where a citation rots.
+  cite_path <- test_path("..", "..", "R", "axes_scaled_fit.R")
+  target_path <- test_path("..", "..", "R", "axes_corrected_se.R")
+  skip_if_not(file.exists(cite_path) && file.exists(target_path),
+              "package R/ sources absent (installed package)")
+  cite_src <- readLines(cite_path)
+  target <- readLines(target_path)
+  expect_gt(length(target), 100L)
+
+  # The citation, parsed rather than assumed: "(R/axes_corrected_se.R:A-B)".
+  hits <- regmatches(
+    cite_src,
+    regexpr("R/axes_corrected_se\\.R:[0-9]+-[0-9]+", cite_src)
+  )
+  hits <- hits[nzchar(hits)]
+  expect_length(hits, 1L)
+
+  rng <- as.integer(strsplit(sub(".*:", "", hits[[1]]), "-", fixed = TRUE)[[1]])
+  expect_lt(rng[[2]] - rng[[1]], 15L)      # AC4: at most a 15-line span
+  expect_lte(rng[[2]], length(target))
+
+  # It must actually contain the fold it claims to point at. A bare "the file
+  # exists" check would pass over any range at all -- the loophole the M69
+  # criteria audit flagged in the first draft of this criterion.
+  cited <- target[rng[[1]]:rng[[2]]]
+  expect_true(any(grepl("diag(wc) <- -rowSums(wc * sigma)", cited, fixed = TRUE)))
+
+  # AC4 requires the cited range to state EACH SIDE's pricing. Both assertions
+  # are made over `cited` — the parsed range — and never over the citing file
+  # at large: an earlier draft checked "cov2cor(Sigma-hat)" anywhere in
+  # axes_scaled_fit.R, which its own prose satisfied, so the guard passed
+  # without the cited range saying anything about pricing at all (M69 review
+  # round 1, F21).
+  cited_txt <- paste(cited, collapse = " ")
+  expect_true(grepl("unit diagonal", cited_txt, fixed = TRUE))
+  expect_true(grepl("cov2cor(Sigma-hat)", cited_txt, fixed = TRUE))
+  expect_true(grepl("naive", cited_txt, fixed = TRUE) &&
+                grepl("raw", cited_txt, fixed = TRUE))
+})
