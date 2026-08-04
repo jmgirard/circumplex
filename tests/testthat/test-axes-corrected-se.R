@@ -765,3 +765,137 @@ test_that("BC1: a non-invertible Sigma-hat gives NA SEs with a reason, never a n
   expect_false(any(is.nan(got$corrected)))
   expect_identical(got$reason, "singular")
 })
+
+
+# ---- M69 / AC2: the vech-space oracle at cov2cor(Sigma-hat) ------------------
+#
+# The shipped corrected branch folds the covariance-to-correlation Jacobian into
+# a p x p sandwich. This rebuilds the same asymptotic variance the STUPID way --
+# literal p* x p* duplication matrix, V, Gamma_S and the standardization
+# Jacobian J -- so the two routes share no arithmetic.
+#
+# Priced at cov2cor(Sigma-hat) per RR15 Q1: the fold's compression Sigma_ij =
+# rho_ij holds only at a unit diagonal, and lavaan's sample.cov.rescale leaves
+# the fitted diagonal at (N-1)/N. Appended at the END of this file deliberately
+# -- BC3 anchors the lavaan fence at lines 67-69 and 191-194, so nothing may be
+# inserted above them (M69 deviation D4).
+
+m69_dup <- function(p) {
+  pstar <- p * (p + 1) / 2
+  D <- matrix(0, p * p, pstar)
+  k <- 0L
+  for (j in seq_len(p)) for (i in j:p) {
+    k <- k + 1L
+    D[(j - 1) * p + i, k] <- 1
+    D[(i - 1) * p + j, k] <- 1
+  }
+  D
+}
+
+m69_vech <- function(M) M[lower.tri(M, diag = TRUE)]
+
+# Component SEs from literal vech-space matrices. `sigma` must ALREADY be a
+# correlation matrix in the item map's own order. Returns the normal-theory
+# (`naive`) and correlation-metric (`corrected`) SEs at that matrix.
+m69_vech_se <- function(sigma, mats, n_comp, n) {
+  p <- nrow(sigma)
+  pstar <- p * (p + 1) / 2
+  D <- m69_dup(p)
+  Dp <- solve(t(D) %*% D) %*% t(D)
+  si <- solve(sigma)
+
+  # V, the normal-theory ML weight in vech coordinates, and Gamma_S, the acov of
+  # vech(S). They are inverses; the oracle asserts that rather than assuming it.
+  V <- 0.5 * t(D) %*% kronecker(si, si) %*% D
+  Gs <- 2 * Dp %*% kronecker(sigma, sigma) %*% t(Dp)
+  testthat::expect_lt(max(abs(V %*% Gs - diag(pstar))), 1e-9)
+
+  # Gamma_R = J Gamma_S J', J the row-by-row Jacobian of the
+  # covariance-to-correlation map at a unit diagonal:
+  #   dr_ij = ds_ij - 0.5 * rho_ij * (ds_ii + ds_jj)  (i != j),  dr_ii = 0.
+  idx <- which(lower.tri(matrix(0, p, p), diag = TRUE), arr.ind = TRUE)
+  J <- matrix(0, pstar, pstar)
+  for (a in seq_len(pstar)) {
+    i <- idx[a, 1]
+    j <- idx[a, 2]
+    if (i == j) next
+    J[a, a] <- 1
+    ai <- which(idx[, 1] == i & idx[, 2] == i)
+    aj <- which(idx[, 1] == j & idx[, 2] == j)
+    J[a, ai] <- J[a, ai] - 0.5 * sigma[i, j]
+    J[a, aj] <- J[a, aj] - 0.5 * sigma[i, j]
+  }
+  Gr <- J %*% Gs %*% t(J)
+  # Independent check on Gamma_R: under normality the asymptotic variance of
+  # sqrt(n) r_ij is the Pearson-Filon (1 - rho^2)^2, which J never sees.
+  for (a in seq_len(pstar)) {
+    i <- idx[a, 1]
+    j <- idx[a, 2]
+    want <- if (i == j) 0 else (1 - sigma[i, j]^2)^2
+    testthat::expect_lt(abs(Gr[a, a] - want), 1e-9)
+  }
+
+  Delta <- vapply(mats, m69_vech, numeric(pstar))
+  bread <- solve(t(Delta) %*% V %*% Delta)
+  meat <- t(Delta) %*% V %*% Gr %*% V %*% Delta
+  # Oracle self-check: priced with Gamma_S instead of Gamma_R the sandwich
+  # collapses to the bread exactly, because V and Gamma_S are inverses. A slip
+  # in D, V or Delta breaks this before it reaches any comparison.
+  meat_s <- t(Delta) %*% V %*% Gs %*% V %*% Delta
+  testthat::expect_lt(max(abs(bread %*% meat_s %*% bread - bread)), 1e-9)
+
+  r <- seq_len(n_comp)
+  list(
+    naive = sqrt(diag(bread)[r] / n),
+    corrected = sqrt(diag(bread %*% meat %*% bread)[r] / n)
+  )
+}
+
+
+test_that("AC2: the corrected branch matches the vech oracle at cov2cor, octant map", {
+  skip_if_not_installed("lavaan")
+  pp <- probe_pop()
+  fit <- axes_fit_cormat(pp$sigma, pp$items, pp$angles, n = 600)
+  sigma_hat <- lavaan::fitted(fit)$cov[pp$names, pp$names]
+
+  d <- axes_se_derivs(pp$item_angle, pp$scale, NULL, TRUE, FALSE)
+  want <- m69_vech_se(stats::cov2cor(sigma_hat), d$mats, d$n_comp, 600)
+
+  got <- axes_corrected_se(
+    lavaan::fitted(fit)$cov, pp$names, pp$item_angle, pp$scale,
+    n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE
+  )
+
+  # 1e-6 relative, derived in AC2 from the discrimination required: the
+  # superseded raw-Sigma-hat pricing differs by 1.05e-3 on its closest
+  # component, so this fences that alternative by 1000x.
+  expect_lt(max(abs(unname(got$corrected) / want$corrected - 1)), 1e-6)
+})
+
+
+test_that("AC2: the corrected branch matches the vech oracle at cov2cor, blockwise map", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  # The crossed layout, as the BC1 K-matrix test above uses: a contiguous one
+  # biases xi1 (the M63 lesson).
+  blk <- axes_crossed_blocks(8L, 3L)
+  pop <- axes_population_cor(oct, 3L, xi1 = .35, xi2 = .10, zeta1 = .08,
+                             zeta2 = .05, item_block = blk)
+  nm <- sprintf("item_%02d", seq_len(nrow(pop$sigma)))
+  dimnames(pop$sigma) <- list(nm, nm)
+  items <- unname(split(nm, pop$scale))
+  item_angle <- rep(as.numeric(oct), each = 3L)
+
+  fit <- axes_fit_cormat(pop$sigma, items, oct, n = 600, item_block = blk)
+  sigma_hat <- lavaan::fitted(fit)$cov[nm, nm]
+
+  d <- axes_se_derivs(item_angle, pop$scale, blk, TRUE, TRUE)
+  want <- m69_vech_se(stats::cov2cor(sigma_hat), d$mats, d$n_comp, 600)
+
+  got <- axes_corrected_se(
+    lavaan::fitted(fit)$cov, nm, item_angle, pop$scale, item_block = blk,
+    n = 600, fit_zeta1 = TRUE, fit_zeta2 = TRUE
+  )
+
+  expect_lt(max(abs(unname(got$corrected) / want$corrected - 1)), 1e-6)
+})

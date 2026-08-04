@@ -1,11 +1,11 @@
 # M69: Correlation-metric pricing for `axes_reliability()`'s corrected component SEs
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR15
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m69-axes-corrected-se-unit-diagonal`
 
 ## Goal
 
@@ -92,7 +92,7 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
 - [x] **T0** — Escalate the ratio-pricing question. Done 2026-08-03: RB15 →
       RR15, ingested with five deviations. `(RB tripwire: no-oracle —
       discharged)`
-- [ ] **T1** — Test-first: vech-space oracle at `cov2cor(Sigma-hat)`, confirmed
+- [x] **T1** — Test-first: vech-space oracle at `cov2cor(Sigma-hat)`, confirmed
       RED against the shipped raw pricing before T3.
 - [ ] **T2** — Reprice: one realignment, two pricings — `naive` raw,
       `corrected` and `fiml_ratio` at `cov2cor(Sigma-hat)`
@@ -125,6 +125,8 @@ Agreed at the 2026-08-03 ingest gate after a fresh-context [O] audit of the set.
 - 2026-08-03: **correction, superseding this file's 2026-08-03 entries and T1 wording that state the mixed-ratio artifact as "(N-1)/N" or "shrinking".** RR15 B1 measured the direction inverted: the mixed-matrix ratio **inflates** the reported FIML SE by N/(N-1) (1.0016694 exactly on every component), it does not shrink it by (N-1)/N. Magnitudes stand (~0.17% at n = 600, ~1% at n = 100). History is superseded, never edited (D-045); AC11/BC6 governs the forward-looking prose.
 - 2026-08-03: pre-ingest AC4 carried a live loophole — "invariance under same-matrix pricing, **or the recorded (N-1)/N factor otherwise**" — which a mixed-pricing implementation could satisfy while violating BC1 and BC4'. Cut at the ingest gate rather than reworded; BC4' (AC9) now settles the pricing. The remaining criteria renumbered, old AC5 → AC4 and old AC6 → AC5.
 - 2026-08-03: RR15 B3, new measurement worth carrying: on a shipped-path 5% MCAR FIML fit the fitted diagonal ranges **0.9433-1.0723, sd 0.0303** — nowhere near a constant (N-1)/N, and the fact that makes the mixed ratio un-pinnable on the only path that uses it. Alongside M68's misspecification range of 0.951-1.026.
+
+- 2026-08-03: T1 done. Vech-space oracle appended at the END of `test-axes-corrected-se.R` (deviation D4: nothing may be inserted above BC3's anchors at `:67-69`/`:191-194`). Deliberately RED, as test-first requires: octant map 1.718e-3, blockwise/crossed map 1.731e-3, against the 1e-6 bar. The octant figure independently reproduces RR15's measured 1.7209e-3 on zeta1 by a route sharing no arithmetic with either the shipped code or the review's probe. The oracle's own three self-checks pass — `V %*% Gamma_S = I`, the Pearson-Filon `(1-rho^2)^2` diagonal of Gamma_R, and the Gamma_S sandwich collapsing exactly to the bread — so it is internally validated before it disagrees with anything. First blockwise draft used a contiguous layout; corrected to `axes_crossed_blocks()` per the M63 lesson before running.
 
 ## Decisions
 
