@@ -1023,3 +1023,69 @@ test_that("AC7: the reported FIML SE is se_uncorrected times fiml_ratio", {
   mixed <- captured$corrected / captured$naive
   expect_gt(max(abs(mixed / captured$fiml_ratio - 1)), 1e-4)
 })
+
+
+# ---- M69 / AC10 (BC5): the failure contract, extended to fiml_ratio ----------
+
+test_that("AC10: a nonpositive diagonal is refused before cov2cor() runs", {
+  pp <- probe_pop()
+  bad <- pp$sigma
+  bad[3L, 3L] <- 0                        # a zero variance; cov2cor gives NaN
+
+  expect_warning(
+    got <- axes_corrected_se(bad, pp$names, pp$item_angle, pp$scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
+    "could not be computed"
+  )
+  expect_identical(got$reason, "nonpositive_diagonal")
+
+  # All THREE vectors NA together -- the contract fiml_ratio joined at M69.
+  expect_true(all(is.na(got$naive)))
+  expect_true(all(is.na(got$corrected)))
+  expect_true(all(is.na(got$fiml_ratio)))
+  # NA, never NaN. Without the guard, cov2cor() of a zero diagonal produces NaN
+  # rows and the failure would surface as "indefinite" or as raw NaN rather
+  # than as this honest refusal (RR15 B2, the M62 doctrine).
+  expect_false(any(is.nan(got$fiml_ratio)))
+  expect_false(any(is.nan(got$corrected)))
+
+  # A negative diagonal takes the same door.
+  bad2 <- pp$sigma
+  bad2[5L, 5L] <- -0.2
+  expect_warning(
+    got2 <- axes_corrected_se(bad2, pp$names, pp$item_angle, pp$scale,
+                              n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
+    "could not be computed"
+  )
+  expect_identical(got2$reason, "nonpositive_diagonal")
+})
+
+
+test_that("AC10: every non-success return NAs all three vectors together", {
+  # BC5's enumeration procedure, run as a test rather than by eye: the
+  # na_out() calls are the function's only non-success RETURNS. Deviation D5
+  # records the two error exits that are outside this contract because they
+  # raise conditions instead of returning -- asserted here so "three na_out
+  # calls" cannot quietly become four unnoticed.
+  src <- readLines(test_path("..", "..", "R", "axes_corrected_se.R"))
+  reasons <- regmatches(src, regexpr('return\\("[a-z_]+"\\)', src))
+  reasons <- sub('return\\("', "", sub('"\\)', "", reasons))
+  expect_setequal(reasons, c("singular", "unidentified", "indefinite"))
+  # Plus the guard's own reason, which routes through na_out() directly.
+  expect_true(any(grepl('na_out("nonpositive_diagonal")', src, fixed = TRUE)))
+
+  # D5's two error exits, which are NOT part of the NA-together contract.
+  expect_true(any(grepl("must carry dimnames", src, fixed = TRUE)))
+
+  pp <- probe_pop()
+  sing <- pp$sigma
+  sing[2L, ] <- sing[1L, ]
+  sing[, 2L] <- sing[, 1L]
+  got <- suppressWarnings(
+    axes_corrected_se(sing, pp$names, pp$item_angle, pp$scale,
+                      n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  # The pre-M69 singular path must NA fiml_ratio too, not just its two elders.
+  expect_true(all(is.na(got$fiml_ratio)))
+  expect_named(got, c("naive", "corrected", "fiml_ratio", "reason"))
+})

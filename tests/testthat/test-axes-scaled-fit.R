@@ -1091,9 +1091,19 @@ test_that("AC3: the FIML factor is the complete-data one, per M68-D1", {
 # ---- M69 / AC4: the cross-file citation cannot rot silently ------------------
 
 test_that("AC4: axes_scaled_fit's Wc citation still lands on the Wc fold", {
-  cite_src <- readLines(test_path("..", "..", "R", "axes_scaled_fit.R"))
-  target <- readLines(test_path("..", "..", "R", "axes_corrected_se.R"))
-  skip_if(length(cite_src) == 0L || length(target) == 0L, "sources not readable")
+  # An INSTALLED package carries no R/ sources, so under R CMD check these paths
+  # do not exist and readLines() errors outright. Guarded the way this file's
+  # other source-reading guards are. Stated plainly because a silent skip is
+  # false coverage (the M7 lesson): this guard runs under devtools::test() and
+  # is SKIPPED under R CMD check and on CRAN, so it fences the citation in
+  # development only -- which is where a citation rots.
+  cite_path <- test_path("..", "..", "R", "axes_scaled_fit.R")
+  target_path <- test_path("..", "..", "R", "axes_corrected_se.R")
+  skip_if_not(file.exists(cite_path) && file.exists(target_path),
+              "package R/ sources absent (installed package)")
+  cite_src <- readLines(cite_path)
+  target <- readLines(target_path)
+  expect_gt(length(target), 100L)
 
   # The citation, parsed rather than assumed: "(R/axes_corrected_se.R:A-B)".
   hits <- regmatches(
