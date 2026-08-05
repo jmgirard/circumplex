@@ -1205,3 +1205,35 @@ ranges 0.943–1.072, and would regress against the shipped both-raw ratio's
 here (RR15 rec 8): it changes every shipped point estimate and would not obviate
 `cov2cor()`, since the fitted diagonal departs from 1 under misspecification
 regardless. Source: RR15 (Fable, 2026-08-03); M69 ingest gate.
+
+### D-038 (2026-08-04): the design interview's principle set is adopted — six inviolable, seven guiding (IP1–IP6, GP1–GP7)
+
+**Context:** The cairn migration deferred the IP/GP formalization of the
+statistical invariants to `/design-interview` (this file's preamble). The
+interview ran 2026-08-04 on Fable: Phase 1 elicited Purpose & scope (committed
+42b4a36e) and banked twelve proto-principles; Phase 2 classified them plus
+history-mined candidates (re-trigger discipline, fail-closed edges) and
+domain-derived ones (norms provenance at correctness strength).
+**Decision:** Adopt the set recorded in DESIGN.md "Design Principles":
+inviolable — IP1 correctness outranks all; IP2 angle conventions (degrees
+[0,360), LM=360, contrast second−first in (−180,180]); IP3 ≥2 independent
+oracle types per shipped numeric result; IP4 the RNG contract; IP5
+published-source provenance for shipped instrument data (binds forward; the
+existing roster's debt is the norms-audit candidate row); IP6 boundary tests
+for estimation changes. Guiding — GP1 circumplex constructs only; GP2 compute
+well-defined/caution loudly/fail closed; GP3 minimal deps + SE-only API; GP4
+post-2.0 API stability with deprecation cycle; GP5 teach the field with
+statistically precise prose (venue tradeable — a future ebook may absorb the
+didactic vignettes; precision is not tradeable); GP6 scope is the variable;
+GP7 evidence reopens decisions. Classification choices made deliberately at
+the gates: the contract boundary, guardrail stance, dependency posture, and
+API posture were each offered at inviolable strength and set to guiding
+(judgment-requiring lines); boundary tests and data provenance were elevated
+to inviolable.
+**Consequences:** Anything `ip-touching` now has a numbered referent for RB
+tripwires. CLAUDE.md's invariants section stands as the operational summary of
+IP2/IP6; DESIGN.md owns the principles. Four wart candidate rows (norms audit,
+repel redesign, boundary-interval improvement, Heywood guidance) and the
+vignettes→ebook row carry the interview's deferred work. Prior re-trigger
+clauses (D-006, D-011, D-014) are instances of GP7, not superseded. Source:
+Jeff, design interview gates, 2026-08-04.
