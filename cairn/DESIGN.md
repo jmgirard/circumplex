@@ -1,7 +1,79 @@
 # circumplex — design notes
 
 Stable architecture and decision rationale. Update when architecture or
-conventions change (rare); day-to-day status lives in MILESTONES.md.
+conventions change (rare); day-to-day status lives in ROADMAP.md.
+
+## Purpose & scope
+
+_Elicited at the 2026-08-04 design interview (Jeff); principles formalization
+follows in the Design Principles section._
+
+**Purpose.** circumplex gives applied researchers — clinical, personality,
+and vocational psychologists analyzing their own data — validated, guarded
+tools for instrument-based circumplex analysis: scoring and standardization,
+the Structural Summary Method with resampled inference, circumplex measurement
+models (Browne's CPM, SEM projection, axes reliability), and publication-ready
+tables and circular figures.
+
+**Audience.** Applied researchers first. The statistical guardrails
+(the D-007 certification rule, `summary()` coverage cautions, degenerate-profile
+NAs) exist to protect non-methodologists from over-reading results and are
+design commitments, not conveniences. The expert tier (opt-in engines,
+composable geoms, diagnostic outputs) is served through the same surfaces,
+two-tiered: simple front doors, expert back doors.
+
+**Contract boundary.** The job is circumplex-construct analysis and ends
+there: no general circular statistics (no von Mises fitting, no Watson tests —
+that is the `circular` package's territory). The degree/radian classes are
+internal boundary tags, not a public circular-data toolkit. The DESCRIPTION
+title ("circular data") claims more than the intended surface; the exports are
+the contract.
+
+**Capability bar.** A new capability needs (a) a peer-reviewed methodological
+source and (b) a feasible independent validation oracle (the ≥2-oracle-types
+bar) before it ships. The maintainer's own research program is a legitimate
+secondary driver of what enters, but it enters on the same bar.
+
+**Guardrail stance.** Compute anything statistically well-defined and caution
+loudly; refuse only ill-defined or wrong-object inputs (refuse-don't-coerce).
+Guardrails label honestly — NA with a warning, cautions naming their trigger —
+and never block a defensible analysis.
+
+**Structure-assessment surfaces.** `fit_structure()` (descriptive RANDALL),
+`cpm_fit()` (formal model test), and `axes_reliability()` (reliability
+decomposition) are complementary by design — separate exports answering
+different questions, integrated by cross-referencing docs, never a unified
+front door.
+
+**Docs mission.** Teaching the field correct SSM practice is part of the
+package's mission: vignettes and the pkgdown site are pedagogy, worth their own
+milestones, and their prose stays statistically precise because readers absorb
+interpretation habits from it.
+
+**API stability.** Post-2.0, exported signatures, return structures, and
+printed output are commitments: a break requires statistical cause (a wrong
+number) or a gated irreversible-api decision, and ships with a deprecation
+cycle.
+
+**Platforms.** The commitment is exactly CRAN's check matrix (three OSes,
+r-devel/r-release/r-oldrel, win-builder before submission); anything CRAN
+flags blocks a release. Other platforms are fixed on report, best-effort.
+
+**Instrument roster.** A new instrument enters `data/` when its psychometrics
+and norms are published, transcribable with provenance, and clear of
+permission questions. The bar is data quality, not demand.
+
+**Maintainership.** Single maintainer (Jeff Girard); external PRs are welcome
+through the intake path and held to the same oracle and review bars. Design
+records exist for the maintainer and the AI workflow, not to onboard
+co-maintainers.
+
+**Known fragilities** (confirmed 2026-08-04; each carries a ROADMAP candidate
+row): boundary-regime CI coverage failure at field N (documented, cautioned,
+but users live in that regime); the `repel = TRUE` plotting branch
+hand-computes canvas coordinates (D-019 flag); shipped instrument norms have
+never been re-verified against their published sources; CPM fits at field N
+sit in a 59–91% Heywood regime the cautions describe but users may not absorb.
 
 ## Data flow
 
