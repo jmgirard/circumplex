@@ -1,11 +1,11 @@
 # M72: Norms provenance audit, batch 1 (CSI family + IITC)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5
-- **Branch/PR:** —
+- **Branch/PR:** `m72-norms-audit-batch1` / —
 
 ## Goal
 
@@ -136,6 +136,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 - 2026-08-06: plan gate chose parsing source-note machine-readable tables over hand-typing source values into the script, because a hand-typed table checks one reader's transcription against itself; falsified by the note-block format proving unable to carry a per-value anchor.
 - 2026-08-06: plan gate chose a committed dispositions CSV joined by the script over hand-editing the generated ledger, because regeneration must not destroy dispositions; falsified by the instrument+field+scale key failing to identify a mismatch row uniquely.
 - 2026-08-06: plan chose full-object regression pins over comparing `data/` to regenerated `data-raw/` output, because the `data-raw/` scripts are themselves the transcriptions under audit; falsified by a source note itself proven mis-extracted against the page image.
+- 2026-08-06: status planned→in-progress (/milestone-implement); branch `m72-norms-audit-batch1` cut from pushed master. T1 waits on Jeff shelving the five source PDFs — exact citation list handed over, with two citations flagged as memory-derived for his verification.
 
 ## Decisions
 

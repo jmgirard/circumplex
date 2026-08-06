@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M70 | Self-describing scaled fit output for `axes_reliability()` | done | M69 | normal | milestones/archive/M70-axes-scaled-fit-self-describing.md |
 | M71 | Refuse an infinite fitted diagonal in `axes_scaling_factor()` | done | — | normal | milestones/archive/M71-scaled-fit-infinite-diagonal.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M72 | Norms provenance audit, batch 1 (CSI family + IITC) | planned | — | high | milestones/M72-norms-provenance-audit-batch1.md |
+| M72 | Norms provenance audit, batch 1 (CSI family + IITC) | in-progress | — | high | milestones/M72-norms-provenance-audit-batch1.md |
 
 ## Candidates
 
