@@ -86,56 +86,56 @@ justification). Numbers are never reused or renumbered._
 
 ### Inviolable principles
 
-- **IP1 — Statistical correctness outranks all other concerns.** Release
+- IP1: **Statistical correctness outranks all other concerns.** Release
   timing, API stability, convenience, and performance all yield to it.
-- **IP2 — The angle conventions are fixed.** Degrees [0, 360) in the user
+- IP2: **The angle conventions are fixed.** Degrees [0, 360) in the user
   API with LM = 360 (never 0); contrasts = second minus first, reported in
   (−180°, 180°]; radians internal only. Breaking any of these silently
   corrupts norms matching and published-results comparability.
-- **IP3 — Every shipped numeric result is validated against ≥2 independent
+- IP3: **Every shipped numeric result is validated against ≥2 independent
   oracle types**, and estimation changes revalidate against them (the
   validation-doctrine bar; oracles recorded at the asserting tests).
-- **IP4 — The RNG contract.** A function consumes the global RNG stream iff
+- IP4: **The RNG contract.** A function consumes the global RNG stream iff
   its statistical output is stochastic; everything else is deterministic and
   leaves `.Random.seed` untouched; a given seed reproduces results regardless
   of parallelism (see Reproducibility below).
-- **IP5 — Shipped instrument data carries published-source provenance.**
+- IP5: **Shipped instrument data carries published-source provenance.**
   Norms, scoring keys, and anchors enter or change `data/` only with their
   published source recorded in `data-raw/`. Binds forward from 2026-08-04;
   the pre-existing roster's unverified transcriptions are the norms-audit
   candidate row's debt, not a standing violation.
-- **IP6 — Estimation changes ship with boundary tests.** Any change touching
+- IP6: **Estimation changes ship with boundary tests.** Any change touching
   displacement, contrasts, or `src/` includes tests at profiles peaking at
   0°/360°, CIs straddling 0°/360°, contrasts near ±180°, and flat
   (zero-variance) profiles.
 
 ### Guiding principles
 
-- **GP1 — Circumplex constructs only.** The package does instrument-based
+- GP1: **Circumplex constructs only.** The package does instrument-based
   circumplex analysis, never general circular statistics (the `circular`
   package's territory); the degree/radian classes stay internal boundary tags.
-- **GP2 — Compute anything well-defined; caution loudly; fail closed.**
+- GP2: **Compute anything well-defined; caution loudly; fail closed.**
   Refusal is reserved for statistically ill-defined or wrong-object inputs
   (refuse-don't-coerce); guardrails label honestly (NA + warning, cautions
   naming their trigger) and never block a defensible analysis; undecidable
   edge cases fail closed (not certified, not computed) rather than guessing.
-- **GP3 — Minimal dependencies; standard-evaluation API.** Few Imports;
+- GP3: **Minimal dependencies; standard-evaluation API.** Few Imports;
   heavier or optional functionality goes to Suggests with graceful
   degradation; no tidyverse in package code; the user API is standard
   evaluation (character names / numeric indices), per D-014's evidence-based
   rejection of NSE.
-- **GP4 — Post-2.0 API stability.** Exported signatures, return structures,
+- GP4: **Post-2.0 API stability.** Exported signatures, return structures,
   and printed output are commitments; a break requires statistical cause (a
   wrong number) or a gated irreversible-api decision, and ships with a
   deprecation cycle.
-- **GP5 — Teach the field, precisely.** Pedagogy for applied researchers is
+- GP5: **Teach the field, precisely.** Pedagogy for applied researchers is
   part of the mission and worth its own milestones; its prose is statistically
   precise (never describe an angular CI excluding 0° as a significance test).
   The venue is tradeable — vignettes/pkgdown today, possibly an ebook later
   (candidate row) — the precision is not.
-- **GP6 — Scope is the variable.** When something must give, scope yields —
+- GP6: **Scope is the variable.** When something must give, scope yields —
   never the statistics, and never at the demand of a date.
-- **GP7 — Evidence reopens decisions.** A closed design decision records the
+- GP7: **Evidence reopens decisions.** A closed design decision records the
   class of evidence that would reopen it and is revisited only on that
   evidence; modernization or style advocacy alone never re-triggers.
 
