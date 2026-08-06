@@ -70,10 +70,12 @@ co-maintainers.
 
 **Known fragilities** (confirmed 2026-08-04; each carries a ROADMAP candidate
 row): boundary-regime CI coverage failure at field N (documented, cautioned,
-but users live in that regime); the `repel = TRUE` plotting branch
-hand-computes canvas coordinates (D-019 flag); shipped instrument norms have
-never been re-verified against their published sources; CPM fits at field N
-sit in a 59–91% Heywood regime the cautions describe but users may not absorb.
+but users live in that regime); shipped instrument norms have never been
+re-verified against their published sources; CPM fits at field N sit in a
+59–91% Heywood regime the cautions describe but users may not absorb. (A
+fourth — the `repel = TRUE` branch hand-computing canvas coordinates, D-019's
+flag — was stale at capture: M31's coord-aware rewrite had already fixed it;
+corrected 2026-08-06.)
 
 ## Design Principles
 
