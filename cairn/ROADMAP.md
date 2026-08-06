@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-04 (M71 post-merge. All checks PASS; M71 archived at 11 lines, live file deleted; terminal rows pruned 6 to 5 by dropping M66. Two candidate rows added at review: the huge-but-finite fitted diagonal the `+Inf` guard does not reach, and the sibling's misleading label. One lesson extended in place rather than added, none retired.)_
+_Last hygiene check: 2026-08-06 (routine audit; no work since 2026-08-04. All checks PASS; both GitHub inboxes empty; no tracking changes needed.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
