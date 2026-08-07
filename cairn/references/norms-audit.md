@@ -68,9 +68,13 @@ the mapping the audit script joins on.
 Filenames under `cairn/references/sources/` (gitignored). Scan verdict from the
 positive probe: `pdftotext` text-layer density over the anchor pages plus
 `pdfimages -list` for full-page images, with `pdfinfo` Producer as one input;
-an inconclusive probe is treated as a scan. All nine PDFs came back
+an inconclusive probe is treated as a scan. All nine batch-1/2 PDFs came back
 born-digital (M72, extended M73), so M42-D1's two-channel rule did not fire —
 the notes record that the norm tables were read in two channels regardless.
+Batch 3 breaks that run: `soldz1995.pdf` is an Acrobat Paper Capture OCR scan,
+the first shelf source for which M42-D1 does fire, so its text layer
+corroborates nothing and its norm table needs a channel that is not OCR of the
+same page image — observed 2026-08-07.
 
 | file | sha256 | verdict | observed |
 |---|---|---|---|
@@ -88,6 +92,11 @@ the notes record that the norm tables were read in two channels regardless.
 | hatcher2012.pdf | 239b5474fcfeb3b6b9e226779056d24d7744ae0274427dec40c0ecaac1ea1edf | born-digital (2 images, neither full-page; 5609 chars/page); publishes no norm table at all | 2026-08-06 |
 | markey2009.pdf | ce25c8ef65ddda8b14fec82377667b78bcecbbb4cc6c4a9858a51221853dedfa | born-digital (**zero** images, 4228 chars/page), so its text layer is the whole article | 2026-08-06 |
 | hopwood2011.pdf | b65fd37b08f1165ec66e0d6075500b2984a6e0cb7417e581a4f42d8981f80527 | born-digital (1 image, not full-page; 2474 chars/page); norm values are text objects **inside Figure 2**, p. 717 | 2026-08-06 |
+| sodano2006.pdf | c494d3c518bc6e2f1cd059ce074a0c6860d9236ec64f72db6a75100e02fee8db | born-digital (Distiller 6.0.1, 5290 chars/page); both norm tables are typeset text (Table 2, p. 323; Table 4, p. 325) | 2026-08-07 |
+| hopwood2008.pdf | 490620d357dd0d1b733c6bf5b1d0658e49b01651095dbd39e67054408fc24170 | born-digital (Distiller 6.0.1, 3825 chars/page); norm table is typeset text (Table 1) | 2026-08-07 |
+| horner2025.pdf | 69ce27cd48a2bddc105e5cde59e071e577508f387e2cf6f33127dd8e67eb80f2 | born-digital (Zotero, 5404 chars/page); both samples' norm values are typeset text in Table 1 | 2026-08-07 |
+| trucco2013.pdf | 32c34116c0e47000eeac5fcd808ba1daa4998e5e5311b3151812a7682391834c | born-digital (Adobe PDF Library 9.9, 4853 chars/page); all three samples' norm values are typeset text in Table 3 | 2026-08-07 |
+| soldz1995.pdf | 758030aeebd66fc8989d181ba9fd7c402f4973b831ed1df5ceefa27fba7e7d14 | **OCR scan** (Acrobat Paper Capture plug-in, 3234 chars/page): the text layer is OCR of the page image, so it is not a second witness (M42-D1) and the norm table needs a genuinely independent channel | 2026-08-07 |
 
 Channel plan for batch 2, decided by asking what channel reads the *norm
 table* rather than what produced the file (the M72 lesson). Every anchor a

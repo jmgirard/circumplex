@@ -56,44 +56,44 @@ the octant names (Connect = LM, Engage = NO, Lead = PA, Direct = BC,
 Balance = DE, Restrain = FG, Cooperate = HI, Consider = JK).
 
 <!-- audit-values-begin -->
-| field | scale | value | anchor |
-|---|---|---|---|
-| M | PA | 4.20 | Table 1, p. 558, 'Lead' row, M column |
-| M | BC | 4.10 | Table 1, p. 558, 'Direct' row, M column |
-| M | DE | 4.10 | Table 1, p. 558, 'Balance' row, M column |
-| M | FG | 4.23 | Table 1, p. 558, 'Restrain' row, M column |
-| M | HI | 4.59 | Table 1, p. 558, 'Cooperate' row, M column |
-| M | JK | 4.66 | Table 1, p. 558, 'Consider' row, M column |
-| M | LM | 4.61 | Table 1, p. 558, 'Connect' row, M column |
-| M | NO | 4.16 | Table 1, p. 558, 'Engage' row, M column |
-| SD | PA | 1.32 | Table 1, p. 558, 'Lead' row, SD column |
-| SD | BC | 1.29 | Table 1, p. 558, 'Direct' row, SD column |
-| SD | DE | 1.34 | Table 1, p. 558, 'Balance' row, SD column |
-| SD | FG | 1.24 | Table 1, p. 558, 'Restrain' row, SD column |
-| SD | HI | 1.17 | Table 1, p. 558, 'Cooperate' row, SD column |
-| SD | JK | 1.14 | Table 1, p. 558, 'Consider' row, SD column |
-| SD | LM | 1.24 | Table 1, p. 558, 'Connect' row, SD column |
-| SD | NO | 1.36 | Table 1, p. 558, 'Engage' row, SD column |
-| Angle | PA | not-published-in-source | p. 558 publishes CIRCUM estimates (Lead 86 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | BC | not-published-in-source | p. 558 publishes CIRCUM estimates (Direct 127 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | DE | not-published-in-source | p. 558 publishes CIRCUM estimates (Balance 177 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | FG | not-published-in-source | p. 558 publishes CIRCUM estimates (Restrain 233 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | HI | not-published-in-source | p. 558 publishes CIRCUM estimates (Cooperate 268 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | JK | not-published-in-source | p. 558 publishes CIRCUM estimates (Consider 307 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | LM | not-published-in-source | p. 558 fixes Connect at 0 deg as the CIRCUM reference, not as an assigned degree — degrees are package convention (IP2) |
-| Angle | NO | not-published-in-source | p. 558 publishes CIRCUM estimates (Engage 43 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Items | PA | 11, 16, 22, 29, 31, 37, 40, 58 | Appendix, p. 569, 'Lead' block — grouping only; numbers are the package's own item ordering |
-| Items | BC | 7, 10, 20, 28, 39, 46, 55, 59 | Appendix, p. 569, 'Direct' block — grouping only; numbers are the package's own item ordering |
-| Items | DE | 4, 5, 15, 18, 36, 48, 50, 53 | Appendix, p. 569, 'Balance' block — grouping only; numbers are the package's own item ordering |
-| Items | FG | 3, 8, 21, 34, 45, 51, 54, 56 | Appendix, p. 569, 'Restrain' block — grouping only; numbers are the package's own item ordering |
-| Items | HI | 2, 9, 14, 32, 41, 47, 49, 60 | Appendix, p. 569, 'Cooperate' block — grouping only; numbers are the package's own item ordering |
-| Items | JK | 17, 26, 27, 33, 35, 42, 43, 52 | Appendix, p. 569, 'Consider' block — grouping only; numbers are the package's own item ordering |
-| Items | LM | 6, 13, 19, 23, 30, 44, 57, 61 | Appendix, p. 569, 'Connect' block — grouping only; numbers are the package's own item ordering |
-| Items | NO | 1, 12, 24, 25, 38, 62, 63, 64 | Appendix, p. 569, 'Engage' block — grouping only; numbers are the package's own item ordering |
-| Size | — | 684 | p. 558, Study 3 Participants, 'An undergraduate sample of 684 completed'; the same paragraph's 265 plus 419 breakdown sums to it. Table 1's note on the same page instead reads 'N = 686' |
-| Population | — | undergraduates from a large Midwestern university (265) and a medium-sized Southern university (419) | p. 558, Study 3 Participants paragraph |
-| Reference | — | Hatcher & Rogers (2009) | p. 554, journal header set as two stacked lines, 'Psychological Assessment' above '2009, Vol. 21, No. 4, 554–569' (en dash; the text layer inserts a space before it that the rendered page does not print), with the byline 'Robert L. Hatcher' and 'Daniel T. Rogers' printed side by side above their affiliations and carrying no superscripts |
-| URL | — | https://doi.org/10.1037/a0017269 | p. 554, 'DOI: 10.1037/a0017269' printed in the journal header |
+| field | sample | scale | value | anchor |
+| --- | --- | --- | --- | --- |
+| M | 1 | PA | 4.20 | Table 1, p. 558, 'Lead' row, M column |
+| M | 1 | BC | 4.10 | Table 1, p. 558, 'Direct' row, M column |
+| M | 1 | DE | 4.10 | Table 1, p. 558, 'Balance' row, M column |
+| M | 1 | FG | 4.23 | Table 1, p. 558, 'Restrain' row, M column |
+| M | 1 | HI | 4.59 | Table 1, p. 558, 'Cooperate' row, M column |
+| M | 1 | JK | 4.66 | Table 1, p. 558, 'Consider' row, M column |
+| M | 1 | LM | 4.61 | Table 1, p. 558, 'Connect' row, M column |
+| M | 1 | NO | 4.16 | Table 1, p. 558, 'Engage' row, M column |
+| SD | 1 | PA | 1.32 | Table 1, p. 558, 'Lead' row, SD column |
+| SD | 1 | BC | 1.29 | Table 1, p. 558, 'Direct' row, SD column |
+| SD | 1 | DE | 1.34 | Table 1, p. 558, 'Balance' row, SD column |
+| SD | 1 | FG | 1.24 | Table 1, p. 558, 'Restrain' row, SD column |
+| SD | 1 | HI | 1.17 | Table 1, p. 558, 'Cooperate' row, SD column |
+| SD | 1 | JK | 1.14 | Table 1, p. 558, 'Consider' row, SD column |
+| SD | 1 | LM | 1.24 | Table 1, p. 558, 'Connect' row, SD column |
+| SD | 1 | NO | 1.36 | Table 1, p. 558, 'Engage' row, SD column |
+| Angle | — | PA | not-published-in-source | p. 558 publishes CIRCUM estimates (Lead 86 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | BC | not-published-in-source | p. 558 publishes CIRCUM estimates (Direct 127 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | DE | not-published-in-source | p. 558 publishes CIRCUM estimates (Balance 177 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | FG | not-published-in-source | p. 558 publishes CIRCUM estimates (Restrain 233 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | HI | not-published-in-source | p. 558 publishes CIRCUM estimates (Cooperate 268 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | JK | not-published-in-source | p. 558 publishes CIRCUM estimates (Consider 307 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | LM | not-published-in-source | p. 558 fixes Connect at 0 deg as the CIRCUM reference, not as an assigned degree — degrees are package convention (IP2) |
+| Angle | — | NO | not-published-in-source | p. 558 publishes CIRCUM estimates (Engage 43 deg) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Items | — | PA | 11, 16, 22, 29, 31, 37, 40, 58 | Appendix, p. 569, 'Lead' block — grouping only; numbers are the package's own item ordering |
+| Items | — | BC | 7, 10, 20, 28, 39, 46, 55, 59 | Appendix, p. 569, 'Direct' block — grouping only; numbers are the package's own item ordering |
+| Items | — | DE | 4, 5, 15, 18, 36, 48, 50, 53 | Appendix, p. 569, 'Balance' block — grouping only; numbers are the package's own item ordering |
+| Items | — | FG | 3, 8, 21, 34, 45, 51, 54, 56 | Appendix, p. 569, 'Restrain' block — grouping only; numbers are the package's own item ordering |
+| Items | — | HI | 2, 9, 14, 32, 41, 47, 49, 60 | Appendix, p. 569, 'Cooperate' block — grouping only; numbers are the package's own item ordering |
+| Items | — | JK | 17, 26, 27, 33, 35, 42, 43, 52 | Appendix, p. 569, 'Consider' block — grouping only; numbers are the package's own item ordering |
+| Items | — | LM | 6, 13, 19, 23, 30, 44, 57, 61 | Appendix, p. 569, 'Connect' block — grouping only; numbers are the package's own item ordering |
+| Items | — | NO | 1, 12, 24, 25, 38, 62, 63, 64 | Appendix, p. 569, 'Engage' block — grouping only; numbers are the package's own item ordering |
+| Size | 1 | — | 684 | p. 558, Study 3 Participants, 'An undergraduate sample of 684 completed'; the same paragraph's 265 plus 419 breakdown sums to it. Table 1's note on the same page instead reads 'N = 686' |
+| Population | 1 | — | undergraduates from a large Midwestern university (265) and a medium-sized Southern university (419) | p. 558, Study 3 Participants paragraph |
+| Reference | 1 | — | Hatcher & Rogers (2009) | p. 554, journal header set as two stacked lines, 'Psychological Assessment' above '2009, Vol. 21, No. 4, 554–569' (en dash; the text layer inserts a space before it that the rendered page does not print), with the byline 'Robert L. Hatcher' and 'Daniel T. Rogers' printed side by side above their affiliations and carrying no superscripts |
+| URL | 1 | — | https://doi.org/10.1037/a0017269 | p. 554, 'DOI: 10.1037/a0017269' printed in the journal header |
 <!-- audit-values-end -->
 
 ## Traces to

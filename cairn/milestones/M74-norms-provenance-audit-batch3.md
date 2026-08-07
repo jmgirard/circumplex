@@ -20,7 +20,7 @@ instrument to more than one source.
 `(Sample, scale)`, closing M72's finding that the shipped-side key ignores
 `Sample`; a per-(instrument, sample) citekey map so iipsc's two samples join to
 their two different sources; source notes for `sodano2006` (cais),
-`horner2024` (iei), `trucco2013` (igicr), `hopwood2011a` and `soldz1995`
+`horner2024` (iei), `trucco2013` (igicr), `hopwood2008` and `soldz1995`
 (iipsc's two samples); a clean audit run over all thirteen audited instruments;
 correcting any shipped value the audit finds wrong; pins and status rows for the
 four.
@@ -37,11 +37,11 @@ PA/NO duplicated-statistics question → its existing candidate row.
       source row — fenced by a regression test whose fixture gives two samples
       different `M` values and whose swap of those two samples reddens.
 - [ ] AC2. `AUDIT_BATCH` takes a citekey per (instrument, sample); iipsc's two
-      samples join to `hopwood2011a` and `soldz1995` respectively, shown by
+      samples join to `hopwood2008` and `soldz1995` respectively, shown by
       their ledger or coverage rows carrying different anchors; and every
       single-sample entry from batches 1 and 2 audits unchanged under the new
       form.
-- [ ] AC3. Each of `sodano2006`, `horner2024`, `trucco2013`, `hopwood2011a` and
+- [ ] AC3. Each of `sodano2006`, `horner2024`, `trucco2013`, `hopwood2008` and
       `soldz1995` has a committed `cairn/references/<citekey>.md` authored from
       `skills/shared/templates/source-note.md`, carrying an audit-values block
       that `parse_source_note()` reads without error, a Provenance block whose
@@ -78,18 +78,18 @@ PA/NO duplicated-statistics question → its existing candidate row.
 
 ## Tasks
 
-- [ ] T1. Shelf intake: confirm the four shelf PDFs are present and record each
+- [x] T1. Shelf intake: confirm the four shelf PDFs are present and record each
       one's sha256 and scan verdict in `norms-audit.md`'s manifest; decide the
       channel plan per source by asking what channel reads the norm table.
-- [ ] T2. Rekey `shipped_values()` to carry `Sample` and rekey the
+- [x] T2. Rekey `shipped_values()` to carry `Sample` and rekey the
       `audit_norms()` join on `(field, Sample, scale)`; add the differing-values
       regression fixture and prove the swap reddens.
-- [ ] T3. Rework `AUDIT_BATCH` into a per-(instrument, sample) citekey map;
+- [x] T3. Rework `AUDIT_BATCH` into a per-(instrument, sample) citekey map;
       confirm batches 1 and 2 audit unchanged under it.
 - [ ] T4. Author `sodano2006.md` (cais) and `trucco2013.md` (igicr).
 - [ ] T5. Author `horner2024.md` (iei) from the shelf PDF's Table 1, and shelve
       the author's IEI norms page as retrieval evidence for the `URL` field.
-- [ ] T6. Author `hopwood2011a.md` and `soldz1995.md` for iipsc's two samples.
+- [ ] T6. Author `hopwood2008.md` and `soldz1995.md` for iipsc's two samples.
 - [ ] T7. Extend the batch, run the audit, disposition every ledger row, commit
       the ledger and coverage CSVs.
 - [ ] T8. Resolve every `mismatch` row from T7 — correct `data-raw/<inst>.R`
@@ -103,7 +103,12 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - 2026-08-07: status -> in-progress; branch m74-norms-provenance-audit-batch3 cut from master.
 - 2026-08-07: shelf triage found horner2025.pdf (iei, Table 1 prints both samples' M/SD), trucco2013.pdf (igicr, Table 3, three samples) and soldz1995.pdf (iipsc s2, Table 4 n=106) all present and matching shipped; sodano2006 (cais) and hopwood2011a (iipsc s1) absent from the shelf, Jeff supplying both.
 - 2026-08-07: amendment gate — AC3's "horner2024 is OSF-hosted rather than a shelf PDF" sentence deleted as false (the article is on the shelf and publishes the values); T5 rewritten to match. Rest of AC3 unchanged.
+- 2026-08-07: amendment — iipsc's sample-1 citekey `hopwood2011a` renamed `hopwood2008` in Scope, AC2, AC3 and T6: the shelved paper's own to-cite line reads "(2008) ... Journal of Personality Assessment, 90:6", so a 2011 citekey would name a year the source does not carry. Makes the shipped `Reference` "Hopwood, Pincus, DeMoor, & Koonce (2011)" an AC5 correction rather than a match.
 - 2026-08-07: gate chose the author's IEI norms page over the article DOI and the OSF project for iei's shipped norms URL (M74-D1); rejected because Jeff wants users landing on the norms table itself, falsified if that page goes dead or stops matching the shipped values.
+- 2026-08-07: T1 done — all five batch-3 sources on the shelf (sodano2006, hopwood2008, horner2025, trucco2013, soldz1995), sha256 + scan verdict recorded in norms-audit.md's manifest. Channel plan: soldz1995 is an Acrobat Paper Capture OCR scan, the first shelf source for which M42-D1 fires; the other four are born-digital with the norm values as typeset table text.
+- 2026-08-07: T2 done — shipped_values() now enumerates ONE sample at a time and emits a `sample` column, the join keys on (field, sample, scale), and a batch entry naming a missing sample aborts instead of auditing nothing. Fenced by tests/testthat/test-norms-audit-sample-key.R; reverting to the pre-M74 enumeration and key reddens 8 assertions.
+- 2026-08-07: T3 done — AUDIT_BATCH is a per-(instrument, sample) data.frame carrying citekey, divisor and a `scales` flag, validated by validate_batch(); the nine source notes and the dispositions CSV migrated to the five-column schema. Batches 1 and 2 re-audit to the same 130 ledger rows and 13 coverage rows, 0 value differences on every shared key.
+- 2026-08-07: sodano2006 extracted in two channels (pdftotext + 300-dpi render of pp. 323 and 325): both CAIS samples' M/SD match shipped exactly, but Table 2's note reads N = 204 where the package ships Size = 213 (the article's Participants text gives 213 for the analysis sample). An AC5 item for T8, not yet resolved.
 - 2026-08-06: plan gate chose deferring the multi-sample rework to this milestone over doing it in M73 because M73's four instruments are all single-sample and would leave the rework unexercised; falsified by the rekey turning out to be a precondition for something M73 needs.
 
 ## Decisions

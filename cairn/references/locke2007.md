@@ -45,43 +45,43 @@ package's own convention (DESIGN.md IP2), so every Angle row below is
 `not-published-in-source` rather than a verified match.
 
 <!-- audit-values-begin -->
-| field | scale | value | anchor |
-|---|---|---|---|
-| M | PA | 7.23 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| M | BC | 6.44 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| M | DE | 6.93 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| M | FG | 7.24 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| M | HI | 7.31 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| M | JK | 8.51 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| M | LM | 7.90 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| M | NO | 7.30 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| SD | PA | 1.68 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| SD | BC | 1.66 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| SD | DE | 1.82 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| SD | FG | 1.54 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| SD | HI | 1.53 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| SD | JK | 1.11 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| SD | LM | 1.20 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| SD | NO | 1.37 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
-| Angle | PA | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
-| Angle | BC | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
-| Angle | DE | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
-| Angle | FG | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
-| Angle | HI | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
-| Angle | JK | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
-| Angle | LM | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
-| Angle | NO | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
-| Items | PA | 4, 12, 20, 28 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
-| Items | BC | 7, 15, 23, 31 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
-| Items | DE | 2, 10, 18, 26 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
-| Items | FG | 5, 13, 21, 29 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
-| Items | HI | 8, 16, 24, 32 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
-| Items | JK | 3, 11, 19, 27 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
-| Items | LM | 6, 14, 22, 30 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
-| Items | NO | 1, 9, 17, 25 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
-| Size | — | 367 | locke2007 Table 1 note, p. 97; and CSIE_Norms.html sample description |
-| Population | — | undergraduates who participated in Study 1 of Locke & Sadler (2007) | CSIE_Norms.html sample description (retrieved 2026-08-06) |
-| Reference | — | Locke & Sadler (2007) | CSIE_Norms.html sample description, which prints this credit verbatim: 'the 367 undergraduates who participated in Study 1 of Locke & Sadler (2007)' (retrieved 2026-08-06) |
-| URL | — | https://kennethlocke.org/CSIE/CSIE_Norms.html | retrieved 2026-08-06; the page serving the 0-to-10 undergraduate norms table |
-| note-only | adult 0-to-4 sample | N = 1,234, Locke & Adamic (2012) Studies 3-4 | CSIE_Norms.html, 'U.S. Adult Norms (0-to-4 Scale)' table (retrieved 2026-08-06) |
+| field | sample | scale | value | anchor |
+| --- | --- | --- | --- | --- |
+| M | 1 | PA | 7.23 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| M | 1 | BC | 6.44 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| M | 1 | DE | 6.93 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| M | 1 | FG | 7.24 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| M | 1 | HI | 7.31 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| M | 1 | JK | 8.51 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| M | 1 | LM | 7.90 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| M | 1 | NO | 7.30 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| SD | 1 | PA | 1.68 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| SD | 1 | BC | 1.66 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| SD | 1 | DE | 1.82 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| SD | 1 | FG | 1.54 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| SD | 1 | HI | 1.53 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| SD | 1 | JK | 1.11 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| SD | 1 | LM | 1.20 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| SD | 1 | NO | 1.37 | CSIE_Norms.html, 'U.S. Undergraduate Student Norms (0-to-10 Scale)', All Participants column (retrieved 2026-08-06) |
+| Angle | — | PA | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
+| Angle | — | BC | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
+| Angle | — | DE | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
+| Angle | — | FG | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
+| Angle | — | HI | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
+| Angle | — | JK | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
+| Angle | — | LM | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
+| Angle | — | NO | not-published-in-source | not published — octant order given, degrees are package convention (IP2) |
+| Items | — | PA | 4, 12, 20, 28 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
+| Items | — | BC | 7, 15, 23, 31 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
+| Items | — | DE | 2, 10, 18, 26 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
+| Items | — | FG | 5, 13, 21, 29 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
+| Items | — | HI | 8, 16, 24, 32 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
+| Items | — | JK | 3, 11, 19, 27 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
+| Items | — | LM | 6, 14, 22, 30 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
+| Items | — | NO | 1, 9, 17, 25 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
+| Size | 1 | — | 367 | locke2007 Table 1 note, p. 97; and CSIE_Norms.html sample description |
+| Population | 1 | — | undergraduates who participated in Study 1 of Locke & Sadler (2007) | CSIE_Norms.html sample description (retrieved 2026-08-06) |
+| Reference | 1 | — | Locke & Sadler (2007) | CSIE_Norms.html sample description, which prints this credit verbatim: 'the 367 undergraduates who participated in Study 1 of Locke & Sadler (2007)' (retrieved 2026-08-06) |
+| URL | 1 | — | https://kennethlocke.org/CSIE/CSIE_Norms.html | retrieved 2026-08-06; the page serving the 0-to-10 undergraduate norms table |
+| note-only | — | adult 0-to-4 sample | N = 1,234, Locke & Adamic (2012) Studies 3-4 | CSIE_Norms.html, 'U.S. Adult Norms (0-to-4 Scale)' table (retrieved 2026-08-06) |
 <!-- audit-values-end -->

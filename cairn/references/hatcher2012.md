@@ -62,46 +62,46 @@ Table 4's octant alpha reliabilities, none of which the package ships.
 ## Extracted values
 
 <!-- audit-values-begin -->
-| field | scale | value | anchor |
-|---|---|---|---|
-| M | PA | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| M | BC | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| M | DE | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| M | FG | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| M | HI | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| M | JK | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| M | LM | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| M | NO | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| SD | PA | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| SD | BC | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| SD | DE | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| SD | FG | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| SD | HI | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| SD | JK | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| SD | LM | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| SD | NO | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
-| Angle | PA | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Lead 87 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | BC | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Direct 133 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | DE | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Balance 183 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | FG | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Restrain 230 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | HI | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Cooperate 273 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | JK | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Consider 314 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Angle | LM | not-published-in-source | Table 3, p. 642 fixes Connect at 0 deg as the CIRCUM reference, not as an assigned degree — degrees are package convention (IP2) |
-| Angle | NO | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Engage 41 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
-| Items | PA | 14, 16, 18, 20 | Appendix, p. 646, 'Lead' block — grouping only; numbers are the package's own item ordering |
-| Items | BC | 3, 10, 19, 25 | Appendix, p. 646, 'Direct' block — grouping only; numbers are the package's own item ordering |
-| Items | DE | 6, 8, 26, 28 | Appendix, p. 646, 'Balance' block — grouping only; numbers are the package's own item ordering |
-| Items | FG | 11, 24, 29, 30 | Appendix, p. 646, 'Restrain' block — grouping only; numbers are the package's own item ordering |
-| Items | HI | 5, 17, 27, 31 | Appendix, p. 646, 'Cooperate' block — grouping only; numbers are the package's own item ordering |
-| Items | JK | 7, 13, 21, 22 | Appendix, p. 646, 'Consider' block — grouping only; numbers are the package's own item ordering |
-| Items | LM | 2, 9, 15, 23 | Appendix, p. 646, 'Connect' block — grouping only; numbers are the package's own item ordering |
-| Items | NO | 1, 4, 12, 32 | Appendix, p. 646, 'Engage' block — grouping only; numbers are the package's own item ordering |
-| Size | — | not-published-in-source | the shipped 1380 appears nowhere in the article; its samples are 1,377 / 956 / 497 per Table 2, p. 641, and the Finding above records the sweep |
-| Population | — | not-published-in-source | the shipped norm sample is unidentified, so the article describes no population for it; its development sample is described on p. 640 |
-| Reference | — | Hatcher & Rogers (2012) | p. 638, journal header 'Journal of Personality Assessment, 94(6), 638–646, 2012' (en dash) with the byline 'ROBERT L. HATCHER AND DANIEL T. ROGERS' — set in small caps on the page, which the text layer flattens to the all-caps form quoted here — each surname followed by a superscript affiliation marker ('1' and '2') |
-| URL | — | https://doi.org/10.1080/00223891.2012.681818 | p. 638, 'DOI: 10.1080/00223891.2012.681818' printed in the journal header |
-| note-only | study samples | development N = 1,377, validation N = 956, clinical N = 497 | Table 2, p. 641, 'Fit of circumplex model to Inventory of Interpersonal Strengths (IIS-32) data' |
-| note-only | octant alphas | per-sample octant and full-scale alpha reliabilities for both IIS forms | Table 4, p. 642, 'Reliabilities of Inventory of Interpersonal Strengths-64 and Inventory of Interpersonal Strengths-32 in the samples' |
+| field | sample | scale | value | anchor |
+| --- | --- | --- | --- | --- |
+| M | 1 | PA | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| M | 1 | BC | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| M | 1 | DE | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| M | 1 | FG | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| M | 1 | HI | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| M | 1 | JK | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| M | 1 | LM | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| M | 1 | NO | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| SD | 1 | PA | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| SD | 1 | BC | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| SD | 1 | DE | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| SD | 1 | FG | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| SD | 1 | HI | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| SD | 1 | JK | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| SD | 1 | LM | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| SD | 1 | NO | not-published-in-source | no descriptive-statistics table exists in the article; see the Finding above for the sweep |
+| Angle | — | PA | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Lead 87 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | BC | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Direct 133 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | DE | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Balance 183 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | FG | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Restrain 230 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | HI | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Cooperate 273 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | JK | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Consider 314 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Angle | — | LM | not-published-in-source | Table 3, p. 642 fixes Connect at 0 deg as the CIRCUM reference, not as an assigned degree — degrees are package convention (IP2) |
+| Angle | — | NO | not-published-in-source | Table 3, p. 642 publishes CIRCUM estimates (Engage 41 deg, development sample) with Connect fixed at 0 deg, not assigned degrees — degrees are package convention (IP2) |
+| Items | — | PA | 14, 16, 18, 20 | Appendix, p. 646, 'Lead' block — grouping only; numbers are the package's own item ordering |
+| Items | — | BC | 3, 10, 19, 25 | Appendix, p. 646, 'Direct' block — grouping only; numbers are the package's own item ordering |
+| Items | — | DE | 6, 8, 26, 28 | Appendix, p. 646, 'Balance' block — grouping only; numbers are the package's own item ordering |
+| Items | — | FG | 11, 24, 29, 30 | Appendix, p. 646, 'Restrain' block — grouping only; numbers are the package's own item ordering |
+| Items | — | HI | 5, 17, 27, 31 | Appendix, p. 646, 'Cooperate' block — grouping only; numbers are the package's own item ordering |
+| Items | — | JK | 7, 13, 21, 22 | Appendix, p. 646, 'Consider' block — grouping only; numbers are the package's own item ordering |
+| Items | — | LM | 2, 9, 15, 23 | Appendix, p. 646, 'Connect' block — grouping only; numbers are the package's own item ordering |
+| Items | — | NO | 1, 4, 12, 32 | Appendix, p. 646, 'Engage' block — grouping only; numbers are the package's own item ordering |
+| Size | 1 | — | not-published-in-source | the shipped 1380 appears nowhere in the article; its samples are 1,377 / 956 / 497 per Table 2, p. 641, and the Finding above records the sweep |
+| Population | 1 | — | not-published-in-source | the shipped norm sample is unidentified, so the article describes no population for it; its development sample is described on p. 640 |
+| Reference | 1 | — | Hatcher & Rogers (2012) | p. 638, journal header 'Journal of Personality Assessment, 94(6), 638–646, 2012' (en dash) with the byline 'ROBERT L. HATCHER AND DANIEL T. ROGERS' — set in small caps on the page, which the text layer flattens to the all-caps form quoted here — each surname followed by a superscript affiliation marker ('1' and '2') |
+| URL | 1 | — | https://doi.org/10.1080/00223891.2012.681818 | p. 638, 'DOI: 10.1080/00223891.2012.681818' printed in the journal header |
+| note-only | — | study samples | development N = 1,377, validation N = 956, clinical N = 497 | Table 2, p. 641, 'Fit of circumplex model to Inventory of Interpersonal Strengths (IIS-32) data' |
+| note-only | — | octant alphas | per-sample octant and full-scale alpha reliabilities for both IIS forms | Table 4, p. 642, 'Reliabilities of Inventory of Interpersonal Strengths-64 and Inventory of Interpersonal Strengths-32 in the samples' |
 <!-- audit-values-end -->
 
 ## Traces to
