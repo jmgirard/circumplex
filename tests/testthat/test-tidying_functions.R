@@ -138,3 +138,65 @@ test_that("self_standardize works", {
   expect_error(self_standardize(aw2009, 2:9))
   expect_equal(ncol(new), ncol(new2) + ncol(old))
 })
+
+
+# The shipped norms of a multi-sample instrument are keyed by `Sample`, and
+# norm_standardize() subsets on that key. A miscoded key is invisible to a
+# row-count check -- the frame still has 8 rows per sample -- and shows up only
+# as which octants land in each subset, so these two tests assert the key's
+# CONTENT rather than the frame's shape. They sweep every shipped instrument
+# rather than naming the one that was broken, because the defect is a way of
+# writing the column and not a fact about one instrument.
+shipped_instrument_names <- function() {
+  nms <- utils::data(package = "circumplex")$results[, "Item"]
+  sort(Filter(function(nm) {
+    e <- new.env()
+    utils::data(list = nm, package = "circumplex", envir = e)
+    inherits(get(nm, envir = e), "circumplex_instrument")
+  }, nms))
+}
+
+test_that("each shipped norm sample keys every scale exactly once", {
+  for (nm in shipped_instrument_names()) {
+    obj <- get(nm)
+    norms <- obj$Norms[[1]]
+    key <- if ("Scale" %in% names(norms)) "Scale" else "Abbrev"
+    for (s in obj$Norms[[2]]$Sample) {
+      rows <- norms[norms$Sample == s, ]
+      expect_equal(nrow(rows), nrow(obj$Scales),
+                   info = paste(nm, "sample", s))
+      expect_setequal(as.character(rows[[key]]), as.character(obj$Scales$Abbrev))
+      expect_equal(anyDuplicated(rows$Angle %% 360), 0L,
+                   info = paste(nm, "sample", s, "has a repeated angle"))
+    }
+  }
+})
+
+test_that("norm_standardize runs on every shipped instrument and sample", {
+  # End-to-end rather than structural only: a key that survives the shape
+  # assertions above but still mixes samples would produce numbers here.
+  probe <- as.data.frame(matrix(2, nrow = 2, ncol = 8))
+  for (nm in shipped_instrument_names()) {
+    obj <- get(nm)
+    names(probe) <- obj$Scales$Abbrev
+    for (s in obj$Norms[[2]]$Sample) {
+      expect_no_error(
+        norm_standardize(probe, scales = names(probe),
+                         angles = obj$Scales$Angle, instrument = obj,
+                         sample = s, append = FALSE)
+      )
+    }
+  }
+
+  # And pin the values for one multi-sample instrument against its published
+  # source, so the sweep above cannot pass on norms that run but are wrong.
+  # iei sample 1 is Horner, Locke & Hulsey's Study 1 (N = 1223): PA M = 2.00,
+  # SD = 0.71 and BC M = 1.21, SD = 0.61, so an all-2 probe gives PA_z = 0 and
+  # BC_z = (2 - 1.21) / 0.61.
+  names(probe) <- iei$Scales$Abbrev
+  z1 <- norm_standardize(probe, scales = names(probe),
+                         angles = iei$Scales$Angle, instrument = iei,
+                         sample = 1, append = FALSE)
+  expect_equal(z1$PA_z[[1]], 0)
+  expect_equal(z1$BC_z[[1]], (2 - 1.21) / 0.61)
+})
