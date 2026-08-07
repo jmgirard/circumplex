@@ -1,6 +1,6 @@
 # M74: Norms provenance audit, batch 3 (multi-sample instruments)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M73
 - **Driving RR:** —
@@ -101,7 +101,7 @@ PA/NO duplicated-statistics question → its existing candidate row.
       the ledger and coverage CSVs.
 - [x] T8. Resolve every `mismatch` row from T7 — correct `data-raw/<inst>.R`
       and rebuild `data/`, two-channel per M42-D1, or record a disposition.
-- [ ] T9. Extend `audited_objects` and the `norms-audit.md` status rows for the
+- [x] T9. Extend `audited_objects` and the `norms-audit.md` status rows for the
       four; run the full check.
 - [x] T10. Sweep every bundled instrument's item key for the cais failure mode;
       lock the structural half with a test over all fifteen.
@@ -126,6 +126,8 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - 2026-08-07: T8 done — four corrections, each from values read in two channels: cais Items rekeyed to sodano2006 Table 1's 5/5/5/4/5/3/5/5 blocks (changes JK, LM and NO scores and brings items 33-37 into scoring), cais sample-1 Size 213 -> 204, iipsc sample-1 Reference year 2011 -> 2008, iei URL split per sample (norms page / article DOI). data/cais.rda, data/iei.rda and data/iipsc.rda rebuilt; ?iipsc now cites both normative sources; NEWS records the cais score change as a breaking behavior change.
 - 2026-08-07: T10 done — sweep of all fifteen bundled instruments found cais the only key that is not a complete partition of its items; every other one keys its full item count with no gaps or repeats. Locked by two tests in test-norms-provenance.R: a partition sweep over all fifteen and an explicit pin of cais's key against Table 1. Both verified to redden against HEAD's pre-fix data/cais.rda (partition FALSE because items 33-37 are unkeyed) and to pass after.
 - 2026-08-07: correction to horner2024.md's provenance block — its claim that "the article prints 2024 throughout" was written before reading R/instrument_data.R, which cites a 2025 version of record (JPA 107(2), 170-187). The shelf copy is the online-first version, paginated 1-18; the block now says so and states that every page anchor is that copy's pagination.
+- 2026-08-07: T9 done — cais, iei, igicr and iipsc added to audited_objects with their full Norms and Scales objects pinned (9 normative samples), norms-audit.md's status rows and citekey map extended and a "What batch 3 found" section written; the M73 status<->pin binding test passes over all thirteen. devtools::check(args = "--no-manual") clean: 0 errors, 0 warnings, 0 notes, testthat 0 failures / 6060 passing. cairn_validate: all checks passed.
+- 2026-08-07: status -> review. Norms-fitness question raised by Jeff at the gate captured as a ROADMAP candidate row (reference choice moves z-scores 0.44 SD against 0.12 SD from sampling error at the smallest shipped sample), deliberately out of M74.
 - 2026-08-06: plan gate chose deferring the multi-sample rework to this milestone over doing it in M73 because M73's four instruments are all single-sample and would leave the rework unexercised; falsified by the rekey turning out to be a precondition for something M73 needs.
 
 ## Decisions
