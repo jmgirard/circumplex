@@ -1,6 +1,6 @@
 # M73: Norms provenance audit, batch 2 (single-sample instruments)
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -151,6 +151,7 @@ the source author.
 - 2026-08-07: round-2 fixes for the six actioned findings. F3+F4: iis32's verdict now names Reference and URL and drops the "deviates by design" claim its `source-not-identified` disposition contradicts. F10/F11: iis32 item 28 "ok"->"okay" and ipipipc item 16 "sob-stories"->"sob stories", each confirmed in the text layer and the page image of that instrument's own Appendix; the two IIS articles genuinely differ on ok/okay. F12: markey2009.md's Traces-to no longer claims an anchor-label comparison the block does not carry. F18: hopwood2011.md's page count and printed range reconciled. F5 (logged at 78, fixed anyway): hopwood2011.md now records what actually supports Size = 649 — the Sample-1 derivation narrative, not the figure note alone — and says why Population is the one row drawn from the whole 1,336.
 - 2026-08-07: F1 (logged at 72, fixed anyway): the run block counted every exempt coverage row as "note-only", which would have reported the constructed-credit row as one; it now counts by side and prints both. Scope note — the other 15 sub-threshold findings stay logged, not actioned.
 - 2026-08-07: round-2 verify slot clean — devtools::document() no man/ diff, devtools::test() 0 failures over 5986 assertions. Status back to review.
+- 2026-08-07: review round 2 — AC1-AC4, AC6, AC7, AC8 verified; **AC5 fails again**, on anchor accuracy rather than wording (G5 at 85, G15 at 82, G16 at 80: a false constructed-credit reason, and two anchors citing invisible text-layer production codes as a printed running head). Five further findings >= 80 ride with it. Defect return 2 of the 3 the thrash rule allows.
 
 ## Decisions
 
@@ -257,3 +258,56 @@ Returned to `in-progress` on two criteria.
   rather than the work — its purpose, giving the note-side credit an origin
   independent of the shipped string, is met by anchoring the author names and
   year to the page that prints them. This routes to a gated amendment.
+
+### Round 2, 2026-08-07
+
+Re-executed every criterion on the round-2 tree. AC1, AC2, AC3, AC4, AC6, AC7
+and AC8 all **verified**: audit run 130 rows / 0 gaps / 0 splits / 0 breaches /
+0 `UNDISPOSITIONED` with the counters now reading 12 note-only and 1
+constructed credit; the four verdicts cross-checked field by field against the
+ledger and now match exactly what compared and passed; both mutation
+directions red again (`Needs: "isc"`, `Absent: "isc"`); `check` 0/0/0 (16m42s);
+PDF manual built separately; `cairn_validate` all pass, `document()` no diff,
+`check_pkgdown()` clean.
+
+**AC5 fails again — this time on the work, not the wording.** A fresh
+diff-bug lens returned 23 findings; an independent scorer put eight at >= 80.
+Three of those fail AC5 as amended:
+
+- G5 (85). `locke2000.md`'s `constructed-credit` reason says the CSIV norms
+  page carries "no date and no article citation anywhere on it". Stripping the
+  shelved HTML shows a 2022 citation, a 2012 citation and a 2024 copyright
+  line; the note's own two `note-only` rows record those citations two lines
+  later. The true claim is narrower — the undergraduate norms *table* carries
+  no citation. AC5 requires the reason, so a false reason fails it.
+- G15 (82) and G16 (80). `bliton2019.md` and `locke2014.md` anchor a "running
+  head" that is not printed: rendering p. 1 shows nothing visible, and the
+  string exists only inside SAGE's invisible production-tracking line in the
+  text layer. `boudreaux2018.md` and `locke2014.md` also reconstruct
+  multi-line en-dashed headers as single ASCII-hyphenated strings, and two
+  bylines drop printed superscripts. AC5 says "quoting that printed text".
+
+Five more at >= 80, none mapping to an AC: G1 (92) `markey2009.md` cites
+p. 353 for statistics printed on p. 354, and that page number ships in
+`?ipipipc` and `man/ipipipc.Rd`; G2 (90) the p. 716 citation round 2 itself
+added is on p. 715; G4 (85) the isc `Size` anchor quotes a sentence spanning
+pp. 714-715 and names only 715; G6 (82) `norms-audit.md` still says "Two
+shipped IIS-64 item texts" where NEWS now says four; G7 (85)
+`hatcher2012.md` omits `Population` from its unsourced list.
+
+Fifteen logged below threshold, unchanged in substance from round 1 where they
+recur (G18/F23, G23/F22, G9/F6) plus: G3 (45) the page-range phrasing, G8 (62)
+item text is fenced by no pin, G10 (15) and G13 (18) pre-existing, G11 (72) the
+new counters match two literal sides, G12 (78) the disposition note asserts
+correspondence the work log calls unassertable, G14 (45) an undocumented ASCII
+quote substitution, G17 (68) containment still passes a disclaiming string,
+G19 (65) a match claim stamped before the key changed, G20 (68) item text sits
+outside D-039's scope, G21 (40) a long line, G22 (65) `Anchors` is audited by
+nothing.
+
+**Disposition.** Defect return, the second on this milestone. AC5's three
+failures are anchor accuracy, not criterion wording — the amended criterion is
+doing exactly its job by catching them — so this is not a second amendment
+return and the stop rule does not fire. G1, G2, G4, G6 and G7 ride with the
+fix. The next return would be the third, which the thrash rule treats as a
+mis-planned milestone rather than something to retry.
