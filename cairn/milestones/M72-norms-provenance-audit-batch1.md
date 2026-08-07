@@ -138,7 +138,7 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
       rows; the script gains a note-only kind exempt from coverage.
 - [x] **T8** — Harden `audit-norms.R`: IP2 convention check, failed joins, `NA`
       angles, dropped rows, parse failures all reported; coverage artifact.
-- [ ] **T9** — Pre-fix ledger rebuilt against pre-fix `data/` in a scratch
+- [x] **T9** — Pre-fix ledger rebuilt against pre-fix `data/` in a scratch
       checkout, stamped with both commits; post-fix re-run; dispositions extended.
 - [ ] **T10** — Document the deviation at `norms()`'s help; fix
       `R/instrument_data.R`'s csiv `@source`; `devtools::document()`.
@@ -181,6 +181,8 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
 - 2026-08-06: T7 complete — the five machine-readable tables now carry 7 note-only rows (csie adult N=1,234; csig Study 2 n=327 plotted-only; csip women n=121 and men n=70; csiv N=980 and N=1,244; iitc Study 2 N=608, the last four found by re-reading the shelf copies rather than taken from the earlier prose) plus a `Reference` and `URL` row each. `Reference` compares by containment — the shipped string must credit the author-year the source itself supports, and may carry context around it — so the pre-fix csiv "Locke (2000)" fails while the corrected string passes. locke2000's LM angle row now records the 0 the source prints instead of the package's 360; the IP2 translation moved to the shipped-side check in T8. Run: 0 coverage gaps, 7 note-only, 53 ledger rows unchanged.
 
 - 2026-08-06: T8 complete, every new check proven by mutation rather than by eye (clean run: 0 gaps, 0 splits, 0 IP2 breaches, 53 ledger rows). Setting csiv's LM to 0 in both copies now raises 2 IP2 breaches where the mod-360 ledger stays byte-identical (review finding 1); breaking a scale name raises a split where `which(NA)` used to drop it (finding 2); an `NA` angle raises both a split and an IP2 row (finding 3); a note row carrying a literal `|` now errors instead of vanishing (findings 10, 11); and restoring the pre-fix csiv `Reference` produces a 54th row, `kind = mismatch` — the audit can now see the defect the milestone found. Coverage report written to `data-raw/norms-audit-coverage.csv` (finding 8); the hardcoded run date is gone and the single `commit` column is replaced by `script_commit` + `data_commit`, since a run's own HEAD is necessarily the parent of the commit that lands the ledger (finding 7).
+
+- 2026-08-06: T9 complete — the pre-fix ledger is now a real pre-fix artifact, superseding the earlier claim that the committed one was (the review measured its stamp as a descendant of the fix commit). Rebuilt in a detached scratch worktree carrying `data/` from `c2453755`, the parent of the T4 fix commit, with today's script and notes; it stamps `script_commit 54fbf783` and `data_commit c2453755` rather than one ambiguous commit. The two ledgers are no longer byte-identical outside the stamp, which is the point: pre-fix carries 56 rows including three `transcription-error` rows (csie `URL`, csiv `URL`, csiv `Reference`), post-fix carries 53 with none. Neither has an undispositioned row. The widened field set closed the gap this milestone had to record as uncovered.
 
 ## Decisions
 

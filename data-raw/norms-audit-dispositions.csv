@@ -52,3 +52,6 @@
 "iitc","Items","LM","not-published-in-source","source publishes no value for this field"
 "iitc","Items","NO","not-published-in-source","source publishes no value for this field"
 "iitc","Population","—","intended-deviation","package ships a short standardised population summary; the source description is recorded in the source note"
+"csie","URL","—","transcription-error","URL pointed at a retired uidaho.edu path that no longer serves the cited norms table; repointed at the live page on this branch"
+"csiv","URL","—","transcription-error","URL pointed at a retired uidaho.edu path that no longer serves the cited norms table; repointed at the live page on this branch"
+"csiv","Reference","—","transcription-error","norms credited to Locke (2000), whose article publishes no octant statistics and a different sample; corrected on this branch to credit the website data alongside the instrument's article"
