@@ -1,6 +1,6 @@
 # M73: Norms provenance audit, batch 2 (single-sample instruments)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -117,7 +117,7 @@ the source author.
       `norms-audit.md` status rows.
 - [x] T9. Add the two-directional status↔pin binding test; prove both
       directions by mutation and record the runs.
-- [ ] T10. Correct the iitc and iei `@source` credits in
+- [x] T10. Correct the iitc and iei `@source` credits in
       `R/instrument_data.R:86,191`; `devtools::document()`; correct
       `norms-audit.md`'s iip32/iip64 rows; run the full check plus the PDF
       manual.
@@ -140,6 +140,8 @@ the source author.
 - 2026-08-06: T7 done. No shipped norm value was wrong, so no `mismatch` needed a data correction. A new disposition kind `source-not-identified` (34 rows) separates "this source publishes no such field" from "this value came from somewhere and the venue cannot be found" — the latter covers iis32's M/SD/Size/Population and ipipipc's M/SD. Shipped `Reference` for both rewritten to "Norms source unconfirmed; instrument published as ...", per the gate. Two iis64 item texts corrected from the Appendix (item 5 was truncated to "I realize "; item 7 read "agreeable with" for "agreeable to"); three `.rda` rebuilt.
 - 2026-08-06: T8-T9 done. Four instruments pinned whole (100 assertions in the file). Two mutation runs recorded, each red and each naming `isc` as the discriminating element: dropping isc from `audited_objects` fails the binding assertion with `Needs: "isc"`; flipping isc's status row to `unaudited` fails it with `Absent: "isc"`.
 - 2026-08-06: iitc's `@source` now cites the final print version, Bliton & Pincus (2020), *Assessment* 27(4) 688-705, from Crossref; the shipped norms `Reference` still credits "Bliton & Pincus (2019)", the online-first version the shelf copy is and the one bliton2019.md anchors. Left alone deliberately — iitc is M72-verified and pinned, and the roxygen now states the relationship.
+- 2026-08-06: T10 done. `@source` credits corrected for iitc and iei from Crossref; `devtools::document()` regenerated four Rd files; `norms-audit.md`'s iip32/iip64 rows corrected in place and marked. `grep -rn -i "in press" R/ man/ NEWS.md README.md vignettes/ data-raw/` returns no hit. `devtools::check(args = "--no-manual")` clean (0 errors, 0 warnings, 0 notes, 19m41s); `devtools::test()` 0 failures over 5888 assertions; PDF manual built separately with `R CMD Rd2pdf --no-preview --force` (exit 0, 363 KB) per the M57/M7 lesson — its pdfTeX warnings are pre-existing cross-package hyperlink destinations (ggplot2, lavaan, boot), none from the four touched topics.
+- 2026-08-06: out of scope, captured as a ROADMAP row — **`iei`'s norms `Sample` key is miscoded** (`data-raw/iei.R:27` uses `rep(1:2, times = 8)`), so `norm_standardize()` errors on both IEI samples. Found while answering a mid-session question about Locke's IEI norms page, whose values match the shipped sample 1 exactly. User-visible, so it routes to `/hotfix`, not to M74.
 
 ## Decisions
 
