@@ -87,7 +87,7 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - [x] T3. Rework `AUDIT_BATCH` into a per-(instrument, sample) citekey map;
       confirm batches 1 and 2 audit unchanged under it.
 - [x] T4. Author `sodano2006.md` (cais) and `trucco2013.md` (igicr).
-- [ ] T5. Author `horner2024.md` (iei) from the shelf PDF's Table 1, and shelve
+- [x] T5. Author `horner2024.md` (iei) from the shelf PDF's Table 1, and shelve
       the author's IEI norms page as retrieval evidence for the `URL` field.
 - [ ] T6. Author `hopwood2008.md` and `soldz1995.md` for iipsc's two samples.
 - [ ] T7. Extend the batch, run the audit, disposition every ledger row, commit
@@ -110,6 +110,7 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - 2026-08-07: T3 done — AUDIT_BATCH is a per-(instrument, sample) data.frame carrying citekey, divisor and a `scales` flag, validated by validate_batch(); the nine source notes and the dispositions CSV migrated to the five-column schema. Batches 1 and 2 re-audit to the same 130 ledger rows and 13 coverage rows, 0 value differences on every shared key.
 - 2026-08-07: sodano2006 extracted in two channels (pdftotext + 300-dpi render of pp. 323 and 325): both CAIS samples' M/SD match shipped exactly, but Table 2's note reads N = 204 where the package ships Size = 213 (the article's Participants text gives 213 for the analysis sample). An AC5 item for T8, not yet resolved.
 - 2026-08-07: T4 done — sodano2006.md and trucco2013.md authored and indexed. igicr matches trucco2013 on all 48 M/SD, all three sizes, all 8 target angles, the numbered item map and Reference/URL; only its three Population strings deviate. cais matches sodano2006 on all 32 M/SD, all 8 target angles and Reference, but three findings land: the shipped item map is a strict 8-cycle that reproduces Table 1's grouping only through item 29 (JK has three items there, not four), so 7 of 8 octants mismatch and items 33-37 are unassigned; Table 2's note gives N = 204 where the package ships 213; and the article prints no DOI, so the shipped URL is not-published-in-source. Scoped audit run: 0 coverage gaps, 15 ledger rows.
+- 2026-08-07: T5 done — horner2024.md authored (citekey 2024 against the shelf filename horner2025.pdf; the article prints 2024 throughout) and the author's IEI norms page retrieved 2026-08-07 and shelved as locke_iei_norms_2026-08-07.html with a manifest row. iei matches on all 32 M/SD, both Sizes and both References; Angle and Items are not published (the 64 items are supplemental); the two URL rows mismatch, which is M74-D1's correction, and sample 2 needs its own anchor because the norms page publishes nothing of Study 2.
 - 2026-08-06: plan gate chose deferring the multi-sample rework to this milestone over doing it in M73 because M73's four instruments are all single-sample and would leave the rework unexercised; falsified by the rekey turning out to be a precondition for something M73 needs.
 
 ## Decisions

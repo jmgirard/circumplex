@@ -96,6 +96,7 @@ same page image — observed 2026-08-07.
 | hopwood2008.pdf | 490620d357dd0d1b733c6bf5b1d0658e49b01651095dbd39e67054408fc24170 | born-digital (Distiller 6.0.1, 3825 chars/page); norm table is typeset text (Table 1) | 2026-08-07 |
 | horner2025.pdf | 69ce27cd48a2bddc105e5cde59e071e577508f387e2cf6f33127dd8e67eb80f2 | born-digital (Zotero, 5404 chars/page); both samples' norm values are typeset text in Table 1 | 2026-08-07 |
 | trucco2013.pdf | 32c34116c0e47000eeac5fcd808ba1daa4998e5e5311b3151812a7682391834c | born-digital (Adobe PDF Library 9.9, 4853 chars/page); all three samples' norm values are typeset text in Table 3 | 2026-08-07 |
+| locke_iei_norms_2026-08-07.html | 50230f1b83c68399560e997126df1aafeb3fb540ea4c2a9befd53da2a6cf4a4d | retrieved HTML (kennethlocke.org/IEI/IEI_Norms.html); publishes the iei sample-1 octant M/SD and N = 1,223, and credits horner2024 for them | 2026-08-07 |
 | soldz1995.pdf | 758030aeebd66fc8989d181ba9fd7c402f4973b831ed1df5ceefa27fba7e7d14 | **OCR scan** (Acrobat Paper Capture plug-in, 3234 chars/page): the text layer is OCR of the page image, so it is not a second witness (M42-D1) and the norm table needs a genuinely independent channel | 2026-08-07 |
 
 Channel plan for batch 2, decided by asking what channel reads the *norm
