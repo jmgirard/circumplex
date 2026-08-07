@@ -3,11 +3,15 @@
 **Provenance.** Ingested 2026-08-07 by M74 from two sources, both shelved under
 `cairn/references/sources/` (gitignored):
 
-- `horner2025.pdf`, 18 PDF pages whose printed numbers run pp. 1–18. The shelf
-  filename says 2025 and the citekey says 2024; the article itself is the
-  authority and it prints 2024 throughout — "Accepted 12 August 2024",
-  "© 2024 Taylor & Francis Group, LLC", and a DOI whose stem is `2024.2400266`.
-  Pagination: the article's own page numbers. The PDF is **born-digital**
+- `horner2025.pdf`, 18 PDF pages whose printed numbers run pp. 1–18. This is the
+  **online-first** version, and it prints 2024 throughout — "Accepted 12 August
+  2024", "© 2024 Taylor & Francis Group, LLC", and a DOI whose stem is
+  `2024.2400266` — with continuous pagination from 1 rather than an issue's page
+  range. The version of record came later: `R/instrument_data.R` cites it as
+  *Journal of Personality Assessment, 107*(2), 170–187 (2025), which is what the
+  shelf filename records. The citekey follows the copy on the shelf, and every
+  page anchor below is that copy's pagination, not the issue's.
+  Pagination: the online-first copy's own page numbers. The PDF is **born-digital**
   (`Producer: Zotero`, 5404 text characters per page), not an OCR scan, and
   Table 1 is typeset table text.
 - `locke_iei_norms_2026-08-07.html` (sha256 50230f1b…), retrieved 2026-08-07

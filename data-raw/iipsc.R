@@ -45,7 +45,10 @@ iipsc_norms_src <- data.frame(
     "American psychiatric outpatients"
   ),
   Reference = c(
-    "Hopwood, Pincus, DeMoor, & Koonce (2011)",
+    # 2008, not 2011: the paper publishing these college-student norms is
+    # Journal of Personality Assessment, 90:6, 615-618 (2008), which is also
+    # the DOI shipped below -- only the year was wrong (M74).
+    "Hopwood, Pincus, DeMoor, & Koonce (2008)",
     "Soldz, Budman, Demby, & Merry (1995)"
   ),
   URL = c(

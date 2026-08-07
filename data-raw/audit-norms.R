@@ -33,13 +33,31 @@
 # validate_batch().
 AUDIT_BATCH <- data.frame(
   instrument = c("csie", "csig", "csip", "csiv", "iitc",
-                 "iis32", "iis64", "ipipipc", "isc"),
-  sample     = 1,
+                 "iis32", "iis64", "ipipipc", "isc",
+                 "cais", "cais", "iei", "iei",
+                 "igicr", "igicr", "igicr", "iipsc", "iipsc"),
+  sample     = c(rep(1, 9),
+                 1, 2, 1, 2,
+                 1, 2, 3, 1, 2),
   citekey    = c("locke2007", "locke2014", "boudreaux2018", "locke2000",
                  "bliton2019", "hatcher2012", "hatcher2009", "markey2009",
-                 "hopwood2011"),
-  divisor    = c(1, 1, 8, 1, 1, 1, 1, 1, 1),
-  scales     = TRUE,
+                 "hopwood2011",
+                 "sodano2006", "sodano2006", "horner2024", "horner2024",
+                 "trucco2013", "trucco2013", "trucco2013",
+                 "hopwood2008", "soldz1995"),
+  # iipsc sample 1 is the one deviation among the batch-3 instruments:
+  # hopwood2008 Table 1 prints octant SUMS over four 0-4 items and
+  # data-raw/iipsc.R divides by 4 to express them as item means. Its sample 2
+  # needs no divisor -- soldz1995 already prints item means.
+  divisor    = c(1, 1, 8, 1, 1, 1, 1, 1, 1,
+                 1, 1, 1, 1,
+                 1, 1, 1, 4, 1),
+  # The `scales` entry per multi-sample instrument is the pass whose note
+  # actually carries the instrument-level rows. For iipsc that is SAMPLE 2:
+  # soldz1995 prints the item-to-octant grouping and hopwood2008 does not.
+  scales     = c(rep(TRUE, 9),
+                 TRUE, FALSE, TRUE, FALSE,
+                 TRUE, FALSE, FALSE, FALSE, TRUE),
   stringsAsFactors = FALSE
 )
 

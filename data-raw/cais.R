@@ -1,15 +1,23 @@
 cais_scales <- data.frame(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
+  # NOT the eight-cycle "1, 9, 17, 25" template the package's other 32-item
+  # instruments use. The CAIS has 37 items in octant blocks of UNEQUAL size --
+  # five each for PA, BC, DE, HI, LM and NO, four for FG and three for JK
+  # (sodano2006 Table 1, p. 322) -- and the item ordering below is a round-robin
+  # over those blocks that correctly skips an octant once its items run out.
+  # The eight-cycle key reproduced that ordering only through item 29, then ran
+  # one position out: it put item 30 (an LM item) in JK, 31 (NO) in LM and 32
+  # (PA) in NO, and left items 33-37 in no scale at all (M74).
   Items = c(
-    "1,  9, 17, 25",
-    "2, 10, 18, 26",
-    "3, 11, 19, 27",
+    "1,  9, 17, 25, 32",
+    "2, 10, 18, 26, 33",
+    "3, 11, 19, 27, 34",
     "4, 12, 20, 28",
-    "5, 13, 21, 29",
-    "6, 14, 22, 30",
-    "7, 15, 23, 31",
-    "8, 16, 24, 32"
+    "5, 13, 21, 29, 35",
+    "6, 14, 22",
+    "7, 15, 23, 30, 36",
+    "8, 16, 24, 31, 37"
   ),
   Label = c(
     "Assured-Dominant",
@@ -23,7 +31,9 @@ cais_scales <- data.frame(
   )
 )
 
-# TODO: Confirm whether these are based on scale sums or scale means
+# Item means, not sums: these are sodano2006's Table 2 and Table 4 values
+# verbatim, and the CAIS anchors run 1-5, which the octant means below sit
+# inside (M74; the audit therefore carries no divisor for either sample).
 cais_norms <- data.frame(
   Sample = c(rep(1, 8), rep(2, 8)),
   Scale = rep(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), 2),
@@ -40,7 +50,12 @@ cais_norms <- data.frame(
 
 cais_norms_src <- data.frame(
   Sample = c(1, 2),
-  Size = c(213, 194),
+  # 204, not 213: sodano2006 gives the child sample as 213 on pp. 320-321, but
+  # the note to Table 2 -- the table the sample-1 M and SD above are read from
+  # -- says N = 204, and the article never reconciles them. The size that
+  # describes the sample these statistics were computed on is the table's own
+  # (M74). Sample 2 has no such split: p. 320, p. 321 and Table 4 all say 194.
+  Size = c(204, 194),
   Population = c(
     "American fourth and sixth graders (aged 9 to 13)",
     "American college students (aged 17 to 50)"

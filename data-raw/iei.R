@@ -41,7 +41,14 @@ iei_norms_src <- data.frame(
   Size = c(1223, 278),
   Population = c("American undergraduate students", "American crowdworkers"),
   Reference = "Horner, Locke, & Hulsey (2024)",
-  URL = "https://osf.io/w37dj/"
+  # One URL per sample, because no single page publishes both tables. Sample 1's
+  # eight M/SD and its N of 1,223 are printed on the author's IEI norms page;
+  # sample 2's are published only in the article. The previous value, the
+  # article's OSF project https://osf.io/w37dj/, publishes neither (M74, M74-D1).
+  URL = c(
+    "https://kennethlocke.org/IEI/IEI_Norms.html",
+    "https://doi.org/10.1080/00223891.2024.2400266"
+  )
 )
 
 iei_anchors <- data.frame(

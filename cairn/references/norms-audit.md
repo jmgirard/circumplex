@@ -2,9 +2,9 @@
 
 A synthesis note (no single `<citekey>.md` owns it): the citekey map, the
 shelf manifest, and the per-instrument audit status for all 15 shipped
-instruments. Batch 1 (M72) audited five and batch 2 (M73) four more; the rest carry their
-status here so an unaudited instrument is visible rather than merely out of
-scope.
+instruments. Batch 1 (M72) audited five, batch 2 (M73) four more and batch 3 (M74) the four
+multi-sample instruments; the rest carry their status here so an unaudited
+instrument is visible rather than merely out of scope.
 
 **Provenance.** Ingested 2026-08-06 by M72 (authored here rather than extracted
 from one source — this is a synthesis note over the shelf and the shipped data,
@@ -35,12 +35,12 @@ seeing it. Per-row detail is in `data-raw/norms-audit-ledger.csv`.
 | csip | verified: M, SD, Size, Reference, URL; Population deviates by design (no angles, no item map) | M72 | [boudreaux2018.md](boudreaux2018.md) | 2026-08-06 |
 | csiv | verified: M, SD, Size, item map, angles, Reference, URL; Population deviates by design | M72 | [locke2000.md](locke2000.md) | 2026-08-06 |
 | iitc | verified: M, SD, Size, Reference, URL; Population deviates by design (no angles, no item map) | M72 | [bliton2019.md](bliton2019.md) | 2026-08-06 |
-| cais | unaudited | — | — | 2026-08-06 |
-| iei | unaudited | — | — | 2026-08-06 |
-| igicr | unaudited | — | — | 2026-08-06 |
+| cais | verified: M, SD, angles, item map, Size, Reference (2 samples); the item map and the sample-1 Size were wrong and are corrected here; Population deviates by design (URL not published in source) | M74 | [sodano2006.md](sodano2006.md) | 2026-08-07 |
+| iei | verified: M, SD, Size, Reference (2 samples); URL repointed here at the pages that publish the values; Population deviates by design (no angles, no item map) | M74 | [horner2024.md](horner2024.md) | 2026-08-07 |
+| igicr | verified: M, SD, Size, angles, item map, Reference, URL (3 samples); Population deviates by design | M74 | [trucco2013.md](trucco2013.md) | 2026-08-07 |
 | iip32 | unaudited; source is the IIP-64/IIP-32 professional manual, obtainable — the maintainer holds publisher permission to ship the norming functions but not the item text (M72, corrected M73) | — | — | 2026-08-06 |
 | iip64 | unaudited; source is the IIP-64/IIP-32 professional manual, obtainable — the maintainer holds publisher permission to ship the norming functions but not the item text (M72, corrected M73) | — | — | 2026-08-06 |
-| iipsc | unaudited (two norm samples, two different sources) | — | — | 2026-08-06 |
+| iipsc | verified: M, SD, Size, item map, Reference (2 samples, two different sources); the sample-1 Reference year was wrong and is corrected here; Population deviates by design (no angles; sample-2 URL not published) | M74 | [hopwood2008.md](hopwood2008.md), [soldz1995.md](soldz1995.md) | 2026-08-07 |
 | iis32 | audited, **norms unsourced**: item map, Reference, URL verified; M, SD, Size and Population are published in no identified source (angles not published) | M73 | [hatcher2012.md](hatcher2012.md) | 2026-08-07 |
 | iis64 | verified: M, SD, Size, item map, Reference, URL; Population deviates by design (no angles) | M73 | [hatcher2009.md](hatcher2009.md) | 2026-08-06 |
 | ipipipc | audited, **norms unsourced**: item map, Size, Reference, URL verified; M and SD are published in no identified source (no angles, Population deviates by design) | M73 | [markey2009.md](markey2009.md) | 2026-08-06 |
@@ -62,6 +62,15 @@ the mapping the audit script joins on.
 | iis64 | 1 | hatcher2009 | the article (Table 1) |
 | ipipipc | 1 | markey2009 | **nowhere identified** — the article publishes octant statistics only for a different sample |
 | isc | 1 | hopwood2011 | the article (inside Figure 2) |
+| cais | 1 | sodano2006 | the article (Table 2, child sample) |
+| cais | 2 | sodano2006 | the article (Table 4, adult sample) |
+| iei | 1 | horner2024 | the article (Table 1, Study 1) **and** the author's IEI norms page |
+| iei | 2 | horner2024 | the article (Table 1, Study 2) |
+| igicr | 1 | trucco2013 | the article (Table 3, Combined column) |
+| igicr | 2 | trucco2013 | the article (Table 3, Males column) |
+| igicr | 3 | trucco2013 | the article (Table 3, Females column) |
+| iipsc | 1 | hopwood2008 | the article (Table 1, as octant SUMS; the package divides by 4) |
+| iipsc | 2 | soldz1995 | the article (Table 4, Generic Outpatient column) |
 
 ## Shelf manifest
 
@@ -158,3 +167,55 @@ this word. In `ipipipc`, item 16 read "Don't fall for sob-stories" where
 markey2009's Appendix prints "sob stories". None is a norms field, so none
 appears in the ledger; each was caught by reading that instrument's own
 Appendix in two channels.
+
+## What batch 3 found
+
+No shipped mean or standard deviation was wrong in any of the four. All 88 M/SD
+pairs across the nine normative samples matched their sources exactly — cais's
+32 in sodano2006's Tables 2 and 4, iei's 32 in horner2024's Table 1, igicr's 48
+in trucco2013's Table 3, and iipsc's 32 across hopwood2008's Table 1 and
+soldz1995's Table 4. Eight of the nine sample sizes matched too, as did every
+scale angle and item map the sources publish, apart from the one below.
+
+The serious finding is cais's **item-to-scale key**, and it is a scoring defect
+rather than a provenance one. sodano2006 Table 1 (p. 322) groups the CAIS's 37
+items into octant blocks of unequal size — five each for PA, BC, DE, HI, LM and
+NO, four for FG, three for JK — but `data-raw/cais.R` shipped the equal-four
+eight-cycle key the package's other 32-item instruments use, from its first
+draft in 2018 until M74. That key put item 30 (an LM item) in JK, 31 (NO) in LM
+and 32 (PA) in NO, and left items 33–37 in no scale at all, so `score()`
+returned wrong values for three octants and `norm_standardize()` compared them
+against norms computed the correct way. The diagnosis is decisive rather than
+inferred: dealing Table 1's blocks round-robin, skipping each octant once its
+items run out, reproduces the shipped 37-item *ordering* exactly — so the file
+already encoded the published grouping and only the key contradicted it. A sweep
+of all fifteen bundled instruments found no second instance, and a test now
+requires every key to cover its instrument's items exactly once.
+
+Three provenance corrections went with it. cais's child-sample `Size` moved from
+213 to 204, the N printed on the very table its means come from — the article
+gives 213 twice elsewhere and never reconciles the two. iipsc's college-student
+norms were credited to a 2011 publication and now name Hopwood, Pincus, DeMoor,
+& Koonce (2008), which is the paper that publishes them and the DOI the
+instrument already carried. iei's `URL` pointed at the study's OSF project,
+which publishes neither of its norms tables, and now gives one address per
+sample (M74-D1).
+
+Two source-internal inconsistencies are recorded and left unresolved, both of
+the kind hatcher2009 already showed: sodano2006's 204-vs-213 above, and
+soldz1995's Generic Outpatient sample, given as 105 patients on p. 55 and as
+n = 106 in Table 4's own heading. In each case the package now ships the table's
+number, because that is the sample the statistics were computed on.
+
+Two fields stay uncompared for want of a published value. iei's 64 items are in
+a supplemental table that is not part of the article, and neither iei nor iipsc
+publishes an assigned degree per octant — cais and igicr both do, in a "target
+angle" row, and both match. cais's and iipsc's sources print no DOI or URL at
+all, so those `URL` values rest on later-assigned identifiers that are
+consistent with the printed volume and issue but appear nowhere in the articles.
+
+soldz1995 is also the first shelf source that is an OCR scan, so M42-D1's
+two-channel rule fired for real rather than being honoured as a precaution: its
+values were read by a direct read of a page-image render and by an independent
+`tesseract` pass over that render, neither of them the shelved Acrobat text
+layer, which was consulted afterwards and agreed.

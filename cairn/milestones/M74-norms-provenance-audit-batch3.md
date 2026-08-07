@@ -22,8 +22,9 @@ instrument to more than one source.
 their two different sources; source notes for `sodano2006` (cais),
 `horner2024` (iei), `trucco2013` (igicr), `hopwood2008` and `soldz1995`
 (iipsc's two samples); a clean audit run over all thirteen audited instruments;
-correcting any shipped value the audit finds wrong; pins and status rows for the
-four.
+correcting any shipped value the audit finds wrong; a sweep of all fifteen
+bundled instruments for the same key-vs-source failure cais showed, with the
+structural half locked by a test; pins and status rows for the four.
 
 **Out:** iip32/iip64 → their ROADMAP candidate row, promoted when the IIP
 manual reaches the shelf. The four M73 repairs, which land there. The csig
@@ -65,6 +66,11 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - [ ] AC7. `devtools::check(args = "--no-manual")` is clean (0 errors, 0
       warnings, 0 notes); the PDF-manual step is run separately if this
       milestone touches roxygen.
+- [ ] AC8. Every bundled instrument's `Scales$Items` key is a complete partition
+      of `1:Details$Items` — no unkeyed item, no item keyed twice — enforced by
+      a test sweeping all fifteen that reddens when a key drops or repeats an
+      item; the nine instruments whose source publishes an item map stay
+      additionally compared against it by the AC4 run.
 
 ## Coverage
 
@@ -75,6 +81,7 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - AC5 → T7, T8
 - AC6 → T9
 - AC7 → T9
+- AC8 → T10
 
 ## Tasks
 
@@ -90,12 +97,14 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - [x] T5. Author `horner2024.md` (iei) from the shelf PDF's Table 1, and shelve
       the author's IEI norms page as retrieval evidence for the `URL` field.
 - [x] T6. Author `hopwood2008.md` and `soldz1995.md` for iipsc's two samples.
-- [ ] T7. Extend the batch, run the audit, disposition every ledger row, commit
+- [x] T7. Extend the batch, run the audit, disposition every ledger row, commit
       the ledger and coverage CSVs.
-- [ ] T8. Resolve every `mismatch` row from T7 — correct `data-raw/<inst>.R`
+- [x] T8. Resolve every `mismatch` row from T7 — correct `data-raw/<inst>.R`
       and rebuild `data/`, two-channel per M42-D1, or record a disposition.
 - [ ] T9. Extend `audited_objects` and the `norms-audit.md` status rows for the
       four; run the full check.
+- [x] T10. Sweep every bundled instrument's item key for the cais failure mode;
+      lock the structural half with a test over all fifteen.
 
 ## Work log
 
@@ -112,6 +121,11 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - 2026-08-07: T4 done — sodano2006.md and trucco2013.md authored and indexed. igicr matches trucco2013 on all 48 M/SD, all three sizes, all 8 target angles, the numbered item map and Reference/URL; only its three Population strings deviate. cais matches sodano2006 on all 32 M/SD, all 8 target angles and Reference, but three findings land: the shipped item map is a strict 8-cycle that reproduces Table 1's grouping only through item 29 (JK has three items there, not four), so 7 of 8 octants mismatch and items 33-37 are unassigned; Table 2's note gives N = 204 where the package ships 213; and the article prints no DOI, so the shipped URL is not-published-in-source. Scoped audit run: 0 coverage gaps, 15 ledger rows.
 - 2026-08-07: T5 done — horner2024.md authored (citekey 2024 against the shelf filename horner2025.pdf; the article prints 2024 throughout) and the author's IEI norms page retrieved 2026-08-07 and shelved as locke_iei_norms_2026-08-07.html with a manifest row. iei matches on all 32 M/SD, both Sizes and both References; Angle and Items are not published (the 64 items are supplemental); the two URL rows mismatch, which is M74-D1's correction, and sample 2 needs its own anchor because the norms page publishes nothing of Study 2.
 - 2026-08-07: T6 done — hopwood2008.md and soldz1995.md authored and indexed; iipsc's two samples now join to two different sources, with the instrument-level Angle and Items rows carried by soldz1995 (the only one of the pair that prints the item grouping). All 32 M/SD match, sample 1 through the documented divisor of 4 (hopwood2008 Table 1 prints octant sums, corroborated by its Total M = 35.15); both Sizes and the sample-2 Reference match. Mismatches: two Population strings and the sample-1 Reference year (shipped 2011, source 2008). soldz1995 is the first M42-D1 firing: neither channel is its Acrobat OCR layer — a direct read of a 200-300 dpi render and an independent tesseract pass over it, agreeing on every value.
+- 2026-08-07: T7 done — AUDIT_BATCH extended to 18 (instrument, sample) rows over all thirteen audited instruments. Full run: 166 ledger rows, 15 coverage rows, 0 coverage gaps, 0 angle-copy splits, 0 IP2 breaches, 0 UNDISPOSITIONED. 36 batch-3 dispositions appended (9 Population intended-deviation, 3 URL and 24 Angle/Items not-published-in-source); ledger and coverage CSVs committed.
+- 2026-08-07: gate — Jeff chose correcting the cais item key AND sweeping every bundled instrument for the same failure (a scope amendment, AC8 + T10 added); 204 for the cais child-sample Size, on his stated condition that everything else matched, which it does; and one URL per iei sample. He first asked how the cais defect arose: traced to the first draft (1c75400e, 2018-10-23), never since edited, and diagnosed decisively — dealing sodano2006 Table 1's unequal octant blocks round-robin, skipping exhausted octants, reproduces the shipped 37-item ORDER exactly, so the ordering encoded the published grouping and only the Items key kept the eight-cycle template the package's other 32-item instruments use. Not a typo, not a second sample.
+- 2026-08-07: T8 done — four corrections, each from values read in two channels: cais Items rekeyed to sodano2006 Table 1's 5/5/5/4/5/3/5/5 blocks (changes JK, LM and NO scores and brings items 33-37 into scoring), cais sample-1 Size 213 -> 204, iipsc sample-1 Reference year 2011 -> 2008, iei URL split per sample (norms page / article DOI). data/cais.rda, data/iei.rda and data/iipsc.rda rebuilt; ?iipsc now cites both normative sources; NEWS records the cais score change as a breaking behavior change.
+- 2026-08-07: T10 done — sweep of all fifteen bundled instruments found cais the only key that is not a complete partition of its items; every other one keys its full item count with no gaps or repeats. Locked by two tests in test-norms-provenance.R: a partition sweep over all fifteen and an explicit pin of cais's key against Table 1. Both verified to redden against HEAD's pre-fix data/cais.rda (partition FALSE because items 33-37 are unkeyed) and to pass after.
+- 2026-08-07: correction to horner2024.md's provenance block — its claim that "the article prints 2024 throughout" was written before reading R/instrument_data.R, which cites a 2025 version of record (JPA 107(2), 170-187). The shelf copy is the online-first version, paginated 1-18; the block now says so and states that every page anchor is that copy's pagination.
 - 2026-08-06: plan gate chose deferring the multi-sample rework to this milestone over doing it in M73 because M73's four instruments are all single-sample and would leave the rework unexercised; falsified by the rekey turning out to be a precondition for something M73 needs.
 
 ## Decisions
