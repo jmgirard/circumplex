@@ -1,11 +1,11 @@
 # M74: Norms provenance audit, batch 3 (multi-sample instruments)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** M73
 - **Driving RR:** —
 - **Principles touched:** IP2, IP3, IP5
-- **Branch/PR:** —
+- **Branch/PR:** `m74-norms-provenance-audit-batch3`
 
 ## Goal
 
@@ -102,6 +102,7 @@ PA/NO duplicated-statistics question → its existing candidate row.
 ## Work log
 
 - 2026-08-06: created by /milestone-plan alongside M73.
+- 2026-08-07: status -> in-progress; branch m74-norms-provenance-audit-batch3 cut from master.
 - 2026-08-06: plan gate chose deferring the multi-sample rework to this milestone over doing it in M73 because M73's four instruments are all single-sample and would leave the rework unexercised; falsified by the rekey turning out to be a precondition for something M73 needs.
 
 ## Decisions
