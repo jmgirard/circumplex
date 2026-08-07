@@ -1,11 +1,11 @@
 # M73: Norms provenance audit, batch 2 (single-sample instruments)
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP2, IP3, IP5
-- **Branch/PR:** `m73-norms-provenance-audit-batch2`
+- **Branch/PR:** `m73-norms-provenance-audit-batch2` / https://github.com/jmgirard/circumplex/pull/100
 
 ## Goal
 
@@ -144,7 +144,110 @@ the source author.
 - 2026-08-06: out of scope, captured as a ROADMAP row — **`iei`'s norms `Sample` key is miscoded** (`data-raw/iei.R:27` uses `rep(1:2, times = 8)`), so `norm_standardize()` errors on both IEI samples. Found while answering a mid-session question about Locke's IEI norms page, whose values match the shipped sample 1 exactly. User-visible, so it routes to `/hotfix`, not to M74.
 - 2026-08-06: restored CRLF line endings in `R/instrument_data.R`, which a Python rewrite had converted to LF — the file is the repo's only CRLF source and the whole-file rewrite masked a 25-line change as 468. Every other file this branch touched was audited for the same drift and none had it; `document()` re-run produces no `man/` diff.
 - 2026-08-07: the iei defect captured above shipped as a hotfix (PR #99, merged to master); this branch's ROADMAP row is corrected in place to record the fix and to leave M74 the one open piece, the OSF-vs-norms-page URL question. This branch has NOT yet merged master — /milestone-review does that per the branch-sync rule, and the plugin's merge guard declines a `git merge` here.
+- 2026-08-07: review round 1 — AC1-AC4, AC7, AC8 verified; **AC5 and AC6 fail**. AC6 is a defect return (iis32's verdict omits Reference and URL, F4 at 88). AC5 is an amendment return: its "page at which the source prints that credit" test is unsatisfiable for journal sources, which print author and year but never the author-year short form (F2 at 82). Six further findings at >= 80 ride with the AC6 fix; 17 logged below threshold.
 
 ## Decisions
 
 ## Review
+
+Round 1, 2026-08-07. Branch merged `origin/master` (the iei hotfix, PR #99)
+first; NEWS.md conflict resolved keeping both sides. Draft PR #100.
+
+### Acceptance criteria
+
+- AC1 **verified.** `parse_source_note()` reads all four notes (38/36/37/38
+  rows). Each Provenance block's extraction status, read through
+  `cairn_validate`'s own `_extraction_status` parser, carries a verification
+  claim, an `— observed` stamp and names the channel that read the anchor;
+  all four have INDEX.md lines. (A first probe grepped the status on one
+  physical line and read 0/4 — the status wraps, and the M81 parser reads to
+  the end of the paragraph. Wrong probe, not a wrong artifact.)
+- AC2 **verified.** Audit run on the merged tree: 130 ledger rows,
+  13 coverage rows, 0 coverage gaps, 0 angle-copy splits, 0 IP2 breaches,
+  0 `UNDISPOSITIONED`.
+- AC3 **verified.** Exactly three `mismatch` rows across the four new
+  instruments — iis64, ipipipc and isc `Population` — each carrying
+  `intended-deviation`. No shipped norm value needed correcting.
+- AC4 **verified.** `stamp_ledger()` returns 0 and 1 rows without error and
+  the same ten column names for both.
+- AC5 **FAILS.** Every Reference row carries an anchor, but F2 (82) shows
+  seven of the nine anchor a journal header plus a byline — the components
+  the credit was assembled from — not a page printing the credit. Only
+  locke2007 quotes one verbatim. See the amendment return below.
+- AC6 **FAILS.** The pins and the two-directional binding are verified — all
+  four objects identical to the shipped ones, and both mutation runs
+  reproduced red on the merged tree (`Needs: "isc"` when the pin is dropped,
+  `Absent: "isc"` when the verdict is flipped). But F4 (88): iis32's verdict
+  names only the item map, while `Reference` and `URL` also compared and
+  passed.
+- AC7 **verified.** (a) The named grep returns one NEWS.md hit, the sentence
+  describing this fix, which credits neither author set — the criterion's
+  predicate is "no hit crediting" and no hit does. Both `@source` entries now
+  give published citations and `man/` regenerated. (b) The iip32/iip64 rows
+  no longer claim an unobtainable source, corrected in place and marked.
+- AC8 **verified.** `check(args = "--no-manual")` on the merged tree: 0
+  errors, 0 warnings, 0 notes (13m30s). PDF manual built separately with
+  `R CMD Rd2pdf` (exit 0, 363 KB).
+
+### Consistency gate
+
+`cairn_validate` all checks pass (48 advisories, all pre-existing work-log
+format lines plus one sizing tripwire: M73 has 8 acceptance criteria against
+the 7 threshold). `document()` no diff; `check_pkgdown()` no problems; NEWS
+carries the user-visible entries; no new top-level files. No DESIGN principle
+changed, so `cairn_impact` is skipped.
+
+### Findings
+
+Three fresh-context lenses. The blame-history lens found no conflicts and
+confirmed D-039 covers the provenance-only changes. The prior-review lens
+found no regressions against M72's archived review or LESSONS, and its GitHub
+probe returned `[]`, confirming the threads are empty. The diff-bug lens
+returned 23. Scored by an independent Sonnet scorer.
+
+Actioned (>= 80): F2 (82) AC5 anchors, F3 (82) iis32's verdict calls its
+`Population` an intended deviation while the CSV dispositions it
+`source-not-identified`, F4 (88) AC6 verdict omits Reference/URL, F10 (82)
+iis32 item 28 ships "ok" where hatcher2012 prints "okay", F11 (80) ipipipc
+item 16 ships "sob-stories" where markey2009 prints "sob stories", F12 (80)
+markey2009.md's "Traces to" claims anchor labels are compared and no such row
+exists, F18 (80) hopwood2011.md's "33 pages, printed pp. 707-740" cannot both
+be true.
+
+Logged below threshold (17), one line each: F1 (72) the run block's
+"note-only rows" counter now also counts the constructed-credit row; F5 (78)
+isc's `Size = 649` is asserted without an anchor and the note's Population row
+reads the same figure note as 1,336 — checked at this gate and the shipped
+value is defensible, since the descriptives sit inside the article's Sample-1
+derivation narrative, but the note overstates its support; F6 (75) `data_commit`
+names the parent tree though the data changed in the same commit; F7 (72)
+iis32/ipipipc keep the article DOI as `URL` under the unconfirmed-source
+`Reference`; F8 (62) `?iei` says 2025 where the shipped credit says 2024 with
+no linking sentence; F9 (55) the Crossref-sourced volume/pages have no
+recorded channel; F13 (55) the constructed-credit detector is an unvalidated
+substring match; F14 (50) a constructed credit leaves no ledger row; F15 (60)
+the `stamp_ledger()` test never asserts the two commit columns' values; F16
+(50) the `^unaudited` predicate is whitelist-by-default; F17 (52)
+`expect_length` does not abort; F19 (40) bliton2019's anchor cites a 2019
+copyright line this branch supersedes with 2020 — logged as deliberate; F20
+(68) and F21 (62) stale tracking claims, both superseded by this round; F22
+(55) hatcher2012's 496-vs-497 clinical N not recorded as hatcher2009's was;
+F23 (58) the item-map caveat lives in the notes, not the summary table; F24
+(20) pre-existing, untouched by this diff.
+
+### Disposition
+
+Returned to `in-progress` on two criteria.
+
+- **AC6 — defect return.** F4 is a one-line fix: iis32's verdict must name
+  `Reference` and `URL`. F3 rides with it (the same line's `Population`
+  clause), as do F10, F11, F12 and F18, which are accuracy defects in
+  artifacts this branch authored.
+- **AC5 — amendment return.** The criterion asks for "the page or line at
+  which the source prints that credit". No journal article prints an
+  author-year short form as a string, so seven of nine sources cannot satisfy
+  it however well the work is done; locke2007 passes only because its source
+  is a web page that happens to quote the credit. The criterion is wrong
+  rather than the work — its purpose, giving the note-side credit an origin
+  independent of the shipped string, is met by anchoring the author names and
+  year to the page that prints them. This routes to a gated amendment.
