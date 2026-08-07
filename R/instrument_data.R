@@ -166,9 +166,9 @@
 #'   item-to-octant grouping (Appendix, p. 646); it reports no octant means or
 #'   standard deviations, and none of its samples is the normative sample below.
 #' @source Norms: source unconfirmed. The shipped octant means and standard
-#'   deviations, and the N of 1380, are published in no source that has been
-#'   identified, including the article above. Treat them as unverified until a
-#'   source is established.
+#'   deviations, the N of 1380, and the sample description that accompanies
+#'   them are published in no source that has been identified, including the
+#'   article above. Treat them as unverified until a source is established.
 #' @source \doi{10.1080/00223891.2012.681818}
 #' @keywords internal
 #' @examples
