@@ -110,20 +110,20 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 
 ## Tasks
 
-- [ ] **T1** — Shelf + manifest: receive the five PDFs from Jeff, shelve
+- [x] **T1** — Shelf + manifest: receive the five PDFs from Jeff, shelve
       them, author `cairn/references/norms-audit.md` (citekey map, sha256
       manifest, scan verdicts via the AC1 probe, 15-instrument status table)
       + its INDEX.md line.
-- [ ] **T2** — Author the five source notes from
+- [x] **T2** — Author the five source notes from
       `templates/source-note.md`, copying an existing page's provenance
       idiom (M47 lesson); machine-readable tables with per-value anchors;
       two-channel extraction where T1's verdict is scan/OCR.
-- [ ] **T3** — Write `data-raw/audit-norms.R`; generate the coverage report
+- [x] **T3** — Write `data-raw/audit-norms.R`; generate the coverage report
       and the pre-fix ledger; verify the coverage report is clean.
-- [ ] **T4** — Author `norms-audit-dispositions.csv` with Jeff on
+- [x] **T4** — Author `norms-audit-dispositions.csv` with Jeff on
       escalations; fix `transcription-error` rows in `data-raw/` scripts and
       regenerate `data/`; commit the post-fix ledger re-run.
-- [ ] **T5** — Write `test-norms-provenance.R` (parameterized pins + status
+- [x] **T5** — Write `test-norms-provenance.R` (parameterized pins + status
       completeness assert); prove the pins redden by perturbing one shipped
       value (LESSONS guard-teeth rule).
 - [ ] **T6** — NEWS entries (or clean-outcome work-log line); full
