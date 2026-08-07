@@ -56,11 +56,13 @@ the source author.
       errors on neither a zero-row nor a one-row ledger and returns the same
       column names for both — fenced by a test calling it on each.
 - [ ] AC5. Every `Reference` row in the nine notes' audit-values blocks carries
-      in its anchor cell either the page or line at which the source prints that
-      credit, or the token `constructed-credit` with the reason the source
-      prints none; `audit_norms()` lists every `constructed-credit` Reference as
-      an exempt coverage row, so the AC2 run enumerates them instead of leaving
-      them indistinguishable from quoted ones.
+      in its anchor cell either the page at which the source itself prints the
+      author names and the year the credit is built from, quoting that printed
+      text — which is what gives the note's credit an origin independent of the
+      shipped string — or the token `constructed-credit` with the reason the
+      source prints neither; `audit_norms()` lists every `constructed-credit`
+      Reference as an exempt coverage row, so the AC2 run enumerates them
+      instead of leaving them indistinguishable from anchored ones.
 - [ ] AC6. `norms-audit.md` records a verified verdict for each of the four
       naming the fields actually compared; all four appear in
       `test-norms-provenance.R`'s `audited_objects` with their full `Norms` and
@@ -145,6 +147,9 @@ the source author.
 - 2026-08-06: restored CRLF line endings in `R/instrument_data.R`, which a Python rewrite had converted to LF — the file is the repo's only CRLF source and the whole-file rewrite masked a 25-line change as 468. Every other file this branch touched was audited for the same drift and none had it; `document()` re-run produces no `man/` diff.
 - 2026-08-07: the iei defect captured above shipped as a hotfix (PR #99, merged to master); this branch's ROADMAP row is corrected in place to record the fix and to leave M74 the one open piece, the OSF-vs-norms-page URL question. This branch has NOT yet merged master — /milestone-review does that per the branch-sync rule, and the plugin's merge guard declines a `git merge` here.
 - 2026-08-07: review round 1 — AC1-AC4, AC7, AC8 verified; **AC5 and AC6 fail**. AC6 is a defect return (iis32's verdict omits Reference and URL, F4 at 88). AC5 is an amendment return: its "page at which the source prints that credit" test is unsatisfiable for journal sources, which print author and year but never the author-year short form (F2 at 82). Six further findings at >= 80 ride with the AC6 fix; 17 logged below threshold.
+- 2026-08-07: amendment return: AC5 — "carries in its anchor cell either the page at which the source itself prints the author names and the year the credit is built from, quoting that printed text — which is what gives the note's credit an origin independent of the shipped string — or the token `constructed-credit` with the reason the source prints neither". Re-verified: all nine notes satisfy it, eight by a quoted page anchor and locke2000 by the token.
+- 2026-08-07: round-2 fixes for the six actioned findings. F3+F4: iis32's verdict now names Reference and URL and drops the "deviates by design" claim its `source-not-identified` disposition contradicts. F10/F11: iis32 item 28 "ok"->"okay" and ipipipc item 16 "sob-stories"->"sob stories", each confirmed in the text layer and the page image of that instrument's own Appendix; the two IIS articles genuinely differ on ok/okay. F12: markey2009.md's Traces-to no longer claims an anchor-label comparison the block does not carry. F18: hopwood2011.md's page count and printed range reconciled. F5 (logged at 78, fixed anyway): hopwood2011.md now records what actually supports Size = 649 — the Sample-1 derivation narrative, not the figure note alone — and says why Population is the one row drawn from the whole 1,336.
+- 2026-08-07: F1 (logged at 72, fixed anyway): the run block counted every exempt coverage row as "note-only", which would have reported the constructed-credit row as one; it now counts by side and prints both. Scope note — the other 15 sub-threshold findings stay logged, not actioned.
 
 ## Decisions
 

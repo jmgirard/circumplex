@@ -635,10 +635,14 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   instead of crediting an article that does not carry them, and `?iis32` and
   `?ipipipc` say the same. Standardized scores from these two instruments should
   be treated as resting on unverified norms.
-* Two `iis64` item texts were wrong and are corrected. Item 5 had been
-  truncated to "I realize " and now reads "I realize that I don't have to be
-  friends with everyone"; item 7 read "not agreeable with others" and now reads
-  "not agreeable to others", as the source prints it.
+* Four item texts were wrong against their sources and are corrected. In
+  `iis64`, item 5 had been truncated to "I realize " and now reads "I realize
+  that I don't have to be friends with everyone", and item 7 read "not
+  agreeable with others" where the source prints "not agreeable to others". In
+  `iis32`, item 28 read "I'm ok with not being included in all activities"
+  where its own source prints "okay" (the wording differs between the two IIS
+  articles). In `ipipipc`, item 16 read "Don't fall for sob-stories" where the
+  source prints "sob stories".
 * The sources cited for `iitc` and `iei` were recorded as "in press" and now
   give the published citations.
 

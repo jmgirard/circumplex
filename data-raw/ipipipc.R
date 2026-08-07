@@ -81,7 +81,7 @@ ipip_items <- data.frame(
     "Start conversations",
     "Do most of the talking",
     "Contradict others",
-    "Don't fall for sob-stories",
+    "Don't fall for sob stories",
     "Don't talk a lot",
     "Seldom toot my own horn",
     "Think of others first",

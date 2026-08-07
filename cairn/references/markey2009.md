@@ -101,9 +101,11 @@ parentheses, so both the numbering and the grouping are source-side here.
 
 ## Traces to
 
-- `data-raw/ipipipc.R` — every shipped IPIP-IPC item assignment, anchor label
-  and provenance string compared against the block above; its M and SD are
-  recorded here as unsourced.
+- `data-raw/ipipipc.R` — every shipped IPIP-IPC item assignment and provenance
+  string compared against the block above; its M and SD are recorded here as
+  unsourced. The shipped response anchors were read against p. 360 by hand and
+  agree, but `shipped_values()` enumerates no `Anchors` field, so no row of the
+  block or the ledger records that comparison.
 - `data-raw/audit-norms.R` — parses the block above as the source side of the
   ipipipc comparison.
 - `cairn/references/norms-audit.md` — carries ipipipc's audit verdict and this

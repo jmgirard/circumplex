@@ -1,8 +1,9 @@
 # hopwood2011 — the ISC and its normative descriptive statistics
 
 **Provenance.** Ingested 2026-08-06 by M73 from
-`cairn/references/sources/hopwood2011.pdf` (gitignored), 33 pages, printed
-pp. 707–740. Pagination: the article's own page numbers. The PDF is
+`cairn/references/sources/hopwood2011.pdf` (gitignored), 33 PDF pages, whose
+printed numbers run pp. 707–739; the article's citation of record gives
+pp. 707–740, so the shelf copy is one page short of its own printed range. Pagination: the article's own page numbers. The PDF is
 **born-digital** (`Creator: 3B2 Total Publishing System 8.07f/W`,
 `Producer: PDFlib PLOP 2.0.0p6 (SunOS)/Acrobat Distiller 8.1.0 (Windows)`,
 2474 text characters per page; one 400x324 image, not full-page), not an OCR
@@ -25,10 +26,19 @@ DOI 10.1111/j.1467-6494.2011.00696.x.
 **Role.** The published source for every shipped ISC norm value.
 
 **On the sample.** Figure 2's own note reads "Descriptive values are from
-Study 1". Study 1's total N is 1,336, randomly split into a derivation Sample 1
-of n = 649 and a validation Sample 2 of n = 687 (pp. 714–715). The package
-ships 649, the derivation half, which is the sample Figure 2's α, M and SD
-describe.
+Study 1", which distinguishes Study 1 from Study 2 (N = 299) and does **not**
+by itself name a sample within Study 1. Study 1's total N is 1,336, randomly
+split into a derivation Sample 1 of n = 649 and a validation Sample 2 of
+n = 687 (pp. 714–715). The package ships 649, and what supports that is the
+surrounding narrative rather than the figure note: the passage introducing
+Figure 2 runs from "We submitted ISC item responses in Sample 1 to a principal
+components analysis" (p. 716) through the octant labels to "Internal
+consistencies for octant scales ranged from .68 to .88" — the α values printed
+in the figure — and it names Sample 2 separately when it means it (the
+circumplex CI is given for each). So `Size` is recorded as verified against
+that narrative, not against the note alone. The `Population` row below is the
+one claim on this page drawn from the whole 1,336, because the article
+describes its participants only at that level.
 
 **On the items and angles.** The article does not print the 64-item ISC or its
 item-to-octant assignment — it describes an initial pool of 151 items and

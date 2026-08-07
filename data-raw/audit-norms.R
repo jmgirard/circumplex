@@ -404,7 +404,13 @@ if (!isTRUE(getOption("norms_audit_defs_only", FALSE))) {
   cat("  coverage rows:    ", nrow(res$coverage), " -> ", COVERAGE_PATH, "\n",
       sep = "")
   cat("  coverage gaps:    ", nrow(gaps), "\n", sep = "")
-  cat("  note-only rows:   ", sum(res$coverage$exempt), "\n", sep = "")
+  # Counted by side, not by `exempt`: constructed-credit rows are exempt too,
+  # so one `sum(exempt)` counter would report them as note-only rows -- hiding
+  # the exact quantity the constructed-credit label exists to make visible.
+  cat("  note-only rows:   ",
+      sum(res$coverage$side == "note-only-sample"), "\n", sep = "")
+  cat("  constructed creds:",
+      sum(res$coverage$side == "constructed-credit-reference"), "\n", sep = "")
   cat("  angle-copy splits:", nrow(angle_check), "\n", sep = "")
   cat("  IP2 breaches:     ", nrow(ip2_check), "\n", sep = "")
   if (nrow(res$coverage)) print(res$coverage)

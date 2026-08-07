@@ -41,7 +41,7 @@ seeing it. Per-row detail is in `data-raw/norms-audit-ledger.csv`.
 | iip32 | unaudited; source is the IIP-64/IIP-32 professional manual, obtainable — the maintainer holds publisher permission to ship the norming functions but not the item text (M72, corrected M73) | — | — | 2026-08-06 |
 | iip64 | unaudited; source is the IIP-64/IIP-32 professional manual, obtainable — the maintainer holds publisher permission to ship the norming functions but not the item text (M72, corrected M73) | — | — | 2026-08-06 |
 | iipsc | unaudited (two norm samples, two different sources) | — | — | 2026-08-06 |
-| iis32 | audited, **norms unsourced**: item map verified; M, SD and Size are published in no identified source (angles not published, Population deviates by design) | M73 | [hatcher2012.md](hatcher2012.md) | 2026-08-06 |
+| iis32 | audited, **norms unsourced**: item map, Reference, URL verified; M, SD, Size and Population are published in no identified source (angles not published) | M73 | [hatcher2012.md](hatcher2012.md) | 2026-08-07 |
 | iis64 | verified: M, SD, Size, item map, Reference, URL; Population deviates by design (no angles) | M73 | [hatcher2009.md](hatcher2009.md) | 2026-08-06 |
 | ipipipc | audited, **norms unsourced**: item map, Size, Reference, URL verified; M and SD are published in no identified source (no angles, Population deviates by design) | M73 | [markey2009.md](markey2009.md) | 2026-08-06 |
 | isc | verified: M, SD, Size, Reference, URL; Population deviates by design (no angles, no item map) | M73 | [hopwood2011.md](hopwood2011.md) | 2026-08-06 |
