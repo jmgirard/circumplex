@@ -1,6 +1,6 @@
 # M72: Norms provenance audit, batch 1 (CSI family + IITC)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -126,7 +126,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 - [x] **T5** — Write `test-norms-provenance.R` (parameterized pins + status
       completeness assert); prove the pins redden by perturbing one shipped
       value (LESSONS guard-teeth rule).
-- [ ] **T6** — NEWS entries (or clean-outcome work-log line); full
+- [x] **T6** — NEWS entries (or clean-outcome work-log line); full
       `devtools::check()` against the master baseline.
 
 ## Work log
@@ -149,6 +149,9 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 - 2026-08-06: the `Population` comparison was dead on first write and was fixed before it could certify anything — the notes recorded the package's own summary string as the source value, so both sides came from the same place and the check could never fail (the LESSONS "two sides built by the same line of code" trap). The notes now carry each source's actual wording, which surfaces all five as real `intended-deviation` rows.
 - 2026-08-06: T4 complete — `data-raw/norms-audit-dispositions.csv` gives all 53 rows a disposition (48 `not-published-in-source`, 5 `intended-deviation`); no row is undispositioned and there are **no `transcription-error` rows at all**. Pre-fix and post-fix ledgers are both committed and are byte-identical outside the commit stamp, because the provenance fix touched `Reference` and `URL` — fields outside the plan's audited field set. Recorded rather than papered over: a provenance audit whose ledger cannot show the provenance defect it found is a real gap in the plan's field set, and it is only covered because AC5's pins reach `Reference` and `URL` even though AC3's ledger does not. Widening the audited field set is left as a decision for Jeff, not taken unilaterally mid-implementation.
 - 2026-08-06: T5 complete — `tests/testthat/test-norms-provenance.R`, 76 assertions, enumerating instruments by the same `data()`-plus-class-filter procedure `instruments()` uses rather than a hand-list (AC5 names `instruments()`, which prints and returns `NULL`, so its return value cannot be consumed; the procedure is mirrored and this deviation recorded). Guard teeth proven by mutation, not by eye: perturbing M, SD, `Size`, `Population`, `Reference`, `URL`, an item map, and an angle copy each reddened the suite, as did deleting one instrument's row from `norms-audit.md`. The status-table half is split from the pins and marked development-only so a skip under `R CMD check` cannot silently take the pins with it (M70).
+
+- 2026-08-06: T6 complete — NEWS entry under a new `## Instrument data` heading records the re-verification and the two provenance corrections, narrowed to what the AC5 pins enforce. `devtools::test()`: 0 failures, 5864 passing. `devtools::check(args = "--no-manual")`: **0 errors, 0 warnings, 0 notes** (16m52s). The suite's 4 warnings are pre-existing, not introduced: the branch changes no file under `R/` or `src/`, and both instrument-touching test files report 0 warnings. `--no-manual`'s skipped PDF-manual step (the M7/M57 lesson) carries no risk here because no roxygen changed.
+- 2026-08-06: status in-progress→review. Session hygiene note: the working tree was briefly checked out to master mid-implementation to measure a warning baseline — a careless move with a live branch. It was stopped immediately; the branch, its commits and the working tree were verified intact and the stash empty, and the baseline question was then settled from the branch diff instead.
 
 ## Decisions
 
