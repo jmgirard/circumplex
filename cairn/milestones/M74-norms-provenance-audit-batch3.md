@@ -47,8 +47,6 @@ PA/NO duplicated-statistics question → its existing candidate row.
       that `parse_source_note()` reads without error, a Provenance block whose
       extraction status names the channel that read the norm table itself and
       carries its own `— observed YYYY-MM-DD`, and a line in `INDEX.md`.
-      `horner2024` is OSF-hosted rather than a shelf PDF, so its provenance
-      records the URL and the retrieval date.
 - [ ] AC4. With `AUDIT_BATCH` extended to all thirteen audited instruments,
       `Rscript -e 'devtools::load_all(); source("data-raw/audit-norms.R")'`
       reports zero coverage gaps, zero angle-copy splits and zero IP2 breaches,
@@ -89,8 +87,8 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - [ ] T3. Rework `AUDIT_BATCH` into a per-(instrument, sample) citekey map;
       confirm batches 1 and 2 audit unchanged under it.
 - [ ] T4. Author `sodano2006.md` (cais) and `trucco2013.md` (igicr).
-- [ ] T5. Author `horner2024.md` (iei) from the OSF-hosted source, with the
-      URL and retrieval record its provenance block needs.
+- [ ] T5. Author `horner2024.md` (iei) from the shelf PDF's Table 1, and shelve
+      the author's IEI norms page as retrieval evidence for the `URL` field.
 - [ ] T6. Author `hopwood2011a.md` and `soldz1995.md` for iipsc's two samples.
 - [ ] T7. Extend the batch, run the audit, disposition every ledger row, commit
       the ledger and coverage CSVs.
@@ -103,8 +101,26 @@ PA/NO duplicated-statistics question → its existing candidate row.
 
 - 2026-08-06: created by /milestone-plan alongside M73.
 - 2026-08-07: status -> in-progress; branch m74-norms-provenance-audit-batch3 cut from master.
+- 2026-08-07: shelf triage found horner2025.pdf (iei, Table 1 prints both samples' M/SD), trucco2013.pdf (igicr, Table 3, three samples) and soldz1995.pdf (iipsc s2, Table 4 n=106) all present and matching shipped; sodano2006 (cais) and hopwood2011a (iipsc s1) absent from the shelf, Jeff supplying both.
+- 2026-08-07: amendment gate — AC3's "horner2024 is OSF-hosted rather than a shelf PDF" sentence deleted as false (the article is on the shelf and publishes the values); T5 rewritten to match. Rest of AC3 unchanged.
+- 2026-08-07: gate chose the author's IEI norms page over the article DOI and the OSF project for iei's shipped norms URL (M74-D1); rejected because Jeff wants users landing on the norms table itself, falsified if that page goes dead or stops matching the shipped values.
 - 2026-08-06: plan gate chose deferring the multi-sample rework to this milestone over doing it in M73 because M73's four instruments are all single-sample and would leave the rework unexercised; falsified by the rekey turning out to be a precondition for something M73 needs.
 
 ## Decisions
+
+### M74-D1 (2026-08-07): iei's norms URL points at the author's IEI norms page
+
+**Context:** The shipped `iei` norms `URL` is `https://osf.io/w37dj/`, the
+article's OSF project. Three candidate anchors exist: that OSF project, the
+article itself (`horner2025.pdf` Table 1, which prints both samples' octant
+M/SD and matches every shipped value), and Locke's own norms page,
+`https://kennethlocke.org/IEI/IEI_Norms.html`, whose eight octant M/SD and
+N of 1,223 match the shipped sample-1 values exactly (fetched 2026-08-06).
+**Decision:** Jeff chose the author's norms page at the M74 implementation
+gate. The page is shelved as retrieval evidence alongside the other Locke
+norms pages, and the article stays the source note backing the values.
+**Consequences:** Applies D-039's standing allowance rather than opening a new
+gate. The page is not peer-reviewed and is a live URL, so its shelf copy
+carries a retrieval date and the audit compares against that copy.
 
 ## Review
