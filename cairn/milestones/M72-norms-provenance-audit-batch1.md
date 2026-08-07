@@ -1,6 +1,6 @@
 # M72: Norms provenance audit, batch 1 (CSI family + IITC)
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -52,7 +52,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       `pdfimages -list`, with `pdfinfo` Producer as one input; an inconclusive
       probe is treated as a scan), re-verified against the live shelf at
       review with the re-check recorded in this file's Review section.
-- [x] AC2: A committed source note `cairn/references/<citekey>.md` exists for
+- [ ] AC2: A committed source note `cairn/references/<citekey>.md` exists for
       each batch source, carrying a machine-readable table of every
       audited-field value with a shipped counterpart — plus any norm sample
       the source publishes that the package does not ship, recorded as a
@@ -72,7 +72,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       (ii) `data-raw/norms-audit-ledger-prefix.csv`, dated and recording the
       commit SHA it was generated against, each mismatch row carrying the
       shipped value, the source value, and the source anchor.
-- [x] AC4: Every ledger mismatch row carries a disposition joined from the
+- [ ] AC4: Every ledger mismatch row carries a disposition joined from the
       committed `data-raw/norms-audit-dispositions.csv` (keyed by instrument
       + field + scale) — `transcription-error` (fixed on this branch),
       `intended-deviation` (documented at the surface where users meet the
@@ -81,7 +81,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       post-fix re-run `data-raw/norms-audit-ledger.csv` is committed beside
       the retained pre-fix snapshot, and its surviving mismatch rows all
       carry a disposition other than `transcription-error`.
-- [x] AC5: `tests/testthat/test-norms-provenance.R` enumerates shipped
+- [ ] AC5: `tests/testthat/test-norms-provenance.R` enumerates shipped
       instruments via `instruments()` (never a hand-list), pins each audited
       instrument's full `Norms` and `Scales` objects to the post-audit
       shipped values — every audited field traceable to its ledger row:
@@ -153,6 +153,8 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 - 2026-08-06: T6 complete — NEWS entry under a new `## Instrument data` heading records the re-verification and the two provenance corrections, narrowed to what the AC5 pins enforce. `devtools::test()`: 0 failures, 5864 passing. `devtools::check(args = "--no-manual")`: **0 errors, 0 warnings, 0 notes** (16m52s). The suite's 4 warnings are pre-existing, not introduced: the branch changes no file under `R/` or `src/`, and both instrument-touching test files report 0 warnings. `--no-manual`'s skipped PDF-manual step (the M7/M57 lesson) carries no risk here because no roxygen changed.
 - 2026-08-06: status in-progress→review. Session hygiene note: the working tree was briefly checked out to master mid-implementation to measure a warning baseline — a careless move with a live branch. It was stopped immediately; the branch, its commits and the working tree were verified intact and the stash empty, and the baseline question was then settled from the branch diff instead.
 
+- 2026-08-06: review → **in-progress**. Gate failed on four acceptance criteria, each verified in-session rather than taken on a reviewer's word: AC6 (NEWS.md touched with zero `transcription-error` rows), AC2 (note-only rows in prose, not the machine-readable table), AC4 (`intended-deviation` undocumented at any user surface; and the committed pre-fix ledger is stamped with a descendant of the fix commit, so its work-log provenance claim is false), AC5 (`Norms[[2]]$Sample` unpinned — mutation leaves the suite green). Two records this review had to correct in itself: it ticked AC6 on a charitable reading of two clauses the never-reinterpret rule forbids, and its earlier mutation evidence for the status-table assertion held only for unaudited instruments. 18 further findings recorded in the Review section for the fix pass. AC1, AC3 and AC7 verified and stand.
+
 ## Decisions
 
 ## Review
@@ -166,20 +168,37 @@ Reviewed 2026-08-06. PR [#98](https://github.com/jmgirard/circumplex/pull/98).
   verdicts re-derived from the stated positive probe (text-layer density,
   `pdfimages -list`, `pdfinfo` Producer); all five PDFs born-digital, so
   M42-D1's two-channel rule does not fire.
-- **AC2 — met.** All five source notes carry a parseable `audit-values` block
-  of 34 rows each with a provenance block; `not-published-in-source` appears
-  where and only where the source publishes nothing (8 rows for locke2007 and
-  locke2014, 16 for boudreaux2018 and bliton2019, 0 for locke2000, which
-  publishes degrees).
+- **AC2 — FAILS as written.** The blocks parse and the
+  `not-published-in-source` rows are right, but AC2 also requires "any norm
+  sample the source publishes that the package does not ship, recorded as a
+  **note-only row**" in the machine-readable table. Those samples (locke2007
+  N=1,234; locke2000 N=980 and N=1,244; bliton2019 N=608) exist only as prose
+  in the notes, never as table rows — and `audit-norms.R` has no note-only
+  concept, so adding them would surface as coverage gaps with no exemption.
 - **AC3 — met.** Fresh run of `data-raw/audit-norms.R`: 0 coverage gaps, 0
   angle-copy splits, 53 ledger rows carrying a generated date and commit stamp.
   Source values are parsed from the notes, not retyped into the script.
-- **AC4 — met.** Post-fix ledger: 53 rows, 0 undispositioned, **0
-  `transcription-error`** (48 `not-published-in-source`, 5
-  `intended-deviation`). Dispositions input and both ledgers committed.
-- **AC5 — met.** `test-norms-provenance.R`: 76 passing, 0 failures, 0 warnings,
-  0 skips under `devtools::test()`. Instruments enumerated by the
-  `utils::data()`-plus-class-filter procedure, no literal instrument vector.
+- **AC4 — FAILS as written.** The ledger is fully dispositioned (53 rows, 0
+  undispositioned, 0 `transcription-error`), but AC4 requires
+  `intended-deviation` be "documented at the surface where users meet the
+  value". `norms()` prints `Population` verbatim with no indication it is a
+  package-normalised summary — `norms(csiv)` says "American college students"
+  where the source says "University of Idaho undergraduates, late 1990s and
+  early 2000s", a materially narrower population, undisclosed in `R/`, `man/`
+  or `vignettes/`. Separately, the committed "pre-fix" ledger is not a pre-fix
+  artifact: its own stamp is `e4ecef4d`, a descendant of the T4 fix commit
+  `0dacb2f1` (verified with `git merge-base --is-ancestor`), so the work-log
+  line claiming it was generated against the pre-fix commit is false.
+- **AC5 — FAILS as written.** 76 passing and the enumeration is procedural,
+  but AC5 requires pinning the **full** `Norms` and `Scales` objects: mutating
+  `Norms[[2]]$Sample` to 7 leaves the suite green (verified live), and
+  `Norms[[1]]$Sample` and `Scales$Label` are likewise unpinned. `Sample` is the
+  key linking the two norms frames, so a corrupted value would misroute
+  `norm_standardize()` with the pins still passing. The status-table assertion
+  also has no teeth for the five audited instruments: its regex matches
+  anywhere in the file, and each batch-1 instrument also appears in the citekey
+  map, so deleting its status row still passes — this review's earlier mutation
+  evidence held only for the ten unaudited instruments and was overstated.
 - **AC6 — FAILS as written.** The post-fix ledger has 0 `transcription-error`
   rows, so the criterion's second clause binds: "the clean outcome is recorded
   in the work log **and NEWS.md is untouched**". NEWS.md *was* touched — it
@@ -200,3 +219,51 @@ DESIGN.md is untouched by the branch, so no principle changed and
 `devtools::document()` produces no diff; all five instruments regenerate
 byte-identically from their `data-raw/` scripts; README.md in sync;
 `pkgdown::check_pkgdown()` reports no problems.
+
+### Review findings (fresh-context fan-out, 2026-08-06)
+
+Three reviewers ran on distinct evidence bases. The prior-review lens reported
+**no prior-review evidence** (no archived `## Review` section touches these
+files; the GitHub inline-comment probe returned empty, matching this repo's
+recorded pattern). The blame-history lens found no contradiction of any D-entry
+and confirmed the change is consistent with IP5. The diff-bug lens returned 22
+findings, several measured live with reproductions.
+
+**Gate failures — verified in this session, not taken on report:**
+
+- **AC6** — NEWS.md touched while the ledger has 0 `transcription-error` rows.
+- **AC2** — note-only rows exist in prose, not the machine-readable table.
+- **AC4** — `intended-deviation` not documented at any user-facing surface.
+- **AC5** — `Norms[[2]]$Sample` mutation leaves the suite green (measured).
+
+**Other findings carried to the fix pass** (triage and scoring belong there;
+these are recorded so none is lost):
+
+1. The mod-360 angle comparison cannot detect an IP2 breach — mutating csiv's
+   LM from 360 to 0 leaves the audit byte-identical to a clean run. The one
+   instrument whose source publishes degrees is exactly where the check must
+   bite, and it does not.
+2. `angle_copies_agree()` returns "agree" when the join key fails to match:
+   `which(NA)` drops the row rather than flagging it.
+3. An `NA` in either shipped angle copy is invisible to every check.
+4. `locke2000.md` records the Angle/LM value as `360` — the package's
+   convention — while its own anchor says the source prints `0`. The source
+   side was translated before comparison: the same "both sides from the same
+   place" trap this milestone caught for `Population` and left standing for
+   angles.
+5. `R/instrument_data.R:63` and `man/csiv.Rd:11` still attribute csiv solely to
+   Locke (2000) — the attribution this milestone condemns — so `norms(csiv)`
+   and `?csiv` now disagree. The recurring sibling-surface miss (LESSONS,
+   M56/M62/M63/M66/M68/M69).
+6. csie is left in the same state csiv was corrected for, undisclosed in NEWS.
+7. The ledger's `generated` date is hardcoded to 2026-08-06; the `commit` stamp
+   makes the file unreproducible at the commit containing it.
+8. The coverage report is printed, never written to an artifact.
+9. `Reference`/`URL` sit outside the audited field set (already disclosed).
+10. `parse_source_note()` silently drops any row not splitting into exactly 4
+    cells — an anchor containing a literal `|` would vanish without diagnostic.
+11. A parse failure lands in the ledger as `kind = "mismatch"` and is then
+    eligible to be dispositioned away as an intended deviation.
+12. `norms-audit.md` marks all five instruments `verified` although 48 of 53
+    rows are `not-published-in-source`; for csip and iitc that is every angle
+    and every item map, so a transposed item map would read as `verified`.
