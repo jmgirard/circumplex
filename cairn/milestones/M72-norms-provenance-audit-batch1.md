@@ -1,6 +1,6 @@
 # M72: Norms provenance audit, batch 1 (CSI family + IITC)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -144,7 +144,7 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
       `R/instrument_data.R`'s csiv `@source`; `devtools::document()`.
 - [x] **T11** — Pins over full `Norms`/`Scales` (incl. `Sample`, `Label`);
       status assertion anchored; teeth re-proven by mutation on an audited row.
-- [ ] **T12** — `norms-audit.md` verdicts name the fields they cover; NEWS
+- [x] **T12** — `norms-audit.md` verdicts name the fields they cover; NEWS
       narrowed to the amended AC6; full check.
 
 ## Work log
@@ -187,6 +187,9 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
 - 2026-08-06: T10 complete — `?norms` now says the population label is a standardized package label deliberately broader than the source's own, names the shared "American college students" case, and points the reader at the printed reference and URL for the source's description. That is the surface where a user meets the value, which is what AC4 asks of an `intended-deviation`. `?csiv` no longer contradicts `norms(csiv)`: its `@source` block separates the instrument's article from the unpublished norms table the shipped statistics come from, and `?csie` gains the parallel sentence (its Reference is correct, but the article is not where the octant statistics are published) — review findings 5 and 6. `devtools::document()` rewrote `csie.Rd`, `csiv.Rd`, `norms.Rd`; `tools::checkRd()` clean on the changed pages.
 
 - 2026-08-06: T11 complete — the field-list pins are replaced by literal pins of the whole `Norms` and `Scales` objects, because a field list pins what its author remembered to name and this one forgot `Sample` and `Label` (review AC5 failure). 57 assertions, all green. Twelve mutations each redden the suite, measured not eyed: `Norms[[2]]$Sample`, `Norms[[1]]$Sample`, `Scales$Label`, M, SD, `Size`, `Population`, `Reference`, `URL`, an item map, one desynced angle copy, and LM 360→0 in both copies (the last caught by a new IP2 convention assertion mirroring the script's). The status-table assertion is now scoped to the `## Audit status` section, and deleting csie's row reddens it — the case the earlier evidence claimed but did not cover, since every audited instrument also appears in the citekey map below.
+
+- 2026-08-06: T12 complete — `norms-audit.md`'s status column no longer says a bare `verified`: each verdict names the fields actually compared, so csip and iitc read `verified: M, SD, Size, Reference, URL (no angles, no item map)` rather than implying a transposed item map would have been caught (review finding 12). NEWS narrowed to what the pins enforce — the item-map claim now says "every item-to-scale assignment its source publishes" — and gains a line for the `?norms` population disclosure. `devtools::test()`: 0 failures, 5845 passing (the pins test dropped from 76 assertions to 57 when the field lists became whole-object comparisons); the same 4 pre-existing warnings. `devtools::check(args = "--no-manual")`: **0 errors, 0 warnings, 0 notes** (16m06s).
+- 2026-08-06: status in-progress→review; all four failed criteria and all 12 recorded findings addressed on the branch.
 
 ## Decisions
 

@@ -18,15 +18,22 @@ trusted from write time.
 
 `verified` = every audited field either matched its source or carries a
 recorded disposition. Audited field set: per-scale M and SD, scale angles,
-item-to-scale assignment, sample `Size`, `Population`.
+item-to-scale assignment, sample `Size`, `Population`, `Reference`, `URL`.
+
+A bare `verified` would overstate what was checked: most sources publish only
+some of that set, and the rest carry a `not-published-in-source` disposition
+rather than a comparison. So each verdict below names the fields actually
+compared against the source — for csip and iitc that excludes both the angles
+and the item map, either of which could be transposed without this audit
+seeing it. Per-row detail is in `data-raw/norms-audit-ledger.csv`.
 
 | instrument | status | batch | source note | observed |
 |---|---|---|---|---|
-| csie | verified | M72 | [locke2007.md](locke2007.md) | 2026-08-06 |
-| csig | verified | M72 | [locke2014.md](locke2014.md) | 2026-08-06 |
-| csip | verified | M72 | [boudreaux2018.md](boudreaux2018.md) | 2026-08-06 |
-| csiv | verified | M72 | [locke2000.md](locke2000.md) | 2026-08-06 |
-| iitc | verified | M72 | [bliton2019.md](bliton2019.md) | 2026-08-06 |
+| csie | verified: M, SD, Size, item map, Reference, URL | M72 | [locke2007.md](locke2007.md) | 2026-08-06 |
+| csig | verified: M, SD, Size, item map, Reference, URL | M72 | [locke2014.md](locke2014.md) | 2026-08-06 |
+| csip | verified: M, SD, Size, Reference, URL (no angles, no item map) | M72 | [boudreaux2018.md](boudreaux2018.md) | 2026-08-06 |
+| csiv | verified: M, SD, Size, item map, angles, Reference, URL | M72 | [locke2000.md](locke2000.md) | 2026-08-06 |
+| iitc | verified: M, SD, Size, Reference, URL (no angles, no item map) | M72 | [bliton2019.md](bliton2019.md) | 2026-08-06 |
 | cais | unaudited | — | — | 2026-08-06 |
 | iei | unaudited | — | — | 2026-08-06 |
 | igicr | unaudited | — | — | 2026-08-06 |
