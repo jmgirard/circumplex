@@ -35,8 +35,10 @@ The sweep behind these absence claims, stated so a later reader can rerun it:
 a full read of the article's text layer, an enumeration of every `TABLE`
 caption in it (the six above), the `pdfimages -list` result above ruling out a
 rasterized seventh table, and `grep -F` for each shipped value — `4.25`, `4.66`,
-`1380`, `1,380` — each returning zero hits. The shipped IIS-32 M, SD and sample
-size therefore have no identified published source; the package's own history
+`1380`, `1,380` — each returning zero hits. The shipped IIS-32 M, SD, sample
+size and sample description therefore have no identified published source —
+`M`, `SD`, `Size` and `Population` alike, which is the set the audit ledger
+dispositions as `source-not-identified`; the package's own history
 records only that they were added to "match author version" (2018-10-29), with
 the underlying correspondence no longer recoverable.
 
@@ -96,7 +98,7 @@ Table 4's octant alpha reliabilities, none of which the package ships.
 | Items | NO | 1, 4, 12, 32 | Appendix, p. 646, 'Engage' block — grouping only; numbers are the package's own item ordering |
 | Size | — | not-published-in-source | the shipped 1380 appears nowhere in the article; its samples are 1,377 / 956 / 497 per Table 2, p. 641, and the Finding above records the sweep |
 | Population | — | not-published-in-source | the shipped norm sample is unidentified, so the article describes no population for it; its development sample is described on p. 640 |
-| Reference | — | Hatcher & Rogers (2012) | p. 638, journal header 'Journal of Personality Assessment, 94(6), 638-646, 2012' with the byline 'ROBERT L. HATCHER AND DANIEL T. ROGERS' |
+| Reference | — | Hatcher & Rogers (2012) | p. 638, journal header 'Journal of Personality Assessment, 94(6), 638–646, 2012' (en dash) with the byline 'ROBERT L. HATCHER AND DANIEL T. ROGERS' — set in small caps on the page, which the text layer flattens to the all-caps form quoted here — each surname followed by a superscript affiliation marker ('1' and '2') |
 | URL | — | https://doi.org/10.1080/00223891.2012.681818 | p. 638, 'DOI: 10.1080/00223891.2012.681818' printed in the journal header |
 | note-only | study samples | development N = 1,377, validation N = 956, clinical N = 497 | Table 2, p. 641, 'Fit of circumplex model to Inventory of Interpersonal Strengths (IIS-32) data' |
 | note-only | octant alphas | per-sample octant and full-scale alpha reliabilities for both IIS forms | Table 4, p. 642, 'Reliabilities of Inventory of Interpersonal Strengths-64 and Inventory of Interpersonal Strengths-32 in the samples' |
@@ -105,8 +107,8 @@ Table 4's octant alpha reliabilities, none of which the package ships.
 ## Traces to
 
 - `data-raw/iis32.R` — every shipped IIS-32 item grouping and provenance string
-  compared against the block above; its M, SD and Size are recorded here as
-  unsourced.
+  compared against the block above; its M, SD, Size and Population are recorded
+  here as unsourced.
 - `data-raw/audit-norms.R` — parses the block above as the source side of the
   iis32 comparison.
 - `cairn/references/norms-audit.md` — carries iis32's audit verdict and this

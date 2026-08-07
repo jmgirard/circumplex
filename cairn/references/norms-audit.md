@@ -138,9 +138,13 @@ printed `Reference` and `?instrument` `@source` now say the norms source is
 unconfirmed instead of crediting an article that does not carry them. A ROADMAP
 candidate row carries the open question of asking the authors.
 
-Two shipped IIS-64 item texts were also wrong and are corrected here: item 5
-had been truncated to "I realize " (the Appendix reads "I realize that I don't
-have to be friends with everyone"), and item 7 read "not agreeable with others"
-where the Appendix reads "not agreeable to others". Neither is a norms field,
-so neither appears in the ledger; both were caught by reading the Appendix in
-two channels.
+Four shipped item texts were also wrong and are corrected here. In `iis64`,
+item 5 had been truncated to "I realize " (hatcher2009's Appendix reads "I
+realize that I don't have to be friends with everyone") and item 7 read "not
+agreeable with others" where that Appendix reads "not agreeable to others". In
+`iis32`, item 28 read "I'm ok with not being included in all activities" where
+hatcher2012's Appendix prints "okay" — the two IIS articles genuinely differ on
+this word. In `ipipipc`, item 16 read "Don't fall for sob-stories" where
+markey2009's Appendix prints "sob stories". None is a norms field, so none
+appears in the ledger; each was caught by reading that instrument's own
+Appendix in two channels.

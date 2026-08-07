@@ -92,7 +92,7 @@ Balance = DE, Restrain = FG, Cooperate = HI, Consider = JK).
 | Items | NO | 1, 12, 24, 25, 38, 62, 63, 64 | Appendix, p. 569, 'Engage' block — grouping only; numbers are the package's own item ordering |
 | Size | — | 684 | p. 558, Study 3 Participants, 'An undergraduate sample of 684 completed'; the same paragraph's 265 plus 419 breakdown sums to it. Table 1's note on the same page instead reads 'N = 686' |
 | Population | — | undergraduates from a large Midwestern university (265) and a medium-sized Southern university (419) | p. 558, Study 3 Participants paragraph |
-| Reference | — | Hatcher & Rogers (2009) | p. 554, journal header 'Psychological Assessment / 2009, Vol. 21, No. 4, 554-569' with the byline 'Robert L. Hatcher' and 'Daniel T. Rogers' |
+| Reference | — | Hatcher & Rogers (2009) | p. 554, journal header set as two stacked lines, 'Psychological Assessment' above '2009, Vol. 21, No. 4, 554–569' (en dash; the text layer inserts a space before it that the rendered page does not print), with the byline 'Robert L. Hatcher' and 'Daniel T. Rogers' printed side by side above their affiliations and carrying no superscripts |
 | URL | — | https://doi.org/10.1037/a0017269 | p. 554, 'DOI: 10.1037/a0017269' printed in the journal header |
 <!-- audit-values-end -->
 

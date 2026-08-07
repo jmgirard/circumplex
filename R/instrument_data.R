@@ -214,7 +214,7 @@
 #'   article defines the instrument and supplies its item-to-octant assignment
 #'   and response anchors (Appendix, p. 360); the only octant means and standard
 #'   deviations it reports are for a different sample (Study 1 combined,
-#'   p. 353).
+#'   p. 354).
 #' @source Norms: source unconfirmed. The shipped octant means and standard
 #'   deviations are published in no source that has been identified. The sample
 #'   size of 274 is the article's Study 2 (p. 357), for which the article

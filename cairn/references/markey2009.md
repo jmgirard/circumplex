@@ -26,7 +26,7 @@ source of the shipped IPIP-IPC octant means and standard deviations; see the
 finding below.
 
 **Finding: the shipped M and SD match no table in this article.** The article
-publishes octant descriptive statistics exactly once, on p. 353, for Study 1's
+publishes octant descriptive statistics exactly once, on p. 354, for Study 1's
 *combined* sample: "PA: M = 2.21, SD = .77; BC: M = 2.09, SD = .73; DE:
 M = 2.24, SD = .69; FG: M = 2.81, SD = .80; HI: M = 3.19, SD = .70; JK:
 M = 3.80, SD = .57; LM: M = 3.92, SD = .57; NO: M = 3.17, SD = .77" — where
@@ -60,22 +60,22 @@ parentheses, so both the numbering and the grouping are source-side here.
 <!-- audit-values-begin -->
 | field | scale | value | anchor |
 |---|---|---|---|
-| M | PA | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 353 — see the Finding above |
-| M | BC | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 353 — see the Finding above |
-| M | DE | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 353 — see the Finding above |
-| M | FG | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 353 — see the Finding above |
-| M | HI | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 353 — see the Finding above |
-| M | JK | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 353 — see the Finding above |
-| M | LM | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 353 — see the Finding above |
-| M | NO | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 353 — see the Finding above |
-| SD | PA | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 353 — see the Finding above |
-| SD | BC | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 353 — see the Finding above |
-| SD | DE | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 353 — see the Finding above |
-| SD | FG | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 353 — see the Finding above |
-| SD | HI | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 353 — see the Finding above |
-| SD | JK | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 353 — see the Finding above |
-| SD | LM | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 353 — see the Finding above |
-| SD | NO | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 353 — see the Finding above |
+| M | PA | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 354 — see the Finding above |
+| M | BC | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 354 — see the Finding above |
+| M | DE | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 354 — see the Finding above |
+| M | FG | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 354 — see the Finding above |
+| M | HI | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 354 — see the Finding above |
+| M | JK | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 354 — see the Finding above |
+| M | LM | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 354 — see the Finding above |
+| M | NO | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant M in the article is Study 1's, p. 354 — see the Finding above |
+| SD | PA | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 354 — see the Finding above |
+| SD | BC | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 354 — see the Finding above |
+| SD | DE | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 354 — see the Finding above |
+| SD | FG | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 354 — see the Finding above |
+| SD | HI | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 354 — see the Finding above |
+| SD | JK | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 354 — see the Finding above |
+| SD | LM | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 354 — see the Finding above |
+| SD | NO | not-published-in-source | Study 2 (the shipped sample) publishes no descriptive statistics; the only octant SD in the article is Study 1's, p. 354 — see the Finding above |
 | Angle | PA | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
 | Angle | BC | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
 | Angle | DE | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
@@ -94,9 +94,9 @@ parentheses, so both the numbering and the grouping are source-side here.
 | Items | NO | 5, 13, 21, 29 | Appendix, p. 360, items numbered 1-32 each tagged with its octant in parentheses; NO items 5, 13, 21, 29 |
 | Size | — | 274 | p. 357, Study 2 Participants and Procedure, 'Data were collected from 274 undergraduate students' |
 | Population | — | undergraduate students from a private Northeastern university in the Philadelphia area | p. 357, Study 2 Participants and Procedure |
-| Reference | — | Markey & Markey (2009) | p. 352, journal header 'Assessment / Volume 16 Number 4 / December 2009 352-361' with the byline 'Patrick M. Markey' and 'Charlotte N. Markey' |
+| Reference | — | Markey & Markey (2009) | p. 352, the first three lines of the stacked masthead block, 'Assessment' above 'Volume 16 Number 4' above 'December 2009 352-361' (hyphen, as set), with the byline 'Patrick M. Markey' above 'Charlotte N. Markey', each printed above its affiliation and carrying no superscript |
 | URL | — | https://doi.org/10.1177/1073191109340382 | p. 352, '10.1177/1073191109340382' printed in the journal header |
-| note-only | Study 1 combined octant statistics | PA 2.21 / .77, BC 2.09 / .73, DE 2.24 / .69, FG 2.81 / .80, HI 3.19 / .70, JK 3.80 / .57, LM 3.92 / .57, NO 3.17 / .77 | p. 353, 'for the combined sample, PA: M = 2.21, SD = .77; ...' — a different sample from the one the package ships |
+| note-only | Study 1 combined octant statistics | PA 2.21 / .77, BC 2.09 / .73, DE 2.24 / .69, FG 2.81 / .80, HI 3.19 / .70, JK 3.80 / .57, LM 3.92 / .57, NO 3.17 / .77 | p. 354, 'for the combined sample, PA: M = 2.21, SD = .77; ...' — a different sample from the one the package ships |
 <!-- audit-values-end -->
 
 ## Traces to

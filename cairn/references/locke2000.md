@@ -79,7 +79,7 @@ separately on the shipped side by `data-raw/audit-norms.R`.
 | Items | NO | 6, 14, 22, 30, 38, 46, 54, 62 | CSIV_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
 | Size | — | 1200 | CSIV_Norms.html sample description, 'N=1,200 University of Idaho undergraduates' |
 | Population | — | University of Idaho undergraduates, late 1990s and early 2000s | CSIV_Norms.html sample description (retrieved 2026-08-06) |
-| Reference | — | Locke (n.d.) | constructed-credit — CSIV_Norms.html carries the norms table with no date and no article citation anywhere on it, so no page prints this credit; locke2000 publishes no octant statistics and a different sample (Tables 1-2, pp. 256-258) |
+| Reference | — | Locke (n.d.) | constructed-credit — on CSIV_Norms.html the *undergraduate* norms table and its sample description carry no citation and no date of their own, dating the sample only as 'the late 1990s and early 2000s'. The page does print citations elsewhere (Hopwood et al., 2022 above the adult table and Locke & Adamic, 2012 above the 32-item table, both recorded as note-only rows below) and a site footer '© 2024 Kenneth Locke', but each belongs to another table or to the site, not to this credit, so no printed text supplies its author or year; locke2000 publishes no octant statistics and a different sample (Tables 1-2, pp. 256-258) |
 | URL | — | https://kennethlocke.org/CSIV/CSIV_Norms.html | retrieved 2026-08-06; the page serving the undergraduate norms table |
 | note-only | U.S. adult sample | N = 980, Hopwood et al. (2022) | CSIV_Norms.html, adult norms table (retrieved 2026-08-06) |
 | note-only | 32-item adult MTurk sample | N = 1,244, Locke & Adamic (2012) | CSIV_Norms.html, 32-item norms table (retrieved 2026-08-06) |

@@ -32,7 +32,7 @@ split into a derivation Sample 1 of n = 649 and a validation Sample 2 of
 n = 687 (pp. 714–715). The package ships 649, and what supports that is the
 surrounding narrative rather than the figure note: the passage introducing
 Figure 2 runs from "We submitted ISC item responses in Sample 1 to a principal
-components analysis" (p. 716) through the octant labels to "Internal
+components analysis" (p. 715) through the octant labels to "Internal
 consistencies for octant scales ranged from .68 to .88" — the α values printed
 in the figure — and it names Sample 2 separately when it means it (the
 circumplex CI is given for each). So `Size` is recorded as verified against
@@ -86,9 +86,9 @@ wedges.
 | Items | JK | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
 | Items | LM | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
 | Items | NO | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
-| Size | — | 649 | p. 715, 'split randomly into a derivation Sample 1 (n = 649)'; Figure 2's note, p. 717, ties the descriptive values to Study 1 |
+| Size | — | 649 | pp. 714–715, one sentence broken by the page turn: 'The participants were split randomly into a derivation Sample 1' is the last line of p. 714 and '(n = 649) and a validation Sample 2 (n = 687) with consistent gender ratios' opens p. 715; Figure 2's note, p. 717, ties the descriptive values to Study 1 |
 | Population | — | mostly White college students, average age 19.14 years | p. 714, Study 1 Participants, 'The participants for this study were 1,336 mostly White college students' |
-| Reference | — | Hopwood et al. (2011) | p. 707, byline 'Christopher J. Hopwood, Emily B. Ansell, Aaron L. Pincus, Aidan G. C. Wright, Mark R. Lukowitsky, and Michael J. Roche' with the footer 'Journal of Personality 79:4, August 2011'; the shipped credit abbreviates that list with 'et al.' |
+| Reference | — | Hopwood et al. (2011) | p. 707, byline 'Christopher J. Hopwood, Emily B. Ansell, Aaron L. Pincus, Aidan G. C. Wright, Mark R. Lukowitsky, and Michael J. Roche', set over three centred lines with each name followed by a superscript affiliation marker ('1', '2' or '3'), and the footer 'Journal of Personality 79:4, August 2011'; the shipped credit abbreviates that list with 'et al.' |
 | URL | — | https://doi.org/10.1111/j.1467-6494.2011.00696.x | p. 707, 'DOI: 10.1111/j.1467-6494.2011.00696.x' printed in the article footer |
 | note-only | Study 1 validation half | Sample 2, n = 687, the other half of the 1,336 random split | p. 715, 'a validation Sample 2 (n = 687) with consistent gender ratios' |
 | note-only | Study 2 sample | N = 299, a broader array of correlates | p. 707 abstract, 'In Study 2 (N = 299)' |
