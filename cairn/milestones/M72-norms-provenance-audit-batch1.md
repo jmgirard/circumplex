@@ -142,7 +142,7 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
       checkout, stamped with both commits; post-fix re-run; dispositions extended.
 - [x] **T10** — Document the deviation at `norms()`'s help; fix
       `R/instrument_data.R`'s csiv `@source`; `devtools::document()`.
-- [ ] **T11** — Pins over full `Norms`/`Scales` (incl. `Sample`, `Label`);
+- [x] **T11** — Pins over full `Norms`/`Scales` (incl. `Sample`, `Label`);
       status assertion anchored; teeth re-proven by mutation on an audited row.
 - [ ] **T12** — `norms-audit.md` verdicts name the fields they cover; NEWS
       narrowed to the amended AC6; full check.
@@ -185,6 +185,8 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
 - 2026-08-06: T9 complete — the pre-fix ledger is now a real pre-fix artifact, superseding the earlier claim that the committed one was (the review measured its stamp as a descendant of the fix commit). Rebuilt in a detached scratch worktree carrying `data/` from `c2453755`, the parent of the T4 fix commit, with today's script and notes; it stamps `script_commit 54fbf783` and `data_commit c2453755` rather than one ambiguous commit. The two ledgers are no longer byte-identical outside the stamp, which is the point: pre-fix carries 56 rows including three `transcription-error` rows (csie `URL`, csiv `URL`, csiv `Reference`), post-fix carries 53 with none. Neither has an undispositioned row. The widened field set closed the gap this milestone had to record as uncovered.
 
 - 2026-08-06: T10 complete — `?norms` now says the population label is a standardized package label deliberately broader than the source's own, names the shared "American college students" case, and points the reader at the printed reference and URL for the source's description. That is the surface where a user meets the value, which is what AC4 asks of an `intended-deviation`. `?csiv` no longer contradicts `norms(csiv)`: its `@source` block separates the instrument's article from the unpublished norms table the shipped statistics come from, and `?csie` gains the parallel sentence (its Reference is correct, but the article is not where the octant statistics are published) — review findings 5 and 6. `devtools::document()` rewrote `csie.Rd`, `csiv.Rd`, `norms.Rd`; `tools::checkRd()` clean on the changed pages.
+
+- 2026-08-06: T11 complete — the field-list pins are replaced by literal pins of the whole `Norms` and `Scales` objects, because a field list pins what its author remembered to name and this one forgot `Sample` and `Label` (review AC5 failure). 57 assertions, all green. Twelve mutations each redden the suite, measured not eyed: `Norms[[2]]$Sample`, `Norms[[1]]$Sample`, `Scales$Label`, M, SD, `Size`, `Population`, `Reference`, `URL`, an item map, one desynced angle copy, and LM 360→0 in both copies (the last caught by a new IP2 convention assertion mirroring the script's). The status-table assertion is now scoped to the `## Audit status` section, and deleting csie's row reddens it — the case the earlier evidence claimed but did not cover, since every audited instrument also appears in the citekey map below.
 
 ## Decisions
 
