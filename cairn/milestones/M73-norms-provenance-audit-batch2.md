@@ -94,13 +94,13 @@ the source author.
 
 ## Tasks
 
-- [ ] T1. Shelf intake: confirm the four source PDFs are present under
+- [x] T1. Shelf intake: confirm the four source PDFs are present under
       `cairn/references/sources/`; record each one's sha256 and scan verdict in
       `norms-audit.md`'s manifest; decide the channel plan per source by asking
       what channel reads the *norm table*, not what produced the file (M72).
-- [ ] T2. Author `hatcher2012.md` (iis32) and `hatcher2009.md` (iis64) with
+- [x] T2. Author `hatcher2012.md` (iis32) and `hatcher2009.md` (iis64) with
       audit-values blocks and `INDEX.md` lines.
-- [ ] T3. Author `markey2009.md` (ipipipc) and `hopwood2011.md` (isc) likewise.
+- [x] T3. Author `markey2009.md` (ipipipc) and `hopwood2011.md` (isc) likewise.
 - [ ] T4. Anchored-`Reference` rule: give every `Reference` audit row in the
       nine notes a page/line anchor or a `constructed-credit` token with its
       reason (`locke2000.md:82`'s `Locke (n.d.)` is the known case); teach
@@ -130,6 +130,10 @@ the source author.
 - 2026-08-06: plan gate chose fixing the `Reference` origin problem by labelling constructed credits over requiring every credit be quotable from the source, because `locke2000.md:82` records a page that carries no date and no citation, so the stronger rule is unsatisfiable retroactively; falsified by a constructed-credit row later proving to hide a real mismatch the label did not surface.
 - 2026-08-06: /milestone-implement started; branch `m73-norms-provenance-audit-batch2` cut from master.
 - 2026-08-06: user reported at the gate that the IIP publisher granted permission to ship norming functions but not item text — so iip32/iip64 are not an unobtainable-source case, and `norms-audit.md`'s claim that they need such a disposition is corrected here (AC7b) rather than acted on.
+- 2026-08-06: T1-T3 done. Shelf intake: all four PDFs born-digital; channel plan set by what reads the *anchor* (M72) — every compared value read in the text layer and a 200-300 dpi page-image render. Four source notes authored with audit-values blocks; `parse_source_note()` reads all four (36/38/37/38 rows).
+- 2026-08-06: audit finding — **iis32 and ipipipc ship norms their cited articles never print.** hatcher2012 has six tables, none descriptive, and never prints N=1380; markey2009 publishes octant M/SD only for Study 1's combined sample, while the shipped N=274 is Study 2, whose Results carry no descriptives. Absence bounded by a full text-layer read, a table-caption enumeration, `pdfimages -list` (markey2009 has zero images), and `grep -F` on each shipped value. iis64 and isc verified exactly against hatcher2009 Table 1 (p. 558) and hopwood2011 Figure 2 (p. 717).
+- 2026-08-06: hatcher2009 prints its Study 3 sample two ways — p. 558 text 'An undergraduate sample of 684' (breakdown 265+419 sums to it) against Table 1's note 'N = 686'. Shipped 684 stands; recorded as a source-internal inconsistency at the user's direction.
+- 2026-08-06: web search for the two unsourced norm sets returned nothing; user reports the 2018 author correspondence is unrecoverable, so 'personal communication' is not assertable. Gate chose honest disclosure in the shipped credits plus a tracked follow-up.
 
 ## Decisions
 

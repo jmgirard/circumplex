@@ -79,6 +79,19 @@ the norm tables were read in two channels regardless.
 | locke_csie_scoring_2026-08-06.html | 779394ec913f3a90350dc3fc5311641019e886377a9be6a12623fa44d3f75fb8 | retrieved HTML (kennethlocke.org/CSIE/CSIE_Scoring_R.html) | 2026-08-06 |
 | locke_csiv_scoring_2026-08-06.html | 7f54e01905861a7ac33bf182827d78ce0a36eb5b9e81c5c97ad87bbf6674e13c | retrieved HTML (kennethlocke.org/CSIV/CSIV_Scoring_R.html) | 2026-08-06 |
 | locke_csig_items_2026-08-06.html | 461c8d4dc6866b27c1f5ac33b86faaf7cac36bb1acd196ed40b4daa713c45814 | retrieved HTML (kennethlocke.org/CSIG/CSIG_Items_Scales.html) | 2026-08-06 |
+| hatcher2009.pdf | 41488a551ee7eb349ff2e263a0ca22a0b27496de284103803c3b30ef4126b6d4 | born-digital (no full-page images, 5311 chars/page); norm table is typeset text (Table 1, p. 558) | 2026-08-06 |
+| hatcher2012.pdf | 239b5474fcfeb3b6b9e226779056d24d7744ae0274427dec40c0ecaac1ea1edf | born-digital (2 images, neither full-page; 5609 chars/page); publishes no norm table at all | 2026-08-06 |
+| markey2009.pdf | ce25c8ef65ddda8b14fec82377667b78bcecbbb4cc6c4a9858a51221853dedfa | born-digital (**zero** images, 4228 chars/page), so its text layer is the whole article | 2026-08-06 |
+| hopwood2011.pdf | b65fd37b08f1165ec66e0d6075500b2984a6e0cb7417e581a4f42d8981f80527 | born-digital (1 image, not full-page; 2474 chars/page); norm values are text objects **inside Figure 2**, p. 717 | 2026-08-06 |
+
+Channel plan for batch 2, decided by asking what channel reads the *norm
+table* rather than what produced the file (the M72 lesson). Every anchor a
+compared value came from was read in two independent channels — the `pdftotext`
+text layer and a 200–300 dpi page-image render — because `pdftotext` run twice,
+with and without `-layout`, is one channel read twice. hopwood2011 is the case
+that most needed it: its values sit inside a figure. markey2009 is the case
+that needed it least: with zero images in the file, nothing can hide from the
+text layer, which is also what makes its absence findings checkable.
 
 ## What batch 1 found
 
