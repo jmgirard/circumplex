@@ -14,10 +14,10 @@ An object of class `circumplex_instrument` of length 5.
 
 ## Source
 
-Horner, M. S., Locke, K. D., & Hulsey, T. L. (in press). Assessing
-affective dimensions of the interpersonal circumplex: development and
-validation of the interpersonal emotion inventory. *Journal of
-Personality Assessment*. Advanced online publication.
+Horner, M. S., Locke, K. D., & Hulsey, T. L. (2025). Assessing affective
+dimensions of the interpersonal circumplex: Development and validation
+of the Interpersonal Emotion Inventory. *Journal of Personality
+Assessment, 107*(2), 170-187. First published online 13 September 2024.
 
 [doi:10.1080/00223891.2024.2400266](https://doi.org/10.1080/00223891.2024.2400266)
 

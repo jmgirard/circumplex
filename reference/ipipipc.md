@@ -16,6 +16,16 @@ An object of class `circumplex_instrument` of length 5.
 
 Markey, P. M., & Markey, C. N. (2009). A brief assessment of the
 interpersonal circumplex: The IPIP-IPC. *Assessment, 16*(4), 352-361.
+This article defines the instrument and supplies its item-to-octant
+assignment and response anchors (Appendix, p. 360); the only octant
+means and standard deviations it reports are for a different sample
+(Study 1 combined, p. 354).
+
+Norms: source unconfirmed. The shipped octant means and standard
+deviations are published in no source that has been identified. The
+sample size of 274 is the article's Study 2 (p. 357), for which the
+article reports no descriptive statistics. Treat them as unverified
+until a source is established.
 
 [doi:10.1177/1073191109340382](https://doi.org/10.1177/1073191109340382)
 
@@ -61,7 +71,7 @@ summary(ipipipc)
 #> 13. Start conversations
 #> 14. Do most of the talking
 #> 15. Contradict others
-#> 16. Don't fall for sob-stories
+#> 16. Don't fall for sob stories
 #> 17. Don't talk a lot
 #> 18. Seldom toot my own horn
 #> 19. Think of others first
@@ -81,7 +91,7 @@ summary(ipipipc)
 #> 
 #> The IPIP-IPC currently has 1 normative data set(s):
 #> 1. 274 American college students
-#> Markey & Markey (2009)
+#> Norms source unconfirmed; instrument published as Markey & Markey (2009)
 #> <https://doi.org/10.1177/1073191109340382>
 scales(ipipipc, items = TRUE)
 #> The IPIP-IPC contains 8 circumplex scales.
@@ -97,7 +107,7 @@ scales(ipipipc, items = TRUE)
 #>     31. Have a sharp tongue
 #> DE: Cold-Hearted (180 degrees)
 #>     8. Believe people should fend for themselves
-#>     16. Don't fall for sob-stories
+#>     16. Don't fall for sob stories
 #>     24. Don't put a lot of thought into things
 #>     32. Am not interested in other people's problems
 #> FG: Aloof-Introverted (225 degrees)

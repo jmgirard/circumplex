@@ -17,7 +17,15 @@ An object of class `circumplex_instrument` of length 5.
 
 Hatcher, R. L., & Rogers, D. T. (2012). The IIS-32: A brief inventory of
 interpersonal strengths. *Journal of Personality Assessment, 94*(6),
-638-646.
+638-646. This article defines the instrument and supplies the
+item-to-octant grouping (Appendix, p. 646); it reports no octant means
+or standard deviations, and none of its samples is the normative sample
+below.
+
+Norms: source unconfirmed. The shipped octant means and standard
+deviations, the N of 1380, and the sample description that accompanies
+them are published in no source that has been identified, including the
+article above. Treat them as unverified until a source is established.
 
 [doi:10.1080/00223891.2012.681818](https://doi.org/10.1080/00223891.2012.681818)
 
@@ -76,7 +84,7 @@ summary(iis32)
 #> 25. I can let other people know when I think that they're asking for too much from me
 #> 26. I can rely on myself when I'm having problems with others
 #> 27. I'm cooperative
-#> 28. I'm ok with not being included in all activities
+#> 28. I'm okay with not being included in all activities
 #> 29. I can be interested in others without being nosy
 #> 30. I can resist others' tempting me to indulge myself
 #> 31. I don't ask others for more than they are comfortable giving
@@ -84,7 +92,7 @@ summary(iis32)
 #> 
 #> The IIS-32 currently has 1 normative data set(s):
 #> 1. 1380 American college students
-#> Hatcher & Rogers (2012)
+#> Norms source unconfirmed; instrument published as Hatcher & Rogers (2012)
 #> <https://doi.org/10.1080/00223891.2012.681818>
 scales(iis32, items = TRUE)
 #> The IIS-32 contains 8 circumplex scales.
@@ -102,7 +110,7 @@ scales(iis32, items = TRUE)
 #>     6. I can help others with their needs without neglecting my own
 #>     8. I can say 'no' to others
 #>     26. I can rely on myself when I'm having problems with others
-#>     28. I'm ok with not being included in all activities
+#>     28. I'm okay with not being included in all activities
 #> FG: Restrain (225 degrees)
 #>     11. I can listen and think before I act in relationships
 #>     24. I recognize when others need privacy

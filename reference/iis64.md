@@ -52,9 +52,9 @@ summary(iis64)
 #> 2. I enjoy learning from people who have more experience than I do
 #> 3. It's important to me to be honest even when it's difficult
 #> 4. I recover quickly when people hurt my feelings
-#> 5. I realize 
+#> 5. I realize that I don't have to be friends with everyone
 #> 6. I enjoy being with other people
-#> 7. I can assert my needs even when it's not agreeable with others
+#> 7. I can assert my needs even when it's not agreeable to others
 #> 8. When someone irritates me, I look for a constructive solution
 #> 9. I'm pretty even-tempered with others
 #> 10. I can make a decision even if others disagree
@@ -129,7 +129,7 @@ scales(iis64, items = TRUE)
 #>     40. I can take charge in a group
 #>     58. I am able to be assertive with other people
 #> BC: Direct (135 degrees)
-#>     7. I can assert my needs even when it's not agreeable with others
+#>     7. I can assert my needs even when it's not agreeable to others
 #>     10. I can make a decision even if others disagree
 #>     20. I argue effectively with others
 #>     28. I know how to look after my own interests
@@ -139,7 +139,7 @@ scales(iis64, items = TRUE)
 #>     59. When others get me down, I can bounce back
 #> DE: Balance (180 degrees)
 #>     4. I recover quickly when people hurt my feelings
-#>     5. I realize 
+#>     5. I realize that I don't have to be friends with everyone
 #>     15. I can help others with their needs without neglecting my own
 #>     18. I can say 'no' to others
 #>     36. I like to be clear on my agreements with other people

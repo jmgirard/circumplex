@@ -156,7 +156,7 @@ summary(ipipipc)
 #> 13. Start conversations
 #> 14. Do most of the talking
 #> 15. Contradict others
-#> 16. Don't fall for sob-stories
+#> 16. Don't fall for sob stories
 #> 17. Don't talk a lot
 #> 18. Seldom toot my own horn
 #> 19. Think of others first
@@ -176,7 +176,7 @@ summary(ipipipc)
 #> 
 #> The IPIP-IPC currently has 1 normative data set(s):
 #> 1. 274 American college students
-#> Markey & Markey (2009)
+#> Norms source unconfirmed; instrument published as Markey & Markey (2009)
 #> <https://doi.org/10.1177/1073191109340382>
 ```
 
@@ -205,7 +205,7 @@ anchors(ipipipc)
 norms(ipipipc)
 #> The IPIP-IPC currently has 1 normative data set(s):
 #> 1. 274 American college students
-#> Markey & Markey (2009)
+#> Norms source unconfirmed; instrument published as Markey & Markey (2009)
 #> <https://doi.org/10.1177/1073191109340382>
 ```
 
@@ -231,7 +231,7 @@ scales(ipipipc, items = TRUE)
 #>     31. Have a sharp tongue
 #> DE: Cold-Hearted (180 degrees)
 #>     8. Believe people should fend for themselves
-#>     16. Don't fall for sob-stories
+#>     16. Don't fall for sob stories
 #>     24. Don't put a lot of thought into things
 #>     32. Am not interested in other people's problems
 #> FG: Aloof-Introverted (225 degrees)
