@@ -1,31 +1,24 @@
 # horner2024 — the IEI and its two normative samples
 
 **Provenance.** Ingested 2026-08-07 by M74 from two sources, both shelved under
-`cairn/references/sources/` (gitignored):
-
-- `horner2025.pdf`, 18 PDF pages whose printed numbers run pp. 1–18. This is the
-  **online-first** version, and it prints 2024 throughout — "Accepted 12 August
-  2024", "© 2024 Taylor & Francis Group, LLC", and a DOI whose stem is
-  `2024.2400266` — with continuous pagination from 1 rather than an issue's page
-  range. The version of record came later: `R/instrument_data.R` cites it as
-  *Journal of Personality Assessment, 107*(2), 170–187 (2025), which is what the
-  shelf filename records. The citekey follows the copy on the shelf, and every
-  page anchor below is that copy's pagination, not the issue's.
-  Pagination: the online-first copy's own page numbers. The PDF is **born-digital**
-  (`Producer: Zotero`, 5404 text characters per page), not an OCR scan, and
-  Table 1 is typeset table text.
-- `locke_iei_norms_2026-08-07.html` (sha256 50230f1b…), retrieved 2026-08-07
-  from `https://kennethlocke.org/IEI/IEI_Norms.html`. Unpaginated: `—`. This is
-  the author's own IEI norms page, which publishes the Study 1 octant means and
-  SDs and credits the article for them. M74-D1 chose it as the shipped `URL`
-  anchor for the sample-1 norms.
-
-Extraction: verified 2026-08-07 — Table 1 (p. 6) read in both the `pdftotext`
-text layer and a 220-dpi page-image render, and the norms page read in both a
-raw-HTML tag-stripped extraction and a model-mediated fetch; the channels agree
-on every value, and the page's eight means and SDs agree with Table 1's Study 1
-column value for value; no value read by a second human channel — observed
-2026-08-07.
+`cairn/references/sources/` (gitignored). The article is `horner2025.pdf`,
+18 PDF pages whose printed numbers run pp. 1–18; this is the **online-first**
+version, and it prints 2024 throughout — "Accepted 12 August 2024",
+"© 2024 Taylor & Francis Group, LLC", and a DOI whose stem is `2024.2400266` —
+with continuous pagination from 1 rather than an issue's page range. The version
+of record came later: `R/instrument_data.R` cites it as *Journal of Personality
+Assessment, 107*(2), 170–187 (2025), which is what the shelf filename records.
+The citekey follows the copy on the shelf, and every page anchor below is that
+copy's pagination, not the issue's.
+Pagination: the online-first copy's own page numbers. The PDF is
+**born-digital** (`Producer: Zotero`, 5404 text characters per page), not an OCR
+scan, and Table 1 is typeset table text. The second source is
+`locke_iei_norms_2026-08-07.html` (sha256 50230f1b…), retrieved 2026-08-07 from
+`https://kennethlocke.org/IEI/IEI_Norms.html` and unpaginated (`—`): the
+author's own IEI norms page, which publishes the Study 1 octant means and SDs
+and credits the article for them, chosen by M74-D1 as the shipped `URL` anchor
+for the sample-1 norms.
+Extraction: verified 2026-08-07 — Table 1 (p. 6) read in both the `pdftotext` text layer and a 220-dpi page-image render, and the norms page read in both a raw-HTML tag-stripped extraction and a model-mediated fetch; the channels agree on every value, and the page's eight means and SDs agree with Table 1's Study 1 column value for value; no value read by a second human channel — observed 2026-08-07.
 
 **Citation.** Horner, M. S., Locke, K. D., & Hulsey, T. L. (2024). Assessing
 affective dimensions of the interpersonal circumplex: Development and
