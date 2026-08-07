@@ -1,6 +1,6 @@
 # M72: Norms provenance audit, batch 1 (CSI family + IITC)
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -54,7 +54,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       `pdfimages -list`, with `pdfinfo` Producer as one input; an inconclusive
       probe is treated as a scan), re-verified against the live shelf at
       review with the re-check recorded in this file's Review section.
-- [ ] AC2: A committed source note `cairn/references/<citekey>.md` exists for
+- [x] AC2: A committed source note `cairn/references/<citekey>.md` exists for
       each batch source, carrying a machine-readable table of every
       audited-field value with a shipped counterpart — plus any norm sample
       the source publishes that the package does not ship, recorded as a
@@ -74,7 +74,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       (ii) `data-raw/norms-audit-ledger-prefix.csv`, dated and recording the
       commit SHA it was generated against, each mismatch row carrying the
       shipped value, the source value, and the source anchor.
-- [ ] AC4: Every ledger mismatch row carries a disposition joined from the
+- [x] AC4: Every ledger mismatch row carries a disposition joined from the
       committed `data-raw/norms-audit-dispositions.csv` (keyed by instrument
       + field + scale) — `transcription-error` (fixed on this branch),
       `intended-deviation` (documented at the surface where users meet the
@@ -92,7 +92,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       on any edit to any audited field including sample N and population, and
       fails when any shipped instrument is absent from `norms-audit.md`'s
       status table.
-- [ ] AC6: NEWS.md documents every user-visible instrument-data change this
+- [x] AC6: NEWS.md documents every user-visible instrument-data change this
       milestone ships — each `transcription-error` fix, and each provenance
       correction to a shipped `Reference` or `URL` — each entry narrowed to
       what AC5's pins enforce; if the milestone ships no such change, the
@@ -191,11 +191,119 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
 - 2026-08-06: T12 complete — `norms-audit.md`'s status column no longer says a bare `verified`: each verdict names the fields actually compared, so csip and iitc read `verified: M, SD, Size, Reference, URL (no angles, no item map)` rather than implying a transposed item map would have been caught (review finding 12). NEWS narrowed to what the pins enforce — the item-map claim now says "every item-to-scale assignment its source publishes" — and gains a line for the `?norms` population disclosure. `devtools::test()`: 0 failures, 5845 passing (the pins test dropped from 76 assertions to 57 when the field lists became whole-object comparisons); the same 4 pre-existing warnings. `devtools::check(args = "--no-manual")`: **0 errors, 0 warnings, 0 notes** (16m06s).
 - 2026-08-06: status in-progress→review; all four failed criteria and all 12 recorded findings addressed on the branch.
 
+- 2026-08-06: second review — AC1, AC2, AC3, AC4, AC6, AC7 verified with fresh evidence and ticked; two findings scored at or above 80, both fixed in-review (`norms-audit.md` verdicts now name `Population`; csig's Figure 2 re-read in two further independent channels, confirming every shipped value and placing the PA/NO duplication in the source rather than the extraction). 37 lower-scored findings logged in the Review section, none actioned.
+- 2026-08-06: **amendment return: AC5 — "enumerates shipped instruments by the same procedure `instruments()` uses (`data()` plus the `circumplex_instrument` class filter), never a hand-list"** — proposed. `instruments()` returns `NULL` (measured), so the clause as written cannot be satisfied by any test; the deviation was recorded at T5 and should have been an amendment then. Status review→in-progress for this amendment alone.
+
 ## Decisions
 
 ## Review
 
-Reviewed 2026-08-06. PR [#98](https://github.com/jmgirard/circumplex/pull/98).
+### Second review, 2026-08-06 (after the T7–T12 fix pass)
+
+**AC1 — met.** All ten shelved sources re-hashed live against the committed
+manifest: 10 match, 0 missing. Scan verdicts re-derived from the stated probe
+(text-layer density per page, `pdfimages -list`, `pdfinfo` Producer): all five
+PDFs born-digital, image counts matching the manifest, so M42-D1's two-channel
+rule does not fire on the container verdict. See the AC2 note on where that
+verdict was not sufficient.
+
+**AC2 — met.** All five notes parse: 37/37/38/38/37 rows, 0 blank anchors, 0
+duplicate keys, and the note-only rows are now table rows rather than prose —
+7 of them (csie N=1,234; csig Study 2 n=327; csip women n=121 and men n=70;
+csiv N=980 and N=1,244; iitc Study 2 N=608), each carrying an anchor, and each
+exempt from the coverage report by construction. `Reference` and `URL` rows are
+present for all five under the widened field set. Provenance blocks state the
+extraction channels per source.
+
+**AC3 — met.** Fresh run of `data-raw/audit-norms.R`: 0 coverage gaps, 7
+note-only rows, 0 angle-copy splits, 0 IP2 breaches, 53 ledger rows. Re-running
+reproduces the committed ledger byte-for-byte apart from its own commit stamp
+(the stamp names the commit the run was made against, necessarily the parent of
+the commit containing the file). Source values are parsed from the notes.
+
+**AC4 — met.** Post-fix ledger: 53 rows, 0 undispositioned, 0
+`transcription-error`. The pre-fix ledger is now genuinely pre-fix — its
+`data_commit` is `c2453755`, which `git rev-parse 0dacb2f1^` confirms is the
+parent of the T4 fix commit — and carries 56 rows including the three
+`transcription-error` rows the pre-fix state should show. The
+`intended-deviation` on `Population` is documented where users meet it:
+`man/norms.Rd` states the label is a standardized package label deliberately
+broader than the source's own and points at the printed reference.
+
+**AC5 — the pins pass; the criterion's first clause cannot.** Evidence on the
+pins: 57 assertions green; the mutation that passed at the first review now
+fails (setting `Norms[[2]]$Sample` to 7 reddens the suite, as does editing
+`Scales$Label`), and deleting iitc's row from `norms-audit.md`'s status table
+reddens it — the audited-instrument case the first review's evidence did not
+cover. But AC5 opens "enumerates shipped instruments via `instruments()` (never
+a hand-list)", and `instruments()` prints its listing and returns `NULL`
+(measured at review: `is.null(instruments())` is `TRUE`), so no test can consume
+its return value. The criterion as written is unsatisfiable — the wording is
+wrong, not the work, which mirrors the procedure `instruments()` uses. Reading
+"via `instruments()`" as "by the procedure `instruments()` uses" is exactly the
+charitable reading the never-reinterpret rule forbids, and is the reading that
+cost this milestone its first review. Routed as an amendment return.
+
+**AC6 — met against the amended criterion.** The ledger has 0
+`transcription-error` rows post-fix, but the branch ships two provenance
+corrections, which the amended AC6 requires NEWS to document; it does, and each
+claim is enforced by an AC5 pin.
+
+**AC7 — met.** Fresh at review HEAD: `devtools::check(args = "--no-manual")`
+**0 errors, 0 warnings, 0 notes** (15m47s), tests inside it OK.
+
+### Consistency gate (second review)
+
+`cairn_validate`: all checks pass (48 advisories, none a gate failure).
+DESIGN.md untouched, so `cairn_impact` is a clean skip. Toolchain gate
+(`r-package`): `devtools::document()` produces no diff; all five instruments
+regenerate content-identically from their `data-raw/` scripts; README.md in
+sync; `pkgdown::check_pkgdown()` reports no problems; NEWS.md carries the
+user-visible changes.
+
+### Findings (second fan-out) and their triage
+
+Three fresh-context reviewers on distinct evidence bases produced 39 candidate
+findings; a separate scorer, given the diff and the plan, scored each. Two
+scored ≥80, neither an acceptance-criterion failure, so no return under the
+floor.
+
+- **Population omitted from the verdict strings (82) — fixed now.** The status
+  table named every compared field except the one that did not match. Verdicts
+  now read `… ; Population deviates by design`.
+- **csig's M/SD were a single-channel read (80) — fixed now, by doing the
+  second channel.** The values are printed inside Figure 2 and no text layer
+  carries them, so the born-digital container verdict did not license a single
+  read. Figure 2 was re-read at 400 dpi and independently OCR'd: PA .73/2.96/.68
+  · BC .77/2.53/.86 · DE .75/2.02/.88 · FG .59/1.88/.74 · HI .77/2.24/.90 · JK
+  .77/2.89/.76 · LM .78/2.97/.71 · NO .73/2.96/.68 — matching the shipped values
+  exactly. The PA/NO duplication is in the source, not the extraction;
+  `locke2014.md`'s provenance block records the correction.
+
+37 findings scored below 80 and are excluded from the actioned list, logged
+here so none is dropped. The substantive ones, worth carrying to batch 2: the
+`Reference` containment rule admits a string that credits the source and
+contradicts it (76); the note-side `Reference` value is the note author's
+constructed credit rather than a quoted line, the same both-sides-one-hand trap
+this milestone fixed for `Population` (74); nothing binds the test's pin list to
+`norms-audit.md`'s verdicts in either direction (65); the shipped-side join key
+ignores `Sample`, so a two-sample instrument would compare sample 2 against
+sample 1's source values — latent for batch 1, live for `iipsc` (55); the
+coverage CSV repurposes its `field`/`scale` columns for note-only rows (78); an
+empty ledger crashes the stamp assignment (70); `?norms`'s new disclosure
+describes the narrower-population case but not csig's differently-worded one
+(74); `?iitc` still says "(in press)" against the pinned "Bliton & Pincus
+(2019)" (68, on a line the branch does not touch); the two `URL` repointings are
+dispositioned `transcription-error` where link rot has no category (72); the
+audit script prints its findings and always exits 0 (55). Also logged: DESIGN.md
+IP2's range is written `[0, 360)` while stating LM = 360, which the new checks
+implement as `(0, 360]` (38) — a principle-text question only the maintainer can
+settle; and the printed `norms()` output changed without a GP4 decision entry
+(76).
+
+### First review, 2026-08-06 (gate failed)
+
+PR [#98](https://github.com/jmgirard/circumplex/pull/98).
 
 ### Acceptance-criterion evidence
 

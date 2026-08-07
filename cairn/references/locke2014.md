@@ -13,7 +13,13 @@ Items & Scales page retrieved 2026-08-06 from kennethlocke.org.
 Extraction: verified 2026-08-06 — Figure 2 read from a 170-dpi page-image
 render; the item mapping read in two independent channels (model-mediated fetch
 and raw-HTML extraction), agreeing on every value; no value read by a second
-human channel — observed 2026-08-06.
+human channel — observed 2026-08-06. Re-verified 2026-08-06 at review (M72,
+corrected: the first read was single-channel, which the born-digital container
+verdict did not excuse, because no text layer carries these values at all).
+Figure 2 was re-read in two further independent channels — a 400-dpi page-image
+render read fresh, and a `tesseract` OCR pass — both agreeing with the values
+below on every octant, α included. The PA/NO duplication is therefore in the
+source, not in the extraction.
 
 **Citation.** Locke, K. D. (2014). Circumplex scales of intergroup goals: An
 interpersonal circle model of goals for interactions between groups.
