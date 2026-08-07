@@ -101,11 +101,11 @@ the source author.
 - [x] T2. Author `hatcher2012.md` (iis32) and `hatcher2009.md` (iis64) with
       audit-values blocks and `INDEX.md` lines.
 - [x] T3. Author `markey2009.md` (ipipipc) and `hopwood2011.md` (isc) likewise.
-- [ ] T4. Anchored-`Reference` rule: give every `Reference` audit row in the
+- [x] T4. Anchored-`Reference` rule: give every `Reference` audit row in the
       nine notes a page/line anchor or a `constructed-credit` token with its
       reason (`locke2000.md:82`'s `Locke (n.d.)` is the known case); teach
       `audit_norms()` to emit an exempt coverage row per `constructed-credit`.
-- [ ] T5. Extract `stamp_ledger()` from `audit-norms.R:341-352` and fix the
+- [x] T5. Extract `stamp_ledger()` from `audit-norms.R:341-352` and fix the
       zero-row crash (`ledger$generated <- format(Sys.Date())` errors with
       `replacement has 1 row, data has 0`); test it on both arities.
 - [ ] T6. Extend `AUDIT_BATCH` to the four instruments, run the audit,
@@ -134,6 +134,8 @@ the source author.
 - 2026-08-06: audit finding — **iis32 and ipipipc ship norms their cited articles never print.** hatcher2012 has six tables, none descriptive, and never prints N=1380; markey2009 publishes octant M/SD only for Study 1's combined sample, while the shipped N=274 is Study 2, whose Results carry no descriptives. Absence bounded by a full text-layer read, a table-caption enumeration, `pdfimages -list` (markey2009 has zero images), and `grep -F` on each shipped value. iis64 and isc verified exactly against hatcher2009 Table 1 (p. 558) and hopwood2011 Figure 2 (p. 717).
 - 2026-08-06: hatcher2009 prints its Study 3 sample two ways — p. 558 text 'An undergraduate sample of 684' (breakdown 265+419 sums to it) against Table 1's note 'N = 686'. Shipped 684 stands; recorded as a source-internal inconsistency at the user's direction.
 - 2026-08-06: web search for the two unsourced norm sets returned nothing; user reports the 2018 author correspondence is unrecoverable, so 'personal communication' is not assertable. Gate chose honest disclosure in the shipped credits plus a tracked follow-up.
+- 2026-08-06: T4 done. Re-anchored the `Reference` rows of locke2014, boudreaux2018 and bliton2019 from the value's table to the page that prints the credit (each article's own journal header and byline); locke2007's already quoted its page verbatim. locke2000's stays authored and now carries the `constructed-credit` token, which `audit_norms()` emits as an exempt coverage row. All nine notes' Reference rows now carry a page anchor or the token.
+- 2026-08-06: T5 done. `stamp_ledger()` extracted from the run block; the zero-row crash was `df$col <- <scalar>`, which recycles to any positive row count and errors at zero. Mutation run recorded: restoring the scalar form reddens the new test with `replacement has 1 row, data has 0` — the failure the claim is about, not merely some failure.
 
 ## Decisions
 

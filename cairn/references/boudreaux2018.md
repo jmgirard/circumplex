@@ -67,7 +67,7 @@ items but prints no numbering; angles are likewise unpublished.
 | Items | NO | not-published-in-source | not published in the article — items described but not numbered |
 | Size | — | 712 | Table 1 note, footnote c, p. 600 |
 | Population | — | undergraduate students enrolled at a public university in the western United States | p. 597 text, validation-sample description |
-| Reference | — | Boudreaux, Ozer, Oltmanns, & Wright (2018) | Table 1, p. 600 — the venue of every shipped CSIP norm value |
+| Reference | — | Boudreaux, Ozer, Oltmanns, & Wright (2018) | p. 594, journal header 'Psychological Assessment / 2018, Vol. 30, No. 5, 594-609' with the byline 'Michael J. Boudreaux', 'Daniel J. Ozer', 'Thomas F. Oltmanns', 'Aidan G. C. Wright'; Table 1, p. 600 is the venue of the values themselves |
 | URL | — | https://doi.org/10.1037/pas0000505 | DOI printed on the article's first page, p. 594 |
 | note-only | women subsample | n = 121, own M (SD) column | Table 1, p. 600, 'Women' column; n from table note a |
 | note-only | men subsample | n = 70, own M (SD) column | Table 1, p. 600, 'Men' column; n from table note b |

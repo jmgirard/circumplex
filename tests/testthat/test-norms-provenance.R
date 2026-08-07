@@ -179,6 +179,43 @@ test_that("every audited instrument is a shipped instrument (M72)", {
   expect_true(all(names(audited_objects) %in% shipped_instruments()))
 })
 
+test_that("stamp_ledger() stamps a zero-row ledger as it does a one-row one (M73)", {
+  # DEVELOPMENT-ONLY: data-raw/ is not installed, and unlike Rd or vignettes it
+  # has no installed counterpart to read instead, so a skip is the legitimate
+  # case the M70 lesson leaves open rather than the false coverage it warns
+  # about. It is its own test so the runtime pins above never skip with it.
+  script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
+  skip_if_not(file.exists(script), "data-raw/ not present (installed package)")
+
+  # Base R rather than withr::with_options: withr is not in Suggests, and a
+  # test file is not the place to acquire a dependency.
+  env <- new.env()
+  old <- options(norms_audit_defs_only = TRUE)
+  on.exit(options(old), add = TRUE)
+  sys.source(script, env)
+  stamp_ledger <- get("stamp_ledger", envir = env)
+  empty_ledger <- get("empty_ledger", envir = env)
+
+  zero <- empty_ledger()
+  one <- empty_ledger()
+  one[1L, ] <- as.list(rep("x", ncol(one)))
+
+  # The defect this fences: `df$col <- <scalar>` errors on a zero-row frame
+  # ("replacement has 1 row, data has 0"), so the audit crashed on exactly the
+  # clean ledger it exists to produce. Assert the arity that used to fail, and
+  # assert it by NAME rather than by "no error" -- a stamped frame that dropped
+  # a column would otherwise pass.
+  expect_no_error(zs <- stamp_ledger(zero, generated = "2026-08-06"))
+  expect_no_error(os <- stamp_ledger(one, generated = "2026-08-06"))
+  expect_identical(nrow(zs), 0L)
+  expect_identical(nrow(os), 1L)
+  expect_identical(names(zs), names(os))
+  expect_identical(names(zs), c(names(zero), "generated", "script_commit",
+                                "data_commit"))
+  expect_identical(os$generated, "2026-08-06")
+  expect_identical(zs$generated, character(0))
+})
+
 test_that("norms-audit.md lists every shipped instrument (M72)", {
   # DEVELOPMENT-ONLY half: cairn/ is repo tracking, not installed, so this
   # cannot run under R CMD check. It is split out from the runtime assertions
