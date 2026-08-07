@@ -787,6 +787,15 @@ on a real ggplot2 coordinate system.
   states that the population shown for a normative sample is a short
   standardized label chosen by this package, deliberately broader than
   the description the original source gives.
+- [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
+  now works with `iei`. The sample column of the IEI’s normative data
+  had been built so that its two samples were interleaved rather than
+  stacked, which left each sample holding four octants twice and four
+  not at all; standardizing against either IEI sample failed with an
+  error about duplicate angles. No normative value was wrong, and no
+  other instrument was affected.
+- The reference recorded for the `iei` norms misspelled the second
+  author’s name and now reads Horner, Locke, & Hulsey (2024).
 
 ### Documentation
 

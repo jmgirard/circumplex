@@ -118,10 +118,10 @@ summary(iei)
 #> 
 #> The IEI currently has 2 normative data set(s):
 #> 1. 1223 American undergraduate students
-#> Horner, Locker, & Hulsey (2024)
+#> Horner, Locke, & Hulsey (2024)
 #> <https://osf.io/w37dj/>
 #> 2. 278 American crowdworkers
-#> Horner, Locker, & Hulsey (2024)
+#> Horner, Locke, & Hulsey (2024)
 #> <https://osf.io/w37dj/>
 scales(iei, items = TRUE)
 #> The IEI contains 8 circumplex scales.
