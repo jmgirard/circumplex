@@ -1,6 +1,6 @@
 # M74: Norms provenance audit, batch 3 (multi-sample instruments)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** M73
 - **Driving RR:** —
@@ -131,6 +131,7 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - 2026-08-07: review return 1 (defect) — F2 at 92: NEWS.md, norms-audit.md and the T8 work-log line all state that the cais item-key correction changes JK, LM and NO scores and leaves the other five octants unaffected; diffing the two keys octant by octant at review shows 7 of 8 change (PA, BC, DE and HI each gain an item too) and only FG is unchanged. F5 at 85 rides with it. All 8 acceptance criteria hold with fresh evidence and the consistency gate is clean; the failure is user-facing documentation, not the audit. Status -> in-progress.
 - 2026-08-07: F2/F5 fixed — NEWS.md's cais bullet now states that seven of the eight octants change (PA gains item 32 from NO; BC, DE and HI gain 33, 34 and 35; JK loses 30; LM and NO each lose one and gain two) with only FG unchanged, and its re-verification bullet no longer claims every sample size matched while the next bullet corrects one. norms-audit.md's "three octants" corrected in place and marked. Supersedes the "changes JK, LM and NO scores" clause in the 2026-08-07 T8 line above. Per-octant gains and losses derived by diffing master's data/cais.rda against the branch's, not from the earlier claim.
 - 2026-08-07: the two candidate-row items the review disposition assigned to this fix are now ROADMAP rows, search-first clean (no existing candidate, archive summary or D-entry covers either): cais's sample-2 means exceeding its 1-5 anchors, and the audit-norms.R robustness family (F3, F7, F8, F9, F10, F12).
+- 2026-08-07: devtools::check(args = "--no-manual") re-run against the committed fix at 54c1c129 — 0 errors, 0 warnings, 0 notes, 13m06s. Status -> review, second time. (An earlier run of the same command was clean but had snapshotted the tree before the last two prose edits, so it is not the AC7 evidence.)
 - 2026-08-06: plan gate chose deferring the multi-sample rework to this milestone over doing it in M73 because M73's four instruments are all single-sample and would leave the rework unexercised; falsified by the rekey turning out to be a precondition for something M73 needs.
 
 ## Decisions
