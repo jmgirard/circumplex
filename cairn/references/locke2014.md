@@ -70,5 +70,5 @@ degrees, so the degree assignment is the package's own convention (IP2).
 | Items | LM | 6, 14, 22, 30 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
 | Items | NO | 3, 11, 19, 27 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
 | Size | — | 665 | p. 435 text, 'All (n = 665) participants'; Table 3 CSIG Study 1 row, p. 437 |
-| Population | — | MTurkers from US, Canada, and India about interactions between nations | p. 435 text — MTurk sample drawn from the US, Canada and India |
+| Population | — | MTurk respondents from the United States, Canada and India | p. 435 text, 'accessed and completed an online questionnaire through Amazon's Mechanical Turk website'; country breakdown same page |
 <!-- audit-values-end -->

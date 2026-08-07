@@ -66,5 +66,5 @@ items but prints no numbering; angles are likewise unpublished.
 | Items | LM | not-published-in-source | not published in the article — items described but not numbered |
 | Items | NO | not-published-in-source | not published in the article — items described but not numbered |
 | Size | — | 712 | Table 1 note, footnote c, p. 600 |
-| Population | — | American college students | intended deviation — a summary of the article's validation-sample description |
+| Population | — | undergraduate students enrolled at a public university in the western United States | p. 597 text, validation-sample description |
 <!-- audit-values-end -->

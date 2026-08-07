@@ -75,5 +75,5 @@ convention, so the audit compares them modulo 360.
 | Items | LM | 3, 11, 19, 27, 35, 43, 51, 59 | CSIV_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
 | Items | NO | 6, 14, 22, 30, 38, 46, 54, 62 | CSIV_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
 | Size | — | 1200 | CSIV_Norms.html sample description, 'N=1,200 University of Idaho undergraduates' |
-| Population | — | American college students | intended deviation — a summary of the source's 'University of Idaho undergraduates (late 1990s-early 2000s)' |
+| Population | — | University of Idaho undergraduates, late 1990s and early 2000s | CSIV_Norms.html sample description (retrieved 2026-08-06) |
 <!-- audit-values-end -->

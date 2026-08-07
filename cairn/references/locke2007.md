@@ -80,5 +80,5 @@ package's own convention (DESIGN.md IP2), so every Angle row below is
 | Items | LM | 6, 14, 22, 30 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
 | Items | NO | 1, 9, 17, 25 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
 | Size | — | 367 | locke2007 Table 1 note, p. 97; and CSIE_Norms.html sample description |
-| Population | — | American college students | intended deviation — a summary of the source's 'undergraduates … Study 1 of Locke & Sadler (2007)' |
+| Population | — | undergraduates who participated in Study 1 of Locke & Sadler (2007) | CSIE_Norms.html sample description (retrieved 2026-08-06) |
 <!-- audit-values-end -->

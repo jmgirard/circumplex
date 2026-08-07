@@ -64,5 +64,5 @@ likewise unpublished.
 | Items | LM | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
 | Items | NO | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
 | Size | — | 862 | p. 3 text, 'Overall, 862 valid protocols were retained for analysis' |
-| Population | — | American college students | intended deviation — a summary of the article's Study 1 undergraduate sample |
+| Population | — | undergraduate students from a psychology department subject pool | p. 3 text, 'Of the 885 undergraduate student participants' / 'psychology department subject pool' |
 <!-- audit-values-end -->
