@@ -12,6 +12,7 @@
 # Usage (from the package root, with the package loaded):
 #   Rscript -e 'devtools::load_all(); source("data-raw/audit-norms.R")'
 # Writes: data-raw/norms-audit-ledger.csv   (or -prefix.csv, see LEDGER_PATH)
+#         data-raw/norms-audit-coverage.csv (the coverage report, see AC3)
 
 AUDIT_BATCH <- c(
   csie = "locke2007",
@@ -56,8 +57,21 @@ parse_source_note <- function(citekey,
   rows <- rows[-(1:2)]
   cells <- lapply(strsplit(sub("^\\|", "", sub("\\|$", "", rows)), "|",
                            fixed = TRUE), trimws)
-  keep <- vapply(cells, length, integer(1)) == 4L
-  cells <- cells[keep]
+  # A row that does not split into exactly four cells is a malformed note, not
+  # a row to skip: silently dropping it would remove a value from the audit
+  # while every count still read clean (an anchor containing a literal "|" is
+  # the way this happens).
+  bad <- which(vapply(cells, length, integer(1)) != 4L)
+  if (length(bad)) {
+    stop("source note ", citekey, " has ", length(bad),
+         " malformed audit row(s); first: ", rows[[bad[[1]]]], call. = FALSE)
+  }
+  empty <- which(vapply(cells, function(x) !nzchar(x[[3]]), logical(1)))
+  if (length(empty)) {
+    stop("source note ", citekey, " has ", length(empty),
+         " audit row(s) with an empty value; first: ", rows[[empty[[1]]]],
+         call. = FALSE)
+  }
   data.frame(
     field  = vapply(cells, `[`, character(1), 1L),
     scale  = vapply(cells, `[`, character(1), 2L),
@@ -220,24 +234,77 @@ empty_ledger <- function() {
 # same fact; nothing else in the package makes them agree.
 angle_copies_agree <- function(batch = AUDIT_BATCH) {
   out <- list()
+  add <- function(inst, scale, na, sa, why) {
+    out[[length(out) + 1L]] <<- data.frame(
+      instrument = inst, scale = scale, norms_angle = na, scales_angle = sa,
+      problem = why, stringsAsFactors = FALSE
+    )
+  }
   for (inst in names(batch)) {
     obj <- get(inst, envir = asNamespace("circumplex"))
     norms <- obj$Norms[[1]]
     scales <- obj$Scales
     key <- if ("Scale" %in% names(norms)) "Scale" else "Abbrev"
     j <- match(norms[[key]], scales$Abbrev)
-    bad <- which((norms$Angle %% 360) != (scales$Angle[j] %% 360))
+
+    # An unmatched scale name is a split, not a row to skip: which(NA) drops
+    # the row, so the unjoined case has to be caught before the comparison.
+    unjoined <- which(is.na(j))
+    if (length(unjoined)) {
+      add(inst, norms[[key]][unjoined], norms$Angle[unjoined], NA_real_,
+          "scale name not found in Scales$Abbrev")
+    }
+    # An NA in either copy compares FALSE against everything and would
+    # otherwise be invisible to the != test below.
+    nas <- which(is.na(norms$Angle) | (!is.na(j) & is.na(scales$Angle[j])))
+    if (length(nas)) {
+      add(inst, norms[[key]][nas], norms$Angle[nas], scales$Angle[j][nas],
+          "NA angle in a shipped copy")
+    }
+    ok <- !is.na(j) & !is.na(norms$Angle) & !is.na(scales$Angle[j])
+    bad <- which(ok & (norms$Angle %% 360) != (scales$Angle[j] %% 360))
     if (length(bad)) {
-      out[[length(out) + 1L]] <- data.frame(
-        instrument = inst, scale = norms[[key]][bad],
-        norms_angle = norms$Angle[bad], scales_angle = scales$Angle[j][bad],
-        stringsAsFactors = FALSE
-      )
+      add(inst, norms[[key]][bad], norms$Angle[bad], scales$Angle[j][bad],
+          "copies disagree modulo 360")
     }
   }
   if (length(out)) do.call(rbind, out) else
     data.frame(instrument = character(0), scale = character(0),
                norms_angle = numeric(0), scales_angle = numeric(0),
+               problem = character(0), stringsAsFactors = FALSE)
+}
+
+# --- the IP2 convention, which the modulo comparison cannot see --------------
+
+# Angles are degrees in [0, 360) in the user API with LM = 360, never 0
+# (DESIGN.md IP2). The audit compares against the source modulo 360, so a
+# shipped 0 where the convention wants 360 agrees with the source and passes
+# silently. This check is on the shipped side only, where the convention lives.
+ip2_convention_holds <- function(batch = AUDIT_BATCH) {
+  out <- list()
+  for (inst in names(batch)) {
+    obj <- get(inst, envir = asNamespace("circumplex"))
+    norms <- obj$Norms[[1]]
+    key <- if ("Scale" %in% names(norms)) "Scale" else "Abbrev"
+    copies <- list(
+      list(where = "Norms[[1]]$Angle", scale = as.character(norms[[key]]),
+           angle = norms$Angle),
+      list(where = "Scales$Angle", scale = as.character(obj$Scales$Abbrev),
+           angle = obj$Scales$Angle)
+    )
+    for (cp in copies) {
+      bad <- which(is.na(cp$angle) | cp$angle <= 0 | cp$angle > 360)
+      if (length(bad)) {
+        out[[length(out) + 1L]] <- data.frame(
+          instrument = inst, copy = cp$where, scale = cp$scale[bad],
+          angle = cp$angle[bad], stringsAsFactors = FALSE
+        )
+      }
+    }
+  }
+  if (length(out)) do.call(rbind, out) else
+    data.frame(instrument = character(0), copy = character(0),
+               scale = character(0), angle = numeric(0),
                stringsAsFactors = FALSE)
 }
 
@@ -246,8 +313,11 @@ angle_copies_agree <- function(batch = AUDIT_BATCH) {
 if (!isTRUE(getOption("norms_audit_defs_only", FALSE))) {
   LEDGER_PATH <- Sys.getenv("NORMS_AUDIT_LEDGER",
                             "data-raw/norms-audit-ledger.csv")
+  COVERAGE_PATH <- Sys.getenv("NORMS_AUDIT_COVERAGE",
+                              "data-raw/norms-audit-coverage.csv")
   res <- audit_norms()
   angle_check <- angle_copies_agree()
+  ip2_check <- ip2_convention_holds()
 
   disp_path <- "data-raw/norms-audit-dispositions.csv"
   ledger <- res$ledger
@@ -263,22 +333,36 @@ if (!isTRUE(getOption("norms_audit_defs_only", FALSE))) {
     ledger$disposition <- character(0)
   }
 
-  ledger$generated <- "2026-08-06"
-  ledger$commit <- tryCatch(
-    system("git rev-parse --short HEAD", intern = TRUE),
-    error = function(e) NA_character_
-  )
+  # Two stamps, not one. A run's own HEAD is necessarily the PARENT of the
+  # commit that lands the ledger, so a single "commit" column can never name
+  # the commit containing the file. Recording the script and the package data
+  # separately also lets a pre-fix snapshot be rebuilt honestly: today's
+  # script against an earlier tree's data/, each named.
+  git_head <- function() {
+    tryCatch(system("git rev-parse --short HEAD", intern = TRUE),
+             error = function(e) NA_character_)
+  }
+  or_head <- function(v) if (nzchar(v)) v else git_head()
+
+  ledger$generated <- format(Sys.Date())
+  ledger$script_commit <- or_head(Sys.getenv("NORMS_AUDIT_SCRIPT_COMMIT"))
+  ledger$data_commit <- or_head(Sys.getenv("NORMS_AUDIT_DATA_COMMIT"))
 
   utils::write.csv(ledger, LEDGER_PATH, row.names = FALSE)
+  utils::write.csv(res$coverage, COVERAGE_PATH, row.names = FALSE)
 
   gaps <- res$coverage[!res$coverage$exempt, , drop = FALSE]
   cat("norms audit\n")
   cat("  ledger rows:      ", nrow(ledger), " -> ", LEDGER_PATH, "\n", sep = "")
+  cat("  coverage rows:    ", nrow(res$coverage), " -> ", COVERAGE_PATH, "\n",
+      sep = "")
   cat("  coverage gaps:    ", nrow(gaps), "\n", sep = "")
   cat("  note-only rows:   ", sum(res$coverage$exempt), "\n", sep = "")
   cat("  angle-copy splits:", nrow(angle_check), "\n", sep = "")
+  cat("  IP2 breaches:     ", nrow(ip2_check), "\n", sep = "")
   if (nrow(res$coverage)) print(res$coverage)
   if (nrow(angle_check)) print(angle_check)
+  if (nrow(ip2_check)) print(ip2_check)
   if (nrow(ledger)) {
     print(ledger[, c("instrument", "field", "scale", "kind", "disposition")])
   }
