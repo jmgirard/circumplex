@@ -184,8 +184,11 @@ NO, four for FG, three for JK — but `data-raw/cais.R` shipped the equal-four
 eight-cycle key the package's other 32-item instruments use, from its first
 draft in 2018 until M74. That key put item 30 (an LM item) in JK, 31 (NO) in LM
 and 32 (PA) in NO, and left items 33–37 in no scale at all, so `score()`
-returned wrong values for three octants and `norm_standardize()` compared them
-against norms computed the correct way. The diagnosis is decisive rather than
+returned wrong values for seven of the eight octants — every one but FG
+(corrected 2026-08-07 from "three octants", which counted the three misassigned
+items but not the five unscored ones, whose correct octants are BC, DE, HI, LM
+and NO; PA changes too, gaining the item 32 the old key put in NO) — and
+`norm_standardize()` compared them against norms computed the correct way. The diagnosis is decisive rather than
 inferred: dealing Table 1's blocks round-robin, skipping each octant once its
 items run out, reproduces the shipped 37-item *ordering* exactly — so the file
 already encoded the published grouping and only the key contradicted it. A sweep
