@@ -331,8 +331,11 @@ it is edited.
   iei 2, igicr 3, iipsc 2); all 13 pins `identical()` to the shipped objects.
   `norms-audit.md` carries a verdict per instrument naming compared fields and
   sample count. `test-norms-provenance.R`: 163 pass, 0 fail.
-- **AC7.** `devtools::check(args = "--no-manual")` clean at the tip of this pass:
-  0 errors, 0 warnings, 0 notes. `document()` produces no diff.
+- **AC7.** `devtools::check(args = "--no-manual")` re-run after this pass's five
+  record repairs: **0 errors, 0 warnings, 0 notes**, 14m30s. It covers every
+  package-facing file in the reviewed tree — the only writes after it started
+  were this Review section and a work-log line, both under `cairn/`.
+  `document()` produces no diff.
 - **AC8.** Re-verified by mutation in both directions: dropping item 37 from
   cais's NO key reddens 3 assertions; repeating item 30 in LM at constant item
   count reddens the same 3. Restored, sha256 of `data/cais.rda` identical to the
