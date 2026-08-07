@@ -9,7 +9,17 @@ An object of class \code{circumplex_instrument} of length 5.
 }
 \source{
 Markey, P. M., & Markey, C. N. (2009). A brief assessment of the
-interpersonal circumplex: The IPIP-IPC. \emph{Assessment, 16}(4), 352-361.
+interpersonal circumplex: The IPIP-IPC. \emph{Assessment, 16}(4), 352-361. This
+article defines the instrument and supplies its item-to-octant assignment
+and response anchors (Appendix, p. 360); the only octant means and standard
+deviations it reports are for a different sample (Study 1 combined,
+p. 354).
+
+Norms: source unconfirmed. The shipped octant means and standard
+deviations are published in no source that has been identified. The sample
+size of 274 is the article's Study 2 (p. 357), for which the article
+reports no descriptive statistics. Treat them as unverified until a source
+is established.
 
 \doi{10.1177/1073191109340382}
 }

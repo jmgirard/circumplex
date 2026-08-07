@@ -35,7 +35,7 @@ ipip_norms_src <- data.frame(
   Sample = 1,
   Size = 274,
   Population = "American college students",
-  Reference = "Markey & Markey (2009)",
+  Reference = "Norms source unconfirmed; instrument published as Markey & Markey (2009)",
   URL = "https://doi.org/10.1177/1073191109340382"
 )
 
@@ -81,7 +81,7 @@ ipip_items <- data.frame(
     "Start conversations",
     "Do most of the talking",
     "Contradict others",
-    "Don't fall for sob-stories",
+    "Don't fall for sob stories",
     "Don't talk a lot",
     "Seldom toot my own horn",
     "Think of others first",

@@ -10,7 +10,14 @@ An object of class \code{circumplex_instrument} of length 5.
 \source{
 Hatcher, R. L., & Rogers, D. T. (2012). The IIS-32: A brief inventory
 of interpersonal strengths. \emph{Journal of Personality Assessment, 94}(6),
-638-646.
+638-646. This article defines the instrument and supplies the
+item-to-octant grouping (Appendix, p. 646); it reports no octant means or
+standard deviations, and none of its samples is the normative sample below.
+
+Norms: source unconfirmed. The shipped octant means and standard
+deviations, the N of 1380, and the sample description that accompanies
+them are published in no source that has been identified, including the
+article above. Treat them as unverified until a source is established.
 
 \doi{10.1080/00223891.2012.681818}
 }

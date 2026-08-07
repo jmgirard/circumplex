@@ -35,7 +35,7 @@ iis32_norms_src <- data.frame(
   Sample = 1,
   Size = 1380,
   Population = "American college students",
-  Reference = "Hatcher & Rogers (2012)",
+  Reference = "Norms source unconfirmed; instrument published as Hatcher & Rogers (2012)",
   URL = "https://doi.org/10.1080/00223891.2012.681818"
 )
 
@@ -94,7 +94,7 @@ iis32_items <- data.frame(
     "I can let other people know when I think that they're asking for too much from me",
     "I can rely on myself when I'm having problems with others",
     "I'm cooperative",
-    "I'm ok with not being included in all activities",
+    "I'm okay with not being included in all activities",
     "I can be interested in others without being nosy",
     "I can resist others' tempting me to indulge myself",
     "I don't ask others for more than they are comfortable giving",

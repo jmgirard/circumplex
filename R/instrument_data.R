@@ -83,10 +83,10 @@
 #'
 #' Information about the Interpersonal Emotion Inventory (IEI).
 #'
-#' @source Horner, M. S., Locke, K. D., & Hulsey, T. L. (in press). Assessing
-#'   affective dimensions of the interpersonal circumplex: development and
-#'   validation of the interpersonal emotion inventory. *Journal of Personality
-#'   Assessment*. Advanced online publication.
+#' @source Horner, M. S., Locke, K. D., & Hulsey, T. L. (2025). Assessing
+#'   affective dimensions of the interpersonal circumplex: Development and
+#'   validation of the Interpersonal Emotion Inventory. *Journal of Personality
+#'   Assessment, 107*(2), 170-187. First published online 13 September 2024.
 #' @source \doi{10.1080/00223891.2024.2400266}
 #' @source \url{https://kennethlocke.org/IEI/IEI.html}
 #' @keywords internal
@@ -162,7 +162,13 @@
 #'
 #' @source Hatcher, R. L., & Rogers, D. T. (2012). The IIS-32: A brief inventory
 #'   of interpersonal strengths. *Journal of Personality Assessment, 94*(6),
-#'   638-646.
+#'   638-646. This article defines the instrument and supplies the
+#'   item-to-octant grouping (Appendix, p. 646); it reports no octant means or
+#'   standard deviations, and none of its samples is the normative sample below.
+#' @source Norms: source unconfirmed. The shipped octant means and standard
+#'   deviations, the N of 1380, and the sample description that accompanies
+#'   them are published in no source that has been identified, including the
+#'   article above. Treat them as unverified until a source is established.
 #' @source \doi{10.1080/00223891.2012.681818}
 #' @keywords internal
 #' @examples
@@ -188,9 +194,10 @@
 #'
 #' Information about the Inventory of Influence Tactics Circumplex (IIT-C).
 #'
-#' @source Bliton, C. F., & Pincus, A. L. (in press). Construction and
-#'   Validation of the Interpersonal Influence Tactics Circumplex (IIT-C)
-#'   Scales. *Assessment*.
+#' @source Bliton, C. F., & Pincus, A. L. (2020). Construction and validation
+#'   of the Interpersonal Influence Tactics Circumplex (IIT-C) Scales.
+#'   *Assessment, 27*(4), 688-705. First published online 25 July 2019, which is
+#'   the version the shipped norms credit as Bliton & Pincus (2019).
 #' @source \doi{10.1177/1073191119864661}
 #' @keywords internal
 #' @examples
@@ -203,7 +210,16 @@
 #' Information about the IPIP Interpersonal Circumplex (IPIP-IPC).
 #'
 #' @source Markey, P. M., & Markey, C. N. (2009). A brief assessment of the
-#'   interpersonal circumplex: The IPIP-IPC. *Assessment, 16*(4), 352-361.
+#'   interpersonal circumplex: The IPIP-IPC. *Assessment, 16*(4), 352-361. This
+#'   article defines the instrument and supplies its item-to-octant assignment
+#'   and response anchors (Appendix, p. 360); the only octant means and standard
+#'   deviations it reports are for a different sample (Study 1 combined,
+#'   p. 354).
+#' @source Norms: source unconfirmed. The shipped octant means and standard
+#'   deviations are published in no source that has been identified. The sample
+#'   size of 274 is the article's Study 2 (p. 357), for which the article
+#'   reports no descriptive statistics. Treat them as unverified until a source
+#'   is established.
 #' @source \doi{10.1177/1073191109340382}
 #' @keywords internal
 #' @examples

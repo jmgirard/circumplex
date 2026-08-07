@@ -77,7 +77,7 @@ degrees, so the degree assignment is the package's own convention (IP2).
 | Items | NO | 3, 11, 19, 27 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
 | Size | — | 665 | p. 435 text, 'All (n = 665) participants'; Table 3 CSIG Study 1 row, p. 437 |
 | Population | — | MTurk respondents from the United States, Canada and India | p. 435 text, 'accessed and completed an online questionnaire through Amazon's Mechanical Turk website'; country breakdown same page |
-| Reference | — | Locke (2014) | Figure 2, p. 436 — the venue of every shipped CSIG norm value |
+| Reference | — | Locke (2014) | p. 433, journal header set as stacked lines, 'Personality and Social' above 'Psychology Bulletin' above '2014, Vol. 40(4) 433–449' (en dash), with the byline 'Kenneth D. Locke' carrying a superscript affiliation marker '1'. This page prints no running head: the string 'Locke' occurs on it only inside SAGE's production-tracking line (`PSPXXX10.1177/0146167213514280Personality and Social Psychology BulletinLocke`), which the text layer holds but a page render shows nothing of, so it is not cited here. Figure 2, p. 436 is the venue of the values themselves |
 | URL | — | https://doi.org/10.1177/0146167213514280 | DOI printed on the article's first page, p. 433 |
 | note-only | Study 2 octant means | n = 327; CSIG and CSIV means plotted, not printed numerically | Figure 4, p. 442 |
 <!-- audit-values-end -->

@@ -621,6 +621,30 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   affected.
 * The reference recorded for the `iei` norms misspelled the second author's
   name and now reads Horner, Locke, & Hulsey (2024).
+* The normative data shipped with `iis32`, `iis64`, `ipipipc` and `isc` has now
+  been re-verified the same way. For `iis64` and `isc`, every mean, standard
+  deviation and sample size was confirmed correct against the published source,
+  as was every item-to-scale assignment the source publishes.
+* For `iis32` and `ipipipc`, it could not be. Neither instrument's cited article
+  publishes the octant means and standard deviations the package ships:
+  Hatcher and Rogers (2012) reports no descriptive statistics at all, and
+  Markey and Markey (2009) reports them only for a sample other than the one
+  the package names. No other source for them has been identified. The values
+  ship unchanged, since nothing establishes they are wrong either, but the
+  `Reference` recorded for each now says the norms source is unconfirmed
+  instead of crediting an article that does not carry them, and `?iis32` and
+  `?ipipipc` say the same. Standardized scores from these two instruments should
+  be treated as resting on unverified norms.
+* Four item texts were wrong against their sources and are corrected. In
+  `iis64`, item 5 had been truncated to "I realize " and now reads "I realize
+  that I don't have to be friends with everyone", and item 7 read "not
+  agreeable with others" where the source prints "not agreeable to others". In
+  `iis32`, item 28 read "I'm ok with not being included in all activities"
+  where its own source prints "okay" (the wording differs between the two IIS
+  articles). In `ipipipc`, item 16 read "Don't fall for sob-stories" where the
+  source prints "sob stories".
+* The sources cited for `iitc` and `iei` were recorded as "in press" and now
+  give the published citations.
 
 ## Documentation
 

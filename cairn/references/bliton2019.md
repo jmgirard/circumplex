@@ -65,7 +65,7 @@ likewise unpublished.
 | Items | NO | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
 | Size | — | 862 | p. 3 text, 'Overall, 862 valid protocols were retained for analysis' |
 | Population | — | undergraduate students from a psychology department subject pool | p. 3 text, 'Of the 885 undergraduate student participants' / 'psychology department subject pool' |
-| Reference | — | Bliton & Pincus (2019) | Table 1, p. 7 — the venue of every shipped IIT-C norm value |
+| Reference | — | Bliton & Pincus (2019) | p. 1, the first three lines of the stacked masthead block, 'Assessment' above '1–18' above '© The Author(s) 2019', with the byline 'Chloe F. Bliton and Aaron L. Pincus', each name carrying a superscript affiliation marker '1' and an ORCID badge printed after the first. This page prints no running head: the string 'Bliton and Pincus' occurs on it only inside SAGE's production-tracking line (`ASMXXX10.1177/1073191119864661AssessmentBliton and Pincus`), which the text layer holds but a page render shows nothing of, so it is not cited here. Table 1, p. 7 is the venue of the values themselves |
 | URL | — | https://doi.org/10.1177/1073191119864661 | DOI printed on the article's first page |
 | note-only | Study 2 samples | N = 608, reported separately for romantic partner, friend and acquaintance targets | Table 5, p. 12, 'Descriptive Statistics (Study 2)' |
 <!-- audit-values-end -->

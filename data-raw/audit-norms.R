@@ -19,7 +19,11 @@ AUDIT_BATCH <- c(
   csig = "locke2014",
   csip = "boudreaux2018",
   csiv = "locke2000",
-  iitc = "bliton2019"
+  iitc = "bliton2019",
+  iis32 = "hatcher2012",
+  iis64 = "hatcher2009",
+  ipipipc = "markey2009",
+  isc = "hopwood2011"
 )
 
 # Documented unit deviations: shipped value = source value / divisor.
@@ -33,6 +37,19 @@ NOT_PUBLISHED <- "not-published-in-source"
 # package does not ship. Those rows carry field = "note-only" and are exempt
 # from the coverage report: they have no shipped counterpart by construction.
 NOTE_ONLY <- "note-only"
+
+# A Reference row's source-side value is the author-year credit for the norm
+# SAMPLE, and the audit is only as strong as where that credit came from. Where
+# the source itself prints the credit, the anchor names the page and the two
+# sides of the comparison have independent origins. Where no page prints it --
+# locke2000's undated CSIV norms table is the known case -- the note author
+# CONSTRUCTED the credit, so comparing it against the shipped string compares
+# two descendants of one origin and can never fail (the M72 lesson). Those rows
+# are not removed, because the shipped credit still has to be recorded
+# somewhere; they are LABELLED with this token in the anchor cell and listed as
+# exempt coverage rows, so a reader of the coverage report can tell a quoted
+# credit from an authored one instead of finding them indistinguishable.
+CONSTRUCTED_CREDIT <- "constructed-credit"
 
 # --- source side -------------------------------------------------------------
 
@@ -169,6 +186,17 @@ audit_norms <- function(batch = AUDIT_BATCH) {
       coverage[[length(coverage) + 1L]] <- data.frame(
         instrument = inst, side = "note-only-sample",
         field = note_only$scale, scale = note_only$value,
+        exempt = TRUE, stringsAsFactors = FALSE
+      )
+    }
+
+    constructed <- note[note$field == "Reference" &
+                          grepl(CONSTRUCTED_CREDIT, note$anchor, fixed = TRUE),
+                        , drop = FALSE]
+    if (nrow(constructed)) {
+      coverage[[length(coverage) + 1L]] <- data.frame(
+        instrument = inst, side = "constructed-credit-reference",
+        field = "Reference", scale = constructed$value,
         exempt = TRUE, stringsAsFactors = FALSE
       )
     }
@@ -310,6 +338,28 @@ ip2_convention_holds <- function(batch = AUDIT_BATCH) {
 
 # --- run ---------------------------------------------------------------------
 
+# Two stamps, not one. A run's own HEAD is necessarily the PARENT of the
+# commit that lands the ledger, so a single "commit" column can never name the
+# commit containing the file. Recording the script and the package data
+# separately also lets a pre-fix snapshot be rebuilt honestly: today's script
+# against an earlier tree's data/, each named.
+#
+# Every column is filled with `rep(x, nrow(ledger))` rather than the scalar x.
+# `df$col <- x` recycles a length-1 value to any POSITIVE number of rows and
+# errors on zero ("replacement has 1 row, data has 0"), so the scalar form
+# worked on every ledger M72 happened to produce and would have crashed the run
+# on the first fully-clean one -- the run this audit exists to reach.
+stamp_ledger <- function(ledger,
+                         generated = format(Sys.Date()),
+                         script_commit = NA_character_,
+                         data_commit = NA_character_) {
+  n <- nrow(ledger)
+  ledger$generated <- rep(as.character(generated), n)
+  ledger$script_commit <- rep(as.character(script_commit), n)
+  ledger$data_commit <- rep(as.character(data_commit), n)
+  ledger
+}
+
 if (!isTRUE(getOption("norms_audit_defs_only", FALSE))) {
   LEDGER_PATH <- Sys.getenv("NORMS_AUDIT_LEDGER",
                             "data-raw/norms-audit-ledger.csv")
@@ -333,20 +383,17 @@ if (!isTRUE(getOption("norms_audit_defs_only", FALSE))) {
     ledger$disposition <- character(0)
   }
 
-  # Two stamps, not one. A run's own HEAD is necessarily the PARENT of the
-  # commit that lands the ledger, so a single "commit" column can never name
-  # the commit containing the file. Recording the script and the package data
-  # separately also lets a pre-fix snapshot be rebuilt honestly: today's
-  # script against an earlier tree's data/, each named.
   git_head <- function() {
     tryCatch(system("git rev-parse --short HEAD", intern = TRUE),
              error = function(e) NA_character_)
   }
   or_head <- function(v) if (nzchar(v)) v else git_head()
 
-  ledger$generated <- format(Sys.Date())
-  ledger$script_commit <- or_head(Sys.getenv("NORMS_AUDIT_SCRIPT_COMMIT"))
-  ledger$data_commit <- or_head(Sys.getenv("NORMS_AUDIT_DATA_COMMIT"))
+  ledger <- stamp_ledger(
+    ledger,
+    script_commit = or_head(Sys.getenv("NORMS_AUDIT_SCRIPT_COMMIT")),
+    data_commit = or_head(Sys.getenv("NORMS_AUDIT_DATA_COMMIT"))
+  )
 
   utils::write.csv(ledger, LEDGER_PATH, row.names = FALSE)
   utils::write.csv(res$coverage, COVERAGE_PATH, row.names = FALSE)
@@ -357,7 +404,13 @@ if (!isTRUE(getOption("norms_audit_defs_only", FALSE))) {
   cat("  coverage rows:    ", nrow(res$coverage), " -> ", COVERAGE_PATH, "\n",
       sep = "")
   cat("  coverage gaps:    ", nrow(gaps), "\n", sep = "")
-  cat("  note-only rows:   ", sum(res$coverage$exempt), "\n", sep = "")
+  # Counted by side, not by `exempt`: constructed-credit rows are exempt too,
+  # so one `sum(exempt)` counter would report them as note-only rows -- hiding
+  # the exact quantity the constructed-credit label exists to make visible.
+  cat("  note-only rows:   ",
+      sum(res$coverage$side == "note-only-sample"), "\n", sep = "")
+  cat("  constructed creds:",
+      sum(res$coverage$side == "constructed-credit-reference"), "\n", sep = "")
   cat("  angle-copy splits:", nrow(angle_check), "\n", sep = "")
   cat("  IP2 breaches:     ", nrow(ip2_check), "\n", sep = "")
   if (nrow(res$coverage)) print(res$coverage)
