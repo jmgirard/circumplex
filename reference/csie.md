@@ -18,7 +18,10 @@ An object of class `circumplex_instrument` of length 5.
 Locke, K. D., & Sadler, P. (2007). Self-efficacy, values, and
 complementarity in dyadic interactions: Integrating interpersonal and
 social-cognitive theory. *Personality and Social Psychology Bulletin,
-33*(1), 94-109.
+33*(1), 94-109. The normative sample below is this article's Study 1
+sample, but the octant means and standard deviations themselves are
+published in the author's norms table, not in the article:
+<https://kennethlocke.org/CSIE/CSIE_Norms.html>
 
 <https://kennethlocke.org/CSIE/CSIE.html>
 
@@ -92,7 +95,7 @@ summary(csie)
 #> The CSIE currently has 1 normative data set(s):
 #> 1. 367 American college students
 #> Locke & Sadler (2007)
-#> <https://www.webpages.uidaho.edu/klocke/csie.htm>
+#> <https://kennethlocke.org/CSIE/CSIE_Norms.html>
 scales(csie, items = TRUE)
 #> The CSIE contains 8 circumplex scales.
 #> PA: +A (90 degrees)

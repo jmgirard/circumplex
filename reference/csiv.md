@@ -17,7 +17,14 @@ An object of class `circumplex_instrument` of length 5.
 Locke, K. D. (2000). Circumplex scales of interpersonal values:
 Reliability, validity, and applicability to interpersonal problems and
 personality disorders. *Journal of Personality Assessment, 75*(2),
-249-267.
+249-267. This article defines the instrument; it reports no octant means
+or standard deviations, and its samples are not the normative sample
+below.
+
+Norms: Locke, K. D. (n.d.). *CSIV norms* \[unpublished data\]. The
+shipped octant means and standard deviations, and the N of 1,200, come
+from the author's norms table:
+<https://kennethlocke.org/CSIV/CSIV_Norms.html>
 
 <https://kennethlocke.org/CSIV/CSIV.html>
 
@@ -116,8 +123,8 @@ summary(csiv)
 #> 
 #> The CSIV currently has 1 normative data set(s):
 #> 1. 1200 American college students
-#> Locke (2000)
-#> <https://www.webpages.uidaho.edu/klocke/csiv.htm>
+#> Locke (n.d.); instrument published as Locke (2000)
+#> <https://kennethlocke.org/CSIV/CSIV_Norms.html>
 scales(csiv, items = TRUE)
 #> The CSIV contains 8 circumplex scales.
 #> PA: +A (90 degrees)

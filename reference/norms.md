@@ -22,6 +22,17 @@ norms(x)
 
 The same input object. Prints text to console.
 
+## Details
+
+The population is a short standardized label chosen by this package so
+that samples can be compared across instruments; it is deliberately
+broader than the description the original source gives. Several
+instruments normed on students at a single named university, in a stated
+period or region, are all labelled "American college students" here.
+Consult the reference and hyperlink printed alongside it for the
+source's own description of the sample before treating a normative
+sample as representative of a population.
+
 ## See also
 
 Other instrument functions:
