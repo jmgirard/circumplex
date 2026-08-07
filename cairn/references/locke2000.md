@@ -36,8 +36,11 @@ MTurk sample (Locke & Adamic, 2012; N = 1,244).
 ## Extracted values
 
 Angles here **are** source-published — Figure 2 prints 90/135/180/225/270/315/
-0/45 against the octant labels, and 0 is the package's LM = 360 under the IP2
-convention, so the audit compares them modulo 360.
+0/45 against the octant labels. The table below records what the source
+prints, LM = 0 included; translating it to the package's LM = 360 before
+comparison would put both sides of the audit in the same hand. The comparison
+is modulo 360, and the IP2 convention (LM = 360, never 0) is checked
+separately on the shipped side by `data-raw/audit-norms.R`.
 
 <!-- audit-values-begin -->
 | field | scale | value | anchor |
@@ -64,7 +67,7 @@ convention, so the audit compares them modulo 360.
 | Angle | FG | 225 | locke2000 Figure 2, p. 255 (degrees printed on the circle; LM printed as 0, compared mod 360) |
 | Angle | HI | 270 | locke2000 Figure 2, p. 255 (degrees printed on the circle; LM printed as 0, compared mod 360) |
 | Angle | JK | 315 | locke2000 Figure 2, p. 255 (degrees printed on the circle; LM printed as 0, compared mod 360) |
-| Angle | LM | 360 | locke2000 Figure 2, p. 255 (degrees printed on the circle; LM printed as 0, compared mod 360) |
+| Angle | LM | 0 | locke2000 Figure 2, p. 255 (degrees printed on the circle; the source prints 0 here, recorded verbatim) |
 | Angle | NO | 45 | locke2000 Figure 2, p. 255 (degrees printed on the circle; LM printed as 0, compared mod 360) |
 | Items | PA | 1, 9, 17, 25, 33, 41, 49, 57 | CSIV_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
 | Items | BC | 4, 12, 20, 28, 36, 44, 52, 60 | CSIV_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
@@ -76,4 +79,8 @@ convention, so the audit compares them modulo 360.
 | Items | NO | 6, 14, 22, 30, 38, 46, 54, 62 | CSIV_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
 | Size | — | 1200 | CSIV_Norms.html sample description, 'N=1,200 University of Idaho undergraduates' |
 | Population | — | University of Idaho undergraduates, late 1990s and early 2000s | CSIV_Norms.html sample description (retrieved 2026-08-06) |
+| Reference | — | Locke (n.d.) | CSIV_Norms.html carries the norms table with no date and no article citation; locke2000 publishes no octant statistics and a different sample (Tables 1-2, pp. 256-258) |
+| URL | — | https://kennethlocke.org/CSIV/CSIV_Norms.html | retrieved 2026-08-06; the page serving the undergraduate norms table |
+| note-only | U.S. adult sample | N = 980, Hopwood et al. (2022) | CSIV_Norms.html, adult norms table (retrieved 2026-08-06) |
+| note-only | 32-item adult MTurk sample | N = 1,244, Locke & Adamic (2012) | CSIV_Norms.html, 32-item norms table (retrieved 2026-08-06) |
 <!-- audit-values-end -->

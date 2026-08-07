@@ -133,7 +133,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 
 Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
 
-- [ ] **T7** — Source-note tables gain note-only samples and `Reference`/`URL`
+- [x] **T7** — Source-note tables gain note-only samples and `Reference`/`URL`
       rows; the script gains a note-only kind exempt from coverage.
 - [ ] **T8** — Harden `audit-norms.R`: IP2 convention check, failed joins, `NA`
       angles, dropped rows, parse failures all reported; coverage artifact.
@@ -176,6 +176,8 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
 - 2026-08-06: amendment at the same gate — the audited field set in Scope widens to include the norms' `Reference` and `URL`, so the ledger can show the one defect this audit actually found (review finding 9, previously left as a decision for Jeff). Falsified by a source note proving unable to state a citation or link the shipped value can be compared against.
 - 2026-08-06: fix-pass tasks T7–T12 added for the four failed criteria plus the 12 recorded review findings; Coverage remapped. Tasks section compressed in the same pass to stay under the 150-line plan-owned cap.
 - 2026-08-06: gate answers on the other two open questions — the `Population` deviation is disclosed in `norms()`'s help rather than by reshipping five population strings; the false "pre-fix" ledger is rebuilt honestly against pre-fix `data/` rather than dropped.
+
+- 2026-08-06: T7 complete — the five machine-readable tables now carry 7 note-only rows (csie adult N=1,234; csig Study 2 n=327 plotted-only; csip women n=121 and men n=70; csiv N=980 and N=1,244; iitc Study 2 N=608, the last four found by re-reading the shelf copies rather than taken from the earlier prose) plus a `Reference` and `URL` row each. `Reference` compares by containment — the shipped string must credit the author-year the source itself supports, and may carry context around it — so the pre-fix csiv "Locke (2000)" fails while the corrected string passes. locke2000's LM angle row now records the 0 the source prints instead of the package's 360; the IP2 translation moved to the shipped-side check in T8. Run: 0 coverage gaps, 7 note-only, 53 ledger rows unchanged.
 
 ## Decisions
 

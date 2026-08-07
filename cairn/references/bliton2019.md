@@ -65,4 +65,7 @@ likewise unpublished.
 | Items | NO | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
 | Size | — | 862 | p. 3 text, 'Overall, 862 valid protocols were retained for analysis' |
 | Population | — | undergraduate students from a psychology department subject pool | p. 3 text, 'Of the 885 undergraduate student participants' / 'psychology department subject pool' |
+| Reference | — | Bliton & Pincus (2019) | Table 1, p. 7 — the venue of every shipped IIT-C norm value |
+| URL | — | https://doi.org/10.1177/1073191119864661 | DOI printed on the article's first page |
+| note-only | Study 2 samples | N = 608, reported separately for romantic partner, friend and acquaintance targets | Table 5, p. 12, 'Descriptive Statistics (Study 2)' |
 <!-- audit-values-end -->

@@ -81,4 +81,7 @@ package's own convention (DESIGN.md IP2), so every Angle row below is
 | Items | NO | 1, 9, 17, 25 | CSIE_Scoring_R.html, example R code item numbering (retrieved 2026-08-06) |
 | Size | — | 367 | locke2007 Table 1 note, p. 97; and CSIE_Norms.html sample description |
 | Population | — | undergraduates who participated in Study 1 of Locke & Sadler (2007) | CSIE_Norms.html sample description (retrieved 2026-08-06) |
+| Reference | — | Locke & Sadler (2007) | CSIE_Norms.html sample description, 'the 367 undergraduates who participated in Study 1 of Locke & Sadler (2007)' (retrieved 2026-08-06) |
+| URL | — | https://kennethlocke.org/CSIE/CSIE_Norms.html | retrieved 2026-08-06; the page serving the 0-to-10 undergraduate norms table |
+| note-only | adult 0-to-4 sample | N = 1,234, Locke & Adamic (2012) Studies 3-4 | CSIE_Norms.html, 'U.S. Adult Norms (0-to-4 Scale)' table (retrieved 2026-08-06) |
 <!-- audit-values-end -->

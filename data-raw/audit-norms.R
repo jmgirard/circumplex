@@ -28,6 +28,11 @@ AUDIT_DIVISOR <- c(csip = 8)
 
 NOT_PUBLISHED <- "not-published-in-source"
 
+# A source note may also table a norm sample the source publishes and the
+# package does not ship. Those rows carry field = "note-only" and are exempt
+# from the coverage report: they have no shipped counterpart by construction.
+NOTE_ONLY <- "note-only"
+
 # --- source side -------------------------------------------------------------
 
 # Parse the machine-readable block a source note carries between its
@@ -86,7 +91,11 @@ shipped_values <- function(inst) {
     data.frame(field = "Size", scale = "—",
                value = as.character(src$Size), stringsAsFactors = FALSE),
     data.frame(field = "Population", scale = "—",
-               value = as.character(src$Population), stringsAsFactors = FALSE)
+               value = as.character(src$Population), stringsAsFactors = FALSE),
+    data.frame(field = "Reference", scale = "—",
+               value = as.character(src$Reference), stringsAsFactors = FALSE),
+    data.frame(field = "URL", scale = "—",
+               value = as.character(src$URL), stringsAsFactors = FALSE)
   )
   out$instrument <- inst
   out
@@ -118,6 +127,15 @@ values_agree <- function(field, shipped, source, divisor) {
     if (is.na(s) || is.na(p)) return(FALSE)
     return(isTRUE(all.equal(p, s, tolerance = 1e-8)))
   }
+  # The note records the author-year credit the source itself supports for the
+  # norm sample; the shipped Reference must credit it, and may carry further
+  # context around it (csiv cites the instrument's article alongside the
+  # website that publishes the norms). Containment, not equality, is therefore
+  # the comparison -- but a shipped string that drops the credit still fails,
+  # which is exactly the pre-fix csiv defect.
+  if (identical(field, "Reference")) {
+    return(grepl(trimws(source), trimws(shipped), fixed = TRUE))
+  }
   identical(trimws(shipped), trimws(source))
 }
 
@@ -129,7 +147,17 @@ audit_norms <- function(batch = AUDIT_BATCH) {
     citekey <- batch[[inst]]
     divisor <- if (inst %in% names(AUDIT_DIVISOR)) AUDIT_DIVISOR[[inst]] else 1
     ship <- shipped_values(inst)
-    note <- parse_source_note(citekey)
+    note_all <- parse_source_note(citekey)
+    note_only <- note_all[note_all$field == NOTE_ONLY, , drop = FALSE]
+    note <- note_all[note_all$field != NOTE_ONLY, , drop = FALSE]
+
+    if (nrow(note_only)) {
+      coverage[[length(coverage) + 1L]] <- data.frame(
+        instrument = inst, side = "note-only-sample",
+        field = note_only$scale, scale = note_only$value,
+        exempt = TRUE, stringsAsFactors = FALSE
+      )
+    }
 
     # every shipped value must have a source-side entry, and vice versa
     ship_key <- paste(ship$field, ship$scale)
@@ -140,14 +168,14 @@ audit_norms <- function(batch = AUDIT_BATCH) {
       coverage[[length(coverage) + 1L]] <- data.frame(
         instrument = inst, side = "shipped-value-not-in-note",
         field = miss_source$field, scale = miss_source$scale,
-        stringsAsFactors = FALSE
+        exempt = FALSE, stringsAsFactors = FALSE
       )
     }
     if (nrow(miss_ship)) {
       coverage[[length(coverage) + 1L]] <- data.frame(
         instrument = inst, side = "note-value-not-shipped",
         field = miss_ship$field, scale = miss_ship$scale,
-        stringsAsFactors = FALSE
+        exempt = FALSE, stringsAsFactors = FALSE
       )
     }
 
@@ -175,7 +203,7 @@ audit_norms <- function(batch = AUDIT_BATCH) {
     coverage = if (length(coverage)) do.call(rbind, coverage) else
       data.frame(instrument = character(0), side = character(0),
                  field = character(0), scale = character(0),
-                 stringsAsFactors = FALSE)
+                 exempt = logical(0), stringsAsFactors = FALSE)
   )
 }
 
@@ -243,9 +271,11 @@ if (!isTRUE(getOption("norms_audit_defs_only", FALSE))) {
 
   utils::write.csv(ledger, LEDGER_PATH, row.names = FALSE)
 
+  gaps <- res$coverage[!res$coverage$exempt, , drop = FALSE]
   cat("norms audit\n")
   cat("  ledger rows:      ", nrow(ledger), " -> ", LEDGER_PATH, "\n", sep = "")
-  cat("  coverage gaps:    ", nrow(res$coverage), "\n", sep = "")
+  cat("  coverage gaps:    ", nrow(gaps), "\n", sep = "")
+  cat("  note-only rows:   ", sum(res$coverage$exempt), "\n", sep = "")
   cat("  angle-copy splits:", nrow(angle_check), "\n", sep = "")
   if (nrow(res$coverage)) print(res$coverage)
   if (nrow(angle_check)) print(angle_check)
