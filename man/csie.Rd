@@ -11,7 +11,10 @@ An object of class \code{circumplex_instrument} of length 5.
 Locke, K. D., & Sadler, P. (2007). Self-efficacy, values, and
 complementarity in dyadic interactions: Integrating interpersonal and
 social-cognitive theory. \emph{Personality and Social Psychology Bulletin,
-33}(1), 94-109.
+33}(1), 94-109. The normative sample below is this article's Study 1
+sample, but the octant means and standard deviations themselves are
+published in the author's norms table, not in the article:
+\url{https://kennethlocke.org/CSIE/CSIE_Norms.html}
 
 \url{https://kennethlocke.org/CSIE/CSIE.html}
 }

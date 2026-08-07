@@ -20,7 +20,10 @@
 #' @source Locke, K. D., & Sadler, P. (2007). Self-efficacy, values, and
 #'   complementarity in dyadic interactions: Integrating interpersonal and
 #'   social-cognitive theory. *Personality and Social Psychology Bulletin,
-#'   33*(1), 94-109.
+#'   33*(1), 94-109. The normative sample below is this article's Study 1
+#'   sample, but the octant means and standard deviations themselves are
+#'   published in the author's norms table, not in the article:
+#'   \url{https://kennethlocke.org/CSIE/CSIE_Norms.html}
 #' @source \url{https://kennethlocke.org/CSIE/CSIE.html}
 #' @keywords internal
 #' @examples
@@ -63,6 +66,12 @@
 #' @source Locke, K. D. (2000). Circumplex scales of interpersonal values:
 #'   Reliability, validity, and applicability to interpersonal problems and
 #'   personality disorders. *Journal of Personality Assessment, 75*(2), 249-267.
+#'   This article defines the instrument; it reports no octant means or
+#'   standard deviations, and its samples are not the normative sample below.
+#' @source Norms: Locke, K. D. (n.d.). *CSIV norms* \[unpublished data\]. The
+#'   shipped octant means and standard deviations, and the N of 1,200, come
+#'   from the author's norms table:
+#'   \url{https://kennethlocke.org/CSIV/CSIV_Norms.html}
 #' @source \url{https://kennethlocke.org/CSIV/CSIV.html}
 #' @keywords internal
 #' @examples

@@ -140,7 +140,7 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
       angles, dropped rows, parse failures all reported; coverage artifact.
 - [x] **T9** — Pre-fix ledger rebuilt against pre-fix `data/` in a scratch
       checkout, stamped with both commits; post-fix re-run; dispositions extended.
-- [ ] **T10** — Document the deviation at `norms()`'s help; fix
+- [x] **T10** — Document the deviation at `norms()`'s help; fix
       `R/instrument_data.R`'s csiv `@source`; `devtools::document()`.
 - [ ] **T11** — Pins over full `Norms`/`Scales` (incl. `Sample`, `Label`);
       status assertion anchored; teeth re-proven by mutation on an audited row.
@@ -183,6 +183,8 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
 - 2026-08-06: T8 complete, every new check proven by mutation rather than by eye (clean run: 0 gaps, 0 splits, 0 IP2 breaches, 53 ledger rows). Setting csiv's LM to 0 in both copies now raises 2 IP2 breaches where the mod-360 ledger stays byte-identical (review finding 1); breaking a scale name raises a split where `which(NA)` used to drop it (finding 2); an `NA` angle raises both a split and an IP2 row (finding 3); a note row carrying a literal `|` now errors instead of vanishing (findings 10, 11); and restoring the pre-fix csiv `Reference` produces a 54th row, `kind = mismatch` — the audit can now see the defect the milestone found. Coverage report written to `data-raw/norms-audit-coverage.csv` (finding 8); the hardcoded run date is gone and the single `commit` column is replaced by `script_commit` + `data_commit`, since a run's own HEAD is necessarily the parent of the commit that lands the ledger (finding 7).
 
 - 2026-08-06: T9 complete — the pre-fix ledger is now a real pre-fix artifact, superseding the earlier claim that the committed one was (the review measured its stamp as a descendant of the fix commit). Rebuilt in a detached scratch worktree carrying `data/` from `c2453755`, the parent of the T4 fix commit, with today's script and notes; it stamps `script_commit 54fbf783` and `data_commit c2453755` rather than one ambiguous commit. The two ledgers are no longer byte-identical outside the stamp, which is the point: pre-fix carries 56 rows including three `transcription-error` rows (csie `URL`, csiv `URL`, csiv `Reference`), post-fix carries 53 with none. Neither has an undispositioned row. The widened field set closed the gap this milestone had to record as uncovered.
+
+- 2026-08-06: T10 complete — `?norms` now says the population label is a standardized package label deliberately broader than the source's own, names the shared "American college students" case, and points the reader at the printed reference and URL for the source's description. That is the surface where a user meets the value, which is what AC4 asks of an `intended-deviation`. `?csiv` no longer contradicts `norms(csiv)`: its `@source` block separates the instrument's article from the unpublished norms table the shipped statistics come from, and `?csie` gains the parallel sentence (its Reference is correct, but the article is not where the octant statistics are published) — review findings 5 and 6. `devtools::document()` rewrote `csie.Rd`, `csiv.Rd`, `norms.Rd`; `tools::checkRd()` clean on the changed pages.
 
 ## Decisions
 

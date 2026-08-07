@@ -150,6 +150,15 @@ anchors <- function(x) {
 #' population, and source reference and hyperlink. If another normative data set
 #' exists that is not yet included in the package, please let us know.
 #'
+#' The population is a short standardized label chosen by this package so that
+#' samples can be compared across instruments; it is deliberately broader than
+#' the description the original source gives. Several instruments normed on
+#' students at a single named university, in a stated period or region, are all
+#' labelled "American college students" here. Consult the reference and
+#' hyperlink printed alongside it for the source's own description of the
+#' sample before treating a normative sample as representative of a
+#' population.
+#'
 #' @param x Required. An object of the instrument class.
 #' @return The same input object. Prints text to console.
 #' @family instrument functions
