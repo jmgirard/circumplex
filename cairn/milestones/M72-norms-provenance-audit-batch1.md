@@ -83,7 +83,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       post-fix re-run `data-raw/norms-audit-ledger.csv` is committed beside
       the retained pre-fix snapshot, and its surviving mismatch rows all
       carry a disposition other than `transcription-error`.
-- [ ] AC5: `tests/testthat/test-norms-provenance.R` enumerates shipped
+- [x] AC5: `tests/testthat/test-norms-provenance.R` enumerates shipped
       instruments by the procedure `instruments()` uses (`data()` plus the
       `circumplex_instrument` class filter), never a hand-list; pins each
       audited instrument's full `Norms` and `Scales` objects to the post-audit
@@ -233,7 +233,14 @@ parent of the T4 fix commit — and carries 56 rows including the three
 `man/norms.Rd` states the label is a standardized package label deliberately
 broader than the source's own and points at the printed reference.
 
-**AC5 — the pins pass; the criterion's first clause cannot.** Evidence on the
+**AC5 — met against the amended criterion (re-verified 2026-08-06).** The
+test's enumeration is `instruments()`'s own procedure, and the two agree: the
+function prints 15 instruments and the test's procedure yields the identical
+set of 15 (measured). Evidence for the rest of the criterion, unchanged from
+the run below. Original finding, retained as the record of why the criterion
+moved:
+
+**AC5 — the pins pass; the criterion's first clause could not.** Evidence on the
 pins: 57 assertions green; the mutation that passed at the first review now
 fails (setting `Norms[[2]]$Sample` to 7 reddens the suite, as does editing
 `Scales$Label`), and deleting iitc's row from `norms-audit.md`'s status table
