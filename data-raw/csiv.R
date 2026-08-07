@@ -35,8 +35,8 @@ csiv_norms_src <- data.frame(
   Sample = 1,
   Size = 1200,
   Population = "American college students",
-  Reference = "Locke (2000)",
-  URL = "https://www.webpages.uidaho.edu/klocke/csiv.htm"
+  Reference = "Locke (n.d.); instrument published as Locke (2000)",
+  URL = "https://kennethlocke.org/CSIV/CSIV_Norms.html"
 )
 
 csiv_anchors <- data.frame(

@@ -36,7 +36,7 @@ csie_norms_src <- data.frame(
   Size = 367,
   Population = "American college students",
   Reference = "Locke & Sadler (2007)",
-  URL = "https://www.webpages.uidaho.edu/klocke/csie.htm"
+  URL = "https://kennethlocke.org/CSIE/CSIE_Norms.html"
 )
 
 csie_anchors <- data.frame(
