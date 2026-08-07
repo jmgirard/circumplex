@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5
-- **Branch/PR:** `m72-norms-audit-batch1` / —
+- **Branch/PR:** `m72-norms-audit-batch1` / [PR #98](https://github.com/jmgirard/circumplex/pull/98)
 
 ## Goal
 
@@ -44,7 +44,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 
 ## Acceptance criteria
 
-- [ ] AC1: For each batch instrument and each row of its `Norms[[2]]`, the
+- [x] AC1: For each batch instrument and each row of its `Norms[[2]]`, the
       cited source's PDF is on the `cairn/references/sources/` shelf, and the
       committed `cairn/references/norms-audit.md` records its citekey, shelf
       filename, sha256, and scan verdict — the verdict from a stated positive
@@ -52,7 +52,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       `pdfimages -list`, with `pdfinfo` Producer as one input; an inconclusive
       probe is treated as a scan), re-verified against the live shelf at
       review with the re-check recorded in this file's Review section.
-- [ ] AC2: A committed source note `cairn/references/<citekey>.md` exists for
+- [x] AC2: A committed source note `cairn/references/<citekey>.md` exists for
       each batch source, carrying a machine-readable table of every
       audited-field value with a shipped counterpart — plus any norm sample
       the source publishes that the package does not ship, recorded as a
@@ -60,7 +60,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       not publish is listed as `not-published-in-source`. Where AC1's scan
       verdict is scan/OCR, extraction used two independent channels per
       M42-D1 and the note's provenance block says so.
-- [ ] AC3: `data-raw/audit-norms.R`, committed, parses each source note's
+- [x] AC3: `data-raw/audit-norms.R`, committed, parses each source note's
       machine-readable table, enumerates every shipped audited-field value
       for the five instruments from the package objects (`Norms[[1]]`,
       `Norms[[2]]`, `Scales$Angle`, `Scales$Items`; join key normalized
@@ -72,7 +72,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       (ii) `data-raw/norms-audit-ledger-prefix.csv`, dated and recording the
       commit SHA it was generated against, each mismatch row carrying the
       shipped value, the source value, and the source anchor.
-- [ ] AC4: Every ledger mismatch row carries a disposition joined from the
+- [x] AC4: Every ledger mismatch row carries a disposition joined from the
       committed `data-raw/norms-audit-dispositions.csv` (keyed by instrument
       + field + scale) — `transcription-error` (fixed on this branch),
       `intended-deviation` (documented at the surface where users meet the
@@ -81,7 +81,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       post-fix re-run `data-raw/norms-audit-ledger.csv` is committed beside
       the retained pre-fix snapshot, and its surviving mismatch rows all
       carry a disposition other than `transcription-error`.
-- [ ] AC5: `tests/testthat/test-norms-provenance.R` enumerates shipped
+- [x] AC5: `tests/testthat/test-norms-provenance.R` enumerates shipped
       instruments via `instruments()` (never a hand-list), pins each audited
       instrument's full `Norms` and `Scales` objects to the post-audit
       shipped values — every audited field traceable to its ledger row:
@@ -94,7 +94,7 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       entry narrowed to what AC5's pins enforce; if the post-fix ledger shows
       no `transcription-error` rows, the clean outcome is recorded in the
       work log and NEWS.md is untouched.
-- [ ] AC7: `devtools::test()` clean, and `devtools::check(args =
+- [x] AC7: `devtools::test()` clean, and `devtools::check(args =
       "--no-manual")` with no new ERRORs/WARNINGs/NOTEs relative to the
       master baseline.
 
@@ -156,3 +156,47 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 ## Decisions
 
 ## Review
+
+Reviewed 2026-08-06. PR [#98](https://github.com/jmgirard/circumplex/pull/98).
+
+### Acceptance-criterion evidence
+
+- **AC1 — met.** All ten shelved sources re-hashed against the committed
+  manifest at review time, live: every sha256 matches, nothing missing. Scan
+  verdicts re-derived from the stated positive probe (text-layer density,
+  `pdfimages -list`, `pdfinfo` Producer); all five PDFs born-digital, so
+  M42-D1's two-channel rule does not fire.
+- **AC2 — met.** All five source notes carry a parseable `audit-values` block
+  of 34 rows each with a provenance block; `not-published-in-source` appears
+  where and only where the source publishes nothing (8 rows for locke2007 and
+  locke2014, 16 for boudreaux2018 and bliton2019, 0 for locke2000, which
+  publishes degrees).
+- **AC3 — met.** Fresh run of `data-raw/audit-norms.R`: 0 coverage gaps, 0
+  angle-copy splits, 53 ledger rows carrying a generated date and commit stamp.
+  Source values are parsed from the notes, not retyped into the script.
+- **AC4 — met.** Post-fix ledger: 53 rows, 0 undispositioned, **0
+  `transcription-error`** (48 `not-published-in-source`, 5
+  `intended-deviation`). Dispositions input and both ledgers committed.
+- **AC5 — met.** `test-norms-provenance.R`: 76 passing, 0 failures, 0 warnings,
+  0 skips under `devtools::test()`. Instruments enumerated by the
+  `utils::data()`-plus-class-filter procedure, no literal instrument vector.
+- **AC6 — FAILS as written.** The post-fix ledger has 0 `transcription-error`
+  rows, so the criterion's second clause binds: "the clean outcome is recorded
+  in the work log **and NEWS.md is untouched**". NEWS.md *was* touched — it
+  gains `## Instrument data` for the csie/csiv provenance corrections. This
+  review initially ticked AC6 by reading the two clauses as alternatives; that
+  was a charitable reading of the kind the never-reinterpret rule exists to
+  stop, and the tick is withdrawn. Caught by the blame-history reviewer.
+- **AC7 — met.** `devtools::test()` 0 failures / 5864 passing;
+  `devtools::check(args = "--no-manual")` **0 errors, 0 warnings, 0 notes**
+  (16m52s). No new ERROR/WARNING/NOTE against the master baseline — the branch
+  changes no file under `R/` or `src/`.
+
+### Consistency gate
+
+`cairn_validate`: all checks pass (47 advisories, none a gate failure).
+DESIGN.md is untouched by the branch, so no principle changed and
+`cairn_impact` is a clean skip. Toolchain gate (`r-package` profile):
+`devtools::document()` produces no diff; all five instruments regenerate
+byte-identically from their `data-raw/` scripts; README.md in sync;
+`pkgdown::check_pkgdown()` reports no problems.
