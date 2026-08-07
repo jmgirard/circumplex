@@ -35,7 +35,7 @@ iis32_norms_src <- data.frame(
   Sample = 1,
   Size = 1380,
   Population = "American college students",
-  Reference = "Hatcher & Rogers (2012)",
+  Reference = "Norms source unconfirmed; instrument published as Hatcher & Rogers (2012)",
   URL = "https://doi.org/10.1080/00223891.2012.681818"
 )
 

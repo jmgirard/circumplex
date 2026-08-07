@@ -35,7 +35,7 @@ ipip_norms_src <- data.frame(
   Sample = 1,
   Size = 274,
   Population = "American college students",
-  Reference = "Markey & Markey (2009)",
+  Reference = "Norms source unconfirmed; instrument published as Markey & Markey (2009)",
   URL = "https://doi.org/10.1177/1073191109340382"
 )
 

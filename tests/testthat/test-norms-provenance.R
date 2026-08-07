@@ -136,6 +136,84 @@ audited_objects <- list(
           ), Label = c("Dominant", "Calculating", "Cold", "Self-Critical", 
           "Submissive", "Ingratiating", "Warm", "Gregarious")), class = "data.frame", row.names = c(NA, 
       -8L))
+  ),
+  iis32 = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1), Abbrev = c("PA", 
+      "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 135, 180, 225, 
+      270, 315, 360, 45), M = c(4.25, 4.02, 4.26, 4.29, 4.66, 4.65, 4.42, 4.09
+      ), SD = c(0.99, 0.94, 0.82, 0.88, 0.86, 0.96, 0.87, 0.99)), class = "data.frame", row.names = c(NA, 
+      -8L)), structure(list(Sample = 1, Size = 1380, Population = "American college students", 
+          Reference = "Norms source unconfirmed; instrument published as Hatcher & Rogers (2012)", 
+          URL = "https://doi.org/10.1080/00223891.2012.681818"), class = "data.frame", row.names = c(NA, 
+      -1L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), Items = c("14, 16, 18, 20", 
+      " 3, 10, 19, 25", " 6,  8, 26, 28", "11, 24, 29, 30", " 5, 17, 27, 31", 
+      " 7, 13, 21, 22", " 2,  9, 15, 23", " 1,  4, 12, 32"), Label = c("Lead", 
+      "Direct", "Balance", "Restrain", "Cooperate", "Consider", "Connect", 
+      "Engage")), class = "data.frame", row.names = c(NA, -8L))
+  ),
+  iis64 = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1), Abbrev = c("PA", 
+      "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 135, 180, 225, 
+      270, 315, 360, 45), M = c(4.2, 4.1, 4.1, 4.23, 4.59, 4.66, 4.61, 4.16
+      ), SD = c(1.32, 1.29, 1.34, 1.24, 1.17, 1.14, 1.24, 1.36)), class = "data.frame", row.names = c(NA, 
+      -8L)), structure(list(Sample = 1, Size = 684, Population = "American college students", 
+          Reference = "Hatcher & Rogers (2009)", URL = "https://doi.org/10.1037/a0017269"), class = "data.frame", row.names = c(NA, 
+      -1L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), Items = c("11, 16, 22, 29, 31, 37, 40, 58", 
+      " 7, 10, 20, 28, 39, 46, 55, 59", " 4,  5, 15, 18, 36, 48, 50, 53", " 3,  8, 21, 34, 45, 51, 54, 56", 
+      " 2,  9, 14, 32, 41, 47, 49, 60", "17, 26, 27, 33, 35, 42, 43, 52", " 6, 13, 19, 23, 30, 44, 57, 61", 
+      " 1, 12, 24, 25, 38, 62, 63, 64"), Label = c("Lead", "Direct", "Balance", 
+      "Restrain", "Cooperate", "Consider", "Connect", "Engage")), class = "data.frame", row.names = c(NA, 
+      -8L))
+  ),
+  ipipipc = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1), Scale = c("PA", 
+      "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 135, 180, 225, 
+      270, 315, 360, 45), M = c(2.66, 2.27, 2.46, 2.68, 3.2, 3.64, 4.37, 3.64
+      ), SD = c(0.71, 0.69, 0.58, 0.79, 0.63, 0.58, 0.47, 0.78)), class = "data.frame", row.names = c(NA, 
+      -8L)), structure(list(Sample = 1, Size = 274, Population = "American college students", 
+          Reference = "Norms source unconfirmed; instrument published as Markey & Markey (2009)", 
+          URL = "https://doi.org/10.1177/1073191109340382"), class = "data.frame", row.names = c(NA, 
+      -1L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), Items = c("6, 14, 22, 30", 
+      "7, 15, 23, 31", "8, 16, 24, 32", "1, 9, 17, 25", "2, 10, 18, 26", "3, 11, 19, 27", 
+      "4, 12, 20, 28", "5, 13, 21, 29"), Label = c("Assured-Dominant", "Arrogant-Calculating", 
+      "Cold-Hearted", "Aloof-Introverted", "Unassured-Submissive", "Unassuming-Ingenuous", 
+      "Warm-Agreeable", "Gregarious-Extraverted")), class = "data.frame", row.names = c(NA, 
+      -8L))
+  ),
+  isc = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1), Scale = c("PA", 
+      "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 135, 180, 225, 
+      270, 315, 360, 45), M = c(6.04, 6.17, 5.23, 4.44, 4.55, 3.91, 3.32, 5.31
+      ), SD = c(1.06, 1.1, 1.28, 1.16, 1.24, 0.99, 0.91, 1)), class = "data.frame", row.names = c(NA, 
+      -8L)), structure(list(Sample = 1, Size = 649, Population = "American college students", 
+          Reference = "Hopwood et al. (2011)", URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x"), class = "data.frame", row.names = c(NA, 
+      -1L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), Items = c("1,  9, 17, 25, 33, 41, 49, 57", 
+      "2, 10, 18, 26, 34, 42, 50, 58", "3, 11, 19, 27, 35, 43, 51, 59", "4, 12, 20, 28, 36, 44, 52, 60", 
+      "5, 13, 21, 29, 37, 45, 53, 61", "6, 14, 22, 30, 38, 46, 54, 62", "7, 15, 23, 31, 39, 47, 55, 63", 
+      "8, 16, 24, 32, 40, 48, 56, 64"), Label = c("Sensitive to Control", "Sensitive to Antagonism", 
+      "Sensitive to Remoteness", "Sensitive to Timidity", "Sensitive to Passivity", 
+      "Sensitive to Dependence", "Sensitive to Affection", "Sensitive to Attention-Seeking"
+      )), class = "data.frame", row.names = c(NA, -8L))
   )
 )
 
@@ -177,6 +255,44 @@ test_that("shipped angles follow the LM = 360 convention (M72)", {
 test_that("every audited instrument is a shipped instrument (M72)", {
   # Runtime half: works against the installed package, so it runs on CRAN.
   expect_true(all(names(audited_objects) %in% shipped_instruments()))
+})
+
+test_that("norms-audit.md's verdicts and the pin list bind in both directions (M73)", {
+  # DEVELOPMENT-ONLY, same reasoning as the status-table test below: cairn/ is
+  # repo tracking and is not installed. Split out so the runtime pins above
+  # never skip with it.
+  #
+  # The two records this binds are written at different times by different
+  # hands -- the verdict when a source note is authored, the pin when the
+  # object is locked -- so either can move without the other. An instrument
+  # whose verdict says it was audited but which nothing pins ships unguarded
+  # while the tracking file claims otherwise; an instrument pinned while its
+  # verdict still reads `unaudited` claims a guard the audit never established.
+  # Assert the IFF, not either implication: a one-directional check passes over
+  # exactly the half it does not look at.
+  status <- testthat::test_path("..", "..", "cairn", "references",
+                                "norms-audit.md")
+  skip_if_not(file.exists(status), "cairn/ not present (installed package)")
+
+  lines <- readLines(status, warn = FALSE)
+  starts <- grep("^## ", lines)
+  from <- grep("^## Audit status", lines)
+  expect_length(from, 1L)
+  to <- c(starts[starts > from], length(lines) + 1L)[[1]]
+  section <- lines[(from + 1L):(to - 1L)]
+
+  verdict_of <- function(inst) {
+    row <- section[grepl(paste0("^\\| ", inst, " \\|"), section)]
+    if (length(row) != 1L) return(NA_character_)
+    trimws(strsplit(row, "|", fixed = TRUE)[[1]][[3]])
+  }
+  verdicts <- vapply(shipped_instruments(), verdict_of, character(1))
+  expect_false(anyNA(verdicts))
+
+  # An `unaudited` verdict is the only one that claims no audit; every other
+  # wording -- `verified: ...`, `audited, norms unsourced: ...` -- claims one.
+  claims_audit <- !grepl("^unaudited", verdicts)
+  expect_setequal(names(verdicts)[claims_audit], names(audited_objects))
 })
 
 test_that("stamp_ledger() stamps a zero-row ledger as it does a one-row one (M73)", {

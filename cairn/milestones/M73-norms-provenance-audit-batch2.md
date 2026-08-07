@@ -108,14 +108,14 @@ the source author.
 - [x] T5. Extract `stamp_ledger()` from `audit-norms.R:341-352` and fix the
       zero-row crash (`ledger$generated <- format(Sys.Date())` errors with
       `replacement has 1 row, data has 0`); test it on both arities.
-- [ ] T6. Extend `AUDIT_BATCH` to the four instruments, run the audit,
+- [x] T6. Extend `AUDIT_BATCH` to the four instruments, run the audit,
       disposition every ledger row, commit the ledger and coverage CSVs.
-- [ ] T7. Resolve every `mismatch` row from T6 — correct `data-raw/<inst>.R`
+- [x] T7. Resolve every `mismatch` row from T6 — correct `data-raw/<inst>.R`
       and rebuild `data/`, two-channel per M42-D1, or record a disposition.
-- [ ] T8. Extend `audited_objects` in `tests/testthat/test-norms-provenance.R`
+- [x] T8. Extend `audited_objects` in `tests/testthat/test-norms-provenance.R`
       with the four instruments' full `Norms`/`Scales`; write their four
       `norms-audit.md` status rows.
-- [ ] T9. Add the two-directional status↔pin binding test; prove both
+- [x] T9. Add the two-directional status↔pin binding test; prove both
       directions by mutation and record the runs.
 - [ ] T10. Correct the iitc and iei `@source` credits in
       `R/instrument_data.R:86,191`; `devtools::document()`; correct
@@ -136,6 +136,10 @@ the source author.
 - 2026-08-06: web search for the two unsourced norm sets returned nothing; user reports the 2018 author correspondence is unrecoverable, so 'personal communication' is not assertable. Gate chose honest disclosure in the shipped credits plus a tracked follow-up.
 - 2026-08-06: T4 done. Re-anchored the `Reference` rows of locke2014, boudreaux2018 and bliton2019 from the value's table to the page that prints the credit (each article's own journal header and byline); locke2007's already quoted its page verbatim. locke2000's stays authored and now carries the `constructed-credit` token, which `audit_norms()` emits as an exempt coverage row. All nine notes' Reference rows now carry a page anchor or the token.
 - 2026-08-06: T5 done. `stamp_ledger()` extracted from the run block; the zero-row crash was `df$col <- <scalar>`, which recycles to any positive row count and errors at zero. Mutation run recorded: restoring the scalar form reddens the new test with `replacement has 1 row, data has 0` — the failure the claim is about, not merely some failure.
+- 2026-08-06: T6 done. `AUDIT_BATCH` extended to nine. Run: 130 ledger rows, 13 coverage rows, **0 coverage gaps, 0 angle-copy splits, 0 IP2 breaches, 0 UNDISPOSITIONED**. The four new instruments contribute 77 rows: 3 `mismatch` (all `Population`, intended-deviation) and 74 `not-published`.
+- 2026-08-06: T7 done. No shipped norm value was wrong, so no `mismatch` needed a data correction. A new disposition kind `source-not-identified` (34 rows) separates "this source publishes no such field" from "this value came from somewhere and the venue cannot be found" — the latter covers iis32's M/SD/Size/Population and ipipipc's M/SD. Shipped `Reference` for both rewritten to "Norms source unconfirmed; instrument published as ...", per the gate. Two iis64 item texts corrected from the Appendix (item 5 was truncated to "I realize "; item 7 read "agreeable with" for "agreeable to"); three `.rda` rebuilt.
+- 2026-08-06: T8-T9 done. Four instruments pinned whole (100 assertions in the file). Two mutation runs recorded, each red and each naming `isc` as the discriminating element: dropping isc from `audited_objects` fails the binding assertion with `Needs: "isc"`; flipping isc's status row to `unaudited` fails it with `Absent: "isc"`.
+- 2026-08-06: iitc's `@source` now cites the final print version, Bliton & Pincus (2020), *Assessment* 27(4) 688-705, from Crossref; the shipped norms `Reference` still credits "Bliton & Pincus (2019)", the online-first version the shelf copy is and the one bliton2019.md anchors. Left alone deliberately — iitc is M72-verified and pinned, and the roxygen now states the relationship.
 
 ## Decisions
 

@@ -19,7 +19,11 @@ AUDIT_BATCH <- c(
   csig = "locke2014",
   csip = "boudreaux2018",
   csiv = "locke2000",
-  iitc = "bliton2019"
+  iitc = "bliton2019",
+  iis32 = "hatcher2012",
+  iis64 = "hatcher2009",
+  ipipipc = "markey2009",
+  isc = "hopwood2011"
 )
 
 # Documented unit deviations: shipped value = source value / divisor.

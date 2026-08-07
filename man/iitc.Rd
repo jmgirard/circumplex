@@ -8,9 +8,10 @@
 An object of class \code{circumplex_instrument} of length 5.
 }
 \source{
-Bliton, C. F., & Pincus, A. L. (in press). Construction and
-Validation of the Interpersonal Influence Tactics Circumplex (IIT-C)
-Scales. \emph{Assessment}.
+Bliton, C. F., & Pincus, A. L. (2020). Construction and validation
+of the Interpersonal Influence Tactics Circumplex (IIT-C) Scales.
+\emph{Assessment, 27}(4), 688-705. First published online 25 July 2019, which is
+the version the shipped norms credit as Bliton & Pincus (2019).
 
 \doi{10.1177/1073191119864661}
 }
