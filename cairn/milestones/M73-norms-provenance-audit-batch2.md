@@ -1,11 +1,11 @@
 # M73: Norms provenance audit, batch 2 (single-sample instruments)
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP2, IP3, IP5
-- **Branch/PR:** —
+- **Branch/PR:** `m73-norms-provenance-audit-batch2`
 
 ## Goal
 
@@ -128,6 +128,7 @@ the source author.
 - 2026-08-06: criteria audit ([O], fresh context) returned six findings; five actioned before writing — AC2 quoted output strings the script never prints (`cat(sep="")` padding), AC4 named a callable that does not exist, AC5 contradicted AC2 (passing rows would land `UNDISPOSITIONED`) and demanded a quotable credit `locke2000.md:82` cannot supply, AC6 left the pins/status flip unrequired, AC7 missed `?iei`'s identical stale credit and the generated-`man/` edit path. Its sixth (template missing) was wrong — it searched a stale plugin path.
 - 2026-08-06: plan gate chose splitting batch 2 by sample count over a repairs-only milestone because a repairs-only milestone would ship no verified instrument and leave the multi-sample rework with nothing exercising it; falsified by the single-sample four proving too large for one milestone, which would argue for the repairs standing alone after all.
 - 2026-08-06: plan gate chose fixing the `Reference` origin problem by labelling constructed credits over requiring every credit be quotable from the source, because `locke2000.md:82` records a page that carries no date and no citation, so the stronger rule is unsatisfiable retroactively; falsified by a constructed-credit row later proving to hide a real mismatch the label did not surface.
+- 2026-08-06: /milestone-implement started; branch `m73-norms-provenance-audit-batch2` cut from master.
 - 2026-08-06: user reported at the gate that the IIP publisher granted permission to ship norming functions but not item text — so iip32/iip64 are not an unobtainable-source case, and `norms-audit.md`'s claim that they need such a disposition is corrected here (AC7b) rather than acted on.
 
 ## Decisions
