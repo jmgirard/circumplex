@@ -24,7 +24,10 @@ iei_scales <- data.frame(
 )
 
 iei_norms <- data.frame(
-  Sample = rep(1:2, times = 8),
+  # `each`, not `times`: `times` would interleave the two samples as
+  # 1, 2, 1, 2, ... so each sample's key would hold four octants twice and
+  # four not at all -- which norm_standardize() cannot subset.
+  Sample = rep(1:2, each = 8),
   Abbrev = rep(c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), times = 2),
   Angle = rep(c(90, 135, 180, 225, 270, 315, 360, 45), times = 2),
   M = c(2.00, 1.21, 0.91, 1.18, 2.03, 2.63, 2.70, 2.41,
@@ -37,7 +40,7 @@ iei_norms_src <- data.frame(
   Sample = c(1, 2),
   Size = c(1223, 278),
   Population = c("American undergraduate students", "American crowdworkers"),
-  Reference = "Horner, Locker, & Hulsey (2024)",
+  Reference = "Horner, Locke, & Hulsey (2024)",
   URL = "https://osf.io/w37dj/"
 )
 
