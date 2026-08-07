@@ -22,7 +22,8 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
   Pincus 2019). Jeff supplies the PDFs at implementation start.
 - Audited field set (canonical, used by AC2/AC3/AC5): per-scale M and SD,
   scale angles (both shipped copies), item-to-scale assignments, sample N
-  (`Size`), and `Population`.
+  (`Size`), `Population`, and the norms' provenance fields `Reference` and
+  `URL`.
 - Committed artifacts: synthesis note `cairn/references/norms-audit.md`
   (citekey map, sha256 shelf manifest, scan verdicts, per-instrument audit
   status for all 15 shipped instruments); source notes
@@ -90,10 +91,11 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       on any edit to any audited field including sample N and population, and
       fails when any shipped instrument is absent from `norms-audit.md`'s
       status table.
-- [ ] AC6: NEWS.md documents every `transcription-error` fix shipped, each
-      entry narrowed to what AC5's pins enforce; if the post-fix ledger shows
-      no `transcription-error` rows, the clean outcome is recorded in the
-      work log and NEWS.md is untouched.
+- [ ] AC6: NEWS.md documents every user-visible instrument-data change this
+      milestone ships — each `transcription-error` fix, and each provenance
+      correction to a shipped `Reference` or `URL` — each entry narrowed to
+      what AC5's pins enforce; if the milestone ships no such change, the
+      clean outcome is recorded in the work log and NEWS.md is untouched.
 - [x] AC7: `devtools::test()` clean, and `devtools::check(args =
       "--no-manual")` with no new ERRORs/WARNINGs/NOTEs relative to the
       master baseline.
@@ -101,12 +103,12 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 ## Coverage
 
 - AC1 → T1
-- AC2 → T2
-- AC3 → T3
-- AC4 → T4
-- AC5 → T5
-- AC6 → T6
-- AC7 → T6
+- AC2 → T2, T7
+- AC3 → T3, T7, T8
+- AC4 → T4, T9, T10
+- AC5 → T5, T11
+- AC6 → T6, T12
+- AC7 → T6, T12
 
 ## Tasks
 
@@ -128,6 +130,21 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       value (LESSONS guard-teeth rule).
 - [x] **T6** — NEWS entries (or clean-outcome work-log line); full
       `devtools::check()` against the master baseline.
+
+Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
+
+- [ ] **T7** — Source-note tables gain note-only samples and `Reference`/`URL`
+      rows; the script gains a note-only kind exempt from coverage.
+- [ ] **T8** — Harden `audit-norms.R`: IP2 convention check, failed joins, `NA`
+      angles, dropped rows, parse failures all reported; coverage artifact.
+- [ ] **T9** — Pre-fix ledger rebuilt against pre-fix `data/` in a scratch
+      checkout, stamped with both commits; post-fix re-run; dispositions extended.
+- [ ] **T10** — Document the deviation at `norms()`'s help; fix
+      `R/instrument_data.R`'s csiv `@source`; `devtools::document()`.
+- [ ] **T11** — Pins over full `Norms`/`Scales` (incl. `Sample`, `Label`);
+      status assertion anchored; teeth re-proven by mutation on an audited row.
+- [ ] **T12** — `norms-audit.md` verdicts name the fields they cover; NEWS
+      narrowed to the amended AC6; full check.
 
 ## Work log
 
@@ -154,6 +171,11 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
 - 2026-08-06: status in-progress→review. Session hygiene note: the working tree was briefly checked out to master mid-implementation to measure a warning baseline — a careless move with a live branch. It was stopped immediately; the branch, its commits and the working tree were verified intact and the stash empty, and the baseline question was then settled from the branch diff instead.
 
 - 2026-08-06: review → **in-progress**. Gate failed on four acceptance criteria, each verified in-session rather than taken on a reviewer's word: AC6 (NEWS.md touched with zero `transcription-error` rows), AC2 (note-only rows in prose, not the machine-readable table), AC4 (`intended-deviation` undocumented at any user surface; and the committed pre-fix ledger is stamped with a descendant of the fix commit, so its work-log provenance claim is false), AC5 (`Norms[[2]]$Sample` unpinned — mutation leaves the suite green). Two records this review had to correct in itself: it ticked AC6 on a charitable reading of two clauses the never-reinterpret rule forbids, and its earlier mutation evidence for the status-table assertion held only for unaudited instruments. 18 further findings recorded in the Review section for the fix pass. AC1, AC3 and AC7 verified and stand.
+
+- 2026-08-06: amendment return: AC6 — "NEWS.md documents every user-visible instrument-data change this milestone ships — each `transcription-error` fix, and each provenance correction to a shipped `Reference` or `URL` — each entry narrowed to what AC5's pins enforce; if the milestone ships no such change, the clean outcome is recorded in the work log and NEWS.md is untouched." Gate choice at Jeff's fix-pass gate: keep the NEWS entry rather than revert it, because the branch ships a user-visible change to what csiv reports as its source and the original wording assumed only a wrong number could ever change.
+- 2026-08-06: amendment at the same gate — the audited field set in Scope widens to include the norms' `Reference` and `URL`, so the ledger can show the one defect this audit actually found (review finding 9, previously left as a decision for Jeff). Falsified by a source note proving unable to state a citation or link the shipped value can be compared against.
+- 2026-08-06: fix-pass tasks T7–T12 added for the four failed criteria plus the 12 recorded review findings; Coverage remapped. Tasks section compressed in the same pass to stay under the 150-line plan-owned cap.
+- 2026-08-06: gate answers on the other two open questions — the `Population` deviation is disclosed in `norms()`'s help rather than by reshipping five population strings; the false "pre-fix" ledger is rebuilt honestly against pre-fix `data/` rather than dropped.
 
 ## Decisions
 
