@@ -11,6 +11,13 @@ An object of class \code{circumplex_instrument} of length 5.
 Locke, K. D. (2000). Circumplex scales of interpersonal values:
 Reliability, validity, and applicability to interpersonal problems and
 personality disorders. \emph{Journal of Personality Assessment, 75}(2), 249-267.
+This article defines the instrument; it reports no octant means or
+standard deviations, and its samples are not the normative sample below.
+
+Norms: Locke, K. D. (n.d.). \emph{CSIV norms} [unpublished data]. The
+shipped octant means and standard deviations, and the N of 1,200, come
+from the author's norms table:
+\url{https://kennethlocke.org/CSIV/CSIV_Norms.html}
 
 \url{https://kennethlocke.org/CSIV/CSIV.html}
 }

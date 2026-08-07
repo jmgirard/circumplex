@@ -1,0 +1,8 @@
+"instrument","side","field","scale","exempt"
+"csie","note-only-sample","adult 0-to-4 sample","N = 1,234, Locke & Adamic (2012) Studies 3-4",TRUE
+"csig","note-only-sample","Study 2 octant means","n = 327; CSIG and CSIV means plotted, not printed numerically",TRUE
+"csip","note-only-sample","women subsample","n = 121, own M (SD) column",TRUE
+"csip","note-only-sample","men subsample","n = 70, own M (SD) column",TRUE
+"csiv","note-only-sample","U.S. adult sample","N = 980, Hopwood et al. (2022)",TRUE
+"csiv","note-only-sample","32-item adult MTurk sample","N = 1,244, Locke & Adamic (2012)",TRUE
+"iitc","note-only-sample","Study 2 samples","N = 608, reported separately for romantic partner, friend and acquaintance targets",TRUE

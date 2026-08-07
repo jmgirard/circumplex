@@ -597,6 +597,23 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   translucent rather than opaque, so it restores contrast without hiding the
   data it covers.
 
+## Instrument data
+
+* The normative data shipped with `csie`, `csig`, `csip`, `csiv` and `iitc` has
+  been re-verified against its published sources, value by value. Every mean,
+  standard deviation and sample size was confirmed correct, as was every
+  item-to-scale assignment its source publishes; no norm value changed.
+* The source recorded for two of those instruments did change. `csiv` now
+  reports its norms as unpublished data from the instrument's author rather
+  than attributing them to Locke (2000), whose article reports a different
+  sample and publishes no octant statistics. The `URL` recorded for `csie` and
+  `csiv` now points at the author's current norms tables; the previous
+  addresses had been redirected to a site homepage. Use `norms()` to see the
+  provenance recorded for any instrument.
+* `?norms` now states that the population shown for a normative sample is a
+  short standardized label chosen by this package, deliberately broader than
+  the description the original source gives.
+
 ## Documentation
 
 * New vignette, "Evaluating Circumplex Structure": how to test whether an
