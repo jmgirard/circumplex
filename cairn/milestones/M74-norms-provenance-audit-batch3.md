@@ -132,6 +132,7 @@ PA/NO duplicated-statistics question → its existing candidate row.
 - 2026-08-07: F2/F5 fixed — NEWS.md's cais bullet now states that seven of the eight octants change (PA gains item 32 from NO; BC, DE and HI gain 33, 34 and 35; JK loses 30; LM and NO each lose one and gain two) with only FG unchanged, and its re-verification bullet no longer claims every sample size matched while the next bullet corrects one. norms-audit.md's "three octants" corrected in place and marked. Supersedes the "changes JK, LM and NO scores" clause in the 2026-08-07 T8 line above. Per-octant gains and losses derived by diffing master's data/cais.rda against the branch's, not from the earlier claim.
 - 2026-08-07: the two candidate-row items the review disposition assigned to this fix are now ROADMAP rows, search-first clean (no existing candidate, archive summary or D-entry covers either): cais's sample-2 means exceeding its 1-5 anchors, and the audit-norms.R robustness family (F3, F7, F8, F9, F10, F12).
 - 2026-08-07: devtools::check(args = "--no-manual") re-run against the committed fix at 54c1c129 — 0 errors, 0 warnings, 0 notes, 13m06s. Status -> review, second time. (An earlier run of the same command was clean but had snapshotted the tree before the last two prose edits, so it is not the AC7 evidence.)
+- 2026-08-07: review pass 2 — all 8 criteria re-executed with fresh evidence, consistency gate clean, three lenses + scorer over 22 findings. No return: F5 (82) is the only actioned finding and falsifies no criterion. Five record repairs made review-side (F5's miscount in norms-audit.md; F6/F7/F8's pre-fix present-tense claims in sodano2006.md, hopwood2008.md and two INDEX.md lines; F3's NEWS undercount of the corrections).
 - 2026-08-06: plan gate chose deferring the multi-sample rework to this milestone over doing it in M73 because M73's four instruments are all single-sample and would leave the rework unexercised; falsified by the rekey turning out to be a precondition for something M73 needs.
 
 ## Decisions
@@ -292,4 +293,128 @@ Two advisories, neither a gate failure: `sizing (split tripwires)` reports M74's
 8 acceptance criteria against the 7 tripwire — a consequence of the gated AC8
 amendment, accepted rather than split at this stage — and `work-log format` (47),
 almost all of them M7's legacy multi-line entries.
+
+## Review — second pass
+
+Verified 2026-08-07 on `m74-norms-provenance-audit-batch3` after the return-1
+fix at `54c1c129`, PR #101. Every line below is a command run at this pass. The
+first pass's evidence above stands as the record of what it checked; nothing in
+it is edited.
+
+### Acceptance-criteria evidence (re-executed)
+
+- **AC1.** `test-norms-audit-sample-key.R`: 11 pass, 0 fail. Fence re-verified by
+  mutation: reproducing the M72 defect in full (per-pass note filter removed AND
+  `sample` dropped from the join key) reddens 6 of 11; restored, 11 pass. The
+  join-key-alone mutation again leaves all 11 green — the redundancy the first
+  pass disclosed, unchanged and re-observed rather than recalled.
+- **AC2.** `AUDIT_BATCH` is an 18-row data.frame over 13 instruments carrying
+  `instrument, sample, citekey, divisor, scales`; `validate_batch()` TRUE. iipsc
+  sample 1 → `hopwood2008` (`divisor = 4`, `scales = FALSE`), sample 2 →
+  `soldz1995` (`divisor = 1`, `scales = TRUE`). Batches 1 and 2 unchanged:
+  master's committed 130-row ledger against the branch's 130 batch-1+2 rows —
+  identical key set, 0 differing values across `shipped`, `source`, `kind` and
+  `disposition`.
+- **AC3.** All five notes parse: `sodano2006` 56 rows, `horner2024` 56,
+  `trucco2013` 76, `hopwood2008` 20, `soldz1995` 38. Each carries a
+  `**Provenance.**` block whose extraction status names the channel that read
+  the norm table and carries `— observed 2026-08-07`; each has an `INDEX.md`
+  line, and `references index<->disk` PASSes.
+- **AC4.** Audit re-run: 166 ledger rows, 15 coverage rows, **0 coverage gaps,
+  0 angle-copy splits, 0 IP2 breaches**, 0 `UNDISPOSITIONED`, 13 instruments.
+- **AC5.** 36 batch-3 ledger rows, 9 of kind `mismatch`, all 9
+  `intended-deviation` `Population` (cais 2, iei 2, igicr 3, iipsc 2). The four
+  corrections re-confirmed by loading master's and the branch's `.rda` side by
+  side: cais `Items` in 7 of 8 octants, cais sample-1 `Size` 213→204, iei `URL`
+  split per sample, iipsc sample-1 `Reference` 2011→2008.
+- **AC6.** `audited_objects` holds 13 instruments over 18 pinned samples (cais 2,
+  iei 2, igicr 3, iipsc 2); all 13 pins `identical()` to the shipped objects.
+  `norms-audit.md` carries a verdict per instrument naming compared fields and
+  sample count. `test-norms-provenance.R`: 163 pass, 0 fail.
+- **AC7.** `devtools::check(args = "--no-manual")` clean at the tip of this pass:
+  0 errors, 0 warnings, 0 notes. `document()` produces no diff.
+- **AC8.** Re-verified by mutation in both directions: dropping item 37 from
+  cais's NO key reddens 3 assertions; repeating item 30 in LM at constant item
+  count reddens the same 3. Restored, sha256 of `data/cais.rda` identical to the
+  pre-mutation file.
+
+### Consistency gate (re-run)
+
+`cairn_validate` exit 0 — 16 PASS, no FAIL. No principle changed, so
+`cairn_impact` does not apply. Toolchain slot: `document()` no diff;
+`data/{cais,iei,iipsc}.rda` regenerate byte-identically from `data-raw/`;
+`pkgdown::check_pkgdown()` finds no problems; README in sync; NEWS leaks no
+milestone numbers. Same two advisories as the first pass.
+
+### Independent review (three lenses + scorer)
+
+- **[S] blame-history:** no regression. PR #99's `each` fix in `data-raw/iei.R`
+  is untouched; M72's `csip` divisor of 8, its IP2 and angle-copy checks, and
+  M73's note-only/constructed-credit coverage counters and `stamp_ledger()`
+  zero-row fix all survive the `audit-norms.R` rewrite. D-039's carve-out
+  followed rather than contradicted.
+- **[S] prior-PR-comments:** no regression against M72's, M73's or this
+  branch's own first-pass findings. It recomputed the cais key diff
+  independently and confirms F2 is genuinely fixed rather than reworded, and
+  F5's contradiction resolved. GitHub inline-comment surface empty (`[]`).
+- **[O] diff-bug:** 22 findings, scored below.
+
+Scores: F5 82 · F3 78 · F6 78 · F7 76 · F8 75 · F1 72 · P1 72 · F10 68 ·
+F21 65 · F12 65 · F9 60 · F15 60 · F2 55 · F13 55 · F18 55 · F20 55 · F22 45 ·
+F14 45 · F11 42 · F16 40 · F4 30 · F19 30 · F17 28.
+
+**Actioned (>= 80), verbatim:**
+
+- **F5 (82)** — `cairn/references/norms-audit.md`: "All 88 M/SD pairs across the
+  nine normative samples matched" contradicts its own enumeration in the same
+  sentence — cais 32 + iei 32 + igicr 48 + iipsc 32 = 144 values = 72 pairs.
+  Neither reading gives 88. Fixed: the sentence now reads 144 values / 72 pairs
+  and marks the correction.
+
+**Also corrected, below threshold, under the correcting-a-record-proven-false
+rule** (these are `references/` pages and `NEWS.md` — current knowledge whose
+claims this branch itself falsified, not opinions the scorer's threshold
+governs):
+
+- **F6 (78), F7 (76), F8 (75)** — `sodano2006.md`, `hopwood2008.md` and two
+  `INDEX.md` lines each described pre-fix shipped state in the present tense
+  ("assigns exactly four items to each octant"; "the package currently credits
+  these norms to a 2011 publication"), which the same branch changed. All four
+  sites rewritten to past tense with the M74 correction named and marked.
+- **F3 (78)** — `NEWS.md` said "Two shipped values did not match their source"
+  while the following bullet describes three provenance records changing,
+  double-counting the `Size` and undercounting the total. Corrected to four,
+  enumerated as the key plus the three provenance records. Below the actioned
+  floor, but the sentence was authored at the return-1 fix and a direct count of
+  the corrections in `data/` shows it wrong.
+
+**Logged below threshold, not actioned:** sixteen findings. F1 (72) / P1 (72)
+the new `data-raw/cais.R` comment says the octant means sit inside the 1–5
+anchors, false for sample 2 — its pre-existing half is now a ROADMAP candidate
+row; F10 (68) coverage rows mangle `field` into `"M (sample 1)"`; F21 (65) the
+first-pass Review section's commit anchors predate the fix, which this section
+supersedes rather than edits; F12 (65) `validate_batch()` does not validate
+`divisor`; F9 (60) no shipped-side equivalent of `note-sample-not-audited`;
+F15 (60) the per-instrument iteration comment overstates the de-duplication it
+achieves; F2 (55) the cais sample-2 metric question — the ROADMAP row again;
+F13 (55) `values_agree()` normalises `Items` on the shipped side only; F18 (55)
+the `Size` change carries no D-entry; F20 (55) the cais key pin compares exact
+whitespace; F22 (45) `validate_batch()` does not type-check `scales`; F14 (45)
+instrument-level rows dropped uncovered on a `scales = FALSE` pass (not live);
+F11 (42) `note-sample-not-audited` rows file a citekey under `instrument`;
+F16 (40) the join key alone is unfenced — disclosed at AC1 both passes; F4 (30)
+a NEWS line runs long; F19 (30) `?iei` prints 2025 and `norms(iei)` 2024,
+pre-existing and untouched. The `audit-norms.R` robustness family (F9, F10,
+F11, F12, F13, F14, F15, F22) is already carried by the ROADMAP candidate row
+added at the return-1 fix.
+
+### Disposition
+
+No finding reaches the return floor: F5 is the only actioned finding, it scores
+82 rather than 90+, and it falsifies no acceptance criterion — AC6's verdict
+rows name their fields and sample counts correctly; the miscount sits in the
+narrative section beside them. Defect-return count for this milestone stays at
+1, below the thrash threshold. The five corrections above were made review-side
+as record repairs and re-verified by a full check; the milestone stays at
+`review` and goes to the merge gate.
 

@@ -20,8 +20,10 @@ second human channel — observed 2026-08-07.
 Problems–Short Circumplex (IIP–SC) with college students. *Journal of
 Personality Assessment, 90*(6), 615–618. DOI 10.1080/00223890802388665. The
 citekey follows the article's own year: the cover sheet's "To cite this article"
-line reads "(2008) ... Journal of Personality Assessment, 90:6, 615-618", and
-the package currently credits these norms to a 2011 publication.
+line reads "(2008) ... Journal of Personality Assessment, 90:6, 615-618". The
+package credited these norms to a 2011 publication until M74 corrected the
+`Reference` to 2008 (corrected 2026-08-07; the sentence previously described
+that credit in the present tense).
 
 **Role.** The published source for iipsc's **sample 1**, the college-student
 norms. It is not the source for iipsc's sample 2, which is `soldz1995`, and it

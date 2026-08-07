@@ -170,8 +170,11 @@ Appendix in two channels.
 
 ## What batch 3 found
 
-No shipped mean or standard deviation was wrong in any of the four. All 88 M/SD
-pairs across the nine normative samples matched their sources exactly — cais's
+No shipped mean or standard deviation was wrong in any of the four. All 144
+shipped means and standard deviations across the nine normative samples — 72
+M/SD pairs — matched their sources exactly (corrected 2026-08-07 from "88 M/SD
+pairs", which matched neither the pair count nor the value count enumerated in
+this same sentence) — cais's
 32 in sodano2006's Tables 2 and 4, iei's 32 in horner2024's Table 1, igicr's 48
 in trucco2013's Table 3, and iipsc's 32 across hopwood2008's Table 1 and
 soldz1995's Table 4. Eight of the nine sample sizes matched too, as did every

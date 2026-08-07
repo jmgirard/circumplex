@@ -663,9 +663,9 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
 * The normative data shipped with `cais`, `iei`, `igicr` and `iipsc` has now
   been re-verified against its published sources the same way as the other nine.
   Every mean and standard deviation of all nine normative samples was confirmed
-  correct, as was every scale angle the sources publish. Two shipped values did
+  correct, as was every scale angle the sources publish. Four shipped values did
   not match their source and are corrected: the `cais` item-to-scale key above,
-  and one of the nine sample sizes, below.
+  and the three provenance records below.
 * Three provenance records changed with that verification. The `cais` sample
   size for the child sample now reports 204, the sample size printed on the
   table its means and standard deviations come from, rather than the 213 given

@@ -121,11 +121,14 @@ ordering — Table 1 identifies its items by content, not by number.
 ## Traces to
 
 - `data-raw/cais.R` — every shipped CAIS norm value and provenance string
-  compared against the block above. Its `cais_scales$Items` map assigns exactly
-  four items to each octant on a strict eight-cycle (`1, 9, 17, 25` and so on),
-  which reproduces Table 1's grouping only through item 29: the article's JK
-  block has three items rather than four, so from item 30 on the cycle is one
-  position out and items 33–37 fall off the end unassigned.
+  compared against the block above. Until M74 its `cais_scales$Items` map
+  assigned exactly four items to each octant on a strict eight-cycle
+  (`1, 9, 17, 25` and so on), which reproduced Table 1's grouping only through
+  item 29: the article's JK block has three items rather than four, so from item
+  30 on the cycle was one position out and items 33–37 fell off the end
+  unassigned. M74 rekeyed it to Table 1's own 5/5/5/4/5/3/5/5 blocks — the
+  comparison this note backs is what found the defect (corrected 2026-08-07;
+  the paragraph previously described the pre-M74 key in the present tense).
 - `data-raw/audit-norms.R` — parses the block above as the source side of the
   cais comparison, one pass per sample.
 - `cairn/references/norms-audit.md` — carries cais's audit verdict and this
