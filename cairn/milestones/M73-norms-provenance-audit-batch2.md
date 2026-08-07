@@ -1,6 +1,6 @@
 # M73: Norms provenance audit, batch 2 (single-sample instruments)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -150,6 +150,7 @@ the source author.
 - 2026-08-07: amendment return: AC5 — "carries in its anchor cell either the page at which the source itself prints the author names and the year the credit is built from, quoting that printed text — which is what gives the note's credit an origin independent of the shipped string — or the token `constructed-credit` with the reason the source prints neither". Re-verified: all nine notes satisfy it, eight by a quoted page anchor and locke2000 by the token.
 - 2026-08-07: round-2 fixes for the six actioned findings. F3+F4: iis32's verdict now names Reference and URL and drops the "deviates by design" claim its `source-not-identified` disposition contradicts. F10/F11: iis32 item 28 "ok"->"okay" and ipipipc item 16 "sob-stories"->"sob stories", each confirmed in the text layer and the page image of that instrument's own Appendix; the two IIS articles genuinely differ on ok/okay. F12: markey2009.md's Traces-to no longer claims an anchor-label comparison the block does not carry. F18: hopwood2011.md's page count and printed range reconciled. F5 (logged at 78, fixed anyway): hopwood2011.md now records what actually supports Size = 649 — the Sample-1 derivation narrative, not the figure note alone — and says why Population is the one row drawn from the whole 1,336.
 - 2026-08-07: F1 (logged at 72, fixed anyway): the run block counted every exempt coverage row as "note-only", which would have reported the constructed-credit row as one; it now counts by side and prints both. Scope note — the other 15 sub-threshold findings stay logged, not actioned.
+- 2026-08-07: round-2 verify slot clean — devtools::document() no man/ diff, devtools::test() 0 failures over 5986 assertions. Status back to review.
 
 ## Decisions
 
