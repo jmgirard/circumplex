@@ -1,6 +1,6 @@
 # M72: Norms provenance audit, batch 1 (CSI family + IITC)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -84,14 +84,14 @@ batch of the IP5 debt (DESIGN.md, Known fragilities).
       the retained pre-fix snapshot, and its surviving mismatch rows all
       carry a disposition other than `transcription-error`.
 - [ ] AC5: `tests/testthat/test-norms-provenance.R` enumerates shipped
-      instruments via `instruments()` (never a hand-list), pins each audited
-      instrument's full `Norms` and `Scales` objects to the post-audit
-      shipped values — every audited field traceable to its ledger row:
-      source value where verified or corrected, shipped value where
-      `not-published-in-source` or an approved `intended-deviation` — failing
-      on any edit to any audited field including sample N and population, and
-      fails when any shipped instrument is absent from `norms-audit.md`'s
-      status table.
+      instruments by the procedure `instruments()` uses (`data()` plus the
+      `circumplex_instrument` class filter), never a hand-list; pins each
+      audited instrument's full `Norms` and `Scales` objects to the post-audit
+      shipped values — every audited field traceable to its ledger row: source
+      value where verified or corrected, shipped value where
+      `not-published-in-source` or an approved `intended-deviation` — failing on
+      any edit to any audited field including sample N and population, and fails
+      when any shipped instrument is absent from `norms-audit.md`'s status table.
 - [x] AC6: NEWS.md documents every user-visible instrument-data change this
       milestone ships — each `transcription-error` fix, and each provenance
       correction to a shipped `Reference` or `URL` — each entry narrowed to
@@ -193,6 +193,9 @@ Review fix pass (2026-08-06 gate failure on AC2, AC4, AC5, AC6):
 
 - 2026-08-06: second review — AC1, AC2, AC3, AC4, AC6, AC7 verified with fresh evidence and ticked; two findings scored at or above 80, both fixed in-review (`norms-audit.md` verdicts now name `Population`; csig's Figure 2 re-read in two further independent channels, confirming every shipped value and placing the PA/NO duplication in the source rather than the extraction). 37 lower-scored findings logged in the Review section, none actioned.
 - 2026-08-06: **amendment return: AC5 — "enumerates shipped instruments by the same procedure `instruments()` uses (`data()` plus the `circumplex_instrument` class filter), never a hand-list"** — proposed. `instruments()` returns `NULL` (measured), so the clause as written cannot be satisfied by any test; the deviation was recorded at T5 and should have been an amendment then. Status review→in-progress for this amendment alone.
+
+- 2026-08-06: amendment return: AC5 — "enumerates shipped instruments by the procedure `instruments()` uses (`data()` plus the `circumplex_instrument` class filter), never a hand-list" — applied at Jeff's gate; the test is unchanged, only the criterion's text. Second amendment of the milestone, first naming AC5.
+- 2026-08-06: D-039 recorded at Jeff's gate — the printed `norms()` provenance change is a factual correction under IP5, not a GP4 break; the angle-range wording in IP2 was left alone at the same gate. Status in-progress→review.
 
 ## Decisions
 

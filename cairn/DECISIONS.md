@@ -1237,3 +1237,30 @@ repel redesign, boundary-interval improvement, Heywood guidance) and the
 vignettes→ebook row carry the interview's deferred work. Prior re-trigger
 clauses (D-006, D-011, D-014) are instances of GP7, not superseded. Source:
 Jeff, design interview gates, 2026-08-04.
+
+### D-039 (2026-08-06): csiv's and csie's printed norms provenance is corrected under IP5, and the change is a factual correction rather than a GP4 break (M72)
+
+**Context:** M72 audited the shipped norms of five instruments and found no
+wrong number, but two wrong provenance records: csiv credited its norms to
+Locke (2000), whose article publishes no octant statistics and reports a
+different sample, and both csie's and csiv's `URL` pointed at retired
+`webpages.uidaho.edu` paths that now resolve to a site homepage rather than the
+cited norms table. Both fields print in `norms()` output, and GP4 makes printed
+output a commitment whose break needs "statistical cause (a wrong number) or a
+gated irreversible-api decision". The milestone changed them on IP5's
+authority — published-source provenance for shipped instrument data — without
+recording how the two principles compose, which the review's blame-history lens
+surfaced as a traceability gap.
+**Decision:** The change stands as made, and GP4's "statistical cause" clause is
+read to cover it: a provenance field naming a source that does not publish the
+values is wrong in the same sense a wrong number is wrong, and correcting it
+restores the documented behavior rather than changing it. No deprecation cycle
+is owed for a factual correction to a citation. The `Reference` and `URL` fields
+joined the audited field set at the same gate, so a future drift here surfaces
+in the comparison ledger rather than only in the regression pins.
+**Consequences:** Later batches of the norms audit may correct provenance the
+same way without a fresh gate; a change to a *numeric* norm value is a different
+matter and does not inherit this. Users see the change in NEWS.md and in
+`?csiv` / `?csie`, whose `@source` blocks now separate the instrument's article
+from the norms table. Any future GP4 question about printed output that is not a
+correction — a format change, a dropped field — still needs its own gate.
