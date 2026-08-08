@@ -1,6 +1,6 @@
 # M78: Per-sample reference-kind field in the shipped norms
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** RR16
@@ -65,12 +65,13 @@ custom" claim (RR16 B1) → candidate row.
 - [x] T5. `norm_standardize()`'s disclosure and attribute carry the kind ([R/tidying_functions.R:316](R/tidying_functions.R:316)); extend the attribute-field enumeration in the roxygen; tests per AC6.
 - [x] T6. Update the `Norms[[2]]` pins in `tests/testthat/test-norms-provenance.R` to carry the new column.
 - [x] T7. Rewire `vignettes/using-instruments.Rmd:143-144` off the `Population`/`Reference` text matching; NEWS.md entry; run the AC7 grep.
-- [ ] T8. Gate: warning-free `devtools::document()`, `devtools::check()` 0/0/0, full suite, `git status` clean before reporting any of it.
+- [x] T8. Gate: warning-free `devtools::document()`, `devtools::check()` 0/0/0, full suite, `git status` clean before reporting any of it.
 
 ## Work log
 
 - 2026-08-08: created by /milestone-plan.
 - 2026-08-08: branch `m78-norms-reference-kind` cut from master at 3d5d18a4; status planned -> in-progress.
+- 2026-08-08: T8 done -- document() emits zero unresolved-link warnings at cli.width 500 and regenerates only man/norms.Rd and man/norm_standardize.Rd; devtools::check(--no-manual) is Status OK, 0 errors / 0 warnings / 0 notes in 14m56s with the test suite inside it. The log carries no 'checking PDF version of manual' line, so that step did not run: the manual was built directly (R CMD Rd2pdf, exit 0), its only warnings being the pre-existing cross-package link destinations. The tree the check ran against carried the regenerated man/ pages uncommitted; they are committed here and document() re-run to a zero diff.
 - 2026-08-08: T7 done -- the vignette's standardization and unsourced counts read Kind; its prose names the column as where the three counts come from. NEWS gains the Kind bullet, and two M76 entries were corrected rather than left: the quoted example message and the attribute's field list both predated this change and had gone stale the moment it landed.
 - 2026-08-08: AC7 amended at the implement gate -- its grep clause was over-broad, catching the vignette's `college|undergraduate` head-count, which derives no kind and which RR16's refusal of finer kinds leaves without a column. Narrowed to kind-deriving calls with that hit named; the two kind-deriving calls it was written for are both replaced. Retiring the head-count or adding a second classification column were both offered and declined.
 - 2026-08-08: T6 done -- the 15 provenance pins take the Kind column by surgical insertion rather than regeneration, so nothing else was re-blessed: the diff is 15 line pairs and every added line differs only by `Kind = `. Header notes that Kind is the one pinned field with no ledger row and where its independent origin lives.

@@ -63,10 +63,11 @@ below records the same facts either way.}
 \value{
 A data frame that contains the norm-standardized versions of
 \code{scales}. It carries a \code{"norm_sample"} attribute -- a list with elements
-\code{Instrument}, \code{Sample}, \code{Size} and \code{Population} -- recording which
-normative sample produced the scores, so a script that never sees the
-console can still report what its z-scores are relative to. Retrieve it
-with \code{attr(x, "norm_sample")}.
+\code{Instrument}, \code{Sample}, \code{Size}, \code{Population} and \code{Kind} -- recording which
+normative sample produced the scores and what kind of reference
+distribution it is (see \code{\link[=norms]{norms()}} for the three kinds), so a script that
+never sees the console can still report what its z-scores are relative to.
+Retrieve it with \code{attr(x, "norm_sample")}.
 }
 \description{
 Take in a data frame containing circumplex scales, angle definitions for each
