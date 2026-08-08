@@ -313,6 +313,76 @@ audited_objects <- list(
       "7, 15, 23, 31", "8, 16, 24, 32"), Label = c("Domineering", "Vindictive", 
       "Cold", "Socially Avoidant", "Nonassertive", "Exploitable", "Overly Nurturant", 
       "Intrusive")), class = "data.frame", row.names = c(NA, -8L))
+  ),
+  iip32 = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 
+      2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3), Scale = c("PA", "BC", 
+      "DE", "FG", "HI", "JK", "LM", "NO", "PA", "BC", "DE", "FG", "HI", 
+      "JK", "LM", "NO", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45, 90, 135, 180, 
+      225, 270, 315, 360, 45, 90, 135, 180, 225, 270, 315, 360, 45), 
+    M = c(0.5, 0.675, 0.675, 0.825, 1, 1.075, 1.075, 0.675, 0.45, 
+    0.5, 0.675, 0.75, 1.075, 1.2, 1.175, 0.625, 0.575, 0.75, 
+    0.75, 0.825, 0.925, 1, 0.95, 0.7), SD = c(0.625, 0.825, 0.925, 
+    0.825, 0.825, 0.75, 0.825, 0.65, 0.625, 0.825, 0.825, 0.825, 
+    0.925, 0.825, 0.825, 0.7, 0.625, 0.825, 0.925, 0.925, 0.825, 
+    0.75, 0.825, 0.7)), class = "data.frame", row.names = c(NA, 
+      -24L)), structure(list(Sample = c(1, 2, 3), Size = c(800, 400, 
+      400), Population = c("American adults, national standardization sample, overall", 
+      "American adults, national standardization sample, females", 
+      "American adults, national standardization sample, males"), Reference = c("Horowitz, Alden, Wiggins, & Pincus (2003)", 
+      "Horowitz, Alden, Wiggins, & Pincus (2003)", "Horowitz, Alden, Wiggins, & Pincus (2003)"
+      ), URL = c("https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
+      "https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
+      "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
+      )), class = "data.frame", row.names = c(NA, -3L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", 
+      "LM", "NO"), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), 
+    Items = c("22, 25, 28, 30", "14, 16, 17, 18", "10, 11, 13, 15", 
+    "2, 5, 9, 19", "4, 6, 7, 12", "1, 8, 20, 31", "23, 26, 27, 32", 
+    "3, 21, 24, 29"), Label = c("Domineering/Controlling", "Vindictive/Self-Centered", 
+    "Cold/Distant", "Socially Inhibited", "Nonassertive", "Overly Accommodating", 
+    "Self-Sacrificing", "Intrusive/Needy")), class = "data.frame", row.names = c(NA, 
+      -8L))
+  ),
+  iip64 = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 
+      2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3), Scale = c("PA", "BC", 
+      "DE", "FG", "HI", "JK", "LM", "NO", "PA", "BC", "DE", "FG", "HI", 
+      "JK", "LM", "NO", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45, 90, 135, 180, 
+      225, 270, 315, 360, 45, 90, 135, 180, 225, 270, 315, 360, 45), 
+    M = c(0.6125, 0.6625, 0.7125, 0.8125, 0.925, 0.975, 1.025, 
+    0.7125, 0.5625, 0.6, 0.6375, 0.8, 1, 1.075, 1.1, 0.675, 0.6625, 
+    0.725, 0.7875, 0.825, 0.85, 0.8875, 0.9625, 0.7375), SD = c(0.5625, 
+    0.6375, 0.7375, 0.7125, 0.7625, 0.6625, 0.6875, 0.6, 0.5125, 
+    0.6125, 0.7, 0.7125, 0.7625, 0.675, 0.6875, 0.575, 0.5875, 
+    0.65, 0.7625, 0.7125, 0.7625, 0.6375, 0.675, 0.625)), class = "data.frame", row.names = c(NA, 
+      -24L)), structure(list(Sample = c(1, 2, 3), Size = c(800, 400, 
+      400), Population = c("American adults, national standardization sample, overall", 
+      "American adults, national standardization sample, females", 
+      "American adults, national standardization sample, males"), Reference = c("Horowitz, Alden, Wiggins, & Pincus (2003)", 
+      "Horowitz, Alden, Wiggins, & Pincus (2003)", "Horowitz, Alden, Wiggins, & Pincus (2003)"
+      ), URL = c("https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
+      "https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
+      "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
+      )), class = "data.frame", row.names = c(NA, -3L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", 
+      "LM", "NO"), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), 
+    Items = c("17, 31, 44, 45, 50, 52, 57, 59", "1, 22, 24, 29, 32, 40, 56, 64", 
+    "11, 15, 16, 20, 23, 27, 36, 60", "3, 7, 14, 18, 33, 35, 55, 62", 
+    "5, 6, 8, 9, 12, 13, 19, 39", "2, 10, 25, 34, 38, 42, 53, 61", 
+    "21, 28, 37, 46, 49, 51, 54, 63", "4, 26, 30, 41, 43, 47, 48, 58"
+    ), Label = c("Domineering/Controlling", "Vindictive/Self-Centered", 
+    "Cold/Distant", "Socially Inhibited", "Nonassertive", "Overly Accommodating", 
+    "Self-Sacrificing", "Intrusive/Needy")), class = "data.frame", row.names = c(NA, 
+      -8L))
   )
 )
 
@@ -389,6 +459,57 @@ test_that("cais's item key matches sodano2006's octant blocks (M74)", {
       HI = "5, 13, 21, 29, 35", JK = "6, 14, 22",
       LM = "7, 15, 23, 30, 36", NO = "8, 16, 24, 31, 37")
   )
+})
+
+test_that("both IIP help pages carry the publisher's credit line (M75)", {
+  # The Mind Garden permission licenses the IIP means and SDs on condition (a):
+  # the credit line appears on the same page as the reproduced material. The
+  # shipped norms ARE that material, so losing this line from either help page
+  # is a permission breach, not a documentation nit.
+  #
+  # Read man/ when present and fall back to the installed Rd database, so this
+  # runs both from a source checkout and against an installed package (the
+  # M7/M70 dual-source pattern) rather than skipping in one of them.
+  credit <- paste(
+    "Reproduction by special permission of the Publisher, Mind Garden, Inc.,",
+    "www.mindgarden.com from the Inventory of Interpersonal Problems by",
+    "Leonard M. Horowitz, Lynn E. Alden, Jerry S. Wiggins, & Aaron L. Pincus.",
+    "Copyright © 2000 by Leonard M. Horowitz, Lynn E. Alden,",
+    "Jerry S. Wiggins, & Aaron L. Pincus. Further Reproduction is prohibited",
+    "without the Publisher's written consent."
+  )
+
+  # Rd wraps the line across source lines, so compare on collapsed whitespace.
+  # Comparing raw text would fail on a reflow that changed nothing.
+  squash <- function(x) gsub("\\s+", " ", trimws(paste(x, collapse = " ")))
+
+  rd_text <- function(topic) {
+    f <- testthat::test_path("..", "..", "man", paste0(topic, ".Rd"))
+    if (file.exists(f)) return(readLines(f, warn = FALSE))
+    db <- tools::Rd_db("circumplex")
+    nm <- paste0(topic, ".Rd")
+    expect_true(nm %in% names(db))
+    utils::capture.output(print(db[[nm]]))
+  }
+
+  for (topic in c("iip32", "iip64")) {
+    expect_true(grepl(squash(credit), squash(rd_text(topic)), fixed = TRUE),
+                info = paste(topic, "help page is missing the credit line"))
+  }
+})
+
+test_that("the two IIP instruments ship an Items placeholder, not item text (M75)", {
+  # The same permission covers the means and SDs ONLY, so the item TEXT of both
+  # IIP forms is unlicensed and must not ship. The item NUMBERS in Scales$Items
+  # are the scoring key and are permitted -- pinned by audited_objects above --
+  # so this asserts the narrow thing: $Items stays a single pointer row with no
+  # numbered item, which is what would change if item text were ever pasted in.
+  for (inst in list(iip32, iip64)) {
+    expect_identical(nrow(inst$Items), 1L)
+    expect_true(is.na(inst$Items$Number))
+    expect_match(inst$Items$Text, "Mind Garden")
+    expect_false(grepl("^I ", inst$Items$Text))
+  }
 })
 
 test_that("every audited instrument is a shipped instrument (M72)", {

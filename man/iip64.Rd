@@ -9,8 +9,10 @@ An object of class \code{circumplex_instrument} of length 5.
 }
 \source{
 Horowitz, L. M., Alden, L. E., Wiggins, J. S., & Pincus, A. L.
-(2000). \emph{IIP-64/IIP-32 professional manual.} San Antonio, TX: The
-Psychological Corporation.
+(2003). \emph{Inventory of Interpersonal Problems manual: Includes IIP-64 and
+IIP-32 forms} (3rd ed.). Menlo Park, CA: Mind Garden. Originally published
+by The Psychological Corporation; the shipped values are verified against
+this third edition.
 
 \url{https://www.mindgarden.com/113-inventory-of-interpersonal-problems}
 }
@@ -21,6 +23,19 @@ iip64
 Information about the Inventory of Interpersonal Problems (IIP-64). Note
 that, although we have permission to provide some information about the
 IIP-64, Mind Garden Inc. has exclusive rights to distribute it in full.
+}
+\details{
+The normative means and standard deviations are the manual's Table 4.4
+(pp. 27-29), divided by 8 to express the printed eight-item scale sums as
+item means. They are reproduced under the credit line the publisher's
+permission requires:
+
+"Reproduction by special permission of the Publisher, Mind Garden, Inc.,
+www.mindgarden.com from the Inventory of Interpersonal Problems by Leonard M.
+Horowitz, Lynn E. Alden, Jerry S. Wiggins, & Aaron L. Pincus. Copyright ©
+2000 by Leonard M. Horowitz, Lynn E. Alden, Jerry S. Wiggins, & Aaron L.
+Pincus. Further Reproduction is prohibited without the Publisher's written
+consent."
 }
 \examples{
 summary(iip64)

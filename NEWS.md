@@ -680,6 +680,22 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
 * Every bundled instrument's item-to-scale key is now checked to cover each of
   the instrument's items exactly once, so a key that silently drops or
   double-counts an item — the `cais` failure above — cannot ship again.
+* The normative data shipped with `iip32` and `iip64` has now been re-verified
+  against the IIP professional manual, which completes the sweep: every one of
+  the fifteen bundled instruments has now been checked against its published
+  source. All 96 means and standard deviations of the six IIP normative samples
+  were confirmed correct, as were all 96 item-to-scale assignments and all six
+  sample sizes. No value changed.
+* `?iip32` and `?iip64` now cite the third edition of the manual (Horowitz,
+  Alden, Wiggins, & Pincus, 2003, Mind Garden), the edition the shipped values
+  were verified against, rather than the earlier edition from a different
+  publisher; both help pages also carry the credit line the publisher's
+  reproduction permission requires for the normative statistics.
+* The `Population` recorded for both IIP instruments' normative samples now
+  describes them as a national standardization sample rather than as community
+  adults, which is what the manual reports: 800 adults sampled to be
+  representative of the U.S. adult population, with separate norms for women
+  and men.
 
 ## Documentation
 

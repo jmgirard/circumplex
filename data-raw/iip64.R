@@ -1,3 +1,29 @@
+# IIP-64 (M75).
+#
+# Source: Horowitz, Alden, Wiggins & Pincus (2003), *Inventory of Interpersonal
+# Problems manual* (3rd ed., Mind Garden); see cairn/references/horowitz2003.md
+# for every value's page anchor. Item map: Appendix A, pp. 57-59.
+#
+# Divisor 8: Table 4.4 (pp. 27-29) prints raw scale SUMS over each scale's eight
+# items on a 0-4 anchor range, and the package ships item means, so every mean
+# and SD below is the printed value divided by 8. Samples 1-3 are the manual's
+# Overall (N = 800), Female (n = 400) and Male (n = 400) norm groups -- three
+# groupings of one national standardization sample, not three recruitments.
+#
+# The normative means and standard deviations are reproduced under the credit
+# line the publisher's permission requires:
+#
+#   "Reproduction by special permission of the Publisher, Mind Garden, Inc.,
+#   www.mindgarden.com from the Inventory of Interpersonal Problems by Leonard
+#   M. Horowitz, Lynn E. Alden, Jerry S. Wiggins, & Aaron L. Pincus. Copyright
+#   © 2000 by Leonard M. Horowitz, Lynn E. Alden, Jerry S. Wiggins, & Aaron L.
+#   Pincus. Further Reproduction is prohibited without the Publisher's written
+#   consent."
+#
+# The permission covers the means and SDs only. Item TEXT is not licensed and is
+# not shipped; iip64_items is a pointer row. The item NUMBERS in Scales$Items
+# are the scoring key, which is permitted.
+
 iip64_scales <- data.frame(
   Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"),
   Angle = c(90, 135, 180, 225, 270, 315, 360, 45),
@@ -43,9 +69,9 @@ iip64_norms_src <- data.frame(
   Sample = c(1, 2, 3),
   Size = c(800, 400, 400),
   Population = c(
-    "American community adults, overall",
-    "American community adults, females",
-    "American community adults, males"
+    "American adults, national standardization sample, overall",
+    "American adults, national standardization sample, females",
+    "American adults, national standardization sample, males"
   ),
   Reference = "Horowitz, Alden, Wiggins, & Pincus (2003)",
   URL = "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"

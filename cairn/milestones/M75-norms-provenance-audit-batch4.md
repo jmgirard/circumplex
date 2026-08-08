@@ -99,7 +99,7 @@ well-named for users → the existing norms-fitness row.
 - [x] T2: add six `AUDIT_BATCH` rows to `data-raw/audit-norms.R:34-62`
       (iip32 samples 1–3 `divisor = 4`, iip64 samples 1–3 `divisor = 8`, one
       `scales = TRUE` per instrument); run and record ledger + coverage.
-- [ ] T3: record in `horowitz2003.md` where the IIP-32 descriptives actually
+- [x] T3: record in `horowitz2003.md` where the IIP-32 descriptives actually
       sit (Table F.5, p. 91) and what Appendix F's other tables are; correct in
       place the two `cairn/ROADMAP.md` claims the plan gate premised on their
       absence — the norms-audit row's 2000-edition open item and the T-score
@@ -108,11 +108,11 @@ well-named for users → the existing norms-fitness row.
 - [x] T4: add any Population/Angle/URL deviations to
       `data-raw/norms-audit-dispositions.csv`; re-run until no ledger row is
       `UNDISPOSITIONED`.
-- [ ] T5: update the six `Population` strings, resolve the citation year and
+- [x] T5: update the six `Population` strings, resolve the citation year and
       publisher across `R/instrument_data.R:113-141` and both `data-raw`
       files, add the divisor/provenance comments and the credit line, rebuild
       `data/`.
-- [ ] T6: add the credit-line and `Items`-placeholder tests; add both
+- [x] T6: add the credit-line and `Items`-placeholder tests; add both
       instruments to `audited_objects`
       (`tests/testthat/test-norms-provenance.R:31-317`) and move
       `norms-audit.md`'s status cells off `unaudited` in the same change, so
@@ -140,6 +140,9 @@ well-named for users → the existing norms-fitness row.
 
 - 2026-08-07: T2 + T4 done — six `AUDIT_BATCH` rows added (iip32 divisor 4, iip64 divisor 8, one `scales = TRUE` each). Ledger grows 166 → 194 rows: all 96 M/SD, both item maps, the six Sizes and the six Reference credits reconcile and produce no row; the 28 rows added are exactly the fields the manual publishes for neither instrument (Angle × 8, Population × 3, URL × 3 each), now dispositioned `not-published-in-source`. Coverage gaps 0, angle-copy splits 0, IP2 breaches 0, `UNDISPOSITIONED` 0. `devtools::test()` clean (0 failures, 6068 passing).
 - 2026-08-07: amendment gate — AC1 demanded the ledger carry no `iip64` row at all, which no instrument can satisfy, since every source leaves some audited field unpublished; measured here as 14 rows per instrument. AC1 and AC2 rewritten to demand no row for the fields the manual DOES publish (M, SD, Size, Reference, Items), the unpublished ones staying covered by AC4's disposition requirement.
+
+- 2026-08-07: T3, T5 and T6 land together — the pins depend on the rebuilt `data/`, and `norms-audit.md`'s status cells must move in the same change or the bidirectional binding test fails. T3's content had already landed with T1 (source note) and the amendment commit (ROADMAP corrections). Population strings rewritten to "American adults, national standardization sample, {overall,females,males}"; `@source` repointed to the 2003 3rd edition, Mind Garden; divisor/provenance comments and the credit line added to both `data-raw` scripts and both help pages; `data/` rebuilt; both instruments pinned in `audited_objects`.
+- 2026-08-07: the credit line's © tripped `test-rd-latex-safe.R`, which flags every non-ASCII character in `man/` after an M7 CRAN failure on Greek letters. Transliterating it would alter a permission condition, so the allowlist was extended instead — with evidence, not assumption: `tools::Rd2latex()` + `pdflatex` on both Rd files produces no "Unicode character … not set up" line and the glyph typesets (`pdftotext` cannot extract it, which is an extraction artifact). The guard comment records the check and requires the same evidence for any further addition.
 
 ## Decisions
 
