@@ -1,6 +1,6 @@
 # M75: Norms provenance audit, batch 4 (IIP family)
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** —
@@ -117,7 +117,7 @@ well-named for users → the existing norms-fitness row.
       (`tests/testthat/test-norms-provenance.R:31-317`) and move
       `norms-audit.md`'s status cells off `unaudited` in the same change, so
       the bidirectional binding test at `:399-435` stays green.
-- [ ] T7: NEWS.md entry; `devtools::document()`; `devtools::test()`;
+- [x] T7: NEWS.md entry; `devtools::document()`; `devtools::test()`;
       `devtools::check()`.
 
 ## Work log
@@ -143,6 +143,8 @@ well-named for users → the existing norms-fitness row.
 
 - 2026-08-07: T3, T5 and T6 land together — the pins depend on the rebuilt `data/`, and `norms-audit.md`'s status cells must move in the same change or the bidirectional binding test fails. T3's content had already landed with T1 (source note) and the amendment commit (ROADMAP corrections). Population strings rewritten to "American adults, national standardization sample, {overall,females,males}"; `@source` repointed to the 2003 3rd edition, Mind Garden; divisor/provenance comments and the credit line added to both `data-raw` scripts and both help pages; `data/` rebuilt; both instruments pinned in `audited_objects`.
 - 2026-08-07: the credit line's © tripped `test-rd-latex-safe.R`, which flags every non-ASCII character in `man/` after an M7 CRAN failure on Greek letters. Transliterating it would alter a permission condition, so the allowlist was extended instead — with evidence, not assumption: `tools::Rd2latex()` + `pdflatex` on both Rd files produces no "Unicode character … not set up" line and the glyph typesets (`pdftotext` cannot extract it, which is an extraction artifact). The guard comment records the check and requires the same evidence for any further addition.
+
+- 2026-08-07: T7 done — NEWS entries for the two instruments, the citation change and the Population rewrite; `devtools::document()` produces no further diff; `devtools::test()` clean (0 failures, 6094 passing); `devtools::check(args = "--no-manual")` clean (0 errors, 0 warnings, 0 notes). Status → review.
 
 ## Decisions
 

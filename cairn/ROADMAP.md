@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M72 | Norms provenance audit, batch 1 (CSI family + IITC) | done | — | high | milestones/archive/M72-norms-provenance-audit-batch1.md |
 | M73 | Norms provenance audit, batch 2 (single-sample instruments) | done | — | high | milestones/archive/M73-norms-provenance-audit-batch2.md |
 | M74 | Norms provenance audit, batch 3 (multi-sample instruments) | done | M73 | high | milestones/archive/M74-norms-provenance-audit-batch3.md |
-| M75 | Norms provenance audit, batch 4 (IIP family) | in-progress | — | high | milestones/M75-norms-provenance-audit-batch4.md |
+| M75 | Norms provenance audit, batch 4 (IIP family) | review | — | high | milestones/M75-norms-provenance-audit-batch4.md |
 
 ## Candidates
 
