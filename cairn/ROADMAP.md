@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-07 (audit green, nothing changed since M75 archived; both GitHub inboxes empty; M7 stays blocked on the `submit_cran()` handoff; 47 `work-log format` advisories are M7's wrapped multi-line entries, left as history)._
+_Last hygiene check: 2026-08-08 (M76 merged and archived, PR #104; RR16 ingested and archived, closing the norms-rename candidate on the merits as D-041; M77 unblocked to planned; one new candidate, the per-sample reference-kind field; M7 still blocked on the `submit_cran()` handoff; 47 `work-log format` advisories remain M7's wrapped entries, left as history)._
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,13 +9,12 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M71 | Refuse an infinite fitted diagonal in `axes_scaling_factor()` | done | — | normal | milestones/archive/M71-scaled-fit-infinite-diagonal.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M72 | Norms provenance audit, batch 1 (CSI family + IITC) | done | — | high | milestones/archive/M72-norms-provenance-audit-batch1.md |
 | M73 | Norms provenance audit, batch 2 (single-sample instruments) | done | — | high | milestones/archive/M73-norms-provenance-audit-batch2.md |
 | M74 | Norms provenance audit, batch 3 (multi-sample instruments) | done | M73 | high | milestones/archive/M74-norms-provenance-audit-batch3.md |
 | M75 | Norms provenance audit, batch 4 (IIP family) | done | — | high | milestones/archive/M75-norms-provenance-audit-batch4.md |
-| M76 | Disclose the reference sample at the standardizing call site | review | — | normal | milestones/M76-norms-call-site-disclosure.md |
+| M76 | Disclose the reference sample at the standardizing call site | done | — | normal | milestones/archive/M76-norms-call-site-disclosure.md |
 | M77 | Say precisely what the shipped reference statistics are | planned | M76 | normal | milestones/M77-norms-fitness-docs.md |
 
 ## Candidates
