@@ -284,7 +284,12 @@ refuses with "No normative data for sample NA. The IIP-SC carries samples 1, 2"
 on a multi-sample instrument and the ISC equivalent on a single-sample one;
 `document()` emits zero `resolve link` lines and the rendered `.Rd` carries
 "see the Value section below" with no `\verb{@return}`. `devtools::test()`:
-0 failures, 6550 passing. AC1 and AC4 re-ticked on this evidence.
+0 failures, 6550 passing (4 WARNs, all `test-ci_accuracy.R`'s, untouched).
+`devtools::check(args = "--no-manual")`: 0 errors, 0 warnings, 0 notes (14m 9s).
+`cairn_validate` exit 0. AC1, AC4 and AC7 re-ticked on this evidence; the
+remaining six criteria keep their round-1 evidence, none of it invalidated by
+the fixes (the diff touches the message's count, the `Sample` subset, three
+test assertions, and one roxygen line).
 
 **Return floor met — status back to `in-progress`.** F1 scores 90 on a defect
 in what the package does for its users, and F4 demonstrates AC4 failing inside
