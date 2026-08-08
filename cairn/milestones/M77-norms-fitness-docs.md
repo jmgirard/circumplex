@@ -77,12 +77,12 @@ this milestone cites it, it does not restate it.
 - [x] T1 Run the AC4 sweep and record every hit with a proposed disposition
       before editing anything, so the edit set is decided by the sweep rather
       than by recall.
-- [ ] T2 Rewrite the four passages at `vignettes/using-instruments.Rmd:122`,
+- [x] T2 Rewrite the four passages at `vignettes/using-instruments.Rmd:122`,
       `:124`, `:126`, `:132`. Where a synonym for "normative samples" is wanted,
       gloss them "reference samples"; avoid "comparison sample", which in the
       psychological literature connotes a study-internal control group (RR16 R4,
       B3, reaching `:122`'s own "normative or comparison sample").
-- [ ] T3 Add the characterization passage and its computing chunk; verify each
+- [x] T3 Add the characterization passage and its computing chunk; verify each
       printed figure against a separate run rather than against the chunk that
       produced it.
 - [ ] T4 Extend the `?norms` hedge at `R/instrument_oop.R:153-160`; run
@@ -102,6 +102,10 @@ this milestone cites it, it does not restate it.
 - 2026-08-08: RR16 ingested; unblocked, back to planned. No binding criterion constrains this file — BC1 and BC2 land in M76, BC3 routes to a new milestone — so the amendment here is T2's wording constraint (RR16 R4/B3) only, and the four passages, the characterization chunk and the AC4 sweep stand as planned. RR16 endorsed this milestone's docs-only scope explicitly (its Q3(e)), finding the docs-vs-API mismatch worry does not arise because the prose keeps the field's vocabulary and corrects only the claims. RB16/RR16 archived; ingest audit detail in M76's work log.
 - 2026-08-08: RR16 B1 (`norm_standardize()`'s roxygen promising "normative data (from the package or custom)" where the signature admits only a `circumplex_instrument`) went to M76 AC5/T7 rather than here — M76 already rewrites that help page, and this milestone's AC4 sweep pattern does not match the phrase.
 - 2026-08-08: T1 pre-edit AC4 sweep (the AC4 `grep -n -iE` command, run at 9e9fff31 + this branch's tracking commits) returns 23 matched lines; proposed dispositions — REWRITE 4: `using-instruments.Rmd:122` (definite-article "the normative average"), `:132` (size-resolves-it), `R/instrument_oop.R:153` and `:159` (the `?norms` hedge, AC3). CONFIRMED CORRECT AS WRITTEN 19, all naming an estimation-theoretic population or sampling error rather than a reference sample: `evaluating-circumplex-structure.Rmd:35,298`; `sem-based-ssm-analysis.Rmd:246,247`; `R/ssm_ci_oop.R:298`; `R/tidying_functions.R:310,328` (M76's own comments stating the ground this milestone documents); `R/axes_reliability.R:261,430,459`; `R/cpm_fit.R:405,1806`; `R/ssm_ci_accuracy.R:15,16,126,151,257,431,554`.
+- 2026-08-08: T2 + T3 land in one commit because the characterization passage sits between two of the four rewritten passages and the four read as one argument; `:122` now defines a reference sample as a described group and drops "the normative average" and "comparison sample", `:124` drops the nationality-matched claim (no shipped instrument carries one; the matched sets are gender and age) and subordinates size to fit, `:126` and `:132` resolve the IIP-SC choice on which group the participants resemble, and `:132` states the choice-vs-sampling-error comparison qualitatively rather than printing M74's figures, which the vignette could not cite to a non-shipped file.
+- 2026-08-08: T3's four figures verified against a second, independently written derivation (per-instrument `utils::data()` loop into fresh environments, rather than the chunk's `mget()` over the attached package env): 15 instruments, 24 samples, 11 college/undergraduate, 7 with `Size` < 300, 6 national standardization. The uncomputable claim — that most shipped samples are single-study convenience samples rather than samples drawn to represent a frame — is cited to `cairn/references/norms-audit.md` and stated in the vignette without a figure.
+- 2026-08-08: T4 extends the `?norms` hedge with the drawn-from-versus-drawn-to-represent distinction and a pointer to the vignette passage T3 adds; `options(cli.width = 500); devtools::document()` exits clean with zero `resolve link` lines and regenerates `man/norms.Rd` only.
+- 2026-08-08: honest checkpoint — T2/T3/T4 edits and the T6 NEWS entry are on the branch, but the profile's `devtools::test()` verify slot was still running when this commit was made (a second R test process on the box is competing with it), so no task is verified yet; the branch touches only roxygen comments, vignette prose and NEWS, with no runtime surface. T5 and T6's `check()` still outstanding.
 - 2026-08-08: implement question gate chose inline computed figures (a visible chunk assigns the counts, prose interpolates them) over a printed summary block or a 24-row table, and placed the characterization passage before the IIP-SC demo so the reader knows what the samples are before making the worked choice.
 
 ## Decisions

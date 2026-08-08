@@ -119,17 +119,39 @@ Because we set `append` to FALSE, the `scale_scores` data frame contains only th
 Note that the `na.rm` argument for the `score()` function defaulted to `TRUE`, which means that missing values were ignored in calculating the scale scores. This practice is common in the literature, but is technically a form of single imputation and thus can produce biased results when data are not missing completely at random (MCAR). Please examine and report the amount and patterns of missingness in your data.
 
 ### Standardizing scale-level data
-Finally, it can often be helpful to transform scale-level data through reference to a normative or comparison sample. This is often called "norm standardizing" and involves subtracting the normative sample's mean score on a scale from each participant's score on that scale and then dividing this difference by the normative sample's standard deviation. This rescales the scale scores to be in standard deviation units and to describe the magnitude of each participant's difference from the normative average.
+Finally, it can often be helpful to transform scale-level data through reference to a *reference sample*: a specific group of people, described in a published source, whose scores on the same instrument the package ships as a table of means and standard deviations. This is often called "norm standardizing" and involves subtracting the reference sample's mean score on a scale from each participant's score on that scale and then dividing this difference by the reference sample's standard deviation. This rescales the scale scores to be in standard deviation units and to describe the magnitude of each participant's difference from the average of that particular sample.
 
-For many circumplex instruments, the data needed to perform standardization is included in its instrument object. Some instruments even have multiple (e.g., different or overlapping) normative samples for comparisons that are matched in terms of gender, age, or nationality. In selecting a normative sample to compare to, it is important to consider both the size and the appropriateness of the sample.
+For many circumplex instruments, the data needed to perform standardization is included in its instrument object. Some instruments have more than one reference sample — for example, separate samples for men and women, or for children and adults. In selecting a reference sample, the first question to ask is which group your participants are most sensibly described relative to; the size of the sample is a secondary consideration.
 
-To demonstrate, let's examine the normative data sets available for the IIP-SC. Below we see that there are two options: a rather large sample of American college students and a rather small sample of American psychiatric outpatients.
+Before choosing, it is worth knowing what these reference samples generally are.
+
+```{r}
+inst <- Filter(
+  function(x) inherits(x, "circumplex_instrument"),
+  mget(
+    utils::data(package = "circumplex")$results[, "Item"],
+    envir = as.environment("package:circumplex"),
+    ifnotfound = list(NULL)
+  )
+)
+samples <- do.call(rbind, lapply(inst, function(x) x$Norms[[2]]))
+
+n_instruments <- length(inst)
+n_samples <- nrow(samples)
+n_college <- sum(grepl("college|undergraduate", samples$Population))
+n_small <- sum(samples$Size < 300)
+n_standardization <- sum(grepl("standardization", samples$Population))
+```
+
+The package ships `r n_samples` reference samples across `r n_instruments` instruments. `r n_college` of them describe college or undergraduate students, and `r n_small` have fewer than 300 participants. Most are the single study sample that was available to the researchers who published the instrument — people recruited at one institution, at one time — rather than a group assembled to represent any wider population. The exception is the IIP-32 and IIP-64, whose `r n_standardization` samples come from a national standardization study designed for exactly that purpose. A reference sample is therefore best read as a concrete, described group of people to compare against, and the `Population` column printed below names the group each sample was drawn from rather than a population the sample stands in for.
+
+To demonstrate, let's examine the reference samples available for the IIP-SC. Below we see two options: a sample of American college students and a sample of American psychiatric outpatients. They differ greatly in size, but what makes one or the other the right choice is which group your participants resemble.
 
 ```{r}
 norms(iipsc)
 ```
 
-Assuming our example data also come from a non-psychiatric community sample of mostly college students, the first normative sample seems like a better choice, especially since it is so much larger and therefore subject to less sampling error. However, there may be times when the second normative sample would be the more appropriate comparison, even despite its smaller sample.
+Assuming our example data also come from a non-psychiatric community sample of mostly college students, the first reference sample is the better choice — because it describes a similar group of people, not because it is larger. Which sample you choose matters a great deal more than how precisely that sample's mean and standard deviation are estimated: switching to a different reference sample typically shifts standardized scores by several times the uncertainty that even the smallest shipped sample contributes. If your participants were psychiatric outpatients, the second sample would be the appropriate reference despite its size.
 
 To transform the scale scores we calculated during the last section, we can call the `norm_standardize()` function and give it the `scale_scores` object we created above. We will save the output of this function to a data frame named `z_scales` to reflect the idea that standardized scores are often called "z-scores."
 
