@@ -1,6 +1,6 @@
 # M77: Say precisely what the shipped reference statistics are
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M76
 - **Driving RR:** —
