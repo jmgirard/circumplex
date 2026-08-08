@@ -37,17 +37,19 @@ test_that("norm_standardize works", {
     matrix(runif(8 * 5, min = 0, max = 4), nrow = 5, ncol = 8)
   )
   new <- norm_standardize(
-    old, 
-    scales = 1:8, 
-    instrument = iipsc, 
-    sample = 1
-  )
-  new2 <- norm_standardize(
-    old, 
+    old,
     scales = 1:8,
     instrument = iipsc,
     sample = 1,
-    append = FALSE
+    quiet = TRUE
+  )
+  new2 <- norm_standardize(
+    old,
+    scales = 1:8,
+    instrument = iipsc,
+    sample = 1,
+    append = FALSE,
+    quiet = TRUE
   )
   expect_equal(round(new$X1_z, 4), c(3.2176, 4.1562, 3.4605, 4.2189, 1.6150))
   expect_equal(round(new$X2_z, 4), c(-0.1841, 0.7361, 1.8035, 3.07, 4.5891))
@@ -190,7 +192,7 @@ test_that("norm_standardize runs on every shipped instrument and sample", {
       standardize_it <- function() {
         norm_standardize(probe, scales = names(probe),
                          angles = obj$Scales$Angle, instrument = obj,
-                         sample = s, append = FALSE)
+                         sample = s, append = FALSE, quiet = TRUE)
       }
       if (in_range) {
         expect_no_error(standardize_it())
@@ -208,7 +210,7 @@ test_that("norm_standardize runs on every shipped instrument and sample", {
   names(probe) <- iei$Scales$Abbrev
   z1 <- norm_standardize(probe, scales = names(probe),
                          angles = iei$Scales$Angle, instrument = iei,
-                         sample = 1, append = FALSE)
+                         sample = 1, append = FALSE, quiet = TRUE)
   expect_equal(z1$PA_z[[1]], 0)
   expect_equal(z1$BC_z[[1]], (2 - 1.21) / 0.61)
 })

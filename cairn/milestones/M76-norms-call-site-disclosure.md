@@ -1,11 +1,11 @@
 # M76: Disclose the reference sample at the standardizing call site
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR16
 - **Principles touched:** GP2, GP4
-- **Branch/PR:** —
+- **Branch/PR:** `m76-norms-call-site-disclosure`
 
 ## Goal
 
@@ -119,20 +119,20 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 
 ## Tasks
 
-- [ ] T1 Re-fence the existing call sites that will stop being silent:
+- [x] T1 Re-fence the existing call sites that will stop being silent:
       `tests/testthat/test-norms-anchor-range.R`'s `expect_silent` case and the
       explicit-`sample` calls in `tests/testthat/test-tidying_functions.R:43,49,191`.
       Decide per site whether it passes `quiet = TRUE` or asserts the message.
-- [ ] T2 Test-first for AC1 and AC8: both message forms over the partitioned
+- [x] T2 Test-first for AC1 and AC8: both message forms over the partitioned
       roster, the verbatim-`Population` assertion over all 24 (instrument,
       sample) pairs, the fixed-text token absence via a sentinel-`Population`
       fixture, `quiet = TRUE` silence, and the row-order-vs-`Sample` fixture.
-- [ ] T3 Implement `quiet` and the message in `R/tidying_functions.R`, keying
+- [x] T3 Implement `quiet` and the message in `R/tidying_functions.R`, keying
       the `Size`/`Population` read on `Sample`. Use base `message()`, the
       package's established idiom (`R/ssm_analysis.R:350`); cli is not an Import.
       The fixed text frames the stored value as a description and uses neither
       "population" nor "representative" (AC8).
-- [ ] T4 Test-first, then implement, the returned attribute on both `append`
+- [x] T4 Test-first, then implement, the returned attribute on both `append`
       branches.
 - [ ] T5 Test-first, then fix, the `Abbrev`/`Scale` column assumption at
       `R/tidying_functions.R:197`.
@@ -154,6 +154,8 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 - 2026-08-08: RB16 opened on the norms vocabulary rename. M76 stays planned and workable — its `quiet`/message/attribute scope is independent of what the vocabulary is called — but an RR16 verdict renaming `norm_standardize()` would amend this file through the /milestone-implement step-6 gate.
 - 2026-08-08: RR16 ingested. Verdict is no rename, so nothing in this file's existing scope changes; the amendment adds AC8 (BC2, the message's wording), AC9 (BC1 as a regression pin), RR16 B1's "or custom" fix to AC5, and T9. BC3 is routed out to a new milestone. Three departures recorded in the Deviations table above.
 - 2026-08-08: ingest audit ([O], fresh context) over the RR16 criteria returned six findings — BC1 vacuous as an AC and naming a procedure that creates no objects to filter, BC2 quantifying over 24 samples while naming a 15-instrument procedure and carving out a tolerance its own procedure would fail, BC3 mandating work both milestones' Scope excludes, the R3-vs-BC3 gap leaving the attribute without the kind, and no milestone owning IP5's `data-raw/` derivation record. All six were determinate; BC3's own falsifier F2 does not fire (2 of 24 hard to place, under its threshold of 4), and every BC3 count verified against the shipped tree. Routing settled at the ingest gate.
+- 2026-08-08: T2/T3/T1/T4 done in one checkpoint, T1 following T3 rather than leading it — the re-fencing adds `quiet = TRUE` at call sites, which cannot pass until the argument exists. Tests written red first (10 failures, all "unused argument (quiet = TRUE)" or no message emitted), then green. Two sites beyond T1's named three were re-fenced in the same pass: `test-norms-anchor-range.R`'s two `out <- norm_standardize(...)` calls, the same class as the `expect_silent` case T1 named.
+- 2026-08-08: implementation choices settled at the pre-implementation gate — message form "Standardized against IIP-SC normative sample 1: N = 872, American college students." plus, on a multi-sample instrument, "1 other sample is available; see norms()."; and one list attribute `"norm_sample"` over four flat ones. The gate showed `see norms(iipsc)`; the shipped text says `see norms()` because `$Details` carries no lowercase object name to interpolate, and the existing anchor-range refusal already points at bare `norms()`.
 - 2026-08-08: this file now carries 9 acceptance criteria, over the ~7 split tripwire. Not split: AC8 constrains AC1's message text and AC9 is a one-file test pin, so both land inside the same reviewable PR rather than forming an independent slice.
 
 ## Decisions

@@ -162,9 +162,10 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #' @examples
 #' data("jz2017")
 #' norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
-norm_standardize <- function(data, scales, angles = octants(), instrument, 
-                       sample = 1, prefix = "", suffix = "_z", append = TRUE) {
-  
+norm_standardize <- function(data, scales, angles = octants(), instrument,
+                       sample = 1, prefix = "", suffix = "_z", append = TRUE,
+                       quiet = FALSE) {
+
   stopifnot(is.data.frame(data) || is.matrix(data))
   stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
@@ -174,6 +175,7 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
   stopifnot(is_char(prefix, n = 1))
   stopifnot(is_char(suffix, n = 1))
   stopifnot(is_flag(append))
+  stopifnot(is_flag(quiet))
 
   if (is.matrix(data)) data <- as.data.frame(data)
   key <- instrument$Norms[[1]]
@@ -237,12 +239,48 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
     scores[, i] <- (scale_data[[i]] - m_i) / s_i
   }
   scores[is.nan(scores)] <- NA_real_
-  
-  if (append) {
+
+  # Which sample the scores are relative to is a result-determining input --
+  # the choice moves scores far more than the sampling error of any one
+  # sample's moments -- so it is disclosed at the call site rather than left
+  # in an argument the caller may have defaulted. The read is keyed on Sample
+  # rather than taken by row position: nothing requires Norms[[2]] to be
+  # stored in Sample order, and a positional read would silently report a
+  # different sample's size and description than the one used.
+  info <- instrument$Norms[[2]]
+  info <- info[info$Sample == sample, ]
+  disclosure <- list(
+    Instrument = instrument$Details$Abbrev,
+    Sample = sample,
+    Size = info$Size[[1]],
+    Population = info$Population[[1]]
+  )
+
+  if (!quiet) {
+    # The stored label names the group the sample was drawn from, so it is
+    # printed as a plain description; framing it as a population would make
+    # the package assert a representativeness none of these samples claims.
+    n_other <- nrow(instrument$Norms[[2]]) - 1L
+    msg <- paste0(
+      "Standardized against ", disclosure$Instrument, " normative sample ",
+      sample, ": N = ", disclosure$Size, ", ", disclosure$Population, "."
+    )
+    if (n_other > 0) {
+      msg <- paste0(
+        msg, " ", n_other, " other sample", if (n_other > 1L) "s are" else " is",
+        " available; see norms()."
+      )
+    }
+    message(msg)
+  }
+
+  out <- if (append) {
     cbind(data, scores)
   } else {
-    as.data.frame(scores) 
+    as.data.frame(scores)
   }
+  attr(out, "norm_sample") <- disclosure
+  out
 }
 
 #' Standardize circumplex scales using sample data

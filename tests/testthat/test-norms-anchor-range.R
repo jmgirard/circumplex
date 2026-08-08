@@ -81,7 +81,7 @@ test_that("norm_standardize() still standardizes an in-range sample of the same 
   data("jz2017")
   out <- norm_standardize(
     jz2017,
-    scales = 2:9, instrument = cais, sample = 1, append = FALSE
+    scales = 2:9, instrument = cais, sample = 1, append = FALSE, quiet = TRUE
   )
   expect_s3_class(out, "data.frame")
   expect_identical(ncol(out), 8L)
@@ -90,12 +90,18 @@ test_that("norm_standardize() still standardizes an in-range sample of the same 
 
 test_that("the refusal does not disturb instruments with no violation", {
   data("jz2017")
+  # quiet = TRUE because every successful call now discloses its sample; what
+  # this case asserts is that no *refusal* disturbs a non-violating
+  # instrument, and the disclosure message would mask that with noise of its
+  # own. The message itself is fenced in test-norms-disclosure.R.
   expect_silent(
-    norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 2)
+    norm_standardize(
+      jz2017, scales = 2:9, instrument = iipsc, sample = 2, quiet = TRUE
+    )
   )
   out <- norm_standardize(
     jz2017,
-    scales = 2:9, instrument = iipsc, sample = 2, append = FALSE
+    scales = 2:9, instrument = iipsc, sample = 2, append = FALSE, quiet = TRUE
   )
   expect_identical(ncol(out), 8L)
 })
