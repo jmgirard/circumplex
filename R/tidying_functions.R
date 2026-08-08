@@ -121,12 +121,37 @@ score <- function(data, items, instrument, na.rm = TRUE,
   }
 }
 
+# Would norm_standardize() accept this sample of this instrument? Shares the
+# anchor-range predicate with the refusal below rather than restating it, so
+# the disclosure's count of usable alternatives cannot drift from what the
+# refusal actually does.
+norm_sample_usable <- function(instrument, sample) {
+  key <- instrument$Norms[[1]]
+  key <- key[which(key$Sample == sample), ]
+  if (nrow(key) == 0) return(FALSE)
+  anchors <- instrument$Anchors
+  if (is.null(anchors)) return(TRUE)
+  all(
+    key$M >= min(anchors$Value) & key$M <= max(anchors$Value),
+    na.rm = TRUE
+  )
+}
+
 #' Standardize circumplex scales using normative data
 #'
 #' Take in a data frame containing circumplex scales, angle definitions for each
-#' scale, and normative data (from the package or custom) and return that same
-#' data frame with each specified circumplex scale transformed into standard
-#' scores (i.e., z-scores) based on comparison to the normative data.
+#' scale, and an instrument whose normative data will be used, and return that
+#' same data frame with each specified circumplex scale transformed into
+#' standard scores (i.e., z-scores) based on comparison to that instrument's
+#' normative sample.
+#'
+#' The sample the scores are compared against is a result-determining choice,
+#' not a technicality: different samples of the same instrument can move a
+#' respondent's z-scores by more than half a standard deviation. So unless
+#' `quiet = TRUE`, every successful call reports which sample it used, how
+#' large that sample was, and how it is described, and every call attaches the
+#' same facts to the result (see the Value section below). Use `norms()` to see
+#' the samples an instrument carries before choosing one.
 #'
 #' @param data Required. A data frame or matrix containing at least circumplex
 #'   scales.
@@ -143,10 +168,12 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #'   available circumplex instruments, see `instruments()`.
 #' @param sample Required. An integer corresponding to the normative sample to
 #'   use in standardizing the scale scores (default = 1). See `?norms` to
-#'   see the normative samples available for an instrument. A sample whose
-#'   mean scores fall outside the instrument's own response range cannot be on
-#'   the same metric as the scores being standardized, and is refused with an
-#'   error rather than used; `norms()` lists the alternatives.
+#'   see the normative samples available for an instrument. Two conditions are
+#'   refused with an error rather than used: a `sample` the instrument does not
+#'   carry (the error lists the sample numbers it does), and a sample whose
+#'   mean scores fall outside the instrument's own response range, which cannot
+#'   be on the same metric as the scores being standardized. `norms()` lists
+#'   the alternatives in both cases.
 #' @param prefix Optional. A string to include at the beginning of the newly
 #'   calculated scale variables' names, before the scale name and `suffix`
 #'   (default = "").
@@ -156,15 +183,30 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #' @param append Optional. A logical that determines whether the calculated
 #'   standardized scores should be added as columns to `data` in the output or
 #'   the standardized scores alone should be output (default = TRUE).
-#' @return A data frame that contains the norm-standardized versions of `scales`.
+#' @param quiet Optional. A logical that suppresses the message naming the
+#'   normative sample used (default = FALSE). Set to `TRUE` in loops, knitted
+#'   documents, and anywhere else the message is noise; the returned attribute
+#'   below records the same facts either way.
+#' @return A data frame that contains the norm-standardized versions of
+#'   `scales`. It carries a `"norm_sample"` attribute -- a list with elements
+#'   `Instrument`, `Sample`, `Size` and `Population` -- recording which
+#'   normative sample produced the scores, so a script that never sees the
+#'   console can still report what its z-scores are relative to. Retrieve it
+#'   with `attr(x, "norm_sample")`.
 #' @export
 #' @family tidying functions
 #' @examples
 #' data("jz2017")
 #' norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
-norm_standardize <- function(data, scales, angles = octants(), instrument, 
-                       sample = 1, prefix = "", suffix = "_z", append = TRUE) {
-  
+#'
+#' # The IIP-SC carries more than one normative sample. Omitting `sample` takes
+#' # the first, and the message says which one that was.
+#' z <- norm_standardize(jz2017, scales = 2:9, instrument = iipsc)
+#' attr(z, "norm_sample")
+norm_standardize <- function(data, scales, angles = octants(), instrument,
+                       sample = 1, prefix = "", suffix = "_z", append = TRUE,
+                       quiet = FALSE) {
+
   stopifnot(is.data.frame(data) || is.matrix(data))
   stopifnot(is_var(scales))
   stopifnot(is.numeric(angles))
@@ -174,10 +216,32 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
   stopifnot(is_char(prefix, n = 1))
   stopifnot(is_char(suffix, n = 1))
   stopifnot(is_flag(append))
+  stopifnot(is_flag(quiet))
 
   if (is.matrix(data)) data <- as.data.frame(data)
   key <- instrument$Norms[[1]]
-  key <- key[key$Sample == sample, ]
+  # which() rather than a bare logical index: `key$Sample == NA` is NA rather
+  # than FALSE, and indexing a data frame by NA returns a row of NAs instead of
+  # no rows -- so an NA `sample` (or an NA in the column) would survive the
+  # zero-row guard below and fail later, somewhere that names neither the
+  # argument nor the mistake. which() drops NAs from either side.
+  key <- key[which(key$Sample == sample), ]
+
+  # An unmatched `sample` used to fall through to the arity check below, whose
+  # message names neither the argument at fault nor what would have been
+  # valid -- so the one mistake the argument invites was reported as a
+  # mismatch between `scales` and the norms.
+  if (nrow(key) == 0) {
+    available <- sort(unique(instrument$Norms[[1]]$Sample))
+    stop(
+      "No normative data for sample ", sample, ". The ",
+      instrument$Details$Abbrev, " carries sample",
+      if (length(available) > 1) "s " else " ",
+      paste(available, collapse = ", "),
+      "; see norms() for what each one is.",
+      call. = FALSE
+    )
+  }
 
   stopifnot(length(scales) == nrow(key))
 
@@ -191,10 +255,14 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
     hi <- max(anchors$Value)
     outside <- which(key$M < lo | key$M > hi)
     if (length(outside) > 0) {
+      # The norms label their scale column `Scale` on some instruments and
+      # `Abbrev` on others; reading `Scale` unconditionally printed a bare NA
+      # for the seven that use the other name.
+      labels <- if ("Scale" %in% names(key)) key$Scale else key$Abbrev
       stop(
         "The ", instrument$Details$Abbrev, " normative sample ", sample,
         " cannot be used for standardization. Its mean score for ",
-        paste(key$Scale[outside], collapse = ", "),
+        paste(labels[outside], collapse = ", "),
         " falls outside the instrument's ", lo, " to ", hi,
         " response range, so this sample is not on the same metric as the ",
         "scores being standardized. Use norms() to see the other samples ",
@@ -237,12 +305,57 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
     scores[, i] <- (scale_data[[i]] - m_i) / s_i
   }
   scores[is.nan(scores)] <- NA_real_
-  
-  if (append) {
+
+  # Which sample the scores are relative to is a result-determining input --
+  # the choice moves scores far more than the sampling error of any one
+  # sample's moments -- so it is disclosed at the call site rather than left
+  # in an argument the caller may have defaulted. The read is keyed on Sample
+  # rather than taken by row position: nothing requires Norms[[2]] to be
+  # stored in Sample order, and a positional read would silently report a
+  # different sample's size and description than the one used.
+  info <- instrument$Norms[[2]]
+  info <- info[info$Sample == sample, ]
+  disclosure <- list(
+    Instrument = instrument$Details$Abbrev,
+    Sample = sample,
+    Size = info$Size[[1]],
+    Population = info$Population[[1]]
+  )
+
+  if (!quiet) {
+    # The stored label names the group the sample was drawn from, so it is
+    # printed as a plain description; framing it as a population would make
+    # the package assert a representativeness none of these samples claims.
+    #
+    # The count offers the reader an alternative they can act on, so it counts
+    # only samples this function would accept -- not rows of Norms[[2]]. A
+    # sample whose means leave the response range is refused, and advertising
+    # it would point at a call that errors.
+    n_other <- sum(vapply(
+      setdiff(instrument$Norms[[2]]$Sample, sample),
+      function(other) norm_sample_usable(instrument, other),
+      logical(1)
+    ))
+    msg <- paste0(
+      "Standardized against ", disclosure$Instrument, " normative sample ",
+      sample, ": N = ", disclosure$Size, ", ", disclosure$Population, "."
+    )
+    if (n_other > 0) {
+      msg <- paste0(
+        msg, " ", n_other, " other sample", if (n_other > 1L) "s are" else " is",
+        " available; see norms()."
+      )
+    }
+    message(msg)
+  }
+
+  out <- if (append) {
     cbind(data, scores)
   } else {
-    as.data.frame(scores) 
+    as.data.frame(scores)
   }
+  attr(out, "norm_sample") <- disclosure
+  out
 }
 
 #' Standardize circumplex scales using sample data

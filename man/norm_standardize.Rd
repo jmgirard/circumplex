@@ -12,7 +12,8 @@ norm_standardize(
   sample = 1,
   prefix = "",
   suffix = "_z",
-  append = TRUE
+  append = TRUE,
+  quiet = FALSE
 )
 }
 \arguments{
@@ -35,10 +36,12 @@ available circumplex instruments, see \code{instruments()}.}
 
 \item{sample}{Required. An integer corresponding to the normative sample to
 use in standardizing the scale scores (default = 1). See \code{?norms} to
-see the normative samples available for an instrument. A sample whose
-mean scores fall outside the instrument's own response range cannot be on
-the same metric as the scores being standardized, and is refused with an
-error rather than used; \code{norms()} lists the alternatives.}
+see the normative samples available for an instrument. Two conditions are
+refused with an error rather than used: a \code{sample} the instrument does not
+carry (the error lists the sample numbers it does), and a sample whose
+mean scores fall outside the instrument's own response range, which cannot
+be on the same metric as the scores being standardized. \code{norms()} lists
+the alternatives in both cases.}
 
 \item{prefix}{Optional. A string to include at the beginning of the newly
 calculated scale variables' names, before the scale name and \code{suffix}
@@ -51,19 +54,44 @@ calculated scale variables' names, after the scale name and \code{prefix}
 \item{append}{Optional. A logical that determines whether the calculated
 standardized scores should be added as columns to \code{data} in the output or
 the standardized scores alone should be output (default = TRUE).}
+
+\item{quiet}{Optional. A logical that suppresses the message naming the
+normative sample used (default = FALSE). Set to \code{TRUE} in loops, knitted
+documents, and anywhere else the message is noise; the returned attribute
+below records the same facts either way.}
 }
 \value{
-A data frame that contains the norm-standardized versions of \code{scales}.
+A data frame that contains the norm-standardized versions of
+\code{scales}. It carries a \code{"norm_sample"} attribute -- a list with elements
+\code{Instrument}, \code{Sample}, \code{Size} and \code{Population} -- recording which
+normative sample produced the scores, so a script that never sees the
+console can still report what its z-scores are relative to. Retrieve it
+with \code{attr(x, "norm_sample")}.
 }
 \description{
 Take in a data frame containing circumplex scales, angle definitions for each
-scale, and normative data (from the package or custom) and return that same
-data frame with each specified circumplex scale transformed into standard
-scores (i.e., z-scores) based on comparison to the normative data.
+scale, and an instrument whose normative data will be used, and return that
+same data frame with each specified circumplex scale transformed into
+standard scores (i.e., z-scores) based on comparison to that instrument's
+normative sample.
+}
+\details{
+The sample the scores are compared against is a result-determining choice,
+not a technicality: different samples of the same instrument can move a
+respondent's z-scores by more than half a standard deviation. So unless
+\code{quiet = TRUE}, every successful call reports which sample it used, how
+large that sample was, and how it is described, and every call attaches the
+same facts to the result (see the Value section below). Use \code{norms()} to see
+the samples an instrument carries before choosing one.
 }
 \examples{
 data("jz2017")
 norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
+
+# The IIP-SC carries more than one normative sample. Omitting `sample` takes
+# the first, and the message says which one that was.
+z <- norm_standardize(jz2017, scales = 2:9, instrument = iipsc)
+attr(z, "norm_sample")
 }
 \seealso{
 Other tidying functions:
