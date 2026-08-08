@@ -1,6 +1,6 @@
 # M76: Disclose the reference sample at the standardizing call site
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR16
@@ -141,8 +141,8 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 - [x] T7 Roxygen for `quiet`, `@return`, the message and both refusals; add the
       default-sample example; resolve the "or custom" claim at
       `R/tidying_functions.R:127`; run `document()`.
-- [ ] T8 NEWS entries; full `test()` and `check()`.
-- [ ] T9 The AC9 regression pin on the two exports and the `Population` column.
+- [x] T8 NEWS entries; full `test()` and `check()`.
+- [x] T9 The AC9 regression pin on the two exports and the `Population` column.
 
 ## Work log
 
@@ -164,6 +164,8 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 - 2026-08-08: AC6 entry-to-test mapping. "reports which normative sample it used" + `quiet` → test-norms-disclosure.R "a single-sample instrument's message names the sample, size and description", "a multi-sample instrument's message says how many other samples exist", "quiet = TRUE emits nothing". "norm_sample attribute" → "both return paths carry the norm_sample attribute" and "the attribute is present whether or not the message was emitted". "names the offending scales for every instrument" → test-norms-anchor-range.R "the refusal names the offending scales on an Abbrev-labelled instrument". "a normative sample an instrument does not carry" → test-norms-disclosure.R "a sample the instrument does not carry is refused by name", with the retained arity check fenced by "the scales-vs-norms arity check is retained and still fires".
 - 2026-08-08: the NEWS entry's first draft said the reference choice moves scores "half a standard deviation on average"; M74 measured 0.44, so the entry now reads "roughly half ... and by nearly twice that at the extreme" (0.78). Corrected before the entry was committed.
 - 2026-08-08: full `devtools::test()` clean — 0 failures, 6537 passing. The 4 warnings are all in `test-ci_accuracy.R`, which this branch does not touch.
+
+- 2026-08-08: T8 and T9 done. `devtools::check(args = "--no-manual")` clean — 0 errors, 0 warnings, 0 notes, vignettes rebuilt (13m 33s). T9's pin was written with the AC1/AC2 tests in the same file rather than as a separate late task; it asserts both exports and the `Population` column over the shipped enumeration. All tasks complete; status → review.
 
 ## Decisions
 
