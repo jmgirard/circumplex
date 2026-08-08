@@ -20,3 +20,12 @@ shipped_instrument <- function(nm) {
   utils::data(list = nm, package = "circumplex", envir = e)
   get(nm, envir = e)
 }
+
+# The probe is deliberately shaped from the instrument itself rather than
+# hand-written, so the sweeps over it cover every shipped instrument whatever
+# its scale count or naming.
+disclosure_probe <- function(obj) {
+  probe <- as.data.frame(matrix(2, nrow = 2, ncol = nrow(obj$Scales)))
+  names(probe) <- obj$Scales$Abbrev
+  probe
+}

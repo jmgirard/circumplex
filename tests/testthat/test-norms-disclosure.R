@@ -9,14 +9,8 @@
 # tests fence the disclosure: a message at the call site, and an attribute on
 # the returned frame for scripts that never see the console.
 
-# The probe is deliberately shaped from the instrument itself rather than
-# hand-written, so the sweeps below cover every shipped instrument whatever its
-# scale count or naming.
-disclosure_probe <- function(obj) {
-  probe <- as.data.frame(matrix(2, nrow = 2, ncol = nrow(obj$Scales)))
-  names(probe) <- obj$Scales$Abbrev
-  probe
-}
+# disclosure_probe() moved to helper-norms.R at M78, so the kind sweeps in
+# test-norms-kind.R build their probes the same way rather than a second way.
 
 # Samples whose means leave the instrument's response range are refused before
 # any message is emitted (D-040), so the disclosure sweeps skip them rather

@@ -151,3 +151,67 @@ test_that("norms() prints each sample's kind, and no other sample's", {
     }
   }
 })
+
+# The pairs norm_standardize() will actually accept. Built from the anchor-range
+# predicate rather than hand-listed, so the one shipped refusal (cais sample 2,
+# D-040) is excluded by the rule that refuses it and a future refusal is
+# excluded by the same rule rather than by an edit here.
+accepted_pairs <- function() {
+  rows <- lapply(shipped_instruments(), function(nm) {
+    obj <- shipped_instrument(nm)
+    keep <- Filter(function(s) {
+      key <- obj$Norms[[1]]
+      m <- key$M[key$Sample == s]
+      all(m >= min(obj$Anchors$Value) & m <= max(obj$Anchors$Value), na.rm = TRUE)
+    }, obj$Norms[[2]]$Sample)
+    if (!length(keep)) return(NULL)
+    data.frame(instrument = nm, sample = unlist(keep), stringsAsFactors = FALSE)
+  })
+  do.call(rbind, Filter(Negate(is.null), rows))
+}
+
+test_that("every accepted call discloses its sample's kind, in message and attribute", {
+  pairs <- accepted_pairs()
+  expected <- expected_kinds[
+    pair_key(expected_kinds$instrument, expected_kinds$sample) %in%
+      pair_key(pairs$instrument, pairs$sample),
+  ]
+
+  # Exhaustiveness, before the loop: iterating the expectation map alone would
+  # pass while skipping an accepted pair the map does not name.
+  expect_setequal(
+    pair_key(expected$instrument, expected$sample),
+    pair_key(pairs$instrument, pairs$sample)
+  )
+  # And the one pair the predicate excludes is excluded for D-040's reason,
+  # not by an empty predicate that would vacuously satisfy the setequal above.
+  expect_false("cais:2" %in% pair_key(pairs$instrument, pairs$sample))
+
+  for (i in seq_len(nrow(expected))) {
+    obj <- shipped_instrument(expected$instrument[[i]])
+    smp <- expected$sample[[i]]
+    label <- paste0(expected$instrument[[i]], " sample ", smp)
+    phrase <- KIND_PHRASES[[expected$kind[[i]]]]
+
+    probe <- disclosure_probe(obj)
+    msg <- capture_messages(
+      norm_standardize(
+        probe, scales = names(probe), angles = obj$Scales$Angle,
+        instrument = obj, sample = smp, append = FALSE
+      )
+    )
+    expect_match(
+      msg[[1]], paste0("Reference kind: ", phrase), fixed = TRUE, info = label
+    )
+
+    # The attribute is asserted on a quiet call: it must carry the kind whether
+    # or not the message was emitted, which is the whole point of it existing.
+    out <- norm_standardize(
+      probe, scales = names(probe), angles = obj$Scales$Angle,
+      instrument = obj, sample = smp, append = FALSE, quiet = TRUE
+    )
+    expect_identical(
+      attr(out, "norm_sample")$Kind, expected$kind[[i]], info = label
+    )
+  }
+})
