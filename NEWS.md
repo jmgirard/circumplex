@@ -732,6 +732,22 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
 
 ## Documentation
 
+* The "Using Circumplex Instruments" vignette and `?norms` now say precisely
+  what the bundled normative statistics are, instead of implying that a
+  normative sample stands in for a population. The standardizing section
+  characterizes the shipped samples from the instrument objects themselves —
+  the counts are computed in the vignette rather than written down — noting
+  that many are single-study samples of college students, that the IIP-32 and
+  IIP-64 national standardization samples are the exception at one end, and
+  that two of the tables are published in no identified source at the other.
+  It drops a claim
+  that some instruments offer samples matched on nationality (none do; the
+  matched sets are by gender and by age), and it resolves the choice between
+  samples on which group your participants resemble rather than on which
+  sample is larger. `?norms` now adds that the `Population` label names the
+  group a sample was drawn from rather than a population it was drawn to
+  represent, and points at the vignette.
+
 * New vignette, "Evaluating Circumplex Structure": how to test whether an
   instrument fits a circumplex in your sample with `cpm_fit()` (reading and
   benchmarking the fit indices, comparing the constrained model variants,
