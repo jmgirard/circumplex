@@ -1,6 +1,6 @@
 # M77: Say precisely what the shipped reference statistics are
 
-- **Status:** planned
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** M76
 - **Driving RR:** —
@@ -93,6 +93,7 @@ this milestone cites it, it does not restate it.
 - 2026-08-08: created by /milestone-plan.
 - 2026-08-08: criteria audit ([O], fresh context) covered this file's criteria in the same pass as M76's; of the 10 findings, 4 were M77's — the `:126` omission, the uncomputable college-student count, the compute-it rule exempting the unquantified convenience-sample claim, and a false characterization of what `?norms` already says. All 4 fixed before the gate.
 - 2026-08-08: plan gate chose to fix the prose and leave every identifier alone over renaming the docs' vocabulary away from "norms"; renaming the prose alone puts the docs and the API out of step for readers, and the identifiers are not the claim. Falsified by evidence that readers take the word itself, rather than the surrounding prose, as the representativeness claim.
+- 2026-08-08: blocked on RB16 (norms vocabulary rename). The maintainer raised the irreversible-api tripwire immediately after planning: GP4 binds API stability only after v2.0.0, which D-040 already relied on, so the cost-of-change ground the gate decided on is at its weakest now and expensive later. The gate's keep-the-names choice is provisional pending RR16.
 
 ## Decisions
 

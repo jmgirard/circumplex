@@ -109,6 +109,8 @@ at this plan gate, ROADMAP candidate row. A `getOption()` global mute beside
 - 2026-08-08: plan gate chose an always-on message with a `quiet` escape over messaging only when the caller omitted `sample`; the narrower form fires exactly where the hazard is but leaves a deliberate chooser with no record, and the user asked for the broader form with a mute. Falsified by any report that the message is noise in loops or knitted documents that `quiet` does not answer.
 - 2026-08-08: plan gate chose to leave every `norm*` identifier and the `Population` column alone over renaming them; the identifiers are not themselves claims, and a rename breaks stored data structures and user code for a defect that lives in prose. Falsified by evidence that users read the column name itself as the representativeness claim.
 
+- 2026-08-08: RB16 opened on the norms vocabulary rename. M76 stays planned and workable — its `quiet`/message/attribute scope is independent of what the vocabulary is called — but an RR16 verdict renaming `norm_standardize()` would amend this file through the /milestone-implement step-6 gate.
+
 ## Decisions
 
 ## Review
