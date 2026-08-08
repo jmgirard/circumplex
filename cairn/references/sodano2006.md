@@ -51,6 +51,65 @@ table's other columns carry the estimates). Those targets are recorded below as
 published values. LM's target is printed as 0, which the package ships as 360
 under IP2; the audit compares angles modulo 360, so the two agree.
 
+**On the adult sample's M and SD — the source is internally inconsistent, and
+the shipped sample-2 values are probably the IAS's** (found 2026-08-08 while
+planning the norms-fitness work; the transcription below is unaffected and is
+not changed by this note). Three of the eight adult means Table 4 prints under
+its CAIS columns — PA 5.19, LM 6.52, NO 6.14 — lie outside the CAIS's own 1–5
+response range, which `cais$Anchors` ships. The article states the 5-point
+format for the CAIS twice, and the second statement is not confined to the
+child pilot: p. 320 (right column), describing the instrument itself, reads
+"Items were rated on the 5-point scale just mentioned". The validity screen
+that produced both the 213 child and 194 adult counts is likewise phrased in
+5-point anchor labels ("a lot", "never", "always"). So nothing in the article
+licenses reading the adult administration as a wider scale, and the printed
+CAIS means cannot be right as labelled.
+
+Three checks agree on what happened: **Table 4's M and SD rows appear to be
+transposed between the CAIS and the IAS column blocks.**
+
+| check | printed under CAIS | printed under IAS |
+|---|---|---|
+| M fits the CAIS's 1–5 range | no (max 6.52) | yes (max 4.16) |
+| slope regressed on the child CAIS profile (Table 2) | 1.78 | 1.12 |
+| mean SD as a fraction of scale width | 0.249 | 0.077 |
+| …the same, with the two blocks swapped | 0.134 | 0.142 |
+
+The dispersion row carries most of the weight: as printed, two instruments
+administered in one sitting differ threefold in relative dispersion and the
+IAS's 0.077 is implausibly tight, while swapping them yields 0.134 and 0.142,
+near-identical and both slightly below the child sample's 0.195. The slope
+agrees — the IAS-labelled block sits essentially on the child metric, which is
+what the same 5-point instrument in an older sample should do. The **α row is
+not** transposed and corroborates the rest: the low α values (.29–.80) sit
+under the CAIS, and JK's .29 matches the article's own note (p. 322) that JK
+was the weakest child scale at .32. Two adjacent rows swapping while a third
+does not is an ordinary typesetting slip.
+
+Ruled out on the way: **sum scores** (for the adult means to be sums of 1–5
+items, DE would need a per-item mean of 2.34 / 5 = 0.47, below the scale
+minimum; DE's 2.34 caps any item count at 2 while every scale has 3–5), and a
+**published correction** (Crossref carries no `update-to` or `updated-by`
+relation for 10.1207/s15327752jpa8703_12; its relation field is present and
+empty — Taylor & Francis returns 403 to automated fetches, so Crossref is the
+authoritative check available).
+
+The extracted values below stay exactly as the article prints them: this note's
+job is to record the source faithfully, and the source does print these numbers
+under these headings. The finding is about what they *mean*, not about whether
+they were read correctly — they were, including the column block, which was
+re-checked against Table 4's full 16-column layout on 2026-08-08.
+
+**Outstanding.** An author query went to Sodano (Tracey copied) on 2026-08-08
+asking whether the two rows are transposed, and carrying the Table 2 *N*
+question above. A "swapped" reply makes the block printed under IAS the correct
+sample-2 M and SD, which is a numeric change to shipped norms and needs its own
+gate (IP5, D-039). A "correct as printed" reply leaves the adult sample
+irreconcilable with a 5-point CAIS, and it should then be withdrawn or hard-
+flagged. Until either arrives, every reading agrees the shipped sample-2 values
+are unusable as CAIS norms, so a fail-closed refusal at `norm_standardize()`
+does not depend on the answer.
+
 ## Extracted values
 
 Sample 1 = the child sample, Table 2 (p. 323); sample 2 = the adult sample,
