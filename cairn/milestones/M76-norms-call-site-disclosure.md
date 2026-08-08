@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** RR16
 - **Principles touched:** GP2, GP4
-- **Branch/PR:** `m76-norms-call-site-disclosure`
+- **Branch/PR:** `m76-norms-call-site-disclosure` / https://github.com/jmgirard/circumplex/pull/104
 
 ## Goal
 
@@ -34,7 +34,7 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 
 ## Acceptance criteria
 
-- [ ] AC1 `norm_standardize()` takes `quiet`, default `FALSE`. On a successful
+- [x] AC1 `norm_standardize()` takes `quiet`, default `FALSE`. On a successful
       non-quiet call it emits a message naming the sample number used and that
       sample's `Size` and `Population`, read from the `Norms[[2]]` row whose
       `Sample` equals the number used rather than by row position; where the
@@ -46,25 +46,25 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
       are asserted to partition all 15. The `Sample`-keyed read is fenced by a
       constructed instrument whose `Norms[[2]]` row order differs from its
       `Sample` values, which no shipped instrument does.
-- [ ] AC2 Every successful call returns a frame carrying an attribute recording
+- [x] AC2 Every successful call returns a frame carrying an attribute recording
       the instrument abbreviation, the sample number used, its `Size` and its
       `Population`, on both the `append = TRUE` (`R/tidying_functions.R:242`)
       and `append = FALSE` (`:244`) return paths, and `@return` documents it.
       Tested over the `shipped_instruments()` enumeration at both `append`
       values.
-- [ ] AC3 The out-of-anchor-range refusal names the offending scales for an
+- [x] AC3 The out-of-anchor-range refusal names the offending scales for an
       instrument whose `Norms[[1]]` labels its second column `Abbrev`, as it
       already does for one labelled `Scale`. Fenced by a constructed
       `Abbrev`-labelled violating instrument, because `cais` is the only shipped
       violator and is `Scale`-labelled — so the shipped roster cannot exhibit
       this. The exact-set pin at `tests/testthat/test-norms-anchor-range.R:46`
       is left standing.
-- [ ] AC4 A `sample` matching no `Norms[[1]]` row is refused by its own check,
+- [x] AC4 A `sample` matching no `Norms[[1]]` row is refused by its own check,
       distinct from the scales-vs-norms arity `stopifnot()`, which is retained
       and separately tested. The error names the `sample` argument and lists the
       sample numbers the instrument carries; the test asserts those numbers
       appear, not merely the word "sample".
-- [ ] AC5 `?norm_standardize` documents `quiet`, the message, the attribute and
+- [x] AC5 `?norm_standardize` documents `quiet`, the message, the attribute and
       both refusal conditions, and its `@examples` include one call on a
       multi-sample instrument that omits `sample`, so the disclosure appears in
       shipped documentation. Its opening "normative data (from the package or
@@ -72,14 +72,14 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
       what it means, the signature admitting only a `circumplex_instrument`
       (`:172`). `Rscript -e 'options(cli.width = 500); devtools::document()'`
       produces no diff and zero lines matching `resolve link`.
-- [ ] AC6 `NEWS.md` carries user-facing entries for `quiet`, the message, the
+- [x] AC6 `NEWS.md` carries user-facing entries for `quiet`, the message, the
       attribute and the two refusal-message fixes, naming no test file. Each
       entry's asserted behavior has a test that fails without it; the
       entry-to-test mapping is recorded in this milestone's work log, not in
       NEWS.
-- [ ] AC7 `Rscript -e 'devtools::test()'` clean and `Rscript -e
+- [x] AC7 `Rscript -e 'devtools::test()'` clean and `Rscript -e
       'devtools::check()'` clean (0 errors, 0 warnings; NOTEs justified).
-- [ ] AC8 (BC2) The disclosure message emitted by `norm_standardize()` (M76 AC1)
+- [x] AC8 (BC2) The disclosure message emitted by `norm_standardize()` (M76 AC1)
       contains the selected sample's `Norms[[2]]$Population` value verbatim, and
       its fixed (non-data) message text contains neither the token "population"
       nor the token "representative", case-insensitively; the verbatim-value
@@ -90,7 +90,7 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
       tokens, so the procedure asserts what the tolerance states. Tolerance:
       exact string absence in the fixed text; a shipped `Population` *value*
       containing those tokens does not violate this criterion.
-- [ ] AC9 (BC1) `norm_standardize` and `norms` both appear in `NAMESPACE` as
+- [x] AC9 (BC1) `norm_standardize` and `norms` both appear in `NAMESPACE` as
       exports under exactly those names, and every instrument in the
       `shipped_instruments()` enumeration has a `Norms` list slot whose second
       element contains a column named `Population`. Asserted by a regression pin
@@ -174,3 +174,60 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 - 2026-08-08 (RR16 R3, BC3, B2): the per-sample reference-kind column, and the extension of this milestone's message and attribute to carry it, go to a new milestone rather than into this scope. RR16 leaves scheduling to the maintainer, who chose that route at the ingest gate; the pre-2.0.0 window is what makes it cheap, so it is planned before the release.
 
 ## Review
+
+Verified 2026-08-08 against branch `m76-norms-call-site-disclosure` at `ac1e9e10`,
+PR #104. `devtools::check()` ran at `ee061927`; `git diff ee061927..HEAD -- . ':!cairn'`
+is empty, so the check evidence holds for HEAD.
+
+- AC1 — Live: a default (`sample` omitted) call on iipsc emits "Standardized against
+  IIP-SC normative sample 1: N = 872, American college students. 1 other sample is
+  available; see norms()."; isc (single-sample) emits the form without the
+  others clause. Tests: both message forms over their memberships, the two
+  memberships asserted to partition all 15, `quiet = TRUE` silence over every
+  usable sample, and the row-order-vs-`Sample` fixture (iipsc rows reversed,
+  message still reports N = 872 and not N = 106). All green.
+- AC2 — Live: `attr(z, "norm_sample")` is a 4-element list (Instrument "IIP-SC",
+  Sample 1, Size 872, Population "American college students"); present on the
+  `append = FALSE` path too, and identical whether or not `quiet` suppressed the
+  message. Tested over the enumeration at both `append` values.
+- AC3 — Live: a constructed `Abbrev`-labelled violator (iitc, one octant pushed
+  past its anchor maximum) refuses with "Its mean score for DE falls outside the
+  instrument's 0 to 5 response range". The exact-set pin at
+  `test-norms-anchor-range.R` is untouched and green.
+- AC4 — Live: `sample = 7` on iipsc refuses with "No normative data for sample 7.
+  The IIP-SC carries samples 1, 2; see norms() for what each one is." — names the
+  argument and lists the numbers. The arity `stopifnot()` is retained and has its
+  own test.
+- AC5 — `Rscript -e 'options(cli.width = 500); devtools::document()'` produces no
+  diff and zero `resolve link` lines. The shipped `man/norm_standardize.Rd`
+  carries the multi-sample default-`sample` example ending in
+  `attr(z, "norm_sample")`. The "or custom" opening is gone (RR16 B1).
+- AC6 — 4 new user-facing NEWS entries, naming no test file. The entry-to-test
+  mapping is in this milestone's work log (2026-08-08), not in NEWS.
+- AC7 — `devtools::test()`: 0 failures, 6537 passing; the 4 WARNs are all in
+  `test-ci_accuracy.R`, untouched by this branch. `devtools::check(args =
+  "--no-manual")`: 0 errors, 0 warnings, 0 notes, vignettes rebuilt (13m 33s).
+- AC8 (BC2) — Measured over the shipped roster: 24 (instrument, sample) pairs, 23
+  emitting a message (the CAIS adult sample is refused before any message, D-040),
+  and 23 of 23 carrying that sample's `Population` value verbatim. The
+  fixed-text clause is asserted via a sentinel `Population`
+  ("a representative population of nobody"): stripping the value from the emitted
+  message leaves text containing neither "population" nor "representative",
+  case-insensitively.
+- AC9 (BC1) — `norm_standardize` and `norms` both exported under exactly those
+  names; 15 of 15 shipped instruments carry a `Population` column in `Norms[[2]]`.
+
+**Projection vs outcome (RR16).** The one numeric quantity ingested is AC8's
+domain: measured 24 (instrument, sample) pairs against RR16's stated 24, and
+23 emitting messages — the one gap being the anchor-range refusal RR16 did not
+model. RR16's other counts (BC3's 6/16/2 partition) were not ingested here and
+are carried by the ROADMAP candidate row.
+
+**Consistency gate.** `cairn_validate` exit 0, every check PASS; the one WARN is
+`sizing (split tripwires)` on this file's 9 criteria, logged at the ingest gate
+with its justification. No `DESIGN.md` principle changed, so `cairn_impact` was
+not run. Toolchain slot: `document()` no-diff and no `resolve link` (above);
+generated files regenerated rather than hand-edited; `pkgdown::check_pkgdown()`
+reports no problems; NEWS entries present; no new top-level files, so no
+`.Rbuildignore` change.
+
