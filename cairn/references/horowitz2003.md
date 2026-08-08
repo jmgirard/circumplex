@@ -12,11 +12,7 @@ a 150-dpi page-image render — because Table 4.4 lays seven numeric columns sid
 by side across three pages and Table F.5 lays three two-column groups side by
 side, which is the arrangement a reflowed text layer misattributes if it
 misattributes anything.
-Extraction: verified 2026-08-07 — pp. 27–29 (Table 4.4), p. 91 (Table F.5),
-pp. 57–59 (Appendix A) and pp. 101–102 (Appendix H) each read in both channels,
-the channels agreeing on every value, on which norm group each column belongs
-to, and on every item's scale; no value read by a second human channel —
-observed 2026-08-07.
+Extraction: verified 2026-08-07 — pp. 27–29 (Table 4.4), p. 91 (Table F.5), pp. 57–59 (Appendix A) and pp. 101–102 (Appendix H) each read in both channels, the channels agreeing on every value, on which norm group each column belongs to, and on every item's scale; no value read by a second human channel — observed 2026-08-07.
 
 **Citation.** Horowitz, L. M., Alden, L. E., Wiggins, J. S., & Pincus, A. L.
 (2003). *Inventory of Interpersonal Problems manual: Includes IIP-64 and IIP-32
@@ -127,7 +123,7 @@ scale sums; the package divides them by 8.
 | SD | 1 | LM | 5.5 | Table 4.4, p. 28, scale 7 SD row, Overall (N = 800) column |
 | SD | 1 | NO | 4.8 | Table 4.4, p. 29, scale 8 SD row, Overall (N = 800) column |
 | Size | 1 | — | 800 | p. 25, "a national standardization sample of 800 cases"; Table 4.4 column head, p. 27 (N = 800) |
-| Population | 1 | — | not-published-in-source | the manual describes the sample in prose (p. 25) and prints no short population label |
+| Population | 1 | — | a national standardization sample of 800 U.S. adults aged 18–89, stratified by race/ethnicity and education within gender against 1999 Census figures | p. 25, Normative Sample, 'The IIP normative information presented in this manual is based on a national standardization sample of 800 cases representative of the U.S. population of adults aged 18-89' |
 | Reference | 1 | — | Horowitz, Alden, Wiggins, & Pincus (2003) | title page, p. 3 (four authors, "Third Edition"); copyright page, p. 2 ("Copyright © 2003", published by Mind Garden, Inc.) |
 | URL | 1 | — | not-published-in-source | the manual prints only www.mindgarden.com in its copyright line (p. 1); the shipped value is the publisher's product page for the instrument |
 | M | 2 | PA | 4.5 | Table 4.4, p. 27, scale 1 mean row, Female (n = 400) column |
@@ -147,7 +143,7 @@ scale sums; the package divides them by 8.
 | SD | 2 | LM | 5.5 | Table 4.4, p. 28, scale 7 SD row, Female (n = 400) column |
 | SD | 2 | NO | 4.6 | Table 4.4, p. 29, scale 8 SD row, Female (n = 400) column |
 | Size | 2 | — | 400 | Table 4.4 column head, p. 27 (Female, n = 400); Table 4.1 note, p. 26 ("400 females") |
-| Population | 2 | — | not-published-in-source | the manual describes the sample in prose (p. 25) and prints no short population label |
+| Population | 2 | — | the 400 female members of that standardization sample | p. 25 ('equal numbers of participants were selected by gender (n = 100) within each age group') with Table 4.1's note, p. 26 ('N = 800 (400 females, 400 males)'); the manual gives no demographics for this half separately |
 | Reference | 2 | — | Horowitz, Alden, Wiggins, & Pincus (2003) | title page, p. 3 (four authors, "Third Edition"); copyright page, p. 2 ("Copyright © 2003", published by Mind Garden, Inc.) |
 | URL | 2 | — | not-published-in-source | the manual prints only www.mindgarden.com in its copyright line (p. 1); the shipped value is the publisher's product page for the instrument |
 | M | 3 | PA | 5.3 | Table 4.4, p. 27, scale 1 mean row, Male (n = 400) column |
@@ -167,7 +163,7 @@ scale sums; the package divides them by 8.
 | SD | 3 | LM | 5.4 | Table 4.4, p. 28, scale 7 SD row, Male (n = 400) column |
 | SD | 3 | NO | 5.0 | Table 4.4, p. 29, scale 8 SD row, Male (n = 400) column |
 | Size | 3 | — | 400 | Table 4.4 column head, p. 27 (Male, n = 400); Table 4.1 note, p. 26 ("400 males") |
-| Population | 3 | — | not-published-in-source | the manual describes the sample in prose (p. 25) and prints no short population label |
+| Population | 3 | — | the 400 male members of that standardization sample | p. 25 ('equal numbers of participants were selected by gender (n = 100) within each age group') with Table 4.1's note, p. 26 ('N = 800 (400 females, 400 males)'); the manual gives no demographics for this half separately |
 | Reference | 3 | — | Horowitz, Alden, Wiggins, & Pincus (2003) | title page, p. 3 (four authors, "Third Edition"); copyright page, p. 2 ("Copyright © 2003", published by Mind Garden, Inc.) |
 | URL | 3 | — | not-published-in-source | the manual prints only www.mindgarden.com in its copyright line (p. 1); the shipped value is the publisher's product page for the instrument |
 | Angle | — | PA | not-published-in-source | the manual prints no octant angles for either instrument |
@@ -216,8 +212,8 @@ description rather than to Table F.5.
 | SD | 1 | JK | 3.0 | Table F.5, p. 91, scale 6 row, Overall SD column |
 | SD | 1 | LM | 3.3 | Table F.5, p. 91, scale 7 row, Overall SD column |
 | SD | 1 | NO | 2.6 | Table F.5, p. 91, scale 8 row, Overall SD column |
-| Size | 1 | — | 800 | p. 25, "a national standardization sample of 800 cases"; the IIP-32 is scored from a subset of the same administration (p. 24) |
-| Population | 1 | — | not-published-in-source | the manual describes the sample in prose (p. 25) and prints no short population label |
+| Size | 1 | — | 800 | DERIVED, not printed for the IIP-32: p. 25's N = 800 for the standardization sample, carried over because the IIP-32 is scored from a subset of the same administration (p. 24). Table F.5 prints no group sizes |
+| Population | 1 | — | a national standardization sample of 800 U.S. adults aged 18–89, stratified by race/ethnicity and education within gender against 1999 Census figures | p. 25, Normative Sample, 'The IIP normative information presented in this manual is based on a national standardization sample of 800 cases representative of the U.S. population of adults aged 18-89' |
 | Reference | 1 | — | Horowitz, Alden, Wiggins, & Pincus (2003) | title page, p. 3 (four authors, "Third Edition"); copyright page, p. 2 ("Copyright © 2003", published by Mind Garden, Inc.) |
 | URL | 1 | — | not-published-in-source | the manual prints only www.mindgarden.com in its copyright line (p. 1); the shipped value is the publisher's product page for the instrument |
 | M | 2 | PA | 1.8 | Table F.5, p. 91, scale 1 row, Females Mean column |
@@ -236,8 +232,8 @@ description rather than to Table F.5.
 | SD | 2 | JK | 3.3 | Table F.5, p. 91, scale 6 row, Females SD column |
 | SD | 2 | LM | 3.3 | Table F.5, p. 91, scale 7 row, Females SD column |
 | SD | 2 | NO | 2.8 | Table F.5, p. 91, scale 8 row, Females SD column |
-| Size | 2 | — | 400 | Table 4.1 note, p. 26 ("400 females"); the IIP-32 is scored from a subset of the same administration (p. 24) |
-| Population | 2 | — | not-published-in-source | the manual describes the sample in prose (p. 25) and prints no short population label |
+| Size | 2 | — | 400 | DERIVED, not printed for the IIP-32: Table 4.1's note, p. 26 ("400 females"), carried over on the same p. 24 grounds |
+| Population | 2 | — | the 400 female members of that standardization sample | p. 25 ('equal numbers of participants were selected by gender (n = 100) within each age group') with Table 4.1's note, p. 26 ('N = 800 (400 females, 400 males)'); the manual gives no demographics for this half separately |
 | Reference | 2 | — | Horowitz, Alden, Wiggins, & Pincus (2003) | title page, p. 3 (four authors, "Third Edition"); copyright page, p. 2 ("Copyright © 2003", published by Mind Garden, Inc.) |
 | URL | 2 | — | not-published-in-source | the manual prints only www.mindgarden.com in its copyright line (p. 1); the shipped value is the publisher's product page for the instrument |
 | M | 3 | PA | 2.3 | Table F.5, p. 91, scale 1 row, Males Mean column |
@@ -256,8 +252,8 @@ description rather than to Table F.5.
 | SD | 3 | JK | 3.0 | Table F.5, p. 91, scale 6 row, Males SD column |
 | SD | 3 | LM | 3.3 | Table F.5, p. 91, scale 7 row, Males SD column |
 | SD | 3 | NO | 2.8 | Table F.5, p. 91, scale 8 row, Males SD column |
-| Size | 3 | — | 400 | Table 4.1 note, p. 26 ("400 males"); the IIP-32 is scored from a subset of the same administration (p. 24) |
-| Population | 3 | — | not-published-in-source | the manual describes the sample in prose (p. 25) and prints no short population label |
+| Size | 3 | — | 400 | DERIVED, not printed for the IIP-32: Table 4.1's note, p. 26 ("400 males"), carried over on the same p. 24 grounds |
+| Population | 3 | — | the 400 male members of that standardization sample | p. 25 ('equal numbers of participants were selected by gender (n = 100) within each age group') with Table 4.1's note, p. 26 ('N = 800 (400 females, 400 males)'); the manual gives no demographics for this half separately |
 | Reference | 3 | — | Horowitz, Alden, Wiggins, & Pincus (2003) | title page, p. 3 (four authors, "Third Edition"); copyright page, p. 2 ("Copyright © 2003", published by Mind Garden, Inc.) |
 | URL | 3 | — | not-published-in-source | the manual prints only www.mindgarden.com in its copyright line (p. 1); the shipped value is the publisher's product page for the instrument |
 | Angle | — | PA | not-published-in-source | the manual prints no octant angles for either instrument |

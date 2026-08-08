@@ -461,6 +461,37 @@ test_that("cais's item key matches sodano2006's octant blocks (M74)", {
   )
 })
 
+test_that("a source-note block no batch row audits is reported (M75)", {
+  # DEVELOPMENT-ONLY: data-raw/ is not installed.
+  script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
+  skip_if_not(file.exists(script), "data-raw/ not present (installed package)")
+
+  env <- new.env()
+  old <- options(norms_audit_defs_only = TRUE)
+  on.exit(options(old), add = TRUE)
+  sys.source(script, env)
+  audit_norms <- get("audit_norms", envir = env)
+  batch <- get("AUDIT_BATCH", envir = env)
+  dir <- testthat::test_path("..", "..", "cairn", "references")
+  skip_if_not(dir.exists(dir), "cairn/ not present (installed package)")
+
+  # The whole batch leaves nothing uncovered.
+  full <- audit_norms(batch, dir)
+  expect_identical(sum(!full$coverage$exempt), 0L)
+
+  # Drop one instrument's rows and its note block is orphaned. Before M75's
+  # block-level sweep this returned a completely clean report -- the ledger,
+  # the coverage report and every printed count -- while 48 tabled values went
+  # uncompared. Assert the block is NAMED, not merely that some gap appeared:
+  # a gap of any other kind would satisfy a bare count.
+  partial <- audit_norms(batch[batch$instrument != "iip32", ], dir)
+  gaps <- partial$coverage[!partial$coverage$exempt, , drop = FALSE]
+  expect_true("note-block-not-audited" %in% gaps$side)
+  orphan <- gaps[gaps$side == "note-block-not-audited", , drop = FALSE]
+  expect_identical(orphan$instrument, "horowitz2003")
+  expect_identical(orphan$scale, "iip32")
+})
+
 test_that("both IIP help pages carry the publisher's credit line (M75)", {
   # The Mind Garden permission licenses the IIP means and SDs on condition (a):
   # the credit line appears on the same page as the reproduced material. The
@@ -503,12 +534,18 @@ test_that("the two IIP instruments ship an Items placeholder, not item text (M75
   # IIP forms is unlicensed and must not ship. The item NUMBERS in Scales$Items
   # are the scoring key and are permitted -- pinned by audited_objects above --
   # so this asserts the narrow thing: $Items stays a single pointer row with no
-  # numbered item, which is what would change if item text were ever pasted in.
+  # numbered item.
+  #
+  # Pin the placeholder EXACTLY, which is what AC3 says. A pattern match is
+  # false coverage here: "Mind Garden" and a not-item-text heuristic are both
+  # satisfied by a string that has item text appended to the placeholder, and a
+  # heuristic keyed to how IIP items open ("I am too...", "It is hard for
+  # me...") catches only the subset it happens to enumerate.
+  placeholder <- "Visit the Mind Garden Inc. website for item text and numbering."
   for (inst in list(iip32, iip64)) {
     expect_identical(nrow(inst$Items), 1L)
     expect_true(is.na(inst$Items$Number))
-    expect_match(inst$Items$Text, "Mind Garden")
-    expect_false(grepl("^I ", inst$Items$Text))
+    expect_identical(inst$Items$Text, placeholder)
   }
 })
 

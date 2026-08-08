@@ -141,6 +141,25 @@ CONSTRUCTED_CREDIT <- "constructed-credit"
 # refused is the ambiguous middle: asking a multi-block note for an instrument
 # none of its blocks names aborts rather than falling back to the first block,
 # which would audit one instrument against another's values and could not fail.
+# The tag carried by each begin marker; "" for an untagged block.
+source_note_tags <- function(begin_lines) {
+  trimws(sub("-->$", "",
+             sub("^<!-- audit-values-begin:?", "", trimws(begin_lines))))
+}
+
+# Every block tag a note carries, in file order. Read by the unclaimed-block
+# sweep, which must see blocks NO batch row selected -- parse_source_note()
+# by construction only ever returns one.
+source_note_block_tags <- function(citekey,
+                                   dir = file.path("cairn", "references")) {
+  path <- file.path(dir, paste0(citekey, ".md"))
+  if (!file.exists(path)) {
+    stop("source note not found: ", path, call. = FALSE)
+  }
+  lines <- readLines(path, warn = FALSE)
+  source_note_tags(lines[grep("^\\s*<!-- audit-values-begin", lines)])
+}
+
 parse_source_note <- function(citekey,
                               dir = file.path("cairn", "references"),
                               instrument = NULL) {
@@ -159,8 +178,7 @@ parse_source_note <- function(citekey,
     stop("source note ", citekey, " has no well-formed audit-values block(s)",
          call. = FALSE)
   }
-  tags <- trimws(sub("-->$", "",
-                     sub("^<!-- audit-values-begin:?", "", trimws(lines[b]))))
+  tags <- source_note_tags(lines[b])
   if (anyDuplicated(tags)) {
     stop("source note ", citekey, " tags two audit-values blocks alike: ",
          paste(tags[duplicated(tags)], collapse = ", "), call. = FALSE)
@@ -431,6 +449,31 @@ audit_norms <- function(batch = AUDIT_BATCH,
                      else blk$citekey,
         side = "note-sample-not-audited",
         field = "sample", scale = unclaimed,
+        exempt = FALSE, stringsAsFactors = FALSE
+      )
+    }
+  }
+
+  # ...and the block level. The sweep above walks blocks the batch CLAIMED, so
+  # it can only ever report a sample missing from a block someone audited. A
+  # whole block no batch row selects is never parsed, never keyed, and never
+  # counted -- measured at the M75 review: dropping the three iip32 rows from
+  # AUDIT_BATCH made all 48 of that instrument's tabled values vanish with the
+  # ledger, the coverage report and every printed count reading clean. That is
+  # the same silent-loss shape the malformed-row and missing-sample aborts
+  # above refuse, one level up, so it is refused here too.
+  for (citekey in unique(batch$citekey)) {
+    tags <- source_note_block_tags(citekey, dir)
+    seen <- vapply(names(claimed), function(k) blocks[[k]]$tag, character(1),
+                   USE.NAMES = FALSE)
+    unaudited <- setdiff(tags, seen[
+      vapply(names(claimed), function(k) blocks[[k]]$citekey, character(1),
+             USE.NAMES = FALSE) == citekey
+    ])
+    if (length(unaudited)) {
+      coverage[[length(coverage) + 1L]] <- data.frame(
+        instrument = citekey, side = "note-block-not-audited",
+        field = "block", scale = unaudited,
         exempt = FALSE, stringsAsFactors = FALSE
       )
     }

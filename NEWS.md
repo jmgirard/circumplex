@@ -682,10 +682,14 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   double-counts an item — the `cais` failure above — cannot ship again.
 * The normative data shipped with `iip32` and `iip64` has now been re-verified
   against the IIP professional manual, which completes the sweep: every one of
-  the fifteen bundled instruments has now been checked against its published
-  source. All 96 means and standard deviations of the six IIP normative samples
-  were confirmed correct, as were all 96 item-to-scale assignments and all six
-  sample sizes. No value changed.
+  the fifteen bundled instruments has now been checked against a published
+  source, though for `iis32` and `ipipipc` that check is what established that
+  no source publishes their values. All 96 means and standard deviations of the
+  six IIP normative samples were confirmed correct, as were all 96 item-to-scale
+  assignments and the three IIP-64 sample sizes. No value changed. The manual
+  prints no sample sizes for the IIP-32 specifically, so its 800/400/400 are
+  carried over from the same standardization sample the manual describes for the
+  longer form, which is what the shorter form was scored from.
 * `?iip32` and `?iip64` now cite the third edition of the manual (Horowitz,
   Alden, Wiggins, & Pincus, 2003, Mind Garden), the edition the shipped values
   were verified against, rather than the earlier edition from a different

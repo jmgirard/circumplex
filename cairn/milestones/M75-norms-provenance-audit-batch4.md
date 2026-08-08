@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5, GP4
-- **Branch/PR:** `m75-norms-provenance-audit-batch4`
+- **Branch/PR:** `m75-norms-provenance-audit-batch4` · https://github.com/jmgirard/circumplex/pull/102
 
 ## Goal
 
@@ -32,13 +32,13 @@ well-named for users → the existing norms-fitness row.
 
 ## Acceptance criteria
 
-- [ ] AC1: `audit_norms()` compares all 48 shipped `iip64` M/SD values
+- [x] AC1: `audit_norms()` compares all 48 shipped `iip64` M/SD values
       (3 samples × 8 octants × 2) against `horowitz2003`'s `iip64` audit-values
       block with `divisor = 8`; the regenerated `norms-audit-ledger.csv` carries
       **no `iip64` row for any field the manual publishes** — no M, SD, Size,
       Reference or Items row — and `norms-audit-coverage.csv` contains no
       non-exempt `iip64` row.
-- [ ] AC2: the same for all 48 shipped `iip32` M/SD values against the `iip32`
+- [x] AC2: the same for all 48 shipped `iip32` M/SD values against the `iip32`
       block with `divisor = 4`: no `iip32` M, SD, Size, Reference or Items
       ledger row, and no non-exempt `iip32` coverage row. `horowitz2003.md`
       records that the IIP-32
@@ -46,25 +46,25 @@ well-named for users → the existing norms-fitness row.
       the T-score conversion tables, rather than beside the IIP-64's Table 4.4 —
       and that Appendices B, D, F and G's conversion tables are a separate
       T-score norming path the package does not implement.
-- [ ] AC3: the 96 shipped item→octant assignments (`iip32$Scales$Items` 1–32,
+- [x] AC3: the 96 shipped item→octant assignments (`iip32$Scales$Items` 1–32,
       `iip64$Scales$Items` 1–64) each match the manual's printed
       scale-membership lists at the anchors recorded in `horowitz2003.md`; and
       `iip32$Items` / `iip64$Items` each remain exactly one row with `Number`
       `NA` and the shipped placeholder `Text`. Both test-asserted.
-- [ ] AC4: each of the six `Population` strings describes the manual's
+- [x] AC4: each of the six `Population` strings describes the manual's
       national stratified standardization sample, and every `Population` row
       in the ledger is either agreeing or dispositioned.
-- [ ] AC5: the permission's condition-(a) credit line appears verbatim in the
+- [x] AC5: the permission's condition-(a) credit line appears verbatim in the
       rendered help for both instruments, in `cairn/references/horowitz2003.md`,
       and in `data-raw/iip32.R` and `data-raw/iip64.R`. A test asserts it in
       both help pages, reading `man/` when present and falling back to
       `tools::Rd_db("circumplex")` otherwise (the M7/M70 dual-source pattern).
-- [ ] AC6: the citation year agrees across `@source`, `Norms[[2]]$Reference`
+- [x] AC6: the citation year agrees across `@source`, `Norms[[2]]$Reference`
       and `Details$Reference` for both instruments; `@source` names the
       edition and publisher the shipped values are attributed to; and
       `horowitz2003.md` records that all 96 shipped M/SD values reconcile
       exactly against the 2003 3rd edition, which is the edition now cited.
-- [ ] AC7: `cairn/references/horowitz2003.md` exists carrying a Provenance
+- [x] AC7: `cairn/references/horowitz2003.md` exists carrying a Provenance
       block (shelf path, ingested date, pagination basis, extraction status
       naming two independent channels for pp. 27–29, 57–59, 91 and 101) and an
       `INDEX.md` line; `norms-audit.md`'s `iip32`/`iip64` status, citekey-map
@@ -149,3 +149,134 @@ well-named for users → the existing norms-fitness row.
 ## Decisions
 
 ## Review
+
+Verified 2026-08-07 against branch `m75-norms-provenance-audit-batch4`, PR #102.
+Every figure below was produced by running a command at review time, never read
+off the work log.
+
+- AC1 — regenerated ledger carries 0 `iip64` rows for any field the manual
+  publishes (M, SD, Size, Reference, Items); its only `iip64` fields are Angle,
+  Population and URL. 0 non-exempt `iip64` coverage rows. Independently of the
+  audit script, all 48 shipped M/SD were recompared against the note's `iip64`
+  block at `divisor = 8`: max |shipped − source/divisor| = 0.
+- AC2 — same measurement for `iip32` against the `iip32` block at
+  `divisor = 4`: 0 ledger rows for published fields, 0 non-exempt coverage rows,
+  max deviation 0 over 48 values. `horowitz2003.md` carries the "On where the
+  IIP-32 descriptives are" and "On the T-score tables" sections, recording
+  Table F.5 (p. 91), its position after Appendix F's conversion tables, its
+  omission from the manual's contents listing, and that Appendices B/D/F/G are
+  a norming path the package does not implement.
+- AC3 — all 16 item-map rows (8 per instrument) match the note's anchors
+  exactly, checked by recomputing `normalise_items()` over the shipped
+  `Scales$Items` and joining to the note. `iip32$Items` and `iip64$Items` are
+  each 1 row with `Number` `NA`. Test-asserted by the M75 placeholder test and
+  by the `audited_objects` pins.
+- AC4 — the six `Population` strings read "American adults, national
+  standardization sample, {overall,females,males}"; the manual describes a
+  national standardization sample of 800 stratified against 1999 Census figures
+  with separate norms by gender (p. 25). All 6 `Population` ledger rows carry a
+  `not-published-in-source` disposition; 0 rows are `UNDISPOSITIONED`.
+- AC5 — the credit line is present verbatim, on collapsed whitespace, in all
+  six required places: `man/iip32.Rd`, `man/iip64.Rd`,
+  `cairn/references/horowitz2003.md`, `data-raw/iip32.R`, `data-raw/iip64.R`
+  and `R/instrument_data.R`. The dual-source test reads `man/` when present and
+  falls back to `tools::Rd_db()`; mutation-checked — deleting the credit
+  paragraph from either Rd flips the assertion to FALSE.
+- AC6 — `Norms[[2]]$Reference` and `Details$Reference` both read "Horowitz,
+  Alden, Wiggins, & Pincus (2003)" for both instruments, and both `@source`
+  entries name the year, the edition ("3rd ed.") and the publisher ("Mind
+  Garden"); no Rd still cites the 2000 edition as source. `horowitz2003.md`
+  records the reconciliation against the third edition.
+- AC7 — the note carries a Provenance block (shelf path, ingested date,
+  pagination basis, and a one-physical-line extraction status naming two
+  channels for pp. 27–29, 57–59, 91 and 101–102) and one `INDEX.md` line.
+  `norms-audit.md` carries both status rows off `unaudited`, 6 citekey-map rows
+  and 2 shelf-manifest rows. Both instruments are in `audited_objects`. Both
+  `data-raw` scripts state their divisor and why. `devtools::test()` 6094
+  passing / 0 failures; `devtools::check(args = "--no-manual")` 0 errors,
+  0 warnings, 0 notes.
+
+Consistency gate: `cairn_validate` exit 0, all 16 checks PASS; 47 advisory
+`work-log format` warnings, every one of them pre-existing lines in M7's log
+and none from this milestone. No `DESIGN.md` principle changed, so
+`cairn_impact` does not apply. Toolchain gate (`r-package` profile):
+`devtools::document()` leaves no diff, `pkgdown::check_pkgdown()` reports no
+problems, generated files were regenerated rather than hand-edited, NEWS.md
+carries the user-visible entries, no new top-level file needs an
+`.Rbuildignore` entry, and the full check is clean.
+
+Fixed at review: the note's `Extraction:` status was wrapped across five
+physical lines. The staleness advisory reads the line its status starts on, so
+a wrapped status can lose its trailing `— observed` stamp; rewritten as one
+physical line, as the source-note template requires.
+
+### Independent review
+
+Three fresh-context lenses over `master..HEAD`: an [O] diff-bug reviewer, an
+[S] blame-history reviewer and an [S] prior-PR-comments reviewer, then an [S]
+scorer that did not generate the findings. 22 items reported; the prior-review
+lens found no regression of any point M72–M74 raised on these files, and the
+GitHub inline-comment probe returned empty, so that surface was skipped. Two
+of the 22 are recorded clean verifications rather than defects (no numeric or
+scoring change — `Norms[[1]]`, `Scales`, `Items` and `Details` are `identical()`
+to master for both objects, only `Norms[[2]]$Population` differs; and the
+Overall/Female/Male sample order is not transposed despite Table F.5's printed
+column order).
+
+Actioned (scored ≥ 80), both fixed on the branch:
+
+- **An unclaimed source-note block was invisible (88).** `claimed`/`blocks`
+  were populated only inside the batch loop, so a tagged block no batch row
+  selected was never parsed and never counted. Measured: dropping the three
+  `iip32` rows from `AUDIT_BATCH` made all 48 of that instrument's tabled
+  values vanish with the ledger, the coverage report and every printed count
+  reading clean — the same silent-loss shape the malformed-row and
+  missing-sample aborts refuse, one level up. Fixed with a block-level sweep
+  emitting a non-exempt `note-block-not-audited` row, and a test that names the
+  orphaned block rather than counting gaps. Mutation-checked: removing the
+  sweep reddens it.
+- **NEWS overstated two things (80).** "every one of the fifteen bundled
+  instruments has now been checked against its published source" contradicted
+  `norms-audit.md`'s own `audited, norms unsourced` verdict for `iis32` and
+  `ipipipc`, and "all six sample sizes … confirmed correct" glossed the three
+  derived `iip32` sizes. Both rewritten.
+
+Also fixed, below the action bar but defects in content this branch itself
+added:
+
+- **The `Items` placeholder test was false coverage (78).**
+  `expect_false(grepl("^I ", Text))` matches only the subset of IIP items
+  opening that way, and pasted text would already have failed the `nrow == 1`
+  assertion above it. Replaced with the exact placeholder string, which is what
+  AC3 names.
+- **The six `Population` dispositions broke the batch-1–3 taxonomy (78).** They
+  read `not-published-in-source`, so the shipped label was compared against
+  nothing, where every prior instrument in the identical situation records the
+  source's prose sample description with a page anchor and dispositions the
+  deviation `intended-deviation`. The note now carries the manual's p. 25
+  description; the six rows are `mismatch`/`intended-deviation` like their
+  predecessors.
+- **The `iip32` `Size` rows were derived, not transcribed, and nothing said so
+  (78).** Table F.5 prints no group sizes; the shipped 800/400/400 carry over
+  the IIP-64 standardization sample on the manual's p. 24 grounds. The three
+  anchors now say `DERIVED, not printed for the IIP-32`, and the
+  `norms-audit.md` verdict and the NEWS entry say the same.
+
+Logged, not actioned (14 findings scoring 25–72): six against
+`data-raw/audit-norms.R`, five of them in the tagged-block machinery — the
+`instrument = NULL` fallback (55), the untagged-note `claimed` collision (55),
+fence-unaware marker matching (50), permissive tag extraction (55), untested
+abort paths (72) — plus the coverage report's `instrument` column now mixing
+namespaces (50); all six absorbed into the existing `data-raw/audit-norms.R`
+robustness candidate row rather than a new one. The rest: the credit-line
+test's `Rd_db()` fallback may render `©` as an escape in a C locale (55) and
+the sibling hazard in `test-rd-latex-safe.R`'s fallback (25, pre-existing); the
+allowlist regex would create a character range if a future addition were a
+hyphen (35); `attr(, "tag")` read-order fragility (28); an empty block parsing
+to a 0-row frame (25, pre-existing); a stale M74 comment on an unmodified line
+(25); a cosmetic `expect_true` before a `NULL` index (25); and the help pages'
+`\source` citing 2003 beside a credit line reading "Copyright © 2000" (60) —
+real but the credit line is verbatim-required text and the note explains it.
+
+No finding met the return floor: neither actioned finding demonstrates an
+acceptance criterion failing, and neither scored ≥ 90.
