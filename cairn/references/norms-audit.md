@@ -2,9 +2,9 @@
 
 A synthesis note (no single `<citekey>.md` owns it): the citekey map, the
 shelf manifest, and the per-instrument audit status for all 15 shipped
-instruments. Batch 1 (M72) audited five, batch 2 (M73) four more and batch 3 (M74) the four
-multi-sample instruments; the rest carry their status here so an unaudited
-instrument is visible rather than merely out of scope.
+instruments. Batch 1 (M72) audited five, batch 2 (M73) four more, batch 3 (M74)
+the four multi-sample instruments and batch 4 (M75) the two IIP forms, which
+closes the family: every shipped instrument now carries an audit verdict below.
 
 **Provenance.** Ingested 2026-08-06 by M72 (authored here rather than extracted
 from one source — this is a synthesis note over the shelf and the shipped data,
@@ -38,8 +38,8 @@ seeing it. Per-row detail is in `data-raw/norms-audit-ledger.csv`.
 | cais | verified: M, SD, angles, item map, Size, Reference (2 samples); the item map and the sample-1 Size were wrong and are corrected here; Population deviates by design (URL not published in source) | M74 | [sodano2006.md](sodano2006.md) | 2026-08-07 |
 | iei | verified: M, SD, Size, Reference (2 samples); URL repointed here at the pages that publish the values; Population deviates by design (no angles, no item map) | M74 | [horner2024.md](horner2024.md) | 2026-08-07 |
 | igicr | verified: M, SD, Size, angles, item map, Reference, URL (3 samples); Population deviates by design | M74 | [trucco2013.md](trucco2013.md) | 2026-08-07 |
-| iip32 | unaudited; source is the IIP-64/IIP-32 professional manual, obtainable — the maintainer holds publisher permission to ship the norming functions but not the item text (M72, corrected M73) | — | — | 2026-08-06 |
-| iip64 | unaudited; source is the IIP-64/IIP-32 professional manual, obtainable — the maintainer holds publisher permission to ship the norming functions but not the item text (M72, corrected M73) | — | — | 2026-08-06 |
+| iip32 | verified: M, SD, item map, Reference (3 samples); `Size` is **derived**, not printed — Table F.5 gives no group sizes, so the shipped 800/400/400 carries over the IIP-64 standardization sample on the manual's own p. 24 grounds; Population deviates by design (no angles, no URL published) | M75 | [horowitz2003.md](horowitz2003.md) | 2026-08-07 |
+| iip64 | verified: M, SD, Size, item map, Reference (3 samples); Population deviates by design (no angles, no URL published) | M75 | [horowitz2003.md](horowitz2003.md) | 2026-08-07 |
 | iipsc | verified: M, SD, Size, item map, Reference (2 samples, two different sources); the sample-1 Reference year was wrong and is corrected here; Population deviates by design (no angles; sample-2 URL not published) | M74 | [hopwood2008.md](hopwood2008.md), [soldz1995.md](soldz1995.md) | 2026-08-07 |
 | iis32 | audited, **norms unsourced**: item map, Reference, URL verified; M, SD, Size and Population are published in no identified source (angles not published) | M73 | [hatcher2012.md](hatcher2012.md) | 2026-08-07 |
 | iis64 | verified: M, SD, Size, item map, Reference, URL; Population deviates by design (no angles) | M73 | [hatcher2009.md](hatcher2009.md) | 2026-08-06 |
@@ -71,6 +71,16 @@ the mapping the audit script joins on.
 | igicr | 3 | trucco2013 | the article (Table 3, Females column) |
 | iipsc | 1 | hopwood2008 | the article (Table 1, as octant SUMS; the package divides by 4) |
 | iipsc | 2 | soldz1995 | the article (Table 4, Generic Outpatient column) |
+| iip32 | 1 | horowitz2003 | the manual (Table F.5, p. 91, Overall column; SUMS over four items, divided by 4) |
+| iip32 | 2 | horowitz2003 | the manual (Table F.5, p. 91, Females column) |
+| iip32 | 3 | horowitz2003 | the manual (Table F.5, p. 91, Males column) |
+| iip64 | 1 | horowitz2003 | the manual (Table 4.4, pp. 27–29, Overall column; SUMS over eight items, divided by 8) |
+| iip64 | 2 | horowitz2003 | the manual (Table 4.4, pp. 27–29, Female column) |
+| iip64 | 3 | horowitz2003 | the manual (Table 4.4, pp. 27–29, Male column) |
+
+`horowitz2003` is the one citekey backing two instruments, so its note carries
+two instrument-tagged audit-values blocks and `AUDIT_BATCH` selects between
+them by instrument (M75).
 
 ## Shelf manifest
 
@@ -106,6 +116,8 @@ same page image — observed 2026-08-07.
 | horner2025.pdf | 69ce27cd48a2bddc105e5cde59e071e577508f387e2cf6f33127dd8e67eb80f2 | born-digital (Zotero, 5404 chars/page); both samples' norm values are typeset text in Table 1 | 2026-08-07 |
 | trucco2013.pdf | 32c34116c0e47000eeac5fcd808ba1daa4998e5e5311b3151812a7682391834c | born-digital (Adobe PDF Library 9.9, 4853 chars/page); all three samples' norm values are typeset text in Table 3 | 2026-08-07 |
 | locke_iei_norms_2026-08-07.html | 50230f1b83c68399560e997126df1aafeb3fb540ea4c2a9befd53da2a6cf4a4d | retrieved HTML (kennethlocke.org/IEI/IEI_Norms.html); publishes the iei sample-1 octant M/SD and N = 1,223, and credits horner2024 for them | 2026-08-07 |
+| IIP Manual.pdf | 02397de4bc96d3b99134fa573a4e685fdf4489ce9d4b41684d9871833030b012 | born-digital (Power PDF Create, 6 images none full-page; 2024 chars/page); both instruments' norm tables are typeset text (Table 4.4, pp. 27–29; Table F.5, p. 91) | 2026-08-07 |
+| IIP Agreement.pdf | a25589682a22a9e297e7ac6dbee0ea83ad6ecea4a40a6eb736ef25b5b1c2fb22 | born-digital; the Mind Garden publication agreement, source of the condition-(a) credit line — a permission record, not a norms source | 2026-08-07 |
 | soldz1995.pdf | 758030aeebd66fc8989d181ba9fd7c402f4973b831ed1df5ceefa27fba7e7d14 | **OCR scan** (Acrobat Paper Capture plug-in, 3234 chars/page): the text layer is OCR of the page image, so it is not a second witness (M42-D1) and the norm table needs a genuinely independent channel | 2026-08-07 |
 
 Channel plan for batch 2, decided by asking what channel reads the *norm

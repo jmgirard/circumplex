@@ -313,6 +313,76 @@ audited_objects <- list(
       "7, 15, 23, 31", "8, 16, 24, 32"), Label = c("Domineering", "Vindictive", 
       "Cold", "Socially Avoidant", "Nonassertive", "Exploitable", "Overly Nurturant", 
       "Intrusive")), class = "data.frame", row.names = c(NA, -8L))
+  ),
+  iip32 = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 
+      2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3), Scale = c("PA", "BC", 
+      "DE", "FG", "HI", "JK", "LM", "NO", "PA", "BC", "DE", "FG", "HI", 
+      "JK", "LM", "NO", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45, 90, 135, 180, 
+      225, 270, 315, 360, 45, 90, 135, 180, 225, 270, 315, 360, 45), 
+    M = c(0.5, 0.675, 0.675, 0.825, 1, 1.075, 1.075, 0.675, 0.45, 
+    0.5, 0.675, 0.75, 1.075, 1.2, 1.175, 0.625, 0.575, 0.75, 
+    0.75, 0.825, 0.925, 1, 0.95, 0.7), SD = c(0.625, 0.825, 0.925, 
+    0.825, 0.825, 0.75, 0.825, 0.65, 0.625, 0.825, 0.825, 0.825, 
+    0.925, 0.825, 0.825, 0.7, 0.625, 0.825, 0.925, 0.925, 0.825, 
+    0.75, 0.825, 0.7)), class = "data.frame", row.names = c(NA, 
+      -24L)), structure(list(Sample = c(1, 2, 3), Size = c(800, 400, 
+      400), Population = c("American adults, national standardization sample, overall", 
+      "American adults, national standardization sample, females", 
+      "American adults, national standardization sample, males"), Reference = c("Horowitz, Alden, Wiggins, & Pincus (2003)", 
+      "Horowitz, Alden, Wiggins, & Pincus (2003)", "Horowitz, Alden, Wiggins, & Pincus (2003)"
+      ), URL = c("https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
+      "https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
+      "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
+      )), class = "data.frame", row.names = c(NA, -3L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", 
+      "LM", "NO"), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), 
+    Items = c("22, 25, 28, 30", "14, 16, 17, 18", "10, 11, 13, 15", 
+    "2, 5, 9, 19", "4, 6, 7, 12", "1, 8, 20, 31", "23, 26, 27, 32", 
+    "3, 21, 24, 29"), Label = c("Domineering/Controlling", "Vindictive/Self-Centered", 
+    "Cold/Distant", "Socially Inhibited", "Nonassertive", "Overly Accommodating", 
+    "Self-Sacrificing", "Intrusive/Needy")), class = "data.frame", row.names = c(NA, 
+      -8L))
+  ),
+  iip64 = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 
+      2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3), Scale = c("PA", "BC", 
+      "DE", "FG", "HI", "JK", "LM", "NO", "PA", "BC", "DE", "FG", "HI", 
+      "JK", "LM", "NO", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45, 90, 135, 180, 
+      225, 270, 315, 360, 45, 90, 135, 180, 225, 270, 315, 360, 45), 
+    M = c(0.6125, 0.6625, 0.7125, 0.8125, 0.925, 0.975, 1.025, 
+    0.7125, 0.5625, 0.6, 0.6375, 0.8, 1, 1.075, 1.1, 0.675, 0.6625, 
+    0.725, 0.7875, 0.825, 0.85, 0.8875, 0.9625, 0.7375), SD = c(0.5625, 
+    0.6375, 0.7375, 0.7125, 0.7625, 0.6625, 0.6875, 0.6, 0.5125, 
+    0.6125, 0.7, 0.7125, 0.7625, 0.675, 0.6875, 0.575, 0.5875, 
+    0.65, 0.7625, 0.7125, 0.7625, 0.6375, 0.675, 0.625)), class = "data.frame", row.names = c(NA, 
+      -24L)), structure(list(Sample = c(1, 2, 3), Size = c(800, 400, 
+      400), Population = c("American adults, national standardization sample, overall", 
+      "American adults, national standardization sample, females", 
+      "American adults, national standardization sample, males"), Reference = c("Horowitz, Alden, Wiggins, & Pincus (2003)", 
+      "Horowitz, Alden, Wiggins, & Pincus (2003)", "Horowitz, Alden, Wiggins, & Pincus (2003)"
+      ), URL = c("https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
+      "https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
+      "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
+      )), class = "data.frame", row.names = c(NA, -3L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", 
+      "LM", "NO"), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), 
+    Items = c("17, 31, 44, 45, 50, 52, 57, 59", "1, 22, 24, 29, 32, 40, 56, 64", 
+    "11, 15, 16, 20, 23, 27, 36, 60", "3, 7, 14, 18, 33, 35, 55, 62", 
+    "5, 6, 8, 9, 12, 13, 19, 39", "2, 10, 25, 34, 38, 42, 53, 61", 
+    "21, 28, 37, 46, 49, 51, 54, 63", "4, 26, 30, 41, 43, 47, 48, 58"
+    ), Label = c("Domineering/Controlling", "Vindictive/Self-Centered", 
+    "Cold/Distant", "Socially Inhibited", "Nonassertive", "Overly Accommodating", 
+    "Self-Sacrificing", "Intrusive/Needy")), class = "data.frame", row.names = c(NA, 
+      -8L))
   )
 )
 
@@ -389,6 +459,94 @@ test_that("cais's item key matches sodano2006's octant blocks (M74)", {
       HI = "5, 13, 21, 29, 35", JK = "6, 14, 22",
       LM = "7, 15, 23, 30, 36", NO = "8, 16, 24, 31, 37")
   )
+})
+
+test_that("a source-note block no batch row audits is reported (M75)", {
+  # DEVELOPMENT-ONLY: data-raw/ is not installed.
+  script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
+  skip_if_not(file.exists(script), "data-raw/ not present (installed package)")
+
+  env <- new.env()
+  old <- options(norms_audit_defs_only = TRUE)
+  on.exit(options(old), add = TRUE)
+  sys.source(script, env)
+  audit_norms <- get("audit_norms", envir = env)
+  batch <- get("AUDIT_BATCH", envir = env)
+  dir <- testthat::test_path("..", "..", "cairn", "references")
+  skip_if_not(dir.exists(dir), "cairn/ not present (installed package)")
+
+  # The whole batch leaves nothing uncovered.
+  full <- audit_norms(batch, dir)
+  expect_identical(sum(!full$coverage$exempt), 0L)
+
+  # Drop one instrument's rows and its note block is orphaned. Before M75's
+  # block-level sweep this returned a completely clean report -- the ledger,
+  # the coverage report and every printed count -- while 48 tabled values went
+  # uncompared. Assert the block is NAMED, not merely that some gap appeared:
+  # a gap of any other kind would satisfy a bare count.
+  partial <- audit_norms(batch[batch$instrument != "iip32", ], dir)
+  gaps <- partial$coverage[!partial$coverage$exempt, , drop = FALSE]
+  expect_true("note-block-not-audited" %in% gaps$side)
+  orphan <- gaps[gaps$side == "note-block-not-audited", , drop = FALSE]
+  expect_identical(orphan$instrument, "horowitz2003")
+  expect_identical(orphan$scale, "iip32")
+})
+
+test_that("both IIP help pages carry the publisher's credit line (M75)", {
+  # The Mind Garden permission licenses the IIP means and SDs on condition (a):
+  # the credit line appears on the same page as the reproduced material. The
+  # shipped norms ARE that material, so losing this line from either help page
+  # is a permission breach, not a documentation nit.
+  #
+  # Read man/ when present and fall back to the installed Rd database, so this
+  # runs both from a source checkout and against an installed package (the
+  # M7/M70 dual-source pattern) rather than skipping in one of them.
+  credit <- paste(
+    "Reproduction by special permission of the Publisher, Mind Garden, Inc.,",
+    "www.mindgarden.com from the Inventory of Interpersonal Problems by",
+    "Leonard M. Horowitz, Lynn E. Alden, Jerry S. Wiggins, & Aaron L. Pincus.",
+    "Copyright © 2000 by Leonard M. Horowitz, Lynn E. Alden,",
+    "Jerry S. Wiggins, & Aaron L. Pincus. Further Reproduction is prohibited",
+    "without the Publisher's written consent."
+  )
+
+  # Rd wraps the line across source lines, so compare on collapsed whitespace.
+  # Comparing raw text would fail on a reflow that changed nothing.
+  squash <- function(x) gsub("\\s+", " ", trimws(paste(x, collapse = " ")))
+
+  rd_text <- function(topic) {
+    f <- testthat::test_path("..", "..", "man", paste0(topic, ".Rd"))
+    if (file.exists(f)) return(readLines(f, warn = FALSE))
+    db <- tools::Rd_db("circumplex")
+    nm <- paste0(topic, ".Rd")
+    expect_true(nm %in% names(db))
+    utils::capture.output(print(db[[nm]]))
+  }
+
+  for (topic in c("iip32", "iip64")) {
+    expect_true(grepl(squash(credit), squash(rd_text(topic)), fixed = TRUE),
+                info = paste(topic, "help page is missing the credit line"))
+  }
+})
+
+test_that("the two IIP instruments ship an Items placeholder, not item text (M75)", {
+  # The same permission covers the means and SDs ONLY, so the item TEXT of both
+  # IIP forms is unlicensed and must not ship. The item NUMBERS in Scales$Items
+  # are the scoring key and are permitted -- pinned by audited_objects above --
+  # so this asserts the narrow thing: $Items stays a single pointer row with no
+  # numbered item.
+  #
+  # Pin the placeholder EXACTLY, which is what AC3 says. A pattern match is
+  # false coverage here: "Mind Garden" and a not-item-text heuristic are both
+  # satisfied by a string that has item text appended to the placeholder, and a
+  # heuristic keyed to how IIP items open ("I am too...", "It is hard for
+  # me...") catches only the subset it happens to enumerate.
+  placeholder <- "Visit the Mind Garden Inc. website for item text and numbering."
+  for (inst in list(iip32, iip64)) {
+    expect_identical(nrow(inst$Items), 1L)
+    expect_true(is.na(inst$Items$Number))
+    expect_identical(inst$Items$Text, placeholder)
+  }
 })
 
 test_that("every audited instrument is a shipped instrument (M72)", {
@@ -469,6 +627,62 @@ test_that("stamp_ledger() stamps a zero-row ledger as it does a one-row one (M73
                                 "data_commit"))
   expect_identical(os$generated, "2026-08-06")
   expect_identical(zs$generated, character(0))
+})
+
+test_that("a source note backing two instruments is read per instrument (M75)", {
+  # DEVELOPMENT-ONLY, same reasoning as the stamp_ledger test above: the script
+  # under test lives in data-raw/, which is not installed.
+  script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
+  skip_if_not(file.exists(script), "data-raw/ not present (installed package)")
+
+  env <- new.env()
+  old <- options(norms_audit_defs_only = TRUE)
+  on.exit(options(old), add = TRUE)
+  sys.source(script, env)
+  parse_source_note <- get("parse_source_note", envir = env)
+
+  # The IIP manual is one source for two instruments whose rows key alike --
+  # both have samples 1-3 over the same eight octant names -- so the note tags
+  # its blocks. The fixture reproduces that shape rather than reading the real
+  # note, so the test states the contract and does not restate the manual.
+  dir <- tempfile("m75-notes-")
+  dir.create(dir)
+  on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+  block <- function(tag, value) {
+    c(paste0("<!-- audit-values-begin: ", tag, " -->"),
+      "| field | sample | scale | value | anchor |",
+      "| --- | --- | --- | --- | --- |",
+      paste0("| M | 1 | PA | ", value, " | Table 1 |"),
+      "<!-- audit-values-end -->")
+  }
+  writeLines(c("# two", block("aa", "1.5"), "", block("bb", "9.5")),
+             file.path(dir, "two.md"))
+  writeLines(c("# one", "<!-- audit-values-begin -->",
+               "| field | sample | scale | value | anchor |",
+               "| --- | --- | --- | --- | --- |",
+               "| M | 1 | PA | 4.25 | Table 1 |",
+               "<!-- audit-values-end -->"),
+             file.path(dir, "one.md"))
+
+  # Each instrument gets ITS OWN block's value. Assert the values, not merely
+  # that a frame came back: the defect this fences is a note whose second block
+  # is never reached, and a first-block fallback returns a perfectly well-formed
+  # frame of the wrong instrument's numbers.
+  expect_identical(parse_source_note("two", dir, "aa")$value, "1.5")
+  expect_identical(parse_source_note("two", dir, "bb")$value, "9.5")
+  expect_identical(attr(parse_source_note("two", dir, "bb"), "tag"), "bb")
+
+  # An instrument no block names must abort. Assert the condition by its
+  # message, not by "an error happened": a typo'd fixture path errors too.
+  expect_error(parse_source_note("two", dir, "cc"),
+               "no audit-values block for cc")
+  expect_error(parse_source_note("two", dir), "no audit-values block for")
+
+  # The untagged single-block note is the batch-1..3 shape and keeps working
+  # for any instrument, with an empty tag.
+  expect_identical(parse_source_note("one", dir, "anything")$value, "4.25")
+  expect_identical(parse_source_note("one", dir)$value, "4.25")
+  expect_identical(attr(parse_source_note("one", dir), "tag"), "")
 })
 
 test_that("norms-audit.md lists every shipped instrument (M72)", {

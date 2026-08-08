@@ -35,29 +35,42 @@ AUDIT_BATCH <- data.frame(
   instrument = c("csie", "csig", "csip", "csiv", "iitc",
                  "iis32", "iis64", "ipipipc", "isc",
                  "cais", "cais", "iei", "iei",
-                 "igicr", "igicr", "igicr", "iipsc", "iipsc"),
+                 "igicr", "igicr", "igicr", "iipsc", "iipsc",
+                 "iip32", "iip32", "iip32", "iip64", "iip64", "iip64"),
   sample     = c(rep(1, 9),
                  1, 2, 1, 2,
-                 1, 2, 3, 1, 2),
+                 1, 2, 3, 1, 2,
+                 1, 2, 3, 1, 2, 3),
   citekey    = c("locke2007", "locke2014", "boudreaux2018", "locke2000",
                  "bliton2019", "hatcher2012", "hatcher2009", "markey2009",
                  "hopwood2011",
                  "sodano2006", "sodano2006", "horner2024", "horner2024",
                  "trucco2013", "trucco2013", "trucco2013",
-                 "hopwood2008", "soldz1995"),
+                 "hopwood2008", "soldz1995",
+                 "horowitz2003", "horowitz2003", "horowitz2003",
+                 "horowitz2003", "horowitz2003", "horowitz2003"),
   # iipsc sample 1 is the one deviation among the batch-3 instruments:
   # hopwood2008 Table 1 prints octant SUMS over four 0-4 items and
   # data-raw/iipsc.R divides by 4 to express them as item means. Its sample 2
   # needs no divisor -- soldz1995 already prints item means.
+  #
+  # Both IIP instruments deviate the same way: horowitz2003 prints raw scale
+  # SUMS over a common 0-4 item anchor range, and the package ships item means,
+  # so the divisor is the scale length -- 4 for the IIP-32's four-item scales
+  # (Table F.5, p. 91) and 8 for the IIP-64's eight-item scales (Table 4.4,
+  # pp. 27-29). One source note, one citekey, two instruments: the note tags its
+  # two audit-values blocks and parse_source_note() picks by instrument.
   divisor    = c(1, 1, 8, 1, 1, 1, 1, 1, 1,
                  1, 1, 1, 1,
-                 1, 1, 1, 4, 1),
+                 1, 1, 1, 4, 1,
+                 4, 4, 4, 8, 8, 8),
   # The `scales` entry per multi-sample instrument is the pass whose note
   # actually carries the instrument-level rows. For iipsc that is SAMPLE 2:
   # soldz1995 prints the item-to-octant grouping and hopwood2008 does not.
   scales     = c(rep(TRUE, 9),
                  TRUE, FALSE, TRUE, FALSE,
-                 TRUE, FALSE, FALSE, FALSE, TRUE),
+                 TRUE, FALSE, FALSE, FALSE, TRUE,
+                 TRUE, FALSE, FALSE, TRUE, FALSE, FALSE),
   stringsAsFactors = FALSE
 )
 
@@ -109,21 +122,78 @@ CONSTRUCTED_CREDIT <- "constructed-credit"
 
 # Parse the machine-readable block a source note carries between its
 # audit-values markers. Returns a data.frame(field, sample, scale, value,
-# anchor).
-parse_source_note <- function(citekey,
-                              dir = file.path("cairn", "references")) {
+# anchor), carrying the block's tag in attr(, "tag").
+#
+# A note may carry SEVERAL blocks, each tagged with the instrument it backs:
+#
+#   <!-- audit-values-begin: iip64 -->
+#
+# One source can be the published source for more than one instrument -- the
+# IIP manual (M75) norms both the IIP-64 and the IIP-32 -- and their rows
+# collide, because the comparison keys on (field, sample, scale) and both
+# instruments have samples 1-3 over the same eight octant names. Two notes for
+# one source would duplicate its provenance and citation, so the note stays
+# one page and the blocks carry the instrument.
+#
+# `instrument` selects among tagged blocks. A note with a single UNTAGGED block
+# is the batch-1..3 shape and is returned whatever is asked for -- exactly one
+# instrument names such a note, so there is nothing to disambiguate. What is
+# refused is the ambiguous middle: asking a multi-block note for an instrument
+# none of its blocks names aborts rather than falling back to the first block,
+# which would audit one instrument against another's values and could not fail.
+# The tag carried by each begin marker; "" for an untagged block.
+source_note_tags <- function(begin_lines) {
+  trimws(sub("-->$", "",
+             sub("^<!-- audit-values-begin:?", "", trimws(begin_lines))))
+}
+
+# Every block tag a note carries, in file order. Read by the unclaimed-block
+# sweep, which must see blocks NO batch row selected -- parse_source_note()
+# by construction only ever returns one.
+source_note_block_tags <- function(citekey,
+                                   dir = file.path("cairn", "references")) {
   path <- file.path(dir, paste0(citekey, ".md"))
   if (!file.exists(path)) {
     stop("source note not found: ", path, call. = FALSE)
   }
   lines <- readLines(path, warn = FALSE)
-  b <- grep("<!-- audit-values-begin -->", lines, fixed = TRUE)
+  source_note_tags(lines[grep("^\\s*<!-- audit-values-begin", lines)])
+}
+
+parse_source_note <- function(citekey,
+                              dir = file.path("cairn", "references"),
+                              instrument = NULL) {
+  path <- file.path(dir, paste0(citekey, ".md"))
+  if (!file.exists(path)) {
+    stop("source note not found: ", path, call. = FALSE)
+  }
+  lines <- readLines(path, warn = FALSE)
+  b <- grep("^\\s*<!-- audit-values-begin", lines)
   e <- grep("<!-- audit-values-end -->", lines, fixed = TRUE)
-  if (length(b) != 1L || length(e) != 1L || e <= b) {
-    stop("source note ", citekey, " has no single audit-values block",
+  # Blocks must nest as begin/end/begin/end: interleaved or unclosed markers
+  # would silently hand back a row range spanning someone else's block.
+  ok <- length(b) && length(e) == length(b) && all(e > b) &&
+    (length(b) == 1L || all(b[-1L] > e[-length(e)]))
+  if (!ok) {
+    stop("source note ", citekey, " has no well-formed audit-values block(s)",
          call. = FALSE)
   }
-  rows <- lines[(b + 1L):(e - 1L)]
+  tags <- source_note_tags(lines[b])
+  if (anyDuplicated(tags)) {
+    stop("source note ", citekey, " tags two audit-values blocks alike: ",
+         paste(tags[duplicated(tags)], collapse = ", "), call. = FALSE)
+  }
+  if (length(b) == 1L && !nzchar(tags)) {
+    k <- 1L
+  } else {
+    k <- match(instrument %||% "", tags)
+    if (is.na(k)) {
+      stop("source note ", citekey, " has no audit-values block for ",
+           instrument %||% "<no instrument given>", "; it tags: ",
+           paste(tags, collapse = ", "), call. = FALSE)
+    }
+  }
+  rows <- lines[(b[[k]] + 1L):(e[[k]] - 1L)]
   rows <- rows[grepl("^\\|", rows)]
   # drop the header and the |---|---| separator
   rows <- rows[-(1:2)]
@@ -150,7 +220,7 @@ parse_source_note <- function(citekey,
          " audit row(s) with an empty value; first: ", rows[[empty[[1]]]],
          call. = FALSE)
   }
-  data.frame(
+  out <- data.frame(
     field  = vapply(cells, `[`, character(1), 1L),
     sample = vapply(cells, `[`, character(1), 2L),
     scale  = vapply(cells, `[`, character(1), 3L),
@@ -158,6 +228,8 @@ parse_source_note <- function(citekey,
     anchor = vapply(cells, `[`, character(1), 5L),
     stringsAsFactors = FALSE
   )
+  attr(out, "tag") <- tags[[k]]
+  out
 }
 
 # Angle and Items are instrument-level facts with no sample of their own; both
@@ -270,11 +342,15 @@ audit_norms <- function(batch = AUDIT_BATCH,
   validate_batch(batch)
   ledger <- list()
   coverage <- list()
-  # Which of each note's sample labels some batch entry actually claimed. A
-  # note tabling three samples while the batch names two would otherwise drop
+  # Which of each note BLOCK's sample labels some batch entry actually claimed.
+  # A note tabling three samples while the batch names two would otherwise drop
   # the third with no row anywhere -- the same silent-loss shape the malformed
-  # -row abort above refuses.
+  # -row abort above refuses. Keyed per block, not per citekey: a two-block note
+  # keyed by citekey alone would let one instrument's claims cover the other
+  # instrument's unaudited samples, which is the whole failure this sweep exists
+  # to catch.
   claimed <- list()
+  blocks <- list()
 
   for (i in seq_len(nrow(batch))) {
     inst <- batch$instrument[[i]]
@@ -283,11 +359,14 @@ audit_norms <- function(batch = AUDIT_BATCH,
     divisor <- batch$divisor[[i]]
     ship <- shipped_values(inst, smp, batch$scales[[i]], obj = objects[[inst]])
 
-    note_all <- parse_source_note(citekey, dir)
+    note_all <- parse_source_note(citekey, dir, inst)
     note_only <- note_all[note_all$field == NOTE_ONLY, , drop = FALSE]
     note_real <- note_all[note_all$field != NOTE_ONLY, , drop = FALSE]
-    claimed[[citekey]] <- union(
-      claimed[[citekey]] %||% character(0), as.character(smp)
+    bkey <- paste0(citekey, "\r", attr(note_all, "tag"))
+    blocks[[bkey]] <- list(citekey = citekey, instrument = inst,
+                           tag = attr(note_all, "tag"))
+    claimed[[bkey]] <- union(
+      claimed[[bkey]] %||% character(0), as.character(smp)
     )
     # Restrict to the sample this pass audits, plus the instrument-level rows.
     # Other samples' rows belong to their own pass, not to this one's coverage.
@@ -358,15 +437,43 @@ audit_norms <- function(batch = AUDIT_BATCH,
     }
   }
 
-  for (citekey in names(claimed)) {
-    tabled <- parse_source_note(citekey, dir)
+  for (bkey in names(claimed)) {
+    blk <- blocks[[bkey]]
+    tabled <- parse_source_note(blk$citekey, dir, blk$instrument)
     tabled <- tabled[tabled$field != NOTE_ONLY, , drop = FALSE]
     unclaimed <- setdiff(unique(tabled$sample),
-                         c(claimed[[citekey]], NO_SAMPLE))
+                         c(claimed[[bkey]], NO_SAMPLE))
     if (length(unclaimed)) {
       coverage[[length(coverage) + 1L]] <- data.frame(
-        instrument = citekey, side = "note-sample-not-audited",
+        instrument = if (nzchar(blk$tag)) paste0(blk$citekey, " (", blk$tag, ")")
+                     else blk$citekey,
+        side = "note-sample-not-audited",
         field = "sample", scale = unclaimed,
+        exempt = FALSE, stringsAsFactors = FALSE
+      )
+    }
+  }
+
+  # ...and the block level. The sweep above walks blocks the batch CLAIMED, so
+  # it can only ever report a sample missing from a block someone audited. A
+  # whole block no batch row selects is never parsed, never keyed, and never
+  # counted -- measured at the M75 review: dropping the three iip32 rows from
+  # AUDIT_BATCH made all 48 of that instrument's tabled values vanish with the
+  # ledger, the coverage report and every printed count reading clean. That is
+  # the same silent-loss shape the malformed-row and missing-sample aborts
+  # above refuse, one level up, so it is refused here too.
+  for (citekey in unique(batch$citekey)) {
+    tags <- source_note_block_tags(citekey, dir)
+    seen <- vapply(names(claimed), function(k) blocks[[k]]$tag, character(1),
+                   USE.NAMES = FALSE)
+    unaudited <- setdiff(tags, seen[
+      vapply(names(claimed), function(k) blocks[[k]]$citekey, character(1),
+             USE.NAMES = FALSE) == citekey
+    ])
+    if (length(unaudited)) {
+      coverage[[length(coverage) + 1L]] <- data.frame(
+        instrument = citekey, side = "note-block-not-audited",
+        field = "block", scale = unaudited,
         exempt = FALSE, stringsAsFactors = FALSE
       )
     }

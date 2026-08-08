@@ -53,7 +53,18 @@ test_that("Rd files contain no LaTeX-hostile characters", {
 
   # En/em dash and curly quotes: present in man/ today and accepted by
   # win-builder. Everything else outside printable ASCII is flagged.
-  safe <- "–—‘’“”"
+  #
+  # The copyright sign joined them in M75, deliberately and with evidence
+  # rather than on the assumption that Latin-1 is safe. `?iip32` and `?iip64`
+  # must carry the Mind Garden reproduction credit line VERBATIM, and that line
+  # contains the sign; transliterating it to "(c)" would alter a permission
+  # condition to satisfy a guard. Before allowing it, the two Rd files were
+  # converted with tools::Rd2latex() and compiled with pdflatex: the log
+  # contains no "Unicode character ... not set up for use with LaTeX" line and
+  # the glyph typesets. (pdftotext cannot extract it from the result, which is
+  # an extraction artifact and not a rendering failure -- the rendered page
+  # shows it.) Any further addition here needs the same evidence.
+  safe <- "–—‘’“”©"
   hostile <- sprintf("[^ -~%s]", safe)
 
   offenders <- character()
