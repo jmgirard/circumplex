@@ -138,7 +138,7 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
       `R/tidying_functions.R:197`.
 - [x] T6 Test-first, then implement, the unmatched-`sample` refusal, leaving the
       arity check in place with its own test.
-- [ ] T7 Roxygen for `quiet`, `@return`, the message and both refusals; add the
+- [x] T7 Roxygen for `quiet`, `@return`, the message and both refusals; add the
       default-sample example; resolve the "or custom" claim at
       `R/tidying_functions.R:127`; run `document()`.
 - [ ] T8 NEWS entries; full `test()` and `check()`.
@@ -159,6 +159,11 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 - 2026-08-08: this file now carries 9 acceptance criteria, over the ~7 split tripwire. Not split: AC8 constrains AC1's message text and AC9 is a one-file test pin, so both land inside the same reviewable PR rather than forming an independent slice.
 
 - 2026-08-08: T5 and T6 done. The `Abbrev`/`Scale` defect's pre-fix failure was verified rather than assumed: `key$Scale` is NULL on an Abbrev-labelled instrument, so `paste(NULL[outside], collapse = ", ")` yields `""` and the refusal named no scale at all — it did not print "NA", which the test's first draft asserted. The test now pins the empty-list shape it actually produced. Two further loud call sites in `test-tidying_functions.R` (the 0-vs-360 pair) were quieted in the same pass; the suite now emits no disclosure noise.
+
+- 2026-08-08: T7 done — `quiet`, `@return`'s attribute, both refusal conditions, the multi-sample default-`sample` example, and RR16 B1's "or custom" opening, which now names the instrument argument the signature actually requires. `document()` regenerates `man/norm_standardize.Rd` only, with no `resolve link` line and no further diff on a second run.
+- 2026-08-08: AC6 entry-to-test mapping. "reports which normative sample it used" + `quiet` → test-norms-disclosure.R "a single-sample instrument's message names the sample, size and description", "a multi-sample instrument's message says how many other samples exist", "quiet = TRUE emits nothing". "norm_sample attribute" → "both return paths carry the norm_sample attribute" and "the attribute is present whether or not the message was emitted". "names the offending scales for every instrument" → test-norms-anchor-range.R "the refusal names the offending scales on an Abbrev-labelled instrument". "a normative sample an instrument does not carry" → test-norms-disclosure.R "a sample the instrument does not carry is refused by name", with the retained arity check fenced by "the scales-vs-norms arity check is retained and still fires".
+- 2026-08-08: the NEWS entry's first draft said the reference choice moves scores "half a standard deviation on average"; M74 measured 0.44, so the entry now reads "roughly half ... and by nearly twice that at the extreme" (0.78). Corrected before the entry was committed.
+- 2026-08-08: full `devtools::test()` clean — 0 failures, 6537 passing. The 4 warnings are all in `test-ci_accuracy.R`, which this branch does not touch.
 
 ## Decisions
 

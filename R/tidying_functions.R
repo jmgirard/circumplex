@@ -124,9 +124,18 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #' Standardize circumplex scales using normative data
 #'
 #' Take in a data frame containing circumplex scales, angle definitions for each
-#' scale, and normative data (from the package or custom) and return that same
-#' data frame with each specified circumplex scale transformed into standard
-#' scores (i.e., z-scores) based on comparison to the normative data.
+#' scale, and an instrument whose normative data will be used, and return that
+#' same data frame with each specified circumplex scale transformed into
+#' standard scores (i.e., z-scores) based on comparison to that instrument's
+#' normative sample.
+#'
+#' The sample the scores are compared against is a result-determining choice,
+#' not a technicality: different samples of the same instrument can move a
+#' respondent's z-scores by more than half a standard deviation. So unless
+#' `quiet = TRUE`, every successful call reports which sample it used, how
+#' large that sample was, and how it is described, and every call attaches the
+#' same facts to the result (see `@return`). Use `norms()` to see the samples
+#' an instrument carries before choosing one.
 #'
 #' @param data Required. A data frame or matrix containing at least circumplex
 #'   scales.
@@ -143,10 +152,12 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #'   available circumplex instruments, see `instruments()`.
 #' @param sample Required. An integer corresponding to the normative sample to
 #'   use in standardizing the scale scores (default = 1). See `?norms` to
-#'   see the normative samples available for an instrument. A sample whose
-#'   mean scores fall outside the instrument's own response range cannot be on
-#'   the same metric as the scores being standardized, and is refused with an
-#'   error rather than used; `norms()` lists the alternatives.
+#'   see the normative samples available for an instrument. Two conditions are
+#'   refused with an error rather than used: a `sample` the instrument does not
+#'   carry (the error lists the sample numbers it does), and a sample whose
+#'   mean scores fall outside the instrument's own response range, which cannot
+#'   be on the same metric as the scores being standardized. `norms()` lists
+#'   the alternatives in both cases.
 #' @param prefix Optional. A string to include at the beginning of the newly
 #'   calculated scale variables' names, before the scale name and `suffix`
 #'   (default = "").
@@ -156,12 +167,26 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #' @param append Optional. A logical that determines whether the calculated
 #'   standardized scores should be added as columns to `data` in the output or
 #'   the standardized scores alone should be output (default = TRUE).
-#' @return A data frame that contains the norm-standardized versions of `scales`.
+#' @param quiet Optional. A logical that suppresses the message naming the
+#'   normative sample used (default = FALSE). Set to `TRUE` in loops, knitted
+#'   documents, and anywhere else the message is noise; the returned attribute
+#'   below records the same facts either way.
+#' @return A data frame that contains the norm-standardized versions of
+#'   `scales`. It carries a `"norm_sample"` attribute -- a list with elements
+#'   `Instrument`, `Sample`, `Size` and `Population` -- recording which
+#'   normative sample produced the scores, so a script that never sees the
+#'   console can still report what its z-scores are relative to. Retrieve it
+#'   with `attr(x, "norm_sample")`.
 #' @export
 #' @family tidying functions
 #' @examples
 #' data("jz2017")
 #' norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
+#'
+#' # The IIP-SC carries more than one normative sample. Omitting `sample` takes
+#' # the first, and the message says which one that was.
+#' z <- norm_standardize(jz2017, scales = 2:9, instrument = iipsc)
+#' attr(z, "norm_sample")
 norm_standardize <- function(data, scales, angles = octants(), instrument,
                        sample = 1, prefix = "", suffix = "_z", append = TRUE,
                        quiet = FALSE) {
