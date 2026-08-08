@@ -35,7 +35,10 @@ available circumplex instruments, see \code{instruments()}.}
 
 \item{sample}{Required. An integer corresponding to the normative sample to
 use in standardizing the scale scores (default = 1). See \code{?norms} to
-see the normative samples available for an instrument.}
+see the normative samples available for an instrument. A sample whose
+mean scores fall outside the instrument's own response range cannot be on
+the same metric as the scores being standardized, and is refused with an
+error rather than used; \code{norms()} lists the alternatives.}
 
 \item{prefix}{Optional. A string to include at the beginning of the newly
 calculated scale variables' names, before the scale name and \code{suffix}
