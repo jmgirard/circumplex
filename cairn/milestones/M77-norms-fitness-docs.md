@@ -108,6 +108,7 @@ this milestone cites it, it does not restate it.
 - 2026-08-08: T5 post-edit AC4 sweep (same command, run on this branch after T2–T4 landed) returns 21 matched lines, down from T1's 23. `vignettes/using-instruments.Rmd` now matches nothing: both of its T1 REWRITE hits are gone with the rewritten passages. `R/instrument_oop.R` still matches at `:153` and `:159`, which is the intended outcome — AC3 extends the existing hedge rather than replacing it, so its original two sentences stand and the new paragraph follows them. The 19 CONFIRMED CORRECT AS WRITTEN hits from T1 are unchanged and unedited; every AC4 hit is therefore dispositioned as rewritten (4) or correct as written (19).
 - 2026-08-08: `devtools::test()` clean on the branch — `[ FAIL 0 | WARN 4 | SKIP 0 | PASS 6550 ]`; the 4 warnings are the pre-existing ill-conditioned-Hessian notices raised from `test-ci_accuracy.R` at `:323`, `:516`, `:532`, `:866`, unrelated to this branch, which touches no runtime code.
 - 2026-08-08: honest checkpoint — T2/T3/T4 edits and the T6 NEWS entry are on the branch, but the profile's `devtools::test()` verify slot was still running when this commit was made (a second R test process on the box is competing with it), so no task is verified yet; the branch touches only roxygen comments, vignette prose and NEWS, with no runtime surface. T5 and T6's `check()` still outstanding.
+- 2026-08-08: review round 2 — post-fix `check()` Status OK 0/0/0 with a clean vignette rebuild; a fresh [O] lens confirmed the round-1 defect gone and the `n_unsourced` derivation sound against `norms-audit.md`; its one actioned finding (N1, 82: the carve-out's grammar inverted the caution for the unsourced samples) was under the return floor and falsified no criterion, so it was fixed in review rather than returned, and its fix also takes up N2 and N3. Twelve sub-threshold findings logged in the Review section.
 - 2026-08-08: round-1 fixes applied at the maintainer's chosen scope (correct the three overclaims and state the gap rather than only stop overstating it). `?norms` and `man/norms.Rd` now except "those whose `Reference` records the norms source as unconfirmed" alongside the IIP standardization samples; the vignette's `:122` definition drops "described in a published source", which was the false universal; the characterization chunk gains `n_unsourced <- sum(grepl("unconfirmed", samples$Reference))` and the passage now says how many tables have no identified source and that scores standardized against them rest on unverified numbers; NEWS drops "most" for "many" and carries both ends of the provenance range. Verified by knit: the passage prints 2 unsourced against the 24/15/11/7/6 already pinned. `document()` clean with zero `resolve link` lines. The 17 sub-threshold findings are untouched and stay logged.
 - 2026-08-08: review round 1 returns the milestone to `in-progress` under the return floor. What failed: the `?norms` paragraph added by T4 asserts that every non-standardization sample is "the study samples their authors had available", which is false for iis32 and ipipipc — the two samples M73 gave the `source-not-identified` disposition and whose own help pages say their norms are published in no identified source — so `?norms` contradicts `?iis32` and `?ipipipc` (scored 92). The same false universal reaches `vignettes/using-instruments.Rmd:122`'s new definition (87) and the NEWS entry, which also overstates the college count as "most" where the vignette correctly says 11 of 24 (88, 80). No acceptance criterion fails as written; the criteria stand and only the prose under them needs repair. Defect returns for this milestone: 1.
 - 2026-08-08: review opened draft PR #105 and ran the consistency gate — `cairn_validate` exit 0 with all 16 checks PASS (47 advisories, all M7's pre-existing wrapped work-log lines); `document()` no-diff and zero `resolve link` lines; `pkgdown::check_pkgdown()` no problems; README in sync; no new top-level files needing `.Rbuildignore`. No principle changed, so `cairn_impact` is skipped. Three fresh-context reviewers spawned; CI running.
@@ -167,7 +168,7 @@ adjacent sentences; AC1, AC2, AC4 and AC5 were each verified and hold. This is
 a defect return, not an amendment return — the criteria are right, the prose
 under them is not. Defect returns for this milestone: 1.
 
-**Logged, below threshold (17), surfaced not dropped:** F4 (70) "24 samples"
+**Logged, below threshold (17), surfaced not dropped — round 1:** F4 (70) "24 samples"
 counts subgroup rows as distinct samples where ~17 humans' samples exist, and
 the rewrite dropped the old "overlapping" hedge; F3 (65) the characterization
 passage never mentions the 2 unsourced rows; F5 (62) "separate samples for men
@@ -186,3 +187,60 @@ F17 (35) the 300 threshold is unexplained; F14 (30) NEWS carries process
 meta-commentary; B1 (25) the two `?norms` hedges stack without signposting;
 B5 (20) the vignette still does not narrate M76's disclosure message, which
 this milestone's Scope excludes.
+
+### Round 2 — 2026-08-08
+
+**Re-verification after the round-1 fix.** `devtools::check(args =
+"--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes, 18m 34s, with
+`checking re-building of vignette outputs ... OK` — and `R CMD check` runs the
+test suite, so the tests are re-verified by it. `document()` no-diff with zero
+`resolve link` lines.
+
+**Fresh [O] diff-bug lens over the corrected state** (a reviewer that took no
+part in round 1), told not to re-report the 17 accepted sub-threshold findings.
+It confirmed the round-1 defect gone from all four surfaces and independently
+verified the `n_unsourced` derivation sound: exactly 2, matching
+`cairn/references/norms-audit.md`'s two `norms unsourced` rows, with no
+over- or under-count — csiv's similar-looking `Reference` is audited as
+verified against the author's published website table. It found no contradiction
+between the corrected prose and any other help page, vignette or NEWS entry,
+and noted the fix incidentally actioned round 1's F3. A [S] scorer holding the
+diff and this plan scored its 13 findings.
+
+**Actioned (score ≥ 80), 1 finding, fixed in review:**
+
+- **N1 (82) — the round-1 carve-out inverted the caution for the samples it
+  was meant to warn about.** `R/instrument_oop.R:163-166`, mirrored in
+  `man/norms.Rd`. Writing "Apart from the IIP-32 and IIP-64 national
+  standardization samples, **and those whose `Reference` records the norms
+  source as unconfirmed**, the shipped samples are the study samples their
+  authors had available, **so** a mean and standard deviation … describes that
+  group of people rather than a population" put both exceptions under one
+  `so`-clause. The two have opposite epistemic status — the IIP samples are
+  excepted because they *do* represent a population — so a reader applying the
+  parallel would conclude the unsourced samples may be population norms too,
+  the inverse of what `?iis32` says. Falsifies no criterion (AC3 asks for the
+  drawn-from/drawn-to-represent distinction and the vignette pointer, both
+  present), and at 82 it is under the return floor, so it took in-review triage
+  rather than a second return. **Fixed:** the sentence is split, the caution
+  stays universal, and the unsourced samples get their own stronger statement
+  ("the statistics appear in no source that has been identified and should be
+  treated as unverified"), keyed on "the printed reference" rather than the
+  undocumented `Reference` field name — which also takes up N2 and N3.
+
+**Logged, below threshold (12) — round 2:** N4 (72) the vignette attributes
+"published in no source that has been identified" to the `Reference` field,
+which says only "unconfirmed" — the stronger claim rests on `?iis32`/`?ipipipc`
+and the audit; N5 (65) "**The** exception is the IIP-32 and IIP-64" is now
+followed by a second exception without being demoted to indefinite, same in
+NEWS; N7 (52) iis32's own `Population` label is unsourced yet feeds the
+computed college count; N6 (50) "At the other end" frames sampling design and
+documentation provenance as one continuum; N8 (48) `n_unsourced` is a
+case-sensitive substring match on prose that would silently print 0 if the
+wording changed — a new call site of round 1's F7/F9, and it retires when
+D-041's machine-readable kind column lands; N9 (45) AC2's enumerated figure
+list does not include `n_unsourced`, which leaves the criterion's illustration
+incomplete while its rule stays satisfied; N2 (42) and N3 (38), both taken up
+by the N1 fix; N10 (42) the post-fix check evidence sat in a commit message
+rather than the work log, recorded here; N13 (35), N12 (32), N11 (28) wording
+and cosmetic.

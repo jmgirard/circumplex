@@ -30,10 +30,12 @@ population.
 
 The label names the group each sample was drawn from, not a frame the
 sample was drawn to represent. Apart from the IIP-32 and IIP-64 national
-standardization samples, and those whose \code{Reference} records the norms
-source as unconfirmed, the shipped samples are the study samples their
+standardization samples, the shipped samples are the study samples their
 authors had available, so a mean and standard deviation computed from one
-of them describes that group of people rather than a population. See
+of them describes that group of people rather than a population. A few are
+weaker still: where the printed reference says the norms source is
+unconfirmed, the statistics appear in no source that has been identified
+and should be treated as unverified. See
 \code{vignette("using-instruments")} for what the shipped reference samples are
 and how to choose among them.
 }
