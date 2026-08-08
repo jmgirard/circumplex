@@ -28,7 +28,7 @@ this milestone cites it, it does not restate it.
 
 ## Acceptance criteria
 
-- [ ] AC1 The four passages are rewritten: the nationality-matching claim at
+- [x] AC1 The four passages are rewritten: the nationality-matching claim at
       `:124` goes (no shipped instrument carries nationality-matched samples —
       the matched sets are gender for igicr/iip32/iip64 and age for cais); the
       definite-article "the normative average" at `:122` names a specific study
@@ -39,7 +39,7 @@ this milestone cites it, it does not restate it.
       0.44 SD on average and 0.78 at the extreme, against ~0.12 SD contributed
       by reference-moment sampling error at the worst shipped sample size
       (iipsc sample 2, n = 106).
-- [ ] AC2 The vignette states, where sample choice is first taught, what the
+- [x] AC2 The vignette states, where sample choice is first taught, what the
       shipped reference samples are, and every *quantified* claim in that
       passage is either computed by a visible chunk from the shipped instrument
       objects or cited to `cairn/references/norms-audit.md` — never
@@ -49,18 +49,18 @@ this milestone cites it, it does not restate it.
       sample (iip32 and iip64, the exception the passage must name). Claims
       about study *design* — that most are single-study convenience samples —
       are not computable from any shipped field and are cited, not computed.
-- [ ] AC3 `?norms`'s hedge, which already cautions against treating a sample as
+- [x] AC3 `?norms`'s hedge, which already cautions against treating a sample as
       representative (`R/instrument_oop.R:158-160`), additionally states that
       `Population` names the group the sample was drawn from rather than a
       frame it was sampled to represent, and points at the vignette passage
       AC2 adds.
-- [ ] AC4 Every site returned by `grep -n -iE
+- [x] AC4 Every site returned by `grep -n -iE
       'representative|normative average|sampling error|the population'
       vignettes/*.Rmd R/*.R` is dispositioned in this milestone's work log as
       rewritten or as confirmed correct as written. This criterion claims what
       that command sweeps and nothing wider; it makes no claim about passages
       the pattern does not match.
-- [ ] AC5 `NEWS.md` carries a user-facing entry for the documentation
+- [x] AC5 `NEWS.md` carries a user-facing entry for the documentation
       correction, and `Rscript -e 'devtools::check()'` is clean (0 errors, 0
       warnings; NOTEs justified) — which is what rebuilds the edited vignette.
 
@@ -244,3 +244,39 @@ incomplete while its rule stays satisfied; N2 (42) and N3 (38), both taken up
 by the N1 fix; N10 (42) the post-fix check evidence sat in a commit message
 rather than the work log, recorded here; N13 (35), N12 (32), N11 (28) wording
 and cosmetic.
+
+### Acceptance criteria — evidence (gathered 2026-08-08 at 48824462)
+
+- **AC1** — read the four passages in the current tree. `:122` no longer says
+  "the normative average" (now "the average of that particular sample") and no
+  longer says "comparison sample"; `:124` no longer claims nationality-matched
+  samples, and subordinates size to fit; `:126` no longer resolves on "a rather
+  large … a rather small sample" but on "which group your participants
+  resemble"; `:132` no longer says "so much larger and therefore subject to
+  less sampling error", resolving instead on "because it describes a similar
+  group of people, not because it is larger". The 0.44/0.78/0.12 SD measurement
+  is carried qualitatively — the vignette ships and `norms-audit.md` does not,
+  so printing the figures would leave them uncitable by the reader.
+- **AC2** — knitted the vignette and read the rendered passage: every figure in
+  it is interpolated from the visible chunk, which reads the shipped instrument
+  objects. Printed 24 samples, 15 instruments, 11 college/undergraduate, 7 under
+  300, 6 standardization — each verified against a second, independently written
+  derivation (a per-instrument `utils::data()` loop into fresh environments
+  rather than the chunk's `mget()` over the attached package env), plus a sixth,
+  `n_unsourced` = 2, verified by the round-2 lens against
+  `cairn/references/norms-audit.md`'s two `norms unsourced` rows. The
+  uncomputable study-design claim is stated without a figure.
+- **AC3** — read the rendered `man/norms.Rd`. The hedge now adds that the label
+  "names the group each sample was drawn from, not a frame the sample was drawn
+  to represent", and closes with `vignette("using-instruments")`, the passage
+  AC2 adds. M72's original two sentences are intact above it, extended not
+  replaced.
+- **AC4** — re-ran the criterion's own `grep -n -iE` command on the final tree:
+  21 matched lines, from T1's pre-edit 23. `vignettes/using-instruments.Rmd`
+  matches nothing; `R/instrument_oop.R` matches only at `:153` and `:159`, the
+  retained M72 sentences AC3 extends. Every hit is dispositioned in the work log
+  as rewritten (4) or confirmed correct as written (19), pre- and post-edit.
+- **AC5** — `NEWS.md` carries a Documentation entry for the correction, and
+  `Rscript -e 'devtools::check(args = "--no-manual")'` is Status OK — 0 errors,
+  0 warnings, 0 notes, 13m 23s — with `checking re-building of vignette outputs
+  ... OK`, the rebuild of the edited vignette.
