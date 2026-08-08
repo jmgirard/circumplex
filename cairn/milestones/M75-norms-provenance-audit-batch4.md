@@ -33,15 +33,15 @@ well-named for users → the existing norms-fitness row.
 ## Acceptance criteria
 
 - [ ] AC1: `audit_norms()` compares all 48 shipped `iip64` M/SD values
-      (3 samples × 8 octants × 2) against `horowitz2003`'s audit-values block
-      with `divisor = 8`; the regenerated `norms-audit-ledger.csv` contains
-      **no `iip64` row at all** and `norms-audit-coverage.csv` contains no
+      (3 samples × 8 octants × 2) against `horowitz2003`'s `iip64` audit-values
+      block with `divisor = 8`; the regenerated `norms-audit-ledger.csv` carries
+      **no `iip64` row for any field the manual publishes** — no M, SD, Size,
+      Reference or Items row — and `norms-audit-coverage.csv` contains no
       non-exempt `iip64` row.
-- [ ] AC2: `audit_norms()` compares all 48 shipped `iip32` M/SD values
-      (3 samples × 8 octants × 2) against `horowitz2003`'s audit-values block
-      with `divisor = 4`; the regenerated `norms-audit-ledger.csv` contains
-      **no `iip32` M or SD row at all** and `norms-audit-coverage.csv` contains
-      no non-exempt `iip32` row. `horowitz2003.md` records that the IIP-32
+- [ ] AC2: the same for all 48 shipped `iip32` M/SD values against the `iip32`
+      block with `divisor = 4`: no `iip32` M, SD, Size, Reference or Items
+      ledger row, and no non-exempt `iip32` coverage row. `horowitz2003.md`
+      records that the IIP-32
       descriptives are printed in Table F.5 (p. 91) — inside Appendix F, after
       the T-score conversion tables, rather than beside the IIP-64's Table 4.4 —
       and that Appendices B, D, F and G's conversion tables are a separate
@@ -96,7 +96,7 @@ well-named for users → the existing norms-fitness row.
       instruments — `<!-- audit-values-begin: <instrument> -->` tagged blocks
       selected by the batch row's instrument, with untagged single-block notes
       unchanged. Test both the selection and the abort when no block matches.
-- [ ] T2: add six `AUDIT_BATCH` rows to `data-raw/audit-norms.R:34-62`
+- [x] T2: add six `AUDIT_BATCH` rows to `data-raw/audit-norms.R:34-62`
       (iip32 samples 1–3 `divisor = 4`, iip64 samples 1–3 `divisor = 8`, one
       `scales = TRUE` per instrument); run and record ledger + coverage.
 - [ ] T3: record in `horowitz2003.md` where the IIP-32 descriptives actually
@@ -105,7 +105,7 @@ well-named for users → the existing norms-fitness row.
       absence — the norms-audit row's 2000-edition open item and the T-score
       row's "for the IIP-32 the tables are the *only* published norming
       content".
-- [ ] T4: add any Population/Angle/URL deviations to
+- [x] T4: add any Population/Angle/URL deviations to
       `data-raw/norms-audit-dispositions.csv`; re-run until no ledger row is
       `UNDISPOSITIONED`.
 - [ ] T5: update the six `Population` strings, resolve the citation year and
@@ -137,6 +137,9 @@ well-named for users → the existing norms-fitness row.
 - 2026-08-07: discovered sub-task T2a — one source note backing two instruments collides in the audit's `(field, sample, scale)` join key, since `parse_source_note()` assumes one note per instrument and requires exactly one audit-values block. Adding instrument-tagged blocks rather than splitting the manual across two citekey pages.
 
 - 2026-08-07: T2a done — `parse_source_note()` takes an `instrument` and selects among instrument-tagged blocks; untagged single-block notes unchanged, and re-running the audit over batches 1-3 reproduces the committed ledger and coverage byte-for-byte. `devtools::test()` clean (0 failures, 6068 passing).
+
+- 2026-08-07: T2 + T4 done — six `AUDIT_BATCH` rows added (iip32 divisor 4, iip64 divisor 8, one `scales = TRUE` each). Ledger grows 166 → 194 rows: all 96 M/SD, both item maps, the six Sizes and the six Reference credits reconcile and produce no row; the 28 rows added are exactly the fields the manual publishes for neither instrument (Angle × 8, Population × 3, URL × 3 each), now dispositioned `not-published-in-source`. Coverage gaps 0, angle-copy splits 0, IP2 breaches 0, `UNDISPOSITIONED` 0. `devtools::test()` clean (0 failures, 6068 passing).
+- 2026-08-07: amendment gate — AC1 demanded the ledger carry no `iip64` row at all, which no instrument can satisfy, since every source leaves some audited field unpublished; measured here as 14 rows per instrument. AC1 and AC2 rewritten to demand no row for the fields the manual DOES publish (M, SD, Size, Reference, Items), the unpublished ones staying covered by AC4's disposition requirement.
 
 ## Decisions
 

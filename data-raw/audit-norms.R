@@ -35,29 +35,42 @@ AUDIT_BATCH <- data.frame(
   instrument = c("csie", "csig", "csip", "csiv", "iitc",
                  "iis32", "iis64", "ipipipc", "isc",
                  "cais", "cais", "iei", "iei",
-                 "igicr", "igicr", "igicr", "iipsc", "iipsc"),
+                 "igicr", "igicr", "igicr", "iipsc", "iipsc",
+                 "iip32", "iip32", "iip32", "iip64", "iip64", "iip64"),
   sample     = c(rep(1, 9),
                  1, 2, 1, 2,
-                 1, 2, 3, 1, 2),
+                 1, 2, 3, 1, 2,
+                 1, 2, 3, 1, 2, 3),
   citekey    = c("locke2007", "locke2014", "boudreaux2018", "locke2000",
                  "bliton2019", "hatcher2012", "hatcher2009", "markey2009",
                  "hopwood2011",
                  "sodano2006", "sodano2006", "horner2024", "horner2024",
                  "trucco2013", "trucco2013", "trucco2013",
-                 "hopwood2008", "soldz1995"),
+                 "hopwood2008", "soldz1995",
+                 "horowitz2003", "horowitz2003", "horowitz2003",
+                 "horowitz2003", "horowitz2003", "horowitz2003"),
   # iipsc sample 1 is the one deviation among the batch-3 instruments:
   # hopwood2008 Table 1 prints octant SUMS over four 0-4 items and
   # data-raw/iipsc.R divides by 4 to express them as item means. Its sample 2
   # needs no divisor -- soldz1995 already prints item means.
+  #
+  # Both IIP instruments deviate the same way: horowitz2003 prints raw scale
+  # SUMS over a common 0-4 item anchor range, and the package ships item means,
+  # so the divisor is the scale length -- 4 for the IIP-32's four-item scales
+  # (Table F.5, p. 91) and 8 for the IIP-64's eight-item scales (Table 4.4,
+  # pp. 27-29). One source note, one citekey, two instruments: the note tags its
+  # two audit-values blocks and parse_source_note() picks by instrument.
   divisor    = c(1, 1, 8, 1, 1, 1, 1, 1, 1,
                  1, 1, 1, 1,
-                 1, 1, 1, 4, 1),
+                 1, 1, 1, 4, 1,
+                 4, 4, 4, 8, 8, 8),
   # The `scales` entry per multi-sample instrument is the pass whose note
   # actually carries the instrument-level rows. For iipsc that is SAMPLE 2:
   # soldz1995 prints the item-to-octant grouping and hopwood2008 does not.
   scales     = c(rep(TRUE, 9),
                  TRUE, FALSE, TRUE, FALSE,
-                 TRUE, FALSE, FALSE, FALSE, TRUE),
+                 TRUE, FALSE, FALSE, FALSE, TRUE,
+                 TRUE, FALSE, FALSE, TRUE, FALSE, FALSE),
   stringsAsFactors = FALSE
 )
 
