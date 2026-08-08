@@ -117,6 +117,19 @@ on a real ggplot2 coordinate system.
   exact-pole endpoint is a measure-zero floating-point corner for real
   data, so numeric results are otherwise unchanged.
 
+- [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
+  now refuses a normative sample whose mean scores fall outside the
+  instrument’s own response range, instead of returning z-scores
+  computed from it. Such a sample cannot be on the same metric as the
+  scores being standardized, so the values it produced were wrong in an
+  undefined unit, with nothing in the output to indicate it. One shipped
+  sample is affected: the CAIS adult sample (`sample = 2`), three of
+  whose octant means exceed the CAIS’s 1–5 response range. The CAIS
+  child sample (`sample = 1`) and every other instrument are unaffected.
+  See [`?cais`](http://circumplex.jmgirard.com/reference/cais.md); the
+  source of those values is under query with its authors, and the sample
+  will be corrected or withdrawn once that is settled.
+
 - The package now requires ggplot2 (\>= 4.0.0), and `ggforce` is no
   longer a dependency. The declared R requirement moves to R (\>= 4.1)
   to match the floor ggplot2 already imposes; no installation that

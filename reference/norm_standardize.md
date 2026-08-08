@@ -57,7 +57,12 @@ norm_standardize(
   Required. An integer corresponding to the normative sample to use in
   standardizing the scale scores (default = 1). See
   [`?norms`](http://circumplex.jmgirard.com/reference/norms.md) to see
-  the normative samples available for an instrument.
+  the normative samples available for an instrument. A sample whose mean
+  scores fall outside the instrument's own response range cannot be on
+  the same metric as the scores being standardized, and is refused with
+  an error rather than used;
+  [`norms()`](http://circumplex.jmgirard.com/reference/norms.md) lists
+  the alternatives.
 
 - prefix:
 

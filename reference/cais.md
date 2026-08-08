@@ -20,6 +20,21 @@ childhood: Development of the Child and Adolescent Interpersonal Survey.
 
 [doi:10.1207/s15327752jpa8703_12](https://doi.org/10.1207/s15327752jpa8703_12)
 
+## Note on the adult normative sample
+
+The CAIS is rated on a 5-point scale, but three of the octant means the
+source publishes for its adult sample (`sample = 2`) fall above 5: PA
+5.19, LM 6.52, and NO 6.14. The package transcribes them faithfully, and
+the source's own table is the origin of the discrepancy rather than the
+transcription. Because a sample whose means lie outside the response
+range cannot be on the same metric as the scores being standardized,
+[`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
+refuses `sample = 2` rather than returning z-scores in an undefined
+unit. The child sample (`sample = 1`) is unaffected and its means all
+sit inside the response range. The discrepancy is under query with the
+instrument's authors; this sample will be corrected or withdrawn once
+that is resolved.
+
 ## Examples
 
 ``` r

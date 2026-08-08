@@ -119,7 +119,10 @@ available circumplex instruments, see <code><a href="instruments.html">instrumen
 <dt id="arg-sample">sample<a class="anchor" aria-label="anchor" href="#arg-sample"></a></dt>
 <dd><p>Required. An integer corresponding to the normative sample to
 use in standardizing the scale scores (default = 1). See <code><a href="norms.html">?norms</a></code> to
-see the normative samples available for an instrument.</p></dd>
+see the normative samples available for an instrument. A sample whose
+mean scores fall outside the instrument's own response range cannot be on
+the same metric as the scores being standardized, and is refused with an
+error rather than used; <code><a href="norms.html">norms()</a></code> lists the alternatives.</p></dd>
 
 
 <dt id="arg-prefix">prefix<a class="anchor" aria-label="anchor" href="#arg-prefix"></a></dt>
