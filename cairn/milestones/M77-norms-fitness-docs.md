@@ -1,6 +1,6 @@
 # M77: Say precisely what the shipped reference statistics are
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M76
 - **Driving RR:** —
@@ -89,7 +89,7 @@ this milestone cites it, it does not restate it.
       `document()`.
 - [x] T5 Close out the AC4 dispositions in the work log after the edits land,
       re-running the sweep so the record describes the post-edit tree.
-- [ ] T6 NEWS entry; full `check()` including the vignette rebuild.
+- [x] T6 NEWS entry; full `check()` including the vignette rebuild.
 
 ## Work log
 
@@ -108,6 +108,7 @@ this milestone cites it, it does not restate it.
 - 2026-08-08: T5 post-edit AC4 sweep (same command, run on this branch after T2–T4 landed) returns 21 matched lines, down from T1's 23. `vignettes/using-instruments.Rmd` now matches nothing: both of its T1 REWRITE hits are gone with the rewritten passages. `R/instrument_oop.R` still matches at `:153` and `:159`, which is the intended outcome — AC3 extends the existing hedge rather than replacing it, so its original two sentences stand and the new paragraph follows them. The 19 CONFIRMED CORRECT AS WRITTEN hits from T1 are unchanged and unedited; every AC4 hit is therefore dispositioned as rewritten (4) or correct as written (19).
 - 2026-08-08: `devtools::test()` clean on the branch — `[ FAIL 0 | WARN 4 | SKIP 0 | PASS 6550 ]`; the 4 warnings are the pre-existing ill-conditioned-Hessian notices raised from `test-ci_accuracy.R` at `:323`, `:516`, `:532`, `:866`, unrelated to this branch, which touches no runtime code.
 - 2026-08-08: honest checkpoint — T2/T3/T4 edits and the T6 NEWS entry are on the branch, but the profile's `devtools::test()` verify slot was still running when this commit was made (a second R test process on the box is competing with it), so no task is verified yet; the branch touches only roxygen comments, vignette prose and NEWS, with no runtime surface. T5 and T6's `check()` still outstanding.
+- 2026-08-08: T6 `Rscript -e 'devtools::check(args = "--no-manual")'` — `Status: OK`, 0 errors, 0 warnings, 0 notes, 12m 50s, with `checking re-building of vignette outputs ... OK`, which is the rebuild of the edited vignette AC5 turns on. All tasks checked; status to review.
 - 2026-08-08: implement question gate chose inline computed figures (a visible chunk assigns the counts, prose interpolates them) over a printed summary block or a 24-row table, and placed the characterization passage before the IIP-SC demo so the reader knows what the samples are before making the worked choice.
 
 ## Decisions
