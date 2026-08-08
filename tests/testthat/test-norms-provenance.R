@@ -471,6 +471,62 @@ test_that("stamp_ledger() stamps a zero-row ledger as it does a one-row one (M73
   expect_identical(zs$generated, character(0))
 })
 
+test_that("a source note backing two instruments is read per instrument (M75)", {
+  # DEVELOPMENT-ONLY, same reasoning as the stamp_ledger test above: the script
+  # under test lives in data-raw/, which is not installed.
+  script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
+  skip_if_not(file.exists(script), "data-raw/ not present (installed package)")
+
+  env <- new.env()
+  old <- options(norms_audit_defs_only = TRUE)
+  on.exit(options(old), add = TRUE)
+  sys.source(script, env)
+  parse_source_note <- get("parse_source_note", envir = env)
+
+  # The IIP manual is one source for two instruments whose rows key alike --
+  # both have samples 1-3 over the same eight octant names -- so the note tags
+  # its blocks. The fixture reproduces that shape rather than reading the real
+  # note, so the test states the contract and does not restate the manual.
+  dir <- tempfile("m75-notes-")
+  dir.create(dir)
+  on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+  block <- function(tag, value) {
+    c(paste0("<!-- audit-values-begin: ", tag, " -->"),
+      "| field | sample | scale | value | anchor |",
+      "| --- | --- | --- | --- | --- |",
+      paste0("| M | 1 | PA | ", value, " | Table 1 |"),
+      "<!-- audit-values-end -->")
+  }
+  writeLines(c("# two", block("aa", "1.5"), "", block("bb", "9.5")),
+             file.path(dir, "two.md"))
+  writeLines(c("# one", "<!-- audit-values-begin -->",
+               "| field | sample | scale | value | anchor |",
+               "| --- | --- | --- | --- | --- |",
+               "| M | 1 | PA | 4.25 | Table 1 |",
+               "<!-- audit-values-end -->"),
+             file.path(dir, "one.md"))
+
+  # Each instrument gets ITS OWN block's value. Assert the values, not merely
+  # that a frame came back: the defect this fences is a note whose second block
+  # is never reached, and a first-block fallback returns a perfectly well-formed
+  # frame of the wrong instrument's numbers.
+  expect_identical(parse_source_note("two", dir, "aa")$value, "1.5")
+  expect_identical(parse_source_note("two", dir, "bb")$value, "9.5")
+  expect_identical(attr(parse_source_note("two", dir, "bb"), "tag"), "bb")
+
+  # An instrument no block names must abort. Assert the condition by its
+  # message, not by "an error happened": a typo'd fixture path errors too.
+  expect_error(parse_source_note("two", dir, "cc"),
+               "no audit-values block for cc")
+  expect_error(parse_source_note("two", dir), "no audit-values block for")
+
+  # The untagged single-block note is the batch-1..3 shape and keeps working
+  # for any instrument, with an empty tag.
+  expect_identical(parse_source_note("one", dir, "anything")$value, "4.25")
+  expect_identical(parse_source_note("one", dir)$value, "4.25")
+  expect_identical(attr(parse_source_note("one", dir), "tag"), "")
+})
+
 test_that("norms-audit.md lists every shipped instrument (M72)", {
   # DEVELOPMENT-ONLY half: cairn/ is repo tracking, not installed, so this
   # cannot run under R CMD check. It is split out from the runtime assertions

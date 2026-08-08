@@ -92,7 +92,7 @@ well-named for users → the existing norms-fitness row.
       printed scale-membership lists (Appendix A pp. 57–59, Appendix H
       pp. 101–102). Second channel: 150-dpi renders of every cited page
       (M42-D1; `pdftotext` twice is one channel). Add the `INDEX.md` line.
-- [ ] T2a: extend `data-raw/audit-norms.R` so one source note can back two
+- [x] T2a: extend `data-raw/audit-norms.R` so one source note can back two
       instruments — `<!-- audit-values-begin: <instrument> -->` tagged blocks
       selected by the batch row's instrument, with untagged single-block notes
       unchanged. Test both the selection and the abort when no block matches.
@@ -135,6 +135,8 @@ well-named for users → the existing norms-fitness row.
 
 - 2026-08-07: T1 done — `cairn/references/horowitz2003.md` + `INDEX.md` line; all 96 M/SD values, both item maps, the three sizes and the reference credit read in two channels (text layer, 150-dpi render) across pp. 27–29, 57–59, 91 and 101–102. `devtools::test()` clean (0 failures, 6060 passing).
 - 2026-08-07: discovered sub-task T2a — one source note backing two instruments collides in the audit's `(field, sample, scale)` join key, since `parse_source_note()` assumes one note per instrument and requires exactly one audit-values block. Adding instrument-tagged blocks rather than splitting the manual across two citekey pages.
+
+- 2026-08-07: T2a done — `parse_source_note()` takes an `instrument` and selects among instrument-tagged blocks; untagged single-block notes unchanged, and re-running the audit over batches 1-3 reproduces the committed ledger and coverage byte-for-byte. `devtools::test()` clean (0 failures, 6068 passing).
 
 ## Decisions
 
