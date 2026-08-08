@@ -60,7 +60,7 @@ custom" claim (RR16 B1) → candidate row.
 
 - [x] T1. Extend `cairn/references/norms-audit.md` with a per-sample kind table: all 24 instrument-sample pairs, each with its kind and the basis (source note anchor or the audit's unsourced disposition). The citekey map encodes only sourced-vs-unidentified today; nothing there marks a standardization sample.
 - [x] T2. Test-first: extend the roster loop at `tests/testthat/test-norms-disclosure.R:219` to require `Kind` and its token set, and add the literal 24-pair expectation map asserted `setequal` to the enumeration. Red before T3.
-- [ ] T3. Add `Kind` to all 15 `data-raw/<instrument>.R` builders with a per-sample basis comment; add `data-raw/derive-norms-kind.R` re-deriving from T1's table and diffing against the shipped column; rebuild `data/`.
+- [x] T3. Add `Kind` to all 15 `data-raw/<instrument>.R` builders with a per-sample basis comment; add `data-raw/derive-norms-kind.R` re-deriving from T1's table and diffing against the shipped column; rebuild `data/`.
 - [ ] T4. `norms()` prints the kind phrase ([R/instrument_oop.R:189](R/instrument_oop.R:189)); extend the `?norms` prose classification at `R/instrument_oop.R:162-171` to key off the column; re-accept `_snaps/instrument_oop.md`.
 - [ ] T5. `norm_standardize()`'s disclosure and attribute carry the kind ([R/tidying_functions.R:316](R/tidying_functions.R:316)); extend the attribute-field enumeration in the roxygen; tests per AC6.
 - [ ] T6. Update the `Norms[[2]]` pins in `tests/testthat/test-norms-provenance.R` to carry the new column.
@@ -71,6 +71,7 @@ custom" claim (RR16 B1) → candidate row.
 
 - 2026-08-08: created by /milestone-plan.
 - 2026-08-08: branch `m78-norms-reference-kind` cut from master at 3d5d18a4; status planned -> in-progress.
+- 2026-08-08: T3 done -- Kind added to all 15 builders with a per-sample basis comment; data/ rebuilt; data-raw/derive-norms-kind.R reports 24 audit rows against 24 shipped samples, 6/16/2, zero disagreements. Mutating one audit row (isc published -> unsourced) makes it exit 1 naming that row, and it restores clean. Its shipped-side read is data/*.rda directly, not utils::data(), which resolves against the installed package and reported the freshly rebuilt column as absent.
 - 2026-08-08: T2 done -- tests/testthat/test-norms-kind.R added (vocabulary, audit-transcribed per-pair map asserted setequal to the shipped pairs, the 6/16/2 partition, and which six instruments carry the standardization label), plus the Kind pin in the RR16 BC1 roster loop; red on 51 failures, every one reporting the absent Kind column rather than a wrong value.
 - 2026-08-08: T1 done -- norms-audit.md gains a Reference kind section: the three kind definitions and a 24-row table of instrument/sample/kind/basis, tallying 16 published, 6 standardization, 2 unsourced against the section's own rows.
 - 2026-08-08: implement gate chose a short kind label at both surfaces ("Reference kind: standardization sample" / "identified published source" / "no identified source") over a full explanatory sentence, because AC2 bars the words that would carry the explanation from the message anyway and 24 listed samples make length expensive; falsified by users reading the bare label as uninformative.

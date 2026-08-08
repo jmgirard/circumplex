@@ -36,7 +36,14 @@ iis32_norms_src <- data.frame(
   Size = 1380,
   Population = "American college students",
   Reference = "Norms source unconfirmed; instrument published as Hatcher & Rogers (2012)",
-  URL = "https://doi.org/10.1080/00223891.2012.681818"
+  URL = "https://doi.org/10.1080/00223891.2012.681818",
+  # Kind: `unsourced` -- hatcher2012 publishes no octant statistics and no other
+  # venue has been identified, so the shipped M and SD trace to no source. The
+  # sample is described; its statistics are what is unsourced.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = "unsourced"
 )
 
 iis32_anchors <- data.frame(

@@ -36,7 +36,13 @@ csig_norms_src <- data.frame(
   Size = 665,
   Population = "MTurkers from US, Canada, and India about interactions between nations",
   Reference = "Locke (2014)",
-  URL = "https://doi.org/10.1177/0146167213514280"
+  URL = "https://doi.org/10.1177/0146167213514280",
+  # Kind: `published` -- locke2014 prints the octant statistics inside Figure 2
+  # (p. 436).
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = "published"
 )
 
 csig_anchors <- data.frame(

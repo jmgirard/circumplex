@@ -48,7 +48,13 @@ igicr_norms_src <- data.frame(
     "American community adolescents (age 11-13), females"
   ),
   Reference = "Trucco, Wright, & Colder (2013)",
-  URL = "https://doi.org/10.1177/1073191111411672"
+  URL = "https://doi.org/10.1177/1073191111411672",
+  # Kind: `published` all three -- trucco2013 Table 3's Combined, Males and
+  # Females columns.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = c("published", "published", "published")
 )
 
 igicr_anchors <- data.frame(

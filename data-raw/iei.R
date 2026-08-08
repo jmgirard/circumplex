@@ -48,7 +48,13 @@ iei_norms_src <- data.frame(
   URL = c(
     "https://kennethlocke.org/IEI/IEI_Norms.html",
     "https://doi.org/10.1080/00223891.2024.2400266"
-  )
+  ),
+  # Kind: `published` both -- horner2024 Table 1 prints Study 1 and Study 2;
+  # sample 1's values also appear on the author's IEI norms page.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = c("published", "published")
 )
 
 iei_anchors <- data.frame(

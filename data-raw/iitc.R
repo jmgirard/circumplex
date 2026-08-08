@@ -36,7 +36,12 @@ iitc_norms_src <- data.frame(
   Size = 862,
   Population = "American college students",
   Reference = "Bliton & Pincus (2019)",
-  URL = "https://doi.org/10.1177/1073191119864661"
+  URL = "https://doi.org/10.1177/1073191119864661",
+  # Kind: `published` -- bliton2019 Table 1.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = "published"
 )
 
 iitc_anchors <- data.frame(

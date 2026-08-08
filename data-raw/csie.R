@@ -36,7 +36,13 @@ csie_norms_src <- data.frame(
   Size = 367,
   Population = "American college students",
   Reference = "Locke & Sadler (2007)",
-  URL = "https://kennethlocke.org/CSIE/CSIE_Norms.html"
+  URL = "https://kennethlocke.org/CSIE/CSIE_Norms.html",
+  # Kind: `published` -- the octant statistics are printed on the author's CSIE
+  # norms page rather than in the cited article, which publishes none.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = "published"
 )
 
 csie_anchors <- data.frame(

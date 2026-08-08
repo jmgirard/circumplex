@@ -67,7 +67,15 @@ cais_norms_src <- data.frame(
   URL = c(
     "https://doi.org/10.1207/s15327752jpa8703_12",
     "https://doi.org/10.1207/s15327752jpa8703_12"
-  )
+  ),
+  # Kind: both samples' octant statistics are printed in sodano2006 (Table 2,
+  # children; Table 4, adults), so both are `published`. Sample 2 is separately
+  # refused at standardization for leaving the response range, which is a metric
+  # problem and does not change what kind of reference the sample is.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = c("published", "published")
 )
 
 cais_anchors <- data.frame(

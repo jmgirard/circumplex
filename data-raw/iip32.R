@@ -75,7 +75,16 @@ iip32_norms_src <- data.frame(
     "American adults, national standardization sample, males"
   ),
   Reference = "Horowitz, Alden, Wiggins, & Pincus (2003)",
-  URL = "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
+  URL = "https://www.mindgarden.com/113-inventory-of-interpersonal-problems",
+  # Kind: `standardization` all three -- the manual describes a national
+  # standardization sample of 800 cases (p. 25), and the IIP-32 is scored from a
+  # subset of that same administration (p. 24). With the IIP-64, the only shipped
+  # samples drawn to represent a defined population rather than describing
+  # whoever the researchers had available.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = c("standardization", "standardization", "standardization")
 )
 
 iip32_anchors <- data.frame(

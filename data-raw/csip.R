@@ -36,7 +36,12 @@ csip_norms_src <- data.frame(
   Size = 712,
   Population = "American college students",
   Reference = "Boudreaux, Ozer, Oltmanns, & Wright (2018)",
-  URL = "https://doi.org/10.1037/pas0000505"
+  URL = "https://doi.org/10.1037/pas0000505",
+  # Kind: `published` -- boudreaux2018 Table 1.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = "published"
 )
 
 csip_anchors <- data.frame(
