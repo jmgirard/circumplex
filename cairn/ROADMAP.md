@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-07 (M75 done — the norms audit closes, all 15 instruments verdicted; the 2000-edition open item closed unopened and the T-score row's "only published norming content" claim corrected, both premised on descriptives the manual does print; the audit-script robustness row extended with six M75 review findings)._
+_Last hygiene check: 2026-08-07 (audit green, nothing changed since M75 archived; both GitHub inboxes empty; M7 stays blocked on the `submit_cran()` handoff; 47 `work-log format` advisories are M7's wrapped multi-line entries, left as history)._
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
