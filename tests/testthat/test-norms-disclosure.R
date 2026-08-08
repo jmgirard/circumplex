@@ -196,3 +196,39 @@ test_that("the norm-standardizing surfaces keep the names the review settled on"
     expect_true("Population" %in% names(obj$Norms[[2]]), info = nm)
   }
 })
+
+# AC4 -------------------------------------------------------------------
+
+test_that("a sample the instrument does not carry is refused by name", {
+  obj <- shipped_instrument("iipsc")
+  probe <- disclosure_probe(obj)
+  msg <- tryCatch(
+    norm_standardize(
+      probe, scales = names(probe), angles = obj$Scales$Angle,
+      instrument = obj, sample = 7
+    ),
+    error = conditionMessage
+  )
+  expect_match(msg, "sample", ignore.case = TRUE)
+  expect_match(msg, "7", fixed = TRUE)
+  # The numbers the instrument does carry, so the user can act on the message
+  # rather than go looking. Asserted as the numbers, not as the word "sample":
+  # before this check existed the call died in the scales-vs-norms arity
+  # stopifnot(), whose message names neither.
+  for (s in obj$Norms[[2]]$Sample) {
+    expect_match(msg, as.character(s), fixed = TRUE)
+  }
+})
+
+test_that("the scales-vs-norms arity check is retained and still fires", {
+  # Distinct from the unmatched-sample refusal above: here the sample exists
+  # and it is `scales` that disagrees with it.
+  obj <- shipped_instrument("iipsc")
+  probe <- disclosure_probe(obj)
+  expect_error(
+    norm_standardize(
+      probe, scales = names(probe)[1:5], angles = obj$Scales$Angle[1:5],
+      instrument = obj, sample = 1
+    )
+  )
+})

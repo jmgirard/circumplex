@@ -134,9 +134,9 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
       "population" nor "representative" (AC8).
 - [x] T4 Test-first, then implement, the returned attribute on both `append`
       branches.
-- [ ] T5 Test-first, then fix, the `Abbrev`/`Scale` column assumption at
+- [x] T5 Test-first, then fix, the `Abbrev`/`Scale` column assumption at
       `R/tidying_functions.R:197`.
-- [ ] T6 Test-first, then implement, the unmatched-`sample` refusal, leaving the
+- [x] T6 Test-first, then implement, the unmatched-`sample` refusal, leaving the
       arity check in place with its own test.
 - [ ] T7 Roxygen for `quiet`, `@return`, the message and both refusals; add the
       default-sample example; resolve the "or custom" claim at
@@ -157,6 +157,8 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 - 2026-08-08: T2/T3/T1/T4 done in one checkpoint, T1 following T3 rather than leading it — the re-fencing adds `quiet = TRUE` at call sites, which cannot pass until the argument exists. Tests written red first (10 failures, all "unused argument (quiet = TRUE)" or no message emitted), then green. Two sites beyond T1's named three were re-fenced in the same pass: `test-norms-anchor-range.R`'s two `out <- norm_standardize(...)` calls, the same class as the `expect_silent` case T1 named.
 - 2026-08-08: implementation choices settled at the pre-implementation gate — message form "Standardized against IIP-SC normative sample 1: N = 872, American college students." plus, on a multi-sample instrument, "1 other sample is available; see norms()."; and one list attribute `"norm_sample"` over four flat ones. The gate showed `see norms(iipsc)`; the shipped text says `see norms()` because `$Details` carries no lowercase object name to interpolate, and the existing anchor-range refusal already points at bare `norms()`.
 - 2026-08-08: this file now carries 9 acceptance criteria, over the ~7 split tripwire. Not split: AC8 constrains AC1's message text and AC9 is a one-file test pin, so both land inside the same reviewable PR rather than forming an independent slice.
+
+- 2026-08-08: T5 and T6 done. The `Abbrev`/`Scale` defect's pre-fix failure was verified rather than assumed: `key$Scale` is NULL on an Abbrev-labelled instrument, so `paste(NULL[outside], collapse = ", ")` yields `""` and the refusal named no scale at all — it did not print "NA", which the test's first draft asserted. The test now pins the empty-list shape it actually produced. Two further loud call sites in `test-tidying_functions.R` (the 0-vs-360 pair) were quieted in the same pass; the suite now emits no disclosure noise.
 
 ## Decisions
 

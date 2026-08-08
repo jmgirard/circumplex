@@ -181,6 +181,22 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
   key <- instrument$Norms[[1]]
   key <- key[key$Sample == sample, ]
 
+  # An unmatched `sample` used to fall through to the arity check below, whose
+  # message names neither the argument at fault nor what would have been
+  # valid -- so the one mistake the argument invites was reported as a
+  # mismatch between `scales` and the norms.
+  if (nrow(key) == 0) {
+    available <- sort(unique(instrument$Norms[[1]]$Sample))
+    stop(
+      "No normative data for sample ", sample, ". The ",
+      instrument$Details$Abbrev, " carries sample",
+      if (length(available) > 1) "s " else " ",
+      paste(available, collapse = ", "),
+      "; see norms() for what each one is.",
+      call. = FALSE
+    )
+  }
+
   stopifnot(length(scales) == nrow(key))
 
   # A normative sample whose means fall outside the instrument's own response
@@ -193,10 +209,14 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
     hi <- max(anchors$Value)
     outside <- which(key$M < lo | key$M > hi)
     if (length(outside) > 0) {
+      # The norms label their scale column `Scale` on some instruments and
+      # `Abbrev` on others; reading `Scale` unconditionally printed a bare NA
+      # for the seven that use the other name.
+      labels <- if ("Scale" %in% names(key)) key$Scale else key$Abbrev
       stop(
         "The ", instrument$Details$Abbrev, " normative sample ", sample,
         " cannot be used for standardization. Its mean score for ",
-        paste(key$Scale[outside], collapse = ", "),
+        paste(labels[outside], collapse = ", "),
         " falls outside the instrument's ", lo, " to ", hi,
         " response range, so this sample is not on the same metric as the ",
         "scores being standardized. Use norms() to see the other samples ",

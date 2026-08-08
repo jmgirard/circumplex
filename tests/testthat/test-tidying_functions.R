@@ -73,11 +73,11 @@ test_that("norm_standardize matches 0 and 360 degrees as the same angle", {
   # LM stored as 360 in the norms; passing 0 must give identical results
   with360 <- norm_standardize(
     old, scales = 1:8, angles = octants(), instrument = iipsc, sample = 1,
-    append = FALSE
+    append = FALSE, quiet = TRUE
   )
   with0 <- norm_standardize(
     old, scales = 1:8, angles = c(90, 135, 180, 225, 270, 315, 0, 45),
-    instrument = iipsc, sample = 1, append = FALSE
+    instrument = iipsc, sample = 1, append = FALSE, quiet = TRUE
   )
   expect_equal(with0, with360)
 })

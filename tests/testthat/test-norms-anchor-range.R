@@ -105,3 +105,36 @@ test_that("the refusal does not disturb instruments with no violation", {
   )
   expect_identical(ncol(out), 8L)
 })
+
+# The refusal names the offending scales by reading the second column of
+# Norms[[1]], which is labelled `Scale` on 8 shipped instruments and `Abbrev`
+# on 7. cais -- the only shipped violator -- is `Scale`-labelled, so the
+# shipped roster cannot exhibit the `Abbrev` case at all: a constructed
+# violator is the only way to fence it.
+
+test_that("the refusal names the offending scales on an Abbrev-labelled instrument", {
+  data("jz2017")
+  obj <- shipped_instrument("iitc")
+  expect_true("Abbrev" %in% names(obj$Norms[[1]]))
+  values <- obj$Norms[[1]]
+  hi <- max(obj$Anchors$Value)
+  # Push exactly one octant out of range, and remember which.
+  offender <- as.character(values$Abbrev[[3]])
+  values$M[[3]] <- hi + 1
+  obj$Norms[[1]] <- values
+  msg <- tryCatch(
+    norm_standardize(
+      jz2017, scales = 2:9, angles = obj$Scales$Angle, instrument = obj,
+      sample = 1
+    ),
+    error = conditionMessage
+  )
+  expect_match(msg, "response range")
+  expect_match(msg, offender, fixed = TRUE)
+  # Verified against the pre-fix expression: `key$Scale` is NULL on an
+  # Abbrev-labelled instrument, so the offending-scale list came out empty --
+  # the refusal named no scale at all rather than naming a wrong one. This
+  # pins that shape, so the assertion above cannot pass on a message that
+  # merely happens to contain the abbreviation somewhere else.
+  expect_false(grepl("mean score for  falls", msg, fixed = TRUE))
+})
