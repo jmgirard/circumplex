@@ -13,6 +13,14 @@
 # cairn/references/<citekey>.md; the comparison that established them is
 # data-raw/audit-norms.R. Pinning the whole object rather than a field list is
 # deliberate: a field list pins what its author remembered to name.
+#
+# The Kind column (M78) is the one field below with no ledger row: it is a
+# package-authored classification, not a value any source prints. Its
+# independent origin is the Reference kind table in
+# cairn/references/norms-audit.md, transcribed into test-norms-kind.R and
+# re-derived from the note itself by data-raw/derive-norms-kind.R. It appears
+# here so this file keeps comparing WHOLE objects -- a pin that excluded one
+# column would stop failing on an edit to it.
 
 # shipped_instruments() lives in helper-norms.R, so that this file and
 # test-norms-anchor-range.R sweep one enumeration rather than two that can
@@ -27,7 +35,7 @@ audited_objects <- list(
       8.51, 7.9, 7.3), SD = c(1.68, 1.66, 1.82, 1.54, 1.53, 1.11, 1.2, 
       1.37)), class = "data.frame", row.names = c(NA, -8L)), structure(list(
           Sample = 1, Size = 367, Population = "American college students", 
-          Reference = "Locke & Sadler (2007)", URL = "https://kennethlocke.org/CSIE/CSIE_Norms.html"), class = "data.frame", row.names = c(NA, 
+          Reference = "Locke & Sadler (2007)", URL = "https://kennethlocke.org/CSIE/CSIE_Norms.html", Kind = "published"), class = "data.frame", row.names = c(NA, 
       -1L)))
     ,
     Scales = 
@@ -47,7 +55,7 @@ audited_objects <- list(
       2.89, 2.97, 2.96), SD = c(0.68, 0.86, 0.88, 0.74, 0.9, 0.76, 
       0.71, 0.68)), class = "data.frame", row.names = c(NA, -8L)), 
           structure(list(Sample = 1, Size = 665, Population = "MTurkers from US, Canada, and India about interactions between nations", 
-              Reference = "Locke (2014)", URL = "https://doi.org/10.1177/0146167213514280"), class = "data.frame", row.names = c(NA, 
+              Reference = "Locke (2014)", URL = "https://doi.org/10.1177/0146167213514280", Kind = "published"), class = "data.frame", row.names = c(NA, 
           -1L)))
     ,
     Scales = 
@@ -69,7 +77,7 @@ audited_objects <- list(
       0.6375, 0.575, 0.5875, 0.5)), class = "data.frame", row.names = c(NA, 
       -8L)), structure(list(Sample = 1, Size = 712, Population = "American college students", 
           Reference = "Boudreaux, Ozer, Oltmanns, & Wright (2018)", 
-          URL = "https://doi.org/10.1037/pas0000505"), class = "data.frame", row.names = c(NA, 
+          URL = "https://doi.org/10.1037/pas0000505", Kind = "published"), class = "data.frame", row.names = c(NA, 
       -1L)))
     ,
     Scales = 
@@ -92,7 +100,7 @@ audited_objects <- list(
       0.69, 0.57)), class = "data.frame", row.names = c(NA, -8L)), 
           structure(list(Sample = 1, Size = 1200, Population = "American college students", 
               Reference = "Locke (n.d.); instrument published as Locke (2000)", 
-              URL = "https://kennethlocke.org/CSIV/CSIV_Norms.html"), class = "data.frame", row.names = c(NA, 
+              URL = "https://kennethlocke.org/CSIV/CSIV_Norms.html", Kind = "published"), class = "data.frame", row.names = c(NA, 
           -1L)))
     ,
     Scales = 
@@ -113,7 +121,7 @@ audited_objects <- list(
       2.13, 2.66, 1.88), SD = c(0.81, 0.77, 0.73, 0.74, 0.78, 0.86, 
       0.85, 1.02)), class = "data.frame", row.names = c(NA, -8L)), 
           structure(list(Sample = 1, Size = 862, Population = "American college students", 
-              Reference = "Bliton & Pincus (2019)", URL = "https://doi.org/10.1177/1073191119864661"), class = "data.frame", row.names = c(NA, 
+              Reference = "Bliton & Pincus (2019)", URL = "https://doi.org/10.1177/1073191119864661", Kind = "published"), class = "data.frame", row.names = c(NA, 
           -1L)))
     ,
     Scales = 
@@ -135,7 +143,7 @@ audited_objects <- list(
       ), SD = c(0.99, 0.94, 0.82, 0.88, 0.86, 0.96, 0.87, 0.99)), class = "data.frame", row.names = c(NA, 
       -8L)), structure(list(Sample = 1, Size = 1380, Population = "American college students", 
           Reference = "Norms source unconfirmed; instrument published as Hatcher & Rogers (2012)", 
-          URL = "https://doi.org/10.1080/00223891.2012.681818"), class = "data.frame", row.names = c(NA, 
+          URL = "https://doi.org/10.1080/00223891.2012.681818", Kind = "unsourced"), class = "data.frame", row.names = c(NA, 
       -1L)))
     ,
     Scales = 
@@ -153,7 +161,7 @@ audited_objects <- list(
       270, 315, 360, 45), M = c(4.2, 4.1, 4.1, 4.23, 4.59, 4.66, 4.61, 4.16
       ), SD = c(1.32, 1.29, 1.34, 1.24, 1.17, 1.14, 1.24, 1.36)), class = "data.frame", row.names = c(NA, 
       -8L)), structure(list(Sample = 1, Size = 684, Population = "American college students", 
-          Reference = "Hatcher & Rogers (2009)", URL = "https://doi.org/10.1037/a0017269"), class = "data.frame", row.names = c(NA, 
+          Reference = "Hatcher & Rogers (2009)", URL = "https://doi.org/10.1037/a0017269", Kind = "published"), class = "data.frame", row.names = c(NA, 
       -1L)))
     ,
     Scales = 
@@ -173,7 +181,7 @@ audited_objects <- list(
       ), SD = c(0.71, 0.69, 0.58, 0.79, 0.63, 0.58, 0.47, 0.78)), class = "data.frame", row.names = c(NA, 
       -8L)), structure(list(Sample = 1, Size = 274, Population = "American college students", 
           Reference = "Norms source unconfirmed; instrument published as Markey & Markey (2009)", 
-          URL = "https://doi.org/10.1177/1073191109340382"), class = "data.frame", row.names = c(NA, 
+          URL = "https://doi.org/10.1177/1073191109340382", Kind = "unsourced"), class = "data.frame", row.names = c(NA, 
       -1L)))
     ,
     Scales = 
@@ -192,7 +200,7 @@ audited_objects <- list(
       270, 315, 360, 45), M = c(6.04, 6.17, 5.23, 4.44, 4.55, 3.91, 3.32, 5.31
       ), SD = c(1.06, 1.1, 1.28, 1.16, 1.24, 0.99, 0.91, 1)), class = "data.frame", row.names = c(NA, 
       -8L)), structure(list(Sample = 1, Size = 649, Population = "American college students", 
-          Reference = "Hopwood et al. (2011)", URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x"), class = "data.frame", row.names = c(NA, 
+          Reference = "Hopwood et al. (2011)", URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x", Kind = "published"), class = "data.frame", row.names = c(NA, 
       -1L)))
     ,
     Scales = 
@@ -217,7 +225,7 @@ audited_objects <- list(
       -16L)), structure(list(Sample = c(1, 2), Size = c(204, 194), Population = c("American fourth and sixth graders (aged 9 to 13)", 
       "American college students (aged 17 to 50)"), Reference = c("Sodano & Tracey (2006)", 
       "Sodano & Tracey (2006)"), URL = c("https://doi.org/10.1207/s15327752jpa8703_12", 
-      "https://doi.org/10.1207/s15327752jpa8703_12")), class = "data.frame", row.names = c(NA, 
+      "https://doi.org/10.1207/s15327752jpa8703_12"), Kind = c("published", "published")), class = "data.frame", row.names = c(NA, 
       -2L)))
     ,
     Scales = 
@@ -241,7 +249,7 @@ audited_objects <- list(
       -16L)), structure(list(Sample = c(1, 2), Size = c(1223, 278), Population = c("American undergraduate students", 
       "American crowdworkers"), Reference = c("Horner, Locke, & Hulsey (2024)", 
       "Horner, Locke, & Hulsey (2024)"), URL = c("https://kennethlocke.org/IEI/IEI_Norms.html", 
-      "https://doi.org/10.1080/00223891.2024.2400266")), class = "data.frame", row.names = c(NA, 
+      "https://doi.org/10.1080/00223891.2024.2400266"), Kind = c("published", "published")), class = "data.frame", row.names = c(NA, 
       -2L)))
     ,
     Scales = 
@@ -271,7 +279,7 @@ audited_objects <- list(
       ), Reference = c("Trucco, Wright, & Colder (2013)", "Trucco, Wright, & Colder (2013)", 
       "Trucco, Wright, & Colder (2013)"), URL = c("https://doi.org/10.1177/1073191111411672", 
       "https://doi.org/10.1177/1073191111411672", "https://doi.org/10.1177/1073191111411672"
-      )), class = "data.frame", row.names = c(NA, -3L)))
+      ), Kind = c("published", "published", "published")), class = "data.frame", row.names = c(NA, -3L)))
     ,
     Scales = 
       structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
@@ -293,7 +301,7 @@ audited_objects <- list(
       -16L)), structure(list(Sample = c(1, 2), Size = c(872, 106), Population = c("American college students", 
       "American psychiatric outpatients"), Reference = c("Hopwood, Pincus, DeMoor, & Koonce (2008)", 
       "Soldz, Budman, Demby, & Merry (1995)"), URL = c("https://doi.org/10.1080/00223890802388665", 
-      "https://doi.org/10.1177/1073191195002001006")), class = "data.frame", row.names = c(NA, 
+      "https://doi.org/10.1177/1073191195002001006"), Kind = c("published", "published")), class = "data.frame", row.names = c(NA, 
       -2L)))
     ,
     Scales = 
@@ -326,7 +334,7 @@ audited_objects <- list(
       ), URL = c("https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
       "https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
       "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
-      )), class = "data.frame", row.names = c(NA, -3L)))
+      ), Kind = c("standardization", "standardization", "standardization")), class = "data.frame", row.names = c(NA, -3L)))
     ,
     Scales = 
       structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", 
@@ -360,7 +368,7 @@ audited_objects <- list(
       ), URL = c("https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
       "https://www.mindgarden.com/113-inventory-of-interpersonal-problems", 
       "https://www.mindgarden.com/113-inventory-of-interpersonal-problems"
-      )), class = "data.frame", row.names = c(NA, -3L)))
+      ), Kind = c("standardization", "standardization", "standardization")), class = "data.frame", row.names = c(NA, -3L)))
     ,
     Scales = 
       structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", 
