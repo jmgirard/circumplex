@@ -32,13 +32,13 @@ custom" claim (RR16 B1) → candidate row.
 
 ## Acceptance criteria
 
-- [ ] AC1 (BC1): After the constrained milestones merge, `norm_standardize` and `norms` both appear in `NAMESPACE` as exports under exactly those names, and every instrument returned by the enumeration `Rscript -e 'utils::data(package="circumplex")'` filtered to objects inheriting `circumplex_instrument` (the RB16 Materials enumeration) has a `Norms` list slot whose second element contains a column named `Population`. Tolerance: exact; any departure is a deviation.
-- [ ] AC2 (BC2): The disclosure message emitted by `norm_standardize()` (M76 AC1) contains the selected sample's `Norms[[2]]$Population` value verbatim, and its fixed (non-data) message text contains neither the token "population" nor the token "representative", case-insensitively; asserted by the AC1 message-form tests over the same instrument enumeration BC1 names, which covers every shipped message variant because AC1's two message forms partition that enumeration. Tolerance: exact string absence in the fixed text; a shipped `Population` *value* containing those tokens does not violate this criterion.
-- [ ] AC3 (BC3): Every shipped `Norms[[2]]` carries a machine-readable column classifying each sample's reference-distribution kind under a controlled vocabulary of exactly three values (drawn-to-represent standardization sample; identified-study participant pool; no identified source). Over the BC1 enumeration the kind counts are exactly 6 standardization (the iip32 and iip64 samples), 16 identified-study, and 2 no-identified-source (iis32 sample 1, ipipipc sample 1), totalling 24; `norms()` prints the kind for every sample it lists. Procedure: the BC1 enumeration extended to read the new column and tally kinds. Tolerance: exact counts; if the shipped roster changes size, the partition is re-derived from `cairn/references/norms-audit.md` and the deviation shown.
-- [ ] AC4: The column is named `Kind` and every value over the AC1 enumeration is one of exactly `"standardization"` (the sample was drawn to represent a defined population), `"published"` (the sample's octant statistics appear in an identified published source, a study report or an author's norms page alike) or `"unsourced"` (the sample's octant statistics appear in no identified source, whatever is known about the sample itself). For each sample `norms()` lists, its printed block carries the reader-facing phrase mapped to that row's `Kind` and neither of the other two kinds' phrases.
-- [ ] AC5: `cairn/references/norms-audit.md` records, per instrument-sample pair, the kind assigned and the basis for it; each of the 15 `data-raw/<instrument>.R` builders states its own samples' kinds and basis; and `data-raw/derive-norms-kind.R` re-derives the partition from the audit table and reports zero disagreements against the shipped column over the AC1 enumeration (IP5).
-- [ ] AC6: For every instrument-sample pair in the AC1 enumeration that `norm_standardize()` accepts — the `norm_sample_usable()` predicate, which excludes cais sample 2 under D-040 — the non-quiet message names the sample's kind and the returned `norm_sample` attribute carries a `Kind` element equal to that row's value. The tests' expected kinds are a literal map transcribed from the audit table, asserted `setequal` to the accepted-pair enumeration so no pair is silently skipped.
-- [ ] AC7: `?norms`, `?norm_standardize`'s attribute-field enumeration and NEWS.md describe the column; `vignettes/using-instruments.Rmd` computes its standardization and unsourced counts from `Kind`; `grep -rn "grepl(" R/ man/ tests/ vignettes/ data-raw/ NEWS.md` returns no call deriving a sample's reference kind, its only hit against `$Population` or `$Reference` being the vignette's `college|undergraduate` head-count, which names a description rather than a kind and which RR16's refusal of finer kinds leaves without a column; the roster loop at `tests/testthat/test-norms-disclosure.R:219` also asserts `"Kind" %in% names(obj$Norms[[2]])` with every value in AC4's token set; `_snaps/instrument_oop.md` is re-accepted; `devtools::document()` emits no warnings (whole log grepped, never its tail) and `devtools::check()` reports 0 errors, 0 warnings, 0 notes.
+- [x] AC1 (BC1): After the constrained milestones merge, `norm_standardize` and `norms` both appear in `NAMESPACE` as exports under exactly those names, and every instrument returned by the enumeration `Rscript -e 'utils::data(package="circumplex")'` filtered to objects inheriting `circumplex_instrument` (the RB16 Materials enumeration) has a `Norms` list slot whose second element contains a column named `Population`. Tolerance: exact; any departure is a deviation.
+- [x] AC2 (BC2): The disclosure message emitted by `norm_standardize()` (M76 AC1) contains the selected sample's `Norms[[2]]$Population` value verbatim, and its fixed (non-data) message text contains neither the token "population" nor the token "representative", case-insensitively; asserted by the AC1 message-form tests over the same instrument enumeration BC1 names, which covers every shipped message variant because AC1's two message forms partition that enumeration. Tolerance: exact string absence in the fixed text; a shipped `Population` *value* containing those tokens does not violate this criterion.
+- [x] AC3 (BC3): Every shipped `Norms[[2]]` carries a machine-readable column classifying each sample's reference-distribution kind under a controlled vocabulary of exactly three values (drawn-to-represent standardization sample; identified-study participant pool; no identified source). Over the BC1 enumeration the kind counts are exactly 6 standardization (the iip32 and iip64 samples), 16 identified-study, and 2 no-identified-source (iis32 sample 1, ipipipc sample 1), totalling 24; `norms()` prints the kind for every sample it lists. Procedure: the BC1 enumeration extended to read the new column and tally kinds. Tolerance: exact counts; if the shipped roster changes size, the partition is re-derived from `cairn/references/norms-audit.md` and the deviation shown.
+- [x] AC4: The column is named `Kind` and every value over the AC1 enumeration is one of exactly `"standardization"` (the sample was drawn to represent a defined population), `"published"` (the sample's octant statistics appear in an identified published source, a study report or an author's norms page alike) or `"unsourced"` (the sample's octant statistics appear in no identified source, whatever is known about the sample itself). For each sample `norms()` lists, its printed block carries the reader-facing phrase mapped to that row's `Kind` and neither of the other two kinds' phrases.
+- [x] AC5: `cairn/references/norms-audit.md` records, per instrument-sample pair, the kind assigned and the basis for it; each of the 15 `data-raw/<instrument>.R` builders states its own samples' kinds and basis; and `data-raw/derive-norms-kind.R` re-derives the partition from the audit table and reports zero disagreements against the shipped column over the AC1 enumeration (IP5).
+- [x] AC6: For every instrument-sample pair in the AC1 enumeration that `norm_standardize()` accepts — the `norm_sample_usable()` predicate, which excludes cais sample 2 under D-040 — the non-quiet message names the sample's kind and the returned `norm_sample` attribute carries a `Kind` element equal to that row's value. The tests' expected kinds are a literal map transcribed from the audit table, asserted `setequal` to the accepted-pair enumeration so no pair is silently skipped.
+- [x] AC7: `?norms`, `?norm_standardize`'s attribute-field enumeration and NEWS.md describe the column; `vignettes/using-instruments.Rmd` computes its standardization and unsourced counts from `Kind`; `grep -rn "grepl(" R/ man/ tests/ vignettes/ data-raw/ NEWS.md` returns no call deriving a sample's reference kind, its only hit against `$Population` or `$Reference` being the vignette's `college|undergraduate` head-count, which names a description rather than a kind and which RR16's refusal of finer kinds leaves without a column; the roster loop at `tests/testthat/test-norms-disclosure.R:219` also asserts `"Kind" %in% names(obj$Norms[[2]])` with every value in AC4's token set; `_snaps/instrument_oop.md` is re-accepted; `devtools::document()` emits no warnings (whole log grepped, never its tail) and `devtools::check()` reports 0 errors, 0 warnings, 0 notes.
 
 ### Deviations from RR16
 
@@ -90,3 +90,67 @@ custom" claim (RR16 B1) → candidate row.
 ## Decisions
 
 ## Review
+
+Reviewed 2026-08-08 on branch `m78-norms-reference-kind`, PR #106. Master had
+not moved since the branch was cut (0 commits behind), so no merge or re-run
+was needed before evidence was gathered.
+
+### Criterion evidence
+
+- **AC1 (BC1).** `getNamespaceExports()` under `load_all()` carries both
+  `norm_standardize` and `norms`; the RB16 enumeration returns 15 instruments
+  and every one's `Norms[[2]]` carries `Population`. The M76 roster loop that
+  pins this (`test-norms-disclosure.R`) passes.
+- **AC2 (BC2).** The full `norms-disclosure` suite passes, including the
+  sentinel test that strips the `Population` value out of an emitted message
+  and asserts neither "population" nor "representative" survives in what
+  remains — run against the new message, whose added clause is
+  "Reference kind: <phrase>".
+- **AC3 (BC3).** Tallying `Kind` over the enumeration returns 24 samples:
+  6 standardization, 16 published, 2 unsourced. `norms()` prints a kind line
+  for every sample it lists (asserted per sample in `test-norms-kind.R`).
+- **AC4.** Every one of the 24 values is in the three-token vocabulary. The
+  print test parses output into per-sample blocks and asserts the prefixed
+  `Reference kind: <phrase>` plus the absence of the other two kinds' phrases;
+  the prefix is load-bearing because iip32's `Population` value already
+  contains "national standardization sample". Deleting the `cat` line reddens
+  10 assertions.
+- **AC5.** `norms-audit.md` carries a 24-row Reference kind table with a basis
+  per sample; all 15 builders carry `Kind` with a basis comment;
+  `derive-norms-kind.R` reports 24 audit rows against 24 shipped samples,
+  6/16/2, zero disagreements, exit 0. Mutating one audit row (isc published to
+  unsourced) makes it exit 1 naming that row.
+- **AC6.** The accepted-pair sweep passes over 23 pairs, setequal to the
+  anchor-range predicate's own enumeration, with `cais:2` asserted absent so an
+  empty predicate cannot satisfy the setequal vacuously. Deleting the message
+  clause reddens 11 assertions.
+- **AC7.** `?norms` and `?norm_standardize` both document the column; NEWS
+  carries its bullet and two M76 entries corrected for staleness; the vignette
+  computes both counts from `Kind`. The AC7 grep returns exactly the one named
+  exception, the vignette's `college|undergraduate` head-count. The roster loop
+  asserts `Kind` and its token set; `_snaps/instrument_oop.md` re-accepted;
+  `document()` at cli.width 500 emits zero unresolved-link warnings and a zero
+  diff; `devtools::check()` Status OK, 0/0/0 in 14m56s.
+
+### Projection vs outcome (Driving RR: RR16)
+
+BC3 projects the partition exactly, tolerance exact. Measured 6
+standardization against projected 6; measured 16 published against projected 16
+(BC3's "identified-study", widened by the recorded deviation); measured 2
+unsourced against projected 2 (iis32 sample 1 and ipipipc sample 1, the two BC3
+names); measured 24 total against projected 24. No shortfall.
+
+RR16's F2 falsifier — more than 4 of 24 samples unassignable without new source
+research — did not fire: the pre-task sweep placed all 24 with no residue.
+
+### Consistency gate
+
+`cairn_validate` passes all 16 checks (the 47 `work-log format` advisories are
+M7's wrapped entries, unrelated). Profile `r-package` consistency-gate:
+`document()` no-diff and zero `resolve link` output; generated files
+regenerated from their sources, never hand-edited; NEWS entry present; no new
+top-level files; `devtools::check()` clean. The check log carries no
+"checking PDF version of manual" line, so that step did not run and the manual
+was built directly (`R CMD Rd2pdf`, exit 0). No `DESIGN.md` principle changed,
+so `cairn_impact` was not run.
+
