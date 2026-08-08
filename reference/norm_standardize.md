@@ -1,10 +1,10 @@
 # Standardize circumplex scales using normative data
 
 Take in a data frame containing circumplex scales, angle definitions for
-each scale, and normative data (from the package or custom) and return
-that same data frame with each specified circumplex scale transformed
-into standard scores (i.e., z-scores) based on comparison to the
-normative data.
+each scale, and an instrument whose normative data will be used, and
+return that same data frame with each specified circumplex scale
+transformed into standard scores (i.e., z-scores) based on comparison to
+that instrument's normative sample.
 
 ## Usage
 
@@ -17,7 +17,8 @@ norm_standardize(
   sample = 1,
   prefix = "",
   suffix = "_z",
-  append = TRUE
+  append = TRUE,
+  quiet = FALSE
 )
 ```
 
@@ -57,12 +58,13 @@ norm_standardize(
   Required. An integer corresponding to the normative sample to use in
   standardizing the scale scores (default = 1). See
   [`?norms`](http://circumplex.jmgirard.com/reference/norms.md) to see
-  the normative samples available for an instrument. A sample whose mean
-  scores fall outside the instrument's own response range cannot be on
-  the same metric as the scores being standardized, and is refused with
-  an error rather than used;
+  the normative samples available for an instrument. Two conditions are
+  refused with an error rather than used: a `sample` the instrument does
+  not carry (the error lists the sample numbers it does), and a sample
+  whose mean scores fall outside the instrument's own response range,
+  which cannot be on the same metric as the scores being standardized.
   [`norms()`](http://circumplex.jmgirard.com/reference/norms.md) lists
-  the alternatives.
+  the alternatives in both cases.
 
 - prefix:
 
@@ -81,9 +83,32 @@ norm_standardize(
   standardized scores should be added as columns to `data` in the output
   or the standardized scores alone should be output (default = TRUE).
 
+- quiet:
+
+  Optional. A logical that suppresses the message naming the normative
+  sample used (default = FALSE). Set to `TRUE` in loops, knitted
+  documents, and anywhere else the message is noise; the returned
+  attribute below records the same facts either way.
+
 ## Value
 
 A data frame that contains the norm-standardized versions of `scales`.
+It carries a `"norm_sample"` attribute – a list with elements
+`Instrument`, `Sample`, `Size` and `Population` – recording which
+normative sample produced the scores, so a script that never sees the
+console can still report what its z-scores are relative to. Retrieve it
+with `attr(x, "norm_sample")`.
+
+## Details
+
+The sample the scores are compared against is a result-determining
+choice, not a technicality: different samples of the same instrument can
+move a respondent's z-scores by more than half a standard deviation. So
+unless `quiet = TRUE`, every successful call reports which sample it
+used, how large that sample was, and how it is described, and every call
+attaches the same facts to the result (see the Value section below). Use
+[`norms()`](http://circumplex.jmgirard.com/reference/norms.md) to see
+the samples an instrument carries before choosing one.
 
 ## See also
 
@@ -97,6 +122,7 @@ Other tidying functions:
 ``` r
 data("jz2017")
 norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
+#> Standardized against IIP-SC normative sample 1: N = 872, American college students. 1 other sample is available; see norms().
 #>      Gender   PA   BC   DE   FG   HI   JK   LM   NO PARPD SCZPD SZTPD ASPD
 #> 1    Female 1.50 1.50 1.25 1.00 2.00 2.50 2.25 2.50     4     3     7    7
 #> 2    Female 0.00 0.25 0.00 0.25 1.25 1.75 2.25 2.25     1     0     2    0
@@ -3598,4 +3624,22 @@ norm_standardize(jz2017, scales = 2:9, instrument = iipsc, sample = 1)
 #> 1164 -0.84168865 -1.55191257 -1.3313783 -0.86666667 -0.65625
 #> 1165 -0.84168865 -1.27868852 -1.3313783 -1.47272727 -0.65625
 #> 1166 -1.10554090 -1.55191257 -1.6246334 -0.56363636 -0.34375
+
+# The IIP-SC carries more than one normative sample. Omitting `sample` takes
+# the first, and the message says which one that was.
+z <- norm_standardize(jz2017, scales = 2:9, instrument = iipsc)
+#> Standardized against IIP-SC normative sample 1: N = 872, American college students. 1 other sample is available; see norms().
+attr(z, "norm_sample")
+#> $Instrument
+#> [1] "IIP-SC"
+#> 
+#> $Sample
+#> [1] 1
+#> 
+#> $Size
+#> [1] 872
+#> 
+#> $Population
+#> [1] "American college students"
+#> 
 ```

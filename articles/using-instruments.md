@@ -574,6 +574,7 @@ z_scales <- norm_standardize(
   sample = 1,
   append = FALSE
 )
+#> Standardized against IIP-SC normative sample 1: N = 872, American college students. 1 other sample is available; see norms().
 print(z_scales)
 #>           PA_z       BC_z       DE_z        FG_z       HI_z       JK_z
 #> 1   1.50000000  1.7500000  0.4093567 -1.10554090 -1.0054645 -1.3313783

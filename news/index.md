@@ -130,6 +130,28 @@ on a real ggplot2 coordinate system.
   source of those values is under query with its authors, and the sample
   will be corrected or withdrawn once that is settled.
 
+- [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
+  now reports which normative sample it used. Every successful call
+  prints the sample number, its size and its description — for example,
+  “Standardized against IIP-SC normative sample 1: N = 872, American
+  college students.” — and, where the instrument carries more than one
+  sample, says how many others are available. Which sample you
+  standardize against is a result-determining choice rather than a
+  technicality: across the shipped instruments, different samples of the
+  same instrument move a respondent’s z-scores by roughly half a
+  standard deviation on average, and by nearly twice that at the
+  extreme. Pass the new `quiet = TRUE` to suppress the message in loops
+  and knitted documents.
+
+- Every data frame returned by
+  [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
+  now carries a `"norm_sample"` attribute recording the instrument, the
+  sample number, its size and its description, so a script that never
+  sees the console can still report what its z-scores are relative to.
+  Retrieve it with `attr(x, "norm_sample")`. It is attached whether or
+  not `quiet` is set, and on both the `append = TRUE` and
+  `append = FALSE` return paths.
+
 - The package now requires ggplot2 (\>= 4.0.0), and `ggforce` is no
   longer a dependency. The declared R requirement moves to R (\>= 4.1)
   to match the floor ggplot2 already imposes; no installation that
@@ -979,6 +1001,21 @@ on a real ggplot2 coordinate system.
   reported fit can fall below 0.
 
 ### Bug fixes
+
+- [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)’s
+  refusal of an off-metric normative sample now names the offending
+  scales for every instrument. On the seven instruments whose normative
+  data labels its scale column `Abbrev` rather than `Scale`, the message
+  previously named no scale at all.
+
+- Asking
+  [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
+  for a normative sample an instrument does not carry now produces an
+  error naming that argument and listing the sample numbers the
+  instrument does carry. Previously the call fell through to an
+  unrelated check and failed with a message about `scales` not matching
+  the normative data, which named neither the argument at fault nor a
+  valid value.
 
 - Fixed a bug where a bootstrap resample under pairwise deletion
   (`listwise = FALSE`) could crash
