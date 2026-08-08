@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-08 (M77 merged and archived, PR #105, closing the norms-fitness pair's docs half; M72's terminal row pruned for the 5-row retention; M77's lesson extended the stale-prose family rather than adding a line, LESSONS being at 49 of 50; M7 still blocked on the `submit_cran()` handoff; 47 `work-log format` advisories remain M7's wrapped entries, left as history)._
+_Last hygiene check: 2026-08-08 (audit re-run after M77 archived: all checks green, nothing in flight, both GitHub inboxes empty; M7 still blocked on the `submit_cran()` handoff, and the 47 `work-log format` advisories remain its wrapped entries, left as history)._
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
