@@ -1,6 +1,6 @@
 # M77: Say precisely what the shipped reference statistics are
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M76
 - **Driving RR:** —
@@ -108,6 +108,7 @@ this milestone cites it, it does not restate it.
 - 2026-08-08: T5 post-edit AC4 sweep (same command, run on this branch after T2–T4 landed) returns 21 matched lines, down from T1's 23. `vignettes/using-instruments.Rmd` now matches nothing: both of its T1 REWRITE hits are gone with the rewritten passages. `R/instrument_oop.R` still matches at `:153` and `:159`, which is the intended outcome — AC3 extends the existing hedge rather than replacing it, so its original two sentences stand and the new paragraph follows them. The 19 CONFIRMED CORRECT AS WRITTEN hits from T1 are unchanged and unedited; every AC4 hit is therefore dispositioned as rewritten (4) or correct as written (19).
 - 2026-08-08: `devtools::test()` clean on the branch — `[ FAIL 0 | WARN 4 | SKIP 0 | PASS 6550 ]`; the 4 warnings are the pre-existing ill-conditioned-Hessian notices raised from `test-ci_accuracy.R` at `:323`, `:516`, `:532`, `:866`, unrelated to this branch, which touches no runtime code.
 - 2026-08-08: honest checkpoint — T2/T3/T4 edits and the T6 NEWS entry are on the branch, but the profile's `devtools::test()` verify slot was still running when this commit was made (a second R test process on the box is competing with it), so no task is verified yet; the branch touches only roxygen comments, vignette prose and NEWS, with no runtime surface. T5 and T6's `check()` still outstanding.
+- 2026-08-08: review round 1 returns the milestone to `in-progress` under the return floor. What failed: the `?norms` paragraph added by T4 asserts that every non-standardization sample is "the study samples their authors had available", which is false for iis32 and ipipipc — the two samples M73 gave the `source-not-identified` disposition and whose own help pages say their norms are published in no identified source — so `?norms` contradicts `?iis32` and `?ipipipc` (scored 92). The same false universal reaches `vignettes/using-instruments.Rmd:122`'s new definition (87) and the NEWS entry, which also overstates the college count as "most" where the vignette correctly says 11 of 24 (88, 80). No acceptance criterion fails as written; the criteria stand and only the prose under them needs repair. Defect returns for this milestone: 1.
 - 2026-08-08: review opened draft PR #105 and ran the consistency gate — `cairn_validate` exit 0 with all 16 checks PASS (47 advisories, all M7's pre-existing wrapped work-log lines); `document()` no-diff and zero `resolve link` lines; `pkgdown::check_pkgdown()` no problems; README in sync; no new top-level files needing `.Rbuildignore`. No principle changed, so `cairn_impact` is skipped. Three fresh-context reviewers spawned; CI running.
 - 2026-08-08: T6 `Rscript -e 'devtools::check(args = "--no-manual")'` — `Status: OK`, 0 errors, 0 warnings, 0 notes, 12m 50s, with `checking re-building of vignette outputs ... OK`, which is the rebuild of the edited vignette AC5 turns on. All tasks checked; status to review.
 - 2026-08-08: implement question gate chose inline computed figures (a visible chunk assigns the counts, prose interpolates them) over a printed summary block or a 24-row table, and placed the characterization passage before the IIP-SC demo so the reader knows what the samples are before making the worked choice.
@@ -117,3 +118,70 @@ this milestone cites it, it does not restate it.
 - 2026-08-08 (RR16 R4, B3): where the rewritten passages want a synonym for "normative samples", they say "reference samples" and not "comparison sample" — the latter connotes a study-internal control group, inviting the reading that the user's data are compared to a matched design element rather than to an external published table.
 
 ## Review
+
+### Round 1 — 2026-08-08 — returned to `in-progress`
+
+**Consistency gate: clean.** `cairn_validate` exit 0, all 16 checks PASS (47
+advisories, all M7's pre-existing wrapped work-log lines). Profile
+`consistency-gate` slot: `document()` no-diff with zero `resolve link` lines;
+generated files regenerate clean; README in sync; `pkgdown::check_pkgdown()` no
+problems; NEWS entry present; no new top-level files; `devtools::check(args =
+"--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes, including a clean
+rebuild of the edited vignette. `devtools::test()` clean at 6550 passing. No
+principle changed, so `cairn_impact` was skipped. PR #105 opened as a draft.
+
+**Fresh-context review:** three distinct-evidence reviewers ([O] diff-bug, [S]
+blame-history, [S] prior-review-regression) reported 21 findings; a [S] scorer
+holding the diff and this plan scored each. The prior-review lens's GitHub
+probe returned no genuine human review threads, so its evidence base was the
+archived `## Review` sections plus RB16/RR16.
+
+**Actioned (score ≥ 80), 4 findings, 3 distinct defects:**
+
+- **P1 / F2 (92, same defect from two evidence bases) — `?norms` now
+  overclaims provenance for the two samples the package's own audit could not
+  source.** `R/instrument_oop.R:163-164`, mirrored at `man/norms.Rd`. The added
+  sentence "Apart from the IIP-32 and IIP-64 national standardization samples,
+  the shipped samples are the study samples their authors had available" covers
+  all 18 non-standardization samples with no carve-out for iis32 and ipipipc,
+  whose shipped roxygen (`R/instrument_data.R:223-226`, `:273-276`) says their
+  norms are "published in no source that has been identified" and must be
+  treated as unverified. `?norms` therefore contradicts `?iis32` and
+  `?ipipipc`, and undoes what M73's `source-not-identified` disposition and
+  RR16 BC3's three-category split were built to protect.
+- **F1 (87) — the vignette's new definition of a reference sample is false for
+  the same two instruments.** `vignettes/using-instruments.Rmd:122` defines one
+  as "a specific group of people, described in a published source"; iis32's and
+  ipipipc's `Reference` fields read "Norms source unconfirmed".
+- **P2 / F13 (88, 80) — the NEWS entry carries both errors.** It repeats the
+  "only exception is IIP-32/64" framing, and its "most are single-study samples
+  of college students" overstates the 11-of-24 the vignette states correctly.
+
+**Return floor.** P1/F2 scores 92 on a defect in a shipped user-facing
+deliverable — a help page that contradicts two other help pages — so it takes
+the floor return rather than in-review triage. No acceptance criterion fails as
+written: AC3 mandates adding the drawn-from/drawn-to-represent distinction and
+the vignette pointer, which the diff does, and imposes no accuracy bar on
+adjacent sentences; AC1, AC2, AC4 and AC5 were each verified and hold. This is
+a defect return, not an amendment return — the criteria are right, the prose
+under them is not. Defect returns for this milestone: 1.
+
+**Logged, below threshold (17), surfaced not dropped:** F4 (70) "24 samples"
+counts subgroup rows as distinct samples where ~17 humans' samples exist, and
+the rewrite dropped the old "overlapping" hedge; F3 (65) the characterization
+passage never mentions the 2 unsourced rows; F5 (62) "separate samples for men
+and women" describes one partitioned sample; F6 (60) the hand-written IIP
+exception can desynchronize from its computed count; F9 (58) unguarded
+`Norms[[2]]` / `rbind` would break the build when D-041's kind column lands;
+F7 (52) both `grepl()` calls are case-sensitive; F18 (50) subgroup
+standardizing's effect on z-scores is unexplained; F8 (50) a `"name (topic)"`
+Item string would be swallowed silently; F10 (50) the chunk depends on the
+search path and indexes `Norms[[2]]` positionally; F16 (45) the
+convenience-sample claim cites a file that does not ship; F11 (45) the
+qualitative choice-vs-sampling-error comparison was a recorded plan decision;
+F15 (35) "comparison data" survives at `:24`, outside AC4's pattern; B7 (35)
+the man page's static claim vs the vignette's computed ones, subsumed by F6;
+F17 (35) the 300 threshold is unexplained; F14 (30) NEWS carries process
+meta-commentary; B1 (25) the two `?norms` hedges stack without signposting;
+B5 (20) the vignette still does not narrate M76's disclosure message, which
+this milestone's Scope excludes.

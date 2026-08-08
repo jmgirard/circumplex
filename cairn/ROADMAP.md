@@ -15,7 +15,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M74 | Norms provenance audit, batch 3 (multi-sample instruments) | done | M73 | high | milestones/archive/M74-norms-provenance-audit-batch3.md |
 | M75 | Norms provenance audit, batch 4 (IIP family) | done | — | high | milestones/archive/M75-norms-provenance-audit-batch4.md |
 | M76 | Disclose the reference sample at the standardizing call site | done | — | normal | milestones/archive/M76-norms-call-site-disclosure.md |
-| M77 | Say precisely what the shipped reference statistics are | review | M76 | normal | milestones/M77-norms-fitness-docs.md |
+| M77 | Say precisely what the shipped reference statistics are | in-progress | M76 | normal | milestones/M77-norms-fitness-docs.md |
 
 ## Candidates
 
