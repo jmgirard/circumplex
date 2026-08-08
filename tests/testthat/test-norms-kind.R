@@ -107,3 +107,47 @@ test_that("the six standardization samples are the IIP forms", {
 
   expect_setequal(standardizing, c(rep("iip32", 3), rep("iip64", 3)))
 })
+
+# The phrase each kind prints as. Written here as literals rather than by
+# calling norm_kind_phrase(), which is the mapping under test -- deriving the
+# expectation from it would make the comparison two readings of one expression.
+KIND_PHRASES <- c(
+  standardization = "standardization sample",
+  published = "identified published source",
+  unsourced = "no identified source"
+)
+
+test_that("norms() prints each sample's kind, and no other sample's", {
+  for (nm in shipped_instruments()) {
+    obj <- shipped_instrument(nm)
+    info <- obj$Norms[[2]]
+    out <- utils::capture.output(norms(obj))
+
+    # One block per listed sample, opened by the "<n>. <size> <population>"
+    # line, so a phrase is bound to the sample it was printed under rather than
+    # merely present somewhere in the output.
+    starts <- grep("^[0-9]+\\. ", out)
+    expect_identical(length(starts), nrow(info), info = nm)
+
+    ends <- c(starts[-1] - 1L, length(out))
+    for (i in seq_along(starts)) {
+      block <- paste(out[starts[[i]]:ends[[i]]], collapse = "\n")
+      mine <- KIND_PHRASES[[info$Kind[[i]]]]
+      label <- paste0(nm, " sample ", info$Sample[[i]])
+
+      # The prefix matters: iip32's Population string already contains the
+      # words "national standardization sample", so a bare phrase search would
+      # pass on those rows without anything having been printed for the kind.
+      expect_true(
+        grepl(paste0("Reference kind: ", mine), block, fixed = TRUE),
+        info = label
+      )
+      for (other in setdiff(KIND_PHRASES, mine)) {
+        expect_false(
+          grepl(paste0("Reference kind: ", other), block, fixed = TRUE),
+          info = paste0(label, " / ", other)
+        )
+      }
+    }
+  }
+})

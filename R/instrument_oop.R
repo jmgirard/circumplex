@@ -160,15 +160,23 @@ anchors <- function(x) {
 #' population.
 #'
 #' The label names the group each sample was drawn from, not a frame the
-#' sample was drawn to represent. Apart from the IIP-32 and IIP-64 national
-#' standardization samples, the shipped samples are the study samples their
-#' authors had available, so a mean and standard deviation computed from one
-#' of them describes that group of people rather than a population. A few are
-#' weaker still: where the printed reference says the norms source is
-#' unconfirmed, the statistics appear in no source that has been identified
-#' and should be treated as unverified. See
-#' `vignette("using-instruments")` for what the shipped reference samples are
-#' and how to choose among them.
+#' sample was drawn to represent. Which of those a given sample is, is recorded
+#' per sample in the `Kind` column and printed as its reference kind:
+#'
+#' \describe{
+#'   \item{standardization sample}{The sample was drawn to represent a defined
+#'     population, so its mean and standard deviation estimate that
+#'     population's. Only the IIP-32 and IIP-64 samples are of this kind.}
+#'   \item{identified published source}{The sample's octant statistics are
+#'     printed in an identified source -- a study report or an author's norms
+#'     page -- and describe that group of people rather than any wider frame.}
+#'   \item{no identified source}{The sample's octant statistics appear in no
+#'     source that has been identified, whatever is known about the sample
+#'     itself, and should be treated as unverified.}
+#' }
+#'
+#' See `vignette("using-instruments")` for what the shipped reference samples
+#' are and how to choose among them.
 #'
 #' @param x Required. An object of the instrument class.
 #' @return The same input object. Prints text to console.
@@ -190,8 +198,14 @@ norms <- function(x) {
     sample_i <- samples$Sample[[i]]
     size_i <- samples$Size[[i]]
     pop_i <- samples$Population[[i]]
+    # The kind is what a reader choosing between samples most needs and the
+    # Population string cannot say: whether these statistics estimate a
+    # population, describe a group someone published, or rest on no identified
+    # source at all.
+    kind_i <- norm_kind_phrase(samples$Kind[[i]])
     cat(
       sample_i, ". ", size_i, " ", pop_i, "\n",
+      "Reference kind: ", kind_i, "\n",
       samples$Reference[[i]], "\n",
       "<", samples$URL[[i]], ">", "\n",
       sep = ""
