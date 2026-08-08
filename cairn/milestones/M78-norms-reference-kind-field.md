@@ -1,11 +1,11 @@
 # M78: Per-sample reference-kind field in the shipped norms
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** high
 - **Depends on:** —
 - **Driving RR:** RR16
 - **Principles touched:** IP5, GP4
-- **Branch/PR:** —
+- **Branch/PR:** `m78-norms-reference-kind`
 
 ## Goal
 
@@ -70,6 +70,8 @@ custom" claim (RR16 B1) → candidate row.
 ## Work log
 
 - 2026-08-08: created by /milestone-plan.
+- 2026-08-08: branch `m78-norms-reference-kind` cut from master at 3d5d18a4; status planned -> in-progress.
+- 2026-08-08: pre-task classification sweep over norms-audit.md's citekey map places all 24 samples with no residue (16 published, 6 standardization from horowitz2003.md p. 25's national standardization sample, 2 unsourced), so RR16's F2 falsifier (>4 unassignable) does not fire.
 - 2026-08-08: criteria audit ([O], fresh context) returned six single-answer defects, all fixed before this file was written — the three tokens were unwritten; the `norms-audit.md` derivation was unreachable (its citekey map marks no standardization sample, so T1 was added); an AC grep would have matched the milestone file quoting it; and a clause about "every pinned `Norms[[2]]` structure in `tests/testthat/`" quantified over an empty set. It found no criterion forbidden by any IP or GP.
 - 2026-08-08: plan gate chose token vocabulary `standardization`/`published`/`unsourced` over RR16's literal `standardization`/`study`/`unknown` because "study" mislabels the two author-website tables and "unknown" misplaces the ipipipc case, where the study is identified and only its statistics are not; falsified by more than 4 of the 24 samples proving unassignable when T1 populates the table (RR16 F2).
 - 2026-08-08: plan gate chose recording the kind basis in both the 15 builders and one central derivation script over the central form alone, because a maintainer editing one instrument meets the reasoning where the value is typed; falsified by the two records disagreeing in practice, which the AC5 diff would surface.
