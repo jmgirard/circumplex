@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-07 (M75 planned — batch-4 IIP norms audit, the manual now on the shelf; the norms-audit row's false "item-map by-design absent" claim corrected and the 2000-edition question added to it; one candidate row added for the IIP T-score conversion tables)._
+_Last hygiene check: 2026-08-07 (M75 done — the norms audit closes, all 15 instruments verdicted; the 2000-edition open item closed unopened and the T-score row's "only published norming content" claim corrected, both premised on descriptives the manual does print; the audit-script robustness row extended with six M75 review findings)._
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,13 +9,12 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M70 | Self-describing scaled fit output for `axes_reliability()` | done | M69 | normal | milestones/archive/M70-axes-scaled-fit-self-describing.md |
 | M71 | Refuse an infinite fitted diagonal in `axes_scaling_factor()` | done | — | normal | milestones/archive/M71-scaled-fit-infinite-diagonal.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M72 | Norms provenance audit, batch 1 (CSI family + IITC) | done | — | high | milestones/archive/M72-norms-provenance-audit-batch1.md |
 | M73 | Norms provenance audit, batch 2 (single-sample instruments) | done | — | high | milestones/archive/M73-norms-provenance-audit-batch2.md |
 | M74 | Norms provenance audit, batch 3 (multi-sample instruments) | done | M73 | high | milestones/archive/M74-norms-provenance-audit-batch3.md |
-| M75 | Norms provenance audit, batch 4 (IIP family) | review | — | high | milestones/M75-norms-provenance-audit-batch4.md |
+| M75 | Norms provenance audit, batch 4 (IIP family) | done | — | high | milestones/archive/M75-norms-provenance-audit-batch4.md |
 
 ## Candidates
 
