@@ -58,7 +58,7 @@ custom" claim (RR16 B1) → candidate row.
 
 ## Tasks
 
-- [ ] T1. Extend `cairn/references/norms-audit.md` with a per-sample kind table: all 24 instrument-sample pairs, each with its kind and the basis (source note anchor or the audit's unsourced disposition). The citekey map encodes only sourced-vs-unidentified today; nothing there marks a standardization sample.
+- [x] T1. Extend `cairn/references/norms-audit.md` with a per-sample kind table: all 24 instrument-sample pairs, each with its kind and the basis (source note anchor or the audit's unsourced disposition). The citekey map encodes only sourced-vs-unidentified today; nothing there marks a standardization sample.
 - [ ] T2. Test-first: extend the roster loop at `tests/testthat/test-norms-disclosure.R:219` to require `Kind` and its token set, and add the literal 24-pair expectation map asserted `setequal` to the enumeration. Red before T3.
 - [ ] T3. Add `Kind` to all 15 `data-raw/<instrument>.R` builders with a per-sample basis comment; add `data-raw/derive-norms-kind.R` re-deriving from T1's table and diffing against the shipped column; rebuild `data/`.
 - [ ] T4. `norms()` prints the kind phrase ([R/instrument_oop.R:189](R/instrument_oop.R:189)); extend the `?norms` prose classification at `R/instrument_oop.R:162-171` to key off the column; re-accept `_snaps/instrument_oop.md`.
@@ -71,6 +71,8 @@ custom" claim (RR16 B1) → candidate row.
 
 - 2026-08-08: created by /milestone-plan.
 - 2026-08-08: branch `m78-norms-reference-kind` cut from master at 3d5d18a4; status planned -> in-progress.
+- 2026-08-08: T1 done -- norms-audit.md gains a Reference kind section: the three kind definitions and a 24-row table of instrument/sample/kind/basis, tallying 16 published, 6 standardization, 2 unsourced against the section's own rows.
+- 2026-08-08: implement gate chose a short kind label at both surfaces ("Reference kind: standardization sample" / "identified published source" / "no identified source") over a full explanatory sentence, because AC2 bars the words that would carry the explanation from the message anyway and 24 listed samples make length expensive; falsified by users reading the bare label as uninformative.
 - 2026-08-08: pre-task classification sweep over norms-audit.md's citekey map places all 24 samples with no residue (16 published, 6 standardization from horowitz2003.md p. 25's national standardization sample, 2 unsourced), so RR16's F2 falsifier (>4 unassignable) does not fire.
 - 2026-08-08: criteria audit ([O], fresh context) returned six single-answer defects, all fixed before this file was written — the three tokens were unwritten; the `norms-audit.md` derivation was unreachable (its citekey map marks no standardization sample, so T1 was added); an AC grep would have matched the milestone file quoting it; and a clause about "every pinned `Norms[[2]]` structure in `tests/testthat/`" quantified over an empty set. It found no criterion forbidden by any IP or GP.
 - 2026-08-08: plan gate chose token vocabulary `standardization`/`published`/`unsourced` over RR16's literal `standardization`/`study`/`unknown` because "study" mislabels the two author-website tables and "unknown" misplaces the ipipipc case, where the study is identified and only its statistics are not; falsified by more than 4 of the 24 samples proving unassignable when T1 populates the table (RR16 F2).
