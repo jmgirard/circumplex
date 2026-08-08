@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** RR16
 - **Principles touched:** IP5, GP4
-- **Branch/PR:** `m78-norms-reference-kind`
+- **Branch/PR:** `m78-norms-reference-kind` / https://github.com/jmgirard/circumplex/pull/106
 
 ## Goal
 
