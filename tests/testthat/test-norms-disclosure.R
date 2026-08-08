@@ -217,6 +217,14 @@ test_that("the norm-standardizing surfaces keep the names the review settled on"
     obj <- shipped_instrument(nm)
     expect_true("Norms" %in% names(obj), info = nm)
     expect_true("Population" %in% names(obj$Norms[[2]]), info = nm)
+    # M78's column joins the pin: it is as easy to drop as the names above are
+    # to rename, and dropping it would take the kind out of every surface that
+    # reports one.
+    expect_true("Kind" %in% names(obj$Norms[[2]]), info = nm)
+    expect_true(
+      all(obj$Norms[[2]]$Kind %in% c("standardization", "published", "unsourced")),
+      info = nm
+    )
   }
 })
 
