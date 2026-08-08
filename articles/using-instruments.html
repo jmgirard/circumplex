@@ -558,25 +558,61 @@ amount and patterns of missingness in your data.</p>
 <h3 id="standardizing-scale-level-data">Standardizing scale-level data<a class="anchor" aria-label="anchor" href="#standardizing-scale-level-data"></a>
 </h3>
 <p>Finally, it can often be helpful to transform scale-level data
-through reference to a normative or comparison sample. This is often
-called “norm standardizing” and involves subtracting the normative
-sample’s mean score on a scale from each participant’s score on that
-scale and then dividing this difference by the normative sample’s
-standard deviation. This rescales the scale scores to be in standard
-deviation units and to describe the magnitude of each participant’s
-difference from the normative average.</p>
+through reference to a <em>reference sample</em>: a specific group of
+people whose scores on the same instrument the package ships as a table
+of means and standard deviations. This is often called “norm
+standardizing” and involves subtracting the reference sample’s mean
+score on a scale from each participant’s score on that scale and then
+dividing this difference by the reference sample’s standard deviation.
+This rescales the scale scores to be in standard deviation units and to
+describe the magnitude of each participant’s difference from the average
+of that particular sample.</p>
 <p>For many circumplex instruments, the data needed to perform
 standardization is included in its instrument object. Some instruments
-even have multiple (e.g., different or overlapping) normative samples
-for comparisons that are matched in terms of gender, age, or
-nationality. In selecting a normative sample to compare to, it is
-important to consider both the size and the appropriateness of the
-sample.</p>
-<p>To demonstrate, let’s examine the normative data sets available for
-the IIP-SC. Below we see that there are two options: a rather large
-sample of American college students and a rather small sample of
-American psychiatric outpatients.</p>
+have more than one reference sample — for example, separate samples for
+men and women, or for children and adults. In selecting a reference
+sample, the first question to ask is which group your participants are
+most sensibly described relative to; the size of the sample is a
+secondary consideration.</p>
+<p>Before choosing, it is worth knowing what these reference samples
+generally are.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">inst</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Filter</a></span><span class="op">(</span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"circumplex_instrument"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">mget</a></span><span class="op">(</span></span>
+<span>    <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"circumplex"</span><span class="op">)</span><span class="op">$</span><span class="va">results</span><span class="op">[</span>, <span class="st">"Item"</span><span class="op">]</span>,</span>
+<span>    envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.environment.html" class="external-link">as.environment</a></span><span class="op">(</span><span class="st">"package:circumplex"</span><span class="op">)</span>,</span>
+<span>    ifnotfound <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">inst</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">Norms</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">n_instruments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">inst</span><span class="op">)</span></span>
+<span><span class="va">n_samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span>
+<span><span class="va">n_college</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"college|undergraduate"</span>, <span class="va">samples</span><span class="op">$</span><span class="va">Population</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">n_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">samples</span><span class="op">$</span><span class="va">Size</span> <span class="op">&lt;</span> <span class="fl">300</span><span class="op">)</span></span>
+<span><span class="va">n_standardization</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"standardization"</span>, <span class="va">samples</span><span class="op">$</span><span class="va">Population</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">n_unsourced</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"unconfirmed"</span>, <span class="va">samples</span><span class="op">$</span><span class="va">Reference</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The package ships 24 reference samples across 15 instruments. 11 of
+them describe college or undergraduate students, and 7 have fewer than
+300 participants. Most are the single study sample that was available to
+the researchers who published the instrument — people recruited at one
+institution, at one time — rather than a group assembled to represent
+any wider population. The exception is the IIP-32 and IIP-64, whose 6
+samples come from a national standardization study designed for exactly
+that purpose. At the other end, 2 of the tables are published in no
+source that has been identified — their <code>Reference</code> entries
+say so, and scores standardized against them rest on unverified numbers.
+A reference sample is therefore best read as a concrete, described group
+of people to compare against, and the <code>Population</code> column
+printed below names the group each sample was drawn from rather than a
+population the sample stands in for.</p>
+<p>To demonstrate, let’s examine the reference samples available for the
+IIP-SC. Below we see two options: a sample of American college students
+and a sample of American psychiatric outpatients. They differ greatly in
+size, but what makes one or the other the right choice is which group
+your participants resemble.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/norms.html">norms</a></span><span class="op">(</span><span class="va">iipsc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; The IIP-SC currently has 2 normative data set(s):</span></span>
 <span><span class="co">#&gt; 1. 872 American college students</span></span>
@@ -586,18 +622,22 @@ American psychiatric outpatients.</p>
 <span><span class="co">#&gt; Soldz, Budman, Demby, &amp; Merry (1995)</span></span>
 <span><span class="co">#&gt; &lt;https://doi.org/10.1177/1073191195002001006&gt;</span></span></code></pre></div>
 <p>Assuming our example data also come from a non-psychiatric community
-sample of mostly college students, the first normative sample seems like
-a better choice, especially since it is so much larger and therefore
-subject to less sampling error. However, there may be times when the
-second normative sample would be the more appropriate comparison, even
-despite its smaller sample.</p>
+sample of mostly college students, the first reference sample is the
+better choice — because it describes a similar group of people, not
+because it is larger. Which sample you choose matters a great deal more
+than how precisely that sample’s mean and standard deviation are
+estimated: switching to a different reference sample typically shifts
+standardized scores by several times the uncertainty that even the
+smallest shipped sample contributes. If your participants were
+psychiatric outpatients, the second sample would be the appropriate
+reference despite its size.</p>
 <p>To transform the scale scores we calculated during the last section,
 we can call the <code><a href="../reference/norm_standardize.html">norm_standardize()</a></code> function and give it the
 <code>scale_scores</code> object we created above. We will save the
 output of this function to a data frame named <code>z_scales</code> to
 reflect the idea that standardized scores are often called
 “z-scores.”</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">z_scales</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/norm_standardize.html">norm_standardize</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">scale_scores</span>,</span>
 <span>  scales <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>,</span>
