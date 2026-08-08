@@ -1264,3 +1264,46 @@ matter and does not inherit this. Users see the change in NEWS.md and in
 `?csiv` / `?csie`, whose `@source` blocks now separate the instrument's article
 from the norms table. Any future GP4 question about printed output that is not a
 correction — a format change, a dropped field — still needs its own gate.
+
+### D-040 (2026-08-08): a norm sample outside its instrument's response range is refused, not caveated (hotfix, PR #103)
+
+**Context:** `norm_standardize()` computed z-scores from whichever normative
+sample the caller named, never checking that the sample's moments were on the
+same metric as the scores being standardized. One shipped sample is not: the
+CAIS adult sample's PA, LM and NO means (5.19, 6.52, 6.14) exceed the CAIS's
+own 1–5 range as declared in `cais$Anchors`, so standardizing against it
+returned numbers in an undefined unit with nothing in the output to say so.
+The M72–M75 provenance audit could not have caught it: that audit compares
+shipped values against the published source, and here the two agree exactly —
+the discrepancy originates in sodano2006's own Table 4. Three dispositions were
+weighed at the gate: refuse, warn-and-compute, or rescale the sample onto the
+1–5 metric.
+
+**Decision:** Refuse. GP2's fail-closed clause governs — "undecidable edge
+cases fail closed (not certified, not computed) rather than guessing" — and the
+condition for it is met in the strong form: there is no metric under which the
+returned values are correct, so refusing blocks no defensible analysis, which
+is the interest GP2's "never block a defensible analysis" clause protects.
+Warn-and-compute was rejected because a warning does not make a wrong number
+right and the caller still receives it. Rescaling was rejected as premature: it
+acts on an inference about what the source meant, and a numeric change to
+shipped norms is exactly what D-039 carves out as *not* inheriting its
+provenance-correction licence. **This is a behavior change rather than a pure
+restoration** — callers who previously received numbers now receive an error —
+and it is recorded here for that reason. GP4 does not bind: the package is at
+1.3.0 and v2.0.0 has not shipped, which is what makes now the cheap moment.
+
+**Consequences:** The refusal is roster-wide, not cais-specific: any shipped
+sample whose means leave its instrument's anchor range is refused, and a
+roster-wide invariant test pins the violation set exactly, so both a new
+violation and the disappearance of this one fail the suite. The evidence that
+Table 4's M and SD rows are transposed with its IAS block, what was ruled out
+(sum scores; a published erratum), and the author query sent to Sodano and
+Tracey on 2026-08-08 are in `cairn/references/sodano2006.md`. **The class of
+evidence that reopens this:** a reply identifying the adult sample's metric, or
+a second source printing those descriptives. Either would turn the refusal into
+a repair — correcting the shipped values under a fresh gate per D-039's
+numeric-change carve-out — or into a withdrawal of the sample. Users see the
+change in NEWS.md and `?cais`. A future sample that is merely *unrepresentative*
+rather than off-metric is a different question and does not inherit this;
+that is the norms-fitness candidate row's territory.
