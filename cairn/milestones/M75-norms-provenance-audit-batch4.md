@@ -280,3 +280,10 @@ real but the credit line is verbatim-required text and the note explains it.
 
 No finding met the return floor: neither actioned finding demonstrates an
 acceptance criterion failing, and neither scored ≥ 90.
+
+Re-verified after the fixes: `devtools::test()` 6096 passing / 0 failures;
+`devtools::check(args = "--no-manual")` 0 errors, 0 warnings, 0 notes;
+`devtools::document()` no diff; `cairn_validate` exit 0; the regenerated ledger
+still carries 0 rows for any published field of either instrument, 0 coverage
+gaps and 0 `UNDISPOSITIONED`. CI on PR #102 was green before the fixes and is
+re-running on the fix commit; the merge waits on it.
