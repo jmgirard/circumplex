@@ -17,7 +17,14 @@ An object of class `circumplex_instrument` of length 5.
 
 Soldz, S., Budman, S., Demby, A., & Merry, J. (1995). A short form of
 the Inventory of Interpersonal Problems Circumplex Scales. *Assessment,
-2*(1), 53-63.
+2*(1), 53-63. This article constructed the IIP-SC and is the source of
+the outpatient normative sample below.
+
+Hopwood, C. J., Pincus, A. L., DeMoor, R. M., & Koonce, E. A. (2008).
+Psychometric characteristics of the Inventory of Interpersonal
+Problems-Short Circumplex (IIP-SC) with college students. *Journal of
+Personality Assessment, 90*(6), 615-618. The source of the
+college-student normative sample below.
 
 [doi:10.1080/00223890802388665](https://doi.org/10.1080/00223890802388665)
 
@@ -83,7 +90,7 @@ summary(iipsc)
 #> 
 #> The IIP-SC currently has 2 normative data set(s):
 #> 1. 872 American college students
-#> Hopwood, Pincus, DeMoor, & Koonce (2011)
+#> Hopwood, Pincus, DeMoor, & Koonce (2008)
 #> <https://doi.org/10.1080/00223890802388665>
 #> 2. 106 American psychiatric outpatients
 #> Soldz, Budman, Demby, & Merry (1995)

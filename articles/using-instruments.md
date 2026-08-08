@@ -544,7 +544,7 @@ psychiatric outpatients.
 norms(iipsc)
 #> The IIP-SC currently has 2 normative data set(s):
 #> 1. 872 American college students
-#> Hopwood, Pincus, DeMoor, & Koonce (2011)
+#> Hopwood, Pincus, DeMoor, & Koonce (2008)
 #> <https://doi.org/10.1080/00223890802388665>
 #> 2. 106 American psychiatric outpatients
 #> Soldz, Budman, Demby, & Merry (1995)

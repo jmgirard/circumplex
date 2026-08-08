@@ -86,7 +86,7 @@ summary(cais)
 #> 37. I have a lot of friends
 #> 
 #> The CAIS currently has 2 normative data set(s):
-#> 1. 213 American fourth and sixth graders (aged 9 to 13)
+#> 1. 204 American fourth and sixth graders (aged 9 to 13)
 #> Sodano & Tracey (2006)
 #> <https://doi.org/10.1207/s15327752jpa8703_12>
 #> 2. 194 American college students (aged 17 to 50)
@@ -99,16 +99,19 @@ scales(cais, items = TRUE)
 #>     9. I know a lot
 #>     17. I think I can do a lot
 #>     25. I speak up for myself
+#>     32. I think I am right
 #> BC: Arrogant-Calculating (135 degrees)
 #>     2. I call people names
 #>     10. I like making trouble
 #>     18. I trick people
 #>     26. I tell people what to do
+#>     33. I am sneaky
 #> DE: Cold-Hearted (180 degrees)
 #>     3. I hurt people
 #>     11. I make people cry
 #>     19. I am mean to others
 #>     27. I like it when others feel bad
+#>     34. I am grumpy
 #> FG: Aloof-Introverted (225 degrees)
 #>     4. I am by myself a lot
 #>     12. I am alone
@@ -119,19 +122,21 @@ scales(cais, items = TRUE)
 #>     13. I am sad
 #>     21. I know very little
 #>     29. I give in easily
+#>     35. I am afraid
 #> JK: Unassuming-Ingenuous (315 degrees)
 #>     6. I am calm
 #>     14. I am quiet
 #>     22. Tricking people is mean
-#>     30. I help people
 #> LM: Warm-Agreeable (360 degrees)
 #>     7. I am kind to others
 #>     15. I try to help others feel better
 #>     23. I am friendly
-#>     31. I play with others
+#>     30. I help people
+#>     36. I share
 #> NO: Gregarious-Extraverted (45 degrees)
 #>     8. I am fun to be around
 #>     16. I am happy
 #>     24. I am giving
-#>     32. I think I am right
+#>     31. I play with others
+#>     37. I have a lot of friends
 ```

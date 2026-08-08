@@ -119,10 +119,10 @@ summary(iei)
 #> The IEI currently has 2 normative data set(s):
 #> 1. 1223 American undergraduate students
 #> Horner, Locke, & Hulsey (2024)
-#> <https://osf.io/w37dj/>
+#> <https://kennethlocke.org/IEI/IEI_Norms.html>
 #> 2. 278 American crowdworkers
 #> Horner, Locke, & Hulsey (2024)
-#> <https://osf.io/w37dj/>
+#> <https://doi.org/10.1080/00223891.2024.2400266>
 scales(iei, items = TRUE)
 #> The IEI contains 8 circumplex scales.
 #> PA: Confident-Impressive (90 degrees)
