@@ -84,13 +84,18 @@ well-named for users → the existing norms-fitness row.
 
 ## Tasks
 
-- [ ] T1: author `cairn/references/horowitz2003.md` from
+- [x] T1: author `cairn/references/horowitz2003.md` from
       `templates/source-note.md` — Provenance block, condition-(a) credit
-      line, and a five-column audit-values block carrying Table 4.4's 48 raw
-      statistics (pp. 27–29), Size/Population/Reference/URL/Angle, and the
-      printed scale-membership lists. Second channel: 150-dpi render of
-      pp. 27–29 and 87–89 (M42-D1; `pdftotext` twice is one channel). Add the
-      `INDEX.md` line.
+      line, and **two** instrument-tagged five-column audit-values blocks (one
+      source, two instruments): Table 4.4's 48 raw statistics (pp. 27–29) and
+      Table F.5's 48 (p. 91), Size/Population/Reference/URL/Angle, and the
+      printed scale-membership lists (Appendix A pp. 57–59, Appendix H
+      pp. 101–102). Second channel: 150-dpi renders of every cited page
+      (M42-D1; `pdftotext` twice is one channel). Add the `INDEX.md` line.
+- [ ] T2a: extend `data-raw/audit-norms.R` so one source note can back two
+      instruments — `<!-- audit-values-begin: <instrument> -->` tagged blocks
+      selected by the batch row's instrument, with untagged single-block notes
+      unchanged. Test both the selection and the abort when no block matches.
 - [ ] T2: add six `AUDIT_BATCH` rows to `data-raw/audit-norms.R:34-62`
       (iip32 samples 1–3 `divisor = 4`, iip64 samples 1–3 `divisor = 8`, one
       `scales = TRUE` per instrument); run and record ledger + coverage.
@@ -127,6 +132,9 @@ well-named for users → the existing norms-fitness row.
 - 2026-08-07: gate chose citing the 2003 3rd edition (Mind Garden) across `@source`, `Norms[[2]]$Reference` and `Details$Reference` for both instruments over the 2000 first edition (The Psychological Corporation) that `@source` carried, because the shipped values are verified against the 3rd edition and nothing here was checked against the first.
 - 2026-08-07: corrected in place the two `cairn/ROADMAP.md` claims the plan gate premised on the descriptives' absence — the norms-audit row's 2000-edition open item (closed, never opened) and the T-score row's "the tables are the only published norming content".
 - 2026-08-07: measured the published-vs-linear T gap for iip32 (all 24 Appendix F columns, shipped M/SD): excluding the 99-ceiling cells, median 0.3 T points (0.03 SD), 90th pct 1.3, max 4.0 (0.4 SD); below T=60 max 1.2. Confirms keeping M/SD standardization; recorded on the T-table candidate row.
+
+- 2026-08-07: T1 done — `cairn/references/horowitz2003.md` + `INDEX.md` line; all 96 M/SD values, both item maps, the three sizes and the reference credit read in two channels (text layer, 150-dpi render) across pp. 27–29, 57–59, 91 and 101–102. `devtools::test()` clean (0 failures, 6060 passing).
+- 2026-08-07: discovered sub-task T2a — one source note backing two instruments collides in the audit's `(field, sample, scale)` join key, since `parse_source_note()` assumes one note per instrument and requires exactly one audit-values block. Adding instrument-tagged blocks rather than splitting the manual across two citekey pages.
 
 ## Decisions
 
