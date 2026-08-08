@@ -45,7 +45,9 @@ statistics are well-named for users → the existing norms-fitness row.
       M/SD ledger rows carry disposition `not-published-in-source`, and
       `horowitz2003.md` records both that the 3rd edition prints no IIP-32
       descriptives and that the strict reproduce-every-printed-T check
-      succeeds for only 5 of its 24 columns.
+      succeeds for only 5 of its 24 columns. `horowitz2003.md` also records
+      that the manual's p. 30 describes a linear T transformation while
+      Appendix F's printed tables are not linear, with the measured gap.
 - [ ] AC3: the 96 shipped item→octant assignments (`iip32$Scales$Items` 1–32,
       `iip64$Scales$Items` 1–64) each match the manual's printed
       scale-membership lists at the anchors recorded in `horowitz2003.md`; and
@@ -120,6 +122,8 @@ statistics are well-named for users → the existing norms-fitness row.
 - 2026-08-07: plan gate chose recording `iip32` as norms-unsourced with the Appendix F recovery attached as corroboration over calling it verified-by- derivation, because the strict reproduce-every-printed-T oracle succeeds on only 5 of 24 columns (the printed tables compress at the tails despite the text calling the transform linear), so the recovery bounds the values but cannot verify them; falsified by obtaining an edition that prints the IIP-32 descriptives, which would make this an ordinary transcription audit.
 - 2026-08-07: plan gate chose keeping M/SD standardization over adopting the manual's T-score tables, because the permission licenses "Normative Data (Means and SDs)" only and the tables are demonstrably non-linear at the tails, so they are not equivalent to z-scoring; falsified by a fresh permission covering the conversion tables plus a use case needing them.
 - 2026-08-07: `Scales$Items` ships for both instruments and is audited here rather than removed — maintainer confirmed 2026-08-07 that scoring the items is permitted. `cairn/ROADMAP.md`'s claim that the item-map field is "by-design absent for these two" is false and is corrected in this plan's commit.
+
+- 2026-08-07: measured the published-vs-linear T gap for iip32 (all 24 Appendix F columns, shipped M/SD): excluding the 99-ceiling cells, median 0.3 T points (0.03 SD), 90th pct 1.3, max 4.0 (0.4 SD); below T=60 max 1.2. Confirms keeping M/SD standardization; recorded on the T-table candidate row.
 
 ## Decisions
 
