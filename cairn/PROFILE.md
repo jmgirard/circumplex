@@ -13,7 +13,14 @@ Run by `/milestone-implement` (per task) and `/hotfix` (gate-lite):
 ## consistency-gate
 Toolchain checks `/milestone-review` runs *in addition to* the universal
 cairn-file checks (`cairn_validate`, coverage completeness, `cairn_impact`):
-- `devtools::document()` produces no diff.
+- `devtools::document()` produces no diff, and emits no unresolved-link warning:
+  run `Rscript -e 'options(cli.width = 500); devtools::document()'` and require
+  zero output lines matching `resolve link` (the width is pinned because cli
+  wraps its output, and a break falling inside the phrase hides a live warning
+  from a line-based grep). roxygen reads `[...]` in a markdown block as link
+  syntax, so bare interval notation (`[0, 360]`) and references to unexported
+  functions both warn; protect them with backticks or an escaped closing
+  bracket (`[0, 360\]`).
 - Generated files are never hand-edited: `NAMESPACE`, `man/`, and `data/*.rda`
   regenerate from roxygen and `data-raw/` scripts (the no-diff `document()`
   check catches drift).

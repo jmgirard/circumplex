@@ -44,7 +44,7 @@ cpm_rho <- function(delta, beta) {
 #' Derivative of the correlation function, rho'(delta)
 #'
 #' `rho'(delta) = -sum_{k=0}^{m} k beta_k sin(k delta)` (design sec. 3.4). Same
-#' shape contract as [cpm_rho()].
+#' shape contract as `cpm_rho()`.
 #'
 #' @noRd
 cpm_rho_deriv <- function(delta, beta) {
@@ -128,7 +128,7 @@ cpm_discrepancy <- function(R, P, ldR = NULL) {
 #'   D circulant         : 0 free angles, 1 free zeta, m free beta
 #'
 #' The free-parameter vector gamma* is laid out as
-#'   [ free-angle radians ] [ zeta logits u ] [ sigma logs s ] [ beta free logits v_1..v_m ].
+#'   `[ free-angle radians ] [ zeta logits u ] [ sigma logs s ] [ beta free logits v_1..v_m ]`.
 #' The `s` (log-scale) block is present only under `scaling = "free"` (M18); it
 #' sits BETWEEN zeta and beta so beta stays the trailing block that the boundary
 #' polish (`cpm_spec_reduce`) shrinks from the tail (spec sec. 5, mechanical pin
@@ -428,7 +428,7 @@ cpm_beta_start_interior <- function(beta0, fallback) {
 #' Starting values for one orientation (design sec. 3.5)
 #'
 #' theta0 = user angles; zeta0_i = sqrt(max_{j!=i} |r_ij|) clipped to
-#' [0.3, 0.95]; beta0 = LS fit of off-diagonal r_ij on {cos(k delta0_ij)},
+#' `[0.3, 0.95]`; beta0 = LS fit of off-diagonal r_ij on {cos(k delta0_ij)},
 #' nonpositives floored to 0.01 and renormalized (strict interior; see
 #' cpm_beta_start_interior); singular-LS fallback (0.4, 0.3, 0.2, 0.1, ...)
 #' truncated to m+1 and renormalized.
@@ -612,8 +612,8 @@ cpm_canonicalize <- function(gstar, spec, theta_theory) {
 #'
 #' Internal engine core (the exported `cpm_fit()` API is a later task). Returns
 #' a plain list with the natural-scale estimates (estimated angles wrapped to
-#' [0, 360] with the pole labeled 360, only in the reported degrees field;
-#' `theta_theory` echoes the plain [0, 360) wrap, and `cpm_fit()`'s results
+#' `[0, 360]` with the pole labeled 360, only in the reported degrees field;
+#' `theta_theory` echoes the plain `[0, 360)` wrap, and `cpm_fit()`'s results
 #' table echoes the user's supplied angles verbatim) and the full diagnostic
 #' set required by design sec. 5.4.
 #'
@@ -1031,7 +1031,7 @@ cpm_polish_beta <- function(fit, R, spec) {
 #'
 #' Note: the design doc sec. 5.3 states the lower-guard inequality as
 #' "lambda_L = 0 when pchisq(T, df) >= .95", which is the opposite of the
-#' condition its own worked example (T = 20, df = 40 -> [0, 0]) requires. The
+#' condition its own worked example (T = 20, df = 40 -> `[0, 0]`) requires. The
 #' standard condition implemented here (`pchisq(T, df) < 1 - a`) reproduces that
 #' example; the design change log records the correction.
 #'
@@ -1124,7 +1124,7 @@ cpm_fit_indices <- function(Fhat, df, p, N, R, Phat, q) {
 
 #' Hessian of F in the unconstrained coordinates via FD of the analytic gradient
 #'
-#' Central finite differences of [cpm_gradient()] (step 1e-5), symmetrized
+#' Central finite differences of `cpm_gradient()` (step 1e-5), symmetrized
 #' (design sec. 5.2). Computed fresh at the reported (canonicalized) solution;
 #' the engine's own condition-number Hessian is left untouched.
 #'
