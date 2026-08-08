@@ -737,8 +737,10 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   normative sample stands in for a population. The standardizing section
   characterizes the shipped samples from the instrument objects themselves —
   the counts are computed in the vignette rather than written down — noting
-  that most are single-study samples of college students, with the IIP-32 and
-  IIP-64 national standardization samples as the exception. It drops a claim
+  that many are single-study samples of college students, that the IIP-32 and
+  IIP-64 national standardization samples are the exception at one end, and
+  that two of the tables are published in no identified source at the other.
+  It drops a claim
   that some instruments offer samples matched on nationality (none do; the
   matched sets are by gender and by age), and it resolves the choice between
   samples on which group your participants resemble rather than on which

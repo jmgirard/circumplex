@@ -161,7 +161,8 @@ anchors <- function(x) {
 #'
 #' The label names the group each sample was drawn from, not a frame the
 #' sample was drawn to represent. Apart from the IIP-32 and IIP-64 national
-#' standardization samples, the shipped samples are the study samples their
+#' standardization samples, and those whose `Reference` records the norms
+#' source as unconfirmed, the shipped samples are the study samples their
 #' authors had available, so a mean and standard deviation computed from one
 #' of them describes that group of people rather than a population. See
 #' `vignette("using-instruments")` for what the shipped reference samples are
