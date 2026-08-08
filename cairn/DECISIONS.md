@@ -1307,3 +1307,50 @@ numeric-change carve-out — or into a withdrawal of the sample. Users see the
 change in NEWS.md and `?cais`. A future sample that is merely *unrepresentative*
 rather than off-metric is a different question and does not inherit this;
 that is the norms-fitness candidate row's territory.
+
+### D-041 (2026-08-08): the reference-statistics vocabulary keeps its names — `norm_standardize()`, `norms()`, `$Norms`, `Population` (M76, M77, RR16)
+
+**Context:** The M72–M75 provenance audit established what the 24 shipped
+reference samples actually are: 11 carry a college- or undergraduate-student
+label, 7 have n < 300, and only the 6 IIP samples are drawn to represent a
+defined population. M74 then measured that the *choice* of reference sample
+moves scores 0.44 SD on average and 0.78 at the extreme, against ~0.12 SD from
+reference-moment sampling error at the worst shipped size. M76 and M77 were
+planned to close that with a call-site disclosure and prose corrections, both
+gates provisionally keeping the `norm*` vocabulary. The maintainer then raised
+the `irreversible-api` tripwire: GP4 binds API stability only after v2.0.0,
+which D-040 already relied on, so the rename's cost is at its lowest now and
+expensive later. RB16 escalated the question; RR16 answered it.
+
+**Decision:** Keep all four surfaces. "Norms" is the interpersonal-circumplex
+field's own word for exactly these tables, convenience-sample ones included —
+the instrument authors title their own single-study tables "norms", and the
+*Standards* tradition qualifies the word ("local norms", "convenience norms")
+rather than replacing it — so the identifiers report field usage rather than
+assert representativeness. The hazard is real but runs through *claims* — the
+definite article, silence about which sample was used, a header asked to carry
+both who the sample was and what it represents — which M76's disclosure and
+M77's prose address at the layer where they live. A rename carries at most one
+bit, visible only where a call is written, and would understate the 6 genuine
+standardization samples in the same motion that it stops overstating the other
+18. `Population` was the one surface where the word does claim-work and was the
+closest call; it stays, its residual hazard closed by M77's `?norms` hedge and
+by the per-sample kind field below. A deprecation-cycle rename was rejected
+too: mechanics mitigate cost, not pointlessness.
+
+**Consequences:** M76's message prints the stored `Population` value as a plain
+description, framed by neither "population" nor representativeness wording
+(M76 AC8); a regression pin fails if any of the three surfaces is renamed or
+dropped (M76 AC9). The distinction a rename would have flattened ships instead
+as a machine-readable per-sample reference-kind column — standardization sample
+/ identified published source / no identified source — printed by `norms()` and
+carried by the disclosure, planned as its own milestone before the v2.0.0
+submission while `Norms[[2]]` is cheap to touch. The ROADMAP's parked rename
+item is closed on the merits, not deferred. **The class of evidence that
+reopens this:** three or more documented instances, after a release carrying
+the disclosure, of a user describing convenience-referenced z-scores as
+locating respondents in a general population *with the disclosure in effect*;
+or a field-level vocabulary shift deprecating "norms" for non-representative
+reference tables. Explicitly insufficient: a reverse-dependency scan showing
+few external callers (that lowers the cost, and the verdict rests on the
+benefit), or modernization preference.

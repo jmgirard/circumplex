@@ -1,6 +1,6 @@
 # M77: Say precisely what the shipped reference statistics are
 
-- **Status:** blocked
+- **Status:** planned
 - **Priority:** normal
 - **Depends on:** M76
 - **Driving RR:** —
@@ -78,7 +78,10 @@ this milestone cites it, it does not restate it.
       before editing anything, so the edit set is decided by the sweep rather
       than by recall.
 - [ ] T2 Rewrite the four passages at `vignettes/using-instruments.Rmd:122`,
-      `:124`, `:126`, `:132`.
+      `:124`, `:126`, `:132`. Where a synonym for "normative samples" is wanted,
+      gloss them "reference samples"; avoid "comparison sample", which in the
+      psychological literature connotes a study-internal control group (RR16 R4,
+      B3, reaching `:122`'s own "normative or comparison sample").
 - [ ] T3 Add the characterization passage and its computing chunk; verify each
       printed figure against a separate run rather than against the chunk that
       produced it.
@@ -96,7 +99,11 @@ this milestone cites it, it does not restate it.
 - 2026-08-08: blocked on RB16 (norms vocabulary rename). The maintainer raised the irreversible-api tripwire immediately after planning: GP4 binds API stability only after v2.0.0, which D-040 already relied on, so the cost-of-change ground the gate decided on is at its weakest now and expensive later. The gate's keep-the-names choice is provisional pending RR16.
 - 2026-08-08: at the RB16 approval gate the maintainer chose to run the review manually rather than have the session spawn it, so RB16 sits open awaiting `cairn/reviews/RR16-norms-vocabulary-rename.md`; ingestion runs at the next session start once that file appears.
 - 2026-08-08: the manual review run wrote `cairn/reviews/RR16-norms-vocabulary-rename.md`. Verdict: no rename (all four identifier surfaces kept); binds a per-sample reference-kind field and M76 message-prose wording via BC1–BC3. Awaiting ingestion.
+- 2026-08-08: RR16 ingested; unblocked, back to planned. No binding criterion constrains this file — BC1 and BC2 land in M76, BC3 routes to a new milestone — so the amendment here is T2's wording constraint (RR16 R4/B3) only, and the four passages, the characterization chunk and the AC4 sweep stand as planned. RR16 endorsed this milestone's docs-only scope explicitly (its Q3(e)), finding the docs-vs-API mismatch worry does not arise because the prose keeps the field's vocabulary and corrects only the claims. RB16/RR16 archived; ingest audit detail in M76's work log.
+- 2026-08-08: RR16 B1 (`norm_standardize()`'s roxygen promising "normative data (from the package or custom)" where the signature admits only a `circumplex_instrument`) went to M76 AC5/T7 rather than here — M76 already rewrites that help page, and this milestone's AC4 sweep pattern does not match the phrase.
 
 ## Decisions
+
+- 2026-08-08 (RR16 R4, B3): where the rewritten passages want a synonym for "normative samples", they say "reference samples" and not "comparison sample" — the latter connotes a study-internal control group, inviting the reading that the user's data are compared to a matched design element rather than to an external published table.
 
 ## Review
