@@ -129,6 +129,10 @@
 #' Pincus. Further Reproduction is prohibited without the Publisher's written
 #' consent."
 #'
+#' That credit line is the publisher's own required wording, reproduced
+#' verbatim; its 2000 copyright date is part of that wording and is not the
+#' edition the values come from, which is the 2003 third edition cited below.
+#'
 #' @source Horowitz, L. M., Alden, L. E., Wiggins, J. S., & Pincus, A. L.
 #'   (2003). *Inventory of Interpersonal Problems manual: Includes IIP-64 and
 #'   IIP-32 forms* (3rd ed.). Menlo Park, CA: Mind Garden. Originally published
@@ -157,6 +161,10 @@
 #' 2000 by Leonard M. Horowitz, Lynn E. Alden, Jerry S. Wiggins, & Aaron L.
 #' Pincus. Further Reproduction is prohibited without the Publisher's written
 #' consent."
+#'
+#' That credit line is the publisher's own required wording, reproduced
+#' verbatim; its 2000 copyright date is part of that wording and is not the
+#' edition the values come from, which is the 2003 third edition cited below.
 #'
 #' @source Horowitz, L. M., Alden, L. E., Wiggins, J. S., & Pincus, A. L.
 #'   (2003). *Inventory of Interpersonal Problems manual: Includes IIP-64 and

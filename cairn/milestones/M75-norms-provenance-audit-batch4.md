@@ -287,3 +287,8 @@ Re-verified after the fixes: `devtools::test()` 6096 passing / 0 failures;
 still carries 0 rows for any published field of either instrument, 0 coverage
 gaps and 0 `UNDISPOSITIONED`. CI on PR #102 was green before the fixes and is
 re-running on the fix commit; the merge waits on it.
+
+At the merge gate the maintainer chose to fix the one logged-not-actioned
+finding that reaches a user-facing page (60): both help pages now say the
+credit line's 2000 date is the publisher's required wording rather than the
+edition the values come from. The licensed text itself is untouched.
