@@ -1,11 +1,11 @@
 # M77: Say precisely what the shipped reference statistics are
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M76
 - **Driving RR:** —
 - **Principles touched:** GP5
-- **Branch/PR:** —
+- **Branch/PR:** `m77-norms-fitness-docs`
 
 ## Goal
 
@@ -74,7 +74,7 @@ this milestone cites it, it does not restate it.
 
 ## Tasks
 
-- [ ] T1 Run the AC4 sweep and record every hit with a proposed disposition
+- [x] T1 Run the AC4 sweep and record every hit with a proposed disposition
       before editing anything, so the edit set is decided by the sweep rather
       than by recall.
 - [ ] T2 Rewrite the four passages at `vignettes/using-instruments.Rmd:122`,
@@ -101,6 +101,8 @@ this milestone cites it, it does not restate it.
 - 2026-08-08: the manual review run wrote `cairn/reviews/RR16-norms-vocabulary-rename.md`. Verdict: no rename (all four identifier surfaces kept); binds a per-sample reference-kind field and M76 message-prose wording via BC1–BC3. Awaiting ingestion.
 - 2026-08-08: RR16 ingested; unblocked, back to planned. No binding criterion constrains this file — BC1 and BC2 land in M76, BC3 routes to a new milestone — so the amendment here is T2's wording constraint (RR16 R4/B3) only, and the four passages, the characterization chunk and the AC4 sweep stand as planned. RR16 endorsed this milestone's docs-only scope explicitly (its Q3(e)), finding the docs-vs-API mismatch worry does not arise because the prose keeps the field's vocabulary and corrects only the claims. RB16/RR16 archived; ingest audit detail in M76's work log.
 - 2026-08-08: RR16 B1 (`norm_standardize()`'s roxygen promising "normative data (from the package or custom)" where the signature admits only a `circumplex_instrument`) went to M76 AC5/T7 rather than here — M76 already rewrites that help page, and this milestone's AC4 sweep pattern does not match the phrase.
+- 2026-08-08: T1 pre-edit AC4 sweep (the AC4 `grep -n -iE` command, run at 9e9fff31 + this branch's tracking commits) returns 23 matched lines; proposed dispositions — REWRITE 4: `using-instruments.Rmd:122` (definite-article "the normative average"), `:132` (size-resolves-it), `R/instrument_oop.R:153` and `:159` (the `?norms` hedge, AC3). CONFIRMED CORRECT AS WRITTEN 19, all naming an estimation-theoretic population or sampling error rather than a reference sample: `evaluating-circumplex-structure.Rmd:35,298`; `sem-based-ssm-analysis.Rmd:246,247`; `R/ssm_ci_oop.R:298`; `R/tidying_functions.R:310,328` (M76's own comments stating the ground this milestone documents); `R/axes_reliability.R:261,430,459`; `R/cpm_fit.R:405,1806`; `R/ssm_ci_accuracy.R:15,16,126,151,257,431,554`.
+- 2026-08-08: implement question gate chose inline computed figures (a visible chunk assigns the counts, prose interpolates them) over a printed summary block or a 24-row table, and placed the characterization passage before the IIP-SC demo so the reader knows what the samples are before making the worked choice.
 
 ## Decisions
 
