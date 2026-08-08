@@ -214,6 +214,105 @@ audited_objects <- list(
       "Sensitive to Remoteness", "Sensitive to Timidity", "Sensitive to Passivity", 
       "Sensitive to Dependence", "Sensitive to Affection", "Sensitive to Attention-Seeking"
       )), class = "data.frame", row.names = c(NA, -8L))
+  ),
+  cais = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 
+      2, 2), Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO", "PA", 
+      "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 135, 180, 225, 
+      270, 315, 360, 45, 90, 135, 180, 225, 270, 315, 360, 45), M = c(3.39, 2.11, 
+      1.85, 1.99, 2.08, 2.76, 3.62, 3.75, 5.19, 3.97, 2.34, 2.76, 3.87, 4.16, 
+      6.52, 6.14), SD = c(0.84, 0.85, 0.77, 0.74, 0.64, 0.81, 0.86, 0.73, 0.89, 
+      1.08, 0.98, 1.11, 1.12, 0.99, 0.93, 0.87)), class = "data.frame", row.names = c(NA, 
+      -16L)), structure(list(Sample = c(1, 2), Size = c(204, 194), Population = c("American fourth and sixth graders (aged 9 to 13)", 
+      "American college students (aged 17 to 50)"), Reference = c("Sodano & Tracey (2006)", 
+      "Sodano & Tracey (2006)"), URL = c("https://doi.org/10.1207/s15327752jpa8703_12", 
+      "https://doi.org/10.1207/s15327752jpa8703_12")), class = "data.frame", row.names = c(NA, 
+      -2L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), Items = c("1,  9, 17, 25, 32", 
+      "2, 10, 18, 26, 33", "3, 11, 19, 27, 34", "4, 12, 20, 28", "5, 13, 21, 29, 35", 
+      "6, 14, 22", "7, 15, 23, 30, 36", "8, 16, 24, 31, 37"), Label = c("Assured-Dominant", 
+      "Arrogant-Calculating", "Cold-Hearted", "Aloof-Introverted", "Unassured-Submissive", 
+      "Unassuming-Ingenuous", "Warm-Agreeable", "Gregarious-Extraverted")), class = "data.frame", row.names = c(NA, 
+      -8L))
+  ),
+  iei = list(
+    Norms = 
+      list(structure(list(Sample = c(1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 
+      2L, 2L, 2L, 2L, 2L, 2L), Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", 
+      "LM", "NO", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 
+      135, 180, 225, 270, 315, 360, 45, 90, 135, 180, 225, 270, 315, 360, 45), 
+    M = c(2, 1.21, 0.91, 1.18, 2.03, 2.63, 2.7, 2.41, 1.82, 1.22, 1.08, 
+    1.3, 1.83, 2.37, 2.43, 2.2), SD = c(0.71, 0.61, 0.68, 0.84, 0.86, 0.6, 
+    0.66, 0.73, 0.79, 0.53, 0.66, 0.89, 0.9, 0.51, 0.68, 0.79)), class = "data.frame", row.names = c(NA, 
+      -16L)), structure(list(Sample = c(1, 2), Size = c(1223, 278), Population = c("American undergraduate students", 
+      "American crowdworkers"), Reference = c("Horner, Locke, & Hulsey (2024)", 
+      "Horner, Locke, & Hulsey (2024)"), URL = c("https://kennethlocke.org/IEI/IEI_Norms.html", 
+      "https://doi.org/10.1080/00223891.2024.2400266")), class = "data.frame", row.names = c(NA, 
+      -2L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), Items = c("1, 2, 3, 4, 5, 6, 7, 8", 
+      "9, 10, 11, 12, 13, 14, 15, 16", "17, 18, 19, 20, 21, 22, 23, 24", "25, 26, 27, 28, 29, 30, 31, 32", 
+      "33, 34, 35, 36, 37, 38, 39, 40", "41, 42, 43, 44, 45, 46, 47, 48", "49, 50, 51, 52, 53, 54, 55, 56", 
+      "57, 58, 59, 60, 61, 62, 63, 64"), Label = c("Confident-Impressive", "Superior-Callous", 
+      "Rejecting-Suspicious", "Rejected-Ashamed", "Insecure-Anxious", "Needy-Empathic", 
+      "Welcoming-Trusting", "Included-Proud")), class = "data.frame", row.names = c(NA, 
+      -8L))
+  ),
+  igicr = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 
+      2, 2, 3, 3, 3, 3, 3, 3, 3, 3), Scale = c("PA", "BC", "DE", "FG", "HI", 
+      "JK", "LM", "NO", "PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO", "PA", 
+      "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 135, 180, 225, 
+      270, 315, 360, 45, 90, 135, 180, 225, 270, 315, 360, 45, 90, 135, 180, 
+      225, 270, 315, 360, 45), M = c(2.09, 0.97, 1.51, 2.23, 2.38, 2.74, 2.68, 
+      2.35, 2.13, 1.11, 1.68, 2.24, 2.32, 2.64, 2.52, 2.29, 2.06, 0.85, 1.37, 
+      2.23, 2.43, 2.82, 2.81, 2.4), SD = c(0.8, 0.66, 0.85, 0.91, 0.8, 0.76, 
+      0.77, 0.76, 0.75, 0.68, 0.87, 0.92, 0.79, 0.7, 0.72, 0.73, 0.83, 0.61, 
+      0.82, 0.91, 0.81, 0.8, 0.78, 0.78)), class = "data.frame", row.names = c(NA, 
+      -24L)), structure(list(Sample = c(1, 2, 3), Size = c(387, 174, 213), Population = c("American community adolescents (age 11-13), overall", 
+      "American community adolescents (age 11-13), males", "American community adolescents (age 11-13), females"
+      ), Reference = c("Trucco, Wright, & Colder (2013)", "Trucco, Wright, & Colder (2013)", 
+      "Trucco, Wright, & Colder (2013)"), URL = c("https://doi.org/10.1177/1073191111411672", 
+      "https://doi.org/10.1177/1073191111411672", "https://doi.org/10.1177/1073191111411672"
+      )), class = "data.frame", row.names = c(NA, -3L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), Items = c("1,  9, 17, 25", 
+      "2, 10, 18, 26", "3, 11, 19, 27", "4, 12, 20, 28", "5, 13, 21, 29", "6, 14, 22, 30", 
+      "7, 15, 23, 31", "8, 16, 24, 32"), Label = c("+A", "+A-C", "-C", "-A-C", 
+      "-A", "-A+C", "+C", "+A+C")), class = "data.frame", row.names = c(NA, -8L
+      ))
+  ),
+  iipsc = list(
+    Norms = 
+      list(structure(list(Sample = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 
+      2, 2), Scale = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO", "PA", 
+      "BC", "DE", "FG", "HI", "JK", "LM", "NO"), Angle = c(90, 135, 180, 225, 
+      270, 315, 360, 45, 90, 135, 180, 225, 270, 315, 360, 45), M = c(0.76, 0.7925, 
+      0.9, 1.0475, 1.42, 1.385, 1.465, 1.025, 0.99, 0.97, 1.3, 1.33, 1.81, 1.92, 
+      2.14, 1.43), SD = c(0.66, 0.69, 0.855, 0.9475, 0.915, 0.8525, 0.825, 0.8, 
+      0.82, 0.85, 1.07, 0.98, 0.89, 0.89, 0.9, 1.05)), class = "data.frame", row.names = c(NA, 
+      -16L)), structure(list(Sample = c(1, 2), Size = c(872, 106), Population = c("American college students", 
+      "American psychiatric outpatients"), Reference = c("Hopwood, Pincus, DeMoor, & Koonce (2008)", 
+      "Soldz, Budman, Demby, & Merry (1995)"), URL = c("https://doi.org/10.1080/00223890802388665", 
+      "https://doi.org/10.1177/1073191195002001006")), class = "data.frame", row.names = c(NA, 
+      -2L)))
+    ,
+    Scales = 
+      structure(list(Abbrev = c("PA", "BC", "DE", "FG", "HI", "JK", "LM", "NO"
+      ), Angle = c(90, 135, 180, 225, 270, 315, 360, 45), Items = c("1,  9, 17, 25", 
+      "2, 10, 18, 26", "3, 11, 19, 27", "4, 12, 20, 28", "5, 13, 21, 29", "6, 14, 22, 30", 
+      "7, 15, 23, 31", "8, 16, 24, 32"), Label = c("Domineering", "Vindictive", 
+      "Cold", "Socially Avoidant", "Nonassertive", "Exploitable", "Overly Nurturant", 
+      "Intrusive")), class = "data.frame", row.names = c(NA, -8L))
   )
 )
 
@@ -250,6 +349,46 @@ test_that("shipped angles follow the LM = 360 convention (M72)", {
       expect_true(all(a > 0 & a <= 360), info = inst)
     }
   }
+})
+
+test_that("every shipped instrument's item key partitions its items (M74)", {
+  # score() takes rowMeans over exactly the numbers in Scales$Items, so an item
+  # missing from every key is silently never scored and an item named twice is
+  # scored into two octants. Neither shows up in any count the audit reports:
+  # the audit compares the key against the SOURCE, and four of the shipped
+  # instruments have no published item map to compare against at all.
+  #
+  # This is the failure cais shipped from 2018 to M74. Its 37 items sit in
+  # octant blocks of unequal size (sodano2006 Table 1, p. 322: 5/5/5/4/5/3/5/5),
+  # but the key carried the "1, 9, 17, 25" eight-cycle template the package's
+  # other 32-item instruments use, which fits only when every block holds four.
+  # The template dropped items 33-37 from every scale and misassigned 30, 31
+  # and 32 -- and the item ORDER in the same file was right all along, so the
+  # file contradicted itself. Sweeping all fifteen rather than the audited
+  # thirteen is deliberate: iip32 and iip64 have no source on the shelf yet and
+  # would otherwise be checked by nothing.
+  for (inst in shipped_instruments()) {
+    obj <- get(inst)
+    keyed <- unlist(lapply(strsplit(obj$Scales$Items, ",", fixed = TRUE),
+                           function(x) as.integer(trimws(x))))
+    expect_false(anyNA(keyed), info = inst)
+    expect_equal(sort(keyed), seq_len(obj$Details$Items), info = inst)
+  }
+})
+
+test_that("cais's item key matches sodano2006's octant blocks (M74)", {
+  # The partition test above catches a key that drops or repeats an item; this
+  # one catches a key that partitions cleanly into the WRONG octants, which the
+  # pre-M74 cais key also did (item 30 is an LM item, 31 is NO and 32 is PA).
+  # Values are sodano2006 Table 1, p. 322, read in two channels; see
+  # cairn/references/sodano2006.md.
+  expect_equal(
+    setNames(cais$Scales$Items, cais$Scales$Abbrev),
+    c(PA = "1,  9, 17, 25, 32", BC = "2, 10, 18, 26, 33",
+      DE = "3, 11, 19, 27, 34", FG = "4, 12, 20, 28",
+      HI = "5, 13, 21, 29, 35", JK = "6, 14, 22",
+      LM = "7, 15, 23, 30, 36", NO = "8, 16, 24, 31, 37")
+  )
 })
 
 test_that("every audited instrument is a shipped instrument (M72)", {

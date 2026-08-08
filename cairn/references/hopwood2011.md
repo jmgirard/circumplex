@@ -52,46 +52,46 @@ Figure 2; the octant labels (PA through NO) sit outside the circle beside their
 wedges.
 
 <!-- audit-values-begin -->
-| field | scale | value | anchor |
-|---|---|---|---|
-| M | PA | 6.04 | Figure 2, p. 717, PA wedge (Sensitive to Control) |
-| M | BC | 6.17 | Figure 2, p. 717, BC wedge (Sensitive to Antagonism) |
-| M | DE | 5.23 | Figure 2, p. 717, DE wedge (Sensitive to Remoteness) |
-| M | FG | 4.44 | Figure 2, p. 717, FG wedge (Sensitive to Timidity) |
-| M | HI | 4.55 | Figure 2, p. 717, HI wedge (Sensitive to Passivity) |
-| M | JK | 3.91 | Figure 2, p. 717, JK wedge (Sensitive to Dependence) |
-| M | LM | 3.32 | Figure 2, p. 717, LM wedge (Sensitive to Affection) |
-| M | NO | 5.31 | Figure 2, p. 717, NO wedge (Sensitive to Attention-Seeking) |
-| SD | PA | 1.06 | Figure 2, p. 717, PA wedge (Sensitive to Control) |
-| SD | BC | 1.10 | Figure 2, p. 717, BC wedge (Sensitive to Antagonism) |
-| SD | DE | 1.28 | Figure 2, p. 717, DE wedge (Sensitive to Remoteness) |
-| SD | FG | 1.16 | Figure 2, p. 717, FG wedge (Sensitive to Timidity) |
-| SD | HI | 1.24 | Figure 2, p. 717, HI wedge (Sensitive to Passivity) |
-| SD | JK | 0.99 | Figure 2, p. 717, JK wedge (Sensitive to Dependence) |
-| SD | LM | 0.91 | Figure 2, p. 717, LM wedge (Sensitive to Affection) |
-| SD | NO | 1.00 | Figure 2, p. 717, NO wedge (Sensitive to Attention-Seeking) |
-| Angle | PA | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
-| Angle | BC | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
-| Angle | DE | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
-| Angle | FG | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
-| Angle | HI | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
-| Angle | JK | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
-| Angle | LM | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
-| Angle | NO | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
-| Items | PA | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
-| Items | BC | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
-| Items | DE | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
-| Items | FG | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
-| Items | HI | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
-| Items | JK | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
-| Items | LM | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
-| Items | NO | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
-| Size | — | 649 | pp. 714–715, one sentence broken by the page turn: 'The participants were split randomly into a derivation Sample 1' is the last line of p. 714 and '(n = 649) and a validation Sample 2 (n = 687) with consistent gender ratios' opens p. 715; Figure 2's note, p. 717, ties the descriptive values to Study 1 |
-| Population | — | mostly White college students, average age 19.14 years | p. 714, Study 1 Participants, 'The participants for this study were 1,336 mostly White college students' |
-| Reference | — | Hopwood et al. (2011) | p. 707, byline 'Christopher J. Hopwood, Emily B. Ansell, Aaron L. Pincus, Aidan G. C. Wright, Mark R. Lukowitsky, and Michael J. Roche', set over three centred lines with each name followed by a superscript affiliation marker ('1', '2' or '3'), and the footer 'Journal of Personality 79:4, August 2011'; the shipped credit abbreviates that list with 'et al.' |
-| URL | — | https://doi.org/10.1111/j.1467-6494.2011.00696.x | p. 707, 'DOI: 10.1111/j.1467-6494.2011.00696.x' printed in the article footer |
-| note-only | Study 1 validation half | Sample 2, n = 687, the other half of the 1,336 random split | p. 715, 'a validation Sample 2 (n = 687) with consistent gender ratios' |
-| note-only | Study 2 sample | N = 299, a broader array of correlates | p. 707 abstract, 'In Study 2 (N = 299)' |
+| field | sample | scale | value | anchor |
+| --- | --- | --- | --- | --- |
+| M | 1 | PA | 6.04 | Figure 2, p. 717, PA wedge (Sensitive to Control) |
+| M | 1 | BC | 6.17 | Figure 2, p. 717, BC wedge (Sensitive to Antagonism) |
+| M | 1 | DE | 5.23 | Figure 2, p. 717, DE wedge (Sensitive to Remoteness) |
+| M | 1 | FG | 4.44 | Figure 2, p. 717, FG wedge (Sensitive to Timidity) |
+| M | 1 | HI | 4.55 | Figure 2, p. 717, HI wedge (Sensitive to Passivity) |
+| M | 1 | JK | 3.91 | Figure 2, p. 717, JK wedge (Sensitive to Dependence) |
+| M | 1 | LM | 3.32 | Figure 2, p. 717, LM wedge (Sensitive to Affection) |
+| M | 1 | NO | 5.31 | Figure 2, p. 717, NO wedge (Sensitive to Attention-Seeking) |
+| SD | 1 | PA | 1.06 | Figure 2, p. 717, PA wedge (Sensitive to Control) |
+| SD | 1 | BC | 1.10 | Figure 2, p. 717, BC wedge (Sensitive to Antagonism) |
+| SD | 1 | DE | 1.28 | Figure 2, p. 717, DE wedge (Sensitive to Remoteness) |
+| SD | 1 | FG | 1.16 | Figure 2, p. 717, FG wedge (Sensitive to Timidity) |
+| SD | 1 | HI | 1.24 | Figure 2, p. 717, HI wedge (Sensitive to Passivity) |
+| SD | 1 | JK | 0.99 | Figure 2, p. 717, JK wedge (Sensitive to Dependence) |
+| SD | 1 | LM | 0.91 | Figure 2, p. 717, LM wedge (Sensitive to Affection) |
+| SD | 1 | NO | 1.00 | Figure 2, p. 717, NO wedge (Sensitive to Attention-Seeking) |
+| Angle | — | PA | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
+| Angle | — | BC | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
+| Angle | — | DE | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
+| Angle | — | FG | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
+| Angle | — | HI | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
+| Angle | — | JK | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
+| Angle | — | LM | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
+| Angle | — | NO | not-published-in-source | no assigned degree per octant is printed; degrees are package convention (IP2) |
+| Items | — | PA | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
+| Items | — | BC | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
+| Items | — | DE | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
+| Items | — | FG | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
+| Items | — | HI | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
+| Items | — | JK | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
+| Items | — | LM | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
+| Items | — | NO | not-published-in-source | the article prints no item list — an initial pool of 151 items with seven quoted as examples, p. 714 |
+| Size | 1 | — | 649 | pp. 714–715, one sentence broken by the page turn: 'The participants were split randomly into a derivation Sample 1' is the last line of p. 714 and '(n = 649) and a validation Sample 2 (n = 687) with consistent gender ratios' opens p. 715; Figure 2's note, p. 717, ties the descriptive values to Study 1 |
+| Population | 1 | — | mostly White college students, average age 19.14 years | p. 714, Study 1 Participants, 'The participants for this study were 1,336 mostly White college students' |
+| Reference | 1 | — | Hopwood et al. (2011) | p. 707, byline 'Christopher J. Hopwood, Emily B. Ansell, Aaron L. Pincus, Aidan G. C. Wright, Mark R. Lukowitsky, and Michael J. Roche', set over three centred lines with each name followed by a superscript affiliation marker ('1', '2' or '3'), and the footer 'Journal of Personality 79:4, August 2011'; the shipped credit abbreviates that list with 'et al.' |
+| URL | 1 | — | https://doi.org/10.1111/j.1467-6494.2011.00696.x | p. 707, 'DOI: 10.1111/j.1467-6494.2011.00696.x' printed in the article footer |
+| note-only | — | Study 1 validation half | Sample 2, n = 687, the other half of the 1,336 random split | p. 715, 'a validation Sample 2 (n = 687) with consistent gender ratios' |
+| note-only | — | Study 2 sample | N = 299, a broader array of correlates | p. 707 abstract, 'In Study 2 (N = 299)' |
 <!-- audit-values-end -->
 
 ## Traces to

@@ -148,7 +148,13 @@
 #'
 #' @source Soldz, S., Budman, S., Demby, A., & Merry, J. (1995). A short form of
 #'   the Inventory of Interpersonal Problems Circumplex Scales. *Assessment,
-#'   2*(1), 53-63.
+#'   2*(1), 53-63. This article constructed the IIP-SC and is the source of the
+#'   outpatient normative sample below.
+#' @source Hopwood, C. J., Pincus, A. L., DeMoor, R. M., & Koonce, E. A. (2008).
+#'   Psychometric characteristics of the Inventory of Interpersonal
+#'   Problems-Short Circumplex (IIP-SC) with college students. *Journal of
+#'   Personality Assessment, 90*(6), 615-618. The source of the college-student
+#'   normative sample below.
 #' @source \doi{10.1080/00223890802388665}
 #' @keywords internal
 #' @examples

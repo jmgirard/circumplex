@@ -14,22 +14,76 @@
 # Writes: data-raw/norms-audit-ledger.csv   (or -prefix.csv, see LEDGER_PATH)
 #         data-raw/norms-audit-coverage.csv (the coverage report, see AC3)
 
-AUDIT_BATCH <- c(
-  csie = "locke2007",
-  csig = "locke2014",
-  csip = "boudreaux2018",
-  csiv = "locke2000",
-  iitc = "bliton2019",
-  iis32 = "hatcher2012",
-  iis64 = "hatcher2009",
-  ipipipc = "markey2009",
-  isc = "hopwood2011"
+# One row per (instrument, sample), because an instrument's norm samples can
+# come from different papers -- iipsc's college sample and its outpatient
+# sample do -- and because the shipped side has to be enumerated one sample at
+# a time (see shipped_values()).
+#
+# `divisor` is the documented unit deviation for that sample: shipped value =
+# source value / divisor. csip's source prints octant SUM scores (0-24) and
+# data-raw/csip.R divides by 8 to express them as item means on the
+# instrument's own 0-3 anchor range. It rides in the batch rather than in a
+# second lookup because it is a property of the (instrument, sample) pairing,
+# not of the instrument.
+#
+# `scales` marks the one entry per instrument whose note is the source for the
+# instrument-level fields, Angle and Items. Those are not per-sample facts, so
+# auditing them once per sample would demand the same item map from every
+# sample's paper; exactly one entry per instrument carries TRUE, checked by
+# validate_batch().
+AUDIT_BATCH <- data.frame(
+  instrument = c("csie", "csig", "csip", "csiv", "iitc",
+                 "iis32", "iis64", "ipipipc", "isc",
+                 "cais", "cais", "iei", "iei",
+                 "igicr", "igicr", "igicr", "iipsc", "iipsc"),
+  sample     = c(rep(1, 9),
+                 1, 2, 1, 2,
+                 1, 2, 3, 1, 2),
+  citekey    = c("locke2007", "locke2014", "boudreaux2018", "locke2000",
+                 "bliton2019", "hatcher2012", "hatcher2009", "markey2009",
+                 "hopwood2011",
+                 "sodano2006", "sodano2006", "horner2024", "horner2024",
+                 "trucco2013", "trucco2013", "trucco2013",
+                 "hopwood2008", "soldz1995"),
+  # iipsc sample 1 is the one deviation among the batch-3 instruments:
+  # hopwood2008 Table 1 prints octant SUMS over four 0-4 items and
+  # data-raw/iipsc.R divides by 4 to express them as item means. Its sample 2
+  # needs no divisor -- soldz1995 already prints item means.
+  divisor    = c(1, 1, 8, 1, 1, 1, 1, 1, 1,
+                 1, 1, 1, 1,
+                 1, 1, 1, 4, 1),
+  # The `scales` entry per multi-sample instrument is the pass whose note
+  # actually carries the instrument-level rows. For iipsc that is SAMPLE 2:
+  # soldz1995 prints the item-to-octant grouping and hopwood2008 does not.
+  scales     = c(rep(TRUE, 9),
+                 TRUE, FALSE, TRUE, FALSE,
+                 TRUE, FALSE, FALSE, FALSE, TRUE),
+  stringsAsFactors = FALSE
 )
 
-# Documented unit deviations: shipped value = source value / divisor.
-# csip's source prints octant SUM scores (0-24); data-raw/csip.R divides by 8
-# to express them as item means on the instrument's own 0-3 anchor range.
-AUDIT_DIVISOR <- c(csip = 8)
+# A batch that names one (instrument, sample) twice would audit it twice and
+# report both passes' coverage; one that marks no `scales` entry for an
+# instrument would silently stop auditing its Angle and Items rows, and one
+# that marks two would demand the item map from both papers. Neither shows up
+# in any count, so both are refused here rather than discovered in a ledger.
+validate_batch <- function(batch) {
+  stopifnot(is.data.frame(batch),
+            all(c("instrument", "sample", "citekey", "divisor", "scales") %in%
+                  names(batch)))
+  dup <- duplicated(paste(batch$instrument, batch$sample))
+  if (any(dup)) {
+    stop("AUDIT_BATCH names the same (instrument, sample) twice: ",
+         paste(unique(paste(batch$instrument, batch$sample)[dup]),
+               collapse = ", "), call. = FALSE)
+  }
+  n_scales <- tapply(batch$scales, batch$instrument, sum)
+  bad <- names(n_scales)[n_scales != 1L]
+  if (length(bad)) {
+    stop("AUDIT_BATCH must mark exactly one `scales` entry per instrument; ",
+         "wrong for: ", paste(bad, collapse = ", "), call. = FALSE)
+  }
+  invisible(TRUE)
+}
 
 NOT_PUBLISHED <- "not-published-in-source"
 
@@ -54,7 +108,8 @@ CONSTRUCTED_CREDIT <- "constructed-credit"
 # --- source side -------------------------------------------------------------
 
 # Parse the machine-readable block a source note carries between its
-# audit-values markers. Returns a data.frame(field, scale, value, anchor).
+# audit-values markers. Returns a data.frame(field, sample, scale, value,
+# anchor).
 parse_source_note <- function(citekey,
                               dir = file.path("cairn", "references")) {
   path <- file.path(dir, paste0(citekey, ".md"))
@@ -74,16 +129,22 @@ parse_source_note <- function(citekey,
   rows <- rows[-(1:2)]
   cells <- lapply(strsplit(sub("^\\|", "", sub("\\|$", "", rows)), "|",
                            fixed = TRUE), trimws)
-  # A row that does not split into exactly four cells is a malformed note, not
+  # A row that does not split into exactly five cells is a malformed note, not
   # a row to skip: silently dropping it would remove a value from the audit
   # while every count still read clean (an anchor containing a literal "|" is
   # the way this happens).
-  bad <- which(vapply(cells, length, integer(1)) != 4L)
+  #
+  # Five, not four: M74 added the `sample` column so a note backing several of
+  # an instrument's norm samples can say which row belongs to which. There is
+  # deliberately no four-column fallback -- a default sample would make a
+  # mis-migrated note read as sample 1 and audit clean against the wrong rows,
+  # which is the very collision the column exists to remove.
+  bad <- which(vapply(cells, length, integer(1)) != 5L)
   if (length(bad)) {
     stop("source note ", citekey, " has ", length(bad),
          " malformed audit row(s); first: ", rows[[bad[[1]]]], call. = FALSE)
   }
-  empty <- which(vapply(cells, function(x) !nzchar(x[[3]]), logical(1)))
+  empty <- which(vapply(cells, function(x) !nzchar(x[[4]]), logical(1)))
   if (length(empty)) {
     stop("source note ", citekey, " has ", length(empty),
          " audit row(s) with an empty value; first: ", rows[[empty[[1]]]],
@@ -91,43 +152,76 @@ parse_source_note <- function(citekey,
   }
   data.frame(
     field  = vapply(cells, `[`, character(1), 1L),
-    scale  = vapply(cells, `[`, character(1), 2L),
-    value  = vapply(cells, `[`, character(1), 3L),
-    anchor = vapply(cells, `[`, character(1), 4L),
+    sample = vapply(cells, `[`, character(1), 2L),
+    scale  = vapply(cells, `[`, character(1), 3L),
+    value  = vapply(cells, `[`, character(1), 4L),
+    anchor = vapply(cells, `[`, character(1), 5L),
     stringsAsFactors = FALSE
   )
 }
 
+# Angle and Items are instrument-level facts with no sample of their own; both
+# sides of the comparison mark them with this token so they key alike.
+NO_SAMPLE <- "—"
+
 # --- shipped side ------------------------------------------------------------
 
-# Enumerate shipped audited-field values from the package object itself.
+# Enumerate ONE sample's shipped audited-field values from the package object.
 # Norms[[1]]'s scale-name column is `Scale` for some instruments and `Abbrev`
 # for others, so the key is normalised here rather than assumed.
-shipped_values <- function(inst) {
-  obj <- get(inst, envir = asNamespace("circumplex"))
+#
+# One sample at a time, not all of them: M72 enumerated the whole object and
+# keyed each row by (field, scale), which for a two-sample instrument produced
+# two rows keyed "M PA" that match() both resolved to the first. Sample 2's
+# shipped mean was then compared against sample 1's source value and could
+# never disagree. Filtering here means the join below cannot collide, and the
+# emitted `sample` column keeps the key honest at the comparison too.
+#
+# `scales` selects whether this pass also emits the instrument-level Angle and
+# Items rows; exactly one of an instrument's passes does (see AUDIT_BATCH).
+# `obj` is injectable so a test can drive a synthetic two-sample instrument.
+shipped_values <- function(inst, sample, scales = TRUE, obj = NULL) {
+  if (is.null(obj)) obj <- get(inst, envir = asNamespace("circumplex"))
   norms <- obj$Norms[[1]]
   src <- obj$Norms[[2]]
-  scales <- obj$Scales
+  scl <- obj$Scales
   key <- if ("Scale" %in% names(norms)) "Scale" else "Abbrev"
 
+  nrows <- norms[norms$Sample == sample, , drop = FALSE]
+  srows <- src[src$Sample == sample, , drop = FALSE]
+  # A batch entry naming a sample the object does not carry must abort, not
+  # audit nothing: an empty comparison leaves the ledger, the coverage report
+  # and every printed count clean, which is indistinguishable from a pass.
+  if (nrow(nrows) == 0L || nrow(srows) != 1L) {
+    stop(inst, " has no single norms record for sample ", sample,
+         " (", nrow(nrows), " norm rows, ", nrow(srows), " source rows)",
+         call. = FALSE)
+  }
+
+  smp <- as.character(sample)
   out <- rbind(
-    data.frame(field = "M", scale = norms[[key]],
-               value = as.character(norms$M), stringsAsFactors = FALSE),
-    data.frame(field = "SD", scale = norms[[key]],
-               value = as.character(norms$SD), stringsAsFactors = FALSE),
-    data.frame(field = "Angle", scale = scales$Abbrev,
-               value = as.character(scales$Angle), stringsAsFactors = FALSE),
-    data.frame(field = "Items", scale = scales$Abbrev,
-               value = normalise_items(scales$Items), stringsAsFactors = FALSE),
-    data.frame(field = "Size", scale = "—",
-               value = as.character(src$Size), stringsAsFactors = FALSE),
-    data.frame(field = "Population", scale = "—",
-               value = as.character(src$Population), stringsAsFactors = FALSE),
-    data.frame(field = "Reference", scale = "—",
-               value = as.character(src$Reference), stringsAsFactors = FALSE),
-    data.frame(field = "URL", scale = "—",
-               value = as.character(src$URL), stringsAsFactors = FALSE)
+    data.frame(field = "M", sample = smp, scale = nrows[[key]],
+               value = as.character(nrows$M), stringsAsFactors = FALSE),
+    data.frame(field = "SD", sample = smp, scale = nrows[[key]],
+               value = as.character(nrows$SD), stringsAsFactors = FALSE),
+    data.frame(field = "Size", sample = smp, scale = NO_SAMPLE,
+               value = as.character(srows$Size), stringsAsFactors = FALSE),
+    data.frame(field = "Population", sample = smp, scale = NO_SAMPLE,
+               value = as.character(srows$Population), stringsAsFactors = FALSE),
+    data.frame(field = "Reference", sample = smp, scale = NO_SAMPLE,
+               value = as.character(srows$Reference), stringsAsFactors = FALSE),
+    data.frame(field = "URL", sample = smp, scale = NO_SAMPLE,
+               value = as.character(srows$URL), stringsAsFactors = FALSE)
   )
+  if (isTRUE(scales)) {
+    out <- rbind(
+      out,
+      data.frame(field = "Angle", sample = NO_SAMPLE, scale = scl$Abbrev,
+                 value = as.character(scl$Angle), stringsAsFactors = FALSE),
+      data.frame(field = "Items", sample = NO_SAMPLE, scale = scl$Abbrev,
+                 value = normalise_items(scl$Items), stringsAsFactors = FALSE)
+    )
+  }
   out$instrument <- inst
   out
 }
@@ -170,17 +264,38 @@ values_agree <- function(field, shipped, source, divisor) {
   identical(trimws(shipped), trimws(source))
 }
 
-audit_norms <- function(batch = AUDIT_BATCH) {
+audit_norms <- function(batch = AUDIT_BATCH,
+                        dir = file.path("cairn", "references"),
+                        objects = NULL) {
+  validate_batch(batch)
   ledger <- list()
   coverage <- list()
+  # Which of each note's sample labels some batch entry actually claimed. A
+  # note tabling three samples while the batch names two would otherwise drop
+  # the third with no row anywhere -- the same silent-loss shape the malformed
+  # -row abort above refuses.
+  claimed <- list()
 
-  for (inst in names(batch)) {
-    citekey <- batch[[inst]]
-    divisor <- if (inst %in% names(AUDIT_DIVISOR)) AUDIT_DIVISOR[[inst]] else 1
-    ship <- shipped_values(inst)
-    note_all <- parse_source_note(citekey)
+  for (i in seq_len(nrow(batch))) {
+    inst <- batch$instrument[[i]]
+    smp <- batch$sample[[i]]
+    citekey <- batch$citekey[[i]]
+    divisor <- batch$divisor[[i]]
+    ship <- shipped_values(inst, smp, batch$scales[[i]], obj = objects[[inst]])
+
+    note_all <- parse_source_note(citekey, dir)
     note_only <- note_all[note_all$field == NOTE_ONLY, , drop = FALSE]
-    note <- note_all[note_all$field != NOTE_ONLY, , drop = FALSE]
+    note_real <- note_all[note_all$field != NOTE_ONLY, , drop = FALSE]
+    claimed[[citekey]] <- union(
+      claimed[[citekey]] %||% character(0), as.character(smp)
+    )
+    # Restrict to the sample this pass audits, plus the instrument-level rows.
+    # Other samples' rows belong to their own pass, not to this one's coverage.
+    note <- note_real[note_real$sample %in% c(as.character(smp), NO_SAMPLE),
+                      , drop = FALSE]
+    if (!isTRUE(batch$scales[[i]])) {
+      note <- note[note$sample != NO_SAMPLE, , drop = FALSE]
+    }
 
     if (nrow(note_only)) {
       coverage[[length(coverage) + 1L]] <- data.frame(
@@ -202,40 +317,57 @@ audit_norms <- function(batch = AUDIT_BATCH) {
     }
 
     # every shipped value must have a source-side entry, and vice versa
-    ship_key <- paste(ship$field, ship$scale)
-    note_key <- paste(note$field, note$scale)
+    ship_key <- paste(ship$field, ship$sample, ship$scale)
+    note_key <- paste(note$field, note$sample, note$scale)
     miss_source <- ship[!(ship_key %in% note_key), , drop = FALSE]
     miss_ship <- note[!(note_key %in% ship_key), , drop = FALSE]
     if (nrow(miss_source)) {
       coverage[[length(coverage) + 1L]] <- data.frame(
         instrument = inst, side = "shipped-value-not-in-note",
-        field = miss_source$field, scale = miss_source$scale,
+        field = paste0(miss_source$field, " (sample ", miss_source$sample, ")"),
+        scale = miss_source$scale,
         exempt = FALSE, stringsAsFactors = FALSE
       )
     }
     if (nrow(miss_ship)) {
       coverage[[length(coverage) + 1L]] <- data.frame(
         instrument = inst, side = "note-value-not-shipped",
-        field = miss_ship$field, scale = miss_ship$scale,
+        field = paste0(miss_ship$field, " (sample ", miss_ship$sample, ")"),
+        scale = miss_ship$scale,
         exempt = FALSE, stringsAsFactors = FALSE
       )
     }
 
-    for (i in seq_len(nrow(ship))) {
-      j <- match(ship_key[[i]], note_key)
+    for (k in seq_len(nrow(ship))) {
+      j <- match(ship_key[[k]], note_key)
       if (is.na(j)) next
-      agree <- values_agree(ship$field[[i]], ship$value[[i]],
+      agree <- values_agree(ship$field[[k]], ship$value[[k]],
                             note$value[[j]], divisor)
       if (isTRUE(agree)) next
       ledger[[length(ledger) + 1L]] <- data.frame(
         instrument = inst,
-        field = ship$field[[i]],
-        scale = ship$scale[[i]],
-        shipped = ship$value[[i]],
+        field = ship$field[[k]],
+        sample = ship$sample[[k]],
+        scale = ship$scale[[k]],
+        shipped = ship$value[[k]],
         source = note$value[[j]],
         anchor = note$anchor[[j]],
         kind = if (is.na(agree)) "not-published" else "mismatch",
         stringsAsFactors = FALSE
+      )
+    }
+  }
+
+  for (citekey in names(claimed)) {
+    tabled <- parse_source_note(citekey, dir)
+    tabled <- tabled[tabled$field != NOTE_ONLY, , drop = FALSE]
+    unclaimed <- setdiff(unique(tabled$sample),
+                         c(claimed[[citekey]], NO_SAMPLE))
+    if (length(unclaimed)) {
+      coverage[[length(coverage) + 1L]] <- data.frame(
+        instrument = citekey, side = "note-sample-not-audited",
+        field = "sample", scale = unclaimed,
+        exempt = FALSE, stringsAsFactors = FALSE
       )
     }
   }
@@ -249,18 +381,21 @@ audit_norms <- function(batch = AUDIT_BATCH) {
   )
 }
 
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
 empty_ledger <- function() {
   data.frame(instrument = character(0), field = character(0),
-             scale = character(0), shipped = character(0),
-             source = character(0), anchor = character(0),
-             kind = character(0), stringsAsFactors = FALSE)
+             sample = character(0), scale = character(0),
+             shipped = character(0), source = character(0),
+             anchor = character(0), kind = character(0),
+             stringsAsFactors = FALSE)
 }
 
 # --- cross-check the two shipped angle copies --------------------------------
 
 # Scales$Angle and Norms[[1]]$Angle are two independent shipped copies of the
 # same fact; nothing else in the package makes them agree.
-angle_copies_agree <- function(batch = AUDIT_BATCH) {
+angle_copies_agree <- function(batch = AUDIT_BATCH, objects = NULL) {
   out <- list()
   add <- function(inst, scale, na, sa, why) {
     out[[length(out) + 1L]] <<- data.frame(
@@ -268,8 +403,11 @@ angle_copies_agree <- function(batch = AUDIT_BATCH) {
       problem = why, stringsAsFactors = FALSE
     )
   }
-  for (inst in names(batch)) {
-    obj <- get(inst, envir = asNamespace("circumplex"))
+  # Per instrument, not per batch row: both shipped angle copies are
+  # instrument-level, so a multi-sample instrument would otherwise be reported
+  # once per sample and inflate the split count.
+  for (inst in unique(batch$instrument)) {
+    obj <- objects[[inst]] %||% get(inst, envir = asNamespace("circumplex"))
     norms <- obj$Norms[[1]]
     scales <- obj$Scales
     key <- if ("Scale" %in% names(norms)) "Scale" else "Abbrev"
@@ -308,10 +446,10 @@ angle_copies_agree <- function(batch = AUDIT_BATCH) {
 # (DESIGN.md IP2). The audit compares against the source modulo 360, so a
 # shipped 0 where the convention wants 360 agrees with the source and passes
 # silently. This check is on the shipped side only, where the convention lives.
-ip2_convention_holds <- function(batch = AUDIT_BATCH) {
+ip2_convention_holds <- function(batch = AUDIT_BATCH, objects = NULL) {
   out <- list()
-  for (inst in names(batch)) {
-    obj <- get(inst, envir = asNamespace("circumplex"))
+  for (inst in unique(batch$instrument)) {
+    obj <- objects[[inst]] %||% get(inst, envir = asNamespace("circumplex"))
     norms <- obj$Norms[[1]]
     key <- if ("Scale" %in% names(norms)) "Scale" else "Abbrev"
     copies <- list(
@@ -373,8 +511,8 @@ if (!isTRUE(getOption("norms_audit_defs_only", FALSE))) {
   ledger <- res$ledger
   if (file.exists(disp_path) && nrow(ledger)) {
     disp <- utils::read.csv(disp_path, stringsAsFactors = FALSE)
-    k <- paste(ledger$instrument, ledger$field, ledger$scale)
-    dk <- paste(disp$instrument, disp$field, disp$scale)
+    k <- paste(ledger$instrument, ledger$field, ledger$sample, ledger$scale)
+    dk <- paste(disp$instrument, disp$field, disp$sample, disp$scale)
     ledger$disposition <- disp$disposition[match(k, dk)]
     ledger$disposition[is.na(ledger$disposition)] <- "UNDISPOSITIONED"
   } else if (nrow(ledger)) {
@@ -417,6 +555,7 @@ if (!isTRUE(getOption("norms_audit_defs_only", FALSE))) {
   if (nrow(angle_check)) print(angle_check)
   if (nrow(ip2_check)) print(ip2_check)
   if (nrow(ledger)) {
-    print(ledger[, c("instrument", "field", "scale", "kind", "disposition")])
+    print(ledger[, c("instrument", "field", "sample", "scale", "kind",
+                     "disposition")])
   }
 }

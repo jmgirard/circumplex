@@ -31,44 +31,44 @@ Item-to-scale assignment is not published in the article, which describes the
 items but prints no numbering; angles are likewise unpublished.
 
 <!-- audit-values-begin -->
-| field | scale | value | anchor |
-|---|---|---|---|
-| M | PA | 3.0 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| M | BC | 3.2 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| M | DE | 5.6 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| M | FG | 7.2 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| M | HI | 7.1 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| M | JK | 6.5 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| M | LM | 7.4 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| M | NO | 4.7 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| SD | PA | 3.9 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| SD | BC | 3.8 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| SD | DE | 5.1 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| SD | FG | 5.5 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| SD | HI | 5.1 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| SD | JK | 4.6 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| SD | LM | 4.7 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| SD | NO | 4.0 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
-| Angle | PA | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | BC | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | DE | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | FG | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | HI | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | JK | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | LM | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | NO | not-published-in-source | not published — degrees are package convention (IP2) |
-| Items | PA | not-published-in-source | not published in the article — items described but not numbered |
-| Items | BC | not-published-in-source | not published in the article — items described but not numbered |
-| Items | DE | not-published-in-source | not published in the article — items described but not numbered |
-| Items | FG | not-published-in-source | not published in the article — items described but not numbered |
-| Items | HI | not-published-in-source | not published in the article — items described but not numbered |
-| Items | JK | not-published-in-source | not published in the article — items described but not numbered |
-| Items | LM | not-published-in-source | not published in the article — items described but not numbered |
-| Items | NO | not-published-in-source | not published in the article — items described but not numbered |
-| Size | — | 712 | Table 1 note, footnote c, p. 600 |
-| Population | — | undergraduate students enrolled at a public university in the western United States | p. 597 text, validation-sample description |
-| Reference | — | Boudreaux, Ozer, Oltmanns, & Wright (2018) | p. 594, journal header set as two stacked lines, 'Psychological Assessment' above '2018, Vol. 30, No. 5, 594–609' (en dash; the text layer inserts spaces around it that the rendered page does not print), with the byline in two rows of two — 'Michael J. Boudreaux' and 'Daniel J. Ozer', then 'Thomas F. Oltmanns' and 'Aidan G. C. Wright' — each name printed above its affiliation and carrying no superscript; Table 1, p. 600 is the venue of the values themselves |
-| URL | — | https://doi.org/10.1037/pas0000505 | DOI printed on the article's first page, p. 594 |
-| note-only | women subsample | n = 121, own M (SD) column | Table 1, p. 600, 'Women' column; n from table note a |
-| note-only | men subsample | n = 70, own M (SD) column | Table 1, p. 600, 'Men' column; n from table note b |
+| field | sample | scale | value | anchor |
+| --- | --- | --- | --- | --- |
+| M | 1 | PA | 3.0 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| M | 1 | BC | 3.2 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| M | 1 | DE | 5.6 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| M | 1 | FG | 7.2 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| M | 1 | HI | 7.1 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| M | 1 | JK | 6.5 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| M | 1 | LM | 7.4 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| M | 1 | NO | 4.7 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| SD | 1 | PA | 3.9 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| SD | 1 | BC | 3.8 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| SD | 1 | DE | 5.1 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| SD | 1 | FG | 5.5 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| SD | 1 | HI | 5.1 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| SD | 1 | JK | 4.6 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| SD | 1 | LM | 4.7 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| SD | 1 | NO | 4.0 | Table 1, p. 600, overall 'M (SD)' column (n = 712) |
+| Angle | — | PA | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | BC | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | DE | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | FG | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | HI | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | JK | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | LM | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | NO | not-published-in-source | not published — degrees are package convention (IP2) |
+| Items | — | PA | not-published-in-source | not published in the article — items described but not numbered |
+| Items | — | BC | not-published-in-source | not published in the article — items described but not numbered |
+| Items | — | DE | not-published-in-source | not published in the article — items described but not numbered |
+| Items | — | FG | not-published-in-source | not published in the article — items described but not numbered |
+| Items | — | HI | not-published-in-source | not published in the article — items described but not numbered |
+| Items | — | JK | not-published-in-source | not published in the article — items described but not numbered |
+| Items | — | LM | not-published-in-source | not published in the article — items described but not numbered |
+| Items | — | NO | not-published-in-source | not published in the article — items described but not numbered |
+| Size | 1 | — | 712 | Table 1 note, footnote c, p. 600 |
+| Population | 1 | — | undergraduate students enrolled at a public university in the western United States | p. 597 text, validation-sample description |
+| Reference | 1 | — | Boudreaux, Ozer, Oltmanns, & Wright (2018) | p. 594, journal header set as two stacked lines, 'Psychological Assessment' above '2018, Vol. 30, No. 5, 594–609' (en dash; the text layer inserts spaces around it that the rendered page does not print), with the byline in two rows of two — 'Michael J. Boudreaux' and 'Daniel J. Ozer', then 'Thomas F. Oltmanns' and 'Aidan G. C. Wright' — each name printed above its affiliation and carrying no superscript; Table 1, p. 600 is the venue of the values themselves |
+| URL | 1 | — | https://doi.org/10.1037/pas0000505 | DOI printed on the article's first page, p. 594 |
+| note-only | — | women subsample | n = 121, own M (SD) column | Table 1, p. 600, 'Women' column; n from table note a |
+| note-only | — | men subsample | n = 70, own M (SD) column | Table 1, p. 600, 'Men' column; n from table note b |
 <!-- audit-values-end -->

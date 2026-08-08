@@ -41,43 +41,43 @@ Angles are not published: Figure 2 shows the octant arrangement but prints no
 degrees, so the degree assignment is the package's own convention (IP2).
 
 <!-- audit-values-begin -->
-| field | scale | value | anchor |
-|---|---|---|---|
-| M | PA | 2.96 | Figure 2, p. 436 (statistics printed inside the figure) |
-| M | BC | 2.53 | Figure 2, p. 436 (statistics printed inside the figure) |
-| M | DE | 2.02 | Figure 2, p. 436 (statistics printed inside the figure) |
-| M | FG | 1.88 | Figure 2, p. 436 (statistics printed inside the figure) |
-| M | HI | 2.24 | Figure 2, p. 436 (statistics printed inside the figure) |
-| M | JK | 2.89 | Figure 2, p. 436 (statistics printed inside the figure) |
-| M | LM | 2.97 | Figure 2, p. 436 (statistics printed inside the figure) |
-| M | NO | 2.96 | Figure 2, p. 436 (statistics printed inside the figure) |
-| SD | PA | 0.68 | Figure 2, p. 436 (statistics printed inside the figure) |
-| SD | BC | 0.86 | Figure 2, p. 436 (statistics printed inside the figure) |
-| SD | DE | 0.88 | Figure 2, p. 436 (statistics printed inside the figure) |
-| SD | FG | 0.74 | Figure 2, p. 436 (statistics printed inside the figure) |
-| SD | HI | 0.90 | Figure 2, p. 436 (statistics printed inside the figure) |
-| SD | JK | 0.76 | Figure 2, p. 436 (statistics printed inside the figure) |
-| SD | LM | 0.71 | Figure 2, p. 436 (statistics printed inside the figure) |
-| SD | NO | 0.68 | Figure 2, p. 436 (statistics printed inside the figure) |
-| Angle | PA | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
-| Angle | BC | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
-| Angle | DE | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
-| Angle | FG | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
-| Angle | HI | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
-| Angle | JK | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
-| Angle | LM | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
-| Angle | NO | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
-| Items | PA | 8, 16, 24, 32 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
-| Items | BC | 5, 13, 21, 29 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
-| Items | DE | 2, 10, 18, 26 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
-| Items | FG | 7, 15, 23, 31 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
-| Items | HI | 4, 12, 20, 28 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
-| Items | JK | 1, 9, 17, 25 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
-| Items | LM | 6, 14, 22, 30 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
-| Items | NO | 3, 11, 19, 27 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
-| Size | — | 665 | p. 435 text, 'All (n = 665) participants'; Table 3 CSIG Study 1 row, p. 437 |
-| Population | — | MTurk respondents from the United States, Canada and India | p. 435 text, 'accessed and completed an online questionnaire through Amazon's Mechanical Turk website'; country breakdown same page |
-| Reference | — | Locke (2014) | p. 433, journal header set as stacked lines, 'Personality and Social' above 'Psychology Bulletin' above '2014, Vol. 40(4) 433–449' (en dash), with the byline 'Kenneth D. Locke' carrying a superscript affiliation marker '1'. This page prints no running head: the string 'Locke' occurs on it only inside SAGE's production-tracking line (`PSPXXX10.1177/0146167213514280Personality and Social Psychology BulletinLocke`), which the text layer holds but a page render shows nothing of, so it is not cited here. Figure 2, p. 436 is the venue of the values themselves |
-| URL | — | https://doi.org/10.1177/0146167213514280 | DOI printed on the article's first page, p. 433 |
-| note-only | Study 2 octant means | n = 327; CSIG and CSIV means plotted, not printed numerically | Figure 4, p. 442 |
+| field | sample | scale | value | anchor |
+| --- | --- | --- | --- | --- |
+| M | 1 | PA | 2.96 | Figure 2, p. 436 (statistics printed inside the figure) |
+| M | 1 | BC | 2.53 | Figure 2, p. 436 (statistics printed inside the figure) |
+| M | 1 | DE | 2.02 | Figure 2, p. 436 (statistics printed inside the figure) |
+| M | 1 | FG | 1.88 | Figure 2, p. 436 (statistics printed inside the figure) |
+| M | 1 | HI | 2.24 | Figure 2, p. 436 (statistics printed inside the figure) |
+| M | 1 | JK | 2.89 | Figure 2, p. 436 (statistics printed inside the figure) |
+| M | 1 | LM | 2.97 | Figure 2, p. 436 (statistics printed inside the figure) |
+| M | 1 | NO | 2.96 | Figure 2, p. 436 (statistics printed inside the figure) |
+| SD | 1 | PA | 0.68 | Figure 2, p. 436 (statistics printed inside the figure) |
+| SD | 1 | BC | 0.86 | Figure 2, p. 436 (statistics printed inside the figure) |
+| SD | 1 | DE | 0.88 | Figure 2, p. 436 (statistics printed inside the figure) |
+| SD | 1 | FG | 0.74 | Figure 2, p. 436 (statistics printed inside the figure) |
+| SD | 1 | HI | 0.90 | Figure 2, p. 436 (statistics printed inside the figure) |
+| SD | 1 | JK | 0.76 | Figure 2, p. 436 (statistics printed inside the figure) |
+| SD | 1 | LM | 0.71 | Figure 2, p. 436 (statistics printed inside the figure) |
+| SD | 1 | NO | 0.68 | Figure 2, p. 436 (statistics printed inside the figure) |
+| Angle | — | PA | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
+| Angle | — | BC | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
+| Angle | — | DE | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
+| Angle | — | FG | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
+| Angle | — | HI | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
+| Angle | — | JK | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
+| Angle | — | LM | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
+| Angle | — | NO | not-published-in-source | not published — Figure 2 shows octant arrangement without degrees; degrees are package convention (IP2) |
+| Items | — | PA | 8, 16, 24, 32 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
+| Items | — | BC | 5, 13, 21, 29 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
+| Items | — | DE | 2, 10, 18, 26 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
+| Items | — | FG | 7, 15, 23, 31 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
+| Items | — | HI | 4, 12, 20, 28 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
+| Items | — | JK | 1, 9, 17, 25 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
+| Items | — | LM | 6, 14, 22, 30 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
+| Items | — | NO | 3, 11, 19, 27 | CSIG_Items_Scales.html, 'Item Order' column (retrieved 2026-08-06) |
+| Size | 1 | — | 665 | p. 435 text, 'All (n = 665) participants'; Table 3 CSIG Study 1 row, p. 437 |
+| Population | 1 | — | MTurk respondents from the United States, Canada and India | p. 435 text, 'accessed and completed an online questionnaire through Amazon's Mechanical Turk website'; country breakdown same page |
+| Reference | 1 | — | Locke (2014) | p. 433, journal header set as stacked lines, 'Personality and Social' above 'Psychology Bulletin' above '2014, Vol. 40(4) 433–449' (en dash), with the byline 'Kenneth D. Locke' carrying a superscript affiliation marker '1'. This page prints no running head: the string 'Locke' occurs on it only inside SAGE's production-tracking line (`PSPXXX10.1177/0146167213514280Personality and Social Psychology BulletinLocke`), which the text layer holds but a page render shows nothing of, so it is not cited here. Figure 2, p. 436 is the venue of the values themselves |
+| URL | 1 | — | https://doi.org/10.1177/0146167213514280 | DOI printed on the article's first page, p. 433 |
+| note-only | — | Study 2 octant means | n = 327; CSIG and CSIV means plotted, not printed numerically | Figure 4, p. 442 |
 <!-- audit-values-end -->

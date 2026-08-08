@@ -645,6 +645,41 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   source prints "sob stories".
 * The sources cited for `iitc` and `iei` were recorded as "in press" and now
   give the published citations.
+* **`cais` scores change.** The CAIS item-to-scale key was wrong and is
+  corrected. The instrument's 37 items are not distributed evenly across the
+  eight octants — its source assigns five items each to PA, BC, DE, HI, LM and
+  NO, four to FG and three to JK — but the key shipped four items per octant,
+  which put one Warm-Agreeable item into Unassuming-Ingenuous, one
+  Gregarious-Extraverted item into Warm-Agreeable and one Assured-Dominant item
+  into Gregarious-Extraverted, and left the last five items scored into no scale
+  at all. `score()` and anything downstream of it therefore returned different
+  values than the instrument's authors defined, and `norm_standardize()`
+  compared those values against norms computed the correct way. **Seven of the
+  eight octants change under the correction:** PA gains the item that had been
+  scored as Gregarious-Extraverted, BC, DE and HI each gain one of the
+  previously unscored items, JK loses an item, and LM and NO each lose one item
+  and gain two. Only FG (items 4, 12, 20 and 28) is unchanged. Re-run any CAIS analysis. The item text and its ordering were
+  correct throughout.
+* The normative data shipped with `cais`, `iei`, `igicr` and `iipsc` has now
+  been re-verified against its published sources the same way as the other nine.
+  Every mean and standard deviation of all nine normative samples was confirmed
+  correct, as was every scale angle the sources publish. Four shipped values did
+  not match their source and are corrected: the `cais` item-to-scale key above,
+  and the three provenance records below.
+* Three provenance records changed with that verification. The `cais` sample
+  size for the child sample now reports 204, the sample size printed on the
+  table its means and standard deviations come from, rather than the 213 given
+  for the child sample elsewhere in the same article. The `iipsc`
+  college-student norms were credited to a 2011 publication and now name
+  Hopwood, Pincus, DeMoor, & Koonce (2008), the article that publishes them,
+  which is also the DOI the instrument already recorded; `?iipsc` now cites both
+  of its normative sources rather than only one. The `iei` `URL` pointed at the
+  study's data repository, which publishes neither of its normative tables, and
+  now gives one address per sample: the author's IEI norms page for the
+  undergraduate sample and the article for the community sample.
+* Every bundled instrument's item-to-scale key is now checked to cover each of
+  the instrument's items exactly once, so a key that silently drops or
+  double-counts an item — the `cais` failure above — cannot ship again.
 
 ## Documentation
 

@@ -29,43 +29,43 @@ so item-to-scale assignment is not verifiable from the shelf copy; angles are
 likewise unpublished.
 
 <!-- audit-values-begin -->
-| field | scale | value | anchor |
-|---|---|---|---|
-| M | PA | 1.18 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| M | BC | 0.83 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| M | DE | 0.76 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| M | FG | 0.85 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| M | HI | 1.24 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| M | JK | 2.13 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| M | LM | 2.66 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| M | NO | 1.88 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| SD | PA | 0.81 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| SD | BC | 0.77 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| SD | DE | 0.73 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| SD | FG | 0.74 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| SD | HI | 0.78 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| SD | JK | 0.86 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| SD | LM | 0.85 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| SD | NO | 1.02 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
-| Angle | PA | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | BC | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | DE | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | FG | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | HI | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | JK | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | LM | not-published-in-source | not published — degrees are package convention (IP2) |
-| Angle | NO | not-published-in-source | not published — degrees are package convention (IP2) |
-| Items | PA | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
-| Items | BC | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
-| Items | DE | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
-| Items | FG | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
-| Items | HI | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
-| Items | JK | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
-| Items | LM | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
-| Items | NO | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
-| Size | — | 862 | p. 3 text, 'Overall, 862 valid protocols were retained for analysis' |
-| Population | — | undergraduate students from a psychology department subject pool | p. 3 text, 'Of the 885 undergraduate student participants' / 'psychology department subject pool' |
-| Reference | — | Bliton & Pincus (2019) | p. 1, the first three lines of the stacked masthead block, 'Assessment' above '1–18' above '© The Author(s) 2019', with the byline 'Chloe F. Bliton and Aaron L. Pincus', each name carrying a superscript affiliation marker '1' and an ORCID badge printed after the first. This page prints no running head: the string 'Bliton and Pincus' occurs on it only inside SAGE's production-tracking line (`ASMXXX10.1177/1073191119864661AssessmentBliton and Pincus`), which the text layer holds but a page render shows nothing of, so it is not cited here. Table 1, p. 7 is the venue of the values themselves |
-| URL | — | https://doi.org/10.1177/1073191119864661 | DOI printed on the article's first page |
-| note-only | Study 2 samples | N = 608, reported separately for romantic partner, friend and acquaintance targets | Table 5, p. 12, 'Descriptive Statistics (Study 2)' |
+| field | sample | scale | value | anchor |
+| --- | --- | --- | --- | --- |
+| M | 1 | PA | 1.18 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| M | 1 | BC | 0.83 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| M | 1 | DE | 0.76 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| M | 1 | FG | 0.85 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| M | 1 | HI | 1.24 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| M | 1 | JK | 2.13 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| M | 1 | LM | 2.66 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| M | 1 | NO | 1.88 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| SD | 1 | PA | 0.81 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| SD | 1 | BC | 0.77 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| SD | 1 | DE | 0.73 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| SD | 1 | FG | 0.74 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| SD | 1 | HI | 0.78 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| SD | 1 | JK | 0.86 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| SD | 1 | LM | 0.85 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| SD | 1 | NO | 1.02 | Table 1, p. 7, 'Interpersonal measures' block, IIT-C rows |
+| Angle | — | PA | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | BC | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | DE | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | FG | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | HI | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | JK | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | LM | not-published-in-source | not published — degrees are package convention (IP2) |
+| Angle | — | NO | not-published-in-source | not published — degrees are package convention (IP2) |
+| Items | — | PA | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
+| Items | — | BC | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
+| Items | — | DE | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
+| Items | — | FG | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
+| Items | — | HI | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
+| Items | — | JK | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
+| Items | — | LM | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
+| Items | — | NO | not-published-in-source | not published in the article — items are in an online appendix (p. 5 text) |
+| Size | 1 | — | 862 | p. 3 text, 'Overall, 862 valid protocols were retained for analysis' |
+| Population | 1 | — | undergraduate students from a psychology department subject pool | p. 3 text, 'Of the 885 undergraduate student participants' / 'psychology department subject pool' |
+| Reference | 1 | — | Bliton & Pincus (2019) | p. 1, the first three lines of the stacked masthead block, 'Assessment' above '1–18' above '© The Author(s) 2019', with the byline 'Chloe F. Bliton and Aaron L. Pincus', each name carrying a superscript affiliation marker '1' and an ORCID badge printed after the first. This page prints no running head: the string 'Bliton and Pincus' occurs on it only inside SAGE's production-tracking line (`ASMXXX10.1177/1073191119864661AssessmentBliton and Pincus`), which the text layer holds but a page render shows nothing of, so it is not cited here. Table 1, p. 7 is the venue of the values themselves |
+| URL | 1 | — | https://doi.org/10.1177/1073191119864661 | DOI printed on the article's first page |
+| note-only | — | Study 2 samples | N = 608, reported separately for romantic partner, friend and acquaintance targets | Table 5, p. 12, 'Descriptive Statistics (Study 2)' |
 <!-- audit-values-end -->

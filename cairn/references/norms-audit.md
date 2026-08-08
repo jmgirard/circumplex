@@ -2,9 +2,9 @@
 
 A synthesis note (no single `<citekey>.md` owns it): the citekey map, the
 shelf manifest, and the per-instrument audit status for all 15 shipped
-instruments. Batch 1 (M72) audited five and batch 2 (M73) four more; the rest carry their
-status here so an unaudited instrument is visible rather than merely out of
-scope.
+instruments. Batch 1 (M72) audited five, batch 2 (M73) four more and batch 3 (M74) the four
+multi-sample instruments; the rest carry their status here so an unaudited
+instrument is visible rather than merely out of scope.
 
 **Provenance.** Ingested 2026-08-06 by M72 (authored here rather than extracted
 from one source — this is a synthesis note over the shelf and the shipped data,
@@ -35,12 +35,12 @@ seeing it. Per-row detail is in `data-raw/norms-audit-ledger.csv`.
 | csip | verified: M, SD, Size, Reference, URL; Population deviates by design (no angles, no item map) | M72 | [boudreaux2018.md](boudreaux2018.md) | 2026-08-06 |
 | csiv | verified: M, SD, Size, item map, angles, Reference, URL; Population deviates by design | M72 | [locke2000.md](locke2000.md) | 2026-08-06 |
 | iitc | verified: M, SD, Size, Reference, URL; Population deviates by design (no angles, no item map) | M72 | [bliton2019.md](bliton2019.md) | 2026-08-06 |
-| cais | unaudited | — | — | 2026-08-06 |
-| iei | unaudited | — | — | 2026-08-06 |
-| igicr | unaudited | — | — | 2026-08-06 |
+| cais | verified: M, SD, angles, item map, Size, Reference (2 samples); the item map and the sample-1 Size were wrong and are corrected here; Population deviates by design (URL not published in source) | M74 | [sodano2006.md](sodano2006.md) | 2026-08-07 |
+| iei | verified: M, SD, Size, Reference (2 samples); URL repointed here at the pages that publish the values; Population deviates by design (no angles, no item map) | M74 | [horner2024.md](horner2024.md) | 2026-08-07 |
+| igicr | verified: M, SD, Size, angles, item map, Reference, URL (3 samples); Population deviates by design | M74 | [trucco2013.md](trucco2013.md) | 2026-08-07 |
 | iip32 | unaudited; source is the IIP-64/IIP-32 professional manual, obtainable — the maintainer holds publisher permission to ship the norming functions but not the item text (M72, corrected M73) | — | — | 2026-08-06 |
 | iip64 | unaudited; source is the IIP-64/IIP-32 professional manual, obtainable — the maintainer holds publisher permission to ship the norming functions but not the item text (M72, corrected M73) | — | — | 2026-08-06 |
-| iipsc | unaudited (two norm samples, two different sources) | — | — | 2026-08-06 |
+| iipsc | verified: M, SD, Size, item map, Reference (2 samples, two different sources); the sample-1 Reference year was wrong and is corrected here; Population deviates by design (no angles; sample-2 URL not published) | M74 | [hopwood2008.md](hopwood2008.md), [soldz1995.md](soldz1995.md) | 2026-08-07 |
 | iis32 | audited, **norms unsourced**: item map, Reference, URL verified; M, SD, Size and Population are published in no identified source (angles not published) | M73 | [hatcher2012.md](hatcher2012.md) | 2026-08-07 |
 | iis64 | verified: M, SD, Size, item map, Reference, URL; Population deviates by design (no angles) | M73 | [hatcher2009.md](hatcher2009.md) | 2026-08-06 |
 | ipipipc | audited, **norms unsourced**: item map, Size, Reference, URL verified; M and SD are published in no identified source (no angles, Population deviates by design) | M73 | [markey2009.md](markey2009.md) | 2026-08-06 |
@@ -62,15 +62,28 @@ the mapping the audit script joins on.
 | iis64 | 1 | hatcher2009 | the article (Table 1) |
 | ipipipc | 1 | markey2009 | **nowhere identified** — the article publishes octant statistics only for a different sample |
 | isc | 1 | hopwood2011 | the article (inside Figure 2) |
+| cais | 1 | sodano2006 | the article (Table 2, child sample) |
+| cais | 2 | sodano2006 | the article (Table 4, adult sample) |
+| iei | 1 | horner2024 | the article (Table 1, Study 1) **and** the author's IEI norms page |
+| iei | 2 | horner2024 | the article (Table 1, Study 2) |
+| igicr | 1 | trucco2013 | the article (Table 3, Combined column) |
+| igicr | 2 | trucco2013 | the article (Table 3, Males column) |
+| igicr | 3 | trucco2013 | the article (Table 3, Females column) |
+| iipsc | 1 | hopwood2008 | the article (Table 1, as octant SUMS; the package divides by 4) |
+| iipsc | 2 | soldz1995 | the article (Table 4, Generic Outpatient column) |
 
 ## Shelf manifest
 
 Filenames under `cairn/references/sources/` (gitignored). Scan verdict from the
 positive probe: `pdftotext` text-layer density over the anchor pages plus
 `pdfimages -list` for full-page images, with `pdfinfo` Producer as one input;
-an inconclusive probe is treated as a scan. All nine PDFs came back
+an inconclusive probe is treated as a scan. All nine batch-1/2 PDFs came back
 born-digital (M72, extended M73), so M42-D1's two-channel rule did not fire —
 the notes record that the norm tables were read in two channels regardless.
+Batch 3 breaks that run: `soldz1995.pdf` is an Acrobat Paper Capture OCR scan,
+the first shelf source for which M42-D1 does fire, so its text layer
+corroborates nothing and its norm table needs a channel that is not OCR of the
+same page image — observed 2026-08-07.
 
 | file | sha256 | verdict | observed |
 |---|---|---|---|
@@ -88,6 +101,12 @@ the notes record that the norm tables were read in two channels regardless.
 | hatcher2012.pdf | 239b5474fcfeb3b6b9e226779056d24d7744ae0274427dec40c0ecaac1ea1edf | born-digital (2 images, neither full-page; 5609 chars/page); publishes no norm table at all | 2026-08-06 |
 | markey2009.pdf | ce25c8ef65ddda8b14fec82377667b78bcecbbb4cc6c4a9858a51221853dedfa | born-digital (**zero** images, 4228 chars/page), so its text layer is the whole article | 2026-08-06 |
 | hopwood2011.pdf | b65fd37b08f1165ec66e0d6075500b2984a6e0cb7417e581a4f42d8981f80527 | born-digital (1 image, not full-page; 2474 chars/page); norm values are text objects **inside Figure 2**, p. 717 | 2026-08-06 |
+| sodano2006.pdf | c494d3c518bc6e2f1cd059ce074a0c6860d9236ec64f72db6a75100e02fee8db | born-digital (Distiller 6.0.1, 5290 chars/page); both norm tables are typeset text (Table 2, p. 323; Table 4, p. 325) | 2026-08-07 |
+| hopwood2008.pdf | 490620d357dd0d1b733c6bf5b1d0658e49b01651095dbd39e67054408fc24170 | born-digital (Distiller 6.0.1, 3825 chars/page); norm table is typeset text (Table 1) | 2026-08-07 |
+| horner2025.pdf | 69ce27cd48a2bddc105e5cde59e071e577508f387e2cf6f33127dd8e67eb80f2 | born-digital (Zotero, 5404 chars/page); both samples' norm values are typeset text in Table 1 | 2026-08-07 |
+| trucco2013.pdf | 32c34116c0e47000eeac5fcd808ba1daa4998e5e5311b3151812a7682391834c | born-digital (Adobe PDF Library 9.9, 4853 chars/page); all three samples' norm values are typeset text in Table 3 | 2026-08-07 |
+| locke_iei_norms_2026-08-07.html | 50230f1b83c68399560e997126df1aafeb3fb540ea4c2a9befd53da2a6cf4a4d | retrieved HTML (kennethlocke.org/IEI/IEI_Norms.html); publishes the iei sample-1 octant M/SD and N = 1,223, and credits horner2024 for them | 2026-08-07 |
+| soldz1995.pdf | 758030aeebd66fc8989d181ba9fd7c402f4973b831ed1df5ceefa27fba7e7d14 | **OCR scan** (Acrobat Paper Capture plug-in, 3234 chars/page): the text layer is OCR of the page image, so it is not a second witness (M42-D1) and the norm table needs a genuinely independent channel | 2026-08-07 |
 
 Channel plan for batch 2, decided by asking what channel reads the *norm
 table* rather than what produced the file (the M72 lesson). Every anchor a
@@ -148,3 +167,61 @@ this word. In `ipipipc`, item 16 read "Don't fall for sob-stories" where
 markey2009's Appendix prints "sob stories". None is a norms field, so none
 appears in the ledger; each was caught by reading that instrument's own
 Appendix in two channels.
+
+## What batch 3 found
+
+No shipped mean or standard deviation was wrong in any of the four. All 144
+shipped means and standard deviations across the nine normative samples — 72
+M/SD pairs — matched their sources exactly (corrected 2026-08-07 from "88 M/SD
+pairs", which matched neither the pair count nor the value count enumerated in
+this same sentence) — cais's
+32 in sodano2006's Tables 2 and 4, iei's 32 in horner2024's Table 1, igicr's 48
+in trucco2013's Table 3, and iipsc's 32 across hopwood2008's Table 1 and
+soldz1995's Table 4. Eight of the nine sample sizes matched too, as did every
+scale angle and item map the sources publish, apart from the one below.
+
+The serious finding is cais's **item-to-scale key**, and it is a scoring defect
+rather than a provenance one. sodano2006 Table 1 (p. 322) groups the CAIS's 37
+items into octant blocks of unequal size — five each for PA, BC, DE, HI, LM and
+NO, four for FG, three for JK — but `data-raw/cais.R` shipped the equal-four
+eight-cycle key the package's other 32-item instruments use, from its first
+draft in 2018 until M74. That key put item 30 (an LM item) in JK, 31 (NO) in LM
+and 32 (PA) in NO, and left items 33–37 in no scale at all, so `score()`
+returned wrong values for seven of the eight octants — every one but FG
+(corrected 2026-08-07 from "three octants", which counted the three misassigned
+items but not the five unscored ones, whose correct octants are BC, DE, HI, LM
+and NO; PA changes too, gaining the item 32 the old key put in NO) — and
+`norm_standardize()` compared them against norms computed the correct way. The diagnosis is decisive rather than
+inferred: dealing Table 1's blocks round-robin, skipping each octant once its
+items run out, reproduces the shipped 37-item *ordering* exactly — so the file
+already encoded the published grouping and only the key contradicted it. A sweep
+of all fifteen bundled instruments found no second instance, and a test now
+requires every key to cover its instrument's items exactly once.
+
+Three provenance corrections went with it. cais's child-sample `Size` moved from
+213 to 204, the N printed on the very table its means come from — the article
+gives 213 twice elsewhere and never reconciles the two. iipsc's college-student
+norms were credited to a 2011 publication and now name Hopwood, Pincus, DeMoor,
+& Koonce (2008), which is the paper that publishes them and the DOI the
+instrument already carried. iei's `URL` pointed at the study's OSF project,
+which publishes neither of its norms tables, and now gives one address per
+sample (M74-D1).
+
+Two source-internal inconsistencies are recorded and left unresolved, both of
+the kind hatcher2009 already showed: sodano2006's 204-vs-213 above, and
+soldz1995's Generic Outpatient sample, given as 105 patients on p. 55 and as
+n = 106 in Table 4's own heading. In each case the package now ships the table's
+number, because that is the sample the statistics were computed on.
+
+Two fields stay uncompared for want of a published value. iei's 64 items are in
+a supplemental table that is not part of the article, and neither iei nor iipsc
+publishes an assigned degree per octant — cais and igicr both do, in a "target
+angle" row, and both match. cais's and iipsc's sources print no DOI or URL at
+all, so those `URL` values rest on later-assigned identifiers that are
+consistent with the printed volume and issue but appear nowhere in the articles.
+
+soldz1995 is also the first shelf source that is an OCR scan, so M42-D1's
+two-channel rule fired for real rather than being honoured as a precaution: its
+values were read by a direct read of a page-image render and by an independent
+`tesseract` pass over that render, neither of them the shelved Acrobat text
+layer, which was consulted afterwards and agreed.

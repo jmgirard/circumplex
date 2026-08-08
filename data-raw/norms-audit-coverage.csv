@@ -12,3 +12,5 @@
 "ipipipc","note-only-sample","Study 1 combined octant statistics","PA 2.21 / .77, BC 2.09 / .73, DE 2.24 / .69, FG 2.81 / .80, HI 3.19 / .70, JK 3.80 / .57, LM 3.92 / .57, NO 3.17 / .77",TRUE
 "isc","note-only-sample","Study 1 validation half","Sample 2, n = 687, the other half of the 1,336 random split",TRUE
 "isc","note-only-sample","Study 2 sample","N = 299, a broader array of correlates",TRUE
+"iipsc","note-only-sample","Group sample","n = 143 pretherapy patients referred for short-term time-limited group treatment, whose IIP-SC octant M (SD) are Table 4's first column",TRUE
+"iipsc","note-only-sample","PD sample","n = 107 pretherapy patients referred for a personality-disorder study, whose IIP-SC octant M (SD) are Table 4's second column",TRUE
