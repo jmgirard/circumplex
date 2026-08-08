@@ -1,6 +1,6 @@
 # M76: Disclose the reference sample at the standardizing call site
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR16
@@ -34,7 +34,7 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 
 ## Acceptance criteria
 
-- [x] AC1 `norm_standardize()` takes `quiet`, default `FALSE`. On a successful
+- [ ] AC1 `norm_standardize()` takes `quiet`, default `FALSE`. On a successful
       non-quiet call it emits a message naming the sample number used and that
       sample's `Size` and `Population`, read from the `Norms[[2]]` row whose
       `Sample` equals the number used rather than by row position; where the
@@ -59,7 +59,7 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
       violator and is `Scale`-labelled — so the shipped roster cannot exhibit
       this. The exact-set pin at `tests/testthat/test-norms-anchor-range.R:46`
       is left standing.
-- [x] AC4 A `sample` matching no `Norms[[1]]` row is refused by its own check,
+- [ ] AC4 A `sample` matching no `Norms[[1]]` row is refused by its own check,
       distinct from the scales-vs-norms arity `stopifnot()`, which is retained
       and separately tested. The error names the `sample` argument and lists the
       sample numbers the instrument carries; the test asserts those numbers
@@ -167,6 +167,8 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 
 - 2026-08-08: T8 and T9 done. `devtools::check(args = "--no-manual")` clean — 0 errors, 0 warnings, 0 notes, vignettes rebuilt (13m 33s). T9's pin was written with the AC1/AC2 tests in the same file rather than as a separate late task; it asserts both exports and the `Population` column over the shipped enumeration. All tasks complete; status → review.
 
+- 2026-08-08: review returned the milestone to in-progress (defect return 1). F1 (90): the "N other samples are available" clause counts anchor-range-refused samples, so cais sample 1's message advertises a sample D-040 refuses. F4 (85): `sample = NA_real_` bypasses AC4's refusal, which is AC4 failing inside its own domain. AC1 and AC4 unticked; the other seven criteria keep their recorded evidence. F2, F10 and F16 are actioned without forcing the return.
+
 ## Decisions
 
 - 2026-08-08 (RR16 R1, R5, R6): `norm_standardize()`, `norms()`, `$Norms` and the `Population` column keep their names. The plan gate's provisional keep is now decided on the merits — the identifiers are the interpersonal-circumplex field's own usage rather than claims, the behavioral hazard runs through silence plus the definite article and is closed by this milestone's disclosure plus M77's prose, and the rename's benefit is near zero at any cost. Promoted to D-041; the ROADMAP's parked rename item is closed rather than deferred.
@@ -231,3 +233,47 @@ generated files regenerated rather than hand-edited; `pkgdown::check_pkgdown()`
 reports no problems; NEWS entries present; no new top-level files, so no
 `.Rbuildignore` change.
 
+**Independent review (three lenses + scorer), 2026-08-08.** 22 candidate
+findings; 5 scored >= 80 and are actioned, 17 below 80 are logged here.
+
+Actioned (>= 80):
+
+- F1 (90) — `R/tidying_functions.R`: the "N other samples are available" clause
+  counts every `Norms[[2]]` row, including samples D-040 refuses. Live: cais
+  sample 1 prints "1 other sample is available; see norms()." while cais sample
+  2 errors. The disclosure points the user at a sample the package refuses.
+- F2 (88) — `test-norms-disclosure.R`: the multi-sample assertion computes its
+  expected count with the same expression the implementation uses
+  (`nrow(Norms[[2]]) - 1`), so no test in the branch can fail on F1.
+- F4 (85) — `R/tidying_functions.R`: `sample = NA_real_` passes
+  `is_num(sample, n = 1)`, then `key$Sample == NA` yields NAs and `key[NA, ]`
+  returns NA-filled rows, so `nrow(key) == 0` is false and the new refusal is
+  bypassed — the call dies in the arity `stopifnot()` or in the angle loop.
+- F10 (80) — `test-norms-disclosure.R`: "the attribute is present whether or
+  not the message was emitted" asserts only identity between two attributes,
+  which passes if both are NULL; the AC2 sweep uses `quiet = TRUE` on every
+  call, so the non-quiet path's attribute presence is unfenced.
+- F16 (88) — `R/tidying_functions.R:137`: "(see `@return`)" renders in the
+  shipped help page as the literal text `@return`.
+
+Logged, below threshold (17): F9 (78, the partition assertions are true by
+construction and nothing pins the roster at 15) · F3 (68, `Norms[[1]]`/`[[2]]`
+sample sets assumed in sync; bare "subscript out of bounds" if not, unreachable
+on the shipped roster) · F5 (55, chained `append = TRUE` leaves the attribute
+describing only the last call) · F12 (55, bare `expect_error()` on the arity
+check) · F14 (45, the single-sample sweep omits the `disclosure_usable()` skip)
+· F11 (40) · F13 (40) · F18 (35, NEWS "nearly twice that") · F21 (35) · F6 (30)
+· F8 (30) · F17 (30) · F20 (30, the vignette chunk gains a message; file
+untouched by the diff and outside Scope) · F22 (30, the `expect_silent`
+narrowing, judged deliberate and compensated) · F7 (25) · F19 (20).
+
+Lens coverage: the prior-review lens reported no prior-review evidence
+contradicted (GitHub inline-comment probe returned empty; the M72-M75 archives
+do not touch this code surface). The blame-history lens confirmed D-040's
+refusal intact, PR #99's `iei` sample-key pin preserved, and no contradiction
+of D-039/D-040/D-041.
+
+**Return floor met — status back to `in-progress`.** F1 scores 90 on a defect
+in what the package does for its users, and F4 demonstrates AC4 failing inside
+its own domain: a `sample` matching no `Norms[[1]]` row is not refused by its
+own check when that sample is `NA`. Defect-return count for this milestone: 1.
