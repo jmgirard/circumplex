@@ -14,19 +14,9 @@
 # data-raw/audit-norms.R. Pinning the whole object rather than a field list is
 # deliberate: a field list pins what its author remembered to name.
 
-# The shipped instruments are enumerated by the same procedure instruments()
-# uses -- data() plus a class filter -- rather than a hand-list, so a newly
-# added instrument is caught by the completeness test below instead of
-# silently going unpinned. (instruments() itself prints and returns NULL, so
-# its return value cannot be used here.)
-shipped_instruments <- function() {
-  nms <- utils::data(package = "circumplex")$results[, "Item"]
-  sort(Filter(function(nm) {
-    e <- new.env()
-    utils::data(list = nm, package = "circumplex", envir = e)
-    inherits(get(nm, envir = e), "circumplex_instrument")
-  }, nms))
-}
+# shipped_instruments() lives in helper-norms.R, so that this file and
+# test-norms-anchor-range.R sweep one enumeration rather than two that can
+# drift apart.
 
 audited_objects <- list(
   csie = list(

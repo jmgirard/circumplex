@@ -147,17 +147,11 @@ test_that("self_standardize works", {
 # CONTENT rather than the frame's shape. They sweep every shipped instrument
 # rather than naming the one that was broken, because the defect is a way of
 # writing the column and not a fact about one instrument.
-shipped_instrument_names <- function() {
-  nms <- utils::data(package = "circumplex")$results[, "Item"]
-  sort(Filter(function(nm) {
-    e <- new.env()
-    utils::data(list = nm, package = "circumplex", envir = e)
-    inherits(get(nm, envir = e), "circumplex_instrument")
-  }, nms))
-}
+# The enumeration lives in helper-norms.R as shipped_instruments(); this file
+# previously carried a second, identical copy of it.
 
 test_that("each shipped norm sample keys every scale exactly once", {
-  for (nm in shipped_instrument_names()) {
+  for (nm in shipped_instruments()) {
     obj <- get(nm)
     norms <- obj$Norms[[1]]
     key <- if ("Scale" %in% names(norms)) "Scale" else "Abbrev"
@@ -175,16 +169,34 @@ test_that("each shipped norm sample keys every scale exactly once", {
 test_that("norm_standardize runs on every shipped instrument and sample", {
   # End-to-end rather than structural only: a key that survives the shape
   # assertions above but still mixes samples would produce numbers here.
+  #
+  # A sample whose means fall outside its instrument's response range is
+  # refused rather than standardized (see test-norms-anchor-range.R for the
+  # invariant and the one shipped violation). The expectation below is derived
+  # from that same predicate rather than hand-listing the exception, so it
+  # stays correct when the CAIS adult sample is corrected or withdrawn, and
+  # when a new instrument is added.
   probe <- as.data.frame(matrix(2, nrow = 2, ncol = 8))
-  for (nm in shipped_instrument_names()) {
+  for (nm in shipped_instruments()) {
     obj <- get(nm)
     names(probe) <- obj$Scales$Abbrev
     for (s in obj$Norms[[2]]$Sample) {
-      expect_no_error(
+      key <- obj$Norms[[1]]
+      m <- key$M[key$Sample == s]
+      in_range <- all(
+        m >= min(obj$Anchors$Value) & m <= max(obj$Anchors$Value),
+        na.rm = TRUE
+      )
+      standardize_it <- function() {
         norm_standardize(probe, scales = names(probe),
                          angles = obj$Scales$Angle, instrument = obj,
                          sample = s, append = FALSE)
-      )
+      }
+      if (in_range) {
+        expect_no_error(standardize_it())
+      } else {
+        expect_error(standardize_it(), "response range")
+      }
     }
   }
 

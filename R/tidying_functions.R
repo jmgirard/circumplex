@@ -143,7 +143,10 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #'   available circumplex instruments, see `instruments()`.
 #' @param sample Required. An integer corresponding to the normative sample to
 #'   use in standardizing the scale scores (default = 1). See `?norms` to
-#'   see the normative samples available for an instrument.
+#'   see the normative samples available for an instrument. A sample whose
+#'   mean scores fall outside the instrument's own response range cannot be on
+#'   the same metric as the scores being standardized, and is refused with an
+#'   error rather than used; `norms()` lists the alternatives.
 #' @param prefix Optional. A string to include at the beginning of the newly
 #'   calculated scale variables' names, before the scale name and `suffix`
 #'   (default = "").
@@ -175,8 +178,31 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
   if (is.matrix(data)) data <- as.data.frame(data)
   key <- instrument$Norms[[1]]
   key <- key[key$Sample == sample, ]
-  
+
   stopifnot(length(scales) == nrow(key))
+
+  # A normative sample whose means fall outside the instrument's own response
+  # range cannot be on the same metric as the scores being standardized, so the
+  # z-scores it produces would carry an undefined unit. There is no reading
+  # under which those numbers are right, so refuse rather than return them.
+  anchors <- instrument$Anchors
+  if (!is.null(anchors) && nrow(key) > 0) {
+    lo <- min(anchors$Value)
+    hi <- max(anchors$Value)
+    outside <- which(key$M < lo | key$M > hi)
+    if (length(outside) > 0) {
+      stop(
+        "The ", instrument$Details$Abbrev, " normative sample ", sample,
+        " cannot be used for standardization. Its mean score for ",
+        paste(key$Scale[outside], collapse = ", "),
+        " falls outside the instrument's ", lo, " to ", hi,
+        " response range, so this sample is not on the same metric as the ",
+        "scores being standardized. Use norms() to see the other samples ",
+        "available for this instrument.",
+        call. = FALSE
+      )
+    }
+  }
   
   scale_data <- data[scales]
   scale_names <- colnames(scale_data)

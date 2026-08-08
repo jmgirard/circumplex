@@ -2,6 +2,19 @@
 #'
 #' Information about the Child and Adolescent Interpersonal Survey (CAIS).
 #'
+#' @section Note on the adult normative sample:
+#' The CAIS is rated on a 5-point scale, but three of the octant means the
+#' source publishes for its adult sample (`sample = 2`) fall above 5: PA 5.19,
+#' LM 6.52, and NO 6.14. The package transcribes them faithfully, and the
+#' source's own table is the origin of the discrepancy rather than the
+#' transcription. Because a sample whose means lie outside the response range
+#' cannot be on the same metric as the scores being standardized,
+#' `norm_standardize()` refuses `sample = 2` rather than returning z-scores in
+#' an undefined unit. The child sample (`sample = 1`) is unaffected and its
+#' means all sit inside the response range. The discrepancy is under query with
+#' the instrument's authors; this sample will be corrected or withdrawn once
+#' that is resolved.
+#'
 #' @source Sodano, S. M., & Tracey, T. J. G. (2006). Interpersonal traits in
 #'   childhood: Development of the Child and Adolescent Interpersonal Survey.
 #'   *Journal of Personality Assessment, 87*(3), 317–329.
