@@ -121,6 +121,22 @@ score <- function(data, items, instrument, na.rm = TRUE,
   }
 }
 
+# Would norm_standardize() accept this sample of this instrument? Shares the
+# anchor-range predicate with the refusal below rather than restating it, so
+# the disclosure's count of usable alternatives cannot drift from what the
+# refusal actually does.
+norm_sample_usable <- function(instrument, sample) {
+  key <- instrument$Norms[[1]]
+  key <- key[which(key$Sample == sample), ]
+  if (nrow(key) == 0) return(FALSE)
+  anchors <- instrument$Anchors
+  if (is.null(anchors)) return(TRUE)
+  all(
+    key$M >= min(anchors$Value) & key$M <= max(anchors$Value),
+    na.rm = TRUE
+  )
+}
+
 #' Standardize circumplex scales using normative data
 #'
 #' Take in a data frame containing circumplex scales, angle definitions for each
@@ -134,8 +150,8 @@ score <- function(data, items, instrument, na.rm = TRUE,
 #' respondent's z-scores by more than half a standard deviation. So unless
 #' `quiet = TRUE`, every successful call reports which sample it used, how
 #' large that sample was, and how it is described, and every call attaches the
-#' same facts to the result (see `@return`). Use `norms()` to see the samples
-#' an instrument carries before choosing one.
+#' same facts to the result (see the Value section below). Use `norms()` to see
+#' the samples an instrument carries before choosing one.
 #'
 #' @param data Required. A data frame or matrix containing at least circumplex
 #'   scales.
@@ -204,7 +220,12 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
 
   if (is.matrix(data)) data <- as.data.frame(data)
   key <- instrument$Norms[[1]]
-  key <- key[key$Sample == sample, ]
+  # which() rather than a bare logical index: `key$Sample == NA` is NA rather
+  # than FALSE, and indexing a data frame by NA returns a row of NAs instead of
+  # no rows -- so an NA `sample` (or an NA in the column) would survive the
+  # zero-row guard below and fail later, somewhere that names neither the
+  # argument nor the mistake. which() drops NAs from either side.
+  key <- key[which(key$Sample == sample), ]
 
   # An unmatched `sample` used to fall through to the arity check below, whose
   # message names neither the argument at fault nor what would have been
@@ -305,7 +326,16 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
     # The stored label names the group the sample was drawn from, so it is
     # printed as a plain description; framing it as a population would make
     # the package assert a representativeness none of these samples claims.
-    n_other <- nrow(instrument$Norms[[2]]) - 1L
+    #
+    # The count offers the reader an alternative they can act on, so it counts
+    # only samples this function would accept -- not rows of Norms[[2]]. A
+    # sample whose means leave the response range is refused, and advertising
+    # it would point at a call that errors.
+    n_other <- sum(vapply(
+      setdiff(instrument$Norms[[2]]$Sample, sample),
+      function(other) norm_sample_usable(instrument, other),
+      logical(1)
+    ))
     msg <- paste0(
       "Standardized against ", disclosure$Instrument, " normative sample ",
       sample, ": N = ", disclosure$Size, ", ", disclosure$Population, "."

@@ -81,8 +81,8 @@ not a technicality: different samples of the same instrument can move a
 respondent's z-scores by more than half a standard deviation. So unless
 \code{quiet = TRUE}, every successful call reports which sample it used, how
 large that sample was, and how it is described, and every call attaches the
-same facts to the result (see \verb{@return}). Use \code{norms()} to see the samples
-an instrument carries before choosing one.
+same facts to the result (see the Value section below). Use \code{norms()} to see
+the samples an instrument carries before choosing one.
 }
 \examples{
 data("jz2017")

@@ -53,6 +53,10 @@ test_that("the two message forms partition the shipped instruments", {
   expect_identical(intersect(multi, single), character(0))
   expect_gt(length(multi), 0)
   expect_gt(length(single), 0)
+  # AC1 asks the two memberships partition all 15. The two assertions above
+  # are true by construction of the loop, so the roster size is what actually
+  # carries the claim -- without it the "partition" holds over any roster.
+  expect_identical(length(multi) + length(single), 15L)
 })
 
 test_that("a single-sample instrument's message names the sample, size and description", {
@@ -80,12 +84,27 @@ test_that("a multi-sample instrument's message says how many other samples exist
       msg <- capture_messages(standardize_probe(obj, s))
       expect_length(msg, 1)
       expect_match(msg[[1]], paste0("sample ", s), fixed = TRUE)
-      expect_match(
-        msg[[1]], paste0(n - 1, " other sample"),
-        fixed = TRUE,
-        info = paste(nm, "sample", s)
-      )
-      expect_match(msg[[1]], "norms()", fixed = TRUE)
+      # Derived independently of the implementation, which counts rows of
+      # Norms[[2]]. What the sentence offers the reader is an alternative they
+      # can actually use, so the expected count is the number of OTHER samples
+      # that would not be refused -- computed here from the anchor-range
+      # predicate, not from nrow().
+      usable_others <- sum(vapply(
+        setdiff(obj$Norms[[2]]$Sample, s),
+        function(o) disclosure_usable(obj, o),
+        logical(1)
+      ))
+      if (usable_others > 0) {
+        expect_match(
+          msg[[1]], paste0(usable_others, " other sample"),
+          fixed = TRUE,
+          info = paste(nm, "sample", s)
+        )
+        expect_match(msg[[1]], "norms()", fixed = TRUE)
+      } else {
+        expect_false(grepl("other sample", msg[[1]], fixed = TRUE),
+                     info = paste(nm, "sample", s))
+      }
     }
   }
 })
@@ -179,6 +198,10 @@ test_that("the attribute is present whether or not the message was emitted", {
   obj <- shipped_instrument("iipsc")
   loud <- suppressMessages(standardize_probe(obj, 1))
   hushed <- standardize_probe(obj, 1, quiet = TRUE)
+  # Assert presence on each path before comparing them: an identity check
+  # alone passes when BOTH attributes are absent, so it fenced nothing.
+  expect_type(attr(loud, "norm_sample"), "list")
+  expect_type(attr(hushed, "norm_sample"), "list")
   expect_identical(attr(loud, "norm_sample"), attr(hushed, "norm_sample"))
 })
 
@@ -231,4 +254,45 @@ test_that("the scales-vs-norms arity check is retained and still fires", {
       instrument = obj, sample = 1
     )
   )
+})
+
+test_that("an NA sample is refused by the same check, not by a later one", {
+  # NA matches no Norms[[1]] row, so AC4's refusal owns this case. It did not:
+  # `key$Sample == NA` is NA rather than FALSE, and `key[NA, ]` returns
+  # NA-filled rows instead of zero rows, so the nrow() == 0 guard was false and
+  # the call fell through -- into the arity stopifnot() on a multi-sample
+  # instrument, and into the angle loop on a single-sample one.
+  for (nm in c("iipsc", "isc")) {
+    obj <- shipped_instrument(nm)
+    probe <- disclosure_probe(obj)
+    msg <- tryCatch(
+      norm_standardize(
+        probe, scales = names(probe), angles = obj$Scales$Angle,
+        instrument = obj, sample = NA_real_
+      ),
+      error = conditionMessage
+    )
+    # Asserts WHICH failure, not that some failure occurred: the two failures
+    # it used to produce name "length(scales)" and "degrees" respectively.
+    expect_match(msg, "No normative data for sample", fixed = TRUE, info = nm)
+    expect_false(grepl("length(scales)", msg, fixed = TRUE), info = nm)
+    expect_false(grepl("degrees", msg, fixed = TRUE), info = nm)
+  }
+})
+
+test_that("the other-samples clause counts only samples that can be used", {
+  # cais carries two samples but sample 2 is refused for leaving its anchor
+  # range (D-040), so there is no other sample a reader of sample 1's message
+  # could act on. Advertising it points at a call that errors.
+  obj <- shipped_instrument("cais")
+  expect_identical(nrow(obj$Norms[[2]]), 2L)
+  expect_false(disclosure_usable(obj, 2))
+  msg <- capture_messages(standardize_probe(obj, 1))
+  expect_false(grepl("other sample", msg[[1]], fixed = TRUE))
+
+  # And the converse: iipsc's second sample IS usable, so it is still offered.
+  ok <- shipped_instrument("iipsc")
+  expect_true(disclosure_usable(ok, 2))
+  msg2 <- capture_messages(standardize_probe(ok, 1))
+  expect_match(msg2[[1]], "1 other sample is available", fixed = TRUE)
 })

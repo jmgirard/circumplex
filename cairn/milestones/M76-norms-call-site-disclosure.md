@@ -1,6 +1,6 @@
 # M76: Disclose the reference sample at the standardizing call site
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR16
@@ -34,7 +34,7 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 
 ## Acceptance criteria
 
-- [ ] AC1 `norm_standardize()` takes `quiet`, default `FALSE`. On a successful
+- [x] AC1 `norm_standardize()` takes `quiet`, default `FALSE`. On a successful
       non-quiet call it emits a message naming the sample number used and that
       sample's `Size` and `Population`, read from the `Norms[[2]]` row whose
       `Sample` equals the number used rather than by row position; where the
@@ -59,7 +59,7 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
       violator and is `Scale`-labelled — so the shipped roster cannot exhibit
       this. The exact-set pin at `tests/testthat/test-norms-anchor-range.R:46`
       is left standing.
-- [ ] AC4 A `sample` matching no `Norms[[1]]` row is refused by its own check,
+- [x] AC4 A `sample` matching no `Norms[[1]]` row is refused by its own check,
       distinct from the scales-vs-norms arity `stopifnot()`, which is retained
       and separately tested. The error names the `sample` argument and lists the
       sample numbers the instrument carries; the test asserts those numbers
@@ -169,6 +169,9 @@ new milestone, ROADMAP candidate row; a `data-raw/` schema change and a
 
 - 2026-08-08: review returned the milestone to in-progress (defect return 1). F1 (90): the "N other samples are available" clause counts anchor-range-refused samples, so cais sample 1's message advertises a sample D-040 refuses. F4 (85): `sample = NA_real_` bypasses AC4's refusal, which is AC4 failing inside its own domain. AC1 and AC4 unticked; the other seven criteria keep their recorded evidence. F2, F10 and F16 are actioned without forcing the return.
 
+- 2026-08-08: all five actioned findings fixed on the branch, tests-first (three new/changed assertions red first, each for its own reason). F1: the other-samples count now counts only samples `norm_standardize()` would accept, via a new internal `norm_sample_usable()` that shares the anchor-range predicate with the refusal rather than restating it — live, cais sample 1 no longer advertises its refused sibling while iipsc sample 1 still offers its usable one. F4: the `Sample` subset uses `which()`, which drops NAs from either side; the first attempt (`!is.na(key$Sample) & key$Sample == sample`) was wrong because `TRUE & NA` is NA, and was corrected before it was run. F2: the multi-sample assertion derives its expected count from the usability predicate instead of mirroring the implementation's `nrow() - 1`. F10: presence is asserted on each path before the two are compared. F16: the roxygen now says "the Value section below" rather than a literal tag name. F9 (78, below threshold) was fixed in the same pass since it sat in the test AC1 names — the roster size is now pinned at 15.
+- 2026-08-08: post-fix `devtools::test()`: 0 failures, 6550 passing (up from 6537). The 4 WARNs remain `test-ci_accuracy.R`'s, untouched. AC1 and AC4 re-ticked on the live evidence recorded in the Review section.
+
 ## Decisions
 
 - 2026-08-08 (RR16 R1, R5, R6): `norm_standardize()`, `norms()`, `$Norms` and the `Population` column keep their names. The plan gate's provisional keep is now decided on the merits — the identifiers are the interpersonal-circumplex field's own usage rather than claims, the behavioral hazard runs through silence plus the definite article and is closed by this milestone's disclosure plus M77's prose, and the rename's benefit is near zero at any cost. Promoted to D-041; the ROADMAP's parked rename item is closed rather than deferred.
@@ -272,6 +275,16 @@ contradicted (GitHub inline-comment probe returned empty; the M72-M75 archives
 do not touch this code surface). The blame-history lens confirmed D-040's
 refusal intact, PR #99's `iei` sample-key pin preserved, and no contradiction
 of D-039/D-040/D-041.
+
+**Post-fix verification, 2026-08-08 (round 2).** All five actioned findings
+fixed and verified live: cais sample 1's message now omits the other-samples
+clause entirely (its only sibling is anchor-range refused) while iipsc sample 1
+still reads "1 other sample is available; see norms()."; `sample = NA_real_`
+refuses with "No normative data for sample NA. The IIP-SC carries samples 1, 2"
+on a multi-sample instrument and the ISC equivalent on a single-sample one;
+`document()` emits zero `resolve link` lines and the rendered `.Rd` carries
+"see the Value section below" with no `\verb{@return}`. `devtools::test()`:
+0 failures, 6550 passing. AC1 and AC4 re-ticked on this evidence.
 
 **Return floor met — status back to `in-progress`.** F1 scores 90 on a defect
 in what the package does for its users, and F4 demonstrates AC4 failing inside
