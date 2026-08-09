@@ -91,7 +91,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       an unattributed gap count. The comment on the existing real-roster
       assertion at `tests/testthat/test-norms-provenance.R:462-478` records
       that it becomes a roster check once AC1 lands.
-- [x] AC7 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
+- [ ] AC7 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
       re-running the audit leaves `data-raw/norms-audit-ledger.csv` and
       `data-raw/norms-audit-coverage.csv` unchanged but for their stamps.
 
@@ -149,6 +149,7 @@ Return 2 (2026-08-08), from the review findings below:
 
 ## Work log
 
+- 2026-08-09: AC7 unticked, correcting the evidence line first written this session. The review-time `devtools::check(args = "--no-manual")` is Status 1 ERROR at 17m14s, in `checking re-building of vignette outputs`: kableExtra fails to load for want of `stringi` in two vignettes. Not a branch defect -- `stringi` and kableExtra are both installed interactively, the branch touches no vignette and no DESCRIPTION line, and the check's own tests phase passed OK at 14m/15m; the probable cause is two `check()` runs overlapping `document()` in this session. AC7's other two clauses hold (test FAIL 0 / PASS 6876; audit re-run stamp-only at 194 rows). The next pass re-runs `check()` serially before ticking it. Jeff chose to stop here rather than route to /milestone-plan or /milestone-brief in this session.
 - 2026-08-09: review returned M79 to in-progress (return 3). AC5 fails on both clauses, inside its own domain: the registry test sources the script under `norms_audit_defs_only = TRUE`, so `git_head()` and `or_head()` are outside the counted enumeration and a `stop()` planted among them leaves the guard at FAIL 0 / PASS 69 (mutation-verified this session); and `validate_batch()`'s `stopifnot()` at `data-raw/audit-norms.R:83-85` is an abort path with no message test. AC1 and AC4 -- the two that failed at return 2 -- both pass and are ticked, with AC2, AC3, AC6, AC7. Blame-history and prior-review lenses reported no findings; 14 diff-lens candidates, 2 actioned, 12 logged below threshold. Both thrash triggers fire: (a) third defect return, so M79 routes to /milestone-plan rather than another retry, corroborated by cairn_validate's new "18 tasks (>10 tripwire)" WARN; (b) AC5 twice by a new mechanism of the same shape, and return 2 recorded no alternative against for AC5, so /milestone-brief escalation is offered alongside. Full findings in the Review section.
 - 2026-08-08: created by /milestone-plan.
 - 2026-08-08: criteria audit ([O], fresh context, authored none of the criteria) returned findings on 7 of this milestone's 8 drafted criteria; all adopted. The load-bearing three: AC2 was unsatisfiable as written, since 6 of the 24 batch rows abort in `validate_batch()` before any coverage count exists; the drafted instrument-level-rows criterion would have emitted 16 duplicate coverage rows per pass and is re-cut into M80 AC6; the drafted marker criteria missed the end marker and `source_note_block_tags()` entirely, leaving the fence protection one-sided.
@@ -254,12 +255,25 @@ carried from return 1, return 2, or implementation.
 - **AC6** — the roster-identity assertion is `TRUE` at review: the batch's
   (instrument, sample) pair set equals the roster's, pinned non-vacuously at 24
   pairs over 15 instruments.
-- **AC7** — `devtools::test()` FAIL 0 / WARN 4 / PASS 6876. Re-running the audit
+- **AC7** — **not verified this pass; the check clause is unresolved.**
+  `devtools::test()` is FAIL 0 / WARN 4 / PASS 6876, and re-running the audit
   leaves `norms-audit-coverage.csv` byte-identical and the ledger identical in
   every substantive column at 194 rows, differing only in `script_commit` and
-  `data_commit` (checked column by column, not by eye). The full
-  `devtools::check(args = "--no-manual")` was re-run at review time and is
-  recorded in the work log below.
+  `data_commit` (checked column by column, not by eye). But
+  `devtools::check(args = "--no-manual")` came back **Status: 1 ERROR** at
+  17m14s. The error is **not attributable to this branch**: it is
+  `checking re-building of vignette outputs`, failing in
+  `intermediate-ssm-analysis.Rmd` and `introduction-to-ssm-analysis.Rmd` with
+  "package or namespace load failed for 'kableExtra' … there is no package
+  called 'stringi'". `stringi` and `kableExtra` are both present in the
+  interactive library, this branch changes no vignette and no DESCRIPTION line
+  (`git diff --name-only master..HEAD -- vignettes/ DESCRIPTION` is empty), and
+  the check's own `checking tests` phase passed OK at 14m/15m. The likely cause
+  is library contention from two `check()` runs plus `document()` overlapping in
+  this session. Unticked rather than carried: return 2's clean check and the
+  T18 completion run both predate this pass, and AC fencing wants this pass's
+  own evidence. **The next pass must re-run `check()` serially, with nothing
+  else touching the library.**
 
 ### Return 3 — consistency gate (2026-08-09)
 
@@ -325,9 +339,11 @@ Scope says one extracted helper where two were extracted. (12) the two new `R/`
 helpers use `#` rather than `@noRd`.
 
 **Disposition: returned to `in-progress`. Return 3 of this milestone.** AC1,
-AC2, AC3, AC4, AC6 and AC7 are verified and ticked — AC1 and AC4, the two that
-failed at return 2, both hold this pass. AC5 alone fails, on both of its
-clauses.
+AC2, AC3, AC4 and AC6 are verified and ticked — AC1 and AC4, the two that
+failed at return 2, both hold this pass. AC5 fails on both of its clauses. AC7
+is unticked as unverified rather than failed: its check clause could not be
+resolved this pass for an environment reason recorded above, and the next pass
+re-runs it serially.
 
 **Both thrash triggers fire, and they compose.**
 Trigger (a) — this is the third defect return, a threshold that holds from here
