@@ -389,3 +389,189 @@ See `## Binding criteria` below.
   re-running the audit leaves `data-raw/norms-audit-ledger.csv` and
   `data-raw/norms-audit-coverage.csv` unchanged but for the three stamp
   columns, compared column by column (AC5 unchanged).
+
+## Binding criteria (revision 2, 2026-08-09)
+
+This section supersedes `## Binding criteria` above, which stays as the
+record of what was first proposed. Reissued after the ingest audit ([O],
+fresh context). What changed and why:
+
+- **BC8 (rev 1) was unsatisfiable as written**: under the composite identity
+  the two `source note not found` sites share one key and therefore one
+  message matcher, so a `conditionMessage()`-only matrix has a structurally
+  guaranteed off-diagonal cell. Rev 2's BC10 asserts the off-diagonal
+  accepting set *equals the declared shared-key pair set* instead of
+  asserting diagonality, and delegates discrimination of those cells to the
+  stack assertion (BC8).
+- **BC7's (rev 1) closing sentence** — "no matcher in the suite" — was an
+  unbounded universal over a domain no named procedure enumerates, the exact
+  defect RB17 §6 forbids, and false today (audit re-measure: 79 bare
+  `expect_error()` calls across 19 files, all outside M81's Scope In).
+  Rev 2 bounds every matcher claim to registry-built matchers; the
+  suite-wide `expect_error` hygiene is explicitly not bound here.
+- **BC2's (rev 1) mutation evidence conflated two mutants**: appending
+  `stopifnot(exprs = {TRUE})` leaves the shipped walk at 14, unchanged
+  (re-verified 2026-08-09); the 12-of-14 figure belongs to rewriting
+  `validate_batch()`'s two existing conditions into `exprs` form (gate
+  measurement). Rev 2 states both correctly, gives the discrimination floor
+  one home (registry-build matcher construction, BC9), and narrows the
+  literal-floor tolerance to [10, 20].
+- **BC5 (rev 1) dropped the ordinal escape hatch** its own §4 specified,
+  making AC1 and the duplicate-identity refusal jointly unsatisfiable for
+  two same-key sites in one function; carried no mutation clause; and its
+  comment-insertion check passes against the shipped enumerator
+  (`keep.source = FALSE`), so it is a guard, not a verification. All three
+  fixed in BC7.
+- Smaller audit items, all accepted: BC4 (rev 2) now binds the test name at
+  `test-norms-audit-markers.R:464` and the helper header at
+  `helper-norms-audit-script.R:11-14`, not only AC text. The denylist's
+  alias/`assign`/`<<-`/higher-order gaps are closed by one cleaner rule — a
+  bare BC1-head symbol in any non-head position — plus a named-`what`
+  clause for `do.call`. BC8 (rev 2) pins "innermost sourced-binding frame"
+  and requires non-vacuous capture. The stem-floor tolerance narrows to
+  [20, 45]. Locale flakiness is bound: measured 2026-08-09, under
+  `LANGUAGE=fr` `stopifnot(is.data.frame(batch))` raises
+  `"is.data.frame(batch) n'est pas TRUE"`, `norms_audit_stopifnot_stem()`
+  strips nothing, and the shipped match fails — so message assertions pin
+  the C locale. The rev-1 BC9 universal ("all previously verified
+  properties") is replaced by an enumerated list, and its "`test()` clean"
+  is restated to match the T6 record (FAIL 0 suite-wide; the milestone's
+  files WARN 0 in isolation).
+- **Partition**: `[M81]` keeps what is built plus the minimal repair for
+  the demonstrated hole (the named-`stopifnot` miss) and the promise-text
+  bounding; `[successor]` takes the denylist, composite identity, stack
+  binding, matcher floors, and the matrix. Dependency direction: the
+  successor depends on M81 (its identity and matrix quantify over the
+  classification-complete enumeration M81 ships); M81 depends on nothing
+  new. Inseparable groups are flagged on the criteria.
+
+- BC1 `[M81]` **Named-`stopifnot` conditions collected.** The enumerator
+  treats every named argument of a collected `stopifnot()` call — except
+  `exprs`, `exprObject`, and `local` — as one condition, keyed on its name
+  (which is the runtime message). Mutation-verified, script restored
+  byte-clean: planting `"divisor must be numeric" = is.numeric(batch$divisor)`
+  in `validate_batch()`'s `stopifnot()` moves the collected count 14 → 15
+  and reddens the set-equality test as an unregistered site. Pre-repair
+  baseline (gate measurement, reproduced 2026-08-09): count stays 14 → 14
+  and the suite stays green at FAIL 0 | PASS 76. Inseparable from BC2:
+  treating named arguments as conditions forces a decision on `exprs` in
+  the same change, or `stopifnot(exprs = {...})` would register a bogus
+  site keyed `"exprs"`.
+- BC2 `[M81]` **Fail-closed `stopifnot` classification.** The enumerator
+  raises an error — reddening the suite and naming the offending call
+  deparsed — on any `stopifnot()` argument named `exprs`, `exprObject`, or
+  `local`. Mutation-verified, script restored byte-clean after each:
+  (i) appending `stopifnot(exprs = { TRUE })` to the script reddens the
+  enumeration (pre-repair baseline, measured 2026-08-09: the walk returns
+  14, unchanged — the form is silently invisible); (ii) rewriting
+  `validate_batch()`'s two existing conditions into `exprs` form reddens
+  (pre-repair baseline, gate measurement: 12 sites against 14, silent).
+- BC3 `[M81]` **Named-form matcher.** A named-form condition site is
+  matched by full string equality of the abort's `conditionMessage()` with
+  the site's key — no stem, no regex. Verified by a unit test driving
+  `expect_abort_at_site()` with a synthetic named-form site: the exact
+  message passes; any strict superstring or substring of it fails.
+- BC4 `[M81]` **Bounded promise, in all three texts.** AC1's criterion
+  text, the test name at `tests/testthat/test-norms-audit-markers.R:464`
+  (today "no abort anywhere in the audit script is left unregistered"), and
+  the helper header at `tests/testthat/helper-norms-audit-script.R:11-14`
+  (today "The parse tree has neither hole") each state the enumerated
+  domain — calls whose deparsed head is `stop`, `stopifnot`, `base::stop`,
+  or `base::stopifnot`, with `stopifnot` conditions per BC1/BC2 — and name
+  what is outside it: alternative abort spellings (until the successor's
+  BC6 denylist, and beyond it for runtime-resolved names), dynamically
+  constructed calls, process exits, `warning` promotion, and non-call
+  failure mechanisms per the existing AC2 bound. No M81 text claims
+  enumeration of "all aborts" or any domain no named procedure produces.
+- BC5 `[M81]` **Regression floor, enumerated.** On the finished branch,
+  each of the following reproduces with the same FAIL count as recorded in
+  the work log (tolerance 0 on FAIL counts; PASS counts may grow by the
+  number of tests this milestone adds): the two AC3 mutations (FAIL 2
+  each), the two AC4 mutations (FAIL 1; control FAIL 0), and the T4
+  run-block mutant (FAIL 1), each restored byte-clean. `devtools::test()`
+  FAIL 0 suite-wide, and the milestone's two test files WARN 0 run in
+  isolation (the T6 record's 4 warnings lie outside them);
+  `devtools::check(args = "--no-manual")` 0 errors / 0 warnings / 0 notes;
+  re-running the audit leaves `data-raw/norms-audit-ledger.csv` and
+  `data-raw/norms-audit-coverage.csv` unchanged but for the three stamp
+  columns, compared column by column.
+- BC6 `[successor]` **Denylist sweep.** One test walks every call in the
+  script's parse tree and fails, naming the deparsed call, on: (i) any call
+  whose paren-normalised head deparses to `rlang::abort`, `abort`,
+  `cli::cli_abort`, or `cli_abort`; (ii) any `do.call` or `base::do.call`
+  whose first positional argument, or argument named `what`, is the string
+  or symbol of a BC4 head; (iii) any appearance of a bare BC4-head symbol
+  in a non-head position of any call — one rule covering `fail <- stop`,
+  `fail <<- stop`, `assign("fail", stop)`, and `lapply(msgs, stop)` alike.
+  The list is closed and stated in the test source; runtime-resolved names
+  stay outside per BC4. Mutation-verified for at least
+  `do.call("stop", list("x"))` and `fail <- stop` (both measured
+  2026-08-09: invisible to the shipped walk, count stays 14), restored
+  byte-clean.
+- BC7 `[successor]` **Composite site identity with ordinal.** Every
+  registry entry and collected site carries
+  `(kind, enclosing top-level binding name — "<run>" for run-block sites,
+  key, ordinal)`, the ordinal assigned in source order and distinguishing
+  only entries otherwise identical. AC1's set equality compares this full
+  identity in both directions, superseding "by key and count". Registry
+  construction errors on two entries with identical full identity;
+  mutation-verified: registering one entry twice reddens the build. Two
+  same-key sites inside one function remain jointly satisfiable: verified
+  on a scratch copy with two identical planted `stop()` calls in one
+  function — the walk yields two identities differing in ordinal. The
+  `source note not found` pair carries distinct identities
+  (`parse_source_note`, `source_note_block_tags`). Identity contains no
+  line or column numbers; the comment-insertion invariance check is
+  recorded as a standing guard against future srcref keying, not as
+  verification — it passes against the shipped enumerator too, which
+  parses with `keep.source = FALSE`. Inseparable from BC8 and BC10: the
+  matrix criterion is only satisfiable given identity-level structure plus
+  stack discrimination, and cutting them apart across milestones would
+  reproduce rev 1's BC8 failure at a milestone boundary.
+- BC8 `[successor]` **Stack-bound fixtures for shared keys.** For every
+  site whose `(kind, key)` is shared with a site under a different
+  enclosing binding (today: exactly the `source note not found` pair), the
+  per-site test captures the abort's frame stack via a calling handler
+  established around the thunk with no exiting handler between it and the
+  abort, asserts the capture is non-empty — a vacuous capture is a
+  failure, never a silent pass — and asserts the *innermost* captured
+  frame whose function is a sourced-environment binding is `identical()`
+  to the binding the site's identity names ("innermost", so the assertion
+  does not degrade if one of the pair ever calls the other).
+  Mutation-verified: pointing one pair fixture at the other function's
+  trigger reddens its binding assertion. Inseparable from BC7 and BC10.
+- BC9 `[successor]` **Matcher floors, one home, locale pinned.** All
+  discriminating-power checks live in one procedure: matcher construction
+  at registry-build time. `expect_abort_at_site()` consumes prebuilt
+  matchers and adds no floor of its own. The constructor errors on: a
+  `stop`-kind key with fewer than 15 literal characters (tolerance: any
+  floor in [10, 20]; shipped minimum measured 23, so the band keeps ≥ 3
+  characters of headroom before a behaviour-preserving message edit could
+  redden the build); a `stopifnot` stem shorter than
+  `min(nchar(squish(key)), 40)` (tolerance on the constant: [20, 45];
+  measured: R's truncation leaves 66 characters of the script's longest
+  shipped condition, so the band keeps ≥ 21 characters of headroom, and
+  the shipped check accepts a 1-character stem — measured). Every test
+  asserting a `stopifnot` message runs with messages pinned to the C
+  locale (`LANGUAGE=C` and `LC_MESSAGES=C` for the expression): measured
+  2026-08-09, under `LANGUAGE=fr` the verdict is "n'est pas TRUE", the
+  English-only strip removes nothing, and the shipped match fails. Must
+  land no later than BC10, which shares the locale pin and whose
+  off-diagonal set a degenerate matcher would explode.
+- BC10 `[successor]` **Cross-discrimination matrix over declared pairs.**
+  One test captures each fixture's `conditionMessage()` once (locale
+  pinned per BC9), evaluates every registry-built matcher against every
+  captured message, and asserts the set of accepting off-diagonal cells
+  *equals* the declared shared-key pair set — today the two cells of the
+  `source note not found` pair, in both directions, and nothing else.
+  The declared cells are discriminated by BC8's stack assertion, not
+  exempted by comment. The claim is bounded to registry-built matchers;
+  suite-wide `expect_error` hygiene (audit re-measure: 79 bare calls
+  across 19 files, all outside Scope In) is explicitly not bound by this
+  criterion. Inseparable from BC7 and BC8.
+- BC11 `[successor]` **Successor gate floor.** At the successor's review
+  gate, every `[M81]` criterion above reproduces as stated (FAIL-count
+  invariants, tolerance 0; PASS counts may grow with added tests),
+  `devtools::test()` FAIL 0 with the touched test files WARN 0 in
+  isolation, `devtools::check(args = "--no-manual")` 0/0/0, and the AC5
+  stamp-only CSV comparison holds column by column.
