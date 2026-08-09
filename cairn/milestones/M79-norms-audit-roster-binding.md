@@ -1,6 +1,6 @@
 # M79: Bind the norms audit's batch to the shipped roster
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
