@@ -5,7 +5,7 @@
 - **Depends on:** M79
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m81-norms-audit-abort-registry`
+- **Branch/PR:** `m81-norms-audit-abort-registry` / https://github.com/jmgirard/circumplex/pull/108
 
 ## Goal
 
