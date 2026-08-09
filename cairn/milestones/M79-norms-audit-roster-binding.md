@@ -85,7 +85,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       an unattributed gap count. The comment on the existing real-roster
       assertion at `tests/testthat/test-norms-provenance.R:462-478` records
       that it becomes a roster check once AC1 lands.
-- [ ] AC6 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
+- [x] AC6 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
       re-running the audit leaves `data-raw/norms-audit-ledger.csv` and
       `data-raw/norms-audit-coverage.csv` unchanged but for their three stamp
       columns (`generated`, `script_commit`, `data_commit`,
@@ -193,6 +193,75 @@ Return 4 (2026-08-09), from the re-plan:
 ## Decisions
 
 ## Review
+
+### Return 4 — acceptance criteria, fresh evidence (2026-08-09)
+
+Measured on the branch at `7103b62c`; every figure re-run this pass, none
+carried from earlier returns. The criteria renumbered at the re-plan: AC5 here
+is return 3's AC6 and AC6 here is return 3's AC7, while return 3's AC5 left for
+M81.
+
+- **AC1** — `shipped_roster()` returns 24 pairs over 15 instruments; `roster`
+  is a formal of `audit_norms()` defaulting to `NULL` and resolved independently
+  of `objects`. Dropping `isc` emits exactly one non-exempt row,
+  `instrument = "isc"`, `side = "shipped-sample-not-audited"`, `scale = "1"`.
+  The injection hole is measured both ways again: a `csie`-only batch slice
+  reports 23 non-exempt gaps with no objects and **23 again** with
+  `objects = list(csie = csie)`. Single-sourced by code reading:
+  `helper-norms.R:12` calls `circumplex:::instrument_names()`,
+  `audit-norms.R:414` resolves the same function through `asNamespace()`, and
+  `grep -rn 'data(package' data-raw/` matches nothing — no second sweep exists.
+- **AC2** — the drop-each-row sweep over all 24 batch rows, re-measured this
+  pass: **6 aborts, 18 gap>0, 0 silent**, against the criterion's recorded
+  pre-fix 6/8/10.
+- **AC3** — an untagged block read by two instruments aborts with "source note
+  shared carries an untagged audit-values block but is read by 2 instruments
+  (fx, fy); tag each block with the instrument it backs" — both instruments and
+  the citekey named, message asserted rather than bare failure. `horowitz2003`
+  is re-confirmed the only note two instruments read (iip32, iip64) and both
+  its blocks are tagged, so nothing committed is refused.
+- **AC4** — classified through `source_note_marker()` this pass: the three
+  accepted shapes accept, and all thirteen near-misses abort — the return-2
+  four (`begin-->`, `end-->`, padded terminator, padded tag), colon-without-
+  space, trailing whitespace, leading indent, inline-in-prose,
+  `audit-values-beginning`, junk after the tag, a bare `: -->`, a path
+  character in the tag, and an embedded newline. Both scanning sites share one
+  helper by code reading: `source_note_markers()` at `:178-184` is the only
+  production caller of the recognizer, and is itself called at `:195` by
+  `source_note_block_tags()` and `:227` by `parse_source_note()`. The fixture
+  partition test and the unclosed-fence regression test both pass.
+- **AC5** — the roster-identity assertion is `TRUE` at review: the batch's
+  (instrument, sample) pair set equals the roster's, pinned non-vacuously at 24
+  pairs over 15 instruments.
+- **AC6** — `devtools::check(args = "--no-manual")` is **Status OK, 0 errors /
+  0 warnings / 0 notes, 14m55s**, run serially on a tree with `git status`
+  empty, and the two load-bearing steps are present in the log by name:
+  `checking tests ... [12m/12m] OK` and `checking re-building of vignette
+  outputs ... [52s/56s] OK`. `devtools::test()` is FAIL 0 / WARN 4 / SKIP 0 /
+  PASS 6876. Re-running the audit leaves `norms-audit-coverage.csv`
+  byte-identical and the 194-row ledger identical in 10 of its 12 columns,
+  compared column by column — only `script_commit` and `data_commit` move,
+  `generated` does not. Both runs are this session's and every commit since
+  touches only `cairn/`, so they describe the code under review. The return-3
+  vignette ERROR does not reproduce, which is the evidence for its recorded
+  diagnosis of library contention.
+
+### Return 4 — consistency gate (2026-08-09)
+
+Universal: `cairn_validate` exit 0, all 14 checks PASS. 48 advisories — 47 the
+pre-existing M7 `work-log format` history, and one `sizing (split tripwires)`
+WARN reading "M79: 19 tasks (>10 tripwire)", which is the split that already
+happened: the work those tasks outgrew is M81. `cairn_impact` skipped —
+`DESIGN.md` is unchanged on this branch.
+
+Profile (`r-package` `consistency-gate`): `document()` at `cli.width = 500`
+emits 0 `resolve link` warnings and leaves `man/`, `NAMESPACE`, `data/` and the
+RcppExports pair diff-free; `pkgdown::check_pkgdown()` reports no problems;
+README.md is not stale and neither README file changed on this branch; no new
+top-level files, so no `.Rbuildignore` entry is owed. **No NEWS entry:** the
+only shipped-code change remains the extraction of two unexported helpers, with
+`instruments()` byte-identical, so there is no user-visible behaviour an entry
+could assert.
 
 ### Return 3 — acceptance criteria, fresh evidence (2026-08-09)
 
