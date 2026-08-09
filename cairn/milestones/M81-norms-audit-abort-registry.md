@@ -1,6 +1,6 @@
 # M81: Enumerate the norms-audit abort registry from the script's parse tree
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M79
 - **Driving RR:** —
@@ -107,7 +107,7 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
       and restore.
 - [x] T5 Re-anchor the single-sourcing assertion on the parse tree; both AC4
       mutations measured.
-- [ ] T6 Re-run the audit (stamp columns only), `devtools::test()`, full
+- [x] T6 Re-run the audit (stamp columns only), `devtools::test()`, full
       `check(args = "--no-manual")`, run with nothing else in the session
       touching the R library.
 
@@ -126,6 +126,7 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
 - 2026-08-09: T4 return-3 mutant measured — an unregistered `stop()` planted in the run block beside `res <- audit_norms()`. New guard: FAIL 1 | PASS 75, the set-equality test reporting the site as unregistered. Retired text-count guard run against the same mutated file: still 12, i.e. it would have stayed green. Script restored byte-clean.
 - 2026-08-09: T5 re-anchored the single-sourcing assertion on the parse tree via `norms_audit_resolves_name()`; the absence half stays a text assertion, deliberately, a second enumeration being a defect whether live or commented out. Two mutations measured, script restored byte-clean after each. Deleting the resolving call and replacing it with a hard-coded copy of the 15-instrument list — behaviour identical, so the mutation isolates: FAIL 1 | PASS 16, the only failure being the assertion, while the retired text grep stays TRUE off the doc comment at `:404`. Control: switching the call to `circumplex:::instrument_names()` keeps FAIL 0 | PASS 17, and green for the claim's reason — the `:::` shape is what matched, verified by listing the matching call.
 - 2026-08-09: the AC4 assertion accepts `pkg:::nm`, `pkg::nm` and a literal-naming `get()`/`getExportedValue()`, not the one shape at `:414` alone — a test that reddens under a behaviour-preserving accessor switch is a defect in the test.
+- 2026-08-09: T6 — audit re-run at `53908411`: ledger 194 rows, coverage 15 rows, 0 gaps, 14 note-only, 1 constructed credit, 0 angle-copy splits, 0 IP2 breaches. Compared column by column against the committed CSVs: coverage identical in all 5 columns; ledger identical in all 12 but `script_commit` and `data_commit`, `generated` included. The stamp-only churn was reverted rather than committed — M81 changes no audited value, so the committed stamps stay a true record of the run that produced them. `devtools::test()`: FAIL 0 | WARN 4 | SKIP 0 | PASS 6883, the 4 warnings outside this milestone's files (both ran WARN 0 on their own). `devtools::check(args = "--no-manual")`: Status OK, 0 errors / 0 warnings / 0 notes, 16m 46s.
 
 ## Decisions
 
