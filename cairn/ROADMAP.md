@@ -10,7 +10,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
 | M78 | Per-sample reference-kind field in the shipped norms | done | — | high | milestones/archive/M78-norms-reference-kind-field.md |
-| M79 | Bind the norms audit's batch to the shipped roster | in-progress | — | normal | milestones/M79-norms-audit-roster-binding.md |
+| M79 | Bind the norms audit's batch to the shipped roster | review | — | normal | milestones/M79-norms-audit-roster-binding.md |
 | M81 | Enumerate the norms-audit abort registry from the script's parse tree | planned | M79 | normal | milestones/M81-norms-audit-abort-registry.md |
 | M80 | Give the norms-audit coverage report a machine-readable key | planned | M79, M81 | normal | milestones/M80-norms-audit-report-schema.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
