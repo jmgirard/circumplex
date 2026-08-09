@@ -105,7 +105,7 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
 - [x] T4 Mutation-verify T1's collector with the return-3 mutant (an
       unregistered `stop()` in the run block); record the measured before/after
       and restore.
-- [ ] T5 Re-anchor the single-sourcing assertion on the parse tree; both AC4
+- [x] T5 Re-anchor the single-sourcing assertion on the parse tree; both AC4
       mutations measured.
 - [ ] T6 Re-run the audit (stamp columns only), `devtools::test()`, full
       `check(args = "--no-manual")`, run with nothing else in the session
@@ -124,6 +124,8 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
 - 2026-08-09: T1+T2 landed in one checkpoint — replacing the count test's sourced enumeration (T1) has no meaning without the per-site registry it compares against (T2). New `tests/testthat/helper-norms-audit-script.R`; the walk returns 14 site entries (12 `stop()`, 2 `stopifnot()` conditions), every key unique but the intended `source note not found: {}` pair. `test-norms-audit-markers.R`: FAIL 0 | PASS 76, up from PASS 69.
 - 2026-08-09: T3 mutations measured on `data-raw/audit-norms.R`, script restored byte-clean after each. Deleting `is.data.frame(batch)`: FAIL 2 | PASS 73, the message test reporting "no error raised" — the five-name fixture reaches no sibling guard, so the case cannot pass through one. Deleting the required-columns condition: FAIL 2 | PASS 74, its fixture likewise raising nothing. Both also redden the set-equality test, which drops the deleted condition's key.
 - 2026-08-09: T4 return-3 mutant measured — an unregistered `stop()` planted in the run block beside `res <- audit_norms()`. New guard: FAIL 1 | PASS 75, the set-equality test reporting the site as unregistered. Retired text-count guard run against the same mutated file: still 12, i.e. it would have stayed green. Script restored byte-clean.
+- 2026-08-09: T5 re-anchored the single-sourcing assertion on the parse tree via `norms_audit_resolves_name()`; the absence half stays a text assertion, deliberately, a second enumeration being a defect whether live or commented out. Two mutations measured, script restored byte-clean after each. Deleting the resolving call and replacing it with a hard-coded copy of the 15-instrument list — behaviour identical, so the mutation isolates: FAIL 1 | PASS 16, the only failure being the assertion, while the retired text grep stays TRUE off the doc comment at `:404`. Control: switching the call to `circumplex:::instrument_names()` keeps FAIL 0 | PASS 17, and green for the claim's reason — the `:::` shape is what matched, verified by listing the matching call.
+- 2026-08-09: the AC4 assertion accepts `pkg:::nm`, `pkg::nm` and a literal-naming `get()`/`getExportedValue()`, not the one shape at `:414` alone — a test that reddens under a behaviour-preserving accessor switch is a defect in the test.
 
 ## Decisions
 

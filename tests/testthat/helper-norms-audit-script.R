@@ -26,7 +26,8 @@ norms_audit_script_exprs <- function() {
   parse(file = norms_audit_script_path(), keep.source = FALSE)
 }
 
-# Every call in the tree whose deparsed head is one of `heads`, in source order.
+# Every call in the tree whose deparsed head is one of `heads`, in source order;
+# `heads = NULL` collects every call.
 #
 # `x[[i]]` on a call's empty-symbol element (the blank in `d[i, , drop = FALSE]`)
 # binds a MISSING variable, and touching it errors -- so each child is tested
@@ -36,7 +37,7 @@ norms_audit_calls <- function(heads, exprs = norms_audit_script_exprs()) {
   walk <- function(x) {
     if (is.call(x)) {
       head <- paste(deparse(x[[1L]]), collapse = "")
-      if (head %in% heads) found[[length(found) + 1L]] <<- x
+      if (is.null(heads) || head %in% heads) found[[length(found) + 1L]] <<- x
     }
     if (is.recursive(x)) {
       for (i in seq_along(x)) {
@@ -107,6 +108,32 @@ norms_audit_abort_sites <- function(exprs = norms_audit_script_exprs()) {
 # site cannot match a registry entry of the other kind.
 norms_audit_site_ids <- function(sites) {
   sort(vapply(sites, function(s) paste0(s$kind, "\t", s$key), character(1)))
+}
+
+# Does this call resolve `nm` out of a package namespace?
+#
+# Every shape that reaches the package's own binding counts -- `pkg:::nm`,
+# `pkg::nm`, and a `get()`/`getExportedValue()` naming it as a literal -- so
+# that a behaviour-preserving switch between them does not redden the caller.
+# What does NOT count is a comment mentioning the name, or a bare string
+# literal sitting anywhere else in the file: those are what the text grep this
+# replaces could not tell apart from the call (M81 AC4).
+norms_audit_resolves_name <- function(nm, exprs = norms_audit_script_exprs()) {
+  getters <- c("get", "base::get", "getExportedValue", "base::getExportedValue")
+  hits <- Filter(function(cl) {
+    head <- paste(deparse(cl[[1L]]), collapse = "")
+    if (head %in% c("::", ":::")) {
+      return(length(cl) >= 3L && identical(cl[[3L]], as.name(nm)))
+    }
+    if (head %in% getters) {
+      args <- as.list(cl)[-1L]
+      return(any(vapply(args, function(a) {
+        is.character(a) && length(a) == 1L && identical(a, nm)
+      }, logical(1))))
+    }
+    FALSE
+  }, norms_audit_calls(NULL, exprs))
+  length(hits) > 0L
 }
 
 regex_escape <- function(x) gsub("([][{}()^$.|*+?\\\\])", "\\\\\\1", x)

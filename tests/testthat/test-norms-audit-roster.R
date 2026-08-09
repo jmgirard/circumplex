@@ -112,13 +112,26 @@ test_that("the roster is the package's own enumeration, not a copy (M79)", {
   # The claim is about the SOURCE, so the source is what is checked: the audit
   # script must reach the package's enumeration and must not carry one of its
   # own. A third copy written into data-raw/ reddens the second assertion.
-  script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
-  skip_if_not(file.exists(script), "data-raw/ not present (installed package)")
-  src <- readLines(script, warn = FALSE)
+  #
+  # PRESENCE is asserted over the parse tree, not the file's text (M81). The
+  # text grep this replaces matched the doc comment above shipped_roster() and
+  # the string literal the call itself passes, so deleting the CALL left it
+  # green -- the false coverage the abort registry in the sibling file was
+  # rebuilt to remove. What must exist is a call resolving the name from the
+  # namespace, today `get("instrument_names", envir = ns)()`; a comment
+  # mentioning it and a bare literal now satisfy nothing. Every namespace-
+  # resolving shape counts, so switching to `circumplex:::instrument_names()`
+  # would not redden this -- the assertion is about reaching the package's
+  # enumeration, not about which accessor reaches it.
+  expect_true(norms_audit_resolves_name("instrument_names"))
 
-  expect_true(any(grepl("instrument_names", src, fixed = TRUE)))
+  # ABSENCE stays a text assertion, and deliberately: a second enumeration is
+  # a defect wherever it is written, a live call and a commented-out draft
+  # alike, so the broader instrument is the right one here.
   # The sweep is `utils::data(package = "circumplex")` plus a class filter.
   # data-raw/ may not run one: that is the second copy this test exists to stop.
+  script <- norms_audit_script_path()
+  src <- readLines(script, warn = FALSE)
   expect_false(any(grepl("data(package", src, fixed = TRUE)))
 
   env <- roster_defs()
