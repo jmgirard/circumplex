@@ -205,6 +205,109 @@ test_that("a tagged note read by two instruments still parses (M79)", {
   )
 })
 
+# --- every abort path in parse_source_note() (M79) ----------------------------
+#
+# Each `stop()` in the function's body gets a case here, and the count test
+# below binds the two: adding a seventh `stop()` without registering it fails
+# the suite. Registered by MESSAGE rather than by a hand-count, so the registry
+# says which abort each case is for and cannot drift into a bare tally.
+#
+# Each was no-oped in turn and the surviving behaviour recorded (measured
+# 2026-08-08). Three are load-bearing in the strong sense -- no-oping them
+# leaves the parser RETURNING ROWS rather than raising anything. Three
+# relocate: some later expression, or another guard, fails instead, so the test
+# reddens on the message without that proving this guard is what stopped the
+# bad state. Recorded per case below rather than papered over, because a test
+# that reddens for the wrong reason is the false coverage the guard rule warns
+# about.
+
+note_dir <- function(name, lines) {
+  dir <- tempfile("m79-abort-")
+  dir.create(dir)
+  writeLines(lines, file.path(dir, paste0(name, ".md")))
+  dir
+}
+
+table_head <- c("| field | sample | scale | value | anchor |", "|---|---|---|---|---|")
+
+# field = the abort's message fragment; value = a thunk raising it.
+PARSE_ABORTS <- list(
+  # RELOCATES: no-oped, readLines() fails next -- "cannot open the connection".
+  "source note not found" = function(env) {
+    env$parse_source_note("absent", note_dir("other", "x"), instrument = "fx")
+  },
+  # RELOCATES, into the guard below: no-oped, the two untagged blocks both
+  # carry the tag "", so the duplicate-tag abort catches it -- "tags two
+  # audit-values blocks alike: ". Removing BOTH would return a row range
+  # spanning someone else's block, which is why neither is redundant.
+  "no well-formed audit-values block" = function(env) {
+    env$parse_source_note("bad", note_dir("bad", c(
+      "<!-- audit-values-begin -->", "<!-- audit-values-begin -->",
+      table_head, "| M | 1 | PA | 1.1 | t |", "<!-- audit-values-end -->"
+    )), instrument = "fx")
+  },
+  # LOAD-BEARING: no-oped, it RETURNS the first of the two blocks tagged alike
+  # (measured: 1 row, value 1.1, the second block's 2.2 never seen), so the
+  # second instrument is audited against the first's rows and no comparison can
+  # fail. Nothing else raises.
+  "tags two audit-values blocks alike" = function(env) {
+    env$parse_source_note("dup", note_dir("dup", c(
+      "<!-- audit-values-begin: fx -->", table_head,
+      "| M | 1 | PA | 1.1 | t |", "<!-- audit-values-end -->",
+      "<!-- audit-values-begin: fx -->", table_head,
+      "| M | 1 | PA | 2.2 | t |", "<!-- audit-values-end -->"
+    )), instrument = "fx")
+  },
+  # RELOCATES: no-oped, k stays NA and b[[NA]] raises "subscript out of
+  # bounds" -- a redder message for the same state, not a survival.
+  "no audit-values block for" = function(env) {
+    env$parse_source_note("tagged", note_dir("tagged", c(
+      "<!-- audit-values-begin: fx -->", table_head,
+      "| M | 1 | PA | 1.1 | t |", "<!-- audit-values-end -->",
+      "<!-- audit-values-begin: fy -->", table_head,
+      "| M | 1 | PA | 2.2 | t |", "<!-- audit-values-end -->"
+    )), instrument = "zz")
+  },
+  # LOAD-BEARING: no-oped, it RETURNS the row with anchor NA (measured: cell 5
+  # of a four-cell row), so the value joins the note with its provenance anchor
+  # silently gone. An anchor containing a literal "|" is how a real note gets
+  # here.
+  "malformed audit row" = function(env) {
+    env$parse_source_note("short", note_dir("short", c(
+      "<!-- audit-values-begin -->", table_head,
+      "| M | 1 | PA | 1.1 |", "<!-- audit-values-end -->"
+    )), instrument = "fx")
+  },
+  # LOAD-BEARING: no-oped, it RETURNS the row with an empty value (measured),
+  # which downstream compares as a mismatch -- a wrong ledger row rather than a
+  # refusal, so the note's defect is reported as the package's.
+  "audit row\\(s\\) with an empty value" = function(env) {
+    env$parse_source_note("empty", note_dir("empty", c(
+      "<!-- audit-values-begin -->", table_head,
+      "| M | 1 | PA |  | t |", "<!-- audit-values-end -->"
+    )), instrument = "fx")
+  }
+)
+
+test_that("every parse_source_note() abort raises its own message (M79)", {
+  env <- marker_defs()
+  for (msg in names(PARSE_ABORTS)) {
+    # The specific message, never bare failure: five of these six fixtures
+    # would also raise if the parser were broken in an unrelated way.
+    expect_error(PARSE_ABORTS[[msg]](env), msg, info = msg)
+  }
+})
+
+test_that("no parse_source_note() abort is left unregistered (M79)", {
+  env <- marker_defs()
+  # The domain is enumerated, not recalled: count the stop() calls in the
+  # function's own body and require one registered case each. A seventh abort
+  # added without a case fails here rather than shipping untested.
+  body_src <- deparse(body(env$parse_source_note))
+  n_stops <- sum(grepl("stop(", body_src, fixed = TRUE))
+  expect_identical(n_stops, length(PARSE_ABORTS))
+})
+
 test_that("source_note_tags() reads the two well-formed marker shapes (M79)", {
   env <- marker_defs()
   expect_identical(env$source_note_tags("<!-- audit-values-begin -->"), "")
