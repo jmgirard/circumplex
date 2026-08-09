@@ -1,6 +1,6 @@
 # M79: Bind the norms audit's batch to the shipped roster
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -39,33 +39,30 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 
 ## Acceptance criteria
 
-- [x] AC1 `audit_norms()` emits a `shipped-sample-not-audited` coverage row
+- [ ] AC1 `audit_norms()` emits a `shipped-sample-not-audited` coverage row
       with `exempt = FALSE` for every shipped (instrument, sample) pair no
-      `AUDIT_BATCH` row names. The roster is a parameter defaulting to the
-      `data()`-plus-`circumplex_instrument`-class sweep crossed with each
-      object's `Norms[[1]]$Sample`, and is taken from `objects` when a caller
-      injects one, so fixture batches are unaffected and
-      `tests/testthat/test-norms-audit-sample-key.R:127` stays green. The
-      sweep is single-sourced with `tests/testthat/helper-norms.R:8`, not a
-      second copy.
+      `AUDIT_BATCH` row names. The roster is its own `roster` parameter,
+      defaulting to the full `data()`-plus-`circumplex_instrument`-class
+      sweep crossed with each object's `Norms[[1]]$Sample` — never derived
+      from `objects`, which stays a per-instrument value override. A caller
+      injecting one object therefore cannot shrink the world it is audited
+      against; a fixture pass states its roster explicitly. A test asserts
+      that a one-instrument slice of `AUDIT_BATCH`, with that instrument's
+      real object injected, still reports the other shipped samples as
+      non-exempt gaps. The sweep is single-sourced with
+      `tests/testthat/helper-norms.R:8`, not a second copy.
 - [x] AC2 A test iterates `seq_len(nrow(AUDIT_BATCH))`, drops that row, and
       asserts `audit_norms()` either aborts or returns a non-exempt gap count
-      above zero. Measured 2026-08-08 at `cef9d36f`: 10 rows (the 9
-      single-sample rows and `iipsc` sample 1) return 0 gaps and are the rows
-      AC1 fixes; 6 rows (each multi-sample instrument's `scales = TRUE` row)
-      abort in `validate_batch()` both before and after AC1; the remaining 8
-      already report a gap.
+      above zero. Pre-fix partition measured at `cef9d36f` and recorded in the
+      test's comment: 10 silent, 6 aborting in `validate_batch()`, 8 gapped.
 - [x] AC3 A source note whose block is untagged is refused when more than one
       instrument's `AUDIT_BATCH` row reads it, the abort naming both
-      instruments and the citekey. Two instruments' rows key alike on
-      (field, sample, scale) — same octant names, same sample numbers — so one
-      untagged block cannot audit both, and refusing makes the `claimed`-key
-      collision the M75 review found unreachable rather than repairing it
-      downstream. Three tests: the refused batch asserts the message; a note
-      read by one instrument still parses; a tagged note read by two still
-      parses. Measured 2026-08-08: `horowitz2003` is the only note two
-      instruments read and it is already tagged, so nothing in the repo is
-      refused by this.
+      instruments and the citekey — two instruments' rows key alike on
+      (field, sample, scale), so one untagged block cannot audit both, and
+      refusing makes the M75 `claimed`-key collision unreachable rather than
+      repairing it downstream. Three tests: the refused batch asserts the
+      message; a note read by one instrument still parses; a tagged note read
+      by two still parses.
 - [ ] AC4 The audit parses no markdown fences and infers nothing: a line
       carrying the literal `<!-- audit-values-` is either an exact marker or
       an abort. Accepted, and nothing else, at column zero:
@@ -100,7 +97,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 
 ## Coverage
 
-- AC1 → T4
+- AC1 → T4, T18
 - AC2 → T5
 - AC3 → T3
 - AC4 → T1, T2, T10, T14, T15
@@ -146,6 +143,9 @@ Return 2 (2026-08-08), from the review findings below:
       over every script function; message tests for the four that had none.
 - [x] T17 Log the exhaustive-claim lesson (extend the derive-from-the-
       requirement family line); re-run the audit and the full check.
+- [x] T18 AC1 as amended: a `roster` parameter defaulting to the full sweep,
+      independent of `objects`; the six fixture call sites state their roster;
+      a test pins that injecting one real object no longer hides the rest.
 
 ## Work log
 
@@ -156,6 +156,9 @@ Return 2 (2026-08-08), from the review findings below:
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
+- 2026-08-09: amendment return: AC1 — "The roster is its own `roster` parameter, defaulting to the full `data()`-plus-`circumplex_instrument`-class sweep crossed with each object's `Norms[[1]]$Sample` — never derived from `objects`, which stays a per-instrument value override. A caller injecting one object therefore cannot shrink the world it is audited against; a fixture pass states its roster explicitly. A test asserts that a one-instrument slice of `AUDIT_BATCH`, with that instrument's real object injected, still reports the other shipped samples as non-exempt gaps."
+- 2026-08-09: T18 done. `audit_norms()` gained a `roster` parameter that defaults to the full shipped sweep and is no longer derived from `objects`; the two answer different questions and deriving one from the other let a value override shrink the world. Measured on the real batch: a `csie`-only slice reports 23 non-exempt gaps, and injecting `csie`'s own real object now also reports 23 where it reported 0 before. The six fixture call sites state `roster = shipped_roster(objects)`, which is exactly what they got implicitly, so no test expectation moved. The regression test is mutation-checked -- restoring the `shipped_roster(objects)` derivation reddens it. AC1 was amended at the gate because as written it endorsed the defect, saying the roster "is taken from `objects` when a caller injects one"; Jeff chose separating the two arguments over keeping them linked with an abort. `devtools::test()` FAIL 0 / WARN 4 / PASS 6876, `document()` clean with no generated-file diff, and the audit CSVs move only in their three stamp columns (194 / 15 / 0 gaps).
+- 2026-08-09: Acceptance criteria compressed in one pass (AC2's measured partition and AC3's rationale, both restated in the Review section and work log) to carry AC1's amendment inside the 150-line cap.
 - 2026-08-09: T17 done, return 2 complete, status to review. `devtools::check(args = "--no-manual")` is Status OK -- 0 errors, 0 warnings, 0 notes, 16m15s -- and `devtools::test()` is FAIL 0 / WARN 4 / PASS 6871. `document()` at `cli.width = 500` emits 0 `resolve link` warnings and leaves the generated files diff-free; `pkgdown::check_pkgdown()` finds no problems; `cairn_validate` exits 0, all checks PASS with 48 pre-existing M7 advisories. Re-running the audit leaves the coverage CSV byte-identical and the ledger identical apart from its stamp columns (194 / 15 / 0 gaps). Verified this session against the recognizer rather than carried from the previous one: the three accepted shapes are accepted and the return-2 four, the colon-no-space and the trailing-whitespace tolerances all abort, as does a marker line carrying an embedded newline -- the anchored regex leaves no gap at `$`. The file-scoped registry pins 12 `stop(` sites across 6 script functions by message fragment, not by total alone.
 - 2026-08-08: checkpoint mid-T17, session paused at Jeff's request to resume in the circumplex session: the lesson is logged (extends the derive-from-the-requirement LESSONS line), the audit is re-run at `13b0ccbc` (ledger stamp-only, coverage byte-identical, 194/15/0 gaps), and the Tasks section is compressed for the 150-line cap (`cairn_validate` all-pass, 48 pre-existing M7 advisories). The full `check(args = "--no-manual")` is NOT yet recorded -- T17 stays open on it; the resuming session runs it before completion.
 - 2026-08-08: T14-T16 done. `source_note_marker()` is now two `identical()` comparisons against string literals and one anchored whole-line regex — no trimming, no substring arithmetic — so the accepted set is the three constants at `data-raw/audit-norms.R:124-126`. The return-2 four, the colon-no-space tolerance and the trailing-whitespace tolerance all abort by name, and the boundary is asserted as a partition (every ACCEPTED_MARKERS and single-line REFUSED_MARKERS shape classified, both directions). The AC5 registry is file-scoped: SCRIPT_ABORTS registers all 12 `stop(` sites by message fragment across every function the script defines, with new message tests for `validate_batch()`'s two, `shipped_values()`'s single-record abort and `source_note_block_tags()`'s not-found. Both guards mutation-checked: re-tolerating trailing whitespace reddens the partition test plus a refused-shape test, and an unregistered `stop()` reddens the count. `devtools::test()` FAIL 0 / WARN 4 / PASS 6871.

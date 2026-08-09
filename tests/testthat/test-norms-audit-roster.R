@@ -131,3 +131,35 @@ test_that("the roster is the package's own enumeration, not a copy (M79)", {
     logical(1)
   )))
 })
+
+test_that("injecting one object does not shrink the audited world (M79)", {
+  env <- roster_defs()
+  dir <- roster_notes()
+  # The return-2 hole: `objects` overrides one instrument's VALUES, and the
+  # roster used to be derived from it, so a value override silently narrowed
+  # the world. Auditing a one-instrument slice of the real batch reported a
+  # CLEAN run over every other shipped sample -- the exact "clean run over
+  # data it never read" the Goal forbids. The two are now separate arguments.
+  batch <- env$AUDIT_BATCH
+  inst <- batch$instrument[[1L]]
+  slice <- batch[batch$instrument == inst, , drop = FALSE]
+
+  gaps <- function(res) {
+    g <- res$coverage[!res$coverage$exempt, , drop = FALSE]
+    g[g$side == "shipped-sample-not-audited", , drop = FALSE]
+  }
+  bare <- gaps(env$audit_norms(slice, dir = dir))
+  # Injecting that instrument's own real object changes no value and so must
+  # change no gap: same count, same pairs. Before the fix this was 0 rows.
+  injected <- gaps(env$audit_norms(
+    slice, dir = dir,
+    objects = stats::setNames(list(shipped_instrument(inst)), inst)
+  ))
+  expect_gt(nrow(bare), 0L)
+  expect_identical(nrow(injected), nrow(bare))
+  expect_setequal(paste(injected$instrument, injected$scale),
+                  paste(bare$instrument, bare$scale))
+  # And the omitted instruments are named, not merely counted.
+  expect_false(inst %in% injected$instrument)
+  expect_gt(length(unique(injected$instrument)), 1L)
+})

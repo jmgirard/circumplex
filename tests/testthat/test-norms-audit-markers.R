@@ -264,7 +264,8 @@ test_that("an untagged note read by two instruments is refused (M79)", {
   # The message names both instruments and the citekey: "some error" would pass
   # against a batch rejected for any of validate_batch()'s other reasons.
   expect_error(
-    env$audit_norms(shared_batch(), dir = dir, objects = shared_objects()),
+    env$audit_norms(shared_batch(), dir = dir, objects = shared_objects(),
+                    roster = env$shipped_roster(shared_objects())),
     "shared carries an untagged audit-values block but is read by 2 .*fx, fy"
   )
 })
@@ -276,7 +277,8 @@ test_that("a note read by one instrument still parses (M79)", {
   writeLines(block_rows(), file.path(dir, "shared.md"))
 
   res <- env$audit_norms(shared_batch()[1, , drop = FALSE], dir = dir,
-                         objects = list(fx = two_scale_object()))
+                         objects = list(fx = two_scale_object()),
+                         roster = env$shipped_roster(list(fx = two_scale_object())))
   expect_identical(sum(res$ledger$kind == "mismatch"), 0L)
 })
 
@@ -287,7 +289,8 @@ test_that("a tagged note read by two instruments still parses (M79)", {
   writeLines(c(block_rows("fx"), "", block_rows("fy")),
              file.path(dir, "shared.md"))
 
-  res <- env$audit_norms(shared_batch(), dir = dir, objects = shared_objects())
+  res <- env$audit_norms(shared_batch(), dir = dir, objects = shared_objects(),
+                         roster = env$shipped_roster(shared_objects()))
   expect_identical(sum(res$ledger$kind == "mismatch"), 0L)
   # And the pass compared something: 2 scales x (M, SD) + 4 record fields +
   # 2 scales x (Angle, Items) = 12 rows per instrument, both scales-bearing.

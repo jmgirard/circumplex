@@ -458,9 +458,20 @@ refuse_shared_untagged_blocks <- function(batch, dir) {
   invisible(TRUE)
 }
 
+# `roster` is the world the batch is audited against, and it is deliberately
+# NOT derived from `objects`. The two answer different questions: `objects`
+# overrides one instrument's VALUES, `roster` states which shipped
+# (instrument, sample) pairs must be covered. Deriving one from the other made
+# a value override silently shrink the world -- auditing a one-instrument slice
+# of AUDIT_BATCH with that instrument's real object injected reported 0 gaps
+# where the same slice reports 23 without it, which is exactly the clean run
+# over unread data this milestone exists to prevent (M79 return-2 review).
+# A fixture pass states its own roster; the default is the full shipped sweep.
 audit_norms <- function(batch = AUDIT_BATCH,
                         dir = file.path("cairn", "references"),
-                        objects = NULL) {
+                        objects = NULL,
+                        roster = NULL) {
+  if (is.null(roster)) roster <- shipped_roster()
   validate_batch(batch)
   refuse_shared_untagged_blocks(batch, dir)
   ledger <- list()
@@ -608,7 +619,7 @@ audit_norms <- function(batch = AUDIT_BATCH,
   # never mentions is not reached by either. Reported rather than refused, as
   # its two siblings are: an abort would stop the audit exactly when a new
   # instrument lands before its source note does, which is when it is wanted.
-  unaudited <- shipped_roster(objects)
+  unaudited <- roster
   unaudited <- unaudited[
     !(paste(unaudited$instrument, unaudited$sample) %in%
         paste(batch$instrument, batch$sample)), , drop = FALSE
