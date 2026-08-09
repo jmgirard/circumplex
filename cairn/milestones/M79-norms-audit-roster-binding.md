@@ -1,6 +1,6 @@
 # M79: Bind the norms audit's batch to the shipped roster
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -122,7 +122,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       `stop(`-count test that fails when a new one lands untested.
 - [x] T7 The roster-identity test; update the comment at
       `tests/testthat/test-norms-provenance.R:462`.
-- [ ] T8 Re-run the audit, confirm the two CSVs are unchanged, run
+- [x] T8 Re-run the audit, confirm the two CSVs are unchanged, run
       `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
 ## Work log
@@ -134,6 +134,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
+- 2026-08-08: T8 done, all eight tasks complete, status to review. `devtools::check(args = "--no-manual")` is Status OK -- 0 errors, 0 warnings, 0 notes, 14 minutes -- and `document()` is clean with no diff in `man/`, `NAMESPACE` or the RcppExports pair. Re-running the audit leaves the ledger and coverage CSVs byte-identical apart from their commit stamps (194 ledger rows, 15 coverage rows, 0 gaps), so no shipped value or audit verdict moves on this branch.
 - 2026-08-08: T6 done. All six `stop()` calls in `parse_source_note()` now have a case asserting their own message, and a count test binds the registry to the function body so a seventh abort fails the suite unregistered. Each was no-oped in turn and the surviving behaviour measured rather than assumed, which corrected three of the six labels I first wrote: the nesting guard relocates into the duplicate-tag guard (both untagged blocks carry tag "") rather than into a subscript error; the malformed-row guard returns the row with anchor NA rather than a shifted value; and the empty-value guard returns the row rather than relocating. Three are load-bearing (duplicate tags, malformed row, empty value) and three relocate.
 - 2026-08-08: T4, T5, T7 done. `audit_norms()` now sweeps the shipped roster and reports a `shipped-sample-not-audited` gap for any (instrument, sample) the batch omits; the enumeration is the package's own, an unexported `instrument_names()` in `R/instrument_oop.R` that `instruments()` and `tests/testthat/helper-norms.R` now also call instead of each writing it out. Measured on the same probe that opened the milestone: dropping `isc` moves from gaps 0 with no row naming it to gaps 1 naming `isc` sample 1. Across all 24 batch rows, abort-or-gap went from 6/8 with 10 silent to 6/18 with 0 silent. `instruments()` output is byte-identical to the pre-extraction body, and `document()` is clean with no generated-file diff.
 - 2026-08-08: T1-T3 done. One fence-aware, `-->`-anchored marker scanner now serves both `parse_source_note()` and `source_note_block_tags()`, which ran independent greps; a malformed marker aborts instead of yielding a tag (`audit-values-beginning` gave `"ning"`); an untagged block read by two instruments is refused. Each guard mutation-checked: removing the refusal, the fence-awareness, and the tag validation reddens 1, 3 and 2 of the new tests respectively and nothing else. The real audit is byte-identical -- 194 ledger rows, 15 coverage rows, 0 gaps -- and only browne1982.md carries a fence, with no markers, so nothing committed changes behaviour.
