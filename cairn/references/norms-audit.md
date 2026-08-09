@@ -82,6 +82,53 @@ the mapping the audit script joins on.
 two instrument-tagged audit-values blocks and `AUDIT_BATCH` selects between
 them by instrument (M75).
 
+## Reference kind
+
+The kind assigned to each shipped sample in `Norms[[2]]$Kind`, and the basis for
+it. This table is the record `data-raw/derive-norms-kind.R` re-derives the
+shipped column from; the builders carry the same assignment beside each value,
+and the script reports any disagreement between the two. The classification is a
+package-authored inference over the audit above, not a value any source prints —
+the same standing `Population` already has.
+
+The three kinds. **standardization** — the sample was drawn to represent a
+defined population, so its moments are estimates of that population's.
+**published** — the sample's octant statistics appear in an identified published
+source, a study report and an author's norms page alike; the moments describe
+that group of people and no wider frame. **unsourced** — the sample's octant
+statistics appear in no identified source, whatever is known about the sample
+itself; ipipipc sample 1 is the case that forces the wording, its study being
+identified (markey2009 Study 2, n = 274) while its M and SD are not.
+
+Assignment covers all 24 shipped samples with no residue — observed 2026-08-08.
+
+| instrument | sample | kind | basis |
+|---|---|---|---|
+| cais | 1 | published | sodano2006 Table 2 (child sample) |
+| cais | 2 | published | sodano2006 Table 4 (adult sample); off-metric and refused at `norm_standardize()` under D-040, which does not change what kind of reference it is |
+| csie | 1 | published | locke2007 — the author's website norms table |
+| csig | 1 | published | locke2014 Figure 2 (p. 436) |
+| csip | 1 | published | boudreaux2018 Table 1 |
+| csiv | 1 | published | locke2000 — the author's website norms table |
+| iei | 1 | published | horner2024 Table 1 (Study 1) and the author's IEI norms page |
+| iei | 2 | published | horner2024 Table 1 (Study 2) |
+| igicr | 1 | published | trucco2013 Table 3 (Combined column) |
+| igicr | 2 | published | trucco2013 Table 3 (Males column) |
+| igicr | 3 | published | trucco2013 Table 3 (Females column) |
+| iip32 | 1 | standardization | horowitz2003 p. 25, "a national standardization sample of 800 cases"; values Table F.5, p. 91 (Overall column) |
+| iip32 | 2 | standardization | the 400 female members of that same sample (horowitz2003 Table 4.1 note, p. 26); values Table F.5, p. 91 (Females column) |
+| iip32 | 3 | standardization | the 400 male members of that same sample (horowitz2003 Table 4.1 note, p. 26); values Table F.5, p. 91 (Males column) |
+| iip64 | 1 | standardization | horowitz2003 p. 25, same national standardization sample; values Table 4.4, pp. 27–29 (Overall column) |
+| iip64 | 2 | standardization | the 400 female members of that sample; values Table 4.4, pp. 27–29 (Female column) |
+| iip64 | 3 | standardization | the 400 male members of that sample; values Table 4.4, pp. 27–29 (Male column) |
+| iipsc | 1 | published | hopwood2008 Table 1 (octant sums; the package divides by 4) |
+| iipsc | 2 | published | soldz1995 Table 4 (Generic Outpatient column) |
+| iis32 | 1 | unsourced | hatcher2012 publishes no octant statistics and no other venue has been identified; ships an "unconfirmed" norms credit (M73) |
+| iis64 | 1 | published | hatcher2009 Table 1 |
+| ipipipc | 1 | unsourced | markey2009 publishes octant statistics only for a sample other than the shipped n = 274; the study is identified, the statistics are not (M73) |
+| isc | 1 | published | hopwood2011 Figure 2 |
+| iitc | 1 | published | bliton2019 Table 1 |
+
 ## Shelf manifest
 
 Filenames under `cairn/references/sources/` (gitignored). Scan verdict from the

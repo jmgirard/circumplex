@@ -189,10 +189,11 @@ norm_sample_usable <- function(instrument, sample) {
 #'   below records the same facts either way.
 #' @return A data frame that contains the norm-standardized versions of
 #'   `scales`. It carries a `"norm_sample"` attribute -- a list with elements
-#'   `Instrument`, `Sample`, `Size` and `Population` -- recording which
-#'   normative sample produced the scores, so a script that never sees the
-#'   console can still report what its z-scores are relative to. Retrieve it
-#'   with `attr(x, "norm_sample")`.
+#'   `Instrument`, `Sample`, `Size`, `Population` and `Kind` -- recording which
+#'   normative sample produced the scores and what kind of reference
+#'   distribution it is (see [norms()] for the three kinds), so a script that
+#'   never sees the console can still report what its z-scores are relative to.
+#'   Retrieve it with `attr(x, "norm_sample")`.
 #' @export
 #' @family tidying functions
 #' @examples
@@ -319,7 +320,8 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
     Instrument = instrument$Details$Abbrev,
     Sample = sample,
     Size = info$Size[[1]],
-    Population = info$Population[[1]]
+    Population = info$Population[[1]],
+    Kind = info$Kind[[1]]
   )
 
   if (!quiet) {
@@ -336,9 +338,15 @@ norm_standardize <- function(data, scales, angles = octants(), instrument,
       function(other) norm_sample_usable(instrument, other),
       logical(1)
     ))
+    # The kind travels with the description rather than replacing it: the
+    # description says who these people were, the kind says what their
+    # statistics are good for. `?norms` defines the three; the message names
+    # one, because the words that would explain the difference here are the
+    # ones this message may not use.
     msg <- paste0(
       "Standardized against ", disclosure$Instrument, " normative sample ",
-      sample, ": N = ", disclosure$Size, ", ", disclosure$Population, "."
+      sample, ": N = ", disclosure$Size, ", ", disclosure$Population,
+      ". Reference kind: ", norm_kind_phrase(disclosure$Kind), "."
     )
     if (n_other > 0) {
       msg <- paste0(

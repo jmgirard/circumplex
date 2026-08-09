@@ -36,7 +36,13 @@ csiv_norms_src <- data.frame(
   Size = 1200,
   Population = "American college students",
   Reference = "Locke (n.d.); instrument published as Locke (2000)",
-  URL = "https://kennethlocke.org/CSIV/CSIV_Norms.html"
+  URL = "https://kennethlocke.org/CSIV/CSIV_Norms.html",
+  # Kind: `published` -- the octant statistics are printed on the author's CSIV
+  # norms page rather than in the cited article, which publishes none.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = "published"
 )
 
 csiv_anchors <- data.frame(

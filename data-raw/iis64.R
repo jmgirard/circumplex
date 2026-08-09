@@ -36,7 +36,12 @@ iis64_norms_src <- data.frame(
   Size = 684,
   Population = "American college students",
   Reference = "Hatcher & Rogers (2009)",
-  URL = "https://doi.org/10.1037/a0017269"
+  URL = "https://doi.org/10.1037/a0017269",
+  # Kind: `published` -- hatcher2009 Table 1.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = "published"
 )
 
 iis64_anchors <- data.frame(

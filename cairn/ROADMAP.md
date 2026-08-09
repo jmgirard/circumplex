@@ -9,7 +9,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M78 | Per-sample reference-kind field in the shipped norms | planned | — | high | milestones/M78-norms-reference-kind-field.md |
+| M78 | Per-sample reference-kind field in the shipped norms | review | — | high | milestones/M78-norms-reference-kind-field.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M73 | Norms provenance audit, batch 2 (single-sample instruments) | done | — | high | milestones/archive/M73-norms-provenance-audit-batch2.md |
 | M74 | Norms provenance audit, batch 3 (multi-sample instruments) | done | M73 | high | milestones/archive/M74-norms-provenance-audit-batch3.md |

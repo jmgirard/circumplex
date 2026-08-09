@@ -54,7 +54,13 @@ iipsc_norms_src <- data.frame(
   URL = c(
     "https://doi.org/10.1080/00223890802388665",
     "https://doi.org/10.1177/1073191195002001006"
-  )
+  ),
+  # Kind: `published` both -- hopwood2008 Table 1 (sample 1) and soldz1995
+  # Table 4 (sample 2).
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = c("published", "published")
 )
 
 iipsc_anchors <- data.frame(

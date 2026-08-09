@@ -219,3 +219,19 @@ is_num <- function(x, n = NULL) {
 is_null_or_num <- function(x, n = NULL) {
   is.null(x) || is_num(x, n)
 }
+
+# The reader-facing phrase for a stored reference-kind token. One mapping for
+# both surfaces that report a kind -- norms() and norm_standardize()'s
+# disclosure -- so the two cannot drift into describing the same sample
+# differently. An unrecognized token returns NA rather than a plausible-looking
+# phrase: the controlled vocabulary is pinned by the test suite, so reaching
+# this branch means the data went somewhere the vocabulary does not cover, and
+# printing a guess there would hide it.
+norm_kind_phrase <- function(kind) {
+  phrases <- c(
+    standardization = "standardization sample",
+    published = "identified published source",
+    unsourced = "no identified source"
+  )
+  unname(phrases[match(as.character(kind), names(phrases))])
+}

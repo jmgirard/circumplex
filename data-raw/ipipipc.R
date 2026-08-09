@@ -36,7 +36,15 @@ ipip_norms_src <- data.frame(
   Size = 274,
   Population = "American college students",
   Reference = "Norms source unconfirmed; instrument published as Markey & Markey (2009)",
-  URL = "https://doi.org/10.1177/1073191109340382"
+  URL = "https://doi.org/10.1177/1073191109340382",
+  # Kind: `unsourced` -- markey2009 publishes octant statistics only for a sample
+  # other than the shipped n = 274. The study is identified and the statistics
+  # are not, which is the case that makes this field classify the statistics
+  # rather than the sample.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = "unsourced"
 )
 
 ipip_anchors <- data.frame(

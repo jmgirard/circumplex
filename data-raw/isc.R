@@ -36,7 +36,13 @@ isc_norms_src <- data.frame(
   Size = 649,
   Population = "American college students",
   Reference = "Hopwood et al. (2011)",
-  URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x"
+  URL = "https://doi.org/10.1111/j.1467-6494.2011.00696.x",
+  # Kind: `published` -- hopwood2011 prints the octant statistics inside
+  # Figure 2.
+  # The assignment and its basis are recorded in
+  # cairn/references/norms-audit.md's Reference kind table;
+  # data-raw/derive-norms-kind.R diffs this column against that record.
+  Kind = "published"
 )
 
 isc_anchors <- data.frame(
