@@ -80,8 +80,47 @@ REFUSED_MARKERS <- list(
   "a prefix that is neither begin nor end" = "<!-- audit-values-middle -->",
   "an end marker with a tail" = "<!-- audit-values-end: fx -->",
   "junk after an end marker" = "<!-- audit-values-end --> and more -->",
-  "a marker inline in prose" = "See <!-- audit-values-begin --> for the shape."
+  "a marker inline in prose" = "See <!-- audit-values-begin --> for the shape.",
+  # The return-2 four: `substring()` on an exhausted string returns "", so the
+  # procedural recognizer's space before the terminator was silently optional.
+  "no space before the terminator (begin)" = "<!-- audit-values-begin-->",
+  "no space before the terminator (end)" = "<!-- audit-values-end-->",
+  "padding before the terminator" = "<!-- audit-values-begin      -->",
+  "a padded tag" = "<!-- audit-values-begin:   iip32   -->",
+  # Two tolerances the return-1 tests deliberately pinned as accepted, both
+  # outside AC4's "and nothing else" and used by no committed note: a colon
+  # without its following space, and trailing whitespace.
+  "a colon with no space after it" = "<!-- audit-values-begin:iip32 -->",
+  "trailing whitespace" = "<!-- audit-values-begin -->  "
 )
+
+# The accepted set, stated extensionally: the two untagged shapes byte-exact,
+# and the tagged form over instrument-name tags. Everything the recognizer
+# accepts must be here, and everything here must be accepted -- the partition
+# test below asserts both directions over this vector plus every single-line
+# refused shape above, so the accepted set cannot silently grow a member the
+# way the procedural recognizer's did (M79 return 2).
+ACCEPTED_MARKERS <- c(
+  "<!-- audit-values-end -->",
+  "<!-- audit-values-begin -->",
+  "<!-- audit-values-begin: iip64 -->",
+  "<!-- audit-values-begin: a.b-c_9 -->"
+)
+
+test_that("the accepted marker set is exactly AC4's three shapes (M79)", {
+  env <- marker_defs()
+  reads <- function(line) {
+    !inherits(tryCatch(env$source_note_marker(line), error = identity),
+              "error")
+  }
+  # Single lines only: the multi-line REFUSED_MARKERS fixtures carry their
+  # marker on one line; classify each line that carries the prefix.
+  refused <- unlist(REFUSED_MARKERS, use.names = FALSE)
+  refused <- refused[grepl("<!-- audit-values-", refused, fixed = TRUE)]
+  boundary <- c(ACCEPTED_MARKERS, refused)
+  got <- vapply(boundary, reads, logical(1), USE.NAMES = TRUE)
+  expect_identical(names(got)[got], ACCEPTED_MARKERS)
+})
 
 test_that("an ambiguous marker line is refused, not ignored (M79)", {
   env <- marker_defs()
@@ -350,36 +389,88 @@ test_that("every parse_source_note() abort raises its own message (M79)", {
   }
 })
 
-test_that("no parse_source_note() abort is left unregistered (M79)", {
+# Every abort the script can raise, registered by a message fragment and the
+# number of stop() sites raising it. The count test binds this registry to the
+# WHOLE script -- every function it defines -- because a count scoped to one
+# function's body is evaded by an abort landing in a helper, which is exactly
+# where return 1 put source_note_marker()'s (AC5 as amended, return 2). Each
+# fragment has a message-asserting test: the parse_source_note() six in
+# PARSE_ABORTS above, the marker abort throughout this file, and the remaining
+# four in the non-parser abort test below.
+SCRIPT_ABORTS <- c(
+  "malformed audit-values marker: " = 1L,
+  "source note not found: " = 2L,
+  "has no well-formed audit-values block(s)" = 1L,
+  "tags two audit-values blocks alike: " = 1L,
+  "has no audit-values block for " = 1L,
+  "malformed audit row(s); first: " = 1L,
+  "audit row(s) with an empty value; first: " = 1L,
+  "AUDIT_BATCH names the same (instrument, sample) twice: " = 1L,
+  "AUDIT_BATCH must mark exactly one `scales` entry per instrument; " = 1L,
+  "has no single norms record for sample " = 1L,
+  "carries an untagged audit-values block " = 1L
+)
+
+# OCCURRENCES, not lines containing one: a predecessor counted deparsed lines
+# matching the substring, so two stop() calls deparsed onto one line counted
+# as one and a new abort could land registered-looking (M79 review, F15).
+count_fixed <- function(x, pattern) {
+  at <- gregexpr(pattern, x, fixed = TRUE)[[1]]
+  if (at[[1]] == -1L) 0L else length(at)
+}
+
+test_that("no abort anywhere in the audit script is left unregistered (M79)", {
   env <- marker_defs()
-  # The domain is enumerated, not recalled: count the stop() calls in the
-  # function's own body and require one registered case each. A seventh abort
-  # added without a case fails here rather than shipping untested.
-  #
-  # OCCURRENCES, not lines containing one: the predecessor counted deparsed
-  # lines matching the substring, so two stop() calls deparsed onto one line
-  # counted as one and a seventh abort could land registered-looking (M79
-  # review, F15).
-  body_src <- paste(deparse(body(env$parse_source_note)), collapse = "\n")
-  at <- gregexpr("stop(", body_src, fixed = TRUE)[[1]]
-  n_stops <- if (at[[1]] == -1L) 0L else length(at)
-  expect_identical(n_stops, length(PARSE_ABORTS))
+  fns <- Filter(is.function, mget(ls(env), envir = env))
+  src <- paste(
+    vapply(fns, function(f) paste(deparse(body(f)), collapse = "\n"),
+           character(1)),
+    collapse = "\n"
+  )
+  # "stop(" does not match "stopifnot(": the character after "stop" there is
+  # "i", not "(".
+  expect_identical(count_fixed(src, "stop("), sum(SCRIPT_ABORTS))
+  for (frag in names(SCRIPT_ABORTS)) {
+    expect_identical(count_fixed(src, frag), SCRIPT_ABORTS[[frag]],
+                     info = frag)
+  }
 })
 
-test_that("source_note_tags() reads the two well-formed marker shapes (M79)", {
+test_that("the script's non-parser aborts each raise their own message (M79)", {
+  env <- marker_defs()
+  # source_note_block_tags() on an absent note: the second "source note not
+  # found" site, a different function from the parser's.
+  expect_error(
+    env$source_note_block_tags("absent", tempdir()),
+    "source note not found"
+  )
+  # validate_batch(): a duplicate (instrument, sample) pair...
+  dup <- rbind(shared_batch(), shared_batch()[1, ])
+  expect_error(
+    env$validate_batch(dup),
+    "names the same \\(instrument, sample\\) twice"
+  )
+  # ...and an instrument marking no `scales` row.
+  noscales <- shared_batch()
+  noscales$scales <- FALSE
+  expect_error(
+    env$validate_batch(noscales),
+    "exactly one `scales` entry per instrument"
+  )
+  # shipped_values(): a batch row naming a sample the object does not carry
+  # must abort, not audit nothing.
+  expect_error(
+    env$shipped_values("fx", 2, TRUE, two_scale_object()),
+    "has no single norms record for sample 2"
+  )
+})
+
+test_that("source_note_tags() reads the two well-formed begin shapes (M79)", {
   env <- marker_defs()
   expect_identical(env$source_note_tags("<!-- audit-values-begin -->"), "")
   expect_identical(
     env$source_note_tags("<!-- audit-values-begin: iip64 -->"), "iip64"
   )
-  # A colon with no space after it is a real shape and must not change the tag.
-  expect_identical(
-    env$source_note_tags("<!-- audit-values-begin:iip32 -->"), "iip32"
-  )
-  # Trailing whitespace is invisible in an editor and carries no meaning, so it
-  # is tolerated -- unlike leading whitespace, which is how a note displays a
-  # marker rather than writing one, and which REFUSED_MARKERS pins as an abort.
-  expect_identical(env$source_note_tags("<!-- audit-values-begin -->  "), "")
 })
 
 test_that("a malformed marker aborts instead of inventing a tag (M79)", {

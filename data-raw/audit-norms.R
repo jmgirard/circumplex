@@ -121,7 +121,9 @@ CONSTRUCTED_CREDIT <- "constructed-credit"
 # --- source side -------------------------------------------------------------
 
 MARKER_PREFIX <- "<!-- audit-values-"
-MARKER_CLOSE <- "-->"
+MARKER_END <- "<!-- audit-values-end -->"
+MARKER_BEGIN <- "<!-- audit-values-begin -->"
+MARKER_TAGGED <- "^<!-- audit-values-begin: ([A-Za-z0-9._-]+) -->$"
 
 # Read one marker line, or refuse it.
 #
@@ -137,8 +139,14 @@ MARKER_CLOSE <- "-->"
 # silence. Refusing is the doctrine this file already follows elsewhere: a
 # marker one character wrong is a block someone meant to write, not prose.
 #
-# Accepted, and nothing else, at column zero: `<!-- audit-values-end -->`,
-# `<!-- audit-values-begin -->`, and `<!-- audit-values-begin: <tag> -->`.
+# The accepted set IS the three definitions above: the two literals, compared
+# byte-for-byte, and the tagged form, matched whole-line. Nothing is trimmed
+# and no substring arithmetic runs, because the set an accepted-shape
+# procedure admits is emergent -- the M79 return-2 review found four shapes
+# admitted by `substring()` returning "" on an exhausted string, which made
+# the space before the terminator optional. A definitional recognizer has no
+# next member to find: what the constants say is what is accepted, trailing
+# whitespace and a colon without its following space included in the refusals.
 # Every other line CONTAINING the prefix aborts, so an indented, inline, or
 # misspelled marker stops the audit rather than joining a block or hiding one.
 # Prose may still discuss audit-values blocks; what it may not do is write the
@@ -150,38 +158,11 @@ MARKER_CLOSE <- "-->"
 # property the fence tracker broke. A note may not display a marker at column
 # zero; indent it, and it aborts by name.
 source_note_marker <- function(one) {
-  refuse <- function() {
-    stop("malformed audit-values marker: ", one, call. = FALSE)
-  }
-  # Leading whitespace is NOT trimmed, and that is the whole column-zero rule:
-  # startsWith() below then refuses an indented line by itself. Trailing
-  # whitespace is invisible in an editor and carries no meaning, so it goes.
-  txt <- sub("[[:space:]]+$", "", one)
-  if (!startsWith(txt, MARKER_PREFIX) || !endsWith(txt, MARKER_CLOSE)) refuse()
-  mid <- substring(txt, nchar(MARKER_PREFIX) + 1L,
-                   nchar(txt) - nchar(MARKER_CLOSE))
-  # Only the TRAILING `-->` was stripped, so anything before it stays in `mid`
-  # and reaches the shape checks below:
-  # `<!-- audit-values-begin: iip64 --> and more -->` reaches the tag check
-  # with the tag "iip64 --> and more", and an end marker with a tail reaches
-  # the emptiness check with "--> and more". Neither survives.
-  if (startsWith(mid, "end")) {
-    if (nzchar(trimws(substring(mid, nchar("end") + 1L)))) refuse()
-    return(list(kind = "end", tag = ""))
-  }
-  if (!startsWith(mid, "begin")) refuse()
-  rest <- trimws(substring(mid, nchar("begin") + 1L))
-  if (!nzchar(rest)) return(list(kind = "begin", tag = ""))
-  # `<!-- audit-values-beginning -->` reaches here with rest = "ning". The lax
-  # predecessor returned that as the tag, silently renaming the block so the
-  # instrument whose block it was could no longer be found.
-  if (!startsWith(rest, ":")) refuse()
-  tag <- trimws(substring(rest, 2L))
-  # A colon promising a tag and delivering none is not the untagged shape, and
-  # a tag is an instrument name, not free text: `...begin:: fx -->` would
-  # otherwise tag a block ": fx" and match no instrument in any batch.
-  if (!grepl("^[A-Za-z0-9._-]+$", tag)) refuse()
-  list(kind = "begin", tag = tag)
+  if (identical(one, MARKER_END)) return(list(kind = "end", tag = ""))
+  if (identical(one, MARKER_BEGIN)) return(list(kind = "begin", tag = ""))
+  hit <- regmatches(one, regexec(MARKER_TAGGED, one))[[1L]]
+  if (length(hit) == 2L) return(list(kind = "begin", tag = hit[[2L]]))
+  stop("malformed audit-values marker: ", one, call. = FALSE)
 }
 
 # The tag carried by each begin marker; "" for an untagged block. A named
