@@ -55,12 +55,17 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       AC1 fixes; 6 rows (each multi-sample instrument's `scales = TRUE` row)
       abort in `validate_batch()` both before and after AC1; the remaining 8
       already report a gap.
-- [ ] AC3 Two instruments whose `AUDIT_BATCH` rows name the same *untagged*
-      source note get distinct `claimed` keys. Two tests over a fixture note:
-      one audits a single instrument and asserts the other's unaudited sample
-      is reported; one audits both and asserts zero non-exempt coverage rows,
-      so a per-instrument key cannot report one instrument's audited sample as
-      the other's gap.
+- [ ] AC3 A source note whose block is untagged is refused when more than one
+      instrument's `AUDIT_BATCH` row reads it, the abort naming both
+      instruments and the citekey. Two instruments' rows key alike on
+      (field, sample, scale) — same octant names, same sample numbers — so one
+      untagged block cannot audit both, and refusing makes the `claimed`-key
+      collision the M75 review found unreachable rather than repairing it
+      downstream. Three tests: the refused batch asserts the message; a note
+      read by one instrument still parses; a tagged note read by two still
+      parses. Measured 2026-08-08: `horowitz2003` is the only note two
+      instruments read and it is already tagged, so nothing in the repo is
+      refused by this.
 - [ ] AC4 A begin or end marker is recognised only on a line whose trimmed
       text starts with that marker's prefix and ends with `-->`, and not when
       the line lies inside a fenced code block; and a tag is accepted only
@@ -98,18 +103,16 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 
 ## Tasks
 
-- [ ] T1 Extract one marker-scanning helper from the two independent greps at
+- [x] T1 Extract one marker-scanning helper from the two independent greps at
       `data-raw/audit-norms.R:160` and `:171-172`: anchored begin/end
       recognition, `-->` terminator, fence-awareness, strict `: <tag>` form
       with an abort on anything else.
-- [ ] T2 Fixture note carrying a fenced begin marker, a fenced end marker and
+- [x] T2 Fixture note carrying a fenced begin marker, a fenced end marker and
       `audit-values-beginning`; tests asserting none parses as a block or tag,
       through both `parse_source_note()` and `source_note_block_tags()`.
-- [ ] T3 Key `claimed`/`blocks` (`:365-370`) per instrument as well as per
-      block, and make the sample-level sweep at `:440-455` subtract every
-      key's claims on the same block rather than only its own — otherwise the
-      new key reports each instrument's audited sample as the other's gap.
-      Both tests from AC3.
+- [x] T3 Refuse an untagged block read by more than one instrument, before any
+      pass parses it; the `claimed`/`blocks` key at `:365-370` is then
+      collision-free by construction. Three tests from AC3.
 - [ ] T4 Add the `roster` parameter and the `shipped-sample-not-audited`
       emitter to `audit_norms()`; move the `data()`-plus-class sweep to one
       definition shared with `tests/testthat/helper-norms.R:8`.
@@ -131,6 +134,9 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
+- 2026-08-08: T1-T3 done. One fence-aware, `-->`-anchored marker scanner now serves both `parse_source_note()` and `source_note_block_tags()`, which ran independent greps; a malformed marker aborts instead of yielding a tag (`audit-values-beginning` gave `"ning"`); an untagged block read by two instruments is refused. Each guard mutation-checked: removing the refusal, the fence-awareness, and the tag validation reddens 1, 3 and 2 of the new tests respectively and nothing else. The real audit is byte-identical -- 194 ledger rows, 15 coverage rows, 0 gaps -- and only browne1982.md carries a fence, with no markers, so nothing committed changes behaviour.
+- 2026-08-08: AC3 and T3 amended at the implementation gate — refuse an untagged block read by two instruments rather than repair the `claimed` key downstream. The planned mechanism left the bad state reachable: both instruments' rows key alike on (field, sample, scale), so each is audited against the other's values while the coverage counts read tidy, and the code comment at `data-raw/audit-norms.R:141-143` already refuses the neighbouring ambiguous case. Measured: `horowitz2003` is the only note two instruments read and it is tagged, so nothing in the repo is refused.
+- 2026-08-08: implementation gate chose refusing the untagged shared block over the planned per-instrument `claimed` key, and over doing both; falsified by a legitimate case appearing where two instruments must share one untagged note, which would need the tag mechanism extended rather than the refusal relaxed.
 - 2026-08-08: plan gate declined the `parse_source_note(instrument = NULL)` finding (M75 review, scored 55) as intended behaviour per the design note at `data-raw/audit-norms.R:138-143` and unreachable through `audit_norms()`; falsified by a caller outside `audit_norms()` coming to rely on the parser.
 
 ## Decisions

@@ -141,10 +141,55 @@ CONSTRUCTED_CREDIT <- "constructed-credit"
 # refused is the ambiguous middle: asking a multi-block note for an instrument
 # none of its blocks names aborts rather than falling back to the first block,
 # which would audit one instrument against another's values and could not fail.
+MARKER_BEGIN <- "<!-- audit-values-begin"
+MARKER_END <- "<!-- audit-values-end -->"
+
 # The tag carried by each begin marker; "" for an untagged block.
+#
+# A marker line is accepted only in the two shapes the notes actually use --
+# `<!-- audit-values-begin -->` and `<!-- audit-values-begin: <tag> -->` -- and
+# anything else ABORTS. The lax predecessor stripped the prefix and a trailing
+# `-->` and returned whatever was left, so `<!-- audit-values-beginning -->`
+# yielded the tag "ning": a typo in a marker silently renamed the block, and
+# the instrument whose block it really was could no longer be found. Refusing
+# is right rather than ignoring the line, because a marker one character wrong
+# is a block someone meant to write, not prose.
 source_note_tags <- function(begin_lines) {
-  trimws(sub("-->$", "",
-             sub("^<!-- audit-values-begin:?", "", trimws(begin_lines))))
+  vapply(trimws(begin_lines), function(one) {
+    mid <- substring(one, nchar(MARKER_BEGIN) + 1L)
+    if (!endsWith(mid, "-->")) {
+      stop("malformed audit-values marker: ", one, call. = FALSE)
+    }
+    mid <- trimws(substring(mid, 1L, nchar(mid) - 3L))
+    if (!nzchar(mid)) return("")
+    if (!startsWith(mid, ":")) {
+      stop("malformed audit-values marker: ", one, call. = FALSE)
+    }
+    trimws(substring(mid, 2L))
+  }, character(1), USE.NAMES = FALSE)
+}
+
+# Which lines lie inside a fenced code block, the fence lines themselves
+# included. A note that documents its own format shows a marker inside a
+# fence; without this the example is parsed as a real block, and because such
+# an example carries a matching end marker the begin/end counts balance and
+# nothing aborts -- the fake rows simply join the note.
+fenced_lines <- function(lines) {
+  fence <- grepl("^\\s*(```|~~~)", lines)
+  (cumsum(fence) %% 2L == 1L) | fence
+}
+
+# Locate a note's block markers: begin lines, end lines, and each begin's tag.
+# The single scanner both readers below share, so a shape refused for one is
+# refused for the other -- they previously ran independent greps and drifted.
+# A marker is recognised only on a line that is nothing BUT the marker, which
+# is what anchoring on the trailing `-->` buys.
+source_note_markers <- function(lines) {
+  live <- !fenced_lines(lines)
+  txt <- trimws(lines)
+  b <- which(live & startsWith(txt, MARKER_BEGIN))
+  list(begin = b, end = which(live & txt == MARKER_END),
+       tags = source_note_tags(txt[b]))
 }
 
 # Every block tag a note carries, in file order. Read by the unclaimed-block
@@ -156,8 +201,7 @@ source_note_block_tags <- function(citekey,
   if (!file.exists(path)) {
     stop("source note not found: ", path, call. = FALSE)
   }
-  lines <- readLines(path, warn = FALSE)
-  source_note_tags(lines[grep("^\\s*<!-- audit-values-begin", lines)])
+  source_note_markers(readLines(path, warn = FALSE))$tags
 }
 
 parse_source_note <- function(citekey,
@@ -168,8 +212,9 @@ parse_source_note <- function(citekey,
     stop("source note not found: ", path, call. = FALSE)
   }
   lines <- readLines(path, warn = FALSE)
-  b <- grep("^\\s*<!-- audit-values-begin", lines)
-  e <- grep("<!-- audit-values-end -->", lines, fixed = TRUE)
+  marks <- source_note_markers(lines)
+  b <- marks$begin
+  e <- marks$end
   # Blocks must nest as begin/end/begin/end: interleaved or unclosed markers
   # would silently hand back a row range spanning someone else's block.
   ok <- length(b) && length(e) == length(b) && all(e > b) &&
@@ -178,7 +223,7 @@ parse_source_note <- function(citekey,
     stop("source note ", citekey, " has no well-formed audit-values block(s)",
          call. = FALSE)
   }
-  tags <- source_note_tags(lines[b])
+  tags <- marks$tags
   if (anyDuplicated(tags)) {
     stop("source note ", citekey, " tags two audit-values blocks alike: ",
          paste(tags[duplicated(tags)], collapse = ", "), call. = FALSE)
@@ -336,10 +381,40 @@ values_agree <- function(field, shipped, source, divisor) {
   identical(trimws(shipped), trimws(source))
 }
 
+# One source can be the published source for more than one instrument, and the
+# blocks then have to be tagged: an UNTAGGED block is handed whole to whoever
+# asks, so two instruments reading one would each be audited against rows that
+# may be the other's. Their rows are indistinguishable inside the block --
+# both key on (field, sample, scale), over the same octant names and the same
+# sample numbers -- so there is no join that separates them and no comparison
+# that could fail. That is the same "audit one instrument against another's
+# values and could not fail" case parse_source_note() already refuses when a
+# multi-block note is asked for an instrument none of its blocks names; this
+# closes it one shape over, where the block carries no tag at all.
+#
+# Refused up front rather than repaired downstream: the alternative was to key
+# each pass's claims per instrument, which leaves the mis-comparison in place
+# and only makes the coverage counts tidy about it.
+refuse_shared_untagged_blocks <- function(batch, dir) {
+  for (citekey in unique(batch$citekey)) {
+    insts <- unique(batch$instrument[batch$citekey == citekey])
+    if (length(insts) < 2L) next
+    tags <- source_note_block_tags(citekey, dir)
+    if (any(!nzchar(tags))) {
+      stop("source note ", citekey, " carries an untagged audit-values block ",
+           "but is read by ", length(insts), " instruments (",
+           paste(sort(insts), collapse = ", "),
+           "); tag each block with the instrument it backs", call. = FALSE)
+    }
+  }
+  invisible(TRUE)
+}
+
 audit_norms <- function(batch = AUDIT_BATCH,
                         dir = file.path("cairn", "references"),
                         objects = NULL) {
   validate_batch(batch)
+  refuse_shared_untagged_blocks(batch, dir)
   ledger <- list()
   coverage <- list()
   # Which of each note BLOCK's sample labels some batch entry actually claimed.
