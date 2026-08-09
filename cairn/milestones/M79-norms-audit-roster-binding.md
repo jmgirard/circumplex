@@ -80,12 +80,14 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       which share one helper. A fixture note exercises each refused shape and
       each accepted one, plus the unclosed fence that formerly hid every
       later block.
-- [ ] AC5 Every abort path in `parse_source_note()` has a test asserting its
-      specific message, and a test asserts the count of `stop(` occurrences in
-      that function's body equals the number of enumerated abort tests, so a
-      new `stop()` fails the suite. Where no-oping a `stop()` only relocates
-      the error, the test records the mutant's surviving behavior instead of
-      claiming the guard is load-bearing.
+- [ ] AC5 Every abort path in `data-raw/audit-norms.R` has a test asserting
+      its specific message, and a test asserts the count of `stop(` occurrences
+      across the bodies of every function the script defines equals the
+      registry of enumerated abort cases — file-scoped because a count over one
+      function's body is evaded by an abort landing in a helper, which this
+      branch did. Where no-oping a `stop()` only relocates the error, the test
+      records the mutant's surviving behavior instead of claiming the guard is
+      load-bearing.
 - [x] AC6 A test asserts the shipped (instrument, sample) pair set produced by
       AC1's roster sweep equals the `(instrument, sample)` pair set of
       `AUDIT_BATCH`, so shipping a new instrument fails by name rather than as
@@ -101,8 +103,8 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - AC1 → T4
 - AC2 → T5
 - AC3 → T3
-- AC4 → T1, T2, T10
-- AC5 → T6, T11
+- AC4 → T1, T2, T10, T14, T15
+- AC5 → T6, T11, T16
 - AC6 → T7
 - AC7 → T8
 
@@ -146,6 +148,25 @@ Return 1 (2026-08-08), from the review findings below:
 - [x] T13 Re-run the audit and the full `check()`; confirm the two CSVs still
       move only in their stamps.
 
+Return 2 (2026-08-08), from the review findings below:
+
+- [ ] T14 Make the marker recognizer definitional: the accepted set IS two
+      string constants and one anchored full-line regex, compared byte-exact
+      with no trimming, so "and nothing else" is readable off the code. The
+      four `substring()`-admitted shapes, the colon-no-space tolerance and
+      the trailing-whitespace tolerance all become aborts.
+- [ ] T15 The set-equality boundary test: one enumerated vector of accepted
+      lines and near-misses, asserted as a partition through
+      `source_note_marker()` — never sampled examples.
+- [ ] T16 AC5 as amended: the abort registry and its `stop(`-count go
+      file-scoped across every function the script defines; message tests
+      added for the aborts that had none (`validate_batch()`'s two, the
+      shipped-values single-record abort, and `source_note_block_tags()`'s
+      not-found).
+- [ ] T17 Log the exhaustive-claim lesson (LESSONS at its cap — extend the
+      derive-from-the-requirement family line rather than add); re-run the
+      audit (CSVs stamp-only) and the full check.
+
 ## Work log
 
 - 2026-08-08: created by /milestone-plan.
@@ -155,6 +176,8 @@ Return 1 (2026-08-08), from the review findings below:
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
+- 2026-08-08: return 2 opened; T14-T17 added for the two actioned findings. The gate chose the definitional recognizer (two string literals plus one anchored full-line regex, byte-exact, no trimming) over escalating via /milestone-brief: both failures share one mechanism — a procedural parser makes the accepted set emergent, so each review buys its next member — and making the set definitional removes the mechanism rather than patching its latest instance. Jeff declined the brief in chat. The colon-no-space and trailing-whitespace tolerances the return-1 tests pinned also fall under AC4's "and nothing else"; measured this session: every committed marker line already matches the three exact shapes, so nothing shipped is refused. Falsified by AC4 failing again with the recognizer definitional.
+- 2026-08-08: amendment return: AC5 — "Every abort path in `data-raw/audit-norms.R` has a test asserting its specific message, and a test asserts the count of `stop(` occurrences across the bodies of every function the script defines equals the registry of enumerated abort cases — file-scoped because a count over one function's body is evaded by an abort landing in a helper, which this branch did. Where no-oping a `stop()` only relocates the error, the test records the mutant's surviving behavior instead of claiming the guard is load-bearing."
 - 2026-08-08: review returned M79 to in-progress (return 2). AC4 fails inside its own domain again, by a new mechanism: the criterion says "Accepted, and nothing else" for three exact shapes, and four more are accepted because `substring()` on an exhausted string returns "" and the space before the terminator is therefore optional -- `<!-- audit-values-begin-->`, `<!-- audit-values-end-->`, and the padded variants. AC5 routes to a gated amendment instead: its count guard is scoped to `parse_source_note()`'s body, and this diff put a reachable abort in `source_note_marker()`, so the criterion's literal wording holds while its stated purpose does not. AC1, AC2, AC3, AC6, AC7 verified and ticked with fresh evidence. Blame-history and prior-review lenses reported no findings. Thrash trigger (b) fires -- AC4 twice, same shape -- so escalation is offered alongside the fix. Full findings and the 14 below-threshold ones in the Review section.
 - 2026-08-08: T13 done, return 1 complete. `devtools::check(args = "--no-manual")` is Status OK -- 0 errors, 0 warnings, 0 notes, 15m44s -- `document()` is clean with no diff and 0 `resolve link` warnings, `pkgdown::check_pkgdown()` finds no problems, and `cairn_validate` exits 0 with all checks PASS (48 `work-log format` advisories, all pre-existing M7 history). Re-running the audit leaves the ledger and coverage CSVs identical apart from the ledger's commit stamps: 194 ledger rows, 15 coverage rows, 0 gaps, unchanged from the pre-return run, so removing the fence tracker moves no audit verdict.
 - 2026-08-08: T9-T12 done. `fenced_lines()` is gone: the audit no longer parses markdown, and a line carrying `<!-- audit-values-` is either an exact column-zero marker or an abort naming it. That closes F1, F2, F3, F4 and F6 by removing what they were defects in, and F5 by construction -- the unclosed-fence regression test now sees both blocks where the fence tracker reported one. The duplicate `MARKER_BEGIN`/`MARKER_END` pair is deleted and `parse_source_note()`'s doc comment sits with its function again (F14). Each new guard was no-oped: two of the three I first wrote were dead (the leading-whitespace refusal is subsumed by not trimming, and the interior `-->` check by the tag pattern) and were removed rather than shipped; of the five that remain, four redden and the begin/end check relocates into the colon check, recorded in its fixture comment. The `stop(`-count test counts occurrences, not deparsed lines (F15), and the single-sourcing test now reads the audit script's source instead of comparing one function against itself -- adding a `data(package` sweep to `data-raw/` reddens it, as does renaming `instrument_names()` (F11).
