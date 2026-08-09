@@ -263,6 +263,61 @@ only shipped-code change remains the extraction of two unexported helpers, with
 `instruments()` byte-identical, so there is no user-visible behaviour an entry
 could assert.
 
+### Return 4 — review findings (2026-08-09, PR #107)
+
+Three fresh-context lenses (diff-bug [O], blame-history [S], prior-review [S]),
+then a [S] scorer that generated none of them. 23 candidates, **none scored
+>= 80, so nothing is actioned and nothing returns the milestone.**
+
+The blame-history lens reported **no findings**, having independently confirmed
+that `instruments()` is behaviour-preserved by the extraction, that the deleted
+`sub()`-based recognizer was itself the return-2 defect rather than a prior fix,
+and that no D-entry is contradicted. The prior-review lens reported **no
+findings** and established that `git diff fd5acd0e..HEAD -- data-raw/ R/ tests/`
+is empty: no code line has changed since return 3 read it. Its GitHub probe
+returned `[]` again.
+
+**Logged below threshold, not actioned (23).** (68) `shipped_roster()` drops a
+norms row whose `Sample` is `NA`, `sort()` dropping it — unreachable today, no
+shipped sample being `NA`. (55) `shipped_roster(objects)` still derives the
+roster from `objects`, so a call written `roster = shipped_roster(objects)`
+against real instruments would reproduce the return-2 defect; all six users of
+it are synthetic fixtures. (45) a caller-supplied `roster` is unvalidated, so an
+empty or misspelt-column roster audits clean — AC1 sanctions an explicit roster
+and `batch` is unvalidated on the same footing. (45) `shipped_roster()` raises a
+raw R error on a norms table with no `Sample` column. (40) the tag pattern
+admits any token, never bound to a real instrument name. (40)
+`is.null(norms) || !nrow(norms)` errors on a non-data-frame `Norms[[1]]`. (40)
+the default roster resolves before `validate_batch()`, masking its clearer
+message. (35) `source_note_tags()` has no production caller and two tests fence
+it. (35) the AC2 drop-each-row test counts any error as noticed and asserts no
+partition. (35) `source_note_block_tags()` skips the nesting check
+`parse_source_note()` performs, masked by call order. (35) the
+`data(package` absence assert would redden on a future comment. (30) the
+committed ledger's `script_commit` predates the last script change. (30) the
+swap fixture's roster is built from the non-swapped object. (30, 35) the
+single-sourcing assertion and its companion — **owned by M81 AC4**. (25) AC1's
+roster is crossed with `Norms[[1]]$Sample` only, so a `Norms[[2]]`-only sample
+is unswept; the criterion's own wording sanctions it. (25) the roster/batch join
+key uses a space where the block key uses `\r`. (25) AC5's non-vacuity pins
+hard-code 24 and 15. (25) two stale line anchors in this file's Scope and AC1
+(`audit-norms.R:138-143`, `helper-norms.R:8`). (20) test fixtures leak temp
+dirs, the M73 no-withr precedent. (18) `shipped_roster()` enumerates via
+`data()` and fetches via `get()`. (18) Scope says one extracted helper where two
+were. (15) Coverage maps none of T6, T9, T11-T13, T16, T17 — the
+`coverage complete` check requires every criterion to map to a task, not the
+reverse, and it PASSes. (15) the abort-registry pair — **owned by M81**.
+
+The unvalidated-roster cluster (the 68, 55, 45, 45 and 40 above) is one family —
+`shipped_roster()` and the `roster` argument accepting or silently dropping what
+they should refuse — and is carried forward as a ROADMAP candidate row rather
+than left to die with this file's compression.
+
+**Disposition: no return.** All six criteria verified with fresh evidence and
+ticked; the consistency gate is clean; no finding reached the action threshold
+and none demonstrates a criterion failing inside its named domain. Return count
+stands at 3 defect returns plus one re-plan, all before this pass.
+
 ### Return 3 — acceptance criteria, fresh evidence (2026-08-09)
 
 Measured on the branch at `fd5acd0e`; every figure re-run this pass, none
