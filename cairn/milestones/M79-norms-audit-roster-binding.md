@@ -1,6 +1,6 @@
 # M79: Bind the norms audit's batch to the shipped roster
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -39,7 +39,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 
 ## Acceptance criteria
 
-- [ ] AC1 `audit_norms()` emits a `shipped-sample-not-audited` coverage row
+- [x] AC1 `audit_norms()` emits a `shipped-sample-not-audited` coverage row
       with `exempt = FALSE` for every shipped (instrument, sample) pair no
       `AUDIT_BATCH` row names. The roster is a parameter defaulting to the
       `data()`-plus-`circumplex_instrument`-class sweep crossed with each
@@ -48,14 +48,14 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       `tests/testthat/test-norms-audit-sample-key.R:127` stays green. The
       sweep is single-sourced with `tests/testthat/helper-norms.R:8`, not a
       second copy.
-- [ ] AC2 A test iterates `seq_len(nrow(AUDIT_BATCH))`, drops that row, and
+- [x] AC2 A test iterates `seq_len(nrow(AUDIT_BATCH))`, drops that row, and
       asserts `audit_norms()` either aborts or returns a non-exempt gap count
       above zero. Measured 2026-08-08 at `cef9d36f`: 10 rows (the 9
       single-sample rows and `iipsc` sample 1) return 0 gaps and are the rows
       AC1 fixes; 6 rows (each multi-sample instrument's `scales = TRUE` row)
       abort in `validate_batch()` both before and after AC1; the remaining 8
       already report a gap.
-- [ ] AC3 A source note whose block is untagged is refused when more than one
+- [x] AC3 A source note whose block is untagged is refused when more than one
       instrument's `AUDIT_BATCH` row reads it, the abort naming both
       instruments and the citekey. Two instruments' rows key alike on
       (field, sample, scale) — same octant names, same sample numbers — so one
@@ -81,13 +81,13 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       new `stop()` fails the suite. Where no-oping a `stop()` only relocates
       the error, the test records the mutant's surviving behavior instead of
       claiming the guard is load-bearing.
-- [ ] AC6 A test asserts the shipped (instrument, sample) pair set produced by
+- [x] AC6 A test asserts the shipped (instrument, sample) pair set produced by
       AC1's roster sweep equals the `(instrument, sample)` pair set of
       `AUDIT_BATCH`, so shipping a new instrument fails by name rather than as
       an unattributed gap count. The comment on the existing real-roster
       assertion at `tests/testthat/test-norms-provenance.R:462-478` records
       that it becomes a roster check once AC1 lands.
-- [ ] AC7 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
+- [x] AC7 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
       re-running the audit leaves `data-raw/norms-audit-ledger.csv` and
       `data-raw/norms-audit-coverage.csv` unchanged but for their stamps.
 
@@ -134,6 +134,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
+- 2026-08-08: review returned M79 to in-progress (return 1). AC4 fails inside its own domain: `fenced_lines()` misses indented code blocks (F1, 87), a `~~~` line closes a backtick fence (F3, 80), and an unclosed fence silently hides every later block (F5, 83) -- the last a silent-loss path this diff INTRODUCED, so it fails the Goal and not only the criterion. AC4's tag clause also fails on F6 (90), junk after the tag being accepted. AC5 fails on F15's literal reading (75, logged). AC1, AC2, AC3, AC6, AC7 verified and ticked. F14 (92) is the duplicate constant pair. Full findings and the fence design question in the Review section.
 - 2026-08-08: review in flight (PR #107). AC evidence and the consistency gate are recorded below; criterion checkboxes deliberately NOT yet ticked, pending triage of the three review lenses. Two lenses in, both independently naming one defect: `MARKER_BEGIN`/`MARKER_END` are defined twice, at `data-raw/audit-norms.R:123-124` and `:147-148`. Commit `d9b2ff48`'s message claims it moved them; it added a copy without deleting the original. Inert (identical rebind) but dead duplicate code, and the commit message is a record proven false -- history, so corrected forward here rather than edited.
 - 2026-08-08: T8 done, all eight tasks complete, status to review. `devtools::check(args = "--no-manual")` is Status OK -- 0 errors, 0 warnings, 0 notes, 14 minutes -- and `document()` is clean with no diff in `man/`, `NAMESPACE` or the RcppExports pair. Re-running the audit leaves the ledger and coverage CSVs byte-identical apart from their commit stamps (194 ledger rows, 15 coverage rows, 0 gaps), so no shipped value or audit verdict moves on this branch.
 - 2026-08-08: T6 done. All six `stop()` calls in `parse_source_note()` now have a case asserting their own message, and a count test binds the registry to the function body so a seventh abort fails the suite unregistered. Each was no-oped in turn and the surviving behaviour measured rather than assumed, which corrected three of the six labels I first wrote: the nesting guard relocates into the duplicate-tag guard (both untagged blocks carry tag "") rather than into a subscript error; the malformed-row guard returns the row with anchor NA rather than a shifted value; and the empty-value guard returns the row rather than relocating. Three are load-bearing (duplicate tags, malformed row, empty value) and three relocate.
@@ -158,9 +159,12 @@ not carried from implementation.
   `scale = "1"`. The roster defaults to the `data()`-plus-class sweep crossed
   with `Norms[[1]]$Sample` and takes `objects` when injected, so
   `test-norms-audit-sample-key.R:127` still asserts zero non-exempt rows.
-  Single-sourced: `unique(shipped_roster()$instrument)` is `identical()` to
-  `circumplex:::instrument_names()`, and `helper-norms.R:12,17` are wrappers
-  over `R/instrument_oop.R:261,246`, not copies.
+  Single-sourced by code reading, not by runtime comparison:
+  `helper-norms.R:12,17` call `circumplex:::instrument_names()` /
+  `instrument_object()` directly and `shipped_roster()` reaches the same
+  definition via `asNamespace()`, so no second sweep exists in `data-raw/`.
+  (The runtime comparison first recorded here was circular -- both sides
+  bottom out in one function -- as review finding F11 established.)
 - **AC2** — the drop-each-row test over `seq_len(nrow(AUDIT_BATCH))` passes.
   Re-measured at review: 6 aborts, 18 gap>0, **0 silent** — against the
   criterion's stated pre-fix 6/8/10. The 6 aborts are the multi-sample
@@ -202,3 +206,63 @@ Profile (`r-package` `consistency-gate` slot): `document()` at
 helpers, and `instruments()` output is byte-identical to the pre-extraction
 body — there is no user-visible behaviour to assert, and an entry asserting one
 would have no test that fails without it.
+
+### Review findings (2026-08-08, PR #107)
+
+Three fresh-context lenses (diff-bug [O], blame-history [S], prior-review [S]),
+then a [S] scorer that generated none of them. 19 candidate findings, 5 scored
+>= 80 and actioned, 12 logged below threshold, 2 cleared as not-defects.
+
+**Actioned (>= 80).** All five return the milestone; none is fixed review-side.
+
+- F14 (92) `MARKER_BEGIN`/`MARKER_END` are defined twice, `data-raw/audit-norms.R:123-124`
+  and `:147-148`, both added by this diff. Inert rebind, but dead duplicate code and
+  a drift hazard, and it orphans `parse_source_note()`'s doc comment from its function.
+  Found independently by two lenses. Commit `d9b2ff48`'s message claims the constants
+  were moved; they were copied. That message is history and is corrected forward here.
+- F6 (90) `source_note_tags()` accepts arbitrary text after the tag -- only the last
+  `-->` is stripped. `"<!-- audit-values-begin: iip64 --> and more -->"` yields the tag
+  `"iip64 --> and more"`, and `"...begin:: fx -->"` yields `": fx"`. AC4 requires the
+  strict `: <tag>` form, and the code comment at `:188-189` claims a marker is
+  recognised "only on a line that is nothing BUT the marker".
+- F1 (87) `fenced_lines()` sees only ```` ``` ````/`~~~` fences, never a 4-space indented
+  code block, and `source_note_markers()` trims the line so indentation cannot protect
+  it. An indented example yields a phantom `"example"` tag and a phantom
+  `note-block-not-audited` gap -- failure shapes (a) and (b) from the new test file's
+  own header, reproduced in the sibling markdown syntax.
+- F5 (83) An unclosed fence after a real block silently hides every later block:
+  `source_note_block_tags()` reports only the first, the unclaimed-block sweep reports
+  nothing, and `refuse_shared_untagged_blocks()` cannot see the hidden block. **This is
+  a silent-loss path this diff introduced** -- before it, fences were ignored entirely
+  and no real block could be hidden by one. It fails the milestone's Goal, not only AC4.
+- F3 (80) A `~~~` line closes a ```` ``` ```` fence and vice versa, so a marker still inside
+  the fence is reported unfenced.
+
+**Logged below threshold, not actioned (12).** F11 (78) the single-sourcing test at
+`test-norms-audit-roster.R:108-114` is a tautology -- both sides call one function, and
+rebinding it to return nothing leaves the assertion passing; it also invalidated this
+review's first AC1 evidence line, corrected above. F4 (76) a line beginning with an
+inline code span flips fence parity for the rest of the note. F15 (75) the `stop(`-count
+test counts deparsed lines containing the substring, not occurrences, against AC5's
+literal wording. F2 (72) nested fences double-toggle parity. F8 (68) a partial `objects`
+override silently empties the roster, `shipped_roster()` replacing it wholesale while
+`audit_norms()` treats `objects` as a per-instrument override with fallback. F7 (62) a
+bare `: -->` degrades to untagged. F18 (50) begin aborts on a malformed tail while end
+silently ignores. F9 (45), F10 (45) malformed `objects` shapes raise raw R errors.
+F16 (42) the AC6 test re-implements the production join key. F17 (35) the shared-note
+refusal is batch-relative. F19 (22) `#` comments where the repo uses `@noRd`.
+
+**Cleared:** `instruments()` is byte-identical post-extraction; no deleted line was
+itself a prior fix, and no D-entry is contradicted.
+
+**Disposition: returned to `in-progress`.** AC4 fails inside its own domain on F1-F5
+and AC5 on F15's literal reading; AC1, AC2, AC3, AC6 and AC7 are verified and ticked.
+Return 1 of this milestone.
+
+**For the next implementation pass**, a design question this review will not settle:
+whether to keep parsing markdown fences at all. Getting `fenced_lines()` right means
+handling indented blocks, nested fences, mismatched fence characters and unclosed
+fences -- a markdown parser the audit does not otherwise need. The alternative, more in
+keeping with this file's fail-closed doctrine, is to stop inferring and refuse: abort on
+a note whose marker lines are not unambiguous. That may need an AC4 amendment, which is
+a gated decision, not a review-side one.
