@@ -1,11 +1,11 @@
 # M81: Enumerate the norms-audit abort registry from the script's parse tree
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M79
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m81-norms-audit-abort-registry`
 
 ## Goal
 
@@ -41,16 +41,21 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
       expression of `parse(file = "data-raw/audit-norms.R")` — including the
       trailing run block that `norms_audit_defs_only = TRUE` skips — and
       collects every call whose deparsed head is one of `stop`, `stopifnot`,
-      `base::stop`, `base::stopifnot`. Each collected site keys on its own
-      first literal message fragment, and a `stopifnot()` site, which carries
-      no message argument, keys on its deparsed condition. A test asserts the
+      `base::stop`, `base::stopifnot`. Each collected `stop()` site keys on its
+      **message template** — every literal fragment of the call in order, with
+      each non-literal argument rendered `{}` — and not on its first fragment
+      alone, which is `"source note "` at six distinct sites (measured
+      2026-08-09) and would let a fixture for one of the six satisfy AC2's
+      assertion for another. A `stopifnot()` site, which carries
+      no message argument, contributes one key per condition, each keyed on
+      that condition's deparsed text. A test asserts the
       collected site set equals the registry's, in both directions, by key and
       count. Mutation-verified with the return-3 mutant: an unregistered
       `stop()` planted inside the run block reddens the test, where the
       pre-milestone guard stayed at FAIL 0 / PASS 69 and its own count stayed
       at 12 while the parse walk saw 13.
 - [ ] AC2 Every **site** AC1's walk collects — not every registry entry; the
-      `"source note not found: "` key covers two sites, `:193` and `:224` —
+      `"source note not found: {}"` key covers two sites, `:193` and `:224` —
       carries a fixture that provokes that site, and a test asserts the fixture
       raises an error matching that site's key rather than bare failure. With
       AC1's set equality the message-tested set and the parsed set are
@@ -113,6 +118,9 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
 - 2026-08-09: plan gate chose settling the twice-failed criterion here over a /milestone-brief escalation, offered per M79's thrash trigger (b): the repair is named by the bounded-promise rule (narrow the promise until a stated procedure settles it), not by a judgment the session lacks. Falsified by AC1 or AC2 failing again by a third mechanism of the same shape.
 - 2026-08-09: plan gate chose folding the single-sourcing guard in over leaving it a candidate row; it is the same false-coverage shape and the same repair, and it stands behind a clause M79 is shipping. Falsified by the parse-tree re-anchoring proving unrelated to the registry work at implement time.
 - 2026-08-09: criteria audit ([O], fresh context, authored none of the criteria) returned findings on 4 of the 5 drafted criteria plus M79's amended one; all adopted. The load-bearing ones: AC4 was unsatisfiable as drafted (no `circumplex:::instrument_names` call exists; `:414` is a `get()` call, whose string literal also satisfies today's grep); AC1 left its matching and keying rules to the reader, "the AC5 failure mode in miniature"; AC2 promised one fixture per registry entry where `"source note not found: "` covers two sites; and AC3's mutation clause was defeatable by a fixture missing the five required names. The auditor verified the run-block invisibility (12 sites counted vs 13 parsed on a planted mutant) and the FAIL 0 / PASS 69 baseline.
+
+- 2026-08-09: implement gate amended AC1's keying rule and AC2's example key — sites key on the message template (all literal fragments, `{}` for the rest), not the first fragment alone, which is `"source note "` at six distinct sites and would let one site's fixture satisfy another's AC2 assertion. Measured on the parse walk over `data-raw/audit-norms.R` at `2ab626f6`: 13 abort calls (12 `stop()`, 1 `stopifnot()`) against the shipped text guard's 12.
+- 2026-08-09: implement gate chose a shared `tests/testthat/helper-norms-audit-script.R` for the parse walk over a copy in each of the two test files, matching the suite's five existing helper files.
 
 ## Decisions
 
