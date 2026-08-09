@@ -1,6 +1,6 @@
 # M81: Enumerate the norms-audit abort registry from the script's parse tree
 
-- **Status:** blocked
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M79
 - **Driving RR:** —
@@ -18,21 +18,17 @@ looked.
 **In:** `tests/testthat/test-norms-audit-markers.R`'s `SCRIPT_ABORTS` registry
 and the procedure that enumerates its domain; a message test for
 `validate_batch()`'s `stopifnot()` at `data-raw/audit-norms.R:83-85`; and the
-single-sourcing assertion at `tests/testthat/test-norms-audit-roster.R:119`,
-green today over deletion of the call it stands behind because a text grep
-matches the doc comment at `data-raw/audit-norms.R:404` and the string literal
-at `:414`. One mechanism serves all three: read the script's parse tree, never
-its text and never a sourced environment. M79 removed its AC5 to here after it
-failed twice, each time by the counted enumeration falling one scope short of
-the file.
+single-sourcing assertion in `tests/testthat/test-norms-audit-roster.R`. One
+mechanism serves all three: read the script's parse tree, never its text and
+never a sourced environment. The enumeration's prior failures, and RR17's
+diagnosis of them as one family, are in the work log and in RR17.
 
 **Out:** adding, moving, or widening any guard in `data-raw/audit-norms.R` —
 this milestone changes tests and their enumeration, not the script's abort
-sites. The coverage report's column schema → M80. Any change to `data/` → not
-here. A promise about errors the script raises by mechanisms other than a
-`stop()`/`stopifnot()` call — a subscript failure, a coercion, `match.arg()` —
-is declined at this gate rather than deferred: no procedure available here
-enumerates that domain, and AC2 states the bound instead of claiming it.
+sites; transient mutation restored byte-clean is not such a change. The
+coverage report's column schema → M80. Any change to `data/` → not here. The
+denylist sweep, composite site identity, stack-bound fixtures, matcher floors
+and the discrimination matrix (RR17 rev 2 BC6–BC11) → the successor milestone.
 
 ## Acceptance criteria
 
@@ -42,74 +38,114 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
       trailing run block that `norms_audit_defs_only = TRUE` skips — and
       collects every call whose deparsed head is one of `stop`, `stopifnot`,
       `base::stop`, `base::stopifnot`. Each collected `stop()` site keys on its
-      **message template** — every literal fragment of the call in order, with
-      each non-literal argument rendered `{}` — and not on its first fragment
-      alone, which is `"source note "` at six distinct sites (measured
-      2026-08-09) and would let a fixture for one of the six satisfy AC2's
-      assertion for another. A `stopifnot()` site, which carries
-      no message argument, contributes one key per condition, each keyed on
-      that condition's deparsed text. A test asserts the
-      collected site set equals the registry's, in both directions, by key and
-      count. Mutation-verified with the return-3 mutant: an unregistered
-      `stop()` planted inside the run block reddens the test, where the
-      pre-milestone guard stayed at FAIL 0 / PASS 69 and its own count stayed
-      at 12 while the parse walk saw 13.
+      **message template** — every literal fragment in order, each non-literal
+      argument rendered `{}` — not its first fragment alone, which is
+      `"source note "` at six distinct sites. A `stopifnot()` site contributes
+      one key per condition: a positional condition keyed on its deparsed text,
+      a named one on its name, which is the runtime message (AC6). A test
+      asserts the collected site set equals the registry's, in both directions,
+      by key and count. Mutation-verified with the return-3 mutant (work log,
+      T4): a `stop()` planted in the run block reddens the test, where the
+      retired guard stayed green at a count of 12 against the walk's 13.
+      The enumerated domain is stated, and what lies outside it named, in
+      exactly these five texts: this criterion; M81's Goal sentence; the
+      section comment at `tests/testthat/test-norms-audit-markers.R:302`; the
+      test name at `:464`, which must merely stop claiming "anywhere"; and the
+      helper header at `tests/testthat/helper-norms-audit-script.R:12-14`.
+      Outside the domain: alternative abort spellings (`rlang::abort`,
+      `cli::cli_abort`, `do.call`-dispatched and aliased heads), dynamically
+      constructed or runtime-resolved calls, process exits, `warning` promotion
+      under `options(warn = 2)`, and the non-call failure mechanisms AC2 already
+      bounds. No claim of enumerating "all aborts" is made in any of the five.
 - [ ] AC2 Every **site** AC1's walk collects — not every registry entry; the
       `"source note not found: {}"` key covers two sites, `:193` and `:224` —
       carries a fixture that provokes that site, and a test asserts the fixture
       raises an error matching that site's key rather than bare failure. With
-      AC1's set equality the message-tested set and the parsed set are
-      identical. The promise is bounded by AC1's walk: it quantifies over the
-      calls that walk returns and claims nothing about errors the script raises
+      AC1's set equality the message-tested and parsed sets are identical. The
+      promise is bounded by AC1's walk and claims nothing about errors raised
       by other mechanisms, which no procedure here enumerates.
 - [ ] AC3 `validate_batch()`'s `stopifnot()` at `data-raw/audit-norms.R:83-85`
       is registered and message-tested under AC1 and AC2 for each of its two
-      conditions — a batch that is not a data frame, and one missing a required
-      column — each asserted by the failing condition's own deparsed text
-      rather than by any error. Each is mutation-checked, and the
-      not-a-data-frame fixture carries all five required names so that dropping
-      `is.data.frame(batch)` cannot abort through the sibling condition
-      instead.
-- [ ] AC4 The single-sourcing assertion at
-      `tests/testthat/test-norms-audit-roster.R:119` is stated over the
-      script's parse tree — the call resolving `instrument_names` from the
-      package namespace, today `get("instrument_names", envir = ns)()` at
-      `data-raw/audit-norms.R:414` — so neither the doc comment at `:404` nor
-      any string literal satisfies it. Mutation-verified: deleting the call at
-      `:414` reddens it while the comment at `:404` stands, which the text grep
-      it replaces does not do.
-- [ ] AC5 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
-      re-running the audit leaves `data-raw/norms-audit-ledger.csv` and
-      `data-raw/norms-audit-coverage.csv` unchanged but for their three stamp
-      columns (`generated`, `script_commit`, `data_commit`,
-      `data-raw/audit-norms.R:750-758`), compared column by column.
+      conditions — a non-data-frame batch, and one missing a required column —
+      each asserted by the failing condition's own deparsed text rather than by
+      any error, and each mutation-checked. The non-data-frame fixture carries
+      all five required names, so dropping `is.data.frame(batch)` cannot abort
+      through the sibling condition instead.
+- [ ] AC4 The single-sourcing assertion in
+      `tests/testthat/test-norms-audit-roster.R` is stated over the script's
+      parse tree — a call resolving `instrument_names` from the package
+      namespace — so neither the doc comment at `data-raw/audit-norms.R:404`
+      nor any string literal satisfies it. Mutation-verified (work log, T5):
+      replacing the call with a hard-coded roster copy reddens it while the
+      comment stands, which the retired text grep does not; the
+      `circumplex:::` accessor switch stays green, for the `:::` shape.
+- [ ] AC5 (RR17 BC5) On the finished branch each of these reproduces at the
+      recorded FAIL count (tolerance 0; PASS counts non-decreasing against the
+      recorded 76 and 17, measured per test file in isolation), each mutation
+      restored byte-clean: the two AC3 mutations (FAIL 2 each), the AC4
+      mutation (FAIL 1) and its control (FAIL 0), and the T4 run-block mutant
+      (FAIL 1). `devtools::test()` FAIL 0 suite-wide with this milestone's two
+      test files WARN 0 in isolation; `devtools::check(args = "--no-manual")`
+      0/0/0; re-running the audit leaves `data-raw/norms-audit-ledger.csv` and
+      `data-raw/norms-audit-coverage.csv` unchanged but for their stamp columns
+      (`generated`, `script_commit`, `data_commit`), compared column by column.
+- [ ] AC6 (RR17 BC1+BC2) The enumerator treats every named argument of a
+      collected `stopifnot()` call as one condition keyed on its name, except
+      the names in `setdiff(names(formals(stopifnot)), "...")`, on which it
+      raises an error naming the call deparsed; likewise on any `stop()`
+      argument named other than `call.`/`domain`, which R concatenates into the
+      runtime message while the template drops it. A named condition carries a
+      kind distinct from a positional one, which AC7's matcher keys on.
+      Mutation-verified against the baselines RR17 rev 2 BC1/BC2 records,
+      script restored byte-clean after each: the planted `divisor` guard moves
+      the collected count 14 → 15 and reddens set-equality; both `exprs` forms
+      redden.
+- [ ] AC7 (RR17 BC3) A named-form condition site is matched by full string
+      equality of `conditionMessage()` with the site's key — no stem, no regex
+      — verified by a unit test driving `expect_abort_at_site()` with a
+      synthetic site where the exact message passes and any strict superstring
+      or substring fails. Every test asserting a `stopifnot` message pins the C
+      locale (`LANGUAGE=C`, `LC_MESSAGES=C`); RR17 rev 2 BC9 records the
+      measured French failure.
+
+**Deviations from RR17 (rev 2).** BC4 folds into AC1, being an amendment to
+its text, and its closing universal over "M81 text" is replaced by the
+five-text enumeration above — the defect the rev-2 re-audit found. BC5 folds
+into AC5, which it restates and extends. BC1+BC2 merge into AC6, which they
+declare inseparable; AC6 restores the `stop()` named-argument clause rev 2
+dropped from both partitions, and BC2's three literal names become
+`formals(stopifnot)`. BC3 becomes AC7, reworded to the same effect. BC9's
+locale pin rides along in AC7. BC6-BC11 are deviated out of M81 entirely, to
+the successor milestone RR17 itself partitions them into (ROADMAP candidate).
+Measured baselines cross-reference RR17 rather than being restated, for the cap.
 
 ## Coverage
 
-- AC1 → T1, T4
+- AC1 → T1, T4, T7
 - AC2 → T2
 - AC3 → T3
 - AC4 → T5
-- AC5 → T6
+- AC5 → T6, T9
+- AC6 → T7
+- AC7 → T8
 
 ## Tasks
 
-- [x] T1 The parse-tree collector: walk every top-level expression of
-      `data-raw/audit-norms.R`, collect the four call heads, key each site per
-      AC1. Replace `marker_defs()`'s sourced enumeration in the count test.
-- [x] T2 Re-key `SCRIPT_ABORTS` to one entry per site, each carrying its
-      fixture; one test asserts each fixture raises its own key, another
-      asserts set equality with T1's collection in both directions.
+- [x] T1 The parse-tree collector, replacing the sourced enumeration.
+- [x] T2 `SCRIPT_ABORTS` re-keyed one entry per site, each with its fixture;
+      per-site message test and bidirectional set equality.
 - [x] T3 The two `validate_batch()` `stopifnot()` cases, the five-name
       non-data-frame fixture, and both mutation checks.
-- [x] T4 Mutation-verify T1's collector with the return-3 mutant (an
-      unregistered `stop()` in the run block); record the measured before/after
-      and restore.
-- [x] T5 Re-anchor the single-sourcing assertion on the parse tree; both AC4
-      mutations measured.
-- [x] T6 Re-run the audit (stamp columns only), `devtools::test()`, full
-      `check(args = "--no-manual")`, run with nothing else in the session
-      touching the R library.
+- [x] T4 The return-3 run-block mutant measured against both guards.
+- [x] T5 The single-sourcing assertion re-anchored; both AC4 mutations.
+- [x] T6 Audit re-run, `devtools::test()`, full `check(args = "--no-manual")`.
+- [ ] T7 AC6: named-`stopifnot` conditions collected and keyed on their name;
+      fail-closed refusal of the `formals(stopifnot)` names and of `stop()`
+      named arguments; distinct kind for named conditions. All four mutations
+      measured and restored.
+- [ ] T8 AC7: the equality matcher for named-form sites, its synthetic-site
+      unit test, and the C-locale pin across the `stopifnot` message tests.
+- [ ] T9 AC1's five promise texts; re-run the AC5 regression floor entire.
 
 ## Work log
 
@@ -134,6 +170,8 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
 - 2026-08-09: gate chose returning the four defective criteria to RR17's author over settling them here, per the rule that the implementing session never authors the durable verdict on the review constraining it; the reviewer was also asked to choose the split partition, its criteria's dependency structure being what decides a safe cut.
 - 2026-08-09: RR17 revision-2 re-audit ([O], fresh context, neither author nor prior auditor), scoped to the five `[M81]` criteria and the partition. Every stated number reproduces (14->14 with FAIL 0 | PASS 76 pre-repair; 14->15 repaired; exprs append 14 unchanged; exprs rewrite 12 of 14; AC3 FAIL 2 each; AC4 FAIL 1 with control FAIL 0; T4 FAIL 1; check 0/0/0), and the partition is separable in both directions. Two must-fixes remain. BC4's closing sentence quantifies over "M81 text", a domain nothing enumerates -- the third occurrence of this defect in the lineage, and wider than revision 1's correctly-bounded "acceptance criterion of M81"; verified false today at `test-norms-audit-markers.R:302` and at M81's own Goal, and its helper citation `:11-14` is off by one (line 11 is a bare `#`). Revision 2 also dropped revision 1's `stop()` named-argument clause from both partitions: verified here, `stop(msg = "x")` keys `""` whose regex is `.` and matches an unrelated error, and `stop("boom ", tail = "TAIL")` keys `"boom "` while raising `"boom TAIL"` -- the same `call_positional_args()` mechanism that returned this milestone.
 - 2026-08-09: re-audit line budget: BC1-BC5 verbatim measure 49 lines plus 5 Coverage lines against 37 headroom, and would leave 10 acceptance criteria against a ~7 tripwire, so the split as drawn does not by itself achieve what the split gate was for.
+- 2026-08-09: ingested RR17 rev 2 into M81 at the maintainer's gate ruling, which settled both re-audit must-fixes: BC4's universal over "M81 text" replaced by a five-text enumeration, and the `stop()` named-argument clause restored into AC6. Four should-fixes applied (distinct kind for named conditions, PASS non-decreasing per file, `formals(stopifnot)` in place of three literal names, C-locale pin brought forward). Folds and departures are in the Deviations block under the criteria. Plan-owned body 148/149 after compressing the acceptance criteria in one pass and collapsing the six completed tasks to one line each. Status back to in-progress; BC6-BC11 go to a successor milestone, captured as a ROADMAP candidate row.
+- 2026-08-09: `Driving RR` left at `—` rather than RR17, and the reason is a defect in how this session ran the escalation, not in RR17. Two authoring errors: the reviewer was told to APPEND a superseding `## Binding criteria` section, so RR17 carries two and the check cannot tell which binds; and it was never given the item shape the check parses (`- BC<n>: ...`), so neither revision is parseable. Substantively, every one of the 11 criteria was reworded, folded, merged or partitioned by the maintainer's gate ruling, so none binds verbatim in any case and a deviations table naming all 11 is equivalent to `—`. The departures and their reasons are recorded in the Deviations block and above. An RR18 reissuing the settled criteria as one parseable section is what would restore mechanical enforcement; the fork is open with the maintainer. RR17 was briefly edited here to satisfy the parser and has been restored byte-identical — the check's own contract is that the RR file is history and never edited.
 
 ## Decisions
 
