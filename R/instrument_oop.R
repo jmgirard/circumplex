@@ -159,9 +159,10 @@ anchors <- function(x) {
 #' sample before treating a normative sample as representative of a
 #' population.
 #'
-#' The label names the group each sample was drawn from, not a frame the
-#' sample was drawn to represent. Which of those a given sample is, is recorded
-#' per sample in the `Kind` column and printed as its reference kind:
+#' For most samples the label names the group they were drawn from rather than
+#' a frame they were drawn to represent -- but not for all of them, and which
+#' is which is recorded per sample in the `Kind` column and printed as the
+#' sample's reference kind:
 #'
 #' \describe{
 #'   \item{standardization sample}{The sample was drawn to represent a defined

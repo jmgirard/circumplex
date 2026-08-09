@@ -89,6 +89,9 @@ custom" claim (RR16 B1) → candidate row.
 
 - 2026-08-08: review return 1 (defect) -- F6 shows AC6 failing as written: its enumeration is specified as the `norm_sample_usable()` predicate and `accepted_pairs()` re-implements it, diverging on the `is.null(anchors)` branch. F7 (85) actioned alongside: `?norms` contradicts itself after M77's qualifier was deleted with the paragraph that carried it. Status review -> in-progress; AC6 and AC7 unticked pending re-verification.
 
+- 2026-08-08: return 1 fixed -- `accepted_pairs()` now calls `norm_sample_usable()` itself (mutating that predicate to a constant TRUE reddens 4 assertions, so the test consults it rather than a copy of its arithmetic), and `?norms`'s opening sentence is repaired to "For most samples ... but not for all of them", which no longer contradicts the standardization item four lines below it.
+- 2026-08-08: F10 and F11 fixed too, a deliberate departure from "below 80 is logged, not actioned" -- both are one vignette sentence this branch introduced, and it was false as written on two counts ("the three counts above" when two come from `Kind`; "every standardizing call reports" when `quiet = TRUE` reports nothing and the refused sample errors first). CLAUDE.md makes vignette precision a hard rule, so shipping a knowingly false teaching sentence to respect a triage threshold was the worse trade. The remaining sub-threshold findings stand as logged.
+
 ## Decisions
 
 ## Review

@@ -152,18 +152,19 @@ test_that("norms() prints each sample's kind, and no other sample's", {
   }
 })
 
-# The pairs norm_standardize() will actually accept. Built from the anchor-range
-# predicate rather than hand-listed, so the one shipped refusal (cais sample 2,
-# D-040) is excluded by the rule that refuses it and a future refusal is
-# excluded by the same rule rather than by an edit here.
+# The pairs norm_standardize() will actually accept -- asked of
+# norm_sample_usable(), the predicate the refusal itself consults, rather than
+# of a copy of its arithmetic. A copy agrees on today's roster and is free to
+# stop agreeing: this one did, silently, on the is.null(anchors) branch, where
+# the real predicate returns TRUE and min(NULL) is Inf. testthat runs these
+# tests inside the package namespace, so the internal is callable here.
 accepted_pairs <- function() {
   rows <- lapply(shipped_instruments(), function(nm) {
     obj <- shipped_instrument(nm)
-    keep <- Filter(function(s) {
-      key <- obj$Norms[[1]]
-      m <- key$M[key$Sample == s]
-      all(m >= min(obj$Anchors$Value) & m <= max(obj$Anchors$Value), na.rm = TRUE)
-    }, obj$Norms[[2]]$Sample)
+    keep <- Filter(
+      function(s) norm_sample_usable(obj, s),
+      obj$Norms[[2]]$Sample
+    )
     if (!length(keep)) return(NULL)
     data.frame(instrument = nm, sample = unlist(keep), stringsAsFactors = FALSE)
   })
