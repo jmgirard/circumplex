@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5
-- **Branch/PR:** `m79-norms-audit-roster-binding`
+- **Branch/PR:** `m79-norms-audit-roster-binding` · https://github.com/jmgirard/circumplex/pull/107
 
 ## Goal
 
@@ -134,6 +134,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
+- 2026-08-08: review in flight (PR #107). AC evidence and the consistency gate are recorded below; criterion checkboxes deliberately NOT yet ticked, pending triage of the three review lenses. Two lenses in, both independently naming one defect: `MARKER_BEGIN`/`MARKER_END` are defined twice, at `data-raw/audit-norms.R:123-124` and `:147-148`. Commit `d9b2ff48`'s message claims it moved them; it added a copy without deleting the original. Inert (identical rebind) but dead duplicate code, and the commit message is a record proven false -- history, so corrected forward here rather than edited.
 - 2026-08-08: T8 done, all eight tasks complete, status to review. `devtools::check(args = "--no-manual")` is Status OK -- 0 errors, 0 warnings, 0 notes, 14 minutes -- and `document()` is clean with no diff in `man/`, `NAMESPACE` or the RcppExports pair. Re-running the audit leaves the ledger and coverage CSVs byte-identical apart from their commit stamps (194 ledger rows, 15 coverage rows, 0 gaps), so no shipped value or audit verdict moves on this branch.
 - 2026-08-08: T6 done. All six `stop()` calls in `parse_source_note()` now have a case asserting their own message, and a count test binds the registry to the function body so a seventh abort fails the suite unregistered. Each was no-oped in turn and the surviving behaviour measured rather than assumed, which corrected three of the six labels I first wrote: the nesting guard relocates into the duplicate-tag guard (both untagged blocks carry tag "") rather than into a subscript error; the malformed-row guard returns the row with anchor NA rather than a shifted value; and the empty-value guard returns the row rather than relocating. Three are load-bearing (duplicate tags, malformed row, empty value) and three relocate.
 - 2026-08-08: T4, T5, T7 done. `audit_norms()` now sweeps the shipped roster and reports a `shipped-sample-not-audited` gap for any (instrument, sample) the batch omits; the enumeration is the package's own, an unexported `instrument_names()` in `R/instrument_oop.R` that `instruments()` and `tests/testthat/helper-norms.R` now also call instead of each writing it out. Measured on the same probe that opened the milestone: dropping `isc` moves from gaps 0 with no row naming it to gaps 1 naming `isc` sample 1. Across all 24 batch rows, abort-or-gap went from 6/8 with 10 silent to 6/18 with 0 silent. `instruments()` output is byte-identical to the pre-extraction body, and `document()` is clean with no generated-file diff.
@@ -145,3 +146,59 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 ## Decisions
 
 ## Review
+
+### Acceptance criteria — fresh evidence (2026-08-08)
+
+Measured on the branch at `d9b2ff48`; every figure below re-run at review time,
+not carried from implementation.
+
+- **AC1** — `shipped_roster()` returns 24 pairs over 15 instruments and
+  `audit_norms()` emits `shipped-sample-not-audited` (`exempt = FALSE`) for any
+  pair the batch omits: dropping `isc` yields one row, `instrument = "isc"`,
+  `scale = "1"`. The roster defaults to the `data()`-plus-class sweep crossed
+  with `Norms[[1]]$Sample` and takes `objects` when injected, so
+  `test-norms-audit-sample-key.R:127` still asserts zero non-exempt rows.
+  Single-sourced: `unique(shipped_roster()$instrument)` is `identical()` to
+  `circumplex:::instrument_names()`, and `helper-norms.R:12,17` are wrappers
+  over `R/instrument_oop.R:261,246`, not copies.
+- **AC2** — the drop-each-row test over `seq_len(nrow(AUDIT_BATCH))` passes.
+  Re-measured at review: 6 aborts, 18 gap>0, **0 silent** — against the
+  criterion's stated pre-fix 6/8/10. The 6 aborts are the multi-sample
+  instruments' `scales = TRUE` rows, as the criterion predicts.
+- **AC3** — an untagged block read by two instruments aborts naming both and
+  the citekey; the message is asserted, not bare failure. A note read by one
+  instrument and a tagged note read by two both still parse. Confirmed
+  `horowitz2003` is the only shared note in the repo and is tagged, so nothing
+  shipped is refused.
+- **AC4** — one `source_note_markers()` serves both `parse_source_note()` and
+  `source_note_block_tags()`. A fenced begin marker, a fenced end marker and
+  `audit-values-beginning` are all refused or ignored as specified; the tag
+  shapes `""`, `"iip64"` and a colon-without-space all read correctly.
+- **AC5** — 6 `stop(` occurrences in `parse_source_note()`'s body, 6 registered
+  cases in `PARSE_ABORTS`, and the count test binds them. Each abort asserts
+  its own message. Each was no-oped and the surviving behaviour recorded: 3
+  load-bearing (the parser returns rows), 3 relocate.
+- **AC6** — the roster-identity test asserts the batch and roster pair sets are
+  equal (`TRUE` at review) with non-vacuity pins at 24 pairs / 15 instruments,
+  and the comment at `test-norms-provenance.R:478` now records that the
+  assertion covers the shipped side since this milestone.
+- **AC7** — `devtools::check(args = "--no-manual")` Status OK, 0 errors /
+  0 warnings / 0 notes, 14m, at `d9b2ff48`; no non-`cairn/` file has changed
+  since. Re-running the audit leaves the ledger and coverage CSVs
+  byte-identical apart from their commit stamps (194 / 15 / 0 gaps).
+
+### Consistency gate (2026-08-08)
+
+Universal: `cairn_validate` exit 0, all checks PASS (47 `work-log format`
+advisories, all pre-existing M7 history). `cairn_impact` skipped — `DESIGN.md`
+is unchanged on this branch, so no principle moved.
+
+Profile (`r-package` `consistency-gate` slot): `document()` at
+`cli.width = 500` emits 0 `resolve link` warnings and leaves `man/`,
+`NAMESPACE`, `data/` and the RcppExports pair diff-free; README.md not stale;
+`pkgdown::check_pkgdown()` passes; no new top-level files, so no
+`.Rbuildignore` entry is owed; full `check()` clean as recorded under AC7.
+**No NEWS entry:** the only shipped-code change is extracting two unexported
+helpers, and `instruments()` output is byte-identical to the pre-extraction
+body — there is no user-visible behaviour to assert, and an entry asserting one
+would have no test that fails without it.
