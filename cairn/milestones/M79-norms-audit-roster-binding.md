@@ -1,6 +1,6 @@
 # M79: Bind the norms audit's batch to the shipped roster
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -39,7 +39,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 
 ## Acceptance criteria
 
-- [ ] AC1 `audit_norms()` emits a `shipped-sample-not-audited` coverage row
+- [x] AC1 `audit_norms()` emits a `shipped-sample-not-audited` coverage row
       with `exempt = FALSE` for every shipped (instrument, sample) pair no
       `AUDIT_BATCH` row names. The roster is its own `roster` parameter,
       defaulting to the full `data()`-plus-`circumplex_instrument`-class
@@ -63,7 +63,7 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       repairing it downstream. Three tests: the refused batch asserts the
       message; a note read by one instrument still parses; a tagged note read
       by two still parses.
-- [ ] AC4 The audit parses no markdown fences and infers nothing: a line
+- [x] AC4 The audit parses no markdown fences and infers nothing: a line
       carrying the literal `<!-- audit-values-` is either an exact marker or
       an abort. Accepted, and nothing else, at column zero:
       `<!-- audit-values-end -->`, `<!-- audit-values-begin -->`, and
@@ -149,6 +149,7 @@ Return 2 (2026-08-08), from the review findings below:
 
 ## Work log
 
+- 2026-08-09: review returned M79 to in-progress (return 3). AC5 fails on both clauses, inside its own domain: the registry test sources the script under `norms_audit_defs_only = TRUE`, so `git_head()` and `or_head()` are outside the counted enumeration and a `stop()` planted among them leaves the guard at FAIL 0 / PASS 69 (mutation-verified this session); and `validate_batch()`'s `stopifnot()` at `data-raw/audit-norms.R:83-85` is an abort path with no message test. AC1 and AC4 -- the two that failed at return 2 -- both pass and are ticked, with AC2, AC3, AC6, AC7. Blame-history and prior-review lenses reported no findings; 14 diff-lens candidates, 2 actioned, 12 logged below threshold. Both thrash triggers fire: (a) third defect return, so M79 routes to /milestone-plan rather than another retry, corroborated by cairn_validate's new "18 tasks (>10 tripwire)" WARN; (b) AC5 twice by a new mechanism of the same shape, and return 2 recorded no alternative against for AC5, so /milestone-brief escalation is offered alongside. Full findings in the Review section.
 - 2026-08-08: created by /milestone-plan.
 - 2026-08-08: criteria audit ([O], fresh context, authored none of the criteria) returned findings on 7 of this milestone's 8 drafted criteria; all adopted. The load-bearing three: AC2 was unsatisfiable as written, since 6 of the 24 batch rows abort in `validate_batch()` before any coverage count exists; the drafted instrument-level-rows criterion would have emitted 16 duplicate coverage rows per pass and is re-cut into M80 AC6; the drafted marker criteria missed the end marker and `source_note_block_tags()` entirely, leaving the fence protection one-sided.
 - 2026-08-08: a second audit pass on the criterion added at the gate found it duplicated the existing assertion at `tests/testthat/test-norms-provenance.R:478`, which already runs the real batch over the real notes; it was re-cut as AC6's roster-identity check, which nothing asserts today.
@@ -186,6 +187,168 @@ Return 2 (2026-08-08), from the review findings below:
 ## Decisions
 
 ## Review
+
+### Return 3 — acceptance criteria, fresh evidence (2026-08-09)
+
+Measured on the branch at `fd5acd0e`; every figure re-run this pass, none
+carried from return 1, return 2, or implementation.
+
+- **AC1** — `shipped_roster()` returns 24 pairs over 15 instruments;
+  `audit_norms()` gained `roster` as its own formal, defaulting to `NULL` and
+  resolved to `shipped_roster()` independently of `objects`. Dropping `isc`
+  emits exactly one non-exempt row, `instrument = "isc"`,
+  `side = "shipped-sample-not-audited"`, `scale = "1"`. The injection hole the
+  amendment named is closed and measured both ways: a `csie`-only batch slice
+  reports 23 non-exempt gaps with no objects, and **23 again** with
+  `objects = list(csie = csie)` — the return-2 measurement was 0. Single-sourced
+  by code reading: `helper-norms.R:12,17` call `circumplex:::instrument_names()`
+  / `instrument_object()` and `shipped_roster()` reaches the same definitions
+  through `asNamespace()`; no second sweep exists in `data-raw/`.
+- **AC2** — the drop-each-row sweep over all 24 batch rows, re-measured this
+  pass: **6 aborts, 18 gap>0, 0 silent**, against the criterion's stated pre-fix
+  6/8/10. The 6 aborts are the multi-sample `scales = TRUE` rows the criterion
+  predicts.
+- **AC3** — an untagged block read by two instruments aborts with "source note
+  shared carries an untagged audit-values block but is read by 2 instruments
+  (fx, fy); tag each block with the instrument it backs" — both instruments and
+  the citekey named, message asserted rather than bare failure. Re-confirmed
+  this pass that `horowitz2003` is the only note two instruments read
+  (iip32, iip64) and both its blocks are tagged, so nothing committed is
+  refused.
+- **AC4** — the recognizer is definitional and the accepted set is now exactly
+  the criterion's three shapes. Classified through `source_note_marker()` this
+  pass: the three accepted shapes accept; the return-2 four
+  (`begin-->`, `end-->`, padded `begin      -->`, padded tag) all abort by name,
+  as do colon-without-space, trailing whitespace, leading indent, inline-in-prose,
+  `audit-values-beginning`, junk after the tag, a bare `: -->`, a tag with a
+  path character, and an embedded newline. Both scanning sites share one helper:
+  `source_note_markers()` is called at `:195` by `source_note_block_tags()` and
+  at `:227` by `parse_source_note()`, and it is the only caller of the
+  recognizer on the production path. The fixture note exercises each refused and
+  each accepted shape, and the unclosed-fence regression test at
+  `test-norms-audit-markers.R:170` sees both blocks. Ticked. Recorded caveat,
+  from finding 7 below (scored 50, under the action bar): the tag pattern
+  `[A-Za-z0-9._-]+` admits any token, so a typo'd tag becomes a
+  `note-block-not-audited` gap rather than an abort.
+- **AC5** — **FAILS, on both of its clauses.** The registry is genuinely
+  file-scoped in intent and the count now counts occurrences, but the
+  enumeration it counts over is not the one the criterion names, and one abort
+  path has no test at all.
+  (i) `marker_defs()` sources the script under `norms_audit_defs_only = TRUE`,
+  which skips the run block, so `git_head()` at `:784` and `or_head()` at `:788`
+  — functions the script defines — are invisible to `mget(ls(env), envir = env)`:
+  `exists("git_head", envir = env, inherits = FALSE)` is FALSE and the
+  enumeration is 17 functions, not every function the script defines. Verified
+  by mutation this session: inserting
+  `unregistered_guard <- function(x) stop("a brand new unregistered abort: ", x)`
+  into the run block leaves `test-norms-audit-markers.R` at FAIL 0 / PASS 69 —
+  the guard is green over an unregistered abort. This is structurally the same
+  evasion return 2 amended AC5 to close, one scope out.
+  (ii) `validate_batch()`'s `stopifnot()` at `:83-85` aborts on a non-data-frame
+  batch or one missing `divisor`/`scales`, and no test asserts its message; the
+  count guard cannot see it either, `"stop("` not matching `"stopifnot("` by the
+  test's own design. AC5 says "Every abort path in `data-raw/audit-norms.R` has
+  a test asserting its specific message."
+  Both are inside AC5's own domain and both are meetable as the criterion is
+  written, so this is the work and not the wording. Not ticked.
+- **AC6** — the roster-identity assertion is `TRUE` at review: the batch's
+  (instrument, sample) pair set equals the roster's, pinned non-vacuously at 24
+  pairs over 15 instruments.
+- **AC7** — `devtools::test()` FAIL 0 / WARN 4 / PASS 6876. Re-running the audit
+  leaves `norms-audit-coverage.csv` byte-identical and the ledger identical in
+  every substantive column at 194 rows, differing only in `script_commit` and
+  `data_commit` (checked column by column, not by eye). The full
+  `devtools::check(args = "--no-manual")` was re-run at review time and is
+  recorded in the work log below.
+
+### Return 3 — consistency gate (2026-08-09)
+
+Universal: `cairn_validate` exit 0, all checks PASS. 48 advisories, 47 of them
+the pre-existing M7 `work-log format` history; the 48th is new and is evidence
+for the thrash disposition below — a `sizing (split tripwires)` WARN reading
+"M79: 18 tasks (>10 tripwire) — consider splitting". `cairn_impact` skipped —
+`DESIGN.md` is unchanged on this branch.
+
+Profile (`r-package` `consistency-gate`): `document()` at `cli.width = 500`
+emits 0 `resolve link` warnings and leaves `man/`, `NAMESPACE`, `data/` and the
+RcppExports pair diff-free; `pkgdown::check_pkgdown()` reports no problems;
+README.md not stale; no new top-level files, so no `.Rbuildignore` entry is
+owed. **No NEWS entry:** the only shipped-code change remains the extraction of
+two unexported helpers, with `instruments()` byte-identical, so there is no
+user-visible behaviour an entry could assert.
+
+### Return 3 — review findings (2026-08-09, PR #107)
+
+Three fresh-context lenses (diff-bug [O], blame-history [S], prior-review [S]),
+then a [S] scorer that generated none of them. The blame-history and
+prior-review lenses each reported **no findings**: the fence tracker was
+introduced and removed inside this one milestone, the `instrument_names()`
+extraction leaves `instruments()` byte-identical, no D-entry is contradicted,
+and no return-1 or return-2 finding is reintroduced. The prior-review lens's
+GitHub probe returned `[]` — the repo carries no inline PR review comments at
+all — so its evidence was the archived and in-file `## Review` sections alone.
+14 candidates from the diff lens, 2 scored >= 80.
+
+**Actioned (>= 80).** Both return the milestone; neither is fixed review-side.
+Both were re-verified by this session, not taken from the lens.
+
+- (87) The AC5 abort registry is blind to the run block. `marker_defs()` sources
+  under `norms_audit_defs_only = TRUE`, so `git_head()` and `or_head()` — which
+  the script defines — are never counted, and an unregistered `stop()` placed
+  among them leaves the guard green (mutation-verified). Falsifies AC5's "the
+  count of `stop(` occurrences across the bodies of **every function the script
+  defines**". **Defect return** — the same evasion shape AC5 was amended to
+  close, one scope out.
+- (83) `validate_batch()`'s `stopifnot()` at `data-raw/audit-norms.R:83-85` is
+  an abort path with no test asserting its message, and is structurally
+  invisible to the count guard. Falsifies AC5's "**Every** abort path in
+  `data-raw/audit-norms.R` has a test asserting its specific message."
+  **Defect return.**
+
+**Logged below threshold, not actioned (12).** (62) the single-sourcing test at
+`test-norms-audit-roster.R:119` is satisfied by the doc comment at
+`audit-norms.R:404`, which itself contains the string `instrument_names`, so
+deleting the real call would leave it green. (55) `shipped_roster()` drops a
+norms row whose `Sample` is `NA`, since `sort()` drops `NA` — unaudited and
+unreported. (55) `shipped_roster()` raises a raw R error on a norms table with
+no `Sample` column. (50) the tag pattern admits any token, never bound to a real
+instrument name. (45) a caller-supplied `roster` is unvalidated, so an empty one
+audits clean. (42) `source_note_block_tags()` skips the nesting check
+`parse_source_note()` performs — masked today by call order. (28)
+`source_note_tags()` has no production caller. (28) the roster/batch join key
+uses a space where the block key uses `\r`. (20) a near-miss prefix
+(`<!--audit-values-`, no space after the comment opener) hides a block silently
+— verified live, but pre-existing: master's greps required the same space, and
+AC4's own wording is scoped to lines carrying the literal `<!-- audit-values-`.
+(18) `shipped_roster()` enumerates via `data()` but fetches via `get()`. (18)
+Scope says one extracted helper where two were extracted. (12) the two new `R/`
+helpers use `#` rather than `@noRd`.
+
+**Disposition: returned to `in-progress`. Return 3 of this milestone.** AC1,
+AC2, AC3, AC4, AC6 and AC7 are verified and ticked — AC1 and AC4, the two that
+failed at return 2, both hold this pass. AC5 alone fails, on both of its
+clauses.
+
+**Both thrash triggers fire, and they compose.**
+Trigger (a) — this is the third defect return, a threshold that holds from here
+on. The remedy is not another retry: M79 routes to `/milestone-plan` for a
+re-plan or split. The gate's own instrument agrees independently —
+`cairn_validate` WARNs "M79: 18 tasks (>10 tripwire) — consider splitting", and
+the milestone has run 8 planned tasks plus 10 added across two returns.
+Trigger (b) — AC5 has now failed twice by a new mechanism of the same shape:
+an abort escaping the registry's counted scope, first by landing in a helper
+outside `parse_source_note()` (return 2), now by landing in a function outside
+the defs-only enumeration. Return 2's gate recorded an alternative against for
+AC4's recognizer but none for AC5's registry, so per the thrash rule escalation
+via `/milestone-brief` is offered at the routing point alongside the re-plan —
+a per-instance offer, not a standing option.
+
+The composed disposition: (a) governs the routing, so no bare retry under the
+current plan; (b)'s diagnosis and its escalation offer carry into that routing
+rather than being discarded. The question a re-plan or brief should settle is
+whether "every abort has a registered, message-tested guard" is enforceable by
+counting at all, given that two passes have each found the count's scope one
+step short of the file.
 
 ### Return 2 — acceptance criteria, fresh evidence (2026-08-08)
 
