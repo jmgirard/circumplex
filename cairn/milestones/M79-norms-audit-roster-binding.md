@@ -31,7 +31,9 @@ as good as the block boundaries it trusts.
 
 **Out:** the coverage report's column schema, `divisor` validation, the
 `Items` normalisation asymmetry, and instrument-level note rows no
-`scales = TRUE` pass reads → M80. Changing any value in `data/` → not here;
+`scales = TRUE` pass reads → M80. The abort registry's completeness guard and
+`validate_batch()`'s `stopifnot()` message test → M81. Changing any value in
+`data/` → not here;
 this milestone touches no shipped object. `parse_source_note()` returning a
 note's single untagged block when the caller names no instrument → declined
 at this gate, not deferred: the design note at `data-raw/audit-norms.R:138-143`
@@ -77,23 +79,17 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       which share one helper. A fixture note exercises each refused shape and
       each accepted one, plus the unclosed fence that formerly hid every
       later block.
-- [ ] AC5 Every abort path in `data-raw/audit-norms.R` has a test asserting
-      its specific message, and a test asserts the count of `stop(` occurrences
-      across the bodies of every function the script defines equals the
-      registry of enumerated abort cases — file-scoped because a count over one
-      function's body is evaded by an abort landing in a helper, which this
-      branch did. Where no-oping a `stop()` only relocates the error, the test
-      records the mutant's surviving behavior instead of claiming the guard is
-      load-bearing.
-- [x] AC6 A test asserts the shipped (instrument, sample) pair set produced by
+- [x] AC5 A test asserts the shipped (instrument, sample) pair set produced by
       AC1's roster sweep equals the `(instrument, sample)` pair set of
       `AUDIT_BATCH`, so shipping a new instrument fails by name rather than as
       an unattributed gap count. The comment on the existing real-roster
       assertion at `tests/testthat/test-norms-provenance.R:462-478` records
       that it becomes a roster check once AC1 lands.
-- [ ] AC7 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
+- [ ] AC6 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
       re-running the audit leaves `data-raw/norms-audit-ledger.csv` and
-      `data-raw/norms-audit-coverage.csv` unchanged but for their stamps.
+      `data-raw/norms-audit-coverage.csv` unchanged but for their three stamp
+      columns (`generated`, `script_commit`, `data_commit`,
+      `data-raw/audit-norms.R:750-758`), compared column by column.
 
 ## Coverage
 
@@ -101,9 +97,8 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - AC2 → T5
 - AC3 → T3
 - AC4 → T1, T2, T10, T14, T15
-- AC5 → T6, T11, T16
-- AC6 → T7
-- AC7 → T8
+- AC5 → T7
+- AC6 → T8, T19
 
 ## Tasks
 
@@ -147,8 +142,17 @@ Return 2 (2026-08-08), from the review findings below:
       independent of `objects`; the six fixture call sites state their roster;
       a test pins that injecting one real object no longer hides the rest.
 
+Return 4 (2026-08-09), from the re-plan:
+
+- [ ] T19 Re-run the audit and the full check with nothing else in the session
+      touching the R library; the three stamp columns are the only movement.
+
 ## Work log
 
+- 2026-08-09: re-plan gate (return-3 thrash trigger (a)). AC5 is removed from this milestone and re-cut as M81; the remaining criteria renumber, so the Review sections above, which are history, use the pre-amendment numbering — their AC6 is this file's AC5 and their AC7 is this file's AC6. T19 is added for AC6's outstanding evidence run. No shipped code moves: the tests T6/T11/T16 built stay in the suite, they just no longer back a promise this milestone makes.
+- 2026-08-09: re-plan gate chose splitting AC5 out over re-wording it in place and over a bare retry; five criteria are verified with fresh evidence and the branch is otherwise mergeable, so holding them behind a criterion that has failed twice buys nothing, and `cairn_validate`'s 18-task WARN says the same. Falsified by M81's registry work proving inseparable from this branch's marker tests at implement time.
+- 2026-08-09: amendment return: AC6 (was AC7) — the "with nothing else touching the R library concurrently" clause drafted at this gate was dropped on the criteria audit's finding that it is a universal over concurrent processes no procedure evidences, and is exactly what left AC7 unticked at return 3; running the check serially is now T19's instruction. The criterion instead names the three stamp columns (`generated`, `script_commit`, `data_commit`) so the ledger diff is mechanical. Re-checked against the audit's three questions before writing: satisfiable (both halves were observed together at return 2), no IP blocks it, and its universal quantifies over two named CSVs' columns, which a column-by-column diff enumerates.
+- 2026-08-09: criteria audit ([O], fresh context, authored none of the criteria) ran over the amended AC6 and all five M81 criteria and returned findings on five of the six; all adopted. It also verified the return-3 diagnosis mechanically: on a planted mutant the current guard's count stays at 12 while a parse walk sees 13.
 - 2026-08-09: AC7 unticked, correcting the evidence line first written this session. The review-time `devtools::check(args = "--no-manual")` is Status 1 ERROR at 17m14s, in `checking re-building of vignette outputs`: kableExtra fails to load for want of `stringi` in two vignettes. Not a branch defect -- `stringi` and kableExtra are both installed interactively, the branch touches no vignette and no DESCRIPTION line, and the check's own tests phase passed OK at 14m/15m; the probable cause is two `check()` runs overlapping `document()` in this session. AC7's other two clauses hold (test FAIL 0 / PASS 6876; audit re-run stamp-only at 194 rows). The next pass re-runs `check()` serially before ticking it. Jeff chose to stop here rather than route to /milestone-plan or /milestone-brief in this session.
 - 2026-08-09: review returned M79 to in-progress (return 3). AC5 fails on both clauses, inside its own domain: the registry test sources the script under `norms_audit_defs_only = TRUE`, so `git_head()` and `or_head()` are outside the counted enumeration and a `stop()` planted among them leaves the guard at FAIL 0 / PASS 69 (mutation-verified this session); and `validate_batch()`'s `stopifnot()` at `data-raw/audit-norms.R:83-85` is an abort path with no message test. AC1 and AC4 -- the two that failed at return 2 -- both pass and are ticked, with AC2, AC3, AC6, AC7. Blame-history and prior-review lenses reported no findings; 14 diff-lens candidates, 2 actioned, 12 logged below threshold. Both thrash triggers fire: (a) third defect return, so M79 routes to /milestone-plan rather than another retry, corroborated by cairn_validate's new "18 tasks (>10 tripwire)" WARN; (b) AC5 twice by a new mechanism of the same shape, and return 2 recorded no alternative against for AC5, so /milestone-brief escalation is offered alongside. Full findings in the Review section.
 - 2026-08-08: created by /milestone-plan.
