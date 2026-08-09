@@ -1,6 +1,6 @@
 # M81: Enumerate the norms-audit abort registry from the script's parse tree
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** M79
 - **Driving RR:** —
@@ -128,6 +128,7 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
 - 2026-08-09: the AC4 assertion accepts `pkg:::nm`, `pkg::nm` and a literal-naming `get()`/`getExportedValue()`, not the one shape at `:414` alone — a test that reddens under a behaviour-preserving accessor switch is a defect in the test.
 - 2026-08-09: T6 — audit re-run at `53908411`: ledger 194 rows, coverage 15 rows, 0 gaps, 14 note-only, 1 constructed credit, 0 angle-copy splits, 0 IP2 breaches. Compared column by column against the committed CSVs: coverage identical in all 5 columns; ledger identical in all 12 but `script_commit` and `data_commit`, `generated` included. The stamp-only churn was reverted rather than committed — M81 changes no audited value, so the committed stamps stay a true record of the run that produced them. `devtools::test()`: FAIL 0 | WARN 4 | SKIP 0 | PASS 6883, the 4 warnings outside this milestone's files (both ran WARN 0 on their own). `devtools::check(args = "--no-manual")`: Status OK, 0 errors / 0 warnings / 0 notes, 16m 46s.
 - 2026-08-09: review returned M81 to `in-progress` on AC1 (defect return 1 on this milestone). What failed: AC1 says a collected `stopifnot()` site "contributes one key per condition", but `call_positional_args()` drops named arguments, so a condition written `stopifnot("msg" = cond)` contributes none. Verified at the gate — a real added guard fires (`divisor must be numeric`) while the walk returns 14 sites against a baseline of 14 and the suite stays FAIL 0 | PASS 76; the `stopifnot(exprs = {...})` form returns 12 against the same baseline. Thrash trigger (b) fires: this is the third mechanism of the same shape against this criterion's lineage, after M79's AC5 failed twice, and it is exactly the falsifier the 2026-08-09 plan gate wrote down when it declined a `/milestone-brief` escalation. Trigger (a) composes — a re-plan has already been spent on this criterion (M81 is that re-cut) — so a bare retry is not the disposition.
+- 2026-08-09: blocked on RB17 — whether a syntactic enumeration of abort sites over open-ended R source can be complete at all, and what shape the promise should take if not. Raised at the user's choice at the review gate, on the thrash trigger the plan gate had recorded in advance. Brief committed on the milestone branch rather than the default branch: the milestone file's status mirror travels with it and lands at squash-merge, so splitting the two across branches would conflict.
 
 ## Decisions
 
