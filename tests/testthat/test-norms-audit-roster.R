@@ -88,6 +88,23 @@ test_that("the batch covers the shipped roster exactly (M79)", {
   expect_identical(length(unique(roster$instrument)), 15L)
 })
 
+test_that("an instrument shipping no norms is not a roster gap (M79)", {
+  env <- roster_defs()
+  # Every shipped instrument carries norms today, so this is future-proofing:
+  # an instrument with nothing to audit must not be reported as unaudited, or
+  # the gap count stops meaning what the roster sweep exists to make it mean.
+  # NULL[[1]] is NULL rather than an error in R, which is what makes the
+  # one-line guard sufficient -- pinned here so a rewrite cannot quietly rely
+  # on the other behaviour.
+  none <- list(Norms = NULL, Scales = data.frame(Abbrev = "PA", Angle = 90))
+  expect_identical(nrow(env$shipped_roster(list(fz = none))), 0L)
+
+  empty <- list(Norms = list(
+    data.frame(Sample = numeric(0), Scale = character(0), M = numeric(0))
+  ))
+  expect_identical(nrow(env$shipped_roster(list(fz = empty))), 0L)
+})
+
 test_that("the roster is the package's own enumeration, not a copy (M79)", {
   env <- roster_defs()
   # Single-sourcing is the point: a second sweep in data-raw/ could disagree

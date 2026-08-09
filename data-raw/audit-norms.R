@@ -120,6 +120,9 @@ CONSTRUCTED_CREDIT <- "constructed-credit"
 
 # --- source side -------------------------------------------------------------
 
+MARKER_BEGIN <- "<!-- audit-values-begin"
+MARKER_END <- "<!-- audit-values-end -->"
+
 # Parse the machine-readable block a source note carries between its
 # audit-values markers. Returns a data.frame(field, sample, scale, value,
 # anchor), carrying the block's tag in attr(, "tag").
