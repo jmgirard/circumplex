@@ -90,9 +90,11 @@ summary(iipsc)
 #> 
 #> The IIP-SC currently has 2 normative data set(s):
 #> 1. 872 American college students
+#> Reference kind: identified published source
 #> Hopwood, Pincus, DeMoor, & Koonce (2008)
 #> <https://doi.org/10.1080/00223890802388665>
 #> 2. 106 American psychiatric outpatients
+#> Reference kind: identified published source
 #> Soldz, Budman, Demby, & Merry (1995)
 #> <https://doi.org/10.1177/1073191195002001006>
 ```

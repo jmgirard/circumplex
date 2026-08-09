@@ -33,14 +33,30 @@ Consult the reference and hyperlink printed alongside it for the
 source's own description of the sample before treating a normative
 sample as representative of a population.
 
-The label names the group each sample was drawn from, not a frame the
-sample was drawn to represent. Apart from the IIP-32 and IIP-64 national
-standardization samples, the shipped samples are the study samples their
-authors had available, so a mean and standard deviation computed from
-one of them describes that group of people rather than a population. A
-few are weaker still: where the printed reference says the norms source
-is unconfirmed, the statistics appear in no source that has been
-identified and should be treated as unverified. See
+For most samples the label names the group they were drawn from rather
+than a frame they were drawn to represent – but not for all of them, and
+which is which is recorded per sample in the `Kind` column and printed
+as the sample's reference kind:
+
+- standardization sample:
+
+  The sample was drawn to represent a defined population, so its mean
+  and standard deviation estimate that population's. Only the IIP-32 and
+  IIP-64 samples are of this kind.
+
+- identified published source:
+
+  The sample's octant statistics are printed in an identified source – a
+  study report or an author's norms page – and describe that group of
+  people rather than any wider frame.
+
+- no identified source:
+
+  The sample's octant statistics appear in no source that has been
+  identified, whatever is known about the sample itself, and should be
+  treated as unverified.
+
+See
 [`vignette("using-instruments")`](http://circumplex.jmgirard.com/articles/using-instruments.md)
 for what the shipped reference samples are and how to choose among them.
 
@@ -58,6 +74,7 @@ Other instrument functions:
 norms(csip)
 #> The CSIP currently has 1 normative data set(s):
 #> 1. 712 American college students
+#> Reference kind: identified published source
 #> Boudreaux, Ozer, Oltmanns, & Wright (2018)
 #> <https://doi.org/10.1037/pas0000505>
 ```

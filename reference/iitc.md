@@ -117,6 +117,7 @@ summary(iitc)
 #> 
 #> The IIT-C currently has 1 normative data set(s):
 #> 1. 862 American college students
+#> Reference kind: identified published source
 #> Bliton & Pincus (2019)
 #> <https://doi.org/10.1177/1073191119864661>
 scales(iitc, items = TRUE)

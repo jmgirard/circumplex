@@ -118,6 +118,7 @@ summary(isc)
 #> 
 #> The ISC currently has 1 normative data set(s):
 #> 1. 649 American college students
+#> Reference kind: identified published source
 #> Hopwood et al. (2011)
 #> <https://doi.org/10.1111/j.1467-6494.2011.00696.x>
 scales(isc, items = TRUE)

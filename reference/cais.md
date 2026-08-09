@@ -102,9 +102,11 @@ summary(cais)
 #> 
 #> The CAIS currently has 2 normative data set(s):
 #> 1. 204 American fourth and sixth graders (aged 9 to 13)
+#> Reference kind: identified published source
 #> Sodano & Tracey (2006)
 #> <https://doi.org/10.1207/s15327752jpa8703_12>
 #> 2. 194 American college students (aged 17 to 50)
+#> Reference kind: identified published source
 #> Sodano & Tracey (2006)
 #> <https://doi.org/10.1207/s15327752jpa8703_12>
 scales(cais, items = TRUE)

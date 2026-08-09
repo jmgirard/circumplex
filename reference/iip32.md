@@ -75,12 +75,15 @@ summary(iip32)
 #> 
 #> The IIP-32 currently has 3 normative data set(s):
 #> 1. 800 American adults, national standardization sample, overall
+#> Reference kind: standardization sample
 #> Horowitz, Alden, Wiggins, & Pincus (2003)
 #> <https://www.mindgarden.com/113-inventory-of-interpersonal-problems>
 #> 2. 400 American adults, national standardization sample, females
+#> Reference kind: standardization sample
 #> Horowitz, Alden, Wiggins, & Pincus (2003)
 #> <https://www.mindgarden.com/113-inventory-of-interpersonal-problems>
 #> 3. 400 American adults, national standardization sample, males
+#> Reference kind: standardization sample
 #> Horowitz, Alden, Wiggins, & Pincus (2003)
 #> <https://www.mindgarden.com/113-inventory-of-interpersonal-problems>
 ```

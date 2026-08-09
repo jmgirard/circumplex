@@ -94,6 +94,7 @@ summary(csie)
 #> 
 #> The CSIE currently has 1 normative data set(s):
 #> 1. 367 American college students
+#> Reference kind: identified published source
 #> Locke & Sadler (2007)
 #> <https://kennethlocke.org/CSIE/CSIE_Norms.html>
 scales(csie, items = TRUE)

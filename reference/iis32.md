@@ -92,6 +92,7 @@ summary(iis32)
 #> 
 #> The IIS-32 currently has 1 normative data set(s):
 #> 1. 1380 American college students
+#> Reference kind: no identified source
 #> Norms source unconfirmed; instrument published as Hatcher & Rogers (2012)
 #> <https://doi.org/10.1080/00223891.2012.681818>
 scales(iis32, items = TRUE)

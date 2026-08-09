@@ -115,6 +115,7 @@ summary(iis64)
 #> 
 #> The IIS-64 currently has 1 normative data set(s):
 #> 1. 684 American college students
+#> Reference kind: identified published source
 #> Hatcher & Rogers (2009)
 #> <https://doi.org/10.1037/a0017269>
 scales(iis64, items = TRUE)

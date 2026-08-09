@@ -176,6 +176,7 @@ summary(ipipipc)
 #> 
 #> The IPIP-IPC currently has 1 normative data set(s):
 #> 1. 274 American college students
+#> Reference kind: no identified source
 #> Norms source unconfirmed; instrument published as Markey & Markey (2009)
 #> <https://doi.org/10.1177/1073191109340382>
 ```
@@ -205,6 +206,7 @@ anchors(ipipipc)
 norms(ipipipc)
 #> The IPIP-IPC currently has 1 normative data set(s):
 #> 1. 274 American college students
+#> Reference kind: no identified source
 #> Norms source unconfirmed; instrument published as Markey & Markey (2009)
 #> <https://doi.org/10.1177/1073191109340382>
 ```
@@ -555,8 +557,8 @@ n_instruments <- length(inst)
 n_samples <- nrow(samples)
 n_college <- sum(grepl("college|undergraduate", samples$Population))
 n_small <- sum(samples$Size < 300)
-n_standardization <- sum(grepl("standardization", samples$Population))
-n_unsourced <- sum(grepl("unconfirmed", samples$Reference))
+n_standardization <- sum(samples$Kind == "standardization")
+n_unsourced <- sum(samples$Kind == "unsourced")
 ```
 
 The package ships 24 reference samples across 15 instruments. 11 of them
@@ -567,10 +569,17 @@ institution, at one time — rather than a group assembled to represent
 any wider population. The exception is the IIP-32 and IIP-64, whose 6
 samples come from a national standardization study designed for exactly
 that purpose. At the other end, 2 of the tables are published in no
-source that has been identified — their `Reference` entries say so, and
-scores standardized against them rest on unverified numbers. A reference
-sample is therefore best read as a concrete, described group of people
-to compare against, and the `Population` column printed below names the
+source that has been identified, and scores standardized against them
+rest on unverified numbers. You do not have to work any of this out from
+the descriptions: every sample carries a `Kind` — `standardization`,
+`published`, or `unsourced` — which is where the two counts just given
+come from, and which
+[`norms()`](http://circumplex.jmgirard.com/reference/norms.md) prints
+and
+[`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
+names in the message it prints unless you silence it. A reference sample
+is therefore best read as a concrete, described group of people to
+compare against, and the `Population` column printed below names the
 group each sample was drawn from rather than a population the sample
 stands in for.
 
@@ -585,9 +594,11 @@ your participants resemble.
 norms(iipsc)
 #> The IIP-SC currently has 2 normative data set(s):
 #> 1. 872 American college students
+#> Reference kind: identified published source
 #> Hopwood, Pincus, DeMoor, & Koonce (2008)
 #> <https://doi.org/10.1080/00223890802388665>
 #> 2. 106 American psychiatric outpatients
+#> Reference kind: identified published source
 #> Soldz, Budman, Demby, & Merry (1995)
 #> <https://doi.org/10.1177/1073191195002001006>
 ```
@@ -619,7 +630,7 @@ z_scales <- norm_standardize(
   sample = 1,
   append = FALSE
 )
-#> Standardized against IIP-SC normative sample 1: N = 872, American college students. 1 other sample is available; see norms().
+#> Standardized against IIP-SC normative sample 1: N = 872, American college students. Reference kind: identified published source. 1 other sample is available; see norms().
 print(z_scales)
 #>           PA_z       BC_z       DE_z        FG_z       HI_z       JK_z
 #> 1   1.50000000  1.7500000  0.4093567 -1.10554090 -1.0054645 -1.3313783

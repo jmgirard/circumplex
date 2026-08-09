@@ -118,9 +118,11 @@ summary(iei)
 #> 
 #> The IEI currently has 2 normative data set(s):
 #> 1. 1223 American undergraduate students
+#> Reference kind: identified published source
 #> Horner, Locke, & Hulsey (2024)
 #> <https://kennethlocke.org/IEI/IEI_Norms.html>
 #> 2. 278 American crowdworkers
+#> Reference kind: identified published source
 #> Horner, Locke, & Hulsey (2024)
 #> <https://doi.org/10.1080/00223891.2024.2400266>
 scales(iei, items = TRUE)

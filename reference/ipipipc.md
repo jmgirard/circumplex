@@ -91,6 +91,7 @@ summary(ipipipc)
 #> 
 #> The IPIP-IPC currently has 1 normative data set(s):
 #> 1. 274 American college students
+#> Reference kind: no identified source
 #> Norms source unconfirmed; instrument published as Markey & Markey (2009)
 #> <https://doi.org/10.1177/1073191109340382>
 scales(ipipipc, items = TRUE)

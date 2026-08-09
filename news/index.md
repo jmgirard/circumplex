@@ -132,25 +132,41 @@ on a real ggplot2 coordinate system.
 
 - [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
   now reports which normative sample it used. Every successful call
-  prints the sample number, its size and its description — for example,
-  “Standardized against IIP-SC normative sample 1: N = 872, American
-  college students.” — and, where the instrument carries more than one
-  sample, says how many others are available. Which sample you
-  standardize against is a result-determining choice rather than a
-  technicality: across the shipped instruments, different samples of the
-  same instrument move a respondent’s z-scores by roughly half a
-  standard deviation on average, and by nearly twice that at the
-  extreme. Pass the new `quiet = TRUE` to suppress the message in loops
-  and knitted documents.
+  prints the sample number, its size, its description and its reference
+  kind — for example, “Standardized against IIP-SC normative sample 1: N
+  = 872, American college students. Reference kind: identified published
+  source.” — and, where the instrument carries more than one sample,
+  says how many others are available. Which sample you standardize
+  against is a result-determining choice rather than a technicality:
+  across the shipped instruments, different samples of the same
+  instrument move a respondent’s z-scores by roughly half a standard
+  deviation on average, and by nearly twice that at the extreme. Pass
+  the new `quiet = TRUE` to suppress the message in loops and knitted
+  documents.
+
+- Every normative sample now records what kind of reference distribution
+  it is, in a new `Kind` column readable at `instrument$Norms[[2]]`. Six
+  of the 24 shipped samples — the IIP-32’s and IIP-64’s — were drawn to
+  represent a defined population, so their means and standard deviations
+  estimate that population’s; 16 are described in an identified
+  published source and describe that group of people and no wider frame;
+  and two appear in no source that has been identified at all.
+  [`norms()`](http://circumplex.jmgirard.com/reference/norms.md) prints
+  the kind for each sample it lists, and
+  [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
+  names it in both its message and its attribute, so the distinction is
+  available where you choose a sample and where you use one. See
+  [`?norms`](http://circumplex.jmgirard.com/reference/norms.md) for what
+  each kind means.
 
 - Every data frame returned by
   [`norm_standardize()`](http://circumplex.jmgirard.com/reference/norm_standardize.md)
   now carries a `"norm_sample"` attribute recording the instrument, the
-  sample number, its size and its description, so a script that never
-  sees the console can still report what its z-scores are relative to.
-  Retrieve it with `attr(x, "norm_sample")`. It is attached whether or
-  not `quiet` is set, and on both the `append = TRUE` and
-  `append = FALSE` return paths.
+  sample number, its size, its description and its reference kind, so a
+  script that never sees the console can still report what its z-scores
+  are relative to. Retrieve it with `attr(x, "norm_sample")`. It is
+  attached whether or not `quiet` is set, and on both the
+  `append = TRUE` and `append = FALSE` return paths.
 
 - The package now requires ggplot2 (\>= 4.0.0), and `ggforce` is no
   longer a dependency. The declared R requirement moves to R (\>= 4.1)

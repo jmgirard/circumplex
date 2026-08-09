@@ -123,6 +123,7 @@ summary(csiv)
 #> 
 #> The CSIV currently has 1 normative data set(s):
 #> 1. 1200 American college students
+#> Reference kind: identified published source
 #> Locke (n.d.); instrument published as Locke (2000)
 #> <https://kennethlocke.org/CSIV/CSIV_Norms.html>
 scales(csiv, items = TRUE)
