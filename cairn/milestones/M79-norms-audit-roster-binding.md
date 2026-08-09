@@ -1,6 +1,6 @@
 # M79: Bind the norms audit's batch to the shipped roster
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -155,6 +155,7 @@ Return 1 (2026-08-08), from the review findings below:
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
+- 2026-08-08: review returned M79 to in-progress (return 2). AC4 fails inside its own domain again, by a new mechanism: the criterion says "Accepted, and nothing else" for three exact shapes, and four more are accepted because `substring()` on an exhausted string returns "" and the space before the terminator is therefore optional -- `<!-- audit-values-begin-->`, `<!-- audit-values-end-->`, and the padded variants. AC5 routes to a gated amendment instead: its count guard is scoped to `parse_source_note()`'s body, and this diff put a reachable abort in `source_note_marker()`, so the criterion's literal wording holds while its stated purpose does not. AC1, AC2, AC3, AC6, AC7 verified and ticked with fresh evidence. Blame-history and prior-review lenses reported no findings. Thrash trigger (b) fires -- AC4 twice, same shape -- so escalation is offered alongside the fix. Full findings and the 14 below-threshold ones in the Review section.
 - 2026-08-08: T13 done, return 1 complete. `devtools::check(args = "--no-manual")` is Status OK -- 0 errors, 0 warnings, 0 notes, 15m44s -- `document()` is clean with no diff and 0 `resolve link` warnings, `pkgdown::check_pkgdown()` finds no problems, and `cairn_validate` exits 0 with all checks PASS (48 `work-log format` advisories, all pre-existing M7 history). Re-running the audit leaves the ledger and coverage CSVs identical apart from the ledger's commit stamps: 194 ledger rows, 15 coverage rows, 0 gaps, unchanged from the pre-return run, so removing the fence tracker moves no audit verdict.
 - 2026-08-08: T9-T12 done. `fenced_lines()` is gone: the audit no longer parses markdown, and a line carrying `<!-- audit-values-` is either an exact column-zero marker or an abort naming it. That closes F1, F2, F3, F4 and F6 by removing what they were defects in, and F5 by construction -- the unclosed-fence regression test now sees both blocks where the fence tracker reported one. The duplicate `MARKER_BEGIN`/`MARKER_END` pair is deleted and `parse_source_note()`'s doc comment sits with its function again (F14). Each new guard was no-oped: two of the three I first wrote were dead (the leading-whitespace refusal is subsumed by not trimming, and the interior `-->` check by the tag pattern) and were removed rather than shipped; of the five that remain, four redden and the begin/end check relocates into the colon check, recorded in its fixture comment. The `stop(`-count test counts occurrences, not deparsed lines (F15), and the single-sourcing test now reads the audit script's source instead of comparing one function against itself -- adding a `data(package` sweep to `data-raw/` reddens it, as does renaming `instrument_names()` (F11).
 - 2026-08-08: amendment return: AC4 — "The audit parses no markdown fences and infers nothing: a line carrying the literal `<!-- audit-values-` is either an exact marker or an abort. […] Every other line carrying the prefix — indented, inline in prose, misspelt, or with junk after its tag — aborts naming the line. So no fence, indent, or surrounding prose can hide a block from the sweep or invent a tag: a marker displayed inside a fence is read as the real marker it looks like, never silently dropped. […] A fixture note exercises each refused shape and each accepted one, plus the unclosed fence that formerly hid every later block."
@@ -175,6 +176,123 @@ Return 1 (2026-08-08), from the review findings below:
 ## Decisions
 
 ## Review
+
+### Return 2 — acceptance criteria, fresh evidence (2026-08-08)
+
+Measured on the branch at `d954b0cc`; every figure re-run this pass, none
+carried from return 1 or from implementation.
+
+- **AC1** — `shipped_roster()` returns 24 pairs over 15 instruments; dropping
+  `isc` from the batch emits exactly one non-exempt row,
+  `instrument = "isc"`, `side = "shipped-sample-not-audited"`, `scale = "1"`.
+  Ticked on that evidence. Recorded caveat, from finding 2 below (scored 78,
+  under the action bar): a caller passing `objects` for one instrument
+  replaces the roster wholesale, so a single-instrument injection reports 0
+  gaps where the same batch reports 23 without it. AC1's stated behaviour holds
+  on the default path; the `objects` path is the logged concern.
+- **AC2** — the drop-each-row sweep over all 24 batch rows, re-measured:
+  **6 aborts, 18 gap>0, 0 silent**, against the criterion's stated pre-fix
+  6/8/10. The 6 aborts are the multi-sample `scales = TRUE` rows the criterion
+  predicts.
+- **AC3** — an untagged block read by two instruments aborts with
+  "source note shared carries an untagged audit-values block but is read by 2
+  instruments (fx, fy)" — both instruments and the citekey named, message
+  asserted rather than bare failure. `horowitz2003` is confirmed the only note
+  two instruments read, and its blocks tag `iip64`, `iip32`, so nothing
+  committed is refused.
+- **AC4** — **FAILS.** `fenced_lines()` is gone (`exists()` FALSE), one
+  `source_note_markers()` serves both readers, and all ten refused shapes abort
+  by name. But AC4 says "Accepted, **and nothing else**, at column zero" for
+  three exact shapes, and four further shapes are accepted:
+  `<!-- audit-values-begin-->` and `<!-- audit-values-end-->` (no space before
+  the terminator), `<!-- audit-values-begin      -->` (padded), and
+  `<!-- audit-values-begin:   iip32   -->` (padded tag). `substring()` on an
+  exhausted string returns `""`, so the space is optional at both sites. The
+  in-file comment makes the same "and nothing else" claim and is equally wrong.
+  Inside AC4's own domain — which lines count as markers. Not ticked.
+- **AC5** — **criterion wrong, not the code.** All 6 `stop(` occurrences in
+  `parse_source_note()`'s body have a registered case, the count test now
+  counts occurrences rather than deparsed lines, and each abort asserts its own
+  message. But the marker abort at `:154` lives in `source_note_marker()`, is
+  reachable from `parse_source_note()` on most malformed notes, and is invisible
+  to a count scoped to one function body. AC5's literal wording is satisfied;
+  its stated purpose — "a new `stop()` fails the suite" — is not. Routes to a
+  gated amendment. Not ticked.
+- **AC6** — the roster-identity assertion is `TRUE` at review: the batch's
+  (instrument, sample) pair set equals the roster's, pinned non-vacuously at 24
+  pairs over 15 instruments.
+- **AC7** — `devtools::test()` FAIL 0 / WARN 4 / PASS 6845.
+  `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings /
+  0 notes, 15m44s, on the code at `3e3134e5`; only `cairn/` files and the
+  ledger's commit stamps have changed since. Re-running the audit leaves
+  `norms-audit-coverage.csv` byte-identical and the ledger identical apart from
+  its stamp columns (194 / 15 / 0 gaps).
+
+### Return 2 — consistency gate (2026-08-08)
+
+Universal: `cairn_validate` exit 0, all checks PASS (48 `work-log format`
+advisories, all pre-existing M7 history). `cairn_impact` skipped — `DESIGN.md`
+is unchanged on this branch.
+
+Profile (`r-package` `consistency-gate`): `document()` at `cli.width = 500`
+emits 0 `resolve link` warnings and no diff in `man/`, `NAMESPACE`, `data/` or
+the RcppExports pair; `pkgdown::check_pkgdown()` reports no problems; README.md
+not stale; no new top-level files, so no `.Rbuildignore` entry is owed; full
+`check()` clean as recorded under AC7. **No NEWS entry:** the only shipped-code
+change remains the extraction of two unexported helpers, with `instruments()`
+byte-identical, so there is no user-visible behaviour an entry could assert.
+
+### Return 2 — review findings (2026-08-08, PR #107)
+
+Three fresh-context lenses (diff-bug [O], blame-history [S], prior-review [S]),
+then a [S] scorer that generated none of them. The blame-history and
+prior-review lenses each reported **no findings**: the fence tracker was
+introduced and removed inside this one milestone so no prior milestone's intent
+is undone, the `instrument_names()` extraction continues M14's single-sourced
+roster line with `instruments()` byte-identical, and no return-1 finding is
+reintroduced. 16 candidates from the diff lens, 2 scored >= 80.
+
+**Actioned (>= 80).** Both return the milestone; neither is fixed review-side.
+
+- (85) AC4's accepted set is wider than the criterion. `<!-- audit-values-begin-->`,
+  `<!-- audit-values-end-->`, `<!-- audit-values-begin      -->` and
+  `<!-- audit-values-begin:   iip32   -->` are all accepted, against AC4's
+  "Accepted, and nothing else". Verified by the reviewer and again by this
+  session. **Defect return** — AC4 fails inside its own domain, the second time
+  this milestone's marker-recognition predicate has failed by a new mechanism.
+- (85) AC5's count guard is evadable by moving an abort into a helper, and this
+  diff already did so: the marker `stop()` at `data-raw/audit-norms.R:154` is
+  reachable from `parse_source_note()` and invisible to a count over that one
+  function's body. AC5's literal wording holds, so the criterion is what is
+  wrong. **Amendment return** for AC5.
+
+**Logged below threshold, not actioned (14).** (78) `objects` replaces the
+roster wholesale while `audit_norms()` treats it as a per-instrument override
+with fallback, so injecting one instrument reports 0 gaps where the same batch
+reports 23 -- the F8 shape from return 1, now measured to report *clean* rather
+than merely empty. (65) the T12 single-sourcing test is satisfied by a comment
+containing `instrument_names`, and a hard-coded roster copy in `data-raw/`
+leaves all 12 roster tests green. (60) `shipped_roster()` raises a raw R error
+on a norms table with no `Sample` column, and silently drops partly-`NA`
+samples. (60) AC1 and T4 both name a `roster` parameter `audit_norms()` does not
+have. (55) a tag is pattern-checked but never bound to a real instrument name.
+(50) the AC2 drop-each-row test counts any error as "noticed" and asserts no
+partition. (50) `source_note_block_tags()` skips the nesting check
+`parse_source_note()` performs. (35) `refuse_shared_untagged_blocks()` scans all
+of a note's blocks rather than the selected ones. (30) `source_note_tags()` has
+no production caller. (30) the roster/batch join key uses a space separator
+where the file elsewhere uses `\r`. (25) a near-miss prefix (`<!--audit-values-`,
+no space) is invisible -- pre-existing on master, not introduced here. (20)
+`shipped_roster()` enumerates via `data()` but fetches via `get()`. (20) two new
+fence tests also pass against master. (15) the two new `R/` helpers use `#`
+rather than `@noRd`.
+
+**Disposition: returned to `in-progress`. Return 2 of this milestone.** AC1,
+AC2, AC3, AC6 and AC7 are verified and ticked. Thrash trigger (b) fires: AC4 has
+now failed twice, each time by a new mechanism of the same shape -- which lines
+count as markers. The return-1 gate's recorded alternative (completing the fence
+parser) does not bear on this mechanism, so escalation via `/milestone-brief` is
+offered at the routing point alongside the direct fix.
 
 ### Acceptance criteria — fresh evidence (2026-08-08)
 
