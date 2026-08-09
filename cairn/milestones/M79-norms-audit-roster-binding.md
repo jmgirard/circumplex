@@ -1,6 +1,6 @@
 # M79: Bind the norms audit's batch to the shipped roster
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -144,11 +144,12 @@ Return 2 (2026-08-08), from the review findings below:
 
 Return 4 (2026-08-09), from the re-plan:
 
-- [ ] T19 Re-run the audit and the full check with nothing else in the session
+- [x] T19 Re-run the audit and the full check with nothing else in the session
       touching the R library; the three stamp columns are the only movement.
 
 ## Work log
 
+- 2026-08-09: T19 done, return 4 complete, status to review. Run strictly serially on a clean tree, nothing else touching the R library: the audit re-run leaves the coverage CSV byte-identical (15 rows, 0 gaps, 14 note-only, 1 constructed credit, 0 angle-copy splits, 0 IP2 breaches) and the 194-row ledger identical in 10 of its 12 columns, compared column by column — only `script_commit` and `data_commit` moved, `generated` did not. `devtools::check(args = "--no-manual")` is Status OK, 0 errors / 0 warnings / 0 notes, 14m55s, with `checking tests ... [12m/12m] OK` and `checking re-building of vignette outputs ... [52s/56s] OK` both present in the log; `devtools::test()` is FAIL 0 / WARN 4 / SKIP 0 / PASS 6876. The return-3 vignette ERROR does not reproduce, which is the evidence for its recorded diagnosis of library contention rather than a branch defect: no vignette, DESCRIPTION, or dependency line changed between the two runs. The ledger's stamp churn was restored rather than committed, so the check built from a tree with `git status` empty.
 - 2026-08-09: re-plan gate (return-3 thrash trigger (a)). AC5 is removed from this milestone and re-cut as M81; the remaining criteria renumber, so the Review sections above, which are history, use the pre-amendment numbering — their AC6 is this file's AC5 and their AC7 is this file's AC6. T19 is added for AC6's outstanding evidence run. No shipped code moves: the tests T6/T11/T16 built stay in the suite, they just no longer back a promise this milestone makes.
 - 2026-08-09: re-plan gate chose splitting AC5 out over re-wording it in place and over a bare retry; five criteria are verified with fresh evidence and the branch is otherwise mergeable, so holding them behind a criterion that has failed twice buys nothing, and `cairn_validate`'s 18-task WARN says the same. Falsified by M81's registry work proving inseparable from this branch's marker tests at implement time.
 - 2026-08-09: amendment return: AC6 (was AC7) — the "with nothing else touching the R library concurrently" clause drafted at this gate was dropped on the criteria audit's finding that it is a universal over concurrent processes no procedure evidences, and is exactly what left AC7 unticked at return 3; running the check serially is now T19's instruction. The criterion instead names the three stamp columns (`generated`, `script_commit`, `data_commit`) so the ledger diff is mechanical. Re-checked against the audit's three questions before writing: satisfiable (both halves were observed together at return 2), no IP blocks it, and its universal quantifies over two named CSVs' columns, which a column-by-column diff enumerates.
