@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-08 (audit re-run after M77 archived: all checks green, nothing in flight, both GitHub inboxes empty; M7 still blocked on the `submit_cran()` handoff, and the 47 `work-log format` advisories remain its wrapped entries, left as history)._
+_Last hygiene check: 2026-08-08 (M78 merged and archived, PR #106, shipping the reference-kind column RR16 chose over a rename; M73's terminal row pruned for the 5-row retention; two lessons extended rather than added, LESSONS being at 49 of 50; M7 still blocked on the `submit_cran()` handoff, and its 47 `work-log format` advisories are left as history)._
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,9 +9,8 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M78 | Per-sample reference-kind field in the shipped norms | review | — | high | milestones/M78-norms-reference-kind-field.md |
+| M78 | Per-sample reference-kind field in the shipped norms | done | — | high | milestones/archive/M78-norms-reference-kind-field.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M73 | Norms provenance audit, batch 2 (single-sample instruments) | done | — | high | milestones/archive/M73-norms-provenance-audit-batch2.md |
 | M74 | Norms provenance audit, batch 3 (multi-sample instruments) | done | M73 | high | milestones/archive/M74-norms-provenance-audit-batch3.md |
 | M75 | Norms provenance audit, batch 4 (IIP family) | done | — | high | milestones/archive/M75-norms-provenance-audit-batch4.md |
 | M76 | Disclose the reference sample at the standardizing call site | done | — | normal | milestones/archive/M76-norms-call-site-disclosure.md |
