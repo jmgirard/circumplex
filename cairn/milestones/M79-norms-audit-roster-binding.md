@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5
-- **Branch/PR:** —
+- **Branch/PR:** `m79-norms-audit-roster-binding`
 
 ## Goal
 
@@ -14,7 +14,12 @@ data it never read.
 
 ## Scope
 
-**In:** `data-raw/audit-norms.R` and its tests. The audit enumerates
+**In:** `data-raw/audit-norms.R` and its tests, plus one unexported
+`instrument_names()` in `R/instrument_oop.R` that single-sources the
+shipped-instrument sweep the exported `instruments()` and
+`tests/testthat/helper-norms.R:8` already write out separately — widened at
+the 2026-08-08 implementation gate, AC1 forbidding a third copy while
+`helper-norms.R` cannot read `.Rbuildignore`d `data-raw/`. The audit enumerates
 `AUDIT_BATCH` and the source notes that batch names, and never the shipped
 roster, so `AUDIT_BATCH` is bound to nothing: measured 2026-08-08 at
 `cef9d36f`, dropping `isc` from the batch loses 17 audited values while the
@@ -124,6 +129,8 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - 2026-08-08: a second audit pass on the criterion added at the gate found it duplicated the existing assertion at `tests/testthat/test-norms-provenance.R:478`, which already runs the real batch over the real notes; it was re-cut as AC6's roster-identity check, which nothing asserts today.
 - 2026-08-08: plan gate chose reporting an unaudited shipped sample as a non-exempt coverage row over aborting, because the two sibling note-side sweeps already report and an abort would stop the audit exactly when a new instrument lands before its source note; falsified by a run where a reported gap is overlooked and unaudited data ships anyway.
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
+- 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
+- 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
 - 2026-08-08: plan gate declined the `parse_source_note(instrument = NULL)` finding (M75 review, scored 55) as intended behaviour per the design note at `data-raw/audit-norms.R:138-143` and unreachable through `audit_norms()`; falsified by a caller outside `audit_norms()` coming to rely on the parser.
 
 ## Decisions
