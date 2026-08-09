@@ -66,15 +66,20 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       parses. Measured 2026-08-08: `horowitz2003` is the only note two
       instruments read and it is already tagged, so nothing in the repo is
       refused by this.
-- [ ] AC4 A begin or end marker is recognised only on a line whose trimmed
-      text starts with that marker's prefix and ends with `-->`, and not when
-      the line lies inside a fenced code block; and a tag is accepted only
-      where the text between prefix and `-->` is empty or of the form
-      `: <tag>`, so `<!-- audit-values-beginning -->` aborts rather than
-      yielding the tag `"ning"`. Both hold at both scanning sites,
-      `parse_source_note()` and `source_note_block_tags()`, which share one
-      helper. A fixture note carries a fenced begin marker, a fenced end
-      marker, and the malformed prefix.
+- [ ] AC4 The audit refuses an ambiguous marker line rather than inferring
+      whether it is real, and parses no markdown fences at all. A begin or
+      end marker is recognised only on a line whose trimmed text starts with
+      that marker's prefix, ends with `-->`, and carries no further `-->`
+      inside; a tag is accepted only where the text between prefix and `-->`
+      is empty or of the form `: <tag>`. Any other line containing the
+      literal `<!-- audit-values-` aborts naming the offending line, so an
+      indented, fenced, inline, or malformed marker is refused and never
+      silently ignored — no note can hide a block from the sweep. Both hold
+      at both scanning sites, `parse_source_note()` and
+      `source_note_block_tags()`, which share one helper. A fixture note
+      carries an indented marker, a marker inside a fence, a marker with
+      junk after its tag, and `<!-- audit-values-beginning -->`, and each is
+      refused by name.
 - [ ] AC5 Every abort path in `parse_source_note()` has a test asserting its
       specific message, and a test asserts the count of `stop(` occurrences in
       that function's body equals the number of enumerated abort tests, so a
@@ -96,8 +101,8 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - AC1 → T4
 - AC2 → T5
 - AC3 → T3
-- AC4 → T1, T2
-- AC5 → T6
+- AC4 → T1, T2, T10
+- AC5 → T6, T11
 - AC6 → T7
 - AC7 → T8
 
@@ -125,6 +130,22 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - [x] T8 Re-run the audit, confirm the two CSVs are unchanged, run
       `devtools::test()` and `devtools::check(args = "--no-manual")`.
 
+Return 1 (2026-08-08), from the review findings below:
+
+- [ ] T9 F14: delete the duplicated `MARKER_BEGIN`/`MARKER_END` pair and
+      reunite `parse_source_note()`'s doc comment with its function.
+- [ ] T10 AC4 as amended: drop `fenced_lines()` entirely; one strict scanner
+      that refuses any line carrying the marker prefix it cannot read
+      unambiguously. Closes F1, F2, F3, F4, F5 (the silent-loss path) and F6.
+      Fixture note per the amended criterion.
+- [ ] T11 F15: the `stop(`-count test counts occurrences, not deparsed lines
+      containing the substring, as AC5 words it.
+- [ ] T12 F11: replace the tautological single-sourcing assertion at
+      `tests/testthat/test-norms-audit-roster.R:108-114` with one that reddens
+      when a second sweep is written into `data-raw/`.
+- [ ] T13 Re-run the audit and the full `check()`; confirm the two CSVs still
+      move only in their stamps.
+
 ## Work log
 
 - 2026-08-08: created by /milestone-plan.
@@ -134,6 +155,10 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
+- 2026-08-08: amendment return: AC4 — "The audit refuses an ambiguous marker line rather than inferring whether it is real, and parses no markdown fences at all. […] Any other line containing the literal `<!-- audit-values-` aborts naming the offending line, so an indented, fenced, inline, or malformed marker is refused and never silently ignored — no note can hide a block from the sweep. […] A fixture note carries an indented marker, a marker inside a fence, a marker with junk after its tag, and `<!-- audit-values-beginning -->`, and each is refused by name."
+- 2026-08-08: return-1 gate chose refusing an ambiguous marker line over completing the fence parser, and over escalating the question; F1, F2, F3, F4 and F5 are four independent defects in one hand-rolled markdown fence tracker the audit needs for nothing else, and fail-closed is this file's existing doctrine. Measured before choosing: no committed note carries a stray `<!-- audit-values-` occurrence, and the one note with a fence (`browne1982.md`) has no markers in it, so no committed note is refused by the change. Falsified by a source note legitimately needing to display a marker line it does not mean.
+- 2026-08-08: return-1 gate chose fixing F11 (scored 78, below the action threshold) in this pass, because it is the only test standing behind AC1's single-sourcing clause and it passes even when the function it checks returns nothing.
+- 2026-08-08: return 1 opened; T9-T13 added for the five actioned findings plus F11 and F15. AC4 amended at the gate above; AC5 unchanged, F15 being a defect in its test rather than in its wording.
 - 2026-08-08: review returned M79 to in-progress (return 1). AC4 fails inside its own domain: `fenced_lines()` misses indented code blocks (F1, 87), a `~~~` line closes a backtick fence (F3, 80), and an unclosed fence silently hides every later block (F5, 83) -- the last a silent-loss path this diff INTRODUCED, so it fails the Goal and not only the criterion. AC4's tag clause also fails on F6 (90), junk after the tag being accepted. AC5 fails on F15's literal reading (75, logged). AC1, AC2, AC3, AC6, AC7 verified and ticked. F14 (92) is the duplicate constant pair. Full findings and the fence design question in the Review section.
 - 2026-08-08: review in flight (PR #107). AC evidence and the consistency gate are recorded below; criterion checkboxes deliberately NOT yet ticked, pending triage of the three review lenses. Two lenses in, both independently naming one defect: `MARKER_BEGIN`/`MARKER_END` are defined twice, at `data-raw/audit-norms.R:123-124` and `:147-148`. Commit `d9b2ff48`'s message claims it moved them; it added a copy without deleting the original. Inert (identical rebind) but dead duplicate code, and the commit message is a record proven false -- history, so corrected forward here rather than edited.
 - 2026-08-08: T8 done, all eight tasks complete, status to review. `devtools::check(args = "--no-manual")` is Status OK -- 0 errors, 0 warnings, 0 notes, 14 minutes -- and `document()` is clean with no diff in `man/`, `NAMESPACE` or the RcppExports pair. Re-running the audit leaves the ledger and coverage CSVs byte-identical apart from their commit stamps (194 ledger rows, 15 coverage rows, 0 gaps), so no shipped value or audit verdict moves on this branch.
