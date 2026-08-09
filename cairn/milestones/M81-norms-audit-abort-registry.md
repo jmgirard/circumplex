@@ -1,6 +1,6 @@
 # M81: Enumerate the norms-audit abort registry from the script's parse tree
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M79
 - **Driving RR:** —
@@ -127,7 +127,65 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
 - 2026-08-09: T5 re-anchored the single-sourcing assertion on the parse tree via `norms_audit_resolves_name()`; the absence half stays a text assertion, deliberately, a second enumeration being a defect whether live or commented out. Two mutations measured, script restored byte-clean after each. Deleting the resolving call and replacing it with a hard-coded copy of the 15-instrument list — behaviour identical, so the mutation isolates: FAIL 1 | PASS 16, the only failure being the assertion, while the retired text grep stays TRUE off the doc comment at `:404`. Control: switching the call to `circumplex:::instrument_names()` keeps FAIL 0 | PASS 17, and green for the claim's reason — the `:::` shape is what matched, verified by listing the matching call.
 - 2026-08-09: the AC4 assertion accepts `pkg:::nm`, `pkg::nm` and a literal-naming `get()`/`getExportedValue()`, not the one shape at `:414` alone — a test that reddens under a behaviour-preserving accessor switch is a defect in the test.
 - 2026-08-09: T6 — audit re-run at `53908411`: ledger 194 rows, coverage 15 rows, 0 gaps, 14 note-only, 1 constructed credit, 0 angle-copy splits, 0 IP2 breaches. Compared column by column against the committed CSVs: coverage identical in all 5 columns; ledger identical in all 12 but `script_commit` and `data_commit`, `generated` included. The stamp-only churn was reverted rather than committed — M81 changes no audited value, so the committed stamps stay a true record of the run that produced them. `devtools::test()`: FAIL 0 | WARN 4 | SKIP 0 | PASS 6883, the 4 warnings outside this milestone's files (both ran WARN 0 on their own). `devtools::check(args = "--no-manual")`: Status OK, 0 errors / 0 warnings / 0 notes, 16m 46s.
+- 2026-08-09: review returned M81 to `in-progress` on AC1 (defect return 1 on this milestone). What failed: AC1 says a collected `stopifnot()` site "contributes one key per condition", but `call_positional_args()` drops named arguments, so a condition written `stopifnot("msg" = cond)` contributes none. Verified at the gate — a real added guard fires (`divisor must be numeric`) while the walk returns 14 sites against a baseline of 14 and the suite stays FAIL 0 | PASS 76; the `stopifnot(exprs = {...})` form returns 12 against the same baseline. Thrash trigger (b) fires: this is the third mechanism of the same shape against this criterion's lineage, after M79's AC5 failed twice, and it is exactly the falsifier the 2026-08-09 plan gate wrote down when it declined a `/milestone-brief` escalation. Trigger (a) composes — a re-plan has already been spent on this criterion (M81 is that re-cut) — so a bare retry is not the disposition.
 
 ## Decisions
 
 ## Review
+
+**2026-08-09 — returned to `in-progress` on AC1. PR #108 (draft, not merged).**
+
+Evidence gathered before the return:
+
+- AC1 (structure, PASS): 27 top-level expressions parsed; the last is the `if`
+  guarded by `norms_audit_defs_only`, so the run block is inside the walked
+  domain. 14 sites (12 `stop`, 2 `stopifnot` conditions), 13 distinct keys,
+  the one duplicate being the intended `source note not found: {}` pair. Set
+  equality is bidirectional (sorted multiset `identical()`).
+- AC1 (promise, **FAIL**): see the return below.
+- AC2: `SCRIPT_ABORTS` holds 14 entries, all carrying `(kind, key, fixture)`.
+  The diff-bug reviewer's cross-contamination matrix — every fixture's actual
+  message against every key's matcher — found no message satisfying a key
+  other than its own, bar the intended pair.
+- AC3: reviewer independently reproduced the discrimination; the five-name
+  non-data-frame fixture leaves the sibling condition TRUE.
+- AC4: met against the two stated mutations; F6 names a third it does not
+  survive.
+- AC5: not re-verified fresh this session — the return came first.
+- Consistency gate: `cairn_validate` exit 0, every CHECK PASS. The 47
+  `work-log format` advisories are all pre-existing hard-wrapped lines in M7.
+- Touched test files, fresh: FAIL 0 | PASS 76 and FAIL 0 | PASS 17.
+
+Fresh-context review: three lenses. Blame-history — zero findings (F15's
+occurrence-counting superseded by AST node collection, all four assertions of
+the removed non-parser abort test present, F11's fix tightened not reverted,
+no D-entry contradicted). Prior-review — zero findings; the
+`gh api pulls/comments` probe returned empty, so the thread walk was skipped.
+Diff-bug — 11 findings, scored by a fresh [S] scorer.
+
+**Actioned (>= 80): F1, scored 82 — AC1's walk misses a `stopifnot()`
+condition written in named-message form.** `call_positional_args()` drops
+every named argument, which is right for `stop()`'s `call. = FALSE` and wrong
+for `stopifnot("msg" = cond)`, where the name IS the message and the argument
+is a real condition. Verified independently at the gate: adding
+`"divisor must be numeric" = is.numeric(batch$divisor)` to `validate_batch()`
+gives a guard that genuinely fires (`validate_batch()` on a character
+`divisor` raises `divisor must be numeric`), while the walk still returns 14
+sites against a baseline of 14 and the suite stays FAIL 0 | WARN 0 | PASS 76.
+The reviewer separately measured the `stopifnot(exprs = {...})` form at 12
+sites against the same baseline. Additions hide; removals show.
+
+Below threshold, logged not actioned (10): F3 (78) an all-`{}` key renders
+regex `"."`, so a `sprintf`-form rewrite of any `stop()` would make that
+site's AC2 assertion pass on any error — measured. F6 (72) the AC4 assertion
+checks neither the package operand of `:::` nor that `get()`'s `envir` is a
+namespace, so a local hard-coded copy read via `get("instrument_names",
+envir = environment())` satisfies it. F4 (65) `stopifnot` stem matching has
+no length floor and cannot see past R's truncation width — measured. F2 (55)
+nothing ties a registry entry to a site, so two same-key entries could share
+one fixture. F9 (55) key mutual-non-matching is a comment, not a test.
+F5 (45) `stopifnot` keys redden under a pure formal rename. F10 (42) a
+run-block abort is collectable but not fixturable, so AC1 and AC2 would be
+jointly unsatisfiable for one. F8 (40) `norms_audit_site_ids()` is
+name-sensitive. F7 (32) the absence-half text grep is evadable. F11 (15)
+generic helper names in the shared test environment.
