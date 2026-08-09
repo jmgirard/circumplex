@@ -381,6 +381,42 @@ values_agree <- function(field, shipped, source, divisor) {
   identical(trimws(shipped), trimws(source))
 }
 
+# Every shipped (instrument, sample) pair there is. The batch is a hand-written
+# table and nothing has ever bound it to `data/`: measured 2026-08-08, dropping
+# `isc` from AUDIT_BATCH lost all 17 of its audited values while the ledger fell
+# from 194 rows to 177, the coverage report from 15 to 13, and the gap count
+# stayed at 0 with no row anywhere naming the instrument or its note. The
+# note-side sweeps below cannot see it: they walk the notes the batch NAMES, so
+# an instrument the batch omits is never reached at all.
+#
+# The instrument enumeration is the package's own (circumplex:::instrument_names),
+# not a copy, so the roster cannot drift from `data/`. `objects` overrides it:
+# a fixture batch drives synthetic instruments and must be swept against those,
+# not against the shipped roster.
+shipped_roster <- function(objects = NULL) {
+  ns <- asNamespace("circumplex")
+  if (length(objects)) {
+    nms <- names(objects)
+    fetch <- function(nm) objects[[nm]]
+  } else {
+    nms <- get("instrument_names", envir = ns)()
+    fetch <- function(nm) get(nm, envir = ns)
+  }
+  out <- list()
+  for (nm in nms) {
+    norms <- fetch(nm)$Norms[[1]]
+    # An instrument shipping no norms has nothing to audit and is not a gap.
+    if (is.null(norms) || !nrow(norms)) next
+    out[[length(out) + 1L]] <- data.frame(
+      instrument = nm, sample = as.character(sort(unique(norms$Sample))),
+      stringsAsFactors = FALSE
+    )
+  }
+  if (length(out)) do.call(rbind, out) else
+    data.frame(instrument = character(0), sample = character(0),
+               stringsAsFactors = FALSE)
+}
+
 # One source can be the published source for more than one instrument, and the
 # blocks then have to be tagged: an UNTAGGED block is handed whole to whoever
 # asks, so two instruments reading one would each be audited against rows that
@@ -552,6 +588,25 @@ audit_norms <- function(batch = AUDIT_BATCH,
         exempt = FALSE, stringsAsFactors = FALSE
       )
     }
+  }
+
+  # ...and the shipped side, the one direction neither sweep above covers.
+  # Both of those walk the notes the batch names, so they can only ever report
+  # something missing from a note SOMEONE audited; a shipped sample the batch
+  # never mentions is not reached by either. Reported rather than refused, as
+  # its two siblings are: an abort would stop the audit exactly when a new
+  # instrument lands before its source note does, which is when it is wanted.
+  unaudited <- shipped_roster(objects)
+  unaudited <- unaudited[
+    !(paste(unaudited$instrument, unaudited$sample) %in%
+        paste(batch$instrument, batch$sample)), , drop = FALSE
+  ]
+  if (nrow(unaudited)) {
+    coverage[[length(coverage) + 1L]] <- data.frame(
+      instrument = unaudited$instrument, side = "shipped-sample-not-audited",
+      field = "sample", scale = unaudited$sample,
+      exempt = FALSE, stringsAsFactors = FALSE
+    )
   }
 
   list(
