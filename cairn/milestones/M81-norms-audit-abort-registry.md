@@ -94,10 +94,10 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
 
 ## Tasks
 
-- [ ] T1 The parse-tree collector: walk every top-level expression of
+- [x] T1 The parse-tree collector: walk every top-level expression of
       `data-raw/audit-norms.R`, collect the four call heads, key each site per
       AC1. Replace `marker_defs()`'s sourced enumeration in the count test.
-- [ ] T2 Re-key `SCRIPT_ABORTS` to one entry per site, each carrying its
+- [x] T2 Re-key `SCRIPT_ABORTS` to one entry per site, each carrying its
       fixture; one test asserts each fixture raises its own key, another
       asserts set equality with T1's collection in both directions.
 - [ ] T3 The two `validate_batch()` `stopifnot()` cases, the five-name
@@ -121,6 +121,7 @@ enumerates that domain, and AC2 states the bound instead of claiming it.
 
 - 2026-08-09: implement gate amended AC1's keying rule and AC2's example key — sites key on the message template (all literal fragments, `{}` for the rest), not the first fragment alone, which is `"source note "` at six distinct sites and would let one site's fixture satisfy another's AC2 assertion. Measured on the parse walk over `data-raw/audit-norms.R` at `2ab626f6`: 13 abort calls (12 `stop()`, 1 `stopifnot()`) against the shipped text guard's 12.
 - 2026-08-09: implement gate chose a shared `tests/testthat/helper-norms-audit-script.R` for the parse walk over a copy in each of the two test files, matching the suite's five existing helper files.
+- 2026-08-09: T1+T2 landed in one checkpoint — replacing the count test's sourced enumeration (T1) has no meaning without the per-site registry it compares against (T2). New `tests/testthat/helper-norms-audit-script.R`; the walk returns 14 site entries (12 `stop()`, 2 `stopifnot()` conditions), every key unique but the intended `source note not found: {}` pair. `test-norms-audit-markers.R`: FAIL 0 | PASS 76, up from PASS 69.
 
 ## Decisions
 
