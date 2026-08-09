@@ -66,20 +66,20 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
       parses. Measured 2026-08-08: `horowitz2003` is the only note two
       instruments read and it is already tagged, so nothing in the repo is
       refused by this.
-- [ ] AC4 The audit refuses an ambiguous marker line rather than inferring
-      whether it is real, and parses no markdown fences at all. A begin or
-      end marker is recognised only on a line whose trimmed text starts with
-      that marker's prefix, ends with `-->`, and carries no further `-->`
-      inside; a tag is accepted only where the text between prefix and `-->`
-      is empty or of the form `: <tag>`. Any other line containing the
-      literal `<!-- audit-values-` aborts naming the offending line, so an
-      indented, fenced, inline, or malformed marker is refused and never
-      silently ignored — no note can hide a block from the sweep. Both hold
-      at both scanning sites, `parse_source_note()` and
-      `source_note_block_tags()`, which share one helper. A fixture note
-      carries an indented marker, a marker inside a fence, a marker with
-      junk after its tag, and `<!-- audit-values-beginning -->`, and each is
-      refused by name.
+- [ ] AC4 The audit parses no markdown fences and infers nothing: a line
+      carrying the literal `<!-- audit-values-` is either an exact marker or
+      an abort. Accepted, and nothing else, at column zero:
+      `<!-- audit-values-end -->`, `<!-- audit-values-begin -->`, and
+      `<!-- audit-values-begin: <tag> -->` with `<tag>` an instrument name.
+      Every other line carrying the prefix — indented, inline in prose,
+      misspelt, or with junk after its tag — aborts naming the line. So no
+      fence, indent, or surrounding prose can hide a block from the sweep or
+      invent a tag: a marker displayed inside a fence is read as the real
+      marker it looks like, never silently dropped. Both hold at both
+      scanning sites, `parse_source_note()` and `source_note_block_tags()`,
+      which share one helper. A fixture note exercises each refused shape and
+      each accepted one, plus the unclosed fence that formerly hid every
+      later block.
 - [ ] AC5 Every abort path in `parse_source_note()` has a test asserting its
       specific message, and a test asserts the count of `stop(` occurrences in
       that function's body equals the number of enumerated abort tests, so a
@@ -132,15 +132,15 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 
 Return 1 (2026-08-08), from the review findings below:
 
-- [ ] T9 F14: delete the duplicated `MARKER_BEGIN`/`MARKER_END` pair and
+- [x] T9 F14: delete the duplicated `MARKER_BEGIN`/`MARKER_END` pair and
       reunite `parse_source_note()`'s doc comment with its function.
-- [ ] T10 AC4 as amended: drop `fenced_lines()` entirely; one strict scanner
+- [x] T10 AC4 as amended: drop `fenced_lines()` entirely; one strict scanner
       that refuses any line carrying the marker prefix it cannot read
       unambiguously. Closes F1, F2, F3, F4, F5 (the silent-loss path) and F6.
       Fixture note per the amended criterion.
-- [ ] T11 F15: the `stop(`-count test counts occurrences, not deparsed lines
+- [x] T11 F15: the `stop(`-count test counts occurrences, not deparsed lines
       containing the substring, as AC5 words it.
-- [ ] T12 F11: replace the tautological single-sourcing assertion at
+- [x] T12 F11: replace the tautological single-sourcing assertion at
       `tests/testthat/test-norms-audit-roster.R:108-114` with one that reddens
       when a second sweep is written into `data-raw/`.
 - [ ] T13 Re-run the audit and the full `check()`; confirm the two CSVs still
@@ -155,7 +155,9 @@ Return 1 (2026-08-08), from the review findings below:
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
-- 2026-08-08: amendment return: AC4 — "The audit refuses an ambiguous marker line rather than inferring whether it is real, and parses no markdown fences at all. […] Any other line containing the literal `<!-- audit-values-` aborts naming the offending line, so an indented, fenced, inline, or malformed marker is refused and never silently ignored — no note can hide a block from the sweep. […] A fixture note carries an indented marker, a marker inside a fence, a marker with junk after its tag, and `<!-- audit-values-beginning -->`, and each is refused by name."
+- 2026-08-08: T9-T12 done. `fenced_lines()` is gone: the audit no longer parses markdown, and a line carrying `<!-- audit-values-` is either an exact column-zero marker or an abort naming it. That closes F1, F2, F3, F4 and F6 by removing what they were defects in, and F5 by construction -- the unclosed-fence regression test now sees both blocks where the fence tracker reported one. The duplicate `MARKER_BEGIN`/`MARKER_END` pair is deleted and `parse_source_note()`'s doc comment sits with its function again (F14). Each new guard was no-oped: two of the three I first wrote were dead (the leading-whitespace refusal is subsumed by not trimming, and the interior `-->` check by the tag pattern) and were removed rather than shipped; of the five that remain, four redden and the begin/end check relocates into the colon check, recorded in its fixture comment. The `stop(`-count test counts occurrences, not deparsed lines (F15), and the single-sourcing test now reads the audit script's source instead of comparing one function against itself -- adding a `data(package` sweep to `data-raw/` reddens it, as does renaming `instrument_names()` (F11).
+- 2026-08-08: amendment return: AC4 — "The audit parses no markdown fences and infers nothing: a line carrying the literal `<!-- audit-values-` is either an exact marker or an abort. […] Every other line carrying the prefix — indented, inline in prose, misspelt, or with junk after its tag — aborts naming the line. So no fence, indent, or surrounding prose can hide a block from the sweep or invent a tag: a marker displayed inside a fence is read as the real marker it looks like, never silently dropped. […] A fixture note exercises each refused shape and each accepted one, plus the unclosed fence that formerly hid every later block."
+- 2026-08-08: the amended AC4 was corrected once before any code was written against it. The first wording claimed a fenced marker is refused; without fence parsing a column-zero marker inside a fence is indistinguishable from a real one and is read as real. What the code can guarantee, and what the criterion now says, is that no such line is silently DROPPED — the property F5 broke.
 - 2026-08-08: return-1 gate chose refusing an ambiguous marker line over completing the fence parser, and over escalating the question; F1, F2, F3, F4 and F5 are four independent defects in one hand-rolled markdown fence tracker the audit needs for nothing else, and fail-closed is this file's existing doctrine. Measured before choosing: no committed note carries a stray `<!-- audit-values-` occurrence, and the one note with a fence (`browne1982.md`) has no markers in it, so no committed note is refused by the change. Falsified by a source note legitimately needing to display a marker line it does not mean.
 - 2026-08-08: return-1 gate chose fixing F11 (scored 78, below the action threshold) in this pass, because it is the only test standing behind AC1's single-sourcing clause and it passes even when the function it checks returns nothing.
 - 2026-08-08: return 1 opened; T9-T13 added for the five actioned findings plus F11 and F15. AC4 amended at the gate above; AC5 unchanged, F15 being a defect in its test rather than in its wording.

@@ -1,26 +1,28 @@
 # Block-marker recognition in the norms audit's source-note parser (M79).
 #
-# The parser locates a note's machine-readable block with two independent
+# The parser located a note's machine-readable block with two independent
 # greps -- one in parse_source_note(), one in source_note_block_tags() --
-# neither anchored at the end of the line nor aware of fenced code blocks, and
-# both handing whatever follows the prefix to the tag extractor. Three shapes
-# get through:
+# neither anchored at the end of the line, and both handing whatever followed
+# the prefix to the tag extractor, so `<!-- audit-values-beginning -->` was a
+# marker carrying the tag "ning".
 #
-#   (a) A note that SHOWS the audit-values format inside a fence has its
-#       example parsed as a real block. With a matching fenced end marker the
-#       begin/end counts balance, so the well-formedness test passes and the
-#       example's values become a block of the note -- and the instrument whose
-#       real block is untagged can then no longer be found at all, because a
-#       two-block note is selected by tag.
-#   (b) The same fenced example reaches the unclaimed-block sweep through
-#       source_note_block_tags(), which emits a phantom `note-block-not-audited`
-#       coverage gap for a block that does not exist.
-#   (c) `<!-- audit-values-beginning -->` is accepted as a marker carrying the
-#       tag "ning", because tag extraction strips the prefix and the trailing
-#       `-->` and returns whatever is left.
+# The first fix ignored any marker lying inside a fenced code block, so a note
+# could display its own format. That needed a markdown fence tracker, and the
+# M79 review found four defects in it: an indented code block is not a fence,
+# a `~~~` line closed a backtick fence, a line opening with an inline code
+# span flipped fence parity for the rest of the note, and an unclosed fence
+# hid every later block from every reader in silence -- a data-loss path the
+# fix itself introduced.
 #
-# No note in cairn/references/ carries a fence today (only browne1982.md does,
-# and it has no markers), so all three are latent rather than live.
+# So the audit stopped inferring. A line carrying the marker prefix is either
+# one of the three exact accepted shapes or an abort; markdown fences are not
+# parsed at all, and an indented, fenced, inline or misspelled marker is
+# refused rather than ignored. These tests pin the accepted shapes, and pin
+# that each refused shape aborts by name.
+#
+# No note in cairn/references/ carries a stray `<!-- audit-values-` occurrence
+# today, and the one note with a fence (browne1982.md) has no marker in it, so
+# nothing committed is refused by this.
 #
 # DEVELOPMENT-ONLY: data-raw/ is not installed, so these skip against the
 # installed package, as the sibling audit test files do.
@@ -35,15 +37,12 @@ marker_defs <- function() {
   env
 }
 
-# One real untagged block, followed by a fenced example of the same format.
-# The example carries BOTH markers so the begin/end counts balance -- an
-# unbalanced fence would merely abort, which is a false alarm rather than the
-# silent mis-parse this fences.
-fenced_note_dir <- function() {
-  dir <- tempfile("m79-fenced-")
+# One well-formed untagged block, then whatever the case under test appends.
+note_with <- function(trailing) {
+  dir <- tempfile("m79-marker-")
   dir.create(dir)
   writeLines(c(
-    "# A source note that documents its own format",
+    "# A source note",
     "",
     "<!-- audit-values-begin -->",
     "| field | sample | scale | value | anchor |",
@@ -52,8 +51,65 @@ fenced_note_dir <- function() {
     "| M | 1 | NO | 1.22 | Table 1 |",
     "<!-- audit-values-end -->",
     "",
-    "The block above is written in this format:",
-    "",
+    trailing
+  ), file.path(dir, "note.md"))
+  dir
+}
+
+# Every shape AC4 refuses, named by how it goes wrong. Each is fixtured alone:
+# the first abort ends the read, so a note carrying all of them would only ever
+# prove the first.
+REFUSED_MARKERS <- list(
+  # Indentation is how a note displays a marker without writing one, so it is
+  # refused rather than trimmed -- including the 4-space code block that the
+  # retired fence tracker never saw as a fence at all (F1).
+  "an indented marker" = "    <!-- audit-values-begin: example -->",
+  "an indented fenced marker" =
+    c("  ```", "  <!-- audit-values-end -->", "  ```"),
+  # The tag shapes: junk riding in after the tag, and a colon that promises a
+  # tag it does not deliver.
+  "junk after the tag" = "<!-- audit-values-begin: iip64 --> and more -->",
+  "a doubled colon" = "<!-- audit-values-begin:: fx -->",
+  "a colon with no tag" = "<!-- audit-values-begin: -->",
+  # The prefix itself, misspelt or buried in prose.
+  "a misspelt prefix" = "<!-- audit-values-beginning -->",
+  # Neither begin nor end. Its guard RELOCATES rather than being load-bearing:
+  # no-oped, "middle" falls through to the colon check and aborts there with
+  # the same message (measured 2026-08-08). Kept because relying on that
+  # fall-through is an accident of the word lengths.
+  "a prefix that is neither begin nor end" = "<!-- audit-values-middle -->",
+  "an end marker with a tail" = "<!-- audit-values-end: fx -->",
+  "junk after an end marker" = "<!-- audit-values-end --> and more -->",
+  "a marker inline in prose" = "See <!-- audit-values-begin --> for the shape."
+)
+
+test_that("an ambiguous marker line is refused, not ignored (M79)", {
+  env <- marker_defs()
+  for (why in names(REFUSED_MARKERS)) {
+    dir <- note_with(REFUSED_MARKERS[[why]])
+    # The specific message, not bare failure: a note broken in some unrelated
+    # way would also raise, and would prove nothing about marker recognition.
+    # Both readers, because they scanned independently before M79 and a shape
+    # refused for one must be refused for the other.
+    expect_error(
+      env$parse_source_note("note", dir, instrument = "fx"),
+      "malformed audit-values marker", info = why
+    )
+    expect_error(
+      env$source_note_block_tags("note", dir),
+      "malformed audit-values marker", info = why
+    )
+  }
+})
+
+test_that("a column-zero marker in a fence is read as real (M79)", {
+  env <- marker_defs()
+  # The honest limit of not parsing fences: this line is indistinguishable from
+  # a real marker, so it becomes one. Pinned because the alternative -- guessing
+  # it is only an example -- is what the retired fence tracker did, and what
+  # made a block disappear. Not silently ignored is the property; refused is
+  # not claimed.
+  dir <- note_with(c(
     "```",
     "<!-- audit-values-begin: example -->",
     "| field | sample | scale | value | anchor |",
@@ -61,51 +117,47 @@ fenced_note_dir <- function() {
     "| M | 1 | PA | 9.99 | not a real anchor |",
     "<!-- audit-values-end -->",
     "```"
-  ), file.path(dir, "fenced.md"))
-  dir
-}
-
-test_that("a fenced example is not parsed as a block (M79)", {
-  env <- marker_defs()
-  dir <- fenced_note_dir()
-
-  # Two real rows, and the 9.99 from the fenced example is not among them.
-  got <- env$parse_source_note("fenced", dir, instrument = "fx")
-  expect_identical(nrow(got), 2L)
-  expect_false("9.99" %in% got$value)
-  expect_identical(attr(got, "tag"), "")
+  ))
+  # Both blocks are reported: the real untagged one and the displayed one.
+  expect_identical(env$source_note_block_tags("note", dir), c("", "example"))
+  # And the note is now a two-block note, so asking it for an instrument no
+  # block names aborts rather than handing back the first block.
+  expect_error(
+    env$parse_source_note("note", dir, instrument = "fx"),
+    "has no audit-values block for"
+  )
 })
 
-test_that("a fenced example contributes no block tag (M79)", {
+test_that("an unclosed fence cannot hide a later block (M79)", {
   env <- marker_defs()
-  dir <- fenced_note_dir()
+  # The regression test for the silent-loss path the fence tracker introduced:
+  # an unclosed fence put every later line "inside" it, so source_note_block_tags()
+  # reported only the first block, the unclaimed-block sweep saw nothing, and
+  # the shared-untagged refusal could not see the hidden block either. With no
+  # fence tracking, the fence is just text and both blocks are reported.
+  dir <- tempfile("m79-unclosed-")
+  dir.create(dir)
+  writeLines(c(
+    "<!-- audit-values-begin: fx -->",
+    "| field | sample | scale | value | anchor |",
+    "|---|---|---|---|---|",
+    "| M | 1 | PA | 1.11 | Table 1 |",
+    "<!-- audit-values-end -->",
+    "",
+    "```",                      # opened and never closed
+    "some example output",
+    "",
+    "<!-- audit-values-begin: fy -->",
+    "| field | sample | scale | value | anchor |",
+    "|---|---|---|---|---|",
+    "| M | 1 | PA | 2.22 | Table 1 |",
+    "<!-- audit-values-end -->"
+  ), file.path(dir, "hidden.md"))
 
-  # source_note_block_tags() feeds the unclaimed-block sweep, so a phantom tag
-  # here becomes a phantom `note-block-not-audited` coverage gap.
-  expect_identical(env$source_note_block_tags("fenced", dir), "")
-})
-
-test_that("a fenced example does not raise a phantom block gap (M79)", {
-  env <- marker_defs()
-  dir <- fenced_note_dir()
-  batch <- data.frame(
-    instrument = "fx", sample = 1, citekey = "fenced",
-    divisor = 1, scales = TRUE, stringsAsFactors = FALSE
+  expect_identical(env$source_note_block_tags("hidden", dir), c("fx", "fy"))
+  expect_identical(
+    env$parse_source_note("hidden", dir, instrument = "fy")$value, "2.22"
   )
-  obj <- list(
-    Norms = list(
-      data.frame(Sample = c(1, 1), Scale = c("PA", "NO"), Angle = c(90, 45),
-                 M = c(1.11, 1.22), SD = c(0.11, 0.22),
-                 stringsAsFactors = FALSE),
-      data.frame(Sample = 1, Size = 100, Population = "p",
-                 Reference = "r", URL = "u", stringsAsFactors = FALSE)
-    ),
-    Scales = data.frame(Abbrev = c("PA", "NO"), Angle = c(90, 45),
-                        Items = c("1, 3", "2, 4"), stringsAsFactors = FALSE)
-  )
-  res <- env$audit_norms(batch, dir = dir, objects = list(fx = obj))
-  gaps <- res$coverage[!res$coverage$exempt, , drop = FALSE]
-  expect_false("note-block-not-audited" %in% gaps$side)
 })
 
 # --- one note, two instruments (M79) -----------------------------------------
@@ -303,8 +355,14 @@ test_that("no parse_source_note() abort is left unregistered (M79)", {
   # The domain is enumerated, not recalled: count the stop() calls in the
   # function's own body and require one registered case each. A seventh abort
   # added without a case fails here rather than shipping untested.
-  body_src <- deparse(body(env$parse_source_note))
-  n_stops <- sum(grepl("stop(", body_src, fixed = TRUE))
+  #
+  # OCCURRENCES, not lines containing one: the predecessor counted deparsed
+  # lines matching the substring, so two stop() calls deparsed onto one line
+  # counted as one and a seventh abort could land registered-looking (M79
+  # review, F15).
+  body_src <- paste(deparse(body(env$parse_source_note)), collapse = "\n")
+  at <- gregexpr("stop(", body_src, fixed = TRUE)[[1]]
+  n_stops <- if (at[[1]] == -1L) 0L else length(at)
   expect_identical(n_stops, length(PARSE_ABORTS))
 })
 
@@ -314,11 +372,14 @@ test_that("source_note_tags() reads the two well-formed marker shapes (M79)", {
   expect_identical(
     env$source_note_tags("<!-- audit-values-begin: iip64 -->"), "iip64"
   )
-  # Leading whitespace and a colon with no space are both real shapes in the
-  # committed notes' vicinity; neither may change the tag.
+  # A colon with no space after it is a real shape and must not change the tag.
   expect_identical(
-    env$source_note_tags("   <!-- audit-values-begin:iip32 -->"), "iip32"
+    env$source_note_tags("<!-- audit-values-begin:iip32 -->"), "iip32"
   )
+  # Trailing whitespace is invisible in an editor and carries no meaning, so it
+  # is tolerated -- unlike leading whitespace, which is how a note displays a
+  # marker rather than writing one, and which REFUSED_MARKERS pins as an abort.
+  expect_identical(env$source_note_tags("<!-- audit-values-begin -->  "), "")
 })
 
 test_that("a malformed marker aborts instead of inventing a tag (M79)", {

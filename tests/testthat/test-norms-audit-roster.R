@@ -106,9 +106,28 @@ test_that("an instrument shipping no norms is not a roster gap (M79)", {
 })
 
 test_that("the roster is the package's own enumeration, not a copy (M79)", {
+  # Comparing shipped_roster()'s instruments against shipped_instruments() is
+  # a tautology -- both bottom out in circumplex:::instrument_names(), so the
+  # assertion holds even if that function returns nothing (M79 review, F11).
+  # The claim is about the SOURCE, so the source is what is checked: the audit
+  # script must reach the package's enumeration and must not carry one of its
+  # own. A third copy written into data-raw/ reddens the second assertion.
+  script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
+  skip_if_not(file.exists(script), "data-raw/ not present (installed package)")
+  src <- readLines(script, warn = FALSE)
+
+  expect_true(any(grepl("instrument_names", src, fixed = TRUE)))
+  # The sweep is `utils::data(package = "circumplex")` plus a class filter.
+  # data-raw/ may not run one: that is the second copy this test exists to stop.
+  expect_false(any(grepl("data(package", src, fixed = TRUE)))
+
   env <- roster_defs()
-  # Single-sourcing is the point: a second sweep in data-raw/ could disagree
-  # with the one the tests use and nothing would say so.
-  expect_setequal(unique(env$shipped_roster()$instrument),
-                  shipped_instruments())
+  # Non-vacuity, so an empty enumeration cannot satisfy the above by silence.
+  roster <- env$shipped_roster()
+  expect_gt(length(unique(roster$instrument)), 1L)
+  expect_true(all(vapply(
+    unique(roster$instrument),
+    function(nm) inherits(shipped_instrument(nm), "circumplex_instrument"),
+    logical(1)
+  )))
 })

@@ -120,8 +120,99 @@ CONSTRUCTED_CREDIT <- "constructed-credit"
 
 # --- source side -------------------------------------------------------------
 
-MARKER_BEGIN <- "<!-- audit-values-begin"
-MARKER_END <- "<!-- audit-values-end -->"
+MARKER_PREFIX <- "<!-- audit-values-"
+MARKER_CLOSE <- "-->"
+
+# Read one marker line, or refuse it.
+#
+# The audit does not INFER which lines carrying the marker prefix are real
+# markers; it refuses the ones it cannot read unambiguously. Its predecessor
+# inferred, ignoring any marker inside a fenced code block so that a note
+# could display its own format -- which meant carrying a markdown fence
+# tracker the audit needs for nothing else, and getting it wrong four
+# independent ways (M79 review): an indented code block is not a fence, a
+# `~~~` line closed a backtick fence, a line opening with an inline code span
+# flipped fence parity for the rest of the note, and -- the one that loses
+# data -- an unclosed fence hid every later block from every reader, in
+# silence. Refusing is the doctrine this file already follows elsewhere: a
+# marker one character wrong is a block someone meant to write, not prose.
+#
+# Accepted, and nothing else, at column zero: `<!-- audit-values-end -->`,
+# `<!-- audit-values-begin -->`, and `<!-- audit-values-begin: <tag> -->`.
+# Every other line CONTAINING the prefix aborts, so an indented, inline, or
+# misspelled marker stops the audit rather than joining a block or hiding one.
+# Prose may still discuss audit-values blocks; what it may not do is write the
+# comment opener.
+#
+# What this does NOT claim: a column-zero marker inside a fence is
+# indistinguishable from a real one and is read as real. That is the fail-closed
+# side of the trade -- such a line is never silently DROPPED, which is the
+# property the fence tracker broke. A note may not display a marker at column
+# zero; indent it, and it aborts by name.
+source_note_marker <- function(one) {
+  refuse <- function() {
+    stop("malformed audit-values marker: ", one, call. = FALSE)
+  }
+  # Leading whitespace is NOT trimmed, and that is the whole column-zero rule:
+  # startsWith() below then refuses an indented line by itself. Trailing
+  # whitespace is invisible in an editor and carries no meaning, so it goes.
+  txt <- sub("[[:space:]]+$", "", one)
+  if (!startsWith(txt, MARKER_PREFIX) || !endsWith(txt, MARKER_CLOSE)) refuse()
+  mid <- substring(txt, nchar(MARKER_PREFIX) + 1L,
+                   nchar(txt) - nchar(MARKER_CLOSE))
+  # Only the TRAILING `-->` was stripped, so anything before it stays in `mid`
+  # and reaches the shape checks below:
+  # `<!-- audit-values-begin: iip64 --> and more -->` reaches the tag check
+  # with the tag "iip64 --> and more", and an end marker with a tail reaches
+  # the emptiness check with "--> and more". Neither survives.
+  if (startsWith(mid, "end")) {
+    if (nzchar(trimws(substring(mid, nchar("end") + 1L)))) refuse()
+    return(list(kind = "end", tag = ""))
+  }
+  if (!startsWith(mid, "begin")) refuse()
+  rest <- trimws(substring(mid, nchar("begin") + 1L))
+  if (!nzchar(rest)) return(list(kind = "begin", tag = ""))
+  # `<!-- audit-values-beginning -->` reaches here with rest = "ning". The lax
+  # predecessor returned that as the tag, silently renaming the block so the
+  # instrument whose block it was could no longer be found.
+  if (!startsWith(rest, ":")) refuse()
+  tag <- trimws(substring(rest, 2L))
+  # A colon promising a tag and delivering none is not the untagged shape, and
+  # a tag is an instrument name, not free text: `...begin:: fx -->` would
+  # otherwise tag a block ": fx" and match no instrument in any batch.
+  if (!grepl("^[A-Za-z0-9._-]+$", tag)) refuse()
+  list(kind = "begin", tag = tag)
+}
+
+# The tag carried by each begin marker; "" for an untagged block. A named
+# helper because the accepted and refused marker shapes are tested directly.
+source_note_tags <- function(begin_lines) {
+  vapply(begin_lines, function(one) source_note_marker(one)$tag,
+         character(1), USE.NAMES = FALSE)
+}
+
+# Locate a note's block markers: begin lines, end lines, and each begin's tag.
+# The single scanner both readers below share, so a shape refused for one is
+# refused for the other -- they previously ran independent greps and drifted.
+source_note_markers <- function(lines) {
+  hit <- which(grepl(MARKER_PREFIX, lines, fixed = TRUE))
+  marks <- lapply(lines[hit], source_note_marker)
+  kind <- vapply(marks, function(m) m$kind, character(1))
+  list(begin = hit[kind == "begin"], end = hit[kind == "end"],
+       tags = vapply(marks[kind == "begin"], function(m) m$tag, character(1)))
+}
+
+# Every block tag a note carries, in file order. Read by the unclaimed-block
+# sweep, which must see blocks NO batch row selected -- parse_source_note()
+# by construction only ever returns one.
+source_note_block_tags <- function(citekey,
+                                   dir = file.path("cairn", "references")) {
+  path <- file.path(dir, paste0(citekey, ".md"))
+  if (!file.exists(path)) {
+    stop("source note not found: ", path, call. = FALSE)
+  }
+  source_note_markers(readLines(path, warn = FALSE))$tags
+}
 
 # Parse the machine-readable block a source note carries between its
 # audit-values markers. Returns a data.frame(field, sample, scale, value,
@@ -144,69 +235,6 @@ MARKER_END <- "<!-- audit-values-end -->"
 # refused is the ambiguous middle: asking a multi-block note for an instrument
 # none of its blocks names aborts rather than falling back to the first block,
 # which would audit one instrument against another's values and could not fail.
-MARKER_BEGIN <- "<!-- audit-values-begin"
-MARKER_END <- "<!-- audit-values-end -->"
-
-# The tag carried by each begin marker; "" for an untagged block.
-#
-# A marker line is accepted only in the two shapes the notes actually use --
-# `<!-- audit-values-begin -->` and `<!-- audit-values-begin: <tag> -->` -- and
-# anything else ABORTS. The lax predecessor stripped the prefix and a trailing
-# `-->` and returned whatever was left, so `<!-- audit-values-beginning -->`
-# yielded the tag "ning": a typo in a marker silently renamed the block, and
-# the instrument whose block it really was could no longer be found. Refusing
-# is right rather than ignoring the line, because a marker one character wrong
-# is a block someone meant to write, not prose.
-source_note_tags <- function(begin_lines) {
-  vapply(trimws(begin_lines), function(one) {
-    mid <- substring(one, nchar(MARKER_BEGIN) + 1L)
-    if (!endsWith(mid, "-->")) {
-      stop("malformed audit-values marker: ", one, call. = FALSE)
-    }
-    mid <- trimws(substring(mid, 1L, nchar(mid) - 3L))
-    if (!nzchar(mid)) return("")
-    if (!startsWith(mid, ":")) {
-      stop("malformed audit-values marker: ", one, call. = FALSE)
-    }
-    trimws(substring(mid, 2L))
-  }, character(1), USE.NAMES = FALSE)
-}
-
-# Which lines lie inside a fenced code block, the fence lines themselves
-# included. A note that documents its own format shows a marker inside a
-# fence; without this the example is parsed as a real block, and because such
-# an example carries a matching end marker the begin/end counts balance and
-# nothing aborts -- the fake rows simply join the note.
-fenced_lines <- function(lines) {
-  fence <- grepl("^\\s*(```|~~~)", lines)
-  (cumsum(fence) %% 2L == 1L) | fence
-}
-
-# Locate a note's block markers: begin lines, end lines, and each begin's tag.
-# The single scanner both readers below share, so a shape refused for one is
-# refused for the other -- they previously ran independent greps and drifted.
-# A marker is recognised only on a line that is nothing BUT the marker, which
-# is what anchoring on the trailing `-->` buys.
-source_note_markers <- function(lines) {
-  live <- !fenced_lines(lines)
-  txt <- trimws(lines)
-  b <- which(live & startsWith(txt, MARKER_BEGIN))
-  list(begin = b, end = which(live & txt == MARKER_END),
-       tags = source_note_tags(txt[b]))
-}
-
-# Every block tag a note carries, in file order. Read by the unclaimed-block
-# sweep, which must see blocks NO batch row selected -- parse_source_note()
-# by construction only ever returns one.
-source_note_block_tags <- function(citekey,
-                                   dir = file.path("cairn", "references")) {
-  path <- file.path(dir, paste0(citekey, ".md"))
-  if (!file.exists(path)) {
-    stop("source note not found: ", path, call. = FALSE)
-  }
-  source_note_markers(readLines(path, warn = FALSE))$tags
-}
-
 parse_source_note <- function(citekey,
                               dir = file.path("cairn", "references"),
                               instrument = NULL) {
