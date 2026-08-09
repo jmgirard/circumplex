@@ -473,7 +473,14 @@ test_that("a source-note block no batch row audits is reported (M75)", {
   dir <- testthat::test_path("..", "..", "cairn", "references")
   skip_if_not(dir.exists(dir), "cairn/ not present (installed package)")
 
-  # The whole batch leaves nothing uncovered.
+  # The whole batch leaves nothing uncovered. Since M79 this covers the
+  # SHIPPED side too, not only the notes: `audit_norms()` now sweeps the
+  # shipped roster, so a sample in `data/` that no batch row names is a
+  # non-exempt gap and lands in this count. Before that it was a statement
+  # about the notes alone -- 10 of the 24 batch rows could be deleted with this
+  # assertion still green. What it still cannot do is say the batch and the
+  # roster are the same SET, or name what is missing when they are not; that is
+  # test-norms-audit-roster.R's "the batch covers the shipped roster exactly".
   full <- audit_norms(batch, dir)
   expect_identical(sum(!full$coverage$exempt), 0L)
 

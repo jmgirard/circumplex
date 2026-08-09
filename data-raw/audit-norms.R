@@ -120,6 +120,81 @@ CONSTRUCTED_CREDIT <- "constructed-credit"
 
 # --- source side -------------------------------------------------------------
 
+MARKER_PREFIX <- "<!-- audit-values-"
+MARKER_END <- "<!-- audit-values-end -->"
+MARKER_BEGIN <- "<!-- audit-values-begin -->"
+MARKER_TAGGED <- "^<!-- audit-values-begin: ([A-Za-z0-9._-]+) -->$"
+
+# Read one marker line, or refuse it.
+#
+# The audit does not INFER which lines carrying the marker prefix are real
+# markers; it refuses the ones it cannot read unambiguously. Its predecessor
+# inferred, ignoring any marker inside a fenced code block so that a note
+# could display its own format -- which meant carrying a markdown fence
+# tracker the audit needs for nothing else, and getting it wrong four
+# independent ways (M79 review): an indented code block is not a fence, a
+# `~~~` line closed a backtick fence, a line opening with an inline code span
+# flipped fence parity for the rest of the note, and -- the one that loses
+# data -- an unclosed fence hid every later block from every reader, in
+# silence. Refusing is the doctrine this file already follows elsewhere: a
+# marker one character wrong is a block someone meant to write, not prose.
+#
+# The accepted set IS the three definitions above: the two literals, compared
+# byte-for-byte, and the tagged form, matched whole-line. Nothing is trimmed
+# and no substring arithmetic runs, because the set an accepted-shape
+# procedure admits is emergent -- the M79 return-2 review found four shapes
+# admitted by `substring()` returning "" on an exhausted string, which made
+# the space before the terminator optional. A definitional recognizer has no
+# next member to find: what the constants say is what is accepted, trailing
+# whitespace and a colon without its following space included in the refusals.
+# Every other line CONTAINING the prefix aborts, so an indented, inline, or
+# misspelled marker stops the audit rather than joining a block or hiding one.
+# Prose may still discuss audit-values blocks; what it may not do is write the
+# comment opener.
+#
+# What this does NOT claim: a column-zero marker inside a fence is
+# indistinguishable from a real one and is read as real. That is the fail-closed
+# side of the trade -- such a line is never silently DROPPED, which is the
+# property the fence tracker broke. A note may not display a marker at column
+# zero; indent it, and it aborts by name.
+source_note_marker <- function(one) {
+  if (identical(one, MARKER_END)) return(list(kind = "end", tag = ""))
+  if (identical(one, MARKER_BEGIN)) return(list(kind = "begin", tag = ""))
+  hit <- regmatches(one, regexec(MARKER_TAGGED, one))[[1L]]
+  if (length(hit) == 2L) return(list(kind = "begin", tag = hit[[2L]]))
+  stop("malformed audit-values marker: ", one, call. = FALSE)
+}
+
+# The tag carried by each begin marker; "" for an untagged block. A named
+# helper because the accepted and refused marker shapes are tested directly.
+source_note_tags <- function(begin_lines) {
+  vapply(begin_lines, function(one) source_note_marker(one)$tag,
+         character(1), USE.NAMES = FALSE)
+}
+
+# Locate a note's block markers: begin lines, end lines, and each begin's tag.
+# The single scanner both readers below share, so a shape refused for one is
+# refused for the other -- they previously ran independent greps and drifted.
+source_note_markers <- function(lines) {
+  hit <- which(grepl(MARKER_PREFIX, lines, fixed = TRUE))
+  marks <- lapply(lines[hit], source_note_marker)
+  kind <- vapply(marks, function(m) m$kind, character(1))
+  list(begin = hit[kind == "begin"], end = hit[kind == "end"],
+       tags = vapply(marks[kind == "begin"], function(m) m$tag, character(1)))
+}
+
+# Every block tag a note carries, in file order. Read by the unclaimed-block
+# sweep, which must see blocks NO batch row selected -- parse_source_note()
+# by construction only ever returns one.
+source_note_block_tags <- function(citekey,
+                                   dir = file.path("cairn", "references")) {
+  path <- file.path(dir, paste0(citekey, ".md"))
+  if (!file.exists(path)) {
+    stop("source note not found: ", path, call. = FALSE)
+  }
+  source_note_markers(readLines(path, warn = FALSE))$tags
+}
+
 # Parse the machine-readable block a source note carries between its
 # audit-values markers. Returns a data.frame(field, sample, scale, value,
 # anchor), carrying the block's tag in attr(, "tag").
@@ -141,25 +216,6 @@ CONSTRUCTED_CREDIT <- "constructed-credit"
 # refused is the ambiguous middle: asking a multi-block note for an instrument
 # none of its blocks names aborts rather than falling back to the first block,
 # which would audit one instrument against another's values and could not fail.
-# The tag carried by each begin marker; "" for an untagged block.
-source_note_tags <- function(begin_lines) {
-  trimws(sub("-->$", "",
-             sub("^<!-- audit-values-begin:?", "", trimws(begin_lines))))
-}
-
-# Every block tag a note carries, in file order. Read by the unclaimed-block
-# sweep, which must see blocks NO batch row selected -- parse_source_note()
-# by construction only ever returns one.
-source_note_block_tags <- function(citekey,
-                                   dir = file.path("cairn", "references")) {
-  path <- file.path(dir, paste0(citekey, ".md"))
-  if (!file.exists(path)) {
-    stop("source note not found: ", path, call. = FALSE)
-  }
-  lines <- readLines(path, warn = FALSE)
-  source_note_tags(lines[grep("^\\s*<!-- audit-values-begin", lines)])
-}
-
 parse_source_note <- function(citekey,
                               dir = file.path("cairn", "references"),
                               instrument = NULL) {
@@ -168,8 +224,9 @@ parse_source_note <- function(citekey,
     stop("source note not found: ", path, call. = FALSE)
   }
   lines <- readLines(path, warn = FALSE)
-  b <- grep("^\\s*<!-- audit-values-begin", lines)
-  e <- grep("<!-- audit-values-end -->", lines, fixed = TRUE)
+  marks <- source_note_markers(lines)
+  b <- marks$begin
+  e <- marks$end
   # Blocks must nest as begin/end/begin/end: interleaved or unclosed markers
   # would silently hand back a row range spanning someone else's block.
   ok <- length(b) && length(e) == length(b) && all(e > b) &&
@@ -178,7 +235,7 @@ parse_source_note <- function(citekey,
     stop("source note ", citekey, " has no well-formed audit-values block(s)",
          call. = FALSE)
   }
-  tags <- source_note_tags(lines[b])
+  tags <- marks$tags
   if (anyDuplicated(tags)) {
     stop("source note ", citekey, " tags two audit-values blocks alike: ",
          paste(tags[duplicated(tags)], collapse = ", "), call. = FALSE)
@@ -336,10 +393,87 @@ values_agree <- function(field, shipped, source, divisor) {
   identical(trimws(shipped), trimws(source))
 }
 
+# Every shipped (instrument, sample) pair there is. The batch is a hand-written
+# table and nothing has ever bound it to `data/`: measured 2026-08-08, dropping
+# `isc` from AUDIT_BATCH lost all 17 of its audited values while the ledger fell
+# from 194 rows to 177, the coverage report from 15 to 13, and the gap count
+# stayed at 0 with no row anywhere naming the instrument or its note. The
+# note-side sweeps below cannot see it: they walk the notes the batch NAMES, so
+# an instrument the batch omits is never reached at all.
+#
+# The instrument enumeration is the package's own (circumplex:::instrument_names),
+# not a copy, so the roster cannot drift from `data/`. `objects` overrides it:
+# a fixture batch drives synthetic instruments and must be swept against those,
+# not against the shipped roster.
+shipped_roster <- function(objects = NULL) {
+  ns <- asNamespace("circumplex")
+  if (length(objects)) {
+    nms <- names(objects)
+    fetch <- function(nm) objects[[nm]]
+  } else {
+    nms <- get("instrument_names", envir = ns)()
+    fetch <- function(nm) get(nm, envir = ns)
+  }
+  out <- list()
+  for (nm in nms) {
+    norms <- fetch(nm)$Norms[[1]]
+    # An instrument shipping no norms has nothing to audit and is not a gap.
+    if (is.null(norms) || !nrow(norms)) next
+    out[[length(out) + 1L]] <- data.frame(
+      instrument = nm, sample = as.character(sort(unique(norms$Sample))),
+      stringsAsFactors = FALSE
+    )
+  }
+  if (length(out)) do.call(rbind, out) else
+    data.frame(instrument = character(0), sample = character(0),
+               stringsAsFactors = FALSE)
+}
+
+# One source can be the published source for more than one instrument, and the
+# blocks then have to be tagged: an UNTAGGED block is handed whole to whoever
+# asks, so two instruments reading one would each be audited against rows that
+# may be the other's. Their rows are indistinguishable inside the block --
+# both key on (field, sample, scale), over the same octant names and the same
+# sample numbers -- so there is no join that separates them and no comparison
+# that could fail. That is the same "audit one instrument against another's
+# values and could not fail" case parse_source_note() already refuses when a
+# multi-block note is asked for an instrument none of its blocks names; this
+# closes it one shape over, where the block carries no tag at all.
+#
+# Refused up front rather than repaired downstream: the alternative was to key
+# each pass's claims per instrument, which leaves the mis-comparison in place
+# and only makes the coverage counts tidy about it.
+refuse_shared_untagged_blocks <- function(batch, dir) {
+  for (citekey in unique(batch$citekey)) {
+    insts <- unique(batch$instrument[batch$citekey == citekey])
+    if (length(insts) < 2L) next
+    tags <- source_note_block_tags(citekey, dir)
+    if (any(!nzchar(tags))) {
+      stop("source note ", citekey, " carries an untagged audit-values block ",
+           "but is read by ", length(insts), " instruments (",
+           paste(sort(insts), collapse = ", "),
+           "); tag each block with the instrument it backs", call. = FALSE)
+    }
+  }
+  invisible(TRUE)
+}
+
+# `roster` is the world the batch is audited against, and it is deliberately
+# NOT derived from `objects`. The two answer different questions: `objects`
+# overrides one instrument's VALUES, `roster` states which shipped
+# (instrument, sample) pairs must be covered. Deriving one from the other made
+# a value override silently shrink the world -- auditing a one-instrument slice
+# of AUDIT_BATCH with that instrument's real object injected reported 0 gaps
+# where the same slice reports 23 without it, which is exactly the clean run
+# over unread data this milestone exists to prevent (M79 return-2 review).
+# A fixture pass states its own roster; the default is the full shipped sweep.
 audit_norms <- function(batch = AUDIT_BATCH,
                         dir = file.path("cairn", "references"),
-                        objects = NULL) {
+                        objects = NULL,
+                        roster = NULL) {
+  if (is.null(roster)) roster <- shipped_roster()
   validate_batch(batch)
+  refuse_shared_untagged_blocks(batch, dir)
   ledger <- list()
   coverage <- list()
   # Which of each note BLOCK's sample labels some batch entry actually claimed.
@@ -477,6 +611,25 @@ audit_norms <- function(batch = AUDIT_BATCH,
         exempt = FALSE, stringsAsFactors = FALSE
       )
     }
+  }
+
+  # ...and the shipped side, the one direction neither sweep above covers.
+  # Both of those walk the notes the batch names, so they can only ever report
+  # something missing from a note SOMEONE audited; a shipped sample the batch
+  # never mentions is not reached by either. Reported rather than refused, as
+  # its two siblings are: an abort would stop the audit exactly when a new
+  # instrument lands before its source note does, which is when it is wanted.
+  unaudited <- roster
+  unaudited <- unaudited[
+    !(paste(unaudited$instrument, unaudited$sample) %in%
+        paste(batch$instrument, batch$sample)), , drop = FALSE
+  ]
+  if (nrow(unaudited)) {
+    coverage[[length(coverage) + 1L]] <- data.frame(
+      instrument = unaudited$instrument, side = "shipped-sample-not-audited",
+      field = "sample", scale = unaudited$sample,
+      exempt = FALSE, stringsAsFactors = FALSE
+    )
   }
 
   list(

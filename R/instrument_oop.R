@@ -228,30 +228,40 @@ norms <- function(x) {
 #' @examples
 #' instruments()
 instruments <- function() {
-
-  # Enumerate the packaged instruments from the data itself so this listing
-  # can never drift from the shipped datasets. Each instrument is a
-  # circumplex_instrument object carrying its abbreviation and full name in
-  # $Details; example datasets (e.g. aw2009, jz2017, raw) are filtered out by
-  # class.
-  nms <- utils::data(package = "circumplex")$results[, "Item"]
-  insts <- sort(Filter(function(nm) {
-    e <- new.env()
-    utils::data(list = nm, package = "circumplex", envir = e)
-    inherits(get(nm, envir = e), "circumplex_instrument")
-  }, nms))
+  insts <- instrument_names()
 
   header <- sprintf(
     "The circumplex package currently includes %d instruments:\n",
     length(insts)
   )
   lines <- vapply(seq_along(insts), function(i) {
-    nm <- insts[[i]]
-    e <- new.env()
-    utils::data(list = nm, package = "circumplex", envir = e)
-    d <- get(nm, envir = e)$Details
-    sprintf("%d. %s: %s (%s)\n", i, d$Abbrev, d$Name, nm)
+    d <- instrument_object(insts[[i]])$Details
+    sprintf("%d. %s: %s (%s)\n", i, d$Abbrev, d$Name, insts[[i]])
   }, character(1))
 
   cat(c(header, lines))
+}
+
+# Fetch a shipped dataset by name without attaching it to the search path.
+instrument_object <- function(nm) {
+  e <- new.env()
+  utils::data(list = nm, package = "circumplex", envir = e)
+  get(nm, envir = e)
+}
+
+# Enumerate the packaged instruments from the data itself, so any listing or
+# sweep over them can never drift from the shipped datasets. Example datasets
+# (aw2009, jz2017, raw) are filtered out by class.
+#
+# Unexported and single-sourced deliberately: this sweep was written out three
+# times over -- here, in tests/testthat/helper-norms.R, and very nearly a
+# fourth time in data-raw/audit-norms.R -- and each copy is a place the roster
+# can silently disagree with `data/`. The audit reaches it through
+# asNamespace(); the test helper calls it directly.
+instrument_names <- function() {
+  nms <- utils::data(package = "circumplex")$results[, "Item"]
+  sort(Filter(
+    function(nm) inherits(instrument_object(nm), "circumplex_instrument"),
+    nms
+  ))
 }
