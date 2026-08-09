@@ -110,62 +110,42 @@ makes it deliberate, and it is unreachable through `audit_norms()`.
 
 ## Tasks
 
-- [x] T1 Extract one marker-scanning helper from the two independent greps at
-      `data-raw/audit-norms.R:160` and `:171-172`: anchored begin/end
-      recognition, `-->` terminator, fence-awareness, strict `: <tag>` form
-      with an abort on anything else.
-- [x] T2 Fixture note carrying a fenced begin marker, a fenced end marker and
-      `audit-values-beginning`; tests asserting none parses as a block or tag,
-      through both `parse_source_note()` and `source_note_block_tags()`.
-- [x] T3 Refuse an untagged block read by more than one instrument, before any
-      pass parses it; the `claimed`/`blocks` key at `:365-370` is then
-      collision-free by construction. Three tests from AC3.
-- [x] T4 Add the `roster` parameter and the `shipped-sample-not-audited`
-      emitter to `audit_norms()`; move the `data()`-plus-class sweep to one
-      definition shared with `tests/testthat/helper-norms.R:8`.
-- [x] T5 The drop-each-row test, with the measured 10/6/8 partition recorded
-      in its comment as the reason the assertion is abort-or-gap.
-- [x] T6 Abort-path tests for each `stop()` in `parse_source_note()`, plus the
-      `stop(`-count test that fails when a new one lands untested.
-- [x] T7 The roster-identity test; update the comment at
+- [x] T1 One marker-scanning helper shared by both readers: strict forms,
+      abort on the rest.
+- [x] T2 Fixture note: fenced markers and `audit-values-beginning` parse as no
+      block or tag, through both readers.
+- [x] T3 Refuse an untagged block read by two instruments before any pass
+      parses it; three tests from AC3.
+- [x] T4 The `roster` sweep and `shipped-sample-not-audited` emitter in
+      `audit_norms()`; single-source the shipped-instrument sweep.
+- [x] T5 The drop-each-row test, its measured 10/6/8 partition in a comment.
+- [x] T6 Abort-path tests for each `stop()` in `parse_source_note()` plus the
+      count test binding them.
+- [x] T7 The roster-identity test; comment updated at
       `tests/testthat/test-norms-provenance.R:462`.
-- [x] T8 Re-run the audit, confirm the two CSVs are unchanged, run
-      `devtools::test()` and `devtools::check(args = "--no-manual")`.
+- [x] T8 Re-run the audit (CSVs stamp-only), `devtools::test()`, full check.
 
 Return 1 (2026-08-08), from the review findings below:
 
-- [x] T9 F14: delete the duplicated `MARKER_BEGIN`/`MARKER_END` pair and
-      reunite `parse_source_note()`'s doc comment with its function.
-- [x] T10 AC4 as amended: drop `fenced_lines()` entirely; one strict scanner
-      that refuses any line carrying the marker prefix it cannot read
-      unambiguously. Closes F1, F2, F3, F4, F5 (the silent-loss path) and F6.
-      Fixture note per the amended criterion.
-- [x] T11 F15: the `stop(`-count test counts occurrences, not deparsed lines
-      containing the substring, as AC5 words it.
-- [x] T12 F11: replace the tautological single-sourcing assertion at
-      `tests/testthat/test-norms-audit-roster.R:108-114` with one that reddens
-      when a second sweep is written into `data-raw/`.
-- [x] T13 Re-run the audit and the full `check()`; confirm the two CSVs still
-      move only in their stamps.
+- [x] T9 F14: delete the duplicated marker-constant pair; reunite the doc
+      comment with its function.
+- [x] T10 AC4 as amended: drop `fenced_lines()`; one strict scanner refusing
+      any ambiguous marker line (closes F1-F6), fixture per the criterion.
+- [x] T11 F15: the `stop(`-count test counts occurrences, not lines.
+- [x] T12 F11: a single-sourcing assertion that reddens on a second sweep.
+- [x] T13 Re-run the audit and the full `check()`; CSVs stamp-only.
 
 Return 2 (2026-08-08), from the review findings below:
 
-- [x] T14 Make the marker recognizer definitional: the accepted set IS two
-      string constants and one anchored full-line regex, compared byte-exact
-      with no trimming, so "and nothing else" is readable off the code. The
-      four `substring()`-admitted shapes, the colon-no-space tolerance and
-      the trailing-whitespace tolerance all become aborts.
-- [x] T15 The set-equality boundary test: one enumerated vector of accepted
-      lines and near-misses, asserted as a partition through
-      `source_note_marker()` — never sampled examples.
-- [x] T16 AC5 as amended: the abort registry and its `stop(`-count go
-      file-scoped across every function the script defines; message tests
-      added for the aborts that had none (`validate_batch()`'s two, the
-      shipped-values single-record abort, and `source_note_block_tags()`'s
-      not-found).
-- [ ] T17 Log the exhaustive-claim lesson (LESSONS at its cap — extend the
-      derive-from-the-requirement family line rather than add); re-run the
-      audit (CSVs stamp-only) and the full check.
+- [x] T14 The definitional recognizer: two string literals plus one anchored
+      whole-line regex, byte-exact, no trimming; the four `substring()` shapes
+      and the colon-no-space and trailing-whitespace tolerances become aborts.
+- [x] T15 The set-equality boundary test: enumerated accepted lines and
+      near-misses asserted as a partition through `source_note_marker()`.
+- [x] T16 AC5 as amended: the abort registry and `stop(`-count go file-scoped
+      over every script function; message tests for the four that had none.
+- [ ] T17 Log the exhaustive-claim lesson (extend the derive-from-the-
+      requirement family line); re-run the audit and the full check.
 
 ## Work log
 
@@ -176,6 +156,7 @@ Return 2 (2026-08-08), from the review findings below:
 - 2026-08-08: plan gate chose two milestones over one 12-fix milestone and over planning M79 alone; falsified by M80's coverage-emitter changes proving inseparable from M79's new emitter at implement time.
 - 2026-08-08: Scope amended at the implementation gate to admit an unexported `instrument_names()` in `R/instrument_oop.R`. AC1 forbids a third copy of the shipped-instrument sweep, and investigation found two already exist — `R/instrument_oop.R:237-242` inside the exported `instruments()`, and `tests/testthat/helper-norms.R:8-15` — while `helper-norms.R` cannot read `.Rbuildignore`d `data-raw/` because its callers run against the installed package on CRAN. Jeff chose extraction over a third copy bound by an equality test.
 - 2026-08-08: implementation gate chose extracting to `R/` over keeping a third copy bound by a drift test, and over extracting for only two of the three callers; falsified by the extraction changing any observable behaviour of the exported `instruments()`.
+- 2026-08-08: checkpoint mid-T17, session paused at Jeff's request to resume in the circumplex session: the lesson is logged (extends the derive-from-the-requirement LESSONS line), the audit is re-run at `13b0ccbc` (ledger stamp-only, coverage byte-identical, 194/15/0 gaps), and the Tasks section is compressed for the 150-line cap (`cairn_validate` all-pass, 48 pre-existing M7 advisories). The full `check(args = "--no-manual")` is NOT yet recorded -- T17 stays open on it; the resuming session runs it before completion.
 - 2026-08-08: T14-T16 done. `source_note_marker()` is now two `identical()` comparisons against string literals and one anchored whole-line regex — no trimming, no substring arithmetic — so the accepted set is the three constants at `data-raw/audit-norms.R:124-126`. The return-2 four, the colon-no-space tolerance and the trailing-whitespace tolerance all abort by name, and the boundary is asserted as a partition (every ACCEPTED_MARKERS and single-line REFUSED_MARKERS shape classified, both directions). The AC5 registry is file-scoped: SCRIPT_ABORTS registers all 12 `stop(` sites by message fragment across every function the script defines, with new message tests for `validate_batch()`'s two, `shipped_values()`'s single-record abort and `source_note_block_tags()`'s not-found. Both guards mutation-checked: re-tolerating trailing whitespace reddens the partition test plus a refused-shape test, and an unregistered `stop()` reddens the count. `devtools::test()` FAIL 0 / WARN 4 / PASS 6871.
 - 2026-08-08: return 2 opened; T14-T17 added for the two actioned findings. The gate chose the definitional recognizer (two string literals plus one anchored full-line regex, byte-exact, no trimming) over escalating via /milestone-brief: both failures share one mechanism — a procedural parser makes the accepted set emergent, so each review buys its next member — and making the set definitional removes the mechanism rather than patching its latest instance. Jeff declined the brief in chat. The colon-no-space and trailing-whitespace tolerances the return-1 tests pinned also fall under AC4's "and nothing else"; measured this session: every committed marker line already matches the three exact shapes, so nothing shipped is refused. Falsified by AC4 failing again with the recognizer definitional.
 - 2026-08-08: amendment return: AC5 — "Every abort path in `data-raw/audit-norms.R` has a test asserting its specific message, and a test asserts the count of `stop(` occurrences across the bodies of every function the script defines equals the registry of enumerated abort cases — file-scoped because a count over one function's body is evaded by an abort landing in a helper, which this branch did. Where no-oping a `stop()` only relocates the error, the test records the mutant's surviving behavior instead of claiming the guard is load-bearing."
