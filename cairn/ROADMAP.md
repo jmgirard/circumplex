@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-09 (M79 merged and archived, PR #107, after a re-plan moved its twice-failed abort-registry criterion to the new M81; M74's terminal row pruned for the 5-row retention; M79's `shipped_roster()` findings graduated to a candidate row; no lesson added or retired, M79's having been logged during implementation)._
+_Last hygiene check: 2026-08-13 (all mechanical checks green; nothing changed on the default branch since 2026-08-09. M81 is in flight on branch `m81-norms-audit-abort-registry` / PR #108, whose own tracking carries `in-progress` with T7–T9 open and all 5 CI checks green — this row reads `planned` until that branch merges. No open issues; no external PRs.)._
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
