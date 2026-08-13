@@ -473,6 +473,49 @@ test_that("no abort anywhere in the audit script is left unregistered (M81)", {
   )
 })
 
+test_that("a named-form site is matched by exact equality, not a stem (M81)", {
+  # A synthetic site, raised through the real mechanism: a stopifnot() call
+  # whose condition is named, built as a call so the message is R's own rather
+  # than one this test writes.
+  raise <- function(msg) {
+    cl <- as.call(list(quote(stopifnot), FALSE))
+    names(cl) <- c("", msg)
+    function() eval(cl)
+  }
+  # What expect_abort_at_site() is asked to accept is the question, so its
+  # FAILURES are what this test reads -- running it directly would only report
+  # whether this file passes, which is the opposite of what is under test.
+  failures <- function(expr) {
+    out <- character()
+    withCallingHandlers(expr, expectation_failure = function(cnd) {
+      out <<- c(out, conditionMessage(cnd))
+      invokeRestart("continue_test")
+    })
+    out
+  }
+
+  key <- "divisor must be numeric"
+  expect_identical(tryCatch(raise(key)(), error = conditionMessage), key)
+
+  expect_length(
+    failures(expect_abort_at_site(raise(key), "stopifnot_named", key)), 0L
+  )
+  # Both directions fail: a strict superstring and a strict substring.
+  expect_length(
+    failures(expect_abort_at_site(raise(paste0(key, " and finite")),
+                                  "stopifnot_named", key)), 1L
+  )
+  truncated <- substr(key, 1L, nchar(key) - 1L)
+  expect_length(
+    failures(expect_abort_at_site(raise(truncated), "stopifnot_named", key)), 1L
+  )
+  # And the substring case is the one that needed equality: the stem matcher
+  # the POSITIONAL form uses accepts it, so a named site keyed through that
+  # matcher would report a truncated message as its own.
+  stem <- norms_audit_stopifnot_stem(truncated)
+  expect_true(nzchar(stem) && startsWith(squish(key), stem))
+})
+
 test_that("the walk keys named conditions and refuses the rest (M81)", {
   sites <- function(txt) norms_audit_abort_sites(parse(text = txt, keep.source = FALSE))
 
