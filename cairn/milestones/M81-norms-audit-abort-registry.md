@@ -32,7 +32,7 @@ and the discrimination matrix (RR17 rev 2 BC6–BC11) → the successor mileston
 
 ## Acceptance criteria
 
-- [ ] AC1 The registry's domain is produced by parsing the script, not by
+- [x] AC1 The registry's domain is produced by parsing the script, not by
       sourcing it. A helper walks the full expression tree of every top-level
       expression of `parse(file = "data-raw/audit-norms.R")` — including the
       trailing run block that `norms_audit_defs_only = TRUE` skips — and
@@ -57,21 +57,21 @@ and the discrimination matrix (RR17 rev 2 BC6–BC11) → the successor mileston
       constructed or runtime-resolved calls, process exits, `warning` promotion
       under `options(warn = 2)`, and the non-call failure mechanisms AC2 already
       bounds. No claim of enumerating "all aborts" is made in any of the five.
-- [ ] AC2 Every **site** AC1's walk collects — not every registry entry; the
+- [x] AC2 Every **site** AC1's walk collects — not every registry entry; the
       `"source note not found: {}"` key covers two sites, `:193` and `:224` —
       carries a fixture that provokes that site, and a test asserts the fixture
       raises an error matching that site's key rather than bare failure. With
       AC1's set equality the message-tested and parsed sets are identical. The
       promise is bounded by AC1's walk and claims nothing about errors raised
       by other mechanisms, which no procedure here enumerates.
-- [ ] AC3 `validate_batch()`'s `stopifnot()` at `data-raw/audit-norms.R:83-85`
+- [x] AC3 `validate_batch()`'s `stopifnot()` at `data-raw/audit-norms.R:83-85`
       is registered and message-tested under AC1 and AC2 for each of its two
       conditions — a non-data-frame batch, and one missing a required column —
       each asserted by the failing condition's own deparsed text rather than by
       any error, and each mutation-checked. The non-data-frame fixture carries
       all five required names, so dropping `is.data.frame(batch)` cannot abort
       through the sibling condition instead.
-- [ ] AC4 The single-sourcing assertion in
+- [x] AC4 The single-sourcing assertion in
       `tests/testthat/test-norms-audit-roster.R` is stated over the script's
       parse tree — a call resolving `instrument_names` from the package
       namespace — so neither the doc comment at `data-raw/audit-norms.R:404`
@@ -89,7 +89,7 @@ and the discrimination matrix (RR17 rev 2 BC6–BC11) → the successor mileston
       0/0/0; re-running the audit leaves `data-raw/norms-audit-ledger.csv` and
       `data-raw/norms-audit-coverage.csv` unchanged but for their stamp columns
       (`generated`, `script_commit`, `data_commit`), compared column by column.
-- [ ] AC6 (RR17 BC1+BC2) The enumerator treats every named argument of a
+- [x] AC6 (RR17 BC1+BC2) The enumerator treats every named argument of a
       collected `stopifnot()` call as one condition keyed on its name, except
       the names in `setdiff(names(formals(stopifnot)), "...")`, on which it
       raises an error naming the call deparsed; likewise on any `stop()`
@@ -100,7 +100,7 @@ and the discrimination matrix (RR17 rev 2 BC6–BC11) → the successor mileston
       script restored byte-clean after each: the planted `divisor` guard moves
       the collected count 14 → 15 and reddens set-equality; both `exprs` forms
       redden.
-- [ ] AC7 (RR17 BC3) A named-form condition site is matched by full string
+- [x] AC7 (RR17 BC3) A named-form condition site is matched by full string
       equality of `conditionMessage()` with the site's key — no stem, no regex
       — verified by a unit test driving `expect_abort_at_site()` with a
       synthetic site where the exact message passes and any strict superstring
@@ -185,6 +185,112 @@ Measured baselines cross-reference RR17 rather than being restated, for the cap.
 ## Decisions
 
 ## Review
+
+**2026-08-13 — round 2. PR #108. Evidence below is fresh at this gate; the
+round-1 record follows it unchanged.**
+
+- **AC1 (structure, PASS):** 27 top-level expressions parsed; the last is the
+  `if` guarded by `norms_audit_defs_only`, so the run block is inside the
+  walked domain. 14 sites (12 `stop`, 2 `stopifnot`), 13 distinct keys, the one
+  duplicate being the intended `source note not found: {}` pair. Heads
+  collected are exactly the four AC1 names. Set equality is bidirectional
+  (sorted multiset `identical()`), and the run-block mutant reddens it (FAIL 1).
+- **AC1 (promise, PASS):** all five texts state the domain and name what lies
+  outside it — the Goal (amended at the implement gate), the section comment at
+  `test-norms-audit-markers.R:302`, the test name at `:472`, the helper header,
+  and AC1 itself. A sweep for `every abort` / `all aborts` / `anywhere in the`
+  across the helper and the test file returns nothing.
+- **AC2 (PASS):** `SCRIPT_ABORTS` holds 14 entries, one per site, each carrying
+  `(kind, key, fixture)`; the per-site message test asserts each fixture raises
+  its own site's key rather than bare failure, and AC1's set equality makes the
+  message-tested and parsed sets identical.
+- **AC3 (PASS):** both `validate_batch()` conditions registered and
+  message-tested. Fixtures discriminate as the criterion requires — the
+  non-data-frame case is a `list` carrying all five required names, so the
+  sibling condition is TRUE and cannot abort in its place; the missing-column
+  case is a real data frame lacking only `scales`. Mutations: dropping
+  `is.data.frame(batch)` FAIL 2, dropping the columns condition FAIL 2.
+- **AC4 (PASS):** the assertion is stated over the parse tree via
+  `norms_audit_resolves_name()`. Mutation (delete the call, hard-code a
+  15-instrument roster copy) FAIL 1; control (switch to `circumplex:::`) FAIL 0,
+  green for the claim's reason.
+- **AC6 (PASS):** named conditions carry kind `stopifnot_named` keyed on the
+  name; reserved names come from `setdiff(names(formals(stopifnot)), "...")`,
+  which matters — this R spells the third formal `exprObject` where RR17 rev 2
+  spelled it `exprs.env`. Four mutations, each restored byte-clean: planted
+  named `divisor` guard moves the walk 14 -> 15 and reddens set-equality
+  (FAIL 1); both `exprs` forms refused by name (FAIL 2 each); a planted
+  `stop("boom ", tail = "TAIL")` refused (FAIL 2).
+- **AC7 (PASS, with a recorded limitation):** named-form sites matched by
+  `identical(conditionMessage(err), key)`. The synthetic-site test reads
+  `expect_abort_at_site()`'s failures — exact 0, strict superstring 1, strict
+  substring 1 — and measures that the positional stem matcher would accept the
+  substring, which is what equality buys. **The C-locale pin cannot be shown
+  load-bearing under this suite:** neutralising it and running under
+  `LANGUAGE=fr` leaves the file at FAIL 0, because testthat 3e already sets
+  `LANGUAGE=C` inside every `test_that()` block (measured directly: `LANGUAGE`
+  is `fr` outside the block and `C` inside). The pin satisfies the criterion as
+  written and covers a call made outside a 3e block; no mutation here can redden
+  it. Recorded rather than waved through.
+- **AC5:** see the fresh floor above — baseline FAIL 0 with PASS 94 and 17
+  against the recorded 76 and 17 (non-decreasing), both files WARN 0 in
+  isolation, every mutation restored byte-clean and the tree clean after the
+  set. Suite-wide and full-check figures in the work log.
+
+**Consistency gate.** `cairn_validate` exit 0, every CHECK PASS (the 47
+`work-log format` advisories are pre-existing hard-wrapped lines in M7).
+Profile `r-package` consistency-gate: `document()` emits zero unresolved-link
+warnings and produces no `man/`/`NAMESPACE` diff; `pkgdown::check_pkgdown()`
+reports no problems; no generated file is hand-edited (the diff touches no
+`R/`, `man/`, `NAMESPACE`, `data/`, `src/`); no NEWS entry owed, the diff
+having no user-visible surface; README untouched. `document()` did try to bump
+`Config/roxygen2/version` 8.0.0 -> 8.1.0 (this machine has a newer roxygen2);
+reverted rather than carried, DESCRIPTION being outside this milestone's Scope.
+
+**Scope compliance.** `data-raw/audit-norms.R` is not in the diff at all, so no
+guard was added, moved, or widened — every mutation above was transient and
+restored byte-clean, which Scope Out explicitly permits.
+
+**Fresh-context review: three lenses, then a scorer.** Blame-history — no
+finding that the diff undoes deliberate prior work; it confirmed the T8
+loss/repair is disclosed in the work log and that no other commit shows the
+pattern. Prior-review — **no findings**; it read the archived `## Review`
+sections of M72-M75 and M79 plus this milestone's round-1 record. Diff-bug —
+17 findings, scored by a fresh [S] scorer holding the diff and the plan.
+
+**Actioned (>= 80): F4, scored 82 — `expect_abort_at_site()` did not validate
+`kind`, so an unrecognised one fell through to the `stop` regex branch**, the
+loosest of the three matchers, in a helper that fails closed everywhere else.
+Not hypothetical: it is the mechanism behind this milestone's own T8
+correction, where a stale dispatch accepted a key's own superstring. Fixed at
+this gate — refused by name, with a typo'd-kind test and an assertion that
+every kind the walk emits is one the matcher accepts. Inversion: disabling the
+validation gives FAIL 1. Return floor not reached (no criterion promises kind
+validation; 82 is below the >=90 deliverable bar), so this was fix-now with no
+status change.
+
+Below threshold, logged not actioned (17): F10 (75) two of AC1's five line
+citations are stale — the test name is at `:472` not `:464`, the helper's
+domain paragraph at `:16-24` not `:12-14`. F7 (72) `norms_audit_resolves_name()`
+checks neither the package operand of `:::` nor that `get()`'s `envir` is a
+namespace. F9 (65) the AC7 test's closing assertion re-implements the stem
+matcher instead of driving it. F8 (55) that test asserts failure counts, not
+which failure. F11 (40) the reserved-formal refusal message is inaccurate for
+`local`/`exprObject`. F16 (35) four unprefixed globals (`squish`,
+`regex_escape`, `deparse_call`, `site`) in the shared test namespace. F17 (30)
+the two same-key sites report identical `info`, so a red run does not say which
+broke. F1/F2/F3 (25 each) `base:::stop` is neither collected nor refused; an
+all-dynamic `stop()` keys `{}` whose regex is `.`; a literal `{}` in a message
+is indistinguishable from the placeholder. F5/F6/F12/F18 (20 each) calls inside
+`quote()` are collected though unfixturable; two structurally identical sites
+merge into one key; the stem match has no length floor; M79's F15
+two-calls-on-one-line intent has no named fixture. F13/F14/F15 (15 each)
+deparsed-text keying is refactor-fragile; `Sys.setenv(LC_MESSAGES=)` does not
+call `Sys.setlocale()`; the "in source order" comment is pre-order.
+
+Several of these (F2, F3, F6, F12) are squarely the matcher-floor and
+composite-identity work RR17 rev 2 partitions to the successor milestone, which
+the ROADMAP already carries as a candidate row.
 
 **2026-08-09 — returned to `in-progress` on AC1. PR #108 (draft, not merged).**
 
