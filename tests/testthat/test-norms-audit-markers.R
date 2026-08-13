@@ -299,12 +299,20 @@ test_that("a tagged note read by two instruments still parses (M79)", {
   )
 })
 
-# --- every abort the script can raise (M79 registry, M81 enumeration) ---------
+# --- the script's stop()/stopifnot() sites (M79 registry, M81 enumeration) ----
 #
 # One registry entry per ABORT SITE, each carrying the fixture that provokes
 # that site. Two tests bind it: one asserts every fixture raises its own site's
 # message, the other asserts the registry and the script's parse tree hold the
 # same sites, in both directions.
+#
+# The domain is exactly the `stop()` and `stopifnot()` calls the parse walk
+# collects, run block included -- NOT every way this script can fail. Outside
+# it: other abort spellings (rlang::abort, cli::cli_abort, do.call-dispatched
+# and aliased heads), calls built at runtime, process exits, warnings promoted
+# under options(warn = 2), and failures that are not calls at all (a subscript
+# error, a coercion, match.arg). Nothing here enumerates those, so nothing here
+# claims them; what the walk cannot key it refuses rather than skips.
 #
 # The domain is the parse tree, not a sourced environment and not the file's
 # text (helper-norms-audit-script.R says why both fail). The predecessor
@@ -461,7 +469,7 @@ test_that("every registered abort site raises its own message (M79, M81)", {
   }
 })
 
-test_that("no abort anywhere in the audit script is left unregistered (M81)", {
+test_that("no stop()/stopifnot() site the walk collects is unregistered (M81)", {
   norms_audit_script_path()  # skips against the installed package
   # Both directions at once: sorted (kind, key) ids compared for identity, so
   # an unregistered site and a registered non-site each fail. The parse tree
