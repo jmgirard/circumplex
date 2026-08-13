@@ -299,21 +299,36 @@ test_that("a tagged note read by two instruments still parses (M79)", {
   )
 })
 
-# --- every abort path in parse_source_note() (M79) ----------------------------
+# --- the script's stop()/stopifnot() sites (M79 registry, M81 enumeration) ----
 #
-# Each `stop()` in the function's body gets a case here, and the count test
-# below binds the two: adding a seventh `stop()` without registering it fails
-# the suite. Registered by MESSAGE rather than by a hand-count, so the registry
-# says which abort each case is for and cannot drift into a bare tally.
+# One registry entry per ABORT SITE, each carrying the fixture that provokes
+# that site. Two tests bind it: one asserts every fixture raises its own site's
+# message, the other asserts the registry and the script's parse tree hold the
+# same sites, in both directions.
 #
-# Each was no-oped in turn and the surviving behaviour recorded (measured
-# 2026-08-08). Three are load-bearing in the strong sense -- no-oping them
-# leaves the parser RETURNING ROWS rather than raising anything. Three
-# relocate: some later expression, or another guard, fails instead, so the test
-# reddens on the message without that proving this guard is what stopped the
-# bad state. Recorded per case below rather than papered over, because a test
-# that reddens for the wrong reason is the false coverage the guard rule warns
-# about.
+# The domain is exactly the `stop()` and `stopifnot()` calls the parse walk
+# collects, run block included -- NOT every way this script can fail. Outside
+# it: other abort spellings (rlang::abort, cli::cli_abort, do.call-dispatched
+# and aliased heads), calls built at runtime, process exits, warnings promoted
+# under options(warn = 2), and failures that are not calls at all (a subscript
+# error, a coercion, match.arg). Nothing here enumerates those, so nothing here
+# claims them; what the walk cannot key it refuses rather than skips.
+#
+# The domain is the parse tree, not a sourced environment and not the file's
+# text (helper-norms-audit-script.R says why both fail). The predecessor
+# counted `stop(` occurrences in the deparsed bodies of the functions a
+# defs-only sys.source() leaves behind: measured 2026-08-09 at 2ab626f6 it
+# counted 12 while the parse walk saw 13 calls, the trailing run block being
+# invisible to it, so an abort landing there registered by not being seen.
+#
+# Each parse_source_note() guard was no-oped in turn and the surviving
+# behaviour recorded (measured 2026-08-08). Three are load-bearing in the
+# strong sense -- no-oping them leaves the parser RETURNING ROWS rather than
+# raising anything. Three relocate: some later expression, or another guard,
+# fails instead, so the test reddens on the message without that proving this
+# guard is what stopped the bad state. Recorded per case below rather than
+# papered over, because a test that reddens for the wrong reason is the false
+# coverage the guard rule warns about.
 
 note_dir <- function(name, lines) {
   dir <- tempfile("m79-abort-")
@@ -324,148 +339,240 @@ note_dir <- function(name, lines) {
 
 table_head <- c("| field | sample | scale | value | anchor |", "|---|---|---|---|---|")
 
-# field = the abort's message fragment; value = a thunk raising it.
-PARSE_ABORTS <- list(
+site <- function(kind, key, fixture) list(kind = kind, key = key, fixture = fixture)
+
+SCRIPT_ABORTS <- list(
+  # validate_batch()'s stopifnot(), one entry per CONDITION: each fails on its
+  # own and each needs a fixture that reaches it rather than its sibling.
+  #
+  # The non-data-frame fixture carries all five required names, so the sibling
+  # condition below is TRUE and cannot abort in this one's place -- without
+  # that, deleting `is.data.frame(batch)` would still leave the case red.
+  site("stopifnot", "is.data.frame(batch)", function(env) {
+    env$validate_batch(list(instrument = "fx", sample = 1, citekey = "k",
+                            divisor = 1, scales = TRUE))
+  }),
+  site("stopifnot",
+       paste0('all(c("instrument", "sample", "citekey", "divisor", ',
+              '"scales") %in% names(batch))'),
+       function(env) {
+         # A real data frame, so the sibling condition is TRUE: only the
+         # missing `scales` column can be what aborts here.
+         env$validate_batch(data.frame(instrument = "fx", sample = 1,
+                                       citekey = "k", divisor = 1,
+                                       stringsAsFactors = FALSE))
+       }),
+  site("stop", "AUDIT_BATCH names the same (instrument, sample) twice: {}",
+       function(env) env$validate_batch(rbind(shared_batch(), shared_batch()[1, ]))),
+  site("stop",
+       paste0("AUDIT_BATCH must mark exactly one `scales` entry per ",
+              "instrument; wrong for: {}"),
+       function(env) {
+         noscales <- shared_batch()
+         noscales$scales <- FALSE
+         env$validate_batch(noscales)
+       }),
+  site("stop", "malformed audit-values marker: {}",
+       function(env) env$source_note_tags("<!-- audit-values-beginning -->")),
+  # The two "source note not found" sites are different functions, and the
+  # registry carries both: this key is the one place a site count above 1 is
+  # intended, so the set equality below is what keeps it honest.
+  #
   # RELOCATES: no-oped, readLines() fails next -- "cannot open the connection".
-  "source note not found" = function(env) {
+  site("stop", "source note not found: {}", function(env) {
     env$parse_source_note("absent", note_dir("other", "x"), instrument = "fx")
-  },
-  # RELOCATES, into the guard below: no-oped, the two untagged blocks both
-  # carry the tag "", so the duplicate-tag abort catches it -- "tags two
-  # audit-values blocks alike: ". Removing BOTH would return a row range
-  # spanning someone else's block, which is why neither is redundant.
-  "no well-formed audit-values block" = function(env) {
-    env$parse_source_note("bad", note_dir("bad", c(
-      "<!-- audit-values-begin -->", "<!-- audit-values-begin -->",
-      table_head, "| M | 1 | PA | 1.1 | t |", "<!-- audit-values-end -->"
-    )), instrument = "fx")
-  },
+  }),
+  site("stop", "source note not found: {}", function(env) {
+    env$source_note_block_tags("absent", note_dir("other", "x"))
+  }),
+  # RELOCATES, into the duplicate-tag guard: no-oped, the two untagged blocks
+  # both carry the tag "", so that guard catches it. Removing BOTH would return
+  # a row range spanning someone else's block, which is why neither is
+  # redundant.
+  site("stop", "source note {} has no well-formed audit-values block(s)",
+       function(env) {
+         env$parse_source_note("bad", note_dir("bad", c(
+           "<!-- audit-values-begin -->", "<!-- audit-values-begin -->",
+           table_head, "| M | 1 | PA | 1.1 | t |", "<!-- audit-values-end -->"
+         )), instrument = "fx")
+       }),
   # LOAD-BEARING: no-oped, it RETURNS the first of the two blocks tagged alike
   # (measured: 1 row, value 1.1, the second block's 2.2 never seen), so the
   # second instrument is audited against the first's rows and no comparison can
   # fail. Nothing else raises.
-  "tags two audit-values blocks alike" = function(env) {
-    env$parse_source_note("dup", note_dir("dup", c(
-      "<!-- audit-values-begin: fx -->", table_head,
-      "| M | 1 | PA | 1.1 | t |", "<!-- audit-values-end -->",
-      "<!-- audit-values-begin: fx -->", table_head,
-      "| M | 1 | PA | 2.2 | t |", "<!-- audit-values-end -->"
-    )), instrument = "fx")
-  },
+  site("stop", "source note {} tags two audit-values blocks alike: {}",
+       function(env) {
+         env$parse_source_note("dup", note_dir("dup", c(
+           "<!-- audit-values-begin: fx -->", table_head,
+           "| M | 1 | PA | 1.1 | t |", "<!-- audit-values-end -->",
+           "<!-- audit-values-begin: fx -->", table_head,
+           "| M | 1 | PA | 2.2 | t |", "<!-- audit-values-end -->"
+         )), instrument = "fx")
+       }),
   # RELOCATES: no-oped, k stays NA and b[[NA]] raises "subscript out of
   # bounds" -- a redder message for the same state, not a survival.
-  "no audit-values block for" = function(env) {
-    env$parse_source_note("tagged", note_dir("tagged", c(
-      "<!-- audit-values-begin: fx -->", table_head,
-      "| M | 1 | PA | 1.1 | t |", "<!-- audit-values-end -->",
-      "<!-- audit-values-begin: fy -->", table_head,
-      "| M | 1 | PA | 2.2 | t |", "<!-- audit-values-end -->"
-    )), instrument = "zz")
-  },
+  site("stop", "source note {} has no audit-values block for {}; it tags: {}",
+       function(env) {
+         env$parse_source_note("tagged", note_dir("tagged", c(
+           "<!-- audit-values-begin: fx -->", table_head,
+           "| M | 1 | PA | 1.1 | t |", "<!-- audit-values-end -->",
+           "<!-- audit-values-begin: fy -->", table_head,
+           "| M | 1 | PA | 2.2 | t |", "<!-- audit-values-end -->"
+         )), instrument = "zz")
+       }),
   # LOAD-BEARING: no-oped, it RETURNS the row with anchor NA (measured: cell 5
   # of a four-cell row), so the value joins the note with its provenance anchor
   # silently gone. An anchor containing a literal "|" is how a real note gets
   # here.
-  "malformed audit row" = function(env) {
-    env$parse_source_note("short", note_dir("short", c(
-      "<!-- audit-values-begin -->", table_head,
-      "| M | 1 | PA | 1.1 |", "<!-- audit-values-end -->"
-    )), instrument = "fx")
-  },
+  site("stop", "source note {} has {} malformed audit row(s); first: {}",
+       function(env) {
+         env$parse_source_note("short", note_dir("short", c(
+           "<!-- audit-values-begin -->", table_head,
+           "| M | 1 | PA | 1.1 |", "<!-- audit-values-end -->"
+         )), instrument = "fx")
+       }),
   # LOAD-BEARING: no-oped, it RETURNS the row with an empty value (measured),
   # which downstream compares as a mismatch -- a wrong ledger row rather than a
   # refusal, so the note's defect is reported as the package's.
-  "audit row\\(s\\) with an empty value" = function(env) {
-    env$parse_source_note("empty", note_dir("empty", c(
-      "<!-- audit-values-begin -->", table_head,
-      "| M | 1 | PA |  | t |", "<!-- audit-values-end -->"
-    )), instrument = "fx")
-  }
-)
-
-test_that("every parse_source_note() abort raises its own message (M79)", {
-  env <- marker_defs()
-  for (msg in names(PARSE_ABORTS)) {
-    # The specific message, never bare failure: five of these six fixtures
-    # would also raise if the parser were broken in an unrelated way.
-    expect_error(PARSE_ABORTS[[msg]](env), msg, info = msg)
-  }
-})
-
-# Every abort the script can raise, registered by a message fragment and the
-# number of stop() sites raising it. The count test binds this registry to the
-# WHOLE script -- every function it defines -- because a count scoped to one
-# function's body is evaded by an abort landing in a helper, which is exactly
-# where return 1 put source_note_marker()'s (AC5 as amended, return 2). Each
-# fragment has a message-asserting test: the parse_source_note() six in
-# PARSE_ABORTS above, the marker abort throughout this file, and the remaining
-# four in the non-parser abort test below.
-SCRIPT_ABORTS <- c(
-  "malformed audit-values marker: " = 1L,
-  "source note not found: " = 2L,
-  "has no well-formed audit-values block(s)" = 1L,
-  "tags two audit-values blocks alike: " = 1L,
-  "has no audit-values block for " = 1L,
-  "malformed audit row(s); first: " = 1L,
-  "audit row(s) with an empty value; first: " = 1L,
-  "AUDIT_BATCH names the same (instrument, sample) twice: " = 1L,
-  "AUDIT_BATCH must mark exactly one `scales` entry per instrument; " = 1L,
-  "has no single norms record for sample " = 1L,
-  "carries an untagged audit-values block " = 1L
-)
-
-# OCCURRENCES, not lines containing one: a predecessor counted deparsed lines
-# matching the substring, so two stop() calls deparsed onto one line counted
-# as one and a new abort could land registered-looking (M79 review, F15).
-count_fixed <- function(x, pattern) {
-  at <- gregexpr(pattern, x, fixed = TRUE)[[1]]
-  if (at[[1]] == -1L) 0L else length(at)
-}
-
-test_that("no abort anywhere in the audit script is left unregistered (M79)", {
-  env <- marker_defs()
-  fns <- Filter(is.function, mget(ls(env), envir = env))
-  src <- paste(
-    vapply(fns, function(f) paste(deparse(body(f)), collapse = "\n"),
-           character(1)),
-    collapse = "\n"
-  )
-  # "stop(" does not match "stopifnot(": the character after "stop" there is
-  # "i", not "(".
-  expect_identical(count_fixed(src, "stop("), sum(SCRIPT_ABORTS))
-  for (frag in names(SCRIPT_ABORTS)) {
-    expect_identical(count_fixed(src, frag), SCRIPT_ABORTS[[frag]],
-                     info = frag)
-  }
-})
-
-test_that("the script's non-parser aborts each raise their own message (M79)", {
-  env <- marker_defs()
-  # source_note_block_tags() on an absent note: the second "source note not
-  # found" site, a different function from the parser's.
-  expect_error(
-    env$source_note_block_tags("absent", tempdir()),
-    "source note not found"
-  )
-  # validate_batch(): a duplicate (instrument, sample) pair...
-  dup <- rbind(shared_batch(), shared_batch()[1, ])
-  expect_error(
-    env$validate_batch(dup),
-    "names the same \\(instrument, sample\\) twice"
-  )
-  # ...and an instrument marking no `scales` row.
-  noscales <- shared_batch()
-  noscales$scales <- FALSE
-  expect_error(
-    env$validate_batch(noscales),
-    "exactly one `scales` entry per instrument"
-  )
+  site("stop", "source note {} has {} audit row(s) with an empty value; first: {}",
+       function(env) {
+         env$parse_source_note("empty", note_dir("empty", c(
+           "<!-- audit-values-begin -->", table_head,
+           "| M | 1 | PA |  | t |", "<!-- audit-values-end -->"
+         )), instrument = "fx")
+       }),
   # shipped_values(): a batch row naming a sample the object does not carry
   # must abort, not audit nothing.
-  expect_error(
-    env$shipped_values("fx", 2, TRUE, two_scale_object()),
-    "has no single norms record for sample 2"
+  site("stop",
+       paste0("{} has no single norms record for sample {} ",
+              "({} norm rows, {} source rows)"),
+       function(env) env$shipped_values("fx", 2, TRUE, two_scale_object())),
+  site("stop",
+       paste0("source note {} carries an untagged audit-values block but is ",
+              "read by {} instruments ({}); tag each block with the ",
+              "instrument it backs"),
+       function(env) {
+         dir <- tempfile("m81-untagged-")
+         dir.create(dir)
+         writeLines(block_rows(), file.path(dir, "shared.md"))
+         env$refuse_shared_untagged_blocks(shared_batch(), dir)
+       })
+)
+
+test_that("every registered abort site raises its own message (M79, M81)", {
+  env <- marker_defs()
+  for (s in SCRIPT_ABORTS) {
+    # The site's own message, never bare failure: most of these fixtures would
+    # also raise if the script were broken in an unrelated way, and several
+    # reach a function with more than one guard in it.
+    expect_abort_at_site(function() s$fixture(env), s$kind, s$key)
+  }
+})
+
+test_that("no stop()/stopifnot() site the walk collects is unregistered (M81)", {
+  norms_audit_script_path()  # skips against the installed package
+  # Both directions at once: sorted (kind, key) ids compared for identity, so
+  # an unregistered site and a registered non-site each fail. The parse tree
+  # covers the trailing run block, which the sourced-environment count this
+  # replaces could not see at all.
+  expect_identical(
+    norms_audit_site_ids(SCRIPT_ABORTS),
+    norms_audit_site_ids(norms_audit_abort_sites())
   )
+})
+
+test_that("a named-form site is matched by exact equality, not a stem (M81)", {
+  # A synthetic site, raised through the real mechanism: a stopifnot() call
+  # whose condition is named, built as a call so the message is R's own rather
+  # than one this test writes.
+  raise <- function(msg) {
+    cl <- as.call(list(quote(stopifnot), FALSE))
+    names(cl) <- c("", msg)
+    function() eval(cl)
+  }
+  # What expect_abort_at_site() is asked to accept is the question, so its
+  # FAILURES are what this test reads -- running it directly would only report
+  # whether this file passes, which is the opposite of what is under test.
+  failures <- function(expr) {
+    out <- character()
+    withCallingHandlers(expr, expectation_failure = function(cnd) {
+      out <<- c(out, conditionMessage(cnd))
+      invokeRestart("continue_test")
+    })
+    out
+  }
+
+  key <- "divisor must be numeric"
+  expect_identical(tryCatch(raise(key)(), error = conditionMessage), key)
+
+  expect_length(
+    failures(expect_abort_at_site(raise(key), "stopifnot_named", key)), 0L
+  )
+  # Both directions fail: a strict superstring and a strict substring.
+  expect_length(
+    failures(expect_abort_at_site(raise(paste0(key, " and finite")),
+                                  "stopifnot_named", key)), 1L
+  )
+  truncated <- substr(key, 1L, nchar(key) - 1L)
+  expect_length(
+    failures(expect_abort_at_site(raise(truncated), "stopifnot_named", key)), 1L
+  )
+  # An unrecognised kind is refused rather than dispatched to the loosest
+  # matcher. Named with a typo, as the real incident was:
+  expect_error(
+    expect_abort_at_site(raise(key), "stopifnot_nmaed", key),
+    "unknown abort site kind"
+  )
+  # Every kind the walk can emit is one the matcher accepts, so the registry
+  # and the matcher cannot drift apart in the other direction either.
+  expect_true(all(
+    vapply(norms_audit_abort_sites(), function(s) s$kind, character(1)) %in%
+      SITE_KINDS
+  ))
+
+  # And the substring case is the one that needed equality: the stem matcher
+  # the POSITIONAL form uses accepts it, so a named site keyed through that
+  # matcher would report a truncated message as its own.
+  stem <- norms_audit_stopifnot_stem(truncated)
+  expect_true(nzchar(stem) && startsWith(squish(key), stem))
+})
+
+test_that("the walk keys named conditions and refuses the rest (M81)", {
+  sites <- function(txt) norms_audit_abort_sites(parse(text = txt, keep.source = FALSE))
+
+  # A named condition IS a condition, keyed on its name -- the runtime message.
+  # Reading positional arguments only is what returned this milestone: such a
+  # guard fires and contributes no key, so nothing ever reports it missing.
+  expect_identical(
+    sites('stopifnot("must be numeric" = is.numeric(x), is.data.frame(y))'),
+    list(list(kind = "stopifnot_named", key = "must be numeric"),
+         list(kind = "stopifnot", key = "is.data.frame(y)"))
+  )
+
+  # `stop()`'s own formals carry no message, so they leave the key alone.
+  expect_identical(
+    sites('stop("boom", call. = FALSE, domain = NA)'),
+    list(list(kind = "stop", key = "boom"))
+  )
+
+  # Refused, not skipped. Each of these is a real abort site whose message the
+  # keying rules cannot predict, and a site the walk passes over silently is
+  # the false coverage the whole registry exists to remove: `exprs = ` holds
+  # its conditions in an expression object this walk does not descend, and a
+  # `stop()` argument named anything else is concatenated into the message
+  # while the template drops it (`stop("boom ", tail = "T")` raises "boom T").
+  expect_error(sites("stopifnot(exprs = { TRUE })"),
+               "cannot enumerate .*stopifnot\\(\\) formal exprs")
+  expect_error(sites("stopifnot(local = TRUE)"),
+               "cannot enumerate .*stopifnot\\(\\) formal local")
+  expect_error(sites('stop("boom ", tail = "TAIL")'),
+               "cannot enumerate .*stop\\(\\) argument named tail")
+
+  # The reserved set is read from formals(), not written out: this R spells
+  # the third formal `exprObject` where RR17 spelled it `exprs.env`, and a
+  # literal list would have stopped covering whichever name R renamed.
+  expect_true(all(c("exprs", "local") %in% STOPIFNOT_RESERVED))
+  expect_false("..." %in% STOPIFNOT_RESERVED)
 })
 
 test_that("source_note_tags() reads the two well-formed begin shapes (M79)", {
