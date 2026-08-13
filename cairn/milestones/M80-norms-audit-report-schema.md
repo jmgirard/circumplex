@@ -88,7 +88,7 @@ the same emitters. Changing any value in `data/` → not here.
       `tests/testthat/test-norms-audit-roster.R`.
 - [x] T3 Dedupe note-only rows on citekey, tag and payload; test the full run
       still emits 14.
-- [ ] T4 `divisor` validation in `validate_batch()` (`:82-99`), one test per
+- [x] T4 `divisor` validation in `validate_batch()` (`:82-99`), one test per
       refused shape.
 - [ ] T5 Make `normalise_items()` abort on a non-integer-list cell and
       normalise the source side in `values_agree()`; test the two-unparseable
@@ -109,6 +109,7 @@ the same emitters. Changing any value in `data/` → not here.
 - 2026-08-13: started by /milestone-implement on `m80-norms-audit-report-schema`.
 - 2026-08-13: T1/T2/T3/T6 done as one rewrite — all four change the same emitters, and splitting them would have meant three passes over the same lines. Schema, dedupe and the AC6 sweep land together with `tests/testthat/test-norms-audit-coverage.R`.
 - 2026-08-13: T1 minor amendment at the implementation gate: the schema takes two free-text columns, `label` and `detail`, beside the eight the plan named. A note-only row carries two free-text cells (the note's name for the unshipped material and its description) and the eight key columns have nowhere to put either once each holds only its own fact; Jeff chose the two-column shape over pasting them together or dropping the description.
+- 2026-08-13: T4 done in `tests/testthat/test-norms-audit-batch.R`; the four new `stop()` sites are registered in M81's abort registry, which is what forced them to carry fixtures. The missing-column shape needed no new guard — M72's required-names `stopifnot()` already covers it, so its test asserts that site instead.
 - 2026-08-13: T2 found seven emitters, not the plan's six — M79 added `shipped-sample-not-audited` after this plan was written — and the roster test file carries coverage assertions the plan attributed to the provenance file alone.
 
 ## Decisions

@@ -89,6 +89,38 @@ validate_batch <- function(batch) {
          paste(unique(paste(batch$instrument, batch$sample)[dup]),
                collapse = ", "), call. = FALSE)
   }
+  # `divisor` divides every source-side M and SD before the comparison, so an
+  # unusable one does not stop the audit -- it makes it compare the wrong
+  # numbers, or no numbers, while every count reads clean. A non-numeric column
+  # coerces to NA and `values_agree()` returns FALSE for the whole sample, which
+  # arrives as a page of mismatches against the source rather than as a batch
+  # defect. NA and Inf do the same silently in the other direction: NA/x is NA,
+  # x/Inf is 0, and 0 or a negative divisor turns a real value into a wrong one.
+  # None of the four is distinguishable downstream from a package error, which
+  # is why each is refused here and named.
+  #
+  # A `divisor` column absent altogether is refused by the stopifnot() above.
+  where <- function(i) paste0(batch$instrument[i], " sample ", batch$sample[i])
+  if (!is.numeric(batch$divisor)) {
+    stop("AUDIT_BATCH$divisor must be numeric, not ",
+         class(batch$divisor)[[1L]], call. = FALSE)
+  }
+  bad <- which(is.na(batch$divisor))
+  if (length(bad)) {
+    stop("AUDIT_BATCH$divisor is missing for: ",
+         paste(where(bad), collapse = ", "), call. = FALSE)
+  }
+  bad <- which(!is.finite(batch$divisor))
+  if (length(bad)) {
+    stop("AUDIT_BATCH$divisor is not finite for: ",
+         paste(where(bad), collapse = ", "), call. = FALSE)
+  }
+  bad <- which(batch$divisor <= 0)
+  if (length(bad)) {
+    stop("AUDIT_BATCH$divisor must be strictly positive; wrong for: ",
+         paste(where(bad), collapse = ", "), call. = FALSE)
+  }
+
   n_scales <- tapply(batch$scales, batch$instrument, sum)
   bad <- names(n_scales)[n_scales != 1L]
   if (length(bad)) {
