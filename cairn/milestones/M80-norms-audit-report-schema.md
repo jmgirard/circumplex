@@ -1,6 +1,6 @@
 # M80: Give the norms-audit coverage report a machine-readable key
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M79, M81
 - **Driving RR:** —
@@ -96,7 +96,7 @@ the same emitters. Changing any value in `data/` → not here.
 - [x] T6 Report instrument-level note rows in a block no `scales = TRUE` pass
       reads; fixture note plus test for both the uncovered and the
       already-covered case.
-- [ ] T7 Regenerate the coverage CSV, run `devtools::test()` and
+- [x] T7 Regenerate the coverage CSV, run `devtools::test()` and
       `devtools::check(args = "--no-manual")`.
 
 ## Work log
@@ -111,6 +111,8 @@ the same emitters. Changing any value in `data/` → not here.
 - 2026-08-13: T1 minor amendment at the implementation gate: the schema takes two free-text columns, `label` and `detail`, beside the eight the plan named. A note-only row carries two free-text cells (the note's name for the unshipped material and its description) and the eight key columns have nowhere to put either once each holds only its own fact; Jeff chose the two-column shape over pasting them together or dropping the description.
 - 2026-08-13: T4 done in `tests/testthat/test-norms-audit-batch.R`; the four new `stop()` sites are registered in M81's abort registry, which is what forced them to carry fixtures. The missing-column shape needed no new guard — M72's required-names `stopifnot()` already covers it, so its test asserts that site instead.
 - 2026-08-13: T5 done in `tests/testthat/test-norms-audit-compare.R`; normalising the source side changes no committed ledger row, the notes' item keys having been written unpadded — the run stays 194 ledger rows, 15 coverage rows, 0 gaps.
+- 2026-08-13: T7 — audit re-run at `9d56bf2a`: ledger 194 rows, coverage 15 rows, 0 gaps, 14 note-only, 1 constructed credit, 0 angle-copy splits, 0 IP2 breaches. Ledger compared row by row against the committed file with the three stamp columns stripped: identical, so no audited comparison changed; the coverage CSV was regenerated at T1/T2 and is unchanged since. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 6974 (the 6 warnings all outside this milestone's files, unchanged from M81's run). `devtools::check(args = "--no-manual")`: Status OK, 0 errors / 0 warnings / 0 notes, 7m 12s. No NEWS entry: this milestone changes `data-raw/` and `tests/` only, neither of which is installed, so there is no user-visible change to record.
+- 2026-08-13: check needed M81's recorded gfortran workaround again — a scratch `FLIBS=` via `R_MAKEVARS_USER`, uncommitted. Without it the source install fails to link (`ld: library 'emutls_w' not found`), R's default `FLIBS` naming `/opt/gfortran/lib` unconditionally though `src/` is C++ only. Machine setup, not this branch: the first check run failed before compiling any of it.
 - 2026-08-13: T2 found seven emitters, not the plan's six — M79 added `shipped-sample-not-audited` after this plan was written — and the roster test file carries coverage assertions the plan attributed to the provenance file alone.
 
 ## Decisions

@@ -516,8 +516,9 @@ refuse_shared_untagged_blocks <- function(batch, dir) {
 # left out -- and it is read by machine: the test files assert over its columns,
 # and a reader relates it to the ledger through the names the ledger uses. So
 # every cell holds one fact, and no cell holds a sentence assembled out of two.
-# Before M80 six emitters pasted their payload into whichever column was free
-# (`field` became "M (sample 1)", `instrument` became "horowitz2003 (iip32)"),
+# Before M80 every emitter below pasted its payload into whichever column was
+# free (`field` became "M (sample 1)", `instrument` became "horowitz2003
+# (iip32)"),
 # which left the report unjoinable and, worse, unreadable by its own column
 # names: `instrument` did not hold an instrument.
 #
@@ -628,7 +629,7 @@ audit_norms <- function(batch = AUDIT_BATCH,
     note_real <- note_all[note_all$field != NOTE_ONLY, , drop = FALSE]
     btag <- attr(note_all, "tag")
     bkey <- paste0(citekey, "\r", btag)
-    # `scales` accumulates with |: whether a block's instrument-level rows were
+    # `scales` accumulates by OR: whether a block's instrument-level rows were
     # ever read is a property of the BLOCK across every pass over it, so the
     # last pass must not overwrite an earlier pass's TRUE (AC6).
     blocks[[bkey]] <- list(
