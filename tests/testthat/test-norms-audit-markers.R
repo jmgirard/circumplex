@@ -473,6 +473,44 @@ test_that("no abort anywhere in the audit script is left unregistered (M81)", {
   )
 })
 
+test_that("the walk keys named conditions and refuses the rest (M81)", {
+  sites <- function(txt) norms_audit_abort_sites(parse(text = txt, keep.source = FALSE))
+
+  # A named condition IS a condition, keyed on its name -- the runtime message.
+  # Reading positional arguments only is what returned this milestone: such a
+  # guard fires and contributes no key, so nothing ever reports it missing.
+  expect_identical(
+    sites('stopifnot("must be numeric" = is.numeric(x), is.data.frame(y))'),
+    list(list(kind = "stopifnot_named", key = "must be numeric"),
+         list(kind = "stopifnot", key = "is.data.frame(y)"))
+  )
+
+  # `stop()`'s own formals carry no message, so they leave the key alone.
+  expect_identical(
+    sites('stop("boom", call. = FALSE, domain = NA)'),
+    list(list(kind = "stop", key = "boom"))
+  )
+
+  # Refused, not skipped. Each of these is a real abort site whose message the
+  # keying rules cannot predict, and a site the walk passes over silently is
+  # the false coverage the whole registry exists to remove: `exprs = ` holds
+  # its conditions in an expression object this walk does not descend, and a
+  # `stop()` argument named anything else is concatenated into the message
+  # while the template drops it (`stop("boom ", tail = "T")` raises "boom T").
+  expect_error(sites("stopifnot(exprs = { TRUE })"),
+               "cannot enumerate .*stopifnot\\(\\) formal exprs")
+  expect_error(sites("stopifnot(local = TRUE)"),
+               "cannot enumerate .*stopifnot\\(\\) formal local")
+  expect_error(sites('stop("boom ", tail = "TAIL")'),
+               "cannot enumerate .*stop\\(\\) argument named tail")
+
+  # The reserved set is read from formals(), not written out: this R spells
+  # the third formal `exprObject` where RR17 spelled it `exprs.env`, and a
+  # literal list would have stopped covering whichever name R renamed.
+  expect_true(all(c("exprs", "local") %in% STOPIFNOT_RESERVED))
+  expect_false("..." %in% STOPIFNOT_RESERVED)
+})
+
 test_that("source_note_tags() reads the two well-formed begin shapes (M79)", {
   env <- marker_defs()
   expect_identical(env$source_note_tags("<!-- audit-values-begin -->"), "")

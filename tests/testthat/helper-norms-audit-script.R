@@ -62,6 +62,35 @@ call_positional_args <- function(cl) {
   args[!nzchar(nms)]
 }
 
+# Argument names that are NOT part of the message or the conditions.
+#
+# For `stop()` that is `call.` and `domain`; R concatenates every OTHER named
+# argument into the runtime message while the template above drops it, so
+# `stop("boom ", tail = "TAIL")` would key `"boom "` and raise `"boom TAIL"`.
+#
+# For `stopifnot()` it is its own formals less `...`, read from `formals()`
+# rather than written out: the set is version-dependent (this R spells the
+# third one `exprObject`, RR17 rev 2 spelled it `exprs.env`), and a literal
+# list would silently stop covering a name R renamed. Conditions passed
+# through `exprs =` live in an expression object this walk does not descend,
+# so such a call is refused rather than under-counted.
+STOPIFNOT_RESERVED <- setdiff(names(formals(stopifnot)), "...")
+STOP_NON_MESSAGE_NAMES <- c("call.", "domain")
+
+deparse_call <- function(cl) squish(paste(deparse(cl), collapse = " "))
+
+# Fail closed on an argument shape the keying rules cannot express.
+#
+# The alternative is to skip it, and skipping is what returned this milestone:
+# an unenumerable shape that raises nothing here is an abort site the registry
+# never learns about, which is the exact failure the walk replaced. An error
+# naming the call deparsed reddens every test that walks the script, so the
+# shape has to be handled before the suite can go green again.
+refuse_unenumerable <- function(cl, what) {
+  stop("abort site this walk cannot enumerate (", what, "): ",
+       deparse_call(cl), call. = FALSE)
+}
+
 # A `stop()` site's MESSAGE TEMPLATE: every literal fragment in order, each
 # non-literal argument rendered `{}`.
 #
@@ -71,6 +100,16 @@ call_positional_args <- function(cl) {
 # milestone exists to remove, one level in. The template is unique for every
 # site here except the deliberate `source note not found: {}` pair.
 norms_audit_stop_key <- function(cl) {
+  nms <- names(as.list(cl)[-1L])
+  if (!is.null(nms)) {
+    carried <- setdiff(nms[nzchar(nms)], STOP_NON_MESSAGE_NAMES)
+    if (length(carried)) {
+      refuse_unenumerable(
+        cl, paste0("stop() argument named ", paste(carried, collapse = ", "),
+                   ", which R concatenates into the message")
+      )
+    }
+  }
   paste(vapply(call_positional_args(cl), function(a) {
     if (is.character(a) && length(a) == 1L) a else "{}"
   }, character(1)), collapse = "")
@@ -78,12 +117,40 @@ norms_audit_stop_key <- function(cl) {
 
 squish <- function(x) trimws(gsub("[[:space:]]+", " ", x))
 
-# A `stopifnot()` site carries no message argument, so each of its conditions
-# keys on that condition's own deparsed text.
-norms_audit_stopifnot_keys <- function(cl) {
-  vapply(call_positional_args(cl),
-         function(a) squish(paste(deparse(a), collapse = " ")), character(1),
-         USE.NAMES = FALSE)
+# Every CONDITION of a `stopifnot()` site, as (kind, key) pairs in order.
+#
+# The two forms key differently because they FAIL differently, and the kind is
+# what tells the matcher which is which (AC7). A positional condition has no
+# message of its own, so R deparses it into one and truncates it; the key is
+# that deparsed text, matched as a stem. A NAMED condition's name IS the
+# runtime message, verbatim and untruncated, so its key is the name and the
+# match is string equality.
+#
+# Named conditions are why this milestone came back from review: the walk read
+# positional arguments only, so `stopifnot("msg" = cond)` contributed no key at
+# all -- a guard that genuinely fires, registered nowhere, with every count
+# still balancing (M81 review, F1).
+norms_audit_stopifnot_conditions <- function(cl) {
+  args <- as.list(cl)[-1L]
+  nms <- names(args)
+  if (is.null(nms)) nms <- rep("", length(args))
+  out <- list()
+  for (i in seq_along(args)) {
+    if (!nzchar(nms[[i]])) {
+      out[[length(out) + 1L]] <- list(
+        kind = "stopifnot",
+        key = squish(paste(deparse(args[[i]]), collapse = " "))
+      )
+    } else if (nms[[i]] %in% STOPIFNOT_RESERVED) {
+      refuse_unenumerable(
+        cl, paste0("stopifnot() formal ", nms[[i]],
+                   ", whose conditions are not arguments of this call")
+      )
+    } else {
+      out[[length(out) + 1L]] <- list(kind = "stopifnot_named", key = nms[[i]])
+    }
+  }
+  out
 }
 
 # Every abort site the script contains, as (kind, key) pairs in source order.
@@ -94,8 +161,8 @@ norms_audit_abort_sites <- function(exprs = norms_audit_script_exprs()) {
   for (cl in norms_audit_calls(ABORT_HEADS, exprs)) {
     head <- paste(deparse(cl[[1L]]), collapse = "")
     if (head %in% c("stopifnot", "base::stopifnot")) {
-      for (k in norms_audit_stopifnot_keys(cl)) {
-        out[[length(out) + 1L]] <- list(kind = "stopifnot", key = k)
+      for (cond in norms_audit_stopifnot_conditions(cl)) {
+        out[[length(out) + 1L]] <- cond
       }
     } else {
       out[[length(out) + 1L]] <- list(kind = "stop", key = norms_audit_stop_key(cl))
