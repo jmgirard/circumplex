@@ -79,7 +79,7 @@ and the discrimination matrix (RR17 rev 2 BC6–BC11) → the successor mileston
       replacing the call with a hard-coded roster copy reddens it while the
       comment stands, which the retired text grep does not; the
       `circumplex:::` accessor switch stays green, for the `:::` shape.
-- [ ] AC5 (RR17 BC5) On the finished branch each of these reproduces at the
+- [x] AC5 (RR17 BC5) On the finished branch each of these reproduces at the
       recorded FAIL count (tolerance 0; PASS counts non-decreasing against the
       recorded 76 and 17, measured per test file in isolation), each mutation
       restored byte-clean: the two AC3 mutations (FAIL 2 each), the AC4
@@ -181,6 +181,7 @@ Measured baselines cross-reference RR17 rather than being restated, for the cap.
 - 2026-08-13: all tasks checked, local checks clean, status in-progress -> review. Acceptance-criterion boxes deliberately left unticked: review ticks them against its own fresh evidence.
 - 2026-08-13: review round 2 — fixed F4 (scored 82, the only finding at or above the action bar): `expect_abort_at_site()` did not validate `kind`, so an unrecognised one fell through to the `stop` regex branch, the loosest of the three matchers, in a helper that fails closed everywhere else. Not hypothetical — it is the mechanism behind this milestone's own 2026-08-13 correction. Now refused by name, with a typo'd-kind test and a second assertion that every kind the walk emits is one the matcher accepts, so the two cannot drift apart in either direction. Inversion: disabling the validation gives FAIL 1. Both files after: FAIL 0 | WARN 0 | PASS 94 and 17. Return floor not reached — F4 demonstrates no acceptance criterion failing (none promises kind validation) and 82 is below the >=90 deliverable-defect bar — so this was triaged as fix-now with no status change.
 - 2026-08-13: **the `git checkout --` restore error recurred, on the same file, one turn after logging it.** Mutating the helper to invert the F4 validation and restoring with `git checkout -- tests/testthat/helper-norms-audit-script.R` reverted the uncommitted F4 fix along with the mutation; the inversion measurement itself stands (FAIL 1 with the validation disabled), and the fix was re-applied and re-verified. Twice in one session, both times on a file holding uncommitted work. The rule that actually prevents it is sequencing, not care: commit the edit before mutating the file it lives in, or snapshot to a scratch path and restore from there — `git checkout --` restores from the INDEX, so it cannot distinguish a mutation from adjacent unstaged work. Candidate for LESSONS at the hygiene pass.
+- 2026-08-13: review round 2 gate evidence complete. Suite-wide `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 6891 and `devtools::check(args = "--no-manual")` Status OK 0/0/0 (7m 15s), both re-run after the F4 fix rather than carried over from the pre-fix runs. All seven criteria verified with fresh evidence and ticked. Three environment facts that are not this milestone's, recorded at the gate: `circumplex` had to be installed before the two `parallel = "snow"` tests could pass (socket workers cannot see a `load_all()`ed package); `test-axes-scaled-fit.R` skips 3 lavaan-internal corroborations here that ran on the old machine, each naming its own reason, so real coverage is lower on this laptop than the committed record assumes; and `document()` wants to bump `Config/roxygen2/version` to 8.1.0, reverted as outside Scope.
 
 ## Decisions
 
@@ -232,10 +233,19 @@ round-1 record follows it unchanged.**
   is `fr` outside the block and `C` inside). The pin satisfies the criterion as
   written and covers a call made outside a 3e block; no mutation here can redden
   it. Recorded rather than waved through.
-- **AC5:** see the fresh floor above — baseline FAIL 0 with PASS 94 and 17
-  against the recorded 76 and 17 (non-decreasing), both files WARN 0 in
-  isolation, every mutation restored byte-clean and the tree clean after the
-  set. Suite-wide and full-check figures in the work log.
+- **AC5 (PASS):** every clause measured fresh at this gate, after the F4 fix.
+  Baseline FAIL 0 with PASS 94 and 17 against the recorded 76 and 17
+  (non-decreasing), both files WARN 0 in isolation. Mutations at their recorded
+  FAIL counts, tolerance 0: the two AC3 mutations FAIL 2 each, the AC4 mutation
+  FAIL 1 with its control FAIL 0, the T4 run-block mutant FAIL 1; each restored
+  byte-clean and the tree clean after the set. `devtools::test()` suite-wide
+  FAIL 0 | WARN 6 | SKIP 3 | PASS 6891, the 6 warnings all outside this
+  milestone's two files. `devtools::check(args = "--no-manual")`: Status OK,
+  0 errors / 0 warnings / 0 notes, 7m 15s. Audit re-run through
+  `NORMS_AUDIT_LEDGER`/`NORMS_AUDIT_COVERAGE` into scratch paths, so the
+  committed CSVs were never written: ledger 194 rows x 12 cols and coverage
+  15 x 5, every column identical bar `generated`, `script_commit`,
+  `data_commit`.
 
 **Consistency gate.** `cairn_validate` exit 0, every CHECK PASS (the 47
 `work-log format` advisories are pre-existing hard-wrapped lines in M7).
