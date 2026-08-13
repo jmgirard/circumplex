@@ -388,10 +388,22 @@ shipped_values <- function(inst, sample, scales = TRUE, obj = NULL) {
 }
 
 # "1,  9, 17" and "1, 9, 17" are the same assignment; compare on the numbers.
+#
+# A cell that is not a comma-separated list of integers aborts rather than
+# coercing. `as.integer("x")` is NA with a warning, and the paste turned that
+# into the STRING "NA" -- so two unparseable cells normalised to "NA" and
+# compared equal, which is a comparison that cannot fail. That is the same
+# shape this file refuses everywhere else: a value the audit cannot read is a
+# note or an object someone got wrong, not a value to agree with.
 normalise_items <- function(x) {
-  vapply(strsplit(x, ",", fixed = TRUE), function(p) {
-    paste(as.integer(trimws(p)), collapse = ", ")
-  }, character(1))
+  vapply(x, function(one) {
+    p <- trimws(strsplit(as.character(one), ",", fixed = TRUE)[[1L]])
+    if (!length(p) || !all(grepl("^[0-9]+$", p))) {
+      stop("item key is not a comma-separated list of integers: ",
+           as.character(one), call. = FALSE)
+    }
+    paste(as.integer(p), collapse = ", ")
+  }, character(1), USE.NAMES = FALSE)
 }
 
 # --- comparison --------------------------------------------------------------
@@ -421,6 +433,14 @@ values_agree <- function(field, shipped, source, divisor) {
   # which is exactly the pre-fix csiv defect.
   if (identical(field, "Reference")) {
     return(grepl(trimws(source), trimws(shipped), fixed = TRUE))
+  }
+  # Both sides, not one. The shipped side was normalised in shipped_values()
+  # and the source side was not, so a note writing an item key with the column
+  # padding the package uses ("1,  9, 17, 25") disagreed with the shipped key
+  # it was transcribed from -- a mismatch reported against the package for a
+  # difference in whitespace.
+  if (identical(field, "Items")) {
+    return(identical(normalise_items(shipped), normalise_items(source)))
   }
   identical(trimws(shipped), trimws(source))
 }

@@ -396,6 +396,10 @@ SCRIPT_ABORTS <- list(
          b$divisor <- c(1, 0)
          env$validate_batch(b)
        }),
+  # normalise_items() (M80): an unparseable item key aborts rather than
+  # coercing to the string "NA", which two unparseable cells shared.
+  site("stop", "item key is not a comma-separated list of integers: {}",
+       function(env) env$normalise_items("not an item key")),
   site("stop", "malformed audit-values marker: {}",
        function(env) env$source_note_tags("<!-- audit-values-beginning -->")),
   # The two "source note not found" sites are different functions, and the
