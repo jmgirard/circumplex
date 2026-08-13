@@ -250,7 +250,22 @@ norms_audit_stopifnot_stem <- function(msg) {
 # covers them all and cannot be forgotten by a test added later. Under
 # testthat 3e this is belt-and-braces -- test_that() already sets LANGUAGE=C
 # (measured 2026-08-13) -- and it is what covers a call made outside one.
+SITE_KINDS <- c("stop", "stopifnot", "stopifnot_named")
+
 expect_abort_at_site <- function(thunk, kind, key, info = key) {
+  # Fail closed on an unknown kind, for the same reason the walk does.
+  # The dispatch below ends in the `stop` regex branch, which is the LOOSEST
+  # matcher of the three, so an unrecognised kind would silently get the
+  # weakest check rather than an error -- and that is not hypothetical: a
+  # stale dispatch let `kind` fall through to exactly that branch during this
+  # milestone, where it accepted a key's own superstring and the test reported
+  # one failure instead of two (work log, 2026-08-13).
+  if (!(length(kind) == 1L && !is.na(kind) && kind %in% SITE_KINDS)) {
+    stop("unknown abort site kind: ", paste(deparse(kind), collapse = ""),
+         " (expected one of ", paste(SITE_KINDS, collapse = ", "), ")",
+         call. = FALSE)
+  }
+
   old <- Sys.getenv(c("LANGUAGE", "LC_MESSAGES"), unset = NA)
   Sys.setenv(LANGUAGE = "C", LC_MESSAGES = "C")
   on.exit({

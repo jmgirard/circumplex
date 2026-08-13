@@ -517,6 +517,19 @@ test_that("a named-form site is matched by exact equality, not a stem (M81)", {
   expect_length(
     failures(expect_abort_at_site(raise(truncated), "stopifnot_named", key)), 1L
   )
+  # An unrecognised kind is refused rather than dispatched to the loosest
+  # matcher. Named with a typo, as the real incident was:
+  expect_error(
+    expect_abort_at_site(raise(key), "stopifnot_nmaed", key),
+    "unknown abort site kind"
+  )
+  # Every kind the walk can emit is one the matcher accepts, so the registry
+  # and the matcher cannot drift apart in the other direction either.
+  expect_true(all(
+    vapply(norms_audit_abort_sites(), function(s) s$kind, character(1)) %in%
+      SITE_KINDS
+  ))
+
   # And the substring case is the one that needed equality: the stem matcher
   # the POSITIONAL form uses accepts it, so a named site keyed through that
   # matcher would report a truncated message as its own.
