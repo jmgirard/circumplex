@@ -1,11 +1,11 @@
 # M80: Give the norms-audit coverage report a machine-readable key
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
-- **Depends on:** M79
+- **Depends on:** M79, M81
 - **Driving RR:** —
 - **Principles touched:** IP5
-- **Branch/PR:** —
+- **Branch/PR:** `m80-norms-audit-report-schema`
 
 ## Goal
 
@@ -80,21 +80,20 @@ the same emitters. Changing any value in `data/` → not here.
 
 ## Tasks
 
-- [ ] T1 Fix the coverage frame's columns — instrument, citekey, tag, side,
-      field, sample, scale, exempt — and document each side's cell contents in
-      a header comment beside `audit_norms()`.
-- [ ] T2 Rewrite the six emitters (`:379-385`, `:387-396`, `:403-418`,
-      `:447-453`, `:474-479`) onto that schema; update the printed summary at
-      `:646-661` and the coverage assertions in
-      `tests/testthat/test-norms-provenance.R`.
-- [ ] T3 Dedupe note-only rows on citekey, tag and payload; test the full run
+- [x] T1 Fix the coverage frame's columns — instrument, citekey, tag, side,
+      field, sample, scale, label, detail, exempt — and document each side's
+      cell contents in a header comment beside `audit_norms()`.
+- [x] T2 Rewrite the seven emitters onto that schema; update the coverage
+      assertions in `tests/testthat/test-norms-provenance.R` and
+      `tests/testthat/test-norms-audit-roster.R`.
+- [x] T3 Dedupe note-only rows on citekey, tag and payload; test the full run
       still emits 14.
 - [ ] T4 `divisor` validation in `validate_batch()` (`:82-99`), one test per
       refused shape.
 - [ ] T5 Make `normalise_items()` abort on a non-integer-list cell and
       normalise the source side in `values_agree()`; test the two-unparseable
       -cells case.
-- [ ] T6 Report instrument-level note rows in a block no `scales = TRUE` pass
+- [x] T6 Report instrument-level note rows in a block no `scales = TRUE` pass
       reads; fixture note plus test for both the uncovered and the
       already-covered case.
 - [ ] T7 Regenerate the coverage CSV, run `devtools::test()` and
@@ -106,6 +105,11 @@ the same emitters. Changing any value in `data/` → not here.
 - 2026-08-08: criteria audit ([O], fresh context, authored none of the criteria) returned findings on all 5 drafted criteria; all adopted. Two were load-bearing: AC1's stated rationale was impossible, coverage rows and ledger rows being disjoint by construction, so the criterion now asks for a joinable key rather than a join; and AC3's drafted dedupe key of (citekey, block, sample) would itself have deleted 6 of the 14 shipped note-only rows, every one of which carries `sample = "—"` with its payload in `scale` — the silent row loss the rest of the script refuses.
 - 2026-08-08: plan gate chose two milestones over one, putting this one second because both rewrite the same coverage emitters and a shared-emitter conflict is cheaper to take in sequence than in review; falsified by M79 landing without touching the emitters, which would make the dependency spurious.
 - 2026-08-08: AC6 arrives here from M79's draft, where the criteria audit measured that implementing it as drafted would emit 16 duplicate rows for each of 8 passes; the real hole is narrower and has no instance in the repo, which is why it sits in the report milestone rather than the silent-loss one.
+- 2026-08-13: Depends-on mirror reconciled to ROADMAP (M79 → M79, M81); M81's plan added the dependency to the ROADMAP row and never mirrored it into this header. Bookkeeping only, no scope change.
+- 2026-08-13: started by /milestone-implement on `m80-norms-audit-report-schema`.
+- 2026-08-13: T1/T2/T3/T6 done as one rewrite — all four change the same emitters, and splitting them would have meant three passes over the same lines. Schema, dedupe and the AC6 sweep land together with `tests/testthat/test-norms-audit-coverage.R`.
+- 2026-08-13: T1 minor amendment at the implementation gate: the schema takes two free-text columns, `label` and `detail`, beside the eight the plan named. A note-only row carries two free-text cells (the note's name for the unshipped material and its description) and the eight key columns have nowhere to put either once each holds only its own fact; Jeff chose the two-column shape over pasting them together or dropping the description.
+- 2026-08-13: T2 found seven emitters, not the plan's six — M79 added `shipped-sample-not-audited` after this plan was written — and the roster test file carries coverage assertions the plan attributed to the provenance file alone.
 
 ## Decisions
 

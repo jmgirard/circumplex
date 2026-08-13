@@ -66,7 +66,8 @@ test_that("a dropped instrument is named, not just counted (M79)", {
   gaps <- res$coverage[!res$coverage$exempt, , drop = FALSE]
   hit <- gaps[gaps$side == "shipped-sample-not-audited", , drop = FALSE]
   expect_identical(hit$instrument, "isc")
-  expect_identical(hit$scale, "1")
+  # The sample rides in `sample` since M80; it was pasted into `scale` before.
+  expect_identical(hit$sample, "1")
 })
 
 test_that("the batch covers the shipped roster exactly (M79)", {
@@ -170,8 +171,8 @@ test_that("injecting one object does not shrink the audited world (M79)", {
   ))
   expect_gt(nrow(bare), 0L)
   expect_identical(nrow(injected), nrow(bare))
-  expect_setequal(paste(injected$instrument, injected$scale),
-                  paste(bare$instrument, bare$scale))
+  expect_setequal(paste(injected$instrument, injected$sample),
+                  paste(bare$instrument, bare$sample))
   # And the omitted instruments are named, not merely counted.
   expect_false(inst %in% injected$instrument)
   expect_gt(length(unique(injected$instrument)), 1L)

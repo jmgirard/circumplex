@@ -458,6 +458,84 @@ refuse_shared_untagged_blocks <- function(batch, dir) {
   invisible(TRUE)
 }
 
+# --- the coverage report ------------------------------------------------------
+
+# The coverage report says what the audit did NOT compare -- one row per thing
+# left out -- and it is read by machine: the test files assert over its columns,
+# and a reader relates it to the ledger through the names the ledger uses. So
+# every cell holds one fact, and no cell holds a sentence assembled out of two.
+# Before M80 six emitters pasted their payload into whichever column was free
+# (`field` became "M (sample 1)", `instrument` became "horowitz2003 (iip32)"),
+# which left the report unjoinable and, worse, unreadable by its own column
+# names: `instrument` did not hold an instrument.
+#
+# Ten columns. Seven are the KEY -- instrument, citekey, tag, side, field,
+# sample, scale -- and each is NA on a row that has no such fact, rather than
+# carrying a stand-in for one. `label` and `detail` are free text and are never
+# keys. `exempt` marks a row that records a fact about the sources rather than
+# a gap in the audit; the run block's gap count is `sum(!exempt)`.
+#
+# Coverage rows and ledger rows are disjoint by construction -- a coverage row
+# exists precisely because there was nothing to compare -- so what the key
+# provides is joinABILITY (to the batch, to the notes, to `data/`), not a join.
+#
+# Which cells each side fills:
+#
+#   note-only-sample (exempt)     instrument citekey tag; label = the note's own
+#     name for material the source publishes and the package does not ship,
+#     detail = the note's description of it. One row per block and payload, not
+#     per batch pass over the block.
+#   constructed-credit-reference (exempt)  instrument citekey tag field sample;
+#     label = the credit the note's author constructed rather than quoted.
+#   shipped-value-not-in-note     instrument citekey tag field sample scale
+#   note-value-not-shipped        instrument citekey tag field sample scale
+#   note-instrument-row-not-audited  instrument citekey tag field sample scale;
+#     sample is the NO_SAMPLE token, these rows being instrument-level.
+#   note-sample-not-audited       instrument citekey tag sample; sample is the
+#     one the note tables and no batch row claimed.
+#   note-block-not-audited        citekey tag; instrument is NA because no batch
+#     row names one -- that absence is exactly why the block is a gap.
+#   shipped-sample-not-audited    instrument sample; citekey and tag are NA for
+#     the mirror-image reason, no batch row names a note.
+#
+# `tag` is NA for an untagged block rather than "": an empty string reads as a
+# tag whose text went missing, not as a block that carries none.
+COVERAGE_COLUMNS <- c("instrument", "citekey", "tag", "side", "field",
+                      "sample", "scale", "label", "detail", "exempt")
+
+# Every emitter goes through this, so a side cannot invent a column order or
+# omit a column, and an unfilled cell is NA by default rather than by each
+# emitter remembering to say so.
+coverage_rows <- function(side, exempt,
+                          instrument = NA_character_, citekey = NA_character_,
+                          tag = NA_character_, field = NA_character_,
+                          sample = NA_character_, scale = NA_character_,
+                          label = NA_character_, detail = NA_character_) {
+  data.frame(instrument = as.character(instrument),
+             citekey = as.character(citekey),
+             tag = as.character(tag),
+             side = as.character(side),
+             field = as.character(field),
+             sample = as.character(sample),
+             scale = as.character(scale),
+             label = as.character(label),
+             detail = as.character(detail),
+             exempt = exempt,
+             stringsAsFactors = FALSE)
+}
+
+empty_coverage <- function() {
+  data.frame(instrument = character(0), citekey = character(0),
+             tag = character(0), side = character(0), field = character(0),
+             sample = character(0), scale = character(0),
+             label = character(0), detail = character(0), exempt = logical(0),
+             stringsAsFactors = FALSE)
+}
+
+# "" is how the parser spells "this block carries no tag"; the report spells it
+# NA, so that `tag` is either a tag or nothing.
+tag_or_na <- function(tag) if (nzchar(tag)) tag else NA_character_
+
 # `roster` is the world the batch is audited against, and it is deliberately
 # NOT derived from `objects`. The two answer different questions: `objects`
 # overrides one instrument's VALUES, `roster` states which shipped
@@ -496,9 +574,15 @@ audit_norms <- function(batch = AUDIT_BATCH,
     note_all <- parse_source_note(citekey, dir, inst)
     note_only <- note_all[note_all$field == NOTE_ONLY, , drop = FALSE]
     note_real <- note_all[note_all$field != NOTE_ONLY, , drop = FALSE]
-    bkey <- paste0(citekey, "\r", attr(note_all, "tag"))
-    blocks[[bkey]] <- list(citekey = citekey, instrument = inst,
-                           tag = attr(note_all, "tag"))
+    btag <- attr(note_all, "tag")
+    bkey <- paste0(citekey, "\r", btag)
+    # `scales` accumulates with |: whether a block's instrument-level rows were
+    # ever read is a property of the BLOCK across every pass over it, so the
+    # last pass must not overwrite an earlier pass's TRUE (AC6).
+    blocks[[bkey]] <- list(
+      citekey = citekey, instrument = inst, tag = btag,
+      scales = isTRUE(blocks[[bkey]]$scales) || isTRUE(batch$scales[[i]])
+    )
     claimed[[bkey]] <- union(
       claimed[[bkey]] %||% character(0), as.character(smp)
     )
@@ -511,10 +595,10 @@ audit_norms <- function(batch = AUDIT_BATCH,
     }
 
     if (nrow(note_only)) {
-      coverage[[length(coverage) + 1L]] <- data.frame(
-        instrument = inst, side = "note-only-sample",
-        field = note_only$scale, scale = note_only$value,
-        exempt = TRUE, stringsAsFactors = FALSE
+      coverage[[length(coverage) + 1L]] <- coverage_rows(
+        "note-only-sample", TRUE, instrument = inst, citekey = citekey,
+        tag = tag_or_na(btag),
+        label = note_only$scale, detail = note_only$value
       )
     }
 
@@ -522,10 +606,10 @@ audit_norms <- function(batch = AUDIT_BATCH,
                           grepl(CONSTRUCTED_CREDIT, note$anchor, fixed = TRUE),
                         , drop = FALSE]
     if (nrow(constructed)) {
-      coverage[[length(coverage) + 1L]] <- data.frame(
-        instrument = inst, side = "constructed-credit-reference",
-        field = "Reference", scale = constructed$value,
-        exempt = TRUE, stringsAsFactors = FALSE
+      coverage[[length(coverage) + 1L]] <- coverage_rows(
+        "constructed-credit-reference", TRUE, instrument = inst,
+        citekey = citekey, tag = tag_or_na(btag), field = "Reference",
+        sample = constructed$sample, label = constructed$value
       )
     }
 
@@ -535,19 +619,17 @@ audit_norms <- function(batch = AUDIT_BATCH,
     miss_source <- ship[!(ship_key %in% note_key), , drop = FALSE]
     miss_ship <- note[!(note_key %in% ship_key), , drop = FALSE]
     if (nrow(miss_source)) {
-      coverage[[length(coverage) + 1L]] <- data.frame(
-        instrument = inst, side = "shipped-value-not-in-note",
-        field = paste0(miss_source$field, " (sample ", miss_source$sample, ")"),
-        scale = miss_source$scale,
-        exempt = FALSE, stringsAsFactors = FALSE
+      coverage[[length(coverage) + 1L]] <- coverage_rows(
+        "shipped-value-not-in-note", FALSE, instrument = inst,
+        citekey = citekey, tag = tag_or_na(btag), field = miss_source$field,
+        sample = miss_source$sample, scale = miss_source$scale
       )
     }
     if (nrow(miss_ship)) {
-      coverage[[length(coverage) + 1L]] <- data.frame(
-        instrument = inst, side = "note-value-not-shipped",
-        field = paste0(miss_ship$field, " (sample ", miss_ship$sample, ")"),
-        scale = miss_ship$scale,
-        exempt = FALSE, stringsAsFactors = FALSE
+      coverage[[length(coverage) + 1L]] <- coverage_rows(
+        "note-value-not-shipped", FALSE, instrument = inst,
+        citekey = citekey, tag = tag_or_na(btag), field = miss_ship$field,
+        sample = miss_ship$sample, scale = miss_ship$scale
       )
     }
 
@@ -578,13 +660,31 @@ audit_norms <- function(batch = AUDIT_BATCH,
     unclaimed <- setdiff(unique(tabled$sample),
                          c(claimed[[bkey]], NO_SAMPLE))
     if (length(unclaimed)) {
-      coverage[[length(coverage) + 1L]] <- data.frame(
-        instrument = if (nzchar(blk$tag)) paste0(blk$citekey, " (", blk$tag, ")")
-                     else blk$citekey,
-        side = "note-sample-not-audited",
-        field = "sample", scale = unclaimed,
-        exempt = FALSE, stringsAsFactors = FALSE
+      coverage[[length(coverage) + 1L]] <- coverage_rows(
+        "note-sample-not-audited", FALSE, instrument = blk$instrument,
+        citekey = blk$citekey, tag = tag_or_na(blk$tag), sample = unclaimed
       )
+    }
+
+    # The instrument-level rows -- Angle and Items, keyed with NO_SAMPLE -- are
+    # read by the ONE pass per instrument that carries `scales = TRUE`, and
+    # dropped by every other pass (see the restriction above). When that pass
+    # reads a DIFFERENT block from this one, nothing ever compares this block's
+    # instrument-level rows and nothing reports them: they are dropped in
+    # silence, the same shape as the sweeps above one level in. iipsc is the
+    # live near-miss -- its `scales` pass is sample 2 (soldz1995), so
+    # hopwood2008's block would lose any instrument-level row it carried -- and
+    # no committed note has one today, which is why this needs a fixture.
+    if (!isTRUE(blk$scales)) {
+      inst_rows <- tabled[tabled$sample == NO_SAMPLE, , drop = FALSE]
+      if (nrow(inst_rows)) {
+        coverage[[length(coverage) + 1L]] <- coverage_rows(
+          "note-instrument-row-not-audited", FALSE,
+          instrument = blk$instrument, citekey = blk$citekey,
+          tag = tag_or_na(blk$tag), field = inst_rows$field,
+          sample = inst_rows$sample, scale = inst_rows$scale
+        )
+      }
     }
   }
 
@@ -605,10 +705,9 @@ audit_norms <- function(batch = AUDIT_BATCH,
              USE.NAMES = FALSE) == citekey
     ])
     if (length(unaudited)) {
-      coverage[[length(coverage) + 1L]] <- data.frame(
-        instrument = citekey, side = "note-block-not-audited",
-        field = "block", scale = unaudited,
-        exempt = FALSE, stringsAsFactors = FALSE
+      coverage[[length(coverage) + 1L]] <- coverage_rows(
+        "note-block-not-audited", FALSE, citekey = citekey,
+        tag = vapply(unaudited, tag_or_na, character(1), USE.NAMES = FALSE)
       )
     }
   }
@@ -625,19 +724,32 @@ audit_norms <- function(batch = AUDIT_BATCH,
         paste(batch$instrument, batch$sample)), , drop = FALSE
   ]
   if (nrow(unaudited)) {
-    coverage[[length(coverage) + 1L]] <- data.frame(
-      instrument = unaudited$instrument, side = "shipped-sample-not-audited",
-      field = "sample", scale = unaudited$sample,
-      exempt = FALSE, stringsAsFactors = FALSE
+    coverage[[length(coverage) + 1L]] <- coverage_rows(
+      "shipped-sample-not-audited", FALSE,
+      instrument = unaudited$instrument, sample = unaudited$sample
     )
   }
 
+  cov <- if (length(coverage)) do.call(rbind, coverage) else empty_coverage()
+
+  # A note-only row is a fact about the BLOCK, so it is reported once per block
+  # and payload rather than once per batch pass that reads the block: iipsc's
+  # two passes read two different notes today, but an instrument whose samples
+  # share one note would have reported each of its note-only rows twice.
+  #
+  # The payload is part of the key, not decoration. Keying on (citekey, block,
+  # sample) alone would collapse the 14 rows the repo emits to 8 -- every
+  # note-only row carries the NO_SAMPLE token, csip's two subsamples and iis32's
+  # two rows differing only in what they say -- which is the silent row loss
+  # every other sweep in this file exists to refuse.
+  dup <- cov$side == "note-only-sample" &
+    duplicated(paste(cov$citekey, cov$tag, cov$label, cov$detail, sep = "\r"))
+  cov <- cov[!dup, , drop = FALSE]
+  row.names(cov) <- NULL
+
   list(
     ledger = if (length(ledger)) do.call(rbind, ledger) else empty_ledger(),
-    coverage = if (length(coverage)) do.call(rbind, coverage) else
-      data.frame(instrument = character(0), side = character(0),
-                 field = character(0), scale = character(0),
-                 exempt = logical(0), stringsAsFactors = FALSE)
+    coverage = cov
   )
 }
 
