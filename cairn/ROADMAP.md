@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-13 (all mechanical checks green; nothing changed on the default branch since 2026-08-09. M81 is in flight on branch `m81-norms-audit-abort-registry` / PR #108, whose own tracking carries `in-progress` with T7–T9 open and all 5 CI checks green — this row reads `planned` until that branch merges. No open issues; no external PRs.)._
+_Last hygiene check: 2026-08-13 (M81 merged and archived, PR #108, after a review return on AC1 and an RB17/RR17 escalation; its successor candidate row stands. M75's terminal row pruned for the 5-row retention. No lesson added or retired: M81's snow-worker finding folded into the existing installed-vs-`load_all()` line, its gfortran build quirk being machine setup, not a repo lesson)._
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -11,10 +11,9 @@ Pre-migration history: see `cairn/legacy/` and git log.
 |---|---|---|---|---|---|
 | M78 | Per-sample reference-kind field in the shipped norms | done | — | high | milestones/archive/M78-norms-reference-kind-field.md |
 | M79 | Bind the norms audit's batch to the shipped roster | done | — | normal | milestones/archive/M79-norms-audit-roster-binding.md |
-| M81 | Enumerate the norms-audit abort registry from the script's parse tree | review | M79 | normal | milestones/M81-norms-audit-abort-registry.md |
+| M81 | Enumerate the norms-audit abort registry from the script's parse tree | done | M79 | normal | milestones/archive/M81-norms-audit-abort-registry.md |
 | M80 | Give the norms-audit coverage report a machine-readable key | planned | M79, M81 | normal | milestones/M80-norms-audit-report-schema.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
-| M75 | Norms provenance audit, batch 4 (IIP family) | done | — | high | milestones/archive/M75-norms-provenance-audit-batch4.md |
 | M76 | Disclose the reference sample at the standardizing call site | done | — | normal | milestones/archive/M76-norms-call-site-disclosure.md |
 | M77 | Say precisely what the shipped reference statistics are | done | M76 | normal | milestones/archive/M77-norms-fitness-docs.md |
 
