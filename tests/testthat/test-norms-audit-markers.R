@@ -835,6 +835,46 @@ test_that("a named-form site is matched by exact equality, not a stem (M81)", {
   expect_true(nzchar(stem) && startsWith(squish(key), stem))
 })
 
+test_that("expect_abort_at_site() refuses a non-matcher (M83)", {
+  # The shape that hid M82's own call-site breakage: a stale call passing
+  # something that is not a matcher died with "attempt to apply non-function"
+  # from inside the assertion, naming neither the argument nor the site. The
+  # message must name the argument, so the reader is sent to the call rather
+  # than to the helper.
+  named <- function(msg) {
+    cl <- as.call(list(quote(stopifnot), FALSE))
+    names(cl) <- c("", msg)
+    function() eval(cl)
+  }
+  key <- "divisor must be numeric"
+
+  # A bare string is the stale-call shape.
+  expect_error(
+    expect_abort_at_site(named(key), key),
+    "`matcher` must be a norms_audit_matcher"
+  )
+  # A plain function is the dangerous one: it is callable, so without this
+  # guard it would be USED, and whatever it returned would stand in for a
+  # verdict built from a declared (kind, key).
+  expect_error(
+    expect_abort_at_site(named(key), function(msg) TRUE),
+    "`matcher` must be a norms_audit_matcher"
+  )
+  expect_error(
+    expect_abort_at_site(named(key), NULL),
+    "`matcher` must be a norms_audit_matcher"
+  )
+
+  # The control, and it passes for the claim's reason: the matcher accepts this
+  # fixture's own message, asserted here directly, rather than the assertion
+  # merely not failing.
+  m <- norms_audit_matcher("stopifnot_named", key)
+  expect_true(m(tryCatch(named(key)(), error = conditionMessage)))
+  expect_length(
+    norms_audit_expectation_failures(expect_abort_at_site(named(key), m)), 0L
+  )
+})
+
 test_that("the walk keys named conditions and refuses the rest (M81)", {
   sites <- function(txt) norms_audit_abort_sites(parse(text = txt, keep.source = FALSE))
 

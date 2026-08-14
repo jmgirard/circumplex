@@ -97,7 +97,7 @@ change it; a widening would change the pinned roster at
 
 ## Tasks
 
-- [ ] T1. Guard `expect_abort_at_site()`'s `matcher` argument
+- [x] T1. Guard `expect_abort_at_site()`'s `matcher` argument
       (`helper-norms-audit-script.R:600-612`); add its refusal test near
       `test-norms-audit-markers.R:784-836`.
 - [ ] T2. Single-source the matrix's expected set onto
@@ -130,6 +130,7 @@ change it; a widening would change the pinned roster at
 - 2026-08-14: amendment return: AC1 — "A fixture script carrying three `stopifnot` conditions with distinct keys, none a prefix of another's stem and no two sharing a binding-and-key, is parsed by the helper's own parse call" — AC1 as planned required a registry entry, and `SCRIPT_ABORTS` is pinned site-for-site to `data-raw/audit-norms.R`, which Scope puts Out (M84), so the narrowing binds the entry to a fixture script instead; implement gate chose this over widening scope to add a real guard to the audit script or dropping AC1; falsified by a matcher fix that a fixture-script registry passes and the shipped registry would not.
 - 2026-08-14: implement gate chose returning stem-plus-truncation-flag from `norms_audit_stopifnot_stem()` over a separate truncation predicate or a silent attribute, because the two existing readers then break loudly rather than pass a structure through unnoticed and the marker test has one home; falsified by a third reader needing the stem alone often enough that the pair is noise.
 - 2026-08-14: amendment criteria audit ([O], two fresh readers) returned eleven clear-fix findings and two judgment calls — AC1's "bound to a real site" not requiring the fixture to evaluate the script, a vacuous 1x1 off-diagonal, unasserted marker/short-stem properties, a moving-target citation of the shipped matrix's assertions, an off-diagonal set compared to a list of entries no `identical()` relates, a floor stated as `NORMS_AUDIT_STEM_FLOOR` rather than the effective `min(nchar(squish(key)), 40)`, a missing T2 coverage row, and a non-vacuity claim aimed at the expected side rather than the observed. All fixed before the amended text was written. The judgment calls: the fixture gains an over-floor truncated site and a named site so both sides of the removed floor and the never-truncating kind are exercised; and AC2's no-floor-when-truncated rule is kept as planned with its residual leak pinned rather than closed (see Decisions).
+- 2026-08-14: T1 done — `expect_abort_at_site()` refuses a non-`norms_audit_matcher` argument by name; test asserts the refusal for a string, a plain callable and `NULL`, with a passing control that shows the matcher accepts its own fixture's message. Suite green (FAIL 0, PASS 7130).
 
 ## Decisions
 

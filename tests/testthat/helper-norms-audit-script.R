@@ -597,7 +597,20 @@ norms_audit_matcher <- function(kind, key) {
 # Assert that `thunk` aborts, and aborts at the site `matcher` was built for --
 # never that some error occurred. A fixture can reach the wrong guard, or fail
 # before it reaches any, and a bare expect_error() reports both as coverage.
+#
+# The argument is checked rather than trusted. A stale call passing something
+# else reached `matcher(msg)` and died there -- "attempt to apply non-function",
+# or, for a character argument, "could not find function \"matcher\"" (measured
+# 2026-08-14) -- naming neither this argument nor the site under test, which is
+# the shape that hid M82's own call-site breakage. A plain function is refused
+# for a second reason: it is callable, so it would be USED, and its verdict
+# would stand in for one built from a declared (kind, key).
 expect_abort_at_site <- function(thunk, matcher, info = attr(matcher, "key")) {
+  if (!inherits(matcher, "norms_audit_matcher")) {
+    stop("`matcher` must be a norms_audit_matcher, not ",
+         paste(deparse(class(matcher)), collapse = ""),
+         "; build one with norms_audit_matcher(kind, key)", call. = FALSE)
+  }
   norms_audit_with_c_messages({
     err <- tryCatch({
       thunk()
