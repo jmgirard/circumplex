@@ -5,7 +5,7 @@
 - **Depends on:** M81
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m82-norms-audit-abort-discrimination`
+- **Branch/PR:** `m82-norms-audit-abort-discrimination` / [PR #110](https://github.com/jmgirard/circumplex/pull/110)
 
 ## Goal
 
