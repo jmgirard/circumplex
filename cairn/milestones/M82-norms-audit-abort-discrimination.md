@@ -170,6 +170,8 @@ Runtime-resolved abort names, and `data/` → not here.
 
 - 2026-08-14: T3-T5 done. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7083 (7069 before this milestone's tests; the 6 warnings are the same pre-existing lavaan ones, none in a touched file). Markers file in isolation FAIL 0 | WARN 0 | PASS 118.
 
+- 2026-08-14: T6 written, NOT checked off pending the full verify run; markers file in isolation FAIL 0 | WARN 0 | PASS 128. The shared-key roster is derived from the registry by `norms_audit_shared_key_sites()` rather than declared beside it, so a later pair joins the stack loop by existing. Capture measured live: 12 frames per abort, resolving to `parse_source_note` and `source_note_block_tags`; crossing the two fixtures resolves each to its TWIN rather than to NA, so the mutation reddens on the binding and not on an empty capture -- pinned as its own assertion, an NA having reddened the first assertion just as well.
+
 ## Decisions
 
 ## Review

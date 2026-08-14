@@ -622,6 +622,73 @@ test_that("the identity carries no source reference (M82)", {
   )
 })
 
+# Shared-key sites: the pair one message cannot tell apart (M82, RR17 BC8).
+#
+# `source note not found: {}` is raised by two functions. Their messages are
+# identical by construction, so no matcher discriminates them and the identity
+# comparison cannot either (see the SWAP test above). What is left is WHERE the
+# abort happened, and that is what these assert.
+
+test_that("every shared-key site is stack-bound to its own function (M82)", {
+  env <- marker_defs()
+  shared <- norms_audit_shared_key_sites(SCRIPT_ABORTS)
+
+  # The roster is DERIVED from the registry, so a shared pair added later joins
+  # this loop by existing. Pinned all the same, so that a new pair is a visible
+  # change here rather than a silent extra iteration.
+  expect_identical(
+    sort(vapply(shared, function(s) s$binding, character(1))),
+    c("parse_source_note", "source_note_block_tags")
+  )
+
+  for (s in shared) {
+    frames <- norms_audit_capture_abort_frames(function() s$fixture(env))
+    # Non-empty first: a capture that caught nothing would make every binding
+    # assertion below vacuous, and vacuous is the failure mode this file is
+    # about. NA_character_ from the search would satisfy nothing either way,
+    # but an empty capture should say so in its own words.
+    expect_true(length(frames) > 0L, info = paste("no frames captured:", s$binding))
+    expect_identical(
+      norms_audit_innermost_script_binding(frames, env), s$binding,
+      info = s$binding
+    )
+  }
+})
+
+test_that("a shared-key fixture pointed at its twin's trigger reddens (M82)", {
+  env <- marker_defs()
+  shared <- norms_audit_shared_key_sites(SCRIPT_ABORTS)
+  expect_length(shared, 2L)
+
+  # The mutation the identity comparison cannot make: keep each entry's binding
+  # and give it the OTHER site's fixture. Both still raise, with the same
+  # message, and every other assertion in this file stays green.
+  crossed <- shared
+  crossed[[1L]]$fixture <- shared[[2L]]$fixture
+  crossed[[2L]]$fixture <- shared[[1L]]$fixture
+
+  twin <- rev(vapply(shared, function(s) s$binding, character(1)))
+  for (i in seq_along(crossed)) {
+    s <- crossed[[i]]
+    frames <- norms_audit_capture_abort_frames(function() s$fixture(env))
+    # The assertion fails ...
+    expect_length(
+      norms_audit_expectation_failures(
+        expect_identical(norms_audit_innermost_script_binding(frames, env),
+                         s$binding)
+      ),
+      1L
+    )
+    # ... and fails because the stack names the TWIN, not because the capture
+    # came back empty. An NA would redden the line above just as well, which
+    # would make this mutation evidence for nothing (measured 2026-08-14: 12
+    # frames captured, resolving to the twin in both directions).
+    expect_identical(
+      norms_audit_innermost_script_binding(frames, env), twin[[i]]
+    )
+  }
+})
+
 test_that("a named-form site is matched by exact equality, not a stem (M81)", {
   # A synthetic site, raised through the real mechanism: a stopifnot() call
   # whose condition is named, built as a call so the message is R's own rather

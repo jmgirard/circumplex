@@ -355,6 +355,73 @@ norms_audit_build_registry <- function(entries) {
   entries
 }
 
+# The entries whose (kind, key) is shared with an entry under ANOTHER binding.
+#
+# DERIVED from the registry, never declared beside it. A hand-kept list of
+# "the shared pairs" is a proxy for the thing it names: a later shared pair
+# would be added to the registry and not to the list, and the stack assertions
+# that discriminate such a pair would silently stop covering it -- the shape
+# the M79 review beat twice, and the reason AC3 requires one structure rather
+# than two agreeing ones (M82 plan gate, criteria audit).
+norms_audit_shared_key_sites <- function(entries) {
+  key <- vapply(entries, function(e) paste(e$kind, e$key, sep = "\t"),
+                character(1))
+  binding <- vapply(entries, function(e) e$binding, character(1))
+  shared <- vapply(seq_along(entries), function(i) {
+    any(key == key[[i]] & binding != binding[[i]])
+  }, logical(1))
+  entries[shared]
+}
+
+# The frame stack as it stood WHEN the abort was signalled.
+#
+# A calling handler, because an exiting one (tryCatch) unwinds the stack before
+# its handler runs and would leave nothing to look at. The tryCatch here sits
+# OUTSIDE the calling handler, so it catches the condition only after the
+# capture has happened -- there is no exiting handler between the capture and
+# the abort, which is the whole point.
+norms_audit_capture_abort_frames <- function(thunk) {
+  frames <- list()
+  tryCatch(
+    withCallingHandlers(thunk(), error = function(e) {
+      frames <<- lapply(seq_len(sys.nframe()), sys.function)
+    }),
+    error = function(e) invisible(NULL)
+  )
+  frames
+}
+
+# The name of the INNERMOST captured frame whose function is a binding of the
+# sourced script environment, or NA if none is.
+#
+# Innermost, so the assertion does not degrade if one of a shared-key pair ever
+# calls the other: the site that actually raised is the inner one either way.
+# NA rather than an error, so a vacuous capture reads as a FAILURE at the call
+# site rather than as a passed assertion about nothing.
+norms_audit_innermost_script_binding <- function(frames, env) {
+  nms <- ls(env, all.names = TRUE)
+  for (i in rev(seq_along(frames))) {
+    f <- frames[[i]]
+    if (!is.function(f)) next
+    for (nm in nms) {
+      g <- env[[nm]]
+      if (is.function(g) && identical(g, f)) return(nm)
+    }
+  }
+  NA_character_
+}
+
+# The expectation failures `expr` raises, rather than letting them fail here.
+# Used where what an assertion REFUSES is the thing under test.
+norms_audit_expectation_failures <- function(expr) {
+  out <- character()
+  withCallingHandlers(expr, expectation_failure = function(cnd) {
+    out <<- c(out, conditionMessage(cnd))
+    invokeRestart("continue_test")
+  })
+  out
+}
+
 # Comparable form for the set-equality assertion: the full identity, so a site
 # cannot match a registry entry of another kind, another function, or another
 # occurrence of the same guard. M81 compared kind and key alone, which two
