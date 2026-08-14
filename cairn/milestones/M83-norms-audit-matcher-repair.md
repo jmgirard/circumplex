@@ -1,11 +1,11 @@
 # M83: Make the norms-audit abort matcher accept correct sites
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m83-norms-audit-matcher-repair`
 
 ## Goal
 
@@ -30,13 +30,25 @@ change it; a widening would change the pinned roster at
 
 ## Acceptance criteria
 
-- [ ] AC1. The registry gains an entry whose provoking fixture raises a
-      `stopifnot` message carrying the `....` truncation marker with a stem
-      shorter than `NORMS_AUDIT_STEM_FLOOR`, and the cross-site matrix's
-      per-entry acceptance assertion (`test-norms-audit-markers.R`,
-      `all(diag(accepts))`) passes for it. Without a new entry this criterion
-      is already green today and cannot distinguish a fixed matcher from an
-      unfixed one.
+- [ ] AC1. A fixture script carrying three `stopifnot` conditions with
+      distinct keys, none a prefix of another's stem and no two sharing a
+      binding-and-key, is parsed by the helper's own parse call; its collected
+      site set is asserted equal to that of a registry built over it, so each
+      entry is bound to a parsed site rather than declared. Every entry carries
+      a fixture that evaluates that same parsed script and raises. One entry's
+      message is asserted to carry the `....` marker with a stem component
+      shorter than `min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR)` — the
+      effective floor, so the entry provably fails an unfixed matcher; a second
+      is truncated with a stem above that floor; the third is
+      `stopifnot_named`, which never truncates. One procedure computes the
+      acceptance matrix for both the shipped registry and this one; over this
+      one `all(diag())` holds and the off-diagonal accepting set is empty,
+      which is what AC5's derivation over `norms_audit_shared_key_sites()`
+      yields here. This is not AC5's fixture: with no shared-key pair the
+      expected side is empty under either derivation, and it is the six
+      computed off-diagonal cells and the three diagonal ones that carry the
+      criterion. The shipped registry cannot carry the truncated entry: it is
+      pinned site-for-site to `data-raw/audit-norms.R`, out of scope (M84).
 - [ ] AC2. The `stopifnot` matcher distinguishes truncated from untruncated
       messages: where the `....` marker is present it requires the stem to be a
       non-empty prefix of the squished key and applies no length floor; where
@@ -75,7 +87,7 @@ change it; a widening would change the pinned roster at
 
 ## Coverage
 
-- AC1 → T6
+- AC1 → T2, T6
 - AC2 → T4, T5
 - AC3 → T5, T6
 - AC4 → T3
@@ -90,7 +102,8 @@ change it; a widening would change the pinned roster at
       `test-norms-audit-markers.R:784-836`.
 - [ ] T2. Single-source the matrix's expected set onto
       `norms_audit_shared_key_sites()` (`test-norms-audit-markers.R:704-714`);
-      add the two-part fixture and run both mutants.
+      add the two-part fixture and run both mutants. Extract the matrix
+      computation into one procedure the shipped and AC1 registries both call.
 - [ ] T3. Widen denylist rule (iii)'s exemptions to `$`/`@` third operands and
       `for` index symbols (`helper-norms-audit-script.R:195-204`); update the
       exemption rationale at `:166-172`, which currently claims `::` is the
@@ -103,8 +116,9 @@ change it; a widening would change the pinned roster at
       `expect_false(ml("condition ...."))` flips under T4, and `:674`'s
       `substr(long, 1L, 66L)` fixture encodes a truncation R does not perform —
       and the constants comment at `helper-norms-audit-script.R:537-542`.
-- [ ] T6. Add the truncated-stem registry entry and its fixture; run AC3's
-      restatement grep and clear each hit.
+- [ ] T6. Add AC1's three-site fixture script and the registry over it, and
+      assert T2's matrix procedure over that registry; run AC3's restatement
+      grep and clear each hit.
 - [ ] T7. Full check; update NEWS only if user-visible (expected: not).
 
 ## Work log
@@ -113,7 +127,31 @@ change it; a widening would change the pinned roster at
 - 2026-08-14: plan gate chose exempting only field access and `for` indices over also exempting safe assignment, because `abort <- rlang::abort` is the aliasing rule (iii) exists to catch and separating it from `abort <- 1` requires inspecting assigned values; falsified by a measured false positive on an assignment shape that no value inspection could classify.
 - 2026-08-14: plan gate chose leaving `norms_audit_shared_key_sites()`'s contract narrow (differing bindings only) over widening it to same-binding twins, because AC5 needs one derivation not a changed one, and widening moves the pinned roster at `test-norms-audit-markers.R:731-734`; falsified by a shipped registry needing same-binding twins discriminated.
 - 2026-08-14: criteria audit ([O], fresh context) returned eight clear-fix findings and one judgment call — AC1 vacuous against existing coverage, AC2 unbounded below, AC3's grep non-functional (`....` unescaped, unmatched glob aborts under zsh), AC4 self-contradictory (`fail <- x$stop` is the shape `opts$abort` exempts), AC5's single mutant vacuous on its own fixture, AC6's hand-authored count, and an "IP4" citation that resolves to this repo's RNG contract rather than the append-only-history rule. All fixed before the criteria were written; the miscitation was resolved by dropping the number, the same miscitation in `cairn/DECISIONS.md:1054` being history.
+- 2026-08-14: amendment return: AC1 — "A fixture script carrying three `stopifnot` conditions with distinct keys, none a prefix of another's stem and no two sharing a binding-and-key, is parsed by the helper's own parse call" — AC1 as planned required a registry entry, and `SCRIPT_ABORTS` is pinned site-for-site to `data-raw/audit-norms.R`, which Scope puts Out (M84), so the narrowing binds the entry to a fixture script instead; implement gate chose this over widening scope to add a real guard to the audit script or dropping AC1; falsified by a matcher fix that a fixture-script registry passes and the shipped registry would not.
+- 2026-08-14: implement gate chose returning stem-plus-truncation-flag from `norms_audit_stopifnot_stem()` over a separate truncation predicate or a silent attribute, because the two existing readers then break loudly rather than pass a structure through unnoticed and the marker test has one home; falsified by a third reader needing the stem alone often enough that the pair is noise.
+- 2026-08-14: amendment criteria audit ([O], two fresh readers) returned eleven clear-fix findings and two judgment calls — AC1's "bound to a real site" not requiring the fixture to evaluate the script, a vacuous 1x1 off-diagonal, unasserted marker/short-stem properties, a moving-target citation of the shipped matrix's assertions, an off-diagonal set compared to a list of entries no `identical()` relates, a floor stated as `NORMS_AUDIT_STEM_FLOOR` rather than the effective `min(nchar(squish(key)), 40)`, a missing T2 coverage row, and a non-vacuity claim aimed at the expected side rather than the observed. All fixed before the amended text was written. The judgment calls: the fixture gains an over-floor truncated site and a named site so both sides of the removed floor and the never-truncating kind are exercised; and AC2's no-floor-when-truncated rule is kept as planned with its residual leak pinned rather than closed (see Decisions).
 
 ## Decisions
+
+### 2026-08-14: AC2's no-floor-when-truncated rule keeps a measured residual leak, pinned rather than closed
+
+Where R's `....` marker is present, AC2 applies no length floor and requires only
+that the stem be a non-empty prefix of the squished key. That leaves a leak:
+`stopifnot({ ... })` raises `{ .... is not TRUE`, a one-character stem (measured
+2026-08-14 on R 4.6.1), which prefixes the key of any other braced condition, so
+one such site's message is accepted by the other's matcher.
+
+Closing it would need the matcher to re-derive R's own line break by re-parsing
+the key — fragile, the key being a squished join of `deparse(cond)` — and even
+then two conditions whose first deparsed lines are identical stay
+indistinguishable by message alone, exactly as the shipped
+`source note not found: {}` pair is. Message-level discrimination cannot settle
+that class. The cross-site matrix can and does: two sites cross-accepting
+off-diagonal without sharing a key reddens the off-diagonal equality.
+
+So the leak is pinned by an assertion recording that the degenerate truncated
+stem IS accepted, in the manner of the existing "the comparison cannot see a
+shared-key binding SWAP" test, and the matrix is what stands behind
+discrimination there. Reopen if a shipped condition acquires a braced form.
 
 ## Review
