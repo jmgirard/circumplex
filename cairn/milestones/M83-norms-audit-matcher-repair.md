@@ -108,11 +108,11 @@ change it; a widening would change the pinned roster at
       `for` index symbols (`helper-norms-audit-script.R:195-204`); update the
       exemption rationale at `:166-172`, which currently claims `::` is the
       only one; rewrite the partition in `test-norms-audit-denylist.R:41-70`.
-- [ ] T4. Expose truncation-marker presence from
+- [x] T4. Expose truncation-marker presence from
       `norms_audit_stopifnot_stem()` (`:494-498`, which discards it at `:496`);
       rewrite the matcher branch (`:583-592`). Two existing readers of the
       single-value contract: `test-norms-audit-markers.R:668`, `:834`.
-- [ ] T5. Repair the fallout at `test-norms-audit-markers.R:658-676` — `:675`'s
+- [x] T5. Repair the fallout at `test-norms-audit-markers.R:658-676` — `:675`'s
       `expect_false(ml("condition ...."))` flips under T4, and `:674`'s
       `substr(long, 1L, 66L)` fixture encodes a truncation R does not perform —
       and the constants comment at `helper-norms-audit-script.R:537-542`.
@@ -134,6 +134,7 @@ change it; a widening would change the pinned roster at
 
 - 2026-08-14: T2 done — the acceptance matrix and its expected off-diagonal moved into `norms_audit_acceptance_matrix()` / `norms_audit_expected_offdiag()` in the helper; membership now comes from `norms_audit_shared_key_sites()` alone, with `shared_fn` injectable so AC5's two mutants run without editing source. Both mutants verified against the two-part fixture, and each shown vacuous on the other part. Suite green (FAIL 0, PASS 7136).
 - 2026-08-14: T3 done — rule (iii) now skips `$`/`@` operand 3 and `for` operand 2 via `NON_VALUE_OPERANDS`; the four shapes it used to flag (`opts$abort`, `x@abort`, `df$stop <- 1`, `for (abort in x) f(1)`) were measured red against the partition before the fix and are green after, while `for (i in abort) 1` and `abort <- 1` stay denied by (iii). Suite green (FAIL 0, PASS 7146).
+- 2026-08-14: T4 and T5 done, committed together because T4's matcher change is what creates T5's fallout and a commit carrying only one of them would be red — `norms_audit_stopifnot_stem()` now returns `list(stem, truncated)`, the matcher applies the floor only where R did not truncate, and both readers of the old contract were updated. The retired `substr(long, 1L, 66L)` fixture, a truncation R does not perform, is replaced by a fixture script whose key comes from the parse tree and whose message comes from R. Suite green (FAIL 0, PASS 7153).
 ## Decisions
 
 ### 2026-08-14: AC2's no-floor-when-truncated rule keeps a measured residual leak, pinned rather than closed

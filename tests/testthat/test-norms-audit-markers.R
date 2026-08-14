@@ -655,24 +655,90 @@ test_that("a stop() key under the literal floor stops the build (M82)", {
   expect_gte(min(shipped), 23L)
 })
 
-test_that("a stopifnot matcher rejects a degenerate stem (M82)", {
+test_that("a stopifnot matcher rejects a degenerate UNTRUNCATED stem (M82, M83)", {
   # The defect this floor closes: before it, the shipped check accepted any
   # non-empty prefix, so a one-character stem satisfied a 20-character key and
   # any `stopifnot()` in the script could stand in for any other.
+  #
+  # Untruncated is the whole of what the floor now governs (M83). Here the stem
+  # IS the condition R deparsed, so a one-character one cannot be honest.
   key <- "is.data.frame(batch)"
   m <- norms_audit_matcher("stopifnot", key)
   expect_true(m("is.data.frame(batch) is not TRUE"))
   expect_false(m("i is not TRUE"))
-  # ... and the old rule would have accepted it, so the assertion above is
-  # about the floor rather than about the prefix test.
-  expect_true(startsWith(squish(key), norms_audit_stopifnot_stem("i is not TRUE")))
-  # The floor is the key's own length where the key is shorter than 40, so a
-  # truncated-but-honest stem from a LONG condition still matches.
-  long <- paste(rep("condition_fragment", 5L), collapse = " + ")
-  expect_gt(nchar(long), NORMS_AUDIT_STEM_FLOOR)
-  ml <- norms_audit_matcher("stopifnot", long)
-  expect_true(ml(paste(substr(long, 1L, 66L), "....")))
-  expect_false(ml("condition ...."))
+  # ... and the prefix test alone would have accepted it, so the assertion
+  # above is about the floor rather than about the prefix.
+  got <- norms_audit_stopifnot_stem("i is not TRUE")
+  expect_false(got$truncated)
+  expect_true(startsWith(squish(key), got$stem))
+})
+
+# The truncated branch (M83, AC2). The fixture is a SCRIPT: parsed by the
+# helper's own parse call for its key and evaluated for its message, so the two
+# come from one text rather than from two hand-authored strings that a reader
+# must take on trust. The retired version of this test asserted acceptance of
+# `paste(substr(long, 1L, 66L), "....")` -- a truncation R does not perform,
+# hand-cut at a character count, which is the very model this milestone removes.
+
+fixture_script <- function(lines) {
+  exprs <- norms_audit_parse_text(lines)
+  env <- new.env()
+  for (e in exprs) eval(e, env)
+  list(exprs = exprs, env = env)
+}
+
+BRACED_FIXTURE <- c(
+  "braced <- function() {",
+  "  stopifnot(all(vapply(list(1, 2), function(el) {",
+  "    is.numeric(el) && length(el) == 1L",
+  "  }, logical(1))) && FALSE)",
+  "}"
+)
+
+test_that("a truncated stopifnot message is matched without the floor (M83)", {
+  fx <- fixture_script(BRACED_FIXTURE)
+  sites <- norms_audit_abort_sites(fx$exprs)
+  expect_length(sites, 1L)
+  key <- sites[[1L]]$key
+
+  msg <- norms_audit_with_c_messages(
+    tryCatch(fx$env$braced(), error = conditionMessage)
+  )
+  got <- norms_audit_stopifnot_stem(msg)
+  # The three properties that make this the case under test, asserted rather
+  # than assumed -- R's deparse width is R's, and on an R that broke the line
+  # later this fixture would silently stop being a truncated one.
+  expect_true(got$truncated)
+  expect_true(startsWith(squish(key), got$stem))
+  # Under the EFFECTIVE floor the unfixed matcher compared against, not the
+  # constant alone: `min(nchar(squish(key)), 40)` is what it computed.
+  expect_lt(nchar(got$stem), min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR))
+
+  # So the site's own genuine message failed its own matcher before M83 ...
+  expect_false(nchar(got$stem) >= min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR) &&
+                 startsWith(squish(key), got$stem))
+  # ... and is accepted now.
+  expect_true(norms_audit_matcher("stopifnot", key)(msg))
+})
+
+test_that("a truncated stem carries no floor, and that is a BOUND (M83)", {
+  # Recorded, not fixed. With the marker present no length floor applies, so a
+  # one-character truncated stem is accepted by any matcher whose key starts
+  # the same way. Message-level discrimination cannot settle that class: two
+  # conditions whose first deparsed lines agree are indistinguishable, exactly
+  # as the shipped `source note not found: {}` pair is, and the cross-site
+  # matrix -- not this matcher -- is what stands behind discrimination there.
+  # See this milestone's Decisions entry.
+  fx <- fixture_script(c("braced <- function() stopifnot({", "  FALSE", "})"))
+  msg <- norms_audit_with_c_messages(
+    tryCatch(fx$env$braced(), error = conditionMessage)
+  )
+  got <- norms_audit_stopifnot_stem(msg)
+  expect_true(got$truncated)
+  expect_identical(got$stem, "{")
+  expect_true(
+    norms_audit_matcher("stopifnot", "{ a condition that clears the floor }")(msg)
+  )
 })
 
 test_that("no matcher accepts a message from another site (M82)", {
@@ -858,7 +924,7 @@ test_that("a named-form site is matched by exact equality, not a stem (M81)", {
   # And the substring case is the one that needed equality: the stem matcher
   # the POSITIONAL form uses accepts it, so a named site keyed through that
   # matcher would report a truncated message as its own.
-  stem <- norms_audit_stopifnot_stem(truncated)
+  stem <- norms_audit_stopifnot_stem(truncated)$stem
   expect_true(nzchar(stem) && startsWith(squish(key), stem))
 })
 

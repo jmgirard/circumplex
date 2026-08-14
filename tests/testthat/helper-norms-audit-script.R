@@ -552,17 +552,24 @@ norms_audit_key_regex <- function(key) {
   paste(vapply(parts, regex_escape, character(1)), collapse = ".*")
 }
 
-# What `stopifnot()` printed, less its verdict and its truncation marker.
+# What `stopifnot()` printed, less its verdict, and WHETHER R truncated it.
 #
-# R deparses the failing condition into the message and TRUNCATES it with
-# " ...." past a width R chooses, so the key is matched as a prefix of the
-# condition rather than whole -- pinning the width would pin R's internals
-# instead of this script's guards. Discriminating all the same: neither of
-# validate_batch()'s two conditions is a prefix of the other.
+# R deparses the failing condition into the message; where that deparse runs to
+# more than one line it keeps the FIRST LINE and appends " ....". So the key is
+# matched as a prefix of the condition rather than whole -- pinning the width
+# would pin R's internals instead of this script's guards.
+#
+# The marker is returned rather than discarded because it is the only signal
+# distinguishing "R cut this short" from "this is the whole condition", and the
+# two want different treatment: a short stem is honest in the first case and
+# degenerate in the second. Discarding it is what made the matcher reject its
+# own site's genuine message (M83). Both readers get a list, so a caller that
+# wants the text alone says so.
 norms_audit_stopifnot_stem <- function(msg) {
   msg <- sub("[[:space:]]*(is not TRUE|are not all TRUE)[[:space:]]*$", "", msg)
+  truncated <- grepl("[[:space:]]*\\.\\.\\.\\.[[:space:]]*$", msg)
   msg <- sub("[[:space:]]*\\.\\.\\.\\.[[:space:]]*$", "", msg)
-  squish(msg)
+  list(stem = squish(msg), truncated = truncated)
 }
 
 # Assert that `thunk` aborts, and aborts at the site `key` names -- never that
@@ -603,9 +610,14 @@ norms_audit_with_c_messages <- function(expr) {
 }
 
 # Discriminating-power floors. Both sit inside the bands RR17 rev 2 BC9 fixes
-# ([10, 20] and [20, 45]) and keep the headroom it states: the shortest shipped
-# `stop` key carries 23 literal characters, and R's truncation leaves 66 of the
-# script's longest shipped condition (both re-measured 2026-08-14).
+# ([10, 20] and [20, 45]).
+#
+# The stem floor applies to UNTRUNCATED messages only (M83). Where R truncated,
+# the stem is its own first deparsed line and no floor is meaningful: the line
+# break is R's choice and can fall anywhere, so comparing it against a floor
+# derived from the key rejected correct sites. Each floor's headroom over the
+# shipped sites is asserted in test-norms-audit-markers.R rather than written
+# here, where a later edit to the script would strand it.
 NORMS_AUDIT_STOP_KEY_FLOOR <- 15L
 NORMS_AUDIT_STEM_FLOOR <- 40L
 
@@ -649,14 +661,28 @@ norms_audit_matcher <- function(kind, key) {
     # longer message satisfy a shorter key. No floor: the key IS the message.
     fn <- function(msg) identical(msg, key)
   } else {
-    # A positional condition's message is R's deparse of it, truncated at a
-    # width R chooses, so the key is matched as a prefix. The floor is what
-    # stops a degenerate prefix standing in for the whole: without it the
-    # shipped check accepts a ONE-character stem (measured 2026-08-14).
+    # A positional condition's message is R's deparse of it, so the key is
+    # matched as a prefix -- but the two cases part here (M83).
+    #
+    # UNTRUNCATED, the stem IS the whole condition, so a short one is a
+    # degenerate prefix standing in for the whole and the floor rejects it:
+    # without the floor the shipped check accepted a ONE-character stem
+    # (measured 2026-08-14).
+    #
+    # TRUNCATED, the stem is R's own first deparsed line and its length is R's
+    # choice, not the guard's. The old floor tracked the KEY and was compared
+    # against that line, so a condition holding a braced `function(el) {...}`
+    # gave a 79-character key and a 28-character stem and the matcher rejected
+    # its own site's genuine message. No floor applies here; the marker is the
+    # evidence that R, not a weak key, is what shortened it. The residual --
+    # `stopifnot({ ... })` gives the one-character stem `{` -- is pinned as a
+    # bound in test-norms-audit-markers.R, not closed; see this milestone's
+    # Decisions.
     floor <- min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR)
     fn <- function(msg) {
-      stem <- norms_audit_stopifnot_stem(msg)
-      nchar(stem) >= floor && startsWith(squish(key), stem)
+      got <- norms_audit_stopifnot_stem(msg)
+      nzchar(got$stem) && startsWith(squish(key), got$stem) &&
+        (got$truncated || nchar(got$stem) >= floor)
     }
   }
   structure(fn, kind = kind, key = key, class = c("norms_audit_matcher", "function"))
