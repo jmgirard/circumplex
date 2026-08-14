@@ -30,7 +30,7 @@ Runtime-resolved abort names, and `data/` → not here.
 
 ## Acceptance criteria
 
-- [ ] AC1 (BC6) **Denylist sweep.** One test walks every call in
+- [x] AC1 (BC6) **Denylist sweep.** One test walks every call in
       `data-raw/audit-norms.R`'s parse tree and fails, naming the deparsed call,
       on (i) any call whose paren-normalised head deparses to `rlang::abort`,
       `abort`, `cli::cli_abort` or `cli_abort`; (ii) any `do.call` whose first
@@ -48,7 +48,7 @@ Runtime-resolved abort names, and `data/` → not here.
       script for at least `do.call("stop", list("x"))` and `fail <- stop`,
       restored byte-clean and both measured invisible to the walk (RR17,
       2026-08-09, at 14 sites; 19 today, re-measured 2026-08-14).
-- [ ] AC2 (BC7) **Composite site identity with ordinal.** Every registry entry
+- [x] AC2 (BC7) **Composite site identity with ordinal.** Every registry entry
       and collected site carries `(kind, enclosing top-level binding —
       `"<run>"` for run-block sites, key, ordinal)`. A collected site's ordinal
       is assigned in source order; a registry entry **declares** its ordinal,
@@ -70,7 +70,7 @@ Runtime-resolved abort names, and `data/` → not here.
       comment-insertion invariance check is a standing guard against future
       srcref keying, not verification — it passes against the shipped
       enumerator too (`helper-norms-audit-script.R:36`).
-- [ ] AC3 (BC8) **Stack-bound fixtures for shared keys.** The declared
+- [x] AC3 (BC8) **Stack-bound fixtures for shared keys.** The declared
       shared-key pair set and the stack-fixture roster derive from one structure
       and are asserted set-equal, so no future pair can be declared without a
       fixture. For every site in that set — today exactly the `source note not
@@ -81,7 +81,7 @@ Runtime-resolved abort names, and `data/` → not here.
       function is a binding of the sourced script environment is `identical()`
       to the binding the site's identity names. Mutation-verified: pointing one
       pair fixture at the other's trigger reddens its binding assertion.
-- [ ] AC4 (BC9) **Matcher floors, one home, locale pinned.** Discriminating-
+- [x] AC4 (BC9) **Matcher floors, one home, locale pinned.** Discriminating-
       power checks live in one procedure — matcher construction at
       registry-build time; `expect_abort_at_site()` consumes prebuilt matchers
       and adds no floor. Build and match time are separated because a
@@ -96,14 +96,14 @@ Runtime-resolved abort names, and `data/` → not here.
       the build; a matcher fed a 1-character stem fails, where today it passes.
       Every assertion through `expect_abort_at_site()` or a registry-built
       matcher, AC5's capture included, runs under one shared C-locale pin.
-- [ ] AC5 (BC10) **Cross-discrimination matrix.** One test captures each
+- [x] AC5 (BC10) **Cross-discrimination matrix.** One test captures each
       fixture's `conditionMessage()` once (pinned per AC4), evaluates every
       registry-built matcher against every captured message, and asserts the
       set of accepting off-diagonal cells *equals* the declared shared-key pair
       set — today the two `source note not found` cells, both directions, and
       nothing else, those cells discriminated by AC3's stack assertion rather
       than exempted by comment.
-- [ ] AC6 (BC11, amended at the gate) **Gate floor.** At review each of M81's
+- [x] AC6 (BC11, amended at the gate) **Gate floor.** At review each of M81's
       five recorded mutations — two AC3, two AC4 (control FAIL 0), the T4
       run-block mutant — reddens with the M81 test it was recorded against
       **named among the failures**, at a FAIL count no lower than the recorded
@@ -186,6 +186,34 @@ Runtime-resolved abort names, and `data/` → not here.
 - 2026-08-14: T9 isolation runs, all WARN 0: markers PASS 142, denylist 43, batch 21, compare 35, roster 17. Suite-wide `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7107, the 6 warnings pre-existing lavaan ones outside every touched file.
 - 2026-08-14: all nine tasks done; status -> review. `tools/m82-gate-floor.R` is committed so AC6 is re-runnable at the gate rather than attested from this log.
 
+- 2026-08-14: review gate. Three lenses returned 16 candidate findings unfiltered; a fresh scorer actioned four (>=80). F2, F3 and F4 fixed at the gate and re-verified (gate floor re-run OK, denylist inversion load-bearing at FAIL 1, suite FAIL 0 | WARN 6 | SKIP 3 | PASS 7123, up from 7107). F1 carried to the approval gate as a decision because fixing it needs an AC4 amendment. Twelve findings logged below the bar. Return floor NOT met: no actioned finding demonstrates an acceptance criterion failing -- AC4 as written is satisfied by every shipped site -- and none reaches the >=90 deliverable-defect bar. Defect-return count for this milestone stays 0; the AC2 amendment on 2026-08-14 is the only amendment return and is on its own track.
+
 ## Decisions
 
 ## Review
+
+### Evidence per criterion (2026-08-14, all re-run at this gate)
+
+- **AC1** — `norms_audit_denied_calls()` returns 0 findings on the shipped script. Partition: 16 denied shapes and 9 near-misses, each now asserting the RULE that must fire, not merely that something fired (F4/F5 fix). Inversion: neutralising `unwrap_parens()` reddens the `parenthesised head` fixture, FAIL 1 | PASS 58 — before the fix it stayed green, both rules catching that shape. T2's two mutations reproduce with the walk unchanged at 19 sites. `test-norms-audit-denylist.R` FAIL 0 | WARN 0 | PASS 59.
+- **AC2** — 19 collected sites yield 19 distinct identities over 7 bindings. The four comparison-path probes (binding, kind, key, ordinal) each redden; double registration reddens the build; the same entry at a different declared ordinal builds. The recorded measurement holds: the shared-key binding SWAP does not redden, and its own test states so.
+- **AC3** — the shared-key roster is derived by `norms_audit_shared_key_sites()` and pinned to the pair. Capture measured at 12 frames per abort, resolving to `parse_source_note` and `source_note_block_tags`; crossing the fixtures resolves each to its twin rather than NA, so the mutation reddens on the binding and not on an empty capture.
+- **AC4** — floors measured at this gate: shortest shipped `stop` key 23 literal characters against a floor of 15 (RR17 band [10, 20]); longest shipped condition leaves 66 characters of stem against a floor of 40 (band [20, 45]). Both probes pass, including that the OLD rule accepted a 1-character stem. **F1 applies to this criterion and is recorded below.**
+- **AC5** — the matrix's off-diagonal accepting set equals the registry-derived shared-key pairs, diagonal all TRUE, count pinned at 2.
+- **AC6** — `tools/m82-gate-floor.R` re-run after its own F2/F3 fixes: baseline failed=0; the five M81 mutations give failed 8 / 6 / 3 / 1 / 0 against recorded 2 / 2 / 1 / 1 / 0, each carrying its recorded M81 test among the failures; script restored byte-clean (blob 3a9be94c) after every one. `devtools::check(args = "--no-manual")` **Status OK, 0 errors / 0 warnings / 0 notes, 8m 7.5s**. Audit re-run: ledger identical in all 12 columns bar its three stamps, coverage byte-identical, committed CSVs never written. All five touched test files WARN 0 in isolation.
+
+### Consistency gate
+
+`cairn_validate` exit 0, all checks pass. No principle changed, so `cairn_impact` is skipped. Profile consistency-gate: `document()` not required (no roxygen touched, `man/` and `NAMESPACE` byte-unchanged); no new exports, so no `_pkgdown.yml` row is owed; NEWS.md untouched, this milestone changing nothing user-visible; `tools/` is already in `.Rbuildignore` (`^tools$`), confirmed by check reporting 0 notes.
+
+### Independent review — three lenses, then a scorer
+
+16 candidate findings reported unfiltered; a fresh scorer that generated none of them scored each against the rubric with the diff and the milestone file in hand. Four scored at or above the action bar.
+
+**Actioned:**
+
+- **F2 (85) — the gate-floor harness read "pattern absent" as "pattern unique".** `gregexpr` returns `-1` on no match and `-1` has length 1, so the uniqueness test passed, `sub()` rewrote nothing, and the FAIL-0 control mutant would have printed OK for a mutation never made. **Fixed:** the check now requires a real match, and every mutation must change the file's blob or the harness aborts.
+- **F3 (80) — the harness left the shipped script mutated if any run errored.** `restore()` was the loop's last statement with no `on.exit`. **Fixed:** `on.exit(restore(AUDIT, want), add = TRUE)` registered before the loop.
+- **F4 (82) — the paren-normalisation fixture had no non-redundant coverage.** `(rlang::abort)("x")` is reported by rule (i) AND rule (iii), so deleting `unwrap_parens()` left the format-only assertion green. **Fixed:** each denied fixture now declares the rule that must catch it; inversion confirms the fix is load-bearing.
+- **F1 (85) — the `stopifnot` stem floor can reject a correct site's own message.** Carried to the approval gate as a decision; see below.
+
+**Logged, below the action bar (12):** F5 (68) the denylist test asserted format not rule — covered by the F4 fix anyway; F8 (65) the matrix re-derives the shared-key set with a rule differing from AC3's roster, agreeing today only because no same-binding twin exists; F13 (62) `expect_abort_at_site()` does not validate it received a matcher; F10 (55) `sys.nframe()` inside `lapply` over-counts, harmless today; F11 (50) aliased script closures could resolve ambiguously under `identical()`, and `ls()` order is `LC_COLLATE`-dependent; F6 (45) rule (iii)'s `::` exemption is a narrowing AC1's text does not record; F15 (45) six hygiene items including a tempfile leak per `norms_audit_parse_text()` call; F12 (40) `paste(sep="\t")` drops a NULL identity component; F14 (40) the matrix's matcher loop runs outside the locale pin; F9 (25) and F16 (25) both self-flagged as documented bounds rather than defects; F7 (78) rule (iii) false-positives on `opts$abort`, a `for` index named `abort`, and a formal defaulted to `abort`.

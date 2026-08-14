@@ -37,8 +37,15 @@ restore <- function(path, want) {
 edit_file <- function(path, from, to) {
   txt <- readLines(path, warn = FALSE)
   joined <- paste(txt, collapse = "\n")
-  n <- length(gregexpr(from, joined, fixed = TRUE)[[1]])
-  if (!nzchar(from) || n != 1L) stop("pattern not unique in ", path, ": ", n)
+  hits <- gregexpr(from, joined, fixed = TRUE)[[1]]
+  # `gregexpr` returns -1 on NO match, and -1 has length 1, so a length-only
+  # uniqueness test reads "absent" as "unique" and `sub()` then rewrites
+  # nothing -- a mutant silently never applied, which for the FAIL 0 control
+  # would print OK for a mutation that was never made (M82 review, F2).
+  if (!nzchar(from) || hits[[1L]] == -1L || length(hits) != 1L) {
+    stop("pattern not found exactly once in ", path, ": ",
+         if (hits[[1L]] == -1L) 0L else length(hits))
+  }
   writeLines(strsplit(sub(from, to, joined, fixed = TRUE), "\n",
                       fixed = TRUE)[[1]], path)
 }
@@ -105,6 +112,12 @@ MUTANTS <- list(
 want <- snapshot(AUDIT)
 cat("baseline blob:", want, "\n\n")
 
+# The script is restored even if a run errors, a mutant breaks `sys.source()`,
+# or the session is interrupted: without this the loop's own `restore()` is
+# unreachable on error and the shipped script is left mutated, against the
+# milestone's byte-unchanged scope (M82 review, F3).
+on.exit(restore(AUDIT, want), add = TRUE)
+
 base <- run_files(FILES)
 cat(sprintf("BASELINE            failed=%d\n\n", base$failed))
 stopifnot(base$failed == 0L)
@@ -112,6 +125,9 @@ stopifnot(base$failed == 0L)
 ok <- TRUE
 for (m in MUTANTS) {
   edit_file(m$path, m$from, m$to)
+  if (identical(blob(m$path), want)) {
+    stop("mutation left the file unchanged: ", m$id)
+  }
   r <- run_files(FILES)
   hit <- if (is.na(m$named)) NA else any(grepl(m$named, r$tests, fixed = TRUE))
   pass <- r$failed >= m$recorded && (is.na(hit) || isTRUE(hit)) &&

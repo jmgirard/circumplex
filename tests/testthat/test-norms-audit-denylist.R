@@ -31,23 +31,30 @@ test_that("the audit script uses no denied abort spelling (M82)", {
 # expressions. `keep.source = FALSE` drops comments, so the comment case is only
 # a fixture at all if the fixture starts life as text (M82 plan gate).
 
+# Each denied shape carries the RULE it must be caught by, not merely the fact
+# that something caught it. Without that, a shape can be held up by the wrong
+# rule and the intended one deleted with the suite still green: measured
+# 2026-08-14, `(rlang::abort)("x")` is reported by (i) AND by (iii), so a
+# format-only assertion covers paren normalisation not at all, and
+# `do.call(stop, list("x"))` is reported by (ii) AND (iii), leaving rule (ii)'s
+# symbol arm held up by nothing (M82 review, F4/F5).
 denied_shapes <- list(
-  "rlang::abort head"        = 'rlang::abort("x")',
-  "bare abort head"          = 'abort("x")',
-  "cli::cli_abort head"      = 'cli::cli_abort("x")',
-  "bare cli_abort head"      = 'cli_abort("x")',
-  "parenthesised head"       = '(rlang::abort)("x")',
-  "do.call string"           = 'do.call("stop", list("x"))',
-  "do.call symbol"           = 'do.call(stop, list("x"))',
-  "do.call what ="           = 'do.call(args = list("x"), what = "stop")',
-  "do.call denied spelling"  = 'do.call("cli_abort", list("x"))',
-  "alias by <-"              = 'fail <- stop',
-  "alias by <<-"             = 'fail <<- stop',
-  "alias to a denied head"   = 'fail <- rlang::abort',
-  "alias to base::stop"      = 'fail <- base::stop',
-  "assign()"                 = 'assign("fail", stop)',
-  "higher-order"             = 'lapply(msgs, stop)',
-  "function default"         = 'f(g = stopifnot)'
+  "rlang::abort head"        = list('rlang::abort("x")', "i"),
+  "bare abort head"          = list('abort("x")', "i"),
+  "cli::cli_abort head"      = list('cli::cli_abort("x")', "i"),
+  "bare cli_abort head"      = list('cli_abort("x")', "i"),
+  "parenthesised head"       = list('(rlang::abort)("x")', "i"),
+  "do.call string"           = list('do.call("stop", list("x"))', "ii"),
+  "do.call symbol"           = list('do.call(stop, list("x"))', "ii"),
+  "do.call what ="           = list('do.call(args = list("x"), what = "stop")', "ii"),
+  "do.call denied spelling"  = list('do.call("cli_abort", list("x"))', "ii"),
+  "alias by <-"              = list('fail <- stop', "iii"),
+  "alias by <<-"             = list('fail <<- stop', "iii"),
+  "alias to a denied head"   = list('fail <- rlang::abort', "iii"),
+  "alias to base::stop"      = list('fail <- base::stop', "iii"),
+  "assign()"                 = list('assign("fail", stop)', "iii"),
+  "higher-order"             = list('lapply(msgs, stop)', "iii"),
+  "function default"         = list('f(g = stopifnot)', "iii")
 )
 
 accepted_shapes <- list(
@@ -62,13 +69,16 @@ accepted_shapes <- list(
   "a string in a message"    = 'stop("do not use rlang::abort here")'
 )
 
-test_that("every denied shape is caught, and named by its rule (M82)", {
+test_that("every denied shape is caught, by the rule it is meant for (M82)", {
   for (nm in names(denied_shapes)) {
-    hits <- norms_audit_denied_calls(
-      norms_audit_parse_text(denied_shapes[[nm]])
-    )
+    code <- denied_shapes[[nm]][[1L]]
+    rule <- denied_shapes[[nm]][[2L]]
+    hits <- norms_audit_denied_calls(norms_audit_parse_text(code))
     expect_true(length(hits) > 0L, info = nm)
-    # The finding names the offending call, not just its rule: a sweep that
+    # The intended rule fired -- not merely some rule. This is what makes
+    # `unwrap_parens()` and rule (ii)'s symbol arm load-bearing.
+    expect_true(any(startsWith(hits, paste0("(", rule, ") "))), info = nm)
+    # And the finding names the offending call, not just its rule: a sweep that
     # reports "something is wrong" sends the reader back to the whole file.
     expect_true(all(grepl("^\\((i|ii|iii)\\) .", hits)), info = nm)
   }
