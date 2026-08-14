@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-13 (M80 merged and archived, PR #109, after two review returns on AC5 and a maintainer-authorized second AC3 amendment; F1, the note-only emitter's NA `sample` cell, absorbed into the standing `audit-norms.R` robustness candidate row. No lesson added or retired: the composed-guard finding is a code fact this branch's tests now enforce, not a repo behavior worth a line)._
+_Last hygiene check: 2026-08-13 (post-M80 audit: all checks green, nothing in flight, working tree clean, both GitHub inboxes empty, tracking reconciled with git. Only mechanical fix was this line's own length; M7's 47 pre-format work-log wraps reported as an advisory, not fixed)._
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
