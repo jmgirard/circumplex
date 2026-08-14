@@ -1,6 +1,6 @@
 # M80: Give the norms-audit coverage report a machine-readable key
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M79, M81
 - **Driving RR:** —
@@ -131,6 +131,7 @@ the same emitters. Changing any value in `data/` → not here.
 - 2026-08-13: check needed M81's recorded gfortran workaround again — a scratch `FLIBS=` via `R_MAKEVARS_USER`, uncommitted. Without it the source install fails to link (`ld: library 'emutls_w' not found`), R's default `FLIBS` naming `/opt/gfortran/lib` unconditionally though `src/` is C++ only. Machine setup, not this branch: the first check run failed before compiling any of it.
 - 2026-08-13: AC5 third attempt, chosen at the resume gate over a `/milestone-brief` escalation: the `Items` guard now COMPOSES the shape test with `as.integer()`'s verdict instead of substituting one for the other — round 1 shipped shape alone (a digit string past integer range coerced to `"NA"`), round 2 coercion alone (`normalise_items("1.5, 9")` returned `"1, 9"`, agreeing with a shipped `1, 9`). Decimal, hex, scientific and signed cells now tested plus the comparison pair; deleting the shape half reddens 6 assertions and the coercion half 2, so neither is redundant.
 - 2026-08-13: AC3 amended under D-M80-1's authorization — `sample` joins the note-only dedupe key. Audited before landing by a fresh-context [O] reader that authored none of it; three findings, all adopted: the within-pass half of the filter was unfenced, the criterion's absence parenthetical carried no measurement stamp, and the 14-row assertion fences no single key cell — dropping `scale` alone from the key passed the entire coverage file, confirmed by mutation — so the criterion now asks one fixture per key cell plus an identical-rows fixture. All five mutations redden (3 per cell, 2 for the within-pass half). Accepted at the mini gate.
+- 2026-08-13: T7 re-run at `ab46cbef` — audit reproduces 194 ledger rows, 15 coverage rows, 0 gaps, 14 note-only, 1 constructed credit, 0 angle-copy splits, 0 IP2 breaches. Ledger identical to the committed one bar its three stamp columns and the coverage CSV byte-unchanged, so neither the composed `Items` guard nor the widened dedupe key moved a reported value. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7026 (up 26 from round 2, the new item-key shapes and the four key-cell fixtures). `devtools::check(args = "--no-manual")` Status OK, 0/0/0, 8m 45s, again with M81's uncommitted `FLIBS=` workaround. Back to `review`.
 - 2026-08-13: T2 found seven emitters, not the plan's six — M79 added `shipped-sample-not-audited` after this plan was written — and the roster test file carries coverage assertions the plan attributed to the provenance file alone.
 
 ## Decisions
