@@ -493,8 +493,12 @@ test_that("a source-note block no batch row audits is reported (M75)", {
   gaps <- partial$coverage[!partial$coverage$exempt, , drop = FALSE]
   expect_true("note-block-not-audited" %in% gaps$side)
   orphan <- gaps[gaps$side == "note-block-not-audited", , drop = FALSE]
-  expect_identical(orphan$instrument, "horowitz2003")
-  expect_identical(orphan$scale, "iip32")
+  # Since M80 the citekey and the block tag ride in their own columns rather
+  # than pasted together into `instrument`, and `instrument` is NA here because
+  # no batch row names one -- which is precisely why the block is a gap.
+  expect_identical(orphan$citekey, "horowitz2003")
+  expect_identical(orphan$tag, "iip32")
+  expect_true(is.na(orphan$instrument))
 })
 
 test_that("both IIP help pages carry the publisher's credit line (M75)", {

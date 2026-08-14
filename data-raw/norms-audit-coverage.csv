@@ -1,16 +1,16 @@
-"instrument","side","field","scale","exempt"
-"csie","note-only-sample","adult 0-to-4 sample","N = 1,234, Locke & Adamic (2012) Studies 3-4",TRUE
-"csig","note-only-sample","Study 2 octant means","n = 327; CSIG and CSIV means plotted, not printed numerically",TRUE
-"csip","note-only-sample","women subsample","n = 121, own M (SD) column",TRUE
-"csip","note-only-sample","men subsample","n = 70, own M (SD) column",TRUE
-"csiv","note-only-sample","U.S. adult sample","N = 980, Hopwood et al. (2022)",TRUE
-"csiv","note-only-sample","32-item adult MTurk sample","N = 1,244, Locke & Adamic (2012)",TRUE
-"csiv","constructed-credit-reference","Reference","Locke (n.d.)",TRUE
-"iitc","note-only-sample","Study 2 samples","N = 608, reported separately for romantic partner, friend and acquaintance targets",TRUE
-"iis32","note-only-sample","study samples","development N = 1,377, validation N = 956, clinical N = 497",TRUE
-"iis32","note-only-sample","octant alphas","per-sample octant and full-scale alpha reliabilities for both IIS forms",TRUE
-"ipipipc","note-only-sample","Study 1 combined octant statistics","PA 2.21 / .77, BC 2.09 / .73, DE 2.24 / .69, FG 2.81 / .80, HI 3.19 / .70, JK 3.80 / .57, LM 3.92 / .57, NO 3.17 / .77",TRUE
-"isc","note-only-sample","Study 1 validation half","Sample 2, n = 687, the other half of the 1,336 random split",TRUE
-"isc","note-only-sample","Study 2 sample","N = 299, a broader array of correlates",TRUE
-"iipsc","note-only-sample","Group sample","n = 143 pretherapy patients referred for short-term time-limited group treatment, whose IIP-SC octant M (SD) are Table 4's first column",TRUE
-"iipsc","note-only-sample","PD sample","n = 107 pretherapy patients referred for a personality-disorder study, whose IIP-SC octant M (SD) are Table 4's second column",TRUE
+"instrument","citekey","tag","side","field","sample","scale","label","detail","exempt"
+"csie","locke2007",NA,"note-only-sample",NA,NA,NA,"adult 0-to-4 sample","N = 1,234, Locke & Adamic (2012) Studies 3-4",TRUE
+"csig","locke2014",NA,"note-only-sample",NA,NA,NA,"Study 2 octant means","n = 327; CSIG and CSIV means plotted, not printed numerically",TRUE
+"csip","boudreaux2018",NA,"note-only-sample",NA,NA,NA,"women subsample","n = 121, own M (SD) column",TRUE
+"csip","boudreaux2018",NA,"note-only-sample",NA,NA,NA,"men subsample","n = 70, own M (SD) column",TRUE
+"csiv","locke2000",NA,"note-only-sample",NA,NA,NA,"U.S. adult sample","N = 980, Hopwood et al. (2022)",TRUE
+"csiv","locke2000",NA,"note-only-sample",NA,NA,NA,"32-item adult MTurk sample","N = 1,244, Locke & Adamic (2012)",TRUE
+"csiv","locke2000",NA,"constructed-credit-reference","Reference","1",NA,"Locke (n.d.)",NA,TRUE
+"iitc","bliton2019",NA,"note-only-sample",NA,NA,NA,"Study 2 samples","N = 608, reported separately for romantic partner, friend and acquaintance targets",TRUE
+"iis32","hatcher2012",NA,"note-only-sample",NA,NA,NA,"study samples","development N = 1,377, validation N = 956, clinical N = 497",TRUE
+"iis32","hatcher2012",NA,"note-only-sample",NA,NA,NA,"octant alphas","per-sample octant and full-scale alpha reliabilities for both IIS forms",TRUE
+"ipipipc","markey2009",NA,"note-only-sample",NA,NA,NA,"Study 1 combined octant statistics","PA 2.21 / .77, BC 2.09 / .73, DE 2.24 / .69, FG 2.81 / .80, HI 3.19 / .70, JK 3.80 / .57, LM 3.92 / .57, NO 3.17 / .77",TRUE
+"isc","hopwood2011",NA,"note-only-sample",NA,NA,NA,"Study 1 validation half","Sample 2, n = 687, the other half of the 1,336 random split",TRUE
+"isc","hopwood2011",NA,"note-only-sample",NA,NA,NA,"Study 2 sample","N = 299, a broader array of correlates",TRUE
+"iipsc","soldz1995",NA,"note-only-sample",NA,NA,NA,"Group sample","n = 143 pretherapy patients referred for short-term time-limited group treatment, whose IIP-SC octant M (SD) are Table 4's first column",TRUE
+"iipsc","soldz1995",NA,"note-only-sample",NA,NA,NA,"PD sample","n = 107 pretherapy patients referred for a personality-disorder study, whose IIP-SC octant M (SD) are Table 4's second column",TRUE

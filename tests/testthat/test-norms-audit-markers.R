@@ -372,6 +372,34 @@ SCRIPT_ABORTS <- list(
          noscales$scales <- FALSE
          env$validate_batch(noscales)
        }),
+  # validate_batch()'s divisor guards (M80). Each fixture is clean in every
+  # other respect, so only the shape it names can be what aborts: the NA case
+  # carries no Inf, the Inf case no NA, and the non-positive case neither.
+  site("stop", "AUDIT_BATCH$divisor must be numeric, not {}", function(env) {
+    b <- shared_batch()
+    b$divisor <- c("1", "1")
+    env$validate_batch(b)
+  }),
+  site("stop", "AUDIT_BATCH$divisor is missing for: {}", function(env) {
+    b <- shared_batch()
+    b$divisor <- c(1, NA_real_)
+    env$validate_batch(b)
+  }),
+  site("stop", "AUDIT_BATCH$divisor is not finite for: {}", function(env) {
+    b <- shared_batch()
+    b$divisor <- c(1, Inf)
+    env$validate_batch(b)
+  }),
+  site("stop", "AUDIT_BATCH$divisor must be strictly positive; wrong for: {}",
+       function(env) {
+         b <- shared_batch()
+         b$divisor <- c(1, 0)
+         env$validate_batch(b)
+       }),
+  # normalise_items() (M80): an unparseable item key aborts rather than
+  # coercing to the string "NA", which two unparseable cells shared.
+  site("stop", "item key is not a comma-separated list of integers: {}",
+       function(env) env$normalise_items("not an item key")),
   site("stop", "malformed audit-values marker: {}",
        function(env) env$source_note_tags("<!-- audit-values-beginning -->")),
   # The two "source note not found" sites are different functions, and the
