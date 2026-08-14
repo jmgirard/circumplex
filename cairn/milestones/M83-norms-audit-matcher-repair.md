@@ -1,6 +1,6 @@
 # M83: Make the norms-audit abort matcher accept correct sites
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -119,7 +119,7 @@ change it; a widening would change the pinned roster at
 - [x] T6. Add AC1's three-site fixture script and the registry over it, and
       assert T2's matrix procedure over that registry; run AC3's restatement
       grep and clear each hit.
-- [ ] T7. Full check; update NEWS only if user-visible (expected: not).
+- [x] T7. Full check; update NEWS only if user-visible (expected: not).
 
 ## Work log
 
@@ -138,6 +138,8 @@ change it; a widening would change the pinned roster at
 - 2026-08-14: T6 done — a three-site fixture script (braced condition truncating below the removed floor, flat condition truncating above it, named condition that never truncates) with a hand-declared registry bound to it by site-id equality; the matrix procedure over it has a full diagonal and an empty off-diagonal, with no stem prefixing another key. AC3's grep run over `tests/`, `cairn/ROADMAP.md` and the M83/M84/M85 files: hits in `test-cpm_fit.R`, `test-cpm_oracles.R`, `test-axes-scaled-fit.R` and `ROADMAP.md:57` are unrelated senses of "truncate"; `ROADMAP.md:26` already states the first-deparsed-line model; two live restatements cleared — the walk's keying comment and a `truncated <- substr(key, ...)` variable that echoed the character-count model, renamed `shortened`. Suite green (FAIL 0, PASS 7169).
 - 2026-08-14: T7 partial, AC7 blocked on the local toolchain — `devtools::test()` clean (FAIL 0, PASS 7169) and `document()` warning-free with `man/` and `NAMESPACE` byte-unchanged, but `devtools::check(args = "--no-manual")` cannot build: R's Makeconf links `-L/opt/gfortran/lib`, which is absent on this machine, so `R CMD INSTALL` fails at `ld: library 'emutls_w' not found`. Verified pre-existing and unrelated by installing master from a detached worktree carrying none of this branch's changes — identical failure. No NEWS entry: nothing user-visible changed (test machinery only).
 - 2026-08-14: `document()` bumped `Config/roxygen2/version` in DESCRIPTION from 8.0.0 to 8.1.0 (the local roxygen2 is newer than the one that last generated `man/`); reverted rather than swept into this branch, since it is unrelated to M83 and is the maintainer's call.
+- 2026-08-14: T7 done, AC7's blocker resolved — the maintainer installed the R-project gfortran build, and `devtools::check(args = "--no-manual")` now runs to `0 errors | 0 warnings | 0 notes` (7m 55s). The first post-install run carried one NOTE naming the installer left in the repo root by the download command; it was moved to `~/Downloads` and the check re-run clean. No NEWS entry: the milestone changes test machinery only.
+- 2026-08-14: all tasks done; status → review.
 ## Decisions
 
 ### 2026-08-14: AC2's no-floor-when-truncated rule keeps a measured residual leak, pinned rather than closed
