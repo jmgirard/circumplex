@@ -395,14 +395,31 @@ shipped_values <- function(inst, sample, scales = TRUE, obj = NULL) {
 # compared equal, which is a comparison that cannot fail. That is the same
 # shape this file refuses everywhere else: a value the audit cannot read is a
 # note or an object someone got wrong, not a value to agree with.
+#
+# The refusal is the COERCION's own verdict, not a shape test standing in for
+# it. A `grepl("^[0-9]+$", p)` shape test looks equivalent and is not: it
+# admits any digit string, and `as.integer("99999999999")` is NA for being out
+# of integer range, so two overflowing cells still normalised to "NA" and still
+# compared equal -- the defect this guard exists to close, surviving inside the
+# guard that claimed to close it (M80 review, F3). Checking `as.integer()`'s
+# own result covers every way it can fail to read a cell, which no enumeration
+# of shapes can promise.
+#
+# `strsplit()` drops a trailing empty field, so the fields are counted against
+# the separators rather than read off the split: "1, 9," is a malformed cell
+# and not a two-item key (M80 review, F4).
 normalise_items <- function(x) {
   vapply(x, function(one) {
-    p <- trimws(strsplit(as.character(one), ",", fixed = TRUE)[[1L]])
-    if (!length(p) || !all(grepl("^[0-9]+$", p))) {
-      stop("item key is not a comma-separated list of integers: ",
-           as.character(one), call. = FALSE)
+    one <- as.character(one)
+    p <- trimws(strsplit(one, ",", fixed = TRUE)[[1L]])
+    n <- suppressWarnings(as.integer(p))
+    bad <- is.na(one) || !length(p) || anyNA(n) ||
+      length(p) != lengths(regmatches(one, gregexpr(",", one, fixed = TRUE))) + 1L
+    if (bad) {
+      stop("item key is not a comma-separated list of integers: ", one,
+           call. = FALSE)
     }
-    paste(as.integer(p), collapse = ", ")
+    paste(n, collapse = ", ")
   }, character(1), USE.NAMES = FALSE)
 }
 
@@ -616,6 +633,9 @@ audit_norms <- function(batch = AUDIT_BATCH,
   # to catch.
   claimed <- list()
   blocks <- list()
+  # Which of each block's note-only rows have already been reported; see the
+  # emitter below for why the key is the note row rather than the report row.
+  note_only_seen <- list()
 
   for (i in seq_len(nrow(batch))) {
     inst <- batch$instrument[[i]]
@@ -647,12 +667,43 @@ audit_norms <- function(batch = AUDIT_BATCH,
       note <- note[note$sample != NO_SAMPLE, , drop = FALSE]
     }
 
+    # A note-only row is a fact about the BLOCK, so it is emitted once per
+    # block and payload rather than once per batch pass that reads the block:
+    # iipsc's two passes read two different notes today, but an instrument
+    # whose samples share one note would have reported each of its note-only
+    # rows twice.
+    #
+    # The payload is part of the key, not decoration, and the payload is the
+    # NOTE ROW -- scale, value and anchor -- not the two cells the report
+    # happens to carry. Keying on (citekey, block, sample) alone would collapse
+    # the 14 rows the repo emits to the 9 blocks that carry them, every
+    # note-only row carrying the NO_SAMPLE token; keying without the anchor
+    # collapses two rows citing one sample to two different tables into one.
+    # Both are the silent row loss every other sweep in this file refuses.
+    #
+    # Keyed here rather than by deduplicating the assembled frame: the anchor
+    # is the audit's provenance cell and the report does not carry it, so the
+    # key exists only at this point. Filtering here also cannot reach across
+    # sides, which a `duplicated()` over the whole frame could.
     if (nrow(note_only)) {
-      coverage[[length(coverage) + 1L]] <- coverage_rows(
-        "note-only-sample", TRUE, instrument = inst, citekey = citekey,
-        tag = tag_or_na(btag),
-        label = note_only$scale, detail = note_only$value
-      )
+      key <- paste(note_only$scale, note_only$value, note_only$anchor,
+                   sep = "\r")
+      # Within this pass's rows as well as against earlier passes. Filtering
+      # only against earlier passes leaves the key inert for a block read once
+      # -- every row of a single pass is unseen whatever it says -- so the
+      # anchor could be dropped from the key with no test able to tell (caught
+      # by mutating this line during the M80 return-1 fixes).
+      fresh <- !duplicated(key) &
+        !(key %in% (note_only_seen[[bkey]] %||% character(0)))
+      note_only_seen[[bkey]] <- c(note_only_seen[[bkey]] %||% character(0),
+                                  key[fresh])
+      if (any(fresh)) {
+        coverage[[length(coverage) + 1L]] <- coverage_rows(
+          "note-only-sample", TRUE, instrument = inst, citekey = citekey,
+          tag = tag_or_na(btag),
+          label = note_only$scale[fresh], detail = note_only$value[fresh]
+        )
+      }
     }
 
     constructed <- note[note$field == "Reference" &
@@ -784,20 +835,6 @@ audit_norms <- function(batch = AUDIT_BATCH,
   }
 
   cov <- if (length(coverage)) do.call(rbind, coverage) else empty_coverage()
-
-  # A note-only row is a fact about the BLOCK, so it is reported once per block
-  # and payload rather than once per batch pass that reads the block: iipsc's
-  # two passes read two different notes today, but an instrument whose samples
-  # share one note would have reported each of its note-only rows twice.
-  #
-  # The payload is part of the key, not decoration. Keying on (citekey, block,
-  # sample) alone would collapse the 14 rows the repo emits to 8 -- every
-  # note-only row carries the NO_SAMPLE token, csip's two subsamples and iis32's
-  # two rows differing only in what they say -- which is the silent row loss
-  # every other sweep in this file exists to refuse.
-  dup <- cov$side == "note-only-sample" &
-    duplicated(paste(cov$citekey, cov$tag, cov$label, cov$detail, sep = "\r"))
-  cov <- cov[!dup, , drop = FALSE]
   row.names(cov) <- NULL
 
   list(

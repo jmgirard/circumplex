@@ -1,6 +1,6 @@
 # M80: Give the norms-audit coverage report a machine-readable key
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M79, M81
 - **Driving RR:** —
@@ -44,11 +44,16 @@ the same emitters. Changing any value in `data/` → not here.
       claiming instrument from `blocks[[bkey]]$instrument`. Citekey and block
       tag ride in their own columns rather than inside `instrument` (`:448`).
 - [ ] AC3 A `note-only` coverage row appears once per citekey, block, and the
-      row's own payload — not once per batch pass that reads the block
-      (`:379-385` sits inside the per-pass loop). A test asserts the full run
-      still emits 14 note-only rows: every note-only row in the repo carries
-      `sample = "—"`, so a key including `sample` but not the payload
-      collapses those 14 to 8.
+      row's own payload — the note row's `scale`, `value` and `anchor` cells,
+      the key being taken from the note row rather than from the report, whose
+      ten columns do not include `anchor` — not once per batch pass that reads
+      the block. A test asserts the full run still emits 14 note-only rows, and
+      a fixture test asserts that two note-only rows in one block differing only
+      in their `anchor` cell emit two coverage rows (no committed note has that
+      shape). Every note-only row in the repo carries `sample = "—"` in the
+      note, so a key including `sample` but not the payload collapses those 14
+      to the 9 blocks that carry them (measured 2026-08-13 over the committed
+      notes).
 - [ ] AC4 `validate_batch()` refuses a `divisor` that is missing,
       non-numeric, `NA`, non-finite, or not strictly positive, each shape with
       its own test asserting the specific message.
@@ -111,6 +116,11 @@ the same emitters. Changing any value in `data/` → not here.
 - 2026-08-13: T1 minor amendment at the implementation gate: the schema takes two free-text columns, `label` and `detail`, beside the eight the plan named. A note-only row carries two free-text cells (the note's name for the unshipped material and its description) and the eight key columns have nowhere to put either once each holds only its own fact; Jeff chose the two-column shape over pasting them together or dropping the description.
 - 2026-08-13: T4 done in `tests/testthat/test-norms-audit-batch.R`; the four new `stop()` sites are registered in M81's abort registry, which is what forced them to carry fixtures. The missing-column shape needed no new guard — M72's required-names `stopifnot()` already covers it, so its test asserts that site instead.
 - 2026-08-13: T5 done in `tests/testthat/test-norms-audit-compare.R`; normalising the source side changes no committed ledger row, the notes' item keys having been written unpadded — the run stays 194 ledger rows, 15 coverage rows, 0 gaps.
+- 2026-08-13: return-1 verification: audit re-run at `a834445a` — 194 ledger rows, 15 coverage rows, 0 gaps, 14 note-only; ledger identical to the committed one bar its three stamp columns and the coverage CSV byte-unchanged, so none of the six fixes moved a reported value. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7000 (up 26 from round 1's 6974, the new fixtures). `devtools::check(args = "--no-manual")` Status OK, 0/0/0, 7m 39s. Back to `review`.
+- 2026-08-13: return-1 fixes. F3: the `Items` guard now refuses on `as.integer()`'s own verdict rather than on a shape test standing in for it, which is what let a digit string past integer range coerce to the string `"NA"` and compare equal to another; F4 came with it, the field count now taken from the separators so a trailing comma is malformed rather than a two-item key. F1: the note-only key is the note row — scale, value and anchor — and is applied within a pass as well as across passes; the post-hoc `duplicated()` over the assembled frame is gone, which takes F2's cross-side reach with it. F8, F9: the two value-level emitters and AC2's claiming-instrument clause have committed tests for the first time. F10: `nzchar(NA_character_)` is TRUE, so the payload assertion now tests `!is.na()` first. F12, F13 fixed as false comments though both scored below the bar, being prose this branch authored.
+- 2026-08-13: the anchor mutation caught a second defect in the first fix: keying only against EARLIER passes left the key inert for a block read once, every row of a single pass being unseen whatever it says, so the anchor could be dropped with no test able to tell. Found by mutating the key line, not by reading it. All four rewritten guards now redden under mutation — anchor dropped from the key (3 failures), the pre-M80 paste restored in the value-level emitter (2), `note-sample-not-audited` carrying the citekey again (1), the `Items` shape test restored (3).
+- 2026-08-13: correcting a figure this milestone recorded twice: the 2026-08-08 criteria-audit line says a (citekey, block, sample) key "would itself have deleted 6 of the 14 shipped note-only rows". Measured 2026-08-13 over the committed notes, it deletes 5 — the 14 rows span 9 blocks. The line stands as written, history not being edited; this supersedes its figure.
+- 2026-08-13: amendment return: AC3 — "the note row's `scale`, `value` and `anchor` cells, the key being taken from the note row rather than from the report, whose ten columns do not include `anchor`"; the collapse figure corrected from 8 to the measured 9, and a fixture test for the anchor case added to the criterion. Audited before landing by a fresh-context [O] reader that authored none of it, which rejected the first draft: it asked for the anchor as a cell "the report carries", a set the ten columns provably exclude, so two different landing states satisfied it. Both of that audit's minimal changes adopted; accepted at the mini gate.
 - 2026-08-13: review round 1 returned to `in-progress` (defect return 1). AC5 fails: `normalise_items()`'s `grepl("^[0-9]+$", p)` admits a digit string past integer range, `as.integer()` overflows to NA and the paste yields the string `"NA"`, so `values_agree("Items", "99999999999", "88888888888", 1)` is TRUE — the coercion the criterion names as closed. Five more findings action at ≥80 (F1 anchor-blind dedupe key, F8/F9 two unfenced criterion clauses, F10 a vacuous NA assertion, R1 a false figure). PR #109 open, draft.
 - 2026-08-13: T7 — audit re-run at `9d56bf2a`: ledger 194 rows, coverage 15 rows, 0 gaps, 14 note-only, 1 constructed credit, 0 angle-copy splits, 0 IP2 breaches. Ledger compared row by row against the committed file with the three stamp columns stripped: identical, so no audited comparison changed; the coverage CSV was regenerated at T1/T2 and is unchanged since. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 6974 (the 6 warnings all outside this milestone's files, unchanged from M81's run). `devtools::check(args = "--no-manual")`: Status OK, 0 errors / 0 warnings / 0 notes, 7m 12s. No NEWS entry: this milestone changes `data-raw/` and `tests/` only, neither of which is installed, so there is no user-visible change to record.
 - 2026-08-13: check needed M81's recorded gfortran workaround again — a scratch `FLIBS=` via `R_MAKEVARS_USER`, uncommitted. Without it the source install fails to link (`ld: library 'emutls_w' not found`), R's default `FLIBS` naming `/opt/gfortran/lib` unconditionally though `src/` is C++ only. Machine setup, not this branch: the first check run failed before compiling any of it.

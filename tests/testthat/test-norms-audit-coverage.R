@@ -114,9 +114,8 @@ test_that("no coverage cell is a string-pasted payload (M80)", {
   # run. Absence assertions are weak on their own -- an empty report satisfies
   # every one -- so the row count above and the positive per-side assertions
   # below are what keep them from being vacuous.
-  # na.rm, because an empty key cell is NA by design and `any(NA)` is NA.
-  expect_false(any(grepl("(sample ", cov$field, fixed = TRUE), na.rm = TRUE))
-  expect_false(any(grepl("(", cov$instrument, fixed = TRUE), na.rm = TRUE))
+  expect_false(any(grepl("(sample ", cov$field, fixed = TRUE)))
+  expect_false(any(grepl("(", cov$instrument, fixed = TRUE)))
 
   # `field` holds a bare field name, from the fixed set the audit compares.
   fields <- unique(stats::na.omit(cov$field))
@@ -140,13 +139,17 @@ test_that("a note-only row is reported once per block and payload (M80)", {
   # 14, measured over the committed notes. The number is the point: every
   # note-only row in the repo carries the NO_SAMPLE token in its sample cell,
   # so a dedupe key of (citekey, block, sample) -- the obvious one -- collapses
-  # these 14 to 8, and the report would silently lose six statements about what
-  # the sources publish. The payload is therefore part of the key.
+  # these 14 to the 9 blocks that carry them, and the report would silently
+  # lose 5 statements about what the sources publish. The payload is therefore
+  # part of the key. Both figures measured 2026-08-13 over cairn/references/.
   expect_identical(nrow(only), 14L)
-  expect_identical(anyDuplicated(paste(only$citekey, only$tag, only$label,
-                                       only$detail)), 0L)
+  expect_identical(length(unique(paste(only$citekey, only$tag))), 9L)
   # And each carries its payload in the free-text columns, not in a key column.
-  expect_true(all(nzchar(only$label)) && all(nzchar(only$detail)))
+  # `!is.na()` before `nzchar()`, because nzchar(NA_character_) is TRUE and an
+  # emitter that filled neither column would satisfy nzchar() alone -- which is
+  # the regression this line exists to catch (M80 review, F10).
+  expect_true(all(!is.na(only$label) & nzchar(only$label)))
+  expect_true(all(!is.na(only$detail) & nzchar(only$detail)))
   expect_true(all(is.na(only$field)) && all(is.na(only$scale)))
 })
 
@@ -172,6 +175,87 @@ test_that("two passes over one note do not duplicate its note-only row (M80)", {
   # produced the 1 above rather than the fixture only being read once.
   expect_identical(nrow(res$ledger), 0L)
   expect_identical(sum(!res$coverage$exempt), 0L)
+})
+
+test_that("two note-only rows differing only in anchor stay two (M80)", {
+  env <- coverage_defs()
+  # The dedupe key is the NOTE ROW -- scale, value and anchor -- not the two
+  # cells the report carries. Keyed on the report's `label` and `detail` alone,
+  # these two rows collapse to one and the second citation vanishes with no row
+  # anywhere recording it (M80 review, F1): one source tabling one sample at two
+  # places is an ordinary shape, and which table a value came from is the
+  # provenance this audit exists to keep. No committed note has it, hence a
+  # fixture.
+  objects <- list(fx = cov_object())
+  dir <- cov_note_dir(list(one = c(
+    cov_sample_rows(1), cov_sample_rows(2), cov_instrument_rows,
+    "| note-only | — | replication sample | n = 50 | Table 9 |",
+    "| note-only | — | replication sample | n = 50 | Table 10 |"
+  )))
+  res <- env$audit_norms(cov_batch(c("one", "one"), c(TRUE, FALSE)), dir = dir,
+                         objects = objects,
+                         roster = env$shipped_roster(objects))
+  only <- res$coverage[res$coverage$side == "note-only-sample", , drop = FALSE]
+  # Two rows, and both from one pass over the block rather than one row per
+  # pass: the count alone cannot tell those apart, so assert the payloads.
+  expect_identical(nrow(only), 2L)
+  expect_identical(only$label, rep("replication sample", 2L))
+  expect_identical(only$detail, rep("n = 50", 2L))
+  expect_identical(sum(!res$coverage$exempt), 0L)
+})
+
+test_that("a value missing from either side names its field and sample (M80)", {
+  env <- coverage_defs()
+  # AC1's central case, and the one the committed run cannot exercise: it has
+  # no non-exempt row at all, so the two value-level emitters emit nothing and
+  # an assertion over the real report says nothing about them (M80 review, F8).
+  # The fixture's note omits the object's NO scale and tables a ZZ scale the
+  # object does not ship, so one row of each side is produced.
+  objects <- list(fx = cov_object())
+  rows <- cov_sample_rows(1)
+  rows <- rows[!grepl("^\\| M \\| 1 \\| NO ", rows)]
+  dir <- cov_note_dir(list(k = c(
+    rows, cov_instrument_rows, "| M | 1 | ZZ | 9.99 | T |"
+  )))
+  bat <- data.frame(instrument = "fx", sample = 1, citekey = "k", divisor = 1,
+                    scales = TRUE, stringsAsFactors = FALSE)
+  cov <- env$audit_norms(bat, dir = dir, objects = objects,
+                         roster = env$shipped_roster(objects))$coverage
+
+  miss_note <- cov[cov$side == "shipped-value-not-in-note", , drop = FALSE]
+  miss_ship <- cov[cov$side == "note-value-not-shipped", , drop = FALSE]
+  # `field` is the bare field name and the sample rides in `sample`. Before
+  # M80 `field` held "M (sample 1)" and `sample` did not exist, so these four
+  # assertions are what would redden if that paste came back.
+  expect_identical(miss_note$field, "M")
+  expect_identical(miss_note$sample, "1")
+  expect_identical(miss_note$scale, "NO")
+  expect_identical(miss_ship$field, "M")
+  expect_identical(miss_ship$sample, "1")
+  expect_identical(miss_ship$scale, "ZZ")
+  # Both sides carry the block they came from, and neither is exempt.
+  expect_true(all(c(miss_note$citekey, miss_ship$citekey) == "k"))
+  expect_true(all(c(miss_note$instrument, miss_ship$instrument) == "fx"))
+  expect_false(any(c(miss_note$exempt, miss_ship$exempt)))
+})
+
+test_that("an unaudited note sample names the claiming instrument (M80)", {
+  env <- coverage_defs()
+  dir <- coverage_notes()
+  # AC2's second clause. trucco2013 tables igicr's three samples; dropping the
+  # third from the batch leaves the block claimed by the surviving two, so the
+  # sweep reports the unclaimed sample. The instrument comes from the block's
+  # claiming batch row -- before M80 this column held "citekey (tag)" instead,
+  # and the only assertion anywhere on this side checked the side NAME, which
+  # passes either way (M80 review, F9).
+  b <- env$AUDIT_BATCH
+  res <- env$audit_norms(b[!(b$instrument == "igicr" & b$sample == 3), ], dir)
+  hit <- res$coverage[res$coverage$side == "note-sample-not-audited", ,
+                      drop = FALSE]
+  expect_identical(hit$instrument, "igicr")
+  expect_identical(hit$citekey, "trucco2013")
+  expect_identical(hit$sample, "3")
+  expect_true(is.na(hit$tag))
 })
 
 test_that("a block whose instrument-level rows no pass reads is reported (M80)", {
@@ -217,8 +301,9 @@ test_that("the committed coverage report is the one this code emits (M80)", {
 
   # The CSV is a committed artifact of a run, so it can drift from the code
   # that writes it -- a schema change with no regeneration leaves a file whose
-  # columns no longer exist. Compare the frame, not the file's text: quoting
-  # and row order are write.csv()'s business, not this audit's.
+  # columns no longer exist. Compared column by column rather than as text, so
+  # that write.csv()'s quoting is not what is under test; row order IS pinned,
+  # the comparison being element-wise.
   on_disk <- utils::read.csv(path, stringsAsFactors = FALSE,
                              colClasses = "character")
   fresh <- env$audit_norms(env$AUDIT_BATCH, dir)$coverage

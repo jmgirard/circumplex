@@ -58,6 +58,31 @@ test_that("two unparseable item cells do not compare equal (M80)", {
     function() env$normalise_items("1, 9, seventeen"),
     "stop", "item key is not a comma-separated list of integers: {}"
   )
+  # The shape that survived the first fix: a digit string is not an integer if
+  # it is out of R's integer range, and `as.integer()` returns NA for it with a
+  # warning. Two such cells both normalised to the string "NA" and compared
+  # EQUAL -- the same defect one shape over, inside the guard that claimed to
+  # close it (M80 review, F3). Asserted as a pair, since a single abort proves
+  # only that one cell is refused.
+  expect_abort_at_site(
+    function() env$normalise_items("99999999999"),
+    "stop", "item key is not a comma-separated list of integers: {}"
+  )
+  expect_abort_at_site(
+    function() env$values_agree("Items", "99999999999", "88888888888", 1),
+    "stop", "item key is not a comma-separated list of integers: {}"
+  )
+  # `strsplit()` drops a trailing empty field, so "1, 9," parsed as a two-item
+  # key while ",1" aborted -- one malformed shape refused and its mirror image
+  # normalised away (M80 review, F4).
+  expect_abort_at_site(
+    function() env$normalise_items("1, 9,"),
+    "stop", "item key is not a comma-separated list of integers: {}"
+  )
+  expect_abort_at_site(
+    function() env$normalise_items("1,,9"),
+    "stop", "item key is not a comma-separated list of integers: {}"
+  )
   # An empty cell is unreadable too, and reached parse_source_note()'s
   # empty-value guard only on the source side.
   expect_abort_at_site(
