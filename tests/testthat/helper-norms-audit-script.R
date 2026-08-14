@@ -163,18 +163,54 @@ names_denied_head <- function(x) {
 #         higher-order use (`lapply(msgs, stop)`) in one rule rather than three
 #         -- an enumeration of shapes is what the M79 review beat twice.
 #
-# Position 1 of a call is its head and is exempt from (iii). So is the whole of
-# a `::`/`:::` call, whose operands are namespace parts rather than arguments:
-# without that exemption the walk reaches the `stopifnot` symbol inside
-# `base::stopifnot(x)`'s own head and reports an ordinary shipped call as an
-# alias (measured 2026-08-14, before the exemption: `base::stopifnot(is.numeric
-# (x))` was flagged "(iii) base::stopifnot"). `fail <- base::stop` is unaffected
-# -- there the `::` call is a CHILD of `<-`, which is where rule (iii) reads.
+# Position 1 of a call is its head and is exempt from (iii). Three further
+# exemptions, and they share one reason: the slot holds a NAME being written or
+# selected, never a value that could be called, so no aliased abort is reachable
+# through it and flagging it reddens the sweep over ordinary code.
+#
+#   `::`/`:::` -- the whole call, whose operands are namespace parts rather than
+#     arguments: without it the walk reaches the `stopifnot` symbol inside
+#     `base::stopifnot(x)`'s own head and reports an ordinary shipped call as an
+#     alias (measured 2026-08-14: `base::stopifnot(is.numeric(x))` was flagged
+#     "(iii) base::stopifnot"). `fail <- base::stop` is unaffected -- there the
+#     `::` call is a CHILD of `<-`, which is where rule (iii) reads.
+#   `$`/`@` -- operand 3, the field or slot name. `opts$abort`, `x@abort` and
+#     `df$stop <- 1` were each flagged before this (measured 2026-08-14).
+#   `for` -- operand 2, the loop variable. `for (abort in x) f(1)` was flagged.
+#
+# What is NOT exempt, deliberately: the `for` SEQUENCE (`for (i in abort)`), and
+# assignment of any kind. `abort <- rlang::abort` is the aliasing rule (iii)
+# exists to catch, and telling it from `abort <- 1` needs the assigned value
+# inspected -- which no rule here does (M83 plan gate).
+NON_VALUE_OPERANDS <- list("$" = 3L, "@" = 3L, "for" = 2L)
+
+# Is this the HEAD of a call, reached through a field or slot named for a denied
+# abort -- `handlers$abort("boom")`, `x@cli_abort("boom")`?
+#
+# The `$`/`@` exemption above is about the NAME slot, and in head position that
+# name selects the function actually being called, so exempting it there would
+# fail open: the M81 walk cannot see such a call either (its head deparses to
+# `handlers$abort`, which is not in ABORT_HEADS), leaving an unregistered abort
+# site with every count still balancing. Caught as rule (i) -- an abort spelling
+# the walk cannot see -- rather than by re-consulting rule (iii), which AC4 fixes.
+#
+# BOUND, stated rather than closed: this reads the head position only, so a
+# field access passed as a VALUE (`lapply(x, opts$abort)`) is not flagged. That
+# shape was caught before M83 only as a side effect of the over-broad rule this
+# milestone narrows, and separating it from an ordinary `opts$abort` read needs
+# the assignment-target case exempted in turn -- past what AC4 licenses. It has
+# its own ROADMAP candidate row.
+calls_denied_field <- function(fn) {
+  is.call(fn) && length(fn) >= 3L &&
+    deparse_flat(fn[[1L]]) %in% c("$", "@") &&
+    is.name(fn[[3L]]) && as.character(fn[[3L]]) %in% DENIED_INDIRECT_HEADS
+}
 norms_audit_denied_calls <- function(exprs = norms_audit_script_exprs()) {
   out <- character(0)
   for (cl in norms_audit_calls(NULL, exprs)) {
-    head <- deparse_flat(unwrap_parens(cl[[1L]]))
-    if (head %in% DENIED_ABORT_HEADS) {
+    fn <- unwrap_parens(cl[[1L]])
+    head <- deparse_flat(fn)
+    if (head %in% DENIED_ABORT_HEADS || calls_denied_field(fn)) {
       out <- c(out, paste0("(i) ", deparse_call(cl)))
     }
     if (head %in% c("do.call", "base::do.call")) {
@@ -193,7 +229,8 @@ norms_audit_denied_calls <- function(exprs = norms_audit_script_exprs()) {
       if (denied) out <- c(out, paste0("(ii) ", deparse_call(cl)))
     }
     if (!head %in% c("::", ":::")) {
-      for (i in seq_along(cl)[-1L]) {
+      exempt <- NON_VALUE_OPERANDS[[head]]
+      for (i in setdiff(seq_along(cl)[-1L], exempt)) {
         child <- cl[[i]]
         if (missing(child)) next
         if (names_denied_head(child)) {
@@ -248,8 +285,9 @@ squish <- function(x) trimws(gsub("[[:space:]]+", " ", x))
 #
 # The two forms key differently because they FAIL differently, and the kind is
 # what tells the matcher which is which (AC7). A positional condition has no
-# message of its own, so R deparses it into one and truncates it; the key is
-# that deparsed text, matched as a stem. A NAMED condition's name IS the
+# message of its own, so R deparses it into one and, where that deparse runs to
+# more than one line, keeps the first line and marks it; the key is the whole
+# deparsed text, matched as a stem. A NAMED condition's name IS the
 # runtime message, verbatim and untruncated, so its key is the name and the
 # match is string equality.
 #
@@ -388,6 +426,60 @@ norms_audit_shared_key_sites <- function(entries) {
   entries[shared]
 }
 
+# The cross-discrimination matrix, computed ONCE for whichever registry it is
+# handed: the shipped one and AC1's fixture registry go through this, so the two
+# cannot drift into disagreeing about what "accepts" means (M83).
+#
+# Each fixture is raised ONCE and its message reused across the row and column,
+# because the message is a property of the site: provoking per cell would make
+# the run quadratic in fixture evaluations for nothing. A fixture that raised
+# NOTHING contributes NA, which the caller checks -- a vacuous row and column
+# would otherwise read as a clean matrix.
+norms_audit_acceptance_matrix <- function(entries, env) {
+  msgs <- vapply(entries, function(s) {
+    norms_audit_with_c_messages(
+      tryCatch({
+        s$fixture(env)
+        NA_character_
+      }, error = conditionMessage)
+    )
+  }, character(1))
+  n <- length(entries)
+  accepts <- matrix(FALSE, n, n)
+  for (i in seq_len(n)) {
+    for (j in seq_len(n)) accepts[i, j] <- entries[[i]]$matcher(msgs[[j]])
+  }
+  list(msgs = msgs, accepts = accepts)
+}
+
+# The off-diagonal cells a correct matcher set is ALLOWED to accept: one per
+# ordered pair of entries the shared-key helper returned that carry the same
+# (kind, key).
+#
+# Derived through `norms_audit_shared_key_sites()` rather than beside it. The
+# matrix used to re-derive the pair set as `outer(key, key, "==")`, which is a
+# second derivation of one thing: it ignores the helper's `binding != binding`
+# conjunct and agrees with it only because no same-binding twin is shipped
+# (M82 review, F8). Membership now comes from the helper alone; only the pairing
+# among its members is computed here.
+#
+# `shared_fn` is an argument so AC5's mutants can be run without editing source.
+norms_audit_expected_offdiag <- function(entries,
+                                         shared_fn = norms_audit_shared_key_sites) {
+  n <- length(entries)
+  id <- vapply(entries, function(e) {
+    paste(e$kind, e$binding, e$key, e$ordinal, sep = "\t")
+  }, character(1))
+  shared <- shared_fn(entries)
+  pairable <- id %in% vapply(shared, function(e) {
+    paste(e$kind, e$binding, e$key, e$ordinal, sep = "\t")
+  }, character(1))
+  kk <- vapply(entries, function(e) paste(e$kind, e$key, sep = "\t"), character(1))
+  kk[!pairable] <- NA_character_
+  same <- outer(kk, kk, function(a, b) !is.na(a) & !is.na(b) & a == b)
+  same & !diag(TRUE, n)
+}
+
 # The frame stack as it stood WHEN the abort was signalled.
 #
 # A calling handler, because an exiting one (tryCatch) unwinds the stack before
@@ -484,17 +576,37 @@ norms_audit_key_regex <- function(key) {
   paste(vapply(parts, regex_escape, character(1)), collapse = ".*")
 }
 
-# What `stopifnot()` printed, less its verdict and its truncation marker.
+# What `stopifnot()` printed, less its verdict, and WHETHER R truncated it.
 #
-# R deparses the failing condition into the message and TRUNCATES it with
-# " ...." past a width R chooses, so the key is matched as a prefix of the
-# condition rather than whole -- pinning the width would pin R's internals
-# instead of this script's guards. Discriminating all the same: neither of
-# validate_batch()'s two conditions is a prefix of the other.
+# R deparses the failing condition into the message; where that deparse runs to
+# more than one line it keeps the FIRST LINE and appends " ....". So the key is
+# matched as a prefix of the condition rather than whole -- pinning the width
+# would pin R's internals instead of this script's guards.
+#
+# The marker is returned rather than discarded because it is the only signal
+# distinguishing "R cut this short" from "this is the whole condition", and the
+# two want different treatment: a short stem is honest in the first case and
+# degenerate in the second. Discarding it is what made the matcher reject its
+# own site's genuine message (M83). Both readers get a list, so a caller that
+# wants the text alone says so.
+# The marker is recognised only WITH R's verdict behind it, because R emits the
+# two together -- `paste(ch[1L], "....")`, then " is not TRUE". Testing for a
+# trailing `....` alone made any message ending that way read as truncated, and
+# a truncated reading removes the floor: `is.d....` was accepted against key
+# `is.data.frame(batch)` (measured 2026-08-14). A fixture failing BEFORE its
+# guard, with an unrelated message ending in `....`, would then be reported as
+# coverage for a site never reached -- what this file exists to prevent.
+NORMS_AUDIT_VERDICT <- "(is not TRUE|are not all TRUE)"
+
 norms_audit_stopifnot_stem <- function(msg) {
-  msg <- sub("[[:space:]]*(is not TRUE|are not all TRUE)[[:space:]]*$", "", msg)
-  msg <- sub("[[:space:]]*\\.\\.\\.\\.[[:space:]]*$", "", msg)
-  squish(msg)
+  truncated <- grepl(
+    paste0("[[:space:]]\\.\\.\\.\\.[[:space:]]+", NORMS_AUDIT_VERDICT,
+           "[[:space:]]*$"),
+    msg
+  )
+  msg <- sub(paste0("[[:space:]]*", NORMS_AUDIT_VERDICT, "[[:space:]]*$"), "", msg)
+  if (truncated) msg <- sub("[[:space:]]*\\.\\.\\.\\.[[:space:]]*$", "", msg)
+  list(stem = squish(msg), truncated = truncated)
 }
 
 # Assert that `thunk` aborts, and aborts at the site `key` names -- never that
@@ -535,9 +647,14 @@ norms_audit_with_c_messages <- function(expr) {
 }
 
 # Discriminating-power floors. Both sit inside the bands RR17 rev 2 BC9 fixes
-# ([10, 20] and [20, 45]) and keep the headroom it states: the shortest shipped
-# `stop` key carries 23 literal characters, and R's truncation leaves 66 of the
-# script's longest shipped condition (both re-measured 2026-08-14).
+# ([10, 20] and [20, 45]).
+#
+# The stem floor applies to UNTRUNCATED messages only (M83). Where R truncated,
+# the stem is its own first deparsed line and no floor is meaningful: the line
+# break is R's choice and can fall anywhere, so comparing it against a floor
+# derived from the key rejected correct sites. Each floor's headroom over the
+# shipped sites is asserted in test-norms-audit-markers.R rather than written
+# here, where a later edit to the script would strand it.
 NORMS_AUDIT_STOP_KEY_FLOOR <- 15L
 NORMS_AUDIT_STEM_FLOOR <- 40L
 
@@ -581,14 +698,28 @@ norms_audit_matcher <- function(kind, key) {
     # longer message satisfy a shorter key. No floor: the key IS the message.
     fn <- function(msg) identical(msg, key)
   } else {
-    # A positional condition's message is R's deparse of it, truncated at a
-    # width R chooses, so the key is matched as a prefix. The floor is what
-    # stops a degenerate prefix standing in for the whole: without it the
-    # shipped check accepts a ONE-character stem (measured 2026-08-14).
+    # A positional condition's message is R's deparse of it, so the key is
+    # matched as a prefix -- but the two cases part here (M83).
+    #
+    # UNTRUNCATED, the stem IS the whole condition, so a short one is a
+    # degenerate prefix standing in for the whole and the floor rejects it:
+    # without the floor the shipped check accepted a ONE-character stem
+    # (measured 2026-08-14).
+    #
+    # TRUNCATED, the stem is R's own first deparsed line and its length is R's
+    # choice, not the guard's. The old floor tracked the KEY and was compared
+    # against that line, so a condition holding a braced `function(el) {...}`
+    # gave a 79-character key and a 28-character stem and the matcher rejected
+    # its own site's genuine message. No floor applies here; the marker is the
+    # evidence that R, not a weak key, is what shortened it. The residual --
+    # `stopifnot({ ... })` gives the one-character stem `{` -- is pinned as a
+    # bound in test-norms-audit-markers.R, not closed; see this milestone's
+    # Decisions.
     floor <- min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR)
     fn <- function(msg) {
-      stem <- norms_audit_stopifnot_stem(msg)
-      nchar(stem) >= floor && startsWith(squish(key), stem)
+      got <- norms_audit_stopifnot_stem(msg)
+      nzchar(got$stem) && startsWith(squish(key), got$stem) &&
+        (got$truncated || nchar(got$stem) >= floor)
     }
   }
   structure(fn, kind = kind, key = key, class = c("norms_audit_matcher", "function"))
@@ -597,7 +728,20 @@ norms_audit_matcher <- function(kind, key) {
 # Assert that `thunk` aborts, and aborts at the site `matcher` was built for --
 # never that some error occurred. A fixture can reach the wrong guard, or fail
 # before it reaches any, and a bare expect_error() reports both as coverage.
+#
+# The argument is checked rather than trusted. A stale call passing something
+# else reached `matcher(msg)` and died there -- "attempt to apply non-function",
+# or, for a character argument, "could not find function \"matcher\"" (measured
+# 2026-08-14) -- naming neither this argument nor the site under test, which is
+# the shape that hid M82's own call-site breakage. A plain function is refused
+# for a second reason: it is callable, so it would be USED, and its verdict
+# would stand in for one built from a declared (kind, key).
 expect_abort_at_site <- function(thunk, matcher, info = attr(matcher, "key")) {
+  if (!inherits(matcher, "norms_audit_matcher")) {
+    stop("`matcher` must be a norms_audit_matcher, not ",
+         paste(deparse(class(matcher)), collapse = ""),
+         "; build one with norms_audit_matcher(kind, key)", call. = FALSE)
+  }
   norms_audit_with_c_messages({
     err <- tryCatch({
       thunk()

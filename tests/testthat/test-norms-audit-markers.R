@@ -655,63 +655,261 @@ test_that("a stop() key under the literal floor stops the build (M82)", {
   expect_gte(min(shipped), 23L)
 })
 
-test_that("a stopifnot matcher rejects a degenerate stem (M82)", {
+test_that("a stopifnot matcher rejects a degenerate UNTRUNCATED stem (M82, M83)", {
   # The defect this floor closes: before it, the shipped check accepted any
   # non-empty prefix, so a one-character stem satisfied a 20-character key and
   # any `stopifnot()` in the script could stand in for any other.
+  #
+  # Untruncated is the whole of what the floor now governs (M83). Here the stem
+  # IS the condition R deparsed, so a one-character one cannot be honest.
   key <- "is.data.frame(batch)"
   m <- norms_audit_matcher("stopifnot", key)
   expect_true(m("is.data.frame(batch) is not TRUE"))
   expect_false(m("i is not TRUE"))
-  # ... and the old rule would have accepted it, so the assertion above is
-  # about the floor rather than about the prefix test.
-  expect_true(startsWith(squish(key), norms_audit_stopifnot_stem("i is not TRUE")))
-  # The floor is the key's own length where the key is shorter than 40, so a
-  # truncated-but-honest stem from a LONG condition still matches.
-  long <- paste(rep("condition_fragment", 5L), collapse = " + ")
-  expect_gt(nchar(long), NORMS_AUDIT_STEM_FLOOR)
-  ml <- norms_audit_matcher("stopifnot", long)
-  expect_true(ml(paste(substr(long, 1L, 66L), "....")))
-  expect_false(ml("condition ...."))
+  # ... and the prefix test alone would have accepted it, so the assertion
+  # above is about the floor rather than about the prefix.
+  got <- norms_audit_stopifnot_stem("i is not TRUE")
+  expect_false(got$truncated)
+  expect_true(startsWith(squish(key), got$stem))
+})
+
+# The truncated branch (M83, AC2). The fixture is a SCRIPT: parsed by the
+# helper's own parse call for its key and evaluated for its message, so the two
+# come from one text rather than from two hand-authored strings that a reader
+# must take on trust. The retired version of this test asserted acceptance of
+# `paste(substr(long, 1L, 66L), "....")` -- a truncation R does not perform,
+# hand-cut at a character count, which is the very model this milestone removes.
+
+fixture_script <- function(lines) {
+  exprs <- norms_audit_parse_text(lines)
+  env <- new.env()
+  for (e in exprs) eval(e, env)
+  list(exprs = exprs, env = env)
+}
+
+BRACED_FIXTURE <- c(
+  "braced <- function() {",
+  "  stopifnot(all(vapply(list(1, 2), function(el) {",
+  "    is.numeric(el) && length(el) == 1L",
+  "  }, logical(1))) && FALSE)",
+  "}"
+)
+
+test_that("a truncated stopifnot message is matched without the floor (M83)", {
+  fx <- fixture_script(BRACED_FIXTURE)
+  sites <- norms_audit_abort_sites(fx$exprs)
+  expect_length(sites, 1L)
+  key <- sites[[1L]]$key
+
+  msg <- norms_audit_with_c_messages(
+    tryCatch(fx$env$braced(), error = conditionMessage)
+  )
+  got <- norms_audit_stopifnot_stem(msg)
+  # The three properties that make this the case under test, asserted rather
+  # than assumed -- R's deparse width is R's, and on an R that broke the line
+  # later this fixture would silently stop being a truncated one.
+  expect_true(got$truncated)
+  expect_true(startsWith(squish(key), got$stem))
+  # Under the EFFECTIVE floor the unfixed matcher compared against, not the
+  # constant alone: `min(nchar(squish(key)), 40)` is what it computed.
+  expect_lt(nchar(got$stem), min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR))
+
+  # So the site's own genuine message failed its own matcher before M83 ...
+  expect_false(nchar(got$stem) >= min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR) &&
+                 startsWith(squish(key), got$stem))
+  # ... and is accepted now.
+  expect_true(norms_audit_matcher("stopifnot", key)(msg))
+})
+
+test_that("the truncation marker is read only with R's verdict (M83)", {
+  # Removing the floor is gated on R having truncated, so what counts as
+  # "truncated" has to be R's own shape and not any trailing dots. Testing for
+  # a bare `....` accepted `is.d....` against this key (measured 2026-08-14):
+  # a fixture failing BEFORE its guard, with an unrelated message ending that
+  # way, would be reported as coverage for a site never reached.
+  m <- norms_audit_matcher("stopifnot", "is.data.frame(batch)")
+  expect_false(m("is.d...."))
+  expect_false(m("is.data...."))
+  expect_false(norms_audit_stopifnot_stem("is.d....")$truncated)
+  # R's own shape -- marker AND verdict -- still reads as truncated, so the
+  # rejections above are about the anchor and not about the marker itself.
+  # R's own shape carries a space before the dots -- `paste(ch[1L], "....")`
+  # -- so the anchor requires one, and `is.d....` above lacks it.
+  got <- norms_audit_stopifnot_stem("is.d .... is not TRUE")
+  expect_true(got$truncated)
+  expect_identical(got$stem, "is.d")
+  # The verdict alone, with no marker, is untruncated and takes the floor.
+  expect_false(norms_audit_stopifnot_stem("is.d is not TRUE")$truncated)
+})
+
+test_that("a truncated stem carries no floor, and that is a BOUND (M83)", {
+  # Recorded, not fixed. With the marker present no length floor applies, so a
+  # one-character truncated stem is accepted by any matcher whose key starts
+  # the same way. Message-level discrimination cannot settle that class: two
+  # conditions whose first deparsed lines agree are indistinguishable, exactly
+  # as the shipped `source note not found: {}` pair is, and the cross-site
+  # matrix -- not this matcher -- is what stands behind discrimination there.
+  # See this milestone's Decisions entry.
+  fx <- fixture_script(c("braced <- function() stopifnot({", "  FALSE", "})"))
+  msg <- norms_audit_with_c_messages(
+    tryCatch(fx$env$braced(), error = conditionMessage)
+  )
+  got <- norms_audit_stopifnot_stem(msg)
+  expect_true(got$truncated)
+  expect_identical(got$stem, "{")
+  expect_true(
+    norms_audit_matcher("stopifnot", "{ a condition that clears the floor }")(msg)
+  )
+})
+
+# The whole pipeline over a truncated site (M83, AC1).
+#
+# The shipped registry cannot carry one: it is pinned site-for-site to
+# data-raw/audit-norms.R, which M83 leaves alone (M84 adds sites there). So the
+# same machinery runs over a fixture SCRIPT instead -- parsed for its keys,
+# evaluated for its messages, one text behind both.
+#
+# Three sites, because one would make the off-diagonal a 1x1 cell and the
+# comparison vacuous, and because the domain is free in more than one axis: the
+# braced condition truncates BELOW the removed floor, the flat one truncates
+# ABOVE it, and the named one never truncates at all, so the marker branch is
+# shown unreachable for that kind. Their keys are hand-declared, as the shipped
+# registry's are -- deriving them from the walk would make the identity
+# assertion below true of any implementation whatsoever.
+
+FIXTURE_SCRIPT <- c(
+  "braced <- function() {",
+  "  stopifnot(all(vapply(list(1, 2), function(el) {",
+  "    is.numeric(el) && length(el) == 1L",
+  "  }, logical(1))) && FALSE)",
+  "}",
+  "flat <- function() {",
+  '  stopifnot(nchar("alpha") > 0 && nchar("bravo") > 0 &&',
+  '    nchar("charlie") > 0 && nchar("delta") > 0 && FALSE)',
+  "}",
+  "named <- function() {",
+  '  stopifnot("a named condition that is its own message" = FALSE)',
+  "}"
+)
+
+test_that("the pipeline accepts a truncated site end to end (M83)", {
+  fx <- fixture_script(FIXTURE_SCRIPT)
+  reg <- norms_audit_build_registry(list(
+    site("stopifnot", "braced",
+         paste0("all(vapply(list(1, 2), function(el) { is.numeric(el) && ",
+                "length(el) == 1L }, logical(1))) && FALSE"),
+         function(env) env$braced()),
+    site("stopifnot", "flat",
+         paste0('nchar("alpha") > 0 && nchar("bravo") > 0 && ',
+                'nchar("charlie") > 0 && nchar("delta") > 0 && FALSE'),
+         function(env) env$flat()),
+    site("stopifnot_named", "named",
+         "a named condition that is its own message",
+         function(env) env$named())
+  ))
+  # Declared above, bound here: this is what keeps the keys the parse tree's
+  # rather than the author's.
+  expect_identical(norms_audit_site_ids(reg),
+                   norms_audit_site_ids(norms_audit_abort_sites(fx$exprs)))
+
+  mx <- norms_audit_acceptance_matrix(reg, fx$env)
+  expect_false(anyNA(mx$msgs))
+  got <- lapply(mx$msgs, norms_audit_stopifnot_stem)
+  keys <- vapply(reg, function(e) squish(e$key), character(1))
+
+  # The three axes, asserted rather than assumed -- R's deparse width is R's,
+  # and on an R that broke lines elsewhere these would quietly stop being the
+  # cases they are named for.
+  expect_true(got[[1L]]$truncated)
+  expect_lt(nchar(got[[1L]]$stem),
+            min(nchar(keys[[1L]]), NORMS_AUDIT_STEM_FLOOR))
+  expect_true(got[[2L]]$truncated)
+  expect_gt(nchar(got[[2L]]$stem), NORMS_AUDIT_STEM_FLOOR)
+  expect_false(got[[3L]]$truncated)
+
+  # No entry's stem prefixes another's key, so the empty off-diagonal below is
+  # empty for a reason rather than by luck.
+  for (i in seq_len(3L)) {
+    for (j in seq_len(3L)) {
+      if (i != j) {
+        expect_false(startsWith(keys[[i]], got[[j]]$stem),
+                     info = paste(i, j))
+      }
+    }
+  }
+
+  # Every site matches its own message -- entry 1 is the one an unfixed matcher
+  # rejected -- and none matches another's.
+  expect_true(all(diag(mx$accepts)))
+  offdiag <- !diag(TRUE, 3L)
+  expect_identical(mx$accepts & offdiag, norms_audit_expected_offdiag(reg))
+  expect_identical(sum(mx$accepts & offdiag), 0L)
 })
 
 test_that("no matcher accepts a message from another site (M82)", {
   env <- marker_defs()
-  # Each fixture raised ONCE, its message captured under the shared locale pin.
-  # Once, because provoking a site per cell would make the matrix quadratic in
-  # fixture runs for no gain -- the message is a property of the site.
-  msgs <- vapply(SCRIPT_ABORTS, function(s) {
-    norms_audit_with_c_messages(
-      tryCatch({
-        s$fixture(env)
-        NA_character_
-      }, error = conditionMessage)
-    )
-  }, character(1))
+  mx <- norms_audit_acceptance_matrix(SCRIPT_ABORTS, env)
   # A fixture that raised nothing would contribute a vacuous row and column.
-  expect_false(anyNA(msgs))
-
-  n <- length(SCRIPT_ABORTS)
-  accepts <- matrix(FALSE, n, n)
-  for (i in seq_len(n)) {
-    for (j in seq_len(n)) accepts[i, j] <- SCRIPT_ABORTS[[i]]$matcher(msgs[[j]])
-  }
+  expect_false(anyNA(mx$msgs))
 
   # Every site matches its own message. Without this the equality below could
   # be satisfied by a matcher that accepts nothing at all.
-  expect_true(all(diag(accepts)))
+  expect_true(all(diag(mx$accepts)))
 
-  # And the off-diagonal accepting set EQUALS the declared shared-key pairs --
-  # derived from the registry, not listed here, so a new shared pair changes
-  # both sides of this comparison at once and a leaky matcher changes only one.
-  key <- vapply(SCRIPT_ABORTS, function(s) paste(s$kind, s$key, sep = "\t"),
-                character(1))
-  offdiag <- !diag(TRUE, n)
-  expect_identical(accepts & offdiag, outer(key, key, "==") & offdiag)
+  # And the off-diagonal accepting set EQUALS the shared-key pairs the helper
+  # returns -- ONE derivation, called here rather than reproduced. Reproducing
+  # it as `outer(key, key, "==")` dropped the helper's differing-binding
+  # conjunct and agreed with it only because no same-binding twin is shipped
+  # (M82 review, F8); the two mutants below are what hold this to the helper.
+  offdiag <- !diag(TRUE, length(SCRIPT_ABORTS))
+  expect_identical(mx$accepts & offdiag, norms_audit_expected_offdiag(SCRIPT_ABORTS))
 
   # Today that set is exactly the two `source note not found` cells. Pinned, so
   # the equality above cannot quietly become true of a larger set.
-  expect_identical(sum(accepts & offdiag), 2L)
+  expect_identical(sum(mx$accepts & offdiag), 2L)
+})
+
+# The expected side is single-sourced onto `norms_audit_shared_key_sites()`
+# (M83, AC5). Two mutants against a two-part fixture, because one alone is
+# vacuous: on the same-binding fixture the correct helper already returns zero
+# entries, so emptying it changes nothing there.
+
+test_that("the expected off-diagonal is the helper's, not a second derivation (M83)", {
+  # Keys clear AC4's 15-literal-character floor, since the matcher constructor
+  # runs over them at build time.
+  key <- "a planted guard that clears the floor"
+  twin <- norms_audit_build_registry(list(
+    site("stop", "f", key, function(env) NULL, ordinal = 1L),
+    site("stop", "f", key, function(env) NULL, ordinal = 2L)
+  ))
+  pair <- norms_audit_build_registry(list(
+    site("stop", "f", key, function(env) NULL),
+    site("stop", "g", key, function(env) NULL)
+  ))
+  none <- matrix(FALSE, 2L, 2L)
+  both <- !diag(TRUE, 2L)
+
+  # The control. A same-binding twin shares no key ACROSS bindings, so nothing
+  # is pairable; a differing-binding pair contributes both ordered cells.
+  expect_identical(norms_audit_expected_offdiag(twin), none)
+  expect_identical(norms_audit_expected_offdiag(pair), both)
+
+  # Mutant 1 -- the helper without its `binding != binding[[i]]` conjunct. It
+  # calls the twin shared, so the expected side gains the two cells the shipped
+  # matrix would then have to accept.
+  no_binding <- function(entries) {
+    k <- vapply(entries, function(e) paste(e$kind, e$key, sep = "\t"), character(1))
+    entries[vapply(seq_along(entries), function(i) any(k == k[[i]]), logical(1))]
+  }
+  expect_identical(norms_audit_expected_offdiag(twin, no_binding), both)
+  # ... and it is invisible on the differing-binding fixture, which the correct
+  # helper already calls shared. This is why one fixture cannot verify both.
+  expect_identical(norms_audit_expected_offdiag(pair, no_binding), both)
+
+  # Mutant 2 -- the helper returning nothing. It empties the differing-binding
+  # fixture's expected set, and is invisible on the twin, which is already empty.
+  expect_identical(norms_audit_expected_offdiag(pair, function(entries) list()), none)
+  expect_identical(norms_audit_expected_offdiag(twin, function(entries) list()), none)
 })
 
 # Shared-key sites: the pair one message cannot tell apart (M82, RR17 BC8).
@@ -811,8 +1009,10 @@ test_that("a named-form site is matched by exact equality, not a stem (M81)", {
   expect_length(
     failures(expect_abort_at_site(raise(paste0(key, " and finite")), m)), 1L
   )
-  truncated <- substr(key, 1L, nchar(key) - 1L)
-  expect_length(failures(expect_abort_at_site(raise(truncated), m)), 1L)
+  # Hand-cut at a character count -- this is a shortened STRING, not R's
+  # truncation, which cuts at a deparsed line boundary and marks what it cut.
+  shortened <- substr(key, 1L, nchar(key) - 1L)
+  expect_length(failures(expect_abort_at_site(raise(shortened), m)), 1L)
   # An unrecognised kind is refused rather than dispatched to the loosest
   # matcher. Named with a typo, as the real incident was. Since M82 the refusal
   # is the CONSTRUCTOR's, so it fires at registry build rather than at the
@@ -830,9 +1030,49 @@ test_that("a named-form site is matched by exact equality, not a stem (M81)", {
 
   # And the substring case is the one that needed equality: the stem matcher
   # the POSITIONAL form uses accepts it, so a named site keyed through that
-  # matcher would report a truncated message as its own.
-  stem <- norms_audit_stopifnot_stem(truncated)
+  # matcher would report a shortened message as its own.
+  stem <- norms_audit_stopifnot_stem(shortened)$stem
   expect_true(nzchar(stem) && startsWith(squish(key), stem))
+})
+
+test_that("expect_abort_at_site() refuses a non-matcher (M83)", {
+  # The shape that hid M82's own call-site breakage: a stale call passing
+  # something that is not a matcher died with "attempt to apply non-function"
+  # from inside the assertion, naming neither the argument nor the site. The
+  # message must name the argument, so the reader is sent to the call rather
+  # than to the helper.
+  named <- function(msg) {
+    cl <- as.call(list(quote(stopifnot), FALSE))
+    names(cl) <- c("", msg)
+    function() eval(cl)
+  }
+  key <- "divisor must be numeric"
+
+  # A bare string is the stale-call shape.
+  expect_error(
+    expect_abort_at_site(named(key), key),
+    "`matcher` must be a norms_audit_matcher"
+  )
+  # A plain function is the dangerous one: it is callable, so without this
+  # guard it would be USED, and whatever it returned would stand in for a
+  # verdict built from a declared (kind, key).
+  expect_error(
+    expect_abort_at_site(named(key), function(msg) TRUE),
+    "`matcher` must be a norms_audit_matcher"
+  )
+  expect_error(
+    expect_abort_at_site(named(key), NULL),
+    "`matcher` must be a norms_audit_matcher"
+  )
+
+  # The control, and it passes for the claim's reason: the matcher accepts this
+  # fixture's own message, asserted here directly, rather than the assertion
+  # merely not failing.
+  m <- norms_audit_matcher("stopifnot_named", key)
+  expect_true(m(tryCatch(named(key)(), error = conditionMessage)))
+  expect_length(
+    norms_audit_expectation_failures(expect_abort_at_site(named(key), m)), 0L
+  )
 })
 
 test_that("the walk keys named conditions and refuses the rest (M81)", {
