@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** `m83-norms-audit-matcher-repair`
+- **Branch/PR:** `m83-norms-audit-matcher-repair` / https://github.com/jmgirard/circumplex/pull/111
 
 ## Goal
 
@@ -30,7 +30,7 @@ change it; a widening would change the pinned roster at
 
 ## Acceptance criteria
 
-- [ ] AC1. A fixture script carrying three `stopifnot` conditions with
+- [x] AC1. A fixture script carrying three `stopifnot` conditions with
       distinct keys, none a prefix of another's stem and no two sharing a
       binding-and-key, is parsed by the helper's own parse call; its collected
       site set is asserted equal to that of a registry built over it, so each
@@ -49,7 +49,7 @@ change it; a widening would change the pinned roster at
       computed off-diagonal cells and the three diagonal ones that carry the
       criterion. The shipped registry cannot carry the truncated entry: it is
       pinned site-for-site to `data-raw/audit-norms.R`, out of scope (M84).
-- [ ] AC2. The `stopifnot` matcher distinguishes truncated from untruncated
+- [x] AC2. The `stopifnot` matcher distinguishes truncated from untruncated
       messages: where the `....` marker is present it requires the stem to be a
       non-empty prefix of the squished key and applies no length floor; where
       absent it applies `min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR)`
@@ -58,19 +58,19 @@ change it; a widening would change the pinned roster at
       the floor AND carries the marker AND prefixes the key, and asserts
       acceptance; an untruncated one-character stem is still rejected; and the
       cross-site matrix stays green with its off-diagonal count pinned at 2.
-- [ ] AC3. No site under `tests/`, `cairn/ROADMAP.md`, or the M83/M84/M85
+- [x] AC3. No site under `tests/`, `cairn/ROADMAP.md`, or the M83/M84/M85
       milestone files states the superseded character-count truncation model.
       Procedure: `grep -rnE 'STEM_FLOOR|truncat|\.\.\.\.'` over that explicit
       path list, each hit inspected. (`cairn/milestones/archive/` and
       `cairn/reviews/archive/` are excluded — history, never edited.)
-- [ ] AC4. Denylist rule (iii) is not consulted for the third operand of `$` or
+- [x] AC4. Denylist rule (iii) is not consulted for the third operand of `$` or
       `@`, nor for the index symbol of `for`; it remains consulted everywhere
       else, assignment included. Evidence: `test-norms-audit-denylist.R`
       asserts an enumerated partition in both directions, each shape
       individually — accepted: `opts$abort`, `x@abort`, `df$stop <- 1`,
       `for (abort in x) f(1)`; denied: `for (i in abort) 1`, `abort <- 1`,
       `f(g = stopifnot)`, `lapply(x, stop)`.
-- [ ] AC5. The cross-discrimination matrix derives its expected shared-key
+- [x] AC5. The cross-discrimination matrix derives its expected shared-key
       entries by calling `norms_audit_shared_key_sites()` rather than
       re-deriving them with `outer()`. Verified by two mutants against a
       two-part fixture: dropping the helper's `binding != binding[[i]]`
@@ -78,11 +78,11 @@ change it; a widening would change the pinned roster at
       mutating the helper to `list()` reddens it when a differing-binding pair
       is registered. One mutant alone is vacuous — on a same-binding fixture
       the correct helper already returns zero entries.
-- [ ] AC6. `expect_abort_at_site()` refuses a `matcher` that is not a
+- [x] AC6. `expect_abort_at_site()` refuses a `matcher` that is not a
       `norms_audit_matcher`, naming the argument in its message. Evidence: a
       test asserting that message, and a green `devtools::test()` run over the
       existing call sites.
-- [ ] AC7. `devtools::test()` and `devtools::check(args = "--no-manual")` clean,
+- [x] AC7. `devtools::test()` and `devtools::check(args = "--no-manual")` clean,
       with `document()` warning-free per the profile's consistency gate.
 
 ## Coverage
@@ -164,3 +164,26 @@ shared-key binding SWAP" test, and the matrix is what stands behind
 discrimination there. Reopen if a shipped condition acquires a braced form.
 
 ## Review
+
+_Fresh evidence gathered 2026-08-14 on branch `m83-norms-audit-matcher-repair` at `742817d4`, PR #111. Every figure below was produced by running the code in this session, never recalled._
+
+### Acceptance-criteria evidence
+
+- **AC1.** The three-site fixture registry builds and its declared site ids are identical to those the walk collects from the parsed fixture (`TRUE`), so the hand-declared keys are the parse tree's. All three fixtures raise (no `NA` message). Measured per entry: `braced` truncated, stem 37 against an effective floor of 40; `flat` truncated, stem 62 above it; `named` untruncated, kind `stopifnot_named`. `all(diag(accepts))` holds, the off-diagonal accepting set is identical to `norms_audit_expected_offdiag()`, and its accept count is 0 over the six computed cells.
+- **AC2.** On the truncated site's own message the pre-M83 predicate (`nchar(stem) >= min(nchar(squish(key)), 40) && startsWith(...)`) returns `FALSE` and the shipped matcher returns `TRUE` — the repair measured on one message rather than argued. Untruncated behaviour unchanged: `"i is not TRUE"` rejected against key `is.data.frame(batch)`, the full stem accepted. The shipped cross-site matrix stays green with its off-diagonal count pinned at 2.
+- **AC3.** `grep -rnE 'STEM_FLOOR|truncat|\.\.\.\.'` over `tests/`, `cairn/ROADMAP.md` and the M83/M84/M85 files returns 61 hits, each inspected. Outside the norms-audit files there are five, all unrelated senses of the word (`test-cpm_fit.R:220,230` truncated DFT; `test-cpm_oracles.R:203` a truncated decimal; `test-axes-scaled-fit.R:1167` truncation of an excess; `ROADMAP.md:57` a truncated log tail). `ROADMAP.md:26` already states the first-deparsed-line model. Inside the audit files every statement is the new model; the two live restatements found at T6 were cleared.
+- **AC4.** The partition runs in both directions: 18/18 denied shapes are caught **by the rule they are meant for** (not merely by some rule), and 0 of 13 accepted shapes are flagged — including the four this milestone exempts. The shipped `data-raw/audit-norms.R` sweep returns 0 hits.
+- **AC5.** Controls: the same-binding twin yields an empty expected set, the differing-binding pair yields both ordered cells. Mutant 1 (helper without its `binding != binding[[i]]` conjunct) reddens the twin fixture and is vacuous on the pair; mutant 2 (helper returning `list()`) reddens the pair and is vacuous on the twin. Each mutant is shown vacuous on the other part, which is why one fixture cannot verify both.
+- **AC6.** `expect_abort_at_site()` refuses all three shapes by name, the message naming the argument: `` `matcher` must be a norms_audit_matcher, not "character" `` / `"function"` / `"NULL"`. The `"function"` case matters most — a callable would otherwise be used. Green over the existing call sites (full suite below).
+- **AC7.** `devtools::test()` — `FAIL 0 | WARN 6 | SKIP 3 | PASS 7169`; the 6 warnings and 3 skips are pre-existing lavaan/CRAN ones, unchanged from master. `devtools::check(args = "--no-manual")` — **0 errors, 0 warnings, 0 notes** (7m 55s). `document()` emits zero `resolve link` lines with `cli.width = 500`, and leaves `man/` and `NAMESPACE` byte-unchanged.
+
+### Consistency gate
+
+**Universal cairn-file checks.** `cairn_validate` exits 0 — all 16 PASS checks pass, including `coverage complete`, `weight caps`, `binding criteria` and `mirror agreement`; 4 advisories, of which the only WARN is `work-log format` (47 hits, every one an M7 hard-wrapped line, none in this milestone's file). No `DESIGN.md` principle changed, so `cairn_impact` is skipped.
+
+**Toolchain checks (r-package `consistency-gate` slot).** `document()` warning-free at `cli.width = 500` with zero `resolve link` lines and no diff in `man/` or `NAMESPACE`; no generated file hand-edited (the branch touches no `R/`, `src/`, `man/`, `NAMESPACE` or `DESCRIPTION`); `pkgdown::check_pkgdown()` — "No problems found"; `README.Rmd`/`README.md` untouched and unchanged from master; no NEWS entry owed (test machinery only, no user-visible change); no new top-level files, so no `.Rbuildignore` entry owed; `devtools::check(args = "--no-manual")` clean at 0/0/0.
+
+**Returns.** This is the milestone's first review; no defect returns, and one amendment return (AC1, at the implement gate before any review).
+
+### Independent review
+
