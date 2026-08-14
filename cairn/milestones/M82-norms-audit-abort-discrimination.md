@@ -139,10 +139,10 @@ Runtime-resolved abort names, and `data/` → not here.
 - [x] T6 Derive the pair set and fixture roster from one structure, assert
       set-equality, add the calling-handler capture with its non-empty and
       innermost-binding assertions, cross-point one fixture to verify.
-- [ ] T7 Matcher construction at registry-build time with the 15-character
+- [x] T7 Matcher construction at registry-build time with the 15-character
       `stop` floor; the match-time stem floor; one shared locale pin; a probe
       per floor.
-- [ ] T8 Cross-discrimination matrix: captured messages × registry matchers.
+- [x] T8 Cross-discrimination matrix: captured messages × registry matchers.
 - [ ] T9 Gate floor: M81's five mutations with named tests among the failures,
       full `test()` and `check()`, audit re-run compared (ledger stamp-only,
       coverage byte-identical).
@@ -176,6 +176,8 @@ Runtime-resolved abort names, and `data/` → not here.
 - 2026-08-14: T7-T8 written, NOT checked off pending the verify run that covers both (one run, both tasks -- recorded rather than claimed per task). Markers file in isolation FAIL 0 | WARN 0 | PASS 142. T7 moves every discrimination check into `norms_audit_matcher()`, called from the registry builder: the 15-literal-character `stop` floor fails the BUILD (`{}` placeholders excluded, matching anything and so not discrimination), the stem floor is checked at match time because a stem exists only once a message is raised, `expect_abort_at_site()` consumes a prebuilt matcher, the locale pin moved to one shared `norms_audit_with_c_messages()` the matrix also uses, and the unknown-kind refusal moved to the constructor. The degenerate-stem probe also asserts the OLD rule accepted `"i"` against `is.data.frame(batch)`, so it is evidence about the floor and not about the prefix test. T8's matrix asserts the off-diagonal accepting set equals the registry-derived shared-key pairs, with a full-TRUE diagonal (without which a matcher accepting nothing would satisfy the equality) and the count pinned at 2.
 
 - 2026-08-14: T7's signature change broke six tests in two files the per-file run could not see, and the full suite caught it: `expect_abort_at_site()` takes a prebuilt matcher, and `test-norms-audit-batch.R` (7 calls) and `test-norms-audit-compare.R` (10) still passed `(kind, key)` positionally, erroring `could not find function "matcher"`. The helper's own header comment named `test-norms-audit-markers.R` and `test-norms-audit-roster.R` as its consumers while four files used it -- so every file the comment listed was green and the two it omitted were red. All 17 call sites now build a matcher explicitly, which keeps AC4's "consumes prebuilt matchers" true as written rather than softening it by letting the assertion construct one; the header comment is corrected and now says to re-derive the list by grep. This is the LESSONS "enumeration with no owner" family, fourth instance in this repo and the first inside a test helper -- a candidate for a LESSONS line at review.
+
+- 2026-08-14: T7-T8 done. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7107 (7069 at branch point; the 6 warnings are the same pre-existing lavaan ones, none in a touched file).
 
 ## Decisions
 
