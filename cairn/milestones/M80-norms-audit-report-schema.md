@@ -28,7 +28,7 @@ the same emitters. Changing any value in `data/` → not here.
 
 ## Acceptance criteria
 
-- [ ] AC1 Every coverage row carries a machine-readable key: `field` holds a
+- [x] AC1 Every coverage row carries a machine-readable key: `field` holds a
       bare field name and any sample label rides in its own `sample` column
       rather than being pasted into `field` (`:406`, `:414`). A header comment
       states the cell contents for each `side`, including the four that carry
@@ -38,12 +38,12 @@ the same emitters. Changing any value in `data/` → not here.
       today. Coverage rows and ledger rows are disjoint by construction, a
       missing-key coverage row having no ledger counterpart, so what is
       required is a joinable key and not a join.
-- [ ] AC2 The coverage report's `instrument` column holds a shipped instrument
+- [x] AC2 The coverage report's `instrument` column holds a shipped instrument
       name, and `NA` only where no batch row identifies one
       (`note-block-not-audited`); a `note-sample-not-audited` row carries the
       claiming instrument from `blocks[[bkey]]$instrument`. Citekey and block
       tag ride in their own columns rather than inside `instrument` (`:448`).
-- [ ] AC3 A `note-only` coverage row appears once per citekey, block, and the
+- [x] AC3 A `note-only` coverage row appears once per citekey, block, and the
       row's own payload — the note row's `sample`, `scale`, `value` and
       `anchor` cells, the key being taken from the note row rather than from
       the report, whose ten columns do not include `anchor` — not once per
@@ -57,22 +57,22 @@ the same emitters. Changing any value in `data/` → not here.
       Every note-only row in the repo carries `sample = "—"` in the note, so a
       key including `sample` but not the payload collapses those 14 to the 9
       blocks that carry them (measured 2026-08-13 over the committed notes).
-- [ ] AC4 `validate_batch()` refuses a `divisor` that is missing,
+- [x] AC4 `validate_batch()` refuses a `divisor` that is missing,
       non-numeric, `NA`, non-finite, or not strictly positive, each shape with
       its own test asserting the specific message.
-- [ ] AC5 `values_agree()` compares `Items` after normalising both sides
+- [x] AC5 `values_agree()` compares `Items` after normalising both sides
       through `normalise_items()` — today only the shipped side is normalised
       (`:294` against the fall-through at `:336`) — and `normalise_items()`
       aborts on a cell that is not a comma-separated list of integers rather
       than coercing it to the string `"NA"`. A test asserts two unparseable
       cells do not compare equal, which without the abort they would.
-- [ ] AC6 Instrument-level note rows (`sample` = the NO_SAMPLE token) in a
+- [x] AC6 Instrument-level note rows (`sample` = the NO_SAMPLE token) in a
       block that no `scales = TRUE` batch pass reads are reported as
       non-exempt coverage rather than discarded at `:375-377`. Rows in a block
       whose instrument does have a `scales = TRUE` pass are covered by that
       pass and produce no additional row. A fixture supplies the uncovered
       case; no note in the repo has one today.
-- [ ] AC7 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
+- [x] AC7 `devtools::test()` and `devtools::check(args = "--no-manual")` clean;
       `data-raw/norms-audit-coverage.csv` is regenerated and committed with the
       run that produces it, and the ledger CSV is unchanged but for its stamps.
 
@@ -148,6 +148,46 @@ the same emitters. Changing any value in `data/` → not here.
   authored none of it, and the mini gate.
 
 ## Review
+
+### Round 3 (2026-08-13)
+
+**Evidence gathered this round** (fresh, by command, at `2b0d8514`):
+
+- AC1 — the run's coverage frame has exactly the ten declared columns,
+  `identical(names(cov), COVERAGE_COLUMNS)` TRUE. The header comment's per-side
+  table and the side literals reaching `coverage_rows()` are the same set of 8,
+  compared by extraction rather than by eye. Zero `field` cells carrying a
+  pasted sample over the 15-row run.
+- AC2 — zero `instrument` cells carrying a paren; every non-NA `instrument` is
+  an instrument the batch ships, and no cell holds a citekey.
+- AC3 — the run emits 14 note-only rows, distinct on (citekey, tag, label,
+  detail), spanning 9 blocks. Each of the four key cells is fenced by its own
+  fixture and the within-pass half by a fifth: dropping `sample`, `scale`,
+  `value` or `anchor` from the key reddens 3 assertions apiece, and dropping
+  `!duplicated(key)` reddens 2.
+- AC4 — deleting the strictly-positive guard reddens 5 assertions across the
+  batch test and M81's abort registry.
+- AC5 — every shape named in rounds 1 and 2 is now refused:
+  `normalise_items()` aborts on `"1.5, 9"`, `"0x10, 9"`, `"1e2, 9"`, `"+1, 9"`,
+  `"-9, 1"` and `"99999999999"`, while `"1,  9, 17"` still normalises to
+  `"1, 9, 17"` and `values_agree("Items", "1, 9, 17", "1,9,17", 1)` is TRUE, so
+  the source side is normalised. Deleting the shape half reddens 6 assertions
+  and the coercion half 2 — neither is redundant with the other.
+- AC6 — disabling the `!isTRUE(blk$scales)` sweep reddens 3 assertions.
+- AC7 — `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7026;
+  `devtools::check(args = "--no-manual")` Status OK, 0/0/0, 8m 45s (needed
+  M81's uncommitted `FLIBS=` workaround; machine setup, not this branch). The
+  audit re-run at this gate reproduced the committed ledger identically bar its
+  three stamp columns, and left the coverage CSV byte-unchanged.
+
+**Consistency gate.** `cairn_validate` exit 0, every CHECK PASS (47
+work-log-format advisories, all M7's). `document()` no diff and zero
+`resolve link` warnings, after reverting a `Config/roxygen2/version` bump it
+wanted (outside Scope, as at M81 and round 1). `pkgdown::check_pkgdown()` no
+problems. No new top-level file, so no `.Rbuildignore` change. No NEWS entry:
+`data-raw/` and `tests/` are not installed. `cairn_impact` skipped, no
+principle changed.
+
 
 ### Round 2 (2026-08-13) — returned to `in-progress`
 
