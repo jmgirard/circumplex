@@ -262,8 +262,9 @@ squish <- function(x) trimws(gsub("[[:space:]]+", " ", x))
 #
 # The two forms key differently because they FAIL differently, and the kind is
 # what tells the matcher which is which (AC7). A positional condition has no
-# message of its own, so R deparses it into one and truncates it; the key is
-# that deparsed text, matched as a stem. A NAMED condition's name IS the
+# message of its own, so R deparses it into one and, where that deparse runs to
+# more than one line, keeps the first line and marks it; the key is the whole
+# deparsed text, matched as a stem. A NAMED condition's name IS the
 # runtime message, verbatim and untruncated, so its key is the name and the
 # match is string equality.
 #

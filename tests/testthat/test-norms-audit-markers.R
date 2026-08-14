@@ -741,6 +741,90 @@ test_that("a truncated stem carries no floor, and that is a BOUND (M83)", {
   )
 })
 
+# The whole pipeline over a truncated site (M83, AC1).
+#
+# The shipped registry cannot carry one: it is pinned site-for-site to
+# data-raw/audit-norms.R, which M83 leaves alone (M84 adds sites there). So the
+# same machinery runs over a fixture SCRIPT instead -- parsed for its keys,
+# evaluated for its messages, one text behind both.
+#
+# Three sites, because one would make the off-diagonal a 1x1 cell and the
+# comparison vacuous, and because the domain is free in more than one axis: the
+# braced condition truncates BELOW the removed floor, the flat one truncates
+# ABOVE it, and the named one never truncates at all, so the marker branch is
+# shown unreachable for that kind. Their keys are hand-declared, as the shipped
+# registry's are -- deriving them from the walk would make the identity
+# assertion below true of any implementation whatsoever.
+
+FIXTURE_SCRIPT <- c(
+  "braced <- function() {",
+  "  stopifnot(all(vapply(list(1, 2), function(el) {",
+  "    is.numeric(el) && length(el) == 1L",
+  "  }, logical(1))) && FALSE)",
+  "}",
+  "flat <- function() {",
+  '  stopifnot(nchar("alpha") > 0 && nchar("bravo") > 0 &&',
+  '    nchar("charlie") > 0 && nchar("delta") > 0 && FALSE)',
+  "}",
+  "named <- function() {",
+  '  stopifnot("a named condition that is its own message" = FALSE)',
+  "}"
+)
+
+test_that("the pipeline accepts a truncated site end to end (M83)", {
+  fx <- fixture_script(FIXTURE_SCRIPT)
+  reg <- norms_audit_build_registry(list(
+    site("stopifnot", "braced",
+         paste0("all(vapply(list(1, 2), function(el) { is.numeric(el) && ",
+                "length(el) == 1L }, logical(1))) && FALSE"),
+         function(env) env$braced()),
+    site("stopifnot", "flat",
+         paste0('nchar("alpha") > 0 && nchar("bravo") > 0 && ',
+                'nchar("charlie") > 0 && nchar("delta") > 0 && FALSE'),
+         function(env) env$flat()),
+    site("stopifnot_named", "named",
+         "a named condition that is its own message",
+         function(env) env$named())
+  ))
+  # Declared above, bound here: this is what keeps the keys the parse tree's
+  # rather than the author's.
+  expect_identical(norms_audit_site_ids(reg),
+                   norms_audit_site_ids(norms_audit_abort_sites(fx$exprs)))
+
+  mx <- norms_audit_acceptance_matrix(reg, fx$env)
+  expect_false(anyNA(mx$msgs))
+  got <- lapply(mx$msgs, norms_audit_stopifnot_stem)
+  keys <- vapply(reg, function(e) squish(e$key), character(1))
+
+  # The three axes, asserted rather than assumed -- R's deparse width is R's,
+  # and on an R that broke lines elsewhere these would quietly stop being the
+  # cases they are named for.
+  expect_true(got[[1L]]$truncated)
+  expect_lt(nchar(got[[1L]]$stem),
+            min(nchar(keys[[1L]]), NORMS_AUDIT_STEM_FLOOR))
+  expect_true(got[[2L]]$truncated)
+  expect_gt(nchar(got[[2L]]$stem), NORMS_AUDIT_STEM_FLOOR)
+  expect_false(got[[3L]]$truncated)
+
+  # No entry's stem prefixes another's key, so the empty off-diagonal below is
+  # empty for a reason rather than by luck.
+  for (i in seq_len(3L)) {
+    for (j in seq_len(3L)) {
+      if (i != j) {
+        expect_false(startsWith(keys[[i]], got[[j]]$stem),
+                     info = paste(i, j))
+      }
+    }
+  }
+
+  # Every site matches its own message -- entry 1 is the one an unfixed matcher
+  # rejected -- and none matches another's.
+  expect_true(all(diag(mx$accepts)))
+  offdiag <- !diag(TRUE, 3L)
+  expect_identical(mx$accepts & offdiag, norms_audit_expected_offdiag(reg))
+  expect_identical(sum(mx$accepts & offdiag), 0L)
+})
+
 test_that("no matcher accepts a message from another site (M82)", {
   env <- marker_defs()
   mx <- norms_audit_acceptance_matrix(SCRIPT_ABORTS, env)
@@ -904,8 +988,10 @@ test_that("a named-form site is matched by exact equality, not a stem (M81)", {
   expect_length(
     failures(expect_abort_at_site(raise(paste0(key, " and finite")), m)), 1L
   )
-  truncated <- substr(key, 1L, nchar(key) - 1L)
-  expect_length(failures(expect_abort_at_site(raise(truncated), m)), 1L)
+  # Hand-cut at a character count -- this is a shortened STRING, not R's
+  # truncation, which cuts at a deparsed line boundary and marks what it cut.
+  shortened <- substr(key, 1L, nchar(key) - 1L)
+  expect_length(failures(expect_abort_at_site(raise(shortened), m)), 1L)
   # An unrecognised kind is refused rather than dispatched to the loosest
   # matcher. Named with a typo, as the real incident was. Since M82 the refusal
   # is the CONSTRUCTOR's, so it fires at registry build rather than at the
@@ -923,8 +1009,8 @@ test_that("a named-form site is matched by exact equality, not a stem (M81)", {
 
   # And the substring case is the one that needed equality: the stem matcher
   # the POSITIONAL form uses accepts it, so a named site keyed through that
-  # matcher would report a truncated message as its own.
-  stem <- norms_audit_stopifnot_stem(truncated)$stem
+  # matcher would report a shortened message as its own.
+  stem <- norms_audit_stopifnot_stem(shortened)$stem
   expect_true(nzchar(stem) && startsWith(squish(key), stem))
 })
 

@@ -116,7 +116,7 @@ change it; a widening would change the pinned roster at
       `expect_false(ml("condition ...."))` flips under T4, and `:674`'s
       `substr(long, 1L, 66L)` fixture encodes a truncation R does not perform —
       and the constants comment at `helper-norms-audit-script.R:537-542`.
-- [ ] T6. Add AC1's three-site fixture script and the registry over it, and
+- [x] T6. Add AC1's three-site fixture script and the registry over it, and
       assert T2's matrix procedure over that registry; run AC3's restatement
       grep and clear each hit.
 - [ ] T7. Full check; update NEWS only if user-visible (expected: not).
@@ -135,6 +135,7 @@ change it; a widening would change the pinned roster at
 - 2026-08-14: T2 done — the acceptance matrix and its expected off-diagonal moved into `norms_audit_acceptance_matrix()` / `norms_audit_expected_offdiag()` in the helper; membership now comes from `norms_audit_shared_key_sites()` alone, with `shared_fn` injectable so AC5's two mutants run without editing source. Both mutants verified against the two-part fixture, and each shown vacuous on the other part. Suite green (FAIL 0, PASS 7136).
 - 2026-08-14: T3 done — rule (iii) now skips `$`/`@` operand 3 and `for` operand 2 via `NON_VALUE_OPERANDS`; the four shapes it used to flag (`opts$abort`, `x@abort`, `df$stop <- 1`, `for (abort in x) f(1)`) were measured red against the partition before the fix and are green after, while `for (i in abort) 1` and `abort <- 1` stay denied by (iii). Suite green (FAIL 0, PASS 7146).
 - 2026-08-14: T4 and T5 done, committed together because T4's matcher change is what creates T5's fallout and a commit carrying only one of them would be red — `norms_audit_stopifnot_stem()` now returns `list(stem, truncated)`, the matcher applies the floor only where R did not truncate, and both readers of the old contract were updated. The retired `substr(long, 1L, 66L)` fixture, a truncation R does not perform, is replaced by a fixture script whose key comes from the parse tree and whose message comes from R. Suite green (FAIL 0, PASS 7153).
+- 2026-08-14: T6 done — a three-site fixture script (braced condition truncating below the removed floor, flat condition truncating above it, named condition that never truncates) with a hand-declared registry bound to it by site-id equality; the matrix procedure over it has a full diagonal and an empty off-diagonal, with no stem prefixing another key. AC3's grep run over `tests/`, `cairn/ROADMAP.md` and the M83/M84/M85 files: hits in `test-cpm_fit.R`, `test-cpm_oracles.R`, `test-axes-scaled-fit.R` and `ROADMAP.md:57` are unrelated senses of "truncate"; `ROADMAP.md:26` already states the first-deparsed-line model; two live restatements cleared — the walk's keying comment and a `truncated <- substr(key, ...)` variable that echoed the character-count model, renamed `shortened`. Suite green (FAIL 0, PASS 7169).
 ## Decisions
 
 ### 2026-08-14: AC2's no-floor-when-truncated rule keeps a measured residual leak, pinned rather than closed
