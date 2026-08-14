@@ -166,3 +166,5 @@ Three fresh-context lenses over `master..HEAD`, then a fresh scorer that generat
 - F9 (15) — `norms_object()` is a top-level test helper where siblings live in the helper file.
 
 **Return floor.** No actioned finding demonstrates an acceptance criterion failing, and none scored ≥90, so the milestone does not return to `in-progress`. F1 was fixed in place under the ordinary triage.
+
+**Re-verified after the F1 fix.** `devtools::test()`: FAIL 0 | WARN 6 | SKIP 3 | PASS 7217 (one assertion more than the pre-fix run, the new NA-name case). `devtools::check(args = "--no-manual")`: Status: OK. `cairn_validate`: all checks passed. The AC7 evidence above records the pre-fix run; both runs are clean and this is the one the merge is made on.
