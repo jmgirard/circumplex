@@ -23,8 +23,18 @@
 # keying rules cannot predict raises rather than being passed over, because a
 # site silently skipped is the false coverage this whole mechanism replaced.
 #
-# Used by test-norms-audit-markers.R (the abort registry) and by
-# test-norms-audit-roster.R (the single-sourcing assertion).
+# Consumers, as of M82: test-norms-audit-markers.R (the abort registry),
+# test-norms-audit-roster.R (the single-sourcing assertion),
+# test-norms-audit-denylist.R (the denied-spelling sweep), and
+# test-norms-audit-batch.R and test-norms-audit-compare.R, which between them
+# hold 17 `expect_abort_at_site()` calls.
+#
+# That list is an enumeration with no owner, so it goes stale silently: it named
+# two files while four used the helper, and M82's signature change was green in
+# every file this comment mentioned and broke six tests in the two it did not
+# (measured 2026-08-14). Re-derive it before trusting it --
+# `grep -rn expect_abort_at_site tests/testthat` -- rather than reading it as a
+# guarantee.
 
 norms_audit_script_path <- function() {
   script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
