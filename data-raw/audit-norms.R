@@ -131,6 +131,31 @@ validate_batch <- function(batch) {
   invisible(TRUE)
 }
 
+# `roster` states which shipped (instrument, sample) pairs the run must cover,
+# and the sweep at the end of audit_norms() reports as a gap every pair the
+# roster holds that the batch does not name. So the roster is the only thing
+# standing between an unaudited sample and a clean count: one that is empty, or
+# whose columns are spelt `Instrument`/`Sample`, reports NO gaps and the run
+# reads clean over data nothing read -- the silent shape the sweep exists to
+# remove, reintroduced through the argument that lets a fixture state its own
+# roster. Measured 2026-08-14 before this guard: a one-instrument slice of
+# AUDIT_BATCH with a capitalised-column roster reported 0 gaps, against 23 with
+# the shipped one.
+#
+# audit_norms() resolves its NULL default before calling this, so the default
+# sweep is what gets checked and a caller who passes nothing is never refused
+# for passing nothing.
+validate_roster <- function(roster) {
+  stopifnot(is.data.frame(roster),
+            all(c("instrument", "sample") %in% names(roster)))
+  if (!nrow(roster)) {
+    stop("`roster` names no (instrument, sample) pair to cover, so every ",
+         "unaudited shipped sample would be reported as covered",
+         call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
 NOT_PUBLISHED <- "not-published-in-source"
 
 # A source note may also table a norm sample the source publishes and the
@@ -479,23 +504,78 @@ values_agree <- function(field, shipped, source, divisor) {
 # an instrument the batch omits is never reached at all.
 #
 # The instrument enumeration is the package's own (circumplex:::instrument_names),
-# not a copy, so the roster cannot drift from `data/`. `objects` overrides it:
-# a fixture batch drives synthetic instruments and must be swept against those,
-# not against the shipped roster.
-shipped_roster <- function(objects = NULL) {
+# not a copy, so the roster cannot drift from `data/`.
+#
+# shipped_roster() takes NO arguments (M84). It used to accept an `objects`
+# list that overrode the enumeration, which is how `roster = shipped_roster(
+# objects)` came to be spellable: that call re-fused the roster to the object
+# list the caller was ALSO passing as a value override, reproducing the very
+# narrowing M79 split the two arguments to end. The derivation lives in
+# roster_from_objects() below, which fixtures call by its own name; the fusion
+# is no longer a thing anyone can write by accident.
+shipped_roster <- function() {
   ns <- asNamespace("circumplex")
-  if (length(objects)) {
-    nms <- names(objects)
-    fetch <- function(nm) objects[[nm]]
-  } else {
-    nms <- get("instrument_names", envir = ns)()
-    fetch <- function(nm) get(nm, envir = ns)
+  nms <- get("instrument_names", envir = ns)()
+  objects <- lapply(nms, function(nm) get(nm, envir = ns))
+  names(objects) <- nms
+  roster_from_objects(objects)
+}
+
+# The roster over an explicit, NAMED list of instrument objects.
+#
+# Every refusal here is a norms table the builder cannot roster, and each was a
+# silent or unnamed failure before M84: the roster is what says which shipped
+# (instrument, sample) pairs the audit must cover, so a pair this loop drops is
+# a pair nothing will ever report. Measured 2026-08-14 against the pre-M84
+# builder, all four:
+#
+#   - a non-data-frame `Norms[[1]]` raised R's "invalid argument type" from the
+#     `!nrow(norms)` guard, naming neither the instrument nor the fault;
+#   - a row-carrying table with no `Sample` column raised "arguments imply
+#     differing number of rows: 1, 0" from data.frame(), same;
+#   - `Sample = c(1, NA)` returned ONE row -- sort() drops NA, so the sample was
+#     neither rostered nor reported, the silent shape;
+#   - `Sample = c(NA, NA)` raised the differing-number-of-rows message, which is
+#     the SECOND shape's message: without a named guard the two are
+#     indistinguishable to whoever reads the failure;
+#   - an unnamed `objects` list returned a zero-row roster, which covers nothing
+#     and reports every unaudited sample as covered.
+#
+# A zero-row `Norms[[1]]` is NOT one of them and is skipped as it always was:
+# an instrument shipping no norms has nothing to audit and is not a gap.
+roster_from_objects <- function(objects) {
+  nms <- names(objects)
+  # `nzchar(NA_character_)` is TRUE, so an NA name clears a bare nzchar() test
+  # and then `objects[[NA_character_]]` returns NULL rather than raising -- the
+  # loop skips it as a no-norms instrument and the builder returns the very
+  # zero-row roster this guard exists to refuse (measured 2026-08-14, M84
+  # review F1). `setNames(list(obj), lookup)` with a lookup that missed is how
+  # a caller reaches it.
+  if (length(objects) && (is.null(nms) || !all(!is.na(nms) & nzchar(nms)))) {
+    stop("every entry of `objects` must be named for the instrument it ",
+         "carries; an unnamed list rosters nothing at all", call. = FALSE)
   }
   out <- list()
   for (nm in nms) {
-    norms <- fetch(nm)$Norms[[1]]
-    # An instrument shipping no norms has nothing to audit and is not a gap.
-    if (is.null(norms) || !nrow(norms)) next
+    norms <- objects[[nm]]$Norms[[1]]
+    # NULL[[1]] is NULL rather than an error in R, which is what lets the
+    # no-norms case be tested before the table's shape is (M79).
+    if (is.null(norms)) next
+    if (!is.data.frame(norms)) {
+      stop("norms table for ", nm, " is not a data frame but a ",
+           class(norms)[[1L]], call. = FALSE)
+    }
+    if (!nrow(norms)) next
+    if (!"Sample" %in% names(norms)) {
+      stop("norms table for ", nm, " has no `Sample` column; it has: ",
+           paste(names(norms), collapse = ", "), call. = FALSE)
+    }
+    if (anyNA(norms$Sample)) {
+      stop("norms table for ", nm, " leaves `Sample` missing in ",
+           sum(is.na(norms$Sample)), " of ", nrow(norms), " rows, and a ",
+           "missing sample is dropped from the roster rather than covered",
+           call. = FALSE)
+    }
     out[[length(out) + 1L]] <- data.frame(
       instrument = nm, sample = as.character(sort(unique(norms$Sample))),
       stringsAsFactors = FALSE
@@ -629,7 +709,10 @@ audit_norms <- function(batch = AUDIT_BATCH,
                         objects = NULL,
                         roster = NULL) {
   if (is.null(roster)) roster <- shipped_roster()
+  # After validate_batch(), not before: a caller who got both arguments wrong
+  # should meet the batch's message, which names the column it is missing.
   validate_batch(batch)
+  validate_roster(roster)
   refuse_shared_untagged_blocks(batch, dir)
   ledger <- list()
   coverage <- list()

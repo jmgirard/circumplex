@@ -166,7 +166,7 @@ test_that("two passes over one note do not duplicate its note-only row (M80)", {
   )))
   res <- env$audit_norms(cov_batch(c("one", "one"), c(TRUE, FALSE)), dir = dir,
                          objects = objects,
-                         roster = env$shipped_roster(objects))
+                         roster = env$roster_from_objects(objects))
   only <- res$coverage[res$coverage$side == "note-only-sample", , drop = FALSE]
   expect_identical(nrow(only), 1L)
   expect_identical(only$label, "a further sample")
@@ -217,7 +217,7 @@ test_that("two note-only rows differing in one key cell stay two (M80)", {
     )))
     res <- env$audit_norms(cov_batch(c("one", "one"), c(TRUE, FALSE)),
                            dir = dir, objects = objects,
-                           roster = env$shipped_roster(objects))
+                           roster = env$roster_from_objects(objects))
     only <- res$coverage[res$coverage$side == "note-only-sample", , drop = FALSE]
     # Two rows, and both from ONE pass over the block rather than one row per
     # pass: the count alone cannot tell those apart, so assert the payloads. The
@@ -238,7 +238,7 @@ test_that("two note-only rows differing in one key cell stay two (M80)", {
   )))
   res <- env$audit_norms(cov_batch(c("one", "one"), c(TRUE, FALSE)), dir = dir,
                          objects = objects,
-                         roster = env$shipped_roster(objects))
+                         roster = env$roster_from_objects(objects))
   only <- res$coverage[res$coverage$side == "note-only-sample", , drop = FALSE]
   expect_identical(nrow(only), 1L)
   expect_identical(only$label, "replication sample")
@@ -260,7 +260,7 @@ test_that("a value missing from either side names its field and sample (M80)", {
   bat <- data.frame(instrument = "fx", sample = 1, citekey = "k", divisor = 1,
                     scales = TRUE, stringsAsFactors = FALSE)
   cov <- env$audit_norms(bat, dir = dir, objects = objects,
-                         roster = env$shipped_roster(objects))$coverage
+                         roster = env$roster_from_objects(objects))$coverage
 
   miss_note <- cov[cov$side == "shipped-value-not-in-note", , drop = FALSE]
   miss_ship <- cov[cov$side == "note-value-not-shipped", , drop = FALSE]
@@ -311,7 +311,7 @@ test_that("a block whose instrument-level rows no pass reads is reported (M80)",
   ))
   res <- env$audit_norms(cov_batch(c("a", "b"), c(FALSE, TRUE)), dir = dir,
                          objects = objects,
-                         roster = env$shipped_roster(objects))
+                         roster = env$roster_from_objects(objects))
   gaps <- res$coverage[!res$coverage$exempt, , drop = FALSE]
   hit <- gaps[gaps$side == "note-instrument-row-not-audited", , drop = FALSE]
 

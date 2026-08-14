@@ -265,7 +265,7 @@ test_that("an untagged note read by two instruments is refused (M79)", {
   # against a batch rejected for any of validate_batch()'s other reasons.
   expect_error(
     env$audit_norms(shared_batch(), dir = dir, objects = shared_objects(),
-                    roster = env$shipped_roster(shared_objects())),
+                    roster = env$roster_from_objects(shared_objects())),
     "shared carries an untagged audit-values block but is read by 2 .*fx, fy"
   )
 })
@@ -278,7 +278,7 @@ test_that("a note read by one instrument still parses (M79)", {
 
   res <- env$audit_norms(shared_batch()[1, , drop = FALSE], dir = dir,
                          objects = list(fx = two_scale_object()),
-                         roster = env$shipped_roster(list(fx = two_scale_object())))
+                         roster = env$roster_from_objects(list(fx = two_scale_object())))
   expect_identical(sum(res$ledger$kind == "mismatch"), 0L)
 })
 
@@ -290,7 +290,7 @@ test_that("a tagged note read by two instruments still parses (M79)", {
              file.path(dir, "shared.md"))
 
   res <- env$audit_norms(shared_batch(), dir = dir, objects = shared_objects(),
-                         roster = env$shipped_roster(shared_objects()))
+                         roster = env$roster_from_objects(shared_objects()))
   expect_identical(sum(res$ledger$kind == "mismatch"), 0L)
   # And the pass compared something: 2 scales x (M, SD) + 4 record fields +
   # 2 scales x (Angle, Items) = 12 rows per instrument, both scales-bearing.
@@ -402,6 +402,60 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
          b <- shared_batch()
          b$divisor <- c(1, 0)
          env$validate_batch(b)
+       }),
+  # validate_roster() (M84). The roster is the only thing standing between an
+  # unaudited sample and a clean count, so each shape it refuses is a run that
+  # would otherwise have read clean over data nothing audited. Same fixture
+  # discipline as the batch entries above: each is well-formed in every respect
+  # but the one it names, so no sibling condition can abort in its place.
+  site("stopifnot", "validate_roster", "is.data.frame(roster)", function(env) {
+    env$validate_roster(list(instrument = "fx", sample = "1"))
+  }),
+  site("stopifnot", "validate_roster",
+       'all(c("instrument", "sample") %in% names(roster))',
+       function(env) {
+         env$validate_roster(data.frame(Instrument = "fx", Sample = "1",
+                                        stringsAsFactors = FALSE))
+       }),
+  site("stop", "validate_roster",
+       paste0("`roster` names no (instrument, sample) pair to cover, so every ",
+              "unaudited shipped sample would be reported as covered"),
+       function(env) {
+         env$validate_roster(data.frame(instrument = character(0),
+                                        sample = character(0),
+                                        stringsAsFactors = FALSE))
+       }),
+  # roster_from_objects() (M84). Each fixture carries ONE malformed norms
+  # table and is well-formed in every other respect, so the guard it is named
+  # for is the only one it can reach: the non-frame case never reaches the
+  # column check, the column case carries a row so it is not skipped, and the
+  # NA case carries the column the check before it looks for.
+  site("stop", "roster_from_objects",
+       "norms table for {} is not a data frame but a {}", function(env) {
+         env$roster_from_objects(list(fx = list(Norms = list(list(Sample = 1)))))
+       }),
+  site("stop", "roster_from_objects",
+       "norms table for {} has no `Sample` column; it has: {}", function(env) {
+         env$roster_from_objects(list(fx = list(Norms = list(
+           data.frame(Scale = "PA", M = 1, stringsAsFactors = FALSE)))))
+       }),
+  site("stop", "roster_from_objects",
+       paste0("norms table for {} leaves `Sample` missing in {} of {} rows, ",
+              "and a missing sample is dropped from the roster rather than ",
+              "covered"),
+       function(env) {
+         env$roster_from_objects(list(fx = list(Norms = list(
+           data.frame(Sample = c(1, NA), Scale = "PA", M = 1,
+                      stringsAsFactors = FALSE)))))
+       }),
+  site("stop", "roster_from_objects",
+       paste0("every entry of `objects` must be named for the instrument it ",
+              "carries; an unnamed list rosters nothing at all"),
+       function(env) {
+         # The norms table is well-formed; only the list's names are missing.
+         env$roster_from_objects(list(list(Norms = list(
+           data.frame(Sample = 1, Scale = "PA", M = 1,
+                      stringsAsFactors = FALSE)))))
        }),
   # normalise_items() (M80): an unparseable item key aborts rather than
   # coercing to the string "NA", which two unparseable cells shared.
