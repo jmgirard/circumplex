@@ -1,11 +1,11 @@
 # M82: Make the norms-audit abort registry discriminating
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M81
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m82-norms-audit-abort-discrimination`
 
 ## Goal
 
@@ -155,6 +155,9 @@ per BC10. Runtime-resolved abort names, and `data/` → not here.
 - 2026-08-14: plan gate chose to widen BC6's rules (ii)/(iii) to the four denied spellings over keeping RR17's `ABORT_HEADS`-only wording, because the narrower form leaves `fail <- abort` and `do.call("cli_abort", …)` undetected for one vector's cost; falsified by the wider rule flagging a legitimate shape in this script or a successor.
 - 2026-08-14: plan gate chose test-side-only scope over folding in the `shipped_roster()` robustness row, because that row's promotion condition is unmet and folding it would break the byte-unchanged-script Scope Out; falsified by a shipped instrument reaching one of the five silent paths.
 - 2026-08-14: `Driving RR` left `—` for M81's reason, re-verified today — RR17's `- BC<n> \`[tag]\` **Label.**` bullets do not match cairn_validate's `_BC_HEAD`, so all three of its Binding criteria sections parse to zero items and naming RR17 in the slot would fail the check LOUD. BC6–BC11 are ingested by substance with their ids cited on each criterion instead.
+
+- 2026-08-14: in-progress on `m82-norms-audit-abort-discrimination`, cut from master at 23f469f9.
+- 2026-08-14: T1 written (denylist sweep + partition). Checkpoint only, T1 NOT checked off: the full `devtools::test()` verify run is still in flight, so nothing here claims a clean suite. The partition caught one defect in its own rule (iii), which reached the `stopifnot` symbol inside `base::stopifnot(x)`'s own head and reported a shipped call as an alias (measured 2026-08-14, "(iii) base::stopifnot"); `::`/`:::` calls are now exempt from (iii) and `fail <- base::stop` is unaffected. `test_file()` on the new file alone: FAIL 0 | WARN 0 | PASS 43.
 
 ## Decisions
 

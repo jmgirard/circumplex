@@ -13,7 +13,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M79 | Bind the norms audit's batch to the shipped roster | done | — | normal | milestones/archive/M79-norms-audit-roster-binding.md |
 | M81 | Enumerate the norms-audit abort registry from the script's parse tree | done | M79 | normal | milestones/archive/M81-norms-audit-abort-registry.md |
 | M80 | Give the norms-audit coverage report a machine-readable key | done | M79, M81 | normal | milestones/archive/M80-norms-audit-report-schema.md |
-| M82 | Make the norms-audit abort registry discriminating | planned | M81 | normal | milestones/M82-norms-audit-abort-discrimination.md |
+| M82 | Make the norms-audit abort registry discriminating | in-progress | M81 | normal | milestones/M82-norms-audit-abort-discrimination.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 | M77 | Say precisely what the shipped reference statistics are | done | M76 | normal | milestones/archive/M77-norms-fitness-docs.md |
 

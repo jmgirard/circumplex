@@ -32,8 +32,23 @@ norms_audit_script_path <- function() {
   script
 }
 
+# The one parse call every walk here goes through. Fixtures written to a file
+# and parsed by this function travel the shipped path rather than a lookalike,
+# which matters for anything a parse can DROP: `keep.source = FALSE` discards
+# comments, so a comment fixture built as a quoted expression is not a fixture
+# at all -- it is an empty expression list, and asserting the sweep ignores it
+# would pass against any implementation whatsoever (M82 plan gate).
+norms_audit_parse <- function(path) parse(file = path, keep.source = FALSE)
+
 norms_audit_script_exprs <- function() {
-  parse(file = norms_audit_script_path(), keep.source = FALSE)
+  norms_audit_parse(norms_audit_script_path())
+}
+
+# Parse a fixture written as SOURCE TEXT, through the same call as the script.
+norms_audit_parse_text <- function(lines) {
+  path <- tempfile("m82-fixture-", fileext = ".R")
+  writeLines(lines, path)
+  norms_audit_parse(path)
 }
 
 # Every call in the tree whose deparsed head is one of `heads`, in source order;
@@ -63,6 +78,23 @@ norms_audit_calls <- function(heads, exprs = norms_audit_script_exprs()) {
 
 ABORT_HEADS <- c("stop", "stopifnot", "base::stop", "base::stopifnot")
 
+# The abort spellings the M81 walk does not collect, and which the script must
+# therefore not acquire. Closed, and written here as string literals so the
+# denied set is readable off the source rather than emerging from a procedure:
+# this is a denylist and its whole content is the promise (M79's lesson).
+#
+# Nothing here claims to enumerate every way to raise a condition -- a name
+# resolved at run time defeats any syntactic list, and that stays outside the
+# promise. What it does is close the three doors an aliased abort would walk
+# through today unseen.
+DENIED_ABORT_HEADS <- c("rlang::abort", "abort", "cli::cli_abort", "cli_abort")
+
+# Heads whose appearance AWAY from a call head is denied. Both sets, not just
+# the four above (M82 plan gate, widening RR17 BC6): `fail <- stop` and
+# `fail <- abort` are the same defect, and a rule covering only one of them
+# leaves the other invisible for no saving.
+DENIED_INDIRECT_HEADS <- c(ABORT_HEADS, DENIED_ABORT_HEADS)
+
 # The unnamed arguments of a call: `stop()`'s message pieces, `stopifnot()`'s
 # conditions. Named ones (`call. = FALSE`) are not part of either.
 call_positional_args <- function(cl) {
@@ -88,6 +120,81 @@ STOPIFNOT_RESERVED <- setdiff(names(formals(stopifnot)), "...")
 STOP_NON_MESSAGE_NAMES <- c("call.", "domain")
 
 deparse_call <- function(cl) squish(paste(deparse(cl), collapse = " "))
+
+deparse_flat <- function(x) paste(deparse(x), collapse = "")
+
+# `(f)(x)` is a call whose head is a call to `(`. Strip those wrappers so a
+# head is compared by what it names, not by how it was written.
+unwrap_parens <- function(x) {
+  while (is.call(x) && identical(x[[1L]], quote(`(`)) && length(x) == 2L) {
+    x <- x[[2L]]
+  }
+  x
+}
+
+# Does this element NAME a denied head -- as a bare symbol (`stop`) or as a
+# namespaced call (`base::stop`, `rlang::abort`)? A character literal does not:
+# `f("stop")` passes a string, and only `do.call` turns a string into a call,
+# which rule (ii) covers on its own.
+names_denied_head <- function(x) {
+  if (is.name(x)) return(as.character(x) %in% DENIED_INDIRECT_HEADS)
+  is.call(x) && deparse_flat(x) %in% DENIED_INDIRECT_HEADS
+}
+
+# Every denied appearance of an abort spelling in the script, as "(rule) call".
+#
+# Three rules, and the rule number travels with the finding so a failure names
+# which door was walked through:
+#   (i)   a call to one of DENIED_ABORT_HEADS -- an abort the M81 walk, which
+#         collects `stop`/`stopifnot` heads only, cannot see at all;
+#   (ii)  `do.call` dispatching one of either set by name, string or symbol;
+#   (iii) a denied head appearing anywhere but a call's head position, which is
+#         aliasing (`fail <- stop`), assignment (`assign("fail", stop)`) and
+#         higher-order use (`lapply(msgs, stop)`) in one rule rather than three
+#         -- an enumeration of shapes is what the M79 review beat twice.
+#
+# Position 1 of a call is its head and is exempt from (iii). So is the whole of
+# a `::`/`:::` call, whose operands are namespace parts rather than arguments:
+# without that exemption the walk reaches the `stopifnot` symbol inside
+# `base::stopifnot(x)`'s own head and reports an ordinary shipped call as an
+# alias (measured 2026-08-14, before the exemption: `base::stopifnot(is.numeric
+# (x))` was flagged "(iii) base::stopifnot"). `fail <- base::stop` is unaffected
+# -- there the `::` call is a CHILD of `<-`, which is where rule (iii) reads.
+norms_audit_denied_calls <- function(exprs = norms_audit_script_exprs()) {
+  out <- character(0)
+  for (cl in norms_audit_calls(NULL, exprs)) {
+    head <- deparse_flat(unwrap_parens(cl[[1L]]))
+    if (head %in% DENIED_ABORT_HEADS) {
+      out <- c(out, paste0("(i) ", deparse_call(cl)))
+    }
+    if (head %in% c("do.call", "base::do.call")) {
+      args <- as.list(cl)[-1L]
+      nms <- names(args)
+      if (is.null(nms)) nms <- rep("", length(args))
+      what <- if ("what" %in% nms) {
+        args[[match("what", nms)]]
+      } else {
+        pos <- args[!nzchar(nms)]
+        if (length(pos)) pos[[1L]] else NULL
+      }
+      denied <- !is.null(what) &&
+        ((is.character(what) && length(what) == 1L &&
+            what %in% DENIED_INDIRECT_HEADS) || names_denied_head(what))
+      if (denied) out <- c(out, paste0("(ii) ", deparse_call(cl)))
+    }
+    if (!head %in% c("::", ":::")) {
+      for (i in seq_along(cl)[-1L]) {
+        child <- cl[[i]]
+        if (missing(child)) next
+        if (names_denied_head(child)) {
+          out <- c(out, paste0("(iii) ", deparse_call(cl)))
+          break
+        }
+      }
+    }
+  }
+  out
+}
 
 # Fail closed on an argument shape the keying rules cannot express.
 #
