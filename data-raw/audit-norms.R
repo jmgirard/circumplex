@@ -545,7 +545,13 @@ shipped_roster <- function() {
 # an instrument shipping no norms has nothing to audit and is not a gap.
 roster_from_objects <- function(objects) {
   nms <- names(objects)
-  if (length(objects) && (is.null(nms) || !all(nzchar(nms)))) {
+  # `nzchar(NA_character_)` is TRUE, so an NA name clears a bare nzchar() test
+  # and then `objects[[NA_character_]]` returns NULL rather than raising -- the
+  # loop skips it as a no-norms instrument and the builder returns the very
+  # zero-row roster this guard exists to refuse (measured 2026-08-14, M84
+  # review F1). `setNames(list(obj), lookup)` with a lookup that missed is how
+  # a caller reaches it.
+  if (length(objects) && (is.null(nms) || !all(!is.na(nms) & nzchar(nms)))) {
     stop("every entry of `objects` must be named for the instrument it ",
          "carries; an unnamed list rosters nothing at all", call. = FALSE)
   }

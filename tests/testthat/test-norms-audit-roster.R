@@ -288,6 +288,17 @@ test_that("an unnamed object list rosters nothing and is refused (M84)", {
       data.frame(Sample = 1, Scale = "PA", M = 1, stringsAsFactors = FALSE)))),
     "must be named for the instrument it carries", fixed = TRUE
   )
+  # An NA name is the same fault wearing a name, and it reached the same
+  # zero-row roster: `nzchar(NA_character_)` is TRUE, so the guard's first
+  # spelling let it through and `objects[[NA_character_]]` returned NULL, which
+  # the no-norms skip swallowed (measured 2026-08-14 at the M84 review, F1,
+  # scored 87). `setNames(list(obj), lookup)` with a lookup that missed is the
+  # route in, and the file's own fixtures build object lists that way.
+  na_named <- list(norms_object(
+    data.frame(Sample = 1, Scale = "PA", M = 1, stringsAsFactors = FALSE)))
+  names(na_named) <- NA_character_
+  expect_error(env$roster_from_objects(na_named),
+               "must be named for the instrument it carries", fixed = TRUE)
   # An empty list is not that shape: it has nothing to name and rosters nothing
   # by construction, which is what the shipped path returns when no instrument
   # carries norms.

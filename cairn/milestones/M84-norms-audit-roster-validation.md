@@ -141,3 +141,28 @@ _Evidence gathered 2026-08-14 on `m84-norms-audit-roster-validation` at the T4/T
 - **AC5.** Seven sites added — 3 in `validate_roster()`, 4 in `roster_from_objects()` — all three parts settled by the named tests. Declaration: "no stop()/stopifnot() site the walk collects is unregistered (M81, M82)" passes, over 26 sites carrying 26 distinct identities. Spelling: `test-norms-audit-denylist.R` passes 80/80. Provocation and discrimination: "no matcher accepts a message from another site (M82)" passes 4/4, with the off-diagonal still pinned at exactly the two `source note not found` cells and no NA message, so no new fixture is vacuous. Floors: measured, the new `stop` keys carry 43, 49, 108, 116 and 122 literal characters against a floor of 15.
 - **AC6.** Measured this session on the csie slice of the real `AUDIT_BATCH`: 23 non-exempt gaps with the roster defaulted and 23 with `roster = shipped_roster()` passed explicitly — the plan's figure, reproduced. "passing the shipped roster explicitly changes no gap (M84)" passes 3/3, asserting the count is non-zero, equal, and over the same pair set. The `roster = shipped_roster(objects)` spelling that measured 0 is no longer expressible (AC4).
 - **AC7.** `devtools::test()`: FAIL 0 | WARN 6 | SKIP 3 | PASS 7216 (the 6 warnings are pre-existing lavaan `bad.marker.crit` notes). `devtools::check(args = "--no-manual")`: Status: OK — 0 errors, 0 warnings, 0 notes. `options(cli.width = 500); devtools::document()`: zero lines matching `resolve link`, and no `man/` or `NAMESPACE` diff (the roxygen 8.0.0→8.1.0 `DESCRIPTION` line it wrote is a local toolchain artifact and was reverted). `pkgdown::check_pkgdown()`: no problems found. `cairn_validate`: exit 0, all checks PASS including `coverage complete`; 47 advisory `work-log format` warnings, all pre-existing in M7. No DESIGN principle changed, so `cairn_impact` is a no-op. No NEWS entry: `data-raw/` is not installed, so the milestone ships nothing user-visible.
+
+### Independent review
+
+Three fresh-context lenses over `master..HEAD`, then a fresh scorer that generated none of the findings.
+
+- **Blame-history lens ([S]):** zero findings. M79's invariant that the roster is never derived from `objects` is preserved and now made unspellable; the `NULL[[1]]` skip and the M79 no-norms pin survive the extraction; the 13 migrated call sites are pure renames with identical assertions.
+- **Prior-review lens ([S]):** zero findings. `gh api repos/jmgirard/circumplex/pulls/comments?per_page=1` returned `[]`, so the GitHub thread surface was skipped; primary evidence was the archived `## Review` sections of M79–M83, none of whose taught lessons this diff regresses.
+- **Diff-bug lens ([O]):** nine findings, scored below.
+
+**Actioned (≥80).**
+
+- **F1 (87) — fixed on the branch.** `nzchar(NA_character_)` is `TRUE`, so an `NA` name cleared the unnamed-`objects` guard this milestone added; `objects[[NA_character_]]` then returns `NULL`, the no-norms skip swallowed it, and the builder returned the very zero-row roster the guard exists to refuse. Reproduced before the fix and refused by name after. The guard now tests `!all(!is.na(nms) & nzchar(nms))`, and "an unnamed object list rosters nothing and is refused (M84)" gained an `NA`-name assertion. No new abort site — the same registered site now catches the wider domain.
+
+**Logged, below the action bar (8).** Surfaced, not silently dropped.
+
+- F2 (20) — duplicate names in `objects` roster the first entry twice and drop the second's samples. Real, but the scorer verified `master:data-raw/audit-norms.R` carries the identical `for (nm in nms)` / `objects[[nm]]` pattern, so the diff did not introduce it.
+- F3 (30) — `validate_roster()` still accepts a one-row roster naming only the batch's own pair, which reads clean over the other 23 shipped pairs. AC1 enumerates exactly three shapes and the plan gate recorded that scope choice.
+- F4 (40) — `objects[[nm]]$Norms[[1]]` is unguarded, so `Norms = list()` gives "subscript out of bounds" and a non-list object gives "$ operator is invalid for atomic vectors", naming neither instrument. Both reproduced; AC2's "two of the norms tables" declares the coverage incomplete.
+- F5 (65) — the AC1 column test matches `"%in% names(roster)"`, a substring that survives weakening the condition to one column; no test covers a roster missing only `instrument` or only `sample`. The registry set-equality test pins the exact deparsed condition and would redden, so the discrimination exists elsewhere than where AC1 nominates it.
+- F6 (50) — the AC6 test compares the defaulted call against `roster = shipped_roster()`, which resolves to the same nullary function, so it cannot fail; the substantive regression is the pre-existing M79 `objects`-injection test.
+- F7 (30) — the explicit-`NULL` assertion duplicates the defaulted one, and the default resolves before `validate_batch()`, so a malformed `data/` would surface the builder's message rather than the batch's.
+- F8 (20) — the shipped path now aborts on a degenerate shipped norms table where it previously dropped a row silently. The intended direction; no shipped instrument trips it.
+- F9 (15) — `norms_object()` is a top-level test helper where siblings live in the helper file.
+
+**Return floor.** No actioned finding demonstrates an acceptance criterion failing, and none scored ≥90, so the milestone does not return to `in-progress`. F1 was fixed in place under the ordinary triage.
