@@ -136,7 +136,7 @@ Runtime-resolved abort names, and `data/` → not here.
       duplicate-identity refusal; widen the `:500` test to the full identity.
 - [x] T5 AC2's five probes (double registration; wrong binding, kind, key and
       ordinal) plus the comment-insertion guard and the swap measurement.
-- [ ] T6 Derive the pair set and fixture roster from one structure, assert
+- [x] T6 Derive the pair set and fixture roster from one structure, assert
       set-equality, add the calling-handler capture with its non-empty and
       innermost-binding assertions, cross-point one fixture to verify.
 - [ ] T7 Matcher construction at registry-build time with the 15-character
@@ -171,6 +171,9 @@ Runtime-resolved abort names, and `data/` → not here.
 - 2026-08-14: T3-T5 done. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7083 (7069 before this milestone's tests; the 6 warnings are the same pre-existing lavaan ones, none in a touched file). Markers file in isolation FAIL 0 | WARN 0 | PASS 118.
 
 - 2026-08-14: T6 written, NOT checked off pending the full verify run; markers file in isolation FAIL 0 | WARN 0 | PASS 128. The shared-key roster is derived from the registry by `norms_audit_shared_key_sites()` rather than declared beside it, so a later pair joins the stack loop by existing. Capture measured live: 12 frames per abort, resolving to `parse_source_note` and `source_note_block_tags`; crossing the two fixtures resolves each to its TWIN rather than to NA, so the mutation reddens on the binding and not on an empty capture -- pinned as its own assertion, an NA having reddened the first assertion just as well.
+
+- 2026-08-14: T6 done, `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7093.
+- 2026-08-14: T7-T8 written, NOT checked off pending the verify run that covers both (one run, both tasks -- recorded rather than claimed per task). Markers file in isolation FAIL 0 | WARN 0 | PASS 142. T7 moves every discrimination check into `norms_audit_matcher()`, called from the registry builder: the 15-literal-character `stop` floor fails the BUILD (`{}` placeholders excluded, matching anything and so not discrimination), the stem floor is checked at match time because a stem exists only once a message is raised, `expect_abort_at_site()` consumes a prebuilt matcher, the locale pin moved to one shared `norms_audit_with_c_messages()` the matrix also uses, and the unknown-kind refusal moved to the constructor. The degenerate-stem probe also asserts the OLD rule accepted `"i"` against `is.data.frame(batch)`, so it is evidence about the floor and not about the prefix test. T8's matrix asserts the off-diagonal accepting set equals the registry-derived shared-key pairs, with a full-TRUE diagonal (without which a matcher accepting nothing would satisfy the equality) and the count pinned at 2.
 
 ## Decisions
 

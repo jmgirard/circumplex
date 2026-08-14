@@ -352,7 +352,12 @@ norms_audit_build_registry <- function(entries) {
     stop("registry declares the same abort site twice: ",
          paste(gsub("\t", " | ", dup), collapse = "; "), call. = FALSE)
   }
-  entries
+  # Matchers are built HERE, so a key too weak to discriminate stops the build
+  # rather than waiting for a run that happens to exercise that site (AC4).
+  lapply(entries, function(e) {
+    e$matcher <- norms_audit_matcher(e$kind, e$key)
+    e
+  })
 }
 
 # The entries whose (kind, key) is shared with an entry under ANOTHER binding.
@@ -496,20 +501,18 @@ norms_audit_stopifnot_stem <- function(msg) {
 # (measured 2026-08-13) -- and it is what covers a call made outside one.
 SITE_KINDS <- c("stop", "stopifnot", "stopifnot_named")
 
-expect_abort_at_site <- function(thunk, kind, key, info = key) {
-  # Fail closed on an unknown kind, for the same reason the walk does.
-  # The dispatch below ends in the `stop` regex branch, which is the LOOSEST
-  # matcher of the three, so an unrecognised kind would silently get the
-  # weakest check rather than an error -- and that is not hypothetical: a
-  # stale dispatch let `kind` fall through to exactly that branch during this
-  # milestone, where it accepted a key's own superstring and the test reported
-  # one failure instead of two (work log, 2026-08-13).
-  if (!(length(kind) == 1L && !is.na(kind) && kind %in% SITE_KINDS)) {
-    stop("unknown abort site kind: ", paste(deparse(kind), collapse = ""),
-         " (expected one of ", paste(SITE_KINDS, collapse = ", "), ")",
-         call. = FALSE)
-  }
-
+# Run `expr` with R's messages pinned to the C locale.
+#
+# ONE home for the pin, because more than one surface reads these messages: the
+# per-site assertion below and the cross-discrimination matrix, which captures
+# `conditionMessage()` itself. `stopifnot()`'s positional message is generated
+# and TRANSLATED by R, not written by the script, so a translated session fails
+# a correct guard: measured under `LANGUAGE=fr`, `stopifnot(is.data.frame(batch))`
+# raises "is.data.frame(batch) n'est pas TRUE", the English-only strip removes
+# nothing and the match fails (RR17 rev 2 BC9, 2026-08-09). Under testthat 3e
+# this is belt-and-braces -- `test_that()` sets LANGUAGE=C itself (measured
+# 2026-08-13) -- and it is what covers a call made outside one.
+norms_audit_with_c_messages <- function(expr) {
   old <- Sys.getenv(c("LANGUAGE", "LC_MESSAGES"), unset = NA)
   Sys.setenv(LANGUAGE = "C", LC_MESSAGES = "C")
   on.exit({
@@ -518,28 +521,82 @@ expect_abort_at_site <- function(thunk, kind, key, info = key) {
     unset <- names(old)[is.na(old)]
     if (length(unset)) Sys.unsetenv(unset)
   }, add = TRUE)
+  force(expr)
+}
 
-  err <- tryCatch({
-    thunk()
-    NULL
-  }, error = identity)
-  expect_true(inherits(err, "error"), info = paste("no error raised:", info))
-  if (!inherits(err, "error")) return(invisible(NULL))
-  msg <- conditionMessage(err)
-  if (identical(kind, "stopifnot_named")) {
+# Discriminating-power floors. Both sit inside the bands RR17 rev 2 BC9 fixes
+# ([10, 20] and [20, 45]) and keep the headroom it states: the shortest shipped
+# `stop` key carries 23 literal characters, and R's truncation leaves 66 of the
+# script's longest shipped condition (both re-measured 2026-08-14).
+NORMS_AUDIT_STOP_KEY_FLOOR <- 15L
+NORMS_AUDIT_STEM_FLOOR <- 40L
+
+# A `stop()` key's literal characters -- what a message must actually carry.
+# The `{}` placeholders stand for interpolated arguments and match anything, so
+# they are not discrimination and do not count toward the floor.
+norms_audit_key_literals <- function(key) gsub("{}", "", key, fixed = TRUE)
+
+# The matcher for one site: a predicate on a raised message.
+#
+# ONE procedure, and it runs at registry-BUILD time (AC4). The floors live here
+# rather than in the assertion because a floor checked at assertion time is only
+# checked for sites some test happens to exercise, while a key too weak to
+# discriminate is a defect of the REGISTRY -- it should stop the build, not wait
+# for a run. `expect_abort_at_site()` therefore consumes what this returns and
+# adds no floor of its own.
+#
+# Fail-closed on an unknown kind, for the same reason the walk is: the `stop`
+# branch is the loosest of the three, so an unrecognised kind falling through to
+# it would silently get the weakest check. Not hypothetical -- a stale dispatch
+# did exactly that during M81, accepting a key's own superstring (M81 work log,
+# 2026-08-13). Refusing at build time moves that failure earlier still.
+norms_audit_matcher <- function(kind, key) {
+  if (!(length(kind) == 1L && !is.na(kind) && kind %in% SITE_KINDS)) {
+    stop("unknown abort site kind: ", paste(deparse(kind), collapse = ""),
+         " (expected one of ", paste(SITE_KINDS, collapse = ", "), ")",
+         call. = FALSE)
+  }
+  if (identical(kind, "stop")) {
+    n <- nchar(norms_audit_key_literals(key))
+    if (n < NORMS_AUDIT_STOP_KEY_FLOOR) {
+      stop("stop() key carries ", n, " literal characters, under the floor of ",
+           NORMS_AUDIT_STOP_KEY_FLOOR, ": ", key, call. = FALSE)
+    }
+    rx <- norms_audit_key_regex(key)
+    fn <- function(msg) grepl(rx, msg)
+  } else if (identical(kind, "stopifnot_named")) {
     # Full equality, no stem and no regex. A named condition's message is its
     # name verbatim -- R appends no verdict and truncates nothing -- so there
     # is nothing here for a looser matcher to buy, and a stem would let a
-    # longer message satisfy a shorter key.
-    expect_identical(msg, key, info = info)
-  } else if (identical(kind, "stopifnot")) {
-    stem <- norms_audit_stopifnot_stem(msg)
-    expect_true(
-      nzchar(stem) && startsWith(squish(key), stem),
-      info = paste0(info, " -- got: ", msg)
-    )
+    # longer message satisfy a shorter key. No floor: the key IS the message.
+    fn <- function(msg) identical(msg, key)
   } else {
-    expect_match(msg, norms_audit_key_regex(key), info = info)
+    # A positional condition's message is R's deparse of it, truncated at a
+    # width R chooses, so the key is matched as a prefix. The floor is what
+    # stops a degenerate prefix standing in for the whole: without it the
+    # shipped check accepts a ONE-character stem (measured 2026-08-14).
+    floor <- min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR)
+    fn <- function(msg) {
+      stem <- norms_audit_stopifnot_stem(msg)
+      nchar(stem) >= floor && startsWith(squish(key), stem)
+    }
   }
+  structure(fn, kind = kind, key = key, class = c("norms_audit_matcher", "function"))
+}
+
+# Assert that `thunk` aborts, and aborts at the site `matcher` was built for --
+# never that some error occurred. A fixture can reach the wrong guard, or fail
+# before it reaches any, and a bare expect_error() reports both as coverage.
+expect_abort_at_site <- function(thunk, matcher, info = attr(matcher, "key")) {
+  norms_audit_with_c_messages({
+    err <- tryCatch({
+      thunk()
+      NULL
+    }, error = identity)
+    expect_true(inherits(err, "error"), info = paste("no error raised:", info))
+    if (!inherits(err, "error")) return(invisible(NULL))
+    msg <- conditionMessage(err)
+    expect_true(matcher(msg), info = paste0(info, " -- got: ", msg))
+  })
   invisible(NULL)
 }

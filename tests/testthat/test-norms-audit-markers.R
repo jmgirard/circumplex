@@ -500,7 +500,7 @@ test_that("every registered abort site raises its own message (M79, M81)", {
     # The site's own message, never bare failure: most of these fixtures would
     # also raise if the script were broken in an unrelated way, and several
     # reach a function with more than one guard in it.
-    expect_abort_at_site(function() s$fixture(env), s$kind, s$key)
+    expect_abort_at_site(function() s$fixture(env), s$matcher)
   }
 })
 
@@ -589,8 +589,12 @@ test_that("two identical guards in one function stay separable (M82)", {
   # satisfiable: a function carrying the same guard twice is a legal script, and
   # the ordinal is what keeps its two sites distinct instead of collapsing them
   # into one identity the registry can only half-satisfy.
+  # The key clears AC4's 15-literal-character floor, since the registry built
+  # below runs the matcher constructor over it.
+  planted_key <- "a planted guard that clears the floor"
   sites <- norms_audit_abort_sites(parse(
-    text = 'f <- function(x) { stop("boom"); stop("boom") }',
+    text = sprintf('f <- function(x) { stop("%s"); stop("%s") }',
+                   planted_key, planted_key),
     keep.source = FALSE
   ))
   expect_identical(
@@ -600,8 +604,8 @@ test_that("two identical guards in one function stay separable (M82)", {
                    c("f", "f"))
   # Registering both, each at its own declared ordinal, builds and matches.
   reg <- norms_audit_build_registry(list(
-    site("stop", "f", "boom", function(env) NULL, ordinal = 1L),
-    site("stop", "f", "boom", function(env) NULL, ordinal = 2L)
+    site("stop", "f", planted_key, function(env) NULL, ordinal = 1L),
+    site("stop", "f", planted_key, function(env) NULL, ordinal = 2L)
   ))
   expect_identical(norms_audit_site_ids(reg), norms_audit_site_ids(sites))
 })
@@ -620,6 +624,94 @@ test_that("the identity carries no source reference (M82)", {
     norms_audit_site_ids(norms_audit_abort_sites(
       norms_audit_parse_text(shifted)))
   )
+})
+
+# The matcher floors (M82, RR17 BC9). Each floor gets its own probe, because a
+# shortened key can never fall below a floor that tracks it -- the `stopifnot`
+# floor is `min(nchar(key), 40)`, so mutating the key moves the floor with it
+# and proves nothing. The two are checked at different times for the same
+# reason: a `stop` key's literal content is known when the registry is built,
+# while a stem exists only once a message has been raised.
+
+test_that("a stop() key under the literal floor stops the build (M82)", {
+  short <- "too short"  # 9 literal characters, under the floor of 15
+  expect_lt(nchar(short), NORMS_AUDIT_STOP_KEY_FLOOR)
+  expect_error(
+    norms_audit_matcher("stop", short),
+    "literal characters, under the floor"
+  )
+  # `{}` is an interpolated argument, matching anything, so it is not
+  # discrimination and does not count: a key that clears the floor only by
+  # counting its placeholders is refused too.
+  expect_error(
+    norms_audit_matcher("stop", paste0(short, "{}{}{}{}{}{}{}{}")),
+    "literal characters, under the floor"
+  )
+  # Every shipped stop key clears it, with the headroom RR17 states.
+  shipped <- vapply(
+    Filter(function(s) s$kind == "stop", norms_audit_abort_sites()),
+    function(s) nchar(norms_audit_key_literals(s$key)), integer(1)
+  )
+  expect_gte(min(shipped), 23L)
+})
+
+test_that("a stopifnot matcher rejects a degenerate stem (M82)", {
+  # The defect this floor closes: before it, the shipped check accepted any
+  # non-empty prefix, so a one-character stem satisfied a 20-character key and
+  # any `stopifnot()` in the script could stand in for any other.
+  key <- "is.data.frame(batch)"
+  m <- norms_audit_matcher("stopifnot", key)
+  expect_true(m("is.data.frame(batch) is not TRUE"))
+  expect_false(m("i is not TRUE"))
+  # ... and the old rule would have accepted it, so the assertion above is
+  # about the floor rather than about the prefix test.
+  expect_true(startsWith(squish(key), norms_audit_stopifnot_stem("i is not TRUE")))
+  # The floor is the key's own length where the key is shorter than 40, so a
+  # truncated-but-honest stem from a LONG condition still matches.
+  long <- paste(rep("condition_fragment", 5L), collapse = " + ")
+  expect_gt(nchar(long), NORMS_AUDIT_STEM_FLOOR)
+  ml <- norms_audit_matcher("stopifnot", long)
+  expect_true(ml(paste(substr(long, 1L, 66L), "....")))
+  expect_false(ml("condition ...."))
+})
+
+test_that("no matcher accepts a message from another site (M82)", {
+  env <- marker_defs()
+  # Each fixture raised ONCE, its message captured under the shared locale pin.
+  # Once, because provoking a site per cell would make the matrix quadratic in
+  # fixture runs for no gain -- the message is a property of the site.
+  msgs <- vapply(SCRIPT_ABORTS, function(s) {
+    norms_audit_with_c_messages(
+      tryCatch({
+        s$fixture(env)
+        NA_character_
+      }, error = conditionMessage)
+    )
+  }, character(1))
+  # A fixture that raised nothing would contribute a vacuous row and column.
+  expect_false(anyNA(msgs))
+
+  n <- length(SCRIPT_ABORTS)
+  accepts <- matrix(FALSE, n, n)
+  for (i in seq_len(n)) {
+    for (j in seq_len(n)) accepts[i, j] <- SCRIPT_ABORTS[[i]]$matcher(msgs[[j]])
+  }
+
+  # Every site matches its own message. Without this the equality below could
+  # be satisfied by a matcher that accepts nothing at all.
+  expect_true(all(diag(accepts)))
+
+  # And the off-diagonal accepting set EQUALS the declared shared-key pairs --
+  # derived from the registry, not listed here, so a new shared pair changes
+  # both sides of this comparison at once and a leaky matcher changes only one.
+  key <- vapply(SCRIPT_ABORTS, function(s) paste(s$kind, s$key, sep = "\t"),
+                character(1))
+  offdiag <- !diag(TRUE, n)
+  expect_identical(accepts & offdiag, outer(key, key, "==") & offdiag)
+
+  # Today that set is exactly the two `source note not found` cells. Pinned, so
+  # the equality above cannot quietly become true of a larger set.
+  expect_identical(sum(accepts & offdiag), 2L)
 })
 
 # Shared-key sites: the pair one message cannot tell apart (M82, RR17 BC8).
@@ -713,22 +805,20 @@ test_that("a named-form site is matched by exact equality, not a stem (M81)", {
   key <- "divisor must be numeric"
   expect_identical(tryCatch(raise(key)(), error = conditionMessage), key)
 
-  expect_length(
-    failures(expect_abort_at_site(raise(key), "stopifnot_named", key)), 0L
-  )
+  m <- norms_audit_matcher("stopifnot_named", key)
+  expect_length(failures(expect_abort_at_site(raise(key), m)), 0L)
   # Both directions fail: a strict superstring and a strict substring.
   expect_length(
-    failures(expect_abort_at_site(raise(paste0(key, " and finite")),
-                                  "stopifnot_named", key)), 1L
+    failures(expect_abort_at_site(raise(paste0(key, " and finite")), m)), 1L
   )
   truncated <- substr(key, 1L, nchar(key) - 1L)
-  expect_length(
-    failures(expect_abort_at_site(raise(truncated), "stopifnot_named", key)), 1L
-  )
+  expect_length(failures(expect_abort_at_site(raise(truncated), m)), 1L)
   # An unrecognised kind is refused rather than dispatched to the loosest
-  # matcher. Named with a typo, as the real incident was:
+  # matcher. Named with a typo, as the real incident was. Since M82 the refusal
+  # is the CONSTRUCTOR's, so it fires at registry build rather than at the
+  # first assertion that happens to use the site.
   expect_error(
-    expect_abort_at_site(raise(key), "stopifnot_nmaed", key),
+    norms_audit_matcher("stopifnot_nmaed", key),
     "unknown abort site kind"
   )
   # Every kind the walk can emit is one the matcher accepts, so the registry
