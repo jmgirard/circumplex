@@ -5,7 +5,7 @@
 - **Depends on:** M83
 - **Driving RR:** —
 - **Principles touched:** GP2
-- **Branch/PR:** `m84-norms-audit-roster-validation`
+- **Branch/PR:** `m84-norms-audit-roster-validation` / https://github.com/jmgirard/circumplex/pull/112
 
 ## Goal
 
@@ -30,14 +30,14 @@ row is a duplicate of that rejection, not a live finding.
 
 ## Acceptance criteria
 
-- [ ] AC1. `audit_norms()` validates the roster it will audit against — after
+- [x] AC1. `audit_norms()` validates the roster it will audit against — after
       the `NULL` default is resolved by `shipped_roster()` at `:631`, so the
       default is never refused — by the same shape as the sibling
       `validate_batch()` (`:82-132`): a `validate_roster()` refuses a
       non-data-frame, a missing `instrument` or `sample` column, and a zero-row
       roster, each with its own message naming the fault. Evidence: one test
       per refusal shape asserting that shape's message.
-- [ ] AC2. The roster builder `roster_from_objects()` refuses by name two of
+- [x] AC2. The roster builder `roster_from_objects()` refuses by name two of
       the norms tables it cannot roster: a `Norms[[1]]` that is not a data
       frame, and one carrying rows but no `Sample` column. A zero-row
       `Norms[[1]]` is not one of them and stays skipped, as an instrument
@@ -46,7 +46,7 @@ row is a duplicate of that rejection, not a live finding.
       `shipped_roster()`'s body calls `roster_from_objects()`. Today the two
       shapes surface as R's own `"invalid argument type"` and `"arguments
       imply differing number of rows: 1, 0"`, naming neither.
-- [ ] AC3. A norms row whose `Sample` is `NA` is refused by
+- [x] AC3. A norms row whose `Sample` is `NA` is refused by
       `roster_from_objects()` rather than silently dropped by the `sort()` the
       builder derives its sample labels with. Evidence: an object-list fixture
       whose `Norms[[1]]` has `Sample = c(1, NA)` raises a refusal naming the
@@ -55,14 +55,14 @@ row is a duplicate of that rejection, not a live finding.
       second raises `"arguments imply differing number of rows: 1, 0"` — the
       message AC2's second shape also raises, so today the two are
       indistinguishable to a reader of the failure.
-- [ ] AC4. `shipped_roster()` takes no arguments, so `shipped_roster(objects)`
+- [x] AC4. `shipped_roster()` takes no arguments, so `shipped_roster(objects)`
       is not spellable and cannot re-fuse the roster to the object list.
       Evidence: `expect_length(formals(env$shipped_roster), 0L)`. Fixtures
       needing a roster over an explicit object list call a separately named
       constructor; the 13 argument-taking call sites in tracked files migrate
       to it. `grep -rn 'shipped_roster(' tests/ data-raw/ R/ vignettes/` as
       hygiene.
-- [ ] AC5. Every abort site this milestone adds is declared in `SCRIPT_ABORTS`
+- [x] AC5. Every abort site this milestone adds is declared in `SCRIPT_ABORTS`
       and provoked by a fixture, settled in three parts by tests cited by name,
       not line: spelling stays closed to `stop()`/`stopifnot()` by the
       denylist sweep in `test-norms-audit-denylist.R`; declaration is settled
@@ -71,11 +71,11 @@ row is a duplicate of that rejection, not a live finding.
       whose non-NA-message and diagonal assertions fail on an entry whose
       fixture raises nothing. Each new key clears the 15-literal-character
       floor and is mutually discriminating against the existing keys.
-- [ ] AC6. The M79 regression gap closes: `audit_norms()` over a real
+- [x] AC6. The M79 regression gap closes: `audit_norms()` over a real
       single-instrument batch reports the same non-exempt gap count with and
       without an explicitly passed roster. Measured today: 23 gaps both ways,
       but 0 when passed `roster = shipped_roster(objects)`.
-- [ ] AC7. `devtools::test()` and `devtools::check(args = "--no-manual")` clean,
+- [x] AC7. `devtools::test()` and `devtools::check(args = "--no-manual")` clean,
       with `document()` warning-free per the profile's consistency gate.
 
 ## Coverage
@@ -132,3 +132,12 @@ row is a duplicate of that rejection, not a live finding.
 ## Decisions
 
 ## Review
+
+_Evidence gathered 2026-08-14 on `m84-norms-audit-roster-validation` at the T4/T6 checkpoint, by command in this session. PR #112._
+- **AC1.** `validate_roster()` refuses all three shapes, each by its own message. "audit_norms() refuses a roster it cannot audit against (M84)" passes 3/3 — one assertion per shape, matching `is.data.frame(roster)`, `%in% names(roster)` and `names no (instrument, sample) pair to cover` as fixed strings, each ridden with a real one-instrument batch slice so `validate_batch()` cannot abort in its place. "the default roster is resolved before it is validated (M84)" passes 2/2, fencing the ordering the criterion requires: both a defaulted call and an explicit `roster = NULL` run without error.
+- **AC2.** Both shapes refused by name. "the builder refuses a norms table it cannot roster (M84)" passes 2/2, asserting `norms table for fx is not a data frame but a list` and `norms table for fx has no `Sample` column`. The zero-row corner is unrefused: the M79 test "an instrument shipping no norms is not a roster gap" passes 2/2 unchanged against `roster_from_objects()`, covering both the `Norms = NULL` and the zero-row-data-frame cases. The wrapper relation is asserted, not assumed — "shipped_roster() cannot be re-fused to an object list (M84)" checks `"roster_from_objects" %in% all.names(body(env$shipped_roster))`.
+- **AC3.** Both NA shapes refused, and the messages distinguish the row counts. "a missing Sample is refused, not dropped by sort() (M84)" passes 2/2, asserting `leaves `Sample` missing in 1 of 2 rows` for `Sample = c(1, NA)` and `2 of 2 rows` for `Sample = c(NA, NA)`. The today-claim in the criterion was measured against the pre-M84 builder before the guard landed: the first returned one row, the second raised `"arguments imply differing number of rows: 1, 0"`.
+- **AC4.** `expect_length(formals(env$shipped_roster), 0L)` passes inside "shipped_roster() cannot be re-fused to an object list (M84)". Hygiene grep `grep -rn 'shipped_roster(' tests/ data-raw/ R/ vignettes/` returns no argument-taking call site in tracked files — only no-arg calls and prose mentions; the three remaining hits under `tests/testthat/_problems/` are gitignored. All 13 argument-taking sites migrated (3 markers, 5 coverage, 3 sample-key, 2 roster).
+- **AC5.** Seven sites added — 3 in `validate_roster()`, 4 in `roster_from_objects()` — all three parts settled by the named tests. Declaration: "no stop()/stopifnot() site the walk collects is unregistered (M81, M82)" passes, over 26 sites carrying 26 distinct identities. Spelling: `test-norms-audit-denylist.R` passes 80/80. Provocation and discrimination: "no matcher accepts a message from another site (M82)" passes 4/4, with the off-diagonal still pinned at exactly the two `source note not found` cells and no NA message, so no new fixture is vacuous. Floors: measured, the new `stop` keys carry 43, 49, 108, 116 and 122 literal characters against a floor of 15.
+- **AC6.** Measured this session on the csie slice of the real `AUDIT_BATCH`: 23 non-exempt gaps with the roster defaulted and 23 with `roster = shipped_roster()` passed explicitly — the plan's figure, reproduced. "passing the shipped roster explicitly changes no gap (M84)" passes 3/3, asserting the count is non-zero, equal, and over the same pair set. The `roster = shipped_roster(objects)` spelling that measured 0 is no longer expressible (AC4).
+- **AC7.** `devtools::test()`: FAIL 0 | WARN 6 | SKIP 3 | PASS 7216 (the 6 warnings are pre-existing lavaan `bad.marker.crit` notes). `devtools::check(args = "--no-manual")`: Status: OK — 0 errors, 0 warnings, 0 notes. `options(cli.width = 500); devtools::document()`: zero lines matching `resolve link`, and no `man/` or `NAMESPACE` diff (the roxygen 8.0.0→8.1.0 `DESCRIPTION` line it wrote is a local toolchain artifact and was reverted). `pkgdown::check_pkgdown()`: no problems found. `cairn_validate`: exit 0, all checks PASS including `coverage complete`; 47 advisory `work-log format` warnings, all pre-existing in M7. No DESIGN principle changed, so `cairn_impact` is a no-op. No NEWS entry: `data-raw/` is not installed, so the milestone ships nothing user-visible.
