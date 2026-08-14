@@ -124,10 +124,10 @@ per BC10. Runtime-resolved abort names, and `data/` → not here.
 
 ## Tasks
 
-- [ ] T1 Denylist sweep over the parse tree (rules i–iii over `ABORT_HEADS` +
+- [x] T1 Denylist sweep over the parse tree (rules i–iii over `ABORT_HEADS` +
       the four denied spellings), with the accepted/near-miss partition built
       from source-text fixtures parsed through the sweep's own path.
-- [ ] T2 Mutation-verify the sweep on the real script (`do.call("stop", …)`,
+- [x] T2 Mutation-verify the sweep on the real script (`do.call("stop", …)`,
       `fail <- stop`), restoring byte-clean and recording the measurements.
 - [ ] T3 Extend the enumerator to composite identity: top-level binding name
       (`"<run>"` for the run block), source-order ordinals, `site_ids()` retuple.
@@ -158,6 +158,10 @@ per BC10. Runtime-resolved abort names, and `data/` → not here.
 
 - 2026-08-14: in-progress on `m82-norms-audit-abort-discrimination`, cut from master at 23f469f9.
 - 2026-08-14: T1 written (denylist sweep + partition). Checkpoint only, T1 NOT checked off: the full `devtools::test()` verify run is still in flight, so nothing here claims a clean suite. The partition caught one defect in its own rule (iii), which reached the `stopifnot` symbol inside `base::stopifnot(x)`'s own head and reported a shipped call as an alias (measured 2026-08-14, "(iii) base::stopifnot"); `::`/`:::` calls are now exempt from (iii) and `fail <- base::stop` is unaffected. `test_file()` on the new file alone: FAIL 0 | WARN 0 | PASS 43.
+
+- 2026-08-14: T1 done. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7069 (the 6 warnings are pre-existing lavaan warnings in `test-ssm_sem.R` and siblings, none in a file this milestone touches); `test-norms-audit-denylist.R` in isolation FAIL 0 | WARN 0 | PASS 43.
+- 2026-08-14: T2 done, both mutants measured against `data-raw/audit-norms.R` at blob 3a9be94c and restored byte-clean (blob re-hashed identical after each). `unused_helper <- function() do.call("stop", list("x"))` -> M81 walk 19 sites (unchanged), `test-norms-audit-markers.R` FAIL 0 | PASS 104, denylist sweep reports `(ii) do.call("stop", list("x"))` and its file goes FAIL 1. `unused_alias <- function() { fail <- stop; fail("x") }` -> walk 19 sites, markers FAIL 0 | PASS 104, sweep reports `(iii) fail <- stop`, FAIL 1. So both are invisible to M81 end to end, not merely at the walk, and both are caught here.
+- 2026-08-14: measurement note, and a trap for any later mutation of this script. The first attempt planted each mutant as a BARE TOP-LEVEL expression appended to the file, and `do.call("stop", list("x"))` then reddened `test-norms-audit-markers.R` -- not because the registry noticed the site but because `marker_defs()` loads the script with `sys.source()`, `norms_audit_defs_only = TRUE` skips only the run-block `if`, and a top-level abort therefore executes during the load and fails every test in the file (backtrace named `base::do.call("stop", list("x"))`, max-fails exceeded). Read as coverage that would have been the "reddens for the wrong reason" failure LESSONS already carries. Both mutants were re-planted inside functions that are never called, which is also the realistic shape, and the invisibility claim above is measured on those.
 
 ## Decisions
 
