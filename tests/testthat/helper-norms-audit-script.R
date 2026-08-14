@@ -388,6 +388,60 @@ norms_audit_shared_key_sites <- function(entries) {
   entries[shared]
 }
 
+# The cross-discrimination matrix, computed ONCE for whichever registry it is
+# handed: the shipped one and AC1's fixture registry go through this, so the two
+# cannot drift into disagreeing about what "accepts" means (M83).
+#
+# Each fixture is raised ONCE and its message reused across the row and column,
+# because the message is a property of the site: provoking per cell would make
+# the run quadratic in fixture evaluations for nothing. A fixture that raised
+# NOTHING contributes NA, which the caller checks -- a vacuous row and column
+# would otherwise read as a clean matrix.
+norms_audit_acceptance_matrix <- function(entries, env) {
+  msgs <- vapply(entries, function(s) {
+    norms_audit_with_c_messages(
+      tryCatch({
+        s$fixture(env)
+        NA_character_
+      }, error = conditionMessage)
+    )
+  }, character(1))
+  n <- length(entries)
+  accepts <- matrix(FALSE, n, n)
+  for (i in seq_len(n)) {
+    for (j in seq_len(n)) accepts[i, j] <- entries[[i]]$matcher(msgs[[j]])
+  }
+  list(msgs = msgs, accepts = accepts)
+}
+
+# The off-diagonal cells a correct matcher set is ALLOWED to accept: one per
+# ordered pair of entries the shared-key helper returned that carry the same
+# (kind, key).
+#
+# Derived through `norms_audit_shared_key_sites()` rather than beside it. The
+# matrix used to re-derive the pair set as `outer(key, key, "==")`, which is a
+# second derivation of one thing: it ignores the helper's `binding != binding`
+# conjunct and agrees with it only because no same-binding twin is shipped
+# (M82 review, F8). Membership now comes from the helper alone; only the pairing
+# among its members is computed here.
+#
+# `shared_fn` is an argument so AC5's mutants can be run without editing source.
+norms_audit_expected_offdiag <- function(entries,
+                                         shared_fn = norms_audit_shared_key_sites) {
+  n <- length(entries)
+  id <- vapply(entries, function(e) {
+    paste(e$kind, e$binding, e$key, e$ordinal, sep = "\t")
+  }, character(1))
+  shared <- shared_fn(entries)
+  pairable <- id %in% vapply(shared, function(e) {
+    paste(e$kind, e$binding, e$key, e$ordinal, sep = "\t")
+  }, character(1))
+  kk <- vapply(entries, function(e) paste(e$kind, e$key, sep = "\t"), character(1))
+  kk[!pairable] <- NA_character_
+  same <- outer(kk, kk, function(a, b) !is.na(a) & !is.na(b) & a == b)
+  same & !diag(TRUE, n)
+}
+
 # The frame stack as it stood WHEN the abort was signalled.
 #
 # A calling handler, because an exiting one (tryCatch) unwinds the stack before

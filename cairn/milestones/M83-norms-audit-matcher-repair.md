@@ -100,7 +100,7 @@ change it; a widening would change the pinned roster at
 - [x] T1. Guard `expect_abort_at_site()`'s `matcher` argument
       (`helper-norms-audit-script.R:600-612`); add its refusal test near
       `test-norms-audit-markers.R:784-836`.
-- [ ] T2. Single-source the matrix's expected set onto
+- [x] T2. Single-source the matrix's expected set onto
       `norms_audit_shared_key_sites()` (`test-norms-audit-markers.R:704-714`);
       add the two-part fixture and run both mutants. Extract the matrix
       computation into one procedure the shipped and AC1 registries both call.
@@ -132,6 +132,7 @@ change it; a widening would change the pinned roster at
 - 2026-08-14: amendment criteria audit ([O], two fresh readers) returned eleven clear-fix findings and two judgment calls — AC1's "bound to a real site" not requiring the fixture to evaluate the script, a vacuous 1x1 off-diagonal, unasserted marker/short-stem properties, a moving-target citation of the shipped matrix's assertions, an off-diagonal set compared to a list of entries no `identical()` relates, a floor stated as `NORMS_AUDIT_STEM_FLOOR` rather than the effective `min(nchar(squish(key)), 40)`, a missing T2 coverage row, and a non-vacuity claim aimed at the expected side rather than the observed. All fixed before the amended text was written. The judgment calls: the fixture gains an over-floor truncated site and a named site so both sides of the removed floor and the never-truncating kind are exercised; and AC2's no-floor-when-truncated rule is kept as planned with its residual leak pinned rather than closed (see Decisions).
 - 2026-08-14: T1 done — `expect_abort_at_site()` refuses a non-`norms_audit_matcher` argument by name; test asserts the refusal for a string, a plain callable and `NULL`, with a passing control that shows the matcher accepts its own fixture's message. Suite green (FAIL 0, PASS 7130).
 
+- 2026-08-14: T2 done — the acceptance matrix and its expected off-diagonal moved into `norms_audit_acceptance_matrix()` / `norms_audit_expected_offdiag()` in the helper; membership now comes from `norms_audit_shared_key_sites()` alone, with `shared_fn` injectable so AC5's two mutants run without editing source. Both mutants verified against the two-part fixture, and each shown vacuous on the other part. Suite green (FAIL 0, PASS 7136).
 ## Decisions
 
 ### 2026-08-14: AC2's no-floor-when-truncated rule keeps a measured residual leak, pinned rather than closed

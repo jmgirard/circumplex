@@ -677,41 +677,68 @@ test_that("a stopifnot matcher rejects a degenerate stem (M82)", {
 
 test_that("no matcher accepts a message from another site (M82)", {
   env <- marker_defs()
-  # Each fixture raised ONCE, its message captured under the shared locale pin.
-  # Once, because provoking a site per cell would make the matrix quadratic in
-  # fixture runs for no gain -- the message is a property of the site.
-  msgs <- vapply(SCRIPT_ABORTS, function(s) {
-    norms_audit_with_c_messages(
-      tryCatch({
-        s$fixture(env)
-        NA_character_
-      }, error = conditionMessage)
-    )
-  }, character(1))
+  mx <- norms_audit_acceptance_matrix(SCRIPT_ABORTS, env)
   # A fixture that raised nothing would contribute a vacuous row and column.
-  expect_false(anyNA(msgs))
-
-  n <- length(SCRIPT_ABORTS)
-  accepts <- matrix(FALSE, n, n)
-  for (i in seq_len(n)) {
-    for (j in seq_len(n)) accepts[i, j] <- SCRIPT_ABORTS[[i]]$matcher(msgs[[j]])
-  }
+  expect_false(anyNA(mx$msgs))
 
   # Every site matches its own message. Without this the equality below could
   # be satisfied by a matcher that accepts nothing at all.
-  expect_true(all(diag(accepts)))
+  expect_true(all(diag(mx$accepts)))
 
-  # And the off-diagonal accepting set EQUALS the declared shared-key pairs --
-  # derived from the registry, not listed here, so a new shared pair changes
-  # both sides of this comparison at once and a leaky matcher changes only one.
-  key <- vapply(SCRIPT_ABORTS, function(s) paste(s$kind, s$key, sep = "\t"),
-                character(1))
-  offdiag <- !diag(TRUE, n)
-  expect_identical(accepts & offdiag, outer(key, key, "==") & offdiag)
+  # And the off-diagonal accepting set EQUALS the shared-key pairs the helper
+  # returns -- ONE derivation, called here rather than reproduced. Reproducing
+  # it as `outer(key, key, "==")` dropped the helper's differing-binding
+  # conjunct and agreed with it only because no same-binding twin is shipped
+  # (M82 review, F8); the two mutants below are what hold this to the helper.
+  offdiag <- !diag(TRUE, length(SCRIPT_ABORTS))
+  expect_identical(mx$accepts & offdiag, norms_audit_expected_offdiag(SCRIPT_ABORTS))
 
   # Today that set is exactly the two `source note not found` cells. Pinned, so
   # the equality above cannot quietly become true of a larger set.
-  expect_identical(sum(accepts & offdiag), 2L)
+  expect_identical(sum(mx$accepts & offdiag), 2L)
+})
+
+# The expected side is single-sourced onto `norms_audit_shared_key_sites()`
+# (M83, AC5). Two mutants against a two-part fixture, because one alone is
+# vacuous: on the same-binding fixture the correct helper already returns zero
+# entries, so emptying it changes nothing there.
+
+test_that("the expected off-diagonal is the helper's, not a second derivation (M83)", {
+  # Keys clear AC4's 15-literal-character floor, since the matcher constructor
+  # runs over them at build time.
+  key <- "a planted guard that clears the floor"
+  twin <- norms_audit_build_registry(list(
+    site("stop", "f", key, function(env) NULL, ordinal = 1L),
+    site("stop", "f", key, function(env) NULL, ordinal = 2L)
+  ))
+  pair <- norms_audit_build_registry(list(
+    site("stop", "f", key, function(env) NULL),
+    site("stop", "g", key, function(env) NULL)
+  ))
+  none <- matrix(FALSE, 2L, 2L)
+  both <- !diag(TRUE, 2L)
+
+  # The control. A same-binding twin shares no key ACROSS bindings, so nothing
+  # is pairable; a differing-binding pair contributes both ordered cells.
+  expect_identical(norms_audit_expected_offdiag(twin), none)
+  expect_identical(norms_audit_expected_offdiag(pair), both)
+
+  # Mutant 1 -- the helper without its `binding != binding[[i]]` conjunct. It
+  # calls the twin shared, so the expected side gains the two cells the shipped
+  # matrix would then have to accept.
+  no_binding <- function(entries) {
+    k <- vapply(entries, function(e) paste(e$kind, e$key, sep = "\t"), character(1))
+    entries[vapply(seq_along(entries), function(i) any(k == k[[i]]), logical(1))]
+  }
+  expect_identical(norms_audit_expected_offdiag(twin, no_binding), both)
+  # ... and it is invisible on the differing-binding fixture, which the correct
+  # helper already calls shared. This is why one fixture cannot verify both.
+  expect_identical(norms_audit_expected_offdiag(pair, no_binding), both)
+
+  # Mutant 2 -- the helper returning nothing. It empties the differing-binding
+  # fixture's expected set, and is invisible on the twin, which is already empty.
+  expect_identical(norms_audit_expected_offdiag(pair, function(entries) list()), none)
+  expect_identical(norms_audit_expected_offdiag(twin, function(entries) list()), none)
 })
 
 # Shared-key sites: the pair one message cannot tell apart (M82, RR17 BC8).
