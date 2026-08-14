@@ -141,6 +141,7 @@ change it; a widening would change the pinned roster at
 - 2026-08-14: T7 done, AC7's blocker resolved — the maintainer installed the R-project gfortran build, and `devtools::check(args = "--no-manual")` now runs to `0 errors | 0 warnings | 0 notes` (7m 55s). The first post-install run carried one NOTE naming the installer left in the repo root by the download command; it was moved to `~/Downloads` and the check re-run clean. No NEWS entry: the milestone changes test machinery only.
 - 2026-08-14: all tasks done; status → review.
 - 2026-08-14: review round 1 — three fresh-context lenses plus a fresh scorer; ten findings, three actioned (F6 88, F1 85, F3 84), none meeting the return floor. F6 and F1 fixed on the branch and re-verified (`check` 0/0/0); F3's disposition goes to the maintainer at the merge gate. A stated bound and its ROADMAP candidate row come out of F1's repair.
+- 2026-08-14: merge approved by Jeff at the review gate with F3 recorded rather than fixed; two ROADMAP candidate rows added (the same-binding-twin matrix defect, promote into M84; the value-passing field-access bound from F1's repair).
 ## Decisions
 
 ### 2026-08-14: AC2's no-floor-when-truncated rule keeps a measured residual leak, pinned rather than closed
