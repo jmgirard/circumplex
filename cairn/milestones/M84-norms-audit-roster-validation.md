@@ -1,6 +1,6 @@
 # M84: Validate the norms-audit roster at its boundary
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M83
 - **Driving RR:** —
@@ -103,7 +103,7 @@ row is a duplicate of that rejection, not a live finding.
       wrapper; migrate the 13 argument-taking call sites (3 in markers, 5 in
       coverage, 3 in sample-key, 2 in roster), found by
       `grep -rn 'shipped_roster(' tests/ data-raw/ R/ vignettes/`.
-- [ ] T4. Register each new abort site in `SCRIPT_ABORTS`
+- [x] T4. Register each new abort site in `SCRIPT_ABORTS`
       (`test-norms-audit-markers.R:351`) with its provoking fixture. The
       registrations travel with the task that adds the site — the set-equality
       test reddens the moment an unregistered site exists, so a code task
@@ -111,7 +111,7 @@ row is a duplicate of that rejection, not a live finding.
       that confirms the registry is complete once every site is in.
 - [x] T5. Add the roster-refusal tests to `test-norms-audit-roster.R:92-107`
       and the AC6 real-instrument regression.
-- [ ] T6. Full check.
+- [x] T6. Full check.
 
 ## Work log
 
@@ -125,6 +125,9 @@ row is a duplicate of that rejection, not a live finding.
 - 2026-08-14: amendment gate — AC2 and AC3 amended to name `roster_from_objects()`, the builder the refusals move into, because AC4 removes the argument that made them reachable through `shipped_roster()`. Both wordings cleared a fresh-context [O] criteria audit; its findings fixed before writing were AC2's exhaustive "the two" (AC3 names a third shape), AC3's false today-claim (an all-NA `Sample` errors today with AC2's second message, verified), the zero-row corner AC2 must not refuse, and AC2's unbacked "fixturable only through an object list" clause, dropped. Declined: editing the Goal, which is plan-owned and stays true through the wrapper; naming the builder in AC4 and AC6, which are satisfiable as written.
 - 2026-08-14: amendment gate added a fourth refusal not in the plan — an unnamed `objects` list, which returned a zero-row roster covering nothing. Registered and fixture-provoked under AC5 rather than given its own criterion.
 - 2026-08-14: T2, T3, T5 — `roster_from_objects()` holds the derivation and all four refusals; `shipped_roster()` is its no-argument wrapper over the package's own enumeration. 13 argument-taking call sites migrated. Four new abort sites registered. Line anchors in Scope, AC1 and T1 predate `validate_roster()` and are ~25 lines short of the current file; the builder now sits at `data-raw/audit-norms.R:508-576` and the roster resolves at `:705`.
+- 2026-08-14: T4 — registry sweep: 7 sites added (3 in `validate_roster()`, 4 in `roster_from_objects()`), all present in `SCRIPT_ABORTS`, 26 sites with 26 distinct identities, every new `stop` key 43–122 literal characters against the floor of 15, and the cross-discrimination off-diagonal still pinned at the 2 `source note not found` cells. `document()` emits no unresolved-link warning and no `man/`/`NAMESPACE` diff; the roxygen 8.0.0→8.1.0 `DESCRIPTION` line it wrote is a local toolchain artifact, reverted.
+- 2026-08-14: T6 — `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7216; `devtools::check(args = "--no-manual")` Status: OK (0 errors, 0 warnings, 0 notes); `cairn_validate` all checks passed. No NEWS entry: `data-raw/` is not installed, so nothing here is user-visible.
+- 2026-08-14: status → review.
 
 ## Decisions
 
