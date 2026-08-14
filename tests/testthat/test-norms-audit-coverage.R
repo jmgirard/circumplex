@@ -177,31 +177,71 @@ test_that("two passes over one note do not duplicate its note-only row (M80)", {
   expect_identical(sum(!res$coverage$exempt), 0L)
 })
 
-test_that("two note-only rows differing only in anchor stay two (M80)", {
+test_that("two note-only rows differing in one key cell stay two (M80)", {
   env <- coverage_defs()
-  # The dedupe key is the NOTE ROW -- scale, value and anchor -- not the two
-  # cells the report carries. Keyed on the report's `label` and `detail` alone,
-  # these two rows collapse to one and the second citation vanishes with no row
-  # anywhere recording it (M80 review, F1): one source tabling one sample at two
-  # places is an ordinary shape, and which table a value came from is the
-  # provenance this audit exists to keep. No committed note has it, hence a
-  # fixture.
+  # The dedupe key is the NOTE ROW -- sample, scale, value and anchor -- not the
+  # two cells the report carries. Keyed on the report's `label` and `detail`
+  # alone, a pair differing only in a cell the report does not carry collapses to
+  # one and the second row vanishes with no row anywhere recording it (M80
+  # review, F1): one source tabling one sample at two places is an ordinary
+  # shape, and which table a value came from is the provenance this audit exists
+  # to keep.
+  #
+  # One case per cell the key is free in, because the full run fences none of
+  # them: dropping any SINGLE cell from the key still emits 14 note-only rows
+  # over the committed notes (measured 2026-08-13), so a fixture varying one cell
+  # leaves the other three able to be dropped with no test able to tell. No
+  # committed note carries any of the four shapes (measured 2026-08-13 over the
+  # committed notes), hence fixtures.
+  base <- "| note-only | — | replication sample | n = 50 | Table 9 |"
+  axes <- list(
+    sample = list(row = "| note-only | 1 | replication sample | n = 50 | Table 9 |",
+                  label = rep("replication sample", 2L),
+                  detail = rep("n = 50", 2L)),
+    scale  = list(row = "| note-only | — | validation sample | n = 50 | Table 9 |",
+                  label = c("replication sample", "validation sample"),
+                  detail = rep("n = 50", 2L)),
+    value  = list(row = "| note-only | — | replication sample | n = 80 | Table 9 |",
+                  label = rep("replication sample", 2L),
+                  detail = c("n = 50", "n = 80")),
+    anchor = list(row = "| note-only | — | replication sample | n = 50 | Table 10 |",
+                  label = rep("replication sample", 2L),
+                  detail = rep("n = 50", 2L))
+  )
   objects <- list(fx = cov_object())
+  for (cell in names(axes)) {
+    ax <- axes[[cell]]
+    dir <- cov_note_dir(list(one = c(
+      cov_sample_rows(1), cov_sample_rows(2), cov_instrument_rows,
+      base, ax$row
+    )))
+    res <- env$audit_norms(cov_batch(c("one", "one"), c(TRUE, FALSE)),
+                           dir = dir, objects = objects,
+                           roster = env$shipped_roster(objects))
+    only <- res$coverage[res$coverage$side == "note-only-sample", , drop = FALSE]
+    # Two rows, and both from ONE pass over the block rather than one row per
+    # pass: the count alone cannot tell those apart, so assert the payloads. The
+    # second pass carries scales = FALSE and reads neither row.
+    expect_identical(nrow(only), 2L, info = cell)
+    expect_identical(only$label, ax$label, info = cell)
+    expect_identical(only$detail, ax$detail, info = cell)
+    expect_identical(sum(!res$coverage$exempt), 0L, info = cell)
+  }
+
+  # The other half of the same filter: two IDENTICAL note-only rows inside ONE
+  # pass collapse to one. Keying only against EARLIER passes satisfies every
+  # case above -- each pair's rows are both unseen when the first pass reads
+  # them -- so without this the within-pass half could be deleted with no test
+  # able to tell (M80 return-1, found by mutating the key line).
   dir <- cov_note_dir(list(one = c(
-    cov_sample_rows(1), cov_sample_rows(2), cov_instrument_rows,
-    "| note-only | — | replication sample | n = 50 | Table 9 |",
-    "| note-only | — | replication sample | n = 50 | Table 10 |"
+    cov_sample_rows(1), cov_sample_rows(2), cov_instrument_rows, base, base
   )))
   res <- env$audit_norms(cov_batch(c("one", "one"), c(TRUE, FALSE)), dir = dir,
                          objects = objects,
                          roster = env$shipped_roster(objects))
   only <- res$coverage[res$coverage$side == "note-only-sample", , drop = FALSE]
-  # Two rows, and both from one pass over the block rather than one row per
-  # pass: the count alone cannot tell those apart, so assert the payloads.
-  expect_identical(nrow(only), 2L)
-  expect_identical(only$label, rep("replication sample", 2L))
-  expect_identical(only$detail, rep("n = 50", 2L))
-  expect_identical(sum(!res$coverage$exempt), 0L)
+  expect_identical(nrow(only), 1L)
+  expect_identical(only$label, "replication sample")
 })
 
 test_that("a value missing from either side names its field and sample (M80)", {

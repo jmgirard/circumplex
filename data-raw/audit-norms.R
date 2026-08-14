@@ -396,14 +396,21 @@ shipped_values <- function(inst, sample, scales = TRUE, obj = NULL) {
 # shape this file refuses everywhere else: a value the audit cannot read is a
 # note or an object someone got wrong, not a value to agree with.
 #
-# The refusal is the COERCION's own verdict, not a shape test standing in for
-# it. A `grepl("^[0-9]+$", p)` shape test looks equivalent and is not: it
-# admits any digit string, and `as.integer("99999999999")` is NA for being out
-# of integer range, so two overflowing cells still normalised to "NA" and still
-# compared equal -- the defect this guard exists to close, surviving inside the
-# guard that claimed to close it (M80 review, F3). Checking `as.integer()`'s
-# own result covers every way it can fail to read a cell, which no enumeration
-# of shapes can promise.
+# The refusal composes TWO independent tests, because each admits what the
+# other refuses and this milestone shipped each one alone once:
+#
+#   * shape -- `grepl("^[0-9]+$", p)`. An item number is a plain unsigned digit
+#     string. `as.integer()` alone reads a decimal, a scientific literal, a hex
+#     literal and a signed integer without ever returning NA, so it REWRITES
+#     such a cell into a different key instead of refusing it: "1.5, 9" became
+#     "1, 9" and agreed with a shipped "1, 9" (M80 review round 2, G1).
+#   * coercion -- `as.integer()`'s own verdict. The shape test alone admits any
+#     digit string, and `as.integer("99999999999")` is NA for being out of
+#     integer range, so two overflowing cells both normalised to the string
+#     "NA" and compared equal (M80 review round 1, F3).
+#
+# Neither is a stand-in for the other: shape refuses what R can read but this
+# audit must not, coercion refuses what R cannot read at all.
 #
 # `strsplit()` drops a trailing empty field, so the fields are counted against
 # the separators rather than read off the split: "1, 9," is a malformed cell
@@ -413,7 +420,7 @@ normalise_items <- function(x) {
     one <- as.character(one)
     p <- trimws(strsplit(one, ",", fixed = TRUE)[[1L]])
     n <- suppressWarnings(as.integer(p))
-    bad <- is.na(one) || !length(p) || anyNA(n) ||
+    bad <- is.na(one) || !length(p) || anyNA(n) || !all(grepl("^[0-9]+$", p)) ||
       length(p) != lengths(regmatches(one, gregexpr(",", one, fixed = TRUE))) + 1L
     if (bad) {
       stop("item key is not a comma-separated list of integers: ", one,
@@ -674,20 +681,24 @@ audit_norms <- function(batch = AUDIT_BATCH,
     # rows twice.
     #
     # The payload is part of the key, not decoration, and the payload is the
-    # NOTE ROW -- scale, value and anchor -- not the two cells the report
-    # happens to carry. Keying on (citekey, block, sample) alone would collapse
-    # the 14 rows the repo emits to the 9 blocks that carry them, every
-    # note-only row carrying the NO_SAMPLE token; keying without the anchor
-    # collapses two rows citing one sample to two different tables into one.
-    # Both are the silent row loss every other sweep in this file refuses.
+    # NOTE ROW -- sample, scale, value and anchor -- not the two cells the
+    # report happens to carry. Keying on (citekey, block, sample) alone would
+    # collapse the 14 rows the repo emits to the 9 blocks that carry them,
+    # every note-only row carrying the NO_SAMPLE token; keying without the
+    # anchor collapses two rows citing one sample to two different tables into
+    # one; keying without the sample collapses an instrument-level note and a
+    # per-sample note that happen to read alike. All three are the silent row
+    # loss every other sweep in this file refuses. `sample` earns its place on
+    # the same ground as `anchor` and not on the committed run, where every
+    # note-only row carries the NO_SAMPLE token and it changes nothing.
     #
     # Keyed here rather than by deduplicating the assembled frame: the anchor
     # is the audit's provenance cell and the report does not carry it, so the
     # key exists only at this point. Filtering here also cannot reach across
     # sides, which a `duplicated()` over the whole frame could.
     if (nrow(note_only)) {
-      key <- paste(note_only$scale, note_only$value, note_only$anchor,
-                   sep = "\r")
+      key <- paste(note_only$sample, note_only$scale, note_only$value,
+                   note_only$anchor, sep = "\r")
       # Within this pass's rows as well as against earlier passes. Filtering
       # only against earlier passes leaves the key inert for a block read once
       # -- every row of a single pass is unseen whatever it says -- so the

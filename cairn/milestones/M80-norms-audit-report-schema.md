@@ -44,16 +44,19 @@ the same emitters. Changing any value in `data/` → not here.
       claiming instrument from `blocks[[bkey]]$instrument`. Citekey and block
       tag ride in their own columns rather than inside `instrument` (`:448`).
 - [ ] AC3 A `note-only` coverage row appears once per citekey, block, and the
-      row's own payload — the note row's `scale`, `value` and `anchor` cells,
-      the key being taken from the note row rather than from the report, whose
-      ten columns do not include `anchor` — not once per batch pass that reads
-      the block. A test asserts the full run still emits 14 note-only rows, and
-      a fixture test asserts that two note-only rows in one block differing only
-      in their `anchor` cell emit two coverage rows (no committed note has that
-      shape). Every note-only row in the repo carries `sample = "—"` in the
-      note, so a key including `sample` but not the payload collapses those 14
-      to the 9 blocks that carry them (measured 2026-08-13 over the committed
-      notes).
+      row's own payload — the note row's `sample`, `scale`, `value` and
+      `anchor` cells, the key being taken from the note row rather than from
+      the report, whose ten columns do not include `anchor` — not once per
+      batch pass that reads the block, and once within a pass as well as
+      across passes. A test asserts the full run still emits 14 note-only rows;
+      because dropping any single cell from the key still emits those 14, one
+      fixture test per key cell asserts that two note-only rows in one block
+      differing only in that cell emit two coverage rows, and a fixture of two
+      identical rows in one pass asserts they emit one (measured 2026-08-13
+      over the committed notes: no committed note carries any of these shapes).
+      Every note-only row in the repo carries `sample = "—"` in the note, so a
+      key including `sample` but not the payload collapses those 14 to the 9
+      blocks that carry them (measured 2026-08-13 over the committed notes).
 - [ ] AC4 `validate_batch()` refuses a `divisor` that is missing,
       non-numeric, `NA`, non-finite, or not strictly positive, each shape with
       its own test asserting the specific message.
@@ -126,6 +129,8 @@ the same emitters. Changing any value in `data/` → not here.
 - 2026-08-13: review round 1 returned to `in-progress` (defect return 1). AC5 fails: `normalise_items()`'s `grepl("^[0-9]+$", p)` admits a digit string past integer range, `as.integer()` overflows to NA and the paste yields the string `"NA"`, so `values_agree("Items", "99999999999", "88888888888", 1)` is TRUE — the coercion the criterion names as closed. Five more findings action at ≥80 (F1 anchor-blind dedupe key, F8/F9 two unfenced criterion clauses, F10 a vacuous NA assertion, R1 a false figure). PR #109 open, draft.
 - 2026-08-13: T7 — audit re-run at `9d56bf2a`: ledger 194 rows, coverage 15 rows, 0 gaps, 14 note-only, 1 constructed credit, 0 angle-copy splits, 0 IP2 breaches. Ledger compared row by row against the committed file with the three stamp columns stripped: identical, so no audited comparison changed; the coverage CSV was regenerated at T1/T2 and is unchanged since. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 6974 (the 6 warnings all outside this milestone's files, unchanged from M81's run). `devtools::check(args = "--no-manual")`: Status OK, 0 errors / 0 warnings / 0 notes, 7m 12s. No NEWS entry: this milestone changes `data-raw/` and `tests/` only, neither of which is installed, so there is no user-visible change to record.
 - 2026-08-13: check needed M81's recorded gfortran workaround again — a scratch `FLIBS=` via `R_MAKEVARS_USER`, uncommitted. Without it the source install fails to link (`ld: library 'emutls_w' not found`), R's default `FLIBS` naming `/opt/gfortran/lib` unconditionally though `src/` is C++ only. Machine setup, not this branch: the first check run failed before compiling any of it.
+- 2026-08-13: AC5 third attempt, chosen at the resume gate over a `/milestone-brief` escalation: the `Items` guard now COMPOSES the shape test with `as.integer()`'s verdict instead of substituting one for the other — round 1 shipped shape alone (a digit string past integer range coerced to `"NA"`), round 2 coercion alone (`normalise_items("1.5, 9")` returned `"1, 9"`, agreeing with a shipped `1, 9`). Decimal, hex, scientific and signed cells now tested plus the comparison pair; deleting the shape half reddens 6 assertions and the coercion half 2, so neither is redundant.
+- 2026-08-13: AC3 amended under D-M80-1's authorization — `sample` joins the note-only dedupe key. Audited before landing by a fresh-context [O] reader that authored none of it; three findings, all adopted: the within-pass half of the filter was unfenced, the criterion's absence parenthetical carried no measurement stamp, and the 14-row assertion fences no single key cell — dropping `scale` alone from the key passed the entire coverage file, confirmed by mutation — so the criterion now asks one fixture per key cell plus an identical-rows fixture. All five mutations redden (3 per cell, 2 for the within-pass half). Accepted at the mini gate.
 - 2026-08-13: T2 found seven emitters, not the plan's six — M79 added `shipped-sample-not-audited` after this plan was written — and the roster test file carries coverage assertions the plan attributed to the provenance file alone.
 
 ## Decisions

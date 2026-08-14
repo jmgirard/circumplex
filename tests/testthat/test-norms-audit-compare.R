@@ -89,6 +89,24 @@ test_that("two unparseable item cells do not compare equal (M80)", {
     function() env$normalise_items(""),
     "stop", "item key is not a comma-separated list of integers: {}"
   )
+  # The shape the SECOND fix opened by dropping the shape test rather than
+  # composing with it: `as.integer()` reads a decimal, a scientific literal, a
+  # hex literal and a signed integer without ever returning NA, so each was
+  # silently rewritten into a different key -- "1.5, 9" normalised to "1, 9"
+  # and agreed with a shipped "1, 9" (M80 review round 2, G1). An item number
+  # is a plain unsigned digit string; none of these is one.
+  for (cell in c("1.5, 9", "0x10, 9", "1e2, 9", "+1, 9", "-9, 1")) {
+    expect_abort_at_site(
+      function() env$normalise_items(cell),
+      "stop", "item key is not a comma-separated list of integers: {}"
+    )
+  }
+  # The comparison that made it a defect rather than a cosmetic rewrite: a note
+  # transcribing an item as 1.4 agreed with a shipped 1.
+  expect_abort_at_site(
+    function() env$values_agree("Items", "1, 9", "1.4, 9", 1),
+    "stop", "item key is not a comma-separated list of integers: {}"
+  )
   # The control: a real key still normalises, so the guard has not simply
   # refused everything.
   expect_identical(env$normalise_items(c("1,  9, 17", "2, 10, 18")),
