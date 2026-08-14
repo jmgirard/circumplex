@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-14 (M83, M84, M85 planned in one run from the two norms-audit candidate rows, both now graduated and carrying corrections the plan gate's surveys forced — M79's AC1 does not sanction an unvalidated roster, and F7's `function(abort = 1)` example was never flagged. M84 depends on M83: every abort site M84 adds must pass M83's matcher.)_
+_Last hygiene check: 2026-08-14 (M83 done — the norms-audit abort matcher now accepts correct sites. Its review left two candidate rows: a same-binding-twin matrix defect M83 introduced, to be taken by M84, and the value-passing field-access bound. M78's terminal row pruned under retention; two LESSONS families extended.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,12 +9,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M78 | Per-sample reference-kind field in the shipped norms | done | — | high | milestones/archive/M78-norms-reference-kind-field.md |
 | M79 | Bind the norms audit's batch to the shipped roster | done | — | normal | milestones/archive/M79-norms-audit-roster-binding.md |
 | M81 | Enumerate the norms-audit abort registry from the script's parse tree | done | M79 | normal | milestones/archive/M81-norms-audit-abort-registry.md |
 | M80 | Give the norms-audit coverage report a machine-readable key | done | M79, M81 | normal | milestones/archive/M80-norms-audit-report-schema.md |
 | M82 | Make the norms-audit abort registry discriminating | done | M81 | normal | milestones/archive/M82-norms-audit-abort-discrimination.md |
-| M83 | Make the norms-audit abort matcher accept correct sites | review | — | normal | milestones/M83-norms-audit-matcher-repair.md |
+| M83 | Make the norms-audit abort matcher accept correct sites | done | — | normal | milestones/archive/M83-norms-audit-matcher-repair.md |
 | M84 | Validate the norms-audit roster at its boundary | planned | M83 | normal | milestones/M84-norms-audit-roster-validation.md |
 | M85 | Carry the sample through the audit's note-only coverage rows | planned | — | low | milestones/M85-norms-audit-note-only-sample.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
