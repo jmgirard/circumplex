@@ -116,6 +116,7 @@ the same emitters. Changing any value in `data/` → not here.
 - 2026-08-13: T1 minor amendment at the implementation gate: the schema takes two free-text columns, `label` and `detail`, beside the eight the plan named. A note-only row carries two free-text cells (the note's name for the unshipped material and its description) and the eight key columns have nowhere to put either once each holds only its own fact; Jeff chose the two-column shape over pasting them together or dropping the description.
 - 2026-08-13: T4 done in `tests/testthat/test-norms-audit-batch.R`; the four new `stop()` sites are registered in M81's abort registry, which is what forced them to carry fixtures. The missing-column shape needed no new guard — M72's required-names `stopifnot()` already covers it, so its test asserts that site instead.
 - 2026-08-13: T5 done in `tests/testthat/test-norms-audit-compare.R`; normalising the source side changes no committed ledger row, the notes' item keys having been written unpadded — the run stays 194 ledger rows, 15 coverage rows, 0 gaps.
+- 2026-08-13: paused at the maintainer's choice with two items open, both decided but neither built: AC5's third attempt (approach not chosen — the routing chip offered a direct fix and a `/milestone-brief` escalation, and the maintainer paused instead of picking), and G3, which the maintainer ruled IN as D-M80-1 above. Resume with `/milestone-implement M80`; nothing is half-applied, the branch is pushed at `154c8524` and the suite is green but for the AC5 hole this pause leaves open.
 - 2026-08-13: review round 2 returned to `in-progress` (defect return 2). AC5 fails again: round 1's fix replaced the `grepl("^[0-9]+$", p)` shape test with `as.integer()`'s verdict instead of composing the two, so `normalise_items("1.5, 9")` returns `"1, 9"` and `values_agree("Items", "1, 9", "1.4, 9", 1)` is TRUE — a decimal, hex, scientific or signed cell is now coerced where the pre-fix guard refused it. One finding at the bar (G1, 93); 15 logged below it, 5 of them round 1's own sub-threshold findings re-reported unchanged. Thrash trigger (b) fires — one criterion, two failures, both a guard admitting a cell it should refuse — and the plan gate recorded no alternative against, so `/milestone-brief` escalation is offered at the routing chip.
 - 2026-08-13: return-1 verification: audit re-run at `a834445a` — 194 ledger rows, 15 coverage rows, 0 gaps, 14 note-only; ledger identical to the committed one bar its three stamp columns and the coverage CSV byte-unchanged, so none of the six fixes moved a reported value. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7000 (up 26 from round 1's 6974, the new fixtures). `devtools::check(args = "--no-manual")` Status OK, 0/0/0, 7m 39s. Back to `review`.
 - 2026-08-13: return-1 fixes. F3: the `Items` guard now refuses on `as.integer()`'s own verdict rather than on a shape test standing in for it, which is what let a digit string past integer range coerce to the string `"NA"` and compare equal to another; F4 came with it, the field count now taken from the separators so a trailing comma is malformed rather than a two-item key. F1: the note-only key is the note row — scale, value and anchor — and is applied within a pass as well as across passes; the post-hoc `duplicated()` over the assembled frame is gone, which takes F2's cross-side reach with it. F8, F9: the two value-level emitters and AC2's claiming-instrument clause have committed tests for the first time. F10: `nzchar(NA_character_)` is TRUE, so the payload assertion now tests `!is.na()` first. F12, F13 fixed as false comments though both scored below the bar, being prose this branch authored.
@@ -128,6 +129,17 @@ the same emitters. Changing any value in `data/` → not here.
 - 2026-08-13: T2 found seven emitters, not the plan's six — M79 added `shipped-sample-not-audited` after this plan was written — and the roster test file carries coverage assertions the plan attributed to the provenance file alone.
 
 ## Decisions
+
+- 2026-08-13 (D-M80-1): the note-only dedupe key will take the note row's
+  `sample` cell as well as its `scale`, `value` and `anchor`. Decided by the
+  maintainer at the round-2 routing chip, on G3 (scored 52, below the action
+  bar): two note-only rows differing only in their sample collapse to one and
+  the lost row is recorded nowhere, which the maintainer judged a silent loss
+  worth closing whatever its score. This authorizes a SECOND amendment to
+  AC3's wording, which the tracking rules otherwise stop and route to the
+  maintainer — the authorization is this entry. The amendment still runs the
+  full protocol at implement time: proposed text, a fresh-context reader that
+  authored none of it, and the mini gate.
 
 ## Review
 
