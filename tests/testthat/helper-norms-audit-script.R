@@ -270,29 +270,99 @@ norms_audit_stopifnot_conditions <- function(cl) {
   out
 }
 
-# Every `stop()`/`stopifnot()` site the walk collects, as (kind, key) pairs in
-# source order -- the header above bounds what that does and does not cover.
-# One entry per `stop()` call and one per `stopifnot()` CONDITION, since each
-# condition fails on its own and gets its own fixture under AC2/AC3.
-norms_audit_abort_sites <- function(exprs = norms_audit_script_exprs()) {
-  out <- list()
-  for (cl in norms_audit_calls(ABORT_HEADS, exprs)) {
-    head <- paste(deparse(cl[[1L]]), collapse = "")
-    if (head %in% c("stopifnot", "base::stopifnot")) {
-      for (cond in norms_audit_stopifnot_conditions(cl)) {
-        out[[length(out) + 1L]] <- cond
-      }
-    } else {
-      out[[length(out) + 1L]] <- list(kind = "stop", key = norms_audit_stop_key(cl))
+# The binding name carried by run-block sites, which sit under no binding.
+NORMS_AUDIT_RUN_BINDING <- "<run>"
+
+# The top-level binding a whole expression defines, or `"<run>"` if it defines
+# none. `f <- function() ...` binds `f`; the trailing `if (...) { ... }` block
+# binds nothing and its sites are run-block sites.
+norms_audit_top_level_binding <- function(expr) {
+  if (is.call(expr) && length(expr) >= 3L) {
+    head <- deparse_flat(expr[[1L]])
+    if (head %in% c("<-", "=", "<<-")) {
+      lhs <- expr[[2L]]
+      if (is.name(lhs)) return(as.character(lhs))
+      if (is.character(lhs) && length(lhs) == 1L) return(lhs)
     }
   }
-  out
+  NORMS_AUDIT_RUN_BINDING
 }
 
-# Comparable form for the set-equality assertion: kind and key together, so a
-# site cannot match a registry entry of the other kind.
+# Source-order ordinals, assigned WITHIN each (kind, binding, key) group.
+#
+# The ordinal exists to keep two sites that are otherwise identical -- the same
+# guard written twice inside one function -- separately identifiable, and it
+# does nothing else: a site with no twin is ordinal 1, so adding a twin later
+# renumbers nothing that already exists.
+norms_audit_assign_ordinals <- function(sites) {
+  counts <- list()
+  for (i in seq_along(sites)) {
+    s <- sites[[i]]
+    k <- paste(s$kind, s$binding, s$key, sep = "\t")
+    n <- if (is.null(counts[[k]])) 1L else counts[[k]] + 1L
+    counts[[k]] <- n
+    sites[[i]]$ordinal <- n
+  }
+  sites
+}
+
+# Every `stop()`/`stopifnot()` site the walk collects, as
+# (kind, binding, key, ordinal) in source order -- the header above bounds what
+# that does and does not cover. One entry per `stop()` call and one per
+# `stopifnot()` CONDITION, since each condition fails on its own and gets its
+# own fixture under AC2/AC3.
+#
+# The walk is per top-level expression rather than over the whole tree at once,
+# because the enclosing binding is a property of the top-level expression a site
+# sits inside and is lost by a flat walk (M82).
+norms_audit_abort_sites <- function(exprs = norms_audit_script_exprs()) {
+  out <- list()
+  for (i in seq_along(exprs)) {
+    binding <- norms_audit_top_level_binding(exprs[[i]])
+    for (cl in norms_audit_calls(ABORT_HEADS, exprs[i])) {
+      head <- paste(deparse(cl[[1L]]), collapse = "")
+      if (head %in% c("stopifnot", "base::stopifnot")) {
+        for (cond in norms_audit_stopifnot_conditions(cl)) {
+          out[[length(out) + 1L]] <- c(cond, list(binding = binding))
+        }
+      } else {
+        out[[length(out) + 1L]] <- list(
+          kind = "stop", key = norms_audit_stop_key(cl), binding = binding
+        )
+      }
+    }
+  }
+  norms_audit_assign_ordinals(out)
+}
+
+# Build the registry, refusing two entries that claim the same site.
+#
+# A registry entry DECLARES its ordinal rather than receiving a derived one, and
+# that is what makes this check reachable: derive the ordinal per duplicate
+# group, as the collected side does, and a doubly-registered entry silently
+# becomes ordinal 2 -- a distinct identity, matching nothing, and no error
+# anywhere (M82 plan gate, criteria audit). Declared, the two collide and the
+# build says so.
+norms_audit_build_registry <- function(entries) {
+  ids <- vapply(entries, function(e) {
+    paste(e$kind, e$binding, e$key, e$ordinal, sep = "\t")
+  }, character(1))
+  dup <- unique(ids[duplicated(ids)])
+  if (length(dup)) {
+    stop("registry declares the same abort site twice: ",
+         paste(gsub("\t", " | ", dup), collapse = "; "), call. = FALSE)
+  }
+  entries
+}
+
+# Comparable form for the set-equality assertion: the full identity, so a site
+# cannot match a registry entry of another kind, another function, or another
+# occurrence of the same guard. M81 compared kind and key alone, which two
+# sites sharing a key satisfy in either pairing (M82, RR17 rev 2 BC7).
 norms_audit_site_ids <- function(sites) {
-  sort(vapply(sites, function(s) paste0(s$kind, "\t", s$key), character(1)))
+  sort(vapply(sites, function(s) {
+    paste(s$kind, s$binding, s$key, s$ordinal, sep = "\t")
+  }, character(1)))
 }
 
 # Does this call resolve `nm` out of a package namespace?

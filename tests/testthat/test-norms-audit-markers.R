@@ -339,20 +339,27 @@ note_dir <- function(name, lines) {
 
 table_head <- c("| field | sample | scale | value | anchor |", "|---|---|---|---|---|")
 
-site <- function(kind, key, fixture) list(kind = kind, key = key, fixture = fixture)
+# One registry entry. The identity is (kind, binding, key, ordinal): `binding`
+# is the top-level binding the site sits under, and `ordinal` is DECLARED here
+# rather than derived, so registering one entry twice collides at build time
+# instead of quietly becoming a second, matchless identity (M82).
+site <- function(kind, binding, key, fixture, ordinal = 1L) {
+  list(kind = kind, binding = binding, key = key, fixture = fixture,
+       ordinal = ordinal)
+}
 
-SCRIPT_ABORTS <- list(
+SCRIPT_ABORTS <- norms_audit_build_registry(list(
   # validate_batch()'s stopifnot(), one entry per CONDITION: each fails on its
   # own and each needs a fixture that reaches it rather than its sibling.
   #
   # The non-data-frame fixture carries all five required names, so the sibling
   # condition below is TRUE and cannot abort in this one's place -- without
   # that, deleting `is.data.frame(batch)` would still leave the case red.
-  site("stopifnot", "is.data.frame(batch)", function(env) {
+  site("stopifnot", "validate_batch", "is.data.frame(batch)", function(env) {
     env$validate_batch(list(instrument = "fx", sample = 1, citekey = "k",
                             divisor = 1, scales = TRUE))
   }),
-  site("stopifnot",
+  site("stopifnot", "validate_batch",
        paste0('all(c("instrument", "sample", "citekey", "divisor", ',
               '"scales") %in% names(batch))'),
        function(env) {
@@ -362,9 +369,9 @@ SCRIPT_ABORTS <- list(
                                        citekey = "k", divisor = 1,
                                        stringsAsFactors = FALSE))
        }),
-  site("stop", "AUDIT_BATCH names the same (instrument, sample) twice: {}",
+  site("stop", "validate_batch", "AUDIT_BATCH names the same (instrument, sample) twice: {}",
        function(env) env$validate_batch(rbind(shared_batch(), shared_batch()[1, ]))),
-  site("stop",
+  site("stop", "validate_batch",
        paste0("AUDIT_BATCH must mark exactly one `scales` entry per ",
               "instrument; wrong for: {}"),
        function(env) {
@@ -375,22 +382,22 @@ SCRIPT_ABORTS <- list(
   # validate_batch()'s divisor guards (M80). Each fixture is clean in every
   # other respect, so only the shape it names can be what aborts: the NA case
   # carries no Inf, the Inf case no NA, and the non-positive case neither.
-  site("stop", "AUDIT_BATCH$divisor must be numeric, not {}", function(env) {
+  site("stop", "validate_batch", "AUDIT_BATCH$divisor must be numeric, not {}", function(env) {
     b <- shared_batch()
     b$divisor <- c("1", "1")
     env$validate_batch(b)
   }),
-  site("stop", "AUDIT_BATCH$divisor is missing for: {}", function(env) {
+  site("stop", "validate_batch", "AUDIT_BATCH$divisor is missing for: {}", function(env) {
     b <- shared_batch()
     b$divisor <- c(1, NA_real_)
     env$validate_batch(b)
   }),
-  site("stop", "AUDIT_BATCH$divisor is not finite for: {}", function(env) {
+  site("stop", "validate_batch", "AUDIT_BATCH$divisor is not finite for: {}", function(env) {
     b <- shared_batch()
     b$divisor <- c(1, Inf)
     env$validate_batch(b)
   }),
-  site("stop", "AUDIT_BATCH$divisor must be strictly positive; wrong for: {}",
+  site("stop", "validate_batch", "AUDIT_BATCH$divisor must be strictly positive; wrong for: {}",
        function(env) {
          b <- shared_batch()
          b$divisor <- c(1, 0)
@@ -398,26 +405,26 @@ SCRIPT_ABORTS <- list(
        }),
   # normalise_items() (M80): an unparseable item key aborts rather than
   # coercing to the string "NA", which two unparseable cells shared.
-  site("stop", "item key is not a comma-separated list of integers: {}",
+  site("stop", "normalise_items", "item key is not a comma-separated list of integers: {}",
        function(env) env$normalise_items("not an item key")),
-  site("stop", "malformed audit-values marker: {}",
+  site("stop", "source_note_marker", "malformed audit-values marker: {}",
        function(env) env$source_note_tags("<!-- audit-values-beginning -->")),
   # The two "source note not found" sites are different functions, and the
   # registry carries both: this key is the one place a site count above 1 is
   # intended, so the set equality below is what keeps it honest.
   #
   # RELOCATES: no-oped, readLines() fails next -- "cannot open the connection".
-  site("stop", "source note not found: {}", function(env) {
+  site("stop", "parse_source_note", "source note not found: {}", function(env) {
     env$parse_source_note("absent", note_dir("other", "x"), instrument = "fx")
   }),
-  site("stop", "source note not found: {}", function(env) {
+  site("stop", "source_note_block_tags", "source note not found: {}", function(env) {
     env$source_note_block_tags("absent", note_dir("other", "x"))
   }),
   # RELOCATES, into the duplicate-tag guard: no-oped, the two untagged blocks
   # both carry the tag "", so that guard catches it. Removing BOTH would return
   # a row range spanning someone else's block, which is why neither is
   # redundant.
-  site("stop", "source note {} has no well-formed audit-values block(s)",
+  site("stop", "parse_source_note", "source note {} has no well-formed audit-values block(s)",
        function(env) {
          env$parse_source_note("bad", note_dir("bad", c(
            "<!-- audit-values-begin -->", "<!-- audit-values-begin -->",
@@ -428,7 +435,7 @@ SCRIPT_ABORTS <- list(
   # (measured: 1 row, value 1.1, the second block's 2.2 never seen), so the
   # second instrument is audited against the first's rows and no comparison can
   # fail. Nothing else raises.
-  site("stop", "source note {} tags two audit-values blocks alike: {}",
+  site("stop", "parse_source_note", "source note {} tags two audit-values blocks alike: {}",
        function(env) {
          env$parse_source_note("dup", note_dir("dup", c(
            "<!-- audit-values-begin: fx -->", table_head,
@@ -439,7 +446,7 @@ SCRIPT_ABORTS <- list(
        }),
   # RELOCATES: no-oped, k stays NA and b[[NA]] raises "subscript out of
   # bounds" -- a redder message for the same state, not a survival.
-  site("stop", "source note {} has no audit-values block for {}; it tags: {}",
+  site("stop", "parse_source_note", "source note {} has no audit-values block for {}; it tags: {}",
        function(env) {
          env$parse_source_note("tagged", note_dir("tagged", c(
            "<!-- audit-values-begin: fx -->", table_head,
@@ -452,7 +459,7 @@ SCRIPT_ABORTS <- list(
   # of a four-cell row), so the value joins the note with its provenance anchor
   # silently gone. An anchor containing a literal "|" is how a real note gets
   # here.
-  site("stop", "source note {} has {} malformed audit row(s); first: {}",
+  site("stop", "parse_source_note", "source note {} has {} malformed audit row(s); first: {}",
        function(env) {
          env$parse_source_note("short", note_dir("short", c(
            "<!-- audit-values-begin -->", table_head,
@@ -462,7 +469,7 @@ SCRIPT_ABORTS <- list(
   # LOAD-BEARING: no-oped, it RETURNS the row with an empty value (measured),
   # which downstream compares as a mismatch -- a wrong ledger row rather than a
   # refusal, so the note's defect is reported as the package's.
-  site("stop", "source note {} has {} audit row(s) with an empty value; first: {}",
+  site("stop", "parse_source_note", "source note {} has {} audit row(s) with an empty value; first: {}",
        function(env) {
          env$parse_source_note("empty", note_dir("empty", c(
            "<!-- audit-values-begin -->", table_head,
@@ -471,11 +478,11 @@ SCRIPT_ABORTS <- list(
        }),
   # shipped_values(): a batch row naming a sample the object does not carry
   # must abort, not audit nothing.
-  site("stop",
+  site("stop", "shipped_values",
        paste0("{} has no single norms record for sample {} ",
               "({} norm rows, {} source rows)"),
        function(env) env$shipped_values("fx", 2, TRUE, two_scale_object())),
-  site("stop",
+  site("stop", "refuse_shared_untagged_blocks",
        paste0("source note {} carries an untagged audit-values block but is ",
               "read by {} instruments ({}); tag each block with the ",
               "instrument it backs"),
@@ -485,7 +492,7 @@ SCRIPT_ABORTS <- list(
          writeLines(block_rows(), file.path(dir, "shared.md"))
          env$refuse_shared_untagged_blocks(shared_batch(), dir)
        })
-)
+))
 
 test_that("every registered abort site raises its own message (M79, M81)", {
   env <- marker_defs()
@@ -497,15 +504,121 @@ test_that("every registered abort site raises its own message (M79, M81)", {
   }
 })
 
-test_that("no stop()/stopifnot() site the walk collects is unregistered (M81)", {
+test_that("no stop()/stopifnot() site the walk collects is unregistered (M81, M82)", {
   norms_audit_script_path()  # skips against the installed package
-  # Both directions at once: sorted (kind, key) ids compared for identity, so
-  # an unregistered site and a registered non-site each fail. The parse tree
-  # covers the trailing run block, which the sourced-environment count this
-  # replaces could not see at all.
+  # Both directions at once: sorted (kind, binding, key, ordinal) ids compared
+  # for identity, so an unregistered site and a registered non-site each fail.
+  # The parse tree covers the trailing run block, which the sourced-environment
+  # count this replaces could not see at all.
+  #
+  # The identity is the full four-part one since M82. M81 compared kind and key,
+  # which the two `source note not found` sites satisfy in EITHER pairing: each
+  # could be registered against the other's function and nothing here noticed.
   expect_identical(
     norms_audit_site_ids(SCRIPT_ABORTS),
     norms_audit_site_ids(norms_audit_abort_sites())
+  )
+})
+
+# The identity's four components, probed one at a time (M82). Asserting only
+# that the two sides agree today would leave every component unexercised: the
+# sides agree because they were written to, and a comparison neither side can
+# fail is the false coverage this whole file exists to remove.
+
+test_that("registering one site twice is refused at build time (M82)", {
+  one <- SCRIPT_ABORTS[[1L]]
+  expect_error(
+    norms_audit_build_registry(list(one, one)),
+    "declares the same abort site twice"
+  )
+  # The refusal is about the DECLARED identity, not about being a copy: the
+  # same site at a different declared ordinal is a different entry and builds.
+  twin <- one
+  twin$ordinal <- 2L
+  expect_length(norms_audit_build_registry(list(one, twin)), 2L)
+})
+
+test_that("a wrong entry in any identity component reddens the comparison (M82)", {
+  norms_audit_script_path()
+  sites <- norms_audit_abort_sites()
+  # The control: unmutated, the two sides agree. Every assertion below is a
+  # departure from THIS, so a disagreement cannot come from somewhere else.
+  expect_identical(norms_audit_site_ids(SCRIPT_ABORTS),
+                   norms_audit_site_ids(sites))
+
+  reddens <- function(mutate, info) {
+    reg <- SCRIPT_ABORTS
+    reg[[1L]] <- mutate(reg[[1L]])
+    expect_false(
+      identical(norms_audit_site_ids(reg), norms_audit_site_ids(sites)),
+      info = info
+    )
+  }
+  reddens(function(e) { e$binding <- "no_such_function"; e }, "binding")
+  reddens(function(e) { e$kind <- "stop"; e }, "kind")
+  reddens(function(e) { e$key <- paste0(e$key, " (corrupted)"); e }, "key")
+  reddens(function(e) { e$ordinal <- 7L; e }, "ordinal")
+})
+
+test_that("the comparison cannot see a shared-key binding SWAP (M82)", {
+  norms_audit_script_path()
+  # Measured, and recorded as a bound rather than fixed: `norms_audit_site_ids()`
+  # compares sorted identity multisets, and the `source note not found` pair is
+  # identical in kind, key and ordinal, so exchanging the two entries' bindings
+  # maps the multiset onto itself. Both entries stay individually correct-looking
+  # while each names the other's function.
+  #
+  # This is exactly why RR17 makes BC7 and BC8 inseparable, and it is AC3's
+  # stack assertion -- not this comparison -- that discriminates the pair. The
+  # test exists so the blindness is stated where a reader meets the comparison,
+  # instead of being rediscovered as a hole.
+  swapped <- SCRIPT_ABORTS
+  idx <- which(vapply(swapped, function(s) s$key, character(1)) ==
+                 "source note not found: {}")
+  expect_length(idx, 2L)
+  b <- vapply(swapped[idx], function(s) s$binding, character(1))
+  expect_identical(sort(b), c("parse_source_note", "source_note_block_tags"))
+  swapped[[idx[[1L]]]]$binding <- b[[2L]]
+  swapped[[idx[[2L]]]]$binding <- b[[1L]]
+  expect_identical(norms_audit_site_ids(swapped),
+                   norms_audit_site_ids(norms_audit_abort_sites()))
+})
+
+test_that("two identical guards in one function stay separable (M82)", {
+  # AC1's set equality and the duplicate-identity refusal have to be jointly
+  # satisfiable: a function carrying the same guard twice is a legal script, and
+  # the ordinal is what keeps its two sites distinct instead of collapsing them
+  # into one identity the registry can only half-satisfy.
+  sites <- norms_audit_abort_sites(parse(
+    text = 'f <- function(x) { stop("boom"); stop("boom") }',
+    keep.source = FALSE
+  ))
+  expect_identical(
+    vapply(sites, function(s) s$ordinal, integer(1)), c(1L, 2L)
+  )
+  expect_identical(vapply(sites, function(s) s$binding, character(1)),
+                   c("f", "f"))
+  # Registering both, each at its own declared ordinal, builds and matches.
+  reg <- norms_audit_build_registry(list(
+    site("stop", "f", "boom", function(env) NULL, ordinal = 1L),
+    site("stop", "f", "boom", function(env) NULL, ordinal = 2L)
+  ))
+  expect_identical(norms_audit_site_ids(reg), norms_audit_site_ids(sites))
+})
+
+test_that("the identity carries no source reference (M82)", {
+  # A STANDING GUARD, not a verification: the shipped enumerator parses with
+  # keep.source = FALSE, so it has no line numbers to key on and this passes
+  # against it trivially. It exists so that a later change to srcref-based
+  # identity -- which would make every identity move whenever a comment above it
+  # moved -- fails here rather than in a confusing diff months later.
+  base <- 'f <- function(x) stop("boom")'
+  shifted <- c("# a comment inserted above", "", base)
+  expect_identical(
+    norms_audit_site_ids(norms_audit_abort_sites(
+      parse(text = base, keep.source = FALSE))),
+    norms_audit_site_ids(norms_audit_abort_sites(
+      norms_audit_parse_text(shifted)))
   )
 })
 
@@ -571,16 +684,20 @@ test_that("the walk keys named conditions and refuses the rest (M81)", {
   # A named condition IS a condition, keyed on its name -- the runtime message.
   # Reading positional arguments only is what returned this milestone: such a
   # guard fires and contributes no key, so nothing ever reports it missing.
+  # Each site carries its full identity since M82: the fixture text binds
+  # nothing, so both sit under `"<run>"` at ordinal 1.
   expect_identical(
     sites('stopifnot("must be numeric" = is.numeric(x), is.data.frame(y))'),
-    list(list(kind = "stopifnot_named", key = "must be numeric"),
-         list(kind = "stopifnot", key = "is.data.frame(y)"))
+    list(list(kind = "stopifnot_named", key = "must be numeric",
+              binding = "<run>", ordinal = 1L),
+         list(kind = "stopifnot", key = "is.data.frame(y)",
+              binding = "<run>", ordinal = 1L))
   )
 
   # `stop()`'s own formals carry no message, so they leave the key alone.
   expect_identical(
     sites('stop("boom", call. = FALSE, domain = NA)'),
-    list(list(kind = "stop", key = "boom"))
+    list(list(kind = "stop", key = "boom", binding = "<run>", ordinal = 1L))
   )
 
   # Refused, not skipped. Each of these is a real abort site whose message the
