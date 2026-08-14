@@ -721,6 +721,27 @@ test_that("a truncated stopifnot message is matched without the floor (M83)", {
   expect_true(norms_audit_matcher("stopifnot", key)(msg))
 })
 
+test_that("the truncation marker is read only with R's verdict (M83)", {
+  # Removing the floor is gated on R having truncated, so what counts as
+  # "truncated" has to be R's own shape and not any trailing dots. Testing for
+  # a bare `....` accepted `is.d....` against this key (measured 2026-08-14):
+  # a fixture failing BEFORE its guard, with an unrelated message ending that
+  # way, would be reported as coverage for a site never reached.
+  m <- norms_audit_matcher("stopifnot", "is.data.frame(batch)")
+  expect_false(m("is.d...."))
+  expect_false(m("is.data...."))
+  expect_false(norms_audit_stopifnot_stem("is.d....")$truncated)
+  # R's own shape -- marker AND verdict -- still reads as truncated, so the
+  # rejections above are about the anchor and not about the marker itself.
+  # R's own shape carries a space before the dots -- `paste(ch[1L], "....")`
+  # -- so the anchor requires one, and `is.d....` above lacks it.
+  got <- norms_audit_stopifnot_stem("is.d .... is not TRUE")
+  expect_true(got$truncated)
+  expect_identical(got$stem, "is.d")
+  # The verdict alone, with no marker, is untruncated and takes the floor.
+  expect_false(norms_audit_stopifnot_stem("is.d is not TRUE")$truncated)
+})
+
 test_that("a truncated stem carries no floor, and that is a BOUND (M83)", {
   # Recorded, not fixed. With the marker present no length floor applies, so a
   # one-character truncated stem is accepted by any matcher whose key starts

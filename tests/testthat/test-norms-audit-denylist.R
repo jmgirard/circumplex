@@ -61,7 +61,15 @@ denied_shapes <- list(
   # Assignment is NOT exempt. `abort <- rlang::abort` is the aliasing the rule
   # exists to catch, and separating it from `abort <- 1` needs the assigned
   # value inspected, which no syntactic rule here does (M83 plan gate).
-  "assignment to a denied name" = list('abort <- 1', "iii")
+  "assignment to a denied name" = list('abort <- 1', "iii"),
+  # CALLING through a field or slot so named is the head position, where the
+  # name selects the function actually invoked -- the `$`/`@` exemption is
+  # about the name slot and must not reach here (M83 review, F1). Rule (i),
+  # since this is an abort the M81 walk cannot see: the head deparses to
+  # `opts$abort`, which is not in ABORT_HEADS.
+  "call through a field"     = list('opts$abort("x")', "i"),
+  "call through a slot"      = list('x@cli_abort("x")', "i"),
+  "call through a field, aliased head" = list('h$stopifnot(FALSE)', "i")
 )
 
 accepted_shapes <- list(
@@ -109,6 +117,24 @@ test_that("every accepted shape is left alone (M82)", {
       info = nm
     )
   }
+})
+
+test_that("a field access passed as a VALUE is a stated bound (M83)", {
+  # Recorded, not fixed. `lapply(x, opts$abort)` aliases a denied name just as
+  # `lapply(x, abort)` does, and is not flagged: the head-position rule above
+  # reads heads only. Before M83 it was caught as a side effect of the
+  # over-broad rule (iii) this milestone narrows -- the same rule that flagged
+  # an ordinary `opts$abort` read -- and separating the two needs the
+  # assignment-target case exempted in turn, past what AC4 licenses.
+  # It carries its own ROADMAP candidate row.
+  expect_identical(
+    norms_audit_denied_calls(norms_audit_parse_text('lapply(x, opts$abort)')),
+    character(0)
+  )
+  # The dangerous half IS caught, which is what bounds the gap: a field access
+  # can no longer become an invisible abort CALL.
+  expect_true(length(norms_audit_denied_calls(
+    norms_audit_parse_text('opts$abort("x")'))) > 0L)
 })
 
 test_that("a comment is dropped by the parse, so its fixture is empty (M82)", {

@@ -183,11 +183,34 @@ names_denied_head <- function(x) {
 # exists to catch, and telling it from `abort <- 1` needs the assigned value
 # inspected -- which no rule here does (M83 plan gate).
 NON_VALUE_OPERANDS <- list("$" = 3L, "@" = 3L, "for" = 2L)
+
+# Is this the HEAD of a call, reached through a field or slot named for a denied
+# abort -- `handlers$abort("boom")`, `x@cli_abort("boom")`?
+#
+# The `$`/`@` exemption above is about the NAME slot, and in head position that
+# name selects the function actually being called, so exempting it there would
+# fail open: the M81 walk cannot see such a call either (its head deparses to
+# `handlers$abort`, which is not in ABORT_HEADS), leaving an unregistered abort
+# site with every count still balancing. Caught as rule (i) -- an abort spelling
+# the walk cannot see -- rather than by re-consulting rule (iii), which AC4 fixes.
+#
+# BOUND, stated rather than closed: this reads the head position only, so a
+# field access passed as a VALUE (`lapply(x, opts$abort)`) is not flagged. That
+# shape was caught before M83 only as a side effect of the over-broad rule this
+# milestone narrows, and separating it from an ordinary `opts$abort` read needs
+# the assignment-target case exempted in turn -- past what AC4 licenses. It has
+# its own ROADMAP candidate row.
+calls_denied_field <- function(fn) {
+  is.call(fn) && length(fn) >= 3L &&
+    deparse_flat(fn[[1L]]) %in% c("$", "@") &&
+    is.name(fn[[3L]]) && as.character(fn[[3L]]) %in% DENIED_INDIRECT_HEADS
+}
 norms_audit_denied_calls <- function(exprs = norms_audit_script_exprs()) {
   out <- character(0)
   for (cl in norms_audit_calls(NULL, exprs)) {
-    head <- deparse_flat(unwrap_parens(cl[[1L]]))
-    if (head %in% DENIED_ABORT_HEADS) {
+    fn <- unwrap_parens(cl[[1L]])
+    head <- deparse_flat(fn)
+    if (head %in% DENIED_ABORT_HEADS || calls_denied_field(fn)) {
       out <- c(out, paste0("(i) ", deparse_call(cl)))
     }
     if (head %in% c("do.call", "base::do.call")) {
@@ -566,10 +589,23 @@ norms_audit_key_regex <- function(key) {
 # degenerate in the second. Discarding it is what made the matcher reject its
 # own site's genuine message (M83). Both readers get a list, so a caller that
 # wants the text alone says so.
+# The marker is recognised only WITH R's verdict behind it, because R emits the
+# two together -- `paste(ch[1L], "....")`, then " is not TRUE". Testing for a
+# trailing `....` alone made any message ending that way read as truncated, and
+# a truncated reading removes the floor: `is.d....` was accepted against key
+# `is.data.frame(batch)` (measured 2026-08-14). A fixture failing BEFORE its
+# guard, with an unrelated message ending in `....`, would then be reported as
+# coverage for a site never reached -- what this file exists to prevent.
+NORMS_AUDIT_VERDICT <- "(is not TRUE|are not all TRUE)"
+
 norms_audit_stopifnot_stem <- function(msg) {
-  msg <- sub("[[:space:]]*(is not TRUE|are not all TRUE)[[:space:]]*$", "", msg)
-  truncated <- grepl("[[:space:]]*\\.\\.\\.\\.[[:space:]]*$", msg)
-  msg <- sub("[[:space:]]*\\.\\.\\.\\.[[:space:]]*$", "", msg)
+  truncated <- grepl(
+    paste0("[[:space:]]\\.\\.\\.\\.[[:space:]]+", NORMS_AUDIT_VERDICT,
+           "[[:space:]]*$"),
+    msg
+  )
+  msg <- sub(paste0("[[:space:]]*", NORMS_AUDIT_VERDICT, "[[:space:]]*$"), "", msg)
+  if (truncated) msg <- sub("[[:space:]]*\\.\\.\\.\\.[[:space:]]*$", "", msg)
   list(stem = squish(msg), truncated = truncated)
 }
 
