@@ -130,11 +130,11 @@ Runtime-resolved abort names, and `data/` → not here.
       accepted/near-miss partition of source-text fixtures.
 - [x] T2 Mutation-verify the sweep on the real script (`do.call("stop", …)`,
       `fail <- stop`), restoring byte-clean and recording the measurements.
-- [ ] T3 Extend the enumerator to composite identity: top-level binding name
+- [x] T3 Extend the enumerator to composite identity: top-level binding name
       (`"<run>"` for the run block), source-order ordinals, `site_ids()` retuple.
-- [ ] T4 Rebuild `SCRIPT_ABORTS` with declared binding + ordinal; add the
+- [x] T4 Rebuild `SCRIPT_ABORTS` with declared binding + ordinal; add the
       duplicate-identity refusal; widen the `:500` test to the full identity.
-- [ ] T5 AC2's five probes (double registration; wrong binding, kind, key and
+- [x] T5 AC2's five probes (double registration; wrong binding, kind, key and
       ordinal) plus the comment-insertion guard and the swap measurement.
 - [ ] T6 Derive the pair set and fixture roster from one structure, assert
       set-equality, add the calling-handler capture with its non-empty and
@@ -167,6 +167,8 @@ Runtime-resolved abort names, and `data/` → not here.
 - 2026-08-14: AMENDMENT, AC2, substantive (wording), user-approved at a mini gate. The clause "swapping the `source note not found` pair's declared bindings reddens the identity comparison" was measured FALSE at T5: `norms_audit_site_ids()` compares sorted identity multisets and the pair is identical in kind, key and ordinal, so the swap is an automorphism (measured 2026-08-14: swap -> identical TRUE; a binding no site carries -> identical FALSE). Amended to record the blindness as a bound owned by AC3 and to require four comparison-path probes (binding, kind, key, ordinal) plus the build-time duplicate refusal. A fresh-context [O] reader asked the audit's three questions of the amended wording first and returned four defects, all fixed before writing: "a binding no collected site carries" was ambiguous between global and local absence (now "anywhere"); the stated structural reason was itself an over-general universal, false for a swap between entries differing in key (narrowed to the true one); the RR17 attribution was wrong, RR17's inseparability rationale being matcher degeneracy over a shared message key rather than identity permutation (dropped); and "three axes" named three mutations against a four-part identity, `kind` and `key` having no comparison-path probe under either wording (now four probes).
 - 2026-08-14: plan gate's alternative reconsidered and declined at the amendment gate: regrouping ordinals by `(kind, key)` would make the swap redden and the original wording true, but it departs from RR17 BC7's "distinguishing only entries otherwise identical" and makes ordinals cross-binding, so inserting a site in one function renumbers a site in another; falsified by a case where cross-binding source order is what a reader needs from an ordinal.
 - 2026-08-14: the amendment grew the plan-owned body past the cap; the Acceptance criteria section was compressed in one pass, 156 -> 149 lines against the <150 cap.
+
+- 2026-08-14: T3-T5 done. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7083 (7069 before this milestone's tests; the 6 warnings are the same pre-existing lavaan ones, none in a touched file). Markers file in isolation FAIL 0 | WARN 0 | PASS 118.
 
 ## Decisions
 
