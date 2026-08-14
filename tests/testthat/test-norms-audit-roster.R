@@ -98,12 +98,12 @@ test_that("an instrument shipping no norms is not a roster gap (M79)", {
   # one-line guard sufficient -- pinned here so a rewrite cannot quietly rely
   # on the other behaviour.
   none <- list(Norms = NULL, Scales = data.frame(Abbrev = "PA", Angle = 90))
-  expect_identical(nrow(env$shipped_roster(list(fz = none))), 0L)
+  expect_identical(nrow(env$roster_from_objects(list(fz = none))), 0L)
 
   empty <- list(Norms = list(
     data.frame(Sample = numeric(0), Scale = character(0), M = numeric(0))
   ))
-  expect_identical(nrow(env$shipped_roster(list(fz = empty))), 0L)
+  expect_identical(nrow(env$roster_from_objects(list(fz = empty))), 0L)
 })
 
 test_that("the roster is the package's own enumeration, not a copy (M79)", {
@@ -228,4 +228,102 @@ test_that("the default roster is resolved before it is validated (M84)", {
   # every ordinary call with "is.data.frame(roster) is not TRUE".
   expect_no_error(env$audit_norms(slice, dir = dir))
   expect_no_error(env$audit_norms(slice, dir = dir, roster = NULL))
+})
+
+# The BUILDER's boundary (M84).
+#
+# `shipped_roster()` no longer takes an object list, so these shapes are
+# reachable only through `roster_from_objects()`, which fixtures call by name.
+# Measured 2026-08-14 against the pre-M84 builder: the non-frame table raised
+# R's "invalid argument type", the Sample-less table and the all-NA table both
+# raised "arguments imply differing number of rows: 1, 0" -- one message for
+# two different faults, naming neither instrument -- the one-NA table returned
+# a single row with the NA sample silently gone, and an unnamed object list
+# returned a zero-row roster.
+
+norms_object <- function(norms) list(Norms = list(norms))
+
+test_that("the builder refuses a norms table it cannot roster (M84)", {
+  env <- roster_defs()
+  # Each fixture is well-formed but for the shape it is named for, so the
+  # message can only be that shape's, and each message must name `fx`.
+  expect_error(
+    env$roster_from_objects(list(fx = list(Norms = list(list(Sample = 1))))),
+    "norms table for fx is not a data frame but a list", fixed = TRUE
+  )
+  expect_error(
+    env$roster_from_objects(list(fx = norms_object(
+      data.frame(Scale = "PA", M = 1, stringsAsFactors = FALSE)))),
+    "norms table for fx has no `Sample` column", fixed = TRUE
+  )
+})
+
+test_that("a missing Sample is refused, not dropped by sort() (M84)", {
+  env <- roster_defs()
+  # One NA beside a real sample: the silent case. sort() dropped the NA, so the
+  # builder returned one row and nothing anywhere named the missing sample.
+  expect_error(
+    env$roster_from_objects(list(fx = norms_object(
+      data.frame(Sample = c(1, NA), Scale = "PA", M = 1,
+                 stringsAsFactors = FALSE)))),
+    "norms table for fx leaves `Sample` missing in 1 of 2 rows", fixed = TRUE
+  )
+  # All NA: the case that DID abort before, with the same message the
+  # Sample-less table raises, so the two faults were indistinguishable.
+  expect_error(
+    env$roster_from_objects(list(fx = norms_object(
+      data.frame(Sample = c(NA, NA), Scale = "PA", M = 1,
+                 stringsAsFactors = FALSE)))),
+    "norms table for fx leaves `Sample` missing in 2 of 2 rows", fixed = TRUE
+  )
+})
+
+test_that("an unnamed object list rosters nothing and is refused (M84)", {
+  env <- roster_defs()
+  # A roster over an unnamed list covers no pair at all, which reports every
+  # unaudited shipped sample as covered -- the failure the sweep exists to
+  # stop, reached through the builder rather than through the argument.
+  expect_error(
+    env$roster_from_objects(list(norms_object(
+      data.frame(Sample = 1, Scale = "PA", M = 1, stringsAsFactors = FALSE)))),
+    "must be named for the instrument it carries", fixed = TRUE
+  )
+  # An empty list is not that shape: it has nothing to name and rosters nothing
+  # by construction, which is what the shipped path returns when no instrument
+  # carries norms.
+  expect_identical(nrow(env$roster_from_objects(list())), 0L)
+})
+
+test_that("shipped_roster() cannot be re-fused to an object list (M84)", {
+  env <- roster_defs()
+  # The pre-T18 fusion, spelt `roster = shipped_roster(objects)`, reproduced
+  # M79's return-2 defect with no guard: it derived the roster from the same
+  # list that overrode the VALUES, so a value override narrowed the world.
+  # Cutting the parameter makes the call unspellable rather than merely wrong.
+  expect_length(formals(env$shipped_roster), 0L)
+  # And the derivation is not duplicated back into it: the shipped path goes
+  # through the same builder the fixtures use, so a refusal added to one is a
+  # refusal on both.
+  expect_true("roster_from_objects" %in% all.names(body(env$shipped_roster)))
+})
+
+test_that("passing the shipped roster explicitly changes no gap (M84)", {
+  env <- roster_defs()
+  dir <- roster_notes()
+  # The M79 regression, restated against the surviving spelling. Auditing a
+  # one-instrument slice must report the same gaps whether the roster is
+  # defaulted or passed: the roster says what must be covered, and stating it
+  # explicitly is not a licence to shrink it.
+  batch <- env$AUDIT_BATCH
+  slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
+  gaps <- function(res) {
+    g <- res$coverage[!res$coverage$exempt, , drop = FALSE]
+    g[g$side == "shipped-sample-not-audited", , drop = FALSE]
+  }
+  bare <- gaps(env$audit_norms(slice, dir = dir))
+  passed <- gaps(env$audit_norms(slice, dir = dir, roster = env$shipped_roster()))
+  expect_gt(nrow(bare), 0L)
+  expect_identical(nrow(passed), nrow(bare))
+  expect_setequal(paste(passed$instrument, passed$sample),
+                  paste(bare$instrument, bare$sample))
 })

@@ -37,14 +37,24 @@ row is a duplicate of that rejection, not a live finding.
       non-data-frame, a missing `instrument` or `sample` column, and a zero-row
       roster, each with its own message naming the fault. Evidence: one test
       per refusal shape asserting that shape's message.
-- [ ] AC2. `shipped_roster()` refuses by name a norms table it cannot roster: a
-      `Norms[[1]]` that is not a data frame, and one with no `Sample` column.
-      Evidence: a test per shape asserting the message names the offending
-      instrument. Today these surface as R's own `"invalid argument type"` and
-      `"arguments imply differing number of rows: 1, 0"`, naming neither.
-- [ ] AC3. A norms row whose `Sample` is `NA` is refused rather than silently
-      dropped by `sort()` at `:500`. Evidence: a fixture object with
-      `Sample = c(1, NA)` raises a named refusal; today it returns one row.
+- [ ] AC2. The roster builder `roster_from_objects()` refuses by name two of
+      the norms tables it cannot roster: a `Norms[[1]]` that is not a data
+      frame, and one carrying rows but no `Sample` column. A zero-row
+      `Norms[[1]]` is not one of them and stays skipped, as an instrument
+      shipping no norms always was. Evidence: a test per shape asserting the
+      message names the offending instrument, and a test asserting
+      `shipped_roster()`'s body calls `roster_from_objects()`. Today the two
+      shapes surface as R's own `"invalid argument type"` and `"arguments
+      imply differing number of rows: 1, 0"`, naming neither.
+- [ ] AC3. A norms row whose `Sample` is `NA` is refused by
+      `roster_from_objects()` rather than silently dropped by the `sort()` the
+      builder derives its sample labels with. Evidence: an object-list fixture
+      whose `Norms[[1]]` has `Sample = c(1, NA)` raises a refusal naming the
+      instrument, and one with `Sample = c(NA, NA)` raises the same refusal.
+      Measured 2026-08-14 before the guard: the first returns one row, and the
+      second raises `"arguments imply differing number of rows: 1, 0"` — the
+      message AC2's second shape also raises, so today the two are
+      indistinguishable to a reader of the failure.
 - [ ] AC4. `shipped_roster()` takes no arguments, so `shipped_roster(objects)`
       is not spellable and cannot re-fuse the roster to the object list.
       Evidence: `expect_length(formals(env$shipped_roster), 0L)`. Fixtures
@@ -84,21 +94,22 @@ row is a duplicate of that rejection, not a live finding.
       (`data-raw/audit-norms.R:82-132`); call it in `audit_norms()` after the
       default resolves at `:631`, sequenced so `validate_batch()`'s clearer
       message is not masked.
-- [ ] T2. Add `shipped_roster()`'s named refusals at `:496-502` —
-      non-data-frame `Norms[[1]]`, absent `Sample` column, `NA` sample —
-      preserving the `NULL[[1]]` behaviour pinned at
-      `test-norms-audit-roster.R:97-101`.
-- [ ] T3. Cut the `objects` parameter (`:485-493`); add the fixture
-      constructor; migrate the 13 argument-taking call sites (markers `:268`,
-      `:281`, `:293`; coverage `:169`, `:220`, `:241`, `:263`, `:314`;
-      sample-key `:121`, `:145`, `:178`; roster `:101`, `:106`).
+- [x] T2. Add `roster_from_objects()`'s named refusals — non-data-frame
+      `Norms[[1]]`, absent `Sample` column, `NA` sample, and the unnamed
+      `objects` list added at the gate — preserving the `NULL[[1]]` behaviour
+      pinned by "an instrument shipping no norms is not a roster gap (M79)".
+- [x] T3. Cut the `objects` parameter; extract the derivation into
+      `roster_from_objects()` with `shipped_roster()` as its no-argument
+      wrapper; migrate the 13 argument-taking call sites (3 in markers, 5 in
+      coverage, 3 in sample-key, 2 in roster), found by
+      `grep -rn 'shipped_roster(' tests/ data-raw/ R/ vignettes/`.
 - [ ] T4. Register each new abort site in `SCRIPT_ABORTS`
       (`test-norms-audit-markers.R:351`) with its provoking fixture. The
       registrations travel with the task that adds the site — the set-equality
       test reddens the moment an unregistered site exists, so a code task
       cannot leave the suite clean without them — and this task is the sweep
       that confirms the registry is complete once every site is in.
-- [ ] T5. Add the roster-refusal tests to `test-norms-audit-roster.R:92-107`
+- [x] T5. Add the roster-refusal tests to `test-norms-audit-roster.R:92-107`
       and the AC6 real-instrument regression.
 - [ ] T6. Full check.
 
@@ -111,6 +122,9 @@ row is a duplicate of that rejection, not a live finding.
 - 2026-08-14: the ROADMAP's claim that M79's AC1 sanctioned an unvalidated roster does not survive quoting — AC1 sanctions an *explicit* roster and says nothing about validation, and its stated companion premise "`batch` is unvalidated on the same footing" was already false at M79, `validate_batch()` having existed since M72.
 - 2026-08-14: T1 — `validate_roster()` refuses a non-data-frame, a roster missing `instrument`/`sample`, and a zero-row roster; called after `validate_batch()` so the batch's message is not masked. Measured with the guard bound to a no-op: the csie slice reports 0 non-exempt gaps against a capitalised-column roster and 0 against an empty one, where the shipped roster reports 23.
 - 2026-08-14: minor amendment — T4's registrations travel with the task that adds each site, since the registry set-equality test reddens on any unregistered site and no code task could otherwise leave the suite clean; T4 becomes the completeness sweep. T1's three sites are registered in its own commit.
+- 2026-08-14: amendment gate — AC2 and AC3 amended to name `roster_from_objects()`, the builder the refusals move into, because AC4 removes the argument that made them reachable through `shipped_roster()`. Both wordings cleared a fresh-context [O] criteria audit; its findings fixed before writing were AC2's exhaustive "the two" (AC3 names a third shape), AC3's false today-claim (an all-NA `Sample` errors today with AC2's second message, verified), the zero-row corner AC2 must not refuse, and AC2's unbacked "fixturable only through an object list" clause, dropped. Declined: editing the Goal, which is plan-owned and stays true through the wrapper; naming the builder in AC4 and AC6, which are satisfiable as written.
+- 2026-08-14: amendment gate added a fourth refusal not in the plan — an unnamed `objects` list, which returned a zero-row roster covering nothing. Registered and fixture-provoked under AC5 rather than given its own criterion.
+- 2026-08-14: T2, T3, T5 — `roster_from_objects()` holds the derivation and all four refusals; `shipped_roster()` is its no-argument wrapper over the package's own enumeration. 13 argument-taking call sites migrated. Four new abort sites registered. Line anchors in Scope, AC1 and T1 predate `validate_roster()` and are ~25 lines short of the current file; the builder now sits at `data-raw/audit-norms.R:508-576` and the roster resolves at `:705`.
 
 ## Decisions
 
