@@ -179,6 +179,9 @@ Runtime-resolved abort names, and `data/` → not here.
 
 - 2026-08-14: T7-T8 done. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7107 (7069 at branch point; the 6 warnings are the same pre-existing lavaan ones, none in a touched file).
 
+- 2026-08-14: T9 gate floor run via the committed harness `tools/m82-gate-floor.R` (restores from a scratch snapshot, never `git checkout --`, M81 having logged that trap twice on this very helper; `data-raw/audit-norms.R` re-hashed to blob 3a9be94c after every mutation). Baseline failed=0. AC3-1 (delete `is.data.frame(batch)`) failed=8 against a recorded 2; AC3-2 (delete the required-columns condition) failed=6 against 2; T4 (unregistered `stop()` in the run block) failed=3 against 1; AC4 (hard-code the instrument list) failed=1 against 1; AC4 control (the `:::` shape) failed=0 against 0. Every one carried its recorded M81 test among the failures. The three inflated counts are the AC6 amendment being right: RR17 BC11's tolerance 0 would have failed three of the five, and every extra failure is an M82 test over the same fixtures.
+- 2026-08-14: T9 audit re-run under `load_all()` with `NORMS_AUDIT_LEDGER`/`NORMS_AUDIT_COVERAGE` pointed at scratch paths, so the committed CSVs were never written (`git status data-raw/` clean after). Ledger 194 x 12 and coverage 15 x 10, matching the committed files; ledger identical in all 12 columns bar `generated`, `script_commit` and `data_commit`; coverage identical column by column AND byte-identical by `cmp`. A plain `Rscript data-raw/audit-norms.R` cannot do this -- `asNamespace("circumplex")` at `:486` reads the INSTALLED tree and dies at `object 'cais' not found` -- which is the M78 lesson's shape one turn on, and why the run goes through `load_all()`.
+
 ## Decisions
 
 ## Review
