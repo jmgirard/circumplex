@@ -1,6 +1,6 @@
 # M82: Make the norms-audit abort registry discriminating
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M81
 - **Driving RR:** —
@@ -143,7 +143,7 @@ Runtime-resolved abort names, and `data/` → not here.
       `stop` floor; the match-time stem floor; one shared locale pin; a probe
       per floor.
 - [x] T8 Cross-discrimination matrix: captured messages × registry matchers.
-- [ ] T9 Gate floor: M81's five mutations with named tests among the failures,
+- [x] T9 Gate floor: M81's five mutations with named tests among the failures,
       full `test()` and `check()`, audit re-run compared (ledger stamp-only,
       coverage byte-identical).
 
@@ -181,6 +181,10 @@ Runtime-resolved abort names, and `data/` → not here.
 
 - 2026-08-14: T9 gate floor run via the committed harness `tools/m82-gate-floor.R` (restores from a scratch snapshot, never `git checkout --`, M81 having logged that trap twice on this very helper; `data-raw/audit-norms.R` re-hashed to blob 3a9be94c after every mutation). Baseline failed=0. AC3-1 (delete `is.data.frame(batch)`) failed=8 against a recorded 2; AC3-2 (delete the required-columns condition) failed=6 against 2; T4 (unregistered `stop()` in the run block) failed=3 against 1; AC4 (hard-code the instrument list) failed=1 against 1; AC4 control (the `:::` shape) failed=0 against 0. Every one carried its recorded M81 test among the failures. The three inflated counts are the AC6 amendment being right: RR17 BC11's tolerance 0 would have failed three of the five, and every extra failure is an M82 test over the same fixtures.
 - 2026-08-14: T9 audit re-run under `load_all()` with `NORMS_AUDIT_LEDGER`/`NORMS_AUDIT_COVERAGE` pointed at scratch paths, so the committed CSVs were never written (`git status data-raw/` clean after). Ledger 194 x 12 and coverage 15 x 10, matching the committed files; ledger identical in all 12 columns bar `generated`, `script_commit` and `data_commit`; coverage identical column by column AND byte-identical by `cmp`. A plain `Rscript data-raw/audit-norms.R` cannot do this -- `asNamespace("circumplex")` at `:486` reads the INSTALLED tree and dies at `object 'cais' not found` -- which is the M78 lesson's shape one turn on, and why the run goes through `load_all()`.
+
+- 2026-08-14: T9 check evidence. `devtools::check(args = "--no-manual")` **Status OK, 0 errors / 0 warnings / 0 notes, 7m 53s**, tests inside it running 389s. The FIRST attempt failed to install, not to check: `ld: library 'emutls_w' not found` with warnings for a missing `/opt/gfortran/lib`, R's default `FLIBS` naming a gfortran toolchain unconditionally though `src/` is C++ only. That is M81's recorded laptop-environment finding, not a defect of this branch; re-run under M81's documented workaround (`R_MAKEVARS_USER` pointing at a scratch file holding `FLIBS=`), which is deliberately not committed. CI is unaffected. Still a LESSONS candidate, now on its second milestone.
+- 2026-08-14: T9 isolation runs, all WARN 0: markers PASS 142, denylist 43, batch 21, compare 35, roster 17. Suite-wide `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7107, the 6 warnings pre-existing lavaan ones outside every touched file.
+- 2026-08-14: all nine tasks done; status -> review. `tools/m82-gate-floor.R` is committed so AC6 is re-runnable at the gate rather than attested from this log.
 
 ## Decisions
 
