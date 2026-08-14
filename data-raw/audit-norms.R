@@ -131,6 +131,31 @@ validate_batch <- function(batch) {
   invisible(TRUE)
 }
 
+# `roster` states which shipped (instrument, sample) pairs the run must cover,
+# and the sweep at the end of audit_norms() reports as a gap every pair the
+# roster holds that the batch does not name. So the roster is the only thing
+# standing between an unaudited sample and a clean count: one that is empty, or
+# whose columns are spelt `Instrument`/`Sample`, reports NO gaps and the run
+# reads clean over data nothing read -- the silent shape the sweep exists to
+# remove, reintroduced through the argument that lets a fixture state its own
+# roster. Measured 2026-08-14 before this guard: a one-instrument slice of
+# AUDIT_BATCH with a capitalised-column roster reported 0 gaps, against 23 with
+# the shipped one.
+#
+# audit_norms() resolves its NULL default before calling this, so the default
+# sweep is what gets checked and a caller who passes nothing is never refused
+# for passing nothing.
+validate_roster <- function(roster) {
+  stopifnot(is.data.frame(roster),
+            all(c("instrument", "sample") %in% names(roster)))
+  if (!nrow(roster)) {
+    stop("`roster` names no (instrument, sample) pair to cover, so every ",
+         "unaudited shipped sample would be reported as covered",
+         call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
 NOT_PUBLISHED <- "not-published-in-source"
 
 # A source note may also table a norm sample the source publishes and the
@@ -629,7 +654,10 @@ audit_norms <- function(batch = AUDIT_BATCH,
                         objects = NULL,
                         roster = NULL) {
   if (is.null(roster)) roster <- shipped_roster()
+  # After validate_batch(), not before: a caller who got both arguments wrong
+  # should meet the batch's message, which names the column it is missing.
   validate_batch(batch)
+  validate_roster(roster)
   refuse_shared_untagged_blocks(batch, dir)
   ledger <- list()
   coverage <- list()

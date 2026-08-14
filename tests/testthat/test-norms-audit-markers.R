@@ -403,6 +403,28 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
          b$divisor <- c(1, 0)
          env$validate_batch(b)
        }),
+  # validate_roster() (M84). The roster is the only thing standing between an
+  # unaudited sample and a clean count, so each shape it refuses is a run that
+  # would otherwise have read clean over data nothing audited. Same fixture
+  # discipline as the batch entries above: each is well-formed in every respect
+  # but the one it names, so no sibling condition can abort in its place.
+  site("stopifnot", "validate_roster", "is.data.frame(roster)", function(env) {
+    env$validate_roster(list(instrument = "fx", sample = "1"))
+  }),
+  site("stopifnot", "validate_roster",
+       'all(c("instrument", "sample") %in% names(roster))',
+       function(env) {
+         env$validate_roster(data.frame(Instrument = "fx", Sample = "1",
+                                        stringsAsFactors = FALSE))
+       }),
+  site("stop", "validate_roster",
+       paste0("`roster` names no (instrument, sample) pair to cover, so every ",
+              "unaudited shipped sample would be reported as covered"),
+       function(env) {
+         env$validate_roster(data.frame(instrument = character(0),
+                                        sample = character(0),
+                                        stringsAsFactors = FALSE))
+       }),
   # normalise_items() (M80): an unparseable item key aborts rather than
   # coercing to the string "NA", which two unparseable cells shared.
   site("stop", "normalise_items", "item key is not a comma-separated list of integers: {}",

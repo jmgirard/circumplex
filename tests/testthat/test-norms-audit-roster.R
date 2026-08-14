@@ -177,3 +177,55 @@ test_that("injecting one object does not shrink the audited world (M79)", {
   expect_false(inst %in% injected$instrument)
   expect_gt(length(unique(injected$instrument)), 1L)
 })
+
+# The roster ARGUMENT's own boundary (M84).
+#
+# Everything above tests what the roster sweep catches. These test the roster
+# itself: it is the only thing standing between an unaudited sample and a clean
+# count, and until M84 nothing checked it, so a fixture -- or a caller writing
+# `Instrument`/`Sample` -- could hand the audit a roster that makes every
+# uncovered sample invisible. Measured 2026-08-14 with validate_roster() bound
+# to a no-op: the csie slice below reported 0 non-exempt gaps against a
+# capitalised-column roster and 0 against an empty one, where the shipped
+# roster reports 23.
+
+test_that("audit_norms() refuses a roster it cannot audit against (M84)", {
+  env <- roster_defs()
+  dir <- roster_notes()
+  batch <- env$AUDIT_BATCH
+  slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
+
+  # Each fixture is well-formed in every respect but the one it is named for,
+  # and the batch it rides with is a real slice, so validate_batch() cannot
+  # abort in validate_roster()'s place and the message can only be this shape's.
+  expect_error(
+    env$audit_norms(slice, dir = dir,
+                    roster = list(instrument = "fx", sample = "1")),
+    "is.data.frame(roster)", fixed = TRUE
+  )
+  expect_error(
+    env$audit_norms(slice, dir = dir,
+                    roster = data.frame(Instrument = "fx", Sample = "1",
+                                        stringsAsFactors = FALSE)),
+    "%in% names(roster)", fixed = TRUE
+  )
+  expect_error(
+    env$audit_norms(slice, dir = dir,
+                    roster = data.frame(instrument = character(0),
+                                        sample = character(0),
+                                        stringsAsFactors = FALSE)),
+    "names no (instrument, sample) pair to cover", fixed = TRUE
+  )
+})
+
+test_that("the default roster is resolved before it is validated (M84)", {
+  env <- roster_defs()
+  dir <- roster_notes()
+  batch <- env$AUDIT_BATCH
+  slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
+  # Passing nothing must not be refused for passing nothing: `roster = NULL` is
+  # the default, and a validator run before the default resolved would refuse
+  # every ordinary call with "is.data.frame(roster) is not TRUE".
+  expect_no_error(env$audit_norms(slice, dir = dir))
+  expect_no_error(env$audit_norms(slice, dir = dir, roster = NULL))
+})

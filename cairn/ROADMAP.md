@@ -14,7 +14,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M80 | Give the norms-audit coverage report a machine-readable key | done | M79, M81 | normal | milestones/archive/M80-norms-audit-report-schema.md |
 | M82 | Make the norms-audit abort registry discriminating | done | M81 | normal | milestones/archive/M82-norms-audit-abort-discrimination.md |
 | M83 | Make the norms-audit abort matcher accept correct sites | done | — | normal | milestones/archive/M83-norms-audit-matcher-repair.md |
-| M84 | Validate the norms-audit roster at its boundary | planned | M83 | normal | milestones/M84-norms-audit-roster-validation.md |
+| M84 | Validate the norms-audit roster at its boundary | in-progress | M83 | normal | milestones/M84-norms-audit-roster-validation.md |
 | M85 | Carry the sample through the audit's note-only coverage rows | planned | — | low | milestones/M85-norms-audit-note-only-sample.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 

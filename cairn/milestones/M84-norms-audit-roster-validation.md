@@ -1,11 +1,11 @@
 # M84: Validate the norms-audit roster at its boundary
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M83
 - **Driving RR:** —
 - **Principles touched:** GP2
-- **Branch/PR:** —
+- **Branch/PR:** `m84-norms-audit-roster-validation`
 
 ## Goal
 
@@ -80,7 +80,7 @@ row is a duplicate of that rejection, not a live finding.
 
 ## Tasks
 
-- [ ] T1. Add `validate_roster()` beside `validate_batch()`
+- [x] T1. Add `validate_roster()` beside `validate_batch()`
       (`data-raw/audit-norms.R:82-132`); call it in `audit_norms()` after the
       default resolves at `:631`, sequenced so `validate_batch()`'s clearer
       message is not masked.
@@ -93,7 +93,11 @@ row is a duplicate of that rejection, not a live finding.
       `:281`, `:293`; coverage `:169`, `:220`, `:241`, `:263`, `:314`;
       sample-key `:121`, `:145`, `:178`; roster `:101`, `:106`).
 - [ ] T4. Register each new abort site in `SCRIPT_ABORTS`
-      (`test-norms-audit-markers.R:351`) with its provoking fixture.
+      (`test-norms-audit-markers.R:351`) with its provoking fixture. The
+      registrations travel with the task that adds the site — the set-equality
+      test reddens the moment an unregistered site exists, so a code task
+      cannot leave the suite clean without them — and this task is the sweep
+      that confirms the registry is complete once every site is in.
 - [ ] T5. Add the roster-refusal tests to `test-norms-audit-roster.R:92-107`
       and the AC6 real-instrument regression.
 - [ ] T6. Full check.
@@ -103,7 +107,10 @@ row is a duplicate of that rejection, not a live finding.
 - 2026-08-14: created by /milestone-plan.
 - 2026-08-14: plan gate chose validating the roster argument in place over withdrawing it for a caller-passed predicate, because the consumer at `:843-848` must *enumerate* unaudited pairs to name them and a predicate can only test membership — withdrawing it would regress M79's goal; falsified by a caller needing a roster `shipped_roster()` cannot produce (none of the 13 current sites does).
 - 2026-08-14: plan gate chose a `validate_roster()` checker over a validating constructor, following the local precedent of `validate_batch()`, which validates the argument it is handed rather than building it; falsified by fixtures needing a roster the shipped builder cannot construct.
+- 2026-08-14: implement started on `m84-norms-audit-roster-validation`.
 - 2026-08-14: the ROADMAP's claim that M79's AC1 sanctioned an unvalidated roster does not survive quoting — AC1 sanctions an *explicit* roster and says nothing about validation, and its stated companion premise "`batch` is unvalidated on the same footing" was already false at M79, `validate_batch()` having existed since M72.
+- 2026-08-14: T1 — `validate_roster()` refuses a non-data-frame, a roster missing `instrument`/`sample`, and a zero-row roster; called after `validate_batch()` so the batch's message is not masked. Measured with the guard bound to a no-op: the csie slice reports 0 non-exempt gaps against a capitalised-column roster and 0 against an empty one, where the shipped roster reports 23.
+- 2026-08-14: minor amendment — T4's registrations travel with the task that adds each site, since the registry set-equality test reddens on any unregistered site and no code task could otherwise leave the suite clean; T4 becomes the completeness sweep. T1's three sites are registered in its own commit.
 
 ## Decisions
 
