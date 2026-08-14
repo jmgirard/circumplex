@@ -54,7 +54,14 @@ denied_shapes <- list(
   "alias to base::stop"      = list('fail <- base::stop', "iii"),
   "assign()"                 = list('assign("fail", stop)', "iii"),
   "higher-order"             = list('lapply(msgs, stop)', "iii"),
-  "function default"         = list('f(g = stopifnot)', "iii")
+  "function default"         = list('f(g = stopifnot)', "iii"),
+  # The `for` exemption is the INDEX slot only: a denied name in the sequence
+  # slot is an ordinary rule (iii) hit and stays one (M83).
+  "for sequence"             = list('for (i in abort) 1', "iii"),
+  # Assignment is NOT exempt. `abort <- rlang::abort` is the aliasing the rule
+  # exists to catch, and separating it from `abort <- 1` needs the assigned
+  # value inspected, which no syntactic rule here does (M83 plan gate).
+  "assignment to a denied name" = list('abort <- 1', "iii")
 )
 
 accepted_shapes <- list(
@@ -66,7 +73,17 @@ accepted_shapes <- list(
   "string named what = "     = 'f(what = "rlang::abort")',
   "do.call of something else"= 'do.call("paste0", list("x"))',
   "a variable so named"      = 'aborted <- TRUE',
-  "a string in a message"    = 'stop("do not use rlang::abort here")'
+  "a string in a message"    = 'stop("do not use rlang::abort here")',
+  # Field and slot names are not values: `$` and `@` take their third operand
+  # as a NAME, so no denied function is reachable through one, and flagging it
+  # would redden the sweep over an ordinary variable the script may well grow
+  # (M83). The same holds when the field access is an assignment target.
+  "a field so named"         = 'opts$abort',
+  "a slot so named"          = 'x@abort',
+  "a field assigned into"    = 'df$stop <- 1',
+  # `for`'s index is a binding site, not a value: the loop variable named
+  # `abort` is being written, never called.
+  "a loop index so named"    = 'for (abort in x) f(1)'
 )
 
 test_that("every denied shape is caught, by the rule it is meant for (M82)", {

@@ -104,7 +104,7 @@ change it; a widening would change the pinned roster at
       `norms_audit_shared_key_sites()` (`test-norms-audit-markers.R:704-714`);
       add the two-part fixture and run both mutants. Extract the matrix
       computation into one procedure the shipped and AC1 registries both call.
-- [ ] T3. Widen denylist rule (iii)'s exemptions to `$`/`@` third operands and
+- [x] T3. Widen denylist rule (iii)'s exemptions to `$`/`@` third operands and
       `for` index symbols (`helper-norms-audit-script.R:195-204`); update the
       exemption rationale at `:166-172`, which currently claims `::` is the
       only one; rewrite the partition in `test-norms-audit-denylist.R:41-70`.
@@ -133,6 +133,7 @@ change it; a widening would change the pinned roster at
 - 2026-08-14: T1 done — `expect_abort_at_site()` refuses a non-`norms_audit_matcher` argument by name; test asserts the refusal for a string, a plain callable and `NULL`, with a passing control that shows the matcher accepts its own fixture's message. Suite green (FAIL 0, PASS 7130).
 
 - 2026-08-14: T2 done — the acceptance matrix and its expected off-diagonal moved into `norms_audit_acceptance_matrix()` / `norms_audit_expected_offdiag()` in the helper; membership now comes from `norms_audit_shared_key_sites()` alone, with `shared_fn` injectable so AC5's two mutants run without editing source. Both mutants verified against the two-part fixture, and each shown vacuous on the other part. Suite green (FAIL 0, PASS 7136).
+- 2026-08-14: T3 done — rule (iii) now skips `$`/`@` operand 3 and `for` operand 2 via `NON_VALUE_OPERANDS`; the four shapes it used to flag (`opts$abort`, `x@abort`, `df$stop <- 1`, `for (abort in x) f(1)`) were measured red against the partition before the fix and are green after, while `for (i in abort) 1` and `abort <- 1` stay denied by (iii). Suite green (FAIL 0, PASS 7146).
 ## Decisions
 
 ### 2026-08-14: AC2's no-floor-when-truncated rule keeps a measured residual leak, pinned rather than closed

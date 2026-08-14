@@ -163,13 +163,26 @@ names_denied_head <- function(x) {
 #         higher-order use (`lapply(msgs, stop)`) in one rule rather than three
 #         -- an enumeration of shapes is what the M79 review beat twice.
 #
-# Position 1 of a call is its head and is exempt from (iii). So is the whole of
-# a `::`/`:::` call, whose operands are namespace parts rather than arguments:
-# without that exemption the walk reaches the `stopifnot` symbol inside
-# `base::stopifnot(x)`'s own head and reports an ordinary shipped call as an
-# alias (measured 2026-08-14, before the exemption: `base::stopifnot(is.numeric
-# (x))` was flagged "(iii) base::stopifnot"). `fail <- base::stop` is unaffected
-# -- there the `::` call is a CHILD of `<-`, which is where rule (iii) reads.
+# Position 1 of a call is its head and is exempt from (iii). Three further
+# exemptions, and they share one reason: the slot holds a NAME being written or
+# selected, never a value that could be called, so no aliased abort is reachable
+# through it and flagging it reddens the sweep over ordinary code.
+#
+#   `::`/`:::` -- the whole call, whose operands are namespace parts rather than
+#     arguments: without it the walk reaches the `stopifnot` symbol inside
+#     `base::stopifnot(x)`'s own head and reports an ordinary shipped call as an
+#     alias (measured 2026-08-14: `base::stopifnot(is.numeric(x))` was flagged
+#     "(iii) base::stopifnot"). `fail <- base::stop` is unaffected -- there the
+#     `::` call is a CHILD of `<-`, which is where rule (iii) reads.
+#   `$`/`@` -- operand 3, the field or slot name. `opts$abort`, `x@abort` and
+#     `df$stop <- 1` were each flagged before this (measured 2026-08-14).
+#   `for` -- operand 2, the loop variable. `for (abort in x) f(1)` was flagged.
+#
+# What is NOT exempt, deliberately: the `for` SEQUENCE (`for (i in abort)`), and
+# assignment of any kind. `abort <- rlang::abort` is the aliasing rule (iii)
+# exists to catch, and telling it from `abort <- 1` needs the assigned value
+# inspected -- which no rule here does (M83 plan gate).
+NON_VALUE_OPERANDS <- list("$" = 3L, "@" = 3L, "for" = 2L)
 norms_audit_denied_calls <- function(exprs = norms_audit_script_exprs()) {
   out <- character(0)
   for (cl in norms_audit_calls(NULL, exprs)) {
@@ -193,7 +206,8 @@ norms_audit_denied_calls <- function(exprs = norms_audit_script_exprs()) {
       if (denied) out <- c(out, paste0("(ii) ", deparse_call(cl)))
     }
     if (!head %in% c("::", ":::")) {
-      for (i in seq_along(cl)[-1L]) {
+      exempt <- NON_VALUE_OPERANDS[[head]]
+      for (i in setdiff(seq_along(cl)[-1L], exempt)) {
         child <- cl[[i]]
         if (missing(child)) next
         if (names_denied_head(child)) {
