@@ -2,8 +2,8 @@
 #
 # The report is the audit's statement of what it did NOT compare, and it is
 # read by machine -- the sibling test files assert over its columns and a
-# reader relates it to the batch and to `data/` through them. Six emitters used
-# to paste their payload into whichever column was free: `field` held
+# reader relates it to the batch and to `data/` through them. Seven emitters
+# used to put their payload wherever a column was free: `field` held
 # "M (sample 1)" and `instrument` held "horowitz2003 (iip32)", so no row could
 # be joined to anything and two columns did not hold what they are named for.
 #

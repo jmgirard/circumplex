@@ -90,12 +90,13 @@ validate_batch <- function(batch) {
                collapse = ", "), call. = FALSE)
   }
   # `divisor` divides every source-side M and SD before the comparison, so an
-  # unusable one does not stop the audit -- it makes it compare the wrong
-  # numbers, or no numbers, while every count reads clean. A non-numeric column
-  # coerces to NA and `values_agree()` returns FALSE for the whole sample, which
-  # arrives as a page of mismatches against the source rather than as a batch
-  # defect. NA and Inf do the same silently in the other direction: NA/x is NA,
-  # x/Inf is 0, and 0 or a negative divisor turns a real value into a wrong one.
+  # unusable one either compares the wrong numbers while every count reads
+  # clean, or dies far from its cause. A non-numeric column reaches
+  # `values_agree()`'s division and raises R's "non-numeric argument to binary
+  # operator" from inside the ledger loop, naming neither the batch nor the
+  # column. NA and Inf fail the other way, silently: x/NA is NA and x/Inf is 0,
+  # so every value compares FALSE or 0 against the source; 0 or a negative
+  # divisor turns a real value into a wrong one.
   # None of the four is distinguishable downstream from a package error, which
   # is why each is refused here and named.
   #
@@ -540,11 +541,12 @@ refuse_shared_untagged_blocks <- function(batch, dir) {
 # left out -- and it is read by machine: the test files assert over its columns,
 # and a reader relates it to the ledger through the names the ledger uses. So
 # every cell holds one fact, and no cell holds a sentence assembled out of two.
-# Before M80 every emitter below pasted its payload into whichever column was
-# free (`field` became "M (sample 1)", `instrument` became "horowitz2003
-# (iip32)"),
-# which left the report unjoinable and, worse, unreadable by its own column
-# names: `instrument` did not hold an instrument.
+# Before M80 the emitters below put their payload wherever a column was free:
+# five pasted two facts into one cell (`field` became "M (sample 1)",
+# `instrument` became "horowitz2003 (iip32)") and the other two pasted nothing
+# but filled a mis-named column, a note-only row putting its scale in `field`
+# and its value in `scale`. Both shapes left the report unjoinable and, worse,
+# unreadable by its own column names: `instrument` did not hold an instrument.
 #
 # Ten columns. Seven are the KEY -- instrument, citekey, tag, side, field,
 # sample, scale -- and each is NA on a row that has no such fact, rather than

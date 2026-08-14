@@ -189,6 +189,56 @@ problems. No new top-level file, so no `.Rbuildignore` change. No NEWS entry:
 principle changed.
 
 
+**Fresh-context review.** Three lenses. Diff-bug: 23 findings. History: two
+candidates, neither a prior intent undone — it enumerated every committed
+`Items` cell and confirmed the composed guard refuses none of them. Prior
+review: zero findings; the GitHub inline-comment probe returned empty, so the
+archived `## Review` sections and this file's own rounds 1 and 2 were the whole
+evidence base, and all seven of their actioned findings verified genuinely
+fixed. Scored by a fourth agent that generated none of them.
+
+**Actioned (score ≥ 80), fixed on the branch:**
+
+- F11 (82) — `tests/testthat/test-norms-audit-coverage.R:5` says "Six emitters"
+  where there are seven; the work log records that correction being made
+  mid-implementation and the test file, authored after it, repeats the old
+  figure. The same shape as round 1's R1.
+
+Fixed with it as branch-authored prose proven false, though all three scored
+below the bar (as rounds 1 and 2 did the same class): F8 (78), the new divisor
+comment claimed a non-numeric column "coerces to NA … a page of mismatches"
+where R in fact raises "non-numeric argument to binary operator" and the run
+dies — contradicted by the branch's own test comment; F9 (22) the same
+sentence's `NA/x` had the operand order backwards; F13 (55) an inverted comment
+in the compare test. F10 (50) went with F11, the header comment's "every
+emitter pasted" overclaiming for the two that filled a mis-named column
+without pasting.
+
+**No return.** The single actioned finding demonstrates no acceptance criterion
+failing and is not a ≥90 defect in shipped behaviour, so the return floor is
+not met.
+
+**Logged, below the 80 action bar (24):** F1 (72) — the note-only emitter
+leaves the report's `sample` column NA, so two rows the widened key correctly
+keeps apart are emitted with all ten cells identical; the scorer holds this
+satisfies AC1 and AC3 as written (AC1's sample clause is scoped to the two
+value-level emitters, and AC3 authorizes a key drawn from the note row rather
+than the report) but names it a real verified defect. F4 (68) the `Items` abort
+names the cell but not its instrument or citekey, unlike the divisor guards
+beside it. F14 (58) `exempt` is the one column `coverage_rows()` leaves
+uncoerced. F13 (55). F2 (45) `values_agree("Items", character(0),
+character(0), 1)` is TRUE. F7 (42) a shipped object with an unreadable `Items`
+cell would abort the run before the report could name it; latent over all 15.
+F6 (35) the shape test admits `0` and leading zeros. F21 (35) nothing binds the
+header comment's per-side table to the emitted side set. F5 (28) two clauses of
+the composed guard are dead. F19 (22) the key's `\r` separator could in
+principle collide. F9 (22). F12 (20) the 14-row assertion constrains the note
+corpus, not the key. F3 (15) a list-column `Items` raises R's coercion error
+rather than the named abort. F23 (12) three lines over 80 columns. H1 (38) and
+H2 (22), the history lens's two candidates, both judged compensated. Ten more
+re-report rounds 1 and 2 unchanged at or below their prior scores: F10 (50),
+F15 (52), F16 (52), F17 (30), F18 (15), F20 (50), F22 (30), and F8's siblings.
+
 ### Round 2 (2026-08-13) — returned to `in-progress`
 
 **Outcome.** AC5 fails again, by a mechanism round 1's fix introduced. Defect

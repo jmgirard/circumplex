@@ -83,8 +83,9 @@ test_that("two unparseable item cells do not compare equal (M80)", {
     function() env$normalise_items("1,,9"),
     "stop", "item key is not a comma-separated list of integers: {}"
   )
-  # An empty cell is unreadable too, and reached parse_source_note()'s
-  # empty-value guard only on the source side.
+  # An empty cell is unreadable too. It cannot arrive from a note --
+  # parse_source_note() refuses an empty value cell before the comparison sees
+  # it -- so this fences the shipped side, which has no such guard of its own.
   expect_abort_at_site(
     function() env$normalise_items(""),
     "stop", "item key is not a comma-separated list of integers: {}"
