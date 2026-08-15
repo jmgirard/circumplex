@@ -316,6 +316,28 @@ test_that("an unnamed object list rosters nothing and is refused (M84)", {
   expect_identical(nrow(env$roster_from_objects(list())), 0L)
 })
 
+test_that("a name carried twice by `objects` is refused (M86)", {
+  env <- roster_defs()
+  # `for (nm in nms)` walks names, and `objects[[nm]]` resolves each to the
+  # FIRST entry carrying it -- so a repeated name rosters that entry's samples
+  # twice and the second entry's samples not at all. Measured 2026-08-15 before
+  # the guard: the call below returned two rows, both reading `fx 1`, with
+  # sample 2 nowhere. `validate_batch()` has refused exactly this shape for the
+  # batch since M72, so the sibling asymmetry was the whole of the defect.
+  dup <- list(
+    fx = norms_object(data.frame(Sample = 1, Scale = "PA", M = 1,
+                                 stringsAsFactors = FALSE)),
+    fx = norms_object(data.frame(Sample = 2, Scale = "PA", M = 1,
+                                 stringsAsFactors = FALSE))
+  )
+  expect_error(env$roster_from_objects(dup),
+               "`objects` carries the name fx more than once", fixed = TRUE)
+  # A name repeated three times names itself once, not three times.
+  tri <- list(fx = dup$fx, fy = dup$fx, fx = dup$fx, fx = dup$fx)
+  expect_error(env$roster_from_objects(tri),
+               "`objects` carries the name fx more than once", fixed = TRUE)
+})
+
 test_that("shipped_roster() cannot be re-fused to an object list (M84)", {
   env <- roster_defs()
   # The pre-T18 fusion, spelt `roster = shipped_roster(objects)`, reproduced

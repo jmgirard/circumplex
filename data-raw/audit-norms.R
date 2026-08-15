@@ -576,6 +576,18 @@ roster_from_objects <- function(objects) {
     stop("every entry of `objects` must be named for the instrument it ",
          "carries; an unnamed list rosters nothing at all", call. = FALSE)
   }
+  # The loop below walks NAMES and resolves each with `objects[[nm]]`, which
+  # returns the first entry carrying that name -- so a repeated name rosters
+  # the first entry's samples once per repetition and the second entry's not at
+  # all. Measured 2026-08-15: `list(fx = <Sample 1>, fx = <Sample 2>)` returned
+  # two rows both reading `fx 1`. `validate_batch()` has refused the same shape
+  # for the batch since M72; this closes the sibling asymmetry (M86).
+  if (anyDuplicated(nms)) {
+    stop("`objects` carries the name ",
+         paste(unique(nms[duplicated(nms)]), collapse = ", "),
+         " more than once, and only the first entry of a repeated name is ",
+         "ever read", call. = FALSE)
+  }
   out <- list()
   for (nm in nms) {
     norms <- objects[[nm]]$Norms[[1]]

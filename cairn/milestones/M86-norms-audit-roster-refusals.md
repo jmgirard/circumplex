@@ -99,7 +99,7 @@ serving IP5.
 - [x] T1: split `validate_roster()`'s `%in% names(roster)` condition
       (`data-raw/audit-norms.R:149-150`) into two named refusals; migrate the
       superseded assertion and add the per-column tests.
-- [ ] T2: refuse a duplicate-named `objects` entry in `roster_from_objects()`
+- [x] T2: refuse a duplicate-named `objects` entry in `roster_from_objects()`
       (`data-raw/audit-norms.R:546-557`); test.
 - [ ] T3: guard the `$Norms[[1]]` access — `is.list(entry)`, then the `NULL`
       skip, then non-empty `Norms` (`data-raw/audit-norms.R:559-563`); test.
@@ -124,6 +124,8 @@ serving IP5.
 - 2026-08-15: plan gate chose taking the argument-ordering fix with a stubbed-`shipped_roster` test over leaving it out, the shape being unreachable from shipped data today; falsified by the stub proving unbindable in the sourced script environment.
 
 - 2026-08-15: T1 done. The two column guards are written out rather than looped: a loop is one `stop()` call carrying the column as an argument, keying `"`roster` has no `{}` column"`, whose matcher accepts both messages — the matrix would then certify as distinguishable two refusals it cannot tell apart. Deleting the `sample` guard reddens 1 assertion in test-norms-audit-roster.R and 8 in test-norms-audit-markers.R; restore verified by blob hash.
+
+- 2026-08-15: T2 done. `anyDuplicated(nms)` refuses a repeated name, reporting each repeated name once however many times it recurs; measured before the guard, `list(fx = <Sample 1>, fx = <Sample 2>)` returned two rows both reading `fx 1`. Guard sits after the naming check, so an unnamed list still reports as unnamed.
 
 ## Decisions
 

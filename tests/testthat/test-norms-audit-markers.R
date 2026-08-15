@@ -465,6 +465,15 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
            data.frame(Sample = 1, Scale = "PA", M = 1,
                       stringsAsFactors = FALSE)))))
        }),
+  site("stop", "roster_from_objects",
+       paste0("`objects` carries the name {} more than once, and only the ",
+              "first entry of a repeated name is ever read"),
+       function(env) {
+         # Both norms tables are well-formed; only the names collide.
+         one <- list(Norms = list(data.frame(Sample = 1, Scale = "PA", M = 1,
+                                             stringsAsFactors = FALSE)))
+         env$roster_from_objects(list(fx = one, fx = one))
+       }),
   # normalise_items() (M80): an unparseable item key aborts rather than
   # coercing to the string "NA", which two unparseable cells shared.
   site("stop", "normalise_items", "item key is not a comma-separated list of integers: {}",
