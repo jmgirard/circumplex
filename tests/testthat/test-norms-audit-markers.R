@@ -456,8 +456,8 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
   # only this site can fire.
   site("stop", "validate_roster",
        paste0("`roster` cannot be checked for completeness: the shipped ",
-              "roster could not be built, which is a fault in `data/` rather ",
-              "than in the roster passed here -- {}"),
+              "roster could not be built, so the fault is not in the roster ",
+              "passed here -- {}"),
        function(env) {
          local <- new.env(parent = parent.env(env))
          for (nm in ls(env)) assign(nm, get(nm, envir = env), envir = local)

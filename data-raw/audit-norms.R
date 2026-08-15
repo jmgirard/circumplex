@@ -200,13 +200,20 @@ validate_roster <- function(roster, fixture_world = FALSE) {
   # message surfaced as this call's answer and a caller with a well-formed
   # explicit roster met the BUILDER's complaint -- the same message-precedence
   # inversion moving validate_batch() ahead of the default roster removed at
-  # T4, reappearing inside this guard (M86 review F2). It fires on every
-  # non-exempt call, so the attribution is stated rather than left to be
-  # inferred from the message's subject.
+  # T4, reappearing inside this guard (M86 review F2). It is reachable on the
+  # EXPLICIT-roster path only: audit_norms() builds the default roster before
+  # calling here, so a defaulted call still meets the builder's own message
+  # from that earlier line, and it is the caller who passed a roster whose
+  # message needed the subject (M86 re-review D5).
+  #
+  # The attribution says what it has established and no more: that the failure
+  # is not the roster passed in. Naming `data/` as the cause would overclaim --
+  # this catches any error the call raises, a missing package or an absent
+  # binding included, not only a malformed norms table (M86 re-review D7).
   shipped <- tryCatch(shipped_roster(), error = function(e) {
     stop("`roster` cannot be checked for completeness: the shipped roster ",
-         "could not be built, which is a fault in `data/` rather than in the ",
-         "roster passed here -- ", conditionMessage(e), call. = FALSE)
+         "could not be built, so the fault is not in the roster passed here ",
+         "-- ", conditionMessage(e), call. = FALSE)
   })
   absent <- setdiff(paste(shipped$instrument, shipped$sample),
                     paste(roster$instrument, roster$sample))
@@ -586,7 +593,7 @@ shipped_roster <- function() {
 
 # The roster over an explicit, NAMED list of instrument objects.
 #
-# Every refusal here is a norms table the builder cannot roster, and each was a
+# Every refusal here is a shape the builder cannot roster, and each was a
 # silent or unnamed failure before M84: the roster is what says which shipped
 # (instrument, sample) pairs the audit must cover, so a pair this loop drops is
 # a pair nothing will ever report. Measured 2026-08-14 against the pre-M84
@@ -606,14 +613,20 @@ shipped_roster <- function() {
 #
 # A zero-row `Norms[[1]]` is NOT one of them and is skipped as it always was:
 # an instrument shipping no norms has nothing to audit and is not a gap.
+#
+# Two later refusals are about the `objects` LIST rather than a norms table --
+# a name carried twice, and a name carried with NULL behind it (M86). They are
+# listed with the loop's guards below rather than here.
 roster_from_objects <- function(objects) {
   nms <- names(objects)
   # `nzchar(NA_character_)` is TRUE, so an NA name clears a bare nzchar() test
-  # and then `objects[[NA_character_]]` returns NULL rather than raising -- the
-  # loop skips it as a no-norms instrument and the builder returns the very
+  # and then `objects[[NA_character_]]` returns NULL rather than raising, which
+  # before M84 let the loop skip it as a no-norms instrument and return the very
   # zero-row roster this guard exists to refuse (measured 2026-08-14, M84
   # review F1). `setNames(list(obj), lookup)` with a lookup that missed is how
-  # a caller reaches it.
+  # a caller reaches it. The skip that description names is gone -- the NULL
+  # entry now meets its own refusal in the loop below (M86) -- so this guard is
+  # what keeps an NA name from being reported as that refusal instead.
   if (length(objects) && (is.null(nms) || !all(!is.na(nms) & nzchar(nms)))) {
     stop("every entry of `objects` must be named for the instrument it ",
          "carries; an unnamed list rosters nothing at all", call. = FALSE)

@@ -68,7 +68,7 @@ serving IP5.
       the builder's returned frame 26 times — one per pair dropped, one
       spurious pair added, one `sample` returned numeric — each reddening (a).
       The self-comparing assertion at `:334-335` is replaced by both.
-- [ ] AC6: `validate_roster(roster, fixture_world = FALSE)` refuses every
+- [x] AC6: `validate_roster(roster, fixture_world = FALSE)` refuses every
       roster that does not cover every (instrument, sample) pair
       `shipped_roster()` returns, naming the omitted pairs. `fixture_world =
       TRUE` is the only exemption, and it is asked for at the call site rather
@@ -85,7 +85,7 @@ serving IP5.
       (real instrument | fake instrument `fx`) — the exempted-real cell
       included, that cell being the declared lie the exemption deliberately
       does not police.
-- [ ] AC7: every `stop()`/`stopifnot()` site this milestone adds to or removes
+- [x] AC7: every `stop()`/`stopifnot()` site this milestone adds to or removes
       from `data-raw/audit-norms.R` is reflected in the abort-site registry —
       the registry/walk set-equality assertion in
       `tests/testthat/test-norms-audit-markers.R` passes, each new site carries
@@ -93,7 +93,7 @@ serving IP5.
       each new message distinguishable from every other registered site's. The
       denylist sweep in `tests/testthat/test-norms-audit-denylist.R` covers the
       aliased and namespaced abort spellings the parse-tree walk cannot see.
-- [ ] AC8: `devtools::test()` clean and `devtools::check(args = "--no-manual")`
+- [x] AC8: `devtools::test()` clean and `devtools::check(args = "--no-manual")`
       at 0 errors / 0 warnings / 0 notes.
 
 ## Coverage
@@ -172,6 +172,7 @@ serving IP5.
 - 2026-08-14: T8 re-run. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7266; the 6 warnings are the same lavaan convergence notices and occasions messages in `test-ssm_sem.R`, a file this branch does not touch. `devtools::check(args = "--no-manual")` Status: OK, 0/0/0. Status -> review.
 - 2026-08-14: a mid-session measurement re-ran the script end to end, which rewrote `data-raw/norms-audit-ledger.csv`'s `generated`/`script_commit`/`data_commit` stamps and swept them into the amendment commit. Every audited row was byte-identical; the file is restored to master's version, because the new stamps named a branch commit a squash-merge erases.
 - 2026-08-14: date correction. Every M86 work-log line above reading 2026-08-15, this session's amendment lines included, was authored on 2026-08-14 — the machine clock and every commit date on this branch say so. The lines are history and stand as written; this line supersedes their dates. Measurements they report are unaffected.
+- 2026-08-14: re-review clean. All 8 criteria verified on fresh evidence; consistency gate green (`cairn_validate` exit 0, weight caps PASS, coverage map complete). Three lenses returned 10 findings, none scoring >= 80. Three sub-threshold ones fixed anyway: two stale comments T9's task line had promised (D3), and two false claims this branch itself added (D5's "fires on every non-exempt call" comment, D7's message blaming `data/` for any builder error) — branch-added prose asserting something untrue is a defect at any score. Suite and full check re-run after.
 
 ## Decisions
 
@@ -279,3 +280,108 @@ rather than being fixed under the criterion as it stands. F2 and F3 are carried
 into that amendment round for ordinary triage; neither requires a criterion
 change. AC1–AC5 and AC7 stay verified on the evidence above and are not
 re-opened.
+
+---
+
+## Re-review (after the AC6 amendment)
+
+Re-reviewed 2026-08-14 on `m86-norms-audit-roster-refusals` at `caaedcf3` plus
+the three prose corrections below, PR #114. Every line was executed at this
+review, not carried over from the round above.
+
+### Acceptance-criteria evidence
+
+- AC1: `validate_roster(df(sample = "1"))` raises ``roster` has no `instrument`
+  column; it has: sample`; `validate_roster(df(instrument = "fx"))` raises
+  ``roster` has no `sample` column; it has: instrument`. Replacement verified
+  rather than assumed: `all(c("instrument", "sample") %in% ...)` occurs nowhere
+  outside comments in `data-raw/` or `tests/`, and the walked registry lists 6
+  `validate_roster` sites carrying the two per-column keys and no combined one.
+- AC2: `roster_from_objects(list(fx = <Sample 1>, fx = <Sample 2>))` raises
+  ``objects` carries the name fx more than once, and only the first entry of a
+  repeated name is ever read`.
+- AC3: a non-list entry raises `instrument object for fx is not a list but a
+  integer`; `Norms = list()` raises ``Norms` for fx must be a non-empty list to
+  hold a norms table; it is a list of length 0`. `Norms = NULL` still returns a
+  0-row roster, so the M79 skip stands under the new NULL-entry guard beside it.
+- AC4: with `shipped_roster` stubbed to abort, a malformed batch raises
+  `AUDIT_BATCH$divisor must be numeric, not character` — the batch's own
+  message. The control discriminates: the same stub under a well-formed batch
+  reports `STUB: the default roster was built`, so the probe separates the two
+  orders rather than merely passing.
+- AC5: `shipped_roster()` is identical to the 24-pair literal read from
+  `data/*.rda` by `load()`, both `sample` columns character. All 26 mutations of
+  the builder's returned frame redden the equality — 24 one-pair drops, one
+  spurious pair, one numeric `sample` — with the unmutated baseline holding.
+- AC6: unasked, every roster short of the shipped set is refused —
+  `instrument = "csie"` by 23 pairs, and `"CSIE"`, `"csie "`, `NA` and `fx`/`fy`
+  by 24 each; the three near-miss spellings that evaded the superseded guard are
+  refused by the same branch as any other shortfall. Asked
+  (`fixture_world = TRUE`), the `fx`/`fy` fixture roster and the narrow real
+  `csie` roster both return TRUE, the latter being the declared lie the
+  criterion names. The full shipped roster passes unasked. `formals()` shows
+  `fixture_world` on both `audit_norms()` and `validate_roster()`, and
+  `instrument_names` no longer appears in `validate_roster`'s body at all.
+- AC7: the walk collects 33 abort sites, 14 on the roster path — 2 added by this
+  round, none removed. Registry/walk set-equality, the cross-discrimination
+  matrix and the denylist sweep are green (212 and 80 assertions). Teeth checked
+  by planting an unregistered `stop()` in a function no fixture reaches — 3
+  assertions redden; restore confirmed by blob hash.
+- AC8: `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7266, the 6 warnings
+  being lavaan convergence notices and occasions messages in `test-ssm_sem.R`,
+  a file outside this diff. `devtools::check(args = "--no-manual")` Status: OK,
+  0 errors / 0 warnings / 0 notes. Both re-run after the prose corrections.
+
+### Consistency gate
+
+- `cairn_validate.py` exit 0, `weight caps` PASS; 48 advisories, none a gate
+  failure, the same two touching this milestone as the round above (the `sizing`
+  count against the >7 tripwire, and wrapped work-log lines that are pre-existing
+  M7 entries).
+- `cairn_impact.py` not run: this milestone changes no `DESIGN.md` principle.
+- Coverage map complete — every criterion maps to an existing task.
+
+### Independent review (three lenses + scorer)
+
+Blame-history lens: zero findings. It confirmed the `fixture_world` rule is a
+strict superset of what the removed `instrument_names()` guard caught, that the
+M79 `Norms = NULL` skip survives ahead of the new NULL-entry refusal, that the
+M84 roster/objects split is untouched, and that no caller of the changed
+functions exists outside the four files in the diff. Prior-review lens: zero
+regressions; its `gh api .../pulls/comments` probe returned `[]`, so the
+archived `## Review` sections were the primary evidence, and it verified F2–F5
+are each closed in the direction the original finding named. Diff-bug lens: 9
+findings, plus 1 from the prior-review lens, scored by a fresh agent that
+generated none of them.
+
+**Actioned (>= 80): none.** The scorer put every finding below the bar. Its
+answer to the criterion hunt: no roster reaches the audit and under-reports
+shipped-sample coverage without its caller asking for the exemption, save the
+zero-row case in D2 below.
+
+Logged below the bar, ten: D1 (66) the new attribution site embeds the
+builder's message, so a real failure is a superstring of another registered
+site's key and both matchers accept — the matrix certifies only the stub
+fixture; the substring semantics is the Scope-excluded matcher defect on its
+own candidate row. D2 (60) the completeness check fails open if
+`shipped_roster()` ever returns zero rows, unreachable against real `data/`.
+D3 (76) two comments left stale by the new guards. D4 (22) `fixture_world` is
+unvalidated and R's partial matching lets `f = TRUE` buy the exemption. D5 (55)
+the attribution is unreachable on the defaulted path, where the builder runs
+first. D6 (15) the shipped roster is derived twice per default run, accepted at
+T6. D7 (74) the attribution blamed `data/` for any error the call raised.
+D8 (22) message grammar, the prior round's F14. D9 (25) `obj$Norms` re-read
+with `$` partial matching, the prior round's F13. P1 (42) the literal's "no
+install can shadow it" comment overstates, the prior round's F9.
+
+Three were fixed despite scoring below the bar, for reasons independent of
+their scores: D3 because T9's own task line promised that correction and had
+not made it, leaving a checked task claiming work not done; D5 and D7 because
+both are prose this branch added that asserts something untrue — a comment
+claiming the attribution "fires on every non-exempt call", and a message naming
+`data/` as the cause of any error the builder raised, including a missing
+package. The branch-added-claims rule makes writing either a defect at any
+score. The message now says only what it has established — that the fault is
+not the roster passed in — and its registry key and both assertions moved with
+it. D1, D2, D4, D6, D8, D9 and P1 stand as logged; the suite was re-run and the
+full check re-executed after the corrections.
