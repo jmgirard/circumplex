@@ -26,6 +26,37 @@ roster_notes <- function() {
   dir
 }
 
+# The shipped roster, written out (M86).
+#
+# ORIGIN: read from `data/*.rda` with `load()` directly, 2026-08-15 -- not from
+# `roster_from_objects()`, and not through the package namespace. That
+# independence is the whole point of the literal. The assertion this replaced
+# compared `audit_norms(slice, dir)` against
+# `audit_norms(slice, dir, roster = shipped_roster())`, and the default IS
+# `shipped_roster()`, so both sides came from one nullary call and no defect of
+# the builder could make it fail (M84 review F6; the M72/M76/M78 shared-origin
+# family). Reading the `.rda` files rather than asking the package is the M78
+# lesson: a data-raw script verifies the ARTIFACT, and no install can shadow it.
+#
+# It is a fence on `data/` as well as on the builder: adding or removing a
+# shipped sample reddens this until the list is updated by hand, which is the
+# intended cost -- shipped norms changing unnoticed is the hazard the whole
+# audit exists for.
+SHIPPED_ROSTER_PAIRS <- c(
+  "cais", "1",    "cais", "2",    "csie", "1",    "csig", "1",
+  "csip", "1",    "csiv", "1",    "iei", "1",     "iei", "2",
+  "igicr", "1",   "igicr", "2",   "igicr", "3",   "iip32", "1",
+  "iip32", "2",   "iip32", "3",   "iip64", "1",   "iip64", "2",
+  "iip64", "3",   "iipsc", "1",   "iipsc", "2",   "iis32", "1",
+  "iis64", "1",   "iitc", "1",    "ipipipc", "1", "isc", "1"
+)
+
+shipped_roster_literal <- function() {
+  m <- matrix(SHIPPED_ROSTER_PAIRS, ncol = 2L, byrow = TRUE)
+  data.frame(instrument = m[, 1L], sample = m[, 2L],
+             stringsAsFactors = FALSE)
+}
+
 test_that("dropping any batch row is visible in the run (M79)", {
   env <- roster_defs()
   dir <- roster_notes()
@@ -203,11 +234,22 @@ test_that("audit_norms() refuses a roster it cannot audit against (M84)", {
                     roster = list(instrument = "fx", sample = "1")),
     "is.data.frame(roster)", fixed = TRUE
   )
+  # One message per missing column (M86). Until then both omissions raised one
+  # `all(c("instrument", "sample") %in% names(roster)) is not TRUE`, which names
+  # both columns and so names neither: a roster misspelling ONE of them read
+  # exactly like a roster misspelling the other, and the assertion that stood
+  # here survived weakening the condition to a single column.
   expect_error(
     env$audit_norms(slice, dir = dir,
-                    roster = data.frame(Instrument = "fx", Sample = "1",
+                    roster = data.frame(Instrument = "fx", sample = "1",
                                         stringsAsFactors = FALSE)),
-    "%in% names(roster)", fixed = TRUE
+    "`roster` has no `instrument` column", fixed = TRUE
+  )
+  expect_error(
+    env$audit_norms(slice, dir = dir,
+                    roster = data.frame(instrument = "fx", Sample = "1",
+                                        stringsAsFactors = FALSE)),
+    "`roster` has no `sample` column", fixed = TRUE
   )
   expect_error(
     env$audit_norms(slice, dir = dir,
@@ -216,6 +258,55 @@ test_that("audit_norms() refuses a roster it cannot audit against (M84)", {
                                         stringsAsFactors = FALSE)),
     "names no (instrument, sample) pair to cover", fixed = TRUE
   )
+})
+
+test_that("a roster touching `data/` must cover all of it (M86)", {
+  env <- roster_defs()
+  dir <- roster_notes()
+  batch <- env$AUDIT_BATCH
+  slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
+  # Measured 2026-08-15 before this guard: the roster below audits the csie
+  # slice with 0 non-exempt shipped-sample gaps where the shipped roster
+  # reports 23 -- a clean run over 23 samples nothing read. It is already a
+  # superset of the slice's own batch pairs, and csie ships exactly one sample
+  # so it is also complete for the only instrument it names: neither weaker
+  # rule sees it, which is why the rule is all-or-nothing.
+  narrow <- data.frame(instrument = "csie", sample = "1",
+                       stringsAsFactors = FALSE)
+  expect_error(env$audit_norms(slice, dir = dir, roster = narrow),
+               "omits 23 shipped (instrument, sample) pair(s)", fixed = TRUE)
+  # The exemption is asked for at the call site, so no spelling of an
+  # instrument can buy it. Through M86's first pass it was INFERRED, by testing
+  # the roster's instruments against circumplex:::instrument_names(); each
+  # spelling below missed that list and was taken for a fixture's own world,
+  # and each then audited the csie slice at 1 non-exempt shipped-sample gap
+  # where the shipped roster reports 23 (all three measured 2026-08-15).
+  # They are regression fixtures for a rule that no longer reads the column:
+  # what makes them refused is that they omit shipped pairs, which is why the
+  # near-miss family needs no enumerating.
+  for (spelling in list("CSIE", "csie ", NA_character_)) {
+    evasion <- data.frame(instrument = spelling, sample = "1",
+                          stringsAsFactors = FALSE)
+    expect_error(env$audit_norms(slice, dir = dir, roster = evasion),
+                 "omits 24 shipped (instrument, sample) pair(s)", fixed = TRUE)
+  }
+  # The four cells of (exemption asked | not asked) x (real | fake instrument).
+  # Not asked + fake is the one that changed: a roster over instruments that do
+  # not ship used to pass unasked, and every coverage and marker fixture in
+  # this suite leaned on that. It is refused now, and each of those fixtures
+  # says `fixture_world = TRUE` instead.
+  fake <- data.frame(instrument = c("fx", "fy"), sample = c("1", "1"),
+                     stringsAsFactors = FALSE)
+  expect_error(env$validate_roster(fake),
+               "omits 24 shipped (instrument, sample) pair(s)", fixed = TRUE)
+  expect_identical(env$validate_roster(fake, fixture_world = TRUE), TRUE)
+  # Asked + real is the declared lie the exemption deliberately does not
+  # police: a caller who says out loud that this run is not about `data/` is
+  # taken at their word, and the point of the amendment is that saying it is
+  # the only way through. Pinned so the hole stays a stated one.
+  expect_identical(env$validate_roster(narrow, fixture_world = TRUE), TRUE)
+  # The full shipped roster passes, defaulted or stated, exemption or none.
+  expect_identical(env$validate_roster(shipped_roster_literal()), TRUE)
 })
 
 test_that("the default roster is resolved before it is validated (M84)", {
@@ -228,6 +319,24 @@ test_that("the default roster is resolved before it is validated (M84)", {
   # every ordinary call with "is.data.frame(roster) is not TRUE".
   expect_no_error(env$audit_norms(slice, dir = dir))
   expect_no_error(env$audit_norms(slice, dir = dir, roster = NULL))
+})
+
+test_that("the batch is validated before the default roster is built (M86)", {
+  env <- roster_defs()
+  dir <- roster_notes()
+  batch <- env$AUDIT_BATCH
+  slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
+  slice$divisor <- "x"
+  # The two orders are indistinguishable while `shipped_roster()` succeeds,
+  # which it always does under the suite -- so the probe has to make building
+  # the default roster fail. `sys.source()` makes `env` the enclosure of
+  # `audit_norms`, so rebinding the name here is what the call resolves.
+  # Against the pre-M86 order this reports the stub, not the batch.
+  env$shipped_roster <- function() {
+    stop("STUB: the default roster was built", call. = FALSE)
+  }
+  expect_error(env$audit_norms(slice, dir = dir),
+               "AUDIT_BATCH$divisor must be numeric", fixed = TRUE)
 })
 
 # The BUILDER's boundary (M84).
@@ -256,6 +365,78 @@ test_that("the builder refuses a norms table it cannot roster (M84)", {
       data.frame(Scale = "PA", M = 1, stringsAsFactors = FALSE)))),
     "norms table for fx has no `Sample` column", fixed = TRUE
   )
+})
+
+test_that("a `Norms` field the builder cannot index is refused (M86)", {
+  env <- roster_defs()
+  # `objects[[nm]]$Norms[[1]]` was reached before anything about the entry was
+  # known, so R's own message was the whole report and it named neither the
+  # instrument nor the fault. Measured 2026-08-15 before these guards: a
+  # non-list entry raised "$ operator is invalid for atomic vectors" and an
+  # empty `Norms` list raised "subscript out of bounds".
+  expect_error(env$roster_from_objects(list(fx = 1:3)),
+               "instrument object for fx is not a list but a integer",
+               fixed = TRUE)
+  expect_error(env$roster_from_objects(list(fx = list(Norms = list()))),
+               "`Norms` for fx must be a non-empty list to hold a norms table; it is a list of length 0",
+               fixed = TRUE)
+  # An atomic `Norms` reaches the same guard rather than R's message. Through
+  # M85 it fell to the `is.data.frame()` refusal below instead, because
+  # `(1:3)[[1]]` is 1 -- correct by luck, and only for atomics of length >= 1.
+  expect_error(env$roster_from_objects(list(fx = list(Norms = 1:3))),
+               "`Norms` for fx must be a non-empty list to hold a norms table; it is a integer of length 3",
+               fixed = TRUE)
+  # The skip these guards must NOT swallow: `Norms = NULL` is an instrument
+  # with nothing to audit, not a malformed one, and it stays a skip rather than
+  # a refusal (pinned above at the M79 case, restated here against the guards
+  # that now stand between it and the loop body).
+  none <- list(Norms = NULL, Scales = data.frame(Abbrev = "PA", Angle = 90))
+  expect_identical(nrow(env$roster_from_objects(list(fz = none))), 0L)
+})
+
+test_that("an instrument named with no object behind it is refused (M86)", {
+  env <- roster_defs()
+  # The third shape, distinct from both above it. `Norms = NULL` is an
+  # instrument that ships nothing to audit and stays a skip; a NULL ENTRY is an
+  # instrument the caller named and then supplied nothing for, so the name is a
+  # claim with no object behind it and the roster loses every sample it would
+  # have carried. Before M86 the loop skipped it in silence -- `NULL$Norms` is
+  # NULL, so it took the no-norms branch -- and through M86's first pass it
+  # reached the is.list() guard and reported "is not a list but a NULL", a type
+  # complaint for what is an empty slot.
+  expect_error(env$roster_from_objects(list(fx = NULL)),
+               "`objects` names fx but carries NULL for it, so the instrument would be rostered with no samples at all",
+               fixed = TRUE)
+  # The skip it must not swallow, restated against this guard: a named entry
+  # that IS a list and whose `Norms` is NULL is still an instrument with
+  # nothing to audit, and is still skipped.
+  none <- list(Norms = NULL, Scales = data.frame(Abbrev = "PA", Angle = 90))
+  expect_identical(nrow(env$roster_from_objects(list(fz = none))), 0L)
+})
+
+test_that("a failed shipped-roster build is not blamed on `roster` (M86)", {
+  env <- roster_defs()
+  # The completeness check reads every shipped norms table, so it can fail for
+  # reasons the caller's roster had nothing to do with. Unattributed, the
+  # BUILDER's message answered for an argument that was well-formed -- the same
+  # message-precedence inversion moving validate_batch() ahead of the default
+  # roster removed, reappearing inside this guard. The stub is what separates
+  # the two: `sys.source()` makes `env` the enclosure of validate_roster(), so
+  # rebinding `shipped_roster` there is what the check resolves.
+  local <- new.env(parent = parent.env(env))
+  for (nm in ls(env)) assign(nm, get(nm, envir = env), envir = local)
+  environment(local$validate_roster) <- local
+  local$shipped_roster <- function() stop("STUB: builder failed")
+  fine <- data.frame(instrument = "fx", sample = "1", stringsAsFactors = FALSE)
+  expect_error(local$validate_roster(fine),
+               "`roster` cannot be checked for completeness: the shipped roster could not be built",
+               fixed = TRUE)
+  # The builder's own words survive inside it -- attribution adds a subject,
+  # it does not swallow the cause.
+  expect_error(local$validate_roster(fine), "STUB: builder failed", fixed = TRUE)
+  # And the exemption never reaches the builder at all, so a fixture is not
+  # held hostage to `data/` parsing cleanly.
+  expect_identical(local$validate_roster(fine, fixture_world = TRUE), TRUE)
 })
 
 test_that("a missing Sample is refused, not dropped by sort() (M84)", {
@@ -305,6 +486,28 @@ test_that("an unnamed object list rosters nothing and is refused (M84)", {
   expect_identical(nrow(env$roster_from_objects(list())), 0L)
 })
 
+test_that("a name carried twice by `objects` is refused (M86)", {
+  env <- roster_defs()
+  # `for (nm in nms)` walks names, and `objects[[nm]]` resolves each to the
+  # FIRST entry carrying it -- so a repeated name rosters that entry's samples
+  # twice and the second entry's samples not at all. Measured 2026-08-15 before
+  # the guard: the call below returned two rows, both reading `fx 1`, with
+  # sample 2 nowhere. `validate_batch()` has refused exactly this shape for the
+  # batch since M72, so the sibling asymmetry was the whole of the defect.
+  dup <- list(
+    fx = norms_object(data.frame(Sample = 1, Scale = "PA", M = 1,
+                                 stringsAsFactors = FALSE)),
+    fx = norms_object(data.frame(Sample = 2, Scale = "PA", M = 1,
+                                 stringsAsFactors = FALSE))
+  )
+  expect_error(env$roster_from_objects(dup),
+               "`objects` carries the name fx more than once", fixed = TRUE)
+  # A name repeated three times names itself once, not three times.
+  tri <- list(fx = dup$fx, fy = dup$fx, fx = dup$fx, fx = dup$fx)
+  expect_error(env$roster_from_objects(tri),
+               "`objects` carries the name fx more than once", fixed = TRUE)
+})
+
 test_that("shipped_roster() cannot be re-fused to an object list (M84)", {
   env <- roster_defs()
   # The pre-T18 fusion, spelt `roster = shipped_roster(objects)`, reproduced
@@ -318,13 +521,25 @@ test_that("shipped_roster() cannot be re-fused to an object list (M84)", {
   expect_true("roster_from_objects" %in% all.names(body(env$shipped_roster)))
 })
 
-test_that("passing the shipped roster explicitly changes no gap (M84)", {
+test_that("the builder's roster is the shipped data, pair for pair (M86)", {
+  env <- roster_defs()
+  # Compared UNCOERCED: the builder's own column types are under test, so a
+  # `sample` returned numeric must redden here rather than be coerced away.
+  # `shipped_roster()` is the whole derivation -- the namespace enumeration,
+  # the object list, and `roster_from_objects()`'s sort/unique/as.character --
+  # measured against a list read from the `.rda` files by another route.
+  expect_identical(env$shipped_roster(), shipped_roster_literal())
+})
+
+test_that("passing the shipped roster explicitly changes no gap (M84, M86)", {
   env <- roster_defs()
   dir <- roster_notes()
   # The M79 regression, restated against the surviving spelling. Auditing a
   # one-instrument slice must report the same gaps whether the roster is
   # defaulted or passed: the roster says what must be covered, and stating it
-  # explicitly is not a licence to shrink it.
+  # explicitly is not a licence to shrink it. The explicit side is now the
+  # LITERAL above rather than a second `shipped_roster()` call, so the two
+  # sides no longer share an origin (M86).
   batch <- env$AUDIT_BATCH
   slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
   gaps <- function(res) {
@@ -332,7 +547,8 @@ test_that("passing the shipped roster explicitly changes no gap (M84)", {
     g[g$side == "shipped-sample-not-audited", , drop = FALSE]
   }
   bare <- gaps(env$audit_norms(slice, dir = dir))
-  passed <- gaps(env$audit_norms(slice, dir = dir, roster = env$shipped_roster()))
+  passed <- gaps(env$audit_norms(slice, dir = dir,
+                                 roster = shipped_roster_literal()))
   expect_gt(nrow(bare), 0L)
   expect_identical(nrow(passed), nrow(bare))
   expect_setequal(paste(passed$instrument, passed$sample),

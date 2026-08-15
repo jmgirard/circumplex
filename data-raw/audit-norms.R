@@ -145,13 +145,83 @@ validate_batch <- function(batch) {
 # audit_norms() resolves its NULL default before calling this, so the default
 # sweep is what gets checked and a caller who passes nothing is never refused
 # for passing nothing.
-validate_roster <- function(roster) {
-  stopifnot(is.data.frame(roster),
-            all(c("instrument", "sample") %in% names(roster)))
+#
+# The two key columns are checked one at a time, and each refusal names the
+# column it is about. One condition over both (`all(c("instrument", "sample")
+# %in% names(roster))`, through M85) raised a message naming BOTH columns for
+# either omission, so a roster misspelling one read exactly like a roster
+# misspelling the other -- and the assertion covering it survived weakening the
+# condition to a single column, since the deparsed condition text is what the
+# message carries either way (M86).
+#
+# Written out one column at a time rather than looped, because a loop is one
+# `stop()` call carrying the column as an argument: its registry key would be
+# "`roster` has no `{}` column", whose matcher accepts BOTH messages, and the
+# cross-discrimination matrix would then certify as distinguishable two
+# refusals it cannot tell apart. Two calls, two keys, two fixtures.
+validate_roster <- function(roster, fixture_world = FALSE) {
+  stopifnot(is.data.frame(roster))
+  if (!"instrument" %in% names(roster)) {
+    stop("`roster` has no `instrument` column; it has: ",
+         paste(names(roster), collapse = ", "), call. = FALSE)
+  }
+  if (!"sample" %in% names(roster)) {
+    stop("`roster` has no `sample` column; it has: ",
+         paste(names(roster), collapse = ", "), call. = FALSE)
+  }
   if (!nrow(roster)) {
     stop("`roster` names no (instrument, sample) pair to cover, so every ",
          "unaudited shipped sample would be reported as covered",
          call. = FALSE)
+  }
+  # A non-empty roster can still be a narrow one, and a narrow roster over REAL
+  # instruments is the same silent clean run one shape over: measured
+  # 2026-08-15, `data.frame(instrument = "csie", sample = "1")` audits a csie
+  # batch slice with 0 non-exempt shipped-sample gaps where the shipped roster
+  # reports 23. Neither "a superset of the batch" nor "complete per instrument"
+  # catches it -- csie ships exactly one sample, so that roster satisfies both.
+  # So a roster the caller has not declared a fixture world must cover the
+  # whole of `data/` (M86).
+  #
+  # The exemption is ASKED FOR, never inferred. Through M86's first pass it was
+  # inferred, by testing `roster$instrument` against circumplex:::
+  # instrument_names(): a roster naming no known instrument was taken for a
+  # fixture's own world and skipped. That reading is decided by a spelling, so
+  # every near miss bought the exemption -- measured 2026-08-15, `"CSIE"`,
+  # `"csie "` and `NA` each passed this validator and then audited the csie
+  # batch slice at 1 non-exempt shipped-sample gap where the shipped roster
+  # reports 23. Repairing it by matching more spellings fixes the exempt set by
+  # what an author recalled, so the rule is total instead and the fixture says
+  # so at its own call site. Nothing below reads an instrument name to decide
+  # whether to check, which is what makes the spelling irrelevant.
+  if (isTRUE(fixture_world)) return(invisible(TRUE))
+  # `shipped_roster()` reads every shipped norms table, so it can fail for
+  # reasons that have nothing to do with the roster passed here. Unwrapped, its
+  # message surfaced as this call's answer and a caller with a well-formed
+  # explicit roster met the BUILDER's complaint -- the same message-precedence
+  # inversion moving validate_batch() ahead of the default roster removed at
+  # T4, reappearing inside this guard (M86 review F2). It is reachable on the
+  # EXPLICIT-roster path only: audit_norms() builds the default roster before
+  # calling here, so a defaulted call still meets the builder's own message
+  # from that earlier line, and it is the caller who passed a roster whose
+  # message needed the subject (M86 re-review D5).
+  #
+  # The attribution says what it has established and no more: that the failure
+  # is not the roster passed in. Naming `data/` as the cause would overclaim --
+  # this catches any error the call raises, a missing package or an absent
+  # binding included, not only a malformed norms table (M86 re-review D7).
+  shipped <- tryCatch(shipped_roster(), error = function(e) {
+    stop("`roster` cannot be checked for completeness: the shipped roster ",
+         "could not be built, so the fault is not in the roster passed here ",
+         "-- ", conditionMessage(e), call. = FALSE)
+  })
+  absent <- setdiff(paste(shipped$instrument, shipped$sample),
+                    paste(roster$instrument, roster$sample))
+  if (length(absent)) {
+    stop("`roster` omits ", length(absent), " shipped (instrument, sample) ",
+         "pair(s), which would be reported as covered; pass ",
+         "`fixture_world = TRUE` if this roster is not about `data/`: ",
+         paste(absent, collapse = ", "), call. = FALSE)
   }
   invisible(TRUE)
 }
@@ -523,7 +593,7 @@ shipped_roster <- function() {
 
 # The roster over an explicit, NAMED list of instrument objects.
 #
-# Every refusal here is a norms table the builder cannot roster, and each was a
+# Every refusal here is a shape the builder cannot roster, and each was a
 # silent or unnamed failure before M84: the roster is what says which shipped
 # (instrument, sample) pairs the audit must cover, so a pair this loop drops is
 # a pair nothing will ever report. Measured 2026-08-14 against the pre-M84
@@ -543,21 +613,70 @@ shipped_roster <- function() {
 #
 # A zero-row `Norms[[1]]` is NOT one of them and is skipped as it always was:
 # an instrument shipping no norms has nothing to audit and is not a gap.
+#
+# Two later refusals are about the `objects` LIST rather than a norms table --
+# a name carried twice, and a name carried with NULL behind it (M86). They are
+# listed with the loop's guards below rather than here.
 roster_from_objects <- function(objects) {
   nms <- names(objects)
   # `nzchar(NA_character_)` is TRUE, so an NA name clears a bare nzchar() test
-  # and then `objects[[NA_character_]]` returns NULL rather than raising -- the
-  # loop skips it as a no-norms instrument and the builder returns the very
+  # and then `objects[[NA_character_]]` returns NULL rather than raising, which
+  # before M84 let the loop skip it as a no-norms instrument and return the very
   # zero-row roster this guard exists to refuse (measured 2026-08-14, M84
   # review F1). `setNames(list(obj), lookup)` with a lookup that missed is how
-  # a caller reaches it.
+  # a caller reaches it. The skip that description names is gone -- the NULL
+  # entry now meets its own refusal in the loop below (M86) -- so this guard is
+  # what keeps an NA name from being reported as that refusal instead.
   if (length(objects) && (is.null(nms) || !all(!is.na(nms) & nzchar(nms)))) {
     stop("every entry of `objects` must be named for the instrument it ",
          "carries; an unnamed list rosters nothing at all", call. = FALSE)
   }
+  # The loop below walks NAMES and resolves each with `objects[[nm]]`, which
+  # returns the first entry carrying that name -- so a repeated name rosters
+  # the first entry's samples once per repetition and the second entry's not at
+  # all. Measured 2026-08-15: `list(fx = <Sample 1>, fx = <Sample 2>)` returned
+  # two rows both reading `fx 1`. `validate_batch()` has refused the same shape
+  # for the batch since M72; this closes the sibling asymmetry (M86).
+  if (anyDuplicated(nms)) {
+    stop("`objects` carries the name ",
+         paste(unique(nms[duplicated(nms)]), collapse = ", "),
+         " more than once, and only the first entry of a repeated name is ",
+         "ever read", call. = FALSE)
+  }
   out <- list()
   for (nm in nms) {
-    norms <- objects[[nm]]$Norms[[1]]
+    # `objects[[nm]]$Norms[[1]]` used to be reached before anything about the
+    # entry was known, so R's own message was the whole report: a non-list
+    # entry raised "$ operator is invalid for atomic vectors" and an empty
+    # `Norms` list raised "subscript out of bounds", naming neither the
+    # instrument nor the fault (both measured 2026-08-15, M86).
+    obj <- objects[[nm]]
+    # A NULL entry is an instrument the caller NAMED and then supplied nothing
+    # for, which is not the same thing as an instrument shipping no norms: the
+    # name is a claim that this instrument is in the world being rostered. It
+    # reached the is.list() guard above through M86's first pass and reported
+    # "is not a list but a NULL", a type complaint for what is really an empty
+    # slot; before M86 it was skipped silently, which is the shape the loop's
+    # other refusals exist to end (M86 review F3).
+    if (is.null(obj)) {
+      stop("`objects` names ", nm, " but carries NULL for it, so the ",
+           "instrument would be rostered with no samples at all",
+           call. = FALSE)
+    }
+    if (!is.list(obj)) {
+      stop("instrument object for ", nm, " is not a list but a ",
+           class(obj)[[1L]], call. = FALSE)
+    }
+    # `Norms = NULL` is an instrument with nothing to audit, not a malformed
+    # one, and it is skipped -- tested BEFORE the emptiness guard below, since
+    # NULL and list() are both length 0 and only the second is a defect (M79).
+    if (is.null(obj$Norms)) next
+    if (!is.list(obj$Norms) || !length(obj$Norms)) {
+      stop("`Norms` for ", nm, " must be a non-empty list to hold a norms ",
+           "table; it is a ", class(obj$Norms)[[1L]], " of length ",
+           length(obj$Norms), call. = FALSE)
+    }
+    norms <- obj$Norms[[1]]
     # NULL[[1]] is NULL rather than an error in R, which is what lets the
     # no-norms case be tested before the table's shape is (M79).
     if (is.null(norms)) next
@@ -721,12 +840,22 @@ blank_to_na <- function(x) {
 audit_norms <- function(batch = AUDIT_BATCH,
                         dir = file.path("cairn", "references"),
                         objects = NULL,
-                        roster = NULL) {
-  if (is.null(roster)) roster <- shipped_roster()
-  # After validate_batch(), not before: a caller who got both arguments wrong
-  # should meet the batch's message, which names the column it is missing.
+                        roster = NULL,
+                        fixture_world = FALSE) {
+  # The batch is validated FIRST, before the default roster is even built: a
+  # caller who got both arguments wrong should meet the batch's message, which
+  # names the column it is missing. Through M85 the default resolved above this
+  # line, so building it was the first thing that could fail and a malformed
+  # shipped norms table would have reported the BUILDER's message for a call
+  # whose batch was the thing at fault -- the opposite of the stated intent
+  # this comment has carried since M84 (M86).
   validate_batch(batch)
-  validate_roster(roster)
+  if (is.null(roster)) roster <- shipped_roster()
+  # validate_roster() still runs after the default resolves, so a caller who
+  # passes nothing is never refused for passing nothing. `fixture_world` goes
+  # through unchanged: this function decides nothing about it, so there is one
+  # place the exemption is written down and it is the fixture's own call.
+  validate_roster(roster, fixture_world = fixture_world)
   refuse_shared_untagged_blocks(batch, dir)
   ledger <- list()
   coverage <- list()

@@ -265,6 +265,7 @@ test_that("an untagged note read by two instruments is refused (M79)", {
   # against a batch rejected for any of validate_batch()'s other reasons.
   expect_error(
     env$audit_norms(shared_batch(), dir = dir, objects = shared_objects(),
+                    fixture_world = TRUE,
                     roster = env$roster_from_objects(shared_objects())),
     "shared carries an untagged audit-values block but is read by 2 .*fx, fy"
   )
@@ -278,6 +279,7 @@ test_that("a note read by one instrument still parses (M79)", {
 
   res <- env$audit_norms(shared_batch()[1, , drop = FALSE], dir = dir,
                          objects = list(fx = two_scale_object()),
+                         fixture_world = TRUE,
                          roster = env$roster_from_objects(list(fx = two_scale_object())))
   expect_identical(sum(res$ledger$kind == "mismatch"), 0L)
 })
@@ -290,6 +292,7 @@ test_that("a tagged note read by two instruments still parses (M79)", {
              file.path(dir, "shared.md"))
 
   res <- env$audit_norms(shared_batch(), dir = dir, objects = shared_objects(),
+                         fixture_world = TRUE,
                          roster = env$roster_from_objects(shared_objects()))
   expect_identical(sum(res$ledger$kind == "mismatch"), 0L)
   # And the pass compared something: 2 scales x (M, SD) + 4 record fields +
@@ -411,10 +414,18 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
   site("stopifnot", "validate_roster", "is.data.frame(roster)", function(env) {
     env$validate_roster(list(instrument = "fx", sample = "1"))
   }),
-  site("stopifnot", "validate_roster",
-       'all(c("instrument", "sample") %in% names(roster))',
-       function(env) {
-         env$validate_roster(data.frame(Instrument = "fx", Sample = "1",
+  # One entry per column (M86), replacing the single `%in% names(roster)`
+  # condition whose message named both and so discriminated neither. Each
+  # fixture carries the OTHER column correctly spelt, so the guard it is named
+  # for is the only one it can reach.
+  site("stop", "validate_roster",
+       "`roster` has no `instrument` column; it has: {}", function(env) {
+         env$validate_roster(data.frame(Instrument = "fx", sample = "1",
+                                        stringsAsFactors = FALSE))
+       }),
+  site("stop", "validate_roster",
+       "`roster` has no `sample` column; it has: {}", function(env) {
+         env$validate_roster(data.frame(instrument = "fx", Sample = "1",
                                         stringsAsFactors = FALSE))
        }),
   site("stop", "validate_roster",
@@ -425,11 +436,53 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
                                         sample = character(0),
                                         stringsAsFactors = FALSE))
        }),
+  # The narrow-roster refusal (M86, amended). Every roster must cover every
+  # shipped pair unless its caller asks for the fixture-world exemption; this
+  # one names csie and omits the other 23, and asks for nothing. It carries
+  # both key columns and a row, so no guard above it can fire.
+  site("stop", "validate_roster",
+       paste0("`roster` omits {} shipped (instrument, sample) pair(s), which ",
+              "would be reported as covered; pass `fixture_world = TRUE` if ",
+              "this roster is not about `data/`: {}"),
+       function(env) {
+         env$validate_roster(data.frame(instrument = "csie", sample = "1",
+                                        stringsAsFactors = FALSE))
+       }),
+  # The shipped-roster build failing UNDER that check (M86 review F2). The
+  # check reads every shipped norms table, so it can fail for reasons the
+  # roster passed in had nothing to do with; unattributed, the builder's
+  # message answered for the caller's argument. The fixture stubs the builder
+  # rather than corrupting `data/`, and the roster it passes is well-formed, so
+  # only this site can fire.
+  site("stop", "validate_roster",
+       paste0("`roster` cannot be checked for completeness: the shipped ",
+              "roster could not be built, so the fault is not in the roster ",
+              "passed here -- {}"),
+       function(env) {
+         local <- new.env(parent = parent.env(env))
+         for (nm in ls(env)) assign(nm, get(nm, envir = env), envir = local)
+         environment(local$validate_roster) <- local
+         local$shipped_roster <- function() stop("STUB: builder failed")
+         local$validate_roster(data.frame(instrument = "fx", sample = "1",
+                                          stringsAsFactors = FALSE))
+       }),
   # roster_from_objects() (M84). Each fixture carries ONE malformed norms
   # table and is well-formed in every other respect, so the guard it is named
   # for is the only one it can reach: the non-frame case never reaches the
   # column check, the column case carries a row so it is not skipped, and the
   # NA case carries the column the check before it looks for.
+  # A NULL entry (M86 review F3). The name is a claim that the instrument is in
+  # the world being rostered, so supplying nothing for it is an empty slot
+  # rather than a type error -- it reported "is not a list but a NULL" through
+  # M86's first pass, and before M86 was skipped in silence. The list is named
+  # and carries one entry, so neither the naming guard nor the duplicate guard
+  # can fire in its place.
+  site("stop", "roster_from_objects",
+       paste0("`objects` names {} but carries NULL for it, so the instrument ",
+              "would be rostered with no samples at all"),
+       function(env) {
+         env$roster_from_objects(list(fx = NULL))
+       }),
   site("stop", "roster_from_objects",
        "norms table for {} is not a data frame but a {}", function(env) {
          env$roster_from_objects(list(fx = list(Norms = list(list(Sample = 1)))))
@@ -456,6 +509,28 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
          env$roster_from_objects(list(list(Norms = list(
            data.frame(Sample = 1, Scale = "PA", M = 1,
                       stringsAsFactors = FALSE)))))
+       }),
+  # The `$Norms[[1]]` access guards (M86). Each fixture is well-formed but for
+  # the shape it names: the non-list entry never reaches the `Norms` check, and
+  # the empty-`Norms` entry is a list, so it cannot reach the one above it.
+  site("stop", "roster_from_objects",
+       "instrument object for {} is not a list but a {}", function(env) {
+         env$roster_from_objects(list(fx = 1:3))
+       }),
+  site("stop", "roster_from_objects",
+       paste0("`Norms` for {} must be a non-empty list to hold a norms table; ",
+              "it is a {} of length {}"),
+       function(env) {
+         env$roster_from_objects(list(fx = list(Norms = list())))
+       }),
+  site("stop", "roster_from_objects",
+       paste0("`objects` carries the name {} more than once, and only the ",
+              "first entry of a repeated name is ever read"),
+       function(env) {
+         # Both norms tables are well-formed; only the names collide.
+         one <- list(Norms = list(data.frame(Sample = 1, Scale = "PA", M = 1,
+                                             stringsAsFactors = FALSE)))
+         env$roster_from_objects(list(fx = one, fx = one))
        }),
   # normalise_items() (M80): an unparseable item key aborts rather than
   # coercing to the string "NA", which two unparseable cells shared.
