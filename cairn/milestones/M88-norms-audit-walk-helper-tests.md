@@ -107,7 +107,7 @@ their existing candidate rows.
       from `helper-norms-audit-manifest.R`, narrow the identity in
       `test-norms-audit-manifest.R:28-37`, and add the AC5 duplicate-refusal on
       both sides.
-- [ ] T6 Run the AC6 mutation pass over the added tests; record the summary line
+- [x] T6 Run the AC6 mutation pass over the added tests; record the summary line
       and restore hashes; re-run `devtools::test()`.
 
 ## Work log
@@ -121,6 +121,12 @@ their existing candidate rows.
 - 2026-08-15: T2-T4 done in one commit, the three criteria being three sections of one new file (`tests/testthat/test-norms-audit-walk.R`, 177 lines, 46 assertions). All eight norms-audit test files pass. The file does not skip against the installed package as its siblings do: the helpers under test are pure and read no `data-raw/` path.
 - 2026-08-15: T5 done — ordinal removed from the walk (`helper-norms-audit-script.R`), the manifest's columns and both identity builders; the duplicate refusal added on both sides of the set comparison, plus the AC4 field-set assertion. All eight norms-audit files pass; the manifest file goes 9 → 44 assertions.
 - 2026-08-15: AC4 amended at a mini gate — the original wording promised "no code carries it" but checked three spellings of the word. A fresh-context [O] reader wrote nine reintroduction shapes to a scratch file and grepped them: nine escaped, including `[["ordinal"]]` (the field-access style this codebase already uses) and a renamed fourth field, so the procedure was a proxy for its own universal. Replaced by a direct assertion on the field set of both sides, which every escaping shape must violate to have any effect; the grep is retained and relabelled a spot check. Also fixed at the same gate: the original grep matched four comment lines explaining the removal, so satisfying it literally meant deleting the explanation D-043 asks the helpers to carry.
+- 2026-08-15: T6 done — 7 mutants, 7 killed, 0 survived, each restored by copy from HEAD's blob and re-hashed before the next ran. AC1 truncation-marker regression → 5 failures; AC2 unknown-kind fall-through → 1; AC2 named-match loosened to containment → 2; AC3 reserved set emptied → 2; AC3 kinds collapsed → 1; AC3 stop() named-arg refusal removed → 1; AC4/AC5 fourth per-site field → 33. Both helpers end at their pre-mutation blobs (`50fedd235c`, `b24345448a`) with a clean tree.
+- 2026-08-15: T6 run one mutant per invocation after an unattended seven-in-one run was interrupted and left mutant 2 on disk — an `atexit` restore does not survive a hard kill (extends M82's harness lesson, whose snapshot-and-restore discipline assumed the process gets to exit). Recovery was possible because each mutant is a one-hunk diff against a committed HEAD, so the restore was verifiable by blob hash; the single-shot form keeps the mutated window inside one call.
+- 2026-08-15: T6's seventh anchor initially matched two sites and the harness refused to apply it rather than mutating the wrong one — the multi-site anchoring trap M87 hit, here failing closed. Re-anchored on the enclosing block.
+- 2026-08-15: mutant 4 is the evidence for the criteria audit's vacuity finding: emptying `STOPIFNOT_RESERVED` drops the file from 46 assertions to 37 because the loop runs zero times, so without the two anchor assertions the test would pass green over its own mutation.
+- 2026-08-15: mutant 7 is the evidence AC4's field-set assertion carries the claim its grep cannot: `out[[i]][["seq_within_group"]] <- 1L` reintroduces a per-site field, is not matched by `git grep -nE '(\$|\.)ordinal|ordinal *=|assign_ordinals'` (verified against the line itself), and reddens 33 assertions — one per walked site.
+- 2026-08-15: CHECKPOINT — T6's mutation half is complete and recorded above; the confirming full `devtools::test()` was still running when this was committed, so AC7 is not yet evidenced and the milestone stays `in-progress`. The filtered `norms-audit` run was clean at the same tree.
 - 2026-08-15: plan gate weighed D-042's bar on reopening this area and read this scope as distinct — no registry, matcher, matrix or denylist returns, no sweep is added, and the manifest check's promise is byte-unchanged; falsified by any criterion here widening what the manifest check promises.
 
 ## Decisions
