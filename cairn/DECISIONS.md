@@ -1379,9 +1379,10 @@ key to exactly one manifest site and checks the raised message against it under
 that site's kind. The property kept is the one per-test regexps structurally
 cannot provide: a regexp is quantified over the tests, so a guard added to the
 script with no test at all is invisible to it, while the manifest is quantified
-over the script. The branch removes far more than it adds; the exact figures
-are whatever `git diff --numstat` reports over the squash-merge, and were 498
-insertions against 1567 deletions measured on the branch tip before merge.
+over the script. The branch removes several times what it adds; the figures are
+whatever `git diff --numstat` reports for the squash-merge commit, and are not
+restated here — a hand-copied count of a moving branch was this entry's own
+first defect, caught at review after further commits had already stranded it.
 
 **Consequences:** Three things are given up, named because nothing that replaces
 them covers them. (1) The denylist's whole job: abort spellings other than
