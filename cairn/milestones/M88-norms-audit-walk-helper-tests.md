@@ -1,6 +1,6 @@
 # M88: Fence the norms-audit walk helpers M87 kept
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -51,7 +51,7 @@ their existing candidate rows.
       for a kind outside `stop`/`stopifnot`/`stopifnot_named`; and asserts the
       `stopifnot_named` branch in both directions — a message equal to the key
       accepted, a message carrying the key as a strict superstring rejected.
-- [x] AC3 A test asserts each `refuse_unenumerable()` site raises and names its
+- [ ] AC3 A test asserts each `refuse_unenumerable()` site raises and names its
       cause: `norms_audit_stopifnot_conditions()` for a condition passed under any
       element of `STOPIFNOT_RESERVED`, iterated as the running R defines it and
       anchored non-vacuous by pinning `"exprs"` as a literal member; and
@@ -128,12 +128,71 @@ their existing candidate rows.
 - 2026-08-15: mutant 7 is the evidence AC4's field-set assertion carries the claim its grep cannot: `out[[i]][["seq_within_group"]] <- 1L` reintroduces a per-site field, is not matched by `git grep -nE '(\$|\.)ordinal|ordinal *=|assign_ordinals'` (verified against the line itself), and reddens 33 assertions — one per walked site.
 - 2026-08-15: CHECKPOINT — T6's mutation half is complete and recorded above; the confirming full `devtools::test()` was still running when this was committed, so AC7 is not yet evidenced and the milestone stays `in-progress`. The filtered `norms-audit` run was clean at the same tree.
 - 2026-08-15: AC7 evidenced, superseding the checkpoint line above — full `devtools::test()` clean at FAIL 0 / WARN 6 / SKIP 3 / PASS 7132, warnings and skips unchanged from the T1 baseline's 7051 passes. The +81 is the new walk file's 46 assertions plus the manifest file's 9 → 44. Tree clean; status in-progress → review.
+- 2026-08-15: REVIEW RETURN 1 — AC3 fails. F1 (85), verified independently: `refuse_unenumerable()` echoes the deparsed call, so `expect_match(msg, nm, fixed = TRUE)` passes even with the naming logic gutted; the single-name half of AC3's "names its cause" promise is unasserted. Riding the return: F2 (80), AC1's `long_key` retypes the shipped derivation instead of calling it, and B5, a misattributed M60 citation that should be M43 (verified against LESSONS). 28 findings below the bar logged in Review. Status review → in-progress.
 - 2026-08-15: review in progress — PR #116 opened as draft; AC1-AC5 evidenced fresh and ticked, consistency gate clean (`cairn_validate` exit 0; the profile's toolchain checks are no-ops by file list, the branch touching only `tests/` and `cairn/`). AC6/AC7 deferred until the fresh-context reviewers finish, since a mutation pass would churn the tree they read.
 - 2026-08-15: plan gate weighed D-042's bar on reopening this area and read this scope as distinct — no registry, matcher, matrix or denylist returns, no sweep is added, and the manifest check's promise is byte-unchanged; falsified by any criterion here widening what the manifest check promises.
 
 ## Decisions
 
 ## Review
+
+### Fresh-context review (2026-08-15)
+
+Three lenses, then a [S] scorer that generated none of the findings and was
+given the diff and this plan. 30 candidates reported, filtered by none of the
+lenses. Prior-PR-comments: no prior-review evidence, zero findings (the GitHub
+inline-comment surface probed empty, so archived `## Review` sections were the
+evidence base). Blame-history: 5 candidates, every one self-assessed a
+non-violation — it traced the ordinal to M82, confirmed D-043 authorises the
+deletion and names the weakening as the intended trade, and found D-042's
+retirement bar respected. Diff-bug: 25 candidates.
+
+**Actioned (>= 80): 2.**
+
+- **F1 (85) — AC3's "names its cause" assertions are vacuous for every
+  single-name case.** `refuse_unenumerable()` appends `deparse_call(cl)` to
+  every message, so the probe call `stopifnot(exprs = x > 0)` already carries
+  `exprs`. Verified independently at this branch tip: with the `what` clause
+  replaced by a literal naming nothing, all three of `exprs`, `exprObject` and
+  `local` still appear in the message and `expect_match(msg, nm, fixed = TRUE)`
+  still passes. Only the `"tail, extra"` multi-name assertion is non-vacuous.
+  **This is a return-floor finding — AC3 promises a test that asserts each site
+  "raises and names its cause", and the naming half is unasserted.**
+- **F2 (80) — AC1's `long_key` re-implements the shipped key derivation.** The
+  test retypes `norms_audit_stopifnot_conditions()`'s own expression rather than
+  calling it, the M76/M78 trap this repo has been bitten by three times. Not an
+  AC failure — AC1's wording asks for the condition's full deparsed text, which
+  the test does compute — so it rides the return as a quality fix.
+
+**Below the bar, logged, not actioned (28).** F6 (78) two AC1 case labels
+misdescribe the rejection mechanism, and only case 4 reaches the floor branch ·
+F4 (72) `NORMS_AUDIT_VERDICT`'s `are not all TRUE` alternative is never
+exercised · F5 (72) case 2 hard-codes the verdict instead of reusing the
+constant · F11 (72) AC4/AC5 assertions sit behind the `data-raw/` skip, so they
+do not run under `R CMD check`, including two that need no script · F12 (72)
+`expect_setequal` is multiplicity-insensitive, so a fourth field duplicating an
+existing name escapes · F17 (62) the AC1 fixture bypasses
+`norms_audit_with_c_messages()` · F13 (62) nothing asserts the id builders paste
+exactly the three fields · B5 (60) the M60 citation at
+`test-norms-audit-walk.R:44` is misattributed; M43 is the lesson that says "the
+probe was narrower than what it probed" (verified against LESSONS independently
+of the scorer) · F18 (58) and F19 (55) two wrong line cross-references in new
+comments · F9 (50) the `stopifnot_named`-absent assertion would redden on
+legitimate future work · F3/F7/F8/F10/F22 (45) fixture self-certification,
+two redundant assertion pairs, an unanchored loop rescued incidentally by the
+assertion above it, and the stale word "fixture" · F14 (35) `$` partial-matching
+· F21/F15 (30) a shadowed `c`, a tab separator unreachable today · F20 (20) a
+dead parameter; its env-leak half was disproven by the scorer · B4 (15), B1/B2
+(12), B3 (10) the blame lens's own non-findings · F23 (8) an artifact of reading
+the milestone file mid-edit · F25 (8) D-042's text is untouched by this diff and
+IP4 forbids editing it in place · F24 (12) and F16 (5) both disproven — the
+per-AC counts reproduce exactly, and the twin-refusal verification found the
+ordinal deletion sound.
+
+### Gate outcome: returned to `in-progress` (defect return 1)
+
+F1 demonstrates AC3 failing inside the domain of the procedure it names, which
+is the return floor. AC3 is unticked; AC1, AC2, AC4 and AC5 keep their evidence.
 
 Reviewed 2026-08-15 against PR #116. Evidence executed fresh at this branch
 tip, never recalled from the implement run.
