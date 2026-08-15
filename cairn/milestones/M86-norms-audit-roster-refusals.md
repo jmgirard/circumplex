@@ -111,7 +111,7 @@ serving IP5.
       gap-equivalence pair, and run the 26 mutations.
 - [x] T6: add the shipped-superset refusal to `validate_roster()`; test the
       measured csie shape and confirm the fake-instrument fixtures are untouched.
-- [ ] T7: register every added and removed abort site; re-run the registry
+- [x] T7: register every added and removed abort site; re-run the registry
       set-equality assertion and the cross-discrimination matrix.
 - [ ] T8: run the profile's verify slot and the full check.
 
@@ -134,6 +134,8 @@ serving IP5.
 - 2026-08-15: T5 done. The 24-pair literal's origin is a direct `load()` read of `data/*.rda`, not the builder and not the package namespace — the replaced assertion compared the defaulted run against `roster = shipped_roster()` while the default IS `shipped_roster()`, one nullary call on both sides. All 26 mutations of the builder's returned frame redden the equality (24 drops, one spurious pair, one numeric `sample`); the comparison is uncoerced, which is what makes the type mutation reachable.
 
 - 2026-08-15: T6 done. The all-or-nothing rule: a roster naming any instrument in `circumplex:::instrument_names()` must cover every shipped pair, and one naming none is a fixture's own world and is not consulted against `data/`. All 11 norms-audit test files stay green, so no fixture roster in the suite touches a shipped instrument. Cost noted: `validate_roster()` now builds `shipped_roster()` on any real-instrument roster, so the default path derives it twice per run.
+
+- 2026-08-15: T7 done. The walk now collects 31 abort sites, 12 on the roster path; this milestone added 5 (two column refusals, duplicate name, non-list entry, non-indexable `Norms`, narrow roster) and removed 1 (the shared `%in% names(roster)` condition). Registry/walk set-equality and the cross-discrimination matrix both pass, and the denylist sweep stays green at 80. Teeth checked by planting an unregistered `stop()` inside a function no fixture calls — 3 assertions redden; restore verified by blob hash.
 
 ## Decisions
 
