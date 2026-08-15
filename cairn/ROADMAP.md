@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-14 (M84 done — the norms audit now refuses a roster it cannot audit against and a norms table it cannot roster, by name. Its review fixed one finding and graduated six below-bar ones to a candidate row; the same-binding-twin row records its decline. M79's terminal row pruned under retention; one lesson captured.)_
+_Last hygiene check: 2026-08-14 (M85 done — the audit's note-only coverage rows now carry the sample their key distinguishes them by, so two stop collapsing under a `unique()`. Review fixed one finding M85 itself introduced, a blank note cell reaching a key column as `""`, and logged ten below-bar. M81's terminal row pruned; one lesson folded into the environment-quirk line.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,12 +9,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M81 | Enumerate the norms-audit abort registry from the script's parse tree | done | M79 | normal | milestones/archive/M81-norms-audit-abort-registry.md |
 | M80 | Give the norms-audit coverage report a machine-readable key | done | M79, M81 | normal | milestones/archive/M80-norms-audit-report-schema.md |
 | M82 | Make the norms-audit abort registry discriminating | done | M81 | normal | milestones/archive/M82-norms-audit-abort-discrimination.md |
 | M83 | Make the norms-audit abort matcher accept correct sites | done | — | normal | milestones/archive/M83-norms-audit-matcher-repair.md |
 | M84 | Validate the norms-audit roster at its boundary | done | M83 | normal | milestones/archive/M84-norms-audit-roster-validation.md |
-| M85 | Carry the sample through the audit's note-only coverage rows | review | — | low | milestones/M85-norms-audit-note-only-sample.md |
+| M85 | Carry the sample through the audit's note-only coverage rows | done | — | low | milestones/archive/M85-norms-audit-note-only-sample.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
