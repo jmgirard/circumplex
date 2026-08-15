@@ -200,29 +200,20 @@ norms_audit_top_level_binding <- function(expr) {
   NORMS_AUDIT_RUN_BINDING
 }
 
-# Source-order ordinals, assigned WITHIN each (kind, binding, key) group.
+# Every `stop()`/`stopifnot()` site the walk collects, as (kind, binding, key)
+# in source order -- the header above bounds what that does and does not cover.
+# One entry per `stop()` call and one per `stopifnot()` CONDITION, since each
+# condition fails on its own and gets its own fixture.
 #
-# The ordinal exists to keep two sites that are otherwise identical -- the same
-# guard written twice inside one function -- separately identifiable, and it
-# does nothing else: a site with no twin is ordinal 1, so adding a twin later
-# renumbers nothing that already exists.
-norms_audit_assign_ordinals <- function(sites) {
-  counts <- list()
-  for (i in seq_along(sites)) {
-    s <- sites[[i]]
-    k <- paste(s$kind, s$binding, s$key, sep = "\t")
-    n <- if (is.null(counts[[k]])) 1L else counts[[k]] + 1L
-    counts[[k]] <- n
-    sites[[i]]$ordinal <- n
-  }
-  sites
-}
-
-# Every `stop()`/`stopifnot()` site the walk collects, as
-# (kind, binding, key, ordinal) in source order -- the header above bounds what
-# that does and does not cover. One entry per `stop()` call and one per
-# `stopifnot()` CONDITION, since each condition fails on its own and gets its
-# own fixture under AC2/AC3.
+# The identity carried a fourth part until M88: a source-order ordinal within
+# each (kind, binding, key) group, there to keep two otherwise identical sites
+# -- the same guard written twice inside one function -- separately
+# identifiable. Measured 2026-08-15, all 33 shipped sites were ordinal 1 and no
+# triple was duplicated, so the field distinguished nothing and was tested by
+# nothing. What it nominally bought is kept instead as a REFUSAL, asserted in
+# test-norms-audit-manifest.R: both sides of the manifest comparison must be
+# duplicate-free, so a twin reddens the suite rather than being numbered
+# silently and never asserted (D-043).
 #
 # The walk is per top-level expression rather than over the whole tree at once,
 # because the enclosing binding is a property of the top-level expression a site
@@ -244,7 +235,7 @@ norms_audit_abort_sites <- function(exprs = norms_audit_script_exprs()) {
       }
     }
   }
-  norms_audit_assign_ordinals(out)
+  out
 }
 
 # Does this call resolve `nm` out of a package namespace?

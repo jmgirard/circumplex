@@ -23,16 +23,16 @@ manifest_sites <- function() {
   norms_audit_abort_sites(parse(script, keep.source = FALSE))
 }
 
-# The manifest's own rows as the same four-part identity the walk produces, so
+# The manifest's own rows as the same three-part identity the walk produces, so
 # the two sides are compared as sets of identities rather than by row order.
 manifest_ids <- function() {
   paste(NORMS_AUDIT_MANIFEST$kind, NORMS_AUDIT_MANIFEST$binding,
-        NORMS_AUDIT_MANIFEST$key, NORMS_AUDIT_MANIFEST$ordinal, sep = "\t")
+        NORMS_AUDIT_MANIFEST$key, sep = "\t")
 }
 
 walked_ids <- function(sites) {
   vapply(sites, function(s) {
-    paste(s$kind, s$binding, s$key, s$ordinal, sep = "\t")
+    paste(s$kind, s$binding, s$key, sep = "\t")
   }, character(1))
 }
 
@@ -49,9 +49,34 @@ test_that("the manifest is set-equal to a fresh walk of the audit script (M87)",
   expect_identical(setdiff(got, want), character(0))
   expect_identical(setdiff(want, got), character(0))
 
-  # The manifest is a set: a duplicated identity would let one row stand in for
-  # two sites.
+  # Both sides are sets, and BOTH are asserted duplicate-free -- the property
+  # the ordinal used to carry, kept as a refusal instead of a discriminator
+  # (M88, D-043).
+  #
+  # `expect_setequal()` compares membership, so it is blind to a repeat on
+  # either side: two guards identical in (kind, binding, key) would walk to two
+  # equal ids, collapse onto the manifest's one row, and leave the comparison
+  # green with a site nothing asserts. The manifest side needs the same check
+  # for the mirror reason -- one duplicated row would stand in for two sites.
+  #
+  # A twin is not forbidden, only silent adoption of one. Adding a second guard
+  # identical in all three parts now reddens here, and the decision is then a
+  # deliberate one: reword one guard, or restore an ordinal.
   expect_identical(anyDuplicated(want), 0L)
+  expect_identical(anyDuplicated(got), 0L)
+
+  # The identity's field SET, asserted directly rather than by searching for a
+  # spelling. A fourth field is how any restoration of the ordinal -- or of
+  # anything else keyed per site -- would have to arrive, whatever it is named
+  # and however it is written: dollar or double-bracket field assignment, a
+  # field renamed to something the word search cannot know, a setNames() or
+  # cbind() column. Each of those escapes a search for the word and none of
+  # them escapes this. The grep AC4 also names is a spot check on three
+  # spellings, not what carries the claim (M88).
+  expect_identical(names(NORMS_AUDIT_MANIFEST), c("kind", "binding", "key"))
+  for (s in sites) {
+    expect_setequal(names(s), c("kind", "key", "binding"))
+  }
 })
 
 test_that("every manifest key carries enough literal text to discriminate (M87)", {

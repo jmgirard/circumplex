@@ -60,9 +60,16 @@ their existing candidate rows.
       Each is paired with a negative that must not raise — a positional
       condition, a named condition, a `stop()` with no names, and one carrying
       only `call.`/`domain`.
-- [ ] AC4 `ordinal` is absent from the walk, the generated manifest and the
-      manifest identity, which becomes (kind, binding, key):
-      `git grep -n ordinal -- tests tools` returns no line.
+- [ ] AC4 The abort-site identity is (kind, binding, key). A test asserts the
+      field set directly rather than by spelling: `names(NORMS_AUDIT_MANIFEST)`
+      is exactly `c("kind", "binding", "key")`, and every element of
+      `norms_audit_abort_sites()` has `names()` equal as a set to
+      `c("kind", "key", "binding")`, so a fourth field on either side reddens
+      the suite under any spelling; `manifest_ids()` and `walked_ids()` each
+      paste exactly those three. As a spot check on the three spellings the
+      retired mechanism used,
+      `git grep -nE '(\$|\.)ordinal|ordinal *=|assign_ordinals' -- tests tools`
+      returns no line — prose explaining the removal may name `ordinal`.
 - [ ] AC5 A test asserts the walked identities and the manifest identities are
       each duplicate-free, so two guards identical in (kind, binding, key) redden
       the suite rather than collapsing onto one row — the separability the
@@ -95,7 +102,7 @@ their existing candidate rows.
       (`helper-norms-audit-manifest.R:176-197`).
 - [x] T4 Add the AC3 refusal assertions with their negatives
       (`helper-norms-audit-script.R:103`, `:117-120`, `:130-144`, `:162-183`).
-- [ ] T5 Delete `norms_audit_assign_ordinals()` and its call
+- [x] T5 Delete `norms_audit_assign_ordinals()` and its call
       (`helper-norms-audit-script.R:203-219`, `:247`), drop the `ordinal` column
       from `helper-norms-audit-manifest.R`, narrow the identity in
       `test-norms-audit-manifest.R:28-37`, and add the AC5 duplicate-refusal on
@@ -112,6 +119,8 @@ their existing candidate rows.
 - 2026-08-15: T1 in progress — branch cut from a synced master, status in-progress; the baseline `devtools::test()` is still running, so no task is checked off yet. The T2-T4 test file is drafted outside the repo and dry-runs clean (46 assertions, testthat 3.3.2); an in-memory reintroduction of the M83 marker regression reddens 5 of them, naming both shapes AC1 exists for, so the partition is not vacuous. Nothing is committed to `tests/` yet.
 - 2026-08-15: T1 done — baseline `devtools::test()` clean at FAIL 0 / WARN 6 / SKIP 3 / PASS 7051 on master's tree.
 - 2026-08-15: T2-T4 done in one commit, the three criteria being three sections of one new file (`tests/testthat/test-norms-audit-walk.R`, 177 lines, 46 assertions). All eight norms-audit test files pass. The file does not skip against the installed package as its siblings do: the helpers under test are pure and read no `data-raw/` path.
+- 2026-08-15: T5 done — ordinal removed from the walk (`helper-norms-audit-script.R`), the manifest's columns and both identity builders; the duplicate refusal added on both sides of the set comparison, plus the AC4 field-set assertion. All eight norms-audit files pass; the manifest file goes 9 → 44 assertions.
+- 2026-08-15: AC4 amended at a mini gate — the original wording promised "no code carries it" but checked three spellings of the word. A fresh-context [O] reader wrote nine reintroduction shapes to a scratch file and grepped them: nine escaped, including `[["ordinal"]]` (the field-access style this codebase already uses) and a renamed fourth field, so the procedure was a proxy for its own universal. Replaced by a direct assertion on the field set of both sides, which every escaping shape must violate to have any effect; the grep is retained and relabelled a spot check. Also fixed at the same gate: the original grep matched four comment lines explaining the removal, so satisfying it literally meant deleting the explanation D-043 asks the helpers to carry.
 - 2026-08-15: plan gate weighed D-042's bar on reopening this area and read this scope as distinct — no registry, matcher, matrix or denylist returns, no sweep is added, and the manifest check's promise is byte-unchanged; falsified by any criterion here widening what the manifest check promises.
 
 ## Decisions
