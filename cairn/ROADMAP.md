@@ -14,7 +14,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M84 | Validate the norms-audit roster at its boundary | done | M83 | normal | milestones/archive/M84-norms-audit-roster-validation.md |
 | M85 | Carry the sample through the audit's note-only coverage rows | done | — | low | milestones/archive/M85-norms-audit-note-only-sample.md |
 | M86 | Name every roster shape the norms-audit builder cannot honestly audit | done | — | normal | milestones/archive/M86-norms-audit-roster-refusals.md |
-| M87 | Retire the norms-audit abort apparatus for a manifest check | planned | — | normal | milestones/M87-norms-audit-apparatus-retirement.md |
+| M87 | Retire the norms-audit abort apparatus for a manifest check | in-progress | — | normal | milestones/M87-norms-audit-apparatus-retirement.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
