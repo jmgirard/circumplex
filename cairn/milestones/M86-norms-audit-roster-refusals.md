@@ -1,6 +1,6 @@
 # M86: Name every roster shape the norms-audit builder cannot honestly audit
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -126,10 +126,10 @@ serving IP5.
       measured csie shape and confirm the fake-instrument fixtures are untouched.
 - [x] T7: register every added and removed abort site; re-run the registry
       set-equality assertion and the cross-discrimination matrix.
-- [ ] T8: run the profile's verify slot and the full check (re-runs after T9).
-- [ ] T9: replace the instrument-name trigger with the call-site
+- [x] T8: run the profile's verify slot and the full check (re-runs after T9).
+- [x] T9: replace the instrument-name trigger with the call-site
       `fixture_world` exemption in `validate_roster()` and `audit_norms()`;
-      update the 13 fixture `roster =` call sites, attribute a failed
+      update the fixture `roster =` call sites, attribute a failed
       `shipped_roster()` build to its own message (F2), test and register the
       `NULL` entry refusal and correct its stale comment (F3), and re-derive
       the abort registry and cross-discrimination matrix.
@@ -166,6 +166,12 @@ serving IP5.
 - 2026-08-15: AC7 un-ticked and T8 un-checked: the amendment changes the narrow-roster abort message and adds sites, so the registry, the cross-discrimination matrix and the full check are all re-derived rather than carried over. AC1–AC5 stay verified; their evidence is untouched by the exemption, which sits after the shape guards.
 - 2026-08-15: amended-criterion audit ([O], fresh context) ran twice on wording no session author wrote. Round 1 killed the first design outright — marking rosters built by `roster_from_objects()` marks by provenance, and `roster_from_objects(list(csie = <real object>))` is a marked narrow roster over real `data/`, so the exemption would have relocated rather than closed. Round 2 over the call-site design returned the bounded-promise defect repaired, plus three clear fixes taken before writing (qualify the name-comparison sentence to the exemption decision; assert all three measured shapes rather than one exemplar; un-tick AC7) and three judgments routed to the gate.
 - 2026-08-15: the T6 work-log line above and the comment at `data-raw/audit-norms.R:184-186` describe the superseded all-or-nothing rule keyed on `instrument_names()`; T9 replaces the comment, and this line supersedes that log entry rather than editing it.
+
+- 2026-08-14: T9 done. `validate_roster(roster, fixture_world = FALSE)` and `audit_norms(..., fixture_world = FALSE)`; the `instrument_names()` trigger is gone, so the exemption is a caller argument and no branch reads `roster$instrument` to decide whether to check. 12 fixture call sites across the coverage, markers and sample-key files declare `fixture_world = TRUE`. F2 fixed by attributing a failed `shipped_roster()` build to `data/` while carrying the builder's own words inside the message; F3 fixed by refusing a NULL `objects` entry with its own message, with the `Norms = NULL` skip pinned again beside it. Walk now collects 33 abort sites, 14 on the roster path (2 added, none removed); registry set-equality, the cross-discrimination matrix and the denylist sweep (80) all pass.
+- 2026-08-14: T9 teeth. Five mutations, each red, restore verified by blob hash: exemption always granted (13 failures — the failure mode the amendment repairs), exemption never granted (12 errors), the exemption test made unreachable so the rule is inferred again (12 errors), the F2 attribution wrapper removed (5 failures, 1 error), the NULL-entry guard removed (7 failures, 1 error).
+- 2026-08-14: T8 re-run. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7266; the 6 warnings are the same lavaan convergence notices and occasions messages in `test-ssm_sem.R`, a file this branch does not touch. `devtools::check(args = "--no-manual")` Status: OK, 0/0/0. Status -> review.
+- 2026-08-14: a mid-session measurement re-ran the script end to end, which rewrote `data-raw/norms-audit-ledger.csv`'s `generated`/`script_commit`/`data_commit` stamps and swept them into the amendment commit. Every audited row was byte-identical; the file is restored to master's version, because the new stamps named a branch commit a squash-merge erases.
+- 2026-08-14: date correction. Every M86 work-log line above reading 2026-08-15, this session's amendment lines included, was authored on 2026-08-14 — the machine clock and every commit date on this branch say so. The lines are history and stand as written; this line supersedes their dates. Measurements they report are unaffected.
 
 ## Decisions
 
