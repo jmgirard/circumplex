@@ -131,7 +131,7 @@ refused: the retirement closes both on the merits.
       (batch 7, compare 10); the markers 10 go to T3. Keep the kind-aware
       match and the key-regex/stem helpers the retired matcher used, and
       record the `:321`/`:352` pair as the one declared-binding exception.
-- [ ] T3 — delete `test-norms-audit-denylist.R` and the registry, ordinal,
+- [x] T3 — delete `test-norms-audit-denylist.R` and the registry, ordinal,
       matcher-floor and acceptance-matrix blocks of
       `test-norms-audit-markers.R`, including the blocks the criteria audit
       named vacuous (`:742`, `:802`, `:1036`, `:1041`, `:1245`).
@@ -159,6 +159,7 @@ refused: the retirement closes both on the merits.
 - 2026-08-15: T2 — 17 sites converted to `expect_audit_abort()` (compare 10, batch 7, the last a multi-line `paste0` key done by hand); both files green at 28 and 49 assertions.
 - 2026-08-15: T2 discrimination probe (scratchpad, results here): correct key 0 failures; a WRONG but real manifest key fails naming both sides ("AUDIT_BATCH$divisor is missing for: {} -- got: AUDIT_BATCH$divisor must be numeric, not character"); a key absent from the manifest refuses by name; an expression raising nothing fails; the ambiguous key without `binding` refuses naming its 2 sites.
 - 2026-08-15: T2 method note — a first pass with a DOTALL regex spanned ACROSS call sites, renaming one call while stranding its `norms_audit_matcher` argument and leaving the next site with a bare string; caught by re-reading the file, reverted with a two-path `git checkout --` (no uncommitted work in either), and redone line-anchored requiring the matcher on the immediately following line. Verify a batched edit landed before trusting it.
+- 2026-08-15: T3 — `test-norms-audit-denylist.R` removed (5 blocks); `test-norms-audit-markers.R` cut from 1292 to 348 lines and 30 blocks to 10, deleting the `SCRIPT_ABORTS` registry and the 20 M81–M83 apparatus blocks at :626–:1207 while keeping the 10 M79 source-note marker-parsing blocks. Cut verified first: `note_dir`, `table_head`, `site()` and `sites()` are defined and used only inside the deleted range, so no survivor lost a helper. Suite after: 55 blocks, 281 assertions, 0 failures, 0 errors, 0 skips (was 90 blocks / 496 assertions at 1fb6bce1, which counted the denylist and markers apparatus).
 - 2026-08-15: criteria audit ([O], fresh context) returned findings on AC1–AC5 and none on AC6–AC7; `_problems/` grep scoping, AC3 already-true-at-HEAD, AC4's comment-line and missing `stopifnot()` domain, and AC5's unrelated counts were fixed at the gate; the hand-list-vs-procedure finding became the first gate question.
 
 ## Decisions
