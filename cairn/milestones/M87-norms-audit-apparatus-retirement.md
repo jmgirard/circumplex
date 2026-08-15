@@ -1,6 +1,6 @@
 # M87: Retire the norms-audit abort apparatus for a manifest check
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -140,7 +140,7 @@ refused: the retirement closes both on the merits.
       callers; run AC1's callerless-name sweep and fix what it names.
 - [x] T5 — re-point `tools/m82-gate-floor.R`'s three orphaned mutants at
       surviving tests, re-run all five, re-record their FAIL counts.
-- [ ] T6 — full suite, provenance file, `check()`, `document()`; confirm
+- [x] T6 — full suite, provenance file, `check()`, `document()`; confirm
       `git status` clean and `data-raw/` untouched before recording any gate
       as green.
 - [x] T7 — `DECISIONS.md` entry, ROADMAP row dispositions, LESSONS retirement
@@ -167,6 +167,7 @@ refused: the retirement closes both on the merits.
 - 2026-08-15: T5 — mutants 4 and 5 were ALREADY broken before this milestone: their anchor `nms <- get("instrument_names", envir = ns)()` carried four leading spaces where the script has two, so the tool errored out rather than running them. Pre-existing drift, not introduced here; fixed with the rest.
 - 2026-08-15: T7 — D-042 appended recording the retirement, the three surrendered properties and the reopening condition; the two candidate rows were already struck through as closed by M87 at the plan gate. LESSONS: nothing retires here — the M82 mutation-harness lessons still hold and their instrument (tools/m82-gate-floor.R) survives; the DOTALL-regex-spanning-call-sites gotcha from T2 is a capture candidate for post-merge hygiene, not a retirement.
 - 2026-08-15: T6 — full suite 925 blocks / 7051 assertions / 0 failures / 0 errors / 3 skips; norms-audit filter 55 blocks / 281 assertions; test-norms-provenance.R 13 blocks / 200 assertions, all 0/0. `document()` left man/ and NAMESPACE byte-identical and rewrote only DESCRIPTION's Config/roxygen2/version 8.0.0 -> 8.1.0, reverted rather than committed (M85: a machine-wide toolchain stamp, the maintainer's call).
+- 2026-08-15: T6 — `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes, 32m25s, run with R_MAKEVARS_USER=FLIBS= for the known local gfortran `emutls_w` link failure (M82); AC6 verified, `git diff $(git merge-base master HEAD) -- data-raw/` empty, so the script and all three CSVs are byte-unchanged. Branch diffstat: 496 insertions, 1566 deletions across 11 files.
 - 2026-08-15: criteria audit ([O], fresh context) returned findings on AC1–AC5 and none on AC6–AC7; `_problems/` grep scoping, AC3 already-true-at-HEAD, AC4's comment-line and missing `stopifnot()` domain, and AC5's unrelated counts were fixed at the gate; the hand-list-vs-procedure finding became the first gate question.
 
 ## Decisions
