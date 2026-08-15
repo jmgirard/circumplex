@@ -61,7 +61,11 @@ test_that("every manifest key carries enough literal text to discriminate (M87)"
   # uniqueness does not subsume it: an all-placeholder key renders the regex
   # ".", which accepts ANY message while remaining perfectly unique. The
   # helper's own comments record two incidents of that failing open.
-  literals <- gsub("{}", "", NORMS_AUDIT_MANIFEST$key, fixed = TRUE)
+  # The shipped helper, not a re-implementation of it: a test that retypes the
+  # expression under test agrees with it by construction and diverges only
+  # where it matters (M78).
+  literals <- vapply(NORMS_AUDIT_MANIFEST$key, norms_audit_key_literals,
+                     character(1), USE.NAMES = FALSE)
   is_stop <- NORMS_AUDIT_MANIFEST$kind == "stop"
 
   expect_true(all(nchar(literals[is_stop]) >= NORMS_AUDIT_STOP_KEY_FLOOR))

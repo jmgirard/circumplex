@@ -135,7 +135,7 @@ refused: the retirement closes both on the merits.
       matcher-floor and acceptance-matrix blocks of
       `test-norms-audit-markers.R`, including the blocks the criteria audit
       named vacuous (`:742`, `:802`, `:1036`, `:1041`, `:1245`).
-- [ ] T4 — strip `helper-norms-audit-script.R` to definitions that still have
+- [x] T4 — strip `helper-norms-audit-script.R` to definitions that still have
       callers; run AC1's callerless-name sweep and fix what it names.
 - [ ] T5 — re-point `tools/m82-gate-floor.R`'s three orphaned mutants at
       surviving tests, re-run all five, re-record their FAIL counts.
@@ -160,6 +160,8 @@ refused: the retirement closes both on the merits.
 - 2026-08-15: T2 discrimination probe (scratchpad, results here): correct key 0 failures; a WRONG but real manifest key fails naming both sides ("AUDIT_BATCH$divisor is missing for: {} -- got: AUDIT_BATCH$divisor must be numeric, not character"); a key absent from the manifest refuses by name; an expression raising nothing fails; the ambiguous key without `binding` refuses naming its 2 sites.
 - 2026-08-15: T2 method note — a first pass with a DOTALL regex spanned ACROSS call sites, renaming one call while stranding its `norms_audit_matcher` argument and leaving the next site with a bare string; caught by re-reading the file, reverted with a two-path `git checkout --` (no uncommitted work in either), and redone line-anchored requiring the matcher on the immediately following line. Verify a batched edit landed before trusting it.
 - 2026-08-15: T3 — `test-norms-audit-denylist.R` removed (5 blocks); `test-norms-audit-markers.R` cut from 1292 to 348 lines and 30 blocks to 10, deleting the `SCRIPT_ABORTS` registry and the 20 M81–M83 apparatus blocks at :626–:1207 while keeping the 10 M79 source-note marker-parsing blocks. Cut verified first: `note_dir`, `table_head`, `site()` and `sites()` are defined and used only inside the deleted range, so no survivor lost a helper. Suite after: 55 blocks, 281 assertions, 0 failures, 0 errors, 0 skips (was 90 blocks / 496 assertions at 1fb6bce1, which counted the denylist and markers apparatus).
+- 2026-08-15: T4 — helper cut 756 -> 358 lines, 46 top-level definitions to 27, by transitive reachability from the names with an external caller rather than by a hand-list; the 19 dropped definitions are the registry, matcher, acceptance matrix, stack-capture, site-id and denylist machinery, each removed with its own comment block. AC1 sweep after: 27 definitions, 0 callerless (a reference counts from the parse tree, so a comment naming a function is not a caller).
+- 2026-08-15: T4 — the helper header's consumer list named three surfaces this milestone deleted and "17 expect_abort_at_site() calls" that no longer exist; replaced with the derivation (`git grep -l norms_audit_ -- tests`) rather than a fresh list, which is what the comment itself warns about. The manifest test also now calls `norms_audit_key_literals()` instead of retyping its `gsub()` (M78).
 - 2026-08-15: criteria audit ([O], fresh context) returned findings on AC1–AC5 and none on AC6–AC7; `_problems/` grep scoping, AC3 already-true-at-HEAD, AC4's comment-line and missing `stopifnot()` domain, and AC5's unrelated counts were fixed at the gate; the hand-list-vs-procedure finding became the first gate question.
 
 ## Decisions
