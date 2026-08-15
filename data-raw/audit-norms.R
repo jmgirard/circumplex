@@ -590,7 +590,26 @@ roster_from_objects <- function(objects) {
   }
   out <- list()
   for (nm in nms) {
-    norms <- objects[[nm]]$Norms[[1]]
+    # `objects[[nm]]$Norms[[1]]` used to be reached before anything about the
+    # entry was known, so R's own message was the whole report: a non-list
+    # entry raised "$ operator is invalid for atomic vectors" and an empty
+    # `Norms` list raised "subscript out of bounds", naming neither the
+    # instrument nor the fault (both measured 2026-08-15, M86).
+    obj <- objects[[nm]]
+    if (!is.list(obj)) {
+      stop("instrument object for ", nm, " is not a list but a ",
+           class(obj)[[1L]], call. = FALSE)
+    }
+    # `Norms = NULL` is an instrument with nothing to audit, not a malformed
+    # one, and it is skipped -- tested BEFORE the emptiness guard below, since
+    # NULL and list() are both length 0 and only the second is a defect (M79).
+    if (is.null(obj$Norms)) next
+    if (!is.list(obj$Norms) || !length(obj$Norms)) {
+      stop("`Norms` for ", nm, " must be a non-empty list to hold a norms ",
+           "table; it is a ", class(obj$Norms)[[1L]], " of length ",
+           length(obj$Norms), call. = FALSE)
+    }
+    norms <- obj$Norms[[1]]
     # NULL[[1]] is NULL rather than an error in R, which is what lets the
     # no-norms case be tested before the table's shape is (M79).
     if (is.null(norms)) next

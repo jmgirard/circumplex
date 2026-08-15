@@ -465,6 +465,19 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
            data.frame(Sample = 1, Scale = "PA", M = 1,
                       stringsAsFactors = FALSE)))))
        }),
+  # The `$Norms[[1]]` access guards (M86). Each fixture is well-formed but for
+  # the shape it names: the non-list entry never reaches the `Norms` check, and
+  # the empty-`Norms` entry is a list, so it cannot reach the one above it.
+  site("stop", "roster_from_objects",
+       "instrument object for {} is not a list but a {}", function(env) {
+         env$roster_from_objects(list(fx = 1:3))
+       }),
+  site("stop", "roster_from_objects",
+       paste0("`Norms` for {} must be a non-empty list to hold a norms table; ",
+              "it is a {} of length {}"),
+       function(env) {
+         env$roster_from_objects(list(fx = list(Norms = list())))
+       }),
   site("stop", "roster_from_objects",
        paste0("`objects` carries the name {} more than once, and only the ",
               "first entry of a repeated name is ever read"),

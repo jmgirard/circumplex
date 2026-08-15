@@ -101,7 +101,7 @@ serving IP5.
       superseded assertion and add the per-column tests.
 - [x] T2: refuse a duplicate-named `objects` entry in `roster_from_objects()`
       (`data-raw/audit-norms.R:546-557`); test.
-- [ ] T3: guard the `$Norms[[1]]` access — `is.list(entry)`, then the `NULL`
+- [x] T3: guard the `$Norms[[1]]` access — `is.list(entry)`, then the `NULL`
       skip, then non-empty `Norms` (`data-raw/audit-norms.R:559-563`); test.
 - [ ] T4: move `validate_batch(batch)` ahead of the default-roster resolution
       (`data-raw/audit-norms.R:725-728`); add the stubbed-`shipped_roster`
@@ -126,6 +126,8 @@ serving IP5.
 - 2026-08-15: T1 done. The two column guards are written out rather than looped: a loop is one `stop()` call carrying the column as an argument, keying `"`roster` has no `{}` column"`, whose matcher accepts both messages — the matrix would then certify as distinguishable two refusals it cannot tell apart. Deleting the `sample` guard reddens 1 assertion in test-norms-audit-roster.R and 8 in test-norms-audit-markers.R; restore verified by blob hash.
 
 - 2026-08-15: T2 done. `anyDuplicated(nms)` refuses a repeated name, reporting each repeated name once however many times it recurs; measured before the guard, `list(fx = <Sample 1>, fx = <Sample 2>)` returned two rows both reading `fx 1`. Guard sits after the naming check, so an unnamed list still reports as unnamed.
+
+- 2026-08-15: T3 done. Guard order is `is.list(entry)`, then the `NULL` skip, then the non-empty-`Norms` refusal — NULL and `list()` are both length 0 and only the second is a defect. One departure from the plan's two shapes: an ATOMIC `Norms` now reaches the new guard rather than the `is.data.frame()` refusal it fell to through M85, where `(1:3)[[1]]` being 1 made it correct by luck and only for atomics of length >= 1; the message states the actual class and length rather than calling it empty. All 11 norms-audit test files green.
 
 ## Decisions
 

@@ -269,6 +269,33 @@ test_that("the builder refuses a norms table it cannot roster (M84)", {
   )
 })
 
+test_that("a `Norms` field the builder cannot index is refused (M86)", {
+  env <- roster_defs()
+  # `objects[[nm]]$Norms[[1]]` was reached before anything about the entry was
+  # known, so R's own message was the whole report and it named neither the
+  # instrument nor the fault. Measured 2026-08-15 before these guards: a
+  # non-list entry raised "$ operator is invalid for atomic vectors" and an
+  # empty `Norms` list raised "subscript out of bounds".
+  expect_error(env$roster_from_objects(list(fx = 1:3)),
+               "instrument object for fx is not a list but a integer",
+               fixed = TRUE)
+  expect_error(env$roster_from_objects(list(fx = list(Norms = list()))),
+               "`Norms` for fx must be a non-empty list to hold a norms table; it is a list of length 0",
+               fixed = TRUE)
+  # An atomic `Norms` reaches the same guard rather than R's message. Through
+  # M85 it fell to the `is.data.frame()` refusal below instead, because
+  # `(1:3)[[1]]` is 1 -- correct by luck, and only for atomics of length >= 1.
+  expect_error(env$roster_from_objects(list(fx = list(Norms = 1:3))),
+               "`Norms` for fx must be a non-empty list to hold a norms table; it is a integer of length 3",
+               fixed = TRUE)
+  # The skip these guards must NOT swallow: `Norms = NULL` is an instrument
+  # with nothing to audit, not a malformed one, and it stays a skip rather than
+  # a refusal (pinned above at the M79 case, restated here against the guards
+  # that now stand between it and the loop body).
+  none <- list(Norms = NULL, Scales = data.frame(Abbrev = "PA", Angle = 90))
+  expect_identical(nrow(env$roster_from_objects(list(fz = none))), 0L)
+})
+
 test_that("a missing Sample is refused, not dropped by sort() (M84)", {
   env <- roster_defs()
   # One NA beside a real sample: the silent case. sort() dropped the NA, so the
