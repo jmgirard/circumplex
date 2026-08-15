@@ -1354,3 +1354,49 @@ or a field-level vocabulary shift deprecating "norms" for non-representative
 reference tables. Explicitly insufficient: a reverse-dependency scan showing
 few external callers (that lowers the cost, and the verdict rests on the
 benefit), or modernization preference.
+
+---
+
+### D-042 (2026-08-15): the norms-audit abort apparatus is retired for a manifest check (M87)
+
+**Context:** M81–M83 built, around the developer script `data-raw/audit-norms.R`,
+an abort-site registry with per-site message matchers, build-time
+discriminating-power floors, a cross-discrimination matrix and a denied-spelling
+sweep — roughly 1500 lines of test machinery over a 1262-line script that is
+`.Rbuildignore`d and ships to nobody; 77 of the suite's 90 blocks skipped under
+`R CMD check`. Eight consecutive milestones (M79–M86) extended that script or
+its machinery, and the two findings still open against it were both defects
+*in the machinery*, latent, reachable only by adding a site shaped to trigger
+them.
+
+**Decision:** Delete the registry, the matchers and their build-time floors, the
+acceptance matrix, the stack-capture machinery and the denylist. In their place
+`tests/testthat/helper-norms-audit-manifest.R` carries a generated manifest of
+the script's `stop()` calls and `stopifnot()` conditions, keyed
+(kind, binding, key, ordinal); one test asserts set equality between it and a
+fresh parse walk of the script; and `expect_audit_abort(expr, key)` resolves a
+key to exactly one manifest site and checks the raised message against it under
+that site's kind. The property kept is the one per-test regexps structurally
+cannot provide: a regexp is quantified over the tests, so a guard added to the
+script with no test at all is invisible to it, while the manifest is quantified
+over the script. Net −1488 lines.
+
+**Consequences:** Three things are given up, named because nothing that replaces
+them covers them. (1) The denylist's whole job: abort spellings other than
+`stop()`/`stopifnot()` — `rlang::abort`, `cli_abort`, `do.call("stop", …)`, an
+aliased or field-held handler — are no longer swept for at all, and the bound
+M83 recorded, that a denied name passed as a value through a field access is not
+seen, survives only as this sentence. (2) The acceptance matrix's build-time
+sweep of every matcher against every site's message; `expect_audit_abort()`
+folds the cross-site property in by requiring a raised message to be rendered by
+exactly one manifest key, but only for sites some test exercises. (3) The guard
+is opt-in — a site assertion written as a plain `expect_error()` receives none of
+it, and no criterion detects the downgrade. That last is parity with the state
+before M87, where 24 `expect_error()` calls already asserted script aborts with
+no site discrimination. **The class of evidence that reopens this:** an abort
+site the manifest cannot see (a non-`stop()` spelling, or a call assembled at
+runtime) appearing in the audit script, or a second identically-messaged pair
+arising, which would make an existing key stop resolving to a single site. Any
+of those argues for building the sweep the gap needs, not for restoring the
+registry. Explicitly insufficient: a wish for symmetry with the pre-M87
+machinery, or a review preferring more assertions to fewer.

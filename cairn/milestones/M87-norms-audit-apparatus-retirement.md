@@ -23,9 +23,10 @@ relies on any deliverable here; 77 of the suite's 90 blocks already skip under
 
 **In:** a manifest test that parses the audit script, collects its `stop()` and
 `stopifnot()` sites, and asserts set equality against a checked-in manifest;
-replacement of the 27 `expect_abort_at_site()` call sites with message-asserting
-`expect_error()` calls under a literal-length floor and a cross-site
-non-ambiguity check; deletion of `tests/testthat/test-norms-audit-denylist.R`,
+conversion of the 17 script-abort `expect_abort_at_site()` calls to a new
+`expect_audit_abort()` helper that resolves a manifest key to a single site and
+checks the raised message against it, the other 10 being deleted with the
+machinery they test; deletion of `tests/testthat/test-norms-audit-denylist.R`,
 of the registry/matcher/matrix blocks in `test-norms-audit-markers.R`
 (`SCRIPT_ABORTS` at `:354` included), and of every helper definition left
 without a caller; re-pointing `tools/m82-gate-floor.R` at the surviving tests
@@ -142,7 +143,7 @@ refused: the retirement closes both on the merits.
 - [ ] T6 — full suite, provenance file, `check()`, `document()`; confirm
       `git status` clean and `data-raw/` untouched before recording any gate
       as green.
-- [ ] T7 — `DECISIONS.md` entry, ROADMAP row dispositions, LESSONS retirement
+- [x] T7 — `DECISIONS.md` entry, ROADMAP row dispositions, LESSONS retirement
       check (the M82 mutation-harness lessons lose their subject here).
 
 ## Work log
@@ -164,6 +165,8 @@ refused: the retirement closes both on the merits.
 - 2026-08-15: T4 — the helper header's consumer list named three surfaces this milestone deleted and "17 expect_abort_at_site() calls" that no longer exist; replaced with the derivation (`git grep -l norms_audit_ -- tests`) rather than a fresh list, which is what the comment itself warns about. The manifest test also now calls `norms_audit_key_literals()` instead of retyping its `gsub()` (M78).
 - 2026-08-15: T5 — the three mutants naming deleted tests re-pointed at "the manifest is set-equal to a fresh walk of the audit script (M87)"; measured at 326cfdb0, baseline failed=0, AC3-1 failed=2, AC3-2 failed=3, T4 failed=2, AC4 failed=2, AC4-control failed=0, GATE FLOOR OK, restored blob c1c11a6e matching baseline. The `recorded` values stay floors, as the tool's own header says.
 - 2026-08-15: T5 — mutants 4 and 5 were ALREADY broken before this milestone: their anchor `nms <- get("instrument_names", envir = ns)()` carried four leading spaces where the script has two, so the tool errored out rather than running them. Pre-existing drift, not introduced here; fixed with the rest.
+- 2026-08-15: T7 — D-042 appended recording the retirement, the three surrendered properties and the reopening condition; the two candidate rows were already struck through as closed by M87 at the plan gate. LESSONS: nothing retires here — the M82 mutation-harness lessons still hold and their instrument (tools/m82-gate-floor.R) survives; the DOTALL-regex-spanning-call-sites gotcha from T2 is a capture candidate for post-merge hygiene, not a retirement.
+- 2026-08-15: T6 — full suite 925 blocks / 7051 assertions / 0 failures / 0 errors / 3 skips; norms-audit filter 55 blocks / 281 assertions; test-norms-provenance.R 13 blocks / 200 assertions, all 0/0. `document()` left man/ and NAMESPACE byte-identical and rewrote only DESCRIPTION's Config/roxygen2/version 8.0.0 -> 8.1.0, reverted rather than committed (M85: a machine-wide toolchain stamp, the maintainer's call).
 - 2026-08-15: criteria audit ([O], fresh context) returned findings on AC1–AC5 and none on AC6–AC7; `_problems/` grep scoping, AC3 already-true-at-HEAD, AC4's comment-line and missing `stopifnot()` domain, and AC5's unrelated counts were fixed at the gate; the hand-list-vs-procedure finding became the first gate question.
 
 ## Decisions
