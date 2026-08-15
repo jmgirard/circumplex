@@ -42,7 +42,7 @@ dedupe key at `:702-703`, which already includes `sample` correctly (D-M80-1).
 - [x] AC4. No shipped audit verdict changes: the non-exempt gap count and the
       set of instruments named in the report are identical before and after,
       compared against the pre-change CSV.
-- [ ] AC5. `devtools::test()` and `devtools::check(args = "--no-manual")` clean,
+- [x] AC5. `devtools::test()` and `devtools::check(args = "--no-manual")` clean,
       with `document()` warning-free per the profile's consistency gate.
 
 ## Coverage
@@ -117,6 +117,13 @@ it reddens under the mutation). All 14 `note-only-sample` rows carry the
 before and 0 after; instrument set identical. Column-wise, exactly 14 cells moved,
 all of them `sample` on `note-only-sample`. No other column and no other side
 moved, so no shipped audit verdict changes.
+
+**AC5** — PASS, re-run against the F1-fixed tree (the pre-fix results are stale and
+not cited). `devtools::test()` FAIL 0, PASS 7230 — 6 warnings and 3 skips, all in
+`test-ssm_sem.R` and the glmmTMB/lavaan load path, none in a file this diff
+touches. `devtools::check(args = "--no-manual")` Status: OK — 0 errors, 0
+warnings, 0 notes (8m 10.2s, circumplex 2.0.0). `document()` warning-free; see the
+gate below.
 
 ### Consistency gate
 
