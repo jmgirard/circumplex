@@ -241,6 +241,24 @@ test_that("the default roster is resolved before it is validated (M84)", {
   expect_no_error(env$audit_norms(slice, dir = dir, roster = NULL))
 })
 
+test_that("the batch is validated before the default roster is built (M86)", {
+  env <- roster_defs()
+  dir <- roster_notes()
+  batch <- env$AUDIT_BATCH
+  slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
+  slice$divisor <- "x"
+  # The two orders are indistinguishable while `shipped_roster()` succeeds,
+  # which it always does under the suite -- so the probe has to make building
+  # the default roster fail. `sys.source()` makes `env` the enclosure of
+  # `audit_norms`, so rebinding the name here is what the call resolves.
+  # Against the pre-M86 order this reports the stub, not the batch.
+  env$shipped_roster <- function() {
+    stop("STUB: the default roster was built", call. = FALSE)
+  }
+  expect_error(env$audit_norms(slice, dir = dir),
+               "AUDIT_BATCH$divisor must be numeric", fixed = TRUE)
+})
+
 # The BUILDER's boundary (M84).
 #
 # `shipped_roster()` no longer takes an object list, so these shapes are

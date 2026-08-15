@@ -774,10 +774,17 @@ audit_norms <- function(batch = AUDIT_BATCH,
                         dir = file.path("cairn", "references"),
                         objects = NULL,
                         roster = NULL) {
-  if (is.null(roster)) roster <- shipped_roster()
-  # After validate_batch(), not before: a caller who got both arguments wrong
-  # should meet the batch's message, which names the column it is missing.
+  # The batch is validated FIRST, before the default roster is even built: a
+  # caller who got both arguments wrong should meet the batch's message, which
+  # names the column it is missing. Through M85 the default resolved above this
+  # line, so building it was the first thing that could fail and a malformed
+  # shipped norms table would have reported the BUILDER's message for a call
+  # whose batch was the thing at fault -- the opposite of the stated intent
+  # this comment has carried since M84 (M86).
   validate_batch(batch)
+  if (is.null(roster)) roster <- shipped_roster()
+  # validate_roster() still runs after the default resolves, so a caller who
+  # passes nothing is never refused for passing nothing.
   validate_roster(roster)
   refuse_shared_untagged_blocks(batch, dir)
   ledger <- list()

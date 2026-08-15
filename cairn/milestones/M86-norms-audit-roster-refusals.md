@@ -103,7 +103,7 @@ serving IP5.
       (`data-raw/audit-norms.R:546-557`); test.
 - [x] T3: guard the `$Norms[[1]]` access — `is.list(entry)`, then the `NULL`
       skip, then non-empty `Norms` (`data-raw/audit-norms.R:559-563`); test.
-- [ ] T4: move `validate_batch(batch)` ahead of the default-roster resolution
+- [x] T4: move `validate_batch(batch)` ahead of the default-roster resolution
       (`data-raw/audit-norms.R:725-728`); add the stubbed-`shipped_roster`
       ordering test.
 - [ ] T5: author the 24-pair literal, replace the self-comparing assertion at
@@ -128,6 +128,8 @@ serving IP5.
 - 2026-08-15: T2 done. `anyDuplicated(nms)` refuses a repeated name, reporting each repeated name once however many times it recurs; measured before the guard, `list(fx = <Sample 1>, fx = <Sample 2>)` returned two rows both reading `fx 1`. Guard sits after the naming check, so an unnamed list still reports as unnamed.
 
 - 2026-08-15: T3 done. Guard order is `is.list(entry)`, then the `NULL` skip, then the non-empty-`Norms` refusal — NULL and `list()` are both length 0 and only the second is a defect. One departure from the plan's two shapes: an ATOMIC `Norms` now reaches the new guard rather than the `is.data.frame()` refusal it fell to through M85, where `(1:3)[[1]]` being 1 made it correct by luck and only for atomics of length >= 1; the message states the actual class and length rather than calling it empty. All 11 norms-audit test files green.
+
+- 2026-08-15: T4 done. `validate_batch()` now runs before the default roster is built. The probe stubs `shipped_roster` in the sourced script environment, which `sys.source()` makes the enclosure of `audit_norms`; measured both ways — green on the new order, and under the old order the call reports `STUB: the default roster was built` rather than the batch's message, so the assertion separates the two orders the plan's first draft could not.
 
 ## Decisions
 
