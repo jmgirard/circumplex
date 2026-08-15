@@ -1,6 +1,6 @@
 # M86: Name every roster shape the norms-audit builder cannot honestly audit
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -65,7 +65,7 @@ serving IP5.
       the builder's returned frame 26 times — one per pair dropped, one
       spurious pair added, one `sample` returned numeric — each reddening (a).
       The self-comparing assertion at `:334-335` is replaced by both.
-- [x] AC6: `validate_roster()` refuses a roster naming at least one instrument
+- [ ] AC6: `validate_roster()` refuses a roster naming at least one instrument
       in `circumplex:::instrument_names()` unless its pairs are a superset of
       `shipped_roster()`'s, naming the omitted pairs; a roster naming no such
       instrument is not consulted against `data/`. Measured 2026-08-15:
@@ -139,6 +139,8 @@ serving IP5.
 
 - 2026-08-15: T8 done. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7252; the 6 warnings are lavaan convergence notices in `test-ssm_sem.R` and occasions messages, in files this branch does not touch (`git diff --name-only master..HEAD` is 5 files, none under `R/`, `src/` or `man/`). `devtools::check(args = "--no-manual")` Status: OK, 0/0/0. Stated rather than assumed: the PDF-manual step did not run (grep count 0 for `checking PDF version of manual`), which is what `--no-manual` means and is not coverage; no roxygen or `man/` file is in the diff. Status -> review.
 
+- 2026-08-15: review returned AC6 for a gated criterion amendment. The fresh-context diff lens found the guard evadable by any misspelling or NA instrument name (`"CSIE"`, `"csie "`, `NA` each audit the csie slice at 1 gap against 23), scored 85/85 — but AC6 holds as written, its second clause exempting a roster that names no shipped instrument, so this is evidence about the promise and not the work. F2 (88, the builder's message surfacing from a validator whose subject is the caller's argument) and F3 (80, a NULL entry now aborting where master skipped) ride into the same round. Blame-history and prior-review lenses returned zero findings; ten further findings logged below the action bar.
+
 ## Decisions
 
 ## Review
@@ -191,3 +193,57 @@ Every line below was executed at review, not recalled.
 - `cairn_impact.py` not run: this milestone changes no `DESIGN.md` principle.
   `Principles touched: IP5` records the principle it works under, not one it
   alters.
+
+### Independent review (three lenses + scorer)
+
+Blame-history lens: zero findings — every deleted condition, assertion and
+registry entry is a documented 1:1 or strengthened replacement, and it
+confirmed independently that the M79 gap-equivalence fence survives and the
+`Norms = NULL` skip is preserved. Prior-review lens: zero findings; its
+`gh api .../pulls/comments` probe returned `[]`, so the archived `## Review`
+sections were the primary evidence, and it verified each of F2–F7 is closed in
+the direction its original finding named. Diff-bug lens: 14 findings, scored by
+a fresh agent that did not generate them.
+
+Actioned (>= 80), four:
+
+- F2 (88) — the narrow-roster guard makes `validate_roster()` depend on
+  `shipped_roster()` succeeding, so a caller passing a well-formed explicit
+  roster meets the BUILDER's message when a shipped norms table is malformed.
+  Reproduced by stubbing `shipped_roster` to abort. This is the
+  message-precedence inversion T4 removed, reappearing inside T6's guard.
+- F3 (80) — `roster_from_objects(list(fx = NULL))` now aborts where master
+  silently skipped. A third shape AC3 does not name, with no test and no
+  registry fixture, and it makes the M84 comment at `data-raw/audit-norms.R`
+  `:590-595` stale.
+- F4 (85) — AC6's rule is evadable by any misspelling: `%in% known` is exact
+  match, so `instrument = "CSIE"` or `"csie "` audits the csie slice at 1 gap
+  where the shipped roster reports 23.
+- F5 (85) — an all-`NA` roster clears the same guard, `NA %in% known` being
+  FALSE; measured at 1 gap versus 23.
+
+Logged below the bar, ten: F1 (30) duplicate roster pairs double-report gaps
+(25 vs 23), sweep unmodified by this diff; F6 (28) `paste()` join key unfenced
+against separator collision, no collision constructible against shipped data;
+F7 (20) shipped roster derived twice per default run, logged at T6 as accepted;
+F8 (12) `validate_batch()` keeps a combined five-column condition, Scope-excluded;
+F9 (45) the literal's "no install can shadow it" comment overstates, since
+`instrument_names()` reads the installed data index while the objects resolve
+from the `load_all()` namespace; F10 (35) `shipped_roster_literal()` recycles
+silently on an odd-length literal; F11 (22) the equality pins row order, no
+consumer depends on it, passes under `LC_ALL=C`; F12 (12) `roster_from_objects(NULL)`
+returns a 0-row roster, pre-existing M84; F13 (12) `obj$Norms` partial-matches
+and is re-evaluated, pre-existing; F14 (15) article agreement.
+
+### Disposition: amendment return on AC6
+
+F4 and F5 do not falsify AC6 — they falsify the Goal through it. AC6's second
+clause blesses the evasion in so many words ("a roster naming no such
+instrument is not consulted against `data/`"), and `"CSIE"` names no instrument
+in `instrument_names()`, so the criterion holds exactly as written while 23
+shipped samples are reported as covered. That is evidence about the promise
+rather than the work, so it routes to the gated criterion-amendment protocol
+rather than being fixed under the criterion as it stands. F2 and F3 are carried
+into that amendment round for ordinary triage; neither requires a criterion
+change. AC1–AC5 and AC7 stay verified on the evidence above and are not
+re-opened.
