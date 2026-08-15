@@ -137,7 +137,7 @@ refused: the retirement closes both on the merits.
       named vacuous (`:742`, `:802`, `:1036`, `:1041`, `:1245`).
 - [x] T4 — strip `helper-norms-audit-script.R` to definitions that still have
       callers; run AC1's callerless-name sweep and fix what it names.
-- [ ] T5 — re-point `tools/m82-gate-floor.R`'s three orphaned mutants at
+- [x] T5 — re-point `tools/m82-gate-floor.R`'s three orphaned mutants at
       surviving tests, re-run all five, re-record their FAIL counts.
 - [ ] T6 — full suite, provenance file, `check()`, `document()`; confirm
       `git status` clean and `data-raw/` untouched before recording any gate
@@ -162,6 +162,8 @@ refused: the retirement closes both on the merits.
 - 2026-08-15: T3 — `test-norms-audit-denylist.R` removed (5 blocks); `test-norms-audit-markers.R` cut from 1292 to 348 lines and 30 blocks to 10, deleting the `SCRIPT_ABORTS` registry and the 20 M81–M83 apparatus blocks at :626–:1207 while keeping the 10 M79 source-note marker-parsing blocks. Cut verified first: `note_dir`, `table_head`, `site()` and `sites()` are defined and used only inside the deleted range, so no survivor lost a helper. Suite after: 55 blocks, 281 assertions, 0 failures, 0 errors, 0 skips (was 90 blocks / 496 assertions at 1fb6bce1, which counted the denylist and markers apparatus).
 - 2026-08-15: T4 — helper cut 756 -> 358 lines, 46 top-level definitions to 27, by transitive reachability from the names with an external caller rather than by a hand-list; the 19 dropped definitions are the registry, matcher, acceptance matrix, stack-capture, site-id and denylist machinery, each removed with its own comment block. AC1 sweep after: 27 definitions, 0 callerless (a reference counts from the parse tree, so a comment naming a function is not a caller).
 - 2026-08-15: T4 — the helper header's consumer list named three surfaces this milestone deleted and "17 expect_abort_at_site() calls" that no longer exist; replaced with the derivation (`git grep -l norms_audit_ -- tests`) rather than a fresh list, which is what the comment itself warns about. The manifest test also now calls `norms_audit_key_literals()` instead of retyping its `gsub()` (M78).
+- 2026-08-15: T5 — the three mutants naming deleted tests re-pointed at "the manifest is set-equal to a fresh walk of the audit script (M87)"; measured at 326cfdb0, baseline failed=0, AC3-1 failed=2, AC3-2 failed=3, T4 failed=2, AC4 failed=2, AC4-control failed=0, GATE FLOOR OK, restored blob c1c11a6e matching baseline. The `recorded` values stay floors, as the tool's own header says.
+- 2026-08-15: T5 — mutants 4 and 5 were ALREADY broken before this milestone: their anchor `nms <- get("instrument_names", envir = ns)()` carried four leading spaces where the script has two, so the tool errored out rather than running them. Pre-existing drift, not introduced here; fixed with the rest.
 - 2026-08-15: criteria audit ([O], fresh context) returned findings on AC1–AC5 and none on AC6–AC7; `_problems/` grep scoping, AC3 already-true-at-HEAD, AC4's comment-line and missing `stopifnot()` domain, and AC5's unrelated counts were fixed at the gate; the hand-list-vs-procedure finding became the first gate question.
 
 ## Decisions
