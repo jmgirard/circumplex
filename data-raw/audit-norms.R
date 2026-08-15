@@ -699,6 +699,16 @@ empty_coverage <- function() {
 # NA, so that `tag` is either a tag or nothing.
 tag_or_na <- function(tag) if (nzchar(tag)) tag else NA_character_
 
+# The same rule over a vector of note-row cells. parse_source_note() validates
+# the VALUE cell for emptiness and not the sample cell, so a blank sample
+# reaches an emitter as "" -- and an empty string in one of the seven KEY
+# columns reads as a label whose text went missing, not as a row that carries
+# no such fact, which is what the schema above declares NA to mean.
+blank_to_na <- function(x) {
+  x[!nzchar(x)] <- NA_character_
+  x
+}
+
 # `roster` is the world the batch is audited against, and it is deliberately
 # NOT derived from `objects`. The two answer different questions: `objects`
 # overrides one instrument's VALUES, `roster` states which shipped
@@ -800,7 +810,7 @@ audit_norms <- function(batch = AUDIT_BATCH,
       if (any(fresh)) {
         coverage[[length(coverage) + 1L]] <- coverage_rows(
           "note-only-sample", TRUE, instrument = inst, citekey = citekey,
-          tag = tag_or_na(btag), sample = note_only$sample[fresh],
+          tag = tag_or_na(btag), sample = blank_to_na(note_only$sample[fresh]),
           label = note_only$scale[fresh], detail = note_only$value[fresh]
         )
       }

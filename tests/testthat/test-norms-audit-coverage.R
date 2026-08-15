@@ -267,6 +267,27 @@ test_that("two note-only rows differing in one key cell stay two (M80)", {
   expect_identical(nrow(only), 1L)
   expect_identical(only$label, "replication sample")
   expect_identical(only$sample, "—")
+
+  # A BLANK sample cell reaches the report's `sample` key column, because
+  # parse_source_note() validates the VALUE cell for emptiness and not this one.
+  # It is spelled NA for the reason tag_or_na() spells an untagged block NA: an
+  # empty string in a key column reads as a label whose text went missing, not
+  # as a row that carries none, and the schema declares each key cell NA on a
+  # row that has no such fact. Reachable only since the emitter began passing
+  # the cell through at all -- before that every note-only row took the
+  # NA default and no blank could leak (M85 review, F1).
+  dir <- cov_note_dir(list(one = c(
+    cov_sample_rows(1), cov_sample_rows(2), cov_instrument_rows,
+    "| note-only |  | blank sample cell | n = 9 | Table 9 |"
+  )))
+  res <- env$audit_norms(cov_batch(c("one", "one"), c(TRUE, FALSE)), dir = dir,
+                         objects = objects,
+                         roster = env$roster_from_objects(objects))
+  only <- res$coverage[res$coverage$side == "note-only-sample", , drop = FALSE]
+  expect_identical(nrow(only), 1L)
+  expect_identical(only$label, "blank sample cell")
+  expect_identical(only$sample, NA_character_)
+  expect_identical(sum(!res$coverage$exempt), 0L)
 })
 
 test_that("a value missing from either side names its field and sample (M80)", {
