@@ -74,6 +74,8 @@ dedupe key at `:702-703`, which already includes `sample` correctly (D-M80-1).
 - 2026-08-14: the `distinct` expectation is 1 on the `anchor` axis and 2 on the other three, deliberately. The M80 dedupe key runs one cell wider than the report — the anchor is provenance the report does not carry — so anchor-only twins stay indistinguishable to a reader by design, and pinning that at 1 keeps it from reading as the defect M85 removes.
 - 2026-08-14: T1 passed `sample = note_only$sample[fresh]` and updated the schema comment's per-side table, which listed `instrument citekey tag` for this side.
 - 2026-08-14: T3 regenerated the coverage CSV. Column-wise against the pre-change file: 14 cells moved, all of them `sample` on `note-only-sample`, every one NA → the NO_SAMPLE token; no other column and no other side moved. AC4 measured on the same pair — non-exempt gap count 0 before and after, instrument set identical (csie, csig, csip, csiv, iipsc, iis32, iitc, ipipipc, isc).
+- 2026-08-14: T4 — `devtools::test()` clean (FAIL 0, PASS 7226; 6 warnings and 3 skips, all in `test-ssm_sem.R` and glmmTMB/lavaan load, none in a file this diff touches). `document()` emitted zero `resolve link` warnings and left `man/` and `NAMESPACE` byte-unchanged.
+- 2026-08-14: `document()` also rewrote DESCRIPTION's `Config/roxygen2/version` 8.0.0 → 8.1.0, this machine's roxygen2 being newer than the one the repo was documented with. Reverted rather than committed: it is a toolchain stamp unrelated to M85 and repo-wide in effect, so it is the maintainer's to take deliberately, not a stranger to sweep into a milestone branch. It will recur for anyone running `document()` on roxygen2 >= 8.1.0.
 
 ## Decisions
 
