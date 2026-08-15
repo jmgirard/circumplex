@@ -1,11 +1,11 @@
 # M85: Carry the sample through the audit's note-only coverage rows
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** low
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** —
-- **Branch/PR:** —
+- **Branch/PR:** `m85-norms-audit-note-only-sample`
 
 ## Goal
 
@@ -55,12 +55,12 @@ dedupe key at `:702-703`, which already includes `sample` correctly (D-M80-1).
 
 ## Tasks
 
-- [ ] T1. Pass `sample = note_only$sample[fresh]` from the emitter
-      (`data-raw/audit-norms.R:713-719`).
-- [ ] T2. Add the `sample`-axis assertions to the note-only test
-      (`test-norms-audit-coverage.R:180-245`) — write them first and watch them
-      redden against the current emitter.
-- [ ] T3. Regenerate `data-raw/norms-audit-coverage.csv`; diff it against the
+- [x] T1. Pass `sample = note_only$sample[fresh]` from the emitter
+      (`data-raw/audit-norms.R`, the `note-only-sample` `coverage_rows()` call).
+- [x] T2. Add the `sample`-axis assertions to the note-only test
+      (`test-norms-audit-coverage.R`, the four-axis test) — write them first and
+      watch them redden against the current emitter.
+- [x] T3. Regenerate `data-raw/norms-audit-coverage.csv`; diff it against the
       committed version and confirm only the 14 note-only `sample` cells move.
 - [ ] T4. Full check.
 
@@ -68,7 +68,22 @@ dedupe key at `:702-703`, which already includes `sample` correctly (D-M80-1).
 
 - 2026-08-14: created by /milestone-plan.
 - 2026-08-14: plan gate chose a separate milestone over folding this into M84, because its lineage is M80's report schema rather than M79's roster and it changes a committed data artifact, which deserves its own review surface; falsified by the regeneration turning out to be inseparable from a roster change.
+- 2026-08-14: branch `m85-norms-audit-note-only-sample` cut from a synced master; no question gate, the plan leaving nothing open (AC3 settles the token-vs-NA call).
+- 2026-08-14: T1–T3 landed as one checkpoint rather than three. The emitter, its test and the regenerated CSV are one atomic change — the "committed coverage report is the one this code emits" test fails unless all three are present — so separate commits would each leave the suite red at a resume point.
+- 2026-08-14: T2 first. The four axes gained a `sample`-cell assertion and a `distinct` expectation (rows surviving `unique()`); reddened against the unfixed emitter with the sample axis at 1 unique against 2, AC1's measured baseline, and `sample` NA on all four axes.
+- 2026-08-14: the `distinct` expectation is 1 on the `anchor` axis and 2 on the other three, deliberately. The M80 dedupe key runs one cell wider than the report — the anchor is provenance the report does not carry — so anchor-only twins stay indistinguishable to a reader by design, and pinning that at 1 keeps it from reading as the defect M85 removes.
+- 2026-08-14: T1 passed `sample = note_only$sample[fresh]` and updated the schema comment's per-side table, which listed `instrument citekey tag` for this side.
+- 2026-08-14: T3 regenerated the coverage CSV. Column-wise against the pre-change file: 14 cells moved, all of them `sample` on `note-only-sample`, every one NA → the NO_SAMPLE token; no other column and no other side moved. AC4 measured on the same pair — non-exempt gap count 0 before and after, instrument set identical (csie, csig, csip, csiv, iipsc, iis32, iitc, ipipipc, isc).
 
 ## Decisions
+
+- 2026-08-14 (M85-D1): the regenerated `data-raw/norms-audit-ledger.csv` is not
+  committed. The run block writes both CSVs, so regenerating the coverage report
+  re-runs the ledger too; but its twelve columns are byte-identical apart from
+  three stamp cells (`generated` 2026-08-13 → 2026-08-14, `script_commit` and
+  `data_commit` ab46cbef → 1a31c8aa). M85 changes nothing the ledger records, and
+  committing the re-stamp would date a provenance verification this milestone did
+  not perform. Reverted rather than committed; the next milestone that moves a
+  ledger value re-stamps it honestly.
 
 ## Review

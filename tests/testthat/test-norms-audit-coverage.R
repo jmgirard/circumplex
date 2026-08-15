@@ -194,19 +194,38 @@ test_that("two note-only rows differing in one key cell stay two (M80)", {
   # committed note carries any of the four shapes (measured 2026-08-13 over the
   # committed notes), hence fixtures.
   base <- "| note-only | — | replication sample | n = 50 | Table 9 |"
+  #
+  # Each axis also states the report's own `sample` cell, because the report has
+  # to CARRY the cell the key distinguishes on for the two rows to survive a
+  # reader (M85). Without it the sample axis emits two rows whose ten cells are
+  # all identical, so the second is dropped by any `unique()` over the CSV and
+  # the key's work is undone downstream -- and the three axes below it pin the
+  # cell at the NO_SAMPLE token, so an emitter passing some other row's sample,
+  # or NA, fails here rather than only on the axis that varies it.
+  #
+  # `distinct` is how many rows survive a `unique()` over the emitted report,
+  # and it is 2 on three axes and 1 on `anchor` BY DESIGN: the key deliberately
+  # runs one cell wider than the report, the anchor being the audit's provenance
+  # and not a reported fact (M80). So the anchor axis is the one place the key
+  # keeps two rows a reader cannot tell apart, and pinning it at 1 says that is
+  # intended rather than leaving it looking like the defect M85 fixes.
   axes <- list(
     sample = list(row = "| note-only | 1 | replication sample | n = 50 | Table 9 |",
                   label = rep("replication sample", 2L),
-                  detail = rep("n = 50", 2L)),
+                  detail = rep("n = 50", 2L),
+                  sample = c("—", "1"), distinct = 2L),
     scale  = list(row = "| note-only | — | validation sample | n = 50 | Table 9 |",
                   label = c("replication sample", "validation sample"),
-                  detail = rep("n = 50", 2L)),
+                  detail = rep("n = 50", 2L),
+                  sample = rep("—", 2L), distinct = 2L),
     value  = list(row = "| note-only | — | replication sample | n = 80 | Table 9 |",
                   label = rep("replication sample", 2L),
-                  detail = c("n = 50", "n = 80")),
+                  detail = c("n = 50", "n = 80"),
+                  sample = rep("—", 2L), distinct = 2L),
     anchor = list(row = "| note-only | — | replication sample | n = 50 | Table 10 |",
                   label = rep("replication sample", 2L),
-                  detail = rep("n = 50", 2L))
+                  detail = rep("n = 50", 2L),
+                  sample = rep("—", 2L), distinct = 1L)
   )
   objects <- list(fx = cov_object())
   for (cell in names(axes)) {
@@ -225,6 +244,11 @@ test_that("two note-only rows differing in one key cell stay two (M80)", {
     expect_identical(nrow(only), 2L, info = cell)
     expect_identical(only$label, ax$label, info = cell)
     expect_identical(only$detail, ax$detail, info = cell)
+    expect_identical(only$sample, ax$sample, info = cell)
+    # The consequence, stated over the emitted rows rather than over the key:
+    # a row the key kept apart AND the report can carry must still be there
+    # after a reader deduplicates the report it was handed.
+    expect_identical(nrow(unique(only)), ax$distinct, info = cell)
     expect_identical(sum(!res$coverage$exempt), 0L, info = cell)
   }
 
@@ -242,6 +266,7 @@ test_that("two note-only rows differing in one key cell stay two (M80)", {
   only <- res$coverage[res$coverage$side == "note-only-sample", , drop = FALSE]
   expect_identical(nrow(only), 1L)
   expect_identical(only$label, "replication sample")
+  expect_identical(only$sample, "—")
 })
 
 test_that("a value missing from either side names its field and sample (M80)", {

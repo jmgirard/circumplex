@@ -640,10 +640,14 @@ refuse_shared_untagged_blocks <- function(batch, dir) {
 #
 # Which cells each side fills:
 #
-#   note-only-sample (exempt)     instrument citekey tag; label = the note's own
-#     name for material the source publishes and the package does not ship,
-#     detail = the note's description of it. One row per block and payload, not
-#     per batch pass over the block.
+#   note-only-sample (exempt)     instrument citekey tag sample; label = the
+#     note's own name for material the source publishes and the package does
+#     not ship, detail = the note's description of it. One row per block and
+#     payload, not per batch pass over the block. `sample` is the note row's
+#     own -- the NO_SAMPLE token on every committed row, a sample label where
+#     the note names one -- because the dedupe key at the emitter distinguishes
+#     two such rows by it and a report that did not carry it would emit them
+#     identically (M85).
 #   constructed-credit-reference (exempt)  instrument citekey tag field sample;
 #     label = the credit the note's author constructed rather than quoted.
 #   shipped-value-not-in-note     instrument citekey tag field sample scale
@@ -796,7 +800,7 @@ audit_norms <- function(batch = AUDIT_BATCH,
       if (any(fresh)) {
         coverage[[length(coverage) + 1L]] <- coverage_rows(
           "note-only-sample", TRUE, instrument = inst, citekey = citekey,
-          tag = tag_or_na(btag),
+          tag = tag_or_na(btag), sample = note_only$sample[fresh],
           label = note_only$scale[fresh], detail = note_only$value[fresh]
         )
       }
