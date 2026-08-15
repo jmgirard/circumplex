@@ -118,6 +118,10 @@ before and 0 after; instrument set identical. Column-wise, exactly 14 cells move
 all of them `sample` on `note-only-sample`. No other column and no other side
 moved, so no shipped audit verdict changes.
 
+The AC1–AC4 figures above were measured at `ac02b355`, before the F1 fix below;
+re-confirmed after it at `3180c254`, where the same file reads FAIL 0, PASS 81
+(the four added by F1's regression test) and the committed CSV is byte-unchanged.
+
 **AC5** — PASS, re-run against the F1-fixed tree (the pre-fix results are stale and
 not cited). `devtools::test()` FAIL 0, PASS 7230 — 6 warnings and 3 skips, all in
 `test-ssm_sem.R` and the glmmTMB/lavaan load path, none in a file this diff
