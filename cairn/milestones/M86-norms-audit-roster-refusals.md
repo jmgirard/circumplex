@@ -1,6 +1,6 @@
 # M86: Name every roster shape the norms-audit builder cannot honestly audit
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -113,7 +113,7 @@ serving IP5.
       measured csie shape and confirm the fake-instrument fixtures are untouched.
 - [x] T7: register every added and removed abort site; re-run the registry
       set-equality assertion and the cross-discrimination matrix.
-- [ ] T8: run the profile's verify slot and the full check.
+- [x] T8: run the profile's verify slot and the full check.
 
 ## Work log
 
@@ -136,6 +136,8 @@ serving IP5.
 - 2026-08-15: T6 done. The all-or-nothing rule: a roster naming any instrument in `circumplex:::instrument_names()` must cover every shipped pair, and one naming none is a fixture's own world and is not consulted against `data/`. All 11 norms-audit test files stay green, so no fixture roster in the suite touches a shipped instrument. Cost noted: `validate_roster()` now builds `shipped_roster()` on any real-instrument roster, so the default path derives it twice per run.
 
 - 2026-08-15: T7 done. The walk now collects 31 abort sites, 12 on the roster path; this milestone added 5 (two column refusals, duplicate name, non-list entry, non-indexable `Norms`, narrow roster) and removed 1 (the shared `%in% names(roster)` condition). Registry/walk set-equality and the cross-discrimination matrix both pass, and the denylist sweep stays green at 80. Teeth checked by planting an unregistered `stop()` inside a function no fixture calls — 3 assertions redden; restore verified by blob hash.
+
+- 2026-08-15: T8 done. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7252; the 6 warnings are lavaan convergence notices in `test-ssm_sem.R` and occasions messages, in files this branch does not touch (`git diff --name-only master..HEAD` is 5 files, none under `R/`, `src/` or `man/`). `devtools::check(args = "--no-manual")` Status: OK, 0/0/0. Stated rather than assumed: the PDF-manual step did not run (grep count 0 for `checking PDF version of manual`), which is what `--no-manual` means and is not coverage; no roxygen or `man/` file is in the diff. Status -> review.
 
 ## Decisions
 
