@@ -1379,7 +1379,9 @@ key to exactly one manifest site and checks the raised message against it under
 that site's kind. The property kept is the one per-test regexps structurally
 cannot provide: a regexp is quantified over the tests, so a guard added to the
 script with no test at all is invisible to it, while the manifest is quantified
-over the script. Net −1488 lines.
+over the script. The branch removes far more than it adds; the exact figures
+are whatever `git diff --numstat` reports over the squash-merge, and were 498
+insertions against 1567 deletions measured on the branch tip before merge.
 
 **Consequences:** Three things are given up, named because nothing that replaces
 them covers them. (1) The denylist's whole job: abort spellings other than
@@ -1392,8 +1394,10 @@ folds the cross-site property in by requiring a raised message to be rendered by
 exactly one manifest key, but only for sites some test exercises. (3) The guard
 is opt-in — a site assertion written as a plain `expect_error()` receives none of
 it, and no criterion detects the downgrade. That last is parity with the state
-before M87, where 24 `expect_error()` calls already asserted script aborts with
-no site discrimination. **The class of evidence that reopens this:** an abort
+before M87 rather than a loss: the `expect_error()` calls matched by
+`grep -c 'expect_error(' tests/testthat/test-norms-audit-roster.R
+tests/testthat/test-norms-provenance.R` already asserted script aborts with no
+site discrimination, and did so before this milestone as well as after it. **The class of evidence that reopens this:** an abort
 site the manifest cannot see (a non-`stop()` spelling, or a call assembled at
 runtime) appearing in the audit script, or a second identically-messaged pair
 arising, which would make an existing key stop resolving to a single site. Any

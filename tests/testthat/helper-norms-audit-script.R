@@ -31,8 +31,8 @@
 # instead -- `git grep -l norms_audit_ -- tests` -- and read nothing here as a
 # guarantee about who calls what.
 #
-# What the walk feeds, as of M87: helper-norms-audit-manifest.R, which holds the
-# manifest of the script's abort sites and the assertion that names one.
+# No list follows here on purpose: the sentence above says lists go stale, and
+# writing one anyway is how this comment was wrong before.
 
 norms_audit_script_path <- function() {
   script <- testthat::test_path("..", "..", "data-raw", "audit-norms.R")
@@ -346,9 +346,12 @@ norms_audit_with_c_messages <- function(expr) {
 # The stem floor applies to UNTRUNCATED messages only (M83). Where R truncated,
 # the stem is its own first deparsed line and no floor is meaningful: the line
 # break is R's choice and can fall anywhere, so comparing it against a floor
-# derived from the key rejected correct sites. Each floor's headroom over the
-# shipped sites is asserted in test-norms-audit-markers.R rather than written
-# here, where a later edit to the script would strand it.
+# derived from the key rejected correct sites.
+#
+# Headroom over the shipped sites is asserted for STOP_KEY_FLOOR only, in
+# test-norms-audit-manifest.R; STEM_FLOOR's headroom is asserted nowhere since
+# M87 retired the markers-file apparatus that used to carry it. Do not read
+# either constant as fenced by a test it is not.
 NORMS_AUDIT_STOP_KEY_FLOOR <- 15L
 NORMS_AUDIT_STEM_FLOOR <- 40L
 

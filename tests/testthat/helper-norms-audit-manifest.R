@@ -180,6 +180,16 @@ audit_key_matches <- function(kind, key, msg) {
   if (identical(kind, "stopifnot_named")) {
     return(identical(msg, key))
   }
+  # Fail closed on an unrecognised kind rather than falling through. The
+  # positional-`stopifnot` branch below is the loosest of the three, so a kind
+  # this dispatch does not know would silently get the weakest check -- which
+  # is not hypothetical: a stale dispatch did exactly that during M81 and
+  # accepted a key's own superstring. The retired matcher refused by name here
+  # and this keeps that refusal.
+  if (!identical(kind, "stopifnot")) {
+    stop("unknown abort site kind: ", paste(deparse(kind), collapse = ""),
+         " (expected one of stop, stopifnot, stopifnot_named)", call. = FALSE)
+  }
   got <- norms_audit_stopifnot_stem(msg)
   floor <- min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR)
   nzchar(got$stem) && startsWith(squish(key), got$stem) &&

@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5
-- **Branch/PR:** `m87-norms-audit-apparatus-retirement`
+- **Branch/PR:** `m87-norms-audit-apparatus-retirement` · https://github.com/jmgirard/circumplex/pull/115
 
 ## Goal
 
@@ -44,12 +44,12 @@ refused: the retirement closes both on the merits.
 
 ## Acceptance criteria
 
-- [ ] AC1 — `tests/testthat/test-norms-audit-denylist.R` is absent, and no
+- [x] AC1 — `tests/testthat/test-norms-audit-denylist.R` is absent, and no
       top-level name defined in `tests/testthat/helper-norms-audit-script.R`
       is callerless: for each name enumerated by parsing that file's top-level
       assignments, `git grep -n <name> -- tests tools data-raw` reports at
       least one hit outside its own definition.
-- [ ] AC2 — a surviving test parses `data-raw/audit-norms.R`, collects every
+- [x] AC2 — a surviving test parses `data-raw/audit-norms.R`, collects every
       `stop()` call and every `stopifnot()` condition including the run block,
       and asserts set equality with a checked-in manifest. The manifest is
       held to the build-time floor the retired matcher enforced: every `stop`
@@ -58,7 +58,7 @@ refused: the retirement closes both on the merits.
       defect varying both form and location: a `stop()` site and a
       `stopifnot()` condition, each planted in a different top-level binding,
       each reddens the test alone, and each restores green on removal.
-- [ ] AC3 — the discrimination the retired matcher enforced survives as a
+- [x] AC3 — the discrimination the retired matcher enforced survives as a
       declared site assertion, never as a judgment about regexp text: each of
       the 17 `expect_abort_at_site()` calls that assert a script abort site
       (`test-norms-audit-batch.R` 7, `test-norms-audit-compare.R` 10) is
@@ -82,22 +82,22 @@ refused: the retirement closes both on the merits.
       `expect_error()` calls asserting interpolated content are outside this
       criterion's domain by construction — the distinction is which function
       the test calls, never a property of the regexp.
-- [ ] AC4 — `tools/m82-gate-floor.R` names only tests that exist after the
+- [x] AC4 — `tools/m82-gate-floor.R` names only tests that exist after the
       retirement; running it reports every one of its five mutants as a hit,
       and the fresh FAIL counts are recorded in the work log beside the commit
       measured.
-- [ ] AC5 — `testthat::test_dir("tests/testthat", filter = "norms-audit")` and
+- [x] AC5 — `testthat::test_dir("tests/testthat", filter = "norms-audit")` and
       a separate run over `tests/testthat/test-norms-provenance.R` both report
       0 failures and 0 errors; surviving block and assertion counts are
       recorded against the pre-milestone 90 blocks / 496 assertions (the
       filter run measured 2026-08-15 at `1fb6bce1`, which excludes
       `test-norms-provenance.R`), and every block the Coverage section names
       as substantive still exists by title.
-- [ ] AC6 — `git diff $(git merge-base master HEAD) -- data-raw/` is empty at
+- [x] AC6 — `git diff $(git merge-base master HEAD) -- data-raw/` is empty at
       the review gate: the audit script, `norms-audit-ledger.csv`,
       `norms-audit-coverage.csv` and `norms-audit-dispositions.csv` are all
       byte-unchanged.
-- [ ] AC7 — a `DECISIONS.md` entry records the retirement, names the
+- [x] AC7 — a `DECISIONS.md` entry records the retirement, names the
       discrimination given up — the denylist's coverage of non-`stop()` abort
       spellings, whose bound survives only as prose once its pinning test
       goes; the acceptance matrix's build-time sweep of every matcher against
@@ -107,7 +107,7 @@ refused: the retirement closes both on the merits.
       of evidence that reopens it; the two candidate rows
       describing defects in the retired machinery are struck through as closed
       on the merits, not deferred.
-- [ ] AC8 — `devtools::check(args = "--no-manual")` clean, and
+- [x] AC8 — `devtools::check(args = "--no-manual")` clean, and
       `devtools::document()` produces no diff in `man/` or `NAMESPACE`.
 
 ## Coverage
@@ -168,8 +168,101 @@ refused: the retirement closes both on the merits.
 - 2026-08-15: T7 — D-042 appended recording the retirement, the three surrendered properties and the reopening condition; the two candidate rows were already struck through as closed by M87 at the plan gate. LESSONS: nothing retires here — the M82 mutation-harness lessons still hold and their instrument (tools/m82-gate-floor.R) survives; the DOTALL-regex-spanning-call-sites gotcha from T2 is a capture candidate for post-merge hygiene, not a retirement.
 - 2026-08-15: T6 — full suite 925 blocks / 7051 assertions / 0 failures / 0 errors / 3 skips; norms-audit filter 55 blocks / 281 assertions; test-norms-provenance.R 13 blocks / 200 assertions, all 0/0. `document()` left man/ and NAMESPACE byte-identical and rewrote only DESCRIPTION's Config/roxygen2/version 8.0.0 -> 8.1.0, reverted rather than committed (M85: a machine-wide toolchain stamp, the maintainer's call).
 - 2026-08-15: T6 — `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes, 32m25s, run with R_MAKEVARS_USER=FLIBS= for the known local gfortran `emutls_w` link failure (M82); AC6 verified, `git diff $(git merge-base master HEAD) -- data-raw/` empty, so the script and all three CSVs are byte-unchanged. Branch diffstat: 496 insertions, 1566 deletions across 11 files.
+- 2026-08-15: review — PR #115 opened draft; all 8 criteria verified with fresh evidence and ticked; cairn_validate exit 0; profile consistency-gate clean (document() warning-free and no man/NAMESPACE diff, pkgdown no problems, README in sync, no NEWS owed at 0 runtime files changed).
+- 2026-08-15: review — three fresh-context lenses returned 29 candidate findings; an independent [S] scorer scored 4 at >=80, none >=90, so the return floor did not fire. Fixed on the branch: F22 (88) D-042's "Net -1488 lines" was wrong, real total 498 insertions / 1567 deletions = net -1069, the figure having summed only the shrinking files; F24 (85) D-042's "24 expect_error() calls" restated as its derivation; F4 (82) audit_key_matches() fell through to the loosest branch on an unknown kind, fail-closed refusal restored; F14 (82) a floor-headroom claim naming a file that now asserts neither floor. Also fixed below the bar: F16 (72), the replacement consumer list that reinstated the stale-enumeration defect it warned against.
+- 2026-08-15: review — F13 (78) logged not actioned: norms_audit_stopifnot_stem, the named-condition keying, refuse_unenumerable and norms_audit_assign_ordinals survive on the manifest path but lost every unit test with the deleted apparatus. Raised at the approval gate rather than silently logged; ROADMAP is at 59/60 lines so a new candidate row needs a fold-in, not an added line.
+- 2026-08-15: review checkpoint committed with the final devtools::check() still running on the post-fix tree; the pre-fix run was 0/0/0 and the post-fix suite is green, but AC8's tick rests on the post-fix run and is re-confirmed before merge.
 - 2026-08-15: criteria audit ([O], fresh context) returned findings on AC1–AC5 and none on AC6–AC7; `_problems/` grep scoping, AC3 already-true-at-HEAD, AC4's comment-line and missing `stopifnot()` domain, and AC5's unrelated counts were fixed at the gate; the hand-list-vs-procedure finding became the first gate question.
 
 ## Decisions
 
 ## Review
+
+Evidence gathered 2026-08-15 at branch tip, PR #115. Every figure below is from
+a command run at review, never recalled.
+
+- **AC1** — `tests/testthat/test-norms-audit-denylist.R` absent (`ls` reports no
+  such file). Callerless sweep over the helper's top-level assignments, counting
+  a reference from the parse tree so a comment naming a function is not a
+  caller: **27 definitions, 0 callerless**.
+- **AC2** — manifest set-equality test green; **33 rows, 30 `stop` + 3 positional
+  `stopifnot`**, minimum `stop`-key literal count **23** against the floor of 15,
+  **0** all-placeholder keys. Planted-defect probe re-run fresh: baseline FAIL=0,
+  a `stop()` planted in `empty_ledger` FAIL=2, a `stopifnot()` condition planted
+  in the run block FAIL=2 — two forms, two bindings, each reddening alone; script
+  restored from scratch snapshot with `git hash-object` matching the clean blob.
+- **AC3** — parse of the audit test files finds **17 `expect_audit_abort()` call
+  sites**, **0** with a key absent from the manifest, **0** ambiguous without a
+  declared `binding`, and **0** surviving `expect_abort_at_site` references
+  anywhere in `tests/` or `tools/`.
+- **AC4** — `Rscript tools/m82-gate-floor.R`: baseline failed=0; AC3-1 failed=2,
+  AC3-2 failed=3, T4 failed=2, AC4 failed=2, AC4-control failed=0; every mutant
+  OK, `GATE FLOOR: OK`, restored blob c1c11a6e matching baseline.
+- **AC5** — `test_dir(filter = "norms-audit")` **55 blocks / 281 assertions**,
+  `test-norms-provenance.R` **13 blocks / 200 assertions**, both 0 failures and
+  0 errors, against the pre-milestone 90 blocks / 496 assertions at `1fb6bce1`.
+  Full suite **925 blocks / 7051 assertions / 0 failures / 3 skips**. The
+  substantive blocks the Coverage section fences (coverage report, provenance
+  pins) are present: 22 `test_that` titles across those two files.
+- **AC6** — `git diff $(git merge-base master HEAD) -- data-raw/` is **empty**:
+  the audit script and all three CSVs byte-unchanged.
+- **AC7** — D-042 present in `cairn/DECISIONS.md` naming the three surrendered
+  properties and the reopening evidence; both candidate rows struck through as
+  closed by M87 in `cairn/ROADMAP.md`.
+- **AC8** — `document()` emits **0** lines matching `resolve link` at
+  `cli.width = 500` and leaves `man/` and `NAMESPACE` byte-identical (only
+  DESCRIPTION's roxygen stamp moved, reverted per M85).
+  `devtools::check(args = "--no-manual")` **0 errors / 0 warnings / 0 notes**.
+
+**Consistency gate.** `cairn_validate` exit 0, every check PASS including
+`coverage complete`; two advisories, `sizing` (8 acceptance criteria against a
+7 tripwire) and `work-log format` (47, all but four pre-existing on M7). Profile
+`consistency-gate` slot: `document()` no-diff and warning-free as above,
+`pkgdown::check_pkgdown()` "No problems found", README.Rmd/README.md untouched
+and in sync, no NEWS entry owed (0 runtime files changed — `R/`, `src/` and
+`NAMESPACE` are untouched, which is what an internal-tier milestone should
+show). No principle changed, so `cairn_impact` was not run.
+
+**Independent review.** Three fresh-context lenses (diff-bug [O], blame-history
+[S], prior-PR-comments [S]) reported 29 candidate findings; a separate [S]
+scorer that generated none of them scored each. **Four scored ≥80, none ≥90.**
+No finding demonstrated an acceptance criterion failing and none was ≥90 on
+deliverable behaviour, so the return floor did not fire.
+
+Actioned (≥80), all fixed on the branch:
+
+- **F22 (88)** — D-042 claimed "Net −1488 lines"; the real branch total is 498
+  insertions / 1567 deletions, net −1069. The figure summed only the three
+  shrinking files and omitted the 335 lines the replacement adds. Replaced with
+  its derivation plus a pinned measured figure, per the derived-figure rule.
+- **F24 (85)** — D-042's "24 `expect_error()` calls" could not be reproduced by
+  the reviewer under any scoping. It was in fact roster's 22 plus provenance's
+  2, but the sentence claimed more than that set. Replaced with the grep that
+  derives it.
+- **F4 (82)** — `audit_key_matches()` fell through to the loosest branch on an
+  unrecognised kind, dropping a refusal the retired matcher made by name after
+  a stale dispatch did exactly this in M81. Fail-closed refusal restored.
+- **F14 (82)** — `helper-norms-audit-script.R` claimed both floors' headroom was
+  asserted in the markers file, which now asserts neither. Corrected to say
+  STOP_KEY_FLOOR's headroom is asserted in the manifest test and STEM_FLOOR's
+  nowhere.
+
+Also fixed though below the bar: **F16 (72)**, the helper header's replacement
+consumer list, which reinstated the stale-enumeration defect it had just warned
+against and was already incomplete.
+
+Logged, not actioned (below 80): F13 (78) surviving walk/matcher helpers lost
+all their unit tests to the deletion — the most substantive sub-threshold item,
+raised at the approval gate; F12 (75) the manifest test hand-rolls the parse
+rather than calling the helper's single entry point; F16 (72) fixed anyway;
+F6 (68) the test file header says "these skip" but block 2 does not; F15 (68)
+two stale comment referents; F3 (62) declaring `binding` buys no site
+discrimination for the ambiguous key; F20/F27 (62/60) three gate-floor mutants
+now name one test; F21 (62) stale tool header; F25 (62) D-042's surrendered
+list arguably omits two items; F26 (58) the manifest's "GENERATED" note has no
+committed generator; F1 (55) a nested re-raised message can match two keys,
+latent; F5 (55) dead `stopifnot_named` branch; F7 (55) empty-manifest skip;
+F19 (45) gate-floor `recorded` floors unchanged; F2 (40) `binding` ignored when
+the key is unambiguous; F9 (35), F8 (32), F18 (32), F28 (30), F29 (22),
+F10/F11 (20), F17 (15), and **F23 (5), which the scorer refuted** — it claimed
+the script is 1260 lines; `wc -l` gives 1262, so D-042 was right.
