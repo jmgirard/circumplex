@@ -106,7 +106,7 @@ serving IP5.
 - [x] T4: move `validate_batch(batch)` ahead of the default-roster resolution
       (`data-raw/audit-norms.R:725-728`); add the stubbed-`shipped_roster`
       ordering test.
-- [ ] T5: author the 24-pair literal, replace the self-comparing assertion at
+- [x] T5: author the 24-pair literal, replace the self-comparing assertion at
       `tests/testthat/test-norms-audit-roster.R:334-335` with the equality and
       gap-equivalence pair, and run the 26 mutations.
 - [ ] T6: add the shipped-superset refusal to `validate_roster()`; test the
@@ -130,6 +130,8 @@ serving IP5.
 - 2026-08-15: T3 done. Guard order is `is.list(entry)`, then the `NULL` skip, then the non-empty-`Norms` refusal — NULL and `list()` are both length 0 and only the second is a defect. One departure from the plan's two shapes: an ATOMIC `Norms` now reaches the new guard rather than the `is.data.frame()` refusal it fell to through M85, where `(1:3)[[1]]` being 1 made it correct by luck and only for atomics of length >= 1; the message states the actual class and length rather than calling it empty. All 11 norms-audit test files green.
 
 - 2026-08-15: T4 done. `validate_batch()` now runs before the default roster is built. The probe stubs `shipped_roster` in the sourced script environment, which `sys.source()` makes the enclosure of `audit_norms`; measured both ways — green on the new order, and under the old order the call reports `STUB: the default roster was built` rather than the batch's message, so the assertion separates the two orders the plan's first draft could not.
+
+- 2026-08-15: T5 done. The 24-pair literal's origin is a direct `load()` read of `data/*.rda`, not the builder and not the package namespace — the replaced assertion compared the defaulted run against `roster = shipped_roster()` while the default IS `shipped_roster()`, one nullary call on both sides. All 26 mutations of the builder's returned frame redden the equality (24 drops, one spurious pair, one numeric `sample`); the comparison is uncoerced, which is what makes the type mutation reachable.
 
 ## Decisions
 

@@ -396,13 +396,56 @@ test_that("shipped_roster() cannot be re-fused to an object list (M84)", {
   expect_true("roster_from_objects" %in% all.names(body(env$shipped_roster)))
 })
 
-test_that("passing the shipped roster explicitly changes no gap (M84)", {
+# The shipped roster, written out (M86).
+#
+# ORIGIN: read from `data/*.rda` with `load()` directly, 2026-08-15 -- not from
+# `roster_from_objects()`, and not through the package namespace. That
+# independence is the whole point of the literal. The assertion this replaced
+# compared `audit_norms(slice, dir)` against
+# `audit_norms(slice, dir, roster = shipped_roster())`, and the default IS
+# `shipped_roster()`, so both sides came from one nullary call and no defect of
+# the builder could make it fail (M84 review F6; the M72/M76/M78 shared-origin
+# family). Reading the `.rda` files rather than asking the package is the M78
+# lesson: a data-raw script verifies the ARTIFACT, and no install can shadow it.
+#
+# It is a fence on `data/` as well as on the builder: adding or removing a
+# shipped sample reddens this until the list is updated by hand, which is the
+# intended cost -- shipped norms changing unnoticed is the hazard the whole
+# audit exists for.
+SHIPPED_ROSTER_PAIRS <- c(
+  "cais", "1",    "cais", "2",    "csie", "1",    "csig", "1",
+  "csip", "1",    "csiv", "1",    "iei", "1",     "iei", "2",
+  "igicr", "1",   "igicr", "2",   "igicr", "3",   "iip32", "1",
+  "iip32", "2",   "iip32", "3",   "iip64", "1",   "iip64", "2",
+  "iip64", "3",   "iipsc", "1",   "iipsc", "2",   "iis32", "1",
+  "iis64", "1",   "iitc", "1",    "ipipipc", "1", "isc", "1"
+)
+
+shipped_roster_literal <- function() {
+  m <- matrix(SHIPPED_ROSTER_PAIRS, ncol = 2L, byrow = TRUE)
+  data.frame(instrument = m[, 1L], sample = m[, 2L],
+             stringsAsFactors = FALSE)
+}
+
+test_that("the builder's roster is the shipped data, pair for pair (M86)", {
+  env <- roster_defs()
+  # Compared UNCOERCED: the builder's own column types are under test, so a
+  # `sample` returned numeric must redden here rather than be coerced away.
+  # `shipped_roster()` is the whole derivation -- the namespace enumeration,
+  # the object list, and `roster_from_objects()`'s sort/unique/as.character --
+  # measured against a list read from the `.rda` files by another route.
+  expect_identical(env$shipped_roster(), shipped_roster_literal())
+})
+
+test_that("passing the shipped roster explicitly changes no gap (M84, M86)", {
   env <- roster_defs()
   dir <- roster_notes()
   # The M79 regression, restated against the surviving spelling. Auditing a
   # one-instrument slice must report the same gaps whether the roster is
   # defaulted or passed: the roster says what must be covered, and stating it
-  # explicitly is not a licence to shrink it.
+  # explicitly is not a licence to shrink it. The explicit side is now the
+  # LITERAL above rather than a second `shipped_roster()` call, so the two
+  # sides no longer share an origin (M86).
   batch <- env$AUDIT_BATCH
   slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
   gaps <- function(res) {
@@ -410,7 +453,8 @@ test_that("passing the shipped roster explicitly changes no gap (M84)", {
     g[g$side == "shipped-sample-not-audited", , drop = FALSE]
   }
   bare <- gaps(env$audit_norms(slice, dir = dir))
-  passed <- gaps(env$audit_norms(slice, dir = dir, roster = env$shipped_roster()))
+  passed <- gaps(env$audit_norms(slice, dir = dir,
+                                 roster = shipped_roster_literal()))
   expect_gt(nrow(bare), 0L)
   expect_identical(nrow(passed), nrow(bare))
   expect_setequal(paste(passed$instrument, passed$sample),
