@@ -1405,3 +1405,28 @@ arising, which would make an existing key stop resolving to a single site. Any
 of those argues for building the sweep the gap needs, not for restoring the
 registry. Explicitly insufficient: a wish for symmetry with the pre-M87
 machinery, or a review preferring more assertions to fewer.
+
+### D-043 (2026-08-15): the abort-site identity drops its ordinal for a duplicate refusal — annotates D-042's four-part key (M88)
+
+**Context:** D-042 recorded the manifest as keyed (kind, binding, key, ordinal),
+the ordinal existing to keep two guards identical in the other three separately
+identifiable. Measured 2026-08-15 over `data-raw/audit-norms.R`: 33 sites, every
+one ordinal 1, and no duplicated (kind, binding, key) triple. The field has never
+distinguished anything, and `norms_audit_assign_ordinals()` is exercised by no
+shipped site and tested by nothing.
+
+**Decision:** Delete the ordinal from the walk, the generated manifest and the
+identity, which becomes (kind, binding, key). The separability it nominally
+carried is kept as a refusal rather than a discriminator: the walked identities
+and the manifest identities are each asserted duplicate-free, so a second guard
+identical in all three reddens the suite instead of collapsing onto one row.
+Fail closed where the old mechanism silently absorbed (GP2).
+
+**Consequences:** A twin now costs a deliberate decision — restore an ordinal, or
+reword one of the two guards — rather than being numbered automatically. That is
+the point: automatic numbering meant a twin could be added with every count
+balancing and neither site ever asserted. D-042 is annotated, not superseded: its
+retirement, its three surrendered properties and its reopening bar all stand, and
+this narrows only the identity it recorded. **What reopens this:** a twin the
+duplicate refusal cannot be resolved for without an ordinal — two guards that
+must be identical in kind, binding and key and cannot be reworded.
