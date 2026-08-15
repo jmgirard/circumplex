@@ -88,12 +88,12 @@ their existing candidate rows.
 
 - [ ] T1 Cut `m88-norms-audit-walk-helper-tests` from the up-to-date default
       branch; confirm a clean `devtools::test()` baseline before any edit.
-- [ ] T2 Add `tests/testthat/test-norms-audit-walk.R` with the AC1 partition,
+- [x] T2 Add `tests/testthat/test-norms-audit-walk.R` with the AC1 partition,
       written as an enumerated accept/reject vector rather than examples
       (`helper-norms-audit-script.R:307-318`, `helper-norms-audit-manifest.R:193-196`).
-- [ ] T3 Add the AC2 matcher assertions to that file
+- [x] T3 Add the AC2 matcher assertions to that file
       (`helper-norms-audit-manifest.R:176-197`).
-- [ ] T4 Add the AC3 refusal assertions with their negatives
+- [x] T4 Add the AC3 refusal assertions with their negatives
       (`helper-norms-audit-script.R:103`, `:117-120`, `:130-144`, `:162-183`).
 - [ ] T5 Delete `norms_audit_assign_ordinals()` and its call
       (`helper-norms-audit-script.R:203-219`, `:247`), drop the `ordinal` column
@@ -110,6 +110,8 @@ their existing candidate rows.
 - 2026-08-15: plan gate chose deleting the ordinal over testing it because all 33 shipped sites are ordinal 1 and no duplicated (kind, binding, key) triple exists (measured 2026-08-15), so the field fences nothing today; falsified by a second guard identical in kind, binding and key appearing in the audit script, which AC5's duplicate-refusal reddens rather than silently absorbing.
 - 2026-08-15: plan gate chose test-only-plus-repairs over tests-only because the audit found untested branches rather than defects, and a defect surfaced while writing a test is cheaper to fix in place than to route; falsified by a repair large enough to need its own design decision, which returns to plan.
 - 2026-08-15: T1 in progress — branch cut from a synced master, status in-progress; the baseline `devtools::test()` is still running, so no task is checked off yet. The T2-T4 test file is drafted outside the repo and dry-runs clean (46 assertions, testthat 3.3.2); an in-memory reintroduction of the M83 marker regression reddens 5 of them, naming both shapes AC1 exists for, so the partition is not vacuous. Nothing is committed to `tests/` yet.
+- 2026-08-15: T1 done — baseline `devtools::test()` clean at FAIL 0 / WARN 6 / SKIP 3 / PASS 7051 on master's tree.
+- 2026-08-15: T2-T4 done in one commit, the three criteria being three sections of one new file (`tests/testthat/test-norms-audit-walk.R`, 177 lines, 46 assertions). All eight norms-audit test files pass. The file does not skip against the installed package as its siblings do: the helpers under test are pure and read no `data-raw/` path.
 - 2026-08-15: plan gate weighed D-042's bar on reopening this area and read this scope as distinct — no registry, matcher, matrix or denylist returns, no sweep is added, and the manifest check's promise is byte-unchanged; falsified by any criterion here widening what the manifest check promises.
 
 ## Decisions
