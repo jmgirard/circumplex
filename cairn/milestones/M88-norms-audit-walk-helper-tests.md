@@ -1,6 +1,6 @@
 # M88: Fence the norms-audit walk helpers M87 kept
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -127,6 +127,7 @@ their existing candidate rows.
 - 2026-08-15: mutant 4 is the evidence for the criteria audit's vacuity finding: emptying `STOPIFNOT_RESERVED` drops the file from 46 assertions to 37 because the loop runs zero times, so without the two anchor assertions the test would pass green over its own mutation.
 - 2026-08-15: mutant 7 is the evidence AC4's field-set assertion carries the claim its grep cannot: `out[[i]][["seq_within_group"]] <- 1L` reintroduces a per-site field, is not matched by `git grep -nE '(\$|\.)ordinal|ordinal *=|assign_ordinals'` (verified against the line itself), and reddens 33 assertions — one per walked site.
 - 2026-08-15: CHECKPOINT — T6's mutation half is complete and recorded above; the confirming full `devtools::test()` was still running when this was committed, so AC7 is not yet evidenced and the milestone stays `in-progress`. The filtered `norms-audit` run was clean at the same tree.
+- 2026-08-15: AC7 evidenced, superseding the checkpoint line above — full `devtools::test()` clean at FAIL 0 / WARN 6 / SKIP 3 / PASS 7132, warnings and skips unchanged from the T1 baseline's 7051 passes. The +81 is the new walk file's 46 assertions plus the manifest file's 9 → 44. Tree clean; status in-progress → review.
 - 2026-08-15: plan gate weighed D-042's bar on reopening this area and read this scope as distinct — no registry, matcher, matrix or denylist returns, no sweep is added, and the manifest check's promise is byte-unchanged; falsified by any criterion here widening what the manifest check promises.
 
 ## Decisions

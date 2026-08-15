@@ -14,7 +14,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M85 | Carry the sample through the audit's note-only coverage rows | done | — | low | milestones/archive/M85-norms-audit-note-only-sample.md |
 | M86 | Name every roster shape the norms-audit builder cannot honestly audit | done | — | normal | milestones/archive/M86-norms-audit-roster-refusals.md |
 | M87 | Retire the norms-audit abort apparatus for a manifest check | done | — | normal | milestones/archive/M87-norms-audit-apparatus-retirement.md |
-| M88 | Fence the norms-audit walk helpers M87 kept | in-progress | — | normal | milestones/M88-norms-audit-walk-helper-tests.md |
+| M88 | Fence the norms-audit walk helpers M87 kept | review | — | normal | milestones/M88-norms-audit-walk-helper-tests.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
