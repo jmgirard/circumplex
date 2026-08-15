@@ -51,10 +51,9 @@ refused: the retirement closes both on the merits.
 - [ ] AC2 — a surviving test parses `data-raw/audit-norms.R`, collects every
       `stop()` call and every `stopifnot()` condition including the run block,
       and asserts set equality with a checked-in manifest. The manifest is
-      held to the floors the retired matcher enforced at build time: every
-      `stop` key carries ≥15 literal characters, every untruncated positional
-      `stopifnot` stem ≥40, and no key renders a degenerate regex that would
-      accept an arbitrary message. Verified by planted
+      held to the build-time floor the retired matcher enforced: every `stop`
+      key carries ≥15 literal characters and no key is all-placeholder, so
+      none renders a regex accepting an arbitrary message. Verified by planted
       defect varying both form and location: a `stop()` site and a
       `stopifnot()` condition, each planted in a different top-level binding,
       each reddens the test alone, and each restores green on removal.
@@ -65,8 +64,10 @@ refused: the retirement closes both on the merits.
       replaced by `expect_audit_abort(expr, key)`, which fails unless `key` is
       present in the AC2 manifest, `key` selects exactly one manifest site,
       the message raised by `expr` is matched by that key under its own kind
-      (regex match for `stop`, truncation-aware stem for a positional
-      `stopifnot`, string equality for a named one), and that raised message
+      (regex match for `stop`; for a positional `stopifnot`, the observed stem
+      is a prefix of the key carrying at least `min(nchar(key), 40)`
+      characters, with no floor where R itself truncated; string equality for
+      a named one), and that raised message
       is rendered by exactly one manifest key — the last condition folding the
       retired acceptance matrix's cross-site property into the per-call check.
       For every `expect_audit_abort()` call enumerated by parsing
@@ -121,7 +122,7 @@ refused: the retirement closes both on the merits.
 
 ## Tasks
 
-- [ ] T1 — author the manifest and its parsing test first: plant a `stop()`
+- [x] T1 — author the manifest and its parsing test first: plant a `stop()`
       and a `stopifnot()` condition in two different bindings of
       `data-raw/audit-norms.R`, watch each redden alone, restore by scratch
       snapshot and re-hash (never `git checkout --`), then build the manifest
@@ -152,6 +153,9 @@ refused: the retirement closes both on the merits.
 - 2026-08-15: plan gate chose a tests-only scope over also shrinking the script's ~225-line guard surface because the batch guards still protect a hand-edit of `AUDIT_BATCH` when instrument 16 is added; falsified by evidence that no maintainer path reaches those guards.
 - 2026-08-15: branch `m87-norms-audit-apparatus-retirement` cut from master at 484ae30a; status in-progress.
 - 2026-08-15: amendment gate — AC2, AC3, AC7 and T2 amended after a fresh-context [O] audit of the proposed AC3 wording returned four findings: the conversion count was 27 where only 17 assert script abort sites (the markers 10 test the retired helper and have keys absent from the script, making the criterion unsatisfiable as written); "the message the key renders" was unimplementable against `{}` templates and needed the kind-aware match; the acceptance matrix's cross-site property was neither preserved nor named as surrendered; and dropping the literal floors fails open on an all-placeholder key, `norms_audit_key_regex()` returning "." (two incidents recorded at helper-norms-audit-script.R:594-598 and :706-708). All four repaired; Jeff accepted the message-uniqueness fold at the gate.
+- 2026-08-15: AC2 amended a second time — the stem floor was written "≥40" where the retired rule is `min(nchar(squish(key)), 40)` (helper-norms-audit-script.R:718), unsatisfiable against the two 20/21-character `stopifnot` keys the script actually carries; the floor clause now covers `stop` keys only and the stem rule moved into AC3's kind-aware match. Jeff approved at the gate; the wrong number was mine, introduced in the first amendment.
+- 2026-08-15: T1 — manifest derived by walking `data-raw/audit-norms.R` at 8604a203 rather than hand-typed: 33 sites, 30 `stop` and 3 positional `stopifnot`, minimum literal-character count 23 against the floor of 15, zero all-placeholder keys, and exactly one duplicated (kind, key) — `source note not found: {}` from `source_note_block_tags` and `parse_source_note`.
+- 2026-08-15: T1 planted-defect probe (scratchpad, results here): baseline FAIL=0; a `stop()` planted in `empty_ledger` FAIL=2; a `stopifnot()` condition planted in the run block FAIL=2 — two forms in two bindings, each reddening alone. Restored by scratch snapshot with `git hash-object` re-checked against the clean blob, never `git checkout --`; `git status` confirmed `data-raw/` untouched afterwards.
 - 2026-08-15: criteria audit ([O], fresh context) returned findings on AC1–AC5 and none on AC6–AC7; `_problems/` grep scoping, AC3 already-true-at-HEAD, AC4's comment-line and missing `stopifnot()` domain, and AC5's unrelated counts were fixed at the gate; the hand-list-vs-procedure finding became the first gate question.
 
 ## Decisions
