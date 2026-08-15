@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2
-- **Branch/PR:** `m88-norms-audit-walk-helper-tests`
+- **Branch/PR:** `m88-norms-audit-walk-helper-tests` / [PR #116](https://github.com/jmgirard/circumplex/pull/116)
 
 ## Goal
 
@@ -38,7 +38,7 @@ their existing candidate rows.
 
 ## Acceptance criteria
 
-- [ ] AC1 A test asserts `audit_key_matches("stopifnot", key, msg)` over an
+- [x] AC1 A test asserts `audit_key_matches("stopifnot", key, msg)` over an
       enumerated vector of message shapes, each declared accepted or rejected and
       asserted in both directions, containing at least: a message R itself raised
       by overflowing a `stopifnot()` condition past one deparsed line, keyed on
@@ -47,11 +47,11 @@ their existing candidate rows.
       message (accepted); a below-floor stem carrying the verdict but no
       truncation marker (rejected). The first shape is captured from a live
       `stopifnot()` at test time, never hand-typed.
-- [ ] AC2 A test asserts `audit_key_matches()` raises, naming the kind it got,
+- [x] AC2 A test asserts `audit_key_matches()` raises, naming the kind it got,
       for a kind outside `stop`/`stopifnot`/`stopifnot_named`; and asserts the
       `stopifnot_named` branch in both directions — a message equal to the key
       accepted, a message carrying the key as a strict superstring rejected.
-- [ ] AC3 A test asserts each `refuse_unenumerable()` site raises and names its
+- [x] AC3 A test asserts each `refuse_unenumerable()` site raises and names its
       cause: `norms_audit_stopifnot_conditions()` for a condition passed under any
       element of `STOPIFNOT_RESERVED`, iterated as the running R defines it and
       anchored non-vacuous by pinning `"exprs"` as a literal member; and
@@ -60,7 +60,7 @@ their existing candidate rows.
       Each is paired with a negative that must not raise — a positional
       condition, a named condition, a `stop()` with no names, and one carrying
       only `call.`/`domain`.
-- [ ] AC4 The abort-site identity is (kind, binding, key). A test asserts the
+- [x] AC4 The abort-site identity is (kind, binding, key). A test asserts the
       field set directly rather than by spelling: `names(NORMS_AUDIT_MANIFEST)`
       is exactly `c("kind", "binding", "key")`, and every element of
       `norms_audit_abort_sites()` has `names()` equal as a set to
@@ -70,7 +70,7 @@ their existing candidate rows.
       retired mechanism used,
       `git grep -nE '(\$|\.)ordinal|ordinal *=|assign_ordinals' -- tests tools`
       returns no line — prose explaining the removal may name `ordinal`.
-- [ ] AC5 A test asserts the walked identities and the manifest identities are
+- [x] AC5 A test asserts the walked identities and the manifest identities are
       each duplicate-free, so two guards identical in (kind, binding, key) redden
       the suite rather than collapsing onto one row — the separability the
       deleted ordinal carried, kept as a refusal.
@@ -93,7 +93,7 @@ their existing candidate rows.
 
 ## Tasks
 
-- [ ] T1 Cut `m88-norms-audit-walk-helper-tests` from the up-to-date default
+- [x] T1 Cut `m88-norms-audit-walk-helper-tests` from the up-to-date default
       branch; confirm a clean `devtools::test()` baseline before any edit.
 - [x] T2 Add `tests/testthat/test-norms-audit-walk.R` with the AC1 partition,
       written as an enumerated accept/reject vector rather than examples
@@ -128,8 +128,49 @@ their existing candidate rows.
 - 2026-08-15: mutant 7 is the evidence AC4's field-set assertion carries the claim its grep cannot: `out[[i]][["seq_within_group"]] <- 1L` reintroduces a per-site field, is not matched by `git grep -nE '(\$|\.)ordinal|ordinal *=|assign_ordinals'` (verified against the line itself), and reddens 33 assertions — one per walked site.
 - 2026-08-15: CHECKPOINT — T6's mutation half is complete and recorded above; the confirming full `devtools::test()` was still running when this was committed, so AC7 is not yet evidenced and the milestone stays `in-progress`. The filtered `norms-audit` run was clean at the same tree.
 - 2026-08-15: AC7 evidenced, superseding the checkpoint line above — full `devtools::test()` clean at FAIL 0 / WARN 6 / SKIP 3 / PASS 7132, warnings and skips unchanged from the T1 baseline's 7051 passes. The +81 is the new walk file's 46 assertions plus the manifest file's 9 → 44. Tree clean; status in-progress → review.
+- 2026-08-15: review in progress — PR #116 opened as draft; AC1-AC5 evidenced fresh and ticked, consistency gate clean (`cairn_validate` exit 0; the profile's toolchain checks are no-ops by file list, the branch touching only `tests/` and `cairn/`). AC6/AC7 deferred until the fresh-context reviewers finish, since a mutation pass would churn the tree they read.
 - 2026-08-15: plan gate weighed D-042's bar on reopening this area and read this scope as distinct — no registry, matcher, matrix or denylist returns, no sweep is added, and the manifest check's promise is byte-unchanged; falsified by any criterion here widening what the manifest check promises.
 
 ## Decisions
 
 ## Review
+
+Reviewed 2026-08-15 against PR #116. Evidence executed fresh at this branch
+tip, never recalled from the implement run.
+
+### Acceptance criteria
+
+- **AC1** — `test-norms-audit-walk.R::the stopifnot stem accepts and rejects as
+  a partition` passes 10/10. The partition is asserted in both directions over
+  five declared shapes, and the live-captured probe is asserted truncated
+  before its accept case is trusted, so it cannot silently degrade into a
+  non-truncated message.
+- **AC2** — two tests, 6/6 and 5/5. The unknown-kind refusal names the kind it
+  received; the `stopifnot_named` branch accepts equality and rejects both a
+  strict superstring and a substring.
+- **AC3** — three tests, 11/11, 5/5 and 9/9. Both `refuse_unenumerable()` sites
+  raise and name their cause; the reserved-formal loop is anchored non-vacuous
+  by pinning `"exprs"`, and the `stop()` refusal asserts the multi-name
+  rendering as well as the single.
+- **AC4** — `names(NORMS_AUDIT_MANIFEST)` is exactly `kind, binding, key`; all
+  33 walked sites carry name-sets equal to `{kind, key, binding}`;
+  `norms_audit_assign_ordinals` no longer exists. The spot-check grep
+  `(\$|\.)ordinal|ordinal *=|assign_ordinals` over `tests tools` exits 1.
+- **AC5** — `anyDuplicated()` asserted 0 on both the walked and the manifest
+  identities (`test-norms-audit-manifest.R:65-66`).
+
+### Consistency gate
+
+- `cairn_validate` exit 0, all 16 checks PASS. The 47 `work-log format` WARNs
+  are M7's pre-existing hard-wrapped history, untouched by this branch.
+- Coverage completeness passes; no `DESIGN.md` principle changed, so
+  `cairn_impact` is skipped by its own condition.
+- Profile `consistency-gate` slot: the branch touches only `tests/` and
+  `cairn/` — no `NAMESPACE`, `man/`, `data/*.rda`, `R/`, `src/`, `DESCRIPTION`,
+  README, vignettes or `_pkgdown.yml` — so the generated-file, README and
+  pkgdown checks are clean no-ops by inspection of the file list. No
+  `.Rbuildignore` entry is owed: the one added file sits under
+  `tests/testthat/`.
+- No NEWS.md entry is owed. The deliverable is internal-tier test machinery
+  over a `.Rbuildignore`d script; nothing a user of the package can observe
+  changes.
