@@ -15,11 +15,14 @@ refused by a message naming the instrument, column, or pair at fault.
 ## Scope
 
 **In:** the roster path of `data-raw/audit-norms.R` — `validate_roster()`,
-`roster_from_objects()`, and the order in which `audit_norms()` validates its
-two arguments — plus the roster tests in
-`tests/testthat/test-norms-audit-roster.R` and the abort-site registration
-those refusals require. Absorbs the six M84 review findings scored 20–65
-(F2–F7) carried by the norms-audit roster-builder candidate row.
+`roster_from_objects()`, and `audit_norms()`'s argument list and the order in
+which it validates them — plus the roster tests in
+`tests/testthat/test-norms-audit-roster.R`, the `roster =` call sites in
+`test-norms-audit-coverage.R`, `test-norms-audit-markers.R` and
+`test-norms-audit-sample-key.R` that the fixture-world exemption's `FALSE`
+default requires updating, and the abort-site registration those refusals
+require. Absorbs the six M84 review findings scored 20–65 (F2–F7) carried by
+the norms-audit roster-builder candidate row.
 
 **Out:** the abort machinery's own matcher and sweep in
 `tests/testthat/helper-norms-audit-script.R` — the same-binding-twin defect and
@@ -65,14 +68,24 @@ serving IP5.
       the builder's returned frame 26 times — one per pair dropped, one
       spurious pair added, one `sample` returned numeric — each reddening (a).
       The self-comparing assertion at `:334-335` is replaced by both.
-- [ ] AC6: `validate_roster()` refuses a roster naming at least one instrument
-      in `circumplex:::instrument_names()` unless its pairs are a superset of
-      `shipped_roster()`'s, naming the omitted pairs; a roster naming no such
-      instrument is not consulted against `data/`. Measured 2026-08-15:
-      `data.frame(instrument = "csie", sample = "1")` audits the csie batch
-      slice with 0 non-exempt shipped-sample gaps against 23 for the shipped
-      roster, and is refused after the guard.
-- [x] AC7: every `stop()`/`stopifnot()` site this milestone adds to or removes
+- [ ] AC6: `validate_roster(roster, fixture_world = FALSE)` refuses every
+      roster that does not cover every (instrument, sample) pair
+      `shipped_roster()` returns, naming the omitted pairs. `fixture_world =
+      TRUE` is the only exemption, and it is asked for at the call site rather
+      than inferred from the roster: `audit_norms()` passes its own
+      `fixture_world` argument through unchanged, and that argument defaults
+      to `FALSE`. Nothing in the EXEMPTION decision compares an instrument
+      name against a list of known names, so no spelling of an instrument can
+      obtain the exemption. Measured 2026-08-15 before the amendment:
+      `data.frame(instrument = "CSIE", sample = "1")`, the same with
+      `"csie "`, and the same with `NA` each pass `validate_roster()` and
+      audit the csie batch slice at 1 non-exempt shipped-sample gap where the
+      shipped roster reports 23. Tests assert each of those three shapes is
+      now refused, and all four cells of (exemption asked | not asked) x
+      (real instrument | fake instrument `fx`) — the exempted-real cell
+      included, that cell being the declared lie the exemption deliberately
+      does not police.
+- [ ] AC7: every `stop()`/`stopifnot()` site this milestone adds to or removes
       from `data-raw/audit-norms.R` is reflected in the abort-site registry —
       the registry/walk set-equality assertion in
       `tests/testthat/test-norms-audit-markers.R` passes, each new site carries
@@ -90,8 +103,8 @@ serving IP5.
 - AC3 → T3, T7
 - AC4 → T4
 - AC5 → T5
-- AC6 → T6, T7
-- AC7 → T7
+- AC6 → T6, T7, T9
+- AC7 → T7, T9
 - AC8 → T8
 
 ## Tasks
@@ -113,7 +126,13 @@ serving IP5.
       measured csie shape and confirm the fake-instrument fixtures are untouched.
 - [x] T7: register every added and removed abort site; re-run the registry
       set-equality assertion and the cross-discrimination matrix.
-- [x] T8: run the profile's verify slot and the full check.
+- [ ] T8: run the profile's verify slot and the full check (re-runs after T9).
+- [ ] T9: replace the instrument-name trigger with the call-site
+      `fixture_world` exemption in `validate_roster()` and `audit_norms()`;
+      update the 13 fixture `roster =` call sites, attribute a failed
+      `shipped_roster()` build to its own message (F2), test and register the
+      `NULL` entry refusal and correct its stale comment (F3), and re-derive
+      the abort registry and cross-discrimination matrix.
 
 ## Work log
 
@@ -140,6 +159,13 @@ serving IP5.
 - 2026-08-15: T8 done. `devtools::test()` FAIL 0 | WARN 6 | SKIP 3 | PASS 7252; the 6 warnings are lavaan convergence notices in `test-ssm_sem.R` and occasions messages, in files this branch does not touch (`git diff --name-only master..HEAD` is 5 files, none under `R/`, `src/` or `man/`). `devtools::check(args = "--no-manual")` Status: OK, 0/0/0. Stated rather than assumed: the PDF-manual step did not run (grep count 0 for `checking PDF version of manual`), which is what `--no-manual` means and is not coverage; no roxygen or `man/` file is in the diff. Status -> review.
 
 - 2026-08-15: review returned AC6 for a gated criterion amendment. The fresh-context diff lens found the guard evadable by any misspelling or NA instrument name (`"CSIE"`, `"csie "`, `NA` each audit the csie slice at 1 gap against 23), scored 85/85 — but AC6 holds as written, its second clause exempting a roster that names no shipped instrument, so this is evidence about the promise and not the work. F2 (88, the builder's message surfacing from a validator whose subject is the caller's argument) and F3 (80, a NULL entry now aborting where master skipped) ride into the same round. Blame-history and prior-review lenses returned zero findings; ten further findings logged below the action bar.
+
+- 2026-08-15: amendment return: AC6 — "`validate_roster(roster, fixture_world = FALSE)` refuses every roster that does not cover every (instrument, sample) pair `shipped_roster()` returns, naming the omitted pairs. `fixture_world = TRUE` is the only exemption, and it is asked for at the call site rather than inferred from the roster: `audit_norms()` passes its own `fixture_world` argument through unchanged, and that argument defaults to `FALSE`. Nothing in the EXEMPTION decision compares an instrument name against a list of known names, so no spelling of an instrument can obtain the exemption."
+- 2026-08-15: the amendment's repair is the narrowing one, not a wider match: the evasion was measured this session (`"CSIE"`, `"csie "`, `NA` each pass and audit the csie slice at 1 non-exempt gap against 23), and matching more spellings would fix membership by author recall. Rejected alternative: keep the name trigger and narrow AC6 to what exact matching settles, logging the residual as a candidate — it loses because the audits that run today keep the hole. Falsified by a fixture world that cannot be declared at its call site.
+- 2026-08-15: amendment gate also widened Scope (three test files and `audit_norms()`'s argument list, which the 13 fixture call sites and the new parameter reach) and kept the Goal unamended — an exemption the caller asks for out loud is not a shape that slips through silently, which is what the Goal's "cannot honestly audit" names.
+- 2026-08-15: AC7 un-ticked and T8 un-checked: the amendment changes the narrow-roster abort message and adds sites, so the registry, the cross-discrimination matrix and the full check are all re-derived rather than carried over. AC1–AC5 stay verified; their evidence is untouched by the exemption, which sits after the shape guards.
+- 2026-08-15: amended-criterion audit ([O], fresh context) ran twice on wording no session author wrote. Round 1 killed the first design outright — marking rosters built by `roster_from_objects()` marks by provenance, and `roster_from_objects(list(csie = <real object>))` is a marked narrow roster over real `data/`, so the exemption would have relocated rather than closed. Round 2 over the call-site design returned the bounded-promise defect repaired, plus three clear fixes taken before writing (qualify the name-comparison sentence to the exemption decision; assert all three measured shapes rather than one exemplar; un-tick AC7) and three judgments routed to the gate.
+- 2026-08-15: the T6 work-log line above and the comment at `data-raw/audit-norms.R:184-186` describe the superseded all-or-nothing rule keyed on `instrument_names()`; T9 replaces the comment, and this line supersedes that log entry rather than editing it.
 
 ## Decisions
 
