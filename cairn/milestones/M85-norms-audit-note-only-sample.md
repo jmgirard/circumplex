@@ -117,3 +117,76 @@ it reddens under the mutation). All 14 `note-only-sample` rows carry the
 before and 0 after; instrument set identical. Column-wise, exactly 14 cells moved,
 all of them `sample` on `note-only-sample`. No other column and no other side
 moved, so no shipped audit verdict changes.
+
+### Consistency gate
+
+`cairn_validate` exit 0 — every check PASS. 47 advisories, all `work-log format`
+on M7's pre-existing hard-wrapped log; none on M85. No principle changed, so
+`cairn_impact` is skipped. Profile consistency gate (`r-package`): `document()`
+zero `resolve link` warnings with `man/` and `NAMESPACE` byte-unchanged; README
+untouched by the diff; no new top-level file; no NEWS entry owed — `data-raw/`
+and `cairn/` are both `.Rbuildignore`d, so the milestone ships no user-visible
+change.
+
+`document()` also rewrites DESCRIPTION's `Config/roxygen2/version` 8.0.0 → 8.1.0
+on this machine (newer roxygen2 than the repo was documented with). Reverted, not
+committed — a repo-wide toolchain stamp unrelated to M85. It will recur for
+anyone on roxygen2 >= 8.1.0.
+
+### Independent review
+
+Three fresh-context lenses, then a scorer that did not generate the findings.
+
+- **[O] diff-bug (Opus)** — 11 reported, including its own mutation testing.
+- **[S] blame-history (Sonnet)** — no contradiction of recorded intent. Established
+  that M80's round-3 review had already found this exact defect and logged it as
+  its F1 at 72, below that milestone's action bar: the `NA` was a deferred known
+  bug, not a design choice. Confirmed M85 correctly left the neighbouring `anchor`
+  exclusion alone, which *was* deliberate (D-M80-1).
+- **[S] prior-PR-comments (Sonnet)** — no prior-review regression. The GitHub
+  inline-comment surface is empty (probe returned `[]`), so only the archived
+  `## Review` sections were evidence.
+
+**Actioned (>= 80): 1 of 11.**
+
+**F1 (82) — FIXED at `3180c254`.** A blank note `sample` cell reached the report's
+`sample` key column as `""`. `parse_source_note()` validates the *value* cell for
+emptiness and not the sample cell, so once the emitter began passing the cell
+through, a blank could leak where before it took the `NA` default — a defect this
+milestone's own change introduced. `""` in a key column reads as a label whose
+text went missing rather than a row that carries no such fact, which is what the
+schema declares `NA` to mean and exactly why `tag_or_na()` exists for the sibling
+`tag`. Fixed by `blank_to_na()` beside `tag_or_na()`, applied at the emitter.
+Regression test first: reddens with `actual: ""` against the unguarded emitter.
+The committed CSV is byte-unchanged — no committed note carries a blank sample
+cell — so AC3 and AC4 are unaffected.
+
+**Logged below the 80 action bar (10), surfaced not dropped:**
+
+- F2 (45) — a note-only row's `sample` is unvalidated against the roster, so it
+  can name a sample the package does not ship. Real, but roster validation is
+  M85's Scope Out (→ M84).
+- F4 (48) — the schema header says key columns are `NA` on a row with no such
+  fact, while 14 committed rows carry the `NO_SAMPLE` stand-in. Pre-existing for
+  `note-instrument-row-not-audited`; M85 makes it the majority case.
+- F7 (40) — the `anchor` axis's `distinct = 1L` is an equality, so a future
+  milestone carrying `anchor` in the report reddens it as a regression rather
+  than passing as progress.
+- F3 (35) — `sample` means "shipped sample audited" on value sides and "note-side
+  label for unshipped material" here; latent, every committed row carrying the
+  token.
+- F9 (30) — the once-per-block test asserts nothing about `sample` over the
+  committed run; pinned only indirectly by the committed-CSV test.
+- F11 (20) — M85-D1's uncommitted ledger re-stamp leaves the ledger's
+  `script_commit` naming a revision that would now emit a different coverage CSV.
+- F10 (15) — Scope and AC3 carry line anchors gone stale since M84
+  (`:713-719`, `:592`, `:702-703`, `:327`). Plan-owned text, amendable only by
+  gate; not worth an amendment round for anchors alone.
+- F6 (15) — the `is.na` → token change is undocumented for downstream consumers;
+  none exist in-repo.
+- F5 (5), F8 (5) — reported as no-findings (per-side text accurate; no assertion
+  weakened or removed).
+
+No finding falsified an acceptance criterion, and none scored >= 90 on package
+behavior, so the return floor is not met: F1 took the fix-now triage on the
+branch with no status change.
