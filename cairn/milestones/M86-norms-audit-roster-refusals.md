@@ -1,11 +1,11 @@
 # M86: Name every roster shape the norms-audit builder cannot honestly audit
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5
-- **Branch/PR:** —
+- **Branch/PR:** m86-norms-audit-roster-refusals
 
 ## Goal
 
@@ -96,7 +96,7 @@ serving IP5.
 
 ## Tasks
 
-- [ ] T1: split `validate_roster()`'s `%in% names(roster)` condition
+- [x] T1: split `validate_roster()`'s `%in% names(roster)` condition
       (`data-raw/audit-norms.R:149-150`) into two named refusals; migrate the
       superseded assertion and add the per-column tests.
 - [ ] T2: refuse a duplicate-named `objects` entry in `roster_from_objects()`
@@ -122,6 +122,8 @@ serving IP5.
 - 2026-08-15: plan gate chose refusing any roster that names a shipped instrument without covering every shipped pair, over per-instrument completeness, because csie ships one sample so the measured 0-gap roster is already per-instrument complete; falsified by a legitimate use for a narrow audit over real data.
 - 2026-08-15: plan gate chose a hand-authored 24-pair literal over asserting counts and instrument names, because only the literal reddens on a mistyped sample or a swapped pair; falsified by the literal's maintenance cost exceeding the losses it catches as `data/` grows.
 - 2026-08-15: plan gate chose taking the argument-ordering fix with a stubbed-`shipped_roster` test over leaving it out, the shape being unreachable from shipped data today; falsified by the stub proving unbindable in the sourced script environment.
+
+- 2026-08-15: T1 done. The two column guards are written out rather than looped: a loop is one `stop()` call carrying the column as an argument, keying `"`roster` has no `{}` column"`, whose matcher accepts both messages — the matrix would then certify as distinguishable two refusals it cannot tell apart. Deleting the `sample` guard reddens 1 assertion in test-norms-audit-roster.R and 8 in test-norms-audit-markers.R; restore verified by blob hash.
 
 ## Decisions
 

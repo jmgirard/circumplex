@@ -203,11 +203,22 @@ test_that("audit_norms() refuses a roster it cannot audit against (M84)", {
                     roster = list(instrument = "fx", sample = "1")),
     "is.data.frame(roster)", fixed = TRUE
   )
+  # One message per missing column (M86). Until then both omissions raised one
+  # `all(c("instrument", "sample") %in% names(roster)) is not TRUE`, which names
+  # both columns and so names neither: a roster misspelling ONE of them read
+  # exactly like a roster misspelling the other, and the assertion that stood
+  # here survived weakening the condition to a single column.
   expect_error(
     env$audit_norms(slice, dir = dir,
-                    roster = data.frame(Instrument = "fx", Sample = "1",
+                    roster = data.frame(Instrument = "fx", sample = "1",
                                         stringsAsFactors = FALSE)),
-    "%in% names(roster)", fixed = TRUE
+    "`roster` has no `instrument` column", fixed = TRUE
+  )
+  expect_error(
+    env$audit_norms(slice, dir = dir,
+                    roster = data.frame(instrument = "fx", Sample = "1",
+                                        stringsAsFactors = FALSE)),
+    "`roster` has no `sample` column", fixed = TRUE
   )
   expect_error(
     env$audit_norms(slice, dir = dir,

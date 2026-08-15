@@ -145,9 +145,30 @@ validate_batch <- function(batch) {
 # audit_norms() resolves its NULL default before calling this, so the default
 # sweep is what gets checked and a caller who passes nothing is never refused
 # for passing nothing.
+#
+# The two key columns are checked one at a time, and each refusal names the
+# column it is about. One condition over both (`all(c("instrument", "sample")
+# %in% names(roster))`, through M85) raised a message naming BOTH columns for
+# either omission, so a roster misspelling one read exactly like a roster
+# misspelling the other -- and the assertion covering it survived weakening the
+# condition to a single column, since the deparsed condition text is what the
+# message carries either way (M86).
+#
+# Written out one column at a time rather than looped, because a loop is one
+# `stop()` call carrying the column as an argument: its registry key would be
+# "`roster` has no `{}` column", whose matcher accepts BOTH messages, and the
+# cross-discrimination matrix would then certify as distinguishable two
+# refusals it cannot tell apart. Two calls, two keys, two fixtures.
 validate_roster <- function(roster) {
-  stopifnot(is.data.frame(roster),
-            all(c("instrument", "sample") %in% names(roster)))
+  stopifnot(is.data.frame(roster))
+  if (!"instrument" %in% names(roster)) {
+    stop("`roster` has no `instrument` column; it has: ",
+         paste(names(roster), collapse = ", "), call. = FALSE)
+  }
+  if (!"sample" %in% names(roster)) {
+    stop("`roster` has no `sample` column; it has: ",
+         paste(names(roster), collapse = ", "), call. = FALSE)
+  }
   if (!nrow(roster)) {
     stop("`roster` names no (instrument, sample) pair to cover, so every ",
          "unaudited shipped sample would be reported as covered",

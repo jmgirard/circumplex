@@ -411,10 +411,18 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
   site("stopifnot", "validate_roster", "is.data.frame(roster)", function(env) {
     env$validate_roster(list(instrument = "fx", sample = "1"))
   }),
-  site("stopifnot", "validate_roster",
-       'all(c("instrument", "sample") %in% names(roster))',
-       function(env) {
-         env$validate_roster(data.frame(Instrument = "fx", Sample = "1",
+  # One entry per column (M86), replacing the single `%in% names(roster)`
+  # condition whose message named both and so discriminated neither. Each
+  # fixture carries the OTHER column correctly spelt, so the guard it is named
+  # for is the only one it can reach.
+  site("stop", "validate_roster",
+       "`roster` has no `instrument` column; it has: {}", function(env) {
+         env$validate_roster(data.frame(Instrument = "fx", sample = "1",
+                                        stringsAsFactors = FALSE))
+       }),
+  site("stop", "validate_roster",
+       "`roster` has no `sample` column; it has: {}", function(env) {
+         env$validate_roster(data.frame(instrument = "fx", Sample = "1",
                                         stringsAsFactors = FALSE))
        }),
   site("stop", "validate_roster",
