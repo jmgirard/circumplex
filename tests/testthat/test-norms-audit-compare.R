@@ -46,34 +46,34 @@ test_that("two unparseable item cells do not compare equal (M80)", {
   # reported as agreeing. Assert the abort by its own message, since a
   # comparison of two junk strings would also raise if the audit were broken in
   # an unrelated way.
-  expect_abort_at_site(function() env$values_agree("Items", "x", "y", 1),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
-  expect_abort_at_site(function() env$normalise_items(NA_character_),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
-  expect_abort_at_site(function() env$normalise_items("1, 9, seventeen"),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
+  expect_audit_abort(env$values_agree("Items", "x", "y", 1),
+    "item key is not a comma-separated list of integers: {}")
+  expect_audit_abort(env$normalise_items(NA_character_),
+    "item key is not a comma-separated list of integers: {}")
+  expect_audit_abort(env$normalise_items("1, 9, seventeen"),
+    "item key is not a comma-separated list of integers: {}")
   # The shape that survived the first fix: a digit string is not an integer if
   # it is out of R's integer range, and `as.integer()` returns NA for it with a
   # warning. Two such cells both normalised to the string "NA" and compared
   # EQUAL -- the same defect one shape over, inside the guard that claimed to
   # close it (M80 review, F3). Asserted as a pair, since a single abort proves
   # only that one cell is refused.
-  expect_abort_at_site(function() env$normalise_items("99999999999"),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
-  expect_abort_at_site(function() env$values_agree("Items", "99999999999", "88888888888", 1),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
+  expect_audit_abort(env$normalise_items("99999999999"),
+    "item key is not a comma-separated list of integers: {}")
+  expect_audit_abort(env$values_agree("Items", "99999999999", "88888888888", 1),
+    "item key is not a comma-separated list of integers: {}")
   # `strsplit()` drops a trailing empty field, so "1, 9," parsed as a two-item
   # key while ",1" aborted -- one malformed shape refused and its mirror image
   # normalised away (M80 review, F4).
-  expect_abort_at_site(function() env$normalise_items("1, 9,"),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
-  expect_abort_at_site(function() env$normalise_items("1,,9"),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
+  expect_audit_abort(env$normalise_items("1, 9,"),
+    "item key is not a comma-separated list of integers: {}")
+  expect_audit_abort(env$normalise_items("1,,9"),
+    "item key is not a comma-separated list of integers: {}")
   # An empty cell is unreadable too. It cannot arrive from a note --
   # parse_source_note() refuses an empty value cell before the comparison sees
   # it -- so this fences the shipped side, which has no such guard of its own.
-  expect_abort_at_site(function() env$normalise_items(""),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
+  expect_audit_abort(env$normalise_items(""),
+    "item key is not a comma-separated list of integers: {}")
   # The shape the SECOND fix opened by dropping the shape test rather than
   # composing with it: `as.integer()` reads a decimal, a scientific literal, a
   # hex literal and a signed integer without ever returning NA, so each was
@@ -81,13 +81,13 @@ test_that("two unparseable item cells do not compare equal (M80)", {
   # and agreed with a shipped "1, 9" (M80 review round 2, G1). An item number
   # is a plain unsigned digit string; none of these is one.
   for (cell in c("1.5, 9", "0x10, 9", "1e2, 9", "+1, 9", "-9, 1")) {
-    expect_abort_at_site(function() env$normalise_items(cell),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
+    expect_audit_abort(env$normalise_items(cell),
+      "item key is not a comma-separated list of integers: {}")
   }
   # The comparison that made it a defect rather than a cosmetic rewrite: a note
   # transcribing an item as 1.4 agreed with a shipped 1.
-  expect_abort_at_site(function() env$values_agree("Items", "1, 9", "1.4, 9", 1),
-    norms_audit_matcher("stop", "item key is not a comma-separated list of integers: {}"))
+  expect_audit_abort(env$values_agree("Items", "1, 9", "1.4, 9", 1),
+    "item key is not a comma-separated list of integers: {}")
   # The control: a real key still normalises, so the guard has not simply
   # refused everything.
   expect_identical(env$normalise_items(c("1,  9, 17", "2, 10, 18")),

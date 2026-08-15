@@ -71,7 +71,7 @@ MUTANTS <- list(
     from = "stopifnot(is.data.frame(batch),\n            all(c(",
     to   = "stopifnot(all(c(",
     recorded = 2L,
-    named = "every registered abort site raises its own message"
+    named = "the manifest is set-equal to a fresh walk of the audit script (M87)"
   ),
   list(
     id = "AC3-2 delete the required-columns condition",
@@ -81,7 +81,7 @@ MUTANTS <- list(
                   "                  names(batch)))"),
     to   = "stopifnot(is.data.frame(batch))",
     recorded = 2L,
-    named = "every registered abort site raises its own message"
+    named = "the manifest is set-equal to a fresh walk of the audit script (M87)"
   ),
   list(
     id = "T4 unregistered stop() in the run block",
@@ -89,21 +89,21 @@ MUTANTS <- list(
     from = "  res <- audit_norms()",
     to   = "  if (FALSE) stop(\"an unregistered run-block abort site\")\n  res <- audit_norms()",
     recorded = 1L,
-    named = "no stop()/stopifnot() site the walk collects is unregistered"
+    named = "the manifest is set-equal to a fresh walk of the audit script (M87)"
   ),
   list(
     id = "AC4 hard-code the instrument list",
     path = AUDIT,
-    from = "    nms <- get(\"instrument_names\", envir = ns)()",
-    to   = "    nms <- c(\"cais\", \"csie\", \"csig\", \"csip\", \"csiv\", \"iei\", \"igicr\",\n             \"iip32\", \"iip64\", \"iipsc\", \"iis32\", \"iis64\", \"ipipipc\",\n             \"isc\", \"iitc\")",
+    from = "  nms <- get(\"instrument_names\", envir = ns)()",
+    to   = "  nms <- c(\"cais\", \"csie\", \"csig\", \"csip\", \"csiv\", \"iei\", \"igicr\",\n             \"iip32\", \"iip64\", \"iipsc\", \"iis32\", \"iis64\", \"ipipipc\",\n             \"isc\", \"iitc\")",
     recorded = 1L,
     named = "the roster is the package's own enumeration, not a copy"
   ),
   list(
     id = "AC4 control: switch to the ::: shape",
     path = AUDIT,
-    from = "    nms <- get(\"instrument_names\", envir = ns)()",
-    to   = "    nms <- circumplex:::instrument_names()",
+    from = "  nms <- get(\"instrument_names\", envir = ns)()",
+    to   = "  nms <- circumplex:::instrument_names()",
     recorded = 0L,
     named = NA_character_
   )
