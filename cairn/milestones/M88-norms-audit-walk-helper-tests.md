@@ -1,11 +1,11 @@
 # M88: Fence the norms-audit walk helpers M87 kept
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP2
-- **Branch/PR:** —
+- **Branch/PR:** `m88-norms-audit-walk-helper-tests`
 
 ## Goal
 
@@ -109,6 +109,7 @@ their existing candidate rows.
 - 2026-08-15: criteria audit ran — a fresh-context [O] reader returned five findings, four fixed at the gate (AC1 unsatisfiable: a truncated stem can never prefix a 20-char key, so the accepted probe is keyed on the full condition text; AC3 vacuous under `STOPIFNOT_RESERVED <- character(0)`, anchored by pinning `"exprs"`; AC5-as-drafted locked one axis of three, superseded by the ordinal deletion; AC6 disproportionate for an internal tier, narrowed to one summary line plus restore hashes) and one widened (AC4-as-drafted, one exemplar for a family free in two axes).
 - 2026-08-15: plan gate chose deleting the ordinal over testing it because all 33 shipped sites are ordinal 1 and no duplicated (kind, binding, key) triple exists (measured 2026-08-15), so the field fences nothing today; falsified by a second guard identical in kind, binding and key appearing in the audit script, which AC5's duplicate-refusal reddens rather than silently absorbing.
 - 2026-08-15: plan gate chose test-only-plus-repairs over tests-only because the audit found untested branches rather than defects, and a defect surfaced while writing a test is cheaper to fix in place than to route; falsified by a repair large enough to need its own design decision, which returns to plan.
+- 2026-08-15: T1 in progress — branch cut from a synced master, status in-progress; the baseline `devtools::test()` is still running, so no task is checked off yet. The T2-T4 test file is drafted outside the repo and dry-runs clean (46 assertions, testthat 3.3.2); an in-memory reintroduction of the M83 marker regression reddens 5 of them, naming both shapes AC1 exists for, so the partition is not vacuous. Nothing is committed to `tests/` yet.
 - 2026-08-15: plan gate weighed D-042's bar on reopening this area and read this scope as distinct — no registry, matcher, matrix or denylist returns, no sweep is added, and the manifest check's promise is byte-unchanged; falsified by any criterion here widening what the manifest check promises.
 
 ## Decisions
