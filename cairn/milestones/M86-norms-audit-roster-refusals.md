@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP5
-- **Branch/PR:** m86-norms-audit-roster-refusals
+- **Branch/PR:** m86-norms-audit-roster-refusals / https://github.com/jmgirard/circumplex/pull/114
 
 ## Goal
 
@@ -30,7 +30,7 @@ serving IP5.
 
 ## Acceptance criteria
 
-- [ ] AC1: `validate_roster()` refuses a roster missing `instrument` with a
+- [x] AC1: `validate_roster()` refuses a roster missing `instrument` with a
       message naming `instrument`, and one missing `sample` with a message
       naming `sample`; the two messages differ. The single
       `%in% names(roster)` condition at `data-raw/audit-norms.R:150`, the
@@ -38,25 +38,25 @@ serving IP5.
       registry entry at `tests/testthat/test-norms-audit-markers.R:414-419` are
       replaced by their two-site successors, not left standing. A test asserts
       each message against a roster missing only that column.
-- [ ] AC2: `roster_from_objects()` refuses an `objects` list carrying one name
+- [x] AC2: `roster_from_objects()` refuses an `objects` list carrying one name
       twice, naming the repeated name, rather than rostering the first entry
       twice — measured 2026-08-15, `list(fx = <Sample 1>, fx = <Sample 2>)`
       returns two rows both reading `fx 1`. A test asserts message and refusal.
-- [ ] AC3: `roster_from_objects()` evaluates `objects[[nm]]$Norms[[1]]` only
+- [x] AC3: `roster_from_objects()` evaluates `objects[[nm]]$Norms[[1]]` only
       after asserting the entry is a list and its `Norms` a non-empty list,
       each refusal naming the instrument; a `NULL` `Norms` is still skipped and
       `tests/testthat/test-norms-audit-roster.R:100-101` still passes. Measured
       2026-08-15 before the guard: a non-list entry raises `$ operator is
       invalid for atomic vectors`, `Norms = list()` raises `subscript out of
       bounds`, naming neither instrument nor fault. A test asserts each message.
-- [ ] AC4: `audit_norms()` calls `validate_batch(batch)` before resolving the
+- [x] AC4: `audit_norms()` calls `validate_batch(batch)` before resolving the
       `NULL` roster default. A test binds `shipped_roster` in the sourced
       script environment to a function that aborts distinctively, calls
       `audit_norms()` with a malformed batch and a defaulted roster, and
       asserts the batch's own message surfaces — an assertion that fails
       against the order at `data-raw/audit-norms.R:725-728`. M84's "the default
       roster is resolved before it is validated" test still passes.
-- [ ] AC5: `tests/testthat/test-norms-audit-roster.R` asserts (a)
+- [x] AC5: `tests/testthat/test-norms-audit-roster.R` asserts (a)
       `roster_from_objects()` over the shipped objects `expect_identical()`-equals
       a 24-row (instrument, sample) literal authored as character in the test
       file, the builder's frame compared uncoerced so a type change reddens;
@@ -65,14 +65,14 @@ serving IP5.
       the builder's returned frame 26 times — one per pair dropped, one
       spurious pair added, one `sample` returned numeric — each reddening (a).
       The self-comparing assertion at `:334-335` is replaced by both.
-- [ ] AC6: `validate_roster()` refuses a roster naming at least one instrument
+- [x] AC6: `validate_roster()` refuses a roster naming at least one instrument
       in `circumplex:::instrument_names()` unless its pairs are a superset of
       `shipped_roster()`'s, naming the omitted pairs; a roster naming no such
       instrument is not consulted against `data/`. Measured 2026-08-15:
       `data.frame(instrument = "csie", sample = "1")` audits the csie batch
       slice with 0 non-exempt shipped-sample gaps against 23 for the shipped
       roster, and is refused after the guard.
-- [ ] AC7: every `stop()`/`stopifnot()` site this milestone adds to or removes
+- [x] AC7: every `stop()`/`stopifnot()` site this milestone adds to or removes
       from `data-raw/audit-norms.R` is reflected in the abort-site registry —
       the registry/walk set-equality assertion in
       `tests/testthat/test-norms-audit-markers.R` passes, each new site carries
@@ -142,3 +142,52 @@ serving IP5.
 ## Decisions
 
 ## Review
+
+Reviewed 2026-08-15 on `m86-norms-audit-roster-refusals` at `cf0b19da`, PR #114.
+
+### Acceptance-criteria evidence
+
+Every line below was executed at review, not recalled.
+
+- AC1: `validate_roster(df(sample = "1"))` raises ``roster` has no `instrument`
+  column; it has: sample`; `validate_roster(df(instrument = "fx"))` raises
+  ``roster` has no `sample` column; it has: instrument`. The two differ and each
+  names its own column. Replacement verified rather than assumed: the combined
+  `all(c("instrument", "sample") %in% names(roster))` condition occurs nowhere
+  outside comments in `data-raw/` or `tests/`, and the walked registry shows 5
+  `validate_roster` sites with the two per-column keys and no combined one.
+- AC2: `roster_from_objects(list(fx = one, fx = one))` raises ``objects` carries
+  the name fx more than once, and only the first entry of a repeated name is
+  ever read`. A name repeated three times is reported once.
+- AC3: a non-list entry raises `instrument object for fx is not a list but a
+  integer`; `Norms = list()` raises ``Norms` for fx must be a non-empty list to
+  hold a norms table; it is a list of length 0`. `Norms = NULL` still returns a
+  0-row roster rather than aborting, so the M79 skip stands.
+- AC4: with `shipped_roster` stubbed to abort in a freshly sourced script
+  environment, a malformed batch raises `AUDIT_BATCH$divisor must be numeric,
+  not character` — the batch's own message, not the stub's. Measured against the
+  pre-M86 order at T4, the same call reported the stub instead.
+- AC5: `shipped_roster()` is `expect_identical()`-equal to the 24-pair literal
+  read from `data/*.rda` by `load()`. All 26 mutations of the builder's returned
+  frame redden the equality — 24 one-pair drops, one spurious pair, one numeric
+  `sample`; the last is reachable only because the comparison is uncoerced.
+- AC6: `validate_roster(df(instrument = "csie", sample = "1"))` raises ``roster`
+  names shipped instruments but omits 23 shipped (instrument, sample) pair(s)`
+  and lists all 23. A roster over `fx`/`fy` returns `TRUE`, so a fixture's own
+  world is not consulted against `data/`.
+- AC7: the walk collects 31 abort sites, 12 on the roster path; registry/walk
+  set-equality and the cross-discrimination matrix pass, and the denylist sweep
+  is green. Teeth checked by planting an unregistered `stop()` inside a function
+  no fixture calls — 3 assertions redden; restore confirmed by blob hash.
+- AC8: recorded below with the consistency gate.
+
+### Consistency gate
+
+- `cairn_validate.py` exit 0, all checks passed; 48 advisories, none a gate
+  failure. Two concern this milestone: `sizing` flags 8 criteria against the >7
+  tripwire (AC8 is the template-mandated verify criterion, so the substantive
+  count is 7 — kept as one milestone deliberately, logged at plan time), and
+  `work-log format` counts 47 wrapped lines, all pre-existing M7 entries.
+- `cairn_impact.py` not run: this milestone changes no `DESIGN.md` principle.
+  `Principles touched: IP5` records the principle it works under, not one it
+  alters.
