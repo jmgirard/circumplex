@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-14 (M85 done — the audit's note-only coverage rows now carry the sample their key distinguishes them by, so two stop collapsing under a `unique()`. Review fixed one finding M85 itself introduced, a blank note cell reaching a key column as `""`, and logged ten below-bar. M81's terminal row pruned; one lesson folded into the environment-quirk line.)_
+_Last hygiene check: 2026-08-14 (audit pass after M85 merged — all 16 checks green, nothing in flight, no untriaged issues or external PRs, working tree clean. M7 stays parked on the maintainer's CRAN submission handoff; no tracking edits were needed.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
