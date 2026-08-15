@@ -433,6 +433,17 @@ SCRIPT_ABORTS <- norms_audit_build_registry(list(
                                         sample = character(0),
                                         stringsAsFactors = FALSE))
        }),
+  # The narrow-roster refusal (M86). A roster naming a real instrument must
+  # cover every shipped pair; this one names csie and omits the other 23. It
+  # carries both key columns and a row, so no guard above it can fire.
+  site("stop", "validate_roster",
+       paste0("`roster` names shipped instruments but omits {} shipped ",
+              "(instrument, sample) pair(s), which would be reported as ",
+              "covered: {}"),
+       function(env) {
+         env$validate_roster(data.frame(instrument = "csie", sample = "1",
+                                        stringsAsFactors = FALSE))
+       }),
   # roster_from_objects() (M84). Each fixture carries ONE malformed norms
   # table and is well-formed in every other respect, so the guard it is named
   # for is the only one it can reach: the non-frame case never reaches the

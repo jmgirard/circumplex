@@ -109,7 +109,7 @@ serving IP5.
 - [x] T5: author the 24-pair literal, replace the self-comparing assertion at
       `tests/testthat/test-norms-audit-roster.R:334-335` with the equality and
       gap-equivalence pair, and run the 26 mutations.
-- [ ] T6: add the shipped-superset refusal to `validate_roster()`; test the
+- [x] T6: add the shipped-superset refusal to `validate_roster()`; test the
       measured csie shape and confirm the fake-instrument fixtures are untouched.
 - [ ] T7: register every added and removed abort site; re-run the registry
       set-equality assertion and the cross-discrimination matrix.
@@ -132,6 +132,8 @@ serving IP5.
 - 2026-08-15: T4 done. `validate_batch()` now runs before the default roster is built. The probe stubs `shipped_roster` in the sourced script environment, which `sys.source()` makes the enclosure of `audit_norms`; measured both ways — green on the new order, and under the old order the call reports `STUB: the default roster was built` rather than the batch's message, so the assertion separates the two orders the plan's first draft could not.
 
 - 2026-08-15: T5 done. The 24-pair literal's origin is a direct `load()` read of `data/*.rda`, not the builder and not the package namespace — the replaced assertion compared the defaulted run against `roster = shipped_roster()` while the default IS `shipped_roster()`, one nullary call on both sides. All 26 mutations of the builder's returned frame redden the equality (24 drops, one spurious pair, one numeric `sample`); the comparison is uncoerced, which is what makes the type mutation reachable.
+
+- 2026-08-15: T6 done. The all-or-nothing rule: a roster naming any instrument in `circumplex:::instrument_names()` must cover every shipped pair, and one naming none is a fixture's own world and is not consulted against `data/`. All 11 norms-audit test files stay green, so no fixture roster in the suite touches a shipped instrument. Cost noted: `validate_roster()` now builds `shipped_roster()` on any real-instrument roster, so the default path derives it twice per run.
 
 ## Decisions
 

@@ -174,6 +174,27 @@ validate_roster <- function(roster) {
          "unaudited shipped sample would be reported as covered",
          call. = FALSE)
   }
+  # A non-empty roster can still be a narrow one, and a narrow roster over REAL
+  # instruments is the same silent clean run one shape over: measured
+  # 2026-08-15, `data.frame(instrument = "csie", sample = "1")` audits a csie
+  # batch slice with 0 non-exempt shipped-sample gaps where the shipped roster
+  # reports 23. Neither "a superset of the batch" nor "complete per instrument"
+  # catches it -- csie ships exactly one sample, so that roster satisfies both.
+  # So a roster that touches `data/` at all must cover the whole of it (M86).
+  #
+  # A roster naming no shipped instrument is a fixture's own world and is not
+  # consulted against `data/`: that is what the `roster` argument is for.
+  known <- get("instrument_names", envir = asNamespace("circumplex"))()
+  if (any(roster$instrument %in% known)) {
+    shipped <- shipped_roster()
+    absent <- setdiff(paste(shipped$instrument, shipped$sample),
+                      paste(roster$instrument, roster$sample))
+    if (length(absent)) {
+      stop("`roster` names shipped instruments but omits ", length(absent),
+           " shipped (instrument, sample) pair(s), which would be reported as ",
+           "covered: ", paste(absent, collapse = ", "), call. = FALSE)
+    }
+  }
   invisible(TRUE)
 }
 

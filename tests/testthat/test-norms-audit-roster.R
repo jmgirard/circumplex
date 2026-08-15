@@ -26,6 +26,37 @@ roster_notes <- function() {
   dir
 }
 
+# The shipped roster, written out (M86).
+#
+# ORIGIN: read from `data/*.rda` with `load()` directly, 2026-08-15 -- not from
+# `roster_from_objects()`, and not through the package namespace. That
+# independence is the whole point of the literal. The assertion this replaced
+# compared `audit_norms(slice, dir)` against
+# `audit_norms(slice, dir, roster = shipped_roster())`, and the default IS
+# `shipped_roster()`, so both sides came from one nullary call and no defect of
+# the builder could make it fail (M84 review F6; the M72/M76/M78 shared-origin
+# family). Reading the `.rda` files rather than asking the package is the M78
+# lesson: a data-raw script verifies the ARTIFACT, and no install can shadow it.
+#
+# It is a fence on `data/` as well as on the builder: adding or removing a
+# shipped sample reddens this until the list is updated by hand, which is the
+# intended cost -- shipped norms changing unnoticed is the hazard the whole
+# audit exists for.
+SHIPPED_ROSTER_PAIRS <- c(
+  "cais", "1",    "cais", "2",    "csie", "1",    "csig", "1",
+  "csip", "1",    "csiv", "1",    "iei", "1",     "iei", "2",
+  "igicr", "1",   "igicr", "2",   "igicr", "3",   "iip32", "1",
+  "iip32", "2",   "iip32", "3",   "iip64", "1",   "iip64", "2",
+  "iip64", "3",   "iipsc", "1",   "iipsc", "2",   "iis32", "1",
+  "iis64", "1",   "iitc", "1",    "ipipipc", "1", "isc", "1"
+)
+
+shipped_roster_literal <- function() {
+  m <- matrix(SHIPPED_ROSTER_PAIRS, ncol = 2L, byrow = TRUE)
+  data.frame(instrument = m[, 1L], sample = m[, 2L],
+             stringsAsFactors = FALSE)
+}
+
 test_that("dropping any batch row is visible in the run (M79)", {
   env <- roster_defs()
   dir <- roster_notes()
@@ -229,6 +260,34 @@ test_that("audit_norms() refuses a roster it cannot audit against (M84)", {
   )
 })
 
+test_that("a roster touching `data/` must cover all of it (M86)", {
+  env <- roster_defs()
+  dir <- roster_notes()
+  batch <- env$AUDIT_BATCH
+  slice <- batch[batch$instrument == batch$instrument[[1L]], , drop = FALSE]
+  # Measured 2026-08-15 before this guard: the roster below audits the csie
+  # slice with 0 non-exempt shipped-sample gaps where the shipped roster
+  # reports 23 -- a clean run over 23 samples nothing read. It is already a
+  # superset of the slice's own batch pairs, and csie ships exactly one sample
+  # so it is also complete for the only instrument it names: neither weaker
+  # rule sees it, which is why the rule is all-or-nothing.
+  narrow <- data.frame(instrument = "csie", sample = "1",
+                       stringsAsFactors = FALSE)
+  expect_error(env$audit_norms(slice, dir = dir, roster = narrow),
+               "omits 23 shipped (instrument, sample) pair(s)", fixed = TRUE)
+  # A roster over instruments that do not ship is a fixture's own world and is
+  # never compared against `data/` -- every coverage and marker fixture in this
+  # suite passes one, and the argument exists for exactly that.
+  expect_identical(
+    env$validate_roster(data.frame(instrument = c("fx", "fy"),
+                                   sample = c("1", "1"),
+                                   stringsAsFactors = FALSE)),
+    TRUE
+  )
+  # The full shipped roster passes, defaulted or stated.
+  expect_identical(env$validate_roster(shipped_roster_literal()), TRUE)
+})
+
 test_that("the default roster is resolved before it is validated (M84)", {
   env <- roster_defs()
   dir <- roster_notes()
@@ -395,37 +454,6 @@ test_that("shipped_roster() cannot be re-fused to an object list (M84)", {
   # refusal on both.
   expect_true("roster_from_objects" %in% all.names(body(env$shipped_roster)))
 })
-
-# The shipped roster, written out (M86).
-#
-# ORIGIN: read from `data/*.rda` with `load()` directly, 2026-08-15 -- not from
-# `roster_from_objects()`, and not through the package namespace. That
-# independence is the whole point of the literal. The assertion this replaced
-# compared `audit_norms(slice, dir)` against
-# `audit_norms(slice, dir, roster = shipped_roster())`, and the default IS
-# `shipped_roster()`, so both sides came from one nullary call and no defect of
-# the builder could make it fail (M84 review F6; the M72/M76/M78 shared-origin
-# family). Reading the `.rda` files rather than asking the package is the M78
-# lesson: a data-raw script verifies the ARTIFACT, and no install can shadow it.
-#
-# It is a fence on `data/` as well as on the builder: adding or removing a
-# shipped sample reddens this until the list is updated by hand, which is the
-# intended cost -- shipped norms changing unnoticed is the hazard the whole
-# audit exists for.
-SHIPPED_ROSTER_PAIRS <- c(
-  "cais", "1",    "cais", "2",    "csie", "1",    "csig", "1",
-  "csip", "1",    "csiv", "1",    "iei", "1",     "iei", "2",
-  "igicr", "1",   "igicr", "2",   "igicr", "3",   "iip32", "1",
-  "iip32", "2",   "iip32", "3",   "iip64", "1",   "iip64", "2",
-  "iip64", "3",   "iipsc", "1",   "iipsc", "2",   "iis32", "1",
-  "iis64", "1",   "iitc", "1",    "ipipipc", "1", "isc", "1"
-)
-
-shipped_roster_literal <- function() {
-  m <- matrix(SHIPPED_ROSTER_PAIRS, ncol = 2L, byrow = TRUE)
-  data.frame(instrument = m[, 1L], sample = m[, 2L],
-             stringsAsFactors = FALSE)
-}
 
 test_that("the builder's roster is the shipped data, pair for pair (M86)", {
   env <- roster_defs()
