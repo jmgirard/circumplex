@@ -640,10 +640,14 @@ refuse_shared_untagged_blocks <- function(batch, dir) {
 #
 # Which cells each side fills:
 #
-#   note-only-sample (exempt)     instrument citekey tag; label = the note's own
-#     name for material the source publishes and the package does not ship,
-#     detail = the note's description of it. One row per block and payload, not
-#     per batch pass over the block.
+#   note-only-sample (exempt)     instrument citekey tag sample; label = the
+#     note's own name for material the source publishes and the package does
+#     not ship, detail = the note's description of it. One row per block and
+#     payload, not per batch pass over the block. `sample` is the note row's
+#     own -- the NO_SAMPLE token on every committed row, a sample label where
+#     the note names one -- because the dedupe key at the emitter distinguishes
+#     two such rows by it and a report that did not carry it would emit them
+#     identically (M85).
 #   constructed-credit-reference (exempt)  instrument citekey tag field sample;
 #     label = the credit the note's author constructed rather than quoted.
 #   shipped-value-not-in-note     instrument citekey tag field sample scale
@@ -694,6 +698,16 @@ empty_coverage <- function() {
 # "" is how the parser spells "this block carries no tag"; the report spells it
 # NA, so that `tag` is either a tag or nothing.
 tag_or_na <- function(tag) if (nzchar(tag)) tag else NA_character_
+
+# The same rule over a vector of note-row cells. parse_source_note() validates
+# the VALUE cell for emptiness and not the sample cell, so a blank sample
+# reaches an emitter as "" -- and an empty string in one of the seven KEY
+# columns reads as a label whose text went missing, not as a row that carries
+# no such fact, which is what the schema above declares NA to mean.
+blank_to_na <- function(x) {
+  x[!nzchar(x)] <- NA_character_
+  x
+}
 
 # `roster` is the world the batch is audited against, and it is deliberately
 # NOT derived from `objects`. The two answer different questions: `objects`
@@ -796,7 +810,7 @@ audit_norms <- function(batch = AUDIT_BATCH,
       if (any(fresh)) {
         coverage[[length(coverage) + 1L]] <- coverage_rows(
           "note-only-sample", TRUE, instrument = inst, citekey = citekey,
-          tag = tag_or_na(btag),
+          tag = tag_or_na(btag), sample = blank_to_na(note_only$sample[fresh]),
           label = note_only$scale[fresh], detail = note_only$value[fresh]
         )
       }
