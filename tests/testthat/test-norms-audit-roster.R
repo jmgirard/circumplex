@@ -275,16 +275,37 @@ test_that("a roster touching `data/` must cover all of it (M86)", {
                        stringsAsFactors = FALSE)
   expect_error(env$audit_norms(slice, dir = dir, roster = narrow),
                "omits 23 shipped (instrument, sample) pair(s)", fixed = TRUE)
-  # A roster over instruments that do not ship is a fixture's own world and is
-  # never compared against `data/` -- every coverage and marker fixture in this
-  # suite passes one, and the argument exists for exactly that.
-  expect_identical(
-    env$validate_roster(data.frame(instrument = c("fx", "fy"),
-                                   sample = c("1", "1"),
-                                   stringsAsFactors = FALSE)),
-    TRUE
-  )
-  # The full shipped roster passes, defaulted or stated.
+  # The exemption is asked for at the call site, so no spelling of an
+  # instrument can buy it. Through M86's first pass it was INFERRED, by testing
+  # the roster's instruments against circumplex:::instrument_names(); each
+  # spelling below missed that list and was taken for a fixture's own world,
+  # and each then audited the csie slice at 1 non-exempt shipped-sample gap
+  # where the shipped roster reports 23 (all three measured 2026-08-15).
+  # They are regression fixtures for a rule that no longer reads the column:
+  # what makes them refused is that they omit shipped pairs, which is why the
+  # near-miss family needs no enumerating.
+  for (spelling in list("CSIE", "csie ", NA_character_)) {
+    evasion <- data.frame(instrument = spelling, sample = "1",
+                          stringsAsFactors = FALSE)
+    expect_error(env$audit_norms(slice, dir = dir, roster = evasion),
+                 "omits 24 shipped (instrument, sample) pair(s)", fixed = TRUE)
+  }
+  # The four cells of (exemption asked | not asked) x (real | fake instrument).
+  # Not asked + fake is the one that changed: a roster over instruments that do
+  # not ship used to pass unasked, and every coverage and marker fixture in
+  # this suite leaned on that. It is refused now, and each of those fixtures
+  # says `fixture_world = TRUE` instead.
+  fake <- data.frame(instrument = c("fx", "fy"), sample = c("1", "1"),
+                     stringsAsFactors = FALSE)
+  expect_error(env$validate_roster(fake),
+               "omits 24 shipped (instrument, sample) pair(s)", fixed = TRUE)
+  expect_identical(env$validate_roster(fake, fixture_world = TRUE), TRUE)
+  # Asked + real is the declared lie the exemption deliberately does not
+  # police: a caller who says out loud that this run is not about `data/` is
+  # taken at their word, and the point of the amendment is that saying it is
+  # the only way through. Pinned so the hole stays a stated one.
+  expect_identical(env$validate_roster(narrow, fixture_world = TRUE), TRUE)
+  # The full shipped roster passes, defaulted or stated, exemption or none.
   expect_identical(env$validate_roster(shipped_roster_literal()), TRUE)
 })
 
@@ -371,6 +392,51 @@ test_that("a `Norms` field the builder cannot index is refused (M86)", {
   # that now stand between it and the loop body).
   none <- list(Norms = NULL, Scales = data.frame(Abbrev = "PA", Angle = 90))
   expect_identical(nrow(env$roster_from_objects(list(fz = none))), 0L)
+})
+
+test_that("an instrument named with no object behind it is refused (M86)", {
+  env <- roster_defs()
+  # The third shape, distinct from both above it. `Norms = NULL` is an
+  # instrument that ships nothing to audit and stays a skip; a NULL ENTRY is an
+  # instrument the caller named and then supplied nothing for, so the name is a
+  # claim with no object behind it and the roster loses every sample it would
+  # have carried. Before M86 the loop skipped it in silence -- `NULL$Norms` is
+  # NULL, so it took the no-norms branch -- and through M86's first pass it
+  # reached the is.list() guard and reported "is not a list but a NULL", a type
+  # complaint for what is an empty slot.
+  expect_error(env$roster_from_objects(list(fx = NULL)),
+               "`objects` names fx but carries NULL for it, so the instrument would be rostered with no samples at all",
+               fixed = TRUE)
+  # The skip it must not swallow, restated against this guard: a named entry
+  # that IS a list and whose `Norms` is NULL is still an instrument with
+  # nothing to audit, and is still skipped.
+  none <- list(Norms = NULL, Scales = data.frame(Abbrev = "PA", Angle = 90))
+  expect_identical(nrow(env$roster_from_objects(list(fz = none))), 0L)
+})
+
+test_that("a failed shipped-roster build is not blamed on `roster` (M86)", {
+  env <- roster_defs()
+  # The completeness check reads every shipped norms table, so it can fail for
+  # reasons the caller's roster had nothing to do with. Unattributed, the
+  # BUILDER's message answered for an argument that was well-formed -- the same
+  # message-precedence inversion moving validate_batch() ahead of the default
+  # roster removed, reappearing inside this guard. The stub is what separates
+  # the two: `sys.source()` makes `env` the enclosure of validate_roster(), so
+  # rebinding `shipped_roster` there is what the check resolves.
+  local <- new.env(parent = parent.env(env))
+  for (nm in ls(env)) assign(nm, get(nm, envir = env), envir = local)
+  environment(local$validate_roster) <- local
+  local$shipped_roster <- function() stop("STUB: builder failed")
+  fine <- data.frame(instrument = "fx", sample = "1", stringsAsFactors = FALSE)
+  expect_error(local$validate_roster(fine),
+               "`roster` cannot be checked for completeness: the shipped roster could not be built",
+               fixed = TRUE)
+  # The builder's own words survive inside it -- attribution adds a subject,
+  # it does not swallow the cause.
+  expect_error(local$validate_roster(fine), "STUB: builder failed", fixed = TRUE)
+  # And the exemption never reaches the builder at all, so a fixture is not
+  # held hostage to `data/` parsing cleanly.
+  expect_identical(local$validate_roster(fine, fixture_world = TRUE), TRUE)
 })
 
 test_that("a missing Sample is refused, not dropped by sort() (M84)", {

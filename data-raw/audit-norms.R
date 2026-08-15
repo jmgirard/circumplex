@@ -159,7 +159,7 @@ validate_batch <- function(batch) {
 # "`roster` has no `{}` column", whose matcher accepts BOTH messages, and the
 # cross-discrimination matrix would then certify as distinguishable two
 # refusals it cannot tell apart. Two calls, two keys, two fixtures.
-validate_roster <- function(roster) {
+validate_roster <- function(roster, fixture_world = FALSE) {
   stopifnot(is.data.frame(roster))
   if (!"instrument" %in% names(roster)) {
     stop("`roster` has no `instrument` column; it has: ",
@@ -180,20 +180,41 @@ validate_roster <- function(roster) {
   # batch slice with 0 non-exempt shipped-sample gaps where the shipped roster
   # reports 23. Neither "a superset of the batch" nor "complete per instrument"
   # catches it -- csie ships exactly one sample, so that roster satisfies both.
-  # So a roster that touches `data/` at all must cover the whole of it (M86).
+  # So a roster the caller has not declared a fixture world must cover the
+  # whole of `data/` (M86).
   #
-  # A roster naming no shipped instrument is a fixture's own world and is not
-  # consulted against `data/`: that is what the `roster` argument is for.
-  known <- get("instrument_names", envir = asNamespace("circumplex"))()
-  if (any(roster$instrument %in% known)) {
-    shipped <- shipped_roster()
-    absent <- setdiff(paste(shipped$instrument, shipped$sample),
-                      paste(roster$instrument, roster$sample))
-    if (length(absent)) {
-      stop("`roster` names shipped instruments but omits ", length(absent),
-           " shipped (instrument, sample) pair(s), which would be reported as ",
-           "covered: ", paste(absent, collapse = ", "), call. = FALSE)
-    }
+  # The exemption is ASKED FOR, never inferred. Through M86's first pass it was
+  # inferred, by testing `roster$instrument` against circumplex:::
+  # instrument_names(): a roster naming no known instrument was taken for a
+  # fixture's own world and skipped. That reading is decided by a spelling, so
+  # every near miss bought the exemption -- measured 2026-08-15, `"CSIE"`,
+  # `"csie "` and `NA` each passed this validator and then audited the csie
+  # batch slice at 1 non-exempt shipped-sample gap where the shipped roster
+  # reports 23. Repairing it by matching more spellings fixes the exempt set by
+  # what an author recalled, so the rule is total instead and the fixture says
+  # so at its own call site. Nothing below reads an instrument name to decide
+  # whether to check, which is what makes the spelling irrelevant.
+  if (isTRUE(fixture_world)) return(invisible(TRUE))
+  # `shipped_roster()` reads every shipped norms table, so it can fail for
+  # reasons that have nothing to do with the roster passed here. Unwrapped, its
+  # message surfaced as this call's answer and a caller with a well-formed
+  # explicit roster met the BUILDER's complaint -- the same message-precedence
+  # inversion moving validate_batch() ahead of the default roster removed at
+  # T4, reappearing inside this guard (M86 review F2). It fires on every
+  # non-exempt call, so the attribution is stated rather than left to be
+  # inferred from the message's subject.
+  shipped <- tryCatch(shipped_roster(), error = function(e) {
+    stop("`roster` cannot be checked for completeness: the shipped roster ",
+         "could not be built, which is a fault in `data/` rather than in the ",
+         "roster passed here -- ", conditionMessage(e), call. = FALSE)
+  })
+  absent <- setdiff(paste(shipped$instrument, shipped$sample),
+                    paste(roster$instrument, roster$sample))
+  if (length(absent)) {
+    stop("`roster` omits ", length(absent), " shipped (instrument, sample) ",
+         "pair(s), which would be reported as covered; pass ",
+         "`fixture_world = TRUE` if this roster is not about `data/`: ",
+         paste(absent, collapse = ", "), call. = FALSE)
   }
   invisible(TRUE)
 }
@@ -617,6 +638,18 @@ roster_from_objects <- function(objects) {
     # `Norms` list raised "subscript out of bounds", naming neither the
     # instrument nor the fault (both measured 2026-08-15, M86).
     obj <- objects[[nm]]
+    # A NULL entry is an instrument the caller NAMED and then supplied nothing
+    # for, which is not the same thing as an instrument shipping no norms: the
+    # name is a claim that this instrument is in the world being rostered. It
+    # reached the is.list() guard above through M86's first pass and reported
+    # "is not a list but a NULL", a type complaint for what is really an empty
+    # slot; before M86 it was skipped silently, which is the shape the loop's
+    # other refusals exist to end (M86 review F3).
+    if (is.null(obj)) {
+      stop("`objects` names ", nm, " but carries NULL for it, so the ",
+           "instrument would be rostered with no samples at all",
+           call. = FALSE)
+    }
     if (!is.list(obj)) {
       stop("instrument object for ", nm, " is not a list but a ",
            class(obj)[[1L]], call. = FALSE)
@@ -794,7 +827,8 @@ blank_to_na <- function(x) {
 audit_norms <- function(batch = AUDIT_BATCH,
                         dir = file.path("cairn", "references"),
                         objects = NULL,
-                        roster = NULL) {
+                        roster = NULL,
+                        fixture_world = FALSE) {
   # The batch is validated FIRST, before the default roster is even built: a
   # caller who got both arguments wrong should meet the batch's message, which
   # names the column it is missing. Through M85 the default resolved above this
@@ -805,8 +839,10 @@ audit_norms <- function(batch = AUDIT_BATCH,
   validate_batch(batch)
   if (is.null(roster)) roster <- shipped_roster()
   # validate_roster() still runs after the default resolves, so a caller who
-  # passes nothing is never refused for passing nothing.
-  validate_roster(roster)
+  # passes nothing is never refused for passing nothing. `fixture_world` goes
+  # through unchanged: this function decides nothing about it, so there is one
+  # place the exemption is written down and it is the fixture's own call.
+  validate_roster(roster, fixture_world = fixture_world)
   refuse_shared_untagged_blocks(batch, dir)
   ledger <- list()
   coverage <- list()

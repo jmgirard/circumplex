@@ -118,6 +118,7 @@ test_that("a two-sample instrument agreeing with its source audits clean (M74)",
   dir <- fixture_note_dir()
   res <- env$audit_norms(fixture_batch(), dir = dir,
                          objects = list(fx = fixture_object()),
+                         fixture_world = TRUE,
                          roster = env$roster_from_objects(list(fx = fixture_object())))
 
   # No DISAGREEMENT, rather than no ledger rows: the two Angle rows are marked
@@ -142,6 +143,7 @@ test_that("swapping the two samples' means reddens the audit (M74)", {
   dir <- fixture_note_dir()
   res <- env$audit_norms(fixture_batch(), dir = dir,
                          objects = list(fx = fixture_object(swap = TRUE)),
+                         fixture_world = TRUE,
                          roster = env$roster_from_objects(list(fx = fixture_object())))
 
   # Under the M72 key every one of these four rows compared against sample 1's
@@ -175,6 +177,7 @@ test_that("a note sample no batch entry claims is reported as a gap (M74)", {
   batch <- fixture_batch()[1, , drop = FALSE]
   res <- env$audit_norms(batch, dir = dir,
                          objects = list(fx = fixture_object()),
+                         fixture_world = TRUE,
                          roster = env$roster_from_objects(list(fx = fixture_object())))
   gaps <- res$coverage[!res$coverage$exempt, , drop = FALSE]
   expect_true(any(gaps$side == "note-sample-not-audited"))
