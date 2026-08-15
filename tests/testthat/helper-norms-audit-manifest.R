@@ -163,3 +163,81 @@ NORMS_AUDIT_MANIFEST <- data.frame(
 # expects; every other key selects exactly one site on its own.
 NORMS_AUDIT_AMBIGUOUS_KEYS <- "source note not found: {}"
 
+# Does `msg` match `key` under `kind`? The three kinds fail differently, so they
+# match differently, and dispatching on a kind read from the manifest is what
+# keeps a `stopifnot` message from being judged by the loosest branch.
+#
+# `stop`: the key's literal fragments in order, `{}` standing for an
+# interpolated argument. `stopifnot_named`: the name IS the message, so
+# equality. Positional `stopifnot`: R deparses the condition into the message,
+# so the key is a prefix -- floored at min(nchar(key), 40) where R did not
+# truncate, and unfloored where it did, the line break being R's choice and not
+# the guard's (M83).
+audit_key_matches <- function(kind, key, msg) {
+  if (identical(kind, "stop")) {
+    return(grepl(norms_audit_key_regex(key), msg))
+  }
+  if (identical(kind, "stopifnot_named")) {
+    return(identical(msg, key))
+  }
+  got <- norms_audit_stopifnot_stem(msg)
+  floor <- min(nchar(squish(key)), NORMS_AUDIT_STEM_FLOOR)
+  nzchar(got$stem) && startsWith(squish(key), got$stem) &&
+    (got$truncated || nchar(got$stem) >= floor)
+}
+
+# Assert that `expr` aborts AT the manifest site named by `key` -- never that
+# some error occurred.
+#
+# Three conditions, and the third is the one a per-test regexp cannot express.
+# A regexp is checked only against the message its own fixture raised, so
+# nothing stops it also accepting a sibling site's message: six sites of this
+# script open "source note ", and six tests asserting that fragment would all
+# pass while discriminating nothing. Requiring the raised message to be matched
+# by exactly ONE manifest key folds the retired acceptance matrix's cross-site
+# property into the per-call check.
+#
+# The key is looked up rather than trusted: a key absent from the manifest is a
+# stale call site, and it fails by name here instead of quietly matching
+# nothing.
+expect_audit_abort <- function(expr, key, binding = NULL) {
+  rows <- NORMS_AUDIT_MANIFEST[NORMS_AUDIT_MANIFEST$key == key, , drop = FALSE]
+  if (!nrow(rows)) {
+    stop("`key` names no manifest site: ", key, call. = FALSE)
+  }
+  if (nrow(rows) > 1L) {
+    if (is.null(binding)) {
+      stop("`key` resolves to ", nrow(rows), " sites (", key,
+           "); name the one you expect with `binding`", call. = FALSE)
+    }
+    rows <- rows[rows$binding == binding, , drop = FALSE]
+    if (nrow(rows) != 1L) {
+      stop("`binding` ", binding, " names ", nrow(rows), " sites for: ", key,
+           call. = FALSE)
+    }
+  }
+
+  norms_audit_with_c_messages({
+    err <- tryCatch({
+      expr
+      NULL
+    }, error = identity)
+    expect_true(inherits(err, "error"), info = paste("no error raised:", key))
+    if (!inherits(err, "error")) return(invisible(NULL))
+    msg <- conditionMessage(err)
+
+    expect_true(audit_key_matches(rows$kind[[1L]], key, msg),
+                info = paste0(key, " -- got: ", msg))
+
+    distinct <- unique(NORMS_AUDIT_MANIFEST[c("kind", "key")])
+    hits <- vapply(seq_len(nrow(distinct)), function(i) {
+      audit_key_matches(distinct$kind[[i]], distinct$key[[i]], msg)
+    }, logical(1))
+    expect_true(sum(hits) == 1L,
+                info = paste0(key, " -- message matched ", sum(hits),
+                              " manifest keys: ",
+                              paste(distinct$key[hits], collapse = " | ")))
+  })
+  invisible(NULL)
+}
+

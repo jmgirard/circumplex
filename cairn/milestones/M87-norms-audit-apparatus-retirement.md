@@ -127,7 +127,7 @@ refused: the retirement closes both on the merits.
       `data-raw/audit-norms.R`, watch each redden alone, restore by scratch
       snapshot and re-hash (never `git checkout --`), then build the manifest
       from the unplanted script.
-- [ ] T2 — write `expect_audit_abort()` and convert the 17 script-abort sites
+- [x] T2 — write `expect_audit_abort()` and convert the 17 script-abort sites
       (batch 7, compare 10); the markers 10 go to T3. Keep the kind-aware
       match and the key-regex/stem helpers the retired matcher used, and
       record the `:321`/`:352` pair as the one declared-binding exception.
@@ -156,6 +156,9 @@ refused: the retirement closes both on the merits.
 - 2026-08-15: AC2 amended a second time — the stem floor was written "≥40" where the retired rule is `min(nchar(squish(key)), 40)` (helper-norms-audit-script.R:718), unsatisfiable against the two 20/21-character `stopifnot` keys the script actually carries; the floor clause now covers `stop` keys only and the stem rule moved into AC3's kind-aware match. Jeff approved at the gate; the wrong number was mine, introduced in the first amendment.
 - 2026-08-15: T1 — manifest derived by walking `data-raw/audit-norms.R` at 8604a203 rather than hand-typed: 33 sites, 30 `stop` and 3 positional `stopifnot`, minimum literal-character count 23 against the floor of 15, zero all-placeholder keys, and exactly one duplicated (kind, key) — `source note not found: {}` from `source_note_block_tags` and `parse_source_note`.
 - 2026-08-15: T1 planted-defect probe (scratchpad, results here): baseline FAIL=0; a `stop()` planted in `empty_ledger` FAIL=2; a `stopifnot()` condition planted in the run block FAIL=2 — two forms in two bindings, each reddening alone. Restored by scratch snapshot with `git hash-object` re-checked against the clean blob, never `git checkout --`; `git status` confirmed `data-raw/` untouched afterwards.
+- 2026-08-15: T2 — 17 sites converted to `expect_audit_abort()` (compare 10, batch 7, the last a multi-line `paste0` key done by hand); both files green at 28 and 49 assertions.
+- 2026-08-15: T2 discrimination probe (scratchpad, results here): correct key 0 failures; a WRONG but real manifest key fails naming both sides ("AUDIT_BATCH$divisor is missing for: {} -- got: AUDIT_BATCH$divisor must be numeric, not character"); a key absent from the manifest refuses by name; an expression raising nothing fails; the ambiguous key without `binding` refuses naming its 2 sites.
+- 2026-08-15: T2 method note — a first pass with a DOTALL regex spanned ACROSS call sites, renaming one call while stranding its `norms_audit_matcher` argument and leaving the next site with a bare string; caught by re-reading the file, reverted with a two-path `git checkout --` (no uncommitted work in either), and redone line-anchored requiring the matcher on the immediately following line. Verify a batched edit landed before trusting it.
 - 2026-08-15: criteria audit ([O], fresh context) returned findings on AC1–AC5 and none on AC6–AC7; `_problems/` grep scoping, AC3 already-true-at-HEAD, AC4's comment-line and missing `stopifnot()` domain, and AC5's unrelated counts were fixed at the gate; the hand-list-vs-procedure finding became the first gate question.
 
 ## Decisions
