@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-15 (post-merge pass after M86 merged — row set to done, file archived at 23/25 lines, M80's terminal row pruned to hold retention at 5, two lesson families extended. M7 stays parked on the maintainer's CRAN submission handoff.)_
+_Last hygiene check: 2026-08-15 (post-merge pass after M87 merged — row set to done, file archived at 25/25 lines, M82's terminal row pruned to hold retention at 5, two lesson families extended in place since LESSONS sits at its 50-line cap. M7 stays parked on the maintainer's CRAN submission handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
@@ -9,12 +9,11 @@ Pre-migration history: see `cairn/legacy/` and git log.
 
 | ID | Title | Status | Depends on | Priority | File/Archive |
 |---|---|---|---|---|---|
-| M82 | Make the norms-audit abort registry discriminating | done | M81 | normal | milestones/archive/M82-norms-audit-abort-discrimination.md |
 | M83 | Make the norms-audit abort matcher accept correct sites | done | — | normal | milestones/archive/M83-norms-audit-matcher-repair.md |
 | M84 | Validate the norms-audit roster at its boundary | done | M83 | normal | milestones/archive/M84-norms-audit-roster-validation.md |
 | M85 | Carry the sample through the audit's note-only coverage rows | done | — | low | milestones/archive/M85-norms-audit-note-only-sample.md |
 | M86 | Name every roster shape the norms-audit builder cannot honestly audit | done | — | normal | milestones/archive/M86-norms-audit-roster-refusals.md |
-| M87 | Retire the norms-audit abort apparatus for a manifest check | review | — | normal | milestones/M87-norms-audit-apparatus-retirement.md |
+| M87 | Retire the norms-audit abort apparatus for a manifest check | done | — | normal | milestones/archive/M87-norms-audit-apparatus-retirement.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates
