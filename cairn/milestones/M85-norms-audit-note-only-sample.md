@@ -1,6 +1,6 @@
 # M85: Carry the sample through the audit's note-only coverage rows
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** low
 - **Depends on:** —
 - **Driving RR:** —
@@ -62,7 +62,7 @@ dedupe key at `:702-703`, which already includes `sample` correctly (D-M80-1).
       watch them redden against the current emitter.
 - [x] T3. Regenerate `data-raw/norms-audit-coverage.csv`; diff it against the
       committed version and confirm only the 14 note-only `sample` cells move.
-- [ ] T4. Full check.
+- [x] T4. Full check.
 
 ## Work log
 
@@ -76,6 +76,7 @@ dedupe key at `:702-703`, which already includes `sample` correctly (D-M80-1).
 - 2026-08-14: T3 regenerated the coverage CSV. Column-wise against the pre-change file: 14 cells moved, all of them `sample` on `note-only-sample`, every one NA → the NO_SAMPLE token; no other column and no other side moved. AC4 measured on the same pair — non-exempt gap count 0 before and after, instrument set identical (csie, csig, csip, csiv, iipsc, iis32, iitc, ipipipc, isc).
 - 2026-08-14: T4 — `devtools::test()` clean (FAIL 0, PASS 7226; 6 warnings and 3 skips, all in `test-ssm_sem.R` and glmmTMB/lavaan load, none in a file this diff touches). `document()` emitted zero `resolve link` warnings and left `man/` and `NAMESPACE` byte-unchanged.
 - 2026-08-14: `document()` also rewrote DESCRIPTION's `Config/roxygen2/version` 8.0.0 → 8.1.0, this machine's roxygen2 being newer than the one the repo was documented with. Reverted rather than committed: it is a toolchain stamp unrelated to M85 and repo-wide in effect, so it is the maintainer's to take deliberately, not a stranger to sweep into a milestone branch. It will recur for anyone running `document()` on roxygen2 >= 8.1.0.
+- 2026-08-14: T4 closed — `devtools::check(args = "--no-manual")` Status: OK, 0 errors / 0 warnings / 0 notes (7m 47.5s, circumplex 2.0.0). Status → review.
 
 ## Decisions
 
