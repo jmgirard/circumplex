@@ -41,20 +41,20 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
 
 ## Acceptance criteria
 
-- [ ] **AC1 (BC1)** — `axes_scaling_factor()` evaluates the shared degeneracy
+- [x] **AC1 (BC1)** — `axes_scaling_factor()` evaluates the shared degeneracy
       criterion on `cov2cor(Σ̂)` (the realigned fitted matrix, after its
       existing diagonal guards). On the counterexample-A construction — the
       probe-octant fitted Σ̂ congruence-scaled by D = diag(1e4, 1, …, 1) — it
       returns `reason = NULL` and a `scale` equal to the unscaled matrix's
       `scale` to within 1e-9 relative.
-- [ ] **AC2 (BC2)** — `axes_corrected_se()` evaluates the same criterion on both the
+- [x] **AC2 (BC2)** — `axes_corrected_se()` evaluates the same criterion on both the
       raw realigned Σ̂ and `cov2cor(Σ̂)` and refuses (all three vectors NA, one
       reason) when either trips. On the BC1 counterexample-A construction it
       refuses with the criterion's conditioning literal. Nestedness: over the
       probe grid the revised AC2 test enumerates, plus the committed exemplar
       B, every matrix `axes_scaling_factor()` refuses for degeneracy is also
       refused by `axes_corrected_se()` with the same literal.
-- [ ] **AC3 (BC3)** — The criterion's floor is λmin ≤ λmax·sqrt(p·ε/τ) with
+- [x] **AC3 (BC3)** — The criterion's floor is λmin ≤ λmax·sqrt(p·ε/τ) with
       τ = 1e-6 recorded as a named constant beside the criterion (equivalently:
       the shipped floor × 1000). At p = 3 it refuses the committed exemplar
       `cairn/reviews/rb18-counterexample-b.rds` (λmin/λmax = 1.503e-7 ≤
@@ -62,14 +62,14 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
       (`probe_octant()`, `probe_six()`, `probe_single()` fits at p = 24/12/8,
       whose κ(cov2cor(Σ̂)) measure 10.45/4.85/4.08 — this review — against
       floors at κ ≈ 1.37e4/1.94e4/2.37e4).
-- [ ] **AC4 (BC7)** — An offline exact-rational oracle script lives with the
+- [x] **AC4 (BC7)** — An offline exact-rational oracle script lives with the
       validation materials (no package dependency) and reproduces, from
       `rb18-counterexample-b.rds`: true `cval` = 0.05554788 ± 1e-7 and true
       corrected SEs 0.1476340 ± 1e-6 and 0.1443740 ± 1e-6; and reproduces the
       Q4 sweep (S_t = t·S_B + (1−t)·I, t ∈ {1−2.5e-5, 1−2.5e-4, 1−2.5e-3})
       showing double-precision SE relative error within a factor of 10 of
       p·κ(R)²·ε at each t.
-- [ ] **AC5 (BC8)** — The documented reason enumerations, the criterion's in-code
+- [x] **AC5 (BC8)** — The documented reason enumerations, the criterion's in-code
       rationale, and NEWS state the revised contract: the criterion prices
       `cov2cor(Σ̂)` (plus raw for the SE helper's `naive` arm), the two
       surfaces' degeneracy refusals are nested with exact agreement on
@@ -78,14 +78,14 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
       was one") is corrected to the inertia-invariance argument. The tracking
       record correction of F1 (exemplar B is not a metric counterexample) is
       made wherever RO2's claim is recorded.
-- [ ] **AC6** — AC4's oracle is re-derivable from committed material alone: the
+- [x] **AC6** — AC4's oracle is re-derivable from committed material alone: the
       script names every setting its anchors need that the fixture does not
       carry (`n`, item scales, `item_block`, both zeta flags, `df`,
       `baseline_df`), reads no uncommitted file, and on a clean checkout
       reproduces all of AC4's anchors — the three values at AC4's tolerances
       and the three-point sweep. AC4 is verified through this, not beside it.
       (Ingest audit, findings 7 and 9.)
-- [ ] **AC7** — AC1's invariance is verified across the family it claims. A test
+- [x] **AC7** — AC1's invariance is verified across the family it claims. A test
       sweeps positive-diagonal congruences over `probe_octant()`, `probe_six()`
       and `probe_single()`, asserting NULL `reason` and `scale` within 1e-9
       relative at every point, and varies every axis the claim is free in:
@@ -93,12 +93,12 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
       inflation), location (two diagonal positions), multiplicity (a D moving
       several entries), and ratio (one D with max/min < 10). The `p` factor is
       thereby exercised at p = 24, 12 and 8. (Ingest audit, finding 5.)
-- [ ] **AC8** — AC2's nestedness is verified over a grid this criterion fixes,
+- [x] **AC8** — AC2's nestedness is verified over a grid this criterion fixes,
       not one the implementer chooses: both diagonal positions × k = 0..16 of
       the inflation form on each of the three probe maps, plus exemplar B, plus
       ≥1 non-unit-diagonal indefinite and ≥1 near-singular matrix per map.
       (Ingest audit, finding 1.)
-- [ ] **AC9** — The record this milestone contradicts is superseded, not left
+- [x] **AC9** — The record this milestone contradicts is superseded, not left
       standing: its own 2026-08-15 `## Decisions` entry (criterion "on the raw
       fitted matrix"; "Rejected: any correlation-metric test") carries a dated
       superseding annotation naming RR18, and the metric choice is recorded in
@@ -211,6 +211,76 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
 - 2026-08-15 — **The RR18 binding-criteria ingest audit ([O], fresh context) returned a blocking collision, raised rather than softened.** BC1 requires `axes_scaling_factor()` to ACCEPT the counterexample-A construction; BC2 requires `axes_corrected_se()` to REFUSE it; M89's already-verified **AC2 requires the two surfaces to return non-NULL `reason` at exactly the same grid points**, and counterexample A sits on that grid. BC1–BC8 and AC1–AC7 are therefore **jointly unsatisfiable as written** — no implementation can pass both. RR18's own F5 names the consequence but its BC set never amends AC2. The audit further found: BC1/BC3 mandate what M89's own recorded Decision explicitly rejected ("any correlation-metric test"), so that entry needs superseding, not just extending; BC2's same-literal nestedness is an independent unverified claim that BC5's non-congruence-invariant threshold can falsify, and BC2's verification domain is a test the implementer writes; BC6 becomes unreachable once BC3 and BC4 land, leaving it satisfiable by a string edit; BC4 ships a new user-visible literal `"saturated"` that no criterion documents and that M89's Scope In does not cover; BC7's anchors are not reproducible from the fixture it names (n, item scales, both zeta flags and df are all unstated); and BC1/BC5's probes stand one exemplar in for a family at one p, re-importing the `p`-factor coverage gap prior rounds scored twice. Every numeric anchor the audit could check reproduced exactly. Disposition goes to the user: the criteria set cannot be ingested verbatim without shipping a contradiction.
 
 ## Review
+
+### Round 3 — 2026-08-16, at 792b05f4 (the re-cut), PR #117
+
+`origin/master` unmoved since the branch was cut (0 behind); all evidence below
+gathered fresh at this HEAD against the re-cut's AC1–AC9, superseding rounds 1–2
+(whose evidence verified the superseded criteria set).
+
+- **AC1** — `axes_scaling_factor()`'s helper evaluates the criterion on
+  `cov2cor(sigma)` after the diagonal guards (`R/axes_scaled_fit.R:152-154`,
+  guards at `:139-140`). The counterexample-A test
+  (`test-axes-scaled-fit.R`, "AC1/AC2: a pure diagonal rescaling…") passes:
+  `reason` NULL and `scale` within 1e-9 relative of the unscaled fit's.
+- **AC2** — the SE helper evaluates the criterion on the raw realigned Σ̂ and,
+  when that passes, on `cov2cor(sigma)` (`R/axes_corrected_se.R:264-268`),
+  refusing all three vectors through the single `na_out()`. At counterexample A
+  it refuses `"ill_conditioned"` (same test). Nestedness holds over the AC8
+  grid (3 maps × 2 positions × k = 0..16 + indefinite + near-singular per map)
+  and exemplar B; whole suite FAIL 0.
+- **AC3** — floor is `ev[p] <= ev[1] * sqrt(p * eps / axes_degeneracy_tau)`
+  with `axes_degeneracy_tau <- 1e-6` beside the criterion
+  (`R/axes_corrected_se.R`). Measured this round: exemplar B λmin/λmax =
+  1.503e-7 ≤ floor 2.581e-5 → refused; the three probe-map fitted matrices
+  measure κ(cov2cor(Σ̂)) = 10.45 / 4.849 / 4.077 against floor-κ 1.37e4 /
+  1.937e4 / 2.373e4 → all accepted (and pinned by the AC3 test).
+- **AC4 / AC6** — the oracle was run from a fresh `git clone` of the branch in
+  a scratch directory: ANCHORS PASS (cval +0.0555478790711 against projected
+  0.05554788 ± 1e-7; SEs 0.147633962893 / 0.144373995369 against projected
+  0.1476340 ± 1e-6 / 0.1443740 ± 1e-6) and SWEEP PASS at ratios 3.28 / 2.4 /
+  1.27 against RR18's projected 3.3 / 2.4 / 1.25 — every anchor reproduced
+  from committed material alone; the script's header names n, item scales,
+  item_block, both zeta flags, df, and baseline_df. AC4 verified through AC6's
+  clean-checkout run, as AC6 requires.
+- **AC5** — `sqrt(p * .Machine$double.eps / 1e-6)` appears in the roxygen (2
+  sites), `man/axes_reliability.Rd` (2), and `NEWS.md` (1); the nested-refusal
+  contract sentence ("nest the scaling surface's") in NEWS and the Rd; the
+  "transforms of a matrix that never was one" sentence is gone from
+  `R/axes_corrected_se.R` (grep 0), replaced by the inertia-invariance
+  rationale. F1's record correction verified under AC9.
+- **AC7** — the five-axis congruence sweep (magnitude 10^±{2,4,8}, both
+  directions, two positions, a three-entry multiplicity D, a max/min = 8 ratio
+  D; p = 24/12/8) passes with NULL reasons and scale drift < 1e-9 everywhere.
+- **AC8** — the grid test passes at HEAD; its red was measured pre-move at the
+  counterexample-A construction (work log, T3–T4: sf refused "ill_conditioned"
+  where the AC1 pins NULL, from k = 7).
+- **AC9** — the 2026-08-15 raw-criterion Decisions entry carries the dated
+  superseding annotation naming RR18 (grep 1); D-044 recorded on D-036/D-037's
+  footing (grep 1); `grep -rn "well conditioned raw" cairn/` returns 8 sites,
+  each carrying or adjoining its correction: milestone 106/185 quote the
+  enumerating command itself, 209 is the correcting Decisions entry, 291/302
+  the annotated RO2 bullet, RB18:64 the annotated brief claim, RR18:28/332 the
+  review's own statements of the falsity.
+
+Projection-vs-outcome (Driving RR18): every numeric projection above is shown
+beside its measured value — cval, both SEs, the three sweep ratios, exemplar
+B's eigenvalue ratio, and the three probe-κ measurements; no shortfall
+anywhere (sweep ratio 1.27 vs 1.25 sits inside the oracle's own
+factor-of-10 acceptance band, which is the criterion's stated tolerance).
+
+### Consistency gate (round 3)
+
+- `cairn_validate` exit 0, all checks PASS; 49 advisory WARNs, all pre-existing
+  M7 work-log lines.
+- No `DESIGN.md` change on the branch → `cairn_impact` skipped.
+- `r-package` slot: `document()` emits 0 `resolve link` lines and leaves
+  `man/`/`NAMESPACE`/`DESCRIPTION` diff-free; NEWS entry present (no milestone
+  numbers); `devel/` covered by `^devel$` in `.Rbuildignore`; README sources
+  untouched by this branch; `pkgdown::check_pkgdown()` "No problems found";
+  `devtools::test()` FAIL 0 | WARN 5 | SKIP 3 | PASS 7413 (the 5 warnings in
+  files this branch does not touch); `devtools::check(args = "--no-manual")`
+  Status OK 0/0/0 at this code state (T7, tracking-only commits since).
 
 ### Round 2 — 2026-08-15, at 8778ae06, PR #117
 
