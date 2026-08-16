@@ -191,6 +191,29 @@ IP4 forbids editing it in place · F24 (12) and F16 (5) both disproven — the
 per-AC counts reproduce exactly, and the twin-refusal verification found the
 ordinal deletion sound.
 
+### Re-review after return 1 (2026-08-15)
+
+- **AC3 re-verified and re-ticked.** The naming assertions now match phrases
+  only the refusal's own `what` clause composes. Evidence is the mutation the
+  old assertions survived: gutting the `stopifnot` naming clause reddens 3, and
+  the `stop()` one reddens 2. Test passes 11/11.
+- **AC6 evidenced.** Nine valid mutants, nine killed, none survived — AC1's
+  truncation regression 5 · AC2 unknown-kind 1 · AC2 named-match 2 · AC3
+  reserved-set 2 · AC3 kind-collapse 1 · AC3 stop-refusal 1 · AC4/AC5
+  fourth-field 33 · F1-A naming 3 · F1-B naming 2. Every mutant restored by
+  copy from HEAD's blob, each restore confirmed by `git hash-object` against
+  `git rev-parse HEAD:<path>` (`50fedd235c`, `b24345448a`) with a clean tree
+  between runs.
+- **One mutant retracted as invalid, not counted.** Changing the walk key's
+  `collapse` from one space to two produces a byte-identical key, because
+  `squish()` collapses whitespace runs (measured). A mutation perturbing a
+  quantity the code is provably invariant to cannot redden, and reading that
+  null as missing coverage is the error M60 names.
+- **F2's fix is proven by construction, not by mutation.** The test and the
+  walk now share one derivation and cannot diverge; a mutation of that
+  derivation correctly moves both sides together, so no kill is claimable and
+  none is claimed.
+
 ### Gate outcome: returned to `in-progress` (defect return 1)
 
 F1 demonstrates AC3 failing inside the domain of the procedure it names, which
