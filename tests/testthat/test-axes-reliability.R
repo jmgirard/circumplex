@@ -3077,3 +3077,62 @@ test_that("AC2: the vignette's calibration table and its object pointer travel t
   expect_identical(has_table, has_pointer)
   expect_true(has_table)
 })
+
+
+# ---- M89 AC6: the degeneracy criterion tripping inside axes_reliability() ----
+
+test_that("M89 AC6: a degenerate fitted matrix NAs the corrected SEs and the four scaled statistics together", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  pop <- axes_population_cor(oct, 3L, .35, .10, .08)
+  sigma <- pop$sigma
+  inames <- sprintf("i%02d", seq_len(nrow(sigma)))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, pop$scale)
+
+  # No converged fit is known to reach the degenerate regime, so a degenerate
+  # fitted matrix is CONSTRUCTED and injected at the one seam both consumers
+  # read (axes_fitted_cov): the population matrix with one diagonal entry
+  # inflated by 1e10, which fails the stated criterion (M89) while leaving
+  # everything upstream of the two consumers -- the fit, the point estimates,
+  # lavaan's own fit measures -- untouched.
+  bad <- sigma
+  bad[4L, 4L] <- bad[4L, 4L] * 1e10
+  local_mocked_bindings(axes_fitted_cov = function(fit) bad)
+
+  w <- testthat::capture_warnings(
+    res <- suppressMessages(
+      axes_reliability(cormat = sigma, items = items, angles = oct, n = 600L)
+    )
+  )
+
+  # Each surface's own warning names the SHARED reason -- one from the
+  # corrected-SE surface, one from the scaled-fit surface, same literal.
+  expect_length(grep("ill_conditioned", w, fixed = TRUE), 2L)
+  expect_true(any(grepl("standard errors could not be computed", w)))
+  expect_true(any(grepl("scaled fit statistics could not be computed", w)))
+
+  # Both failure fields carry the shared literal.
+  expect_identical(res$details$se_correction_failed, "ill_conditioned")
+  expect_identical(res$details$fit_scaling_failed, "ill_conditioned")
+
+  # The corrected component SEs are all NA together...
+  expect_true(all(is.na(res$components$SE)))
+
+  # ...and so are the four statistics D-036 scales, while df and srmr are
+  # unaffected: neither is a test statistic, and both must keep reporting
+  # lavaan's own values beside the four NAs.
+  expect_identical(res$fit$chisq, NA_real_)
+  expect_identical(res$fit$pvalue, NA_real_)
+  expect_identical(res$fit$rmsea, NA_real_)
+  expect_identical(res$fit$cfi, NA_real_)
+  expect_identical(res$fit$df, res$details$fit_uncorrected$df)
+  expect_identical(res$fit$srmr, res$details$fit_uncorrected$srmr)
+  expect_true(is.finite(res$fit$df))
+  expect_true(is.finite(res$fit$srmr))
+
+  # The point estimates, reliability and SEm ride on the fit itself, not on
+  # the injected matrix, and stay reported.
+  expect_true(all(is.finite(res$results$reliability)))
+  expect_true(all(is.finite(res$components$Estimate)))
+})

@@ -97,7 +97,7 @@ the scaled statistic → M68 already carries one.
       (`R/axes_corrected_se.R:162-163`) so the stated criterion is the gate.
 - [x] **T5** — Unify the reason vocabulary; confirm the M71 block passes
       byte-unchanged.
-- [ ] **T6** — Assembly-level test through `axes_reliability()` on a
+- [x] **T6** — Assembly-level test through `axes_reliability()` on a
       constructed fitted matrix.
 - [ ] **T7** — Roxygen reason enumeration, `devtools::document()`, NEWS entry.
 - [ ] **T8** — Full `devtools::check()`.
@@ -110,6 +110,8 @@ the scaled statistic → M68 already carries one.
 - 2026-08-15: plan gate chose to decide the cutoff in the build over escalating it to a written Fable review, because the choice is a numerical-conditioning call rather than a new statistical quantity and the build can justify it in code. Falsified by the build finding the cutoff turns on a statistical property of the estimator rather than on conditioning.
 - 2026-08-15: T1–T2 red against HEAD as planned — the pairwise reason grid splits from k = 7 at both positions (se "unidentified"/"singular" against sf NULL), and the AC4 opposite-direction form is the near-zero positive diagonal with off-diagonals kept (raw pricing survives, both correlation-metric surfaces refuse); near-collinear pairs fail both surfaces at the same eps in every scan, so they cannot serve as the opposite-direction probe.
 - 2026-08-15: T3–T5 done — criterion `axes_sigma_degenerate()` chosen and recorded beside its rationale (see Decisions), applied at both consumers ahead of any pricing; se relabels "nonpositive_diagonal" → "singular" and adopts "infinite_diagonal" for +Inf; M71 block byte-unchanged (diff hunks fall at lines 359, 1228, and 1301 only); full suite clean (7215 pass, 0 fail). Also added `axes_fitted_cov()` as the single seam both consumer call sites read, for T6's constructed-matrix injection.
+
+- 2026-08-15: T6 done — assembly test injects a constructed degenerate matrix at the `axes_fitted_cov()` seam via `local_mocked_bindings()`; both surfaces warn with the shared literal, component SEs and the four D-036 statistics are NA together, df/srmr and the point estimates unaffected.
 
 ## Decisions
 
