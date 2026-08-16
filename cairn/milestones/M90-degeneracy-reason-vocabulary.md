@@ -1,6 +1,6 @@
 # M90: Say which degeneracy happened, and stop saying it when it didn't
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** M89
 - **Driving RR:** RR18
@@ -141,7 +141,7 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - [x] **T7** — AC4's grep sweep: roxygen enumerations, the
       `R/axes_reliability.R:1897-1950` comment block (falsified df = 0
       claim), `devtools::document()`, NEWS.
-- [ ] **T8** — Full `devtools::check()`.
+- [x] **T8** — Full `devtools::check()`.
 
 ## Work log
 
@@ -160,6 +160,8 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - 2026-08-16: T6 (AC5 search record) — families: Wishart correlations at 3 concentrations + spectrum-surgery draws pinned 1.05–3× above the refusal floor + 1000-step adversarial hill-climbs from the minimum-cval draw; 10,000 accepted draws per p ∈ {3, 8, 24} (30,000 total; script `scratchpad/ac5-search.R`, seed 20260816). Branch reached 0 times; min cval by map: +1.2e-5 (p=3, df=1), +0.813 (p=8), +0.956 (p=24). Disposition: defensive backstop, relabeled "ill_conditioned"; cb arms settled analytically; seeded smoke tier + exemplar-B upstream-guard identity in test. Suite 8250/0.
 
 - 2026-08-16: T7 (AC4 grep disposition) — repo-wide grep over R/, man/, NEWS.md, vignettes/: vignettes 0 hits; updated the two roxygen passages (refusal criterion, se_correction_failed), both inline reason-list comments (falsified df=0 "unidentified" claim corrected to the measured "indefinite"-via-cval=Inf history; enumeration now 8 literals incl. "saturated"), NEWS M89 bullet's now-false indefinite→ill_conditioned sentence fixed in place, M90 bullet added; document() warning-free, no DESCRIPTION drift; suite 8250/0.
+
+- 2026-08-16: T8 — devtools::check() 0 errors / 0 warnings / 0 notes (9m24s). PDF manual unbuildable on this machine (no TeX; environment fact, M82-family); the class it screens for is ruled out directly — 0 non-ASCII bytes in every line the branch adds to R/ and man/. All tasks done; status → review.
 
 ## Decisions
 
