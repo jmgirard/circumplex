@@ -307,6 +307,20 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # covariance matrix, the correlation-metric quantities downstream are
 # transforms of a matrix that never was one.
 #
+# THE ACCURACY TARGET tau: the largest relative error tolerated in a reported
+# corrected SE before the matrix is refused instead. Calibrated against the
+# exact-rational oracle (devel/degeneracy-oracle/): its Q4 sweep measures the
+# double-precision SE relative error to sit within a factor of 10 of
+# p * kappa(cov2cor(Sigma-hat))^2 * eps (ratios 3.28/2.4/1.27 across three
+# decades of kappa, M89 T1), so refusing when that bound exceeds tau -- i.e.
+# when lambda_min/lambda_max <= sqrt(p*eps/tau) -- caps the error a computed
+# answer can carry at ~10*tau = 1e-5 relative, far below anything a reported
+# SE's downstream use can resolve. The committed counterexample
+# cairn/reviews/rb18-counterexample-b.rds sits at 3.4% relative error
+# (RR18/M89): three orders past any defensible target, and one the shipped
+# sqrt(p*eps) floor -- tau = 1, in these terms -- accepted with reason NULL.
+axes_degeneracy_tau <- 1e-6
+
 # Returns NULL (priceable), "singular" (non-finite entries: the literal the
 # NA/NaN-diagonal route has carried since before M69, now reached here rather
 # than in solve()), or "ill_conditioned". Callers refuse nonpositive and +Inf

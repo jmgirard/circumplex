@@ -133,7 +133,7 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
 - [x] **T1** — Commit the exact-rational oracle as validation material, with
       every setting its anchors depend on named in the script, and pin its five
       figures. It is the evidence base for T2, so it lands first.
-- [ ] **T2** — Choose and record τ = 1e-6 beside the criterion, with the
+- [x] **T2** — Choose and record τ = 1e-6 beside the criterion, with the
       oracle's error table as its calibration. *(RB tripwire: no-oracle —
       RR18 supplies the oracle; re-escalate only if τ's calibration turns out
       to rest on something the oracle cannot measure.)*
@@ -189,6 +189,8 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
 - 2026-08-16: gate chose to keep M89 whole at 9 criteria over splitting the oracle or the documentation out, because the metric move is meaningless without the floor and the floor is unjustifiable without the oracle that calibrates it. Falsified by implementation finding the oracle work separable in practice — it would then have been its own milestone.
 
 - 2026-08-16: T1 done — the exact-rational oracle lands at `devel/degeneracy-oracle/` (an R driver naming every setting the fixture does not carry, plus a stdlib-only Python core for the arithmetic; `devel/` is .Rbuildignore'd so it is dev tooling, not a dependency). It runs from committed material alone and self-checks: anchors PASS (cval +0.0555478790711 against 0.05554788 ± 1e-7; SEs 0.147633962893 and 0.144373995369 against ± 1e-6) and the Q4 sweep PASSes at ratios 3.28 / 2.4 / 1.27, reproducing RR18's 3.3 / 2.4 / 1.25. The ad-hoc `cairn/reviews/rb18-exact-oracle.py` is deleted with it: it read an uncommitted dump and hard-coded n and df, which is exactly what AC6 forbids. No package code changed — `devel/` is outside the build — so the suite cannot have moved and was not re-run for this task.
+
+- 2026-08-16: T2 done — τ = 1e-6 recorded as `axes_degeneracy_tau` beside the criterion, its calibration comment citing the oracle's Q4 error table (T1's measured ratios 3.28/2.4/1.27 against p·κ²·ε) and the 3.4% counterexample; the tripwire's re-escalation condition did not fire — the calibration rests entirely on what the oracle measures. Suite clean (FAIL 0, PASS 7249).
 
 ## Decisions
 
