@@ -241,8 +241,28 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # matrix is a grossly inconsistent estimate of it.
   cb <- sum((1 - rho^2)^2) / baseline_df
 
+  # Defensive backstop, not a diagnosis (M90 AC3/AC5). Four arms:
+  #   cb <= 0 and !is.finite(cb): analytically unreachable -- cb =
+  #     sum((1 - rho^2)^2) / baseline_df over finite rho (sigma passed the
+  #     finiteness gate above), so cb is finite and >= 0, with equality only
+  #     if every |rho| = 1, a matrix the degeneracy criterion refuses first.
+  #   cval <= 0 and !is.finite(cval): tr(U Gamma) >= 0 in exact arithmetic
+  #     (U is the psd projection residual of V, Gamma_R is psd) and df > 0
+  #     past the saturation guard, so a nonpositive or non-finite cval here
+  #     is double-precision cancellation, never evidence about the user's
+  #     model -- which is why this door stopped saying "indefinite" at M90.
+  #     The criterion's tau floor caps the cancellation error a computed
+  #     cval can carry (RR18), and the one matrix measured to produce
+  #     cval < 0 in doubles (exemplar B, true cval +0.0556) is refused
+  #     upstream. Recorded search (M90 AC5, work log): 30,000
+  #     criterion-accepted draws spanning p in {3, 8, 24} plus adversarial
+  #     hill-climbs reached this branch 0 times; the nearest miss, an
+  #     adversarial p = 3 / df = 1 draw at cval = +1.2e-5, still computes.
+  #     Retained because "not reached by the search" is not "unreachable":
+  #     the p = 3 / df = 1 family approaches 0+ continuously, so a deeper
+  #     adversary could land inside the cancellation noise.
   if (!is.finite(cval) || !is.finite(cb) || cval <= 0 || cb <= 0) {
-    return(na_out("indefinite"))
+    return(na_out("ill_conditioned"))
   }
   list(scale = cval, baseline = cb, reason = NULL)
 }

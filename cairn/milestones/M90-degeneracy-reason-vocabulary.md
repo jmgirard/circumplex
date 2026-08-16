@@ -135,7 +135,7 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - [x] **T5** — The cov2cor-arm-first inversion and finiteness hoist in
       `axes_corrected_se()`; M89's nestedness grid re-expected under the new
       vocabulary and re-run (AC7).
-- [ ] **T6** — The `cval ≤ 0` relabel, the four-arm comment, and AC5's
+- [x] **T6** — The `cval ≤ 0` relabel, the four-arm comment, and AC5's
       arm-by-arm record (`cb` by argument; `cval` by reaching test or
       recorded search).
 - [ ] **T7** — AC4's grep sweep: roxygen enumerations, the
@@ -156,6 +156,8 @@ RR18 asks for its constant to be calibrated against the oracle first.
 
 - 2026-08-16: T4 mutants — drop-p 8 fails, squared-p 8 fails, drop-λmax 5 fails (the λmax-scale cells), each applied/restored with blob-hash verification; first perl attempt silently no-opped (interpolated `$double` in \Q…\E), caught by the hash check before any green was trusted.
 - 2026-08-16: T5 — arm-disagreement probe measured red first (cov2cor arm "indefinite", raw arm "ill_conditioned", reported = raw's); finiteness hoisted, cov2cor arm now consulted first, AC7 pin test asserts both surfaces say "indefinite" on the split probe; suite 7448/0.
+
+- 2026-08-16: T6 (AC5 search record) — families: Wishart correlations at 3 concentrations + spectrum-surgery draws pinned 1.05–3× above the refusal floor + 1000-step adversarial hill-climbs from the minimum-cval draw; 10,000 accepted draws per p ∈ {3, 8, 24} (30,000 total; script `scratchpad/ac5-search.R`, seed 20260816). Branch reached 0 times; min cval by map: +1.2e-5 (p=3, df=1), +0.813 (p=8), +0.956 (p=24). Disposition: defensive backstop, relabeled "ill_conditioned"; cb arms settled analytically; seeded smoke tier + exemplar-B upstream-guard identity in test. Suite 8250/0.
 
 ## Decisions
 

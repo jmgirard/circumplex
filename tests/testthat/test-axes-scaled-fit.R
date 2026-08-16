@@ -1608,6 +1608,44 @@ test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 
 })
 
 
+test_that("M90 AC5: the cval backstop is not reached by criterion-accepted draws; the known negative-cval matrix is refused upstream", {
+  # Smoke tier of the recorded AC5 search (work log: 30,000 accepted draws
+  # spanning p in {3, 8, 24} + adversarial hill-climbs, 0 reaches, nearest
+  # miss cval = +1.2e-5 at p = 3 / df = 1 -- the one map family whose cval
+  # approaches 0+). This seeded subset re-runs the most cancellable family:
+  # every criterion-accepted draw must COMPUTE (reason NULL, finite positive
+  # scale), i.e. never fall through to the backstop, whose literal on an
+  # accepted draw could only come from the cval branch.
+  set.seed(20260816)
+  ang <- c(0, 0, 90)
+  scl <- c("A", "A", "B")
+  nm <- c("i1", "i2", "i3")
+  n_acc <- 0L
+  for (i in 1:400) {
+    S <- stats::cov2cor(drop(stats::rWishart(1L, 4L, diag(3))))
+    if (!is.null(axes_sigma_degenerate(S))) next
+    n_acc <- n_acc + 1L
+    dimnames(S) <- list(nm, nm)
+    got <- axes_scaling_factor(S, nm, ang, scl,
+                               fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                               df = 1, baseline_df = 3)
+    expect_null(got$reason, label = sprintf("accepted draw %d computes", i))
+    expect_true(got$scale > 0, label = sprintf("accepted draw %d cval > 0", i))
+  }
+  expect_gt(n_acc, 100L)  # the smoke family actually exercised acceptance
+
+  # The upstream guard fires on the strongest known candidate: exemplar B is
+  # the one matrix measured to produce cval < 0 in doubles (true cval
+  # +0.0556, RR18), and the degeneracy criterion -- not the backstop --
+  # is what refuses it. Asserted at the criterion itself, so the refusal's
+  # identity is pinned, not inferred from a shared literal.
+  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
+  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  fx <- readRDS(fp)
+  expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
+})
+
+
 test_that("AC3: tau is a named constant, and the floored criterion accepts all three probe-map fits", {
   skip_if_not_installed("lavaan")
   # The accuracy target is a named constant beside the criterion, not an
