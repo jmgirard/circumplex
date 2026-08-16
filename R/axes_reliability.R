@@ -1911,24 +1911,34 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # derived statistics are NA ("singular", "ill_conditioned" from the
       # shared degeneracy criterion (M89), "unidentified", "df_mismatch",
       # "baseline_df_mismatch", "indefinite", "infinite_diagonal"), enumerated
-      # from the source the same way as the SE list above. Six of the seven are
-      # reachable at the helper's contract boundary and five are fired by a
-      # test; "unidentified" joined them at M89 via a degenerate Delta rather
-      # than a degenerate Sigma-hat (two identical derivative matrices, which
-      # the criterion below cannot see and does not refuse).
+      # from the source the same way as the SE list above, and carrying the
+      # same caveat: it enumerates what the helper CONTAINS, not what a user
+      # has been shown. All seven are reachable at the helper's contract
+      # boundary; what a call through axes_reliability() can actually reach is
+      # a strictly smaller set, because this assembly refuses upstream several
+      # of the shapes that reach them.
       #
-      # "indefinite" is the exception, and it is M89 that made it one. That
-      # guard fires on a nonpositive scaling factor, and until M89 an
-      # indefinite Sigma-hat reached it: at the octant probe with one diagonal
-      # entry pulled to 1e-3 (lambda_min = -0.382) BOTH surfaces answered
-      # "indefinite", where they now answer "ill_conditioned" -- the criterion
-      # refuses every such matrix first. No construction reaching it has been
-      # found since: c is a trace of a positive-semidefinite operator against a
-      # positive-semidefinite Gamma_R, so c <= 0 wants round-off at a value
-      # already near zero, and 1500 random positive-definite correlation
-      # matrices at this map returned c in [0.94, 1.29] with no refusal at all.
-      # So this literal now carries the same caveat the SE list does: it
-      # enumerates what the helper CONTAINS, not what a user has been shown.
+      # Two of them are worth naming, because both are reached by a Sigma-hat
+      # the M89 criterion ACCEPTS -- it prices the raw matrix, while everything
+      # below cov2cor()s first, so a matrix well conditioned raw and degenerate
+      # in the correlation metric passes the door and fails later:
+      #
+      #   "unidentified"  fires when Delta'V Delta is singular. Two routes,
+      #                   both measured: a degenerate Delta (a one-scale map
+      #                   makes zeta1 identical to the all-ones xi2), and an
+      #                   ordinary 3-scale map at a raw-accepted but
+      #                   correlation-degenerate Sigma-hat.
+      #   "indefinite"    fires on a nonpositive or non-finite scaling factor.
+      #                   Measured at p = 3: c goes negative on a Sigma-hat the
+      #                   criterion accepts (kappa 6.65e6, well below the p = 3
+      #                   cutoff), and the df = 0 saturated case divides by zero
+      #                   at the cval line below.
+      #
+      # Neither route survives the assembly: axes_reliability() refuses fewer
+      # than four scales, and axes_design() drops a component collinear with
+      # another, so no call through it has been seen to reach either. That is a
+      # statement about this assembly's gates, NOT about the criterion, which
+      # does not separate these cases -- see the ROADMAP row M89 graduated.
       fit_scaling_failed = scaling$reason,
       ols_shadow = ols
     ),

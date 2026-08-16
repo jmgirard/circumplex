@@ -135,6 +135,8 @@ the scaled statistic → M68 already carries one.
 
 - 2026-08-15: T10 done — `"unidentified"` is fired as a returned reason on BOTH surfaces by a new test each, with its condition asserted and a passing control that passes for the claim's reason (dropping `fit_zeta1` is the only change). The probe is a degenerate Δ rather than a degenerate Σ̂: a single-scale map makes `zeta1` identical to the all-ones `xi2`, which the criterion cannot see (`axes_sigma_degenerate()` returns NULL on that Σ̂, asserted in both tests). `"indefinite"` has no construction left and the reachability claim at `R/axes_reliability.R` is corrected in place rather than tested: measured, an indefinite Σ̂ (λmin = −0.382) answered `"indefinite"` on both surfaces pre-M89 and answers `"ill_conditioned"` now, and 1500 random PD correlation matrices returned c ∈ [0.94, 1.29] with no refusal. Suite FAIL 0 / PASS 7250 (up 19); check Status OK; `document()` warning-free, no `man/` diff. Status → review.
 
+- 2026-08-15: /milestone-review round 2 — all seven criteria re-verified at 8778ae06, consistency gate green. 23 findings, 2 actioned: RO1 (92) falsified the reachability comment T10 added and is fixed here (with the same wording in both tests and RO5's dead assertion); RS5 (85) is round 1's O1, disposition unchanged. RO2 (70), the mirror-image half of O1, is recorded on the ROADMAP row — verified, helper-boundary only. Not a defect return: no acceptance criterion failed, and RO1 is an internal comment rather than a defect in what the package does for users.
+
 ## Decisions
 
 - 2026-08-15 — **The stated criterion is a relative smallest-eigenvalue floor on the raw fitted matrix: refuse as `"ill_conditioned"` when λmin(Σ̂) ≤ λmax(Σ̂)·sqrt(p·eps), evaluated after each surface's diagonal guards.** (≈ κ ≥ 1.4e7 at p = 24.) Grounds: both consumers build the information matrix from Σ̂⁻¹ twice, so its entries carry relative error growing like p·κ²·eps, and the floor is exactly where that bound reaches 1. Measured fit: every pre-M89 divergence point sits at or above it (the inflation grid splits at κ = 2.1e7; the emergent near-collinear failures begin at κ = 7.9e8) and every measured accurately-computing point sits below it (κ ≤ 8.6e6 on the probe grids), so the criterion refuses nothing the surfaces were pricing accurately. One inequality also covers indefinite and exactly singular matrices (λmin ≤ 0) — needed: an indefinite Σ̂ (λmin = −0.11) sailed through both surfaces with reason NULL and scale 0.95 before M89. Rejected: any correlation-metric test (cov2cor of the inflated matrix stays at condition 10.45 at every magnitude 10⁰–10¹⁶ — blind, the plan's T3 note); the bare eps^(−1/2) ≈ 6.7e7 cutoff without the dimension factor (leaves the measured k = 7 divergence point, κ = 2.1e7, computing on one surface while emergently refused on the other — the exact disagreement M89 exists to remove). Recorded in code beside `axes_sigma_degenerate()` (R/axes_corrected_se.R).
@@ -183,6 +185,75 @@ below is re-gathered at this HEAD, superseding round 1's.
 - No `DESIGN.md` principle changed → `cairn_impact` skipped.
 - `r-package` `consistency-gate` slot: `document()` emits 0 `resolve link`
   lines and no diff; `NEWS.md` entry present; no new top-level files or exports.
+
+### Independent fresh-context review (round 2)
+
+Three distinct-evidence reviewers over the updated branch, then a fresh scorer.
+23 findings: 10 from the [O] diff-bug lens, 8 from the [S] blame lens, 5 from
+the [S] prior-review lens. Round-1 findings re-reported by the lenses were
+re-scored on their own merits. Two actioned at >= 80.
+
+**RO1 (92) — the `"indefinite"` reachability comment T10 added was FALSE, and
+is corrected.** It claimed "No construction reaching it has been found since",
+resting on 1500 random PD matrices at p = 24 only. The criterion admits kappa up
+to 1/sqrt(p*eps), which is 3.8e7 at p = 3, and c goes negative in that admitted
+band. Verified two ways by this review: deterministically, a saturated model
+(p = 3, df = 0) makes `R/axes_scaled_fit.R:217` divide by zero, giving
+`cval = Inf` -> `"indefinite"` on a matrix `axes_sigma_degenerate()` returns
+NULL for; and on a captured exemplar at kappa = 6.65e6, two orders below the
+p = 3 cutoff. **Fixed now**: the comment no longer claims unreachability. It
+states both measured routes, names the assembly gates that stop them
+(`axes_reliability()` refuses < 4 scales; `axes_design()` drops a collinear
+component), and says explicitly that this is a fact about the assembly and not
+about the criterion. The same falsified "only" wording in both T10 tests is
+corrected with it, and RO5's vacuous `expect_false(any(is.nan(...)))` — dead by
+construction after `na_out()` — is removed.
+
+**RS5 (85) — round 1's O1, restated by the blame lens.** Disposition unchanged:
+follow-up on the graduated ROADMAP row, not fixed here.
+
+**Below the action bar (21), logged not actioned.** Highest first:
+
+- RO4 (75) / RS3 (74) — T10 fires `"unidentified"` through a single-scale map,
+  which `axes_reliability()` refuses upstream, so the literal is fired only at
+  the helper contract boundary. Both tests now say so in as many words.
+- RO2 (70) — **the mirror of RS5/O1, and the more serious half.** Because the
+  criterion prices raw Sigma-hat while both surfaces price `cov2cor(Sigma-hat)`,
+  a matrix well conditioned raw and degenerate in the correlation metric passes
+  the door and fails later: at p = 3 over ~8,200 criterion-accepted draws, 36
+  returned finite corrected SEs with `se_correction_failed = NULL` beside
+  `fit_scaling_failed = "indefinite"` — this milestone's Goal failure mode with
+  the roles swapped. Reproduced by this review at kappa = 6.65e6. Scored 70
+  because `axes_reliability()` refuses fewer than 4 scales and the reviewer
+  found 0 disagreements at p = 4, 5, 6, 8, so no user path reaches it. Recorded
+  on the ROADMAP row beside O1: together the two say the raw-vs-correlation
+  metric choice is the open question, not the cutoff value.
+- RO3 (68) — the T10 tests' "only a degenerate Delta" prose was the same
+  overstatement that produced RO1; corrected with it.
+- RP1 (66) — the ROADMAP row's round-1 note went stale when T9 and T10 closed
+  two of the three findings it listed; corrected in place and marked.
+- RO7 (65) / RS8 (62) — the load-bearing `p` factor is exercised at p = 24 only;
+  sharpened by round 2, whose counterexamples sit at p = 3 where that factor
+  makes the cutoff loosest. Carried on the ROADMAP row.
+- RP5 (62) — the sibling `se_correction_failed` comment still carries a
+  "never fired" caveat that round 2 shows was already stale on master.
+- RS1 (55) / RP3 (55) — M70's declined reason-code parity overturned with no
+  recorded supersession.
+- RS2 (55) / RP4 (55) — M71's declined `+Inf` label, likewise.
+- RO5 (52) — vacuous NaN assertion in the new SE test; removed with RO1's fix.
+- RS6 (50) — T4's "relax the emergent refusals" never happened; they are
+  shadowed, and round 2 shows they remain reachable.
+- RS7 (48) — the NA/NaN warning-count collapse is still absent from NEWS.
+- RO8 (40) — all four NEWS literal claims verified accurate; two wording gaps.
+- RO9 (38) — `p` used before it is defined in the generated Rd prose.
+- RS4 (35) — the rewritten `na.rm` comment drops M70's attribution.
+- RO6 (34) — `eigen(symmetric = TRUE)` folds to the symmetric part.
+- RO10 (20) — the `Config/roxygen2/version` stamp.
+- RP2 (5) — explicitly not a finding (records that no regression was found).
+
+**Re-verified after the RO1 fix:** `devtools::test()` FAIL 0 | PASS 7249;
+`devtools::check(args = "--no-manual")` Status OK; `document()` 0 `resolve link`
+lines, no `man/` diff.
 
 ### Round 1 — 2026-08-15, at 416cb655, PR #117.
 Branch 5 commits ahead of `origin/master`, 0 behind — no sync merge needed.

@@ -1437,10 +1437,18 @@ test_that("AC4: the non-inflation form drives the divergence the other way, and 
 test_that("AC2: the scaling factor refuses as 'unidentified' when the model's derivatives are degenerate", {
   # The sibling of the corrected-SE test in test-axes-corrected-se.R, and for
   # the same reason: M89's degeneracy criterion refuses a degenerate Sigma-hat
-  # ahead of every solve() on this surface, so the door below is reachable only
-  # by a Delta that is degenerate while Sigma-hat is well conditioned. A
+  # ahead of every solve() on this surface, so this door is NOT reached the way
+  # an exactly singular matrix is. It is reached here by a degenerate Delta: a
   # single-scale map with zeta1 fitted makes `zeta1` identical to the all-ones
   # `xi2`, so two columns of Delta coincide.
+  #
+  # A degenerate Delta is not the only route -- the criterion prices the RAW
+  # matrix, so a Sigma-hat that is well conditioned raw and degenerate after
+  # cov2cor() also reaches this door with an ordinary map (measured at p = 3).
+  # That second route is the ROADMAP follow-up M89 graduated, not this test's
+  # subject; this one pins the literal against a cause it can hold fixed.
+  # Neither route survives axes_reliability(), which refuses fewer than four
+  # scales -- so this is the helper's contract boundary, not a user path.
   pp <- probe_octant()
   p <- nrow(pp$sigma)
   one_scale <- rep("A", p)

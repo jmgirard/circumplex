@@ -1211,9 +1211,17 @@ test_that("the corrected SEs refuse as 'unidentified' when the model's derivativ
   # Until M89 no test asserted this literal as a returned reason -- only that
   # the string occurs in the source (the BC5 enumeration test above). The
   # degeneracy criterion M89 added refuses a degenerate SIGMA-hat before any
-  # pricing runs, so a probe that reaches this door must be degenerate in
-  # DELTA instead: the information matrix Delta'V Delta is singular while
-  # Sigma-hat itself is perfectly well conditioned.
+  # pricing runs, so this probe reaches the door a different way: the
+  # information matrix Delta'V Delta is singular while Sigma-hat itself is
+  # perfectly well conditioned.
+  #
+  # A degenerate Delta is not the ONLY route to this literal. The criterion
+  # prices the raw matrix while the corrected branch prices cov2cor(), so a
+  # Sigma-hat well conditioned raw and degenerate after normalization reaches
+  # it too, with an ordinary map (measured at p = 3) -- that is the ROADMAP
+  # follow-up M89 graduated. This test pins the literal against the one cause
+  # it can hold fixed, and axes_reliability() refuses fewer than four scales,
+  # so this is the helper's contract boundary rather than a user path.
   #
   # The construction is the model's own: `xi2` is an all-ones matrix and
   # `zeta1` is the same-scale indicator, so a map whose items all sit on ONE
@@ -1241,7 +1249,6 @@ test_that("the corrected SEs refuse as 'unidentified' when the model's derivativ
   expect_true(all(is.na(got$naive)))
   expect_true(all(is.na(got$corrected)))
   expect_true(all(is.na(got$fiml_ratio)))
-  expect_false(any(is.nan(got$corrected)))
 
   # The passing control, and it passes for the claim's reason: the ONLY change
   # is dropping zeta1, which removes the duplicate derivative matrix. Same
