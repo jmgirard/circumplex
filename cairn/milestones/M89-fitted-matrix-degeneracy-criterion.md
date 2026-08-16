@@ -1,122 +1,151 @@
-# M89: One degeneracy criterion for the two fitted-matrix consumers
+# M89: Price the degeneracy criterion in the metric the reported numbers live in
 
 - **Status:** planned
 - **Priority:** normal
 - **Depends on:** —
-- **Driving RR:** —
+- **Driving RR:** RR18
 - **Principles touched:** IP1, GP2, GP4
 - **Branch/PR:** `m89-fitted-matrix-degeneracy` / https://github.com/jmgirard/circumplex/pull/117
 
 ## Goal
 
-Give `axes_reliability()`'s two consumers of `lavaan::fitted(fit)$cov` one
-stated criterion for when that matrix is too degenerate to price, so a user
-never receives NA corrected SEs beside silently scaled fit statistics derived
-from the same matrix.
+Move `axes_reliability()`'s fitted-matrix degeneracy criterion off the raw
+matrix and onto `cov2cor(Sigma-hat)` -- the metric every reported number is
+actually computed in -- and tighten its floor to a stated accuracy target, so
+the package stops refusing matrices it can price exactly and starts refusing
+the ones on which it currently returns a wrong standard error.
 
 ## Scope
 
-Surface tier: **user-facing** — `axes_reliability()`'s `$fit`, `$components`
-and printed output are exported surfaces a user reads, and the reason literals
-are documented and printed verbatim.
+Surface tier: **user-facing** -- `axes_reliability()`'s `$fit`, `$components`
+and printed output are exported surfaces, and the reason literals are
+documented and printed verbatim.
 
-**In:** one stated degeneracy criterion on the fitted covariance matrix,
-recorded beside its rationale and applied at both consumers
-(`R/axes_reliability.R:1715`, `:1824`); relaxing `axes_corrected_se()`'s
-emergent `solve()`-based refusals so the stated criterion is what gates;
-one shared reason vocabulary across both surfaces, including the `+Inf` case;
-what `axes_reliability()` reports when the criterion fires; regression probes
-at the boundary; the documented reason enumerations and a NEWS entry.
+This milestone was re-cut on 2026-08-16 after RR18, which measured that half
+its first cut's premise was wrong (diagonal inflation is benign for every
+reported statistic) and that the real defect is a floor a thousand times too
+loose, returning corrected SEs wrong by 3.4% at `reason = NULL`. The branch's
+shipped code is the starting point, not the deliverable.
 
-**Out:** the upstream input-side positive-definiteness gate at
-`R/axes_reliability.R:1428`, which prices the user's input R rather than the
-fitted matrix → stays unowned, no candidate row (no defect is known in it).
-Any change to the scaling arithmetic itself → D-036 stands. A new oracle for
-the scaled statistic → M68 already carries one.
+**In:** evaluating the criterion at `cov2cor(Sigma-hat)` for every reported
+quantity, and at both arms of the SE helper, whose three vectors refuse as a
+unit (the retained cost in the Deviations table); the tau = 1e-6 floor; the
+cross-surface contract as nested refusals; the exact-rational oracle as
+committed validation material; the documented reason enumerations, the in-code
+rationale, and NEWS.
+
+**Out:** the reason-vocabulary split, the `df == 0` guard, the `cval <= 0`
+relabel (RR18 BC4-BC6), and RR18 rec 7's decoupling of `naive` -> **M90**,
+planned in this run, `Depends on: M89`. The scaling arithmetic -> D-036
+stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
 
 ## Acceptance criteria
 
-- [x] **AC1** — A single stated degeneracy criterion on the fitted covariance
-      matrix is recorded in code beside its rationale, and is applied at both
-      consumers: the `corrected <- axes_corrected_se(...)` expression and the
-      `scaling <- axes_scaling_factor(...)` expression in
-      `R/axes_reliability.R`. *(RB tripwire: no-oracle — escalation offered and
-      declined at the plan gate; see work log.)*
-- [x] **AC2** — The two surfaces agree, in both senses, over the probe grid the
-      AC4 test enumerates (both diagonal positions × k = 0..16 × the forms in
-      AC4) plus the `+Inf` and `-Inf` cases: they return a non-NULL `reason` at
-      exactly the same grid points, and wherever both refuse they name the same
-      reason literal. `axes_corrected_se()` is the surface that adopts
-      `"infinite_diagonal"` for `+Inf`; `axes_scaling_factor()`'s literal is
-      unchanged. Asserted by a test that runs that grid and compares the two
-      `reason` fields pairwise.
-- [x] **AC3** — The new criterion is evaluated after the existing `<= 0` and
-      `is.infinite()` diagonal guards in `axes_scaling_factor()`
-      (`R/axes_scaled_fit.R:147-148`), and the M71 AC1/AC2 block in
-      `tests/testthat/test-axes-scaled-fit.R:1258-1300` passes byte-unchanged.
-- [x] **AC4** — Regression probes fail against the pre-milestone code at ≥2
-      distinct diagonal positions, and include ≥1 non-inflation form (a
-      near-collinear item pair or a near-zero positive diagonal) that drives
-      the divergence in the opposite direction — `axes_scaling_factor()`
-      refusing while the raw-priced branch survives.
-- [x] **AC5** — The documented reason enumerations (`R/axes_reliability.R`
-      roxygen and the regenerated `man/axes_reliability.Rd`) and `NEWS.md`
-      name the new literal and the new NA condition.
-- [x] **AC6** — On a constructed fitted matrix that trips the criterion inside
-      `axes_reliability()`, the corrected component SEs and the four scaled
-      statistics D-036 scales (`chisq`, `pvalue`, `rmsea`, `cfi`) are all NA,
-      each surface warning names the shared reason, and `df` and `srmr` are
-      unaffected.
-- [x] **AC7** — `devtools::test()` clean and `devtools::check(args =
-      "--no-manual")` clean, with a warning-free `devtools::document()` and a
-      diff-free `man/`/`NAMESPACE` beyond AC6's intended change.
+- [ ] **AC1 (BC1)** — `axes_scaling_factor()` evaluates the shared degeneracy
+      criterion on `cov2cor(Σ̂)` (the realigned fitted matrix, after its
+      existing diagonal guards). On the counterexample-A construction — the
+      probe-octant fitted Σ̂ congruence-scaled by D = diag(1e4, 1, …, 1) — it
+      returns `reason = NULL` and a `scale` equal to the unscaled matrix's
+      `scale` to within 1e-9 relative.
+- [ ] **AC2 (BC2)** — `axes_corrected_se()` evaluates the same criterion on both the
+      raw realigned Σ̂ and `cov2cor(Σ̂)` and refuses (all three vectors NA, one
+      reason) when either trips. On the BC1 counterexample-A construction it
+      refuses with the criterion's conditioning literal. Nestedness: over the
+      probe grid the revised AC2 test enumerates, plus the committed exemplar
+      B, every matrix `axes_scaling_factor()` refuses for degeneracy is also
+      refused by `axes_corrected_se()` with the same literal.
+- [ ] **AC3 (BC3)** — The criterion's floor is λmin ≤ λmax·sqrt(p·ε/τ) with
+      τ = 1e-6 recorded as a named constant beside the criterion (equivalently:
+      the shipped floor × 1000). At p = 3 it refuses the committed exemplar
+      `cairn/reviews/rb18-counterexample-b.rds` (λmin/λmax = 1.503e-7 ≤
+      2.581e-5); it accepts all three probe-map fitted matrices
+      (`probe_octant()`, `probe_six()`, `probe_single()` fits at p = 24/12/8,
+      whose κ(cov2cor(Σ̂)) measure 10.45/4.85/4.08 — this review — against
+      floors at κ ≈ 1.37e4/1.94e4/2.37e4).
+- [ ] **AC4 (BC7)** — An offline exact-rational oracle script lives with the
+      validation materials (no package dependency) and reproduces, from
+      `rb18-counterexample-b.rds`: true `cval` = 0.05554788 ± 1e-7 and true
+      corrected SEs 0.1476340 ± 1e-6 and 0.1443740 ± 1e-6; and reproduces the
+      Q4 sweep (S_t = t·S_B + (1−t)·I, t ∈ {1−2.5e-5, 1−2.5e-4, 1−2.5e-3})
+      showing double-precision SE relative error within a factor of 10 of
+      p·κ(R)²·ε at each t.
+- [ ] **AC5 (BC8)** — The documented reason enumerations, the criterion's in-code
+      rationale, and NEWS state the revised contract: the criterion prices
+      `cov2cor(Σ̂)` (plus raw for the SE helper's `naive` arm), the two
+      surfaces' degeneracy refusals are nested with exact agreement on
+      unit-diagonal inputs, and the raw-metric rationale sentence at
+      `R/axes_corrected_se.R:299-308` ("...transforms of a matrix that never
+      was one") is corrected to the inertia-invariance argument. The tracking
+      record correction of F1 (exemplar B is not a metric counterexample) is
+      made wherever RO2's claim is recorded.
+- [ ] **AC6** — AC4's oracle is re-derivable from committed material alone: the
+      script names every setting its anchors need that the fixture does not
+      carry (`n`, item scales, `item_block`, both zeta flags, `df`,
+      `baseline_df`), reads no uncommitted file, and on a clean checkout
+      reproduces all of AC4's anchors — the three values at AC4's tolerances
+      and the three-point sweep. AC4 is verified through this, not beside it.
+      (Ingest audit, findings 7 and 9.)
+- [ ] **AC7** — AC1's invariance is verified across the family it claims. A test
+      sweeps positive-diagonal congruences over `probe_octant()`, `probe_six()`
+      and `probe_single()`, asserting NULL `reason` and `scale` within 1e-9
+      relative at every point, and varies every axis the claim is free in:
+      magnitude (10^k, k ∈ {2,4,8}), direction (deflation as well as
+      inflation), location (two diagonal positions), multiplicity (a D moving
+      several entries), and ratio (one D with max/min < 10). The `p` factor is
+      thereby exercised at p = 24, 12 and 8. (Ingest audit, finding 5.)
+- [ ] **AC8** — AC2's nestedness is verified over a grid this criterion fixes,
+      not one the implementer chooses: both diagonal positions × k = 0..16 of
+      the inflation form on each of the three probe maps, plus exemplar B, plus
+      ≥1 non-unit-diagonal indefinite and ≥1 near-singular matrix per map.
+      (Ingest audit, finding 1.)
+- [ ] **AC9** — The record this milestone contradicts is superseded, not left
+      standing: its own 2026-08-15 `## Decisions` entry (criterion "on the raw
+      fitted matrix"; "Rejected: any correlation-metric test") carries a dated
+      superseding annotation naming RR18, and the metric choice is recorded in
+      `cairn/DECISIONS.md` on the footing D-036 and D-037 set. AC5's record
+      correction is made at every site `grep -rn "well conditioned raw" cairn/`
+      returns, that command being this criterion's enumerating procedure.
+      (Ingest audit, findings 9 and 10.)
+
+### Deviations from RR18
+
+| BC | Departure | Why |
+|---|---|---|
+| BC4 | Deferred to M90 | The `df == 0` guard and its `"saturated"` literal price the model's df, not the fitted matrix; it is a distinct defect from the metric question and M89's Scope In does not reach it (ingest audit, finding 7). |
+| BC5 | Deferred to M90 | The `"indefinite"`/`"ill_conditioned"` split changes the literal AC2 (BC2) asserts agreement on; sequencing it after the metric move keeps AC2's nestedness structural rather than contingent on a non-congruence-invariant threshold (ingest audit, finding 3). |
+| BC2 | Retained cost recorded, not removed | AC2's all-three-vectors refusal means a raw-arm failure also NAs `corrected`/`fiml_ratio`, which RR18 rec 8 rejects in principle and rec 7 fixes by decoupling `naive`. Accepted here at Jeff's 2026-08-16 gate decision, deferred to M90: no real call reaches such an input, and the decoupling changes the helper's return contract. |
+| BC6 | Deferred to M90 | The `cval ≤ 0` relabel is unreachable once BC3 and BC4 land, so it needs BC4's guard in place and a direct probe to be verifiable at all (ingest audit, finding 6). |
 
 ## Coverage
 
 - AC1 → T3, T4
-- AC2 → T1, T4, T5
-- AC3 → T5
-- AC4 → T1, T2
-- AC5 → T7
-- AC6 → T6
-- AC7 → T8
+- AC2 → T3, T4
+- AC3 → T2, T4
+- AC4 → T1
+- AC5 → T6
+- AC6 → T1
+- AC7 → T5
+- AC8 → T3
+- AC9 → T6
 
 ## Tasks
 
-- [x] **T1** — Test-first: the AC2 grid as a failing test — both diagonal
-      positions × k = 0..16 at the octant probe, comparing the two `reason`
-      decisions pairwise. Red against HEAD from k = 7 up.
-- [x] **T2** — Add the non-inflation probe form (near-collinear pair or
-      near-zero positive diagonal) and confirm by measurement that it drives
-      the divergence in the opposite direction. Red against HEAD.
-- [x] **T3** — Choose the stated criterion and record its rationale in code.
-      It must price the raw Σ̂: `cov2cor()` of an inflated matrix stays at
-      condition 10.45, so a correlation-metric test cannot see this at all.
-- [x] **T4** — Apply the criterion at both consumers; relax
-      `axes_corrected_se()`'s emergent `solve()`-based refusals
-      (`R/axes_corrected_se.R:162-163`) so the stated criterion is the gate.
-- [x] **T5** — Unify the reason vocabulary; confirm the M71 block passes
-      byte-unchanged.
-- [x] **T6** — Assembly-level test through `axes_reliability()` on a
-      constructed fitted matrix.
-- [x] **T7** — Roxygen reason enumeration, `devtools::document()`, NEWS entry.
-- [x] **T8** — Full `devtools::check()`.
-- [x] **T9** — Requested at the 2026-08-15 review gate: NEWS names two of the
-      four user-visible reason-literal changes. Add the other two — an exactly
-      singular fitted matrix moves `"singular"` → `"ill_conditioned"` and an
-      indefinite one moves `"indefinite"` → `"ill_conditioned"`, on both
-      surfaces — then re-run `devtools::test()` and `devtools::check()`.
-- [x] **T10** — Requested at the same gate: no test asserts `"unidentified"` or
-      `"indefinite"` as a *returned* reason from either fitted-matrix surface
-      (review finding O3, scored 65). Fire what is reachable with its condition
-      asserted and a passing control, and correct the reachability claim in
-      `R/axes_reliability.R` for whatever is not.
-- [ ] **T11** — Requested at the round-2 review gate: escalate the criterion's
-      metric choice to a Fable review via `/milestone-brief`. The question is
-      which matrix the degeneracy criterion should price — raw Sigma-hat, as
-      shipped, or the `cov2cor(Sigma-hat)` both surfaces actually invert — given
-      two verified counterexamples pointing in opposite directions (O1/RS5, 85;
-      RO2, 70). Ingest the RR, then re-review.
+- [ ] **T1** — Commit the exact-rational oracle as validation material, with
+      every setting its anchors depend on named in the script, and pin its five
+      figures. It is the evidence base for T2, so it lands first.
+- [ ] **T2** — Choose and record τ = 1e-6 beside the criterion, with the
+      oracle's error table as its calibration. *(RB tripwire: no-oracle —
+      RR18 supplies the oracle; re-escalate only if τ's calibration turns out
+      to rest on something the oracle cannot measure.)*
+- [ ] **T3** — Test-first: the AC8 grid asserting the nested contract, red
+      against the branch's current code at the counterexample-A construction.
+- [ ] **T4** — Move the criterion to `cov2cor(Σ̂)` at the scaling surface and to
+      both arms at the SE helper; apply the τ floor.
+- [ ] **T5** — The AC7 invariance sweep: all five axes, all three probe maps.
+- [ ] **T6** — Roxygen enumerations, the corrected in-code rationale,
+      `devtools::document()`, NEWS, the AC9 supersession (in-file annotation +
+      `DECISIONS.md` entry), and the AC9 record correction at both grep sites.
+- [ ] **T7** — Full `devtools::check()`.
 
 ## Work log
 
@@ -150,6 +179,14 @@ the scaled statistic → M68 already carries one.
 - 2026-08-16: RR18 ingested — answers and both verified measurements recorded in Decisions; ingest audit ([O], fresh context) run before any criteria change, per protocol, and it returned a blocking collision rather than a clean set. RB18/RR18 stay LIVE in `cairn/reviews/` rather than archiving now: the binding criteria are not yet ingested, and the re-cut is what ingests them. Archive the pair once it does.
 
 - 2026-08-16: **M89 re-cut at Jeff's decision at the ingest gate.** RR18 falsifies half the milestone's premise (the diagonal-inflation regime is benign for every reported statistic, so M89's refusals there are false NAs on correct numbers) and relocates the real defect to a cutoff a thousand times too loose, measured as a 3.4% wrong `components$SE` at `reason = NULL`. Its replacement criteria are jointly unsatisfiable with the shipped AC2, and its recommended metric is what this milestone's own Decisions entry explicitly rejected — so the criteria set needs authoring whole, not extending, and that entry needs superseding. Status → planned for `/milestone-plan`. Counted as a re-cut for the thrash rule: this is M89's first, and it follows an escalation rather than a defect return (the two review returns before it were both withheld approvals, not gate failures).
+
+- 2026-08-16: re-cut authored. Task numbering restarts at T1 — the work-log entries above naming T6-T10 belong to the superseded cut and are history, not this plan's tasks.
+
+- 2026-08-16: criteria audit ([O], fresh context, over the drafted wording) returned 13 findings. Twelve fixed before the gate: AC7 widened past magnitude-only probes to direction, multiplicity and scale-ratio; AC8 added to fix AC2's nestedness grid, which was otherwise a domain the implementer chooses; AC6 rewritten to subsume AC4 (satisfiable by already-committed material) and to name `item_block`, which its enumeration omitted; AC9 added for the supersession of this milestone's own contrary Decisions entry and for the record correction, whose sites `grep -rn "well conditioned raw" cairn/` enumerates; and in M90, AC4 extended to AC3's relabel, AC5 given an evidentiary standard for its unreachability escape, AC6 moved to near-threshold anchors (its far-field pair passed with no `p` in the code at all), and AC7 added so the vocabulary split cannot silently kill M89's cross-surface contract. The thirteenth went to the gate.
+
+- 2026-08-16: gate chose to accept AC2's all-three-vectors refusal as a recorded cost and defer RR18 rec 7's decoupling of `naive` to M90, over taking the decoupling now. Rejected because it changes `axes_corrected_se()`'s return contract mid-milestone and no real call reaches the input that makes the cost bite. Falsified by any evidence a reachable fit trips the raw arm while the cov2cor arm computes.
+
+- 2026-08-16: gate chose to keep M89 whole at 9 criteria over splitting the oracle or the documentation out, because the metric move is meaningless without the floor and the floor is unjustifiable without the oracle that calibrates it. Falsified by implementation finding the oracle work separable in practice — it would then have been its own milestone.
 
 ## Decisions
 

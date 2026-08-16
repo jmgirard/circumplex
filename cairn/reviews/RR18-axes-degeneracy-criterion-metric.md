@@ -400,20 +400,20 @@ same object to double arithmetic, and no user action differs between them.
 
 ## Binding criteria
 
-- **BC1** — `axes_scaling_factor()` evaluates the shared degeneracy
+- BC1: `axes_scaling_factor()` evaluates the shared degeneracy
   criterion on `cov2cor(Σ̂)` (the realigned fitted matrix, after its
   existing diagonal guards). On the counterexample-A construction — the
   probe-octant fitted Σ̂ congruence-scaled by D = diag(1e4, 1, …, 1) — it
   returns `reason = NULL` and a `scale` equal to the unscaled matrix's
   `scale` to within 1e-9 relative.
-- **BC2** — `axes_corrected_se()` evaluates the same criterion on both the
+- BC2: `axes_corrected_se()` evaluates the same criterion on both the
   raw realigned Σ̂ and `cov2cor(Σ̂)` and refuses (all three vectors NA, one
   reason) when either trips. On the BC1 counterexample-A construction it
   refuses with the criterion's conditioning literal. Nestedness: over the
   probe grid the revised AC2 test enumerates, plus the committed exemplar
   B, every matrix `axes_scaling_factor()` refuses for degeneracy is also
   refused by `axes_corrected_se()` with the same literal.
-- **BC3** — The criterion's floor is λmin ≤ λmax·sqrt(p·ε/τ) with
+- BC3: The criterion's floor is λmin ≤ λmax·sqrt(p·ε/τ) with
   τ = 1e-6 recorded as a named constant beside the criterion (equivalently:
   the shipped floor × 1000). At p = 3 it refuses the committed exemplar
   `cairn/reviews/rb18-counterexample-b.rds` (λmin/λmax = 1.503e-7 ≤
@@ -421,28 +421,28 @@ same object to double arithmetic, and no user action differs between them.
   (`probe_octant()`, `probe_six()`, `probe_single()` fits at p = 24/12/8,
   whose κ(cov2cor(Σ̂)) measure 10.45/4.85/4.08 — this review — against
   floors at κ ≈ 1.37e4/1.94e4/2.37e4).
-- **BC4** — `axes_scaling_factor()` refuses `df == 0` with the literal
+- BC4: `axes_scaling_factor()` refuses `df == 0` with the literal
   `"saturated"`, checked after the two df-consistency guards and before any
   matrix computation; the brief's deterministic p = 3 saturated construction
   (S = {1,.5,.3;.5,1,.4;.3,.4,1}, scales A/A/B, `fit_zeta1 = TRUE`, df = 0)
   returns `"saturated"`, and no path reaches `cval = Inf`.
-- **BC5** — Within the refusal region the eigenvalue criterion returns
+- BC5: Within the refusal region the eigenvalue criterion returns
   `"indefinite"` iff λmin < −λmax·sqrt(p·ε), else `"ill_conditioned"`;
   measured anchors: the M89 T9 indefinite probe (λmin = −0.382) returns
   `"indefinite"` on both surfaces, and the exactly/near-singular probe
   (λmin = −9.32e-16) returns `"ill_conditioned"` on both.
-- **BC6** — The `cval ≤ 0` (or non-finite) refusal at the end of
+- BC6: The `cval ≤ 0` (or non-finite) refusal at the end of
   `axes_scaling_factor()` no longer returns `"indefinite"`; it returns
   `"ill_conditioned"`, with the tr(UΓ) ≥ 0 rationale recorded in a comment
   beside it.
-- **BC7** — An offline exact-rational oracle script lives with the
+- BC7: An offline exact-rational oracle script lives with the
   validation materials (no package dependency) and reproduces, from
   `rb18-counterexample-b.rds`: true `cval` = 0.05554788 ± 1e-7 and true
   corrected SEs 0.1476340 ± 1e-6 and 0.1443740 ± 1e-6; and reproduces the
   Q4 sweep (S_t = t·S_B + (1−t)·I, t ∈ {1−2.5e-5, 1−2.5e-4, 1−2.5e-3})
   showing double-precision SE relative error within a factor of 10 of
   p·κ(R)²·ε at each t.
-- **BC8** — The documented reason enumerations, the criterion's in-code
+- BC8: The documented reason enumerations, the criterion's in-code
   rationale, and NEWS state the revised contract: the criterion prices
   `cov2cor(Σ̂)` (plus raw for the SE helper's `naive` arm), the two
   surfaces' degeneracy refusals are nested with exact agreement on
