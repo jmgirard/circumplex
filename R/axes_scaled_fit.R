@@ -100,6 +100,14 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   if (!isTRUE(p * (p - 1) / 2 == baseline_df)) {
     return(na_out("baseline_df_mismatch"))
   }
+  # A saturated model has no chi-square to scale: T = 0 on 0 degrees of
+  # freedom, and the cval line below divides by df. Before M90 this reached
+  # cval = Inf and fell out of the final refusal as "indefinite" -- a claim
+  # about the user's model that df = 0 never licenses. Checked AFTER the two
+  # df-consistency guards (a df = 0 that does not match the derivative set is
+  # a df_mismatch, not a saturation) and before any matrix computation; this
+  # guard is also what keeps df nonzero at the cval division (M90 AC1).
+  if (df == 0) return(na_out("saturated"))
   # `na.rm = TRUE` is load-bearing, not defensive. Without it a single NA or
   # NaN on the fitted diagonal makes the predicate NA and `if (NA)` ERRORS with
   # "missing value where TRUE/FALSE needed" -- in place of the named-reason NA

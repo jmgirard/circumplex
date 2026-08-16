@@ -383,6 +383,45 @@ test_that("AC1: the factor refuses rather than guessing when its inputs are wron
 })
 
 
+test_that("M90 AC1: a saturated model (df = 0) is refused as 'saturated', not 'indefinite'", {
+  # The deterministic saturated construction (RR18 BC4): p = 3, scales A/A/B
+  # with zeta1 fitted gives q = 6 = p(p+1)/2, so df = 0 and the cval line's
+  # division by df has no chi-square to scale. Before M90 this reached
+  # cval = Inf and reported "indefinite" -- a statement about the user's
+  # model that a saturated model never licenses. The guard sits after the
+  # two df-consistency guards (a df = 0 that does NOT match the derivative
+  # set must still refuse "df_mismatch") and before any matrix computation.
+  S <- matrix(c(1, .5, .3, .5, 1, .4, .3, .4, 1), 3L, 3L)
+  nm <- c("i1", "i2", "i3")
+  dimnames(S) <- list(nm, nm)
+  ang <- c(0, 0, 90)
+  scl <- c("A", "A", "B")
+
+  d <- axes_se_derivs(ang, scl, NULL, TRUE, FALSE)
+  expect_identical(length(d$mats), 6L)  # q = p(p+1)/2: saturated
+
+  expect_warning(
+    got <- axes_scaling_factor(S, nm, ang, scl,
+                               fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+                               df = 0, baseline_df = 3),
+    "could not be computed"
+  )
+  expect_identical(got$reason, "saturated")
+  expect_identical(got$scale, NA_real_)
+  expect_identical(got$baseline, NA_real_)
+
+  # Guard order: a zero df inconsistent with the derivative set is a
+  # df_mismatch, not a saturation -- the df-consistency guards run first.
+  pp <- probe_octant()
+  got <- suppressWarnings(
+    axes_scaling_factor(pp$sigma, pp$names, pp$item_angle, pp$scale,
+                        fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+                        df = 0, baseline_df = nrow(pp$sigma) * (nrow(pp$sigma) - 1) / 2)
+  )
+  expect_identical(got$reason, "df_mismatch")
+})
+
+
 test_that("AC1: lavaan still forms rmsea, cfi and pvalue the way the scaler assumes", {
   skip_if_not_installed("lavaan")
   # The scaler does not re-derive lavaan's fit indices -- it recomputes them

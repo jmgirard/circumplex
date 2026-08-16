@@ -1,11 +1,11 @@
 # M90: Say which degeneracy happened, and stop saying it when it didn't
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** M89
 - **Driving RR:** RR18
 - **Principles touched:** GP2, GP4
-- **Branch/PR:** —
+- **Branch/PR:** m90-degeneracy-reason-vocabulary
 
 ## Goal
 
@@ -123,10 +123,10 @@ RR18 asks for its constant to be calibrated against the oracle first.
 
 ## Tasks
 
-- [ ] **T1** — Test-first: the deterministic saturated construction, red
+- [x] **T1** — Test-first: the deterministic saturated construction, red
       against M89's merged code (measured at the replan audit: it returns
       `"indefinite"` today).
-- [ ] **T2** — The `df == 0` guard and its `"saturated"` literal.
+- [x] **T2** — The `df == 0` guard and its `"saturated"` literal.
 - [ ] **T3** — Test-first: the indefinite/near-singular partition at the
       nestedness-grid probes, red where the two currently share one literal.
 - [ ] **T4** — The partition in `axes_sigma_degenerate()`, plus the AC6
@@ -149,6 +149,8 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - 2026-08-16: replanned under the current rulebook (/milestone-plan). Full-mode criteria audit ([O] fresh-context reader, two passes): round 1 returned 1 blocker (AC7's "grid still passes" unsatisfiable — the grid pins the literals AC2/AC8 change) plus 10 findings; round 2 on the final wordings returned clean except the AC7 finiteness hoist, added. AC1/AC4/AC5 narrowed to named procedures, AC2 anchors restated by construction+metric, AC6 gains the λmax/form axes and the drop-λmax mutant, the arm-order task added; AC8 split to M91 at the gate.
 - 2026-08-16: alternative rejected at the gate — keeping AC8 (naive decoupling) in M90; lost to the size tripwire (8 criteria, ~12 tasks after repairs); falsified if the split forces `axes_corrected_se()`'s return shape to be reopened twice across the M90/M91 seam.
 - 2026-08-16: alternative rejected at the gate — tightening the AC2 partition to the eigensolver-noise band (~p·ε); the reviewed BC5 constant kept with a demanded convergence-noise rationale; falsified by implementation finding no defensible rationale, in which case escalate via RB (no-oracle) rather than silently change the constant.
+
+- 2026-08-16: T1+T2 — red premise re-measured on the branch (construction returns "indefinite" via cval = Inf pre-guard; q = 6, df = 0 verified); guard added after the df-consistency guards with a df_mismatch-ordering control; suite 7423 pass / 0 fail.
 
 ## Decisions
 
