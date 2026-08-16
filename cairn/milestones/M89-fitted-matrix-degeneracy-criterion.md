@@ -141,7 +141,50 @@ the scaled statistic → M68 already carries one.
 
 ## Review
 
-Reviewed 2026-08-15 on `m89-fitted-matrix-degeneracy` at 416cb655, PR #117.
+### Round 2 — 2026-08-15, at 8778ae06, PR #117
+
+Re-reviewed after T9 and T10 landed. `origin/master` has not moved since the
+branch was cut (0 behind, nothing unpushed), so no sync merge; all evidence
+below is re-gathered at this HEAD, superseding round 1's.
+
+- **AC1** — `axes_sigma_degenerate()` defined once (`R/axes_corrected_se.R:315`)
+  beside its rationale, called at both named consumers' helpers
+  (`R/axes_corrected_se.R:259`, `R/axes_scaled_fit.R:149`) for the
+  `corrected <- axes_corrected_se(...)` and `scaling <- axes_scaling_factor(...)`
+  expressions (`R/axes_reliability.R:1727`, `:1836`). One definition, two sites.
+- **AC2** — the grid test passes (78 assertions, 0 failures); pre-milestone the
+  same grid diverges at 20 of 68 points. `+Inf` → `"infinite_diagonal"` on both;
+  `-Inf` → `"singular"` on both.
+- **AC3** — guards precede the criterion in both files
+  (`R/axes_scaled_fit.R:139,140,149`; `R/axes_corrected_se.R:244,253,259`);
+  master's `test-axes-scaled-fit.R:1258-1300` block is present verbatim at
+  HEAD:1262 and passes.
+- **AC4** — re-measured against a scratch `origin/master` checkout: the
+  inflation form diverges from k = 7 at **both** positions 4 and 20
+  (`"unidentified"` against `NULL`); the non-inflation form (`sigma[4,4] <-
+  1e-3`) has the raw-priced branch surviving with finite naive SEs while
+  `axes_scaling_factor()` refuses — AC4's stated direction — and its
+  `"ill_conditioned"` pin fails pre-milestone (both answer `"indefinite"`).
+- **AC5** — `"ill_conditioned"` in roxygen (5 sites), `man/axes_reliability.Rd`
+  (2), and `NEWS.md` (3). After T9 the NEWS entry names all six literals in
+  play: `"nonpositive_diagonal"`, `"singular"`, `"unidentified"`,
+  `"infinite_diagonal"`, `"indefinite"`, `"ill_conditioned"`.
+- **AC6** — the assembly test passes (16 assertions): both warnings name the
+  shared reason, `components$SE` and all four scaled statistics NA together,
+  `df`/`srmr` finite and equal to `details$fit_uncorrected`.
+- **AC7** — `devtools::test()` **FAIL 0 | WARN 5 | SKIP 3 | PASS 7250**;
+  `devtools::check(args = "--no-manual")` **Status: OK** (0/0/0, test phase OK
+  at 401s). `document()` warning-free, `man/`/`NAMESPACE` diff-free.
+
+### Consistency gate (round 2)
+
+- `cairn_validate` exit 0, all 16 CHECKs PASS; advisory WARNs are M7 work-log
+  lines only.
+- No `DESIGN.md` principle changed → `cairn_impact` skipped.
+- `r-package` `consistency-gate` slot: `document()` emits 0 `resolve link`
+  lines and no diff; `NEWS.md` entry present; no new top-level files or exports.
+
+### Round 1 — 2026-08-15, at 416cb655, PR #117.
 Branch 5 commits ahead of `origin/master`, 0 behind — no sync merge needed.
 
 ### Acceptance-criterion evidence
