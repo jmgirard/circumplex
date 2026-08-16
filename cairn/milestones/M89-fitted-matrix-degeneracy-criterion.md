@@ -1,6 +1,6 @@
 # M89: One degeneracy criterion for the two fitted-matrix consumers
 
-- **Status:** in-progress
+- **Status:** blocked
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -144,6 +144,8 @@ the scaled statistic → M68 already carries one.
 - 2026-08-15: /milestone-review round 2 — all seven criteria re-verified at 8778ae06, consistency gate green. 23 findings, 2 actioned: RO1 (92) falsified the reachability comment T10 added and is fixed here (with the same wording in both tests and RO5's dead assertion); RS5 (85) is round 1's O1, disposition unchanged. RO2 (70), the mirror-image half of O1, is recorded on the ROADMAP row — verified, helper-boundary only. Not a defect return: no acceptance criterion failed, and RO1 is an internal comment rather than a defect in what the package does for users.
 
 - 2026-08-15: merge approval WITHHELD at the round-2 gate — Jeff chose a Fable review of the criterion's metric choice over merging as it stands, the per-instance escalation approval D-004 requires. Logged as T11; status review → in-progress. Not a defect return: no acceptance criterion failed and nothing met the return floor, so this does not count toward the thrash rule.
+
+- 2026-08-15: blocked on RB18 (`cairn/reviews/RB18-axes-degeneracy-criterion-metric.md`) — which matrix the degeneracy criterion should price, with both counterexamples and the correlation-metric blindness of the inflation regime stated, and D-037 surfaced as the standing precedent the answer must engage.
 
 ## Decisions
 
