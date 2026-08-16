@@ -1,6 +1,6 @@
 # M89: One degeneracy criterion for the two fitted-matrix consumers
 
-- **Status:** blocked
+- **Status:** planned
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -146,6 +146,10 @@ the scaled statistic → M68 already carries one.
 - 2026-08-15: merge approval WITHHELD at the round-2 gate — Jeff chose a Fable review of the criterion's metric choice over merging as it stands, the per-instance escalation approval D-004 requires. Logged as T11; status review → in-progress. Not a defect return: no acceptance criterion failed and nothing met the return floor, so this does not count toward the thrash rule.
 
 - 2026-08-15: blocked on RB18 (`cairn/reviews/RB18-axes-degeneracy-criterion-metric.md`) — which matrix the degeneracy criterion should price, with both counterexamples and the correlation-metric blindness of the inflation regime stated, and D-037 surfaced as the standing precedent the answer must engage.
+
+- 2026-08-16: RR18 ingested — answers and both verified measurements recorded in Decisions; ingest audit ([O], fresh context) run before any criteria change, per protocol, and it returned a blocking collision rather than a clean set. RB18/RR18 stay LIVE in `cairn/reviews/` rather than archiving now: the binding criteria are not yet ingested, and the re-cut is what ingests them. Archive the pair once it does.
+
+- 2026-08-16: **M89 re-cut at Jeff's decision at the ingest gate.** RR18 falsifies half the milestone's premise (the diagonal-inflation regime is benign for every reported statistic, so M89's refusals there are false NAs on correct numbers) and relocates the real defect to a cutoff a thousand times too loose, measured as a 3.4% wrong `components$SE` at `reason = NULL`. Its replacement criteria are jointly unsatisfiable with the shipped AC2, and its recommended metric is what this milestone's own Decisions entry explicitly rejected — so the criteria set needs authoring whole, not extending, and that entry needs superseding. Status → planned for `/milestone-plan`. Counted as a re-cut for the thrash rule: this is M89's first, and it follows an escalation rather than a defect return (the two review returns before it were both withheld approvals, not gate failures).
 
 ## Decisions
 
