@@ -74,11 +74,11 @@ their existing candidate rows.
       each duplicate-free, so two guards identical in (kind, binding, key) redden
       the suite rather than collapsing onto one row — the separability the
       deleted ordinal carried, kept as a refusal.
-- [ ] AC6 Each test this milestone adds reddens under a mutation of a helper line
+- [x] AC6 Each test this milestone adds reddens under a mutation of a helper line
       it locks. The Review section records one summary line — the tests, the
       mutations applied, the assertions that failed — and a `git hash-object`
       comparison showing each mutated helper file restored to its pre-mutation blob.
-- [ ] AC7 `Rscript -e 'devtools::test()'` clean; `git status` empty before any
+- [x] AC7 `Rscript -e 'devtools::test()'` clean; `git status` empty before any
       gate is reported clean.
 
 ## Coverage
@@ -213,6 +213,11 @@ ordinal deletion sound.
   walk now share one derivation and cannot diverge; a mutation of that
   derivation correctly moves both sides together, so no kill is claimable and
   none is claimed.
+
+- **AC7 evidenced.** Full `devtools::test()` clean at FAIL 0 / WARN 6 / SKIP 3 / PASS 7132,
+  warnings and skips unchanged from the T1 baseline's 7051 passes; `git status` empty at the
+  same tree. The count is unchanged from the pre-fix run because the F1 repair changed what
+  two assertions match, not how many there are.
 
 ### Gate outcome: returned to `in-progress` (defect return 1)
 
