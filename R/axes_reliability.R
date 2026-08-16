@@ -1713,7 +1713,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # `n` is the sample size the SEs are priced at on each path: complete cases
   # for listwise, the supplied `n` for cormat.
   corrected <- axes_corrected_se(
-    lavaan::fitted(fit)$cov, all_cols, item_angle, item_scale, item_block,
+    axes_fitted_cov(fit), all_cols, item_angle, item_scale, item_block,
     n = n, fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2
   )
   se_reported <- if (missing == "fiml") {
@@ -1822,7 +1822,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # this point, so no scaled statistic is ever computed against a saturated
   # model that was never reached.
   scaling <- axes_scaling_factor(
-    lavaan::fitted(fit)$cov, all_cols, item_angle, item_scale, item_block,
+    axes_fitted_cov(fit), all_cols, item_angle, item_scale, item_block,
     fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2,
     df = fm[["df"]], baseline_df = fm[["baseline.df"]]
   )
@@ -1868,12 +1868,14 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # offering a supported way to ASK for the uncorrected number.
       se_uncorrected = se_uncorrected,
       # NULL when the correction succeeded; otherwise why every corrected SE
-      # is NA ("nonpositive_diagonal" from the guard's own door, and
-      # "singular", "unidentified", "indefinite" forwarded from
-      # axes_se_pricing()). The list named two of the four until M71 audited
-      # it against the source; "indefinite" in particular has never been
-      # observed to fire (R/axes_corrected_se.R:185-198), so this enumerates
-      # what the helper CONTAINS, not what a user has been shown.
+      # is NA ("singular" from the nonpositive-diagonal door or non-finite
+      # entries, "infinite_diagonal", "ill_conditioned" from the stated
+      # degeneracy criterion -- M89, axes_sigma_degenerate() -- and
+      # "unidentified", "indefinite" forwarded from axes_se_pricing() as
+      # backstops behind it). M71 audited the list against the source;
+      # "indefinite" in particular has never been observed to fire
+      # (R/axes_corrected_se.R:185-198), so this enumerates what the helper
+      # CONTAINS, not what a user has been shown.
       se_correction_failed = corrected$reason,
       # What lavaan reported before the correlation-metric scaling (M68), on the
       # same footing as `se_uncorrected` above: visible for comparison and for
@@ -1894,10 +1896,11 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # Both are NA together when the scaling failed.
       scaling_factor = c(model = scaling$scale, baseline = scaling$baseline),
       # NULL when the scaling succeeded; otherwise why the four chi-square-
-      # derived statistics are NA ("singular", "unidentified", "df_mismatch",
+      # derived statistics are NA ("singular", "ill_conditioned" from the
+      # shared degeneracy criterion (M89), "unidentified", "df_mismatch",
       # "baseline_df_mismatch", "indefinite", "infinite_diagonal"), enumerated
       # from the source the same way as the SE list above -- but WITHOUT its
-      # never-fired caveat: this surface's guards are its own, and all six
+      # never-fired caveat: this surface's guards are its own, and all seven
       # literals here are reachable at the helper's contract boundary.
       fit_scaling_failed = scaling$reason,
       ols_shadow = ols

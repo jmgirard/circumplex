@@ -83,19 +83,19 @@ the scaled statistic → M68 already carries one.
 
 ## Tasks
 
-- [ ] **T1** — Test-first: the AC2 grid as a failing test — both diagonal
+- [x] **T1** — Test-first: the AC2 grid as a failing test — both diagonal
       positions × k = 0..16 at the octant probe, comparing the two `reason`
       decisions pairwise. Red against HEAD from k = 7 up.
-- [ ] **T2** — Add the non-inflation probe form (near-collinear pair or
+- [x] **T2** — Add the non-inflation probe form (near-collinear pair or
       near-zero positive diagonal) and confirm by measurement that it drives
       the divergence in the opposite direction. Red against HEAD.
-- [ ] **T3** — Choose the stated criterion and record its rationale in code.
+- [x] **T3** — Choose the stated criterion and record its rationale in code.
       It must price the raw Σ̂: `cov2cor()` of an inflated matrix stays at
       condition 10.45, so a correlation-metric test cannot see this at all.
-- [ ] **T4** — Apply the criterion at both consumers; relax
+- [x] **T4** — Apply the criterion at both consumers; relax
       `axes_corrected_se()`'s emergent `solve()`-based refusals
       (`R/axes_corrected_se.R:162-163`) so the stated criterion is the gate.
-- [ ] **T5** — Unify the reason vocabulary; confirm the M71 block passes
+- [x] **T5** — Unify the reason vocabulary; confirm the M71 block passes
       byte-unchanged.
 - [ ] **T6** — Assembly-level test through `axes_reliability()` on a
       constructed fitted matrix.
@@ -108,7 +108,11 @@ the scaled statistic → M68 already carries one.
 - 2026-08-15: criteria audit ([O], fresh context) returned seven findings; six fixed before the gate (numbering as shipped): AC1's `grep` procedure selected four lines of which two were comments, replaced with expression-pinned sites; AC3's ordering constraint stated; AC6 restated at the helper-plus-assembly boundary with a constructed matrix, no real fit being known to reach the regime, and narrowed to the four statistics D-036 scales; AC4 widened past one exemplar to two positions plus a non-inflation form; AC5 added for the documented enumerations the user-facing tier obliges. The two judgment calls went to the gate as one scope-width question; the draft's AC2 and AC3 were merged after the gate to hold the criteria count under the split tripwire.
 - 2026-08-15: plan gate chose the wide scope — one stated criterion gating both surfaces, emergent `solve()`-based refusals relaxed, one shared reason vocabulary — over the narrow scope that adds the criterion and leaves the existing refusals and labels alone, because the narrow version leaves the `+Inf` case still disagreeing and meets the Goal only half. Falsified by evidence that relaxing the emergent refusals lets a genuinely unpriceable matrix through, which would argue those guards were load-bearing.
 - 2026-08-15: plan gate chose to decide the cutoff in the build over escalating it to a written Fable review, because the choice is a numerical-conditioning call rather than a new statistical quantity and the build can justify it in code. Falsified by the build finding the cutoff turns on a statistical property of the estimator rather than on conditioning.
+- 2026-08-15: T1–T2 red against HEAD as planned — the pairwise reason grid splits from k = 7 at both positions (se "unidentified"/"singular" against sf NULL), and the AC4 opposite-direction form is the near-zero positive diagonal with off-diagonals kept (raw pricing survives, both correlation-metric surfaces refuse); near-collinear pairs fail both surfaces at the same eps in every scan, so they cannot serve as the opposite-direction probe.
+- 2026-08-15: T3–T5 done — criterion `axes_sigma_degenerate()` chosen and recorded beside its rationale (see Decisions), applied at both consumers ahead of any pricing; se relabels "nonpositive_diagonal" → "singular" and adopts "infinite_diagonal" for +Inf; M71 block byte-unchanged (diff hunks fall at lines 359, 1228, and 1301 only); full suite clean (7215 pass, 0 fail). Also added `axes_fitted_cov()` as the single seam both consumer call sites read, for T6's constructed-matrix injection.
 
 ## Decisions
+
+- 2026-08-15 — **The stated criterion is a relative smallest-eigenvalue floor on the raw fitted matrix: refuse as `"ill_conditioned"` when λmin(Σ̂) ≤ λmax(Σ̂)·sqrt(p·eps), evaluated after each surface's diagonal guards.** (≈ κ ≥ 1.4e7 at p = 24.) Grounds: both consumers build the information matrix from Σ̂⁻¹ twice, so its entries carry relative error growing like p·κ²·eps, and the floor is exactly where that bound reaches 1. Measured fit: every pre-M89 divergence point sits at or above it (the inflation grid splits at κ = 2.1e7; the emergent near-collinear failures begin at κ = 7.9e8) and every measured accurately-computing point sits below it (κ ≤ 8.6e6 on the probe grids), so the criterion refuses nothing the surfaces were pricing accurately. One inequality also covers indefinite and exactly singular matrices (λmin ≤ 0) — needed: an indefinite Σ̂ (λmin = −0.11) sailed through both surfaces with reason NULL and scale 0.95 before M89. Rejected: any correlation-metric test (cov2cor of the inflated matrix stays at condition 10.45 at every magnitude 10⁰–10¹⁶ — blind, the plan's T3 note); the bare eps^(−1/2) ≈ 6.7e7 cutoff without the dimension factor (leaves the measured k = 7 divergence point, κ = 2.1e7, computing on one surface while emergently refused on the other — the exact disagreement M89 exists to remove). Recorded in code beside `axes_sigma_degenerate()` (R/axes_corrected_se.R).
 
 ## Review

@@ -359,14 +359,17 @@ test_that("AC1: the factor refuses rather than guessing when its inputs are wron
 
   # A singular sigma-hat: both factors NA together, with a named reason, and
   # never a silent fall back to 1 (which would relabel the uncorrected
-  # statistic as corrected -- the one failure a user could not detect).
+  # statistic as corrected -- the one failure a user could not detect). The
+  # literal moved at M89: an exactly singular matrix is now refused by the
+  # stated degeneracy criterion (its smallest eigenvalue is 0), before the
+  # solve() that used to fail on it emergently as "singular".
   sing <- ff$sigma
   sing[, 2] <- sing[, 1]
   sing[2, ] <- sing[1, ]
   got <- suppressWarnings(
     do.call(axes_scaling_factor, utils::modifyList(args, list(sigma = sing)))
   )
-  expect_identical(got$reason, "singular")
+  expect_identical(got$reason, "ill_conditioned")
   expect_true(is.na(got$scale))
   expect_true(is.na(got$baseline))
 
@@ -1225,20 +1228,21 @@ test_that("AC5: a non-finite fitted diagonal refuses cleanly instead of erroring
   # An NA and a NaN entry each used to error out of `if (NA)` with "missing
   # value where TRUE/FALSE needed", instead of the named-reason NA this
   # function's own header promises. With the predicate NA-safe they fall
-  # through to cov2cor() and are caught by the solve()/is.finite pair below it
-  # -- which is why the reason is "singular" and not "nonpositive_diagonal".
-  # Two warnings arrive on these paths, R's own cov2cor() non-finite-diagonal
-  # warning first and this function's refusal second; the refusal is the one
-  # asserted, and the first is expected rather than suppressed.
+  # through the diagonal guards and are refused as "singular" -- which is why
+  # the reason is "singular" and not "nonpositive_diagonal". Where the refusal
+  # happens has moved once since: M70's fix let them reach cov2cor() and the
+  # solve()/is.finite pair (two warnings, cov2cor()'s first); since M89 the
+  # degeneracy criterion's finiteness arm refuses them before cov2cor() runs,
+  # so exactly one warning arrives -- this function's own refusal, and no
+  # cov2cor() noise. The count is asserted, not just the membership: a second
+  # warning reappearing would mean the input is traveling past the criterion
+  # again.
   for (bad_value in list(NA_real_, NaN)) {
     sig <- pp$sigma
     sig[2L, 2L] <- bad_value
     w <- testthat::capture_warnings(got <- call_it(sig))
-    # Both are asserted rather than one asserted and one left to escape as a
-    # test warning: cov2cor()'s arrival is a fact about the route this input
-    # takes, and the route is what the fix changed.
-    expect_true(any(grepl("could not be computed", w, fixed = TRUE)))
-    expect_true(any(grepl("diag", w, fixed = TRUE)))
+    expect_length(w, 1L)
+    expect_match(w, "could not be computed", fixed = TRUE)
     expect_identical(got$reason, "singular")
     expect_identical(got$scale, NA_real_)
     expect_identical(got$baseline, NA_real_)
@@ -1296,4 +1300,133 @@ test_that("AC1: a +Inf fitted diagonal refuses instead of scaling a corrupted ma
   expect_identical(got_n$reason, "singular")
   expect_identical(got_n$scale, NA_real_)
   expect_identical(got_n$baseline, NA_real_)
+})
+
+
+# ---- M89 AC2/AC4: one degeneracy criterion for the two fitted-matrix consumers
+
+# The two consumers of lavaan's fitted covariance matrix -- axes_corrected_se()
+# and axes_scaling_factor() -- price the same matrix, so a matrix too degenerate
+# for one must be refused by both, with the same reason literal. Before M89 the
+# refusals were emergent (whatever solve() happened to reject, at whatever
+# magnitude this platform's LAPACK gave up): at sigma[4,4] * 1e7 the SE surface
+# refused "unidentified" while the scaling surface computed reason = NULL from
+# the same matrix -- NA corrected SEs beside silently scaled fit statistics
+# (measured at the M89 plan gate, commit 89ba5e79). The stated criterion and its
+# rationale live beside axes_sigma_degenerate() in R/axes_corrected_se.R.
+m89_reasons <- function(sig, pp, df, baseline_df) {
+  se <- suppressWarnings(
+    axes_corrected_se(sig, pp$names, pp$item_angle, pp$scale, n = 600,
+                      fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  sf <- suppressWarnings(
+    axes_scaling_factor(sig, pp$names, pp$item_angle, pp$scale,
+                        fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+                        df = df, baseline_df = baseline_df)
+  )
+  list(se = se$reason, sf = sf$reason)
+}
+
+test_that("AC2: the two consumers refuse at the same grid points, naming the same literal", {
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  d <- axes_se_derivs(pp$item_angle, pp$scale, NULL, TRUE, FALSE)
+  df <- p * (p + 1) / 2 - length(d$mats)
+  bdf <- p * (p - 1) / 2
+
+  # Both diagonal positions x k = 0..16, over both AC4 forms: the inflation
+  # form (diagonal * 10^k) and the near-zero positive diagonal with
+  # off-diagonals KEPT (diagonal = 10^-k; k = 0 is the intact matrix in both).
+  for (pos in c(4L, 20L)) {
+    for (k in 0:16) {
+      sig <- pp$sigma
+      sig[pos, pos] <- sig[pos, pos] * 10^k
+      r <- m89_reasons(sig, pp, df, bdf)
+      expect_identical(
+        r$se, r$sf,
+        label = sprintf("inflation pos %d k %d: se reason", pos, k),
+        expected.label = "the scaling surface's reason"
+      )
+
+      sig <- pp$sigma
+      sig[pos, pos] <- 10^-k
+      r <- m89_reasons(sig, pp, df, bdf)
+      expect_identical(
+        r$se, r$sf,
+        label = sprintf("near-zero pos %d k %d: se reason", pos, k),
+        expected.label = "the scaling surface's reason"
+      )
+    }
+  }
+
+  # The literal at the divergence points AC4 names, pinned at BOTH positions so
+  # this asserts WHICH failure, not merely that some failure occurred: k = 7 is
+  # where the pre-M89 code split ("unidentified" against reason = NULL).
+  for (pos in c(4L, 20L)) {
+    sig <- pp$sigma
+    sig[pos, pos] <- sig[pos, pos] * 1e7
+    r <- m89_reasons(sig, pp, df, bdf)
+    expect_identical(r$se, "ill_conditioned",
+                     label = sprintf("inflation pos %d k 7, SE surface", pos))
+    expect_identical(r$sf, "ill_conditioned",
+                     label = sprintf("inflation pos %d k 7, scaling surface", pos))
+  }
+
+  # The passing control, shown to pass for the claim's reason: one decade below
+  # the criterion both surfaces still COMPUTE (reason NULL), so the pins above
+  # mark the criterion firing, not a grid that refuses everywhere.
+  sig <- pp$sigma
+  sig[4L, 4L] <- sig[4L, 4L] * 1e6
+  r <- m89_reasons(sig, pp, df, bdf)
+  expect_null(r$se, label = "inflation k 6, SE surface computes")
+  expect_null(r$sf, label = "inflation k 6, scaling surface computes")
+
+  # The +Inf and -Inf cases. axes_corrected_se() is the surface that adopts
+  # "infinite_diagonal" for +Inf (it said "unidentified" before M89, reaching
+  # that answer by pricing the raw matrix); axes_scaling_factor()'s literals
+  # are unchanged, so -Inf stays "singular" on both -- which is also the
+  # relabel of axes_corrected_se()'s old "nonpositive_diagonal" door.
+  sig <- pp$sigma
+  sig[4L, 4L] <- Inf
+  r <- m89_reasons(sig, pp, df, bdf)
+  expect_identical(r$se, "infinite_diagonal", label = "+Inf, SE surface")
+  expect_identical(r$sf, "infinite_diagonal", label = "+Inf, scaling surface")
+
+  sig <- pp$sigma
+  sig[4L, 4L] <- -Inf
+  r <- m89_reasons(sig, pp, df, bdf)
+  expect_identical(r$se, "singular", label = "-Inf, SE surface")
+  expect_identical(r$sf, "singular", label = "-Inf, scaling surface")
+})
+
+test_that("AC4: the non-inflation form drives the divergence the other way, and is refused", {
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  d <- axes_se_derivs(pp$item_angle, pp$scale, NULL, TRUE, FALSE)
+  df <- p * (p + 1) / 2 - length(d$mats)
+  bdf <- p * (p - 1) / 2
+
+  # A near-zero positive diagonal with the off-diagonals KEPT: after cov2cor()
+  # the implied correlations blow past 1, so the correlation-metric surface is
+  # the one that cannot price it -- the opposite direction from the inflation
+  # form, where the raw-priced side failed first.
+  sig <- pp$sigma
+  sig[4L, 4L] <- 1e-3
+
+  # The raw-priced branch SURVIVES this matrix: priced directly, the raw
+  # sandwich returns finite SEs, not a failure string. This is the measured
+  # divergence driver (raw ok / correlation metric refusing), asserted so the
+  # refusal below is shown to come from the stated criterion on the raw
+  # matrix, not from another emergent solve() failure.
+  raw <- axes_se_pricing(sig[pp$names, pp$names], d, 600)
+  expect_false(is.character(raw))
+  expect_true(all(is.finite(raw$naive)))
+
+  # Both consumers refuse it under the stated criterion (the matrix is
+  # indefinite: its smallest eigenvalue is negative), naming the shared
+  # literal -- before M89 both fell to the emergent "indefinite"/NaN door.
+  r <- m89_reasons(sig, pp, df, bdf)
+  expect_identical(r$se, "ill_conditioned", label = "near-zero d44, SE surface")
+  expect_identical(r$sf, "ill_conditioned",
+                   label = "near-zero d44, scaling surface")
 })

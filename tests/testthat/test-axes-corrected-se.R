@@ -782,9 +782,12 @@ test_that("BC1: a non-invertible Sigma-hat gives NA SEs with a reason, never a n
   )
   expect_true(all(is.na(got$corrected)))
   expect_true(all(is.na(got$naive)))
-  # NA, never NaN, and never a fallback to the uncorrected value.
+  # NA, never NaN, and never a fallback to the uncorrected value. The literal
+  # moved at M89: an exactly singular matrix is now refused by the stated
+  # degeneracy criterion (its smallest eigenvalue is 0), before the solve()
+  # that used to fail on it emergently as "singular".
   expect_false(any(is.nan(got$corrected)))
-  expect_identical(got$reason, "singular")
+  expect_identical(got$reason, "ill_conditioned")
 })
 
 
@@ -1098,7 +1101,10 @@ test_that("AC10: a nonpositive diagonal is refused before cov2cor() runs", {
                              n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
     "could not be computed"
   )
-  expect_identical(got$reason, "nonpositive_diagonal")
+  # "singular", not the pre-M89 "nonpositive_diagonal": M89 unified the two
+  # fitted-matrix surfaces' reason vocabulary on the literal the sibling
+  # guard in axes_scaling_factor() already printed for this input.
+  expect_identical(got$reason, "singular")
 
   # All THREE vectors NA together -- the contract fiml_ratio joined at M69.
   expect_true(all(is.na(got$naive)))
@@ -1111,9 +1117,11 @@ test_that("AC10: a nonpositive diagonal is refused before cov2cor() runs", {
   expect_false(any(is.nan(got$corrected)))
 
   # A non-finite diagonal must NOT take this door, and must not error. The
-  # predicate is NA-safe precisely so this input keeps the route it had before
-  # M69: solve() -> tryCatch -> na_out("singular"). Written as a regression
-  # test because M69 shipped the erroring version to review (round 1, F1).
+  # predicate is NA-safe precisely so this input keeps its literal, "singular"
+  # -- reached before M69 through solve() -> tryCatch, and since M89 through
+  # the degeneracy criterion's finiteness arm, ahead of any pricing. Written
+  # as a regression test because M69 shipped the erroring version to review
+  # (round 1, F1).
   na_diag <- pp$sigma
   na_diag[1L, 1L] <- NA_real_
   expect_warning(
@@ -1143,7 +1151,7 @@ test_that("AC10: a nonpositive diagonal is refused before cov2cor() runs", {
                               n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
     "could not be computed"
   )
-  expect_identical(got2$reason, "nonpositive_diagonal")
+  expect_identical(got2$reason, "singular")
 })
 
 
@@ -1180,9 +1188,18 @@ test_that("AC10: the na_out() calls are the only non-success returns (BC5 enumer
 
   reasons <- regmatches(src, regexpr('return\\("[a-z_]+"\\)', src))
   reasons <- sub('return\\("', "", sub('"\\)', "", reasons))
-  expect_setequal(reasons, c("singular", "unidentified", "indefinite"))
-  # Plus the guard's own reason, which routes through na_out() directly.
-  expect_true(any(grepl('na_out("nonpositive_diagonal")', src, fixed = TRUE)))
+  # axes_se_pricing()'s three, plus the two axes_sigma_degenerate() returns
+  # (M89): its finiteness arm reuses "singular", and the stated criterion
+  # itself is "ill_conditioned".
+  expect_setequal(
+    reasons,
+    c("singular", "unidentified", "indefinite", "ill_conditioned")
+  )
+  # Plus the guards' own reasons, which route through na_out() directly: the
+  # nonpositive-diagonal door (relabeled "nonpositive_diagonal" -> "singular"
+  # at M89) and the +Inf door this surface adopted at M89.
+  expect_true(any(grepl('na_out("singular")', src, fixed = TRUE)))
+  expect_true(any(grepl('na_out("infinite_diagonal")', src, fixed = TRUE)))
   # D5's error exit, which is NOT part of the NA-together contract.
   expect_true(any(grepl("must carry dimnames", src, fixed = TRUE)))
 })
