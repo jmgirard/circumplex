@@ -79,7 +79,13 @@ respondents behind any item pair, \code{se_uncorrected}, the component standard
 errors as normal-theory maximum likelihood reports them before the
 correlation-structure correction, \code{se_correction_failed}, \code{NULL} when
 that correction succeeded or a string naming why the reported SEs are
-\code{NA}, \code{fit_uncorrected}, the six fit statistics as lavaan reports them
+\code{NA} -- notably \code{"ill_conditioned"}, the shared degeneracy criterion
+(smallest eigenvalue relative to largest at or below
+\code{sqrt(p * .Machine$double.eps / 1e-6)}, evaluated on \code{cov2cor()} of the
+fitted covariance matrix and, for this surface only, on the raw matrix
+as well), which also sets \code{fit_scaling_failed} when the correlation form
+is what tripped it -- \code{fit_uncorrected}, the six fit statistics as
+lavaan reports them
 before the correlation-metric scaling, \code{scaling_factor}, the two
 Satorra-Bentler factors (\code{model} and \code{baseline}), and
 \code{fit_scaling_failed}, \code{NULL} when the scaling succeeded or a string naming
@@ -192,6 +198,26 @@ The scaled statistic matches its reference chi-square in \strong{mean}; it is no
 exact, and it does not make a badly misspecified model fit. If the factor
 cannot be computed, all four are \code{NA} with the reason in
 \code{details$fit_scaling_failed} -- never the uncorrected value in their place.
+One refusal is shared with the component-SE correction, under one stated
+criterion evaluated in the metric the reported numbers are computed in: a
+fitted covariance matrix whose correlation form \code{cov2cor()} is degenerate
+-- indefinite, singular, or so ill-conditioned that its smallest
+eigenvalue, relative to its largest, falls at or below
+\code{sqrt(p * .Machine$double.eps / 1e-6)}, where the \code{1e-6} is a stated
+accuracy target: past that floor the corrected standard errors could carry
+relative error above it -- is refused by both surfaces with the reason
+\code{"ill_conditioned"}, so the corrected standard errors and the four scaled
+statistics go \code{NA} together (each with its own warning naming that reason)
+rather than one surface refusing while the other silently scales. The
+standard-error surface additionally applies the same criterion to the raw
+fitted matrix, which one of its internal arms inverts, so its refusals
+nest the scaling surface's: whatever refuses the scaled statistics also
+refuses the standard errors with the same reason, while a matrix
+degenerate only in the raw metric (wildly unequal fitted variances over a
+well-conditioned correlation structure) returns \code{NA} standard errors
+beside validly scaled fit statistics -- never the reverse. On a
+unit-diagonal fitted matrix the two metrics coincide and the surfaces
+agree exactly. \code{df} and \code{srmr} still report.
 
 If you cross-check against lavaan, match the variant. The scaled \code{chisq},
 \code{pvalue}, \code{rmsea} and \code{cfi} here are built with the definitions lavaan calls

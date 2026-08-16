@@ -712,6 +712,26 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' exact, and it does not make a badly misspecified model fit. If the factor
 #' cannot be computed, all four are `NA` with the reason in
 #' `details$fit_scaling_failed` -- never the uncorrected value in their place.
+#' One refusal is shared with the component-SE correction, under one stated
+#' criterion evaluated in the metric the reported numbers are computed in: a
+#' fitted covariance matrix whose correlation form `cov2cor()` is degenerate
+#' -- indefinite, singular, or so ill-conditioned that its smallest
+#' eigenvalue, relative to its largest, falls at or below
+#' `sqrt(p * .Machine$double.eps / 1e-6)`, where the `1e-6` is a stated
+#' accuracy target: past that floor the corrected standard errors could carry
+#' relative error above it -- is refused by both surfaces with the reason
+#' `"ill_conditioned"`, so the corrected standard errors and the four scaled
+#' statistics go `NA` together (each with its own warning naming that reason)
+#' rather than one surface refusing while the other silently scales. The
+#' standard-error surface additionally applies the same criterion to the raw
+#' fitted matrix, which one of its internal arms inverts, so its refusals
+#' nest the scaling surface's: whatever refuses the scaled statistics also
+#' refuses the standard errors with the same reason, while a matrix
+#' degenerate only in the raw metric (wildly unequal fitted variances over a
+#' well-conditioned correlation structure) returns `NA` standard errors
+#' beside validly scaled fit statistics -- never the reverse. On a
+#' unit-diagonal fitted matrix the two metrics coincide and the surfaces
+#' agree exactly. `df` and `srmr` still report.
 #'
 #' If you cross-check against lavaan, match the variant. The scaled `chisq`,
 #' `pvalue`, `rmsea` and `cfi` here are built with the definitions lavaan calls
@@ -983,7 +1003,13 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   errors as normal-theory maximum likelihood reports them before the
 #'   correlation-structure correction, `se_correction_failed`, `NULL` when
 #'   that correction succeeded or a string naming why the reported SEs are
-#'   `NA`, `fit_uncorrected`, the six fit statistics as lavaan reports them
+#'   `NA` -- notably `"ill_conditioned"`, the shared degeneracy criterion
+#'   (smallest eigenvalue relative to largest at or below
+#'   `sqrt(p * .Machine$double.eps / 1e-6)`, evaluated on `cov2cor()` of the
+#'   fitted covariance matrix and, for this surface only, on the raw matrix
+#'   as well), which also sets `fit_scaling_failed` when the correlation form
+#'   is what tripped it -- `fit_uncorrected`, the six fit statistics as
+#'   lavaan reports them
 #'   before the correlation-metric scaling, `scaling_factor`, the two
 #'   Satorra-Bentler factors (`model` and `baseline`), and
 #'   `fit_scaling_failed`, `NULL` when the scaling succeeded or a string naming
@@ -1713,7 +1739,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # `n` is the sample size the SEs are priced at on each path: complete cases
   # for listwise, the supplied `n` for cormat.
   corrected <- axes_corrected_se(
-    lavaan::fitted(fit)$cov, all_cols, item_angle, item_scale, item_block,
+    axes_fitted_cov(fit), all_cols, item_angle, item_scale, item_block,
     n = n, fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2
   )
   se_reported <- if (missing == "fiml") {
@@ -1822,7 +1848,7 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
   # this point, so no scaled statistic is ever computed against a saturated
   # model that was never reached.
   scaling <- axes_scaling_factor(
-    lavaan::fitted(fit)$cov, all_cols, item_angle, item_scale, item_block,
+    axes_fitted_cov(fit), all_cols, item_angle, item_scale, item_block,
     fit_zeta1 = fit_zeta1, fit_zeta2 = fit_zeta2,
     df = fm[["df"]], baseline_df = fm[["baseline.df"]]
   )
@@ -1868,12 +1894,14 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # offering a supported way to ASK for the uncorrected number.
       se_uncorrected = se_uncorrected,
       # NULL when the correction succeeded; otherwise why every corrected SE
-      # is NA ("nonpositive_diagonal" from the guard's own door, and
-      # "singular", "unidentified", "indefinite" forwarded from
-      # axes_se_pricing()). The list named two of the four until M71 audited
-      # it against the source; "indefinite" in particular has never been
-      # observed to fire (R/axes_corrected_se.R:185-198), so this enumerates
-      # what the helper CONTAINS, not what a user has been shown.
+      # is NA ("singular" from the nonpositive-diagonal door or non-finite
+      # entries, "infinite_diagonal", "ill_conditioned" from the stated
+      # degeneracy criterion -- M89, axes_sigma_degenerate() -- and
+      # "unidentified", "indefinite" forwarded from axes_se_pricing() as
+      # backstops behind it). M71 audited the list against the source;
+      # "indefinite" in particular has never been observed to fire
+      # (R/axes_corrected_se.R:185-198), so this enumerates what the helper
+      # CONTAINS, not what a user has been shown.
       se_correction_failed = corrected$reason,
       # What lavaan reported before the correlation-metric scaling (M68), on the
       # same footing as `se_uncorrected` above: visible for comparison and for
@@ -1894,11 +1922,43 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # Both are NA together when the scaling failed.
       scaling_factor = c(model = scaling$scale, baseline = scaling$baseline),
       # NULL when the scaling succeeded; otherwise why the four chi-square-
-      # derived statistics are NA ("singular", "unidentified", "df_mismatch",
+      # derived statistics are NA ("singular", "ill_conditioned" from the
+      # shared degeneracy criterion (M89), "unidentified", "df_mismatch",
       # "baseline_df_mismatch", "indefinite", "infinite_diagonal"), enumerated
-      # from the source the same way as the SE list above -- but WITHOUT its
-      # never-fired caveat: this surface's guards are its own, and all six
-      # literals here are reachable at the helper's contract boundary.
+      # from the source the same way as the SE list above, and carrying the
+      # same caveat: it enumerates what the helper CONTAINS, not what a user
+      # has been shown. All seven are reachable at the helper's contract
+      # boundary; what a call through axes_reliability() can actually reach is
+      # a strictly smaller set, because this assembly refuses upstream several
+      # of the shapes that reach them.
+      #
+      # Two of them are worth naming, for what the M89 re-cut left reachable:
+      #
+      #   "unidentified"  fires when Delta'V Delta is singular. One measured
+      #                   route remains: a degenerate Delta (a one-scale map
+      #                   makes zeta1 identical to the all-ones xi2), which no
+      #                   conditioning test of Sigma-hat can see. The re-cut
+      #                   closed the other measured route (an ordinary map at a
+      #                   correlation-degenerate Sigma-hat): the criterion now
+      #                   prices cov2cor(Sigma-hat) -- the metric everything
+      #                   below computes in -- so that shape is refused at the
+      #                   door as "ill_conditioned" (RR18).
+      #   "indefinite"    fires on a nonpositive or non-finite scaling factor.
+      #                   The measured negative-c route (a cancellation
+      #                   sign-flip at kappa = 6.65e6, p = 3, whose exact value
+      #                   is positive -- RR18) is refused at the door by the
+      #                   tau = 1e-6 floor, whose p = 3 cutoff is kappa ~
+      #                   3.9e4. A saturated df = 0 probe does NOT reach it:
+      #                   measured at p = 3 (the only p where q can reach
+      #                   p(p+1)/2, and only with zeta1 fitted), the
+      #                   degenerate zeta1 column answers "unidentified"
+      #                   before the cval division. Guarding df = 0
+      #                   explicitly is M90's task (RR18 BC4).
+      #
+      # Neither surviving route outlives the assembly: axes_reliability()
+      # refuses fewer than four scales, and axes_design() drops a component
+      # collinear with another, so no call through it has been seen to reach
+      # either at the exported surface.
       fit_scaling_failed = scaling$reason,
       ols_shadow = ols
     ),

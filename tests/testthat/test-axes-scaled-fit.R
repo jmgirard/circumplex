@@ -359,14 +359,17 @@ test_that("AC1: the factor refuses rather than guessing when its inputs are wron
 
   # A singular sigma-hat: both factors NA together, with a named reason, and
   # never a silent fall back to 1 (which would relabel the uncorrected
-  # statistic as corrected -- the one failure a user could not detect).
+  # statistic as corrected -- the one failure a user could not detect). The
+  # literal moved at M89: an exactly singular matrix is now refused by the
+  # stated degeneracy criterion (its smallest eigenvalue is 0), before the
+  # solve() that used to fail on it emergently as "singular".
   sing <- ff$sigma
   sing[, 2] <- sing[, 1]
   sing[2, ] <- sing[1, ]
   got <- suppressWarnings(
     do.call(axes_scaling_factor, utils::modifyList(args, list(sigma = sing)))
   )
-  expect_identical(got$reason, "singular")
+  expect_identical(got$reason, "ill_conditioned")
   expect_true(is.na(got$scale))
   expect_true(is.na(got$baseline))
 
@@ -1225,20 +1228,21 @@ test_that("AC5: a non-finite fitted diagonal refuses cleanly instead of erroring
   # An NA and a NaN entry each used to error out of `if (NA)` with "missing
   # value where TRUE/FALSE needed", instead of the named-reason NA this
   # function's own header promises. With the predicate NA-safe they fall
-  # through to cov2cor() and are caught by the solve()/is.finite pair below it
-  # -- which is why the reason is "singular" and not "nonpositive_diagonal".
-  # Two warnings arrive on these paths, R's own cov2cor() non-finite-diagonal
-  # warning first and this function's refusal second; the refusal is the one
-  # asserted, and the first is expected rather than suppressed.
+  # through the diagonal guards and are refused as "singular" -- which is why
+  # the reason is "singular" and not "nonpositive_diagonal". Where the refusal
+  # happens has moved once since: M70's fix let them reach cov2cor() and the
+  # solve()/is.finite pair (two warnings, cov2cor()'s first); since M89 the
+  # degeneracy criterion's finiteness arm refuses them before cov2cor() runs,
+  # so exactly one warning arrives -- this function's own refusal, and no
+  # cov2cor() noise. The count is asserted, not just the membership: a second
+  # warning reappearing would mean the input is traveling past the criterion
+  # again.
   for (bad_value in list(NA_real_, NaN)) {
     sig <- pp$sigma
     sig[2L, 2L] <- bad_value
     w <- testthat::capture_warnings(got <- call_it(sig))
-    # Both are asserted rather than one asserted and one left to escape as a
-    # test warning: cov2cor()'s arrival is a fact about the route this input
-    # takes, and the route is what the fix changed.
-    expect_true(any(grepl("could not be computed", w, fixed = TRUE)))
-    expect_true(any(grepl("diag", w, fixed = TRUE)))
+    expect_length(w, 1L)
+    expect_match(w, "could not be computed", fixed = TRUE)
     expect_identical(got$reason, "singular")
     expect_identical(got$scale, NA_real_)
     expect_identical(got$baseline, NA_real_)
@@ -1296,4 +1300,418 @@ test_that("AC1: a +Inf fitted diagonal refuses instead of scaling a corrupted ma
   expect_identical(got_n$reason, "singular")
   expect_identical(got_n$scale, NA_real_)
   expect_identical(got_n$baseline, NA_real_)
+})
+
+
+# ---- M89 AC2/AC8: nested degeneracy refusals across the two consumers --------
+
+# The two consumers of lavaan's fitted covariance matrix -- axes_corrected_se()
+# and axes_scaling_factor() -- evaluate one stated degeneracy criterion
+# (axes_sigma_degenerate(), R/axes_corrected_se.R) on the matrix each actually
+# computes with: cov2cor(Sigma-hat) at the scaling surface, and BOTH
+# cov2cor(Sigma-hat) and the raw Sigma-hat at the SE helper, whose `naive` arm
+# is the one place the raw matrix is inverted (D-037). The refusals are
+# therefore NESTED, not identical: every matrix the scaling surface refuses for
+# degeneracy is refused by the SE helper with the same literal, while a
+# raw-metric-only degeneracy (a diagonal inflation) is refused by the SE helper
+# alone. Before M89's RR18 re-cut both surfaces priced the raw matrix, refusing
+# NA on quantities they price exactly -- cov2cor() of an inflated matrix is the
+# same correlation matrix at every magnitude (RR18 measured corrected/fiml_ratio
+# invariant to <= 6.4e-16 across eight decades of inflation).
+m89_reasons <- function(sig, pp, df, baseline_df, fit_zeta1 = TRUE) {
+  se <- suppressWarnings(
+    axes_corrected_se(sig, pp$names, pp$item_angle, pp$scale, n = 600,
+                      fit_zeta1 = fit_zeta1, fit_zeta2 = FALSE)
+  )
+  sf <- suppressWarnings(
+    axes_scaling_factor(sig, pp$names, pp$item_angle, pp$scale,
+                        fit_zeta1 = fit_zeta1, fit_zeta2 = FALSE,
+                        df = df, baseline_df = baseline_df)
+  )
+  list(se = se$reason, sf = sf$reason)
+}
+
+# The AC8 grid is fixed by the criterion, not chosen here: both diagonal
+# positions x k = 0..16 of the inflation form on each of the three probe maps,
+# plus the committed exemplar B (its own test below), plus one
+# non-unit-diagonal indefinite and one near-singular matrix per map.
+m89_grid_maps <- function() {
+  list(
+    list(pp = probe_octant(), pos = c(4L, 20L), zeta1 = TRUE),
+    list(pp = probe_six(),    pos = c(4L, 12L), zeta1 = TRUE),
+    list(pp = probe_single(), pos = c(4L, 8L),  zeta1 = FALSE)
+  )
+}
+
+test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's, same literal", {
+  for (m in m89_grid_maps()) {
+    pp <- m$pp
+    p <- nrow(pp$sigma)
+    d <- axes_se_derivs(pp$item_angle, pp$scale, NULL, m$zeta1, FALSE)
+    df <- p * (p + 1) / 2 - length(d$mats)
+    bdf <- p * (p - 1) / 2
+
+    # The nested contract, pointwise: wherever the scaling surface refuses for
+    # degeneracy, the SE helper refuses with the same literal.
+    check_nested <- function(sig, what) {
+      r <- m89_reasons(sig, pp, df, bdf, m$zeta1)
+      if (!is.null(r$sf) && r$sf %in% c("ill_conditioned", "singular")) {
+        expect_identical(
+          r$se, r$sf,
+          label = sprintf("%s: SE helper reason", what),
+          expected.label = "the scaling surface's literal"
+        )
+      }
+      r
+    }
+
+    # Inflation form: a pure diagonal congruence leaves cov2cor(sigma)
+    # unchanged, so the scaling surface must COMPUTE at every k -- the false
+    # NAs on correct numbers that RR18 measured and this re-cut removes.
+    for (pos in m$pos) {
+      for (k in 0:16) {
+        sig <- pp$sigma
+        sig[pos, pos] <- sig[pos, pos] * 10^k
+        r <- check_nested(sig, sprintf("p %d inflation pos %d k %d", p, pos, k))
+        expect_null(
+          r$sf,
+          label = sprintf("p %d inflation pos %d k %d: scaling surface", p, pos, k)
+        )
+      }
+    }
+
+    # The split is real on this map, and in the stated direction: the SE
+    # helper computes at k = 0 (the passing control, shown to pass for the
+    # claim's reason -- the same matrix uninflated) and refuses the extreme
+    # inflation on its RAW arm with the criterion's conditioning literal.
+    expect_null(m89_reasons(pp$sigma, pp, df, bdf, m$zeta1)$se,
+                label = sprintf("p %d k 0: SE helper computes", p))
+    sig <- pp$sigma
+    sig[m$pos[1L], m$pos[1L]] <- sig[m$pos[1L], m$pos[1L]] * 1e16
+    expect_identical(m89_reasons(sig, pp, df, bdf, m$zeta1)$se,
+                     "ill_conditioned",
+                     label = sprintf("p %d k 16: SE helper raw arm", p))
+
+    # One non-unit-diagonal indefinite matrix per map: indefiniteness is
+    # metric-invariant (cov2cor() is a congruence; Sylvester's law of inertia
+    # preserves eigenvalue signs), so BOTH surfaces refuse it, same literal.
+    dd <- diag(seq(0.5, 2, length.out = p))
+    ind <- dd %*% pp$sigma %*% dd
+    dimnames(ind) <- dimnames(pp$sigma)
+    ind[1L, 2L] <- ind[2L, 1L] <- 1.5 * sqrt(ind[1L, 1L] * ind[2L, 2L])
+    r <- check_nested(ind, sprintf("p %d indefinite", p))
+    expect_identical(r$sf, "ill_conditioned",
+                     label = sprintf("p %d indefinite, scaling surface", p))
+    expect_identical(r$se, "ill_conditioned",
+                     label = sprintf("p %d indefinite, SE helper", p))
+
+    # One near-singular matrix per map (one item duplicated, plus a 1e-9 ridge
+    # so the smallest eigenvalue is a hair above zero rather than roundoff-
+    # negative): near-singular in both metrics, refused by both surfaces.
+    ns <- pp$sigma
+    ns[2L, ] <- ns[1L, ]
+    ns[, 2L] <- ns[, 1L]
+    ns <- ns + 1e-9 * diag(p)
+    r <- check_nested(ns, sprintf("p %d near-singular", p))
+    expect_identical(r$sf, "ill_conditioned",
+                     label = sprintf("p %d near-singular, scaling surface", p))
+    expect_identical(r$se, "ill_conditioned",
+                     label = sprintf("p %d near-singular, SE helper", p))
+  }
+})
+
+
+test_that("AC2: the non-finite diagonal doors keep one vocabulary on both surfaces", {
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  d <- axes_se_derivs(pp$item_angle, pp$scale, NULL, TRUE, FALSE)
+  df <- p * (p + 1) / 2 - length(d$mats)
+  bdf <- p * (p - 1) / 2
+
+  # +Inf and -Inf sit at the callers' own doors, AHEAD of the shared criterion,
+  # so the metric move cannot touch them: axes_corrected_se() adopted
+  # "infinite_diagonal" for +Inf at M89 (it said "unidentified" before,
+  # reaching that answer by pricing the raw matrix); -Inf stays "singular" on
+  # both -- the relabel of its old "nonpositive_diagonal" door.
+  sig <- pp$sigma
+  sig[4L, 4L] <- Inf
+  r <- m89_reasons(sig, pp, df, bdf)
+  expect_identical(r$se, "infinite_diagonal", label = "+Inf, SE surface")
+  expect_identical(r$sf, "infinite_diagonal", label = "+Inf, scaling surface")
+
+  sig <- pp$sigma
+  sig[4L, 4L] <- -Inf
+  r <- m89_reasons(sig, pp, df, bdf)
+  expect_identical(r$se, "singular", label = "-Inf, SE surface")
+  expect_identical(r$sf, "singular", label = "-Inf, scaling surface")
+})
+
+
+test_that("AC1/AC2: a pure diagonal rescaling of the fitted matrix computes at the scaling surface; the SE helper refuses it", {
+  skip_if_not_installed("lavaan")
+  pp <- probe_octant()
+  ff <- probe_fit(pp)
+  p <- nrow(ff$sigma)
+
+  base <- axes_scaling_factor(
+    ff$sigma, pp$names, pp$item_angle, pp$scale,
+    fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+    df = ff$fm[["df"]], baseline_df = ff$fm[["baseline.df"]]
+  )
+  expect_null(base$reason)
+
+  # Counterexample A (RR18): the fitted octant Sigma-hat congruence-scaled by
+  # D = diag(1e4, 1, ..., 1). The estimand is exactly invariant under this, and
+  # cov2cor() of the scaled matrix is the same correlation matrix.
+  D <- diag(c(1e4, rep(1, p - 1L)))
+  Sa <- D %*% ff$sigma %*% D
+  dimnames(Sa) <- dimnames(ff$sigma)
+
+  got <- axes_scaling_factor(
+    Sa, pp$names, pp$item_angle, pp$scale,
+    fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+    df = ff$fm[["df"]], baseline_df = ff$fm[["baseline.df"]]
+  )
+  expect_null(got$reason)
+  expect_lt(abs(got$scale - base$scale) / abs(base$scale), 1e-9)
+
+  # The SE helper refuses the same matrix -- its naive arm inverts the raw
+  # Sigma-hat, whose conditioning the rescaling did destroy -- with the
+  # criterion's conditioning literal. The passing control (the unscaled fitted
+  # matrix) computes, so the refusal marks the raw arm's criterion firing.
+  se0 <- axes_corrected_se(ff$sigma, pp$names, pp$item_angle, pp$scale,
+                           n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  expect_null(se0$reason)
+  se <- suppressWarnings(
+    axes_corrected_se(Sa, pp$names, pp$item_angle, pp$scale,
+                      n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  expect_identical(se$reason, "ill_conditioned")
+})
+
+
+test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 3", {
+  # The committed fixture is repo material, absent from an installed package;
+  # stated plainly because a silent skip is false coverage (the M7 lesson).
+  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
+  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  fx <- readRDS(fp)
+  S <- fx$S
+
+  # Unit diagonal: the two metrics coincide, so this is the exact-agreement
+  # point of the nested contract -- both surfaces refuse, one literal. The
+  # shipped tau = 1 floor accepted this matrix and returned corrected SEs
+  # wrong by 3.4% with reason NULL (RR18; the exact-rational oracle in
+  # devel/degeneracy-oracle/ reproduces the true values).
+  expect_true(isTRUE(all.equal(stats::cov2cor(S), S)))
+
+  scl <- c("A", "B", "C")
+  se <- suppressWarnings(
+    axes_corrected_se(S, rownames(S), as.numeric(fx$ia), scl,
+                      n = 600, fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  )
+  sf <- suppressWarnings(
+    axes_scaling_factor(S, rownames(S), as.numeric(fx$ia), scl,
+                        fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                        df = 1, baseline_df = 3)
+  )
+  expect_identical(se$reason, "ill_conditioned")
+  expect_identical(sf$reason, "ill_conditioned")
+})
+
+
+test_that("AC3: tau is a named constant, and the floored criterion accepts all three probe-map fits", {
+  skip_if_not_installed("lavaan")
+  # The accuracy target is a named constant beside the criterion, not an
+  # inlined magic number: tau = 1e-6, making the floor sqrt(p * eps / tau) --
+  # the pre-re-cut sqrt(p * eps) floor times 1000.
+  expect_identical(axes_degeneracy_tau, 1e-6)
+
+  # The tightened floor must not refuse anything the surfaces price
+  # accurately: all three probe-map FITTED matrices (p = 24, 12, 8) are
+  # accepted by both surfaces, exercising the p factor at three dimensions.
+  for (m in m89_grid_maps()) {
+    pp <- m$pp
+    ff <- probe_fit(pp)
+    sf <- axes_scaling_factor(
+      ff$sigma, pp$names, pp$item_angle, pp$scale,
+      fit_zeta1 = m$zeta1, fit_zeta2 = FALSE,
+      df = ff$fm[["df"]], baseline_df = ff$fm[["baseline.df"]]
+    )
+    expect_null(sf$reason, label = sprintf("p %d fitted, scaling surface", nrow(ff$sigma)))
+    se <- axes_corrected_se(ff$sigma, pp$names, pp$item_angle, pp$scale,
+                            n = 600, fit_zeta1 = m$zeta1, fit_zeta2 = FALSE)
+    expect_null(se$reason, label = sprintf("p %d fitted, SE helper", nrow(ff$sigma)))
+  }
+})
+
+
+test_that("AC7: the scaling surface is invariant under positive-diagonal congruences on every free axis", {
+  # AC1's invariance claim, verified across the family it is free in: for any
+  # positive diagonal D, sigma -> D sigma D changes nothing this surface
+  # computes -- cov2cor() removes D exactly -- so `reason` stays NULL and
+  # `scale` moves only by floating-point roundoff. The sweep varies magnitude
+  # (10^k, k in {2, 4, 8}), direction (deflation as well as inflation),
+  # location (two diagonal positions), multiplicity (a D moving several
+  # entries at once), and ratio (one gentle D with max/min < 10), on all
+  # three probe maps -- so the criterion's p factor is exercised at
+  # p = 24, 12 and 8.
+  for (m in m89_grid_maps()) {
+    pp <- m$pp
+    p <- nrow(pp$sigma)
+    d <- axes_se_derivs(pp$item_angle, pp$scale, NULL, m$zeta1, FALSE)
+    df <- p * (p + 1) / 2 - length(d$mats)
+    bdf <- p * (p - 1) / 2
+
+    sf <- function(sig) {
+      axes_scaling_factor(sig, pp$names, pp$item_angle, pp$scale,
+                          fit_zeta1 = m$zeta1, fit_zeta2 = FALSE,
+                          df = df, baseline_df = bdf)
+    }
+    base <- sf(pp$sigma)
+    expect_null(base$reason, label = sprintf("p %d unscaled", p))
+
+    check_D <- function(dvec, what) {
+      D <- diag(dvec)
+      sig <- D %*% pp$sigma %*% D
+      dimnames(sig) <- dimnames(pp$sigma)
+      got <- sf(sig)
+      expect_null(got$reason, label = sprintf("p %d %s: reason", p, what))
+      expect_lt(abs(got$scale - base$scale) / abs(base$scale), 1e-9,
+                label = sprintf("p %d %s: relative scale drift", p, what))
+    }
+
+    for (pos in m$pos) {
+      for (k in c(2, 4, 8)) {
+        dv <- rep(1, p)
+        dv[pos] <- 10^k
+        check_D(dv, sprintf("inflation pos %d k %d", pos, k))
+        dv <- rep(1, p)
+        dv[pos] <- 10^-k
+        check_D(dv, sprintf("deflation pos %d k %d", pos, k))
+      }
+    }
+
+    dv <- rep(1, p)
+    dv[m$pos] <- c(1e4, 1e-4)
+    dv[1L] <- 100
+    check_D(dv, "multiplicity (three entries, both directions)")
+
+    dv <- seq(0.5, 4, length.out = p)
+    check_D(dv, "ratio (max/min = 8)")
+  }
+})
+
+
+test_that("AC3: the floor discriminates its p factor at the threshold", {
+  # Near-threshold probes on the criterion itself, at two dimensions. An
+  # equicorrelation matrix (1-c)I + cJ has eigenvalue ratio
+  # (1-c)/(1+(p-1)c), so c can place a matrix a hair above or below the
+  # floor sqrt(p*eps/tau). Acceptance three decades from the floor (the
+  # probe fits) cannot tell sqrt(p*eps/tau) from sqrt(eps/tau) or
+  # p*sqrt(eps/tau); these points can -- dropping the p factor accepts the
+  # below-floor probe at p = 24, and squaring it refuses the above-floor
+  # one (both mutants verified red at review round 3).
+  for (p in c(24L, 8L)) {
+    f <- sqrt(p * .Machine$double.eps / 1e-6)
+    for (mult in c(1.05, 0.95)) {
+      r <- f * mult
+      c_ <- (1 - r) / (1 + r * (p - 1))
+      S <- matrix(c_, p, p)
+      diag(S) <- 1
+      got <- axes_sigma_degenerate(S)
+      if (mult > 1) {
+        expect_null(got, label = sprintf("p %d, ratio 1.05x floor", p))
+      } else {
+        expect_identical(got, "ill_conditioned",
+                         label = sprintf("p %d, ratio 0.95x floor", p))
+      }
+    }
+  }
+})
+
+test_that("the non-inflation (indefinite) form is refused by both surfaces with one literal", {
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  d <- axes_se_derivs(pp$item_angle, pp$scale, NULL, TRUE, FALSE)
+  df <- p * (p + 1) / 2 - length(d$mats)
+  bdf <- p * (p - 1) / 2
+
+  # A near-zero positive diagonal with the off-diagonals KEPT: after cov2cor()
+  # the implied correlations blow past 1, so the correlation-metric surface is
+  # the one that cannot price it -- the opposite direction from the inflation
+  # form, where the raw-priced side failed first.
+  sig <- pp$sigma
+  sig[4L, 4L] <- 1e-3
+
+  # The raw-priced sandwich SURVIVES this matrix: priced directly, it returns
+  # finite SEs, not a failure string. Asserted so the refusals below are shown
+  # to come from the stated criterion -- the matrix is indefinite, which the
+  # criterion sees in either metric (Sylvester) -- and not from another
+  # emergent solve() failure.
+  raw <- axes_se_pricing(sig[pp$names, pp$names], d, 600)
+  expect_false(is.character(raw))
+  expect_true(all(is.finite(raw$naive)))
+
+  # Both consumers refuse it under the stated criterion (the matrix is
+  # indefinite: its smallest eigenvalue is negative), naming the shared
+  # literal -- before M89 both fell to the emergent "indefinite"/NaN door.
+  r <- m89_reasons(sig, pp, df, bdf)
+  expect_identical(r$se, "ill_conditioned", label = "near-zero d44, SE surface")
+  expect_identical(r$sf, "ill_conditioned",
+                   label = "near-zero d44, scaling surface")
+})
+
+
+# ---- M89 T10: "unidentified" fired as a RETURNED reason on this surface too ----
+
+test_that("AC2: the scaling factor refuses as 'unidentified' when the model's derivatives are degenerate", {
+  # The sibling of the corrected-SE test in test-axes-corrected-se.R, and for
+  # the same reason: M89's degeneracy criterion refuses a degenerate Sigma-hat
+  # ahead of every solve() on this surface, so this door is NOT reached the way
+  # an exactly singular matrix is. It is reached here by a degenerate Delta: a
+  # single-scale map with zeta1 fitted makes `zeta1` identical to the all-ones
+  # `xi2`, so two columns of Delta coincide.
+  #
+  # A degenerate Delta is, since the M89 re-cut, the only measured route to
+  # this literal: the criterion now prices cov2cor(Sigma-hat) -- the metric
+  # this surface computes in (RR18) -- so the formerly measured second route
+  # (an ordinary map at a Sigma-hat degenerate after normalization, p = 3) is
+  # refused as "ill_conditioned" before any pricing runs. A degenerate Delta
+  # survives because no conditioning test of Sigma-hat can see it. This route
+  # does not survive axes_reliability(), which refuses fewer than four scales
+  # -- so this is the helper's contract boundary, not a user path.
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  one_scale <- rep("A", p)
+  d <- axes_se_derivs(pp$item_angle, one_scale, NULL, TRUE, FALSE)
+  q <- length(d$mats)
+
+  expect_identical(d$mats[[2L]], d$mats[[3L]])
+  expect_null(axes_sigma_degenerate(pp$sigma))
+
+  args <- list(
+    sigma = pp$sigma, item_names = pp$names, item_angle_deg = pp$item_angle,
+    item_scale = one_scale, item_block = NULL, fit_zeta1 = TRUE,
+    fit_zeta2 = FALSE, df = p * (p + 1) / 2 - q, baseline_df = p * (p - 1) / 2
+  )
+  expect_warning(
+    got <- do.call(axes_scaling_factor, args),
+    "could not be computed"
+  )
+  expect_identical(got$reason, "unidentified")
+  expect_identical(got$scale, NA_real_)
+  expect_identical(got$baseline, NA_real_)
+
+  # The passing control: dropping zeta1 removes the duplicate derivative and
+  # both factors compute from the same sigma. `df` moves with `q` because this
+  # surface checks the two against each other -- holding the old df would make
+  # the control refuse "df_mismatch" and prove nothing about this door.
+  d0 <- axes_se_derivs(pp$item_angle, one_scale, NULL, FALSE, FALSE)
+  ctl <- do.call(axes_scaling_factor, utils::modifyList(args, list(
+    fit_zeta1 = FALSE, df = p * (p + 1) / 2 - length(d0$mats)
+  )))
+  expect_null(ctl$reason)
+  expect_true(is.finite(ctl$scale))
+  expect_true(is.finite(ctl$baseline))
 })

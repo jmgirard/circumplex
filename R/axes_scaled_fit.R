@@ -104,12 +104,12 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # NaN on the fitted diagonal makes the predicate NA and `if (NA)` ERRORS with
   # "missing value where TRUE/FALSE needed" -- in place of the named-reason NA
   # this function's header promises, and which every other refusal here honors.
-  # With na.rm an NA or NaN entry falls THROUGH this guard, reaches cov2cor()
-  # on the next line (which warns about it in its own words), and is caught by
-  # the solve()/tryCatch/is.finite pair below as "singular". That is the route
-  # it should take: this guard exists for a diagonal that is finite but not
-  # positive, which cov2cor() would silently turn into NaN correlations, and
-  # `<= 0` still catches every such entry with na.rm in place.
+  # With na.rm an NA or NaN entry falls THROUGH this guard and is refused as
+  # "singular" by axes_sigma_degenerate()'s finiteness arm below (before M89 it
+  # traveled further, to the solve()/tryCatch/is.finite pair, same literal).
+  # This guard exists for a diagonal that is finite but not positive, which
+  # cov2cor() would silently turn into NaN correlations, and `<= 0` still
+  # catches every such entry with na.rm in place.
   #
   # NA and NaN, deliberately, and not "non-finite" in general. The three
   # non-finite entries take three different doors here, and the ORDER of the
@@ -117,8 +117,8 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   #
   #   -Inf   caught by `<= 0`, which is true of it        -> "singular"
   #   NA/NaN falls through both (na.rm above, and is.infinite() is FALSE on
-  #          both), reaches cov2cor(), and is caught by the solve()/is.finite
-  #          pair below                                   -> "singular"
+  #          both), and is caught by axes_sigma_degenerate()'s finiteness
+  #          arm below                                    -> "singular"
   #   +Inf   fails `<= 0`, so the second guard is the only thing that refuses
   #          it                                           -> "infinite_diagonal"
   #
@@ -132,21 +132,29 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # would refuse the same input but silently relabel the -Inf and NA/NaN routes
   # above, which are correct as they stand; tests pin all three.
   #
-  # The sibling guard in axes_corrected_se() differs in its REASON STRING on
-  # the finite-nonpositive route only ("nonpositive_diagonal" where this one
-  # says "singular"): the two guards simply chose different literals. On the
-  # NA/NaN route the sibling also falls through and also refuses as
-  # "singular", so the two agree there. On +Inf the sibling refuses too, as
-  # "unidentified", by a different route than this one: it prices the RAW
-  # sigma, and solve() of an infinite variance zeroes that row/column of the
-  # INVERSE (1/Inf), which makes its information matrix rank-deficient. No
-  # cov2cor() is involved on that path -- the laundering described above is
-  # specific to this file, which normalizes before it inverts. So the sibling
-  # computes no wrong number, which is why its label was left alone; the
-  # relabel is tracked separately rather than made here.
+  # The sibling guards in axes_corrected_se() have named the same literals on
+  # every one of these routes since M89 unified the two surfaces' reason
+  # vocabulary (its `<= 0` door said "nonpositive_diagonal" before, and +Inf
+  # fell out of its raw-matrix pricing as "unidentified").
   if (any(diag(sigma) <= 0, na.rm = TRUE)) return(na_out("singular"))
   if (any(is.infinite(diag(sigma)))) return(na_out("infinite_diagonal"))
+
+  # The stated degeneracy criterion (M89), shared with axes_corrected_se() --
+  # see axes_sigma_degenerate() in R/axes_corrected_se.R for the criterion and
+  # its rationale. It prices cov2cor(sigma) deliberately (M89 re-cut, RR18):
+  # every quantity this surface computes is a function of the correlation
+  # matrix alone, so raw-metric conditioning is not the error model of
+  # anything computed here -- the first cut priced the raw matrix and refused
+  # pure diagonal rescalings this surface prices exactly. The criterion's
+  # finiteness arm is evaluated on the RAW matrix, ahead of the cov2cor() its
+  # conditioning arm prices: cov2cor() of an NA/NaN diagonal emits its own
+  # warning first, and the M71 contract is exactly one warning per refusal --
+  # this function's own, with no cov2cor() noise. Finiteness is metric-blind,
+  # so hoisting it moves no refusal across the two arms' boundary.
+  if (!all(is.finite(sigma))) return(na_out("singular"))
   sigma <- stats::cov2cor(sigma)
+  degenerate <- axes_sigma_degenerate(sigma)
+  if (!is.null(degenerate)) return(na_out(degenerate))
 
   si <- tryCatch(solve(sigma), error = function(e) NULL)
   if (is.null(si) || !all(is.finite(si))) return(na_out("singular"))

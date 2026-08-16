@@ -58,6 +58,39 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   against lavaan's bare `cfi` will differ and a request for `cfi.robust` will
   come back empty.
 
+* `axes_reliability()` now refuses a degenerate fitted covariance matrix under
+  a single stated criterion, evaluated in the metric every reported number is
+  computed in: when the smallest eigenvalue of `cov2cor()` of the fitted
+  matrix, relative to its largest, falls at or below
+  `sqrt(p * .Machine$double.eps / 1e-6)` — an indefinite, singular, or
+  severely ill-conditioned correlation structure; the `1e-6` is a stated
+  accuracy target, past whose floor the corrected standard errors could carry
+  relative error above it — both surfaces refuse with reason
+  `"ill_conditioned"`, the component standard errors and the four scaled
+  statistics (`chisq`, `pvalue`, `rmsea`, `cfi`) are `NA` together, and each
+  surface's warning names that shared reason; `df` and `srmr` still report.
+  The standard-error surface additionally applies the same criterion to the
+  raw fitted matrix, which one of its internal arms inverts, so its refusals
+  nest the scaling surface's: a matrix degenerate only in the raw metric
+  (wildly unequal fitted variances over a well-conditioned correlation
+  structure) yields `NA` standard errors beside validly scaled fit
+  statistics, never the reverse, and on a unit-diagonal fitted matrix the two
+  surfaces agree exactly.
+  Previously the two surfaces disagreed at the numerical margin — whichever
+  internal `solve()` failed first refused with an incidental label — so a
+  sufficiently degenerate fitted matrix could yield `NA` corrected standard
+  errors beside silently scaled fit statistics derived from the same matrix.
+  The failure-reason vocabulary is now shared across both surfaces, and four
+  reported literals change. On `details$se_correction_failed` alone: a
+  nonpositive fitted variance reports `"singular"` where it previously
+  reported `"nonpositive_diagonal"`, and a positive-infinite one reports
+  `"infinite_diagonal"` rather than `"unidentified"`. On
+  `details$se_correction_failed` and `details$fit_scaling_failed` alike: an
+  exactly singular fitted matrix reports `"ill_conditioned"` where both
+  previously reported `"singular"`, and an indefinite one reports
+  `"ill_conditioned"` where both previously reported `"indefinite"`. Code
+  that branches on any of these reason strings needs updating.
+
 * `axes_reliability()` objects now report `details$n_moments`, the number of
   distinct analyzed moments p\* = p(p+1)/2, and `details$baseline`, the
   independence model's unscaled chi-square and degrees of freedom.

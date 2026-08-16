@@ -228,19 +228,44 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # cov2cor() of a nonpositive diagonal returns NaN rows rather than erroring,
   # so without this the failure would surface as "indefinite" or as raw NaN
   # instead of as an honest refusal. The sibling surface has carried the same
-  # guard since M68 (R/axes_scaled_fit.R); this one did not (RR15 B2).
+  # guard since M68 (R/axes_scaled_fit.R); this one did not (RR15 B2). Until
+  # M89 this door said "nonpositive_diagonal" where the sibling's says
+  # "singular": the two surfaces price the same fitted matrix and their reasons
+  # are read side by side, so they now share one vocabulary, and the sibling's
+  # literal is the one M71's boundary tests pinned.
   #
   # `na.rm = TRUE` is load-bearing, not defensive. Without it a single NA or
   # NaN on the diagonal makes the predicate NA and `if (NA)` ERRORS, which
-  # breaks the NA-together contract on an input the pre-M69 code handled: it
-  # fell through to solve() -> tryCatch -> na_out("singular"). With na.rm the
-  # same input takes that same route again, and the NaN never reaches cov2cor()
-  # because this function returns before it. `<= 0` still catches every
-  # genuinely nonpositive variance. (M69 review round 1, F1 -- the `is.finite`
-  # family recurring: M32, M35, M60.)
+  # breaks the NA-together contract on an input the pre-M69 code handled. With
+  # na.rm the same input is still refused as "singular" -- since M89 by
+  # axes_sigma_degenerate()'s finiteness arm below, before any pricing runs.
+  # `<= 0` still catches every genuinely nonpositive variance. (M69 review
+  # round 1, F1 -- the `is.finite` family recurring: M32, M35, M60.)
   if (any(diag(sigma) <= 0, na.rm = TRUE)) {
-    return(na_out("nonpositive_diagonal"))
+    return(na_out("singular"))
   }
+  # +Inf fails `<= 0`, so it needs its own door, exactly as in the sibling
+  # (M71). Before M89 this surface refused it too, but by accident rather than
+  # contract: pricing the raw matrix, solve() of an infinite variance zeroes
+  # that row/column of the inverse, and the rank-deficient information matrix
+  # fell out as "unidentified" -- a different literal than the sibling prints
+  # for the same input. This surface adopts the sibling's literal (M89 AC2).
+  if (any(is.infinite(diag(sigma)))) return(na_out("infinite_diagonal"))
+
+  # The stated degeneracy criterion (M89) -- see axes_sigma_degenerate() at the
+  # end of this file for the criterion and its rationale. Checked before any
+  # pricing so that what refuses a degenerate matrix is a stated contract, not
+  # whichever solve() call happens to give up first on this platform's LAPACK.
+  # Evaluated on BOTH matrices this helper prices: the raw realigned Sigma-hat
+  # (the `naive` arm below inverts it) and cov2cor(Sigma-hat) (the corrected
+  # arm, and the only matrix anything user-reported depends on). Either arm
+  # tripping refuses all three vectors as a unit -- the retained cost recorded
+  # in M89's Deviations table; RR18 rec 7's decoupling of `naive` is M90's.
+  degenerate <- axes_sigma_degenerate(sigma)
+  if (is.null(degenerate)) {
+    degenerate <- axes_sigma_degenerate(stats::cov2cor(sigma))
+  }
+  if (!is.null(degenerate)) return(na_out(degenerate))
 
   raw <- axes_se_pricing(sigma, d, n)
   if (is.character(raw)) return(na_out(raw))
@@ -254,3 +279,83 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
     reason = NULL
   )
 }
+
+
+# The single stated degeneracy criterion for lavaan's fitted covariance matrix
+# (M89), shared by its two consumers -- axes_corrected_se() above and
+# axes_scaling_factor() in R/axes_scaled_fit.R -- so a matrix too degenerate to
+# price is refused by BOTH surfaces with one literal, instead of a user
+# receiving NA corrected SEs beside silently scaled fit statistics derived
+# from the same matrix.
+#
+# THE CRITERION: the smallest eigenvalue of the priced matrix, relative to its
+# largest, must exceed sqrt(p * eps / tau) (tau below); at or below that the
+# matrix is refused as "ill_conditioned". One inequality carries three cases:
+# indefinite (lambda_min <= 0 < lambda_max), exactly singular (lambda_min = 0),
+# and ill-conditioned (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4
+# at p = 24).
+#
+# WHICH MATRIX (M89 re-cut, RR18): each consumer prices the matrix it actually
+# computes with. Every quantity the scaling surface computes -- and every
+# number axes_reliability() reports -- is a function of cov2cor(Sigma-hat)
+# alone, so that surface evaluates the criterion on cov2cor(Sigma-hat). The SE
+# helper evaluates it on BOTH cov2cor(Sigma-hat) and the raw Sigma-hat: its
+# `naive` arm is the one place the raw matrix is inverted (the lavaan tie,
+# D-037), and its three vectors refuse as a unit. The two surfaces' refusals
+# are therefore NESTED -- whatever the scaling surface refuses, the SE helper
+# refuses with the same literal, exactly so on a unit diagonal where the two
+# metrics coincide. Pricing the raw matrix everywhere, as the first cut did,
+# refused pure diagonal rescalings the estimand is exactly invariant under:
+# RR18 measured corrected/fiml_ratio invariant to <= 6.4e-16 across eight
+# decades of diagonal inflation that move kappa(raw) to 2.1e8. No
+# model-statement content is lost in the move: cov2cor() is a congruence, so
+# by Sylvester's law of inertia it preserves eigenvalue signs exactly --
+# indefiniteness and exact singularity are metric-invariant, and only the
+# scale nuisance the reported quantities never depend on is normalized away.
+#
+# WHY THIS CUTOFF: the corrected branch builds the information matrix
+# Delta'V Delta from the priced matrix's INVERSE twice, so its entries carry a
+# relative error growing like p * kappa^2 * eps; the floor is where that bound
+# reaches the accuracy target tau. The shipped sqrt(p*eps) floor -- tau = 1 in
+# these terms -- was a thousand times looser: it accepted the committed
+# exemplar B (kappa = 6.65e6 in BOTH metrics, unit diagonal) on which the
+# reported corrected SEs were wrong by 3.4% with reason NULL, the package's
+# first measured silent wrong number in this subsystem (RR18).
+#
+# THE ACCURACY TARGET tau: the largest relative error tolerated in a reported
+# corrected SE before the matrix is refused instead. Calibrated against the
+# exact-rational oracle (devel/degeneracy-oracle/): its Q4 sweep measures the
+# double-precision SE relative error to sit within a factor of 10 of
+# p * kappa(cov2cor(Sigma-hat))^2 * eps (ratios 3.28/2.4/1.27 across three
+# decades of kappa, M89 T1), so refusing when that bound exceeds tau -- i.e.
+# when lambda_min/lambda_max <= sqrt(p*eps/tau) -- caps the error a computed
+# answer can carry at ~10*tau = 1e-5 relative, far below anything a reported
+# SE's downstream use can resolve. The committed counterexample
+# cairn/reviews/rb18-counterexample-b.rds sits at 3.4% relative error
+# (RR18/M89): three orders past any defensible target, and one the shipped
+# sqrt(p*eps) floor -- tau = 1, in these terms -- accepted with reason NULL.
+axes_degeneracy_tau <- 1e-6
+
+# Returns NULL (priceable), "singular" (non-finite entries: the literal the
+# NA/NaN-diagonal route has carried since before M69, now reached here rather
+# than in solve()), or "ill_conditioned". Callers refuse nonpositive and +Inf
+# diagonals at their own doors first, so lambda_max > 0 whenever the
+# eigendecomposition runs.
+axes_sigma_degenerate <- function(sigma) {
+  if (!all(is.finite(sigma))) return("singular")
+  ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values
+  p <- nrow(sigma)
+  floor_ <- sqrt(p * .Machine$double.eps / axes_degeneracy_tau)
+  if (ev[p] <= ev[1] * floor_) return("ill_conditioned")
+  NULL
+}
+
+
+# The one expression both fitted-matrix consumers are fed from (M89): the
+# fitted covariance matrix exactly as lavaan reports it, dimnames and all. A
+# named seam rather than an inline `lavaan::fitted(fit)$cov` at each call site
+# in axes_reliability(), so the assembly-level tests can inject a constructed
+# degenerate matrix: no converged fit is known to reach the degenerate regime,
+# and the criterion's assembly behavior still needs exercising through
+# axes_reliability() itself.
+axes_fitted_cov <- function(fit) lavaan::fitted(fit)$cov
