@@ -1,6 +1,6 @@
 # M88: Fence the norms-audit walk helpers M87 kept
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -51,7 +51,7 @@ their existing candidate rows.
       for a kind outside `stop`/`stopifnot`/`stopifnot_named`; and asserts the
       `stopifnot_named` branch in both directions — a message equal to the key
       accepted, a message carrying the key as a strict superstring rejected.
-- [ ] AC3 A test asserts each `refuse_unenumerable()` site raises and names its
+- [x] AC3 A test asserts each `refuse_unenumerable()` site raises and names its
       cause: `norms_audit_stopifnot_conditions()` for a condition passed under any
       element of `STOPIFNOT_RESERVED`, iterated as the running R defines it and
       anchored non-vacuous by pinning `"exprs"` as a literal member; and
@@ -128,6 +128,8 @@ their existing candidate rows.
 - 2026-08-15: mutant 7 is the evidence AC4's field-set assertion carries the claim its grep cannot: `out[[i]][["seq_within_group"]] <- 1L` reintroduces a per-site field, is not matched by `git grep -nE '(\$|\.)ordinal|ordinal *=|assign_ordinals'` (verified against the line itself), and reddens 33 assertions — one per walked site.
 - 2026-08-15: CHECKPOINT — T6's mutation half is complete and recorded above; the confirming full `devtools::test()` was still running when this was committed, so AC7 is not yet evidenced and the milestone stays `in-progress`. The filtered `norms-audit` run was clean at the same tree.
 - 2026-08-15: AC7 evidenced, superseding the checkpoint line above — full `devtools::test()` clean at FAIL 0 / WARN 6 / SKIP 3 / PASS 7132, warnings and skips unchanged from the T1 baseline's 7051 passes. The +81 is the new walk file's 46 assertions plus the manifest file's 9 → 44. Tree clean; status in-progress → review.
+- 2026-08-15: return 1 fixed. F1 — the AC3 naming assertions now match `formal <nm>` and `argument named tail`, phrases only the refusal's own `what` clause composes, instead of a bare name the echoed deparsed call already carries. Proven by the mutation the old assertions survived: gutting the stopifnot naming clause now reddens 3, gutting the stop() one reddens 2. F2 — the AC1 key now comes from `norms_audit_stopifnot_conditions()` rather than a retyped copy, so test and walk cannot diverge; proven by construction, not mutation, since a derivation change correctly moves both sides together. B5 — the M60 citation corrected to M43. Walk file green at 46.
+- 2026-08-15: a tenth mutant (walk key `collapse = " "` -> `"  "`) SURVIVED and is retracted as invalid, not recorded as a coverage hole: `squish()` collapses whitespace runs, so the two produce byte-identical keys (measured). M60's lesson exactly — a mutation perturbing a quantity the code is provably invariant to cannot redden, and reading that null as missing coverage is the error.
 - 2026-08-15: REVIEW RETURN 1 — AC3 fails. F1 (85), verified independently: `refuse_unenumerable()` echoes the deparsed call, so `expect_match(msg, nm, fixed = TRUE)` passes even with the naming logic gutted; the single-name half of AC3's "names its cause" promise is unasserted. Riding the return: F2 (80), AC1's `long_key` retypes the shipped derivation instead of calling it, and B5, a misattributed M60 citation that should be M43 (verified against LESSONS). 28 findings below the bar logged in Review. Status review → in-progress.
 - 2026-08-15: review in progress — PR #116 opened as draft; AC1-AC5 evidenced fresh and ticked, consistency gate clean (`cairn_validate` exit 0; the profile's toolchain checks are no-ops by file list, the branch touching only `tests/` and `cairn/`). AC6/AC7 deferred until the fresh-context reviewers finish, since a mutation pass would churn the tree they read.
 - 2026-08-15: plan gate weighed D-042's bar on reopening this area and read this scope as distinct — no registry, matcher, matrix or denylist returns, no sweep is added, and the manifest check's promise is byte-unchanged; falsified by any criterion here widening what the manifest check promises.

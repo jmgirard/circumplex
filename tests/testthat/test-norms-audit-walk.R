@@ -36,12 +36,19 @@ live_truncated <- function(cond, env = list(batch = 1)) {
 test_that("the stopifnot stem accepts and rejects as a partition (M88)", {
   long <- quote(is.data.frame(batch) && is.numeric(batch) &&
                   is.character(batch) && is.list(batch) && nrow(batch) > 3)
-  long_key <- squish(paste(deparse(long), collapse = " "))
+  # The key comes from the shipped walk, never retyped here. Recomputing it as
+  # `squish(paste(deparse(long), collapse = " "))` agrees with the walk by
+  # construction and diverges exactly when the walk's own derivation changes --
+  # the trap M76/M78 record, where a test asserts its own copy of the
+  # expression under test (M88 review, F2).
+  long_key <- norms_audit_stopifnot_conditions(
+    bquote(stopifnot(.(long)))
+  )[[1L]][["key"]]
   truncated <- live_truncated(long)
 
   # The live message really is the truncated shape, not a short one that
   # happened to fit -- otherwise the accept case below proves nothing about
-  # truncation (M60: a probe that cannot reach the regime it names).
+  # truncation (M43: the probe was narrower than what it probed).
   expect_true(norms_audit_stopifnot_stem(truncated)$truncated)
   expect_true(grepl("....", truncated, fixed = TRUE))
 
@@ -126,7 +133,14 @@ test_that("a stopifnot formal carrying conditions is refused by name (M88)", {
     err <- tryCatch(norms_audit_stopifnot_conditions(cl), error = identity)
     expect_true(inherits(err, "error"), info = nm)
     expect_match(conditionMessage(err), "cannot enumerate", fixed = TRUE)
-    expect_match(conditionMessage(err), nm, fixed = TRUE)
+
+    # `formal <nm>`, not a bare `<nm>`. `refuse_unenumerable()` echoes the
+    # deparsed call, which for this probe is `stopifnot(<nm> = x > 0)` -- so a
+    # bare name match is satisfied by the echo alone and passes with the naming
+    # clause gutted entirely (measured at the M88 review, F1). The phrase below
+    # occurs only in the `what` clause the refusal composes, so it fails when
+    # that clause stops naming the formal.
+    expect_match(conditionMessage(err), paste0("formal ", nm), fixed = TRUE)
   }
 })
 
@@ -150,7 +164,10 @@ test_that("a stop() argument R folds into the message is refused (M88)", {
                   error = identity)
   expect_true(inherits(one, "error"))
   expect_match(conditionMessage(one), "cannot enumerate", fixed = TRUE)
-  expect_match(conditionMessage(one), "tail", fixed = TRUE)
+  # `argument named tail`, for the reason above: the echoed call carries
+  # `tail = "TAIL"`, so a bare `tail` match cannot tell the naming clause from
+  # the echo.
+  expect_match(conditionMessage(one), "argument named tail", fixed = TRUE)
 
   # More than one carried name exercises the paste(collapse = ", ") rendering,
   # which no single-name probe reaches.
