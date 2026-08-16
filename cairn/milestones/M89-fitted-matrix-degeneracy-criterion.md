@@ -1,6 +1,6 @@
 # M89: One degeneracy criterion for the two fitted-matrix consumers
 
-- **Status:** review
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -111,6 +111,12 @@ the scaled statistic → M68 already carries one.
       (review finding O3, scored 65). Fire what is reachable with its condition
       asserted and a passing control, and correct the reachability claim in
       `R/axes_reliability.R` for whatever is not.
+- [ ] **T11** — Requested at the round-2 review gate: escalate the criterion's
+      metric choice to a Fable review via `/milestone-brief`. The question is
+      which matrix the degeneracy criterion should price — raw Sigma-hat, as
+      shipped, or the `cov2cor(Sigma-hat)` both surfaces actually invert — given
+      two verified counterexamples pointing in opposite directions (O1/RS5, 85;
+      RO2, 70). Ingest the RR, then re-review.
 
 ## Work log
 
@@ -136,6 +142,8 @@ the scaled statistic → M68 already carries one.
 - 2026-08-15: T10 done — `"unidentified"` is fired as a returned reason on BOTH surfaces by a new test each, with its condition asserted and a passing control that passes for the claim's reason (dropping `fit_zeta1` is the only change). The probe is a degenerate Δ rather than a degenerate Σ̂: a single-scale map makes `zeta1` identical to the all-ones `xi2`, which the criterion cannot see (`axes_sigma_degenerate()` returns NULL on that Σ̂, asserted in both tests). `"indefinite"` has no construction left and the reachability claim at `R/axes_reliability.R` is corrected in place rather than tested: measured, an indefinite Σ̂ (λmin = −0.382) answered `"indefinite"` on both surfaces pre-M89 and answers `"ill_conditioned"` now, and 1500 random PD correlation matrices returned c ∈ [0.94, 1.29] with no refusal. Suite FAIL 0 / PASS 7250 (up 19); check Status OK; `document()` warning-free, no `man/` diff. Status → review.
 
 - 2026-08-15: /milestone-review round 2 — all seven criteria re-verified at 8778ae06, consistency gate green. 23 findings, 2 actioned: RO1 (92) falsified the reachability comment T10 added and is fixed here (with the same wording in both tests and RO5's dead assertion); RS5 (85) is round 1's O1, disposition unchanged. RO2 (70), the mirror-image half of O1, is recorded on the ROADMAP row — verified, helper-boundary only. Not a defect return: no acceptance criterion failed, and RO1 is an internal comment rather than a defect in what the package does for users.
+
+- 2026-08-15: merge approval WITHHELD at the round-2 gate — Jeff chose a Fable review of the criterion's metric choice over merging as it stands, the per-instance escalation approval D-004 requires. Logged as T11; status review → in-progress. Not a defect return: no acceptance criterion failed and nothing met the return floor, so this does not count toward the thrash rule.
 
 ## Decisions
 
