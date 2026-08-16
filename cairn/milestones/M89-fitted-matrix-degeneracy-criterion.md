@@ -1,6 +1,6 @@
 # M89: Price the degeneracy criterion in the metric the reported numbers live in
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** RR18
@@ -145,7 +145,7 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
 - [x] **T6** — Roxygen enumerations, the corrected in-code rationale,
       `devtools::document()`, NEWS, the AC9 supersession (in-file annotation +
       `DECISIONS.md` entry), and the AC9 record correction at both grep sites.
-- [ ] **T7** — Full `devtools::check()`.
+- [x] **T7** — Full `devtools::check()`.
 
 ## Work log
 
@@ -197,6 +197,8 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
 - 2026-08-16: T5 done — the AC7 sweep asserts NULL `reason` and scale within 1e-9 relative on all three probe maps across magnitude (10^±k, k ∈ {2,4,8}), direction, two locations, a three-entry multiplicity D, and a max/min = 8 ratio D. Suite FAIL 0 / PASS 7413 (up 87).
 
 - 2026-08-16: T6 done — roxygen (details block + return enumeration) and NEWS state the revised contract (cov2cor pricing, τ floor, nested refusals, unit-diagonal agreement); `devtools::document()` warning-free, regenerating only `man/axes_reliability.Rd`; the in-code rationale was corrected at T4. AC9: the 2026-08-15 raw-criterion Decisions entry carries its dated superseding annotation; the metric choice recorded as D-044 on D-036/D-037's footing; RO2's falsified framing annotated at the Review-section site and at RB18 (RR18 already states the correction at its own two grep sites, and the ROADMAP row carried it since the ingest — that row now also carries a dated resolution note, since "the metric choice is the open question" was stale current knowledge). Suite FAIL 0 / PASS 7413.
+
+- 2026-08-16: T7 done — `devtools::check(args = "--no-manual")` Status OK, 0 errors / 0 warnings / 0 notes, 7m26s. All tasks complete; status → review.
 
 ## Decisions
 
