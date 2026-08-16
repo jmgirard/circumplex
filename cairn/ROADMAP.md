@@ -1,7 +1,7 @@
 # circumplex Roadmap
 
 _The only authority on milestone status. Grouped by status, not ID._
-_Last hygiene check: 2026-08-15 (post-merge pass after M88 merged — row set to done, file archived at 24/25 lines, M83's terminal row pruned to hold retention at 5, the M87-lineage candidate row extended with M88's 28 below-bar findings, two lesson families extended in place since LESSONS sits one line under its cap. M7 stays parked on the maintainer's CRAN submission handoff.)_
+_Last hygiene check: 2026-08-15 (audit pass over the M88 post-merge stamp it replaces — no work since; all checks green, tree clean and level with origin, no open RB, GitHub issue and PR inboxes both empty. M7 stays parked on the maintainer's CRAN submission handoff.)_
 
 Pre-migration history: see `cairn/legacy/` and git log.
 
