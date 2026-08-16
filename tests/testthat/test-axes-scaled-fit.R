@@ -1545,6 +1545,63 @@ test_that("AC3: tau is a named constant, and the floored criterion accepts all t
   }
 })
 
+
+test_that("AC7: the scaling surface is invariant under positive-diagonal congruences on every free axis", {
+  # AC1's invariance claim, verified across the family it is free in: for any
+  # positive diagonal D, sigma -> D sigma D changes nothing this surface
+  # computes -- cov2cor() removes D exactly -- so `reason` stays NULL and
+  # `scale` moves only by floating-point roundoff. The sweep varies magnitude
+  # (10^k, k in {2, 4, 8}), direction (deflation as well as inflation),
+  # location (two diagonal positions), multiplicity (a D moving several
+  # entries at once), and ratio (one gentle D with max/min < 10), on all
+  # three probe maps -- so the criterion's p factor is exercised at
+  # p = 24, 12 and 8.
+  for (m in m89_grid_maps()) {
+    pp <- m$pp
+    p <- nrow(pp$sigma)
+    d <- axes_se_derivs(pp$item_angle, pp$scale, NULL, m$zeta1, FALSE)
+    df <- p * (p + 1) / 2 - length(d$mats)
+    bdf <- p * (p - 1) / 2
+
+    sf <- function(sig) {
+      axes_scaling_factor(sig, pp$names, pp$item_angle, pp$scale,
+                          fit_zeta1 = m$zeta1, fit_zeta2 = FALSE,
+                          df = df, baseline_df = bdf)
+    }
+    base <- sf(pp$sigma)
+    expect_null(base$reason, label = sprintf("p %d unscaled", p))
+
+    check_D <- function(dvec, what) {
+      D <- diag(dvec)
+      sig <- D %*% pp$sigma %*% D
+      dimnames(sig) <- dimnames(pp$sigma)
+      got <- sf(sig)
+      expect_null(got$reason, label = sprintf("p %d %s: reason", p, what))
+      expect_lt(abs(got$scale - base$scale) / abs(base$scale), 1e-9,
+                label = sprintf("p %d %s: relative scale drift", p, what))
+    }
+
+    for (pos in m$pos) {
+      for (k in c(2, 4, 8)) {
+        dv <- rep(1, p)
+        dv[pos] <- 10^k
+        check_D(dv, sprintf("inflation pos %d k %d", pos, k))
+        dv <- rep(1, p)
+        dv[pos] <- 10^-k
+        check_D(dv, sprintf("deflation pos %d k %d", pos, k))
+      }
+    }
+
+    dv <- rep(1, p)
+    dv[m$pos] <- c(1e4, 1e-4)
+    dv[1L] <- 100
+    check_D(dv, "multiplicity (three entries, both directions)")
+
+    dv <- seq(0.5, 4, length.out = p)
+    check_D(dv, "ratio (max/min = 8)")
+  }
+})
+
 test_that("the non-inflation (indefinite) form is refused by both surfaces with one literal", {
   pp <- probe_octant()
   p <- nrow(pp$sigma)

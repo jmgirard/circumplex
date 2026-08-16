@@ -141,7 +141,7 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
       against the branch's current code at the counterexample-A construction.
 - [x] **T4** — Move the criterion to `cov2cor(Σ̂)` at the scaling surface and to
       both arms at the SE helper; apply the τ floor.
-- [ ] **T5** — The AC7 invariance sweep: all five axes, all three probe maps.
+- [x] **T5** — The AC7 invariance sweep: all five axes, all three probe maps.
 - [ ] **T6** — Roxygen enumerations, the corrected in-code rationale,
       `devtools::document()`, NEWS, the AC9 supersession (in-file annotation +
       `DECISIONS.md` entry), and the AC9 record correction at both grep sites.
@@ -193,6 +193,8 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
 - 2026-08-16: T2 done — τ = 1e-6 recorded as `axes_degeneracy_tau` beside the criterion, its calibration comment citing the oracle's Q4 error table (T1's measured ratios 3.28/2.4/1.27 against p·κ²·ε) and the 3.4% counterexample; the tripwire's re-escalation condition did not fire — the calibration rests entirely on what the oracle measures. Suite clean (FAIL 0, PASS 7249).
 
 - 2026-08-16: T3–T4 done, one commit so every commit's suite stays green (the red test alone would break the per-task verify). T3's red measured against the pre-move code: the AC8 grid's scaling-surface NULL pins fail from k = 7 ("ill_conditioned" where the estimand is invariant) and the counterexample-A test fails at the sf refusal — the metric defect, verified as such. T4 moves the criterion to `cov2cor(Σ̂)` at the scaling surface (finiteness arm hoisted ahead of `cov2cor()` to keep M71's one-warning contract) and to both arms at the SE helper, floor `sqrt(p·ε/τ)`; assembly tests split — near-singular injection refuses both surfaces, inflation injection NAs SEs alone with fit computing; the falsified "criterion prices the raw matrix" comments in both T10 tests and `R/axes_reliability.R` corrected in place. Suite FAIL 0 / PASS 7326 (up 77); oracle re-run ANCHORS PASS, SWEEP PASS — the sweep's κ = 1.1e4 point computes at error 2.0e-7 and its κ = 1.1e5 point is refused at error 2.6e-5, bracketing the τ floor.
+
+- 2026-08-16: T5 done — the AC7 sweep asserts NULL `reason` and scale within 1e-9 relative on all three probe maps across magnitude (10^±k, k ∈ {2,4,8}), direction, two locations, a three-entry multiplicity D, and a max/min = 8 ratio D. Suite FAIL 0 / PASS 7413 (up 87).
 
 ## Decisions
 
