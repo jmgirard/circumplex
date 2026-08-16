@@ -1,11 +1,13 @@
 # The abort-site manifest for `data-raw/audit-norms.R` (M87).
 #
 # One row per `stop()` call and per `stopifnot()` CONDITION, keyed
-# (kind, binding, key, ordinal) exactly as `norms_audit_abort_sites()` collects
-# them. `test-norms-audit-manifest.R` asserts set equality between this table
-# and a fresh walk of the script, so a guard added to the script with no entry
-# here reddens the suite -- the one property the retired abort-site registry
-# existed for (M81-M83), kept at a fraction of its mass.
+# (kind, binding, key) exactly as `norms_audit_abort_sites()` collects them.
+# `test-norms-audit-manifest.R` asserts set equality between this table and a
+# fresh walk of the script, so a guard added to the script with no entry here
+# reddens the suite -- the one property the retired abort-site registry existed
+# for (M81-M83), kept at a fraction of its mass. That file also asserts both
+# sides duplicate-free, which is what makes a three-part key safe: a twin cannot
+# collapse onto one row unnoticed (M88, D-043).
 #
 # GENERATED, never hand-edited: re-derive with a walk of the script rather than
 # typing a row, so the table cannot drift from what the script actually raises.
@@ -82,41 +84,6 @@ NORMS_AUDIT_MANIFEST <- data.frame(
     "roster_from_objects",
     "roster_from_objects",
     "refuse_shared_untagged_blocks"
-  ),
-  ordinal = c(
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L,
-    1L
   ),
   key = c(
     "is.data.frame(batch)",
