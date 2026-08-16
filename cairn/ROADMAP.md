@@ -14,7 +14,7 @@ Pre-migration history: see `cairn/legacy/` and git log.
 | M86 | Name every roster shape the norms-audit builder cannot honestly audit | done | — | normal | milestones/archive/M86-norms-audit-roster-refusals.md |
 | M87 | Retire the norms-audit abort apparatus for a manifest check | done | — | normal | milestones/archive/M87-norms-audit-apparatus-retirement.md |
 | M88 | Fence the norms-audit walk helpers M87 kept | done | — | normal | milestones/archive/M88-norms-audit-walk-helper-tests.md |
-| M89 | One degeneracy criterion for the two fitted-matrix consumers | in-progress | — | normal | milestones/M89-fitted-matrix-degeneracy-criterion.md |
+| M89 | One degeneracy criterion for the two fitted-matrix consumers | review | — | normal | milestones/M89-fitted-matrix-degeneracy-criterion.md |
 | M7 | v2.0.0 CRAN release preparation | blocked | M25, M26, M27, M31, M32, M33, M34, M35, M36, M37, M38, M54, M55 | high | milestones/M7-v2-release-prep.md |
 
 ## Candidates

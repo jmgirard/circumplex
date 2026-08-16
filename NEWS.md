@@ -71,10 +71,16 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   internal `solve()` failed first refused with an incidental label — so a
   sufficiently degenerate fitted matrix could yield `NA` corrected standard
   errors beside silently scaled fit statistics derived from the same matrix.
-  The failure-reason vocabulary is now shared across both surfaces:
-  `details$se_correction_failed` reports `"singular"` where it previously
-  reported `"nonpositive_diagonal"`, and `"infinite_diagonal"` (rather than
-  `"unidentified"`) for a positive-infinite fitted variance.
+  The failure-reason vocabulary is now shared across both surfaces, and four
+  reported literals change. On `details$se_correction_failed` alone: a
+  nonpositive fitted variance reports `"singular"` where it previously
+  reported `"nonpositive_diagonal"`, and a positive-infinite one reports
+  `"infinite_diagonal"` rather than `"unidentified"`. On
+  `details$se_correction_failed` and `details$fit_scaling_failed` alike: an
+  exactly singular fitted matrix reports `"ill_conditioned"` where both
+  previously reported `"singular"`, and an indefinite one reports
+  `"ill_conditioned"` where both previously reported `"indefinite"`. Code
+  that branches on any of these reason strings needs updating.
 
 * `axes_reliability()` objects now report `details$n_moments`, the number of
   distinct analyzed moments p\* = p(p+1)/2, and `details$baseline`, the

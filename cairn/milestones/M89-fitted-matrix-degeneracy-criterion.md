@@ -1,6 +1,6 @@
 # M89: One degeneracy criterion for the two fitted-matrix consumers
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -101,7 +101,7 @@ the scaled statistic → M68 already carries one.
       constructed fitted matrix.
 - [x] **T7** — Roxygen reason enumeration, `devtools::document()`, NEWS entry.
 - [x] **T8** — Full `devtools::check()`.
-- [ ] **T9** — Requested at the 2026-08-15 review gate: NEWS names two of the
+- [x] **T9** — Requested at the 2026-08-15 review gate: NEWS names two of the
       four user-visible reason-literal changes. Add the other two — an exactly
       singular fitted matrix moves `"singular"` → `"ill_conditioned"` and an
       indefinite one moves `"indefinite"` → `"ill_conditioned"`, on both
@@ -125,6 +125,8 @@ the scaled statistic → M68 already carries one.
 - 2026-08-15: /milestone-review — PR #117 opened draft; all seven criteria verified with fresh evidence (AC4's pre-milestone reds re-measured against a scratch `origin/master` checkout); consistency gate green (`cairn_validate` exit 0, no DESIGN principle change so `cairn_impact` skipped, `document()` warning-free and diff-free, check Status OK). Three-lens review returned 21 findings, 1 actioned at >= 80 (O1, 85 — the criterion is not invariant under a pure diagonal rescaling), routed to the graduated ROADMAP row rather than patched: no criterion fails, it is unreachable through the exported API, and the repair re-opens the criterion's design as an `no-oracle` tripwire. 20 below-bar findings logged in the Review section.
 
 - 2026-08-15: merge approval WITHHELD at the review gate — Jeff chose to close the NEWS gap first (finding O5, scored 75, below the action bar and so logged rather than actioned by the review). Logged as T9; status review → in-progress. Not a defect return: no acceptance criterion failed and no finding met the return floor, so this does not count toward the thrash rule.
+
+- 2026-08-15: T9 done — the NEWS vocabulary sentence widened from two literal changes to all four, each verified by measurement against `origin/master` rather than composed: an exactly singular fitted matrix moves `"singular"` → `"ill_conditioned"` and an indefinite one `"indefinite"` → `"ill_conditioned"`, both on both surfaces (measured at λmin = −9.32e−16 and −0.382 on the octant probe). All four are pinned by named tests. `devtools::test()` FAIL 0 / PASS 7231 and `devtools::check(args = "--no-manual")` Status OK. All tasks complete; status → review. Note for the next review pass: the recorded AC5 and AC7 evidence predates this NEWS edit and needs re-gathering.
 
 ## Decisions
 
