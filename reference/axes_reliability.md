@@ -114,8 +114,14 @@ respondents behind any item pair, `se_uncorrected`, the component
 standard errors as normal-theory maximum likelihood reports them before
 the correlation-structure correction, `se_correction_failed`, `NULL`
 when that correction succeeded or a string naming why the reported SEs
-are `NA`, `fit_uncorrected`, the six fit statistics as lavaan reports
-them before the correlation-metric scaling, `scaling_factor`, the two
+are `NA` – notably `"ill_conditioned"`, the shared degeneracy criterion
+(smallest eigenvalue relative to largest at or below
+`sqrt(p * .Machine$double.eps / 1e-6)`, evaluated on
+[`cov2cor()`](https://rdrr.io/r/stats/cor.html) of the fitted covariance
+matrix and, for this surface only, on the raw matrix as well), which
+also sets `fit_scaling_failed` when the correlation form is what tripped
+it – `fit_uncorrected`, the six fit statistics as lavaan reports them
+before the correlation-metric scaling, `scaling_factor`, the two
 Satorra-Bentler factors (`model` and `baseline`), and
 `fit_scaling_failed`, `NULL` when the scaling succeeded or a string
 naming why `chisq`, `pvalue`, `rmsea` and `cfi` are `NA`). `details`
@@ -220,7 +226,27 @@ The scaled statistic matches its reference chi-square in **mean**; it is
 not exact, and it does not make a badly misspecified model fit. If the
 factor cannot be computed, all four are `NA` with the reason in
 `details$fit_scaling_failed` – never the uncorrected value in their
-place.
+place. One refusal is shared with the component-SE correction, under one
+stated criterion evaluated in the metric the reported numbers are
+computed in: a fitted covariance matrix whose correlation form
+[`cov2cor()`](https://rdrr.io/r/stats/cor.html) is degenerate –
+indefinite, singular, or so ill-conditioned that its smallest
+eigenvalue, relative to its largest, falls at or below
+`sqrt(p * .Machine$double.eps / 1e-6)`, where the `1e-6` is a stated
+accuracy target: past that floor the corrected standard errors could
+carry relative error above it – is refused by both surfaces with the
+reason `"ill_conditioned"`, so the corrected standard errors and the
+four scaled statistics go `NA` together (each with its own warning
+naming that reason) rather than one surface refusing while the other
+silently scales. The standard-error surface additionally applies the
+same criterion to the raw fitted matrix, which one of its internal arms
+inverts, so its refusals nest the scaling surface's: whatever refuses
+the scaled statistics also refuses the standard errors with the same
+reason, while a matrix degenerate only in the raw metric (wildly unequal
+fitted variances over a well-conditioned correlation structure) returns
+`NA` standard errors beside validly scaled fit statistics – never the
+reverse. On a unit-diagonal fitted matrix the two metrics coincide and
+the surfaces agree exactly. `df` and `srmr` still report.
 
 If you cross-check against lavaan, match the variant. The scaled
 `chisq`, `pvalue`, `rmsea` and `cfi` here are built with the definitions
