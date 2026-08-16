@@ -1430,3 +1430,48 @@ test_that("AC4: the non-inflation form drives the divergence the other way, and 
   expect_identical(r$sf, "ill_conditioned",
                    label = "near-zero d44, scaling surface")
 })
+
+
+# ---- M89 T10: "unidentified" fired as a RETURNED reason on this surface too ----
+
+test_that("AC2: the scaling factor refuses as 'unidentified' when the model's derivatives are degenerate", {
+  # The sibling of the corrected-SE test in test-axes-corrected-se.R, and for
+  # the same reason: M89's degeneracy criterion refuses a degenerate Sigma-hat
+  # ahead of every solve() on this surface, so the door below is reachable only
+  # by a Delta that is degenerate while Sigma-hat is well conditioned. A
+  # single-scale map with zeta1 fitted makes `zeta1` identical to the all-ones
+  # `xi2`, so two columns of Delta coincide.
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  one_scale <- rep("A", p)
+  d <- axes_se_derivs(pp$item_angle, one_scale, NULL, TRUE, FALSE)
+  q <- length(d$mats)
+
+  expect_identical(d$mats[[2L]], d$mats[[3L]])
+  expect_null(axes_sigma_degenerate(pp$sigma))
+
+  args <- list(
+    sigma = pp$sigma, item_names = pp$names, item_angle_deg = pp$item_angle,
+    item_scale = one_scale, item_block = NULL, fit_zeta1 = TRUE,
+    fit_zeta2 = FALSE, df = p * (p + 1) / 2 - q, baseline_df = p * (p - 1) / 2
+  )
+  expect_warning(
+    got <- do.call(axes_scaling_factor, args),
+    "could not be computed"
+  )
+  expect_identical(got$reason, "unidentified")
+  expect_identical(got$scale, NA_real_)
+  expect_identical(got$baseline, NA_real_)
+
+  # The passing control: dropping zeta1 removes the duplicate derivative and
+  # both factors compute from the same sigma. `df` moves with `q` because this
+  # surface checks the two against each other -- holding the old df would make
+  # the control refuse "df_mismatch" and prove nothing about this door.
+  d0 <- axes_se_derivs(pp$item_angle, one_scale, NULL, FALSE, FALSE)
+  ctl <- do.call(axes_scaling_factor, utils::modifyList(args, list(
+    fit_zeta1 = FALSE, df = p * (p + 1) / 2 - length(d0$mats)
+  )))
+  expect_null(ctl$reason)
+  expect_true(is.finite(ctl$scale))
+  expect_true(is.finite(ctl$baseline))
+})

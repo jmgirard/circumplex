@@ -106,6 +106,11 @@ the scaled statistic → M68 already carries one.
       singular fitted matrix moves `"singular"` → `"ill_conditioned"` and an
       indefinite one moves `"indefinite"` → `"ill_conditioned"`, on both
       surfaces — then re-run `devtools::test()` and `devtools::check()`.
+- [x] **T10** — Requested at the same gate: no test asserts `"unidentified"` or
+      `"indefinite"` as a *returned* reason from either fitted-matrix surface
+      (review finding O3, scored 65). Fire what is reachable with its condition
+      asserted and a passing control, and correct the reachability claim in
+      `R/axes_reliability.R` for whatever is not.
 
 ## Work log
 
@@ -127,6 +132,8 @@ the scaled statistic → M68 already carries one.
 - 2026-08-15: merge approval WITHHELD at the review gate — Jeff chose to close the NEWS gap first (finding O5, scored 75, below the action bar and so logged rather than actioned by the review). Logged as T9; status review → in-progress. Not a defect return: no acceptance criterion failed and no finding met the return floor, so this does not count toward the thrash rule.
 
 - 2026-08-15: T9 done — the NEWS vocabulary sentence widened from two literal changes to all four, each verified by measurement against `origin/master` rather than composed: an exactly singular fitted matrix moves `"singular"` → `"ill_conditioned"` and an indefinite one `"indefinite"` → `"ill_conditioned"`, both on both surfaces (measured at λmin = −9.32e−16 and −0.382 on the octant probe). All four are pinned by named tests. `devtools::test()` FAIL 0 / PASS 7231 and `devtools::check(args = "--no-manual")` Status OK. All tasks complete; status → review. Note for the next review pass: the recorded AC5 and AC7 evidence predates this NEWS edit and needs re-gathering.
+
+- 2026-08-15: T10 done — `"unidentified"` is fired as a returned reason on BOTH surfaces by a new test each, with its condition asserted and a passing control that passes for the claim's reason (dropping `fit_zeta1` is the only change). The probe is a degenerate Δ rather than a degenerate Σ̂: a single-scale map makes `zeta1` identical to the all-ones `xi2`, which the criterion cannot see (`axes_sigma_degenerate()` returns NULL on that Σ̂, asserted in both tests). `"indefinite"` has no construction left and the reachability claim at `R/axes_reliability.R` is corrected in place rather than tested: measured, an indefinite Σ̂ (λmin = −0.382) answered `"indefinite"` on both surfaces pre-M89 and answers `"ill_conditioned"` now, and 1500 random PD correlation matrices returned c ∈ [0.94, 1.29] with no refusal. Suite FAIL 0 / PASS 7250 (up 19); check Status OK; `document()` warning-free, no `man/` diff. Status → review.
 
 ## Decisions
 

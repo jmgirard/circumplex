@@ -1203,3 +1203,52 @@ test_that("AC10: the na_out() calls are the only non-success returns (BC5 enumer
   # D5's error exit, which is NOT part of the NA-together contract.
   expect_true(any(grepl("must carry dimnames", src, fixed = TRUE)))
 })
+
+
+# ---- M89 T10: "unidentified" fired as a RETURNED reason, not just enumerated ----
+
+test_that("the corrected SEs refuse as 'unidentified' when the model's derivatives are degenerate", {
+  # Until M89 no test asserted this literal as a returned reason -- only that
+  # the string occurs in the source (the BC5 enumeration test above). The
+  # degeneracy criterion M89 added refuses a degenerate SIGMA-hat before any
+  # pricing runs, so a probe that reaches this door must be degenerate in
+  # DELTA instead: the information matrix Delta'V Delta is singular while
+  # Sigma-hat itself is perfectly well conditioned.
+  #
+  # The construction is the model's own: `xi2` is an all-ones matrix and
+  # `zeta1` is the same-scale indicator, so a map whose items all sit on ONE
+  # scale makes the two derivative matrices IDENTICAL when zeta1 is fitted.
+  # Two identical columns of Delta cannot be told apart by any amount of data,
+  # which is exactly what "unidentified" names.
+  pp <- probe_pop()
+  p <- nrow(pp$sigma)
+  one_scale <- rep("A", p)
+
+  d <- axes_se_derivs(pp$item_angle, one_scale, NULL, TRUE, FALSE)
+  expect_identical(d$mats[[2L]], d$mats[[3L]])
+
+  # Sigma-hat is NOT what fails here: the stated criterion accepts it, so the
+  # refusal below cannot be the criterion firing under another name.
+  expect_null(axes_sigma_degenerate(pp$sigma))
+
+  expect_warning(
+    got <- axes_corrected_se(pp$sigma, pp$names, pp$item_angle, one_scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE),
+    "could not be computed"
+  )
+  # WHICH failure, never bare failure.
+  expect_identical(got$reason, "unidentified")
+  expect_true(all(is.na(got$naive)))
+  expect_true(all(is.na(got$corrected)))
+  expect_true(all(is.na(got$fiml_ratio)))
+  expect_false(any(is.nan(got$corrected)))
+
+  # The passing control, and it passes for the claim's reason: the ONLY change
+  # is dropping zeta1, which removes the duplicate derivative matrix. Same
+  # sigma, same map, same n -- so the refusal above is the degenerate Delta and
+  # nothing else about this input.
+  ctl <- axes_corrected_se(pp$sigma, pp$names, pp$item_angle, one_scale,
+                           n = 600, fit_zeta1 = FALSE, fit_zeta2 = FALSE)
+  expect_null(ctl$reason)
+  expect_true(all(is.finite(ctl$corrected)))
+})

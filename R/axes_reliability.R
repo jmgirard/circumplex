@@ -1911,9 +1911,24 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # derived statistics are NA ("singular", "ill_conditioned" from the
       # shared degeneracy criterion (M89), "unidentified", "df_mismatch",
       # "baseline_df_mismatch", "indefinite", "infinite_diagonal"), enumerated
-      # from the source the same way as the SE list above -- but WITHOUT its
-      # never-fired caveat: this surface's guards are its own, and all seven
-      # literals here are reachable at the helper's contract boundary.
+      # from the source the same way as the SE list above. Six of the seven are
+      # reachable at the helper's contract boundary and five are fired by a
+      # test; "unidentified" joined them at M89 via a degenerate Delta rather
+      # than a degenerate Sigma-hat (two identical derivative matrices, which
+      # the criterion below cannot see and does not refuse).
+      #
+      # "indefinite" is the exception, and it is M89 that made it one. That
+      # guard fires on a nonpositive scaling factor, and until M89 an
+      # indefinite Sigma-hat reached it: at the octant probe with one diagonal
+      # entry pulled to 1e-3 (lambda_min = -0.382) BOTH surfaces answered
+      # "indefinite", where they now answer "ill_conditioned" -- the criterion
+      # refuses every such matrix first. No construction reaching it has been
+      # found since: c is a trace of a positive-semidefinite operator against a
+      # positive-semidefinite Gamma_R, so c <= 0 wants round-off at a value
+      # already near zero, and 1500 random positive-definite correlation
+      # matrices at this map returned c in [0.94, 1.29] with no refusal at all.
+      # So this literal now carries the same caveat the SE list does: it
+      # enumerates what the helper CONTAINS, not what a user has been shown.
       fit_scaling_failed = scaling$reason,
       ols_shadow = ols
     ),
