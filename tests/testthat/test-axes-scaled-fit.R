@@ -1462,6 +1462,53 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
 })
 
 
+test_that("M90 AC7: when the two SE arms disagree on the label, the cov2cor arm's literal is the one reported", {
+  # The partition is not congruence-invariant: cov2cor() preserves eigenvalue
+  # SIGNS (Sylvester) but moves the RATIO the partition tests. This probe is
+  # built to split the arms -- a rank-one indefinite matrix at 2x the band
+  # (cov2cor arm: "indefinite") congruence-inflated so the raw lambda_max
+  # explodes and the raw ratio falls inside the band (raw arm:
+  # "ill_conditioned"). Measured before the M90 arm-order inversion: the
+  # helper reported the raw arm's "ill_conditioned" while the scaling
+  # surface said "indefinite" -- the same-literal half of the nestedness
+  # contract dying in the dependent. The cov2cor arm is the arm
+  # axes_scaling_factor() prices, so consulting it first restores pointwise
+  # literal agreement wherever both surfaces refuse.
+  p <- 24L
+  t_ <- sqrt(p * .Machine$double.eps)
+  v <- rep(1 / sqrt(p), p)
+  S <- diag(p) - (1 + 2 * t_) * tcrossprod(v)
+  D <- diag(c(1e4, rep(1, p - 1L)))
+  Sr <- D %*% S %*% D
+  Sr <- (Sr + t(Sr)) / 2
+  nm <- sprintf("i%02d", seq_len(p))
+  dimnames(Sr) <- list(nm, nm)
+
+  # The split is real on this matrix: the two arms genuinely disagree.
+  expect_identical(axes_sigma_degenerate(stats::cov2cor(Sr)), "indefinite")
+  expect_identical(axes_sigma_degenerate(Sr), "ill_conditioned")
+
+  ang <- rep(c(0, 90, 180, 270), each = 6L)
+  scl <- rep(LETTERS[1:8], each = 3L)
+  se <- suppressWarnings(
+    axes_corrected_se(Sr, nm, ang, scl, n = 600,
+                      fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  expect_identical(se$reason, "indefinite")
+
+  # And the scaling surface agrees, so the nestedness contract holds with
+  # one literal on a matrix where only the arm order makes that true.
+  d <- axes_se_derivs(ang, scl, NULL, TRUE, FALSE)
+  sf <- suppressWarnings(
+    axes_scaling_factor(Sr, nm, ang, scl, fit_zeta1 = TRUE,
+                        fit_zeta2 = FALSE,
+                        df = p * (p + 1) / 2 - length(d$mats),
+                        baseline_df = p * (p - 1) / 2)
+  )
+  expect_identical(sf$reason, "indefinite")
+})
+
+
 test_that("AC2: the non-finite diagonal doors keep one vocabulary on both surfaces", {
   pp <- probe_octant()
   p <- nrow(pp$sigma)

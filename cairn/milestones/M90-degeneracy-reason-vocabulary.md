@@ -132,7 +132,7 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - [x] **T4** — The partition in `axes_sigma_degenerate()`, plus the AC6
       battery: two p values, two λmax scales, two construction forms, three
       partition mutants verified to redden.
-- [ ] **T5** — The cov2cor-arm-first inversion and finiteness hoist in
+- [x] **T5** — The cov2cor-arm-first inversion and finiteness hoist in
       `axes_corrected_se()`; M89's nestedness grid re-expected under the new
       vocabulary and re-run (AC7).
 - [ ] **T6** — The `cval ≤ 0` relabel, the four-arm comment, and AC5's
@@ -153,6 +153,9 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - 2026-08-16: T1+T2 — red premise re-measured on the branch (construction returns "indefinite" via cval = Inf pre-guard; q = 6, df = 0 verified); guard added after the df-consistency guards with a df_mismatch-ordering control; suite 7423 pass / 0 fail.
 
 - 2026-08-16: T3+T4 — anchors+battery written first, red on exactly the 10 "indefinite" expectations; partition landed with the convergence-noise rationale comment (one-directional claim, so no escalation needed); grid dd-probe, check_nested set, and d44 cells re-expected ("indefinite" measured λmin −0.56 raw / −48 cor); suite 7444/0. Mutant verification follows this commit.
+
+- 2026-08-16: T4 mutants — drop-p 8 fails, squared-p 8 fails, drop-λmax 5 fails (the λmax-scale cells), each applied/restored with blob-hash verification; first perl attempt silently no-opped (interpolated `$double` in \Q…\E), caught by the hash check before any green was trusted.
+- 2026-08-16: T5 — arm-disagreement probe measured red first (cov2cor arm "indefinite", raw arm "ill_conditioned", reported = raw's); finiteness hoisted, cov2cor arm now consulted first, AC7 pin test asserts both surfaces say "indefinite" on the split probe; suite 7448/0.
 
 ## Decisions
 

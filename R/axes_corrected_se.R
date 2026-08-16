@@ -256,14 +256,29 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # end of this file for the criterion and its rationale. Checked before any
   # pricing so that what refuses a degenerate matrix is a stated contract, not
   # whichever solve() call happens to give up first on this platform's LAPACK.
-  # Evaluated on BOTH matrices this helper prices: the raw realigned Sigma-hat
-  # (the `naive` arm below inverts it) and cov2cor(Sigma-hat) (the corrected
-  # arm, and the only matrix anything user-reported depends on). Either arm
+  # Evaluated on BOTH matrices this helper prices: cov2cor(Sigma-hat) (the
+  # corrected arm, and the only matrix anything user-reported depends on) and
+  # the raw realigned Sigma-hat (the `naive` arm below inverts it). Either arm
   # tripping refuses all three vectors as a unit -- the retained cost recorded
-  # in M89's Deviations table; RR18 rec 7's decoupling of `naive` is M90's.
-  degenerate <- axes_sigma_degenerate(sigma)
+  # in M89's Deviations table; RR18 rec 7's decoupling of `naive` is M91's.
+  #
+  # ORDER (M90 AC7): the cov2cor arm is consulted FIRST, so whenever both
+  # arms refuse, the literal reported is the cov2cor arm's -- the arm
+  # axes_scaling_factor() also prices. M90's indefinite/ill_conditioned
+  # partition is not congruence-invariant (the eigenvalue RATIO moves under
+  # cov2cor even though the signs do not), so the two arms can label one
+  # matrix differently; without this precedence the raw arm's label would
+  # leak out and break the same-literal half of M89's nestedness contract.
+  # The finiteness hoist above this comment exists for that order: the raw
+  # matrix is checked finite before cov2cor() runs on it, because cov2cor()
+  # of an NA/NaN diagonal emits its own warning and the M71 contract is
+  # exactly one warning per refusal (the same trap the sibling documents at
+  # R/axes_scaled_fit.R; finiteness is metric-blind, so hoisting it moves no
+  # refusal across the arms' boundary).
+  if (!all(is.finite(sigma))) return(na_out("singular"))
+  degenerate <- axes_sigma_degenerate(stats::cov2cor(sigma))
   if (is.null(degenerate)) {
-    degenerate <- axes_sigma_degenerate(stats::cov2cor(sigma))
+    degenerate <- axes_sigma_degenerate(sigma)
   }
   if (!is.null(degenerate)) return(na_out(degenerate))
 
