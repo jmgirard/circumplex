@@ -1948,8 +1948,12 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       #                   sign-flip at kappa = 6.65e6, p = 3, whose exact value
       #                   is positive -- RR18) is refused at the door by the
       #                   tau = 1e-6 floor, whose p = 3 cutoff is kappa ~
-      #                   3.9e4; the df = 0 saturated case still divides by
-      #                   zero at the cval line below (M90's guard).
+      #                   3.9e4. A saturated df = 0 probe does NOT reach it:
+      #                   measured at p = 3 (the only p where q can reach
+      #                   p(p+1)/2, and only with zeta1 fitted), the
+      #                   degenerate zeta1 column answers "unidentified"
+      #                   before the cval division. Guarding df = 0
+      #                   explicitly is M90's task (RR18 BC4).
       #
       # Neither surviving route outlives the assembly: axes_reliability()
       # refuses fewer than four scales, and axes_design() drops a component

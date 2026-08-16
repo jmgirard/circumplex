@@ -282,6 +282,78 @@ factor-of-10 acceptance band, which is the criterion's stated tolerance).
   files this branch does not touch); `devtools::check(args = "--no-manual")`
   Status OK 0/0/0 at this code state (T7, tracking-only commits since).
 
+### Independent fresh-context review (round 3)
+
+Three distinct-evidence reviewers, then a fresh scorer. The [S] blame-history
+lens and the [S] prior-review lens each returned zero findings (the blame
+lens's one open item — the M71 test block's byte-pin — was verified intact by
+the orchestrator, line-identical to master). The [O] diff-bug lens returned 19
+findings (F1–F19). One actioned at ≥ 80:
+
+**F6 (80) — the floor's `p` factor was not discriminated by any test, and the
+ROADMAP resolution note claimed otherwise.** Mutation-verified by the
+reviewer: dropping `p` from the floor, or squaring it, left every touched test
+green — acceptance pins three decades from the floor cannot discriminate.
+**Fixed now:** a near-threshold criterion test (equicorrelation matrices at
+1.05× and 0.95× the floor ratio, p = 24 and 8) added; both mutants re-run and
+verified red under it (drop-`p` fails the below-floor refusals, `p²` fails the
+above-floor acceptances), then restored. The ROADMAP note's `p`-factor claim
+corrected in place and marked. Not an AC failure: AC3/AC7 as written pin
+acceptance and the constant, which held; the gap was the resolution claim and
+the missing discrimination, both now closed.
+
+**F9 (75, below bar, corrected under the derived-claims rule)** — the
+`"indefinite"` comment T4 added claimed "the df = 0 saturated case still
+divides by zero at the cval line"; measured false (at p = 3, the only
+reachable saturated case, the degenerate zeta1 column answers "unidentified"
+first; p ≥ 4 cannot saturate). The comment now states the measured outcome —
+the same falsified-branch-added-prose repair round 2 made for RO1.
+
+**Below the action bar (17), logged not actioned.** Highest first:
+- F3 (68) — the τ floor is reachable through the exported API (a cormat with
+  an r = 0.9999 item pair reaches κ = 3.3e4 and now refuses where master
+  computed values numerically accurate to ~5 digits), so the "no realistic fit
+  moves" claims are overdrawn and τ's statistical (vs numerical) calibration
+  is undefended. Real tension, and the re-cut's own design: τ = 1e-6 is the
+  RR18-recommended stated target, near-duplicate items are a degenerate
+  design a user should hear about, and the refusal is loud (two warnings +
+  reason), not silent. Carried as a candidate row (see below) rather than
+  patched: moving τ is a calibration decision, not a review-side fix.
+- F19 (58) — NEWS attributes only "ill_conditioned" to the criterion though
+  its finiteness arm returns "singular"; the singular route predates M89 and
+  the bullet's relabel paragraph covers it — wording gap only.
+- F7 (58) — τ's factor-of-10 error model is bracketed by three sweep points,
+  not measured at the cutoff; the oracle's own acceptance band is the stated
+  tolerance, logged as a limitation.
+- F8 (55) — the raw-arm floor reuses τ without its own oracle; the naive arm
+  is test-only (D-037) and the retained cost is the recorded BC2 deviation.
+- F17 (55) — AC6's header names model settings but not the runtime needs
+  (pkgload, python3); the clean-clone run passed, logged as a gap in the
+  header's enumeration, not in reproducibility.
+- F4 (52) / F5 (38) — the nested-contract sentences read as unconditional
+  though df/identifiability guards are scaling-surface-only; in context each
+  paragraph scopes itself to the degeneracy criterion, and the df==0 and
+  cval<=0 doors are M90's recorded scope.
+- F1 (45) / F2 (45) — a subnormal (1e-320) diagonal makes cov2cor() non-finite
+  and splits the literals ("ill_conditioned" raw vs "singular" cov2cor) and
+  doubles the warning on the scaling surface; synthetic, unreachable from any
+  fit, logged for M90's vocabulary work.
+- F11 (48) — the documented 1e-6 literal appears in five prose sites with only
+  the constant itself pinned by test.
+- F16 (42) — the exact oracle is same-derivation (it mirrors the R algorithm
+  in exact arithmetic): it validates conditioning, not derivation — noted so
+  it is not mistaken for statistical validation.
+- F12 (40) — `p` used before definition in the generated Rd (round 2's RO9,
+  now at two sites).
+- F13 (25), F14 (30), F15 (22), F18 (15) — pre-existing or style
+  (asymmetric-input eigen fold; double cov2cor; shadowed emergent guards;
+  roxygen version stamp), unchanged dispositions from prior rounds.
+- F10 (30) — the exemplar-B pin skips under R CMD check (fixture outside the
+  tarball); stated plainly in the test itself, dev-tree coverage only.
+
+**Re-verified after the F6/F9 fixes:** full suite FAIL 0 | PASS 7417;
+mutants restored (diff-clean criterion file).
+
 ### Round 2 — 2026-08-15, at 8778ae06, PR #117
 
 Re-reviewed after T9 and T10 landed. `origin/master` has not moved since the

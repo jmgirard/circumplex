@@ -1602,6 +1602,34 @@ test_that("AC7: the scaling surface is invariant under positive-diagonal congrue
   }
 })
 
+
+test_that("AC3: the floor discriminates its p factor at the threshold", {
+  # Near-threshold probes on the criterion itself, at two dimensions. An
+  # equicorrelation matrix (1-c)I + cJ has eigenvalue ratio
+  # (1-c)/(1+(p-1)c), so c can place a matrix a hair above or below the
+  # floor sqrt(p*eps/tau). Acceptance three decades from the floor (the
+  # probe fits) cannot tell sqrt(p*eps/tau) from sqrt(eps/tau) or
+  # p*sqrt(eps/tau); these points can -- dropping the p factor accepts the
+  # below-floor probe at p = 24, and squaring it refuses the above-floor
+  # one (both mutants verified red at review round 3).
+  for (p in c(24L, 8L)) {
+    f <- sqrt(p * .Machine$double.eps / 1e-6)
+    for (mult in c(1.05, 0.95)) {
+      r <- f * mult
+      c_ <- (1 - r) / (1 + r * (p - 1))
+      S <- matrix(c_, p, p)
+      diag(S) <- 1
+      got <- axes_sigma_degenerate(S)
+      if (mult > 1) {
+        expect_null(got, label = sprintf("p %d, ratio 1.05x floor", p))
+      } else {
+        expect_identical(got, "ill_conditioned",
+                         label = sprintf("p %d, ratio 0.95x floor", p))
+      }
+    }
+  }
+})
+
 test_that("the non-inflation (indefinite) form is refused by both surfaces with one literal", {
   pp <- probe_octant()
   p <- nrow(pp$sigma)
