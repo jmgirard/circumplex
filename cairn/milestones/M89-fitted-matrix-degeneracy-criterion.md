@@ -1,11 +1,11 @@
 # M89: One degeneracy criterion for the two fitted-matrix consumers
 
-- **Status:** planned
+- **Status:** in-progress
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** IP1, GP2, GP4
-- **Branch/PR:** —
+- **Branch/PR:** `m89-fitted-matrix-degeneracy`
 
 ## Goal
 
