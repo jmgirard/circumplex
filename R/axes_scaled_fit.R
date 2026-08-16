@@ -141,15 +141,20 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
 
   # The stated degeneracy criterion (M89), shared with axes_corrected_se() --
   # see axes_sigma_degenerate() in R/axes_corrected_se.R for the criterion and
-  # its rationale. It prices the RAW matrix deliberately, ahead of the
-  # cov2cor() below: normalization erases exactly the degeneracy under test (a
-  # diagonal inflated by any power of ten normalizes to the same correlation
-  # matrix), which is how this surface came to scale statistics from matrices
-  # the SE surface had already refused.
+  # its rationale. It prices cov2cor(sigma) deliberately (M89 re-cut, RR18):
+  # every quantity this surface computes is a function of the correlation
+  # matrix alone, so raw-metric conditioning is not the error model of
+  # anything computed here -- the first cut priced the raw matrix and refused
+  # pure diagonal rescalings this surface prices exactly. The criterion's
+  # finiteness arm is evaluated on the RAW matrix, ahead of the cov2cor() its
+  # conditioning arm prices: cov2cor() of an NA/NaN diagonal emits its own
+  # warning first, and the M71 contract is exactly one warning per refusal --
+  # this function's own, with no cov2cor() noise. Finiteness is metric-blind,
+  # so hoisting it moves no refusal across the two arms' boundary.
+  if (!all(is.finite(sigma))) return(na_out("singular"))
+  sigma <- stats::cov2cor(sigma)
   degenerate <- axes_sigma_degenerate(sigma)
   if (!is.null(degenerate)) return(na_out(degenerate))
-
-  sigma <- stats::cov2cor(sigma)
 
   si <- tryCatch(solve(sigma), error = function(e) NULL)
   if (is.null(si) || !all(is.finite(si))) return(na_out("singular"))

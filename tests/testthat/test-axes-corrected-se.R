@@ -1215,13 +1215,15 @@ test_that("the corrected SEs refuse as 'unidentified' when the model's derivativ
   # information matrix Delta'V Delta is singular while Sigma-hat itself is
   # perfectly well conditioned.
   #
-  # A degenerate Delta is not the ONLY route to this literal. The criterion
-  # prices the raw matrix while the corrected branch prices cov2cor(), so a
-  # Sigma-hat well conditioned raw and degenerate after normalization reaches
-  # it too, with an ordinary map (measured at p = 3) -- that is the ROADMAP
-  # follow-up M89 graduated. This test pins the literal against the one cause
-  # it can hold fixed, and axes_reliability() refuses fewer than four scales,
-  # so this is the helper's contract boundary rather than a user path.
+  # A degenerate Delta is, since the M89 re-cut, the only measured route to
+  # this literal: the criterion now prices cov2cor(Sigma-hat) on this helper's
+  # corrected arm as well as the raw matrix its naive arm inverts (RR18), so
+  # the formerly measured second route -- an ordinary map at a Sigma-hat
+  # degenerate after normalization, p = 3 -- is refused as "ill_conditioned"
+  # before any pricing runs. A degenerate Delta survives because no
+  # conditioning test of Sigma-hat can see it. axes_reliability() refuses
+  # fewer than four scales, so this is the helper's contract boundary rather
+  # than a user path.
   #
   # The construction is the model's own: `xi2` is an all-ones matrix and
   # `zeta1` is the same-scale indicator, so a map whose items all sit on ONE

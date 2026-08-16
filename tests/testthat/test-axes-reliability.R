@@ -3092,12 +3092,16 @@ test_that("M89 AC6: a degenerate fitted matrix NAs the corrected SEs and the fou
 
   # No converged fit is known to reach the degenerate regime, so a degenerate
   # fitted matrix is CONSTRUCTED and injected at the one seam both consumers
-  # read (axes_fitted_cov): the population matrix with one diagonal entry
-  # inflated by 1e10, which fails the stated criterion (M89) while leaving
-  # everything upstream of the two consumers -- the fit, the point estimates,
-  # lavaan's own fit measures -- untouched.
+  # read (axes_fitted_cov): the population matrix with one item duplicated
+  # (plus a 1e-9 ridge so the smallest eigenvalue is a hair above zero rather
+  # than roundoff-negative), near-singular in the correlation metric the
+  # criterion prices since the M89 re-cut -- so BOTH surfaces refuse it --
+  # while leaving everything upstream of the two consumers (the fit, the point
+  # estimates, lavaan's own fit measures) untouched.
   bad <- sigma
-  bad[4L, 4L] <- bad[4L, 4L] * 1e10
+  bad[2L, ] <- bad[1L, ]
+  bad[, 2L] <- bad[, 1L]
+  bad <- bad + 1e-9 * diag(nrow(bad))
   local_mocked_bindings(axes_fitted_cov = function(fit) bad)
 
   w <- testthat::capture_warnings(
@@ -3135,4 +3139,46 @@ test_that("M89 AC6: a degenerate fitted matrix NAs the corrected SEs and the fou
   # the injected matrix, and stay reported.
   expect_true(all(is.finite(res$results$reliability)))
   expect_true(all(is.finite(res$components$Estimate)))
+})
+
+
+test_that("M89 AC2: a raw-metric-only degeneracy NAs the SEs alone; the scaled fit computes", {
+  skip_if_not_installed("lavaan")
+  oct <- octants()
+  pop <- axes_population_cor(oct, 3L, .35, .10, .08)
+  sigma <- pop$sigma
+  inames <- sprintf("i%02d", seq_len(nrow(sigma)))
+  dimnames(sigma) <- list(inames, inames)
+  items <- split(inames, pop$scale)
+
+  # The nested contract at the assembly: a diagonal inflation is degenerate in
+  # the raw metric only -- cov2cor() of it is the same correlation matrix --
+  # so the SE helper (whose naive arm inverts the raw matrix) refuses while
+  # the scaling surface prices it exactly. Before the M89 re-cut both surfaces
+  # refused this shape: NA fit statistics on numbers computable to full
+  # precision (RR18).
+  bad <- sigma
+  bad[4L, 4L] <- bad[4L, 4L] * 1e10
+  local_mocked_bindings(axes_fitted_cov = function(fit) bad)
+
+  w <- testthat::capture_warnings(
+    res <- suppressMessages(
+      axes_reliability(cormat = sigma, items = items, angles = oct, n = 600L)
+    )
+  )
+
+  # One warning, from the SE surface alone, naming the conditioning literal.
+  expect_length(grep("ill_conditioned", w, fixed = TRUE), 1L)
+  expect_true(any(grepl("standard errors could not be computed", w)))
+  expect_false(any(grepl("scaled fit statistics could not be computed", w)))
+
+  expect_identical(res$details$se_correction_failed, "ill_conditioned")
+  expect_null(res$details$fit_scaling_failed)
+
+  # The SEs are NA as a unit; the four scaled statistics compute.
+  expect_true(all(is.na(res$components$SE)))
+  expect_true(is.finite(res$fit$chisq))
+  expect_true(is.finite(res$fit$pvalue))
+  expect_true(is.finite(res$fit$rmsea))
+  expect_true(is.finite(res$fit$cfi))
 })

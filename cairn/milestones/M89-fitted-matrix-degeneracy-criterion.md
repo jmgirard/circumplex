@@ -137,9 +137,9 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
       oracle's error table as its calibration. *(RB tripwire: no-oracle —
       RR18 supplies the oracle; re-escalate only if τ's calibration turns out
       to rest on something the oracle cannot measure.)*
-- [ ] **T3** — Test-first: the AC8 grid asserting the nested contract, red
+- [x] **T3** — Test-first: the AC8 grid asserting the nested contract, red
       against the branch's current code at the counterexample-A construction.
-- [ ] **T4** — Move the criterion to `cov2cor(Σ̂)` at the scaling surface and to
+- [x] **T4** — Move the criterion to `cov2cor(Σ̂)` at the scaling surface and to
       both arms at the SE helper; apply the τ floor.
 - [ ] **T5** — The AC7 invariance sweep: all five axes, all three probe maps.
 - [ ] **T6** — Roxygen enumerations, the corrected in-code rationale,
@@ -191,6 +191,8 @@ stands. `naive`'s raw pricing and its lavaan tie -> D-037 stands.
 - 2026-08-16: T1 done — the exact-rational oracle lands at `devel/degeneracy-oracle/` (an R driver naming every setting the fixture does not carry, plus a stdlib-only Python core for the arithmetic; `devel/` is .Rbuildignore'd so it is dev tooling, not a dependency). It runs from committed material alone and self-checks: anchors PASS (cval +0.0555478790711 against 0.05554788 ± 1e-7; SEs 0.147633962893 and 0.144373995369 against ± 1e-6) and the Q4 sweep PASSes at ratios 3.28 / 2.4 / 1.27, reproducing RR18's 3.3 / 2.4 / 1.25. The ad-hoc `cairn/reviews/rb18-exact-oracle.py` is deleted with it: it read an uncommitted dump and hard-coded n and df, which is exactly what AC6 forbids. No package code changed — `devel/` is outside the build — so the suite cannot have moved and was not re-run for this task.
 
 - 2026-08-16: T2 done — τ = 1e-6 recorded as `axes_degeneracy_tau` beside the criterion, its calibration comment citing the oracle's Q4 error table (T1's measured ratios 3.28/2.4/1.27 against p·κ²·ε) and the 3.4% counterexample; the tripwire's re-escalation condition did not fire — the calibration rests entirely on what the oracle measures. Suite clean (FAIL 0, PASS 7249).
+
+- 2026-08-16: T3–T4 done, one commit so every commit's suite stays green (the red test alone would break the per-task verify). T3's red measured against the pre-move code: the AC8 grid's scaling-surface NULL pins fail from k = 7 ("ill_conditioned" where the estimand is invariant) and the counterexample-A test fails at the sf refusal — the metric defect, verified as such. T4 moves the criterion to `cov2cor(Σ̂)` at the scaling surface (finiteness arm hoisted ahead of `cov2cor()` to keep M71's one-warning contract) and to both arms at the SE helper, floor `sqrt(p·ε/τ)`; assembly tests split — near-singular injection refuses both surfaces, inflation injection NAs SEs alone with fit computing; the falsified "criterion prices the raw matrix" comments in both T10 tests and `R/axes_reliability.R` corrected in place. Suite FAIL 0 / PASS 7326 (up 77); oracle re-run ANCHORS PASS, SWEEP PASS — the sweep's κ = 1.1e4 point computes at error 2.0e-7 and its κ = 1.1e5 point is refused at error 2.6e-5, bracketing the τ floor.
 
 ## Decisions
 

@@ -1918,27 +1918,29 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # a strictly smaller set, because this assembly refuses upstream several
       # of the shapes that reach them.
       #
-      # Two of them are worth naming, because both are reached by a Sigma-hat
-      # the M89 criterion ACCEPTS -- it prices the raw matrix, while everything
-      # below cov2cor()s first, so a matrix well conditioned raw and degenerate
-      # in the correlation metric passes the door and fails later:
+      # Two of them are worth naming, for what the M89 re-cut left reachable:
       #
-      #   "unidentified"  fires when Delta'V Delta is singular. Two routes,
-      #                   both measured: a degenerate Delta (a one-scale map
-      #                   makes zeta1 identical to the all-ones xi2), and an
-      #                   ordinary 3-scale map at a raw-accepted but
-      #                   correlation-degenerate Sigma-hat.
+      #   "unidentified"  fires when Delta'V Delta is singular. One measured
+      #                   route remains: a degenerate Delta (a one-scale map
+      #                   makes zeta1 identical to the all-ones xi2), which no
+      #                   conditioning test of Sigma-hat can see. The re-cut
+      #                   closed the other measured route (an ordinary map at a
+      #                   correlation-degenerate Sigma-hat): the criterion now
+      #                   prices cov2cor(Sigma-hat) -- the metric everything
+      #                   below computes in -- so that shape is refused at the
+      #                   door as "ill_conditioned" (RR18).
       #   "indefinite"    fires on a nonpositive or non-finite scaling factor.
-      #                   Measured at p = 3: c goes negative on a Sigma-hat the
-      #                   criterion accepts (kappa 6.65e6, well below the p = 3
-      #                   cutoff), and the df = 0 saturated case divides by zero
-      #                   at the cval line below.
+      #                   The measured negative-c route (a cancellation
+      #                   sign-flip at kappa = 6.65e6, p = 3, whose exact value
+      #                   is positive -- RR18) is refused at the door by the
+      #                   tau = 1e-6 floor, whose p = 3 cutoff is kappa ~
+      #                   3.9e4; the df = 0 saturated case still divides by
+      #                   zero at the cval line below (M90's guard).
       #
-      # Neither route survives the assembly: axes_reliability() refuses fewer
-      # than four scales, and axes_design() drops a component collinear with
-      # another, so no call through it has been seen to reach either. That is a
-      # statement about this assembly's gates, NOT about the criterion, which
-      # does not separate these cases -- see the ROADMAP row M89 graduated.
+      # Neither surviving route outlives the assembly: axes_reliability()
+      # refuses fewer than four scales, and axes_design() drops a component
+      # collinear with another, so no call through it has been seen to reach
+      # either at the exported surface.
       fit_scaling_failed = scaling$reason,
       ols_shadow = ols
     ),

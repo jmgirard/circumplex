@@ -256,7 +256,15 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # end of this file for the criterion and its rationale. Checked before any
   # pricing so that what refuses a degenerate matrix is a stated contract, not
   # whichever solve() call happens to give up first on this platform's LAPACK.
+  # Evaluated on BOTH matrices this helper prices: the raw realigned Sigma-hat
+  # (the `naive` arm below inverts it) and cov2cor(Sigma-hat) (the corrected
+  # arm, and the only matrix anything user-reported depends on). Either arm
+  # tripping refuses all three vectors as a unit -- the retained cost recorded
+  # in M89's Deviations table; RR18 rec 7's decoupling of `naive` is M90's.
   degenerate <- axes_sigma_degenerate(sigma)
+  if (is.null(degenerate)) {
+    degenerate <- axes_sigma_degenerate(stats::cov2cor(sigma))
+  }
   if (!is.null(degenerate)) return(na_out(degenerate))
 
   raw <- axes_se_pricing(sigma, d, n)
@@ -280,32 +288,39 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 # receiving NA corrected SEs beside silently scaled fit statistics derived
 # from the same matrix.
 #
-# THE CRITERION: the smallest eigenvalue of the raw fitted matrix, relative to
-# its largest, must exceed sqrt(p * .Machine$double.eps); at or below that the
+# THE CRITERION: the smallest eigenvalue of the priced matrix, relative to its
+# largest, must exceed sqrt(p * eps / tau) (tau below); at or below that the
 # matrix is refused as "ill_conditioned". One inequality carries three cases:
 # indefinite (lambda_min <= 0 < lambda_max), exactly singular (lambda_min = 0),
-# and ill-conditioned (lambda_max/lambda_min >= 1/sqrt(p*eps), about 1.4e7 at
-# p = 24).
+# and ill-conditioned (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4
+# at p = 24).
 #
-# WHY THIS CUTOFF: both consumers build the information matrix Delta'V Delta
-# from Sigma-hat-INVERSE twice, so its entries carry a relative error growing
-# like p * kappa(Sigma-hat)^2 * eps, and lambda_min/lambda_max = sqrt(p*eps)
-# is where that bound reaches 1 -- past it none of the double significand
-# survives the sandwich, and what refuses is whichever solve() gives up first
-# on the platform's LAPACK. Measured before M89 (R 4.6.1, the RR13 octant
-# probe): a diagonal inflated by 1e7 -- one grid step past this cutoff -- was
-# refused "unidentified" by the SE surface while the scaling surface computed
-# a factor from the same matrix with reason NULL.
+# WHICH MATRIX (M89 re-cut, RR18): each consumer prices the matrix it actually
+# computes with. Every quantity the scaling surface computes -- and every
+# number axes_reliability() reports -- is a function of cov2cor(Sigma-hat)
+# alone, so that surface evaluates the criterion on cov2cor(Sigma-hat). The SE
+# helper evaluates it on BOTH cov2cor(Sigma-hat) and the raw Sigma-hat: its
+# `naive` arm is the one place the raw matrix is inverted (the lavaan tie,
+# D-037), and its three vectors refuse as a unit. The two surfaces' refusals
+# are therefore NESTED -- whatever the scaling surface refuses, the SE helper
+# refuses with the same literal, exactly so on a unit diagonal where the two
+# metrics coincide. Pricing the raw matrix everywhere, as the first cut did,
+# refused pure diagonal rescalings the estimand is exactly invariant under:
+# RR18 measured corrected/fiml_ratio invariant to <= 6.4e-16 across eight
+# decades of diagonal inflation that move kappa(raw) to 2.1e8. No
+# model-statement content is lost in the move: cov2cor() is a congruence, so
+# by Sylvester's law of inertia it preserves eigenvalue signs exactly --
+# indefiniteness and exact singularity are metric-invariant, and only the
+# scale nuisance the reported quantities never depend on is normalized away.
 #
-# WHY IT PRICES THE RAW MATRIX, which the corrected branch and the whole
-# scaling surface never compute with (both run at cov2cor(Sigma-hat)):
-# normalization erases exactly the degeneracy under test -- cov2cor() of that
-# 1e7-inflated matrix is the same condition-10.45 correlation matrix at every
-# inflation from 1e0 to 1e16 (measured at the M89 plan gate) -- so a
-# correlation-metric test cannot see this at all. The raw matrix is the fitted
-# model's own statement of the item moments; when it is not numerically a
-# covariance matrix, the correlation-metric quantities downstream are
-# transforms of a matrix that never was one.
+# WHY THIS CUTOFF: the corrected branch builds the information matrix
+# Delta'V Delta from the priced matrix's INVERSE twice, so its entries carry a
+# relative error growing like p * kappa^2 * eps; the floor is where that bound
+# reaches the accuracy target tau. The shipped sqrt(p*eps) floor -- tau = 1 in
+# these terms -- was a thousand times looser: it accepted the committed
+# exemplar B (kappa = 6.65e6 in BOTH metrics, unit diagonal) on which the
+# reported corrected SEs were wrong by 3.4% with reason NULL, the package's
+# first measured silent wrong number in this subsystem (RR18).
 #
 # THE ACCURACY TARGET tau: the largest relative error tolerated in a reported
 # corrected SE before the matrix is refused instead. Calibrated against the
@@ -330,7 +345,8 @@ axes_sigma_degenerate <- function(sigma) {
   if (!all(is.finite(sigma))) return("singular")
   ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values
   p <- nrow(sigma)
-  if (ev[p] <= ev[1] * sqrt(p * .Machine$double.eps)) return("ill_conditioned")
+  floor_ <- sqrt(p * .Machine$double.eps / axes_degeneracy_tau)
+  if (ev[p] <= ev[1] * floor_) return("ill_conditioned")
   NULL
 }
 
