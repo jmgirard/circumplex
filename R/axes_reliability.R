@@ -719,19 +719,26 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' eigenvalue, relative to its largest, falls at or below
 #' `sqrt(p * .Machine$double.eps / 1e-6)`, where the `1e-6` is a stated
 #' accuracy target: past that floor the corrected standard errors could carry
-#' relative error above it -- is refused by both surfaces with the reason
-#' `"ill_conditioned"`, so the corrected standard errors and the four scaled
-#' statistics go `NA` together (each with its own warning naming that reason)
-#' rather than one surface refusing while the other silently scales. The
-#' standard-error surface additionally applies the same criterion to the raw
-#' fitted matrix, which one of its internal arms inverts, so its refusals
+#' relative error above it -- is refused by both surfaces, and the refusal
+#' says which degeneracy happened: `"indefinite"` when the smallest
+#' eigenvalue is decisively negative (beyond the fit's own numerical noise
+#' band, so it is a statement about the model), `"ill_conditioned"` for
+#' roundoff-level negativity, exact singularity, or mere ill-conditioning (a
+#' numerical caution). Either way the corrected standard errors and the four
+#' scaled statistics go `NA` together (each with its own warning naming that
+#' reason) rather than one surface refusing while the other silently scales.
+#' The standard-error surface additionally applies the same criterion to the
+#' raw fitted matrix, which one of its internal arms inverts, so its refusals
 #' nest the scaling surface's: whatever refuses the scaled statistics also
-#' refuses the standard errors with the same reason, while a matrix
-#' degenerate only in the raw metric (wildly unequal fitted variances over a
-#' well-conditioned correlation structure) returns `NA` standard errors
-#' beside validly scaled fit statistics -- never the reverse. On a
-#' unit-diagonal fitted matrix the two metrics coincide and the surfaces
-#' agree exactly. `df` and `srmr` still report.
+#' refuses the standard errors with the same reason -- when its two arms
+#' would label one matrix differently, the correlation-metric arm's literal
+#' is the one reported, which is what keeps the two surfaces in exact
+#' agreement -- while a matrix degenerate only in the raw metric (wildly
+#' unequal fitted variances over a well-conditioned correlation structure)
+#' returns `NA` standard errors beside validly scaled fit statistics --
+#' never the reverse. On a unit-diagonal fitted matrix the two metrics
+#' coincide. A saturated model (`df = 0`) is refused as `"saturated"`
+#' before any scaling arithmetic runs. `df` and `srmr` still report.
 #'
 #' If you cross-check against lavaan, match the variant. The scaled `chisq`,
 #' `pvalue`, `rmsea` and `cfi` here are built with the definitions lavaan calls
@@ -1003,11 +1010,14 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   errors as normal-theory maximum likelihood reports them before the
 #'   correlation-structure correction, `se_correction_failed`, `NULL` when
 #'   that correction succeeded or a string naming why the reported SEs are
-#'   `NA` -- notably `"ill_conditioned"`, the shared degeneracy criterion
+#'   `NA` -- notably the shared degeneracy criterion's two literals
 #'   (smallest eigenvalue relative to largest at or below
 #'   `sqrt(p * .Machine$double.eps / 1e-6)`, evaluated on `cov2cor()` of the
 #'   fitted covariance matrix and, for this surface only, on the raw matrix
-#'   as well), which also sets `fit_scaling_failed` when the correlation form
+#'   as well): `"indefinite"` for a decisively negative eigenvalue, a
+#'   statement about the model, and `"ill_conditioned"` for roundoff-level
+#'   negativity, singularity, or ill-conditioning, a numerical caution --
+#'   which also sets `fit_scaling_failed` when the correlation form
 #'   is what tripped it -- `fit_uncorrected`, the six fit statistics as
 #'   lavaan reports them
 #'   before the correlation-metric scaling, `scaling_factor`, the two
@@ -1895,13 +1905,17 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       se_uncorrected = se_uncorrected,
       # NULL when the correction succeeded; otherwise why every corrected SE
       # is NA ("singular" from the nonpositive-diagonal door or non-finite
-      # entries, "infinite_diagonal", "ill_conditioned" from the stated
-      # degeneracy criterion -- M89, axes_sigma_degenerate() -- and
-      # "unidentified", "indefinite" forwarded from axes_se_pricing() as
-      # backstops behind it). M71 audited the list against the source;
-      # "indefinite" in particular has never been observed to fire
+      # entries, "infinite_diagonal", "ill_conditioned"/"indefinite" from the
+      # stated degeneracy criterion's M90 partition -- M89/M90,
+      # axes_sigma_degenerate(); when the helper's two arms would label one
+      # matrix differently, the correlation-metric arm's literal is reported
+      # -- and "unidentified", "indefinite" forwarded from axes_se_pricing()
+      # as backstops behind it). M71 audited the list against the source;
+      # the PRICING "indefinite" backstop has never been observed to fire
       # (R/axes_corrected_se.R:185-198), so this enumerates what the helper
-      # CONTAINS, not what a user has been shown.
+      # CONTAINS, not what a user has been shown -- the criterion's
+      # "indefinite", by contrast, fires on any decisively indefinite
+      # fitted matrix (tested).
       se_correction_failed = corrected$reason,
       # What lavaan reported before the correlation-metric scaling (M68), on the
       # same footing as `se_uncorrected` above: visible for comparison and for
@@ -1922,17 +1936,18 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # Both are NA together when the scaling failed.
       scaling_factor = c(model = scaling$scale, baseline = scaling$baseline),
       # NULL when the scaling succeeded; otherwise why the four chi-square-
-      # derived statistics are NA ("singular", "ill_conditioned" from the
-      # shared degeneracy criterion (M89), "unidentified", "df_mismatch",
-      # "baseline_df_mismatch", "indefinite", "infinite_diagonal"), enumerated
-      # from the source the same way as the SE list above, and carrying the
-      # same caveat: it enumerates what the helper CONTAINS, not what a user
-      # has been shown. All seven are reachable at the helper's contract
-      # boundary; what a call through axes_reliability() can actually reach is
-      # a strictly smaller set, because this assembly refuses upstream several
-      # of the shapes that reach them.
+      # derived statistics are NA ("singular", "ill_conditioned"/"indefinite"
+      # from the shared degeneracy criterion's M90 partition (M89/M90),
+      # "saturated", "unidentified", "df_mismatch", "baseline_df_mismatch",
+      # "infinite_diagonal"), enumerated from the source the same way as the
+      # SE list above, and carrying the same caveat: it enumerates what the
+      # helper CONTAINS, not what a user has been shown. All eight are
+      # reachable at the helper's contract boundary; what a call through
+      # axes_reliability() can actually reach is a strictly smaller set,
+      # because this assembly refuses upstream several of the shapes that
+      # reach them.
       #
-      # Two of them are worth naming, for what the M89 re-cut left reachable:
+      # Three of them are worth naming, for what the M89/M90 re-cuts left:
       #
       #   "unidentified"  fires when Delta'V Delta is singular. One measured
       #                   route remains: a degenerate Delta (a one-scale map
@@ -1942,23 +1957,31 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       #                   correlation-degenerate Sigma-hat): the criterion now
       #                   prices cov2cor(Sigma-hat) -- the metric everything
       #                   below computes in -- so that shape is refused at the
-      #                   door as "ill_conditioned" (RR18).
-      #   "indefinite"    fires on a nonpositive or non-finite scaling factor.
-      #                   The measured negative-c route (a cancellation
-      #                   sign-flip at kappa = 6.65e6, p = 3, whose exact value
-      #                   is positive -- RR18) is refused at the door by the
-      #                   tau = 1e-6 floor, whose p = 3 cutoff is kappa ~
-      #                   3.9e4. A saturated df = 0 probe does NOT reach it:
-      #                   measured at p = 3 (the only p where q can reach
-      #                   p(p+1)/2, and only with zeta1 fitted), the
-      #                   degenerate zeta1 column answers "unidentified"
-      #                   before the cval division. Guarding df = 0
-      #                   explicitly is M90's task (RR18 BC4).
+      #                   door (RR18).
+      #   "saturated"     fires on df = 0 (M90, RR18 BC4), ahead of every
+      #                   matrix computation. Before the guard, the measured
+      #                   p = 3 saturated construction (the only p where q can
+      #                   reach p(p+1)/2, and only with zeta1 fitted) reached
+      #                   the cval division and answered "indefinite" via
+      #                   cval = Inf -- a comment here previously claimed it
+      #                   answered "unidentified"; that claim was measured
+      #                   false at the M90 replan audit.
+      #   "indefinite"    is, since M90, the criterion's own word for a
+      #                   decisively negative smallest eigenvalue -- past the
+      #                   convergence-noise band, a statement about the
+      #                   model. The final nonpositive/non-finite-factor
+      #                   backstop no longer says "indefinite": it says
+      #                   "ill_conditioned", because a negative computed cval
+      #                   there is cancellation, not evidence (its one
+      #                   measured instance, kappa = 6.65e6 at p = 3, has a
+      #                   positive exact value and is refused at the door by
+      #                   the tau floor -- RR18; a 30,000-draw search reached
+      #                   the backstop zero times, M90 AC5).
       #
-      # Neither surviving route outlives the assembly: axes_reliability()
+      # None of these routes outlives the assembly: axes_reliability()
       # refuses fewer than four scales, and axes_design() drops a component
       # collinear with another, so no call through it has been seen to reach
-      # either at the exported surface.
+      # them at the exported surface.
       fit_scaling_failed = scaling$reason,
       ols_shadow = ols
     ),

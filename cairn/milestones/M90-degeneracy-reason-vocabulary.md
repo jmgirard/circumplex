@@ -138,7 +138,7 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - [x] **T6** — The `cval ≤ 0` relabel, the four-arm comment, and AC5's
       arm-by-arm record (`cb` by argument; `cval` by reaching test or
       recorded search).
-- [ ] **T7** — AC4's grep sweep: roxygen enumerations, the
+- [x] **T7** — AC4's grep sweep: roxygen enumerations, the
       `R/axes_reliability.R:1897-1950` comment block (falsified df = 0
       claim), `devtools::document()`, NEWS.
 - [ ] **T8** — Full `devtools::check()`.
@@ -158,6 +158,8 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - 2026-08-16: T5 — arm-disagreement probe measured red first (cov2cor arm "indefinite", raw arm "ill_conditioned", reported = raw's); finiteness hoisted, cov2cor arm now consulted first, AC7 pin test asserts both surfaces say "indefinite" on the split probe; suite 7448/0.
 
 - 2026-08-16: T6 (AC5 search record) — families: Wishart correlations at 3 concentrations + spectrum-surgery draws pinned 1.05–3× above the refusal floor + 1000-step adversarial hill-climbs from the minimum-cval draw; 10,000 accepted draws per p ∈ {3, 8, 24} (30,000 total; script `scratchpad/ac5-search.R`, seed 20260816). Branch reached 0 times; min cval by map: +1.2e-5 (p=3, df=1), +0.813 (p=8), +0.956 (p=24). Disposition: defensive backstop, relabeled "ill_conditioned"; cb arms settled analytically; seeded smoke tier + exemplar-B upstream-guard identity in test. Suite 8250/0.
+
+- 2026-08-16: T7 (AC4 grep disposition) — repo-wide grep over R/, man/, NEWS.md, vignettes/: vignettes 0 hits; updated the two roxygen passages (refusal criterion, se_correction_failed), both inline reason-list comments (falsified df=0 "unidentified" claim corrected to the measured "indefinite"-via-cval=Inf history; enumeration now 8 literals incl. "saturated"), NEWS M89 bullet's now-false indefinite→ill_conditioned sentence fixed in place, M90 bullet added; document() warning-free, no DESCRIPTION drift; suite 8250/0.
 
 ## Decisions
 

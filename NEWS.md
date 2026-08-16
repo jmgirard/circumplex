@@ -88,8 +88,25 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   `details$se_correction_failed` and `details$fit_scaling_failed` alike: an
   exactly singular fitted matrix reports `"ill_conditioned"` where both
   previously reported `"singular"`, and an indefinite one reports
-  `"ill_conditioned"` where both previously reported `"indefinite"`. Code
+  `"indefinite"` deliberately or `"ill_conditioned"` at the numerical
+  margin, per the refusal-vocabulary split in the next entry. Code
   that branches on any of these reason strings needs updating.
+
+* `axes_reliability()`'s refusal reasons now say which degeneracy happened.
+  Within the degeneracy criterion's refusal region, a fitted correlation
+  structure whose smallest eigenvalue is decisively negative — beyond the
+  fit's own numerical noise band — reports `"indefinite"`, a statement about
+  the model; roundoff-level negativity, exact singularity, and mere
+  ill-conditioning report `"ill_conditioned"`, a numerical caution. A
+  saturated model (zero degrees of freedom) is refused as `"saturated"`
+  before any scaling arithmetic runs, where it previously surfaced as
+  `"indefinite"` through an internal division by zero; and the final
+  nonpositive-scaling-factor backstop likewise reports `"ill_conditioned"`
+  rather than `"indefinite"`, an indefiniteness it cannot diagnose. When the
+  standard-error surface's two internal arms would label one matrix
+  differently, the reported literal is the correlation-metric arm's — the
+  same arm the fit-scaling surface prices — so the two surfaces never name
+  the same matrix differently.
 
 * `axes_reliability()` objects now report `details$n_moments`, the number of
   distinct analyzed moments p\* = p(p+1)/2, and `details$baseline`, the
