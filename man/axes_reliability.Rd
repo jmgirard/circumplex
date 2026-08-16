@@ -79,7 +79,11 @@ respondents behind any item pair, \code{se_uncorrected}, the component standard
 errors as normal-theory maximum likelihood reports them before the
 correlation-structure correction, \code{se_correction_failed}, \code{NULL} when
 that correction succeeded or a string naming why the reported SEs are
-\code{NA}, \code{fit_uncorrected}, the six fit statistics as lavaan reports them
+\code{NA} -- notably \code{"ill_conditioned"}, the shared degeneracy criterion (the
+fitted covariance matrix's smallest eigenvalue, relative to its largest,
+at or below \code{sqrt(p * .Machine$double.eps)}), which also sets
+\code{fit_scaling_failed} -- \code{fit_uncorrected}, the six fit statistics as
+lavaan reports them
 before the correlation-metric scaling, \code{scaling_factor}, the two
 Satorra-Bentler factors (\code{model} and \code{baseline}), and
 \code{fit_scaling_failed}, \code{NULL} when the scaling succeeded or a string naming
@@ -192,6 +196,14 @@ The scaled statistic matches its reference chi-square in \strong{mean}; it is no
 exact, and it does not make a badly misspecified model fit. If the factor
 cannot be computed, all four are \code{NA} with the reason in
 \code{details$fit_scaling_failed} -- never the uncorrected value in their place.
+One refusal is shared with the component-SE correction, under one stated
+criterion: a degenerate fitted covariance matrix -- indefinite, singular, or
+so ill-conditioned that its smallest eigenvalue, relative to its largest,
+falls at or below \code{sqrt(p * .Machine$double.eps)} -- is refused by both
+surfaces with the reason \code{"ill_conditioned"}, so the corrected standard
+errors and the four scaled statistics go \code{NA} together (each with its own
+warning naming that reason) rather than one surface refusing while the
+other silently scales. \code{df} and \code{srmr} still report.
 
 If you cross-check against lavaan, match the variant. The scaled \code{chisq},
 \code{pvalue}, \code{rmsea} and \code{cfi} here are built with the definitions lavaan calls

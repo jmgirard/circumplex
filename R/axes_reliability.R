@@ -712,6 +712,14 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #' exact, and it does not make a badly misspecified model fit. If the factor
 #' cannot be computed, all four are `NA` with the reason in
 #' `details$fit_scaling_failed` -- never the uncorrected value in their place.
+#' One refusal is shared with the component-SE correction, under one stated
+#' criterion: a degenerate fitted covariance matrix -- indefinite, singular, or
+#' so ill-conditioned that its smallest eigenvalue, relative to its largest,
+#' falls at or below `sqrt(p * .Machine$double.eps)` -- is refused by both
+#' surfaces with the reason `"ill_conditioned"`, so the corrected standard
+#' errors and the four scaled statistics go `NA` together (each with its own
+#' warning naming that reason) rather than one surface refusing while the
+#' other silently scales. `df` and `srmr` still report.
 #'
 #' If you cross-check against lavaan, match the variant. The scaled `chisq`,
 #' `pvalue`, `rmsea` and `cfi` here are built with the definitions lavaan calls
@@ -983,7 +991,11 @@ axes_resolve_blocks <- function(blocks, src, all_cols) {
 #'   errors as normal-theory maximum likelihood reports them before the
 #'   correlation-structure correction, `se_correction_failed`, `NULL` when
 #'   that correction succeeded or a string naming why the reported SEs are
-#'   `NA`, `fit_uncorrected`, the six fit statistics as lavaan reports them
+#'   `NA` -- notably `"ill_conditioned"`, the shared degeneracy criterion (the
+#'   fitted covariance matrix's smallest eigenvalue, relative to its largest,
+#'   at or below `sqrt(p * .Machine$double.eps)`), which also sets
+#'   `fit_scaling_failed` -- `fit_uncorrected`, the six fit statistics as
+#'   lavaan reports them
 #'   before the correlation-metric scaling, `scaling_factor`, the two
 #'   Satorra-Bentler factors (`model` and `baseline`), and
 #'   `fit_scaling_failed`, `NULL` when the scaling succeeded or a string naming

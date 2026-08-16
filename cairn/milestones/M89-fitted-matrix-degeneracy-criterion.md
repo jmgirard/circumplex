@@ -99,7 +99,7 @@ the scaled statistic → M68 already carries one.
       byte-unchanged.
 - [x] **T6** — Assembly-level test through `axes_reliability()` on a
       constructed fitted matrix.
-- [ ] **T7** — Roxygen reason enumeration, `devtools::document()`, NEWS entry.
+- [x] **T7** — Roxygen reason enumeration, `devtools::document()`, NEWS entry.
 - [ ] **T8** — Full `devtools::check()`.
 
 ## Work log
@@ -112,6 +112,8 @@ the scaled statistic → M68 already carries one.
 - 2026-08-15: T3–T5 done — criterion `axes_sigma_degenerate()` chosen and recorded beside its rationale (see Decisions), applied at both consumers ahead of any pricing; se relabels "nonpositive_diagonal" → "singular" and adopts "infinite_diagonal" for +Inf; M71 block byte-unchanged (diff hunks fall at lines 359, 1228, and 1301 only); full suite clean (7215 pass, 0 fail). Also added `axes_fitted_cov()` as the single seam both consumer call sites read, for T6's constructed-matrix injection.
 
 - 2026-08-15: T6 done — assembly test injects a constructed degenerate matrix at the `axes_fitted_cov()` seam via `local_mocked_bindings()`; both surfaces warn with the shared literal, component SEs and the four D-036 statistics are NA together, df/srmr and the point estimates unaffected.
+
+- 2026-08-15: T7 done — roxygen names the criterion and the shared literal at the scaled-fit details and the return-value enumeration; NEWS bullet added; `devtools::document()` warning-free, regenerating only `man/axes_reliability.Rd` (plus the roxygen2 8.1.0 version stamp in DESCRIPTION, a generated line from the updated local toolchain).
 
 ## Decisions
 
