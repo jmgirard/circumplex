@@ -127,9 +127,9 @@ RR18 asks for its constant to be calibrated against the oracle first.
       against M89's merged code (measured at the replan audit: it returns
       `"indefinite"` today).
 - [x] **T2** — The `df == 0` guard and its `"saturated"` literal.
-- [ ] **T3** — Test-first: the indefinite/near-singular partition at the
+- [x] **T3** — Test-first: the indefinite/near-singular partition at the
       nestedness-grid probes, red where the two currently share one literal.
-- [ ] **T4** — The partition in `axes_sigma_degenerate()`, plus the AC6
+- [x] **T4** — The partition in `axes_sigma_degenerate()`, plus the AC6
       battery: two p values, two λmax scales, two construction forms, three
       partition mutants verified to redden.
 - [ ] **T5** — The cov2cor-arm-first inversion and finiteness hoist in
@@ -151,6 +151,8 @@ RR18 asks for its constant to be calibrated against the oracle first.
 - 2026-08-16: alternative rejected at the gate — tightening the AC2 partition to the eigensolver-noise band (~p·ε); the reviewed BC5 constant kept with a demanded convergence-noise rationale; falsified by implementation finding no defensible rationale, in which case escalate via RB (no-oracle) rather than silently change the constant.
 
 - 2026-08-16: T1+T2 — red premise re-measured on the branch (construction returns "indefinite" via cval = Inf pre-guard; q = 6, df = 0 verified); guard added after the df-consistency guards with a df_mismatch-ordering control; suite 7423 pass / 0 fail.
+
+- 2026-08-16: T3+T4 — anchors+battery written first, red on exactly the 10 "indefinite" expectations; partition landed with the convergence-noise rationale comment (one-directional claim, so no escalation needed); grid dd-probe, check_nested set, and d44 cells re-expected ("indefinite" measured λmin −0.56 raw / −48 cor); suite 7444/0. Mutant verification follows this commit.
 
 ## Decisions
 

@@ -1394,7 +1394,8 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
     # degeneracy, the SE helper refuses with the same literal.
     check_nested <- function(sig, what) {
       r <- m89_reasons(sig, pp, df, bdf, m$zeta1)
-      if (!is.null(r$sf) && r$sf %in% c("ill_conditioned", "singular")) {
+      if (!is.null(r$sf) &&
+          r$sf %in% c("ill_conditioned", "indefinite", "singular")) {
         expect_identical(
           r$se, r$sf,
           label = sprintf("%s: SE helper reason", what),
@@ -1433,15 +1434,16 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
 
     # One non-unit-diagonal indefinite matrix per map: indefiniteness is
     # metric-invariant (cov2cor() is a congruence; Sylvester's law of inertia
-    # preserves eigenvalue signs), so BOTH surfaces refuse it, same literal.
+    # preserves eigenvalue signs), so BOTH surfaces refuse it, same literal --
+    # since M90's partition, the literal that names the model defect.
     dd <- diag(seq(0.5, 2, length.out = p))
     ind <- dd %*% pp$sigma %*% dd
     dimnames(ind) <- dimnames(pp$sigma)
     ind[1L, 2L] <- ind[2L, 1L] <- 1.5 * sqrt(ind[1L, 1L] * ind[2L, 2L])
     r <- check_nested(ind, sprintf("p %d indefinite", p))
-    expect_identical(r$sf, "ill_conditioned",
+    expect_identical(r$sf, "indefinite",
                      label = sprintf("p %d indefinite, scaling surface", p))
-    expect_identical(r$se, "ill_conditioned",
+    expect_identical(r$se, "indefinite",
                      label = sprintf("p %d indefinite, SE helper", p))
 
     # One near-singular matrix per map (one item duplicated, plus a 1e-9 ridge
@@ -1669,6 +1671,83 @@ test_that("AC3: the floor discriminates its p factor at the threshold", {
   }
 })
 
+test_that("M90 AC2: within the refusal region, deep negativity says 'indefinite', roundoff-level says 'ill_conditioned'", {
+  # The two anchors, each named by construction and metric (M90 AC2). The
+  # nestedness-grid indefinite probe is deeply indefinite in BOTH metrics
+  # (cov2cor lambda_min = -0.5 at p = 24, measured at the replan audit), far
+  # past the convergence-noise band -lambda_max*sqrt(p*eps), so the criterion
+  # now names the model defect instead of hiding it under the numerical
+  # caution.
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  dd <- diag(seq(0.5, 2, length.out = p))
+  ind <- dd %*% pp$sigma %*% dd
+  dimnames(ind) <- dimnames(pp$sigma)
+  ind[1L, 2L] <- ind[2L, 1L] <- 1.5 * sqrt(ind[1L, 1L] * ind[2L, 2L])
+
+  R <- stats::cov2cor(ind)
+  evR <- eigen(R, symmetric = TRUE, only.values = TRUE)$values
+  expect_lt(evR[p], -0.4)  # the anchor is DEEP negativity, not roundoff
+  expect_identical(axes_sigma_degenerate(R), "indefinite")
+  # Indefiniteness is metric-invariant (Sylvester), and the raw matrix is
+  # also far past its own band -- the two arms agree on this probe.
+  expect_identical(axes_sigma_degenerate(ind), "indefinite")
+
+  # An EXACTLY singular matrix (duplicated item): its computed smallest
+  # eigenvalue is roundoff-negative (|lambda_min| ~ 1e-15, measured
+  # -9.32e-16 at the replan audit), inside the noise band -- a numerical
+  # caution, never a claim the user's model is indefinite.
+  sing <- pp$sigma
+  sing[2L, ] <- sing[1L, ]
+  sing[, 2L] <- sing[, 1L]
+  evS <- eigen(sing, symmetric = TRUE, only.values = TRUE)$values
+  expect_lt(abs(evS[p]), 1e-13)
+  expect_identical(axes_sigma_degenerate(sing), "ill_conditioned")
+})
+
+
+test_that("M90 AC6: the partition flips exactly at -lambda_max*sqrt(p*eps), at two p, two scales, two forms", {
+  # Near-threshold probes on the PARTITION (the refusal floor has its own
+  # battery above): lambda_min at 0.5x and 2x the band, per p, at two
+  # lambda_max scales and two construction forms. Far-field anchors cannot
+  # detect a missing/squared p or a dropped lambda_max factor; these cells
+  # can, and the three mutants are each verified to redden against this
+  # battery (work log). p = 3 is excluded deliberately: there the 2x factor
+  # no longer separates the squared-p mutant.
+  set.seed(421)
+  for (p in c(24L, 8L)) {
+    t_ <- sqrt(p * .Machine$double.eps)
+    Q <- qr.Q(qr(matrix(stats::rnorm(p * p), p, p)))
+    for (L in c(1, 1e3)) {
+      for (m in c(0.5, 2)) {
+        want <- if (m > 1) "indefinite" else "ill_conditioned"
+
+        # Form 1: rank-one negative perturbation of L*I. Eigenvalues exactly
+        # L (multiplicity p-1) and -m*t_*L, so lambda_min/lambda_max = -m*t_.
+        v <- rep(1 / sqrt(p), p)
+        S1 <- L * (diag(p) - (1 + m * t_) * tcrossprod(v))
+        S1 <- (S1 + t(S1)) / 2
+        expect_identical(
+          axes_sigma_degenerate(S1), want,
+          label = sprintf("rank-one: p %d, L %g, %gx band", p, L, m)
+        )
+
+        # Form 2: eigen-recomposition with a spread spectrum under a random
+        # (seeded) orthogonal basis -- same lambda_min/lambda_max, different
+        # matrix form.
+        vals <- c(L, seq(L / 2, L / 10, length.out = p - 2L), -m * t_ * L)
+        S2 <- Q %*% diag(vals) %*% t(Q)
+        S2 <- (S2 + t(S2)) / 2
+        expect_identical(
+          axes_sigma_degenerate(S2), want,
+          label = sprintf("recomposed: p %d, L %g, %gx band", p, L, m)
+        )
+      }
+    }
+  }
+})
+
+
 test_that("the non-inflation (indefinite) form is refused by both surfaces with one literal", {
   pp <- probe_octant()
   p <- nrow(pp$sigma)
@@ -1692,12 +1771,15 @@ test_that("the non-inflation (indefinite) form is refused by both surfaces with 
   expect_false(is.character(raw))
   expect_true(all(is.finite(raw$naive)))
 
-  # Both consumers refuse it under the stated criterion (the matrix is
-  # indefinite: its smallest eigenvalue is negative), naming the shared
-  # literal -- before M89 both fell to the emergent "indefinite"/NaN door.
+  # Both consumers refuse it under the stated criterion, naming the shared
+  # literal. The matrix is DEEPLY indefinite (lambda_min = -0.56 raw, -48 in
+  # the correlation metric -- measured, far past the noise band), so since
+  # M90's partition the criterion says "indefinite" for the honest reason;
+  # before M89 both fell to an emergent "indefinite"/NaN door, and between
+  # M89 and M90 the criterion hid the model defect under "ill_conditioned".
   r <- m89_reasons(sig, pp, df, bdf)
-  expect_identical(r$se, "ill_conditioned", label = "near-zero d44, SE surface")
-  expect_identical(r$sf, "ill_conditioned",
+  expect_identical(r$se, "indefinite", label = "near-zero d44, SE surface")
+  expect_identical(r$sf, "indefinite",
                    label = "near-zero d44, scaling surface")
 })
 

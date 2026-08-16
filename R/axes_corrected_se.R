@@ -338,15 +338,39 @@ axes_degeneracy_tau <- 1e-6
 
 # Returns NULL (priceable), "singular" (non-finite entries: the literal the
 # NA/NaN-diagonal route has carried since before M69, now reached here rather
-# than in solve()), or "ill_conditioned". Callers refuse nonpositive and +Inf
-# diagonals at their own doors first, so lambda_max > 0 whenever the
-# eigendecomposition runs.
+# than in solve()), "indefinite", or "ill_conditioned". Callers refuse
+# nonpositive and +Inf diagonals at their own doors first, so lambda_max > 0
+# whenever the eigendecomposition runs.
+#
+# WITHIN the refusal region, which word (M90): "indefinite" is a statement
+# about the user's MODEL -- the model-implied matrix has a genuinely negative
+# direction -- so it is claimed only where the negativity exceeds what the
+# fit's own noise can produce: lambda_min < -lambda_max * sqrt(p * eps).
+# RATIONALE for that band (RR18 BC5's constant; M90 AC2 demands the rationale
+# stated here): the priced matrix's entries are not exact -- they are
+# optimizer output rounded through cov2cor(), carrying entrywise relative
+# error no smaller than order sqrt(eps) (an iterative fit stopped on a
+# relative objective tolerance `tol` leaves the implied moments with errors
+# of order sqrt(tol) near a quadratic optimum, and sqrt(tol) >= sqrt(eps) for
+# any achievable tolerance). A symmetric entrywise perturbation of relative
+# size sqrt(eps) has spectral norm ~ sqrt(p)*sqrt(eps)*lambda_max under
+# incoherent signs, and Weyl's inequality moves every eigenvalue by at most
+# that norm -- so a computed eigenvalue within lambda_max*sqrt(p*eps) of zero
+# is indistinguishable from a nonnegative one perturbed by the fit's own
+# error, and is refused as "ill_conditioned" (a numerical caution), never
+# reported as a defect of the user's model. The claim is one-directional:
+# within the band, indefiniteness cannot be asserted; beyond it, "indefinite"
+# is the best available reading of a decisively negative eigenvalue. Changing
+# this constant is an escalation (RB, no-oracle), never a silent edit.
 axes_sigma_degenerate <- function(sigma) {
   if (!all(is.finite(sigma))) return("singular")
   ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values
   p <- nrow(sigma)
   floor_ <- sqrt(p * .Machine$double.eps / axes_degeneracy_tau)
-  if (ev[p] <= ev[1] * floor_) return("ill_conditioned")
+  if (ev[p] <= ev[1] * floor_) {
+    if (ev[p] < -ev[1] * sqrt(p * .Machine$double.eps)) return("indefinite")
+    return("ill_conditioned")
+  }
   NULL
 }
 
