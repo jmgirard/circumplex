@@ -1,6 +1,6 @@
 # M89: One degeneracy criterion for the two fitted-matrix consumers
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -100,7 +100,7 @@ the scaled statistic → M68 already carries one.
 - [x] **T6** — Assembly-level test through `axes_reliability()` on a
       constructed fitted matrix.
 - [x] **T7** — Roxygen reason enumeration, `devtools::document()`, NEWS entry.
-- [ ] **T8** — Full `devtools::check()`.
+- [x] **T8** — Full `devtools::check()`.
 
 ## Work log
 
@@ -114,6 +114,8 @@ the scaled statistic → M68 already carries one.
 - 2026-08-15: T6 done — assembly test injects a constructed degenerate matrix at the `axes_fitted_cov()` seam via `local_mocked_bindings()`; both surfaces warn with the shared literal, component SEs and the four D-036 statistics are NA together, df/srmr and the point estimates unaffected.
 
 - 2026-08-15: T7 done — roxygen names the criterion and the shared literal at the scaled-fit details and the return-value enumeration; NEWS bullet added; `devtools::document()` warning-free, regenerating only `man/axes_reliability.Rd` (plus the roxygen2 8.1.0 version stamp in DESCRIPTION, a generated line from the updated local toolchain).
+
+- 2026-08-15: T8 done — `devtools::check(args = "--no-manual")` clean, 0 errors / 0 warnings / 0 notes. All tasks complete; status → review.
 
 ## Decisions
 
