@@ -66,7 +66,11 @@ patched. Both are reproduced in Materials below.
   surface only. Measured at p = 3: finite corrected SEs with
   `se_correction_failed = NULL` beside `fit_scaling_failed = "indefinite"`
   NA-ing all four scaled statistics, from the same Σ̂. That is M89's own Goal
-  failure mode with the roles swapped.
+  failure mode with the roles swapped. *[Corrected at the RR18 ingest,
+  2026-08-16 (RR18 F1, D-044): the exemplar behind this framing has an exactly
+  unit diagonal, so `cov2cor(S) == S` and its κ = 6.654e6 is identical in both
+  metrics — it is not a raw-vs-correlation counterexample, but evidence the
+  cutoff was a thousand times too loose.]*
 
 **The tension that makes this non-obvious.** "Just price `cov2cor(Σ̂)`" is not
 an available answer as stated, because the regime M89 was built to close is

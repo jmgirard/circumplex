@@ -1430,3 +1430,46 @@ retirement, its three surrendered properties and its reopening bar all stand, an
 this narrows only the identity it recorded. **What reopens this:** a twin the
 duplicate refusal cannot be resolved for without an ordinal — two guards that
 must be identical in kind, binding and key and cannot be reworded.
+
+### D-044 (2026-08-16): the fitted-matrix degeneracy criterion prices `cov2cor(Σ̂)`, floored at a stated accuracy target τ = 1e-6 — supersedes M89's raw-matrix criterion (M89 re-cut, RR18)
+
+**Context:** M89's first cut recorded (its milestone-local Decisions,
+2026-08-15) a relative smallest-eigenvalue floor on the RAW fitted matrix,
+`sqrt(p·ε)`, and explicitly rejected "any correlation-metric test" as blind to
+diagonal inflation. RR18 (Fable, spawned at M89's round-2 gate) measured that
+half that premise was wrong: the diagonal-inflation regime is benign for every
+reported statistic (`corrected`/`fiml_ratio` invariant to ≤ 6.4e-16 across
+eight decades of inflation moving κ(raw) to 2.1e8), so raw pricing refused NA
+on numbers priced exactly; and the binding defect was the floor, a thousand
+times too loose — the committed exemplar
+`cairn/reviews/rb18-counterexample-b.rds` (κ = 6.65e6, identical in both
+metrics) returned corrected SEs wrong by 3.4% with `reason = NULL`, the
+package's first measured silent wrong number in this subsystem.
+**Decision:** `axes_sigma_degenerate()` is evaluated on `cov2cor(Σ̂)` for every
+user-reported quantity — at `axes_scaling_factor()`, and at
+`axes_corrected_se()`'s corrected arm — and on the raw Σ̂ only where it is
+actually inverted, that helper's `naive` arm (the lavaan tie, D-037). The SE
+helper's three vectors refuse as a unit, so its refusals **nest** the scaling
+surface's, with exact agreement on unit-diagonal inputs; `cov2cor()` is a
+congruence, so by Sylvester's law of inertia indefiniteness and exact
+singularity are metric-invariant and no model-statement content is lost. The
+floor is λmin ≤ λmax·`sqrt(p·ε/τ)` with τ = 1e-6 a named constant
+(`axes_degeneracy_tau`), calibrated against the exact-rational oracle
+(`devel/degeneracy-oracle/`): measured double-precision SE relative error sits
+within a factor of 10 of p·κ(R)²·ε (ratios 3.28/2.4/1.27), so the floor caps
+the error a computed answer can carry at ~1e-5 relative. At p = 24 the refusal
+threshold tightens from κ ≈ 1.4e7 to κ ≈ 1.4e4.
+**Footing:** stands on the ground D-036 and D-037 set — D-036 scales the four
+fit statistics from quantities computed at `cov2cor(Σ̂)`; D-037 evaluates the
+FIML ratio at `cov2cor(Σ̂)` and keeps `naive` at the raw Σ̂. The criterion now
+prices each surface in the metric those decisions compute in. M89's contrary
+milestone-local entry carries a dated superseding annotation.
+**Consequences:** exported behavior changes on the unreleased dev line
+(NEWS-documented): pure diagonal rescalings now compute at the scaling surface
+with `scale` invariant to 1e-9; correlation structures with κ between ~1.4e4
+and ~1.4e7 (at p = 24) that previously computed now refuse `"ill_conditioned"`
+— the probe fits measure κ ≤ 10.45, six decades below the floor, so no
+measured realistic fit moves. RR18 rec 7 (decoupling `naive` so a raw-arm
+refusal cannot NA the reported vectors), the `df == 0` guard, the `cval ≤ 0`
+relabel, and the reason-vocabulary split are M90's. Source: RR18 (Fable,
+ingested 2026-08-16); Jeff's decisions at the M89 re-cut gates.
