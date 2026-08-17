@@ -1925,6 +1925,15 @@ axes_reliability <- function(data = NULL, items, angles = NULL,
       # "indefinite", by contrast, fires on any decisively indefinite
       # fitted matrix (tested).
       se_correction_failed = corrected$reason,
+      # NULL unless the SE helper's internal raw arm -- the uncorrected
+      # normal-theory pricing, kept only as the tie to lavaan's own SE
+      # (D-037) -- was refused while every reported number computed (M91;
+      # RR18 rec 7). Carries the same refusal vocabulary as
+      # `se_correction_failed`. Deliberately silent: no warning and no
+      # printed note accompany it, because the refused quantity is never
+      # user-reported and the reported SEs beside it are present and correct
+      # (M91-D1).
+      naive_reason = corrected$naive_reason,
       # What lavaan reported before the correlation-metric scaling (M68), on the
       # same footing as `se_uncorrected` above: visible for comparison and for
       # reproducing a pre-M68 analysis, without the package offering a supported

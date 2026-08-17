@@ -1168,7 +1168,11 @@ test_that("AC10: every non-success return NAs all three vectors together", {
   )
   # The pre-M69 singular path must NA fiml_ratio too, not just its two elders.
   expect_true(all(is.na(got$fiml_ratio)))
-  expect_named(got, c("naive", "corrected", "fiml_ratio", "reason"))
+  # Since M91 the return carries `naive_reason` beside `reason`; on a unit
+  # refusal like this one it is NULL -- the one reason speaks for all three.
+  expect_named(got, c("naive", "corrected", "fiml_ratio", "reason",
+                      "naive_reason"))
+  expect_null(got$naive_reason)
 })
 
 
