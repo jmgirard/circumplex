@@ -1473,3 +1473,9 @@ measured realistic fit moves. RR18 rec 7 (decoupling `naive` so a raw-arm
 refusal cannot NA the reported vectors), the `df == 0` guard, the `cval ≤ 0`
 relabel, and the reason-vocabulary split are M90's. Source: RR18 (Fable,
 ingested 2026-08-16); Jeff's decisions at the M89 re-cut gates.
+_The "three vectors refuse as a unit" clause in the Decision above is
+superseded by M91 (2026-08-16), which executes the rec-7 routing this entry's
+Consequences name: a raw-arm-only refusal now NAs `naive` alone, carried
+silently in `naive_reason`/`details$naive_reason`, while `corrected` and
+`fiml_ratio` compute; the cov2cor arm's refusals remain unit refusals, so the
+two surfaces' user-facing refusals still agree exactly._

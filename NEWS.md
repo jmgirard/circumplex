@@ -70,12 +70,16 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   statistics (`chisq`, `pvalue`, `rmsea`, `cfi`) are `NA` together, and each
   surface's warning names that shared reason; `df` and `srmr` still report.
   The standard-error surface additionally applies the same criterion to the
-  raw fitted matrix, which one of its internal arms inverts, so its refusals
-  nest the scaling surface's: a matrix degenerate only in the raw metric
+  raw fitted matrix, which one internal arm of its computation — the
+  uncorrected normal-theory pricing kept only as a diagnostic tie to lavaan's
+  own standard errors — inverts. A matrix degenerate only in the raw metric
   (wildly unequal fitted variances over a well-conditioned correlation
-  structure) yields `NA` standard errors beside validly scaled fit
-  statistics, never the reverse, and on a unit-diagonal fitted matrix the two
-  surfaces agree exactly.
+  structure) refuses that internal arm alone: the reported standard errors
+  and scaled fit statistics all compute, with no warning, and the internal
+  refusal is recorded silently in `details$naive_reason` (a new `details`
+  field, `NULL` whenever that arm computed) under the same reason
+  vocabulary. The two surfaces' user-facing refusals therefore agree
+  exactly, and on a unit-diagonal fitted matrix the two metrics coincide.
   Previously the two surfaces disagreed at the numerical margin — whichever
   internal `solve()` failed first refused with an incidental label — so a
   sufficiently degenerate fitted matrix could yield `NA` corrected standard
