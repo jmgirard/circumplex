@@ -807,6 +807,19 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
 
 ## Documentation
 
+* The "Evaluating Circumplex Structure" vignette gains a section, *When a fit
+  sits at a boundary*, on reading a `cpm_fit()` solution that sits at or near
+  a parameter boundary — the regime the vignette's own worked example turns
+  out to occupy. It glosses each of the five boundary and
+  weak-identification markers `cpm_fit()` records, reads the displayed fit's
+  Heywood case and its zero-width communality interval, shows a fit whose
+  `summary()` prints the fired-marker list, separates what the package's
+  validation simulations measured from what they did not, and gives four
+  concrete next steps. `?summary.circumplex_cpm` points at it. The section on
+  reading the estimated angles is also corrected: it now says that one scale
+  is held fixed to identify the configuration, and describes the spacing the
+  printed table actually shows rather than calling the departures minor.
+
 * The "Using Circumplex Instruments" vignette and `?norms` now say precisely
   what the bundled normative statistics are, instead of implying that a
   normative sample stands in for a population. The standardizing section

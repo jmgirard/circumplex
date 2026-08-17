@@ -27,5 +27,7 @@ configuration studied), and up to N = 50000 when the fitted solution shows a
 boundary or weak-identification marker (Heywood communality, removed
 harmonic, small correlation-function weight, ill-conditioning, or competing
 near-tied optima), the regime where they mis-covered even at large N (see
-\code{\link[=cpm_fit]{cpm_fit()}}).
+\code{\link[=cpm_fit]{cpm_fit()}}). The vignette section \emph{When a fit sits at a boundary}
+(\code{vignette("evaluating-circumplex-structure")}) glosses each marker and
+gives the interpretation and next steps when one fires.
 }

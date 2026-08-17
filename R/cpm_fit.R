@@ -1413,21 +1413,36 @@ cpm_hessian_condition_warn <- 1e8
 # signals the same weak-identification regime (near-tied optima), and
 # omitting it would let summary() print "may be weakly identified" while
 # staying silent about the CI consequence.
+# The fired-marker vocabulary in one place, so the printed caution, the help
+# page, and the vignette that teaches these markers all enumerate the same set:
+# a surface that names a marker can be checked against this catalog rather than
+# against the marker function's source text, which a behavior-preserving
+# refactor would move. Names are the internal condition keys; values are the
+# labels summary() prints.
+cpm_marker_labels <- function() {
+  c(
+    # Heywood case: Browne (1992) p. 472 -- a communality index rho(x_i,c_i)
+    # estimated at one (browne1992.md).
+    heywood = "Heywood communality",
+    removed = "boundary harmonic removed",
+    small_beta = "small correlation-function weight",
+    illcond = "ill-conditioned Hessian",
+    multimodal = "competing near-tied optima"
+  )
+}
+
 cpm_boundary_markers <- function(object) {
   d <- object$details
   b <- object$betas$Beta
+  lab <- cpm_marker_labels()
   as.character(c(
-    # Heywood case: Browne (1992) p. 472 -- a communality index rho(x_i,c_i)
-    # estimated at one (browne1992.md).
-    if (isTRUE(d$heywood)) "Heywood communality",
-    if (length(d$removed_harmonics) > 0) "boundary harmonic removed",
-    if (length(b) > 0 && isTRUE(min(b) < 0.10)) {
-      "small correlation-function weight"
-    },
+    if (isTRUE(d$heywood)) lab[["heywood"]],
+    if (length(d$removed_harmonics) > 0) lab[["removed"]],
+    if (length(b) > 0 && isTRUE(min(b) < 0.10)) lab[["small_beta"]],
     if (isTRUE(d$hessian_condition > cpm_hessian_condition_warn)) {
-      "ill-conditioned Hessian"
+      lab[["illcond"]]
     },
-    if (isTRUE(d$multimodal)) "competing near-tied optima"
+    if (isTRUE(d$multimodal)) lab[["multimodal"]]
   ))
 }
 
