@@ -78,8 +78,11 @@ plotting layer has been rebuilt on a real ggplot2 coordinate system.
   and scaled fit statistics all compute, with no warning, and the internal
   refusal is recorded silently in `details$naive_reason` (a new `details`
   field, `NULL` whenever that arm computed) under the same reason
-  vocabulary. The two surfaces' user-facing refusals therefore agree
-  exactly, and on a unit-diagonal fitted matrix the two metrics coincide.
+  vocabulary. Under the shared criterion the two surfaces' user-facing
+  refusals therefore agree exactly, and on a unit-diagonal fitted matrix the
+  two metrics coincide; each surface retains its own refusals outside the
+  criterion (such as the saturated-model door, which touches only the fit
+  statistics).
   Previously the two surfaces disagreed at the numerical margin — whichever
   internal `solve()` failed first refused with an incidental label — so a
   sufficiently degenerate fitted matrix could yield `NA` corrected standard

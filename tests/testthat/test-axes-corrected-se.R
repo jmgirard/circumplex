@@ -1155,7 +1155,7 @@ test_that("AC10: a nonpositive diagonal is refused before cov2cor() runs", {
 })
 
 
-test_that("AC10: every non-success return NAs all three vectors together", {
+test_that("AC10: a reported-vector failure NAs all three vectors together (raw-arm-only refusals decoupled at M91)", {
   # Runtime half -- always runs, including under R CMD check. This is the
   # load-bearing assertion; the source enumeration below is a completeness aid.
   pp <- probe_pop()

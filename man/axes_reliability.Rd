@@ -88,10 +88,12 @@ smallest eigenvalue
 statement about the model, and \code{"ill_conditioned"} for roundoff-level
 negativity, singularity, or ill-conditioning, a numerical caution --
 which also sets \code{fit_scaling_failed} when the shared criterion
-is what tripped it -- \code{naive_reason}, \code{NULL} unless the same criterion,
-evaluated on the raw fitted matrix, refused the internal uncorrected
-arm (the diagnostic tie to lavaan's own standard errors) while every
-reported number computed; it carries the same reason vocabulary and is
+is what tripped it -- \code{naive_reason}, \code{NULL} unless the internal
+uncorrected arm (the diagnostic tie to lavaan's own standard errors)
+was refused while every reported number computed, whether by the same
+criterion evaluated on the raw fitted matrix or by that arm's own
+pricing (\code{"singular"}, \code{"unidentified"}, \code{"indefinite"}); it carries
+the same reason vocabulary and is
 deliberately silent -- no warning or printed note accompanies it --
 \code{fit_uncorrected}, the six fit statistics as
 lavaan reports them
@@ -235,11 +237,14 @@ standard errors and scaled fit statistics all compute --
 \code{NULL}, and no warning or note fires, because every reported number is
 present and priced in the metric the criterion cleared -- and the
 internal refusal is recorded, silently, in \code{details$naive_reason} under
-the same reason vocabulary. The two surfaces' user-facing refusals
-therefore agree exactly: whatever refuses the scaled statistics refuses
-the standard errors with the same reason, and nothing the raw metric
-alone refuses touches either. On a unit-diagonal fitted matrix the two
-metrics coincide. Separately, a saturated model (\code{df = 0}) is refused as
+the same reason vocabulary. Under the shared criterion the two surfaces'
+user-facing refusals therefore agree exactly: whatever the criterion
+refuses for the scaled statistics it refuses for the standard errors
+with the same reason, and nothing the raw metric alone refuses touches
+either. (Each surface retains its own refusals outside the criterion --
+the saturated-model door below touches only the fit statistics, and
+either surface's internal computation can still refuse on its own.) On
+a unit-diagonal fitted matrix the two metrics coincide. Separately, a saturated model (\code{df = 0}) is refused as
 \code{"saturated"} before any scaling arithmetic runs -- a refusal that
 touches only the four scaled statistics; the corrected standard errors
 still compute. (A \code{df = 0} fit is reachable today only at the internal

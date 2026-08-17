@@ -3159,8 +3159,10 @@ test_that("M91 AC5: a raw-metric-only degeneracy through the assembly seam NAs n
   # so the one thing it touches is the SE helper's internal `naive` arm, the
   # arm that inverts the raw matrix and is never user-reported. Injected at
   # the one seam both consumers read (axes_fitted_cov), as in the test above.
-  # Between M89 and M91 this shape NA'd all three SE vectors as a unit with a
-  # warning; before the M89 re-cut it NA'd the scaled fit statistics too.
+  # This IS the M89 AC2 assembly test, re-expected: between M89 and M91 this
+  # shape NA'd all three SE vectors as a unit with a warning (which that
+  # criterion pinned here under its own name); before the M89 re-cut it NA'd
+  # the scaled fit statistics too.
   bad <- sigma
   bad[4L, 4L] <- bad[4L, 4L] * 1e10
   local_mocked_bindings(axes_fitted_cov = function(fit) bad)
