@@ -2,10 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    # hotfix-windows-fiml-em is TEMPORARY: this hotfix fixes a Windows-only
-    # test failure, so its evidence needs the full matrix pre-merge; the
-    # branch entry is reverted before merge.
-    branches: [main, master, hotfix-windows-fiml-em]
+    branches: [main, master]
     paths-ignore:
       - 'cairn/**'
       - 'man/**'
