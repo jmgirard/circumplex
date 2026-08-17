@@ -140,8 +140,10 @@ The fit above is one of these fits, and it says so. Its `# Diagnostics` block
 prints a note that a communality index reached its upper boundary, and the
 results table shows which one: the NO scale's communality index is 1.000, with
 a confidence interval of [1.000, 1.000\]. A zero-width interval is not a
-precise estimate — it is an absent one. Every bootstrap resample landed on the
-same boundary, so the percentile interval has no width left to report. The same
+precise estimate — it is an absent one. Both endpoints equal the estimate,
+which is to say that at least the middle 95% of the retained bootstrap
+resamples also sat on the boundary, leaving the percentile interval no width
+to report. The same
 chunk also emits a warning that the fit's Hessian is ill-conditioned, a second
 signal from the same regime. When octant scales share a strong general factor,
 as interpersonal problem scales do, fitted solutions frequently sit at or near
@@ -184,6 +186,11 @@ demo <- cpm_fit(
 summary(demo)
 ```
 
+That fit shows something else worth seeing: every one of its analytic
+intervals came back `NA`. The standard errors are undefined when the curvature
+matrix is too close to singular to invert, which is the same condition the
+ill-conditioning marker reports.
+
 **What a fired marker does and does not tell you.** The package's validation
 simulations measured what these markers predict, and the measurement is
 narrower than the markers are. It covered *analytic* (Wald) intervals fitted
@@ -192,9 +199,12 @@ an interval contained the truth — not bias in the point estimates.
 
 - *Communality indices* are the most affected, and in two ways that are
   visible rather than hidden: the standard errors can come back missing
-  altogether, or the interval can collapse to zero width, as NO's did above.
-  Fits carrying a Heywood or an ill-conditioning marker covered $\zeta$
-  noticeably less often than unmarked fits.
+  altogether, or the interval can collapse to zero width because a negative
+  asymptotic variance was clamped at zero. Fits carrying a Heywood or an
+  ill-conditioning marker covered $\zeta$ noticeably less often than unmarked
+  fits. NO's zero-width interval above arises by a different route — it is a
+  percentile interval whose resamples sat on the boundary — but it reaches the
+  reader the same way, as an interval with no usable width.
 - *Angles* are affected less. The marker that tracked angle mis-coverage most
   closely was the small-weight one, not the Heywood one.
 - *Correlation-function weights* carry a separate and structural problem: in
@@ -218,12 +228,13 @@ from a single provoking configuration.
 1. *Locate it.* Read the results table beside the note and find the scale or
    weight sitting at the boundary, as NO is above. A marker with no identified
    owner is not yet a diagnosis.
-2. *Re-fit to find out what the boundary is about.* Compare the default fit
-   against the constrained variants in the next subsection. A boundary that
-   disappears when a constraint is relaxed is telling you about the model you
-   imposed; one that survives is telling you about the data. If you fitted
-   from a correlation matrix, refitting from raw data also buys you bootstrap
-   intervals in place of analytic ones.
+2. *Re-fit to find out what the boundary is about.* The default
+   `"quasi-circumplex"` model is the least constrained of the variants in the
+   next subsection, so a boundary that appears only under a constrained
+   variant was put there by the constraint, while one already present in the
+   default fit belongs to the data and the model family rather than to an
+   assumption you added. If you fitted from a correlation matrix, refitting
+   from raw data also buys you bootstrap intervals in place of analytic ones.
 3. *Report it.* Quote the marker alongside the estimate it belongs to: which
    scales sat at the boundary, and that their intervals are degenerate or
    missing. An angle or communality reported without its diagnostic note is a
@@ -232,7 +243,9 @@ from a single provoking configuration.
    estimates, as the solution the model actually fitted (their bias in this
    regime is unmeasured, so read them as estimates, not to the digit); the fit
    indices and the residual summary, which still locate where the model
-   misses; and any interval that came back with ordinary width. These do not:
+   misses; and intervals that came back with ordinary width, read with
+   whatever caution `summary()` prints beside them — in validation, marked
+   fits covered less well than unmarked ones across the board. These do not:
    an interval that is missing or zero-width, and the chi-square $p$ value at
    field sample sizes, for the reason given above.
 

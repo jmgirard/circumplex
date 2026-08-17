@@ -109,20 +109,20 @@ label test checks the contract rather than the function's source text.
       `cpm_boundary_markers()` (`R/cpm_fit.R:1416`) index it; the existing
       marker tests (`tests/testthat/test-cpm_api.R:555-610`) still pass, and
       no user-visible output changes.
-- [ ] T2 Write the tests first and watch each fail: catalog-vs-subsection label
+- [x] T2 Write the tests first and watch each fail: catalog-vs-subsection label
       sweep (scoped extraction), demo-chunk marker-set equality, the angle
       figures and ordering, the roxygen heading string. Break one guarded line
       per test.
-- [ ] T3 Draft the subsection — marker glossary, the on-page reading of the
+- [x] T3 Draft the subsection — marker glossary, the on-page reading of the
       displayed fit (NO ζ̂ = 1.000 and its zero-width interval, the printed
       Heywood note, the ill-conditioning warning), and the per-family interval
       implications with their explicit not-measured statements.
-- [ ] T4 Add the seeded analytic-path demonstration chunk (base-R `chol` +
+- [x] T4 Add the seeded analytic-path demonstration chunk (base-R `chol` +
       `rnorm` draw from the fitted implied matrix at N = 2500 — no new
       dependency) and write the action ladder from what it prints.
-- [ ] T5 Reconcile the angle-reading paragraph and the "Boundary solutions are
+- [x] T5 Reconcile the angle-reading paragraph and the "Boundary solutions are
       common" bullet against the new subsection.
-- [ ] T6 Author the claims ledger in this file, sentence by sentence.
+- [x] T6 Author the claims ledger in this file, sentence by sentence.
 - [ ] T7 Roxygen pointer + `document()`; NEWS entry; full check with vignettes
       rebuilt; grep the built vignette for scaffolding.
 
@@ -142,6 +142,75 @@ label test checks the contract rather than the function's source text.
 
 - 2026-08-16: T1 done — `cpm_marker_labels()` catalog added, `cpm_boundary_markers()` indexes it; full `devtools::test()` clean (8300 pass, 0 fail), no user-visible output change. Tests-first guards for AC1/AC2/AC6/AC7 written (`tests/testthat/test-cpm-boundary-guidance.R`); three fail for the intended reason (section, demo chunk and roxygen pointer do not exist yet), the angle-figure guard already passes against the displayed fit. Two defects in the first draft of those guards were found by running them: the reference field is numeric not integer, and the ordering assertion compared circular order linearly, failing on where the wrap falls rather than on disordered scales.
 
+- 2026-08-16: T2-T6 done. Teeth demonstrated per guard by mutating the guarded artifact and observing failures (label dropped from the section: 2; demo simulated from an identity structure: 5; displayed fit refitted on a 400-row subset: 8; roxygen pointer removed: 5), each restored to 0.
+- 2026-08-16: a mutation-harness error cost the vignette and roxygen edits once — the harness reverted each mutation with `git checkout --`, which also discarded the uncommitted content underneath. Re-applied and thereafter committed before mutating.
+- 2026-08-16: three claims were repaired before ledgering rather than after review: a bootstrap resample claim the two percentile endpoints do not license, a zeta paragraph that read the on-page zero-width interval as an instance of the analytic clamping mechanism, and a ladder step whose constraint direction was backwards. The rendered vignette also showed the demonstration fit returning `NA` for every analytic interval, so the section now reads that too.
+- 2026-08-16: the claims ledger lives in `## Decisions`, not a plan-owned section: the plan-owned body stood at 128 of 150 lines and the ledger runs ~50.
+- 2026-08-16: noted for the review gate, not fixed here: the vignette cites Gurtman & Pincus (2000) but `cairn/references/` holds no page for it, and no other surface cites it. Pre-existing; this milestone narrowed the claim resting on it rather than extending it.
+
 ## Decisions
+
+### 2026-08-16: claims ledger for *When a fit sits at a boundary* (AC4)
+
+Home note: the ledger lives here rather than in a plan-owned section because
+the plan-owned body stood at 128 of its 150 lines; `## Decisions` is
+milestone-local, append-only and cap-exempt, and review reads it here.
+
+Built by walking the subsection's prose sentence by sentence with
+`scratchpad/sentences.R` (splits the section's non-chunk lines on sentence
+boundaries; 36 units, list-bullet runs counted with the sentence that
+introduces them). Verdicts: `on-page` = shown by a chunk the reader runs;
+`derived` = from the named artifact, which states the claim; `inherited` =
+carried forward from the bullet AC6(b) reduced, not newly composed;
+`exempt` = framing, instruction, or no factual claim.
+
+| # | verdict | anchor |
+|---|---|---|
+| 1 | exempt | framing |
+| 2 | on-page | chunk `cpm` output: NO row, Zeta 1.000 [1.000, 1.000]; Diagnostics note |
+| 3 | exempt | restates 2 |
+| 4 | on-page | chunk `cpm`: both endpoints equal the estimate to 12 dp (measured 2026-08-16), which entails the middle 95% of retained resamples sat there |
+| 5 | on-page | chunk `cpm` emits `CPM Hessian is ill-conditioned (condition number 1.83e+14)` |
+| 6 | inherited | the reduced bullet's general-factor claim, shipped text |
+| 7 | derived | `R/cpm_fit.R` `cpm_marker_labels()` / `cpm_boundary_markers()`; gloss wording checked against the printed notes in `R/cpm_oop.R:50-97` and the ill-conditioning `warning()` |
+| 8 | derived | `R/cpm_oop.R:232-252` (analytic branch, N thresholds) and `cpm_diagnostic_lines()` (bootstrap path prints notes, not the list) |
+| 9 | exempt | instruction |
+| 10 | on-page | chunk `boundary_demo` draws from `cpm$matrices$Phat`, whose NO communality is 1.000 to 12 dp |
+| 11 | exempt | scope disclaimer |
+| 12 | on-page | chunk `boundary_demo` output: every Angle_lci/uci and Zeta_lci/uci is `NA` |
+| 13 | derived | `devel/cpm-marker-validation.md`: SEs come back NA exactly when `solve()` rejects the finite-difference Hessian as computationally singular |
+| 14 | derived | `devel/cpm-marker-validation.md`, "Provenance" and "Headline results" |
+| 15 | derived | same, "Per-marker conditional coverage" mechanism paragraph (NA SEs from singular Hessian; negative variances clamped to zero) |
+| 16 | derived | same, per-marker table: Heywood zeta .836 fired / .936 quiet; ill-cond .757 / .936 |
+| 17 | derived | same table (small weight angle .890 / .936 vs Heywood .899 / .913); beta half from `cairn/DESIGN.md`, M4 coverage record (~.77, flat in N at boundary truths) |
+| 18 | derived | `cairn/DESIGN.md`, M4 record: "structural rather than small-sample" |
+| 19 | exempt | framing |
+| 20 | derived | `devel/cpm-marker-validation.md` measures coverage only; no bias outcome |
+| 21 | derived | same, "Provenance": all fits on the literal `cormat` path, analytic Wald |
+| 22 | derived | same, "Per-marker verdicts": removed harmonic is a predictive null |
+| 23 | derived | same, "Honest nulls and caveats" 2, and 114 firings all in the zeta = 0.97 config |
+| 24 | exempt | heading + list marker |
+| 25 | exempt | instruction |
+| 26 | exempt | maxim, no factual claim |
+| 27 | exempt | list marker |
+| 28 | derived | `R/cpm_fit.R:1576-1577` — `"quasi-circumplex"` is the default and least constrained of the four variants |
+| 29 | exempt | instruction (correlation-matrix path has analytic intervals only, already stated in the shipped paragraph above) |
+| 30 | exempt | list marker |
+| 31 | exempt | instruction |
+| 32 | exempt | maxim, no factual claim |
+| 33 | exempt | list marker |
+| 34 | derived | interpretable list: point estimates unmeasured for bias (row 20); fit indices and residuals unchanged by a boundary (`R/cpm_oop.R` summary computes them identically); marked-vs-unmarked coverage gap from the per-marker table |
+| 35 | derived | not-interpretable list: missing or zero-width intervals (row 15); chi-square at field N from the shipped caution above and `cairn/DESIGN.md`'s KS record |
+| 36 | exempt | cross-reference |
+
+Two claims were repaired during the walk rather than ledgered as written.
+"Every bootstrap resample landed on the same boundary" was an inference the
+output does not license — two percentile endpoints entail only the middle 95% —
+and now says that. And the zeta paragraph originally read NO's zero-width
+interval as an instance of the analytic clamping mechanism; it is a percentile
+interval, a different route to the same absence, and the text now says so.
+Ladder item 2 was also rewritten: it had the constraint direction backwards,
+advising a comparison against *more* constrained variants while describing a
+constraint being relaxed.
 
 ## Review
