@@ -1,6 +1,6 @@
 # M92: Teach the boundary regime the structure vignette's own example is in
 
-- **Status:** in-progress
+- **Status:** review
 - **Priority:** normal
 - **Depends on:** —
 - **Driving RR:** —
@@ -123,7 +123,7 @@ label test checks the contract rather than the function's source text.
 - [x] T5 Reconcile the angle-reading paragraph and the "Boundary solutions are
       common" bullet against the new subsection.
 - [x] T6 Author the claims ledger in this file, sentence by sentence.
-- [ ] T7 Roxygen pointer + `document()`; NEWS entry; full check with vignettes
+- [x] T7 Roxygen pointer + `document()`; NEWS entry; full check with vignettes
       rebuilt; grep the built vignette for scaffolding.
 
 ## Work log
@@ -147,6 +147,7 @@ label test checks the contract rather than the function's source text.
 - 2026-08-16: three claims were repaired before ledgering rather than after review: a bootstrap resample claim the two percentile endpoints do not license, a zeta paragraph that read the on-page zero-width interval as an instance of the analytic clamping mechanism, and a ladder step whose constraint direction was backwards. The rendered vignette also showed the demonstration fit returning `NA` for every analytic interval, so the section now reads that too.
 - 2026-08-16: the claims ledger lives in `## Decisions`, not a plan-owned section: the plan-owned body stood at 128 of 150 lines and the ledger runs ~50.
 - 2026-08-16: noted for the review gate, not fixed here: the vignette cites Gurtman & Pincus (2000) but `cairn/references/` holds no page for it, and no other surface cites it. Pre-existing; this milestone narrowed the claim resting on it rather than extending it.
+- 2026-08-16: T7 done — `document()` clean with no unresolved links, `devtools::check(args = "--no-manual")` 0/0/0 with vignettes rebuilt and the test suite run inside check, `pkgdown::check_pkgdown()` clean, `cairn_validate` all green. Rendered vignette grepped: no tool-call scaffolding, the ill-conditioning warning and the fired-marker list both present in the output the reader sees. Status → review.
 
 ## Decisions
 
