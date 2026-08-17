@@ -256,14 +256,29 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
   # end of this file for the criterion and its rationale. Checked before any
   # pricing so that what refuses a degenerate matrix is a stated contract, not
   # whichever solve() call happens to give up first on this platform's LAPACK.
-  # Evaluated on BOTH matrices this helper prices: the raw realigned Sigma-hat
-  # (the `naive` arm below inverts it) and cov2cor(Sigma-hat) (the corrected
-  # arm, and the only matrix anything user-reported depends on). Either arm
+  # Evaluated on BOTH matrices this helper prices: cov2cor(Sigma-hat) (the
+  # corrected arm, and the only matrix anything user-reported depends on) and
+  # the raw realigned Sigma-hat (the `naive` arm below inverts it). Either arm
   # tripping refuses all three vectors as a unit -- the retained cost recorded
-  # in M89's Deviations table; RR18 rec 7's decoupling of `naive` is M90's.
-  degenerate <- axes_sigma_degenerate(sigma)
+  # in M89's Deviations table; RR18 rec 7's decoupling of `naive` is M91's.
+  #
+  # ORDER (M90 AC7): the cov2cor arm is consulted FIRST, so whenever both
+  # arms refuse, the literal reported is the cov2cor arm's -- the arm
+  # axes_scaling_factor() also prices. M90's indefinite/ill_conditioned
+  # partition is not congruence-invariant (the eigenvalue RATIO moves under
+  # cov2cor even though the signs do not), so the two arms can label one
+  # matrix differently; without this precedence the raw arm's label would
+  # leak out and break the same-literal half of M89's nestedness contract.
+  # The finiteness hoist just below exists for that order: the raw
+  # matrix is checked finite before cov2cor() runs on it, because cov2cor()
+  # of an NA/NaN diagonal emits its own warning and the M71 contract is
+  # exactly one warning per refusal (the same trap the sibling documents at
+  # R/axes_scaled_fit.R; finiteness is metric-blind, so hoisting it moves no
+  # refusal across the arms' boundary).
+  if (!all(is.finite(sigma))) return(na_out("singular"))
+  degenerate <- axes_sigma_degenerate(stats::cov2cor(sigma))
   if (is.null(degenerate)) {
-    degenerate <- axes_sigma_degenerate(stats::cov2cor(sigma))
+    degenerate <- axes_sigma_degenerate(sigma)
   }
   if (!is.null(degenerate)) return(na_out(degenerate))
 
@@ -290,10 +305,14 @@ axes_corrected_se <- function(sigma, item_names, item_angle_deg, item_scale,
 #
 # THE CRITERION: the smallest eigenvalue of the priced matrix, relative to its
 # largest, must exceed sqrt(p * eps / tau) (tau below); at or below that the
-# matrix is refused as "ill_conditioned". One inequality carries three cases:
-# indefinite (lambda_min <= 0 < lambda_max), exactly singular (lambda_min = 0),
-# and ill-conditioned (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4
-# at p = 24).
+# matrix is refused. One inequality carries three spectral cases -- a
+# negative smallest eigenvalue (lambda_min <= 0 < lambda_max), exact
+# singularity (lambda_min = 0), and mere ill-conditioning
+# (lambda_max/lambda_min >= sqrt(tau/(p*eps)), about 1.4e4 at p = 24) --
+# and since M90 the refusal's LITERAL is decided by depth, not by case:
+# "indefinite" only where the negativity is decisive, "ill_conditioned" for
+# everything else including roundoff-level negativity; the partition and
+# its rationale live at axes_sigma_degenerate() below.
 #
 # WHICH MATRIX (M89 re-cut, RR18): each consumer prices the matrix it actually
 # computes with. Every quantity the scaling surface computes -- and every
@@ -338,15 +357,39 @@ axes_degeneracy_tau <- 1e-6
 
 # Returns NULL (priceable), "singular" (non-finite entries: the literal the
 # NA/NaN-diagonal route has carried since before M69, now reached here rather
-# than in solve()), or "ill_conditioned". Callers refuse nonpositive and +Inf
-# diagonals at their own doors first, so lambda_max > 0 whenever the
-# eigendecomposition runs.
+# than in solve()), "indefinite", or "ill_conditioned". Callers refuse
+# nonpositive and +Inf diagonals at their own doors first, so lambda_max > 0
+# whenever the eigendecomposition runs.
+#
+# WITHIN the refusal region, which word (M90): "indefinite" is a statement
+# about the user's MODEL -- the model-implied matrix has a genuinely negative
+# direction -- so it is claimed only where the negativity exceeds what the
+# fit's own noise can produce: lambda_min < -lambda_max * sqrt(p * eps).
+# RATIONALE for that band (RR18 BC5's constant; M90 AC2 demands the rationale
+# stated here): the priced matrix's entries are not exact -- they are
+# optimizer output rounded through cov2cor(), carrying entrywise relative
+# error no smaller than order sqrt(eps) (an iterative fit stopped on a
+# relative objective tolerance `tol` leaves the implied moments with errors
+# of order sqrt(tol) near a quadratic optimum, and sqrt(tol) >= sqrt(eps) for
+# any achievable tolerance). A symmetric entrywise perturbation of relative
+# size sqrt(eps) has spectral norm ~ sqrt(p)*sqrt(eps)*lambda_max under
+# incoherent signs, and Weyl's inequality moves every eigenvalue by at most
+# that norm -- so a computed eigenvalue within lambda_max*sqrt(p*eps) of zero
+# is indistinguishable from a nonnegative one perturbed by the fit's own
+# error, and is refused as "ill_conditioned" (a numerical caution), never
+# reported as a defect of the user's model. The claim is one-directional:
+# within the band, indefiniteness cannot be asserted; beyond it, "indefinite"
+# is the best available reading of a decisively negative eigenvalue. Changing
+# this constant is an escalation (RB, no-oracle), never a silent edit.
 axes_sigma_degenerate <- function(sigma) {
   if (!all(is.finite(sigma))) return("singular")
   ev <- eigen(sigma, symmetric = TRUE, only.values = TRUE)$values
   p <- nrow(sigma)
   floor_ <- sqrt(p * .Machine$double.eps / axes_degeneracy_tau)
-  if (ev[p] <= ev[1] * floor_) return("ill_conditioned")
+  if (ev[p] <= ev[1] * floor_) {
+    if (ev[p] < -ev[1] * sqrt(p * .Machine$double.eps)) return("indefinite")
+    return("ill_conditioned")
+  }
   NULL
 }
 

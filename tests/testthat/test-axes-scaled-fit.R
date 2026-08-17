@@ -383,6 +383,45 @@ test_that("AC1: the factor refuses rather than guessing when its inputs are wron
 })
 
 
+test_that("M90 AC1: a saturated model (df = 0) is refused as 'saturated', not 'indefinite'", {
+  # The deterministic saturated construction (RR18 BC4): p = 3, scales A/A/B
+  # with zeta1 fitted gives q = 6 = p(p+1)/2, so df = 0 and the cval line's
+  # division by df has no chi-square to scale. Before M90 this reached
+  # cval = Inf and reported "indefinite" -- a statement about the user's
+  # model that a saturated model never licenses. The guard sits after the
+  # two df-consistency guards (a df = 0 that does NOT match the derivative
+  # set must still refuse "df_mismatch") and before any matrix computation.
+  S <- matrix(c(1, .5, .3, .5, 1, .4, .3, .4, 1), 3L, 3L)
+  nm <- c("i1", "i2", "i3")
+  dimnames(S) <- list(nm, nm)
+  ang <- c(0, 0, 90)
+  scl <- c("A", "A", "B")
+
+  d <- axes_se_derivs(ang, scl, NULL, TRUE, FALSE)
+  expect_identical(length(d$mats), 6L)  # q = p(p+1)/2: saturated
+
+  expect_warning(
+    got <- axes_scaling_factor(S, nm, ang, scl,
+                               fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+                               df = 0, baseline_df = 3),
+    "could not be computed"
+  )
+  expect_identical(got$reason, "saturated")
+  expect_identical(got$scale, NA_real_)
+  expect_identical(got$baseline, NA_real_)
+
+  # Guard order: a zero df inconsistent with the derivative set is a
+  # df_mismatch, not a saturation -- the df-consistency guards run first.
+  pp <- probe_octant()
+  got <- suppressWarnings(
+    axes_scaling_factor(pp$sigma, pp$names, pp$item_angle, pp$scale,
+                        fit_zeta1 = TRUE, fit_zeta2 = FALSE,
+                        df = 0, baseline_df = nrow(pp$sigma) * (nrow(pp$sigma) - 1) / 2)
+  )
+  expect_identical(got$reason, "df_mismatch")
+})
+
+
 test_that("AC1: lavaan still forms rmsea, cfi and pvalue the way the scaler assumes", {
   skip_if_not_installed("lavaan")
   # The scaler does not re-derive lavaan's fit indices -- it recomputes them
@@ -1355,7 +1394,8 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
     # degeneracy, the SE helper refuses with the same literal.
     check_nested <- function(sig, what) {
       r <- m89_reasons(sig, pp, df, bdf, m$zeta1)
-      if (!is.null(r$sf) && r$sf %in% c("ill_conditioned", "singular")) {
+      if (!is.null(r$sf) &&
+          r$sf %in% c("ill_conditioned", "indefinite", "singular")) {
         expect_identical(
           r$se, r$sf,
           label = sprintf("%s: SE helper reason", what),
@@ -1394,15 +1434,16 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
 
     # One non-unit-diagonal indefinite matrix per map: indefiniteness is
     # metric-invariant (cov2cor() is a congruence; Sylvester's law of inertia
-    # preserves eigenvalue signs), so BOTH surfaces refuse it, same literal.
+    # preserves eigenvalue signs), so BOTH surfaces refuse it, same literal --
+    # since M90's partition, the literal that names the model defect.
     dd <- diag(seq(0.5, 2, length.out = p))
     ind <- dd %*% pp$sigma %*% dd
     dimnames(ind) <- dimnames(pp$sigma)
     ind[1L, 2L] <- ind[2L, 1L] <- 1.5 * sqrt(ind[1L, 1L] * ind[2L, 2L])
     r <- check_nested(ind, sprintf("p %d indefinite", p))
-    expect_identical(r$sf, "ill_conditioned",
+    expect_identical(r$sf, "indefinite",
                      label = sprintf("p %d indefinite, scaling surface", p))
-    expect_identical(r$se, "ill_conditioned",
+    expect_identical(r$se, "indefinite",
                      label = sprintf("p %d indefinite, SE helper", p))
 
     # One near-singular matrix per map (one item duplicated, plus a 1e-9 ridge
@@ -1418,6 +1459,53 @@ test_that("AC8: scaling-surface degeneracy refusals nest inside the SE helper's,
     expect_identical(r$se, "ill_conditioned",
                      label = sprintf("p %d near-singular, SE helper", p))
   }
+})
+
+
+test_that("M90 AC7: when the two SE arms disagree on the label, the cov2cor arm's literal is the one reported", {
+  # The partition is not congruence-invariant: cov2cor() preserves eigenvalue
+  # SIGNS (Sylvester) but moves the RATIO the partition tests. This probe is
+  # built to split the arms -- a rank-one indefinite matrix at 2x the band
+  # (cov2cor arm: "indefinite") congruence-inflated so the raw lambda_max
+  # explodes and the raw ratio falls inside the band (raw arm:
+  # "ill_conditioned"). Measured before the M90 arm-order inversion: the
+  # helper reported the raw arm's "ill_conditioned" while the scaling
+  # surface said "indefinite" -- the same-literal half of the nestedness
+  # contract dying in the dependent. The cov2cor arm is the arm
+  # axes_scaling_factor() prices, so consulting it first restores pointwise
+  # literal agreement wherever both surfaces refuse.
+  p <- 24L
+  t_ <- sqrt(p * .Machine$double.eps)
+  v <- rep(1 / sqrt(p), p)
+  S <- diag(p) - (1 + 2 * t_) * tcrossprod(v)
+  D <- diag(c(1e4, rep(1, p - 1L)))
+  Sr <- D %*% S %*% D
+  Sr <- (Sr + t(Sr)) / 2
+  nm <- sprintf("i%02d", seq_len(p))
+  dimnames(Sr) <- list(nm, nm)
+
+  # The split is real on this matrix: the two arms genuinely disagree.
+  expect_identical(axes_sigma_degenerate(stats::cov2cor(Sr)), "indefinite")
+  expect_identical(axes_sigma_degenerate(Sr), "ill_conditioned")
+
+  ang <- rep(c(0, 90, 180, 270), each = 6L)
+  scl <- rep(LETTERS[1:8], each = 3L)
+  se <- suppressWarnings(
+    axes_corrected_se(Sr, nm, ang, scl, n = 600,
+                      fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  expect_identical(se$reason, "indefinite")
+
+  # And the scaling surface agrees, so the nestedness contract holds with
+  # one literal on a matrix where only the arm order makes that true.
+  d <- axes_se_derivs(ang, scl, NULL, TRUE, FALSE)
+  sf <- suppressWarnings(
+    axes_scaling_factor(Sr, nm, ang, scl, fit_zeta1 = TRUE,
+                        fit_zeta2 = FALSE,
+                        df = p * (p + 1) / 2 - length(d$mats),
+                        baseline_df = p * (p - 1) / 2)
+  )
+  expect_identical(sf$reason, "indefinite")
 })
 
 
@@ -1517,6 +1605,95 @@ test_that("AC2/AC3: the committed exemplar B is refused by both surfaces at p = 
   )
   expect_identical(se$reason, "ill_conditioned")
   expect_identical(sf$reason, "ill_conditioned")
+})
+
+
+test_that("M90 AC5: criterion-accepted draws from the most cancellable recorded family never reach the backstop", {
+  # Smoke tier of the recorded AC5 search (work log: 30,000 accepted draws
+  # spanning p in {3, 8, 24} + adversarial hill-climbs, 0 reaches, nearest
+  # miss cval = +1.2e-5 at p = 3 / df = 1 -- the one map family whose cval
+  # approaches 0+). This seeded subset re-runs the most cancellable family:
+  # every criterion-accepted draw must COMPUTE (reason NULL, finite positive
+  # scale), i.e. never fall through to the backstop, whose literal on an
+  # accepted draw could only come from the cval branch.
+  set.seed(20260816)
+  ang <- c(0, 0, 90)
+  scl <- c("A", "A", "B")
+  nm <- c("i1", "i2", "i3")
+  n_acc <- 0L
+  for (i in 1:400) {
+    S <- stats::cov2cor(drop(stats::rWishart(1L, 4L, diag(3))))
+    if (!is.null(axes_sigma_degenerate(S))) next
+    n_acc <- n_acc + 1L
+    dimnames(S) <- list(nm, nm)
+    got <- axes_scaling_factor(S, nm, ang, scl,
+                               fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                               df = 1, baseline_df = 3)
+    expect_null(got$reason, label = sprintf("accepted draw %d computes", i))
+    expect_true(got$scale > 0, label = sprintf("accepted draw %d cval > 0", i))
+  }
+  expect_gt(n_acc, 100L)  # the smoke family actually exercised acceptance
+})
+
+
+test_that("M90 AC5: the one recorded negative-cval matrix is refused by the criterion, not the backstop", {
+  # Exemplar B is the one matrix on record measured to compute cval < 0 in
+  # doubles (true cval +0.0556, RR18), and the degeneracy criterion -- not
+  # the backstop -- is what refuses it. Asserted at the criterion itself, so
+  # the refusal's identity is pinned, not inferred from a shared literal.
+  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
+  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  fx <- readRDS(fp)
+  expect_identical(axes_sigma_degenerate(fx$S), "ill_conditioned")
+})
+
+
+test_that("M90 AC5: the backstop's own literal is 'ill_conditioned' (branch WIRING only; the criterion is mocked away)", {
+  # This mock proves the branch's wiring, never the condition that selects
+  # it (the M62 mock doctrine): the degeneracy criterion is stubbed to
+  # accept everything, so exemplar B -- whose double-precision cval is
+  # negative (-0.216) while its exact value is +0.0556 (RR18) -- flows past
+  # the door it is really refused at and lands in the final backstop. The
+  # unmocked path is pinned by the smoke test above (accepted draws never
+  # get here) and by the exemplar-B criterion assertion; this test pins the
+  # literal the backstop itself emits -- a literal the recorded search found
+  # no accepted input reaching (never "unreachable"; see the backstop
+  # comment). Under the stub the backstop is the only remaining site in this
+  # function that can emit this literal, so the assertion is site-exclusive.
+  fp <- test_path("..", "..", "cairn", "reviews", "rb18-counterexample-b.rds")
+  skip_if_not(file.exists(fp), "cairn/ fixture absent (installed package)")
+  fx <- readRDS(fp)
+  testthat::local_mocked_bindings(
+    axes_sigma_degenerate = function(sigma) NULL
+  )
+  expect_warning(
+    got <- axes_scaling_factor(fx$S, rownames(fx$S), as.numeric(fx$ia),
+                               c("A", "B", "C"),
+                               fit_zeta1 = FALSE, fit_zeta2 = FALSE,
+                               df = 1, baseline_df = 3),
+    "could not be computed"
+  )
+  expect_identical(got$reason, "ill_conditioned")
+  expect_identical(got$scale, NA_real_)
+})
+
+
+test_that("M90 AC7: an NA fitted diagonal refuses with exactly ONE warning on the SE surface (the hoist is load-bearing)", {
+  # The finiteness hoist exists so cov2cor() never runs on an NA/NaN
+  # diagonal: cov2cor() emits its own warning there, and the M71 contract is
+  # exactly one warning per refusal. Reverting the hoist alone would leave
+  # every literal correct and double the warning -- only this count sees it.
+  # (The sibling surface's count is pinned in its own test above.)
+  pp <- probe_octant()
+  sig <- pp$sigma
+  sig[4L, 4L] <- NA_real_
+  w <- testthat::capture_warnings(
+    got <- axes_corrected_se(sig, pp$names, pp$item_angle, pp$scale,
+                             n = 600, fit_zeta1 = TRUE, fit_zeta2 = FALSE)
+  )
+  expect_length(w, 1L)
+  expect_match(w, "could not be computed", fixed = TRUE)
+  expect_identical(got$reason, "singular")
 })
 
 
@@ -1630,6 +1807,86 @@ test_that("AC3: the floor discriminates its p factor at the threshold", {
   }
 })
 
+test_that("M90 AC2: within the refusal region, deep negativity says 'indefinite', roundoff-level says 'ill_conditioned'", {
+  # The two anchors, each named by construction and metric (M90 AC2). The
+  # nestedness-grid indefinite probe is deeply indefinite in BOTH metrics
+  # (cov2cor lambda_min = -0.5 at p = 24, measured at the replan audit), far
+  # past the convergence-noise band -lambda_max*sqrt(p*eps), so the criterion
+  # now names the model defect instead of hiding it under the numerical
+  # caution.
+  pp <- probe_octant()
+  p <- nrow(pp$sigma)
+  dd <- diag(seq(0.5, 2, length.out = p))
+  ind <- dd %*% pp$sigma %*% dd
+  dimnames(ind) <- dimnames(pp$sigma)
+  ind[1L, 2L] <- ind[2L, 1L] <- 1.5 * sqrt(ind[1L, 1L] * ind[2L, 2L])
+
+  R <- stats::cov2cor(ind)
+  evR <- eigen(R, symmetric = TRUE, only.values = TRUE)$values
+  expect_lt(evR[p], -0.4)  # the anchor is DEEP negativity, not roundoff
+  expect_identical(axes_sigma_degenerate(R), "indefinite")
+  # Indefiniteness is metric-invariant (Sylvester), and the raw matrix is
+  # also far past its own band -- the two arms agree on this probe.
+  expect_identical(axes_sigma_degenerate(ind), "indefinite")
+
+  # An EXACTLY singular matrix (duplicated item): its computed smallest
+  # eigenvalue is roundoff-negative (|lambda_min| ~ 1e-15, measured
+  # -9.32e-16 at the replan audit), inside the noise band -- a numerical
+  # caution, never a claim the user's model is indefinite.
+  sing <- pp$sigma
+  sing[2L, ] <- sing[1L, ]
+  sing[, 2L] <- sing[, 1L]
+  # The probe is unit-diagonal, so its cov2cor form is the same matrix --
+  # this call IS the criterion's cov2cor-metric evaluation, as AC2 labels it.
+  expect_true(isTRUE(all.equal(stats::cov2cor(sing), sing)))
+  evS <- eigen(sing, symmetric = TRUE, only.values = TRUE)$values
+  expect_lt(abs(evS[p]), 1e-13)
+  expect_identical(axes_sigma_degenerate(sing), "ill_conditioned")
+})
+
+
+test_that("M90 AC6: the partition flips exactly at -lambda_max*sqrt(p*eps), at two p, two scales, two forms", {
+  # Near-threshold probes on the PARTITION (the refusal floor has its own
+  # battery above): lambda_min at 0.5x and 2x the band, per p, at two
+  # lambda_max scales and two construction forms. Far-field anchors cannot
+  # detect a missing/squared p or a dropped lambda_max factor; these cells
+  # can, and the three mutants are each verified to redden against this
+  # battery (work log). p = 3 is excluded deliberately: there the 2x factor
+  # no longer separates the squared-p mutant.
+  set.seed(421)
+  for (p in c(24L, 8L)) {
+    t_ <- sqrt(p * .Machine$double.eps)
+    Q <- qr.Q(qr(matrix(stats::rnorm(p * p), p, p)))
+    for (L in c(1, 1e3)) {
+      for (m in c(0.5, 2)) {
+        want <- if (m > 1) "indefinite" else "ill_conditioned"
+
+        # Form 1: rank-one negative perturbation of L*I. Eigenvalues exactly
+        # L (multiplicity p-1) and -m*t_*L, so lambda_min/lambda_max = -m*t_.
+        v <- rep(1 / sqrt(p), p)
+        S1 <- L * (diag(p) - (1 + m * t_) * tcrossprod(v))
+        S1 <- (S1 + t(S1)) / 2
+        expect_identical(
+          axes_sigma_degenerate(S1), want,
+          label = sprintf("rank-one: p %d, L %g, %gx band", p, L, m)
+        )
+
+        # Form 2: eigen-recomposition with a spread spectrum under a random
+        # (seeded) orthogonal basis -- same lambda_min/lambda_max, different
+        # matrix form.
+        vals <- c(L, seq(L / 2, L / 10, length.out = p - 2L), -m * t_ * L)
+        S2 <- Q %*% diag(vals) %*% t(Q)
+        S2 <- (S2 + t(S2)) / 2
+        expect_identical(
+          axes_sigma_degenerate(S2), want,
+          label = sprintf("recomposed: p %d, L %g, %gx band", p, L, m)
+        )
+      }
+    }
+  }
+})
+
+
 test_that("the non-inflation (indefinite) form is refused by both surfaces with one literal", {
   pp <- probe_octant()
   p <- nrow(pp$sigma)
@@ -1653,12 +1910,15 @@ test_that("the non-inflation (indefinite) form is refused by both surfaces with 
   expect_false(is.character(raw))
   expect_true(all(is.finite(raw$naive)))
 
-  # Both consumers refuse it under the stated criterion (the matrix is
-  # indefinite: its smallest eigenvalue is negative), naming the shared
-  # literal -- before M89 both fell to the emergent "indefinite"/NaN door.
+  # Both consumers refuse it under the stated criterion, naming the shared
+  # literal. The matrix is DEEPLY indefinite (lambda_min = -0.382 raw, -38.3
+  # in the correlation metric -- measured, far past the noise band), so since
+  # M90's partition the criterion says "indefinite" for the honest reason;
+  # before M89 both fell to an emergent "indefinite"/NaN door, and between
+  # M89 and M90 the criterion hid the model defect under "ill_conditioned".
   r <- m89_reasons(sig, pp, df, bdf)
-  expect_identical(r$se, "ill_conditioned", label = "near-zero d44, SE surface")
-  expect_identical(r$sf, "ill_conditioned",
+  expect_identical(r$se, "indefinite", label = "near-zero d44, SE surface")
+  expect_identical(r$sf, "indefinite",
                    label = "near-zero d44, scaling surface")
 })
 

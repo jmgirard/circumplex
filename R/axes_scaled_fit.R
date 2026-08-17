@@ -100,6 +100,14 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   if (!isTRUE(p * (p - 1) / 2 == baseline_df)) {
     return(na_out("baseline_df_mismatch"))
   }
+  # A saturated model has no chi-square to scale: T = 0 on 0 degrees of
+  # freedom, and the cval line below divides by df. Before M90 this reached
+  # cval = Inf and fell out of the final refusal as "indefinite" -- a claim
+  # about the user's model that df = 0 never licenses. Checked AFTER the two
+  # df-consistency guards (a df = 0 that does not match the derivative set is
+  # a df_mismatch, not a saturation) and before any matrix computation; this
+  # guard is also what keeps df nonzero at the cval division (M90 AC1).
+  if (df == 0) return(na_out("saturated"))
   # `na.rm = TRUE` is load-bearing, not defensive. Without it a single NA or
   # NaN on the fitted diagonal makes the predicate NA and `if (NA)` ERRORS with
   # "missing value where TRUE/FALSE needed" -- in place of the named-reason NA
@@ -233,8 +241,33 @@ axes_scaling_factor <- function(sigma, item_names, item_angle_deg, item_scale,
   # matrix is a grossly inconsistent estimate of it.
   cb <- sum((1 - rho^2)^2) / baseline_df
 
+  # Defensive backstop, not a diagnosis (M90 AC3/AC5). Four arms:
+  #   cb <= 0 and !is.finite(cb): analytically unreachable -- cb =
+  #     sum((1 - rho^2)^2) / baseline_df over finite rho (sigma passed the
+  #     finiteness gate above), so cb is finite and >= 0, with equality only
+  #     if every |rho| = 1, a matrix the degeneracy criterion refuses first.
+  #     baseline_df > 0 whenever this line runs: the baseline_df guard pins
+  #     baseline_df = p(p - 1)/2, which is 0 only at p = 1 -- where the
+  #     information matrix (q x q from a single moment, rank <= 1 < q) is
+  #     singular, so acov's solve refuses "unidentified" before this line
+  #     (measured at the M90 round-2 review).
+  #   cval <= 0 and !is.finite(cval): tr(U Gamma) >= 0 in exact arithmetic
+  #     (U is the psd projection residual of V, Gamma_R is psd) and df is
+  #     nonzero past the saturation guard, so a nonpositive or non-finite cval here
+  #     is double-precision cancellation, never evidence about the user's
+  #     model -- which is why this door stopped saying "indefinite" at M90.
+  #     The criterion's tau floor caps the cancellation error a computed
+  #     cval can carry (RR18), and the one matrix measured to produce
+  #     cval < 0 in doubles (exemplar B, true cval +0.0556) is refused
+  #     upstream. Recorded search (M90 AC5, work log): 30,000
+  #     criterion-accepted draws spanning p in {3, 8, 24} plus adversarial
+  #     hill-climbs reached this branch 0 times; the nearest miss, an
+  #     adversarial p = 3 / df = 1 draw at cval = +1.2e-5, still computes.
+  #     Retained because "not reached by the search" is not "unreachable":
+  #     the p = 3 / df = 1 family approaches 0+ continuously, so a deeper
+  #     adversary could land inside the cancellation noise.
   if (!is.finite(cval) || !is.finite(cb) || cval <= 0 || cb <= 0) {
-    return(na_out("indefinite"))
+    return(na_out("ill_conditioned"))
   }
   list(scale = cval, baseline = cb, reason = NULL)
 }
