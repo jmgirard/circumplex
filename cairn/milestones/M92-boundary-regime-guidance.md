@@ -5,7 +5,7 @@
 - **Depends on:** —
 - **Driving RR:** —
 - **Principles touched:** GP5
-- **Branch/PR:** `m92-boundary-regime-guidance`
+- **Branch/PR:** `m92-boundary-regime-guidance` / https://github.com/jmgirard/circumplex/pull/120
 
 ## Goal
 
@@ -215,3 +215,15 @@ advising a comparison against *more* constrained variants while describing a
 constraint being relaxed.
 
 ## Review
+
+### Evidence
+
+- **AC1** — `cpm_marker_labels()` returns 5 labels; a scoped extraction of the subsection (heading to next same-level heading, fenced code excluded) contains all 5. Guard `test-cpm-boundary-guidance.R` passes; teeth shown at implement by deleting one label's bullet (2 failures, restored to 0).
+- **AC2** — the section's `boundary_demo` chunk is executed by the guard, which reproduces the fit from the chunk source and asserts the fired set equals `Heywood communality`, `small correlation-function weight`, `ill-conditioned Hessian`; each fired label is also asserted present in the section text. Rendered vignette contains the printed line "near a parameter boundary or weakly identified".
+- **AC3** — the "What a fired marker does and does not tell you" paragraph scopes the record to analytic intervals from a correlation matrix and to coverage rather than bias, then states an interval consequence for each of the three families; a following paragraph names four things the record does not support (no bias measurement; analytic path only, so unvalidated on the bootstrap default; removed-harmonic a predictive null; near-tied optima thin evidence from one configuration).
+- **AC4** — ledger in `## Decisions` carries 36 rows against the 36 sentence units the section splits into, each with a verdict and anchor. Three claims were repaired during the walk rather than ledgered as written; the ledger records which.
+- **AC5** — four numbered steps (locate / re-fit / report / keep using what holds), the last a closed list of what stays and what does not. None of the four restates the shipped "Prefer the bootstrap (the raw-data default) when you have raw data" sentence, which remains in its original paragraph.
+- **AC6** — (a) guard asserts, against the vignette's own executed `cpm` chunk, reference PA fixed at 90°, largest departure 65.8° at LM, the eight circular adjacent gaps min 18.8° / max 78.7°, and the estimated circular order a rotation of the theoretical order; the paragraph's wording is ledgered. Teeth shown by refitting the example on a 400-row subset (8 failures). (b) the bullet is now three lines pointing at the new subsection; its general-factor claim is carried forward into the section and ledgered (row 6).
+- **AC7** — `?summary.circumplex_cpm` names the section (1 match in `man/summary.circumplex_cpm.Rd`); guard asserts the named heading exists in the vignette, teeth shown by removing the pointer (5 failures). NEWS.md has one Documentation entry. Full check result recorded below.
+
+### Consistency gate
